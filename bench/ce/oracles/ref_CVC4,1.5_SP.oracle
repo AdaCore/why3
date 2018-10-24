@@ -1,0 +1,112 @@
+Strongest Postcondition
+bench/ce/ref.mlw M VC test_post: Timeout or Unknown
+Counter-example model:File ref.mlw:
+Line 6:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "1" }
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 7:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "1" }
+y at 'Old, [[@introduced], [@model_trace:y], [@at:'Old],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+
+bench/ce/ref.mlw M VC test_post2: Timeout or Unknown
+Counter-example model:File ref.mlw:
+Line 11:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "43" }
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 13:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "43" }
+y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
+"val" : "42" }
+y at 'Old, [[@introduced], [@model_trace:y], [@at:'Old],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+
+bench/ce/ref.mlw M VC incr: Timeout or Unknown
+Counter-example model:File ref.mlw:
+Line 21:
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 23:
+x23, [[@introduced], [@model_trace:x23],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 24:
+x23, [[@introduced], [@model_trace:x23]] = {"type" : "Integer" ,
+"val" : "2" }
+x23 at 'Old, [[@introduced], [@at:'Old], [@model_trace:x23],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+y at 'Old, [[@introduced], [@model_trace:y], [@at:'Old],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/ref.mlw M VC test_loop: Timeout or Unknown
+Counter-example model:File ref.mlw:
+Line 21:
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "-2" }
+Line 31:
+x, [[@introduced], [@model_trace:x], [@at:'Old:loc:location],
+[@at:L:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 38:
+x at L, [[@introduced], [@model_trace:x], [@at:L],
+[@at:L:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+x at M, [[@introduced], [@model_trace:x], [@at:M],
+[@at:M:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "0" }
+
+bench/ce/ref.mlw M VC test_loop: Valid
+bench/ce/ref.mlw M VC test_loop: Timeout or Unknown
+Counter-example model:File ref.mlw:
+Line 21:
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "-2" }
+Line 31:
+x, [[@introduced], [@model_trace:x], [@at:'Old:loc:location],
+[@at:L:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 38:
+x at L, [[@introduced], [@model_trace:x], [@at:L],
+[@at:L:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+x at M, [[@introduced], [@model_trace:x], [@at:M],
+[@at:M:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "0" }
+
+bench/ce/ref.mlw M VC test_loop: Timeout or Unknown
+Counter-example model:File ref.mlw:
+Line 21:
+y, [[@introduced], [@model_trace:y],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "-3" }
+Line 31:
+x, [[@introduced], [@model_trace:x], [@at:'Old:loc:location],
+[@at:L:loc:location],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 32:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "0" }
+x at 'Old, [[@introduced], [@model_trace:x], [@at:'Old],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+

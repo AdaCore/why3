@@ -1,0 +1,11 @@
+Weakest Precondition
+bench/ce/simple_array.mlw ModelArray t1: Unknown (sat)
+Counter-example model:File simple_array.mlw:
+Line 5:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "0" }
+t, [[@introduced], [@model_trace:t]] = {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "43" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+
