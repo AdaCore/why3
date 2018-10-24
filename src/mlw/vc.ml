@@ -1513,15 +1513,28 @@ and wp_expr kn k q = match k with
       let wp, _, _ = sp_expr kn k Mint.empty Mpv.empty in wp
   | Ktag ((Push _|WP), _) -> assert false (* cannot happen *)
 
+let simp_cast_projections env t =
+  let rec fn t = match t.t_node with
+  | Tapp(ls, [{t_node = Tconst (Number.ConstInt c);
+               t_ty = Some {ty_node = Tyapp (ts, _)}}])
+       when is_range_type_def ts.ts_def ->
+     (* t'int (c:t) -> c *)
+     if ls_equal ls (int_of_range env ts)
+     then t_const (Number.ConstInt c) ty_int
+     else t
+  | _ -> t_map fn t in
+  t_map fn t
+
 (** VCgen *)
 
-let vc_kode {known_map = kn} vc_wp k =
+let vc_kode ({known_map = kn} as env) vc_wp k =
   if Debug.test_flag debug_vc then
     Format.eprintf "K @[%a@]@\n" k_print k;
   let k = reflow vc_wp k in
   if Debug.test_flag debug_reflow then
     Format.eprintf "R @[%a@]@\n" k_print k;
-  wp_expr kn k Mint.empty
+  let vc = wp_expr kn k Mint.empty in
+  simp_cast_projections env vc
 
 let vc_fun env vc_wp cty e =
   vc_kode env vc_wp (k_fun env Mls.empty cty e)
