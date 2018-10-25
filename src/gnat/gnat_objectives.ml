@@ -534,8 +534,16 @@ let iter_main_goals s fu =
     Hstr.fold (fun _ (x:Session_itp.file) (acc: Session_itp.theory list) ->
                         (Session_itp.file_theories x) @ acc)
     files [] in
+  (* We filter detached goals (they don't have task) *)
+  let filter_detached goal =
+    let goal = Session_itp.APn goal in
+    not (Session_itp.is_detached s goal)
+  in
   let main_goals =
-    List.fold_left (fun acc th -> (Session_itp.theory_goals th) @ acc) [] theories in
+    List.fold_left (fun acc th ->
+        List.filter filter_detached (Session_itp.theory_goals th) @ acc)
+      [] theories
+  in
   List.iter fu main_goals
 
 exception Prover_Found of Whyconf.prover
