@@ -83,6 +83,12 @@ let debug_sp = Debug.register_flag "vc_sp"
   ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification."
 let () = Debug.set_flag debug_sp
 
+(* TODO we may want to revert this at some point *)
+let debug_useless_at = Debug.register_flag "ignore_useless_at"
+  ~desc:"Remove@ warning@ for@ useless@ at/old."
+let () = Debug.set_flag debug_useless_at
+
+
 (* Disable warnings for unused variables *)
 let () = Debug.set_flag Dterm.debug_ignore_unused_var
 
