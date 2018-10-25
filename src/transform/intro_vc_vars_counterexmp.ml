@@ -22,9 +22,6 @@ let meta_vc_location =
   Theory.register_meta_excl "vc_location" [Theory.MTstring]
   ~desc:"Location@ of@ the@ term@ that@ triggers@ vc@ in@ the@ form@ file:line:col."
 
-let model_trace_prefix = "model_trace:"
-  (* The term tagged with "model_trace:name" will be in counterexample with name "name" *)
-
 (* Information about the term that triggers VC.  *)
 type vc_term_info = {
   vc_inside : bool;
@@ -34,10 +31,6 @@ type vc_term_info = {
   vc_pre_or_post : bool;
   (* true if VC was generated for precondition or postcondition *)
 }
-
-let get_attr attrs prefix =
-  let check l = Strings.has_prefix prefix l.attr_string in
-  Sattr.choose (Sattr.filter check attrs)
 
 let is_model_vc_attr l =
   attr_equal l model_vc_attr || attr_equal l model_vc_post_attr
@@ -68,7 +61,7 @@ let add_old attr_str =
     else attr_str
   with Not_found -> attr_str ^ "@old"
 
-let model_trace_for_postcondition ~attrs =
+let model_trace_for_postcondition ~attrs trace_attr =
   (* Modifies the  model_trace attribute of a term in the postcondition:
      - if term corresponds to the initial value of a function
      parameter, model_trace attribute will have postfix @old
@@ -76,18 +69,14 @@ let model_trace_for_postcondition ~attrs =
      Returns attrs with model_trace attribute modified if there
      exist model_trace attribute in attrs, attrs otherwise.
   *)
-  try
-    let trace_attr = get_attr attrs model_trace_prefix in
-    let attr_str = add_old trace_attr.attr_string in
-    if attr_str = trace_attr.attr_string then
-      attrs
-    else
-      let other_attrs = Sattr.remove trace_attr attrs in
-      Sattr.add
-        (Ident.create_attribute attr_str)
-        other_attrs
-  with Not_found ->
+  let attr_str = add_old trace_attr.attr_string in
+  if attr_str = trace_attr.attr_string then
     attrs
+  else
+    let other_attrs = Sattr.remove trace_attr attrs in
+    Sattr.add
+      (Ident.create_attribute attr_str)
+      other_attrs
 
 (* Preid table necessary to avoid duplication of *_vc_constant *)
 module Hprid = Exthtbl.Make (struct
@@ -95,6 +84,14 @@ module Hprid = Exthtbl.Make (struct
   let equal x y = x.pre_name = y.pre_name && Sattr.equal x.pre_attrs y.pre_attrs
   let hash p = Exthtbl.hash p
 end)
+
+let same_line_loc loc1 loc2 =
+  match loc1, loc2 with
+  | Some loc1, Some loc2 ->
+      let (f1, l1, _, _) = Loc.get loc1 in
+      let (f2, l2, _, _) = Loc.get loc2 in
+      f1 = f2 && l1 = l2
+  | _ -> false
 
 (*  Used to generate duplicate vc_constant and axioms for counterex generation.
     This function is always called when the term is in negative position or
@@ -118,36 +115,46 @@ let rec do_intro info vc_loc vc_map vc_var t =
     if info.vc_inside then begin
       match info.vc_loc with
       | None -> []
-      | Some loc ->
+      | Some loc when not (same_line_loc info.vc_loc ls.id_loc) ->
           (* variable inside the term T that triggers VC. If the variable
              should be in counterexample, introduce new constant in location
              loc with all attributes necessary for collecting it for
              counterexample and make it equal to the variable *)
-          if Ident.has_a_model_attr ls then
-            let const_attr = if info.vc_pre_or_post then
-              model_trace_for_postcondition ~attrs:ls.id_attrs
-            else
-              ls.id_attrs in
-            let const_name = ls.id_string^"_vc_constant" in
-            let axiom_name = ls.id_string^"_vc_axiom" in
-            (* Create a new id here to check the couple name, location. *)
-            let id_new = Ident.id_user ~attrs:const_attr const_name loc in
-            (* The following check is used to avoid duplication of
-               *_vc_constant_n.  We keep track of the preids that have already
-               been duplicated in vc_map.  Note that we need to do it before
-               these preid are casted to lsymbol (by Term.create_lsymbol)
-               because those integrates a unique hash that would make identical
-               preid different lsymbol *)
-            if (Hprid.mem vc_map id_new) then
-              []
-            else
-              begin
-                Hprid.add vc_map id_new true;
-                intro_const_equal_to_term
-                  ~term:t ~id_new:id_new ~axiom_name
-              end
-          else
-            []
+          begin match Ident.get_model_trace_attr ~attrs:ls.id_attrs with
+          | tr_attr ->
+              let const_attr =
+                if info.vc_pre_or_post then
+                  model_trace_for_postcondition ~attrs:ls.id_attrs tr_attr
+                else
+                  ls.id_attrs
+              in
+              let const_name = ls.id_string^"_vc_constant" in
+              let axiom_name = ls.id_string^"_vc_axiom" in
+              let labels_attr =
+                Sattr.filter (fun x ->
+                    Strings.has_prefix "at:" x.attr_string)
+                  t.t_attrs
+              in
+              let const_attr = Sattr.union const_attr labels_attr in
+              (* Create a new id here to check the couple name, location. *)
+              let id_new = Ident.id_user ~attrs:const_attr const_name loc in
+              (* The following check is used to avoid duplication of
+                 *_vc_constant_n.  We keep track of the preids that have already
+                 been duplicated in vc_map.  Note that we need to do it before
+                 these preid are casted to lsymbol (by Term.create_lsymbol)
+                 because those integrates a unique hash that would make
+                 identical preid different lsymbol *)
+              if (Hprid.mem vc_map id_new) then
+                []
+              else
+                begin
+                  Hprid.add vc_map id_new true;
+                  intro_const_equal_to_term
+                    ~term:t ~id_new:id_new ~axiom_name
+                end
+          | exception Not_found -> []
+          end
+      | _ -> []
     end
     else [] in
   match t.t_node with

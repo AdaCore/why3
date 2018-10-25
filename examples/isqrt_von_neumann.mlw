@@ -47,7 +47,7 @@ module VonNeumann16
     let ghost bits_g = ref (0x80:t) in   (* 2^{m-1} *)
     let ghost res_g = ref (0:t) in     (* res / 2^m *)
     while not (eq !bits (0:t)) do
-      variant { t'int !bits }
+      variant { !bits }
       (* 0 <= m <= 8 *)
       invariant { ule !m (8:t) }
       (* bits_g = 2^{m-1} ou 0 si m=0 *)
@@ -94,9 +94,7 @@ module VonNeumann16
     done;
     !res
 
-
 end
-
 
 
 module VonNeumann32
@@ -123,7 +121,7 @@ module VonNeumann32
     let ghost bits_g = ref (0x8000:t) in   (* 2^{m-1} *)
     let ghost res_g = ref (0:t) in     (* res / 2^m *)
     while not (eq !bits (0:t)) do
-      variant { t'int !bits }
+      variant { !bits }
       (* 0 <= m <= 16 *)
       invariant { ule !m (16:t) }
       (* bits_g = 2^{m-1} ou 0 si m=0 *)
@@ -170,7 +168,6 @@ module VonNeumann32
     done;
     !res
 
-
 end
 
 
@@ -198,7 +195,7 @@ module VonNeumann64
     let ghost bits_g = ref (0x8000_0000:t) in   (* 2^{m-1} *)
     let ghost res_g = ref (0:t) in     (* res / 2^m *)
     while not (eq !bits (0:t)) do
-      variant { t'int !bits }
+      variant { !bits }
       (* 0 <= m <= 32 *)
       invariant { ule !m (32:t) }
       (* bits_g = 2^{m-1} or 0 if m=0 *)
@@ -246,6 +243,5 @@ module VonNeumann64
     assert { !m = (0:t) };
     assert { !bits = (0:t) };
     !res
-
 
 end

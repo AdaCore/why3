@@ -192,7 +192,7 @@ let report_messages c obj =
         match unproved_pa with
         | Some { Session_itp.proof_state =
                    Some {Call_provers.pr_answer =
-                         Call_provers.Unknown (_, Some Call_provers.Resourceout)}} ->
+                         Call_provers.StepLimitExceeded}} ->
             (* Resource limit was hit, the model is not useful *)
             None
         | Some { Session_itp.proof_state =

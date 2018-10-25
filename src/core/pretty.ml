@@ -53,6 +53,13 @@ module type Printer = sig
     val print_ty : formatter -> ty -> unit            (* type *)
     val print_vsty : formatter -> vsymbol -> unit     (* variable : type *)
 
+    val print_ts_qualified : formatter -> tysymbol -> unit
+    val print_ls_qualified : formatter -> lsymbol -> unit
+    val print_cs_qualified : formatter -> lsymbol -> unit
+    val print_pr_qualified : formatter -> prsymbol -> unit
+    val print_th_qualified : formatter -> theory -> unit
+    val print_ty_qualified : formatter -> ty -> unit
+
     val print_quant : formatter -> quant -> unit      (* quantifier *)
     val print_binop : asym:bool -> formatter -> binop -> unit (* binary operator *)
     val print_pat : formatter -> pattern -> unit      (* pattern *)
@@ -86,9 +93,7 @@ module type Printer = sig
 
   end
 
-let debug_print_attrs =
-  Debug.register_info_flag
-    "print_attributes"
+let debug_print_attrs = Debug.register_info_flag "print_attributes"
     ~desc:"Print@ attributes@ of@ identifiers@ and@ expressions."
 
 let debug_print_locs = Debug.register_info_flag "print_locs"
@@ -96,6 +101,10 @@ let debug_print_locs = Debug.register_info_flag "print_locs"
 
 let debug_print_coercions = Debug.register_info_flag "print_coercions"
   ~desc:"Print@ coercions@ in@ logical@ formulas."
+
+(* always print qualified?
+let debug_print_qualifs = Debug.register_info_flag "print_qualifs"
+  ~desc:"Print@ qualifiers@ of@ identifiers@ in@ error@ messages."*)
 
 let create sprinter aprinter tprinter pprinter do_forget_all =
   (module (struct
@@ -154,31 +163,74 @@ let print_ls fmt ls =
 let print_pr fmt pr =
   Ident.print_decoded fmt (id_unique pprinter pr.pr_name)
 
+let print_qualified decode fmt id =
+(* if Debug.test_noflag debug_print_qualifs then raise Not_found; *)
+  let dot fmt () =
+    pp_print_char fmt '.'; pp_print_cut fmt () in
+  let str fmt s =
+    if String.contains s ' ' || String.contains s '.' then begin
+      pp_print_char fmt '"'; pp_print_string fmt s; pp_print_char fmt '"'
+    end else pp_print_string fmt s;
+    dot fmt () in
+  let lp, tn, qn = Theory.restore_path id (* raises Not_found *) in
+  let qn = match lp with
+    | "why3"::_ -> if qn = [] then [tn] (* theory *) else qn
+    | _ -> print_list Pp.nothing str fmt lp; tn::qn in
+  if decode then match List.rev qn with
+    | [sn] ->
+        Ident.print_decoded fmt sn
+    | sn::qn ->
+        print_list dot pp_print_string fmt (List.rev qn); dot fmt ();
+        Ident.print_decoded fmt sn
+    | [] -> ()
+  else
+    print_list dot pp_print_string fmt qn
+
+let print_th_qualified fmt th =
+  try print_qualified false fmt th.th_name with Not_found -> print_th fmt th
+
+let print_ts_qualified fmt ts =
+  if ts_equal ts ts_func then pp_print_string fmt "(->)" else
+  try print_qualified false fmt ts.ts_name with Not_found -> print_ts fmt ts
+
+let print_cs_qualified fmt ls =
+  try print_qualified false fmt ls.ls_name with Not_found -> print_cs fmt ls
+
+let print_ls_qualified fmt ls =
+  try print_qualified true fmt ls.ls_name with Not_found -> print_ls fmt ls
+
+let print_pr_qualified fmt pr =
+  try print_qualified true fmt pr.pr_name with Not_found -> print_pr fmt pr
+
 (** Types *)
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let rec print_ty_node pri fmt ty = match ty.ty_node with
+let rec print_ty_node q pri fmt ty = match ty.ty_node with
   | Tyvar v -> print_tv fmt v
   | Tyapp (ts, [t1;t2]) when ts_equal ts Ty.ts_func ->
       fprintf fmt (protect_on (pri > 0) "%a@ ->@ %a")
-        (print_ty_node 1) t1 (print_ty_node 0) t2
+        (print_ty_node q 1) t1 (print_ty_node q 0) t2
   | Tyapp (ts, []) when is_ts_tuple ts ->
       fprintf fmt "unit"
   | Tyapp (ts, tl) when is_ts_tuple ts ->
-      fprintf fmt "(%a)" (print_list comma (print_ty_node 0)) tl
-  | Tyapp (ts, []) -> print_ts fmt ts
+      fprintf fmt "(%a)" (print_list comma (print_ty_node q 0)) tl
+  | Tyapp (ts, []) ->
+      if q then print_ts_qualified fmt ts else print_ts fmt ts
   | Tyapp (ts, tl) -> fprintf fmt (protect_on (pri > 1) "%a@ %a")
-      print_ts ts (print_list space (print_ty_node 2)) tl
+      (if q then print_ts_qualified else print_ts) ts
+      (print_list space (print_ty_node q 2)) tl
 
-let print_ty fmt ty = print_ty_node 0 fmt ty
+let print_ty fmt ty = print_ty_node false 0 fmt ty
+
+let print_ty_qualified fmt ty = print_ty_node true 0 fmt ty
 
 let print_vsty fmt v =
   fprintf fmt "%a%a:@,%a" print_vs v
     print_id_attrs v.vs_name print_ty v.vs_ty
 
 let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
-let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node 2) ty
+let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node false 2) ty
 let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
 (* can the type of a value be derived from the type of the arguments? *)
@@ -592,40 +644,29 @@ let print_goal fmt d =
    | _ -> assert false
 *)
 
-let local_decls task symbmap =
-  let rec skip t = function
-    | { td_node = Use th } :: rest
-      when id_equal t.th_name th.th_name -> rest
-    | _ :: rest -> skip t rest
-    | [] -> []
-  in
-  let rec filter ((acc1,acc2) as acc) = function
-    | { td_node = Decl d } :: rest ->
-        let id = Sid.choose d.d_news in
-        (try filter acc (skip (Mid.find id symbmap) rest)
-         with Not_found ->
-              filter (acc1,d::acc2) rest)
-    | _ :: rest -> filter acc rest
-    | [] -> match acc1,acc2 with
-            | [], g::r -> List.rev r, [g]
-            | _ -> assert false
-  in
-  filter ([],[]) (task_tdecls task)
-
 let print_sequent fmt task =
   let ut = Task.used_symbols (Task.used_theories task) in
-  let (ld1,ld2) = local_decls task ut in
+  let ld = Task.local_decls task ut in
   let rec aux fmt l =
     match l with
       | [] -> ()
+      | [_] -> ()
       | d :: r ->
          fprintf fmt "@[%a@]@\n@\n" print_decl d;
          aux fmt r
   in
+  let rec last fmt l =
+    match l with
+      | [] -> ()
+      | [d] ->
+         fprintf fmt "@[%a@]@\n@\n" print_decl d
+      | _ :: r ->
+         last fmt r
+  in
   fprintf fmt "--------------------------- Local Context ---------------------------@\n@\n";
-  fprintf fmt "@[<v 0>%a@]" aux ld1;
+  fprintf fmt "@[<v 0>%a@]" aux ld;
   fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
-  fprintf fmt "@[<v 0>%a@]" aux ld2
+  fprintf fmt "@[<v 0>%a@]" last ld
 
 let sprinter = sprinter
 let aprinter = aprinter
@@ -654,7 +695,7 @@ let () = Exn_printer.register
   begin fun fmt exn -> match exn with
   | Ty.TypeMismatch (t1,t2) ->
       fprintf fmt "Type mismatch between %a and %a"
-        print_ty t1 print_ty t2
+        print_ty_qualified t1 print_ty_qualified t2
   | Ty.BadTypeArity ({ts_args = []} as ts, _) ->
       fprintf fmt "Type symbol %a expects no arguments" print_ts ts
   | Ty.BadTypeArity (ts, app_arg) ->
@@ -755,6 +796,6 @@ let () = Exn_printer.register
       fprintf fmt "Ident %a is already declared, with a different declaration"
         Ident.print_decoded s
   | Decl.NoTerminationProof ls ->
-      fprintf fmt "Cannot prove the termination of %a" print_ls ls
+      fprintf fmt "Cannot prove termination for %a" print_ls ls
   | _ -> raise exn
   end

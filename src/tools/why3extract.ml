@@ -71,7 +71,7 @@ let option_list = [
       " same as -D";
   "--recursive", Arg.Unit (fun () -> opt_rec_single := Recursive),
       " recursively extract all dependencies";
-  "--flat", Arg.Unit (fun x -> x),
+  "--flat", Arg.Unit (fun () -> opt_modu_flat := Flat),
       " perform a flat extraction (default option)";
   "--modular", Arg.Unit (fun () -> opt_modu_flat := Modular),
       " perform a modular extraction";

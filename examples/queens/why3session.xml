@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Coq" version="8.7.1" timelimit="0" steplimit="0" memlimit="0"/>
@@ -225,21 +226,24 @@
    <proof prover="10"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC t3.16.2" expl="VC for t3" proved="true">
-   <proof prover="10"><result status="valid" time="0.04"/></proof>
+   <proof prover="1"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC t3.16.3" expl="VC for t3" proved="true">
-   <proof prover="7"><result status="valid" time="0.02"/></proof>
-   </goal>
-   <goal name="VC t3.16.4" expl="VC for t3" proved="true">
    <proof prover="10"><result status="valid" time="0.04"/></proof>
    </goal>
+   <goal name="VC t3.16.4" expl="VC for t3" proved="true">
+   <proof prover="7"><result status="valid" time="0.02"/></proof>
+   </goal>
    <goal name="VC t3.16.5" expl="VC for t3" proved="true">
-   <proof prover="10"><result status="valid" time="0.03"/></proof>
+   <proof prover="10"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC t3.16.6" expl="VC for t3" proved="true">
    <proof prover="10"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC t3.16.7" expl="VC for t3" proved="true">
+   <proof prover="10"><result status="valid" time="0.03"/></proof>
+   </goal>
+   <goal name="VC t3.16.8" expl="VC for t3" proved="true">
    <proof prover="10"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>

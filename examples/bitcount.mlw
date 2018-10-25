@@ -368,7 +368,7 @@ module AsciiCode
     ensures  { eq_sub_bv result b zeros lastbit }
     ensures  { validAscii result }
     let c = count b in
-    let maskbit = lsl_check c (of_int 31) in
+    let maskbit = lsl_check c (31:t) in
     assert { bw_and b maskbit = zeros };
     assert { even (t'int c) ->
                not (nth_bv c zeros)

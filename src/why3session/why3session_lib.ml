@@ -78,7 +78,7 @@ let read_session fname =
   S.load_session project_dir
 
 let read_update_session ~allow_obsolete env config fname =
-  let session,use_shapes = read_session fname in
+  let session,shape_version = read_session fname in
 (*
   let ctxt = S.mk_update_context
     ~allow_obsolete_goals:allow_obsolete
@@ -90,7 +90,7 @@ let read_update_session ~allow_obsolete env config fname =
   let cont = Controller_itp.create_controller config env session in
   let found_obs, some_merge_miss =
     try
-      Controller_itp.reload_files cont ~use_shapes
+      Controller_itp.reload_files cont ~shape_version
     with
     | Controller_itp.Errors_list l ->
         List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;
@@ -164,7 +164,7 @@ the proof containing this prover are selected";
    Arg.Unit (fun () -> opt_status := Call_provers.Invalid::!opt_status),
    " filter the invalid goals";
    "--filter-unknown",
-   Arg.String (fun s -> opt_status := Call_provers.Unknown (s, None)::!opt_status),
+   Arg.String (fun s -> opt_status := Call_provers.Unknown s::!opt_status),
    " filter when the prover reports it can't determine if the task is valid";
    "--filter-failure",
    Arg.String (fun s -> opt_status := Call_provers.Failure s::!opt_status),

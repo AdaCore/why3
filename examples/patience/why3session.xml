@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../patience.mlw" proved="true">
@@ -73,9 +73,6 @@
  <proof prover="3"><result status="valid" time="0.01" steps="24"/></proof>
  </goal>
  <goal name="VC play_game" expl="VC for play_game" proved="true">
- <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
- </goal>
- <goal name="VC test" expl="VC for test" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
@@ -348,9 +345,6 @@
   <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="VC test" expl="VC for test" proved="true">
- <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
 </file>

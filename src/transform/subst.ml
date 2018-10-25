@@ -11,6 +11,7 @@
 
 open Term
 open Decl
+open Theory
 open Generic_arg_trans_utils
 open Args_wrapper
 
@@ -80,88 +81,94 @@ let _apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) : Task.task Trans.trans =
 
 
 let apply_subst ((prs,sigma) : (Spr.t * term Mls.t)) (tdl:Theory.tdecl list) : Task.task =
-  let rec aux tdl tuc postponed =
-    match tdl with
-    | [] -> assert false
-    | td :: rem ->
-       match td.Theory.td_node with
-       | Theory.Decl d ->
-          begin
-            match d.d_node with
-            | Dprop(Pgoal,pr,t) ->
-               begin match postponed with
-                     | [] ->
-                        let d = create_prop_decl Pgoal pr (subst_in_term sigma t) in
-                        let td = Theory.create_decl d in
-Task.add_tdecl tuc td
-                     | _ -> raise (Arg_trans "apply_subst failed")
-               end
-            | Dprop(_k,pr,_t) when Spr.mem pr prs ->
-               aux rem tuc postponed
-            | Dprop(k,pr,t) ->
-               let d = create_prop_decl k pr (subst_in_term sigma t) in
-               let td = Theory.create_decl d in
-               begin
-                 match Task.add_tdecl tuc td with
-                 | tuc ->
-                     aux rem tuc postponed
-                 | exception _ ->
-                   aux rem tuc (td::postponed)
-               end
-            | Dparam ls ->
-               if Mls.mem ls sigma then aux rem tuc postponed
-               else let tuc = Task.add_decl tuc d in
-                    aux (List.rev_append postponed rem) tuc []
+  let rec aux urg tdl tuc postponed =
+    match urg, tdl with
+    | td::urg, rem ->
+        begin
+          match Task.add_tdecl tuc td with
+          | tuc ->
+              begin
+                match td.td_node with
+                | Decl {d_node = Dprop _} ->
+                    aux urg rem tuc postponed
+                | Decl _ -> (* got new symbols: flush postponed *)
+                    aux (List.rev_append postponed urg) rem tuc []
+                | _ ->
+                    aux urg rem tuc postponed
+              end
+          | exception _ ->
+              aux urg rem tuc (td::postponed)
+        end
+    | [], ({td_node = Decl d} as td) :: rem ->
+        begin
+          match d.d_node with
+          | Dprop (Pgoal,pr,t) ->
+              if postponed <> [] then
+                raise (Arg_trans "apply_subst failed");
+              let t = subst_in_term sigma t in
+              let d = create_prop_decl Pgoal pr t in
+              Task.add_decl tuc d
+          | Dprop (_,pr,_) when Spr.mem pr prs ->
+              aux urg rem tuc postponed
+          | Dprop (k,pr,t) ->
+              let t = subst_in_term sigma t in
+              let d = create_prop_decl k pr t in
+              let td = Theory.create_decl d in
+              aux (td::urg) rem tuc postponed
+          | Dparam ls when Mls.mem ls sigma ->
+              aux urg rem tuc postponed
+          | Dparam _ ->
+              aux (td::urg) rem tuc postponed
           | Dlogic ld ->
-             let ld' =
-               List.fold_right
-                 (fun (ls,ld) acc ->
-                  if Mls.mem ls sigma then acc
-                  else (subst_in_def sigma ls ld)::acc)
-                 ld
-                 []
-             in
-             begin
-               match ld' with
-               | [] -> aux rem tuc postponed
-               | _ ->
-                  let d = Theory.create_decl (create_logic_decl ld') in
-                  begin
-                    match Task.add_tdecl tuc d with
-                    | tuc ->
-                        aux (List.rev_append postponed rem) tuc []
-                    | exception _ ->
-                                aux rem tuc (d::postponed)
-                  end
-             end
+              let ld' = List.fold_right (fun (ls,ld) acc ->
+                if Mls.mem ls sigma then acc else
+                  (subst_in_def sigma ls ld) :: acc) ld []
+              in
+              if ld' = [] then
+                aux urg rem tuc postponed
+              else begin
+                match create_logic_decl ld' with
+                | d ->
+                    let td = Theory.create_decl d in
+                    aux (td::urg) rem tuc postponed
+                | exception (NoTerminationProof _) ->
+                    let urg = List.fold_right (fun (ls,ld) urg ->
+                      let nm = ls.ls_name.Ident.id_string ^ "'def" in
+                      let pr = create_prsymbol (Ident.id_fresh nm) in
+                      let f = ls_defn_axiom ld in
+                      let d = create_prop_decl Paxiom pr f in
+                      Theory.create_decl d :: urg) ld' urg
+                    in
+                    let urg = List.fold_right (fun (ls,_) urg ->
+                      let d = create_param_decl ls in
+                      Theory.create_decl d :: urg) ld' urg
+                    in
+                    aux urg rem tuc postponed
+              end
           | Dind ((is: ind_sign), (ind_list: ind_decl list)) ->
-             let ind_list =
-               List.map (fun ((ls: lsymbol), (idl: (prsymbol * term) list)) ->
-                         let idl = List.map (fun (pr, t) -> (pr, subst_in_term sigma t)) idl in
-                         (ls, idl)) ind_list
-             in
-             let d = create_ind_decl is ind_list in
-             let td = Theory.create_decl d in
-             begin
-               try let tuc = Task.add_tdecl tuc td in
-                   aux (List.rev_append postponed rem) tuc []
-               with _ -> aux rem tuc (td::postponed)
-             end
+              let ind_list =
+                List.map (fun ((ls: lsymbol), (idl: (prsymbol * term) list)) ->
+                          let idl = List.map (fun (pr, t) ->
+                              (pr, subst_in_term sigma t)) idl in
+                          (ls, idl)) ind_list
+              in
+              let d = create_ind_decl is ind_list in
+              let td = Theory.create_decl d in
+              aux (td::urg) rem tuc postponed
           | Dtype _
           | Ddata _ ->
-             let tuc = Task.add_decl tuc d in
-             aux (List.rev_append postponed rem) tuc []
-
+              aux (td::urg) rem tuc postponed
         end
-     | _ -> aux rem (Task.add_tdecl tuc td) postponed
+    | [], td::rem ->
+        aux (td::urg) rem tuc postponed
+    | [], [] -> assert false
   in
-  aux tdl None []
+  aux [] tdl None []
 
 let rec occurs_in_term ls t =
   match t.t_node with
   | Tapp(ls',[]) when ls_equal ls' ls -> true
   | _ -> t_any (occurs_in_term ls) t
-
 
 (* [find_equalities filter t] searches in task [t] for equalities of
    the form constant = term or term = constant, where constant does
@@ -176,6 +183,18 @@ let rec occurs_in_term ls t =
    constant, the first one is considered.
  *)
 let find_equalities filter =
+  let valid ls =
+    ls.ls_args = [] && ls.ls_constr = 0 && ls.ls_value <> None &&
+    List.for_all Ty.ty_closed (Ty.oty_cons ls.ls_args ls.ls_value) &&
+    filter ls
+  in
+  let select ls t sigma =
+    let () = Debug.dprintf debug_subst "selected: %a -> %a@."
+                            Pretty.print_ls ls Pretty.print_term t in
+    let sigma' = Mls.add ls t Mls.empty in
+    let sigma = Mls.map (subst_in_term sigma') sigma in
+    Mls.add ls t sigma
+  in
   Trans.fold_decl
     (fun d ((prs,sigma) as acc) ->
      match d.d_node with
@@ -187,30 +206,20 @@ let find_equalities filter =
              begin
                try match t1.t_node with
                | Tapp (ls, []) when
-                      filter ls &&
+                      valid ls &&
                         not (Mls.mem ls sigma) ->
                   let t2' = subst_in_term sigma t2 in
                   if occurs_in_term ls t2' then raise Exit
-                  else
-                    let () = Debug.dprintf debug_subst "selected: %a -> %a@."
-                                           Pretty.print_ls ls Pretty.print_term t2' in
-                    let sigma' = Mls.add ls t2' Mls.empty in
-                    let sigma = Mls.map (subst_in_term sigma') sigma in
-                    (Spr.add pr prs, Mls.add ls t2' sigma)
+                  else (Spr.add pr prs, select ls t2' sigma)
                | _ -> raise Exit
                with Exit ->
                     match t2.t_node with
                     | Tapp (ls, []) when
-                           filter ls &&
+                           valid ls &&
                              not (Mls.mem ls sigma) ->
                        let t1' = subst_in_term sigma t1 in
                        if occurs_in_term ls t1' then acc
-                       else
-                         let () = Debug.dprintf debug_subst "selected: %a -> %a@."
-                                                Pretty.print_ls ls Pretty.print_term t1' in
-                         let sigma' = Mls.add ls t1' Mls.empty in
-                         let sigma = Mls.map (subst_in_term sigma') sigma in
-                         (Spr.add pr prs, Mls.add ls t1' sigma)
+                       else (Spr.add pr prs, select ls t1' sigma)
                     | _ -> acc
              end
           | _ -> acc
@@ -218,12 +227,11 @@ let find_equalities filter =
      | Dlogic ld ->
         List.fold_left
           (fun ((prs,sigma) as acc) (ls,ld) ->
-           if filter ls then
-             let vl, t = open_ls_defn ld in
-             if vl = [] && not (occurs_in_term ls t) then
-               let t = subst_in_term sigma t in
-               (prs, Mls.add ls t sigma)
-             else acc
+           if valid ls && not (Mls.mem ls sigma) then
+             let _, t = open_ls_defn ld in
+             let t' = subst_in_term sigma t in
+             if occurs_in_term ls t' then acc
+             else (prs, select ls t' sigma)
            else acc)
           acc
           ld
@@ -236,9 +244,11 @@ let get_decls =
 let apply_subst x t =
   apply_subst x (List.rev (Trans.apply get_decls t))
 
-let subst_all =
-  Trans.bind (find_equalities (fun _ -> true))
+let subst_filtered filter =
+  Trans.bind (find_equalities filter)
              (fun x -> Trans.store (apply_subst x))
+
+let subst_all = subst_filtered (fun _ -> true)
 
 let () =
   wrap_and_register ~desc:"substitutes with all equalities between a constant and a term"
@@ -253,8 +263,7 @@ let subst tl =
        | Tapp (ls, []) -> Sls.add ls acc
        | _ -> raise (Arg_trans "subst: %a is not a constant")) Sls.empty tl
   in
-  Trans.bind (find_equalities (fun ls -> Sls.mem ls to_subst))
-             (fun x -> Trans.store (apply_subst x))
+  subst_filtered (fun ls -> Sls.mem ls to_subst)
 
 let () =
   wrap_and_register ~desc:"substitutes with all equalities involving one of the given constants"

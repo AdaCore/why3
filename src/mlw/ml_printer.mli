@@ -22,7 +22,6 @@ val print_list2 : unit pp -> unit pp -> 'a pp -> 'b pp -> ('a list * 'b list) pp
 
 type info = private {
   info_syn          : syntax_map;
-  info_convert      : syntax_map;
   info_literal      : syntax_map;
   info_current_th   : Theory.theory;
   info_current_mo   : Pmodule.pmodule option;

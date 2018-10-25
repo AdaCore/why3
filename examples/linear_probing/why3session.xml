@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -13,16 +13,13 @@
  <goal name="VC neq" expl="VC for neq" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="VC dummy" expl="VC for dummy" proved="true">
- <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
 </theory>
 <theory name="LinearProbing" proved="true">
  <goal name="VC bucket" expl="VC for bucket" proved="true">
  <proof prover="6"><result status="valid" time="0.01" steps="13"/></proof>
  </goal>
  <goal name="NumOfDummy.VC numof_eq" expl="VC for numof_eq" proved="true">
- <proof prover="2"><result status="valid" time="3.57"/></proof>
+ <proof prover="2"><result status="valid" time="3.96"/></proof>
  </goal>
  <goal name="NumOfDummy.VC dummy_const" expl="VC for dummy_const" proved="true">
  <proof prover="6"><result status="valid" time="0.22" steps="356"/></proof>
@@ -54,9 +51,6 @@
  </goal>
  <goal name="VC clear" expl="VC for clear" proved="true">
  <proof prover="6"><result status="valid" time="0.07" steps="219"/></proof>
- </goal>
- <goal name="VC next" expl="VC for next" proved="true">
- <proof prover="6"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
  <goal name="VC find" expl="VC for find" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -352,7 +346,7 @@
  </transf>
  </goal>
  <goal name="VC copy" expl="VC for copy" proved="true">
- <proof prover="2"><result status="valid" time="2.03"/></proof>
+ <proof prover="2"><result status="valid" time="2.38"/></proof>
  </goal>
  <goal name="VC find_dummy" expl="VC for find_dummy" proved="true">
  <proof prover="6"><result status="valid" time="1.02" steps="1301"/></proof>
@@ -493,7 +487,7 @@
   <proof prover="6"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="VC delete.42" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.01" steps="1"/></proof>
+  <proof prover="6"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
   <goal name="VC delete.43" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.13"/></proof>
@@ -580,7 +574,7 @@
   </goal>
   <goal name="VC remove.25" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.16"/></proof>
-  <proof prover="3"><result status="valid" time="0.25"/></proof>
+  <proof prover="3"><result status="valid" time="0.46"/></proof>
   </goal>
  </transf>
  </goal>

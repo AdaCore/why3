@@ -57,21 +57,16 @@ let syntactic_transform transf =
   | Decl { d_node = Dlogic ((ls,_def)::[]) } -> Sls.add ls acc
   | _ -> acc) Sls.empty)
   (fun decl ->
-  Trans.on_meta Printer.meta_syntax_converter (fun metas_conv ->
   Trans.on_meta Printer.meta_syntax_logic (fun metas ->
     let symbols = List.fold_left (fun acc meta_arg ->
       match meta_arg with
       | [Theory.MAls ls; Theory.MAstr _; Theory.MAint _] -> Sls.add ls acc
-      | _ -> assert false) decl metas_conv in
-    let symbols = List.fold_left (fun acc meta_arg ->
-      match meta_arg with
-      | [Theory.MAls ls; Theory.MAstr _; Theory.MAint _] -> Sls.add ls acc
-      | _ -> assert false) symbols metas in
+      | _ -> assert false) decl metas in
     let keep ls =  Sls.exists (ls_equal ls) symbols in
     Trans.compose (transf keep)
       (Trans.decl (fun d -> match d.d_node with
            | Dparam l when not (keep l || l.ls_args = []) -> []
-           | _ -> [d]) None))))
+           | _ -> [d]) None)))
 
 let () =
   Trans.register_transform "eliminate_unknown_lsymbols"

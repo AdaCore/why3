@@ -1,0 +1,13 @@
+val partial random () : int
+val f (x:int) : unit
+
+use int.Int
+
+let main () =
+  let r = random () in
+  let s = random () in
+  let ghost x = random () in
+  f x;
+  f r;
+  f x;
+  r * s

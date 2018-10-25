@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -9,33 +9,7 @@
 <prover id="10" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../defunctionalization.mlw" proved="true">
-<theory name="Expr" proved="true">
- <goal name="VC p0" expl="VC for p0" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC p1" expl="VC for p1" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC p2" expl="VC for p2" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC p3" expl="VC for p3" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC p4" expl="VC for p4" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
-</theory>
 <theory name="DirectSem" proved="true">
- <goal name="VC eval_0" expl="VC for eval_0" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC interpret_0" expl="VC for interpret_0" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
- <goal name="VC test" expl="VC for test" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="1"/></proof>
- </goal>
  <goal name="eval_p3" proved="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
  <proof prover="6" memlimit="4000"><result status="valid" time="0.02"/></proof>
@@ -76,9 +50,6 @@
  <goal name="VC interpret_2" expl="VC for interpret_2" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
- <goal name="VC test" expl="VC for test" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="3"/></proof>
- </goal>
 </theory>
 <theory name="Defunctionalization2" proved="true">
  <goal name="VC continue_2" expl="VC for continue_2" proved="true">
@@ -99,9 +70,6 @@
  </goal>
  <goal name="VC interpret_2" expl="VC for interpret_2" proved="true">
  <proof prover="11"><result status="valid" time="0.00" steps="15"/></proof>
- </goal>
- <goal name="VC test" expl="VC for test" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>
 <theory name="SemWithError" proved="true">
@@ -221,16 +189,10 @@
  <goal name="VC interpret_4" expl="VC for interpret_4" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="40"/></proof>
  </goal>
- <goal name="VC test" expl="VC for test" proved="true">
- <proof prover="11"><result status="valid" time="0.01" steps="6"/></proof>
- </goal>
 </theory>
 <theory name="ReductionSemantics" proved="true">
  <goal name="VC contract" expl="VC for contract" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="44"/></proof>
- </goal>
- <goal name="VC recompose" expl="VC for recompose" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="VC recompose_values" expl="VC for recompose_values" proved="true">
  <proof prover="11"><result status="valid" time="0.04" steps="294"/></proof>
@@ -291,9 +253,6 @@
  <goal name="VC interpret" expl="VC for interpret" proved="true">
  <proof prover="11"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
- <goal name="VC test" expl="VC for test" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="5"/></proof>
- </goal>
 </theory>
 <theory name="RWithError" proved="true">
  <goal name="size_c_pos" proved="true">
@@ -317,9 +276,6 @@
  </goal>
  <goal name="VC interpret" expl="VC for interpret" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="9"/></proof>
- </goal>
- <goal name="VC test" expl="VC for test" proved="true">
- <proof prover="11"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
 </theory>
 </file>

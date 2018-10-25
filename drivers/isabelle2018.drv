@@ -1,0 +1,14 @@
+(* driver for Isabelle/HOL *)
+(* main author: Stefan Berghofer <stefan.berghofer@secunet.com> *)
+
+printer "isabelle"
+filename "%f_%t_%g.xml"
+
+transformation "inline_trivial"
+transformation "eliminate_builtin"
+
+import "isabelle-common.gen"
+import "isabelle-2018.gen"
+
+
+transformation "simplify_trivial_quantification_in_goal"

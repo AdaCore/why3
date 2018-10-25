@@ -32,7 +32,7 @@ lemma nth_eq: "0 \<le> i \<Longrightarrow> nat i < length xs \<Longrightarrow> n
   by (induct xs arbitrary: i) (auto simp add: nat_diff_distrib)
 
 why3_vc is_none_spec
-  by (simp add: is_none_def option.disc_eq_case(1))
+  by (simp add: is_none_def split: option.split)
 
 why3_end
 
@@ -77,7 +77,7 @@ next
 qed
 
 why3_vc is_none_spec
-  by (simp add: NthLength.is_none_def option.disc_eq_case(1))
+  by (simp add: is_none_def split: option.split)
 
 why3_end
 
@@ -87,7 +87,7 @@ section {* Head and tail *}
 why3_open "list/HdTl.xml"
 
 why3_vc is_none_spec
-  by (simp add: HdTl.is_none_def option.disc_eq_case(1))
+  by (simp add: is_none_def split: option.split)
 
 why3_end
 
@@ -113,7 +113,7 @@ why3_vc Nth0_head
   by (simp add: hd_def split: list.split)
 
 why3_vc is_none_spec
-  by (simp add: NthHdTl.is_none_def option.disc_eq_case(1))
+  by (simp add: is_none_def split: option.split)
 
 why3_end
 
@@ -163,7 +163,7 @@ next
 qed
 
 why3_vc is_none_spec
-  by (simp add: NthLengthAppend.is_none_def option.disc_eq_case(1))
+  by (simp add: is_none_def split: option.split)
 
 why3_end
 

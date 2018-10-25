@@ -118,7 +118,7 @@
 %BEGIN LATEX
 \begin{LARGE}
 %END LATEX
-  Version \whyversion{}, June 2018
+  Version \whyversion{}, October 2018
 %BEGIN LATEX
 \end{LARGE}
 %END LATEX
@@ -351,6 +351,49 @@ file describes other potential sources of incompatibility.
 \label{fig:syntax-1.0}
 \end{figure}
 
+Here are a few more semantic changes
+\begin{description}
+\item[Proving only partial correctness] In versions 0.xx of Why3, when
+  a program function is recursive but not given a variant, or contains
+  a while loop not given a variant, then it was assumed that the user
+  wants to prove partial correctness only. A warning was issued,
+  recommending to add an extra \verb|diverges| clause to that
+  function's contract. It was also possible to disable that warning by
+  adding the label \verb|"W:diverges:N"| to the function's
+  name. Version 1.00 of Why3 is more aggressively requiring the user
+  to prove the termination of functions which are not given the
+  \verb|diverges| clause, and the previous warning is now an
+  error. The possibility of proving only partial correctness is now
+  given on a more fine-grain basis: any expression for which one wants
+  to prove partial correctness only, must by annotated with the
+  attribute \verb|[@vc:divergent]|.
+
+  In other words, if one was using the following structure in Why3 0.xx:
+  \begin{lstlisting}
+    let f "W:diverges:N" <parameters> <contract> = <body>
+  \end{lstlisting}
+  then in 1.00 it should be written as
+  \begin{lstlisting}
+    let f <parameters> <contract> = [@vc:divergent] <body>
+  \end{lstlisting}
+\item[Semantics of the \texttt{any} construct] The \verb|any| construct
+  in Why3 0.xx was introducing an arbitrary value satisfying the
+  associated post-condition. In some sense, this construct was
+  introducing some form of an axiom stating that such a value
+  exists. In Why3 1.00, it is now mandatory to prove the existence of
+  such a value, and a VC is generated for that purpose.
+
+  To obtain the effect of the former semantics of the \verb|any| construct, one should use instead a local \verb|val| function. In other words, if one was using the following structure in Why3 0.xx:
+  \begin{lstlisting}
+    any t ensures { P }
+  \end{lstlisting}
+  then in 1.00 it should be written as
+  \begin{lstlisting}
+    val x:t ensures { P } in x
+  \end{lstlisting}
+
+
+\end{description}
 \section{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
 
 The syntax of \whyml programs changed in release 0.80.

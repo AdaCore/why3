@@ -12,15 +12,6 @@
 
 (* Handling of attributes *)
 
-val model_trace_regexp: Str.regexp
-  (* The term tagged with "model_trace:name" will be in counterexample
-     with name "name" *)
-
-val attr_starts_with: Str.regexp -> Ident.attribute -> bool
-
-val get_attr: Ident.Sattr.t -> Str.regexp -> Ident.Sattr.elt
-
-
 val intro_projections_counterexmp :  Env.env -> Task.task Trans.trans
  (**
     Transformation that for each declared abstract function or predicate

@@ -122,6 +122,12 @@ let mk_env env kn tuc =
   let th_wf  = Env.read_theory env ["relations"] "WellFounded" in
   mk_env th_int th_wf kn tuc
 
+let int_of_range env ty =
+  let td = Mts.find ty env.ts_ranges in
+  match td.Theory.td_node with
+  | Theory.Meta (_, [_; Theory.MAls s]) -> s
+  | _ -> assert false
+
 (* explanation attributes *)
 
 let expl_pre       = Ident.create_attribute "expl:precondition"
@@ -222,17 +228,6 @@ let sp_let v t sp rd =
   if Spv.mem v rd then sp_and (t_equ (t_var v.pv_vs) t) sp else
   t_let_close_simp v.pv_vs t sp
 
-(* affected program variables *)
-
-let ity_affected wr ity =
-  Util.any ity_rch_fold (Mreg.contains wr) ity
-
-let pv_affected wr v = ity_affected wr v.pv_ity
-
-let pvs_affected wr pvs =
-  if Mreg.is_empty wr then Spv.empty
-  else Spv.filter (pv_affected wr) pvs
-
 (* variant decrease preconditions *)
 
 let decrease_alg env loc old_t t =
@@ -256,24 +251,34 @@ let decrease_alg env loc old_t t =
   t_case old_t (List.map add_cs csl)
 
 let decrease_def env loc old_t t =
-  if ty_equal (t_type old_t) ty_int && ty_equal (t_type t) ty_int
-  then t_and (ps_app env.ps_int_le [t_nat_const 0; old_t])
-             (ps_app env.ps_int_lt [t; old_t])
+  let ty = t_type t in
+  if ty_equal (t_type old_t) ty then
+    match ty.ty_node with
+    | Tyapp (ts,_) when ts_equal ts ts_int ->
+        t_and (ps_app env.ps_int_le [t_nat_const 0; old_t])
+              (ps_app env.ps_int_lt [t; old_t])
+    | Tyapp (ts, _) when is_range_type_def ts.ts_def ->
+        let ls = int_of_range env ts in
+        let proj t = fs_app ls [t] ty_int in
+        ps_app env.ps_int_lt [proj t; proj old_t]
+    | _ ->
+        decrease_alg env loc old_t t
   else decrease_alg env loc old_t t
 
 let decrease env loc attrs expl olds news =
   if olds = [] && news = [] then t_true else
   let rec decr olds news = match olds, news with
-    | (old_t, Some old_r)::olds, (t, Some r)::news
-      when oty_equal old_t.t_ty t.t_ty && ls_equal old_r r ->
+    | (old_t, Some old_r)::olds, (t, Some r)::news when ls_equal old_r r ->
+        if t_equal old_t t then decr olds news else
         let dt = t_and (ps_app r [t; old_t]) (acc env r old_t) in
         t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
-    | (old_t, None)::olds, (t, None)::news
-      when oty_equal old_t.t_ty t.t_ty ->
+    | (old_t, None)::olds, (t, None)::news when oty_equal old_t.t_ty t.t_ty ->
+        if t_equal old_t t then decr olds news else
         let dt = decrease_def env loc old_t t in
         t_or_simp dt (t_and_simp (t_equ old_t t) (decr olds news))
     | (old_t, None)::_, (t, None)::_ ->
         decrease_def env loc old_t t
+    | _::_, [] -> t_true
     | _ -> t_false in
   vc_expl loc attrs expl (decr olds news)
 
@@ -522,7 +527,7 @@ let rec k_expr env lps e res xmap =
            Kseq (k_expr env lps e v xmap, 0, k v) in
   let var_or_proxy = var_or_proxy_case xmap in
   let check_divergence k =
-    if eff.eff_oneway && not env.divergent then begin
+    if diverges eff.eff_oneway && not env.divergent then begin
       if Debug.test_noflag debug_ignore_diverges then
       Warning.emit ?loc "termination@ of@ this@ expression@ \
         cannot@ be@ proved,@ but@ there@ is@ no@ `diverges'@ \
@@ -762,8 +767,8 @@ let rec k_expr env lps e res xmap =
         let branch (pp,e) = pp.pp_pat, k_expr env lps e res xmap in
         let bl = List.map branch bl in
         let kk v =
-          if s then try
-            if true || ity_fragile e.e_ity then raise Exit;
+          if s then (* try
+            if ity_fragile e.e_ity then raise Exit;
             let add_br (p,k) (bl,tl,fl) =
               let t, f, k = term_of_kode res k in
               let tl = t_close_branch p t :: tl in
@@ -773,7 +778,8 @@ let rec k_expr env lps e res xmap =
             let tv = t_var v.pv_vs in
             let t = t_case tv tl and f = sp_case tv fl in
             Kseq (Ktag (SP, Kcase (v, bl)), 0, Klet (res, t, f))
-          with Exit -> Ktag (SP, Kcase (v, bl))
+          with Exit -> *)
+            Ktag (SP, Kcase (v, bl))
           else Kcase (v, bl) in
         let k = match bl with
           | [] ->
@@ -837,10 +843,7 @@ let rec k_expr env lps e res xmap =
           | Tyapp (s,_) when ts_equal s ts_int ->
               fun v -> t_var v.pv_vs
           | Tyapp (s,_) ->
-              let td = Mts.find s env.ts_ranges in
-              let s = match td.Theory.td_node with
-                | Theory.Meta (_, [_; Theory.MAls s]) -> s
-                | _ -> assert false (* never *) in
+              let s = int_of_range env s in
               fun v -> fs_app s [t_var v.pv_vs] ty_int
           | Tyvar _ -> assert false (* never *) in
         let a = int_of_pv a and i = t_var vi.pv_vs in
@@ -1494,6 +1497,15 @@ let add_vc_decl kn id f vcl =
   if can_simp f then vcl else mk_vc_decl kn id f :: vcl
 
 let vc env kn tuc d = match d.pd_node with
+  | PDlet (LDvar (_, {e_node = Eexec ({c_node = Cany},_)})) ->
+      []
+  | PDlet (LDvar (v, e)) ->
+      let env = mk_env env kn tuc in
+      let c, e = match e.e_node with
+        | Eexec ({c_node = Cfun e} as c, _) -> c, e
+        | _ -> c_fun [] [] [] Mxs.empty Mpv.empty e, e in
+      let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
+      add_vc_decl kn v.pv_vs.vs_name f []
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let env = mk_env env kn tuc in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in

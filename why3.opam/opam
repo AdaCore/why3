@@ -24,6 +24,9 @@ tags: [
 available: [ ocaml-version >= "4.02.3" ]
 
 build: [
+  ["sh" "-eux" "./run_autoconf_if_needed.sh"] # when used in pinned mode,
+                                              # the configure *cannot* yet be
+                                              # generated
   ["./configure"
    "--prefix" prefix
    "--disable-frama-c"

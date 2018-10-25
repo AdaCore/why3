@@ -1,11 +1,26 @@
-FROM ocaml/ocaml:debian-stable
+ARG debian_version=stable
+FROM ocaml/ocaml:debian-$debian_version
 
 # install dependencies
+RUN apt-get update -yq && apt-get upgrade -yq --with-new-pkgs --auto-remove
+RUN apt-get update -yq && apt-get upgrade -yq --with-new-pkgs --auto-remove && apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module opam xvfb unzip build-essential autoconf automake
 ARG debian_packages
-RUN apt-get update
-RUN apt-get install -y wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module opam xvfb
-RUN apt-get install -y $debian_packages
+RUN apt-get update -yq && apt-get upgrade -yq --with-new-pkgs --auto-remove && apt-get install -yq --no-install-recommends $debian_packages
 RUN apt-get clean
+
+# install provers
+## CVC4 1.5
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.5-x86_64-linux-opt
+RUN chmod a+x cvc4-1.5-x86_64-linux-opt
+RUN cp cvc4-1.5-x86_64-linux-opt /usr/local/bin/cvc4-1.5
+## CVC4 1.4
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.4-x86_64-linux-opt
+RUN chmod a+x cvc4-1.4-x86_64-linux-opt
+RUN cp cvc4-1.4-x86_64-linux-opt /usr/local/bin/cvc4-1.4
+## Z3
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.6.0/z3-4.6.0-x64-debian-8.10.zip
+RUN unzip z3-4.6.0-x64-debian-8.10.zip
+RUN cp z3-4.6.0-x64-debian-8.10/bin/z3 /usr/local/bin/z3-4.6.0
 
 # create user
 RUN sudo adduser --disabled-password --gecos '' why3
@@ -16,7 +31,11 @@ WORKDIR /home/why3
 ARG compiler=system
 RUN opam init -a -y -j1 --compiler=$compiler
 RUN opam repository add coq-released https://coq.inria.fr/opam/released
+RUN opam install -y depext
 
 ARG opam_packages
+RUN opam depext --dry-run menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo
 RUN opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo
+
+RUN test -z "$opam_packages" || opam depext --dry-run $opam_packages
 RUN test -z "$opam_packages" || opam install -y $opam_packages

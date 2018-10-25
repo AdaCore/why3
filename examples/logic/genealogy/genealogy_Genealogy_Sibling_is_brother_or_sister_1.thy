@@ -1,5 +1,5 @@
 theory genealogy_Genealogy_Sibling_is_brother_or_sister_1
-imports Why3
+imports Why3.Why3
 begin
 
 why3_open "genealogy_Genealogy_Sibling_is_brother_or_sister_1.xml"

@@ -31,6 +31,9 @@ module C
   val null () : ptr 'a
     ensures { result.zone = null_zone }
 
+  val predicate is_not_null (p:ptr 'a) : bool
+    ensures { result <-> p.zone <> null_zone }
+
   val incr (p:ptr 'a) (ofs:int32) : ptr 'a
     requires { p.min <= p.offset + ofs <= p.max }
     ensures { result.offset = p.offset + ofs }
@@ -69,7 +72,8 @@ module C
     p.min <= p.offset + i < p.max
 
   predicate valid (p:ptr 'a) (sz:int) =
-    in_bounds sz /\ 0 <= sz /\ 0 <= p.min <= p.offset /\ p.offset + sz <= p.max <= plength p
+    in_bounds sz /\ 0 <= sz /\ 0 <= p.min <= p.offset
+    /\ p.offset + sz <= p.max <= plength p
 
   let lemma valid_itv_to_shift (p:ptr 'a) (sz:int)
     requires { valid p sz }
@@ -83,12 +87,33 @@ module C
     ensures { result.min = 0 }
     ensures { result.max = plength result }
 
+  exception StackOverflow
+
+  let salloc sz
+    requires { 0 <= sz }
+    ensures { plength result = sz }
+    ensures { result.offset = 0 }
+    ensures { result.min = 0 }
+    ensures { result.max = sz }
+    raises  { StackOverflow -> true }
+  = let p = malloc sz in
+    if is_not_null p then p
+    else raise StackOverflow
+
   val free (p:ptr 'a) : unit
     requires { p.offset = 0 }
     requires { p.min = 0 }
     requires { p.max = plength p }
     writes { p }
     writes { p.data }
+
+  let sfree p
+    requires { p.offset = 0 }
+    requires { p.min = 0 }
+    requires { p.max = plength p }
+    writes { p }
+    writes { p.data }
+  = free p
 
   val realloc (p:ptr 'a) (sz:int32) : ptr 'a
     requires { 0 <= sz }
@@ -106,9 +131,6 @@ module C
                 forall i:int. 0 <= i < plength (old p) /\ i < sz ->
                   (pelts result)[i] = (pelts (old p))[i] }
     ensures { result.zone = null_zone -> p = old p }
-
-  val predicate is_not_null (p:ptr 'a) : bool
-    ensures { result <-> p.zone <> null_zone }
 
   val incr_split (p:ptr 'a) (i:int32) : ptr 'a
     requires { 0 <= i }

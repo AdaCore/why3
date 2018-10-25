@@ -117,12 +117,14 @@ type prover_upgrade_policy =
   | CPU_keep
   | CPU_upgrade of prover
   | CPU_duplicate of prover
+  | CPU_remove
 
 let print_prover_upgrade_policy fmt p =
   match p with
   | CPU_keep -> Format.fprintf fmt "keep"
   | CPU_upgrade p -> Format.fprintf fmt "upgrade to %a" print_prover p
   | CPU_duplicate p -> Format.fprintf fmt "copy to %a" print_prover p
+  | CPU_remove -> Format.fprintf fmt "remove"
 
 
 
@@ -383,6 +385,8 @@ let set_prover_upgrade_policy prover policy (i, family) =
     match policy with
       | CPU_keep ->
         set_string section "policy" "keep"
+      | CPU_remove ->
+        set_string section "policy" "remove"
       | CPU_upgrade p ->
         let section = set_string section "target_name" p.prover_name in
         let section = set_string section "target_version" p.prover_version in
@@ -479,6 +483,7 @@ let load_policy provers acc (_,section) =
     try
       match get_string section "policy" with
       | "keep" -> Mprover.add source CPU_keep acc
+      | "remove" -> Mprover.add source CPU_remove acc
       | "upgrade" ->
         let target =
           { prover_name = get_string section "target_name";
@@ -921,9 +926,10 @@ module Args = struct
     let lp = List.rev_append !opt_loadpath (loadpath main) in
     config, base_config, Env.create_env lp
 
-  let exit_with_usage options usage =
-    Arg.usage (align_options options) usage;
-    exit 1
+  let exit_with_usage ?(exit_code=1) ?(extra_help=Format.pp_print_newline) options usage =
+    let options = align_options options in
+    Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
+    exit exit_code
 end
 
 

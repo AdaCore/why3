@@ -1,7 +1,8 @@
-#!/bin/sh
+#!/bin/sh -eu
 # regression tests for why3
 
 REPLAYOPT=""
+REGTESTS_MODE=""
 
 while test $# != 0; do
 case "$1" in
@@ -14,6 +15,9 @@ case "$1" in
   "--prover")
         REPLAYOPT="$REPLAYOPT --prover $2"
         shift
+        ;;
+  "--reduced-mode")
+        REGTESTS_MODE="REDUCED"
         ;;
   *)
         echo "$0: Unknown option '$1'"
@@ -39,12 +43,24 @@ export shapes=""
 
 
 run_dir () {
-    for f in `ls $1/*/why3session.xml`; do
+    if [ "$REGTESTS_MODE" = "REDUCED" ]; then
+        if [ -f $1/reduced_regtests.list ]; then
+            LIST=`sed $1/reduced_regtests.list -n -e "s&^\([^ #]\+\).*&$1/\1/why3session.xml&p"`
+        else
+            LIST=
+        fi
+    else
+        LIST=`ls $1/*/why3session.xml`
+    fi
+    for f in $LIST; do
         d=`dirname $f`
         printf "Replaying $d ... "
-        ../bin/why3replay.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP
-        ret=$?
-        if test "$ret" != "0"  ; then
+        if ../bin/why3replay.opt -q $REPLAYOPT $2 $d 2> $TMPERR > $TMP ; then
+            printf "OK"
+            cat $TMP $TMPERR
+            success=`expr $success + 1`
+        else
+            ret=$?
             printf "FAILED (ret code=$ret):"
             out=`head -1 $TMP`
             if test -z "$out" ; then
@@ -54,10 +70,6 @@ run_dir () {
                cat $TMP
             fi
             res=1
-        else
-            printf "OK"
-            cat $TMP $TMPERR
-            success=`expr $success + 1`
         fi
         total=`expr $total + 1`
     done
@@ -67,13 +79,13 @@ run_dir () {
 
 echo "=== Programs already ported === MUST REPLAY AND ALL GOALS PROVED ==="
 echo ""
-run_dir .
+run_dir . ""
 run_dir double_wp "-L double_wp"
 run_dir avl "-L avl"
-run_dir foveoos11-cm
+run_dir foveoos11-cm ""
 run_dir vacid_0_binary_heaps "-L vacid_0_binary_heaps"
 run_dir verifythis_2016_matrix_multiplication "-L verifythis_2016_matrix_multiplication"
-run_dir WP_revisited
+run_dir WP_revisited ""
 run_dir prover "-L prover --debug ignore_unused_vars"
 run_dir multiprecision "-L multiprecision"
 echo ""
@@ -83,29 +95,29 @@ echo ""
 
 echo "=== Standard Library ==="
 echo ""
-run_dir stdlib
+run_dir stdlib ""
 echo ""
 
 echo "=== Tests ==="
 echo ""
 # there's no session there...
 # run_dir tests
-run_dir tests-provers
+run_dir tests-provers ""
 echo ""
 
 echo "=== Check Builtin translation ==="
 echo ""
-run_dir check-builtin
+run_dir check-builtin ""
 echo ""
 
 echo "=== BTS ==="
 echo ""
-run_dir bts
+run_dir bts ""
 echo ""
 
 echo "=== Logic ==="
 echo ""
-run_dir logic
+run_dir logic ""
 run_dir bitvectors "-L bitvectors"
 echo ""
 

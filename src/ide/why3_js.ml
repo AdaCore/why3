@@ -559,13 +559,15 @@ let interpNotif (n: notification) =
       TaskList.remove_node (string_of_int nid)
   | Saved ->
       PE.error_print_msg "Saved"
+  | Saving_needed _b ->
+      PE.error_print_msg "Saving_needed"
   | Message m ->
     begin
       match m with
       | Proof_error (_nid, s) ->
         PE.error_print_msg
           (Format.asprintf "Proof error on selected node: \"%s\"" s)
-      | Transf_error (_ids, _tr, _args, _loc, s, _d) ->
+      | Transf_error (_b, _ids, _tr, _args, _loc, s, _d) ->
         PE.error_print_msg
           (Format.asprintf "Transformation error on selected node: \"%s\"" s)
       | Strat_error (_nid, s) ->

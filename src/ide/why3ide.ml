@@ -102,16 +102,9 @@ module Protocol_why3ide = struct
 
 end
 
-(* True when session differs from the saved session *)
-let session_needs_saving = ref false
-
 let get_notified = Protocol_why3ide.get_notified
 
-let send_request r =
-  (* If request changes the session then session needs saving *)
-  if modify_session r then
-    session_needs_saving := true;
-  Protocol_why3ide.send_request r
+let send_request r = Protocol_why3ide.send_request r
 
 (****************************************)
 (* server instance on the GTK scheduler *)
@@ -329,7 +322,10 @@ let files_need_saving () =
 (* Ask if the user wants to save session before exit. Exit is then delayed until
    the [Saved] notification is received *)
 let exit_function_safe () =
-  if not !session_needs_saving && not (files_need_saving ()) then
+  send_request Check_need_saving_req
+
+let exit_function_handler b =
+  if not b && not (files_need_saving ()) then
     exit_function_unsafe ()
   else
     let answer =
@@ -593,12 +589,8 @@ let get_obs (pa_st: pa_status) = match pa_st with
 let get_proof_attempt (pa_st: pa_status) = match pa_st with
 | pa, _, _ -> pa
 
-let get_limit (pa_st: pa_status) = match pa_st with
-| _, _, l -> l
-
 let get_node_obs id = get_obs (get_node_id_pa id)
 let get_node_proof_attempt id = get_proof_attempt (get_node_id_pa id)
-let get_node_limit id = get_limit (get_node_id_pa id)
 
 let get_node_id iter = goals_model#get ~row:iter ~column:node_id_column
 
@@ -649,9 +641,9 @@ let notebook = GPack.notebook ~packing:vpan222#add ()
 (********************************)
 (* Task view (part of notebook) *)
 (********************************)
-let task_page,scrolled_task_view =
+let scrolled_task_view =
   let label = GMisc.label ~text:"Task" () in
-  0, GPack.vbox ~homogeneous:false ~packing:
+  GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
 
 let scrolled_task_view =
@@ -771,15 +763,15 @@ let error_page,error_view =
   0, GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
 
-let log_page,log_view =
+let log_view =
   let label = GMisc.label ~text:"Log" () in
-  1, GPack.vbox ~homogeneous:false ~packing:
+  GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
 
 (* tab 3: edited proof *)
-let edited_page,edited_tab =
+let edited_tab =
   let label = GMisc.label ~text:"Edited proof" () in
-  2, GPack.vbox ~homogeneous:false ~packing:
+  GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
 
 let scrolled_edited_view =
@@ -795,9 +787,9 @@ let edited_view =
     ()
 
 (* tab 4: prover output *)
-let output_page,output_tab =
+let output_tab =
   let label = GMisc.label ~text:"Prover output" () in
-  3, GPack.vbox ~homogeneous:false ~packing:
+  GPack.vbox ~homogeneous:false ~packing:
     (fun w -> ignore(messages_notebook#append_page ~tab_label:label#coerce w)) ()
 
 let scrolled_output_view =
@@ -1015,22 +1007,6 @@ let reload_unsafe () =
 
 let save_and_reload () = save_sources (); reload_unsafe ()
 
-(* Same as reload_safe but propose to save edited sources before reload *)
-let reload_safe () =
-  if files_need_saving () then
-    let answer =
-      GToolbox.question_box
-        ~title:"Why3 saving source files"
-        ~buttons:["Yes"; "No"; "Cancel"]
-        "Do you want to save modified source files before refresh?\nBeware that unsaved modifications will be discarded."
-    in
-    match answer with
-    | 1 -> save_and_reload ()
-    | 2 -> reload_unsafe ()
-    | _ -> ()
-  else
-    reload_unsafe ()
-
 (****************************)
 (* command entry completion *)
 (****************************)
@@ -1110,7 +1086,7 @@ let color_line ~color loc =
 
   let f, l, _, _ = Loc.get loc in
   try
-    let (_, v, _, _) = get_source_view_table f in
+    let v = get_source_view f in
     let color = convert_color color in
     color_line ~color v l
   with
@@ -1136,10 +1112,7 @@ let color_loc ?(ce=false) ~color loc =
 
   let f, l, b, e = Loc.get loc in
   try
-    let v = if ce then counterexample_view else
-      let (_, v, _, _) = get_source_view_table f in
-      v
-    in
+    let v = if ce then counterexample_view else get_source_view f in
     let color = convert_color color in
     color_loc ~color v l b e
   with
@@ -1383,6 +1356,7 @@ let on_selected_row r =
          | Controller_itp.InternalFailure e ->
             (Pp.sprintf "internal failure: %a" Exn_printer.exn_printer e)
          | Controller_itp.Uninstalled _p -> "uninstalled prover"
+         | Controller_itp.Removed _p -> "removed proof attempt"
          | Controller_itp.UpgradeProver _p -> "upgraded prover"
        in
        let output_text =
@@ -1491,7 +1465,12 @@ let treat_message_notification msg = match msg with
   (* TODO: do something ! *)
   | Proof_error (_id, s)                        ->
      print_message ~kind:1 ~notif_kind:"Proof_error" "%s" s
-  | Transf_error (_id, tr_name, arg, loc, msg, doc) ->
+  | Transf_error (true, _id, tr_name, _arg, _loc, msg, _doc) ->
+      (* When the error reported by the transformation is fatal, we notify the
+         user with a popup. *)
+      let msg = Format.sprintf "Please report:\nTransformation %s failed: \n%s\n" tr_name msg in
+      GToolbox.message_box ~title:"Why3 fatal error" msg
+  | Transf_error (false, _id, tr_name, arg, loc, msg, doc) ->
       if arg = "" then
         print_message ~kind:1 ~notif_kind:"Transformation Error"
                       "%s\nTransformation failed: \n%s\n\n%s" msg tr_name doc
@@ -1554,35 +1533,6 @@ let treat_message_notification msg = match msg with
      print_message ~kind:1 ~notif_kind:"General request failure" "%s" s
 
 
-(***********************)
-(* First Unproven goal *)
-(***********************)
-
-let is_goal node =
-  get_node_type node = NGoal
-
-let proved node =
-  get_node_proved node
-
-let children node =
-  let iter = (get_node_row node)#iter in
-  let n = goals_model#iter_n_children (Some iter) in
-  let acc = ref [] in
-  for i = 0 to (n-1) do
-    let new_iter = goals_model#iter_children ?nth:(Some i) (Some iter) in
-    let child_node = get_node_id new_iter in
-    if (get_node_type child_node != NProofAttempt) then
-      acc := child_node :: !acc
-  done;
-  !acc
-
-let get_parent node =
-  let iter = (get_node_row node)#iter in
-  let parent_iter = goals_model#iter_parent iter in
-  match parent_iter with
-  | None -> None
-  | Some parent -> Some (get_node_id parent)
-
 let is_selected_alone id =
   match get_selected_row_references () with
   | [r] -> let i = get_node_id r#iter in i = id
@@ -1603,6 +1553,7 @@ let image_of_pa_status ~obsolete pa =
   | Controller_itp.InternalFailure _e -> !image_failure
   | Controller_itp.Detached -> !image_undone (* TODO !image_detached *)
   | Controller_itp.Uninstalled _p -> !image_undone (* TODO !image_uninstalled *)
+  | Controller_itp.Removed _p -> !image_undone (* TODO !image_removed *)
   | Controller_itp.UpgradeProver _p -> !image_undone
   | Controller_itp.Done r ->
     let pr_answer = r.Call_provers.pr_answer in
@@ -1695,6 +1646,7 @@ let set_status_and_time_column ?limit row =
         | C.Undone -> "(undone)"
         | C.Uninstalled _ -> "(uninstalled prover)"
         | C.UpgradeProver _ -> "(upgraded prover)"
+        | C.Removed _ -> "(removed prover)"
         | C.Scheduled -> "(scheduled)"
         | C.Running -> "(running)"
         | C.Detached -> "(detached)"
@@ -2409,11 +2361,11 @@ let treat_notification n =
      complete_context_menu ();
      Opt.iter select_iter goals_model#get_iter_first
   | Saved                         ->
-      session_needs_saving := false;
       print_message ~kind:1 ~notif_kind:"Saved action info"
                         "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
+  | Saving_needed b -> exit_function_handler b
   | Message (msg)                 -> treat_message_notification msg
   | Task (id, s, list_loc)        ->
      if is_selected_alone id then

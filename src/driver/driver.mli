@@ -65,6 +65,8 @@ val prove_task :
   driver -> Task.task -> Call_provers.prover_call
 
 (** Split the previous function in two simpler functions *)
+
+(* Apply driver's transformations to the task *)
 val prepare_task : driver -> Task.task -> Task.task
 
 val print_task_prepared :

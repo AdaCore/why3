@@ -31,7 +31,9 @@ type pty =
   | PTtyvar of ident
   | PTtyapp of qualid * pty list
   | PTtuple of pty list
+  | PTref   of pty list
   | PTarrow of pty * pty
+  | PTscope of qualid * pty
   | PTparen of pty
   | PTpure  of pty
 
@@ -53,8 +55,9 @@ and pat_desc =
   | Pas of pattern * ident * ghost
   | Por of pattern * pattern
   | Pcast of pattern * pty
-  | Pghost of pattern
+  | Pscope of qualid * pattern
   | Pparen of pattern
+  | Pghost of pattern
 
 (*s Logical terms and formulas *)
 
@@ -71,6 +74,7 @@ and term_desc =
   | Tfalse
   | Tconst of Number.constant
   | Tident of qualid
+  | Tasref of qualid
   | Tidapp of qualid * term list
   | Tapply of term * term
   | Tinfix of term * ident * term
@@ -110,6 +114,7 @@ type spec = {
   sp_variant : variant;
   sp_checkrw : bool;
   sp_diverge : bool;
+  sp_partial : bool;
 }
 
 type expr = {
@@ -118,11 +123,13 @@ type expr = {
 }
 
 and expr_desc =
+  | Eref
   | Etrue
   | Efalse
   | Econst of Number.constant
   (* lambda-calculus *)
   | Eident of qualid
+  | Easref of qualid
   | Eidapp of qualid * expr list
   | Eapply of expr * expr
   | Einfix of expr * ident * expr
@@ -134,7 +141,7 @@ and expr_desc =
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
-  | Eassign of (expr * qualid * expr) list
+  | Eassign of (expr * qualid option * expr) list
   (* control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr

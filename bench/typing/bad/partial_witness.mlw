@@ -1,0 +1,3 @@
+val partial random () : int
+
+type t = { x: int } invariant { x = 0 } by { x = random () }

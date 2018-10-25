@@ -121,11 +121,16 @@ let sn_decode s =
     if s.[i] = '\'' then skip_quote (succ i) else
     if i = l || s.[i] = '_' then i else pred i in
   let m = skip_quote l in
+  let prefix o =
+    if o.[0] <> '!' && o.[0] <> '?' then SNprefix o
+    else try for i = 1 to l - 8 do match o.[i] with
+      | '!' | '$' | '&' | '?' | '@'
+      | '^' | '.' | ':' | '|' | '#' -> ()
+      | _ -> raise Exit done; SNtight o
+    with Exit -> SNprefix o in
   if l = k && k < 8 then SNword s (* null infix/prefix *) else
   let w = if k = 6 then SNinfix (String.sub s 6 (m - 6)) else
-          if k = 7 then let op = String.sub s 7 (m - 7) in
-                        if s.[7] = '!' || s.[7] = '?' then
-                          SNtight op else SNprefix op else
+          if k = 7 then prefix (String.sub s 7 (m - 7)) else
           let p = if l < m then String.sub s l (m - l) else "" in
           match String.sub s 8 (l - 8) with
           | "]"   -> SNget p | "]<-"  -> SNset p  | "<-]"  -> SNupdate p
@@ -249,6 +254,12 @@ let create_ident_printer ?(sanitizer = same) sl =
     sanitizer = sanitizer;
     blacklist = sl }
 
+let duplicate_ident_printer id_printer =
+  {id_printer with
+   indices = Hstr.copy id_printer.indices;
+   values  = Hid.copy id_printer.values;
+  }
+
 let known_id printer id =
   try
     (let _ = Hid.find printer.values id in true)
@@ -363,7 +374,8 @@ let append_to_model_element_name ~attrs ~to_append =
     let splitted = Strings.bounded_split '@' attr_str 2 in
     match splitted with
     | [before; after] -> before ^ to_append ^ "@" ^ after
-    | _ -> attr_str^to_append in
+    | _ -> attr_str^to_append
+  in
   transform_model_trace_attr attrs trans
 
 let append_to_model_trace_attr ~attrs ~to_append =

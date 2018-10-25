@@ -64,8 +64,7 @@ prequest parse_request(char* str_req, int len, int key) {
   char* tmp;
   bool runstdin = false;
 
-  log_msg("received query");
-  log_msg_len(str_req, len);
+  log_msg("received query %.*s",len,str_req);
 
   semic = count_semicolons(str_req, len);
   if (semic == 0) {
@@ -130,22 +129,43 @@ prequest parse_request(char* str_req, int len, int key) {
 
 void print_request(prequest r) {
   if (r) {
-    printf("%s %d %d %s", r->id, r->timeout, r->memlimit, r->cmd);
-    for (int i = 0; i < r->numargs; i++) {
-       printf(" %s", r->args[i]);
+    switch (r->req_type) {
+    case REQ_RUN:
+      printf("req_type=REQ_RUN, timeout=%d, memlimit=%d, cmd=%s", r->timeout, r->memlimit, r->cmd);
+      for (int i = 0; i < r->numargs; i++) {
+        printf(" %s", r->args[i]);
+      }
+      break;
+    case REQ_INTERRUPT:
+      printf("req_type=REQ_INTERRUPT, id=%s", r->id);
+      break;
+    default:
+      printf("request.print_request: ill-formed request");
     }
-  } else {
-    printf("<null>");
+  }
+  else {
+    printf("<null request>");
   }
 }
 
 void free_request(prequest r) {
-  free(r->cmd);
-  for (int i = 0;i < r->numargs; i++) {
-    free(r->args[i]);
+  if (r) {
+    switch (r->req_type) {
+    case REQ_RUN:
+      free(r->cmd);
+      for (int i = 0;i < r->numargs; i++) {
+        free(r->args[i]);
+      }
+      free(r->args);
+      break;
+    case REQ_INTERRUPT:
+      free(r->id);
+      break;
+    default:
+        log_msg("bad argument for request.free_request()");
+    }
+    free(r);
   }
-  free(r->args);
-  free(r);
 }
 
 void init_request_queue () {

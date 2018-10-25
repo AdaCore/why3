@@ -1,18 +1,7 @@
 \begin{syntax}
-  lqualid ::= (uident ".")* lident
+  qualifier ::= (uident ".")+
   \
-  uqualid ::= (uident ".")* uident
+  lqualid ::= qualifier? lident
   \
-  qualid ::= (uident ".")* (lident-ext | uident)
-  \
-  lident-ext ::= lident | "(" lident-op ")"
-  \
-  lident-op ::= op-char-1234+     ;   infix or bang operator
-              | op-char-1234+ "_" ;   prefix (non-bang) operator
-              | "[]"              ;   collection access
-              | "[<-]"            ;   collection update
-              | "[]<-"            ;   in-place collection update
-              | "[..]"            ;   collection slice
-              | "[_..]"           ;   right-open slice
-              | "[.._]"           ;   left-open slice %
+  uqualid ::= qualifier? uident %
 \end{syntax}

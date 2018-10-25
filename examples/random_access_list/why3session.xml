@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../random_access_list.mlw" proved="true">
@@ -24,7 +24,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC nth_flatten.2" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="5"><result status="valid" time="3.54"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="3.03"/></proof>
   </goal>
  </transf>
  </goal>
@@ -149,33 +149,33 @@
   <proof prover="3" timelimit="5"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="VC lookup.1" expl="variant decrease" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="5"/></proof>
-  </goal>
-  <goal name="VC lookup.2" expl="precondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="20"/></proof>
-  </goal>
-  <goal name="VC lookup.3" expl="precondition" proved="true">
   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
+  <goal name="VC lookup.2" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="VC lookup.3" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="3"/></proof>
+  </goal>
   <goal name="VC lookup.4" expl="variant decrease" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="42"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="VC lookup.5" expl="precondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="38"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.02" steps="37"/></proof>
   </goal>
   <goal name="VC lookup.6" expl="precondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="5"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
   <goal name="VC lookup.7" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC lookup.7.0" expl="postcondition" proved="true">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="11"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.06" steps="10"/></proof>
    </goal>
    <goal name="VC lookup.7.1" expl="postcondition" proved="true">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="27"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="66"/></proof>
    </goal>
    <goal name="VC lookup.7.2" expl="postcondition" proved="true">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.06" steps="96"/></proof>
+   <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="98"/></proof>
    </goal>
   </transf>
   </goal>
@@ -231,9 +231,6 @@
   </transf>
   </goal>
  </transf>
- </goal>
- <goal name="VC f" expl="VC for f" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC update" expl="VC for update" proved="true">
  <proof prover="4"><result status="valid" time="0.06"/></proof>

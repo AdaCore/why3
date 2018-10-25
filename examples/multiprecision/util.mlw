@@ -17,8 +17,8 @@ module Util
     ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
               (pelts r)[j] = old (pelts r)[j] }
   =
-    let zero = Int32.of_int 0 in
-    let one = Int32.of_int 1 in
+    let zero = (0:int32) in
+    let one = (1:int32) in
     let i = ref zero in
     let xp = ref (C.incr x zero) in
     let rp = ref (C.incr r zero) in
@@ -49,15 +49,15 @@ module Util
      ensures { Int32.to_int result = 1 <-> value x sz = 0 }
    =
      let i = ref sz in
-     let uzero = Limb.of_int 0 in
+     let uzero = (0:uint64) in
      let lx = ref uzero in
      try
-       while Int32.(>=) !i (Int32.of_int 1) do
+       while Int32.(>=) !i (1:int32) do
          variant { p2i !i }
          invariant { 0 <= !i <= sz }
          invariant { value_sub (pelts x) (x.offset + !i) (x.offset + sz)=0 }
          let ghost k = p2i !i in
-         i := Int32.(-) !i (Int32.of_int 1);
+         i := Int32.(-) !i (1:int32);
          assert { 0 <= !i < sz };
          lx := get_ofs x !i;
          if not (Limb.(=) !lx uzero)
@@ -65,13 +65,13 @@ module Util
            value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset + p2i sz);
            value_sub_lower_bound_tight (pelts x) x.offset (x.offset+k);
            value_sub_lower_bound (pelts x) (x.offset+k) (x.offset + p2i sz);
-           raise Return32 (Int32.of_int 0);
+           raise Return32 (0:int32);
          end
          else begin
            assert { 1+2=3 };
          end
        done;
-       Int32.of_int 1
+       (1:int32)
      with Return32 r -> r
      end
 
@@ -82,8 +82,8 @@ module Util
     ensures { forall j. (j < offset r \/ offset r + sz <= j)
               -> (pelts r)[j] = old (pelts r)[j] }
   =
-    let i = ref (Int32.of_int 0) in
-    let lzero = Limb.of_int 0 in
+    let i = ref (0:int32) in
+    let lzero = (0:uint64) in
     while Int32.(<) !i sz do
       invariant { 0 <= !i <= sz }
       variant { sz - !i }
@@ -92,7 +92,7 @@ module Util
                 -> (pelts r)[j] = old (pelts r)[j] }
       set_ofs r !i lzero;
       value_sub_tail (pelts r) r.offset (r.offset + p2i !i);
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := Int32.(+) !i (1:int32);
     done
 
 end

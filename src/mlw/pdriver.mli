@@ -19,7 +19,6 @@ type driver = private {
   drv_thinterface : Printer.interface_map;
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
-  drv_converter   : Printer.syntax_map;
   drv_literal     : Printer.syntax_map;
 }
 
@@ -31,7 +30,6 @@ type printer_args = private {
   thinterface : Printer.interface_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
-  converter   : Printer.syntax_map;
   literal     : Printer.syntax_map;
 }
 

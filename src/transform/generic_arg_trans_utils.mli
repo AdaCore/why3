@@ -17,6 +17,7 @@ exception Arg_trans_term of (string * term)
 exception Arg_trans_term2 of (string * term * term)
 exception Arg_trans_pattern of (string * pattern * pattern)
 exception Arg_trans_type of (string * Ty.ty * Ty.ty)
+exception Arg_trans_missing of (string * Svs.t)
 exception Arg_bad_hypothesis of (string * term)
 exception Cannot_infer_type of string
 exception Unnecessary_terms of term list
@@ -47,13 +48,9 @@ val get_local_task: Task.task -> Decl.decl list
    definitions defined before axioms *)
 val sort: Task.task Trans.trans
 
-(* Add an attribute to a goal (useful to add an expl for example) *)
-val add_goal_attr_trans: Ident.attribute -> Task.task Trans.trans
-
-
-(****************************)
-(* Substitution of terms    *)
-(****************************)
+(*************************)
+(* Substitution of terms *)
+(*************************)
 
 type term_subst = term Mterm.t
 
@@ -62,3 +59,13 @@ val replace_subst: term_subst -> Term.term -> Term.term
 val replace_decl: term_subst -> Decl.decl -> Decl.decl
 
 val replace_tdecl: term_subst -> Theory.tdecl -> Theory.tdecl
+
+(************************)
+(* Explanation handling *)
+(************************)
+
+(* This function creates a goal with an explanation. The term on which this is
+   applied should not contain any explanation itself (otherwise both would
+   appear in the ide).
+*)
+val create_goal: expl:string -> Decl.prsymbol -> Term.term -> Decl.decl

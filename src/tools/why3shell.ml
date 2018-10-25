@@ -105,7 +105,7 @@ module Server = Itp_server.Make (Unix_scheduler) (Protocol_shell)
 let treat_message_notification fmt msg = match msg with
   (* TODO: do something ! *)
   | Proof_error (_id, s)                           -> fprintf fmt "%s@." s
-  | Transf_error (_id, _tr_name, _arg, _loc, s, _) -> fprintf fmt "%s@." s
+  | Transf_error (_b, _id, _tr_name, _arg, _loc, s, _) -> fprintf fmt "%s@." s
   | Strat_error (_id, s)                           -> fprintf fmt "%s@." s
   | Replay_Info s                                  -> fprintf fmt "%s@." s
   | Query_Info (_id, s)                            -> fprintf fmt "%s@." s
@@ -250,6 +250,8 @@ let treat_notification fmt n =
     fprintf fmt "Initialized@."
   | Saved                         -> (* TODO *)
     fprintf fmt "got a Saved notification not yet supported@."
+  | Saving_needed _b                -> (* TODO *)
+    fprintf fmt "got a Saving_needed notification not yet supported@."
   | Message (msg)                 -> treat_message_notification fmt msg
   | Dead _s                       -> (* TODO *)
     fprintf fmt "got a Dead notification not yet supported@."

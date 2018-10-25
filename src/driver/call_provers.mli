@@ -15,13 +15,6 @@ open Model_parser
 
 (** {2 data types for prover answers} *)
 
-(** The reason why unknown was reported *)
-type reason_unknown =
-  | Resourceout
-  (** Out of resources  *)
-  | Other
-  (** Other reason *)
-
 type prover_answer =
   | Valid
       (** The task is valid according to the prover *)
@@ -33,7 +26,7 @@ type prover_answer =
       (** the task runs out of memory *)
   | StepLimitExceeded
       (** the task required more steps than the limit provided *)
-  | Unknown of (string * reason_unknown option)
+  | Unknown of string
       (** The prover can't determine if the task is valid *)
   | Failure of string
       (** The prover reports a failure *)
@@ -188,10 +181,11 @@ val query_call : prover_call -> prover_update
 (** non-blocking function that reports any new updates
     from the server related to a given prover call. *)
 
+val interrupt_call : prover_call -> unit
+(** non-blocking function that asks for prover interruption *)
+
 val wait_on_call : prover_call -> prover_result
 (** blocking function that waits until the prover finishes. *)
-
-val interrupt_call : server_id -> unit
 
 val wait_for_server_result :
   blocking:bool -> (server_id * prover_result option) list

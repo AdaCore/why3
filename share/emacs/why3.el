@@ -1,4 +1,3 @@
-
 ;; why3.el - GNU Emacs mode for Why3
 
 (defvar why3-mode-hook nil)
@@ -15,7 +14,7 @@
 
 (setq auto-mode-alist
       (append
-       '(("\\.\\(why\\|mlw\\)" . why3-mode))
+       '(("\\.\\(why\\|mlw\\)\\'" . why3-mode))
        auto-mode-alist))
 
 ;; font-lock
@@ -26,7 +25,7 @@
 (defconst why3-font-lock-keywords-1
   (list
    `(,(why3-regexp-opt '("invariant" "variant" "diverges" "requires" "ensures" "pure" "returns" "raises" "reads" "writes" "alias" "assert" "assume" "check")) . font-lock-type-face)
-   `(,(why3-regexp-opt '("use" "clone" "scope" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "raise" "return" "break" "continue" "try" "with" "theory" "uses" "module" "converter" "fun" "at" "old" "true" "false" "forall" "exists" "label" "by" "so" "meta")) . font-lock-keyword-face)
+   `(,(why3-regexp-opt '("use" "clone" "scope" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "partial" "raise" "ref" "return" "break" "continue" "try" "with" "theory" "uses" "module" "fun" "at" "old" "true" "false" "forall" "exists" "label" "by" "so" "meta")) . font-lock-keyword-face)
    )
   "Minimal highlighting for Why3 mode")
 
@@ -50,10 +49,6 @@
     (modify-syntax-entry ?\( "()1n" st)
     (modify-syntax-entry ?\) ")(4n" st)
     (modify-syntax-entry ?* ". 23" st)
-    ; attributes
-    (modify-syntax-entry ?[ "(]1b" st)
-    (modify-syntax-entry ?@ ". 2b" st)
-    (modify-syntax-entry ?] "> b" st)
     st)
   "Syntax table for why3-mode")
 
@@ -144,6 +139,14 @@
                    (let ((file (file-name-nondirectory buffer-file-name)))
                      (format "why3 ide %s" file))))))
 
+(defconst why3--syntax-propertize
+  (syntax-propertize-rules
+    ; attributes: [@foo]
+    ("\\(\\[\\)@[^]]*\\(]\\)" (1 "!]") (2 "!["))
+    ; star: (*)
+    ("\\((\\)\\*\\()\\)" (1 "()") (2 ")("))
+  ))
+
 ;; setting the mode
 (defun why3-mode ()
   "Major mode for editing Why3 programs.
@@ -161,6 +164,7 @@
   ; OCaml style comments for comment-region, comment-dwim, etc.
   (set (make-local-variable 'comment-start) "(*")
   (set (make-local-variable 'comment-end)   "*)")
+  (setq-local syntax-propertize-function why3--syntax-propertize)
   ; menu
   ; providing the mode
   (setq major-mode 'why3-mode)

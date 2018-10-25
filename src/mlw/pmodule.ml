@@ -71,6 +71,12 @@ let same_overload r1 r2 =
   | FixedRes t1, FixedRes t2 -> ity_equal t1 t2
   | _ -> false (* two NoOver's are not the same *)
 
+let ref_attr = Ident.create_attribute "mlw:reference_var"
+
+let has_ref s =
+  let has v = Sattr.mem ref_attr v.pv_vs.vs_name.id_attrs in
+  List.exists has s.rs_cty.cty_args
+
 exception IncompatibleNotation of string
 
 let merge_ps chk x vo vn =
@@ -85,14 +91,19 @@ let merge_ps chk x vo vn =
     (* once again, no way to export notation *)
     | _, OO _ -> assert false
     (* but we can merge two compatible symbols *)
-    | RS r1, RS r2 when not (rs_equal r1 r2) ->
+    | RS r1, RS r2 ->
+        if rs_equal r1 r2 then vo else
+        if has_ref r1 || has_ref r2 then vn else
         if not (same_overload r1 r2) then vn else
         if ity_equal (fsty r1) (fsty r2) then vn else
         OO (Srs.add r2 (Srs.singleton r1))
     (* or add a compatible symbol to notation *)
     | OO s1, RS r2 ->
-        let r1 = Srs.choose s1 and ty = fsty r2 in
+        if Srs.mem r2 s1 then vo else
+        if has_ref r2 then vn else
+        let r1 = Srs.choose s1 in
         if not (same_overload r1 r2) then vn else
+        let ty = fsty r2 in
         let confl r = not (ity_equal (fsty r) ty) in
         let s1 = Srs.filter confl s1 in
         if Srs.is_empty s1 then vn else
@@ -395,6 +406,33 @@ let unit_module =
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
   close_module (List.fold_left add uc (create_type_decl [td]))
 
+let itd_ref =
+  let tv = create_tvsymbol (id_fresh "a") in
+  let attrs = Sattr.singleton (create_attribute "model_trace:") in
+  let pj = create_pvsymbol (id_fresh ~attrs "contents") (ity_var tv) in
+  create_plain_record_decl ~priv:false ~mut:true (id_fresh "ref")
+                                            [tv] [true, pj] [] []
+
+let its_ref = itd_ref.itd_its
+let rs_ref_cons = List.hd itd_ref.itd_constructors
+let rs_ref_proj = List.hd itd_ref.itd_fields
+
+let ts_ref = its_ref.its_ts
+let ls_ref_cons = ls_of_rs rs_ref_cons
+let ls_ref_proj = ls_of_rs rs_ref_proj
+
+let rs_ref_ld, rs_ref =
+  let cty = rs_ref_cons.rs_cty in
+  let ityl = List.map (fun v -> v.pv_ity) cty.cty_args in
+  let_sym (id_fresh "ref") (c_app rs_ref_cons [] ityl cty.cty_result)
+
+let ref_module =
+  let add uc d = add_pdecl_raw ~warn:false uc d in
+  let uc = empty_module dummy_env (id_fresh "Ref") ["why3";"Ref"] in
+  let uc = List.fold_left add uc (create_type_decl [itd_ref]) in
+  let uc = use_export uc builtin_module (* needed for "=" *) in
+  close_module (add uc (create_let_decl rs_ref_ld))
+
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
   let m = use_export m builtin_module in
@@ -405,6 +443,8 @@ let create_module env ?(path=[]) n =
 let add_use uc d = Sid.fold (fun id uc ->
   if id_equal id ts_func.ts_name then
     use_export uc highord_module
+  else if id_equal id ts_ref.ts_name then
+    use_export uc ref_module
   else match is_ts_tuple_id id with
   | Some n -> use_export uc (tuple_module n)
   | None -> uc) (Mid.set_diff d.pd_syms uc.muc_known) uc
@@ -447,6 +487,8 @@ let empty_clones m = {
   rs_table = Mrs.empty;
   xs_table = Mxs.empty;
 }
+
+exception CloneDivergence of ident * ident
 
 (* populate the clone structure *)
 
@@ -727,7 +769,8 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let eff = eff_reset (eff_write reads writes) resets in
   let add_raise xs eff = eff_raise eff (sm_find_xs sm xs) in
   let eff = Sxs.fold add_raise cty.cty_effect.eff_raises eff in
-  let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
+  let eff = if partial cty.cty_effect.eff_oneway then eff_partial eff else eff in
+  let eff = if diverges cty.cty_effect.eff_oneway then eff_diverge eff else eff in
   let cty = create_cty ~mask:cty.cty_mask args pre post xpost olds eff res in
   cty_ghostify (cty_ghost cty) cty
 
@@ -787,8 +830,8 @@ let rec clone_expr cl sm e = e_attr_copy e (match e.e_node with
       e_for v'
         (e_var (sm_find_pv sm f)) dir (e_var (sm_find_pv sm t))
         i' (clone_invl cl ism invl) (clone_expr cl ism e)
-  | Eraise (xs, e) ->
-      e_raise (sm_find_xs sm xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
+  | Eraise (xs, e1) ->
+      e_raise (sm_find_xs sm xs) (clone_expr cl sm e1) (clone_ity cl e.e_ity)
   | Eexn ({xs_name = id; xs_mask = mask; xs_ity = ity} as xs, e) ->
       let xs' = create_xsymbol (id_clone id) ~mask (clone_ity cl ity) in
       e_exn xs' (clone_expr cl (sm_save_xs sm xs xs') e)
@@ -1049,6 +1092,11 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       | RLls ls, RLls ls' -> cl.ls_table <- Mls.add ls ls' cl.ls_table
       | _ -> raise (BadInstance rs.rs_name)
       end;
+      begin
+        match cty.cty_effect.eff_oneway, rs'.rs_cty.cty_effect.eff_oneway with
+        | _, Total | Diverges, _ | Partial, Partial -> ()
+        | _ -> raise (CloneDivergence (rs.rs_name, rs'.rs_name))
+      end;
       cl.rs_table <- Mrs.add rs rs' cl.rs_table;
       let e = e_exec (c_app rs' cty.cty_args [] cty.cty_result) in
       let cexp = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
@@ -1176,6 +1224,7 @@ end)
 let mlw_language_builtin =
   let builtin s =
     if s = unit_module.mod_theory.th_name.id_string then unit_module else
+    if s = ref_module.mod_theory.th_name.id_string then ref_module else
     if s = builtin_theory.th_name.id_string then builtin_module else
     if s = highord_theory.th_name.id_string then highord_module else
     if s = bool_theory.th_name.id_string then bool_module else
@@ -1225,9 +1274,15 @@ let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string
   (Pp.print_list Pp.newline2 print_unit) m.mod_units
 
+let print_id fmt id = Ident.print_decoded fmt id.id_string
+
 let () = Exn_printer.register (fun fmt e -> match e with
   | IncompatibleNotation nm -> Format.fprintf fmt
       "Incombatible type signatures for notation '%a'" Ident.print_decoded nm
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
+  | CloneDivergence (iv, il) -> Format.fprintf fmt
+      "Cannot instantiate symbol %a with symbol %a \
+       that has worse termination status"
+      print_id iv print_id il
   | _ -> raise e)

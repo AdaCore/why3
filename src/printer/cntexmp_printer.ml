@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
 open Ident
 open Term
 
@@ -93,3 +94,31 @@ let check_exit_vc_term t in_goal info =
   if in_goal && Sattr.mem Ident.model_vc_attr t.t_attrs then begin
     info.vc_inside <- false;
   end
+
+(* This is used to update info_labels of info in the printer. This takes the
+   label informations present in the term and add a location to help pretty
+   printing the counterexamples.
+*)
+let update_info_labels lsname cur_attrs t ls =
+  let cur_l =
+    match Mstr.find lsname cur_attrs with
+    | exception Not_found -> Sattr.empty
+    | s -> s
+  in
+  let updated_attr_labels =
+    (* Change attributes labels with "at:" to located
+       "at:[label]:loc:filename:line" *)
+    Sattr.fold (fun attr acc ->
+        if Strings.has_prefix "at:" attr.attr_string then
+          let (f, l, _, _) =
+            match t.t_loc with
+            | None -> Loc.get (Opt.get_def Loc.dummy_position ls.ls_name.id_loc)
+            | Some loc -> Loc.get loc
+          in
+          let attr = create_attribute (attr.attr_string ^ ":loc:" ^ f ^ ":" ^ (string_of_int l)) in
+          Sattr.add attr acc
+        else
+          acc
+      ) (Sattr.union t.t_attrs ls.ls_name.id_attrs) cur_l
+  in
+  Mstr.add lsname updated_attr_labels cur_attrs

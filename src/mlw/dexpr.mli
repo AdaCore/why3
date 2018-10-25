@@ -30,13 +30,14 @@ val dity_bool : dity
 val dity_unit : dity
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
+type dref = bool list * bool
 
 (** Patterns *)
 
 type dpattern = private {
   dp_pat  : pre_pattern;
   dp_dity : dity;
-  dp_vars : dity Mstr.t;
+  dp_vars : (dity * bool) Mstr.t;
   dp_loc  : Loc.position option;
 }
 
@@ -76,6 +77,7 @@ type dspec_final = {
   ds_reads   : pvsymbol list;
   ds_writes  : term list;
   ds_diverge : bool;
+  ds_partial : bool;
   ds_checkrw : bool;
 }
 
@@ -100,7 +102,7 @@ type dexpr = private {
 }
 
 and dexpr_node =
-  | DEvar of string * dvty
+  | DEvar of string * dvty * dref
   | DEsym of prog_symbol
   | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
@@ -122,7 +124,7 @@ and dexpr_node =
   | DEoptexn of preid * dity * mask * dexpr
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
-  | DEvar_pure of string * dvty
+  | DEvar_pure of string * dvty * dref
   | DEls_pure of lsymbol * bool
   | DEpv_pure of pvsymbol
   | DEabsurd
@@ -188,9 +190,12 @@ type pre_fun_defn = preid * ghost * rs_kind * dbinder list *
 
 val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
+val undereference : dexpr -> dexpr
+  (* raises Not_found if the argument is not auto-dereferenced *)
+
 (** Final stage *)
 
-val expr : ?keep_loc:bool -> dexpr -> expr
+val expr : ?keep_loc:bool -> ?ughost:bool -> dexpr -> expr
 
 val let_defn : ?keep_loc:bool -> dlet_defn -> let_defn
 val rec_defn : ?keep_loc:bool -> drec_defn -> let_defn

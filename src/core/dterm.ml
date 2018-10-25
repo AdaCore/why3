@@ -124,16 +124,17 @@ let rec print_dty ht pri fmt = function
       Format.fprintf fmt "(%a)"
         (Pp.print_list Pp.comma (print_dty ht 0)) dl
   | Dapp (ts,[]) ->
-      Pretty.print_ts fmt ts
+      Pretty.print_ts_qualified fmt ts
   | Dapp (ts,dl) ->
       Format.fprintf fmt (protect_on (pri > 1) "%a@ %a")
-        Pretty.print_ts ts (Pp.print_list Pp.space (print_dty ht 2)) dl
+        Pretty.print_ts_qualified ts
+        (Pp.print_list Pp.space (print_dty ht 2)) dl
   | Duty ({ty_node = Tyapp (ts,(_::_))} as ty)
     when (pri > 1 && not (is_ts_tuple ts))
       || (pri = 1 && ts_equal ts Ty.ts_func) ->
-      Format.fprintf fmt "(%a)" Pretty.print_ty ty
+      Format.fprintf fmt "(%a)" Pretty.print_ty_qualified ty
   | Duty ty ->
-      Pretty.print_ty fmt ty
+      Pretty.print_ty_qualified fmt ty
 
 let print_dty = let ht = Hint.create 3 in fun fmt dty ->
   print_dty ht 0 fmt dty
@@ -373,6 +374,34 @@ let ty_of_dty_raw = function
   | Some dt_dty -> ty_of_dty_raw dt_dty
   | None        -> ty_bool
 
+let max_dty crcmap dtl =
+  let rec aux = function
+    | (dty1, ts1, ty1) :: l ->
+        (* find a type that cannot be coerced to another type *)
+        let check (_, ts2, ty2) =
+          try
+            if not (ts_equal ts1 ts2) then
+              ignore (Coercion.find crcmap ty1 ty2);
+            true
+          with Not_found -> false in
+        (* by transitivity, we never have to look back *)
+        if List.exists check l then aux l else dty1
+    | [] -> assert false in
+  let l = List.fold_left (fun acc { dt_dty = dty } ->
+    try (dty, ts_of_dty dty, ty_of_dty_raw dty) :: acc
+    with Exit -> acc) [] dtl in
+  if l == [] then (List.hd dtl).dt_dty
+  else aux l
+
+let max_dty crcmap dtl =
+  match max_dty crcmap dtl with
+  | Some (Duty ty)
+    when ty_equal ty ty_bool
+    && List.exists (fun { dt_dty = dty } -> dty = None) dtl ->
+      (* favor prop over bool *)
+      None
+  | dty -> dty
+
 let dterm_expected crcmap dt dty =
   try
     let (ts1, ts2) = ts_of_dty dt.dt_dty, ts_of_dty dty in
@@ -383,15 +412,16 @@ let dterm_expected crcmap dt dty =
       apply_coercion crc dt
   with Not_found | Exit -> dt
 
-let dterm_expected_dterm crcmap dt dty =
-  let dt = dterm_expected crcmap dt (Some dty) in
-  dterm_expected_type dt dty;
+let dexpr_expected_dexpr crcmap dt dty =
+  let dt = dterm_expected crcmap dt dty in
+  dexpr_expected_type dt dty;
   dt
 
-let dfmla_expected_dterm tuc dt =
-  let dt = dterm_expected tuc dt None in
-  dfmla_expected_type dt;
-  dt
+let dterm_expected_dterm crcmap dt dty =
+  dexpr_expected_dexpr crcmap dt (Some dty)
+
+let dfmla_expected_dterm crcmap dt =
+  dexpr_expected_dexpr crcmap dt None
 
 let dterm crcmap ?loc node =
   let dterm_node loc node =
@@ -404,34 +434,13 @@ let dterm crcmap ?loc node =
     | DTconst (_,dty) ->
         mk_dty (Some dty)
     | DTapp (ls, dtl) when ls_equal ls ps_equ ->
-       let swap, dtl =
-         match dtl with
-         | [dt1; dt2] ->
-            begin
-              try
-                let (ts1, ts2) = (ts_of_dty dt1.dt_dty, ts_of_dty dt2.dt_dty) in
-                if (ts_equal ts1 ts2) then (false, dtl)
-                else
-                  let (ty1, ty2) =
-                    (ty_of_dty_raw dt1.dt_dty, ty_of_dty_raw dt2.dt_dty)
-                  in
-                  begin
-                    try let _ = Coercion.find crcmap ty1 ty2
-                        in (true, List.rev dtl)
-                    with Not_found ->
-                      try let _ = Coercion.find crcmap ty2 ty1
-                          in (false, dtl)
-                      with Not_found -> (false, dtl)
-                  end
-              with Exit -> (false, dtl)
-              (* raised by ts_of_dty, i.e., ts1 or ts2 is a type variable *)
-            end
-         | _ -> assert false (* since ls = ps_equ *)
-       in
        let dtyl, dty = specialize_ls ls in
+       let max = max_dty crcmap dtl in
+       begin try dty_unify (Opt.get_def dty_bool max) (List.hd dtyl)
+             with Exit -> () end;
        let dtl = dty_unify_app_map ls
                    (dterm_expected_dterm crcmap) dtl dtyl in
-       { dt_node = DTapp (ls, if swap then List.rev dtl else dtl);
+       { dt_node = DTapp (ls, dtl);
          dt_dty  = dty;
          dt_loc  = loc }
     | DTapp (ls, dtl) ->
@@ -451,20 +460,23 @@ let dterm crcmap ?loc node =
         Loc.errorm ?loc "This term has type bool,@ it cannot be applied"
     | DTif (df,dt1,dt2) ->
         let df = dfmla_expected_dterm crcmap df in
-        dexpr_expected_type dt2 dt1.dt_dty;
+        let dty = max_dty crcmap [dt1;dt2] in
+        let dt1 = dexpr_expected_dexpr crcmap dt1 dty in
+        let dt2 = dexpr_expected_dexpr crcmap dt2 dty in
         { dt_node = DTif (df, dt1, dt2);
-          dt_dty = if dt2.dt_dty = None then None else dt1.dt_dty;
+          dt_dty = dty;
           dt_loc = loc }
     | DTlet (dt,_,df) ->
         ignore (dty_of_dterm dt);
         mk_dty df.dt_dty
     | DTcase (_,[]) ->
         raise EmptyCase
-    | DTcase (_,(_,df1)::bl) ->
-        let check (_,df) = dexpr_expected_type df df1.dt_dty in
-        List.iter check bl;
-        let is_fmla (_,df) = df.dt_dty = None in
-        if List.exists is_fmla bl then mk_dty None else mk_dty df1.dt_dty
+    | DTcase (dt,bl) ->
+        let dty = max_dty crcmap (List.map snd bl) in
+        let bl = List.map (fun (pat,dt) -> pat, dexpr_expected_dexpr crcmap dt dty) bl in
+        { dt_node = DTcase (dt,bl);
+          dt_dty = dty;
+          dt_loc = loc }
     | DTeps (_,dty,df) ->
         dfmla_expected_type df;
         mk_dty (Some dty)

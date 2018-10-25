@@ -169,8 +169,9 @@ val read_file :
    signaled with exceptions.  *)
 
 val merge_files :
-  use_shapes:bool -> Env.env -> session -> session -> exn list * bool * bool
-(** [merge_files ~use_shapes env ses old_ses] merges the file sections
+  shape_version:int option ->
+  Env.env -> session -> session -> exn list * bool * bool
+(** [merge_files ~use_shape_version env ses old_ses] merges the file sections
     of session [s] with file sections of the same name in old session
     [old_ses]. Recursively, for each theory whose name is identical to
     old theories, it is attempted to associate the old goals,
@@ -221,11 +222,11 @@ val mark_obsolete: session -> proofAttemptID -> unit
 val save_session : session -> unit
 (** [save_session s] Save the session [s] *)
 
-val load_session : string -> session * bool
+val load_session : string -> session * int option
 (** [load_session dir] load a session in directory [dir]; all the
     tasks are initialised to None
 
-    The returned boolean is set when there was shapes read from disk.
+    The second result is the shape version read from disk, if any
 
     raises [SessionFileError msg] if the database file cannot be read
     correctly.

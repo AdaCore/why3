@@ -52,10 +52,6 @@ theory list.Mem
   syntax predicate mem "List.mem %1 %2"
 end
 
-theory list.Nth
-  syntax function nth "List.nth %1 %2"
-end
-
 theory list.Append
   syntax function (++) "List.append %1 %2"
 end
@@ -72,10 +68,13 @@ theory list.Combine
   syntax function combine "List.combine %1 %2"
 end
 
-module ref.Ref
+module Ref
   syntax type     ref      "%1 ref"
   syntax function contents "!%1"
   syntax val      ref      "ref %1"
+end
+
+module ref.Ref
   syntax val      (!_)     "!%1"
   syntax val      (:=)     "%1 := %2"
 end
@@ -210,7 +209,6 @@ module mach.int.Int63
   syntax type     int63     "int"
 
   syntax literal   int63    "%1"
-  syntax converter of_int   "%1"
 
   syntax val of_int "Z.to_int %1"
   syntax val to_int "Z.of_int %1"
@@ -314,8 +312,6 @@ module mach.onetime.OneTime
   syntax val  ge     "%1 >= %2"
   syntax val  eq     "%1 = %2"
   syntax val  ne     "%1 <> %2"
-
-  syntax converter to_peano "%1"
 
   syntax val transfer "%1"
   syntax val neg      "-%1"

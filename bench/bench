@@ -59,6 +59,26 @@ bads () {
     done
 }
 
+warns () {
+    pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
+    rm -f bench_errors
+    for f in $1/*.[wm][hl][yw] ; do
+	printf "  $f... "
+	if ! $pgm $2 $f > /dev/null 2>bench_errors; then
+            echo "FAILED!"
+            echo "invocation: $pgm $2 $f"
+            exit 1
+        fi
+        if ! test -s bench_errors; then
+            echo "SHOULD HAVE A WARNING !"
+            echo "invocation: $pgm $2 $f"
+            exit 1
+        fi
+	echo "ok"
+    done
+}
+
 drivers () {
     pgm="bin/why3prove$suffix"
     test -d $1 || exit 1
@@ -78,6 +98,7 @@ drivers () {
 }
 
 valid_goals () {
+    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
     pgm="bin/why3prove$suffix"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
@@ -93,6 +114,7 @@ valid_goals () {
 }
 
 invalid_goals () {
+    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
     pgm="bin/why3prove$suffix"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
@@ -250,8 +272,10 @@ echo ""
 echo "=== Checking bad files ==="
 goods bench/typing/bad --parse-only
 goods bench/programs/bad-typing --parse-only
+goods bench/programs/warn-typing --parse-only
 bads bench/typing/bad --type-only
 bads bench/programs/bad-typing --type-only
+warns bench/programs/warn-typing --type-only
 goods bench/typing/x-bad --type-only
 echo ""
 
@@ -275,7 +299,7 @@ goods examples/bitvectors "-L examples/bitvectors"
 goods examples/avl "-L examples/avl"
 goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication"
 goods examples/double_wp "-L examples/double_wp"
-goods examples/ring_decision "-L examples/ring_decision"
+goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
 goods examples/prover "-L examples/prover --debug ignore_unused_vars"
 goods examples/in_progress
@@ -297,7 +321,7 @@ replay examples/bitvectors "-L examples/bitvectors --merging-only"
 replay examples/avl "-L examples/avl --merging-only"
 replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication --merging-only"
 replay examples/double_wp "-L examples/double_wp --merging-only"
-replay examples/ring_decision "-L examples/ring_decision --merging-only"
+replay examples/in_progress/ring_decision "-L examples/in_progress/ring_decision --merging-only"
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
 replay examples/prover "-L examples/prover --merging-only --debug ignore_unused_vars"
 #replay examples/in_progress --merging-only

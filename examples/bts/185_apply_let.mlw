@@ -1,0 +1,11 @@
+module Test
+
+  function f int : int = 17
+  predicate p int int
+  axiom A: forall x y. x = f y -> p x y
+  axiom B: forall y. let x = f y in p x y
+
+  goal g : p 17 42
+
+
+end

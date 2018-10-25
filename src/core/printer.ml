@@ -74,6 +74,8 @@ type printer_mapping = {
   queried_terms : Term.term Mstr.t;
   list_projections: Sstr.t;
   list_records: ((string * string) list) Mstr.t;
+  noarg_constructors: string list;
+  set_str: Sattr.t Mstr.t
 }
 
 type printer_args = {
@@ -99,6 +101,8 @@ let get_default_printer_mapping = {
   queried_terms = Mstr.empty;
   list_projections = Sstr.empty;
   list_records = Mstr.empty;
+  noarg_constructors = [];
+  set_str = Mstr.empty
 }
 
 let register_printer ~desc s p =
@@ -389,10 +393,8 @@ let print_prelude_for_theory th fmt pm =
 
 exception KnownTypeSyntax of tysymbol
 exception KnownLogicSyntax of lsymbol
-exception KnownConverterSyntax of lsymbol
 exception TooManyTypeOverride of tysymbol
 exception TooManyLogicOverride of lsymbol
-exception TooManyConverterOverride of lsymbol
 
 let meta_syntax_type = register_meta "syntax_type" [MTtysymbol; MTstring; MTint]
   ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ type@ symbol.@ \
@@ -403,11 +405,6 @@ let meta_syntax_logic = register_meta "syntax_logic" [MTlsymbol; MTstring; MTint
          symbol.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax function'@ \
          or@ 'syntax predicate'@ rules."
-
-let meta_syntax_converter = register_meta "syntax_converter" [MTlsymbol; MTstring; MTint]
-  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ converter@ \ symbol.@ \
-         Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax converter'@ \
-         rules."
 
 let meta_syntax_literal = register_meta "syntax_literal" [MTtysymbol; MTstring; MTint]
   ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ range@ literal.@ \
@@ -440,10 +437,6 @@ let syntax_logic ls s b =
   check_syntax_logic ls s;
   create_meta meta_syntax_logic [MAls ls; MAstr s; MAint (if b then 1 else 0)]
 
-let syntax_converter ls s b =
-  check_syntax_logic ls s;
-  create_meta meta_syntax_converter [MAls ls; MAstr s; MAint (if b then 1 else 0)]
-
 let syntax_literal ts s b =
   check_syntax_literal ts s;
   create_meta meta_syntax_literal [MAts ts; MAstr s; MAint (if b then 1 else 0)]
@@ -452,7 +445,6 @@ let remove_prop pr =
   create_meta meta_remove_prop [MApr pr]
 
 type syntax_map = (string * int) Mid.t
-type converter_map = (string * int) Mls.t
 
 let change_override e e' rs ov = function
   | None         -> Some (rs,ov)
@@ -489,22 +481,12 @@ let sm_add_pr sm = function
   | [MApr pr] -> Mid.add pr.pr_name ("",0) sm
   | _ -> assert false
 
-let cm_add_ls cm = function
-  | [MAls ls; MAstr rs; MAint ov] ->
-    Mls.change
-      (change_override (KnownConverterSyntax ls) (TooManyConverterOverride ls)
-         rs ov) ls cm
-  | _ -> assert false
-
 let get_syntax_map task =
   let sm = Mid.empty in
   let sm = Task.on_meta meta_syntax_type sm_add_ts sm task in
   let sm = Task.on_meta meta_syntax_logic sm_add_ls sm task in
   let sm = Task.on_meta meta_remove_prop sm_add_pr sm task in
   sm
-
-let get_converter_map task =
-  Task.on_meta meta_syntax_converter cm_add_ls Mls.empty task
 
 let get_rliteral_map task =
   Task.on_meta meta_syntax_literal sm_add_ts Mid.empty task
@@ -518,11 +500,6 @@ let add_syntax_map td sm = match td.td_node with
       sm_add_pr sm args
   | _ -> sm
 
-(*let add_converter_map td cm = match td.td_node with
-  | Meta (m, args) when meta_equal m meta_syntax_converter ->
-    cm_add_ls cm args
-  | _ -> cm*)
-
 let add_rliteral_map td sm = match td.td_node with
   | Meta (m, args) when meta_equal m meta_syntax_literal ->
       sm_add_ts sm args
@@ -530,9 +507,6 @@ let add_rliteral_map td sm = match td.td_node with
 
 let query_syntax sm id =
   try Some (fst (Mid.find id sm)) with Not_found -> None
-
-let query_converter cm ls =
-  try Some (fst (Mls.find ls cm)) with Not_found -> None
 
 let on_syntax_map fn =
   Trans.on_meta meta_syntax_type (fun sts ->
@@ -543,10 +517,6 @@ let on_syntax_map fn =
     let sm = List.fold_left sm_add_ls sm sls in
     let sm = List.fold_left sm_add_pr sm spr in
     fn sm)))
-
-let on_converter_map fn =
-  Trans.on_meta meta_syntax_converter (fun scs ->
-    fn (List.fold_left cm_add_ls Mls.empty scs))
 
 let sprint_tdecl (fn : 'a -> Format.formatter -> tdecl -> 'a * string list) =
   let buf = Buffer.create 2048 in
@@ -606,17 +576,11 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | KnownLogicSyntax ls ->
       fprintf fmt "Syntax for logical symbol %a is already defined"
         Pretty.print_ls ls
-  | KnownConverterSyntax ls ->
-      fprintf fmt "Converter syntax for logical symbol %a is already defined"
-        Pretty.print_ls ls
   | TooManyTypeOverride ts ->
       fprintf fmt "Too many syntax overriding for type symbol %a"
         Pretty.print_ts ts
   | TooManyLogicOverride ls ->
       fprintf fmt "Too many syntax overriding for logic symbol %a"
-        Pretty.print_ls ls
-  | TooManyConverterOverride ls ->
-      fprintf fmt "Too many syntax converter overriding for logic symbol %a"
         Pretty.print_ls ls
   | BadSyntaxIndex i ->
       fprintf fmt "Bad argument index %d, must start with 1" i

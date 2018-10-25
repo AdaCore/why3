@@ -190,6 +190,15 @@ let () = Trans.register_transform "introduce_premises" introduce_premises
   ~desc:"Introduce@ universal@ quantification@ and@ hypothesis@ in@ the@ \
          goal@ into@ constant@ symbol@ and@ axioms."
 
+(* In this file t_replace is used to substitute vsymbol with lsymbols. This is
+   done in [set_vs]; but in cases where the attribute is directly on the lsymbol
+   term application (Tapp), the substitution may not work resulting in an error
+   of the transformation. That's why we check for equality modulo attributes and
+   then copy attributes back on the term again.
+*)
+let rec t_replace t1 t2 t =
+  if t_equal_nt_na t t1 then t_attr_copy t t2 else t_map (t_replace t1 t2) t
+
 let rec generalize hd =
   match hd.Task.task_decl.Theory.td_node with
   | Theory.Decl {d_node = Dprop (Pgoal,pr,f)} ->
@@ -278,9 +287,13 @@ let () = Trans.register_transform
            (Trans.decl eliminate_exists None)
            ~desc:"Replace axioms of the form 'exists x. P' by 'constant x axiom P'."
 
+let subst_filter ls =
+  Sattr.mem intro_attr ls.ls_name.id_attrs &&
+  not (Ident.has_a_model_attr ls.ls_name)
+
 let simplify_intros =
-  Trans.compose Simplify_formula.simplify_trivial_wp_quantification
-                introduce_premises
+  Trans.compose introduce_premises
+                (Subst.subst_filtered subst_filter)
 
 let split_vc =
   Trans.compose_l
@@ -291,5 +304,4 @@ let () = Trans.register_transform_l
            "split_vc" split_vc
            ~desc:"The@ recommended@ splitting@ transformation@ to@ apply@ \
               on@ VCs@ generated@ by@ WP@ (split_goal_right@ followed@ \
-              by@ simplify_trivial_quantifications@ followed@ by@ \
-              introduce_premises)."
+              by@ introduce_premises@ followed@ by@ subst_all)."

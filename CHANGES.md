@@ -1,5 +1,48 @@
 :x: marks a potential source of incompatibility
 
+Version 1.1.0, October 17, 2018
+-------------------------------
+
+Core
+  * variants can now be inferred on some lemma functions
+  * coercions are now supported for `if` and `match` branches
+  * `interrupt` command should now properly interrupt running provers.
+  * clearer typing error messages thanks to printing qualified names
+  * fixed handling of prover upgrades, resurrected the policy
+    "duplicate" and added a policy "remove"
+
+API
+  * added `Call_provers.interrupt_call` to interrupt a running prover
+    (contribution by Pierre-Yves Strub)
+
+Language
+  * program functions can now be marked `partial` to prevent them from
+    being used in ghost context; the annotation does not have to be
+    explicitly put on their callers
+  * `use` now accepts several module names separated by commas
+  * symbolic operators can be used in identifiers like `(+)_ident` or
+    `([])'ident`
+  * range types have now a default ordering to be used in `variant` clause
+
+Standard library
+  * library `ieee_float`: floating-point operations can now be used in
+    programs
+
+Transformations
+  * `split_vc` behaves slightly differently :x:
+
+Provers
+  * support for Alt-Ergo 2.1.0 (released Mar 14, 2018)
+  * support for Alt-Ergo 2.2.0 (released Apr 26, 2018)
+  * support for Coq 8.8.1 (released Jun 29, 2018)
+  * support for Coq 8.8.2 (released Sep 26, 2018)
+  * support for CVC4 1.6 (released Jun 25, 2018)
+  * support for Z3 4.7.1 (released May 23, 2018)
+  * support for Isabelle 2018 (released Aug 2018)
+    (contribution by Stefan Berghofer)
+  * dropped support for Isabelle 2016 (2017 still supported) :x:
+  * dropped support for Alt-Ergo versions < 2.0.0 :x:
+
 Version 1.0.0, June 25, 2018
 ----------------------------
 
@@ -36,10 +79,13 @@ Language
   * `use T` and `clone T` now import the generated namespace T;
     use `use T as T` and `clone T as T` to prevent this :x:
   * `pure { <term> }` produces a ghost value in program code
+  * `a <-> b <-> c` is now parsed as `(a <-> b) /\ (b <-> c)`;
+    `a <-> b -> c` is now rejected :x:
 
 Standard library
   * machine integers in `mach.int.*` are now range types :x:
   * added a minimal memory model for the C language in `mach.c`
+  * new modules `witness.Witness` and `witness.Nat`
 
 Extraction
   * improved extraction to OCaml

@@ -27,7 +27,6 @@ open Printer
 
 type info = {
   info_syn          : syntax_map;
-  info_convert      : syntax_map;
   info_literal      : syntax_map;
   info_current_th   : Theory.theory;
   info_current_mo   : Pmodule.pmodule option;
@@ -76,8 +75,8 @@ module Print = struct
      aprinter: type variables
      tprinter: toplevel definitions *)
   let iprinter, aprinter, tprinter =
-    let isanitize = sanitizer char_to_alpha char_to_alnumus in
-    let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
+    let isanitize = sanitizer char_to_alnumus char_to_alnumus in
+    let lsanitize = sanitizer char_to_lalnumus char_to_alnumus in
     create_ident_printer ocaml_keywords ~sanitizer:isanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize
@@ -229,17 +228,19 @@ module Print = struct
         List.filter (fun e -> not (rs_ghost e)) itd.itd_fields
     | _ -> []
 
-  let rec print_pat info fmt = function
+  let rec print_pat ?(paren=false) info fmt = function
     | Pwild ->
         fprintf fmt "_"
     | Pvar {vs_name=id} ->
         (print_lident info) fmt id
     | Pas (p, {vs_name=id}) ->
-        fprintf fmt "%a as %a" (print_pat info) p (print_lident info) id
+        fprintf fmt (protect_on paren "%a as %a") (print_pat info) p
+          (print_lident info) id
     | Por (p1, p2) ->
-        fprintf fmt "%a | %a" (print_pat info) p1 (print_pat info) p2
+        fprintf fmt (protect_on paren "%a | %a") (print_pat info) p1
+          (print_pat info) p2
     | Ptuple pl ->
-        fprintf fmt "(%a)" (print_list comma (print_pat info)) pl
+        fprintf fmt "(%a)" (print_list comma (print_pat ~paren:true info)) pl
     | Papp (ls, pl) ->
         match query_syntax info.info_syn ls.ls_name, pl with
         | Some s, _ ->
@@ -248,9 +249,10 @@ module Print = struct
             let pjl = let rs = restore_rs ls in get_record info rs in
             match pjl with
             | []  -> print_papp info ls fmt pl
-            | pjl -> fprintf fmt "@[<hov 2>{ %a }@]"
-                (print_list2 semi equal (print_rs info) (print_pat info))
-                (pjl, pl)
+            | pjl ->
+                fprintf fmt (protect_on paren "@[<hov 2>{ %a }@]")
+                  (print_list2 semi equal (print_rs info)
+                  (print_pat ~paren: true info)) (pjl, pl)
 
   and print_papp info ls fmt = function
     | []  -> fprintf fmt "%a"      (print_uident info) ls.ls_name
@@ -264,8 +266,6 @@ module Print = struct
   let pv_name pv = pv.pv_vs.vs_name
   let print_pv info fmt pv = print_lident info fmt (pv_name pv)
 
-  let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
-
   (* FIXME put these in Compile*)
   let is_true e = match e.e_node with
     | Eapp (s, []) -> rs_equal s rs_true
@@ -277,9 +277,8 @@ module Print = struct
 
   let check_val_in_drv info ({rs_name = {id_loc = loc}} as rs) =
     (* here [rs] refers to a [val] declaration *)
-    match query_syntax info.info_convert rs.rs_name,
-          query_syntax info.info_syn     rs.rs_name with
-    | None, None (* when info.info_flat *) ->
+    match query_syntax info.info_syn     rs.rs_name with
+    | None (* when info.info_flat *) ->
         Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
     | _ -> ()
 
@@ -331,18 +330,16 @@ module Print = struct
             List.exists (rs_equal rs) its.itd_constructors in
           List.exists is_constructor its
       | _ -> false in
-    match query_syntax info.info_convert rs.rs_name,
-          query_syntax info.info_syn rs.rs_name, pvl with
-    | Some s, _, [{e_node = Econst _}] ->
-        syntax_arguments s print_constant fmt pvl
-    | _, Some s, _ (* when is_local_id info rs.rs_name  *)->
+    match query_syntax info.info_syn rs.rs_name, pvl with
+    | Some s, _ (* when is_local_id info rs.rs_name  *)->
         syntax_arguments s (print_expr ~paren:true info) fmt pvl;
-    | _, None, tl when is_rs_tuple rs ->
-        fprintf fmt "@[(%a)@]"
-          (print_list comma (print_expr info)) tl
-    | _, None, [t1] when isfield ->
+    | None, [t] when is_rs_tuple rs ->
+        fprintf fmt "@[%a@]" (print_expr info) t
+    | None, tl when is_rs_tuple rs ->
+        fprintf fmt "@[(%a)@]" (print_list comma (print_expr info)) tl
+    | None, [t1] when isfield ->
         fprintf fmt "%a.%a" (print_expr info) t1 (print_lident info) rs.rs_name
-    | _, None, tl when isconstructor () ->
+    | None, tl when isconstructor () ->
         let pjl = get_record info rs in
         begin match pjl, tl with
           | [], [] ->
@@ -357,9 +354,9 @@ module Print = struct
               fprintf fmt "@[<hov 2>{ %a }@]"
                 (print_list2 semi equal (print_rs info)
                    (print_expr ~paren:true info)) (pjl, tl) end
-    | _, None, [] ->
+    | None, [] ->
         (print_lident info) fmt rs.rs_name
-    | _, _, tl ->
+    | _, tl ->
         fprintf fmt "@[<hov 2>%a %a@]"
           (print_lident info) rs.rs_name
           (print_apply_args info) (tl, rs.rs_cty.cty_args)
@@ -389,12 +386,10 @@ module Print = struct
   and print_let_def ?(functor_arg=false) info fmt = function
     | Lvar (pv, {e_node = Eany ty}) when functor_arg ->
         fprintf fmt "@[<hov 2>val %a : %a@]"
-          (print_lident info) (pv_name pv)
-          (print_ty info) ty;
+          (print_lident info) (pv_name pv) (print_ty info) ty;
     | Lvar (pv, e) ->
         fprintf fmt "@[<hov 2>let %a =@ %a@]"
-          (print_lident info) (pv_name pv)
-          (print_expr info) e;
+          (print_lident info) (pv_name pv) (print_expr info) e
     | Lsym (rs, res, args, ef) ->
         fprintf fmt "@[<hov 2>let %a @[%a@] : %a@ =@ @[%a@]@]"
           (print_lident info) rs.rs_name
@@ -411,9 +406,7 @@ module Print = struct
                 (print_fun_type_args info) (args, s, res, e);
               forget_vars args
         in
-        List.iter (fun fd -> Hrs.replace ht_rs fd.rec_rsym fd.rec_sym) rdef;
         print_list_next newline print_one fmt rdef;
-        List.iter (fun fd -> Hrs.remove ht_rs fd.rec_rsym) rdef
     | Lany (rs, res, []) when functor_arg ->
         fprintf fmt "@[<hov 2>val %a : %a@]"
           (print_lident info) rs.rs_name
@@ -450,20 +443,16 @@ module Print = struct
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
     | Ehole -> ()
-    | Eany _ -> assert false
+    | Eany _ -> () (* FIXME *)
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
         fprintf fmt "false"
     | Eapp (rs, [])  -> (* avoids parenthesis around values *)
-        fprintf fmt "%a" (print_apply info (Hrs.find_def ht_rs rs rs)) []
+        fprintf fmt "%a" (print_apply info rs) []
     | Eapp (rs, pvl) ->
-        begin match query_syntax info.info_convert rs.rs_name, pvl with
-          | Some s, [{e_node = Econst _}] ->
-              syntax_arguments s print_constant fmt pvl
-          | _ ->
-              fprintf fmt (protect_on paren "%a")
-                (print_apply info (Hrs.find_def ht_rs rs rs)) pvl end
+       fprintf fmt (protect_on paren "%a")
+               (print_apply info rs) pvl
     | Ematch (e1, [p, e2], []) ->
         fprintf fmt (protect_on paren "let %a =@ %a in@ %a")
           (print_pat info) p (print_expr info) e1 (print_expr info) e2
@@ -513,11 +502,12 @@ module Print = struct
     | Eraise (xs, e_opt) ->
         print_raise ~paren info xs fmt e_opt
     | Efor (pv1, pv2, dir, pv3, e) ->
-        if is_mapped_to_int info pv1.pv_ity then
+        if is_mapped_to_int info pv1.pv_ity then begin
           fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
             (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)
             print_for_direction dir (print_lident info) (pv_name pv3)
-            (print_expr info) e
+            (print_expr info) e;
+          forget_pv pv1 end
         else
           let for_id  = id_register (id_fresh "for_loop_to") in
           let cmp, op = match dir with
@@ -680,7 +670,6 @@ let print_decl =
     ignore (old);
     let info = {
       info_syn          = pargs.Pdriver.syntax;
-      info_convert      = pargs.Pdriver.converter;
       info_literal      = pargs.Pdriver.literal;
       info_current_th   = th;
       info_current_mo   = Some m;

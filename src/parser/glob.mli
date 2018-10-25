@@ -13,8 +13,6 @@ open Ident
 
 val flag: Debug.flag
 
-val dummy_id: ident
-
 val def: kind:string -> ident -> unit
   (** [def id] registers that [id] is defined at position [id.id_loc] *)
 

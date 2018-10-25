@@ -36,6 +36,8 @@ Lemma cdiv_cases : forall (n:Z) (d:Z), ((0%Z <= n)%Z -> ((0%Z < d)%Z ->
       rewrite on_pos_euclidean_is_div.
       rewrite Z.mul_1_l.
       reflexivity.
+    + destruct H; auto.
+    + destruct H; auto.
     + assert (NZ_d:((Zpos d) <> 0)%Z) by discriminate.
       rewrite (Z.quot_div (Z.neg n) (Z.pos d) NZ_d).
       rewrite on_pos_euclidean_is_div.
@@ -45,6 +47,8 @@ Lemma cdiv_cases : forall (n:Z) (d:Z), ((0%Z <= n)%Z -> ((0%Z < d)%Z ->
       simpl.
       rewrite on_pos_euclidean_is_div.
       reflexivity.
+    + destruct H. auto.
+    + destruct H. auto.
     + assert (NZ_d:((Z.neg d) <> 0)%Z) by discriminate.
       rewrite (Z.quot_div (Z.neg n) (Z.neg d) NZ_d).
       simpl.
@@ -64,7 +68,6 @@ Lemma cmod_cases : forall (n:Z) (d:Z), ((0%Z <= n)%Z -> ((0%Z < d)%Z ->
   (-d)%Z))%Z))))).
   intros n d.
   unfold int.EuclideanDivision.mod1.
-  SearchAbout Z.rem Z.quot.
   assert (Z.rem n d = n - (d * (Z.quot n d)))%Z.
   assert (H:= Z.quot_rem' n d).
   omega.

@@ -3,8 +3,10 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="5">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../hillel_challenge.mlw" proved="true">
 <theory name="Leftpad" proved="true">
  <goal name="VC leftpad" expl="VC for leftpad" proved="true">
@@ -48,13 +50,13 @@
   <proof prover="3"><result status="valid" time="0.84"/></proof>
   </goal>
   <goal name="VC unique.11" expl="loop invariant preservation" proved="true">
-  <transf name="case" proved="true" arg1="(x=o)">
+  <transf name="case" proved="true" arg1="x=a[i]">
    <goal name="VC unique.11.0" expl="true case (loop invariant preservation)" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="88"/></proof>
+   <proof prover="1"><result status="valid" time="0.01" steps="75"/></proof>
    </goal>
    <goal name="VC unique.11.1" expl="false case (loop invariant preservation)" proved="true">
    <transf name="assert" proved="true" arg1="(mem x a (i+1) &lt;-&gt; mem x a i)">
-    <goal name="VC unique.11.1.0" proved="true">
+    <goal name="VC unique.11.1.0" expl="asserted formula" proved="true">
     <proof prover="0"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="VC unique.11.1.1" expl="false case (loop invariant preservation)" proved="true">
@@ -70,12 +72,12 @@
    <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
    </goal>
    <goal name="VC unique.12.1" expl="false case (loop invariant preservation)" proved="true">
-   <transf name="assert" proved="true" arg1="(not (mem o a i1))">
-    <goal name="VC unique.12.1.0" proved="true">
-    <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <transf name="assert" proved="true" arg1="(not (mem a[i1] a i1))">
+    <goal name="VC unique.12.1.0" expl="asserted formula" proved="true">
+    <proof prover="4"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="VC unique.12.1.1" expl="false case (loop invariant preservation)" proved="true">
-    <proof prover="2"><result status="valid" time="0.01" steps="50"/></proof>
+    <proof prover="1"><result status="valid" time="0.01" steps="92"/></proof>
     </goal>
    </transf>
    </goal>
@@ -88,17 +90,17 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC unique.15" expl="loop invariant preservation" proved="true">
-  <transf name="case" proved="true" arg1="(x = o)">
+  <transf name="case" proved="true" arg1="(x=n-1)">
    <goal name="VC unique.15.0" expl="true case (loop invariant preservation)" proved="true">
-   <proof prover="2"><result status="valid" time="0.02" steps="54"/></proof>
+   <proof prover="4"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC unique.15.1" expl="false case (loop invariant preservation)" proved="true">
    <transf name="assert" proved="true" arg1="(mem x a (i+1) &lt;-&gt; mem x a i)">
-    <goal name="VC unique.15.1.0" proved="true">
-    <proof prover="0"><result status="valid" time="0.06"/></proof>
+    <goal name="VC unique.15.1.0" expl="asserted formula" proved="true">
+    <proof prover="0"><result status="valid" time="0.02"/></proof>
     </goal>
     <goal name="VC unique.15.1.1" expl="false case (loop invariant preservation)" proved="true">
-    <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
+    <proof prover="2"><result status="valid" time="0.00" steps="25"/></proof>
     </goal>
    </transf>
    </goal>
@@ -126,7 +128,7 @@
  <goal name="VC fulcrum" expl="VC for fulcrum" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC fulcrum.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC fulcrum.1" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
@@ -135,7 +137,7 @@
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC fulcrum.3" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC fulcrum.4" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
@@ -207,12 +209,6 @@
  <goal name="VC big_zero" expl="VC for big_zero" proved="true">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
  </goal>
- <goal name="VC min_int32" expl="VC for min_int32" proved="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- </goal>
- <goal name="VC max_int32" expl="VC for max_int32" proved="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
- </goal>
  <goal name="VC add_big" expl="VC for add_big" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC add_big.0" expl="integer overflow" proved="true">
@@ -225,7 +221,7 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC add_big.3" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC add_big.4" expl="type invariant" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -259,7 +255,7 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC add_big.9" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC add_big.10" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -290,7 +286,7 @@
  <goal name="VC delta" expl="VC for delta" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC delta.0" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC delta.1" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -308,7 +304,7 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC delta.6" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
+  <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC delta.7" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -317,7 +313,7 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC delta.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="0"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC delta.10" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -335,7 +331,7 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC delta.15" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC delta.16" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -344,7 +340,7 @@
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC delta.18" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC delta.19" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -447,7 +443,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC fulcrum.28" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="38"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="61"/></proof>
   </goal>
   <goal name="VC fulcrum.29" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -462,10 +458,10 @@
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC fulcrum.33" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="51"/></proof>
   </goal>
   <goal name="VC fulcrum.34" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="31"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="55"/></proof>
   </goal>
   <goal name="VC fulcrum.35" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>

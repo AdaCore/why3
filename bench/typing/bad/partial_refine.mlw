@@ -1,0 +1,9 @@
+module S
+  val constant c : int
+  val f () : int
+end
+
+module I2
+  val partial random () : int
+  clone export S with val f = random
+end

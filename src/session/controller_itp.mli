@@ -26,6 +26,7 @@ type proof_attempt_status =
   | InternalFailure of exn (** external proof aborted by internal error *)
   | Uninstalled of Whyconf.prover (** prover is uninstalled *)
   | UpgradeProver of Whyconf.prover (** prover is upgraded *)
+  | Removed of Whyconf.prover (** prover has been removed or upgraded *)
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
 
@@ -33,10 +34,17 @@ type transformation_status =
     TSscheduled
   | TSdone of transID
   | TSfailed of (proofNodeID * exn)
+  (* We distinguish normal usage exception of transformation from fatal
+     exception like assertion failure that should not be raised *)
+  | TSfatal of (proofNodeID * exn)
 
 val print_trans_status : Format.formatter -> transformation_status -> unit
 
 type strategy_status = STSgoto of proofNodeID * int | STShalt
+                     (* When a transformation fatally returns, we have to
+                        fatally fail the strategy
+                        [transformation_name, pid, exn] *)
+                     | STSfatal of string * proofNodeID * exn
 
 val print_strategy_status : Format.formatter -> strategy_status -> unit
 
@@ -109,8 +117,17 @@ val print_session : Format.formatter -> controller -> unit
 
 exception Errors_list of exn list
 
-val reload_files : controller -> use_shapes:bool -> bool * bool
-(** reload the files of the given session:
+val reload_files : controller -> shape_version:int option -> bool * bool
+(** [reload_files] returns a pair [(o,d)]: [o] true means there are
+    obsolete goals, [d] means there are missed objects (goals,
+    transformations, theories or files) that are now detached in the
+    session returned.
+
+  If parsing or typing errors occurs, a list of errors is raised
+  inside exception Errors_list.
+
+  The detailed process of reloading the files of the given session is
+  as follows.
 
   - each file is parsed again and theories/goals extracted from it. If
     some syntax error or parsing error occurs, then the corresponding
@@ -154,13 +171,7 @@ val reload_files : controller -> use_shapes:bool -> bool * bool
       it, neither to its subgoals.
 
 
-  [reload_files] It returns a pair (o, d): o true means there are
-    obsolete goals, d means there are missed objects (goals, transformations,
-    theories or files) that are now detached in the session returned.
-   If parsing or typing errors occurs, a list of errors is raised inside
-   exception Errors_list.
-
-*)
+ *)
 
 val add_file : controller -> ?format:Env.fformat -> string -> unit
 (** [add_fil cont ?fmt fname] parses the source file
@@ -237,6 +248,7 @@ val prepare_edition :
     session directory, and [res] is the former result if any. *)
 
 exception TransAlreadyExists of string * string
+exception GoalNodeDetached of proofNodeID
 
 val schedule_transformation :
   controller ->
@@ -339,6 +351,7 @@ val replay:
 
  *)
 
+exception CannotRunBisectionOn of proofAttemptID
 
 val bisect_proof_attempt:
   callback_tr:(string -> string list -> transformation_status -> unit) ->
@@ -346,5 +359,23 @@ val bisect_proof_attempt:
   notification:notifier ->
   removed:notifier ->
   controller -> proofAttemptID -> unit
+  (** [bisect_proof_attempt ~callback_tr ~callback_pa ~notification
+                            ~removed cont id] runs a bisection process
+      based on the proof attempt [id] of the session managed by [cont].
 
+      The proof attempt [id] must be a successful one, otherwise,
+      exception [CannotRunBisectionOn id] is raised.
+
+      Bisection tries to remove from the context the largest number of
+      definitions and axioms, using the `remove` transformation (bound
+      to [Cut.remove_list]). It proceeeds by dichotomy of the
+      context. Note that there is no garantee that the removed data at
+      the end is globally maximal. During that process, [callback_tr]
+      is called each time the `remove` transformation is added to the session,
+      [callback_pa] is called each time the prover is called on a
+      reduced task, [notification] is called when a proof node is
+      created or modified, and [removed] is called when a node is
+      removed.
+
+   *)
 end

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -193,12 +193,12 @@
   </goal>
   <goal name="VC mex.28" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="(mem x a)">
-   <goal name="VC mex.28.0" proved="true">
+   <goal name="VC mex.28.0" expl="asserted formula" proved="true">
    <transf name="assert" proved="true" arg1="(a[x] = x)">
-    <goal name="VC mex.28.0.0" proved="true">
+    <goal name="VC mex.28.0.0" expl="asserted formula" proved="true">
     <proof prover="1"><result status="valid" time="0.02"/></proof>
     </goal>
-    <goal name="VC mex.28.0.1" proved="true">
+    <goal name="VC mex.28.0.1" expl="asserted formula" proved="true">
     <proof prover="1"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
@@ -219,12 +219,12 @@
   </goal>
   <goal name="VC mex.32" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="(mem x a)">
-   <goal name="VC mex.32.0" proved="true">
+   <goal name="VC mex.32.0" expl="asserted formula" proved="true">
    <transf name="assert" proved="true" arg1="(a[x] = x)">
-    <goal name="VC mex.32.0.0" proved="true">
+    <goal name="VC mex.32.0.0" expl="asserted formula" proved="true">
     <proof prover="1"><result status="valid" time="0.03"/></proof>
     </goal>
-    <goal name="VC mex.32.0.1" proved="true">
+    <goal name="VC mex.32.0.1" expl="asserted formula" proved="true">
     <proof prover="1"><result status="valid" time="0.03"/></proof>
     </goal>
    </transf>

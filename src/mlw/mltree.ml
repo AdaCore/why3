@@ -79,7 +79,7 @@ and let_def =
 
 and rdef = {
   rec_sym  : rsymbol; (* exported *)
-  rec_rsym : rsymbol; (* internal *)
+  (* rec_rsym : rsymbol;*) (* internal *)
   rec_args : var list;
   rec_exp  : expr;
   rec_res  : ty;
@@ -298,6 +298,12 @@ let mk_its_defn its_name its_args its_private its_def =
 (* smart constructors *)
 let e_unit =
   mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty Sattr.empty
+
+let e_const c =
+  mk_expr (Econst c)
+
+let e_var pv =
+  mk_expr (Evar pv)
 
 let var_defn pv e =
   Lvar (pv, e)

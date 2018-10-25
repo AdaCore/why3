@@ -606,8 +606,8 @@ let cl_clone_ts cl ts =
     match ts.ts_def with
     | Alias t -> Alias (cl_trans_ty cl t)
     | NoDef -> NoDef
-    | Range _ -> assert false (* TODO *)
-    | Float _ -> assert false (* TODO *) in
+    | Range ir -> Range ir
+    | Float irf -> Float irf in
   let ts' = create_tysymbol (id_clone ts.ts_name) ts.ts_args td' in
   cl.ts_table <- Mts.add ts ts' cl.ts_table;
   ts'

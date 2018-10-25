@@ -26,11 +26,10 @@ module Mul
               -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
   =
-    let limb_zero = Limb.of_int 0 in
-    let lx = ref limb_zero in
-    let c = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz do
+    let lx = ref 0 in
+    let c = ref 0 in
+    let i = ref 0 in
+    while !i < sz do
       variant { sz - !i }
       invariant { 0 <= !i <= sz }
       invariant { value r !i + (power radix !i) * !c =
@@ -39,13 +38,7 @@ module Mul
                 -> (pelts r)[j] = old (pelts r)[j] }
       label StartLoop in
       lx := get_ofs x !i;
-      let rl, rh = Limb.mul_double !lx y in
-      let res, carry = Limb.add_with_carry rl !c limb_zero in
-      label BeforeWrite in
-      value_sub_shift_no_change (pelts r) r.offset (p2i !i) (p2i !i) res;
-      set_ofs r !i res;
-      assert { value r !i + (power radix !i) * !c =
-                  value x !i * y };
+      let rl, rh = mul_double !lx y in
       assert { rh < radix - 1
                by
                (!lx * y <= !lx * (radix-1) <= (radix-1)*(radix-1)
@@ -58,7 +51,15 @@ module Mul
                so
                radix * rh <= (radix -1) * (radix -1)
                };
-      c := Limb.(+) rh carry;
+      let res = add_mod rl !c in
+      c := rh;
+      [@vc:sp] if res < rl then c := !c + 1;
+      assert { res + radix * !c = !lx * y + (!c at StartLoop) };
+      label BeforeWrite in
+      value_sub_shift_no_change (pelts r) r.offset (p2i !i) (p2i !i) res;
+      set_ofs r !i res;
+      assert { value r !i + ((power radix !i) * !c at StartLoop) =
+                  value x !i * y };
       value_tail r !i;
       value_tail x !i;
       assert { value x (!i+1) * y
@@ -66,7 +67,7 @@ module Mul
                (*nonlinear, needed for reflection*)
       assert { value r (!i+1) + (power radix (!i+1)) * !c =
                value x (!i+1) * y };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := !i + 1;
     done;
     !c
 
@@ -84,12 +85,11 @@ module Mul
     ensures { forall j. (j < r.offset \/ r.offset + sz <= j) ->
               (pelts r)[j] = (pelts (old r))[j] }
   =
-    let limb_zero = Limb.of_int 0 in
-    let lx = ref limb_zero in
-    let lr = ref limb_zero in
-    let c = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz do
+    let lx = ref 0 in
+    let lr = ref 0 in
+    let c = ref 0 in
+    let i = ref 0 in
+    while !i < sz do
       variant { sz - !i }
       invariant { 0 <= !i <= sz }
       invariant { value r !i + (power radix !i) * !c
@@ -103,8 +103,8 @@ module Mul
       lx := get_ofs x !i;
       lr := get_ofs r !i;
       assert { !lr = (pelts (old r))[r.offset + !i] };
-      let rl, rh = Limb.mul_double !lx y in
-      let res, carry = Limb.add3 !lr rl !c in
+      let rl, rh = mul_double !lx y in
+      let res, carry = add3 !lr rl !c in
       value_tail r !i;
       value_tail x !i;
       assert { value (old r) (!i+1) = value (old r) !i + power radix !i * !lr };
@@ -137,14 +137,14 @@ module Mul
                rl + radix * rh <= (radix-1)*(radix-1) };
       assert { rh = radix - 2 -> carry <= 1
                by rl <= 1 };
-      c := Limb.(+) rh carry;
+      c := rh + carry;
       assert { value x (!i + 1) * y
                = value x !i * y + (power radix !i) * (!lx * y) };
                (* nonlinear part *)
       assert { value r (!i+1) + (power radix (!i+1)) * !c
                  = value (old r) (!i+1)
                    + value x (!i+1) * y };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := !i + 1;
     done;
     !c
 
@@ -163,12 +163,10 @@ module Mul
               -> (pelts r)[j] = old (pelts r)[j] }
   =
     wmpn_zero r sz;
-    let limb_zero = Limb.of_int 0 in
-    let one = Int32.of_int 1 in
-    let rp = ref (C.incr r (Int32.of_int 0)) in
-    let ly = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz do
+    let rp = ref (C.incr r 0) in
+    let ly = ref 0 in
+    let i = ref 0 in
+    while !i < sz do
       invariant { 0 <= !i <= sz }
       invariant { value r (!i + sz) = value x sz * value y !i }
       invariant { (!rp).offset = r.offset + !i }
@@ -221,8 +219,8 @@ module Mul
                = value x sz * value y !i + (power radix !i) * (value x sz * !ly) };
              (* nonlinear *)
       assert { value r (!i + sz + 1) = value x sz * value y (!i+1) };
-      i := Int32.(+) !i one;
-      rp.contents <- C.incr !rp one;
+      i := !i + 1;
+      rp.contents <- C.incr !rp 1;
     done
 
  let wmpn_addmul_n (r x y:t) (sz:int32) : limb
@@ -236,14 +234,12 @@ module Mul
               = value (old r) (sz + sz)
                 + value x sz * value y sz }
   =
-    let limb_zero = Limb.of_int 0 in
-    let one = Int32.of_int 1 in
-    let rp = ref (C.incr r (Int32.of_int 0)) in
-    let ly = ref limb_zero in
-    let lr = ref limb_zero in
-    let c = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz do
+    let rp = ref (C.incr r 0) in
+    let ly = ref 0 in
+    let lr = ref 0 in
+    let c = ref 0 in
+    let i = ref 0 in
+    while !i < sz do
       invariant { 0 <= !i <= sz }
       invariant { value r (!i + sz)
                     + (power radix (!i + sz)) * !c
@@ -305,17 +301,17 @@ module Mul
                     + (power radix (!i + sz + 1)) * !c
                   = value (old r) (!i + sz + 1)
                     + value x sz * value y (!i + 1) };
-      i := Int32.(+) !i one;
-      rp.contents <- C.incr !rp one;
+      i := !i + 1;
+      rp.contents <- C.incr !rp 1;
       assert { forall j. (!rp).offset + sz <= j ->
                  (pelts (old r)) [j] = (pelts r)[j] };
     done;
     !c
 
-  (** `wmpn_mul r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
+  (** `wmpn_mul_basecase r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
   the result in `(r, sx+sy)`. `sx` must be greater than or equal to
   `sy`. Corresponds to `mpn_mul`. *)
-  let wmpn_mul (r x y:t) (sx sy:int32) : unit
+  let wmpn_mul_basecase (r x y:t) (sx sy:int32) : unit
     requires { 0 < sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -335,10 +331,9 @@ module Mul
     assert { value r (sx + 1) = value x sx * value y 1
              by value y 1 = !ly
              so value r sx + power radix sx * c = value x sx * value y 1 };
-    let one = Int32.of_int 1 in
-    let rp = ref (C.incr r (Int32.of_int 1)) in
-    let i = ref (Int32.of_int 1) in
-    while Int32.(<) !i sy do
+    let rp = ref (C.incr r 1) in
+    let i = ref 1 in
+    while !i < sy do
       invariant { 1 <= !i <= sy }
       invariant { value r (!i + sx) = value x sx * value y !i }
       invariant { (!rp).offset = r.offset + !i }
@@ -383,8 +378,8 @@ module Mul
                  + power radix !i * (value x sx * !ly) };
              (*nonlinear*)
       assert { value r (!i + sx + 1) = value x sx * value y (!i+1) };
-      i := Int32.(+) !i one;
-      rp.contents <- C.incr !rp one;
+      i := !i + 1;
+      rp.contents <- C.incr !rp 1;
     done;
 
 end

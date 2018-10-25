@@ -74,8 +74,10 @@ let rs_kind s = match s.rs_logic with
 let rs_ghost s = s.rs_cty.cty_effect.eff_ghost
 
 let check_effects ?loc c =
-  if c.cty_effect.eff_oneway then Loc.errorm ?loc
+  if diverges c.cty_effect.eff_oneway then Loc.errorm ?loc
     "This function may not terminate, it cannot be used as pure";
+  if partial c.cty_effect.eff_oneway then Loc.errorm ?loc
+    "This function may fail, it cannot be used as pure";
   if not (cty_pure c) then Loc.errorm ?loc
     "This function has side effects, it cannot be used as pure"
 
@@ -370,7 +372,7 @@ let e_attr_copy { e_attrs = attrs; e_loc = loc } e =
   let loc = if e.e_loc = None then loc else e.e_loc in
   { e with e_attrs = attrs; e_loc = loc }
 
-let proxy_attr = create_attribute "whyml_proxy_symbol"
+let proxy_attr = create_attribute "mlw:proxy_symbol"
 let proxy_attrs = Sattr.singleton proxy_attr
 
 let rec e_attr_push ?loc l e = match e.e_node with
@@ -451,7 +453,7 @@ let localize_reset_stale v r el =
 
 (* localize a divergence *)
 let localize_divergence el =
-  let diverges eff = eff.eff_oneway in
+  let diverges eff = diverges eff.eff_oneway in
   List.iter (fun e -> if diverges e.e_effect then
     let loc = e_locate_effect diverges e in
     Loc.error ?loc GhostDivergence) el;
@@ -1021,6 +1023,72 @@ let e_assert ak f =
 
 let e_absurd ity = mk_expr Eabsurd ity MaskVisible eff_empty
 
+(* structural descent *)
+
+exception NoVariantFound of rsymbol
+
+let term_check rdl =
+  let cgr = Decl.create_call_set () in
+  let add acc rd = Mrs.add rd.rec_rsym rd acc in
+  let syms = List.fold_left add Mrs.empty rdl in
+  let term_of e =
+    try pure_of_expr false e with Exit -> t_void in
+  let rec expr rs vm e = match e.e_node with
+    | Evar _ | Econst _ | Epure _ | Eassert _ -> ()
+    | Eghost e | Eexn (_,e) -> expr rs vm e
+    | Eexec (c, _) ->
+        cexp rs vm c
+    | Elet (LDvar (v,d),e) ->
+        expr rs vm d;
+        let t = term_of d in
+        expr rs (Decl.vs_graph_let vm t v.pv_vs) e
+    | Elet (LDsym (_, c),e) ->
+        cexp rs vm c; expr rs vm e
+    | Elet (LDrec rdl,e) ->
+        List.iter (fun rd -> cexp rs vm rd.rec_fun) rdl;
+        expr rs vm e;
+    | Eif (e0,e1,e2) ->
+        expr rs vm e0; expr rs vm e1; expr rs vm e2
+    | Ematch (d,bl,xl) when Mxs.is_empty xl ->
+        expr rs vm d;
+        let t = term_of d in
+        let check (p,e) =
+          expr rs (Decl.vs_graph_pat vm t p.pp_pat) e in
+        List.iter check bl
+    | Eassign _ | Ewhile _ | Efor _
+    | Ematch _ | Eraise _ | Eabsurd ->
+        raise Exit
+  and cexp rs vm c = match c.c_node with
+    | Cfun d ->
+        if not (eff_pure d.e_effect) then raise Exit;
+        let drop vm v = Decl.vs_graph_drop vm v.pv_vs in
+        expr rs (List.fold_left drop vm c.c_cty.cty_args) d
+    | Capp (s,vl) when Mrs.mem s syms ->
+        if c.c_cty.cty_args <> [] then raise Exit;
+        let tl = List.map (fun v -> t_var v.pv_vs) vl in
+        Decl.register_call cgr rs.rs_name vm s.rs_name tl
+    | Cany | Cpur _ | Capp _ -> ()
+  in
+  let build_call_graph rs rd =
+    let vl = List.map (fun v -> v.pv_vs) rs.rs_cty.cty_args in
+    let e = match rd.rec_fun.c_node with
+      Cfun e -> e | _ -> assert false in
+    if not (eff_pure e.e_effect) then
+      raise (NoVariantFound rs);
+    try expr rs (Decl.create_vs_graph vl) e
+    with Exit -> raise (NoVariantFound rs)
+  in
+  Mrs.iter build_call_graph syms;
+  let check rs _ =
+    Decl.find_variant (NoVariantFound rs) cgr rs.rs_name in
+  ignore (Mrs.mapi check syms)
+
+let term_check rdl = match rdl with
+  | {rec_varl = []}::_
+    when List.for_all (fun rd -> rd.rec_sym.rs_logic <> RLnone) rdl ->
+      term_check rdl
+  | _ -> ()
+
 (* recursive definitions *)
 
 let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
@@ -1102,13 +1170,9 @@ let let_rec fdl =
         "All functions in a recursive definition must use the same \
         well-founded order for the first component of the variant" in
   List.iter check_variant (List.tl fdl);
-  (* if we have a top-level total let-function definition and
-     no variants are supplied, then we expect the definition
-     to be terminating with respect to Decl.check_termination *)
-  let impure (_,d,_,k) =
-    (k <> RKfunc && k <> RKpred) || d.c_cty.cty_pre <> [] in
-  let start_eff = if varl1 = [] && List.exists impure fdl then
-    eff_diverge eff_empty else eff_empty in
+  let start_eff = (* pure functions cannot diverge *)
+    if varl1 = [] && List.exists (fun (_,_,_,k) -> k = RKnone) fdl
+    then eff_diverge eff_empty else eff_empty in
   (* create the first substitution *)
   let update sm (s,({c_cty = c} as d),varl,_) =
     (* check that the type signatures are consistent *)
@@ -1143,13 +1207,15 @@ let let_rec fdl =
     let s = create_rsymbol id ~kind ~ghost:(rs_ghost rs) c in
     { rec_sym = s; rec_rsym = rs; rec_fun = d; rec_varl = varl } in
   let rdl = List.map2 merge fdl (rec_fixp (List.map conv dl)) in
+  (* try to infer the missing variant if termination is assumed *)
+  term_check rdl;
   LDrec rdl, rdl
 
 let ls_decr_of_rec_defn = function
   | { rec_rsym = {rs_cty = {cty_pre = {t_node = Tapp (ls,_)}::_}} } -> Some ls
   | _ -> None
 
-(* pretty-pringting *)
+(* pretty-printing *)
 
 open Format
 open Pretty
@@ -1172,8 +1238,9 @@ let forget_let_defn = function
 let print_rs fmt s =
   Ident.print_decoded fmt (id_unique sprinter (id_of_rs s))
 
-let print_rs_head fmt s = fprintf fmt "%s%s%a%a"
+let print_rs_head fmt s = fprintf fmt "%s%s%s%a%a"
   (if s.rs_cty.cty_effect.eff_ghost then "ghost " else "")
+  (if partial s.rs_cty.cty_effect.eff_oneway then "partial " else "")
   (match s.rs_logic with
     | RLnone -> ""
     | RLpv _ -> "function "
@@ -1443,4 +1510,6 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Function %a is not a mutable field" print_rs s
   | ExceptionLeak xs -> fprintf fmt
       "Uncaught local exception %a" print_xs xs
+  | NoVariantFound rs -> fprintf fmt
+      "Cannot prove termination for %a" print_rs rs
   | _ -> raise e)

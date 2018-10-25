@@ -79,6 +79,7 @@ let empty_spec = {
   sp_variant = [];
   sp_checkrw = false;
   sp_diverge = false;
+  sp_partial = false;
 }
 
 type env = {
@@ -106,8 +107,6 @@ let deref env t =
     let tid = mk_term ~loc (Tidapp (prefix ~loc "!", [tid])) in
     mk_term ~loc:t.term_loc (Tlet (id, tid, t)) in
   Mstr.fold deref env.vars t
-
-let stmt_of_decl = function Dstmt s -> s | _ -> invalid_arg "not a statement"
 
 let rec has_stmt p = function
   | Dstmt s -> p s || begin match s.stmt_desc with
@@ -196,16 +195,6 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
     List.fold_left init (mk_var ~loc id) el))
   | Py_ast.Eget (e1, e2) ->
     mk_expr ~loc (Eidapp (get_op ~loc, [expr env e1; expr env e2]))
-
-let post env (loc, l) =
-  loc, List.map (fun (pat, t) -> pat, deref env t) l
-
-let spec env sp =
-  assert (sp.sp_xpost = [] && sp.sp_reads = [] && sp.sp_writes = []
-    && sp.sp_variant = []);
-  { sp with
-    sp_pre = List.map (deref env) sp.sp_pre;
-    sp_post = List.map (post env) sp.sp_post }
 
 let no_params ~loc = [loc, None, false, Some (PTtuple [])]
 

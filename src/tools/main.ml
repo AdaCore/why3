@@ -65,17 +65,32 @@ let available_commands () =
     if Str.string_match re v 0 then
       let w = Str.matched_group 1 v in
       match acc with
-      | _ when w = "contraption" -> acc
       | (h,_)::_ when h = w -> acc
       | _ -> (w, v) :: acc
     else acc) [] commands in
   List.rev commands
 
 let command sscmd =
+  let sscmd,args =
+    let cur = !Arg.current in
+    if sscmd = "help" then begin
+      if cur + 1 >= Array.length Sys.argv then begin
+        let extra_help fmt () = extra_help fmt (available_commands ()) in
+        Args.exit_with_usage ~exit_code:0 ~extra_help option_list usage_msg
+      end;
+      let sscmd = Sys.argv.(cur + 1) in
+      sscmd, ["--help"]
+    end else begin
+      let args = ref [] in
+      for i = 1 to Array.length Sys.argv - 1 do
+        if i <> cur then args := Sys.argv.(i) :: !args;
+      done;
+      sscmd, List.rev !args
+    end in
   let cmd =
     let scmd = "why3" ^ sscmd in
     let cmd = Filename.concat command_path scmd in
-    if cmd <> "" && cmd <> "contraption" && Sys.file_exists cmd
+    if cmd <> "" && Sys.file_exists cmd
     then cmd
     else begin
       let commands = available_commands () in
@@ -87,12 +102,8 @@ let command sscmd =
           exit 1 in
       Filename.concat command_path scmd
     end in
-  let args = ref [] in
-  for i = 1 to Array.length Sys.argv - 1 do
-    if i <> !Arg.current then args := Sys.argv.(i) :: !args;
-  done;
   let scmd = "why3 " ^ sscmd in
-  Unix.execv cmd (Array.of_list (scmd :: List.rev !args))
+  Unix.execv cmd (Array.of_list (scmd :: args))
 
 let () = try
   let extra_help fmt () = extra_help fmt (available_commands ()) in
@@ -111,7 +122,13 @@ let () = try
       (List.sort sort_pair (Trans.list_transforms ()));
     printf "@[<hov 2>Known splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline2 print_trans_desc)
-      (List.sort sort_pair (Trans.list_transforms_l ()))
+      (List.sort sort_pair (Trans.list_transforms_l ()));
+    let list_transform_with_arg =
+      Trans.list_transforms_with_args () @ Trans.list_transforms_with_args_l ()
+    in
+    printf "@[<hov 2>Known transformations with arguments:@\n%a@]@\n@."
+      (Pp.print_list Pp.newline2 print_trans_desc)
+      (List.sort sort_pair list_transform_with_arg)
   end;
   if !opt_list_printers then begin
     opt_list := true;

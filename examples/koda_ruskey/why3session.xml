@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="36" steplimit="0" memlimit="1000"/>
@@ -500,7 +500,7 @@
        <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="1.37"/></proof>
        </goal>
        <goal name="VC sub_valid_coloring_white.8.1.0.1.0.1" expl="VC for sub_valid_coloring_white" proved="true">
-       <proof prover="2" timelimit="5"><result status="valid" time="2.52"/></proof>
+       <proof prover="2" timelimit="5"><result status="valid" time="2.07"/></proof>
        <transf name="remove" proved="true" arg1="real,bool,tuple0,unit,tuple2,map,coloring,stack,zero,one,(-),(+),( * ),(&lt;),(-),(&gt;),(&lt;=),(&gt;=),get,set,([&lt;-]),is_nil,length,mem,size_forest,between_range_forest,valid_nums_forest,count_forest,eq_coloring,size_stack,even_forest,final_forest,any_forest,unchanged,inverse,any_stack,disjoint_stack,x2,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,is_nil_spec,Length_nonnegative,Length_nil,Append_assoc,Append_l_nil,Append_length,mem_append,mem_decomp,size_forest_nonneg,count_forest_nonneg,mem_app,size_stack_nonneg,any_forest_frame,any_stack_frame,inverse_frame,inverse_frame2,inverse_any,inverse_final,inverse_white,white_final_exclusive,final_unique,inverse_inverse,sub_not_nil,sub_empty,sub_weaken1,sub_weaken2,not_mem_st,sub_frame,sub_no_rep2,white_valid,final_valid,valid_coloring_set,head_and_tail,sub_valid_coloring_f1,sub_valid_coloring,white_white,H1,H2,H3">
         <goal name="VC sub_valid_coloring_white.8.1.0.1.0.1.0" expl="VC for sub_valid_coloring_white" proved="true">
         <proof prover="2" timelimit="1"><result status="valid" time="0.14"/></proof>
@@ -509,7 +509,7 @@
        </transf>
        </goal>
        <goal name="VC sub_valid_coloring_white.8.1.0.1.0.2" expl="VC for sub_valid_coloring_white" proved="true">
-       <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="6.52"/></proof>
+       <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="7.51"/></proof>
        </goal>
       </transf>
       </goal>
@@ -549,7 +549,7 @@
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC enum.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="21"/></proof>
   <proof prover="4"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC enum.3" expl="postcondition" proved="true">

@@ -19,8 +19,6 @@ else
   HIDE = @
 endif
 
-.DELETE_ON_ERROR:
-
 # install the binaries
 DESTDIR =
 
@@ -179,7 +177,6 @@ LIBGENERATED = src/util/config.ml \
 	       src/util/json_lexer.ml \
 	       src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
-	       src/parser/parser_messages.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
 	       src/driver/parse_smtv2_model_parser.mli src/driver/parse_smtv2_model_parser.ml \
@@ -208,27 +205,26 @@ LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr \
           pinterp mltree compile mlinterp pdriver cprinter ml_printer \
 	  ocaml_printer cakeml_printer
 
-LIB_PARSER = ptree glob typing parser_messages parser typing report lexer
+LIB_PARSER = ptree glob typing parser typing lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper detect_polymorphism reduction_engine compute \
 		fold_defs eliminate_quantifiers \
 		eliminate_definition eliminate_algebraic \
 		abstract_quantifiers eliminate_unknown_types \
-		eliminate_unknown_lsymbols \
-		eliminate_symbol \
+		eliminate_unknown_lsymbols eliminate_symbol \
 		eliminate_inductive eliminate_let eliminate_if \
 		libencoding discriminate encoding encoding_select \
 		encoding_guards_full encoding_tags_full \
 		encoding_guards encoding_tags encoding_twin \
 		encoding_sort simplify_array filter_trigger \
-		introduction abstraction close_epsilon lift_epsilon \
+		abstraction close_epsilon lift_epsilon \
 		eliminate_epsilon intro_projections_counterexmp \
 		intro_vc_vars_counterexmp prepare_for_counterexmp \
 		instantiate_predicate smoke_detector \
 		prop_curry eliminate_literal \
 		generic_arg_trans_utils case apply subst \
-		ind_itp destruct cut \
+		introduction ind_itp destruct cut congruence \
 		rec_logic gnat_split_conj gnat_split_disj \
 		eliminate_unused_hypo eliminate_literal induction induction_pr \
 		matching reflection
@@ -283,33 +279,6 @@ else
 src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
-
-.PHONY: initialize_messages
-
-initialize_messages: src/parser/parser.mly
-	$(MENHIR) --explain --strict src/parser/parser.mly --list-errors > src/parser/handcrafted.messages
-
-src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.messages
-	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
-src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp;
-# If the update fails, the exit code is 0 so we also try to compile-errors directly
-# before replacing handcrafted.messages. If the following line fails, exit code
-# 1 is returned stopping the command. And empty file parser_messages.ml is
-# deleted by .DELETE_ON_ERROR. This behavior ensures that second run of make
-# will not continue with a fake parser_messages.ml.
-	$(MENHIR) --explain --strict src/parser/parser.mly --compile-errors \
-src/parser/handcrafted.messages.temp > src/parser/parser_messages.ml;
-	if cmp -s src/parser/handcrafted.messages.temp src/parser/handcrafted.messages; then \
-	echo "parser_messages.ml OK"; \
-	else \
-	echo "Regenerating handcrafted.messages"; \
-	rm -f src/parser/parser_messages.ml; \
-	cp src/parser/handcrafted.messages.temp src/parser/handcrafted.messages; \
-	rm -f src/parser/handcrafted.messages.temp; \
-	fi
-
-clean ::
-	rm -f src/parser/handcrafted.messages.temp
 
 # hide deprecated warnings for strings
 src/util/strings.cmo:: WARNINGS:=$(WARNINGS)-3
@@ -1104,8 +1073,9 @@ COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 endif
 
 COQLIBS_FOR_DRIVERS_FILES = ComputerOfEuclideanDivision
+COQLIBS_FOR_DRIVERS = $(addprefix lib/coq/for_drivers/, $(COQLIBS_FOR_DRIVERS_FILES))
 
-COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT)
+COQLIBS_FILES = lib/coq/BuiltIn lib/coq/HighOrd $(COQLIBS_INT) $(COQLIBS_BOOL) $(COQLIBS_REAL) $(COQLIBS_NUMBER) $(COQLIBS_SET) $(COQLIBS_MAP) $(COQLIBS_LIST) $(COQLIBS_OPTION) $(COQLIBS_FP)  $(COQLIBS_BV) $(COQLIBS_IEEEFLOAT) $(COQLIBS_FOR_DRIVERS)
 
 %.vo: %.v
 	$(SHOW) 'Coqc     $<'
@@ -1153,8 +1123,8 @@ drivers/coq-realizations.aux: Makefile
 	echo 'theory ieee_float.'"$$f"' meta "realized_theory" "ieee_float.'"$$f"'", "" end'; done; \
 	for f in $(COQLIBS_FP_FILES); do \
 	echo 'theory floating_point.'"$$f"' meta "realized_theory" "floating_point.'"$$f"'", "" end'; done; \
-	for f in $(COQLIBS_FOR_DRIVER_FILES); do \
-	echo 'theory for_driver.'"$$f"' meta "realized_theory" "for_driver.'"$$f"'", "" end'; done; \
+	for f in $(COQLIBS_FOR_DRIVERS_FILES); do \
+	echo 'theory for_drivers.'"$$f"' meta "realized_theory" "for_drivers.'"$$f"'", "" end'; done; \
 	) > $@
 
 update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-bv update-coq-ieee_float update-coq-for-drivers
@@ -1228,6 +1198,8 @@ ifeq (@enable_coq_fp_libs@,yes)
 	$(MKDIR_P) $(LIBDIR)/why3/coq/ieee_float
 	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_IEEEFLOAT)) $(LIBDIR)/why3/coq/ieee_float/
 endif
+	$(MKDIR_P) $(LIBDIR)/why3/coq/for_drivers
+	$(INSTALL_DATA) $(addsuffix .vo, $(COQLIBS_FOR_DRIVERS)) $(LIBDIR)/why3/coq/for_drivers/
 	$(MKDIR_P) $(DATADIR)/why3/drivers
 	$(INSTALL_DATA) drivers/coq-realizations.aux $(DATADIR)/why3/drivers/
 
@@ -1348,7 +1320,7 @@ clean::
 #######################
 
 
-ISABELLEVERSIONSPECIFIC=ROOT why3.ML Why3_BV.thy Why3_Number.thy Why3_Real.thy Why3_Set.thy
+ISABELLEVERSIONSPECIFIC=why3.ML Why3_Number.thy Why3_Real.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
@@ -1511,6 +1483,41 @@ install-data::
 
 clean::
 	rm -f drivers/isabelle-realizations.aux
+
+#######################
+# Isabelle client
+#######################
+
+ISABELLEC_FILES := isabelle_client_main
+
+ISABELLECMODULES := $(addprefix src/isabelle-client/, $(ISABELLEC_FILES))
+ISABELLECDEP = $(addsuffix .dep, $(ISABELLECMODULES))
+ISABELLECCMO = $(addsuffix .cmo, $(ISABELLECMODULES))
+ISABELLECCMX = $(addsuffix .cmx, $(ISABELLECMODULES))
+$(ISABELLECCMO) $(ISABELLECCMX): INCLUDES += -I src/isabelle-client -I src/util
+$(ISABELLECDEP): DEPFLAGS += -I src/isabelle-client
+
+depend: $(ISABELLECDEP)
+CLEANDIRS += src/isabelle-client
+
+# build targets
+
+byte: bin/isabelle_client.byte
+opt:  bin/isabelle_client.opt
+
+bin/isabelle_client.opt: lib/why3/why3.cmxa $(ISABELLECCMX)
+
+bin/isabelle_client.byte: lib/why3/why3.cma $(ISABELLECCMO)
+
+install_no_local::
+	cp -f bin/isabelle_client.@OCAMLBEST@ $(BINDIR)/isabelle_client$(EXE)
+
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+-include $(ISABELLECDEP)
+endif
+
+clean::
+	rm -f bin/isabelle_client.byte bin/isabelle_client.opt bin/isabelle_client
 
 #######################
 # Ocaml realizations
@@ -1876,6 +1883,20 @@ test-api-transform.opt: examples/use_api/transform.ml lib/why3/why3.cmxa
 	|| (rm -f test-api-transform.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-transform.opt
 
+test-api-clone.opt: examples/use_api/clone.ml lib/why3/why3.cmxa
+	$(SHOW) 'Ocamlopt $<'
+	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
+	&& ./test-api-clone.opt > /dev/null) \
+	|| (rm -f test-api-clone.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-clone.opt
+
+test-api-clone.byte: examples/use_api/clone.ml lib/why3/why3.cma
+	$(SHOW) 'Ocamlc $<'
+	($(OCAMLC) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< \
+	&& ./test-api-clone.byte > /dev/null) \
+	|| (rm -f test-api-clone.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-clone.byte
+
 test-api-mlw-tree.byte: examples/use_api/mlw_tree.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
 	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null\
@@ -1950,8 +1971,9 @@ ifeq (@enable_doc@,yes)
 
 doc: doc/manual.pdf doc/html/index.html
 
-BNF = ident qualid attribute constant operator type formula term1 term2 term3 \
-	theory theory2 \
+BNF = ident qualid attribute constant operator type \
+	term1 term2 term3 expr1 expr2 expr3 \
+	formula theory theory2 \
 	why_file spec expr expr2 module whyml_file term_old_at
 BNFTEX = $(BNF:%=doc/generated/%_bnf.tex)
 

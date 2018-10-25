@@ -109,12 +109,30 @@ let load_strategies cont =
 let list_strategies cont =
   Hstr.fold (fun _ (name,short,_,_) acc -> (short,name)::acc) cont.Controller_itp.controller_strategies []
 
-
 let symbol_name s =
   match s with
   | Args_wrapper.Tstysymbol ts -> ts.Ty.ts_name
   | Args_wrapper.Tsprsymbol pr -> pr.Decl.pr_name
   | Args_wrapper.Tslsymbol ls -> ls.Term.ls_name
+
+(* Prints a constructor in a string using the inductive list definition
+   containing the constructor *)
+let print_constr_string ~print_term ~print_pr il pr =
+  (* The inductive type is an lsymbol: we are sure to get a constructor *)
+      let constr_def =
+        List.fold_left (fun acc (_, ind_decl) ->
+            List.fold_left (fun acc x ->
+                if Decl.pr_equal (fst x) pr then
+                  Some x
+                else
+                  acc) acc ind_decl)
+          None il
+      in
+      match constr_def with
+      | None -> raise Not_found (* construct was not found: should not happen *)
+      | Some (_, t_def) ->
+          let s = Pp.string_of print_term t_def in
+          Pp.string_of print_pr pr ^ ": " ^ s
 
 (* The id you are trying to use is undefined *)
 exception Undefined_id of string
@@ -124,21 +142,26 @@ exception Number_of_arguments
 let print_id s tables =
   (* let tables = Args_wrapper.build_name_tables task in*)
   let km = tables.Trans.known_map in
-  let id = try Args_wrapper.find_symbol s tables with
-  | Args_wrapper.Arg_parse_type_error _
-  | Args_wrapper.Arg_qid_not_found _ -> raise (Undefined_id s) in
-  let d =
-    try Ident.Mid.find (symbol_name id) km with
-    | Not_found -> raise Not_found (* Should not happen *)
+  let table_id =
+    try Args_wrapper.find_symbol s tables with
     | Args_wrapper.Arg_parse_type_error _
     | Args_wrapper.Arg_qid_not_found _ -> raise (Undefined_id s)
   in
-  let pr = tables.Trans.printer in
-  let apr = tables.Trans.aprinter in
+  (* Check that the symbol is defined *)
+  let d = (* Not_found should not happend *)
+    Ident.Mid.find (symbol_name table_id) km
+  in
+  (* We use snapshots of printers to avoid registering new value insides it only
+     to print info messages to the user.
+  *)
+  let pr = Ident.duplicate_ident_printer tables.Trans.printer in
+  let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
   let module P = (val Pretty.create pr apr pr pr false) in
-  Pp.string_of P.print_decl d
-
-
+  (* Different constructs are printed differently *)
+  match d.Decl.d_node, table_id with
+  | Decl.Dind (_, il), Args_wrapper.Tsprsymbol pr ->
+      print_constr_string ~print_term:P.print_term ~print_pr:P.print_pr il pr
+  | _ -> Pp.string_of P.print_decl d
 
 (* searching ids in declarations *)
 
@@ -156,7 +179,8 @@ let occurs_in_defn id (ls,def) =
   let (_vl,t) = Decl.open_ls_defn def in occurs_in_term id t
 
 let occurs_in_ind_decl id (_,clauses) =
-  List.exists (fun (_,t) -> occurs_in_term id t) clauses
+  List.exists (fun (pr,t) ->
+      Ident.id_equal id pr.Decl.pr_name || occurs_in_term id t) clauses
 
 let occurs_in_decl d id =
   Decl.(match d.d_node with
@@ -178,7 +202,8 @@ let do_search ~search_both km idl =
       if search_both then
         (if List.exists (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc)
       else
-        (if List.for_all (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc)) km Decl.Sdecl.empty
+        (if List.for_all (occurs_in_decl d) idl then Decl.Sdecl.add d acc else acc))
+    km Decl.Sdecl.empty
 
 let search ~search_both s tables =
   let ids = List.rev_map
@@ -195,11 +220,15 @@ let search ~search_both s tables =
          (List.length ids)
          (Pp.print_list Pp.space (fun fmt id -> Pp.string fmt id.Ident.id_string))
          ids
-    else let l = Decl.Sdecl.elements l in
-         let pr = tables.Trans.printer in
-         let apr = tables.Trans.aprinter in
-         let module P = (val Pretty.create pr apr pr pr false) in
-         Pp.string_of (Pp.print_list Pp.newline2 P.print_decl) l
+    else
+      let l = Decl.Sdecl.elements l in
+      (* We use snapshots of printers to avoid registering new value insides it
+         only to print info messages to the user.
+      *)
+      let pr = Ident.duplicate_ident_printer tables.Trans.printer in
+      let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
+      let module P = (val Pretty.create pr apr pr pr false) in
+      Pp.string_of (Pp.print_list Pp.newline2 P.print_decl) l
 
 let print_id _cont task args =
   match args with

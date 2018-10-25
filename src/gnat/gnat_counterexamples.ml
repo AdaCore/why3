@@ -8,7 +8,9 @@ open Smt2_model_defs
 (* This function should remain consistant with the theories and the gnat2why
    conversion.
 *)
-let apply_to_record (list_records: (string list) Mstr.t) (t: term) =
+let apply_to_record (list_records: (string list) Mstr.t)
+    (* TODO use it *)
+    (noarg_constructors: string list) (t: term) =
 
   let rec array_apply_to_record (a: array) =
     match a with
@@ -24,8 +26,9 @@ let apply_to_record (list_records: (string list) Mstr.t) (t: term) =
 
   and apply_to_record (v: term) =
     match v with
-    | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
-    | Cvc4_Variable _ | Function_Local_Variable _ | Variable _ | Other _ -> v
+    | Sval _ | Cvc4_Variable _ | Function_Local_Variable _ | Variable _  -> v
+    (* TODO Does not exist yet *)
+    | Trees _ -> assert false
     | Array a ->
         Array (array_apply_to_record a)
     | Record (s, l) ->

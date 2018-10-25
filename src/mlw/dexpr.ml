@@ -35,6 +35,7 @@ and dvar =
 (* In Dreg and Durg, the dity field is a Dapp of the region's type. *)
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
+type dref = bool list * bool
 
 let dity_of_dvty (argl,res) =
   List.fold_right (fun a d -> Dapp (its_func, [a;d], [])) argl res
@@ -263,7 +264,7 @@ let rec print_dity pur pri fmt = function
   | Durg (Dapp (s,tl,rl),{reg_name = id}) ->
       Format.fprintf fmt
         (protect_on (pri > 1 && (tl <> [] || rl <> [])) "%a%a%a@ @@%s")
-        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+        Pretty.print_ts_qualified s.its_ts (print_args (print_dity pur 2)) tl
           (print_regs (print_dity pur 0)) rl (Ident.id_unique rprinter id)
   | Dvar {contents = Dreg _} | Durg _ -> assert false
   | Dapp (s,[t1;t2],[]) when its_equal s its_func ->
@@ -273,16 +274,16 @@ let rec print_dity pur pri fmt = function
       Format.fprintf fmt "(%a)" (Pp.print_list Pp.comma (print_dity pur 0)) tl
   | Dapp (s,tl,_) when pur ->
       Format.fprintf fmt (protect_on (pri > 1 && tl <> []) "%a%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+        Pretty.print_ts_qualified s.its_ts (print_args (print_dity pur 2)) tl
   | Dapp (s,tl,rl) when not s.its_mutable ->
       Format.fprintf fmt
         (protect_on (pri > 1 && (tl <> [] || rl <> [])) "%a%a%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+        Pretty.print_ts_qualified s.its_ts (print_args (print_dity pur 2)) tl
           (print_regs (print_dity pur 0)) rl
   | Dapp (s,tl,rl) ->
       Format.fprintf fmt
         (protect_on (pri > 1 && (tl <> [] || rl <> [])) "{%a}%a%a")
-        Pretty.print_ts s.its_ts (print_args (print_dity pur 2)) tl
+        Pretty.print_ts_qualified s.its_ts (print_args (print_dity pur 2)) tl
           (print_regs (print_dity pur 0)) rl
 
 let print_dity fmt d = print_dity false 0 fmt d
@@ -352,7 +353,7 @@ let specialize_dxs = function
 type dpattern = {
   dp_pat  : pre_pattern;
   dp_dity : dity;
-  dp_vars : dity Mstr.t;
+  dp_vars : (dity * bool) Mstr.t;
   dp_loc  : Loc.position option;
 }
 
@@ -384,6 +385,7 @@ type dspec_final = {
   ds_reads   : pvsymbol list;
   ds_writes  : term list;
   ds_diverge : bool;
+  ds_partial : bool;
   ds_checkrw : bool;
 }
 
@@ -406,7 +408,7 @@ type dexpr = {
 }
 
 and dexpr_node =
-  | DEvar of string * dvty
+  | DEvar of string * dvty * dref
   | DEsym of prog_symbol
   | DEconst of Number.constant * dity
   | DEapp of dexpr * dexpr
@@ -428,7 +430,7 @@ and dexpr_node =
   | DEoptexn of preid * dity * mask * dexpr
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
-  | DEvar_pure of string * dvty
+  | DEvar_pure of string * dvty * dref
   | DEls_pure of lsymbol * bool
   | DEpv_pure of pvsymbol
   | DEabsurd
@@ -456,6 +458,11 @@ let dity_unify_app ls fn (l1: 'a list) (l2: dity list) =
   try List.iter2 fn l1 l2 with Invalid_argument _ ->
     raise (BadArity (ls, List.length l1))
 
+let dvar_expected_type {pre_loc = loc} dv_dity dity =
+  try dity_unify dv_dity dity with Exit -> Loc.errorm ?loc
+    "This variable has type %a,@ but is expected to have type %a"
+    print_dity dv_dity print_dity dity
+
 let dpat_expected_type {dp_dity = dp_dity; dp_loc = loc} dity =
   try dity_unify dp_dity dity with Exit -> Loc.errorm ?loc
     "This pattern has type %a,@ but is expected to have type %a"
@@ -477,7 +484,7 @@ let dexpr_expected_type_weak {de_dvty = dvty; de_loc = loc} dity =
 
 type denv = {
   frozen : dity list;
-  locals : (bool * Stv.t option * dvty) Mstr.t;
+  locals : (bool * Stv.t option * dvty * dref) Mstr.t;
   excpts : dxsymbol Mstr.t
 }
 
@@ -506,27 +513,29 @@ let free_vars frozen (argl,res) =
     | Dapp (_,tl,_) -> List.fold_left add s tl in
   List.fold_left add (add Stv.empty res) argl
 
-let denv_add_exn { frozen = fz; locals = ls; excpts = xs } id dity =
+let denv_add_exn {frozen = fz; locals = ls; excpts = xs} id dity =
   let xs = Mstr.add id.pre_name (DElexn (id.pre_name, dity)) xs in
   { frozen = freeze_dvty fz ([], dity); locals = ls; excpts = xs }
 
-let denv_add_mono { frozen = fz; locals = ls; excpts = xs } id dvty =
-  let ls = Mstr.add id.pre_name (false, None, dvty) ls in
+let denv_add_mono {frozen = fz; locals = ls; excpts = xs} id dvty dref =
+  let ls = Mstr.add id.pre_name (false, None, dvty, dref) ls in
   { frozen = freeze_dvty fz dvty; locals = ls; excpts = xs }
 
-let denv_add_poly { frozen = fz; locals = ls; excpts = xs } id dvty =
-  let ls = Mstr.add id.pre_name (false, Some (free_vars fz dvty), dvty) ls in
+let denv_add_poly {frozen = fz; locals = ls; excpts = xs} id dvty dref =
+  let fvs = free_vars fz dvty in
+  let ls = Mstr.add id.pre_name (false, Some fvs, dvty, dref) ls in
   { frozen = fz; locals = ls; excpts = xs }
 
-let denv_add_rec_mono { frozen = fz; locals = ls; excpts = xs } id dvty =
-  let ls = Mstr.add id.pre_name (false, Some Stv.empty, dvty) ls in
+let denv_add_rec_mono {frozen = fz; locals = ls; excpts = xs} id dvty dref =
+  let ls = Mstr.add id.pre_name (false, Some Stv.empty, dvty, dref) ls in
   { frozen = freeze_dvty fz dvty; locals = ls; excpts = xs }
 
-let denv_add_rec_poly { frozen = fz; locals = ls; excpts = xs } fz0 id dvty =
-  let ls = Mstr.add id.pre_name (false, Some (free_vars fz0 dvty), dvty) ls in
+let denv_add_rec_poly {frozen = fz; locals = ls; excpts = xs} fz0 id dvty dref =
+  let fvs = free_vars fz0 dvty in
+  let ls = Mstr.add id.pre_name (false, Some fvs, dvty, dref) ls in
   { frozen = fz; locals = ls; excpts = xs }
 
-let denv_add_rec denv fz0 id ((argl,res) as dvty) =
+let denv_add_rec denv fz0 id ((argl,res) as dvty) dref =
   let rec is_explicit = function
     | Dvar {contents = (Dval d|Dpur d|Dsim (d,_)|Dreg (d,_))}
     | Durg (d,_) -> is_explicit d
@@ -534,40 +543,86 @@ let denv_add_rec denv fz0 id ((argl,res) as dvty) =
     | Dutv _ -> true
     | Dapp (_,tl,_) -> List.for_all is_explicit tl in
   if List.for_all is_explicit argl && is_explicit res
-  then denv_add_rec_poly denv fz0 id dvty
-  else denv_add_rec_mono denv id dvty
+  then denv_add_rec_poly denv fz0 id dvty dref
+  else denv_add_rec_mono denv id dvty dref
 
-let denv_add_var denv id dity = denv_add_mono denv id ([], dity)
+let attr_dref attrs = Sattr.mem Pmodule.ref_attr attrs
+
+let bl_dref bl =
+  let check = function
+    | Some id,_,_ -> attr_dref id.pre_attrs
+    | _ -> false in
+  List.map check bl
+
+let bl_type bl = List.map (fun (_,_,t) -> t) bl
+
+let pv_dref pv = attr_dref pv.pv_vs.vs_name.id_attrs
+
+let id_nref {pre_loc = loc; pre_attrs = attrs} =
+  if attr_dref attrs then Loc.errorm ?loc
+    "reference markers are only admitted over program variables";
+  false
+
+let id_dref id dity =
+  if attr_dref id.pre_attrs then begin
+    let dity_ref = dity_reg (Dapp (its_ref, [dity_fresh ()], [])) in
+    dvar_expected_type id dity dity_ref;
+    true
+  end else
+    false
+
+let argl_dref ({de_dvty = argl,_} as de) =
+  let rec cut dr acc = match dr, acc with
+    | dr, [] -> assert (List.length dr = List.length argl); dr
+    | _::dr, _::acc -> cut dr acc
+    | _, _ -> List.map Util.ffalse argl in
+  let rec deapp acc de = match de.de_node with
+    | DEvar (_,_,(dr,_)) (* no DEvar_pure|DEls_pure *) -> cut dr acc
+    | DEsym (RS rs) -> cut (List.map pv_dref rs.rs_cty.cty_args) acc
+    | DEfun (bl,_,_,_,_) | DEany (bl,_,_,_) -> cut (bl_dref bl) acc
+    | DEapp (de,d) -> deapp (d::acc) de
+    | DEuloc (de,_) | DEattr (de,_) | DEcast (de,_)
+    | DElet (_,de) | DErec (_,de) | DElabel (_,de)
+    | DEexn (_,_,_,de) | DEoptexn (_,_,_,de)
+    | DEghost de -> deapp acc de
+    | _ -> List.map Util.ffalse argl in
+  deapp [] de
+
+let denv_add_var denv id dity =
+  denv_add_mono denv id ([], dity) ([], id_dref id dity)
 
 let denv_add_for_index denv id dvty =
   let dvty = [], dity_of_dvty dvty in
+  let dref = [], id_dref id (snd dvty) in
   let { frozen = fz; locals = ls; excpts = xs } = denv in
-  let ls = Mstr.add id.pre_name (true, None, dvty) ls in
+  let ls = Mstr.add id.pre_name (true, None, dvty, dref) ls in
   { frozen = freeze_dvty fz dvty; locals = ls; excpts = xs }
 
-let denv_add_let denv (id,_,_,({de_dvty = dvty} as de)) =
-  if fst dvty = [] then denv_add_mono denv id dvty else
+let denv_add_let denv (id,_,_,({de_dvty = (argl,res as dvty)} as de)) =
+  let dref = if argl = [] then [], id_dref id res
+                else argl_dref de, id_nref id in
+  if argl = [] then denv_add_mono denv id dvty dref else
   let rec is_value de = match de.de_node with
     | DEghost de | DEuloc (de,_) | DEattr (de,_) -> is_value de
     | DEvar _ | DEsym _ | DEls_pure _ | DEfun _ | DEany _ -> true
     | _ -> false in
-  if is_value de
-  then denv_add_poly denv id dvty
-  else denv_add_mono denv id dvty
+  if is_value de then denv_add_poly denv id dvty dref
+                 else denv_add_mono denv id dvty dref
 
-let denv_add_args { frozen = fz; locals = ls; excpts = xs } bl =
+let denv_add_args {frozen = fz; locals = ls; excpts = xs} bl =
   let l = List.fold_left (fun l (_,_,t) -> t::l) fz bl in
   let add s (id,_,t) = match id with
-    | Some {pre_name = n} ->
-        Mstr.add_new (Dterm.DuplicateVar n) n (false, None, ([],t)) s
+    | Some ({pre_name = n} as id) ->
+        let dvty = [], t and dref = [], id_dref id t in
+        Mstr.add_new (Dterm.DuplicateVar n) n (false, None, dvty, dref) s
     | None -> s in
   let s = List.fold_left add Mstr.empty bl in
   { frozen = l; locals = Mstr.set_union s ls; excpts = xs }
 
-let denv_add_pat { frozen = fz; locals = ls; excpts = xs } dp dity =
+let denv_add_pat {frozen = fz; locals = ls; excpts = xs} dp dity =
   dpat_expected_type dp dity;
-  let l = Mstr.fold (fun _ t l -> t::l) dp.dp_vars fz in
-  let s = Mstr.map (fun t -> false, None, ([], t)) dp.dp_vars in
+  let l = Mstr.fold (fun _ (t,_) l -> t::l) dp.dp_vars fz in
+  let s = Mstr.map (fun (t,d) -> false, None, ([],t), ([],d)) dp.dp_vars in
   { frozen = l; locals = Mstr.set_union s ls; excpts = xs }
 
 let denv_add_expr_pat denv dp de =
@@ -577,8 +632,8 @@ let denv_add_exn_pat denv dp dxs =
   denv_add_pat denv dp (specialize_dxs dxs)
 
 let mk_node n = function
-  | _, Some tvs, dvty -> DEvar (n, specialize_scheme tvs dvty)
-  | _, None,     dvty -> DEvar (n, dvty)
+  | _, Some tvs, dvty, dref -> DEvar (n, specialize_scheme tvs dvty, dref)
+  | _, None,     dvty, dref -> DEvar (n, dvty, dref)
 
 let denv_get denv n =
   mk_node n (Mstr.find_exn (Dterm.UnboundVar n) n denv.locals)
@@ -587,8 +642,8 @@ let denv_get_opt denv n =
   Opt.map (mk_node n) (Mstr.find_opt n denv.locals)
 
 let mk_node_pure n = function
-  | _, Some tvs, dvty -> DEvar_pure (n, specialize_scheme tvs dvty)
-  | _, None,     dvty -> DEvar_pure (n, dvty)
+  | _, Some tvs, dvty, dref -> DEvar_pure (n, specialize_scheme tvs dvty, dref)
+  | _, None,     dvty, dref -> DEvar_pure (n, dvty, dref)
 
 let denv_get_pure denv n =
   mk_node_pure n (Mstr.find_exn (Dterm.UnboundVar n) n denv.locals)
@@ -613,9 +668,13 @@ let denv_pure denv get_dty =
         let f = Dterm.dty_fresh () in Htv.add ht v (f,d); f end
     | Dapp (s,dl,_) -> Dterm.dty_app s.its_ts (List.map fold dl)
     | Dutv v -> Dterm.dty_var v in
-  let add n (idx, _, dvty) =
+  let add n (idx, _, dvty, dref) =
     let dity = if idx then dity_int else dity_of_dvty dvty in
-    Dterm.DTvar (n, fold dity) in
+    let dt = Dterm.DTvar (n, fold dity) in
+    if dref = ([], true) then
+      let dt = Dterm.dterm Coercion.empty dt in
+      Dterm.DTapp (ls_ref_proj, [dt])
+    else dt in
   let dty = get_dty (Mstr.mapi add denv.locals) in
   Htv.iter (fun v (f,_) ->
     try Dterm.dty_match f (ty_var v) with Exit -> ()) ht;
@@ -632,15 +691,14 @@ type pre_fun_defn = preid * ghost * rs_kind * dbinder list *
 
 exception DupId of preid
 
-let drec_defn denv0 prel =
+let drec_defn ({frozen = frz} as denv0) prel =
   if prel = [] then invalid_arg "Dexpr.drec_defn: empty function list";
   let add s (id,_,_,_,_,_,_) = Sstr.add_new (DupId id) id.pre_name s in
   let _ = try List.fold_left add Sstr.empty prel with DupId id ->
     Loc.errorm ?loc:id.pre_loc "duplicate function name %s" id.pre_name in
   let add denv (id,_,_,bl,res,_,_) =
     if bl = [] then invalid_arg "Dexpr.drec_defn: empty argument list";
-    let argl = List.map (fun (_,_,t) -> t) bl in
-    denv_add_rec denv denv0.frozen id (argl,res) in
+    denv_add_rec denv frz id (bl_type bl, res) (bl_dref bl, id_nref id) in
   let denv1 = List.fold_left add denv0 prel in
   let parse (id,gh,pk,bl,res,msk,pre) =
     let dsp, dvl, de = pre denv1 in
@@ -648,16 +706,14 @@ let drec_defn denv0 prel =
     (id,gh,pk,bl,res,msk,dsp,dvl,de) in
   let fdl = List.map parse prel in
   let add denv (id,_,_,bl,res,_,_,_,_) =
-    (* just in case we linked some polymorphic type var to the outer context *)
-    let check tv = if is_frozen denv0.frozen tv then Loc.errorm ?loc:id.pre_loc
+    (* in case we linked some polymorphic type var to the outer context *)
+    let check tv = if is_frozen frz tv then Loc.errorm ?loc:id.pre_loc
       "This function is expected to be polymorphic in type variable %a"
       Pretty.print_tv tv in
     begin match Mstr.find_opt id.pre_name denv1.locals with
-    | Some (_, Some tvs, _) -> Stv.iter check tvs
-    | Some (_, None, _) | None -> assert false
-    end;
-    let argl = List.map (fun (_,_,t) -> t) bl in
-    denv_add_poly denv id (argl, res) in
+    | Some (_, Some tvs, _, _) -> Stv.iter check tvs
+    | Some (_, None, _, _) | None -> assert false end;
+    denv_add_poly denv id (bl_type bl, res) (bl_dref bl, false) in
   List.fold_left add denv0 fdl, { fds = fdl }
 
 (** Constructors *)
@@ -670,7 +726,8 @@ let dpattern ?loc node =
         mk_dpat PPwild (dity_fresh ()) Mstr.empty
     | DPvar (id,gh) ->
         let dity = dity_fresh () in
-        mk_dpat (PPvar (id,gh)) dity (Mstr.singleton id.pre_name dity)
+        let vars = Mstr.singleton id.pre_name (dity, id_dref id dity) in
+        mk_dpat (PPvar (id,gh)) dity vars
     | DPapp ({rs_logic = RLls ls} as rs, dpl) when ls.ls_constr > 0 ->
         let argl, res = specialize_rs rs in
         dity_unify_app ls dpat_expected_type dpl argl;
@@ -683,15 +740,19 @@ let dpattern ?loc node =
         raise (ConstructorExpected rs);
     | DPor (dp1,dp2) ->
         dpat_expected_type dp2 dp1.dp_dity;
-        let join n dity1 dity2 = try dity_unify dity1 dity2; Some dity1
+        let join n (dity1,dref1) (dity2,dref2) =
+          if dref1 <> dref2 then Loc.errorm ?loc
+            "Variable %s is used with different ref statuses" n;
+          try dity_unify dity1 dity2; Some (dity1,dref1)
           with Exit -> Loc.errorm ?loc
             "Variable %s has type %a,@ but is expected to have type %a"
             n print_dity dity1 print_dity dity2 in
         let vars = Mstr.union join dp1.dp_vars dp2.dp_vars in
         mk_dpat (PPor (dp1.dp_pat, dp2.dp_pat)) dp1.dp_dity vars
     | DPas (dp, ({pre_name = n} as id), gh) ->
+        let exn = Dterm.DuplicateVar n in
         let { dp_pat = pat; dp_dity = dity; dp_vars = vars } = dp in
-        let vars = Mstr.add_new (Dterm.DuplicateVar n) n dity vars in
+        let vars = Mstr.add_new exn n (dity, id_dref id dity) vars in
         mk_dpat (PPas (pat, id, gh)) dity vars
     | DPcast (dp, dity) ->
         dpat_expected_type dp dity;
@@ -699,11 +760,27 @@ let dpattern ?loc node =
   in
   Loc.try1 ?loc dpat node
 
+let to_deref = function
+  | DEvar (_,_,([],deref))
+  | DEvar_pure (_,_,([],deref)) -> deref
+  | DEsym (PV pv)
+  | DEpv_pure pv -> pv_dref pv
+  | _ -> false
+
+let rec undereference de = match de.de_node with
+  | DEuloc (de,l) -> { de with de_node = DEuloc (undereference de, l) }
+  | DEattr (de,a) -> { de with de_node = DEattr (undereference de, a) }
+  | DEcast (de,_) -> undereference de (* already unified *)
+  | DEapp ({de_node = DEsym (RS rs)}, de)
+    when rs_equal rs rs_ref_proj
+      && to_deref de.de_node -> de
+  | _ -> raise Not_found
+
 let dexpr ?loc node =
   let get_dvty = function
-    | DEvar (_,dvty) ->
+    | DEvar (_,dvty,_) ->
         dvty
-    | DEvar_pure (_,dvty) ->
+    | DEvar_pure (_,dvty,_) ->
         let dt = dity_fresh () in
         dity_unify_asym dt (dity_of_dvty dvty);
         [], dt
@@ -746,9 +823,9 @@ let dexpr ?loc node =
         [], r
     | DEfun (bl,res,_,_,de) ->
         dexpr_expected_type de res;
-        List.map (fun (_,_,t) -> t) bl, res
+        bl_type bl, res
     | DEany (bl,res,_,_) ->
-        List.map (fun (_,_,t) -> t) bl, res
+        bl_type bl, res
     | DElet (_,de)
     | DErec (_,de) ->
         de.de_dvty
@@ -817,6 +894,26 @@ let dexpr ?loc node =
     | DEuloc (de,_)
     | DEattr (de,_) ->
         de.de_dvty in
+  (* suppress dereference if needed *)
+  let node = match node with
+    | DEapp (e,d) ->
+        begin try
+          let r = undereference d in
+          match argl_dref e with
+          | true::_ -> DEapp (e,r)
+          | _ -> node
+        with Not_found -> node end
+    | _ -> node in
+  (* dereference if needed *)
+  let node = if not (to_deref node) then node else
+    let de = { de_node = node;
+               de_dvty = get_dvty node;
+               de_loc  = loc } in
+    let dr = { de_node = DEsym (RS rs_ref_proj);
+               de_dvty = specialize_rs rs_ref_proj;
+               de_loc  = loc } in
+    DEapp (dr, de) in
+  (* infer types *)
   let dvty = Loc.try1 ?loc get_dvty node in
   { de_node = node; de_dvty = dvty; de_loc = loc }
 
@@ -892,6 +989,7 @@ let effect_of_dspec dsp =
         Loc.errorm ?loc:t.t_loc "mutable expression expected" in
   let wl, eff = List.fold_left add_write ([], eff_read pvs) dsp.ds_writes in
   let eff = Mxs.fold (fun xs _ eff -> eff_raise eff xs) dsp.ds_xpost eff in
+  let eff = if dsp.ds_partial then eff_partial eff else eff in
   let eff = if dsp.ds_diverge then eff_diverge eff else eff in
   wl, eff
 
@@ -924,8 +1022,10 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
   if check_ue && bad_raise ueff eeff then Loc.errorm ?loc
     "this@ expression@ does@ not@ raise@ exception@ %a"
     print_xs (Sxs.choose (Sxs.diff ueff.eff_raises eeff.eff_raises));
-  if check_ue && ueff.eff_oneway && not eeff.eff_oneway then Loc.errorm ?loc
-      "this@ expression@ does@ not@ diverge";
+  if check_ue && diverges ueff.eff_oneway && not (diverges eeff.eff_oneway)
+    then Loc.errorm ?loc "this@ expression@ does@ not@ diverge";
+  if check_ue && partial ueff.eff_oneway && total eeff.eff_oneway
+    then Loc.errorm ?loc "this@ expression@ does@ not@ diverge@ or@ fail";
   (* check that every computed effect is listed *)
   if check_rw && bad_read eeff ueff then Loc.errorm ?loc
     "this@ expression@ depends@ on@ variable@ %a,@ \
@@ -1217,7 +1317,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     apply c_app tpl (env.ghs || env.lgh || rs_ghost s) s al lpl in
   let c_pur ugh s lpl =
     let loc = Opt.get_def de0.de_loc uloc in
-    if not (ugh || env.ghs || env.lgh || env.ugh) then Warning.emit ?loc
+    if not (ugh || env.ghs || env.lgh || env.ugh) then Loc.errorm ?loc
       "Logical symbol %a is used in a non-ghost context" Pretty.print_ls s;
     apply c_pur false true s (List.map Util.ttrue s.ls_args) lpl in
   let c_oop s lpl =
@@ -1271,7 +1371,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       let ld, s = let_sym id ~ghost:(env.ghs || env.lgh) c in
       c_app s (LD (LS ld) :: lpl) in
   match de0.de_node with
-  | DEvar (n,_) -> c_app (get_rs env n) lpl
+  | DEvar (n,_,_) -> c_app (get_rs env n) lpl
   | DEsym (RS rs) -> c_app rs lpl
   | DEsym (OO ss) -> c_oop ss lpl
   | DEls_pure (ls,ugh) -> c_pur ugh ls lpl
@@ -1317,9 +1417,9 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
 
 and try_expr uloc env ({de_dvty = argl,res} as de0) =
   match de0.de_node with
-  | DEvar (n,_) when argl = [] ->
+  | DEvar (n,_,_) when argl = [] ->
       e_var (get_pv env n)
-  | DEvar_pure (n,_) ->
+  | DEvar_pure (n,_,_) ->
       e_pure (t_var (get_pv env n).pv_vs)
   | DEsym (PV v) ->
       e_var v
@@ -1483,8 +1583,10 @@ and try_expr uloc env ({de_dvty = argl,res} as de0) =
 and var_defn uloc env (id,gh,kind,de) =
   let e = match kind with
     | RKlemma -> Loc.errorm ?loc:id.pre_loc
-        "Lemma-functions must have parameters"
-    | RKfunc | RKpred | RKlocal | RKnone ->
+        "lemma-functions must have parameters"
+    | RKlocal -> Loc.errorm ?loc:id.pre_loc
+        "illegal kind qualifier"
+    | RKfunc | RKpred | RKnone ->
         let e = expr uloc {env with ugh = gh} de in
         e_ghostify env.cgh e in
   let ld, v = let_var id ~ghost:(gh || env.ghs) e in
@@ -1574,10 +1676,11 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
         "Function %s returns unexpected ghost results" nm;
       fst (let_sym id ~ghost ~kind c)
   | (RKfunc | RKpred), ([], _) ->
-      (* FIXME: let ghost constant c = <effectful> *)
       let e = expr uloc {env_empty with ugh = ghost} de in
       if mask_ghost e.e_mask && not ghost then Loc.errorm ?loc
         "Function %s must be explicitly marked ghost" nm;
+      if not e.e_ity.ity_pure then Loc.errorm ?loc
+        "This value is mutable, it cannot be used as pure";
       let c = c_fun [] [] [] Mxs.empty Mpv.empty e in
       (* the rsymbol will carry a single postcondition "the result
          is equal to the logical constant". Any user-written spec
@@ -1598,9 +1701,9 @@ let let_defn ?(keep_loc=true) (id, ghost, kind, de) =
       "Lemma-functions must have parameters"
   | RKlocal, _ -> invalid_arg "Dexpr.let_defn"
 
-let expr ?(keep_loc=true) de =
+let expr ?(keep_loc=true) ?(ughost=false) de =
   let uloc = if keep_loc then None else Some None in
-  expr uloc env_empty de
+  expr uloc {env_empty with ugh = ughost} de
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | UnboundLabel s ->

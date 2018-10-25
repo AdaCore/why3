@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -146,21 +146,6 @@
   <goal name="VC decide_mem.1" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Test" proved="true">
- <goal name="VC a" expl="VC for a" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
- </goal>
- <goal name="VC aa" expl="VC for aa" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
- </goal>
- <goal name="VC astar" expl="VC for astar" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
- </goal>
- <goal name="VC test_astar" expl="VC for test_astar" proved="true">
- <transf name="split_goal_right" proved="true" >
  </transf>
  </goal>
 </theory>

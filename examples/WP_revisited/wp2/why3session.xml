@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="Coq" version="8.7.1" timelimit="3" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -9,9 +9,6 @@
 <prover id="10" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../wp2.mlw" proved="true">
 <theory name="Imp" proved="true">
- <goal name="VC subst_term" expl="VC for subst_term" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
- </goal>
  <goal name="eval_subst_term" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="eval_subst_term.0" proved="true">
@@ -25,9 +22,6 @@
   <proof prover="2"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="VC subst" expl="VC for subst" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
  <goal name="eval_subst" proved="true">
  <transf name="induction_ty_lex" proved="true" >
@@ -120,7 +114,7 @@
  <proof prover="2"><result status="valid" time="0.08" steps="267"/></proof>
  </goal>
  <goal name="assign_rule" proved="true">
- <proof prover="2"><result status="valid" time="0.56" steps="1816"/></proof>
+ <proof prover="2"><result status="valid" time="0.72" steps="1816"/></proof>
  </goal>
  <goal name="seq_rule" proved="true">
  <proof prover="2"><result status="valid" time="0.14" steps="407"/></proof>

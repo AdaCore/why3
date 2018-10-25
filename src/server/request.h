@@ -37,7 +37,7 @@ prequest parse_request(char* str_req, int len, int key);
 //debug code
 void print_request(prequest r);
 
-//does *not* free the id of the request
+// free a request
 void free_request(prequest r);
 
 // Global queue to contain queued requests

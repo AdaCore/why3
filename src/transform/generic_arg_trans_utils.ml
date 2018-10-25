@@ -19,6 +19,7 @@ exception Arg_trans_term of (string * term)
 exception Arg_trans_term2 of (string * term * term)
 exception Arg_trans_pattern of (string * pattern * pattern)
 exception Arg_trans_type of (string * Ty.ty * Ty.ty)
+exception Arg_trans_missing of (string * Svs.t)
 exception Arg_bad_hypothesis of (string * term)
 exception Cannot_infer_type of string
 exception Unnecessary_terms of term list
@@ -155,11 +156,6 @@ let sort =
   Trans.bind get_local sort
 
 
-(* Add an attribute to a goal (useful to add an expl for example) *)
-let add_goal_attr_trans attr =
-  Trans.goal (fun pr g -> [create_prop_decl Pgoal pr (t_attr_add attr g)])
-
-
 (****************************)
 (* Substitution of terms    *)
 (****************************)
@@ -183,3 +179,13 @@ let replace_tdecl (subst: term_subst) (td: tdecl) =
   | Decl d ->
       create_decl (replace_decl subst d)
   | _ -> td
+
+
+(************************)
+(* Explanation handling *)
+(************************)
+
+let create_goal ~expl pr t =
+  let expl = Ident.create_attribute ("expl:" ^ expl) in
+  let t = Term.t_attr_add expl t in
+  create_prop_decl Pgoal pr t

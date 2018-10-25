@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -9,10 +9,6 @@
 <prover id="5" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../vstte12_tree_reconstruction.mlw" proved="true">
 <theory name="Tree" proved="true">
- <goal name="VC depths" expl="VC for depths" proved="true">
- <transf name="split_goal_right" proved="true" >
- </transf>
- </goal>
  <goal name="depths_head" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="depths_head.0" proved="true">
@@ -53,7 +49,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="VC build_rec.3" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="9"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
   <goal name="VC build_rec.4" expl="variant decrease" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="61"/></proof>
@@ -129,7 +125,7 @@
  <proof prover="5" edited="vstte12_tree_reconstruction_ZipperBased_key_lemma_2.v"><result status="valid" time="0.53"/></proof>
  </goal>
  <goal name="right_nil" proved="true">
- <proof prover="5" timelimit="29" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"><result status="valid" time="0.42"/></proof>
+ <proof prover="5" timelimit="29" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"><result status="valid" time="0.24"/></proof>
  </goal>
  <goal name="main_lemma" proved="true">
  <proof prover="4" timelimit="1"><result status="valid" time="0.07"/></proof>
@@ -206,9 +202,6 @@
   <proof prover="4"><result status="valid" time="0.08"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="VC map_leaf" expl="VC for map_leaf" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="map_leaf_depths" proved="true">
  <transf name="induction_ty_lex" proved="true" >

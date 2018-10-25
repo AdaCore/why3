@@ -47,8 +47,8 @@ module Div
     requires { d >= div radix 2 }
     ensures { reciprocal result d }
   =
-    let v = div2by1 (Limb.of_int max_uint64)
-                    (Limb.(-) (Limb.of_int max_uint64) d)
+    let v = div2by1 Limb.uint64_max
+                    (Limb.uint64_max - d)
                     d in
     fact_div (radix * radix - 1) (l2i d) (- radix);
     assert { v = (div (radix*radix - 1) (d)) - radix
@@ -77,13 +77,11 @@ module Div
     returns { q, r -> l2i q * d + l2i r = ul + radix * uh }
     returns { _q, r -> 0 <= l2i r < d }
   =
-    let zero = Limb.of_int 0 in
-    let one = Limb.of_int 1 in
     let ghost k = radix * radix - (radix + l2i v) * l2i d in
     let ghost u = l2i ul + radix * l2i uh in
     assert { 1 <= k <= d };
     let l,h = mul_double v uh in
-    let sl,c = add_with_carry l ul zero in
+    let sl,c = add_with_carry l ul 0 in
     let (sh,ghost c') = add_with_carry uh h c in  (* <c',sh,sl> = <uh, ul> + <h,l> *)
     assert { sl + radix * sh + radix * radix * c'
              = l + radix * h + ul + radix * uh };
@@ -126,7 +124,7 @@ module Div
     let ghost cq = l2i sh + 1 in (*candidate quotient*)
     let ghost cr = l2i ul - cq * l2i d + radix * l2i uh in (*candidate remainder*)
     assert { cq * d + cr = u};
-    qh := add_mod !qh one;
+    qh := add_mod !qh 1;
     assert { !qh = mod cq radix };
     let p = mul_mod !qh d in
     let r = ref (sub_mod ul p) in
@@ -227,10 +225,10 @@ module Div
                 so radix * d + cr < radix * d
                 so cr < 0) };
     assert { 1 <= cq < radix -> !qh = cq /\ !qh * d + cr = u };
-    if Limb.(>) !r !ql
+    if !r > !ql
     then
     begin
-      qh := sub_mod !qh one;
+      qh := sub_mod !qh 1;
       r := add_mod !r d;
       assert { cr >= 0 ->
                   (!r = cr + d
@@ -292,7 +290,7 @@ module Div
     end;
     assert { !qh * d + !r = ul + radix * uh
             by [@case_split] cq = radix \/ 1 <= cq < radix };
-    if Limb.(>=) !r d
+    if !r >= d
     then begin
       assert { cr >= 0 };
       assert { !qh < radix - 1
@@ -309,8 +307,8 @@ module Div
                so !qh * d < (radix - 1) * d
                so d > 0
                so !qh < radix - 1 };
-      qh := Limb.(+) !qh one;
-      r := Limb.(-) !r d;
+      qh := !qh + 1;
+      r := !r - d;
       assert { 0 <= !r < d };
       assert { !qh * d + !r = ul + radix * uh };
     end;
@@ -331,16 +329,13 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
               = value q sz * y + result }
     ensures { result < y }
   =
-    let limb_zero = Limb.of_int 0 in
-    let zero = Int32.of_int 0 in
-    let one = Int32.of_int 1 in
-    let msb = Int32.(-) sz one in
-    let lx = ref limb_zero in
+    let msb = sz - 1 in
+    let lx = ref 0 in
     let i = ref msb in
-    let r = ref limb_zero in
+    let r = ref 0 in
     (*normalize divisor*)
     let clz = count_leading_zeros y in
-    if (Int32.(>) clz zero)
+    if (clz > 0)
     then begin
       let ghost mult = power 2 (p2i clz) in
       let ry = lsl y (Limb.of_int32 clz) in
@@ -348,8 +343,8 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
       let ghost tlum = power 2 (Limb.length - p2i clz) in
       assert { tlum * mult = radix };
       let v = invert_limb ry in
-      while (Int32.(>=) !i zero) do
-        variant   { p2i !i }
+      while (!i >= 0) do
+        variant   { !i }
         invariant { -1 <= !i <= msb }
         invariant { !r < ry }
         invariant { mult * value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
@@ -390,7 +385,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                     <= mult * dym = l2i ry };
         assert { !r + h < radix by
                  !r + h < ry < radix };
-        let (qu,rem) = div2by1_inv (Limb.(+) !r h) l ry v in
+        let (qu,rem) = div2by1_inv (!r + h) l ry v in
         mod_mult mult (l2i y * l2i qu) (l2i rem);
         mod_mult mult (tlum * (l2i !r + l2i h)) (l2i l);
         assert { mod (rem) mult = 0
@@ -457,7 +452,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                                             (x.offset + sz)
                 = value_sub (pelts q) (q.offset + !i) (q.offset + sz) * ry
                   + !r };
-        i := Int32.(-) !i one;
+        i := !i - 1;
       done;
       let ghost res = lsr !r (Limb.of_int32 clz) in
       assert { value x sz = value q sz * y + res
@@ -470,8 +465,8 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
       lsr !r (Limb.of_int32 clz) end
     else begin
       let v = invert_limb y in
-      while (Int32.(>=) !i zero) do
-        variant   { p2i !i }
+      while (!i >= 0) do
+        variant   { !i }
         invariant { -1 <= !i <= msb }
         invariant { !r < y }
         invariant { value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
@@ -489,7 +484,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                                    (q.offset + 1 + p2i !i)
                                    (q.offset + p2i sz) qu;
         C.set_ofs q !i qu;
-        i := Int32.(-) !i one;
+        i := !i - 1;
         value_sub_head (pelts x) (x.offset + k) (x.offset + p2i sz);
         value_sub_head (pelts q) (q.offset + k) (q.offset + p2i sz);
         assert { value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
@@ -541,13 +536,11 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
   =
     let ghost d = l2i dl + radix * l2i dh in
     let ghost u = l2i ul + radix * (l2i um + radix * l2i uh) in
-    let zero = Limb.of_int 0 in
-    let one = Limb.of_int 1 in
-    let q1 = ref zero in
-    let r0 = ref zero in
-    let r1 = ref zero in
+    let q1 = ref 0 in
+    let r0 = ref 0 in
+    let r1 = ref 0 in
     let l,h = mul_double v uh in
-    let sl, c = add_with_carry um l zero in
+    let sl, c = add_with_carry um l 0 in
     let sh, ghost c' = add_with_carry uh h c in
     assert { sl + radix * sh + radix * radix * c'
              = um + radix * uh + v * uh };
@@ -569,18 +562,18 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     q1 := sh;
     let ghost q0 = l2i sl in
     let ghost cq = l2i !q1 + 1 in (*candidate quotient*)
-    q1 := add_mod !q1 one;
+    q1 := add_mod !q1 1;
     assert { !q1 = mod cq radix };
     let p = mul_mod dh sh in
     r1 := sub_mod um p;
     label CQuot in
     let ghost a = div (l2i um - l2i dh * l2i sh) radix in
     let tl, th = mul_double sh dl in
-    let il, b = sub_with_borrow ul tl zero in
+    let il, b = sub_with_borrow ul tl 0 in
     let (ih, ghost b') = sub_with_borrow !r1 th b in
     assert { il + radix * ih - radix * radix * b'
              = ul + radix * !r1 - sh * dl };
-    let bl,b2 = sub_with_borrow il dl zero in
+    let bl,b2 = sub_with_borrow il dl 0 in
     let bh, ghost b2' = sub_with_borrow ih dh b2 in
     assert { bl + radix * bh - radix * radix * b2'
              = il + radix * ih - dl - radix * dh };
@@ -937,9 +930,9 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
              )
            };
     label PreCorrections in
-    if Limb.(>=) !r1 sl
+    if !r1 >= sl
     then begin
-      q1 := sub_mod !q1 one;
+      q1 := sub_mod !q1 1;
       assert { !q1 = cq - 1
                by
                if cq = radix
@@ -952,7 +945,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                  so (!q1 at PreCorrections) = cq
                  so !q1 = mod (cq - 1) radix = cq - 1
                  };
-      let rl, c = add_with_carry !r0 dl zero in
+      let rl, c = add_with_carry !r0 dl 0 in
       let rh, ghost c' = add_with_carry !r1 dh c in
       assert { rl + radix * rh = mod (r' + d) (radix * radix)
                by radix * radix * c' + rl + radix * rh
@@ -1007,9 +1000,9 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                   so !q1 * d + cr = u };
     assert { !q1 * d + !r0 + radix * !r1 = u };
     label PreRemAdjust in
-    if [@ex:unlikely] (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
+    if [@ex:unlikely] (!r1 > dh) || (!r1 = dh && !r0 >= dl)
     then begin
-      let bl, b = sub_with_borrow !r0 dl zero in
+      let bl, b = sub_with_borrow !r0 dl 0 in
       let bh, ghost b'= sub_with_borrow !r1 dh b in
       assert { b' = 0 };
       assert { bl + radix * bh = !r0 + radix * !r1 - d };
@@ -1028,7 +1021,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                               < radix * d - d
                               = (radix - 1) * d )
                };
-      q1 := add_mod !q1 one;
+      q1 := add_mod !q1 1;
       assert { !q1 = (!q1 at PreRemAdjust) + 1 };
       r1 := bh;
       r0 := bl;
@@ -1055,7 +1048,6 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { reciprocal_3by2 result dh dl }
   =
     let ghost d = l2i dl + radix * l2i dh in
-    let one = Limb.of_int 1 in
     let v = ref (invert_limb dh) in
     assert { radix * radix - dh
              <= (radix + !v) * dh
@@ -1080,7 +1072,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
              };
     label Estimate in
     p := add_mod !p dl;
-    if Limb.(<) !p dl (* carry out *)
+    if !p < dl (* carry out *)
     then begin
       assert { (!p at Estimate) + dl >= radix };
       assert { (!p at Estimate) + dl = radix + !p };
@@ -1092,16 +1084,16 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
       assert { (radix + !v) * dh + dl
                = radix * (radix - 1) + radix + !p };
       label Carry in
-      if Limb.(>=) !p dh
+      if !p >= dh
       then begin
-        v := Limb.(-) !v one;
-        p := Limb.(-) !p dh;
+        v := !v - 1;
+        p := !p - dh;
         assert { (radix + !v) * dh + dl
                  = radix * (radix - 1) + radix + !p
                };
       end;
       label Borrow in
-      v := Limb.(-) !v one;
+      v := !v - 1;
       assert { !p < dh };
       p := sub_mod !p dh;
       assert { !p = radix + !p at Borrow - dh };
@@ -1116,7 +1108,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     let tl, th = mul_double !v dl in
     label Adjust in
     p := add_mod !p th;
-    if Limb.(<) !p th (* carry out *)
+    if !p < th (* carry out *)
     then begin
       assert { (!p at Adjust) + th >= radix };
       assert { (!p at Adjust) + th = radix + !p
@@ -1133,10 +1125,10 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                th <> 0
                so !v <> 0
              };
-      if Limb.(>) !p dh || (Limb.(=) !p dh && Limb.(>=) tl dl)
+      if !p > dh || (!p = dh && tl >= dl)
       then begin
         assert { tl + radix * !p >= d };
-        v := Limb.(-) !v one;
+        v := !v - 1;
         assert { (radix + !v) * dh * radix + radix * dl
                    + !v * dl
                  = radix * radix * radix
@@ -1167,7 +1159,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                <= (radix + !v) * dh * radix + radix * dl
                    + !v * dl
                < radix * radix * radix + d };
-      v := Limb.(-) !v one;
+      v := !v - 1;
     end;
     bounds_imply_rec3by2 !v dh dl;
     !v
@@ -1176,10 +1168,9 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     returns { (r,d) -> x - y - z = l2i r - radix * l2i d
                      /\ 0 <= d <= 2 }
   =
-    let limb_zero = Limb.of_int 0 in
-    let u1, b1 = sub_with_borrow x y limb_zero in
-    let u2, b2 = sub_with_borrow u1 z limb_zero in
-    (u2, (Limb.(+) b1 b2))
+    let u1, b1 = sub_with_borrow x y 0 in
+    let u2, b2 = sub_with_borrow u1 z 0 in
+    (u2, (b1 + b2))
 
   (** `submul_limb r x y sz` multiplies `(x, sz)` by `y`, subtracts the `sz`
       least significant limbs from `(r, sz)` and writes the result in `(r, sz)`.
@@ -1195,12 +1186,11 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { forall j. j < r.offset \/ r.offset + sz <= j ->
               (pelts r)[j] = (pelts (old r))[j] }
 =
-    let limb_zero = Limb.of_int 0 in
-    let lx = ref limb_zero in
-    let lr = ref limb_zero in
-    let b = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz do
+    let lx = ref 0 in
+    let lr = ref 0 in
+    let b = ref 0 in
+    let i = ref 0 in
+    while !i < sz do
       variant { sz - !i }
       invariant { 0 <= !i <= sz }
       invariant { value r !i - (power radix !i) * !b
@@ -1215,7 +1205,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
       lx := get_ofs x !i;
       lr := get_ofs r !i;
       assert { !lr = (pelts (old r))[r.offset + !i] };
-      let rl, rh = Limb.mul_double !lx y in
+      let rl, rh = mul_double !lx y in
       let res, borrow = sub3 !lr rl !b in
       value_sub_tail (pelts r) r.offset (r.offset + k);
       value_sub_tail (pelts x) x.offset (x.offset + k);
@@ -1250,8 +1240,8 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                rl + radix * rh <= (radix-1)*(radix-1) };
       assert { rh = radix - 2 -> borrow <= 1
                by rl <= 1 };
-      b := Limb.(+) rh borrow;
-      i := Int32.(+) !i (Int32.of_int 1);
+      b := rh + borrow;
+      i := !i + 1;
       assert { value r !i - (power radix !i) * !b
                  = value (old r) !i
                    - value x !i * y
@@ -1322,31 +1312,26 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { value x sy < value y sy }
     ensures { 0 <= result <= 1 }
   =
-    let one = Int32.of_int 1 in
-    let two = Int32.of_int 2 in
-    let limb_zero = Limb.of_int 0 in
-    let zero = Int32.of_int 0 in
-    let uone = Limb.of_int 1 in
-    let xp = ref (C.incr x (Int32.(-) sx two)) in
-    let qp = ref (C.incr q (Int32.(-) sx sy)) in
-    let dh = C.get_ofs y (Int32.(-) sy one) in
+    let xp = ref (C.incr x (sx - 2)) in
+    let qp = ref (C.incr q (sx - sy)) in
+    let dh = C.get_ofs y (sy - 1) in
     assert { dh >= div radix 2 by normalized y sy };
-    let dl = C.get_ofs y (Int32.(-) sy two) in
+    let dl = C.get_ofs y (sy - 2) in
     let v = reciprocal_word_3by2 dh dl in
-    let i = ref (Int32.(-) sx sy) in
-    let mdn = Int32.(-) two sy in
-    let ql = ref limb_zero in
+    let i = ref (sx - sy) in
+    let mdn = 2 - sy in
+    let ql = ref 0 in
     let xd = C.incr !xp mdn in
     let ghost vy = value y (p2i sy) in
-    let x1 = ref limb_zero in
-    let x0 = ref limb_zero in
+    let x1 = ref 0 in
+    let x0 = ref 0 in
     let r = wmpn_cmp xd y sy in
     let qh = (*begin
                ensures { r >= 0 -> result = 1 }
                ensures { r < 0 -> result = 0 }*)
-               if (Int32.(>=) r zero)
-               then uone
-               else limb_zero
+               if (r >= 0)
+               then 1
+               else 0
              (*end*) in
     label PreAdjust in
     begin
@@ -1364,7 +1349,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                   >= (pelts x)[(!xp).offset] + radix * !x1 }
     let ghost ox = pelts x in
     begin [@vc:sp]
-    if (not (Limb.(=) qh limb_zero))
+    if (not (qh = 0))
     then begin
          assert { qh = 1 };
          let ghost b = wmpn_sub_in_place xd y sy sy in
@@ -1459,7 +1444,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                    + qh * power radix (sx - sy - !i)) = 0 };
          end
     end;
-    let ghost gx1 = (C.get_ofs !xp one) in
+    let ghost gx1 = (C.get_ofs !xp 1) in
     value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
     value_sub_upper_bound_tight (pelts y) y.offset (y.offset + p2i sy - 1);
     value_sub_tail (pelts x) (!xp.offset) (!xp.offset + p2i sy - 1);
@@ -1495,7 +1480,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                    (!xp.offset + p2i mdn + p2i sy - 1);
     value_sub_tail (pelts x) x.offset (x.offset + p2i sy + p2i !i - 1);
 
-    x1 := (C.get_ofs !xp one);
+    x1 := (C.get_ofs !xp 1);
     assert { value_sub (pelts x) (!xp.offset + mdn)
                  (!xp.offset + mdn + sy - 1)
                  + power radix (sy - 1) * !x1
@@ -1540,8 +1525,8 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                   = value x sx
            };
     end;
-    while (Int32.(>) !i zero) do
-      variant { p2i !i }
+    while (!i > 0) do
+      variant { !i }
       invariant { 0 <= !i <= sx - sy }
       invariant { (!qp).offset = q.offset + !i }
       invariant { (!xp).offset = x.offset + sy + !i - 2 }
@@ -1567,14 +1552,14 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                   >= (pelts x)[(!xp).offset] + radix * !x1 }
       label StartLoop in
       let ghost k = int32'int !i in
-      i := Int32.(-) !i one;
+      i := !i - 1;
       let ghost s = int32'int sy + int32'int !i - 1 in
       xp.contents <- C.incr !xp (-1);
       let xd = C.incr !xp mdn in
-      let nx0 = C.get_ofs !xp one in
-      if [@ex:unlikely] (Limb.(=) !x1 dh && Limb.(=) nx0 dl)
+      let nx0 = C.get_ofs !xp 1 in
+      if [@ex:unlikely] (!x1 = dh && nx0 = dl)
       then begin
-        ql := Limb.of_int Limb.max_uint64;
+        ql := Limb.uint64_max;
         value_sub_concat (pelts x) x.offset xd.offset (xd.offset + p2i sy);
         value_sub_tail (pelts xd) xd.offset (xd.offset + p2i sy - 1);
         let ghost vlx = value xd (p2i sy - 1) in
@@ -1737,7 +1722,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                  so - 1 < b - dh < 1
                };
         value_sub_concat (pelts x) x.offset xd.offset (x.offset + s);
-        x1 := C.get_ofs !xp one;
+        x1 := C.get_ofs !xp 1;
         qp.contents <- C.incr !qp (-1);
         value_sub_update_no_change (pelts q) (!qp).offset
                             ((!qp).offset + 1)
@@ -2093,7 +2078,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
         label SmallDiv in
         let ghost vlx = value xd (p2i sy - 2) in
         let xp0 = C.get !xp in
-        let xp1 = C.get_ofs !xp one in
+        let xp1 = C.get_ofs !xp 1 in
         begin
           ensures { value xd sy =
                     vlx
@@ -2137,7 +2122,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                            (x.offset + p2i sy + k - 1);
         let ghost xc = Array.copy (x.data) in
         value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
-        let cy = submul_limb xd y !ql (Int32.(-) sy two) in
+        let cy = submul_limb xd y !ql (sy - 2) in
         label PostSub in
         begin
           ensures { value x !i
@@ -2153,9 +2138,9 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                    ) };
           value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
         end;
-        let cy1 = [@vc:sp] if (Limb.(<) !x0 cy) then uone else limb_zero in
+        let (cy1:limb) = [@vc:sp] if (!x0 < cy) then 1 else 0 in
         x0 := sub_mod !x0 cy;
-        let cy2 = [@vc:sp] if (Limb.(<) !x1 cy1) then uone else limb_zero in
+        let (cy2:limb) = [@vc:sp] if (!x1 < cy1) then 1 else 0 in
         x1 := sub_mod !x1 cy1;
         assert { 0 <= cy2 <= 1 };
         (* assert { cy2 = 1 -> rh = 0 }; (* and cy > rl *)*)
@@ -2264,7 +2249,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                     (* nonlinear *)
            end;
         end;
-        if [@ex:unlikely] (not (Limb.(=) cy2 limb_zero))
+        if [@ex:unlikely] (not (cy2 = 0))
         then begin
           label Adjust in
           assert { cy2 = 1 };
@@ -2398,7 +2383,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                    so 0 <= j < xc.Array.length
                  } ;
           value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
-          let c = wmpn_add_in_place xd y (Int32.(-) sy one) (Int32.(-) sy one) in
+          let c = wmpn_add_in_place xd y (sy - 1) (sy - 1) in
           begin
           ensures { value x !i
                  = value (x at Adjust) !i }
@@ -2512,7 +2497,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                       so c' = 1
                       };
           end;
-          ql := Limb.(-) !ql uone;
+          ql := !ql - 1;
           (* todo refl *)
           assert { value xd (sy - 1) + power radix (sy - 1) * !x1
                    =  value (xd at SubProd) sy
@@ -3123,22 +3108,17 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { value x 2 < value y 2 }
     ensures { 0 <= result <= 1 }
   =
-    let one = Int32.of_int 1 in
-    let zero = Int32.of_int 0 in
-    let two = Int32.of_int 2 in
-    let uzero = Limb.of_int 0 in
-    let uone = Limb.of_int 1 in
-    let xp = ref (C.incr x (Int32.(-) sx two)) in
-    let dh = C.get_ofs y one in
+    let xp = ref (C.incr x (sx - 2)) in
+    let dh = C.get_ofs y 1 in
     let dl = C.get y in
-    let rh = ref (C.get_ofs !xp one) in
+    let rh = ref (C.get_ofs !xp 1) in
     let rl = ref (C.get !xp) in
-    let qh = ref uzero in
-    let lx = ref uzero in
+    let qh = ref 0 in
+    let lx = ref 0 in
     assert { value y 2 = dl + radix * dh };
-    let i = ref (Int32.(-) sx two) in
+    let i = ref (sx - 2) in
     let dinv = reciprocal_word_3by2 dh dl in
-    ([@vc:sp] if (Limb.(>=) !rh dh && ([@vc:sp] Limb.(>) !rh dh || Limb.(>=) !rl dl))
+    ([@vc:sp] if (!rh >= dh && ([@vc:sp] !rh > dh || !rl >= dl))
     then
       label Adjust in
       begin
@@ -3150,7 +3130,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                     + power radix !i * (!rl + radix * !rh) }
         ensures { !rl + radix * !rh < dl + radix * dh }
         ensures { !qh = 1 }
-        let (r0, b) = sub_with_borrow !rl dl uzero in
+        let (r0, b) = sub_with_borrow !rl dl 0 in
         let (r1, ghost b') = sub_with_borrow !rh dh b in
         assert { b' = 0 };
         assert { r0 + radix * r1 = !rl + radix * !rh - (dl + radix * dh) };
@@ -3158,7 +3138,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 2);
         rh := r1;
         rl := r0;
-        qh := uone;
+        qh := 1;
         assert { value x sx
                   = (value_sub (pelts q) (q.offset + !i) (q.offset + sx - 2)
                       + !qh * power radix (sx - 2 - !i))
@@ -3198,8 +3178,8 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 1);
         value_sub_tail (pelts x) x.offset (x.offset + p2i sx - 2);
       end);
-    while (Int32.(>) !i zero) do
-      variant { p2i !i }
+    while (!i > 0) do
+      variant { !i }
       invariant { 0 <= !i <= sx - 2 }
       invariant { !xp.offset = x.offset + !i }
       invariant { plength !xp = plength x }
@@ -3221,7 +3201,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
       let (qu, r0, r1) = div3by2_inv !rh !rl !lx dh dl dinv in
       rh := r1;
       rl := r0;
-      i := Int32.(-) !i one;
+      i := !i - 1;
       C.set_ofs q !i qu;
       assert { qu * (dl + radix * dh) + r0 + radix * r1
                = !lx + radix * (!rl at StartLoop)
@@ -3342,7 +3322,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                     * value y 2
                     + !rl + radix * !rh
              by power radix !i = 1 };
-    C.set_ofs x one !rh;
+    C.set_ofs x 1 !rh;
     C.set x !rl;
     assert { value x 2 = !rl + radix * !rh
              by (pelts x)[x.offset] = !rl
@@ -3367,30 +3347,26 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { value r sy < value y sy }
   =
     label Start in
-    let one = Int32.of_int 1 in
-    let limb_zero = Limb.of_int 0 in
-    let zero = Int32.of_int 0 in
-    let two = Int32.of_int 2 in
     value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
     value_sub_lower_bound (pelts y) y.offset (y.offset + p2i sy - 1);
     assert { value y sy >= power radix (sy - 1) };
-    if (Int32.(=) sy one)
+    if (sy = 1)
     then
       let lr = wmpn_divrem_1 q x (C.get y) sx in
       C.set r lr
     else
-    if (Int32.(=) sy two)
+    if (sy = 2)
     then
-      let clz = clz_ext (C.get_ofs y (Int32.(-) sy one)) in
+      let clz = clz_ext (C.get_ofs y (sy - 1)) in
       let ghost p = power 2 (p2i clz) in
-      if Int32.(=) clz zero
+      if clz = 0
       then begin
         wmpn_copyi nx x sx;
-        value_sub_shift_no_change (pelts x) x.offset (p2i sx) (p2i sx) limb_zero;
-        C.set_ofs nx sx limb_zero;
+        value_sub_shift_no_change (pelts x) x.offset (p2i sx) (p2i sx) 0;
+        C.set_ofs nx sx 0;
         value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
         label Div2_ns in
-        let ghost _qh = wmpn_divrem_2 q nx y (Int32.(+) sx one) in
+        let ghost _qh = wmpn_divrem_2 q nx y (sx + 1) in
         wmpn_copyi r nx sy;
         assert { value x sx
                  = value q (sx - sy + 1) * value y sy
@@ -3496,7 +3472,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
         end;
         label Div2_s in
         (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
-        let ghost _qh = wmpn_divrem_2 q nx ny (Int32.(+) sx one) in
+        let ghost _qh = wmpn_divrem_2 q nx ny (sx + 1) in
         let ghost _l = wmpn_rshift r nx sy (Limb.of_int32 clz) in
         begin ensures { value nx 2 = p * value r 2 }
           assert { _l = 0
@@ -3611,23 +3587,22 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
         ()
       end
     else
-     (* let qn = ref (Int32.(-) (Int32.(+) sx one) sy) in
+     (* let qn = ref (Int32.(-) (Int32.(+) sx 1) sy) in
       if (Int32.(>=)  (Int32.(+) !qn !qn) sx)
       then*) begin
         let adjust =
-          if Limb.(>=) (get_ofs x (Int32.(-) sx one))
-                       (get_ofs y (Int32.(-) sy one))
-          then one
-          else zero
+          if (get_ofs x (sx - 1)) >= (get_ofs y (sy - 1))
+          then 1
+          else 0
         in
-        let clz = clz_ext (C.get_ofs y (Int32.(-) sy one)) in
+        let clz = clz_ext (C.get_ofs y (sy - 1)) in
         let ghost p = power 2 (p2i clz) in
-        if Int32.(=) clz zero
+        if clz = 0
         then begin
           wmpn_copyi nx x sx;
           value_sub_shift_no_change (pelts x) x.offset
-                                    (p2i sx) (p2i sx) limb_zero;
-          C.set_ofs nx sx limb_zero;
+                                    (p2i sx) (p2i sx) 0;
+          C.set_ofs nx sx 0;
           value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
           assert { value y sy * (power radix (sx - sy + adjust))
                    > value nx (sx + adjust)
@@ -3658,7 +3633,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                                  = dh * power radix (sy - 1 + sx - sy)
                                  = dh * power radix (sx - 1))) };
           label Div_ns in
-          let ghost _qh = div_sb_qr q nx y (Int32.(+) sx adjust) sy in
+          let ghost _qh = div_sb_qr q nx y (sx + adjust) sy in
           wmpn_copyi r nx sy;
           assert { value x sx
                    = value q (sx - sy + adjust) * value y sy
@@ -3694,11 +3669,11 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
            begin
              ensures { value q (sx - sy + 1)
                        = value (q at Ret_ns) (sx - sy + adjust) }
-             if (Int32.(=) adjust zero)
+             if (adjust = 0)
              then begin
                value_sub_shift_no_change (pelts x) x.offset
-                                         (p2i sx) (p2i sx) limb_zero;
-               set_ofs q (Int32.(-) sx sy) limb_zero;
+                                         (p2i sx) (p2i sx) 0;
+               set_ofs q (sx - sy) 0;
                value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy);
                ()
              end
@@ -3768,7 +3743,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
           begin
             ensures { value nx (sx + adjust)
                       = p * value x sx  }
-            if (Int32.(=) adjust one)
+            if (adjust = 1)
             then begin
               value_sub_tail (pelts nx) nx.offset (nx.offset + p2i sx);
               assert { value nx (sx + 1)
@@ -3850,7 +3825,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
                                        * power radix (sx - sy)
                                  = p * dh * power radix (sy - 1 + sx - sy)
                                  = p * dh * power radix (sx - 1))) };
-          let ghost _qh = div_sb_qr q nx ny (Int32.(+) sx adjust) sy in
+          let ghost _qh = div_sb_qr q nx ny (sx + adjust) sy in
           let ghost _l = wmpn_rshift r nx sy (Limb.of_int32 clz) in
           begin ensures { value nx sy = p * value r sy }
             assert { _l = 0
@@ -3968,11 +3943,11 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
           begin
             ensures { value q (sx - sy + 1)
                       = value (q at Ret_s) (sx - sy + adjust) }
-            if (Int32.(=) adjust zero)
+            if (adjust = 0)
             then begin
               value_sub_shift_no_change (pelts x) x.offset
-                                        (p2i sx) (p2i sx) limb_zero;
-              set_ofs q (Int32.(-) sx sy) limb_zero;
+                                        (p2i sx) (p2i sx) 0;
+              set_ofs q (sx - sy) 0;
               value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy);
               assert { value q (sx - sy + 1) = value (q at Ret_s) (sx - sy)
                        by value q (sx - sy + 1)
@@ -3997,8 +3972,7 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     ensures { value r sy < value y sy }
     diverges
   =
-    let uone = UInt32.of_int 1 in
-    let nx = malloc (UInt32.(+) (UInt32.of_int32 sx) uone) in
+    let nx = malloc (UInt32.(+) (UInt32.of_int32 sx) 1) in
     c_assert (is_not_null nx);
     let ny = malloc (UInt32.of_int32 sy) in
     c_assert (is_not_null ny);

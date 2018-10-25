@@ -69,6 +69,17 @@ end
 
 (* WhyML *)
 
+module Ref
+  syntax type     ref      "%1 ref"
+  syntax function contents "!%1"
+  syntax val      ref      "ref %1"
+end
+
+module ref.Ref
+  syntax val      (!_)     "!%1"
+  syntax val      (:=)     "%1 := %2"
+end
+
 module stack.Stack
   syntax type      t        "(%1 Stack.t)"
   syntax val       create   "Stack.create"
@@ -138,8 +149,7 @@ module matrix.Matrix
 end
 
 module mach.int.Int31
-  syntax val       of_int   "(fun x -> x)"
-  syntax converter of_int   "%1"
+  syntax val of_int   "%1"
 
   syntax function to_int "(%1)"
 
@@ -157,8 +167,7 @@ module mach.int.Int31
   syntax val      (>)       "(>)"
 end
 module mach.int.Int63
-  syntax val       of_int   "(fun x -> x)"
-  syntax converter of_int   "%1"
+  syntax val      of_int   "%1"
 
   syntax function to_int "(%1)"
 
@@ -234,4 +243,3 @@ module mach.matrix.Matrix63
   syntax val make          "Array.make_matrix"
   syntax val copy          "(Array.map Array.copy)"
 end
-

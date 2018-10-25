@@ -25,6 +25,7 @@ let float = digit* frac? exp?
 let white = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n"
 let name = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
+let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
 
 rule read =
   parse
@@ -56,6 +57,7 @@ and read_string buf =
   | '\\' 'n'  { Buffer.add_char buf '\n'; read_string buf lexbuf }
   | '\\' 'r'  { Buffer.add_char buf '\r'; read_string buf lexbuf }
   | '\\' 't'  { Buffer.add_char buf '\t'; read_string buf lexbuf }
+  | '\\' 'u' '0' '0' (hexadigit hexadigit as s) { Buffer.add_char buf (Char.chr (int_of_string ("0x" ^ s))); read_string buf lexbuf }
   | [^ '"' '\\']+
     { Buffer.add_string buf (Lexing.lexeme lexbuf);
       read_string buf lexbuf

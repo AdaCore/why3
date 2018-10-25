@@ -91,30 +91,14 @@ proof -
   then show ?thesis by (simp add: occ_def)
 qed
 
-(* We use occ_append to decompose into {l..<i} {i} {i+1..<j} {j} {j+1..<u} and this complete the
-   proof
-*)
-lemma occ_exchange2:
-  assumes "l \<le> i \<and> i < u \<and> l \<le> j \<and> j < u \<and> i < j"
-  shows "occ z (m(i := x, j := y)) l u = occ z (m(i := y, j := x)) l u"
-proof -
-  from assms have h1: 
-    "occ z (m (i := x, j := y)) l i + occ z (m (i := x, j := y)) i (i+1) + occ z (m (i := x, j := y)) (i+1) j + 
-     occ z (m (i := x, j := y)) j (j+1) + occ z (m (i := x, j := y)) (j+1) u =
-       occ z (m (i := x, j := y)) l u"
-    by (smt occ_append)
-  from assms have h2:
-    "occ z (m (i := y, j := x)) l i + occ z (m (i := y, j := x)) i (i+1) + occ z (m (i := y, j := x)) (i+1) j + 
-     occ z (m (i := y, j := x)) j (j+1) + occ z (m (i := y, j := x)) (j+1) u =
-       occ z (m (i := y, j := x)) l u"
-    by (smt occ_append)
-  show ?thesis
-    by (smt h1 h2 assms facts.set_def occ_bounds(1) occ_eq occ_exists occ_right_add)
-qed
+lemma vimage_update:
+  "m(i := x) -` {z} = (if x = z then m -` {z} \<union> {i} else m -` {z} - {i})"
+  by auto
 
 why3_vc occ_exchange
   using assms
-  by (smt fun_upd_twist occ_exchange2)
+  by (simp add: occ_def vimage_update insert_Diff_if card_insert)
+    (auto simp add: Diff_Int_distrib2 card_Diff_subset_Int)
 
 why3_vc occ_left_add
 proof -

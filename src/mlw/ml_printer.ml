@@ -28,7 +28,6 @@ open Mltree
 
 type info = {
   info_syn          : syntax_map;
-  info_convert      : syntax_map;
   info_literal      : syntax_map;
   info_current_th   : Theory.theory;
   info_current_mo   : Pmodule.pmodule option;
@@ -41,7 +40,6 @@ type info = {
 
 let create_info pargs fname ~flat ({mod_theory = th} as m) = {
   info_syn          = pargs.syntax;
-  info_convert      = pargs.converter;
   info_literal      = pargs.literal;
   info_current_th   = th;
   info_current_mo   = Some m;
@@ -71,9 +69,8 @@ let rec print_list2 sep sep_m print1 print2 fmt (l1, l2) =
 
 let check_val_in_drv info ({rs_name = {id_loc = loc}} as rs) =
   (* here [rs] refers to a [val] declaration *)
-  match query_syntax info.info_convert rs.rs_name,
-        query_syntax info.info_syn     rs.rs_name with
-  | None, None (* when info.info_flat *) ->
+  match query_syntax info.info_syn rs.rs_name with
+  | None (* when info.info_flat *) ->
       Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
   | _ -> ()
 
@@ -108,8 +105,8 @@ module MLPrinter (K: sig val keywords: string list end) = struct
      aprinter: type variables
      tprinter: toplevel definitions *)
   let iprinter, aprinter, tprinter =
-    let isanitize = sanitizer char_to_alpha char_to_alnumus in
-    let lsanitize = sanitizer char_to_lalpha char_to_alnumus in
+    let isanitize = sanitizer char_to_alnumus char_to_alnumus in
+    let lsanitize = sanitizer char_to_lalnumus char_to_alnumus in
     create_ident_printer K.keywords ~sanitizer:isanitize,
     create_ident_printer K.keywords ~sanitizer:lsanitize,
     create_ident_printer K.keywords ~sanitizer:lsanitize
@@ -185,9 +182,8 @@ module MLPrinter (K: sig val keywords: string list end) = struct
     fprintf fmt "%a" (print_lident info) rs.rs_name
 
   let check_type_in_drv info ({id_loc = loc} as ty_id) =
-    match query_syntax info.info_convert ty_id,
-          query_syntax info.info_syn     ty_id with
-    | None, None ->
+    match query_syntax info.info_syn ty_id with
+    | None ->
         Loc.errorm ?loc "Type %a cannot be extracted" (print_lident info) ty_id
     | _ -> ()
 

@@ -15,7 +15,7 @@ open Decl
 
 (* Canonical forms for epsilon terms. *)
 type canonical =
-  | Id                             (* identity lambda    (\x (x_i). x (x_i)) *)
+  | Id of Ty.ty                    (* identity lambda    (\x (x_i). x (x_i)) *)
   | Eta of term                    (* eta-expansed term  (\(x_i). t (x_i))
                                       (x_i not in t's free variables)        *)
   | Partial of lsymbol * term list (* partial application
@@ -48,7 +48,7 @@ let canonicalize x f =
         if Mvs.set_disjoint (t_freevars Mvs.empty e) (Svs.of_list rvl)
         then Eta e
         else raise Exit
-    | Tvar u, [v] when vs_equal u v -> Id
+    | Tvar u, [v] when vs_equal u v -> Id v.vs_ty
     | Tapp (ls, [fn; {t_node = Tvar u}]), v :: vl
       when ls_equal ls fs_func_app ->
         if vs_equal u v then match_apps fn vl else raise Exit
@@ -84,8 +84,7 @@ let get_canonical ls =
   let ax = (pr, (t_forall_close vl [] f)) in
   create_param_decl cs, ax, cs
 
-let id_canonical =
-  let ty = Ty.ty_var (Ty.tv_of_string "a") in
+let id_canonical ty =
   let tyf = Ty.ty_func ty ty in
   let cs = create_fsymbol (id_fresh "identity") [] tyf in
   let vs = create_vsymbol (id_fresh "y") ty in
@@ -100,6 +99,15 @@ let get_canonical =
   try Hls.find ht ls with Not_found ->
   let res = get_canonical ls in
   Hls.add ht ls res; res
+
+let id_canonical =
+  let ht = Ty.Hty.create 3 in fun ty ->
+  try Ty.Hty.find ht ty with Not_found ->
+  let res = id_canonical ty in
+  Ty.Hty.add ht ty res; res
+
+let poly_id_canonical =
+  id_canonical (Ty.ty_var (Ty.tv_of_string "a"))
 
 type to_elim =
   | All           (* eliminate all epsilon-terms *)
@@ -144,8 +152,9 @@ let rec lift_f el bv acc t0 =
       let vl = Mvs.keys (Mvs.set_diff (t_vars t0) bv) in
       let vs, f = t_open_bound fb in
       let acc, t = match canonicalize vs f with
-        | Id ->
-            let ld, ax, cs = id_canonical in
+        | Id ty ->
+            let ld, ax, cs = if Ty.ty_closed ty then
+              id_canonical ty else poly_id_canonical in
             let abst, axml = acc in
             (ld :: abst, ax :: axml), fs_app cs [] vs.vs_ty
         | Eta t -> lift_f el bv acc t

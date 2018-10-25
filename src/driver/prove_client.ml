@@ -181,6 +181,7 @@ let send_interrupt ~id =
   Buffer.clear send_buf;
   Buffer.add_string send_buf "interrupt;";
   Buffer.add_string send_buf (string_of_int id);
+  Buffer.add_char send_buf '\n';
   let s = Buffer.contents send_buf in
   send_request_string s
 

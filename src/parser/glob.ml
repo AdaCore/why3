@@ -16,8 +16,6 @@ let flag = Debug.register_flag "track_symbol_use"
 
 let () = Debug.unset_flag flag (* make sure it is unset by default *)
 
-let dummy_id = id_register (id_fresh "dummy")
-
 type def_use = Def | Use
 
 let glob = Hashtbl.create 5003

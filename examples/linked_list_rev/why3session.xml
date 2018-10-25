@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="4000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -9,9 +9,6 @@
 <prover id="5" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file name="../linked_list_rev.mlw" proved="true">
 <theory name="InPlaceRev" proved="true">
- <goal name="VC null" expl="VC for null" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="VC mem_decomp" expl="VC for mem_decomp" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
  </goal>
@@ -145,9 +142,6 @@
  </goal>
 </theory>
 <theory name="InPlaceRevSeq" proved="true">
- <goal name="VC null" expl="VC for null" proved="true">
- <proof prover="2"><result status="valid" time="0.01"/></proof>
- </goal>
  <goal name="non_empty_seq" proved="true">
  <proof prover="5"><result status="valid" time="0.31"/></proof>
  </goal>
@@ -312,17 +306,17 @@
    <transf name="destruct" proved="true" arg1="H">
     <goal name="VC list_seg_sublistl.6.0.0" expl="postcondition" proved="true">
     <transf name="assert" proved="true" arg1="(l1 = empty)">
-     <goal name="VC list_seg_sublistl.6.0.0.0" proved="true">
+     <goal name="VC list_seg_sublistl.6.0.0.0" expl="asserted formula" proved="true">
      <proof prover="0"><result status="valid" time="2.07"/></proof>
      </goal>
      <goal name="VC list_seg_sublistl.6.0.0.1" expl="postcondition" proved="true">
      <transf name="assert" proved="true" arg1="(forall l:seq &#39;a. empty ++ l = l)">
-      <goal name="VC list_seg_sublistl.6.0.0.1.0" proved="true">
+      <goal name="VC list_seg_sublistl.6.0.0.1.0" expl="asserted formula" proved="true">
       <transf name="assert" proved="true" arg1="(forall l:seq &#39;a. empty ++ l == l)">
-       <goal name="VC list_seg_sublistl.6.0.0.1.0.0" proved="true">
+       <goal name="VC list_seg_sublistl.6.0.0.1.0.0" expl="asserted formula" proved="true">
        <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
        </goal>
-       <goal name="VC list_seg_sublistl.6.0.0.1.0.1" proved="true">
+       <goal name="VC list_seg_sublistl.6.0.0.1.0.1" expl="asserted formula" proved="true">
        <proof prover="2"><result status="valid" time="0.04"/></proof>
        </goal>
       </transf>
@@ -384,7 +378,7 @@
   </goal>
   <goal name="VC list_seg_no_repet.9" expl="assertion" proved="true">
   <proof prover="2" timelimit="10"><result status="valid" time="1.27"/></proof>
-  <proof prover="4"><result status="valid" time="9.24"/></proof>
+  <proof prover="4"><result status="valid" time="6.63"/></proof>
   </goal>
   <goal name="VC list_seg_no_repet.10" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.20"/></proof>

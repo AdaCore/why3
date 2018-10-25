@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../Firstorder_tableau_spec.mlw" proved="true">
 <theory name="Spec" proved="true">
  <goal name="VC size_positive_lemma_tableau" expl="VC for size_positive_lemma_tableau" proved="true">
- <proof prover="1"><result status="valid" time="0.16" steps="102"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="102"/></proof>
  </goal>
  <goal name="VC renaming_composition_lemma_tableau" expl="VC for renaming_composition_lemma_tableau" proved="true">
  <proof prover="1"><result status="valid" time="0.15" steps="93"/></proof>
@@ -44,7 +44,7 @@
  <proof prover="1"><result status="valid" time="0.10" steps="10"/></proof>
  </goal>
  <goal name="VC rename_free_var_constructive_inversion_fo_term_tableau" expl="VC for rename_free_var_constructive_inversion_fo_term_tableau" proved="true">
- <proof prover="1"><result status="valid" time="0.17" steps="235"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="235"/></proof>
  </goal>
  <goal name="VC rename_free_var_inversion_fo_term_tableau" expl="VC for rename_free_var_inversion_fo_term_tableau" proved="true">
  <proof prover="1"><result status="valid" time="0.10" steps="10"/></proof>
@@ -82,7 +82,7 @@
   <proof prover="1"><result status="valid" time="0.10" steps="8"/></proof>
   </goal>
   <goal name="VC subst_free_var_propagation_symbol_symbol_tableau.4" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.21" steps="460"/></proof>
+  <proof prover="1"><result status="valid" time="0.08" steps="460"/></proof>
   </goal>
  </transf>
  </goal>
@@ -128,10 +128,10 @@
  <proof prover="1"><result status="valid" time="0.17" steps="936"/></proof>
  </goal>
  <goal name="VC free_var_equivalence_of_rename_tableau" expl="VC for free_var_equivalence_of_rename_tableau" proved="true">
- <proof prover="1"><result status="valid" time="0.17" steps="116"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="116"/></proof>
  </goal>
  <goal name="VC free_var_derive_equivalence_of_subst_tableau" expl="VC for free_var_derive_equivalence_of_subst_tableau" proved="true">
- <proof prover="1"><result status="valid" time="0.39" steps="1518"/></proof>
+ <proof prover="1"><result status="valid" time="0.25" steps="1518"/></proof>
  </goal>
  <goal name="VC free_var_derive_equivalence_of_rename_tableau" expl="VC for free_var_derive_equivalence_of_rename_tableau" proved="true">
  <transf name="split_goal_right" proved="true" >

@@ -1,10 +1,24 @@
-bench/ce/real.mlw ModelReal test1: Unknown (other)
+Weakest Precondition
+bench/ce/real.mlw ModelReal test1: Timeout or Unknown
 Counter-example model:File real.mlw:
 Line 5:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Fraction" ,
 "val" : "1\/4" }
 
-bench/ce/real.mlw ModelReal test2: Unknown (other)
+bench/ce/real.mlw ModelReal test2: Timeout or Unknown
+Counter-example model:File real.mlw:
+Line 7:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Decimal" ,
+"val" : "0.0" }
+
+Strongest Postcondition
+bench/ce/real.mlw ModelReal test1: Timeout or Unknown
+Counter-example model:File real.mlw:
+Line 5:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Fraction" ,
+"val" : "1\/4" }
+
+bench/ce/real.mlw ModelReal test2: Timeout or Unknown
 Counter-example model:File real.mlw:
 Line 7:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Decimal" ,

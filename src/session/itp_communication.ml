@@ -36,7 +36,7 @@ type global_information =
 
 type message_notification =
   | Proof_error           of node_ID * string
-  | Transf_error          of node_ID * string * string * Loc.position * string * string
+  | Transf_error          of bool * node_ID * string * string * Loc.position * string * string
   (* Transf_error (nid, trans_with_arg, arg_opt, loc, error_msg, doc_of_trans *)
   | Strat_error           of node_ID * string
   | Replay_Info           of string
@@ -89,6 +89,8 @@ type notification =
      next unproven node from this node *)
   | Initialized  of global_information
   (* initial global data *)
+  | Saving_needed of bool
+  (* the session needs saving when argument is true *)
   | Saved
   (* the session was saved on disk *)
   | Message      of message_notification
@@ -118,20 +120,10 @@ type ide_request =
   | Unfocus_req
   | Save_req
   | Reload_req
+  | Check_need_saving_req
   | Exit_req
   | Interrupt_req
   | Get_global_infos
-
-(* Return true if the request modify the session *)
-let modify_session (r: ide_request) =
-  match r with
-  | Command_req _ | Add_file_req _ | Remove_subtree _ | Copy_paste _
-  | Reload_req -> true
-
-  | Set_config_param _ | Set_prover_policy _ | Get_file_contents _
-  | Get_task _ | Save_file_req _ | Get_first_unproven_node _
-  | Unfocus_req | Save_req | Exit_req | Get_global_infos
-  | Interrupt_req -> false
 
 
 (* Debugging functions *)
@@ -155,6 +147,7 @@ let print_request fmt r =
   | Unfocus_req                     -> fprintf fmt "unfocus"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"
+  | Check_need_saving_req           -> fprintf fmt "check need saving"
   | Exit_req                        -> fprintf fmt "exit"
   | Interrupt_req                   -> fprintf fmt "interrupt"
   | Get_global_infos                -> fprintf fmt "get_global_infos"
@@ -162,7 +155,8 @@ let print_request fmt r =
 let print_msg fmt m =
   match m with
   | Proof_error (_ids, s)                        -> fprintf fmt "proof error %s" s
-  | Transf_error (_ids, _tr, _args, _loc, s, _d) -> fprintf fmt "transf error %s" s
+  | Transf_error (b, _ids, _tr, _args, _loc, s, _d) ->
+      fprintf fmt "transf error (is fatal = %b) %s" b s
   | Strat_error (_ids, s)                        -> fprintf fmt "start error %s" s
   | Replay_Info s                                -> fprintf fmt "replay info %s" s
   | Query_Info (_ids, s)                         -> fprintf fmt "query info %s" s
@@ -201,6 +195,7 @@ let print_notify fmt n =
   | Remove _ni                        -> fprintf fmt "remove"
   | Next_Unproven_Node_Id (ni, nj)    -> fprintf fmt "next unproven node_id from %d is %d" ni nj
   | Initialized _gi                   -> fprintf fmt "initialized"
+  | Saving_needed b                   -> fprintf fmt "saving needed=%b" b
   | Saved                             -> fprintf fmt "saved"
   | Message msg                       ->
       print_msg fmt msg

@@ -28,7 +28,7 @@ open Ptree
 (* BEGIN{openmodule} *)
 let () = Typing.open_file env [] (* empty pathname *)
 let mk_ident s = { id_str = s; id_ats = []; id_loc = Loc.dummy_position }
-let m = Typing.open_module (mk_ident "Program")
+let () = Typing.open_module (mk_ident "Program")
 (* END{openmodule} *)
 
 
@@ -117,6 +117,7 @@ let d1 : decl =
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
   in
   let body = mk_eapp mul_int [mk_evar id_x; mk_econst "7"] in
@@ -163,6 +164,7 @@ let d2 =
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
   in
   let body =
@@ -221,6 +223,7 @@ let d3 =
     sp_variant = [];
     sp_checkrw = false;
     sp_diverge = false;
+    sp_partial = false;
   }
   in
   let body =

@@ -339,6 +339,16 @@ exception IllegalAssign of region * region * region
 exception ImpureVariable of tvsymbol * ity
 exception GhostDivergence
 
+(* termination status *)
+type oneway =
+  | Total
+  | Partial
+  | Diverges
+
+val total : oneway -> bool
+val partial : oneway -> bool
+val diverges : oneway -> bool
+
 type effect = private {
   eff_reads  : Spv.t;         (* known variables *)
   eff_writes : Spv.t Mreg.t;  (* writes to fields *)
@@ -347,7 +357,7 @@ type effect = private {
   eff_resets : Sreg.t;        (* locked by covers *)
   eff_raises : Sxs.t;         (* raised exceptions *)
   eff_spoils : Stv.t;         (* immutable tyvars *)
-  eff_oneway : bool;          (* non-termination *)
+  eff_oneway : oneway;        (* non-termination *)
   eff_ghost  : bool;          (* ghost status *)
 }
 
@@ -377,9 +387,10 @@ val eff_catch : effect -> xsymbol -> effect
 
 val eff_spoil : effect -> ity -> effect
 
-val eff_diverge : effect -> effect                (* forbidden if ghost *)
-val eff_ghostify : bool -> effect -> effect       (* forbidden if diverges *)
-val eff_ghostify_weak : bool -> effect -> effect  (* only if has no effect *)
+val eff_partial : effect -> effect                      (* forbidden if ghost *)
+val eff_diverge : effect -> effect                      (* forbidden if ghost *)
+val eff_ghostify : bool -> effect -> effect (* forbidden if fails or diverges *)
+val eff_ghostify_weak : bool -> effect -> effect     (* only if has no effect *)
 
 val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
 val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
@@ -387,6 +398,18 @@ val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
 val mask_adjust : effect -> ity -> mask -> mask
 
 val eff_escape : effect -> ity -> Sity.t
+
+val ity_affected : 'a Mreg.t -> ity -> bool
+(** [ity_affected wr ity] returns [true] if the regions of [ity] are contained
+    in the effect described by [wr]. *)
+
+val pv_affected  : 'a Mreg.t -> pvsymbol -> bool
+(** [pv_affected wr pv] returns [true] if the regions of [pv] are contained in
+    the effect described by [wr]. *)
+
+val pvs_affected : 'a Mreg.t -> Spv.t -> Spv.t
+(** [pvs_affected wr pvs] returns the set of pvsymbols from [pvs] whose regions
+    are contained in the effect described by [wr]. *)
 
 (** {2 Computation types (higher-order types with effects)} *)
 

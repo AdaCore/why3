@@ -26,52 +26,62 @@ module Sub
     ensures { 0 <= result <= 1 }
     writes { r.data.elts }
   =
-    let limb_zero = Limb.of_int 0 in
-    let b = ref y in
-    let lx = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz && (not (Limb.(=) !b limb_zero)) do
+    let b = ref 0 in
+    let lx = ref (C.get x) in
+    let i = ref 1 in
+    let res = sub_mod !lx y in
+    C.set r res;
+    if (!lx < y)
+    then begin
+      b := 1;
+      assert { res - radix = !lx - y };
+      while (!i < sz) do
+        invariant { 1 <= !i <= sz }
+        invariant { 0 <= !b <= 1 }
+        invariant { !i = sz \/ !b = 1 }
+        invariant { value r !i - (power radix !i) * !b =
+                    value x !i - y }
+        invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                  -> (pelts r)[j] = old (pelts r)[j] }
+        variant { sz - !i }
+        assert { !b = 1 };
+        lx := get_ofs x !i;
+        let res = sub_mod !lx 1 in
+        set_ofs r !i res;
+        assert { value r !i - (power radix !i) * !b = value x !i - y };
+        value_tail r !i;
+        value_tail x !i;
+        i := !i + 1;
+        if !lx <> 0
+        then begin
+          b := 0;
+          assert { res = !lx - 1 };
+          assert { value r !i = value x !i - y };
+          break
+        end
+        else begin
+          assert { res = radix - 1 };
+          assert { value r !i - power radix !i = value x !i - y }
+        end
+      done;
+    end;
+    while !i < sz do
+      invariant { !i = sz \/ !b = 0 }
       invariant { 0 <= !i <= sz }
-      invariant { !i > 0 -> 0 <= !b <= 1 }
-      invariant { value r !i - power radix !i * !b
-                  = value x !i - y }
-      invariant { forall j. (j < offset r \/ offset r + sz <= j)
-                -> (pelts r)[j] = old (pelts r)[j] }
-      variant { sz - !i }
-      label StartLoop in
-      lx := get_ofs x !i;
-      let (res, borrow) = sub_with_borrow !lx !b limb_zero in
-      set_ofs r !i res;
-      assert { value r !i - power radix !i * !b =
-                 value x !i - y };
-      b := borrow;
-      value_tail r !i;
-      value_tail x !i;
-      assert { value r (!i+1) - power radix (!i+1) * !b
-                  = value x (!i+1) - y };
-      i := Int32.(+) !i (Int32.of_int 1);
-    done;
-    if Int32.(=) !i sz then !b
-    else begin
-    while Int32.(<) !i sz do
-      invariant { !b = 0 }
-      invariant { 0 <= !i <= sz }
-      invariant { value r !i - power radix !i * !b
-                   = value x !i - y }
+      invariant { value r !i - (power radix !i) * !b =
+                  value x !i - y }
       invariant { forall j. (j < offset r \/ offset r + sz <= j)
                 -> (pelts r)[j] = old (pelts r)[j] }
       variant { sz - !i }
       lx := get_ofs x !i;
       set_ofs r !i !lx;
-      assert { value r !i - power radix !i * !b
-                   = value x !i - y };
-      let ghost k = p2i !i in
-      i := Int32.(+) !i (Int32.of_int 1);
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
+      assert { value r !i - (power radix !i) * !b =
+                  value x !i - y };
+      value_tail r !i;
+      value_tail x !i;
+      i := !i + 1;
     done;
     !b
-  end
 
   (** `wmpn_sub_n r x y sz` subtracts `(y, sz)` from `(x, sz)` and
       writes the result to `(r, sz)`. Returns borrow, either 0 or
@@ -87,12 +97,11 @@ module Sub
               -> (pelts r)[j] = old (pelts r)[j] }
     writes { r.data.elts }
   =
-    let limb_zero = Limb.of_int 0 in
-    let lx = ref limb_zero in
-    let ly = ref limb_zero in
-    let b = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    while Int32.(<) !i sz do
+    let lx = ref 0 in
+    let ly = ref 0 in
+    let b = ref 0 in
+    let i = ref 0 in
+    while !i < sz do
       variant { sz - !i }
       invariant { 0 <= !i <= sz }
       invariant { value r !i - (power radix !i) * !b
@@ -113,7 +122,7 @@ module Sub
       value_tail y !i;
       assert { value r (!i+1) - (power radix (!i+1)) * !b
                   = value x (!i+1) - value y (!i+1) };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := !i + 1;
       done;
       !b
 
@@ -132,13 +141,11 @@ module Sub
     ensures { 0 <= result <= 1 }
     writes { r.data.elts }
   =
-    let limb_zero = Limb.of_int 0 in
-    let lx = ref limb_zero in
-    let ly = ref limb_zero in
-    let b = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    let one = Int32.of_int 1 in
-    while Int32.(<) !i sy do
+    let lx = ref 0 in
+    let ly = ref 0 in
+    let b = ref 0 in
+    let i = ref 0 in
+    while !i < sy do
       variant { sy - !i }
       invariant { 0 <= !i <= sy }
       invariant { value r !i - power radix !i * !b =
@@ -159,36 +166,41 @@ module Sub
       value_tail y !i;
       assert { value r (!i+1) - power radix (!i+1) * !b =
               value x (!i+1) - value y (!i+1) };
-      i := Int32.(+) !i one;
+      i := !i + 1;
     done;
-    try
-    begin while Int32.(<) !i sx do
-      variant { sx - !i }
-      invariant { sy <= !i <= sx }
-      invariant { value r !i - power radix !i * !b =
-                  value x !i - value y sy }
-      invariant { forall j. (j < offset r \/ offset r + sx <= j)
-                -> (pelts r)[j] = old (pelts r)[j] }
-      invariant { 0 <= !b <= 1 }
-      (if (Limb.(=) !b (Limb.of_int 0)) then raise Break);
-      label StartLoop2 in
-      lx := get_ofs x !i;
-      let res, borrow = sub_with_borrow !lx limb_zero !b in
-      set_ofs r !i res;
-      assert { value r !i - power radix !i * !b =
-      value x !i - value y sy };
-      b := borrow;
-      value_tail r !i;
-      value_tail x !i;
-      assert { value r (!i+1) - power radix (!i+1) * !b =
-               value x (!i+1) - value y sy };
-      i := Int32.(+) !i one;
-    done;
-    assert { !i = sx }
-    end
-    with Break -> assert { !b = 0 }
+    if !b <> 0
+    then begin
+      while !i < sx do
+        variant { sx - !i }
+        invariant { sy <= !i <= sx }
+        invariant { value r !i - power radix !i * !b =
+                    value x !i - value y sy }
+        invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                  -> (pelts r)[j] = old (pelts r)[j] }
+        invariant { 0 <= !b <= 1 }
+        invariant { !i = sx \/ !b = 1 }
+        assert { !b = 1 };
+        lx := get_ofs x !i;
+        let res = sub_mod !lx 1 in
+        set_ofs r !i res;
+        assert { value r !i - (power radix !i) * !b = value x !i - value y sy };
+        value_tail r !i;
+        value_tail x !i;
+        i := !i + 1;
+        if (!lx <> 0)
+        then begin
+          b := 0;
+          assert { res = !lx - 1 };
+          assert { value r !i = value x !i - value y sy};
+          break;
+        end
+        else begin
+          assert { res = radix - 1 };
+          assert { value r !i - power radix !i = value x !i - value y sy }
+        end
+      done
     end;
-    while Int32.(<) !i sx do
+    while !i < sx do
       variant { sx - !i }
       invariant { sy <= !i <= sx }
       invariant { !i = sx \/ !b = 0 }
@@ -204,7 +216,7 @@ module Sub
       assert { value r !i = value x !i - value y sy };
       assert { value r (!i+1) - power radix (!i+1) * !b
                = value x (!i+1) - value y sy };
-      i := Int32.(+) !i (Int32.of_int 1);
+      i := !i + 1;
     done;
     !b
 
@@ -220,13 +232,11 @@ module Sub
               (pelts x)[j] = (pelts (old x))[j] }
   =
     let ghost ox = { x } in
-    let limb_zero = Limb.of_int 0 in
-    let lx = ref limb_zero in
-    let ly = ref limb_zero in
-    let b = ref limb_zero in
-    let i = ref (Int32.of_int 0) in
-    let one = Int32.of_int 1 in
-    while Int32.(<) !i sy do
+    let lx = ref 0 in
+    let ly = ref 0 in
+    let b = ref 0 in
+    let i = ref 0 in
+    while !i < sy do
       variant { sy - !i }
       invariant { 0 <= !i <= sy }
       invariant { value x !i - power radix !i * !b =
@@ -255,55 +265,57 @@ module Sub
       value_tail y !i;
       assert { value x (!i+1) - power radix (!i+1) * !b =
               value ox (!i+1) - value y (!i+1) };
-      i := Int32.(+) !i one;
+      i := !i + 1;
     done;
-    try
-    begin while Int32.(<) !i sx do
-      variant { sx - !i }
-      invariant { sy <= !i <= sx }
-      invariant { value x !i - power radix !i * !b =
-                  value ox !i - value y sy }
-      invariant { 0 <= !b <= 1 }
-      invariant { forall j. !i <= j < sx ->
-                  (pelts x)[x.offset + j] = (pelts ox) [x.offset + j] }
-      invariant { forall j. j < x.offset \/ x.offset + sx <= j ->
-                  (pelts x)[j] = (pelts (old x))[j] }
-      (if (Limb.(=) !b limb_zero) then raise ReturnLimb limb_zero);
-      label StartLoop2 in
-      lx := get_ofs x !i;
-      assert { !lx = (pelts ox)[ox.offset + !i] };
-      let res, borrow = sub_with_borrow !lx limb_zero !b in
-      value_sub_update_no_change (pelts x) (x.offset + p2i !i)
-                                           (x.offset + p2i !i + 1)
-                                           (x.offset + p2i sx) res;
-      set_ofs x !i res;
-      assert { value x !i - power radix !i * !b = value ox !i - value y sy };
-      b := borrow;
-      assert { forall j. !i < j < sx ->
-                  (pelts x)[x.offset + j] = (pelts ox) [x.offset + j] };
-      value_tail ox !i;
-      value_tail x !i;
-      assert { value x (!i+1) - power radix (!i+1) * !b =
-               value ox (!i+1) - value y sy };
-      i := Int32.(+) !i one;
-    done;
-    assert { !i = sx };
+    if not (!b = 0)
+    then begin
+      while !i < sx do
+        variant { sx - !i }
+        invariant { sy <= !i <= sx }
+        invariant { value x !i - power radix !i * !b =
+                    value ox !i - value y sy }
+        invariant { 0 <= !b <= 1 }
+        invariant { !i = sx \/ !b = 1 }
+        invariant { forall j. !i <= j < sx ->
+                    (pelts x)[x.offset + j] = (pelts ox) [x.offset + j] }
+        invariant { forall j. j < x.offset \/ x.offset + sx <= j ->
+                    (pelts x)[j] = (pelts (old x))[j] }
+        assert { !b = 1 };
+        lx := get_ofs x !i;
+        assert { !lx = (pelts ox)[ox.offset + !i] };
+        let res = sub_mod !lx 1 in
+        value_sub_update_no_change (pelts x) (x.offset + p2i !i)
+                                             (x.offset + p2i !i + 1)
+                                             (x.offset + p2i sx) res;
+        set_ofs x !i res;
+        assert { value x !i - power radix !i * !b = value ox !i - value y sy };
+        assert { forall j. !i < j < sx ->
+                 (pelts x)[x.offset + j] = (pelts ox) [x.offset + j] };
+        value_tail ox !i;
+        value_tail x !i;
+        i := !i + 1;
+        if not (!lx =  0)
+        then begin
+          b := 0;
+          assert { res = !lx - 1 };
+          assert { value x !i = value ox !i - value y sy };
+          break;
+        end
+        else begin
+          assert { res = radix - 1 };
+          assert { value x !i - power radix !i = value ox !i - value y sy }
+        end
+      done
+    end;
+    assert { forall j. x.offset + !i <= j < x.offset + sx
+             -> (pelts x)[j] = (pelts ox)[j]
+             by !i <= j - x.offset < sx
+             so (pelts x)[x.offset + (j - x.offset)]
+                = (pelts ox)[x.offset + (j - x.offset)] };
+    value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sx);
+    value_sub_concat (pelts x) x.offset (x.offset + p2i !i) (x.offset + p2i sx);
+    value_sub_concat (pelts ox) x.offset (x.offset + p2i !i) (x.offset + p2i sx);
     !b
-    end
-    with ReturnLimb n -> begin
-      assert { n = 0 = !b };
-      assert { forall j. x.offset + !i <= j < x.offset + sx
-               -> (pelts x)[j] = (pelts ox)[j]
-               by !i <= j - x.offset < sx
-               so (pelts x)[x.offset + (j - x.offset)]
-                  = (pelts ox)[x.offset + (j - x.offset)] };
-      value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sx);
-      value_sub_concat (pelts x) x.offset (x.offset + p2i !i) (x.offset + p2i sx);
-      value_sub_concat (pelts ox) x.offset (x.offset + p2i !i) (x.offset + p2i sx);
-      assert { value x sx = value (old x) sx - value y sy };
-      n
-      end
-    end
 
   (** `wmpn_decr x y sz` subtracts from `x` the value of the limb `y` in place.
       `x` has size `sz`. The subtraction must not overflow. This corresponds
@@ -318,46 +330,60 @@ module Sub
     writes   { x.data.elts }
   =
     let ghost ox = { x } in
-    let b = ref y in
-    let lx : ref limb = ref 0 in
-    let i : ref int32 = ref 0 in
-    while not (Limb.(=) !b 0) do
-      invariant { 0 <= !i <= sz }
-      invariant { !i = sz -> !b = 0 }
-      invariant { !i > 0 -> 0 <= !b <= 1 }
-      invariant { value x !i - (power radix !i) * !b
-                  = value ox !i - y }
-      invariant { forall j. !i <= j < sz ->
-                  (pelts x)[x.offset + j] = (pelts ox)[x.offset + j] }
-      invariant { forall j. j < x.offset \/ x.offset + sz <= j ->
-                  (pelts x)[j] = (pelts ox)[j] }
-      variant   { sz - !i }
-      label StartLoop in
-      lx := get_ofs x !i;
-      assert { !lx = (pelts ox)[ox.offset + !i] };
-      let (res, borrow) = sub_with_borrow !lx !b 0 in (*TODO*)
-      assert { res - radix * borrow = !lx - !b }; (* TODO remove this *)
-      value_sub_update_no_change (pelts x) (x.offset + p2i !i)
-                                           (x.offset + p2i !i + 1)
-                                           (x.offset + p2i sz) res;
-      set_ofs x !i res;
-      assert { forall j. !i < j < sz ->
-                 (pelts x)[x.offset + j]
-                 = (pelts ox)[x.offset + j] };
-      assert { value x !i - (power radix !i) * !b = value ox !i - y };
-      b := borrow;
-      value_tail x !i;
-      value_tail ox !i;
-      assert { value x (!i+1) - power radix (!i+1) * !b =
-               value ox (!i+1) - y };
-      i := Int32.(+) !i 1;
-      assert { !i = sz -> !b = 0
-               by value x sz - power radix sz * !b = value ox sz - y
-                  so 0 <= value ox sz - y
-                  so value x sz < power radix sz
-                  so value x sz - power radix sz * 1 < 0
-                  so (!b=0 \/ !b=1) };
-    done;
+    let b = ref (0:limb) in
+    let lx : ref limb = ref (C.get x) in
+    let i : ref int32 = ref 1 in
+    let res = sub_mod !lx y in
+    C.set x res;
+    if !lx < y
+    then begin
+      b := 1;
+      assert { res - radix = !lx - y };
+      while not (!b = 0) do
+        invariant { 1 <= !i <= sz }
+        invariant { !i = sz -> !b = 0 }
+        invariant { 0 <= !b <= 1 }
+        invariant { value x !i - (power radix !i) * !b
+                    = value ox !i - y }
+        invariant { forall j. !i <= j < sz ->
+                    (pelts x)[x.offset + j] = (pelts ox)[x.offset + j] }
+        invariant { forall j. j < x.offset \/ x.offset + sz <= j ->
+                    (pelts x)[j] = (pelts ox)[j] }
+        variant   { sz - !i }
+        assert { !b = 1 };
+        lx := get_ofs x !i;
+        assert { !lx = (pelts ox)[ox.offset + !i] };
+        let res = sub_mod !lx 1 in
+        value_sub_update_no_change (pelts x) (x.offset + p2i !i)
+                                             (x.offset + p2i !i + 1)
+                                             (x.offset + p2i sz) res;
+        set_ofs x !i res;
+        assert { forall j. !i < j < sz ->
+                   (pelts x)[x.offset + j]
+                   = (pelts ox)[x.offset + j] };
+        assert { value x !i - (power radix !i) * !b = value ox !i - y };
+        value_tail x !i;
+        value_tail ox !i;
+        i := !i + 1;
+        if not (!lx = 0)
+        then begin
+          b := 0;
+          assert { res = !lx - 1 };
+          assert { value x !i = value ox !i - y };
+          break
+        end
+        else begin
+          assert { res = radix - 1 };
+          assert { value x !i - power radix !i = value ox !i - y };
+        end;
+        assert { !i = sz -> !b = 0
+                 by value x sz - power radix sz * !b = value ox sz - y
+                 so 0 <= value ox sz - y
+                 so value x sz < power radix sz
+                 so value x sz - power radix sz * 1 < 0
+                 so (!b=0 \/ !b=1) };
+        done
+    end;
     value_concat x !i sz;
     value_concat ox !i sz;
     assert { forall j. x.offset + !i <= j < x.offset + sz ->
@@ -380,10 +406,10 @@ module Sub
     writes   { x.data.elts }
   =
     let ghost ox = { x } in
-    let ghost b : ref limb = ref 1 in
-    let lx : ref limb = ref 0 in
-    let i : ref int32 = ref 0 in
-    while (Limb.(=) !lx 0) do
+    let ghost b = ref (1:limb) in
+    let lx = ref 0 in
+    let i = ref 0 in
+    while (!lx = 0) do
       invariant { 0 <= !i <= sz }
       invariant { !i = sz -> !lx <> 0 }
       invariant { !lx <> 0 <-> !b = 0 }
@@ -399,7 +425,7 @@ module Sub
       lx := get_ofs x !i;
       assert { !lx = (pelts ox)[ox.offset + !i] };
       let res = sub_mod !lx 1 in
-      ghost (if Limb.(=) !lx 0 then b := 1 else b := 0);
+      ghost (if !lx = 0 then b := 1 else b := 0);
       assert { res - radix * !b = !lx - 1 };
       value_sub_update_no_change (pelts x) (x.offset + p2i !i)
                                            (x.offset + p2i !i + 1)
@@ -413,7 +439,7 @@ module Sub
       value_tail ox !i;
       assert { value x (!i+1) - power radix (!i+1) * !b =
                value ox (!i+1) - 1 };
-      i := Int32.(+) !i 1;
+      i := !i + 1;
       assert { !i = sz -> !b = 0
                by value x sz - power radix sz * !b = value ox sz - 1
                   so 0 <= value ox sz - 1
@@ -429,5 +455,114 @@ module Sub
                 !i <= k < sz
                 so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
     value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sz)
+
+  let wmpn_sub_1_in_place (x:t) (y:limb) (sz:int32) : limb
+    requires { valid x sz }
+    requires { sz > 0 }
+    ensures  { value x sz - (power radix sz) * result = value (old x) sz - y }
+    ensures  { 0 <= result <= 1 }
+    ensures  { forall j. (j < offset x \/ offset x + sz <= j)
+              -> (pelts x)[j] = old (pelts x)[j] }
+    writes { x.data.elts }
+  =
+    let ghost ox = { x } in
+    let b = ref 0 in
+    let lx = ref (C.get x) in
+    let i = ref 1 in
+    let res = sub_mod !lx y in
+    C.set x res;
+    if !lx < y
+    then begin
+      b := 1;
+      assert { res - radix = !lx - y };
+      while !i < sz do
+        invariant { 1 <= !i <= sz }
+        invariant { 0 <= !b <= 1 }
+        invariant { !b = 1 \/ !i = sz }
+        invariant { value x !i - (power radix !i) * !b =
+                    value ox !i - y }
+        invariant { forall j. (j < offset x \/ offset x + !i <= j)
+                  -> (pelts x)[j] = old (pelts x)[j] }
+        variant { sz - !i }
+        assert { !b = 1 };
+        lx := get_ofs x !i;
+        assert { !lx = (pelts ox)[offset ox + !i] };
+        let res = sub_mod !lx 1 in
+        value_sub_update_no_change (pelts x) (x.offset + p2i !i)
+                                             (x.offset + p2i !i + 1)
+                                             (x.offset + p2i sz) res;
+        set_ofs x !i res;
+        assert { forall j. !i < j < sz ->
+                   (pelts x)[x.offset + j]
+                   = (pelts ox)[x.offset + j] };
+        assert { value x !i - (power radix !i) * !b = value ox !i - y };
+        value_tail x !i;
+        value_tail ox !i;
+        i := !i + 1;
+        if not (!lx = 0)
+        then begin
+          b := 0;
+          assert { res = !lx - 1 };
+          assert { value x !i = value ox !i - y };
+          break
+        end
+        else begin
+          assert { res = radix - 1 };
+          assert { value x !i - power radix !i = value ox !i - y };
+        end;
+      done;
+    end;
+    value_concat x !i sz;
+    value_concat ox !i sz;
+    assert { forall j. x.offset + !i <= j < x.offset + sz ->
+             (pelts x)[j] = (pelts ox)[j]
+             by let k = j - x.offset in
+                !i <= k < sz
+                so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
+    value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sz);
+    !b
+  (*let ghost ox = { x } in
+    let b = ref y in
+    let lx = ref 0 in
+    let i = ref 0 in
+    while !i < sz && not (!b = 0) do
+      invariant { 0 <= !i <= sz }
+      invariant { !i > 0 -> 0 <= !b <= 1 }
+      invariant { value x !i - (power radix !i) * !b =
+                  value ox !i - y }
+      invariant { forall j. (j < offset x \/ offset x + !i <= j)
+                -> (pelts x)[j] = old (pelts x)[j] }
+      variant { sz - !i }
+      label StartLoop in
+      lx := get_ofs x !i;
+      assert { !lx = (pelts ox)[offset ox + !i] };
+      let (res, borrow) = sub_with_borrow !lx !b 0 in
+      assert { res - radix * borrow = !lx - !b }; (* TODO remove this *)
+      value_sub_update_no_change (pelts x) (x.offset + p2i !i)
+                                           (x.offset + p2i !i + 1)
+                                           (x.offset + p2i sz) res;
+      set_ofs x !i res;
+      assert { forall j. !i < j < sz ->
+                 (pelts x)[x.offset + j]
+                 = (pelts ox)[x.offset + j] };
+      assert { value x !i = value x !i at StartLoop };
+      assert { value x !i - (power radix !i) * !b = value ox !i - y };
+      b := borrow;
+      value_tail x !i;
+      value_tail ox !i;
+      assert { value x (!i+1) - (power radix (!i+1)) * !b
+             = value ox (!i+1) - y };
+      i := !i + 1;
+    done;
+    value_concat x !i sz;
+    value_concat ox !i sz;
+    assert { forall j. x.offset + !i <= j < x.offset + sz ->
+             (pelts x)[j] = (pelts ox)[j]
+             by let k = j - x.offset in
+                !i <= k < sz
+                so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
+    value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sz);
+    !b*)
+
 
 end

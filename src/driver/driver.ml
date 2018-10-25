@@ -21,6 +21,10 @@ open Trans
 open Driver_ast
 open Call_provers
 
+let driver_debug =
+  Debug.register_flag "interm_task"
+    ~desc:"Print intermediate task generated during processing of a driver"
+
 (** drivers *)
 
 type driver = {
@@ -93,7 +97,7 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
     | RegexpOutOfMemory s -> add_to_list regexps (s, OutOfMemory)
     | RegexpStepLimitExceeded s ->
       add_to_list regexps (s, StepLimitExceeded)
-    | RegexpUnknown (s,t) -> add_to_list regexps (s, Unknown (t, None))
+    | RegexpUnknown (s,t) -> add_to_list regexps (s, Unknown t)
     | RegexpFailure (s,t) -> add_to_list regexps (s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
     | StepRegexp (r,ns) ->
@@ -101,10 +105,9 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
-    | ExitCodeOutOfMemory s -> add_to_list exitcodes (s, OutOfMemory)
     | ExitCodeStepLimitExceeded s ->
       add_to_list exitcodes (s, StepLimitExceeded)
-    | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown (t, None))
+    | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"
     | Printer s -> set_or_raise loc printer s "printer"
@@ -169,10 +172,6 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
       in
       Mid.iter it th.th_local;
       th_uc
-    | Rconverter (q,s,b) ->
-        let cs = syntax_converter (find_ls th q) s b in
-        add_meta th cs meta;
-        th_uc
     | Rliteral (q,s,b) ->
         let cs = syntax_literal (find_ts th q) s b in
         add_meta th cs meta;
@@ -335,16 +334,24 @@ let update_task = let ht = Hint.create 5 in fun drv ->
       add_tdecl task goal
     | task -> update task
 
+(* Apply driver's transformations to the task *)
 let prepare_task drv task =
   let lookup_transform t =
     let stat_name = "gnatwhy3.transformations." ^ t in
-    stat_name, lookup_transform t drv.drv_env in
+    stat_name, lookup_transform t drv.drv_env, t in
   let transl = List.map lookup_transform drv.drv_transform in
-  let apply task (name, tr) =
-    let res = Trans.apply tr task in
-    Util.timing_step_completed name;
-    res in
+  let apply task (stat_name, tr, name) =
+    let task = Trans.apply tr task in
+    Util.timing_step_completed stat_name;
+    Debug.dprintf driver_debug "Task after transformation: %s\n%a@."
+      name Pretty.print_task task;
+    task
+  in
+  Debug.dprintf driver_debug "Task before driver's transformation\n%a@."
+    Pretty.print_task task;
   let task = update_task drv task in
+  Debug.dprintf driver_debug "Task after update\n%a@."
+    Pretty.print_task task;
   List.fold_left apply task transl
 
 let print_task_prepared ?old drv fmt task =

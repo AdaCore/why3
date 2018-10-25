@@ -106,69 +106,94 @@ type descent =
   | Equal of int
   | Unknown
 
+type call_set = (ident * descent array) Hid.t
+type vs_graph = descent Mvs.t list
+
+let create_call_set () = Hid.create 5
+
+let create_vs_graph vl =
+  let i = ref (-1) in
+  let add vm v = incr i; Mvs.add v (Equal !i) vm in
+  [List.fold_left add Mvs.empty vl]
+
+(* TODO: can we handle projections somehow? *)
+let register_call cgr caller vsg callee tl =
+  let call vm =
+    let describe t = match t.t_node with
+      | Tvar v -> Mvs.find_def Unknown v vm
+      | _ -> Unknown in
+    let dl = List.map describe tl in
+    Hid.add cgr callee (caller, Array.of_list dl) in
+  List.iter call vsg
+
+let vs_graph_drop vsg u = List.rev_map (Mvs.remove u) vsg
+
+(* TODO: can we handle projections somehow? *)
+let vs_graph_let vsg t u = match t.t_node with
+  | Tvar v ->
+      let add vm = try Mvs.add u (Mvs.find v vm) vm
+                  with Not_found -> Mvs.remove u vm in
+      List.rev_map add vsg
+  | _ ->
+      vs_graph_drop vsg u
+
 let rec match_var link acc p = match p.pat_node with
   | Pwild -> acc
   | Pvar u -> List.rev_map (Mvs.add u link) acc
   | Pas (p,u) -> List.rev_map (Mvs.add u link) (match_var link acc p)
   | Por (p1,p2) ->
-      let acc1 = match_var link acc p1 in
-      let acc2 = match_var link acc p2 in
-      List.rev_append acc1 acc2
+      List.rev_append (match_var link acc p1) (match_var link acc p2)
   | Papp _ ->
       let link = match link with
         | Unknown -> Unknown
         | Equal i -> Less i
-        | Less i  -> Less i
-      in
+        | Less i  -> Less i in
       let join u = Mvs.add u link in
       List.rev_map (Svs.fold join p.pat_vars) acc
 
 let rec match_term vm t acc p = match t.t_node, p.pat_node with
   | _, Pwild -> acc
-  | Tvar v, _ when not (Mvs.mem v vm) -> acc
-  | Tvar v, _ -> match_var (Mvs.find v vm) acc p
-  | Tapp _, Pvar _ -> acc
-  | Tapp _, Pas (p,_) -> match_term vm t acc p
+  | Tvar v, _ when Mvs.mem v vm ->
+      match_var (Mvs.find v vm) acc p
+  | Tapp _, Pvar u ->
+      vs_graph_drop acc u
+  | Tapp _, Pas (p,u) ->
+      match_term vm t (vs_graph_drop acc u) p
   | Tapp _, Por (p1,p2) ->
-      let acc1 = match_term vm t acc p1 in
-      let acc2 = match_term vm t acc p2 in
-      List.rev_append acc1 acc2
+      List.rev_append (match_term vm t acc p1) (match_term vm t acc p2)
   | Tapp (c1,tl), Papp (c2,pl) when ls_equal c1 c2 ->
       let down l t p = match_term vm t l p in
       List.fold_left2 down acc tl pl
-  | _,_ -> acc
+  | _,_ ->
+      List.rev_map (fun vm -> Mvs.set_diff vm p.pat_vars) acc
 
-let build_call_graph cgr syms ls =
-  let call vm s tl =
-    let desc t = match t.t_node with
-      | Tvar v -> Mvs.find_def Unknown v vm
-      | _ -> Unknown
-    in
-    Hls.add cgr s (ls, Array.of_list (List.map desc tl))
-  in
+let vs_graph_pat vsg t p =
+  let add acc vm = List.rev_append (match_term vm t [vm] p) acc in
+  List.fold_left add [] vsg
+
+let build_call_graph cgr syms ls (vl,e) =
   let rec term vm () t = match t.t_node with
     | Tapp (s,tl) when Mls.mem s syms ->
-        t_fold (term vm) () t; call vm s tl
-    | Tlet ({t_node = Tvar v}, b) when Mvs.mem v vm ->
+        t_fold (term vm) () t;
+        register_call cgr ls.ls_name vm s.ls_name tl
+    | Tlet (t,b) ->
+        term vm () t;
         let u,e = t_open_bound b in
-        term (Mvs.add u (Mvs.find v vm) vm) () e
-    | Tcase (e,bl) ->
-        term vm () e; List.iter (fun b ->
-          let p,t = t_open_branch b in
-          let vml = match_term vm e [vm] p in
-          List.iter (fun vm -> term vm () t) vml) bl
-    | Tquant (_,b) ->
+        term (vs_graph_let vm t u) () e
+    | Tcase (t,bl) ->
+        term vm () t;
+        List.iter (fun b ->
+          let p,e = t_open_branch b in
+          term (vs_graph_pat vm t p) () e) bl
+    | Tquant (_,b) -> (* ignore triggers *)
         let _,_,f = t_open_quant b in term vm () f
-    | _ -> t_fold (term vm) () t
+    | _ ->
+        t_fold (term vm) () t
   in
-  fun (vl,e) ->
-    let i = ref (-1) in
-    let add vm v = incr i; Mvs.add v (Equal !i) vm in
-    let vm = List.fold_left add Mvs.empty vl in
-    term vm () e
+  term (create_vs_graph vl) () e
 
-let build_call_list cgr ls =
-  let htb = Hls.create 5 in
+let build_call_list cgr id =
+  let htb = Hid.create 5 in
   let local v = Array.mapi (fun i -> function
     | (Less j) as d when i = j -> d
     | (Equal j) as d when i = j -> d
@@ -186,7 +211,7 @@ let build_call_list cgr ls =
     try Array.iteri test v1; true with Not_found -> false
   in
   let subsumed s c =
-    List.exists (subsumes c) (Hls.find_all htb s)
+    List.exists (subsumes c) (Hid.find_all htb s)
   in
   let multiply v1 v2 =
     let to_less = function
@@ -200,21 +225,20 @@ let build_call_list cgr ls =
       | Less i -> to_less (Array.get v2 i)) v1
   in
   let resolve s c =
-    Hls.add htb s c;
+    Hid.add htb s c;
     let mult (s,v) = (s, multiply c v) in
-    List.rev_map mult (Hls.find_all cgr s)
+    List.rev_map mult (Hid.find_all cgr s)
   in
   let rec add_call lc = function
     | [] -> lc
-    | (s,c)::r when ls_equal ls s -> add_call (local c :: lc) r
+    | (s,c)::r when id_equal id s -> add_call (local c :: lc) r
     | (s,c)::r when subsumed s c -> add_call lc r
     | (s,c)::r -> add_call lc (List.rev_append (resolve s c) r)
   in
-  add_call [] (Hls.find_all cgr ls)
+  add_call [] (Hid.find_all cgr id)
 
-exception NoTerminationProof of lsymbol
-
-let check_call_list ls cl =
+let find_variant exn cgr id =
+  let cl = build_call_list cgr id in
   let add d1 d2 = match d1, d2 with
     | Unknown, _ -> d1
     | _, Unknown -> d2
@@ -234,7 +258,7 @@ let check_call_list ls cl =
         let find l = function Less i -> i :: l | _ -> l in
         let res = Array.fold_left find [] p in
         (* eliminate the decreasing calls *)
-        if res = [] then raise (NoTerminationProof ls);
+        if res = [] then raise exn;
         let test a =
           List.for_all (fun i -> Array.get a i <> Less i) res
         in
@@ -242,15 +266,15 @@ let check_call_list ls cl =
   in
   check [] cl
 
+exception NoTerminationProof of lsymbol
+
 let check_termination ldl =
-  let cgr = Hls.create 5 in
+  let cgr = create_call_set () in
   let add acc (ls,ld) = Mls.add ls (open_ls_defn ld) acc in
   let syms = List.fold_left add Mls.empty ldl in
   Mls.iter (build_call_graph cgr syms) syms;
   let check ls _ =
-    let cl = build_call_list cgr ls in
-    check_call_list ls cl
-  in
+    find_variant (NoTerminationProof ls) cgr ls.ls_name in
   let res = Mls.mapi check syms in
   List.map (fun (ls,(_,f,_)) -> (ls,(ls,f,Mls.find ls res))) ldl
 

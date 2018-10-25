@@ -303,13 +303,15 @@ let init () =
    session *)
 let init_cont () =
   let session_dir = get_session_dir () in
-  let is_new_session, (session, use_shapes) =
+  (* Shape version is always None for gnatwhy3 because we don't use shapes *)
+  let is_new_session, (session, _shape_version) =
     if not Gnat_config.force && Sys.file_exists session_dir then
       false, Session_itp.load_session session_dir
     else begin
       if not (Sys.file_exists session_dir) then Unix.mkdir session_dir 0o700;
-      true, (Session_itp.empty_session session_dir, false)
-    end in
+      true, (Session_itp.empty_session session_dir, None)
+    end
+  in
   let c = Controller_itp.create_controller Gnat_config.config Gnat_config.env session in
   if is_new_session || not (has_file session) then begin
     try
@@ -325,7 +327,7 @@ let init_cont () =
   if is_new_session then c
   else
     try
-      let (_ : bool), (_ : bool) = Controller_itp.reload_files c ~use_shapes in
+      let (_ : bool), (_ : bool) = Controller_itp.reload_files c ~shape_version:None in
       c
     with
     | Controller_itp.Errors_list l ->
@@ -446,6 +448,7 @@ let further_split (c: Controller_itp.controller) (goal: goal_id) =
            end
          | Controller_itp.TSscheduled  -> ()
          | Controller_itp.TSfailed _ -> ()
+         | Controller_itp.TSfatal _ -> ()
        in
        (* Pass empty function for notification as there is no IDE to update *)
        C.schedule_transformation c goal trans [] ~callback:callback

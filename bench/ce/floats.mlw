@@ -44,8 +44,8 @@ theory T64
 
   goal g8 : forall x:t. not (eq x (div RNE (1.0:t) (0.0:t)))
 
-  goal g9 : forall x:t. gt x (0.0:t) -> gt (div RNE x (2.0:t)) (0.0:t)
-
+(*  TODO: Removed due to differences amongst platforms:
+    goal g9 : forall x:t. gt x (0.0:t) -> gt (div RNE x (2.0:t)) (0.0:t)*)
   goal g10: forall x:t. not (ge (mul RNE (10.0:t) x) (1.0:t) /\ (le (mul RTZ (10.0:t) x) (1.0:t)))
 
 end

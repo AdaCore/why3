@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file name="../verifythis_2018_mind_the_gap_2.mlw" proved="true">
 <theory name="GapBuffer" proved="true">
- <goal name="VC dummy_char" expl="VC for dummy_char" proved="true">
- <proof prover="2"><result status="valid" time="0.00"/></proof>
- </goal>
  <goal name="VC buffer" expl="VC for buffer" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  </goal>
@@ -27,13 +24,13 @@
   <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC left.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="56"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="61"/></proof>
   </goal>
   <goal name="VC left.5" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC left.6" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
@@ -52,18 +49,15 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC right.4" expl="postcondition" proved="true">
-  <proof prover="0" memlimit="2000"><result status="valid" time="0.02" steps="52"/></proof>
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.02" steps="61"/></proof>
   </goal>
   <goal name="VC right.5" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC right.6" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="3"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="VC k" expl="VC for k" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC grow" expl="VC for grow" proved="true">
  <transf name="split_vc" proved="true" >
@@ -105,10 +99,10 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC insert.2" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC insert.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="173"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="188"/></proof>
   </goal>
   <goal name="VC insert.4" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.02"/></proof>
@@ -117,10 +111,10 @@
   <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC insert.6" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC insert.7" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="94"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="115"/></proof>
   </goal>
  </transf>
  </goal>
@@ -130,7 +124,7 @@
   <proof prover="2"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC delete.1" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.19"/></proof>
   </goal>
   <goal name="VC delete.2" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01"/></proof>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="5">
 <prover id="0" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -38,7 +38,7 @@
    <transf name="introduce_premises" proved="true" >
     <goal name="VC max_sum.4.2.0" expl="VC for max_sum" proved="true">
     <transf name="assert" proved="true" arg1="(i*m1 &lt;= i * m)">
-     <goal name="VC max_sum.4.2.0.0" proved="true">
+     <goal name="VC max_sum.4.2.0.0" expl="asserted formula" proved="true">
      <proof prover="0"><result status="valid" time="0.02"/></proof>
      </goal>
      <goal name="VC max_sum.4.2.0.1" expl="VC for max_sum" proved="true">

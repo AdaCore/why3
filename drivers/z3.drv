@@ -7,7 +7,8 @@ prelude "(set-logic AUFNIRA)"
    NIRA : NonLinear Integer Reals Arithmetic
 *)
 
-import "smt-libv2.drv"
+import "smt-libv2.gen"
+printer "smtv2"
 import "discrimination.gen"
 
 transformation "inline_trivial"

@@ -240,7 +240,10 @@ let save_config t =
   let time = Whyconf.timelimit new_main in
   let mem = Whyconf.memlimit new_main in
   let nb = Whyconf.running_provers_max new_main in
-  let config = set_main config (set_limits (get_main config) time mem nb) in
+  let main = get_main config in
+  let main = set_limits main time mem nb in
+  let main = set_default_editor main (Whyconf.default_editor new_main) in
+  let config = set_main config main in
   (* copy also provers section since it may have changed (the editor
      can be set via the preferences dialog) *)
   let config = set_provers config (get_provers t.config) in
@@ -1026,6 +1029,7 @@ let alternatives_frame c (notebook:GPack.notebook) =
   let iter p policy =
     let label =
       match policy with
+        | CPU_remove -> Pp.sprintf_wnl "proofs with %a removed" print_prover p
         | CPU_keep -> Pp.sprintf_wnl "proofs with %a kept as they are" print_prover p
         | CPU_upgrade t ->
           Pp.sprintf_wnl "proofs with %a moved to %a" print_prover p print_prover t
@@ -1241,17 +1245,21 @@ let uninstalled_prover_dialog ~height ~callback c unknown =
     GPack.button_box `VERTICAL ~border_width:5 ~spacing:5
       ~packing:policy_frame#add ()
   in
+  let choice_keep = GButton.radio_button
+      ~label:"keep proofs as they are, do not try to play them"
+      ~active:true
+      ~packing:box#add () in
   let choice1 = GButton.radio_button
       ~label:"move proofs to the selected prover below"
-      ~active:true
+      ~active:false ~group:choice_keep#group
       ~packing:box#add () in
   let choice2 = GButton.radio_button
       ~label:"duplicate proofs to the selected prover below"
-      ~active:false ~group:choice1#group
+      ~active:false ~group:choice_keep#group
       ~packing:box#add () in
-  let choice0 = GButton.radio_button
-      ~label:"keep proofs as they are, do not try to play them"
-      ~active:false  ~group:choice1#group
+  let choice3 = GButton.radio_button
+      ~label:"remove these proofs from session"
+      ~active:false  ~group:choice_keep#group
       ~packing:box#add () in
   let first = ref None in
   let alternatives_section acc label alternatives =
@@ -1287,12 +1295,21 @@ let uninstalled_prover_dialog ~height ~callback c unknown =
   let boxes = alternatives_section boxes "Different name" others in
   let hide_provers () = List.iter (fun b -> b#set_sensitive false) boxes in
   let show_provers () = List.iter (fun b -> b#set_sensitive true) boxes in
-  ignore (choice0#connect#toggled
+  if versions<>[] || names<>[] then
+    begin
+      choice_keep#set_active false;
+      choice1#set_active true;
+    end
+  else
+    hide_provers();
+  ignore (choice_keep#connect#toggled
             ~callback:(fun () -> choice := 0; hide_provers ()));
   ignore (choice1#connect#toggled
             ~callback:(fun () -> choice := 1; show_provers ()));
   ignore (choice2#connect#toggled
             ~callback:(fun () -> choice := 2; show_provers ()));
+  ignore (choice3#connect#toggled
+            ~callback:(fun () -> choice := 3; hide_provers ()));
   dialog#add_button "Ok" `CLOSE ;
   ignore (dialog#run ());
   dialog#destroy ();
@@ -1301,6 +1318,7 @@ let uninstalled_prover_dialog ~height ~callback c unknown =
     | 0,_ -> CPU_keep
     | 1, Some p -> CPU_upgrade p
     | 2, Some p -> CPU_duplicate p
+    | 3,_ -> CPU_remove
     | _ -> assert false
   in
   c.config <- set_prover_upgrade_policy c.config unknown policy;
