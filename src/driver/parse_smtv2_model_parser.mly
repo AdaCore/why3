@@ -227,16 +227,21 @@ isort_def:
 | name integer { }
 
 idata_def:
+(* cvc4,1.5 with smtlib2.5 compat *)
 | LPAREN RPAREN LPAREN LPAREN idata_type RPAREN RPAREN { }
 | LPAREN RPAREN LPAREN LPAREN RPAREN RPAREN { }
+(* cvc4,1.6 with smtlib2.6 compat *)
+| LPAREN LPAREN ilist_app RPAREN RPAREN LPAREN LPAREN idata_type RPAREN RPAREN { }
 
 ilist_app:
 | name { }
+| INT_STR { }
 | name ilist_app { }
 | LPAREN idata_type RPAREN { }
 | LPAREN idata_type RPAREN ilist_app { }
 
 idata_type:
 | name { }
-| name ilist_app { }
+| name idata_type { }
+| LPAREN idata_type RPAREN option(idata_type) { }
 (* END IGNORED TYPES *)

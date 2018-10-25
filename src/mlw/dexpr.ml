@@ -673,6 +673,8 @@ let denv_pure denv get_dty =
     let dt = Dterm.DTvar (n, fold dity) in
     if dref = ([], true) then
       let dt = Dterm.dterm Coercion.empty dt in
+      let dt = Dterm.DTattr (dt, Sattr.singleton Pmodule.ref_attr) in
+      let dt = Dterm.dterm Coercion.empty dt in
       Dterm.DTapp (ls_ref_proj, [dt])
     else dt in
   let dty = get_dty (Mstr.mapi add denv.locals) in

@@ -26,14 +26,43 @@ if test "$files" = "" ; then
     files="$dir/ce/*.mlw"
 fi
 
+is_xfail=false
 
-# $1 = prover, $2 = file
+# TODO this function should disappear as counterexamples should eventually get
+# more reproducible.
+decide_fail () {
+    case "$1" in
+        # Inconsistent results between two runs
+        "bench/ce/algebraic_type_Z3,4.6.0_SP")
+            is_xfail=true;;
+        # Inconsistent results between two runs
+        "bench/ce/algebraic_type_Z3,4.6.0_WP")
+            is_xfail=true;;
+        # Inconsistent results between two runs
+        "bench/ce/ref_mono_Z3,4.6.0_WP")
+            is_xfail=true;;
+    esac
+}
+
+# $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP
 run () {
+    is_xfail=false
     printf "  $2 ($1)... "
-    f="$2_$1"
-    printf "WP  $2 ($1)... "
-    echo "Weakest Precondition" > "$f.out"
-    $dir/../bin/why3prove.opt --debug print_model_attrs -P "$1,counterexamples" --timelimit 1 -a split_vc "$2.mlw" | \
+    file_path="$2/$3"
+    if $4; then
+        f="${file_path}_$1_WP"
+        oracle_file="$2/oracles/$3_$1_WP.oracle"
+        wp_sp=""
+        echo "Weakest Precondition" > "$f.out"
+        printf "Weakest Precondition  ${file_path} ($1)... "
+    else
+        f="${file_path}_$1_SP"
+        oracle_file="$2/oracles/$3_$1_SP.oracle"
+        wp_sp=" --debug vc_sp"
+        echo "Strongest Postcondition" > "$f.out"
+        printf "Strongest Postcondition  ${file_path} ($1)... "
+    fi
+    $dir/../bin/why3prove.opt --debug print_model_attrs${wp_sp} -P "$1,counterexamples" --timelimit 1 -a split_vc "${file_path}.mlw" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
         sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
@@ -45,31 +74,23 @@ run () {
         # TODO temporary as this comes from incorrect locations generated in
         # a[i] <- x like terms.
         sed -r 's/\:loc\:.*\]/\:loc\:location\]/' >> "$f.out"
-    printf "SP  $2 ($1)... "
-    echo "Strongest Postcondition" >> "$f.out"
-    $dir/../bin/why3prove.opt --debug print_model_attrs --debug vc_sp -P "$1,counterexamples" --timelimit 1 -a split_vc "$2.mlw" | \
-        # This ad hoc sed removes any timing information from counterexamples output.
-        # Counterexamples in JSON format cannot match this regexp.
-        sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
-        # This ad hoc sed removes diff between Timeout and Unknown (unknown)
-        # when running from platform with different speed.
-        sed -r 's/(Timeout|Unknown \(unknown\))/Timeout or Unknown/' | \
-        # ad hoc sed to remove the directory of the stdlib that can be found
-        # inside labels attribute [@at:'Old:loc:/home/.../stdlib/array.mlw
-        # TODO temporary as this comes from incorrect locations generated in
-        # a[i] <- x like terms.
-        sed -r 's/\:loc\:.*\]/\:loc\:location\]/' >> "$f.out"
-    if cmp "$f.oracle" "$f.out" > /dev/null 2>&1 ; then
+    if cmp "${oracle_file}" "$f.out" > /dev/null 2>&1 ; then
         echo "ok"
     else
         if $updateoracle; then
-            echo "Updating oracle for $2, prover $1"
-            mv "$f.out" "$f.oracle"
+            echo "Updating oracle for ${file_path}, prover $1"
+            mv "$f.out" "${oracle_file}"
         else
             echo "FAILED!"
             echo "diff is the following:"
-            diff "$f.oracle" "$f.out"
-            success=false
+            echo "${f}"
+            diff "${oracle_file}" "$f.out"
+            decide_fail ${f}
+            if $is_xfail; then
+                echo "Failed but bench is ok because asserted as an XFAIL."
+            else
+                success=false
+            fi
         fi
     fi
 }
@@ -78,8 +99,10 @@ for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
-    run CVC4,1.5 $filedir/$filebase
-    run Z3,4.6.0 $filedir/$filebase
+    run CVC4,1.5 $filedir $filebase true
+    run CVC4,1.5 $filedir $filebase false
+    run Z3,4.6.0 $filedir $filebase true
+    run Z3,4.6.0 $filedir $filebase false
 done
 if $success; then
     exit 0

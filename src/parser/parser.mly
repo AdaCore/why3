@@ -22,7 +22,8 @@
     ~desc:"When set, model attributes are not added during parsing"
     "no_auto_model"
 
-  let add_attr id l = { id with id_ats = l }
+  let add_attr id l = (* id.id_ats is usually nil *)
+    { id with id_ats = List.rev_append id.id_ats l }
 
   let add_model_trace_attr id =
     if Debug.test_flag debug_auto_model then id else

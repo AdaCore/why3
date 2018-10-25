@@ -1,0 +1,59 @@
+Strongest Postcondition
+bench/ce/algebraic_type.mlw M G: Unknown (sat)
+Counter-example model:File algebraic_type.mlw:
+Line 6:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
+"val" : {"apply" : "Integer" , "list" : [{"type" : "Integer" ,
+"val" : "0" }] } }
+
+bench/ce/algebraic_type.mlw M g2: Unknown (sat)
+Counter-example model:File algebraic_type.mlw:
+Line 10:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
+"val" : {"apply" : "B" , "list" : [{"type" : "Integer" ,
+"val" : "0" }] } }
+
+bench/ce/algebraic_type.mlw M g4: Unknown (sat)
+Counter-example model:File algebraic_type.mlw:
+Line 12:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
+"val" : {"apply" : "A" ,
+"list" : [] } }
+
+bench/ce/algebraic_type.mlw M g5: Unknown (sat)
+Counter-example model:File algebraic_type.mlw:
+Line 16:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Apply" ,
+"val" : {"apply" : "Au" , "list" : [{"type" : "Integer" , "val" : "1" },
+{"type" : "Integer" ,
+"val" : "0" }] } }
+
+bench/ce/algebraic_type.mlw M g1: Timeout or Unknown
+Counter-example model:File algebraic_type.mlw:
+Line 25:
+l, [[@introduced], [@model_trace:l]] = {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "17" },
+{"type" : "Apply" , "val" : {"apply" : "Cons" ,
+"list" : [{"type" : "Integer" , "val" : "160" }, {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "158" },
+{"type" : "Apply" , "val" : {"apply" : "Cons" ,
+"list" : [{"type" : "Integer" , "val" : "156" }, {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "154" },
+{"type" : "Apply" , "val" : {"apply" : "Nil" ,
+"list" : [] } }] } }] } }] } }] } }] } }
+
+bench/ce/algebraic_type.mlw M g7: Timeout or Unknown
+Counter-example model:File algebraic_type.mlw:
+Line 27:
+l, [[@introduced], [@model_trace:l]] = {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "21" },
+{"type" : "Apply" , "val" : {"apply" : "Cons" ,
+"list" : [{"type" : "Integer" , "val" : "10" }, {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "9" },
+{"type" : "Apply" , "val" : {"apply" : "Cons" ,
+"list" : [{"type" : "Integer" , "val" : "7" }, {"type" : "Apply" ,
+"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "8" },
+{"type" : "Apply" , "val" : {"apply" : "Nil" ,
+"list" : [] } }] } }] } }] } }] } }] } }
+
+bench/ce/algebraic_type.mlw M g: Timeout or Unknown
