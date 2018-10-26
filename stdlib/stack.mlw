@@ -5,6 +5,7 @@
 
 module Stack
 
+  use mach.peano.Peano
   use list.List
   use list.Length as L
 
@@ -46,7 +47,7 @@ module Stack
 
   function length (s: t 'a) : int = L.length s.elts
 
-  val length (s: t 'a) : int
+  val length (s: t 'a) : Peano.t
     ensures { result = L.length s.elts }
 
 end

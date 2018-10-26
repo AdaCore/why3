@@ -24,16 +24,16 @@ module MergesortQueue
     requires { q.elts = Nil /\ sorted q1.elts /\ sorted q2.elts }
     ensures  { sorted q.elts }
     ensures  { permut q.elts (old q1.elts ++ old q2.elts) }
-  = while length q1 > 0 || length q2 > 0 do
+  = while not (is_empty q1 && is_empty q2) do
       invariant { sorted q1.elts /\ sorted q2.elts /\ sorted q.elts }
       invariant { forall x y: elt. mem x q.elts -> mem y q1.elts -> le x y }
       invariant { forall x y: elt. mem x q.elts -> mem y q2.elts -> le x y }
       invariant { permut (q.elts ++ q1.elts ++ q2.elts)
                          (old (q1.elts ++ q2.elts)) }
       variant { length q1 + length q2 }
-      if length q1 = 0 then
+      if is_empty q1 then
         push (safe_pop q2) q
-      else if length q2 = 0 then
+      else if is_empty q2 then
         push (safe_pop q1) q
       else
         let x1 = safe_peek q1 in
@@ -47,7 +47,7 @@ module MergesortQueue
   let rec mergesort (q: t elt) : unit
     ensures { sorted q.elts /\ permut q.elts (old q.elts) }
     variant { length q }
-  = if length q > 1 then begin
+  = if Peano.gt (length q) Peano.one then begin
       let q1 = create () : t elt in
       let q2 = create () : t elt in
       while not (is_empty q) do
