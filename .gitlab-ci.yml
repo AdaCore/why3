@@ -39,9 +39,9 @@ build-4.06.1:
     COMPILER: 4.06.1
   <<: *build_definition
 
-build-4.07.0:
+build-4.07.1:
   variables:
-    COMPILER: 4.07.0
+    COMPILER: 4.07.1
   <<: *build_definition
 
 .bench_template1: &bench_definition_always
@@ -83,15 +83,15 @@ bench-4.06.1:
     COMPILER: 4.06.1
   <<: *bench_definition
 
-bench-4.07.0:
+bench-4.07.1:
   variables:
-    COMPILER: 4.07.0
+    COMPILER: 4.07.1
   <<: *bench_definition_always
 
-full-4.07.0:
+full-4.07.1:
   stage: test
   variables:
-    COMPILER: 4.07.0
+    COMPILER: 4.07.1
     DEBIAN_PACKAGES: hevea rubber texlive-latex-extra lmodern texlive-fonts-recommended
     OPAM_PACKAGES: coq-flocq.2.6.1 js_of_ocaml-ppx alt-ergo.2.0.0
   script:
