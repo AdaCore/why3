@@ -280,6 +280,8 @@ module Translate = struct
         ML.e_let ld (expr info svar mask e2) (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rs, _), ein) when rs_ghost rs ->
         expr info svar mask ein
+    | Elet (LDsym (_, {c_node = Cpur (_, _); _}), _) ->
+        assert false (* necessarily handled above *)
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
         Debug.dprintf debug_compile "compiling local function definition %s@."
           rs.rs_name.id_string;
@@ -309,6 +311,8 @@ module Translate = struct
         let ld = ML.sym_defn rsf res (params cty.cty_args) eapp in
         let ein = expr info svar mask ein in
         ML.e_let ld ein (ML.I e.e_ity) mask eff attrs
+    | Elet (LDsym (_, {c_node = Cany; _}), _) -> let loc = e.e_loc in
+        Loc.errorm ?loc "This expression cannot be extracted"
     | Elet (LDrec rdefl, ein) ->
         let rdefl = filter_out_ghost_rdef rdefl in
         List.iter
@@ -369,8 +373,10 @@ module Translate = struct
         Debug.dprintf debug_compile "compiling a lambda expression@.";
         let ef = expr info svar e.e_mask ef in
         ML.e_fun (params cty.cty_args) ef (ML.I e.e_ity) mask eff attrs
-    | Eexec ({c_node = Cany}, _) ->
-        ML.mk_hole
+    | Eexec ({c_node = Cpur (_, _); _ }, _) ->
+        assert false (* necessarily ghost *)
+    | Eexec ({c_node = Cany}, _) -> let loc = e.e_loc in
+        Loc.errorm ?loc "This expression cannot be extracted"
     | Eabsurd ->
         ML.e_absurd (ML.I e.e_ity) mask eff attrs
     | Eassert _ ->
@@ -440,8 +446,6 @@ module Translate = struct
           let ty = if ity_equal xs.xs_ity ity_unit then None
             else Some (mlty_of_ity xs.xs_mask xs.xs_ity) in
         ML.mk_expr (ML.Eexn (xs, ty, e1)) (ML.I e.e_ity) mask eff attrs
-    | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _)
-    | Eexec ({c_node=Cpur (_, _); _ }, _) -> ML.mk_hole
 
   and ebranch info svar mask ({pp_pat = p; pp_mask = m}, e) =
     (* if the [case] expression is not ghost but there is (at least) one ghost
@@ -507,7 +511,7 @@ module Translate = struct
         if eff_pure e.e_effect then []
         else let unit_ = pv (* create_pvsymbol (id_fresh "_") ity_unit *) in
           [ML.Dlet (ML.Lvar (unit_, expr info Stv.empty MaskGhost e))]
-    | PDlet (LDvar (pv,  {e_node = Eexec ({c_node = Cany}, cty)})) ->
+    | PDlet (LDvar (pv, {e_node = Eexec ({c_node = Cany}, cty)})) ->
         Debug.dprintf debug_compile "compiling undifined constant %a@"
           print_pv pv;
         let ty = mlty_of_ity cty.cty_mask cty.cty_result in
@@ -708,7 +712,7 @@ module Transform = struct
              ((pv, rs, e)::accl, Spv.union spv s))
            ([], Spv.empty) al in
        mk (Eassign (List.rev al)), s
-    | Econst _ | Eabsurd | Ehole | Eany _ -> e, Spv.empty
+    | Econst _ | Eabsurd | Eany _ -> e, Spv.empty
     | Eignore e ->
         let e, spv = expr info subst e in
         mk (Eignore e), spv
