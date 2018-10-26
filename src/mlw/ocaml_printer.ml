@@ -279,7 +279,7 @@ module Print = struct
   let check_val_in_drv info ({rs_name = {id_loc = loc}} as rs) =
     (* here [rs] refers to a [val] declaration *)
     match query_syntax info.info_convert rs.rs_name,
-          query_syntax info.info_syn     rs.rs_name with
+          query_syntax info.info_syn rs.rs_name with
     | None, None (* when info.info_flat *) ->
         Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
     | _ -> ()
@@ -447,7 +447,6 @@ module Print = struct
         forget_let_defn let_def
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
-    | Ehole -> ()
     | Eany _ -> assert false
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
