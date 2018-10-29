@@ -1,0 +1,41 @@
+
+module Ex1
+
+  use int.Int
+  function f int : int
+  predicate p int
+  axiom B: forall y. let x = f y in x >= 0 -> p y
+  goal g : p 42
+
+end
+
+module Ex2
+
+
+function f int : int
+predicate p int int
+axiom A: forall x y. x = f y -> p x y
+axiom B: forall y. let x = f y in p x y
+goal g : p 17 42
+
+end
+
+module Ex3
+
+  type a constant a0: a
+  type b constant b0: b
+  type c constant c0: c
+
+  function f unit : b
+  function g unit : c
+
+  predicate p a b c
+
+  axiom a : forall a.
+    let b = f () in
+    let c = g () in
+    p a b c ->
+    false
+
+  goal g : false
+end
