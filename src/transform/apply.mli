@@ -9,13 +9,11 @@ val intros: Term.term ->
    - the term without premises/let-binding and forall variables at head.
 *)
 
-val rewrite_list: Term.term list option -> bool -> bool -> Decl.prsymbol list ->
+val rewrite_list: bool -> bool -> Decl.prsymbol list ->
   Decl.prsymbol option -> Task.task list Trans.trans
 (* [rewrite_list with_terms rev opt hl h1]
    @param opt: If set, all the rewritings are optional
    @param rev: If set, all the rewritings are from right to left
-   @param with_terms: A list of terms to instantiate variables that cannot be
-     matched (TODO this probably does not work: remove this argument ?)
    @param hl: list of rewrite hypothesis
    @param h1: hypothesis to rewrite in
 *)

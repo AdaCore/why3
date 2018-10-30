@@ -339,7 +339,7 @@ let rewrite_in rev with_terms h h1 =
   (* Composing previous functions *)
   Trans.bind (Trans.bind found_eq lp_new) recreate_tasks
 
-let rewrite_list opt rev with_terms hl h1 =
+let rewrite_list opt rev hl h1 =
   let found_decl =
     fold_decl (fun d (ok,acc) ->
         if ok then (ok,acc)
@@ -373,10 +373,10 @@ let rewrite_list opt rev with_terms hl h1 =
           | _ -> raise (Arg_bad_hypothesis ("rewrite", f))) in
           let new_lp, new_term =
             if opt
-            then try replace_subst lp lv llet t1 t2 with_terms accterm
+            then try replace_subst lp lv llet t1 t2 [] accterm
                  with Arg_trans _ -> acc
             else
-              replace_subst lp lv llet t1 t2 with_terms accterm in
+              replace_subst lp lv llet t1 t2 [] accterm in
        new_lp@acclp, new_term
       | _ -> acc) (lp, term) in
   let do_all = List.fold_left (fun acc h -> Trans.bind acc (do_h h)) found_term hl in
@@ -419,13 +419,8 @@ let rewrite with_terms rev h h1 =
   in
   Trans.bind (find_target_prop h1) (rewrite_in (not rev) with_terms h)
 
-let rewrite_list with_terms rev opt hl h1 =
-  let with_terms =
-    match with_terms with
-    | None -> []
-    | Some l -> l
-  in
-  Trans.bind (find_target_prop h1) (rewrite_list opt (not rev) with_terms hl)
+let rewrite_list rev opt hl h1 =
+  Trans.bind (find_target_prop h1) (rewrite_list opt (not rev) hl)
 
 let detect_prop_list pr k hl =
   match hl with
@@ -513,8 +508,8 @@ let _ = wrap_and_register
           (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol (Topt ("with", Ttermlist Ttrans_l))))))) (fun rev h h1opt term_list -> rewrite term_list rev h h1opt)
 
 let _ = wrap_and_register
-    ~desc:"rewrite_list [<-] <list name> [?] [in] <name2> [with] <list term> rewrites equalities defined in <list name> into name2 using exactly all terms of the list as instance for what cannot be deduced directly. If [?] is set, each of the rewrites is optional." "rewrite_list"
-    (Toptbool ("<-", (Tprlist (Toptbool ("?", Topt ("in",  Tprsymbol (Topt ("with", Ttermlist Ttrans_l)))))))) (fun rev hl opt h1opt term_list -> rewrite_list term_list rev opt hl h1opt)
+    ~desc:"rewrite_list [<-] <list name> [?] [in] <name2> rewrites equalities defined in <list name> into name2. If [?] is set, each of the rewrites is optional." "rewrite_list"
+    (Toptbool ("<-", (Tprlist (Toptbool ("?", Topt ("in", Tprsymbol Ttrans_l)))))) (fun rev hl opt h1opt -> rewrite_list rev opt hl h1opt)
 
 let () = wrap_and_register
            ~desc:"apply <prop> [with] <list term> applies prop to the goal and \
