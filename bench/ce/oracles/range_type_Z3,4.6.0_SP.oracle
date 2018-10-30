@@ -1,0 +1,23 @@
+Strongest Postcondition
+bench/ce/range_type.mlw Range_int VC f: Unknown (sat)
+Counter-example model:File range_type.mlw:
+Line 7:
+x, [[@introduced], [@model_trace:x]] = {"proj_name" : "int32qtint" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "5" } }
+Line 9:
+x, [[@introduced], [@model_trace:x]] = {"proj_name" : "int32qtint" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "5" } }
+
+bench/ce/range_type.mlw Range_float VC f: Unknown (sat)
+Counter-example model:File range_type.mlw:
+Line 20:
+x, [[@introduced], [@model_trace:x]] = {"proj_name" : "tqtreal" ,
+"type" : "Proj" , "value" : {"type" : "Decimal" ,
+"val" : "10.0" } }
+Line 22:
+x, [[@introduced], [@model_trace:x]] = {"proj_name" : "tqtreal" ,
+"type" : "Proj" , "value" : {"type" : "Decimal" ,
+"val" : "10.0" } }
+
