@@ -579,7 +579,7 @@ let build_goals do_trans renv prev mapdecls defdecls subst env lp g rt =
            let t = Trans.apply (compute_hyp_few hr) t in
            match t with
            | [t] ->
-              let rewrite = Apply.rewrite_list None false true
+              let rewrite = Apply.rewrite_list false true
                               (mapdecls@defdecls) (Some hr) in
               Trans.apply rewrite t
            | [] -> []
