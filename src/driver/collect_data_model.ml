@@ -409,7 +409,8 @@ and convert_to_model_value (t: term): Model_parser.model_value =
   | Trees tree ->
       begin match tree with
       | [] -> raise Not_value
-      | [field, value] -> Model_parser.Proj (field, convert_to_model_value value)
+      | [field, value] ->
+          Model_parser.Proj (field, convert_to_model_value value)
       | l ->
           Model_parser.Record
             (List.map (fun (field, value) ->
