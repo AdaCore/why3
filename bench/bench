@@ -305,29 +305,6 @@ goods examples/prover "-L examples/prover --debug ignore_unused_vars"
 goods examples/in_progress
 echo ""
 
-echo "=== Checking replay (no prover) ==="
-replay bench/replay
-replay examples/stdlib --merging-only
-replay examples/bts --merging-only
-replay examples/tests --merging-only
-replay examples/tests-provers --merging-only
-replay examples/check-builtin --merging-only
-replay examples/logic --merging-only
-replay examples --merging-only
-replay examples/foveoos11-cm --merging-only
-replay examples/WP_revisited --merging-only
-replay examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps --merging-only"
-replay examples/bitvectors "-L examples/bitvectors --merging-only"
-replay examples/avl "-L examples/avl --merging-only"
-replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication --merging-only"
-replay examples/double_wp "-L examples/double_wp --merging-only"
-replay examples/in_progress/ring_decision "-L examples/in_progress/ring_decision --merging-only"
-replay examples/multiprecision "-L examples/multiprecision --merging-only"
-replay examples/prover "-L examples/prover --merging-only --debug ignore_unused_vars"
-#replay examples/in_progress --merging-only
-#replay examples/in_progress/multiprecision "-L examples/in_progress/multiprecision --merging-only"
-echo ""
-
 echo "=== Checking valid goals ==="
 valid_goals bench/valid
 echo ""
@@ -371,7 +348,6 @@ execute examples/vstte10_queens.mlw NQueens.test8
 # examples/residual.mlw Test.test_astar
 echo ""
 
-
 echo "=== Checking extraction to OCaml ==="
 extract_and_run examples/euler001 euler001.ml 1000000
 extract_and_run examples/gcd gcd.ml 6 15
@@ -385,6 +361,29 @@ echo ""
 echo "=== Checking extraction to C ==="
 extract_and_test_wmp examples/in_progress/multiprecision
 extract_and_test_wmp examples/multiprecision
+echo ""
+
+echo "=== Checking replay (no prover) ==="
+replay bench/replay
+replay examples/stdlib --merging-only
+replay examples/bts --merging-only
+replay examples/tests --merging-only
+replay examples/tests-provers --merging-only
+replay examples/check-builtin --merging-only
+replay examples/logic --merging-only
+replay examples --merging-only
+replay examples/foveoos11-cm --merging-only
+replay examples/WP_revisited --merging-only
+replay examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps --merging-only"
+replay examples/bitvectors "-L examples/bitvectors --merging-only"
+replay examples/avl "-L examples/avl --merging-only"
+replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication --merging-only"
+replay examples/double_wp "-L examples/double_wp --merging-only"
+replay examples/in_progress/ring_decision "-L examples/in_progress/ring_decision --merging-only"
+replay examples/multiprecision "-L examples/multiprecision --merging-only"
+replay examples/prover "-L examples/prover --merging-only --debug ignore_unused_vars"
+#replay examples/in_progress --merging-only
+#replay examples/in_progress/multiprecision "-L examples/in_progress/multiprecision --merging-only"
 echo ""
 
 echo "=== Checking --list-* ==="

@@ -579,7 +579,7 @@ let build_goals do_trans renv prev mapdecls defdecls subst env lp g rt =
            let t = Trans.apply (compute_hyp_few hr) t in
            match t with
            | [t] ->
-              let rewrite = Apply.rewrite_list None false true
+              let rewrite = Apply.rewrite_list false true
                               (mapdecls@defdecls) (Some hr) in
               Trans.apply rewrite t
            | [] -> []
@@ -605,7 +605,9 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
     | (_, t) -> t
     | exception Not_found -> raise (Exit "lemma not found")
   in
-  let (lp, lv, rt) = Apply.intros l in
+  (* TODO solve llet assert *)
+  let (lp, lv, llet, rt) = Apply.intros l in
+  assert (llet = []);
   let nt = Args_wrapper.build_naming_tables task in
   let crc = nt.Trans.coercion in
   let renv = reify_term (init_renv kn crc lv env prev) g rt in
@@ -664,7 +666,9 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
           Debug.dprintf debug_refl "new post@.";
           Debug.dprintf debug_refl "post: %a, %a@."
             Pretty.print_vs vres Pretty.print_term p;
-          let (lp, lv, rt) = Apply.intros p in
+          (* TODO solve this llet assert *)
+          let (lp, lv, llet, rt) = Apply.intros p in
+          assert (llet = []);
           let lv = lv @ args in
           let renv = reify_term (init_renv kn crc lv env prev) g rt in
           Debug.dprintf debug_refl "computing args@.";

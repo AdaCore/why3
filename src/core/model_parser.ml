@@ -350,12 +350,17 @@ let create_model_element ~name ~value ~attrs ?location ?term () =
   let (name, type_s) = split_model_trace_name name in
   let me_kind = match type_s with
     | "result" -> Result
-    | "old" -> Old
-    | _ -> Other in
+    | _ -> Other
+  in
+  let attrs =
+    match term with
+    | None -> attrs
+    | Some t -> Sattr.union t.t_attrs attrs
+  in
   let me_name = {
     men_name = name;
     men_kind = me_kind;
-    men_attrs = match term with | None -> attrs | Some t -> Sattr.union t.t_attrs attrs;
+    men_attrs = attrs;
   } in
   {
     me_name = me_name;
@@ -368,7 +373,6 @@ let construct_name (name: string) attrs : model_element_name =
   let (name, type_s) = split_model_trace_name name in
   let me_kind = match type_s with
   | "result" -> Result
-  | "old" -> Old
   | _ -> Other in
   {men_name = name; men_kind = me_kind; men_attrs = attrs}
 
@@ -654,24 +658,59 @@ let print_attrs_json (me: model_element_name) fmt =
   Json_base.list (fun fmt attr -> Json_base.string fmt attr.attr_string) fmt
     (Sattr.elements me.men_attrs)
 
+(* Compute the kind of a model_element using its attributes and location *)
+let compute_kind (me: model_element) =
+  let me_kind = me.me_name.men_kind in
+  let location = me.me_location in
+  let attrs = me.me_name.men_attrs in
+  let me_kind =
+    (* We match on the attribute on the form [@at:'Old:loc:file:line]. If it
+       exists, depending on the location of the me, we use it or not. If it
+       does not we keep me_kind.
+    *)
+    match Sattr.choose (Sattr.filter (fun x -> Strings.has_prefix "at:'Old:" x.attr_string) attrs) with
+    | exception Not_found -> me_kind
+    | a ->
+        begin
+          match Strings.split ':' a.attr_string, location with
+          | "at" :: "'Old" :: "loc" :: file :: line_number :: [], Some location ->
+              let (loc_file, loc_line, _, _) =
+                Loc.get location
+              in
+              if loc_file = file && loc_line = int_of_string line_number then
+                Old
+              else
+                me_kind
+          | _ -> me_kind
+        end
+  in
+  me_kind
+
 (*
 **  Quering the model - json
 *)
 let print_model_element_json me_name_to_str fmt me =
   let print_value fmt =
-    fprintf fmt "%a" print_model_value_sanit me.me_value in
+    fprintf fmt "%a" print_model_value_sanit me.me_value
+  in
   let print_kind fmt =
-    match me.me_name.men_kind with
+    (* We compute kinds using the attributes and locations *)
+    let me_kind = compute_kind me in
+    match me_kind with
     | Result -> fprintf fmt "%a" Json_base.string "result"
     | Old -> fprintf fmt "%a" Json_base.string "old"
     | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
-    | Other -> fprintf fmt "%a" Json_base.string "other" in
+    | Other -> fprintf fmt "%a" Json_base.string "other"
+  in
   let print_name fmt =
-    Json_base.string fmt (me_name_to_str me) in
+    Json_base.string fmt (me_name_to_str me)
+  in
   let print_json_attrs fmt =
-    print_attrs_json me.me_name fmt in
+    print_attrs_json me.me_name fmt
+  in
   let print_value_or_kind_or_name fmt printer =
-    printer fmt in
+    printer fmt
+  in
   Json_base.map_bindings
     (fun s -> s)
     print_value_or_kind_or_name

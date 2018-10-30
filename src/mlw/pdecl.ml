@@ -346,6 +346,8 @@ let create_type_decl dl =
         let pj_id = id_derive (nm ^ "'int") id in
         let pj_ls = create_fsymbol pj_id [ty_app ts []] ty_int in
         let pj_decl = create_param_decl pj_ls in
+        (* Create the projection meta for pj_decl *)
+        let meta_proj_pj = (Theory.meta_projection, [Theory.MAls pj_ls]) in
         (* create max attribute *)
         let max_id = id_derive (nm ^ "'maxInt") id in
         let max_ls = create_fsymbol max_id [] ty_int  in
@@ -358,11 +360,13 @@ let create_type_decl dl =
         let min_decl = create_logic_decl [make_ls_defn min_ls [] min_defn] in
         let pure = [create_ty_decl ts; pj_decl; max_decl; min_decl] in
         let meta = Theory.(meta_range, [MAts ts; MAls pj_ls]) in
-        mk_decl_meta [meta] (PDtype [itd]) pure
+        mk_decl_meta [meta; meta_proj_pj] (PDtype [itd]) pure
     | _, _, Float ff ->
         let pj_id = id_derive (nm ^ "'real") id in
         let pj_ls = create_fsymbol pj_id [ty_app ts []] ty_real in
         let pj_decl = create_param_decl pj_ls in
+        (* Create the projection meta for pj_decl *)
+        let meta_proj_pj = (Theory.meta_projection, [Theory.MAls pj_ls]) in
         (* create finiteness predicate *)
         let iF_id = id_derive (nm ^ "'isFinite") id in
         let iF_ls = create_psymbol iF_id [ty_app ts []] in
@@ -379,7 +383,7 @@ let create_type_decl dl =
         let sb_decl = create_logic_decl [make_ls_defn sb_ls [] sb_defn] in
         let pure = [create_ty_decl ts; pj_decl; iF_decl; eb_decl; sb_decl] in
         let meta = Theory.(meta_float, [MAts ts; MAls pj_ls; MAls iF_ls]) in
-        mk_decl_meta [meta] (PDtype [itd]) pure
+        mk_decl_meta [meta; meta_proj_pj] (PDtype [itd]) pure
     | fl, _, NoDef when itd.itd_invariant <> [] ->
         let inv = axiom_of_invariant itd in
         let pr = create_prsymbol (id_derive (nm ^ "'invariant") id) in

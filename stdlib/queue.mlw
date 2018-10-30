@@ -3,6 +3,7 @@
 
 module Queue
 
+  use mach.peano.Peano
   use list.List
   use list.Append
   use list.Length as L
@@ -45,7 +46,7 @@ module Queue
 
   function length (q: t 'a) : int = L.length q.elts
 
-  val length (q: t 'a) : int
+  val length (q: t 'a) : Peano.t
     ensures { result = L.length q.elts }
 
   val transfer (q1 q2: t 'a) : unit

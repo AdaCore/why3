@@ -1,0 +1,24 @@
+module Range_int
+
+  use int.Int
+
+  type int32 = < range -0x8000_0000 0x7fff_ffff >
+
+  let f (x: int32) 
+  =
+    assert {int32'int x < 5}
+
+end
+
+
+module Range_float
+
+  use real.Real
+
+  type t = < float 8 24 >
+  
+  let f (x: t)
+  =
+    assert {t'real x < 10.}
+
+end
