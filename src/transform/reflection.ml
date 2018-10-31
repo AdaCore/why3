@@ -605,9 +605,13 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
     | (_, t) -> t
     | exception Not_found -> raise (Exit "lemma not found")
   in
-  (* TODO solve llet assert *)
   let (lp, lv, llet, rt) = Apply.intros l in
-  assert (llet = []);
+  if llet <> []
+  then begin
+      (* TODO handle lets *)
+      Debug.dprintf debug_refl "let in procedure postcondition@.";
+      raise NoReification
+    end;
   let nt = Args_wrapper.build_naming_tables task in
   let crc = nt.Trans.coercion in
   let renv = reify_term (init_renv kn crc lv env prev) g rt in
@@ -666,9 +670,13 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
           Debug.dprintf debug_refl "new post@.";
           Debug.dprintf debug_refl "post: %a, %a@."
             Pretty.print_vs vres Pretty.print_term p;
-          (* TODO solve this llet assert *)
           let (lp, lv, llet, rt) = Apply.intros p in
-          assert (llet = []);
+          if llet <> []
+          then begin
+              (* TODO handle lets *)
+              Debug.dprintf debug_refl "let in procedure postcondition@.";
+              raise NoReification
+            end;
           let lv = lv @ args in
           let renv = reify_term (init_renv kn crc lv env prev) g rt in
           Debug.dprintf debug_refl "computing args@.";
