@@ -203,6 +203,23 @@ let print_version_info () =
   Format.printf "Why3 for gnatprove version %s@." Config.version;
   exit 0
 
+let show_config () =
+  Format.printf "enable_ide: %s@." Config.enable_ide;
+  Format.printf "enable_zarith: %s@." Config.enable_zarith;
+  Format.printf "enable_zip: %s@." Config.enable_zip;
+  Format.printf "enable_menhirLib: %s@." Config.enable_menhirLib;
+  Format.printf "enable_coq_tactic: %s@." Config.enable_coq_tactic;
+  Format.printf "enable_coq_libs: %s@." Config.enable_coq_libs;
+  Format.printf "enable_coq_support: %s@." Config.enable_coq_support;
+  Format.printf "enable_coq_fp_libs: %s@." Config.enable_coq_fp_libs;
+  Format.printf "enable_pvs_libs: %s@." Config.enable_pvs_libs;
+  Format.printf "enable_isabelle_libs: %s@." Config.enable_isabelle_libs;
+  Format.printf "enable_hypothesis_selection: %s@."
+    Config.enable_hypothesis_selection;
+  Format.printf "enable_local: %s@." Config.enable_local;
+  Format.printf "enable_relocation: %s@." Config.enable_relocation;
+  exit 0
+
 let debug_gnat_server () =
   let debug_server =
     Debug.register_flag ~desc:"Debug gnat_server" "gnat_server"
@@ -212,6 +229,8 @@ let debug_gnat_server () =
 let options = Arg.align [
    "--version", Arg.Unit print_version_info,
           " Print version information and exit";
+   "--show-config", Arg.Unit show_config,
+          " Print configuration information and exit";
    "-t", Arg.Int set_timeout,
           " Set the timeout in seconds";
    "--timeout", Arg.Int set_timeout,
