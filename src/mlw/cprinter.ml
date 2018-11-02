@@ -1052,7 +1052,6 @@ module MLToC = struct
        let v = expr info env e2 in
        [], C.(Sexpr(Ebinop(Bassign, t, simplify_expr v)))
     | Eassign _ -> raise (Unsupported "assign")
-    | Eany _ -> assert false
     | Eexn (_,_,e) -> expr info env e
     | Eignore e ->
        [], C.Sseq(C.Sblock(expr info {env with computes_return_value = false} e),

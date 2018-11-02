@@ -515,7 +515,7 @@ module Translate = struct
         Debug.dprintf debug_compile "compiling undifined constant %a@"
           print_pv pv;
         let ty = mlty_of_ity cty.cty_mask cty.cty_result in
-        [ML.Dlet (ML.Lvar (pv, ML.e_any ty cty))]
+        [ML.Dval (pv, ty)]
     | PDlet (LDvar (pv, e)) ->
         Debug.dprintf debug_compile "compiling top-level symbol %a@."
           print_pv pv;
@@ -712,7 +712,7 @@ module Transform = struct
              ((pv, rs, e)::accl, Spv.union spv s))
            ([], Spv.empty) al in
        mk (Eassign (List.rev al)), s
-    | Econst _ | Eabsurd | Eany _ -> e, Spv.empty
+    | Econst _ | Eabsurd -> e, Spv.empty
     | Eignore e ->
         let e, spv = expr info subst e in
         mk (Eignore e), spv
@@ -740,7 +740,7 @@ module Transform = struct
     { r with rec_exp = rec_exp }, spv
 
   let rec pdecl info = function
-    | Dtype _ | Dexn _ as d -> d
+    | Dtype _ | Dexn _ | Dval _ as d -> d
     | Dmodule (id, dl) ->
         let dl = List.map (pdecl info) dl in Dmodule (id, dl)
     | Dlet def ->
