@@ -63,7 +63,6 @@ and expr_node =
   | Eraise  of xsymbol * expr option
   | Eexn    of xsymbol * ty option * expr
   | Eignore of expr
-  | Eany    of ty
   | Eabsurd
 
 and reg_branch = pat * expr
@@ -104,6 +103,7 @@ type its_defn = {
 type decl =
   | Dtype   of its_defn list
   | Dlet    of let_def
+  | Dval    of pvsymbol * ty (* top-level constants, of the form [val c: tau] *)
   | Dexn    of xsymbol * ty option
   | Dmodule of string * decl list
 
@@ -134,6 +134,7 @@ let rec get_decl_name = function
   | Dlet (Lvar ({pv_vs={vs_name=id}}, _))
   | Dlet (Lsym ({rs_name=id}, _, _, _))
   | Dlet (Lany ({rs_name=id}, _, _))
+  | Dval ({pv_vs={vs_name=id}}, _)
   | Dexn ({xs_name=id}, _) -> [id]
   | Dmodule (_, dl) -> List.concat (List.map get_decl_name dl)
 
@@ -183,7 +184,7 @@ and iter_deps_pat f = function
   | Pas (p, _) -> iter_deps_pat f p
 
 and iter_deps_expr f e = match e.e_node with
-  | Econst _ | Evar _ | Eabsurd | Eany _ -> ()
+  | Econst _ | Evar _ | Eabsurd -> ()
   | Eapp (rs, exprl) ->
       f rs.rs_name; List.iter (iter_deps_expr f) exprl
   | Efun (args, e) ->
@@ -253,7 +254,7 @@ let rec iter_deps f = function
            iter_deps_expr f e; iter_deps_ty f res) rdef
   | Dlet (Lvar (_, e)) -> iter_deps_expr f e
   | Dexn (_, None) -> ()
-  | Dexn (_, Some ty) -> iter_deps_ty f ty
+  | Dexn (_, Some ty) | Dval (_, ty) -> iter_deps_ty f ty
   | Dmodule (_, dl) -> List.iter (iter_deps f) dl
 
 let ity_unit = I Ity.ity_unit
@@ -279,9 +280,6 @@ let is_unit = function
   | _ -> false
 
 let enope = Eblock []
-
-let e_any ty c =
-  mk_expr (Eany ty) (C c) MaskVisible Ity.eff_empty Sattr.empty
 
 let mk_var id ty ghost = (id, ty, ghost)
 

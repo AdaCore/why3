@@ -276,12 +276,12 @@ module Print = struct
     | Eapp (s, []) -> rs_equal s rs_false
     | _ -> false
 
-  let check_val_in_drv info ({rs_name = {id_loc = loc}} as rs) =
+  let check_val_in_drv info loc id =
     (* here [rs] refers to a [val] declaration *)
-    match query_syntax info.info_convert rs.rs_name,
-          query_syntax info.info_syn rs.rs_name with
+    match query_syntax info.info_convert id,
+          query_syntax info.info_syn id with
     | None, None (* when info.info_flat *) ->
-        Loc.errorm ?loc "Function %a cannot be extracted" Expr.print_rs rs
+        Loc.errorm ?loc "Symbol %a cannot be extracted" (print_lident info) id
     | _ -> ()
 
   let is_mapped_to_int info ity =
@@ -389,9 +389,6 @@ module Print = struct
         (print_expr info) e
 
   and print_let_def ?(functor_arg=false) info fmt = function
-    | Lvar (pv, {e_node = Eany ty}) when functor_arg ->
-        fprintf fmt "@[<hov 2>val %a : %a@]"
-          (print_lident info) (pv_name pv) (print_ty info) ty;
     | Lvar (pv, e) ->
         fprintf fmt "@[<hov 2>let %a =@ %a@]"
           (print_lident info) (pv_name pv) (print_expr info) e
@@ -409,8 +406,7 @@ module Print = struct
                 (if fst then "let rec" else "and")
                 (print_lident info) rs1.rs_name
                 (print_fun_type_args info) (args, s, res, e);
-              forget_vars args
-        in
+              forget_vars args in
         print_list_next newline print_one fmt rdef;
     | Lany (rs, res, []) when functor_arg ->
         fprintf fmt "@[<hov 2>val %a : %a@]"
@@ -424,7 +420,7 @@ module Print = struct
           (print_list arrow (print_ty_arg info)) args
           (print_ty info) res;
         forget_vars args
-    | Lany (rs, _, _) -> check_val_in_drv info rs
+    | Lany ({rs_name}, _, _) -> check_val_in_drv info rs_name.id_loc rs_name
 
   and print_expr ?(paren=false) info fmt e =
     match e.e_node with
@@ -447,7 +443,6 @@ module Print = struct
         forget_let_defn let_def
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
-    | Eany _ -> assert false
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
@@ -616,7 +611,7 @@ module Print = struct
   let rec is_signature_decl info = function
     | Dtype _ -> true
     | Dlet (Lany _) -> true
-    | Dlet (Lvar (_, {e_node = Eany _})) -> true
+    | Dval _ -> true
     | Dlet _ -> false
     | Dexn _ -> true
     | Dmodule (_, dl) -> is_signature info dl
@@ -633,9 +628,18 @@ module Print = struct
       | dl -> List.rev args, dl in
     extract [] dl
 
+  let print_top_val ?(functor_arg=false) info fmt ({pv_vs}, ty) =
+    if functor_arg then
+      fprintf fmt "@[<hov 2>val %a : %a@]"
+        (print_lident info) pv_vs.vs_name (print_ty info) ty
+    else
+      check_val_in_drv info pv_vs.vs_name.id_loc pv_vs.vs_name
+
   let rec print_decl ?(functor_arg=false) info fmt = function
     | Dlet ldef ->
         print_let_def info ~functor_arg fmt ldef
+    | Dval (pv, ty) ->
+        print_top_val info ~functor_arg fmt (pv, ty)
     | Dtype dl ->
         print_list_next newline (print_type_decl info) fmt dl
     | Dexn (xs, None) ->
