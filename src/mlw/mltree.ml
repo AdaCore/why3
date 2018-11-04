@@ -184,7 +184,8 @@ and iter_deps_pat f = function
   | Pas (p, _) -> iter_deps_pat f p
 
 and iter_deps_expr f e = match e.e_node with
-  | Econst _ | Evar _ | Eabsurd -> ()
+  | Econst _ | Eabsurd -> ()
+  | Evar pv -> f pv.pv_vs.vs_name
   | Eapp (rs, exprl) ->
       f rs.rs_name; List.iter (iter_deps_expr f) exprl
   | Efun (args, e) ->

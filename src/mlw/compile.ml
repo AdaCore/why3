@@ -512,7 +512,7 @@ module Translate = struct
         else let unit_ = pv (* create_pvsymbol (id_fresh "_") ity_unit *) in
           [ML.Dlet (ML.Lvar (unit_, expr info Stv.empty MaskGhost e))]
     | PDlet (LDvar (pv, {e_node = Eexec ({c_node = Cany}, cty)})) ->
-        Debug.dprintf debug_compile "compiling undifined constant %a@"
+        Debug.dprintf debug_compile "compiling undefined constant %a@"
           print_pv pv;
         let ty = mlty_of_ity cty.cty_mask cty.cty_result in
         [ML.Dval (pv, ty)]
