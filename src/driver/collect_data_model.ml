@@ -316,7 +316,7 @@ and refine_function ~enc (table: correspondence_table) (term: tterm) =
              defined
           *)
           if Hstr.mem enc v then
-            term
+            TCvc4_Variable (Tree tree)
           else
             let () = Hstr.add enc v () in
             let table = refine_variable_value ~enc table v tree in

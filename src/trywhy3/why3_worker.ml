@@ -199,11 +199,7 @@ module Task =
 
     let set_status id st =
       let rec loop id st acc =
-        match
-          try
-            Some (get_info id)
-          with Not_found -> None
-        with
+        match get_info_opt id with
         | Some info when info.status <> st ->
 	   info.status <- st;
            let acc = (UpdateStatus (st, id)) :: acc in
@@ -269,10 +265,8 @@ let why3_split id =
 	[], _ -> ()
       | [ child ], `Task(orig) when Why3.Task.task_equal child orig -> ()
       | subtasks, _ ->
-	 t.subtasks <- List.fold_left (fun acc t ->
-				       let tid = register_task id t in
-				       why3_prove tid;
-				       tid :: acc) [] subtasks
+          t.subtasks <- List.map (fun t -> register_task id t) subtasks;
+          List.iter why3_prove t.subtasks
     end
   | _ -> ()
 
