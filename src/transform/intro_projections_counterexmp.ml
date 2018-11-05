@@ -67,10 +67,11 @@ let introduce_constant ls t_rhs proj_name =
     (* introduce new constant c and axiom stating c = t_rhs  *)
     let const_attr = ls.ls_name.id_attrs in
     let const_attr = append_to_model_element_name ~attrs:const_attr ~to_append:proj_name in
-    let const_loc = Opt.get ls.ls_name.id_loc in
+    (* Note that this location can now be None *)
+    let const_loc = ls.ls_name.id_loc in
     let const_name = ls.ls_name.id_string^"_proj_constant_"^proj_name in
     let axiom_name = ls.ls_name.id_string^"_proj_axiom_"^proj_name in
-    let id_new = Ident.id_user ~attrs:const_attr const_name const_loc in
+    let id_new = Ident.id_fresh ~attrs:const_attr ?loc:const_loc const_name in
     intro_const_equal_to_term ~term:t_rhs ~id_new:id_new ~axiom_name:axiom_name
   else
     []
