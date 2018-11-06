@@ -408,6 +408,8 @@ module Translate = struct
     | Eassign al ->
         let rm_ghost (_, rs, _) = not (rs_ghost rs) in
         let al = List.filter rm_ghost al in
+        let e_of_var pv = ML.e_var pv (ML.I pv.pv_ity) MaskVisible eff attrs in
+        let al = List.map (fun (pv1, rs, pv2) -> (pv1, rs, e_of_var pv2)) al in
         ML.e_assign al (ML.I e.e_ity) mask eff attrs
     | Ematch (e1, bl, xl) when e_ghost e1 ->
         assert (Mxs.is_empty xl); (* Expr ensures this for the time being *)
@@ -616,6 +618,14 @@ module Transform = struct
      * Spv.for_all is_not_write spv *)
     Spv.is_empty (pvs_affected spv_mreg spv)
 
+  let rec can_inline ({e_effect = eff1} as e1) ({e_effect = eff2} as e2) =
+    match e2.e_node with
+    | Evar _ | Econst _ | Eapp _ | Eassign [_] -> true
+    | Elet (Lvar (_, {e_effect = eff1'}), e2') ->
+       no_reads_writes_conflict eff1.eff_reads eff1'.eff_writes
+       && can_inline e1 e2'
+    | _ -> no_reads_writes_conflict eff1.eff_reads eff2.eff_writes
+
   let mk_list_eb ebl f =
     let mk_acc e (e_acc, s_acc) =
       let e, s = f e in e::e_acc, Spv.union s s_acc in
@@ -627,10 +637,10 @@ module Transform = struct
     match e.e_node with
     | Evar pv -> begin try Mpv.find pv subst, Spv.singleton pv
         with Not_found -> e, Spv.empty end
-    | Elet (Lvar (pv, ({e_effect = eff1} as e1)), ({e_effect = eff2} as e2))
+    | Elet (Lvar (pv, ({e_effect = eff1} as e1)), e2)
       when Sattr.mem Expr.proxy_attr pv.pv_vs.vs_name.id_attrs &&
            eff_pure eff1 &&
-           no_reads_writes_conflict eff1.eff_reads eff2.eff_writes ->
+           can_inline e1 e2 ->
         let e1, s1 = expr info subst e1 in
         let e2, s2 = add_subst pv e1 e2 in
         let s_union = Spv.union s1 s2 in
@@ -690,8 +700,14 @@ module Transform = struct
     | Eraise (exn, Some e) ->
         let e, spv = expr info subst e in
         mk (Eraise (exn, Some e)), spv
-    | Eassign _al ->
-        e, Spv.empty
+    | Eassign al ->
+       let al, s =
+         List.fold_left
+           (fun (accl, spv) (pv,rs,e) ->
+             let e, s = expr info subst e in
+             ((pv, rs, e)::accl, Spv.union spv s))
+           ([], Spv.empty) al in
+       mk (Eassign (List.rev al)), s
     | Econst _ | Eabsurd | Ehole | Eany _ -> e, Spv.empty
     | Eignore e ->
         let e, spv = expr info subst e in
