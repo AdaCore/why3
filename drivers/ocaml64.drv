@@ -14,9 +14,10 @@ module HighOrd
 end
 
 theory option.Option
-  syntax type     option "%1 option"
-  syntax function None   "None"
-  syntax function Some   "Some %1"
+  syntax type      option  "%1 option"
+  syntax function  None    "None"
+  syntax function  Some    "Some %1"
+  syntax predicate is_none "%1 = None"
 end
 
 theory Bool
