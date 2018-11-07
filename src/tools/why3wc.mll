@@ -132,6 +132,8 @@ let token =
 rule scan = parse
   | space+
       { scan lexbuf }
+  | "(*)"
+      { add_token (); scan lexbuf }
   | "(*" space* '\n'?
       { add_comment (comment 0 lexbuf); scan lexbuf }
   | '"'
