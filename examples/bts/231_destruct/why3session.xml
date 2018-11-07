@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="5">
+<file name="../231_destruct.mlw">
+<theory name="T">
+ <goal name="G">
+ <transf name="destruct" arg1="H">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1">
+  </goal>
+ </transf>
+ <transf name="destruct_rec" arg1="H">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1">
+  </goal>
+  <goal name="G.2">
+  </goal>
+ </transf>
+ <transf name="destruct_rec" arg1="H1">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ <transf name="destruct_rec" arg1="H2">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1">
+  </goal>
+  <goal name="G.2">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="T2">
+ <goal name="G">
+ <transf name="destruct_rec" arg1="H2">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1">
+  </goal>
+  <goal name="G.2">
+  </goal>
+ </transf>
+ <transf name="destruct_rec" arg1="H1">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Imbrication">
+ <goal name="G">
+ <transf name="destruct" arg1="H">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1">
+  </goal>
+ </transf>
+ <transf name="destruct_rec" arg1="H">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1">
+  </goal>
+  <goal name="G.2">
+  </goal>
+  <goal name="G.3">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

@@ -128,70 +128,103 @@ let destruct_alg replace (x: term) : Task.task tlist =
           trans
     end
 
+(* Type used to tag new declarations inside the destruct function. *)
+type is_destructed =
+  | Axiom_term of term
+  | Param of Decl.decl
+  | Goal_term of term
+
 (* [destruct_term ~original_decl ~decl_name t]: This destroys a headterm and
      generate an appropriate lists of goals/declarations that can be used by
      decl_goal_l.
 
-   [original_decl] referenced the declaration corresponding to [t] in the task.
-     It exists only to keep the exists hypothesis. TODO remove ?
-   [decl_name] is the name of the [original_decl]. It is here only to name new
-     hypotheses.
+   [recursive] when false, disallow the recursive calls to destruct_term
+
+   In this function, we use "parallel" to refer to elements of the topmost list
+   which are eventually converted to disjoint tasks.
 *)
-let destruct_term ~original_decl ~decl_name (t: term) =
+let destruct_term ~recursive (t: term) =
+  let original_decl = t in
 
-  let create_destruct_axiom t =
-    let new_pr = create_prsymbol (Ident.id_clone decl_name) in
-    create_prop_decl Paxiom new_pr t
-  in
-  let create_destruct_goal t =
-    let new_pr = create_prsymbol (Ident.id_clone decl_name) in
-    create_prop_decl Pgoal new_pr t
-  in
+  (* Main function *)
+  let rec destruct_term (t: term) =
+    let destruct_term_exception t =
+      if not recursive then [[Axiom_term t]] else
+        match destruct_term t with
+        | exception _ -> [[Axiom_term t]]
+        | l -> l
+    in
 
-  match t.t_node with
-  | Tbinop (Tand, t1, t2) ->
-      let t1 = create_destruct_axiom t1 in
-      let t2 = create_destruct_axiom t2 in
-      [[Normal_decl t1;Normal_decl t2]]
-  | Tbinop (Tor, t1, t2) ->
-      let t1 = create_destruct_axiom t1 in
-      let t2 = create_destruct_axiom t2 in
-      [[Normal_decl t1];[Normal_decl t2]]
-  | Tbinop (Timplies, t1, t2) ->
-      begin
-        let t1 = create_destruct_goal t1 in
-        let t2 = create_destruct_axiom t2 in
-        (* Creates a task with hypothesis removes (need to prove t1) and one
-           with hypothesis replaced by t2 (needs to prove current goal).
-           Example: "false -> false" *)
-        [[Goal_decl t1]; [Normal_decl t2]]
-      end
-  | Tquant (Texists, tb) ->
-    let (vsl, tr, te) = Term.t_open_quant tb in
-    begin match vsl with
-    | x :: tl ->
+    match t.t_node with
+    | Tbinop (Tand, t1, t2) ->
+        let l1 = destruct_term_exception t1 in
+        let l2 = destruct_term_exception t2 in
+        (* For each parallel branch of l1 we have to append *all* parallel
+           branch of l2. *)
+        (* TODO efficiency: this is not expected to work on very large terms
+           with tons of Tand/Tor. *)
+        List.fold_left (fun par_acc seq_list1 ->
+            List.fold_left (fun par_acc seq_list2 ->
+                par_acc @ ([seq_list1 @ seq_list2])) par_acc l2
+          ) [] l1
+    | Tbinop (Tor, t1, t2) ->
+        let l1 = destruct_term_exception t1 in
+        let l2 = destruct_term_exception t2 in
+        (* The two branch are completely disjoint. We just concatenate them to
+           ensure they are done in parallel *)
+        l1 @ l2
+    | Tbinop (Timplies, t1, t2) ->
+        (* The premises is converted to a goal. The rest is recursively
+           destructed in parallel. *)
+        let l2 = destruct_term_exception t2 in
+        [Goal_term t1] :: l2
+    | Tquant (Texists, tb) ->
+      let (vsl, tr, te) = Term.t_open_quant tb in
+      begin match vsl with
+      | x :: tl ->
         let ls = create_lsymbol (Ident.id_clone x.vs_name) [] (Some x.vs_ty) in
         let tx = fs_app ls [] x.vs_ty in
         let x_decl = create_param_decl ls in
         (try
            let part_t = t_subst_single x tx te in
            let new_t = t_quant_close Texists tl tr part_t in
-           let new_t = create_destruct_axiom new_t in
-           [[Normal_decl original_decl; Normal_decl x_decl; Normal_decl new_t]]
+           (* TODO remove original_decl here ? *)
+           (* The recursive call is done after new symbols are introduced so we
+              readd the new decls to every generated list. *)
+           let l_t = destruct_term_exception new_t in
+           List.map (fun x -> Axiom_term original_decl :: Param x_decl :: x) l_t
          with
          | Ty.TypeMismatch (ty1, ty2) ->
              raise (Arg_trans_type ("destruct_exists", ty1, ty2)))
-    | [] -> raise (Arg_trans ("destruct_exists"))
-    end
-  | _ -> raise (Arg_trans ("destruct"))
+      | [] -> raise (Arg_trans ("destruct_exists"))
+      end
+    | _ -> raise (Arg_trans ("destruct"))
+  in
+  destruct_term t
 
 (* Destruct the head term of an hypothesis if it is either
    conjunction, disjunction or exists *)
-let destruct pr : Task.task tlist =
+let destruct ~recursive pr : Task.task tlist =
+  let create_destruct_axiom t =
+    let new_pr = create_prsymbol (Ident.id_clone pr.pr_name) in
+    create_prop_decl Paxiom new_pr t
+  in
+  let create_destruct_goal t =
+    let new_pr = create_prsymbol (gen_ident "G") in
+    create_goal ~expl:destruct_expl new_pr t
+  in
+
   decl_goal_l (fun d ->
       match d.d_node with
       | Dprop (Paxiom, dpr, ht) when Ident.id_equal dpr.pr_name pr.pr_name ->
-          destruct_term ~original_decl:d ~decl_name:dpr.pr_name ht
+          (* TODO solve the problem of original_decl not being a decl anymore ??? *)
+          let decl_list = destruct_term ~recursive ht in
+          List.map (fun l -> List.map (fun x ->
+              match x with
+              | Axiom_term t -> Normal_decl (create_destruct_axiom t)
+              | Param d -> Normal_decl d
+              | Goal_term t -> Goal_decl (create_destruct_goal t)
+            ) l) decl_list
       | _ -> [[Normal_decl d]]) None
 
 (* from task [delta, name:forall x.A |- G,
@@ -216,7 +249,10 @@ let () = wrap_and_register
     (Tprsymbol (Ttermlist Ttrans)) instantiate
 
 let () = wrap_and_register ~desc:"destruct <name> destructs the head logic constructor of hypothesis name (/\\, \\/, -> or <->).\nTo destruct a literal of algebraic type, use destruct_alg."
-    "destruct" (Tprsymbol Ttrans_l) destruct
+    "destruct" (Tprsymbol Ttrans_l) (destruct ~recursive:false)
+
+let () = wrap_and_register ~desc:"destruct <name> recursively destructs the head logic constructor of hypothesis name (/\\, \\/, -> or <->).\nTo destruct a literal of algebraic type, use destruct_alg."
+    "destruct_rec" (Tprsymbol Ttrans_l) (destruct ~recursive:true)
 
 let () = wrap_and_register ~desc:"destruct <name> destructs as an algebraic type"
     "destruct_alg" (Tterm Ttrans_l) (destruct_alg false)
