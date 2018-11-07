@@ -175,6 +175,8 @@ rule scan = parse
 and start_annotation = parse
   | space+
       { start_annotation lexbuf }
+  | "(*)"
+      { add_token (); scan lexbuf }
   | "(*"
       { add_comment (comment 0 lexbuf); start_annotation lexbuf }
   | "{"
@@ -195,6 +197,8 @@ and scan_annotation = parse
       { add_token (); scan_annotation lexbuf; scan_annotation lexbuf }
   | "}"
       { add_token () }
+  | "(*)"
+      { add_token (); scan lexbuf }
   | "(*" space* '\n'?
       { add_comment (comment 0 lexbuf); scan_annotation lexbuf }
   | '"'
@@ -226,6 +230,7 @@ and string n = parse
 and comment n = parse
   | ('\n' | space)* "*)"
           { n }
+  | "(*)" { comment n lexbuf }
   | "(*"  { comment (comment n lexbuf) lexbuf }
   | '"'   { comment (string n lexbuf) lexbuf }
   | '\n'+ { comment (n + 1) lexbuf }
