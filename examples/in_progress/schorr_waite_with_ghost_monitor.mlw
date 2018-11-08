@@ -170,32 +170,62 @@ module SchorrWaite
   val t : ref loc
   val p : ref loc
 
-  val step () : unit
+  let step () : unit
     requires { 0 <= !pc < 2 }
+    requires { !pc = 1 -> !p <> null \/ (!t <> null && not memo.mark[!t]) }
     writes { pc,t,p,memo }
-    ensures { old !pc = 0 /\ (!p <> null \/ (!t <> null && not memo.mark[!t])) -> !pc = 1 }
-    ensures { old !pc = 0 /\ not (!p <> null \/ (!t <> null && not memo.mark[!t])) -> !pc = 2 }
-    ensures { old !pc = 1 /\ (!t = null || memo.mark[!t]) /\ memo.color[!p] -> (* pop *)
+    ensures { old (!pc = 0 /\ (!p <> null \/ (!t <> null && not memo.mark[!t]))) ->
+                !pc = 1 /\
+                !t = old !t /\
+                !p = old !p /\
+                memo = old memo }
+    ensures { old (!pc = 0 /\ not (!p <> null \/ (!t <> null && not memo.mark[!t]))) ->
+                !pc = 2 /\
+                !t = old !t /\
+                !p = old !p /\
+                memo = old memo }
+    ensures { old (!pc = 1 /\ (!t = null || memo.mark[!t]) /\ memo.color[!p]) -> (* pop *)
                 (* q = t *) let q = old !t in let o = old !p in
                 (* t = p *) !t = o /\
                 (* p = p->r *) !p = old (memo.right[o]) /\
                 (* t->r = q (t is old p here!) *) memo.right = old (memo.right[o <- q]) /\
-                !pc = 0 }
-    ensures { old !pc = 1 /\ (!t = null || memo.mark[!t]) /\ not memo.color[!p] -> (* swing *)
+                !pc = 0 /\
+                memo.left = old (memo.left) /\
+                memo.mark = old (memo.mark) /\
+                memo.color = old (memo.color) }
+    ensures { old (!pc = 1 /\ (!t = null || memo.mark[!t]) /\ not memo.color[!p]) -> (* swing *)
                 (* q = t *) let q =old !t in let o = old !p in
                 (* t = p->r *) !t = old (memo.right[o]) /\
                 (* p->r = p->l *) memo.right = old (memo.right[o <- memo.left[o]]) /\
                 (* p->l = q *) memo.left = old (memo.left[o <- q]) /\
                 (* p->c = 1 *) memo.color = old (memo.color[o <- true]) /\
-                !pc = 0 }
-    ensures { old !pc = 1 /\ not (!t = null || memo.mark[!t]) -> (* push *)
+                !pc = 0 /\
+                memo.mark = old (memo.mark) }
+    ensures { old (!pc = 1 /\ not (!t = null || memo.mark[!t])) -> (* push *)
                 (* q = p *) let q = old !p in let o = old !t in
                 (* p = t *) !p = o /\
                 (* t = t->l *) !t = old (memo.left[o]) /\
                 (* p->l = q (p is old t here!) *) memo.left = old (memo.left[o <- q]) /\
-                (* p->m = 1 *) memo.mark = old (memo.color[o <- true]) /\
+                (* p->m = 1 *) memo.mark = old (memo.mark[o <- true]) /\
                 (* p->c = 0 *) memo.color = old (memo.color[o <- false]) /\
-                !pc = 0 }
+                !pc = 0 /\
+                memo.right = old (memo.right) }
+  =
+    if !pc = 0 then
+       if !p <> null || (!t <> null && not get_m !t) then
+          pc := 1
+        else
+          pc := 2
+    else
+      if !pc = 1 then
+        if !t = null || get_m !t then
+          if get_c !p then (* pop *)
+            let q = !t in t := !p; p := get_r !p; set_r !t q; pc := 0
+          else (* swing *)
+	    let q = !t in t := get_r !p; set_r !p (get_l !p); set_l !p q; set_c !p true; pc := 0
+        else (* push *)
+          let q = !p in p := !t; t := get_l !t; set_l !p q; set_m !p true; set_c !p false; pc := 0
+      else absurd
 
   (* the monitor performs a depth-first search from current node `!t` *)
   let rec monitor (ghost initial_memo:memory) (ghost graph: set loc) (ghost gray_nodes:set loc) : unit
@@ -208,7 +238,7 @@ module SchorrWaite
       requires { forall x. x <> null /\ not memo.mark[x] ->
           memo.left[x] = initial_memo.left[x] /\ memo.right[x] = initial_memo.right[x]
         }
-      ensures { !pc = 2 }
+      ensures { !pc = 0 }
       (* 'stack frames' are maintained correctly *)
       ensures { !t = old !t /\ !p = old !p }
       (* Pointer buffer is left unchanged *)
@@ -223,14 +253,12 @@ module SchorrWaite
         memo.mark[x] = (old memo.mark)[x] }
       (* Terminates because there is a limited number of 'grayable' nodes. *)
       variant { cardinal graph - cardinal gray_nodes }
-    = step (); (* checks condition of the while loop *)
-      if !pc = 1 then (* we entered the loop *)
-        begin
-        let ghost new_gray = add !t gray_nodes in
-        step ();
-        monitor initial_memo graph new_gray; (* traverse the left child *)
-        monitor initial_memo graph new_gray; (* traverse the right child *)
-        end
+    = if !t = null || get_m !t then () else
+      let ghost new_gray = add !t gray_nodes in
+      step ();
+      step ();
+      monitor initial_memo graph new_gray; (* traverse the left child *)
+      monitor initial_memo graph new_gray (* traverse the right child *)
 
 
   let schorr_waite (root: loc) (ghost graph: set loc) : unit

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="5">
+<prover id="0" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file name="../schorr_waite_with_ghost_monitor.mlw">
+<theory name="SchorrWaite">
+ <goal name="VC step" expl="VC for step" proved="true">
+ <proof prover="2"><result status="valid" time="0.06"/></proof>
+ </goal>
+ <goal name="VC monitor" expl="VC for monitor">
+ <transf name="split_vc" >
+  <goal name="VC monitor.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="VC monitor.1" expl="postcondition" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC monitor.2" expl="postcondition" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC monitor.3" expl="postcondition" proved="true">
+  <proof prover="1" obsolete="true"><result status="valid" time="0.04" steps="210"/></proof>
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC monitor.4" expl="postcondition" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC monitor.5" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC monitor.6" expl="postcondition" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC monitor.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC monitor.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC monitor.9" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC monitor.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC monitor.11" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="VC monitor.12" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC monitor.13" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="VC monitor.14" expl="precondition">
+  </goal>
+  <goal name="VC monitor.15" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="63"/></proof>
+  <proof prover="2"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC monitor.16" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.08"/></proof>
+  </goal>
+  <goal name="VC monitor.17" expl="precondition" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC monitor.18" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC monitor.19" expl="precondition">
+  </goal>
+  <goal name="VC monitor.20" expl="precondition">
+  </goal>
+  <goal name="VC monitor.21" expl="postcondition" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="1.00"/></proof>
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC monitor.22" expl="postcondition">
+  </goal>
+  <goal name="VC monitor.23" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="210"/></proof>
+  <proof prover="2"><result status="timeout" time="1.00"/></proof>
+  </goal>
+  <goal name="VC monitor.24" expl="postcondition">
+  </goal>
+  <goal name="VC monitor.25" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC monitor.26" expl="postcondition">
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC schorr_waite" expl="VC for schorr_waite" proved="true">
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
