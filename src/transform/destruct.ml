@@ -205,25 +205,34 @@ let destruct pr : Task.task Trans.tlist =
       | _ -> assert false)
 
 (* from task [delta, name:forall x.A |- G,
-     build the task [delta,name:forall x.A,name':A[x -> t]] |- G] *)
-let instantiate (pr: Decl.prsymbol) lt =
+     build the task [delta,name:forall x.A,name':A[x -> t]] |- G]
+   When [rem] is true, the general hypothesis is removed.
+*)
+let instantiate ~rem (pr: Decl.prsymbol) lt =
   let r = ref [] in
   Trans.decl
     (fun d ->
       match d.d_node with
-      | Dprop (pk, dpr, ht) when Ident.id_equal dpr.pr_name pr.pr_name ->
+      | Dprop (pk, dpr, ht) when Ident.id_equal dpr.pr_name pr.pr_name
+         && pk <> Pgoal ->
           let t_subst = subst_forall_list ht lt in
           let new_pr = create_prsymbol (gen_ident "Hinst") in
           let new_decl = create_prop_decl pk new_pr t_subst in
           r := [new_decl];
-          [d]
+          (* We remove the original hypothesis only if [rem] is set *)
+          if rem then [] else [d]
       | Dprop (Pgoal, _, _) -> !r @ [d]
       | _ -> [d]) None
 
 let () = wrap_and_register
     ~desc:"instantiate <prop> <term list> generates a new hypothesis with quantified variables of prop replaced with terms"
     "instantiate"
-    (Tprsymbol (Ttermlist Ttrans)) instantiate
+    (Tprsymbol (Ttermlist Ttrans)) (instantiate ~rem:false)
+
+let () = wrap_and_register
+    ~desc:"instantiate <prop> <term list> generates a new hypothesis with quantified variables of prop replaced with terms. Also remove the old hypothesis."
+    "inst_rem"
+    (Tprsymbol (Ttermlist Ttrans)) (instantiate ~rem:true)
 
 let () = wrap_and_register ~desc:"destruct <name> destructs the head logic constructor of hypothesis name (/\\, \\/, -> or <->).\nTo destruct a literal of algebraic type, use destruct_alg."
     "destruct" (Tprsymbol Ttrans_l) destruct
