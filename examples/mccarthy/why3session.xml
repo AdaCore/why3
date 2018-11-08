@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="5">
-<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <file name="../mccarthy.mlw" proved="true">
 <theory name="McCarthy91" proved="true">
@@ -16,18 +16,18 @@
  <proof prover="3"><result status="valid" time="0.01" steps="49"/></proof>
  </goal>
 </theory>
-<theory name="McCarthyWithCoroutines" proved="true">
- <goal name="VC aux1" expl="VC for aux1" proved="true">
- <proof prover="0"><result status="valid" time="0.04"/></proof>
+<theory name="McCarthyWithGhostMonitor" proved="true">
+ <goal name="VC monitor" expl="VC for monitor" proved="true">
+ <proof prover="1"><result status="valid" time="0.07"/></proof>
  </goal>
- <goal name="VC mccarthy1" expl="VC for mccarthy1" proved="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <goal name="VC mccarthy" expl="VC for mccarthy" proved="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="VC aux2" expl="VC for aux2" proved="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <goal name="VC monitor2" expl="VC for monitor2" proved="true">
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
  </goal>
  <goal name="VC mccarthy2" expl="VC for mccarthy2" proved="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 <theory name="McCarthy91Mach" proved="true">

@@ -85,7 +85,7 @@ module McCarthy91
 
 end
 
-module McCarthyWithCoroutines
+module McCarthyWithGhostMonitor
 
 
   use int.Int
@@ -138,7 +138,7 @@ we define the small-step semantics of this code by the following [step] function
     ensures { old !pc = 6 -> !pc = 7 /\ !e = old !e /\ !r = old !r + 11 }
     ensures { old !pc = 7 -> !pc = 2 /\ !e = old !e + 1 /\ !r = old !r }
 
-  let rec aux1 () : unit
+  let rec monitor () : unit
     requires { !pc = 2 /\ !e > 0 }
     variant  { 101 - !r }
     ensures  { !pc = 5 /\ !r = spec(old !r) /\ !e = old !e - 1 }
@@ -150,17 +150,17 @@ we define the small-step semantics of this code by the following [step] function
     else begin
        step (); (* assignment r <- r + 11 *)
        step (); (* assignment e <- e + 1 *)
-       aux1 ();
+       monitor ();
        step (); (* 'if e=0' must be false *)
-       aux1 ()
+       monitor ()
        end
 
-  let mccarthy1 ()
+  let mccarthy ()
     requires { !pc = 0 /\ !n >= 0 }
     ensures { !pc = 8 /\ !r = spec !n }
   = step (); (* assignment e <- 1 *)
     step (); (* assignment r <- n *)
-    aux1 (); (* loop *)
+    monitor (); (* loop *)
     step() (* loop exit *)
 
 (** {2 a variant with not-so-small steps}
@@ -195,19 +195,19 @@ we define the not-so-small-step semantics of this code by the following [next] f
 
   (* [aux2] performs as may loop iterations as needed so as to reach program point 2
      from program point 1 *)
-  let rec aux2 () : unit
+  let rec monitor2 () : unit
     requires { !pc = 1 /\ !e > 0 }
     variant  { 101 - !r }
     ensures  { !pc = 2 /\ !r = spec(old !r) /\ !e = old !e - 1 }
   = next ();
-    if !pc <> 2 then begin aux2 (); next (); aux2 () end
+    if !pc <> 2 then begin monitor2 (); next (); monitor2 () end
 
 
   let mccarthy2 ()
     requires { !pc = 0 /\ !n >= 0 }
     ensures { !pc = 3 /\ !r = spec !n }
   = next (); (* assignments e <- 1; r <- n *)
-    aux2 (); (* loop *)
+    monitor2 (); (* loop *)
     next ()
 
 end
