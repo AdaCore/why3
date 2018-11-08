@@ -218,3 +218,13 @@ let uniquify file =
   done;
   let file = name ^ "_" ^ (string_of_int !i) ^ ext in
   file
+
+let cannonical file =
+  assert (Sys.file_exists file);
+  let cwd = Sys.getcwd () in
+  let file_dir = Filename.dirname file in
+  Sys.chdir file_dir;
+  let file_dir = Sys.getcwd () in
+  (* Return to dir *)
+  Sys.chdir cwd;
+  Filename.concat file_dir (Filename.basename file)

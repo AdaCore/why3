@@ -282,3 +282,15 @@ val change_prover : notifier -> session -> proofNodeID -> Whyconf.prover -> Whyc
    attempt using prover [opr] by the new prover [npr]. Proof attempt
    status is set to obsolete.
  *)
+
+(** Edition of session *)
+
+val move_file: shape_version:int option -> check_reload:bool -> Env.env ->
+  session -> string -> string -> session
+(** [move_file shape check_reload env s from_file to_file] This changes the
+    filename in session from [from_file] to [to_file] and reload the session (if
+    [check_reload] is true) so that the session is up to date with what is
+    inside the new [to_file].
+    Returns the current session.
+    [from_file] and [to_file] are paths given relative to the session directory.
+*)

@@ -9,10 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-
-
-
-
 open Wstdlib
 
 module Hprover = Whyconf.Hprover
@@ -38,7 +34,7 @@ let print_proofAttemptID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
-  theory_parent_name            : string;
+  mutable theory_parent_name    : string;
   mutable theory_is_detached    : bool;
 }
 
@@ -1612,9 +1608,6 @@ let merge_file_section ~shape_version ~old_ses ~old_theories ~file_is_detached ~
   f.file_theories <- theories @ detached;
   update_file_node (fun _ -> ()) s f
 
-
-
-
 let read_file env ?format fn =
   let theories = Env.read_file Env.base_language env ?format fn in
   let ltheories =
@@ -1948,3 +1941,48 @@ let save_session (s : session) =
   session_dir_for_save := s.session_dir;
   let fs = if Compress.compression_supported then fz else fs in
   save f fs s
+
+(**********************)
+(* Edition of session *)
+(**********************)
+
+let move_file ~shape_version ~check_reload env ses from_file to_file =
+  assert (Sys.file_exists (Filename.concat ses.session_dir to_file));
+  assert (not (Sys.is_directory (Filename.concat ses.session_dir to_file)));
+  assert (Filename.check_suffix to_file ".mlw");
+  let files = get_files ses in
+  let key_from_file =
+    (* let exception for OCaml prior to version 4.03 *)
+    let module M = struct exception Found of string end in
+    try
+      Hstr.iter (fun key file ->
+          if file.file_name = from_file then
+            raise (M.Found key)
+        ) files;
+      None
+    with M.Found s -> Some s
+  in
+  match key_from_file with
+  | None -> raise Not_found
+  | Some key_file ->
+      let old_file = Hstr.find files key_file in
+      Hstr.remove files key_file;
+      List.iter (fun th -> th.theory_parent_name <- to_file) old_file.file_theories;
+      let new_file =
+        {old_file with
+         file_name = to_file;
+         file_is_detached = true
+        }
+      in
+      Hstr.add files to_file new_file;
+      (* Only save the new session if the .mlw file [to_file] does not mess with
+         the session: parse/type errors, other errors ?
+      *)
+      if check_reload then
+        let new_ses = empty_session ~from:ses (get_dir ses) in
+        let e_l, _, _ = merge_files ~shape_version env new_ses ses in
+        match e_l with
+        | [] -> save_session new_ses; new_ses
+        | e :: _ -> raise e
+      else
+        (save_session ses; ses)
