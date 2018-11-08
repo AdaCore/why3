@@ -149,151 +149,157 @@ module SchorrWaite
 
   (** step function for low-level Schorr-Waite algorithm
 
-    while L0: (p != NULL || (t != NULL && ! t->m)) {
-    L1:
+  L0:
+  node t = root;
+  node p = NULL;
+  while L1: (p != NULL || (t != NULL && ! t->m)) {
+  L2:
     if (t == NULL || t->m) {
       if (p->c) { /* pop */
-	node q = t; t = p; p = p->r; t->r = q;
+        node q = t; t = p; p = p->r; t->r = q;
       }
       else { /* swing */
-	node q = t; t = p->r; p->r = p->l; p->l = q; p->c = 1;
+        node q = t; t = p->r; p->r = p->l; p->l = q; p->c = 1;
       }
     }
     else { /* push */
       node q = p; p = t; t = t->l; p->l = q; p->m = 1; p->c = 0;
     }
   }
-  L2:
+  L3:
 
   *)
+
+  (* Extract parameters (including ghosts) of the main monitor
+     at top-level so that they are visible in step as well
+     (only [root] need to be extracted, [graph] extracted for uniformity only) *)
+  val root : loc
+  val ghost graph : set loc
+
+  (* Non-memory internal state *)
   val pc : ref int
   val t : ref loc
   val p : ref loc
 
+  (* Step function *)
   let step () : unit
-    requires { 0 <= !pc < 2 }
-    requires { !pc = 1 -> !p <> null \/ (!t <> null && not memo.mark[!t]) }
-    writes { pc,t,p,memo }
-    ensures { old (!pc = 0 /\ (!p <> null \/ (!t <> null && not memo.mark[!t]))) ->
-                !pc = 1 /\
-                !t = old !t /\
-                !p = old !p /\
-                memo = old memo }
-    ensures { old (!pc = 0 /\ not (!p <> null \/ (!t <> null && not memo.mark[!t]))) ->
-                !pc = 2 /\
-                !t = old !t /\
-                !p = old !p /\
-                memo = old memo }
-    ensures { old (!pc = 1 /\ (!t = null || memo.mark[!t]) /\ memo.color[!p]) -> (* pop *)
-                (* q = t *) let q = old !t in let o = old !p in
-                (* t = p *) !t = o /\
-                (* p = p->r *) !p = old (memo.right[o]) /\
-                (* t->r = q (t is old p here!) *) memo.right = old (memo.right[o <- q]) /\
-                !pc = 0 /\
-                memo.left = old (memo.left) /\
-                memo.mark = old (memo.mark) /\
-                memo.color = old (memo.color) }
-    ensures { old (!pc = 1 /\ (!t = null || memo.mark[!t]) /\ not memo.color[!p]) -> (* swing *)
-                (* q = t *) let q =old !t in let o = old !p in
-                (* t = p->r *) !t = old (memo.right[o]) /\
-                (* p->r = p->l *) memo.right = old (memo.right[o <- memo.left[o]]) /\
-                (* p->l = q *) memo.left = old (memo.left[o <- q]) /\
-                (* p->c = 1 *) memo.color = old (memo.color[o <- true]) /\
-                !pc = 0 /\
-                memo.mark = old (memo.mark) }
-    ensures { old (!pc = 1 /\ not (!t = null || memo.mark[!t])) -> (* push *)
-                (* q = p *) let q = old !p in let o = old !t in
-                (* p = t *) !p = o /\
-                (* t = t->l *) !t = old (memo.left[o]) /\
-                (* p->l = q (p is old t here!) *) memo.left = old (memo.left[o <- q]) /\
-                (* p->m = 1 *) memo.mark = old (memo.mark[o <- true]) /\
-                (* p->c = 0 *) memo.color = old (memo.color[o <- false]) /\
-                !pc = 0 /\
-                memo.right = old (memo.right) }
+    requires { 0 <= !pc < 3 }
+    requires { !pc = 2 -> !p <> null \/ (!t <> null && not memo.mark[!t]) }
+    writes   { pc,t,p,memo }
+    ensures  { old (!pc = 0) -> !pc = 1 /\ !t = root /\ !p = null /\ memo = old memo }
+    ensures  { old (!pc = 1 /\ (!p <> null \/ (!t <> null /\ not memo.mark[!t]))) ->
+      !pc = 2 /\ !t = old !t /\ !p = old !p /\ memo = old memo }
+    ensures { old (!pc = 1 /\ not(!p <> null \/ (!t <> null /\ not memo.mark[!t]))) ->
+      !pc = 3 /\ !t = old !t /\ !p = old !p /\ memo = old memo }
+    ensures { old (!pc = 2 /\ (!t = null \/ memo.mark[!t]) /\ memo.color[!p]) -> (* pop *)
+      (* q = t *) let q = old !t in
+      (* t = p *) !t = old !p /\
+      (* p = p->r *) !p = old (memo.right[!p]) /\
+      (* t->r = q (t is old p here!) *) memo.right = old (memo.right[!p <- q]) /\
+      !pc = 1 /\
+      memo.left = old (memo.left) /\
+      memo.mark = old (memo.mark) /\
+      memo.color = old (memo.color) }
+    ensures { old (!pc = 2 /\ (!t = null \/ memo.mark[!t]) /\ not memo.color[!p]) -> (* swing *)
+      (* q = t *) let q = old !t in
+      (* p unchanged *) !p = old !p /\
+      (* t = p->r *) !t = old (memo.right[!p]) /\
+      (* p->r = p->l *) memo.right = old (memo.right[!p <- memo.left[!p]]) /\
+      (* p->l = q *) memo.left = old (memo.left[!p <- q]) /\
+      (* p->c = 1 *) memo.color = old (memo.color[!p <- true]) /\
+      !pc = 1 /\ memo.mark = old (memo.mark) }
+    ensures { old (!pc = 2 /\ not (!t = null \/ memo.mark[!t])) -> (* push *)
+      (* q = p *) let q = old !p in
+      (* p = t *) !p = old !t /\
+      (* t = t -> l *) !t = old (memo.left[!t]) /\
+      (* p->l = q (p is old t here!) *) memo.left = old (memo.left[!t <- q]) /\
+      (* p->m = 1 *) memo.mark = old (memo.mark[!t <- true]) /\
+      (* p->c = 0 *) memo.color = old (memo.color[!t <- false]) /\
+      !pc = 1 /\ memo.right = old (memo.right) }
   =
-    if !pc = 0 then
-       if !p <> null || (!t <> null && not get_m !t) then
-          pc := 1
-        else
-          pc := 2
-    else
-      if !pc = 1 then
-        if !t = null || get_m !t then
-          if get_c !p then (* pop *)
-            let q = !t in t := !p; p := get_r !p; set_r !t q; pc := 0
-          else (* swing *)
-	    let q = !t in t := get_r !p; set_r !p (get_l !p); set_l !p q; set_c !p true; pc := 0
-        else (* push *)
-          let q = !p in p := !t; t := get_l !t; set_l !p q; set_m !p true; set_c !p false; pc := 0
-      else absurd
+    if !pc = 0 then (t := root; p := null; pc := 1)
+    else if !pc = 1 then
+      if !p <> null || (!t <> null && not(get_m(!t)))
+      then pc := 2
+      else pc := 3
+    else if !pc = 2 then
+      if !t = null || get_m(!t) then
+      if get_c !p then (* pop *)
+        let q = !t in t := !p;  p := get_r !p; set_r !t q; pc := 1
+      else (* swing *)
+        let q = !t in t := get_r !p; set_r !p (get_l !p); set_l !p q; set_c !p true; pc := 1
+      else
+        let q = !p in p := !t; t := get_l !t; set_l !p q; set_m !p true; set_c !p false; pc := 1
+    else absurd
 
-  (* the monitor performs a depth-first search from current node `!t` *)
-  let rec monitor (ghost initial_memo:memory) (ghost graph: set loc) (ghost gray_nodes:set loc) : unit
-      requires { !pc = 0 }
+  let schorr_waite () : unit
+    (** The program begins execution. *)
+    requires { !pc = 0 }
+    (** Root belong to graph (note: for simplicity, the graph set may (and likely does)
+        contain the null pointer. *)
+    requires { mem root graph }
+    (** Graph is closed by following edges *)
+    requires { forall l. mem l graph /\ l <> null ->
+      mem memo.left[l] graph /\ mem memo.right[l] graph }
+    writes { memo,pc,t,p }
+    (** The graph starts fully unmarked. *)
+    requires { forall x. mem x graph -> not memo.mark[x] }
+    (** The program is indeed done executing. *)
+    ensures  { !pc = 3 }
+    (** The graph structure is left unchanged. *)
+    ensures  { unchanged (old memo) memo }
+    (** Every non-null location reachable from the root is marked. *)
+    ensures  { forall x. path (old memo) root x /\ x <> null ->
+      memo.mark[x] }
+    (** Every other location is left with its previous marking. *)
+    ensures { forall x. not path (old memo) root x /\ x <> null ->
+      memo.mark[x] = (old memo.mark)[x] }
+  =
+    step (); (* Initialize *)
+    let ghost initial_memo = pure {memo} in (* Copy of initial memory *)
+    let rec monitor (ghost gray_nodes: set loc) : unit
+      requires { !pc = 1 }
       (* DFS invariant *)
       requires { well_colored_on graph gray_nodes initial_memo memo.mark }
       requires { mem !t graph }
-      (* Non-marked nodes have unchanged structure with
-          respect to the initial one. *)
+      (* Non-marked nodes have unchanged structure with respect to the initial one.
+         Cause: specification refer the graph in initial memory. *)
       requires { forall x. x <> null /\ not memo.mark[x] ->
-          memo.left[x] = initial_memo.left[x] /\ memo.right[x] = initial_memo.right[x]
-        }
-      ensures { !pc = 0 }
-      (* 'stack frames' are maintained correctly *)
+        memo.left[x] = initial_memo.left[x] /\ memo.right[x] = initial_memo.right[x] }
+      ensures { !pc = 1 }
+      (* 'stack frames' are maintained correctly. *)
       ensures { !t = old !t /\ !p = old !p }
-      (* Pointer buffer is left unchanged *)
+      (* Pointer buffer is overall left unchanged *)
       ensures { unchanged (old memo) memo }
       (* Maintain DFS invariant *)
       ensures { well_colored_on graph gray_nodes initial_memo memo.mark }
       (* The top node get marked *)
       ensures { !t <> null -> memo.mark[!t] }
-      (* May not mark unreachable node, neither change marked node. *)
+      (* May not mark unreachable node (in any way), neither change marked nodes. *)
       ensures { forall x. x <> null ->
-        not path initial_memo !t x \/ not (old memo.mark[x]) ->
-        memo.mark[x] = (old memo.mark)[x] }
+        not path initial_memo !t x \/ old memo.mark[x] ->
+        memo.mark[x] = (old memo.mark)[x] /\
+        memo.color[x] = (old memo.color)[x]
+      }
       (* Terminates because there is a limited number of 'grayable' nodes. *)
       variant { cardinal graph - cardinal gray_nodes }
     = if !t = null || get_m !t then () else
       let ghost new_gray = add !t gray_nodes in
-      step ();
-      step ();
-      monitor initial_memo graph new_gray; (* traverse the left child *)
-      step ();
-      step ();
-      monitor initial_memo graph new_gray; (* traverse the right child *)
-      step ();
-      step ()
-
-
-  let schorr_waite (root: loc) (ghost graph: set loc) : unit
-    (** Root belong to graph (note: for simplicity, the graph set
-        may (and likely does) contain the null pointer. *)
-    requires { mem root graph }
-    (** Graph is closed by following edges *)
-    requires { forall l.
-      mem l graph /\ l <> null ->
-      mem memo.left[l] graph /\ mem memo.right[l] graph }
-    writes { memo,pc,t,p }
-    (** The graph starts fully unmarked. *)
-    requires { forall x. mem x graph -> not memo.mark[x] }
-    (** The graph structure is left unchanged. *)
-    ensures { unchanged (old memo) memo }
-    (** Every non-null location reachable from the root is marked black. *)
-    ensures { forall x. path (old memo) root x /\ x <> null ->
-      memo.mark[x] }
-    (** Every other location is left with its previous color. *)
-    ensures { forall x. not path (old memo) root x /\ x <> null ->
-      memo.mark[x] = (old memo.mark)[x] }
-  =
-    pc := 0;
-    t := root;
-    p := null;
-    monitor (pure {memo}) graph empty
-
-   (* Need induction to recover path-based specification. *)
-   (*   assert { forall x y m. m = memo at I /\ x <> null /\ y <> null /\
-        mem x graph /\ black memo.colors[x] ->
-        ([@induction] path m x y) -> black memo.colors[y] }
-   *)
+      (* assert { path initial_memo !t !t }; *)
+      step (); (* Test *)
+      step (); (* Push *)
+      monitor new_gray; (* traverse the left child *)
+      step (); (* Test *)
+      step (); (* Swing *)
+      monitor new_gray; (* traverse the right child *)
+      step (); (* Test *)
+      step () (* Pop *)
+    in
+    monitor empty;
+    step (); (* Exit. *)
+    (* Need induction to recover path-based specification. *)
+    assert { forall x y. ([@induction] path initial_memo x y) ->
+        x <> null /\ y <> null /\ mem x graph /\ memo.mark[x] ->
+        memo.mark[y] }
 
 end
