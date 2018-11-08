@@ -258,7 +258,11 @@ module SchorrWaite
       step ();
       step ();
       monitor initial_memo graph new_gray; (* traverse the left child *)
-      monitor initial_memo graph new_gray (* traverse the right child *)
+      step ();
+      step ();
+      monitor initial_memo graph new_gray; (* traverse the right child *)
+      step ();
+      step ()
 
 
   let schorr_waite (root: loc) (ghost graph: set loc) : unit
@@ -284,7 +288,7 @@ module SchorrWaite
     pc := 0;
     t := root;
     p := null;
-    monitor (pure {memo}) graph empty;
+    monitor (pure {memo}) graph empty
 
    (* Need induction to recover path-based specification. *)
    (*   assert { forall x y m. m = memo at I /\ x <> null /\ y <> null /\
