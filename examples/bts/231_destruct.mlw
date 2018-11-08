@@ -40,4 +40,46 @@ module Imbrication
 
 end
 
+
 (* TODO add more complex examples *)
+
+
+module Injection
+
+  (* To avoid warning on axioms not containing local abstract symbol *)
+  predicate p int
+  constant z: int
+
+  type t = 
+    | C int
+    | D
+    | E bool
+    | F int
+
+  axiom H: exists x. C x = D /\ p z
+  axiom H1: C 1 = C 4 /\ p z
+  axiom H2: E true = F 4 /\ p z
+  
+  goal G: True
+
+end
+
+module Injection2
+
+  (* To avoid warning on axioms not containing local abstract symbol *)
+  predicate p int
+  constant z: int
+
+  type t = 
+    | C int
+    | D
+    | E bool
+    | F int
+
+  axiom H: exists x. C x <> D /\ p z
+  axiom H1: C 1 <> C 4 /\ p z
+  axiom H2: E true <> F 4 /\ p z
+  
+  goal G: True
+
+end

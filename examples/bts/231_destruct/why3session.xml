@@ -6,15 +6,15 @@
 <theory name="T">
  <goal name="G">
  <transf name="destruct" arg1="H">
-  <goal name="G.0">
+  <goal name="G.0" expl="destruct premise">
   </goal>
   <goal name="G.1">
   </goal>
  </transf>
  <transf name="destruct_rec" arg1="H">
-  <goal name="G.0">
+  <goal name="G.0" expl="destruct premise">
   </goal>
-  <goal name="G.1">
+  <goal name="G.1" expl="destruct premise">
   </goal>
   <goal name="G.2">
   </goal>
@@ -65,6 +65,58 @@
   <goal name="G.2">
   </goal>
   <goal name="G.3">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Injection">
+ <goal name="G">
+ <transf name="destruct" arg1="H">
+  <goal name="G.0">
+  <transf name="destruct" arg1="H">
+   <goal name="G.0.0">
+   <transf name="destruct" arg1="H3">
+    <goal name="G.0.0.0">
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ <transf name="destruct" arg1="H1">
+  <goal name="G.0">
+  <transf name="destruct" arg1="H11">
+   <goal name="G.0.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ <transf name="destruct" arg1="H2">
+  <goal name="G.0">
+  <transf name="destruct" arg1="H21">
+   <goal name="G.0.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ <transf name="destruct_rec" arg1="H">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Injection2">
+ <goal name="G">
+ <transf name="destruct_rec" arg1="H">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ <transf name="destruct_rec" arg1="H1">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ <transf name="destruct_rec" arg1="H2">
+  <goal name="G.0">
   </goal>
  </transf>
  </goal>

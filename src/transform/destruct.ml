@@ -145,6 +145,10 @@ type is_destructed =
 *)
 let destruct_term ~recursive (t: term) =
   let original_decl = t in
+  (* Standard way to know that a lsymbol is a constructor TODO ? *)
+  let is_constructor l =
+    l.ls_constr <> 0
+  in
 
   (* Main function *)
   let rec destruct_term (t: term) =
@@ -198,6 +202,33 @@ let destruct_term ~recursive (t: term) =
              raise (Arg_trans_type ("destruct_exists", ty1, ty2)))
       | [] -> raise (Arg_trans ("destruct_exists"))
       end
+    (* Beginning of cases for injection transformation. With C1, C2 constructors,
+       simplify H: C1 ?a = C1 ?b into ?a = ?b and remove trivial hypothesis of
+       the form H: C1 <> C2. *)
+    | Tapp (ls, [{t_node = Tapp (cs1, l1); _}; {t_node = Tapp (cs2, l2); _}])
+      when ls_equal ls ps_equ && is_constructor cs1 && is_constructor cs2 ->
+      (* Cs1 [l1] = Cs2 [l2] *)
+      if ls_equal cs1 cs2 then
+        (* Create new hypotheses for equalities of l1 and l2 *)
+        try
+          [List.map2 (fun x1 x2 ->
+               let equal_term = t_app_infer ps_equ [x1; x2] in
+               Axiom_term equal_term) l1 l2]
+        with
+        | _ -> [[Axiom_term t]]
+      else
+        (* TODO Replace the hypothesis by False or manage to remove the goal. *)
+        [[Axiom_term t_false]]
+
+    | Tnot {t_node = Tapp (ls,
+                  [{t_node = Tapp (cs1, _); _}; {t_node = Tapp (cs2, _); _}]); _}
+        when ls_equal ls ps_equ && is_constructor cs1 && is_constructor cs2 ->
+      (* Cs1 [l1] <> Cs2 [l2] *)
+      if ls_equal cs1 cs2 then
+        [[Axiom_term t]]
+      else
+        (* The hypothesis is trivial because Cs1 <> Cs2 thus useless *)
+        [[]]
     | _ -> raise (Arg_trans ("destruct"))
   in
   destruct_term t
