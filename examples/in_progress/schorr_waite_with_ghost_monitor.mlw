@@ -1,0 +1,267 @@
+
+(** proof of Schorr-Waite algorithm using a ghost monitor
+
+The C code for Schorr-Waite is the following:
+
+typedef struct struct_node {
+  unsigned int m :1, c :1;
+  struct struct_node *l, *r;
+} * node;
+
+void schorr_waite(node root) {
+  node t = root;
+  node p = NULL;
+  while (p != NULL || (t != NULL && ! t->m)) {
+    if (t == NULL || t->m) {
+      if (p->c) { /* pop */
+	node q = t; t = p; p = p->r; t->r = q;
+      }
+      else { /* swing */
+	node q = t; t = p->r; p->r = p->l; p->l = q; p->c = 1;
+      }
+    }
+    else { /* push */
+      node q = p; p = t; t = t->l; p->l = q; p->m = 1; p->c = 0;
+    }
+  }
+}
+
+The informal specification is
+
+- the graph structure induced by pointer `l` and `r` is restored into its original shape
+- assuming that initially all the nodes reachable from `root` are unmarked (m is 0) then
+  at exit all those nodes are marked.
+- the nodes initially unreachable from `root` have their mark unchanged
+
+*)
+
+(** Component-as-array memory model, with null pointers *)
+module Memory
+
+  use int.Int
+  use option.Option
+  use map.Map
+
+  (** Memory locations *)
+  type loc
+
+  (** null pointer *)
+  val constant null : loc
+
+  (** pointer equality *)
+  val (=) (l1 l2:loc) : bool
+    ensures { result <-> l1 = l2 }
+
+  type memory = abstract {
+    mutable left : map loc loc;
+    mutable right : map loc loc;
+    mutable mark : map loc bool;
+    mutable color : map loc bool;
+  }
+
+  (** Global instance for memory *)
+  val memo : memory
+
+  (** Getters/setters for pointers *)
+  val get_l (l:loc) : loc
+    requires { l <> null }
+    reads { memo }
+    ensures { result = memo.left[l] }
+  val get_r (l:loc) : loc
+    requires { l <> null }
+    reads { memo }
+    ensures { result = memo.right[l] }
+  val get_m (l:loc) : bool
+    requires { l <> null }
+    reads { memo }
+    ensures { result = memo.mark[l] }
+  val get_c (l:loc) : bool
+    requires { l <> null }
+    reads { memo }
+    ensures { result = memo.color[l] }
+  val set_l (l:loc) (d:loc) : unit
+    requires { l <> null }
+    writes { memo.left }
+    ensures { memo.left = (old memo.left)[l <- d] }
+  val set_r (l:loc) (d:loc) : unit
+    requires { l <> null }
+    writes { memo.right }
+    ensures { memo.right = (old memo.right)[l <- d] }
+  val set_m (l:loc) (m:bool) : unit
+    requires { l <> null }
+    writes { memo.mark }
+    ensures { memo.mark = old (memo.mark[l <- m]) }
+  val set_c (l:loc) (c:bool) : unit
+    requires { l <> null }
+    writes { memo.color }
+    ensures { memo.color = old (memo.color[l <- c]) }
+
+end
+
+
+
+(** Define notions about the memory graph *)
+module GraphShape
+
+  use int.Int
+  use set.Fset
+  use map.Map
+  use Memory
+
+  (** Edges *)
+  predicate edge (m:memory) (x y:loc) =
+    x <> null /\ (m.left[x] = y \/ m.right[x] = y)
+
+  (** Paths *)
+  inductive path memory (x y:loc) =
+    | path_nil : forall m x. path m x x
+    | path_cons : forall m x y z. edge m x y /\ path m y z -> path m x z
+
+  (** DFS invariant. For technical reason, it must refer to different parts
+     of the memory at different time. The graph structure is given
+     via the initial memory `m`, but the coloring is given via the current one `mark`. *)
+  predicate well_colored_on (graph gray:set loc) (m:memory) (mark:map loc bool) =
+    subset gray graph /\
+    (forall x. mem x gray -> mark[x]) /\
+    (forall x y. mem x graph /\ edge m x y /\ y <> null /\ mark[x] ->
+      mem x gray \/ mark[y])
+
+  (** Unchanged only concerns the graph shape, not the marks *)
+  predicate unchanged (m1 m2:memory) =
+    forall x. x <> null ->
+      m2.left[x] = m1.left[x] /\ m2.right[x] = m1.right[x]
+
+end
+
+
+
+
+module SchorrWaite
+
+  use int.Int
+  use option.Option
+  use set.Fset
+  use map.Map
+  use map.Const
+  use ref.Ref
+  use Memory
+  use GraphShape
+
+  (** step function for low-level Schorr-Waite algorithm
+
+    while L0: (p != NULL || (t != NULL && ! t->m)) {
+    L1:
+    if (t == NULL || t->m) {
+      if (p->c) { /* pop */
+	node q = t; t = p; p = p->r; t->r = q;
+      }
+      else { /* swing */
+	node q = t; t = p->r; p->r = p->l; p->l = q; p->c = 1;
+      }
+    }
+    else { /* push */
+      node q = p; p = t; t = t->l; p->l = q; p->m = 1; p->c = 0;
+    }
+  }
+  L2:
+
+  *)
+  val pc : ref int
+  val t : ref loc
+  val p : ref loc
+
+  val step () : unit
+    requires { 0 <= !pc < 2 }
+    writes { pc,t,p,memo }
+    ensures { old !pc = 0 /\ (!p <> null \/ (!t <> null && not memo.mark[!t])) -> !pc = 1 }
+    ensures { old !pc = 0 /\ not (!p <> null \/ (!t <> null && not memo.mark[!t])) -> !pc = 2 }
+    ensures { old !pc = 1 /\ (!t = null || memo.mark[!t]) /\ memo.color[!p] -> (* pop *)
+                (* q = t *) let q = old !t in let o = old !p in
+                (* t = p *) !t = o /\
+                (* p = p->r *) !p = old (memo.right[o]) /\
+                (* t->r = q (t is old p here!) *) memo.right = old (memo.right[o <- q]) /\
+                !pc = 0 }
+    ensures { old !pc = 1 /\ (!t = null || memo.mark[!t]) /\ not memo.color[!p] -> (* swing *)
+                (* q = t *) let q =old !t in let o = old !p in
+                (* t = p->r *) !t = old (memo.right[o]) /\
+                (* p->r = p->l *) memo.right = old (memo.right[o <- memo.left[o]]) /\
+                (* p->l = q *) memo.left = old (memo.left[o <- q]) /\
+                (* p->c = 1 *) memo.color = old (memo.color[o <- true]) /\
+                !pc = 0 }
+    ensures { old !pc = 1 /\ not (!t = null || memo.mark[!t]) -> (* push *)
+                (* q = p *) let q = old !p in let o = old !t in
+                (* p = t *) !p = o /\
+                (* t = t->l *) !t = old (memo.left[o]) /\
+                (* p->l = q (p is old t here!) *) memo.left = old (memo.left[o <- q]) /\
+                (* p->m = 1 *) memo.mark = old (memo.color[o <- true]) /\
+                (* p->c = 0 *) memo.color = old (memo.color[o <- false]) /\
+                !pc = 0 }
+
+  (* the monitor performs a depth-first search from current node `!t` *)
+  let rec monitor (ghost initial_memo:memory) (ghost graph: set loc) (ghost gray_nodes:set loc) : unit
+      requires { !pc = 0 }
+      (* DFS invariant *)
+      requires { well_colored_on graph gray_nodes initial_memo memo.mark }
+      requires { mem !t graph }
+      (* Non-marked nodes have unchanged structure with
+          respect to the initial one. *)
+      requires { forall x. x <> null /\ not memo.mark[x] ->
+          memo.left[x] = initial_memo.left[x] /\ memo.right[x] = initial_memo.right[x]
+        }
+      ensures { !pc = 2 }
+      (* 'stack frames' are maintained correctly *)
+      ensures { !t = old !t /\ !p = old !p }
+      (* Pointer buffer is left unchanged *)
+      ensures { unchanged (old memo) memo }
+      (* Maintain DFS invariant *)
+      ensures { well_colored_on graph gray_nodes initial_memo memo.mark }
+      (* The top node get marked *)
+      ensures { !t <> null -> memo.mark[!t] }
+      (* May not mark unreachable node, neither change marked node. *)
+      ensures { forall x. x <> null ->
+        not path initial_memo !t x \/ not (old memo.mark[x]) ->
+        memo.mark[x] = (old memo.mark)[x] }
+      (* Terminates because there is a limited number of 'grayable' nodes. *)
+      variant { cardinal graph - cardinal gray_nodes }
+    = step (); (* checks condition of the while loop *)
+      if !pc = 1 then (* we entered the loop *)
+        begin
+        let ghost new_gray = add !t gray_nodes in
+        step ();
+        monitor initial_memo graph new_gray; (* traverse the left child *)
+        monitor initial_memo graph new_gray; (* traverse the right child *)
+        end
+
+
+  let schorr_waite (root: loc) (ghost graph: set loc) : unit
+    (** Root belong to graph (note: for simplicity, the graph set
+        may (and likely does) contain the null pointer. *)
+    requires { mem root graph }
+    (** Graph is closed by following edges *)
+    requires { forall l.
+      mem l graph /\ l <> null ->
+      mem memo.left[l] graph /\ mem memo.right[l] graph }
+    writes { memo,pc,t,p }
+    (** The graph starts fully unmarked. *)
+    requires { forall x. mem x graph -> not memo.mark[x] }
+    (** The graph structure is left unchanged. *)
+    ensures { unchanged (old memo) memo }
+    (** Every non-null location reachable from the root is marked black. *)
+    ensures { forall x. path (old memo) root x /\ x <> null ->
+      memo.mark[x] }
+    (** Every other location is left with its previous color. *)
+    ensures { forall x. not path (old memo) root x /\ x <> null ->
+      memo.mark[x] = (old memo.mark)[x] }
+  =
+    pc := 0;
+    t := root;
+    p := null;
+    monitor (pure {memo}) graph empty;
+
+   (* Need induction to recover path-based specification. *)
+   (*   assert { forall x y m. m = memo at I /\ x <> null /\ y <> null /\
+        mem x graph /\ black memo.colors[x] ->
+        ([@induction] path m x y) -> black memo.colors[y] }
+   *)
+
+end
