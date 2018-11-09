@@ -21,8 +21,12 @@ why3:
 dir:
 	mkdir -p build
 
+MLWFILES= $(addsuffix .mlw, toom logical div mul sub add compare util)
+
 cfiles: why3 dir
-	$(WHY3) extract -D c -L . --recursive --modular --interface -o build/ wmpn.mlw
+	$(WHY3) extract -D c -L . --recursive --modular --interface -o build/ \
+	wmpn.mlw
+	#$(MLWFILES)
 
 extract: why3 dir cfiles
 

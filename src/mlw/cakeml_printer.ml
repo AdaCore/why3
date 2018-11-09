@@ -240,8 +240,6 @@ module Print = struct
         forget_let_defn let_def
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
-    | Ehole -> ()
-    | Eany _ -> assert false
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
@@ -425,6 +423,10 @@ module Print = struct
   let rec print_decl info fmt = function
     | Dlet ldef ->
         print_let_def info fmt ldef
+    | Dval ({pv_vs}, _) ->
+        let loc = pv_vs.vs_name.id_loc in
+        Loc.errorm ?loc "cannot extract top-level undefined constant %a@."
+          (print_lident info) pv_vs.vs_name
     | Dtype dl ->
         print_list newline (print_type_decl info) fmt dl
     | Dexn (xs, None) ->
