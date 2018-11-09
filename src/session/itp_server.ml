@@ -1364,13 +1364,52 @@ end
             P.notify (Next_Unproven_Node_Id (ni, node_ID_from_any any))
       end
 
+  (* [move_source_file d from_file to_file]: Move a source file from the IDE
+     both in the session and on the filesystem.
+     [from_file] and [to_file] are relative to the session directory.
+  *)
+  let move_source_file d from_file to_file =
+    let s = d.cont.controller_session in
+    let session_dir = Session_itp.get_dir s in
+    let abs_from_file = Filename.concat session_dir from_file in
+    let abs_to_file = Filename.concat session_dir to_file in
+    if Sys.file_exists abs_to_file then
+      let msg = Format.sprintf "File %s should not exist" abs_to_file in
+      P.notify (Message (Error msg))
+    else
+      if not (Sys.file_exists abs_from_file) || Sys.is_directory abs_from_file then
+        let msg = Format.sprintf "Incorrect file: %s" abs_from_file in
+        (* Should not happen as this is sent by IDE *)
+        P.notify (Message (Error msg))
+      else
+        begin
+          C.interrupt ();
+          Sys.rename abs_from_file abs_to_file;
+          let msg = "File successfully moved: reloading session..." in
+          P.notify (Message (Information msg));
+          (try
+            (* Ignore the result session because we do not reload *)
+            let (_: session) = move_file ~shape_version:None ~check_reload:false
+                 d.cont.controller_env s from_file to_file in
+            let msg = "Filename successfully changed in session" in
+            P.notify (Message (Information msg))
+          with _ ->
+            begin
+              Sys.rename abs_to_file abs_from_file;
+              let msg = "Error when changing the session name. Switching filenames back and reload..." in
+              P.notify (Message (Information msg))
+            end);
+          reload_session ();
+        end
+
    (* Check if a request is valid (does not suppose existence of obsolete node_id) *)
    let request_is_valid r =
      match r with
      | Save_req | Check_need_saving_req | Reload_req
      | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
-     | Exit_req | Get_global_infos | Itp_communication.Unfocus_req -> true
+     | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
+     | Move_source_req _ -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
@@ -1398,6 +1437,8 @@ end
     | Reload_req                   ->
        reload_session ();
        session_needs_saving := true
+    | Move_source_req (from_file, to_file) ->
+       move_source_file d from_file to_file
     | Get_first_unproven_node ni   ->
        notify_first_unproven_node d ni
     | Remove_subtree nid           ->

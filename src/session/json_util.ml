@@ -168,6 +168,7 @@ let convert_request_constructor (r: ide_request) =
   | Remove_subtree _          -> String "Remove_subtree"
   | Copy_paste _              -> String "Copy_paste"
   | Get_first_unproven_node _ -> String "Get_first_unproven_node"
+  | Move_source_req _         -> String "Move_source_req"
   | Unfocus_req               -> String "Unfocus_req"
   | Save_req                  -> String "Save_req"
   | Check_need_saving_req     -> String "Check_need_saving_req"
@@ -223,6 +224,10 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Get_first_unproven_node id ->
       convert_record ["ide_request", cc r;
                       "node_ID", Int id]
+  | Move_source_req (from_file, to_file) ->
+      convert_record ["ide_request", cc r;
+                      "from_file", String from_file;
+                      "to_file", String to_file]
   | Check_need_saving_req
   | Unfocus_req
   | Save_req
@@ -455,6 +460,11 @@ let parse_request (constr: string) j =
   | "Get_first_unproven_node" ->
     let nid = get_int (get_field j "node_ID") in
     Get_first_unproven_node nid
+
+  | "Move_source_req" ->
+    let from_file = get_string (get_field j "from_file") in
+    let to_file = get_string (get_field j "to_file") in
+    Move_source_req (from_file, to_file)
 
   | "Add_file_req" ->
     let f = get_string (get_field j "file") in

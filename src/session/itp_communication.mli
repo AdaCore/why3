@@ -135,6 +135,9 @@ type ide_request =
   | Save_file_req           of string * string
   (** [Save_file_req(filename, content_of_file)] saves the file *)
   | Get_first_unproven_node of node_ID
+  | Move_source_req         of string * string
+  (** [Move_source_req(from_file, to_file)] request to move source [from_file]
+      to location [to_file]. file path are given relative to session directory. *)
   | Unfocus_req
   | Save_req
   | Reload_req
