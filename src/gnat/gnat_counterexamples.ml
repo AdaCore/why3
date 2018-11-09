@@ -65,10 +65,7 @@ let apply_to_record (list_records: (string list) Mstr.t) (t: term) =
                     | Record (_, a) -> acc @ a
                     | _ -> (s,e) :: acc)
                   else
-                    if s = "attr__constrained" then
-                      acc
-                    else
-                      (s, e) :: acc)
+                    (s, e) :: acc)
                   [] fields l
               in
               Record (s, new_st)
