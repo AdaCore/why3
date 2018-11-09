@@ -217,12 +217,12 @@ let translate_module =
       Ident.Hid.add memo name pm;
       pm
 
-let not_extractable_theories = ["why3"; "map"; ]
+(* let not_extractable_theories = ["why3"; "map"; ] *)
 
-let is_not_extractable_theory =
-  let h = Hstr.create 16 in
-  List.iter (fun s -> Hstr.add h s ()) not_extractable_theories;
-  Hstr.mem h
+(* let is_not_extractable_theory = *)
+(*   let h = Hstr.create 16 in *)
+(*   List.iter (fun s -> Hstr.add h s ()) not_extractable_theories; *)
+(*   Hstr.mem h *)
 
 let translate ?decl m = match decl with
   | None   -> (translate_module m).Mltree.mod_decl
@@ -232,7 +232,7 @@ let extract_to =
   let memo = Ident.Hid.create 16 in
   fun ?fname ?decl m deps ->
     match m.mod_theory.th_path with
-    | t::_ when is_not_extractable_theory t -> false
+    | "why3"::_ -> false
     | _ -> let name = m.mod_theory.th_name in
         if not (Ident.Hid.mem memo name) then begin
           let mdecls = translate ?decl m in
@@ -349,7 +349,7 @@ let rec visit ~recurs mm id =
     match path_th with
     (* this test avoids symbols from the Why3's standard library (e.g. Tuples_n)
        to get extracted *)
-    | t::_ when is_not_extractable_theory t -> ()
+    | "why3"::_ -> ()
     | _ -> let d = find_decl mm id in
         Ident.Hid.add visited id ();
         if recurs then Mltree.iter_deps (visit ~recurs mm) d;
