@@ -405,6 +405,7 @@ end
 module ocaml.Pervasives
   syntax exception Exit             "Pervasives.Exit"
   syntax exception Not_found        "Not_found"
+  syntax exception AssertFailure    "REMOVE"
   syntax val       ocaml_assert     "assert (%1)"
   syntax exception Invalid_argument "Invalid_argument \"\""
   syntax val       succ             "succ %1"
