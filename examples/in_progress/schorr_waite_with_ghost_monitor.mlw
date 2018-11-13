@@ -317,6 +317,26 @@ module SchorrWaiteBis
   use Memory
   use GraphShape
 
+  let schorr_waite (root : loc) (ghost graph : set loc) : unit
+    (** Root belong to graph (note: for simplicity, the graph set may (and likely does)
+        contain the null pointer. *)
+    requires { mem root graph }
+    (** Graph is closed by following edges *)
+    requires { forall l. mem l graph /\ l <> null ->
+      mem memo.left[l] graph /\ mem memo.right[l] graph }
+    writes { memo }
+    (** The graph starts fully unmarked. *)
+    requires { forall x. mem x graph -> not memo.mark[x] }
+    (** The graph structure is left unchanged. *)
+    ensures  { unchanged (old memo) memo }
+    (** Every non-null location reachable from the root is marked. *)
+    ensures  { forall x. path (old memo) root x /\ x <> null ->
+      memo.mark[x] }
+    (** Every other location is left with its previous marking. *)
+    ensures { forall x. not path (old memo) root x /\ x <> null ->
+      memo.mark[x] = (old memo.mark)[x] }
+
+
   (** step function for low-level Schorr-Waite algorithm
 
   L0:
@@ -338,17 +358,11 @@ module SchorrWaiteBis
   L2:
 
   *)
-
-  (* Extract parameters (including ghosts) of the main monitor
-     at top-level so that they are visible in step as well
-     (only [root] need to be extracted, [graph] extracted for uniformity only) *)
-  val root : loc
-  val ghost graph : set loc
-
+=
   (* Non-memory internal state *)
-  val pc : ref int
-  val t : ref loc
-  val p : ref loc
+  let pc = ref 0 in
+  let t = ref null in
+  let p = ref null in
 
   (* Step function *)
   let step () : unit
@@ -401,33 +415,9 @@ module SchorrWaiteBis
        end
       else pc := 2
     else absurd
-
-  let schorr_waite () : unit
-    (** The program begins execution. *)
-    requires { !pc = 0 }
-    (** Root belong to graph (note: for simplicity, the graph set may (and likely does)
-        contain the null pointer. *)
-    requires { mem root graph }
-    (** Graph is closed by following edges *)
-    requires { forall l. mem l graph /\ l <> null ->
-      mem memo.left[l] graph /\ mem memo.right[l] graph }
-    writes { memo,pc,t,p }
-    (** The graph starts fully unmarked. *)
-    requires { forall x. mem x graph -> not memo.mark[x] }
-    (** The program is indeed done executing. *)
-    ensures  { !pc = 2 }
-    (** The graph structure is left unchanged. *)
-    ensures  { unchanged (old memo) memo }
-    (** Every non-null location reachable from the root is marked. *)
-    ensures  { forall x. path (old memo) root x /\ x <> null ->
-      memo.mark[x] }
-    (** Every other location is left with its previous marking. *)
-    ensures { forall x. not path (old memo) root x /\ x <> null ->
-      memo.mark[x] = (old memo.mark)[x] }
-  =
-    step (); (* Initialize *)
-    let ghost initial_memo = pure {memo} in (* Copy of initial memory *)
-    let rec monitor (ghost gray_nodes: set loc) : unit
+  in
+  let ghost initial_memo = pure {memo} in (* Copy of initial memory *)
+  let rec recursive_monitor (ghost gray_nodes: set loc) : unit
       requires { !pc = 1 }
       (* DFS invariant *)
       requires { well_colored_on graph gray_nodes initial_memo memo.mark }
@@ -457,13 +447,15 @@ module SchorrWaiteBis
       let ghost new_gray = add !t gray_nodes in
       (* assert { path initial_memo !t !t }; *)
       step (); (* Push *)
-      monitor new_gray; (* traverse the left child *)
+      recursive_monitor new_gray; (* traverse the left child *)
       step (); (* Swing *)
-      monitor new_gray; (* traverse the right child *)
+      recursive_monitor new_gray; (* traverse the right child *)
       step () (* Pop *)
     in
-    monitor empty;
+    step (); (* Initialize *)
+    recursive_monitor empty;
     step (); (* Exit. *)
+    assert { !pc = 2 };
     (* Need induction to recover path-based specification. *)
     assert { forall x y. ([@induction] path initial_memo x y) ->
         x <> null /\ y <> null /\ mem x graph /\ memo.mark[x] ->
