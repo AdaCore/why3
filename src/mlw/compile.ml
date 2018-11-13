@@ -642,7 +642,7 @@ module Transform = struct
     | Evar pv -> begin try Mpv.find pv subst, Spv.singleton pv
         with Not_found -> e, Spv.empty end
     | Elet (Lvar (pv, ({e_effect = eff1} as e1)), e2)
-      when Sattr.mem Expr.proxy_attr pv.pv_vs.vs_name.id_attrs &&
+      when Sattr.mem proxy_attr pv.pv_vs.vs_name.id_attrs &&
            eff_pure eff1 &&
            can_inline e1 e2 ->
         let e1, s1 = expr info subst e1 in
