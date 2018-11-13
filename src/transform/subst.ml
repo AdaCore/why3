@@ -171,14 +171,16 @@ let rec occurs_in_term ls t =
   | Tapp(ls',[]) when ls_equal ls' ls -> true
   | _ -> t_any (occurs_in_term ls) t
 
+(* [true] if [ls] is a proxy symbol *)
+let ls_is_proxy ls = Sattr.mem proxy_attr ls.ls_name.id_attrs
+
 (* [true] if [t] is exactly a proxy symbol *)
-let is_proxy t =
+let t_is_proxy t =
   match t.t_node with
-  | Tapp (ls, []) ->
-      Sattr.exists (fun a -> attr_equal a proxy_attr) ls.ls_name.id_attrs
+  | Tapp (ls, []) -> ls_is_proxy ls
   | _ -> false
 
-(* [find_equalities subst_to_proxy filter t] searches in task [t] for equalities
+(* [find_equalities subst_proxy filter t] searches task [t] for equalities
    of the form constant = term or term = constant, where constant does
    not occur in the term.  That function returns first the set of
    prsymbols for the equalities found, and second a map from the
@@ -186,18 +188,20 @@ let is_proxy t =
    normalized in the sense that the terms on the right are fully
    substituted, for example if the equalities "x=t" and "y=x+u" are
    found, then the map contains "x -> t" and "y ->t+u".  The [filter]
-   function applys a generic filter to the constants that can be taken
+   function applies a generic filter to the constants that can be taken
    into consideration.  if several equalities occur for the same
    constant, the first one is considered.
-   [subst_to_proxy]: If false, we don't register equalities which are a direct
-   substitution to a proxy variable (from a non-proxy variable).
+   [subst_proxy]: If false, we don't register equalities which
+   substitute a proxy variable into a non-proxy variable.
  *)
-let find_equalities ~subst_to_proxy filter =
-  let valid ls t2 =
+let find_equalities ~subst_proxy filter =
+  let valid ls =
     ls.ls_args = [] && ls.ls_constr = 0 && ls.ls_value <> None &&
     List.for_all Ty.ty_closed (Ty.oty_cons ls.ls_args ls.ls_value) &&
-    filter ls &&
-    (subst_to_proxy || is_proxy (t_app_infer ls []) || not (is_proxy t2))
+    filter ls
+  in
+  let bad_proxy_subst ls t =
+    not subst_proxy && t_is_proxy t && not (ls_is_proxy ls)
   in
   let select ls t sigma =
     let () = Debug.dprintf debug_subst "selected: %a -> %a@."
@@ -217,20 +221,20 @@ let find_equalities ~subst_to_proxy filter =
              begin
                try match t1.t_node with
                | Tapp (ls, []) when
-                      valid ls t2 &&
-                        not (Mls.mem ls sigma) ->
+                      valid ls && not (Mls.mem ls sigma) ->
                   let t2' = subst_in_term sigma t2 in
-                  if occurs_in_term ls t2' then raise Exit
-                  else (Spr.add pr prs, select ls t2' sigma)
+                  if occurs_in_term ls t2' then raise Exit else
+                  if bad_proxy_subst ls t2' then raise Exit else
+                  (Spr.add pr prs, select ls t2' sigma)
                | _ -> raise Exit
                with Exit ->
                     match t2.t_node with
                     | Tapp (ls, []) when
-                           valid ls t1 &&
-                             not (Mls.mem ls sigma) ->
+                           valid ls && not (Mls.mem ls sigma) ->
                        let t1' = subst_in_term sigma t1 in
-                       if occurs_in_term ls t1' then acc
-                       else (Spr.add pr prs, select ls t1' sigma)
+                       if occurs_in_term ls t1' then acc else
+                       if bad_proxy_subst ls t1' then acc else
+                       (Spr.add pr prs, select ls t1' sigma)
                     | _ -> acc
              end
           | _ -> acc
@@ -239,10 +243,11 @@ let find_equalities ~subst_to_proxy filter =
         List.fold_left
           (fun ((prs,sigma) as acc) (ls,ld) ->
            let _, t = open_ls_defn ld in
-           if valid ls t && not (Mls.mem ls sigma) then
+           if valid ls && not (Mls.mem ls sigma) then
              let t' = subst_in_term sigma t in
-             if occurs_in_term ls t' then acc
-             else (prs, select ls t' sigma)
+             if occurs_in_term ls t' then acc else
+             if bad_proxy_subst ls t' then acc else
+             (prs, select ls t' sigma)
            else acc)
           acc
           ld
@@ -255,11 +260,11 @@ let get_decls =
 let apply_subst x t =
   apply_subst x (List.rev (Trans.apply get_decls t))
 
-let subst_filtered ~subst_to_proxy filter =
-  Trans.bind (find_equalities ~subst_to_proxy filter)
+let subst_filtered ~subst_proxy filter =
+  Trans.bind (find_equalities ~subst_proxy filter)
              (fun x -> Trans.store (apply_subst x))
 
-let subst_all = subst_filtered ~subst_to_proxy:false (fun _ -> true)
+let subst_all = subst_filtered ~subst_proxy:false (fun _ -> true)
 
 let () =
   wrap_and_register ~desc:"substitutes with all equalities between a constant and a term"
@@ -274,7 +279,7 @@ let subst tl =
        | Tapp (ls, []) -> Sls.add ls acc
        | _ -> raise (Arg_trans "subst: %a is not a constant")) Sls.empty tl
   in
-  subst_filtered ~subst_to_proxy:true (fun ls -> Sls.mem ls to_subst)
+  subst_filtered ~subst_proxy:true (fun ls -> Sls.mem ls to_subst)
 
 let () =
   wrap_and_register ~desc:"substitutes with all equalities involving one of the given constants"
