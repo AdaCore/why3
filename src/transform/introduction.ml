@@ -293,7 +293,7 @@ let subst_filter ls =
 
 let simplify_intros =
   Trans.compose introduce_premises
-                (Subst.subst_filtered subst_filter)
+                (Subst.subst_filtered ~subst_to_proxy:false subst_filter)
 
 let split_vc =
   Trans.compose_l

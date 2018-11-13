@@ -165,10 +165,11 @@ val id_unique_attr :
 (** Do the same as id_unique except that it tries first to use
     the "name:" attribute to generate the name instead of id.id_string *)
 
+val proxy_attr: attribute
+
 (** {2 Attributes for handling counterexamples} *)
 
 val model_projected_attr : attribute
-
 val model_vc_attr : attribute
 val model_vc_post_attr : attribute
 val model_vc_havoc_attr : attribute
