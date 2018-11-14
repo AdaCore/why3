@@ -347,6 +347,7 @@ type command =
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
   | Edit         of Whyconf.prover
+  | Get_ce
   | Bisect
   | Replay       of bool
   | Clean
@@ -375,6 +376,7 @@ let help_message commands_table =
      @ bisect @\n\
      @ clean @\n\
      @ edit @\n\
+     @ get-ce @\n\
      @ Focus @\n\
      @ help <transformation_name> @\n\
      @ list_ide_command @ \n\
@@ -453,6 +455,13 @@ let interp commands_table cont id s =
                        Edit pa.Session_itp.prover
                     | _ ->  QError ("Please select a proof node in the task tree")
                   end
+               | "get-ce", _ ->
+                   begin
+                     match id with
+                    | Some (Session_itp.APa _) ->
+                       Get_ce
+                    | _ ->  QError ("Please select a proof node in the task tree")
+                   end
                | "bisect", _ ->
                   begin
                     match id with
