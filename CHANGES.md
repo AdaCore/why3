@@ -9,6 +9,12 @@ Transformations
   * "destruct_rec" applies "destruct" recursively on a goal (issue 231).
   * "destruct" now simplifies away equalities on constructors.
 
+Tools
+  * add a command 'why3 session update' to modify sessions from the
+    command line. So far, only one option exists, for renaming files
+    fixes issue #227
+
+
 Version 1.1.0, October 17, 2018
 -------------------------------
 
