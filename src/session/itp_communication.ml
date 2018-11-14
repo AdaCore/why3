@@ -117,7 +117,6 @@ type ide_request =
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string
   | Get_first_unproven_node of node_ID
-  | Move_source_req         of string * string
   | Unfocus_req
   | Save_req
   | Reload_req
@@ -145,7 +144,6 @@ let print_request fmt r =
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
   | Save_file_req _                 -> fprintf fmt "save file"
-  | Move_source_req _               -> fprintf fmt "move source file"
   | Unfocus_req                     -> fprintf fmt "unfocus"
   | Save_req                        -> fprintf fmt "save"
   | Reload_req                      -> fprintf fmt "reload"

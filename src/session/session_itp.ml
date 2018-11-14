@@ -1946,43 +1946,21 @@ let save_session (s : session) =
 (* Edition of session *)
 (**********************)
 
-let move_file ~shape_version ~check_reload env ses from_file to_file =
-  assert (Sys.file_exists (Filename.concat ses.session_dir to_file));
-  assert (not (Sys.is_directory (Filename.concat ses.session_dir to_file)));
-  assert (Filename.check_suffix to_file ".mlw");
-  let files = get_files ses in
-  let key_from_file =
-    (* let exception for OCaml prior to version 4.03 *)
-    let module M = struct exception Found of string end in
+let rename_file s from_file to_file =
+  let src = Sysutil.relativize_filename s.session_dir from_file in
+  let dst = Sysutil.relativize_filename s.session_dir to_file in
+  let files = get_files s in
+  let file =
     try
-      Hstr.iter (fun key file ->
-          if file.file_name = from_file then
-            raise (M.Found key)
-        ) files;
-      None
-    with M.Found s -> Some s
+      Hstr.find files src
+    with Not_found -> failwith ("filename " ^ src ^ " not found in session")
   in
-  match key_from_file with
-  | None -> raise Not_found
-  | Some key_file ->
-      let old_file = Hstr.find files key_file in
-      Hstr.remove files key_file;
-      List.iter (fun th -> th.theory_parent_name <- to_file) old_file.file_theories;
-      let new_file =
-        {old_file with
-         file_name = to_file;
-         file_is_detached = true
-        }
-      in
-      Hstr.add files to_file new_file;
-      (* Only save the new session if the .mlw file [to_file] does not mess with
-         the session: parse/type errors, other errors ?
-      *)
-      if check_reload then
-        let new_ses = empty_session ~from:ses (get_dir ses) in
-        let e_l, _, _ = merge_files ~shape_version env new_ses ses in
-        match e_l with
-        | [] -> save_session new_ses; new_ses
-        | e :: _ -> raise e
-      else
-        (save_session ses; ses)
+  assert (file.file_name = src);
+  assert (Sys.file_exists (Filename.concat s.session_dir src));
+  assert (not (Sys.is_directory (Filename.concat s.session_dir src)));
+  assert (not (Sys.file_exists (Filename.concat s.session_dir dst)));
+  Sys.rename (Filename.concat s.session_dir src) (Filename.concat s.session_dir dst);
+  Hstr.remove files src;
+  List.iter (fun th -> th.theory_parent_name <- dst) file.file_theories;
+  let new_file = { file with file_name = dst } in
+  Hstr.add files dst new_file

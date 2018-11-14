@@ -2241,59 +2241,6 @@ let () =
   connect_menu_item copy_item ~callback:copy;
   connect_menu_item paste_item ~callback:paste
 
-(********************)
-(* Move source file *)
-(********************)
-
-let move_source_file () =
-  let note_page = notebook#current_page in
-  let from_file =
-    let module M = struct exception Found of string end in
-    try
-      Hstr.iter (fun fname (page_num, _, _, _) ->
-          if page_num = note_page then
-            raise (M.Found fname)) source_view_table;
-      None
-    with M.Found fname -> Some fname
-  in
-  match from_file with
-  | None -> print_message ~kind:1 ~notif_kind:"Move file" "select a source file tab to move."
-  | Some from_file ->
-      let to_file =
-        let d = GWindow.file_chooser_dialog ~action:`SAVE
-            ~title:"Select a new file to move to"
-            ()
-        in
-        d#add_button_stock `CANCEL `CANCEL ;
-        d#add_select_button_stock `SAVE `SAVE ;
-        d#add_filter (filter_why_files ()) ;
-        d#add_filter (filter_all_files ()) ;
-        let module M = struct exception Found of string end in
-        try
-          begin match d#run () with
-            | `SAVE ->
-                begin
-                  match d#filename with
-                  | None -> ()
-                  | Some f -> raise (M.Found f)
-                end
-            | `DELETE_EVENT | `CANCEL -> ()
-          end ;
-          d#destroy ();
-          None
-        with M.Found f -> d#destroy (); Some f
-      in
-      match to_file with
-      | None -> print_message ~kind:1 ~notif_kind:"Move file" "Error when selecting file to move to."
-      | Some to_file ->
-          let to_file = Sysutil.relativize_filename !session_dir to_file in
-          notebook#remove_page note_page;
-          Hstr.remove source_view_table from_file;
-          clear_tree_and_table goals_model;
-          send_request (Move_source_req (from_file, to_file))
-
-let () =
-  connect_menu_item move_source_file_item ~callback:move_source_file
 
 (**********************************)
 (* Notification handling (part 2) *)

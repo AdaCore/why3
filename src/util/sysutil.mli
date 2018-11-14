@@ -76,10 +76,3 @@ val uniquify : string -> string
 (** find filename that doesn't exists based on the given filename.
     Be careful the file can be taken after the return of this function.
 *)
-
-val cannonical : string -> string
-(** Give a cannonical name to an existing file. Done by chdir to this files
-    directory and getting the current working directory from there.
-    TODO: find a better solution that works with both non-existing files, all
-    OS, and potential symbolic links in filesystems.
-*)

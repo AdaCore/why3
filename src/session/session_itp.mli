@@ -160,13 +160,18 @@ val add_file_section :
 (** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
     subsections corresponding to theories [ths]. The tasks of each
-    theory nodes generated are computed using [Task.split_theory]. *)
+    theory nodes generated are computed using [Task.split_theory].
+
+    Note that this function does not read anything from the file
+    system. The file name [fn] is taken as is
+
+ *)
 
 val read_file :
   Env.env -> ?format:Env.fformat -> string -> Theory.theory list
 (* [read_file env ~format fn] parses the source file [fn], types it
-   and extract its theories.  Parse errors and typing errors are
-   signaled with exceptions.  *)
+   and extract its theories. A parse error or a typing error is
+   signaled with exceptions .  *)
 
 val merge_files :
   shape_version:int option ->
@@ -285,12 +290,7 @@ val change_prover : notifier -> session -> proofNodeID -> Whyconf.prover -> Whyc
 
 (** Edition of session *)
 
-val move_file: shape_version:int option -> check_reload:bool -> Env.env ->
-  session -> string -> string -> session
-(** [move_file shape check_reload env s from_file to_file] This changes the
-    filename in session from [from_file] to [to_file] and reload the session (if
-    [check_reload] is true) so that the session is up to date with what is
-    inside the new [to_file].
-    Returns the current session.
-    [from_file] and [to_file] are paths given relative to the session directory.
+val rename_file: session -> string -> string -> unit
+(** [rename_file s from_file to_file] renames the
+    filename in session from [from_file] to [to_file]
 *)
