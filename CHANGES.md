@@ -1,5 +1,14 @@
 :x: marks a potential source of incompatibility
 
+Next Version
+------------
+
+Transformations
+  * "split_vc" and "subst_all" now avoid substituting user symbols to generated
+    one (issue 235). It may breaks session :x:.
+  * "destruct_rec" applies "destruct" recursively on a goal (issue 231).
+  * "destruct" now simplifies away equalities on constructors.
+
 Version 1.1.0, October 17, 2018
 -------------------------------
 
