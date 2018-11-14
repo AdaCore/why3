@@ -290,7 +290,8 @@ val change_prover : notifier -> session -> proofNodeID -> Whyconf.prover -> Whyc
 
 (** Edition of session *)
 
-val rename_file: session -> string -> string -> unit
+val rename_file: session -> string -> string -> string * string
 (** [rename_file s from_file to_file] renames the
     filename in session from [from_file] to [to_file]
+    @return the paths relative to the session dir
 *)

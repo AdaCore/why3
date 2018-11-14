@@ -18,7 +18,13 @@ let do_action ~env ~session action =
   ignore(env);
   match action with
   | RenameFile(src,dst) ->
-      Session_itp.rename_file session src dst
+      let src,dst = Session_itp.rename_file session src dst in
+      let src = Filename.concat (Session_itp.get_dir session) src in
+      let dst = Filename.concat (Session_itp.get_dir session) dst in
+      assert (Sys.file_exists src);
+      assert (not (Sys.is_directory src));
+      assert (not (Sys.file_exists dst));
+      Sys.rename src dst
 
 let run_update () =
   let env,_config,should_exit1 = read_env_spec () in

@@ -372,9 +372,6 @@ let record_warning ?loc msg =
     (Pp.print_option Loc.report_position) loc msg;
   Queue.push (loc,msg) warnings
 
-(* Keep the current session dir in memory *)
-let session_dir = ref ""
-
 let () =
   Warning.set_hook record_warning;
   let dir =
@@ -384,7 +381,6 @@ let () =
       Format.eprintf "Error: %s@." s;
       Whyconf.Args.exit_with_usage spec usage_str
   in
-  session_dir := dir;
   Server.init_server gconfig.config env dir;
   Queue.iter (fun f -> send_request (Add_file_req f)) files;
   send_request Get_global_infos;
@@ -2142,10 +2138,6 @@ let paste_item =
     ~modi:[`CONTROL] ~key:GdkKeysyms._V
     ~tooltip:"Paste the copied node below the current node"
 
-let move_source_file_item =
-  tools_factory#add_item "Move source file"
-    ~tooltip:"Move source file"
-
 (* complete the contextual menu (but only after provers and strategies, hence the function) *)
 
 let complete_context_menu () =
@@ -2240,7 +2232,6 @@ let () =
   paste_item#misc#set_sensitive false;
   connect_menu_item copy_item ~callback:copy;
   connect_menu_item paste_item ~callback:paste
-
 
 (**********************************)
 (* Notification handling (part 2) *)

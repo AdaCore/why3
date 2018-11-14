@@ -1956,11 +1956,8 @@ let rename_file s from_file to_file =
     with Not_found -> failwith ("filename " ^ src ^ " not found in session")
   in
   assert (file.file_name = src);
-  assert (Sys.file_exists (Filename.concat s.session_dir src));
-  assert (not (Sys.is_directory (Filename.concat s.session_dir src)));
-  assert (not (Sys.file_exists (Filename.concat s.session_dir dst)));
-  Sys.rename (Filename.concat s.session_dir src) (Filename.concat s.session_dir dst);
   Hstr.remove files src;
   List.iter (fun th -> th.theory_parent_name <- dst) file.file_theories;
   let new_file = { file with file_name = dst } in
-  Hstr.add files dst new_file
+  Hstr.add files dst new_file;
+  src,dst
