@@ -1,5 +1,11 @@
 :x: marks a potential source of incompatibility
 
+Bug fixes
+  * prevented broken extraction of `any`
+  * fixed evaluation order when extracting nested mutators
+  * fixed extraction of nested recursive polymorphic functions
+  * fixed cloning of expressions raising exceptions
+
 Version 1.1.0, October 17, 2018
 -------------------------------
 
