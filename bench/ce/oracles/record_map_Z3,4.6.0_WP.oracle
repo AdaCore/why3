@@ -25,13 +25,6 @@ rec_map, [[@model_projected], [@introduced],
 "val" : [{"others" : {"type" : "Integer" , "val" : "1" } }] } },
 {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-rec_map.f_map, [[@model_projected], [@introduced],
-[@model_trace:rec_map.f_map]] = {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
-"val" : "1" } }] }
-rec_map.g_map, [[@model_projected], [@introduced],
-[@model_trace:rec_map.g_map]] = {"type" : "Boolean" ,
-"val" : false }
 Line 47:
 rec_map, [[@model_projected], [@introduced],
 [@model_trace:rec_map]] = {"type" : "Record" ,
@@ -39,13 +32,6 @@ rec_map, [[@model_projected], [@introduced],
 "val" : [{"others" : {"type" : "Integer" , "val" : "1" } }] } },
 {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-rec_map.f_map, [[@model_projected], [@introduced],
-[@model_trace:rec_map.f_map]] = {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
-"val" : "1" } }] }
-rec_map.g_map, [[@model_projected], [@introduced],
-[@model_trace:rec_map.g_map]] = {"type" : "Boolean" ,
-"val" : false }
 
 bench/ce/record_map.mlw M VC record_map_proj_test3: Unknown (sat)
 Counter-example model:File record_map.mlw:
@@ -53,55 +39,27 @@ Line 51:
 re_rec_map, [[@model_projected], [@introduced],
 [@model_trace:re_rec_map]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
+"val" : [{"others" : {"type" : "Integer" , "val" : "1" } }] } },
 {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-re_rec_map.f_map, [[@model_projected], [@introduced],
-[@model_trace:re_rec_map.f_map]] = {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
-"val" : "0" } }] }
-re_rec_map.g_map, [[@model_projected], [@introduced],
-[@model_trace:re_rec_map.g_map]] = {"type" : "Boolean" ,
-"val" : false }
 Line 53:
 rec_map, [[@model_projected], [@introduced],
 [@model_trace:rec_map]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" , "val" : "1" } }] } },
+"val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
 {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-rec_map.f_map, [[@model_projected], [@introduced],
-[@model_trace:rec_map.f_map]] = {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
-"val" : "1" } }] }
-rec_map.g_map, [[@model_projected], [@introduced],
-[@model_trace:rec_map.g_map]] = {"type" : "Boolean" ,
-"val" : false }
 Line 54:
 re_rec_map, [[@model_projected], [@introduced],
 [@model_trace:re_rec_map]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
-{"field" : "g_bool" , "value" : {"type" : "Boolean" ,
-"val" : false } }] } }
-re_rec_map.f_map, [[@model_projected], [@introduced],
-[@model_trace:re_rec_map.f_map]] = {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
-"val" : "0" } }] }
-re_rec_map.g_map, [[@model_projected], [@introduced],
-[@model_trace:re_rec_map.g_map]] = {"type" : "Boolean" ,
-"val" : false }
-rec_map, [[@model_projected], [@introduced],
-[@model_trace:rec_map]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" , "val" : "1" } }] } },
 {"field" : "g_bool" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-rec_map.f_map, [[@model_projected], [@introduced],
-[@model_trace:rec_map.f_map]] = {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
-"val" : "1" } }] }
-rec_map.g_map, [[@model_projected], [@introduced],
-[@model_trace:rec_map.g_map]] = {"type" : "Boolean" ,
-"val" : false }
+rec_map, [[@model_projected], [@introduced],
+[@model_trace:rec_map]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f_map" , "value" : {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
+{"field" : "g_bool" , "value" : {"type" : "Boolean" ,
+"val" : false } }] } }
 
