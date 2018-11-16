@@ -34,7 +34,7 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 y, [[@introduced], [@model_trace:y],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "42" } }
+"val" : "0" } }
 Line 31:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "43" }
@@ -45,7 +45,7 @@ y at 'Old, [[@introduced],
 [@model_trace:y], [@at:'Old],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "42" } }
+"val" : "0" } }
 Line 33:
 y, [[@introduced], [@model_trace:y]] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
@@ -57,12 +57,12 @@ Line 39:
 y, [[@introduced], [@model_trace:y],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "1" } }
 Line 41:
 x23, [[@introduced], [@model_trace:x23],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "0" } }
 Line 42:
 x23, [[@introduced], [@model_trace:x23]] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
@@ -70,11 +70,11 @@ x23, [[@introduced], [@model_trace:x23]] = {"proj_name" : "contents" ,
 x23 at 'Old, [[@introduced], [@at:'Old], [@model_trace:x23],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "0" } }
 y at 'Old, [[@introduced], [@model_trace:y], [@at:'Old],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "1" } }
 Line 45:
 y, [[@introduced], [@model_trace:y]] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
@@ -82,7 +82,7 @@ y, [[@introduced], [@model_trace:y]] = {"proj_name" : "contents" ,
 Line 46:
 x23, [[@introduced], [@model_trace:x23]] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "1" } }
 Line 47:
 x23, [[@introduced], [@model_trace:x23]] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
@@ -94,13 +94,13 @@ Line 39:
 y, [[@introduced], [@model_trace:y],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "0" } }
 Line 49:
 x, [[@introduced], [@model_trace:x],
 [@at:'Old:loc:location],
 [@at:L:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "0" } }
 Line 53:
 x, [[@introduced], [@model_trace:x],
 [@at:M:loc:location] = {"proj_name" : "contents" ,
@@ -109,12 +109,12 @@ x, [[@introduced], [@model_trace:x],
 y, [[@introduced],
 [@model_trace:y]] = {"proj_name" : "contents" , "type" : "Proj" ,
 "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "0" } }
 Line 56:
 x at L, [[@introduced], [@model_trace:x], [@at:L],
 [@at:L:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "0" } }
 x at M, [[@introduced], [@model_trace:x], [@at:M],
 [@at:M:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
@@ -131,21 +131,21 @@ Line 39:
 y, [[@introduced], [@model_trace:y],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "3" } }
+"val" : "0" } }
 Line 49:
 x, [[@introduced], [@model_trace:x],
 [@at:'Old:loc:location],
 [@at:L:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "3" } }
+"val" : "0" } }
 Line 53:
 x, [[@introduced], [@model_trace:x],
 [@at:M:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "3" } }
+"val" : "2" } }
 y, [[@introduced],
 [@model_trace:y]] = {"proj_name" : "contents" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "3" } }
+"value" : {"type" : "Integer" , "val" : "0" } }
 Line 55:
 x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
@@ -154,18 +154,18 @@ Line 56:
 x at L, [[@introduced], [@model_trace:x], [@at:L],
 [@at:L:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "3" } }
+"val" : "0" } }
 x at M, [[@introduced], [@model_trace:x], [@at:M],
 [@at:M:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "3" } }
+"val" : "2" } }
 x, [[@introduced],
 [@model_trace:x]] = {"proj_name" : "contents" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "3" } }
+"value" : {"type" : "Integer" , "val" : "2" } }
 Line 58:
 x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "3" } }
+"val" : "2" } }
 
 bench/ce/record_one_field.mlw M VC test_loop: Timeout or Unknown
 Counter-example model:File record_one_field.mlw:
@@ -173,7 +173,7 @@ Line 39:
 y, [[@introduced], [@model_trace:y],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "-2" } }
+"val" : "0" } }
 Line 49:
 x, [[@introduced], [@model_trace:x],
 [@at:'Old:loc:location],
@@ -184,7 +184,7 @@ x, [[@introduced], [@model_trace:x],
 Line 50:
 x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "-2" } }
+"val" : "0" } }
 x at 'Old, [[@introduced], [@model_trace:x], [@at:'Old],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
@@ -193,12 +193,12 @@ Line 53:
 x, [[@introduced], [@model_trace:x],
 [@at:M:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "-2" } }
+"val" : "0" } }
 y, [[@introduced],
 [@model_trace:y]] = {"proj_name" : "contents" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "-2" } }
+"value" : {"type" : "Integer" , "val" : "0" } }
 Line 55:
 x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "-2" } }
+"val" : "0" } }
 
