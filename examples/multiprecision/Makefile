@@ -43,15 +43,15 @@ bench-tests: extract
 
 
 build/why3%bench: extract check-gmp
-	gcc -O3 -Wall -g -std=c11 -DTEST_WHY3 -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -I$(GMP_DIR) -Irandom -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o $@
+	gcc -O2 -Wall -Wno-unused-function -g -std=c11 -DTEST_WHY3 -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -I$(GMP_DIR) -Irandom -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o $@
 
 build/gmp%bench: extract check-gmp
-	gcc -O3 -Wall -g -std=c11 -DTEST_GMP -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -I$(GMP_DIR) -Irandom -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o $@
+	gcc -O2 -Wall -Wno-unused-function -g -std=c11 -DTEST_GMP -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -I$(GMP_DIR) -Irandom -L$(GMP_LIB) -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -lgmp -o $@
 
-#build/minigmp%bench: extract
-#	gcc -O3 -Wall -g -std=c11 -DTEST_MINIGMP -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -I$(GMP_DIR) -Irandom -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -o $@
+build/minigmp%bench: extract
+	gcc -O2 -Wall -Wno-unused-function -g -std=c11 -DTEST_MINIGMP -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -I$(GMP_DIR) -Imini-gmp -Irandom -fomit-frame-pointer -mtune=haswell -march=haswell -fno-tree-vectorize -o $@
 
-alltests: tests build/why3addbench build/why3mulbench build/why3toombench build/why3divbench build/gmpaddbench build/gmpmulbench build/gmptoombench build/gmpdivbench #build/minigmpaddbench build/minigmpmulbench build/minigmpdivbench
+alltests: tests build/why3addbench build/why3mulbench build/why3toombench build/why3divbench build/gmpaddbench build/gmpmulbench build/gmptoombench build/gmpdivbench build/minigmpaddbench build/minigmpmulbench build/minigmpdivbench build/minigmptoombench
 
 data: alltests
 	mkdir -p bench
@@ -63,9 +63,10 @@ data: alltests
 	./build/gmpmulbench > bench/gmpmul
 	./build/gmptoombench > bench/gmptoom
 	./build/gmpdivbench > bench/gmpdiv
-#	./build/minigmpaddbench > bench/minigmpadd
-#	./build/minigmpmulbench > bench/minigmpmul
-#	./build/minigmpdivbench > bench/minigmpdiv
+	./build/minigmpaddbench > bench/minigmpadd
+	./build/minigmpmulbench > bench/minigmpmul
+	./build/minigmptoombench > bench/minigmptoom # minigmp uses schoolbook mul in that case too
+	./build/minigmpdivbench > bench/minigmpdiv
 
 plots: data
 	make all -C plots
