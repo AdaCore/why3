@@ -11,8 +11,7 @@
 
    This program had been proved correct using Coq and an early version of
    Why back in 2003, by Laurent Théry (INRIA Sophia-Antipolis): Laurent Théry,
-   Proving Pearl: Knuth's Algorithm for Prime Numbers, TPHOLs 2003
-
+   Proving Pearl: Knuth's Algorithm for Prime Numbers, TPHOLs 2003.
    Truly a tour de force, this proof includes the full proof of Bertrand's
    postulate in Coq. Here, we simply focus on the program verification part,
    posing Bertrand's postulate as a lemma that we do not prove.
@@ -61,7 +60,7 @@ module PrimeNumbers
 
   (** `prime_numbers m` returns an array containing the first `m`
   prime numbers *)
-  let prime_numbers (m: int)
+  let prime_numbers (m: int) : array int
     requires { m >= 2 }
     ensures  { result.length = m }
     ensures  { first_primes result.elts m }
@@ -112,3 +111,4 @@ module PrimeNumbers
      t
 
 end
+
