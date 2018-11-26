@@ -152,9 +152,6 @@ let attrs_has_expl attrs =
 
 let annot_attrs = Sattr.add stop_split (Sattr.singleton annot_attr)
 
-(* TODO: remove this line, and use "annot_attr" instead *)
-let annot_attrs = Sattr.add Ident.model_vc_attr annot_attrs
-
 let vc_expl loc attrs expl f =
   let attrs = Sattr.union annot_attrs (Sattr.union attrs f.t_attrs) in
   let attrs = if attrs_has_expl attrs then attrs else Sattr.add expl attrs in
@@ -1373,9 +1370,7 @@ let rec sp_expr kn k rdm dst = match k with
         sp_and (t_and_l (cons_t_simp (t_var n) t fl)) sp in
       let sp = Mpv.fold update dst t_true in
       let sp = sp_exists (Mvs.keys fvs) sp in
-      let attrs = Ident.model_vc_havoc_attr in
-      let attrs = Sattr.add attrs sp.t_attrs in
-      let sp = t_attr_set ?loc attrs sp in
+      let sp = t_attr_set ?loc sp.t_attrs sp in
       let add_rhs _ rhs rd = match rhs with
         | Some v -> Spv.add v rd | None -> rd in
       let add_rhs _ = Mpv.fold add_rhs in

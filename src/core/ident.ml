@@ -342,9 +342,7 @@ let sanitizer head rest n = sanitizer' head rest rest n
 let proxy_attr = create_attribute "mlw:proxy_symbol"
 
 let model_projected_attr = create_attribute "model_projected"
-let model_vc_attr = create_attribute "model_vc"
 let model_vc_post_attr = create_attribute "model_vc_post"
-let model_vc_havoc_attr = create_attribute "model_vc_havoc"
 
 let create_model_trace_attr s = create_attribute ("model_trace:" ^ s)
 

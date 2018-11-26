@@ -33,7 +33,7 @@ type vc_term_info = {
 }
 
 let is_model_vc_attr l =
-  attr_equal l model_vc_attr || attr_equal l model_vc_post_attr
+  attr_equal l Ity.annot_attr || attr_equal l model_vc_post_attr
 
 let check_enter_vc_term t info vc_loc =
   (* Check whether the term that triggers VC is entered.

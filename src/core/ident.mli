@@ -170,9 +170,7 @@ val proxy_attr: attribute
 (** {2 Attributes for handling counterexamples} *)
 
 val model_projected_attr : attribute
-val model_vc_attr : attribute
 val model_vc_post_attr : attribute
-val model_vc_havoc_attr : attribute
 
 val has_a_model_attr : ident -> bool
 (** [true] when [ident] has one of the attributes above *)
