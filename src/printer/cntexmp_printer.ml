@@ -84,14 +84,14 @@ let check_enter_vc_term t in_goal vc_term_info =
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if in_goal && Sattr.mem Ident.model_vc_attr t.t_attrs then begin
+  if in_goal && Sattr.mem Ity.annot_attr t.t_attrs then begin
     vc_term_info.vc_inside <- true;
     vc_term_info.vc_loc <- t.t_loc
   end
 
 let check_exit_vc_term t in_goal info =
   (* Check whether the term triggering VC is exited. *)
-  if in_goal && Sattr.mem Ident.model_vc_attr t.t_attrs then begin
+  if in_goal && Sattr.mem Ity.annot_attr t.t_attrs then begin
     info.vc_inside <- false;
   end
 
