@@ -9,10 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-
-
-
-
 open Wstdlib
 
 module Hprover = Whyconf.Hprover
@@ -38,7 +34,7 @@ let print_proofAttemptID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
-  theory_parent_name            : string;
+  mutable theory_parent_name    : string;
   theory_is_detached            : bool;
 }
 
@@ -1598,9 +1594,6 @@ let merge_file_section ~use_shapes ~old_ses ~old_theories ~file_is_detached ~env
   f.file_theories <- theories (*@ detached*);
   update_file_node (fun _ -> ()) s f
 
-
-
-
 let read_file env ?format fn =
   let theories = Env.read_file Env.base_language env ?format fn in
   let ltheories =
@@ -1915,3 +1908,23 @@ let save_session (s : session) =
   session_dir_for_save := s.session_dir;
   let fs = if Compress.compression_supported then fz else fs in
   save f fs s
+
+(**********************)
+(* Edition of session *)
+(**********************)
+
+let rename_file s from_file to_file =
+  let src = Sysutil.relativize_filename s.session_dir from_file in
+  let dst = Sysutil.relativize_filename s.session_dir to_file in
+  let files = get_files s in
+  let file =
+    try
+      Hstr.find files src
+    with Not_found -> failwith ("filename " ^ src ^ " not found in session")
+  in
+  assert (file.file_name = src);
+  Hstr.remove files src;
+  List.iter (fun th -> th.theory_parent_name <- dst) file.file_theories;
+  let new_file = { file with file_name = dst } in
+  Hstr.add files dst new_file;
+  src,dst

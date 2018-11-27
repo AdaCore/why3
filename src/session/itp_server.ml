@@ -73,7 +73,6 @@ let unproven_goals_below_id cont id =
   | ATh th     ->
      List.rev (unproven_goals_below_th cont [] th)
 
-
 (****** Exception handling *********)
 
 let p s id =

@@ -165,9 +165,9 @@ val reload_files : controller -> use_shapes:bool -> bool * bool
 *)
 
 val add_file : controller -> ?format:Env.fformat -> string -> unit
-(** [add_fil cont ?fmt fname] parses the source file
+(** [add_file cont ?fmt fname] parses the source file
     [fname] and add the resulting theories to the session of [cont].
-    parsing or typing errors are raised inside exception Errors_list
+    parsing or typing errors are raised inside exception [Errors_list]
  *)
 
 val remove_subtree: notification:notifier -> removed:notifier ->
