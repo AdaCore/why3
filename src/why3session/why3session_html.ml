@@ -180,7 +180,7 @@ let rec num_lines s acc tr =
     fprintf fmt "<td style=\"background-color:#%a\" colspan=\"%d\">"
       (color_of_status ~dark:false) (pn_proved s g)
       (max_depth - depth + 1);
-    fprintf fmt "%a</td>" Pp.html_string (get_proof_name s g).Ident.id_string;
+    fprintf fmt "%a</td>" Pp.html_string (goal_full_name s g);
     print_results fmt s provers (get_proof_attempt_ids s g);
     fprintf fmt "</tr>@\n";
     List.iter
@@ -259,8 +259,9 @@ struct
       (print_ul (print_goal s)) (get_sub_tasks s tr)
 
   and print_goal s fmt g =
+
     fprintf fmt "<li>%a : <ul>%a%a</ul></li>"
-      Pp.html_string (get_proof_name s g).Ident.id_string
+      Pp.html_string (goal_full_name s g)
       (Pp.print_iter2 Hprover.iter Pp.newline Pp.nothing
          Pp.nothing (print_proof_attempt s))
       (get_proof_attempt_ids s g)

@@ -176,7 +176,7 @@ let rec goal_latex_stat s fmt prov depth depth_max subgoal g =
       end;
     if (depth <= 1) then
       fprintf fmt "\\explanation{%s} "
-              (protect (get_proof_name s g).Ident.id_string)
+              (protect (goal_full_name s g))
     else
       fprintf fmt " " ;
     let proofs = get_proof_attempt_ids s g in
@@ -230,14 +230,14 @@ let rec goal_latex2_stat s fmt prov depth depth_max subgoal g =
   if Hprover.length proofs > 0 then
     begin
       style_2_row fmt depth prov subgoal
-                  (protect (get_proof_name s g).Ident.id_string);
+                  (protect (goal_full_name s g));
       print_result_prov s proofs prov fmt
     end
  else
     if (*depth = 0*) true then
       begin
         style_2_row fmt depth prov subgoal
-                    (protect (get_proof_name s g).Ident.id_string);
+                    (protect (goal_full_name s g));
 	fprintf fmt "& \\multicolumn{%d}{|c|}{}\\\\ @."
           (List.length prov)
       end;

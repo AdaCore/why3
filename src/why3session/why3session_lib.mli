@@ -117,6 +117,9 @@ val get_transf_string : Session_itp.session -> Session_itp.transID -> string
 (** [get_transf_string s tr] concatenates the name of transformation [tr]
     in session [s] with its arguments *)
 
+val goal_full_name : Session_itp.session ->  Session_itp.proofNodeID -> string
+(** name of goal, taking account explanation *)
+
 val goal_depth : Session_itp.session -> Session_itp.proofNodeID -> int
 (** [goal_depth s g] returns the depth of the tree under goal
     [g] in session [s] *)
