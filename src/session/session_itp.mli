@@ -288,10 +288,15 @@ val change_prover : notifier -> session -> proofNodeID -> Whyconf.prover -> Whyc
    status is set to obsolete.
  *)
 
-(** Edition of session *)
+(** Extra session update operations *)
 
 val rename_file: session -> string -> string -> string * string
 (** [rename_file s from_file to_file] renames the
-    filename in session from [from_file] to [to_file]
+    file section in session [s] named [from_file] into [to_file]
     @return the paths relative to the session dir
-*)
+
+    Beware that this function does not have any effect on the user's
+    file system: if the considered files corresponds the real files,
+    they must be renamed independently. See for example the use in
+    [why3session/why3session_update].
+  *)
