@@ -326,18 +326,39 @@ let init_cont () =
           (Pp.sprintf "could not add file %s to the session: %a"
              Gnat_config.filename (Pp.print_list Pp.space Exn_printer.exn_printer) l)
   end;
+
   (* Init why3server *)
   init ();
   if is_new_session then c
   else
-    try
-      let (_ : bool), (_ : bool) = Controller_itp.reload_files c ~use_shapes in
-      c
-    with
-    | Controller_itp.Errors_list l ->
-      Gnat_util.abort_with_message ~internal:true
-        (Pp.sprintf "could not reload files of the session: %a"
-           (Pp.print_list Pp.space Exn_printer.exn_printer) l)
+    begin
+      let ses = c.Controller_itp.controller_session in
+      let ses_dir = Session_itp.get_dir ses in
+      (* Filenames saved inside the session *)
+      let file = ref "" in
+      let () = (* Find the file defined in the session *)
+        let files = Session_itp.get_files ses in
+        Hstr.iter (fun k _ ->
+            if !file = "" then file := k else
+              Gnat_util.abort_with_message ~internal:true
+                "Several files found in session")
+          files
+      in
+      let abs_file = Sysutil.absolutize_filename ses_dir !file in
+      (if abs_file != Gnat_config.filename then
+         (* rename_file takes absolute filenames *)
+         let (_: string* string) =
+           Session_itp.rename_file ses abs_file Gnat_config.filename in
+         ());
+      try
+        let (_ : bool), (_ : bool) = Controller_itp.reload_files c ~use_shapes in
+        c
+      with
+      | Controller_itp.Errors_list l ->
+        Gnat_util.abort_with_message ~internal:true
+          (Pp.sprintf "could not reload files of the session: %a"
+             (Pp.print_list Pp.space Exn_printer.exn_printer) l)
+    end
 
 let objective_status obj =
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
