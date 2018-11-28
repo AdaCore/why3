@@ -289,7 +289,7 @@ let () = Trans.register_transform
 
 let subst_filter ls =
   Sattr.mem intro_attr ls.ls_name.id_attrs &&
-  not (Ident.has_a_model_attr ls.ls_name)
+  not (relevant_for_counterexample ls.ls_name)
 
 let simplify_intros =
   Trans.compose introduce_premises

@@ -355,6 +355,10 @@ let is_counterexample_attr a =
 let has_a_model_attr id =
   Sattr.exists is_counterexample_attr id.id_attrs
 
+let relevant_for_counterexample id =
+  (Sattr.for_all (fun a -> not (attr_equal a proxy_attr)) id.id_attrs &&
+   id.id_loc <> None) || (has_a_model_attr id)
+
 let remove_model_attrs ~attrs =
   Sattr.filter (fun l -> not (is_counterexample_attr l)) attrs
 
@@ -397,12 +401,14 @@ let get_model_element_name ~attrs =
   | [_] -> ""
   | _ -> assert false
 
-let get_model_trace_string ~attrs =
-  let tl = get_model_trace_attr ~attrs in
-  let splitted = Strings.bounded_split ':' tl.attr_string 2 in
-  match splitted with
-  | [_; t_str] -> t_str
-  | _ -> ""
+let get_model_trace_string ~name ~attrs =
+  match get_model_trace_attr ~attrs with
+  | exception Not_found -> name
+  | tl ->
+      let splitted = Strings.bounded_split ':' tl.attr_string 2 in
+      match splitted with
+      | [_; t_str] -> t_str
+      | _ -> ""
 
 
 (* Functions for working with ITP attributes *)
