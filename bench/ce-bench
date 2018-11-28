@@ -77,7 +77,9 @@ run () {
         # TODO temporary as this comes from incorrect locations generated in
         # a[i] <- x like terms.
         sed -r 's/\:loc\:.*\]/\:loc\:location\]/' >> "$f.out"
-    if cmp "${oracle_file}" "$f.out" > /dev/null 2>&1 ; then
+    str_oracle=$(tr -d ' \n' < "${oracle_file}")
+    str_out=$(tr -d ' \n' < "$f.out")
+    if [ "$str_oracle" = "$str_out" ] ; then
         echo "ok"
     else
         if $updateoracle; then

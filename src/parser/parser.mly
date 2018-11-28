@@ -18,31 +18,8 @@
 
   let floc s e = Loc.extract (s,e)
 
-  let debug_auto_model = Debug.register_flag
-    ~desc:"When set, model attributes are not added during parsing"
-    "no_auto_model"
-
   let add_attr id l = (* id.id_ats is usually nil *)
     { id with id_ats = List.rev_append id.id_ats l }
-
-  let add_model_trace_attr id =
-    if Debug.test_flag debug_auto_model then id else
-    let is_model_trace_attr l =
-      match l with
-      | ATpos _ -> false
-      | ATstr attr -> Ident.is_model_trace_attr attr
-    in
-    if List.exists is_model_trace_attr id.id_ats then id else
-      let l =
-        (ATstr (Ident.create_model_trace_attr id.id_str))
-        :: id.id_ats in
-      { id with id_ats = l }
-
-  let add_model_attrs (b : binder) =
-    match b with
-    | (loc, Some id, ghost, ty) ->
-      (loc, Some (add_model_trace_attr id), ghost, ty)
-    | _ -> b
 
   let id_anonymous loc = { id_str = "_"; id_ats = []; id_loc = loc }
 
@@ -515,7 +492,7 @@ type_case:
 
 constant_decl:
 | attrs(lident_rich) cast preceded(EQUAL,term)?
-  { { ld_ident = add_model_trace_attr $1;
+  { { ld_ident = $1;
       ld_params = []; ld_type = Some $2;
       ld_def = $3; ld_loc = floc $startpos $endpos } }
 
@@ -742,7 +719,7 @@ single_term_:
 | MATCH term WITH match_cases(term) END
     { Tcase ($2, $4) }
 | quant comma_list1(quant_vars) triggers DOT term
-    { let l = List.map add_model_attrs (List.concat $2) in
+    { let l = List.concat $2 in
       Tquant ($1, l, $3, $5) }
 | FUN binders ARROW term
     { Tquant (Dterm.DTlambda, $2, [], $4) }
@@ -887,7 +864,7 @@ fun_defn:
       let spec = apply_return pat (spec_union $3 $5) in
       let id = mk_id return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, mask, $6) } in
-      Efun (List.map add_model_attrs $1, ty, mask, spec, e) }
+      Efun ($1, ty, mask, spec, e) }
 
 fun_decl:
 | params1 return_opt spec
@@ -1363,16 +1340,16 @@ let_pat_uni_:
 (* One-variable binders *)
 
 sym_binder: (* let and val without parameters *)
-|     attrs(lident_rich)  { add_model_trace_attr $1 }
-| AMP attrs(lident_nq)    { add_model_trace_attr (set_ref $2) }
+|     attrs(lident_rich)  { $1 }
+| AMP attrs(lident_nq)    { set_ref $2 }
 
 var_binder: (* pattern variables *)
-|     attrs(lident_nq)    { add_model_trace_attr $1 }
-| AMP attrs(lident_nq)    { add_model_trace_attr (set_ref $2) }
+|     attrs(lident_nq)    { $1 }
+| AMP attrs(lident_nq)    { set_ref $2 }
 
 ref_binder: (* let ref and val ref *)
-|     attrs(lident_nq)    { add_model_trace_attr (set_ref $1) }
-| AMP attrs(lident_nq)    { add_model_trace_attr (double_ref $2) }
+|     attrs(lident_nq)    { set_ref $1 }
+| AMP attrs(lident_nq)    { double_ref $2 }
 
 (* Qualified idents *)
 

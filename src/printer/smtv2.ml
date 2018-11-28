@@ -198,7 +198,7 @@ let print_var_list info fmt vsl =
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
     info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
-  if ls.ls_args = [] && (has_a_model_attr ls.ls_name) then
+  if ls.ls_args = [] && (relevant_for_counterexample ls.ls_name) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
@@ -224,8 +224,8 @@ let number_format = {
 (** expr *)
 let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
-
-  if Sattr.exists is_model_trace_attr t.t_attrs then
+  if check_for_counterexample t
+  then
     info.info_model <- add_model_element t info.info_model;
 
   check_enter_vc_term t info.info_in_goal info.info_vc_term;
@@ -319,7 +319,8 @@ let rec print_term info fmt t =
 
 and print_fmla info fmt f =
   debug_print_term "Printing formula: " f;
-  if Sattr.exists is_model_trace_attr f.t_attrs then
+  if check_for_counterexample f
+  then
     info.info_model <- add_model_element f info.info_model;
 
   check_enter_vc_term f info.info_in_goal info.info_vc_term;
@@ -498,7 +499,7 @@ let print_info_model info =
       let model_map =
 	S.fold (fun f acc ->
           let s = asprintf "%a" (print_fmla info) f in
-	  Mstr.add s f acc)
+          Mstr.add s f acc)
 	info_model
 	Mstr.empty in
 
