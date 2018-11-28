@@ -350,14 +350,14 @@ let is_model_trace_attr a =
   Strings.has_prefix "model_trace:" a.attr_string
 
 let is_counterexample_attr a =
-  is_model_trace_attr a || a = model_projected_attr
+  is_model_trace_attr a || attr_equal a model_projected_attr
 
 let has_a_model_attr id =
   Sattr.exists is_counterexample_attr id.id_attrs
 
 let relevant_for_counterexample id =
-  (Sattr.for_all (fun a -> not (attr_equal a proxy_attr)) id.id_attrs &&
-   id.id_loc <> None) || (has_a_model_attr id)
+  (id.id_loc <> None && not (Sattr.mem proxy_attr id.id_attrs))
+  || has_a_model_attr id
 
 let remove_model_attrs ~attrs =
   Sattr.filter (fun l -> not (is_counterexample_attr l)) attrs
