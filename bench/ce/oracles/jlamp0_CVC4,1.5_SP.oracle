@@ -7,10 +7,11 @@ a, [[@introduced]] = {"type" : "Integer" ,
 Line 8:
 b, [[@introduced]] = {"type" : "Integer" ,
 "val" : "3" }
+Line 11:
+a, [[@introduced]] = {"type" : "Integer" ,
+"val" : "3" }
 Line 12:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "0" }
-b, [[@introduced], [@model_trace:b]] = {"type" : "Integer" ,
 "val" : "3" }
 
 bench/ce/jlamp0.mlw M VC p1: Timeout or Unknown
@@ -22,16 +23,25 @@ Line 8:
 b, [[@introduced]] = {"type" : "Integer" ,
 "val" : "3" }
 Line 10:
-a, [] = {"type" : "Integer" ,
+a, [] = {"type" : "Integer" , "val" : "9" }
+a, [[@introduced],
+[@model_trace:a]] = {"type" : "Integer" ,
 "val" : "9" }
+Line 11:
+a, [[@introduced]] = {"type" : "Integer" ,
+"val" : "10" }
 
 bench/ce/jlamp0.mlw M VC p2: Timeout or Unknown
 Counter-example model:File jlamp0.mlw:
 Line 6:
 a, [[@introduced]] = {"type" : "Integer" ,
 "val" : "0" }
+Line 20:
+c, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
 Line 22:
-the check fails with all inputs
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "1" }
 
 bench/ce/jlamp0.mlw M VC p2: Valid
 bench/ce/jlamp0.mlw M VC p2: Timeout or Unknown
@@ -43,11 +53,21 @@ File jlamp0.mlw:
 Line 6:
 a, [[@introduced]] = {"type" : "Integer" ,
 "val" : "0" }
+Line 20:
+c, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
 Line 21:
-the check fails with all inputs
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "4" }
 Line 23:
 a, [] = {"type" : "Integer" ,
 "val" : "3" }
+Line 24:
+c, [] = {"type" : "Integer" ,
+"val" : "4" }
+Line 25:
+a, [[@introduced]] = {"type" : "Integer" ,
+"val" : "5" }
 
 bench/ce/jlamp0.mlw M VC p2: Timeout or Unknown
 Counter-example model:File ref.mlw:
@@ -58,11 +78,21 @@ File jlamp0.mlw:
 Line 6:
 a, [[@introduced]] = {"type" : "Integer" ,
 "val" : "0" }
+Line 20:
+c, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
 Line 22:
-the check fails with all inputs
+c, [[@introduced], [@model_trace:c]] = {"type" : "Integer" ,
+"val" : "12" }
 Line 23:
 a, [] = {"type" : "Integer" ,
 "val" : "3" }
+Line 25:
+a, [[@introduced]] = {"type" : "Integer" ,
+"val" : "13" }
+Line 26:
+c, [[@introduced]] = {"type" : "Integer" ,
+"val" : "12" }
 
 bench/ce/jlamp0.mlw M VC p2: Timeout or Unknown
 Counter-example model:File ref.mlw:
@@ -73,9 +103,20 @@ File jlamp0.mlw:
 Line 6:
 a, [[@introduced]] = {"type" : "Integer" ,
 "val" : "0" }
+Line 20:
+c, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
 Line 23:
-a, [] = {"type" : "Integer" ,
-"val" : "9" }
+a, [] = {"type" : "Integer" , "val" : "9" }
+a, [[@introduced],
+[@model_trace:a]] = {"type" : "Integer" ,
+"val" : "11" }
+Line 25:
+a, [[@introduced]] = {"type" : "Integer" ,
+"val" : "11" }
+Line 26:
+c, [[@introduced]] = {"type" : "Integer" ,
+"val" : "4" }
 
 bench/ce/jlamp0.mlw M VC p2: Timeout or Unknown
 Counter-example model:File ref.mlw:
@@ -87,6 +128,11 @@ Line 6:
 a, [[@introduced]] = {"type" : "Integer" ,
 "val" : "0" }
 Line 19:
-a, [] = {"type" : "Integer" ,
+a, [] = {"type" : "Integer" , "val" : "3" }
+a, [[@introduced],
+[@model_trace:a]] = {"type" : "Integer" ,
 "val" : "3" }
+Line 20:
+c, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
 

@@ -24,6 +24,11 @@ x at 'Old, [[@introduced], [@at:'Old],
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
+x, [[@introduced],
+[@model_trace:x]] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }] } }
 y at 'Old, [[@introduced], [@at:'Old],
 [@model_trace:y],
 [@at:'Old:loc:location] = {"type" : "Record" ,
@@ -44,21 +49,32 @@ x, [[@introduced],
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-Line 22:
-x at M, [[@at:M],
+Line 19:
+x, [[@introduced],
 [@at:M:loc:location] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
-x, [] = {"type" : "Record" ,
+Line 21:
+x, [[@introduced]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "12" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
+Line 22:
 x at L, [[@introduced], [@at:L], [@model_trace:x],
 [@at:L:loc:location] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
+x at M, [[@introduced], [@at:M], [@model_trace:x],
+[@at:M:loc:location] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
+"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+x, [[@introduced],
+[@model_trace:x]] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
+"value" : {"type" : "Integer" , "val" : "12" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" , "val" : false } }] } }
 y, [[@introduced],
 [@model_trace:y]] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
 "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,

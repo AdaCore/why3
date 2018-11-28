@@ -24,11 +24,17 @@ a at 'Old, [[@at:'Old], [@at:'Old:loc:location],
 "val" : [{"others" : {"type" : "Integer" , "val" : "4" } }] } },
 {"field" : "length" , "value" : {"type" : "Integer" ,
 "val" : "2" } }] } }
-Line 40:
-a at 'Old, [[@introduced], [@at:'Old], [@model_trace:a],
-[@at:'Old:loc:location] = {"type" : "Record" ,
+a, [] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" , "val" : "4" } }] } },
-{"field" : "length" , "value" : {"type" : "Integer" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "42" } },
+{"others" : {"type" : "Integer" , "val" : "4" } }] } }, {"field" : "length" ,
+"value" : {"type" : "Integer" ,
+"val" : "2" } }] } }
+Line 40:
+a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "42" } },
+{"others" : {"type" : "Integer" , "val" : "4" } }] } }, {"field" : "length" ,
+"value" : {"type" : "Integer" ,
 "val" : "2" } }] } }
 

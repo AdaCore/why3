@@ -33,16 +33,15 @@ a, [[@introduced],
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "2" } }
 Line 21:
-a at 'Old, [[@introduced], [@at:'Old], [@model_trace:a],
-[@at:'Old:loc:location] = {"proj_name" : "to_int1" ,
-"type" : "Proj" , "value" : {"type" : "Integer" ,
+a, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" , "val" : "2" } }
+a, [[@introduced],
+[@model_trace:a]] = {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" ,
 "val" : "2" } }
 three, [[@model_trace:three]] = {"proj_name" : "to_int1" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "3" } }
-two, [[@model_trace:two]] = {"proj_name" : "to_int1" ,
-"type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
 
 bench/ce/jlamp_array.mlw Array VC g: Valid
 bench/ce/jlamp_array.mlw Array VC g: Timeout or Unknown
@@ -61,20 +60,24 @@ a, [[@introduced],
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "2" } }
 Line 27:
-a at 'Old, [[@introduced], [@at:'Old], [@model_trace:a],
-[@at:'Old:loc:location] = {"proj_name" : "to_int1" ,
-"type" : "Proj" , "value" : {"type" : "Integer" ,
+a, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" , "val" : "2" } }
+a, [[@introduced],
+[@model_trace:a]] = {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" ,
 "val" : "2" } }
 three, [[@model_trace:three]] = {"proj_name" : "to_int1" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "3" } }
-two, [[@model_trace:two]] = {"proj_name" : "to_int1" ,
-"type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
 
 bench/ce/jlamp_array.mlw Array VC h: Valid
 bench/ce/jlamp_array.mlw Array VC h: Timeout or Unknown
-Counter-example model:File jlamp_array.mlw:
+Counter-example model:File array.mlw:
+Line 32:
+a, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" ,
+"val" : "2" } }
+File jlamp_array.mlw:
 Line 11:
 two, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
 "value" : {"type" : "Integer" ,
@@ -89,14 +92,10 @@ a, [[@introduced],
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "2" } }
 Line 33:
-a at 'Old, [[@introduced], [@at:'Old], [@model_trace:a],
-[@at:'Old:loc:location] = {"proj_name" : "to_int1" ,
+a, [[@introduced], [@model_trace:a]] = {"proj_name" : "to_int1" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "2" } }
 three, [[@model_trace:three]] = {"proj_name" : "to_int1" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "3" } }
-two, [[@model_trace:two]] = {"proj_name" : "to_int1" ,
-"type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
 

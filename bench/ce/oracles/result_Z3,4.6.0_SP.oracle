@@ -8,26 +8,27 @@ Line 9:
 b, [[@introduced]] = {"type" : "Integer" ,
 "val" : "3" }
 Line 11:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
-"val" : "0" }
-b, [[@introduced], [@model_trace:b]] = {"type" : "Integer" ,
+a, [] = {"type" : "Integer" , "val" : "3" }
+a, [[@introduced],
+[@model_trace:a]] = {"type" : "Integer" ,
 "val" : "3" }
 
 bench/ce/result.mlw M VC f: Timeout or Unknown
-Counter-example model:File ref.mlw:
-Line 20:
-a, [] = {"type" : "Integer" ,
-"val" : "0" }
-File result.mlw:
+Counter-example model:File result.mlw:
 Line 16:
 A, [[@introduced], [@model], [@model_trace:A],
 [@at:'Old:loc:location] = {"type" : "Integer" ,
 "val" : "42" }
 Line 18:
-A, [[@introduced], [@model], [@model_trace:A]] = {"type" : "Integer" ,
+a, [] = {"type" : "Integer" , "val" : "1" }
+A, [[@introduced], [@model],
+[@model_trace:A]] = {"type" : "Integer" ,
 "val" : "1" }
 A at 'Old, [[@introduced], [@at:'Old], [@model],
 [@model_trace:A],
 [@at:'Old:loc:location] = {"type" : "Integer" ,
 "val" : "42" }
+Line 19:
+A, [[@introduced], [@model], [@model_trace:A]] = {"type" : "Integer" ,
+"val" : "0" }
 

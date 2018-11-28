@@ -1,6 +1,22 @@
 Strongest Postcondition
 bench/ce/if_assign.mlw Test VC f: Timeout or Unknown
+Counter-example model:File if_assign.mlw:
+Line 10:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "42" }
+Line 12:
+x, [[@introduced]] = {"type" : "Integer" ,
+"val" : "42" }
+
 bench/ce/if_assign.mlw Test VC f2: Timeout or Unknown
+Counter-example model:File if_assign.mlw:
+Line 16:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "42" }
+Line 18:
+x, [[@introduced]] = {"type" : "Integer" ,
+"val" : "42" }
+
 bench/ce/if_assign.mlw Test VC f3: Timeout or Unknown
 Counter-example model:File int.mlw:
 Line 16:
@@ -26,7 +42,8 @@ a, [] = {"type" : "Integer" ,
 "val" : "0" }
 File if_assign.mlw:
 Line 34:
-the check fails with all inputs
+x, [[@introduced]] = {"type" : "Integer" ,
+"val" : "42" }
 
 bench/ce/if_assign.mlw Test VC f4: Valid
 bench/ce/if_assign.mlw Test VC f4: Timeout or Unknown
@@ -42,6 +59,6 @@ File if_assign.mlw:
 Line 31:
 the check fails with all inputs
 Line 34:
-x, [] = {"type" : "Integer" ,
+x, [[@introduced]] = {"type" : "Integer" ,
 "val" : "0" }
 
