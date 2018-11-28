@@ -8,7 +8,7 @@ two, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
 Line 14:
 three, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
 "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "3" } }
 Line 18:
 a, [[@introduced]] = {"proj_name" : "to_int1" , "type" : "Proj" ,
 "value" : {"type" : "Integer" , "val" : "2" } }
@@ -25,7 +25,7 @@ two, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
 "val" : "2" } }
 Line 14:
 three, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "2" } }
+"value" : {"type" : "Integer" , "val" : "3" } }
 Line 18:
 a, [[@introduced],
 [@at:'Old:loc:location],
@@ -41,7 +41,7 @@ a, [[@introduced],
 "val" : "2" } }
 three, [[@model_trace:three]] = {"proj_name" : "to_int1" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "3" } }
 
 bench/ce/jlamp_array.mlw Array VC g: Valid
 bench/ce/jlamp_array.mlw Array VC g: Timeout or Unknown
@@ -52,7 +52,7 @@ two, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
 "val" : "2" } }
 Line 14:
 three, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "2" } }
+"value" : {"type" : "Integer" , "val" : "3" } }
 Line 24:
 a, [[@introduced],
 [@at:'Old:loc:location],
@@ -68,7 +68,7 @@ a, [[@introduced],
 "val" : "2" } }
 three, [[@model_trace:three]] = {"proj_name" : "to_int1" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "3" } }
 
 bench/ce/jlamp_array.mlw Array VC h: Valid
 bench/ce/jlamp_array.mlw Array VC h: Timeout or Unknown
@@ -84,7 +84,7 @@ two, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
 "val" : "2" } }
 Line 14:
 three, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "2" } }
+"value" : {"type" : "Integer" , "val" : "3" } }
 Line 30:
 a, [[@introduced],
 [@at:'Old:loc:location],
@@ -97,5 +97,5 @@ a, [[@introduced], [@model_trace:a]] = {"proj_name" : "to_int1" ,
 "val" : "2" } }
 three, [[@model_trace:three]] = {"proj_name" : "to_int1" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "2" } }
+"val" : "3" } }
 

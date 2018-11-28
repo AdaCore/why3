@@ -56,14 +56,14 @@ bench/ce/records.mlw M VC record_match_eval_test44: Timeout or Unknown
 Counter-example model:File ref.mlw:
 Line 18:
 x, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
-"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 File records.mlw:
 Line 42:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : "-1" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 
 bench/ce/records.mlw M VC record_match_eval_test44: Valid
@@ -71,7 +71,7 @@ bench/ce/records.mlw M VC test_record_match_eval_test5: Timeout or Unknown
 Counter-example model:File ref.mlw:
 Line 18:
 x, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
-"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 File records.mlw:
@@ -87,7 +87,7 @@ re, [[@introduced], [@model_trace:re]] = {"type" : "Record" ,
 "val" : false } }] } }
 x, [[@introduced],
 [@model_trace:x]] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
-"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 

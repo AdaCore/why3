@@ -43,11 +43,11 @@
   <goal name="VC valuation.6" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC valuation.6.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="1.22"/></proof>
+   <proof prover="0"><result status="valid" time="1.69"/></proof>
    </goal>
    <goal name="VC valuation.6.1" expl="postcondition" proved="true">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
-   <proof prover="5"><result status="valid" time="0.01" steps="21"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="22"/></proof>
    </goal>
   </transf>
   </goal>
@@ -215,13 +215,13 @@
    <goal name="VC valuation_times_nondiv.6.1" expl="assertion" proved="true">
    <transf name="apply" proved="true" arg1="valuation_mul">
     <goal name="VC valuation_times_nondiv.6.1.0" expl="apply premises" proved="true">
-    <proof prover="4"><result status="valid" time="0.01"/></proof>
+    <proof prover="5"><result status="valid" time="0.02" steps="28"/></proof>
     </goal>
     <goal name="VC valuation_times_nondiv.6.1.1" expl="apply premises" proved="true">
     <proof prover="4"><result status="valid" time="0.02"/></proof>
     </goal>
     <goal name="VC valuation_times_nondiv.6.1.2" expl="apply premises" proved="true">
-    <proof prover="5"><result status="valid" time="0.02" steps="28"/></proof>
+    <proof prover="4"><result status="valid" time="0.01"/></proof>
     </goal>
    </transf>
    </goal>
@@ -255,19 +255,19 @@
   <goal name="valuation_prod.4" proved="true">
   <transf name="apply" proved="true" arg1="valuation_zero_prod">
    <goal name="valuation_prod.4.0" expl="apply premises" proved="true">
-   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="22"/></proof>
    </goal>
    <goal name="valuation_prod.4.1" expl="apply premises" proved="true">
-   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   <proof prover="5"><result status="valid" time="0.02" steps="22"/></proof>
    </goal>
    <goal name="valuation_prod.4.2" expl="apply premises" proved="true">
    <proof prover="4"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="valuation_prod.4.3" expl="apply premises" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="22"/></proof>
+   <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="valuation_prod.4.4" expl="apply premises" proved="true">
-   <proof prover="5"><result status="valid" time="0.02" steps="22"/></proof>
+   <proof prover="4"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
@@ -302,20 +302,20 @@
   <goal name="valuation_prod.11" proved="true">
   <transf name="apply" proved="true" arg1="valuation_times_nondiv">
    <goal name="valuation_prod.11.0" expl="apply premises" proved="true">
-   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   <transf name="split_vc" proved="true" >
+    <goal name="valuation_prod.11.0.0" expl="apply premises" proved="true">
+    <proof prover="4"><result status="valid" time="0.03"/></proof>
+    </goal>
+    <goal name="valuation_prod.11.0.1" expl="apply premises" proved="true">
+    <proof prover="4"><result status="valid" time="0.02"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="valuation_prod.11.1" expl="apply premises" proved="true">
    <proof prover="4"><result status="valid" time="0.00"/></proof>
    </goal>
    <goal name="valuation_prod.11.2" expl="apply premises" proved="true">
-   <transf name="split_vc" proved="true" >
-    <goal name="valuation_prod.11.2.0" expl="apply premises" proved="true">
-    <proof prover="4"><result status="valid" time="0.03"/></proof>
-    </goal>
-    <goal name="valuation_prod.11.2.1" expl="apply premises" proved="true">
-    <proof prover="4"><result status="valid" time="0.02"/></proof>
-    </goal>
-   </transf>
+   <proof prover="4"><result status="valid" time="0.01"/></proof>
    </goal>
   </transf>
   </goal>
