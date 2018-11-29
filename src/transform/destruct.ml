@@ -149,6 +149,11 @@ let destruct_term ~recursive (t: term) =
     l.ls_constr <> 0
   in
 
+  (* Check if a new goal is created in the branch *)
+  let contains_goal l =
+    List.exists (fun x -> match x with | Goal_term _ -> true | _ -> false) l
+  in
+
   (* Main function *)
   let rec destruct_term (t: term) =
     let destruct_term_exception t =
@@ -163,12 +168,23 @@ let destruct_term ~recursive (t: term) =
         let l1 = destruct_term_exception t1 in
         let l2 = destruct_term_exception t2 in
         (* For each parallel branch of l1 we have to append *all* parallel
-           branch of l2. *)
+           branch of l2 which are not new goals. In case of new goals, we are
+           not allowed to use the left/right conclusions to prove the goal.
+           Example:
+           H: (A -> (B /\ C) /\ (C -> A)
+           Goal g: C
+        *)
         (* TODO efficiency: this is not expected to work on very large terms
            with tons of Tand/Tor. *)
         List.fold_left (fun par_acc seq_list1 ->
-            List.fold_left (fun par_acc seq_list2 ->
-                par_acc @ ([seq_list1 @ seq_list2])) par_acc l2
+            if contains_goal seq_list1 then
+              par_acc @ [seq_list1]
+            else
+              List.fold_left (fun par_acc seq_list2 ->
+                  if contains_goal seq_list2 then
+                    par_acc @ [seq_list2]
+                  else
+                    par_acc @ [seq_list1 @ seq_list2]) par_acc l2
           ) [] l1
     | Tbinop (Tor, t1, t2) ->
         let l1 = destruct_term_exception t1 in

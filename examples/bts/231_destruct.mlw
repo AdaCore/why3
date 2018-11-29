@@ -25,6 +25,31 @@ module T2
   goal G : (forall x. p1 x \/ p2 x \/ p3 x) -> 1 = 1
 end
 
+module Unsoundness
+
+  predicate a
+  predicate b
+  predicate c
+  (* Here if we do things badly we could use a on the right to prove the new 
+     hypothesis a on the left (and vice versa with b) 
+     This should not be provable.
+  *)
+  axiom H: (a -> (c /\ b)) /\ (b -> a)
+  goal t1: c
+
+end
+
+module Incompleteness
+
+  predicate a
+  predicate b
+  predicate c
+
+  axiom H: (a -> (c /\ b)) /\ (b -> a) /\ a
+  goal t1: c
+
+end
+
 module Imbrication
   predicate p1
   predicate p2
