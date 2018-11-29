@@ -134,7 +134,7 @@ type is_destructed =
   | Param of Decl.decl
   | Goal_term of term
 
-(* [destruct_term ~original_decl ~decl_name t]: This destroys a headterm and
+(* [destruct_term ~decl_name t]: This destroys a headterm and
      generate an appropriate lists of goals/declarations that can be used by
      decl_goal_l.
 
@@ -144,7 +144,6 @@ type is_destructed =
    which are eventually converted to disjoint tasks.
 *)
 let destruct_term ~recursive (t: term) =
-  let original_decl = t in
   (* Standard way to know that a lsymbol is a constructor TODO ? *)
   let is_constructor l =
     l.ls_constr <> 0
@@ -192,11 +191,10 @@ let destruct_term ~recursive (t: term) =
         (try
            let part_t = t_subst_single x tx te in
            let new_t = t_quant_close Texists tl tr part_t in
-           (* TODO remove original_decl here ? *)
            (* The recursive call is done after new symbols are introduced so we
               readd the new decls to every generated list. *)
            let l_t = destruct_term_exception new_t in
-           List.map (fun x -> Axiom_term original_decl :: Param x_decl :: x) l_t
+           List.map (fun x -> Param x_decl :: x) l_t
          with
          | Ty.TypeMismatch (ty1, ty2) ->
              raise (Arg_trans_type ("destruct_exists", ty1, ty2)))
@@ -248,7 +246,6 @@ let destruct ~recursive pr : Task.task tlist =
   decl_goal_l (fun d ->
       match d.d_node with
       | Dprop (Paxiom, dpr, ht) when Ident.id_equal dpr.pr_name pr.pr_name ->
-          (* TODO solve the problem of original_decl not being a decl anymore ??? *)
           let decl_list = destruct_term ~recursive ht in
           List.map (fun l -> List.map (fun x ->
               match x with
