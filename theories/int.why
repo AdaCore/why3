@@ -260,6 +260,9 @@ theory Power
   lemma Power_non_neg:
      forall x y. x >= 0 /\ y >= 0 -> power x y >= 0
 
+  lemma Power_pos:
+     forall x y. x > 0 /\ y >= 0 -> power x y > 0
+
   lemma Power_monotonic:
     forall x n m:int. 0 < x /\ 0 <= n <= m -> power x n <= power x m
 
