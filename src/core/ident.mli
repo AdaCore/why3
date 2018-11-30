@@ -180,6 +180,21 @@ val relevant_for_counterexample: ident -> bool
     counterexamples generation.
 *)
 
+val create_written_attr: Loc.position -> attribute
+(** The vc_written attribute is built during VC generation: it is used to
+    track the location of the creation of variables. Those variables can have
+    several creation locations with SP algorithm. These attribute-locations are
+    used by counterexamples.
+    The form is the following:
+    "vc:written:line:start_column:end_column:file_name"
+    file_name is at the end for easier parsing (file_name can contain ":")
+*)
+
+val extract_written_loc: attribute -> Loc.position option
+(** Extract the location inside vc_written attribute. [None] if the attribute is
+    ill-formed.
+*)
+
 val remove_model_attrs : attrs:Sattr.t -> Sattr.t
 (** Remove the counter-example attributes from an attribute set *)
 
