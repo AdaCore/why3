@@ -349,8 +349,30 @@ let create_model_trace_attr s = create_attribute ("model_trace:" ^ s)
 let is_model_trace_attr a =
   Strings.has_prefix "model_trace:" a.attr_string
 
+let is_written_attr a =
+  Strings.has_prefix "vc:written:" a.attr_string
+
+let create_written_attr loc =
+  let f,l,b,e = Loc.get loc in
+  let s = Format.sprintf "vc:written:%i:%i:%i:%s" l b e f in
+  create_attribute s
+
+let extract_written_loc attr =
+  let spl = Strings.bounded_split ':' attr.attr_string 6 in
+  match spl with
+  | "vc" :: "written" :: line :: col_st :: col_end :: file :: [] ->
+      begin try
+          let line = int_of_string line in
+          let col_st = int_of_string col_st in
+          let col_end = int_of_string col_end in
+          Some (Loc.user_position file line col_st col_end)
+        with _ -> None
+      end
+  | _ -> None
+
 let is_counterexample_attr a =
-  is_model_trace_attr a || attr_equal a model_projected_attr
+  is_model_trace_attr a || attr_equal a model_projected_attr ||
+  is_written_attr a
 
 let has_a_model_attr id =
   Sattr.exists is_counterexample_attr id.id_attrs

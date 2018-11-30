@@ -862,7 +862,17 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
          me_location = t.t_loc;
          me_term = Some t;
        } in
-       add_to_model model model_element
+       let model = add_to_model model model_element in
+       (* Here we create the same element for all its possible locations (given
+          by attribute vc:written).
+       *)
+       Sattr.fold (fun attr model ->
+           let loc = Ident.extract_written_loc attr in
+           if loc = None then
+             model
+           else
+             add_to_model model {model_element with me_location = loc}
+         ) attrs model
       )
     with Not_found -> model)
     model

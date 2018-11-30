@@ -1213,12 +1213,8 @@ let ht_written = Hvs.create 17
 
 let fresh_loc_attrs = Loc.dummy_position, Sattr.empty
 
-let wrt_mk_loc_attr = function
-  | Some loc ->
-      let f,l,b,e = Loc.get loc in
-      let s = Format.sprintf "vc:written:%i:%i:%i:%s" l b e f in
-      Some (loc, create_attribute s)
-  | None -> None
+let wrt_mk_loc_attr loc =
+  Opt.map (fun loc -> loc, create_written_attr loc) loc
 
 let wrt_add_loc_attr v = function
   | Some (loc,attr) ->
@@ -1311,7 +1307,7 @@ let rec sp_expr kn k rdm dst = match k with
       let new_written = ref [] in
       let mk_written v =
         let n = clone_pv None v in
-        (* if relevant_for_counterexample v.pv_vs.vs_name then *) begin
+        if relevant_for_counterexample v.pv_vs.vs_name then begin
           Hvs.add ht_written n fresh_loc_attrs;
           new_written := n :: !new_written
         end;
