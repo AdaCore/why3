@@ -326,6 +326,8 @@ why3_vc Power_comm2 by (simp add: power_mult_distrib)
 
 why3_vc Power_non_neg using assms by simp
 
+why3_vc Power_pos using assms by simp
+
 why3_vc Power_monotonic using assms by (simp add: power_increasing)
 
 why3_end
