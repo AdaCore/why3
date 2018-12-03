@@ -2,22 +2,22 @@ Weakest Precondition
 bench/ce/int.mlw T g_lab: Unknown (sat)
 Counter-example model:File int.mlw:
 Line 5:
-x, [[@introduced], [@model_trace:x], [@model]] = {"type" : "Integer" ,
+x, [[@introduced], [@model]] = {"type" : "Integer" ,
 "val" : "48" }
 
 bench/ce/int.mlw T g_no_lab: Unknown (sat)
 Counter-example model:File int.mlw:
 Line 7:
-x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced]] = {"type" : "Integer" ,
 "val" : "48" }
 
 bench/ce/int.mlw T g2_lab: Unknown (sat)
 Counter-example model:File int.mlw:
 Line 9:
-g, [[@model_trace:g]] = {"type" : "Integer" ,
+g, [] = {"type" : "Integer" ,
 "val" : "0" }
 Line 11:
-x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+x, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
 
 bench/ce/int.mlw T newgoal: Unknown (sat)
@@ -25,18 +25,18 @@ Counter-example model:File int.mlw:
 Line 13:
 X, [[@introduced], [@model], [@model_trace:X]] = {"type" : "Integer" ,
 "val" : "1" }
-x2, [[@introduced], [@model_trace:x2]] = {"type" : "Integer" ,
+x2, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
-x3, [[@introduced], [@model_trace:x3]] = {"type" : "Integer" ,
+x3, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
-x4, [[@introduced], [@model_trace:x4]] = {"type" : "Integer" ,
+x4, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
-x5, [[@introduced], [@model_trace:x5]] = {"type" : "Integer" ,
+x5, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
-x6, [[@introduced], [@model_trace:x6]] = {"type" : "Integer" ,
+x6, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
-x7, [[@introduced], [@model_trace:x7]] = {"type" : "Integer" ,
+x7, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
-x8, [[@introduced], [@model_trace:x8]] = {"type" : "Integer" ,
+x8, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
 

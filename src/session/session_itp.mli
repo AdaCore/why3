@@ -160,13 +160,18 @@ val add_file_section :
 (** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
     subsections corresponding to theories [ths]. The tasks of each
-    theory nodes generated are computed using [Task.split_theory]. *)
+    theory nodes generated are computed using [Task.split_theory].
+
+    Note that this function does not read anything from the file
+    system. The file name [fn] is taken as is
+
+ *)
 
 val read_file :
   Env.env -> ?format:Env.fformat -> string -> Theory.theory list
 (* [read_file env ~format fn] parses the source file [fn], types it
-   and extract its theories.  Parse errors and typing errors are
-   signaled with exceptions.  *)
+   and extract its theories. A parse error or a typing error is
+   signaled with exceptions .  *)
 
 val merge_files :
   shape_version:int option ->
@@ -282,3 +287,16 @@ val change_prover : notifier -> session -> proofNodeID -> Whyconf.prover -> Whyc
    attempt using prover [opr] by the new prover [npr]. Proof attempt
    status is set to obsolete.
  *)
+
+(** Extra session update operations *)
+
+val rename_file: session -> string -> string -> string * string
+(** [rename_file s from_file to_file] renames the
+    file section in session [s] named [from_file] into [to_file]
+    @return the paths relative to the session dir
+
+    Beware that this function does not have any effect on the user's
+    file system: if the considered files corresponds the real files,
+    they must be renamed independently. See for example the use in
+    [why3session/why3session_update].
+  *)

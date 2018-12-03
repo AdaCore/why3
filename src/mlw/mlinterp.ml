@@ -698,9 +698,9 @@ let rec interp_expr info (e:Mltree.expr) : value =
      end
   | Eassign l ->
      List.iter
-       (fun (pvs, rs, v) ->
+       (fun (pvs, rs, e) ->
          let fld = fd_of_rs rs in
-         let value = get v info in
+         let value = interp_expr info e in
          match get pvs info with
          | Vconstr(c, args) ->
             let rec aux cargs args =
@@ -778,10 +778,6 @@ let rec interp_expr info (e:Mltree.expr) : value =
                          raise CannotReduce
   | Eabsurd -> Debug.dprintf debug_interp "Eabsurd@.";
                raise CannotReduce
-  | Ehole -> Debug.dprintf debug_interp "Ehole@.";
-             raise CannotReduce
-  | Eany _ -> Debug.dprintf debug_interp "Eany@.";
-             raise CannotReduce
   | Ematch (e, l, bl) ->
      Debug.dprintf debug_interp "Ematch@.";
      begin match interp_expr info e with

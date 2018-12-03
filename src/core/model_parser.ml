@@ -344,7 +344,7 @@ let split_model_trace_name mt_name =
   match splitted with
   | [first] -> (first, "")
   | first::second::_ -> (first, second)
-  | [] -> ("", "")
+  | [] -> (mt_name, "")
 
 let create_model_element ~name ~value ~attrs ?location ?term () =
   let (name, type_s) = split_model_trace_name name in
@@ -788,7 +788,12 @@ let add_to_model model model_element =
 
 let recover_name term_map raw_name =
   let t = Mstr.find raw_name term_map in
-  construct_name (get_model_trace_string ~attrs:t.t_attrs) t.t_attrs
+  let name =
+    match t.t_node with
+    | Tapp (ls, []) -> ls.ls_name.id_string
+    | _ -> ""
+  in
+  construct_name (get_model_trace_string ~name ~attrs:t.t_attrs) t.t_attrs
 
 let rec replace_projection (const_function: string -> string) model_value =
   match model_value with
@@ -846,13 +851,28 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
       (
        let t = Mstr.find raw_element_name term_map in
        let attrs = Sattr.union raw_element.me_name.men_attrs t.t_attrs in
+       let name =
+         match t.t_node with
+         | Tapp (ls, []) -> ls.ls_name.id_string
+         | _ -> ""
+       in
        let model_element = {
-         me_name = construct_name (get_model_trace_string ~attrs:t.t_attrs) attrs;
+         me_name = construct_name (get_model_trace_string ~name ~attrs) attrs;
          me_value = raw_element_value;
          me_location = t.t_loc;
          me_term = Some t;
        } in
-       add_to_model model model_element
+       let model = add_to_model model model_element in
+       (* Here we create the same element for all its possible locations (given
+          by attribute vc:written).
+       *)
+       Sattr.fold (fun attr model ->
+           let loc = Ident.extract_written_loc attr in
+           if loc = None then
+             model
+           else
+             add_to_model model {model_element with me_location = loc}
+         ) attrs model
       )
     with Not_found -> model)
     model

@@ -18,9 +18,9 @@ Require BuiltIn.
 Lemma andb_def :
   forall (x:bool) (y:bool),
   ((Init.Datatypes.andb x y) = match x with
-  | true => y
-  | false => false
-  end).
+                               | true => y
+                               | false => false
+                               end).
 Proof.
 intros x y.
 apply refl_equal.
@@ -30,9 +30,9 @@ Qed.
 Lemma orb_def :
   forall (x:bool) (y:bool),
   ((Init.Datatypes.orb x y) = match x with
-  | false => y
-  | true => true
-  end).
+                              | false => y
+                              | true => true
+                              end).
 Proof.
 intros x y.
 apply refl_equal.
@@ -42,9 +42,9 @@ Qed.
 Lemma notb_def :
   forall (x:bool),
   ((Init.Datatypes.negb x) = match x with
-  | false => true
-  | true => false
-  end).
+                             | false => true
+                             | true => false
+                             end).
 Proof.
 intros x.
 apply refl_equal.
@@ -67,9 +67,9 @@ Qed.
 Lemma implb_def :
   forall (x:bool) (y:bool),
   ((Init.Datatypes.implb x y) = match x with
-  | false => true
-  | true => y
-  end).
+                                | false => true
+                                | true => y
+                                end).
 Proof.
 now intros [|] [|].
 Qed.

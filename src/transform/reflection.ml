@@ -18,7 +18,6 @@ open Args_wrapper
 open Generic_arg_trans_utils
 
 exception NoReification
-exception Exit of string
 
 let debug_reification = Debug.register_info_flag
                           ~desc:"Reification"
@@ -515,7 +514,7 @@ let build_vars_map renv prev =
   then (Debug.dprintf debug_reification "vars not matched: %a@."
           (Pp.print_list Pp.space Pretty.print_vs)
           (List.filter (fun v -> not (Mvs.mem v subst)) renv.lv);
-        raise (Exit "vars not matched"));
+        raise (Arg_error "vars not matched"));
   Debug.dprintf debug_reification "all vars matched@.";
   let prev, defdecls =
     Mterm.fold
@@ -603,7 +602,7 @@ let reflection_by_lemma pr env : Task.task Trans.tlist = Trans.store (fun task -
     let kn' = task_known prev in (* TODO Do we want kn here ? *)
     match find_prop_decl kn' pr with
     | (_, t) -> t
-    | exception Not_found -> raise (Exit "lemma not found")
+    | exception Not_found -> raise (Arg_error "lemma not found")
   in
   let (lp, lv, llet, rt) = Apply.intros l in
   if llet <> []
@@ -641,17 +640,17 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
           let rs = Pmodule.ns_find_rs pmod.Pmodule.mod_export [s] in
           if o = None then Some (pmod, rs)
           else (let es = Format.sprintf "module or function %s found twice" s in
-                raise (Exit es))
+                raise (Arg_error es))
         with Not_found -> o)
       ths None in
   let (_pmod, rs) = if o = None
-                   then (Debug.dprintf debug_refl "Symbol %s not found@." s;
-                         raise Not_found)
+                    then (let es = Format.sprintf "Symbol %s not found@." s in
+                          raise (Arg_error es))
                    else Opt.get o in
   let lpost = List.map open_post rs.rs_cty.cty_post in
   if List.exists (fun pv -> pv.pv_ghost) rs.rs_cty.cty_args
   then (Debug.dprintf debug_refl "ghost parameter@.";
-        raise (Exit "function has ghost parameters"));
+        raise (Arg_error "function has ghost parameters"));
   Debug.dprintf debug_refl "building module map@.";
   let mm = Mid.fold
              (fun id th acc ->

@@ -71,6 +71,32 @@ val decl_l : (decl -> decl list list) -> task -> task tlist
     duplicate the task on each declaration and probably run forever.
 *)
 
+type diff_decl =
+  | Goal_decl of Decl.decl
+  | Normal_decl of Decl.decl
+
+val decl_goal_l: (decl -> diff_decl list list) -> task -> task tlist
+(** [decl_goal_l f t1 t2] does the same as decl_l except that it can
+    differentiate a new axiom added to a task from a new goal added to a task.
+    In case of a new axiom, everything works as in decl_l. When a new goal [ng]
+    is generated, it is remembered so that it can replace the old_goal when the
+    end of the task is encountered.
+
+    Example of use of this feature in the code of [destruct]:
+    H1: p1 -> p2
+    H2: p3
+    H3: ...
+    -------------
+    Goal: True
+
+    In [destruct H1], we know that we will add a new goal [p1] before we read
+    through the entire task, so we need to be able to generate a new goal.
+
+    Current disallowed cases:
+    - Creating a goal twice in the same branch
+    - Creating a goal when analysing the goal of [t2]
+*)
+
 val tdecl   : (decl -> tdecl list     ) -> task -> task trans
 val tdecl_l : (decl -> tdecl list list) -> task -> task tlist
 

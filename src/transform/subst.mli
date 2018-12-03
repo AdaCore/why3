@@ -9,7 +9,12 @@
 (*                                                                  *)
 (********************************************************************)
 
-val subst_filtered : (Term.lsymbol -> bool) -> Task.task Trans.trans
+val subst_filtered : subst_proxy:bool ->
+  (Term.lsymbol -> bool) -> Task.task Trans.trans
+(* [subst_filtered subst_proxy p]: substitute only lsymbol chosen by [p].
+   If [subst_proxy] is true, allow the substitution of proxy symbols into
+   non-proxy symbols.
+*)
 
 val subst : Term.term list -> Task.task Trans.trans
 

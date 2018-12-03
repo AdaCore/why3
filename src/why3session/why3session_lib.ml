@@ -333,6 +333,11 @@ let get_used_provers session =
 let get_transf_string s tr =
   String.concat " " (Session_itp.get_transf_name s tr :: Session_itp.get_transf_args s tr)
 
+let goal_full_name s g =
+  let name = Session_itp.get_proof_expl s g in
+  if name = "" then (Session_itp.get_proof_name s g).Ident.id_string
+  else name
+
 let rec transf_depth s tr =
   List.fold_left
     (fun depth g -> max depth (goal_depth s g)) 0 (Session_itp.get_sub_tasks s tr)

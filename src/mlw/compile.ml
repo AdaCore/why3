@@ -280,6 +280,8 @@ module Translate = struct
         ML.e_let ld (expr info svar mask e2) (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rs, _), ein) when rs_ghost rs ->
         expr info svar mask ein
+    | Elet (LDsym (_, {c_node = Cpur (_, _); _}), _) ->
+        assert false (* necessarily handled above *)
     | Elet (LDsym (rs, {c_node = Cfun ef; c_cty = cty}), ein) ->
         Debug.dprintf debug_compile "compiling local function definition %s@."
           rs.rs_name.id_string;
@@ -309,6 +311,8 @@ module Translate = struct
         let ld = ML.sym_defn rsf res (params cty.cty_args) eapp in
         let ein = expr info svar mask ein in
         ML.e_let ld ein (ML.I e.e_ity) mask eff attrs
+    | Elet (LDsym (_, {c_node = Cany; _}), _) -> let loc = e.e_loc in
+        Loc.errorm ?loc "This expression cannot be extracted"
     | Elet (LDrec rdefl, ein) ->
         let rdefl = filter_out_ghost_rdef rdefl in
         List.iter
@@ -369,8 +373,10 @@ module Translate = struct
         Debug.dprintf debug_compile "compiling a lambda expression@.";
         let ef = expr info svar e.e_mask ef in
         ML.e_fun (params cty.cty_args) ef (ML.I e.e_ity) mask eff attrs
-    | Eexec ({c_node = Cany}, _) ->
-        ML.mk_hole
+    | Eexec ({c_node = Cpur (_, _); _ }, _) ->
+        assert false (* necessarily ghost *)
+    | Eexec ({c_node = Cany}, _) -> let loc = e.e_loc in
+        Loc.errorm ?loc "This expression cannot be extracted"
     | Eabsurd ->
         ML.e_absurd (ML.I e.e_ity) mask eff attrs
     | Eassert _ ->
@@ -408,6 +414,8 @@ module Translate = struct
     | Eassign al ->
         let rm_ghost (_, rs, _) = not (rs_ghost rs) in
         let al = List.filter rm_ghost al in
+        let e_of_var pv = ML.e_var pv (ML.I pv.pv_ity) MaskVisible eff attrs in
+        let al = List.map (fun (pv1, rs, pv2) -> (pv1, rs, e_of_var pv2)) al in
         ML.e_assign al (ML.I e.e_ity) mask eff attrs
     | Ematch (e1, bl, xl) when e_ghost e1 ->
         assert (Mxs.is_empty xl); (* Expr ensures this for the time being *)
@@ -438,8 +446,6 @@ module Translate = struct
           let ty = if ity_equal xs.xs_ity ity_unit then None
             else Some (mlty_of_ity xs.xs_mask xs.xs_ity) in
         ML.mk_expr (ML.Eexn (xs, ty, e1)) (ML.I e.e_ity) mask eff attrs
-    | Elet (LDsym (_, {c_node=(Cany|Cpur (_, _)); _ }), _)
-    | Eexec ({c_node=Cpur (_, _); _ }, _) -> ML.mk_hole
 
   and ebranch info svar mask ({pp_pat = p; pp_mask = m}, e) =
     (* if the [case] expression is not ghost but there is (at least) one ghost
@@ -505,11 +511,11 @@ module Translate = struct
         if eff_pure e.e_effect then []
         else let unit_ = pv (* create_pvsymbol (id_fresh "_") ity_unit *) in
           [ML.Dlet (ML.Lvar (unit_, expr info Stv.empty MaskGhost e))]
-    | PDlet (LDvar (pv,  {e_node = Eexec ({c_node = Cany}, cty)})) ->
-        Debug.dprintf debug_compile "compiling undifined constant %a@"
+    | PDlet (LDvar (pv, {e_node = Eexec ({c_node = Cany}, cty)})) ->
+        Debug.dprintf debug_compile "compiling undefined constant %a@"
           print_pv pv;
         let ty = mlty_of_ity cty.cty_mask cty.cty_result in
-        [ML.Dlet (ML.Lvar (pv, ML.e_any ty cty))]
+        [ML.Dval (pv, ty)]
     | PDlet (LDvar (pv, e)) ->
         Debug.dprintf debug_compile "compiling top-level symbol %a@."
           print_pv pv;
@@ -616,6 +622,14 @@ module Transform = struct
      * Spv.for_all is_not_write spv *)
     Spv.is_empty (pvs_affected spv_mreg spv)
 
+  let rec can_inline ({e_effect = eff1} as e1) ({e_effect = eff2} as e2) =
+    match e2.e_node with
+    | Evar _ | Econst _ | Eapp _ | Eassign [_] -> true
+    | Elet (Lvar (_, {e_effect = eff1'}), e2') ->
+       no_reads_writes_conflict eff1.eff_reads eff1'.eff_writes
+       && can_inline e1 e2'
+    | _ -> no_reads_writes_conflict eff1.eff_reads eff2.eff_writes
+
   let mk_list_eb ebl f =
     let mk_acc e (e_acc, s_acc) =
       let e, s = f e in e::e_acc, Spv.union s s_acc in
@@ -627,10 +641,10 @@ module Transform = struct
     match e.e_node with
     | Evar pv -> begin try Mpv.find pv subst, Spv.singleton pv
         with Not_found -> e, Spv.empty end
-    | Elet (Lvar (pv, ({e_effect = eff1} as e1)), ({e_effect = eff2} as e2))
-      when Sattr.mem Expr.proxy_attr pv.pv_vs.vs_name.id_attrs &&
+    | Elet (Lvar (pv, ({e_effect = eff1} as e1)), e2)
+      when Sattr.mem proxy_attr pv.pv_vs.vs_name.id_attrs &&
            eff_pure eff1 &&
-           no_reads_writes_conflict eff1.eff_reads eff2.eff_writes ->
+           can_inline e1 e2 ->
         let e1, s1 = expr info subst e1 in
         let e2, s2 = add_subst pv e1 e2 in
         let s_union = Spv.union s1 s2 in
@@ -690,9 +704,15 @@ module Transform = struct
     | Eraise (exn, Some e) ->
         let e, spv = expr info subst e in
         mk (Eraise (exn, Some e)), spv
-    | Eassign _al ->
-        e, Spv.empty
-    | Econst _ | Eabsurd | Ehole | Eany _ -> e, Spv.empty
+    | Eassign al ->
+       let al, s =
+         List.fold_left
+           (fun (accl, spv) (pv,rs,e) ->
+             let e, s = expr info subst e in
+             ((pv, rs, e)::accl, Spv.union spv s))
+           ([], Spv.empty) al in
+       mk (Eassign (List.rev al)), s
+    | Econst _ | Eabsurd -> e, Spv.empty
     | Eignore e ->
         let e, spv = expr info subst e in
         mk (Eignore e), spv
@@ -720,7 +740,7 @@ module Transform = struct
     { r with rec_exp = rec_exp }, spv
 
   let rec pdecl info = function
-    | Dtype _ | Dexn _ as d -> d
+    | Dtype _ | Dexn _ | Dval _ as d -> d
     | Dmodule (id, dl) ->
         let dl = List.map (pdecl info) dl in Dmodule (id, dl)
     | Dlet def ->

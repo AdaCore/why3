@@ -152,9 +152,6 @@ let attrs_has_expl attrs =
 
 let annot_attrs = Sattr.add stop_split (Sattr.singleton annot_attr)
 
-(* TODO: remove this line, and use "annot_attr" instead *)
-let annot_attrs = Sattr.add Ident.model_vc_attr annot_attrs
-
 let vc_expl loc attrs expl f =
   let attrs = Sattr.union annot_attrs (Sattr.union attrs f.t_attrs) in
   let attrs = if attrs_has_expl attrs then attrs else Sattr.add expl attrs in
@@ -1210,6 +1207,46 @@ let sp_combine_map sp1 sp2 =
   Mint.union (fun _ (sp1, wr1) (sp2, wr2) ->
     Some (sp_combine sp1 wr1 sp2 wr2)) sp1 sp2
 
+(* handle multiple locations of writes *)
+
+let ht_written = Hvs.create 17
+
+let fresh_loc_attrs = Loc.dummy_position, Sattr.empty
+
+let wrt_mk_loc_attr loc =
+  Opt.map (fun loc -> loc, create_written_attr loc) loc
+
+let wrt_add_loc_attr v = function
+  | Some (loc,attr) ->
+      begin match Hvs.find ht_written v with
+      | _, attrs ->
+          let attrs = Sattr.add attr attrs in
+          Hvs.replace ht_written v (loc,attrs)
+      | exception Not_found -> ()
+      end
+  | None -> ()
+
+let wrt_rename quant vl f =
+  let rename v sbs =
+    match Hvs.find ht_written v with
+    | _,attrs when Sattr.is_empty attrs ->
+        v, sbs (* no write sites, strange *)
+    | loc,attrs ->
+        let id =
+          if Sattr.cardinal attrs = 1 then (* single write site *)
+            id_user ~attrs:v.vs_name.id_attrs v.vs_name.id_string loc
+          else (* multiple write sites *)
+            id_clone ~attrs v.vs_name in
+        let nv = create_vsymbol id v.vs_ty in
+        nv, Mvs.add v (t_var nv) sbs
+    | exception Not_found ->
+        v, sbs in
+  let vl, sbs = Lists.map_fold_right rename vl Mvs.empty in
+  quant vl (t_subst sbs f)
+
+let wrt_forall vl f = wrt_rename wp_forall vl f
+let wrt_exists vl f = wrt_rename sp_exists vl f
+
 (* compute compact verification conditions, in the style
    of the Flanagan and Saxe paper (POPL'01).
 
@@ -1266,14 +1303,23 @@ let rec sp_expr kn k rdm dst = match k with
       wp, Mint.inter close sp2 rdm, Spv.remove v rd1
   | Kseq (k1, i, k2) ->
       let wp2, sp2, rd2 = sp_expr kn k2 rdm dst in
+      (* log new "written" variables added to dst *)
+      let new_written = ref [] in
+      let mk_written v =
+        let n = clone_pv None v in
+        if relevant_for_counterexample v.pv_vs.vs_name then begin
+          Hvs.add ht_written n fresh_loc_attrs;
+          new_written := n :: !new_written
+        end;
+        n in
       (* the dst parameter for k1 must include a fresh final
          name for every variable modified by k2 (on any path),
          and for every variable read by k2 that is not in dst *)
       let get_wr _ (_, w) m = Mpv.set_union w m in
       let wr2 = Mint.fold get_wr sp2 Mpv.empty in
-      let fresh_wr2 v _ = clone_pv None v in
+      let fresh_wr2 v _ = mk_written v in
       let fresh_rd2 v _ = if v.pv_ity.ity_pure then None
-                          else Some (clone_pv None v) in
+                          else Some (mk_written v) in
       let wp1, sp1, rd1 = sp_expr kn k1 (Mint.add i rd2 rdm)
         (Mpv.set_union (Mpv.set_union (Mpv.mapi fresh_wr2 wr2)
         (Mpv.mapi_filter fresh_rd2 (Mpv.set_diff rd2 dst))) dst) in
@@ -1289,7 +1335,7 @@ let rec sp_expr kn k rdm dst = match k with
       let wp2 =
         (* variables in wp2 must be adjusted wrt. wr0 *)
         let adj = adjustment wr0 and vl = concat bound wr0 in
-        wp_forall vl (sp_implies sp0 (t_subst adj wp2)) in
+        wrt_forall vl (sp_implies sp0 (t_subst adj wp2)) in
       (* compute (sp0 /\ sp2_j) for every outcome j of k2 *)
       let close (sp, wr) rd =
         (* retrieve the write effects in wr0 that are visible
@@ -1308,7 +1354,7 @@ let rec sp_expr kn k rdm dst = match k with
            be adjusted wrt. this "advanced" write effect. *)
         let adj = adjustment (Mpv.set_union wr0_dst wr0) in
         let sp0 = t_subst (advancement wr0 wr0_dst) sp0 in
-        sp_exists vl (sp_and sp0 (t_subst adj sp)), wr in
+        wrt_exists vl (sp_and sp0 (t_subst adj sp)), wr in
       let close _ sp rd = Some (close sp rd) in
       let sp2 = Mint.inter close sp2 rdm in
       (* finally, the postcondition and the write effect for
@@ -1317,6 +1363,7 @@ let rec sp_expr kn k rdm dst = match k with
         let dst = Mpv.set_inter dst wr in
         t_subst (advancement wr dst) sp, dst in
       let sp1 = Mint.map advance (Mint.remove i sp1) in
+      List.iter (Hvs.remove ht_written) !new_written;
       wp_and wp1 wp2, sp_combine_map sp1 sp2, rd1
   | Kpar (k1, k2) ->
       let wp1, sp1, rd1 = sp_expr kn k1 rdm dst in
@@ -1368,14 +1415,14 @@ let rec sp_expr kn k rdm dst = match k with
       let add _ t fvs = t_freevars fvs t in
       let fvs = Mreg.fold add regs Mvs.empty in
       let fvs = Mpv.fold (fun _ -> Mvs.remove) dst fvs in
+      let loc_attr = wrt_mk_loc_attr loc in
       let update {pv_vs = o; pv_ity = ity} n sp =
+        wrt_add_loc_attr n loc_attr;
         let t, fl = havoc kn wr regs (t_var o) ity [] in
         sp_and (t_and_l (cons_t_simp (t_var n) t fl)) sp in
       let sp = Mpv.fold update dst t_true in
       let sp = sp_exists (Mvs.keys fvs) sp in
-      let attrs = Ident.model_vc_havoc_attr in
-      let attrs = Sattr.add attrs sp.t_attrs in
-      let sp = t_attr_set ?loc attrs sp in
+      let sp = t_attr_set ?loc sp.t_attrs sp in
       let add_rhs _ rhs rd = match rhs with
         | Some v -> Spv.add v rd | None -> rd in
       let add_rhs _ = Mpv.fold add_rhs in

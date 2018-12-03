@@ -9,10 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-
-
-
-
 open Wstdlib
 
 module Hprover = Whyconf.Hprover
@@ -38,7 +34,7 @@ let print_proofAttemptID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
-  theory_parent_name            : string;
+  mutable theory_parent_name    : string;
   mutable theory_is_detached    : bool;
 }
 
@@ -591,9 +587,9 @@ let mk_proof_node ~shape_version ~expl (s : session) (n : Ident.ident) (t : Task
 let mk_new_proof_node = mk_proof_node ~shape_version:Termcode.current_shape_version
 
 let mk_proof_node_no_task (s : session) (n : Ident.ident)
-    (parent : proof_parent) (node_id : proofNodeID) sum shape proved =
+    (parent : proof_parent) (node_id : proofNodeID) sum shape expl proved =
   let pn = { proofn_name = n;
-             proofn_expl = "";
+             proofn_expl = expl;
              proofn_parent = parent;
              proofn_attempts = Hprover.create 7;
              proofn_transformations = [] } in
@@ -1003,8 +999,9 @@ let rec load_goal session old_provers parent g id =
       try Termcode.shape_of_string (List.assoc "shape" g.Xml.attributes)
       with Not_found -> Termcode.shape_of_string ""
     in
+    let expl = string_attribute_def "expl" g "" in
     let proved = bool_attribute "proved" g false in
-    mk_proof_node_no_task session gname parent id sum shape proved;
+    mk_proof_node_no_task session gname parent id sum shape expl proved;
     List.iter (load_proof_or_transf session old_provers id) g.Xml.elements;
   | "label" -> ()
   | s ->
@@ -1310,13 +1307,14 @@ let save_detached_proof s parent old_pa_n =
 let rec save_detached_goal old_s s parent detached_goal_id id =
   let detached_goal = get_proofNode old_s detached_goal_id in
   let (sum,shape) = Hpn.find old_s.session_sum_shape_table detached_goal_id in
-    mk_proof_node_no_task s detached_goal.proofn_name parent id sum shape false;
-    Hprover.iter (fun _ pa ->
-                  let pa = get_proof_attempt_node old_s pa in
-                  save_detached_proof s id pa) detached_goal.proofn_attempts;
-    List.iter (save_detached_trans old_s s id) detached_goal.proofn_transformations;
-    let new_trans = (get_proofNode s id) in
-    new_trans.proofn_transformations <- List.rev new_trans.proofn_transformations
+  mk_proof_node_no_task s detached_goal.proofn_name parent id sum shape
+                        detached_goal.proofn_expl false;
+  Hprover.iter (fun _ pa ->
+                let pa = get_proof_attempt_node old_s pa in
+                save_detached_proof s id pa) detached_goal.proofn_attempts;
+  List.iter (save_detached_trans old_s s id) detached_goal.proofn_transformations;
+  let new_trans = (get_proofNode s id) in
+  new_trans.proofn_transformations <- List.rev new_trans.proofn_transformations
 
 
 and save_detached_goals old_s detached_goals_id s parent =
@@ -1610,9 +1608,6 @@ let merge_file_section ~shape_version ~old_ses ~old_theories ~file_is_detached ~
   in
   f.file_theories <- theories @ detached;
   update_file_node (fun _ -> ()) s f
-
-
-
 
 let read_file env ?format fn =
   let theories = Env.read_file Env.base_language env ?format fn in
@@ -1946,3 +1941,23 @@ let save_session (s : session) =
   session_dir_for_save := s.session_dir;
   let fs = if Compress.compression_supported then fz else fs in
   save f fs s
+
+(**********************)
+(* Edition of session *)
+(**********************)
+
+let rename_file s from_file to_file =
+  let src = Sysutil.relativize_filename s.session_dir from_file in
+  let dst = Sysutil.relativize_filename s.session_dir to_file in
+  let files = get_files s in
+  let file =
+    try
+      Hstr.find files src
+    with Not_found -> failwith ("filename " ^ src ^ " not found in session")
+  in
+  assert (file.file_name = src);
+  Hstr.remove files src;
+  List.iter (fun th -> th.theory_parent_name <- dst) file.file_theories;
+  let new_file = { file with file_name = dst } in
+  Hstr.add files dst new_file;
+  src,dst

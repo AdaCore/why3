@@ -126,7 +126,8 @@ val create_model_element :
 
     @param location : source-code location of the element
 
-    @param term : why term corresponding to the element *)
+    @param term : why term corresponding to the element
+*)
 
 (*
 ***************************************************************

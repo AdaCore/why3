@@ -4,10 +4,11 @@ all:
 	./mulrelative &
 	./addrelative &
 	./addplot &
-#	./minidivrelative &
-#	./minimulrelative &
-#	./miniaddrelative &
+	./minidivrelative &
+	./minimulrelative &
+	./miniaddrelative &
 #	./gmpdivplot &
 #	./gmpmulplot &
 #	./gmpaddplot &
 	./toomrelative
+	./minitoomrelative

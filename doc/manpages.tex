@@ -698,15 +698,14 @@ The available subcommands are as follows:
 \item[\texttt{info}] prints informations and statistics about sessions.
 \item[\texttt{latex}] outputs session contents in LaTeX format.
 \item[\texttt{html}] outputs session contents in HTML format.
-\item[\texttt{mod}] modifies some of the proofs, selected by a filter.
-\item[\texttt{copy}] duplicates some of the proofs, selected by a filter.
-\item[\texttt{rm}] removes some of the proofs, selected by a filter.
+\item[\texttt{update}] update session contents.
+%\item[\texttt{mod}] modifies some of the proofs, selected by a filter.
+%\item[\texttt{copy}] duplicates some of the proofs, selected by a filter.
+%\item[\texttt{rm}] removes some of the proofs, selected by a filter.
 \end{description}
 
 The first three commands do not modify the sessions, whereas the last
-four modify them. Only the proof attempts recorded are modified. No
-prover is called on the modified or created proof attempts, and
-consequently the proof status is always marked as obsolete.
+modify them.
 
 \subsection{Command \texttt{info}}
 
@@ -971,6 +970,16 @@ Specific options for this command are as follows.
   scripts. This is equivalent to \texttt{-{}-add\_pp .v "coqdoc
     -{}-no-index -{}-html -o \%o \%i" .html}
 
+\end{description}
+
+
+
+\subsection{Command \texttt{update}}
+
+The command \texttt{why3 session update} permits to modify
+the session contents, depending on the following specific options.
+\begin{description}
+\item[\texttt{-rename-file \textsl{<src>} \textsl{<dst>}}] renames the file \textsl{<src>} to \textsl{<dst>} in the session. The file \textsl{<src>} itself is also renamed to \textsl{<dst>} in your filesystem.
 \end{description}
 
 

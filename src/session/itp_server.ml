@@ -73,7 +73,6 @@ let unproven_goals_below_id cont id =
   | ATh th     ->
      List.rev (unproven_goals_below_th cont [] th)
 
-
 (****** Exception handling *********)
 
 let p s id =
@@ -1312,6 +1311,35 @@ end
     let d = get_server_data () in
     C.mark_as_obsolete ~notification:(notify_change_proved d.cont) d.cont n
 
+  (* ----------------- Get counterexampes ------------ *)
+  let get_ce nid =
+    let d = get_server_data () in
+    let session = d.cont.controller_session in
+    let config = d.cont.controller_config in
+    let any = any_from_node_ID nid in
+    match any with
+    | None -> P.notify (Message (Error "Please select a node id"))
+    | Some (APa panid) ->
+      let pan = Session_itp.get_proof_attempt_node session panid in
+      let filter_prover =
+        Whyconf.mk_filter_prover ~version:pan.prover.Whyconf.prover_version
+          ~altern:"counterexamples" pan.prover.Whyconf.prover_name
+      in
+      begin match Whyconf.filter_one_prover config filter_prover with
+      | config_prover ->
+        (* nid should still exists when scheduling attempt *)
+        schedule_proof_attempt nid config_prover pan.limit;
+        remove_node nid
+      | exception Whyconf.ProverNotFound (_, fp) ->
+        let msg = Format.asprintf "Counterexamples alternative for prover does \
+                                   not exists: %a"
+            Whyconf.print_filter_prover fp
+        in
+        P.notify (Message (Error msg))
+      end
+    | _ -> P.notify (Message (Error "Please select a proofattempt"))
+
+
   (* ----------------- locate next unproven node -------------------- *)
 
   let notify_first_unproven_node d ni =
@@ -1417,45 +1445,48 @@ end
          | Prove (p, limit)        ->
             schedule_proof_attempt nid p limit;
             session_needs_saving := true
-        | Strategies st           ->
-            run_strategy_on_task nid st;
-            session_needs_saving := true
-        | Edit p                  ->
-           schedule_edition nid p;
-           session_needs_saving := true
-        | Bisect                  ->
-           schedule_bisection nid;
-           session_needs_saving := true
-        | Replay valid_only       ->
-           replay ~valid_only snid;
-           session_needs_saving := true
-        | Clean                   ->
-           clean snid;
-           session_needs_saving := true
-        | Mark_Obsolete           ->
-           mark_obsolete snid;
-           session_needs_saving := true
-        | Focus_req ->
-            let d = get_server_data () in
-            let s = d.cont.controller_session in
-            let any = any_from_node_ID nid in
-            begin match any with
-            | None -> P.notify (Message (Error "Please select a node id"))
-            | Some any ->
-              let focus_on =
-                match any with
-                | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
-                | _ -> any
-              in
-              focused_node := Focus_on [focus_on];
-              reset_and_send_the_whole_tree ()
-            end
-        | Server_utils.Unfocus_req -> unfocus ()
-        | Help_message s          -> P.notify (Message (Information s))
-        | QError s                -> P.notify (Message (Query_Error (nid, s)))
-        | Other (s, _args)        ->
-           P.notify (Message (Information ("Unknown command: "^s)))
-      end
+         | Strategies st           ->
+             run_strategy_on_task nid st;
+             session_needs_saving := true
+         | Edit p                  ->
+             schedule_edition nid p;
+             session_needs_saving := true
+         | Get_ce                  ->
+             get_ce nid;
+             session_needs_saving := true
+         | Bisect                  ->
+             schedule_bisection nid;
+             session_needs_saving := true
+         | Replay valid_only       ->
+             replay ~valid_only snid;
+             session_needs_saving := true
+         | Clean                   ->
+             clean snid;
+             session_needs_saving := true
+         | Mark_Obsolete           ->
+             mark_obsolete snid;
+             session_needs_saving := true
+         | Focus_req ->
+             let d = get_server_data () in
+             let s = d.cont.controller_session in
+             let any = any_from_node_ID nid in
+             begin match any with
+             | None -> P.notify (Message (Error "Please select a node id"))
+             | Some any ->
+               let focus_on =
+                 match any with
+                 | APa pa -> APn (Session_itp.get_proof_attempt_parent s pa)
+                 | _ -> any
+               in
+               focused_node := Focus_on [focus_on];
+               reset_and_send_the_whole_tree ()
+             end
+         | Server_utils.Unfocus_req -> unfocus ()
+         | Help_message s          -> P.notify (Message (Information s))
+         | QError s                -> P.notify (Message (Query_Error (nid, s)))
+         | Other (s, _args)        ->
+             P.notify (Message (Information ("Unknown command: "^s)))
+       end
     | Add_file_req f ->
       add_file_to_session d.cont f
     | Set_config_param(s,i)   ->

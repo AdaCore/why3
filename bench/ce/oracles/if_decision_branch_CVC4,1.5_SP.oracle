@@ -1,10 +1,20 @@
 Strongest Postcondition
 bench/ce/if_decision_branch.mlw Other VC f: Valid
 bench/ce/if_decision_branch.mlw Other VC f: Timeout or Unknown
-Counter-example model:File if_decision_branch.mlw:
-Line 18:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Integer" ,
+Counter-example model:File int.mlw:
+Line 16:
+a, [] = {"type" : "Integer" ,
 "val" : "5" }
+File if_decision_branch.mlw:
 Line 19:
-the check fails with all inputs
+result, [[@introduced]] = {"type" : "Integer" ,
+"val" : "15" }
+Line 22:
+TEMP_NAME, [[@introduced], [@model],
+[@model_trace:TEMP_NAME]] = {"type" : "Boolean" ,
+"val" : false }
+Line 26:
+TEMP_NAME, [[@introduced], [@model],
+[@model_trace:TEMP_NAME]] = {"type" : "Boolean" ,
+"val" : true }
 

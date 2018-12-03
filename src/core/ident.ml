@@ -339,21 +339,47 @@ let sanitizer head rest n = sanitizer' head rest rest n
 
 (** {2 functions for working with counterexample attributes} *)
 
+let proxy_attr = create_attribute "mlw:proxy_symbol"
+
 let model_projected_attr = create_attribute "model_projected"
-let model_vc_attr = create_attribute "model_vc"
 let model_vc_post_attr = create_attribute "model_vc_post"
-let model_vc_havoc_attr = create_attribute "model_vc_havoc"
 
 let create_model_trace_attr s = create_attribute ("model_trace:" ^ s)
 
 let is_model_trace_attr a =
   Strings.has_prefix "model_trace:" a.attr_string
 
+let is_written_attr a =
+  Strings.has_prefix "vc:written:" a.attr_string
+
+let create_written_attr loc =
+  let f,l,b,e = Loc.get loc in
+  let s = Format.sprintf "vc:written:%i:%i:%i:%s" l b e f in
+  create_attribute s
+
+let extract_written_loc attr =
+  let spl = Strings.bounded_split ':' attr.attr_string 6 in
+  match spl with
+  | "vc" :: "written" :: line :: col_st :: col_end :: file :: [] ->
+      begin try
+          let line = int_of_string line in
+          let col_st = int_of_string col_st in
+          let col_end = int_of_string col_end in
+          Some (Loc.user_position file line col_st col_end)
+        with _ -> None
+      end
+  | _ -> None
+
 let is_counterexample_attr a =
-  is_model_trace_attr a || a = model_projected_attr
+  is_model_trace_attr a || attr_equal a model_projected_attr ||
+  is_written_attr a
 
 let has_a_model_attr id =
   Sattr.exists is_counterexample_attr id.id_attrs
+
+let relevant_for_counterexample id =
+  (id.id_loc <> None && not (Sattr.mem proxy_attr id.id_attrs))
+  || has_a_model_attr id
 
 let remove_model_attrs ~attrs =
   Sattr.filter (fun l -> not (is_counterexample_attr l)) attrs
@@ -397,12 +423,14 @@ let get_model_element_name ~attrs =
   | [_] -> ""
   | _ -> assert false
 
-let get_model_trace_string ~attrs =
-  let tl = get_model_trace_attr ~attrs in
-  let splitted = Strings.bounded_split ':' tl.attr_string 2 in
-  match splitted with
-  | [_; t_str] -> t_str
-  | _ -> ""
+let get_model_trace_string ~name ~attrs =
+  match get_model_trace_attr ~attrs with
+  | exception Not_found -> name
+  | tl ->
+      let splitted = Strings.bounded_split ':' tl.attr_string 2 in
+      match splitted with
+      | [_; t_str] -> t_str
+      | _ -> ""
 
 
 (* Functions for working with ITP attributes *)

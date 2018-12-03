@@ -18,7 +18,13 @@ val add (x y : byte) : byte
   requires { [@expl:integer overflow] in_range (to_int x + to_int y) }
   ensures { to_int result = to_int x + to_int y }
 
+end
+
+module AbstractWithRef
+
+use int.Int
 use ref.Ref
+use Abstract
 
 let p3 (a : ref byte) =
   a := add !a (of_int 1)

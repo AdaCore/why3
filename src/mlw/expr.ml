@@ -372,7 +372,6 @@ let e_attr_copy { e_attrs = attrs; e_loc = loc } e =
   let loc = if e.e_loc = None then loc else e.e_loc in
   { e with e_attrs = attrs; e_loc = loc }
 
-let proxy_attr = create_attribute "mlw:proxy_symbol"
 let proxy_attrs = Sattr.singleton proxy_attr
 
 let rec e_attr_push ?loc l e = match e.e_node with

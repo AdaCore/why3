@@ -112,6 +112,14 @@ intros x y (h1,h2).
 now apply Z.pow_nonneg.
 Qed.
 
+(* Why3 goal *)
+Lemma Power_pos :
+  forall (x:Z) (y:Z), ((0%Z < x)%Z /\ (0%Z <= y)%Z) -> (0%Z < (power x y))%Z.
+Proof.
+intros x y (h1,h2).
+eapply Z.pow_pos_nonneg; eauto.
+Qed.
+
 Open Scope Z_scope.
 
 (* Why3 goal *)

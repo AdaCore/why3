@@ -67,6 +67,7 @@ type command =
   | Prove        of Whyconf.config_prover * Call_provers.resource_limit
   | Strategies   of string
   | Edit         of Whyconf.prover
+  | Get_ce
   | Bisect
   | Replay       of bool
   | Clean

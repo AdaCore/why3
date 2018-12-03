@@ -41,6 +41,9 @@ decide_fail () {
         # Inconsistent results between two runs
         "bench/ce/ref_mono_Z3,4.6.0_WP")
             is_xfail=true;;
+        # Inconsistent results between two runs
+        "bench/ce/ref_mono_Z3,4.6.0_SP")
+            is_xfail=true;;
     esac
 }
 
@@ -74,7 +77,9 @@ run () {
         # TODO temporary as this comes from incorrect locations generated in
         # a[i] <- x like terms.
         sed -r 's/\:loc\:.*\]/\:loc\:location\]/' >> "$f.out"
-    if cmp "${oracle_file}" "$f.out" > /dev/null 2>&1 ; then
+    str_oracle=$(tr -d ' \n' < "${oracle_file}")
+    str_out=$(tr -d ' \n' < "$f.out")
+    if [ "$str_oracle" = "$str_out" ] ; then
         echo "ok"
     else
         if $updateoracle; then

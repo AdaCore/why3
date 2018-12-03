@@ -408,8 +408,7 @@ let unit_module =
 
 let itd_ref =
   let tv = create_tvsymbol (id_fresh "a") in
-  let attrs = Sattr.singleton (create_attribute "model_trace:") in
-  let pj = create_pvsymbol (id_fresh ~attrs "contents") (ity_var tv) in
+  let pj = create_pvsymbol (id_fresh "contents") (ity_var tv) in
   create_plain_record_decl ~priv:false ~mut:true (id_fresh "ref")
                                             [tv] [true, pj] [] []
 

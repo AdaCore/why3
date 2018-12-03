@@ -137,6 +137,65 @@ let decl_l  = gen_decl_l Task.add_decl
 let tdecl   = gen_decl   add_tdecl
 let tdecl_l = gen_decl_l add_tdecl
 
+type diff_decl =
+  | Goal_decl of Decl.decl
+  | Normal_decl of Decl.decl
+
+let decl_goal_l (fn: decl -> diff_decl list list) =
+  (* Same algo as for gen_decl_l so it can be generalized to tdecl *)
+  let fn = store_decl fn in
+  let is_goal d =
+    match d.d_node with
+    | Dprop (Pgoal, _, _) -> true
+    | _ -> false
+  in
+
+  let fn task (changed_goal, task_uc) =
+    match task.task_decl.td_node with
+    | Decl d when is_goal d ->
+        begin match changed_goal with
+        | None ->
+          List.map
+            (fun x -> List.fold_left
+                (fun (changed_goal, task_uc) typed_decl ->
+                   match typed_decl with
+                   | Goal_decl _ ->
+                     (* TODO: disallowing the creation of a new goal when
+                        analysing the goal itself: to be improved ? *)
+                     assert false
+                   | Normal_decl d -> (changed_goal, Task.add_decl task_uc d)
+                )
+                (changed_goal, task_uc)
+                x)
+            (fn d)
+        | Some new_goal ->
+            [changed_goal, Task.add_decl task_uc new_goal]
+        end
+    | Decl d ->
+      List.map
+        (fun x -> List.fold_left
+            (fun (changed_goal, task_uc) typed_decl ->
+               match typed_decl with
+               | Goal_decl d ->
+                   if changed_goal <> None then
+                     (* TODO: Unsure of soundness of this function when several
+                        goals are created in same branch. To be improved ? *)
+                     assert false
+                   else
+                     begin
+                       assert (is_goal d);
+                       (Some d, task_uc)
+                     end
+               | Normal_decl d -> (changed_goal, Task.add_decl task_uc d))
+            (changed_goal, task_uc)
+            x
+        ) (fn d)
+    | _ ->
+        [changed_goal, add_tdecl task_uc task.task_decl]
+  in
+
+  fold_map_l fn None
+
 let apply_to_goal fn d = match d.d_node with
   | Dprop (Pgoal,pr,f) -> fn pr f
   | _ -> assert false

@@ -33,7 +33,7 @@ type vc_term_info = {
 }
 
 let is_model_vc_attr l =
-  attr_equal l model_vc_attr || attr_equal l model_vc_post_attr
+  attr_equal l Ity.annot_attr || attr_equal l model_vc_post_attr
 
 let check_enter_vc_term t info vc_loc =
   (* Check whether the term that triggers VC is entered.
@@ -51,33 +51,6 @@ let check_enter_vc_term t info vc_loc =
   else
     info
 
-(* TODO: add "remove_suffix" to Strings and use it here instead of regexps *)
-let add_old attr_str =
-  try
-    let pos = Str.search_forward (Str.regexp "@") attr_str 0 in
-    let after = String.sub attr_str pos ((String.length attr_str)-pos) in
-    if after = "@init" then
-      (String.sub attr_str 0 pos) ^ "@old"
-    else attr_str
-  with Not_found -> attr_str ^ "@old"
-
-let model_trace_for_postcondition ~attrs trace_attr =
-  (* Modifies the  model_trace attribute of a term in the postcondition:
-     - if term corresponds to the initial value of a function
-     parameter, model_trace attribute will have postfix @old
-
-     Returns attrs with model_trace attribute modified if there
-     exist model_trace attribute in attrs, attrs otherwise.
-  *)
-  let attr_str = add_old trace_attr.attr_string in
-  if attr_str = trace_attr.attr_string then
-    attrs
-  else
-    let other_attrs = Sattr.remove trace_attr attrs in
-    Sattr.add
-      (Ident.create_attribute attr_str)
-      other_attrs
-
 (* Preid table necessary to avoid duplication of *_vc_constant *)
 module Hprid = Exthtbl.Make (struct
   type t = preid
@@ -92,6 +65,13 @@ let same_line_loc loc1 loc2 =
       let (f2, l2, _, _) = Loc.get loc2 in
       f1 = f2 && l1 = l2
   | _ -> false
+
+let add_model_trace_attr name attrs =
+  if Sattr.exists is_model_trace_attr attrs then
+    attrs
+  else
+    let mt_attr = create_attribute ("model_trace:" ^ name) in
+    Sattr.add mt_attr attrs
 
 (*  Used to generate duplicate vc_constant and axioms for counterex generation.
     This function is always called when the term is in negative position or
@@ -120,14 +100,9 @@ let rec do_intro info vc_loc vc_map vc_var t =
              should be in counterexample, introduce new constant in location
              loc with all attributes necessary for collecting it for
              counterexample and make it equal to the variable *)
-          begin match Ident.get_model_trace_attr ~attrs:ls.id_attrs with
-          | tr_attr ->
-              let const_attr =
-                if info.vc_pre_or_post then
-                  model_trace_for_postcondition ~attrs:ls.id_attrs tr_attr
-                else
-                  ls.id_attrs
-              in
+          if relevant_for_counterexample ls then
+            begin
+              let const_attr = ls.id_attrs in
               let const_name = ls.id_string^"_vc_constant" in
               let axiom_name = ls.id_string^"_vc_axiom" in
               let labels_attr =
@@ -136,6 +111,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
                   t.t_attrs
               in
               let const_attr = Sattr.union const_attr labels_attr in
+              let const_attr = add_model_trace_attr ls.id_string const_attr in
               (* Create a new id here to check the couple name, location. *)
               let id_new = Ident.id_user ~attrs:const_attr const_name loc in
               (* The following check is used to avoid duplication of
@@ -152,8 +128,9 @@ let rec do_intro info vc_loc vc_map vc_var t =
                   intro_const_equal_to_term
                     ~term:t ~id_new:id_new ~axiom_name
                 end
-          | exception Not_found -> []
-          end
+            end
+          else
+            []
       | _ -> []
     end
     else [] in

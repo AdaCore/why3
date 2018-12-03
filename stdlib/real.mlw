@@ -58,6 +58,7 @@ module RealInfix
   let function (-._) (x:real) : real = - x
   function inv (x:real) : real = Real.inv x
 
+  let (=.) (x:real) (y:real) = x = y
   let predicate (<=.) (x:real) (y:real) = x <= y
   let predicate (>=.) (x:real) (y:real) = x >= y
   let predicate ( <.) (x:real) (y:real) = x < y

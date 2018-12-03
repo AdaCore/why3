@@ -246,14 +246,14 @@ module Array63
     ensures { 0 <= i < a.length }
     ensures { result = a[i] }
     raises  { OutOfBounds -> i < 0 \/ i >= a.length }
-  = if i < of_int 0 || i >= length a then raise OutOfBounds;
+  = if i < 0 || i >= length a then raise OutOfBounds;
     a[i]
 
   let defensive_set (a: array 'a) (i: int63) (v: 'a)
     ensures { 0 <= i < a.length }
     ensures { a.elts = (old a.elts)[i <- v] }
     raises  { OutOfBounds -> (i < 0 \/ i >= a.length) /\ a = old a }
-  = if i < of_int 0 || i >= length a then raise OutOfBounds;
+  = if i < 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
   val make (n: int63) (v: 'a) : array 'a

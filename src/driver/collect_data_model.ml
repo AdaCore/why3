@@ -257,7 +257,13 @@ let add_vars_to_table (table: correspondence_table) key value : correspondence_t
                     Mstr.add key_val (Node (Mpr.add key (Leaf (TTerm value)) Mpr.empty)) acc
                   else
                     begin match l_elt with
-                      | Node mpt -> Mstr.add key_val (Node (Mpr.add key (Leaf (TTerm value)) mpt)) acc
+                      | Node mpt ->
+                          (* We always prefer explicit assignment to default
+                             type assignment. *)
+                          if Mpr.mem key mpt then
+                            acc
+                          else
+                            Mstr.add key_val (Node (Mpr.add key (Leaf (TTerm value)) mpt)) acc
                       | _ -> acc
                     end
               )

@@ -165,16 +165,35 @@ val id_unique_attr :
 (** Do the same as id_unique except that it tries first to use
     the "name:" attribute to generate the name instead of id.id_string *)
 
+val proxy_attr: attribute
+
 (** {2 Attributes for handling counterexamples} *)
 
 val model_projected_attr : attribute
-
-val model_vc_attr : attribute
 val model_vc_post_attr : attribute
-val model_vc_havoc_attr : attribute
 
 val has_a_model_attr : ident -> bool
 (** [true] when [ident] has one of the attributes above *)
+
+val relevant_for_counterexample: ident -> bool
+(** [true] when [ident] is a constant value that should be used for
+    counterexamples generation.
+*)
+
+val create_written_attr: Loc.position -> attribute
+(** The vc_written attribute is built during VC generation: it is used to
+    track the location of the creation of variables. Those variables can have
+    several creation locations with SP algorithm. These attribute-locations are
+    used by counterexamples.
+    The form is the following:
+    "vc:written:line:start_column:end_column:file_name"
+    file_name is at the end for easier parsing (file_name can contain ":")
+*)
+
+val extract_written_loc: attribute -> Loc.position option
+(** Extract the location inside vc_written attribute. [None] if the attribute is
+    ill-formed.
+*)
 
 val remove_model_attrs : attrs:Sattr.t -> Sattr.t
 (** Remove the counter-example attributes from an attribute set *)
@@ -198,7 +217,7 @@ val get_model_element_name : attrs:Sattr.t -> string
     return ["name"]. Raises [Not_found] if there is no attribute of
     the form ["model_trace:*"]. *)
 
-val get_model_trace_string : attrs:Sattr.t -> string
+val get_model_trace_string : name:string -> attrs:Sattr.t -> string
 (** If attrs contain an attribute of the form ["model_trace:mt_string"],
     return ["mt_string"]. Raises [Not_found] if there is no attribute of
     the form ["model_trace:*"]. *)

@@ -47,3 +47,6 @@ val check_exit_vc_term: Term.term -> bool -> vc_term_info -> unit
 
 val update_info_labels: string -> Sattr.t Mstr.t -> Term.term ->
   Term.lsymbol -> Sattr.t Mstr.t
+
+val check_for_counterexample: Term.term -> bool
+(* Check if a term should be added for counterexample analysis *)
