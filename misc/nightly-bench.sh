@@ -44,6 +44,7 @@ NEWCOMMITHASH=$(git rev-parse HEAD)
 
 if test $LASTCOMMITHASH = $NEWCOMMITHASH; then
     echo "Not running nightly bench: last commit is the same as for previous run" > $REPORT
+    SUBJECT="$SUBJECT not run (no new commit)"
 else
 echo "== Why3 bench on $DATE ==" > $REPORT
 echo "Starting time (UTC): "`date --utc +%H:%M` >> $REPORT
