@@ -66,6 +66,17 @@ let same_line_loc loc1 loc2 =
       f1 = f2 && l1 = l2
   | _ -> false
 
+let same_line_locs loc1 ls =
+  let is_same =
+    match ls.id_loc with
+    | Some loc when same_line_loc (Some loc) loc1 -> true
+    | _ -> false
+  in
+  is_same ||
+  Sattr.exists (fun x ->
+      let loc = extract_written_loc x in
+      same_line_loc loc loc1) ls.id_attrs
+
 let add_model_trace_attr name attrs =
   if Sattr.exists is_model_trace_attr attrs then
     attrs
@@ -95,7 +106,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
     if info.vc_inside then begin
       match info.vc_loc with
       | None -> []
-      | Some loc when not (same_line_loc info.vc_loc ls.id_loc) ->
+      | Some loc when not (same_line_locs info.vc_loc ls) ->
           (* variable inside the term T that triggers VC. If the variable
              should be in counterexample, introduce new constant in location
              loc with all attributes necessary for collecting it for
@@ -134,6 +145,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
       | _ -> []
     end
     else [] in
+
   match t.t_node with
   | Tapp (ls, tl) ->
     begin
