@@ -744,7 +744,7 @@ let schedule_transformation c id name args ~callback ~notification =
          (* if result is same as input task, consider it as a failure *)
          callback (TSfailed (id, NoProgress))
       | (Arg_trans _ | Arg_trans_decl _ | Arg_trans_missing _
-        | Arg_trans_term _ | Arg_trans_term2 _
+        | Arg_trans_term _ | Arg_trans_term2 _ | Arg_trans_term3 _
         | Arg_trans_pattern _ | Arg_trans_type _ | Arg_bad_hypothesis _
         | Cannot_infer_type _ | Unnecessary_terms _ | Parse_error _
         | Arg_expected _ | Arg_theory_not_found _ | Arg_expected_none _

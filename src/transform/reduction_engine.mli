@@ -118,7 +118,9 @@ val normalize : ?step_limit:int -> limit:int -> engine -> Term.term -> Term.term
 
 open Term
 
-exception NoMatch of (term * term) option
+exception NoMatch of (term * term * term option) option
+(** [NoMatch (t1, t2, t3)] Cannot match [t1] with [t2]. If [t3] exists then [t1]
+    is already matched with [t3]. *)
 exception NoMatchpat of (pattern * pattern) option
 
 type substitution = term Mvs.t
