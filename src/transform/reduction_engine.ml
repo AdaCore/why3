@@ -296,7 +296,7 @@ type config = {
    transformation step. *)
 let rec_step_limit = ref 0
 
-exception NoMatch of (term * term) option
+exception NoMatch of (term * term * term option) option
 exception NoMatchpat of (pattern * pattern) option
 
 let rec pattern_renaming (bound_vars, mt) p1 p2 =
@@ -349,7 +349,7 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     if t_equal t t2 then
                       loop bound_vars sigma r1 r2
                     else
-                      raise (NoMatch (Some (t1, t2)))
+                      raise (NoMatch (Some (t1, t2, Some t)))
                 with Not_found ->
                   try
                     let ts = Ty.ty_match mt vs.vs_ty (t_type t2) in
@@ -357,8 +357,9 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     if Mvs.is_empty (Mvs.set_inter bound_vars fv2) then
                       loop bound_vars (ts,Mvs.add vs t2 mv) r1 r2
                     else
-                      raise (NoMatch (Some (t1, t2)))
-                  with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1, t2)))
+                      raise (NoMatch (Some (t1, t2, None)))
+                  with Ty.TypeMismatch _ ->
+                    raise (NoMatch (Some (t1, t2, None)))
               end
             | Tapp(ls1,args1) ->
               begin
@@ -369,9 +370,10 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                         (List.rev_append args2 r2) in
                     begin
                       try Ty.oty_match mt t1.t_ty t2.t_ty, mv
-                      with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1, t2)))
+                      with Ty.TypeMismatch _ ->
+                        raise (NoMatch (Some (t1, t2, None)))
                     end
-                  | _ -> raise (NoMatch (Some (t1, t2)))
+                  | _ -> raise (NoMatch (Some (t1, t2, None)))
               end
             | Tquant (q1, bv1) ->
               begin
@@ -385,17 +387,17 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                       let bound_vars = Mvs.add e2 e1 bound_vars in
                       (bound_vars,term1, mt)) (bound_vars,term1, mt) vl1 vl2
                     with Invalid_argument _ | Ty.TypeMismatch _ ->
-                      raise (NoMatch (Some (t1,t2)))
+                      raise (NoMatch (Some (t1,t2,None)))
                   in
                   loop bound_vars (mt, mv) (term1 :: r1) (term2 :: r2)
-                | _ -> raise (NoMatch (Some (t1, t2)))
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
               end
             | Tbinop (b1, t1_l, t1_r) ->
               begin
                 match t2.t_node with
                 | Tbinop (b2, t2_l, t2_r) when b1 = b2 ->
                   loop bound_vars (mt, mv) (t1_l :: t1_r :: r1) (t2_l :: t2_r :: r2)
-                | _ -> raise (NoMatch (Some (t1, t2)))
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
               end
             | Tif (t11, t12, t13) ->
               begin
@@ -403,7 +405,7 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                 | Tif (t21, t22, t23) ->
                   loop bound_vars (mt, mv) (t11 :: t12 :: t13 :: r1)
                       (t21 :: t22 :: t23 :: r2)
-                | _ -> raise (NoMatch (Some (t1, t2)))
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
               end
             | Tlet (td1, tb1) ->
               begin
@@ -412,11 +414,12 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                   let (v1, tl1) = t_open_bound tb1 in
                   let (v2, tl2) = t_open_bound tb2 in
                   let mt = try Ty.ty_match mt v1.vs_ty v2.vs_ty
-                    with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1,t2))) in
+                    with Ty.TypeMismatch _ ->
+                      raise (NoMatch (Some (t1,t2, None))) in
                   let bound_vars = Mvs.add v2 v1 bound_vars in
                   loop bound_vars (mt, mv) (td1 :: tl1 :: r1) (td2 :: tl2 :: r2)
                 | _ ->
-                  raise (NoMatch (Some (t1, t2)))
+                  raise (NoMatch (Some (t1, t2, None)))
               end
             | Tcase (ts1, tbl1) ->
               begin
@@ -432,9 +435,9 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                         ) (bound_vars,mt, ts1 :: r1, ts2 :: r2) tbl1 tbl2 in
                       loop bound_vars (mt,mv) l1 l2
                     with Invalid_argument _ ->
-                      raise (NoMatch (Some (t1, t2)))
+                      raise (NoMatch (Some (t1, t2, None)))
                     end
-                | _ -> raise (NoMatch (Some (t1, t2)))
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
               end
             | Teps tb1 ->
               begin
@@ -443,10 +446,11 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                   let (v1, td1) = t_open_bound tb1 in
                   let (v2, td2) = t_open_bound tb2 in
                   let mt = try Ty.ty_match mt v1.vs_ty v2.vs_ty
-                    with Ty.TypeMismatch _ -> raise (NoMatch (Some (t1,t2))) in
+                    with Ty.TypeMismatch _ ->
+                      raise (NoMatch (Some (t1,t2,None))) in
                   let bound_vars = Mvs.add v2 v1 bound_vars in
                   loop bound_vars (mt, mv) (td1 :: r1) (td2 :: r2)
-                | _ -> raise (NoMatch (Some (t1, t2)))
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
               end
 
             | Tnot t1 ->
@@ -454,7 +458,7 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                 match t2.t_node with
                 | Tnot t2 ->
                   loop bound_vars sigma (t1 :: r1) (t2 :: r2)
-                | _ -> raise (NoMatch (Some (t1, t2)))
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
               end
             | Tvar v1 ->
                 begin match t2.t_node with
@@ -463,15 +467,15 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                       if vs_equal v1 (Mvs.find v2 bound_vars) then
                         loop bound_vars sigma r1 r2
                       else
-                        raise (NoMatch (Some (t1, t2)))
+                        raise (NoMatch (Some (t1, t2, None)))
                     with
                       Not_found -> assert false
                     end
-                | _ -> raise (NoMatch (Some (t1, t2)))
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
                 end
             | (Tconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
                 loop bound_vars sigma r1 r2
-            | Tconst _ | Ttrue | Tfalse -> raise (NoMatch (Some (t1, t2)))
+            | Tconst _ | Ttrue | Tfalse -> raise (NoMatch (Some (t1, t2, None)))
         end
       | _ -> raise (NoMatch None)
   in
