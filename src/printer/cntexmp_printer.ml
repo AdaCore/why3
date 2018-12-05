@@ -98,6 +98,8 @@ let check_exit_vc_term t in_goal info =
 (* This is used to update info_labels of info in the printer. This takes the
    label informations present in the term and add a location to help pretty
    printing the counterexamples.
+   This also takes the information for if_branching "branch_id=" used by API
+   users.
 *)
 let update_info_labels lsname cur_attrs t ls =
   let cur_l =
@@ -118,7 +120,10 @@ let update_info_labels lsname cur_attrs t ls =
           let attr = create_attribute (attr.attr_string ^ ":loc:" ^ f ^ ":" ^ (string_of_int l)) in
           Sattr.add attr acc
         else
-          acc
+          if Strings.has_prefix "branch_id=" attr.attr_string then
+            Sattr.add attr acc
+          else
+            acc
       ) (Sattr.union t.t_attrs ls.ls_name.id_attrs) cur_l
   in
   Mstr.add lsname updated_attr_labels cur_attrs

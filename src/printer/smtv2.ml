@@ -260,7 +260,7 @@ let rec print_term info fmt t =
 
             let str_ls = sprintf "%a" (print_ident info) ls.ls_name in
             let cur_var = info.info_labels in
-            let new_var = update_info_labels  str_ls cur_var t ls in
+            let new_var = update_info_labels str_ls cur_var t ls in
             let () = info.info_labels <- new_var in
             let vc_term_info = info.info_vc_term in
             if vc_term_info.vc_inside then begin
