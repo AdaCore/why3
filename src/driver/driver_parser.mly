@@ -11,7 +11,6 @@
 
 %{
   open Driver_ast
-
 %}
 
 %token <int> INTEGER
@@ -31,6 +30,7 @@
 %token FUNCTION PREDICATE TYPE PROP ALL FILENAME TRANSFORM PLUGIN
 %token COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
+%token PREC ASSOC LEFT RIGHT
 
 %nonassoc SYNTAX REMOVE PRELUDE INTERFACE
 %nonassoc prec_pty
@@ -211,6 +211,14 @@ mrule:
 | trule                          { MRtheory $1 }
 | INTERFACE STRING               { MRinterface ($2) }
 | SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
-| SYNTAX VAL qualid STRING       { MRval ($3, $4) }
+| SYNTAX VAL qualid STRING precedence? associativity?
+                                 { MRval ($3, $4, $5, $6) }
+
+precedence:
+| PREC INTEGER { $2 }
+
+associativity:
+| ASSOC LEFT  { Left }
+| ASSOC RIGHT { Right }
 
 loc(X): X { Loc.extract ($startpos,$endpos), $1 }

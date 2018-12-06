@@ -28,6 +28,8 @@ type driver = {
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
   drv_literal     : Printer.syntax_map;
+  drv_prec        : (int option) Mid.t;
+  drv_assoc       : (assoc_dir option) Mid.t;
 }
 
 type printer_args = {
@@ -38,6 +40,8 @@ type printer_args = {
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   literal     : Printer.syntax_map;
+  prec        : (int option) Mid.t;
+  assoc       : (assoc_dir option) Mid.t;
 }
 
 let load_file file =
@@ -88,6 +92,8 @@ let load_driver env file extra_files =
   let thinterface = ref Mid.empty in
   let syntax_map = ref Mid.empty in
   let literal_map = ref Mid.empty in
+  let prec_map  = ref Mid.empty in
+  let assoc_map = ref Mid.empty in
   let qualid    = ref [] in
 
   let find_pr th (loc,q) = try Theory.ns_find_pr th.th_export q
@@ -184,9 +190,11 @@ let load_driver env file extra_files =
     | MRexception (q,s) ->
         let xs = find_xs m q in
         add_syntax xs.Ity.xs_name s false
-    | MRval (q,s) ->
+    | MRval (q,s,p,a) ->
         let id = find_val m q in
-        add_syntax id s false
+        add_syntax id s false;
+        prec_map := Mid.add id p !prec_map;
+        assoc_map := Mid.add id a !assoc_map;                   
     | MRtheory trule ->
         add_local m.mod_theory (loc,trule)
   in
@@ -222,6 +230,8 @@ let load_driver env file extra_files =
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_syntax      = !syntax_map;
     drv_literal     = !literal_map;
+    drv_prec        = !prec_map;
+    drv_assoc       = !assoc_map;
   }
 
 (* registering printers for programs *)
@@ -277,6 +287,8 @@ let lookup_printer drv =
       blacklist   = drv.drv_blacklist;
       syntax      = drv.drv_syntax;
       literal     = drv.drv_literal;
+      prec        = drv.drv_prec;
+      assoc       = drv.drv_assoc;
     }
   in
   try
