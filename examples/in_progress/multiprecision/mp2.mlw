@@ -6847,7 +6847,6 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
               = value q (sx - sy + 1) * value y sy
                 + value r sy }
     ensures { value r sy < value y sy }
-    diverges
   =
     let uone = (1:UInt32.uint32) in
     let nx = malloc (UInt32.(+) (UInt32.of_int32 sx) uone) in
