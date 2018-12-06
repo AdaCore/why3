@@ -20,24 +20,24 @@ module Compare
     requires { valid y sz }
     ensures { result = compare_int (value x sz) (value y sz) }
   =
-   let i = ref sz in
-   while !i >= 1 do
-     variant { !i }
-     invariant { 0 <= !i <= sz }
-     invariant { forall j. !i <= j < sz ->
+   let ref i = sz in
+   while i >= 1 do
+     variant { i }
+     invariant { 0 <= i <= sz }
+     invariant { forall j. i <= j < sz ->
                  (pelts x)[x.offset+j] = (pelts y)[y.offset+j] }
-     assert { forall j. 0 <= j < sz - !i ->
-              let k = !i+j in
-              !i <= k < sz ->
+     assert { forall j. 0 <= j < sz - i ->
+              let k = i+j in
+              i <= k < sz ->
               (pelts x)[x.offset+k] = (pelts y)[y.offset+k] /\
-              (pelts x)[!i+x.offset+j] = (pelts y)[!i+y.offset+j] };
-     value_sub_frame_shift (pelts x) (pelts y) (p2i !i+x.offset)
-                           (p2i !i+y.offset) ((p2i sz) - (p2i !i));
-     let ghost k = p2i !i in
-     i := !i - 1;
-     assert { 0 <= !i < sz };
-     let lx = get_ofs x !i in
-     let ly = get_ofs y !i in
+              (pelts x)[i+x.offset+j] = (pelts y)[i+y.offset+j] };
+     value_sub_frame_shift (pelts x) (pelts y) (p2i i+x.offset)
+                           (p2i i+y.offset) ((p2i sz) - (p2i i));
+     let ghost k = p2i i in
+     i <- i - 1;
+     assert { 0 <= i < sz };
+     let lx = get_ofs x i in
+     let ly = get_ofs y i in
      if (not (lx = ly))
      then begin
           value_sub_concat (pelts x) x.offset (x.offset+k) (x.offset+p2i sz);
