@@ -5,7 +5,7 @@ module Main
 
   type path_sel_type = { mutable sel_path : bool}
 
-  val path_selector [@model] [@model_trace:TEMP_NAME]: path_sel_type
+  val path_selector [@model_trace:TEMP_NAME]: path_sel_type
 
 end
 
@@ -19,13 +19,15 @@ module Other
     ensures {result = 5}
   =
     (* The counterexample should contain the node_id 5454 here but not 121 *)
-    if (([@node_id=5454] path_selector).sel_path  <- (a = 1); path_selector.sel_path) then
+    if (path_selector.sel_path <- (a = 1); ([@branch_id=5454] path_selector).sel_path) then
       5
     else
+      begin path_selector.sel_path <- true;
       (* The counterexample should contain the node_id 121 but not 5454 *)
-      if (([@node_id=121] path_selector).sel_path <- (a = 5); path_selector.sel_path) then
+      if (path_selector.sel_path <- (a = 5); ([@branch_id=121] path_selector).sel_path) then
         15
       else
         22
+      end
 
 end

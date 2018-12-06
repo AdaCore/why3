@@ -212,6 +212,12 @@ let get_exception_message ses id e =
         P.print_term t1 (print_opt_type ~print_type:P.print_ty) t1.Term.t_ty
         P.print_term t2 (print_opt_type ~print_type:P.print_ty) t2.Term.t_ty,
       Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Arg_trans_term3 (s, t1, t2, t3) ->
+      Pp.sprintf "Error in transformation %s during unification of following two terms:\n %a : %a \n %a : %a\n\n%a is already matched with %a" s
+        P.print_term t1 (print_opt_type ~print_type:P.print_ty) t1.Term.t_ty
+        P.print_term t2 (print_opt_type ~print_type:P.print_ty) t2.Term.t_ty
+        P.print_term t1 P.print_term t3,
+      Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_pattern (s, pa1, pa2) ->
       Pp.sprintf "Error in transformation %s during unification of the following terms:\n %a \n %a"
         s P.print_pat pa1 P.print_pat pa2, Loc.dummy_position, ""

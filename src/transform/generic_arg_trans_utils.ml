@@ -17,6 +17,7 @@ exception Arg_trans of string
 exception Arg_trans_decl of (string * tdecl list)
 exception Arg_trans_term of (string * term)
 exception Arg_trans_term2 of (string * term * term)
+exception Arg_trans_term3 of (string * term * term * term)
 exception Arg_trans_pattern of (string * pattern * pattern)
 exception Arg_trans_type of (string * Ty.ty * Ty.ty)
 exception Arg_trans_missing of (string * Svs.t)

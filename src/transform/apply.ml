@@ -96,12 +96,20 @@ let with_terms ~trans_name subst_ty subst lv withed_terms =
            is probably possible to use a simplified version. But don't forget
            to unify type variables. (Same comment as at top of this function) *)
         try first_order_matching slv lv withed_terms with
-        | Reduction_engine.NoMatch (Some (t1, t2)) ->
-            Debug.dprintf debug_matching "Term %a and %a can not be matched. Failure in matching@."
+        | Reduction_engine.NoMatch (Some (t1, t2, None)) ->
+            Debug.dprintf debug_matching
+              "Term %a and %a can not be matched. Failure in matching@."
                 Pretty.print_term t1 Pretty.print_term t2;
             raise (Arg_trans_term2 (trans_name^":matching", t1, t2))
+        | Reduction_engine.NoMatch (Some (t1, t2, Some t3)) ->
+            Debug.dprintf debug_matching
+              "Term %a and %a can not be matched. %a already matched with %a@."
+                Pretty.print_term t1 Pretty.print_term t2 Pretty.print_term t1
+                Pretty.print_term t3;
+            raise (Arg_trans_term3 (trans_name^":matching", t1, t2, t3))
         | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
-            Debug.dprintf debug_matching "Term %a and %a can not be matched. Failure in matching@."
+            Debug.dprintf debug_matching
+              "Term %a and %a can not be matched. Failure in matching@."
               Pretty.print_pat p1 Pretty.print_pat p2;
             raise (Arg_trans_pattern (trans_name, p1, p2))
         | Reduction_engine.NoMatch None ->
@@ -131,18 +139,21 @@ let with_terms ~trans_name subst_ty subst lv withed_terms =
    trans_name is used for nice error messages. Errors are returned when the size
    of withed_terms is incorrect.
 *)
-(* TODO Having both slv and lv is redundant but we need both an Svs and the
-   order of elements: to be improved.
-*)
 let matching_with_terms ~trans_name lv llet_vs left_term right_term withed_terms =
   let slv = List.fold_left (fun acc v -> Svs.add v acc) llet_vs lv in
   let (subst_ty, subst) =
     try first_order_matching slv [left_term] [right_term] with
-    | Reduction_engine.NoMatch (Some (t1, t2)) ->
+    | Reduction_engine.NoMatch (Some (t1, t2, None)) ->
       Debug.dprintf debug_matching
         "Term %a and %a can not be matched. Failure in matching@."
         Pretty.print_term t1 Pretty.print_term t2;
       raise (Arg_trans_term2 (trans_name^":no_match", t1, t2))
+    | Reduction_engine.NoMatch (Some (t1, t2, Some t3)) ->
+      Debug.dprintf debug_matching
+        "Term %a and %a can not be matched. %a already matched with %a@."
+        Pretty.print_term t1 Pretty.print_term t2 Pretty.print_term t1
+        Pretty.print_term t3;
+      raise (Arg_trans_term3 (trans_name^":no_match", t1, t2, t3))
     | Reduction_engine.NoMatchpat (Some (p1, p2)) ->
       Debug.dprintf debug_matching
         "Term %a and %a can not be matched. Failure in matching@."
