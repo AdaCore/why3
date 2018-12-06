@@ -52,19 +52,23 @@
 </theory>
 <theory name="Unsoundness">
  <goal name="t1">
+ <transf name="destruct_rec" arg1="H">
+  <goal name="t1.0">
+  <transf name="destruct_rec" arg1="H1">
+   <goal name="t1.0.0" expl="destruct premise">
+   </goal>
+   <goal name="t1.0.1">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
 </theory>
 <theory name="Incompleteness">
  <goal name="t1">
  <transf name="destruct_rec" arg1="H">
-  <goal name="t1.0" expl="destruct premise">
-  <proof prover="0"><result status="unknown" time="0.00"/></proof>
-  </goal>
-  <goal name="t1.1" expl="destruct premise">
-  <proof prover="0"><result status="unknown" time="0.00"/></proof>
-  </goal>
-  <goal name="t1.2" proved="true">
-  <proof prover="0"><result status="valid" time="0.00"/></proof>
+  <goal name="t1.0">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.00"/></proof>
   </goal>
  </transf>
  </goal>
@@ -137,30 +141,6 @@
  </transf>
  <transf name="destruct_rec" arg1="H2">
   <goal name="G.0">
-  </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Tsurfail">
- <goal name="t">
- <transf name="destruct_rec" arg1="H">
-  <goal name="t.0" expl="destruct premise">
-  </goal>
-  <goal name="t.1" expl="destruct premise">
-  </goal>
-  <goal name="t.2">
-  </goal>
- </transf>
- </goal>
-</theory>
-<theory name="Tfail">
- <goal name="G">
- <transf name="destruct_rec" arg1="H">
-  <goal name="G.0" expl="destruct premise">
-  </goal>
-  <goal name="G.1" expl="destruct premise">
-  </goal>
-  <goal name="G.2">
   </goal>
  </transf>
  </goal>
