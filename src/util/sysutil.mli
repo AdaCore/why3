@@ -52,22 +52,17 @@ val copy_dir : string -> string -> unit
     currently the directory must contains only directories and common files
 *)
 
+val concat : string -> string -> string
+(** like [Filename.concat] but returns only second string when it is already absolute *)
+
 val system_independent_path_of_file : string -> string list
-(** [path_of_file filename] return the access path of [filename], in a
-    system-independent way *)
+(** [system_independent_path_of_file filename] return the access path
+    of [filename], in a system-independent way *)
 
-(*
-
-val file_of_path : string list -> string
-(** [file_of_path path] return the system-dependent textual path for [path] *)
- *)
-
-(* unused ?
-val normalize_filename : string -> string
- *)
-(** [normalize_filename filename] removes from [filename] occurrences of
-    "." and ".." that denote respectively the current directory and
-    parent directory, whenever possible *)
+val system_dependent_absolute_path : string -> string list -> string
+(** [system_dependent_absolute_path d p] returns the
+    system-dependent absolute path for the abstract path [p] relative
+    to directory [d] *)
 
 val relativize_filename : string -> string -> string list
 (** [relativize_filename base filename] returns an access path for
@@ -75,14 +70,12 @@ val relativize_filename : string -> string -> string list
     into path components using the system-dependent calls to
     [Filename.dirname] and [Filename.basename].
 
-    OBSOLETE? [base] should not contain occurrences of "." and "..",
-    which can be removed by calling first [normalize_filename].  *)
+    OBSOLETE COMMENT? [base] should not contain occurrences of "." and "..",
+    which can be removed by calling first [normalize_filename].
 
-val absolutize_path : string -> string list -> string
-(** [absolutize_filename base path] constructs a filename for the
-    [path] relatively to [base]. The character marking directories in
-    the result is the one produced by the system-dependent call to
-    [Filename.concat] *)
+    FIXME: this function does not handle symbolic links properly
+ *)
+
 
 val uniquify : string -> string
 (** find filename that doesn't exist based on the given filename.

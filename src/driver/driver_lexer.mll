@@ -123,7 +123,7 @@ rule token = parse
       match tok with
         | INPUT filename ->
           let dirname = Filename.dirname lexbuf.lex_curr_p.pos_fname in
-          let filename = Sysutil.absolutize_path dirname [filename] in
+          let filename = Sysutil.concat dirname filename in
           Stack.push (input_lexbuf filename) s;
           multifile lex_dumb
         | EOF -> ignore (Stack.pop s);

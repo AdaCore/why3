@@ -102,6 +102,9 @@ let rec copy_dir from to_ =
     else copy_file src dst in
   Array.iter copy files
 
+let concat f1 f2 =
+  if Filename.is_relative f2 then Filename.concat f1 f2 else f2
+
 let system_independent_path_of_file f =
   let rec aux acc f =
     let d = Filename.dirname f in
@@ -118,40 +121,6 @@ let system_independent_path_of_file f =
   in
   aux [] f
 
-
-(*
-(* return the absolute path of a given file name.
-   this code has been designed to be architecture-independant so
-   be very careful if you modify this *)
-let absolute_path_of_file f =
-  let rec aux acc f =
-(*
-    Format.printf "aux %s@." f;
-    let _ = read_line () in
-*)
-    let d = Filename.dirname f in
-    if d = Filename.current_dir_name then
-      (* f is relative to the current dir *)
-      let b = Filename.basename f in
-      aux (b::acc) (Sys.getcwd ())
-    else if f=d then
-      (* we are at the root *)
-      acc
-    else
-      let b = Filename.basename f in
-        if f=b then b::acc else
-          aux (b::acc) d
-  in
-  aux [] f
- *)
-
-(* return the file name of an absolute path *)
-let rec file_of_path l =
-  match l with
-    | [] -> ""
-    | [x] -> x
-    | x::l -> Filename.concat x (file_of_path l)
-
 (*
 let test x = (Filename.dirname x, Filename.basename x)
 
@@ -166,26 +135,15 @@ let p1 = path_of_file "/bin/bash"
 let p1 = path_of_file "../src/f.why"
   *)
 
-                              (*
-let normalize_filename f =
-  let rec aux af acc =
-    match af, acc with
-      | x::rf, _ ->
-        if x = Filename.current_dir_name then
-          aux rf acc
-        else if x = Filename.parent_dir_name then
-          (match acc with
-             | _::racc -> aux rf racc
-             | [] ->
-               (* do not treat currently cases like "../../../a/b/c/d",
-                  that cannot occur if [f] is a full path *)
-                failwith "cannot normalize filename")
-        else
-          aux rf (x::acc)
-      | [], _ -> acc
+let system_dependent_absolute_path dir p =
+  let rec file_of_path l =
+    match l with
+    | [] -> ""
+    | [x] -> x
+    | x::l -> Filename.concat x (file_of_path l)
   in
-  file_of_path (List.rev (aux (path_of_file f) []))
-                               *)
+  let f = file_of_path p in
+  Filename.concat dir f
 
 let relativize_filename base f =
   let rec aux abs ab af =
@@ -208,12 +166,7 @@ let relativize_filename base f =
   in
   aux [] (system_independent_path_of_file base) (system_independent_path_of_file f)
 
-let absolutize_path dirname p =
-  let f = file_of_path p in
-  if Filename.is_relative f then
-    Filename.concat dirname f
-  else
-    f
+
 
 (*
 let p1 = relativize_filename "/bin/bash" "src/f.why"

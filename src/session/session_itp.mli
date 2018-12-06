@@ -70,7 +70,7 @@ val file_path : file -> file_path
 val file_format : file -> string option
 val file_theories : file -> theory list
 val system_path : session -> file -> string
-(** the system-dependent path associated to that file *)
+(** the system-dependent absolute path associated to that file *)
 
 val basename : file_path -> string
 

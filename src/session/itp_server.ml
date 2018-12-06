@@ -413,8 +413,9 @@ let get_locations (task: Task.task) =
   let relativize f =
     try Hstr.find file_cache f
     with Not_found ->
-      (* FIXME: this an abusive use of Sysutil.absolutize_path *)
-      let g = Sysutil.absolutize_path "" (Sysutil.relativize_filename session_dir f) in
+      let path = Sysutil.relativize_filename session_dir f in
+      (* FIXME: this an abusive use of Sysutil.system_dependent_absolute_path *)
+      let g = Sysutil.system_dependent_absolute_path "" path in
       Hstr.replace file_cache f g;
       g in
   let color_loc ~color ~loc =
@@ -568,8 +569,9 @@ end
 
   let relativize_location s loc =
     let f, l, b, e = Loc.get loc in
-    (* FIXME: this an abusive use of Sysutil.absolutize_path *)
-    let f = Sysutil.absolutize_path "" (Sysutil.relativize_filename (Session_itp.get_dir s) f) in
+    let path = Sysutil.relativize_filename (Session_itp.get_dir s) f in
+    (* FIXME: this an abusive use of Sysutil.system_dependent_absolute_path *)
+    let f = Sysutil.system_dependent_absolute_path "" path in
     Loc.user_position f l b e
 
   let capture_parse_or_type_errors f cont =
@@ -941,16 +943,16 @@ end
       P.notify (Message (Information ("File already in session: " ^ f)))
     with Not_found ->
       if (Sys.file_exists f) then
+        let l = add_file cont f in
+        let file = find_file_from_path cont.controller_session fn in
+        send_new_subtree_from_file file;
+        read_and_send (Session_itp.system_path cont.controller_session file);
         begin
-          match add_file cont f with
+          match l with
           | [] ->
              session_needs_saving := true;
-             let file = find_file_from_path cont.controller_session fn in
-             send_new_subtree_from_file file;
-             read_and_send (Sysutil.absolutize_path dir fn);
              P.notify (Message (Information "file added in session"))
           | l ->
-             read_and_send (Sysutil.absolutize_path dir fn);
              List.iter
                (function
                  | (loc,rel_loc,s) ->

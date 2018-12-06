@@ -143,7 +143,7 @@ type session = {
 }
 
 let system_path s f =
-  Sysutil.absolutize_path s.session_dir f.file_path
+  Sysutil.system_dependent_absolute_path s.session_dir f.file_path
 
 let theory_parent s th =
   Debug.dprintf debug "[Session_itp.theory_parent] th.parent_name = %d@."
@@ -1675,7 +1675,7 @@ let read_file env ?format fn =
 let merge_file  ~shape_version env (ses : session) (old_ses : session) file =
   let format = file_format file in
   let old_theories = file_theories file in
-  let file_name = Sysutil.absolutize_path (get_dir old_ses) (file_path file) in
+  let file_name = Sysutil.system_dependent_absolute_path (get_dir old_ses) (file_path file) in
   Debug.dprintf debug "merging file %s@." file_name;
   try
     let new_theories = read_file env file_name ?format in
@@ -1944,7 +1944,7 @@ let save_theory s ctxt fmt t =
 
 let save_file s ctxt fmt _ f =
   fprintf fmt
-    "@\n@[<v 0>@[<h><file@ %a%a>@]"
+    "@\n@[<v 0>@[<h><file%a%a>@]"
     (opt_string "format") f.file_format
     (save_bool_def "proved" false) (file_proved s f);
   List.iter (fun s -> fprintf fmt "@\n@[<hov 1><path@ name=\"%s\"/>@]" s) f.file_path;
