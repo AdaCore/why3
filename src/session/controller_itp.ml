@@ -176,9 +176,9 @@ module PSession = struct
     let s = x.tcont.controller_session in
     let n y acc = { x with tkind = y } :: acc in
     match x.tkind with
-    | Session -> "", Hstr.fold (fun _ f -> n (File f)) (get_files s) []
+    | Session -> "", Hfile.fold (fun _ f -> n (File f)) (get_files s) []
     | File f ->
-       (file_name f),
+       string_of_file_path (file_path f),
        List.fold_right (fun th -> n (Theory th)) (file_theories f) []
     | Theory th ->
        let id = theory_name th in
@@ -607,12 +607,14 @@ let create_file_rel_path c pr pn =
   let th = get_encapsulating_theory session (APn pn) in
   let th_name = (Session_itp.theory_name th).Ident.id_string in
   let f = get_encapsulating_file session (ATh th) in
-  let fn = Filename.chop_extension (Filename.basename (file_name f)) in
+  let fn = Filename.chop_extension (Session_itp.basename (file_path f)) in
   let file = Driver.file_of_task driver fn th_name task in
   let file = Filename.concat session_dir file in
   let file = Sysutil.uniquify file in
   let file = Sysutil.relativize_filename session_dir file in
-  file
+  match file with
+  | [f] -> f
+  | _ -> assert false
 
 let prepare_edition c ?file pn pr ~notification =
   let session = c.controller_session in

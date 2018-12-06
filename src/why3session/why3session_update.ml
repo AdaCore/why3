@@ -19,8 +19,8 @@ let do_action ~env ~session action =
   match action with
   | RenameFile(src,dst) ->
       let src,dst = Session_itp.rename_file session src dst in
-      let src = Filename.concat (Session_itp.get_dir session) src in
-      let dst = Filename.concat (Session_itp.get_dir session) dst in
+      let src = Sysutil.absolutize_path (Session_itp.get_dir session) src in
+      let dst = Sysutil.absolutize_path (Session_itp.get_dir session) dst in
       assert (Sys.file_exists src);
       assert (not (Sys.is_directory src));
       assert (not (Sys.file_exists dst));

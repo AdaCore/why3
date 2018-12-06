@@ -102,11 +102,28 @@ let rec copy_dir from to_ =
     else copy_file src dst in
   Array.iter copy files
 
+let system_independent_path_of_file f =
+  let rec aux acc f =
+    let d = Filename.dirname f in
+    if d = Filename.current_dir_name then
+      (* f is relative to the current dir *)
+      let b = Filename.basename f in
+      b::acc
+    else if f=d then
+      (* we are at the root *)
+      acc
+    else
+      let b = Filename.basename f in
+      aux (b::acc) d
+  in
+  aux [] f
 
+
+(*
 (* return the absolute path of a given file name.
    this code has been designed to be architecture-independant so
    be very careful if you modify this *)
-let path_of_file f =
+let absolute_path_of_file f =
   let rec aux acc f =
 (*
     Format.printf "aux %s@." f;
@@ -126,6 +143,7 @@ let path_of_file f =
           aux (b::acc) d
   in
   aux [] f
+ *)
 
 (* return the file name of an absolute path *)
 let rec file_of_path l =
@@ -188,9 +206,10 @@ let relativize_filename base f =
                    aux2 (x::abs) (Filename.parent_dir_name::rel) rb)
           in aux2 abs af ab
   in
-  file_of_path (aux [] (path_of_file base) (path_of_file f))
+  aux [] (system_independent_path_of_file base) (system_independent_path_of_file f)
 
-let absolutize_filename dirname f =
+let absolutize_path dirname p =
+  let f = file_of_path p in
   if Filename.is_relative f then
     Filename.concat dirname f
   else
