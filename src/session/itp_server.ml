@@ -348,13 +348,13 @@ let () =
   let pn_to_node_ID   : node_ID Hpn.t = Hpn.create 17
   let tn_to_node_ID   : node_ID Htn.t = Htn.create 17
   let th_to_node_ID   : node_ID Ident.Hid.t = Ident.Hid.create 7
-  let file_to_node_ID : node_ID Hstr.t = Hstr.create 3
+  let file_to_node_ID : node_ID Hfile.t = Hfile.create 3
 
   let node_ID_from_pan  pan  = Hpan.find pan_to_node_ID pan
   let node_ID_from_pn   pn   = Hpn.find pn_to_node_ID pn
   let node_ID_from_tn   tn   = Htn.find tn_to_node_ID tn
   let node_ID_from_th   th   = Ident.Hid.find th_to_node_ID (theory_name th)
-  let node_ID_from_file file = Hstr.find file_to_node_ID (file_name file)
+  let node_ID_from_file file = Hfile.find file_to_node_ID (file_id file)
 
   let node_ID_from_any  any  =
     match any with
@@ -367,9 +367,9 @@ let () =
   let remove_any_node_ID any =
     match any with
     | AFile file ->
-        let nid = Hstr.find file_to_node_ID (file_name file) in
+        let nid = Hfile.find file_to_node_ID (file_id file) in
         Hint.remove model_any nid;
-        Hstr.remove file_to_node_ID (file_name file)
+        Hfile.remove file_to_node_ID (file_id file)
     | ATh th     ->
         let nid = Ident.Hid.find th_to_node_ID (theory_name th) in
         Hint.remove model_any nid;
@@ -389,7 +389,7 @@ let () =
 
   let add_node_to_table node new_id =
     match node with
-    | AFile file -> Hstr.add file_to_node_ID (file_name file) new_id
+    | AFile file -> Hfile.add file_to_node_ID (file_id file) new_id
     | ATh th     -> Ident.Hid.add th_to_node_ID (theory_name th) new_id
     | ATn tn     -> Htn.add tn_to_node_ID tn new_id
     | APn pn     -> Hpn.add pn_to_node_ID pn new_id
@@ -413,7 +413,9 @@ let get_locations (task: Task.task) =
   let relativize f =
     try Hstr.find file_cache f
     with Not_found ->
-      let g = Sysutil.relativize_filename session_dir f in
+      let path = Sysutil.relativize_filename session_dir f in
+      (* FIXME: this an abusive use of Sysutil.system_dependent_absolute_path *)
+      let g = Sysutil.system_dependent_absolute_path "" path in
       Hstr.replace file_cache f g;
       g in
   let color_loc ~color ~loc =
@@ -543,27 +545,33 @@ end
     try
       let d = get_server_data() in
       if d.send_source then
-        let fn = Sysutil.absolutize_filename
+(*
+        let fn = Sysutil.absolutize_path
             (Session_itp.get_dir d.cont.controller_session) f in
-        let s = Sysutil.file_contents fn in
+ *)
+        let s = Sysutil.file_contents f in
         P.notify (File_contents (f, s))
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
   let save_file f file_content =
     try
+(*
       let d = get_server_data() in
       let fn = Sysutil.absolutize_filename
                  (Session_itp.get_dir d.cont.controller_session) f in
-      Sysutil.backup_file fn;
-      Sysutil.write_file fn file_content;
+ *)
+      Sysutil.backup_file f;
+      Sysutil.write_file f file_content;
       P.notify (Message (File_Saved f))
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
   let relativize_location s loc =
     let f, l, b, e = Loc.get loc in
-    let f = Sysutil.relativize_filename (Session_itp.get_dir s) f in
+    let path = Sysutil.relativize_filename (Session_itp.get_dir s) f in
+    (* FIXME: this an abusive use of Sysutil.system_dependent_absolute_path *)
+    let f = Sysutil.system_dependent_absolute_path "" path in
     Loc.user_position f l b e
 
   let capture_parse_or_type_errors f cont =
@@ -608,7 +616,7 @@ end
   let get_node_name (node: any) =
     let d = get_server_data () in
     match node with
-    | AFile file -> file_name file
+    | AFile file -> Session_itp.basename (file_path file)
     | ATh th -> (theory_name th).Ident.id_string
     | ATn tn ->
        let name = get_transf_name d.cont.controller_session tn in
@@ -787,7 +795,7 @@ end
     let d = get_server_data () in
     let ses = d.cont.controller_session in
     let files = get_files ses in
-    Hstr.iter
+    Hfile.iter
       (fun _ file ->
        on_file file;
        iter_subtree_from_file on_subtree file)
@@ -807,9 +815,12 @@ end
 
   let reset_and_send_the_whole_tree (): unit =
     P.notify Reset_whole_tree;
-    iter_on_files
-      ~on_file:(fun file -> read_and_send (file_name file))
-      ~on_subtree:create_node
+    let d = get_server_data () in
+    let ses = d.cont.controller_session in
+    let on_file f =
+      read_and_send (Session_itp.system_path ses f)
+    in
+    iter_on_files ~on_file ~on_subtree:create_node
 
   let unfocus () =
     focused_node := Unfocused;
@@ -830,12 +841,10 @@ end
 
   let create_ce_tab ~print_attrs s res any list_loc =
     let f = get_encapsulating_file s any in
-    let filename = Sysutil.absolutize_filename
-      (Session_itp.get_dir s) (file_name f)
-    in
+    let filename = Session_itp.system_path s f in
     let source_code = Sysutil.file_contents filename in
     Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
-      ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:(file_name f)
+      ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:filename
       ~source_code:source_code ~locations:list_loc
 
   let send_task nid show_full_context loc =
@@ -858,7 +867,7 @@ end
           let prover_text = "Detached prover\n====================> Prover: " ^ name ^ "\n" in
           P.notify (Task (nid, prover_text, []))
       | AFile f ->
-          P.notify (Task (nid, "Detached file " ^ file_name f, []))
+          P.notify (Task (nid, "Detached file " ^ (basename (file_path f)), []))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
@@ -909,7 +918,7 @@ end
             | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc))
           end
       | AFile f ->
-          P.notify (Task (nid, "File " ^ file_name f, []))
+          P.notify (Task (nid, "File " ^ (basename (file_path f)), []))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
@@ -927,31 +936,31 @@ end
   (* Note that f is the path from execution directory to the file and fn is the
      path from the session directory to the file. *)
   let add_file_to_session cont f =
-    let fn = Sysutil.relativize_filename
-      (get_dir cont.controller_session) f in
+    let dir = get_dir cont.controller_session in
+    let fn = Sysutil.relativize_filename dir f in
     try
-      let (_ : file) = get_file cont.controller_session fn in
-      P.notify (Message (Information ("File already in session: " ^ fn)))
+      let (_ : file) = find_file_from_path cont.controller_session fn in
+      P.notify (Message (Information ("File already in session: " ^ f)))
     with Not_found ->
-         if (Sys.file_exists f) then
-           begin
-             match add_file cont f with
-             | [] ->
+      if (Sys.file_exists f) then
+        let l = add_file cont f in
+        let file = find_file_from_path cont.controller_session fn in
+        send_new_subtree_from_file file;
+        read_and_send (Session_itp.system_path cont.controller_session file);
+        begin
+          match l with
+          | [] ->
              session_needs_saving := true;
-               let file = get_file cont.controller_session fn in
-               send_new_subtree_from_file file;
-               read_and_send (file_name file);
-               P.notify (Message (Information "file added in session"))
-            | l ->
-               read_and_send fn;
-               List.iter
-                 (function
-                   | (loc,rel_loc,s) ->
-                      P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
-                 l
-          end
-        else
-          P.notify (Message (Open_File_Error ("File not found: " ^ f)))
+             P.notify (Message (Information "file added in session"))
+          | l ->
+             List.iter
+               (function
+                 | (loc,rel_loc,s) ->
+                    P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
+               l
+        end
+      else
+        P.notify (Message (Open_File_Error ("File not found: " ^ f)))
 
 
   (* ------------ init server ------------ *)
@@ -1266,7 +1275,7 @@ end
     Hpn.clear pn_to_node_ID;
     Htn.clear tn_to_node_ID;
     Ident.Hid.clear th_to_node_ID;
-    Hstr.clear file_to_node_ID
+    Hfile.clear file_to_node_ID
 
   let reload_session () : unit =
     let d = get_server_data () in

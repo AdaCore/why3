@@ -73,7 +73,8 @@ let file : Session_itp.file =
   let file_name = "examples/logic/hello_proof.why" in
   try
     Controller_itp.add_file controller file_name;
-    Session_itp.get_file session file_name
+    let path = Sysutil.relativize_filename (Session_itp.get_dir session) file_name in
+    Session_itp.find_file_from_path session path
   with
   | Controller_itp.Errors_list le ->
       eprintf "@[Error while reading file@ '%s':@ %a@.@]" file_name

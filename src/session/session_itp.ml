@@ -24,6 +24,7 @@ let debug_stack_trace = Debug.lookup_flag "stack_trace"
 type transID = int
 type proofNodeID = int
 type proofAttemptID = int
+type fileID = int
 
 let print_proofNodeID fmt id =
   Format.fprintf fmt "proofNodeID<%d>" id
@@ -34,7 +35,7 @@ let print_proofAttemptID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
-  mutable theory_parent_name    : string;
+  mutable theory_parent_name    : fileID;
   mutable theory_is_detached    : bool;
 }
 
@@ -73,14 +74,21 @@ type transformation_node = {
   transf_is_detached               : bool;
 }
 
+type file_path = string list
+let string_of_file_path p = String.concat "/" p
+
 type file = {
-  file_name              : string;
+  file_id                : int;
+  mutable file_path      : file_path;
+  (* access path to the source, in the normal order
+  i.e. ["..";"foo.mlw"] *)
   file_format            : string option;
   file_is_detached       : bool;
   mutable file_theories  : theory list;
 }
 
-let file_name f = f.file_name
+let file_id f = f.file_id
+let file_path f = f.file_path
 let file_format f = f.file_format
 let file_theories f = f.file_theories
 
@@ -91,9 +99,17 @@ type any =
   | APn of proofNodeID
   | APa of proofAttemptID
 
+let rec basename p =
+  match p with
+  | [] -> raise Not_found
+  | [f] -> f
+  | _ :: tl -> basename tl
+
+let print_file_path fmt p = Format.fprintf fmt "%a" (Pp.print_list Pp.slash Pp.string) p
+
 let fprintf_any fmt a =
   match a with
-  | AFile f -> Format.fprintf fmt "<AFile %s>" f.file_name
+  | AFile f -> Format.fprintf fmt "<AFile [%a]>" print_file_path f.file_path
   | ATh th ->  Format.fprintf fmt "<ATh %s>" th.theory_name.Ident.id_string
   | ATn trid -> Format.fprintf fmt "<ATn %d>" trid
   | APn pnid -> Format.fprintf fmt "<APn %d>" pnid
@@ -102,6 +118,7 @@ let fprintf_any fmt a =
 module Hpn = Hint
 module Htn = Hint
 module Hpan = Hint
+module Hfile = Hint
 
 type session = {
   proofAttempt_table            : proof_attempt_node Hint.t;
@@ -110,26 +127,28 @@ type session = {
   mutable next_proofNodeID      : int;
   trans_table                   : transformation_node Hint.t;
   mutable next_transID          : int;
+  mutable next_fileID           : int;
   session_dir                   : string; (** Absolute path *)
-  session_files                 : file Hstr.t;
+  session_files                 : file Hfile.t;
   session_sum_shape_table       : (Termcode.checksum * Termcode.shape) Hpn.t;
   session_prover_ids            : int Hprover.t;
   (* tasks *)
   session_raw_tasks : Task.task Hpn.t;
   session_task_tables : Trans.naming_table Hpn.t;
   (* proved status *)
-  file_state: bool Hstr.t;
+  file_state: bool Hfile.t;
   th_state: bool Ident.Hid.t;
   tn_state: bool Htn.t;
   pn_state : bool Hpn.t;
 }
 
-
+let system_path s f =
+  Sysutil.system_dependent_absolute_path s.session_dir f.file_path
 
 let theory_parent s th =
-  Debug.dprintf debug "[Session_itp.theory_parent] th.parent_name = %s@."
+  Debug.dprintf debug "[Session_itp.theory_parent] th.parent_name = %d@."
                 th.theory_parent_name;
-  Hstr.find s.session_files th.theory_parent_name
+  Hfile.find s.session_files th.theory_parent_name
 
 let session_iter_proof_attempt f s =
   Hint.iter f s.proofAttempt_table
@@ -176,7 +195,7 @@ let get_theories s =
  *)
 
 let get_files s = s.session_files
-let get_file s name = Hstr.find s.session_files name
+(* let get_file s name = Hstr.find s.session_files name *)
 let get_dir s = s.session_dir
 
 (*
@@ -201,6 +220,11 @@ let gen_proofNodeID (s : session) =
 let gen_proofAttemptID (s : session) =
   let id = s.next_proofAttemptID in
   s.next_proofAttemptID <- id + 1;
+  id
+
+let gen_fileID (s : session) =
+  let id = s.next_fileID in
+  s.next_fileID <- id + 1;
   id
 
 (* Get elements of the session tree *)
@@ -373,7 +397,7 @@ let fold_all_any s f acc any =
 
 let fold_all_session s f acc =
   let files = get_files s in
-  Hstr.fold (fun _key file acc -> fold_all_any s f acc (AFile file)) files acc
+  Hfile.fold (fun _key file acc -> fold_all_any s f acc (AFile file)) files acc
 
 
 let rec fold_all_sub_goals_of_proofn s f acc pnid =
@@ -495,14 +519,14 @@ let print_theory s fmt th : unit =
     (Pp.print_list Pp.semi (fun fmt a -> print_proof_node s fmt a)) th.theory_goals
 
 let print_file s fmt (file, thl) =
-  fprintf fmt "@[<hv 2> File %s;@ [%a]@]" file.file_name
+  fprintf fmt "@[<hv 2> File [%a];@ [%a]@]" print_file_path file.file_path
     (Pp.print_list Pp.semi (print_theory s)) thl
 
 let print_s s fmt =
   fprintf fmt "@[%a@]" (Pp.print_list Pp.semi (print_file s))
 
 let _print_session fmt s =
-  let l = Hstr.fold (fun _ f acc -> (f,f.file_theories) :: acc) (get_files s) [] in
+  let l = Hfile.fold (fun _ f acc -> (f,f.file_theories) :: acc) (get_files s) [] in
   fprintf fmt "%a@." (print_s s) l;;
 
 
@@ -518,13 +542,14 @@ let empty_session ?from dir =
     next_proofNodeID = 0;
     trans_table = Hint.create 97;
     next_transID = 0;
+    next_fileID = 0;
     session_dir = dir;
-    session_files = Hstr.create 3;
+    session_files = Hfile.create 3;
     session_prover_ids = prover_ids;
     session_raw_tasks = Hpn.create 97;
     session_task_tables = Hpn.create 97;
     session_sum_shape_table = Hpn.create 97;
-    file_state = Hstr.create 3;
+    file_state = Hfile.create 3;
     th_state = Ident.Hid.create 7;
     tn_state = Htn.create 97;
     pn_state = Hpn.create 97;
@@ -657,10 +682,10 @@ let th_proved s th  =
     b
 
 let file_proved s f =
-  try Hstr.find s.file_state f.file_name
+  try Hfile.find s.file_state f.file_id
   with Not_found ->
     let b = f.file_theories = [] in
-    Hstr.add s.file_state f.file_name b;
+    Hfile.add s.file_state f.file_id b;
     b
 
 let pa_proved s paid =
@@ -711,7 +736,7 @@ let update_file_node notification s f =
     in
     if proved <> file_proved s f then
       begin
-        Hstr.replace s.file_state f.file_name proved;
+        Hfile.replace s.file_state f.file_id proved;
         notification (AFile f);
       end
 
@@ -838,7 +863,7 @@ let remove_subtree ~(notification:notifier) ~(removed:notifier) s (n: any) =
     match n with
     | ATn tn -> remove_transformation s tn
     | APa pa -> remove_proof_attempt_pa s pa
-    | AFile f -> Hstr.remove s.session_files f.file_name
+    | AFile f -> Hfile.remove s.session_files f.file_id
     | APn pn ->
        let node = Hint.find s.proofNode_table pn in
        Hint.remove s.proofNode_table pn;
@@ -1068,7 +1093,7 @@ and load_proof_or_transf session old_provers pid a =
         "[Warning] Session.load_proof_or_transf: unexpected element '%s'@."
         s
 
-let load_theory session parent_name old_provers acc th =
+let load_theory session parent_name old_provers (path,acc) th =
   match th.Xml.name with
   | "theory" ->
     let thname = load_ident th in
@@ -1085,26 +1110,40 @@ let load_theory session parent_name old_provers acc th =
       th.Xml.elements goals;
     let proved = bool_attribute "proved" th false in
     Hid.add session.th_state thname proved;
-    mth::acc
+    (path,mth::acc)
+  | "path" ->
+     let fn = string_attribute "name" th in
+     (fn::path,acc)
   | s ->
     Warning.emit "[Warning] Session.load_theory: unexpected element '%s'@."
       s;
-    acc
+    (path,acc)
 
 let load_file session old_provers f =
   match f.Xml.name with
   | "file" ->
-    let fn = string_attribute "name" f in
+    let fn = string_attribute_opt "name" f in
     let fmt = load_option "format" f in
-    let ft = List.rev
-        (List.fold_left
-           (load_theory session fn old_provers) [] f.Xml.elements) in
-    let mf = { file_name = fn;
+    let fid = gen_fileID session in
+    let path,ft =
+      List.fold_left
+        (load_theory session fid old_provers) ([],[]) f.Xml.elements
+    in
+    let path = match path,fn with
+      | [], Some fn ->
+         let l = Sysutil.system_independent_path_of_file fn in
+         Debug.dprintf debug "Loaded path from concrete file name: %a@." print_file_path l;
+         l
+      | [],None -> assert false
+      | p,_ -> List.rev p
+    in
+    let mf = { file_id = fid;
+               file_path = path;
                file_format = fmt;
                file_is_detached = true;
-               file_theories = ft;
+               file_theories = List.rev ft;
              } in
-    Hstr.add session.session_files fn mf;
+    Hfile.add session.session_files fid mf;
     old_provers
   | "prover" ->
     (* The id is just for the session file *)
@@ -1553,21 +1592,25 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
 let add_file_section (s:session) (fn:string) ~file_is_detached
     (theories:Theory.theory list) format : file =
   let fn = Sysutil.relativize_filename s.session_dir fn in
-  Debug.dprintf debug "[Session_itp.add_file_section] fn = %s@." fn;
-  if Hstr.mem s.session_files fn then
+  Debug.dprintf debug "[Session_itp.add_file_section] fn = %a@." print_file_path fn;
+(*
+  if Hfile.mem s.session_files fn then
     begin
       Printexc.print_backtrace stderr;
       Format.eprintf "[session] FATAL: file %s already in database@." fn;
       exit 2
     end
   else
-    let f = { file_name = fn;
+*)
+  let fid = gen_fileID s in
+    let f = { file_id = fid;
+              file_path = fn;
               file_format = format;
               file_is_detached = file_is_detached;
               file_theories = [] }
     in
-    Hstr.add s.session_files fn f;
-    let theories = List.map (make_theory_section ~detached:false s fn) theories in
+    Hfile.add s.session_files fid f;
+    let theories = List.map (make_theory_section ~detached:false s fid) theories in
     f.file_theories <- theories;
     f
 
@@ -1578,7 +1621,7 @@ let merge_file_section ~shape_version ~old_ses ~old_theories ~file_is_detached ~
     : unit =
   Debug.dprintf debug_merge "[Session_itp.merge_file_section] fn = %s@." fn;
   let f = add_file_section s fn ~file_is_detached [] format in
-  let fn = f.file_name in
+  let fid = f.file_id in
   let theories,detached =
     let old_th_table = Hstr.create 7 in
     List.iter
@@ -1593,17 +1636,17 @@ let merge_file_section ~shape_version ~old_ses ~old_theories ~file_is_detached ~
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory found: %s@." theory_name;
         Hstr.remove old_th_table theory_name;
         make_theory_section ~detached:false
-                            ~merge:(old_ses,old_th,env,shape_version) s fn th
+                            ~merge:(old_ses,old_th,env,shape_version) s fid th
       with Not_found ->
         (* if no theory was found we make a new theory section *)
         Debug.dprintf debug_merge "[Session_itp.merge_file_section] theory NOT FOUND in old session: %s@." theory_name;
-        make_theory_section ~detached:false s fn th
+        make_theory_section ~detached:false s fid th
     in
     let theories = List.map add_theory theories in
     (* we save the remaining, detached *)
     let detached = Hstr.fold
                      (fun _key th tl ->
-                      (save_detached_theory fn old_ses th s) :: tl)
+                      (save_detached_theory fid old_ses th s) :: tl)
                      old_th_table [] in
     theories, List.rev detached
   in
@@ -1632,7 +1675,8 @@ let read_file env ?format fn =
 let merge_file  ~shape_version env (ses : session) (old_ses : session) file =
   let format = file_format file in
   let old_theories = file_theories file in
-  let file_name = Filename.concat (get_dir old_ses) (file_name file) in
+  let file_name = Sysutil.system_dependent_absolute_path (get_dir old_ses) (file_path file) in
+  Debug.dprintf debug "merging file %s@." file_name;
   try
     let new_theories = read_file env file_name ?format in
     merge_file_section
@@ -1646,8 +1690,9 @@ let merge_file  ~shape_version env (ses : session) (old_ses : session) file =
     Some e
 
 let merge_files ~shape_version env (ses:session)  (old_ses : session) =
+  Debug.dprintf debug "merging files from old session@.";
   let errors =
-    Hstr.fold
+    Hfile.fold
       (fun _ f acc ->
        match merge_file ~shape_version env ses old_ses f with
        | None -> acc
@@ -1899,9 +1944,10 @@ let save_theory s ctxt fmt t =
 
 let save_file s ctxt fmt _ f =
   fprintf fmt
-    "@\n@[<v 0>@[<h><file@ name=\"%a\"%a%a>@]"
-    save_string f.file_name (opt_string "format") f.file_format
+    "@\n@[<v 0>@[<h><file%a%a>@]"
+    (opt_string "format") f.file_format
     (save_bool_def "proved" false) (file_proved s f);
+  List.iter (fun s -> fprintf fmt "@\n@[<hov 1><path@ name=\"%s\"/>@]" s) f.file_path;
   List.iter (save_theory s ctxt fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 
@@ -1926,7 +1972,7 @@ let save fname shfname session =
   in
   Mint.iter (save_prover fmt) provers_to_save;
   let ctxt = { prover_ids = prover_ids; provers = provers; ch_shapes = chsh } in
-  Hstr.iter (save_file session ctxt fmt) session.session_files;
+  Hfile.iter (save_file session ctxt fmt) session.session_files;
   fprintf fmt "@]@\n</why3session>";
   fprintf fmt "@.";
   close_out ch;
@@ -1948,18 +1994,19 @@ let save_session (s : session) =
 (* Edition of session *)
 (**********************)
 
+let find_file_from_path s path =
+  let files = get_files s in
+  let file =
+    Hfile.fold
+      (fun _ f acc -> if f.file_path = path then Some f else acc) files None
+  in
+  match file with
+  | None -> raise Not_found
+  | Some file -> file
+
 let rename_file s from_file to_file =
   let src = Sysutil.relativize_filename s.session_dir from_file in
   let dst = Sysutil.relativize_filename s.session_dir to_file in
-  let files = get_files s in
-  let file =
-    try
-      Hstr.find files src
-    with Not_found -> failwith ("filename " ^ src ^ " not found in session")
-  in
-  assert (file.file_name = src);
-  Hstr.remove files src;
-  List.iter (fun th -> th.theory_parent_name <- dst) file.file_theories;
-  let new_file = { file with file_name = dst } in
-  Hstr.add files dst new_file;
+  let file = find_file_from_path s src in
+  file.file_path <- dst;
   src,dst

@@ -678,7 +678,8 @@ let create_source_view =
   let create_source_view f content =
     if not (Hstr.mem source_view_table f) then
       begin
-        let label = GMisc.label ~text:f () in
+        let label = GMisc.label ~text:(Filename.basename f) () in
+        label#misc#set_tooltip_markup f;
         let source_page, scrolled_source_view =
           !n, GPack.vbox ~homogeneous:false ~packing:
             (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
