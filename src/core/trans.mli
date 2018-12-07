@@ -107,6 +107,8 @@ val tgoal   : (prsymbol -> term -> tdecl list     ) -> task trans
 val tgoal_l : (prsymbol -> term -> tdecl list list) -> task tlist
 
 val rewrite : (term -> term) -> task -> task trans
+(** [rewrite f t1 t2] appends to task [t1] the declarations in [t2]
+    in which each top level formula [t] is replaced by [f t] **)
 val rewriteTF : (term -> term) -> (term -> term) -> task -> task trans
 
 val add_decls  : decl list -> task trans
