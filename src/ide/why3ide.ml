@@ -467,27 +467,21 @@ let (_ : GtkSignal.id) =
 
 let hp = GPack.paned `HORIZONTAL ~packing:hb#add ()
 
-let scrollview =
+(** {2 view for the session tree} *)
+let scrolled_session_view =
   let sv =
     GBin.scrolled_window
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
-      ~width:gconfig.tree_width ~shadow_type:`ETCHED_OUT
+      ~shadow_type:`ETCHED_OUT
       ~packing:hp#add ()
   in
+  hp#set_position gconfig.tree_width;
   let (_ : GtkSignal.id) =
     sv#misc#connect#size_allocate
       ~callback:
       (fun {Gtk.width=w;Gtk.height=_h} ->
        gconfig.tree_width <- w)
   in sv
-
-(** {2 view for the session tree} *)
-let scrolled_session_view =
-  GBin.scrolled_window
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~shadow_type:`ETCHED_OUT
-    ~packing:scrollview#add_with_viewport
-    ()
 
 (* Vertical pan *)
 let vpan222 = GPack.paned `VERTICAL ~packing:hp#add ()
