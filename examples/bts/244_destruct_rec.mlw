@@ -1,0 +1,6 @@
+  predicate a
+  predicate b
+  predicate c
+
+  axiom H: (a -> (c /\ b)) /\ (b -> a) /\ a
+  goal t1: c
