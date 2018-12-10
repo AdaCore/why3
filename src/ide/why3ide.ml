@@ -17,6 +17,8 @@ open Ide_utils
 open History
 open Itp_communication
 
+module GSourceView = GSourceView2
+
 external reset_gc : unit -> unit = "ml_reset_gc"
 
 let debug = Debug.lookup_flag "ide_info"
@@ -200,7 +202,7 @@ let (why_lang, any_lang) =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
-    GSourceView2.source_language_manager ~default:true
+    GSourceView.source_language_manager ~default:true
   in
   languages_manager#set_search_path
     (load_path :: languages_manager#search_path);
@@ -238,15 +240,15 @@ let try_convert s =
 
 (* For each view, we have to recreate the tags *)
 let create_colors v =
-  let premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"premise_tag" [`BACKGROUND gconfig.premise_color] in
-  let neg_premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let neg_premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color] in
-  let goal_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let goal_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
-  let error_line_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let error_line_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
-  let error_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let error_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
@@ -256,7 +258,7 @@ let create_colors v =
   ()
 
 (* Erase all the source location tags in a source file *)
-let erase_color_loc (v:GSourceView2.source_view) =
+let erase_color_loc (v:GSourceView.source_view) =
   let buf = v#buffer in
   buf#remove_tag_by_name "premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
@@ -288,7 +290,7 @@ let exit_function_unsafe () =
      source has been modified
    - label_of_tab is the mutable title of the tab
 *)
-let source_view_table : (int * GSourceView2.source_view * bool ref * GMisc.label) Hstr.t =
+let source_view_table : (int * GSourceView.source_view * bool ref * GMisc.label) Hstr.t =
   Hstr.create 14
 
 (* The corresponding file does not have a source view *)
@@ -300,7 +302,7 @@ let get_source_view_table (file:string) =
   | exception Not_found -> raise (Nosourceview file)
 
 (* This returns the source_view of a file *)
-let get_source_view (file: string) : GSourceView2.source_view =
+let get_source_view (file: string) : GSourceView.source_view =
   match Hstr.find source_view_table file with
   | (_, v, _, _) -> v
   | exception Not_found -> raise (Nosourceview file)
@@ -308,7 +310,7 @@ let get_source_view (file: string) : GSourceView2.source_view =
 (* Saving function for sources *)
 let save_sources () =
   Hstr.iter
-    (fun k (_n, (s: GSourceView2.source_view), b, _l) ->
+    (fun k (_n, (s: GSourceView.source_view), b, _l) ->
       if !b then
         let text_to_save = s#source_buffer#get_text () in
         send_request (Save_file_req (k, text_to_save))
@@ -395,12 +397,8 @@ let window_title =
   | None -> "Why3 Interactive Proof Session"
 
 let main_window : GWindow.window =
-  let w = GWindow.window
-            ~allow_grow:true ~allow_shrink:true
-            ~width:gconfig.window_width
-            ~height:gconfig.window_height
-            ~title:window_title ()
-  in
+  let w = GWindow.window ~title:window_title () in
+  w#resize ~width:gconfig.window_width ~height:gconfig.window_height;
   (* callback to record the new size of the main window when changed, so
    that on restart the window size is the same as the last session *)
   let (_ : GtkSignal.id) =
@@ -655,7 +653,7 @@ let (_ : GtkSignal.id) =
 
 
 let task_view =
-  GSourceView2.source_view
+  GSourceView.source_view
     ~editable:false
     ~cursor_visible:false
     ~show_line_numbers:true
@@ -684,7 +682,7 @@ let create_source_view =
             ~shadow_type:`ETCHED_OUT
             ~packing:scrolled_source_view#add () in
         let source_view =
-          GSourceView2.source_view
+          GSourceView.source_view
             ~auto_indent:gconfig.allow_source_editing
             ~insert_spaces_instead_of_tabs:true ~tab_width:2
             ~show_line_numbers:true
@@ -775,7 +773,7 @@ let scrolled_edited_view =
     ~shadow_type:`ETCHED_OUT ~packing:edited_tab#add ()
 
 let edited_view =
-  GSourceView2.source_view
+  GSourceView.source_view
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_edited_view#add
@@ -793,7 +791,7 @@ let scrolled_output_view =
     ~shadow_type:`ETCHED_OUT ~packing:output_tab#add ()
 
 let output_view =
-  GSourceView2.source_view
+  GSourceView.source_view
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_output_view#add
@@ -812,7 +810,7 @@ let scrolled_counterexample_view =
     ~shadow_type:`ETCHED_OUT ~packing:counterexample_tab#add ()
 
 let counterexample_view =
-  GSourceView2.source_view
+  GSourceView.source_view
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_counterexample_view#add
@@ -952,7 +950,7 @@ let update_monitor =
 (* Current position in the source files *)
 let current_cursor_loc = ref None
 
-let move_to_line ~yalign (v : GSourceView2.source_view) line =
+let move_to_line ~yalign (v : GSourceView.source_view) line =
   let line = max 0 (line - 1) in
   let line = min line v#buffer#line_count in
   let it = v#buffer#get_iter (`LINE line) in
@@ -1071,7 +1069,7 @@ let convert_color (color: color): string =
   | Error_line_color -> "error_line_tag"
 
 let color_line ~color loc =
-  let color_line (v:GSourceView2.source_view) ~color l =
+  let color_line (v:GSourceView.source_view) ~color l =
     let buf = v#buffer in
     let top = buf#start_iter in
     let start = top#forward_lines (l-1) in
@@ -1096,7 +1094,7 @@ let color_loc ?(ce=false) ~color loc =
 
   (* This apply a background [color] on a location given by its file view [v] line
      [l] beginning char [b] and end char [e]. *)
-  let color_loc (v:GSourceView2.source_view) ~color l b e =
+  let color_loc (v:GSourceView.source_view) ~color l b e =
     let buf = v#buffer in
     let top = buf#start_iter in
     let start = top#forward_lines (l-1) in
