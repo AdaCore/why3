@@ -274,7 +274,12 @@ let options = Arg.align [
    "--debug", Arg.Tuple [Arg.Set opt_debug; Arg.Set opt_standalone],
           " Enable debug mode; also deactivates why3server";
    "--debug-why3", Arg.String (fun s -> let debug = Debug.register_flag s ~desc:"" in
-                                        Debug.set_flag debug),
+                                (* Record backtrace is done in a part of Why3
+                                   that is not executed by gnatwhy3: we have to
+                                   do it here. *)
+                                if s = "stack_trace" then
+                                  Printexc.record_backtrace true;
+                                Debug.set_flag debug),
           " Enable a debug flag from Why3";
    "--debug-server", Arg.Set opt_debug,
           " Enable debug mode and keep why3server activated";
