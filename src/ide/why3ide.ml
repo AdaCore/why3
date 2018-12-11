@@ -1787,7 +1787,7 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   let callback () =
-    Gconfig.preferences gconfig;
+    Gconfig.preferences ~parent:main_window gconfig;
     make_sources_editable gconfig.allow_source_editing;
     send_session_config_to_server ()
   in
@@ -1900,12 +1900,12 @@ let help_factory = new menu_factory help_menu ~accel_path:"<Why3-Main>/Help/" ~a
 let (_ : GMenu.menu_item) =
   help_factory#add_item
     "Legend"
-    ~callback:show_legend_window
+    ~callback:(show_legend_window ~parent:main_window)
 
 let (_ : GMenu.menu_item) =
   help_factory#add_item
     "About"
-    ~callback:show_about_window
+    ~callback:(show_about_window ~parent:main_window)
 
 (*****************************************************************)
 (* "Tools" submenus for strategies, provers, and transformations *)
@@ -2240,11 +2240,7 @@ let check_uninstalled_prover =
       let callback p u =
         send_request (Set_prover_policy(p,u))
       in
-      (* The gconfig.window_height is always the height of the window thanks to
-         the callback to size_allocate. By default, this dialog has 3/4 the
-         height of the main window. *)
-      let height = 3 * gconfig.window_height / 4 in
-      uninstalled_prover_dialog ~height ~callback gconfig p
+      uninstalled_prover_dialog ~parent:main_window ~callback gconfig p
     end
 
 let treat_notification n =

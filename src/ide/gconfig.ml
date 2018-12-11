@@ -529,9 +529,10 @@ let init () =
   resize_images 20;
   Debug.dprintf debug " done.@."
 
-let show_legend_window () =
+let show_legend_window ~parent () =
   let dialog =
     GWindow.dialog
+      ~modal:true ~parent
       ~title:"Why3: legend of icons" ~icon:!why_icon
       ()
   in
@@ -597,9 +598,10 @@ let show_legend_window () =
   dialog#destroy ()
 
 
-let show_about_window () =
+let show_about_window ~parent () =
   let about_dialog =
     GWindow.about_dialog
+      ~parent
       ~name:"The Why3 Verification Platform"
       ~authors:["François Bobot";
                 "Jean-Christophe Filliâtre";
@@ -1130,9 +1132,9 @@ let editors_page c (notebook:GPack.notebook) =
   Mprover.iter add_prover (Whyconf.get_provers c.config)
 
 
-let preferences (c : t) =
+let preferences ~parent (c : t) =
   let dialog = GWindow.dialog
-    ~modal:true ~icon:(!why_icon)
+    ~modal:true ~parent ~icon:(!why_icon)
     ~title:"Why3: preferences" ()
   in
   let vbox = dialog#vbox in
@@ -1190,19 +1192,20 @@ let run_auto_detection gconfig =
 
 (*let () = Debug.dprintf debug "[config] end of configuration initialization@."*)
 
-let uninstalled_prover_dialog ~height ~callback c unknown =
+let uninstalled_prover_dialog ~parent ~callback c unknown =
   let others,names,versions =
     Whyconf.unknown_to_known_provers
       (Whyconf.get_provers c.config) unknown
   in
   let dialog = GWindow.dialog
-                 ~icon:(!why_icon) ~modal:true
+                 ~icon:(!why_icon) ~modal:true ~parent
                  ~title:"Why3: Uninstalled prover" ()
   in
   let vbox = dialog#vbox in
   let vbox_pack = vbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
   let hbox = GPack.hbox ~packing:vbox_pack () in
   let hbox_pack = hbox#pack ~fill:true ~expand:true ?from:None ?padding:None in
+  let height = parent#misc#allocation.Gtk.height * 3 / 4 in
   let scrollview =
     GBin.scrolled_window ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC ~height
       ~packing:hbox_pack ()
