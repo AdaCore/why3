@@ -5,14 +5,15 @@
 <prover id="0" name="Z3" version="4.6.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
-<file  proved="true">
+<file proved="true">
 <path name=".."/>
 <path name="isqrt.mlw"/>
 <theory name="Square" proved="true">
  <goal name="sqr_non_neg" proved="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.00" steps="2"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="sqr_increasing" proved="true">
  <proof prover="0"><result status="valid" time="0.01"/></proof>
