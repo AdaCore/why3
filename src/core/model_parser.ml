@@ -782,7 +782,12 @@ let add_to_model model model_element =
     let (filename, line_number, _, _) = Loc.get pos in
     let model_file = get_model_file model filename in
     let elements = get_elements model_file line_number in
-    let elements = model_element::elements in
+    let elements =
+      if List.mem model_element elements then
+        elements
+      else
+        model_element::elements
+    in
     let model_file = IntMap.add line_number elements model_file in
     StringMap.add filename model_file model
 
@@ -839,6 +844,12 @@ and replace_projection_array const_function a =
   in
   {arr_others = others; arr_indices = arr_index_list}
 
+let internal_loc t =
+  match t.t_node with
+  | Tvar vs -> vs.vs_name.id_loc
+  | Tapp (ls, []) -> ls.ls_name.id_loc
+  | _ -> None
+
 let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t) (model: model_files) =
   List.fold_left (fun model raw_element ->
     let raw_element_name = raw_element.me_name.men_name in
@@ -863,6 +874,13 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
          me_term = Some t;
        } in
        let model = add_to_model model model_element in
+       let internal_loc = internal_loc t in
+       let model =
+         if (internal_loc = None) then
+           model
+         else
+           add_to_model model {model_element with me_location = internal_loc}
+       in
        (* Here we create the same element for all its possible locations (given
           by attribute vc:written).
        *)

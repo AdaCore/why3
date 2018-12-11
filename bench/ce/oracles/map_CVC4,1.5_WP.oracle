@@ -27,6 +27,12 @@ x, [[@introduced],
 "value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
+Line 19:
+x, [] = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
 
 bench/ce/map.mlw M VC test_map_multidim1: Timeout or Unknown
 Counter-example model:File ref.mlw:
@@ -39,9 +45,17 @@ x, [] = {"type" : "Array" , "val" : [{"others" : {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] }
 File map.mlw:
+Line 22:
+x, [] = {"type" : "Array" , "val" : [{"others" : {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
 Line 23:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Array" ,
+"val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
+Line 25:
+x, [] = {"type" : "Array" , "val" : [{"others" : {"type" : "Array" ,
 "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] }
 
@@ -65,10 +79,27 @@ x, [] = {"type" : "Array" , "val" : [{"indice" : "0" ,
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] }
 File map.mlw:
+Line 27:
+x, [] = {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "1" } }] } },
+{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
 Line 28:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"indice" : "1" ,
+"value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" , "val" : "1" } }] } },
+{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }] }
+Line 32:
+x, [] = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"indice" : "1" ,
 "value" : {"type" : "Array" , "val" : [{"indice" : "1" ,
 "value" : {"type" : "Integer" , "val" : "3" } },
@@ -90,10 +121,21 @@ x, [] = {"type" : "Array" , "val" : [{"indice" : "0" ,
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 File map.mlw:
+Line 34:
+x, [] = {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
 Line 35:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "3" } },
 {"indice" : "1" , "value" : {"type" : "Integer" , "val" : "3" } },
+{"others" : {"type" : "Integer" ,
+"val" : "0" } }] }
+Line 37:
+x, [] = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "3" } }, {"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "3" } },
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] }
 
@@ -111,10 +153,21 @@ x, [] = {"type" : "Array" , "val" : [{"indice" : "0" ,
 {"others" : {"type" : "Boolean" ,
 "val" : false } }] }
 File map.mlw:
+Line 39:
+x, [] = {"type" : "Array" , "val" : [{"indice" : "1" ,
+"value" : {"type" : "Boolean" , "val" : true } },
+{"others" : {"type" : "Boolean" ,
+"val" : false } }] }
 Line 40:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Boolean" , "val" : true } },
 {"indice" : "1" , "value" : {"type" : "Boolean" , "val" : true } },
+{"others" : {"type" : "Boolean" ,
+"val" : false } }] }
+Line 42:
+x, [] = {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Boolean" , "val" : true } }, {"indice" : "1" ,
+"value" : {"type" : "Boolean" , "val" : true } },
 {"others" : {"type" : "Boolean" ,
 "val" : false } }] }
 

@@ -13,11 +13,16 @@ y, [] = {"type" : "Integer" ,
 Line 20:
 x, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
+y, [[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
 Line 21:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "1" }
 y at 'Old, [[@introduced], [@at:'Old], [@model_trace:y],
 [@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 23:
+y, [] = {"type" : "Integer" ,
 "val" : "0" }
 
 bench/ce/ref_mono.mlw M VC test_post2: Timeout or Unknown
@@ -31,6 +36,8 @@ y, [] = {"type" : "Integer" ,
 Line 25:
 x, [[@introduced]] = {"type" : "Integer" ,
 "val" : "43" }
+y, [[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
 Line 27:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "43" }
@@ -39,6 +46,9 @@ y, [[@introduced], [@model_trace:y]] = {"type" : "Integer" ,
 y at 'Old, [[@introduced], [@at:'Old], [@model_trace:y],
 [@at:'Old:loc:location] = {"type" : "Integer" ,
 "val" : "0" }
+Line 29:
+y, [] = {"type" : "Integer" ,
+"val" : "42" }
 
 bench/ce/ref_mono.mlw M VC incr: Timeout or Unknown
 Counter-example model:File ref_mono.mlw:
@@ -46,7 +56,11 @@ Line 9:
 y, [[@at:'Old:loc:location] = {"type" : "Integer" ,
 "val" : "-1" }
 Line 11:
-y, [] = {"type" : "Integer" , "val" : "0" }
+y, [] = {"type" : "Integer" ,
+"val" : "0" }
+Line 35:
+y, [[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "-1" }
 Line 37:
 x23, [[@introduced],
 [@at:'Old:loc:location] = {"type" : "Integer" ,
@@ -62,9 +76,15 @@ x23 at 'Old, [[@introduced], [@at:'Old], [@model_trace:x23],
 y at 'Old, [[@introduced], [@at:'Old], [@model_trace:y],
 [@at:'Old:loc:location] = {"type" : "Integer" ,
 "val" : "-1" }
+Line 41:
+y, [] = {"type" : "Integer" ,
+"val" : "0" }
 Line 42:
 x23, [[@introduced]] = {"type" : "Integer" ,
 "val" : "1" }
+Line 43:
+x23, [] = {"type" : "Integer" ,
+"val" : "2" }
 
 bench/ce/ref_mono.mlw M VC test_loop: Timeout or Unknown
 Counter-example model:File ref_mono.mlw:
@@ -76,6 +96,13 @@ Line 38:
 x at 'Old, [[@at:'Old], [@at:'Old:loc:location],
 [@at:L:loc:location] = {"type" : "Integer" ,
 "val" : "0" }
+x, [[@at:M:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 45:
+x, [[@at:'Old], [@at:'Old:loc:location],
+[@at:L:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 49:
 x, [[@at:M:loc:location] = {"type" : "Integer" ,
 "val" : "0" }
 Line 52:
@@ -106,6 +133,15 @@ x at 'Old, [[@at:'Old], [@at:'Old:loc:location],
 "val" : "0" }
 x, [[@at:M:loc:location] = {"type" : "Integer" ,
 "val" : "0" }
+Line 45:
+x, [[@at:'Old], [@at:'Old:loc:location],
+[@at:L:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 49:
+x, [[@at:M:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 51:
+x, [] = {"type" : "Integer" , "val" : "1" }
 Line 52:
 x at L, [[@introduced], [@at:L], [@model_trace:x],
 [@at:L:loc:location] = {"type" : "Integer" ,
@@ -114,6 +150,9 @@ x at M, [[@introduced], [@at:M], [@model_trace:x],
 [@at:M:loc:location] = {"type" : "Integer" ,
 "val" : "0" }
 x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
+"val" : "0" }
+Line 54:
+x, [] = {"type" : "Integer" ,
 "val" : "0" }
 
 bench/ce/ref_mono.mlw M VC test_loop: Timeout or Unknown
@@ -131,10 +170,21 @@ x at 'Old, [[@at:'Old], [@at:'Old:loc:location],
 "val" : "0" }
 x, [[@at:M:loc:location] = {"type" : "Integer" ,
 "val" : "-1" }
+Line 45:
+x, [[@at:'Old], [@at:'Old:loc:location],
+[@at:L:loc:location],
+[@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
 Line 46:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
 "val" : "0" }
 x at 'Old, [[@introduced], [@at:'Old], [@model_trace:x],
 [@at:'Old:loc:location] = {"type" : "Integer" ,
+"val" : "0" }
+Line 49:
+x, [[@at:M:loc:location] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 51:
+x, [] = {"type" : "Integer" ,
 "val" : "0" }
 

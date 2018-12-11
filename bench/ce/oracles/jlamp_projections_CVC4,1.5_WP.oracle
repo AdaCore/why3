@@ -9,11 +9,18 @@ a, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
 File jlamp_projections.mlw:
 Line 15:
 o, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "1" } }
+"value" : {"type" : "Integer" ,
+"val" : "1" } }
+Line 29:
+a, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" , "val" : "127" } }
 Line 30:
 a, [[@introduced], [@model_trace:a]] = {"proj_name" : "to_int1" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "127" } }
+o, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" ,
+"val" : "1" } }
 
 bench/ce/jlamp_projections.mlw Record VC p4: Valid
 bench/ce/jlamp_projections.mlw Record VC p4: Timeout or Unknown
@@ -34,4 +41,7 @@ b, [[@introduced], [@model_trace:b]] = {"type" : "Record" ,
 "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "127" } } },
 {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : true } }] } }
+o, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" ,
+"val" : "1" } }
 
