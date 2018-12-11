@@ -27,6 +27,8 @@ Line 18:
 x, [] = {"type" : "Integer" ,
 "val" : "42" }
 File if_assign.mlw:
+Line 21:
+a, [] = {"type" : "Integer" , "val" : "0" }
 Line 22:
 x, [[@introduced], [@vc:written:25:4:20:bench/ce/if_assign.mlw],
 [@vc:written:27:4:11:bench/ce/if_assign.mlw],
@@ -53,6 +55,8 @@ Line 18:
 x, [] = {"type" : "Integer" ,
 "val" : "18" }
 File if_assign.mlw:
+Line 21:
+a, [] = {"type" : "Integer" , "val" : "-1" }
 Line 22:
 x, [[@introduced], [@vc:written:25:4:20:bench/ce/if_assign.mlw],
 [@vc:written:27:4:11:bench/ce/if_assign.mlw],
@@ -75,6 +79,9 @@ Line 16:
 a, [] = {"type" : "Integer" ,
 "val" : "0" }
 File if_assign.mlw:
+Line 30:
+a, [] = {"type" : "Integer" ,
+"val" : "0" }
 Line 34:
 x, [[@introduced]] = {"type" : "Integer" ,
 "val" : "42" }
@@ -90,9 +97,15 @@ Line 20:
 x, [] = {"type" : "Integer" ,
 "val" : "18" }
 File if_assign.mlw:
+Line 30:
+a, [] = {"type" : "Integer" ,
+"val" : "-1" }
 Line 31:
 the check fails with all inputs
 Line 34:
 x, [[@introduced]] = {"type" : "Integer" ,
 "val" : "0" }
+Line 36:
+x, [] = {"type" : "Integer" ,
+"val" : "18" }
 

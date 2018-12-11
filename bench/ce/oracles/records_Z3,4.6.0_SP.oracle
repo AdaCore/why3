@@ -27,8 +27,15 @@ x, [] = {"proj_name" : "g" , "type" : "Proj" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }
 File records.mlw:
+Line 27:
+x, [] = {"proj_name" : "g" , "type" : "Proj" ,
+"value" : {"type" : "Boolean" , "val" : false } }
 Line 28:
 x, [[@introduced], [@model_trace:x]] = {"proj_name" : "g" , "type" : "Proj" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }
+Line 30:
+x, [] = {"proj_name" : "g" , "type" : "Proj" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }
 
@@ -43,8 +50,15 @@ x, [] = {"proj_name" : "g" , "type" : "Proj" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }
 File records.mlw:
+Line 32:
+x, [] = {"proj_name" : "g" , "type" : "Proj" ,
+"value" : {"type" : "Boolean" , "val" : false } }
 Line 33:
 x, [[@introduced], [@model_trace:x]] = {"proj_name" : "g" , "type" : "Proj" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }
+Line 35:
+x, [] = {"proj_name" : "g" , "type" : "Proj" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }
 
@@ -61,6 +75,16 @@ x, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 File records.mlw:
+Line 38:
+x, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
+"value" : {"type" : "Integer" , "val" : "2" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+Line 40:
+x, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
+"value" : {"type" : "Integer" , "val" : "2" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }] } }
 Line 42:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
@@ -81,6 +105,10 @@ x, [] = {"proj_name" : "g" , "type" : "Proj" ,
 File records.mlw:
 Line 45:
 re, [[@introduced]] = {"proj_name" : "g" , "type" : "Proj" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }
+Line 47:
+x, [] = {"proj_name" : "g" , "type" : "Proj" ,
 "value" : {"type" : "Boolean" , "val" : false } }
 Line 48:
 re, [[@introduced], [@model_trace:re]] = {"proj_name" : "g" ,
@@ -88,6 +116,10 @@ re, [[@introduced], [@model_trace:re]] = {"proj_name" : "g" ,
 "val" : false } }
 x, [[@introduced], [@model_trace:x]] = {"proj_name" : "g" ,
 "type" : "Proj" , "value" : {"type" : "Boolean" ,
+"val" : false } }
+Line 50:
+x, [] = {"proj_name" : "g" , "type" : "Proj" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }
 
 bench/ce/records.mlw Mutable VC record_match_eval_test1: Unknown (sat)
@@ -133,6 +165,11 @@ x, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : ".my_field_f" ,
 x, [[@introduced],
 [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+Line 80:
+x, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }

@@ -7,6 +7,11 @@ a, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : "elts" ,
 "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }, {"field" : "length" , "value" : {"type" : "Integer" ,
 "val" : "0" } }] } }
+Line 35:
+a, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : "elts" ,
+"value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "0" } }] } }, {"field" : "length" , "value" : {"type" : "Integer" ,
+"val" : "0" } }] } }
 Line 36:
 a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
@@ -31,6 +36,14 @@ a, [] = {"type" : "Record" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "42" } },
 {"indice" : "1" , "value" : {"type" : "Integer" , "val" : "42" } },
 {"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"field" : "length" ,
+"value" : {"type" : "Integer" , "val" : "2" } }] } }
+Line 38:
+a, [[@at:'Old], [@at:'Old:loc:location],
+[@at:'Old:loc:location] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
+"val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "42" } },
+{"indice" : "1" , "value" : {"type" : "Integer" , "val" : "42" } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"field" : "length" ,
 "value" : {"type" : "Integer" ,
 "val" : "2" } }] } }
 Line 40:
@@ -38,6 +51,14 @@ a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
 "val" : [{"indice" : "0" , "value" : {"type" : "Integer" , "val" : "42" } },
 {"indice" : "1" , "value" : {"type" : "Integer" , "val" : "42" } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"field" : "length" ,
+"value" : {"type" : "Integer" ,
+"val" : "2" } }] } }
+Line 41:
+a, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : "elts" ,
+"value" : {"type" : "Array" , "val" : [{"indice" : "0" ,
+"value" : {"type" : "Integer" , "val" : "42" } }, {"indice" : "1" ,
+"value" : {"type" : "Integer" , "val" : "42" } },
 {"others" : {"type" : "Integer" , "val" : "0" } }] } }, {"field" : "length" ,
 "value" : {"type" : "Integer" ,
 "val" : "2" } }] } }
