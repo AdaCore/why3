@@ -333,6 +333,10 @@ let find_driver_file ~conf_file fn =
      fails, we look into the SPARK drivers dir.
      If everything fails, we return an error message stating that we cannot find
      the driver: it also returns the configuration file [conf_file] used. *)
+  (* In Why3, driver names are stored in the configuration file(s) without the
+     suffix, so we add it here; for robustness we still check if it's already
+     there. *)
+  let fn = if Strings.ends_with fn ".drv" then fn else fn ^ ".drv" in
   try
     if Sys.file_exists fn then fn
     else match !opt_why3_conf_file with
