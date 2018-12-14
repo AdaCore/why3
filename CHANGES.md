@@ -14,6 +14,10 @@ Tools
     command line. So far, only one option exists, for renaming files
     fixes issue #227
 
+IDE
+  * when clicking on the status of an unproved proofAttempt in the proof tree,
+  launch counterexamples.
+
 
 Version 1.1.0, October 17, 2018
 -------------------------------

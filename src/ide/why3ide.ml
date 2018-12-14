@@ -1998,7 +1998,11 @@ let init_completion provers transformations strategies commands =
                String.compare (Strings.lowercase h1) (Strings.lowercase h2))
               provers
   in
-  List.iter add_submenu_prover provers_sorted;
+  (* Remove counterexample provers from the menu *)
+  let menu_provers =
+    List.filter (fun (_, _, s) -> not (Strings.ends_with s "counterexamples"))
+      provers_sorted in
+  List.iter add_submenu_prover menu_provers;
   context_factory#add_separator ();
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
