@@ -1405,6 +1405,23 @@ let (_ : GtkSignal.id) =
         end;
         context_tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
         true
+      | 1 -> (* Left click *)
+          (* Call get-ce only when clicked on the Status of a proofattempt
+             (which is unproved) *)
+          let x = int_of_float (GdkEvent.Button.x ev) in
+          let y = int_of_float (GdkEvent.Button.y ev) in
+          begin match goals_view#get_path_at_pos ~x ~y with
+            | Some (path,col,_,_) ->
+                if col#title = column_status_title then
+                  let node_id =
+                    get_node_id (goals_model#get_row_reference path)#iter in
+                  let type_id = get_node_type node_id in
+                  let proved_id = get_node_proved node_id in
+                  if type_id = NProofAttempt && not proved_id then
+                    send_request (Command_req (node_id, "get-ce"))
+            | _ -> ()
+          end;
+          false
       | _ -> (* Other buttons *) false
     end
   in
