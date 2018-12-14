@@ -2067,6 +2067,16 @@ let (_ : GMenu.menu_item) =
 
 let (_ : GMenu.menu_item) =
   let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"get-ce error"
+      ~action:"Get Counterexamples"
+      (fun id -> Command_req (id, "get-ce")) in
+  tools_factory#add_item "_Get Counterexamples"
+    ~key:GdkKeysyms._G
+    ~tooltip:"Launch the prover with counterexamples"
+    ~callback
+
+let (_ : GMenu.menu_item) =
+  let callback =
     on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
       (fun id -> Command_req (id, "replay")) in
   tools_factory#add_item "_Replay valid obsolete proofs"
@@ -2164,6 +2174,17 @@ let (_ : GMenu.menu_item) =
   context_factory#add_item "_Edit"
     ~accel_path:"<Why3-Main>/Tools/Edit" ~add_accel:false
     ~tooltip:"View or edit proof script"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"get-ce error"
+      ~action:"Get Counterexamples"
+      (fun id -> Command_req (id, "get-ce")) in
+  context_factory#add_item "_Get Counterexamples"
+    ~accel_path:"<Why3-Main>/Tools/Get Counterexamples" ~add_accel:false
+    ~tooltip:"Launch the prover with counterexamples"
     ~callback
 in ();
 
