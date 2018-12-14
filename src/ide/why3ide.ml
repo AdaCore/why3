@@ -502,9 +502,13 @@ let status_column = cols#add Gobject.Data.gobject
 (* fifth column: extra status info: time, obsolete status, limits *)
 let time_column = cols#add Gobject.Data.string
 
+let column_status_title = "Status"
+let column_time_title = "Time"
+let column_goals_title = "Theories/Goals"
+
 (* first view column: icon and name *)
 let view_name_column =
-  let v = GTree.view_column ~title:"Theories/Goals" () in
+  let v = GTree.view_column ~title:column_goals_title () in
   (* icon attribute *)
   let icon_renderer = GTree.cell_renderer_pixbuf [ ] in
   v#pack icon_renderer ~expand:false;
@@ -520,7 +524,7 @@ let view_name_column =
 (* second view column: status *)
 let view_status_column =
   let status_renderer = GTree.cell_renderer_pixbuf [ ] in
-  let v = GTree.view_column ~title:"Status"
+  let v = GTree.view_column ~title:column_status_title
                             ~renderer:(status_renderer, ["pixbuf", status_column])
                             ()
   in
@@ -530,7 +534,7 @@ let view_status_column =
 
 let view_time_column =
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] in
-  let v = GTree.view_column ~title:"Time"
+  let v = GTree.view_column ~title:column_time_title
                             ~renderer:(renderer, ["text", time_column]) ()
   in
   v#set_resizable false;
@@ -1401,6 +1405,23 @@ let (_ : GtkSignal.id) =
         end;
         context_tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
         true
+      | 1 -> (* Left click *)
+          (* Call get-ce only when clicked on the Status of a proofattempt
+             (which is unproved) *)
+          let x = int_of_float (GdkEvent.Button.x ev) in
+          let y = int_of_float (GdkEvent.Button.y ev) in
+          begin match goals_view#get_path_at_pos ~x ~y with
+            | Some (path,col,_,_) ->
+                if col#title = column_status_title then
+                  let node_id =
+                    get_node_id (goals_model#get_row_reference path)#iter in
+                  let type_id = get_node_type node_id in
+                  let proved_id = get_node_proved node_id in
+                  if type_id = NProofAttempt && not proved_id then
+                    send_request (Command_req (node_id, "get-ce"))
+            | _ -> ()
+          end;
+          false
       | _ -> (* Other buttons *) false
     end
   in
@@ -1631,9 +1652,9 @@ let set_status_and_time_column ?limit row =
                Format.sprintf "%.2f" time
            in
            if steps >= 0 then
-	     Format.sprintf "%s (steps: %d)" s steps
+             Format.sprintf "%s (steps: %d)" s steps
            else
-	     s
+             s
         | C.InternalFailure _ -> "(internal failure)"
         | C.Interrupted -> "(interrupted)"
         | C.Undone -> "(undone)"
@@ -1977,7 +1998,11 @@ let init_completion provers transformations strategies commands =
                String.compare (Strings.lowercase h1) (Strings.lowercase h2))
               provers
   in
-  List.iter add_submenu_prover provers_sorted;
+  (* Remove counterexample provers from the menu *)
+  let menu_provers =
+    List.filter (fun (_, _, s) -> not (Strings.ends_with s "counterexamples"))
+      provers_sorted in
+  List.iter add_submenu_prover menu_provers;
   context_factory#add_separator ();
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
@@ -2042,6 +2067,16 @@ let (_ : GMenu.menu_item) =
   tools_factory#add_item "_Edit"
     ~key:GdkKeysyms._E
     ~tooltip:"View or edit proof script"
+    ~callback
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"get-ce error"
+      ~action:"Get Counterexamples"
+      (fun id -> Command_req (id, "get-ce")) in
+  tools_factory#add_item "_Get Counterexamples"
+    ~key:GdkKeysyms._G
+    ~tooltip:"Launch the prover with counterexamples"
     ~callback
 
 let (_ : GMenu.menu_item) =
@@ -2143,6 +2178,17 @@ let (_ : GMenu.menu_item) =
   context_factory#add_item "_Edit"
     ~accel_path:"<Why3-Main>/Tools/Edit" ~add_accel:false
     ~tooltip:"View or edit proof script"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"get-ce error"
+      ~action:"Get Counterexamples"
+      (fun id -> Command_req (id, "get-ce")) in
+  context_factory#add_item "_Get Counterexamples"
+    ~accel_path:"<Why3-Main>/Tools/Get Counterexamples" ~add_accel:false
+    ~tooltip:"Launch the prover with counterexamples"
     ~callback
 in ();
 
