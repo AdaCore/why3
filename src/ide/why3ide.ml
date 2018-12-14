@@ -502,9 +502,13 @@ let status_column = cols#add Gobject.Data.gobject
 (* fifth column: extra status info: time, obsolete status, limits *)
 let time_column = cols#add Gobject.Data.string
 
+let column_status_title = "Status"
+let column_time_title = "Time"
+let column_goals_title = "Theories/Goals"
+
 (* first view column: icon and name *)
 let view_name_column =
-  let v = GTree.view_column ~title:"Theories/Goals" () in
+  let v = GTree.view_column ~title:column_goals_title () in
   (* icon attribute *)
   let icon_renderer = GTree.cell_renderer_pixbuf [ ] in
   v#pack icon_renderer ~expand:false;
@@ -520,7 +524,7 @@ let view_name_column =
 (* second view column: status *)
 let view_status_column =
   let status_renderer = GTree.cell_renderer_pixbuf [ ] in
-  let v = GTree.view_column ~title:"Status"
+  let v = GTree.view_column ~title:column_status_title
                             ~renderer:(status_renderer, ["pixbuf", status_column])
                             ()
   in
@@ -530,7 +534,7 @@ let view_status_column =
 
 let view_time_column =
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] in
-  let v = GTree.view_column ~title:"Time"
+  let v = GTree.view_column ~title:column_time_title
                             ~renderer:(renderer, ["text", time_column]) ()
   in
   v#set_resizable false;
@@ -1631,9 +1635,9 @@ let set_status_and_time_column ?limit row =
                Format.sprintf "%.2f" time
            in
            if steps >= 0 then
-	     Format.sprintf "%s (steps: %d)" s steps
+             Format.sprintf "%s (steps: %d)" s steps
            else
-	     s
+             s
         | C.InternalFailure _ -> "(internal failure)"
         | C.Interrupted -> "(interrupted)"
         | C.Undone -> "(undone)"
