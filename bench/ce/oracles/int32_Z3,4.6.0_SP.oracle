@@ -4,22 +4,32 @@ bench/ce/int32.mlw Ce_int32 VC dummy_update: Valid
 bench/ce/int32.mlw Ce_int32 VC dummy_update: Timeout or Unknown
 Counter-example model:File int32.mlw:
 Line 6:
-r, [[@introduced]] = {"proj_name" : "int32qtint" , "type" : "Proj" ,
+r, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" ,
+"value" : {"proj_name" : "int32qtint" , "type" : "Proj" ,
 "value" : {"type" : "Integer" ,
-"val" : "22" } }
+"val" : "22" } } }] } }
 Line 8:
-r, [] = {"proj_name" : "int32qtint" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "84" } }
+r, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" ,
+"value" : {"proj_name" : "int32qtint" , "type" : "Proj" ,
+"value" : {"type" : "Integer" , "val" : "84" } } }] } }
 r, [[@introduced],
-[@model_trace:r]] = {"proj_name" : "int32qtint" , "type" : "Proj" ,
+[@field:0:contents], [@model_trace:r]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" ,
+"value" : {"proj_name" : "int32qtint" , "type" : "Proj" ,
 "value" : {"type" : "Integer" ,
-"val" : "84" } }
+"val" : "84" } } }] } }
 Line 9:
-r, [[@introduced]] = {"proj_name" : "int32qtint" , "type" : "Proj" ,
+r, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" ,
+"value" : {"proj_name" : "int32qtint" , "type" : "Proj" ,
 "value" : {"type" : "Integer" ,
-"val" : "42" } }
+"val" : "42" } } }] } }
 Line 10:
-r, [] = {"proj_name" : "int32qtint" , "type" : "Proj" ,
+r, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" ,
+"value" : {"proj_name" : "int32qtint" , "type" : "Proj" ,
 "value" : {"type" : "Integer" ,
-"val" : "84" } }
+"val" : "84" } } }] } }
 

@@ -346,6 +346,26 @@ let split_model_trace_name mt_name =
   | first::second::_ -> (first, second)
   | [] -> (mt_name, "")
 
+(* Elements that are of record with only one field in the source code, are
+   simplified by eval_match in wp generation. So, this allows to reconstruct
+   their value (using the "field" attribute that were added). *)
+let readd_one_fields ~attrs value =
+  (* Small function that insert in a sorted list *)
+  let rec insert_sorted (n, name) l =
+    match l with
+    | (n1, _) :: _ when n1 < n ->
+        (n, name) :: l
+    | (n1, name1) :: tl ->
+        (n1, name1) :: insert_sorted (n, name) tl
+    | [] -> [n, name]
+  in
+  let l = Sattr.fold (fun x l ->
+      match Ident.extract_field x with
+      | None -> l
+      | Some (n, field_name) -> insert_sorted (n, field_name) l) attrs [] in
+    List.fold_left (fun v (_, field_name) ->
+      Record [field_name, v]) value l
+
 let create_model_element ~name ~value ~attrs ?location ?term () =
   let (name, type_s) = split_model_trace_name name in
   let me_kind = match type_s with
@@ -862,14 +882,15 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
       (
        let t = Mstr.find raw_element_name term_map in
        let attrs = Sattr.union raw_element.me_name.men_attrs t.t_attrs in
-       let name =
+       let name, attrs =
          match t.t_node with
-         | Tapp (ls, []) -> ls.ls_name.id_string
-         | _ -> ""
+         | Tapp (ls, []) ->
+             ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
+         | _ -> "", attrs
        in
        let model_element = {
          me_name = construct_name (get_model_trace_string ~name ~attrs) attrs;
-         me_value = raw_element_value;
+         me_value = readd_one_fields ~attrs raw_element_value;
          me_location = t.t_loc;
          me_term = Some t;
        } in

@@ -1,6 +1,6 @@
 module Ref
 
-  type ref1 = { mutable contents [@model_trace:] : int }
+  type ref1 = { mutable contents : int }
 
   function (!) (x: ref1) : int = x.contents
 

@@ -432,6 +432,22 @@ let get_model_trace_string ~name ~attrs =
       | [_; t_str] -> t_str
       | _ -> ""
 
+let compute_model_trace_field pj d =
+  match pj with
+  | None -> Sattr.empty
+  | Some pj ->
+      let name = get_model_trace_string
+          ~name:pj.id_string ~attrs:pj.id_attrs in
+      let attr = "field:" ^ (string_of_int d) ^ ":" ^ name in
+      Sattr.singleton (create_attribute attr)
+
+let extract_field attr =
+  try
+    match Strings.bounded_split ':' attr.attr_string 3 with
+    | "field" :: n :: [field_name] -> Some (int_of_string n, field_name)
+    | _ -> None
+  with
+  | _ -> None
 
 (* Functions for working with ITP attributes *)
 

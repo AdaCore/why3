@@ -3,17 +3,25 @@ bench/ce/jlamp_projections.mlw AbstractWithRef VC p3: Valid
 bench/ce/jlamp_projections.mlw AbstractWithRef VC p3: Timeout or Unknown
 Counter-example model:File ref.mlw:
 Line 18:
-a, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
+a, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" ,
+"value" : {"proj_name" : "to_int1" , "type" : "Proj" ,
 "value" : {"type" : "Integer" ,
-"val" : "0" } }
+"val" : "0" } } }] } }
 File jlamp_projections.mlw:
 Line 29:
-a, [] = {"proj_name" : "to_int1" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "0" } }
+a, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" ,
+"value" : {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" ,
+"val" : "0" } } }] } }
 Line 30:
-a, [[@introduced], [@model_trace:a]] = {"proj_name" : "to_int1" ,
-"type" : "Proj" , "value" : {"type" : "Integer" ,
-"val" : "0" } }
+a, [[@introduced], [@field:0:contents],
+[@model_trace:a]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" ,
+"value" : {"proj_name" : "to_int1" , "type" : "Proj" ,
+"value" : {"type" : "Integer" ,
+"val" : "0" } } }] } }
 
 bench/ce/jlamp_projections.mlw Record VC p4: Valid
 bench/ce/jlamp_projections.mlw Record VC p4: Unknown (sat)

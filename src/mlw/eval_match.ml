@@ -92,11 +92,13 @@ let rec add_quant kn d (vl,tl,f) ({vs_ty = ty} as v) =
   | Some (ls, pjl) ->
       let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
       let mk_v id ty = create_vsymbol id (ty_inst s ty) in
-      let mk_id id _d _pj =
-      (* ls : lsymbol - symbole de constructeur
-         pj : lsymbol option - symbole de projection (si le champs est nommé)
-         d  : profondeur depuis la variable initiale quantifié (0 au départ) *)
-        let attrs = Sattr.empty (* les attributs en fonction de ls, pj et d *) in
+      let mk_id id d (pj: lsymbol option) =
+      (* pj : projection symbol (if field is named),
+         d  : depth of projection (starting at 0) *)
+        let attrs =
+          (* Introduce field attribute to reconstruct the term in
+             counterexamples *)
+          compute_model_trace_field (Opt.map (fun x -> x.ls_name) pj) d in
         id_clone ~attrs id in
       let clone id d = List.map (mk_id id d) pjl in
       let rec lookup_names f = match f.t_node with
