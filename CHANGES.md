@@ -1,8 +1,5 @@
 :x: marks a potential source of incompatibility
 
-Next Version
-------------
-
 Transformations
   * "split_vc" and "subst_all" now avoid substituting user symbols to generated
     one (issue 235). It may breaks session :x:.
@@ -18,6 +15,14 @@ IDE
   * when clicking on the status of an unproved proofAttempt in the proof tree,
   launch counterexamples.
 
+Version 1.1.1, December 17, 2018
+--------------------------------
+
+Bug fixes
+  * prevented broken extraction of `any`
+  * fixed evaluation order when extracting nested mutators
+  * fixed extraction of nested recursive polymorphic functions
+  * fixed cloning of expressions raising exceptions
 
 Version 1.1.0, October 17, 2018
 -------------------------------
