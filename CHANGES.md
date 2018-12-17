@@ -1,19 +1,18 @@
 :x: marks a potential source of incompatibility
 
 Transformations
-  * "split_vc" and "subst_all" now avoid substituting user symbols to generated
-    one (issue 235). It may breaks session :x:.
-  * "destruct_rec" applies "destruct" recursively on a goal (issue 231).
-  * "destruct" now simplifies away equalities on constructors.
+  * `split_vc` and `subst_all` now avoid substituting user symbols by
+    generated ones :x:
+  * `destruct_rec` applies `destruct` recursively on a goal
+  * `destruct` now simplifies away equalities on constructors
 
 Tools
-  * add a command 'why3 session update' to modify sessions from the
-    command line. So far, only one option exists, for renaming files
-    fixes issue #227
+  * add a command `why3 session update` to modify sessions from the
+    command line
 
 IDE
-  * when clicking on the status of an unproved proofAttempt in the proof tree,
-  launch counterexamples.
+  * clicking on the status of a failed proof attempt in the proof tree
+    now generates counterexamples
 
 Version 1.1.1, December 17, 2018
 --------------------------------
