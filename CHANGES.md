@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 1.1.1, December 17, 2018
+--------------------------------
+
 Bug fixes
   * prevented broken extraction of `any`
   * fixed evaluation order when extracting nested mutators
