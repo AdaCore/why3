@@ -645,6 +645,8 @@ else
       if test -z "$JSOFOCAMLPPX"; then
          enable_js_of_ocaml=no
          reason_js_of_ocaml=" (js_of_ocaml-ppx not found)"
+      else
+         JSOFOCAMLPKG="js_of_ocaml js_of_ocaml.ppx"
       fi
    fi
 fi
@@ -653,7 +655,7 @@ if test "$enable_web_ide" != yes; then
    reason_web_ide=" (disabled by user)"
 elif test "$enable_js_of_ocaml" != yes; then
    enable_web_ide=no
-   reason_web_ide=" (js_of_ocaml not available)"
+   reason_web_ide=" (Javascript support not available)"
 fi
 
 # Coq
@@ -896,6 +898,7 @@ AC_SUBST(GTKVERSION)
 
 AC_SUBST(enable_web_ide)
 AC_SUBST(enable_js_of_ocaml)
+AC_SUBST(JSOFOCAMLPKG)
 
 AC_SUBST(META_OCAMLGRAPH)
 
