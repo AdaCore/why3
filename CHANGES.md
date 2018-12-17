@@ -13,6 +13,7 @@ Tools
 IDE
   * clicking on the status of a failed proof attempt in the proof tree
     now generates counterexamples
+  * added support for GTK3
 
 Version 1.1.1, December 17, 2018
 --------------------------------

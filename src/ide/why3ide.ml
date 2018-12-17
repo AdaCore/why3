@@ -16,8 +16,7 @@ open Wstdlib
 open Ide_utils
 open History
 open Itp_communication
-
-module GSourceView = GSourceView2
+open Gtkcompat
 
 external reset_gc : unit -> unit = "ml_reset_gc"
 
