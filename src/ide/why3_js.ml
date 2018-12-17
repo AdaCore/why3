@@ -13,7 +13,13 @@
 open Why3
 open Itp_communication
 
-module JSU = Js.Unsafe
+module Js = Js_of_ocaml.Js
+module JSU = Js_of_ocaml.Js.Unsafe
+module Dom = Js_of_ocaml.Dom
+module Form = Js_of_ocaml.Form
+module Firebug = Js_of_ocaml.Firebug
+module Dom_html = Js_of_ocaml.Dom_html
+module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
 
 let log s = ignore (Firebug.console ## log (Js.string s))
 
