@@ -1576,7 +1576,7 @@ endif
 
 ALTERGODIR=src/trywhy3/alt-ergo
 
-JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.ppx \
         -package ocplib-simplex -I src/trywhy3 \
 	-I $(ALTERGODIR)/lib/util \
 	-I $(ALTERGODIR)/lib/structures \
@@ -1699,8 +1699,6 @@ src/trywhy3/%.cmi: src/trywhy3/%.mli
 	$(JSOCAMLC) $(BFLAGS) -c $<
 
 src/trywhy3/%.cmo: BFLAGS += -w -48
-
-src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo: BFLAGS += -syntax camlp4o
 
 clean::
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte src/trywhy3/trywhy3.cm* \

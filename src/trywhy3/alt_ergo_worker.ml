@@ -12,6 +12,7 @@
 open Format
 open Worker_proto
 
+module Worker = Js_of_ocaml.Worker
 module SAT = (val (Sat_solver.get_current ()) : Sat_solver_sig.S)
 module FE = Frontend.Make (SAT)
 

@@ -45,6 +45,6 @@ let status_of_result = function
 
 let log s = ignore (Firebug.console ## log (Js.string s))
 let log_time s =
-  let date = jsnew Js.date_now () in
-  let date_str = string_of_float ((date ## getTime ()) /. 1000.) in
+  let date = new%js Js.date_now in
+  let date_str = string_of_float (date ## getTime /. 1000.) in
   log (date_str ^ " : " ^ s)

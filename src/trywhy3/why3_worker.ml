@@ -18,7 +18,8 @@ open Why3
 open Format
 open Worker_proto
 
-
+module Sys_js = Js_of_ocaml.Sys_js
+module Worker = Js_of_ocaml.Worker
 
 let () = log_time ("Initialising why3 worker: start ")
 
