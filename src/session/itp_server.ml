@@ -415,7 +415,7 @@ let get_locations (task: Task.task) =
     with Not_found ->
       let path = Sysutil.relativize_filename session_dir f in
       (* FIXME: this an abusive use of Sysutil.system_dependent_absolute_path *)
-      let g = Sysutil.system_dependent_absolute_path "" path in
+      let g = Sysutil.system_dependent_absolute_path session_dir path in
       Hstr.replace file_cache f g;
       g in
   let color_loc ~color ~loc =
