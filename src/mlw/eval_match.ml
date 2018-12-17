@@ -53,10 +53,11 @@ let select_field pj pjl tl =
 
 (* we destruct tuples, units, and singleton records *)
 let destructible kn ty =
+  let check ls = match ls.ls_args with
+    | [] | [_] -> true
+    | _ -> is_fs_tuple ls in
   match ty_constructors kn ty with
-  | [ls,_] when is_fs_tuple ls -> Some ls
-  | [{ls_args = [_]} as ls, _] -> Some ls
-  | [{ls_args = []}  as ls, _] -> Some ls
+  | [ls,_ as cs] when check ls -> Some cs
   | _ -> None
 
 (* we inline projections of destructed types *)
@@ -86,21 +87,27 @@ let unfold_inlineable kn ls tl ty = match find_inlineable kn ls with
 
 exception FoundIdl of preid list
 
-let rec add_quant kn (vl,tl,f) ({vs_ty = ty} as v) =
+let rec add_quant kn d (vl,tl,f) ({vs_ty = ty} as v) =
   match destructible kn ty with
-  | Some ls ->
+  | Some (ls, pjl) ->
       let s = ty_match Mtv.empty (Opt.get ls.ls_value) ty in
       let mk_v id ty = create_vsymbol id (ty_inst s ty) in
-      let clone id = List.map (fun _ -> id_clone id) ls.ls_args in
+      let mk_id id _d _pj =
+      (* ls : lsymbol - symbole de constructeur
+         pj : lsymbol option - symbole de projection (si le champs est nommé)
+         d  : profondeur depuis la variable initiale quantifié (0 au départ) *)
+        let attrs = Sattr.empty (* les attributs en fonction de ls, pj et d *) in
+        id_clone ~attrs id in
+      let clone id d = List.map (mk_id id d) pjl in
       let rec lookup_names f = match f.t_node with
         | Tcase ({t_node = Tvar u}, [bt]) when vs_equal u v ->
             begin match (fst (t_open_branch bt)).pat_node with
-              | Pvar x -> raise (FoundIdl (clone x.vs_name))
+              | Pvar x -> raise (FoundIdl (clone x.vs_name 0))
               | Papp (cs, pl) when ls_equal ls cs ->
-                  let name p = match p.pat_node with
+                  let name p pj = match p.pat_node with
                     | Pvar x -> id_clone x.vs_name
-                    | _ -> id_clone v.vs_name in
-                  raise (FoundIdl (List.map name pl))
+                    | _ -> mk_id v.vs_name d pj in
+                  raise (FoundIdl (List.map2 name pl pjl))
               | Papp _ | Pwild | Por _ | Pas _ -> ()
             end
         | Tcase (t, [bt]) ->
@@ -109,12 +116,14 @@ let rec add_quant kn (vl,tl,f) ({vs_ty = ty} as v) =
         | Tbinop (Tand, t1, t2) -> lookup_names t1; lookup_names t2
         | Tquant (_, qf) -> let _,_,f = t_open_quant qf in lookup_names f
         | _ -> () in
-      let idl = try lookup_names f; clone v.vs_name with FoundIdl idl -> idl in
+      let idl = try lookup_names f;
+                    clone v.vs_name d
+                with FoundIdl idl -> idl in
       let nvl = List.map2 mk_v idl ls.ls_args in
       let t = fs_app ls (List.map t_var nvl) ty in
       let f = t_let_close_simp v t f in
       let tl = tr_map (t_subst_single v t) tl in
-      List.fold_left (add_quant kn) (vl,tl,f) nvl
+      List.fold_left (add_quant kn (succ d)) (vl,tl,f) nvl
   | None ->
       (v::vl, tl, f)
 
@@ -188,7 +197,7 @@ let rec eval_match kn stop env t =
         let vl,tl,f,close = t_open_quant_cb qf in
         let add_quant (vl,tl,f as acc) ({vs_name = id} as v) =
           if stop && not (Sattr.mem Ity.break_attr id.id_attrs)
-          then v::vl, tl, f else add_quant kn acc v in
+          then v::vl, tl, f else add_quant kn 0 acc v in
         let vl,tl,f = List.fold_left add_quant ([],tl,f) vl in
         t_quant_simp q (close (List.rev vl) tl (eval env f))
     | _ ->
