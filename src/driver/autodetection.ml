@@ -566,7 +566,7 @@ let run_auto_detection config =
   let config = set_provers config detected in
   config
 
-let list_prover_ids () =
+let list_prover_families () =
   let config = default_config "" in
   let main = get_main config in
   let l,_ = read_auto_detection_data main in
@@ -598,12 +598,20 @@ let add_existing_shortcuts env shortcuts =
   in
   Mstr.iter aux shortcuts
 
-let add_prover_binary config id path =
+let add_prover_binary config id shortcut path =
   let main = get_main config in
   let l,env = read_auto_detection_data main in
-  add_existing_shortcuts env (get_prover_shortcuts config);
+  let prover_shortcuts = get_prover_shortcuts config in
+  if Mstr.mem shortcut prover_shortcuts then
+    Loc.errorm "Shortcut %s already in use" shortcut;
+  add_existing_shortcuts env prover_shortcuts;
   let l = List.filter (fun p -> p.prover_id = id) l in
-  if l = [] then Loc.errorm "Unknown prover id: %s" id;
+  if l = [] then begin
+    let list_of_allowed_id =
+      Format.asprintf "@[<hov 2>Known prover families:@\n%a@]@\n@."
+        (Pp.print_list Pp.newline Pp.string)
+        (List.sort String.compare (list_prover_families ())) in
+    Loc.errorm "Unknown prover id: %s\n%s" id list_of_allowed_id end;
   let detected = List.fold_left
     (fun acc data -> detect_exec env data acc path) Mprover.empty l in
   let detected = detect_unknown env detected in
@@ -622,6 +630,7 @@ let add_prover_binary config id path =
     let p = {p with prover = prover_id} in
     add_prover_with_uniq_id p provers in
   let provers = Mprover.fold fold detected provers in
-  let shortcuts = convert_shortcuts env in
+  let prover = fst (Mprover.choose detected) in
+  let shortcuts = Mstr.add shortcut prover (convert_shortcuts env) in
   let config = set_provers config ~shortcuts provers in
   config
