@@ -259,9 +259,9 @@ let print_model_value_sanit fmt v =
 let print_model_value = print_model_value_sanit
 
 
-(******************************************)
-(* Print values for humans                *)
-(******************************************)
+(********************************************)
+(* Print values (as to be displayed in IDE) *)
+(********************************************)
 let print_float_human fmt f =
   match f with
   | Plus_infinity ->
@@ -286,9 +286,15 @@ let rec print_array_human fmt (arr: model_array) =
   fprintf fmt "@[others =>@ %a@])@]" print_model_value_human arr.arr_others
 
 and print_record_human fmt r =
-  fprintf fmt "@[%a@]"
-    (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
-    (fun fmt (f, v) -> fprintf fmt "@[%s =@ %a@]" f print_model_value_human v)) r
+  match r with
+  | [_, value] ->
+      (* Special pretty printing for record with only one element *)
+      fprintf fmt "%a" print_model_value_human value
+  | _ ->
+    fprintf fmt "@[%a@]"
+      (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
+         (fun fmt (f, v) ->
+            fprintf fmt "@[%s =@ %a@]" f print_model_value_human v)) r
 
 and print_proj_human fmt p =
   let s, v = p in
