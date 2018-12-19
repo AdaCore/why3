@@ -151,10 +151,14 @@ use specialized executable names, such as \texttt{cvc4-1.4} or
 added to the \texttt{config} command to specify names of prover executables, \eg
 \index{add-prover@\verb+--add-prover+}
 \begin{verbatim}
-why3 config --add-prover cvc4 /usr/local/bin/cvc4-dev
+why3 config --add-prover cvc4 cvc4-dev /usr/local/bin/cvc4-dev
 \end{verbatim}
-the first argument (here \verb|cvc4|) must be one of the class of
-provers known in the file \verb|provers-detection-data.conf| typically
+the first argument (here \verb|cvc4|) must be one of the family of
+provers known. The list of these famillies can be obtain using
+\begin{verbatim}
+why3 config --list-prover-families
+\end{verbatim}
+as they are in fact listed in the file \verb|provers-detection-data.conf|, typically
 located in \verb|/usr/local/share/why3| after installation. See
 Appendix~\ref{sec:proverdetecttiondata} for details.
 

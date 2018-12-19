@@ -129,13 +129,13 @@ the option \verb|--add-prover| will add a specified binary
 to the configuration. For example, an Alt-Ergo executable
 \verb|/home/me/bin/alt-ergo-trunk| can be added as follows:
 \begin{verbatim}
-why3 config --add-prover alt-ergo /home/me/bin/alt-ergo-trunk
+why3 config --add-prover alt-ergo alt-ergo-trunk /home/me/bin/alt-ergo-trunk
 \end{verbatim}
-As the first argument, one should put a prover
-identification string. The list of known prover identifiers
-can be obtained by the option \verb|--list-prover-ids|.
+As the first argument, one should put a prover family
+identification string. The list of known prover families
+can be obtained by the option \verb|--list-prover-families|.
 \index{add-prover@\verb+--add-prover+}
-\index{list-prover-ids@\verb+--list-prover-ids+}
+\index{list-prover-ids@\verb+--list-prover-families+}
 
 \section{The \texttt{prove} Command}
 \label{sec:why3ref}
