@@ -347,6 +347,8 @@ type raw_model_parser =
     [mel]: collected model
  *)
 
+val register_remove_field: (model_value -> model_value) -> unit
+
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit
 
 val lookup_model_parser : string -> model_parser

@@ -876,14 +876,16 @@ let internal_loc t =
   | Tapp (ls, []) -> ls.ls_name.id_loc
   | _ -> None
 
+let default_remove_field (v: model_value) = v
+
+let remove_field_fun = ref None
+
+let register_remove_field f =
+  remove_field_fun := Some f
+
 let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t) (model: model_files) =
   List.fold_left (fun model raw_element ->
     let raw_element_name = raw_element.me_name.men_name in
-    let raw_element_value =
-      replace_projection
-        (fun x -> (recover_name term_map x).men_name)
-        raw_element.me_value
-    in
     try
       (
        let t = Mstr.find raw_element_name term_map in
@@ -894,9 +896,22 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
              ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
          | _ -> "", attrs
        in
+       (* Transform value flattened by eval_match (one field record) back to
+          records *)
+       let raw_element_value = readd_one_fields ~attrs raw_element.me_value in
+       (* Replace projections with their real name *)
+       let raw_element_value =
+         replace_projection
+           (fun x -> (recover_name term_map x).men_name)
+           raw_element_value
+       in
+       (* Remove some specific record field related to the front-end language.
+          This function is registered. *)
+       let raw_element_value =
+         Opt.get_def default_remove_field !remove_field_fun raw_element_value in
        let model_element = {
          me_name = construct_name (get_model_trace_string ~name ~attrs) attrs;
-         me_value = readd_one_fields ~attrs raw_element_value;
+         me_value = raw_element_value;
          me_location = t.t_loc;
          me_term = Some t;
        } in

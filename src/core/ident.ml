@@ -438,6 +438,7 @@ let compute_model_trace_field pj d =
   | Some pj ->
       let name = get_model_trace_string
           ~name:pj.id_string ~attrs:pj.id_attrs in
+      let name = if name = "" then pj.id_string else name in
       let attr = "field:" ^ (string_of_int d) ^ ":" ^ name in
       Sattr.singleton (create_attribute attr)
 
