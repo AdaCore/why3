@@ -287,7 +287,7 @@ let has_file (session: Session_itp.session) =
       files can happen in strange cases (gnatwhy3 crashes in the wrong moment)
       *)
    try
-      Hstr.iter (fun _s -> raise Exit) (Session_itp.get_files session);
+      Session_itp.Hfile.iter (fun _s -> raise Exit) (Session_itp.get_files session);
       false
    with Exit -> true
 
@@ -531,7 +531,7 @@ let iter_main_goals s fu =
   *)
   let files = Session_itp.get_files s in
   let theories =
-    Hstr.fold (fun _ (x:Session_itp.file) (acc: Session_itp.theory list) ->
+    Session_itp.Hfile.fold (fun _ (x:Session_itp.file) (acc: Session_itp.theory list) ->
                         (Session_itp.file_theories x) @ acc)
     files [] in
   (* We filter detached goals (they don't have task) *)
