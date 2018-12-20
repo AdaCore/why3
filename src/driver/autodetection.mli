@@ -9,11 +9,12 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Lists prover id strings from detection config *)
-val list_prover_ids : unit -> string list
+(** Lists prover family names from detection config *)
+val list_prover_families : unit -> string list
 
 (** Adds a new prover executable *)
-val add_prover_binary : Whyconf.config -> string -> string -> Whyconf.config
+val add_prover_binary :
+  Whyconf.config -> string -> string -> string -> Whyconf.config
 
 (** Replace the provers by autodetected one *)
 val run_auto_detection : Whyconf.config -> Whyconf.config

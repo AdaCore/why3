@@ -25,6 +25,8 @@ if ! test -e "$REPORTDIR"; then
     touch "$PREVIOUS"
 fi
 
+LASTCOMMIT=$REPORTDIR/lastcommit
+
 DATE=`date --utc +%Y-%m-%d`
 SUBJECT="Why3 [$GITBRANCH] bench : "
 
@@ -37,11 +39,17 @@ notify() {
     exit 0
 }
 
+LASTCOMMITHASH=$(cat $LASTCOMMIT 2>/dev/null || echo 'none')
+NEWCOMMITHASH=$(git rev-parse HEAD)
 
+if test $LASTCOMMITHASH = $NEWCOMMITHASH; then
+    echo "Not running nightly bench: last commit is the same as for previous run" > $REPORT
+    SUBJECT="$SUBJECT not run (no new commit)"
+else
 echo "== Why3 bench on $DATE ==" > $REPORT
 echo "Starting time (UTC): "`date --utc +%H:%M` >> $REPORT
 echo "Current branch: "$GITBRANCH >> $REPORT
-echo "Current commit: "`git rev-parse HEAD` >> $REPORT
+echo "Current commit: "$NEWCOMMITHASH >> $REPORT
 
 # configuration
 autoconf
@@ -152,6 +160,10 @@ echo "" >> $REPORT
 echo "-------------- Full current state --------------" >> $REPORT
 echo "" >> $REPORT
 cat $OUT >> $REPORT
+
+echo $NEWCOMMITHASH > $LASTCOMMIT
+
+fi # end of test if LASTCOMMITHASH = NEWCOMMITHASH
 
 # final notification after the replay
 notify

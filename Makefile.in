@@ -807,7 +807,9 @@ xml-validate-local:
 
 ifeq (@enable_ide@,yes)
 
-IDE_FILES = gconfig ide_utils why3ide
+IDEGENERATED = src/ide/gtkcompat.ml
+
+IDE_FILES = gtkcompat gconfig ide_utils why3ide
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -818,13 +820,15 @@ IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 $(IDEDEP): DEPFLAGS += -I src/ide
 $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
+$(IDEDEP): $(IDEGENERATED)
+
 # build targets
 
 byte: bin/why3ide.byte
 opt:  bin/why3ide.opt
 
-bin/why3ide.opt bin/why3ide.byte: INCLUDES += -I @LABLGTK2LIB@
-bin/why3ide.opt bin/why3ide.byte: EXTLIBS += lablgtk lablgtksourceview2
+bin/why3ide.opt bin/why3ide.byte: INCLUDES += @LABLGTKINCLUDE@
+bin/why3ide.opt bin/why3ide.byte: EXTLIBS += @LABLGTKLIB@
 bin/why3ide.byte: BLINKFLAGS += -custom
 
 bin/why3ide.opt: $(WHY3CMXA) src/ide/resetgc.o $(IDECMX)
@@ -868,8 +872,17 @@ install:: install-ide
 
 install_local:: bin/why3ide
 
+ifeq (@GTKVERSION@,2)
+src/ide/gtkcompat.ml: config.status src/ide/gtkcompat2.ml
+	cp src/ide/gtkcompat2.ml $@
+else
+src/ide/gtkcompat.ml: config.status src/ide/gtkcompat3.ml
+	cp src/ide/gtkcompat3.ml $@
 endif
 
+GENERATED += $(IDEGENERATED)
+
+endif
 
 ###############
 # WEBSERV
@@ -1665,7 +1678,7 @@ endif
 
 ALTERGODIR=src/trywhy3/alt-ergo
 
-JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.syntax \
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.ppx \
         -package ocplib-simplex -I src/trywhy3 \
 	-I $(ALTERGODIR)/lib/util \
 	-I $(ALTERGODIR)/lib/structures \
@@ -1788,8 +1801,6 @@ src/trywhy3/%.cmi: src/trywhy3/%.mli
 	$(JSOCAMLC) $(BFLAGS) -c $<
 
 src/trywhy3/%.cmo: BFLAGS += -w -48
-
-src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo: BFLAGS += -syntax camlp4o
 
 clean::
 	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte src/trywhy3/trywhy3.cm* \

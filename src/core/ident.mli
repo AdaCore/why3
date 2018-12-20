@@ -222,6 +222,13 @@ val get_model_trace_string : name:string -> attrs:Sattr.t -> string
     return ["mt_string"]. Raises [Not_found] if there is no attribute of
     the form ["model_trace:*"]. *)
 
+val compute_model_trace_field: ident option -> int -> Sattr.t
+(** Take an optional projection name and the depths of its occurence and return
+    the built field attribute associated *)
+
+val extract_field: attribute -> (int * string) option
+(** Take an attribute and extract its depth, name if it was a field attribute *)
+
 val get_model_trace_attr : attrs:Sattr.t -> attribute
 (** Return an attribute of the form ["model_trace:*"].
     Raises [Not_found] if there is no such attribute. *)

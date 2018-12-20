@@ -11,7 +11,6 @@
 
 open Format
 open Why3
-open Wstdlib
 open Why3session_lib
 
 module Hprover = Whyconf.Hprover
@@ -220,7 +219,7 @@ let rec num_lines s acc tr =
 
   let print_file s fmt f =
     (* fprintf fmt "<h1>File %s</h1>@\n" f.file_name; *)
-    let fn = Filename.basename (file_name f) in
+    let fn = basename (file_path f) in
     let fn = Filename.chop_extension fn in
     fprintf fmt "%a"
       (Pp.print_list Pp.newline (print_theory s fn)) (file_theories f)
@@ -228,7 +227,7 @@ let rec num_lines s acc tr =
   let print_session name fmt s =
     fprintf fmt "<h1>Why3 Proof Results for Project \"%s\"</h1>@\n" name;
     fprintf fmt "%a"
-      (Pp.print_iter2 Hstr.iter Pp.newline Pp.nothing Pp.nothing
+      (Pp.print_iter2 Hfile.iter Pp.newline Pp.nothing Pp.nothing
          (print_file s)) (get_files s)
 
 end
@@ -274,13 +273,13 @@ struct
       (print_ul (print_goal s)) (theory_goals th)
 
   let print_file s fmt f =
-    fprintf fmt "<li>%s%a</li>"
-      (file_name f)
+    fprintf fmt "<li>%a%a</li>"
+      print_file_path (file_path f)
       (print_ul (print_theory s)) (file_theories f)
 
   let print_session _name fmt s =
     fprintf fmt "<ul>%a</ul>"
-      (Pp.print_iter2 Hstr.iter Pp.newline Pp.nothing Pp.nothing
+      (Pp.print_iter2 Hfile.iter Pp.newline Pp.nothing Pp.nothing
          (print_file s)) (get_files s)
 
 end

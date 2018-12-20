@@ -58,25 +58,43 @@ val fold_map   : (task_hd -> 'a * 'b -> ('a * 'b)     ) -> 'a -> 'b -> 'b trans
 val fold_map_l : (task_hd -> 'a * 'b -> ('a * 'b) list) -> 'a -> 'b -> 'b tlist
 
 val decl   : (decl -> decl list     ) -> task -> task trans
-(** [decl f t1 t2] adds to task [t1] the declarations [f d] for each
-    declaration [d] of task [t2]. (similar to a "flat_map"
-    operation) *)
+(** [decl f t1 t2] appends to task [t1] the set of declarations [f d]
+    for each declaration [d] of task [t2], similarly to a "flat_map"
+    operation on lists.
+
+    For example, if [t2] is made of the two declarations [d1] and [d2]
+    in that order, if [f d1 = [d11;d12]] and [f d2 = [d21;d22]], then
+    the resulting task contains the declarations of [t1] followed by
+    [d11;d12;d21;d22] *)
 
 val decl_l : (decl -> decl list list) -> task -> task tlist
-(** [decl_l f t1 t2]: on each declaration d of task [t2]
-    (with [f d] = [ld_1; ld_2; ... ld_n]), create n duplicates (newt_i)
-    of t1 with the declaration d_i replaced by ld_i.
+(** [decl_f f t1 t2] produces a set of tasks obtained by appending new
+    declarations to task [t1].  It iterates on each declaration [d]
+    appearing in [t2]: if [f d = [ld_1; ld_2; ... ld_n]] then it
+    produces [n] tasks [t'1;..;t'n], where [ld_i] is appended to [t'i].
+    The operation on remaining tasks of [t2] are then applied to each task [t'i].
 
-    Note for example that this 'decl_l (fun d -> [[d]; [d]])' will
-    duplicate the task on each declaration and probably run forever.
-*)
+    For example, if [t2] is made of the two declarations [d1] and [d2]
+    in that order, if [f d1 = [[d111;d112];[d12]]] and [f d2 =
+    [[d21];[d221;d222]]], then the result is made of the 4 tasks
+    [t1;d111;d112;d21], [t1;d111;d112;d221;d222], [t1;d12;d21] and
+    [t1;d12;d221;d222] *)
+
 
 type diff_decl =
   | Goal_decl of Decl.decl
   | Normal_decl of Decl.decl
+(* FIXME: the differenciation of goal versus normal decl should be made using
+  [is_goal d = match d.decl_node with
+  | Prop(Goal,_) -> true | _ -> false] *)
 
 val decl_goal_l: (decl -> diff_decl list list) -> task -> task tlist
-(** [decl_goal_l f t1 t2] does the same as decl_l except that it can
+(** FIXME:
+     * make this comment more comprehensible
+     * there should be no "disallowed cases": as soon as a goal is produced, no new decls should be added anymore in the resulting tasks
+
+
+    [decl_goal_l f t1 t2] does the same as decl_l except that it can
     differentiate a new axiom added to a task from a new goal added to a task.
     In case of a new axiom, everything works as in decl_l. When a new goal [ng]
     is generated, it is remembered so that it can replace the old_goal when the
@@ -107,6 +125,8 @@ val tgoal   : (prsymbol -> term -> tdecl list     ) -> task trans
 val tgoal_l : (prsymbol -> term -> tdecl list list) -> task tlist
 
 val rewrite : (term -> term) -> task -> task trans
+(** [rewrite f t1 t2] appends to task [t1] the declarations in [t2]
+    in which each top level formula [t] is replaced by [f t] **)
 val rewriteTF : (term -> term) -> (term -> term) -> task -> task trans
 
 val add_decls  : decl list -> task trans

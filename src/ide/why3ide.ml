@@ -16,6 +16,7 @@ open Wstdlib
 open Ide_utils
 open History
 open Itp_communication
+open Gtkcompat
 
 external reset_gc : unit -> unit = "ml_reset_gc"
 
@@ -200,7 +201,7 @@ let (why_lang, any_lang) =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
-    GSourceView2.source_language_manager ~default:true
+    GSourceView.source_language_manager ~default:true
   in
   languages_manager#set_search_path
     (load_path :: languages_manager#search_path);
@@ -238,15 +239,15 @@ let try_convert s =
 
 (* For each view, we have to recreate the tags *)
 let create_colors v =
-  let premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"premise_tag" [`BACKGROUND gconfig.premise_color] in
-  let neg_premise_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let neg_premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color] in
-  let goal_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let goal_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
-  let error_line_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let error_line_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
-  let error_tag (v: GSourceView2.source_view) = v#buffer#create_tag
+  let error_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
@@ -256,7 +257,7 @@ let create_colors v =
   ()
 
 (* Erase all the source location tags in a source file *)
-let erase_color_loc (v:GSourceView2.source_view) =
+let erase_color_loc (v:GSourceView.source_view) =
   let buf = v#buffer in
   buf#remove_tag_by_name "premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
@@ -288,7 +289,7 @@ let exit_function_unsafe () =
      source has been modified
    - label_of_tab is the mutable title of the tab
 *)
-let source_view_table : (int * GSourceView2.source_view * bool ref * GMisc.label) Hstr.t =
+let source_view_table : (int * GSourceView.source_view * bool ref * GMisc.label) Hstr.t =
   Hstr.create 14
 
 (* The corresponding file does not have a source view *)
@@ -300,7 +301,7 @@ let get_source_view_table (file:string) =
   | exception Not_found -> raise (Nosourceview file)
 
 (* This returns the source_view of a file *)
-let get_source_view (file: string) : GSourceView2.source_view =
+let get_source_view (file: string) : GSourceView.source_view =
   match Hstr.find source_view_table file with
   | (_, v, _, _) -> v
   | exception Not_found -> raise (Nosourceview file)
@@ -308,7 +309,7 @@ let get_source_view (file: string) : GSourceView2.source_view =
 (* Saving function for sources *)
 let save_sources () =
   Hstr.iter
-    (fun k (_n, (s: GSourceView2.source_view), b, _l) ->
+    (fun k (_n, (s: GSourceView.source_view), b, _l) ->
       if !b then
         let text_to_save = s#source_buffer#get_text () in
         send_request (Save_file_req (k, text_to_save))
@@ -395,12 +396,8 @@ let window_title =
   | None -> "Why3 Interactive Proof Session"
 
 let main_window : GWindow.window =
-  let w = GWindow.window
-            ~allow_grow:true ~allow_shrink:true
-            ~width:gconfig.window_width
-            ~height:gconfig.window_height
-            ~title:window_title ()
-  in
+  let w = GWindow.window ~title:window_title () in
+  w#resize ~width:gconfig.window_width ~height:gconfig.window_height;
   (* callback to record the new size of the main window when changed, so
    that on restart the window size is the same as the last session *)
   let (_ : GtkSignal.id) =
@@ -467,27 +464,21 @@ let (_ : GtkSignal.id) =
 
 let hp = GPack.paned `HORIZONTAL ~packing:hb#add ()
 
-let scrollview =
+(** {2 view for the session tree} *)
+let scrolled_session_view =
   let sv =
     GBin.scrolled_window
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
-      ~width:gconfig.tree_width ~shadow_type:`ETCHED_OUT
+      ~shadow_type:`ETCHED_OUT
       ~packing:hp#add ()
   in
+  hp#set_position gconfig.tree_width;
   let (_ : GtkSignal.id) =
     sv#misc#connect#size_allocate
       ~callback:
       (fun {Gtk.width=w;Gtk.height=_h} ->
        gconfig.tree_width <- w)
   in sv
-
-(** {2 view for the session tree} *)
-let scrolled_session_view =
-  GBin.scrolled_window
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~shadow_type:`ETCHED_OUT
-    ~packing:scrollview#add_with_viewport
-    ()
 
 (* Vertical pan *)
 let vpan222 = GPack.paned `VERTICAL ~packing:hp#add ()
@@ -510,9 +501,13 @@ let status_column = cols#add Gobject.Data.gobject
 (* fifth column: extra status info: time, obsolete status, limits *)
 let time_column = cols#add Gobject.Data.string
 
+let column_status_title = "Status"
+let column_time_title = "Time"
+let column_goals_title = "Theories/Goals"
+
 (* first view column: icon and name *)
 let view_name_column =
-  let v = GTree.view_column ~title:"Theories/Goals" () in
+  let v = GTree.view_column ~title:column_goals_title () in
   (* icon attribute *)
   let icon_renderer = GTree.cell_renderer_pixbuf [ ] in
   v#pack icon_renderer ~expand:false;
@@ -528,7 +523,7 @@ let view_name_column =
 (* second view column: status *)
 let view_status_column =
   let status_renderer = GTree.cell_renderer_pixbuf [ ] in
-  let v = GTree.view_column ~title:"Status"
+  let v = GTree.view_column ~title:column_status_title
                             ~renderer:(status_renderer, ["pixbuf", status_column])
                             ()
   in
@@ -538,7 +533,7 @@ let view_status_column =
 
 let view_time_column =
   let renderer = GTree.cell_renderer_text [`XALIGN 0.] in
-  let v = GTree.view_column ~title:"Time"
+  let v = GTree.view_column ~title:column_time_title
                             ~renderer:(renderer, ["text", time_column]) ()
   in
   v#set_resizable false;
@@ -661,7 +656,7 @@ let (_ : GtkSignal.id) =
 
 
 let task_view =
-  GSourceView2.source_view
+  GSourceView.source_view
     ~editable:false
     ~cursor_visible:false
     ~show_line_numbers:true
@@ -678,7 +673,8 @@ let create_source_view =
   let create_source_view f content =
     if not (Hstr.mem source_view_table f) then
       begin
-        let label = GMisc.label ~text:f () in
+        let label = GMisc.label ~text:(Filename.basename f) () in
+        label#misc#set_tooltip_markup f;
         let source_page, scrolled_source_view =
           !n, GPack.vbox ~homogeneous:false ~packing:
             (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
@@ -689,7 +685,7 @@ let create_source_view =
             ~shadow_type:`ETCHED_OUT
             ~packing:scrolled_source_view#add () in
         let source_view =
-          GSourceView2.source_view
+          GSourceView.source_view
             ~auto_indent:gconfig.allow_source_editing
             ~insert_spaces_instead_of_tabs:true ~tab_width:2
             ~show_line_numbers:true
@@ -780,7 +776,7 @@ let scrolled_edited_view =
     ~shadow_type:`ETCHED_OUT ~packing:edited_tab#add ()
 
 let edited_view =
-  GSourceView2.source_view
+  GSourceView.source_view
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_edited_view#add
@@ -798,7 +794,7 @@ let scrolled_output_view =
     ~shadow_type:`ETCHED_OUT ~packing:output_tab#add ()
 
 let output_view =
-  GSourceView2.source_view
+  GSourceView.source_view
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_output_view#add
@@ -817,7 +813,7 @@ let scrolled_counterexample_view =
     ~shadow_type:`ETCHED_OUT ~packing:counterexample_tab#add ()
 
 let counterexample_view =
-  GSourceView2.source_view
+  GSourceView.source_view
     ~editable:false
     ~show_line_numbers:true
     ~packing:scrolled_counterexample_view#add
@@ -957,7 +953,7 @@ let update_monitor =
 (* Current position in the source files *)
 let current_cursor_loc = ref None
 
-let move_to_line ~yalign (v : GSourceView2.source_view) line =
+let move_to_line ~yalign (v : GSourceView.source_view) line =
   let line = max 0 (line - 1) in
   let line = min line v#buffer#line_count in
   let it = v#buffer#get_iter (`LINE line) in
@@ -1076,7 +1072,7 @@ let convert_color (color: color): string =
   | Error_line_color -> "error_line_tag"
 
 let color_line ~color loc =
-  let color_line (v:GSourceView2.source_view) ~color l =
+  let color_line (v:GSourceView.source_view) ~color l =
     let buf = v#buffer in
     let top = buf#start_iter in
     let start = top#forward_lines (l-1) in
@@ -1101,7 +1097,7 @@ let color_loc ?(ce=false) ~color loc =
 
   (* This apply a background [color] on a location given by its file view [v] line
      [l] beginning char [b] and end char [e]. *)
-  let color_loc (v:GSourceView2.source_view) ~color l b e =
+  let color_loc (v:GSourceView.source_view) ~color l b e =
     let buf = v#buffer in
     let top = buf#start_iter in
     let start = top#forward_lines (l-1) in
@@ -1408,6 +1404,23 @@ let (_ : GtkSignal.id) =
         end;
         context_tools_menu#popup ~button:3 ~time:(GdkEvent.Button.time ev);
         true
+      | 1 -> (* Left click *)
+          (* Call get-ce only when clicked on the Status of a proofattempt
+             (which is unproved) *)
+          let x = int_of_float (GdkEvent.Button.x ev) in
+          let y = int_of_float (GdkEvent.Button.y ev) in
+          begin match goals_view#get_path_at_pos ~x ~y with
+            | Some (path,col,_,_) ->
+                if col#title = column_status_title then
+                  let node_id =
+                    get_node_id (goals_model#get_row_reference path)#iter in
+                  let type_id = get_node_type node_id in
+                  let proved_id = get_node_proved node_id in
+                  if type_id = NProofAttempt && not proved_id then
+                    send_request (Command_req (node_id, "get-ce"))
+            | _ -> ()
+          end;
+          false
       | _ -> (* Other buttons *) false
     end
   in
@@ -1638,9 +1651,9 @@ let set_status_and_time_column ?limit row =
                Format.sprintf "%.2f" time
            in
            if steps >= 0 then
-	     Format.sprintf "%s (steps: %d)" s steps
+             Format.sprintf "%s (steps: %d)" s steps
            else
-	     s
+             s
         | C.InternalFailure _ -> "(internal failure)"
         | C.Interrupted -> "(interrupted)"
         | C.Undone -> "(undone)"
@@ -1794,7 +1807,7 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   let callback () =
-    Gconfig.preferences gconfig;
+    Gconfig.preferences ~parent:main_window gconfig;
     make_sources_editable gconfig.allow_source_editing;
     send_session_config_to_server ()
   in
@@ -1907,12 +1920,12 @@ let help_factory = new menu_factory help_menu ~accel_path:"<Why3-Main>/Help/" ~a
 let (_ : GMenu.menu_item) =
   help_factory#add_item
     "Legend"
-    ~callback:show_legend_window
+    ~callback:(show_legend_window ~parent:main_window)
 
 let (_ : GMenu.menu_item) =
   help_factory#add_item
     "About"
-    ~callback:show_about_window
+    ~callback:(show_about_window ~parent:main_window)
 
 (*****************************************************************)
 (* "Tools" submenus for strategies, provers, and transformations *)
@@ -1984,7 +1997,11 @@ let init_completion provers transformations strategies commands =
                String.compare (Strings.lowercase h1) (Strings.lowercase h2))
               provers
   in
-  List.iter add_submenu_prover provers_sorted;
+  (* Remove counterexample provers from the menu *)
+  let menu_provers =
+    List.filter (fun (_, _, s) -> not (Strings.ends_with s "counterexamples"))
+      provers_sorted in
+  List.iter add_submenu_prover menu_provers;
   context_factory#add_separator ();
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
@@ -2049,6 +2066,16 @@ let (_ : GMenu.menu_item) =
   tools_factory#add_item "_Edit"
     ~key:GdkKeysyms._E
     ~tooltip:"View or edit proof script"
+    ~callback
+
+let (_ : GMenu.menu_item) =
+  let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"get-ce error"
+      ~action:"Get Counterexamples"
+      (fun id -> Command_req (id, "get-ce")) in
+  tools_factory#add_item "_Get Counterexamples"
+    ~key:GdkKeysyms._G
+    ~tooltip:"Launch the prover with counterexamples"
     ~callback
 
 let (_ : GMenu.menu_item) =
@@ -2155,6 +2182,17 @@ in ();
 
 let (_ : GMenu.menu_item) =
   let callback =
+    on_selected_rows ~multiple:false ~notif_kind:"get-ce error"
+      ~action:"Get Counterexamples"
+      (fun id -> Command_req (id, "get-ce")) in
+  context_factory#add_item "_Get Counterexamples"
+    ~accel_path:"<Why3-Main>/Tools/Get Counterexamples" ~add_accel:false
+    ~tooltip:"Launch the prover with counterexamples"
+    ~callback
+in ();
+
+let (_ : GMenu.menu_item) =
+  let callback =
     on_selected_rows ~multiple:false ~notif_kind:"Replay error" ~action:"replay"
       (fun id -> Command_req (id, "replay")) in
   context_factory#add_item "_Replay valid obsolete proofs"
@@ -2247,11 +2285,7 @@ let check_uninstalled_prover =
       let callback p u =
         send_request (Set_prover_policy(p,u))
       in
-      (* The gconfig.window_height is always the height of the window thanks to
-         the callback to size_allocate. By default, this dialog has 3/4 the
-         height of the main window. *)
-      let height = 3 * gconfig.window_height / 4 in
-      uninstalled_prover_dialog ~height ~callback gconfig p
+      uninstalled_prover_dialog ~parent:main_window ~callback gconfig p
     end
 
 let treat_notification n =

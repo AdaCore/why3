@@ -28,10 +28,11 @@ x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
 bench/ce/records_inv.mlw M VC record_match_eval_test3: Timeout or Unknown
 Counter-example model:File records_inv.mlw:
 Line 28:
-x, [[@introduced]] = {"type" : "Record" ,
+x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
-"val" : false } }] } }
+"val" : false } }] } } }] } }
 Line 31:
 the check fails with all inputs
 
@@ -39,10 +40,11 @@ bench/ce/records_inv.mlw M VC record_match_eval_test3: Valid
 bench/ce/records_inv.mlw M VC record_match_eval_test4: Timeout or Unknown
 Counter-example model:File records_inv.mlw:
 Line 33:
-x, [[@introduced]] = {"type" : "Record" ,
+x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
-"val" : false } }] } }
+"val" : false } }] } } }] } }
 Line 36:
 the check fails with all inputs
 
@@ -50,10 +52,11 @@ bench/ce/records_inv.mlw M VC record_match_eval_test4: Valid
 bench/ce/records_inv.mlw M VC record_match_eval_test44: Timeout or Unknown
 Counter-example model:File records_inv.mlw:
 Line 39:
-x, [[@introduced]] = {"type" : "Record" ,
+x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
-"val" : false } }] } }
+"val" : false } }] } } }] } }
 Line 42:
 the check fails with all inputs
 
@@ -62,15 +65,17 @@ bench/ce/records_inv.mlw M VC record_match_eval_test44: Valid
 bench/ce/records_inv.mlw M VC test_record_match_eval_test5: Timeout or Unknown
 Counter-example model:File records_inv.mlw:
 Line 46:
-re, [[@introduced]] = {"type" : "Record" ,
+re, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
-"val" : false } }] } }
+"val" : false } }] } } }] } }
 Line 48:
-x, [[@introduced]] = {"type" : "Record" ,
+x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
-"val" : false } }] } }
+"val" : false } }] } } }] } }
 Line 51:
 the check fails with all inputs
 
@@ -112,11 +117,18 @@ x, [[@introduced]] = {"type" : "Record" ,
 "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 Line 79:
-x, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : ".my_field_f" ,
+x, [[@introduced]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" , "val" : false } }] } }
 x, [[@introduced],
 [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+Line 81:
+x, [[@introduced]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : ".my_field_f" ,
 "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
 "value" : {"type" : "Boolean" ,

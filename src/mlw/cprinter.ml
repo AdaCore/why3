@@ -935,29 +935,6 @@ module MLToC = struct
               | _ -> assert false
               end
             else Sexpr e')
-    | Elet (ld,e) ->
-       begin match ld with
-       | Lvar (pv,le) -> (* not a block *)
-          begin
-          match le.e_node with
-          | Mltree.Econst ic ->
-            let n = Number.compute_int_constant ic in
-            let ce = C.(Econst (Cint (BigInt.to_string n))) in
-	    Debug.dprintf debug_c_extraction "propagate constant %s for var %s@."
-			  (BigInt.to_string n) (pv_name pv).id_string;
-            C.propagate_in_block (pv_name pv) ce (expr info env e)
-          | _->
-            let t = ty_of_ty info (ty_of_ity pv.pv_ity) in
-            match expr info {env with computes_return_value = false} le with
-            | d,s ->
-              let initblock = d, C.assignify (Evar (pv_name pv)) s in
-              [ C.Ddecl (t, [pv_name pv, C.Enothing]) ],
-              C.Sseq (C.Sblock initblock, C.Sblock (expr info env e))
-          end
-      | Lsym _ -> raise (Unsupported "LDsym")
-      | Lrec _ -> raise (Unsupported "LDrec") (* TODO for rec at least*)
-      | Lany _ -> raise (Unsupported "Lany")
-       end
     | Eif (cond, th, el) ->
        let cd,cs = expr info {env with computes_return_value = false} cond in
        let t = expr info env th in
@@ -1042,13 +1019,8 @@ module MLToC = struct
           let di = C.Ddecl(ty, [i.pv_vs.vs_name, Enothing]) in
           let ei = C.Evar (i.pv_vs.vs_name) in
           let init_e = C.Ebinop (Bassign, ei, C.Evar (sb.pv_vs.vs_name)) in
-          let incr_op = match dir with To -> C.Upostincr | DownTo -> C.Upostdecr in
+          let incr_op = match dir with To -> C.Upreincr | DownTo -> C.Upredecr in
           let incr_e = C.Eunop (incr_op, ei) in
-          let init_test_op = match dir with | To -> C.Blt | DownTo -> C.Bgt in
-          let init_test = C.Sif (C.Ebinop(init_test_op,
-                                          C.Evar (eb.pv_vs.vs_name),
-                                          C.Evar (sb.pv_vs.vs_name)),
-                                 Sbreak, Snop) in
           let end_test = C.Sif (C.Ebinop (C.Beq, ei, C.Evar eb.pv_vs.vs_name),
                                 Sbreak, Snop) in
           let env' = { env with computes_return_value = false;
@@ -1057,8 +1029,13 @@ module MLToC = struct
                                   if env.in_unguarded_loop
                                   then Sid.empty else env.breaks } in
           let bd, bs = expr info env' body in
-          let bs = C.Sseq(init_test, C.Sseq (bs, end_test)) in
-          [di], C.Sfor(init_e, Enothing, incr_e, C.Sblock (bd,bs))
+          let bs = C.Sseq (bs, end_test) in
+          let init_test_op = match dir with | To -> C.Bge | DownTo -> C.Ble in
+          [di], C.Sif (C.Ebinop(init_test_op,
+                                C.Evar (eb.pv_vs.vs_name),
+                                C.Evar (sb.pv_vs.vs_name)),
+                       C.Sfor(init_e, Enothing, incr_e, C.Sblock(bd,bs)),
+                       Snop)
        |  _ -> raise (Unsupported "for loops")
        end
     | Ematch (({e_node = Eapp(rs,_)} as e1), [Ptuple rets,e2], [])
@@ -1123,6 +1100,29 @@ module MLToC = struct
               then C.Sreturn(Enothing)
               else C.Snop)
     | Efun _ -> raise (Unsupported "higher order")
+    | Elet (ld,e) ->
+       begin match ld with
+       | Lvar (pv,le) -> (* not a block *)
+          begin
+          match le.e_node with
+          (*| Mltree.Econst ic ->
+            let n = Number.compute_int_constant ic in
+            let ce = C.(Econst (Cint (BigInt.to_string n))) in
+	    Debug.dprintf debug_c_extraction "propagate constant %s for var %s@."
+			  (BigInt.to_string n) (pv_name pv).id_string;
+            C.propagate_in_block (pv_name pv) ce (expr info env e)*)
+          | _->
+            let t = ty_of_ty info (ty_of_ity pv.pv_ity) in
+            match expr info {env with computes_return_value = false} le with
+            | d,s ->
+              let initblock = d, C.assignify (Evar (pv_name pv)) s in
+              [ C.Ddecl (t, [pv_name pv, C.Enothing]) ],
+              C.Sseq (C.Sblock initblock, C.Sblock (expr info env e))
+          end
+      | Lsym _ -> raise (Unsupported "LDsym")
+      | Lrec _ -> raise (Unsupported "LDrec") (* TODO for rec at least*)
+      | Lany _ -> raise (Unsupported "Lany")
+       end
 
   let translate_decl (info:info) (d:decl) ~header : C.definition list =
     let translate_fun rs vl e =

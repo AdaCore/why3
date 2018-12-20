@@ -14,9 +14,9 @@ x, [[@introduced],
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 Line 12:
-x, [] = {"type" : "Record" , "val" : {"Field" : [{"field" : "f" ,
-"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
-"value" : {"type" : "Boolean" ,
+x, [[@introduced]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
+"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 x at 'Old, [[@introduced], [@at:'Old],
 [@model_trace:x],
@@ -34,6 +34,11 @@ y at 'Old, [[@introduced], [@at:'Old],
 [@at:'Old:loc:location] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
 "val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : false } }] } }
+Line 14:
+x, [[@introduced]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
+"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 
 bench/ce/records_label.mlw Old VC record_at_test2: Timeout or Unknown

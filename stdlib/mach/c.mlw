@@ -192,9 +192,8 @@ module C
     ensures  { forall i. old p2.min <= i < old p2.max ->
                          (pelts p2)[i] = old (pelts p2)[i] }
 
-  val c_assert (e:bool) : unit
+  val partial c_assert (e:bool) : unit
     ensures { e }
-    diverges
 
   (** Printing *)
 

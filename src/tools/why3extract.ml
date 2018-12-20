@@ -184,10 +184,10 @@ let print_mdecls ?fname m mdecls deps =
           if iout <> stdout then close_out iout end;
     let cout, old = get_cout_old fg m ?fname in
     let fmt = formatter_of_out_channel cout in
-    (* print module prelude *)
-    printer.Pdriver.prelude_printer pargs ?old ?fname ~flat deps fmt m;
     (* print driver prelude *)
     Printer.print_prelude fmt pargs.Pdriver.prelude;
+    (* print module prelude *)
+    printer.Pdriver.prelude_printer pargs ?old ?fname ~flat deps fmt m;
     let pm = pargs.Pdriver.thprelude in
     print_preludes tname fmt pm;
     (* print decls *)

@@ -112,12 +112,12 @@ val image_failure_obs : GdkPixbuf.pixbuf ref
 (* miscellaneous dialogs *)
 (*************************)
 
-val show_legend_window : unit -> unit
-val show_about_window : unit -> unit
-val preferences : t -> unit
+val show_legend_window : parent:#GWindow.window_skel -> unit -> unit
+val show_about_window : parent:#GWindow.window_skel -> unit -> unit
+val preferences : parent:#GWindow.window_skel -> t -> unit
 
 val uninstalled_prover_dialog :
-  height:int ->
+  parent:#GWindow.window_skel ->
   callback: (Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit) ->
   t -> Whyconf.prover -> unit
 

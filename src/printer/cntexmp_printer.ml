@@ -131,8 +131,8 @@ let update_info_labels lsname cur_attrs t ls =
 let check_for_counterexample t =
   let is_app t =
     match t.t_node with
-    | Tapp (_, []) -> true
+    | Tapp (ls, []) -> not (Sattr.mem proxy_attr ls.ls_name.id_attrs)
     | _ -> false
   in
-  Sattr.for_all (fun a -> not (attr_equal proxy_attr a)) t.t_attrs &&
+  not (Sattr.mem proxy_attr t.t_attrs) &&
   t.t_loc <> None && (is_app t)

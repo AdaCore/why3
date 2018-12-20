@@ -1,19 +1,32 @@
 :x: marks a potential source of incompatibility
 
-Next Version
-------------
-
 Transformations
-  * "split_vc" and "subst_all" now avoid substituting user symbols to generated
-    one (issue 235). It may breaks session :x:.
-  * "destruct_rec" applies "destruct" recursively on a goal (issue 231).
-  * "destruct" now simplifies away equalities on constructors.
+  * `split_vc` and `subst_all` now avoid substituting user symbols by
+    generated ones :x:
+  * `destruct_rec` applies `destruct` recursively on a goal
+  * `destruct` now simplifies away equalities on constructors
 
 Tools
   * add a command 'why3 session update' to modify sessions from the
     command line. So far, only one option exists, for renaming files
     fixes issue #227
+  * option `--add-prover` of `why3 config` is now taking the shortcut as
+    second argument.  option `--list-prover-ids` renamed to
+    `--list-prover-families`. See documentation for details.
 
+IDE
+  * clicking on the status of a failed proof attempt in the proof tree
+    now generates counterexamples
+  * added support for GTK3
+
+Version 1.1.1, December 17, 2018
+--------------------------------
+
+Bug fixes
+  * prevented broken extraction of `any`
+  * fixed evaluation order when extracting nested mutators
+  * fixed extraction of nested recursive polymorphic functions
+  * fixed cloning of expressions raising exceptions
 
 Version 1.1.0, October 17, 2018
 -------------------------------

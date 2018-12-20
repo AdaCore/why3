@@ -52,27 +52,32 @@ val copy_dir : string -> string -> unit
     currently the directory must contains only directories and common files
 *)
 
-val path_of_file : string -> string list
-(** [path_of_file filename] return the absolute path of [filename] *)
+val concat : string -> string -> string
+(** like [Filename.concat] but returns only second string when it is already absolute *)
 
-(* unused ?
-val normalize_filename : string -> string
+val system_independent_path_of_file : string -> string list
+(** [system_independent_path_of_file filename] return the access path
+    of [filename], in a system-independent way *)
+
+val system_dependent_absolute_path : string -> string list -> string
+(** [system_dependent_absolute_path d p] returns the
+    system-dependent absolute path for the abstract path [p] relative
+    to directory [d] *)
+
+val relativize_filename : string -> string -> string list
+(** [relativize_filename base filename] returns an access path for
+    filename [filename] relatively to [base]. The [filename] is split
+    into path components using the system-dependent calls to
+    [Filename.dirname] and [Filename.basename].
+
+    OBSOLETE COMMENT? [base] should not contain occurrences of "." and "..",
+    which can be removed by calling first [normalize_filename].
+
+    FIXME: this function does not handle symbolic links properly
  *)
-(** [normalize_filename filename] removes from [filename] occurrences of
-    "." and ".." that denote respectively the current directory and
-    parent directory, whenever possible *)
 
-val relativize_filename : string -> string -> string
-(** [relativize_filename base filename] relativize the filename
-    [filename] according to [base]. [base] should not contain occurrences of
-    "." and "..", which can be removed by calling first [normalize_filename].
-*)
-
-val absolutize_filename : string -> string -> string
-(** [absolutize_filename base filename] absolutize the filename
-    [filename] according to [base] *)
 
 val uniquify : string -> string
-(** find filename that doesn't exists based on the given filename.
+(** find filename that doesn't exist based on the given filename.
     Be careful the file can be taken after the return of this function.
 *)

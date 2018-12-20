@@ -259,9 +259,9 @@ let print_model_value_sanit fmt v =
 let print_model_value = print_model_value_sanit
 
 
-(******************************************)
-(* Print values for humans                *)
-(******************************************)
+(********************************************)
+(* Print values (as to be displayed in IDE) *)
+(********************************************)
 let print_float_human fmt f =
   match f with
   | Plus_infinity ->
@@ -286,9 +286,15 @@ let rec print_array_human fmt (arr: model_array) =
   fprintf fmt "@[others =>@ %a@])@]" print_model_value_human arr.arr_others
 
 and print_record_human fmt r =
-  fprintf fmt "@[%a@]"
-    (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
-    (fun fmt (f, v) -> fprintf fmt "@[%s =@ %a@]" f print_model_value_human v)) r
+  match r with
+  | [_, value] ->
+      (* Special pretty printing for record with only one element *)
+      fprintf fmt "%a" print_model_value_human value
+  | _ ->
+    fprintf fmt "@[%a@]"
+      (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi
+         (fun fmt (f, v) ->
+            fprintf fmt "@[%s =@ %a@]" f print_model_value_human v)) r
 
 and print_proj_human fmt p =
   let s, v = p in
@@ -345,6 +351,26 @@ let split_model_trace_name mt_name =
   | [first] -> (first, "")
   | first::second::_ -> (first, second)
   | [] -> (mt_name, "")
+
+(* Elements that are of record with only one field in the source code, are
+   simplified by eval_match in wp generation. So, this allows to reconstruct
+   their value (using the "field" attribute that were added). *)
+let readd_one_fields ~attrs value =
+  (* Small function that insert in a sorted list *)
+  let rec insert_sorted (n, name) l =
+    match l with
+    | (n1, _) :: _ when n1 < n ->
+        (n, name) :: l
+    | (n1, name1) :: tl ->
+        (n1, name1) :: insert_sorted (n, name) tl
+    | [] -> [n, name]
+  in
+  let l = Sattr.fold (fun x l ->
+      match Ident.extract_field x with
+      | None -> l
+      | Some (n, field_name) -> insert_sorted (n, field_name) l) attrs [] in
+    List.fold_left (fun v (_, field_name) ->
+      Record [field_name, v]) value l
 
 let create_model_element ~name ~value ~attrs ?location ?term () =
   let (name, type_s) = split_model_trace_name name in
@@ -782,7 +808,12 @@ let add_to_model model model_element =
     let (filename, line_number, _, _) = Loc.get pos in
     let model_file = get_model_file model filename in
     let elements = get_elements model_file line_number in
-    let elements = model_element::elements in
+    let elements =
+      if List.mem model_element elements then
+        elements
+      else
+        model_element::elements
+    in
     let model_file = IntMap.add line_number elements model_file in
     StringMap.add filename model_file model
 
@@ -839,6 +870,12 @@ and replace_projection_array const_function a =
   in
   {arr_others = others; arr_indices = arr_index_list}
 
+let internal_loc t =
+  match t.t_node with
+  | Tvar vs -> vs.vs_name.id_loc
+  | Tapp (ls, []) -> ls.ls_name.id_loc
+  | _ -> None
+
 let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t) (model: model_files) =
   List.fold_left (fun model raw_element ->
     let raw_element_name = raw_element.me_name.men_name in
@@ -851,18 +888,26 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
       (
        let t = Mstr.find raw_element_name term_map in
        let attrs = Sattr.union raw_element.me_name.men_attrs t.t_attrs in
-       let name =
+       let name, attrs =
          match t.t_node with
-         | Tapp (ls, []) -> ls.ls_name.id_string
-         | _ -> ""
+         | Tapp (ls, []) ->
+             ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
+         | _ -> "", attrs
        in
        let model_element = {
          me_name = construct_name (get_model_trace_string ~name ~attrs) attrs;
-         me_value = raw_element_value;
+         me_value = readd_one_fields ~attrs raw_element_value;
          me_location = t.t_loc;
          me_term = Some t;
        } in
        let model = add_to_model model model_element in
+       let internal_loc = internal_loc t in
+       let model =
+         if (internal_loc = None) then
+           model
+         else
+           add_to_model model {model_element with me_location = internal_loc}
+       in
        (* Here we create the same element for all its possible locations (given
           by attribute vc:written).
        *)
