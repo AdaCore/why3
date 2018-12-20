@@ -513,35 +513,10 @@ if test "$found_menhirlib" = no; then
    AC_MSG_ERROR([Library menhirLib not found.])
 fi
 
-# checking for lablgtk2
+# checking for lablgtk3
 if test "$enable_ide" != yes ; then
    reason_ide=" (disabled by user)"
 else
-   DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query lablgtk2)
-      if test -n "$DIR"; then
-         echo "ocamlfind found lablgtk2 in $DIR"
-         LABLGTKINCLUDE="-I $DIR"
-      fi
-   fi
-   if test -z "$DIR"; then
-      LABLGTKINCLUDE="-I +lablgtk2"
-      DIR="$OCAMLLIB/lablgtk2"
-      AC_CHECK_FILE($DIR/lablgtk.cma,,enable_ide=no)
-   fi
-   AC_CHECK_FILE($DIR/gtkButton.cmi,,enable_ide=no)
-   if test "$enable_ide" = yes; then
-      GTKVERSION=2
-   else
-      AC_MSG_WARN([Lib lablgtk2 not found, trying lablgtk3.])
-      enable_ide=retry
-   fi
-fi
-
-# checking for lablgtk3
-if test "$enable_ide" = retry; then
-   enable_ide=yes
    DIR=
    if test "$USEOCAMLFIND" = yes; then
       DIR=$(ocamlfind query lablgtk3)
@@ -558,8 +533,35 @@ if test "$enable_ide" = retry; then
    AC_CHECK_FILE($DIR/gtkButton.cmi,,enable_ide=no)
    if test "$enable_ide" = yes; then
       GTKVERSION=3
+      reason_ide=" (gtk3)"
    else
-      AC_MSG_WARN([Lib lablgtk3 not found, IDE disabled.])
+      AC_MSG_WARN([Lib lablgtk3 not found, trying lablgtk2.])
+      enable_ide=retry
+   fi
+fi
+
+# checking for lablgtk2
+if test "$enable_ide" = retry; then
+   enable_ide=yes
+   DIR=
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query lablgtk2)
+      if test -n "$DIR"; then
+         echo "ocamlfind found lablgtk2 in $DIR"
+         LABLGTKINCLUDE="-I $DIR"
+      fi
+   fi
+   if test -z "$DIR"; then
+      LABLGTKINCLUDE="-I +lablgtk2"
+      DIR="$OCAMLLIB/lablgtk2"
+      AC_CHECK_FILE($DIR/lablgtk.cma,,enable_ide=no)
+   fi
+   AC_CHECK_FILE($DIR/gtkButton.cmi,,enable_ide=no)
+   if test "$enable_ide" = yes; then
+      GTKVERSION=2
+      reason_ide=" (gtk2)"
+   else
+      AC_MSG_WARN([Lib lablgtk2 not found, IDE disabled.])
       reason_ide=" (lablgtk2/3 not found)"
    fi
 fi
