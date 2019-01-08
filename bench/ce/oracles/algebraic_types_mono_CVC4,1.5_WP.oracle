@@ -1,0 +1,43 @@
+Weakest Precondition
+ce/algebraic_types_mono.mlw M G: Timeout or Unknown
+Counter-example model:File algebraic_types_mono.mlw:
+Line 6:
+x, [[@introduced]] = {"type" : "Integer" ,
+"val" : "0" }
+
+ce/algebraic_types_mono.mlw M g2: Timeout or Unknown
+Counter-example model:File algebraic_types_mono.mlw:
+Line 10:
+x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "B" ,
+"list" : [{"type" : "Integer" ,
+"val" : "0" }] } }
+
+ce/algebraic_types_mono.mlw M g4: Timeout or Unknown
+Counter-example model:File algebraic_types_mono.mlw:
+Line 12:
+x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "A" ,
+"list" : [] } }
+
+ce/algebraic_types_mono.mlw M g5: Timeout or Unknown
+Counter-example model:File algebraic_types_mono.mlw:
+Line 16:
+x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Au" ,
+"list" : [{"type" : "Integer" , "val" : "0" }, {"type" : "Integer" ,
+"val" : "1" }] } }
+
+ce/algebraic_types_mono.mlw M g1: Timeout or Unknown
+Counter-example model:File algebraic_types_mono.mlw:
+Line 25:
+l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
+"list" : [{"type" : "Integer" , "val" : "-1" }, {"type" : "Apply" ,
+"val" : {"apply" : "Nil" ,
+"list" : [] } }] } }
+
+ce/algebraic_types_mono.mlw M g7: Timeout or Unknown
+Counter-example model:File algebraic_types_mono.mlw:
+Line 27:
+l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
+"list" : [{"type" : "Integer" , "val" : "0" }, {"type" : "Apply" ,
+"val" : {"apply" : "Nil" ,
+"list" : [] } }] } }
+
