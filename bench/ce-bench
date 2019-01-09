@@ -77,8 +77,8 @@ run () {
         # TODO temporary as this comes from incorrect locations generated in
         # a[i] <- x like terms.
         sed -r 's/\:loc\:.*\]/\:loc\:location\]/' >> "$f.out"
-    str_oracle=$(tr ' ' '\n' < "${oracle_file}")
-    str_out=$(tr ' ' '\n' < "$f.out")
+    str_oracle=$(tr -d ' \n' < "${oracle_file}")
+    str_out=$(tr -d ' \n' < "$f.out")
     decide_fail $f
     case $is_xfail in
         "full") is_xfail=true;;
@@ -100,6 +100,8 @@ run () {
             mv "$f.out" "${oracle_file}"
         else
             echo "FAILED!"
+            echo "Oracle is ${str_oracle}"
+            echo "Output is ${str_out}"
             echo "diff is the following:"
             echo "$f"
             diff "${oracle_file}" "$f.out"
