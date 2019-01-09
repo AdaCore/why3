@@ -26,30 +26,30 @@ if test "$files" = "" ; then
     files="$dir/ce/*.mlw"
 fi
 
-is_xfail=false
+is_xfail=none
 
 # TODO this function should disappear as counterexamples should eventually get
 # more reproducible.
 decide_fail () {
     case "$1" in
+        # Inconsistent integer values between two runs
+        "bench/ce/algebraic_types_mono_Z3,4.6.0_SP")
+           is_xfail=integer_values;;
         # Inconsistent results between two runs
-        # "bench/ce/algebraic_type_Z3,4.6.0_SP")
-        #    is_xfail=true;;
-        # Inconsistent results between two runs
-        # "bench/ce/algebraic_type_Z3,4.6.0_WP")
-        #    is_xfail=true;;
+        "bench/ce/algebraic_types_mono_Z3,4.6.0_WP")
+           is_xfail=integer_values;;
         # Inconsistent results between two runs
         "bench/ce/ref_mono_Z3,4.6.0_WP")
-            is_xfail=true;;
+            is_xfail=integer_values;;
         # Inconsistent results between two runs
         "bench/ce/ref_mono_Z3,4.6.0_SP")
-            is_xfail=true;;
+            is_xfail=integer_values;;
+        *) is_xfail=none;;
     esac
 }
 
 # $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP
 run () {
-    is_xfail=false
     printf "  $2 ($1)... "
     file_path="$2/$3"
     if $4; then
@@ -77,8 +77,21 @@ run () {
         # TODO temporary as this comes from incorrect locations generated in
         # a[i] <- x like terms.
         sed -r 's/\:loc\:.*\]/\:loc\:location\]/' >> "$f.out"
-    str_oracle=$(tr -d ' \n' < "${oracle_file}")
-    str_out=$(tr -d ' \n' < "$f.out")
+    str_oracle=$(tr ' ' '\n' < "${oracle_file}")
+    str_out=$(tr ' ' '\n' < "$f.out")
+    decide_fail $f
+    case $is_xfail in
+        "full") is_xfail=true;;
+        "none") is_xfail=false;;
+        "integer_values")
+            is_xfail=false
+            str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"[0-9]\+"/"val":"ANYINT"/g')
+            str_out=$(echo ${str_out} | sed -e 's/"val":"[0-9]\+"/"val":"ANYINT"/g')
+            ;;
+        *)
+            echo "High failure: unknown xfail value $is_xfail";
+            exit 2;;
+    esac
     if [ "$str_oracle" = "$str_out" ] ; then
         echo "ok"
     else
@@ -88,9 +101,8 @@ run () {
         else
             echo "FAILED!"
             echo "diff is the following:"
-            echo "${f}"
+            echo "$f"
             diff "${oracle_file}" "$f.out"
-            decide_fail ${f}
             if $is_xfail; then
                 echo "Failed but bench is ok because asserted as an XFAIL."
             else
