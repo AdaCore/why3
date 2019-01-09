@@ -1241,6 +1241,29 @@ let move_current_row_selection_to_first_child () =
         end
   | _ -> ()
 
+let move_current_row_selection_to_down () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let path = goals_model#get_path row#iter in
+      GtkTree.TreePath.down path;
+      goals_view#selection#unselect_all ();
+      goals_view#selection#select_path path;
+      goals_view#set_cursor path view_name_column
+  | _ -> ()
+
+let move_current_row_selection_to_next () =
+  let rows = get_selected_row_references () in
+  match rows with
+  | [row] ->
+      let path = goals_model#get_path row#iter in
+      GtkTree.TreePath.next path;
+      goals_view#selection#unselect_all ();
+      goals_view#selection#select_path path;
+      goals_view#set_cursor path view_name_column
+  | _ -> ()
+
+
 let move_to_next_unproven_node_id () =
   let rows = get_selected_row_references () in
   match rows with
@@ -2472,11 +2495,18 @@ let batch s =
     last := t;
     begin match Strings.split ' ' c with
     | [""] -> ()
+    | ["down"] ->
+        move_current_row_selection_to_down ()
+    | ["next"] -> move_current_row_selection_to_next ()
     | ["view"; "task"] -> notebook#goto_page 0
     | ["view"; "source"] -> notebook#goto_page 1
     | ["wait"; w] ->
       let w = int_of_string w in
       if w > 0 then cmd := Printf.sprintf "wait %d" (w - 1) :: !cmd
+    | "faketype" :: cmd ->
+      let cmd = Strings.join " " cmd in
+      command_entry#misc#grab_focus ();
+      command_entry#set_text cmd
     | "type" :: cmd ->
       let cmd = Strings.join " " cmd in
       command_entry#misc#grab_focus ();
