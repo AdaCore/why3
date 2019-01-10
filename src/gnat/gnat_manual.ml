@@ -30,12 +30,9 @@ let get_file_extension filename =
 
 let prover_files_dir proj wc_prover =
   match Gnat_config.proof_dir with
-  | None -> ""
+  | None -> [""]
   | Some dir ->
-     let prover_dir = (Filename.concat
-                         dir
-                         wc_prover.Whyconf.prover_name)
-     in
+     let prover_dir = Filename.concat dir wc_prover.Whyconf.prover_name in
      if not (Sys.file_exists prover_dir) then
        Unix.mkdir prover_dir 0o750;
      let punit_dir = Filename.concat prover_dir proj in
@@ -55,13 +52,17 @@ let resize_shape sh limit =
   with
   | _ -> "")
 
-let compute_filename s contain_dir theory goal expl driver =
+let make_filename sl =
+  List.fold_left (fun acc x -> Filename.concat acc x) "" sl
+
+let compute_filename s (contain_dir: string list) theory goal expl driver =
   let th_name_no_sanit = (Session_itp.theory_name theory).Ident.id_string in
   let task = Session_itp.get_task s goal in
+  let contain_dir = make_filename contain_dir in
   let why_fn =
     Driver.file_of_task driver
                         th_name_no_sanit
-                        (Session_itp.file_name (Session_itp.theory_parent s theory))
+                        (Session_itp.string_of_file_path (Session_itp.file_path (Session_itp.theory_parent s theory)))
                         task in
   let ext = get_file_extension why_fn in
   let thname = (Ident.sanitizer Ident.char_to_alnumus
@@ -94,7 +95,7 @@ let create_prover_file c goal expl prover =
   let proj_name = Filename.basename (Session_itp.get_dir s) in
   let filename =
     compute_filename s (prover_files_dir proj_name prover) th goal expl driver in
-  Sysutil.relativize_filename (Session_itp.get_dir s) filename
+  make_filename (Sysutil.relativize_filename (Session_itp.get_dir s) filename)
 (*
   let cout = open_out filename in
   let fmt = Format.formatter_of_out_channel cout in
@@ -134,7 +135,7 @@ let manual_proof_info session pa =
   match pa.Session_itp.proof_script with
   | None -> None
   | Some fn ->
-      let fn = Sysutil.absolutize_filename (Session_itp.get_dir session) fn in
+      let fn = Filename.concat (Session_itp.get_dir session) fn in
       let fn = Sysutil.relativize_filename (Filename.dirname Gnat_config.filename) fn in
       (* TODO cannot use Sysutil.normalize_filename here which returns home/...
          instead of /home/... *)
@@ -143,4 +144,5 @@ let manual_proof_info session pa =
         List.find (fun p ->
           p = base_prover)
         Gnat_config.provers in
+      let fn = make_filename fn in
       Some (fn, editor_command real_prover fn)

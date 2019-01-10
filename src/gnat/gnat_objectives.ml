@@ -293,7 +293,7 @@ let has_file (session: Session_itp.session) =
       files can happen in strange cases (gnatwhy3 crashes in the wrong moment)
       *)
    try
-      Hstr.iter (fun _s -> raise Exit) (Session_itp.get_files session);
+      Session_itp.Hfile.iter (fun _s -> raise Exit) (Session_itp.get_files session);
       false
    with Exit -> true
 
@@ -333,21 +333,22 @@ let init_cont () =
   else
     begin
       let ses = c.Controller_itp.controller_session in
-      let ses_dir = Session_itp.get_dir ses in
-      (* Filenames saved inside the session *)
-      let file = ref "" in
+       (* Filenames saved inside the session *)
+      let file = ref None in
       let () = (* Find the file defined in the session *)
         let files = Session_itp.get_files ses in
-        Hstr.iter (fun k _ ->
-            if !file = "" then file := k else
+        Session_itp.Hfile.iter (fun _ e ->
+            if !file = None then file := Some e else
               Gnat_util.abort_with_message ~internal:true
                 "Several files found in session")
           files
       in
-      let abs_file = Sysutil.absolutize_filename ses_dir !file in
+      (* This is not possible that no file is found *)
+      let file = (Opt.get !file) in
+      let abs_file = Session_itp.system_path ses file in
       (if abs_file != Gnat_config.filename then
          (* rename_file takes absolute filenames *)
-         let (_: string* string) =
+         let (_: string list * string list) =
            Session_itp.rename_file ses abs_file Gnat_config.filename in
          ());
       try
@@ -555,7 +556,7 @@ let iter_main_goals s fu =
   *)
   let files = Session_itp.get_files s in
   let theories =
-    Hstr.fold (fun _ (x:Session_itp.file) (acc: Session_itp.theory list) ->
+    Session_itp.Hfile.fold (fun _ (x:Session_itp.file) (acc: Session_itp.theory list) ->
                         (Session_itp.file_theories x) @ acc)
     files [] in
   let main_goals =
