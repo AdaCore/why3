@@ -536,7 +536,7 @@ let load_main dirname section =
   { libdir    = get_string ~default:default_main.libdir section "libdir";
     datadir   = get_string ~default:default_main.datadir section "datadir";
     libobjdir = Config.libobjdir;
-    loadpath  = List.map (Sysutil.absolutize_filename dirname)
+    loadpath  = List.map (fun f -> Sysutil.absolutize_path dirname [f])
                          (get_stringl ~default:[] section "loadpath");
     timelimit = get_int ~default:default_main.timelimit section "timelimit";
     memlimit  = get_int ~default:default_main.memlimit section "memlimit";
@@ -562,7 +562,7 @@ let read_config_rc conf_file =
 exception ConfigFailure of string (* filename *) * string
 
 let get_dirname filename =
-  Filename.dirname (Sysutil.absolutize_filename (Sys.getcwd ()) filename)
+  Filename.dirname (Sysutil.absolutize_path (Sys.getcwd ()) [filename])
 
 let get_config (filename,rc) =
   let dirname = get_dirname filename in
@@ -694,7 +694,7 @@ let merge_config config filename =
   let main = match get_section rc "main" with
     | None -> config.main
     | Some rc ->
-      let loadpath = (List.map (Sysutil.absolutize_filename dirname)
+      let loadpath = (List.map (fun f -> Sysutil.absolutize_path dirname [f])
         (get_stringl ~default:[] rc "loadpath")) @ config.main.loadpath in
       let plugins =
         (get_stringl ~default:[] rc "plugin") @ config.main.plugins in

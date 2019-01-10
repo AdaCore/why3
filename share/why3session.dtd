@@ -10,10 +10,13 @@
 <!ATTLIST prover memlimit CDATA #IMPLIED>
 <!ATTLIST prover steplimit CDATA #IMPLIED>
 
-<!ELEMENT file (theory*)>
-<!ATTLIST file name CDATA #REQUIRED>
+<!ELEMENT file (path*) (theory*)>
+<!ATTLIST file name CDATA #IMPLIED>
 <!ATTLIST file verified CDATA #IMPLIED>
 <!ATTLIST file proved CDATA #IMPLIED>
+
+<!ELEMENT path EMPTY>
+<!ATTLIST path name CDATA #REQUIRED>
 
 <!ELEMENT theory (label*,goal*)>
 <!ATTLIST theory name CDATA #REQUIRED>

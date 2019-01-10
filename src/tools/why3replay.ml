@@ -149,7 +149,7 @@ let print_statistics ses files =
   in
   let print_file (f,ths,n,m) =
     if n<m then begin
-      printf "   +--file %s: %d/%d@." (S.file_name f) n m;
+      printf "   +--file [%a]: %d/%d@." S.print_file_path (S.file_path f) n m;
       List.iter print_theory (List.rev ths)
     end
   in
@@ -194,7 +194,7 @@ let add_to_check_no_smoke some_merge_miss found_obs cont =
   let final_callback found_upgraded_prover report =
     Debug.dprintf debug "@.";
     let files,n,m =
-      Wstdlib.Hstr.fold (file_statistics session)
+      S.Hfile.fold (file_statistics session)
         (S.get_files session) ([],0,0)
     in
     let report =

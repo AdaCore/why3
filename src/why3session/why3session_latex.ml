@@ -11,7 +11,6 @@
 
 open Format
 open Why3
-open Wstdlib
 open Session_itp
 open Why3session_lib
 
@@ -361,7 +360,7 @@ let file_latex_stat_all n s _table dir f =
     provers [] in
   let provers = List.sort Whyconf.Prover.compare provers in
   let depth = file_depth s f in
-  let name = Filename.basename (file_name f) in
+  let name = basename (file_path f) in
   let ch = open_out (Filename.concat dir(name^".tex")) in
   let fmt = formatter_of_out_channel ch in
   latex_tabular_file n s fmt depth provers f;
@@ -423,9 +422,9 @@ let element_latex_stat files n s table dir e =
     | [] -> ()
     | f :: r ->
       let found = ref false in
-      Hstr.iter
-        (fun fname file ->
-          let fname = Filename.basename fname in
+      Hfile.iter
+        (fun _ file ->
+          let fname = basename (file_path file) in
           let fname = List.hd (Strings.split '.' fname) in
           if fname = f then
             begin
@@ -440,7 +439,7 @@ let print_latex_statistics n table dir session =
   let files = get_files session in
   match !opt_elements with
     | None ->
-      Hstr.iter (fun _ f -> file_latex_stat n session table dir f) files
+      Hfile.iter (fun _ f -> file_latex_stat n session table dir f) files
     | Some l ->
       List.iter (element_latex_stat files n session table dir) l
 

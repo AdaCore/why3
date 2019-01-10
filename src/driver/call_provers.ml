@@ -544,7 +544,7 @@ let call_on_buffer ~command ~limit ~res_parser ~filename ~printer_mapping
       Filename.open_temp_file "why_" ("_" ^ filename)
     else
       begin
-        let filename = Sysutil.absolutize_filename (Sys.getcwd ()) filename in
+        let filename = Sysutil.absolutize_path (Sys.getcwd ()) [filename] in
         if inplace then
           Sys.rename filename (backup_file filename);
         filename, open_out filename

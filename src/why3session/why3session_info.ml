@@ -187,8 +187,8 @@ and stats_of_transf prefix_name stats ses transf =
 
 let stats_of_theory file stats ses theory =
   let goals = theory_goals theory in
-  let prefix_name = file_name file ^ " / " ^ (theory_name theory).Ident.id_string
-    ^  " / " in
+  let prefix_name = string_of_file_path (file_path file) ^ " / " ^
+                      (theory_name theory).Ident.id_string ^  " / " in
   List.iter (stats_of_goal ~root:true prefix_name stats ses) goals
 
 let stats_of_file stats ses _ file =
@@ -285,7 +285,7 @@ let stats2_of_file ~nb_proofs ses file =
     [] (file_theories file)
 
 let stats2_of_session ~nb_proofs ses acc =
-  Hstr.fold
+  Hfile.fold
     (fun _ f acc ->
       match stats2_of_file ~nb_proofs ses f with
         | [] -> acc
@@ -293,7 +293,7 @@ let stats2_of_session ~nb_proofs ses acc =
     (get_files ses) acc
 
 let print_file_stats ~time ses (f,r) =
-  printf "+-- file %s@\n" (file_name f);
+  printf "+-- file [%a]@\n" print_file_path (file_path f);
   List.iter (print_theory_stats ~time ses) r
 
 let print_session_stats ~time ses = List.iter (print_file_stats ~time ses)
@@ -373,7 +373,7 @@ let run_one stats r0 r1 fname =
   if !opt_stats_print || !opt_hist_print then
     begin
       (* fill_prover_data stats session; *)
-      Hstr.iter (stats_of_file stats ses) (get_files ses);
+      Hfile.iter (stats_of_file stats ses) (get_files ses);
       r0 := stats2_of_session ~nb_proofs:0 ses !r0;
       r1 := stats2_of_session ~nb_proofs:1 ses !r1
     end;
