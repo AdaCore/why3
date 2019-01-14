@@ -19,6 +19,7 @@ let sqrt1 (a0: uint64): uint64
 =
   let a = fxp_init a0 (-64) in
   assert { 0.25 <=. rval a <=. 0xffffffffffffffffp-64 };
+  assert { 0. <. rval a };
   let ghost sa = sqrt (rval a) in
   let ghost rsa = 1. /. sa in
   let x0 = rsa_estimate a in
@@ -42,11 +43,12 @@ let sqrt1 (a0: uint64): uint64
   let u1 = fxp_mul x1 a2 in
   assert { rsa *. rval a = sa };
   let u2 = fxp_lsr u1 25 in
-  let t2' = fxp_sub (fxp_sub a3 (fxp_mul u2 u2)) (fxp_init 0x10000000000 (-78)) in
+  assert { rval a -. ((rval x1 *. rval a) *. (rval x1 *. rval a)) = -. rval a *. e1 *. (2. +. e1) };
+  let t2 = fxp_asr (fxp_sub (fxp_sub a3 (fxp_mul u2 u2)) (fxp_init 0x10000000000 (-78))) 24 in
   let ghost m2 = 0x1.p-38 in
-  let t2 = fxp_asr t2' 24 in
+  let ghost mt2 = rval a -. (rval x1 *. rval a2) *. (rval x1 *. rval a2) -. m2 in
   let x2 = fxp_add u1 (fxp_asr' (fxp_mul x1 t2) 15 1) in
-  let ghost mx2 = rval x1 *. rval a2 +. rval x1 *. rval t2' *. 0.5 in
+  let ghost mx2 = rval x1 *. rval a2 +. rval x1 *. mt2 *. 0.5 in
   assert { (mx2 -. sa) /. sa = 0.5 *. ea3 *. (1. +. e1) +. ea2 *. (1. +. e1) *. (-. e1 *. (2. +. e1) -. (1. +. e1) *. (1. +. e1) *. 0.5 *. ea2) -. 0.5 *. m2 /. rval a *. (1. +. e1) -. e1 *. e1 *. 0.5 *. (3. +. e1) };
   let x = fxp_lsr x2 32 in
   let ghost sa = trunc_at sa (-32) in
