@@ -962,7 +962,6 @@ end
       else
         P.notify (Message (Open_File_Error ("File not found: " ^ f)))
 
-
   (* ------------ init server ------------ *)
 
   let init_server ?(send_source=true) config env f =

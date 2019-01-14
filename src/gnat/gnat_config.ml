@@ -58,6 +58,7 @@ let opt_ce_prover = ref "cvc4_ce"
 let opt_warn_prover = ref None
 
 let opt_limit_line : limit_mode option ref = ref None
+let opt_limit_region : Gnat_loc.region option ref = ref None
 let opt_limit_subp : string option ref = ref None
 let opt_socket_name : string ref = ref ""
 let opt_standalone = ref false
@@ -180,9 +181,34 @@ let parse_line_spec s =
       ("limit-line: incorrect line specification -\
         line or column field isn't a number")
 
+let parse_region_spec s =
+   try
+     let args = Str.split (Str.regexp_string ":") s in
+     match args with
+     | [] ->
+        Gnat_util.abort_with_message ~internal:true
+        ("limit-region: incorrect region specification - missing ':'")
+     | [fn;l_start;l_end] ->
+         let l_start = int_of_string l_start in
+         let l_end = int_of_string l_end in
+         Gnat_loc.mk_region fn l_start l_end
+     | _ ->
+      Gnat_util.abort_with_message ~internal:true
+      (
+        "limit-region: incorrect line specification -\
+         invalid parameter number, must be \
+         3")
+  with
+   | e when Debug.test_flag Debug.stack_trace -> raise e
+   | Failure "int_of_string" ->
+      Gnat_util.abort_with_message ~internal:true
+      ("limit-region: incorrect line specification -\
+        first or last line field isn't a number")
+
 let set_proof_dir s = opt_proof_dir := Some  s
 
 let set_limit_line s = opt_limit_line := Some (parse_line_spec s)
+let set_limit_region s = opt_limit_region := Some (parse_region_spec s)
 let set_limit_subp s = opt_limit_subp := Some s
 
 let usage_msg =
@@ -190,6 +216,20 @@ let usage_msg =
 
 let print_version_info () =
   Format.printf "Why3 for gnatprove version %s@." Config.version;
+  exit 0
+
+let show_config () =
+  Format.printf "enable_ide: %s@." Config.enable_ide;
+  Format.printf "enable_zarith: %s@." Config.enable_zarith;
+  Format.printf "enable_zip: %s@." Config.enable_zip;
+  Format.printf "enable_coq_libs: %s@." Config.enable_coq_libs;
+  Format.printf "enable_coq_fp_libs: %s@." Config.enable_coq_fp_libs;
+  Format.printf "enable_pvs_libs: %s@." Config.enable_pvs_libs;
+  Format.printf "enable_isabelle_libs: %s@." Config.enable_isabelle_libs;
+  Format.printf "enable_hypothesis_selection: %s@."
+    Config.enable_hypothesis_selection;
+  Format.printf "enable_local: %s@." Config.enable_local;
+  Format.printf "enable_relocation: %s@." Config.enable_relocation;
   exit 0
 
 let debug_gnat_server () =
@@ -201,6 +241,8 @@ let debug_gnat_server () =
 let options = Arg.align [
    "--version", Arg.Unit print_version_info,
           " Print version information and exit";
+   "--show-config", Arg.Unit show_config,
+          " Print configuration information and exit";
    "-t", Arg.Int set_timeout,
           " Set the timeout in seconds";
    "--timeout", Arg.Int set_timeout,
@@ -230,6 +272,9 @@ let options = Arg.align [
    "--limit-line", Arg.String set_limit_line,
           " Limit proof to a file and line, given \
            by \"file:line[:column:checkkind]\"";
+   "--limit-region", Arg.String set_limit_region,
+          " Limit proof to a file and range of lines, given \
+           by \"file:first_line:last_line\"";
    "--limit-subp", Arg.String set_limit_subp,
           " Limit proof to a subprogram defined by \"file:line\"";
    "--prover", Arg.String set_prover,
@@ -241,7 +286,12 @@ let options = Arg.align [
    "--debug", Arg.Tuple [Arg.Set opt_debug; Arg.Set opt_standalone],
           " Enable debug mode; also deactivates why3server";
    "--debug-why3", Arg.String (fun s -> let debug = Debug.register_flag s ~desc:"" in
-                                        Debug.set_flag debug),
+                                (* Record backtrace is done in a part of Why3
+                                   that is not executed by gnatwhy3: we have to
+                                   do it here. *)
+                                if s = "stack_trace" then
+                                  Printexc.record_backtrace true;
+                                Debug.set_flag debug),
           " Enable a debug flag from Why3";
    "--debug-server", Arg.Set opt_debug,
           " Enable debug mode and keep why3server activated";
@@ -287,12 +337,18 @@ let editor_merge me1 me2 =
 let shortcut_merge s1 s2 =
   Mstr.merge merge_opt_keep_first s1 s2
 
-let find_driver_file fn =
+let find_driver_file ~conf_file fn =
   (* Here we search for the driver file. The argument [fn] is the driver path
      as returned by the Why3 API. It simply returns the path as is in the
      configuration file. We first check if the path as is points to a file.
      Then we try to find the file relative to the why3.conf file. If that also
-     fails, we look into the SPARK drivers dir *)
+     fails, we look into the SPARK drivers dir.
+     If everything fails, we return an error message stating that we cannot find
+     the driver: it also returns the configuration file [conf_file] used. *)
+  (* In Why3, driver names are stored in the configuration file(s) without the
+     suffix, so we add it here; for robustness we still check if it's already
+     there. *)
+  let fn = if Strings.ends_with fn ".drv" then fn else fn ^ ".drv" in
   try
     if Sys.file_exists fn then fn
     else match !opt_why3_conf_file with
@@ -308,8 +364,9 @@ let find_driver_file fn =
       if Sys.file_exists full_path then full_path
       else
         Gnat_util.abort_with_message ~internal:false
-          (Format.sprintf "Could not find driver file %s" fn)
-
+          (Format.sprintf "Could not find driver file %s referenced from %s. \
+                           If this is a user-generated file, consider removing \
+                           it. If not, please report." fn conf_file)
 
 let computer_prover_str_list () =
   (* this is a string list of the requested provers by the user *)
@@ -366,8 +423,11 @@ let compute_base_provers config str_list =
 (* we slightly change the config so that drivers files are referenced
    with the right prefix. *)
 let get_gnatprove_config config =
+  let conf_file = Whyconf.get_conf_file config in
   let transform_driver (base_prover: Whyconf.config_prover) =
-    {base_prover with Whyconf.driver = find_driver_file base_prover.Whyconf.driver} in
+    {base_prover with Whyconf.driver =
+       find_driver_file ~conf_file base_prover.Whyconf.driver}
+  in
   Whyconf.set_provers config
     (Whyconf.Mprover.map transform_driver (Whyconf.get_provers config))
 
@@ -677,6 +737,7 @@ let _ =
 
 let force = !opt_force
 let limit_line = !opt_limit_line
+let limit_region = !opt_limit_region
 
 let limit_subp =
    match !opt_limit_subp with

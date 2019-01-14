@@ -1,4 +1,3 @@
-
 open Why3
 open Why3session_lib
 

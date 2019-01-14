@@ -28,9 +28,10 @@ let get_file_extension filename =
   with
   | Invalid_argument _ -> ""
 
+(* Return the absolute dir in which we want to put provers file. *)
 let prover_files_dir proj wc_prover =
   match Gnat_config.proof_dir with
-  | None -> [""]
+  | None -> [Filename.dirname Gnat_config.filename]
   | Some dir ->
      let prover_dir = Filename.concat dir wc_prover.Whyconf.prover_name in
      if not (Sys.file_exists prover_dir) then
@@ -38,7 +39,7 @@ let prover_files_dir proj wc_prover =
      let punit_dir = Filename.concat prover_dir proj in
      if not (Sys.file_exists punit_dir) then
        Unix.mkdir punit_dir 0o750;
-     Sysutil.relativize_filename (Sys.getcwd ()) punit_dir
+     [punit_dir]
 
 let resize_shape sh limit =
   let index = ref 0 in
@@ -135,10 +136,8 @@ let manual_proof_info session pa =
   match pa.Session_itp.proof_script with
   | None -> None
   | Some fn ->
-      let fn = Sysutil.concat (Session_itp.get_dir session) fn in
+      let fn = Filename.concat (Session_itp.get_dir session) fn in
       let fn = Sysutil.relativize_filename (Filename.dirname Gnat_config.filename) fn in
-      (* TODO cannot use Sysutil.normalize_filename here which returns home/...
-         instead of /home/... *)
       let base_prover = pa.Session_itp.prover in
       let real_prover =
         List.find (fun p ->

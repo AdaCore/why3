@@ -367,22 +367,16 @@ let query_on_task cont f id args =
 
 let help_message commands_table =
   Pp.sprintf
-    "Please type a command among the following (automatic completion available)@\n\
+    "Please type a command among the following@\n\
      @\n\
      @ <transformation name> [arguments]@\n\
      @ <prover shortcut> [<time limit> [<mem limit>]]@\n\
      @ <query> [arguments]@\n\
      @ <strategy shortcut>@\n\
-     @ bisect @\n\
      @ clean @\n\
-     @ edit @\n\
      @ get-ce @\n\
-     @ Focus @\n\
      @ help <transformation_name> @\n\
      @ list_ide_command @ \n\
-     @ mark @\n\
-     @ replay [all]@\n\
-     @ Unfocus @\n\
      @\n\
      Available queries are:@\n@[%a@]" help_on_queries commands_table
 

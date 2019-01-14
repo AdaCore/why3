@@ -300,11 +300,11 @@ AC_CHECK_PROG(USEOCAMLFIND,ocamlfind,yes,no)
 if test "$USEOCAMLFIND" = yes; then
    OCAMLFINDLIB=$(ocamlfind printconf stdlib)
    OCAMLFIND=$(which ocamlfind)
-   if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
-   USEOCAMLFIND=no;
-   echo "but your ocamlfind is not compatible with your ocamlc:"
-   echo "ocamlfind : $OCAMLFINDLIB, ocamlc : $OCAMLLIB"
-   fi
+   #if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
+   #USEOCAMLFIND=no;
+   #echo "but your ocamlfind is not compatible with your ocamlc:"
+   #echo "ocamlfind : $OCAMLFINDLIB, ocamlc : $OCAMLLIB"
+   #fi
 fi
 
 if test "$enable_why3_lib" = yes ; then

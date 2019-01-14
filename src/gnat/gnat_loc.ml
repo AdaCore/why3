@@ -18,11 +18,15 @@ let print_context fmt = function
 type simple_loc  =
    { file : string; line : int; col : int; ctxt : context option }
 type loc = simple_loc list
+type region =
+   { rfile : string; first_line : int; last_line : int }
 
 let mk_simple_loc fn l c ctx =
    { file = fn; line = l; col = c; ctxt = ctx }
 let mk_loc fn l c ctx =
    [mk_simple_loc fn l c ctx]
+let mk_region fn f l =
+   { rfile = fn; first_line = f; last_line = l }
 
 let mk_loc_line fn l = mk_loc fn l 0 None
 
@@ -33,6 +37,10 @@ let equal_line l1 l2 =
 let equal_orig_loc l1 l2 =
   let l1 = List.hd l1 and l2 = List.hd l2 in
   l1.file = l2.file && l1.line = l2.line && l1.col = l2.col
+
+let in_region r l =
+  let l = List.hd l in
+  l.file = r.rfile && r.first_line <= l.line && l.line <= r.last_line
 
 let compare_simple = Pervasives.compare
 
@@ -57,6 +65,9 @@ let print_line_loc fmt l =
 
 let print_loc _ _ =
    assert false
+
+let print_region fmt l =
+   Format.fprintf fmt "%s:%d:%d" l.rfile l.first_line l.last_line
 
 let parse_loc =
    let rec parse_loc_list acc ~first l =

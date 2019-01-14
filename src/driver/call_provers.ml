@@ -418,7 +418,7 @@ type prover_call =
 let call_on_file ~command ~limit ~res_parser ~printer_mapping
                  ?(inplace=false) fin =
   let id = gen_id () in
-  let cmd, use_stdin, on_timelimit =
+  let cmd, use_stdin, _ =
     actualcommand ~cleanup:true ~inplace command limit fin in
   let save = {
     vc_file    = fin;
@@ -427,7 +427,6 @@ let call_on_file ~command ~limit ~res_parser ~printer_mapping
     res_parser = res_parser;
     printer_mapping = printer_mapping } in
   Hashtbl.add saved_data id save;
-  let limit = adapt_limits limit on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
   Debug.dprintf
     debug

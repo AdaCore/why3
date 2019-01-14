@@ -10,6 +10,8 @@ type reason =
    | VC_Range_Check
    | VC_Predicate_Check
    | VC_Predicate_Check_On_Default_Value
+   | VC_Null_Pointer_Dereference
+   | VC_Null_Exclusion
    | VC_Invariant_Check
    | VC_Invariant_Check_On_Default_Value
    | VC_Length_Check
@@ -58,6 +60,8 @@ let is_warning_reason r =
    | VC_Range_Check
    | VC_Predicate_Check
    | VC_Predicate_Check_On_Default_Value
+   | VC_Null_Pointer_Dereference
+   | VC_Null_Exclusion
    | VC_Invariant_Check
    | VC_Invariant_Check_On_Default_Value
    | VC_Length_Check
@@ -136,6 +140,8 @@ let reason_from_string s =
    | "VC_PREDICATE_CHECK"           -> VC_Predicate_Check
    | "VC_PREDICATE_CHECK_ON_DEFAULT_VALUE" ->
       VC_Predicate_Check_On_Default_Value
+   | "VC_NULL_POINTER_DEREFERENCE"  -> VC_Null_Pointer_Dereference 
+   | "VC_NULL_EXCLUSION"            -> VC_Null_Exclusion
    | "VC_INVARIANT_CHECK"           -> VC_Invariant_Check
    | "VC_INVARIANT_CHECK_ON_DEFAULT_VALUE" ->
       VC_Invariant_Check_On_Default_Value
@@ -189,6 +195,8 @@ let reason_to_ada reason =
    | VC_Predicate_Check           -> "VC_PREDICATE_CHECK"
    | VC_Predicate_Check_On_Default_Value ->
      "VC_PREDICATE_CHECK_ON_DEFAULT_VALUE"
+   | VC_Null_Pointer_Dereference  -> "VC_NULL_POINTER_DEREFERENCE"
+   | VC_Null_Exclusion            -> "VC_NULL_EXCLUSION"
    | VC_Invariant_Check           -> "VC_INVARIANT_CHECK"
    | VC_Invariant_Check_On_Default_Value ->
      "VC_INVARIANT_CHECK_ON_DEFAULT_VALUE"
@@ -238,6 +246,8 @@ let reason_to_string reason =
    | VC_Range_Check               -> "range_check"
    | VC_Predicate_Check           -> "predicate_check"
    | VC_Predicate_Check_On_Default_Value -> "predicate_check_on_default_value"
+   | VC_Null_Pointer_Dereference  -> "null_pointer_dereference"
+   | VC_Null_Exclusion            -> "null_exclusion"
    | VC_Invariant_Check           -> "invariant_check"
    | VC_Invariant_Check_On_Default_Value -> "invariant_check_on_default_value"
    | VC_Length_Check              -> "length_check"

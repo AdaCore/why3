@@ -123,7 +123,7 @@ let add_to_objective ~toplevel ex go =
   (* add a goal to an objective.
    * A goal can be "top-level", that is a direct goal coming from WP, or not
    * top-level, that is obtained by transformation. *)
-   let filter =
+   let filter_line =
       match Gnat_config.limit_line with
       | Some (Gnat_config.Limit_Line l) ->
          Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
@@ -132,7 +132,13 @@ let add_to_objective ~toplevel ex go =
          && (Gnat_loc.equal_orig_loc c.Gnat_expl.sloc (Gnat_expl.get_loc ex))
       | None -> true
    in
-   if filter then begin
+   let filter_region =
+      match Gnat_config.limit_region with
+      | Some r ->
+         Gnat_loc.in_region r (Gnat_expl.get_loc ex)
+      | None -> true
+   in
+   if filter_line && filter_region then begin
       incr total_nb_goals;
       GoalMap.add goalmap go ex;
       let obj = find ex in
@@ -322,18 +328,40 @@ let init_cont () =
           (Pp.sprintf "could not add file %s to the session: %a"
              Gnat_config.filename (Pp.print_list Pp.space Exn_printer.exn_printer) l)
   end;
+
   (* Init why3server *)
   init ();
   if is_new_session then c
   else
-    try
-      let (_ : bool), (_ : bool) = Controller_itp.reload_files c ~shape_version:None in
-      c
-    with
-    | Controller_itp.Errors_list l ->
-      Gnat_util.abort_with_message ~internal:true
-        (Pp.sprintf "could not reload files of the session: %a"
-           (Pp.print_list Pp.space Exn_printer.exn_printer) l)
+    begin
+      let ses = c.Controller_itp.controller_session in
+       (* Filenames saved inside the session *)
+      let file = ref None in
+      let () = (* Find the file defined in the session *)
+        let files = Session_itp.get_files ses in
+        Session_itp.Hfile.iter (fun _ e ->
+            if !file = None then file := Some e else
+              Gnat_util.abort_with_message ~internal:true
+                "Several files found in session")
+          files
+      in
+      (* This is not possible that no file is found *)
+      let file = (Opt.get !file) in
+      let abs_file = Session_itp.system_path ses file in
+      (if abs_file != Gnat_config.filename then
+         (* rename_file takes absolute filenames *)
+         let (_: string list * string list) =
+           Session_itp.rename_file ses abs_file Gnat_config.filename in
+         ());
+      try
+        let (_ : bool), (_ : bool) = Controller_itp.reload_files c ~shape_version:None in
+        c
+      with
+      | Controller_itp.Errors_list l ->
+        Gnat_util.abort_with_message ~internal:true
+          (Pp.sprintf "could not reload files of the session: %a"
+             (Pp.print_list Pp.space Exn_printer.exn_printer) l)
+    end
 
 let objective_status obj =
    let obj_rec = Gnat_expl.HCheck.find explmap obj in
@@ -689,11 +717,11 @@ module Save_VCs = struct
       add_to_prover_stat pr (Whyconf.Hprover.find stat prover)
     else
       Whyconf.Hprover.add stat prover
-        { Gnat_report.count = 1;
-          max_time = pr.Call_provers.pr_time;
-          max_steps = pr.Call_provers.pr_steps }
+        Gnat_report.{ count = 1;
+                      max_time = pr.Call_provers.pr_time;
+                      max_steps = pr.Call_provers.pr_steps }
 
-  let rec extract_stat_goal (c: Controller_itp.controller) stat goal =
+  let rec extract_stat_goal c stat stat_transforms goal =
     (* Not obsolete and valid *)
     assert (is_valid c goal);
     let ses = c.Controller_itp.controller_session in
@@ -706,8 +734,12 @@ module Save_VCs = struct
       List.iter
         (fun tnid ->
           if Session_itp.tn_proved c.Controller_itp.controller_session tnid then
-            List.iter (extract_stat_goal c stat)
-              (Session_itp.get_sub_tasks ses tnid);
+            let subtasks = Session_itp.get_sub_tasks ses tnid in
+            (* The transformation proved the goal *)
+            if subtasks = [] then
+              stat_transforms := !stat_transforms + 1
+            else
+              List.iter (extract_stat_goal c stat stat_transforms) subtasks;
 
           (* need to exit here so once we found a transformation that proves
            * the goal, don't try further *)
@@ -716,10 +748,14 @@ module Save_VCs = struct
     with Exit -> ()
 
   let extract_stats c (obj : objective) =
+    (* Hold the stats for provers *)
     let stats = Whyconf.Hprover.create 5 in
+    (* Hold the number of goals proved by a transformation. No timings
+       information available. *)
+    let stat_transforms = ref 0 in
     let obj_rec = Gnat_expl.HCheck.find explmap obj in
-    GoalSet.iter (extract_stat_goal c stats) obj_rec.toplevel;
-    stats
+    GoalSet.iter (extract_stat_goal c stats stat_transforms) obj_rec.toplevel;
+    (stats, !stat_transforms)
 
   let count_map : (int ref) Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 
