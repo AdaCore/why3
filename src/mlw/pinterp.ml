@@ -136,7 +136,7 @@ exception NotNum
 
 let big_int_of_const c =
   match c with
-    | Number.ConstInt i -> Number.compute_int_constant i
+    | Number.ConstInt i -> i.Number.il_int
     | _ -> raise NotNum
 
 let big_int_of_value v =

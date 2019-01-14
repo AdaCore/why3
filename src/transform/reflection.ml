@@ -172,7 +172,7 @@ let rec reify_term renv t rt =
             else ()
          | Tconst (Number.ConstInt c1), Tconst (Number.ConstInt c2) ->
             let open Number in
-            if not (BigInt.eq (compute_int_constant c1) (compute_int_constant c2))
+            if not (BigInt.eq c1.il_int c2.il_int)
             then raise NoReification
          | _ -> () (* FIXME add more failure cases if needed *)
        in
@@ -287,7 +287,7 @@ let rec reify_term renv t rt =
                let fr = renv.fr in
                let store = Mterm.add t (vy, fr) renv.store in
                { renv with store = store; fr = fr + 1 }, fr in
-           let const = Number.(ConstInt (int_const_of_int i)) in
+           let const = Number.int_const_of_int i in
            (renv, app_pat (t_const const Ty.ty_int))
          end
     | _ -> raise NoReification

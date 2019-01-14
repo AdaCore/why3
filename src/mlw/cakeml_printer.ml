@@ -114,8 +114,9 @@ module Print = struct
 
   let print_constant fmt e = begin match e.e_node with
     | Econst c ->
-        let s = BigInt.to_string (Number.compute_int_constant c) in
-        if c.Number.ic_negative then fprintf fmt "(%s)" s
+        let v = c.Number.il_int in
+        let s = BigInt.to_string v in
+        if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" s
         else fprintf fmt "%s" s
     | _ -> assert false end
 
@@ -224,7 +225,7 @@ module Print = struct
   and print_expr ?(paren=false) info fmt e =
     match e.e_node with
     | Econst c ->
-        let n = Number.compute_int_constant c in
+        let n = c.Number.il_int in
         let n = BigInt.to_string n in
         let id = match e.e_ity with
           | I { ity_node = Ityapp ({its_ts = ts},_,_) } -> ts.ts_name

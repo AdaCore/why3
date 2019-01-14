@@ -306,7 +306,7 @@ term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
 | ident       { Tident (Qident $1) }
-| INTEGER     { Tconst (Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec $1})) }
+| INTEGER     { Tconst Number.(ConstInt (int_literal ILitDec ~neg:false $1)) }
 | NONE        { Ttuple [] }
 | TRUE        { Ttrue }
 | FALSE       { Tfalse }

@@ -799,7 +799,7 @@ module MLToC = struct
        let e = C.Evar (pv_name pv) in
        ([], return_or_expr env e)
     | Mltree.Econst ic ->
-      let n = Number.compute_int_constant ic in
+      let n = ic.Number.il_int in
       let e = C.(Econst (Cint (BigInt.to_string n))) in
       ([], return_or_expr env e)
     | Eapp (rs, el)

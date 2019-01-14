@@ -51,9 +51,9 @@ let deref_id ~loc id =
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (set_op ~loc, [a; i; v]))
 let constant ~loc i =
-  mk_expr ~loc (Econst (Number.const_of_int i))
+  mk_expr ~loc (Econst (Number.int_const_of_int i))
 let constant_s ~loc s =
-  mk_expr ~loc (Econst (Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec s})))
+  mk_expr ~loc (Econst (Number.(ConstInt (int_literal ILitDec ~neg:false s))))
 let len ~loc =
   Qident (mk_id ~loc "len")
 let break ~loc =

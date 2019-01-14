@@ -27,14 +27,14 @@ let ls_minus = ref ps_equ (* temporary *)
 let term_of_value v =
   match v with
   | Term t -> t
-  | Int n -> t_bigint_const n
+  | Int n -> t_int_const n
 
 exception NotNum
 
 let big_int_of_const c =
   match c with
-    | Number.ConstInt i -> Number.compute_int_constant i
-    | _ -> raise NotNum
+  | Number.ConstInt i -> i.Number.il_int
+  | Number.ConstReal _ -> assert false
 
 let big_int_of_value v =
   match v with
@@ -995,8 +995,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
       match c1,c2 with
       | Number.ConstInt i1, Number.ConstInt i2 ->
         let b =
-          BigInt.eq (Number.compute_int_constant i1)
-                    (Number.compute_int_constant i2)
+          BigInt.eq i1.Number.il_int i2.Number.il_int
         in
         incr(rec_step_limit);
         { value_stack = Term (t_attr_copy orig (to_bool b)) :: st;

@@ -10,6 +10,7 @@
 (********************************************************************)
 
 open Term
+open Number
 
 (*******************************)
 (*          explanations       *)
@@ -173,54 +174,10 @@ let store_id s i =
 type shape = string
 
 let string_of_shape s = s
-(*
-  try
-  let l = String.length s in
-  let r = Buffer.create l in
-  let i = ref 0 in
-  while !i < l do
-  match String.get s !i with
-    | '(' ->
-      Buffer.add_char r '(';
-      incr i;
-      Buffer.add_string r (store_id s i);
-      Buffer.add_char r ')'
-    | c -> Buffer.add_char r c; incr i
-  done;
-  Buffer.contents r
-  with e ->
-    Format.eprintf "Error while reading shape [%s]@." s;
-    raise e
-*)
 
 let shape_of_string s = s
-(*
-  try
-  let l = String.length s in
-  let r = Buffer.create l in
-  let i = ref 0 in
-  while !i < l do
-  match String.get s !i with
-    | '(' -> incr i; Buffer.add_string r (get_id s i)
-    | c -> Buffer.add_char r c; incr i
-  done;
-  Buffer.contents r
-  with e ->
-    Format.eprintf "Error while reading shape [%s]@." s;
-    raise e
- *)
-
-(* tests
-let _ = reset_dict () ; shape_of_string "a(b)cde(0)"
-let _ = reset_dict () ; shape_of_string "a(bc)d(e)f(1)g(0)h"
-let _ = reset_dict () ; shape_of_string "(abc)(def)(1)(0)(1)"
-let _ = reset_dict () ; shape_of_string "(abcde)(fghij)(1)(0)(1)"
-*)
 
 let equal_shape (x:string) y = x = y
-(* unused
-let print_shape fmt s = Format.pp_print_string fmt (string_of_shape s)
-*)
 
 let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
@@ -229,6 +186,8 @@ let debug = Debug.register_info_flag "session_pairing"
 let current_shape_version = 5
 
 type shape_version = SV1 | SV2 | SV3 | SV4
+
+module Shape = struct
 
 (* similarity code of terms, or of "shapes"
 
@@ -271,6 +230,9 @@ let pushc c =
   Buffer.add_char shape_buffer c;
   if Buffer.length shape_buffer >= 1024 then raise ShapeTooLong
 
+let pushb i =
+  push (BigInt.to_string i)
+
 let ident h id =
   let x =
     try Ident.Mid.find id !h
@@ -299,28 +261,29 @@ let id_string_shape id = push id
 let ident_shape id = id_string_shape id.Ident.id_string
 *)
 
-open Number
+let integer_kind_shape = function
+  | ILitUnk -> ()
+  | ILitDec -> ()
+  | ILitHex -> push "0x"
+  | ILitOct -> push "0o"
+  | ILitBin -> push "0b"
 
-let integer_const_shape = function
-  | IConstRaw i -> push (BigInt.to_string i)
-  | IConstDec s -> push s
-  | IConstHex s -> push "0x"; push s
-  | IConstOct s -> push "0o"; push s
-  | IConstBin s -> push "0b"; push s
-
-let real_const_shape = function
-  | RConstDec (i,f,None)   -> push i; push "."; push f
-  | RConstDec (i,f,Some e) -> push i; push "."; push f; push "e"; push e
-  | RConstHex (i,f,Some e) -> push "0x"; push i; push "."; push f; push "p"; push e
-  | RConstHex (i,f,None)   -> push "0x"; push i; push "."; push f
+let real_kind_shape = function
+  | RLitUnk -> ()
+  | RLitDec _ -> ()
+  | RLitHex _ -> push "0x"
 
 let sign_shape is_negative =
   if is_negative then pushc '-'
 
 let const_shape c =
   match c with
-  | ConstInt c -> sign_shape c.ic_negative; integer_const_shape c.ic_abs
-  | ConstReal c -> sign_shape c.rc_negative; real_const_shape c.rc_abs
+  | ConstInt { il_kind=k; il_int=i } ->
+      sign_shape (BigInt.lt i BigInt.zero);
+      integer_kind_shape k; push (BigInt.to_string (BigInt.abs i))
+  | ConstReal { rl_kind=k; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
+      sign_shape (BigInt.lt i BigInt.zero);
+      real_kind_shape k; pushb i; pushc 'p'; pushb p2; pushc 'e'; pushb p5
 
 
 let rec pat_shape c m p : 'a =
@@ -458,6 +421,8 @@ let t_shape_task ~version ~expl t =
   in
   Buffer.contents shape_buffer
 
+end
+
 (*
 let time = ref 0.0
  *)
@@ -470,7 +435,7 @@ let t_shape_task ?(version=current_shape_version) ~expl t =
 (*
   let tim = Unix.gettimeofday () in
  *)
-  let s = t_shape_task ~version ~expl t in
+  let s = Shape.t_shape_task ~version ~expl t in
 (*
   let tim = Unix.gettimeofday () -. tim in
   time := !time +. tim;
@@ -499,6 +464,7 @@ module Checksum = struct
   let int (_,_,_,buf as b) i =
     char b 'i'; Buffer.add_string buf (string_of_int i)
   let raw_string (_,_,_,buf) s = Buffer.add_string buf s
+  let raw_bigint b i = raw_string b (BigInt.to_string i)
   let string (_,_,_,buf as b) s =
     char b '"'; Buffer.add_string buf (String.escaped s); char b '"'
   let option e b = function None -> char b 'n' | Some x -> char b 's'; e b x
@@ -523,31 +489,30 @@ module Checksum = struct
     | CV1 -> ident_v1 b id
     | CV2 -> ident_v2 b id
 
-  let integer_const b = function
-    | IConstRaw i -> raw_string b (BigInt.to_string i)
-    | IConstDec s -> raw_string b s
-    | IConstHex s -> raw_string b "0x"; raw_string b s
-    | IConstOct s -> raw_string b "0o"; raw_string b s
-    | IConstBin s -> raw_string b "0b"; raw_string b s
 
-  let real_const b = function
-    | RConstDec (i,f,None)   ->
-       raw_string b i; raw_string b "."; raw_string b f
-    | RConstDec (i,f,Some e) ->
-       raw_string b i; raw_string b "."; raw_string b f; raw_string b "e"; raw_string b e
-    | RConstHex (i,f,Some e) ->
-       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f;
-       raw_string b "p"; raw_string b e
-    | RConstHex (i,f,None)   ->
-       raw_string b "0x"; raw_string b i; raw_string b "."; raw_string b f
+  let integer_kind b = function
+    | ILitUnk -> ()
+    | ILitDec -> ()
+    | ILitHex -> raw_string b "0x"
+    | ILitOct -> raw_string b "0o"
+    | ILitBin -> raw_string b "0b"
+
+  let real_kind b = function
+    | RLitUnk -> ()
+    | RLitDec _ -> ()
+    | RLitHex _ -> raw_string b "0x"
 
   let sign b is_negative =
     if is_negative then raw_string b "-"
 
   let const b c =
     match c with
-    | ConstInt c -> sign b c.ic_negative; integer_const b c.ic_abs
-    | ConstReal c -> sign b c.rc_negative; real_const b c.rc_abs
+    | ConstInt { il_kind=k; il_int=i } ->
+        sign b (BigInt.lt i BigInt.zero); integer_kind b k;
+        raw_bigint b (BigInt.abs i)
+    | ConstReal { rl_kind=k; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
+        sign b (BigInt.lt i BigInt.zero); real_kind b k;
+        raw_bigint b (BigInt.abs i); char b 'p'; raw_bigint b p2; char b 'e'; raw_bigint b p5
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
