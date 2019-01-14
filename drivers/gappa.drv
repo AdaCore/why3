@@ -23,6 +23,7 @@ transformation "eliminate_let"
 transformation "simplify_formula"
 transformation "simplify_unknown_lsymbols"
 transformation "simplify_trivial_quantification"
+transformation "simplify_computations"
 transformation "introduce_premises"
 transformation "instantiate_predicate"
 transformation "abstract_unknown_lsymbols"
@@ -43,7 +44,7 @@ theory int.Int
 
   syntax function (+)  "(%1 + %2)"
   syntax function (-)  "(%1 - %2)"
-  syntax function ( * )  "(%1 * %2)"
+  syntax function (*)  "(%1 * %2)"
   syntax function (-_) "(-%1)"
 
   syntax predicate (<=) "dummy"
@@ -56,6 +57,7 @@ theory int.Int
   meta "gappa arith" predicate (<), "not ", ">=", "<="
   meta "gappa arith" predicate (>), "not ", "<=", ">="
 
+  meta "inline:no" function (-)
   meta "inline:no" predicate (<=)
   meta "inline:no" predicate (>=)
   meta "inline:no" predicate (>)
@@ -87,7 +89,7 @@ theory real.Real
 
   syntax function (+)  "(%1 + %2)"
   syntax function (-)  "(%1 - %2)"
-  syntax function ( * )  "(%1 * %2)"
+  syntax function (*)  "(%1 * %2)"
   syntax function (/)  "(%1 / %2)"
   syntax function (-_) "(-%1)"
   syntax function inv  "(1.0 / %1)"
@@ -102,6 +104,7 @@ theory real.Real
   meta "gappa arith" predicate (<), "not ", ">=", "<="
   meta "gappa arith" predicate (>), "not ", "<=", ">="
 
+  meta "inline:no" function (-)
   meta "inline:no" predicate (<=)
   meta "inline:no" predicate (>=)
   meta "inline:no" predicate (>)
@@ -213,5 +216,11 @@ theory floating_point.DoubleMultiRounding
 
   syntax function round "float<ieee_64,%1>(%2)"
   meta "instantiate:auto" prop Bounded_value
+
+end
+
+theory mach.fxp.Fxp
+
+  syntax function trunc_at "fixed<%2,dn>(%1)"
 
 end

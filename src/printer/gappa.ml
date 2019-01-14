@@ -28,6 +28,14 @@ let syntactic_transform transf =
       | _ -> assert false) Sls.empty metas in
     transf (fun ls -> Sls.mem ls symbols))
 
+let syntactic_transform_env transf env =
+  Trans.on_meta meta_syntax_logic (fun metas ->
+    let symbols = List.fold_left (fun acc meta_arg ->
+      match meta_arg with
+      | [MAls ls; MAstr _; MAint _] -> Sls.add ls acc
+      | _ -> assert false) Sls.empty metas in
+    transf (fun ls -> Sls.mem ls symbols) env)
+
 let () =
   Trans.register_transform "abstract_unknown_lsymbols"
     (syntactic_transform Abstraction.abstraction)
@@ -48,7 +56,11 @@ let () =
       ])))
     ~desc:"Same@ as@ simplify_trivial_quantification_in_goal,@ but@ instead@ \
       of@ substituting@ quantified@ variables,@ substitute@ applications@ \
-      of@ non-built-in@ symbols.@ Used@ by@ the@ Gappa@ pretty-printer."
+      of@ non-built-in@ symbols.@ Used@ by@ the@ Gappa@ pretty-printer.";
+  Trans.register_env_transform "simplify_computations"
+    (syntactic_transform_env (fun check_ls -> Compute.simplify (fun ls -> check_ls ls)))
+    ~desc:"Perform computations and simplify non-builtin symbols.@ \
+           Used by the Gappa pretty-printer.";
 
 (* patterns (TODO: add a parser and generalize it out of Gappa) *)
 
