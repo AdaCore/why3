@@ -28,7 +28,8 @@ let abstraction (keep : lsymbol -> bool) =
     | _ ->
         let t = t_attr_set Sattr.empty t in
         let (ls, tabs) = try Hterm_nt_na.find term_table t with Not_found ->
-          let ls = create_lsymbol (id_fresh "abstr") [] t.t_ty in
+          let name = Format.asprintf "%a" Pretty.print_term t in
+          let ls = create_lsymbol (id_fresh name) [] t.t_ty in
           let tabs = t_app ls [] t.t_ty in
           Hterm_nt_na.add term_table t (ls, tabs);
           ls, tabs in
