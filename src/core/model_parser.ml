@@ -808,8 +808,22 @@ let add_to_model model model_element =
     let (filename, line_number, _, _) = Loc.get pos in
     let model_file = get_model_file model filename in
     let elements = get_elements model_file line_number in
+    let el = model_element.me_name in
+    (* This removes elements that are duplicated *)
+    let found_elements =
+      List.find_all (fun x ->
+          let xme = x.me_name in
+          Ident.get_model_trace_string ~name:xme.men_name ~attrs:xme.men_attrs =
+          Ident.get_model_trace_string ~name:el.men_name ~attrs:el.men_attrs &&
+          (* TODO Add an efficient version of symmetric difference to extset *)
+          let symm_diff =
+            Sattr.diff (Sattr.union x.me_name.men_attrs el.men_attrs)
+              (Sattr.inter x.me_name.men_attrs el.men_attrs) in
+          Sattr.for_all (fun x ->
+              not (Strings.has_prefix "at" x.attr_string)) symm_diff
+        ) elements in
     let elements =
-      if List.mem model_element elements then
+      if found_elements <> [] then
         elements
       else
         model_element::elements

@@ -53,7 +53,12 @@ let intro_const_equal_to_term
 
   (* Create declaration of the axiom about the constant: t_new_constant = t_rhs *)
   let id_axiom = Decl.create_prsymbol (Ident.id_fresh axiom_name) in
-  let fla_axiom = Term.t_equ t_new_constant term in
+  let fla_axiom =
+    (* Handle the case of predicates *)
+    if term.t_ty = None then
+      Term.t_iff t_new_constant term
+    else
+      Term.t_equ t_new_constant term in
   let decl_axiom = Decl.create_prop_decl Decl.Paxiom id_axiom fla_axiom in
 
   (* Return the declaration of new constant and the axiom *)

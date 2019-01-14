@@ -88,13 +88,10 @@ x23, [[@introduced],
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "0" } }
 Line 42:
-x23, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "2" } }
-x23, [[@introduced],
-[@model_trace:x23]] = {"proj_name" : "contents" , "type" : "Proj" ,
-"value" : {"type" : "Integer" , "val" : "2" } }
-x23 at 'Old, [[@introduced],
-[@at:'Old], [@model_trace:x23],
+x23, [[@introduced], [@model_trace:x23]] = {"proj_name" : "contents" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
+"val" : "2" } }
+x23 at 'Old, [[@introduced], [@at:'Old], [@model_trace:x23],
 [@at:'Old:loc:location] = {"proj_name" : "contents" ,
 "type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "0" } }

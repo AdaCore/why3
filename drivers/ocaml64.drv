@@ -206,6 +206,29 @@ module mach.int.Int
   syntax val ( % ) "Z.rem %1 %2"
 end
 
+module mach.int.Int32
+  syntax type     int32     "int"
+
+  syntax literal   int32    "%1"
+
+  syntax val of_int "Z.to_int %1"
+  syntax val to_int "Z.of_int %1"
+
+  syntax constant min_int32 "Z.of_int 0x7fff_ffff"
+  syntax constant max_int32 "Z.of_int (-0x8000_0000)"
+  syntax val      ( + )     "%1 + %2"
+  syntax val      ( - )     "%1 - %2"
+  syntax val      (-_)      "- %1"
+  syntax val      ( * )     "%1 * %2"
+  syntax val      ( / )     "%1 / %2"
+  syntax val      ( % )     "%1 mod %2"
+  syntax val      (=)       "%1 = %2"
+  syntax val      (<=)      "%1 <= %2"
+  syntax val      (<)       "%1 < %2"
+  syntax val      (>=)      "%1 >= %2"
+  syntax val      (>)       "%1 > %2"
+end
+
 module mach.int.Int63
   syntax type     int63     "int"
 
@@ -351,6 +374,24 @@ end
 module mach.int.MinMax63
   syntax val min "Pervasives.min %1 %2"
   syntax val max "Pervasives.max %1 %2"
+end
+
+module mach.array.Array32
+  syntax type      array         "(%1 array)"
+
+  syntax exception OutOfBounds   "Invalid_argument \"index out of bounds\""
+  syntax val       make          "Array.make %1 %2"
+  syntax val       ([])          "%1.(%2)"
+  syntax val       ([]<-)        "%1.(%2) <- %3"
+  syntax val       defensive_get "%1.(%2)"
+  syntax val       defensive_set "%1.(%2) <- %3"
+  syntax val       length        "Array.length %1"
+  syntax val       append        "Array.append %1 %2"
+  syntax val       sub           "Array.sub %1 %2 %3"
+  syntax val       copy          "Array.copy %1"
+  syntax val       fill          "Array.fill %1 %2 %3 %4"
+  syntax val       blit          "Array.blit %1 %2 %3 %4 %5"
+  syntax val       self_blit     "Array.blit %1 %2 %1 %3 %4"
 end
 
 module mach.array.Array63
