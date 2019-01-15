@@ -593,3 +593,17 @@ module mach.c.C
   syntax val print_uint32 "printf(\"%#010x\",%1)" prec 1 15
 
 end
+
+module mach.fxp.Fxp
+
+  syntax type fxp "uint64_t"
+
+  syntax val fxp_add "%1 + %2"
+  syntax val fxp_sub "%1 - %2"
+  syntax val fxp_mul "%1 * %2"
+  syntax val fxp_lsl "%1 << %2"
+  syntax val fxp_lsr "%1 >> %2"
+  syntax val fxp_asr "(uint64_t)((int64_t)%1 >> %2)"
+  syntax val fxp_asr' "(uint64_t)((int64_t)%1 >> %2)"
+
+end
