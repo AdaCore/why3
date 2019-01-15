@@ -12,6 +12,7 @@
 #define TEST_MUL
 #define TEST_TOOM
 #define TEST_DIV
+#define TEST_SQRT1
 #endif
 
 #ifdef TEST_MINIGMP
@@ -25,6 +26,7 @@
 #include "build/mul.h"
 #include "build/div.h"
 #include "build/toom.h"
+#include "build/sqrt1.h"
 #endif
 
 #include "mt19937-64.c"
@@ -60,7 +62,7 @@ int main () {
   struct timeval begin, end;
   double elapsed;
 #endif
-  uint64_t c, refc;
+  uint64_t a, c, refc;
   //gmp_randstate_t rands;
   //TMP_DECL;
   //TMP_MARK;
@@ -355,10 +357,64 @@ int main () {
 #endif
 	}
         }
-#endif
 #ifdef COMPARE
   printf ("division ok\n");
 #endif
+#endif
+#ifdef TEST_SQRT1
+#ifdef BENCH
+  printf ("#t(s)\n");
+#endif
+
+#ifdef BENCH
+      elapsed = 0;
+#endif
+      an = bn = rn = 1;
+      for (int iter = 0; iter != 500; ++iter) {
+        init_valid (ap, bp, 1, 1);
+        a = *ap;
+        if (a < 0x4000000000000000) continue;
+#ifdef BENCH
+        gettimeofday(&begin, NULL);
+        for (int i = 0; i != 100; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpn_sqrtrem (refr, refp, ap, 1);
+            refc = *refr;
+#endif
+#ifdef TEST_WHY3
+            c = sqrt1 (rp, a);
+#endif
+
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec)
+          + ((end.tv_usec - begin.tv_usec)/1000000.0)
+        printf ("%f\n", an, bn, elapsed);
+        printf ("\n"); //for gnuplot
+#endif
+#ifdef COMPARE
+      if (mpn_cmp (refp, rp, rn) || c != refc)
+        {
+          printf ("ERROR, i=%d\n",
+                  (int) iter);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("r:   "); mpn_dump (rp, rn);
+          printf ("ref: "); mpn_dump (refp, rn);
+          printf ("c:    %016lx\n", c);
+          printf ("refc: %016lx\n", refc);
+          abort();
+        }
+#endif
+    }
+#ifdef COMPARE
+    printf ("sqrt1 ok\n");
+#endif
+#endif
+
           //TMP_FREE;
           //tests_end ();
           return 0;
