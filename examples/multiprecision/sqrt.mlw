@@ -1,21 +1,30 @@
+module Sqrt1
+
 use int.Int
 use real.RealInfix
 use real.Square
 use mach.int.UInt64
 use int.Power
+use map.Map
+use mach.c.C
 use lemmas.Lemmas
 use mach.fxp.Fxp
 
 val rsa_estimate (a: fxp): fxp
+  requires { 0.25 <=. rval a <=. 0xffffffffffffffffp-64 }
+  requires { iexp a = - 64 }
   ensures { iexp result = -8 }
   ensures { 256 <= ival result <= 511 }
   ensures { 1. <=. rval result <=. 2. }
   ensures { let rsa = 1. /. sqrt(rval a) in
             let e0 = (rval result -. rsa) /. rsa in -0.00281 <=. e0 <=. 0.002655 }
 
-let sqrt1 (a0: uint64): uint64
+let sqrt1 (rp: ptr uint64) (a0: uint64): uint64
+  requires { valid rp 1 }
   requires { 0x4000000000000000 <= a0 }
   ensures { result * result <= a0 < (result + 1) * (result + 1) }
+  ensures { result * result + (pelts rp)[offset rp] = a0 }
+  ensures { (pelts rp)[offset rp] <= 2 * result }
 =
   let a = fxp_init a0 (-64) in
   assert { 0.25 <=. rval a <=. 0xffffffffffffffffp-64 };
@@ -42,7 +51,7 @@ let sqrt1 (a0: uint64): uint64
   assert { rsa *. rval a = sa };
   let u2 = fxp_lsr u1 25 in
   assert { rval a -. ((rval x1 *. rval a) *. (rval x1 *. rval a)) = -. rval a *. e1 *. (2. +. e1) };
-  let t2 = fxp_asr (fxp_sub (fxp_sub (fxp_lsl a 14) (fxp_mul u2 u2)) (fxp_init 0x1000000000 (-78))) 24 in
+  let t2 = fxp_asr (fxp_sub (fxp_sub (fxp_lsl a 14) (fxp_mul u2 u2)) (fxp_init 0x10000000000 (-78))) 24 in
   let ghost m2 = 0x1.p-38 in
   let ghost mt2 = rval a -. (rval x1 *. rval a2) *. (rval x1 *. rval a2) -. m2 in
   let x2 = fxp_add u1 (fxp_asr' (fxp_mul x1 t2) 15 1) in
@@ -68,4 +77,7 @@ let sqrt1 (a0: uint64): uint64
     c <- c + 1;
     assert { s = c * c };
   end;
+  C.set rp (a0 - s);
   c
+
+end
