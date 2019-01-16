@@ -52,11 +52,13 @@ Defined.
 (* Why3 goal *)
 Lemma t'axiom :
   forall (x:t), (t'isFinite x) ->
-  ((-(16777215 * 20282409603651670423947251286016)%R)%R <= (t'real x))%R /\
-  ((t'real x) <= (16777215 * 20282409603651670423947251286016)%R)%R.
+  ((-340282346638528859811704183484516925440%R)%R <= (t'real x))%R /\
+  ((t'real x) <= 340282346638528859811704183484516925440%R)%R.
 Proof.
 intros x _.
 apply Rabs_le_inv.
+change 340282346638528859811704183484516925440%Z with (16777215 * 20282409603651670423947251286016)%Z.
+rewrite mult_IZR.
 change (Rabs (B2R _ _ x) <= F2R (Float radix2 (Zpower radix2 24 - 1) (127 - 23)))%R.
 destruct x as [s|s|s|s m e H] ;
   try (simpl ; rewrite Rabs_R0 ; now apply F2R_ge_0).
