@@ -107,14 +107,17 @@ let apply_to_record (list_records: (string list) Mstr.t)
                record so we need to scan the whole record. *)
             let new_st =
                 List.fold_left2 (fun acc s e ->
-                  if Strings.has_prefix "us_split_fields" s ||
-                     Strings.has_prefix "us_split_discrs" s
+                  if Strings.has_prefix "__split_fields" s ||
+                     Strings.has_prefix "__split_discrs" s
                   then
                     (match e with
                     | Record (_, a) -> acc @ a
                     | _ -> (s,e) :: acc)
                   else
-                    (s, e) :: acc)
+                    if Strings.has_prefix "rec__ext" s then
+                      acc
+                    else
+                      (s, e) :: acc)
                   [] fields l
               in
               Record (s, new_st)
