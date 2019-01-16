@@ -10,14 +10,16 @@ use mach.c.C
 use lemmas.Lemmas
 use mach.fxp.Fxp
 
+meta coercion function rval
+
 val rsa_estimate (a: fxp): fxp
-  requires { 0.25 <=. rval a <=. 0xffffffffffffffffp-64 }
+  requires { 0.25 <=. a <=. 0xffffffffffffffffp-64 }
   requires { iexp a = - 64 }
   ensures { iexp result = -8 }
   ensures { 256 <= ival result <= 511 }
-  ensures { 1. <=. rval result <=. 2. }
-  ensures { let rsa = 1. /. sqrt(rval a) in
-            let e0 = (rval result -. rsa) /. rsa in -0.00281 <=. e0 <=. 0.002655 }
+  ensures { 1. <=. result <=. 2. }
+  ensures { let rsa = 1. /. sqrt a in
+            let e0 = (result -. rsa) /. rsa in -0.00281 <=. e0 <=. 0.002655 }
 
 let sqrt1 (rp: ptr uint64) (a0: uint64): uint64
   requires { valid rp 1 }
@@ -27,46 +29,45 @@ let sqrt1 (rp: ptr uint64) (a0: uint64): uint64
   ensures { (pelts rp)[offset rp] <= 2 * result }
 =
   let a = fxp_init a0 (-64) in
-  assert { 0.25 <=. rval a <=. 0xffffffffffffffffp-64 };
-  assert { 0. <. rval a };
-  let ghost sa = sqrt (rval a) in
-  let ghost rsa = 1. /. sa in
+  assert { 0.25 <=. a <=. 0xffffffffffffffffp-64 };
+  assert { 0. <. a };
+  let rsa = pure { 1. /. sqrt a } in
   let x0 = rsa_estimate a in
-  let ghost e0 = (rval x0 -. rsa) /. rsa in
+  let e0 = pure { (x0 -. rsa) /. rsa } in
   let a1 = fxp_lsr a 31 in
-  let ghost ea1 = (rval a1 -. rval a) /. rval a in
+  let ea1 = pure { (a1 -. a) /. a } in
   let m1 = fxp_sub (fxp_init 0x2000000000000 (-49)) (fxp_init 0x30000 (-49)) in
   let t1' = fxp_sub m1 (fxp_mul (fxp_mul x0 x0) a1) in
   let t1 = fxp_asr t1' 16 in
   let x1 = fxp_add (fxp_lsl x0 16) (fxp_asr' (fxp_mul x0 t1) 18 1) in
-  let ghost mx1 = rval x0 +. rval x0 *. rval t1' *. 0.5 in
-  assert { (mx1 -. rsa) /. rsa = -0.5 *. (e0 *. e0 *. (3. +. e0) +. (1. +. e0) *. (1. -. rval m1 +. (1. +. e0) *. (1. +. e0) *. ea1)) };
-  let ghost e1 = (rval x1 -. rsa) /. rsa in
+  let mx1 = pure { x0 +. x0 *. t1' *. 0.5 } in
+  assert { (mx1 -. rsa) /. rsa = -0.5 *. (e0 *. e0 *. (3. +. e0) +. (1. +. e0) *. (1. -. m1 +. (1. +. e0) *. (1. +. e0) *. ea1)) };
+  let e1 = pure { (x1 -. rsa) /. rsa } in
   let a2 = fxp_lsr a 24 in
-  let ghost ea2 = (rval a2 -. rval a) /. rval a in
+  let ea2 = pure { (a2 -. a) /. a } in
   let u1 = fxp_mul x1 a2 in
-  assert { rsa *. rval a = sa };
+  assert { rsa *. a = sqrt a };
   let u2 = fxp_lsr u1 25 in
-  let ghost eu2 = (rval u2 -. rval u1) /. rval u1 in
-  assert { rval a -. ((rval x1 *. rval a) *. (rval x1 *. rval a)) = -. rval a *. e1 *. (2. +. e1) };
+  let eu2 = pure { (u2 -. u1) /. u1 } in
+  assert { a -. (x1 *. a) *. (x1 *. a) = -. a *. e1 *. (2. +. e1) };
   let m2 = fxp_init 0x24000000000 (-78) in
   let t2' = fxp_sub (fxp_sub (fxp_lsl a 14) (fxp_mul u2 u2)) m2 in
   let t2 = fxp_asr t2' 24 in
   let x2 = fxp_add u1 (fxp_asr' (fxp_mul x1 t2) 15 1) in
-  let ghost mx2 = rval u1 +. rval x1 *. rval t2' *. 0.5 in
+  let mx2 = pure { u1 +. x1 *. t2' *. 0.5 } in
   assert { let p1a2 = (1. +. e1) *. (1. +. ea2) in
            let e1a2 = p1a2 -. 1. in
            let ee = p1a2 *. p1a2 *. eu2 *. (eu2 +. 2.) +. e1a2 *. e1a2 in
-           (mx2 -. sa) /. sa = -0.5 *. (ee +. rval m2 /. rval a) *. (1. +. e1) -. e1 *. e1a2
-           by rval x1 <> 0. /\ rval a2 <> 0. };
+           (mx2 -. sqrt a) /. sqrt a = -0.5 *. (ee +. m2 /. a) *. (1. +. e1) -. e1 *. e1a2
+           by x1 <> 0. /\ a2 <> 0. };
   let x = fxp_lsr x2 32 in
-  let ghost sa = trunc_at sa (-32) in
-  assert { -0x1.p-32 <=. rval x -. sa <=. 0. };
+  let sa = pure { trunc_at (sqrt a) (-32) } in
+  assert { -0x1.p-32 <=. x -. sa <=. 0. };
   let ref c = ival x in
   assert { c * c <= a0 < (c+2) * (c+2) };
   let ref s = c * c in
   assert { (c+1) * (c+1) <= radix
-           by rval x <=. sa <=. 1.
+           by x <=. sa <=. 1.
            so iexp x = -32
            so c < power 2 32
            so c+1 <= power 2 32
