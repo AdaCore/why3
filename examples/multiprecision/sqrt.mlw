@@ -35,28 +35,30 @@ let sqrt1 (rp: ptr uint64) (a0: uint64): uint64
   let ghost e0 = (rval x0 -. rsa) /. rsa in
   let a1 = fxp_lsr a 31 in
   let ghost ea1 = (rval a1 -. rval a) /. rval a in
-  let t1' =
-    fxp_sub
-      (fxp_sub (fxp_init 0x2000000000000 (-49)) (fxp_init 0x30000 (-49)))
-      (fxp_mul (fxp_mul x0 x0) a1) in
-  let ghost m1 = 0x3.p-33 in
+  let m1 = fxp_sub (fxp_init 0x2000000000000 (-49)) (fxp_init 0x30000 (-49)) in
+  let t1' = fxp_sub m1 (fxp_mul (fxp_mul x0 x0) a1) in
   let t1 = fxp_asr t1' 16 in
   let x1 = fxp_add (fxp_lsl x0 16) (fxp_asr' (fxp_mul x0 t1) 18 1) in
   let ghost mx1 = rval x0 +. rval x0 *. rval t1' *. 0.5 in
-  assert { (mx1 -. rsa) /. rsa = -0.5 *. (e0 *. e0 *. (3. +. e0) +. (1. +. e0) *. (m1 +. (1. +. e0) *. (1. +. e0) *. ea1)) };
+  assert { (mx1 -. rsa) /. rsa = -0.5 *. (e0 *. e0 *. (3. +. e0) +. (1. +. e0) *. (1. -. rval m1 +. (1. +. e0) *. (1. +. e0) *. ea1)) };
   let ghost e1 = (rval x1 -. rsa) /. rsa in
   let a2 = fxp_lsr a 24 in
   let ghost ea2 = (rval a2 -. rval a) /. rval a in
   let u1 = fxp_mul x1 a2 in
   assert { rsa *. rval a = sa };
   let u2 = fxp_lsr u1 25 in
+  let ghost eu2 = (rval u2 -. rval u1) /. rval u1 in
   assert { rval a -. ((rval x1 *. rval a) *. (rval x1 *. rval a)) = -. rval a *. e1 *. (2. +. e1) };
-  let t2 = fxp_asr (fxp_sub (fxp_sub (fxp_lsl a 14) (fxp_mul u2 u2)) (fxp_init 0x10000000000 (-78))) 24 in
-  let ghost m2 = 0x1.p-38 in
-  let ghost mt2 = rval a -. (rval x1 *. rval a2) *. (rval x1 *. rval a2) -. m2 in
+  let m2 = fxp_init 0x24000000000 (-78) in
+  let t2' = fxp_sub (fxp_sub (fxp_lsl a 14) (fxp_mul u2 u2)) m2 in
+  let t2 = fxp_asr t2' 24 in
   let x2 = fxp_add u1 (fxp_asr' (fxp_mul x1 t2) 15 1) in
-  let ghost mx2 = rval x1 *. rval a2 +. rval x1 *. mt2 *. 0.5 in
-  assert { (mx2 -. sa) /. sa = ea2 *. (1. +. e1) *. (-. e1 *. (2. +. e1) -. (1. +. e1) *. (1. +. e1) *. 0.5 *. ea2) -. 0.5 *. m2 /. rval a *. (1. +. e1) -. e1 *. e1 *. 0.5 *. (3. +. e1) };
+  let ghost mx2 = rval u1 +. rval x1 *. rval t2' *. 0.5 in
+  assert { let p1a2 = (1. +. e1) *. (1. +. ea2) in
+           let e1a2 = p1a2 -. 1. in
+           let ee = p1a2 *. p1a2 *. eu2 *. (eu2 +. 2.) +. e1a2 *. e1a2 in
+           (mx2 -. sa) /. sa = -0.5 *. (ee +. rval m2 /. rval a) *. (1. +. e1) -. e1 *. e1a2
+           by rval x1 <> 0. /\ rval a2 <> 0. };
   let x = fxp_lsr x2 32 in
   let ghost sa = trunc_at sa (-32) in
   assert { -0x1.p-32 <=. rval x -. sa <=. 0. };
