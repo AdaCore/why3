@@ -1,3 +1,12 @@
+
+Note
+====
+
+This repository is NOT the official Why3 repository. It is a clone of Why3 for
+its use in [SPARK](https://github.com/adacore/spark2014). Please report any
+issues or pull requests to the [original
+project](https://gitlab.inria.fr/why3/why3).
+
 WHY3
 ====
 
