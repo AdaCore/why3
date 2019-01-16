@@ -35,3 +35,5 @@ val intros :
      premises of [goal G : f] *)
 
 val introduce_premises : Task.task Trans.trans
+
+val simplify_intros: Task.task Trans.trans

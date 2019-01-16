@@ -46,7 +46,7 @@ let prepare_for_counterexmp2 env task =
     (* Counter-example will be queried, prepare the task *)
     Debug.dprintf debug "Get ce@.";
     let comp_trans = Trans.seq [
-      Introduction.introduce_premises;
+      Introduction.simplify_intros;
       Intro_vc_vars_counterexmp.intro_vc_vars_counterexmp;
       Intro_projections_counterexmp.intro_projections_counterexmp env
     ] in
