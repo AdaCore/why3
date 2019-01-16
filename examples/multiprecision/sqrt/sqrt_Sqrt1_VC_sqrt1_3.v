@@ -593,27 +593,18 @@ Axiom H42 : ((rval u1) = ((rval x1) * (rval a2))%R).
 
 Axiom H43 : ((iexp u1) = ((iexp x1) + (iexp a2))%Z).
 
-Axiom H44 :
-  (((1%R / (Reals.R_sqrt.sqrt (rval a)))%R * (rval a))%R =
-   (Reals.R_sqrt.sqrt (rval a))).
-
-Parameter u2: fxp.
-
-Axiom H45 : ((rval u2) = (trunc_at (rval u1) ((iexp u1) + 25%Z)%Z)).
-
-Axiom H46 : ((iexp u2) = ((iexp u1) + 25%Z)%Z).
-
 (* Why3 goal *)
 Theorem VC_sqrt1 :
-  (((rval a) - (((rval x1) * (rval a))%R * ((rval x1) * (rval a))%R)%R)%R =
-   (((-(rval a))%R *
-     (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
-      (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
-    *
-    (2%R +
-     (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
-      (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R)%R).
+  ((((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
+    (Reals.R_sqrt.sqrt (rval a)))%R
+   =
+   (((1%R +
+      (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
+       (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
+     * (1%R + (((rval a2) - (rval a))%R / (rval a))%R)%R)%R
+    - 1%R)%R).
 Proof.
+rewrite H42.
 set (sa := sqrt (rval a)).
 replace (rval a) with (sa^2)%R.
 field.

@@ -593,15 +593,67 @@ Axiom H42 : ((rval u1) = ((rval x1) * (rval a2))%R).
 
 Axiom H43 : ((iexp u1) = ((iexp x1) + (iexp a2))%Z).
 
+Axiom H44 :
+  ((((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
+    (Reals.R_sqrt.sqrt (rval a)))%R
+   =
+   (((1%R +
+      (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
+       (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
+     * (1%R + (((rval a2) - (rval a))%R / (rval a))%R)%R)%R
+    - 1%R)%R).
+
+Parameter u2: fxp.
+
+Axiom H45 : ((rval u2) = (trunc_at (rval u1) ((iexp u1) + 25%Z)%Z)).
+
+Axiom H46 : ((iexp u2) = ((iexp u1) + 25%Z)%Z).
+
+Parameter m2: fxp.
+
+Parameter rliteral2: uint64.
+
+Axiom rliteral_axiom2 : ((uint64'int rliteral2) = 2473901162496%Z).
+
+Axiom H47 : ((ival m2) = rliteral2).
+
+Axiom H48 :
+  ((rval m2) = ((BuiltIn.IZR 2473901162496%Z) * (pow2 (-78%Z)%Z))%R).
+
+Axiom H49 : ((iexp m2) = (-78%Z)%Z).
+
+Parameter o7: fxp.
+
+Axiom H50 : ((rval o7) = ((rval u2) * (rval u2))%R).
+
+Axiom H51 : ((iexp o7) = ((iexp u2) + (iexp u2))%Z).
+
+Parameter o8: fxp.
+
+Axiom H52 : ((rval o8) = (rval a)).
+
+Axiom H53 : ((iexp o8) = ((iexp a) - 14%Z)%Z).
+
+Parameter o9: fxp.
+
+Axiom H54 : ((rval o9) = ((rval o8) - (rval o7))%R).
+
+Axiom H55 : ((iexp o9) = (iexp o8)).
+
+Parameter t2': fxp.
+
+Axiom H56 : ((rval t2') = ((rval o9) - (rval m2))%R).
+
+Axiom H57 : ((iexp t2') = (iexp o9)).
+
 (* Why3 goal *)
 Theorem VC_sqrt1 :
-  (((1%R / (Reals.R_sqrt.sqrt (rval a)))%R * (rval a))%R =
-   (Reals.R_sqrt.sqrt (rval a))).
+  (((Reals.R_sqrt.sqrt (rval a)) * (Reals.R_sqrt.sqrt (rval a)))%R =
+   (rval a)).
 Proof.
 set (sa := sqrt (rval a)).
 replace (rval a) with (sa^2)%R.
 field.
-apply Rgt_not_eq, sqrt_lt_R0, H6.
 rewrite <- Rsqr_pow2.
 apply Rsqr_sqrt, Rlt_le, H6.
 Qed.

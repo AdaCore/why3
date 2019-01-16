@@ -594,8 +594,14 @@ Axiom H42 : ((rval u1) = ((rval x1) * (rval a2))%R).
 Axiom H43 : ((iexp u1) = ((iexp x1) + (iexp a2))%Z).
 
 Axiom H44 :
-  (((1%R / (Reals.R_sqrt.sqrt (rval a)))%R * (rval a))%R =
-   (Reals.R_sqrt.sqrt (rval a))).
+  ((((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
+    (Reals.R_sqrt.sqrt (rval a)))%R
+   =
+   (((1%R +
+      (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
+       (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
+     * (1%R + (((rval a2) - (rval a))%R / (rval a))%R)%R)%R
+    - 1%R)%R).
 
 Parameter u2: fxp.
 
@@ -603,52 +609,46 @@ Axiom H45 : ((rval u2) = (trunc_at (rval u1) ((iexp u1) + 25%Z)%Z)).
 
 Axiom H46 : ((iexp u2) = ((iexp u1) + 25%Z)%Z).
 
-Axiom H47 :
-  (((rval a) - (((rval x1) * (rval a))%R * ((rval x1) * (rval a))%R)%R)%R =
-   (((-(rval a))%R *
-     (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
-      (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
-    *
-    (2%R +
-     (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
-      (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R)%R).
-
 Parameter m2: fxp.
 
 Parameter rliteral2: uint64.
 
 Axiom rliteral_axiom2 : ((uint64'int rliteral2) = 2473901162496%Z).
 
-Axiom H48 : ((ival m2) = rliteral2).
+Axiom H47 : ((ival m2) = rliteral2).
 
-Axiom H49 :
+Axiom H48 :
   ((rval m2) = ((BuiltIn.IZR 2473901162496%Z) * (pow2 (-78%Z)%Z))%R).
 
-Axiom H50 : ((iexp m2) = (-78%Z)%Z).
+Axiom H49 : ((iexp m2) = (-78%Z)%Z).
 
 Parameter o7: fxp.
 
-Axiom H51 : ((rval o7) = ((rval u2) * (rval u2))%R).
+Axiom H50 : ((rval o7) = ((rval u2) * (rval u2))%R).
 
-Axiom H52 : ((iexp o7) = ((iexp u2) + (iexp u2))%Z).
+Axiom H51 : ((iexp o7) = ((iexp u2) + (iexp u2))%Z).
 
 Parameter o8: fxp.
 
-Axiom H53 : ((rval o8) = (rval a)).
+Axiom H52 : ((rval o8) = (rval a)).
 
-Axiom H54 : ((iexp o8) = ((iexp a) - 14%Z)%Z).
+Axiom H53 : ((iexp o8) = ((iexp a) - 14%Z)%Z).
 
 Parameter o9: fxp.
 
-Axiom H55 : ((rval o9) = ((rval o8) - (rval o7))%R).
+Axiom H54 : ((rval o9) = ((rval o8) - (rval o7))%R).
 
-Axiom H56 : ((iexp o9) = (iexp o8)).
+Axiom H55 : ((iexp o9) = (iexp o8)).
 
 Parameter t2': fxp.
 
-Axiom H57 : ((rval t2') = ((rval o9) - (rval m2))%R).
+Axiom H56 : ((rval t2') = ((rval o9) - (rval m2))%R).
 
-Axiom H58 : ((iexp t2') = (iexp o9)).
+Axiom H57 : ((iexp t2') = (iexp o9)).
+
+Axiom H58 :
+  (((Reals.R_sqrt.sqrt (rval a)) * (Reals.R_sqrt.sqrt (rval a)))%R =
+   (rval a)).
 
 Parameter t2: fxp.
 
@@ -685,29 +685,21 @@ Theorem VC_sqrt1 :
     / (Reals.R_sqrt.sqrt (rval a)))%R
    =
    ((((-(05 / 10)%R)%R *
-      (((((((1%R +
-             (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
-              (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
-            * (1%R + (((rval a2) - (rval a))%R / (rval a))%R)%R)%R
+      ((((((1%R +
+            (((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
+             (Reals.R_sqrt.sqrt (rval a)))%R)%R
            *
-           ((1%R +
-             (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
-              (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
-            * (1%R + (((rval a2) - (rval a))%R / (rval a))%R)%R)%R)%R
+           (1%R +
+            (((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
+             (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
           * (((rval u2) - (rval u1))%R / (rval u1))%R)%R
-         * ((((rval u2) - (rval u1))%R / (rval u1))%R + 2%R)%R)%R
+         * (2%R + (((rval u2) - (rval u1))%R / (rval u1))%R)%R)%R
         +
-        ((((1%R +
-            (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
-             (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
-           * (1%R + (((rval a2) - (rval a))%R / (rval a))%R)%R)%R
-          - 1%R)%R
+        ((((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
+          (Reals.R_sqrt.sqrt (rval a)))%R
          *
-         (((1%R +
-            (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
-             (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
-           * (1%R + (((rval a2) - (rval a))%R / (rval a))%R)%R)%R
-          - 1%R)%R)%R)%R
+         (((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
+          (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
        + ((rval m2) / (rval a))%R)%R)%R
      *
      (1%R +
@@ -717,14 +709,11 @@ Theorem VC_sqrt1 :
     ((((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
       (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R
      *
-     (((1%R +
-        (((rval x1) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
-         (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R
-       * (1%R + (((rval a2) - (rval a))%R / (rval a))%R)%R)%R
-      - 1%R)%R)%R)%R).
+     (((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
+      (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R).
 Proof.
 intros (h1,h2).
-rewrite H57, H55, H53, H51, H42.
+rewrite H56, H54, H52, H50, H42.
 set (sa := sqrt (rval a)).
 replace (rval a) with (sa^2)%R.
 field.

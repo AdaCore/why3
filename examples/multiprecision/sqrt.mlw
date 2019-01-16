@@ -46,19 +46,18 @@ let sqrt1 (rp: ptr uint64) (a0: uint64): uint64
   let a2 = fxp_lsr a 24 in
   let ea2 = pure { (a2 -. a) /. a } in
   let u1 = fxp_mul x1 a2 in
-  assert { rsa *. a = sqrt a };
+  let eu1 = pure { (u1 -. sqrt a) /. sqrt a } in
+  assert { eu1 = (1. +. e1) *. (1. +. ea2) -. 1. };
   let u2 = fxp_lsr u1 25 in
   let eu2 = pure { (u2 -. u1) /. u1 } in
-  assert { a -. (x1 *. a) *. (x1 *. a) = -. a *. e1 *. (2. +. e1) };
   let m2 = fxp_init 0x24000000000 (-78) in
   let t2' = fxp_sub (fxp_sub (fxp_lsl a 14) (fxp_mul u2 u2)) m2 in
+  assert { sqrt a *. sqrt a = a };
   let t2 = fxp_asr t2' 24 in
   let x2 = fxp_add u1 (fxp_asr' (fxp_mul x1 t2) 15 1) in
   let mx2 = pure { u1 +. x1 *. t2' *. 0.5 } in
-  assert { let p1a2 = (1. +. e1) *. (1. +. ea2) in
-           let e1a2 = p1a2 -. 1. in
-           let ee = p1a2 *. p1a2 *. eu2 *. (eu2 +. 2.) +. e1a2 *. e1a2 in
-           (mx2 -. sqrt a) /. sqrt a = -0.5 *. (ee +. m2 /. a) *. (1. +. e1) -. e1 *. e1a2
+  assert { let ee = (1. +. eu1) *. (1. +. eu1) *. eu2 *. (2. +. eu2) +. eu1 *. eu1 in
+           (mx2 -. sqrt a) /. sqrt a = -0.5 *. (ee +. m2 /. a) *. (1. +. e1) -. e1 *. eu1
            by x1 <> 0. /\ a2 <> 0. };
   let x = fxp_lsr x2 32 in
   let sa = pure { trunc_at (sqrt a) (-32) } in
