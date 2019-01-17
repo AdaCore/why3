@@ -70,6 +70,14 @@ module Lemmas
 
   meta remove_prop axiom prod_compat_strict_lr
 
+  let lemma prod_compat_lr (a b c d:int)
+    requires { 0 <= a <= b }
+    requires { 0 <= c <= d }
+    ensures  { a * c <= b * d }
+  = ()
+
+  meta remove_prop axiom prod_compat_lr
+
   (** {3 Integer value of a natural number} *)
 
   (** `value_sub x n m` denotes the integer represented by

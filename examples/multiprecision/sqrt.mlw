@@ -1,8 +1,11 @@
 module Sqrt1
 
 use int.Int
+use int.EuclideanDivision
 use real.RealInfix
 use real.Square
+use real.FromInt
+use real.Truncate as Trunc
 use mach.int.UInt64
 use int.Power
 use map.Map
@@ -11,6 +14,23 @@ use lemmas.Lemmas
 use mach.fxp.Fxp
 
 meta coercion function rval
+
+let lemma real_sqr_compat (x y: real)
+  requires { 0. <. x <. y }
+  ensures  { x *. x <. y *. y }
+= ()
+
+meta remove_prop axiom real_sqr_compat
+
+let lemma trunc_lower_bound (x: real) (k:int)
+  ensures { x <. trunc_at x k +. pow2 k }
+= assert { x *. pow2 (-k)
+           <. from_int (Trunc.floor (x *. pow2 (-k)) + 1)
+           = from_int (Trunc.floor (x *. pow2 (-k))) +. 1.
+           = from_int (Trunc.floor (x *. pow2 (-k))) *. (pow2 k *. pow2 (-k))
+             +. 1.
+           = trunc_at x k *. pow2 (-k) +. 1.
+           = (trunc_at x k +. pow2 k) *. pow2 (-k) }
 
 val rsa_estimate (a: fxp): fxp
   requires { 0.25 <=. a <=. 0xffffffffffffffffp-64 }
@@ -63,11 +83,45 @@ let sqrt1 (rp: ptr uint64) (a0: uint64): uint64
   let sa = pure { trunc_at (sqrt a) (-32) } in
   assert { -0x1.p-32 <=. x -. sa <=. 0. };
   let ref c = ival x in
-  assert { c * c <= a0 < (c+2) * (c+2) };
-  let ref s = c * c in
-  assert { (c+1) * (c+1) <= radix
+  assert { c = Trunc.floor (pow2 32 *. x)
            by x <=. sa <=. 1.
            so iexp x = -32
+           so pow2 32 *. x <. pow2 32
+           so 0 <= Trunc.floor (pow2 32 *. x)
+                < power 2 32
+                < radix
+           so c = mod (Trunc.floor (pow2 32 *. x)) radix
+                = Trunc.floor (pow2 32 *. x) };
+  assert { c * c <= a0 < (c+2) * (c+2)
+           by x *. x <=. a
+           so from_int a0 = pow2 64 *. a
+           so from_int c = pow2 32 *. x
+           so pow2 32 *. pow2 32 = pow2 64
+           so from_int (c * c) = from_int c *. from_int c
+              = pow2 64 *. (x *. x) <=. from_int a0
+           so c * c <= a0
+           so let x' = x +. 0x2.p-32 in
+              let sa' = sa +. pow2 (-32) in
+              pow2 (-32) = 0x1.p-32
+           so sa' <=. x'
+           so sqrt a <. trunc_at (sqrt a) (-32) +. pow2 (-32) = sa'
+           so a = sqrt a *. sqrt a <. sa' *. sa'<=. x' *. x'
+           so from_int (c + 2) = from_int c +. from_int 2
+              = from_int c +. 2.
+              = pow2 32 *. x +. 2.
+              = pow2 32 *. (x +. 0x2.p-32)
+              = pow2 32 *. x'
+           so from_int a0
+              = pow2 64 *. a
+              <. pow2 64 *. (x' *. x')
+              = from_int ((c+2) * (c+2))
+           };
+  let ref s = c * c in
+  assert { (c+1) * (c+1) <= radix
+           so iexp x = -32
+           so pow2 32 *. x <. pow2 32
+           so 0 <= Trunc.floor (pow2 32 *. x)
+                < power 2 32
            so c < power 2 32
            so c+1 <= power 2 32
            so (c+1) * (c+1) <= power 2 32 * power 2 32 = radix };
