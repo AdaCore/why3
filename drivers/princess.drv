@@ -30,11 +30,11 @@ transformation "eliminate_definition"
 transformation "eliminate_inductive"
 transformation "eliminate_algebraic"
 transformation "eliminate_literal"
-transformation "eliminate_epsilon"
 
 (* currently, princess does not support $let and $ite *)
-transformation "eliminate_let"
 transformation "eliminate_if"
+transformation "eliminate_epsilon"
+transformation "eliminate_let"
 
 transformation "discriminate"
 transformation "encoding_smt"
