@@ -325,12 +325,12 @@ let files_need_saving () =
 let exit_function_safe () =
   send_request Check_need_saving_req
 
-let exit_function_handler b =
+let exit_function_handler ~parent b =
   if not b && not (files_need_saving ()) then
     exit_function_unsafe ()
   else
     let answer =
-      GToolbox.question_box
+      GToolbox.question_box ~parent
         ~title:"Why3 saving session and files"
         ~buttons:["Yes"; "No"; "Cancel"]
         "Do you want to save the session and unsaved files?"
@@ -1505,7 +1505,7 @@ let treat_message_notification msg = match msg with
       (* When the error reported by the transformation is fatal, we notify the
          user with a popup. *)
       let msg = Format.sprintf "Please report:\nTransformation %s failed: \n%s\n" tr_name msg in
-      GToolbox.message_box ~title:"Why3 fatal error" msg
+      GToolbox.message_box ~parent:main_window ~title:"Why3 fatal error" msg
   | Transf_error (false, _id, tr_name, arg, loc, msg, doc) ->
       if arg = "" then
         print_message ~kind:1 ~notif_kind:"Transformation Error"
@@ -2422,7 +2422,7 @@ let treat_notification n =
                         "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
-  | Saving_needed b -> exit_function_handler b
+  | Saving_needed b -> exit_function_handler ~parent:main_window b
   | Message (msg)                 -> treat_message_notification msg
   | Task (id, s, list_loc)        ->
      if is_selected_alone id then
