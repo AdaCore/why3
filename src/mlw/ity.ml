@@ -1183,16 +1183,16 @@ let eff_inst sbs e =
   let spoils = Mtv.fold (fun v i s -> if i.ity_pure then
       ity_rch_vars s i else raise (ImpureVariable (v,i)))
     (Mtv.set_inter sbs.isb_var e.eff_spoils) Stv.empty in
-  (* All modified or reset regions in e must be instantiated into
-     distinct regions. We allow regions that are not affected directly
-     to be aliased, even if they contain modified or reset subregions:
-     the values are still updated at the same program points and with
-     the same postconditions, as in the initial verified code.
-     Every modified or reset region must be instantiated into a region,
-     not a snapshot. Also, every region containing a modified or reset
+  (* All modified or stale regions in e must be instantiated into
+     distinct regions. We allow regions that are not affected
+     to be aliased, even if they contain modified subregions:
+     the values are still updated at the same program points and
+     with the same postconditions, as in the initial verified code.
+     Every modified or stale region must be instantiated into a region,
+     not a snapshot. Also, every region containing a modified or stale
      region, must also be instantiated into a region and not a snapshot.
      The latter is not necessary for soundness, but simplifies VCgen. *)
-  let impact = Sreg.union (Mreg.domain e.eff_writes) e.eff_resets in
+  let safe = remove_stale e (Mreg.set_diff sbs.isb_reg e.eff_covers) in
   let inst src = Mreg.fold (fun p v acc -> Mreg.fold (fun q t acc ->
     match t.ity_node with
     | Ityapp _ when reg_r_reachable p q -> raise (IllegalSnapshot t)
@@ -1202,15 +1202,13 @@ let eff_inst sbs e =
   let resets = inst e.eff_resets in
   let taints = inst e.eff_taints in
   let covers = inst e.eff_covers in
-  let impact = inst impact in
+  let impact = inst (Mreg.set_diff sbs.isb_reg safe) in
   (* All type variables and unaffected regions must be instantiated
      outside [impact]. Every region in the instantiated execution
      is either brought in by the type substitution or instantiates
      one of the original regions. *)
-  let sreg = Mreg.set_diff sbs.isb_reg e.eff_writes in
-  let sreg = Mreg.set_diff sreg e.eff_resets in
   let dst = Mreg.fold (fun _ i s -> match i.ity_node with
-    | Ityreg r -> Sreg.add r s | _ -> s) sreg Sreg.empty in
+    | Ityreg r -> Sreg.add r s | _ -> s) safe Sreg.empty in
   let dst = Mtv.fold (fun _ i s -> ity_rch_regs s i) sbs.isb_var dst in
   ignore (Mreg.inter (fun r _ _ -> raise (IllegalAlias r)) dst impact);
   { e with eff_writes = writes; eff_taints = taints;
@@ -1365,6 +1363,10 @@ let create_cty ?(mask=MaskVisible) ?(defensive=false)
     | [q] when is_false q -> None | _ -> Some () in
   let raises = Mxs.diff filter effect.eff_raises xpost in
   let effect = { effect with eff_raises = raises } in
+  (* remove writes/taints invalidated by resets *)
+  let effect = { effect with
+    eff_writes = Mreg.set_inter effect.eff_writes effect.eff_covers;
+    eff_taints = Mreg.set_inter effect.eff_taints effect.eff_covers} in
   (* remove effects on unknown regions. We reset eff_taints
      instead of simply filtering the existing set in order
      to get rid of non-ghost writes into ghost regions.

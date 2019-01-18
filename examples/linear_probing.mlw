@@ -204,7 +204,7 @@ module LinearProbing
 
   let add (h: t) (x: key) : unit
     requires { neq x dummy }
-    writes   { h.size, h.data, h.data.elts, h.view, h.loc }
+    writes   { h }
     ensures  { h.view = Map.set (old h.view) (keym x) True }
    =
     begin
