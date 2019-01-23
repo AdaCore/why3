@@ -24,6 +24,13 @@ let get_only_first l =
       true
   | _ -> false
 
+let remove_fields_attrs attrs =
+  Ident.Sattr.fold (fun attr acc ->
+      match Strings.bounded_split ':' attr.Ident.attr_string 3 with
+      | "field" :: _ :: s when get_only_first s ->
+          acc
+      | _ -> Ident.Sattr.add attr acc) attrs Ident.Sattr.empty
+
 let rec remove_fields model_value =
   Model_parser.(match model_value with
   | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
@@ -61,7 +68,8 @@ and remove_fields_array a =
   {arr_others = others; arr_indices = arr_index_list}
   )
 
-let () = Model_parser.register_remove_field remove_fields
+let () = Model_parser.register_remove_field
+    (fun (attrs, v) -> remove_fields_attrs attrs, remove_fields v)
 
 (* This function should remain consistant with the theories and the gnat2why
    conversion.
