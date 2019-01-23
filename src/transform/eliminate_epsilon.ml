@@ -197,9 +197,9 @@ let rec lift_f el bv acc t0 =
       acc, t_attr_copy t0 t
   | Teps _ ->
       let vl,tr,t = t_open_lambda t0 in
-      let acc, t = lift_f el acc t in
+      let acc, t = lift_f el bv acc t in
       let acc, tr = Lists.map_fold_left
-                      (Lists.map_fold_left (lift_f el))
+                      (Lists.map_fold_left (lift_f el bv))
                       acc tr in
       acc, t_attr_copy t0 (t_lambda vl tr t)
   | _ ->
