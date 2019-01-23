@@ -43,10 +43,24 @@ let rec elim_t contT t =
   | _ ->
       TermTF.t_map_cont elim_t elim_f contT t
 
+and elim_t_eps t = match t.t_node with
+  | Tif (f,t1,t2) when t.t_ty <> None ->
+      let z = create_vsymbol (id_fresh "if_term") (t_type t) in
+      let tz = t_var z in
+      let f = elim_f (fun f -> f) f in
+      let f1 = t_equ tz (elim_t_eps t1) in
+      let f2 = t_equ tz (elim_t_eps t2) in
+      t_attr_copy t (t_eps_close z (t_if f f1 f2))
+  | _ ->
+      TermTF.t_map elim_t_eps (elim_f (fun f -> f)) t
+
 and elim_f contF f = match f.t_node with
-  | Tapp _ | Tlet _ | Tcase _ ->
+  | Tapp _ ->
       contF (TermTF.t_map_cont elim_t elim_f (fun f -> f) f)
-  | _ -> TermTF.t_map_cont elim_tr elim_f contF f
+  | Tlet _ | Tcase _ ->
+      contF (TermTF.t_map elim_t_eps (elim_f (fun f -> f)) f)
+  | _ ->
+      TermTF.t_map_cont elim_tr elim_f contF f
 
 (* the only terms we still can meet are the terms in triggers *)
 and elim_tr contT t = match t.t_node with

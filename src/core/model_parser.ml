@@ -365,12 +365,39 @@ let readd_one_fields ~attrs value =
         (n1, name1) :: insert_sorted (n, name) tl
     | [] -> [n, name]
   in
+  (* l is the list of ordered field_names *)
   let l = Sattr.fold (fun x l ->
       match Ident.extract_field x with
       | None -> l
       | Some (n, field_name) -> insert_sorted (n, field_name) l) attrs [] in
-    List.fold_left (fun v (_, field_name) ->
-      Record [field_name, v]) value l
+  match Ident.get_model_trace_attr ~attrs with
+  | mtrace ->
+      let attrs = Sattr.remove mtrace attrs in
+      (* Special cases for 'Last and 'First. TODO: Should be avoided here but
+         there is no simple way.  *)
+      if Strings.ends_with mtrace.attr_string "'Last" then
+        let new_mtrace = Strings.remove_suffix "'Last" mtrace.attr_string in
+        let new_mtrace = List.fold_left (fun acc (_, field_name) ->
+            acc ^ field_name) new_mtrace l in
+        let new_mtrace = new_mtrace ^ "'Last" in
+        let attrs = Sattr.add (create_attribute new_mtrace) attrs in
+        attrs, value
+      else if Strings.ends_with mtrace.attr_string "'First" then
+        let new_mtrace = Strings.remove_suffix "'First" mtrace.attr_string in
+        let new_mtrace = List.fold_left (fun acc (_, field_name) ->
+            acc ^ field_name) new_mtrace l in
+        let new_mtrace = new_mtrace ^ "'First" in
+        let attrs = Sattr.add (create_attribute new_mtrace) attrs in
+        attrs, value
+      else
+        (* General case *)
+        Sattr.add mtrace attrs,
+        List.fold_left (fun v (_, field_name) ->
+            Record [field_name, v]) value l
+  | exception Not_found ->
+      (* No model trace attribute present, same as general case *)
+      attrs, List.fold_left (fun v (_, field_name) ->
+          Record [field_name, v]) value l
 
 let create_model_element ~name ~value ~attrs ?location ?term () =
   let (name, type_s) = split_model_trace_name name in
@@ -890,7 +917,7 @@ let internal_loc t =
   | Tapp (ls, []) -> ls.ls_name.id_loc
   | _ -> None
 
-let default_remove_field (v: model_value) = v
+let default_remove_field (attrs, v: Sattr.t * model_value) = attrs, v
 
 let remove_field_fun = ref None
 
@@ -910,9 +937,7 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
              ls.ls_name.id_string, Sattr.union attrs ls.ls_name.id_attrs
          | _ -> "", attrs
        in
-       (* Transform value flattened by eval_match (one field record) back to
-          records *)
-       let raw_element_value = readd_one_fields ~attrs raw_element.me_value in
+       let raw_element_value = raw_element.me_value in
        (* Replace projections with their real name *)
        let raw_element_value =
          replace_projection
@@ -921,8 +946,11 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
        in
        (* Remove some specific record field related to the front-end language.
           This function is registered. *)
-       let raw_element_value =
-         Opt.get_def default_remove_field !remove_field_fun raw_element_value in
+       let attrs, raw_element_value =
+         Opt.get_def default_remove_field !remove_field_fun (attrs, raw_element_value) in
+       (* Transform value flattened by eval_match (one field record) back to
+          records *)
+       let attrs, raw_element_value = readd_one_fields ~attrs raw_element_value in
        let model_element = {
          me_name = construct_name (get_model_trace_string ~name ~attrs) attrs;
          me_value = raw_element_value;

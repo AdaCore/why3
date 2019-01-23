@@ -273,7 +273,7 @@ module Impl
     assert { precede (tb at Init) tb }
 
   let add (x:int) (b:'a) (tb:t 'a) : unit
-    writes { tb, tb.buffer.elts }
+    writes { tb }
     requires { correct tb }
     requires { x >= 0 }
     requires { inv tb b }
@@ -300,7 +300,7 @@ module Impl
       (assert { res = table (current_timestamp tb) x } ; res )
 
   let backtrack (t:timestamp 'a) (tb:t 'a) : unit
-    writes { tb,tb.buffer.elts }
+    writes { tb }
     requires { past_time t tb }
     requires { correct tb }
     ensures { correct tb }
@@ -327,7 +327,7 @@ module Impl
           func_of_array tbc.buffer Nil x = func_of_array tb.buffer Nil x) }
       requires { tb.buffer.length <= final_size }
       variant { delta }
-      writes { tb.history,tb.buffer.elts,tbc,tbc.buffer.elts }
+      writes { tb.history,tb.buffer.elts,tbc }
       ensures { correct tbc }
       ensures { tbc.history = tb.history /\
         (forall x:int. 0 <= x < final_size ->

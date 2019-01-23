@@ -130,6 +130,9 @@ let ident_printer () =
      (* From Z3 *)
       "map"; "bv"; "default";
       "difference";
+
+     (* Counterexamples specific keywords *)
+      "model";
       ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in

@@ -7,12 +7,10 @@ Transformations
   * `destruct` now simplifies away equalities on constructors
 
 Tools
-  * add a command 'why3 session update' to modify sessions from the
-    command line. So far, only one option exists, for renaming files
-    fixes issue #227
-  * option `--add-prover` of `why3 config` is now taking the shortcut as
-    second argument.  option `--list-prover-ids` renamed to
-    `--list-prover-families`. See documentation for details.
+  * added a command `why3 session update` to modify sessions from the
+    command line; so far, only option `-rename-file` exists, for renaming files
+  * `why3 config --add-prover` now takes the shortcut as second argument;
+    option `--list-prover-ids` has been renamed to `--list-prover-families` :x:
 
 IDE
   * clicking on the status of a failed proof attempt in the proof tree
