@@ -22,6 +22,10 @@ let get_only_first l =
     (* Records for int__content, bool__content, real__content or anything
        content: we are only interested in the value (not in the record). *)
       true
+  | [x] when Strings.has_prefix "__split_fields" x ->
+      true
+  | [x] when Strings.has_prefix "__split_discrs" x ->
+      true
   | _ -> false
 
 let remove_fields_attrs attrs =
@@ -116,7 +120,9 @@ let apply_to_record (list_records: (string list) Mstr.t)
             let new_st =
                 List.fold_left2 (fun acc s e ->
                   if Strings.has_prefix "us_split_fields" s ||
-                     Strings.has_prefix "us_split_discrs" s
+                     Strings.has_prefix "us_split_discrs" s ||
+                     Strings.has_prefix "__split_discrs" s ||
+                     Strings.has_prefix "__split_fields" s
                   then
                     (match e with
                     | Record (_, a) -> acc @ a
