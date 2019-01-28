@@ -1,5 +1,17 @@
 :x: marks a potential source of incompatibility
 
+Session
+  * file path stored in session files are now represented in an
+    system-independent way, so as to work for example under exotic OS
+    like MS-windows
+
+Drivers
+  * the clause `syntax converter` disappeared. Any former use should
+    be replaced by `syntax literal` and/or `syntax function`
+
+Language
+  * the `any` expression is now always ghost
+
 Transformations
   * `split_vc` and `subst_all` now avoid substituting user symbols by
     generated ones :x:
@@ -8,9 +20,11 @@ Transformations
 
 Tools
   * added a command `why3 session update` to modify sessions from the
-    command line; so far, only option `-rename-file` exists, for renaming files
-  * `why3 config --add-prover` now takes the shortcut as second argument;
-    option `--list-prover-ids` has been renamed to `--list-prover-families` :x:
+    command line; so far, only option `-rename-file` exists, for
+    renaming files
+  * `why3 config --add-prover` now takes the shortcut as second
+    argument; option `--list-prover-ids` has been renamed to
+    `--list-prover-families` :x:
 
 IDE
   * clicking on the status of a failed proof attempt in the proof tree
