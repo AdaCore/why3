@@ -148,7 +148,7 @@ let print_prover_answer fmt = function
   | Valid -> fprintf fmt "Valid"
   | Invalid -> fprintf fmt "Invalid"
   | Timeout -> fprintf fmt "Timeout"
-  | OutOfMemory -> fprintf fmt "Ouf Of Memory"
+  | OutOfMemory -> fprintf fmt "Out Of Memory"
   | StepLimitExceeded -> fprintf fmt "Step limit exceeded"
   | Unknown s -> fprintf fmt "Unknown (%s)" s
   | Failure s -> fprintf fmt "Failure (%s)" s
