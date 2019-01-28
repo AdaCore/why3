@@ -300,6 +300,115 @@ Makarius Wenzel.
 \chapter{Release Notes}
 %HEVEA\cutname{changes.html}
 
+\section{Release Note for version 1.2: new syntax for ``auto-dereference''}
+
+Version 1.2 introduces a simplified syntax for reference variables, to
+avoid the somehow heavy OCaml syntax using bang character. In short,
+this is syntactic sugar summarized in the following table.  An example
+using this new syntax is in \url{examples/isqrt.mlw}
+
+\begin{center}
+  \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+\hline
+\textbf{auto-dereference syntax} & \textbf{desugared to} \\
+\hline
+\texttt{let \&x = ... in} & \texttt{let (x: ref ...) = ... in} \\
+\hline
+\texttt{f x;} & \texttt{f x.contents;} \\
+\hline
+\texttt{x <- ...} & \texttt{x.contents <- ...} \\
+\hline
+\texttt{let ref x = ...} & \texttt{let \&x = ref ...} \\
+\hline
+\end{tabular}
+\end{center}
+Notice that:
+\begin{itemize}
+\item The \verb|&| marker adds the typing constraint \verb|(x: ref ...)|
+\item Top-level \verb|let/val ref| and \verb|let/val &| are allowed
+\item Auto-dereferencing works in logic, but such variables
+  cannot be introduced inside logical terms.
+\end{itemize}
+
+That syntactic sugar is further extended to pattern matching, function
+parameters and reference passing as follows.
+\begin{center}
+  \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+\hline
+\textbf{auto-dereference syntax} & \textbf{desugared to} \\
+\hline
+\texttt{match e with (x,\&y) -> y end} & \texttt{match e with
+ (x,(y: ref ...)) -> y.contents end} \\
+  \hline
+  \texttt{\begin{tabular}{l}
+            let incr (\&x: ref int) = \\
+            ~ x <- x + 1 \\
+            ~ \\
+            let f () = \\
+            ~ let ref x = 0 in \\
+            ~ incr x; \\
+            ~ x
+          \end{tabular}}
+  &
+    \texttt{\begin{tabular}{l}
+              let incr (x: ref int) = \\
+              ~ x.contents <- x.contents + 1 \\
+              ~ \\
+              let f () = \\
+              ~ let x = ref 0 in \\
+              ~ incr x; \\
+              ~ x.contents
+            \end{tabular}}
+  \\
+  \hline
+  \texttt{let incr (ref x: int)  ...} & \texttt{let incr (\&x: ref int) ...}
+                                        \\\hline
+\end{tabular}
+\end{center}
+
+The type annotation is not required. Let-functions with such formal
+parameters also prevent the actual argument from auto-dereferencing
+when used in logic. Pure logical symbols cannot be declared with such
+parameters.
+
+Auto-dereference suppression does not work in the middle of a relation
+chain: in \verb|0 < x :< 17|, \verb|x| will be dereferenced even if \verb|(:<)| expects a
+ref-parameter on the left.
+
+Finally, that syntactic sugar applies to the caller side:
+\begin{center}
+  \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+\hline
+\textbf{auto-dereference syntax} & \textbf{desugared to} \\
+\hline
+ \texttt{\begin{tabular}{l}
+    let f () = \\
+    ~ let ref x = 0 in \\
+    ~ g \&x
+         \end{tabular}}
+  &
+ \texttt{\begin{tabular}{l}
+          let f () = \\
+          ~ let x = ref 0 in \\
+          ~ g x
+         \end{tabular}
+  }
+  \\\hline
+\end{tabular}
+\end{center}
+The \verb|&| marker can only be attached to a variable. Works in logic.
+
+Ref-binders and \verb|&|-binders in variable declarations, patterns,
+and function parameters do not require importing \verb|ref.Ref|.
+Any example that does not use references inside data structures
+can be rewritten by using ref-binders, without importing \verb|ref.Ref|.
+
+Explicit use of type symbol "ref", program function "ref",
+or field "contents" require importing \verb|ref.Ref| or \verb|why3.Ref.Ref|.
+Operations \verb|(:=)| and \verb|(!)| require importing \verb|ref.Ref|.
+
+Operation \verb|(:=)| is fully subsumed by direct assignment \verb|(<-)|.
+
 \section{Release Notes for version 1.0: syntax changes w.r.t. 0.88}
 
 The syntax of \whyml programs changed in release 1.0.

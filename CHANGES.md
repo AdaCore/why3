@@ -11,6 +11,9 @@ Drivers
 
 Language
   * the `any` expression is now always ghost
+  * A syntactic sugar called "auto-dereference" is introduced, so as
+    to avoid, on simple programs, the heavy use of `(!)` character on
+    references. See details in Section A.1 of the manual.
 
 Transformations
   * `split_vc` and `subst_all` now avoid substituting user symbols by
