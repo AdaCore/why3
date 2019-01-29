@@ -4,9 +4,9 @@ module Ce_int32
   use export mach.int.Int32
 
   let dummy_update (r: ref int32)
-    requires { to_int !r = 22}
-    ensures {to_int !r = 42} =
-    r := of_int 42;
+    requires { int32'int !r = 22}
+    ensures { int32'int !r = 42} =
+    r := (42:int32);
     r := !r + !r;
 
 end
