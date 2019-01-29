@@ -633,34 +633,24 @@ let clear_tree_and_table goals_model =
 (* notebook is composed of a Task page and several source files pages *)
 let notebook = GPack.notebook ~packing:vpan222#add ()
 
-(********************************)
-(* Task view (part of notebook) *)
-(********************************)
-let scrolled_task_view =
-  let label = GMisc.label ~text:"Task" () in
-  GPack.vbox ~homogeneous:false ~packing:
-    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
-
-let scrolled_task_view =
-  GBin.scrolled_window
-    ~height:gconfig.task_height
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~shadow_type:`ETCHED_OUT
-    ~packing:scrolled_task_view#add ()
-
 let (_ : GtkSignal.id) =
-  scrolled_task_view#misc#connect#size_allocate
+  vpan222#set_position gconfig.task_height;
+  notebook#misc#connect#size_allocate
     ~callback:
     (fun {Gtk.width=_w;Gtk.height=h} ->
        gconfig.task_height <- h)
 
+(********************************)
+(* Task view (part of notebook) *)
+(********************************)
 
 let task_view =
+  let label = GMisc.label ~text:"Task" () in
   GSourceView.source_view
     ~editable:false
     ~cursor_visible:false
     ~show_line_numbers:true
-    ~packing:scrolled_task_view#add
+    ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
     ()
 
 
