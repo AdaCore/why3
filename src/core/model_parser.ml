@@ -560,12 +560,6 @@ let print_model ?(me_name_trans = why_name_trans)
     fmt
     model = print_model ~print_attrs ~me_name_trans ~print_model_value fmt model
 
-let model_to_string
-    ~print_attrs
-    ?(me_name_trans = why_name_trans)
-    model =
-  Format.asprintf "%a" (print_model ~print_attrs ~me_name_trans) model
-
 let get_model_file model filename =
   try
     StringMap.find filename model
@@ -577,30 +571,6 @@ let get_elements model_file line_number =
     IntMap.find line_number model_file
   with Not_found ->
     []
-
-(* TODO unused
-let print_model_vc_term
-    ~print_attrs
-    ?(me_name_trans = why_name_trans)
-    ?(sep = "\n")
-    fmt
-    model =
-  if not (is_model_empty model) then
-    match model.vc_term_loc with
-    | None -> fprintf fmt "error: cannot get location of the check"
-    | Some pos ->
-      let (filename, line_number, _, _) = Loc.get pos in
-      let model_file = get_model_file model.model_files filename in
-      let model_elements = get_elements model_file line_number in
-      print_model_elements ~print_attrs ~sep print_model_value me_name_trans fmt model_elements
-
-let model_vc_term_to_string
-    ~print_attrs
-    ?(me_name_trans = why_name_trans)
-    ?(sep = "\n")
-    model =
-  Format.asprintf "%a" (print_model_vc_term ~print_attrs ~me_name_trans ~sep) model
-*)
 
 let get_padding line =
   try
@@ -814,12 +784,6 @@ let print_model_json
     (print_model_elements_on_lines_json model me_name_to_str vc_line_trans)
     fmt
     model_files_bindings
-
-let model_to_string_json
-    ?(me_name_trans = why_name_trans)
-    ?(vc_line_trans = (fun i -> string_of_int i))
-    model =
-  asprintf "%a" (print_model_json ~me_name_trans ~vc_line_trans) model
 
 
 (*

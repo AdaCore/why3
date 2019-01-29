@@ -200,8 +200,8 @@ let craft_efficient_re l =
   Str.regexp s
 
 let debug_print_model ~print_attrs model =
-  let model_str = Model_parser.model_to_string ~print_attrs model in
-  Debug.dprintf debug "Call_provers: %s@." model_str
+  Debug.dprintf debug "Call_provers: %a@."
+                (Model_parser.print_model ?me_name_trans:None ~print_attrs) model
 
 type answer_or_model = Answer of prover_answer | Model of string
 
