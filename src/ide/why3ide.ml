@@ -249,11 +249,14 @@ let create_colors v =
       ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
   let error_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
+  let error_font_tag (v: GSourceView.source_view) = v#buffer#create_tag
+      ~name:"error_font_tag" [`BACKGROUND gconfig.error_color] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
   let _ : GText.tag = goal_tag v in
   let _ : GText.tag = error_line_tag v in
   let _ : GText.tag = error_tag v in
+  let _ : GText.tag = error_font_tag v in
   ()
 
 (* Erase all the source location tags in a source file *)
@@ -263,7 +266,8 @@ let erase_color_loc (v:GSourceView.source_view) =
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "goal_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
-  buf#remove_tag_by_name "error_line_tag" ~start:buf#start_iter ~stop:buf#end_iter
+  buf#remove_tag_by_name "error_line_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_font_tag" ~start:buf#start_iter ~stop:buf#end_iter
 
 
 
@@ -1060,6 +1064,7 @@ let convert_color (color: color): string =
   | Goal_color -> "goal_tag"
   | Error_color -> "error_tag"
   | Error_line_color -> "error_line_tag"
+  | Error_font_color -> "error_font_tag"
 
 let color_line ~color loc =
   let color_line (v:GSourceView.source_view) ~color l =
@@ -1534,7 +1539,7 @@ let treat_message_notification msg = match msg with
        begin
          scroll_to_loc ~force_tab_switch:true (Some loc);
          color_line ~color:Error_line_color loc;
-         color_loc ~color:Error_color loc;
+         color_loc ~color:Error_font_color loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
      else
