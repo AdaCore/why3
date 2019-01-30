@@ -1529,12 +1529,12 @@ let treat_message_notification msg = match msg with
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s ->
      print_message ~kind:0 ~notif_kind:"Open_File_Error" "%s" s
-  | Parse_Or_Type_Error (loc, rel_loc, s) ->
+  | Parse_Or_Type_Error (loc, _rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         scroll_to_loc ~force_tab_switch:true (Some rel_loc);
-         color_line ~color:Error_line_color rel_loc;
-         color_loc ~color:Error_color rel_loc;
+         scroll_to_loc ~force_tab_switch:true (Some loc);
+         color_line ~color:Error_line_color loc;
+         color_loc ~color:Error_color loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
      else
