@@ -463,8 +463,8 @@ let default_model = {
 type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
-  Sstr.t -> ((string * string) list) Mstr.t -> string list ->
-    Ident.Sattr.t Mstr.t -> string -> model_element list
+  Ident.ident Mstr.t -> ((string * string) list) Mstr.t ->
+    string list -> Ident.Sattr.t Mstr.t -> string -> model_element list
 
 (*
 ***************************************************************
@@ -822,14 +822,17 @@ let add_to_model model model_element =
     let model_file = IntMap.add line_number elements model_file in
     StringMap.add filename model_file model
 
-let recover_name term_map raw_name =
-  let t = Mstr.find raw_name term_map in
-  let name =
-    match t.t_node with
-    | Tapp (ls, []) -> ls.ls_name.id_string
-    | _ -> ""
+let recover_name list_projs term_map raw_name =
+  let name, attrs =
+    try let t = Mstr.find raw_name term_map in
+      match t.t_node with
+      | Tapp (ls, []) -> (ls.ls_name.id_string, t.t_attrs)
+      | _ -> ("", t.t_attrs)
+    with Not_found ->
+      let id = Mstr.find raw_name list_projs in
+      (id.id_string, id.id_attrs)
   in
-  construct_name (get_model_trace_string ~name ~attrs:t.t_attrs) t.t_attrs
+  construct_name (get_model_trace_string ~name ~attrs) attrs
 
 let rec replace_projection (const_function: string -> string) model_value =
   match model_value with
@@ -888,7 +891,9 @@ let remove_field_fun = ref None
 let register_remove_field f =
   remove_field_fun := Some f
 
-let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t) (model: model_files) =
+let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
+    (list_projs: Ident.ident Mstr.t)
+  =
   List.fold_left (fun model raw_element ->
     let raw_element_name = raw_element.me_name.men_name in
     try
@@ -905,7 +910,7 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
        (* Replace projections with their real name *)
        let raw_element_value =
          replace_projection
-           (fun x -> (recover_name term_map x).men_name)
+           (fun x -> (recover_name list_projs term_map x).men_name)
            raw_element_value
        in
        (* Remove some specific record field related to the front-end language.
@@ -941,7 +946,7 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
          ) attrs model
       )
     with Not_found -> model)
-    model
+    StringMap.empty
     raw_model
 
 let handle_contradictory_vc model_files vc_term_loc =
@@ -979,7 +984,8 @@ let handle_contradictory_vc model_files vc_term_loc =
 	model_files
 
 let build_model raw_model printer_mapping =
-  let model_files = build_model_rec raw_model printer_mapping.queried_terms empty_model in
+  let model_files = build_model_rec raw_model printer_mapping.queried_terms
+      printer_mapping.list_projections in
   let model_files = handle_contradictory_vc model_files printer_mapping.Printer.vc_term_loc in
   {
     vc_term_loc = printer_mapping.Printer.vc_term_loc;

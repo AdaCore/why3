@@ -34,6 +34,10 @@ IDE
     now generates counterexamples
   * added support for GTK3
 
+Counterexamples
+  * Field names now use ident names instead of smt generated ones:
+    int32qtint -> int32'int
+
 Provers
   * support for Z3 4.8.1 (released Oct 16, 2018)
   * support for Z3 4.8.3 (released Nov 20, 2018)

@@ -34,8 +34,9 @@ type printer_mapping = {
   queried_terms : Term.term Mstr.t;
   (* The list of terms that were queried for the counter-example
      by the printer *)
-  list_projections: Sstr.t;
-  (* List of projections as printed in the model *)
+  list_projections: Ident.ident Mstr.t;
+  (* List of projections as printed in the model. They corresponds to an ident
+     which is kept so that we can approximate its used name in task. *)
   list_records: ((string * string) list) Mstr.t;
   (* List of constructors with no arguments that can be confused for variables
      during parsing. *)

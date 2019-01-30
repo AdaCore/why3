@@ -4,8 +4,9 @@ bench/ce/records_inv.mlw M VC record_match_eval_test1: Timeout or Unknown
 Counter-example model:File records_inv.mlw:
 Line 15:
 x, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : true } }] } }
 Line 16:
 result, [[@introduced]] = {"type" : "Integer" ,
@@ -16,13 +17,15 @@ bench/ce/records_inv.mlw M VC record_match_eval_test2: Timeout or Unknown
 Counter-example model:File records_inv.mlw:
 Line 23:
 x, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 Line 24:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 
 bench/ce/records_inv.mlw M VC record_match_eval_test3: Timeout or Unknown
@@ -30,8 +33,9 @@ Counter-example model:File records_inv.mlw:
 Line 28:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 31:
 the check fails with all inputs
@@ -42,8 +46,9 @@ Counter-example model:File records_inv.mlw:
 Line 33:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 36:
 the check fails with all inputs
@@ -54,8 +59,9 @@ Counter-example model:File records_inv.mlw:
 Line 39:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 42:
 the check fails with all inputs
@@ -67,14 +73,16 @@ Counter-example model:File records_inv.mlw:
 Line 46:
 re, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 48:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 51:
 the check fails with all inputs

@@ -45,7 +45,7 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
-  mutable list_projs: Sstr.t;
+  mutable list_projs: Ident.ident Mstr.t;
   meta_model_projection: Sls.t;
   info_cntexample: bool
   }
@@ -93,7 +93,8 @@ let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
+    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
+        ls.ls_name info.list_projs;
   if ls.ls_args = [] && relevant_for_counterexample ls.ls_name then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
@@ -482,7 +483,7 @@ let print_task args ?old:_ fmt task =
     info_model = S.empty;
     info_vc_term = vc_info;
     info_in_goal = false;
-    list_projs = Sstr.empty;
+    list_projs = Mstr.empty;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
     info_cntexample = cntexample;
   } in

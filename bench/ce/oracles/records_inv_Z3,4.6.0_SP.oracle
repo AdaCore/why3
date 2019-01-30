@@ -4,8 +4,9 @@ bench/ce/records_inv.mlw M VC record_match_eval_test1: Timeout or Unknown
 Counter-example model:File records_inv.mlw:
 Line 15:
 x, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : true } }] } }
 Line 16:
 result, [[@introduced]] = {"type" : "Integer" ,
@@ -15,11 +16,11 @@ bench/ce/records_inv.mlw M VC record_match_eval_test1: Valid
 bench/ce/records_inv.mlw M VC record_match_eval_test2: Timeout or Unknown
 Counter-example model:File records_inv.mlw:
 Line 23:
-x, [[@introduced]] = {"proj_name" : "f" , "type" : "Proj" ,
+x, [[@introduced]] = {"proj_name" : ".my_field_f" , "type" : "Proj" ,
 "value" : {"type" : "Integer" , "val" : "0" } }
 Line 24:
-x, [[@introduced], [@model_trace:x]] = {"proj_name" : "f" , "type" : "Proj" ,
-"value" : {"type" : "Integer" ,
+x, [[@introduced], [@model_trace:x]] = {"proj_name" : ".my_field_f" ,
+"type" : "Proj" , "value" : {"type" : "Integer" ,
 "val" : "0" } }
 
 bench/ce/records_inv.mlw M VC record_match_eval_test3: Timeout or Unknown

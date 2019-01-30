@@ -3,8 +3,9 @@ bench/ce/records.mlw M VC record_match_eval_test1: Timeout or Unknown
 Counter-example model:File records.mlw:
 Line 14:
 x, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : true } }] } }
 Line 15:
 result, [[@introduced]] = {"type" : "Integer" ,
@@ -15,13 +16,15 @@ bench/ce/records.mlw M VC record_match_eval_test2: Timeout or Unknown
 Counter-example model:File records.mlw:
 Line 22:
 x, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 Line 23:
 x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "0" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } }
 
 bench/ce/records.mlw M VC record_match_eval_test3: Timeout or Unknown
@@ -29,34 +32,39 @@ Counter-example model:File ref.mlw:
 Line 18:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "-1" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 20:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 File records.mlw:
 Line 27:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "-1" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 28:
 x, [[@introduced], [@field:0:contents],
 [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 30:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 
 bench/ce/records.mlw M VC record_match_eval_test4: Timeout or Unknown
@@ -64,34 +72,39 @@ Counter-example model:File ref.mlw:
 Line 18:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "-1" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 20:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 File records.mlw:
 Line 32:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "-1" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 33:
 x, [[@introduced], [@field:0:contents],
 [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 35:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 
 bench/ce/records.mlw M VC record_match_eval_test44: Timeout or Unknown
@@ -99,34 +112,39 @@ Counter-example model:File ref.mlw:
 Line 18:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "-1" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 20:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 File records.mlw:
 Line 38:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "-1" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 40:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 42:
 x, [[@introduced], [@field:0:contents],
 [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 
 bench/ce/records.mlw M VC record_match_eval_test44: Valid
@@ -135,46 +153,53 @@ Counter-example model:File ref.mlw:
 Line 18:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "-1" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 20:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 File records.mlw:
 Line 45:
 re, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 47:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "-1" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "-1" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 48:
 re, [[@introduced], [@field:0:contents],
 [@model_trace:re]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 x, [[@introduced], [@field:0:contents],
 [@model_trace:x]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 Line 50:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "f" , "value" : {"type" : "Integer" ,
-"val" : "6" } }, {"field" : "g" , "value" : {"type" : "Boolean" ,
+"val" : {"Field" : [{"field" : ".my_field_f" ,
+"value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
+"value" : {"type" : "Boolean" ,
 "val" : false } }] } } }] } }
 
 bench/ce/records.mlw Mutable VC record_match_eval_test1: Timeout or Unknown

@@ -134,7 +134,7 @@ type info = {
   mutable info_in_goal : bool;
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
-  mutable list_projs : Sstr.t;
+  mutable list_projs : Ident.ident Mstr.t;
   info_version : version;
   meta_model_projection : Sls.t;
   mutable list_records : ((string * string) list) Mstr.t;
@@ -200,7 +200,7 @@ let print_var_list info fmt vsl =
 
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Sstr.add (sprintf "%a" (print_ident info) ls.ls_name) info.list_projs;
+    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) ls.ls_name info.list_projs;
   if ls.ls_args = [] && (relevant_for_counterexample ls.ls_name) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
@@ -714,7 +714,7 @@ let print_task version args ?old:_ fmt task =
     info_in_goal = false;
     info_vc_term = vc_info;
     info_printer = ident_printer ();
-    list_projs = Sstr.empty;
+    list_projs = Mstr.empty;
     info_version = version;
     meta_model_projection = Task.on_tagged_ls meta_projection task;
     list_records = Mstr.empty;

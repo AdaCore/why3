@@ -291,7 +291,7 @@ type model_parser =  string -> Printer.printer_mapping -> model
 *)
 
 type raw_model_parser =
-  Wstdlib.Sstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
+  Ident.ident Wstdlib.Mstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
     string list -> Ident.Sattr.t Wstdlib.Mstr.t -> string -> model_element list
 (** Parses the input string into model elements.
     [raw_model_parser: proj->record_map->noarg_cons->s->mel]

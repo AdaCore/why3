@@ -34,7 +34,7 @@ type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
   queried_terms : Term.term Mstr.t;
-  list_projections: Sstr.t;
+  list_projections: Ident.ident Mstr.t;
   list_records: ((string * string) list) Mstr.t;
   noarg_constructors: string list;
   set_str: Sattr.t Mstr.t
@@ -61,7 +61,7 @@ let get_default_printer_mapping = {
   lsymbol_m = (function _ -> raise Not_found);
   vc_term_loc = None;
   queried_terms = Mstr.empty;
-  list_projections = Sstr.empty;
+  list_projections = Mstr.empty;
   list_records = Mstr.empty;
   noarg_constructors = [];
   set_str = Mstr.empty

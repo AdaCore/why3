@@ -597,8 +597,10 @@ and convert_tarray_to_array a =
   | TConst t -> Const (convert_tterm_to_term t)
   | TStore (a, t1, t2) -> Store (convert_tarray_to_array a, convert_tterm_to_term t1, convert_tterm_to_term t2)
 
-let create_list (projections_list: Sstr.t) (list_records: ((string * string) list) Mstr.t)
-    (noarg_constructors: string list) (set_str: Ident.Sattr.t Mstr.t) (table: definition Mstr.t) =
+let create_list (projections_list: Ident.ident Mstr.t)
+    (list_records: ((string * string) list) Mstr.t)
+    (noarg_constructors: string list) (set_str: Ident.Sattr.t Mstr.t)
+    (table: definition Mstr.t) =
 
   (* Convert list_records to take replace fields with model_trace when
      necessary. *)
@@ -642,7 +644,7 @@ let create_list (projections_list: Sstr.t) (list_records: ((string * string) lis
   (* First recover values stored in projections that were registered *)
   let table =
     Mstr.fold (fun key value acc ->
-      if Sstr.mem key projections_list then
+      if Mstr.mem key projections_list then
         add_vars_to_table acc key value
       else
         acc)
