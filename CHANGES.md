@@ -37,6 +37,7 @@ IDE
 Counterexamples
   * Field names now use ident names instead of smt generated ones:
     int32qtint -> int32'int
+  * Fix parsing of bitvector counterexamples orignated from Z3
 
 Provers
   * support for Z3 4.8.1 (released Oct 16, 2018)
