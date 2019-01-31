@@ -117,16 +117,9 @@ let sqrt1 (rp: ptr uint64) (a0: uint64): uint64
               = from_int ((c+2) * (c+2))
            };
   let ref s = c * c in
-  assert { (c+1) * (c+1) <= radix
-           so iexp x = -32
-           so pow2 32 *. x <. pow2 32
-           so 0 <= Trunc.floor (pow2 32 *. x)
-                < power 2 32
-           so c < power 2 32
-           so c+1 <= power 2 32
-           so (c+1) * (c+1) <= power 2 32 * power 2 32 = radix };
+  assert { (c+1) * (c+1) <= radix };
   assert { s + c <= s + c + c < (c+1) * (c+1) <= radix };
-  if (s + c + c <= a0 - 1)
+  if (s + 2 * c <= a0 - 1)
   then begin
     assert { (c+1) * (c+1) <= a0 };
     s <- s + 2 * c + 1;
