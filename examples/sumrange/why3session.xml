@@ -5,7 +5,9 @@
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../sumrange.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="sumrange.mlw"/>
 <theory name="ArraySum" proved="true">
  <goal name="VC sum" expl="VC for sum" proved="true">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -178,24 +180,24 @@
   <goal name="VC tree_of_array.7" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC tree_of_array.7.0" expl="assertion" proved="true">
-   <transf name="destruct_alg" proved="true" arg1="l">
+   <transf name="destruct_term" proved="true" arg1="l">
     <goal name="VC tree_of_array.7.0.0" expl="assertion" proved="true">
-    <transf name="destruct_alg" proved="true" arg1="r">
+    <transf name="destruct_term" proved="true" arg1="r" arg2="using" arg3="b1,b2,b3">
      <goal name="VC tree_of_array.7.0.0.0" expl="assertion" proved="true">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     <proof prover="3" timelimit="5"><result status="valid" time="0.11"/></proof>
      </goal>
      <goal name="VC tree_of_array.7.0.0.1" expl="assertion" proved="true">
-     <proof prover="3"><result status="valid" time="0.08"/></proof>
+     <proof prover="3" timelimit="5"><result status="valid" time="0.04"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="VC tree_of_array.7.0.1" expl="assertion" proved="true">
-    <transf name="destruct_alg" proved="true" arg1="r">
+    <transf name="destruct_term" proved="true" arg1="r">
      <goal name="VC tree_of_array.7.0.1.0" expl="assertion" proved="true">
-     <proof prover="3"><result status="valid" time="0.05"/></proof>
+     <proof prover="3"><result status="valid" time="0.08"/></proof>
      </goal>
      <goal name="VC tree_of_array.7.0.1.1" expl="assertion" proved="true">
-     <proof prover="3"><result status="valid" time="0.06"/></proof>
+     <proof prover="3"><result status="valid" time="0.04"/></proof>
      </goal>
     </transf>
     </goal>
@@ -228,12 +230,12 @@
  <goal name="VC query" expl="VC for query" proved="true">
  <transf name="introduce_premises" proved="true" >
   <goal name="VC query.0" expl="VC for query" proved="true">
-  <transf name="destruct_alg" proved="true" arg1="t">
+  <transf name="destruct_term" proved="true" arg1="t">
    <goal name="VC query.0.0" expl="VC for query" proved="true">
-   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC query.0.1" expl="VC for query" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
@@ -289,12 +291,12 @@
  <goal name="VC update" expl="VC for update" proved="true">
  <transf name="introduce_premises" proved="true" >
   <goal name="VC update.0" expl="VC for update" proved="true">
-  <transf name="destruct_alg" proved="true" arg1="t">
+  <transf name="destruct_term" proved="true" arg1="t">
    <goal name="VC update.0.0" expl="VC for update" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC update.0.1" expl="VC for update" proved="true">
-   <proof prover="3"><result status="valid" time="0.03"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
