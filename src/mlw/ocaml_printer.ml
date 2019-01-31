@@ -689,8 +689,7 @@ module Print = struct
 
   let extract_functor_args info dl =
     let rec extract args = function
-      (* FIXME remove empty args? *)
-      (* | Dmodule (_, []) :: dl -> extract args dl *)
+      | Dmodule (_, []) :: dl -> extract args dl
       | Dmodule (x, dlx) :: dl when is_signature info dlx ->
           extract ((x, dlx) :: args) dl
       | dl -> List.rev args, dl in
