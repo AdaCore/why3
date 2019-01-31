@@ -1,0 +1,14 @@
+Strongest Postcondition
+bench/ce/double_projection.mlw Test VC f: Unknown (sat)
+Counter-example model:File double_projection.mlw:
+Line 17:
+x, [[@introduced]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "c" , "value" : {"type" : "Integer" ,
+"val" : "1" } }, {"field" : "d" , "value" : {"type" : "Integer" ,
+"val" : "0" } }] } }
+Line 19:
+x, [[@introduced], [@model_trace:x]] = {"type" : "Record" ,
+"val" : {"Field" : [{"field" : "c" , "value" : {"type" : "Integer" ,
+"val" : "1" } }, {"field" : "d" , "value" : {"type" : "Integer" ,
+"val" : "0" } }] } }
+
