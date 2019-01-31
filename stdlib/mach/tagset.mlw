@@ -1,0 +1,316 @@
+module S
+
+  use int.Int
+  use mach.int.Int63 as Int63
+
+  type key
+
+  val function tag (k:key): Int63.int63
+      ensures { 0 <= result }
+
+  axiom tag_correct: forall x y. tag x = tag y -> x = y
+
+end
+
+module TagSetIntf
+
+  use int.Int
+  use import mach.int.Int63 as Int63
+  use map.Map
+  use map.Const
+  use set.Fset as S
+  use list.List
+  use list.Mem as LMem
+  use import mach.array.Array63 as Array
+  use seq.Seq as Seq
+  use bool.Bool
+  use mach.peano.Peano as Peano
+  use mach.peano.Int63 as PeanoInt63
+  use ref.Ref
+
+  clone import S as S with axiom tag_correct
+
+  type iteration_state = mutable { }
+
+  type t = abstract {
+         mutable elts: S.set key;
+         max_tags_: int;
+         mutable iterated: iteration_state;
+       }
+   invariant { forall v. S.mem v elts -> tag v <= max_tags_ }
+   by {
+      elts = S.empty;
+      max_tags_ = 0;
+      iterated = any iteration_state;
+    }
+
+  val create (s:Int63.int63) (def:key) : t
+   requires { -1 <= s < Int63.max_int63 }
+   ensures { result.elts = S.empty }
+   ensures { result.max_tags_ = s }
+
+  val function mem (k: key) (h: t) : bool
+   ensures { result = S.mem k h.elts }
+
+  val function max_tags (h: t) : Int63.int63
+    ensures { result = h.max_tags_ }
+
+  val add (h: t) (k: key): unit
+    requires { tag k <= h.max_tags }
+    ensures { h.elts = S.add k (old h.elts) }
+    writes { h.elts, h.iterated }
+
+  type iterator = abstract {
+       iterating: iteration_state;
+       mutable seen: S.set key;
+       mutable todo: S.set key;
+       all: S.set key;
+  }
+  invariant { S.(union seen todo == all) }
+  invariant { S.(inter seen todo == S.empty) }
+  by {
+    iterating = any iteration_state;
+    seen = S.empty;
+    todo = S.empty;
+    all = S.empty
+    }
+
+  scope Iterator
+
+     val create (h:t) : iterator
+          ensures { result.seen = S.empty }
+          ensures { result.todo = h.elts }
+          ensures { result.all = h.elts }
+          alias { result.iterating with h.iterated }
+
+      predicate is_empty (i:iterator) = S.is_empty i.todo
+
+      val is_empty (i:iterator) : bool
+          ensures { result = (S.is_empty i.todo) }
+
+      val next (i:iterator) : key
+          requires { not (S.is_empty i.todo) }
+          writes { i.seen, i.todo }
+          ensures { S.mem result (old i.todo) }
+          ensures { i.todo = S.remove result (old i.todo) }
+          ensures { i.seen = S.add result (old i.seen) }
+  end
+
+end
+
+module TagSet
+
+  use int.Int
+  use import mach.int.Int63 as Int63
+  use set.Fset as S
+  use import mach.array.Array63 as Array
+  use seq.Seq
+  use bool.Bool
+  use mach.peano.Peano as Peano
+  use mach.peano.Int63 as PeanoInt63
+  use ref.Ref
+
+  clone import S as S with axiom tag_correct
+
+  type iteration_state = mutable {
+       ghost max_tags_': int;
+       ghost mutable elts': S.set key;
+       present: array bool;
+       value: array key;
+  }
+  invariant { forall v. S.mem v elts' -> tag v <= max_tags_'  }
+  invariant { forall v. S.mem v elts' -> present[tag v] }
+  invariant { forall i. 0 <= i <= max_tags_' -> present[i] -> tag (value[i]) = i }
+  invariant { forall i. 0 <= i <= max_tags_' -> present[i] -> forall v. tag v = i -> S.mem v elts' }
+  invariant { present.length = max_tags_' + 1 }
+  invariant { value.length = max_tags_' + 1 }
+  by {
+     max_tags_' = -1;
+     elts' = S.empty;
+     present = Array.make 0 false;
+     value = Array.make 0 (any key);
+   }
+
+  type t = {
+         ghost mutable elts: S.set key;
+         ghost max_tags_: int;
+         mutable iterated: iteration_state;
+       }
+   invariant { max_tags_ = iterated.max_tags_' }
+   invariant { elts = iterated.elts' }
+
+  let create (s:Int63.int63) (def:key) : t
+   requires { -1 <= s < Int63.max_int63 }
+   ensures { result.elts = S.empty }
+   ensures { result.max_tags_ = s } =
+   let iterated =  {
+         elts' = S.empty;
+         max_tags_' = Int63.to_int s;
+         present = Array.make (s+1) false;
+         value = Array.make (s+1) def;
+      }
+   in
+   {
+      elts = S.empty;
+      max_tags_ = Int63.to_int s;
+      iterated = iterated;
+   }
+
+  let function mem (k: key) (h: t) : bool
+   ensures { result = S.mem k h.elts } =
+     tag k < Array.length h.iterated.present && Array.(h.iterated.present[tag k])
+
+  let function max_tags (h: t) : Int63.int63
+    ensures { result = h.max_tags_ } =
+    Array.(length h.iterated.present) - 1
+
+  let add (h: t) (k: key): unit
+    requires { tag k <= h.max_tags }
+    ensures { h.elts = S.add k (old h.elts) }
+    writes { h.elts , h.iterated, h.iterated.present, h.iterated.value(*, h.iterated.elts'*) } =
+    h.elts <- S.add k h.elts;
+    h.iterated.elts' <- S.add k h.iterated.elts';
+    h.iterated.present[tag k] <- true;
+    h.iterated.value[tag k] <- k ;
+    if false then
+       h.iterated <- {
+           max_tags_' = h.iterated.max_tags_';
+           elts' = h.iterated.elts';
+           present = h.iterated.present;
+           value = h.iterated.value;
+         }
+
+  type iterator = {
+       iterating: iteration_state;
+       ghost mutable seen: S.set key;
+       ghost mutable todo: S.set key;
+       ghost all: S.set key;
+       mutable offset: int63;
+  }
+  invariant { S.(==) all (S.union seen todo) }
+  invariant { all = iterating.elts' }
+  invariant { 0 <= offset <= Seq.length iterating.present }
+  invariant { offset < Seq.length iterating.present -> iterating.present[offset] }
+  invariant { forall v. S.mem v all -> (0 <= tag v < offset) <-> S.mem v seen }
+  invariant { forall v. S.mem v all -> (offset <= tag v < Seq.length iterating.present) <-> S.mem v todo }
+  by {
+    seen = S.empty;
+    todo = S.empty;
+    all = S.empty;
+    offset = 0;
+    iterating =  {
+     max_tags_' = -1;
+     elts' = S.empty;
+     present = Array.make 0 false;
+     value = Array.make 0 (any key);
+   }
+ }
+
+  scope Iterator
+
+      let create (h:t) : iterator
+          ensures { result.seen = S.empty }
+          ensures { result.todo = h.elts }
+          ensures { result.all = h.elts }
+          alias { result.iterating with h.iterated }
+      =
+       let i = ref 0 in
+       while !i < Array.length h.iterated.present && notb Array.(h.iterated.present[!i]) do
+          variant { Array.length h.iterated.present - !i }
+          invariant { 0 <= !i <= Array.length h.iterated.present }
+          invariant { forall j. 0 <= j < !i -> notb h.iterated.present[j] }
+          i := !i + 1
+       done;
+       {
+          iterating = h.iterated;
+          seen = S.empty;
+          todo = h.elts;
+          all = h.elts;
+          offset = !i;
+        }
+
+
+      predicate is_empty (i:iterator) = S.is_empty i.todo
+
+      let is_empty (i:iterator) : bool
+          ensures { result = (S.is_empty i.todo) } =
+          if i.offset = Array.length i.iterating.present
+          then begin
+            assert { forall v. S.mem v i.todo -> S.mem v i.all };
+            True
+          end
+          else begin
+            assert { i.offset < Array.length i.iterating.present };
+            assert { i.iterating.present[i.offset] };
+            assert { i.iterating.present[i.offset] };
+            assert { S.mem i.iterating.value[i.offset] i.all };
+            assert { S.mem i.iterating.value[i.offset] i.todo };
+            False
+          end
+
+      let next (i:iterator) : key
+          requires { not (S.is_empty i.todo) }
+          writes { i.seen, i.todo, i.offset }
+          ensures { S.mem result (old i.todo) }
+          ensures { i.todo = S.remove result (old i.todo) }
+          ensures { i.seen = S.add result (old i.seen) } =
+           assert { i.offset < Array.length i.iterating.present };
+           let k = Array.(i.iterating.value[i.offset]) in
+           i.seen <- S.add k i.seen;
+           i.todo <- S.remove k i.todo;
+           i.offset <- i.offset + 1;
+           while i.offset < Array.length i.iterating.present && notb Array.(i.iterating.present[i.offset]) do
+             invariant { old i.offset < i.offset <= Array.length i.iterating.present }
+             invariant { forall j. old i.offset < j < i.offset -> notb i.iterating.present[j] }
+             variant { Array.length i.iterating.present - i.offset }
+             i.offset <- i.offset + 1
+           done;
+           assert { forall j. old i.offset < j < i.offset -> notb i.iterating.present[j] };
+           k
+  end
+
+(*
+  clone TagSetIntf with
+        type S.key = key,
+        val S.tag = tag,
+        lemma S.tag_correct,
+        type iteration_state = iteration_state,
+        type t = t,
+        val create = create,
+        val mem = mem,
+        val max_tags = max_tags,
+        val add = add,
+        type iterator = iterator,
+        val Iterator.create = Iterator.create,
+        val Iterator.is_empty = Iterator.is_empty,
+        val Iterator.next = Iterator.next
+*)
+
+end
+
+(* module T *)
+
+(*        use mach.int.Int63 *)
+
+(*        type t = *)
+(*        | A *)
+(*        | B *)
+
+(*        let function tag (x:t) : int63 = match x with A -> 0 | B -> 1 end *)
+(*        clone TagSet with type S.key = t, val S.tag = tag *)
+
+(*        let test () = *)
+(*            let s = create 10 A in *)
+(*            add s A; *)
+(*            let iter1 = Iterator.create s in *)
+(*            assert { not (Iterator.is_empty iter1) }; *)
+(*            let b = Iterator.is_empty iter1 in *)
+(*            assert { not b }; *)
+(*            let x = Iterator.next iter1 in *)
+(*            assert { x = A }; *)
+(*            add s B; *)
+(*            let x = Iterator.next iter1 in *)
+(*            assert { x = A } *)
+
+
+(* end *)
