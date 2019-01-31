@@ -20,6 +20,8 @@ Transformations
     generated ones :x:
   * `destruct_rec` applies `destruct` recursively on a goal
   * `destruct` now simplifies away equalities on constructors
+  * `destruct_alg` renamed to `destruct_term`. It also has a new experimental
+    keyword `using` to name newly destructed elements
 
 Tools
   * added a command `why3 session update` to modify sessions from the
