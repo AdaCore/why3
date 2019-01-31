@@ -92,12 +92,15 @@ module Print = struct
     List.iter (fun s -> Hstr.add h s ()) ocaml_keywords;
     Hstr.mem h
 
+  let char_to_alnumusquote c =
+    match c with '\'' -> "\'" | _ -> char_to_alnumus c
+
   (* iprinter: local names
      aprinter: type variables
      tprinter: toplevel definitions *)
   let iprinter, aprinter, tprinter =
-    let isanitize = sanitizer char_to_alnumus char_to_alnumus in
-    let lsanitize = sanitizer char_to_lalnumus char_to_alnumus in
+    let isanitize = sanitizer char_to_alnumus char_to_alnumusquote in
+    let lsanitize = sanitizer char_to_lalnumus char_to_alnumusquote in
     create_ident_printer ocaml_keywords ~sanitizer:isanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize,
     create_ident_printer ocaml_keywords ~sanitizer:lsanitize
