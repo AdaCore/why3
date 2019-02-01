@@ -4,7 +4,9 @@
 <why3session shape_version="5">
 <prover id="0" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../bellman_ford.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="bellman_ford.mlw"/>
 <theory name="Graph" proved="true">
  <goal name="vertices_cardinal_pos" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
@@ -103,7 +105,7 @@
 </theory>
 <theory name="BellmanFord" proved="true">
  <goal name="VC initialize_single_source" expl="VC for initialize_single_source" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="VC inv2_path" expl="VC for inv2_path" proved="true">
  <transf name="split_goal_right" proved="true" >

@@ -157,6 +157,9 @@ let meta_float = register_meta "float_type" [MTtysymbol; MTlsymbol; MTlsymbol]
 let meta_projection = register_meta "model_projection" [MTlsymbol]
   ~desc:"Declares@ the@ projection."
 
+let meta_record = register_meta "model_record" [MTlsymbol]
+  ~desc:"Declares@ the@ record field."
+
 (** Theory *)
 
 type theory = {

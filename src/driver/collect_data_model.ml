@@ -390,44 +390,51 @@ let convert_simple_to_model_value (v: simple_value) =
   | Boolean b -> Model_parser.Boolean b
   | Other _s -> raise Not_value
 
-let rec convert_array_value (a: array) : Model_parser.model_array =
+(* In the following lf is the list of fields. It is used to differentiate
+   projections from fields so that projections cannot be reconstructed into a
+   record. *)
+let rec convert_array_value lf (a: array) : Model_parser.model_array =
   let array_indices = ref [] in
 
   let rec create_array_value a =
     match a with
     | Array_var _v -> raise Not_value
     | Const t -> { Model_parser.arr_indices = !array_indices;
-                   Model_parser.arr_others = convert_to_model_value t}
+                   Model_parser.arr_others = convert_to_model_value lf t}
     | Store (a, t1, t2) ->
         let new_index =
           { Model_parser.arr_index_key = convert_to_indice t1;
-            Model_parser.arr_index_value = convert_to_model_value t2} in
+            Model_parser.arr_index_value = convert_to_model_value lf t2} in
         array_indices := new_index :: !array_indices;
         create_array_value a in
   create_array_value a
 
-and convert_to_model_value (t: term): Model_parser.model_value =
+and convert_to_model_value lf (t: term): Model_parser.model_value =
   match t with
   | Sval v -> convert_simple_to_model_value v
-  | Array a -> Model_parser.Array (convert_array_value a)
+  | Array a -> Model_parser.Array (convert_array_value lf a)
   | Record (_n, l) ->
-      Model_parser.Record (convert_record l)
+      Model_parser.Record (convert_record lf l)
   | Trees tree ->
       begin match tree with
       | [] -> raise Not_value
       | [field, value] ->
-          Model_parser.Proj (field, convert_to_model_value value)
+          Model_parser.Proj (field, convert_to_model_value lf value)
       | l ->
-          Model_parser.Record
-            (List.map (fun (field, value) ->
-                 let model_value = convert_to_model_value value in
-                 (field, model_value))
-                l)
+          if List.for_all (fun x -> Mstr.mem (fst x) lf) l then
+            Model_parser.Record
+              (List.map (fun (field, value) ->
+                   let model_value = convert_to_model_value lf value in
+                   (field, model_value))
+                  l)
+          else
+            let (proj_name, proj_value) = List.hd l in
+            Model_parser.Proj (proj_name, convert_to_model_value lf proj_value)
       end
   | Cvc4_Variable _v -> raise Not_value (*Model_parser.Unparsed "!"*)
   (* TODO change the value returned for non populated Cvc4 variable '!' -> '?' ? *)
-  | To_array t -> convert_to_model_value (Array (convert_z3_array t))
-  | Apply (s, lt) -> Model_parser.Apply (s, List.map convert_to_model_value lt)
+  | To_array t -> convert_to_model_value lf (Array (convert_z3_array t))
+  | Apply (s, lt) -> Model_parser.Apply (s, List.map (convert_to_model_value lf) lt)
   | Function_Local_Variable _ | Variable _ | Ite _ -> raise Not_value
 
 and convert_z3_array (t: term) : array =
@@ -451,11 +458,11 @@ and convert_z3_array (t: term) : array =
   in
   convert_array t
 
-and convert_record l =
-  List.map (fun (f, v) -> f, convert_to_model_value v) l
+and convert_record lf l =
+  List.map (fun (f, v) -> f, convert_to_model_value lf v) l
 
-let convert_to_model_element ~set_str name (t: term) =
-  let value = convert_to_model_value t in
+let convert_to_model_element ~set_str list_field name (t: term) =
+  let value = convert_to_model_value list_field t in
   let attrs =
     match Mstr.find name set_str with
     | exception Not_found -> Ident.Sattr.empty
@@ -598,6 +605,7 @@ and convert_tarray_to_array a =
   | TStore (a, t1, t2) -> Store (convert_tarray_to_array a, convert_tterm_to_term t1, convert_tterm_to_term t2)
 
 let create_list (projections_list: Ident.ident Mstr.t)
+    (field_list: Ident.ident Mstr.t)
     (list_records: ((string * string) list) Mstr.t)
     (noarg_constructors: string list) (set_str: Ident.Sattr.t Mstr.t)
     (table: definition Mstr.t) =
@@ -644,7 +652,7 @@ let create_list (projections_list: Ident.ident Mstr.t)
   (* First recover values stored in projections that were registered *)
   let table =
     Mstr.fold (fun key value acc ->
-      if Mstr.mem key projections_list then
+      if Mstr.mem key projections_list || Mstr.mem key field_list then
         add_vars_to_table acc key value
       else
         acc)
@@ -671,7 +679,7 @@ let create_list (projections_list: Ident.ident Mstr.t)
   (* Then converts all variables to raw_model_element *)
   Mstr.fold
     (fun key value list_acc ->
-      try (convert_to_model_element ~set_str key value :: list_acc)
+      try (convert_to_model_element ~set_str field_list key value :: list_acc)
       with Not_value when not (Debug.test_flag Debug.stack_trace) ->
         Debug.dprintf debug_cntex "Element creation failed: %s@." key; list_acc
       | e -> raise e)

@@ -7,7 +7,9 @@
 <prover id="3" name="Z3" version="4.6.0" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="20" steplimit="0" memlimit="0"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="30" steplimit="0" memlimit="1000"/>
-<file name="../vstte10_inverting.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="vstte10_inverting.mlw"/>
 <theory name="InvertingAnInjection" proved="true">
  <goal name="VC inverting" expl="VC for inverting" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -24,7 +26,7 @@
   <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC inverting.4" expl="postcondition" proved="true">
-  <proof prover="0" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v"><result status="valid" time="0.34"/></proof>
+  <proof prover="0" edited="vstte10_inverting_WP_InvertingAnInjection_WP_parameter_inverting_1.v"><result status="valid" time="1.00"/></proof>
   </goal>
   <goal name="VC inverting.5" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.00" steps="11"/></proof>
@@ -54,7 +56,7 @@
    <proof prover="6" timelimit="10"><result status="valid" time="0.00" steps="7"/></proof>
    </goal>
    <goal name="VC inverting2.5.1" expl="VC for inverting2" proved="true">
-   <proof prover="0" memlimit="1000" edited="vstte10_inverting_InvertingAnInjection_VC_inverting2_1.v"><result status="valid" time="0.24"/></proof>
+   <proof prover="0" memlimit="1000" edited="vstte10_inverting_InvertingAnInjection_VC_inverting2_1.v"><result status="valid" time="1.04"/></proof>
    </goal>
    <goal name="VC inverting2.5.2" expl="VC for inverting2" proved="true">
    <proof prover="1" timelimit="30"><result status="valid" time="0.01"/></proof>

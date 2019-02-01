@@ -182,7 +182,7 @@
       before a letter. You can only use ' followed by _ or a number."
 
   let add_record_projections (d: Ptree.decl) =
-    let meta_id = {id_str = Theory.(meta_projection.meta_name);
+    let meta_id = {id_str = Theory.(meta_record.meta_name);
                    id_ats = [];
                    id_loc = Loc.dummy_position}
     in

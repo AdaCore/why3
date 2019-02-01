@@ -46,7 +46,9 @@ type info = {
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
   mutable list_projs: Ident.ident Mstr.t;
+  mutable list_field_def: Ident.ident Mstr.t;
   meta_model_projection: Sls.t;
+  meta_record_def : Sls.t;
   info_cntexample: bool
   }
 
@@ -422,6 +424,7 @@ let print_prop_decl vc_loc args info fmt k pr f =
 				vc_term_loc = vc_loc;
 				queried_terms = model_list;
                                 list_projections = info.list_projs;
+                                list_fields = info.list_field_def;
                                 list_records = Mstr.empty;
                                 noarg_constructors = [];
                                 set_str = Mstr.empty};
@@ -484,7 +487,9 @@ let print_task args ?old:_ fmt task =
     info_vc_term = vc_info;
     info_in_goal = false;
     list_projs = Mstr.empty;
+    list_field_def = Mstr.empty;
     meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
+    meta_record_def = Task.on_tagged_ls Theory.meta_record task;
     info_cntexample = cntexample;
   } in
   print_prelude fmt args.prelude;

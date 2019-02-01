@@ -6,7 +6,9 @@
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_2018_le_rouge_et_le_noir_1.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="verifythis_2018_le_rouge_et_le_noir_1.mlw"/>
 <theory name="ColoredTiles" proved="true">
  <goal name="valid_contr" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="6"/></proof>
@@ -667,10 +669,10 @@
        <goal name="VC enum.14.0.0.0.0.0" expl="VC for enum" proved="true">
        <transf name="apply" proved="true" arg1="colo_31">
         <goal name="VC enum.14.0.0.0.0.0.0" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.02"/></proof>
+        <proof prover="3"><result status="valid" time="0.01"/></proof>
         </goal>
         <goal name="VC enum.14.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.01"/></proof>
+        <proof prover="3"><result status="valid" time="0.02"/></proof>
         </goal>
        </transf>
        </goal>
@@ -684,11 +686,11 @@
        <goal name="VC enum.14.0.0.0.2.0" expl="VC for enum" proved="true">
        <transf name="apply" proved="true" arg1="colo_3">
         <goal name="VC enum.14.0.0.0.2.0.0" expl="apply premises" proved="true">
-        <transf name="apply" proved="true" arg1="H">
-        </transf>
+        <proof prover="0"><result status="valid" time="0.26" steps="854"/></proof>
         </goal>
         <goal name="VC enum.14.0.0.0.2.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.26" steps="854"/></proof>
+        <transf name="apply" proved="true" arg1="H">
+        </transf>
         </goal>
        </transf>
        </goal>
@@ -982,10 +984,10 @@
   <goal name="VC enum.55" expl="loop invariant preservation" proved="true">
   <transf name="apply" proved="true" arg1="H21">
    <goal name="VC enum.55.0" expl="apply premises" proved="true">
-   <proof prover="3"><result status="valid" time="0.04"/></proof>
+   <proof prover="3"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="VC enum.55.1" expl="apply premises" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>

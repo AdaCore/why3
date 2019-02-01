@@ -463,7 +463,7 @@ let default_model = {
 type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
-  Ident.ident Mstr.t -> ((string * string) list) Mstr.t ->
+  Ident.ident Mstr.t -> Ident.ident Mstr.t -> ((string * string) list) Mstr.t ->
     string list -> Ident.Sattr.t Mstr.t -> string -> model_element list
 
 (*
@@ -984,9 +984,13 @@ let handle_contradictory_vc model_files vc_term_loc =
 	model_files
 
 let build_model raw_model printer_mapping =
-  let model_files = build_model_rec raw_model printer_mapping.queried_terms
-      printer_mapping.list_projections in
-  let model_files = handle_contradictory_vc model_files printer_mapping.Printer.vc_term_loc in
+  let list_projs =
+    Wstdlib.Mstr.union (fun _ x _ -> Some x) printer_mapping.list_projections
+      printer_mapping.list_fields in
+  let model_files =
+    build_model_rec raw_model printer_mapping.queried_terms list_projs in
+  let model_files =
+    handle_contradictory_vc model_files printer_mapping.Printer.vc_term_loc in
   {
     vc_term_loc = printer_mapping.Printer.vc_term_loc;
     model_files = model_files;
@@ -1053,10 +1057,11 @@ let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
     let list_proj = printer_mapping.list_projections in
+    let list_fields = printer_mapping.list_fields in
     let list_records = printer_mapping.list_records in
     let noarg_cons = printer_mapping.noarg_constructors in
     let set_str = printer_mapping.set_str in
-    let raw_model = raw_mp list_proj list_records noarg_cons set_str input in
+    let raw_model = raw_mp list_proj list_fields list_records noarg_cons set_str input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
@@ -1075,4 +1080,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ _ _ _ _ -> [])
+  (fun _ _ _ _ _ _ -> [])
