@@ -10,7 +10,9 @@
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="6" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_PrefixSumRec.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="verifythis_PrefixSumRec.mlw"/>
 <theory name="PrefixSumRec" proved="true">
  <goal name="Div_mod_2" proved="true">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -96,7 +98,7 @@
   <proof prover="5"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="VC phase1_frame2.6" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="5.23"/></proof>
+  <proof prover="0" timelimit="30" memlimit="4000"><result status="valid" time="4.33"/></proof>
   <proof prover="3" timelimit="30" memlimit="4000"><result status="valid" time="0.02"/></proof>
   </goal>
  </transf>
@@ -166,7 +168,7 @@
   <proof prover="0"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC upsweep.13" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="4.48"/></proof>
+  <proof prover="0"><result status="valid" time="3.54"/></proof>
   </goal>
   <goal name="VC upsweep.14" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -379,7 +381,7 @@
   <goal name="VC downsweep.23" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.35"/></proof>
   <proof prover="1"><result status="valid" time="0.17"/></proof>
-  <proof prover="3"><result status="valid" time="11.42"/></proof>
+  <proof prover="3"><result status="valid" time="9.58"/></proof>
   <proof prover="5"><result status="valid" time="0.11" steps="153"/></proof>
   </goal>
   <goal name="VC downsweep.24" expl="precondition" proved="true">
@@ -411,13 +413,13 @@
   </goal>
   <goal name="VC downsweep.29" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="1.30"/></proof>
-  <proof prover="3"><result status="valid" time="4.39"/></proof>
+  <proof prover="3"><result status="valid" time="3.73"/></proof>
   <proof prover="5"><result status="valid" time="0.08" steps="158"/></proof>
   </goal>
   <goal name="VC downsweep.30" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.13"/></proof>
   <proof prover="3"><result status="valid" time="0.03"/></proof>
-  <proof prover="5"><result status="valid" time="0.15" steps="92"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="92"/></proof>
   <proof prover="7"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC downsweep.31" expl="postcondition" proved="true">
@@ -446,7 +448,7 @@
   <goal name="VC compute_sums.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
-  <proof prover="3"><result status="valid" time="1.40"/></proof>
+  <proof prover="3"><result status="valid" time="1.09"/></proof>
   <proof prover="5"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
   <goal name="VC compute_sums.2" expl="precondition" proved="true">
@@ -459,7 +461,7 @@
   <goal name="VC compute_sums.3" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
   <proof prover="1"><result status="valid" time="0.04"/></proof>
-  <proof prover="3"><result status="valid" time="6.96"/></proof>
+  <proof prover="3"><result status="valid" time="5.59"/></proof>
   </goal>
   <goal name="VC compute_sums.4" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -638,7 +640,7 @@
   <proof prover="1" timelimit="30"><result status="valid" time="0.06"/></proof>
   <proof prover="3" timelimit="30"><result status="valid" time="0.33"/></proof>
   <proof prover="5" timelimit="30" memlimit="1000"><result status="valid" time="0.04" steps="172"/></proof>
-  <proof prover="7" timelimit="30"><result status="valid" time="5.47"/></proof>
+  <proof prover="7" timelimit="30"><result status="valid" time="4.68"/></proof>
   </goal>
   <goal name="VC test_harness.19" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.03"/></proof>

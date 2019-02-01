@@ -4,7 +4,9 @@
 <why3session shape_version="5">
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../compiler.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="compiler.mlw"/>
 <theory name="Compile_aexpr" proved="true">
  <goal name="VC compile_aexpr" expl="VC for compile_aexpr" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -573,7 +575,7 @@
        <proof prover="2"><result status="valid" time="0.14" steps="55"/></proof>
        </goal>
        <goal name="VC compile_com.5.4.0.0.0.22" expl="VC for compile_com" proved="true">
-       <proof prover="2"><result status="valid" time="0.39" steps="364"/></proof>
+       <proof prover="2"><result status="valid" time="0.25" steps="364"/></proof>
        </goal>
        <goal name="VC compile_com.5.4.0.0.0.23" expl="VC for compile_com" proved="true">
        <proof prover="2"><result status="valid" time="0.12" steps="55"/></proof>

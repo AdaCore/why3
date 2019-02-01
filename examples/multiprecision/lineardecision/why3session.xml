@@ -7,7 +7,9 @@
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../lineardecision.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="lineardecision.mlw"/>
 <theory name="LinearEquationsCoeffs" proved="true">
  <goal name="neg_mul" proved="true">
  <proof prover="3"><result status="valid" time="0.06"/></proof>
@@ -2220,7 +2222,7 @@
  <proof prover="4"><result status="valid" time="0.16" steps="173"/></proof>
  </goal>
  <goal name="VC m_expr" expl="VC for m_expr" proved="true">
- <proof prover="4"><result status="valid" time="0.69" steps="2134"/></proof>
+ <proof prover="4"><result status="valid" time="0.52" steps="2134"/></proof>
  </goal>
  <goal name="VC m_eq" expl="VC for m_eq" proved="true">
  <proof prover="4"><result status="valid" time="0.04" steps="137"/></proof>
@@ -4061,7 +4063,7 @@
   <proof prover="4"><result status="valid" time="0.13" steps="287"/></proof>
   </goal>
   <goal name="VC prop_ctx.184" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.27"/></proof>
+  <proof prover="2"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="VC prop_ctx.185" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.14"/></proof>

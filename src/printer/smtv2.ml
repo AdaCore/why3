@@ -28,11 +28,6 @@ let debug = Debug.register_info_flag "smtv2_printer"
 let debug_incremental = Debug.register_info_flag "force_incremental"
     ~desc:"Force@ incremental@ mode@ for@ smtv2@ provers"
 
-(* Meta to tag projection functions *)
-let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
-  ~desc:"Declares@ the@ projection."
-
-
 (** SMTLIB tokens taken from CVC4: src/parser/smt2/{Smt2.g,smt2.cpp} *)
 let ident_printer () =
   let bls =
@@ -135,8 +130,10 @@ type info = {
   info_vc_term : vc_term_info;
   info_printer : ident_printer;
   mutable list_projs : Ident.ident Mstr.t;
+  mutable list_field_def: Ident.ident Mstr.t;
   info_version : version;
   meta_model_projection : Sls.t;
+  meta_record_def : Sls.t;
   mutable list_records : ((string * string) list) Mstr.t;
   (* For algebraic type counterexamples: constructors with no arguments can be
      misunderstood for variables *)
@@ -200,7 +197,11 @@ let print_var_list info fmt vsl =
 
 let collect_model_ls info ls =
   if Sls.mem ls info.meta_model_projection then
-    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) ls.ls_name info.list_projs;
+    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
+        ls.ls_name info.list_projs;
+  if Sls.mem ls info.meta_record_def then
+    info.list_field_def <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
+        ls.ls_name info.list_field_def;
   if ls.ls_args = [] && (relevant_for_counterexample ls.ls_name) then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
@@ -582,6 +583,7 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
                                 vc_term_loc = vc_loc;
                                 queried_terms = model_list;
                                 list_projections = info.list_projs;
+                                list_fields = info.list_field_def;
                                 Printer.list_records = info.list_records;
                                 noarg_constructors = info.noarg_constructors;
                                 set_str = info.info_labels;
@@ -715,8 +717,10 @@ let print_task version args ?old:_ fmt task =
     info_vc_term = vc_info;
     info_printer = ident_printer ();
     list_projs = Mstr.empty;
+    list_field_def = Mstr.empty;
     info_version = version;
-    meta_model_projection = Task.on_tagged_ls meta_projection task;
+    meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
+    meta_record_def = Task.on_tagged_ls Theory.meta_record task;
     list_records = Mstr.empty;
     noarg_constructors = [];
     info_cntexample_need_push = need_push;

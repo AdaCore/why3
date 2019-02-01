@@ -6,7 +6,9 @@
 <prover id="1" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../warshall_algorithm.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="warshall_algorithm.mlw"/>
 <theory name="WarshallAlgorithm" proved="true">
  <goal name="weakening" proved="true">
  <transf name="induction_pr" proved="true" >
@@ -19,7 +21,7 @@
  </transf>
  </goal>
  <goal name="decomposition" proved="true">
- <proof prover="1" edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"><result status="valid" time="0.93"/></proof>
+ <proof prover="1" edited="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"><result status="valid" time="1.54"/></proof>
  </goal>
  <goal name="VC transitive_closure" expl="VC for transitive_closure" proved="true">
  <transf name="split_goal_right" proved="true" >

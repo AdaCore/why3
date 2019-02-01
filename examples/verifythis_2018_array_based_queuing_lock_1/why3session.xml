@@ -5,7 +5,9 @@
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_2018_array_based_queuing_lock_1.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="verifythis_2018_array_based_queuing_lock_1.mlw"/>
 <theory name="Top" proved="true">
  <goal name="VC bounded_int" expl="VC for bounded_int" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
@@ -227,7 +229,20 @@
   <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
   <goal name="VC main.45" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.60" steps="3621"/></proof>
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC main.45.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.08" steps="469"/></proof>
+   </goal>
+   <goal name="VC main.45.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.11" steps="341"/></proof>
+   </goal>
+   <goal name="VC main.45.2" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.10" steps="468"/></proof>
+   </goal>
+   <goal name="VC main.45.3" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.12" steps="342"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC main.46" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
@@ -308,13 +323,13 @@
   <proof prover="0"><result status="valid" time="0.02" steps="154"/></proof>
   </goal>
   <goal name="VC main.63" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="152"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="152"/></proof>
   </goal>
   <goal name="VC main.64" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
   <goal name="VC main.65" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.68" steps="4275"/></proof>
+  <proof prover="0"><result status="valid" time="0.80" steps="4275"/></proof>
   </goal>
   <goal name="VC main.66" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
@@ -442,26 +457,13 @@
   <proof prover="0"><result status="valid" time="0.02" steps="152"/></proof>
   </goal>
   <goal name="VC main.99" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="152"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="152"/></proof>
   </goal>
   <goal name="VC main.100" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
   <goal name="VC main.101" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_right" proved="true" >
-   <goal name="VC main.101.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.08" steps="527"/></proof>
-   </goal>
-   <goal name="VC main.101.1" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.11" steps="407"/></proof>
-   </goal>
-   <goal name="VC main.101.2" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.10" steps="462"/></proof>
-   </goal>
-   <goal name="VC main.101.3" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.12" steps="343"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.68" steps="3551"/></proof>
   </goal>
   <goal name="VC main.102" expl="out of loop bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="14"/></proof>

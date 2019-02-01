@@ -10,7 +10,9 @@
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Spass" version="3.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../div.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="div.mlw"/>
 <theory name="Div" proved="true">
  <goal name="VC fact_div" expl="VC for fact_div" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -2788,7 +2790,7 @@
   </transf>
   </goal>
   <goal name="VC reciprocal_word_3by2.57" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="2.12" steps="513"/></proof>
+  <proof prover="5"><result status="valid" time="2.47" steps="513"/></proof>
   </goal>
   <goal name="VC reciprocal_word_3by2.58" expl="integer overflow" proved="true">
   <proof prover="1" memlimit="1000"><result status="valid" time="0.31"/></proof>
@@ -4480,7 +4482,7 @@
   <goal name="VC div_sb_qr.155" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC div_sb_qr.155.0" expl="VC for div_sb_qr" proved="true">
-   <proof prover="0"><result status="valid" time="1.10"/></proof>
+   <proof prover="0"><result status="valid" time="0.86"/></proof>
    </goal>
    <goal name="VC div_sb_qr.155.1" expl="VC for div_sb_qr" proved="true">
    <proof prover="3"><result status="valid" time="0.10"/></proof>
@@ -4542,49 +4544,49 @@
     <goal name="VC div_sb_qr.156.13.0" expl="VC for div_sb_qr" proved="true">
     <transf name="split_all_full" proved="true" >
      <goal name="VC div_sb_qr.156.13.0.0" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.61"/></proof>
+     <proof prover="9"><result status="valid" time="0.58"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.1" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.61"/></proof>
+     <proof prover="9"><result status="valid" time="0.59"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.2" expl="VC for div_sb_qr" proved="true">
      <proof prover="9"><result status="valid" time="0.57"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.3" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.59"/></proof>
+     <proof prover="9"><result status="valid" time="0.57"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.4" expl="VC for div_sb_qr" proved="true">
      <proof prover="9"><result status="valid" time="0.59"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.5" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.60"/></proof>
+     <proof prover="9"><result status="valid" time="0.59"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.6" expl="VC for div_sb_qr" proved="true">
      <proof prover="9"><result status="valid" time="0.58"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.7" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.58"/></proof>
+     <proof prover="9"><result status="valid" time="0.61"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.8" expl="VC for div_sb_qr" proved="true">
      <proof prover="9"><result status="valid" time="0.58"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.9" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.57"/></proof>
-     </goal>
-     <goal name="VC div_sb_qr.156.13.0.10" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.57"/></proof>
-     </goal>
-     <goal name="VC div_sb_qr.156.13.0.11" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.54"/></proof>
-     </goal>
-     <goal name="VC div_sb_qr.156.13.0.12" expl="VC for div_sb_qr" proved="true">
      <proof prover="9"><result status="valid" time="0.56"/></proof>
      </goal>
+     <goal name="VC div_sb_qr.156.13.0.10" expl="VC for div_sb_qr" proved="true">
+     <proof prover="9"><result status="valid" time="0.61"/></proof>
+     </goal>
+     <goal name="VC div_sb_qr.156.13.0.11" expl="VC for div_sb_qr" proved="true">
+     <proof prover="9"><result status="valid" time="0.57"/></proof>
+     </goal>
+     <goal name="VC div_sb_qr.156.13.0.12" expl="VC for div_sb_qr" proved="true">
+     <proof prover="9"><result status="valid" time="0.60"/></proof>
+     </goal>
      <goal name="VC div_sb_qr.156.13.0.13" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.59"/></proof>
+     <proof prover="9"><result status="valid" time="0.57"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.14" expl="VC for div_sb_qr" proved="true">
-     <proof prover="9"><result status="valid" time="0.57"/></proof>
+     <proof prover="9"><result status="valid" time="0.54"/></proof>
      </goal>
      <goal name="VC div_sb_qr.156.13.0.15" expl="VC for div_sb_qr" proved="true">
      <proof prover="9"><result status="valid" time="0.57"/></proof>
@@ -4709,7 +4711,7 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.34" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.02"/></proof>
+      <proof prover="3"><result status="valid" time="0.04"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.35" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -4736,7 +4738,7 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.43" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.04"/></proof>
+      <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.44" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -4787,10 +4789,10 @@
       <proof prover="3"><result status="valid" time="0.04"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.60" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.04"/></proof>
+      <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.61" expl="apply premises" proved="true">
-      <proof prover="2"><result status="valid" time="0.21"/></proof>
+      <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.62" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -4907,7 +4909,7 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.100" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.03"/></proof>
+      <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.101" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -4919,7 +4921,7 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.104" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.02"/></proof>
+      <proof prover="3"><result status="valid" time="0.03"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.105" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -4943,7 +4945,7 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.112" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.04"/></proof>
+      <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.113" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -4952,10 +4954,10 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.115" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.02"/></proof>
+      <proof prover="3"><result status="valid" time="0.04"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.116" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.02"/></proof>
+      <proof prover="2"><result status="valid" time="0.21"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.117" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -5009,7 +5011,7 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.134" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.02"/></proof>
+      <proof prover="3"><result status="valid" time="0.03"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.135" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -5027,7 +5029,7 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.140" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.02"/></proof>
+      <proof prover="3"><result status="valid" time="0.03"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.141" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -5045,13 +5047,13 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.146" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.02"/></proof>
+      <proof prover="3"><result status="valid" time="0.04"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.147" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.148" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.03"/></proof>
+      <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.149" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -5072,7 +5074,7 @@
       <proof prover="3"><result status="valid" time="0.04"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.155" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.03"/></proof>
+      <proof prover="3"><result status="valid" time="0.04"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.156" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -5120,7 +5122,7 @@
       <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.171" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.04"/></proof>
+      <proof prover="3"><result status="valid" time="0.02"/></proof>
       </goal>
       <goal name="VC div_sb_qr.157.0.0.0.172" expl="apply premises" proved="true">
       <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -5488,7 +5490,7 @@
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC div_sb_qr.182.1" expl="VC for div_sb_qr" proved="true">
-   <proof prover="0"><result status="valid" time="4.81"/></proof>
+   <proof prover="0"><result status="valid" time="3.96"/></proof>
    </goal>
    <goal name="VC div_sb_qr.182.2" expl="VC for div_sb_qr" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -5522,7 +5524,7 @@
    <proof prover="0"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC div_sb_qr.185.1" expl="VC for div_sb_qr" proved="true">
-   <proof prover="0"><result status="valid" time="3.50"/></proof>
+   <proof prover="0"><result status="valid" time="3.03"/></proof>
    </goal>
    <goal name="VC div_sb_qr.185.2" expl="VC for div_sb_qr" proved="true">
    <proof prover="2"><result status="valid" time="0.09"/></proof>
@@ -5978,26 +5980,26 @@
   <goal name="VC div_sb_qr.219" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC div_sb_qr.219.0" expl="assertion" proved="true">
-   <transf name="introduce_premises" proved="true" >
+   <transf name="split_vc" proved="true" >
     <goal name="VC div_sb_qr.219.0.0" expl="assertion" proved="true">
-    <transf name="replace" proved="true" arg1="(value qp ((int32&#39;int sx - int32&#39;int sy) - int32&#39;int i))" arg2="(uint64&#39;int ql+ radix2 *value_sub (pelts q) (offset qp + 1) (((offset qp + int32&#39;int sx) - int32&#39;int sy) - int32&#39;int i))">
-     <goal name="VC div_sb_qr.219.0.0.0" expl="assertion" proved="true">
-     <proof prover="3" memlimit="2000"><result status="valid" time="0.01"/></proof>
-     </goal>
-     <goal name="VC div_sb_qr.219.0.0.1" expl="equality hypothesis" proved="true">
-     <proof prover="0"><result status="valid" time="0.02"/></proof>
-     </goal>
-    </transf>
+    <proof prover="0"><result status="valid" time="0.02"/></proof>
+    </goal>
+    <goal name="VC div_sb_qr.219.0.1" expl="assertion" proved="true">
+    <proof prover="0"><result status="valid" time="0.02"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="VC div_sb_qr.219.1" expl="assertion" proved="true">
-   <transf name="split_vc" proved="true" >
+   <transf name="introduce_premises" proved="true" >
     <goal name="VC div_sb_qr.219.1.0" expl="assertion" proved="true">
-    <proof prover="0"><result status="valid" time="2.33"/></proof>
-    </goal>
-    <goal name="VC div_sb_qr.219.1.1" expl="assertion" proved="true">
-    <proof prover="0"><result status="valid" time="2.28"/></proof>
+    <transf name="replace" proved="true" arg1="(value qp ((int32&#39;int sx - int32&#39;int sy) - int32&#39;int i))" arg2="(uint64&#39;int ql+ radix2 *value_sub (pelts q) (offset qp + 1) (((offset qp + int32&#39;int sx) - int32&#39;int sy) - int32&#39;int i))">
+     <goal name="VC div_sb_qr.219.1.0.0" expl="assertion" proved="true">
+     <proof prover="3" memlimit="2000"><result status="valid" time="0.01"/></proof>
+     </goal>
+     <goal name="VC div_sb_qr.219.1.0.1" expl="equality hypothesis" proved="true">
+     <proof prover="0"><result status="valid" time="0.78"/></proof>
+     </goal>
+    </transf>
     </goal>
    </transf>
    </goal>
@@ -6073,21 +6075,20 @@
   <goal name="VC div_sb_qr.230" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC div_sb_qr.230.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.04"/></proof>
+   <proof prover="0"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC div_sb_qr.230.1" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC div_sb_qr.231" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC div_sb_qr.231.0" expl="assertion" proved="true">
-   <proof prover="0" memlimit="1000"><result status="valid" time="0.02"/></proof>
-   <proof prover="2" timelimit="5"><result status="valid" time="0.27"/></proof>
+   <proof prover="1" memlimit="1000"><result status="valid" time="0.18"/></proof>
    </goal>
    <goal name="VC div_sb_qr.231.1" expl="assertion" proved="true">
-   <proof prover="1" memlimit="1000"><result status="valid" time="2.30"/></proof>
+   <proof prover="1" memlimit="1000"><result status="valid" time="2.41"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6153,7 +6154,7 @@
        <proof prover="2"><result status="valid" time="0.21"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.15" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.23"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.16" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.31"/></proof>
@@ -6162,7 +6163,7 @@
        <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.18" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.22"/></proof>
+       <proof prover="2"><result status="valid" time="0.21"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.19" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.18"/></proof>
@@ -6186,7 +6187,7 @@
        <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.26" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
+       <proof prover="2"><result status="valid" time="0.22"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.27" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.25"/></proof>
@@ -6210,7 +6211,7 @@
        <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.34" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
+       <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.35" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.23"/></proof>
@@ -6237,7 +6238,7 @@
        <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.43" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.23"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.44" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.18"/></proof>
@@ -6273,43 +6274,43 @@
        <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.55" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.19"/></proof>
+       <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.56" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
+       <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.57" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.28"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.58" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
+       <proof prover="2"><result status="valid" time="0.22"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.59" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.21"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.60" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.23"/></proof>
+       <proof prover="2"><result status="valid" time="0.19"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.61" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.23"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.62" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.63" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.22"/></proof>
+       <proof prover="2"><result status="valid" time="0.26"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.64" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.65" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.19"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.66" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.18"/></proof>
+       <proof prover="2"><result status="valid" time="0.19"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.67" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
+       <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.68" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.18"/></proof>
@@ -6405,7 +6406,7 @@
        <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.99" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.22"/></proof>
+       <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.100" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.18"/></proof>
@@ -6420,7 +6421,7 @@
        <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.104" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
+       <proof prover="2"><result status="valid" time="0.19"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.105" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.24"/></proof>
@@ -6429,40 +6430,40 @@
        <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.107" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.18"/></proof>
+       <proof prover="2"><result status="valid" time="0.19"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.108" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.23"/></proof>
+       <proof prover="2"><result status="valid" time="0.20"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.109" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.17"/></proof>
+       <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.110" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.25"/></proof>
-       </goal>
-       <goal name="VC div_sb_qr.233.0.0.1.0.111" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
+       <goal name="VC div_sb_qr.233.0.0.1.0.111" expl="apply premises" proved="true">
+       <proof prover="2"><result status="valid" time="0.18"/></proof>
+       </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.112" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.20"/></proof>
+       <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.113" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.17"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.114" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.23"/></proof>
+       <proof prover="2"><result status="valid" time="0.22"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.115" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.19"/></proof>
+       <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.116" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
+       <proof prover="2"><result status="valid" time="0.20"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.117" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.118" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.21"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.119" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.20"/></proof>
@@ -6486,7 +6487,7 @@
        <proof prover="2"><result status="valid" time="0.19"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.126" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.18"/></proof>
+       <proof prover="2"><result status="valid" time="0.22"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.127" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.19"/></proof>
@@ -6498,7 +6499,7 @@
        <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.130" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.19"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.131" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.23"/></proof>
@@ -6519,31 +6520,31 @@
        <proof prover="2"><result status="valid" time="0.17"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.137" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.18"/></proof>
+       <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.138" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.18"/></proof>
+       <proof prover="2"><result status="valid" time="0.20"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.139" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.20"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.140" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.22"/></proof>
+       <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.141" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.19"/></proof>
+       <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.142" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.20"/></proof>
+       <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.143" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.23"/></proof>
+       <proof prover="2"><result status="valid" time="0.17"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.144" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
+       <proof prover="2"><result status="valid" time="0.25"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.145" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.23"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.146" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.20"/></proof>
@@ -6552,19 +6553,19 @@
        <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.148" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.18"/></proof>
-       </goal>
-       <goal name="VC div_sb_qr.233.0.0.1.0.149" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
+       <goal name="VC div_sb_qr.233.0.0.1.0.149" expl="apply premises" proved="true">
+       <proof prover="2"><result status="valid" time="0.19"/></proof>
+       </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.150" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.20"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.151" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.152" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.26"/></proof>
+       <proof prover="2"><result status="valid" time="0.21"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.153" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.24"/></proof>
@@ -6573,7 +6574,7 @@
        <proof prover="2"><result status="valid" time="0.20"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.155" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.19"/></proof>
+       <proof prover="2"><result status="valid" time="0.22"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.156" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.18"/></proof>
@@ -6633,13 +6634,13 @@
        <proof prover="2"><result status="valid" time="0.19"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.175" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
-       </goal>
-       <goal name="VC div_sb_qr.233.0.0.1.0.176" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.19"/></proof>
        </goal>
+       <goal name="VC div_sb_qr.233.0.0.1.0.176" expl="apply premises" proved="true">
+       <proof prover="2"><result status="valid" time="0.18"/></proof>
+       </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.177" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.23"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.178" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.30"/></proof>
@@ -6669,7 +6670,7 @@
        <proof prover="2"><result status="valid" time="0.22"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.187" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.22"/></proof>
+       <proof prover="2"><result status="valid" time="0.19"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.188" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.22"/></proof>
@@ -6687,10 +6688,10 @@
        <proof prover="2"><result status="valid" time="0.20"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.193" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.24"/></proof>
+       <proof prover="2"><result status="valid" time="0.18"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.194" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.18"/></proof>
+       <proof prover="2"><result status="valid" time="0.24"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.195" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.20"/></proof>
@@ -6702,7 +6703,7 @@
        <proof prover="2"><result status="valid" time="0.19"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.198" expl="apply premises" proved="true">
-       <proof prover="2"><result status="valid" time="0.21"/></proof>
+       <proof prover="2"><result status="valid" time="0.23"/></proof>
        </goal>
        <goal name="VC div_sb_qr.233.0.0.1.0.199" expl="apply premises" proved="true">
        <proof prover="2"><result status="valid" time="0.18"/></proof>
@@ -7349,14 +7350,14 @@
   <goal name="VC wmpn_divrem_2.43" expl="loop variant decrease" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC wmpn_divrem_2.43.0" expl="loop variant decrease" proved="true">
-   <proof prover="2"><result status="valid" time="0.06"/></proof>
-   </goal>
-   <goal name="VC wmpn_divrem_2.43.1" expl="loop variant decrease" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC wmpn_divrem_2.43.1.0" expl="loop variant decrease" proved="true">
+    <goal name="VC wmpn_divrem_2.43.0.0" expl="loop variant decrease" proved="true">
     <proof prover="2"><result status="valid" time="0.12"/></proof>
     </goal>
    </transf>
+   </goal>
+   <goal name="VC wmpn_divrem_2.43.1" expl="loop variant decrease" proved="true">
+   <proof prover="2"><result status="valid" time="0.06"/></proof>
    </goal>
   </transf>
   </goal>
@@ -8611,7 +8612,7 @@
    <proof prover="2"><result status="valid" time="0.06"/></proof>
    </goal>
    <goal name="VC div_qr.123.10" expl="VC for div_qr" proved="true">
-   <proof prover="0"><result status="valid" time="2.94"/></proof>
+   <proof prover="0"><result status="valid" time="2.46"/></proof>
    </goal>
    <goal name="VC div_qr.123.11" expl="VC for div_qr" proved="true">
    <proof prover="2"><result status="valid" time="0.24"/></proof>
@@ -8887,7 +8888,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC div_qr.144" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="4.69"/></proof>
+  <proof prover="0"><result status="valid" time="4.10"/></proof>
   </goal>
   <goal name="VC div_qr.145" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
