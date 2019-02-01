@@ -7,7 +7,9 @@
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="12" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../Firstorder_term_impl.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="Firstorder_term_impl.mlw"/>
 <theory name="Logic" proved="true">
  <goal name="VC nlsize_positive_lemma_fo_term_list" expl="VC for nlsize_positive_lemma_fo_term_list" proved="true">
  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="119"/></proof>
@@ -92,44 +94,44 @@
  <goal name="VC bound_depth_of_symbol_in_fo_term_list_nonnegative" expl="VC for bound_depth_of_symbol_in_fo_term_list_nonnegative" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC bound_depth_of_symbol_in_fo_term_list_nonnegative.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="26"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="22"/></proof>
   </goal>
   <goal name="VC bound_depth_of_symbol_in_fo_term_list_nonnegative.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="18"/></proof>
   </goal>
   <goal name="VC bound_depth_of_symbol_in_fo_term_list_nonnegative.2" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="27"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="23"/></proof>
   </goal>
   <goal name="VC bound_depth_of_symbol_in_fo_term_list_nonnegative.3" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="19"/></proof>
   </goal>
   <goal name="VC bound_depth_of_symbol_in_fo_term_list_nonnegative.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="45"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="52"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC bound_depth_of_fo_term_in_fo_term_list_nonnegative" expl="VC for bound_depth_of_fo_term_in_fo_term_list_nonnegative" proved="true">
- <proof prover="0" timelimit="1"><result status="valid" time="0.07" steps="91"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.07" steps="98"/></proof>
  </goal>
  <goal name="VC bound_depth_of_symbol_in_fo_term_nonnegative" expl="VC for bound_depth_of_symbol_in_fo_term_nonnegative" proved="true">
- <proof prover="0"><result status="valid" time="0.10" steps="143"/></proof>
+ <proof prover="0"><result status="valid" time="0.10" steps="154"/></proof>
  </goal>
  <goal name="VC bound_depth_of_fo_term_in_fo_term_nonnegative" expl="VC for bound_depth_of_fo_term_in_fo_term_nonnegative" proved="true">
- <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="99"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="96"/></proof>
  </goal>
  <goal name="VC model_equal_fo_term_list" expl="VC for model_equal_fo_term_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC model_equal_fo_term_list.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="30"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="26"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term_list.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="46"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="325"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term_list.2" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="9"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term_list.3" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="51"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="223"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term_list.4" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.05" steps="10"/></proof>
@@ -138,16 +140,16 @@
   <proof prover="0"><result status="valid" time="0.08" steps="28"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term_list.6" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="43"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="39"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term_list.7" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="50"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="233"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term_list.8" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="10"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term_list.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="50"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="163"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term_list.10" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="11"/></proof>
@@ -163,7 +165,7 @@
  <goal name="VC model_equal_fo_term" expl="VC for model_equal_fo_term" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC model_equal_fo_term.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="48"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="323"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.06" steps="9"/></proof>
@@ -172,10 +174,10 @@
   <proof prover="0"><result status="valid" time="0.08" steps="34"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term.3" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="42"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="40"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term.4" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="51"/></proof>
+  <proof prover="0"><result status="valid" time="0.40" steps="1583"/></proof>
   </goal>
   <goal name="VC model_equal_fo_term.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="10"/></proof>
@@ -197,7 +199,7 @@
 </theory>
 <theory name="Impl" proved="true">
  <goal name="VC bind_var_symbol_in_fo_term_list" expl="VC for bind_var_symbol_in_fo_term_list" proved="true">
- <proof prover="0"><result status="valid" time="0.26" steps="795"/></proof>
+ <proof prover="0"><result status="valid" time="0.26" steps="1209"/></proof>
  </goal>
  <goal name="VC bind_var_fo_term_in_fo_term_list" expl="VC for bind_var_fo_term_in_fo_term_list" proved="true">
  <proof prover="10"><result status="valid" time="1.40"/></proof>
@@ -223,25 +225,25 @@
   <proof prover="0"><result status="valid" time="0.06" steps="11"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_term.6" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="43"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="42"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_term.7" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="35"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="36"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_term.8" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="42"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="78"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_term.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="53"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="54"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_term.10" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="54"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="99"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_term.11" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.12" steps="170"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="238"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_term.12" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="66"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="68"/></proof>
   </goal>
   <goal name="VC bind_var_symbol_in_fo_term.13" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.09" steps="22"/></proof>
@@ -263,7 +265,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="11"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_term.3" expl="variant decrease" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="43"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="41"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_term.4" expl="precondition" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="35"/></proof>
@@ -278,7 +280,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="102"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_term.8" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="90"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="47"/></proof>
   </goal>
   <goal name="VC bind_var_fo_term_in_fo_term.9" expl="postcondition" proved="true">
   <proof prover="10"><result status="valid" time="1.62"/></proof>
@@ -312,16 +314,16 @@
   <proof prover="0"><result status="valid" time="0.06" steps="14"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.6" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="48"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="47"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.7" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.10" steps="14"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.8" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="41"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="42"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="47"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="84"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.10" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="17"/></proof>
@@ -333,10 +335,10 @@
   <proof prover="0"><result status="valid" time="0.07" steps="18"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.13" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="59"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="60"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.14" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.12" steps="59"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="105"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.15" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="21"/></proof>
@@ -345,10 +347,10 @@
   <proof prover="0"><result status="valid" time="0.07" steps="21"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.17" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="70"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="71"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.18" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="112"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="177"/></proof>
   </goal>
   <goal name="VC unbind_var_symbol_in_fo_term.19" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.10" steps="25"/></proof>
@@ -394,7 +396,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="15"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_term.11" expl="variant decrease" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="48"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="46"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_term.12" expl="precondition" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="15"/></proof>
@@ -421,7 +423,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="58"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_term.20" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="89"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="46"/></proof>
   </goal>
   <goal name="VC unbind_var_fo_term_in_fo_term.21" expl="postcondition" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="107"/></proof>
@@ -449,7 +451,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term_list.6" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="46"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="42"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term_list.7" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.09" steps="36"/></proof>
@@ -461,7 +463,7 @@
   <proof prover="0"><result status="valid" time="0.12" steps="13"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term_list.10" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.13" steps="58"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="54"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term_list.11" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="46"/></proof>
@@ -476,10 +478,10 @@
   <proof prover="0"><result status="valid" time="0.06" steps="72"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term_list.15" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="81"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="24"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term_list.16" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="79"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="25"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term_list.17" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.09" steps="49"/></proof>
@@ -507,7 +509,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="13"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term_list.6" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.12" steps="46"/></proof>
+  <proof prover="0"><result status="valid" time="0.12" steps="42"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term_list.7" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="36"/></proof>
@@ -522,7 +524,7 @@
   <proof prover="0"><result status="valid" time="0.11" steps="14"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term_list.11" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="56"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="52"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term_list.12" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="44"/></proof>
@@ -540,10 +542,10 @@
   <proof prover="0"><result status="valid" time="0.07" steps="70"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term_list.17" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="79"/></proof>
+  <proof prover="0"><result status="valid" time="0.06" steps="25"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term_list.18" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="77"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="26"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term_list.19" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07" steps="48"/></proof>
@@ -571,7 +573,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term.6" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="45"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="43"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term.7" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.11" steps="37"/></proof>
@@ -595,7 +597,7 @@
   <proof prover="0"><result status="valid" time="0.09" steps="69"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term.14" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="75"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="22"/></proof>
   </goal>
   <goal name="VC subst_base_symbol_in_fo_term.15" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="23"/></proof>
@@ -641,7 +643,7 @@
   <proof prover="0"><result status="valid" time="0.08" steps="13"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term.11" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="45"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="43"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term.12" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.09" steps="37"/></proof>
@@ -659,7 +661,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="58"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term.17" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="86"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="43"/></proof>
   </goal>
   <goal name="VC subst_base_fo_term_in_fo_term.18" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.11" steps="45"/></proof>
@@ -762,10 +764,10 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="16"/></proof>
   </goal>
   <goal name="VC construct_fo_term_list.30" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.19" steps="713"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.19" steps="888"/></proof>
   </goal>
   <goal name="VC construct_fo_term_list.31" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="159"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="163"/></proof>
   </goal>
  </transf>
  </goal>
@@ -857,10 +859,10 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="14"/></proof>
   </goal>
   <goal name="VC construct_fo_term.22" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.18" steps="744"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.18" steps="851"/></proof>
   </goal>
   <goal name="VC construct_fo_term.23" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="190"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="191"/></proof>
   </goal>
  </transf>
  </goal>
@@ -885,25 +887,25 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="19"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.6" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.11" steps="63"/></proof>
+  <proof prover="0"><result status="valid" time="0.11" steps="123"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.7" expl="assertion" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="23"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.8" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="64"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="124"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.9" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="24"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.10" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="60"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="122"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.11" expl="assertion" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="26"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.12" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="61"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="125"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.13" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.09" steps="27"/></proof>
@@ -921,7 +923,7 @@
   <proof prover="0"><result status="valid" time="0.09" steps="29"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.18" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="70"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="72"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.19" expl="precondition" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="16"/></proof>
@@ -936,7 +938,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="28"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.23" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="76"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="78"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.24" expl="precondition" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="27"/></proof>
@@ -951,25 +953,25 @@
   <proof prover="0"><result status="valid" time="0.08" steps="28"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.28" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.14" steps="110"/></proof>
+  <proof prover="0"><result status="valid" time="0.14" steps="112"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.29" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="110"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="112"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.30" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.13" steps="112"/></proof>
+  <proof prover="0"><result status="valid" time="0.13" steps="114"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.31" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="112"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="114"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.32" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.16" steps="830"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.16" steps="858"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.33" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.09" steps="207"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.09" steps="211"/></proof>
   </goal>
   <goal name="VC destruct_fo_term_list.34" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="322"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="326"/></proof>
   </goal>
  </transf>
  </goal>
@@ -991,13 +993,13 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="19"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.5" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="65"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="137"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.6" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.11" steps="23"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.7" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="62"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="136"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.8" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="25"/></proof>
@@ -1015,7 +1017,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="27"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.13" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="77"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="78"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.14" expl="precondition" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="15"/></proof>
@@ -1030,7 +1032,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="29"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.18" expl="precondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="78"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="79"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.19" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="26"/></proof>
@@ -1042,22 +1044,22 @@
   <proof prover="0"><result status="valid" time="0.09" steps="27"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.22" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="119"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="120"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.23" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="128"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="129"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.24" expl="assertion" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="114"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.04" steps="115"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.25" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.23" steps="822"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.23" steps="826"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.26" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="201"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.08" steps="202"/></proof>
   </goal>
   <goal name="VC destruct_fo_term.27" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="314"/></proof>
+  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="315"/></proof>
   </goal>
  </transf>
  </goal>

@@ -1342,8 +1342,10 @@ end
       begin match Whyconf.filter_one_prover config filter_prover with
       | config_prover ->
         (* nid should still exists when scheduling attempt *)
-        schedule_proof_attempt nid config_prover pan.limit;
-        remove_node nid
+        let parent_pn = Session_itp.get_proof_attempt_parent session panid in
+        let nid' = node_ID_from_pn parent_pn in
+        remove_node nid;
+        schedule_proof_attempt nid' config_prover pan.limit
       | exception Whyconf.ProverNotFound (_, fp) ->
         let msg = Format.asprintf "Counterexamples alternative for prover does \
                                    not exists: %a"

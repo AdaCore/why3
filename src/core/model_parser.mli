@@ -171,42 +171,6 @@ val print_model_human :
 
 *)
 
-
-val model_to_string :
-  print_attrs:bool ->
-  ?me_name_trans:(model_element_name -> string) ->
-  model ->
-  string
-(** See print_model  *)
-
-(* TODO probably deprecated.
-val print_model_vc_term :
-  print_attrs:bool ->
-  ?me_name_trans: (model_element_name -> string) ->
-  ?sep: string ->
-  Format.formatter ->
-  model ->
-  unit
-(** Prints counter-example model elements related to term that
-    triggers VC.
-
-    @param sep separator of counter-example model elements
-    @param me_name_trans see print_model
-    @model the counter-example model.
-*)
-
-val model_vc_term_to_string :
-  print_attrs:bool ->
-  ?me_name_trans: (model_element_name -> string) ->
-  ?sep: string ->
-  model ->
-  string
-(** Gets string with counter-example model elements related to term that
-    triggers VC.
-    See print_model_vc_term
-*)
-*)
-
 val print_model_json :
   ?me_name_trans:(model_element_name -> string) ->
   ?vc_line_trans:(int -> string) ->
@@ -265,13 +229,6 @@ val print_model_json :
       }
     }
 *)
-
-val model_to_string_json :
-  ?me_name_trans:(model_element_name -> string) ->
-  ?vc_line_trans:(int -> string) ->
-  model ->
-  string
-(** See print_model_json *)
 
 val interleave_with_source :
   print_attrs:bool ->
@@ -334,11 +291,12 @@ type model_parser =  string -> Printer.printer_mapping -> model
 *)
 
 type raw_model_parser =
-  Wstdlib.Sstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
+  Ident.ident Wstdlib.Mstr.t -> Ident.ident Wstdlib.Mstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
     string list -> Ident.Sattr.t Wstdlib.Mstr.t -> string -> model_element list
 (** Parses the input string into model elements.
     [raw_model_parser: proj->record_map->noarg_cons->s->mel]
     [proj]: is the list of projections
+    [list_field]: is the list of field function definition
     [record_map]: is a map associating the name of printed projections to the
       fields (couple of printed field and model_trace name).
     [noarg_cons]: List of constructors with no arguments (collected to avoid

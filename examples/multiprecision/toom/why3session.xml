@@ -9,7 +9,9 @@
 <prover id="4" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../toom.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="toom.mlw"/>
 <theory name="Toom" proved="true">
  <goal name="VC no_borrow" expl="VC for no_borrow" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -102,7 +104,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.15" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="4.43"/></proof>
+  <proof prover="0"><result status="valid" time="2.70"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.16" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -328,7 +330,7 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.71" expl="postcondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.89" steps="223"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.69" steps="223"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.72" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -361,7 +363,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.75" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.61" steps="217"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.45" steps="217"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.76" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.56" steps="204"/></proof>
@@ -379,8 +381,8 @@
   <proof prover="5"><result status="valid" time="0.52" steps="195"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.81" expl="integer overflow" proved="true">
-  <proof prover="4" timelimit="20" memlimit="1000"><result status="valid" time="7.79"/></proof>
-  <proof prover="5" timelimit="20"><result status="valid" time="13.50" steps="385"/></proof>
+  <proof prover="4" timelimit="20" memlimit="1000"><result status="valid" time="5.82"/></proof>
+  <proof prover="5" timelimit="20"><result status="valid" time="11.23" steps="385"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.82" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.13"/></proof>
@@ -407,10 +409,10 @@
    <goal name="VC wmpn_toom22_mul.86.0" expl="right case" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="VC wmpn_toom22_mul.86.0.0" expl="right case" proved="true">
-    <proof prover="5" memlimit="2000"><result status="valid" time="0.54" steps="155"/></proof>
+    <proof prover="5"><result status="valid" time="0.54" steps="155"/></proof>
     </goal>
     <goal name="VC wmpn_toom22_mul.86.0.1" expl="right case" proved="true">
-    <proof prover="5"><result status="valid" time="0.54" steps="154"/></proof>
+    <proof prover="5" memlimit="2000"><result status="valid" time="0.54" steps="154"/></proof>
     </goal>
    </transf>
    </goal>
@@ -529,7 +531,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.112" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.92" steps="146"/></proof>
+  <proof prover="5"><result status="valid" time="0.66" steps="146"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.113" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -566,7 +568,7 @@
   <proof prover="5"><result status="valid" time="0.58" steps="205"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.119" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.74" steps="229"/></proof>
+  <proof prover="5"><result status="valid" time="0.55" steps="229"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.120" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.62" steps="234"/></proof>
@@ -581,10 +583,10 @@
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.124" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.88" steps="218"/></proof>
+  <proof prover="5"><result status="valid" time="0.61" steps="218"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.125" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="0.85" steps="240"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.60" steps="240"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.126" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.68" steps="190"/></proof>
@@ -615,7 +617,7 @@
   <proof prover="5"><result status="valid" time="0.74" steps="165"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.134" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="1.14" steps="199"/></proof>
+  <proof prover="5"><result status="valid" time="0.84" steps="199"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.135" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -652,7 +654,7 @@
    <goal name="VC wmpn_toom22_mul.136.0" expl="precondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC wmpn_toom22_mul.136.0.0" expl="precondition" proved="true">
-    <proof prover="5" memlimit="2000"><result status="valid" time="1.97" steps="254"/></proof>
+    <proof prover="5" memlimit="2000"><result status="valid" time="1.50" steps="254"/></proof>
     </goal>
    </transf>
    </goal>
@@ -668,7 +670,7 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.140" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="1.55"/></proof>
+  <proof prover="0"><result status="valid" time="1.06"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.141" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.08"/></proof>
@@ -730,7 +732,7 @@
    </transf>
    </goal>
    <goal name="VC wmpn_toom22_mul.148.3" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="1.18"/></proof>
+   <proof prover="3"><result status="valid" time="0.89"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.148.4" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="3"><result status="valid" time="1.02"/></proof>
@@ -750,10 +752,10 @@
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.150" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.42" steps="240"/></proof>
+  <proof prover="5"><result status="valid" time="1.12" steps="240"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.151" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="1.52" steps="254"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.18" steps="254"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.152" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -832,13 +834,13 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.163" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="1.09" steps="243"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.78" steps="243"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.164" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.13" steps="233"/></proof>
+  <proof prover="5"><result status="valid" time="0.84" steps="233"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.165" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.11" steps="254"/></proof>
+  <proof prover="5"><result status="valid" time="0.77" steps="254"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.166" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -853,7 +855,7 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.170" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="1.02" steps="290"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.78" steps="290"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.171" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.49" steps="151"/></proof>
@@ -896,19 +898,19 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.182" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.86" steps="293"/></proof>
+  <proof prover="5"><result status="valid" time="1.36" steps="293"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.183" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.184" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.94" steps="261"/></proof>
+  <proof prover="5"><result status="valid" time="1.35" steps="261"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.185" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.186" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="2.25" steps="282"/></proof>
+  <proof prover="5"><result status="valid" time="1.50" steps="282"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.187" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -917,13 +919,13 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.189" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="1.16" steps="281"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.82" steps="281"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.190" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="1.18" steps="300"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="0.96" steps="300"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.191" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.16" steps="320"/></proof>
+  <proof prover="5"><result status="valid" time="0.88" steps="320"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.192" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -971,10 +973,10 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.207" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.208" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  <proof prover="5"><result status="valid" time="1.23" steps="187"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.209" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -998,28 +1000,28 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.212" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
-  </goal>
-  <goal name="VC wmpn_toom22_mul.213" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
+  <goal name="VC wmpn_toom22_mul.213" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  </goal>
   <goal name="VC wmpn_toom22_mul.214" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.215" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.216" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.217" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.218" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.219" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.220" expl="exceptional postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.05"/></proof>
@@ -1037,7 +1039,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.225" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.11" steps="309"/></proof>
+  <proof prover="5"><result status="valid" time="0.79" steps="309"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.226" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -1058,13 +1060,13 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.232" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.29" steps="291"/></proof>
+  <proof prover="5"><result status="valid" time="0.88" steps="291"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.233" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.234" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.20" steps="308"/></proof>
+  <proof prover="5"><result status="valid" time="0.94" steps="308"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.235" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
@@ -1079,16 +1081,16 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.239" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="1.42" steps="359"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.03" steps="359"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.240" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.241" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.242" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="1.23" steps="187"/></proof>
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.243" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1112,28 +1114,28 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.246" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
-  </goal>
-  <goal name="VC wmpn_toom22_mul.247" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
+  <goal name="VC wmpn_toom22_mul.247" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  </goal>
   <goal name="VC wmpn_toom22_mul.248" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.249" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.250" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.251" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.252" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.253" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.254" expl="exceptional postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.07"/></proof>
@@ -1630,7 +1632,7 @@
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.295" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="1.13"/></proof>
+  <proof prover="3"><result status="valid" time="0.88"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.296" expl="precondition" proved="true">
   <proof prover="1" memlimit="2000"><result status="valid" time="0.11"/></proof>
@@ -1648,13 +1650,13 @@
      <proof prover="3"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC wmpn_toom22_mul.297.0.0.2" expl="precondition" proved="true">
-     <proof prover="3"><result status="valid" time="1.13"/></proof>
+     <proof prover="3"><result status="valid" time="0.90"/></proof>
      </goal>
      <goal name="VC wmpn_toom22_mul.297.0.0.3" expl="precondition" proved="true">
      <proof prover="3"><result status="valid" time="1.00"/></proof>
      </goal>
      <goal name="VC wmpn_toom22_mul.297.0.0.4" expl="precondition" proved="true">
-     <proof prover="3"><result status="valid" time="1.15"/></proof>
+     <proof prover="3"><result status="valid" time="0.90"/></proof>
      </goal>
      <goal name="VC wmpn_toom22_mul.297.0.0.5" expl="precondition" proved="true">
      <proof prover="3"><result status="valid" time="1.00"/></proof>
@@ -1732,7 +1734,7 @@
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.301.3" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.36"/></proof>
+   <proof prover="4"><result status="valid" time="0.22"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.301.4" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.20"/></proof>
@@ -1783,7 +1785,7 @@
      <proof prover="3"><result status="valid" time="1.00"/></proof>
      </goal>
      <goal name="VC wmpn_toom22_mul.306.0.0.5" expl="precondition" proved="true">
-     <proof prover="3"><result status="valid" time="1.18"/></proof>
+     <proof prover="3"><result status="valid" time="0.88"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1810,10 +1812,10 @@
      <proof prover="3"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC wmpn_toom22_mul.307.0.0.4" expl="precondition" proved="true">
-     <proof prover="3"><result status="valid" time="1.15"/></proof>
+     <proof prover="3"><result status="valid" time="0.90"/></proof>
      </goal>
      <goal name="VC wmpn_toom22_mul.307.0.0.5" expl="precondition" proved="true">
-     <proof prover="3"><result status="valid" time="1.17"/></proof>
+     <proof prover="3"><result status="valid" time="0.89"/></proof>
      </goal>
     </transf>
     </goal>
@@ -1857,7 +1859,7 @@
    <proof prover="3"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.309.5" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="1.48"/></proof>
+   <proof prover="0"><result status="valid" time="1.05"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.309.6" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.20"/></proof>
@@ -1927,7 +1929,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.314" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.16"/></proof>
+  <proof prover="3"><result status="valid" time="0.89"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.315" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -2053,7 +2055,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.322" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.60"/></proof>
+  <proof prover="3"><result status="valid" time="1.23"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.323" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -2416,7 +2418,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.346" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="1.26"/></proof>
+  <proof prover="0"><result status="valid" time="0.85"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.347" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -2638,7 +2640,7 @@
    </transf>
    </goal>
    <goal name="VC wmpn_toom22_mul.351.45" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.98"/></proof>
+   <proof prover="0"><result status="valid" time="0.69"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.351.46" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.22"/></proof>
@@ -2664,7 +2666,7 @@
    <proof prover="0"><result status="valid" time="0.10"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.351.51" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="1.48"/></proof>
+   <proof prover="0"><result status="valid" time="1.01"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.351.52" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.39"/></proof>
@@ -2781,7 +2783,7 @@
     <proof prover="3"><result status="valid" time="0.01"/></proof>
     </goal>
     <goal name="VC wmpn_toom22_mul.351.66.1" expl="VC for wmpn_toom22_mul" proved="true">
-    <proof prover="4"><result status="valid" time="1.99"/></proof>
+    <proof prover="4"><result status="valid" time="1.54"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2852,7 +2854,7 @@
       <goal name="VC wmpn_toom22_mul.351.70.1.1.0" expl="asserted formula" proved="true">
       <transf name="unfold" proved="true" arg1="a1&#39;">
        <goal name="VC wmpn_toom22_mul.351.70.1.1.0.0" expl="asserted formula" proved="true">
-       <proof prover="3" memlimit="2000"><result status="valid" time="2.51"/></proof>
+       <proof prover="3" memlimit="2000"><result status="valid" time="1.89"/></proof>
        </goal>
       </transf>
       </goal>
@@ -2880,7 +2882,7 @@
       <goal name="VC wmpn_toom22_mul.351.71.1.1.0" expl="asserted formula" proved="true">
       <transf name="unfold" proved="true" arg1="b1&#39;">
        <goal name="VC wmpn_toom22_mul.351.71.1.1.0.0" expl="asserted formula" proved="true">
-       <proof prover="3" memlimit="2000"><result status="valid" time="2.26"/></proof>
+       <proof prover="3" memlimit="2000"><result status="valid" time="1.88"/></proof>
        </goal>
       </transf>
       </goal>
@@ -2958,7 +2960,7 @@
    <goal name="VC wmpn_toom22_mul.351.78" expl="VC for wmpn_toom22_mul" proved="true">
    <transf name="unfold" proved="true" arg1="b1">
     <goal name="VC wmpn_toom22_mul.351.78.0" expl="VC for wmpn_toom22_mul" proved="true">
-    <proof prover="4"><result status="valid" time="0.54"/></proof>
+    <proof prover="4"><result status="valid" time="0.38"/></proof>
     </goal>
    </transf>
    </goal>
@@ -3010,7 +3012,7 @@
     <proof prover="3"><result status="valid" time="0.06"/></proof>
     </goal>
     <goal name="VC wmpn_toom22_mul.351.82.1" expl="VC for wmpn_toom22_mul" proved="true">
-    <proof prover="0"><result status="valid" time="1.66"/></proof>
+    <proof prover="0"><result status="valid" time="1.13"/></proof>
     <proof prover="4"><result status="valid" time="0.47"/></proof>
     </goal>
    </transf>
@@ -3018,7 +3020,7 @@
    <goal name="VC wmpn_toom22_mul.351.83" expl="VC for wmpn_toom22_mul" proved="true">
    <transf name="apply" proved="true" arg1="H" arg2="with" arg3="(power 2 k),(power 2 (64*s))">
     <goal name="VC wmpn_toom22_mul.351.83.0" expl="apply premises" proved="true">
-    <proof prover="0" memlimit="1000"><result status="valid" time="3.75"/></proof>
+    <proof prover="0" memlimit="1000"><result status="valid" time="2.58"/></proof>
     <proof prover="3"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="VC wmpn_toom22_mul.351.83.1" expl="apply premises" proved="true">
@@ -3042,7 +3044,7 @@
      <proof prover="0"><result status="valid" time="0.04"/></proof>
      </goal>
      <goal name="VC wmpn_toom22_mul.351.83.1.1" expl="asserted formula" proved="true">
-     <proof prover="3"><result status="valid" time="2.34"/></proof>
+     <proof prover="3"><result status="valid" time="1.84"/></proof>
      </goal>
     </transf>
     </goal>
@@ -3070,7 +3072,7 @@
     <proof prover="4"><result status="valid" time="0.47"/></proof>
     </goal>
     <goal name="VC wmpn_toom22_mul.351.83.5" expl="apply premises" proved="true">
-    <proof prover="0"><result status="valid" time="4.42"/></proof>
+    <proof prover="0"><result status="valid" time="2.74"/></proof>
     <proof prover="3"><result status="valid" time="2.15"/></proof>
     </goal>
    </transf>
@@ -3084,7 +3086,7 @@
     <proof prover="6"><result status="valid" time="0.15"/></proof>
     </goal>
     <goal name="VC wmpn_toom22_mul.351.85.1" expl="apply premises" proved="true">
-    <proof prover="0" memlimit="1000"><result status="valid" time="3.28"/></proof>
+    <proof prover="0" memlimit="1000"><result status="valid" time="2.16"/></proof>
     </goal>
     <goal name="VC wmpn_toom22_mul.351.85.2" expl="apply premises" proved="true">
     <transf name="cut" proved="true" arg1="(1 &lt;= power 2 l)">
@@ -3382,7 +3384,7 @@
     <proof prover="0"><result status="valid" time="0.02"/></proof>
     </goal>
     <goal name="VC wmpn_toom22_mul.353.1.1" expl="VC for wmpn_toom22_mul" proved="true">
-    <proof prover="4"><result status="valid" time="0.45"/></proof>
+    <proof prover="4"><result status="valid" time="0.30"/></proof>
     <transf name="remove" proved="true" arg1="real,unit,tuple2,tuple3,t1">
      <goal name="VC wmpn_toom22_mul.353.1.1.0" expl="VC for wmpn_toom22_mul" proved="true">
      <proof prover="4" timelimit="1"><result status="valid" time="0.34"/></proof>
@@ -3523,7 +3525,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.360" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="1.43"/></proof>
+  <proof prover="0"><result status="valid" time="1.10"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.361" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3602,7 +3604,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.365" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.62"/></proof>
+  <proof prover="0"><result status="valid" time="0.41"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.366" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -3639,7 +3641,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.370" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="1.60"/></proof>
+  <proof prover="0"><result status="valid" time="1.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.371" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3781,7 +3783,7 @@
    <proof prover="1"><result status="valid" time="0.23"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.382.2" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="3" memlimit="2000"><result status="valid" time="3.89"/></proof>
+   <proof prover="3" memlimit="2000"><result status="valid" time="3.03"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.382.3" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -3937,7 +3939,7 @@
    <proof prover="1"><result status="valid" time="0.14"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.396.2" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="3" memlimit="2000"><result status="valid" time="6.34"/></proof>
+   <proof prover="3" memlimit="2000"><result status="valid" time="5.35"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.396.3" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
@@ -4006,35 +4008,27 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.401" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.402" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.403" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.404" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.15"/></proof>
+  <proof prover="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.405" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_toom22_mul.405.0" expl="assertion" proved="true">
-   <transf name="apply" proved="true" arg1="H2">
-    <goal name="VC wmpn_toom22_mul.405.0.0" expl="apply premises" proved="true">
-    <proof prover="1"><result status="valid" time="1.16"/></proof>
-    </goal>
-   </transf>
+   <proof prover="4"><result status="valid" time="0.46"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.405.1" expl="assertion" proved="true">
-   <transf name="apply" proved="true" arg1="H11">
-    <goal name="VC wmpn_toom22_mul.405.1.0" expl="apply premises" proved="true">
-    <proof prover="1"><result status="valid" time="0.15"/></proof>
-    </goal>
-   </transf>
+   <proof prover="4"><result status="valid" time="0.54"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.405.2" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.07"/></proof>
+   <proof prover="3"><result status="valid" time="0.05"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4066,11 +4060,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.407" expl="assertion" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="VC wmpn_toom22_mul.407.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.06"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.408" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -4084,36 +4074,36 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.409" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.23"/></proof>
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.410" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.411" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.412" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.413" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.414" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.415" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.416" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.14"/></proof>
+  <proof prover="1"><result status="valid" time="0.25"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.417" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(j &lt; offset r)">
    <goal name="VC wmpn_toom22_mul.417.0" expl="true case (postcondition)" proved="true">
-   <proof prover="0"><result status="valid" time="3.64"/></proof>
+   <proof prover="0"><result status="valid" time="2.54"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.417.1" expl="false case (postcondition)" proved="true">
-   <proof prover="0"><result status="valid" time="0.99"/></proof>
+   <proof prover="0"><result status="valid" time="0.80"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4238,7 +4228,7 @@
   <goal name="VC wmpn_toom22_mul.428" expl="integer overflow" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC wmpn_toom22_mul.428.0" expl="integer overflow" proved="true">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="4.99"/></proof>
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="4.24"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4337,27 +4327,35 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.436" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.05"/></proof>
+  <proof prover="3"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.437" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.438" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.439" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.16"/></proof>
+  <proof prover="1"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.440" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_toom22_mul.440.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.46"/></proof>
+   <transf name="apply" proved="true" arg1="H2">
+    <goal name="VC wmpn_toom22_mul.440.0.0" expl="apply premises" proved="true">
+    <proof prover="1"><result status="valid" time="0.93"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="VC wmpn_toom22_mul.440.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.54"/></proof>
+   <transf name="apply" proved="true" arg1="H11">
+    <goal name="VC wmpn_toom22_mul.440.1.0" expl="apply premises" proved="true">
+    <proof prover="1"><result status="valid" time="0.15"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="VC wmpn_toom22_mul.440.2" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="3"><result status="valid" time="0.05"/></proof>
+   <proof prover="3"><result status="valid" time="0.07"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4389,42 +4387,46 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.442" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC wmpn_toom22_mul.442.0" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.06"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC wmpn_toom22_mul.443" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.444" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="1"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.445" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.446" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.447" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.448" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.449" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.450" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.451" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.25"/></proof>
+  <proof prover="1"><result status="valid" time="0.14"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.452" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(j &lt; offset r)">
    <goal name="VC wmpn_toom22_mul.452.0" expl="true case (postcondition)" proved="true">
-   <proof prover="0"><result status="valid" time="5.07"/></proof>
+   <proof prover="0"><result status="valid" time="3.64"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.452.1" expl="false case (postcondition)" proved="true">
-   <proof prover="0"><result status="valid" time="1.19"/></proof>
+   <proof prover="0"><result status="valid" time="0.99"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4533,7 +4535,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.30" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.31" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -4542,10 +4544,10 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.33" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.34" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.35" expl="exceptional postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.07"/></proof>
@@ -4596,7 +4598,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.51" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.52" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -4605,10 +4607,10 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.54" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.55" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul_rec.56" expl="exceptional postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.08"/></proof>
@@ -4793,7 +4795,7 @@
   <proof prover="5"><result status="valid" time="0.15" steps="116"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.23" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.07" steps="143"/></proof>
+  <proof prover="5"><result status="valid" time="0.83" steps="143"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.24" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.04"/></proof>
@@ -5011,7 +5013,7 @@
   <proof prover="1"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.86" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.31"/></proof>
+  <proof prover="1"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.87" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.13"/></proof>
@@ -5165,7 +5167,7 @@
    <proof prover="1"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.127.1" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="2.84"/></proof>
+   <proof prover="0"><result status="valid" time="2.02"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.127.2" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="4"><result status="valid" time="0.87"/></proof>
@@ -5194,7 +5196,7 @@
    </transf>
    </goal>
    <goal name="VC wmpn_toom32_mul.127.7" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.20"/></proof>
+   <proof prover="1"><result status="valid" time="0.08"/></proof>
    </goal>
   </transf>
   </goal>
@@ -5433,7 +5435,7 @@
    <proof prover="1"><result status="valid" time="0.78"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.175.3" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.92"/></proof>
+   <proof prover="1"><result status="valid" time="0.70"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.175.4" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.10"/></proof>
@@ -5607,7 +5609,7 @@
   <proof prover="1"><result status="valid" time="0.32"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.212" expl="precondition" proved="true">
-  <proof prover="1" memlimit="2000"><result status="valid" time="0.94"/></proof>
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.71"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.213" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.19"/></proof>
@@ -5752,13 +5754,13 @@
   <goal name="VC wmpn_toom32_mul.241" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_toom32_mul.241.0" expl="assertion" proved="true">
-   <proof prover="3" memlimit="2000"><result status="valid" time="1.45"/></proof>
+   <proof prover="3" memlimit="2000"><result status="valid" time="1.14"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.241.1" expl="assertion" proved="true">
    <proof prover="3" memlimit="2000"><result status="valid" time="1.38"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.241.2" expl="assertion" proved="true">
-   <proof prover="3" memlimit="2000"><result status="valid" time="1.45"/></proof>
+   <proof prover="3" memlimit="2000"><result status="valid" time="1.16"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.241.3" expl="assertion" proved="true">
    <proof prover="3" memlimit="2000"><result status="valid" time="1.30"/></proof>
@@ -5801,28 +5803,28 @@
    <proof prover="3" timelimit="1"><result status="valid" time="0.28"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.4" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1"><result status="valid" time="1.12"/></proof>
+   <proof prover="1"><result status="valid" time="0.87"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.5" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1"><result status="valid" time="1.04"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.6" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1"><result status="valid" time="1.10"/></proof>
+   <proof prover="1"><result status="valid" time="0.86"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.7" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1"><result status="valid" time="1.03"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.8" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1"><result status="valid" time="1.08"/></proof>
+   <proof prover="1"><result status="valid" time="0.87"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.9" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.10" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1"><result status="valid" time="1.14"/></proof>
+   <proof prover="1"><result status="valid" time="0.86"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.11" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1"><result status="valid" time="1.07"/></proof>
+   <proof prover="1"><result status="valid" time="0.86"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.12" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1"><result status="valid" time="1.01"/></proof>
@@ -5834,7 +5836,7 @@
    <proof prover="1"><result status="valid" time="0.06"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.15" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="4.18"/></proof>
+   <proof prover="0"><result status="valid" time="2.88"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.16" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.11"/></proof>
@@ -5849,7 +5851,7 @@
    <proof prover="1"><result status="valid" time="0.05"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.20" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="4.16"/></proof>
+   <proof prover="0"><result status="valid" time="2.93"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.244.21" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1"><result status="valid" time="0.06"/></proof>
@@ -6026,7 +6028,7 @@
   <goal name="VC wmpn_toom32_mul.258" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC wmpn_toom32_mul.258.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="3.97"/></proof>
+   <proof prover="0"><result status="valid" time="2.84"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6036,29 +6038,29 @@
   <goal name="VC wmpn_toom32_mul.260" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_toom32_mul.260.0" expl="precondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.10"/></proof>
-   </goal>
-   <goal name="VC wmpn_toom32_mul.260.1" expl="precondition" proved="true">
    <transf name="replace" proved="true" arg1="(m*m)" arg2="(power radix (2*n))">
-    <goal name="VC wmpn_toom32_mul.260.1.0" expl="precondition" proved="true">
+    <goal name="VC wmpn_toom32_mul.260.0.0" expl="precondition" proved="true">
     <proof prover="0"><result status="valid" time="0.31"/></proof>
     </goal>
-    <goal name="VC wmpn_toom32_mul.260.1.1" expl="equality hypothesis" proved="true">
+    <goal name="VC wmpn_toom32_mul.260.0.1" expl="equality hypothesis" proved="true">
     <proof prover="1"><result status="valid" time="0.42"/></proof>
     </goal>
    </transf>
+   </goal>
+   <goal name="VC wmpn_toom32_mul.260.1" expl="precondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.10"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC wmpn_toom32_mul.261" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_toom32_mul.261.0" expl="assertion" proved="true">
-   <transf name="replace" proved="true" arg1="(m * m)" arg2="(power radix (2*n))">
+   <transf name="replace" proved="true" arg1="(m*m)" arg2="(power radix (2*n))">
     <goal name="VC wmpn_toom32_mul.261.0.0" expl="assertion" proved="true">
-    <proof prover="0"><result status="valid" time="0.07"/></proof>
+    <proof prover="0"><result status="valid" time="0.04"/></proof>
     </goal>
     <goal name="VC wmpn_toom32_mul.261.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="1"><result status="valid" time="0.50"/></proof>
+    <proof prover="1"><result status="valid" time="0.40"/></proof>
     </goal>
    </transf>
    </goal>
@@ -6235,7 +6237,7 @@
   <goal name="VC wmpn_toom32_mul.277" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC wmpn_toom32_mul.277.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="3.81"/></proof>
+   <proof prover="0"><result status="valid" time="2.80"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6248,12 +6250,12 @@
   <goal name="VC wmpn_toom32_mul.280" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_toom32_mul.280.0" expl="assertion" proved="true">
-   <transf name="replace" proved="true" arg1="(m*m)" arg2="(power radix (2*n))">
+   <transf name="replace" proved="true" arg1="(m * m)" arg2="(power radix (2*n))">
     <goal name="VC wmpn_toom32_mul.280.0.0" expl="assertion" proved="true">
-    <proof prover="0"><result status="valid" time="0.04"/></proof>
+    <proof prover="0"><result status="valid" time="0.07"/></proof>
     </goal>
     <goal name="VC wmpn_toom32_mul.280.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="1"><result status="valid" time="0.40"/></proof>
+    <proof prover="1"><result status="valid" time="0.50"/></proof>
     </goal>
    </transf>
    </goal>
@@ -6435,7 +6437,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom32_mul.305" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.61"/></proof>
+  <proof prover="1"><result status="valid" time="0.43"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.306" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.50"/></proof>
@@ -6446,7 +6448,7 @@
    <proof prover="1"><result status="valid" time="0.06"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.307.1" expl="assertion" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="1.16"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="0.94"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.307.2" expl="assertion" proved="true">
    <proof prover="4"><result status="valid" time="0.24"/></proof>
@@ -6470,7 +6472,7 @@
   </transf>
   </goal>
   <goal name="VC wmpn_toom32_mul.309" expl="integer overflow" proved="true">
-  <proof prover="1"><result status="valid" time="0.58"/></proof>
+  <proof prover="1"><result status="valid" time="0.42"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.310" expl="integer overflow" proved="true">
   <proof prover="1"><result status="valid" time="0.44"/></proof>
@@ -6686,7 +6688,7 @@
    <proof prover="1"><result status="valid" time="0.08"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.340.4" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1"><result status="valid" time="0.26"/></proof>
+   <proof prover="1"><result status="valid" time="0.13"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6773,7 +6775,7 @@
   <proof prover="1"><result status="valid" time="0.67"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.353" expl="precondition" proved="true">
-  <proof prover="1" memlimit="2000"><result status="valid" time="1.81"/></proof>
+  <proof prover="1" memlimit="2000"><result status="valid" time="1.33"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.354" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.14"/></proof>
@@ -6831,13 +6833,13 @@
    <proof prover="1"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.358.5" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="4" timelimit="10"><result status="valid" time="3.11"/></proof>
+   <proof prover="4" timelimit="10"><result status="valid" time="2.37"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.358.6" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="1.71"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="1.32"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.358.7" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="1.68"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="1.31"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.358.8" expl="VC for wmpn_toom32_mul" proved="true">
    <transf name="apply" proved="true" arg1="prod_compat_r">
@@ -7159,7 +7161,7 @@
    <goal name="VC wmpn_toom32_mul.407.7" expl="VC for wmpn_toom32_mul" proved="true">
    <transf name="apply" proved="true" arg1="prod_compat_r">
     <goal name="VC wmpn_toom32_mul.407.7.0" expl="apply premises" proved="true">
-    <proof prover="0"><result status="valid" time="1.24"/></proof>
+    <proof prover="0"><result status="valid" time="0.89"/></proof>
     </goal>
     <goal name="VC wmpn_toom32_mul.407.7.1" expl="apply premises" proved="true">
     <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -7203,7 +7205,7 @@
   <transf name="inline_goal" proved="true" >
    <goal name="VC wmpn_toom32_mul.410.0" expl="precondition" proved="true">
    <proof prover="1" memlimit="2000"><result status="valid" time="0.23"/></proof>
-   <proof prover="4"><result status="valid" time="0.38"/></proof>
+   <proof prover="4"><result status="valid" time="0.24"/></proof>
    </goal>
   </transf>
   </goal>
@@ -7242,7 +7244,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.421" expl="assertion" proved="true">
-  <proof prover="0" timelimit="10"><result status="valid" time="3.48"/></proof>
+  <proof prover="0" timelimit="10"><result status="valid" time="2.55"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.422" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -7402,7 +7404,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.23"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.446" expl="integer overflow" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="1.00"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.78"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.447" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.36"/></proof>
@@ -7435,10 +7437,10 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.25"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.457" expl="precondition" proved="true">
-  <proof prover="1" memlimit="2000"><result status="valid" time="3.53"/></proof>
+  <proof prover="1" memlimit="2000"><result status="valid" time="2.47"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.458" expl="precondition" proved="true">
-  <proof prover="1" memlimit="2000"><result status="valid" time="3.73"/></proof>
+  <proof prover="1" memlimit="2000"><result status="valid" time="2.53"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.459" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
@@ -7517,7 +7519,7 @@
    <proof prover="1" timelimit="1"><result status="valid" time="0.28"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.466.2" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.48"/></proof>
+   <proof prover="4"><result status="valid" time="0.64"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.466.3" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -7615,7 +7617,7 @@
    <proof prover="4"><result status="valid" time="0.53"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.474.1" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="5.06"/></proof>
+   <proof prover="0"><result status="valid" time="3.42"/></proof>
    <proof prover="4"><result status="valid" time="0.54"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.474.2" expl="assertion" proved="true">
@@ -7733,7 +7735,7 @@
    </goal>
    <goal name="VC wmpn_toom32_mul.492.2" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.05"/></proof>
-   <proof prover="4"><result status="valid" time="0.85"/></proof>
+   <proof prover="4"><result status="valid" time="0.62"/></proof>
    </goal>
   </transf>
   </goal>
@@ -7747,7 +7749,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.496" expl="precondition" proved="true">
-  <proof prover="1" memlimit="2000"><result status="valid" time="4.90"/></proof>
+  <proof prover="1" memlimit="2000"><result status="valid" time="3.73"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.497" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
@@ -7886,7 +7888,7 @@
    <proof prover="4"><result status="valid" time="0.85"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.509.3" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="4.38"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="3.78"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.509.4" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.12"/></proof>
@@ -7898,13 +7900,13 @@
    <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.509.7" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.30"/></proof>
+   <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.509.8" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="4"><result status="valid" time="0.71"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.509.9" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="4"><result status="valid" time="0.90"/></proof>
+   <proof prover="4"><result status="valid" time="0.68"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.509.10" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.09"/></proof>
@@ -7955,13 +7957,13 @@
   <goal name="VC wmpn_toom32_mul.516" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_toom32_mul.516.0" expl="assertion" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="6.04"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.48"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.516.1" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="5.87"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.52"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.516.2" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="1.27"/></proof>
+   <proof prover="0"><result status="valid" time="0.89"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.516.3" expl="VC for wmpn_toom32_mul" proved="true">
    <transf name="cut" proved="true" arg1="(power radix sy * value x sx &lt; power radix sy * power radix sx)">
@@ -7988,10 +7990,10 @@
    </goal>
    <goal name="VC wmpn_toom32_mul.516.6" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
-   <proof prover="1" memlimit="2000"><result status="valid" time="6.06"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.66"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.516.7" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.83"/></proof>
+   <proof prover="0"><result status="valid" time="0.62"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.516.8" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.11"/></proof>
@@ -8016,7 +8018,7 @@
    <proof prover="1" timelimit="1"><result status="valid" time="0.22"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.516.13" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="1.66"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="1.36"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.516.14" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="4"><result status="valid" time="1.13"/></proof>
@@ -8031,7 +8033,7 @@
    <goal name="VC wmpn_toom32_mul.518.0" expl="precondition" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="VC wmpn_toom32_mul.518.0.0" expl="precondition" proved="true">
-    <proof prover="1" memlimit="2000"><result status="valid" time="1.58"/></proof>
+    <proof prover="1" memlimit="2000"><result status="valid" time="1.30"/></proof>
     </goal>
     <goal name="VC wmpn_toom32_mul.518.0.1" expl="precondition" proved="true">
     <proof prover="1" timelimit="1"><result status="valid" time="0.18"/></proof>
@@ -8070,7 +8072,7 @@
    <proof prover="1" timelimit="1" memlimit="2000"><result status="valid" time="0.21"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.2" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="1.75"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="1.47"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.3" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1" timelimit="1" memlimit="2000"><result status="valid" time="0.14"/></proof>
@@ -8080,10 +8082,10 @@
    </goal>
    <goal name="VC wmpn_toom32_mul.522.5" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.05"/></proof>
-   <proof prover="1" memlimit="2000"><result status="valid" time="5.26"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.10"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.6" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="5.40"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.00"/></proof>
    <transf name="unfold" proved="true" arg1="value">
     <goal name="VC wmpn_toom32_mul.522.6.0" expl="VC for wmpn_toom32_mul" proved="true">
     <proof prover="1" memlimit="2000"><result status="valid" time="1.71"/></proof>
@@ -8092,13 +8094,13 @@
    </goal>
    <goal name="VC wmpn_toom32_mul.522.7" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
-   <proof prover="1" memlimit="2000"><result status="valid" time="5.23"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.03"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.8" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="5.31"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.10"/></proof>
    <transf name="unfold" proved="true" arg1="value">
     <goal name="VC wmpn_toom32_mul.522.8.0" expl="VC for wmpn_toom32_mul" proved="true">
-    <proof prover="1" memlimit="2000"><result status="valid" time="1.82"/></proof>
+    <proof prover="1" memlimit="2000"><result status="valid" time="1.45"/></proof>
     </goal>
    </transf>
    </goal>
@@ -8106,12 +8108,12 @@
    <proof prover="4"><result status="valid" time="0.82"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.10" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="1.09"/></proof>
+   <proof prover="0"><result status="valid" time="0.79"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.11" expl="VC for wmpn_toom32_mul" proved="true">
    <transf name="cut" proved="true" arg1="(power radix sy * value x sx &lt; power radix sy * power radix sx)">
     <goal name="VC wmpn_toom32_mul.522.11.0" expl="VC for wmpn_toom32_mul" proved="true">
-    <proof prover="4"><result status="valid" time="0.85"/></proof>
+    <proof prover="4"><result status="valid" time="0.64"/></proof>
     </goal>
     <goal name="VC wmpn_toom32_mul.522.11.1" expl="asserted formula" proved="true">
     <transf name="apply" proved="true" arg1="prod_compat_strict_r">
@@ -8127,7 +8129,7 @@
    </goal>
    <goal name="VC wmpn_toom32_mul.522.12" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.23"/></proof>
-   <proof prover="1" memlimit="2000"><result status="valid" time="5.29"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.10"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.13" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -8135,10 +8137,10 @@
    </goal>
    <goal name="VC wmpn_toom32_mul.522.14" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="0"><result status="valid" time="0.06"/></proof>
-   <proof prover="1" memlimit="2000"><result status="valid" time="5.42"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.14"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.15" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="5.44"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="4.23"/></proof>
    <transf name="unfold" proved="true" arg1="value">
     <goal name="VC wmpn_toom32_mul.522.15.0" expl="VC for wmpn_toom32_mul" proved="true">
     <proof prover="1" memlimit="2000"><result status="valid" time="1.62"/></proof>
@@ -8161,7 +8163,7 @@
    <proof prover="4"><result status="valid" time="0.74"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.21" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" timelimit="1" memlimit="2000"><result status="valid" time="0.30"/></proof>
+   <proof prover="1" timelimit="1" memlimit="2000"><result status="valid" time="0.15"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.22" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="1" timelimit="1" memlimit="2000"><result status="valid" time="0.20"/></proof>
@@ -8173,12 +8175,12 @@
    <proof prover="4"><result status="valid" time="0.80"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.25" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.28"/></proof>
+   <proof prover="1" timelimit="1"><result status="valid" time="0.15"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC wmpn_toom32_mul.523" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="2.61"/></proof>
+  <proof prover="0"><result status="valid" time="1.80"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.524" expl="precondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.19"/></proof>
@@ -8196,7 +8198,7 @@
   <goal name="VC wmpn_toom32_mul.527" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC wmpn_toom32_mul.527.0" expl="precondition" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="1.82"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="1.42"/></proof>
    </goal>
   </transf>
   </goal>
@@ -8284,10 +8286,10 @@
   <goal name="VC wmpn_toom32_mul.546" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_toom32_mul.546.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.46"/></proof>
+   <proof prover="0"><result status="valid" time="0.48"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.546.1" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.48"/></proof>
+   <proof prover="0"><result status="valid" time="0.46"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.546.2" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="4"><result status="valid" time="0.77"/></proof>
@@ -8325,7 +8327,7 @@
     <proof prover="1" memlimit="2000"><result status="valid" time="1.85"/></proof>
     </goal>
     <goal name="VC wmpn_toom32_mul.554.0.1" expl="postcondition" proved="true">
-    <proof prover="1" memlimit="2000"><result status="valid" time="2.29"/></proof>
+    <proof prover="1" memlimit="2000"><result status="valid" time="1.72"/></proof>
     <proof prover="4"><result status="valid" time="0.72"/></proof>
     </goal>
    </transf>
@@ -8451,7 +8453,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC wmpn_mul.34" expl="precondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.22"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC wmpn_mul.35" expl="precondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.26"/></proof>
@@ -8469,7 +8471,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.18"/></proof>
   </goal>
   <goal name="VC wmpn_mul.40" expl="precondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.31"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC wmpn_mul.41" expl="precondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.18"/></proof>
@@ -8593,7 +8595,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC wmpn_mul.80" expl="precondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC wmpn_mul.81" expl="precondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
@@ -8606,7 +8608,7 @@
    <goal name="VC wmpn_mul.83.0" expl="precondition" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="VC wmpn_mul.83.0.0" expl="precondition" proved="true">
-    <proof prover="1" timelimit="1"><result status="valid" time="0.30"/></proof>
+    <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
     </goal>
     <goal name="VC wmpn_mul.83.0.1" expl="precondition" proved="true">
     <proof prover="1" timelimit="1"><result status="valid" time="0.18"/></proof>
@@ -8621,7 +8623,7 @@
     <proof prover="1" timelimit="1"><result status="valid" time="0.50"/></proof>
     </goal>
     <goal name="VC wmpn_mul.83.0.5" expl="precondition" proved="true">
-    <proof prover="5" timelimit="1"><result status="valid" time="1.26" steps="240"/></proof>
+    <proof prover="5" timelimit="1"><result status="valid" time="0.96" steps="240"/></proof>
     </goal>
    </transf>
    </goal>
@@ -8631,10 +8633,10 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC wmpn_mul.85" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="4.04" steps="468"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="3.14" steps="468"/></proof>
   <transf name="inline_goal" proved="true" >
    <goal name="VC wmpn_mul.85.0" expl="precondition" proved="true">
-   <proof prover="5" memlimit="2000"><result status="valid" time="3.11" steps="250"/></proof>
+   <proof prover="5" memlimit="2000"><result status="valid" time="2.15" steps="250"/></proof>
    </goal>
   </transf>
   </goal>
@@ -8643,7 +8645,7 @@
   </goal>
   <goal name="VC wmpn_mul.87" expl="assertion" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.21"/></proof>
-  <proof prover="5" memlimit="2000"><result status="valid" time="3.11" steps="240"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="2.18" steps="240"/></proof>
   </goal>
   <goal name="VC wmpn_mul.88" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -8691,7 +8693,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC wmpn_mul.96" expl="assertion" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="5.26" steps="264"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="4.27" steps="264"/></proof>
   </goal>
   <goal name="VC wmpn_mul.97" expl="integer overflow" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.22"/></proof>
@@ -8769,7 +8771,7 @@
   <goal name="VC wmpn_mul.104" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_mul.104.0" expl="assertion" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="1.09"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="0.81"/></proof>
    </goal>
    <goal name="VC wmpn_mul.104.1" expl="VC for wmpn_mul" proved="true">
    <proof prover="1" memlimit="2000"><result status="valid" time="0.88"/></proof>
@@ -8847,7 +8849,7 @@
     <proof prover="1" timelimit="1"><result status="valid" time="0.12"/></proof>
     </goal>
     <goal name="VC wmpn_mul.105.0.4" expl="precondition" proved="true">
-    <proof prover="1" timelimit="1"><result status="valid" time="1.04"/></proof>
+    <proof prover="1" timelimit="1"><result status="valid" time="0.83"/></proof>
     </goal>
     <goal name="VC wmpn_mul.105.0.5" expl="precondition" proved="true">
     <transf name="assert" proved="true" arg1="(plength rpn = plength r)">
@@ -8944,7 +8946,7 @@
    <proof prover="1" timelimit="1"><result status="valid" time="0.25"/></proof>
    </goal>
    <goal name="VC wmpn_mul.114.1" expl="precondition" proved="true">
-   <proof prover="1" memlimit="2000"><result status="valid" time="1.26"/></proof>
+   <proof prover="1" memlimit="2000"><result status="valid" time="0.94"/></proof>
    </goal>
   </transf>
   </goal>
@@ -8970,7 +8972,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC wmpn_mul.122" expl="loop invariant preservation" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="1.15"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.84"/></proof>
   </goal>
   <goal name="VC wmpn_mul.123" expl="loop invariant preservation" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.11"/></proof>
@@ -9166,7 +9168,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC wmpn_mul.187" expl="precondition" proved="true">
-  <proof prover="5" memlimit="2000"><result status="valid" time="1.42" steps="236"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.06" steps="236"/></proof>
   </goal>
   <goal name="VC wmpn_mul.188" expl="assertion" proved="true">
   <proof prover="5" memlimit="2000"><result status="valid" time="0.93" steps="211"/></proof>
@@ -9176,7 +9178,7 @@
   <proof prover="5" memlimit="2000"><result status="valid" time="0.56" steps="164"/></proof>
   </goal>
   <goal name="VC wmpn_mul.190" expl="precondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.09"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC wmpn_mul.191" expl="precondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.18"/></proof>
@@ -9185,11 +9187,11 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.52"/></proof>
   </goal>
   <goal name="VC wmpn_mul.193" expl="precondition" proved="true">
-  <proof prover="5" timelimit="1"><result status="valid" time="1.39" steps="251"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.99" steps="251"/></proof>
   </goal>
   <goal name="VC wmpn_mul.194" expl="precondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.05"/></proof>
-  <proof prover="5" memlimit="2000"><result status="valid" time="1.84" steps="196"/></proof>
+  <proof prover="5" memlimit="2000"><result status="valid" time="1.32" steps="196"/></proof>
   </goal>
   <goal name="VC wmpn_mul.195" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
@@ -9558,27 +9560,27 @@
   <goal name="VC wmpn_mul.237" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_mul.237.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.18"/></proof>
+   <proof prover="0"><result status="valid" time="0.11"/></proof>
    </goal>
    <goal name="VC wmpn_mul.237.1" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.17"/></proof>
+   <proof prover="0"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="VC wmpn_mul.237.2" expl="VC for wmpn_mul" proved="true">
-   <proof prover="6"><result status="valid" time="0.14"/></proof>
+   <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC wmpn_mul.238" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.08"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC wmpn_mul.239" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.13"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC wmpn_mul.240" expl="postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.20"/></proof>
   </goal>
   <goal name="VC wmpn_mul.241" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.09"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_mul.242" expl="postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.36"/></proof>
@@ -9651,13 +9653,13 @@
   </transf>
   </goal>
   <goal name="VC wmpn_mul.264" expl="precondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.17"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.12"/></proof>
   </goal>
   <goal name="VC wmpn_mul.265" expl="precondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.11"/></proof>
   </goal>
   <goal name="VC wmpn_mul.266" expl="precondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.24"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.26"/></proof>
   </goal>
   <goal name="VC wmpn_mul.267" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -9673,19 +9675,19 @@
   </transf>
   </goal>
   <goal name="VC wmpn_mul.268" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC wmpn_mul.269" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC wmpn_mul.270" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.08"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC wmpn_mul.271" expl="postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.07"/></proof>
   </goal>
   <goal name="VC wmpn_mul.272" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC wmpn_mul.273" expl="exceptional postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.05"/></proof>
@@ -9746,24 +9748,24 @@
   </transf>
   </goal>
   <goal name="VC wmpn_mul.291" expl="precondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC wmpn_mul.292" expl="precondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.17"/></proof>
   </goal>
   <goal name="VC wmpn_mul.293" expl="precondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.26"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.24"/></proof>
   </goal>
   <goal name="VC wmpn_mul.294" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC wmpn_mul.294.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.11"/></proof>
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC wmpn_mul.294.1" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.09"/></proof>
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC wmpn_mul.294.2" expl="VC for wmpn_mul" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
+   <proof prover="6"><result status="valid" time="0.14"/></proof>
    </goal>
   </transf>
   </goal>
@@ -9771,16 +9773,16 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC wmpn_mul.296" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.08"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.06"/></proof>
   </goal>
   <goal name="VC wmpn_mul.297" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.13"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.08"/></proof>
   </goal>
   <goal name="VC wmpn_mul.298" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC wmpn_mul.299" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.15"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC wmpn_mul.300" expl="exceptional postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.06"/></proof>

@@ -249,11 +249,14 @@ let create_colors v =
       ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
   let error_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
+  let error_font_tag (v: GSourceView.source_view) = v#buffer#create_tag
+      ~name:"error_font_tag" [`BACKGROUND gconfig.error_color] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
   let _ : GText.tag = goal_tag v in
   let _ : GText.tag = error_line_tag v in
   let _ : GText.tag = error_tag v in
+  let _ : GText.tag = error_font_tag v in
   ()
 
 (* Erase all the source location tags in a source file *)
@@ -263,7 +266,8 @@ let erase_color_loc (v:GSourceView.source_view) =
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "goal_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
-  buf#remove_tag_by_name "error_line_tag" ~start:buf#start_iter ~stop:buf#end_iter
+  buf#remove_tag_by_name "error_line_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_font_tag" ~start:buf#start_iter ~stop:buf#end_iter
 
 
 
@@ -633,34 +637,24 @@ let clear_tree_and_table goals_model =
 (* notebook is composed of a Task page and several source files pages *)
 let notebook = GPack.notebook ~packing:vpan222#add ()
 
-(********************************)
-(* Task view (part of notebook) *)
-(********************************)
-let scrolled_task_view =
-  let label = GMisc.label ~text:"Task" () in
-  GPack.vbox ~homogeneous:false ~packing:
-    (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
-
-let scrolled_task_view =
-  GBin.scrolled_window
-    ~height:gconfig.task_height
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~shadow_type:`ETCHED_OUT
-    ~packing:scrolled_task_view#add ()
-
 let (_ : GtkSignal.id) =
-  scrolled_task_view#misc#connect#size_allocate
+  vpan222#set_position gconfig.task_height;
+  notebook#misc#connect#size_allocate
     ~callback:
     (fun {Gtk.width=_w;Gtk.height=h} ->
        gconfig.task_height <- h)
 
+(********************************)
+(* Task view (part of notebook) *)
+(********************************)
 
 let task_view =
+  let label = GMisc.label ~text:"Task" () in
   GSourceView.source_view
     ~editable:false
     ~cursor_visible:false
     ~show_line_numbers:true
-    ~packing:scrolled_task_view#add
+    ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
     ()
 
 
@@ -1070,6 +1064,7 @@ let convert_color (color: color): string =
   | Goal_color -> "goal_tag"
   | Error_color -> "error_tag"
   | Error_line_color -> "error_line_tag"
+  | Error_font_color -> "error_font_tag"
 
 let color_line ~color loc =
   let color_line (v:GSourceView.source_view) ~color l =
@@ -1539,12 +1534,12 @@ let treat_message_notification msg = match msg with
   | Task_Monitor (t, s, r) -> update_monitor t s r
   | Open_File_Error s ->
      print_message ~kind:0 ~notif_kind:"Open_File_Error" "%s" s
-  | Parse_Or_Type_Error (loc, rel_loc, s) ->
+  | Parse_Or_Type_Error (loc, _rel_loc, s) ->
      if gconfig.allow_source_editing || !initialization_complete then
        begin
-         scroll_to_loc ~force_tab_switch:true (Some rel_loc);
-         color_line ~color:Error_line_color rel_loc;
-         color_loc ~color:Error_color rel_loc;
+         scroll_to_loc ~force_tab_switch:true (Some loc);
+         color_line ~color:Error_line_color loc;
+         color_loc ~color:Error_font_color loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
      else

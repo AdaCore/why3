@@ -7,7 +7,9 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../heapsort.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="heapsort.mlw"/>
 <theory name="HeapSort" proved="true">
  <goal name="VC min_of_sorted" expl="VC for min_of_sorted" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -99,7 +101,9 @@
  </goal>
 </theory>
 </file>
-<file name="../heap.why" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="heap.why"/>
 <theory name="Heap" proved="true">
  <goal name="Parent_inf" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
@@ -170,7 +174,9 @@
  </goal>
 </theory>
 </file>
-<file name="../bag_of_integers.why" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="bag_of_integers.why"/>
 <theory name="Bag_integers" proved="true">
  <goal name="Min_bag_union1" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
@@ -180,7 +186,9 @@
  </goal>
 </theory>
 </file>
-<file name="../test_harness.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="test_harness.mlw"/>
 <theory name="TestHarness" proved="true">
  <goal name="VC testHarness" expl="VC for testHarness" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -224,7 +232,9 @@
  </goal>
 </theory>
 </file>
-<file name="../elements.why" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="elements.why"/>
 <theory name="Elements" proved="true">
  <goal name="Elements_singleton" proved="true">
  <proof prover="0"><result status="valid" time="0.03"/></proof>
@@ -262,7 +272,9 @@
  </goal>
 </theory>
 </file>
-<file name="../heap_implem.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="heap_implem.mlw"/>
 <theory name="Implementation" proved="true">
  <goal name="VC is_heap_min" expl="VC for is_heap_min" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -611,9 +623,13 @@
  </goal>
 </theory>
 </file>
-<file name="../abstract_heap.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="abstract_heap.mlw"/>
 </file>
-<file name="../heap_model.why" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="heap_model.why"/>
 <theory name="Model" proved="true">
  <goal name="Model_empty" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>

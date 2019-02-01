@@ -76,6 +76,7 @@ type color =
   | Goal_color
   | Error_color
   | Error_line_color
+  | Error_font_color
 
 type update_info =
   | Proved of bool

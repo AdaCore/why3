@@ -24,7 +24,7 @@ let dec_num = num"."num
 let name = (['a'-'z']*'_'*['0'-'9']*)*
 let dummy = ('_''_''_')?
 let float_num = '#'('b' | 'x') hexa_num
-
+let bv_num = '#'('b' | 'x') hexa_num
 
 rule token = parse
   | '\n'
@@ -73,6 +73,7 @@ rule token = parse
   | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Not_a_number }
   | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
       { FLOAT_VALUE (Model_parser.interp_float ~interp:false b eb sb) }
+  | bv_num as bv_value { BITVECTOR_VALUE bv_value }
 
   | num as integer
       { INT_STR (integer) }

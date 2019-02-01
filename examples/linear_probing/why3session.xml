@@ -8,7 +8,9 @@
 <prover id="4" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../linear_probing.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="linear_probing.mlw"/>
 <theory name="HashedTypeWithDummy" proved="true">
  <goal name="VC neq" expl="VC for neq" proved="true">
  <proof prover="6"><result status="valid" time="0.00" steps="1"/></proof>
@@ -346,7 +348,7 @@
  </transf>
  </goal>
  <goal name="VC copy" expl="VC for copy" proved="true">
- <proof prover="2"><result status="valid" time="2.38"/></proof>
+ <proof prover="2"><result status="valid" time="2.04"/></proof>
  </goal>
  <goal name="VC find_dummy" expl="VC for find_dummy" proved="true">
  <proof prover="6"><result status="valid" time="1.02" steps="1301"/></proof>

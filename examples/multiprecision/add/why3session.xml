@@ -7,7 +7,9 @@
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../add.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="add.mlw"/>
 <theory name="Add" proved="true">
  <goal name="VC wmpn_add_1" expl="VC for wmpn_add_1" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -1261,7 +1263,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_incr_1.17" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.03" steps="56"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="56"/></proof>
   </goal>
   <goal name="VC wmpn_incr_1.18" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.26"/></proof>
@@ -1281,7 +1283,7 @@
    <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="48"/></proof>
    </goal>
    <goal name="VC wmpn_incr_1.19.4" expl="VC for wmpn_incr_1" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.19" steps="176"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.18" steps="176"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1334,7 +1336,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC wmpn_incr_1.36" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.04" steps="44"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="44"/></proof>
   </goal>
   <goal name="VC wmpn_incr_1.37" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.32"/></proof>
@@ -1354,7 +1356,7 @@
    <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="49"/></proof>
    </goal>
    <goal name="VC wmpn_incr_1.38.4" expl="VC for wmpn_incr_1" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.03" steps="51"/></proof>
+   <proof prover="5" timelimit="5"><result status="valid" time="0.02" steps="51"/></proof>
    </goal>
   </transf>
   </goal>

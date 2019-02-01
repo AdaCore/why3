@@ -1,21 +1,50 @@
 :x: marks a potential source of incompatibility
 
+Session
+  * file path stored in session files are now represented in an
+    system-independent way, so as to work for example under exotic OS
+    like MS-windows
+
+Drivers
+  * the clause `syntax converter` disappeared. Any former use should
+    be replaced by `syntax literal` and/or `syntax function`
+
+Language
+  * the `any` expression is now always ghost
+  * A syntactic sugar called "auto-dereference" is introduced, so as
+    to avoid, on simple programs, the heavy use of `(!)` character on
+    references. See details in Section A.1 of the manual.
+
 Transformations
   * `split_vc` and `subst_all` now avoid substituting user symbols by
     generated ones :x:
   * `destruct_rec` applies `destruct` recursively on a goal
   * `destruct` now simplifies away equalities on constructors
+  * `destruct_alg` renamed to `destruct_term`. It also has a new experimental
+    keyword `using` to name newly destructed elements
 
 Tools
   * added a command `why3 session update` to modify sessions from the
-    command line; so far, only option `-rename-file` exists, for renaming files
-  * `why3 config --add-prover` now takes the shortcut as second argument;
-    option `--list-prover-ids` has been renamed to `--list-prover-families` :x:
+    command line; so far, only option `-rename-file` exists, for
+    renaming files
+  * `why3 config --add-prover` now takes the shortcut as second
+    argument; option `--list-prover-ids` has been renamed to
+    `--list-prover-families` :x:
 
 IDE
   * clicking on the status of a failed proof attempt in the proof tree
     now generates counterexamples
   * added support for GTK3
+
+Counterexamples
+  * Field names now use ident names instead of smt generated ones:
+    int32qtint -> int32'int
+  * Fix parsing of bitvector counterexamples orignated from Z3
+
+Provers
+  * support for Z3 4.8.1 (released Oct 16, 2018)
+  * support for Z3 4.8.3 (released Nov 20, 2018)
+  * support for Z3 4.8.4 (released Dec 20, 2018)
 
 Version 1.1.1, December 17, 2018
 --------------------------------

@@ -1,4 +1,3 @@
-
 (** {2 Peano arithmetic}
 
   This module implements the idea described in this paper:
@@ -99,5 +98,14 @@ module MinMax
 
   val min (x y: t) : t
     ensures { result.v = min x.v y.v }
+
+end
+
+module Int63
+  use mach.int.Int63
+  use Peano
+
+  val partial to_int63 (x:t) : int63
+    ensures { result = x.v }
 
 end

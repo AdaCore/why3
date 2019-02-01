@@ -1,12 +1,11 @@
 module Ce_int32
 
-  use ref.Ref
-  use export mach.int.Int32
+  use mach.int.Int32
 
-  let dummy_update (r: ref int32)
-    requires { to_int !r = 22}
-    ensures {to_int !r = 42} =
-    r := of_int 42;
-    r := !r + !r;
+  let dummy_update (ref r : int32)
+    requires { int32'int r = 22}
+    ensures { int32'int r = 42} =
+    r <- (42:int32);
+    r <- r + r;
 
 end

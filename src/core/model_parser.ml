@@ -463,8 +463,8 @@ let default_model = {
 type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
-  Sstr.t -> ((string * string) list) Mstr.t -> string list ->
-    Ident.Sattr.t Mstr.t -> string -> model_element list
+  Ident.ident Mstr.t -> Ident.ident Mstr.t -> ((string * string) list) Mstr.t ->
+    string list -> Ident.Sattr.t Mstr.t -> string -> model_element list
 
 (*
 ***************************************************************
@@ -560,12 +560,6 @@ let print_model ?(me_name_trans = why_name_trans)
     fmt
     model = print_model ~print_attrs ~me_name_trans ~print_model_value fmt model
 
-let model_to_string
-    ~print_attrs
-    ?(me_name_trans = why_name_trans)
-    model =
-  Format.asprintf "%a" (print_model ~print_attrs ~me_name_trans) model
-
 let get_model_file model filename =
   try
     StringMap.find filename model
@@ -577,30 +571,6 @@ let get_elements model_file line_number =
     IntMap.find line_number model_file
   with Not_found ->
     []
-
-(* TODO unused
-let print_model_vc_term
-    ~print_attrs
-    ?(me_name_trans = why_name_trans)
-    ?(sep = "\n")
-    fmt
-    model =
-  if not (is_model_empty model) then
-    match model.vc_term_loc with
-    | None -> fprintf fmt "error: cannot get location of the check"
-    | Some pos ->
-      let (filename, line_number, _, _) = Loc.get pos in
-      let model_file = get_model_file model.model_files filename in
-      let model_elements = get_elements model_file line_number in
-      print_model_elements ~print_attrs ~sep print_model_value me_name_trans fmt model_elements
-
-let model_vc_term_to_string
-    ~print_attrs
-    ?(me_name_trans = why_name_trans)
-    ?(sep = "\n")
-    model =
-  Format.asprintf "%a" (print_model_vc_term ~print_attrs ~me_name_trans ~sep) model
-*)
 
 let get_padding line =
   try
@@ -815,12 +785,6 @@ let print_model_json
     fmt
     model_files_bindings
 
-let model_to_string_json
-    ?(me_name_trans = why_name_trans)
-    ?(vc_line_trans = (fun i -> string_of_int i))
-    model =
-  asprintf "%a" (print_model_json ~me_name_trans ~vc_line_trans) model
-
 
 (*
 ***************************************************************
@@ -858,14 +822,17 @@ let add_to_model model model_element =
     let model_file = IntMap.add line_number elements model_file in
     StringMap.add filename model_file model
 
-let recover_name term_map raw_name =
-  let t = Mstr.find raw_name term_map in
-  let name =
-    match t.t_node with
-    | Tapp (ls, []) -> ls.ls_name.id_string
-    | _ -> ""
+let recover_name list_projs term_map raw_name =
+  let name, attrs =
+    try let t = Mstr.find raw_name term_map in
+      match t.t_node with
+      | Tapp (ls, []) -> (ls.ls_name.id_string, t.t_attrs)
+      | _ -> ("", t.t_attrs)
+    with Not_found ->
+      let id = Mstr.find raw_name list_projs in
+      (id.id_string, id.id_attrs)
   in
-  construct_name (get_model_trace_string ~name ~attrs:t.t_attrs) t.t_attrs
+  construct_name (get_model_trace_string ~name ~attrs) attrs
 
 let rec replace_projection (const_function: string -> string) model_value =
   match model_value with
@@ -924,7 +891,9 @@ let remove_field_fun = ref None
 let register_remove_field f =
   remove_field_fun := Some f
 
-let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t) (model: model_files) =
+let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
+    (list_projs: Ident.ident Mstr.t)
+  =
   List.fold_left (fun model raw_element ->
     let raw_element_name = raw_element.me_name.men_name in
     try
@@ -941,7 +910,7 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
        (* Replace projections with their real name *)
        let raw_element_value =
          replace_projection
-           (fun x -> (recover_name term_map x).men_name)
+           (fun x -> (recover_name list_projs term_map x).men_name)
            raw_element_value
        in
        (* Remove some specific record field related to the front-end language.
@@ -977,7 +946,7 @@ let build_model_rec (raw_model: model_element list) (term_map: Term.term Mstr.t)
          ) attrs model
       )
     with Not_found -> model)
-    model
+    StringMap.empty
     raw_model
 
 let handle_contradictory_vc model_files vc_term_loc =
@@ -1015,8 +984,13 @@ let handle_contradictory_vc model_files vc_term_loc =
 	model_files
 
 let build_model raw_model printer_mapping =
-  let model_files = build_model_rec raw_model printer_mapping.queried_terms empty_model in
-  let model_files = handle_contradictory_vc model_files printer_mapping.Printer.vc_term_loc in
+  let list_projs =
+    Wstdlib.Mstr.union (fun _ x _ -> Some x) printer_mapping.list_projections
+      printer_mapping.list_fields in
+  let model_files =
+    build_model_rec raw_model printer_mapping.queried_terms list_projs in
+  let model_files =
+    handle_contradictory_vc model_files printer_mapping.Printer.vc_term_loc in
   {
     vc_term_loc = printer_mapping.Printer.vc_term_loc;
     model_files = model_files;
@@ -1083,10 +1057,11 @@ let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 let make_mp_from_raw (raw_mp:raw_model_parser) =
   fun input printer_mapping ->
     let list_proj = printer_mapping.list_projections in
+    let list_fields = printer_mapping.list_fields in
     let list_records = printer_mapping.list_records in
     let noarg_cons = printer_mapping.noarg_constructors in
     let set_str = printer_mapping.set_str in
-    let raw_model = raw_mp list_proj list_records noarg_cons set_str input in
+    let raw_model = raw_mp list_proj list_fields list_records noarg_cons set_str input in
     build_model raw_model printer_mapping
 
 let register_model_parser ~desc s p =
@@ -1105,4 +1080,4 @@ let list_model_parsers () =
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ _ _ _ _ -> [])
+  (fun _ _ _ _ _ _ -> [])

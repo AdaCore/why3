@@ -5,7 +5,9 @@
 <prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../priority_queue.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="priority_queue.mlw"/>
 <theory name="PQueue" proved="true">
  <goal name="M.VC assoc_m" expl="VC for assoc_m" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -507,7 +509,7 @@
   <proof prover="4"><result status="valid" time="0.03" steps="67"/></proof>
   </goal>
   <goal name="VC remove_count.1" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="5.42"/></proof>
+  <proof prover="1" timelimit="10"><result status="valid" time="4.69"/></proof>
   </goal>
   <goal name="VC remove_count.2" expl="postcondition" proved="true">
   <proof prover="1" timelimit="10"><result status="valid" time="0.47"/></proof>

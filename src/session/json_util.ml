@@ -313,7 +313,9 @@ let convert_color (color: color) : Json_base.json =
     | Premise_color -> "Premise_color"
     | Goal_color -> "Goal_color"
     | Error_color -> "Error_color"
-    | Error_line_color -> "Error_line_color")
+    | Error_line_color -> "Error_line_color"
+    | Error_font_color -> "Error_font_color"
+  )
 
 let convert_loc_color (loc,color: Loc.position * color) : Json_base.json =
   let loc = convert_loc loc in
@@ -333,6 +335,7 @@ let parse_color (j: json) : color =
   | String "Goal_color"        -> Goal_color
   | String "Error_color"       -> Error_color
   | String "Error_line_color"  -> Error_line_color
+  | String "Error_font_color"  -> Error_font_color
   | _ -> raise Notcolor
 
 exception Notposition

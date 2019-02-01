@@ -5,7 +5,9 @@
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="11" steplimit="0" memlimit="1000"/>
-<file name="../mergesort_queue.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="mergesort_queue.mlw"/>
 <theory name="MergesortQueue" proved="true">
  <goal name="Transitive.Trans" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
@@ -31,7 +33,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="56"/></proof>
   </goal>
   <goal name="VC merge.6" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.82" steps="2594"/></proof>
+  <proof prover="0"><result status="valid" time="1.05" steps="2594"/></proof>
   </goal>
   <goal name="VC merge.7" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="24"/></proof>

@@ -16,9 +16,9 @@ open Ity
 open Term
 
 type ty =
-  | Tvar    of tvsymbol
-  | Tapp    of ident * ty list
-  | Ttuple  of ty list
+  | Tvar   of tvsymbol
+  | Tapp   of ident * ty list
+  | Ttuple of ty list
 
 type is_ghost = bool
 
@@ -87,11 +87,11 @@ and rdef = {
 type is_mutable = bool
 
 type typedef =
-  | Ddata     of (ident * ty list) list
-  | Drecord   of (is_mutable * ident * ty) list
-  | Dalias    of ty
-  | Drange    of Number.int_range
-  | Dfloat    of Number.float_format
+  | Ddata    of (ident * ty list) list
+  | Drecord  of (is_mutable * ident * ty) list
+  | Dalias   of ty
+  | Drange   of Number.int_range
+  | Dfloat   of Number.float_format
 
 type its_defn = {
   its_name    : ident;
