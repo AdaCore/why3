@@ -1,0 +1,39 @@
+
+constant x: int
+
+predicate p int
+
+axiom H: if x = 42 then p 1 else p 2
+
+goal g: p 3
+
+use list.List
+use list.Length
+use int.Int
+
+constant l: list int
+
+axiom H': match l with
+| Nil -> p 4
+| Cons x y -> p (x+length y)
+| Cons _ (Cons y Nil) -> p y
+| Cons x (Cons y z) -> p (x+y+length z)
+| Cons _ (Cons _ (Cons _ _)) -> p 5
+end
+
+goal g': p 6
+
+axiom H'': match l with
+| Nil -> p 1
+| Cons x Nil | Cons _ (Cons x Nil) -> p x
+| Cons _ (Cons _ _ as l') -> p (length l')
+end
+
+goal g'': p 7
+
+axiom H''': match l with
+| Cons _ (Cons _ _ as l') as l'' -> p (length l'+length l'')
+| _ -> p 0
+end
+
+goal g''': p 8
