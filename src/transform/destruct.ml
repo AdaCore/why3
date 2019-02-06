@@ -268,10 +268,16 @@ let destruct_fmla ~recursive (t: term) =
       else
         (* The hypothesis is trivial because Cs1 <> Cs2 thus useless *)
         [[]]
-    | Tif (t1, t2, t3) -> [
-        [Axiom_term t1; Axiom_term t2];
-        [Axiom_term (t_not t1); Axiom_term t3];
-      ]
+    | Tif (t1, t2, t3) ->
+        let ts2 =
+          destruct_fmla_exception ~toplevel:false t2 |>
+          List.map (fun ts -> Axiom_term t1 :: ts)
+        in
+        let ts3 =
+          destruct_fmla_exception ~toplevel:false t3 |>
+          List.map (fun ts -> Axiom_term (t_not t1) :: ts)
+        in
+        ts2 @ ts3
     | Tcase (t, tbs) ->
         let for_case tb =
           let p, t' = t_open_branch tb in
