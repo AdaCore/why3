@@ -161,6 +161,59 @@ let destruct_term ?names replace (x: term) : Task.task tlist =
           trans
     end
 
+(** [expand p] returns a list of triples [(bindings, equalities, term)], where
+
+    1. [bindings] map pattern variables in [p] to term variables in [term]
+    2. [equalities] contain equalities between pattern variables from [as]
+      patterns, term variables, and terms
+    3. [term] corresponds to [p] under [bindings] and [equalities] *)
+let rec expand (p:pattern) : ((vsymbol option * lsymbol) list * (vsymbol * lsymbol * term) list * term) list =
+  match p.pat_node with
+  | Pwild ->
+      let ls =
+        let id = Ident.id_fresh "_" in
+        create_lsymbol id [] (Some p.pat_ty)
+      in
+      [[None, ls], [], t_app ls [] ls.ls_value]
+  | Pvar v ->
+      let ls =
+        let id = Ident.id_clone v.vs_name in
+        create_lsymbol id [] (Some p.pat_ty)
+      in
+      [[Some v, ls], [], t_app ls [] ls.ls_value]
+  | Papp (ls, args) ->
+      let rec aux args =
+        match args with
+        | [] -> [[], [], []] (* really. *)
+        | arg::args' ->
+            let for_args' (x, eqs, t) (x', eqs', l) =
+              x@x', eqs@eqs', t::l
+            in
+            let for_arg l' arg =
+              List.map (for_args' arg) l'
+            in
+            List.flatten
+              (List.map (for_arg (aux args'))
+                 (expand arg))
+      in
+      let for_arg (bds, eqs, args) =
+        bds, eqs, t_app ls args (Some p.pat_ty)
+      in
+      List.map for_arg (aux args)
+  | Por (p1, p2) ->
+      expand p1 @ expand p2
+  | Pas (p, v) ->
+      let ls =
+        let id = Ident.id_clone v.vs_name in
+        create_lsymbol id [] (Some p.pat_ty)
+      in
+      let for_t (bds, eqs, t) =
+        let eqs' = eqs@[(v, ls, t)] in
+        let t' = t_app ls [] ls.ls_value in
+        bds, eqs', t'
+      in
+      List.map for_t (expand p)
+
 (* Type used to tag new declarations inside the destruct function. *)
 type is_destructed =
   | Axiom_term of term
@@ -279,54 +332,39 @@ let destruct_fmla ~recursive (t: term) =
         in
         ts2 @ ts3
     | Tcase (t, tbs) ->
-        let for_case tb =
-          let p, t' = t_open_branch tb in
-          let rec expand p : ((vsymbol option * lsymbol) list * (vsymbol * lsymbol * term) list * term) list =
-            match p.pat_node with
-            | Pwild ->
-                let id = Ident.id_fresh "_" in
-                let ls = create_lsymbol id [] (Some p.pat_ty) in
-                [[None, ls], [], t_app ls [] ls.ls_value]
-            | Pvar v ->
-                let id = Ident.id_clone v.vs_name in
-                let ls = create_lsymbol id [] (Some p.pat_ty) in
-                [[Some v, ls], [], t_app ls [] ls.ls_value]
-            | Papp (ls, args) ->
-                let rec aux args =
-                  match args with
-                  | [] -> [[], [], []] (* really. *)
-                  | arg::args' ->
-                      let l1 = expand arg in
-                      let l2 = aux args' in
-                      List.flatten
-                        (List.map (fun (x, eqs, t) ->
-                             List.map (fun (y, eqs', l) ->
-                                 x@y, eqs@eqs', t::l)
-                               l2)
-                            l1)
-                in
-                List.map (fun (bds, eqs, args) -> bds, eqs, t_app ls args (Some p.pat_ty)) (aux args)
-            | Por (p1, p2) ->
-                let l1 = expand p1 in
-                let l2 = expand p2 in
-                l1 @ l2
-            | Pas (p, v) ->
-                let id = Ident.id_clone v.vs_name in
-                let ls = create_lsymbol id [] (Some p.pat_ty) in
-                List.map (fun (bds, eqs, t) -> bds, eqs@[(v, ls, t)], t_app ls [] ls.ls_value) (expand p)
+        let for_branch tb =
+          let pat, rhs = t_open_branch tb in
+          let for_expansion (bds, eqs, t') =
+            let mvs =
+              let for_binding acc vls =
+                match vls with
+                | Some v, ls -> Mvs.add v (t_app ls [] ls.ls_value) acc
+                | None, _ -> acc
+              in
+              List.fold_left for_binding Mvs.empty bds in
+            let mvs =
+              let for_eq acc (vs, ls, _) =
+                Mvs.add vs (t_app ls [] ls.ls_value) acc
+              in
+              List.fold_left for_eq mvs eqs
+            in
+            let for_rhs rhs' =
+              let mk_const (_, ls) = Param (create_param_decl ls) in
+              let mk_eq_axiom (_, ls, t) = Param (create_logic_decl [make_ls_defn ls [] t]) in
+              List.map mk_const bds @
+              List.map mk_eq_axiom eqs @
+              [Axiom_term (t_equ t t')] @
+              rhs'
+            in
+            t_subst mvs rhs |>
+            destruct_fmla_exception ~toplevel:false |>
+            List.map for_rhs
           in
-          let for_expansion (bds, eqs, t'') =
-            let mvs = List.fold_left (fun acc vls -> match vls with Some v, ls -> Mvs.add v (t_app ls [] ls.ls_value) acc | None, _ -> acc) Mvs.empty bds in
-            let mvs = List.fold_left (fun acc (vs, ls, _) -> Mvs.add vs (t_app ls [] ls.ls_value) acc) mvs eqs in
-            List.map (fun (_, ls) -> Param (create_param_decl ls)) bds @
-            List.map (fun (_, ls, t) -> Param (create_logic_decl [make_ls_defn ls [] t])) eqs @
-            [Axiom_term (t_equ t t'');
-             Axiom_term (t_subst mvs t')]
-          in
-          List.map for_expansion (expand p)
+          List.map for_expansion (expand pat)
         in
+        List.map for_branch tbs |>
+        List.flatten |>
         List.flatten
-          (List.map for_case tbs)
     | _ -> raise (Arg_trans ("destruct"))
   in
   destruct_fmla ~toplevel:true t
