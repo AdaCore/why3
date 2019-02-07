@@ -1,0 +1,114 @@
+module PtrCursor
+
+  use int.Int
+  use map.MapEq
+  use mach.int.Int32
+  use mach.c.C
+  use array.Array
+
+  (* we assume that a non-null pointer exists *)
+  val ghost dummy_nonnull () : ptr int32
+    ensures { is_not_null result /\ plength result = 1 /\ offset result = 0 }
+    ensures { min result = 0 /\ max result = plength result }
+    ensures { (data result)[0] = 0 }
+
+  type cursor = {
+       current : ptr int32;
+       mutable new : bool;
+       len : int32;
+       ghost mutable freed : bool;
+       bound : int32
+    }
+    invariant { 0 < len }
+    invariant { not freed ->
+                (plength current = len /\
+                offset current = 0 /\
+                valid current len /\
+                min current = 0 /\
+                max current = len /\
+                is_not_null current /\
+                forall i. 0 <= i < len -> (data current)[i] < bound) }
+    by { current = dummy_nonnull (); new = true;
+         len = 1; freed = false; bound = 42 }
+
+  val ([]) (a: array 'a) (i: int32) : 'a
+    requires { [@expl:index in array bounds] 0 <= i < length a }
+    ensures  { result = ([]) a i }
+
+  val ([]<-) (a: array 'a) (i: int32) (v: 'a) : unit writes {a}
+    requires { [@expl:index in array bounds] 0 <= i < length a }
+    ensures  { a.elts = Map.set (old a).elts i v }
+    ensures  { a = ([<-]) (old a) i v }
+
+  let partial create_cursor (l:int32) (b: int32) : cursor
+    requires { 0 < l }
+    requires { 0 < b }
+    ensures  { result.len = l }
+    ensures  { not result.freed }
+    ensures  { forall i. 0 <= i < l -> (data result.current)[i] = 0 }
+  = let a = malloc (UInt32.of_int32 l) in
+    c_assert (is_not_null a);
+    for i = 0 to l-1 do
+      invariant { forall j. 0 <= j < i -> (data a)[j] = 0 }
+      set_ofs a i 0;
+    done;
+    { current = a; new = true; len = l; freed = false; bound = b }
+
+  let free_cursor (c:cursor) : unit
+    requires { not c.freed }
+    ensures { c.freed }
+    writes { c.freed }
+    writes { c.current }
+    writes { c.current.data }
+  = free c.current;
+    c.freed <- true
+
+  val get_current (c:cursor) : array int32
+    requires { not c.freed }
+    ensures { length result = plength c.current }
+    ensures { map_eq_sub result.elts (pelts c.current) 0 c.len }
+    alias   { c.current.data with result }
+
+
+  let ghost test_alias (c:cursor) : unit
+    requires { not c.freed }
+    requires { 2 <= c.len }
+    requires { 43 <= c.bound }
+  =
+    let a = get_current c in
+    let a' = get_current c in
+    a[0] <- 42;
+    a'[1] <- 34;
+    assert { a'[0] = 42 /\ a[1] = 34 };
+    assert { Map.get (pelts c.current) 0 = 42 }
+
+  let next (c: cursor) : unit
+    requires { not c.freed }
+    requires { 0 < c.bound < max_int32 }
+  = let a = get_current c in
+    label L in
+    let n = c.len in
+    let b = c.bound in
+    let ref r = (n-1) in
+    while r >= 0 && a[r] = b - 1 do
+      invariant { -1 <= r < n }
+      invariant { forall s. r < s < c.len -> a[s] = b - 1 }
+      variant { r }
+      r <- r - 1
+    done;
+    if (r < 0) then
+      c.new <- false
+    else begin
+      a[r] <- a[r] + 1;
+      assert { a[r] < b };
+      for i = r+1 to n-1 do
+        invariant { forall j. r+1 <= j < i -> a[j] = 0 }
+        invariant { forall j. 0 <= j < r -> a[j] = a[j] at L }
+        invariant { a[r] = a[r] at L + 1 }
+        a[i] <- 0
+      done;
+      c.new <- true;
+(*      assert { forall i. 0 <= i < n -> Map.get (pelts c.current) i = a[i] };*)
+    end
+
+end
