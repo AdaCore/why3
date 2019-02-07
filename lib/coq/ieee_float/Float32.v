@@ -72,7 +72,7 @@ apply Rmult_le_compat.
 now apply (IZR_le 0).
 apply bpow_ge_0.
 apply IZR_le.
-apply (Z.lt_le_pred (Zabs (Zpos m)) (Zpower radix2 24)).
+apply (Z.lt_le_pred (Z.abs (Zpos m)) (Zpower radix2 24)).
 apply Digits.Zpower_gt_Zdigits.
 revert H1.
 generalize (Digits.Zdigits radix2 (Z.pos m)).

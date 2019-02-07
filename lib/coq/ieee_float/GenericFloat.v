@@ -1207,7 +1207,7 @@ Proof.
   fold sb.
   unfold FLT_exp.
   replace (sb - 1 + 1 + 1 - sb)%Z with 1%Z by ring.
-  apply Zmax_l.
+  apply Z.max_l.
   pose sb_gt_1; pose Hemax'; omega.
   apply Zle_bool_true.
   pose Hemax'; pose Hsbb; omega.
@@ -1276,7 +1276,7 @@ Lemma Exact_rounding_for_integers :
 Proof with auto with typeclass_instances.
 intros m z Hz.
 apply round_generic...
-assert (Zabs z <= pow2sb)%Z.
+assert (Z.abs z <= pow2sb)%Z.
 apply Z.abs_le with (1:=Hz).
 destruct (Zle_lt_or_eq _ _ H) as [Bz|Bz] ; clear H Hz.
 apply generic_format_FLT.
@@ -4633,7 +4633,7 @@ Proof.
   fold sb.
   unfold FLT_exp.
   replace (sb - 1 + 1 + - sb)%Z with 0%Z by ring.
-  apply Zmax_l.
+  apply Z.max_l.
   pose sb_gt_1; pose Hemax'; omega.
   apply Zle_bool_true.
   pose Hemax'; pose sb_gt_1; omega.
