@@ -650,11 +650,18 @@ let (_ : GtkSignal.id) =
 
 let task_view =
   let label = GMisc.label ~text:"Task" () in
+  let scrolled_task_view =
+    GBin.scrolled_window
+      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+      ~shadow_type:`ETCHED_OUT
+      ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
+    ()
+  in
   GSourceView.source_view
     ~editable:false
     ~cursor_visible:false
     ~show_line_numbers:true
-    ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
+    ~packing:scrolled_task_view#add
     ()
 
 
@@ -669,21 +676,25 @@ let create_source_view =
       begin
         let label = GMisc.label ~text:(Filename.basename f) () in
         label#misc#set_tooltip_markup f;
-        let source_page, scrolled_source_view =
-          !n, GPack.vbox ~homogeneous:false ~packing:
-            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+        let source_page (*, scrolled_source_view*) =
+          !n (* , GPack.vbox ~homogeneous:false ~packing:
+            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) () *)
         in
         let scrolled_source_view =
           GBin.scrolled_window
             ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
             ~shadow_type:`ETCHED_OUT
-            ~packing:scrolled_source_view#add () in
+            (*    ~packing:scrolled_source_view#add*)
+            ~packing:
+            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
+            ()
+        in
         let source_view =
           GSourceView.source_view
             ~auto_indent:gconfig.allow_source_editing
             ~insert_spaces_instead_of_tabs:true ~tab_width:2
             ~show_line_numbers:true
-            ~right_margin_position:80 ~show_right_margin:true
+            (* ~right_margin_position:80 ~show_right_margin:true *)
             (* ~smart_home_end:true *)
             ~editable:gconfig.allow_source_editing
             ~packing:scrolled_source_view#add
