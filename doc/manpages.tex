@@ -239,6 +239,19 @@ The provers can give the following output:
   several prefixes.
 \end{description}
 
+\subsection{Getting Potential Counterexamples}
+
+That feature is presented in details in Section~\ref{sec:idece}, that should be read first.
+
+Counterexamples are also displayed by the \texttt{why3 prove} command
+when one selects a prover with the \texttt{counterexamples}
+alternative. The output is currently done in a JSON syntax (this may change in the future).
+
+% TODO: see issue #270
+% should be better given in human readable syntax by default, and
+% turned into JSON syntax only when using a option
+
+
 \section{The \texttt{ide} Command}
 \label{sec:ideref}
 
@@ -546,38 +559,118 @@ make them permanent.
 \end{description}
 
 \subsection{Displaying Counterexamples}
+\label{sec:idece}
 
 Why3 provides some support for extracting a potential counterexample
-from failing proof attempts. It is possible to display parts of this
-model in the terms of the original Why3 input.  Currently, this is
-supported for CVC4 prover version 1.5 and Z3.
+from failing proof attempts, for provers that are able to produce a
+\emph{counter-model} of the proof task. Why3 attempts to turn this
+counter-model into values for the free variables of the original Why3
+input. Currently, this is supported for CVC4 prover version at least
+1.5, and Z3 prover version at least 4.4.0.
 
-The counterexamples are enable when using a prover under the
-alternative form called ``coutnerexamples''. After running the prover
-and clicking on the prover result in, the counterexample can be
-displayed in the tab Counter-example.  The counterexample is displayed
-with the original Why3 code in comments.  Counterexample values for
-Why3 source code elements at given line are displayed in a comment at
-the line below.
+The generation of counterexamples is fully integrated in Why3 IDE. The
+recommended usage is to first start a prover normally, as shown in
+Figure~\ref{fig:ce_example0_p1}) and then click on the status icon for
+the corresponding proof attempt in the tree. Alternatively, one can
+use the key shortcut ``G'' or type \texttt{get-ce} in the command
+entry. The result can be seen on Figure \ref{fig:ce_example0_p2}: the
+same prover but with the alternative \emph{counterexamples} is
+run. The resulting counterexample is displayed in two different
+ways. First, it is displayed in the \textsf{Task} tab of the top-right
+window, at the end of the text of the task, under the form of a list
+of pairs ``variable = value'', ordered by the line number of the
+source code in which that variable takes that value. Second, it is
+displayed in the \textsf{Counterexample} tab of the bottom right
+window, this time interleaved with the code, as shown in Figure~\ref{fig:ce_example0_p2}.
 
-More information how counterexamples in Why3 works can be found
-in~\cite{hauzar16sefm} and in~\cite{dailler18jlamp}.
+%%Generation of the screenshots:
+%%Those commands follow the style of starting.tex. To execute them one needs to
+%%do make update-doc-png.
+%EXECUTE rm -rf doc/cedoc/
+%EXECUTE cp bench/ce/cedoc.mlw doc/
+
+%EXECUTE bin/why3 ide -C doc/why3ide-doc.conf --batch "down;down;type cvc4;wait 2;down;snap -crop 1024x600+0+0 doc/images/ce_example0_p1.png" doc/cedoc.mlw
+
+%EXECUTE bin/why3 ide -C doc/why3ide-doc.conf --batch "down;down;type cvc4;wait 2;down;type get-ce;wait 2;down;faketype get-ce;snap -crop 1024x600+0+0 doc/images/ce_example0_p2.png" doc/cedoc.mlw
+
+%%Cleaning of the environment
+%EXECUTE rm -r doc/cedoc.mlw
+
+\begin{figure}[tbp]
+  \includegraphics[width=\textwidth]{images/ce_example0_p1.png}
+  \caption{Failing execution of CVC4} %TODO style
+  \label{fig:ce_example0_p1}
+\end{figure}
+
+\begin{figure}[tbp]
+  \includegraphics[width=\textwidth]{images/ce_example0_p2.png}
+  \caption{Counterexamples display for CVC4} %TODO style
+  \label{fig:ce_example0_p2}
+\end{figure}
 
 
-%
-% how to use counterexamples - explain labels, projections, the option --get-ce of why3prove and the setting in why3ide
-%
-% problem with set logic and counterexamples
-%
-% which provers
-%
-% where it is displayed
-%
-% how to interpret the display
-%
-% example
+\subsubsection{Notes on format of displayed values}
 
+The counterexamples can contain values of various types.
+\begin{itemize}
+\item Integer or real variables are displayed in decimal.
+\item Bitvectors are displayed in hexadecimal
+\item Integer range types are displayed in a specific notation showing their projection to integers
+\item Floating-point numbers are displayed both under a decimal approximation and an exact hexadecimal value. The special values \texttt{+oo}, \texttt{-oo} and \texttt{NaN} may occur too.
+\item Values from algebraic types and record types are displayed as in the Why3 syntax
+\item Map values are displayed in a specific syntax detailed below
+\end{itemize}
 
+To detail the display of map values, consider the following code with
+a trivially false postcondition:
+\begin{whycode}
+  use int.Int
+  use ref.Ref
+  use map.Map
+
+  let ghost test_map (ghost x : ref (map int int)) : unit
+    ensures { !x[0] <> !x[1] }
+  =
+    x := Map.set !x 0 3
+\end{whycode}
+Executing CVC4 with the ``counterexamples'' alternative on goal will trigger
+counterexamples:
+\begin{whycode}
+  use int.Int
+  use ref.Ref
+  use map.Map
+
+  let ghost test_map (ghost x : ref (map int int)) : unit
+  (* x = (1 => 3,others => 0) *)
+    ensures { !x[0] <> !x[1] }
+    (* x = (0 => 3,1 => 3,others => 0) *)
+  =
+    x := Map.set !x 0 3
+    (* x = (0 => 3,1 => 3,others => 0) *)
+\end{whycode}
+
+The notation for map is to be understood with indices on left of the arrows and
+values on the right ``(index => value)''. The meaning of the keyword \texttt{others} is
+the value for all indices that were not mentioned yet. This shows that setting
+the parameter \texttt{x} to a map that has value 3 for index 1 and zero for all other
+indices is a counterexample. We can check that this negates the
+\why{ensures} clause.
+
+\subsubsection{Known limitations}
+
+The counterexamples are known not to work on the following non-exhaustive list
+(which is undergoing active development):
+\begin{itemize}
+\item Code containing type polymorphism is often a problem due to the bad
+  interaction between monomorphisation techniques and counterexamples. This is
+  current an issue in particular for the Array module of the standard library.
+\item\relax [TODO: complete this list]
+\end{itemize}
+
+More information on the implementation of counterexamples in Why3 can
+be found in~\cite{hauzar16sefm} and in~\cite{dailler18jlamp}.  For the
+producing counterexamples using the Why3 API, see
+Section~\ref{sec:ce_api}.
 
 \section{The \texttt{replay} Command}
 \label{sec:why3replayer}
@@ -1068,6 +1161,8 @@ realize the given theories. See also Section~\ref{sec:realizations}.
 
 %%% Local Variables:
 %%% mode: latex
+%%% mode: flyspell
 %%% TeX-PDF-mode: t
 %%% TeX-master: "manual"
+%%% ispell-local-dictionary: "american"
 %%% End:
