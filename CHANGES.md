@@ -49,6 +49,7 @@ Provers
   * support for Z3 4.8.1 (released Oct 16, 2018)
   * support for Z3 4.8.3 (released Nov 20, 2018)
   * support for Z3 4.8.4 (released Dec 20, 2018)
+  * upgraded Coq realizations for floating-point arithmetic to Flocq 3.1
 
 Version 1.1.1, December 17, 2018
 --------------------------------

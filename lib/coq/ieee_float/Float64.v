@@ -26,8 +26,8 @@ Require bv.Pow2int.
 Require ieee_float.RoundingMode.
 Require ieee_float.GenericFloat.
 
-Import Flocq.Core.Fcore.
-Import Flocq.Appli.Fappli_IEEE.
+Import Flocq.Core.Core.
+Import Flocq.IEEE754.Binary.
 Import ieee_float.RoundingMode.
 Import ieee_float.GenericFloat.
 
@@ -61,7 +61,7 @@ intros x _.
 apply Rabs_le_inv.
 change (Rabs (B2R _ _ x) <= F2R (Float radix2 (Zpower radix2 53 - 1) (1023 - 52)))%R.
 destruct x as [s|s|s|s m e H] ;
-  try (simpl ; rewrite Rabs_R0 ; now apply F2R_ge_0_compat).
+  try (simpl ; rewrite Rabs_R0 ; now apply F2R_ge_0).
 simpl.
 rewrite <- F2R_Zabs.
 rewrite abs_cond_Zopp.
@@ -69,15 +69,15 @@ apply andb_prop in H.
 destruct H as [H1 H2].
 apply Zeq_bool_eq in H1.
 apply Zle_bool_imp_le in H2.
-rewrite Fcore_digits.Zpos_digits2_pos in H1.
+rewrite Digits.Zpos_digits2_pos in H1.
 apply Rmult_le_compat.
-now apply (Z2R_le 0).
+now apply (IZR_le 0).
 apply bpow_ge_0.
-apply Z2R_le.
+apply IZR_le.
 apply (Z.lt_le_pred (Zabs (Zpos m)) (Zpower radix2 53)).
-apply Fcore_digits.Zpower_gt_Zdigits.
+apply Digits.Zpower_gt_Zdigits.
 revert H1.
-generalize (Fcore_digits.Zdigits radix2 (Z.pos m)).
+generalize (Digits.Zdigits radix2 (Z.pos m)).
 unfold FLT_exp, sb.
 intros ; zify ; omega.
 now apply bpow_le.
@@ -116,13 +116,13 @@ Defined.
 (* Why3 goal *)
 Definition abs : t -> t.
 Proof.
-  apply abs.
+  now apply abs.
 Defined.
 
 (* Why3 goal *)
 Definition neg : t -> t.
 Proof.
-  apply neg.
+  now apply neg.
 Defined.
 
 (* Why3 goal *)
@@ -309,7 +309,7 @@ Lemma max_real_int :
    = (BuiltIn.IZR max_int)).
 Proof.
   unfold max_int.
-  now rewrite mult_IZR, <- !Z2R_IZR.
+  now rewrite mult_IZR.
 Qed.
 
 (* Why3 assumption *)

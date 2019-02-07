@@ -17,7 +17,7 @@ Require int.Int.
 Require real.Real.
 Require real.FromInt.
 
-Require Import Flocq.Core.Fcore.
+Require Import Flocq.Core.Core.
 Require Import Fourier.
 
 (* Why3 goal *)
@@ -26,9 +26,7 @@ Notation truncate := Ztrunc.
 (* Why3 goal *)
 Lemma Truncate_int : forall (i:Z), ((truncate (BuiltIn.IZR i)) = i).
 Proof.
-  intro i.
-  rewrite <-Z2R_IZR.
-  apply Ztrunc_Z2R.
+  exact Ztrunc_IZR.
 Qed.
 
 (* Why3 goal *)
@@ -38,10 +36,10 @@ Lemma Truncate_down_pos :
   (x < (BuiltIn.IZR ((truncate x) + 1%Z)%Z))%R.
 Proof.
   intros x h.
-  rewrite (Ztrunc_floor x h), <-Z2R_IZR, <-Z2R_IZR.
+  rewrite (Ztrunc_floor x h).
   split.
   apply Zfloor_lb.
-  rewrite Z2R_plus; simpl.
+  rewrite plus_IZR; simpl.
   apply Zfloor_ub.
 Qed.
 
@@ -52,13 +50,13 @@ Lemma Truncate_up_neg :
   (x <= (BuiltIn.IZR (truncate x)))%R.
 Proof.
   intros x h.
-  rewrite (Ztrunc_ceil x h), <-Z2R_IZR, <-Z2R_IZR.
+  rewrite (Ztrunc_ceil x h).
   split;[|apply Zceil_ub].
-  case (Req_dec (Z2R (Zfloor x)) x); intro.
-  rewrite <-H, Zceil_Z2R, H, Z2R_minus; simpl.
+  case (Req_dec (IZR (Zfloor x)) x); intro.
+  rewrite <-H, Zceil_IZR, H, minus_IZR; simpl.
   fourier.
   rewrite (Zceil_floor_neq _ H).
-  rewrite Z2R_minus, Z2R_plus; simpl.
+  rewrite minus_IZR, plus_IZR; simpl.
   pose proof (Zfloor_lb x).
   destruct (Rle_lt_or_eq_dec _ _ H0); try easy.
   fourier.
@@ -71,15 +69,14 @@ Lemma Real_of_truncate :
   ((BuiltIn.IZR (truncate x)) <= (x + 1%R)%R)%R.
 Proof.
   intro x.
-  rewrite <- (Z2R_IZR (truncate x)).
   destruct (Rle_lt_dec x 0).
   + rewrite Ztrunc_ceil; auto.
-    destruct (Req_dec (Z2R (Zfloor x)) x).
-    rewrite <-H at 2 3; rewrite Zceil_Z2R, H; split; fourier.
+    destruct (Req_dec (IZR (Zfloor x)) x).
+    rewrite <-H at 2 3; rewrite Zceil_IZR, H; split; fourier.
     rewrite Zceil_floor_neq; auto.
     pose proof (Zfloor_lb x);
       pose proof (Zfloor_ub x).
-    rewrite Z2R_plus; simpl Z2R; split; fourier.
+    rewrite plus_IZR; split; fourier.
   + rewrite Ztrunc_floor by fourier.
     pose proof (Zfloor_lb x);
       pose proof (Zfloor_ub x).
@@ -98,12 +95,11 @@ Lemma Truncate_monotonic_int1 :
   forall (x:R) (i:Z), (x <= (BuiltIn.IZR i))%R -> ((truncate x) <= i)%Z.
 Proof.
   intros x i h.
-  rewrite <-Z2R_IZR in h.
   destruct (Rle_lt_dec x 0).
   + rewrite Ztrunc_ceil; auto.
     apply Zceil_glb; assumption.
   + rewrite Ztrunc_floor by fourier.
-    apply le_Z2R.
+    apply le_IZR.
     apply Rle_trans with (r2:=x);[apply Zfloor_lb|assumption].
 Qed.
 
@@ -112,10 +108,9 @@ Lemma Truncate_monotonic_int2 :
   forall (x:R) (i:Z), ((BuiltIn.IZR i) <= x)%R -> (i <= (truncate x))%Z.
 Proof.
   intros x i h.
-  rewrite <-Z2R_IZR in h.
   destruct (Rle_lt_dec x 0).
   + rewrite Ztrunc_ceil; auto.
-    apply le_Z2R.
+    apply le_IZR.
     apply Rle_trans with (r2:=x);[assumption|apply Zceil_ub].
   + rewrite Ztrunc_floor by fourier.
     apply Zfloor_lub; assumption.
@@ -130,15 +125,13 @@ Notation ceil := Zceil.
 (* Why3 goal *)
 Lemma Floor_int : forall (i:Z), ((floor (BuiltIn.IZR i)) = i).
 Proof.
-  intro i; rewrite <-Z2R_IZR.
-  apply Zfloor_Z2R.
+  exact Zfloor_IZR.
 Qed.
 
 (* Why3 goal *)
 Lemma Ceil_int : forall (i:Z), ((ceil (BuiltIn.IZR i)) = i).
 Proof.
-  intro i; rewrite <-Z2R_IZR.
-  apply Zceil_Z2R.
+  exact Zceil_IZR.
 Qed.
 
 (* Why3 goal *)
@@ -148,19 +141,19 @@ Lemma Floor_down :
   (x < (BuiltIn.IZR ((floor x) + 1%Z)%Z))%R.
 Proof.
   intro x.
-  rewrite <-Z2R_IZR, <-Z2R_IZR; split.
+  split.
   apply Zfloor_lb.
-  rewrite Z2R_plus.
+  rewrite plus_IZR.
   apply Zfloor_ub.
 Qed.
 
-Lemma ceil_lb: forall x, ((Z2R (ceil x) - 1) < x).
+Lemma ceil_lb: forall x, ((IZR (ceil x) - 1) < x).
 Proof.
   intro.
-  case (Req_dec (Z2R (Zfloor x)) x); intro.
-  rewrite <-H, Zceil_Z2R, H; simpl; fourier.
+  case (Req_dec (IZR (Zfloor x)) x); intro.
+  rewrite <-H, Zceil_IZR, H; simpl; fourier.
   rewrite (Zceil_floor_neq _ H).
-  rewrite Z2R_plus; simpl.
+  rewrite plus_IZR; simpl.
   pose proof (Zfloor_lb x).
   destruct (Rle_lt_or_eq_dec _ _ H0); try easy.
   fourier.
@@ -172,8 +165,8 @@ Lemma Ceil_up :
   ((BuiltIn.IZR ((ceil x) - 1%Z)%Z) < x)%R /\ (x <= (BuiltIn.IZR (ceil x)))%R.
 Proof.
 intro x.
-rewrite <-Z2R_IZR, <-Z2R_IZR; split; [|apply Zceil_ub].
-rewrite Z2R_minus.
+split; [|apply Zceil_ub].
+rewrite minus_IZR.
 apply ceil_lb.
 Qed.
 

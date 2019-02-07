@@ -25,21 +25,25 @@ Require Import floating_point.GenFloat.
 
 (* Why3 goal *)
 Definition round : floating_point.Rounding.mode -> R -> R.
+Proof.
 exact (round 24 128).
 Defined.
 
 (* Why3 goal *)
 Definition value : floating_point.SingleFormat.single -> R.
+Proof.
 exact (value 24 128).
 Defined.
 
 (* Why3 goal *)
 Definition exact : floating_point.SingleFormat.single -> R.
+Proof.
 exact (exact 24 128).
 Defined.
 
 (* Why3 goal *)
 Definition model : floating_point.SingleFormat.single -> R.
+Proof.
 exact (model 24 128).
 Defined.
 
@@ -57,8 +61,10 @@ Definition no_overflow (m:floating_point.Rounding.mode) (x:R) : Prop :=
    (33554430 * 10141204801825835211973625643008)%R)%R.
 
 Lemma max_single_eq: (33554430 * 10141204801825835211973625643008 = max 24 128)%R.
-unfold max, Fcore_defs.F2R; simpl.
-ring.
+Proof.
+unfold max, Defs.F2R.
+simpl Raux.bpow.
+now rewrite <- 2!mult_IZR.
 Qed.
 
 (* Why3 goal *)
@@ -67,6 +73,7 @@ Lemma Bounded_real_no_overflow :
   ((Reals.Rbasic_fun.Rabs x) <=
    (33554430 * 10141204801825835211973625643008)%R)%R ->
   no_overflow m x.
+Proof.
 intros m x Hx.
 unfold no_overflow.
 rewrite max_single_eq in *.
@@ -77,6 +84,7 @@ Qed.
 Lemma Round_monotonic :
   forall (m:floating_point.Rounding.mode) (x:R) (y:R), (x <= y)%R ->
   ((round m x) <= (round m y))%R.
+Proof.
 apply Round_monotonic.
 easy.
 Qed.
@@ -86,6 +94,7 @@ Lemma Round_idempotent :
   forall (m1:floating_point.Rounding.mode) (m2:floating_point.Rounding.mode)
     (x:R),
   ((round m1 (round m2 x)) = (round m2 x)).
+Proof.
 now apply Round_idempotent.
 Qed.
 
@@ -94,6 +103,7 @@ Lemma Round_value :
   forall (m:floating_point.Rounding.mode)
     (x:floating_point.SingleFormat.single),
   ((round m (value x)) = (value x)).
+Proof.
 now apply Round_value.
 Qed.
 
@@ -102,6 +112,7 @@ Lemma Bounded_value :
   forall (x:floating_point.SingleFormat.single),
   ((Reals.Rbasic_fun.Rabs (value x)) <=
    (33554430 * 10141204801825835211973625643008)%R)%R.
+Proof.
 rewrite max_single_eq.
 now apply Bounded_value.
 Qed.
@@ -119,12 +130,14 @@ Qed.
 (* Why3 goal *)
 Lemma Round_down_le :
   forall (x:R), ((round floating_point.Rounding.Down x) <= x)%R.
+Proof.
 now apply Round_down_le.
 Qed.
 
 (* Why3 goal *)
 Lemma Round_up_ge :
   forall (x:R), (x <= (round floating_point.Rounding.Up x))%R.
+Proof.
 now apply Round_up_ge.
 Qed.
 
@@ -133,6 +146,7 @@ Lemma Round_down_neg :
   forall (x:R),
   ((round floating_point.Rounding.Down (-x)%R) =
    (-(round floating_point.Rounding.Up x))%R).
+Proof.
 now apply Round_down_neg.
 Qed.
 
@@ -141,12 +155,14 @@ Lemma Round_up_neg :
   forall (x:R),
   ((round floating_point.Rounding.Up (-x)%R) =
    (-(round floating_point.Rounding.Down x))%R).
+Proof.
 now apply Round_up_neg.
 Qed.
 
 (* Why3 goal *)
 Definition round_logic :
   floating_point.Rounding.mode -> R -> floating_point.SingleFormat.single.
+Proof.
 exact (round_logic 24 128 (refl_equal true) (refl_equal true)).
 Defined.
 
