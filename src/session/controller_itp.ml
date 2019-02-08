@@ -1125,16 +1125,16 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
       begin
         let parid = pa.parent in
         let pr = pa.prover in
-        (* TODO: if pr is not installed, lookup for a replacement policy
-         OR: delegate this work to the replay_proof_attempt function *)
-        (* If use_steps, we give only steps as a limit
-         TODO: steps should not be used if prover was replaced above *)
-        let limit =
+        (* If use_steps, we give only steps as a limit *)
+        let step_limit = Call_provers.(empty_limit.limit_steps) in
+        let step_limit =
           if use_steps then
-            Call_provers.{empty_limit with limit_steps = pa.limit.limit_steps}
-          else
-            Call_provers.{ pa.limit with limit_steps = empty_limit.limit_steps }
+            match pa.proof_state with
+            | None -> step_limit
+            | Some r -> r.Call_provers.pr_steps
+          else step_limit
         in
+        let limit = Call_provers.{pa.limit with limit_steps = step_limit } in
         replay_proof_attempt c pr limit parid id
                              ~callback:(fun id s ->
                                         craft_report s parid limit pa;

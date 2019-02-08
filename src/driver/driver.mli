@@ -34,6 +34,7 @@ val file_of_theory : driver -> string -> Theory.theory -> string
 (** [file_of_theory d f th] produces a filename
     for the prover of driver [d], for a theory [th] from filename [f] *)
 
+(* unused outside ?
 val call_on_buffer :
   command      : string ->
   limit        : Call_provers.resource_limit ->
@@ -42,7 +43,7 @@ val call_on_buffer :
   filename     : string ->
   printer_mapping : Printer.printer_mapping ->
   driver -> Buffer.t -> Call_provers.prover_call
-
+ *)
 
 val print_task :
   ?old       : in_channel ->
