@@ -198,11 +198,11 @@ module Print = struct
     | Lvar (pv, e) ->
         fprintf fmt "@[<hov 2>val %a =@ %a@]" (print_lident info) (pv_name pv)
           (print_expr info) e
-    | Lsym (rs, _, [], ef) ->
+    | Lsym (rs, _, _, [], ef) ->
         (* TODO? zero-arguments functions as Lvar in compile.Translate *)
         fprintf fmt "@[<hov 2>val %a =@ @[%a@]@]"
           (print_lident info) rs.rs_name (print_expr info) ef;
-    | Lsym (rs, _, args, ef) ->
+    | Lsym (rs, _, _, args, ef) ->
         fprintf fmt "@[<hov 2>fun %a @[%a@] =@ @[%a@]@]"
           (print_lident info) rs.rs_name
           (print_list space (print_vs_arg info)) args
@@ -218,7 +218,7 @@ module Print = struct
                 (print_fun_type_args info) (args, s, res, e);
               forget_vars args in
         print_list_next newline print_one fmt rdef;
-    | Lany (rs, _, _) ->
+    | Lany (rs, _, _, _) ->
         check_val_in_drv info rs
 
   and print_expr ?(paren=false) info fmt e =

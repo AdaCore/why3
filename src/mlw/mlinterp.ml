@@ -643,7 +643,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
                      with Not_found -> info.get_decl rs in
           Debug.dprintf debug_interp "decl found@.";
           match decl with
-          | Dlet (Lsym (rs, _ty, vl, e)) ->
+          | Dlet (Lsym (rs, _, _ty, vl, e)) ->
              eval_call info vl e rs
           | Dlet(Lrec([{rec_args = vl; rec_exp = e;
                         rec_sym = rs; rec_res=_ty}])) ->
@@ -761,7 +761,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
      end
   | Elet (Lany _,_) -> Debug.dprintf debug_interp "unhandled Lany@.";
                        raise CannotReduce
-  | Elet ((Lsym(rs,_,_,_) as ld), e) ->
+  | Elet ((Lsym(rs,_,_,_,_) as ld), e) ->
      interp_expr (add_fundecl rs (Dlet ld) info) e
   | Elet ((Lrec rdl as ld), e) ->
      let info = List.fold_left
@@ -870,6 +870,6 @@ let interp env mm rs vars =
   if Debug.test_flag debug_flamegraph then ts := Unix.gettimeofday ();
   let decl = info.get_decl rs in
   match decl with
-  | Dlet (Lsym (_rs, _, _vl, expr)) ->
+  | Dlet (Lsym (_rs, _, _, _vl, expr)) ->
      interp_expr info expr
   | _ -> raise CannotReduce
