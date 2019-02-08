@@ -1,0 +1,11 @@
+let f (g: unit -> 'a) : 'a = g ()
+
+let g (_:unit) = ()
+
+let good = f (fun x -> g x)
+
+let bad = f g
+
+let ugly = g
+
+let main () = ugly ()

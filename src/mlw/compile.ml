@@ -351,15 +351,18 @@ module Translate = struct
         (* partial application of constructors *)
         mk_eta_expansion rs pvl cty
     | Eexec ({c_node = Capp (rs, pvl); c_cty = cty}, _) ->
-        Debug.dprintf debug_compile "compiling total application of %s@."
+        Debug.dprintf debug_compile "compiling application of %s@."
           rs.rs_name.id_string;
+        Debug.dprintf debug_compile "pvl: %d@." (List.length pvl);
         Debug.dprintf debug_compile "cty_args: %d@." (List.length cty.cty_args);
         let rs = Hrs.find_def ht_rs rs rs in
         let add_unit = function [] -> [ML.e_unit] | args -> args in
         let id_f = fun x -> x in
-        let f_zero = match rs.rs_logic with RLnone ->
-          Debug.dprintf debug_compile "it is a RLnone@."; add_unit
-                                          | _ -> id_f in
+        let f_zero = match rs.rs_logic with
+          | RLnone when cty.cty_args = []  ->
+              Debug.dprintf debug_compile "it is a fully applied RLnone@.";
+              add_unit
+          | _ -> id_f in
         let pvl = app pvl rs.rs_cty.cty_args f_zero in
         begin match pvl with
           | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
