@@ -234,6 +234,13 @@ module Translate = struct
     | ML.Tapp (_, tyl) | ML.Ttuple tyl ->
         List.fold_left add_tvar acc tyl
 
+  let new_svar args res svar =
+    let new_svar =
+      let args' = List.map (fun (_, ty, _) -> ty) args in
+      let svar  = List.fold_left add_tvar Stv.empty args' in
+      add_tvar svar res in
+    Stv.diff new_svar svar
+
   (* expressions *)
   let rec expr info svar mask ({e_effect = eff; e_attrs = attrs} as e) =
     assert (not (e_ghost e));
@@ -287,15 +294,18 @@ module Translate = struct
           rs.rs_name.id_string;
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
-        let ld = ML.sym_defn rs res args (expr info svar cty.cty_mask ef) in
+        let new_svar = new_svar args res svar in
+        let ld = ML.sym_defn rs new_svar res args (expr info svar cty.cty_mask ef) in
         ML.e_let ld (expr info svar mask ein) (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rs, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app -> (* partial application of constructor *)
         let eta_app = mk_eta_expansion rs_app pvl cty in
         let mk_func pv f = ity_func pv.pv_ity f in
         let func = List.fold_right mk_func cty.cty_args cty.cty_result in
+        let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask func in
-        let ld = ML.sym_defn rs res [] eta_app in
+        let new_svar = new_svar args res svar in
+        let ld = ML.sym_defn rs new_svar res [] eta_app in
         let ein = expr info svar mask ein in
         ML.e_let ld ein (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
@@ -307,8 +317,10 @@ module Translate = struct
         let pvl = app pvl rs_app.rs_cty.cty_args (fun x -> x) in
         let rs_app = Hrs.find_def ht_rs rs_app rs_app in
         let eapp = ML.e_app rs_app pvl (ML.C cty) cmk ceff Sattr.empty in
+        let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
-        let ld = ML.sym_defn rsf res (params cty.cty_args) eapp in
+        let new_svar = new_svar args res svar in
+        let ld = ML.sym_defn rsf new_svar res args eapp in
         let ein = expr info svar mask ein in
         ML.e_let ld ein (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (_, {c_node = Cany; _}), _) -> let loc = e.e_loc in
@@ -322,11 +334,7 @@ module Translate = struct
           | { rec_sym = rs1; rec_fun = {c_node = Cfun ef; c_cty = cty} } ->
               let res = mlty_of_ity rs1.rs_cty.cty_mask rs1.rs_cty.cty_result in
               let args = params cty.cty_args in
-              let new_svar =
-                let args' = List.map (fun (_, ty, _) -> ty) args in
-                let svar  = List.fold_left add_tvar Stv.empty args' in
-                add_tvar svar res in
-              let new_svar = Stv.diff new_svar svar in
+              let new_svar = new_svar args res svar in
               let ef = expr info (Stv.union svar new_svar) ef.e_mask ef in
               { ML.rec_sym  = rs1; ML.rec_args = args; ML.rec_exp  = ef;
                 ML.rec_res  = res; ML.rec_svar = new_svar; }
@@ -525,11 +533,14 @@ module Translate = struct
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cany})) ->
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
-        [ML.Dlet (ML.Lany (rs, res, args))]
+        let new_svar = new_svar args res Stv.empty in
+        [ML.Dlet (ML.Lany (rs, new_svar, res, args))]
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e}))
       when is_val e.e_node -> (* zero argument functions *)
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
-        [ML.Dlet (ML.Lany (rs, res, []))]
+        let args = params cty.cty_args in
+        let new_svar = new_svar args res Stv.empty in
+        [ML.Dlet (ML.Lany (rs, new_svar, res, []))]
     | PDlet (LDsym ({rs_cty = cty; rs_logic} as rs, {c_node = Cfun e; c_cty}))
       when c_cty.cty_args = [] ->
         Debug.dprintf debug_compile "compiling zero-arguments function %a@."
@@ -541,22 +552,16 @@ module Translate = struct
           Debug.dprintf debug_compile "rlnone ici@."; [ML.mk_var_unit]
                                      | _ -> [] in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
-        let svar =
-          let args' = List.map (fun (_, ty, _) -> ty) args in
-          let svar  = List.fold_left add_tvar Stv.empty args' in
-          add_tvar svar res in
+        let svar = new_svar args res Stv.empty in
         let e = expr info svar cty.cty_mask e in
-        [ML.Dlet (ML.Lsym (rs, res, args, e))]
+        [ML.Dlet (ML.Lsym (rs, svar, res, args, e))]
     | PDlet (LDsym ({rs_cty = cty} as rs, {c_node = Cfun e})) ->
         Debug.dprintf debug_compile "compiling function %a@." Expr.print_rs rs;
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
-        let svar =
-          let args' = List.map (fun (_, ty, _) -> ty) args in
-          let svar  = List.fold_left add_tvar Stv.empty args' in
-          add_tvar svar res in
+        let svar = new_svar args res Stv.empty in
         let e = expr info svar cty.cty_mask e in
-        [ML.Dlet (ML.Lsym (rs, res, args, e))]
+        [ML.Dlet (ML.Lsym (rs, svar, res, args, e))]
     | PDlet (LDrec rl) ->
         let rl = filter_out_ghost_rdef rl in
         List.iter (fun {rec_sym = rs1; rec_rsym = rs2} ->
@@ -724,9 +729,9 @@ module Transform = struct
         assert (not (Mpv.mem pv subst)); (* no capture *)
         let e, spv = expr info subst e in
         Lvar (pv, e), spv
-    | Lsym (rs, res, args, e) ->
+    | Lsym (rs, svar, res, args, e) ->
         let e, spv = expr info subst e in
-        Lsym (rs, res, args, e), spv
+        Lsym (rs, svar, res, args, e), spv
     | Lany _ as lany -> lany, Mpv.empty
     | Lrec rl ->
         let rdef, spv = mk_list_eb rl (rdef info subst) in

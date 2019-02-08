@@ -118,7 +118,7 @@ module MLPrinter (K: sig val keywords: string list end) = struct
 
   let forget_let_defn = function
     | Lvar (v,_) -> forget_id v.pv_vs.vs_name
-    | Lsym (s,_,_,_) | Lany (s,_,_) -> forget_rs s
+    | Lsym (s,_,_,_,_) | Lany (s,_,_,_) -> forget_rs s
     | Lrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
   let rec forget_pat = function

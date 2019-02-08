@@ -1175,7 +1175,7 @@ module MLToC = struct
 	  sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
     try
       begin match d with
-      | Dlet (Lsym(rs, _, vl, e)) -> translate_fun rs vl e
+      | Dlet (Lsym(rs, _, _, vl, e)) -> translate_fun rs vl e
       | Dtype [{its_name=id; its_def=idef}] ->
          Debug.dprintf debug_c_extraction "PDtype %s@." id.id_string;
          begin
