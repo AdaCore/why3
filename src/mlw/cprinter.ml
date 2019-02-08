@@ -469,7 +469,7 @@ module Print = struct
     | Tptr ty -> fprintf fmt "%a *" (print_ty ~paren:true) ty
     (* should be handled in extract_stars *)
     | Tarray (_ty, Enothing) ->
-       raise (Unsupported "printing array type with unknown size")
+       raise (Unprinted "printing array type with unknown size")
     | Tarray (ty, expr) ->
       fprintf fmt (protect_on paren "%a[%a]")
         (print_ty ~paren:true) ty (print_expr ~prec:1) expr
