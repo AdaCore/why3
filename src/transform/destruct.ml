@@ -331,7 +331,7 @@ let destruct_fmla ~recursive (t: term) =
           List.map (fun ts -> Axiom_term (t_not t1) :: ts)
         in
         ts2 @ ts3
-    | Tcase (t, tbs) ->
+    | Tcase (t, tbs) when toplevel ->
         let for_branch tb =
           let pat, rhs = t_open_branch tb in
           let for_expansion (bds, eqs, t') =
