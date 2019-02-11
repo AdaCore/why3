@@ -46,8 +46,7 @@ depends: [
   "ocaml" {>= "4.02.3"}
   "ocamlfind" {build}
   "why3"
-  ("lablgtk" | "lablgtk3")
-  "conf-gtksourceview"
+  (("lablgtk" & "conf-gtksourceview") | ("lablgtk3" & "conf-gtksourceview3"))
 ]
 
 conflicts: [
