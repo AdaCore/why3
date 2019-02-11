@@ -48,24 +48,7 @@ theory int.Int
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop MulComm.Comm
-  remove prop MulAssoc.Assoc
-  remove prop Unit_def_l
-  remove prop Unit_def_r
-  remove prop Inv_def_l
-  remove prop Inv_def_r
-  remove prop Assoc
-  remove prop Mul_distr_l
-  remove prop Mul_distr_r
-  remove prop Comm
-  remove prop Unitary
-  remove prop Refl
-  remove prop Trans
-  remove prop Antisymm
-  remove prop Total
-  remove prop NonTrivialRing
-  remove prop CompatOrderAdd
-  remove prop ZeroLessOne
+  remove allprops
 
 end
 
@@ -88,28 +71,39 @@ theory real.Real
   syntax predicate (>=) "(>= %1 %2)"
   syntax predicate (>)  "(> %1 %2)"
 
-  remove prop MulComm.Comm
-  remove prop MulAssoc.Assoc
-  remove prop Unit_def_l
-  remove prop Unit_def_r
-  remove prop Inv_def_l
-  remove prop Inv_def_r
-  remove prop Assoc
-  remove prop Mul_distr_l
-  remove prop Mul_distr_r
-  remove prop Comm
-  remove prop Unitary
-  remove prop Inverse
-  remove prop Refl
-  remove prop Trans
-  remove prop Antisymm
-  remove prop Total
-  remove prop NonTrivialRing
-  remove prop CompatOrderAdd
-  remove prop ZeroLessOne
+  remove allprops
 
   meta "encoding:kept" type real
 
+end
+
+theory real.Abs
+  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
+
+  remove allprops
+end
+
+theory real.MinMax
+  syntax function min "(ite (< %1 %2) %1 %2)"
+  syntax function max "(ite (< %1 %2) %2 %1)"
+
+  remove allprops
+end
+
+theory real.FromInt
+  syntax function from_int "(to_real %1)"
+
+  remove allprops
+end
+
+theory real.Truncate
+  syntax function truncate "(ite (>= %1 0.0)
+                                 (to_int %1)
+                                 (- (to_int (- %1))))"
+  syntax function floor "(to_int %1)"
+  syntax function ceil "(- 1 (to_int (- 1.0 %1)))"
+
+  remove allprops
 end
 
 theory Bool

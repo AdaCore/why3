@@ -2,10 +2,6 @@
 
 prelude ";;; SMT-LIB2 driver: bit-vectors, common part"
 
-theory bv.Pow2int
-  remove allprops
-end
-
 theory bv.BV_Gen
   remove prop size_pos
   remove prop nth_out_of_bound
@@ -49,6 +45,7 @@ theory bv.BV_Gen
 
   remove prop to_uint_extensionality
   remove prop to_int_extensionality
+
   remove prop to_uint_bounds
   remove prop to_uint_of_int
   remove prop to_uint_size_bv
@@ -93,6 +90,7 @@ theory bv.BV_Gen
   remove prop to_uint_urem
 
   (** Bitvector alternatives for shifts, rotations and nth *)
+  
   syntax function lsr_bv "(bvlshr %1 %2)"
   (* remove prop lsr_bv_is_lsr *)
   remove prop to_uint_lsr
@@ -218,4 +216,8 @@ end
 theory bv.BVConverter_8_16
   syntax function toBig "((_ zero_extend 8) %1)"
   syntax function toSmall "((_ extract 7 0) %1)"
+end
+
+theory bv.Pow2int
+  remove allprops
 end
