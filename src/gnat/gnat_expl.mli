@@ -25,6 +25,7 @@ type reason =
    | VC_Interrupt_Reserved
    | VC_Ceiling_Priority_Protocol
    | VC_Task_Termination
+   | VC_Initialization_Check
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
    | VC_Default_Initial_Condition

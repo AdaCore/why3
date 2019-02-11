@@ -21,6 +21,7 @@ type reason =
    | VC_Interrupt_Reserved
    | VC_Ceiling_Priority_Protocol
    | VC_Task_Termination
+   | VC_Initialization_Check
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
    | VC_Default_Initial_Condition
@@ -71,6 +72,7 @@ let is_warning_reason r =
    | VC_Interrupt_Reserved
    | VC_Ceiling_Priority_Protocol
    | VC_Task_Termination
+   | VC_Initialization_Check
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
    | VC_Default_Initial_Condition
@@ -152,6 +154,7 @@ let reason_from_string s =
    | "VC_INTERRUPT_RESERVED"        -> VC_Interrupt_Reserved
    | "VC_CEILING_PRIORITY_PROTOCOL" -> VC_Ceiling_Priority_Protocol
    | "VC_TASK_TERMINATION"          -> VC_Task_Termination
+   | "VC_INITIALIZATION_CHECK"      -> VC_Initialization_Check
    (* VC_Assert_Kind - assertions *)
    | "VC_INITIAL_CONDITION"         -> VC_Initial_Condition
    | "VC_DEFAULT_INITIAL_CONDITION" -> VC_Default_Initial_Condition
@@ -207,6 +210,7 @@ let reason_to_ada reason =
    | VC_Interrupt_Reserved        -> "VC_INTERRUPT_RESERVED"
    | VC_Ceiling_Priority_Protocol -> "VC_CEILING_PRIORITY_PROTOCOL"
    | VC_Task_Termination          -> "VC_TASK_TERMINATION"
+   | VC_Initialization_Check      -> "VC_INITIALIZATION_CHECK"
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "VC_INITIAL_CONDITION"
    | VC_Default_Initial_Condition -> "VC_DEFAULT_INITIAL_CONDITION"
@@ -257,6 +261,7 @@ let reason_to_string reason =
    | VC_Interrupt_Reserved        -> "interrupt_reserved"
    | VC_Ceiling_Priority_Protocol -> "ceiling__priority_protocol"
    | VC_Task_Termination          -> "task_termination"
+   | VC_Initialization_Check      -> "initialization"
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "initial_condition"
    | VC_Default_Initial_Condition -> "default_initial_condition"
