@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Js_of_ocaml
+
 type id = string
 type loc = int * int * int * int
 type why3_loc = string * (int * int * int) (* kind, line, column, length *)
