@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 1.2.0, February 11, 2019
+--------------------------------
+
 Session
   * file path stored in session files are now represented in a
     system-independent way
