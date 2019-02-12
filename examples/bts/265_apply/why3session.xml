@@ -33,5 +33,27 @@
  </transf>
  </goal>
 </theory>
+<theory name="Test2">
+ <goal name="g">
+ <transf name="apply" arg1="test_bad" arg2="with" arg3="23">
+  <goal name="g.0" expl="apply premises">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Test3">
+ <goal name="g1">
+ <transf name="apply" arg1="H1" arg2="with" arg3="23">
+  <goal name="g1.0" expl="apply premises">
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g2">
+ <transf name="apply" arg1="H2" arg2="with" arg3="48">
+  <goal name="g2.0" expl="apply premises">
+  </goal>
+ </transf>
+ </goal>
+</theory>
 </file>
 </why3session>

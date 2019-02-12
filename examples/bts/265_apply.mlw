@@ -2,16 +2,50 @@ module Test
   predicate p int
 
   function f int: int
-  
+
   axiom H: forall x. let y = f x in let z = f y in p z
 
   axiom H2: forall x. let y = f x in let z = f y in let a = f z in p a
 
   axiom H1: forall x. let y = x in let z = y in p z
-  
+
   axiom H3: forall x. let y = f x in x = y -> let z = f y in let a = f z in p a
 
   axiom H4: forall x. (let v = x in f v = x) -> let z = f x in let a = f z in p a
 
   goal g: p 17
 end
+
+module Test2
+
+  inductive test int =
+    | test_bad: forall x.
+      let y = x  in
+      let z = y in
+      test z
+    | test_good: forall x.
+      let z =
+        let y = x in
+        y
+      in
+      test z
+
+  goal g: test 0
+end
+
+module Test3
+
+predicate test int
+
+function f int : int
+
+axiom H1 : forall x:int. let y = f x in test y
+
+goal g1: test 42
+
+axiom H2 : forall x:int. let y = f x in let z = f y in test z
+
+goal g2: test 42
+
+end
+
