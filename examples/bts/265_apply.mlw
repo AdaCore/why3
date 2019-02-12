@@ -1,0 +1,17 @@
+module Test
+  predicate p int
+
+  function f int: int
+  
+  axiom H: forall x. let y = f x in let z = f y in p z
+
+  axiom H2: forall x. let y = f x in let z = f y in let a = f z in p a
+
+  axiom H1: forall x. let y = x in let z = y in p z
+  
+  axiom H3: forall x. let y = f x in x = y -> let z = f y in let a = f z in p a
+
+  axiom H4: forall x. (let v = x in f v = x) -> let z = f x in let a = f z in p a
+
+  goal g: p 17
+end

@@ -176,8 +176,10 @@ let matching_with_terms ~trans_name lv llet_vs left_term right_term withed_terms
   subst_ty, subst
 
 let generate_new_subgoals ~subst_ty ~subst llet lp =
-  let new_lets, new_goals =
-    List.fold_left (fun (new_lets, new_goals) (v,t) ->
+  (* Here the substitution is updated in order for the let values to not contain
+     any let-introduced-variables. *)
+  let subst_ty, subst, new_lets, new_goals =
+    List.fold_left (fun (subst_ty, subst, new_lets, new_goals) (v,t) ->
         match Mvs.find v subst with
         | t' ->
             (* [v -> t'] appears in subst. So we want to create two new goals:
@@ -186,27 +188,31 @@ let generate_new_subgoals ~subst_ty ~subst llet lp =
             *)
             let t' = t_ty_subst subst_ty subst t' in
             let t = t_ty_subst subst_ty subst t in
-            (new_lets, (t_equ t' t) :: new_goals)
+            (subst_ty, subst, new_lets, (t_equ t' t) :: new_goals)
         | exception Not_found ->
-            ((v,t) :: new_lets, new_goals)
+            let t = t_ty_subst subst_ty subst t in
+            (subst_ty, Mvs.add v t subst, (v,t) :: new_lets, new_goals)
       )
-      ([], []) llet
+      (subst_ty, subst, [], []) llet
   in
   let add_lets_subst new_goals h =
     let h = t_ty_subst subst_ty subst h in
     let freevars = t_freevars Mvs.empty h in
     let h =
+      (* All the remaining freevars are originally let-binded. We rebind them
+         with a correct let. *)
       List.fold_left (fun h (v, t) ->
           if Mvs.mem v freevars then
             let t = t_ty_subst subst_ty subst t in
-            t_let t (t_close_bound v h)
+            (* Small optimization with t_let_simp instead of t_let *)
+            t_let_simp t (t_close_bound v h)
           else
             h)
         h (List.rev new_lets)
     in
     h :: new_goals
   in
-  List.fold_left add_lets_subst new_goals lp
+  List.fold_left add_lets_subst [] (new_goals @ lp)
 
 (* Apply:
    1) takes the hypothesis and introduce parts of it to keep only the last
