@@ -118,6 +118,13 @@ theory real.Abs
   remove allprops
 end
 
+theory real.MinMax
+  syntax function min "(ite (< %1 %2) %1 %2)"
+  syntax function max "(ite (< %1 %2) %2 %1)"
+
+  remove allprops
+end
+
 theory Bool
   syntax type     bool  "Bool"
   syntax function True  "true"
