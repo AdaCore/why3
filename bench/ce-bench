@@ -85,8 +85,8 @@ run () {
         "none") is_xfail=false;;
         "integer_values")
             is_xfail=false
-            str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"[0-9]\+"/"val":"ANYINT"/g')
-            str_out=$(echo ${str_out} | sed -e 's/"val":"[0-9]\+"/"val":"ANYINT"/g')
+            str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"-\?[0-9]\+"/"val":"ANYINT"/g')
+            str_out=$(echo ${str_out} | sed -e 's/"val":"-\?[0-9]\+"/"val":"ANYINT"/g')
             ;;
         *)
             echo "High failure: unknown xfail value $is_xfail";
