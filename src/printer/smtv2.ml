@@ -697,7 +697,7 @@ let meta_incremental =
                             ~desc:"Internal@ use@ only"
 
 let print_task version args ?old:_ fmt task =
-  let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  let cntexample = Inlining.get_counterexmp task in
   let incremental =
     let incr_meta = Task.find_meta_tds task meta_incremental in
     not (Theory.Stdecl.is_empty incr_meta.Task.tds_set)

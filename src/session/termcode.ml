@@ -440,7 +440,7 @@ let t_shape_task ~version ~expl t =
       | SV4 ->
          let open Decl in
          let introduced id = Ident.Sattr.mem
-                               Introduction.intro_attr
+                               Inlining.intro_attr
                                id.Ident.id_attrs in
          let do_td td = match td.Theory.td_node with
            | Theory.Decl d ->

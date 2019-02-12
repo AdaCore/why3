@@ -470,7 +470,7 @@ let print_task args ?old:_ fmt task =
   let inv_trig = Task.on_tagged_ls meta_invalid_trigger task in
   let show,cast = Task.on_meta meta_printer_option
     check_options (false,true) task in
-  let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  let cntexample = Inlining.get_counterexmp task in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {

@@ -9,22 +9,12 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Task
-
 let debug = Debug.register_info_flag "prepare_for_counterexmp"
   ~desc:"Print@ debugging@ messages@ about@ preparing@ the@ task@ \
     for@ getting@ counter-example."
 
-let meta_get_counterexmp =
-  Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
-  ~desc:"Set@ when@ counter-example@ should@ be@ get."
-
-let get_counterexmp task =
-  let ce_meta = Task.find_meta_tds task meta_get_counterexmp in
-  not (Theory.Stdecl.is_empty ce_meta.tds_set)
-
 let prepare_for_counterexmp2 env task =
-  if not (get_counterexmp task) then begin
+  if not (Inlining.get_counterexmp task) then begin
     (* Counter-example will not be queried, do nothing *)
     Debug.dprintf debug "Not get ce@.";
     task

@@ -84,14 +84,13 @@ let rec dequant pos f = t_attr_copy f (match f.t_node with
 
 and dequant_if_case pos f = if case f then dequant pos f else f
 
-let intro_attr = Ident.create_attribute "introduced"
-let intro_attrs = Sattr.singleton intro_attr
+let intro_attrs = Sattr.singleton Inlining.intro_attr
 
 let compat ls vs =
   ls.ls_args = [] &&
   Opt.equal ty_equal ls.ls_value (Some vs.vs_ty) &&
   Opt.equal Loc.equal ls.ls_name.id_loc vs.vs_name.id_loc &&
-  Sattr.equal ls.ls_name.id_attrs (Sattr.add intro_attr vs.vs_name.id_attrs)
+  Sattr.equal ls.ls_name.id_attrs (Sattr.add Inlining.intro_attr vs.vs_name.id_attrs)
 
 let ls_of_vs mal vs = match mal with
   | Theory.MAls ls :: mal when compat ls vs -> ls, mal
@@ -121,7 +120,7 @@ let rec intros kn pr mal expl f =
       (* f is going to be removed, preserve its attributes and location in f2 *)
       let f2 = t_attr_copy f f2 in
       let fl = Split_goal.split_intro_right ?known_map:kn (dequant false f1) in
-      let idx = id_fresh "H" ~attrs:(Sattr.singleton intro_attr) in
+      let idx = id_fresh "H" ~attrs:intro_attrs in
       let add (subst,dl) f =
         let svs = Mvs.set_diff (t_freevars Mvs.empty f) subst in
         let subst, dl = Mvs.fold (fun vs _ (subst,dl) ->
@@ -206,7 +205,7 @@ let rec generalize hd =
       if pl = [] then [], Some hd else
       let expl = get_expls f in
       let get_vs {ls_name = id; ls_value = oty} =
-        let attrs = Sattr.remove intro_attr id.id_attrs in
+        let attrs = Sattr.remove Inlining.intro_attr id.id_attrs in
         let id = id_fresh ~attrs ?loc:id.id_loc id.id_string in
         create_vsymbol id (Opt.get oty) in
       let set_vs vs ls f =
@@ -233,11 +232,11 @@ let rec generalize hd =
   | Theory.Decl ({d_node =
       ( Dparam ({ls_args = []; ls_value = Some _} as ls)
       | Dlogic [{ls_args = []; ls_value = Some _} as ls, _])} as d)
-    when Sattr.mem intro_attr ls.ls_name.id_attrs ->
+    when Sattr.mem Inlining.intro_attr ls.ls_name.id_attrs ->
       let pl, task = apply_prev generalize hd in
       d::pl, Task.add_meta task meta_intro_ls [Theory.MAls ls]
   | Theory.Decl ({d_node = Dprop (Paxiom, pr, _)} as d)
-    when Sattr.mem intro_attr pr.pr_name.id_attrs ->
+    when Sattr.mem Inlining.intro_attr pr.pr_name.id_attrs ->
       let pl, task = apply_prev generalize hd in
       d::pl, Task.add_meta task meta_intro_pr [Theory.MApr pr]
   (* We only reattach the local premises right before the goal.
@@ -264,7 +263,7 @@ let rec eliminate_exists_aux pr t =
   | Tquant (Texists, q) ->
      let vsl, _, t' = t_open_quant q in
      let intro_var subst vs =
-       let id = id_clone ~attrs:(Sattr.singleton intro_attr) vs.vs_name in
+       let id = id_clone ~attrs:intro_attrs vs.vs_name in
        let ls =
          create_lsymbol id [] (Some vs.vs_ty)
        in
@@ -288,7 +287,7 @@ let () = Trans.register_transform
            ~desc:"Replace axioms of the form 'exists x. P' by 'constant x axiom P'."
 
 let subst_filter ls =
-  Sattr.mem intro_attr ls.ls_name.id_attrs &&
+  Sattr.mem Inlining.intro_attr ls.ls_name.id_attrs &&
   not (relevant_for_counterexample ls.ls_name)
 
 let simplify_intros =
