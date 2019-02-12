@@ -125,6 +125,12 @@ theory real.MinMax
   remove allprops
 end
 
+theory real.FromInt
+  syntax function from_int "(to_real %1)"
+
+  remove allprops
+end
+
 theory Bool
   syntax type     bool  "Bool"
   syntax function True  "true"
