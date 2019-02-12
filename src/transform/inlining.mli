@@ -11,7 +11,15 @@
 
 (** Inline non-recursive definitions *)
 
+val intro_attr : Ident.attribute
+
 val meta : Theory.meta
+
+val get_counterexmp : Task.task -> bool
+(**
+   Returns true if counterexample should be get for the task.
+*)
+
 
 (** {2 Generic inlining} *)
 
@@ -20,7 +28,7 @@ val t :
   ?in_goal:bool ->
   notdeft:(Term.term -> bool) ->
   notdeff:(Term.term -> bool) ->
-  notls  :(Term.lsymbol -> bool) ->
+  notls  :(for_counterexample:bool -> Term.lsymbol -> bool) ->
   Task.task Trans.trans
 
 (** [t ~use_meta ~in_goal ~notdeft ~notdeff ~notls] returns a transformation

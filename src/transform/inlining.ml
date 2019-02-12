@@ -15,6 +15,17 @@ open Decl
 open Theory
 open Task
 
+let intro_attr = Ident.create_attribute "introduced"
+
+let meta_get_counterexmp =
+  Theory.register_meta_excl "get_counterexmp" [Theory.MTstring]
+  ~desc:"Set@ when@ counter-example@ should@ be@ get."
+
+let get_counterexmp task =
+  let ce_meta = Task.find_meta_tds task meta_get_counterexmp in
+  not (Theory.Stdecl.is_empty ce_meta.tds_set)
+
+
 let rec relocate loc t =
   t_map (relocate loc) (t_attr_set ?loc t.t_attrs t)
 
@@ -86,20 +97,24 @@ let meta = Theory.register_meta "inline:no" [Theory.MTlsymbol]
   ~desc:"Disallow@ the@ inlining@ of@ the@ given@ function/predicate@ symbol."
 
 let t ?(use_meta=true) ?(in_goal=false) ~notdeft ~notdeff ~notls =
-  let trans notls =
-    Trans.fold_map (fold in_goal notdeft notdeff notls) Mls.empty None in
-  if use_meta then
-    Trans.on_tagged_ls meta (fun sls ->
-      let notls ls = Sls.mem ls sls || notls ls in
-      trans notls)
-  else
-    trans notls
+  Trans.bind (Trans.store get_counterexmp)
+  (fun for_counterexample ->
+    let trans notls =
+      Trans.fold_map (fold in_goal notdeft notdeff notls) Mls.empty None in
+    if use_meta then
+      Trans.on_tagged_ls meta (fun sls ->
+          let notls ls = Sls.mem ls sls || notls ~for_counterexample ls in
+          trans notls)
+    else
+      trans (notls ~for_counterexample))
 
-let all = t ~use_meta:true ~in_goal:false
-  ~notdeft:Util.ffalse ~notdeff:Util.ffalse ~notls:Util.ffalse
+let all =
+  t ~use_meta:true ~in_goal:false ~notdeft:Util.ffalse ~notdeff:Util.ffalse
+    ~notls:(fun ~for_counterexample:_ _ -> false)
 
-let goal = t ~use_meta:true ~in_goal:true
-  ~notdeft:Util.ffalse ~notdeff:Util.ffalse ~notls:Util.ffalse
+let goal =
+  t ~use_meta:true ~in_goal:true ~notdeft:Util.ffalse ~notdeff:Util.ffalse
+    ~notls:(fun ~for_counterexample:_ _ -> false)
 
 (* inline_trivial *)
 
@@ -120,8 +135,14 @@ let notdeft t = match t.t_node with
   | Tapp (_,tl) -> not (trivial tl)
   | _ -> true
 
-let trivial = t ~use_meta:true ~in_goal:false
-  ~notdeft:notdeft ~notdeff:notdeft ~notls:Util.ffalse
+let trivial =
+  let notls ~for_counterexample ls =
+    (* do not inline things like `let result = ... in ...`
+       when counterexamples are wanted. These are recognized
+       as having the attribute `introduced` *)
+    for_counterexample && ls.ls_args = [] &&
+      Ident.(Sattr.mem intro_attr ls.ls_name.id_attrs) in
+  t ~use_meta:true ~in_goal:false ~notdeft:notdeft ~notdeff:notdeft ~notls
 
 let () =
   Trans.register_transform "inline_all" all
