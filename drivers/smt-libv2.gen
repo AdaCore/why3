@@ -112,6 +112,12 @@ theory real.Real
 
 end
 
+theory real.Abs
+  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
+
+  remove allprops
+end
+
 theory Bool
   syntax type     bool  "Bool"
   syntax function True  "true"
