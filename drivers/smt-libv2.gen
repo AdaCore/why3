@@ -131,6 +131,16 @@ theory real.FromInt
   remove allprops
 end
 
+theory real.Truncate
+  syntax function truncate "(ite (>= %1 0.0)
+                                 (to_int %1)
+                                 (- (to_int (- %1))))"
+  syntax function floor "(to_int %1)"
+  syntax function ceil "(- 1 (to_int (- 1.0 %1)))"
+
+  remove allprops
+end
+
 theory Bool
   syntax type     bool  "Bool"
   syntax function True  "true"
