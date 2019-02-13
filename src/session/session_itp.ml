@@ -484,7 +484,8 @@ let print_proof_attempt fmt pa =
   fprintf fmt "%a tl=%d %a"
           Whyconf.print_prover pa.prover
           pa.limit.Call_provers.limit_time
-          (Pp.print_option Call_provers.print_prover_result) pa.proof_state
+          (Pp.print_option (Call_provers.print_prover_result ~json_model:false))
+          pa.proof_state
 
 let rec print_proof_node s (fmt: Format.formatter) p =
   let pn = get_proofNode s p in

@@ -26,6 +26,8 @@ let opt_input = ref None
 let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
+(* Option for printing counterexamples with JSON formatting *)
+let opt_json = ref false
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -137,6 +139,8 @@ let option_list = [
       "<dir> print the selected goals to separate files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o";
+  "--json", Arg.Set opt_json,
+      " print counterexamples in JSON format";
   "--print-theory", Arg.Set opt_print_theory,
       " print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
@@ -254,7 +258,7 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
         let res = Call_provers.wait_on_call call in
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
-          Call_provers.print_prover_result res;
+          (Call_provers.print_prover_result ~json_model:!opt_json) res;
         if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task
