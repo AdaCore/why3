@@ -112,6 +112,35 @@ theory real.Real
 
 end
 
+theory real.Abs
+  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
+
+  remove allprops
+end
+
+theory real.MinMax
+  syntax function min "(ite (< %1 %2) %1 %2)"
+  syntax function max "(ite (< %1 %2) %2 %1)"
+
+  remove allprops
+end
+
+theory real.FromInt
+  syntax function from_int "(to_real %1)"
+
+  remove allprops
+end
+
+theory real.Truncate
+  syntax function truncate "(ite (>= %1 0.0)
+                                 (to_int %1)
+                                 (- (to_int (- %1))))"
+  syntax function floor "(to_int %1)"
+  syntax function ceil "(- 1 (to_int (- 1.0 %1)))"
+
+  remove allprops
+end
+
 theory Bool
   syntax type     bool  "Bool"
   syntax function True  "true"
