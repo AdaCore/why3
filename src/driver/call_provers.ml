@@ -162,14 +162,17 @@ let print_prover_status fmt = function
 let print_steps fmt s =
   if s >= 0 then fprintf fmt ", %d steps" s
 
-let print_prover_result fmt {pr_answer = ans; pr_status = status;
-                             pr_output = out; pr_time   = t;
-                             pr_steps  = s;   pr_model  = m} =
+let print_prover_result ~json_model fmt {pr_answer = ans; pr_status = status;
+                                         pr_output = out; pr_time   = t;
+                                         pr_steps  = s;   pr_model  = m} =
   let print_attrs = Debug.test_flag debug_attrs in
   fprintf fmt "%a (%.2fs%a)" print_prover_answer ans t print_steps s;
   if not (Model_parser.is_model_empty m) then begin
     fprintf fmt "\nCounter-example model:";
-    Model_parser.print_model ~print_attrs fmt m
+    if json_model then
+      Model_parser.print_model ~print_attrs fmt m
+    else
+      Model_parser.print_model_human ?me_name_trans:None ~print_attrs fmt m
   end;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."
