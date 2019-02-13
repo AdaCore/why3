@@ -44,6 +44,12 @@ decide_fail () {
         # Inconsistent results between two runs
         "bench/ce/ref_mono_Z3,4.6.0_SP")
             is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/floats_Z3,4.6.0_WP")
+            is_xfail=full;;
+        # Inconsistent results between two runs
+        "bench/ce/floats_Z3,4.6.0_SP")
+            is_xfail=full;;
         *) is_xfail=none;;
     esac
 }
