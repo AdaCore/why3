@@ -309,8 +309,9 @@ let init () =
    session *)
 let init_cont () =
   let session_dir = get_session_dir () in
-  (* Shape version is always None for gnatwhy3 because we don't use shapes *)
-  let is_new_session, (session, _shape_version) =
+  (* Shape version is only used for pairing of goals in session_itp.ml
+     (nothing else). *)
+  let is_new_session, (session, shape_version) =
     if not Gnat_config.force && Sys.file_exists session_dir then
       false, Session_itp.load_session session_dir
     else begin
@@ -354,7 +355,8 @@ let init_cont () =
            Session_itp.rename_file ses abs_file Gnat_config.filename in
          ());
       try
-        let (_ : bool), (_ : bool) = Controller_itp.reload_files c ~shape_version:None in
+        let (_ : bool), (_ : bool) =
+          Controller_itp.reload_files c ~shape_version in
         c
       with
       | Controller_itp.Errors_list l ->
