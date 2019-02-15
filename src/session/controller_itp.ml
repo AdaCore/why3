@@ -752,7 +752,7 @@ let schedule_transformation c id name args ~callback ~notification =
         | Cannot_infer_type _ | Unnecessary_terms _ | Parse_error _
         | Arg_expected _ | Arg_theory_not_found _ | Arg_expected_none _
         | Arg_qid_not_found _ | Arg_pr_not_found _ | Arg_error _
-        | Arg_parse_type_error _ | Unnecessary_arguments _
+        | Arg_parse_type_error _ | Trans.Unnecessary_arguments _
         | Reflection.NoReification ) as e ->
           callback (TSfailed (id, e))
       | e when not (Debug.test_flag Debug.stack_trace) ->

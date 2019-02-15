@@ -1,5 +1,24 @@
 :x: marks a potential source of incompatibility
 
+Tools
+  * why3prove counterexamples output is not JSON by default. To restore previous
+   behavior, pass the argument --json
+
+API
+  * function Call_provers.print_prover_result now takes an additional boolean
+  argument ~json_model which state if the counterexamples are printed with json
+  format :x:
+
+Transformations
+  * Improvement of apply/rewrite in presence of let. Solve a bug that prevents
+  applying hypothesis with nested let-bindings :x:
+  * Adding arguments to transformations without arguments is now forbidden
+  (previously ignored):x:
+
+Counterexamples
+  * Improved display of counterexamples in Task view
+
+
 Version 1.2.0, February 11, 2019
 --------------------------------
 

@@ -27,7 +27,6 @@ exception Arg_pr_not_found of Decl.prsymbol
 exception Arg_qid_not_found of Ptree.qualid
 exception Arg_error of string
 exception Arg_parse_type_error of Loc.position * string * exn
-exception Unnecessary_arguments of string list
 
 
 val build_naming_tables : Task.task -> Trans.naming_table

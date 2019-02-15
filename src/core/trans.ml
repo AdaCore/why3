@@ -499,6 +499,8 @@ let list_trans () =
   in
     Hstr.fold (fun k _ acc -> k::acc) transforms_with_args_l l
 
+exception Unnecessary_arguments of string list
+
 let apply_transform tr_name env task =
    match lookup_trans env tr_name with
     | Trans_one t -> [apply t task]
@@ -507,11 +509,13 @@ let apply_transform tr_name env task =
     | Trans_with_args_l _ -> assert false (* apply (t []) task *)
 
 let apply_transform_args tr_name env args tables task =
-   match lookup_trans env tr_name with
-    | Trans_one t -> [apply t task]
-    | Trans_list t -> apply t task
-    | Trans_with_args t -> [apply (t args) env tables task]
-    | Trans_with_args_l t -> apply (t args) env tables task
+   match lookup_trans env tr_name, args with
+    | Trans_one t, [] -> [apply t task]
+    | Trans_list t, [] -> apply t task
+    | Trans_one _, l | Trans_list _, l ->
+        raise (Unnecessary_arguments l)
+    | Trans_with_args t, _ -> [apply (t args) env tables task]
+    | Trans_with_args_l t, _ -> apply (t args) env tables task
 
 (** Flag-dependent transformations *)
 
