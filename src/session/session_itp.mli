@@ -133,6 +133,10 @@ val get_encapsulating_file: session -> any -> file
 val check_if_already_exists:
     session -> proofNodeID -> string -> string list -> bool
 
+(* true if the exception transformation is fatal (ie: caused by a bug in the
+   code of the transformation) *)
+val is_fatal: exn -> bool
+
 (** {2 iterators on sessions} *)
 
 val goal_iter_proof_attempt:

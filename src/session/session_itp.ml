@@ -1396,6 +1396,21 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
 
 exception NoProgress
 
+(* State transformation exception that are fatal (any exception that is not part
+   of transformation normal behavior) *)
+let is_fatal e =
+  Generic_arg_trans_utils.(match e with
+  | NoProgress | Arg_trans _ | Arg_trans_decl _ | Arg_trans_missing _
+  | Arg_trans_term _ | Arg_trans_term2 _ | Arg_trans_term3 _
+  | Arg_trans_pattern _ | Arg_trans_type _ | Arg_bad_hypothesis _
+  | Cannot_infer_type _ | Unnecessary_terms _ | Args_wrapper.Parse_error _
+  | Args_wrapper.Arg_expected _ | Args_wrapper.Arg_theory_not_found _
+  | Args_wrapper.Arg_expected_none _ | Args_wrapper.Arg_qid_not_found _
+  | Args_wrapper.Arg_pr_not_found _ | Args_wrapper.Arg_error _
+  | Args_wrapper.Arg_parse_type_error _ | Trans.Unnecessary_arguments _
+  | Reflection.NoReification -> false
+  | _ -> true)
+
 let () = Exn_printer.register
     (fun fmt e ->
       match e with
@@ -1454,7 +1469,14 @@ and merge_trans ~shape_version env old_s new_s new_goal_id old_tr_id =
     match
     (* add_registered_transformation actually apply the transformation. It can fail *)
     try Some (add_registered_transformation new_s env old_tr new_goal_id)
-    with _ -> None
+    with
+    (* Non fatal exception are silently ignored *)
+    | e when not (is_fatal e) -> None
+    | e when is_fatal e ->
+        Format.eprintf "FATAL unexpected exception during application of %s: %a@."
+          old_tr.transf_name Exn_printer.exn_printer e;
+        (* Notify the user but still allow her to load why3 *)
+        None
   with
   | Some new_tr_id ->
     let new_tr = get_transfNode new_s new_tr_id in
