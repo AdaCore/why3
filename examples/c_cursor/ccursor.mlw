@@ -46,6 +46,7 @@ module PtrCursor
     ensures  { result.len = l }
     ensures  { not result.freed }
     ensures  { forall i. 0 <= i < l -> (data result.current)[i] = 0 }
+    ensures  { bound result = b }
   = let a = malloc (UInt32.of_int32 l) in
     c_assert (is_not_null a);
     for i = 0 to l-1 do
@@ -108,7 +109,17 @@ module PtrCursor
         a[i] <- 0
       done;
       c.new <- true;
-(*      assert { forall i. 0 <= i < n -> Map.get (pelts c.current) i = a[i] };*)
     end
+
+  let main () : int32
+  = let c = create_cursor 4 4 in
+    for i = 0:int32 to 255 do
+      invariant { not c.freed }
+      invariant { forall i. 0 <= i < c.len -> (data c.current)[i] < c.bound }
+      c_assert c.new;
+      next c;
+    done;
+    c_assert (not c.new);
+    0
 
 end

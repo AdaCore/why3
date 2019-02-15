@@ -10,11 +10,20 @@ else
   endif
 endif
 
+clean:
+	rm -rf build
+
+dir:
+	mkdir -p build
+
 why3:
 	make -C ../..
 
-extract: why3
-	$(WHY3) extract -D cursor.drv -D c -L . -o ptrcursor.c ccursor.PtrCursor
+extract: why3 dir
+	$(WHY3) extract -D cursor.drv -D c -L . -o build/ptrcursor.c ccursor.PtrCursor
 
-main: extract
-	gcc -Wall -g -pedantic -Wno-unused-function -c -std=c11 ptrcursor.c
+cfiles: extract
+	gcc -Wall -g -pedantic -Wno-unused-function -std=c11 build/ptrcursor.c -Ibuild -o build/tests
+
+tests: cfiles
+	./build/tests

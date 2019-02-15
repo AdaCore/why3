@@ -15,6 +15,7 @@ exception Unsupported = Printer.Unsupported
 
 module C = struct
 
+  (* names, fields, has mutable field *)
   type struct_def = string * (string * ty) list
 
   and ty =
@@ -468,8 +469,10 @@ module Print = struct
         (print_ty ~paren:false) fmt tl
     | Tptr ty -> fprintf fmt "%a *" (print_ty ~paren:true) ty
     (* should be handled in extract_stars *)
-    | Tarray (_ty, Enothing) ->
-       raise (Unprinted "printing array type with unknown size")
+    | Tarray (ty, Enothing) ->
+       fprintf fmt (protect_on paren "%a[]")
+         (print_ty ~paren:true) ty
+    (* raise (Unprinted "printing array type with unknown size")*)
     | Tarray (ty, expr) ->
       fprintf fmt (protect_on paren "%a[%a]")
         (print_ty ~paren:true) ty (print_expr ~prec:1) expr
@@ -548,7 +551,9 @@ module Print = struct
        fprintf fmt (protect_on (prec <= 1) "%a[%a]")
                       (print_expr ~prec:1) e1
                       (print_expr ~prec:15) e2
-    | Earrow _ -> raise (Unprinted "struct/union access")
+    | Earrow (e,s) ->
+       fprintf fmt (protect_on (prec <= 1) "%a->%s")
+         (print_expr ~prec:1) e s
     | Esyntax (s, t, args, lte) ->
        (* no way to know precedence, so full parentheses*)
        gen_syntax_arguments_typed snd (fun _ -> args)
@@ -789,16 +794,18 @@ module MLToC = struct
     | { pd_node = PDtype its } ->
          let its = List.find (is_constructor rs) its in
          let id = its.itd_its.its_ts.ts_name in
-         let sd = Hid.find structs id in
-         sd
+         (try Hid.find structs id
+         with Not_found -> raise (Unsupported "bad struct"))
     | _ -> assert false
 
   type syntax_env = { in_unguarded_loop : bool;
                       computes_return_value : bool;
                       current_function : rsymbol;
+                      function_regs : Sreg.t;
 		      breaks : Sid.t;
                       returns : Sid.t;
                       array_sizes : C.expr Mid.t;
+                      boxed : unit Hreg.t; (* is this struct boxed or passed by value? *)
                     }
 
   let is_true e = match e.e_node with
@@ -852,7 +859,8 @@ module MLToC = struct
        Debug.dprintf debug_c_extraction "false@.";
        ([],expr_or_return env (C.Econst (Cint "0")))
     | Mltree.Evar pv ->
-       let e = C.Evar (pv_name pv) in
+       let id = pv_name pv in
+       let e = C.Evar id in
        ([], expr_or_return env e)
     | Mltree.Econst ic ->
       let n = Number.compute_int_constant ic in
@@ -862,6 +870,10 @@ module MLToC = struct
          when is_struct_constructor info rs
               && query_syntax info.syntax rs.rs_name = None ->
        Debug.dprintf debug_c_extraction "constructor %s@." rs.rs_name.id_string;
+       (*begin match e.e_ity with
+       | I { ity_node = Ityreg r } when Sreg.mem r env.function_regs ->
+          raise (Unsupported "mutable struct escaping from function")
+       | _ -> () end;*) (* FIXME *)
        let args =
          List.filter
            (fun e ->
@@ -884,18 +896,18 @@ module MLToC = struct
        (defs, Sseq (inits, expr_or_return env st))
     | Eapp (rs, el) ->
        Debug.dprintf debug_c_extraction "call to %s@." rs.rs_name.id_string;
+       let args =
+         List.filter
+           (fun e ->
+             assert (not e.e_effect.eff_ghost);
+             match e.e_ity with
+             | I i when ity_equal i Ity.ity_unit -> false
+             | _ -> true)
+	   el
+       in (*FIXME still needed with masks? *)
+       let env_f = { env with computes_return_value = false } in
        if is_rs_tuple rs && env.computes_return_value
        then begin
-	 let args =
-           List.filter
-             (fun e ->
-               assert (not e.e_effect.eff_ghost);
-               match e.e_ity with
-               | I i when ity_equal i Ity.ity_unit -> false
-               | _ -> true)
-	     el
-         in (*FIXME still needed with masks? *)
-         let env_f = { env with computes_return_value = false } in
          let id_struct = id_register (id_fresh "result") in
          let e_struct = C.Evar id_struct in
          let d_struct = C.(Ddecl(Tstruct
@@ -913,6 +925,21 @@ module MLToC = struct
 	 end
        else
 	 let e' =
+           let unboxed_params =
+	     List.map
+               (fun e ->
+                 (simplify_expr (expr info env_f e),
+                  ty_of_ty info (ty_of_ity (ity_of_expr e))))
+	       args in
+           let params =
+             List.map2
+               (fun p mle ->
+                 match (p, mle) with
+                 | (ce, Tstruct s), { e_ity = I { ity_node = Ityreg r }}
+                      when not (Hreg.mem env.boxed r) ->
+                    C.(Eunop(Uaddr, ce), Tptr (Tstruct s))
+                 | p, _ -> p)
+               unboxed_params args in
            match query_syntax info.syntax rs.rs_name with
            | Some s ->
               begin
@@ -920,14 +947,6 @@ module MLToC = struct
                   let _ =
                     Str.search_forward
                       (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0 in
-                  let env_f =
-                    { env with computes_return_value = false } in
-                  let params =
-		    List.map
-                      (fun e ->
-                        (simplify_expr (expr info env_f e),
-                         ty_of_ty info (ty_of_ity (ity_of_expr e))))
-		      el in
 		  let rty = ty_of_ity (match e.e_ity with
                                        | C _ -> assert false
                                        | I i -> i) in
@@ -938,48 +957,25 @@ module MLToC = struct
 		  in
 		  C.Esyntax(s,ty_of_ty info rty, rtyargs, params)
                 with Not_found ->
-		  let args =
-                    List.filter
-                      (fun e ->
-                        assert (not e.e_effect.eff_ghost);
-                        match e.e_ity with
-                        | I i when ity_equal i Ity.ity_unit -> false
-                        | _ -> true)
-		      el
-                  in
                   if args=[]
                   then C.(Esyntax(s, Tnosyntax, [||], [])) (*constant*)
                   else
                     (*function defined in the prelude *)
-                    let env_f =
-                      { env with computes_return_value = false } in
-		    C.(Ecall(Esyntax(s, Tnosyntax, [||], []),
-			     List.map
-                               (fun e ->
-                                 simplify_expr (expr info env_f e))
-                               el))
+                    let cargs = List.map fst params in
+		    C.(Ecall(Esyntax(s, Tnosyntax, [||], []), cargs))
               end
            | None ->
-              let env_f =
-                { env with computes_return_value = false } in
               match rs.rs_field with
               | None ->
-                 let args =
-                   List.filter
-                     (fun e ->
-                       assert (not e.e_effect.eff_ghost);
-                       match e.e_ity with
-                       | I i when ity_equal i Ity.ity_unit -> false
-                       | _ -> true)
-		     el in
-	         C.(Ecall(Evar(rs.rs_name),
-                          List.map
-                            (fun e -> simplify_expr (expr info env_f e))
-                            args))
+	         C.(Ecall(Evar(rs.rs_name), List.map fst params))
               | Some pv ->
                  assert (List.length el = 1);
-                 let arg = simplify_expr (expr info env_f (List.hd el)) in
-                 C.Edot (arg, (pv_name pv).id_string)
+                 begin match unboxed_params, args with
+                 | [(ce, Tstruct _)], [{ e_ity = I { ity_node = Ityreg r }}] ->
+                    if Hreg.mem env.boxed r
+                    then C.Earrow (ce, (pv_name pv).id_string)
+                    else C.Edot (ce, (pv_name pv).id_string)
+                 | _ -> C.Edot (fst (List.hd params), (pv_name pv).id_string) end
          in
 	 C.([],
             if env.computes_return_value
@@ -1019,7 +1015,9 @@ module MLToC = struct
                    in_unguarded_loop = true;
 		   returns = env.returns;
                    current_function = env.current_function;
+                   function_regs = env.function_regs;
                    array_sizes = env.array_sizes;
+                   boxed = env.boxed;
                    breaks =
                      if env.in_unguarded_loop
                      then Sid.empty else env.breaks } in
@@ -1055,9 +1053,11 @@ module MLToC = struct
       let env' = { computes_return_value = env.computes_return_value;
                    in_unguarded_loop = false;
                    current_function = env.current_function;
+                   function_regs = env.function_regs;
                    array_sizes = env.array_sizes;
 		   breaks = breaks;
                    returns = returns;
+                   boxed = env.boxed;
                  } in
       expr info env' b
     | Eraise (xs,_) when Sid.mem xs.xs_name env.breaks ->
@@ -1130,6 +1130,11 @@ module MLToC = struct
     | Ematch _ -> raise (Unsupported "pattern matching")
     | Eabsurd -> assert false
     | Eassign ([pv, ({rs_field = Some _} as rs), e2]) ->
+       let id = pv_name pv in
+       let boxed =
+         match pv.pv_ity.ity_node with
+         | Ityreg r ->  Hreg.mem env.boxed r
+         | _ -> false in
        let t =
          match query_syntax info.syntax rs.rs_name with
          | Some s ->
@@ -1138,8 +1143,10 @@ module MLToC = struct
                 Str.search_forward
                   (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0
               with Not_found -> raise (Unsupported "assign field format")  in
-            let params = [ C.Evar (pv_name pv),
-                           ty_of_ty info (ty_of_ity pv.pv_ity) ] in
+            let st = if boxed
+                     then C.(Eunop(Ustar, Evar id))
+                     else C.Evar id in
+            let params = [ st, ty_of_ty info (ty_of_ity pv.pv_ity) ] in
             let rty = ty_of_ity rs.rs_cty.cty_result in
             let rtyargs = match rty.ty_node with
 	      | Tyvar _ -> [||]
@@ -1147,7 +1154,9 @@ module MLToC = struct
                  Array.of_list (List.map (ty_of_ty info) args)
 	    in
             C.Esyntax(s,ty_of_ty info rty, rtyargs, params)
-         | None -> C.(Edot(Evar (pv_name pv), rs.rs_name.id_string)) in
+         | None -> if boxed
+                   then C.(Earrow(Evar id, rs.rs_name.id_string))
+                   else C.(Edot(Evar id, rs.rs_name.id_string)) in
        let d,v = expr info { env with computes_return_value = false } e2 in
        d, C.(Sexpr(Ebinop(Bassign, t, simplify_expr ([],v))))
     | Eassign _ -> raise (Unsupported "assign")
@@ -1161,32 +1170,32 @@ module MLToC = struct
     | Elet (Lvar (a, { e_node = Eapp (rs, [n; v]) }), e)
          when Sattr.mem array_mk rs.rs_name.id_attrs ->
        (* let a = Array.make n v in e*)
+       let aregs = ity_exp_fold Sreg.add_left Sreg.empty a.pv_ity in
+       if not (Sreg.is_empty (Sreg.inter aregs env.function_regs))
+       then raise (Unsupported "array escaping function");
        let env_f = { env with computes_return_value = false } in
        let n = expr info env_f n in
-       (*if not (is_const_expr n)
-       then raise (Unsupported "non-constant array size")
-       else *)
-           let n = get_const_expr n in
-           let avar = pv_name a in
-           let sizes = Mid.add avar n env.array_sizes in
-           let v_ty =
-             match v.e_ity with
-             | I i -> ty_of_ty info (ty_of_ity i)
-             | _ -> assert false in
-           let loop_i = id_register (id_fresh "i") in
-           let d = C.([Ddecl (Tarray (v_ty, n), [avar, Enothing]);
-                       Ddecl (Tsyntax ("int", []), [loop_i, Enothing])]) in
-           let i = C.Evar loop_i in
-           let dv, sv = expr info env_f v in
-           let eai = C.Eindex(Evar avar, i) in
-           let assign_e = assignify eai sv in
-           let init_loop = C.(Sfor(Ebinop(Bassign, i, Econst (Cint "0")),
-                                   Ebinop(Blt, i, n),
-                                   Eunop(Upreincr, i),
-                                   assign_e)) in
-           let env = { env with array_sizes = sizes } in
-           let d', s' = expr info env e in
-           d@dv@d', Sseq (init_loop, s')
+       let n = get_const_expr n in
+       let avar = pv_name a in
+       let sizes = Mid.add avar n env.array_sizes in
+       let v_ty =
+         match v.e_ity with
+         | I i -> ty_of_ty info (ty_of_ity i)
+         | _ -> assert false in
+       let loop_i = id_register (id_fresh "i") in
+       let d = C.([Ddecl (Tarray (v_ty, n), [avar, Enothing]);
+                   Ddecl (Tsyntax ("int", []), [loop_i, Enothing])]) in
+       let i = C.Evar loop_i in
+       let dv, sv = expr info env_f v in
+       let eai = C.Eindex(Evar avar, i) in
+       let assign_e = assignify eai sv in
+       let init_loop = C.(Sfor(Ebinop(Bassign, i, Econst (Cint "0")),
+                               Ebinop(Blt, i, n),
+                               Eunop(Upreincr, i),
+                               assign_e)) in
+       let env = { env with array_sizes = sizes } in
+       let d', s' = expr info env e in
+       d@dv@d', Sseq (init_loop, s')
     | Elet (ld,e) ->
        begin match ld with
        | Lvar (pv,le) -> (* not a block *)
@@ -1217,16 +1226,21 @@ module MLToC = struct
       if rs_ghost rs
       then begin Debug.dprintf debug_c_extraction "is ghost@."; [] end
       else
+        let boxed = Hreg.create 16 in
+        let ngvl = List.filter (fun (_,_, gh) -> not gh) vl in
+        let ngargs = List.filter (fun pv -> not pv.pv_ghost) rs.rs_cty.cty_args in
         let params =
-          List.map (fun (id, ty, _gh) -> (ty_of_mlty info ty, id))
-            (List.filter (fun (_,_, gh) -> not gh) vl) in
+          List.map2 (fun (id, mlty, _gh) pv ->
+              let cty = ty_of_mlty info mlty in
+              match cty, pv.pv_ity.ity_node with
+              | Tstruct (_,_), Ityreg r ->
+                Hreg.add boxed r ();
+                C.Tptr cty, id
+              | _ -> (cty, id)) ngvl ngargs in
         let params = List.filter (fun (ty, _) -> ty <> C.Tvoid) params in
-	let env = { computes_return_value = true;
-		    in_unguarded_loop = false;
-                    current_function = rs;
-		    returns = Sid.empty;
-		    breaks = Sid.empty;
-                    array_sizes = Mid.empty; } in
+        let fregs = ity_exp_fold Sreg.add_left Sreg.empty rs.rs_cty.cty_result in
+        let fregs = Sreg.union fregs rs.rs_cty.cty_effect.eff_covers in
+        (* FIXME covers or writes? *)
 	let rity = rs.rs_cty.cty_result in
 	let is_simple_tuple ity =
 	  let arity_zero = function
@@ -1258,6 +1272,15 @@ module MLToC = struct
         if header
         then sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
         else
+	  let env = { computes_return_value = true;
+		      in_unguarded_loop = false;
+                      current_function = rs;
+                      function_regs = fregs;
+		      returns = Sid.empty;
+		      breaks = Sid.empty;
+                      array_sizes = Mid.empty;
+                      boxed = boxed;
+                    } in
 	  let d,s = expr info env e in
 	  let d,s = C.flatten_defs d s in
           let d = C.group_defs_by_type d in
@@ -1287,10 +1310,10 @@ module MLToC = struct
                   List.map
                     (fun (_, id, ty) -> (id.id_string, ty_of_mlty info ty))
                     pjl in
-                if List.exists
+                (*if List.exists
                      (fun (_,t) -> match t with Tarray _ -> true | _ -> false)
                      fields
-                then raise (Unsupported "array in struct");
+                then raise (Unsupported "array in struct");*)
                 let sd = id.id_string, fields in
                 Hid.replace structs id sd;
                 [C.Dstruct sd]
