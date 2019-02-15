@@ -261,6 +261,8 @@ val lookup_trans_desc: string -> Pp.formatted
 
 val list_trans : unit -> string list
 
+exception Unnecessary_arguments of string list
+
 val apply_transform : string -> Env.env -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n, directly.*)
 
