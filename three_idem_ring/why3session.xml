@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="5">
+<prover id="0" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="2.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="veriT" version="dev" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<file proved="true">
+<path name=".."/>
+<path name="three_idem_ring.mlw"/>
+<theory name="ThreeIdempotentRing" proved="true">
+ <goal name="VC mul" expl="VC for mul" proved="true">
+ <proof prover="0"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="Mul.Assoc" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="Mul.Unit_def_l" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="Mul.Unit_def_r" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+ <goal name="Mul.Power_0" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="Mul.Power_s" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="simpl_left" proved="true">
+ <proof prover="0" timelimit="1"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="simpl_right" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="22"/></proof>
+ </goal>
+ <goal name="zero_star_l" proved="true">
+ <proof prover="0" timelimit="1"><result status="valid" time="0.03"/></proof>
+ </goal>
+ <goal name="zero_star_r" proved="true">
+ <proof prover="0" timelimit="1"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="neg_star_r" proved="true">
+ <transf name="split_all_full" proved="true" >
+  <goal name="neg_star_r.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="30"/></proof>
+  </goal>
+  <goal name="neg_star_r.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="neg_star_l" proved="true">
+ <transf name="split_all_full" proved="true" >
+  <goal name="neg_star_l.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="32"/></proof>
+  </goal>
+  <goal name="neg_star_l.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="neg_neg" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+ </goal>
+ <goal name="null_add" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="VC mul_star_l" expl="VC for mul_star_l" proved="true">
+ <proof prover="1"><result status="valid" time="1.02" steps="108"/></proof>
+ <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="VC mul_star_r" expl="VC for mul_star_r" proved="true">
+ <proof prover="1"><result status="valid" time="3.46" steps="124"/></proof>
+ <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="null_star_l" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="24"/></proof>
+ </goal>
+ <goal name="null_star_r" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="28"/></proof>
+ </goal>
+ <goal name="null_mul_congr" proved="true">
+ <proof prover="1" timelimit="1"><result status="valid" time="0.05" steps="20"/></proof>
+ </goal>
+ <goal name="all_null6" proved="true">
+ <transf name="split_all_full" proved="true" >
+  <goal name="all_null6.0" proved="true">
+  <proof prover="0" timelimit="1"><result status="valid" time="0.19"/></proof>
+  </goal>
+  <goal name="all_null6.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="4"/></proof>
+  </goal>
+  <goal name="all_null6.2" proved="true">
+  <proof prover="1"><result status="valid" time="0.17" steps="4"/></proof>
+  </goal>
+  <goal name="all_null6.3" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="all_split" proved="true">
+ <transf name="split_all_full" proved="true" >
+  <goal name="all_split.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="all_split.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="all_split.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="all_split.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="free_split" proved="true">
+ <proof prover="0"><result status="valid" time="0.01"/></proof>
+ </goal>
+ <goal name="null_2_idem" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="null_2_idem.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="null_2_idem.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="null_2_idem.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="null_2_idem.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="null2_comm" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="null2_comm.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="null2_comm.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="null2_comm.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.22"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="swap_equality" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="swap_equality.0" proved="true">
+  <proof prover="0"><result status="valid" time="1.57"/></proof>
+  <proof prover="3"><result status="valid" time="0.55"/></proof>
+  </goal>
+  <goal name="swap_equality.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="swap_equality.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="swap_equality.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="swap_equality.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+  <goal name="swap_equality.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="swap_equality.6" proved="true">
+  <proof prover="0"><result status="valid" time="0.35"/></proof>
+  </goal>
+  <goal name="swap_equality.7" proved="true">
+  <proof prover="0"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="swap_equality.8" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="null3_comm" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="null3_comm.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="null3_comm.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="commutative" proved="true">
+ <transf name="split_all_full" proved="true" >
+  <goal name="commutative.0" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="commutative.1" proved="true">
+  <proof prover="0"><result status="valid" time="0.23"/></proof>
+  </goal>
+  <goal name="commutative.2" proved="true">
+  <proof prover="0"><result status="valid" time="0.09"/></proof>
+  </goal>
+  <goal name="commutative.3" proved="true">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="commutative.4" proved="true">
+  <proof prover="0"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="commutative.5" proved="true">
+  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
