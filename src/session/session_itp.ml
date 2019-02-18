@@ -1470,7 +1470,7 @@ and merge_trans ~shape_version env old_s new_s new_goal_id old_tr_id =
     (* add_registered_transformation actually apply the transformation. It can fail *)
     try Some (add_registered_transformation new_s env old_tr new_goal_id)
     with
-    | e when not (Debug.test_flag debug_stack_trace) ->
+    | e when Debug.test_flag debug_stack_trace ->
         raise e
     (* Non fatal exception are silently ignored *)
     | e when not (is_fatal e) -> None
@@ -1515,7 +1515,7 @@ and merge_trans ~shape_version env old_s new_s new_goal_id old_tr_id =
      save_detached_trans old_s new_s new_goal_id old_tr_id;
      found_detached := true
   with e when not (Debug.test_flag debug_stack_trace) ->
-    Printexc.print_backtrace stderr;
+    (* Printexc.print_backtrace stderr; (* Will appear with stack_trace *) *)
     Warning.emit "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
     exit 2
 
