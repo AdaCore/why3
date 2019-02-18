@@ -233,6 +233,26 @@ let print_binop fmt = function
   | Timplies -> fprintf fmt "->"
   | Tiff -> fprintf fmt "<->"
 
+let number_format info = {
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Custom (fun fmt f -> fprintf fmt "(-%t)%%Z" f);
+    Number.dec_int_support =
+      `Custom (fun fmt i ->
+          fprintf fmt (if info.ssreflect then "%s%%:Z" else "%s%%Z") (BigInt.to_string i));
+    Number.hex_int_support = `Unsupported;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Custom (fun fmt f -> fprintf fmt "(-%t)%%R" f);
+    Number.dec_real_support = `Unsupported;
+    Number.hex_real_support = `Unsupported;
+    Number.frac_real_support =
+      `Custom
+        ((fun fmt i -> fprintf fmt "%s%%R" i),
+         (fun fmt i n -> fprintf fmt "(%s * %s)%%R" i n),
+         (fun fmt i n -> fprintf fmt "(%s / %s)%%R" i n));
+  }
+
+
 (* [opl] means that there is no delimiter on the left of the term, so
    parentheses should be put around the term if it does not start with a
    delimiter; [opr] is similar, but on the right of the term  *)
@@ -244,25 +264,7 @@ and print_tnode ?(boxed=false) opl opr info fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = true;
-          Number.negative_int_support = Number.Number_custom "(-%a)%%Z";
-          Number.dec_int_support =
-            if info.ssreflect then Number.Number_custom "%s%%:Z"
-            else Number.Number_custom "%s%%Z";
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.negative_real_support = Number.Number_custom "(-%a)%%R";
-          Number.dec_real_support = Number.Number_unsupported;
-          Number.hex_real_support = Number.Number_unsupported;
-          Number.frac_real_support = Number.Number_custom
-            (Number.PrintFracReal ("%s%%R", "(%s * %s)%%R", "(%s / %s)%%R"));
-          Number.def_real_support = Number.Number_unsupported;
-        } in
-      Number.print number_format fmt c
+      Number.print (number_format info) fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")

@@ -80,21 +80,18 @@ let t_type_close fn f =
 (* convert a type declaration to a list of lsymbol declarations *)
 let lsdecl_of_ts ts = create_param_decl (ls_of_ts ts)
 
-let ls_of_const_format = Number.({
-  long_int_support = true;
-  extra_leading_zeros_support = false;
-  negative_int_support = Number_unsupported;
-  dec_int_support = Number_default;
-  hex_int_support = Number_unsupported;
-  oct_int_support = Number_unsupported;
-  bin_int_support = Number_unsupported;
-  def_int_support = Number_unsupported;
-  negative_real_support = Number_unsupported;
-  dec_real_support = Number_unsupported;
-  hex_real_support = Number_unsupported;
-  frac_real_support = Number_custom (PrintFracReal ("%s", "%sx%s", "%s_%s"));
-  def_real_support = Number_unsupported;
-})
+let ls_of_const_format = {
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Custom (fun _ _ -> assert false);
+    Number.dec_int_support = `Default;
+    Number.hex_int_support = `Unsupported;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Custom (fun _ _ -> assert false);
+    Number.dec_real_support = `Unsupported;
+    Number.hex_real_support = `Unsupported;
+    Number.frac_real_support = `Unsupported (fun fmt n -> Format.pp_print_string fmt n)
+  }
 
 (* convert a constant to a functional symbol of type ty_base *)
 let ls_of_const =

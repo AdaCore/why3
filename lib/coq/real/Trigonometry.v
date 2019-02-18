@@ -103,7 +103,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Cos_pi2 :
-  ((Reals.Rtrigo_def.cos ((05 / 10)%R * Reals.Rtrigo1.PI)%R) = 0%R).
+  ((Reals.Rtrigo_def.cos ((5 / 10)%R * Reals.Rtrigo1.PI)%R) = 0%R).
 Proof.
 replace (5 / 10 * PI)%R with (PI / 2)%R by field.
 apply cos_PI2.
@@ -111,7 +111,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Sin_pi2 :
-  ((Reals.Rtrigo_def.sin ((05 / 10)%R * Reals.Rtrigo1.PI)%R) = 1%R).
+  ((Reals.Rtrigo_def.sin ((5 / 10)%R * Reals.Rtrigo1.PI)%R) = 1%R).
 Proof.
 replace (5 / 10 * PI)%R with (PI / 2)%R by field.
 apply sin_PI2.
@@ -140,7 +140,7 @@ Qed.
 (* Why3 goal *)
 Lemma Cos_plus_pi2 :
   forall (x:R),
-  ((Reals.Rtrigo_def.cos (x + ((05 / 10)%R * Reals.Rtrigo1.PI)%R)%R) =
+  ((Reals.Rtrigo_def.cos (x + ((5 / 10)%R * Reals.Rtrigo1.PI)%R)%R) =
    (-(Reals.Rtrigo_def.sin x))%R).
 Proof.
 intros x.
@@ -152,7 +152,7 @@ Qed.
 (* Why3 goal *)
 Lemma Sin_plus_pi2 :
   forall (x:R),
-  ((Reals.Rtrigo_def.sin (x + ((05 / 10)%R * Reals.Rtrigo1.PI)%R)%R) =
+  ((Reals.Rtrigo_def.sin (x + ((5 / 10)%R * Reals.Rtrigo1.PI)%R)%R) =
    (Reals.Rtrigo_def.cos x)).
 Proof.
 intros x.

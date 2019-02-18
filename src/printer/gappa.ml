@@ -144,19 +144,16 @@ let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
 let number_format = {
-    Number.long_int_support = true;
-    Number.extra_leading_zeros_support = true;
-    Number.negative_int_support = Number.Number_custom "-%a";
-    Number.dec_int_support = Number.Number_default;
-    Number.hex_int_support = Number.Number_default;
-    Number.oct_int_support = Number.Number_unsupported;
-    Number.bin_int_support = Number.Number_unsupported;
-    Number.def_int_support = Number.Number_unsupported;
-    Number.negative_real_support = Number.Number_custom "-%a";
-    Number.dec_real_support = Number.Number_default;
-    Number.hex_real_support = Number.Number_default;
-    Number.frac_real_support = Number.Number_unsupported;
-    Number.def_real_support = Number.Number_unsupported;
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Custom (fun fmt f -> fprintf fmt "-%t" f);
+    Number.dec_int_support = `Default;
+    Number.hex_int_support = `Default;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Custom (fun fmt f -> fprintf fmt "-%t" f);
+    Number.dec_real_support = `Default;
+    Number.hex_real_support = `Default;
+    Number.frac_real_support = `Unsupported (fun _ _ -> assert false);
   }
 
 type constant = Enum of term * int | Value of term | Varying

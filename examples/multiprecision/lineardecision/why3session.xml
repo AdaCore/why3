@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -1903,7 +1903,7 @@
    <goal name="VC radd.1.3" expl="VC for radd" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="VC radd.1.3.0" expl="VC for radd" proved="true">
-    <proof prover="3" timelimit="10"><result status="valid" time="0.05"/></proof>
+    <proof prover="3" timelimit="10"><result status="valid" time="0.52"/></proof>
     </goal>
    </transf>
    </goal>
@@ -1992,7 +1992,7 @@
   <goal name="VC rinv.2" expl="postcondition" proved="true">
   <transf name="compute_in_goal" proved="true" >
    <goal name="VC rinv.2.0" expl="postcondition" proved="true">
-   <proof prover="3" timelimit="10"><result status="valid" time="0.08"/></proof>
+   <proof prover="3" timelimit="10"><result status="valid" time="0.20"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3461,7 +3461,7 @@
  <goal name="VC impl_self" expl="VC for impl_self" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC impl_self.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.28"/></proof>
+  <proof prover="2"><result status="valid" time="0.15"/></proof>
   </goal>
   <goal name="VC impl_self.1" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.15"/></proof>
