@@ -755,7 +755,7 @@ let update_theory_node notification s th =
       try let p = theory_parent s th in
           update_file_node notification s p
       with Not_found when not (Debug.test_flag Debug.stack_trace) ->
-        Format.eprintf "[Fatal] Session_itp.update_theory_node: parent missing@.";
+        Warning.emit "[Fatal] Session_itp.update_theory_node: parent missing@.";
         assert false
     end
 
@@ -783,7 +783,7 @@ let rec update_goal_node notification s id =
       | Trans trans_id -> update_trans_node notification s trans_id
       | Theory th -> update_theory_node notification s th
       | exception Not_found when not (Debug.test_flag Debug.stack_trace) ->
-                  Format.eprintf "Session_itp.update_goal_node: parent missing@.";
+                  Warning.emit "Session_itp.update_goal_node: parent missing@.";
                   Printexc.print_backtrace stderr;
                   assert false
     end
@@ -927,7 +927,7 @@ let string_attribute field r =
   try
     List.assoc field r.Xml.attributes
   with Not_found ->
-    eprintf "[Error] missing required attribute '%s' from element '%s'@."
+    Warning.emit "[Error] missing required attribute '%s' from element '%s'@."
       field r.Xml.name;
     assert false
 
@@ -1239,7 +1239,7 @@ let read_sum_and_shape ch =
             let old_sum = List.assoc "sum" attrs in
             if sum <> old_sum then
               begin
-                Format.eprintf "old sum = %s ; new sum = %s@." old_sum sum;
+                Warning.emit "old sum = %s ; new sum = %s@." old_sum sum;
                 raise
                   (ShapesFileError
                      "shapes files corrupted (sums do not correspond)")
@@ -1396,6 +1396,21 @@ let merge_proof new_s ~goal_obsolete new_goal _ old_pa_n =
 
 exception NoProgress
 
+(* State transformation exception that are fatal (any exception that is not part
+   of transformation normal behavior) *)
+let is_fatal e =
+  Generic_arg_trans_utils.(match e with
+  | NoProgress | Arg_trans _ | Arg_trans_decl _ | Arg_trans_missing _
+  | Arg_trans_term _ | Arg_trans_term2 _ | Arg_trans_term3 _
+  | Arg_trans_pattern _ | Arg_trans_type _ | Arg_bad_hypothesis _
+  | Cannot_infer_type _ | Unnecessary_terms _ | Args_wrapper.Parse_error _
+  | Args_wrapper.Arg_expected _ | Args_wrapper.Arg_theory_not_found _
+  | Args_wrapper.Arg_expected_none _ | Args_wrapper.Arg_qid_not_found _
+  | Args_wrapper.Arg_pr_not_found _ | Args_wrapper.Arg_error _
+  | Args_wrapper.Arg_parse_type_error _ | Trans.Unnecessary_arguments _
+  | Reflection.NoReification -> false
+  | _ -> true)
+
 let () = Exn_printer.register
     (fun fmt e ->
       match e with
@@ -1426,7 +1441,7 @@ let add_registered_transformation s env old_tr goal_id =
                                         old_tr.transf_args)
         goal.proofn_transformations in
     Printexc.print_backtrace stderr;
-    Format.eprintf "[add_registered_transformation] FATAL transformation already present@.";
+    Warning.emit "[add_registered_transformation] FATAL transformation already present@.";
     exit 2
   with Not_found ->
     let subgoals =
@@ -1454,7 +1469,16 @@ and merge_trans ~shape_version env old_s new_s new_goal_id old_tr_id =
     match
     (* add_registered_transformation actually apply the transformation. It can fail *)
     try Some (add_registered_transformation new_s env old_tr new_goal_id)
-    with _ -> None
+    with
+    | e when Debug.test_flag debug_stack_trace ->
+        raise e
+    (* Non fatal exception are silently ignored *)
+    | e when not (is_fatal e) -> None
+    | e when is_fatal e ->
+        Warning.emit "FATAL unexpected exception during application of %s: %a@."
+          old_tr.transf_name Exn_printer.exn_printer e;
+        (* Notify the user but still allow her to load why3 *)
+        None
   with
   | Some new_tr_id ->
     let new_tr = get_transfNode new_s new_tr_id in
@@ -1491,8 +1515,8 @@ and merge_trans ~shape_version env old_s new_s new_goal_id old_tr_id =
      save_detached_trans old_s new_s new_goal_id old_tr_id;
      found_detached := true
   with e when not (Debug.test_flag debug_stack_trace) ->
-    Printexc.print_backtrace stderr;
-    Format.eprintf "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
+    (* Printexc.print_backtrace stderr; (* Will appear with stack_trace *) *)
+    Warning.emit "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
     exit 2
 
 
@@ -1598,7 +1622,7 @@ let add_file_section (s:session) (fn:string) ~file_is_detached
   if Hfile.mem s.session_files fn then
     begin
       Printexc.print_backtrace stderr;
-      Format.eprintf "[session] FATAL: file %s already in database@." fn;
+      Warning.emit "[session] FATAL: file %s already in database@." fn;
       exit 2
     end
   else
