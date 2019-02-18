@@ -169,6 +169,45 @@ let store_id s i =
           id
 *)
 
+module Common = struct
+
+let sign fmt n =
+  if n then Format.pp_print_char fmt '-'
+
+let const_v1 fmt c =
+  match c with
+  | ConstInt { il_kind=k; il_int=i } ->
+      sign fmt (BigInt.lt i BigInt.zero);
+      let i = BigInt.abs i in
+      begin match k with
+      | ILitUnk | ILitDec -> Format.pp_print_string fmt (BigInt.to_string i)
+      | ILitHex -> Format.fprintf fmt "0x%a" (Number.print_in_base 16 None) i
+      | ILitOct -> Format.fprintf fmt "0o%a" (Number.print_in_base 8 None) i
+      | ILitBin -> Format.fprintf fmt "0b%a" (Number.print_in_base 2 None) i
+      end
+  | ConstReal { rl_kind=k; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
+      (* not the actual encoding *)
+      sign fmt (BigInt.lt i BigInt.zero);
+      let i = BigInt.abs i in
+      begin match k with
+      | RLitUnk | RLitDec _ ->
+          Format.fprintf fmt "%s.0e%sp%s"
+            (BigInt.to_string i) (BigInt.to_string p5) (BigInt.to_string p2)
+      | RLitHex _ ->
+          Format.fprintf fmt "%a.0p%se%s"
+            (Number.print_in_base 16 None) i (BigInt.to_string p2) (BigInt.to_string p5)
+      end
+
+let const_v2 fmt c =
+  match c with
+  | ConstInt { il_kind=_; il_int=i } ->
+      Format.pp_print_string fmt (BigInt.to_string i)
+  | ConstReal { rl_kind=_; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
+      Format.fprintf fmt "%s.p%se%s"
+        (BigInt.to_string i) (BigInt.to_string p2) (BigInt.to_string p5)
+
+end
+
 (* {2 Shapes} *)
 
 type shape = string
@@ -183,9 +222,9 @@ let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
          session@ trees@ after@ modification@ of@ source@ files."
 
-let current_shape_version = 5
+let current_shape_version = 6
 
-type shape_version = SV1 | SV2 | SV3 | SV4
+type shape_version = SV1 | SV2 | SV3 | SV4 | SV5
 
 module Shape = struct
 
@@ -222,16 +261,16 @@ exception ShapeTooLong
 
 let shape_buffer = Buffer.create 17
 
+let check () =
+  if Buffer.length shape_buffer >= 1024 then raise ShapeTooLong
+
 let push s =
   Buffer.add_string shape_buffer s;
-  if Buffer.length shape_buffer >= 1024 then raise ShapeTooLong
+  check ()
 
 let pushc c =
   Buffer.add_char shape_buffer c;
-  if Buffer.length shape_buffer >= 1024 then raise ShapeTooLong
-
-let pushb i =
-  push (BigInt.to_string i)
+  check ()
 
 let ident h id =
   let x =
@@ -261,30 +300,14 @@ let id_string_shape id = push id
 let ident_shape id = id_string_shape id.Ident.id_string
 *)
 
-let integer_kind_shape = function
-  | ILitUnk -> ()
-  | ILitDec -> ()
-  | ILitHex -> push "0x"
-  | ILitOct -> push "0o"
-  | ILitBin -> push "0b"
-
-let real_kind_shape = function
-  | RLitUnk -> ()
-  | RLitDec _ -> ()
-  | RLitHex _ -> push "0x"
-
-let sign_shape is_negative =
-  if is_negative then pushc '-'
-
-let const_shape c =
-  match c with
-  | ConstInt { il_kind=k; il_int=i } ->
-      sign_shape (BigInt.lt i BigInt.zero);
-      integer_kind_shape k; push (BigInt.to_string (BigInt.abs i))
-  | ConstReal { rl_kind=k; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
-      sign_shape (BigInt.lt i BigInt.zero);
-      real_kind_shape k; pushb i; pushc 'p'; pushb p2; pushc 'e'; pushb p5
-
+let const_shape v c =
+  let fmt = Format.formatter_of_buffer shape_buffer in
+  begin match v with
+  | SV1 | SV2 | SV3 | SV4 -> Common.const_v1 fmt c
+  | SV5 -> Common.const_v2 fmt c
+  end;
+  Format.pp_print_flush fmt ();
+  check ()
 
 let rec pat_shape c m p : 'a =
   match p.pat_node with
@@ -301,7 +324,7 @@ let rec pat_shape c m p : 'a =
 let rec t_shape ~version c m t =
   let fn = t_shape ~version c m in
   match t.t_node with
-    | Tconst c -> pushc tag_const; const_shape c
+    | Tconst c -> pushc tag_const; const_shape version c
     | Tvar v -> pushc tag_var; ident m v.vs_name
     | Tapp (s,l) ->
        pushc tag_app;
@@ -310,7 +333,7 @@ let rec t_shape ~version c m t =
     | Tif (f,t1,t2) ->
       begin match version with
       | SV1 | SV2 -> pushc tag_if; fn f; fn t1; fn t2
-      | SV3 | SV4 -> pushc tag_if; fn t2; fn t1; fn f
+      | SV3 | SV4 | SV5 -> pushc tag_if; fn t2; fn t1; fn f
       end
     | Tcase (t1,bl) ->
         let br_shape b =
@@ -320,7 +343,7 @@ let rec t_shape ~version c m t =
             pat_shape c m p;
             pat_rename_alpha c m p;
             t_shape ~version c m t2
-          | SV3 | SV4 ->
+          | SV3 | SV4 | SV5 ->
             pat_rename_alpha c m p;
             t_shape ~version c m t2;
             pat_shape c m p
@@ -330,7 +353,7 @@ let rec t_shape ~version c m t =
                  pushc tag_case;
                  fn t1;
                  List.iter br_shape bl
-        | SV3 | SV4 ->
+        | SV3 | SV4 | SV5 ->
            pushc tag_case;
            List.iter br_shape bl;
            fn t1
@@ -372,14 +395,14 @@ let rec t_shape ~version c m t =
           match version with
             | SV1 ->
                pushc tag_let; fn t1; t_shape ~version c m t2
-            | SV2 | SV3 | SV4 ->
+            | SV2 | SV3 | SV4 | SV5 ->
                      (* t2 first, intentionally *)
                      t_shape ~version c m t2; pushc tag_let; fn t1
         end
     | Tnot f ->
       begin match version with
       | SV1 | SV2 -> fn f; pushc tag_not
-      | SV3 | SV4 -> pushc tag_not; fn f
+      | SV3 | SV4 | SV5 -> pushc tag_not; fn f
       end
     | Ttrue -> pushc tag_true
     | Tfalse -> pushc tag_false
@@ -394,13 +417,13 @@ let t_shape_task ~version ~expl t =
       (* expl *)
       begin match version with
       | SV1 | SV2 -> ()
-      | SV3 | SV4 -> push expl end;
+      | SV3 | SV4 | SV5 -> push expl end;
       (* goal shape *)
       t_shape ~version c m f;
       (* introduced premises shape *)
       begin match version with
       | SV1 | SV2 | SV3 -> ()
-      | SV4 ->
+      | SV4 | SV5 ->
          let open Decl in
          let introduced id = Ident.Sattr.mem
                                Inlining.intro_attr
@@ -429,7 +452,7 @@ let time = ref 0.0
 
 let t_shape_task ?(version=current_shape_version) ~expl t =
   let version = match version with
-    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4
+    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5
     | _ -> assert false
   in
 (*
@@ -456,15 +479,13 @@ let buffer_checksum b =
   let s = Buffer.contents b in
   Digest.to_hex (Digest.string s)
 
-type checksum_version = CV1 | CV2
+type checksum_version = CV1 | CV2 | CV3
 
 module Checksum = struct
 
   let char (_,_,_,buf) c = Buffer.add_char buf c
   let int (_,_,_,buf as b) i =
     char b 'i'; Buffer.add_string buf (string_of_int i)
-  let raw_string (_,_,_,buf) s = Buffer.add_string buf s
-  let raw_bigint b i = raw_string b (BigInt.to_string i)
   let string (_,_,_,buf as b) s =
     char b '"'; Buffer.add_string buf (String.escaped s); char b '"'
   let option e b = function None -> char b 'n' | Some x -> char b 's'; e b x
@@ -487,32 +508,15 @@ module Checksum = struct
 
   let ident (v,_,_,_ as b) id = match v with
     | CV1 -> ident_v1 b id
-    | CV2 -> ident_v2 b id
+    | CV2 | CV3 -> ident_v2 b id
 
-
-  let integer_kind b = function
-    | ILitUnk -> ()
-    | ILitDec -> ()
-    | ILitHex -> raw_string b "0x"
-    | ILitOct -> raw_string b "0o"
-    | ILitBin -> raw_string b "0b"
-
-  let real_kind b = function
-    | RLitUnk -> ()
-    | RLitDec _ -> ()
-    | RLitHex _ -> raw_string b "0x"
-
-  let sign b is_negative =
-    if is_negative then raw_string b "-"
-
-  let const b c =
-    match c with
-    | ConstInt { il_kind=k; il_int=i } ->
-        sign b (BigInt.lt i BigInt.zero); integer_kind b k;
-        raw_bigint b (BigInt.abs i)
-    | ConstReal { rl_kind=k; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
-        sign b (BigInt.lt i BigInt.zero); real_kind b k;
-        raw_bigint b (BigInt.abs i); char b 'p'; raw_bigint b p2; char b 'e'; raw_bigint b p5
+  let const (v,_,_,buf) c =
+    let fmt = Format.formatter_of_buffer buf in
+    begin match v with
+    | CV1 | CV2 -> Common.const_v1 fmt c
+    | CV3 -> Common.const_v2 fmt c
+    end;
+    Format.pp_print_flush fmt ()
 
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
@@ -522,7 +526,7 @@ module Checksum = struct
 
   let vsymbol (v,_,_,_ as b) vs = match v with
     | CV1 -> ty b vs.vs_ty
-    | CV2 -> ident b vs.vs_name; ty b vs.vs_ty
+    | CV2 | CV3 -> ident b vs.vs_name; ty b vs.vs_ty
 
   (* start: _ V ident a o *)
   let rec pat b p = match p.pat_node with
@@ -694,14 +698,14 @@ module Checksum = struct
       Buffer.clear b;
       Digest.to_hex dnew
 
-  let task_v2 =
+  let task_v2 version =
     let c = ref 0 in
     let m = ref Ident.Mid.empty in
     let b = Buffer.create 8192 in
     let task_hd t (cold,mold,dold) =
       c := cold;
       m := mold;
-      tdecl (CV2,c,m,b) t.Task.task_decl;
+      tdecl (version,c,m,b) t.Task.task_decl;
       Buffer.add_string b (Digest.to_hex dold);
       let dnew = Digest.string (Buffer.contents b) in
       Buffer.clear b;
@@ -720,7 +724,7 @@ module Checksum = struct
 
   let task ~version t = match version with
     | CV1 -> task_v1 t
-    | CV2 -> task_v2 t
+    | CV2 | CV3 -> task_v2 version t
 
 end
 
@@ -732,6 +736,7 @@ let task_checksum ?(version=current_shape_version) t =
   let version = match version with
     | 1 | 2 | 3 -> CV1
     | 4 | 5 -> CV2
+    | 6 -> CV3
     | _ -> assert false
   in
 (*
@@ -744,16 +749,6 @@ let task_checksum ?(version=current_shape_version) t =
   Format.eprintf "[Checksum times] %f/%f@." tim !time;
 *)
   s
-
-(* not used anymore
-let theory_checksum ?(version=current_shape_version) t =
-  let version = match version with
-    | 1 | 2 | 3 -> CV1
-    | 4 -> CV2
-    | _ -> assert false
-  in
-  Checksum.theory ~version t
- *)
 
 (*************************************************************)
 (* Pairing of new and old subgoals                           *)
