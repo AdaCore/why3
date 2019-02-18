@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../neg_as_xor.why" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="neg_as_xor.why"/>
 <theory name="TestNegAsXOR" proved="true">
  <goal name="Nth_j" proved="true">
  <proof prover="0"><result status="valid" time="0.05" steps="79"/></proof>
  </goal>
  <goal name="sign_of_j" proved="true">
  <proof prover="0"><result status="valid" time="0.02" steps="75"/></proof>
- <proof prover="3"><result status="valid" time="4.23"/></proof>
+ <proof prover="3"><result status="valid" time="4.98"/></proof>
  </goal>
  <goal name="mantissa_of_j" proved="true">
  <proof prover="0"><result status="valid" time="0.16" steps="121"/></proof>
@@ -54,7 +56,7 @@
  <proof prover="9"><result status="valid" time="0.69"/></proof>
  </goal>
  <goal name="Mantissa_of_xor_j" proved="true">
- <proof prover="3"><result status="valid" time="1.43"/></proof>
+ <proof prover="3"><result status="valid" time="1.75"/></proof>
  <proof prover="5"><result status="valid" time="3.22"/></proof>
  <proof prover="9"><result status="valid" time="0.75"/></proof>
  </goal>
