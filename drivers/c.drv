@@ -548,7 +548,12 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 
 end
 
+module mach.array.Array32
 
+  syntax val ([]) "%1[%2]"
+  syntax val ([]<-) "%1[%2] = %3"
+
+end
 
 module mach.c.C
 
