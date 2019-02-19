@@ -5,7 +5,6 @@
 <prover id="0" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Eprover" version="2.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="veriT" version="dev" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
 <path name=".."/>
@@ -69,12 +68,10 @@
  </goal>
  <goal name="VC mul_star_l" expl="VC for mul_star_l" proved="true">
  <proof prover="1"><result status="valid" time="1.02" steps="108"/></proof>
- <proof prover="3"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="VC mul_star_r" expl="VC for mul_star_r" proved="true">
  <proof prover="1"><result status="valid" time="3.46" steps="124"/></proof>
- <proof prover="3"><result status="valid" time="0.00"/></proof>
  <proof prover="4"><result status="valid" time="0.01"/></proof>
  </goal>
  <goal name="null_star_l" proved="true">
@@ -154,7 +151,6 @@
  <transf name="split_vc" proved="true" >
   <goal name="swap_equality.0" proved="true">
   <proof prover="0"><result status="valid" time="1.57"/></proof>
-  <proof prover="3"><result status="valid" time="0.55"/></proof>
   </goal>
   <goal name="swap_equality.1" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>
