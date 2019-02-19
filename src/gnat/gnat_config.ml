@@ -78,13 +78,11 @@ let debug_no_auto_model =
 
 let () = Debug.set_flag debug_no_auto_model
 
-(* Set the vc_sp (fast_wp) everywhere.
-TODO we may want to do something more clever in the future. *)
+(* Set the vc_sp (fast_wp) everywhere. *)
 let debug_sp = Debug.register_flag "vc_sp"
   ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification."
 let () = Debug.set_flag debug_sp
 
-(* TODO we may want to revert this at some point *)
 let debug_useless_at = Debug.register_flag "ignore_useless_at"
   ~desc:"Remove@ warning@ for@ useless@ at/old."
 let () = Debug.set_flag debug_useless_at
