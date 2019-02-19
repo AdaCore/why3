@@ -243,5 +243,7 @@ ilist_app:
 idata_type:
 | name { }
 | name idata_type { }
+(* Z3 return bv can be "(_ bv 129)" which is not interpreted as a value *)
+| UNDERSCORE name INT_STR { }
 | LPAREN idata_type RPAREN option(idata_type) { }
 (* END IGNORED TYPES *)
