@@ -245,7 +245,7 @@ let rec print_fmla info defs fmt f =
           let c2 = constant_value defs t2 in
           fprintf fmt "%a in [%s,%s]" term t1 c2 c2
         with Not_found ->
-          fprintf fmt "%a - %a in [0,0]" term t1 term t2
+          fprintf fmt "%a = %a" term t1 term t2
       end
   | Tapp (ls, [t1;t2]) when Mls.mem ls info.info_ops_of_rel ->
       let s,op,rev_op = try Mls.find ls info.info_ops_of_rel

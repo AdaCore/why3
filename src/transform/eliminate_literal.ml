@@ -40,6 +40,12 @@ let add_literal (known_lit, decl as acc) t c ls_proj fin =
    NOTE: in this case, [add_literal] above is incorrect. *)
 let rec abstract_terms kn range_metas float_metas type_kept acc t =
   match t.t_node, t.t_ty with
+  | Tapp (ls, [{ t_node = Tconst (Number.ConstInt _ as c); t_ty = Some {ty_node = Tyapp (ts,[])} }]), _
+    when not (ts_equal ts ts_int || Sts.mem ts type_kept) && ls_equal ls (Mts.find ts range_metas) ->
+      acc, t_const c ty_int
+  | Tapp (ls, [{ t_node = Tconst (Number.ConstReal _ as c); t_ty = Some {ty_node = Tyapp (ts,[])} }]), _
+    when not (ts_equal ts ts_real || Sts.mem ts type_kept) && ls_equal ls (fst (Mts.find ts float_metas)) ->
+      acc, t_const c ty_int
   | Tconst (Number.ConstInt _ as c), Some {ty_node = Tyapp (ts,[])}
     when not (ts_equal ts ts_int || Sts.mem ts type_kept) ->
       let to_int = Mts.find ts range_metas in

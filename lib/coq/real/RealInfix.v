@@ -15,10 +15,3 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require real.Real.
 
-(* Why3 goal *)
-Lemma infix_mndt_def : forall (x:R) (y:R), ((x - y)%R = (x + (-y)%R)%R).
-Proof.
-intros x y.
-reflexivity.
-Qed.
-
