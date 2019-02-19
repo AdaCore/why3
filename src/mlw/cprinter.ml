@@ -883,9 +883,17 @@ module MLToC = struct
        let e = C.Evar id in
        ([], expr_or_return env e)
     | Mltree.Econst ic ->
-      let n = ic.Number.il_int in
-      let e = C.(Econst (Cint (BigInt.to_string n))) in
-      ([], expr_or_return env e)
+        let open Number in
+        let n = ic.il_int in
+        let n =
+          if BigInt.lt n BigInt.zero then BigInt.to_string n
+          else
+            match ic.il_kind with
+            | ILitHex -> Format.asprintf "0x%a" (print_in_base 16 None) n
+            | ILitOct -> Format.asprintf "0%a" (print_in_base 8 None) n
+            | _ -> BigInt.to_string n in
+        let e = C.(Econst (Cint n)) in
+        ([], expr_or_return env e)
     | Eapp (rs, el)
          when is_struct_constructor info rs
               && query_syntax info.syntax rs.rs_name = None ->
