@@ -70,19 +70,6 @@ module PtrCursor
     ensures { map_eq_sub result.elts (pelts c.current) 0 c.len }
     alias   { c.current.data with result }
 
-
-  let ghost test_alias (c:cursor) : unit
-    requires { not c.freed }
-    requires { 2 <= c.len }
-    requires { 43 <= c.bound }
-  =
-    let a = get_current c in
-    let a' = get_current c in
-    a[0] <- 42;
-    a'[1] <- 34;
-    assert { a'[0] = 42 /\ a[1] = 34 };
-    assert { Map.get (pelts c.current) 0 = 42 }
-
   let next (c: cursor) : unit
     requires { not c.freed }
     requires { 0 < c.bound < max_int32 }
@@ -120,6 +107,7 @@ module PtrCursor
       next c;
     done;
     c_assert (not c.new);
+    free_cursor c;
     0
-
+    
 end
