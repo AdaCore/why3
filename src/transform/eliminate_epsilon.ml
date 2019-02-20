@@ -236,8 +236,10 @@ let lift_l el (acc,dl) (ls,ld) =
   let vl, t, close = open_ls_defn_cb ld in
   (* remove special case for function declaration to keep definitions when
      no new symbol is generated for fb *)
-  (* match t.t_node with
-  | Teps fb when to_elim el t ->
+  match t.t_node with
+  (* For SPARK, this case is never taken in eliminate_epsilon but it simplifies
+     Coq proof for eliminate_non*epsilon *)
+  | Teps fb when to_elim el t && el <> All ->
       let vs, f = t_open_bound fb in
       let (abst,axml), f = lift_f el acc f in
       let t = t_app ls (List.map t_var vl) t.t_ty in
@@ -245,7 +247,7 @@ let lift_l el (acc,dl) (ls,ld) =
       let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
       let ax = (create_prsymbol id, f) in
       (create_param_decl ls :: abst, ax :: axml), dl
-  | _ -> *)
+  | _ ->
       let acc, t = lift_f el acc t in
       acc, close ls vl t :: dl
 
