@@ -114,7 +114,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_pos :
-forall (x:Z) (y:Z), ((0%Z < x)%Z /\ (0%Z <= y)%Z) -> (0%Z < (power x y))%Z.
+  forall (x:Z) (y:Z), ((0%Z < x)%Z /\ (0%Z <= y)%Z) -> (0%Z < (power x y))%Z.
 intros x y (h1,h2).
 eapply Z.pow_pos_nonneg; eauto.
 Qed.
@@ -128,3 +128,4 @@ Lemma Power_monotonic :
 intros.
 apply Z.pow_le_mono_r; auto with zarith.
 Qed.
+
