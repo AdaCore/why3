@@ -15,7 +15,7 @@ exception Unsupported = Printer.Unsupported
 
 module C = struct
 
-  (* names, fields, has mutable field *)
+  (* struct name, fields) *)
   type struct_def = string * (string * ty) list
 
   and ty =
@@ -249,18 +249,22 @@ module C = struct
       d, Sfor(e1,e2,e3,s')
     | s -> d,s
 
-
   let rec group_defs_by_type l =
     (* heuristic to reduce the number of lines of defs*)
     let rec group_types t1 t2 =
       match t1, t2 with
+      | Tvoid, Tvoid -> true
       | Tsyntax (s1, l1), Tsyntax (s2, l2) ->
         List.length l1 = List.length l2
         && List.for_all2 group_types l1 l2
-        && (s1 = s2)
+        && String.equal s1 s2
         && (not (String.contains s1 '*'))
-      | Tsyntax _, _ | _, Tsyntax _ -> false
-      | t1, t2 -> t1 = t2
+      | Tptr t, Tptr t' -> group_types t t'
+      | Tarray _, _ -> false
+      | Tstruct (n1, _), Tstruct (n2, _) -> String.equal n1 n2
+      | Tunion (id1, _), Tunion (id2, _) -> id_equal id1 id2
+      | Tnamed id1, Tnamed id2 -> id_equal id1 id2
+      | _,_ -> false
     in
     match l with
     | [] | [_] -> l
