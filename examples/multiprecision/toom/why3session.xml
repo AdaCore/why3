@@ -9,6 +9,7 @@
 <prover id="4" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <file proved="true">
 <path name=".."/>
 <path name="toom.mlw"/>
@@ -670,7 +671,7 @@
   <proof prover="3"><result status="valid" time="0.05"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.140" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="1.29"/></proof>
+  <proof prover="7"><result status="valid" time="1.07"/></proof>
   </goal>
   <goal name="VC wmpn_toom22_mul.141" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.08"/></proof>
@@ -715,7 +716,11 @@
    <proof prover="3"><result status="valid" time="0.03"/></proof>
    </goal>
    <goal name="VC wmpn_toom22_mul.148.1" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.52"/></proof>
+   <transf name="introduce_premises" proved="true" >
+    <goal name="VC wmpn_toom22_mul.148.1.0" expl="VC for wmpn_toom22_mul" proved="true">
+    <proof prover="4"><result status="valid" time="0.89"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="VC wmpn_toom22_mul.148.2" expl="VC for wmpn_toom22_mul" proved="true">
    <transf name="introduce_premises" proved="true" >
@@ -7244,7 +7249,7 @@
   <proof prover="1" timelimit="1"><result status="valid" time="0.16"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.421" expl="assertion" proved="true">
-  <proof prover="0" timelimit="10"><result status="valid" time="2.55"/></proof>
+  <proof prover="7"><result status="valid" time="1.90"/></proof>
   </goal>
   <goal name="VC wmpn_toom32_mul.422" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
@@ -8108,7 +8113,7 @@
    <proof prover="4"><result status="valid" time="0.82"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.10" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.79"/></proof>
+   <proof prover="4"><result status="valid" time="0.60"/></proof>
    </goal>
    <goal name="VC wmpn_toom32_mul.522.11" expl="VC for wmpn_toom32_mul" proved="true">
    <transf name="cut" proved="true" arg1="(power radix sy * value x sx &lt; power radix sy * power radix sx)">
