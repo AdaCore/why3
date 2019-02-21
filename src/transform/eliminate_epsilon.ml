@@ -239,7 +239,7 @@ let lift_l el (acc,dl) (ls,ld) =
   match t.t_node with
   (* For SPARK, this case is never taken in eliminate_epsilon but it simplifies
      Coq proof for eliminate_non*epsilon *)
-  | Teps fb when to_elim el t && el <> All ->
+  | Teps fb when (el = All && t_is_lambda t) || (el <> All && to_elim el t) ->
       let vs, f = t_open_bound fb in
       let (abst,axml), f = lift_f el acc f in
       let t = t_app ls (List.map t_var vl) t.t_ty in
