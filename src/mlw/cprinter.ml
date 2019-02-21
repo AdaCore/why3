@@ -257,7 +257,7 @@ module C = struct
       | Tsyntax (s1, l1), Tsyntax (s2, l2) ->
         List.length l1 = List.length l2
         && List.for_all2 group_types l1 l2
-        && String.equal s1 s2
+        && s1 = s2
         && (not (String.contains s1 '*'))
       | Tptr t, Tptr t' -> group_types t t'
       | Tarray _, _ -> false
