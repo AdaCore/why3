@@ -261,7 +261,7 @@ module C = struct
         && (not (String.contains s1 '*'))
       | Tptr t, Tptr t' -> group_types t t'
       | Tarray _, _ -> false
-      | Tstruct (n1, _), Tstruct (n2, _) -> String.equal n1 n2
+      | Tstruct (n1, _), Tstruct (n2, _) -> n1 = n2
       | Tunion (id1, _), Tunion (id2, _) -> id_equal id1 id2
       | Tnamed id1, Tnamed id2 -> id_equal id1 id2
       | _,_ -> false
