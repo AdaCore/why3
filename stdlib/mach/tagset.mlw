@@ -5,8 +5,10 @@ module S
 
   type key
 
+  val constant dummy: key
+
   val function tag (k:key): Int63.int63
-      ensures { 0 <= result < Int63.max_int63 }
+      ensures { k<>dummy -> 0 <= result < Int63.max_int63 }
 
   axiom tag_correct: forall x y. tag x = tag y -> x = y
 
@@ -36,25 +38,29 @@ module TagSetIntf
          mutable elts: S.set key;
          mutable iterated: iteration_state;
        }
+   invariant { not (S.mem S.dummy elts) }
    by {
       elts = S.empty;
       iterated = any iteration_state;
     }
 
-  val create (default:key) : t
+  val create () : t
    ensures { result.elts = S.empty }
 
   val function mem (k: key) (h: t) : bool
+   requires { k <> S.dummy }
    ensures { result = S.mem k h.elts }
 
   val function max_tags (h: t) : Int63.int63
     ensures { forall v. S.mem v h.elts -> tag v <= result }
 
   val add (h: t) (k: key): unit
+    requires { k <> S.dummy }
     ensures { h.elts = S.add k (old h.elts) }
     writes { h.elts, h.iterated }
 
   val remove (h: t) (k: key): unit
+    requires { k <> S.dummy }
     ensures { h.elts = S.remove k (old h.elts) }
     writes { h.elts, h.iterated }
 
@@ -113,17 +119,15 @@ module TagSet
 
   type iteration_state = mutable {
        ghost mutable elts': S.set key;
-       mutable present: array bool;
        mutable value: array key;
   }
-  invariant { forall v. S.mem v elts' -> tag v < present.length  }
-  invariant { forall v. S.mem v elts' -> present[tag v] }
-  invariant { forall i. 0 <= i < present.length -> present[i] -> tag (value[i]) = i }
-  invariant { forall i. 0 <= i < present.length -> present[i] -> forall v. tag v = i -> S.mem v elts' }
-  invariant { value.length = present.length }
+  invariant { not (S.mem S.dummy elts') }
+  invariant { forall v. S.mem v elts' -> tag v < value.length  }
+  invariant { forall v. S.mem v elts' -> value[tag v] <> S.dummy }
+  invariant { forall i. 0 <= i < value.length -> value[i] <> S.dummy -> tag (value[i]) = i }
+  invariant { forall i. 0 <= i < value.length -> value[i] <> S.dummy -> S.mem (value[i]) elts' }
   by {
      elts' = S.empty;
-     present = Array.make 0 false;
      value = Array.make 0 (any key);
    }
 
@@ -133,13 +137,12 @@ module TagSet
        }
    invariant { elts = iterated.elts' }
 
-  let create (def:key) : t
+  let create () : t
    ensures { result.elts = S.empty }
    =
    let iterated =  {
          elts' = S.empty;
-         present = Array.make 8 false;
-         value = Array.make 8 def;
+         value = Array.make 8 S.dummy;
       }
    in
    {
@@ -148,55 +151,53 @@ module TagSet
    }
 
   let function mem (k: key) (h: t) : bool
+   requires { k <> S.dummy }
    ensures { result = S.mem k h.elts } =
-     tag k < Array.length h.iterated.present && Array.(h.iterated.present[tag k])
+     tag k < Array.length h.iterated.value && Array.(S.tag h.iterated.value[tag k] <> S.tag S.dummy)
 
   let function max_tags (h: t) : Int63.int63
     ensures { forall v. S.mem v h.elts -> tag v <= result } =
-    Array.(length h.iterated.present) - 1
+    Array.(length h.iterated.value) - 1
 
   let resize (h:t) (k:key) : unit
-     ensures { tag k < Array.(length h.iterated.present) }
+     requires { k <> S.dummy }
+     ensures { tag k < Array.(length h.iterated.value) }
     =
     let len = tag k + 1 in
     let n = Array.length h.iterated.value in
     if len > n then begin
-    let nlen = (max len (2 * (min n (Int63.max_int / 2)))) in
-      let a = Array.(make nlen k) in
+      let nlen = (max len (2 * (min n (Int63.max_int / 2)))) in
+      let a = Array.(make nlen S.dummy) in
       Array.blit h.iterated.value 0 a 0 n;
       h.iterated.value <- a;
-      let b = Array.make nlen false in
-      Array.blit h.iterated.present 0 b 0 n;
-      h.iterated.present <- b
     end
 
 
   let add (h: t) (k: key): unit
+    requires { k <> S.dummy }
     ensures { h.elts = S.add k (old h.elts) }
     writes { h.elts , h.iterated } =
     resize h k;
     h.elts <- S.add k h.elts;
     h.iterated.elts' <- S.add k h.iterated.elts';
-    h.iterated.present[tag k] <- true;
-    h.iterated.value[tag k] <- k ;
+    h.iterated.value[tag k] <- k;
     if false then
        h.iterated <- {
            elts' = h.iterated.elts';
-           present = h.iterated.present;
            value = h.iterated.value;
          }
 
   let remove (k: key) (h: t) : unit
+   requires { k <> S.dummy }
    ensures { h.elts = S.remove k h.elts } =
-    if tag k < Array.length h.iterated.present then begin
+    if tag k < Array.length h.iterated.value then begin
         h.elts <- S.remove k h.elts;
         h.iterated.elts' <- S.remove k h.iterated.elts';
-        Array.(h.iterated.present[tag k] <- false);
+        Array.(h.iterated.value[tag k] <- S.dummy);
     end;
     if false then
        h.iterated <- {
            elts' = h.iterated.elts';
-           present = h.iterated.present;
            value = h.iterated.value;
          }
 
@@ -210,10 +211,10 @@ module TagSet
   }
   invariant { S.(==) all (S.union seen todo) }
   invariant { all = iterating.elts' }
-  invariant { 0 <= offset <= Seq.length iterating.present }
-  invariant { offset < Seq.length iterating.present -> iterating.present[offset] }
+  invariant { 0 <= offset <= Seq.length iterating.value }
+  invariant { offset < Seq.length iterating.value -> iterating.value[offset] <> S.dummy }
   invariant { forall v. S.mem v all -> (0 <= tag v < offset) <-> S.mem v seen }
-  invariant { forall v. S.mem v all -> (offset <= tag v < Seq.length iterating.present) <-> S.mem v todo }
+  invariant { forall v. S.mem v all -> (offset <= tag v < Seq.length iterating.value) <-> S.mem v todo }
   by {
     seen = S.empty;
     todo = S.empty;
@@ -221,7 +222,6 @@ module TagSet
     offset = 0;
     iterating =  {
      elts' = S.empty;
-     present = Array.make 0 false;
      value = Array.make 0 (any key);
    }
  }
@@ -235,10 +235,10 @@ module TagSet
           alias { result.iterating with h.iterated }
       =
        let i = ref 0 in
-       while !i < Array.length h.iterated.present && notb Array.(h.iterated.present[!i]) do
-          variant { Array.length h.iterated.present - !i }
-          invariant { 0 <= !i <= Array.length h.iterated.present }
-          invariant { forall j. 0 <= j < !i -> notb h.iterated.present[j] }
+       while !i < Array.length h.iterated.value && S.tag Array.(h.iterated.value[!i]) = S.tag S.dummy do
+          variant { Array.length h.iterated.value - !i }
+          invariant { 0 <= !i <= Array.length h.iterated.value }
+          invariant { forall j. 0 <= j < !i -> h.iterated.value[j] = S.dummy }
           i := !i + 1
        done;
        {
@@ -254,15 +254,14 @@ module TagSet
 
       let is_empty (i:iterator) : bool
           ensures { result = (S.is_empty i.todo) } =
-          if i.offset = Array.length i.iterating.present
+          if i.offset = Array.length i.iterating.value
           then begin
             assert { forall v. S.mem v i.todo -> S.mem v i.all };
             True
           end
           else begin
-            assert { i.offset < Array.length i.iterating.present };
-            assert { i.iterating.present[i.offset] };
-            assert { i.iterating.present[i.offset] };
+            assert { i.offset < Array.length i.iterating.value };
+            assert { i.iterating.value[i.offset] <> S.dummy };
             assert { S.mem i.iterating.value[i.offset] i.all };
             assert { S.mem i.iterating.value[i.offset] i.todo };
             False
@@ -274,18 +273,18 @@ module TagSet
           ensures { S.mem result (old i.todo) }
           ensures { i.todo = S.remove result (old i.todo) }
           ensures { i.seen = S.add result (old i.seen) } =
-           assert { i.offset < Array.length i.iterating.present };
+           assert { i.offset < Array.length i.iterating.value };
            let k = Array.(i.iterating.value[i.offset]) in
            i.seen <- S.add k i.seen;
            i.todo <- S.remove k i.todo;
            i.offset <- i.offset + 1;
-           while i.offset < Array.length i.iterating.present && notb Array.(i.iterating.present[i.offset]) do
-             invariant { old i.offset < i.offset <= Array.length i.iterating.present }
-             invariant { forall j. old i.offset < j < i.offset -> notb i.iterating.present[j] }
-             variant { Array.length i.iterating.present - i.offset }
+           while i.offset < Array.length i.iterating.value && S.tag Array.(i.iterating.value[i.offset]) = S.tag S.dummy do
+             invariant { old i.offset < i.offset <= Array.length i.iterating.value }
+             invariant { forall j. old i.offset < j < i.offset -> i.iterating.value[j] = S.dummy }
+             variant { Array.length i.iterating.value - i.offset }
              i.offset <- i.offset + 1
            done;
-           assert { forall j. old i.offset < j < i.offset -> notb i.iterating.present[j] };
+           assert { forall j. old i.offset < j < i.offset -> i.iterating.value[j] = S.dummy };
            k
   end
 
