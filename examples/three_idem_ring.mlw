@@ -6,29 +6,24 @@
 module ThreeIdempotentRing
 
        use int.Int
-       type t
-       val constant zero : t
-       val function (+) t t : t
-       val function ( *) t t : t
 
-       clone import algebra.Ring as R with
-       	     type t = t, constant zero = zero, function (+) = (+), function ( *) = ( *),
-	     axiom .
+       clone export algebra.Ring with
+       	     axiom .
 
        (** Define multiplication by an integer recursively *)
-       let rec function mul (x : t) (n : int) : t
+       let rec ghost function mul (x : t) (n : int) : t
        	   requires { n >= 0 }
        	   variant { n }
        =
-       	if n = 0 then zero else x + mul x (n-1)
+       	if n = 0 then pure{zero} else let r = mul x (n-1) in pure {x + r}
 
        (** We get lemmas from the why3 library *)
-       clone import int.Exponentiation as Mul with
-       	     type t = t, constant one = zero,
-	     function ( *) = (+), function power = mul, lemma .
+       clone int.Exponentiation with type t = t,
+       	     constant one = zero, function ( * ) = (+), function power = mul,
+       	     lemma .
 
 
-(** {2 General results about unitary rings} *)
+(** {2 General results about rings} *)
 
 (** First results : *)
 
