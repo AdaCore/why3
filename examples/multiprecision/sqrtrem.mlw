@@ -380,7 +380,6 @@ module Sqrt
       end;
       let ghost r' = value np' (int32'int h) + power radix (int32'int h) * (l2i q) in
       assert { r' <= 2 * value spl h };
-      (* value np' (h+h) at Rec = value spl h * value spl h + r' *)
       label Sub in
       begin ensures {    (q = 1 /\ value np' h = r' - value spl h)
                       \/ (q = 0 /\ value np' h = r') }
@@ -690,6 +689,9 @@ module Sqrt
                        by power radix n * power radix n <= (vs - 1) * (vs - 1) };
       if (Int64.(<) c 0)
       then begin
+        assert { vr < 0
+                 by value np n < power radix n
+                 so power radix n * c <= - power radix n };
         q <- wmpn_add_1_in_place spl q h;
         assert { q = 0 \/ q = 1 };
         assert { value sp l + power radix l * value spl h + power radix n * q
@@ -720,20 +722,125 @@ module Sqrt
                     then value sp n = 0
                     else q = 0 };
         let c' = wmpn_addmul_1 np sp 2 n in
-        assert { c' = 0 \/ q = 0
+        assert { c' = 0 \/ (q = 0 /\ c' <= 2)
                  by if q = 1
                     then value sp n = 0
-                    else true };
+                         so value np n + power radix n * c'
+                            = value np n at Adjust < power radix n
+                         so power radix n * c' < power radix n * 1
+                         so c' = 0
+                    else value np n + power radix n * c'
+                           = value np n at Adjust + 2 * vs
+                         so value np n at Adjust < power radix n
+                         so vs <= power radix n
+                         so value np n + power radix n * c' < 3 * power radix n
+                         so 0 <= value np n
+                         so c' < 3 };
         c <- Int64.(+) c (to_int64 (2 * q + c'));
         assert { value np n + power radix n * c
                  = value np n at Adjust + 2 * value sp n
                    + power radix n * (2 * q)
                    + power radix n * (c at Adjust)
                  = vr + power radix n * (2 * q)
-                      + 2 * value sp n };
+                      + 2 * value sp n
+                 = vr + 2 * vs };
+        c <- Int64.(-) c (to_int64 (wmpn_sub_1_in_place np 1 n));
+        assert { value np n + power radix n * c = vr + 2 * vs - 1 };
+        assert { 0 <= c
+                 by 0 <= vr + 2 * vs - 1
+                 so 0 <= value np n + power radix n * c
+                 so value np n < power radix n
+                 so -1 < c };
+        label AdjS in
+        let bo = wmpn_sub_1_in_place sp 1 n in
+        assert { bo = 1 -> q = 1
+                 by value sp n - power radix n * bo
+                    = value sp n at AdjS - 1
+                    so value sp n < power radix n
+                    so value sp n - power radix n * bo < 0
+                    so value sp n at AdjS = 0
+                    so vs = power radix n * q
+                    so 0 < vs };
+        assert { q = 1 -> bo = 1
+                 by value sp n at AdjS + power radix n = vs <= power radix n
+                 so value sp n at AdjS = 0
+                 so value sp n - power radix n * bo = - 1
+                 so 0 <= value sp n };
+        q <- q - bo;
+        assert { q = 0 };
+        assert { value sp n = vs - 1 };
+        assert { (value sp n) * (value sp n) + value np n + power radix n * c
+                   = vn
+                 by (value sp n) * (value sp n) = (vs - 1) * (vs - 1)
+                    = vs * vs - 2 * vs + 1
+                 so value np n + power radix n * c = vr + 2 * vs - 1 };
+        assert { value np n + power radix n * c <= 2 * value sp n
+                 by value np n + power radix n * c = vr + 2 * vs - 1
+                    <= 2 * vs - 1 };
       end
-      else (* TODO assert q = 0? *) ();
-      (* TODO joins *)
+      else begin
+        assert { 0 <= vr
+                 by 0 <= value np n
+                 so 0 <= power radix n * c };
+        let ghost osp = pure { sp } in
+        let ghost ospl = pure { spl } in
+        join sp spl;
+        value_sub_frame (pelts sp) (pelts osp) (offset sp)
+                                 (offset sp + int32'int l);
+        value_sub_frame (pelts sp) (pelts ospl) (offset sp + int32'int l)
+                                                (offset sp + int32'int n);
+        value_concat sp l n;
+        assert { value sp n = value osp l + power radix l * s'
+                 by s' = value ospl h
+                    = value_sub (pelts ospl) (offset sp + l) (offset sp + n) };
+        assert { vs = value sp n + power radix l * q };
+        assert { dq * dq < power radix l * (r'' + 1)
+                 by 0 <= vr
+                 so dq * dq <= power radix l * r'' + n0
+                 so n0 < power radix l
+                 so power radix l * r'' + n0 < power radix l * (r'' + 1) };
+        assert { q = 1 -> dq = power radix l };
+        assert { q = 1 -> r'' < power radix l
+                 by r' * power radix l + n1 = 2 * s' * dq + r''
+                 so dq = power radix l
+                 so r' * power radix l + n1 = (2 * s') * power radix l + r''
+                 so r' <= 2 * s'
+                 so r' * power radix l <= (2 * s') * power radix l
+                 so r'' <= n1 < power radix l };
+        assert { q = 1 -> false
+                 by r'' + 1 <= power radix l
+                 so power radix l * power radix l = dq * dq
+                    < power radix l * (r'' + 1)
+                    <= power radix l * power radix l };
+        assert { q = 0 };
+        assert { vs = value sp n };
+      end;
+      let ghost onp = pure { np } in
+      join np npn;
+      value_sub_frame (pelts np) (pelts onp) (offset np)
+                              (offset np + int32'int n);
+      assert { value np n = value onp n };
+      value_tail sp (n-1);
+      let ghost ms = C.get_ofs sp (n-1) in
+      let ghost sqrt = pure { value sp n } in
+      assert { sqrt = value sp (n-1) + power radix (n-1) * ms };
+      assert { (sqrt + 1) * (sqrt + 1) > vn };
+      assert { ms >= power 2 (Limb.length - 1)
+               by power radix (n+n) <= 4 * vn
+               so if (2 * (sqrt + 1)) <= power radix n
+                  then (false
+                        by 4 * vn <= (2 * (sqrt + 1)) * (2 * (sqrt + 1))
+                                  <= power radix n * power radix n
+                                  = power radix (n+n))
+                  else true
+               so power radix n < 2 * (sqrt + 1)
+               so value sp (n-1) < power radix (n-1)
+               so 1 + value sp (n-1) <= power radix (n-1)
+               so sqrt + 1 <= power radix (n-1) * (ms + 1)
+               so power radix n = power radix (n-1) * radix
+               so power radix (n-1) * radix < power radix (n-1) * (2 * (ms + 1))
+               so radix < 2 * (ms + 1)
+               so radix = 2 * power 2 (Limb.length - 1) };
       of_int64 c
     end;
 

@@ -7,10 +7,10 @@
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file>
 <path name=".."/>
 <path name="lemmas.mlw"/>
-<theory name="Lemmas" proved="true">
+<theory name="Lemmas">
  <goal name="VC map_eq_shift" expl="VC for map_eq_shift" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC map_eq_shift.0" expl="postcondition" proved="true">
@@ -60,6 +60,8 @@
  </goal>
  <goal name="VC prod_compat_strict_lr" expl="VC for prod_compat_strict_lr" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="VC prod_compat_lr" expl="VC for prod_compat_lr">
  </goal>
  <goal name="VC value_sub" expl="VC for value_sub" proved="true">
  <transf name="split_goal_right" proved="true" >
