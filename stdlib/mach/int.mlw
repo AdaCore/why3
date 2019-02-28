@@ -624,6 +624,10 @@ module UInt64GMP
     ensures { 2 * (power 2 (Int32.to_int result)) * to_int x > max_uint64 }
     ensures { 0 <= Int32.to_int result < 64 }
 
+  val to_int32(x:uint64) : int32
+    requires { x <= max_int32 }
+    ensures  { Int32.to_int result = x }
+
   val of_int32(x:int32) : uint64
     requires { Int32.to_int x >= 0 }
     ensures { to_int result = Int32.to_int x }

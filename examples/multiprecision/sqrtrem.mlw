@@ -294,8 +294,7 @@ module Sqrt
 
   use toom.Toom
 
-  let rec wmpn_dc_sqrtrem (sp np: ptr limb) (n:int32)
-                     (approx: limb) (scratch: ptr limb) : limb
+  let rec wmpn_dc_sqrtrem (sp np: ptr limb) (n:int32) (scratch: ptr limb) : limb
     requires { valid np (n+n) }
     requires { valid sp n }
     requires { 1 <= n }
@@ -323,9 +322,8 @@ module Sqrt
   = label Start in
     if n = 1
     then
-      let w = salloc (UInt32.of_int32 n) in
-      let r = wmpn_sqrtrem2 sp w np in
-      C.set np (C.get w);
+      let r = wmpn_sqrtrem2 sp scratch np in
+      C.set np (C.get scratch);
       r
     else begin
       let l = n / 2 in
@@ -354,7 +352,7 @@ module Sqrt
       end;
       let spl = C.incr_split sp l in
       label Rec in
-      let ref q = wmpn_dc_sqrtrem spl np' h 0 scratch in
+      let ref q = wmpn_dc_sqrtrem spl np' h scratch in
       assert { n' = value spl h * value spl h
                     + value np' h + power radix h * q };
       begin ensures { power radix l <= 2 * value spl h }
@@ -842,7 +840,258 @@ module Sqrt
                so radix < 2 * (ms + 1)
                so radix = 2 * power 2 (Limb.length - 1) };
       of_int64 c
+    end
+
+  let ghost function ceilhalf (n:int)
+    ensures { 2 * result >= n }
+    ensures { 2 * (result + 1) > n }
+  = ComputerDivision.div (n+1) 2
+
+  (* TODO rp = NULL case? *)
+
+  let lemma sqrt_norm (n nn c s s0 s1 : int)
+    requires { 0 <= c }
+    requires { 0 < n }
+    requires { 0 <= s }
+    requires { 0 <= s0 < power 2 c }
+    requires { nn = power 2 (2 * c) * n }
+    requires { s1 = power 2 c * s + s0 }
+    requires { s1 * s1 <= nn < (s1 + 1) * (s1 + 1) }
+    ensures  { s * s <= n < (s+1) * (s+1) }
+  =
+    assert { power 2 (2 * c) = power 2 c * power 2 c };
+    assert { s * s <= n < (s + 1) * (s + 1)
+             by 0 <= s so 0 <= power 2 c
+             so power 2 (2 * c) * (s * s)
+                = (power 2 c * s) * (power 2 c * s)
+                <= s1 * s1 <= nn = power 2 (2 * c) * n
+             so power 2 (2 * c) * (s * s) <= power 2 (2 * c) * n
+             so 0 <= power 2 (2 * c) so 0 <= s * s so 0 <= n
+             so s * s <= n
+             so s0 < power 2 c
+             so (s1 + 1) = power 2 c * s + s0 + 1
+                <= power 2 c * s + power 2 c
+                = power 2 c * (s + 1)
+             so power 2 (2 * c) * n = nn < (s1 + 1) * (s1 + 1)
+                <= (power 2 c * (s + 1)) * (power 2 c * (s + 1))
+                = power 2 (2 * c) * ((s + 1) * (s + 1))
+             so power 2 (2 * c) * n
+                < power 2 (2 * c) * ((s + 1) * (s + 1))
+             so 0 < power 2 (2 * c) so 0 < (s + 1) * (s + 1) so 0 < n
+             so n < (s + 1) * (s + 1) }
+
+  let rec wmpn_sqrtrem (sp rp np: ptr limb) (n: int32) (ghost k: int32) : int32
+    requires { k = ceilhalf n }
+    requires { valid sp k }
+    requires { valid rp n }
+    requires { valid np n }
+    requires { 1 <= n }
+    requires { 4 * n < max_int32 }
+    requires { (pelts np)[offset np + n - 1] > 0 }
+    raises   { StackOverflow -> true }
+    ensures  { 0 <= result <= k }
+    ensures  { value np n = value sp k * value sp k + value rp result }
+    ensures  { value rp result <= 2 * value sp k }
+    ensures  { max np = old max np }
+    ensures  { min np = old min np }
+    ensures  { plength np = old plength np }
+    ensures  { max rp = old max rp }
+    ensures  { min rp = old min rp }
+    ensures  { plength rp = old plength rp }
+    ensures  { max sp = old max sp }
+    ensures  { min sp = old min sp }
+    ensures  { plength sp = old plength sp }
+    variant  { n }
+  =
+    let high = C.get_ofs np (n-1) in
+    let ref c = (of_int32 (count_leading_zeros high)) / 2 in
+    assert { power 2 (2 * c) * high < radix };
+    assert { power 2 (2 * c) * high <= radix - power 2 (2 * c)
+             by let p = power 2 (2 * c) in
+                let q = power 2 (64 - 2 * c) in
+                let r = p * high in
+                radix = p * q
+                so mod r p = mod (p * high + 0) p = 0
+                so r = p * div r p
+                so r < p * q
+                so div r p < q
+                so r <= p * (q - 1) = radix - power 2 (2 * c) };
+    assert { 4 * power 2 (2 * c) * high >= radix };
+    if n = 1
+    then begin
+      assert { k = 1 };
+      value_tail np 0;
+      assert { value np n = high };
+      if c = 0
+      (* TODO if high & 0xc000_0000_0000_0000 *)
+      then begin
+        let s = wmpn_sqrtrem1 rp high in
+        C.set sp s;
+        value_tail sp 0;
+        assert { value sp k = s };
+      end
+      else begin
+        let nh = lsl high (2 * c) in
+        assert { nh = power 2 (2 * c) * high
+                 so 4 * nh >= radix   };
+        let ncc = wmpn_sqrtrem1 rp nh in
+        let cc = lsr_mod ncc c in
+        let ghost s0 = pure { mod ncc (power 2 c) } in
+        assert { ncc = power 2 c * cc + s0 };
+        assert { power 2 c * cc <= ncc
+                 by 0 <= s0 };
+        sqrt_norm (uint64'int high) (uint64'int nh) (uint64'int c)
+                  (uint64'int cc) s0 (uint64'int ncc);
+        C.set sp cc;
+        value_tail sp 0;
+        assert { value sp k = cc };
+        C.set rp (high - cc * cc);
+        assert { value rp 1 = high - cc * cc };
+      end;
+      let res = if C.get rp = 0 then 0 else 1 in
+      value_tail rp 0;
+      assert { value rp res = value rp 1 = (pelts rp)[offset rp] };
+      return res
     end;
+    let tn = (n + 1) / 2 in
+    assert { tn = k };
+    let ref rn : int32 = 0 in
+    let adj = to_int32 (mod2 (of_int32 n)) in
+    assert { 2 * tn = n + adj };
+    if (adj <> 0 || c <> 0)
+    then begin
+      let tp = salloc (UInt32.(*) 2 (UInt32.of_int32 tn)) in
+      let scratch = salloc (UInt32.(+) (UInt32.(/) (UInt32.of_int32 tn) 2) 1) in
+      C.set tp 0;
+      begin ensures { value tp (n+adj)
+                      = power 2 (2 * c) * power radix adj * value np n }
+            ensures { 4 * value tp (n+adj) >= power radix (n+adj) }
+            ensures { max tp = old max tp }
+            ensures { plength tp = old plength tp }
+        assert { value tp adj = 0 };
+        let ghost otp = pure { tp } in
+        let tpa = C.incr_split tp adj in
+        label Shift in
+        (if c <> 0
+        then begin
+          value_tail np (n-1);
+          assert { value np n * power 2 (2 * c) < power radix n
+                   by value np n = value np (n-1) + power radix (n-1) * high
+                   so high * power 2 (2 * c) <= radix - power 2 (2 * c)
+                   so power 2 (2 * c) * value np (n-1)
+                      < power 2 (2 * c) * power radix (n-1)
+                   so power radix (n-1) * (high * power 2 (2 * c))
+                      <= power radix (n-1) * (radix - power 2 (2 * c))
+                   so value np n * power 2 (2 * c)
+                      = value np (n-1) * power 2 (2 * c)
+                        + power radix (n-1) * high * power 2 (2 * c)
+                      < power 2 (2 * c) * power radix (n-1)
+                        + power radix (n-1) * (radix - power 2 (2 * c))
+                      = power radix (n-1) * radix = power radix n };
+          let ghost h = wmpn_lshift tpa np n (2 * c) in
+          assert { h = 0
+                   by value np n * power 2 (2 * c) < power radix n
+                   so value tpa n + power radix n * h < power radix n
+                   so 0 <= value tpa n
+                   so h < 1 };
+          assert { 4 * value tpa n >= power radix n
+                   by value np n >= power radix (n-1) * high
+                   so value tpa n
+                      = power 2 (2 * c) * value np n
+                      >= power 2 (2 * c) * power radix (n-1) * high
+                   so 4 * power 2 (2 * c) * high >= radix
+                   so power radix n
+                      = power radix (n-1) * radix
+                      <= power radix (n-1) * (4 * power 2 (2 * c) * high)
+                      <= 4 * value tpa n };
+        end
+        else begin
+          wmpn_copyi tpa np n;
+          assert { 4 * high >= radix };
+          assert { 4 * value tpa n >= power radix n
+                   by value np n >= power radix (n-1) * high
+                   so power radix n
+                      = power radix (n-1) * radix
+                      <= power radix (n-1) * 4 * high
+                      <= 4 * value np n = 4 * value tpa n };
+        end);
+        let otpa = pure { tpa } in
+        join tp tpa;
+        value_sub_frame (pelts tp) (pelts otp) 0 (int32'int adj);
+        value_sub_frame (pelts tp) (pelts otpa) (int32'int adj)
+                                (int32'int adj + int32'int n);
+        assert { value_sub (pelts tp) adj (n+adj) = value otpa n };
+        assert { value tp adj = 0 };
+        value_concat tp adj (n+adj);
+        assert { value tp (n+adj) = power radix adj * value otpa n };
+        assert { 4 * value tp (n+adj) >= power radix (n + adj)
+                 by power radix (n+adj) = power radix adj * power radix n
+                 <= power radix adj * (4 * value otpa n)
+                 = 4 * value tp (n+adj) };
+      end;
+      c <- c + (if adj <> 0 then 32 else 0);
+      assert { 0 <= c <= 63 };
+      assert { value tp (n+adj) = power 2 (2 * c) * value np n };
+      (*let mask = lsl 1 c - 1 in*)
+      value_tail tp (tn + tn - 1);
+      let ghost h = pure { (pelts tp)[tn + tn - 1] } in
+      assert { h >= power 2 (Limb.length - 2)
+               by value tp (n+adj)
+                  = value tp (tn + tn - 1) + power radix (tn + tn - 1) * h
+                  < power radix (tn + tn - 1) + power radix (tn + tn - 1) * h
+                  = power radix (tn + tn - 1) * (h+1)
+               so power radix (tn + tn) <= 4 * value tp (n+adj)
+                  < power radix (tn + tn - 1) * 4 * (h+1)
+               so power radix (tn + tn) = power radix (tn + tn - 1) * radix
+               so radix < 4 * (h+1)
+               so radix = 4 * power 2 (Limb.length - 2)
+               so power 2 (Limb.length - 2) < h+1 };
+      let ghost vn = pure { value np n } in
+      let ghost vn1 = pure { value tp (n+adj) } in
+      assert { vn1 = power 2 (2 * c) * vn };
+      let ref rl = wmpn_dc_sqrtrem sp tp tn scratch in
+      let ghost vs = pure { value sp tn } in
+      let ghost vr = pure { value tp tn + power radix tn * rl } in
+      assert { vn1 = vs * vs + vr };
+      let ghost vs0 = pure { mod vs (power 2 c) } in
+      assert { vn1 = (vs - vs0) * (vs - vs0) + 2 * vs0 * vs - vs0 * vs0 + vr };
+      let s0 = salloc 1 in
+      value_concat sp 1 tn;
+      let s00 = mask (C.get sp) c in
+      assert { s00 = vs0
+               by radix = power 2 Limb.length
+                  = power 2 c * power 2 (Limb.length - c)
+               so let q = value_sub (pelts sp) (offset sp + 1)
+                                              (offset sp + tn) in
+                  vs = value sp tn = (pelts sp)[offset sp] + radix * q
+                     = power 2 c * (power 2 (Limb.length - c) * q)
+                       + (pelts sp)[offset sp]
+                  so mod vs (power 2 c)
+                     = mod (power 2 c * (power 2 (Limb.length - c) * q)
+                            + (pelts sp)[offset sp])
+                           (power 2 c)
+                     = mod (pelts sp)[offset sp] (power 2 c)
+                     = s00 };
+      C.set s0 s00;
+      assert { value s0 1 = s00 };
+      let rc = wmpn_addmul_1 tp sp (2 * s00) tn in
+      assert { value tp tn + power radix tn * (rl + rc) = vr + 2 * vs0 * vs };
+      assert { rl + rc < radix
+               by vr <= 2 * vs
+               so vr + 2 * vs0 * vs <= 2 * vs * (vs0 + 1)
+               so vs0 < power 2 c <= power 2 63
+               so 2 * vs * (vs0 + 1) <= 2 * vs * power 2 63 = radix * vs
+               so vs < power radix tn
+               so radix * vs < radix * power radix tn
+               so power radix tn * radix > value tp tn + power radix tn * (rl + rc)
+                  >= power radix tn * (rl + rc)
+               so power radix tn * (rl + rc) < power radix tn * radix };
+      rl <- rl + rc;
+      let cc = submul_limb tp s0 s00 1 in
+      ()
+    end
+    else begin end;
+    0
 
 
 end
