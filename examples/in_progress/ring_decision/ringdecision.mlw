@@ -138,7 +138,7 @@ let rec function le_mon (x1 x2: list int) : bool
   match x1, x2 with
   | Nil, _ -> true
   | _, Nil -> false
-  | Cons v1 r1, Cons v2 r2 ->  v1 <= v2 && le_mon r1 r2
+  | Cons v1 r1, Cons v2 r2 ->  v1 < v2 || (v1 = v2 && le_mon r1 r2)
   end)
 
 let rec function same (l1 l2: list int) : bool
@@ -388,7 +388,7 @@ let rec function le_mon (x1 x2: list int) : bool
   match x1, x2 with
   | Nil, _ -> true
   | _, Nil -> false
-  | Cons v1 r1, Cons v2 r2 ->  v1 <= v2 && le_mon r1 r2
+  | Cons v1 r1, Cons v2 r2 ->  v1 < v2 || (v1 = v2 && le_mon r1 r2)
   end)
 
 let rec function same (l1 l2: list int) : bool
