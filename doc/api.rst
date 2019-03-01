@@ -24,10 +24,24 @@ Building Propositional Formulas
 The first step is to know how to build propositional formulas. The
 module ``Term`` gives a few functions for building these. Here is a
 piece of OCaml code for building the formula :math:`\mathit{true} \lor
-\mathit{false}`. The library uses the common type ``term`` both for
-terms (expressions that produce a value of some particular type) and
-formulas (boolean-valued expressions). Such a formula can be printed
-using the module ``Pretty`` providing pretty-printers.
+\mathit{false}`.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{opening}
+   :end-before: END{opening}
+
+The library uses the common type ``term`` both for terms (*i.e.*,
+expressions that produce a value of some particular type) and formulas
+(boolean-valued expressions).
+
+Such a formula can be printed using the module ``Pretty`` providing
+pretty-printers.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{printformula}
+   :end-before: END{printformula}
 
 Assuming the lines above are written in a file ``f.ml``, it can be
 compiled using
@@ -42,14 +56,25 @@ Running the generated executable ``f`` results in the following output.
 
     formula 1 is: true \/ false
 
-Let us now build a formula with propositional variables:
-:math:`A \land B
-\rightarrow A`. Propositional variables must be declared first before
-using them in formulas. This is done as follows. The type ``lsymbol`` is
-the type of function and predicate symbols (which we call logic symbols
-for brevity). Then the atoms :math:`A` and :math:`B` must be built by
-the general function for applying a predicate symbol to a list of terms.
-Here we just need the empty list of arguments.
+Let us now build a formula with propositional variables: :math:`A \land
+B \rightarrow A`. Propositional variables must be declared first before
+using them in formulas. This is done as follows.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{declarepropvars}
+   :end-before: END{declarepropvars}
+
+The type ``lsymbol`` is the type of function and predicate symbols (which
+we call logic symbols for brevity). Then the atoms :math:`A`
+and :math:`B` must be built by the general function for applying
+a predicate symbol to a list of terms. Here we just need the empty list
+of arguments.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{declarepropatoms}
+   :end-before: END{declarepropatoms}
 
 As expected, the output is as follows.
 
@@ -81,9 +106,19 @@ not allowed in tasks and can only be used in theories.
 
 Once a task is built, it can be printed.
 
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{printtask}
+   :end-before: END{printtask}
+
 The task for our second formula is a bit more complex to build, because
-the variables A and B must be added as abstract (not defined)
+the variables A and B must be added as abstract (*i.e.*, not defined)
 propositional symbols in the task.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildtask2}
+   :end-before: END{buildtask2}
 
 Execution of our OCaml program now outputs:
 
@@ -111,35 +146,90 @@ Calling External Provers
 To call an external prover, we need to access the Why3 configuration
 file ``why3.conf``, as it was built using the ``why3config`` command
 line tool or the menu of the graphical IDE. The following API calls
-allow to access the content of this configuration file. The type
-``’a Whyconf.Mprover.t`` is a map indexed by provers. A prover is a
-record with a name, a version, and an alternative description (to
+make it possible to access the content of this configuration file.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{getconf}
+   :end-before: END{getconf}
+
+The type ``'a Whyconf.Mprover.t`` is a map indexed by provers. A prover
+is a record with a name, a version, and an alternative description (to
 differentiate between various configurations of a given prover). Its
-definition is in the module ``Whyconf``: The map ``provers`` provides
+definition is in the module ``Whyconf``:
+
+.. literalinclude:: ../src/driver/whyconf.ml
+   :language: ocaml
+   :start-after: BEGIN{provertype}
+   :end-before: END{provertype}
+
+The map ``provers`` provides
 the set of existing provers. In the following, we directly attempt to
-access a prover named “Alt-Ergo”, any version. We could also get a
-specific version with :
+access a prover named “Alt-Ergo”, any version.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{getanyaltergo}
+   :end-before: END{getanyaltergo}
+
+We could also get a specific version with
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{getaltergo200}
+   :end-before: END{getaltergo200}
 
 The next step is to obtain the driver associated to this prover. A
 driver typically depends on the standard theories so these should be
 loaded first.
 
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{getdriver}
+   :end-before: END{getdriver}
+
 We are now ready to call the prover on the tasks. This is done by a
 function call that launches the external executable and waits for its
-termination. Here is a simple way to proceed: This way to call a prover
+termination. Here is a simple way to proceed:
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{callprover}
+   :end-before: END{callprover}
+
+This way to call a prover
 is in general too naive, since it may never return if the prover runs
 without time limit. The function ``prove_task`` has an optional
-parameter ``limit``, a record defined in module ``Call_provers``: where
-the field ``limit_time`` is the maximum allowed running time in seconds,
-and ``limit_mem`` is the maximum allowed memory in megabytes. The type
-``prover_result`` is a record defined in module ``Call_provers``: with
-in particular the fields:
+parameter ``limit``, a record defined in module ``Call_provers``:
+
+.. literalinclude:: ../src/driver/call_provers.ml
+   :language: ocaml
+   :start-after: BEGIN{resourcelimit}
+   :end-before: END{resourcelimit}
+
+where the field ``limit_time`` is the maximum allowed running time in
+seconds, and ``limit_mem`` is the maximum allowed memory in megabytes.
+The type ``prover_result`` is a record defined in module
+``Call_provers``:
+
+.. literalinclude:: ../src/driver/call_provers.ml
+   :language: ocaml
+   :start-after: BEGIN{proverresult}
+   :end-before: END{proverresult}
+
+with in particular the fields:
 
 -  ``pr_answer``: the prover answer, explained below;
 
 -  ``pr_time`` : the time taken by the prover, in seconds.
 
 A ``pr_answer`` is the sum type defined in module ``Call_provers``:
+
+.. literalinclude:: ../src/driver/call_provers.ml
+   :language: ocaml
+   :start-after: BEGIN{proveranswer}
+   :end-before: END{proveranswer}
+
 corresponding to these kinds of answers:
 
 -  ``Valid``: the task is valid according to the prover.
@@ -162,7 +252,14 @@ corresponding to these kinds of answers:
    expressions in the driver file matches the output of the prover).
 
 Here is thus another way of calling the Alt-Ergo prover, on our second
-task. The output of our program is now as follows.
+task.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{calltimelimit}
+   :end-before: END{calltimelimit}
+
+The output of our program is now as follows.
 
 ::
 
@@ -178,24 +275,64 @@ constructed.
 
 Here is the way we build the formula :math:`2+2=4`. The main difficulty
 is to access the internal identifier for addition: it must be retrieved
-from the standard theory ``Int`` of the file ``int.why``. An important
-point to notice as that when building the application of :math:`+` to
-the arguments, it is checked that the types are correct. Indeed the
-constructor ``t_app_infer`` infers the type of the resulting term. One
-could also provide the expected type as follows.
+from the standard theory ``Int`` of the file ``int.why``.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildfmla}
+   :end-before: END{buildfmla}
+
+An important point to notice as that when building the application
+of :math:`+` to the arguments, it is checked that the types are correct.
+Indeed the constructor ``t_app_infer`` infers the type of the resulting
+term. One could also provide the expected type as follows.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildtermalt}
+   :end-before: END{buildtermalt}
 
 When building a task with this formula, we need to declare that we use
 theory ``Int``:
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildtaskimport}
+   :end-before: END{buildtaskimport}
 
 Building Quantified Formulas
 ----------------------------
 
 To illustrate how to build quantified formulas, let us consider the
 formula :math:`\forall x:int. x*x \geq 0`. The first step is to obtain
-the symbols from ``Int``. The next step is to introduce the variable
-:math:`x` with the type int. The formula :math:`x*x \geq 0` is obtained
-as in the previous example. To quantify on :math:`x`, we use the
-appropriate smart constructor as follows.
+the symbols from ``Int``.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{quantfmla1}
+   :end-before: END{quantfmla1}
+
+The next step is to introduce the variable :math:`x` with the type ``int``.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{quantfmla2}
+   :end-before: END{quantfmla2}
+
+The formula :math:`x*x \geq 0` is obtained as in the previous example.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{quantfmla3}
+   :end-before: END{quantfmla3}
+
+To quantify on :math:`x`, we use the appropriate smart constructor as
+follows.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{quantfmla4}
+   :end-before: END{quantfmla4}
 
 Building Theories
 -----------------
@@ -210,24 +347,71 @@ done by a sequence of calls:
 -  closing the theory under construction, obtaining something of type
    ``Theory.theory``.
 
-Creation of a theory named ``My_theory`` is done by First let us add
-formula 1 above as a goal: Note that we reused the goal identifier
+Creation of a theory named ``My_theory`` is done by
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildth1}
+   :end-before: END{buildth1}
+
+First let us add formula 1 above as a goal:
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildth1}
+   :end-before: END{buildth1}
+
+Note that we reused the goal identifier
 ``goal_id1`` that we already defined to create task 1 above.
 
 Adding formula 2 needs to add the declarations of predicate variables A
 and B first:
 
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildth3}
+   :end-before: END{buildth3}
+
 Adding formula 3 is a bit more complex since it uses integers, thus it
 requires to “use” the theory ``int.Int``. Using a theory is indeed not a
 primitive operation in the API: it must be done by a combination of an
 “export” and the creation of a namespace. We provide a helper function
-for that: Addition of formula 3 is then
+for that:
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildth4}
+   :end-before: END{buildth4}
+
+Addition of formula 3 is then
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildth5}
+   :end-before: END{buildth5}
 
 Addition of goal 4 is nothing more complex:
 
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildth6}
+   :end-before: END{buildth6}
+
 Finally, we close our theory under construction as follows.
 
-We can inspect what we did by printing that theory: which outputs
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildth7}
+   :end-before: END{buildth7}
+
+We can inspect what we did by printing that theory:
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{printtheory}
+   :end-before: END{printtheory}
+
+which outputs
 
 ::
 
@@ -252,10 +436,22 @@ We can inspect what we did by printing that theory: which outputs
     end
 
 From a theory, one can compute at once all the proof tasks it contains
-as follows: Note that the tasks are returned in reverse order, so we
+as follows:
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{splittheory}
+   :end-before: END{splittheory}
+
+Note that the tasks are returned in reverse order, so we
 reverse the list above.
 
 We can check our generated tasks by printing them:
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{printalltasks}
+   :end-before: END{printalltasks}
 
 One can run provers on those tasks exactly as we did above.
 
@@ -266,9 +462,19 @@ The following code illustrates a simple recursive functions of formulas.
 It explores the formula and when a negation is found, it tries to push
 it down below a conjunction, a disjunction or a quantifier.
 
+.. literalinclude:: ../examples/use_api/transform.ml
+   :language: ocaml
+   :start-after: BEGIN{negate}
+   :end-before: END{negate}
+
 The following illustrates how to turn such an OCaml function into a
 transformation in the sense of the Why3 API. Moreover, it registers that
 transformation to make it available for example in Why3 IDE.
+
+.. literalinclude:: ../examples/use_api/transform.ml
+   :language: ocaml
+   :start-after: BEGIN{register}
+   :end-before: END{register}
 
 The directory ``src/transform`` contains the code for the many
 transformations that are already available in Why3.
@@ -294,39 +500,104 @@ The first step is to build an environment as already illustrated in
 :numref:`sec.api.callingprovers`, and open the OCaml module ``Ptree``
 which contains most of the OCaml functions we need in this section.
 
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{buildenv}
+   :end-before: END{buildenv}
+
 To contain all the example programs we are going to build we need a
 module. We start the creation of that module using the following
 declarations, that first introduces a pseudo “file” to hold the module,
-then the module itself called ``Program``. Notice the use of a first
-simple helper function ``mk_ident`` to build an identifier without any
-attributes nor any location.
+then the module itself called ``Program``.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{openmodule}
+   :end-before: END{openmodule}
+
+Notice the use of a first simple helper function ``mk_ident`` to build an
+identifier without any attributes nor any location.
 
 To write our programs, we need to import some other modules from the
 standard library. The following introduces two helper functions for
 building qualified identifiers and importing modules, and finally
 imports ``int.Int``.
 
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{useimport}
+   :end-before: END{useimport}
+
 We want now to build a program equivalent to the following code in
 concrete Why3 syntax.
 
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{source1}
+   :end-before: END{source1}
+
 The OCaml code that programmatically build this Why3 function is as
-follows. This code makes uses of helper functions that are given in
-:numref:`fig.helpers`.
+follows.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{code1}
+   :end-before: END{code1}
+
+This code makes uses of the following helper functions.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{helper1}
+   :end-before: END{helper1}
 
 We want now to build a program equivalent to the following code in
-concrete Why3 syntax. We need to import the ``ref.Ref`` module first.
-The rest is similar to the first example, the code is as follows
+concrete Why3 syntax.
 
-The next example makes use of arrays. The corresponding OCaml code is as
-follows
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{source2}
+   :end-before: END{source2}
+
+We need to import the ``ref.Ref`` module first. The rest is similar to
+the first example, the code is as follows.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{code2}
+   :end-before: END{code2}
+
+The next example makes use of arrays.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{source3}
+   :end-before: END{source3}
+
+The corresponding OCaml code is as follows.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{code3}
+   :end-before: END{code3}
 
 Having declared all the programs we wanted to write, we can now close
 the module and the file, and get as a result the set of modules of our
 file, under the form of a map of module names to modules.
 
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{closemodule}
+   :end-before: END{closemodule}
+
 We can then construct the proofs tasks for our module, and then try to
 call the Alt-Ergo prover. The rest of that code is using OCaml functions
 that were already introduced before.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{checkingvcs}
+   :end-before: END{checkingvcs}
 
 Generating counterexamples
 --------------------------
@@ -359,7 +630,14 @@ subsequent tasks:
 This means that the ident generated for :math:`x` will hold both a
 ``model_trace`` and a location.
 
-The example becomes the following: In the above, we defined a
+The example becomes the following:
+
+.. literalinclude:: ../examples/use_api/counterexample.ml
+   :language: ocaml
+   :start-after: BEGIN{ce_declarepropvars}
+   :end-before: END{ce_declarepropvars}
+
+In the above, we defined a
 proposition ident with a location and a ``model_trace``.
 
 Attributes in formulas
@@ -371,6 +649,11 @@ formula for counterexamples, we need to tag it with the
 using the VC generation of Why3, but on a user-built task, this needs to
 be added. We also need to add a location for this goal. The following is
 obtained for the simple formula linking :math:`A` and :math:`B`:
+
+.. literalinclude:: ../examples/use_api/counterexample.ml
+   :language: ocaml
+   :start-after: BEGIN{ce_adaptgoals}
+   :end-before: END{ce_adaptgoals}
 
 Note: the transformations used for counterexamples will create new
 variables for each variable occuring inside the formula tagged by
@@ -384,3 +667,8 @@ Counterexamples output formats
 Several output formats are available for counterexamples. For users who
 want to pretty-print their counterexamples values, we recommend to use
 the JSON output as follows:
+
+.. literalinclude:: ../examples/use_api/counterexample.ml
+   :language: ocaml
+   :start-after: BEGIN{ce_callprover}
+   :end-before: END{ce_callprover}
