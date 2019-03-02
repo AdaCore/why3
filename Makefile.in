@@ -2375,8 +2375,7 @@ AUTOCONF_FILES = \
 	src/jessie/.merlin \
 	lib/why3/META \
 	lib/coq/version \
-	lib/pvs/version \
-	doc/version.tex
+	lib/pvs/version
 
 $(AUTOCONF_FILES): %: %.in config.status
 	./config.status chmod --file $@
