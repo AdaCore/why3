@@ -60,7 +60,7 @@ can be performed within the GUI tool ``why3 ide`` as well. See
 
 As an introduction to WhyML, we use a small logical puzzle
 (:numref:`sec.einstein`) and then the five problems from the VSTTE 2010
-verification competition :raw-latex:`\cite{vstte10comp}`. The source
+verification competition :cite:`vstte10comp`. The source
 code for all these examples is contained in Why3’s distribution, in
 sub-directory ``examples/``. Look for files ``logic/einstein.why`` and
 ``vstte10_xxx.mlw``.
@@ -255,7 +255,7 @@ Problem 1: Sum and Maximum
 --------------------------
 
 Let us now move to the problems of the VSTTE 2010 verification
-competition :raw-latex:`\cite{vstte10comp}`. The first problem is stated
+competition :cite:`vstte10comp`. The first problem is stated
 as follows:
 
     Given an :math:`N`-element array of natural numbers, write a program
@@ -978,7 +978,7 @@ composed of two lists, *front* and *rear*. We push elements at the head
 of list *rear* and pop them off the head of list *front*. We maintain
 that the length of *front* is always greater or equal to the length of
 *rear*. (See for instance Okasaki’s *Purely Functional Data
-Structures* :raw-latex:`\cite{okasaki98}` for more details.)
+Structures* :cite:`okasaki98` for more details.)
 
 We have to implement operations ``empty``, ``head``, ``tail``, and
 ``enqueue`` over this data type, to show that the invariant over lengths

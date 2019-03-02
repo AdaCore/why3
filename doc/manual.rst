@@ -13,7 +13,7 @@ mechanism. WhyML is also used as an intermediate language for the
 verification of C, Java, or Ada programs.
 
 Why3 is a complete reimplementation of the former Why
-platform :raw-latex:`\cite{filliatre07cav}`. Among the new features are:
+platform :cite:`filliatre07cav`. Among the new features are:
 numerous extensions to the input language, a new architecture for
 calling external provers, and a well-designed API, allowing to use Why3
 as a software library. An important emphasis is put on modularity and

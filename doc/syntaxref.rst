@@ -498,7 +498,7 @@ Floating-point Types
 
 A declaration of the form ``type f = < float eb sb >`` defines a type of
 floating-point numbers as specified by the IEEE-754
-standard :raw-latex:`\cite{ieee754-2008}`. Here the literal ``eb``
+standard :cite:`ieee754-2008`. Here the literal ``eb``
 represents the number of bits in the exponent and the literal ``sb`` the
 number of bits in the significand (including the hidden bit). Note that
 in order to make such a declaration the theory ``real.Real`` must be

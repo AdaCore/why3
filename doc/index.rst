@@ -21,6 +21,7 @@ Welcome to Why3's documentation!
    exec
    itp
    technical
+   zebibliography
 
 
 Indices and tables

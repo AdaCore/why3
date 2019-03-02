@@ -751,8 +751,8 @@ non-exhaustive list (which is undergoing active development):
 -  [TODO: complete this list]
 
 More information on the implementation of counterexamples in Why3 can be
-found in :raw-latex:`\cite{hauzar16sefm}` and
-in :raw-latex:`\cite{dailler18jlamp}`. For the producing counterexamples
+found in :cite:`hauzar16sefm` and
+in :cite:`dailler18jlamp`. For the producing counterexamples
 using the Why3 API, see :numref:`sec.ce\_api`.
 
 .. _sec.why3replay:

@@ -232,10 +232,8 @@ follows.
       Coq 8.6
 
 The first word of each line is a unique identifier for the associated
-prover. We thus have now the three provers
-Alt-Ergo :raw-latex:`\cite{ergo}`,
-CVC4 :raw-latex:`\cite{barrett11cade}`, and
-Coq :raw-latex:`\cite{CoqArt}`.
+prover. We thus have now the three provers Alt-Ergo :cite:`ergo`,
+CVC4 :cite:`barrett11cade`, and Coq :cite:`CoqArt`.
 
 Let us assume that we want to run Alt-Ergo on the HelloProof example.
 The command to type and its output are as follows, where the ``-P``

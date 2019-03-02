@@ -237,7 +237,7 @@ Other Non-Splitting Transformations
 
 eliminate\_algebraic
     replaces algebraic data types by first-order
-    definitions :raw-latex:`\cite{paskevich09rr}`.
+    definitions :cite:`paskevich09rr`.
 
 eliminate\_builtin
     removes definitions of symbols that are declared as builtin in the
@@ -285,7 +285,7 @@ eliminate\_let
 
 encoding\_smt
     encodes polymorphic types into monomorphic
-    types :raw-latex:`\cite{conchon08smt}`.
+    types :cite:`conchon08smt`.
 
 encoding\_tptp
     encodes theories into unsorted logic.
