@@ -12,6 +12,9 @@ program. Here is our first Why3 file, which is the file
 ``examples/logic/hello_proof.why`` of the distribution. It contains a
 small set of goals.
 
+.. literalinclude:: ../examples/logic/hello_proof.why
+   :language: whyml
+
 Any declaration must occur inside a theory, which is in that example
 called ``HelloProof``. It contains three goals named
 :math:`G_1,G_2,G_3`. The first two are basic propositional goals,
@@ -73,7 +76,7 @@ You are now ready to call provers on the goals. [1]_ A prover is
 selected using the context menu (right-click). This prover is then
 called on the goal selected in the tree view. You can select several
 goals at a time, either by using multi-selection (typically by clicking
-while pressing the or key) or by selecting the parent theory or the
+while pressing the Shift or Ctrl key) or by selecting the parent theory or the
 parent file.
 
 Let us now select the theory “HelloProof” and run the Alt-Ergo prover.
@@ -97,11 +100,11 @@ Applying transformations
 
 Instead of calling a prover on a goal, you can apply a transformation to
 it. Since :math:`G_2` is a conjunction, a possibility is to split it
-into subgoals. You can do that by selecting in the context menu. Now you
+into subgoals. You can do that by selecting *Split VC* in the context menu. Now you
 have two subgoals, and you can try again a prover on them, for example
 Alt-Ergo. We already have a lot of goals and proof attempts, so it is a
 good idea to close the sub-trees which are already proved: this can be
-done by the menu , or even better by its shortcut “Ctrl-C”. You should
+done by the menu *View/Collapse proved goals*, or even better by its shortcut “Ctrl-C”. You should
 see now what is displayed on :numref:`fig.gui4`.
 
 .. _fig.gui4:
@@ -144,7 +147,8 @@ top-right window of the GUI. Let us assume we change the goal
 
    goal G2 : (false -> false) /\ (true \/ false)
 
-We can refresh the goals using menu , or the shortcut “Ctrl-R”. We get
+We can refresh the goals using menu *File/Save all and Refresh session*,
+or the shortcut “Ctrl-R”. We get
 the tree view shown on :numref:`fig.gui5`.
 
 .. _fig.gui5:
@@ -167,8 +171,8 @@ Replaying obsolete proofs
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of pushing a prover’s button to rerun its proofs, you can
-*replay* the existing but obsolete proof attempts, using menu . By
-default, only replays proofs that were successful before. Notice that
+*replay* the existing but obsolete proof attempts, using menu *Tools/Replay obsolete*. By
+default, *Replay* only replays proofs that were successful before. Notice that
 replaying can be done in batch mode, using the ``replay`` command (see
 :numref:`sec.why3replay`) For example, running the replayer on the
 ``hello_proof`` example is as follows (assuming :math:`G_2` still is
@@ -191,8 +195,8 @@ Cleaning
 
 You may want to clean some of the proof attempts, removing the
 unsuccessful ones when a project is finally fully proved. A proof or a
-transformation can be removed by selecting it and using menu or the
-``Delete`` key. Menu or shortcut “C” perform an automatic removal of all
+transformation can be removed by selecting it and using menu *Tools/Remove* or the
+``Delete`` key. Menu *Tools/Clean* or shortcut “C” perform an automatic removal of all
 proofs attempts that are unsuccessful, while there exists a successful
 proof attempt for the same goal. Beware that there is no way to undo
 such a removal.

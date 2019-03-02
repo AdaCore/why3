@@ -30,7 +30,7 @@ In short, installation from sources proceeds as follows.
     make install
 
 After unpacking the distribution, go to the newly created directory
-``why3-version``. Compilation must start with a configuration phase which is
+|whypath|. Compilation must start with a configuration phase which is
 run as
 
 ::
@@ -213,7 +213,7 @@ scripts.
 
 Your choice between the three options above will be recorded, one for
 each prover, in the Why3 configuration file. Within the GUI, you can
-discard these choices via the dialog: just click on one choice to remove
+discard these choices via the *Preferences* dialog: just click on one choice to remove
 it.
 
 Outside the GUI, the prover upgrades are handled as follows. The

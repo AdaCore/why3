@@ -334,7 +334,7 @@ while cursor is on a given row of the proof session tree.
 
 provers
     The detected provers are listed. Note that you can hide some provers
-    of that list using the preferences, tab .
+    of that list using the preferences, tab *Provers*.
 
 strategies
     the set of known strategies is listed
@@ -363,7 +363,7 @@ Interrupt
 Global Menus
 ~~~~~~~~~~~~
 
-Menu
+Menu *File*
     Add File to session
         adds a file in the current proof session.
 
@@ -389,7 +389,7 @@ Menu
     Quit
         exits the GUI.
 
-Menu
+Menu *Tools*
     Strategies
         section provides a set of actions that are performed on the
         selected goal(s):
@@ -473,7 +473,7 @@ Menu
     Paste
         Paste the previously selected sub-tree under the current node
 
-Menu
+Menu *View*
     Enlarge font
         selects a large font
 
@@ -505,7 +505,7 @@ Menu
     Select next unproven goal
         go to the next unproven goal after the current node
 
-Menu
+Menu *Help*
     Legend
         Explanations of the meaning of the various icons
 
@@ -575,7 +575,7 @@ effective only for the current run of the GUI. The “Save&Close” button
 will save the modified settings in Why3 configuration file, to make them
 permanent.
 
- tab
+Tab *General Settings*
     allows one to set various general settings.
 
     -  the limits set on resource usages:
@@ -595,12 +595,12 @@ permanent.
           session is saving on exit
 
        -  never save on exit: the current state of the session is never
-          saved automatically, you must use menu
+          saved automatically, you must use menu *File/Save session*
 
        -  ask whether to save: on exit, a popup window asks whether you
           want to save or not.
 
- tab
+Tab *Appearance settings*
     -  show full task context: by default, only the local context of
        formulas is shown, that is only the declarations comming from the
        same module
@@ -616,7 +616,7 @@ permanent.
     Finally, it is possible to choose an alternative icon set, provided,
     one is installed first.
 
- tab
+Tab *Editors*
     allows one to customize the use of external editors for proof
     scripts.
 
@@ -625,18 +625,15 @@ permanent.
     -  For each installed prover, a specific editor can be selected to
        override the default. Typically if you install the Coq prover,
        then the editor to use will be set to “CoqIDE” by default, and
-       this dialog allows you to select the Emacs editor and its mode
-       instead
+       this dialog allows you to select the Emacs editor and its
+       `Proof General <http://proofgeneral.inf.ed.ac.uk/>`_  mode
+       instead.
 
-       ()
-
-       .
-
- tab
+Tab *Provers*
     allows to select which of the installed provers one wants to see in
     the context menu.
 
- tab
+Tab *Uninstalled Provers*
     presents all the decision previously taken for missing provers, as
     described in :numref:`sec.uninstalledprovers`. You can remove any
     recorded decision by clicking on it.
@@ -660,17 +657,21 @@ corresponding proof attempt in the tree. Alternatively, one can use the
 key shortcut “G” or type ``get-ce`` in the command entry. The result can
 be seen on :numref:`fig.ce\_example0\_p2`: the same prover but with the
 alternative *counterexamples* is run. The resulting counterexample is
-displayed in two different ways. First, it is displayed in the tab of
+displayed in two different ways. First, it is displayed in the *Task* tab of
 the top-right window, at the end of the text of the task, under the form
 of a list of pairs “variable = value”, ordered by the line number of the
 source code in which that variable takes that value. Second, it is
-displayed in the tab of the bottom right window, this time interleaved
+displayed in the *Counterexample* tab of the bottom right window, this time interleaved
 with the code, as shown in :numref:`fig.ce\_example0\_p2`.
+
+.. _fig.ce_example0_p1:
 
 .. figure:: images/ce_example0_p1.png
    :alt: Failing execution of CVC4
 
    Failing execution of CVC4
+
+.. _fig.ce_example0_p2:
 
 .. figure:: images/ce_example0_p2.png
    :alt: Counterexamples display for CVC4
@@ -747,7 +748,7 @@ non-exhaustive list (which is undergoing active development):
    This is current an issue in particular for the Array module of the
    standard library.
 
--  
+-  [TODO: complete this list]
 
 More information on the implementation of counterexamples in Why3 can be
 found in :raw-latex:`\cite{hauzar16sefm}` and
@@ -781,7 +782,7 @@ other words, when a goal, a theory, or a file is fully proved, the
 subtree is not shown.
 
 Obsolete proofs
-'''''''''''''''
+~~~~~~~~~~~~~~~
 
 When some proof attempts stored in the session file are obsolete, the
 replay is run anyway, as with the replay button in the IDE. Then, the
@@ -796,7 +797,7 @@ In other cases, you can use the IDE to update the session, or use the
 option ``--force`` described below.
 
 Exit code and options
-'''''''''''''''''''''
+~~~~~~~~~~~~~~~~~~~~~
 
 The exit code is 0 if no difference was detected, 1 if there was. Other
 exit codes mean some failure in running the replay.
@@ -824,7 +825,7 @@ Options are:
     restricts the replay to the selected provers only.
 
 Smoke detector
-''''''''''''''
+~~~~~~~~~~~~~~
 
 The smoke detector tries to detect if the context is self-contradicting
 and, thus, that anything can be proved in this context. The smoke
@@ -945,7 +946,7 @@ session, depending on the following specific options.
             xargs -0 git add
 
 Session Statistics
-''''''''''''''''''
+^^^^^^^^^^^^^^^^^^
 
 The proof statistics given by option ``--stats`` are as follows:
 
@@ -1027,7 +1028,7 @@ The specific options are
     table per theory is disabled.
 
 Customizing LaTeX output
-''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The generated LaTeX files contain some macros that must be defined
 externally. Various definitions can be given to them to customize the
@@ -1183,7 +1184,7 @@ one can navigate through the HTML documentation, going from some
 identifier use to its definition.
 
 Options
-'''''''
+~~~~~~~
 
 ``-o <dir>``
     defines the directory where to output the HTML files.
@@ -1206,7 +1207,7 @@ Options
     definitions can be added.
 
 Typesetting textual comments
-''''''''''''''''''''''''''''
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some constructs are interpreted:
 
@@ -1218,7 +1219,7 @@ Some constructs are interpreted:
    h
        raw HTML
 
--  ``‘code‘`` is a code escape: the text *code* is typeset as Why3 code.
+-  :literal:`\`code\`` is a code escape: the text *code* is typeset as Why3 code.
 
 A CSS file ``style.css`` suitable for rendering is generated in the same
 directory as output files. This CSS style can be modified manually,

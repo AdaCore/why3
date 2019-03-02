@@ -7,9 +7,7 @@ This chapter is a tutorial for the users who want to link their own
 OCaml code with the Why3 library. We progressively introduce the way one
 can use the library to build terms, formulas, theories, proof tasks,
 call external provers on tasks, and apply transformations on tasks. The
-complete documentation for API calls is given
-
-at URL .
+complete documentation for API calls is given at URL |apiurl|.
 
 We assume the reader has a fair knowledge of the OCaml language. Notice
 that the Why3 library must be installed, see :numref:`sec.installlib`.
@@ -145,7 +143,7 @@ Calling External Provers
 
 To call an external prover, we need to access the Why3 configuration
 file ``why3.conf``, as it was built using the ``why3config`` command
-line tool or the menu of the graphical IDE. The following API calls
+line tool or the *Detect Provers* menu of the graphical IDE. The following API calls
 make it possible to access the content of this configuration file.
 
 .. literalinclude:: ../examples/use_api/logic.ml
@@ -598,6 +596,8 @@ that were already introduced before.
    :language: ocaml
    :start-after: BEGIN{checkingvcs}
    :end-before: END{checkingvcs}
+
+.. _sec.ce_api:
 
 Generating counterexamples
 --------------------------
