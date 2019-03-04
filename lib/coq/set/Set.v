@@ -45,13 +45,13 @@ Hint Unfold mem.
 (* Why3 assumption *)
 Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:a -> bool)
     (s2:a -> bool) : Prop :=
-  forall (x:a), (mem x s1) <-> (mem x s2).
+  forall (x:a), mem x s1 <-> mem x s2.
 
 Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
 
 (* Why3 goal *)
 Lemma extensionality {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool), (infix_eqeq s1 s2) -> (s1 = s2).
+  forall (s1:a -> bool) (s2:a -> bool), infix_eqeq s1 s2 -> (s1 = s2).
 Proof.
 intros s1 s2 h1.
 apply predicate_extensionality.
@@ -69,7 +69,7 @@ Qed.
 (* Why3 assumption *)
 Definition subset {a:Type} {a_WT:WhyType a} (s1:a -> bool) (s2:a -> bool) :
     Prop :=
-  forall (x:a), (mem x s1) -> mem x s2.
+  forall (x:a), mem x s1 -> mem x s2.
 
 (* Why3 goal *)
 Lemma subset_refl {a:Type} {a_WT:WhyType a} :
@@ -80,8 +80,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma subset_trans {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool) (s3:a -> bool), (subset s1 s2) ->
-  (subset s2 s3) -> subset s1 s3.
+  forall (s1:a -> bool) (s2:a -> bool) (s3:a -> bool), subset s1 s2 ->
+  subset s2 s3 -> subset s1 s3.
 Proof.
 intros s1 s2 s3 h1 h2 x H.
 now apply h2, h1.
@@ -89,7 +89,7 @@ Qed.
 
 (* Why3 assumption *)
 Definition is_empty {a:Type} {a_WT:WhyType a} (s:a -> bool) : Prop :=
-  forall (x:a), ~ (mem x s).
+  forall (x:a), ~ mem x s.
 
 (* Why3 goal *)
 Lemma mem_empty {a:Type} {a_WT:WhyType a} :
@@ -101,7 +101,7 @@ Qed.
 (* Why3 goal *)
 Lemma add_spec {a:Type} {a_WT:WhyType a} :
   forall (x:a) (s:a -> bool), forall (y:a),
-  (mem y (map.Map.set s x true)) <-> ((y = x) \/ (mem y s)).
+  mem y (map.Map.set s x true) <-> (y = x) \/ mem y s.
 Proof.
 intros x y s.
 unfold Map.set, mem.
@@ -111,7 +111,7 @@ Qed.
 (* Why3 goal *)
 Lemma remove_spec {a:Type} {a_WT:WhyType a} :
   forall (x:a) (s:a -> bool), forall (y:a),
-  (mem y (map.Map.set s x false)) <-> (~ (y = x) /\ (mem y s)).
+  mem y (map.Map.set s x false) <-> ~ (y = x) /\ mem y s.
 Proof.
 intros x s y.
 unfold Map.set, mem.
@@ -120,7 +120,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma add_remove {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (s:a -> bool), (mem x s) ->
+  forall (x:a) (s:a -> bool), mem x s ->
   ((map.Map.set (map.Map.set s x false) x true) = s).
 Proof.
 intros x s h1.
@@ -163,7 +163,7 @@ Defined.
 (* Why3 goal *)
 Lemma union_def {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> bool) (s2:a -> bool) (x:a),
-  (((union s1 s2) x) = true) <-> (((s1 x) = true) \/ ((s2 x) = true)).
+  ((union s1 s2 x) = true) <-> ((s1 x) = true) \/ ((s2 x) = true).
 Proof.
 intros s1 s2 x.
 apply Bool.orb_true_iff.
@@ -172,7 +172,7 @@ Qed.
 (* Why3 goal *)
 Lemma union_spec {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> bool) (s2:a -> bool), forall (x:a),
-  (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
+  mem x (union s1 s2) <-> mem x s1 \/ mem x s2.
 Proof.
 exact union_def.
 Qed.
@@ -188,7 +188,7 @@ Defined.
 (* Why3 goal *)
 Lemma inter_def {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> bool) (s2:a -> bool) (x:a),
-  (((inter s1 s2) x) = true) <-> (((s1 x) = true) /\ ((s2 x) = true)).
+  ((inter s1 s2 x) = true) <-> ((s1 x) = true) /\ ((s2 x) = true).
 Proof.
 intros s1 s2 x.
 apply Bool.andb_true_iff.
@@ -197,7 +197,7 @@ Qed.
 (* Why3 goal *)
 Lemma inter_spec {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> bool) (s2:a -> bool), forall (x:a),
-  (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
+  mem x (inter s1 s2) <-> mem x s1 /\ mem x s2.
 Proof.
 exact inter_def.
 Qed.
@@ -213,7 +213,7 @@ Defined.
 (* Why3 goal *)
 Lemma diff_def {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> bool) (s2:a -> bool) (x:a),
-  (((diff s1 s2) x) = true) <-> (((s1 x) = true) /\ ~ ((s2 x) = true)).
+  ((diff s1 s2 x) = true) <-> ((s1 x) = true) /\ ~ ((s2 x) = true).
 Proof.
 intros s1 s2 x.
 unfold mem, diff.
@@ -225,7 +225,7 @@ Qed.
 (* Why3 goal *)
 Lemma diff_spec {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> bool) (s2:a -> bool), forall (x:a),
-  (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
+  mem x (diff s1 s2) <-> mem x s1 /\ ~ mem x s2.
 Proof.
 exact diff_def.
 Qed.
@@ -248,8 +248,7 @@ Defined.
 
 (* Why3 goal *)
 Lemma complement_def {a:Type} {a_WT:WhyType a} :
-  forall (s:a -> bool) (x:a),
-  (((complement s) x) = true) <-> ~ ((s x) = true).
+  forall (s:a -> bool) (x:a), ((complement s x) = true) <-> ~ ((s x) = true).
 Proof.
 intros s x.
 unfold complement.
@@ -267,7 +266,7 @@ Defined.
 
 (* Why3 goal *)
 Lemma choose_spec {a:Type} {a_WT:WhyType a} :
-  forall (s:a -> bool), ~ (is_empty s) -> mem (choose s) s.
+  forall (s:a -> bool), ~ is_empty s -> mem (choose s) s.
 Proof.
 intros s h1.
 unfold choose.

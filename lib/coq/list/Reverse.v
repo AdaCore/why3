@@ -76,7 +76,7 @@ Qed.
 (* Why3 goal *)
 Lemma reverse_mem {a:Type} {a_WT:WhyType a} :
   forall (l:(list a)) (x:a),
-  (list.Mem.mem x l) <-> (list.Mem.mem x (Lists.List.rev l)).
+  list.Mem.mem x l <-> list.Mem.mem x (Lists.List.rev l).
 intros l x.
 induction l; simpl; intuition.
 rewrite Append.mem_append.

@@ -63,7 +63,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mem_Num_Occ {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l:(list a)), (list.Mem.mem x l) <-> (0%Z < (num_occ x l))%Z.
+  forall (x:a) (l:(list a)), list.Mem.mem x l <-> (0%Z < (num_occ x l))%Z.
 Proof.
 intros x l.
 induction l as [|lh lt IHl].

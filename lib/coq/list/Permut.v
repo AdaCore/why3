@@ -35,15 +35,15 @@ Qed.
 
 (* Why3 goal *)
 Lemma Permut_sym {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)), (permut l1 l2) -> permut l2 l1.
+  forall (l1:(list a)) (l2:(list a)), permut l1 l2 -> permut l2 l1.
 Proof.
 now intros l1 l2 h1.
 Qed.
 
 (* Why3 goal *)
 Lemma Permut_trans {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)) (l3:(list a)), (permut l1 l2) ->
-  (permut l2 l3) -> permut l1 l3.
+  forall (l1:(list a)) (l2:(list a)) (l3:(list a)), permut l1 l2 ->
+  permut l2 l3 -> permut l1 l3.
 Proof.
 intros l1 l2 l3 h1 h2 x.
 now rewrite h1.
@@ -51,7 +51,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Permut_cons {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l1:(list a)) (l2:(list a)), (permut l1 l2) ->
+  forall (x:a) (l1:(list a)) (l2:(list a)), permut l1 l2 ->
   permut (Init.Datatypes.cons x l1) (Init.Datatypes.cons x l2).
 Proof.
 intros x l1 l2 h1 y.
@@ -97,7 +97,7 @@ Qed.
 (* Why3 goal *)
 Lemma Permut_append {a:Type} {a_WT:WhyType a} :
   forall (l1:(list a)) (l2:(list a)) (k1:(list a)) (k2:(list a)),
-  (permut l1 k1) -> (permut l2 k2) ->
+  permut l1 k1 -> permut l2 k2 ->
   permut (Init.Datatypes.app l1 l2) (Init.Datatypes.app k1 k2).
 Proof.
 intros l1 l2 k1 k2 h1 h2 y.
@@ -117,8 +117,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Permut_mem {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l1:(list a)) (l2:(list a)), (permut l1 l2) ->
-  (list.Mem.mem x l1) -> list.Mem.mem x l2.
+  forall (x:a) (l1:(list a)) (l2:(list a)), permut l1 l2 ->
+  list.Mem.mem x l1 -> list.Mem.mem x l2.
 Proof.
 intros x l1 l2 h1 h2.
 apply NumOcc.Mem_Num_Occ.
@@ -128,7 +128,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Permut_length {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)), (permut l1 l2) ->
+  forall (l1:(list a)) (l2:(list a)), permut l1 l2 ->
   ((list.Length.length l1) = (list.Length.length l2)).
 Proof.
 intros l1 l2 h1.

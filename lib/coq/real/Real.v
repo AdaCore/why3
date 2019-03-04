@@ -28,7 +28,7 @@ Require BuiltIn.
 
 (* Why3 goal *)
 Lemma infix_lseq_def :
-  forall (x:R) (y:R), (x <= y)%R <-> ((x < y)%R \/ (x = y)).
+  forall (x:R) (y:R), (x <= y)%R <-> (x < y)%R \/ (x = y).
 Proof.
 reflexivity.
 Qed.
@@ -175,7 +175,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma assoc_div_mul :
-  forall (x:R) (y:R) (z:R), (~ (y = 0%R) /\ ~ (z = 0%R)) ->
+  forall (x:R) (y:R) (z:R), ~ (y = 0%R) /\ ~ (z = 0%R) ->
   (((x / y)%R / z)%R = (x / (y * z)%R)%R).
 Proof.
 intros x y z (Zy, Zz).
@@ -186,7 +186,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma assoc_div_div :
-  forall (x:R) (y:R) (z:R), (~ (y = 0%R) /\ ~ (z = 0%R)) ->
+  forall (x:R) (y:R) (z:R), ~ (y = 0%R) /\ ~ (z = 0%R) ->
   ((x / (y / z)%R)%R = ((x * z)%R / y)%R).
 Proof.
 intros x y z (Zy, Zz).

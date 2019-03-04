@@ -65,8 +65,8 @@ Qed.
 (* Why3 goal *)
 Lemma mem_append {a:Type} {a_WT:WhyType a} :
   forall (x:a) (l1:(list a)) (l2:(list a)),
-  (list.Mem.mem x (Init.Datatypes.app l1 l2)) <->
-  ((list.Mem.mem x l1) \/ (list.Mem.mem x l2)).
+  list.Mem.mem x (Init.Datatypes.app l1 l2) <->
+  list.Mem.mem x l1 \/ list.Mem.mem x l2.
 Proof.
 intros x l1 l2.
 split.
@@ -90,7 +90,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma mem_decomp {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l:(list a)), (list.Mem.mem x l) ->
+  forall (x:a) (l:(list a)), list.Mem.mem x l ->
   exists l1:(list a), exists l2:(list a),
   (l = (Init.Datatypes.app l1 (Init.Datatypes.cons x l2))).
 Proof.

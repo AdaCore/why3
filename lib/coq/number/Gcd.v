@@ -47,9 +47,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma gcd_def3 :
-  forall (a:Z) (b:Z) (x:Z), (number.Divisibility.divides x a) ->
-  (number.Divisibility.divides x b) ->
-  number.Divisibility.divides x (gcd a b).
+  forall (a:Z) (b:Z) (x:Z), number.Divisibility.divides x a ->
+  number.Divisibility.divides x b -> number.Divisibility.divides x (gcd a b).
 Proof.
 intros a b x.
 apply Zgcd_is_gcd.
@@ -58,9 +57,9 @@ Qed.
 (* Why3 goal *)
 Lemma gcd_unique :
   forall (a:Z) (b:Z) (d:Z), (0%Z <= d)%Z ->
-  (number.Divisibility.divides d a) -> (number.Divisibility.divides d b) ->
-  (forall (x:Z), (number.Divisibility.divides x a) ->
-   (number.Divisibility.divides x b) -> number.Divisibility.divides x d) ->
+  number.Divisibility.divides d a -> number.Divisibility.divides d b ->
+  (forall (x:Z), number.Divisibility.divides x a ->
+   number.Divisibility.divides x b -> number.Divisibility.divides x d) ->
   (d = (gcd a b)).
 Proof.
 intros.

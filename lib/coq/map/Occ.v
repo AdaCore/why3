@@ -166,7 +166,7 @@ Qed.
 (* Why3 goal *)
 Lemma occ_append {a:Type} {a_WT:WhyType a} :
   forall (v:a) (m:Z -> a) (l:Z) (mid:Z) (u:Z),
-  ((l <= mid)%Z /\ (mid <= u)%Z) ->
+  (l <= mid)%Z /\ (mid <= u)%Z ->
   ((occ v m l u) = ((occ v m l mid) + (occ v m mid u))%Z).
 Proof.
 intros v m l mid u (h1,h2).
@@ -211,7 +211,7 @@ Qed.
 (* Why3 goal *)
 Lemma occ_neq {a:Type} {a_WT:WhyType a} :
   forall (v:a) (m:Z -> a) (l:Z) (u:Z),
-  (forall (i:Z), ((l <= i)%Z /\ (i < u)%Z) -> ~ ((m i) = v)) ->
+  (forall (i:Z), (l <= i)%Z /\ (i < u)%Z -> ~ ((m i) = v)) ->
   ((occ v m l u) = 0%Z).
 Proof.
 intros v m l u.
@@ -263,7 +263,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_pos {a:Type} {a_WT:WhyType a} :
-  forall (m:Z -> a) (l:Z) (u:Z) (i:Z), ((l <= i)%Z /\ (i < u)%Z) ->
+  forall (m:Z -> a) (l:Z) (u:Z) (i:Z), (l <= i)%Z /\ (i < u)%Z ->
   (0%Z < (occ (m i) m l u))%Z.
 Proof.
 intros m l u i (h1,h2).
@@ -285,7 +285,7 @@ Qed.
 (* Why3 goal *)
 Lemma occ_eq {a:Type} {a_WT:WhyType a} :
   forall (v:a) (m1:Z -> a) (m2:Z -> a) (l:Z) (u:Z),
-  (forall (i:Z), ((l <= i)%Z /\ (i < u)%Z) -> ((m1 i) = (m2 i))) ->
+  (forall (i:Z), (l <= i)%Z /\ (i < u)%Z -> ((m1 i) = (m2 i))) ->
   ((occ v m1 l u) = (occ v m2 l u)).
 Proof.
 intros v m1 m2 l u h1.
@@ -356,7 +356,7 @@ Qed.
 (* Why3 goal *)
 Lemma occ_exchange {a:Type} {a_WT:WhyType a} :
   forall (m:Z -> a) (l:Z) (u:Z) (i:Z) (j:Z) (x:a) (y:a) (z:a),
-  ((l <= i)%Z /\ (i < u)%Z) -> ((l <= j)%Z /\ (j < u)%Z) -> ~ (i = j) ->
+  (l <= i)%Z /\ (i < u)%Z -> (l <= j)%Z /\ (j < u)%Z -> ~ (i = j) ->
   ((occ z (map.Map.set (map.Map.set m i x) j y) l u) =
    (occ z (map.Map.set (map.Map.set m i y) j x) l u)).
 Proof.

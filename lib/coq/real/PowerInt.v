@@ -119,7 +119,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_ge_one :
-  forall (x:R) (n:Z), ((0%Z <= n)%Z /\ (1%R <= x)%R) ->
+  forall (x:R) (n:Z), (0%Z <= n)%Z /\ (1%R <= x)%R ->
   (1%R <= (Reals.Rfunctions.powerRZ x n))%R.
 intros x n (h1,h2).
 generalize h1.

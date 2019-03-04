@@ -26,7 +26,7 @@ Definition permut {a:Type} {a_WT:WhyType a} (m1:Z -> a) (m2:Z -> a) (l:Z)
 (* Why3 goal *)
 Lemma permut_trans {a:Type} {a_WT:WhyType a} :
   forall (a1:Z -> a) (a2:Z -> a) (a3:Z -> a), forall (l:Z) (u:Z),
-  (permut a1 a2 l u) -> (permut a2 a3 l u) -> permut a1 a3 l u.
+  permut a1 a2 l u -> permut a2 a3 l u -> permut a1 a3 l u.
 Proof.
 intros a1 a2 a3 l u h1 h2.
 unfold permut in *.
@@ -35,8 +35,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma permut_exists {a:Type} {a_WT:WhyType a} :
-  forall (a1:Z -> a) (a2:Z -> a) (l:Z) (u:Z) (i:Z), (permut a1 a2 l u) ->
-  ((l <= i)%Z /\ (i < u)%Z) ->
+  forall (a1:Z -> a) (a2:Z -> a) (l:Z) (u:Z) (i:Z), permut a1 a2 l u ->
+  (l <= i)%Z /\ (i < u)%Z ->
   exists j:Z, ((l <= j)%Z /\ (j < u)%Z) /\ ((a1 j) = (a2 i)).
 Proof.
 intros a1 a2 l u i h1 Hi.

@@ -36,7 +36,7 @@ Qed.
 (* Why3 goal *)
 Lemma Abs_le :
   forall (x:Z) (y:Z),
-  ((ZArith.BinInt.Z.abs x) <= y)%Z <-> (((-y)%Z <= x)%Z /\ (x <= y)%Z).
+  ((ZArith.BinInt.Z.abs x) <= y)%Z <-> ((-y)%Z <= x)%Z /\ (x <= y)%Z.
 intros x y.
 zify.
 omega.

@@ -85,7 +85,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Numof_append :
-  forall (p:Z -> bool) (a:Z) (b:Z) (c:Z), ((a <= b)%Z /\ (b <= c)%Z) ->
+  forall (p:Z -> bool) (a:Z) (b:Z) (c:Z), (a <= b)%Z /\ (b <= c)%Z ->
   ((numof p a c) = ((numof p a b) + (numof p b c))%Z).
 Proof.
   intros p a b c (h1,h2).
@@ -152,7 +152,7 @@ Qed.
 (* Why3 goal *)
 Lemma Empty :
   forall (p:Z -> bool) (a:Z) (b:Z),
-  (forall (n:Z), ((a <= n)%Z /\ (n < b)%Z) -> ~ ((p n) = true)) ->
+  (forall (n:Z), (a <= n)%Z /\ (n < b)%Z -> ~ ((p n) = true)) ->
   ((numof p a b) = 0%Z).
 Proof.
   intros p a b.
@@ -174,7 +174,7 @@ Qed.
 (* Why3 goal *)
 Lemma Full :
   forall (p:Z -> bool) (a:Z) (b:Z), (a <= b)%Z ->
-  (forall (n:Z), ((a <= n)%Z /\ (n < b)%Z) -> ((p n) = true)) ->
+  (forall (n:Z), (a <= n)%Z /\ (n < b)%Z -> ((p n) = true)) ->
   ((numof p a b) = (b - a)%Z).
 Proof.
   intros p a b h1.
@@ -226,7 +226,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma numof_increasing :
-  forall (p:Z -> bool) (i:Z) (j:Z) (k:Z), ((i <= j)%Z /\ (j <= k)%Z) ->
+  forall (p:Z -> bool) (i:Z) (j:Z) (k:Z), (i <= j)%Z /\ (j <= k)%Z ->
   ((numof p i j) <= (numof p i k))%Z.
 Proof.
 intros p i j k (h1,h2).
@@ -238,7 +238,7 @@ Qed.
 (* Why3 goal *)
 Lemma numof_strictly_increasing :
   forall (p:Z -> bool) (i:Z) (j:Z) (k:Z) (l:Z),
-  ((i <= j)%Z /\ ((j <= k)%Z /\ (k < l)%Z)) -> ((p k) = true) ->
+  (i <= j)%Z /\ (j <= k)%Z /\ (k < l)%Z -> ((p k) = true) ->
   ((numof p i j) < (numof p i l))%Z.
 Proof.
 intros p i j k l (h1,(h2,h3)) h4.
@@ -250,7 +250,7 @@ Qed.
 (* Why3 goal *)
 Lemma numof_change_any :
   forall (p1:Z -> bool) (p2:Z -> bool) (a:Z) (b:Z),
-  (forall (j:Z), ((a <= j)%Z /\ (j < b)%Z) -> ((p1 j) = true) ->
+  (forall (j:Z), (a <= j)%Z /\ (j < b)%Z -> ((p1 j) = true) ->
    ((p2 j) = true)) ->
   ((numof p1 a b) <= (numof p2 a b))%Z.
 Proof.
@@ -274,8 +274,8 @@ Qed.
 (* Why3 goal *)
 Lemma numof_change_some :
   forall (p1:Z -> bool) (p2:Z -> bool) (a:Z) (b:Z) (i:Z),
-  ((a <= i)%Z /\ (i < b)%Z) ->
-  (forall (j:Z), ((a <= j)%Z /\ (j < b)%Z) -> ((p1 j) = true) ->
+  (a <= i)%Z /\ (i < b)%Z ->
+  (forall (j:Z), (a <= j)%Z /\ (j < b)%Z -> ((p1 j) = true) ->
    ((p2 j) = true)) ->
   ~ ((p1 i) = true) -> ((p2 i) = true) -> ((numof p1 a b) < (numof p2 a b))%Z.
 Proof.
@@ -301,7 +301,7 @@ Qed.
 (* Why3 goal *)
 Lemma numof_change_equiv :
   forall (p1:Z -> bool) (p2:Z -> bool) (a:Z) (b:Z),
-  (forall (j:Z), ((a <= j)%Z /\ (j < b)%Z) ->
+  (forall (j:Z), (a <= j)%Z /\ (j < b)%Z ->
    ((p1 j) = true) <-> ((p2 j) = true)) ->
   ((numof p2 a b) = (numof p1 a b)).
 Proof.

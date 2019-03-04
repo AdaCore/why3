@@ -36,7 +36,7 @@ Qed.
 (* Why3 goal *)
 Lemma Abs_le :
   forall (x:R) (y:R),
-  ((Reals.Rbasic_fun.Rabs x) <= y)%R <-> (((-y)%R <= x)%R /\ (x <= y)%R).
+  ((Reals.Rbasic_fun.Rabs x) <= y)%R <-> ((-y)%R <= x)%R /\ (x <= y)%R.
 intros x y.
 unfold Rabs.
 case Rcase_abs ; intros H ; (split ; [intros H0;split | intros (H0,H1)]).

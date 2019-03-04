@@ -58,7 +58,7 @@ Qed.
 (* Why3 goal *)
 Lemma Div_unique :
   forall (x:Z) (y:Z) (q:Z), (0%Z < y)%Z ->
-  (((q * y)%Z <= x)%Z /\ (x < ((q * y)%Z + y)%Z)%Z) -> ((div x y) = q).
+  ((q * y)%Z <= x)%Z /\ (x < ((q * y)%Z + y)%Z)%Z -> ((div x y) = q).
 intros x y q h1 (h2,h3).
 assert (h:(~(y=0))%Z) by omega.
 generalize (Mod_bound x y h); intro h0.
@@ -80,7 +80,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Div_bound :
-  forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
+  forall (x:Z) (y:Z), (0%Z <= x)%Z /\ (0%Z < y)%Z ->
   (0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z.
 intros x y (Hx,Hy).
 unfold div.
@@ -116,7 +116,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Div_inf :
-  forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) -> ((div x y) = 0%Z).
+  forall (x:Z) (y:Z), (0%Z <= x)%Z /\ (x < y)%Z -> ((div x y) = 0%Z).
 intros x y Hxy.
 unfold div.
 case Z_le_dec ; intros H.
@@ -127,7 +127,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Div_inf_neg :
-  forall (x:Z) (y:Z), ((0%Z < x)%Z /\ (x <= y)%Z) ->
+  forall (x:Z) (y:Z), (0%Z < x)%Z /\ (x <= y)%Z ->
   ((div (-x)%Z y) = (-1%Z)%Z).
 intros x y Hxy.
 assert (h: (x < y \/ x = y)%Z) by omega.

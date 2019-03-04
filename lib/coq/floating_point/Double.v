@@ -99,7 +99,7 @@ Qed.
 (* Why3 goal *)
 Lemma Exact_rounding_for_integers :
   forall (m:floating_point.Rounding.mode) (i:Z),
-  (((-9007199254740992%Z)%Z <= i)%Z /\ (i <= 9007199254740992%Z)%Z) ->
+  ((-9007199254740992%Z)%Z <= i)%Z /\ (i <= 9007199254740992%Z)%Z ->
   ((round m (BuiltIn.IZR i)) = (BuiltIn.IZR i)).
 Proof.
 intros m i Hi.
@@ -142,7 +142,7 @@ Defined.
 
 (* Why3 goal *)
 Lemma Round_logic_def :
-  forall (m:floating_point.Rounding.mode) (x:R), (no_overflow m x) ->
+  forall (m:floating_point.Rounding.mode) (x:R), no_overflow m x ->
   ((value (round_logic m x)) = (round m x)).
 Proof.
 exact (Round_logic_def 53 1024 (refl_equal true) (refl_equal true)).
@@ -151,7 +151,7 @@ Qed.
 (* Why3 assumption *)
 Definition of_real_post (m:floating_point.Rounding.mode) (x:R)
     (res:floating_point.DoubleFormat.double) : Prop :=
-  ((value res) = (round m x)) /\ (((exact res) = x) /\ ((model res) = x)).
+  ((value res) = (round m x)) /\ ((exact res) = x) /\ ((model res) = x).
 
 (* Why3 assumption *)
 Definition add_post (m:floating_point.Rounding.mode)
@@ -159,8 +159,8 @@ Definition add_post (m:floating_point.Rounding.mode)
     (y:floating_point.DoubleFormat.double)
     (res:floating_point.DoubleFormat.double) : Prop :=
   ((value res) = (round m ((value x) + (value y))%R)) /\
-  (((exact res) = ((exact x) + (exact y))%R) /\
-   ((model res) = ((model x) + (model y))%R)).
+  ((exact res) = ((exact x) + (exact y))%R) /\
+  ((model res) = ((model x) + (model y))%R).
 
 (* Why3 assumption *)
 Definition sub_post (m:floating_point.Rounding.mode)
@@ -168,8 +168,8 @@ Definition sub_post (m:floating_point.Rounding.mode)
     (y:floating_point.DoubleFormat.double)
     (res:floating_point.DoubleFormat.double) : Prop :=
   ((value res) = (round m ((value x) - (value y))%R)) /\
-  (((exact res) = ((exact x) - (exact y))%R) /\
-   ((model res) = ((model x) - (model y))%R)).
+  ((exact res) = ((exact x) - (exact y))%R) /\
+  ((model res) = ((model x) - (model y))%R).
 
 (* Why3 assumption *)
 Definition mul_post (m:floating_point.Rounding.mode)
@@ -177,8 +177,8 @@ Definition mul_post (m:floating_point.Rounding.mode)
     (y:floating_point.DoubleFormat.double)
     (res:floating_point.DoubleFormat.double) : Prop :=
   ((value res) = (round m ((value x) * (value y))%R)) /\
-  (((exact res) = ((exact x) * (exact y))%R) /\
-   ((model res) = ((model x) * (model y))%R)).
+  ((exact res) = ((exact x) * (exact y))%R) /\
+  ((model res) = ((model x) * (model y))%R).
 
 (* Why3 assumption *)
 Definition div_post (m:floating_point.Rounding.mode)
@@ -186,14 +186,14 @@ Definition div_post (m:floating_point.Rounding.mode)
     (y:floating_point.DoubleFormat.double)
     (res:floating_point.DoubleFormat.double) : Prop :=
   ((value res) = (round m ((value x) / (value y))%R)) /\
-  (((exact res) = ((exact x) / (exact y))%R) /\
-   ((model res) = ((model x) / (model y))%R)).
+  ((exact res) = ((exact x) / (exact y))%R) /\
+  ((model res) = ((model x) / (model y))%R).
 
 (* Why3 assumption *)
 Definition neg_post (x:floating_point.DoubleFormat.double)
     (res:floating_point.DoubleFormat.double) : Prop :=
   ((value res) = (-(value x))%R) /\
-  (((exact res) = (-(exact x))%R) /\ ((model res) = (-(model x))%R)).
+  ((exact res) = (-(exact x))%R) /\ ((model res) = (-(model x))%R).
 
 (* Why3 assumption *)
 Definition lt (x:floating_point.DoubleFormat.double)

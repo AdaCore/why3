@@ -43,8 +43,7 @@ Defined.
 (* Why3 goal *)
 Lemma set_def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
   forall (f:a -> b) (x:a) (v:b) (y:a),
-  ((y = x) -> (((set f x v) y) = v)) /\
-  (~ (y = x) -> (((set f x v) y) = (f y))).
+  ((y = x) -> ((set f x v y) = v)) /\ (~ (y = x) -> ((set f x v y) = (f y))).
 Proof.
 intros f x v y.
 unfold set.

@@ -33,7 +33,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma infix_lseq_def :
-  forall (x:Z) (y:Z), (x <= y)%Z <-> ((x < y)%Z \/ (x = y)).
+  forall (x:Z) (y:Z), (x <= y)%Z <-> (x < y)%Z \/ (x = y).
 exact Zle_lt_or_eq_iff.
 Qed.
 

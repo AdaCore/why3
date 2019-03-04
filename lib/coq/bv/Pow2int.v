@@ -38,7 +38,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_sum :
-  forall (n:Z) (m:Z), ((0%Z <= n)%Z /\ (0%Z <= m)%Z) ->
+  forall (n:Z) (m:Z), (0%Z <= n)%Z /\ (0%Z <= m)%Z ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%Z).
   unfold pow2.
   intros n m [H1 H2].
