@@ -103,17 +103,25 @@ val add_rliteral_map : tdecl -> syntax_map -> syntax_map
 
 val query_syntax : syntax_map -> ident -> string option
 
-val syntax_arguments : string -> 'a Pp.pp -> 'a list Pp.pp
-(** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt
-     the list l using the template templ and the printer print_arg *)
+val syntax_arguments_prec : string -> (int -> 'a Pp.pp) -> int list -> 'a list Pp.pp
+(** (syntax_arguments_prec templ print_arg prec_list fmt l) prints in the formatter
+     fmt the list l using the template templ, the printer print_arg, and the
+     precedence list prec_list *)
 
-val gen_syntax_arguments_typed :
-  ('a -> 'b) -> ('a -> 'b array) -> string -> 'a Pp.pp -> 'b Pp.pp -> 'a -> 'a list Pp.pp
+val syntax_arguments : string -> 'a Pp.pp -> 'a list Pp.pp
+
+val gen_syntax_arguments_typed_prec :
+  ('a -> 'b) -> ('a -> 'b array) -> string -> (int -> 'a Pp.pp)
+  -> 'b Pp.pp -> 'a -> int list -> 'a list Pp.pp
+
+val syntax_arguments_typed_prec :
+  string -> (int -> term Pp.pp) -> ty Pp.pp -> term -> int list -> term list Pp.pp
+(** (syntax_arguments_typed templ print_arg prec_list fmt l) prints in the
+    formatter fmt the list l using the template templ, the printer print_arg
+    and the precedence list prec_list  *)
 
 val syntax_arguments_typed :
   string -> term Pp.pp -> ty Pp.pp -> term -> term list Pp.pp
-(** (syntax_arguments templ print_arg fmt l) prints in the formatter fmt
-     the list l using the template templ and the printer print_arg *)
 
 val syntax_range_literal :
   string -> Number.int_constant Pp.pp

@@ -222,12 +222,21 @@ let check_syntax_literal _ts s =
   (* if !count <> 1 then *)
     (* raise (BadSyntaxArity (1,!count)) *)
 
-let syntax_arguments s print fmt l =
+let syntax_arguments_prec s print pl fmt l =
   let args = Array.of_list l in
+  let precs = Array.of_list pl in
+  let lp = Array.length precs in
   let repl_fun s b e fmt =
     let i = int_of_string (String.sub s b (e-b)) in
-    print fmt args.(i-1) in
+    let p =
+      if i < lp then precs.(i)
+      else if lp = 0 then 0
+      else precs.(0) - 1 in
+    print p fmt args.(i-1) in
   global_substitute_fmt opt_search_forward repl_fun s fmt
+
+let syntax_arguments s print fmt l =
+  syntax_arguments_prec s (fun _ f a -> print f a) [] fmt l
 
 (* return the type arguments of a symbol application, sorted according
    to their (formal) names *)
@@ -242,8 +251,11 @@ let get_type_arguments t = match t.t_node with
   | _ ->
       [||]
 
-let gen_syntax_arguments_typed ty_of tys_of s print_arg print_type t fmt l =
+let gen_syntax_arguments_typed_prec
+      ty_of tys_of s print_arg print_type t pl fmt l =
   let args = Array.of_list l in
+  let precs = Array.of_list pl in
+  let lp = Array.length precs in
   let repl_fun s b e fmt =
     if s.[b] = 't' then
       let grp = String.sub s (b+1) (e-b-1) in
@@ -258,11 +270,18 @@ let gen_syntax_arguments_typed ty_of tys_of s print_arg print_type t fmt l =
     else
       let grp = String.sub s b (e-b) in
       let i = int_of_string grp in
-      print_arg fmt args.(i-1) in
+      let p =
+        if i < lp then precs.(i)
+        else if lp = 0 then 0
+        else precs.(0) - 1 in
+      print_arg p fmt args.(i-1) in
   global_substitute_fmt opt_search_forward repl_fun s fmt
 
-let syntax_arguments_typed =
-  gen_syntax_arguments_typed t_type get_type_arguments
+let syntax_arguments_typed_prec =
+  gen_syntax_arguments_typed_prec t_type get_type_arguments
+
+let syntax_arguments_typed s print_arg print_type t fmt l =
+  syntax_arguments_typed_prec s (fun _ f a -> print_arg f a) print_type t [] fmt l
 
 let syntax_range_literal s fmt c =
   let f s b e fmt =

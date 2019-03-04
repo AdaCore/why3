@@ -30,7 +30,7 @@
 %token FUNCTION PREDICATE TYPE PROP ALL FILENAME TRANSFORM PLUGIN
 %token COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
-%token PREC ASSOC LEFT RIGHT
+%token PREC
 
 %nonassoc SYNTAX REMOVE PRELUDE INTERFACE
 %nonassoc prec_pty
@@ -211,14 +211,11 @@ mrule:
 | trule                          { MRtheory $1 }
 | INTERFACE STRING               { MRinterface ($2) }
 | SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
-| SYNTAX VAL qualid STRING precedence? associativity?
-                                 { MRval ($3, $4, $5, $6) }
+| SYNTAX VAL qualid STRING       { MRval ($3, $4, []) }
+| SYNTAX VAL qualid STRING precedence
+                                 { MRval ($3, $4, $5) }
 
 precedence:
-| PREC INTEGER { $2 }
-
-associativity:
-| ASSOC LEFT  { Left }
-| ASSOC RIGHT { Right }
+| PREC list(INTEGER) { $2 }
 
 loc(X): X { Loc.extract ($startpos,$endpos), $1 }

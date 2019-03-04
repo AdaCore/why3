@@ -181,8 +181,8 @@ let rec print_pat info fmt p = match p.pat_node with
       elems' "prod" (print_pat info) fmt pl
   | Papp (cs, pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
-        | Some s -> gen_syntax_arguments_typed p_type (fun _ -> [||])
-            s (print_pat info) (print_ty info) p fmt pl
+        | Some s -> gen_syntax_arguments_typed_prec p_type (fun _ -> [||])
+            s (fun _ fmt p -> print_pat info fmt p) (print_ty info) p [] fmt pl
         | _ -> print_app (print_ls_real info Sls.empty) (print_pat info)
             fmt ((cs, (List.map p_type pl, Some (p.pat_ty))), pl)
       end

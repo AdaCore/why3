@@ -41,14 +41,12 @@ type theory_rules = {
   thr_name  : qualid;
   thr_rules : (loc * th_rule) list;
 }
-
-type assoc_dir = Left | Right
                       
 type mo_rule =
   | MRtheory    of th_rule
   | MRinterface of string
   | MRexception of qualid * string
-  | MRval       of qualid * string * int option * assoc_dir option
+  | MRval       of qualid * string * int list
 
 type module_rules = {
   mor_name  : qualid;

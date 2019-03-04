@@ -20,8 +20,7 @@ type driver = private {
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
   drv_literal     : Printer.syntax_map;
-  drv_prec        : (int option) Ident.Mid.t;
-  drv_assoc       : (Driver_ast.assoc_dir option) Ident.Mid.t;
+  drv_prec        : (int list) Ident.Mid.t;
 }
 
 
@@ -33,8 +32,7 @@ type printer_args = private {
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   literal     : Printer.syntax_map;
-  prec        : (int option) Ident.Mid.t;
-  assoc       : (Driver_ast.assoc_dir option) Ident.Mid.t;
+  prec        : (int list) Ident.Mid.t;
 }
 
 val load_driver : Env.env -> string -> string list -> driver
