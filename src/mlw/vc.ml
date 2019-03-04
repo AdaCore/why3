@@ -1574,8 +1574,9 @@ let vc env kn tuc d = match d.pd_node with
       let add rd f vcl = add_vc_decl env rd.rec_sym.rs_name f vcl in
       List.fold_right2 add rdl fl []
   | PDtype tdl ->
-      let env = mk_env env kn tuc in
+      let env = lazy (mk_env env kn tuc) in
       let add_witness d vcl =
+        let env = Lazy.force env in
         let add_fd (mv,ldl) fd e =
           let fd = fd_of_rs fd in
           let id = id_clone fd.pv_vs.vs_name in
@@ -1592,6 +1593,7 @@ let vc env kn tuc d = match d.pd_node with
         let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
         add_vc_decl env d.itd_its.its_ts.ts_name f vcl in
       let add_invariant d vcl =
+        let env = Lazy.force env in
         let vs_of_rs fd = (fd_of_rs fd).pv_vs in
         let vl = List.map vs_of_rs d.itd_fields in
         let expl f = vc_expl None Sattr.empty expl_type_inv f in
