@@ -59,6 +59,7 @@ module C = struct
     | Eindex of expr * expr (* Array access *)
     | Edot of expr * string (* Field access with dot *)
     | Earrow of expr * string (* Pointer access with arrow *)
+    | Esyntaxrename of string * expr list (* syntax val f "g" w/o params *)
     | Esyntax of string * ty * (ty array) * (expr*ty) list * int list
   (* template, type and type arguments of result, typed arguments, precedence level *)
 
@@ -172,7 +173,9 @@ module C = struct
     | Edot (e,i) -> Edot (propagate_in_expr id v e, i)
     | Earrow (e,i) -> Earrow (propagate_in_expr id v e, i)
     | Esyntax (s,t,ta,l,p) ->
-      Esyntax (s,t,ta,List.map (fun (e,t) -> (propagate_in_expr id v e),t) l,p)
+       Esyntax (s,t,ta,List.map (fun (e,t) -> (propagate_in_expr id v e),t) l,p)
+    | Esyntaxrename (s, l) ->
+       Esyntaxrename (s, List.map (propagate_in_expr id v) l)
     | Enothing -> Enothing
     | Econst c -> Econst c
     | Elikely e -> Elikely (propagate_in_expr id v e)
@@ -400,6 +403,7 @@ module C = struct
     | Esize_type _ -> true
     | Eindex (_,_) | Edot (_,_) | Earrow (_,_) -> false
     | Esyntax (_,_,_,_,_) -> false
+    | Esyntaxrename _ -> false
 
   let rec get_const_expr (d,s) =
     let fail () = raise (Unsupported "non-constant array size") in
@@ -558,8 +562,8 @@ module Print = struct
     | Ecast(ty, e) ->
       fprintf fmt (protect_on (prec < 2) "(%a)%a")
         (print_ty ~paren:false) ty (print_expr ~prec:2) e
-    | Ecall (Esyntax (s, _, _, [],_), l) ->
-       (* function defined in the prelude *)
+    | Esyntaxrename (s, l) ->
+       (* call to function defined in the prelude *)
        fprintf fmt (protect_on (prec < 1) "%s(%a)")
          s (print_list comma (print_expr ~prec:15)) l
     | Ecall (e,l) ->
@@ -988,29 +992,29 @@ module MLToC = struct
                unboxed_params args in
            match query_syntax info.syntax rs.rs_name with
            | Some s ->
-              begin
-                try
-                  let _ =
-                    Str.search_forward
-                      (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0 in
-		  let rty = ty_of_ity (match e.e_ity with
-                                       | C _ -> assert false
-                                       | I i -> i) in
-		  let rtyargs = match rty.ty_node with
-		    | Tyvar _ -> [||]
-		    | Tyapp (_,args) ->
-                       Array.of_list (List.map (ty_of_ty info) args)
-		  in
-                  let p = Mid.find rs.rs_name info.prec in
-		  C.Esyntax(s,ty_of_ty info rty, rtyargs, params, p)
-                with Not_found ->
-                  if args=[]
-                  then C.(Esyntax(s, Tnosyntax, [||], [], [])) (*constant*)
-                  else
-                    (*function defined in the prelude *)
-                    let cargs = List.map fst params in
-		    C.(Ecall(Esyntax(s, Tnosyntax, [||], [], []), cargs))
-              end
+              let complex s =
+                String.contains s '%'
+                || String.contains s ' '
+                || String.contains s '(' in
+              if complex s
+              then
+		let rty = ty_of_ity (match e.e_ity with
+                                     | C _ -> assert false
+                                     | I i -> i) in
+		let rtyargs = match rty.ty_node with
+		  | Tyvar _ -> [||]
+		  | Tyapp (_,args) ->
+                     Array.of_list (List.map (ty_of_ty info) args)
+		in
+                let p = Mid.find rs.rs_name info.prec in
+		C.Esyntax(s,ty_of_ty info rty, rtyargs, params, p)
+              else
+                if args=[]
+                then C.(Esyntax(s, Tnosyntax, [||], [], [])) (*constant*)
+                else
+                  (*function defined in the prelude *)
+                  let cargs = List.map fst params in
+		  C.(Esyntaxrename (s, cargs))
            | None ->
               match rs.rs_field with
               | None ->

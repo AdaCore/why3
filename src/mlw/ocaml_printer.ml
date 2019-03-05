@@ -187,6 +187,9 @@ module Print = struct
   let print_rs info fmt rs =
     fprintf fmt "%a" (print_lident info) rs.rs_name
 
+  let complex_syntax s =
+    String.contains s '%' || String.contains s ' ' || String.contains s '('
+            
   (** Types *)
 
   let rec print_ty ~use_quote ?(paren=false) info fmt = function
@@ -201,9 +204,13 @@ module Print = struct
           (print_list star (print_ty ~use_quote ~paren:true info)) tl
     | Tapp (ts, tl) ->
         match query_syntax info.info_syn ts with
-        | Some s ->
+        | Some s when complex_syntax s ->
             fprintf fmt (protect_on paren "%a")
               (syntax_arguments s (print_ty ~use_quote ~paren:true info)) tl
+        | Some s ->
+           fprintf fmt (protect_on paren "%a%s")
+             (print_list_suf space (print_ty ~use_quote ~paren:true info)) tl
+             s
         | None   ->
             match tl with
             | [] ->
@@ -263,10 +270,13 @@ module Print = struct
     | Ptuple pl ->
         fprintf fmt "(%a)" (print_list comma (print_pat ~paren:true info)) pl
     | Papp (ls, pl) ->
-        match query_syntax info.info_syn ls.ls_name, pl with
-        | Some s, _ ->
-            syntax_arguments s (print_pat info) fmt pl
-        | None, pl ->
+        match query_syntax info.info_syn ls.ls_name with
+        | Some s when complex_syntax s || pl = [] ->
+           syntax_arguments s (print_pat info) fmt pl
+        | Some s ->
+           fprintf fmt (protect_on paren "%s (%a)")
+             s (print_list comma (print_pat ~paren:true info)) pl
+        | None ->
             let pjl = let rs = restore_rs ls in get_record info rs in
             match pjl with
             | []  -> print_papp info ls fmt pl
@@ -353,9 +363,13 @@ module Print = struct
           List.exists is_constructor its
       | _ -> false in
     match query_syntax info.info_syn rs.rs_name, pvl with
-    | Some s, _ (* when is_local_id info rs.rs_name  *)->
+    | Some s, _ when complex_syntax s ->
        let p = Mid.find rs.rs_name info.info_prec in
        syntax_arguments_prec s (print_expr info) p fmt pvl
+    | Some s, _ ->
+       fprintf fmt "@[<hov 2>%s %a@]"
+         s
+         (print_apply_args info) (pvl, rs.rs_cty.cty_args)
     | None, [t] when is_rs_tuple rs ->
         fprintf fmt "@[%a@]" (print_expr info 1) t
     | None, tl when is_rs_tuple rs ->
@@ -572,9 +586,12 @@ module Print = struct
     match query_syntax info.info_syn xs.xs_name, e_opt with
     | Some s, None ->
         fprintf fmt "raise (%s)" s
-    | Some s, Some e ->
+    | Some s, Some e when complex_syntax s ->
         fprintf fmt (protect_on paren "raise %a")
-          (syntax_arguments_prec s (print_expr info) [4; 3]) [e]
+          (syntax_arguments_prec s (print_expr info) []) [e]
+    | Some s, Some e ->
+        fprintf fmt (protect_on paren "raise (%s %a)")
+          s (print_expr info 3) e
     | None, None ->
         fprintf fmt (protect_on paren "raise %a")
           (print_uident info) xs.xs_name
@@ -587,9 +604,13 @@ module Print = struct
       if case then fprintf fmt "exception " else fprintf fmt "" in
     let print_var fmt pv = print_lident info fmt (pv_name pv) in
     match query_syntax info.info_syn xs.xs_name, pvl with
-    | Some s, _ -> fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
-        print_exn () (syntax_arguments s print_var) pvl
-        (print_expr info 17) e
+    | Some s, _ when complex_syntax s || pvl = [] ->
+        fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
+          print_exn () (syntax_arguments s print_var) pvl
+          (print_expr info 17) e
+    | Some s, _ -> fprintf fmt "@[<hov 4>| %a%s (%a) ->@ %a@]"
+        print_exn () s
+        (print_list comma print_var) pvl (print_expr info 17) e
     | None, [] -> fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
         print_exn () (print_uident info) xs.xs_name (print_expr info 17) e
     | None, [pv] -> fprintf fmt "@[<hov 4>| %a%a %a ->@ %a@]"
