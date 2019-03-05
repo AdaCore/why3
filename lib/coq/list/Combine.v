@@ -20,9 +20,9 @@ Require list.List.
 
 (* Why3 goal *)
 Lemma combine_def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
-  forall (x:(list a)) (y:(list b)),
+  forall (x:Init.Datatypes.list a) (y:Init.Datatypes.list b),
   match (x, y) with
-  | ((Init.Datatypes.cons x0 x1), (Init.Datatypes.cons y0 y1)) =>
+  | (Init.Datatypes.cons x0 x1, Init.Datatypes.cons y0 y1) =>
       ((Lists.List.combine x y) =
        (Init.Datatypes.cons (x0, y0) (Lists.List.combine x1 y1)))
   | _ => ((Lists.List.combine x y) = Init.Datatypes.nil)

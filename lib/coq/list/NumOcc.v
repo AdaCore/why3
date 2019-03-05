@@ -21,7 +21,8 @@ Require list.Append.
 Require list.Reverse.
 
 (* Why3 goal *)
-Definition num_occ {a:Type} {a_WT:WhyType a} : a -> (list a) -> Z.
+Definition num_occ {a:Type} {a_WT:WhyType a} :
+  a -> Init.Datatypes.list a -> Numbers.BinNums.Z.
 intros x.
 exact (fix num_occ (l : list a) : int :=
   match l with
@@ -32,10 +33,10 @@ Defined.
 
 (* Why3 goal *)
 Lemma num_occ_def {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l:(list a)),
+  forall (x:a) (l:Init.Datatypes.list a),
   match l with
   | Init.Datatypes.nil => ((num_occ x l) = 0%Z)
-  | (Init.Datatypes.cons y r) =>
+  | Init.Datatypes.cons y r =>
       ((x = y) -> ((num_occ x l) = (1%Z + (num_occ x r))%Z)) /\
       (~ (x = y) -> ((num_occ x l) = (0%Z + (num_occ x r))%Z))
   end.
@@ -51,7 +52,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Num_Occ_NonNeg {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l:(list a)), (0%Z <= (num_occ x l))%Z.
+  forall (x:a) (l:Init.Datatypes.list a), (0%Z <= (num_occ x l))%Z.
 intros x l.
 induction l as [|lh lt IHl].
 easy.
@@ -63,7 +64,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mem_Num_Occ {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l:(list a)), list.Mem.mem x l <-> (0%Z < (num_occ x l))%Z.
+  forall (x:a) (l:Init.Datatypes.list a),
+  list.Mem.mem x l <-> (0%Z < (num_occ x l))%Z.
 Proof.
 intros x l.
 induction l as [|lh lt IHl].
@@ -83,7 +85,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Append_Num_Occ {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l1:(list a)) (l2:(list a)),
+  forall (x:a) (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a),
   ((num_occ x (Init.Datatypes.app l1 l2)) =
    ((num_occ x l1) + (num_occ x l2))%Z).
 Proof.
@@ -98,7 +100,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma reverse_num_occ {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l:(list a)), ((num_occ x l) = (num_occ x (Lists.List.rev l))).
+  forall (x:a) (l:Init.Datatypes.list a),
+  ((num_occ x l) = (num_occ x (Lists.List.rev l))).
 intros x l.
 induction l; simpl.
 auto.

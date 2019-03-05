@@ -15,15 +15,15 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 assumption *)
-Definition is_nil {a:Type} {a_WT:WhyType a} (l:(list a)) : Prop :=
+Definition is_nil {a:Type} {a_WT:WhyType a} (l:Init.Datatypes.list a) : Prop :=
   match l with
   | Init.Datatypes.nil => True
-  | (Init.Datatypes.cons _ _) => False
+  | Init.Datatypes.cons _ _ => False
   end.
 
 (* Why3 goal *)
 Lemma is_nil_spec {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)), is_nil l <-> (l = Init.Datatypes.nil).
+  forall (l:Init.Datatypes.list a), is_nil l <-> (l = Init.Datatypes.nil).
 Proof.
 intros l.
 split.

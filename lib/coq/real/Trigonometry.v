@@ -32,7 +32,7 @@ Require Import Reals.
 
 (* Why3 goal *)
 Lemma Pythagorean_identity :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   (((Reals.RIneq.Rsqr (Reals.Rtrigo_def.cos x)) +
     (Reals.RIneq.Rsqr (Reals.Rtrigo_def.sin x)))%R
    = 1%R).
@@ -44,7 +44,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Cos_le_one :
-  forall (x:R), ((Reals.Rbasic_fun.Rabs (Reals.Rtrigo_def.cos x)) <= 1%R)%R.
+  forall (x:Reals.Rdefinitions.R),
+  ((Reals.Rbasic_fun.Rabs (Reals.Rtrigo_def.cos x)) <= 1%R)%R.
 Proof.
 intros x.
 apply Abs.Abs_le.
@@ -53,7 +54,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Sin_le_one :
-  forall (x:R), ((Reals.Rbasic_fun.Rabs (Reals.Rtrigo_def.sin x)) <= 1%R)%R.
+  forall (x:Reals.Rdefinitions.R),
+  ((Reals.Rbasic_fun.Rabs (Reals.Rtrigo_def.sin x)) <= 1%R)%R.
 Proof.
 intros x.
 apply Abs.Abs_le.
@@ -119,7 +121,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Cos_plus_pi :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((Reals.Rtrigo_def.cos (x + Reals.Rtrigo1.PI)%R) =
    (-(Reals.Rtrigo_def.cos x))%R).
 Proof.
@@ -129,7 +131,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Sin_plus_pi :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((Reals.Rtrigo_def.sin (x + Reals.Rtrigo1.PI)%R) =
    (-(Reals.Rtrigo_def.sin x))%R).
 Proof.
@@ -139,7 +141,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Cos_plus_pi2 :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((Reals.Rtrigo_def.cos (x + ((5 / 10)%R * Reals.Rtrigo1.PI)%R)%R) =
    (-(Reals.Rtrigo_def.sin x))%R).
 Proof.
@@ -151,7 +153,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Sin_plus_pi2 :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((Reals.Rtrigo_def.sin (x + ((5 / 10)%R * Reals.Rtrigo1.PI)%R)%R) =
    (Reals.Rtrigo_def.cos x)).
 Proof.
@@ -163,7 +165,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Cos_neg :
-  forall (x:R), ((Reals.Rtrigo_def.cos (-x)%R) = (Reals.Rtrigo_def.cos x)).
+  forall (x:Reals.Rdefinitions.R),
+  ((Reals.Rtrigo_def.cos (-x)%R) = (Reals.Rtrigo_def.cos x)).
 Proof.
 intros x.
 apply cos_neg.
@@ -171,7 +174,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Sin_neg :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((Reals.Rtrigo_def.sin (-x)%R) = (-(Reals.Rtrigo_def.sin x))%R).
 Proof.
 intros x.
@@ -180,7 +183,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Cos_sum :
-  forall (x:R) (y:R),
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((Reals.Rtrigo_def.cos (x + y)%R) =
    (((Reals.Rtrigo_def.cos x) * (Reals.Rtrigo_def.cos y))%R -
     ((Reals.Rtrigo_def.sin x) * (Reals.Rtrigo_def.sin y))%R)%R).
@@ -191,7 +194,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Sin_sum :
-  forall (x:R) (y:R),
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((Reals.Rtrigo_def.sin (x + y)%R) =
    (((Reals.Rtrigo_def.sin x) * (Reals.Rtrigo_def.cos y))%R +
     ((Reals.Rtrigo_def.cos x) * (Reals.Rtrigo_def.sin y))%R)%R).
@@ -202,7 +205,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma tan_def :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((Reals.Rtrigo1.tan x) =
    ((Reals.Rtrigo_def.sin x) / (Reals.Rtrigo_def.cos x))%R).
 Proof.
@@ -215,7 +218,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Tan_atan :
-  forall (x:R), ((Reals.Rtrigo1.tan (Reals.Ratan.atan x)) = x).
+  forall (x:Reals.Rdefinitions.R),
+  ((Reals.Rtrigo1.tan (Reals.Ratan.atan x)) = x).
 Proof.
 intros x.
 apply atan_right_inv.

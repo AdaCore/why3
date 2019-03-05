@@ -33,7 +33,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Add :
-  forall (x:Z) (y:Z),
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((BuiltIn.IZR (x + y)%Z) = ((BuiltIn.IZR x) + (BuiltIn.IZR y))%R).
 Proof.
 exact plus_IZR.
@@ -41,7 +41,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Sub :
-  forall (x:Z) (y:Z),
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((BuiltIn.IZR (x - y)%Z) = ((BuiltIn.IZR x) - (BuiltIn.IZR y))%R).
 Proof.
 exact minus_IZR.
@@ -49,28 +49,31 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mul :
-  forall (x:Z) (y:Z),
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((BuiltIn.IZR (x * y)%Z) = ((BuiltIn.IZR x) * (BuiltIn.IZR y))%R).
 Proof.
 exact mult_IZR.
 Qed.
 
 (* Why3 goal *)
-Lemma Neg : forall (x:Z), ((BuiltIn.IZR (-x)%Z) = (-(BuiltIn.IZR x))%R).
+Lemma Neg :
+  forall (x:Numbers.BinNums.Z), ((BuiltIn.IZR (-x)%Z) = (-(BuiltIn.IZR x))%R).
 Proof.
 exact opp_IZR.
 Qed.
 
 (* Why3 goal *)
 Lemma Injective :
-  forall (x:Z) (y:Z), ((BuiltIn.IZR x) = (BuiltIn.IZR y)) -> (x = y).
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  ((BuiltIn.IZR x) = (BuiltIn.IZR y)) -> (x = y).
 Proof.
 exact eq_IZR.
 Qed.
 
 (* Why3 goal *)
 Lemma Monotonic :
-  forall (x:Z) (y:Z), (x <= y)%Z -> ((BuiltIn.IZR x) <= (BuiltIn.IZR y))%R.
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), (x <= y)%Z ->
+  ((BuiltIn.IZR x) <= (BuiltIn.IZR y))%R.
 Proof.
 exact (IZR_le).
 Qed.

@@ -39,7 +39,8 @@ now rewrite IHn0.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_0 : forall (x:R), ((Reals.Rfunctions.powerRZ x 0%Z) = 1%R).
+Lemma Power_0 :
+  forall (x:Reals.Rdefinitions.R), ((Reals.Rfunctions.powerRZ x 0%Z) = 1%R).
 Proof.
 intros x.
 easy.
@@ -47,7 +48,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_s :
-  forall (x:R) (n:Z), (0%Z <= n)%Z ->
+  forall (x:Reals.Rdefinitions.R) (n:Numbers.BinNums.Z), (0%Z <= n)%Z ->
   ((Reals.Rfunctions.powerRZ x (n + 1%Z)%Z) =
    (x * (Reals.Rfunctions.powerRZ x n))%R).
 Proof.
@@ -58,7 +59,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_s_alt :
-  forall (x:R) (n:Z), (0%Z < n)%Z ->
+  forall (x:Reals.Rdefinitions.R) (n:Numbers.BinNums.Z), (0%Z < n)%Z ->
   ((Reals.Rfunctions.powerRZ x n) =
    (x * (Reals.Rfunctions.powerRZ x (n - 1%Z)%Z))%R).
 intros x n h1.
@@ -68,14 +69,16 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Power_1 : forall (x:R), ((Reals.Rfunctions.powerRZ x 1%Z) = x).
+Lemma Power_1 :
+  forall (x:Reals.Rdefinitions.R), ((Reals.Rfunctions.powerRZ x 1%Z) = x).
 Proof.
 exact Rmult_1_r.
 Qed.
 
 (* Why3 goal *)
 Lemma Power_sum :
-  forall (x:R) (n:Z) (m:Z), (0%Z <= n)%Z -> (0%Z <= m)%Z ->
+  forall (x:Reals.Rdefinitions.R) (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z),
+  (0%Z <= n)%Z -> (0%Z <= m)%Z ->
   ((Reals.Rfunctions.powerRZ x (n + m)%Z) =
    ((Reals.Rfunctions.powerRZ x n) * (Reals.Rfunctions.powerRZ x m))%R).
 Proof.
@@ -86,7 +89,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_mult :
-  forall (x:R) (n:Z) (m:Z), (0%Z <= n)%Z -> (0%Z <= m)%Z ->
+  forall (x:Reals.Rdefinitions.R) (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z),
+  (0%Z <= n)%Z -> (0%Z <= m)%Z ->
   ((Reals.Rfunctions.powerRZ x (n * m)%Z) =
    (Reals.Rfunctions.powerRZ (Reals.Rfunctions.powerRZ x n) m)).
 Proof.
@@ -97,8 +101,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_comm1 :
-  forall (x:R) (y:R), ((x * y)%R = (y * x)%R) -> forall (n:Z),
-  (0%Z <= n)%Z ->
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  ((x * y)%R = (y * x)%R) -> forall (n:Numbers.BinNums.Z), (0%Z <= n)%Z ->
   (((Reals.Rfunctions.powerRZ x n) * y)%R =
    (y * (Reals.Rfunctions.powerRZ x n))%R).
 intros x y h1 n h2.
@@ -107,8 +111,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_comm2 :
-  forall (x:R) (y:R), ((x * y)%R = (y * x)%R) -> forall (n:Z),
-  (0%Z <= n)%Z ->
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  ((x * y)%R = (y * x)%R) -> forall (n:Numbers.BinNums.Z), (0%Z <= n)%Z ->
   ((Reals.Rfunctions.powerRZ (x * y)%R n) =
    ((Reals.Rfunctions.powerRZ x n) * (Reals.Rfunctions.powerRZ y n))%R).
 Proof.
@@ -119,8 +123,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Pow_ge_one :
-  forall (x:R) (n:Z), (0%Z <= n)%Z /\ (1%R <= x)%R ->
-  (1%R <= (Reals.Rfunctions.powerRZ x n))%R.
+  forall (x:Reals.Rdefinitions.R) (n:Numbers.BinNums.Z),
+  (0%Z <= n)%Z /\ (1%R <= x)%R -> (1%R <= (Reals.Rfunctions.powerRZ x n))%R.
 intros x n (h1,h2).
 generalize h1.
 pattern n; apply Z_lt_induction; auto.

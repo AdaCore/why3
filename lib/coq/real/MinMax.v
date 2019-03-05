@@ -22,7 +22,7 @@ Require Import Rbasic_fun.
 
 (* Why3 goal *)
 Lemma min_def :
-  forall (x:R) (y:R),
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = x)) /\
   (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = y)).
 Proof.
@@ -38,7 +38,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma max_def :
-  forall (x:R) (y:R),
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = y)) /\
   (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = x)).
 Proof.
@@ -51,33 +51,36 @@ Qed.
 
 (* Why3 goal *)
 Lemma Min_r :
-  forall (x:R) (y:R), (y <= x)%R -> ((Reals.Rbasic_fun.Rmin x y) = y).
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (y <= x)%R ->
+  ((Reals.Rbasic_fun.Rmin x y) = y).
 exact Rmin_right.
 Qed.
 
 (* Why3 goal *)
 Lemma Max_l :
-  forall (x:R) (y:R), (y <= x)%R -> ((Reals.Rbasic_fun.Rmax x y) = x).
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (y <= x)%R ->
+  ((Reals.Rbasic_fun.Rmax x y) = x).
 exact Rmax_left.
 Qed.
 
 (* Why3 goal *)
 Lemma Min_comm :
-  forall (x:R) (y:R),
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((Reals.Rbasic_fun.Rmin x y) = (Reals.Rbasic_fun.Rmin y x)).
 exact Rmin_comm.
 Qed.
 
 (* Why3 goal *)
 Lemma Max_comm :
-  forall (x:R) (y:R),
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((Reals.Rbasic_fun.Rmax x y) = (Reals.Rbasic_fun.Rmax y x)).
 exact Rmax_comm.
 Qed.
 
 (* Why3 goal *)
 Lemma Min_assoc :
-  forall (x:R) (y:R) (z:R),
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
   ((Reals.Rbasic_fun.Rmin (Reals.Rbasic_fun.Rmin x y) z) =
    (Reals.Rbasic_fun.Rmin x (Reals.Rbasic_fun.Rmin y z))).
 Proof.
@@ -101,7 +104,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Max_assoc :
-  forall (x:R) (y:R) (z:R),
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
   ((Reals.Rbasic_fun.Rmax (Reals.Rbasic_fun.Rmax x y) z) =
    (Reals.Rbasic_fun.Rmax x (Reals.Rbasic_fun.Rmax y z))).
 Proof.

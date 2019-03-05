@@ -38,7 +38,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition t'real : t -> R.
+Definition t'real : t -> Reals.Rdefinitions.R.
 Proof.
   apply B2R.
 Defined.
@@ -266,13 +266,13 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition of_int : ieee_float.RoundingMode.mode -> Z -> t.
+Definition of_int : ieee_float.RoundingMode.mode -> Numbers.BinNums.Z -> t.
 Proof.
   now apply z_to_fp.
 Defined.
 
 (* Why3 goal *)
-Definition to_int : ieee_float.RoundingMode.mode -> t -> Z.
+Definition to_int : ieee_float.RoundingMode.mode -> t -> Numbers.BinNums.Z.
 Proof.
   now apply fp_to_z.
 Defined.
@@ -285,7 +285,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition round : ieee_float.RoundingMode.mode -> R -> R.
+Definition round :
+  ieee_float.RoundingMode.mode -> Reals.Rdefinitions.R ->
+  Reals.Rdefinitions.R.
 Proof.
   apply (round 11 53).
 Defined.
@@ -299,7 +301,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition max_int : Z.
+Definition max_int : Numbers.BinNums.Z.
 Proof.
   exact (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%Z.
 Defined.
@@ -314,14 +316,14 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition in_range (x:R) : Prop :=
+Definition in_range (x:Reals.Rdefinitions.R) : Prop :=
   ((-(9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R
    <= x)%R /\
   (x <=
    (9007199254740991 * 19958403095347198116563727130368385660674512604354575415025472424372118918689640657849579654926357010893424468441924952439724379883935936607391717982848314203200056729510856765175377214443629871826533567445439239933308104551208703888888552684480441575071209068757560416423584952303440099278848)%R)%R.
 
 (* Why3 assumption *)
-Definition in_int_range (i:Z) : Prop :=
+Definition in_int_range (i:Numbers.BinNums.Z) : Prop :=
   ((-max_int)%Z <= i)%Z /\ (i <= max_int)%Z.
 
 (* Why3 goal *)
@@ -334,13 +336,14 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition no_overflow (m:ieee_float.RoundingMode.mode) (x:R) : Prop :=
+Definition no_overflow (m:ieee_float.RoundingMode.mode)
+    (x:Reals.Rdefinitions.R) : Prop :=
   in_range (round m x).
 
 (* Why3 goal *)
 Lemma Bounded_real_no_overflow :
-  forall (m:ieee_float.RoundingMode.mode) (x:R), in_range x ->
-  no_overflow m x.
+  forall (m:ieee_float.RoundingMode.mode) (x:Reals.Rdefinitions.R),
+  in_range x -> no_overflow m x.
 Proof.
   unfold no_overflow, in_range.
   rewrite <- max_real_cst.
@@ -349,8 +352,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_monotonic :
-  forall (m:ieee_float.RoundingMode.mode) (x:R) (y:R), (x <= y)%R ->
-  ((round m x) <= (round m y))%R.
+  forall (m:ieee_float.RoundingMode.mode) (x:Reals.Rdefinitions.R)
+    (y:Reals.Rdefinitions.R),
+  (x <= y)%R -> ((round m x) <= (round m y))%R.
 Proof.
   apply Round_monotonic.
 Qed.
@@ -358,7 +362,7 @@ Qed.
 (* Why3 goal *)
 Lemma Round_idempotent :
   forall (m1:ieee_float.RoundingMode.mode) (m2:ieee_float.RoundingMode.mode)
-    (x:R),
+    (x:Reals.Rdefinitions.R),
   ((round m1 (round m2 x)) = (round m2 x)).
 Proof.
   apply Round_idempotent.
@@ -374,21 +378,23 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_down_le :
-  forall (x:R), ((round ieee_float.RoundingMode.RTN x) <= x)%R.
+  forall (x:Reals.Rdefinitions.R),
+  ((round ieee_float.RoundingMode.RTN x) <= x)%R.
 Proof.
   apply Round_down_le.
 Qed.
 
 (* Why3 goal *)
 Lemma Round_up_ge :
-  forall (x:R), (x <= (round ieee_float.RoundingMode.RTP x))%R.
+  forall (x:Reals.Rdefinitions.R),
+  (x <= (round ieee_float.RoundingMode.RTP x))%R.
 Proof.
   apply Round_up_ge.
 Qed.
 
 (* Why3 goal *)
 Lemma Round_down_neg :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((round ieee_float.RoundingMode.RTN (-x)%R) =
    (-(round ieee_float.RoundingMode.RTP x))%R).
 Proof.
@@ -397,7 +403,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_up_neg :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((round ieee_float.RoundingMode.RTP (-x)%R) =
    (-(round ieee_float.RoundingMode.RTN x))%R).
 Proof.
@@ -405,13 +411,13 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition in_safe_int_range (i:Z) : Prop :=
+Definition in_safe_int_range (i:Numbers.BinNums.Z) : Prop :=
   ((-9007199254740992%Z)%Z <= i)%Z /\ (i <= 9007199254740992%Z)%Z.
 
 (* Why3 goal *)
 Lemma Exact_rounding_for_integers :
-  forall (m:ieee_float.RoundingMode.mode) (i:Z), in_safe_int_range i ->
-  ((round m (BuiltIn.IZR i)) = (BuiltIn.IZR i)).
+  forall (m:ieee_float.RoundingMode.mode) (i:Numbers.BinNums.Z),
+  in_safe_int_range i -> ((round m (BuiltIn.IZR i)) = (BuiltIn.IZR i)).
 Proof.
   intros m i h1.
   now apply Exact_rounding_for_integers.
@@ -899,7 +905,7 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition same_sign_real (x:t) (r:R) : Prop :=
+Definition same_sign_real (x:t) (r:Reals.Rdefinitions.R) : Prop :=
   is_positive x /\ (0%R < r)%R \/ is_negative x /\ (r < 0%R)%R.
 
 (* Why3 goal *)
@@ -1069,7 +1075,7 @@ Qed.
 (* Why3 goal *)
 Lemma of_int_add_exact :
   forall (m:ieee_float.RoundingMode.mode) (n:ieee_float.RoundingMode.mode)
-    (i:Z) (j:Z),
+    (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
   in_safe_int_range i -> in_safe_int_range j ->
   in_safe_int_range (i + j)%Z ->
   eq (of_int m (i + j)%Z) (add n (of_int m i) (of_int m j)).
@@ -1081,7 +1087,7 @@ Qed.
 (* Why3 goal *)
 Lemma of_int_sub_exact :
   forall (m:ieee_float.RoundingMode.mode) (n:ieee_float.RoundingMode.mode)
-    (i:Z) (j:Z),
+    (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
   in_safe_int_range i -> in_safe_int_range j ->
   in_safe_int_range (i - j)%Z ->
   eq (of_int m (i - j)%Z) (sub n (of_int m i) (of_int m j)).
@@ -1093,7 +1099,7 @@ Qed.
 (* Why3 goal *)
 Lemma of_int_mul_exact :
   forall (m:ieee_float.RoundingMode.mode) (n:ieee_float.RoundingMode.mode)
-    (i:Z) (j:Z),
+    (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
   in_safe_int_range i -> in_safe_int_range j ->
   in_safe_int_range (i * j)%Z ->
   eq (of_int m (i * j)%Z) (mul n (of_int m i) (of_int m j)).
@@ -1140,8 +1146,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma of_int_is_int :
-  forall (m:ieee_float.RoundingMode.mode) (x:Z), in_int_range x ->
-  is_int (of_int m x).
+  forall (m:ieee_float.RoundingMode.mode) (x:Numbers.BinNums.Z),
+  in_int_range x -> is_int (of_int m x).
 Proof.
   intros m x h1.
   now apply of_int_is_int.
@@ -1415,8 +1421,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma to_int_of_int :
-  forall (m:ieee_float.RoundingMode.mode) (i:Z), in_safe_int_range i ->
-  ((to_int m (of_int m i)) = i).
+  forall (m:ieee_float.RoundingMode.mode) (i:Numbers.BinNums.Z),
+  in_safe_int_range i -> ((to_int m (of_int m i)) = i).
 Proof.
   intros m i h1.
   now apply to_int_of_int.
@@ -1448,7 +1454,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma round_bound_ne :
-  forall (x:R), no_overflow ieee_float.RoundingMode.RNE x ->
+  forall (x:Reals.Rdefinitions.R),
+  no_overflow ieee_float.RoundingMode.RNE x ->
   (((x - ((1 / 9007199254740992)%R * (Reals.Rbasic_fun.Rabs x))%R)%R -
     (1 / 404804506614621236704990693437834614099113299528284236713802716054860679135990693783920767402874248990374155728633623822779617474771586953734026799881477019843034848553132722728933815484186432682479535356945490137124014966849385397236206711298319112681620113024717539104666829230461005064372655017292012526615415482186989568)%R)%R
    <= (round ieee_float.RoundingMode.RNE x))%R /\
@@ -1460,7 +1467,8 @@ Admitted.
 
 (* Why3 goal *)
 Lemma round_bound :
-  forall (m:ieee_float.RoundingMode.mode) (x:R), no_overflow m x ->
+  forall (m:ieee_float.RoundingMode.mode) (x:Reals.Rdefinitions.R),
+  no_overflow m x ->
   (((x - ((1 / 4503599627370496)%R * (Reals.Rbasic_fun.Rabs x))%R)%R -
     (1 / 202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784)%R)%R
    <= (round m x))%R /\

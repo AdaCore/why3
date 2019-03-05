@@ -220,23 +220,28 @@ Qed.
 
 
 (* Why3 assumption *)
-Definition injective (a:Z -> Z) (n:Z) : Prop :=
-  forall (i:Z) (j:Z), (0%Z <= i)%Z /\ (i < n)%Z ->
-  (0%Z <= j)%Z /\ (j < n)%Z -> ~ (i = j) -> ~ ((a i) = (a j)).
+Definition injective (a:Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (n:Numbers.BinNums.Z) : Prop :=
+  forall (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
+  (0%Z <= i)%Z /\ (i < n)%Z -> (0%Z <= j)%Z /\ (j < n)%Z -> ~ (i = j) ->
+  ~ ((a i) = (a j)).
 
 (* Why3 assumption *)
-Definition surjective (a:Z -> Z) (n:Z) : Prop :=
-  forall (i:Z), (0%Z <= i)%Z /\ (i < n)%Z ->
-  exists j:Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\ ((a j) = i).
+Definition surjective (a:Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (n:Numbers.BinNums.Z) : Prop :=
+  forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
+  exists j:Numbers.BinNums.Z, ((0%Z <= j)%Z /\ (j < n)%Z) /\ ((a j) = i).
 
 (* Why3 assumption *)
-Definition range (a:Z -> Z) (n:Z) : Prop :=
-  forall (i:Z), (0%Z <= i)%Z /\ (i < n)%Z ->
+Definition range (a:Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (n:Numbers.BinNums.Z) : Prop :=
+  forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
   (0%Z <= (a i))%Z /\ ((a i) < n)%Z.
 
 (* Why3 goal *)
 Lemma injective_surjective :
-  forall (a:Z -> Z) (n:Z), injective a n -> range a n -> surjective a n.
+  forall (a:Numbers.BinNums.Z -> Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
+  injective a n -> range a n -> surjective a n.
 Proof.
 unfold injective, range, surjective.
 intros a n h1 h2.
@@ -253,8 +258,9 @@ Import Occ.
 
 (* Why3 goal *)
 Lemma injection_occ :
-  forall (m:Z -> Z) (n:Z),
-  injective m n <-> (forall (v:Z), ((map.Occ.occ v m 0%Z n) <= 1%Z)%Z).
+  forall (m:Numbers.BinNums.Z -> Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
+  injective m n <->
+  (forall (v:Numbers.BinNums.Z), ((map.Occ.occ v m 0%Z n) <= 1%Z)%Z).
 Proof.
 intros m n; split.
 (* -> *)

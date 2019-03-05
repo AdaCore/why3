@@ -16,7 +16,7 @@ Require BuiltIn.
 Require int.Int.
 
 (* Why3 goal *)
-Definition pow2 : Z -> Z.
+Definition pow2 : Numbers.BinNums.Z -> Numbers.BinNums.Z.
   exact (two_p).
 Defined.
 
@@ -27,7 +27,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_s :
-  forall (n:Z), (0%Z <= n)%Z -> ((pow2 (n + 1%Z)%Z) = (2%Z * (pow2 n))%Z).
+  forall (n:Numbers.BinNums.Z), (0%Z <= n)%Z ->
+  ((pow2 (n + 1%Z)%Z) = (2%Z * (pow2 n))%Z).
   apply two_p_S.
 Qed.
 
@@ -38,7 +39,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_sum :
-  forall (n:Z) (m:Z), (0%Z <= n)%Z /\ (0%Z <= m)%Z ->
+  forall (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z),
+  (0%Z <= n)%Z /\ (0%Z <= m)%Z ->
   ((pow2 (n + m)%Z) = ((pow2 n) * (pow2 m))%Z).
   unfold pow2.
   intros n m [H1 H2].
@@ -46,7 +48,8 @@ Lemma Power_sum :
 Qed.
 
 (* Why3 goal *)
-Lemma pow2pos : forall (i:Z), (0%Z <= i)%Z -> (0%Z < (pow2 i))%Z.
+Lemma pow2pos :
+  forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z -> (0%Z < (pow2 i))%Z.
   intros i h1.
   Require Import Zorder.
   apply Zgt_lt.

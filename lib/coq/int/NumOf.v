@@ -23,19 +23,23 @@ Fixpoint numof_aux (f : Z -> bool) (a : Z) (n : nat) : Z :=
   end.
 
 (* Why3 goal *)
-Definition numof : (Z -> bool) -> Z -> Z -> Z.
+Definition numof :
+  (Numbers.BinNums.Z -> Init.Datatypes.bool) -> Numbers.BinNums.Z ->
+  Numbers.BinNums.Z -> Numbers.BinNums.Z.
 Proof.
   exact (fun f a b => numof_aux f a (Z.to_nat (b - a))).
 Defined.
 
 (* Why3 goal *)
 Lemma numof_def :
-  forall (p:Z -> bool) (a:Z) (b:Z),
+  forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z),
   ((b <= a)%Z -> ((numof p a b) = 0%Z)) /\
   (~ (b <= a)%Z ->
-   (((p (b - 1%Z)%Z) = true) ->
+   (((p (b - 1%Z)%Z) = Init.Datatypes.true) ->
     ((numof p a b) = (1%Z + (numof p a (b - 1%Z)%Z))%Z)) /\
-   (~ ((p (b - 1%Z)%Z) = true) -> ((numof p a b) = (numof p a (b - 1%Z)%Z)))).
+   (~ ((p (b - 1%Z)%Z) = Init.Datatypes.true) ->
+    ((numof p a b) = (numof p a (b - 1%Z)%Z)))).
 Proof.
 intros p a b.
 unfold numof.
@@ -69,8 +73,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Numof_bounds :
-  forall (p:Z -> bool) (a:Z) (b:Z), (a < b)%Z ->
-  (0%Z <= (numof p a b))%Z /\ ((numof p a b) <= (b - a)%Z)%Z.
+  forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z),
+  (a < b)%Z -> (0%Z <= (numof p a b))%Z /\ ((numof p a b) <= (b - a)%Z)%Z.
 Proof.
   intros p a b h1.
   unfold numof.
@@ -85,7 +90,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Numof_append :
-  forall (p:Z -> bool) (a:Z) (b:Z) (c:Z), (a <= b)%Z /\ (b <= c)%Z ->
+  forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  (a <= b)%Z /\ (b <= c)%Z ->
   ((numof p a c) = ((numof p a b) + (numof p b c))%Z).
 Proof.
   intros p a b c (h1,h2).
@@ -128,7 +135,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Numof_left_no_add :
-  forall (p:Z -> bool) (a:Z) (b:Z), (a < b)%Z -> ~ ((p a) = true) ->
+  forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z),
+  (a < b)%Z -> ~ ((p a) = Init.Datatypes.true) ->
   ((numof p a b) = (numof p (a + 1%Z)%Z b)).
 Proof.
   intros p a b h1 h2.
@@ -140,7 +149,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Numof_left_add :
-  forall (p:Z -> bool) (a:Z) (b:Z), (a < b)%Z -> ((p a) = true) ->
+  forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z),
+  (a < b)%Z -> ((p a) = Init.Datatypes.true) ->
   ((numof p a b) = (1%Z + (numof p (a + 1%Z)%Z b))%Z).
 Proof.
   intros p a b h1 h2.
@@ -151,8 +162,10 @@ Qed.
 
 (* Why3 goal *)
 Lemma Empty :
-  forall (p:Z -> bool) (a:Z) (b:Z),
-  (forall (n:Z), (a <= n)%Z /\ (n < b)%Z -> ~ ((p n) = true)) ->
+  forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z),
+  (forall (n:Numbers.BinNums.Z), (a <= n)%Z /\ (n < b)%Z ->
+   ~ ((p n) = Init.Datatypes.true)) ->
   ((numof p a b) = 0%Z).
 Proof.
   intros p a b.
@@ -173,8 +186,11 @@ Qed.
 
 (* Why3 goal *)
 Lemma Full :
-  forall (p:Z -> bool) (a:Z) (b:Z), (a <= b)%Z ->
-  (forall (n:Z), (a <= n)%Z /\ (n < b)%Z -> ((p n) = true)) ->
+  forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z),
+  (a <= b)%Z ->
+  (forall (n:Numbers.BinNums.Z), (a <= n)%Z /\ (n < b)%Z ->
+   ((p n) = Init.Datatypes.true)) ->
   ((numof p a b) = (b - a)%Z).
 Proof.
   intros p a b h1.
@@ -226,8 +242,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma numof_increasing :
-  forall (p:Z -> bool) (i:Z) (j:Z) (k:Z), (i <= j)%Z /\ (j <= k)%Z ->
-  ((numof p i j) <= (numof p i k))%Z.
+  forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z) (k:Numbers.BinNums.Z),
+  (i <= j)%Z /\ (j <= k)%Z -> ((numof p i j) <= (numof p i k))%Z.
 Proof.
 intros p i j k (h1,h2).
 rewrite (Numof_append p i j k) by omega.
@@ -237,8 +254,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma numof_strictly_increasing :
-  forall (p:Z -> bool) (i:Z) (j:Z) (k:Z) (l:Z),
-  (i <= j)%Z /\ (j <= k)%Z /\ (k < l)%Z -> ((p k) = true) ->
+  forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z) (k:Numbers.BinNums.Z) (l:Numbers.BinNums.Z),
+  (i <= j)%Z /\ (j <= k)%Z /\ (k < l)%Z -> ((p k) = Init.Datatypes.true) ->
   ((numof p i j) < (numof p i l))%Z.
 Proof.
 intros p i j k l (h1,(h2,h3)) h4.
@@ -249,9 +267,11 @@ Qed.
 
 (* Why3 goal *)
 Lemma numof_change_any :
-  forall (p1:Z -> bool) (p2:Z -> bool) (a:Z) (b:Z),
-  (forall (j:Z), (a <= j)%Z /\ (j < b)%Z -> ((p1 j) = true) ->
-   ((p2 j) = true)) ->
+  forall (p1:Numbers.BinNums.Z -> Init.Datatypes.bool)
+    (p2:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z),
+  (forall (j:Numbers.BinNums.Z), (a <= j)%Z /\ (j < b)%Z ->
+   ((p1 j) = Init.Datatypes.true) -> ((p2 j) = Init.Datatypes.true)) ->
   ((numof p1 a b) <= (numof p2 a b))%Z.
 Proof.
   intros p1 p2 a b.
@@ -273,11 +293,14 @@ Qed.
 
 (* Why3 goal *)
 Lemma numof_change_some :
-  forall (p1:Z -> bool) (p2:Z -> bool) (a:Z) (b:Z) (i:Z),
+  forall (p1:Numbers.BinNums.Z -> Init.Datatypes.bool)
+    (p2:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z) (i:Numbers.BinNums.Z),
   (a <= i)%Z /\ (i < b)%Z ->
-  (forall (j:Z), (a <= j)%Z /\ (j < b)%Z -> ((p1 j) = true) ->
-   ((p2 j) = true)) ->
-  ~ ((p1 i) = true) -> ((p2 i) = true) -> ((numof p1 a b) < (numof p2 a b))%Z.
+  (forall (j:Numbers.BinNums.Z), (a <= j)%Z /\ (j < b)%Z ->
+   ((p1 j) = Init.Datatypes.true) -> ((p2 j) = Init.Datatypes.true)) ->
+  ~ ((p1 i) = Init.Datatypes.true) -> ((p2 i) = Init.Datatypes.true) ->
+  ((numof p1 a b) < (numof p2 a b))%Z.
 Proof.
   intros p1 p2 a b i (h1,h2) h3 h4 h5.
   generalize (Z_le_lt_eq_dec _ _ (numof_change_any p1 p2 a b h3)).
@@ -300,9 +323,11 @@ Qed.
 
 (* Why3 goal *)
 Lemma numof_change_equiv :
-  forall (p1:Z -> bool) (p2:Z -> bool) (a:Z) (b:Z),
-  (forall (j:Z), (a <= j)%Z /\ (j < b)%Z ->
-   ((p1 j) = true) <-> ((p2 j) = true)) ->
+  forall (p1:Numbers.BinNums.Z -> Init.Datatypes.bool)
+    (p2:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
+    (b:Numbers.BinNums.Z),
+  (forall (j:Numbers.BinNums.Z), (a <= j)%Z /\ (j < b)%Z ->
+   ((p1 j) = Init.Datatypes.true) <-> ((p2 j) = Init.Datatypes.true)) ->
   ((numof p2 a b) = (numof p1 a b)).
 Proof.
 intros p1 p2 a b h1.

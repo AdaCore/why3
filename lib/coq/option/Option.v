@@ -15,15 +15,16 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 assumption *)
-Definition is_none {a:Type} {a_WT:WhyType a} (o:(option a)) : Prop :=
+Definition is_none {a:Type} {a_WT:WhyType a} (o:Init.Datatypes.option a) :
+    Prop :=
   match o with
   | Init.Datatypes.None => True
-  | (Init.Datatypes.Some _) => False
+  | Init.Datatypes.Some _ => False
   end.
 
 (* Why3 goal *)
 Lemma is_none_spec {a:Type} {a_WT:WhyType a} :
-  forall (o:(option a)), is_none o <-> (o = Init.Datatypes.None).
+  forall (o:Init.Datatypes.option a), is_none o <-> (o = Init.Datatypes.None).
 Proof.
 intros o.
 split.

@@ -21,7 +21,7 @@ Require option.Option.
 
 (* Why3 goal *)
 Lemma nth_none_1 {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)) (i:Z), (i < 0%Z)%Z ->
+  forall (l:Init.Datatypes.list a) (i:Numbers.BinNums.Z), (i < 0%Z)%Z ->
   ((list.Nth.nth i l) = Init.Datatypes.None).
 Proof.
 intros l.
@@ -40,7 +40,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma nth_none_2 {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)) (i:Z), ((list.Length.length l) <= i)%Z ->
+  forall (l:Init.Datatypes.list a) (i:Numbers.BinNums.Z),
+  ((list.Length.length l) <= i)%Z ->
   ((list.Nth.nth i l) = Init.Datatypes.None).
 Proof.
 intros l.
@@ -64,7 +65,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma nth_none_3 {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)) (i:Z), ((list.Nth.nth i l) = Init.Datatypes.None) ->
+  forall (l:Init.Datatypes.list a) (i:Numbers.BinNums.Z),
+  ((list.Nth.nth i l) = Init.Datatypes.None) ->
   (i < 0%Z)%Z \/ ((list.Length.length l) <= i)%Z.
 Proof.
 intros l.

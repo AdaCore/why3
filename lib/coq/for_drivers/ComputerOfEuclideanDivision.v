@@ -32,7 +32,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma cdiv_cases :
-  forall (n:Z) (d:Z),
+  forall (n:Numbers.BinNums.Z) (d:Numbers.BinNums.Z),
   ((0%Z <= n)%Z -> (0%Z < d)%Z ->
    ((ZArith.BinInt.Z.quot n d) = (int.EuclideanDivision.div n d))) /\
   ((n <= 0%Z)%Z -> (0%Z < d)%Z ->
@@ -66,7 +66,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma cmod_cases :
-  forall (n:Z) (d:Z),
+  forall (n:Numbers.BinNums.Z) (d:Numbers.BinNums.Z),
   ((0%Z <= n)%Z -> (0%Z < d)%Z ->
    ((ZArith.BinInt.Z.rem n d) = (int.EuclideanDivision.mod1 n d))) /\
   ((n <= 0%Z)%Z -> (0%Z < d)%Z ->

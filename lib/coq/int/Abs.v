@@ -20,7 +20,7 @@ Require int.Int.
 
 (* Why3 goal *)
 Lemma abs_def :
-  forall (x:Z),
+  forall (x:Numbers.BinNums.Z),
   ((0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = x)) /\
   (~ (0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = (-x)%Z)).
 intros x.
@@ -35,7 +35,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Abs_le :
-  forall (x:Z) (y:Z),
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((ZArith.BinInt.Z.abs x) <= y)%Z <-> ((-y)%Z <= x)%Z /\ (x <= y)%Z.
 intros x y.
 zify.
@@ -43,7 +43,8 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Abs_pos : forall (x:Z), (0%Z <= (ZArith.BinInt.Z.abs x))%Z.
+Lemma Abs_pos :
+  forall (x:Numbers.BinNums.Z), (0%Z <= (ZArith.BinInt.Z.abs x))%Z.
 exact Zabs_pos.
 Qed.
 

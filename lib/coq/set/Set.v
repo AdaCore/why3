@@ -25,7 +25,7 @@ Lemma predicate_extensionality:
 Admitted.
 
 (* Why3 assumption *)
-Definition set (a:Type) := a -> bool.
+Definition set (a:Type) := a -> Init.Datatypes.bool.
 
 Global Instance set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
 Proof.
@@ -37,21 +37,23 @@ apply excluded_middle_informative.
 Qed.
 
 (* Why3 assumption *)
-Definition mem {a:Type} {a_WT:WhyType a} (x:a) (s:a -> bool) : Prop :=
-  ((s x) = true).
+Definition mem {a:Type} {a_WT:WhyType a} (x:a) (s:a -> Init.Datatypes.bool) :
+    Prop :=
+  ((s x) = Init.Datatypes.true).
 
 Hint Unfold mem.
 
 (* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:a -> bool)
-    (s2:a -> bool) : Prop :=
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:a -> Init.Datatypes.bool)
+    (s2:a -> Init.Datatypes.bool) : Prop :=
   forall (x:a), mem x s1 <-> mem x s2.
 
 Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
 
 (* Why3 goal *)
 Lemma extensionality {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool), infix_eqeq s1 s2 -> (s1 = s2).
+  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool),
+  infix_eqeq s1 s2 -> (s1 = s2).
 Proof.
 intros s1 s2 h1.
 apply predicate_extensionality.
@@ -67,41 +69,43 @@ easy.
 Qed.
 
 (* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a} (s1:a -> bool) (s2:a -> bool) :
-    Prop :=
+Definition subset {a:Type} {a_WT:WhyType a} (s1:a -> Init.Datatypes.bool)
+    (s2:a -> Init.Datatypes.bool) : Prop :=
   forall (x:a), mem x s1 -> mem x s2.
 
 (* Why3 goal *)
 Lemma subset_refl {a:Type} {a_WT:WhyType a} :
-  forall (s:a -> bool), subset s s.
+  forall (s:a -> Init.Datatypes.bool), subset s s.
 Proof.
 now intros s x.
 Qed.
 
 (* Why3 goal *)
 Lemma subset_trans {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool) (s3:a -> bool), subset s1 s2 ->
-  subset s2 s3 -> subset s1 s3.
+  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool)
+    (s3:a -> Init.Datatypes.bool),
+  subset s1 s2 -> subset s2 s3 -> subset s1 s3.
 Proof.
 intros s1 s2 s3 h1 h2 x H.
 now apply h2, h1.
 Qed.
 
 (* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a} (s:a -> bool) : Prop :=
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:a -> Init.Datatypes.bool) :
+    Prop :=
   forall (x:a), ~ mem x s.
 
 (* Why3 goal *)
 Lemma mem_empty {a:Type} {a_WT:WhyType a} :
-  is_empty (map.Const.const false : a -> bool).
+  is_empty (map.Const.const Init.Datatypes.false : a -> Init.Datatypes.bool).
 Proof.
 now intros x.
 Qed.
 
 (* Why3 goal *)
 Lemma add_spec {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (s:a -> bool), forall (y:a),
-  mem y (map.Map.set s x true) <-> (y = x) \/ mem y s.
+  forall (x:a) (s:a -> Init.Datatypes.bool), forall (y:a),
+  mem y (map.Map.set s x Init.Datatypes.true) <-> (y = x) \/ mem y s.
 Proof.
 intros x y s.
 unfold Map.set, mem.
@@ -110,8 +114,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma remove_spec {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (s:a -> bool), forall (y:a),
-  mem y (map.Map.set s x false) <-> ~ (y = x) /\ mem y s.
+  forall (x:a) (s:a -> Init.Datatypes.bool), forall (y:a),
+  mem y (map.Map.set s x Init.Datatypes.false) <-> ~ (y = x) /\ mem y s.
 Proof.
 intros x s y.
 unfold Map.set, mem.
@@ -120,8 +124,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma add_remove {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (s:a -> bool), mem x s ->
-  ((map.Map.set (map.Map.set s x false) x true) = s).
+  forall (x:a) (s:a -> Init.Datatypes.bool), mem x s ->
+  ((map.Map.set (map.Map.set s x Init.Datatypes.false) x Init.Datatypes.true)
+   = s).
 Proof.
 intros x s h1.
 apply extensionality; intro y.
@@ -132,8 +137,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma remove_add {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (s:a -> bool),
-  ((map.Map.set (map.Map.set s x true) x false) = (map.Map.set s x false)).
+  forall (x:a) (s:a -> Init.Datatypes.bool),
+  ((map.Map.set (map.Map.set s x Init.Datatypes.true) x Init.Datatypes.false)
+   = (map.Map.set s x Init.Datatypes.false)).
 Proof.
 intros x s.
 apply extensionality; intro y.
@@ -145,7 +151,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma subset_remove {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (s:a -> bool), subset (map.Map.set s x false) s.
+  forall (x:a) (s:a -> Init.Datatypes.bool),
+  subset (map.Map.set s x Init.Datatypes.false) s.
 Proof.
 intros x s y.
 rewrite remove_spec.
@@ -154,7 +161,8 @@ Qed.
 
 (* Why3 goal *)
 Definition union {a:Type} {a_WT:WhyType a} :
-  (a -> bool) -> (a -> bool) -> a -> bool.
+  (a -> Init.Datatypes.bool) -> (a -> Init.Datatypes.bool) ->
+  a -> Init.Datatypes.bool.
 Proof.
 intros s1 s2.
 exact (fun x => orb (s1 x) (s2 x)).
@@ -162,8 +170,9 @@ Defined.
 
 (* Why3 goal *)
 Lemma union_def {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool) (x:a),
-  ((union s1 s2 x) = true) <-> ((s1 x) = true) \/ ((s2 x) = true).
+  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool) (x:a),
+  ((union s1 s2 x) = Init.Datatypes.true) <->
+  ((s1 x) = Init.Datatypes.true) \/ ((s2 x) = Init.Datatypes.true).
 Proof.
 intros s1 s2 x.
 apply Bool.orb_true_iff.
@@ -171,15 +180,16 @@ Qed.
 
 (* Why3 goal *)
 Lemma union_spec {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool), forall (x:a),
-  mem x (union s1 s2) <-> mem x s1 \/ mem x s2.
+  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool),
+  forall (x:a), mem x (union s1 s2) <-> mem x s1 \/ mem x s2.
 Proof.
 exact union_def.
 Qed.
 
 (* Why3 goal *)
 Definition inter {a:Type} {a_WT:WhyType a} :
-  (a -> bool) -> (a -> bool) -> a -> bool.
+  (a -> Init.Datatypes.bool) -> (a -> Init.Datatypes.bool) ->
+  a -> Init.Datatypes.bool.
 Proof.
 intros s1 s2.
 exact (fun x => andb (s1 x) (s2 x)).
@@ -187,8 +197,9 @@ Defined.
 
 (* Why3 goal *)
 Lemma inter_def {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool) (x:a),
-  ((inter s1 s2 x) = true) <-> ((s1 x) = true) /\ ((s2 x) = true).
+  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool) (x:a),
+  ((inter s1 s2 x) = Init.Datatypes.true) <->
+  ((s1 x) = Init.Datatypes.true) /\ ((s2 x) = Init.Datatypes.true).
 Proof.
 intros s1 s2 x.
 apply Bool.andb_true_iff.
@@ -196,15 +207,16 @@ Qed.
 
 (* Why3 goal *)
 Lemma inter_spec {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool), forall (x:a),
-  mem x (inter s1 s2) <-> mem x s1 /\ mem x s2.
+  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool),
+  forall (x:a), mem x (inter s1 s2) <-> mem x s1 /\ mem x s2.
 Proof.
 exact inter_def.
 Qed.
 
 (* Why3 goal *)
 Definition diff {a:Type} {a_WT:WhyType a} :
-  (a -> bool) -> (a -> bool) -> a -> bool.
+  (a -> Init.Datatypes.bool) -> (a -> Init.Datatypes.bool) ->
+  a -> Init.Datatypes.bool.
 Proof.
 intros s1 s2.
 exact (fun x => andb (s1 x) (negb (s2 x))).
@@ -212,8 +224,9 @@ Defined.
 
 (* Why3 goal *)
 Lemma diff_def {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool) (x:a),
-  ((diff s1 s2 x) = true) <-> ((s1 x) = true) /\ ~ ((s2 x) = true).
+  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool) (x:a),
+  ((diff s1 s2 x) = Init.Datatypes.true) <->
+  ((s1 x) = Init.Datatypes.true) /\ ~ ((s2 x) = Init.Datatypes.true).
 Proof.
 intros s1 s2 x.
 unfold mem, diff.
@@ -224,15 +237,16 @@ Qed.
 
 (* Why3 goal *)
 Lemma diff_spec {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool), forall (x:a),
-  mem x (diff s1 s2) <-> mem x s1 /\ ~ mem x s2.
+  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool),
+  forall (x:a), mem x (diff s1 s2) <-> mem x s1 /\ ~ mem x s2.
 Proof.
 exact diff_def.
 Qed.
 
 (* Why3 goal *)
 Lemma subset_diff {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> bool) (s2:a -> bool), subset (diff s1 s2) s1.
+  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool),
+  subset (diff s1 s2) s1.
 Proof.
 intros s1 s2 x.
 rewrite diff_spec.
@@ -240,7 +254,8 @@ now intros [H _].
 Qed.
 
 (* Why3 goal *)
-Definition complement {a:Type} {a_WT:WhyType a} : (a -> bool) -> a -> bool.
+Definition complement {a:Type} {a_WT:WhyType a} :
+  (a -> Init.Datatypes.bool) -> a -> Init.Datatypes.bool.
 Proof.
 intros s.
 exact (fun x => negb (s x)).
@@ -248,7 +263,9 @@ Defined.
 
 (* Why3 goal *)
 Lemma complement_def {a:Type} {a_WT:WhyType a} :
-  forall (s:a -> bool) (x:a), ((complement s x) = true) <-> ~ ((s x) = true).
+  forall (s:a -> Init.Datatypes.bool) (x:a),
+  ((complement s x) = Init.Datatypes.true) <->
+  ~ ((s x) = Init.Datatypes.true).
 Proof.
 intros s x.
 unfold complement.
@@ -257,7 +274,8 @@ apply Bool.negb_true_iff.
 Qed.
 
 (* Why3 goal *)
-Definition choose {a:Type} {a_WT:WhyType a} : (a -> bool) -> a.
+Definition choose {a:Type} {a_WT:WhyType a} :
+  (a -> Init.Datatypes.bool) -> a.
 Proof.
 intros s.
 assert (i: inhabited a) by (apply inhabits, why_inhabitant).
@@ -266,7 +284,7 @@ Defined.
 
 (* Why3 goal *)
 Lemma choose_spec {a:Type} {a_WT:WhyType a} :
-  forall (s:a -> bool), ~ is_empty s -> mem (choose s) s.
+  forall (s:a -> Init.Datatypes.bool), ~ is_empty s -> mem (choose s) s.
 Proof.
 intros s h1.
 unfold choose.

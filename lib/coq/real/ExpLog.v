@@ -32,7 +32,7 @@ Require Import Exp_prop.
 
 (* Why3 goal *)
 Lemma Exp_sum :
-  forall (x:R) (y:R),
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((Reals.Rtrigo_def.exp (x + y)%R) =
    ((Reals.Rtrigo_def.exp x) * (Reals.Rtrigo_def.exp y))%R).
 exact exp_plus.
@@ -48,7 +48,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Log_mul :
-  forall (x:R) (y:R), (0%R < x)%R /\ (0%R < y)%R ->
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  (0%R < x)%R /\ (0%R < y)%R ->
   ((Reals.Rpower.ln (x * y)%R) =
    ((Reals.Rpower.ln x) + (Reals.Rpower.ln y))%R).
 intros x y (Hx,Hy).
@@ -57,21 +58,23 @@ Qed.
 
 (* Why3 goal *)
 Lemma Log_exp :
-  forall (x:R), ((Reals.Rpower.ln (Reals.Rtrigo_def.exp x)) = x).
+  forall (x:Reals.Rdefinitions.R),
+  ((Reals.Rpower.ln (Reals.Rtrigo_def.exp x)) = x).
 exact ln_exp.
 Qed.
 
 (* Why3 goal *)
 Lemma Exp_log :
-  forall (x:R), (0%R < x)%R ->
+  forall (x:Reals.Rdefinitions.R), (0%R < x)%R ->
   ((Reals.Rtrigo_def.exp (Reals.Rpower.ln x)) = x).
 exact exp_ln.
 Qed.
 
 (* Why3 assumption *)
-Definition log2 (x:R) : R := ((Reals.Rpower.ln x) / (Reals.Rpower.ln 2%R))%R.
+Definition log2 (x:Reals.Rdefinitions.R) : Reals.Rdefinitions.R :=
+  ((Reals.Rpower.ln x) / (Reals.Rpower.ln 2%R))%R.
 
 (* Why3 assumption *)
-Definition log10 (x:R) : R :=
+Definition log10 (x:Reals.Rdefinitions.R) : Reals.Rdefinitions.R :=
   ((Reals.Rpower.ln x) / (Reals.Rpower.ln 10%R))%R.
 

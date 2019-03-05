@@ -38,7 +38,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Definition t'real : t -> R.
+Definition t'real : t -> Reals.Rdefinitions.R.
 Proof.
   apply B2R.
 Defined.
@@ -263,13 +263,13 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition of_int : ieee_float.RoundingMode.mode -> Z -> t.
+Definition of_int : ieee_float.RoundingMode.mode -> Numbers.BinNums.Z -> t.
 Proof.
   now apply z_to_fp.
 Defined.
 
 (* Why3 goal *)
-Definition to_int : ieee_float.RoundingMode.mode -> t -> Z.
+Definition to_int : ieee_float.RoundingMode.mode -> t -> Numbers.BinNums.Z.
 Proof.
   now apply fp_to_z.
 Defined.
@@ -282,7 +282,9 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition round : ieee_float.RoundingMode.mode -> R -> R.
+Definition round :
+  ieee_float.RoundingMode.mode -> Reals.Rdefinitions.R ->
+  Reals.Rdefinitions.R.
 Proof.
   apply (round 8 24).
 Defined.
@@ -297,7 +299,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Definition max_int : Z.
+Definition max_int : Numbers.BinNums.Z.
 Proof.
   exact (33554430 * 10141204801825835211973625643008)%Z.
 Defined.
@@ -311,12 +313,12 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition in_range (x:R) : Prop :=
+Definition in_range (x:Reals.Rdefinitions.R) : Prop :=
   ((-(33554430 * 10141204801825835211973625643008)%R)%R <= x)%R /\
   (x <= (33554430 * 10141204801825835211973625643008)%R)%R.
 
 (* Why3 assumption *)
-Definition in_int_range (i:Z) : Prop :=
+Definition in_int_range (i:Numbers.BinNums.Z) : Prop :=
   ((-max_int)%Z <= i)%Z /\ (i <= max_int)%Z.
 
 (* Why3 goal *)
@@ -329,13 +331,14 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition no_overflow (m:ieee_float.RoundingMode.mode) (x:R) : Prop :=
+Definition no_overflow (m:ieee_float.RoundingMode.mode)
+    (x:Reals.Rdefinitions.R) : Prop :=
   in_range (round m x).
 
 (* Why3 goal *)
 Lemma Bounded_real_no_overflow :
-  forall (m:ieee_float.RoundingMode.mode) (x:R), in_range x ->
-  no_overflow m x.
+  forall (m:ieee_float.RoundingMode.mode) (x:Reals.Rdefinitions.R),
+  in_range x -> no_overflow m x.
 Proof.
   unfold no_overflow, in_range.
   rewrite <- max_real_cst.
@@ -344,8 +347,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_monotonic :
-  forall (m:ieee_float.RoundingMode.mode) (x:R) (y:R), (x <= y)%R ->
-  ((round m x) <= (round m y))%R.
+  forall (m:ieee_float.RoundingMode.mode) (x:Reals.Rdefinitions.R)
+    (y:Reals.Rdefinitions.R),
+  (x <= y)%R -> ((round m x) <= (round m y))%R.
 Proof.
   apply Round_monotonic.
 Qed.
@@ -353,7 +357,7 @@ Qed.
 (* Why3 goal *)
 Lemma Round_idempotent :
   forall (m1:ieee_float.RoundingMode.mode) (m2:ieee_float.RoundingMode.mode)
-    (x:R),
+    (x:Reals.Rdefinitions.R),
   ((round m1 (round m2 x)) = (round m2 x)).
 Proof.
   apply Round_idempotent.
@@ -369,21 +373,23 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_down_le :
-  forall (x:R), ((round ieee_float.RoundingMode.RTN x) <= x)%R.
+  forall (x:Reals.Rdefinitions.R),
+  ((round ieee_float.RoundingMode.RTN x) <= x)%R.
 Proof.
   apply Round_down_le.
 Qed.
 
 (* Why3 goal *)
 Lemma Round_up_ge :
-  forall (x:R), (x <= (round ieee_float.RoundingMode.RTP x))%R.
+  forall (x:Reals.Rdefinitions.R),
+  (x <= (round ieee_float.RoundingMode.RTP x))%R.
 Proof.
   apply Round_up_ge.
 Qed.
 
 (* Why3 goal *)
 Lemma Round_down_neg :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((round ieee_float.RoundingMode.RTN (-x)%R) =
    (-(round ieee_float.RoundingMode.RTP x))%R).
 Proof.
@@ -392,7 +398,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Round_up_neg :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((round ieee_float.RoundingMode.RTP (-x)%R) =
    (-(round ieee_float.RoundingMode.RTN x))%R).
 Proof.
@@ -400,13 +406,13 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition in_safe_int_range (i:Z) : Prop :=
+Definition in_safe_int_range (i:Numbers.BinNums.Z) : Prop :=
   ((-16777216%Z)%Z <= i)%Z /\ (i <= 16777216%Z)%Z.
 
 (* Why3 goal *)
 Lemma Exact_rounding_for_integers :
-  forall (m:ieee_float.RoundingMode.mode) (i:Z), in_safe_int_range i ->
-  ((round m (BuiltIn.IZR i)) = (BuiltIn.IZR i)).
+  forall (m:ieee_float.RoundingMode.mode) (i:Numbers.BinNums.Z),
+  in_safe_int_range i -> ((round m (BuiltIn.IZR i)) = (BuiltIn.IZR i)).
 Proof.
   intros m i h1.
   now apply Exact_rounding_for_integers.
@@ -890,7 +896,7 @@ Proof.
 Qed.
 
 (* Why3 assumption *)
-Definition same_sign_real (x:t) (r:R) : Prop :=
+Definition same_sign_real (x:t) (r:Reals.Rdefinitions.R) : Prop :=
   is_positive x /\ (0%R < r)%R \/ is_negative x /\ (r < 0%R)%R.
 
 (* Why3 goal *)
@@ -1060,7 +1066,7 @@ Qed.
 (* Why3 goal *)
 Lemma of_int_add_exact :
   forall (m:ieee_float.RoundingMode.mode) (n:ieee_float.RoundingMode.mode)
-    (i:Z) (j:Z),
+    (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
   in_safe_int_range i -> in_safe_int_range j ->
   in_safe_int_range (i + j)%Z ->
   eq (of_int m (i + j)%Z) (add n (of_int m i) (of_int m j)).
@@ -1072,7 +1078,7 @@ Qed.
 (* Why3 goal *)
 Lemma of_int_sub_exact :
   forall (m:ieee_float.RoundingMode.mode) (n:ieee_float.RoundingMode.mode)
-    (i:Z) (j:Z),
+    (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
   in_safe_int_range i -> in_safe_int_range j ->
   in_safe_int_range (i - j)%Z ->
   eq (of_int m (i - j)%Z) (sub n (of_int m i) (of_int m j)).
@@ -1084,7 +1090,7 @@ Qed.
 (* Why3 goal *)
 Lemma of_int_mul_exact :
   forall (m:ieee_float.RoundingMode.mode) (n:ieee_float.RoundingMode.mode)
-    (i:Z) (j:Z),
+    (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
   in_safe_int_range i -> in_safe_int_range j ->
   in_safe_int_range (i * j)%Z ->
   eq (of_int m (i * j)%Z) (mul n (of_int m i) (of_int m j)).
@@ -1131,8 +1137,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma of_int_is_int :
-  forall (m:ieee_float.RoundingMode.mode) (x:Z), in_int_range x ->
-  is_int (of_int m x).
+  forall (m:ieee_float.RoundingMode.mode) (x:Numbers.BinNums.Z),
+  in_int_range x -> is_int (of_int m x).
 Proof.
   intros m x h1.
   now apply of_int_is_int.
@@ -1405,8 +1411,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma to_int_of_int :
-  forall (m:ieee_float.RoundingMode.mode) (i:Z), in_safe_int_range i ->
-  ((to_int m (of_int m i)) = i).
+  forall (m:ieee_float.RoundingMode.mode) (i:Numbers.BinNums.Z),
+  in_safe_int_range i -> ((to_int m (of_int m i)) = i).
 Proof.
   intros m i h1.
   now apply to_int_of_int.
@@ -1438,7 +1444,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma round_bound_ne :
-  forall (x:R), no_overflow ieee_float.RoundingMode.RNE x ->
+  forall (x:Reals.Rdefinitions.R),
+  no_overflow ieee_float.RoundingMode.RNE x ->
   (((x - ((1 / 16777216)%R * (Reals.Rbasic_fun.Rabs x))%R)%R -
     (1 / 1427247692705959881058285969449495136382746624)%R)%R
    <= (round ieee_float.RoundingMode.RNE x))%R /\
@@ -1450,7 +1457,8 @@ Admitted.
 
 (* Why3 goal *)
 Lemma round_bound :
-  forall (m:ieee_float.RoundingMode.mode) (x:R), no_overflow m x ->
+  forall (m:ieee_float.RoundingMode.mode) (x:Reals.Rdefinitions.R),
+  no_overflow m x ->
   (((x - ((1 / 8388608)%R * (Reals.Rbasic_fun.Rabs x))%R)%R -
     (1 / 713623846352979940529142984724747568191373312)%R)%R
    <= (round m x))%R /\

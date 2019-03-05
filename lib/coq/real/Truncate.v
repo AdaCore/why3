@@ -24,14 +24,15 @@ Require Import Fourier.
 Notation truncate := Ztrunc.
 
 (* Why3 goal *)
-Lemma Truncate_int : forall (i:Z), ((truncate (BuiltIn.IZR i)) = i).
+Lemma Truncate_int :
+  forall (i:Numbers.BinNums.Z), ((truncate (BuiltIn.IZR i)) = i).
 Proof.
   exact Ztrunc_IZR.
 Qed.
 
 (* Why3 goal *)
 Lemma Truncate_down_pos :
-  forall (x:R), (0%R <= x)%R ->
+  forall (x:Reals.Rdefinitions.R), (0%R <= x)%R ->
   ((BuiltIn.IZR (truncate x)) <= x)%R /\
   (x < (BuiltIn.IZR ((truncate x) + 1%Z)%Z))%R.
 Proof.
@@ -45,7 +46,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Truncate_up_neg :
-  forall (x:R), (x <= 0%R)%R ->
+  forall (x:Reals.Rdefinitions.R), (x <= 0%R)%R ->
   ((BuiltIn.IZR ((truncate x) - 1%Z)%Z) < x)%R /\
   (x <= (BuiltIn.IZR (truncate x)))%R.
 Proof.
@@ -64,7 +65,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Real_of_truncate :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((x - 1%R)%R <= (BuiltIn.IZR (truncate x)))%R /\
   ((BuiltIn.IZR (truncate x)) <= (x + 1%R)%R)%R.
 Proof.
@@ -85,14 +86,16 @@ Qed.
 
 (* Why3 goal *)
 Lemma Truncate_monotonic :
-  forall (x:R) (y:R), (x <= y)%R -> ((truncate x) <= (truncate y))%Z.
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (x <= y)%R ->
+  ((truncate x) <= (truncate y))%Z.
 Proof.
   apply Ztrunc_le.
 Qed.
 
 (* Why3 goal *)
 Lemma Truncate_monotonic_int1 :
-  forall (x:R) (i:Z), (x <= (BuiltIn.IZR i))%R -> ((truncate x) <= i)%Z.
+  forall (x:Reals.Rdefinitions.R) (i:Numbers.BinNums.Z),
+  (x <= (BuiltIn.IZR i))%R -> ((truncate x) <= i)%Z.
 Proof.
   intros x i h.
   destruct (Rle_lt_dec x 0).
@@ -105,7 +108,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Truncate_monotonic_int2 :
-  forall (x:R) (i:Z), ((BuiltIn.IZR i) <= x)%R -> (i <= (truncate x))%Z.
+  forall (x:Reals.Rdefinitions.R) (i:Numbers.BinNums.Z),
+  ((BuiltIn.IZR i) <= x)%R -> (i <= (truncate x))%Z.
 Proof.
   intros x i h.
   destruct (Rle_lt_dec x 0).
@@ -123,20 +127,21 @@ Notation floor := Zfloor.
 Notation ceil := Zceil.
 
 (* Why3 goal *)
-Lemma Floor_int : forall (i:Z), ((floor (BuiltIn.IZR i)) = i).
+Lemma Floor_int :
+  forall (i:Numbers.BinNums.Z), ((floor (BuiltIn.IZR i)) = i).
 Proof.
   exact Zfloor_IZR.
 Qed.
 
 (* Why3 goal *)
-Lemma Ceil_int : forall (i:Z), ((ceil (BuiltIn.IZR i)) = i).
+Lemma Ceil_int : forall (i:Numbers.BinNums.Z), ((ceil (BuiltIn.IZR i)) = i).
 Proof.
   exact Zceil_IZR.
 Qed.
 
 (* Why3 goal *)
 Lemma Floor_down :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((BuiltIn.IZR (floor x)) <= x)%R /\
   (x < (BuiltIn.IZR ((floor x) + 1%Z)%Z))%R.
 Proof.
@@ -161,7 +166,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Ceil_up :
-  forall (x:R),
+  forall (x:Reals.Rdefinitions.R),
   ((BuiltIn.IZR ((ceil x) - 1%Z)%Z) < x)%R /\ (x <= (BuiltIn.IZR (ceil x)))%R.
 Proof.
 intro x.
@@ -172,14 +177,16 @@ Qed.
 
 (* Why3 goal *)
 Lemma Floor_monotonic :
-  forall (x:R) (y:R), (x <= y)%R -> ((floor x) <= (floor y))%Z.
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (x <= y)%R ->
+  ((floor x) <= (floor y))%Z.
 Proof.
   apply Zfloor_le.
 Qed.
 
 (* Why3 goal *)
 Lemma Ceil_monotonic :
-  forall (x:R) (y:R), (x <= y)%R -> ((ceil x) <= (ceil y))%Z.
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (x <= y)%R ->
+  ((ceil x) <= (ceil y))%Z.
 Proof.
   apply Zceil_le.
 Qed.

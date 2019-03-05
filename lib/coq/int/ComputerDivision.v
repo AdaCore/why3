@@ -26,7 +26,7 @@ Require Import Zquot.
 
 (* Why3 goal *)
 Lemma Div_mod :
-  forall (x:Z) (y:Z), ~ (y = 0%Z) ->
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), ~ (y = 0%Z) ->
   (x = ((y * (ZArith.BinInt.Z.quot x y))%Z + (ZArith.BinInt.Z.rem x y))%Z).
 intros x y _.
 apply Z.quot_rem'.
@@ -34,7 +34,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Div_bound :
-  forall (x:Z) (y:Z), (0%Z <= x)%Z /\ (0%Z < y)%Z ->
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (0%Z <= x)%Z /\ (0%Z < y)%Z ->
   (0%Z <= (ZArith.BinInt.Z.quot x y))%Z /\
   ((ZArith.BinInt.Z.quot x y) <= x)%Z.
 intros x y (Hx,Hy).
@@ -52,7 +53,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mod_bound :
-  forall (x:Z) (y:Z), ~ (y = 0%Z) ->
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), ~ (y = 0%Z) ->
   ((-(ZArith.BinInt.Z.abs y))%Z < (ZArith.BinInt.Z.rem x y))%Z /\
   ((ZArith.BinInt.Z.rem x y) < (ZArith.BinInt.Z.abs y))%Z.
 intros x y Zy.
@@ -68,16 +69,16 @@ Qed.
 
 (* Why3 goal *)
 Lemma Div_sign_pos :
-  forall (x:Z) (y:Z), (0%Z <= x)%Z /\ (0%Z < y)%Z ->
-  (0%Z <= (ZArith.BinInt.Z.quot x y))%Z.
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (0%Z <= x)%Z /\ (0%Z < y)%Z -> (0%Z <= (ZArith.BinInt.Z.quot x y))%Z.
 intros x y (Hx, Hy).
 now apply Z.quot_pos.
 Qed.
 
 (* Why3 goal *)
 Lemma Div_sign_neg :
-  forall (x:Z) (y:Z), (x <= 0%Z)%Z /\ (0%Z < y)%Z ->
-  ((ZArith.BinInt.Z.quot x y) <= 0%Z)%Z.
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (x <= 0%Z)%Z /\ (0%Z < y)%Z -> ((ZArith.BinInt.Z.quot x y) <= 0%Z)%Z.
 intros x y (Hx, Hy).
 generalize (Z.quot_pos (-x) y).
 rewrite Zquot_opp_l.
@@ -86,23 +87,23 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mod_sign_pos :
-  forall (x:Z) (y:Z), (0%Z <= x)%Z /\ ~ (y = 0%Z) ->
-  (0%Z <= (ZArith.BinInt.Z.rem x y))%Z.
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (0%Z <= x)%Z /\ ~ (y = 0%Z) -> (0%Z <= (ZArith.BinInt.Z.rem x y))%Z.
 intros x y (Hx, Zy).
 now apply Zrem_lt_pos.
 Qed.
 
 (* Why3 goal *)
 Lemma Mod_sign_neg :
-  forall (x:Z) (y:Z), (x <= 0%Z)%Z /\ ~ (y = 0%Z) ->
-  ((ZArith.BinInt.Z.rem x y) <= 0%Z)%Z.
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (x <= 0%Z)%Z /\ ~ (y = 0%Z) -> ((ZArith.BinInt.Z.rem x y) <= 0%Z)%Z.
 intros x y (Hx, Zy).
 now apply Zrem_lt_neg.
 Qed.
 
 (* Why3 goal *)
 Lemma Rounds_toward_zero :
-  forall (x:Z) (y:Z), ~ (y = 0%Z) ->
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), ~ (y = 0%Z) ->
   ((ZArith.BinInt.Z.abs ((ZArith.BinInt.Z.quot x y) * y)%Z) <=
    (ZArith.BinInt.Z.abs x))%Z.
 intros x y Zy.
@@ -114,32 +115,35 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_1 : forall (x:Z), ((ZArith.BinInt.Z.quot x 1%Z) = x).
+Lemma Div_1 :
+  forall (x:Numbers.BinNums.Z), ((ZArith.BinInt.Z.quot x 1%Z) = x).
 exact Z.quot_1_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_1 : forall (x:Z), ((ZArith.BinInt.Z.rem x 1%Z) = 0%Z).
+Lemma Mod_1 :
+  forall (x:Numbers.BinNums.Z), ((ZArith.BinInt.Z.rem x 1%Z) = 0%Z).
 exact Z.rem_1_r.
 Qed.
 
 (* Why3 goal *)
 Lemma Div_inf :
-  forall (x:Z) (y:Z), (0%Z <= x)%Z /\ (x < y)%Z ->
-  ((ZArith.BinInt.Z.quot x y) = 0%Z).
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (0%Z <= x)%Z /\ (x < y)%Z -> ((ZArith.BinInt.Z.quot x y) = 0%Z).
 exact Z.quot_small.
 Qed.
 
 (* Why3 goal *)
 Lemma Mod_inf :
-  forall (x:Z) (y:Z), (0%Z <= x)%Z /\ (x < y)%Z ->
-  ((ZArith.BinInt.Z.rem x y) = x).
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (0%Z <= x)%Z /\ (x < y)%Z -> ((ZArith.BinInt.Z.rem x y) = x).
 exact Z.rem_small.
 Qed.
 
 (* Why3 goal *)
 Lemma Div_mult :
-  forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z /\ (0%Z <= y)%Z /\ (0%Z <= z)%Z ->
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (z:Numbers.BinNums.Z),
+  (0%Z < x)%Z /\ (0%Z <= y)%Z /\ (0%Z <= z)%Z ->
   ((ZArith.BinInt.Z.quot ((x * y)%Z + z)%Z x) =
    (y + (ZArith.BinInt.Z.quot z x))%Z).
 intros x y z (Hx&Hy&Hz).
@@ -156,7 +160,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Mod_mult :
-  forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z /\ (0%Z <= y)%Z /\ (0%Z <= z)%Z ->
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (z:Numbers.BinNums.Z),
+  (0%Z < x)%Z /\ (0%Z <= y)%Z /\ (0%Z <= z)%Z ->
   ((ZArith.BinInt.Z.rem ((x * y)%Z + z)%Z x) = (ZArith.BinInt.Z.rem z x)).
 intros x y z (Hx&Hy&Hz).
 rewrite Zplus_comm, Zmult_comm.

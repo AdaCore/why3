@@ -20,12 +20,12 @@ Require list.Mem.
 
 (* Why3 goal *)
 Lemma infix_plpl_def {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)),
+  forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a),
   ((Init.Datatypes.app l1 l2) =
    match l1 with
    | Init.Datatypes.nil => l2
-   | (Init.Datatypes.cons x1 r1) =>
-       (Init.Datatypes.cons x1 (Init.Datatypes.app r1 l2))
+   | Init.Datatypes.cons x1 r1 =>
+       Init.Datatypes.cons x1 (Init.Datatypes.app r1 l2)
    end).
 Proof.
 now intros [|h1 q1] l2.
@@ -35,7 +35,8 @@ Require Import Lists.List.
 
 (* Why3 goal *)
 Lemma Append_assoc {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)) (l3:(list a)),
+  forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a)
+    (l3:Init.Datatypes.list a),
   ((Init.Datatypes.app l1 (Init.Datatypes.app l2 l3)) =
    (Init.Datatypes.app (Init.Datatypes.app l1 l2) l3)).
 Proof.
@@ -45,7 +46,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Append_l_nil {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)), ((Init.Datatypes.app l Init.Datatypes.nil) = l).
+  forall (l:Init.Datatypes.list a),
+  ((Init.Datatypes.app l Init.Datatypes.nil) = l).
 Proof.
 intros l.
 apply app_nil_r.
@@ -53,7 +55,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Append_length {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)),
+  forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a),
   ((list.Length.length (Init.Datatypes.app l1 l2)) =
    ((list.Length.length l1) + (list.Length.length l2))%Z).
 Proof.
@@ -64,7 +66,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma mem_append {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l1:(list a)) (l2:(list a)),
+  forall (x:a) (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a),
   list.Mem.mem x (Init.Datatypes.app l1 l2) <->
   list.Mem.mem x l1 \/ list.Mem.mem x l2.
 Proof.
@@ -90,8 +92,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma mem_decomp {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (l:(list a)), list.Mem.mem x l ->
-  exists l1:(list a), exists l2:(list a),
+  forall (x:a) (l:Init.Datatypes.list a), list.Mem.mem x l ->
+  exists l1:Init.Datatypes.list a, exists l2:Init.Datatypes.list a,
   (l = (Init.Datatypes.app l1 (Init.Datatypes.cons x l2))).
 Proof.
 intros x l h1.

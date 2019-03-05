@@ -23,9 +23,9 @@ Require number.Divisibility.
 Import Znumtheory.
 
 (* Why3 assumption *)
-Definition prime (p:Z) : Prop :=
+Definition prime (p:Numbers.BinNums.Z) : Prop :=
   (2%Z <= p)%Z /\
-  (forall (n:Z), (1%Z < n)%Z /\ (n < p)%Z ->
+  (forall (n:Numbers.BinNums.Z), (1%Z < n)%Z /\ (n < p)%Z ->
    ~ number.Divisibility.divides n p).
 
 Lemma prime_is_Zprime :
@@ -59,7 +59,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma prime_divisors :
-  forall (p:Z), prime p -> forall (d:Z), number.Divisibility.divides d p ->
+  forall (p:Numbers.BinNums.Z), prime p -> forall (d:Numbers.BinNums.Z),
+  number.Divisibility.divides d p ->
   (d = 1%Z) \/ (d = (-1%Z)%Z) \/ (d = p) \/ (d = (-p)%Z).
 Proof.
 intros p Hp d Hd.
@@ -69,8 +70,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma small_divisors :
-  forall (p:Z), (2%Z <= p)%Z ->
-  (forall (d:Z), (2%Z <= d)%Z -> prime d ->
+  forall (p:Numbers.BinNums.Z), (2%Z <= p)%Z ->
+  (forall (d:Numbers.BinNums.Z), (2%Z <= d)%Z -> prime d ->
    (1%Z < (d * d)%Z)%Z /\ ((d * d)%Z <= p)%Z ->
    ~ number.Divisibility.divides d p) ->
   prime p.
@@ -166,7 +167,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma even_prime :
-  forall (p:Z), prime p -> number.Parity.even p -> (p = 2%Z).
+  forall (p:Numbers.BinNums.Z), prime p -> number.Parity.even p -> (p = 2%Z).
 Proof.
 intros p Pp (q,Hq).
 generalize (proj2 Pp q).
@@ -185,7 +186,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma odd_prime :
-  forall (p:Z), prime p -> (3%Z <= p)%Z -> number.Parity.odd p.
+  forall (p:Numbers.BinNums.Z), prime p -> (3%Z <= p)%Z ->
+  number.Parity.odd p.
 Proof.
 intros p Pp Hp.
 apply <- Divisibility.odd_divides.

@@ -20,17 +20,19 @@ Require list.Mem.
 Require list.Append.
 
 (* Why3 assumption *)
-Inductive distinct {a:Type} {a_WT:WhyType a}: (list a) -> Prop :=
+Inductive distinct {a:Type} {a_WT:WhyType a}: Init.Datatypes.list a ->
+  Prop :=
   | distinct_zero : distinct Init.Datatypes.nil
   | distinct_one :
       forall (x:a), distinct (Init.Datatypes.cons x Init.Datatypes.nil)
   | distinct_many :
-      forall (x:a) (l:(list a)), ~ list.Mem.mem x l -> distinct l ->
-      distinct (Init.Datatypes.cons x l).
+      forall (x:a) (l:Init.Datatypes.list a), ~ list.Mem.mem x l ->
+      distinct l -> distinct (Init.Datatypes.cons x l).
 
 (* Why3 goal *)
 Lemma distinct_append {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)), distinct l1 -> distinct l2 ->
+  forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a),
+  distinct l1 -> distinct l2 ->
   (forall (x:a), list.Mem.mem x l1 -> ~ list.Mem.mem x l2) ->
   distinct (Init.Datatypes.app l1 l2).
 Proof.

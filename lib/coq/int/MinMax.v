@@ -20,7 +20,7 @@ Require int.Int.
 
 (* Why3 goal *)
 Lemma min_def :
-  forall (x:Z) (y:Z),
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((x <= y)%Z -> ((ZArith.BinInt.Z.min x y) = x)) /\
   (~ (x <= y)%Z -> ((ZArith.BinInt.Z.min x y) = y)).
 Proof.
@@ -36,7 +36,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma max_def :
-  forall (x:Z) (y:Z),
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((x <= y)%Z -> ((ZArith.BinInt.Z.max x y) = y)) /\
   (~ (x <= y)%Z -> ((ZArith.BinInt.Z.max x y) = x)).
 Proof.
@@ -49,31 +49,35 @@ Qed.
 
 (* Why3 goal *)
 Lemma Min_r :
-  forall (x:Z) (y:Z), (y <= x)%Z -> ((ZArith.BinInt.Z.min x y) = y).
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), (y <= x)%Z ->
+  ((ZArith.BinInt.Z.min x y) = y).
 exact Zmin_r.
 Qed.
 
 (* Why3 goal *)
 Lemma Max_l :
-  forall (x:Z) (y:Z), (y <= x)%Z -> ((ZArith.BinInt.Z.max x y) = x).
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), (y <= x)%Z ->
+  ((ZArith.BinInt.Z.max x y) = x).
 exact Zmax_l.
 Qed.
 
 (* Why3 goal *)
 Lemma Min_comm :
-  forall (x:Z) (y:Z), ((ZArith.BinInt.Z.min x y) = (ZArith.BinInt.Z.min y x)).
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  ((ZArith.BinInt.Z.min x y) = (ZArith.BinInt.Z.min y x)).
 exact Zmin_comm.
 Qed.
 
 (* Why3 goal *)
 Lemma Max_comm :
-  forall (x:Z) (y:Z), ((ZArith.BinInt.Z.max x y) = (ZArith.BinInt.Z.max y x)).
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  ((ZArith.BinInt.Z.max x y) = (ZArith.BinInt.Z.max y x)).
 exact Zmax_comm.
 Qed.
 
 (* Why3 goal *)
 Lemma Min_assoc :
-  forall (x:Z) (y:Z) (z:Z),
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (z:Numbers.BinNums.Z),
   ((ZArith.BinInt.Z.min (ZArith.BinInt.Z.min x y) z) =
    (ZArith.BinInt.Z.min x (ZArith.BinInt.Z.min y z))).
 Proof.
@@ -83,7 +87,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Max_assoc :
-  forall (x:Z) (y:Z) (z:Z),
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (z:Numbers.BinNums.Z),
   ((ZArith.BinInt.Z.max (ZArith.BinInt.Z.max x y) z) =
    (ZArith.BinInt.Z.max x (ZArith.BinInt.Z.max y z))).
 Proof.

@@ -18,7 +18,9 @@ Require int.Int.
 Require map.Map.
 
 (* Why3 goal *)
-Definition occ {a:Type} {a_WT:WhyType a} : a -> (Z -> a) -> Z -> Z -> Z.
+Definition occ {a:Type} {a_WT:WhyType a} :
+  a -> (Numbers.BinNums.Z -> a) -> Numbers.BinNums.Z -> Numbers.BinNums.Z ->
+  Numbers.BinNums.Z.
 Proof.
 intros v m l u.
 induction (Z.to_nat (u-l)) as [|delta occ_].
@@ -81,7 +83,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_empty {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m:Z -> a) (l:Z) (u:Z), (u <= l)%Z -> ((occ v m l u) = 0%Z).
+  forall (v:a) (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z),
+  (u <= l)%Z -> ((occ v m l u) = 0%Z).
 Proof.
 intros v m l u h1.
 assert (u - l <= 0)%Z as h1' by omega.
@@ -92,8 +96,10 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_right_no_add {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m:Z -> a) (l:Z) (u:Z), (l < u)%Z ->
-  ~ ((m (u - 1%Z)%Z) = v) -> ((occ v m l u) = (occ v m l (u - 1%Z)%Z)).
+  forall (v:a) (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z),
+  (l < u)%Z -> ~ ((m (u - 1%Z)%Z) = v) ->
+  ((occ v m l u) = (occ v m l (u - 1%Z)%Z)).
 Proof.
 intros v m l u h1 h2.
 rewrite occ_equation with (1 := h1).
@@ -102,7 +108,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_right_add {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m:Z -> a) (l:Z) (u:Z), (l < u)%Z -> ((m (u - 1%Z)%Z) = v) ->
+  forall (v:a) (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z),
+  (l < u)%Z -> ((m (u - 1%Z)%Z) = v) ->
   ((occ v m l u) = (1%Z + (occ v m l (u - 1%Z)%Z))%Z).
 Proof.
 intros v m l u h1 h2.
@@ -112,8 +120,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_left_no_add {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m:Z -> a) (l:Z) (u:Z), (l < u)%Z -> ~ ((m l) = v) ->
-  ((occ v m l u) = (occ v m (l + 1%Z)%Z u)).
+  forall (v:a) (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z),
+  (l < u)%Z -> ~ ((m l) = v) -> ((occ v m l u) = (occ v m (l + 1%Z)%Z u)).
 Proof.
 intros v m l u h1 h2.
 rewrite occ_equation' with (1 := h1).
@@ -122,7 +131,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_left_add {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m:Z -> a) (l:Z) (u:Z), (l < u)%Z -> ((m l) = v) ->
+  forall (v:a) (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z),
+  (l < u)%Z -> ((m l) = v) ->
   ((occ v m l u) = (1%Z + (occ v m (l + 1%Z)%Z u))%Z).
 Proof.
 intros v m l u h1 h2.
@@ -132,8 +143,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_bounds {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m:Z -> a) (l:Z) (u:Z), (l <= u)%Z ->
-  (0%Z <= (occ v m l u))%Z /\ ((occ v m l u) <= (u - l)%Z)%Z.
+  forall (v:a) (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z),
+  (l <= u)%Z -> (0%Z <= (occ v m l u))%Z /\ ((occ v m l u) <= (u - l)%Z)%Z.
 Proof.
 intros v m l u h1.
 cut (0 <= u - l)%Z. 2: omega.
@@ -165,7 +177,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_append {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m:Z -> a) (l:Z) (mid:Z) (u:Z),
+  forall (v:a) (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (mid:Numbers.BinNums.Z) (u:Numbers.BinNums.Z),
   (l <= mid)%Z /\ (mid <= u)%Z ->
   ((occ v m l u) = ((occ v m l mid) + (occ v m mid u))%Z).
 Proof.
@@ -210,8 +223,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_neq {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m:Z -> a) (l:Z) (u:Z),
-  (forall (i:Z), (l <= i)%Z /\ (i < u)%Z -> ~ ((m i) = v)) ->
+  forall (v:a) (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z),
+  (forall (i:Numbers.BinNums.Z), (l <= i)%Z /\ (i < u)%Z -> ~ ((m i) = v)) ->
   ((occ v m l u) = 0%Z).
 Proof.
 intros v m l u.
@@ -238,8 +252,10 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_exists {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m:Z -> a) (l:Z) (u:Z), (0%Z < (occ v m l u))%Z ->
-  exists i:Z, ((l <= i)%Z /\ (i < u)%Z) /\ ((m i) = v).
+  forall (v:a) (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z),
+  (0%Z < (occ v m l u))%Z ->
+  exists i:Numbers.BinNums.Z, ((l <= i)%Z /\ (i < u)%Z) /\ ((m i) = v).
 Proof.
 intros v m l u h1.
 assert (h: (u < l \/ 0 <= u - l)%Z) by omega. destruct h.
@@ -263,8 +279,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_pos {a:Type} {a_WT:WhyType a} :
-  forall (m:Z -> a) (l:Z) (u:Z) (i:Z), (l <= i)%Z /\ (i < u)%Z ->
-  (0%Z < (occ (m i) m l u))%Z.
+  forall (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z) (i:Numbers.BinNums.Z),
+  (l <= i)%Z /\ (i < u)%Z -> (0%Z < (occ (m i) m l u))%Z.
 Proof.
 intros m l u i (h1,h2).
 pose (v := m i). fold v.
@@ -284,8 +301,10 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_eq {a:Type} {a_WT:WhyType a} :
-  forall (v:a) (m1:Z -> a) (m2:Z -> a) (l:Z) (u:Z),
-  (forall (i:Z), (l <= i)%Z /\ (i < u)%Z -> ((m1 i) = (m2 i))) ->
+  forall (v:a) (m1:Numbers.BinNums.Z -> a) (m2:Numbers.BinNums.Z -> a)
+    (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z),
+  (forall (i:Numbers.BinNums.Z), (l <= i)%Z /\ (i < u)%Z ->
+   ((m1 i) = (m2 i))) ->
   ((occ v m1 l u) = (occ v m2 l u)).
 Proof.
 intros v m1 m2 l u h1.
@@ -355,7 +374,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma occ_exchange {a:Type} {a_WT:WhyType a} :
-  forall (m:Z -> a) (l:Z) (u:Z) (i:Z) (j:Z) (x:a) (y:a) (z:a),
+  forall (m:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z) (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z) 
+    (x:a) (y:a) (z:a),
   (l <= i)%Z /\ (i < u)%Z -> (l <= j)%Z /\ (j < u)%Z -> ~ (i = j) ->
   ((occ z (map.Map.set (map.Map.set m i x) j y) l u) =
    (occ z (map.Map.set (map.Map.set m i y) j x) l u)).
