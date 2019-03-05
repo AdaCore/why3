@@ -116,7 +116,7 @@ val gen_syntax_arguments_typed_prec :
 
 val syntax_arguments_typed_prec :
   string -> (int -> term Pp.pp) -> ty Pp.pp -> term -> int list -> term list Pp.pp
-(** (syntax_arguments_typed templ print_arg prec_list fmt l) prints in the
+(** (syntax_arguments_typed_prec templ print_arg prec_list fmt l) prints in the
     formatter fmt the list l using the template templ, the printer print_arg
     and the precedence list prec_list  *)
 
