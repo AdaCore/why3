@@ -59,8 +59,8 @@ module C = struct
     | Eindex of expr * expr (* Array access *)
     | Edot of expr * string (* Field access with dot *)
     | Earrow of expr * string (* Pointer access with arrow *)
-    | Esyntax of string * ty * (ty array) * (expr*ty) list
-  (* template, type and type arguments of result, typed arguments *)
+    | Esyntax of string * ty * (ty array) * (expr*ty) list * int list
+  (* template, type and type arguments of result, typed arguments, precedence level *)
 
   and constant =
     | Cint of string
@@ -171,8 +171,8 @@ module C = struct
                                 propagate_in_expr id v e2)
     | Edot (e,i) -> Edot (propagate_in_expr id v e, i)
     | Earrow (e,i) -> Earrow (propagate_in_expr id v e, i)
-    | Esyntax (s,t,ta,l) ->
-      Esyntax (s,t,ta,List.map (fun (e,t) -> (propagate_in_expr id v e),t) l)
+    | Esyntax (s,t,ta,l,p) ->
+      Esyntax (s,t,ta,List.map (fun (e,t) -> (propagate_in_expr id v e),t) l,p)
     | Enothing -> Enothing
     | Econst c -> Econst c
     | Elikely e -> Elikely (propagate_in_expr id v e)
@@ -399,7 +399,7 @@ module C = struct
     | Esize_expr _ -> false
     | Esize_type _ -> true
     | Eindex (_,_) | Edot (_,_) | Earrow (_,_) -> false
-    | Esyntax (_,_,_,_) -> false
+    | Esyntax (_,_,_,_,_) -> false
 
   let rec get_const_expr (d,s) =
     let fail () = raise (Unsupported "non-constant array size") in
@@ -431,6 +431,14 @@ module C = struct
     | Tsyntax (_, lty) -> List.exists should_not_escape lty
     | _ -> false
 
+  let left_assoc = function
+    | Band | Bor | Beq | Bne | Blt | Ble | Bgt | Bge -> true
+    | Bassign -> false
+
+  let right_assoc = function
+    | Bassign -> true
+    | _ -> false
+
 end
 
 type info = {
@@ -442,6 +450,7 @@ type info = {
   syntax      : Printer.syntax_map;
   literal     : Printer.syntax_map; (*TODO handle literals*)
   kn          : Pdecl.known_map;
+  prec        : (int list) Mid.t;
 }
 
 let debug_c_extraction = Debug.register_info_flag
@@ -488,9 +497,7 @@ module Print = struct
   let rec print_ty ?(paren=false) fmt = function
     | Tvoid -> fprintf fmt "void"
     | Tsyntax (s, tl) ->
-      syntax_arguments
-	s
-        (print_ty ~paren:false) fmt tl
+      syntax_arguments s (print_ty ~paren:false) fmt tl
     | Tptr ty -> fprintf fmt "%a *" (print_ty ~paren:true) ty
     (* should be handled in extract_stars *)
     | Tarray (ty, Enothing) ->
@@ -528,48 +535,51 @@ module Print = struct
     | Bge -> fprintf fmt ">="
 
   and print_expr ~prec fmt = function
+    (* invariant: 0 <= prec <= 15 *)
     | Enothing -> ()
     | Eunop(u,e) ->
        let p = prec_unop u in
        if unop_postfix u
-       then fprintf fmt (protect_on (prec <= p) "%a%a")
-              (print_expr ~prec:p) e print_unop u
-       else fprintf fmt (protect_on (prec <= p) "%a%a")
-              print_unop u (print_expr ~prec:p) e
+       then fprintf fmt (protect_on (prec < p) "%a%a")
+              (print_expr ~prec:(p-1)) e print_unop u
+       else fprintf fmt (protect_on (prec < p) "%a%a")
+              print_unop u (print_expr ~prec:(p-1)) e
     | Ebinop(b,e1,e2) ->
        let p = prec_binop b in
-       fprintf fmt (protect_on (prec <= p) "%a %a %a")
-        (print_expr ~prec:p) e1 print_binop b (print_expr ~prec:p) e2
+       let pleft = if left_assoc b then p else p-1 in
+       let pright = if right_assoc b then p else p-1 in
+       fprintf fmt (protect_on (prec < p) "%a %a %a")
+         (print_expr ~prec:pleft) e1 print_binop b (print_expr ~prec:pright) e2
     | Equestion(c,t,e) ->
-      fprintf fmt (protect_on (prec <= 13) "%a ? %a : %a")
-        (print_expr ~prec:13) c
-        (print_expr ~prec:13) t
+      fprintf fmt (protect_on (prec < 13) "%a ? %a : %a")
+        (print_expr ~prec:12) c
+        (print_expr ~prec:15) t
         (print_expr ~prec:13) e
     | Ecast(ty, e) ->
-      fprintf fmt (protect_on (prec <= 2) "(%a)%a")
+      fprintf fmt (protect_on (prec < 2) "(%a)%a")
         (print_ty ~paren:false) ty (print_expr ~prec:2) e
-    | Ecall (Esyntax (s, _, _, []), l) ->
+    | Ecall (Esyntax (s, _, _, [],_), l) ->
        (* function defined in the prelude *)
-       fprintf fmt (protect_on (prec <= 1) "%s(%a)")
+       fprintf fmt (protect_on (prec < 1) "%s(%a)")
          s (print_list comma (print_expr ~prec:15)) l
     | Ecall (e,l) ->
-       fprintf fmt (protect_on (prec <= 1) "%a(%a)")
+       fprintf fmt (protect_on (prec < 1) "%a(%a)")
          (print_expr ~prec:1) e (print_list comma (print_expr ~prec:15)) l
     | Econst c -> print_const fmt c
     | Evar id -> print_local_ident fmt id
     | Elikely e -> fprintf fmt
-                     (protect_on (prec <= 1) "__builtin_expect(%a,1)")
+                     (protect_on (prec < 1) "__builtin_expect(%a,1)")
                      (print_expr ~prec:15) e
     | Eunlikely e -> fprintf fmt
-                       (protect_on (prec <= 1) "__builtin_expect(%a,0)")
+                       (protect_on (prec < 1) "__builtin_expect(%a,0)")
                        (print_expr ~prec:15) e
     | Esize_expr e ->
-       fprintf fmt (protect_on (prec <= 2) "sizeof(%a)") (print_expr ~prec:15) e
+       fprintf fmt (protect_on (prec < 2) "sizeof(%a)") (print_expr ~prec:15) e
     | Esize_type ty ->
-       fprintf fmt (protect_on (prec <= 2) "sizeof(%a)")
+       fprintf fmt (protect_on (prec < 2) "sizeof(%a)")
          (print_ty ~paren:false) ty
     | Edot (e,s) ->
-       fprintf fmt (protect_on (prec <= 1) "%a.%s")
+       fprintf fmt (protect_on (prec < 1) "%a.%s")
          (print_expr ~prec:1) e s
     | Eindex (e1, e2) ->
        fprintf fmt (protect_on (prec <= 1) "%a[%a]")
@@ -578,12 +588,20 @@ module Print = struct
     | Earrow (e,s) ->
        fprintf fmt (protect_on (prec <= 1) "%a->%s")
          (print_expr ~prec:1) e s
-    | Esyntax (s, t, args, lte) ->
-       (* no way to know precedence, so full parentheses*)
-       gen_syntax_arguments_typed snd (fun _ -> args)
-         (if prec <= 13 then ("("^s^")") else s)
-         (fun fmt (e,_t) -> print_expr ~prec:1 fmt e)
-         (print_ty ~paren:false) (C.Enothing,t) fmt lte
+    | Esyntax (s, t, args, lte, pl) ->
+       if s = "%1" (*identity*)
+       then begin
+         assert (List.length lte = 1);
+         print_expr ~prec fmt (fst (List.hd lte)) end
+       else
+         let s =
+           if pl = [] || prec < List.hd pl
+           then Format.sprintf "(%s)" s
+           else s in
+         gen_syntax_arguments_typed_prec snd (fun _ -> args)
+           s
+           (fun p fmt (e,_t) -> print_expr ~prec:p fmt e)
+           (print_ty ~paren:false) (C.Enothing,t) pl fmt lte
 
   and print_const  fmt = function
     | Cint s | Cfloat s | Cchar s | Cstring s -> fprintf fmt "%s" s
@@ -983,14 +1001,15 @@ module MLToC = struct
 		    | Tyapp (_,args) ->
                        Array.of_list (List.map (ty_of_ty info) args)
 		  in
-		  C.Esyntax(s,ty_of_ty info rty, rtyargs, params)
+                  let p = Mid.find rs.rs_name info.prec in
+		  C.Esyntax(s,ty_of_ty info rty, rtyargs, params, p)
                 with Not_found ->
                   if args=[]
-                  then C.(Esyntax(s, Tnosyntax, [||], [])) (*constant*)
+                  then C.(Esyntax(s, Tnosyntax, [||], [], [])) (*constant*)
                   else
                     (*function defined in the prelude *)
                     let cargs = List.map fst params in
-		    C.(Ecall(Esyntax(s, Tnosyntax, [||], []), cargs))
+		    C.(Ecall(Esyntax(s, Tnosyntax, [||], [], []), cargs))
               end
            | None ->
               match rs.rs_field with
@@ -1174,7 +1193,8 @@ module MLToC = struct
 	      | Tyapp (_,args) ->
                  Array.of_list (List.map (ty_of_ty info) args)
 	    in
-            C.Esyntax(s,ty_of_ty info rty, rtyargs, params)
+            let p = Mid.find rs.rs_name info.prec in
+            C.Esyntax(s,ty_of_ty info rty, rtyargs, params,p)
          | None -> if boxed
                    then C.(Earrow(Evar id, rs.rs_name.id_string))
                    else C.(Edot(Evar id, rs.rs_name.id_string)) in
@@ -1388,6 +1408,7 @@ let mk_info (args:Pdriver.printer_args) m = {
     blacklist = args.Pdriver.blacklist;
     syntax = args.Pdriver.syntax;
     literal = args.Pdriver.literal;
+    prec = args.Pdriver.prec;
     kn = m.Pmodule.mod_known }
 
 let print_header_decl =

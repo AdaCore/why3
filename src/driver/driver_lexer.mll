@@ -46,6 +46,7 @@
         "transformation", TRANSFORM;
         "plugin", PLUGIN;
         "blacklist", BLACKLIST;
+        "prec", PREC;
         (* WhyML *)
         "module", MODULE;
         "exception", EXCEPTION;
