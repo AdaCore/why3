@@ -43,9 +43,9 @@ void mpn_dump(mp_ptr ap, mp_size_t an) {
 }
 
 void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
-  for (int i = 0; i <= an; i++)
+  for (int i = 0; i < an; i++)
     ap[i] = genrand64_int64();
-  for (int i = 0; i <= bn; i++)
+  for (int i = 0; i < bn; i++)
     bp[i] = genrand64_int64();
   while (bp[bn-1]==0)
     bp[bn-1] = genrand64_int64();
@@ -56,6 +56,7 @@ int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr;
   mp_size_t max_n, max_add, max_mul, max_toom, max_div, an, bn, rn;
 #ifdef BENCH
+  int nb, nb_iter;
   struct timeval begin, end;
   double elapsed;
 #endif
@@ -71,7 +72,11 @@ int main () {
   //gmp_randseed_ui(rands, 42);
   /* Re-interpret reps argument as a size argument.  */
 
+#ifdef BENCH
+  init_genrand64(0);
+#else
   init_genrand64((unsigned long long)time(NULL));
+#endif
   max_n = 1000;
   max_add = 50;
   max_mul = 20;
@@ -90,7 +95,7 @@ int main () {
 
 #ifdef TEST_ADD
 #ifdef BENCH
-  printf ("#an bn t(s)\n");
+  printf ("#an bn t(µs)\n");
 #endif
   for (an = 2; an <= max_add; an += 1)
     {
@@ -99,10 +104,12 @@ int main () {
 	  init_valid (ap, bp, an, bn);
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 1000; ++iter) {
+          nb_iter = 1000;
+          for (int iter = 0; iter != nb_iter; ++iter) {
             init_valid (ap, bp, an, bn);
+            nb = 10000 / an;
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 100; ++i)
+            for (int i = 0; i != nb; ++i)
               {
 #endif
 
@@ -117,10 +124,11 @@ int main () {
               }
             gettimeofday(&end, NULL);
             elapsed +=
-            (end.tv_sec - begin.tv_sec)
-            + ((end.tv_usec - begin.tv_usec)/1000000.0);
+            (end.tv_sec - begin.tv_sec) * 1000000.0
+            + (end.tv_usec - begin.tv_usec);
           }
-          printf ("%d %d %f\n", an, bn, elapsed);
+          elapsed = elapsed / (nb * nb_iter);
+          printf ("%d %d %g\n", an, bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -155,7 +163,7 @@ int main () {
 #endif
 #ifdef TEST_MUL
 #ifdef BENCH
-  printf ("#an bn t(s)\n");
+  printf ("#an bn t(µs)\n");
 #endif
   for (an = 2; an <= max_mul; an += 1)
     {
@@ -164,10 +172,12 @@ int main () {
 	  init_valid (ap, bp, an, bn);
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 500; ++iter) {
+          nb_iter = 500;
+          for (int iter = 0; iter != nb_iter; ++iter) {
             init_valid (ap, bp, an, bn);
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 100; ++i)
+            nb = 5000 / an;
+            for (int i = 0; i != nb; ++i)
               {
 #endif
 #if defined(TEST_GMP) || defined(TEST_MINIGMP)
@@ -181,10 +191,11 @@ int main () {
               }
             gettimeofday(&end, NULL);
             elapsed +=
-            (end.tv_sec - begin.tv_sec)
-            + ((end.tv_usec - begin.tv_usec)/1000000.0);
+            (end.tv_sec - begin.tv_sec) * 1000000.0
+            + (end.tv_usec - begin.tv_usec);
           }
-          printf ("%d %d %f\n", an, bn, elapsed);
+          elapsed = elapsed / (nb * nb_iter);
+          printf ("%d %d %g\n", an, bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -210,7 +221,7 @@ int main () {
 
 #ifdef TEST_TOOM
 #ifdef BENCH
-  printf ("#an bn t(s)\n");
+  printf ("#an bn t(µs)\n");
 #endif
 
   for (bn = 35; bn <= max_toom; bn += 2)
@@ -221,10 +232,12 @@ int main () {
       init_valid (ap, bp, an, bn);
 #ifdef BENCH
       elapsed = 0;
-      for (int iter = 0; iter != 500; ++iter) {
+      nb_iter = 500;
+      for (int iter = 0; iter != nb_iter; ++iter) {
         init_valid (ap, bp, an, bn);
         gettimeofday(&begin, NULL);
-        for (int i = 0; i != 100; ++i)
+        nb = 5000 / bn;
+        for (int i = 0, maxi = nb; i != maxi; ++i)
           {
 #endif
 #if defined(TEST_GMP) || defined(TEST_MINIGMP)
@@ -238,10 +251,11 @@ int main () {
           }
         gettimeofday(&end, NULL);
         elapsed +=
-          (end.tv_sec - begin.tv_sec)
-          + ((end.tv_usec - begin.tv_usec)/1000000.0);
+          (end.tv_sec - begin.tv_sec) * 1000000.0
+          + (end.tv_usec - begin.tv_usec);
       }
-      printf ("%d %d %f\n", an, bn, elapsed);
+      elapsed = elapsed / (nb * nb_iter);
+      printf ("%d %d %g\n", an, bn, elapsed);
       if (an==bn)
         printf ("\n"); //for gnuplot
 #endif
@@ -267,7 +281,7 @@ int main () {
 
 #ifdef TEST_DIV
 #ifdef BENCH
-  printf ("#an bn t(s)\n");
+  printf ("#an bn t(µs)\n");
 #endif
   for (an = 2; an <= max_div; an += 1)
     {
@@ -280,13 +294,15 @@ int main () {
 
 #ifdef BENCH
           elapsed = 0;
-          for (int iter = 0; iter != 1000; ++iter) {
+          nb_iter = 1000;
+          for (int iter = 0; iter != nb_iter; ++iter) {
             init_valid (ap, bp, an, bn);
 #ifdef TEST_MINIGMP
             mpn_copyi(refr, ap, an);
 #endif
             gettimeofday(&begin, NULL);
-            for (int i = 0; i != 100; ++i)
+            nb = 1500 / an;
+            for (int i = 0; i != nb; ++i)
               {
 #endif
 #ifdef TEST_GMP
@@ -303,10 +319,11 @@ int main () {
               }
             gettimeofday(&end, NULL);
             elapsed +=
-              (end.tv_sec - begin.tv_sec)
-              + ((end.tv_usec - begin.tv_usec)/1000000.0);
+              (end.tv_sec - begin.tv_sec) * 1000000.0
+              + (end.tv_usec - begin.tv_usec);
           }
-          printf ("%d %d %f\n", an, bn, elapsed);
+          elapsed = elapsed / (nb * nb_iter);
+          printf ("%d %d %g\n", an, bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
