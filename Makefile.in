@@ -286,15 +286,15 @@ src/util/strings.cmx:: WARNINGS:=$(WARNINGS)-3
 
 # compiler plugins
 
-ifeq (@enable_compiler_plugins@,yes)
-src/util/debug_optim.cmxs: src/util/debug_optim.ml
-	$(SHOW) 'Linking $@'
-	$(HIDE)$(OCAMLOPT) -I @COMPILERLIBS@ -shared src/util/debug_optim.ml -o $@
-src/transform/reflection.cmx: src/util/debug_optim.cmxs
-src/transform/reflection.cmx: OFLAGS += -plugin debug_optim.cmxs
-src/mlw/mlinterp.cmx: src/util/debug_optim.cmxs
-src/mlw/mlinterp.cmx: OFLAGS += -plugin debug_optim.cmxs
-endif
+# ifeq (@enable_compiler_plugins@,yes)
+# src/util/debug_optim.cmxs: src/util/debug_optim.ml
+# 	$(SHOW) 'Linking $@'
+# 	$(HIDE)$(OCAMLOPT) -I @COMPILERLIBS@ -shared src/util/debug_optim.ml -o $@
+# src/transform/reflection.cmx: src/util/debug_optim.cmxs
+# src/transform/reflection.cmx: OFLAGS += -plugin debug_optim.cmxs
+# src/mlw/mlinterp.cmx: src/util/debug_optim.cmxs
+# src/mlw/mlinterp.cmx: OFLAGS += -plugin debug_optim.cmxs
+# endif
 
 # build targets
 
