@@ -16,7 +16,7 @@
 module CoincidenceCount
 
   use list.List
-  use set.Fset
+  use set.SetAppInt
   use list.Elements
   use list.Mem as L
   use int.Int
@@ -24,7 +24,7 @@ module CoincidenceCount
   clone export list.Sorted
      with type t = int, predicate le = (<), goal Transitive.Trans
 
-  let rec coincidence_count (a b: list int) : set int
+  let rec coincidence_count (a b: list int) : set
     requires { sorted a }
     requires { sorted b }
     ensures  { result == inter (elements a) (elements b) }
@@ -39,7 +39,7 @@ module CoincidenceCount
        else
          coincidence_count a tb
     | _ ->
-       empty
+       empty ()
     end
 
 end
@@ -49,7 +49,6 @@ end
 module CoincidenceCountAnyType
 
   use list.List
-  use set.Fset
   use list.Elements
   use list.Mem as L
   use int.Int
@@ -58,6 +57,9 @@ module CoincidenceCountAnyType
 
   val predicate eq (x y : t)
     ensures { result <-> x = y }
+
+  clone set.SetApp with type elt = t, val eq = eq
+
   val predicate rel (x y : t)
 
   clone relations.TotalStrictOrder with type t, predicate rel, axiom .
@@ -65,7 +67,7 @@ module CoincidenceCountAnyType
   clone export list.Sorted
      with type t = t, predicate le = rel, goal Transitive.Trans
 
-  let rec coincidence_count (a b: list t) : set t
+  let rec coincidence_count (a b: list t) : set
     requires { sorted a }
     requires { sorted b }
     ensures  { result == inter (elements a) (elements b) }
@@ -80,7 +82,7 @@ module CoincidenceCountAnyType
        else
          coincidence_count a tb
     | _ ->
-       empty
+       empty ()
     end
 
 end

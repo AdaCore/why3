@@ -8,7 +8,7 @@ use export real.RealInfix
 type pt = { x : real ; y : real }
 
 function crossproduct (p1 p2 p3:pt) : real =
-  (p2.x -. p1.x) *. (p3.y -. p1.y) -. (p3.x -. p1.x) *. (p2.y -. p1.y) 
+  (p2.x -. p1.x) *. (p3.y -. p1.y) -. (p3.x -. p1.x) *. (p2.y -. p1.y)
 
 predicate colinear (p1 p2 p3:pt) = crossproduct p1 p2 p3 = 0.0
 
@@ -21,14 +21,14 @@ lemma knuth2:
   forall p1 p2 p3:pt. turns_left p1 p2 p3 -> not (turns_left p2 p1 p3)
 
 lemma knuth4:
-  forall p1 p2 p3 p4:pt. 
+  forall p1 p2 p3 p4:pt.
     turns_left p1 p2 p4 ->
-    turns_left p2 p3 p4 -> 
-    turns_left p3 p1 p4 -> 
+    turns_left p2 p3 p4 ->
+    turns_left p3 p1 p4 ->
     turns_left p1 p2 p3
 
 lemma knuth5:
-  forall p1 p2 p3 p4 p5:pt. 
+  forall p1 p2 p3 p4 p5:pt.
     turns_left p1 p2 p3 ->
     turns_left p1 p2 p4 ->
     turns_left p1 p2 p5 ->
@@ -36,11 +36,11 @@ lemma knuth5:
     turns_left p4 p2 p5 ->
     turns_left p3 p2 p5
 
-lemma knuth3: 
+lemma knuth3:
   forall p1 p2 p3:pt.
    not (colinear p1 p2 p3) -> turns_left p1 p2 p3 \/ turns_left p1 p3 p2
 
-    
+
 (* test: p1 = (0,0), p2 = (1,0) p3 = (1,1) *)
 
 goal test1 :
@@ -85,7 +85,7 @@ module Jarvis
 (*
 
 on calcule le point p d'ordonnee minimale, et d'abscisse minimale
-parmi ceux-ci 
+parmi ceux-ci
 
 on recherche le point q minimum pour la relation R x y = turns_left p x y
 
@@ -98,13 +98,13 @@ si q = p0: fini
 *)
 
 use ConvexSet
-use set.Fset
+clone set.SetApp with type elt = pt
 use ref.Ref
 
 val predicate lower (p q:pt)
   ensures { result <-> p.y <. q.y \/ (p.y = q.y /\ p.x <=. q.x) }
 
-let lowest_pt (s:set pt) : (pt, set pt)
+let lowest_pt (s:set) : (pt, set)
   requires { not (is_empty s) }
   ensures { let (p,r) = result in
     s = add p r /\ forall q:pt. mem q r -> lower p q }
@@ -144,7 +144,7 @@ let rightest_pt (p:pt) (s:set pt) : (pt, set pt)
 let jarvis (s:set pt) : list pt =
    let p0 = lowest_pt s in
 *)
-   
+
 
 end
 
@@ -163,20 +163,20 @@ let convex_hull (l:path) : path =
   ensures { is_ccw_convex result }
     (* all pt of the input are inside the convex hull of the output *)
   ensures { forall p:pt. List.mem p l /\ not List.mem p result ->
-    is_inside_convex_hull p result  
+    is_inside_convex_hull p result
   }
   let min,rem = find_minimum_pt l in
   let sorted = sorted_increasing_angle min rem in
   match sorted with
     | Nil -> l
-    | Cons p r -> 
+    | Cons p r ->
        let done = ref (Cons p min) in
        let todo = ref r in
        try while true do
          match !todo with
-         | Nil -> 
+         | Nil ->
        with Exit -> !done
- 
+
 *)
 
 end

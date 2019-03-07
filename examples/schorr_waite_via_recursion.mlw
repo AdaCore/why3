@@ -118,7 +118,7 @@ module GraphShape
   (** DFS invariant. For technical reason, it must refer to different parts
      of the memory at different time. The graph structure is given
      via the initial memory, but the coloring is given via the current one. *)
-  predicate well_colored_on (graph gray:set loc) (m:memory) (cl:map loc color) =
+  predicate well_colored_on (graph gray:fset loc) (m:memory) (cl:map loc color) =
     subset gray graph /\
     (forall x y. mem x graph /\ edge m x y /\ y <> null /\ black cl[x] ->
       mem x gray \/ black cl[y]) /\
@@ -150,7 +150,7 @@ module SchorrWaite
 
   exception Stop
 
-  let schorr_waite (root: loc) (ghost graph: set loc) : unit
+  let schorr_waite (root: loc) (ghost graph: fset loc) : unit
     (** Root belong to graph (note: for simplicity, the graph set
         may (and likely does) contain the null pointer. *)
     requires { mem root graph }
@@ -245,7 +245,7 @@ module SchorrWaite
           set_color !p (Black (Some 0))
         end
     in
-    let rec aux (ghost gray:set loc) : unit
+    let rec aux (ghost gray:fset loc) : unit
       (* DFS invariant *)
       requires { well_colored_on graph gray (memo at I) memo.colors }
       requires { mem !t graph }

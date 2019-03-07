@@ -1,5 +1,13 @@
 :x: marks a potential source of incompatibility
 
+Standard library
+  * set library revamped
+    - set.Fset
+      type `set` -> type `fset` and `choose` -> `pick`
+    - `appset.Appset` -> `set.SetApp` and `impset.Impset` -> `set.SetImp`
+      type `t` -> `set` and `.contents` -> `.to_fset`
+      `empty` -> `empty ()`
+
 Tools
   * why3prove counterexamples output is not JSON by default. To restore previous
    behavior, pass the argument --json

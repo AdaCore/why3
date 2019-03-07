@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../pigeonhole.mlw" proved="true">
+<file proved="true">
+<path name=".."/>
+<path name="pigeonhole.mlw"/>
 <theory name="Pigeonhole" proved="true">
  <goal name="VC below" expl="VC for below" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="87"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="94"/></proof>
  </goal>
  <goal name="VC pigeonhole" expl="VC for pigeonhole" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -17,13 +19,13 @@
   <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
   <goal name="VC pigeonhole.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.00" steps="21"/></proof>
+  <proof prover="0"><result status="valid" time="0.00" steps="24"/></proof>
   </goal>
   <goal name="VC pigeonhole.3" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
   <goal name="VC pigeonhole.4" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="62"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="65"/></proof>
   </goal>
   <goal name="VC pigeonhole.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>

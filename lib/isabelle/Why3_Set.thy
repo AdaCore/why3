@@ -30,7 +30,7 @@ why3_vc diff_spec by (simp add: mem_def)
 
 why3_vc inter_def by simp
 
-why3_vc mem_empty by (simp add: const_def mem_def set.Set.is_empty_def)
+why3_vc is_empty_empty by (simp add: const_def mem_def set.Set.is_empty_def)
 
 why3_vc union_def by simp
 

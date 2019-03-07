@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
@@ -75,7 +75,7 @@
    <goal name="VC dfs.20.0" expl="postcondition" proved="true">
    <transf name="split_goal_right" proved="true" >
     <goal name="VC dfs.20.0.0" expl="VC for dfs" proved="true">
-    <proof prover="3"><result status="valid" time="0.42"/></proof>
+    <proof prover="3"><result status="valid" time="0.21"/></proof>
     </goal>
     <goal name="VC dfs.20.0.1" expl="VC for dfs" proved="true">
     <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -83,12 +83,12 @@
     <goal name="VC dfs.20.0.2" expl="VC for dfs" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="VC dfs.20.0.2.0" expl="VC for dfs" proved="true">
-     <proof prover="3"><result status="valid" time="0.40"/></proof>
+     <proof prover="3"><result status="valid" time="1.37"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="VC dfs.20.0.3" expl="VC for dfs" proved="true">
-    <proof prover="3"><result status="valid" time="0.84"/></proof>
+    <proof prover="3"><result status="valid" time="0.64"/></proof>
     </goal>
    </transf>
    </goal>
@@ -161,7 +161,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC topo_order.10" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.10"/></proof>
+  <proof prover="3"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="VC topo_order.11" expl="exceptional postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -250,7 +250,7 @@
   <proof prover="3"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC dfs.19" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="162"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="116"/></proof>
   </goal>
   <goal name="VC dfs.20" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.07"/></proof>

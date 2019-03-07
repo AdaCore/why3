@@ -298,21 +298,16 @@ theory set.Set
   remove prop      mem_empty
 
   syntax function add "add(%1, %2)"
-  remove prop     add_spec
   syntax function singleton "singleton(%1)"
 
   syntax function remove "remove(%1, %2)"
-  remove prop     remove_spec
   remove prop     subset_remove
 
   syntax function union "union(%1, %2)"
-  remove prop     union_spec
 
   syntax function inter "intersection(%1, %2)"
-  remove prop     inter_spec
 
   syntax function diff "difference(%1, %2)"
-  remove prop     diff_spec
   remove prop     subset_diff
 
   (* TODO: choose *)
@@ -321,7 +316,7 @@ theory set.Set
 end
 
 theory set.Fset
-  syntax type set "finite_set[%1]"
+  syntax type fset "finite_set[%1]"
 
   syntax predicate mem "member(%1, %2)"
   remove prop      extensionality
@@ -331,24 +326,25 @@ theory set.Fset
 
   syntax function  empty    "(emptyset :: %t0)"
   syntax predicate is_empty "empty?(%1)"
-  remove prop      empty_def
+  remove prop      is_empty_empty
+  remove prop      empty_is_empty
 
   syntax function add "add(%1, %2)"
-  remove prop     add_spec
+  remove prop     add_def
   syntax function singleton "singleton(%1)"
 
   syntax function remove "remove(%1, %2)"
-  remove prop     remove_spec
+  remove prop     remove_def
   remove prop     subset_remove
 
   syntax function union "union(%1, %2)"
-  remove prop     union_spec
+  remove prop     union_def
 
   syntax function inter "intersection(%1, %2)"
-  remove prop     inter_spec
+  remove prop     inter_def
 
   syntax function diff "difference(%1, %2)"
-  remove prop     diff_spec
+  remove prop     diff_def
   remove prop     subset_diff
 
   (* TODO: choose *)

@@ -278,21 +278,6 @@ module mach.int.State63
   syntax val random_int63 "REMOVE"
 end
 
-module set.Fset
-  syntax val mem      "REMOVE"
-  syntax val (==)     "REMOVE"
-  syntax val subset   "REMOVE"
-  syntax val is_empty "REMOVE"
-  syntax val empty    "REMOVE"
-  syntax val add      "REMOVE"
-  syntax val remove   "REMOVE"
-  syntax val union    "REMOVE"
-  syntax val inter    "REMOVE"
-  syntax val diff     "REMOVE"
-  syntax val choose   "REMOVE"
-  syntax val cardinal "REMOVE"
-end
-
 module mach.peano.Peano
   syntax type t      "int"
   syntax val  to_int "Z.of_int %1"

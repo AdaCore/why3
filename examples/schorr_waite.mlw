@@ -172,7 +172,7 @@ module SchorrWaite
 
   (** Schorr-Waite algorithm *)
 
-  let schorr_waite (root: loc) (ghost graph : S.set loc) : unit
+  let schorr_waite (root: loc) (ghost graph : S.fset loc) : unit
     requires { root <> null /\ S.mem root graph }
     (* graph is closed under left and right *)
     requires { forall n : loc. S.mem n graph ->

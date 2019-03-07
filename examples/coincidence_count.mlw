@@ -14,15 +14,15 @@
 
 module CoincidenceCount
 
+  use int.Int
   use array.Array
   use ref.Refint
-  use set.Fsetint
-  use set.FsetComprehension
+  use set.FsetInt
 
-  function setof (a: array 'a) : set 'a =
+  function setof (a: array 'a) : fset 'a =
     map (fun x -> a[x]) (interval 0 (length a))
 
-  function drop (a: array 'a) (n: int) : set 'a =
+  function drop (a: array 'a) (n: int) : fset 'a =
     map (fun x -> a[x]) (interval n (length a))
 
   lemma drop_left:
@@ -36,11 +36,11 @@ module CoincidenceCount
     cardinal (inter (setof a) (setof b))
 
   lemma not_mem_inter_r:
-    forall a: array int, i: int, s: set int. 0 <= i < length a ->
+    forall a: array int, i: int, s: fset int. 0 <= i < length a ->
     not (mem a[i] s) -> inter (drop a i) s == inter (drop a (i+1)) s
 
   lemma not_mem_inter_l:
-    forall a: array int, i: int, s: set int. 0 <= i < length a ->
+    forall a: array int, i: int, s: fset int. 0 <= i < length a ->
     not (mem a[i] s) -> inter s (drop a i) == inter s (drop a (i+1))
 
   let coincidence_count (a b: array int) : int

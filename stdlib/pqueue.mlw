@@ -81,7 +81,7 @@ module PqueueNoDup
 
   use set.Fset
 
-  type t = abstract { mutable elts: set elt }
+  type t = abstract { mutable elts: fset elt }
   (** the priority queue is modeled as a finite set of elements *)
 
   (** {3 Operations} *)
@@ -96,7 +96,7 @@ module PqueueNoDup
   exception Empty
   (** exception raised by `pop` and `peek` to signal an empty queue *)
 
-  predicate minimal_elt (x: elt) (s: set elt) =
+  predicate minimal_elt (x: elt) (s: fset elt) =
      mem x s /\ forall e: elt. mem e s -> rel x e
   (** property of the element returned by `pop` and `peek` *)
 

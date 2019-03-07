@@ -1,97 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="2">
-<prover id="0" name="Alt-Ergo" version="0.95.1" timelimit="3" steplimit="1" memlimit="1000"/>
-<prover id="1" name="CVC3" version="2.4.1" timelimit="3" steplimit="1" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.3.1" timelimit="3" steplimit="1" memlimit="1000"/>
-<file name="../convex_hull.mlw">
+<why3session shape_version="6">
+<prover id="1" name="CVC3" version="2.4.1" timelimit="3" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.3.1" timelimit="3" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file>
+<path name=".."/>
+<path name="convex_hull.mlw"/>
 <theory name="ConvexSet">
- <goal name="knuth1">
- <proof prover="0" obsolete="true"><result status="valid" time="0.10"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>
- <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+ <goal name="knuth1" proved="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="knuth2">
- <proof prover="0" obsolete="true"><result status="valid" time="0.12"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.03"/></proof>
- <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+ <goal name="knuth2" proved="true">
+ <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="knuth4">
- <proof prover="0" obsolete="true"><result status="valid" time="0.99"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.18"/></proof>
- <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+ <goal name="knuth4" proved="true">
+ <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
  </goal>
  <goal name="knuth5">
- <proof prover="2" obsolete="true"><result status="valid" time="1.08"/></proof>
+ <proof prover="2"><result status="timeout" time="3.00"/></proof>
+ <proof prover="3"><result status="timeout" time="1.00"/></proof>
+ <proof prover="4"><result status="timeout" time="1.00"/></proof>
+ <proof prover="5"><result status="timeout" time="1.00"/></proof>
  </goal>
- <goal name="knuth3">
- <proof prover="0" obsolete="true"><result status="valid" time="0.04"/></proof>
- <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+ <goal name="knuth3" proved="true">
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
  </goal>
- <goal name="test1">
- <proof prover="0" obsolete="true"><result status="valid" time="0.00"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.00"/></proof>
- <proof prover="2" obsolete="true"><result status="valid" time="0.00"/></proof>
+ <goal name="test1" proved="true">
+ <proof prover="1"><result status="valid" time="0.00"/></proof>
+ <proof prover="2"><result status="valid" time="0.00"/></proof>
  </goal>
 </theory>
-<theory name="Incremental" proved="true">
-</theory>
-<theory name="Jarvis">
- <goal name="WP_parameter lowest_pt" expl="VC for lowest_pt">
- <transf name="split_goal_right" >
-  <goal name="WP_parameter lowest_pt.0" expl="loop invariant init">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+<theory name="Jarvis" proved="true">
+ <goal name="VC lowest_pt" expl="VC for lowest_pt" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="VC lowest_pt.0" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter lowest_pt.1" expl="loop invariant init">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.01"/></proof>
+  <goal name="VC lowest_pt.1" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter lowest_pt.2" expl="loop invariant init">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.03"/></proof>
-  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <goal name="VC lowest_pt.2" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter lowest_pt.3" expl="loop invariant preservation">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.03"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.03"/></proof>
-  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <goal name="VC lowest_pt.3" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter lowest_pt.4" expl="loop invariant preservation">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
-  <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <goal name="VC lowest_pt.4" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
   </goal>
-  <goal name="WP_parameter lowest_pt.5" expl="loop invariant preservation">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.04"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.07"/></proof>
+  <goal name="VC lowest_pt.5" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.07"/></proof>
   </goal>
-  <goal name="WP_parameter lowest_pt.6" expl="loop invariant preservation">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <goal name="VC lowest_pt.6" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.05"/></proof>
   </goal>
-  <goal name="WP_parameter lowest_pt.7" expl="loop invariant preservation">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <goal name="VC lowest_pt.7" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
   </goal>
-  <goal name="WP_parameter lowest_pt.8" expl="loop invariant preservation">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.04"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.03"/></proof>
+  <goal name="VC lowest_pt.8" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
-  <goal name="WP_parameter lowest_pt.9" expl="postcondition">
-  <transf name="split_goal_right" >
-   <goal name="WP_parameter lowest_pt.9.0" expl="postcondition">
-   <proof prover="0" obsolete="true"><result status="valid" time="0.04"/></proof>
-   <proof prover="1" obsolete="true"><result status="valid" time="0.02"/></proof>
-   <proof prover="2" obsolete="true"><result status="valid" time="0.02"/></proof>
+  <goal name="VC lowest_pt.9" expl="loop variant decrease" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="VC lowest_pt.9.0" expl="VC for lowest_pt" proved="true">
+   <proof prover="1"><result status="valid" time="0.02"/></proof>
    </goal>
-   <goal name="WP_parameter lowest_pt.9.1" expl="postcondition">
-   <proof prover="0" obsolete="true"><result status="valid" time="0.02"/></proof>
-   <proof prover="1" obsolete="true"><result status="valid" time="0.04"/></proof>
+   <goal name="VC lowest_pt.9.1" expl="VC for lowest_pt" proved="true">
+   <proof prover="1"><result status="valid" time="0.04"/></proof>
    </goal>
   </transf>
   </goal>
+  <goal name="VC lowest_pt.10" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC lowest_pt.11" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC lowest_pt.12" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="VC lowest_pt.13" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.06"/></proof>
+  </goal>
  </transf>
  </goal>
-</theory>
-<theory name="Graham" proved="true">
 </theory>
 </file>
 </why3session>
