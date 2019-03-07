@@ -295,7 +295,7 @@ theory set.Set
 
   syntax function  empty    "(emptyset :: %t0)"
   syntax predicate is_empty "empty?(%1)"
-  remove prop      mem_empty
+  remove prop      is_empty_empty
 
   syntax function add "add(%1, %2)"
   syntax function singleton "singleton(%1)"
