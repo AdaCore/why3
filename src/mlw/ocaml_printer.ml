@@ -367,7 +367,7 @@ module Print = struct
           List.exists is_constructor its
       | _ -> false in
     match query_syntax info.info_syn rs.rs_name, pvl with
-    | Some s, _ when complex_syntax s ->
+    | Some s, _ when complex_syntax s || pvl = [] ->
        let p = Mid.find rs.rs_name info.info_prec in
        syntax_arguments_prec s (print_expr info) p fmt pvl
     | Some s, _ ->
@@ -407,8 +407,8 @@ module Print = struct
 
   and print_fun_type_args info fmt (args, s, res, e) =
     if Stv.is_empty s then
-      fprintf fmt "@[%a@] :@ %a@ =@ %a"
-        (print_list space (print_vs_arg info)) args
+      fprintf fmt "@[%a@]:@ %a@ =@ @[<hov>@[%a@]@]"
+        (print_list_suf space (print_vs_arg info)) args
         (print_ty ~use_quote:false info) res
         (print_expr ~opr:false info 18) e
     else
@@ -510,7 +510,7 @@ module Print = struct
         fprintf fmt
           (protect_on (opr && prec < 16)
              "@[<hv>@[<hov 2>if@ %a@]@ then %a@]")
-          (print_expr ~opr:false info 15) e1 (print_expr ~opr:false ~be:true info 18) e2
+          (print_expr ~opr:false info 15) e1 (print_expr ~be:true info 18) e2
     | Eif (e1, e2, e3) when is_false e2 && is_true e3 ->
         fprintf fmt (protect_on (prec < 4) "not %a")
           (print_expr info 3) e1
@@ -526,7 +526,7 @@ module Print = struct
                         @;<1 0>else@ %a@]")
           (print_expr ~opr:false info 18) e1
           (print_expr ~opr:false info 18) e2
-          (print_expr ~opr:false info 18) e3
+          (print_expr info 18) e3
     | Eblock [] ->
         fprintf fmt "()"
     | Eblock [e] ->
@@ -569,14 +569,16 @@ module Print = struct
         fprintf fmt
           (if prec < 18 && opr
            then "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
-           else "@[<hv>@[<hov 2>try@ %a@] with@]@\n@[<hov>%a@]@\n")
-          (print_expr info 17) e (print_list newline (print_xbranch info false)) xl
+           else "@[<hv>@[<hov 2>try@ %a@] with@]@\n@[<hov>%a@]")
+          (print_expr ~be:true ~opr:false info 17) e
+          (print_list newline (print_xbranch info false)) xl
     | Ematch (e, bl, xl) ->
         fprintf fmt
           (if (prec < 18 && opr)
            then "begin match @[%a@] with@\n@[<hov>%a\n%a@]@\nend"
            else "match @[%a@] with@\n@[<hov>%a\n%a@]")
-          (print_expr info 17) e (print_list newline (print_branch info)) bl
+          (print_expr ~be:true ~opr:false info 17) e
+          (print_list newline (print_branch info)) bl
           (print_list newline (print_xbranch info true)) xl
     | Eexn (xs, None, e) ->
         fprintf fmt "@[<hv>let exception %a in@\n%a@]"
