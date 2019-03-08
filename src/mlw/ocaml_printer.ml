@@ -403,7 +403,7 @@ module Print = struct
           (print_apply_args info) (tl, rs.rs_cty.cty_args)
 
   and print_svar fmt s =
-    Stv.iter (fun tv -> fprintf fmt "%a " (print_tv ~use_quote:false) tv) s
+    print_list space (print_tv ~use_quote:false) fmt (Stv.elements s)
 
   and print_fun_type_args info fmt (args, s, res, e) =
     if Stv.is_empty s then
@@ -417,7 +417,7 @@ module Print = struct
       let arrow fmt () = fprintf fmt " ->@ " in
       let start fmt () = fprintf fmt "fun@ " in
       fprintf fmt ":@ @[<h>type @[%a@]. @[%a@ %a@]@] =@ \
-                   @[<hov 2>@[%a@]@ %a@]"
+                   @[<hov 2>@[%a@]%a@]"
         print_svar s
         (print_list_suf arrow (print_ty ~use_quote:false ~paren:true info)) ty_args
         (print_ty ~use_quote:false ~paren:true info) res
@@ -458,6 +458,7 @@ module Print = struct
     | Lany ({rs_name}, _, _, _) -> check_val_in_drv info rs_name.id_loc rs_name
 
   and print_expr ?(opr=true) ?(be=false) info prec fmt e =
+    let protect_on_be b s = protect_on ~be:true b s in
     let protect_on b s = protect_on ~be b s in
     match e.e_node with
     | Econst c ->
@@ -523,20 +524,24 @@ module Print = struct
     | Eif (e1, e2, e3) ->
         fprintf fmt (protect_on (opr && prec < 16)
                        "@[<hv>@[<hov 2>if@ %a@ then@ %a@]\
-                        @;<1 0>else@ %a@]")
+                        @;<1 0>@[<hov 2>else@ %a@]@]")
           (print_expr ~opr:false info 18) e1
-          (print_expr ~opr:false info 18) e2
-          (print_expr info 18) e3
+          (print_expr ~opr:false ~be:true info 18) e2
+          (print_expr ~be:true info 18) e3
     | Eblock [] ->
         fprintf fmt "()"
     | Eblock [e] ->
         print_expr ~be info prec fmt e
     | Eblock el ->
+        let semibreak fmt () = fprintf fmt ";@\n" in
         let rec aux fmt = function
           | [] -> assert false
           | [e] -> print_expr ~opr:false info 18 fmt e
-          | h::t -> print_expr info 17 fmt h; semi fmt (); aux fmt t in
-        fprintf fmt "@[<hv>begin@;<1 2>@[%a@]@ end@]" aux el
+          | h::t -> print_expr info 17 fmt h; semibreak fmt (); aux fmt t in
+        fprintf fmt
+          (if prec < 17
+           then "@[<hv>begin@;<1 2>@[%a@]@ end@]"
+           else "@[<hv>@[%a@]@]") aux el
     | Efun (varl, e) ->
         fprintf fmt (protect_on (opr && prec < 18) "@[<hov 2>fun %a ->@ %a@]")
           (print_list space (print_vs_arg info)) varl (print_expr info 17) e
@@ -557,7 +562,7 @@ module Print = struct
           let cmp, op = match dir with
             | To     -> "Z.leq", "Z.succ"
             | DownTo -> "Z.geq", "Z.pred" in
-          fprintf fmt (protect_on (opr && prec < 18)
+          fprintf fmt (protect_on_be (opr && prec < 18)
                          "@[<hov 2>let rec %a %a =@ if %s %a %a then \
                           begin@ %a; %a (%s %a) end@ in@ %a %a@]")
           (* let rec *) (print_lident info) for_id (print_pv info) pv1
