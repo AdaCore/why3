@@ -170,8 +170,12 @@ module Print = struct
   let print_tv ~use_quote fmt tv =
     fprintf fmt (if use_quote then "'%s" else "%s") (id_unique aprinter tv.tv_name)
 
-  let protect_on b s =
-    if b then "(" ^^ s ^^ ")" else s
+  let protect_on ?(be=false) b s =
+    if b
+    then if be
+         then "begin@;<1 2>@["^^ s ^^ "@] end"
+         else "(" ^^ s ^^ ")"
+    else s
 
   let star fmt () = fprintf fmt " *@ "
 
@@ -453,7 +457,8 @@ module Print = struct
         forget_vars args
     | Lany ({rs_name}, _, _, _) -> check_val_in_drv info rs_name.id_loc rs_name
 
-  and print_expr ?(opr=true) info prec fmt e =
+  and print_expr ?(opr=true) ?(be=false) info prec fmt e =
+    let protect_on b s = protect_on ~be b s in
     match e.e_node with
     | Econst c ->
         let n = c.Number.il_int in
@@ -465,8 +470,7 @@ module Print = struct
          | Some s -> syntax_arguments s print_constant fmt [e]
          | None when n = "0" -> fprintf fmt "Z.zero"
          | None when n = "1" -> fprintf fmt "Z.one"
-         | None   -> fprintf fmt
-                       (protect_on (opr && prec < 4) "Z.of_string \"%s\"") n)
+         | None   -> fprintf fmt (protect_on (prec < 4) "Z.of_string \"%s\"") n)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->
@@ -482,15 +486,16 @@ module Print = struct
     | Eapp (rs, [])  -> (* avoids parenthesis around values *)
         fprintf fmt "%a" (print_apply info rs) []
     | Eapp (rs, pvl) ->
-       fprintf fmt (protect_on (opr && prec < 4) "%a")
-               (print_apply info rs) pvl
+       fprintf fmt (protect_on (prec < 4) "%a") (print_apply info rs) pvl
     | Ematch (e1, [p, e2], []) ->
         fprintf fmt (protect_on (opr && prec < 18) "let %a =@ %a in@ %a")
           (print_pat info) p (print_expr ~opr:false info 18) e1
           (print_expr ~opr info 18) e2
     | Ematch (e, pl, []) ->
         fprintf fmt
-          "begin match @[%a@] with@\n@[<hov>%a@]@\nend"
+          (if (prec < 18 && opr)
+           then "begin match @[%a@] with@\n@[<hov>%a@]@\nend"
+           else "match @[%a@] with@\n@[<hov>%a@]")
           (print_expr info 18) e
           (print_list newline (print_branch info)) pl
     | Eassign al ->
@@ -504,28 +509,28 @@ module Print = struct
     | Eif (e1, e2, {e_node = Eblock []}) ->
         fprintf fmt
           (protect_on (opr && prec < 16)
-             "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
-          (print_expr ~opr:false info 15) e1 (print_expr ~opr:false info 18) e2
+             "@[<hv>@[<hov 2>if@ %a@]@ then %a@]")
+          (print_expr ~opr:false info 15) e1 (print_expr ~opr:false ~be:true info 18) e2
     | Eif (e1, e2, e3) when is_false e2 && is_true e3 ->
-        fprintf fmt (protect_on (opr && prec < 4) "not %a")
+        fprintf fmt (protect_on (prec < 4) "not %a")
           (print_expr info 3) e1
     | Eif (e1, e2, e3) when is_true e2 ->
-        fprintf fmt (protect_on (opr && prec < 13) "@[<hv>%a || %a@]")
+        fprintf fmt (protect_on (prec < 13) "@[<hv>%a || %a@]")
           (print_expr info 12) e1 (print_expr info 13) e3
     | Eif (e1, e2, e3) when is_false e3 ->
-        fprintf fmt (protect_on (opr && prec < 12) "@[<hv>%a && %a@]")
+        fprintf fmt (protect_on (prec < 12) "@[<hv>%a && %a@]")
           (print_expr info 11) e1 (print_expr info 12) e2
     | Eif (e1, e2, e3) ->
         fprintf fmt (protect_on (opr && prec < 16)
-                       "@[<hv>@[<hov 2>if@ %a@ then@ begin@ @[%a@] end@]\
-                        @;<1 0>else@ begin@;<1 2>@[%a@] end@]")
+                       "@[<hv>@[<hov 2>if@ %a@ then@ %a@]\
+                        @;<1 0>else@ %a@]")
           (print_expr ~opr:false info 18) e1
           (print_expr ~opr:false info 18) e2
           (print_expr ~opr:false info 18) e3
     | Eblock [] ->
         fprintf fmt "()"
     | Eblock [e] ->
-        print_expr info prec fmt e
+        print_expr ~be info prec fmt e
     | Eblock el ->
         let rec aux fmt = function
           | [] -> assert false
@@ -561,11 +566,16 @@ module Print = struct
                         op (print_pv info) pv1
           (* in      *) (print_lident info) for_id (print_pv info) pv2
     | Ematch (e, [], xl) ->
-        fprintf fmt "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
+        fprintf fmt
+          (if prec < 18 && opr
+           then "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
+           else "@[<hv>@[<hov 2>try@ %a@] with@]@\n@[<hov>%a@]@\n")
           (print_expr info 17) e (print_list newline (print_xbranch info false)) xl
     | Ematch (e, bl, xl) ->
         fprintf fmt
-          "begin match @[%a@] with@\n@[<hov>%a@\n%a@]@\nend"
+          (if (prec < 18 && opr)
+           then "begin match @[%a@] with@\n@[<hov>%a\n%a@]@\nend"
+           else "match @[%a@] with@\n@[<hov>%a\n%a@]")
           (print_expr info 17) e (print_list newline (print_branch info)) bl
           (print_list newline (print_xbranch info true)) xl
     | Eexn (xs, None, e) ->
@@ -575,7 +585,9 @@ module Print = struct
         fprintf fmt "@[<hv>let exception %a of %a in@\n%a@]"
           (print_uident info) xs.xs_name (print_ty ~use_quote:false ~paren:true info) t
           (print_expr info 18) e
-    | Eignore e -> fprintf fmt "ignore %a" (print_expr info 4) e
+    | Eignore e ->
+        fprintf fmt (protect_on (prec < 4)"ignore %a")
+          (print_expr info 4) e
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hov 2>| %a ->@ @[%a@]@]"

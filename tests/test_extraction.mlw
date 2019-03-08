@@ -325,6 +325,13 @@ module TestExtraction
       ()
     done
 
+  let test_if (b:bool) (t:ty) : int =
+  if b
+  then let r = ref 0 in
+       r := (match t with A -> 1 | B -> 2 | C -> 3 end);
+       !r
+  else match t with A -> 2 | B -> 3 | C -> 1 end
+
 end
 
 (*
