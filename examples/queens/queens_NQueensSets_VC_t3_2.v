@@ -6,269 +6,271 @@ Require HighOrd.
 Require int.Int.
 Require map.Map.
 
-Axiom set : forall (a:Type), Type.
-Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
-Existing Instance set_WhyType.
+Axiom fset : forall (a:Type), Type.
+Parameter fset_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (fset a).
+Existing Instance fset_WhyType.
 
-Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
+Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> Prop.
 
-Parameter infix_eqeq:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> Prop.
-
-Axiom infix_eqeq_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (infix_eqeq s1 s2) -> forall (x:a),
-  (mem x s1) -> mem x s2.
-
-Axiom infix_eqeq_spec1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (infix_eqeq s1 s2) -> forall (x:a),
-  (mem x s2) -> mem x s1.
-
-Axiom infix_eqeq_spec2 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (forall (x:a), (mem x s1) <-> (mem x s2)) ->
-  infix_eqeq s1 s2.
+(* Why3 assumption *)
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) :
+    Prop :=
+  forall (x:a), mem x s1 <-> mem x s2.
 
 Axiom extensionality :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (infix_eqeq s1 s2) -> (s1 = s2).
+  forall (s1:fset a) (s2:fset a), infix_eqeq s1 s2 -> (s1 = s2).
 
-Parameter subset:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> Prop.
-
-Axiom subset_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (subset s1 s2) -> forall (x:a), (mem x s1) ->
-  mem x s2.
-
-Axiom subset_spec1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (forall (x:a), (mem x s1) -> mem x s2) ->
-  subset s1 s2.
+(* Why3 assumption *)
+Definition subset {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) : Prop :=
+  forall (x:a), mem x s1 -> mem x s2.
 
 Axiom subset_refl :
-  forall {a:Type} {a_WT:WhyType a}, forall (s:set a), subset s s.
+  forall {a:Type} {a_WT:WhyType a}, forall (s:fset a), subset s s.
 
 Axiom subset_trans :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a) (s3:set a), (subset s1 s2) ->
-  (subset s2 s3) -> subset s1 s3.
+  forall (s1:fset a) (s2:fset a) (s3:fset a), subset s1 s2 -> subset s2 s3 ->
+  subset s1 s3.
 
-Parameter is_empty: forall {a:Type} {a_WT:WhyType a}, (set a) -> Prop.
+(* Why3 assumption *)
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:fset a) : Prop :=
+  forall (x:a), ~ mem x s.
 
-Axiom is_empty_spec :
+Parameter empty: forall {a:Type} {a_WT:WhyType a}, fset a.
+
+Axiom is_empty_empty :
+  forall {a:Type} {a_WT:WhyType a}, is_empty (empty : fset a).
+
+Axiom empty_is_empty :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), (is_empty s) -> forall (x:a), ~ (mem x s).
+  forall (s:fset a), is_empty s -> (s = (empty : fset a)).
 
-Axiom is_empty_spec1 :
+Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> fset a.
+
+Axiom add_def :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), (forall (x:a), ~ (mem x s)) -> is_empty s.
+  forall (x:a) (s:fset a) (y:a), mem y (add x s) <-> mem y s \/ (y = x).
 
-Parameter empty: forall {a:Type} {a_WT:WhyType a}, set a.
-
-Axiom empty_def : forall {a:Type} {a_WT:WhyType a}, is_empty (empty : set a).
-
-Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> set a.
-
-Axiom add_spec :
+Axiom mem_singleton :
   forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), forall (y:a), (mem y (add x s)) ->
-  (y = x) \/ (mem y s).
+  forall (x:a) (y:a), mem y (add x (empty : fset a)) -> (y = x).
 
-Axiom add_spec1 :
+Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> fset a.
+
+Axiom remove_def :
   forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), forall (y:a), ((y = x) \/ (mem y s)) ->
-  mem y (add x s).
-
-Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> set a.
-
-Axiom remove_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), forall (y:a), (mem y (remove x s)) -> ~ (y = x).
-
-Axiom remove_spec1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), forall (y:a), (mem y (remove x s)) -> mem y s.
-
-Axiom remove_spec2 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), forall (y:a), (~ (y = x) /\ (mem y s)) ->
-  mem y (remove x s).
+  forall (x:a) (s:fset a) (y:a), mem y (remove x s) <-> mem y s /\ ~ (y = x).
 
 Axiom add_remove :
   forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), (mem x s) -> ((add x (remove x s)) = s).
+  forall (x:a) (s:fset a), mem x s -> ((add x (remove x s)) = s).
 
 Axiom remove_add :
   forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), ((remove x (add x s)) = (remove x s)).
+  forall (x:a) (s:fset a), ((remove x (add x s)) = (remove x s)).
 
 Axiom subset_remove :
   forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), subset (remove x s) s.
+  forall (x:a) (s:fset a), subset (remove x s) s.
 
 Parameter union:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> set a.
+  forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
 
-Axiom union_spec :
+Axiom union_def :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a), (mem x (union s1 s2)) ->
-  (mem x s1) \/ (mem x s2).
+  forall (s1:fset a) (s2:fset a) (x:a),
+  mem x (union s1 s2) <-> mem x s1 \/ mem x s2.
 
-Axiom union_spec1 :
+Axiom subset_union_1 :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a), ((mem x s1) \/ (mem x s2)) ->
-  mem x (union s1 s2).
+  forall (s1:fset a) (s2:fset a), subset s1 (union s1 s2).
+
+Axiom subset_union_2 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), subset s2 (union s1 s2).
 
 Parameter inter:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> set a.
+  forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
 
-Axiom inter_spec :
+Axiom inter_def :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a), (mem x (inter s1 s2)) ->
-  mem x s1.
+  forall (s1:fset a) (s2:fset a) (x:a),
+  mem x (inter s1 s2) <-> mem x s1 /\ mem x s2.
 
-Axiom inter_spec1 :
+Axiom subset_inter_1 :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a), (mem x (inter s1 s2)) ->
-  mem x s2.
+  forall (s1:fset a) (s2:fset a), subset (inter s1 s2) s1.
 
-Axiom inter_spec2 :
+Axiom subset_inter_2 :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a), ((mem x s1) /\ (mem x s2)) ->
-  mem x (inter s1 s2).
+  forall (s1:fset a) (s2:fset a), subset (inter s1 s2) s2.
 
-Parameter diff:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> set a.
+Parameter diff: forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
 
-Axiom diff_spec :
+Axiom diff_def :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a), (mem x (diff s1 s2)) ->
-  mem x s1.
-
-Axiom diff_spec1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a), (mem x (diff s1 s2)) ->
-  ~ (mem x s2).
-
-Axiom diff_spec2 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a), ((mem x s1) /\ ~ (mem x s2)) ->
-  mem x (diff s1 s2).
+  forall (s1:fset a) (s2:fset a) (x:a),
+  mem x (diff s1 s2) <-> mem x s1 /\ ~ mem x s2.
 
 Axiom subset_diff :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), subset (diff s1 s2) s1.
+  forall (s1:fset a) (s2:fset a), subset (diff s1 s2) s1.
 
-Parameter choose: forall {a:Type} {a_WT:WhyType a}, (set a) -> a.
+Parameter pick: forall {a:Type} {a_WT:WhyType a}, fset a -> a.
 
-Axiom choose_spec :
+Axiom pick_def :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), ~ (is_empty s) -> mem (choose s) s.
+  forall (s:fset a), ~ is_empty s -> mem (pick s) s.
 
-Parameter cardinal: forall {a:Type} {a_WT:WhyType a}, (set a) -> Z.
+(* Why3 assumption *)
+Definition disjoint {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) : Prop :=
+  forall (x:a), ~ mem x s1 \/ ~ mem x s2.
+
+Axiom disjoint_inter_empty :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), disjoint s1 s2 <-> is_empty (inter s1 s2).
+
+Axiom disjoint_diff_eq :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), disjoint s1 s2 <-> ((diff s1 s2) = s1).
+
+Axiom disjoint_diff_s2 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), disjoint (diff s1 s2) s2.
+
+Parameter filter:
+  forall {a:Type} {a_WT:WhyType a}, fset a -> (a -> Init.Datatypes.bool) ->
+  fset a.
+
+Axiom filter_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a) (p:a -> Init.Datatypes.bool) (x:a),
+  mem x (filter s p) <-> mem x s /\ ((p x) = Init.Datatypes.true).
+
+Axiom subset_filter :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a) (p:a -> Init.Datatypes.bool), subset (filter s p) s.
+
+Parameter map:
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}, (a -> b) ->
+  fset a -> fset b.
+
+Axiom map_def :
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+  forall (f:a -> b) (u:fset a) (y:b),
+  mem y (map f u) <-> (exists x:a, mem x u /\ (y = (f x))).
+
+Axiom mem_map :
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+  forall (f:a -> b) (u:fset a), forall (x:a), mem x u -> mem (f x) (map f u).
+
+Parameter cardinal:
+  forall {a:Type} {a_WT:WhyType a}, fset a -> Numbers.BinNums.Z.
 
 Axiom cardinal_nonneg :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), (0%Z <= (cardinal s))%Z.
+  forall (s:fset a), (0%Z <= (cardinal s))%Z.
 
 Axiom cardinal_empty :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), ((cardinal s) = 0%Z) -> is_empty s.
-
-Axiom cardinal_empty1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), (is_empty s) -> ((cardinal s) = 0%Z).
+  forall (s:fset a), is_empty s <-> ((cardinal s) = 0%Z).
 
 Axiom cardinal_add :
   forall {a:Type} {a_WT:WhyType a},
-  forall (x:a), forall (s:set a), ~ (mem x s) ->
-  ((cardinal (add x s)) = (1%Z + (cardinal s))%Z).
+  forall (x:a), forall (s:fset a),
+  (mem x s -> ((cardinal (add x s)) = (cardinal s))) /\
+  (~ mem x s -> ((cardinal (add x s)) = ((cardinal s) + 1%Z)%Z)).
 
 Axiom cardinal_remove :
   forall {a:Type} {a_WT:WhyType a},
-  forall (x:a), forall (s:set a), (mem x s) ->
-  ((cardinal s) = (1%Z + (cardinal (remove x s)))%Z).
+  forall (x:a), forall (s:fset a),
+  (mem x s -> ((cardinal (remove x s)) = ((cardinal s) - 1%Z)%Z)) /\
+  (~ mem x s -> ((cardinal (remove x s)) = (cardinal s))).
 
 Axiom cardinal_subset :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (subset s1 s2) ->
+  forall (s1:fset a) (s2:fset a), subset s1 s2 ->
   ((cardinal s1) <= (cardinal s2))%Z.
 
 Axiom subset_eq :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (subset s1 s2) ->
-  ((cardinal s1) = (cardinal s2)) -> infix_eqeq s1 s2.
+  forall (s1:fset a) (s2:fset a), subset s1 s2 ->
+  ((cardinal s1) = (cardinal s2)) -> (s1 = s2).
 
 Axiom cardinal1 :
   forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) ->
-  (x = (choose s)).
+  forall (s:fset a), ((cardinal s) = 1%Z) -> forall (x:a), mem x s ->
+  (x = (pick s)).
 
-Parameter min_elt: (set Z) -> Z.
+Axiom cardinal_union :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a),
+  ((cardinal (union s1 s2)) =
+   (((cardinal s1) + (cardinal s2))%Z - (cardinal (inter s1 s2)))%Z).
 
-Axiom min_elt_spec : forall (s:set Z), ~ (is_empty s) -> mem (min_elt s) s.
+Axiom cardinal_inter_disjoint :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), disjoint s1 s2 ->
+  ((cardinal (inter s1 s2)) = 0%Z).
 
-Axiom min_elt_spec1 :
-  forall (s:set Z), ~ (is_empty s) -> forall (x:Z), (mem x s) ->
-  ((min_elt s) <= x)%Z.
+Axiom cardinal_diff :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a),
+  ((cardinal (diff s1 s2)) = ((cardinal s1) - (cardinal (inter s1 s2)))%Z).
 
-Parameter max_elt: (set Z) -> Z.
+Axiom cardinal_filter :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a) (p:a -> Init.Datatypes.bool),
+  ((cardinal (filter s p)) <= (cardinal s))%Z.
 
-Axiom max_elt_spec : forall (s:set Z), ~ (is_empty s) -> mem (max_elt s) s.
+Axiom cardinal_map :
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+  forall (f:a -> b) (s:fset a), ((cardinal (map f s)) <= (cardinal s))%Z.
 
-Axiom max_elt_spec1 :
-  forall (s:set Z), ~ (is_empty s) -> forall (x:Z), (mem x s) ->
-  (x <= (max_elt s))%Z.
+Parameter min_elt: fset Numbers.BinNums.Z -> Numbers.BinNums.Z.
 
-Parameter interval: Z -> Z -> set Z.
+Axiom min_elt_def :
+  forall (s:fset Numbers.BinNums.Z), ~ is_empty s ->
+  mem (min_elt s) s /\
+  (forall (x:Numbers.BinNums.Z), mem x s -> ((min_elt s) <= x)%Z).
 
-Axiom interval_spec :
-  forall (l:Z) (r:Z), forall (x:Z), (mem x (interval l r)) -> (l <= x)%Z.
+Parameter max_elt: fset Numbers.BinNums.Z -> Numbers.BinNums.Z.
 
-Axiom interval_spec1 :
-  forall (l:Z) (r:Z), forall (x:Z), (mem x (interval l r)) -> (x < r)%Z.
+Axiom max_elt_def :
+  forall (s:fset Numbers.BinNums.Z), ~ is_empty s ->
+  mem (max_elt s) s /\
+  (forall (x:Numbers.BinNums.Z), mem x s -> (x <= (max_elt s))%Z).
 
-Axiom interval_spec2 :
-  forall (l:Z) (r:Z), forall (x:Z), ((l <= x)%Z /\ (x < r)%Z) ->
-  mem x (interval l r).
+Parameter interval:
+  Numbers.BinNums.Z -> Numbers.BinNums.Z -> fset Numbers.BinNums.Z.
+
+Axiom interval_def :
+  forall (l:Numbers.BinNums.Z) (r:Numbers.BinNums.Z) (x:Numbers.BinNums.Z),
+  mem x (interval l r) <-> (l <= x)%Z /\ (x < r)%Z.
 
 Axiom cardinal_interval :
-  forall (l:Z) (r:Z),
+  forall (l:Numbers.BinNums.Z) (r:Numbers.BinNums.Z),
   ((l <= r)%Z -> ((cardinal (interval l r)) = (r - l)%Z)) /\
   (~ (l <= r)%Z -> ((cardinal (interval l r)) = 0%Z)).
 
-Parameter succ: (set Z) -> set Z.
+Axiom set : Type.
+Parameter set_WhyType : WhyType set.
+Existing Instance set_WhyType.
 
-Axiom succ_spec :
-  forall (s:set Z), forall (i:Z), (mem i (succ s)) -> (1%Z <= i)%Z.
+Parameter to_fset: set -> fset Numbers.BinNums.Z.
 
-Axiom succ_spec1 :
-  forall (s:set Z), forall (i:Z), (mem i (succ s)) -> mem (i - 1%Z)%Z s.
+Parameter choose: set -> Numbers.BinNums.Z.
 
-Axiom succ_spec2 :
-  forall (s:set Z), forall (i:Z), ((1%Z <= i)%Z /\ (mem (i - 1%Z)%Z s)) ->
-  mem i (succ s).
-
-Parameter pred: (set Z) -> set Z.
-
-Axiom pred_spec :
-  forall (s:set Z), forall (i:Z), (mem i (pred s)) -> (0%Z <= i)%Z.
-
-Axiom pred_spec1 :
-  forall (s:set Z), forall (i:Z), (mem i (pred s)) -> mem (i + 1%Z)%Z s.
-
-Axiom pred_spec2 :
-  forall (s:set Z), forall (i:Z), ((0%Z <= i)%Z /\ (mem (i + 1%Z)%Z s)) ->
-  mem i (pred s).
+Axiom choose_spec :
+  forall (s:set), ~ is_empty (to_fset s) -> mem (choose s) (to_fset s).
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Implicit Arguments mk_ref [[a]].
+Arguments mk_ref {a}.
 
 (* Why3 assumption *)
 Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
@@ -276,163 +278,179 @@ Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   | mk_ref x => x
   end.
 
-Parameter n: Z.
+Parameter n: Numbers.BinNums.Z.
 
 (* Why3 assumption *)
-Definition solution := Z -> Z.
+Definition solution := Numbers.BinNums.Z -> Numbers.BinNums.Z.
 
 (* Why3 assumption *)
-Definition eq_prefix {a:Type} {a_WT:WhyType a} (t:Z -> a) (u:Z -> a) 
-    (i:Z) : Prop :=
-  forall (k:Z), ((0%Z <= k)%Z /\ (k < i)%Z) -> ((t k) = (u k)).
+Definition eq_prefix {a:Type} {a_WT:WhyType a} (t:Numbers.BinNums.Z -> a)
+    (u:Numbers.BinNums.Z -> a) (i:Numbers.BinNums.Z) : Prop :=
+  forall (k:Numbers.BinNums.Z), (0%Z <= k)%Z /\ (k < i)%Z -> ((t k) = (u k)).
 
 (* Why3 assumption *)
-Definition partial_solution (k:Z) (s:Z -> Z) : Prop :=
-  forall (i:Z), ((0%Z <= i)%Z /\ (i < k)%Z) ->
+Definition partial_solution (k:Numbers.BinNums.Z)
+    (s:Numbers.BinNums.Z -> Numbers.BinNums.Z) : Prop :=
+  forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < k)%Z ->
   ((0%Z <= (s i))%Z /\ ((s i) < n)%Z) /\
-  forall (j:Z), ((0%Z <= j)%Z /\ (j < i)%Z) ->
-  ~ ((s i) = (s j)) /\
-  (~ (((s i) - (s j))%Z = (i - j)%Z) /\ ~ (((s i) - (s j))%Z = (j - i)%Z)).
+  (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < i)%Z ->
+   ~ ((s i) = (s j)) /\
+   ~ (((s i) - (s j))%Z = (i - j)%Z) /\ ~ (((s i) - (s j))%Z = (j - i)%Z)).
 
 Axiom partial_solution_eq_prefix :
-  forall (u:Z -> Z) (t:Z -> Z) (k:Z), (partial_solution k t) ->
-  (eq_prefix t u k) -> partial_solution k u.
+  forall (u:Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (t:Numbers.BinNums.Z -> Numbers.BinNums.Z) (k:Numbers.BinNums.Z),
+  partial_solution k t -> eq_prefix t u k -> partial_solution k u.
 
 (* Why3 assumption *)
-Definition lt_sol (s1:Z -> Z) (s2:Z -> Z) : Prop :=
-  exists i:Z,
-  ((0%Z <= i)%Z /\ (i < n)%Z) /\ ((eq_prefix s1 s2 i) /\ ((s1 i) < (s2 i))%Z).
+Definition lt_sol (s1:Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (s2:Numbers.BinNums.Z -> Numbers.BinNums.Z) : Prop :=
+  exists i:Numbers.BinNums.Z,
+  ((0%Z <= i)%Z /\ (i < n)%Z) /\ eq_prefix s1 s2 i /\ ((s1 i) < (s2 i))%Z.
 
 (* Why3 assumption *)
-Definition solutions := Z -> Z -> Z.
+Definition solutions :=
+  Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z.
 
 (* Why3 assumption *)
-Definition sorted (s:Z -> Z -> Z) (a:Z) (b:Z) : Prop :=
-  forall (i:Z) (j:Z), ((a <= i)%Z /\ ((i < j)%Z /\ (j < b)%Z)) ->
-  lt_sol (s i) (s j).
+Definition sorted
+    (s:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) : Prop :=
+  forall (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
+  (a <= i)%Z /\ (i < j)%Z /\ (j < b)%Z -> lt_sol (s i) (s j).
 
 Axiom no_duplicate :
-  forall (s:Z -> Z -> Z) (a:Z) (b:Z), (sorted s a b) -> forall (i:Z) (j:Z),
-  ((a <= i)%Z /\ ((i < j)%Z /\ (j < b)%Z)) -> ~ (eq_prefix (s i) (s j) n).
+  forall (s:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z),
+  sorted s a b -> forall (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
+  (a <= i)%Z /\ (i < j)%Z /\ (j < b)%Z -> ~ eq_prefix (s i) (s j) n.
 
 (* Why3 goal *)
 Theorem VC_t3 :
-  forall (col:Z -> Z) (k:Z) (sol:Z -> Z -> Z) (s:Z),
-  forall (a:set Z) (b:set Z) (c:set Z),
-  ((0%Z <= k)%Z /\
-   (((k + (cardinal a))%Z = n) /\
-    ((0%Z <= s)%Z /\
-     ((forall (i:Z),
-       (mem i a) <->
-       (((0%Z <= i)%Z /\ (i < n)%Z) /\
-        forall (j:Z), ((0%Z <= j)%Z /\ (j < k)%Z) -> ~ ((col j) = i))) /\
-      ((forall (i:Z), (0%Z <= i)%Z ->
-        ~ (mem i b) <->
-        forall (j:Z), ((0%Z <= j)%Z /\ (j < k)%Z) ->
-        ~ ((col j) = ((i + j)%Z - k)%Z)) /\
-       ((forall (i:Z), (0%Z <= i)%Z ->
-         ~ (mem i c) <->
-         forall (j:Z), ((0%Z <= j)%Z /\ (j < k)%Z) ->
-         ~ ((col j) = ((i + k)%Z - j)%Z)) /\
-        (partial_solution k col))))))) ->
-  ((is_empty a) <-> forall (x:Z), ~ (mem x a)) -> ~ (is_empty a) ->
-  let o := diff a b in
-  (forall (x:Z), (mem x o) <-> ((mem x a) /\ ~ (mem x b))) ->
-  let o1 := diff o c in
-  (forall (x:Z), (mem x o1) <-> ((mem x o) /\ ~ (mem x c))) ->
-  (forall (u:Z -> Z), ((partial_solution n u) /\ (eq_prefix col u k)) ->
-   mem (u k) o1) ->
-  forall (f:Z) (e:set Z) (s1:Z) (sol1:Z -> Z -> Z) (k1:Z) (col1:Z -> Z),
-  ((((f = (s1 - s)%Z) /\ (0%Z <= (s1 - s)%Z)%Z) /\
-    ((k1 = k) /\
-     ((subset e (diff (diff a b) c)) /\
-      ((partial_solution k1 col1) /\
-       ((sorted sol1 s s1) /\
-        forall (i:Z) (j:Z), (mem i (diff o1 e)) -> (mem j e) -> (i < j)%Z))))) /\
-   ((forall (i:Z), ((s <= i)%Z /\ (i < s1)%Z) ->
-     (partial_solution n (sol1 i)) /\
-     ((eq_prefix col1 (sol1 i) k1) /\ (mem ((sol1 i) k1) (diff o1 e)))) /\
-    ((forall (t:Z -> Z),
-      ((partial_solution n t) /\
-       ((eq_prefix col1 t k1) /\ (mem (t k1) (diff o1 e)))) ->
-      (mem (t k1) o1) /\
-      (~ (mem (t k1) e) /\
-       exists i:Z, ((s <= i)%Z /\ (i < s1)%Z) /\ (eq_prefix t (sol1 i) n))) /\
-     ((eq_prefix col col1 k1) /\ (eq_prefix sol sol1 s))))) ->
-  ((is_empty e) <-> forall (x:Z), ~ (mem x e)) -> ~ (is_empty e) ->
-  let d := min_elt e in
-  ((mem d e) /\ forall (x:Z), (mem x e) -> (d <= x)%Z) ->
-  forall (col2:Z -> Z), (col2 = (map.Map.set col1 k1 d)) -> forall (k2:Z),
-  (k2 = (k1 + 1%Z)%Z) ->
-  let o2 := add d c in
-  (forall (y:Z), (mem y o2) <-> ((y = d) \/ (mem y c))) ->
-  (forall (i:Z),
-   (mem i (pred o2)) <-> ((0%Z <= i)%Z /\ (mem (i + 1%Z)%Z o2))) ->
-  let o3 := add d b in
-  (forall (y:Z), (mem y o3) <-> ((y = d) \/ (mem y b))) ->
-  (forall (i:Z),
-   (mem i (succ o3)) <-> ((1%Z <= i)%Z /\ (mem (i - 1%Z)%Z o3))) ->
-  (forall (y:Z), (mem y (remove d a)) <-> (~ (y = d) /\ (mem y a))) ->
-  forall (s2:Z) (sol2:Z -> Z -> Z) (k3:Z) (col3:Z -> Z),
-  ((0%Z <= (s2 - s1)%Z)%Z /\
-   ((k3 = k2) /\
-    ((sorted sol2 s1 s2) /\
-     ((forall (t:Z -> Z),
-       ((partial_solution n t) /\ (eq_prefix col3 t k3)) <->
-       exists i:Z, ((s1 <= i)%Z /\ (i < s2)%Z) /\ (eq_prefix t (sol2 i) n)) /\
-      ((eq_prefix col2 col3 k3) /\ (eq_prefix sol1 sol2 s1)))))) ->
-  forall (f1:Z), (f1 = (f + (s2 - s1)%Z)%Z) -> forall (k4:Z),
-  (k4 = (k3 - 1%Z)%Z) ->
-  let o4 := remove d e in
-  (forall (y:Z), (mem y o4) <-> (~ (y = d) /\ (mem y e))) ->
-  forall (e1:set Z), (e1 = o4) -> sorted sol2 s s2.
-(* Why3 intros col k sol s a b c (h1,(h2,(h3,(h4,(h5,(h6,h7)))))) h8 h9 o h10
-        o1 h11 h12 f e s1 sol1 k1 col1
-        (((h13,h14),(h15,(h16,(h17,(h18,h19))))),(h20,(h21,(h22,h23)))) h24
-        h25 d (h26,h27) col2 h28 k2 h29 o2 h30 h31 o3 h32 h33 h34 s2 sol2 k3
-        col3 (h35,(h36,(h37,(h38,(h39,h40))))) f1 h41 k4 h42 o4 h43 e1 h44. *)
+  forall (col:Numbers.BinNums.Z -> Numbers.BinNums.Z) (k:Numbers.BinNums.Z)
+    (sol:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (s:Numbers.BinNums.Z) (a:set) (b:set) (c:set),
+  (0%Z <= k)%Z -> ((k + (cardinal (to_fset a)))%Z = n) -> (0%Z <= s)%Z ->
+  (forall (i:Numbers.BinNums.Z),
+   mem i (to_fset a) <->
+   ((0%Z <= i)%Z /\ (i < n)%Z) /\
+   (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < k)%Z ->
+    ~ ((col j) = i))) ->
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z ->
+   ~ mem i (to_fset b) <->
+   (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < k)%Z ->
+    ~ ((col j) = ((i + j)%Z - k)%Z))) ->
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z ->
+   ~ mem i (to_fset c) <->
+   (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < k)%Z ->
+    ~ ((col j) = ((i + k)%Z - j)%Z))) ->
+  partial_solution k col -> ~ is_empty (to_fset a) -> forall (o:set),
+  ((to_fset o) = (diff (to_fset a) (to_fset b))) -> forall (o1:set),
+  ((to_fset o1) = (diff (to_fset o) (to_fset c))) ->
+  (forall (u:Numbers.BinNums.Z -> Numbers.BinNums.Z),
+   partial_solution n u /\ eq_prefix col u k -> mem (u k) (to_fset o1)) ->
+  forall (f:Numbers.BinNums.Z) (e:set) (s1:Numbers.BinNums.Z)
+    (sol1:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (k1:Numbers.BinNums.Z) (col1:Numbers.BinNums.Z -> Numbers.BinNums.Z),
+  (f = (s1 - s)%Z) -> (0%Z <= (s1 - s)%Z)%Z -> (k1 = k) ->
+  subset (to_fset e) (diff (diff (to_fset a) (to_fset b)) (to_fset c)) ->
+  partial_solution k1 col1 -> sorted sol1 s s1 ->
+  (forall (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
+   mem i (diff (to_fset o1) (to_fset e)) -> mem j (to_fset e) -> (i < j)%Z) ->
+  (forall (i:Numbers.BinNums.Z), (s <= i)%Z /\ (i < s1)%Z ->
+   partial_solution n (sol1 i) /\
+   eq_prefix col1 (sol1 i) k1 /\
+   mem (sol1 i k1) (diff (to_fset o1) (to_fset e))) ->
+  (forall (t:Numbers.BinNums.Z -> Numbers.BinNums.Z),
+   partial_solution n t /\
+   eq_prefix col1 t k1 /\ mem (t k1) (diff (to_fset o1) (to_fset e)) ->
+   mem (t k1) (to_fset o1) /\
+   ~ mem (t k1) (to_fset e) /\
+   (exists i:Numbers.BinNums.Z,
+    ((s <= i)%Z /\ (i < s1)%Z) /\ eq_prefix t (sol1 i) n)) ->
+  eq_prefix col col1 k1 -> eq_prefix sol sol1 s -> ~ is_empty (to_fset e) ->
+  let d := min_elt (to_fset e) in
+  forall (col2:Numbers.BinNums.Z -> Numbers.BinNums.Z),
+  (col2 = (map.Map.set col1 k1 d)) -> forall (k2:Numbers.BinNums.Z),
+  (k2 = (k1 + 1%Z)%Z) -> forall (o2:set),
+  ((to_fset o2) = (add d (to_fset c))) ->
+  mem d (to_fset c) /\ ((cardinal (to_fset o2)) = (cardinal (to_fset c))) \/
+  ~ mem d (to_fset c) /\
+  ((cardinal (to_fset o2)) = ((cardinal (to_fset c)) + 1%Z)%Z) ->
+  forall (o3:set),
+  (forall (i:Numbers.BinNums.Z),
+   mem i (to_fset o3) <-> (0%Z <= i)%Z /\ mem (i + 1%Z)%Z (to_fset o2)) ->
+  forall (o4:set), ((to_fset o4) = (add d (to_fset b))) ->
+  mem d (to_fset b) /\ ((cardinal (to_fset o4)) = (cardinal (to_fset b))) \/
+  ~ mem d (to_fset b) /\
+  ((cardinal (to_fset o4)) = ((cardinal (to_fset b)) + 1%Z)%Z) ->
+  forall (o5:set),
+  (forall (i:Numbers.BinNums.Z),
+   mem i (to_fset o5) <-> (1%Z <= i)%Z /\ mem (i - 1%Z)%Z (to_fset o4)) ->
+  forall (o6:set), ((to_fset o6) = (remove d (to_fset a))) ->
+  mem d (to_fset a) /\
+  ((cardinal (to_fset o6)) = ((cardinal (to_fset a)) - 1%Z)%Z) \/
+  ~ mem d (to_fset a) /\ ((cardinal (to_fset o6)) = (cardinal (to_fset a))) ->
+  forall (s2:Numbers.BinNums.Z)
+    (sol2:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (k3:Numbers.BinNums.Z) (col3:Numbers.BinNums.Z -> Numbers.BinNums.Z),
+  (0%Z <= (s2 - s1)%Z)%Z -> (k3 = k2) -> sorted sol2 s1 s2 ->
+  (forall (t:Numbers.BinNums.Z -> Numbers.BinNums.Z),
+   partial_solution n t /\ eq_prefix col3 t k3 <->
+   (exists i:Numbers.BinNums.Z,
+    ((s1 <= i)%Z /\ (i < s2)%Z) /\ eq_prefix t (sol2 i) n)) ->
+  eq_prefix col2 col3 k3 -> eq_prefix sol1 sol2 s1 ->
+  forall (f1:Numbers.BinNums.Z), (f1 = (f + (s2 - s1)%Z)%Z) ->
+  forall (k4:Numbers.BinNums.Z), (k4 = (k3 - 1%Z)%Z) -> forall (e1:set),
+  ((to_fset e1) = (remove d (to_fset e))) ->
+  mem d (to_fset e) /\
+  ((cardinal (to_fset e1)) = ((cardinal (to_fset e)) - 1%Z)%Z) \/
+  ~ mem d (to_fset e) /\ ((cardinal (to_fset e1)) = (cardinal (to_fset e))) ->
+  sorted sol2 s s2.
 Proof.
-intros col k sol s a b c (h1,(h2,(h3,(h4,(h5,(h6,h7)))))) h8 h9 o h10 o1 h11
-h12 f e s1 sol1 k1 col1
-(((h13,h14),(h15,(h16,(h17,(h18,h19))))),(h20,(h21,(h22,h23)))) h24 h25 d
-(h26,h27) col2 h28 k2 h29 o2 h30 h31 o3 h32 h33 h34 s2 sol2 k3 col3
-(h35,(h36,(h37,(h38,(h39,h40))))) f1 h41 k4 h42 o4 h43 e1 h44.
+intros col k sol s a b c h1 h2 h3 h4 h5 h6 h7 h8 o h9 o1 h10 h11 f e
+        s1 sol1 k1 col1 h12 h13 h14 h15 h16 h17 h18 h19 h20 h21 h22 h23 d
+        col2 h24 k2 h25 o2 h26 h27 o3 h28 o4 h29 h30 o5 h31 o6 h32 h33 s2
+        sol2 k3 col3 h34 h35 h36 h37 h38 h39 f1 h40 k4 h41 e1 h42 h43.
 red; intros i j hij.
 assert (case: (j < s1 \/ s1 <= j)%Z) by omega. destruct case.
-do 2 (rewrite <- h40; try omega).
-apply h18; omega.
+do 2 (rewrite <- h39; try omega).
+apply h17; omega.
 assert (case: (s1 <= i \/ i < s1)%Z) by omega. destruct case.
-apply h37; omega.
+apply h36; omega.
 (* s1 <= i < s2 <= j < s3 *)
 red.
 subst k1. (* rename k1 into k.*)
 assert (k < n)%Z.
-generalize (cardinal_nonneg a).
-generalize (cardinal_empty a).
-intuition.
-assert (case: (cardinal a = 0 \/ cardinal a > 0)%Z) by omega. destruct case.
-absurd (is_empty a); auto.
+generalize (cardinal_nonneg (to_fset a)).
+generalize (cardinal_empty (to_fset a)).
+intros.
+assert (case: (cardinal (to_fset a) = 0 \/ cardinal (to_fset a) > 0)%Z) by omega. destruct case.
+absurd (is_empty (to_fset a)). auto. intuition.
 omega.
 
-
 assert (ha: eq_prefix col1 (sol1 i) k /\ 
-       mem (sol1 i k) (diff o1 e)).
-  apply (h20 i).
+       mem (sol1 i k) (diff (to_fset o1) (to_fset e))).
+  apply (h19 i).
   omega.
 destruct ha as (ha,hb).
 
-destruct (h38 (sol2 j)) as (_,hj).
+destruct (h37 (sol2 j)) as (_,hj).
 destruct hj.
-exists j; intuition.
+exists j.
+split.
+intuition.
 red; intuition.
-clear h37.
+clear h36.
 
-exists k; intuition.
+exists k.
+split. intuition.
 (* eq_prefix ... *)
-rewrite <- h40; try omega.
+rewrite <- h39; try omega.
+split.
 red; intros l hl.
 rewrite <- H3; try omega.
-rewrite <- h39; try omega.
+rewrite <- h38; try omega.
 subst col2.
 generalize (Map.set_def col1 k d l).
 intros (_,h).
@@ -440,15 +458,15 @@ rewrite h.
 rewrite <- ha; omega.
 omega.
 (* s[i][k] < s[j][k] *)
-apply h19.
-rewrite <- h40; try omega.
+apply h18.
+rewrite <- h39; try omega.
 auto.
 rewrite <- H3; try omega.
-rewrite <- h39; try omega.
+rewrite <- h38; try omega.
 subst col2.
 generalize (Map.set_def col1 k d k).
 intros (h,_).
 rewrite h; try omega.
-generalize (min_elt_spec e); intuition.
+generalize (min_elt_def (to_fset e)); intuition.
 Qed.
 

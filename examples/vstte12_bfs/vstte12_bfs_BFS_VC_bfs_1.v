@@ -2,120 +2,230 @@
 (* Beware! Only edit allowed sections below    *)
 Require Import BuiltIn.
 Require BuiltIn.
+Require HighOrd.
 Require int.Int.
 
-Axiom set : forall (a:Type), Type.
-Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
-Existing Instance set_WhyType.
+Axiom fset : forall (a:Type), Type.
+Parameter fset_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (fset a).
+Existing Instance fset_WhyType.
 
-Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
+Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> Prop.
 
-Parameter infix_eqeq: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) ->
-  Prop.
+(* Why3 assumption *)
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) :
+    Prop :=
+  forall (x:a), mem x s1 <-> mem x s2.
 
-Axiom infix_eqeq_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)), (infix_eqeq s1 s2) <-> forall (x:a), (mem x s1) <-> (mem x
-  s2).
+Axiom extensionality :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), infix_eqeq s1 s2 -> (s1 = s2).
 
-Axiom extensionality : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)), (infix_eqeq s1 s2) -> (s1 = s2).
+(* Why3 assumption *)
+Definition subset {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) : Prop :=
+  forall (x:a), mem x s1 -> mem x s2.
 
-Parameter subset: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) ->
-  Prop.
+Axiom subset_refl :
+  forall {a:Type} {a_WT:WhyType a}, forall (s:fset a), subset s s.
 
-Axiom subset_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)), (subset s1 s2) <-> forall (x:a), (mem x s1) -> (mem x s2).
+Axiom subset_trans :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a) (s3:fset a), subset s1 s2 -> subset s2 s3 ->
+  subset s1 s3.
 
-Axiom subset_refl : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
-  (subset s s).
+(* Why3 assumption *)
+Definition is_empty {a:Type} {a_WT:WhyType a} (s:fset a) : Prop :=
+  forall (x:a), ~ mem x s.
 
-Axiom subset_trans : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)) (s3:(set a)), (subset s1 s2) -> ((subset s2 s3) -> (subset s1
-  s3)).
+Parameter empty: forall {a:Type} {a_WT:WhyType a}, fset a.
 
-Parameter is_empty: forall {a:Type} {a_WT:WhyType a}, (set a) -> Prop.
+Axiom is_empty_empty :
+  forall {a:Type} {a_WT:WhyType a}, is_empty (empty : fset a).
 
-Axiom is_empty_spec : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
-  (is_empty s) <-> forall (x:a), ~ (mem x s).
+Axiom empty_is_empty :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a), is_empty s -> (s = (empty : fset a)).
 
-Parameter empty: forall {a:Type} {a_WT:WhyType a}, (set a).
+Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> fset a.
 
-Axiom empty_def : forall {a:Type} {a_WT:WhyType a}, (is_empty (empty : (set
-  a))).
+Axiom add_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (s:fset a) (y:a), mem y (add x s) <-> mem y s \/ (y = x).
 
-Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
+Axiom mem_singleton :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (y:a), mem y (add x (empty : fset a)) -> (y = x).
 
-Axiom add_spec : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set a)),
-  forall (y:a), (mem y (add x s)) <-> ((y = x) \/ (mem y s)).
+Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> fset a.
 
-Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> (set a).
+Axiom remove_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (s:fset a) (y:a), mem y (remove x s) <-> mem y s /\ ~ (y = x).
 
-Axiom remove_spec : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
-  a)), forall (y:a), (mem y (remove x s)) <-> ((~ (y = x)) /\ (mem y s)).
+Axiom add_remove :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (s:fset a), mem x s -> ((add x (remove x s)) = s).
 
-Axiom add_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
-  a)), (mem x s) -> ((add x (remove x s)) = s).
+Axiom remove_add :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (s:fset a), ((remove x (add x s)) = (remove x s)).
 
-Axiom remove_add : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
-  a)), ((remove x (add x s)) = (remove x s)).
+Axiom subset_remove :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (s:fset a), subset (remove x s) s.
 
-Axiom subset_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a) (s:(set
-  a)), (subset (remove x s) s).
+Parameter union:
+  forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
 
-Parameter union: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
-  a).
+Axiom union_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a) (x:a),
+  mem x (union s1 s2) <-> mem x s1 \/ mem x s2.
 
-Axiom union_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)), forall (x:a), (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x
-  s2)).
+Axiom subset_union_1 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), subset s1 (union s1 s2).
 
-Parameter inter: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
-  a).
+Axiom subset_union_2 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), subset s2 (union s1 s2).
 
-Axiom inter_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)), forall (x:a), (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x
-  s2)).
+Parameter inter:
+  forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
 
-Parameter diff: forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> (set
-  a).
+Axiom inter_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a) (x:a),
+  mem x (inter s1 s2) <-> mem x s1 /\ mem x s2.
 
-Axiom diff_spec : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)), forall (x:a), (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem
-  x s2)).
+Axiom subset_inter_1 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), subset (inter s1 s2) s1.
 
-Axiom subset_diff : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)), (subset (diff s1 s2) s1).
+Axiom subset_inter_2 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), subset (inter s1 s2) s2.
 
-Parameter choose: forall {a:Type} {a_WT:WhyType a}, (set a) -> a.
+Parameter diff: forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
 
-Axiom choose_spec : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
-  (~ (is_empty s)) -> (mem (choose s) s).
+Axiom diff_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a) (x:a),
+  mem x (diff s1 s2) <-> mem x s1 /\ ~ mem x s2.
 
-Parameter cardinal: forall {a:Type} {a_WT:WhyType a}, (set a) -> Z.
+Axiom subset_diff :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), subset (diff s1 s2) s1.
 
-Axiom cardinal_nonneg : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
-  (0%Z <= (cardinal s))%Z.
+Parameter pick: forall {a:Type} {a_WT:WhyType a}, fset a -> a.
 
-Axiom cardinal_empty : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
-  ((cardinal s) = 0%Z) <-> (is_empty s).
+Axiom pick_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a), ~ is_empty s -> mem (pick s) s.
 
-Axiom cardinal_add : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
-  forall (s:(set a)), (~ (mem x s)) -> ((cardinal (add x
-  s)) = (1%Z + (cardinal s))%Z).
+(* Why3 assumption *)
+Definition disjoint {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) : Prop :=
+  forall (x:a), ~ mem x s1 \/ ~ mem x s2.
 
-Axiom cardinal_remove : forall {a:Type} {a_WT:WhyType a}, forall (x:a),
-  forall (s:(set a)), (mem x s) -> ((cardinal s) = (1%Z + (cardinal (remove x
-  s)))%Z).
+Axiom disjoint_inter_empty :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), disjoint s1 s2 <-> is_empty (inter s1 s2).
 
-Axiom cardinal_subset : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)), (subset s1 s2) -> ((cardinal s1) <= (cardinal s2))%Z.
+Axiom disjoint_diff_eq :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), disjoint s1 s2 <-> ((diff s1 s2) = s1).
 
-Axiom subset_eq : forall {a:Type} {a_WT:WhyType a}, forall (s1:(set a))
-  (s2:(set a)), (subset s1 s2) -> (((cardinal s1) = (cardinal s2)) ->
-  (infix_eqeq s1 s2)).
+Axiom disjoint_diff_s2 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), disjoint (diff s1 s2) s2.
 
-Axiom cardinal1 : forall {a:Type} {a_WT:WhyType a}, forall (s:(set a)),
-  ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) -> (x = (choose s)).
+Parameter filter:
+  forall {a:Type} {a_WT:WhyType a}, fset a -> (a -> Init.Datatypes.bool) ->
+  fset a.
+
+Axiom filter_def :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a) (p:a -> Init.Datatypes.bool) (x:a),
+  mem x (filter s p) <-> mem x s /\ ((p x) = Init.Datatypes.true).
+
+Axiom subset_filter :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a) (p:a -> Init.Datatypes.bool), subset (filter s p) s.
+
+Parameter map:
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}, (a -> b) ->
+  fset a -> fset b.
+
+Axiom map_def :
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+  forall (f:a -> b) (u:fset a) (y:b),
+  mem y (map f u) <-> (exists x:a, mem x u /\ (y = (f x))).
+
+Axiom mem_map :
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+  forall (f:a -> b) (u:fset a), forall (x:a), mem x u -> mem (f x) (map f u).
+
+Parameter cardinal:
+  forall {a:Type} {a_WT:WhyType a}, fset a -> Numbers.BinNums.Z.
+
+Axiom cardinal_nonneg :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a), (0%Z <= (cardinal s))%Z.
+
+Axiom cardinal_empty :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a), is_empty s <-> ((cardinal s) = 0%Z).
+
+Axiom cardinal_add :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a), forall (s:fset a),
+  (mem x s -> ((cardinal (add x s)) = (cardinal s))) /\
+  (~ mem x s -> ((cardinal (add x s)) = ((cardinal s) + 1%Z)%Z)).
+
+Axiom cardinal_remove :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a), forall (s:fset a),
+  (mem x s -> ((cardinal (remove x s)) = ((cardinal s) - 1%Z)%Z)) /\
+  (~ mem x s -> ((cardinal (remove x s)) = (cardinal s))).
+
+Axiom cardinal_subset :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), subset s1 s2 ->
+  ((cardinal s1) <= (cardinal s2))%Z.
+
+Axiom subset_eq :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), subset s1 s2 ->
+  ((cardinal s1) = (cardinal s2)) -> (s1 = s2).
+
+Axiom cardinal1 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a), ((cardinal s) = 1%Z) -> forall (x:a), mem x s ->
+  (x = (pick s)).
+
+Axiom cardinal_union :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a),
+  ((cardinal (union s1 s2)) =
+   (((cardinal s1) + (cardinal s2))%Z - (cardinal (inter s1 s2)))%Z).
+
+Axiom cardinal_inter_disjoint :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a), disjoint s1 s2 ->
+  ((cardinal (inter s1 s2)) = 0%Z).
+
+Axiom cardinal_diff :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s1:fset a) (s2:fset a),
+  ((cardinal (diff s1 s2)) = ((cardinal s1) - (cardinal (inter s1 s2)))%Z).
+
+Axiom cardinal_filter :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (s:fset a) (p:a -> Init.Datatypes.bool),
+  ((cardinal (filter s p)) <= (cardinal s))%Z.
+
+Axiom cardinal_map :
+  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
+  forall (f:a -> b) (s:fset a), ((cardinal (map f s)) <= (cardinal s))%Z.
 
 Axiom vertex : Type.
 Parameter vertex_WhyType : WhyType vertex.
@@ -123,111 +233,127 @@ Existing Instance vertex_WhyType.
 
 Parameter eq: vertex -> vertex -> Prop.
 
-Axiom eq_spec : forall (x:vertex) (y:vertex), (eq x y) <-> (x = y).
+Axiom eq_spec : forall (x:vertex) (y:vertex), eq x y <-> (x = y).
 
-Parameter succ: vertex -> (set vertex).
+Parameter succ: vertex -> fset vertex.
 
 (* Why3 assumption *)
-Inductive path: vertex -> vertex -> Z -> Prop :=
-  | path_empty : forall (v:vertex), (path v v 0%Z)
-  | path_succ : forall (v1:vertex) (v2:vertex) (v3:vertex) (n:Z), (path v1 v2
-      n) -> ((mem v3 (succ v2)) -> (path v1 v3 (n + 1%Z)%Z)).
+Inductive path: vertex -> vertex -> Numbers.BinNums.Z -> Prop :=
+  | path_empty : forall (v:vertex), path v v 0%Z
+  | path_succ :
+      forall (v1:vertex) (v2:vertex) (v3:vertex) (n:Numbers.BinNums.Z),
+      path v1 v2 n -> mem v3 (succ v2) -> path v1 v3 (n + 1%Z)%Z.
 
-Axiom path_nonneg : forall (v1:vertex) (v2:vertex) (n:Z), (path v1 v2 n) ->
+Axiom path_nonneg :
+  forall (v1:vertex) (v2:vertex) (n:Numbers.BinNums.Z), path v1 v2 n ->
   (0%Z <= n)%Z.
 
-Axiom path_inversion : forall (v1:vertex) (v3:vertex) (n:Z), (0%Z <= n)%Z ->
-  ((path v1 v3 (n + 1%Z)%Z) -> exists v2:vertex, (path v1 v2 n) /\ (mem v3
-  (succ v2))).
+Axiom path_inversion :
+  forall (v1:vertex) (v3:vertex) (n:Numbers.BinNums.Z), (0%Z <= n)%Z ->
+  path v1 v3 (n + 1%Z)%Z ->
+  exists v2:vertex, path v1 v2 n /\ mem v3 (succ v2).
 
-Axiom path_closure : forall (s:(set vertex)), (forall (x:vertex), (mem x
-  s) -> forall (y:vertex), (mem y (succ x)) -> (mem y s)) ->
-  forall (v1:vertex) (v2:vertex) (n:Z), (path v1 v2 n) -> ((mem v1 s) -> (mem
-  v2 s)).
+Axiom path_closure :
+  forall (s:fset vertex),
+  (forall (x:vertex), mem x s ->
+   (forall (y:vertex), mem y (succ x) -> mem y s)) ->
+  forall (v1:vertex) (v2:vertex) (n:Numbers.BinNums.Z), path v1 v2 n ->
+  mem v1 s -> mem v2 s.
 
 (* Why3 assumption *)
-Definition shortest_path (v1:vertex) (v2:vertex) (n:Z): Prop := (path v1 v2
-  n) /\ forall (m:Z), (m < n)%Z -> ~ (path v1 v2 m).
+Definition shortest_path (v1:vertex) (v2:vertex) (n:Numbers.BinNums.Z) : Prop :=
+  path v1 v2 n /\ (forall (m:Numbers.BinNums.Z), (m < n)%Z -> ~ path v1 v2 m).
 
-Axiom t : Type.
-Parameter t_WhyType : WhyType t.
-Existing Instance t_WhyType.
+Axiom set : Type.
+Parameter set_WhyType : WhyType set.
+Existing Instance set_WhyType.
 
-Parameter contents: t -> (set vertex).
+Parameter to_fset: set -> fset vertex.
 
-Parameter is_empty1: t -> Prop.
+Parameter choose: set -> vertex.
 
-Axiom is_empty_spec1 : forall (s:t), (is_empty1 s) <-> (is_empty
-  (contents s)).
-
-Parameter mem1: vertex -> t -> Prop.
-
-Axiom mem_spec : forall (x:vertex) (s:t), (mem1 x s) <-> (mem x
-  (contents s)).
-
-Parameter cardinal2: t -> Z.
-
-Axiom cardinal_spec : forall (s:t),
-  ((cardinal2 s) = (cardinal (contents s))).
+Axiom choose_spec :
+  forall (s:set), ~ is_empty (to_fset s) -> mem (choose s) (to_fset s).
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
   | mk_ref : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Implicit Arguments mk_ref [[a]].
+Arguments mk_ref {a}.
 
 (* Why3 assumption *)
-Definition contents1 {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | (mk_ref x) => x
+  | mk_ref x => x
   end.
 
 (* Why3 assumption *)
-Definition inv (s:vertex) (t1:vertex) (visited:(set vertex)) (current:(set
-  vertex)) (next:(set vertex)) (d:Z): Prop := (subset current visited) /\
-  ((forall (x:vertex), (mem x current) -> (shortest_path s x d)) /\ ((subset
-  next visited) /\ ((forall (x:vertex), (mem x next) -> (shortest_path s x
-  (d + 1%Z)%Z)) /\ ((forall (x:vertex) (m:Z), (path s x m) -> ((m <= d)%Z ->
-  (mem x visited))) /\ ((forall (x:vertex), (mem x visited) -> exists m:Z,
-  (path s x m) /\ (m <= (d + 1%Z)%Z)%Z) /\ ((forall (x:vertex),
-  (shortest_path s x (d + 1%Z)%Z) -> ((mem x next) \/ ~ (mem x visited))) /\
-  ((mem t1 visited) -> ((mem t1 current) \/ (mem t1 next))))))))).
+Definition inv (s:vertex) (t:vertex) (visited:fset vertex)
+    (current:fset vertex) (next:fset vertex) (d:Numbers.BinNums.Z) : Prop :=
+  subset current visited /\
+  (forall (x:vertex), mem x current -> shortest_path s x d) /\
+  subset next visited /\
+  (forall (x:vertex), mem x next -> shortest_path s x (d + 1%Z)%Z) /\
+  (forall (x:vertex) (m:Numbers.BinNums.Z), path s x m -> (m <= d)%Z ->
+   mem x visited) /\
+  (forall (x:vertex), mem x visited ->
+   (exists m:Numbers.BinNums.Z, path s x m /\ (m <= (d + 1%Z)%Z)%Z)) /\
+  (forall (x:vertex), shortest_path s x (d + 1%Z)%Z ->
+   mem x next \/ ~ mem x visited) /\
+  (mem t visited -> mem t current \/ mem t next).
 
 (* Why3 assumption *)
-Definition closure (visited:(set vertex)) (current:(set vertex)) (next:(set
-  vertex)) (x:vertex): Prop := (mem x visited) -> ((~ (mem x current)) ->
-  ((~ (mem x next)) -> forall (y:vertex), (mem y (succ x)) -> (mem y
-  visited))).
+Definition closure (visited:fset vertex) (current:fset vertex)
+    (next:fset vertex) (x:vertex) : Prop :=
+  mem x visited -> ~ mem x current -> ~ mem x next -> forall (y:vertex),
+  mem y (succ x) -> mem y visited.
 
 (* Why3 goal *)
-Theorem VC_bfs : forall (s:vertex) (t1:vertex), forall (visited:t), (is_empty
-  (contents visited)) -> forall (o:t), (is_empty (contents o)) ->
-  forall (o1:t), (is_empty (contents o1)) -> forall (visited1:t),
-  ((contents visited1) = (add s (contents visited))) -> forall (current:t),
-  ((contents current) = (add s (contents o))) -> forall (d:Z) (next:t)
-  (current1:t) (visited2:t), ((inv s t1 (contents visited2)
-  (contents current1) (contents next) d) /\ (((is_empty
-  (contents current1)) -> (is_empty (contents next))) /\ ((forall (x:vertex),
-  (closure (contents visited2) (contents current1) (contents next) x)) /\
-  (0%Z <= d)%Z))) -> (((is_empty1 current1) <-> (is_empty
-  (contents current1))) -> ((is_empty1 current1) -> ((~ (mem t1
-  (contents visited2))) -> forall (d1:Z), ~ (path s t1 d1)))).
+Theorem VC_bfs :
+  forall (s:vertex) (t:vertex), forall (visited:set),
+  ((to_fset visited) = (empty : fset vertex)) /\
+  ((cardinal (to_fset visited)) = 0%Z) -> forall (o:set),
+  ((to_fset o) = (empty : fset vertex)) /\ ((cardinal (to_fset o)) = 0%Z) ->
+  forall (o1:set),
+  ((to_fset o1) = (empty : fset vertex)) /\ ((cardinal (to_fset o1)) = 0%Z) ->
+  forall (visited1:set),
+  ((to_fset visited1) = (add s (to_fset visited))) /\
+  (mem s (to_fset visited) /\
+   ((cardinal (to_fset visited1)) = (cardinal (to_fset visited))) \/
+   ~ mem s (to_fset visited) /\
+   ((cardinal (to_fset visited1)) = ((cardinal (to_fset visited)) + 1%Z)%Z)) ->
+  forall (current:set),
+  ((to_fset current) = (add s (to_fset o))) /\
+  (mem s (to_fset o) /\
+   ((cardinal (to_fset current)) = (cardinal (to_fset o))) \/
+   ~ mem s (to_fset o) /\
+   ((cardinal (to_fset current)) = ((cardinal (to_fset o)) + 1%Z)%Z)) ->
+  forall (d:Numbers.BinNums.Z) (next:set) (current1:set) (visited2:set),
+  inv s t (to_fset visited2) (to_fset current1) (to_fset next) d /\
+  (is_empty (to_fset current1) -> is_empty (to_fset next)) /\
+  (forall (x:vertex),
+   closure (to_fset visited2) (to_fset current1) (to_fset next) x) /\
+  (0%Z <= d)%Z -> is_empty (to_fset current1) ->
+  ~ mem t (to_fset visited2) -> forall (d1:Numbers.BinNums.Z), ~ path s t d1.
+(* Why3 intros s t visited (h1,h2) o (h3,h4) o1 (h5,h6) visited1 (h7,h8)
+        current (h9,h10) d next current1 visited2 (h11,(h12,(h13,h14))) h15
+        h16 d1. *)
 Proof.
 intros s t1 visited h1 o h2 o1 h3 visited1 h4 current h5 d next current1
-visited2 (h6,(h7,(h8,h9))) h10 h11 h12 d1.
-intuition.
-assert (mem t1 (contents visited2)).
+visited2 (h6,(h7,(h8,h9))) h10 h11 d1 H.
+assert (mem t1 (to_fset visited2)).
 apply path_closure with s d1; auto.
 unfold closure in h8.
 intros x hx.
-apply h8; intuition.
-apply (proj1 (is_empty_spec _) H2 _ H1).
-apply (proj1 (is_empty_spec _) H0 _ H1).
+apply h8.
+intuition.
+rewrite (empty_is_empty _ h10). apply is_empty_empty.
+rewrite (empty_is_empty _ (h7 h10)). apply is_empty_empty.
 red in h6; decompose [and] h6.
-apply H7 with 0%Z.
+apply H4 with 0%Z.
 apply path_empty.
 assumption.
-exact (h12 H1).
+exact (h11 H0).
 Qed.
 

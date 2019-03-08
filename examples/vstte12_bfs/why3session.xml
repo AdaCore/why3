@@ -2,14 +2,12 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
-<prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Coq" version="8.7.1" timelimit="0" steplimit="0" memlimit="0"/>
 <prover id="8" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file>
+<file proved="true">
 <path name=".."/>
 <path name="vstte12_bfs.mlw"/>
 <theory name="Graph" proved="true">
@@ -44,7 +42,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="BFS">
+<theory name="BFS" proved="true">
  <goal name="B.VC eq" expl="VC for eq" proved="true">
  <proof prover="3"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -115,8 +113,8 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC bfs" expl="VC for bfs">
- <transf name="split_goal_right" >
+ <goal name="VC bfs" expl="VC for bfs" proved="true">
+ <transf name="split_goal_right" proved="true" >
   <goal name="VC bfs.0" expl="loop invariant init" proved="true">
   <proof prover="9"><result status="valid" time="0.04" steps="268"/></proof>
   </goal>
@@ -214,12 +212,8 @@
   <goal name="VC bfs.6" expl="assertion" proved="true">
   <proof prover="9"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="VC bfs.7" expl="postcondition">
-  <proof prover="2"><result status="timeout" time="1.00"/></proof>
-  <proof prover="3"><result status="timeout" time="1.00"/></proof>
-  <proof prover="4"><result status="timeout" time="1.00"/></proof>
-  <proof prover="7" obsolete="true" edited="vstte12_bfs_BFS_VC_bfs_1.v"><result status="valid" time="1.28"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00"/></proof>
+  <goal name="VC bfs.7" expl="postcondition" proved="true">
+  <proof prover="7" edited="vstte12_bfs_BFS_VC_bfs_1.v"><result status="valid" time="1.15"/></proof>
   </goal>
  </transf>
  </goal>
