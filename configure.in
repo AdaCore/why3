@@ -688,6 +688,45 @@ elif test "$enable_js_of_ocaml" != yes; then
    reason_web_ide=" (Javascript support not available)"
 fi
 
+# Mlmpfr
+MLMPFR_LINK=
+if test "$enable_js_of_ocaml" != no; then
+   found_mlmpfr=no
+   reason_mlmpfr=" (Cannot allow mlmpfr with js_of_ocaml) "
+else
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query mlmpfr)
+      if test -n "$DIR"; then
+         echo "ocamlfind found mlmpfr in $DIR"
+         # Test that mpfr version is higher than 4.0.0 (because of
+         # Faithful constructor incompatibility).
+         MPFR_VER=$(grep -q "4.0.0" $DIR/META 2> /dev/null)
+         EXIT_CODE=$?
+         if test $EXIT_CODE = 0; then
+            MLMPFRINCLUDE="-I $DIR"
+            MLMPFR=mlmpfr
+            found_mlmpfr=yes
+            MLMPFR_LINK="-cclib -lmpfr"
+            AC_CHECK_FILE($DIR/mlmpfr.cma,,found_mlmpfr=yes)
+         else
+            reason_mlmpfr=" (Version of mlmpfr is not 4.0.0) "
+            found_mlmpfr=no
+         fi
+      else
+         reason_mlmpfr=" (Could not find mlmpfr) "
+         found_mlmpfr=no
+      fi
+   else
+      reason_mlmpfr=" (Should use ocamlfind to use mlmpfr) "
+      found_mlmpfr=no
+   fi
+fi
+if test "$found_mlmpfr" = no; then
+   MLMPFRINCLUDE=
+   MLMPFR=
+fi
+
+
 # Coq
 
 enable_coq_support=yes
@@ -937,6 +976,10 @@ AC_SUBST(COMPILERLIBS)
 AC_SUBST(COMPILERLIBSPKG)
 
 AC_SUBST(NUMINCLUDE)
+AC_SUBST(MLMPFRINCLUDE)
+AC_SUBST(MLMPFR)
+AC_SUBST(MLMPFR_LINK)
+AC_SUBST(found_mlmpfr)
 
 AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)
@@ -1032,6 +1075,7 @@ echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
 echo "    Compiler plugins        : $enable_compiler_plugins$reason_compiler_plugins"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
+echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"

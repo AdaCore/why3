@@ -1,0 +1,31 @@
+module R
+
+  use real.Real
+  use ref.Ref
+  use real.Square
+
+  exception BenchFailure
+
+  let bench1 ()
+    (* Tries to calculate sqrt(2) *)
+    diverges
+    raises { BenchFailure -> false }
+    ensures { result = 10.0 } =
+    let incr = 0.002 (*(1.0 / 10000.0)*) in
+    let i : ref real = ref 0.0 in
+    while (!i * !i <= 2.0) do
+      i := !i + incr;
+    done;
+    !i
+
+  let bench2 ()
+(*    raises { BenchFailure -> false }*)
+    ensures { result = 4.0 } =
+    sqrt (16.0)
+
+  use real.Trigonometry
+
+  let bench3 () =
+    sqrt (pi)
+
+end
