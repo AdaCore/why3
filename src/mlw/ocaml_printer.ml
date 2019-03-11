@@ -170,11 +170,12 @@ module Print = struct
   let print_tv ~use_quote fmt tv =
     fprintf fmt (if use_quote then "'%s" else "%s") (id_unique aprinter tv.tv_name)
 
-  let protect_on ?(be=false) b s =
+  let protect_on ?(boxed=false) ?(be=false) b s =
     if b
     then if be
          then "begin@;<1 2>@["^^ s ^^ "@] end"
-         else "(" ^^ s ^^ ")"
+         else "@[<1>(" ^^ s ^^ ")@]"
+    else if not boxed then "@[<hv>" ^^ s ^^ "@]"
     else s
 
   let star fmt () = fprintf fmt " *@ "
@@ -407,7 +408,7 @@ module Print = struct
 
   and print_fun_type_args info fmt (args, s, res, e) =
     if Stv.is_empty s then
-      fprintf fmt "@[%a@]:@ %a@ =@ @[<hov>@[%a@]@]"
+      fprintf fmt "@[%a@]:@ %a@ =@ @[<hv>%a@]"
         (print_list_suf space (print_vs_arg info)) args
         (print_ty ~use_quote:false info) res
         (print_expr ~opr:false info 18) e
@@ -417,7 +418,7 @@ module Print = struct
       let arrow fmt () = fprintf fmt " ->@ " in
       let start fmt () = fprintf fmt "fun@ " in
       fprintf fmt ":@ @[<h>type @[%a@]. @[%a@ %a@]@] =@ \
-                   @[<hov 2>@[%a@]%a@]"
+                   @[<hv 2>@[%a@]%a@]"
         print_svar s
         (print_list_suf arrow (print_ty ~use_quote:false ~paren:true info)) ty_args
         (print_ty ~use_quote:false ~paren:true info) res
@@ -457,9 +458,9 @@ module Print = struct
         forget_vars args
     | Lany ({rs_name}, _, _, _) -> check_val_in_drv info rs_name.id_loc rs_name
 
-  and print_expr ?(opr=true) ?(be=false) info prec fmt e =
-    let protect_on_be b s = protect_on ~be:true b s in
-    let protect_on b s = protect_on ~be b s in
+  and print_expr ?(boxed=false) ?(opr=true) ?(be=false) info prec fmt e =
+    let protect_on_be ?(boxed=false) b s = protect_on ~boxed ~be:true b s in
+    let protect_on ?(boxed=false) b s = protect_on ~boxed ~be b s in
     match e.e_node with
     | Econst c ->
         let n = c.Number.il_int in
@@ -475,8 +476,8 @@ module Print = struct
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->
-        fprintf fmt (protect_on (opr && prec < 18) "@[%a@] in@ @[%a@]")
-          (print_let_def info) let_def (print_expr ~opr info 18) e;
+        fprintf fmt (protect_on ~boxed (opr && prec < 18) "@[%a in@]@;%a")
+          (print_let_def info) let_def (print_expr ~boxed:true ~opr info 18) e;
         forget_let_defn let_def
     | Eabsurd ->
         fprintf fmt (protect_on (opr && prec < 4) "assert false (* absurd *)")
