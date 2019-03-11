@@ -34,8 +34,29 @@ type info = {
   info_mo_known_map : Pdecl.known_map;
   info_fname        : string option;
   info_flat         : bool;
+  info_prec         : int list Mid.t;
   info_current_ph   : string list; (* current path *)
-}
+  }
+
+(* operator precedence, from http://caml.inria.fr/pub/docs/manual-ocaml/expr.html
+   ! ? ~ ...   | 1
+   . .( .[ .~  | 2
+   #...        | 3
+   fun/cstr app| 4 left
+   -_ -._      | 5
+   ** lsl lsr  | 6 right
+   * / %       | 7 left
+   + -         | 8 left
+   ::          | 9 right
+   @ ^         | 10 right
+   = < > !=    | 11 left
+   & &&        | 12 right
+   or ||       | 13 right
+   ,           | 14
+   <- :=       | 15 right
+   if          | 16
+   ;           | 17 right
+   let fun try | 18 *)
 
 module Print = struct
 
@@ -149,8 +170,13 @@ module Print = struct
   let print_tv ~use_quote fmt tv =
     fprintf fmt (if use_quote then "'%s" else "%s") (id_unique aprinter tv.tv_name)
 
-  let protect_on b s =
-    if b then "(" ^^ s ^^ ")" else s
+  let protect_on ?(boxed=false) ?(be=false) b s =
+    if b
+    then if be
+         then "begin@;<1 2>@["^^ s ^^ "@] end"
+         else "@[<1>(" ^^ s ^^ ")@]"
+    else if not boxed then "@[<hv>" ^^ s ^^ "@]"
+    else s
 
   let star fmt () = fprintf fmt " *@ "
 
@@ -166,6 +192,9 @@ module Print = struct
   let print_rs info fmt rs =
     fprintf fmt "%a" (print_lident info) rs.rs_name
 
+  let complex_syntax s =
+    String.contains s '%' || String.contains s ' ' || String.contains s '('
+            
   (** Types *)
 
   let rec print_ty ~use_quote ?(paren=false) info fmt = function
@@ -180,9 +209,13 @@ module Print = struct
           (print_list star (print_ty ~use_quote ~paren:true info)) tl
     | Tapp (ts, tl) ->
         match query_syntax info.info_syn ts with
-        | Some s ->
+        | Some s when complex_syntax s ->
             fprintf fmt (protect_on paren "%a")
               (syntax_arguments s (print_ty ~use_quote ~paren:true info)) tl
+        | Some s ->
+           fprintf fmt (protect_on paren "%a%s")
+             (print_list_suf space (print_ty ~use_quote ~paren:true info)) tl
+             s
         | None   ->
             match tl with
             | [] ->
@@ -242,10 +275,13 @@ module Print = struct
     | Ptuple pl ->
         fprintf fmt "(%a)" (print_list comma (print_pat ~paren:true info)) pl
     | Papp (ls, pl) ->
-        match query_syntax info.info_syn ls.ls_name, pl with
-        | Some s, _ ->
-            syntax_arguments s (print_pat info) fmt pl
-        | None, pl ->
+        match query_syntax info.info_syn ls.ls_name with
+        | Some s when complex_syntax s || pl = [] ->
+           syntax_arguments s (print_pat info) fmt pl
+        | Some s ->
+           fprintf fmt (protect_on paren "%s (%a)")
+             s (print_list comma (print_pat ~paren:true info)) pl
+        | None ->
             let pjl = let rs = restore_rs ls in get_record info rs in
             match pjl with
             | []  -> print_papp info ls fmt pl
@@ -307,15 +343,15 @@ module Print = struct
             | Eapp (rs, _)
               when query_syntax info.info_syn rs.rs_name = Some "None" -> ()
             | _ -> fprintf fmt "?%s:%a" (pv_name pv).id_string
-                     (print_expr ~paren:true info) expr end
+                     (print_expr info 1) expr end
         else if is_named ~attrs:(pv_name pv).id_attrs then
           fprintf fmt "~%s:%a" (pv_name pv).id_string
-            (print_expr ~paren:true info) expr
-        else fprintf fmt "%a" (print_expr ~paren:true info) expr;
+            (print_expr info 1) expr
+        else fprintf fmt "%a" (print_expr info 3) expr;
         if exprl <> [] then fprintf fmt "@ ";
         print_apply_args info fmt (exprl, pvl)
     | expr :: exprl, [] ->
-        fprintf fmt "%a" (print_expr ~paren:true info) expr;
+        fprintf fmt "%a" (print_expr info 3) expr;
         print_apply_args info fmt (exprl, [])
     | [], _ -> ()
 
@@ -332,14 +368,19 @@ module Print = struct
           List.exists is_constructor its
       | _ -> false in
     match query_syntax info.info_syn rs.rs_name, pvl with
-    | Some s, _ (* when is_local_id info rs.rs_name  *)->
-        syntax_arguments s (print_expr ~paren:true info) fmt pvl;
+    | Some s, _ when complex_syntax s || pvl = [] ->
+       let p = Mid.find rs.rs_name info.info_prec in
+       syntax_arguments_prec s (print_expr info) p fmt pvl
+    | Some s, _ ->
+       fprintf fmt "@[<hov 2>%s %a@]"
+         s
+         (print_apply_args info) (pvl, rs.rs_cty.cty_args)
     | None, [t] when is_rs_tuple rs ->
-        fprintf fmt "@[%a@]" (print_expr info) t
+        fprintf fmt "@[%a@]" (print_expr info 1) t
     | None, tl when is_rs_tuple rs ->
-        fprintf fmt "@[(%a)@]" (print_list comma (print_expr info)) tl
+        fprintf fmt "@[(%a)@]" (print_list comma (print_expr info 14)) tl
     | None, [t1] when isfield ->
-        fprintf fmt "%a.%a" (print_expr info) t1 (print_lident info) rs.rs_name
+        fprintf fmt "%a.%a" (print_expr info 2) t1 (print_lident info) rs.rs_name
     | None, tl when isconstructor () ->
         let pjl = get_record info rs in
         begin match pjl, tl with
@@ -347,48 +388,47 @@ module Print = struct
               (print_uident info) fmt rs.rs_name
           | [], [t] ->
               fprintf fmt "@[<hov 2>%a %a@]" (print_uident info) rs.rs_name
-                (print_expr ~paren:true info) t
+                (print_expr info 2) t
           | [], tl ->
               fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
-                (print_list comma (print_expr ~paren:true info)) tl
+                (print_list comma (print_expr info 14)) tl
           | pjl, tl -> let equal fmt () = fprintf fmt " =@ " in
               fprintf fmt "@[<hov 2>{ %a }@]"
                 (print_list2 semi equal (print_rs info)
-                   (print_expr ~paren:true info)) (pjl, tl) end
+                   (print_expr info 17)) (pjl, tl) end
     | None, [] ->
         (print_lident info) fmt rs.rs_name
     | _, tl ->
         fprintf fmt "@[<hov 2>%a %a@]"
           (print_lident info) rs.rs_name
           (print_apply_args info) (tl, rs.rs_cty.cty_args)
-  (* (print_list space (print_expr ~paren:true info)) tl *)
 
   and print_svar fmt s =
-    Stv.iter (fun tv -> fprintf fmt "%a " (print_tv ~use_quote:false) tv) s
+    print_list space (print_tv ~use_quote:false) fmt (Stv.elements s)
 
   and print_fun_type_args info fmt (args, s, res, e) =
     if Stv.is_empty s then
-      fprintf fmt "@[%a@] :@ %a@ =@ %a"
-        (print_list space (print_vs_arg info)) args
+      fprintf fmt "@[%a@]:@ %a@ =@ @[<hv>%a@]"
+        (print_list_suf space (print_vs_arg info)) args
         (print_ty ~use_quote:false info) res
-        (print_expr info) e
+        (print_expr ~opr:false info 18) e
     else
       let ty_args = List.map (fun (_, ty, _) -> ty) args in
       let id_args = List.map (fun (id, _, _) -> id) args in
       let arrow fmt () = fprintf fmt " ->@ " in
       let start fmt () = fprintf fmt "fun@ " in
       fprintf fmt ":@ @[<h>type @[%a@]. @[%a@ %a@]@] =@ \
-                   @[<hov 2>@[%a@]@ %a@]"
+                   @[<hv 2>@[%a@]%a@]"
         print_svar s
         (print_list_suf arrow (print_ty ~use_quote:false ~paren:true info)) ty_args
         (print_ty ~use_quote:false ~paren:true info) res
         (print_list_delim ~start ~stop:arrow ~sep:space (print_lident info)) id_args
-        (print_expr info) e
+        (print_expr ~opr:false info 18) e
 
   and print_let_def ?(functor_arg=false) info fmt = function
     | Lvar (pv, e) ->
         fprintf fmt "@[<hov 2>let %a =@ %a@]"
-          (print_lident info) (pv_name pv) (print_expr info) e
+          (print_lident info) (pv_name pv) (print_expr ~opr:false info 18) e
     | Lsym (rs, svar, res, args, ef) ->
         fprintf fmt "@[<hov 2>let %a %a@]"
           (print_lident info) rs.rs_name
@@ -418,7 +458,9 @@ module Print = struct
         forget_vars args
     | Lany ({rs_name}, _, _, _) -> check_val_in_drv info rs_name.id_loc rs_name
 
-  and print_expr ?(paren=false) info fmt e =
+  and print_expr ?(boxed=false) ?(opr=true) ?(be=false) info prec fmt e =
+    let protect_on_be ?(boxed=false) b s = protect_on ~boxed ~be:true b s in
+    let protect_on ?(boxed=false) b s = protect_on ~boxed ~be b s in
     match e.e_node with
     | Econst c ->
         let n = c.Number.il_int in
@@ -430,15 +472,15 @@ module Print = struct
          | Some s -> syntax_arguments s print_constant fmt [e]
          | None when n = "0" -> fprintf fmt "Z.zero"
          | None when n = "1" -> fprintf fmt "Z.one"
-         | None   -> fprintf fmt (protect_on paren "Z.of_string \"%s\"") n)
+         | None   -> fprintf fmt (protect_on (prec < 4) "Z.of_string \"%s\"") n)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->
-        fprintf fmt (protect_on paren "@[%a@] in@ @[%a@]")
-          (print_let_def info) let_def (print_expr info) e;
+        fprintf fmt (protect_on ~boxed (opr && prec < 18) "@[%a in@]@;%a")
+          (print_let_def info) let_def (print_expr ~boxed:true ~opr info 18) e;
         forget_let_defn let_def
     | Eabsurd ->
-        fprintf fmt (protect_on paren "assert false (* absurd *)")
+        fprintf fmt (protect_on (opr && prec < 4) "assert false (* absurd *)")
     | Eapp (rs, []) when rs_equal rs rs_true ->
         fprintf fmt "true"
     | Eapp (rs, []) when rs_equal rs rs_false ->
@@ -446,128 +488,159 @@ module Print = struct
     | Eapp (rs, [])  -> (* avoids parenthesis around values *)
         fprintf fmt "%a" (print_apply info rs) []
     | Eapp (rs, pvl) ->
-       fprintf fmt (protect_on paren "%a")
-               (print_apply info rs) pvl
+       fprintf fmt (protect_on (prec < 4) "%a") (print_apply info rs) pvl
     | Ematch (e1, [p, e2], []) ->
-        fprintf fmt (protect_on paren "let %a =@ %a in@ %a")
-          (print_pat info) p (print_expr info) e1 (print_expr info) e2
+        fprintf fmt (protect_on (opr && prec < 18) "let %a =@ %a in@ %a")
+          (print_pat info) p (print_expr ~opr:false info 18) e1
+          (print_expr ~opr info 18) e2
     | Ematch (e, pl, []) ->
         fprintf fmt
-          (protect_on paren "begin match @[%a@] with@\n@[<hov>%a@]@\nend")
-          (print_expr info) e (print_list newline (print_branch info)) pl
+          (if prec < 18 && opr
+           then "@[<hv>@[<hv 2>begin@ match@ %a@]@ with@]@\n@[<hv>%a@]@\nend"
+           else "@[<hv>@[<hv 2>match@ %a@]@ with@]@\n@[<hv>%a@]")
+          (print_expr info 18) e
+          (print_list newline (print_branch info)) pl
     | Eassign al ->
         let assign fmt (rho, rs, e) =
-          fprintf fmt "@[<hov 2>%a.%a <-@ %a@]"
+          fprintf fmt "@[<hv 2>%a.%a <-@ %a@]"
             (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
-            (print_expr info) e in
+            (print_expr info 15) e in
         begin match al with
           | [] -> assert false | [a] -> assign fmt a
           | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end
     | Eif (e1, e2, {e_node = Eblock []}) ->
         fprintf fmt
-          (protect_on paren
-             "@[<hv>@[<hov 2>if@ %a@]@ then begin@;<1 2>@[%a@] end@]")
-          (print_expr info) e1 (print_expr info) e2
+          (protect_on (opr && prec < 16)
+             "@[<hv>@[<hv 2>if@ %a@]@ then %a@]")
+          (print_expr ~opr:false info 15) e1 (print_expr ~be:true info 18) e2
     | Eif (e1, e2, e3) when is_false e2 && is_true e3 ->
-        fprintf fmt (protect_on paren "not %a") (print_expr info ~paren:true) e1
+        fprintf fmt (protect_on (prec < 4) "not %a")
+          (print_expr info 3) e1
     | Eif (e1, e2, e3) when is_true e2 ->
-        fprintf fmt (protect_on paren "@[<hv>%a || %a@]")
-          (print_expr info ~paren:true) e1 (print_expr info ~paren:true) e3
+        fprintf fmt (protect_on (prec < 13) "@[<hv>%a || %a@]")
+          (print_expr info 12) e1 (print_expr info 13) e3
     | Eif (e1, e2, e3) when is_false e3 ->
-        fprintf fmt (protect_on paren "@[<hv>%a && %a@]")
-          (print_expr info ~paren:true) e1 (print_expr info ~paren:true) e2
+        fprintf fmt (protect_on (prec < 12) "@[<hv>%a && %a@]")
+          (print_expr info 11) e1 (print_expr info 12) e2
     | Eif (e1, e2, e3) ->
-        fprintf fmt (protect_on paren
-                       "@[<hv>@[<hov 2>if@ %a@ then@ begin@ @[%a@] end@]\
-                        @;<1 0>else@ begin@;<1 2>@[%a@] end@]")
-          (print_expr info) e1 (print_expr info) e2 (print_expr info) e3
+        fprintf fmt (protect_on (opr && prec < 16)
+                       "@[<hv>@[<hv>if %a@]\
+                        @;<1 0>@[<hv 2>then@;%a@]\
+                        @;<1 0>@[<hv 2>else@;%a@]@]")
+          (print_expr ~opr:false info 18) e1
+          (print_expr ~opr:false ~be:true info 18) e2
+          (print_expr ~be:true info 18) e3
     | Eblock [] ->
         fprintf fmt "()"
     | Eblock [e] ->
-        print_expr info fmt e
+        print_expr ~be info prec fmt e
     | Eblock el ->
-        fprintf fmt "@[<hv>begin@;<1 2>@[%a@]@ end@]"
-          (print_list semi (print_expr info)) el
+        let semibreak fmt () = fprintf fmt ";@ " in
+        let rec aux fmt = function
+          | [] -> assert false
+          | [e] -> print_expr ~opr:false info 18 fmt e
+          | h::t -> print_expr info 17 fmt h; semibreak fmt (); aux fmt t in
+        fprintf fmt
+          (if prec < 17
+           then "@[<hv>begin@;<1 2>@[<hv>%a@]@ end@]"
+           else "@[<hv>@[<hv>%a@]@]") aux el
     | Efun (varl, e) ->
-        fprintf fmt (protect_on paren "@[<hov 2>fun %a ->@ %a@]")
-          (print_list space (print_vs_arg info)) varl (print_expr info) e
+        fprintf fmt (protect_on (opr && prec < 18) "@[<hv 2>fun %a ->@ %a@]")
+          (print_list space (print_vs_arg info)) varl (print_expr info 17) e
     | Ewhile (e1, e2) ->
-        fprintf fmt "@[<hov 2>while %a do@\n%a@ done@]"
-          (print_expr info) e1 (print_expr info) e2
+        fprintf fmt "@[<hv 2>while %a do@\n%a@;<1 -2>done@]"
+          (print_expr info 18) e1 (print_expr ~opr:false info 18) e2
     | Eraise (xs, e_opt) ->
-        print_raise ~paren info xs fmt e_opt
+        print_raise ~paren:(prec < 4) info xs fmt e_opt
     | Efor (pv1, pv2, dir, pv3, e) ->
         if is_mapped_to_int info pv1.pv_ity then begin
-          fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
+          fprintf fmt "@[<hv 2>for %a = %a %a %a do@ @[%a@]@ done@]"
             (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)
             print_for_direction dir (print_lident info) (pv_name pv3)
-            (print_expr info) e;
+            (print_expr ~opr:false info 18) e;
           forget_pv pv1 end
         else
           let for_id  = id_register (id_fresh "for_loop_to") in
           let cmp, op = match dir with
             | To     -> "Z.leq", "Z.succ"
             | DownTo -> "Z.geq", "Z.pred" in
-          fprintf fmt (protect_on paren
-                         "@[<hov 2>let rec %a %a =@ if %s %a %a then \
-                          begin@ %a; %a (%s %a) end@ in@ %a %a@]")
+          fprintf fmt (protect_on_be (opr && prec < 18)
+                         "@[<hv 2>let rec %a %a =@ \
+                          @[<hv 2>if %s %a %a@]@;<1 0>\
+                          @[<hv 2>then begin@ %a;@ %a (%s %a)@;<1 -2>end@]@;<1 -2>in %a %a@]")
           (* let rec *) (print_lident info) for_id (print_pv info) pv1
           (* if      *)  cmp (print_pv info) pv1 (print_pv info) pv3
-          (* then    *) (print_expr info) e (print_lident info) for_id
+          (* then    *) (print_expr info 16) e (print_lident info) for_id
                         op (print_pv info) pv1
           (* in      *) (print_lident info) for_id (print_pv info) pv2
     | Ematch (e, [], xl) ->
-        fprintf fmt "@[<hv>@[<hov 2>begin@ try@ %a@] with@]@\n@[<hov>%a@]@\nend"
-          (print_expr info) e (print_list newline (print_xbranch info false)) xl
+        fprintf fmt
+          (if prec < 18 && opr
+           then "@[<hv>@[<hv 2>begin@ try@ %a@]@ with@]@\n@[<hv>%a@]@\nend"
+           else "@[<hv>@[<hv 2>try@ %a@]@ with@]@\n@[<hv>%a@]")
+          (print_expr ~be:true ~opr:false info 17) e
+          (print_list newline (print_xbranch info false)) xl
     | Ematch (e, bl, xl) ->
         fprintf fmt
-          (protect_on paren "begin match @[%a@] with@\n@[<hov>%a@\n%a@]@\nend")
-          (print_expr info) e (print_list newline (print_branch info)) bl
+          (if (prec < 18 && opr)
+           then "@[begin match @[%a@]@ with@]@\n@[<hv>%a@\n%a@]@\nend"
+           else "@[<hv>match @[%a@]@ with@]@\n@[<hv>%a@\n%a@]")
+          (print_expr ~be:true ~opr:false info 17) e
+          (print_list newline (print_branch info)) bl
           (print_list newline (print_xbranch info true)) xl
     | Eexn (xs, None, e) ->
         fprintf fmt "@[<hv>let exception %a in@\n%a@]"
-          (print_uident info) xs.xs_name (print_expr info) e
+          (print_uident info) xs.xs_name (print_expr info 18) e
     | Eexn (xs, Some t, e) ->
         fprintf fmt "@[<hv>let exception %a of %a in@\n%a@]"
           (print_uident info) xs.xs_name (print_ty ~use_quote:false ~paren:true info) t
-          (print_expr info) e
-    | Eignore e -> fprintf fmt "ignore (%a)" (print_expr info) e
+          (print_expr info 18) e
+    | Eignore e ->
+        fprintf fmt (protect_on (prec < 4)"ignore %a")
+          (print_expr info 4) e
 
   and print_branch info fmt (p, e) =
-    fprintf fmt "@[<hov 2>| %a ->@ @[%a@]@]"
-      (print_pat info) p (print_expr info) e;
+    fprintf fmt "@[<hv 2>| %a ->@ @[%a@]@]"
+      (print_pat info) p (print_expr info 17) e;
     forget_pat p
 
   and print_raise ~paren info xs fmt e_opt =
     match query_syntax info.info_syn xs.xs_name, e_opt with
     | Some s, None ->
         fprintf fmt "raise (%s)" s
+    | Some s, Some e when complex_syntax s ->
+        fprintf fmt (protect_on paren "raise %a")
+          (syntax_arguments_prec s (print_expr info) []) [e]
     | Some s, Some e ->
-        fprintf fmt (protect_on paren "raise (%a)")
-          (syntax_arguments s (print_expr info)) [e]
+        fprintf fmt (protect_on paren "raise (%s %a)")
+          s (print_expr info 3) e
     | None, None ->
         fprintf fmt (protect_on paren "raise %a")
           (print_uident info) xs.xs_name
     | None, Some e ->
         fprintf fmt (protect_on paren "raise (%a %a)")
-          (print_uident info) xs.xs_name (print_expr ~paren:true info) e
+          (print_uident info) xs.xs_name (print_expr info 3) e
 
   and print_xbranch info case fmt (xs, pvl, e) =
     let print_exn fmt () =
       if case then fprintf fmt "exception " else fprintf fmt "" in
     let print_var fmt pv = print_lident info fmt (pv_name pv) in
     match query_syntax info.info_syn xs.xs_name, pvl with
-    | Some s, _ -> fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
-        print_exn () (syntax_arguments s print_var) pvl
-        (print_expr info ~paren:true) e
+    | Some s, _ when complex_syntax s || pvl = [] ->
+        fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
+          print_exn () (syntax_arguments s print_var) pvl
+          (print_expr info 17) e
+    | Some s, _ -> fprintf fmt "@[<hov 4>| %a%s (%a) ->@ %a@]"
+        print_exn () s
+        (print_list comma print_var) pvl (print_expr info 17) e
     | None, [] -> fprintf fmt "@[<hov 4>| %a%a ->@ %a@]"
-        print_exn () (print_uident info) xs.xs_name (print_expr info) e
+        print_exn () (print_uident info) xs.xs_name (print_expr info 17) e
     | None, [pv] -> fprintf fmt "@[<hov 4>| %a%a %a ->@ %a@]"
         print_exn () (print_uident info) xs.xs_name print_var pv
-        (print_expr info) e
+        (print_expr info 17) e
     | None, pvl -> fprintf fmt "@[<hov 4>| %a%a (%a) ->@ %a@]"
         print_exn () (print_uident info) xs.xs_name
-        (print_list comma print_var) pvl (print_expr info) e
+        (print_list comma print_var) pvl (print_expr info 17) e
 
   let print_type_decl info fst fmt its =
     let print_constr fmt (id, cs_args) =
@@ -681,8 +754,9 @@ let print_decl =
       info_mo_known_map = m.mod_known;
       info_fname        = Opt.map Compile.clean_name fname;
       info_flat         = flat;
+      info_prec         = pargs.Pdriver.prec;
       info_current_ph   = [];
-    } in
+      } in
     if not (Hashtbl.mem memo d) then begin Hashtbl.add memo d ();
       Print.print_decl info fmt d end
 
