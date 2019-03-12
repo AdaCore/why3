@@ -11,3 +11,5 @@
 
 #13 "src/ide/gtkcompat3.ml"
 module GSourceView = GSourceView3
+
+let gpango_font_description_from_string = GPango.font_description_from_string
