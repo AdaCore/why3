@@ -953,7 +953,7 @@ module Sqrt
       assert { value rp res = value rp 1 = (pelts rp)[offset rp] };
       return res
     end;
-    let tn = (n + 1) / 2 in
+    let ref tn = (n + 1) / 2 in
     assert { tn = k };
     let ref rn : int32 = 0 in
     let adj = to_int32 (mod2 (of_int32 n)) in
@@ -1052,6 +1052,10 @@ module Sqrt
       let ref rl = wmpn_dc_sqrtrem sp tp tn scratch in
       let ghost vs = pure { value sp tn } in
       let ghost vr = pure { value tp tn + power radix tn * rl } in
+      assert { 0 <= vr
+               by 0 <= value tp tn
+               so 0 <= rl
+               so 0 <= power radix tn };
       assert { vn1 = vs * vs + vr };
       let ghost vs0 = pure { mod vs (power 2 c) } in
       assert { vn1 = (vs - vs0) * (vs - vs0) + 2 * vs0 * vs - vs0 * vs0 + vr };
@@ -1087,7 +1091,103 @@ module Sqrt
                   >= power radix tn * (rl + rc)
                so power radix tn * (rl + rc) < power radix tn * radix };
       rl <- rl + rc;
-      let cc = submul_limb tp s0 s00 1 in
+      assert { value tp tn + power radix tn * rl = vr + 2 * vs0 * vs };
+      value_concat tp 1 tn;
+      let ghost otp = pure { tp } in
+      let ref cc = submul_limb tp s0 s00 1 in
+      value_sub_frame (pelts tp) (pelts otp) (offset tp + 1)
+                                  (offset tp + int32'int tn);
+      value_concat tp 1 tn;
+      assert { value tp tn - radix * cc = value otp tn - s00 * s00 };
+      assert { value tp tn + power radix tn * rl - radix * cc
+               = vr + 2 * vs0 * vs - vs0 * vs0 };
+      begin ensures { value tp tn + power radix tn * rl
+                      = vr + 2 * vs0 * vs - vs0 * vs0 }
+        if tn > 1
+        then begin
+          label Sub in
+          value_concat tp 1 tn;
+          let tp1 = C.incr tp 1 in
+          let ghost otp = pure { tp } in
+          let ghost otp1 = pure { tp1 } in
+          assert { value tp n = value tp 1 + radix * value tp1 (n-1) };
+          cc <- wmpn_sub_1_in_place tp1 cc (tn - 1);
+          value_sub_frame (pelts tp) (pelts otp1) (offset tp)
+                                             (offset tp + 1);
+          assert { value tp 1 = value tp 1 at Sub };
+          value_concat tp 1 tn;
+          assert { value tp tn - power radix tn * cc
+                   = value otp tn - radix * (cc at Sub)
+                   by value tp1 (tn - 1) - power radix (tn - 1) * cc
+                      = value otp1 (tn - 1) - cc at Sub
+                   so value tp tn = value tp 1 + radix * value tp1 (tn - 1)
+                   so value tp tn - power radix tn * cc
+                      = value tp 1
+                        + radix * (value tp1 (tn - 1) - power radix (tn-1) * cc)
+                      = value tp 1 + radix * (value otp1 (tn-1) - (cc at Sub))
+                      = value tp 1 + radix * value otp1 (tn-1)
+                        - radix * (cc at Sub)
+                      = value otp tn - radix * (cc at Sub) };
+        end
+        else begin
+          assert { tn = 1 };
+        end;
+        assert { value tp tn + power radix tn * (rl - cc)
+                   = vr + 2 * vs0 * vs - vs0 * vs0 };
+        assert { 0 <= rl - cc
+                 by (vs0 = mod vs (power 2 c) <= vs
+                     by vs = div vs (power 2 c) * power 2 c + vs0
+                     so div vs (power 2 c) >= 0
+                     so power 2 c >= 0
+                     so div vs (power 2 c) * power 2 c >= 0)
+                 so vs0 * vs0 <= vs0 * vs
+                 so 2 * vs0 * vs - vs0 * vs0 >= 0
+                 so 0 <= vr
+                 so 0 <= value tp tn + power radix tn * (rl - cc)
+                 so value tp tn < power radix tn
+                 so power radix tn * (rl - cc) >= - (power radix tn)
+                 so rl - cc > - 1 };
+        rl <- rl - cc
+      end;
+      let ghost r = wmpn_rshift_in_place sp tn c in
+      let ghost vsq = pure { div vs (power 2 c) } in
+      assert { vs = vsq * power 2 c + vs0 };
+      assert { value sp tn * radix + r = vs * power 2 (Limb.length - c) };
+      assert { mod r (power 2 (Limb.length - c)) = 0
+               by let q = power 2 (Limb.length - c) in
+                  let p = power 2 c in
+                  p * q = radix
+               so r = vs * q - value sp tn * p * q
+                    = q * (vs - value sp tn * p)
+               so mod r q
+                  = mod (q * (vs - value sp tn * p) + 0) q
+                  = 0 };
+      let ghost q = pure { div r (power 2 (Limb.length - c)) } in
+      assert { r = power 2 (Limb.length - c) * q
+      assert { value sp tn * power 2 c + q = vs };
+      assert { q = vs0
+               by vs0 = mod vs (power 2 c)
+                  = mod (value sp tn * power 2 c + q) (power 2 c)
+                  = mod q (power 2 c)
+               so 0 <= q
+               so q * power 2 (Limb.length - c) = r < radix
+                  = power 2 c * power 2 (Limb.length - c)
+               so q < power 2 c
+               so mod q (power 2 c) = q };
+      assert { value sp tn * power 2 c = vs - vs0 };
+      C.set_ofs tp tn rl;
+      value_tail tp tn;
+      assert { value tp (tn + 1) = vr + 2 * vs0 * vs - vs0 * vs0 };
+      assert { vn1 = value tp (tn + 1) + (vs - vs0) * (vs - vs0) };
+      assert { power 2 (2 * c) * vn = value tp (tn + 1)
+               + power 2 (2 * c) * value sp tn * value sp tn };
+      let c2 = lsl c 1 in
+      assert { c2 = 2 * c };
+      (*begin ensures { value tp tn * power 2 c2
+                    = old (value tp (tn + 1) * power 2 c2) }
+      if c < 64
+      then tn <- tn + 1
+      else *)
       ()
     end
     else begin end;
