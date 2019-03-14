@@ -35,7 +35,7 @@ module TagSetIntf
   type iteration_state = mutable { }
 
   type t = abstract {
-         mutable elts: S.set key;
+         mutable elts: S.fset key;
          mutable iterated: iteration_state;
        }
    invariant { not (S.mem S.dummy elts) }
@@ -66,9 +66,9 @@ module TagSetIntf
 
   type iterator = abstract {
        iterating: iteration_state;
-       mutable seen: S.set key;
-       mutable todo: S.set key;
-       all: S.set key;
+       mutable seen: S.fset key;
+       mutable todo: S.fset key;
+       all: S.fset key;
   }
   invariant { S.(union seen todo == all) }
   invariant { S.(inter seen todo == S.empty) }
@@ -118,7 +118,7 @@ module TagSet
   clone import S as S with axiom tag_correct
 
   type iteration_state = mutable {
-       ghost mutable elts': S.set key;
+       ghost mutable elts': S.fset key;
        mutable value: array key;
   }
   invariant { not (S.mem S.dummy elts') }
@@ -132,7 +132,7 @@ module TagSet
    }
 
   type t = {
-         ghost mutable elts: S.set key;
+         ghost mutable elts: S.fset key;
          mutable iterated: iteration_state;
        }
    invariant { elts = iterated.elts' }
@@ -204,9 +204,9 @@ module TagSet
 
   type iterator = {
        iterating: iteration_state;
-       ghost mutable seen: S.set key;
-       ghost mutable todo: S.set key;
-       ghost all: S.set key;
+       ghost mutable seen: S.fset key;
+       ghost mutable todo: S.fset key;
+       ghost all: S.fset key;
        mutable offset: int63;
   }
   invariant { S.(==) all (S.union seen todo) }
