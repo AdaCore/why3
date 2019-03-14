@@ -36,7 +36,7 @@ type info = {
   info_flat         : bool;
   info_prec         : int list Mid.t;
   info_current_ph   : string list; (* current path *)
-  }
+}
 
 (* operator precedence, from http://caml.inria.fr/pub/docs/manual-ocaml/expr.html
    ! ? ~ ...   | 1
@@ -168,7 +168,8 @@ module Print = struct
   let print_uident = print_qident ~sanitizer:Strings.capitalize
 
   let print_tv ~use_quote fmt tv =
-    fprintf fmt (if use_quote then "'%s" else "%s") (id_unique aprinter tv.tv_name)
+    fprintf fmt (if use_quote then "'%s" else "%s")
+      (id_unique aprinter tv.tv_name)
 
   let protect_on ?(boxed=false) ?(be=false) b s =
     if b
@@ -194,7 +195,7 @@ module Print = struct
 
   let complex_syntax s =
     String.contains s '%' || String.contains s ' ' || String.contains s '('
-            
+
   (** Types *)
 
   let rec print_ty ~use_quote ?(paren=false) info fmt = function
@@ -222,7 +223,8 @@ module Print = struct
                 (print_lident info) fmt ts
             | [ty] ->
                 fprintf fmt (protect_on paren "%a@ %a")
-                  (print_ty ~use_quote ~paren:true info) ty (print_lident info) ts
+                  (print_ty ~use_quote ~paren:true info) ty (print_lident info)
+                  ts
             | tl ->
                 fprintf fmt (protect_on paren "(%a)@ %a")
                   (print_list comma (print_ty ~use_quote ~paren:false info)) tl
@@ -232,22 +234,52 @@ module Print = struct
     fprintf fmt "?%s:(%a:@ %a)" id.id_string (print_lident info) id
       (print_ty ~use_quote:false ~paren:false info) ty
 
+  let print_vs_opt info fmt id =
+    fprintf fmt "?%s:%a" id.id_string (print_lident info) id
+
   let print_vsty_named info fmt id ty =
     fprintf fmt "~%s:(%a:@ %a)" id.id_string (print_lident info) id
       (print_ty ~use_quote:false ~paren:false info) ty
+
+  let print_vs_named info fmt id =
+    fprintf fmt "~%s:%a" id.id_string (print_lident info) id
 
   let print_vsty info fmt (id, ty, _) =
     let attrs = id.id_attrs in
     if is_optional ~attrs then print_vsty_opt info fmt id ty
     else if is_named ~attrs then print_vsty_named info fmt id ty
     else fprintf fmt "(%a:@ %a)" (print_lident info) id
-        (print_ty ~use_quote:false ~paren:false info) ty
+      (print_ty ~use_quote:false ~paren:false info) ty
+
+  let print_vsty_opt_fun info fmt id = function
+    | Tapp (id_ty, [arg]) ->
+        assert (query_syntax info.info_syn id_ty = Some "%1 option");
+        fprintf fmt "?%s:%a" id.id_string
+          (print_ty ~use_quote:false ~paren:false info) arg
+    | _ -> invalid_arg "print_vsty_opt_fun" (*FIXME : better error message *)
+
+  let print_vsty_named_fun info fmt id ty =
+    fprintf fmt "%s:%a" id.id_string
+      (print_ty ~use_quote:false ~paren:false info) ty
+
+  let print_vsty_fun info fmt (id, ty, _) =
+    let attrs = id.id_attrs in
+    if is_optional ~attrs then print_vsty_opt_fun info fmt id ty
+    else if is_named ~attrs then print_vsty_named_fun info fmt id ty
+    else fprintf fmt "%a" (print_ty ~use_quote:false ~paren:true info) ty
+
+  let print_vs_fun info fmt id =
+    let attrs = id.id_attrs in
+    if is_optional ~attrs then print_vs_opt info fmt id
+    else if is_named ~attrs then print_vs_named info fmt id
+    else print_lident info fmt id
 
   let print_tv_arg = print_tv
   let print_tv_args ~use_quote fmt = function
     | []   -> ()
     | [tv] -> fprintf fmt "%a@ " (print_tv_arg ~use_quote) tv
-    | tvl  -> fprintf fmt "(%a)@ " (print_list comma (print_tv_arg ~use_quote)) tvl
+    | tvl  ->
+        fprintf fmt "(%a)@ " (print_list comma (print_tv_arg ~use_quote)) tvl
 
   let print_vs_arg info fmt vs =
     fprintf fmt "@[%a@]" (print_vsty info) vs
@@ -380,7 +412,8 @@ module Print = struct
     | None, tl when is_rs_tuple rs ->
         fprintf fmt "@[(%a)@]" (print_list comma (print_expr info 14)) tl
     | None, [t1] when isfield ->
-        fprintf fmt "%a.%a" (print_expr info 2) t1 (print_lident info) rs.rs_name
+        fprintf fmt "%a.%a" (print_expr info 2) t1 (print_lident info)
+          rs.rs_name
     | None, tl when isconstructor () ->
         let pjl = get_record info rs in
         begin match pjl, tl with
@@ -413,16 +446,16 @@ module Print = struct
         (print_ty ~use_quote:false info) res
         (print_expr ~opr:false info 18) e
     else
-      let ty_args = List.map (fun (_, ty, _) -> ty) args in
       let id_args = List.map (fun (id, _, _) -> id) args in
       let arrow fmt () = fprintf fmt " ->@ " in
       let start fmt () = fprintf fmt "fun@ " in
       fprintf fmt ":@ @[<h>type @[%a@]. @[%a@ %a@]@] =@ \
                    @[<hv 2>@[%a@]%a@]"
         print_svar s
-        (print_list_suf arrow (print_ty ~use_quote:false ~paren:true info)) ty_args
+        (print_list_suf arrow (print_vsty_fun info)) args
         (print_ty ~use_quote:false ~paren:true info) res
-        (print_list_delim ~start ~stop:arrow ~sep:space (print_lident info)) id_args
+        (print_list_delim ~start ~stop:arrow ~sep:space (print_vs_fun info))
+          id_args
         (print_expr ~opr:false info 18) e
 
   and print_let_def ?(functor_arg=false) info fmt = function
