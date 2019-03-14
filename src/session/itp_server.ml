@@ -1282,7 +1282,7 @@ end
     (* interrupt all running provers and unfocus before reload *)
     C.interrupt ();
     let _old_focus = !focused_node in
-    unfocus ();
+    focused_node := Unfocused;
     clear_tables ();
     let l = reload_files d.cont
                          ~shape_version:(Some Termcode.current_shape_version)
