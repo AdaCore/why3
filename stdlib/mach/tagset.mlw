@@ -53,6 +53,7 @@ module TagSetIntf
 
   val function max_tags (h: t) : Int63.int63
     ensures { forall v. S.mem v h.elts -> tag v <= result }
+    ensures { -1 <= result  < Int63.max_int63 }
 
   val add (h: t) (k: key): unit
     requires { k <> S.dummy }
@@ -156,7 +157,8 @@ module TagSet
      tag k < Array.length h.iterated.value && Array.(S.tag h.iterated.value[tag k] <> S.tag S.dummy)
 
   let function max_tags (h: t) : Int63.int63
-    ensures { forall v. S.mem v h.elts -> tag v <= result } =
+    ensures { forall v. S.mem v h.elts -> tag v <= result }
+    ensures { -1 <= result  < Int63.max_int63 } =
     Array.(length h.iterated.value) - 1
 
   let resize (h:t) (k:key) : unit
