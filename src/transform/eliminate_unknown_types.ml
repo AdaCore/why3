@@ -52,36 +52,41 @@ let remove_terms keep =
         | _ -> acc) false
   in
 
-  Trans.fold_decl (fun d (already_removed, task_uc) ->
-      match d.d_node with
-      | Dtype ty when not (keep ty) ->
-          Debug.dprintf debug "remove@ type@ %a@." Pretty.print_ty_decl ty;
-          (already_removed, task_uc)
-      | Ddata l  when List.exists (fun (t,_) -> not (keep t)) l ->
-          Debug.dprintf debug "remove@ data@ %a@." Pretty.print_data_decl (List.hd l);
-          (already_removed, task_uc)
-      | Dparam l when not (keep_ls l) ->
-          let already_removed = Sls.add l already_removed in
-          Debug.dprintf debug "remove@ param@ %a@." Pretty.print_ls l;
-          (already_removed, task_uc)
-      | Dlogic l when
-          List.exists (fun (l,def) -> not (keep_ls l) ||
-                        let (_, t) = open_ls_defn def in
-                        not (keep_term t) || is_removed already_removed t) l ->
-          let already_removed =
-            List.fold_left (fun acc (ls, _) -> Sls.add ls acc) already_removed l
-          in
-          Debug.dprintf debug "remove@ logic@ %a@." Pretty.print_logic_decl (List.hd l);
-          (already_removed, task_uc)
-      | Dprop (Pgoal,pr,t) when not (keep_term t) || is_removed already_removed t ->
-          Debug.dprintf debug "change@ goal@ %a@." Pretty.print_term t;
-          let task_uc =
-            Task.add_decl task_uc (create_prop_decl Pgoal pr t_false) in
-          (already_removed, task_uc)
-      | Dprop (_,_,t) when not (keep_term t) || is_removed already_removed t ->
-          Debug.dprintf debug "remove@ prop@ %a@." Pretty.print_term t;
-          (already_removed, task_uc)
-      | _ -> (already_removed, Task.add_decl task_uc d))
+  Trans.fold (fun hd (already_removed, task_uc) ->
+      match hd.Task.task_decl.td_node with
+      | Decl d ->
+          begin match d.d_node with
+          | Dtype ty when not (keep ty) ->
+              Debug.dprintf debug "remove@ type@ %a@." Pretty.print_ty_decl ty;
+              (already_removed, task_uc)
+          | Ddata l  when List.exists (fun (t,_) -> not (keep t)) l ->
+              Debug.dprintf debug "remove@ data@ %a@." Pretty.print_data_decl (List.hd l);
+              (already_removed, task_uc)
+          | Dparam l when not (keep_ls l) ->
+              let already_removed = Sls.add l already_removed in
+              Debug.dprintf debug "remove@ param@ %a@." Pretty.print_ls l;
+              (already_removed, task_uc)
+          | Dlogic l when
+              List.exists (fun (l,def) -> not (keep_ls l) ||
+                                          let (_, t) = open_ls_defn def in
+                                          not (keep_term t) || is_removed already_removed t) l ->
+              let already_removed =
+                List.fold_left (fun acc (ls, _) -> Sls.add ls acc) already_removed l
+              in
+              Debug.dprintf debug "remove@ logic@ %a@." Pretty.print_logic_decl (List.hd l);
+              (already_removed, task_uc)
+          | Dprop (Pgoal,pr,t) when not (keep_term t) || is_removed already_removed t ->
+              Debug.dprintf debug "change@ goal@ %a@." Pretty.print_term t;
+              let task_uc =
+                Task.add_decl task_uc (create_prop_decl Pgoal pr t_false) in
+              (already_removed, task_uc)
+          | Dprop (_,_,t) when not (keep_term t) || is_removed already_removed t ->
+              Debug.dprintf debug "remove@ prop@ %a@." Pretty.print_term t;
+              (already_removed, task_uc)
+          | _ -> (already_removed, Task.add_decl task_uc d)
+          end
+      | _ -> (already_removed, Task.add_tdecl task_uc hd.Task.task_decl)
+    )
     (Sls.empty, None)
 
 let remove_types =
