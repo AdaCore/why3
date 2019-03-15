@@ -22,6 +22,7 @@ Transformations
   applying hypothesis with nested let-bindings :x:
   * Adding arguments to transformations without arguments is now forbidden
   (previously ignored):x:
+  * Fix crash of eliminate_unknown_types
 
 Counterexamples
   * Improved display of counterexamples in Task view

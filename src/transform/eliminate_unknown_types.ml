@@ -17,13 +17,13 @@ open Ty
 let debug = Debug.register_info_flag "eliminate_unknown_types"
   ~desc:"Print@ debugging@ messages@ of@ the@ eliminate_unknown_types@ transformation."
 
-let syntactic_transform transf =
+let syntactic_transform =
   Trans.on_meta Printer.meta_syntax_type (fun metas ->
       let symbols = List.fold_left (fun acc meta_arg ->
       match meta_arg with
       | [MAts ts; MAstr _; MAint _] -> Sts.add ts acc
       | _ -> assert false) Sts.empty metas in
-    transf (fun ts -> Sts.exists (ts_equal ts) symbols))
+      Trans.return (fun ts -> Sts.exists (ts_equal ts) symbols))
 
 let remove_terms keep =
   let keep_ls ls =
@@ -44,35 +44,56 @@ let remove_terms keep =
       | None -> true
     end
   in
-  Trans.decl (fun d ->
-    match d.d_node with
-    | Dtype ty when not (keep ty)                                ->
-      if Debug.test_flag debug then
-        Format.printf "remove@ type@ %a@." Pretty.print_ty_decl ty;
-      []
-    | Ddata l  when List.exists (fun (t,_) -> not (keep t)) l    ->
-      if Debug.test_flag debug then
-        Format.printf "remove@ data@ %a@." Pretty.print_data_decl (List.hd l);
-      []
-    | Dparam l when not (keep_ls l)                              ->
-      if Debug.test_flag debug then
-        Format.printf "remove@ param@ %a@." Pretty.print_ls l;
-      []
-    | Dlogic l when List.exists (fun (l,_) -> not (keep_ls l)) l ->
-      if Debug.test_flag debug then
-        Format.printf "remove@ logic@ %a@." Pretty.print_logic_decl (List.hd l);
-      []
-    | Dprop (Pgoal,pr,t) when not (keep_term t)                  ->
-      if Debug.test_flag debug then
-        Format.printf "change@ goal@ %a@." Pretty.print_term t;
-      [create_prop_decl Pgoal pr t_false]
-    | Dprop (_,_,t) when not (keep_term t)                       ->
-      if Debug.test_flag debug then
-        Format.printf "remove@ prop@ %a@." Pretty.print_term t;
-      []
-    | _ -> [d])
-    None
+  (* let already_removed = ref Sls.empty in*)
+  let is_removed already_removed =
+    Term.t_fold (fun acc t ->
+        match t.t_node with
+        | Tapp (ls, _) -> Sls.mem ls already_removed || acc
+        | _ -> acc) false
+  in
+
+  Trans.fold (fun hd (already_removed, task_uc) ->
+      match hd.Task.task_decl.td_node with
+      | Decl d ->
+          begin match d.d_node with
+          | Dtype ty when not (keep ty) ->
+              Debug.dprintf debug "remove@ type@ %a@." Pretty.print_ty_decl ty;
+              (already_removed, task_uc)
+          | Ddata l  when List.exists (fun (t,_) -> not (keep t)) l ->
+              Debug.dprintf debug "remove@ data@ %a@." Pretty.print_data_decl (List.hd l);
+              (already_removed, task_uc)
+          | Dparam l when not (keep_ls l) ->
+              let already_removed = Sls.add l already_removed in
+              Debug.dprintf debug "remove@ param@ %a@." Pretty.print_ls l;
+              (already_removed, task_uc)
+          | Dlogic l when
+              List.exists (fun (l,def) -> not (keep_ls l) ||
+                                          let (_, t) = open_ls_defn def in
+                                          not (keep_term t) || is_removed already_removed t) l ->
+              let already_removed =
+                List.fold_left (fun acc (ls, _) -> Sls.add ls acc) already_removed l
+              in
+              Debug.dprintf debug "remove@ logic@ %a@." Pretty.print_logic_decl (List.hd l);
+              (already_removed, task_uc)
+          | Dprop (Pgoal,pr,t) when not (keep_term t) || is_removed already_removed t ->
+              Debug.dprintf debug "change@ goal@ %a@." Pretty.print_term t;
+              let task_uc =
+                Task.add_decl task_uc (create_prop_decl Pgoal pr t_false) in
+              (already_removed, task_uc)
+          | Dprop (_,_,t) when not (keep_term t) || is_removed already_removed t ->
+              Debug.dprintf debug "remove@ prop@ %a@." Pretty.print_term t;
+              (already_removed, task_uc)
+          | _ -> (already_removed, Task.add_decl task_uc d)
+          end
+      | _ -> (already_removed, Task.add_tdecl task_uc hd.Task.task_decl)
+    )
+    (Sls.empty, None)
+
+let remove_types =
+  (* TODO fix the pair *)
+  Trans.bind (Trans.bind syntactic_transform remove_terms)
+    (fun (_, task) -> Trans.return task)
 
 let () =
-  Trans.register_transform "eliminate_unknown_types" (syntactic_transform remove_terms)
+  Trans.register_transform "eliminate_unknown_types" remove_types
     ~desc:"Remove@ types@ unknown@ to@ the@ prover@ and@ terms@ referring@ to@ them@."
