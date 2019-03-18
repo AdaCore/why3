@@ -11,3 +11,5 @@
 
 #13 "src/ide/gtkcompat2.ml"
 module GSourceView = GSourceView2
+
+let gpango_font_description_from_string = Pango.Font.from_string

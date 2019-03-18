@@ -302,8 +302,8 @@ let get_main () = (get_main (config ()).config)
 let sans_font_family = "Sans"
 let mono_font_family = "Monospace"
 
-let modifiable_sans_font_views = ref []
-let modifiable_mono_font_views = ref []
+let modifiable_sans_font_views : GObj.misc_ops list ref = ref []
+let modifiable_mono_font_views : GObj.misc_ops list ref = ref []
 
 let add_modifiable_sans_font_view v =
   modifiable_sans_font_views := v :: !modifiable_sans_font_views
@@ -317,8 +317,8 @@ let change_font size =
 *)
   let sff = sans_font_family ^ " " ^ string_of_int size in
   let mff = mono_font_family ^ " " ^ string_of_int size in
-  let sf = Pango.Font.from_string sff in
-  let mf = Pango.Font.from_string mff in
+  let sf = Gtkcompat.gpango_font_description_from_string sff in
+  let mf = Gtkcompat.gpango_font_description_from_string mff in
   List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
   List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
 
