@@ -545,7 +545,7 @@ module Print = struct
         fprintf fmt
           (protect_on (opr && prec < 16)
              "@[<hv>@[<hv 2>if@ %a@]@ then %a@]")
-          (print_expr ~opr:false info 15) e1 (print_expr ~be:true info 18) e2
+          (print_expr ~opr:false info 15) e1 (print_expr ~be:true info 15) e2
     | Eif (e1, e2, e3) when is_false e2 && is_true e3 ->
         fprintf fmt (protect_on (prec < 4) "not %a")
           (print_expr info 3) e1
