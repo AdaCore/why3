@@ -302,6 +302,12 @@ module mach.peano.MinMax
   syntax val  min    "min %1 %2" prec 4 3 3
 end
 
+module mach.peano.Int63
+  syntax val  defensive_to_int63    "%1"
+  syntax val  to_int63    "%1"
+  syntax val  of_int63    "%1"
+end
+
 module mach.onetime.OneTime
   syntax type t      "int"
   syntax val  to_int "Z.of_int %1" prec 4 3
