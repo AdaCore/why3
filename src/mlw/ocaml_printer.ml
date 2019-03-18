@@ -560,9 +560,9 @@ module Print = struct
                        "@[<hv>@[<hv>if %a@]\
                         @;<1 0>@[<hv 2>then@;%a@]\
                         @;<1 0>@[<hv 2>else@;%a@]@]")
-          (print_expr ~opr:false info 18) e1
-          (print_expr ~opr:false ~be:true info 18) e2
-          (print_expr ~be:true info 18) e3
+          (print_expr ~opr:false info 15) e1
+          (print_expr ~opr:false ~be:true info 15) e2
+          (print_expr ~be:true info 15) e3
     | Eblock [] ->
         fprintf fmt "()"
     | Eblock [e] ->
