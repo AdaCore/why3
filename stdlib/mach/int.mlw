@@ -602,6 +602,14 @@ module UInt64GMP
     requires { mod (to_int x) (power 2 (to_int cnt)) = 0 }
     ensures { to_int x = (power 2 (to_int cnt)) * to_int result }
 
+  val lsr_mod (x cnt: uint64) : uint64
+    requires { 0 <= cnt < 64 }
+    ensures { result = div x (power 2 cnt) }
+
+  val lsl_mod (x cnt: uint64) : uint64
+    requires { 0 <= cnt < 64 }
+    ensures  { result = mod (x * power 2 cnt) radix }
+
   val div2by1 (l h d:uint64) : uint64
     requires { to_int h < to_int d }
     (* this pre implies d > 0 and also

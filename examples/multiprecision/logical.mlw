@@ -28,6 +28,35 @@ module Logical
     ensures { mod (x * y + z) x = mod z x }
   =
     ()
+let lsl_mod_ext (x cnt: limb) : limb
+    requires { 0 <= cnt < Limb.length }
+    ensures  { result = mod (x * power 2 cnt) radix }
+    ensures  { result <= radix - power 2 cnt }
+  =
+    let r = lsl_mod x cnt in
+    let ghost p = power 2 (Limb.to_int cnt) in
+    let ghost q = power 2 (Limb.length - Limb.to_int cnt) in
+    assert { p * q = radix };
+    let ghost d = div (Limb.to_int x * p) radix in
+    assert { d * q >= 0 by d >= 0 so q >= 0 };
+    assert { mod r p = 0
+             by x * p = d * radix + r
+             so mod (x * p) p = mod (p * x + 0) p = mod 0 p = 0
+             so mod (d * radix + r) p = 0
+             so d * radix + r = p * (d * q) + r
+             so mod (d * radix + r) p = mod (p * (d * q) + r) p = mod r p };
+    assert { r <= radix - p
+             by mod r p = 0
+             so r < radix
+             so radix = p * power 2 (Limb.length - cnt)
+             so mod radix p = mod (p * q + 0) p = mod 0 p = 0
+             so let d1 = div r p in
+                let d2 = div radix p in
+                (r <= radix - p by
+                r = p * d1 so radix = p * d2 so p * d1 < p * d2 so p > 0
+                so d1 < d2 so d1 <= d2 - 1
+                so p * d1 <= p * (d2 - 1) = radix - p) };
+    r
 
   let lsld_ext (x cnt:limb) : (limb,limb)
     requires { 0 <= cnt < Limb.length }
