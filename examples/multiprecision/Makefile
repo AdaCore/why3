@@ -29,7 +29,7 @@ why3:
 dir:
 	mkdir -p build
 
-MLWFILES= $(addsuffix .mlw, sqrt toom logical div mul sub add compare util)
+MLWFILES= $(addsuffix .mlw, sqrtrem sqrt toom logical div mul sub add compare util)
 
 cfiles: why3 dir
 	$(WHY3) extract -D wmpn.drv -D c -L . --recursive --modular --interface -o build/ \
@@ -38,7 +38,7 @@ cfiles: why3 dir
 
 extract: why3 dir cfiles
 
-CFILES = build/uint64gmp.c build/fxp.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/mul.c build/sub.c build/add.c build/compare.c build/util.c build/int32.c
+CFILES = build/uint64gmp.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/mul.c build/sub.c build/add.c build/compare.c build/util.c build/int32.c
 
 tests: extract check-gmp
 	gcc $(CFLAGS) tests.c $(CFILES) -Iinclude -I$(GMP_DIR) -Irandom -L$(GMP_LIB) -lgmp -o build/tests

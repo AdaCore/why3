@@ -16,6 +16,10 @@ module ref.Ref
   syntax val (:=) "%1 = %2"      prec 14 13 14
 end
 
+module mach.int.Bounded_int
+  syntax val of_int "%1"         prec 0
+end
+
 module mach.int.Int32
 
   syntax type int32  "int32_t"
@@ -536,14 +540,19 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 
   syntax val lsl "%1 << %2" prec 5 5 4
   syntax val lsr "%1 >> %2" prec 5 5 4
+  syntax val lsl_mod "%1 << %2" prec 5 5 4
+  syntax val lsr_mod "%1 >> %2" prec 5 5 4
 
   syntax val is_msb_set "%1 & 0x8000000000000000ULL" prec 8 7
 
   syntax val count_leading_zeros "__builtin_clzll(%1)" prec 1 15
 
+  syntax val to_int32 "(int32_t)%1" prec 2 2
   syntax val of_int32 "(uint64_t)%1" prec 2 2
   syntax val to_int64 "(int64_t)%1" prec 2 2
   syntax val of_int64 "(uint64_t)%1" prec 2 2
+
+  syntax val of_int "%1" prec 0
 
 end
 
