@@ -47,7 +47,7 @@ tests: extract check-gmp
 	./build/minitests
 
 bench-tests: extract
-	gcc $(CFLAGS) tests.c $(CFILES) -Ibench-include -Irandom -lgmp -o build/bench-tests
+	gcc $(CFLAGS) tests.c $(CFILES) -Iinclude -Ibench-include -Irandom -lgmp -o build/bench-tests
 
 
 build/why3%bench: extract check-gmp

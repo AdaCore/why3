@@ -859,7 +859,9 @@ module Sqrt
     raises   { StackOverflow -> true }
     ensures  { value np n = value sp (ceilhalf n) * value sp (ceilhalf n)
                             + value rp result }
+    ensures  { 0 <= result <= n }
     ensures  { value rp result <= 2 * value sp (ceilhalf n) }
+    ensures  { result > 0 -> (pelts rp)[offset rp + result - 1] > 0 }
     ensures  { max np = old max np }
     ensures  { min np = old min np }
     ensures  { plength np = old plength np }
@@ -1223,6 +1225,7 @@ module Sqrt
         end
       end;
       begin ensures { value rp rn = vn - vsp * vsp }
+            ensures { 0 < rn <= k+1 }
         if (not (c2 = 0))
         then begin
           let ghost b = wmpn_rshift rp tp tn c2 in
@@ -1268,6 +1271,24 @@ module Sqrt
                by [@case_split] (h = 0 \/ h = 1) };
       rn <- tn + to_int32 h;
     end;
+    let ghost orp = pure { rp } in
+    let ghost orn = pure { rn } in
+    assert { value np n = value sp k * value sp k + value orp orn };
+    assert { 1 <= rn <= n };
+    while C.get_ofs rp (rn - 1) = 0 do
+      invariant { value rp rn = value orp orn }
+      invariant { 1 <= rn <= orn }
+      variant   { rn }
+      value_tail rp (rn-1);
+      assert { value rp (rn - 1) = value rp rn };
+      rn <- rn - 1;
+      if rn = 0
+      then begin
+        assert { value orp orn = 0
+                 by 0 = value rp 0 = value rp 1 = value orp orn };
+        break
+      end
+    done;
     rn
 
 end
