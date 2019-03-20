@@ -209,8 +209,8 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
          "(uint32_t)((((uint64_t)%1) | (((uint64_t)%2) << 32))/(uint64_t)(%3))"
          prec 2
 
-  syntax val lsl "%1 << %2" prec 5 5 4
-  syntax val lsr "%1 >> %2" prec 5 5 4
+  syntax val lsl "%1 << %2" prec 5 5 2
+  syntax val lsr "%1 >> %2" prec 5 5 2
 
   syntax val is_msb_set "%1 & 0x80000000U" prec 8 8
 
@@ -538,10 +538,10 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   syntax val sub_mod "%1 - %2" prec 4 4 3
   syntax val mul_mod "%1 * %2" prec 3 3 2
 
-  syntax val lsl "%1 << %2" prec 5 5 4
-  syntax val lsr "%1 >> %2" prec 5 5 4
-  syntax val lsl_mod "%1 << %2" prec 5 5 4
-  syntax val lsr_mod "%1 >> %2" prec 5 5 4
+  syntax val lsl "%1 << %2" prec 5 5 2
+  syntax val lsr "%1 >> %2" prec 5 5 2
+  syntax val lsl_mod "%1 << %2" prec 5 5 2
+  syntax val lsr_mod "%1 >> %2" prec 5 5 2
 
   syntax val is_msb_set "%1 & 0x8000000000000000ULL" prec 8 7
 
