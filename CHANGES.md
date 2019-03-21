@@ -23,6 +23,7 @@ Transformations
   * Adding arguments to transformations without arguments is now forbidden
   (previously ignored):x:
   * Fix crash of eliminate_unknown_types
+  * Giving too many arguments to a transformation do not display a popup anymore
 
 Counterexamples
   * Improved display of counterexamples in Task view

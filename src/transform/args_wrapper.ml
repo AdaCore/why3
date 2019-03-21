@@ -407,8 +407,6 @@ let rec print_type : type a b. Format.formatter -> (a, b) trans_typ -> unit =
     | Topt (s,t)     -> Format.fprintf fmt "?%s -> %a" s print_type t
     | Toptbool (s,t) -> Format.fprintf fmt "?%s:bool -> %a" s print_type t
 
-exception Unnecessary_arguments of string list
-
 let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> naming_table -> task -> b =
   fun t f l env tables task ->
     match t, l with
