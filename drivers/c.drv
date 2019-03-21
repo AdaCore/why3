@@ -70,7 +70,7 @@ module mach.int.UInt32GMP
   prelude
 
 "
-#define LOW_MASK 0x00000000FFFFFFFFULL
+#define LOW_MASK 0x00000000FFFFFFFFUL
 
 struct __add32_with_carry_result
 { uint32_t __field_0;
@@ -223,7 +223,7 @@ end
 
 module mach.int.Int64
   syntax type int64  "int64_t"
-  syntax literal int64 "%dLL"
+  syntax literal int64 "%dL"
 
   syntax val (+)     "%1 + %2"   prec 4 4 3
   syntax val (-)     "%1 - %2"   prec 4 4 3
@@ -250,7 +250,7 @@ end
 
 module mach.int.UInt64
 
-  syntax literal uint64 "0x%16xULL"
+  syntax literal uint64 "0x%16xUL"
 
   syntax val (+)     "%1 + %2"   prec 4 4 3
   syntax val (-)     "%1 - %2"   prec 4 4 3
@@ -505,9 +505,9 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   return result;
 }
 "
-  syntax literal uint64 "0x%16xULL"
+  syntax literal uint64 "0x%16xUL"
 
-  syntax val uint64_max "0xffffffffffffffffULL" prec 0
+  syntax val uint64_max "0xffffffffffffffffUL" prec 0
 
   syntax val (+)     "%1 + %2"   prec 4 4 3
   syntax val (-)     "%1 - %2"   prec 4 4 3
@@ -543,7 +543,7 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   syntax val lsl_mod "%1 << %2" prec 5 5 2
   syntax val lsr_mod "%1 >> %2" prec 5 5 2
 
-  syntax val is_msb_set "%1 & 0x8000000000000000ULL" prec 8 7
+  syntax val is_msb_set "%1 & 0x8000000000000000UL" prec 8 7
 
   syntax val count_leading_zeros "__builtin_clzll(%1)" prec 1 15
 
@@ -605,12 +605,12 @@ end
 
 module mach.fxp.Fxp
 
-  syntax val fxp_add "%1 + %2"
-  syntax val fxp_sub "%1 - %2"
-  syntax val fxp_mul "%1 * %2"
-  syntax val fxp_lsl "%1 << %2"
-  syntax val fxp_lsr "%1 >> %2"
-  syntax val fxp_asr "(uint64_t)((int64_t)%1 >> %2)"
-  syntax val fxp_asr' "(uint64_t)((int64_t)%1 >> %2)"
+  syntax val fxp_add "%1 + %2" prec 4 4 3
+  syntax val fxp_sub "%1 - %2" prec 4 4 3
+  syntax val fxp_mul "%1 * %2" prec 3 3 2
+  syntax val fxp_lsl "%1 << %2" prec 5 5 2
+  syntax val fxp_lsr "%1 >> %2" prec 5 5 2
+  syntax val fxp_asr "(uint64_t)((int64_t)%1 >> %2)" prec 2 1 2
+  syntax val fxp_asr' "(uint64_t)((int64_t)%1 >> %2)" prec 2 1 2
 
 end

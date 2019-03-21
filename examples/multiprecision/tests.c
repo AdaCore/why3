@@ -426,12 +426,11 @@ int main () {
   for (an = 1; an <= max_sqrt; an += 1)
     {
       init_valid (bp, ap, 1, an);
-      
 #ifdef BENCH
       elapsed = 0;
       nb_iter = 1000;
       for (int iter = 0; iter != nb_iter; ++iter) {
-        init_valid (ap, bp, an, 1);
+        init_valid (bp, ap, 1, an);
 #ifdef TEST_MINIGMP
         mpn_copyi(refr, ap, an);
 #endif
