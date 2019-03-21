@@ -1041,6 +1041,43 @@ let model_for_positions_and_decls model ~positions =
     model_files = model_filtered }
 
 
+(* SPARK specific section *)
+
+(* Filtering the model to remove elements that are not understood by gnat2why
+   (sole purpose is to reduce the size of the output). *)
+let spark_filter_model (m: model) =
+  let in_spark (e: model_element) =
+    let name = e.me_name.men_name in
+    (* Names that do not begin with either '.' or a number are not recognized by
+       gnat2why *)
+    String.length name > 0 && (name.[0] = '.' || (name.[0] <= '9' && name.[0] >= '0'))
+  in
+  let filter_line (l: model_element list) =
+    List.fold_left (fun acc e ->
+        if in_spark e then e :: acc else acc)
+      [] l
+  in
+
+  let filter_file (f: model_file) =
+    Mint.fold (fun i e acc ->
+        let e = filter_line e in
+        if e = [] then acc else Mint.add i e acc) f Mint.empty
+  in
+
+  let files = m.model_files in
+  let files = StringMap.fold (fun k e acc ->
+      let e = filter_file e in
+      if Mint.is_empty e then
+        acc
+      else
+        StringMap.add k e acc)
+    files StringMap.empty
+  in
+  { vc_term_loc = m.vc_term_loc;
+    model_files = files}
+
+
+
 (*
 ***************************************************************
 ** Registering model parser

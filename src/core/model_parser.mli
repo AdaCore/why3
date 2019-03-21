@@ -279,6 +279,11 @@ val model_for_positions_and_decls : model ->
     Only filename and line number is used to identify positions.
 *)
 
+
+(* SPARK specific section *)
+val spark_filter_model: model -> model
+(** Remove elements whose names are incompatible with SPARK *)
+
 (*
 ***************************************************************
 ** Registering model parser

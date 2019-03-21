@@ -103,6 +103,7 @@ let print_cntexmp_model fmt model =
   match model with
   | None -> ()
   | Some m ->
+    let m = Model_parser.spark_filter_model m in
     if not (Model_parser.is_model_empty m) then begin
       Format.fprintf fmt ", ";
       print_json_field "cntexmp"
