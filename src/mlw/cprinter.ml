@@ -443,6 +443,15 @@ module C = struct
     | Bassign -> true
     | _ -> false
 
+  (** Integer type bounds *)
+  open BigInt
+  let min32 = minus (pow_int_pos 2 31)
+  let max32 = sub (pow_int_pos 2 31) one
+  let maxu32 = sub (pow_int_pos 2 32) one
+  let min64 = minus (pow_int_pos 2 63)
+  let max64 = sub (pow_int_pos 2 63) one
+  let maxu64 = sub (pow_int_pos 2 64) one
+
 end
 
 type info = {
@@ -924,7 +933,21 @@ module MLToC = struct
             | ILitHex -> Format.asprintf "0x%a" (print_in_base 16 None) n
             | ILitOct -> Format.asprintf "0%a" (print_in_base 8 None) n
             | _ -> BigInt.to_string n in
-        let e = C.(Econst (Cint n)) in
+        let suf =
+          match e.e_ity with
+          | I i ->
+             begin match (ty_of_ity i).ty_node with
+             | Tyapp ({ts_def = Range { ir_lower = l; ir_upper = h }},_) ->
+                let open BigInt in
+                let unsigned = eq l zero in
+                if (le min32 l) && (le h max32) then ""
+                else if unsigned && (le h maxu32) then "u"
+                else if (le min64 l) && (le h max64) then "l"
+                else if unsigned && (le h maxu64) then "ul"
+                else raise (Unsupported "unknown number format")
+             | _ ->  raise (Unsupported "non-range integer constant") end
+          | _ -> assert false in
+        let e = C.(Econst (Cint (n^suf))) in
         ([], expr_or_return env e)
     | Eapp (rs, el)
          when is_struct_constructor info rs
