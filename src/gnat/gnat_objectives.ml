@@ -325,6 +325,12 @@ let init_cont () =
       Controller_itp.add_file c Gnat_config.filename
     with
     | Controller_itp.Errors_list l ->
+      List.iter (fun exn ->
+        match exn with
+          | Out_of_memory | Loc.Located (_, Out_of_memory) ->
+            raise Out_of_memory
+          | _ -> ())
+      l;
         Gnat_util.abort_with_message ~internal:true
           (Pp.sprintf "could not add file %s to the session: %a"
              Gnat_config.filename (Pp.print_list Pp.space Exn_printer.exn_printer) l)
@@ -360,6 +366,12 @@ let init_cont () =
         c
       with
       | Controller_itp.Errors_list l ->
+        List.iter (fun exn ->
+          match exn with
+            | Out_of_memory | Loc.Located (_, Out_of_memory) ->
+              raise Out_of_memory
+            | _ -> ())
+        l;
         Gnat_util.abort_with_message ~internal:true
           (Pp.sprintf "could not reload files of the session: %a"
              (Pp.print_list Pp.space Exn_printer.exn_printer) l)

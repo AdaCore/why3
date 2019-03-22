@@ -280,6 +280,7 @@ let _ =
     end;
     Gnat_scheduler.main_loop (ending c);
   with e when Debug.test_flag Debug.stack_trace -> raise e
+  | Out_of_memory as e -> raise e
   | e ->
       let s = Pp.sprintf "%a.@." Exn_printer.exn_printer e in
       Gnat_util.abort_with_message ~internal:true s

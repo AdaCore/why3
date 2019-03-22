@@ -14,7 +14,11 @@ let () =
        let msg = Format.asprintf "%a\nBacktrace is the following:\n%s@."
            Why3.Exn_printer.exn_printer exn bt
        in
-       abort_with_message ~internal:true msg)
+       let internal =
+         match exn with
+         | Out_of_memory -> false
+         | _ -> true in
+       abort_with_message ~internal msg)
 
 let colon = ':'
 
