@@ -718,21 +718,24 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
     [Task.add_decl prev df] )
 
 let () = wrap_and_register
-           ~desc:"reflection_l <prop> attempts to prove the goal by reflection using the lemma prop"
+           ~desc:"reflection_l <prop>@ \
+            attempts@ to@ prove@ the@ goal@ by@ reflection@ \
+            using@ the@ lemma@ <prop>."
            "reflection_l"
            (Tprsymbol Tenvtrans_l) reflection_by_lemma
 
 let () = wrap_and_register
-           ~desc:"reflection_f <f> attempts to prove the goal by reflection using the contract of the program function f"
+           ~desc:"reflection_f <f>@ \
+            attempts@ to@ prove@ the@ goal@ by@ reflection@ \
+            using@ the@ contract@ of@ the@ program@ function@ <f>."
            "reflection_f"
            (Tstring Tenvtrans_l) (reflection_by_function true)
 
 let () = wrap_and_register
-           ~desc:"reflection_f <f> attempts to prove the goal by reflection using the contract of the program function f, does not automatically perform transformations afterward. Use for debugging."
+           ~desc:"reflection_f <f>@ \
+            attempts@ to@ prove@ the@ goal@ by@ reflection@ \
+            using@ the@ contract@ of@ the@ program@ function@ <f>.@ \
+            Does@ not@ automatically@ perform@ transformations@ \
+            afterwards.@ Use@ for@ debugging."
            "reflection_f_nt"
            (Tstring Tenvtrans_l) (reflection_by_function false)
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.."
-End:
-*)

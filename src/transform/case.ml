@@ -152,27 +152,36 @@ let introduce_premises n = Trans.goal (intros (create_list n))
 let intros_list l = Trans.goal (intros l)
 
 let () = wrap_and_register
-    ~desc:"case <term> [name] generates hypothesis 'name: term' in a first goal and 'name: ~ term' in a second one."
+    ~desc:"case <term> [name]@ generates@ hypothesis@ 'name: term'@ \
+      in@ a@ first@ goal@ and@ 'name: ~ term'@ in@ a@ second@ one."
     "case"
     (Tformula (Topt ("as",Tstring Ttrans_l))) case
 
-let () = wrap_and_register ~desc:"left transform a disjunctive goal A \\/ B into A"
+let () = wrap_and_register
+    ~desc:"left@ transforms@ a@ disjunctive@ goal@ A \\/ B@ into@ A."
     "left"
     (Ttrans) (or_intro true)
 
-let () = wrap_and_register ~desc:"right transform a disjunctive goal A \\/ B into B"
+let () = wrap_and_register
+    ~desc:"right@ transforms@ a@ disjunctive@ goal@ A \\/ B@ into@ B."
     "right"
     (Ttrans) (or_intro false)
 
 let () = wrap_and_register
-    ~desc:"exists <term> substitutes the existentially quantified variable with the given term"
+    ~desc:"exists <term>@ substitutes@ the@ top-most@ existentially@ \
+      quantified@ variable@ with@ the@ given@ term."
     "exists"
     (Tterm Ttrans) exists
 
-let () = wrap_and_register ~desc:"intros n introduces the first n quantified variables and hypotheses"
+let () = wrap_and_register
+    ~desc:"intros <n>@ introduces@ the@ first@ <n>@ quantified@ \
+      variables@ and@ hypotheses."
     "intros_n"
     (Tint Ttrans) introduce_premises
 
-let () = wrap_and_register ~desc:"intros id1,id2,...,idk introduces quantified variables and hypotheses using the given identifiers names"
+let () = wrap_and_register
+    ~desc:"intros <id1>,<id2>,...,<idk>@ \
+      introduces@ quantified@ variables@ and@ hypotheses@ under@ \
+      the\ given@ names."
     "intros"
     (Tidentlist Ttrans) intros_list

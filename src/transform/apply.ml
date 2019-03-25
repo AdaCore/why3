@@ -518,29 +518,51 @@ let unfold unf hl =
       | _ -> [d]) None
 
 
-let () = wrap_and_register ~desc:"sort declarations"
-                           "sort"
-                           (Ttrans) sort
-
-let () = wrap_and_register ~desc:"unfold ls [in] pr: unfold logic symbol ls in list of hypothesis pr. The argument in is optional: by default unfold in the goal." (* TODO *)
-                           "unfold"
-                           (Tlsymbol (Topt ("in", Tprlist Ttrans))) unfold
-
+let () = wrap_and_register ~desc:"Sort@ declarations." "sort" Ttrans sort
 
 let () = wrap_and_register
-           ~desc:"replace <term1> <term2> [in] <name list> replaces occcurences of term1 by term2 in prop name. If no list is given, replace in the goal."
-           "replace"
-           (Tterm (Tterm (Topt ("in", Tprlist Ttrans_l)))) replace
-
-let _ = wrap_and_register
-          ~desc:"rewrite [<-] <name> [in] <name2> [with] <list term> rewrites equality defined in name into name2 using exactly all terms of the list as instance for what cannot be deduced directly" "rewrite"
-          (Toptbool ("<-",(Tprsymbol (Topt ("in", Tprsymbol (Topt ("with", Ttermlist Ttrans_l))))))) (fun rev h h1opt term_list -> rewrite term_list rev h h1opt)
-
-let _ = wrap_and_register
-    ~desc:"rewrite_list [<-] <list name> [?] [in] <name2> rewrites equalities defined in <list name> into name2. If [?] is set, each of the rewrites is optional." "rewrite_list"
-    (Toptbool ("<-", (Tprlist (Toptbool ("?", Topt ("in", Tprsymbol Ttrans_l)))))) (fun rev hl opt h1opt -> rewrite_list rev opt hl h1opt)
+          ~desc:"unfold <ls> [in] <name list>@ \
+            unfolds@ logical@ symbol@ <ls> in@ the@ given@ \
+            list@ of@ premises.@ If@ no@ list@ is@ given,@ \
+            unfold@ in@ the@ goal."
+          "unfold"
+          (Tlsymbol (Topt ("in", Tprlist Ttrans)))
+          unfold
 
 let () = wrap_and_register
-           ~desc:"apply <prop> [with] <list term> applies prop to the goal and \
-                  uses the list of terms to instantiate the variables that are not found." "apply"
-           (Tprsymbol (Topt ("with", Ttermlist Ttrans_l))) (fun x y -> apply x y)
+          ~desc:"replace <term1> <term2> [in] <name list>@ \
+            replaces@ occcurences@ of@ <term1>@ by@ <term2>@ in@ \
+            the@ given@ list@ of@ premises.@ If@ no@ list@ is@ given,@ \
+            replace@ in@ the@ goal."
+          "replace"
+          (Tterm (Tterm (Topt ("in", Tprlist Ttrans_l))))
+          replace
+
+let _ = wrap_and_register
+          ~desc:"rewrite [<-] <name> [in] <name2> [with] <term list>@ \
+            rewrites@ equality@ defined@ in@ <name>@ into@ <name2>@ \
+            using@ exactly@ all@ terms@ in@ the@ list@ as@ instances@ \
+            for@ what@ cannot@ be@ deduced@ directly."
+          "rewrite"
+          (Toptbool ("<-",(Tprsymbol (Topt ("in",
+            Tprsymbol (Topt ("with", Ttermlist Ttrans_l)))))))
+          (fun rev h h1opt term_list -> rewrite term_list rev h h1opt)
+
+let _ = wrap_and_register
+          ~desc:"rewrite_list [<-] <name list> [?] [in] <name2>@ \
+            rewrites@ equalities@ defined@ in@ the@ given@ list@ \
+            of@ premises@ into@ <name2>.@ If@ [?]@ is@ set,@ each@ \
+            of@ the@ rewrites@ is@ optional."
+          "rewrite_list"
+          (Toptbool ("<-", (Tprlist (Toptbool ("?",
+            Topt ("in", Tprsymbol Ttrans_l))))))
+          (fun rev hl opt h1opt -> rewrite_list rev opt hl h1opt)
+
+let () = wrap_and_register
+           ~desc:"apply <prop> [with] <term list>@ \
+            applies@ premise@ <prop>@ to@ the@ goal@ and@ uses@ the@ \
+            list@ of@ terms@ to@ instantiate@ the@ variables@ that@ \
+            are@ not@ found."
+          "apply"
+          (Tprsymbol (Topt ("with", Ttermlist Ttrans_l)))
+          apply

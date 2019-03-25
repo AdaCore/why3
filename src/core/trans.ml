@@ -406,9 +406,6 @@ let list_transforms () =
 let list_transforms_l () =
   Hstr.fold (fun k (desc,_) acc -> (k, desc)::acc) transforms_l []
 
-
-
-
 (** transformations with arguments *)
 
 type naming_table = {

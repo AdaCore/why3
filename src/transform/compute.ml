@@ -22,7 +22,7 @@ let meta_rewrite_def = Theory.register_meta "rewrite_def" [Theory.MTlsymbol]
 
 let meta_compute_max_steps = Theory.register_meta_excl "compute_max_steps"
   [Theory.MTint]
-  ~desc:"Maximal@ number@ of@ reduction@ steps@ done@ by@ compute@ \
+  ~desc:"Maximal@ number@ of@ reduction@ steps@ done@ by@ the@ 'compute'@ \
          transformation"
 
 let compute_max_steps = ref 1024
@@ -116,12 +116,13 @@ let normalize_goal_transf_few env =
 
 let () =
   Trans.register_env_transform_l "compute_in_goal" normalize_goal_transf_all
-  ~desc:"Performs@ possible@ computations@ in@ goal, including@ by@ \
-         declared@ rewrite@ rules"
+  ~desc:"Perform@ computations@ in@ the@ goal,@ also@ using@ \
+    the@ automatically@ derived@ rules)."
 
 let () =
   Trans.register_env_transform_l "compute_specified" normalize_goal_transf_few
-  ~desc:"Rewrite@ goal@ using@ specified@ rules"
+  ~desc:"Perform@ computations@ in@ the@ goal,@ only@ using@ \
+    the@ user-specified@ rules)."
 
 let normalize_hyp step_limit pr_norm env =
   let p = { compute_defs = true;
@@ -130,19 +131,24 @@ let normalize_hyp step_limit pr_norm env =
           } in
   normalize_goal_transf ?pr_norm ?step_limit p env
 
-let () = wrap_and_register ~desc:"experimental: Takes a prsymbol and reduce \
-    one \"elementary\" step."
+let () = wrap_and_register
+    ~desc:"step [in] <name>@ performs@ one@ \"elementary\"@ \
+      reduction@ step@ in@ the@ given@ premise@ (experimental)."
     "step"
-    (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp (Some 1))
+    (Topt ("in", Tprsymbol Tenvtrans_l))
+    (normalize_hyp (Some 1))
 
-let () = wrap_and_register ~desc:"experimental: Same as step except that it \
-    reduces the given number of steps."
+let () = wrap_and_register
+    ~desc:"steps <n> [in] <name>@ performs@ <n>@ \"elementary\"@ \
+      reduction@ steps@ in@ the@ given@ premise@ (experimental)."
     "steps"
-    (Tint (Topt ("in", Tprsymbol Tenvtrans_l))) (fun n -> normalize_hyp (Some n))
+    (Tint (Topt ("in", Tprsymbol Tenvtrans_l)))
+    (fun n -> normalize_hyp (Some n))
 
-
-let () = wrap_and_register ~desc:"Performs@ possible@ computations@ in@ given \
-    hypothesis@ including@ by@ declared@ rewrite@ rules"
+let () = wrap_and_register
+    ~desc:"compute_hyp [in] <name>@ performs@ computations@ \
+      in@ the@ given@ premise, also@ using@ the@ automatically@ \
+      derived@ rules."
     "compute_hyp"
     (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp None)
 
@@ -153,8 +159,9 @@ let normalize_hyp_few step_limit pr_norm env =
           } in
   normalize_goal_transf ?pr_norm ?step_limit p env
 
-let () = wrap_and_register ~desc:"Performs@ possible@ computations@ in@ given \
-    hypothesis@ using@ specified@ rules"
+let () = wrap_and_register
+    ~desc:"compute_hyp_specified [in] <name>@ performs@ computations@ \
+      in@ the@ given@ premise, only@ using@ the@ user-specified@ rules."
     "compute_hyp_specified"
     (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp_few None)
 

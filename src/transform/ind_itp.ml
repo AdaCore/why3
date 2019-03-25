@@ -301,11 +301,15 @@ let induction x bound env =
   Trans.par [init_trans; rec_trans]
 
 let () = wrap_and_register
-    ~desc:"induction <term1> [from] <term2> performs a strong induction on int term1 from int term2. term2 is optional and default to 0."
+    ~desc:"induction <term1> [from] <term2>@ \
+      performs@ a@ strong@ induction@ on@ the@ integer@ <term1>@ \
+      starting@ from@ the@ integer@ <term2>.@ <term2>@ is@ optional@ \
+      and@ defaults@ to@ 0."
     "induction"
     (Tterm (Topt ("from", Tterm Tenvtrans_l))) induction
 
 let () = wrap_and_register
-    ~desc:"revert <list> puts list back in the goal."
+    ~desc:"revert <id list>@ \
+      puts@ the@ given@ identifiers@ back@ in@ the@ goal."
     "revert"
     (Tlist Ttrans) revert_tr_symbol

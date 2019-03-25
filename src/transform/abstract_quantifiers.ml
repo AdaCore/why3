@@ -34,4 +34,5 @@ let elim_less (d:decl) =
 
 let () =
   Trans.register_transform "abstract_quantifiers" (Trans.decl elim_less None)
-    ~desc:"abstract@ quantifiers@ in@ the@ axioms@ of@ the@ context and the goals@."
+    ~desc:"Abstract@ quantifiers@ in@ the@ axioms@ of@ the@ context \
+           and@ the@ goals."

@@ -124,8 +124,8 @@ let () = try
       (Pp.print_list Pp.newline2 print_trans_desc)
       (List.sort sort_pair (Trans.list_transforms_l ()));
     let list_transform_with_arg =
-      Trans.list_transforms_with_args () @ Trans.list_transforms_with_args_l ()
-    in
+      Trans.list_transforms_with_args () @
+      Trans.list_transforms_with_args_l () in
     printf "@[<hov 2>Known transformations with arguments:@\n%a@]@\n@."
       (Pp.print_list Pp.newline2 print_trans_desc)
       (List.sort sort_pair list_transform_with_arg)

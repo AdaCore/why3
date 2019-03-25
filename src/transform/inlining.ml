@@ -150,4 +150,4 @@ let () =
     ~desc:"Same@ as@ 'inline_all', but@ only@ inline in@ goals.";
   Trans.register_transform "inline_trivial" trivial
     ~desc:"Inline@ trivial@ definitions@ like@ @[f(x,y) = g(y,x,0)@]. \
-           Add@ the@ \"inline:trivial\"@ attribute@ to@ force@ inlining."
+           Add@ the@ [@@inline:trivial]@ attribute@ to@ force@ inlining."

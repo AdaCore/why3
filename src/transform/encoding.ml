@@ -74,7 +74,8 @@ let encoding_smt env = Trans.seq [
   Libencoding.monomorphise_goal;
   select_kept def_enco_select_smt env;
   Trans.print_meta Libencoding.debug Libencoding.meta_kept;
-  Trans.trace_goal "meta_enco_kept" (Trans.on_flag meta_enco_kept ft_enco_kept def_enco_kept_smt env);
+  Trans.trace_goal "meta_enco_kept"
+    (Trans.on_flag meta_enco_kept ft_enco_kept def_enco_kept_smt env);
   Trans.on_flag meta_enco_poly ft_enco_poly def_enco_poly_smt env]
 
 let encoding_tptp env = Trans.seq [
@@ -100,7 +101,7 @@ let encoding_smt_if_poly env =
 let () =
   Trans.register_env_transform "encoding_smt_if_poly"
     encoding_smt_if_poly
-    ~desc:"Same@ as@ encoding_smt@ but@ only@ if@ polymorphism@ appear."
+    ~desc:"Same@ as@ encoding_smt@ but@ only@ in@ presence@ of@ polymorphism."
 
 let encoding_tptp_if_poly env =
   Trans.on_meta Detect_polymorphism.meta_monomorphic_types_only
@@ -111,4 +112,4 @@ let encoding_tptp_if_poly env =
 let () =
   Trans.register_env_transform "encoding_tptp_if_poly"
     encoding_tptp_if_poly
-    ~desc:"Same@ as@ encoding_tptp@ but@ only@ if@ polymorphism@ appear."
+    ~desc:"Same@ as@ encoding_tptp@ but@ only@ in@ presence@ of@ polymorphism."

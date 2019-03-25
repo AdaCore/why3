@@ -219,7 +219,8 @@ let induction_l attr induct task = match task with
   | Some { task_decl ={ td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
 	   task_prev = prev;
 	   task_known = kn } ->
-    begin try List.map (add_prop_decl prev Pgoal pr) (induction_l attr induct kn f)
+    begin try List.map (add_prop_decl prev Pgoal pr)
+                       (induction_l attr induct kn f)
     with Ind_not_found -> [task] end
   | _ -> assert false
 
@@ -228,26 +229,24 @@ let induction_on_hyp attr b h =
     (Trans.store (induction_l attr b))
 
 let () = wrap_and_register
-    ~desc:"induction_arg_pr <pr> performs induction_pr on pr."
+    ~desc:"induction_arg_pr <name>@ \
+      performs@ 'induction_pr'@ on@ the@ given@ premise."
     "induction_arg_pr"
     (Tprsymbol Ttrans_l) (induction_on_hyp attr_ind true)
 
 let () = wrap_and_register
-    ~desc:"induction_arg_pr <pr> performs inversion_pr on pr."
+    ~desc:"inversion_arg_pr <name>@ \
+      performs@ 'inversion_pr'@ on@ the@ given@ premise."
     "inversion_arg_pr"
     (Tprsymbol Ttrans_l) (induction_on_hyp attr_inv false)
 
 let () =
-  Trans.register_transform_l "induction_pr" (Trans.store (induction_l attr_ind true))
-    ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ inductive@ predicates."
+  Trans.register_transform_l "induction_pr"
+    (Trans.store (induction_l attr_ind true))
+    ~desc:"Generate@ induction@ hypotheses@ \
+      for@ goals@ over@ inductive@ predicates."
 
 let () =
-  Trans.register_transform_l "inversion_pr" (Trans.store (induction_l attr_inv false))
+  Trans.register_transform_l "inversion_pr"
+    (Trans.store (induction_l attr_inv false))
     ~desc:"Invert@ inductive@ predicate."
-
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3.byte"
-End:
-*)

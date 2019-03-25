@@ -414,25 +414,50 @@ let instantiate ~rem (pr: Decl.prsymbol) lt =
       | _ -> [d]) None
 
 let () = wrap_and_register
-    ~desc:"instantiate <prop> <term list> generates a new hypothesis with quantified variables of prop replaced with terms"
+    ~desc:"instantiate <prop> <term list>@ \
+      generates@ a@ new@ hypothesis@ with@ quantified@ variables@ \
+      of@ <prop>@ replaced@ with@ the@ given@ terms."
     "instantiate"
     (Tprsymbol (Ttermlist Ttrans)) (instantiate ~rem:false)
 
 let () = wrap_and_register
-    ~desc:"instantiate <prop> <term list> generates a new hypothesis with quantified variables of prop replaced with terms. Also remove the old hypothesis."
+    ~desc:"instantiate <prop> <term list>@ \
+      generates@ a@ new@ hypothesis@ with@ quantified@ variables@ \
+      of@ <prop>@ replaced@ with@ then@ given@ terms.@ \
+      Also@ removes@ the@ old@ hypothesis."
     "inst_rem"
     (Tprsymbol (Ttermlist Ttrans)) (instantiate ~rem:true)
 
-let () = wrap_and_register ~desc:"destruct <name> destructs the head logic constructor of hypothesis name (/\\, \\/, -> or <->).\nTo destruct a literal of algebraic type, use destruct_term."
+let () = wrap_and_register
+    ~desc:"destruct <name>@ \
+      destructs@ the@ top-most@ propositional@ connector@ \
+      (/\\,@ \\/,@ ->@ or@ <->)@ of@ the@ given@ hypothesis.@ \
+      To@ destruct@ a@ literal@ of@ an@ algebraic@ type,@ \
+      use@ 'destruct_term'."
     "destruct" (Tprsymbol Ttrans_l) (destruct ~recursive:false)
 
-let () = wrap_and_register ~desc:"destruct <name> recursively destructs the head logic constructor of hypothesis name (/\\, \\/, -> or <->).\nTo destruct a literal of algebraic type, use destruct_term."
+let () = wrap_and_register
+    ~desc:"destruct_rec <name>@ \
+      recursively@ destructs@ the@ top@ propositional@ connectors@ \
+      (/\\,@ \\/,@ ->@ or@ <->)@ of@ the@ given@ hypothesis.@ \
+      To@ destruct@ a@ literal@ of@ an@ algebraic@ type,@ \
+      use@ 'destruct_term'."
     "destruct_rec" (Tprsymbol Ttrans_l) (destruct ~recursive:true)
 
-let () = wrap_and_register ~desc:"destruct <name> as an algebraic type. Option using can be used to name elements created by destruct_term"
+let () = wrap_and_register
+    ~desc:"destruct_term <term> [using] <id list>@ \
+      destructs@ the@ given@ term@ of@ an@ algebraic@ type.@ \
+      Option@ 'using'@ can@ be@ used@ to@ name@ the@ elements@ \
+      created@ by@ 'destruct_term'."
     "destruct_term" (Tterm (Topt ("using", Tidentlist Ttrans_l)))
     (fun t names -> destruct_term ?names false t)
 
-let () = wrap_and_register ~desc:"destruct <name> as an algebraic type and substitute the definition if an lsymbol was provided. Option using can be used to name elements created by destruct_term_subst"
+let () = wrap_and_register
+    ~desc:"destruct_term_subst <term> [using] <id list>@ \
+      destructs@ the@ given@ term@ of@ an@ algebraic@ type@ \
+      and@ substitutes@ the@ definition@ if@ the@ term@ is@ \
+      a@ constant@ function@ symbol.@ \
+      Option@ 'using'@ can@ be@ used@ to@ name@ the@ elements@ \
+      created@ by@ 'destruct_term_subst'."
     "destruct_term_subst" (Tterm (Topt ("using", Tidentlist Ttrans_l)))
     (fun t names -> destruct_term ?names true t)

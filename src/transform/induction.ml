@@ -352,7 +352,8 @@ let induction_on_hyp ls =
     (Trans.store induction_ty_lex)
 
 let () = wrap_and_register
-    ~desc:"induction_arg_ty_lex <ls> performs induction_ty_lex on ls."
+    ~desc:"induction_arg_ty_lex <id>@ \
+      performs@ 'induction_ty_lex'@ on@ the@ given@ logical@ symbol."
     "induction_arg_ty_lex"
     (Tlsymbol Ttrans_l) induction_on_hyp
 

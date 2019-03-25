@@ -231,5 +231,5 @@ let () = Trans.register_env_transform "intro_projections_counterexmp"
   intro_projections_counterexmp
   ~desc:"For@ each@ declared@ abstract@ function@ and@ predicate@ p@ \
          with@ attribute@ [%@model_projected]@ and@ projecting@ f@ \
-         for@ p@ creates@ declaration@ of@ new@ constant@ c@ with@ \
+         for@ p,@ create@ declaration@ of@ new@ constant@ c@ with@ \
          attribute@ [%@model]@ and@ an@ axiom@ c = f p."

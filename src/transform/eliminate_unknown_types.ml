@@ -96,4 +96,4 @@ let remove_types =
 
 let () =
   Trans.register_transform "eliminate_unknown_types" remove_types
-    ~desc:"Remove@ types@ unknown@ to@ the@ prover@ and@ terms@ referring@ to@ them@."
+    ~desc:"Remove@ types@ unknown@ to@ the@ prover@ and@ terms@ referring@ to@ them."
