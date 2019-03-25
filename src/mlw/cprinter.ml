@@ -924,30 +924,31 @@ module MLToC = struct
        let e = C.Evar id in
        ([], expr_or_return env e)
     | Mltree.Econst ic ->
-        let open Number in
+       let open Number in
+       let print fmt ic =
         let n = ic.il_int in
-        let n =
-          if BigInt.lt n BigInt.zero then BigInt.to_string n
-          else
-            match ic.il_kind with
-            | ILitHex -> Format.asprintf "0x%a" (print_in_base 16 None) n
-            | ILitOct -> Format.asprintf "0%a" (print_in_base 8 None) n
-            | _ -> BigInt.to_string n in
-        let suf =
-          match e.e_ity with
-          | I i ->
-             begin match (ty_of_ity i).ty_node with
-             | Tyapp ({ts_def = Range { ir_lower = l; ir_upper = h }},_) ->
-                let open BigInt in
-                let unsigned = eq l zero in
-                if (le min32 l) && (le h max32) then ""
-                else if unsigned && (le h maxu32) then "u"
-                else if (le min64 l) && (le h max64) then "l"
-                else if unsigned && (le h maxu64) then "ul"
-                else raise (Unsupported "unknown number format")
-             | _ ->  raise (Unsupported "non-range integer constant") end
-          | _ -> assert false in
-        let e = C.(Econst (Cint (n^suf))) in
+        if BigInt.lt n BigInt.zero
+        then Format.fprintf fmt "-%a" (print_in_base 10 None) (BigInt.abs n)
+        else
+          match ic.il_kind with
+          | ILitHex -> Format.fprintf fmt "0x%a" (print_in_base 16 None) n
+          | ILitOct -> Format.fprintf fmt "0%a" (print_in_base 8 None) n
+          | _ ->
+             (* default to base 10 *)
+             Format.fprintf fmt "%a" (print_in_base 10 None) n in
+        let s = match e.e_ity with
+        | I i ->
+           let ts = match (ty_of_ity i) with
+             | { ty_node = Tyapp (ts, []) } -> ts
+             | _ -> assert false in
+           begin match query_syntax info.literal ts.ts_name with
+           | Some st ->
+              Format.asprintf "%a" (syntax_range_literal ~cb:(Some print) st) ic
+           | _ ->
+              let s = ts.ts_name.id_string in
+              raise (Unsupported ("unspecified number format for type "^s)) end
+        | _ -> assert false in
+        let e = C.(Econst (Cint s)) in
         ([], expr_or_return env e)
     | Eapp (rs, el)
          when is_struct_constructor info rs
