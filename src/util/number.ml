@@ -188,7 +188,7 @@ let print_in_base radix digits fmt i =
       let d,m = BigInt.euclidean_div_mod i radix in
       aux (digits - 1) d;
       Format.pp_print_char fmt (char_of_int (BigInt.to_int m)) in
-  aux (Opt.get_def 0 digits) i
+  aux (Opt.get_def 1 digits) i
 
 let to_small_integer i =
   BigInt.to_int i.il_int
