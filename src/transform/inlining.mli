@@ -26,23 +26,21 @@ val get_counterexmp : Task.task -> bool
 val t :
   ?use_meta:bool ->
   ?in_goal:bool ->
-  notdeft:(Term.term -> bool) ->
-  notdeff:(Term.term -> bool) ->
-  notls  :(for_counterexample:bool -> Term.lsymbol -> bool) ->
+  notls:(for_counterexample:bool -> Term.lsymbol -> bool) ->
+  notdef:(Term.term -> bool) ->
   Task.task Trans.trans
 
-(** [t ~use_meta ~in_goal ~notdeft ~notdeff ~notls] returns a transformation
+(** [t ~use_meta ~in_goal ~notls ~notdef] returns a transformation
     that expands a symbol [ls] in the subsequent declarations unless [ls]
     satisfies one of the following conditions:
     - [ls] is defined via a (mutually) recursive definition;
     - [ls] is an inductive predicate or an algebraic type constructor;
-    - [ls] is a function symbol and [notdeft] returns true on its definition;
-    - [ls] is a predicate symbol and [notdeff] returns true on its definition;
     - [notls ls] returns [true];
+    - [notdef] returns [true] on the definition of [ls];
     - [use_meta] is set and [ls] is tagged by "inline:no"
 
-    Notice that [use_meta], [notdeft], [notdeff], [notls] restrict only which
-    symbols are inlined not when.
+    Notice that [use_meta], [notls], [notdef] restrict only which
+    symbols are inlined, not when.
 
     If [in_goal] is set, only the top-most symbols in the goal are expanded.
 *)
