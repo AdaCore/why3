@@ -6,6 +6,7 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
 <path name=".."/>
@@ -60,6 +61,12 @@
  </goal>
  <goal name="VC prod_compat_strict_lr" expl="VC for prod_compat_strict_lr" proved="true">
  <proof prover="2"><result status="valid" time="0.04"/></proof>
+ </goal>
+ <goal name="VC prod_compat_lr" expl="VC for prod_compat_lr" proved="true">
+ <proof prover="4"><result status="valid" time="0.30"/></proof>
+ </goal>
+ <goal name="VC simp_compat_strict_l" expl="VC for simp_compat_strict_l" proved="true">
+ <proof prover="4"><result status="valid" time="0.24"/></proof>
  </goal>
  <goal name="VC value_sub" expl="VC for value_sub" proved="true">
  <transf name="split_goal_right" proved="true" >

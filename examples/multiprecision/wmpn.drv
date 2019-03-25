@@ -1,0 +1,14 @@
+module sqrt.Sqrt1
+
+  prelude "
+#include \"sqrtinit.h\"
+
+uint64_t rsa_estimate (uint64_t a) {
+  uint64_t abits, x0;
+  abits = a >> 55;
+  x0 = 0x100 | invsqrttab[abits - 0x80];
+  return x0;
+}
+"
+
+end

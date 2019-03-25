@@ -157,3 +157,44 @@ let () = wrap_and_register ~desc:"Performs@ possible@ computations@ in@ given \
     hypothesis@ using@ specified@ rules"
     "compute_hyp_specified"
     (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp_few None)
+
+let simplify check_ls env : 'a Trans.trans =
+  let normalize_transf engine =
+    Trans.decl (fun d ->
+      match d.d_node with
+      | Dprop (k, pr, t) ->
+          let t = normalize ~step_limit:(1024*1024) ~limit:(1024*1024) engine t in
+          let d = Decl.create_prop_decl k pr t in
+          [d]
+      | _ -> [d]) None
+  in
+  let collect t =
+    let acc = Task.task_fold
+      (fun acc td -> match td.Theory.td_node with
+        | Theory.Decl { d_node = Dprop((Plemma|Paxiom), pr, t) } ->
+            begin match t.t_node with
+            | Tapp(ls,[t1;_]) when ls == ps_equ ->
+                begin match t1.t_node with
+                | Tapp(ls,_::_) when not (check_ls ls) -> (pr,t) :: acc
+                | _ -> acc
+                end
+            | _ -> acc
+            end
+        | _ -> acc)
+      [] t
+    in
+    let p = { compute_defs = false;
+              compute_builtin = true;
+              compute_def_set = Term.Mls.empty;
+            } in
+    List.fold_left
+      (fun e (pr,t) ->
+        try add_rule t e
+        with NotARewriteRule msg ->
+          Warning.emit "proposition %a cannot be turned into a rewrite rule: %s"
+            Pretty.print_pr pr msg;
+          e
+      )
+      (create p env (Task.task_known t)) acc in
+  let tr = Trans.store collect in
+  Trans.bind tr (fun engine -> normalize_transf engine)

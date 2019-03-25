@@ -12,6 +12,8 @@
 #define TEST_MUL
 #define TEST_TOOM
 #define TEST_DIV
+#define TEST_SQRT1
+#define TEST_SQRTREM
 #endif
 
 #ifdef TEST_MINIGMP
@@ -25,6 +27,8 @@
 #include "build/mul.h"
 #include "build/div.h"
 #include "build/toom.h"
+#include "build/sqrt1.h"
+#include "build/sqrt.h"
 #endif
 
 #include "mt19937-64.c"
@@ -54,13 +58,13 @@ void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
 
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr;
-  mp_size_t max_n, max_add, max_mul, max_toom, max_div, an, bn, rn;
+  mp_size_t max_n, max_add, max_mul, max_toom, max_div, max_sqrt, an, bn, rn;
 #ifdef BENCH
   int nb, nb_iter;
   struct timeval begin, end;
   double elapsed;
 #endif
-  uint64_t c, refc;
+  uint64_t a, c, refc;
   //gmp_randstate_t rands;
   //TMP_DECL;
   //TMP_MARK;
@@ -82,6 +86,7 @@ int main () {
   max_mul = 20;
   max_toom = 95;
   max_div = 20;
+  max_sqrt = 95;
   ap = TMP_ALLOC_LIMBS (max_n + 1);
   bp = TMP_ALLOC_LIMBS (max_n + 1);
   /* nap = TMP_ALLOC_LIMBS (max_n + 1); */
@@ -355,11 +360,144 @@ int main () {
 #endif
 	}
         }
-#endif
 #ifdef COMPARE
   printf ("division ok\n");
 #endif
-          //TMP_FREE;
-          //tests_end ();
-          return 0;
+#endif
+#ifdef TEST_SQRT1
+#ifdef BENCH
+  printf ("#t(s)\n");
+#endif
+
+#ifdef BENCH
+      elapsed = 0;
+#endif
+      an = bn = rn = 1;
+      for (int iter = 0; iter != 500; ++iter) {
+        init_valid (bp, ap, 1, 1);
+        a = *ap;
+        if (a < 0x4000000000000000) continue;
+#ifdef BENCH
+        gettimeofday(&begin, NULL);
+        for (int i = 0; i != 100; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpn_sqrtrem (refr, refp, ap, 1);
+            refc = *refr;
+#endif
+#ifdef TEST_WHY3
+            c = sqrt1 (rp, a);
+#endif
+
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec)
+          + ((end.tv_usec - begin.tv_usec)/1000000.0)
+        printf ("%f\n", elapsed);
+        printf ("\n"); //for gnuplot
+#endif
+#ifdef COMPARE
+      if (mpn_cmp (refp, rp, rn) || c != refc)
+        {
+          printf ("ERROR, i=%d\n",
+                  (int) iter);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("r:   "); mpn_dump (rp, rn);
+          printf ("ref: "); mpn_dump (refp, rn);
+          printf ("c:    %016lx\n", c);
+          printf ("refc: %016lx\n", refc);
+          abort();
         }
+#endif
+    }
+#ifdef COMPARE
+    printf ("sqrt1 ok\n");
+#endif
+#endif
+
+#ifdef TEST_SQRTREM
+#ifdef BENCH
+  printf ("#an t(µs)\n");
+#endif
+  bn=1;
+  for (an = 1; an <= max_sqrt; an += 1)
+    {
+      init_valid (bp, ap, 1, an);
+#ifdef BENCH
+      elapsed = 0;
+      nb_iter = 1000;
+      for (int iter = 0; iter != nb_iter; ++iter) {
+        init_valid (bp, ap, 1, an);
+#ifdef TEST_MINIGMP
+        mpn_copyi(refr, ap, an);
+#endif
+        gettimeofday(&begin, NULL);
+        nb = 1500 / an;
+        for (int i = 0; i != nb; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            rn = mpn_sqrtrem(refq, refr, ap, an);
+#endif
+#ifdef TEST_WHY3
+            c = wmpn_sqrtrem(rq, rr, ap, an);
+#endif
+            
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec) * 1000000.0
+          + (end.tv_usec - begin.tv_usec);
+      }
+      elapsed = elapsed / (nb * nb_iter);
+      printf ("%d %f\n", an, elapsed);
+      printf ("\n"); //for gnuplot
+#endif
+#ifdef COMPARE
+      if (c != rn)
+        {
+          printf ("ERROR, an = %d, expected rn = %d, actual rn = %d\n",
+                  (int) an, (int) rn, (int) c);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("s: "); mpn_dump (rq, (an+1)/2);
+          printf ("refs: "); mpn_dump (refq, (an+1)/2);
+          printf ("r: "); mpn_dump (rr, c);
+          printf ("refr: "); mpn_dump (refr, rn);
+          abort ();
+        }
+      if (mpn_cmp (refr, rr, rn))
+        {
+          printf ("ERROR, an = %d, rn = %d\n",
+                  (int) an, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("s: "); mpn_dump (rq, (an+1)/2);
+          printf ("refs: "); mpn_dump (refq, (an+1)/2);
+          printf ("r: "); mpn_dump (rr, c);
+          printf ("refr: "); mpn_dump (refr, rn);
+          abort();
+        }
+      if (mpn_cmp (refq, rq, (an+1)/2))
+        {
+          printf ("ERROR, an = %d, rn = %d\n",
+                  (int) an, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("s: "); mpn_dump (rq, (an+1)/2);
+          printf ("refs: "); mpn_dump (refq, (an+1)/2);
+          printf ("r: "); mpn_dump (rr, c);
+          printf ("refr: "); mpn_dump (refr, rn);
+          abort();
+        }
+#endif
+    }
+#ifdef COMPARE
+  printf ("sqrtrem ok\n");
+#endif
+#endif
+  //TMP_FREE;
+  //tests_end ();
+  return 0;
+}

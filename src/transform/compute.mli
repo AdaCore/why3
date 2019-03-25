@@ -22,3 +22,5 @@ val normalize_hyp : int option -> Decl.prsymbol option -> Env.env
 
 val normalize_hyp_few : int option -> Decl.prsymbol option -> Env.env
                     -> Task.task Trans.tlist
+
+val simplify : (Term.lsymbol -> bool) -> Env.env -> Task.task Trans.trans
