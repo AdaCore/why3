@@ -285,7 +285,6 @@ let syntax_arguments_typed s print_arg print_type t fmt l =
 
 let syntax_range_literal ?(cb=None) s fmt c =
   let f s b e fmt =
-    let exception Callback in
     try
       let v = c.Number.il_int in
       let base = match s.[e-1] with
@@ -293,7 +292,7 @@ let syntax_range_literal ?(cb=None) s fmt c =
         | 'd' -> 10
         | 'o' -> 8
         | 'b' -> 2
-        | 'c' -> raise Callback
+        | 'c' -> raise Exit
         | _ -> assert false
       in
       let digits =
@@ -316,7 +315,7 @@ let syntax_range_literal ?(cb=None) s fmt c =
           else v
         in
         Number.print_in_base base digits fmt v
-    with Callback ->
+    with Exit ->
       match cb with
       | Some cb -> cb fmt c
       | None -> failwith ("custom format string with no callback passed")
