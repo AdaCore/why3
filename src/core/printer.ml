@@ -137,7 +137,7 @@ let opt_search_forward_literal_format s pos =
         end;
         while !i < l && is_digit s.[!i] do incr i done;
         begin match s.[!i] with
-        | 'b' | 'x' | 'o' | 'd' -> incr i; raise Exit
+        | 'b' | 'x' | 'o' | 'd' | 'c' -> incr i; raise Exit
         | _ -> ()
         end;
       end;
@@ -283,36 +283,42 @@ let syntax_arguments_typed_prec =
 let syntax_arguments_typed s print_arg print_type t fmt l =
   syntax_arguments_typed_prec s (fun _ f a -> print_arg f a) print_type t [] fmt l
 
-let syntax_range_literal s fmt c =
+let syntax_range_literal ?(cb=None) s fmt c =
   let f s b e fmt =
-    let v = c.Number.il_int in
-    let base = match s.[e-1] with
-      | 'x' -> 16
-      | 'd' -> 10
-      | 'o' -> 8
-      | 'b' -> 2
-      | _ -> assert false
-    in
-    let digits =
-      if e > b + 1 then
-        Some (int_of_string (String.sub s b (e-b-1)))
-      else
-        None
-    in
-    if base = 10 then begin
-        if BigInt.lt v BigInt.zero then fprintf fmt "-";
-        Number.print_in_base base digits fmt (BigInt.abs v)
-      end
-    else
-      let v =
-        if BigInt.lt v BigInt.zero then
-          match digits with
-          | Some d ->
-              BigInt.add (BigInt.pow_int_pos base d) v
-          | None -> failwith ("number of digits must be given for printing negative literals in base " ^ string_of_int base)
-        else v
+    try
+      let v = c.Number.il_int in
+      let base = match s.[e-1] with
+        | 'x' -> 16
+        | 'd' -> 10
+        | 'o' -> 8
+        | 'b' -> 2
+        | 'c' -> raise Exit
+        | _ -> assert false
       in
-      Number.print_in_base base digits fmt v
+      let digits =
+        if e > b + 1 then
+          Some (int_of_string (String.sub s b (e-b-1)))
+        else
+          None
+      in
+      if base = 10 then begin
+          if BigInt.lt v BigInt.zero then fprintf fmt "-";
+          Number.print_in_base base digits fmt (BigInt.abs v)
+        end
+      else
+        let v =
+          if BigInt.lt v BigInt.zero then
+            match digits with
+            | Some d ->
+               BigInt.add (BigInt.pow_int_pos base d) v
+            | None -> failwith ("number of digits must be given for printing negative literals in base " ^ string_of_int base)
+          else v
+        in
+        Number.print_in_base base digits fmt v
+    with Exit ->
+      match cb with
+      | Some cb -> cb fmt c
+      | None -> failwith ("custom format string with no callback passed")
   in
   global_substitute_fmt opt_search_forward_literal_format f s fmt
 

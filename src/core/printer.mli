@@ -124,7 +124,7 @@ val syntax_arguments_typed :
   string -> term Pp.pp -> ty Pp.pp -> term -> term list Pp.pp
 
 val syntax_range_literal :
-  string -> Number.int_constant Pp.pp
+  ?cb:(Number.int_constant Pp.pp option) -> string -> Number.int_constant Pp.pp
 
 val syntax_float_literal :
   string -> Number.float_format -> Number.real_constant Pp.pp

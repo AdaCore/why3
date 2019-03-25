@@ -23,7 +23,7 @@ end
 module mach.int.Int32
 
   syntax type int32  "int32_t"
-  syntax literal int32 "%d"
+  syntax literal int32 "%c"
 
   syntax val (+)     "%1 + %2"   prec 4 4 3
   syntax val (-)     "%1 - %2"   prec 4 4 3
@@ -49,7 +49,7 @@ end
 
 module mach.int.UInt32
 
-  syntax literal uint32 "0x%8xU"
+  syntax literal uint32 "%cU"
 
   syntax val (+)     "%1 + %2"   prec 4 4 3
   syntax val (-)     "%1 - %2"   prec 4 4 3
@@ -181,7 +181,7 @@ struct __lsld32_result
 struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 "
 
-  syntax literal uint32 "0x%8xU"
+  syntax literal uint32 "%cU"
 
   syntax val (+)     "%1 + %2"   prec 4 4 3
   syntax val (-)     "%1 - %2"   prec 4 4 3
@@ -223,7 +223,7 @@ end
 
 module mach.int.Int64
   syntax type int64  "int64_t"
-  syntax literal int64 "%dL"
+  syntax literal int64 "INT64_C(%c)"
 
   syntax val (+)     "%1 + %2"   prec 4 4 3
   syntax val (-)     "%1 - %2"   prec 4 4 3
@@ -250,7 +250,7 @@ end
 
 module mach.int.UInt64
 
-  syntax literal uint64 "0x%16xUL"
+  syntax literal uint64 "UINT64_C(%c)"
 
   syntax val (+)     "%1 + %2"   prec 4 4 3
   syntax val (-)     "%1 - %2"   prec 4 4 3
@@ -505,7 +505,7 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   return result;
 }
 "
-  syntax literal uint64 "0x%16xUL"
+  syntax literal uint64 "UINT64_C(%c)"
 
   syntax val uint64_max "0xffffffffffffffffUL" prec 0
 
