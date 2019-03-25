@@ -928,12 +928,14 @@ module MLToC = struct
        let print fmt ic =
         let n = ic.il_int in
         if BigInt.lt n BigInt.zero
-        then Format.fprintf fmt "-%a" (print_in_base 10 None) (BigInt.abs n)
+        then
+          (* default to base 10 for negative literals *)
+          Format.fprintf fmt "-%a" (print_in_base 10 None) (BigInt.abs n)
         else
           match ic.il_kind with
-          | ILitHex -> Format.fprintf fmt "0x%a" (print_in_base 16 None) n
+          | ILitHex | ILitBin -> Format.fprintf fmt "0x%a" (print_in_base 16 None) n
           | ILitOct -> Format.fprintf fmt "0%a" (print_in_base 8 None) n
-          | _ ->
+          | ILitDec | ILitUnk ->
              (* default to base 10 *)
              Format.fprintf fmt "%a" (print_in_base 10 None) n in
         let s = match e.e_ity with
