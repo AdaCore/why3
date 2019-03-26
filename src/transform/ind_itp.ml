@@ -76,13 +76,15 @@ let revert ?tr g d : Term.term =
   | Ddata _ -> raise (Arg_trans "revert: cannot revert type")
   | Dparam ls ->
     (try
-      let attrs = Opt.map2 (fun tr ls -> tr ls) tr (Some ls) in
-      let new_ident = Ident.id_fresh ?attrs ls.ls_name.Ident.id_string in
-      let new_var = Term.create_vsymbol new_ident (Opt.get ls.Term.ls_value) in
-      let g = t_replace (t_app_infer ls []) (t_var new_var) g in
-      t_forall_close [new_var] [] g
-    with
-    | _ -> raise (Arg_trans ("revert: cannot revert:" ^ ls.ls_name.Ident.id_string)))
+       let attrs = match tr with
+         | None -> None
+         | Some tr -> Some (tr ls) in
+       let new_ident = Ident.id_fresh ?attrs ls.ls_name.Ident.id_string in
+       let new_var = Term.create_vsymbol new_ident (Opt.get ls.Term.ls_value) in
+       let g = t_replace (t_app_infer ls []) (t_var new_var) g in
+       t_forall_close [new_var] [] g
+     with
+     | e -> raise (Arg_trans ("revert: cannot revert:" ^ ls.ls_name.Ident.id_string)))
   (* TODO extend this *)
   | Dlogic _ ->
     raise (Arg_trans "revert: cannot revert logic decls")
