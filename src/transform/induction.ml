@@ -348,7 +348,14 @@ let () =
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ algebraic@ types."
 
 let induction_on_hyp ls =
-  Trans.compose (Ind_itp.revert_tr_symbol [Tslsymbol ls])
+  (* We add the induction attribute on the reverted symbol *)
+  let tr = Some
+      (fun s -> (* Add induction attribute *only* on ls *)
+         if ls_equal s ls then
+           Ident.Sattr.singleton (create_attribute "induction")
+         else Ident.Sattr.empty)
+  in
+  Trans.compose (Ind_itp.revert_tr_symbol ?tr [Tslsymbol ls])
     (Trans.store induction_ty_lex)
 
 let () = wrap_and_register

@@ -9,4 +9,10 @@
 (*                                                                  *)
 (********************************************************************)
 
-val revert_tr_symbol: Args_wrapper.symbol list -> Task.task Trans.trans
+(* [tr] gives a function that gives a set of attributes to the fresh elements
+   generated during the revert. It allows in particular to add [@induction] for
+   induction_ty_lex.
+*)
+val revert_tr_symbol:
+  ?tr:(Term.lsymbol -> Ident.Sattr.t) ->
+    Args_wrapper.symbol list -> Task.task Trans.trans

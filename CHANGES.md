@@ -24,6 +24,7 @@ Transformations
   (previously ignored):x:
   * Fix crash of eliminate_unknown_types
   * Giving too many arguments to a transformation do not display a popup anymore
+  * Fix behavior of induction_arg_ty_lex (now equivalent to induction_ty_lex)
 
 Counterexamples
   * Improved display of counterexamples in Task view
