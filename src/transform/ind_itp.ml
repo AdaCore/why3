@@ -70,18 +70,21 @@ let is_good_type t ty =
   | _ -> false
 
 (* Reverts a declaration d to a goal g *)
-let revert g d : Term.term =
+let revert ?tr g d : Term.term =
   match d.d_node with
   | Dtype _ -> raise (Arg_trans "revert: cannot revert type")
   | Ddata _ -> raise (Arg_trans "revert: cannot revert type")
   | Dparam ls ->
     (try
-      let new_ident = Ident.id_fresh ls.ls_name.Ident.id_string in
-      let new_var = Term.create_vsymbol new_ident (Opt.get ls.Term.ls_value) in
-      let g = t_replace (t_app_infer ls []) (t_var new_var) g in
-      t_forall_close [new_var] [] g
-    with
-    | _ -> raise (Arg_trans ("revert: cannot revert:" ^ ls.ls_name.Ident.id_string)))
+       let attrs = match tr with
+         | None -> None
+         | Some tr -> Some (tr ls) in
+       let new_ident = Ident.id_fresh ?attrs ls.ls_name.Ident.id_string in
+       let new_var = Term.create_vsymbol new_ident (Opt.get ls.Term.ls_value) in
+       let g = t_replace (t_app_infer ls []) (t_var new_var) g in
+       t_forall_close [new_var] [] g
+     with
+     | e -> raise (Arg_trans ("revert: cannot revert:" ^ ls.ls_name.Ident.id_string)))
   (* TODO extend this *)
   | Dlogic _ ->
     raise (Arg_trans "revert: cannot revert logic decls")
@@ -103,8 +106,8 @@ let fold_map f init =
 
 (* Takes a list of prop l and a goal g and reverts the list
    of prop to the goal g *)
-let revert_list (l: decl list) g =
-  List.fold_left revert g l
+let revert_list ?tr (l: decl list) g =
+  List.fold_left (revert ?tr) g l
 
 (* Go through a term and collect constants *)
 let add_ls_term s t =
@@ -150,30 +153,30 @@ let depends dep d =
 
 (* TODO Do a transformation as a fold that reverts automatically dependencies
    but that could be used elsewhere instead of all those adhoc functions. *)
-let revert_tr prlist lslist =
+let revert_tr ?tr prlist lslist =
   fold_map (fun d ((acc, dep), task) ->
     match d.d_node with
-    | Dparam ls when (depends dep d ||
-      List.exists (fun ls1 -> ls_equal ls ls1) lslist) ->
+    | Dparam ls when
+        depends dep d || List.exists (fun ls1 -> ls_equal ls ls1) lslist ->
         ((d :: acc, Sls.add ls dep), task)
-    | Dprop (k, pr1, _) when k != Pgoal
+    | Dprop (k, pr1, _) when
+        k != Pgoal
           && (depends dep d || List.exists (fun pr -> pr_equal pr pr1) prlist)
       ->
         ((d :: acc, dep), task)
     | Dprop (k, pr1, g) when k = Pgoal ->
-      begin
-        match acc with
+        begin match acc with
         | [] ->
             raise (Arg_trans "prsymbol not found")
         | drevlist ->
-          let new_goal = Decl.create_prop_decl k pr1 (revert_list drevlist g) in
-          (([], Sls.empty), Task.add_decl task new_goal)
-      end
+            let new_goal = Decl.create_prop_decl k pr1 (revert_list ?tr drevlist g) in
+            (([], Sls.empty), Task.add_decl task new_goal)
+        end
     | _ -> ((acc, dep), Task.add_decl task d)
     )
     ([], Sls.empty)
 
-let revert_tr_symbol symbol_list =
+let revert_tr_symbol ?tr symbol_list =
 
   (* Order does not matter *)
   let rec convert_list pr_acc ls_acc symbollist =
@@ -185,7 +188,7 @@ let revert_tr_symbol symbol_list =
         raise (Arg_trans "Tysymbol should not appear here. Please report")
   in
   let (prlist, lslist) = convert_list [] [] symbol_list in
-  revert_tr prlist lslist
+  revert_tr ?tr prlist lslist
 
 (* s is a set of variables, g is a term. If d contains one of the elements of s
    then all variables of d are added to s and the declaration is prepended to g.
@@ -312,4 +315,4 @@ let () = wrap_and_register
     ~desc:"revert <id list>@ \
       puts@ the@ given@ identifiers@ back@ in@ the@ goal."
     "revert"
-    (Tlist Ttrans) revert_tr_symbol
+    (Tlist Ttrans) (revert_tr_symbol ?tr:None)
