@@ -103,4 +103,13 @@ module LB09_025_conversion
   =
     to_int RNE x
 
+
+  let ghost fti_purely_float x
+    requires { x .>= (-2147483648.0:t) /\ x .< (2147483648.0:t) }
+    ensures  { of_int RNE result .>= x .- (1.0:t) }
+    ensures  { of_int RNE result .<= x .+ (1.0:t) }
+    ensures  { result = to_int RNE x }
+  =
+    to_int RNE x
+
 end
