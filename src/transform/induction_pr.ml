@@ -224,21 +224,31 @@ let induction_l attr induct task = match task with
     with Ind_not_found -> [task] end
   | _ -> assert false
 
-let induction_on_hyp attr b h =
-  Trans.compose (Ind_itp.revert_tr_symbol [Tsprsymbol h])
+let induction_on_hyp attr b h list_hyp_opt =
+  let l = match list_hyp_opt with
+  | None -> [Tsprsymbol h]
+  | Some l -> Tsprsymbol h :: l in
+  let tr x = match x with
+  | Tsprsymbol pr when Decl.pr_equal pr h -> Some attr
+  | _ -> None in
+  Trans.compose (Ind_itp.revert_tr_symbol ~tr l)
     (Trans.store (induction_l attr b))
 
 let () = wrap_and_register
     ~desc:"induction_arg_pr <name>@ \
-      performs@ 'induction_pr'@ on@ the@ given@ premise."
+      performs@ 'induction_pr'@ on@ the@ given@ premise. Optional@ <with_gen>@ \
+      arguments@ are@ the@ elements@ to@ be@ generalized@."
     "induction_arg_pr"
-    (Tprsymbol Ttrans_l) (induction_on_hyp attr_ind true)
+    (Tprsymbol (Topt ("with_gen", Tlist Ttrans_l)))
+    (induction_on_hyp attr_ind true)
 
 let () = wrap_and_register
     ~desc:"inversion_arg_pr <name>@ \
-      performs@ 'inversion_pr'@ on@ the@ given@ premise."
+      performs@ 'inversion_pr'@ on@ the@ given@ premise. Optional@ <with_gen>@ \
+      arguments@ are@ the@ elements@ to@ be@ generalized@."
     "inversion_arg_pr"
-    (Tprsymbol Ttrans_l) (induction_on_hyp attr_inv false)
+    (Tprsymbol (Topt ("with_gen", Tlist Ttrans_l)))
+    (induction_on_hyp attr_inv false)
 
 let () =
   Trans.register_transform_l "induction_pr"

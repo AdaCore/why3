@@ -9,10 +9,10 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* [tr] gives a function that gives a set of attributes to the fresh elements
-   generated during the revert. It allows in particular to add [@induction] for
-   induction_ty_lex.
+(* [tr] is a function that associates a symbol of the task with an attribute.
+   This is used to add new attributes (such as @induction) on some quantified
+   variables (see induction_arg_pr).
 *)
 val revert_tr_symbol:
-  ?tr:(Term.lsymbol -> Ident.Sattr.t) ->
+  ?tr:(Args_wrapper.symbol -> Ident.attribute option) ->
     Args_wrapper.symbol list -> Task.task Trans.trans

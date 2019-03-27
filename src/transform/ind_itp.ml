@@ -76,22 +76,30 @@ let revert ?tr g d : Term.term =
   | Ddata _ -> raise (Arg_trans "revert: cannot revert type")
   | Dparam ls ->
     (try
-       let attrs = match tr with
+       let attrs = Opt.map (fun x -> Ident.Sattr.add x Ident.Sattr.empty) (match tr with
          | None -> None
-         | Some tr -> Some (tr ls) in
+         | Some tr -> tr (Tslsymbol ls)) in
        let new_ident = Ident.id_fresh ?attrs ls.ls_name.Ident.id_string in
        let new_var = Term.create_vsymbol new_ident (Opt.get ls.Term.ls_value) in
        let g = t_replace (t_app_infer ls []) (t_var new_var) g in
        t_forall_close [new_var] [] g
      with
-     | e -> raise (Arg_trans ("revert: cannot revert:" ^ ls.ls_name.Ident.id_string)))
+     | _ -> raise (Arg_trans ("revert: cannot revert:" ^ ls.ls_name.Ident.id_string)))
   (* TODO extend this *)
   | Dlogic _ ->
     raise (Arg_trans "revert: cannot revert logic decls")
   | Dind _ ->
     raise (Arg_trans "revert: cannot revert induction decls")
-  | Dprop (k, _pr, t) when k <> Pgoal ->
-    Term.t_implies t g
+  | Dprop (k, pr, t) when k <> Pgoal ->
+      let t = match tr with
+      | None -> t
+      | Some tr ->
+          begin match tr (Tsprsymbol pr) with
+          | None -> t
+          | Some attr -> t_attr_add attr t
+          end
+      in
+      Term.t_implies t g
   | Dprop (Pgoal, _, _) -> raise (Arg_trans "revert: cannot revert goal")
   | _ -> raise (Arg_trans "revert: please report")
 

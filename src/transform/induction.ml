@@ -349,13 +349,13 @@ let () =
 
 let induction_on_hyp ls =
   (* We add the induction attribute on the reverted symbol *)
-  let tr = Some
-      (fun s -> (* Add induction attribute *only* on ls *)
-         if ls_equal s ls then
-           Ident.Sattr.singleton (create_attribute "induction")
-         else Ident.Sattr.empty)
+  let tr s = (* Add induction attribute *only* on ls *)
+    match s with
+    | Tslsymbol s when ls_equal s ls ->
+        Some attr_ind
+    | _ -> None
   in
-  Trans.compose (Ind_itp.revert_tr_symbol ?tr [Tslsymbol ls])
+  Trans.compose (Ind_itp.revert_tr_symbol ~tr [Tslsymbol ls])
     (Trans.store induction_ty_lex)
 
 let () = wrap_and_register
