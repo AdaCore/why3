@@ -1273,8 +1273,9 @@ ISABELLELIBS_REAL = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/r
 ISABELLELIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
 ISABELLELIBS_NUMBER = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/number/, $(ISABELLELIBS_NUMBER_FILES)))
 
-ISABELLELIBS_SET_FILES = Set Fset
-ISABELLELIBS_SET = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/set/, $(ISABELLELIBS_SET_FILES)))
+# broken
+# ISABELLELIBS_SET_FILES = Set Fset
+# ISABELLELIBS_SET = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/set/, $(ISABELLELIBS_SET_FILES)))
 
 ISABELLELIBS_MAP_FILES = Map Const Occ MapPermut MapInjection
 ISABELLELIBS_MAP = $(addsuffix .xml, $(addprefix $(GENERATED_PREFIX_ISABELLE)/map/, $(ISABELLELIBS_MAP_FILES)))
@@ -1299,8 +1300,8 @@ drivers/isabelle-realizations.aux: Makefile
 	echo 'theory real.'"$$f"' meta "realized_theory" "real.'"$$f"'", "" end'; done; \
 	for f in $(ISABELLELIBS_NUMBER_FILES); do \
 	echo 'theory number.'"$$f"' meta "realized_theory" "number.'"$$f"'", "" end'; done; \
-	for f in $(ISABELLELIBS_SET_FILES); do \
-	echo 'theory set.'"$$f"' meta "realized_theory" "set.'"$$f"'", "" end'; done; \
+#	for f in $(ISABELLELIBS_SET_FILES); do \
+#	echo 'theory set.'"$$f"' meta "realized_theory" "set.'"$$f"'", "" end'; done; \
 	for f in $(ISABELLELIBS_MAP_FILES); do \
 	echo 'theory map.'"$$f"' meta "realized_theory" "map.'"$$f"'", "" end'; done; \
 	for f in $(ISABELLELIBS_LIST_FILES); do \
