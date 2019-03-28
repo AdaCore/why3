@@ -251,4 +251,6 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Already connected to the proof server"
   | InvalidAnswer s ->
       Format.fprintf fmt "Invalid server answer: %s" s
+  | ConnectionError s ->
+      Format.fprintf fmt "Connection error: %s" s
   | _ -> raise exn)
