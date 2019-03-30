@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file proved="true">
+<path name=".."/>
+<path name="word_common_factor.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="VC power" expl="VC for power" proved="true">
+ <proof prover="2"><result status="valid" time="0.05"/></proof>
+ </goal>
+ <goal name="VC power_add" expl="VC for power_add" proved="true">
+ <proof prover="1"><result status="valid" time="0.14" steps="270"/></proof>
+ </goal>
+ <goal name="VC remove_prefix" expl="VC for remove_prefix" proved="true">
+ <proof prover="1"><result status="valid" time="0.05" steps="518"/></proof>
+ </goal>
+ <goal name="VC common_factor" expl="VC for common_factor" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC common_factor.0" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="78"/></proof>
+  </goal>
+  <goal name="VC common_factor.1" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC common_factor.2" expl="precondition" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC common_factor.2.0" expl="precondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC common_factor.3" expl="variant decrease" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="VC common_factor.3.0" expl="variant decrease" proved="true">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC common_factor.3.1" expl="variant decrease" proved="true">
+   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   </goal>
+   <goal name="VC common_factor.3.2" expl="variant decrease" proved="true">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC common_factor.3.3" expl="variant decrease" proved="true">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC common_factor.3.4" expl="variant decrease" proved="true">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+   <goal name="VC common_factor.3.5" expl="variant decrease" proved="true">
+   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC common_factor.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC common_factor.5" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.24"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
