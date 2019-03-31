@@ -277,6 +277,11 @@ let erase_color_loc (v:GSourceView.source_view) =
 
 (* Elements needed for usage of graphical elements *)
 
+(* Hold the node_id on which "next" was called to allow differentiating on
+   automatic jump from a user jump *)
+let manual_next = ref None
+
+
 (* [quit_on_saved] set to true by exit function to delay quiting after Saved
    notification is received *)
 let quit_on_saved = ref false
@@ -1269,12 +1274,12 @@ let move_current_row_selection_to_next () =
       goals_view#set_cursor path view_name_column
   | _ -> ()
 
-
 let move_to_next_unproven_node_id () =
   let rows = get_selected_row_references () in
   match rows with
   | [row] ->
       let row_id = get_node_id row#iter in
+      manual_next := Some row_id;
       send_request (Get_first_unproven_node row_id)
   | _ -> ()
 
@@ -2368,8 +2373,13 @@ let treat_notification n =
           | _ -> ()
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
-      if is_selected_alone asked_id then
+      if is_selected_alone asked_id &&
+         (* The user manually asked for next node from this one *)
+         (!manual_next = Some asked_id ||
+          (* or auto next is on *)
+          gconfig.auto_next) then
         begin
+          manual_next := None;
           (* Unselect the potentially selected goal to avoid having two tasks
              selected at once when a prover successfully end. To continue the
              proof, it is better to only have the new goal selected *)
