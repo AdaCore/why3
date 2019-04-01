@@ -10,6 +10,7 @@
 (********************************************************************)
 
 exception AlreadyConnected
+exception ConnectionError of string
 
 val connect_external : string -> unit
 (** connects to an already running server, with the given socket name

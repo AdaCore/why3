@@ -14,6 +14,7 @@ let socket : Unix.file_descr option ref = ref None
 exception NotConnected
 exception AlreadyConnected
 exception InvalidAnswer of string
+exception ConnectionError of string
 
 let is_connected () = !socket <> None
 
@@ -32,12 +33,13 @@ let client_connect ~fail socket_name =
     socket := Some sock
   with
   | Unix.Unix_error(err, func, arg) when fail ->
-     Format.eprintf "client_connect: connection failed: %s (%s,%s) (socket_name=%s)@." (Unix.error_message err) func arg socket_name;
-     exit 2
+     let s = Format.sprintf "client_connect: connection failed: %s (%s,%s) (socket_name=%s)@."
+             (Unix.error_message err) func arg socket_name in
+     raise (ConnectionError s)
   | e when fail ->
-     Format.eprintf "client_connect failed for some unexpected reason: %s@\nAborting.@."
-                    (Printexc.to_string e);
-     exit 2
+     let s = Format.sprintf "client_connect failed for some unexpected reason: %s@\nAborting.@."
+                    (Printexc.to_string e) in
+     raise (ConnectionError s)
 
 let client_disconnect () =
   match !socket with
@@ -238,4 +240,6 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Already connected to the proof server"
   | InvalidAnswer s ->
       Format.fprintf fmt "Invalid server answer: %s" s
+  | ConnectionError s ->
+      Format.fprintf fmt "Connection error: %s" s
   | _ -> raise exn)
