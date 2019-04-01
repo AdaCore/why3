@@ -726,7 +726,9 @@ let create_source_view =
         (* We have to create the tags for background colors for each view.
            They are not reusable from the other views.  *)
         create_colors source_view;
-        Gconfig.set_fonts ()
+        Gconfig.set_fonts ();
+        (* Focusing on the tabs that was just added *)
+        notebook#goto_page (!n - 1)
       end in
   create_source_view
 
