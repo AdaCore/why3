@@ -44,9 +44,8 @@ type t =
       mutable show_time_limit : bool;
       mutable max_boxes : int;
       mutable allow_source_editing : bool;
-      mutable saving_policy : int;
+      mutable saving_policy : int; (* 0 = always, 1 = never, 2 = ask *)
       mutable auto_next : bool; (* true if auto jump to next goal *)
-      (** 0 = always, 1 = never, 2 = ask *)
       mutable premise_color : string;
       mutable neg_premise_color : string;
       mutable goal_color : string;
