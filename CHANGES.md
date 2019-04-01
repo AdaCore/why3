@@ -31,6 +31,9 @@ Transformations
 Counterexamples
   * Improved display of counterexamples in Task view
 
+IDE
+  * Added a checkbutton in preferences to disallow auto jumping to next unproved
+  goal
 
 Version 1.2.0, February 11, 2019
 --------------------------------
