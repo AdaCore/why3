@@ -31,6 +31,10 @@ Transformations
 Counterexamples
   * Improved display of counterexamples in Task view
 
+Realizations
+  * Added experimental realizations for new Set theories in both Isabelle and
+  Coq
+
 
 Version 1.2.0, February 11, 2019
 --------------------------------
