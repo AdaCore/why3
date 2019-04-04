@@ -196,7 +196,6 @@ unfold interval, Fset.mem, set.Set.mem.
 destruct Z_le_dec; try destruct Z_lt_dec; intuition; try inversion H.
 Qed.
 
-
 Lemma interval_is_finite: forall l r, 
   Cardinal.is_finite (fun x : int => 
     if Z_le_dec l x then if Z_lt_dec x r then true 

@@ -4,8 +4,6 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
 Require int.Int.
-Require set.Cardinal.
-Require set.Set.
 
 (* Why3 goal *)
 Definition fset : forall (a:Type), Type.
@@ -19,6 +17,8 @@ Defined.
 Definition mem {a:Type} {a_WT:WhyType a} : a -> fset a -> Prop.
 Proof.
 intros. destruct X0 as (f, P).
+(* TODO remove this *)
+Require set.Set.
 apply (set.Set.mem X f).
 Defined.
 
@@ -34,7 +34,8 @@ Proof.
 intros s1 s2 h1.
 unfold infix_eqeq in h1. unfold mem in h1.
 destruct s1, s2.
-assert (x = x0). eapply set.Set.extensionality. intro. eauto.
+assert (x = x0).
+eapply set.Set.extensionality. intro. eauto.
 subst.
 assert (e = e0).
 (* TODO maybe provable on such property ? *)
@@ -71,7 +72,10 @@ Definition is_empty {a:Type} {a_WT:WhyType a} (s:fset a) : Prop :=
 (* Why3 goal *)
 Definition empty {a:Type} {a_WT:WhyType a} : fset a.
 Proof.
-exists (fun x => false). apply Cardinal.is_finite_empty. unfold set.Set.is_empty.
+exists (fun x => false). 
+(* TODO remove this *)
+Require Cardinal.
+apply Cardinal.is_finite_empty. unfold set.Set.is_empty.
 unfold set.Set.mem. intuition.
 Defined.
 

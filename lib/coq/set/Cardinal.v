@@ -475,7 +475,7 @@ destruct ClassicalEpsilon.excluded_middle_informative.
   destruct x0. 
   + inversion h1.
   + destruct x0.
-    - simpl in a0. eapply a0 in h2. eapply a0 in H0. intuition. subst. assumption.
+    - simpl in a0. eapply a0 in h2. eapply a0 in H0. intuition. subst. reflexivity.
     - simpl in h1; contradict h1; zify; omega.
 * inversion h1.
 Qed.
@@ -749,3 +749,4 @@ assert (List.length x <= List.length x0).
 }
 omega.
 Qed.
+
