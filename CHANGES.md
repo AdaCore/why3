@@ -30,6 +30,10 @@ IDE
   * display of counterexamples in the Task view has been improved
   * auto jumping to next unproved goal can now be disabled in the preferences
 
+Realizations
+  * Added experimental realizations for new Set theories in both Isabelle and
+    Coq
+
 Version 1.2.0, February 11, 2019
 --------------------------------
 

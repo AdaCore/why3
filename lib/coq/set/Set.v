@@ -385,7 +385,7 @@ set (P := fun (x:a) => mem x s /\ y = f x).
 assert (inhabited a).
 destruct a_WT.
 exact (inhabits why_inhabitant).
-set (x := epsilon H P). 
+set (x := epsilon H P).
 destruct b_WT.
 destruct (why_decidable_eq y (f x)).
 exact (s x).
