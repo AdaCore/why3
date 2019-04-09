@@ -352,7 +352,7 @@ let generate_auto_strategies config =
   in
   fprintf str_formatter "start:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
-  fprintf str_formatter "t split_all_full start@\n";
+  fprintf str_formatter "t split_vc start@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 10 4000@\n" s) provers_level1;
   let code = flush_str_formatter () in
   let auto1 = {
@@ -371,7 +371,7 @@ let generate_auto_strategies config =
   in
   fprintf str_formatter "start:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level2;
-  fprintf str_formatter "t split_all_full start@\n";
+  fprintf str_formatter "t split_vc start@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 5 2000@\n" s) provers_level2;
   fprintf str_formatter "t introduce_premises afterintro@\n";
   fprintf str_formatter "afterintro:@\n";
