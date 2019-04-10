@@ -306,9 +306,34 @@ and print_proj_human fmt p =
   fprintf fmt "@[{%s =>@ %a}@]"
     s print_model_value_human v
 
+and print_integer fmt (i: string) =
+
+  (* TODO This conversion is adhoc plus it is not the most efficient. But it
+     should be ok as we use this only for display. *)
+  let print_big_int fmt (bn: BigInt.t) =
+    let to_hexa n = sprintf "%X" n in
+    let base = BigInt.of_int 16 in
+    let rec convert_big_int_hexa (bn: BigInt.t) : string =
+      if BigInt.lt bn base then
+        to_hexa (BigInt.to_int bn)
+      else
+        let (q, r) = BigInt.euclidean_div_mod bn base in
+        to_hexa (BigInt.to_int q) ^ convert_big_int_hexa r
+    in
+    fprintf fmt "%s (%s0x%s)" (BigInt.to_string bn)
+      (if (BigInt.sign bn) >= 0 then "" else "-")
+      (convert_big_int_hexa (BigInt.abs bn))
+  in
+  let bn = BigInt.of_string i in
+  try
+    let i = BigInt.to_int bn in
+    fprintf fmt "%d (0x%X)" i i
+  with Failure _ (* "int_of_big_int" *) ->
+    print_big_int fmt bn
+
 and print_model_value_human fmt (v: model_value) =
   match v with
-  | Integer s -> fprintf fmt "%s" s
+  | Integer s -> print_integer fmt s
   | Decimal (s1,s2) -> fprintf fmt "%s" (s1 ^ "." ^ s2)
   | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
   | Float f -> print_float_human fmt f
@@ -320,7 +345,8 @@ and print_model_value_human fmt (v: model_value) =
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Proj p -> print_proj_human fmt p
-  | Bitvector s -> fprintf fmt "%s" s
+  | Bitvector s -> (* Bitvector are returned with the same format as integer *)
+      print_integer fmt s
   | Unparsed s -> fprintf fmt "%s" s
 
 (*
