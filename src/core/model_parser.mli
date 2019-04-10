@@ -22,6 +22,7 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+    (* Float_value (sign, exponent, mantissa) *)
   | Float_hexa of string * float
 
 val interp_float: ?interp:bool -> string -> string -> string -> float_type
