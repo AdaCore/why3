@@ -140,12 +140,10 @@ let handle_obj c obj =
 
 let all_split_subp c subp =
   let s = c.Controller_itp.controller_session in
-  if C.matches_subp_filter s subp then begin
-     C.init_subp_vcs c subp;
-     Gnat_objectives.iter_leaf_goals s subp (register_goal s);
-     C.all_split_leaf_goals ();
-     Gnat_objectives.clear ()
-   end
+   C.init_subp_vcs c subp;
+   Gnat_objectives.iter_leaf_goals s subp (register_goal s);
+   C.all_split_leaf_goals ();
+   Gnat_objectives.clear ()
 
 let filter_model m trace =
   if trace = Gnat_loc.S.empty then
@@ -229,12 +227,9 @@ let ending c () =
   Unix.putenv "GMON_OUT_PREFIX" (basename ^ "_gnatwhy3_gmon.out")
 
 let normal_handle_one_subp c subp =
+   C.init_subp_vcs c subp;
    let s = c.Controller_itp.controller_session in
-   if C.matches_subp_filter s subp then begin
-     C.init_subp_vcs c subp;
-     let s = c.Controller_itp.controller_session in
-     Gnat_objectives.iter_leaf_goals s subp (register_goal s)
-   end
+   Gnat_objectives.iter_leaf_goals s subp (register_goal s)
 
 (* save session on interrupt initiated by the user *)
 let save_session_and_exit c signum =

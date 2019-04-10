@@ -686,15 +686,6 @@ let iter_subps c f =
        else acc := mk_subp_goal s g :: !acc) in
    List.iter f !acc
 
-let matches_subp_filter s subp =
-   match Gnat_config.limit_subp with
-   | None -> true
-   | Some attr ->
-         let task = Session_itp.get_task s subp.subp_goal in
-         let goal_ident = (Task.task_goal task).Decl.pr_name in
-         let attr_set = goal_ident.Ident.id_attrs in
-         Ident.Sattr.mem attr attr_set
-
 module Save_VCs = struct
 
   exception Found of Whyconf.prover *  Call_provers.prover_result

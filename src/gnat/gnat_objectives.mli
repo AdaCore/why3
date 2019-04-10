@@ -161,9 +161,6 @@ val iter_subps : Controller_itp.controller -> (subp -> unit) -> unit
 val init_subp_vcs : Controller_itp.controller -> subp -> unit
 (* init the vcs for a given subp *)
 
-val matches_subp_filter : Session_itp.session -> subp -> bool
-(* check if the subprogram is filtered by command line option --limit-subp *)
-
 module Save_VCs : sig
    (* Provide saving of VCs, traces *)
 

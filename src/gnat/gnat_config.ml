@@ -59,7 +59,6 @@ let opt_warn_prover = ref None
 
 let opt_limit_line : limit_mode option ref = ref None
 let opt_limit_region : Gnat_loc.region option ref = ref None
-let opt_limit_subp : string option ref = ref None
 let opt_socket_name : string ref = ref ""
 let opt_standalone = ref false
 let opt_replay = ref false
@@ -207,7 +206,6 @@ let set_proof_dir s = opt_proof_dir := Some  s
 
 let set_limit_line s = opt_limit_line := Some (parse_line_spec s)
 let set_limit_region s = opt_limit_region := Some (parse_region_spec s)
-let set_limit_subp s = opt_limit_subp := Some s
 
 let usage_msg =
   "Usage: gnatwhy3 [options] file"
@@ -273,8 +271,6 @@ let options = Arg.align [
    "--limit-region", Arg.String set_limit_region,
           " Limit proof to a file and range of lines, given \
            by \"file:first_line:last_line\"";
-   "--limit-subp", Arg.String set_limit_subp,
-          " Limit proof to a subprogram defined by \"file:line\"";
    "--prover", Arg.String set_prover,
           " Use prover given in argument instead of Alt-Ergo";
    "--replay", Arg.Set opt_replay,
@@ -736,11 +732,6 @@ let _ =
 let force = !opt_force
 let limit_line = !opt_limit_line
 let limit_region = !opt_limit_region
-
-let limit_subp =
-   match !opt_limit_subp with
-   | None -> None
-   | Some s -> Some (Ident.create_attribute ("GP_Subp:" ^ s))
 
 let parallel = !opt_parallel
 
