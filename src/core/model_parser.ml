@@ -327,7 +327,10 @@ and print_integer fmt (i: string) =
   let bn = BigInt.of_string i in
   try
     let i = BigInt.to_int bn in
-    fprintf fmt "%d (0x%X)" i i
+    if i >= 0 then
+      fprintf fmt "%d (0x%X)" i i
+    else
+      fprintf fmt "%d (-0x%X)" i (-i)
   with Failure _ (* "int_of_big_int" *) ->
     print_big_int fmt bn
 
