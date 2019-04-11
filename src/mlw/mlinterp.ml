@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -61,7 +61,7 @@ let is_range_small_int ir =
 (* a value with a range type included in [min_int, max_int]
    can be interpreted as an int *)
 let value_of_const ic ty =
-  let bc = Number.compute_int_constant ic in
+  let bc = ic.Number.il_int in
   match ty with
   | Some { ty_node = Tyapp ({ ts_def = Range ir }, [])}
        when is_range_small_int ir
@@ -73,7 +73,7 @@ open Format
 let rec print_value fmt = function
   | Vvoid -> fprintf fmt "()"
   | Vbool b -> fprintf fmt "%b" b
-  | Vbigint i -> fprintf fmt "%a" Number.print_constant (Number.const_of_big_int i)
+  | Vbigint i -> Number.print_constant fmt (Number.int_const i)
   | Vint i -> fprintf fmt "%d" i
   | Vtuple l -> fprintf fmt "@[<hov 2>(%a)@]"
                         (Pp.print_list Pp.comma print_value) l
@@ -643,7 +643,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
                      with Not_found -> info.get_decl rs in
           Debug.dprintf debug_interp "decl found@.";
           match decl with
-          | Dlet (Lsym (rs, _ty, vl, e)) ->
+          | Dlet (Lsym (rs, _, _ty, vl, e)) ->
              eval_call info vl e rs
           | Dlet(Lrec([{rec_args = vl; rec_exp = e;
                         rec_sym = rs; rec_res=_ty}])) ->
@@ -761,7 +761,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
      end
   | Elet (Lany _,_) -> Debug.dprintf debug_interp "unhandled Lany@.";
                        raise CannotReduce
-  | Elet ((Lsym(rs,_,_,_) as ld), e) ->
+  | Elet ((Lsym(rs,_,_,_,_) as ld), e) ->
      interp_expr (add_fundecl rs (Dlet ld) info) e
   | Elet ((Lrec rdl as ld), e) ->
      let info = List.fold_left
@@ -844,7 +844,7 @@ let rec value_of_term kn t =
 let rec term_of_value = function
   | Vbool true -> t_bool_true
   | Vbool false -> t_bool_false
-  | Vbigint i -> t_bigint_const i
+  | Vbigint i -> t_int_const i
   | Vint _ -> raise CannotReduce
   | Vtuple l -> t_tuple (List.map term_of_value l)
   | Vconstr (rs, lf) ->
@@ -870,6 +870,6 @@ let interp env mm rs vars =
   if Debug.test_flag debug_flamegraph then ts := Unix.gettimeofday ();
   let decl = info.get_decl rs in
   match decl with
-  | Dlet (Lsym (_rs, _, _vl, expr)) ->
+  | Dlet (Lsym (_rs, _, _, _vl, expr)) ->
      interp_expr info expr
   | _ -> raise CannotReduce

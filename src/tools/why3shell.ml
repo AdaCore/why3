@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -283,7 +283,9 @@ let print_proof_attempt fmt pa_id =
   | None -> fprintf fmt "%s" pa.node_name
   | Some _pr ->
     fprintf fmt "%s %a"
-      pa.node_name (Pp.print_option Call_provers.print_prover_result) (get_result pa.node_proof)
+      pa.node_name
+      (Pp.print_option (Call_provers.print_prover_result ~json_model:false))
+      (get_result pa.node_proof)
 
 let rec print_proof_node (fmt: Format.formatter) goal_id =
   let goal = Hnode.find nodes goal_id in

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -231,5 +231,5 @@ let () = Trans.register_env_transform "intro_projections_counterexmp"
   intro_projections_counterexmp
   ~desc:"For@ each@ declared@ abstract@ function@ and@ predicate@ p@ \
          with@ attribute@ [%@model_projected]@ and@ projecting@ f@ \
-         for@ p@ creates@ declaration@ of@ new@ constant@ c@ with@ \
+         for@ p,@ create@ declaration@ of@ new@ constant@ c@ with@ \
          attribute@ [%@model]@ and@ an@ axiom@ c = f p."

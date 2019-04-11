@@ -15,7 +15,7 @@ theory Graph
   val predicate eq (x y: vertex)
     ensures { result <-> x = y }
 
-  function succ vertex : set vertex
+  function succ vertex : fset vertex
 
   (* there is a path of length n from v1 to v2 *)
   inductive path (v1 v2: vertex) (n: int) =
@@ -37,7 +37,7 @@ theory Graph
 
   (* a path starting in a set S that is closed under succ ends up in S *)
   lemma path_closure:
-    forall s: set vertex.
+    forall s: fset vertex.
     (forall x: vertex. mem x s ->
        forall y: vertex. mem y (succ x) -> mem y s) ->
     forall v1 v2: vertex, n: int. path v1 v2 n ->
@@ -53,13 +53,13 @@ module BFS
 
   use int.Int
   use Graph
-  clone impset.Impset as B with type elt = vertex
+  clone set.SetImp as B with type elt = vertex, val eq = eq
   use ref.Refint
 
   exception Found int
 
   (* global invariant *)
-  predicate inv (s t: vertex) (visited current next: set vertex) (d: int) =
+  predicate inv (s t: vertex) (visited current next: fset vertex) (d: int) =
     (* current *)
     subset current visited /\
     (forall x: vertex. mem x current -> shortest_path s x d) /\
@@ -77,17 +77,17 @@ module BFS
     (mem t visited -> mem t current \/ mem t next)
 
   (* visited\current\next is closed under succ *)
-  predicate closure (visited current next: set vertex) (x: vertex) =
+  predicate closure (visited current next: fset vertex) (x: vertex) =
     mem x visited -> not (mem x current) -> not (mem x next) ->
     forall y: vertex. mem y (succ x) -> mem y visited
 
-  function (!!) (s: B.t) : set vertex = B.contents s
+  function (!!) (s: B.set) : fset vertex = B.to_fset s
 
-  val pick_succ (v: vertex) : B.t
+  val pick_succ (v: vertex) : B.set
     ensures { !!result = succ v }
 
   (* function fill_next fills set next with the unvisited successors of v *)
-  let fill_next (s t v: vertex) (visited current next: B.t) (d:ref int)
+  let fill_next (s t v: vertex) (visited current next: B.set) (d:ref int)
     requires { inv s t !!visited !!current !!next !d /\
       shortest_path s v !d /\
       (forall x: vertex. x<> v -> closure !!visited !!current !!next x) }

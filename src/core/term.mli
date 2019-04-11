@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -235,7 +235,8 @@ val t_false : term
 val t_nat_const : int -> term
 (** [t_nat_const n] builds the constant integer term [n],
     n must be non-negative *)
-val t_bigint_const : BigInt.t -> term
+val t_int_const : BigInt.t -> term
+val t_real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> term
 
 val stop_split : attribute
 val asym_split : attribute

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -160,29 +160,27 @@ rule token = parse
   | core_uident as id
       { CORE_UIDENT id }
   | dec dec_sep* as s
-      { INTEGER (Number.int_literal_dec (Lexlib.remove_underscores s)) }
+      { INTEGER Number.(int_literal ILitDec ~neg:false (Lexlib.remove_underscores s)) }
   | '0' ['x' 'X'] (hex hex_sep* as s)
-      { INTEGER (Number.int_literal_hex (Lexlib.remove_underscores s)) }
+      { INTEGER Number.(int_literal ILitHex ~neg:false (Lexlib.remove_underscores s)) }
   | '0' ['o' 'O'] (oct oct_sep* as s)
-      { INTEGER (Number.int_literal_oct (Lexlib.remove_underscores s)) }
+      { INTEGER Number.(int_literal ILitOct ~neg:false (Lexlib.remove_underscores s)) }
   | '0' ['b' 'B'] (bin bin_sep* as s)
-      { INTEGER (Number.int_literal_bin (Lexlib.remove_underscores s)) }
+      { INTEGER Number.(int_literal ILitBin ~neg:false (Lexlib.remove_underscores s)) }
   | (dec+ as i) ".."
-      { Lexlib.backjump lexbuf 2; INTEGER (Number.int_literal_dec i) }
+      { Lexlib.backjump lexbuf 2; INTEGER Number.(int_literal ILitDec ~neg:false i) }
   | '0' ['x' 'X'] (hex+ as i) ".."
-      { Lexlib.backjump lexbuf 2; INTEGER (Number.int_literal_hex i) }
+      { Lexlib.backjump lexbuf 2; INTEGER Number.(int_literal ILitHex ~neg:false i) }
   | (dec+ as i)     ("" as f)    ['e' 'E'] (['-' '+']? dec+ as e)
   | (dec+ as i) '.' (dec* as f) (['e' 'E'] (['-' '+']? dec+ as e))?
   | (dec* as i) '.' (dec+ as f) (['e' 'E'] (['-' '+']? dec+ as e))?
-      { REAL (Number.real_const_dec i f
-          (Opt.map Lexlib.remove_leading_plus e)) }
+      { REAL (Number.real_literal ~radix:10 ~neg:false ~int:i ~frac:f ~exp:(Opt.map Lexlib.remove_leading_plus e)) }
   | '0' ['x' 'X'] (hex+ as i) ("" as f) ['p' 'P'] (['-' '+']? dec+ as e)
   | '0' ['x' 'X'] (hex+ as i) '.' (hex* as f)
         (['p' 'P'] (['-' '+']? dec+ as e))?
   | '0' ['x' 'X'] (hex* as i) '.' (hex+ as f)
         (['p' 'P'] (['-' '+']? dec+ as e))?
-      { REAL (Number.real_const_hex i f
-          (Opt.map Lexlib.remove_leading_plus e)) }
+      { REAL (Number.real_literal ~radix:16 ~neg:false ~int:i ~frac:f ~exp:(Opt.map Lexlib.remove_leading_plus e)) }
   | "(*)"
       { Lexlib.backjump lexbuf 2; LEFTPAR }
   | "(*"

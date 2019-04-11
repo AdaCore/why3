@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -161,6 +161,59 @@ let destruct_term ?names replace (x: term) : Task.task tlist =
           trans
     end
 
+(** [expand p] returns a list of triples [(bindings, equalities, term)], where
+
+    1. [bindings] map pattern variables in [p] to term variables in [term]
+    2. [equalities] contain equalities between pattern variables from [as]
+      patterns, term variables, and terms
+    3. [term] corresponds to [p] under [bindings] and [equalities] *)
+let rec expand (p:pattern) : ((vsymbol option * lsymbol) list * (vsymbol * lsymbol * term) list * term) list =
+  match p.pat_node with
+  | Pwild ->
+      let ls =
+        let id = Ident.id_fresh "_" in
+        create_lsymbol id [] (Some p.pat_ty)
+      in
+      [[None, ls], [], t_app ls [] ls.ls_value]
+  | Pvar v ->
+      let ls =
+        let id = Ident.id_clone v.vs_name in
+        create_lsymbol id [] (Some p.pat_ty)
+      in
+      [[Some v, ls], [], t_app ls [] ls.ls_value]
+  | Papp (ls, args) ->
+      let rec aux args =
+        match args with
+        | [] -> [[], [], []] (* really. *)
+        | arg::args' ->
+            let for_args' (x, eqs, t) (x', eqs', l) =
+              x@x', eqs@eqs', t::l
+            in
+            let for_arg l' arg =
+              List.map (for_args' arg) l'
+            in
+            List.flatten
+              (List.map (for_arg (aux args'))
+                 (expand arg))
+      in
+      let for_arg (bds, eqs, args) =
+        bds, eqs, t_app ls args (Some p.pat_ty)
+      in
+      List.map for_arg (aux args)
+  | Por (p1, p2) ->
+      expand p1 @ expand p2
+  | Pas (p, v) ->
+      let ls =
+        let id = Ident.id_clone v.vs_name in
+        create_lsymbol id [] (Some p.pat_ty)
+      in
+      let for_t (bds, eqs, t) =
+        let eqs' = eqs@[(v, ls, t)] in
+        let t' = t_app ls [] ls.ls_value in
+        bds, eqs', t'
+      in
+      List.map for_t (expand p)
+
 (* Type used to tag new declarations inside the destruct function. *)
 type is_destructed =
   | Axiom_term of term
@@ -268,6 +321,50 @@ let destruct_fmla ~recursive (t: term) =
       else
         (* The hypothesis is trivial because Cs1 <> Cs2 thus useless *)
         [[]]
+    | Tif (t1, t2, t3) ->
+        let ts2 =
+          destruct_fmla_exception ~toplevel:false t2 |>
+          List.map (fun ts -> Axiom_term t1 :: ts)
+        in
+        let ts3 =
+          destruct_fmla_exception ~toplevel:false t3 |>
+          List.map (fun ts -> Axiom_term (t_not t1) :: ts)
+        in
+        ts2 @ ts3
+    | Tcase (t, tbs) when toplevel ->
+        let for_branch tb =
+          let pat, rhs = t_open_branch tb in
+          let for_expansion (bds, eqs, t') =
+            let mvs =
+              let for_binding acc vls =
+                match vls with
+                | Some v, ls -> Mvs.add v (t_app ls [] ls.ls_value) acc
+                | None, _ -> acc
+              in
+              List.fold_left for_binding Mvs.empty bds in
+            let mvs =
+              let for_eq acc (vs, ls, _) =
+                Mvs.add vs (t_app ls [] ls.ls_value) acc
+              in
+              List.fold_left for_eq mvs eqs
+            in
+            let for_rhs rhs' =
+              let mk_const (_, ls) = Param (create_param_decl ls) in
+              let mk_eq_axiom (_, ls, t) = Param (create_logic_decl [make_ls_defn ls [] t]) in
+              List.map mk_const bds @
+              List.map mk_eq_axiom eqs @
+              [Axiom_term (t_equ t t')] @
+              rhs'
+            in
+            t_subst mvs rhs |>
+            destruct_fmla_exception ~toplevel:false |>
+            List.map for_rhs
+          in
+          List.map for_expansion (expand pat)
+        in
+        List.map for_branch tbs |>
+        List.flatten |>
+        List.flatten
     | _ -> raise (Arg_trans ("destruct"))
   in
   destruct_fmla ~toplevel:true t
@@ -317,25 +414,50 @@ let instantiate ~rem (pr: Decl.prsymbol) lt =
       | _ -> [d]) None
 
 let () = wrap_and_register
-    ~desc:"instantiate <prop> <term list> generates a new hypothesis with quantified variables of prop replaced with terms"
+    ~desc:"instantiate <prop> <term list>@ \
+      generates@ a@ new@ hypothesis@ with@ quantified@ variables@ \
+      of@ <prop>@ replaced@ with@ the@ given@ terms."
     "instantiate"
     (Tprsymbol (Ttermlist Ttrans)) (instantiate ~rem:false)
 
 let () = wrap_and_register
-    ~desc:"instantiate <prop> <term list> generates a new hypothesis with quantified variables of prop replaced with terms. Also remove the old hypothesis."
+    ~desc:"instantiate <prop> <term list>@ \
+      generates@ a@ new@ hypothesis@ with@ quantified@ variables@ \
+      of@ <prop>@ replaced@ with@ then@ given@ terms.@ \
+      Also@ removes@ the@ old@ hypothesis."
     "inst_rem"
     (Tprsymbol (Ttermlist Ttrans)) (instantiate ~rem:true)
 
-let () = wrap_and_register ~desc:"destruct <name> destructs the head logic constructor of hypothesis name (/\\, \\/, -> or <->).\nTo destruct a literal of algebraic type, use destruct_term."
+let () = wrap_and_register
+    ~desc:"destruct <name>@ \
+      destructs@ the@ top-most@ propositional@ connector@ \
+      (/\\,@ \\/,@ ->@ or@ <->)@ of@ the@ given@ hypothesis.@ \
+      To@ destruct@ a@ literal@ of@ an@ algebraic@ type,@ \
+      use@ 'destruct_term'."
     "destruct" (Tprsymbol Ttrans_l) (destruct ~recursive:false)
 
-let () = wrap_and_register ~desc:"destruct <name> recursively destructs the head logic constructor of hypothesis name (/\\, \\/, -> or <->).\nTo destruct a literal of algebraic type, use destruct_term."
+let () = wrap_and_register
+    ~desc:"destruct_rec <name>@ \
+      recursively@ destructs@ the@ top@ propositional@ connectors@ \
+      (/\\,@ \\/,@ ->@ or@ <->)@ of@ the@ given@ hypothesis.@ \
+      To@ destruct@ a@ literal@ of@ an@ algebraic@ type,@ \
+      use@ 'destruct_term'."
     "destruct_rec" (Tprsymbol Ttrans_l) (destruct ~recursive:true)
 
-let () = wrap_and_register ~desc:"destruct <name> as an algebraic type. Option using can be used to name elements created by destruct_term"
+let () = wrap_and_register
+    ~desc:"destruct_term <term> [using] <id list>@ \
+      destructs@ the@ given@ term@ of@ an@ algebraic@ type.@ \
+      Option@ 'using'@ can@ be@ used@ to@ name@ the@ elements@ \
+      created@ by@ 'destruct_term'."
     "destruct_term" (Tterm (Topt ("using", Tidentlist Ttrans_l)))
     (fun t names -> destruct_term ?names false t)
 
-let () = wrap_and_register ~desc:"destruct <name> as an algebraic type and substitute the definition if an lsymbol was provided. Option using can be used to name elements created by destruct_term_subst"
+let () = wrap_and_register
+    ~desc:"destruct_term_subst <term> [using] <id list>@ \
+      destructs@ the@ given@ term@ of@ an@ algebraic@ type@ \
+      and@ substitutes@ the@ definition@ if@ the@ term@ is@ \
+      a@ constant@ function@ symbol.@ \
+      Option@ 'using'@ can@ be@ used@ to@ name@ the@ elements@ \
+      created@ by@ 'destruct_term_subst'."
     "destruct_term_subst" (Tterm (Topt ("using", Tidentlist Ttrans_l)))
     (fun t names -> destruct_term ?names true t)

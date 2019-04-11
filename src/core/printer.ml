@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -175,7 +175,7 @@ let opt_search_forward_literal_format s pos =
         end;
         while !i < l && is_digit s.[!i] do incr i done;
         begin match s.[!i] with
-        | 'b' | 'x' | 'o' | 'd' -> incr i; raise Exit
+        | 'b' | 'x' | 'o' | 'd' | 'c' -> incr i; raise Exit
         | _ -> ()
         end;
       end;
@@ -260,12 +260,21 @@ let check_syntax_literal _ts s =
   (* if !count <> 1 then *)
     (* raise (BadSyntaxArity (1,!count)) *)
 
-let syntax_arguments s print fmt l =
+let syntax_arguments_prec s print pl fmt l =
   let args = Array.of_list l in
+  let precs = Array.of_list pl in
+  let lp = Array.length precs in
   let repl_fun s b e fmt =
     let i = int_of_string (String.sub s b (e-b)) in
-    print fmt args.(i-1) in
+    let p =
+      if i < lp then precs.(i)
+      else if lp = 0 then 0
+      else precs.(0) - 1 in
+    print p fmt args.(i-1) in
   global_substitute_fmt opt_search_forward repl_fun s fmt
+
+let syntax_arguments s print fmt l =
+  syntax_arguments_prec s (fun _ f a -> print f a) [] fmt l
 
 (* return the type arguments of a symbol application, sorted according
    to their (formal) names *)
@@ -280,8 +289,11 @@ let get_type_arguments t = match t.t_node with
   | _ ->
       [||]
 
-let gen_syntax_arguments_typed ty_of tys_of s print_arg print_type t fmt l =
+let gen_syntax_arguments_typed_prec
+      ty_of tys_of s print_arg print_type t pl fmt l =
   let args = Array.of_list l in
+  let precs = Array.of_list pl in
+  let lp = Array.length precs in
   let repl_fun s b e fmt =
     if s.[b] = 't' then
       let grp = String.sub s (b+1) (e-b-1) in
@@ -296,42 +308,55 @@ let gen_syntax_arguments_typed ty_of tys_of s print_arg print_type t fmt l =
     else
       let grp = String.sub s b (e-b) in
       let i = int_of_string grp in
-      print_arg fmt args.(i-1) in
+      let p =
+        if i < lp then precs.(i)
+        else if lp = 0 then 0
+        else precs.(0) - 1 in
+      print_arg p fmt args.(i-1) in
   global_substitute_fmt opt_search_forward repl_fun s fmt
 
-let syntax_arguments_typed =
-  gen_syntax_arguments_typed t_type get_type_arguments
+let syntax_arguments_typed_prec =
+  gen_syntax_arguments_typed_prec t_type get_type_arguments
 
-let syntax_range_literal s fmt c =
+let syntax_arguments_typed s print_arg print_type t fmt l =
+  syntax_arguments_typed_prec s (fun _ f a -> print_arg f a) print_type t [] fmt l
+
+let syntax_range_literal ?(cb=None) s fmt c =
   let f s b e fmt =
-    let v = Number.compute_int_literal c.Number.ic_abs in
-    let base = match s.[e-1] with
-      | 'x' -> 16
-      | 'd' -> 10
-      | 'o' -> 8
-      | 'b' -> 2
-      | _ -> assert false
-    in
-    let digits =
-      if e > b + 1 then
-        Some (int_of_string (String.sub s b (e-b-1)))
-      else
-        None
-    in
-    if base = 10 then begin
-        if c.Number.ic_negative then fprintf fmt "-";
-        Number.print_in_base base digits fmt v
-      end
-    else
-      let v =
-        if c.Number.ic_negative then
-          match digits with
-            | Some d ->
-               BigInt.sub (BigInt.pow_int_pos base d) v
-            | None -> failwith ("number of digits must be given for printing negative literals in base " ^ string_of_int base)
-        else v
+    try
+      let v = c.Number.il_int in
+      let base = match s.[e-1] with
+        | 'x' -> 16
+        | 'd' -> 10
+        | 'o' -> 8
+        | 'b' -> 2
+        | 'c' -> raise Exit
+        | _ -> assert false
       in
-      Number.print_in_base base digits fmt v
+      let digits =
+        if e > b + 1 then
+          Some (int_of_string (String.sub s b (e-b-1)))
+        else
+          None
+      in
+      if base = 10 then begin
+          if BigInt.lt v BigInt.zero then fprintf fmt "-";
+          Number.print_in_base base digits fmt (BigInt.abs v)
+        end
+      else
+        let v =
+          if BigInt.lt v BigInt.zero then
+            match digits with
+            | Some d ->
+               BigInt.add (BigInt.pow_int_pos base d) v
+            | None -> failwith ("number of digits must be given for printing negative literals in base " ^ string_of_int base)
+          else v
+        in
+        Number.print_in_base base digits fmt v
+    with Exit ->
+      match cb with
+      | Some cb -> cb fmt c
+      | None -> failwith ("custom format string with no callback passed")
   in
   global_substitute_fmt opt_search_forward_literal_format f s fmt
 
@@ -350,8 +375,8 @@ let syntax_float_literal s fp fmt c =
       else
         None
     in
-    let e,m = Number.compute_float c.Number.rc_abs fp in
-    let sg = if c.Number.rc_negative then BigInt.one else BigInt.zero in
+    let e,m = Number.compute_float c fp in
+    let m,sg = if BigInt.lt m BigInt.zero then BigInt.abs m, BigInt.one else m, BigInt.zero in
     match s.[b] with
     | 's' -> Number.print_in_base base digits fmt sg
     | 'e' -> Number.print_in_base base digits fmt e

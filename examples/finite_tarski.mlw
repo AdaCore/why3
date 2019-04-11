@@ -13,7 +13,7 @@ module Tarski
   use set.Fset
   clone export relations.PartialOrder with axiom .
 
-  constant a : set t
+  constant a : fset t
 
   constant e : t
   axiom minimality: mem e a /\ forall x. mem x a -> rel e x
@@ -32,7 +32,7 @@ module Tarski_rec
 
   let lemma least_fix_point () : unit
    ensures {exists mu. fixpoint mu /\ forall x. fixpoint x -> rel mu x }
-   = let rec ghost aux (x: t) (b: set t) : t
+   = let rec ghost aux (x: t) (b: fset t) : t
        requires { mem x a /\ subset b a }
        requires { forall y. mem y a -> rel x y -> mem y b }
        requires { forall y. fixpoint y -> rel x y }

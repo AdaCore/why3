@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -24,7 +24,8 @@ Require list.Append.
 
 (* Why3 goal *)
 Lemma nth_append_1 {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)) (i:Z),
+  forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a)
+    (i:Numbers.BinNums.Z),
   (i < (list.Length.length l1))%Z ->
   ((list.Nth.nth i (Init.Datatypes.app l1 l2)) = (list.Nth.nth i l1)).
 Proof.
@@ -45,7 +46,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma nth_append_2 {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)) (i:Z),
+  forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a)
+    (i:Numbers.BinNums.Z),
   ((list.Length.length l1) <= i)%Z ->
   ((list.Nth.nth i (Init.Datatypes.app l1 l2)) =
    (list.Nth.nth (i - (list.Length.length l1))%Z l2)).

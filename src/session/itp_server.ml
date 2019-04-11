@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -242,7 +242,7 @@ let get_exception_message ses id e =
       Pp.sprintf "Theory not found: %s" s, Loc.dummy_position, ""
   | Args_wrapper.Arg_parse_type_error (loc, arg, e) ->
       Pp.sprintf "Parsing error: %a" Exn_printer.exn_printer e, loc, arg
-  | Args_wrapper.Unnecessary_arguments l ->
+  | Trans.Unnecessary_arguments l ->
       Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
         (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Unnecessary_terms l ->
@@ -1281,7 +1281,7 @@ end
     (* interrupt all running provers and unfocus before reload *)
     C.interrupt ();
     let _old_focus = !focused_node in
-    unfocus ();
+    focused_node := Unfocused;
     clear_tables ();
     let l = reload_files d.cont
                          ~shape_version:(Some Termcode.current_shape_version)

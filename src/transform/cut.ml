@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -178,43 +178,53 @@ let hide (clear: bool) (name: string) (t: term) =
   Trans.bind_comp (pose clear name t)
      (fun (hyp,new_constant,ls_term) -> replace_all hyp new_constant ls_term)
 
-let () = wrap_and_register ~desc:"clear all axioms but the hypothesis argument"
+let () = wrap_and_register
+    ~desc:"clear_but <name list>@ \
+      clears@ all@ premises@ except@ the@ listed@ ones."
     "clear_but"
     (Tprlist Ttrans) clear_but
 
 let () = wrap_and_register
-    ~desc:"cut <term> [name] makes a cut with hypothesis 'name: term'"
+    ~desc:"cut <term> [name]@ \
+      makes@ a@ cut@ with@ a@ hypothesis@ 'name: term'."
     "cut"
     (Tformula (Topt ("as",Tstring Ttrans_l))) cut
 
 let () = wrap_and_register
-    ~desc:"cut <term> [name] makes an assert with hypothesis 'name: term'"
+    ~desc:"assert <term> [name]@ \
+      makes@ an@ assertion@ with@ a@ hypothesis@ 'name: term'."
     "assert"
     (Tformula (Topt ("as",Tstring Ttrans_l))) assert_tac
 
 let () = wrap_and_register
-    ~desc:"remove <prop list>: removes a list of hypothesis given by their names separated with ','. Example: remove_list a,b,c "
+    ~desc:"remove <name list>@ removes@ the@ listed@ premises."
      "remove"
-     (Tlist Ttrans) (fun l -> remove_list l)
+    (Tlist Ttrans) (fun l -> remove_list l)
 
 let () = wrap_and_register
-    ~desc:"use_th <theory> imports the theory" "use_th"
+    ~desc:"use_th <theory>@ imports@ the@ given@ theory."
+    "use_th"
     (Ttheory Ttrans) use_th
 
 let pose (name: string) (t: term) =
   Trans.bind (pose false name t) (fun (_, task) -> Trans.store (fun _ -> task))
 
 let () = wrap_and_register
-    ~desc:"pose <name> <term> adds a new constant <name> equal to <term>"
+    ~desc:"pose <name> <term>@ \
+      adds@ a@ new@ constant@ <name>@ equal@ to@ <term>."
     "pose"
     (Tstring (Tterm Ttrans)) pose
 
 let () = wrap_and_register
-    ~desc:"hide <name> <term> adds a new constant <name> equal to <term> and replace everywhere the term with the new constant."
+    ~desc:"hide <name> <term>@ \
+      adds@ a@ new@ constant@ <name>@ equal@ to@ <term>@ \
+      and@ replaces@ everywhere@ the@ term@ with@ the@ new@ constant."
     "hide"
     (Tstring (Tterm Ttrans)) (hide false)
 
 let () = wrap_and_register
-    ~desc:"hide and clear <name> <term> adds a new constant <name> which replaces all occurences of <term>."
+    ~desc:"hide_and_clear <name> <term>@ \
+      adds@ a@ new constant@ <name>@ which@ replaces@ all@ \
+      occurences@ of@ <term>."
     "hide_and_clear"
     (Tstring (Tterm Ttrans)) (hide true)

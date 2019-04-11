@@ -337,9 +337,9 @@ module ToFset
   use Mem
   use Seq
 
-  val function to_set (s: seq 'a) : set 'a
+  val function to_set (s: seq 'a) : fset 'a
 
-  axiom to_set_empty: to_set (empty: seq 'a) = (Fset.empty: set 'a)
+  axiom to_set_empty: to_set (empty: seq 'a) = (Fset.empty: fset 'a)
 
   axiom to_set_add: forall s: seq 'a. length s > 0 ->
     to_set s = add s[0] (to_set s[1 ..])

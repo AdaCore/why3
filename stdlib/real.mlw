@@ -20,7 +20,6 @@ module Real
   val function  (*)  real real : real
   val predicate (<)  real real : bool
 
-  let (-)  (x y : real) = x + -y
   let predicate (>)  (x y : real) = y < x
   let predicate (<=) (x y : real) = x < y || x = y
   let predicate (>=) (x y : real) = y <= x
@@ -29,6 +28,10 @@ module Real
     constant zero = zero, constant one = one,
     function (-_) = (-_), function (+) = (+),
     function (*) = (*), predicate (<=) = (<=)
+
+  let (-) (x y : real)
+    ensures { result = x - y }
+  = x + -y
 
   val (/) (x y:real) : real
     requires { y <> 0.0 }

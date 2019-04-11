@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -260,6 +260,8 @@ val lookup_trans_desc: string -> Pp.formatted
    description. *)
 
 val list_trans : unit -> string list
+
+exception Unnecessary_arguments of string list
 
 val apply_transform : string -> Env.env -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n, directly.*)

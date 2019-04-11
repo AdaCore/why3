@@ -1,3 +1,27 @@
+(** {2 Finite set iterators} *)
+
+module Min
+
+  use set.Fset
+  use int.Int
+
+  type param
+
+  type elt
+
+  function cost param elt : int
+
+  function min param (fset elt) : int
+
+  axiom min_is_a_lower_bound:
+    forall p: param, s: fset elt.
+    forall x. mem x s -> cost p x >= min p s
+
+  axiom min_appears_in_set:
+    forall p: param, s: fset elt. not (is_empty s) ->
+    exists x. mem x s /\ cost p x = min p s
+
+end
 
 theory TwoPlayerGame
 
@@ -56,7 +80,7 @@ theory TwoPlayerGame
     match p with (p,n) -> minmax (do_move p m) n
     end
 
-  clone import set.Min as MinMaxRec with
+  clone import Min as MinMaxRec with
     type param = param,
     type elt = move,
     function cost = cost

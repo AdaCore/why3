@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -68,17 +68,12 @@ let mk_var id = mk_term (Tident (Qident id))
 let param0 = [Loc.dummy_position, None, false, Some (PTtuple [])]
 let param1 id ty = [Loc.dummy_position, Some id, false, Some ty]
 
-let mk_tconst s =
-  mk_term
-    (Tconst
-       Number.(ConstInt { ic_negative = false ;
-                          ic_abs = int_literal_dec s }))
+let mk_const i =
+  Number.(ConstInt { il_kind = ILitDec; il_int = BigInt.of_int i })
 
-let mk_econst s =
-  mk_expr
-    (Econst
-       Number.(ConstInt { ic_negative = false ;
-                          ic_abs = int_literal_dec s }))
+let mk_tconst i = mk_term (Tconst (mk_const i))
+
+let mk_econst i = mk_expr (Econst (mk_const i))
 
 let mk_tapp f l = mk_term (Tidapp(f,l))
 
@@ -104,9 +99,9 @@ let mul_int = mk_qid ["Int";Ident.op_infix "*"]
 
 let d1 : decl =
   let id_x = mk_ident "x" in
-  let pre = mk_tapp eq_symb [mk_var id_x; mk_tconst "6"] in
+  let pre = mk_tapp eq_symb [mk_var id_x; mk_tconst 6] in
   let result = mk_ident "result" in
-  let post = mk_tapp eq_symb [mk_var result; mk_tconst "42"] in
+  let post = mk_tapp eq_symb [mk_var result; mk_tconst 42] in
   let spec = {
     sp_pre = [pre];
     sp_post = [Loc.dummy_position,[pat_var result,post]];
@@ -120,7 +115,7 @@ let d1 : decl =
     sp_partial = false;
   }
   in
-  let body = mk_eapp mul_int [mk_evar id_x; mk_econst "7"] in
+  let body = mk_eapp mul_int [mk_evar id_x; mk_econst 7] in
   let f1 =
     Efun(param1 id_x int_type, None, Ity.MaskVisible, spec, body)
   in
@@ -153,7 +148,7 @@ let use_ref_Ref = use_import ("ref","Ref")
 
 let d2 =
   let result = mk_ident "result" in
-  let post = mk_term(Tidapp(ge_int,[mk_var result;mk_tconst "0"])) in
+  let post = mk_term(Tidapp(ge_int,[mk_var result;mk_tconst 0])) in
   let spec = {
     sp_pre = [];
     sp_post = [Loc.dummy_position,[pat_var result,post]];
@@ -168,7 +163,7 @@ let d2 =
   }
   in
   let body =
-    let e1 = mk_eapp (mk_qid ["Ref";"ref"]) [mk_econst "42"] in
+    let e1 = mk_eapp (mk_qid ["Ref";"ref"]) [mk_econst 42] in
     let id_x = mk_ident "x" in
     let e2 = mk_eapp (mk_qid ["Ref";Ident.op_prefix "!"]) [mk_evar id_x] in
     mk_expr(Elet(id_x,false,Expr.RKlocal,e1,e2))
@@ -207,11 +202,11 @@ let array_set = mk_qid ["Array"; Ident.op_set ""]
 let d3 =
   let id_a = mk_ident "a" in
   let pre =
-    mk_tapp ge_int [mk_tapp length [mk_var id_a]; mk_tconst "1"]
+    mk_tapp ge_int [mk_tapp length [mk_var id_a]; mk_tconst 1]
   in
   let post =
-    mk_tapp eq_symb [mk_tapp array_get [mk_var id_a; mk_tconst "0"];
-                     mk_tconst "42"]
+    mk_tapp eq_symb [mk_tapp array_get [mk_var id_a; mk_tconst 0];
+                     mk_tconst 42]
   in
   let spec = {
     sp_pre = [pre];
@@ -227,7 +222,7 @@ let d3 =
   }
   in
   let body =
-    mk_eapp array_set [mk_evar id_a; mk_econst "0"; mk_econst "42"]
+    mk_eapp array_set [mk_evar id_a; mk_econst 0; mk_econst 42]
   in
   let f = Efun(param1 id_a array_int_type,
                None,Ity.MaskVisible,spec,body)
@@ -300,7 +295,7 @@ let () =
                               alt_ergo_driver t)
        in
        printf "@[On task %d, alt-ergo answers %a@."
-              i Call_provers.print_prover_result r;
+              i (Call_provers.print_prover_result ~json_model:false) r;
        i+1
       )
       1 my_tasks

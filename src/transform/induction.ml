@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -348,11 +348,19 @@ let () =
     ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ algebraic@ types."
 
 let induction_on_hyp ls =
-  Trans.compose (Ind_itp.revert_tr_symbol [Tslsymbol ls])
+  (* We add the induction attribute on the reverted symbol *)
+  let tr s = (* Add induction attribute *only* on ls *)
+    match s with
+    | Tslsymbol s when ls_equal s ls ->
+        Some attr_ind
+    | _ -> None
+  in
+  Trans.compose (Ind_itp.revert_tr_symbol ~tr [Tslsymbol ls])
     (Trans.store induction_ty_lex)
 
 let () = wrap_and_register
-    ~desc:"induction_arg_ty_lex <ls> performs induction_ty_lex on ls."
+    ~desc:"induction_arg_ty_lex <id>@ \
+      performs@ 'induction_ty_lex'@ on@ the@ given@ logical@ symbol."
     "induction_arg_ty_lex"
     (Tlsymbol Ttrans_l) induction_on_hyp
 

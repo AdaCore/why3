@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1513,6 +1513,16 @@ and wp_expr kn k q = match k with
       let wp, _, _ = sp_expr kn k Mint.empty Mpv.empty in wp
   | Ktag ((Push _|WP), _) -> assert false (* cannot happen *)
 
+let rec simp_cast_projections env t = match t.t_node with
+  | Tapp (ls, [{t_node = Tconst (Number.ConstInt _ as c);
+                t_ty = Some {ty_node = Tyapp (ts,_)}}])
+    when is_range_type_def ts.ts_def
+      && ls_equal ls (int_of_range env ts) ->
+      (* t'int (c:t) -> c *)
+      t_const c ty_int
+  | _ ->
+      t_map (simp_cast_projections env) t
+
 (** VCgen *)
 
 let vc_kode {known_map = kn} vc_wp k =
@@ -1529,7 +1539,7 @@ let vc_fun env vc_wp cty e =
 let vc_rec env vc_wp rdl =
   List.map (vc_kode env vc_wp) (k_rec env Mls.empty rdl)
 
-let mk_vc_decl kn id f =
+let mk_vc_decl ({known_map = kn} as env) id f =
   let {id_string = nm; id_attrs = attrs; id_loc = loc} = id in
   let attrs = if attrs_has_expl attrs then attrs else
     Sattr.add (Ident.create_attribute ("expl:VC for " ^ nm)) attrs in
@@ -1537,7 +1547,8 @@ let mk_vc_decl kn id f =
   let f = wp_forall (Mvs.keys (t_freevars Mvs.empty f)) f in
   let f = Typeinv.inject kn f in
   let f = if Debug.test_flag debug_no_eval then f else
-    Eval_match.eval_match kn f in
+          Eval_match.eval_match kn f in
+  let f = simp_cast_projections env f in
   create_pure_decl (create_prop_decl Pgoal pr f)
 
 let add_vc_decl kn id f vcl =
@@ -1552,18 +1563,20 @@ let vc env kn tuc d = match d.pd_node with
         | Eexec ({c_node = Cfun e} as c, _) -> c, e
         | _ -> c_fun [] [] [] Mxs.empty Mpv.empty e, e in
       let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
-      add_vc_decl kn v.pv_vs.vs_name f []
+      add_vc_decl env v.pv_vs.vs_name f []
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let env = mk_env env kn tuc in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
-      add_vc_decl kn s.rs_name f []
+      add_vc_decl env s.rs_name f []
   | PDlet (LDrec rdl) ->
       let env = mk_env env kn tuc in
       let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
-      let add rd f vcl = add_vc_decl kn rd.rec_sym.rs_name f vcl in
+      let add rd f vcl = add_vc_decl env rd.rec_sym.rs_name f vcl in
       List.fold_right2 add rdl fl []
   | PDtype tdl ->
+      let env = lazy (mk_env env kn tuc) in
       let add_witness d vcl =
+        let env = Lazy.force env in
         let add_fd (mv,ldl) fd e =
           let fd = fd_of_rs fd in
           let id = id_clone fd.pv_vs.vs_name in
@@ -1577,16 +1590,16 @@ let vc env kn tuc d = match d.pd_node with
           e_let ld e) d.itd_invariant e_void in
         let e = List.fold_right e_let ldl e in
         let c = c_fun [] [] [] Mxs.empty Mpv.empty e in
-        let f = vc_fun (mk_env env kn tuc)
-          (Debug.test_noflag debug_sp) c.c_cty e in
-        add_vc_decl kn d.itd_its.its_ts.ts_name f vcl in
+        let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
+        add_vc_decl env d.itd_its.its_ts.ts_name f vcl in
       let add_invariant d vcl =
+        let env = Lazy.force env in
         let vs_of_rs fd = (fd_of_rs fd).pv_vs in
         let vl = List.map vs_of_rs d.itd_fields in
         let expl f = vc_expl None Sattr.empty expl_type_inv f in
         let f = t_and_asym_l (List.map expl d.itd_invariant) in
         let f = t_exists_close_simp vl [] f in
-        add_vc_decl kn d.itd_its.its_ts.ts_name f vcl in
+        add_vc_decl env d.itd_its.its_ts.ts_name f vcl in
       let add_itd d vcl =
         if d.itd_witness <> [] then add_witness d vcl else
         if d.itd_invariant <> [] then add_invariant d vcl else

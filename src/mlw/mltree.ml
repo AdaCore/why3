@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -48,7 +48,7 @@ type expr = {
 }
 
 and expr_node =
-  | Econst  of Number.integer_constant
+  | Econst  of Number.int_constant
   | Evar    of pvsymbol
   | Eapp    of rsymbol * expr list
   | Efun    of var list * expr
@@ -71,8 +71,8 @@ and exn_branch = xsymbol * pvsymbol list * expr
 
 and let_def =
   | Lvar of pvsymbol * expr
-  | Lsym of rsymbol * ty * var list * expr
-  | Lany of rsymbol * ty * var list
+  | Lsym of rsymbol * Stv.t * ty * var list * expr
+  | Lany of rsymbol * Stv.t * ty * var list
   | Lrec of rdef list
 
 and rdef = {
@@ -132,8 +132,8 @@ let rec get_decl_name = function
       List.flatten (List.map add_td_ids itdefl)
   | Dlet (Lrec rdef) -> List.map (fun {rec_sym = rs} -> rs.rs_name) rdef
   | Dlet (Lvar ({pv_vs={vs_name=id}}, _))
-  | Dlet (Lsym ({rs_name=id}, _, _, _))
-  | Dlet (Lany ({rs_name=id}, _, _))
+  | Dlet (Lsym ({rs_name=id}, _, _, _, _))
+  | Dlet (Lany ({rs_name=id}, _, _, _))
   | Dval ({pv_vs={vs_name=id}}, _)
   | Dexn ({xs_name=id}, _) -> [id]
   | Dmodule (_, dl) -> List.concat (List.map get_decl_name dl)
@@ -194,12 +194,12 @@ and iter_deps_expr f e = match e.e_node with
   | Elet (Lvar (_, e1), e2) ->
       iter_deps_expr f e1;
       iter_deps_expr f e2
-  | Elet (Lsym (_, ty_result, args, e1), e2) ->
+  | Elet (Lsym (_, _, ty_result, args, e1), e2) ->
       iter_deps_ty f ty_result;
       List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg) args;
       iter_deps_expr f e1;
       iter_deps_expr f e2
-  | Elet (Lany (_, ty_result, args), e2) ->
+  | Elet (Lany (_, _, ty_result, args), e2) ->
       iter_deps_ty f ty_result;
       List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg) args;
       iter_deps_expr f e2
@@ -241,11 +241,11 @@ and iter_deps_expr f e = match e.e_node with
 let rec iter_deps f = function
   | Dtype its_dl ->
       List.iter (iter_deps_its_defn f) its_dl
-  | Dlet (Lsym (_rs, ty_result, args, e)) ->
+  | Dlet (Lsym (_rs, _, ty_result, args, e)) ->
       iter_deps_ty f ty_result;
       iter_deps_args f args;
       iter_deps_expr f e
-  | Dlet (Lany (_rs, ty_result, args)) ->
+  | Dlet (Lany (_rs, _, ty_result, args)) ->
       iter_deps_ty f ty_result;
       iter_deps_args f args
   | Dlet (Lrec rdef) ->
@@ -303,8 +303,8 @@ let e_var pv =
 let var_defn pv e =
   Lvar (pv, e)
 
-let sym_defn f ty_res args e =
-  Lsym (f, ty_res, args, e)
+let sym_defn f svars ty_res args e =
+  Lsym (f, svars, ty_res, args, e)
 
 let e_let ld e = mk_expr (Elet (ld, e))
 

@@ -11,26 +11,26 @@ use import set.Fset as F
 
 (* The part about bijections, preservation of finiteness and cardinality,
    should be moved somewhere in stdlib. *)
-predicate bijection (p:set 'a) (q:'b -> bool) (f:'a -> 'b) (g:'b -> 'a) =
+predicate bijection (p:fset 'a) (q:'b -> bool) (f:'a -> 'b) (g:'b -> 'a) =
   (forall x. mem x p -> q (f x) /\ g (f x) = x)
   /\ (forall x. q x -> mem (g x) p /\ f (g x) = x)
 
-let rec ghost bij_preserve (p:set 'a) (q:'b -> bool)
-                           (f:'a -> 'b) (g:'b -> 'a) : set 'b
+let rec ghost bij_preserve (p:fset 'a) (q:'b -> bool)
+                           (f:'a -> 'b) (g:'b -> 'a) : fset 'b
   requires { bijection p q f g }
   ensures  { forall x. q x <-> mem x result }
   ensures  { cardinal p = cardinal result }
   variant  { cardinal p }
 = if cardinal p = 0 then empty else
-  let x = choose p in
+  let x = pick p in
   add (f x) (bij_preserve (remove x p) (fun y -> pure { q y /\ y <> f x}) f g)
 
-let rec ghost disjoint_union (p q:set 'a) : unit
+let rec ghost disjoint_union (p q:fset 'a) : unit
   requires { forall x. not (mem x p /\ mem x q) }
   ensures  { cardinal (union p q) = cardinal p + cardinal q }
   variant  { cardinal p }
 = if cardinal p = 0 then assert { union p q == q } else
-  let x = choose p in
+  let x = pick p in
   assert { union (remove x p) q == remove x (union p q) };
   disjoint_union (remove x p) q
 
@@ -39,7 +39,7 @@ let rec ghost disjoint_union (p q:set 'a) : unit
    proof purposes). *)
 type cardinal 'a = {
   card : int;
-  ghost cset : set 'a;
+  ghost cset : fset 'a;
 } invariant { card = cardinal cset }
 by { card = 0; cset = empty }
 

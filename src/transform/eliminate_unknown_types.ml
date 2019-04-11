@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -96,4 +96,4 @@ let remove_types =
 
 let () =
   Trans.register_transform "eliminate_unknown_types" remove_types
-    ~desc:"Remove@ types@ unknown@ to@ the@ prover@ and@ terms@ referring@ to@ them@."
+    ~desc:"Remove@ types@ unknown@ to@ the@ prover@ and@ terms@ referring@ to@ them."

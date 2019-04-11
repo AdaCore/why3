@@ -44,6 +44,12 @@ decide_fail () {
         # Inconsistent results between two runs
         "bench/ce/ref_mono_Z3,4.6.0_SP")
             is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/floats_Z3,4.6.0_WP")
+            is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/floats_Z3,4.6.0_SP")
+            is_xfail=integer_values;;
         *) is_xfail=none;;
     esac
 }
@@ -65,7 +71,7 @@ run () {
         echo "Strongest Postcondition" > "$f.out"
         printf "Strongest Postcondition  ${file_path} ($1)... "
     fi
-    $dir/../bin/why3prove.opt --debug print_model_attrs${wp_sp} -P "$1,counterexamples" --timelimit 1 -a split_vc "${file_path}.mlw" | \
+    $dir/../bin/why3prove.opt --json --debug print_model_attrs${wp_sp} -P "$1,counterexamples" --timelimit 1 -a split_vc "${file_path}.mlw" | \
         # This ad hoc sed removes any timing information from counterexamples output.
         # Counterexamples in JSON format cannot match this regexp.
         sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
@@ -85,8 +91,8 @@ run () {
         "none") is_xfail=false;;
         "integer_values")
             is_xfail=false
-            str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"[0-9]\+"/"val":"ANYINT"/g')
-            str_out=$(echo ${str_out} | sed -e 's/"val":"[0-9]\+"/"val":"ANYINT"/g')
+            str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"-\?[0-9]\+"/"val":"ANYINT"/g')
+            str_out=$(echo ${str_out} | sed -e 's/"val":"-\?[0-9]\+"/"val":"ANYINT"/g')
             ;;
         *)
             echo "High failure: unknown xfail value $is_xfail";

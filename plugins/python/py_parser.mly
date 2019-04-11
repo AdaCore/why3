@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -306,7 +306,7 @@ term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
 | ident       { Tident (Qident $1) }
-| INTEGER     { Tconst (Number.(ConstInt { ic_negative = false ; ic_abs = int_literal_dec $1})) }
+| INTEGER     { Tconst Number.(ConstInt (int_literal ILitDec ~neg:false $1)) }
 | NONE        { Ttuple [] }
 | TRUE        { Ttrue }
 | FALSE       { Tfalse }

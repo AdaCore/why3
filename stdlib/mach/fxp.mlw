@@ -1,0 +1,66 @@
+module Fxp
+
+use real.Real
+use real.RealInfix
+use int.Int
+use int.EuclideanDivision as Div
+use int.Power as PowerInt
+use real.Square
+use real.FromInt as FromInt
+use real.PowerReal as PowerReal
+use real.Truncate as Trunc
+use mach.int.UInt64
+use mach.int.Int64 as Int64
+
+function pow2 (k: int): real =
+  PowerReal.pow 2. (FromInt.from_int k)
+
+function trunc_at (x: real) (k: int): real =
+  FromInt.from_int (Trunc.floor (x *. pow2 (-k))) *. pow2 k
+
+type fxp =
+    { ival: uint64; ghost rval: real; ghost iexp: int }
+  invariant { rval = trunc_at rval iexp }
+  invariant { ival = Div.mod (Trunc.floor (rval *. pow2 (-iexp))) (uint64'maxInt + 1) }
+  by { ival = 0; rval = 0.; iexp = 0 }
+
+let fxp_init (x: uint64) (ghost k: int): fxp
+= { ival = x; rval = FromInt.from_int (to_int x) *. pow2 k; iexp = k }
+
+let fxp_id (x: fxp) (ghost k: int): fxp
+= { ival = ival x; rval = rval x *. pow2 k; iexp = iexp x + k }
+
+val fxp_add (x y: fxp): fxp
+  requires { [@expl:fxp alignment] iexp x = iexp y }
+  ensures { rval result = rval x +. rval y }
+  ensures { iexp result = iexp x }
+
+val fxp_sub (x y: fxp): fxp
+  requires { [@expl:fxp alignment] iexp x = iexp y }
+  ensures { rval result = rval x -. rval y }
+  ensures { iexp result = iexp x }
+
+val fxp_mul (x y: fxp): fxp
+  ensures { rval result = rval x *. rval y }
+  ensures { iexp result = iexp x + iexp y }
+
+val fxp_lsl (x: fxp) (k: uint64): fxp
+  ensures { rval result = rval x }
+  ensures { iexp result = iexp x - to_int k }
+
+val fxp_lsr (x: fxp) (k: uint64): fxp
+  requires { [@expl:fxp overflow] 0. <=. rval x <=. FromInt.from_int uint64'maxInt *. pow2 (iexp x) }
+  ensures { rval result = trunc_at (rval x) (iexp x + k) }
+  ensures { iexp result = iexp x + k }
+
+val fxp_asr (x: fxp) (k: uint64): fxp
+  requires { [@expl:fxp overflow] FromInt.from_int Int64.int64'minInt *. pow2 (iexp x) <=. rval x <=. FromInt.from_int Int64.int64'maxInt *. pow2 (iexp x) }
+  ensures { rval result = trunc_at (rval x) (iexp x + k) }
+  ensures { iexp result = iexp x + k }
+
+val fxp_asr' (x: fxp) (k: uint64) (ghost l: int): fxp
+  requires { [@expl:fxp overflow] FromInt.from_int Int64.int64'minInt *. pow2 (iexp x) <=. rval x <=. FromInt.from_int Int64.int64'maxInt *. pow2 (iexp x) }
+  ensures { rval result = trunc_at (rval x *. pow2 (-l)) (iexp x + k - l) }
+  ensures { iexp result = iexp x + k - l }
+
+end

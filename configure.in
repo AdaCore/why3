@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  #
+#  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -522,11 +522,11 @@ else
       DIR=$(ocamlfind query lablgtk3)
       if test -n "$DIR"; then
          echo "ocamlfind found lablgtk3 in $DIR"
-         LABLGTKINCLUDE="-I $DIR"
+         LABLGTKINCLUDE="-I $DIR -I +threads"
       fi
    fi
    if test -z "$DIR"; then
-      LABLGTKINCLUDE="-I +lablgtk3"
+      LABLGTKINCLUDE="-I +lablgtk3 -I +threads"
       DIR="$OCAMLLIB/lablgtk3"
       AC_CHECK_FILE($DIR/lablgtk.cma,,enable_ide=no)
    fi
@@ -570,12 +570,27 @@ fi
 if test "$enable_ide" = yes ; then
    DIR=
    if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query lablgtk$GTKVERSION.sourceview$GTKVERSION)
-      if test -z "$DIR"; then
-         DIR=$(ocamlfind query lablgtksourceview$GTKVERSION)
-      fi
+      case $GTKVERSION in
+        2)
+           LIB_SOURCEVIEW=lablgtksourceview2
+           PKG_SOURCEVIEW=lablgtk2.sourceview2
+           DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+           if test -z "$DIR"; then
+              PKG_SOURCEVIEW=lablgtksourceview2
+              DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+           fi
+           ;;
+        3)
+           LIB_SOURCEVIEW=lablgtk3_sourceview3
+           PKG_SOURCEVIEW=lablgtk3-sourceview3
+           DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+           ;;
+        *)
+           AC_MSG_ERROR(Unknown gtk version $GTKVERSION)
+           ;;
+      esac
       if test -n "$DIR";then
-         echo "ocamlfind found lablgtksourceview$GTKVERSION in $DIR"
+         echo "ocamlfind found $PKG_SOURCEVIEW in $DIR"
       fi
    fi
    if test -z "$DIR"; then
@@ -586,12 +601,25 @@ if test "$enable_ide" = yes ; then
    if test "$enable_ide" = no; then
       AC_MSG_WARN([Lib lablgtksourceview not found, IDE disabled.])
       reason_ide=" (lablgtksourceview not found)"
+   else
+      LABLGTKINCLUDE="$LABLGTKINCLUDE -I $DIR"
    fi
 fi
 
 if test "$enable_ide" = yes ; then
-   LABLGTKLIB="lablgtk lablgtksourceview$GTKVERSION"
-   LABLGTKPKG="lablgtk$GTKVERSION lablgtk$GTKVERSION.init lablgtk$GTKVERSION.sourceview$GTKVERSION"
+   case $GTKVERSION in
+        2)
+           LABLGTKLIB="lablgtk"
+           ;;
+        3)
+           LABLGTKLIB="threads lablgtk3"
+           ;;
+        *)
+           AC_MSG_ERROR(Unknown gtk version $GTKVERSION)
+           ;;
+      esac
+   LABLGTKLIB="$LABLGTKLIB $LIB_SOURCEVIEW"
+   LABLGTKPKG="lablgtk$GTKVERSION lablgtk$GTKVERSION.init $PKG_SOURCEVIEW"
 else
    LABLGTKLIB=
    LABLGTKPKG=
@@ -728,14 +756,14 @@ fi
 if test "$enable_coq_libs" = yes; then
    AC_MSG_CHECKING([for Flocq])
    AS_IF(
-     [ echo "Require Import Flocq.Flocq_version BinNat." \
-            "Goal (20500 <= Flocq_version)%N. easy. Qed." > conftest.v
+     [ echo "Require Import Flocq.Version BinNat." \
+            "Goal (30100 <= Flocq_version)%N. easy. Qed." > conftest.v
        "$COQC" conftest.v > conftest.err ],
      [ AC_MSG_RESULT(yes) ],
      [ AC_MSG_RESULT(no)
        enable_coq_fp_libs=no
        AC_MSG_WARN(Cannot find Flocq.)
-       reason_coq_fp_libs=" (Flocq >= 2.5, < 3.0 not found)" ])
+       reason_coq_fp_libs=" (Flocq >= 3.1 not found)" ])
    rm -f conftest.v conftest.vo conftest.err
 fi
 

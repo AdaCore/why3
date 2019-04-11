@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -151,6 +151,19 @@ let unambig_fs fs =
   in
   inspect (Opt.get fs.ls_value)
 
+let number_format = {
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Default;
+    Number.dec_int_support = `Default;
+    Number.hex_int_support = `Unsupported;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Default;
+    Number.dec_real_support = `Default;
+    Number.hex_real_support = `Default;
+    Number.frac_real_support = `Unsupported (fun _ _ -> assert false);
+  }
+
 let rec print_term info fmt t =
   if check_for_counterexample t then
     info.info_model <- add_model_element t info.info_model;
@@ -159,21 +172,6 @@ let rec print_term info fmt t =
 
   let () = match t.t_node with
   | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = true;
-          Number.negative_int_support = Number.Number_default;
-          Number.dec_int_support = Number.Number_default;
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.negative_real_support = Number.Number_default;
-          Number.dec_real_support = Number.Number_default;
-          Number.hex_real_support = Number.Number_default;
-          Number.frac_real_support = Number.Number_unsupported;
-          Number.def_real_support = Number.Number_unsupported;
-        } in
       Number.print number_format fmt c
   | Tvar { vs_name = id } ->
       print_ident info fmt id
@@ -474,7 +472,7 @@ let print_task args ?old:_ fmt task =
   let inv_trig = Task.on_tagged_ls meta_invalid_trigger task in
   let show,cast = Task.on_meta meta_printer_option
     check_options (false,true) task in
-  let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  let cntexample = Inlining.get_counterexmp task in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {

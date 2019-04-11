@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -40,6 +40,12 @@ let add_literal (known_lit, decl as acc) t c ls_proj fin =
    NOTE: in this case, [add_literal] above is incorrect. *)
 let rec abstract_terms kn range_metas float_metas type_kept acc t =
   match t.t_node, t.t_ty with
+  | Tapp (ls, [{ t_node = Tconst (Number.ConstInt _ as c); t_ty = Some {ty_node = Tyapp (ts,[])} }]), _
+    when not (ts_equal ts ts_int || Sts.mem ts type_kept) && ls_equal ls (Mts.find ts range_metas) ->
+      acc, t_const c ty_int
+  | Tapp (ls, [{ t_node = Tconst (Number.ConstReal _ as c); t_ty = Some {ty_node = Tyapp (ts,[])} }]), _
+    when not (ts_equal ts ts_real || Sts.mem ts type_kept) && ls_equal ls (fst (Mts.find ts float_metas)) ->
+      acc, t_const c ty_real
   | Tconst (Number.ConstInt _ as c), Some {ty_node = Tyapp (ts,[])}
     when not (ts_equal ts ts_int || Sts.mem ts type_kept) ->
       let to_int = Mts.find ts range_metas in
@@ -65,8 +71,8 @@ let elim le_int le_real neg_real type_kept kn
       let pr = create_prsymbol (id_fresh (ts.ts_name.id_string ^ "'axiom")) in
       let v = create_vsymbol (id_fresh "i") (ty_app ts []) in
       let v_term = t_app to_int [t_var v] (Some ty_int) in
-      let a_term = t_bigint_const lo in
-      let b_term = t_bigint_const hi in
+      let a_term = t_int_const lo in
+      let b_term = t_int_const hi in
       let f = t_and (t_app le_int [a_term; v_term] None)
           (t_app le_int [v_term; b_term] None)
       in
@@ -96,13 +102,8 @@ let elim le_int le_real neg_real type_kept kn
       let emax = BigInt.pow_int_pos_bigint 2 (BigInt.pred eb) in
       let m = BigInt.pred (BigInt.pow_int_pos_bigint 2 sb) in
       let e = BigInt.sub emax sb in
-      let m_string = Format.asprintf "%a" (Number.print_in_base 16 None) m in
-      let e_string = Format.asprintf "%a" (Number.print_in_base 10 None) e in
-      let e_val = Number.real_const_hex m_string "" (Some e_string) in
-      let max_term = t_const
-          Number.(ConstReal { rc_negative = false ; rc_abs = e_val })
-          ty_real
-      in
+      let e_val = Number.real_const m ~pow2:e ?pow5:None in
+      let max_term = t_const e_val ty_real in
       (* compose axiom *)
       let f = t_and (t_app le_real [t_app neg_real [max_term] (Some ty_real); v_term] None)
           (t_app le_real [v_term; max_term] None) in
@@ -171,17 +172,13 @@ open Number
 
 let rec replace_negative_constants neg_int neg_real t =
   match t.t_ty, t.t_node with
-  | (Some ty), (Tconst (ConstInt c)) ->
-     if c.ic_negative && ty_equal ty ty_int then
-       t_app neg_int
-             [t_const (ConstInt { c with ic_negative = false }) ty_int]
-             (Some ty_int)
+  | Some ty, Tconst (ConstInt i as c) ->
+     if BigInt.lt i.il_int BigInt.zero && ty_equal ty ty_int then
+       t_app neg_int [t_const (neg c) ty_int] (Some ty_int)
      else t
-  | (Some ty), (Tconst (ConstReal c)) ->
-     if c.rc_negative && ty_equal ty ty_real then
-       t_app neg_real
-             [t_const (ConstReal { c with rc_negative = false }) ty_real]
-             (Some ty_real)
+  | Some ty, Tconst (ConstReal r as c) ->
+     if BigInt.lt r.rl_real.rv_sig BigInt.zero && ty_equal ty ty_real then
+       t_app neg_real [t_const (neg c) ty_real] (Some ty_real)
      else t
   | _ -> t_map (replace_negative_constants neg_int neg_real) t
 

@@ -363,29 +363,30 @@ module WP
 use Imp
 
 use set.Fset as Set
+clone set.SetApp as S with type elt = ident, val eq = Int.(=)
 
-predicate assigns (sigma:env) (a:Set.set ident) (sigma':env) =
+predicate assigns (sigma:env) (a:Set.fset ident) (sigma':env) =
   forall i:ident. not (Set.mem i a) ->
     IdMap.get sigma i = IdMap.get sigma' i
 
 lemma assigns_refl:
-  forall sigma:env, a:Set.set ident. assigns sigma a sigma
+  forall sigma:env, a:Set.fset ident. assigns sigma a sigma
 
 lemma assigns_trans:
-  forall sigma1 sigma2 sigma3:env, a:Set.set ident.
+  forall sigma1 sigma2 sigma3:env, a:Set.fset ident.
     assigns sigma1 a sigma2 /\ assigns sigma2 a sigma3 ->
     assigns sigma1 a sigma3
 
 lemma assigns_union_left:
-  forall sigma sigma':env, s1 s2:Set.set ident.
+  forall sigma sigma':env, s1 s2:Set.fset ident.
     assigns sigma s1 sigma' -> assigns sigma (Set.union s1 s2) sigma'
 
 lemma assigns_union_right:
-  forall sigma sigma':env, s1 s2:Set.set ident.
+  forall sigma sigma':env, s1 s2:Set.fset ident.
     assigns sigma s2 sigma' -> assigns sigma (Set.union s1 s2) sigma'
 
 
-predicate stmt_writes (i:stmt) (w:Set.set ident) =
+predicate stmt_writes (i:stmt) (w:Set.fset ident) =
   match i with
   | Sskip | Sassert _ -> true
   | Sassign id _ -> Set.mem id w
@@ -394,19 +395,19 @@ predicate stmt_writes (i:stmt) (w:Set.set ident) =
   end
 
 
-  let rec compute_writes (s:stmt) : Set.set ident
+  let rec compute_writes (s:stmt) : S.set
    ensures {
      forall sigma pi sigma' pi':env, n:int.
        many_steps sigma pi s sigma' pi' Sskip n ->
        assigns sigma result sigma' }
    variant { s }
   = match s with
-    | Sskip -> Set.empty
-    | Sassign i _ -> Set.singleton i
-    | Sseq s1 s2 -> Set.union (compute_writes s1) (compute_writes s2)
-    | Sif _ s1 s2 -> Set.union (compute_writes s1) (compute_writes s2)
+    | Sskip -> S.empty ()
+    | Sassign i _ -> S.singleton i
+    | Sseq s1 s2 -> S.union (compute_writes s1) (compute_writes s2)
+    | Sif _ s1 s2 -> S.union (compute_writes s1) (compute_writes s2)
     | Swhile _ _ s -> compute_writes s
-    | Sassert _ -> Set.empty
+    | Sassert _ -> S.empty ()
     end
 
   val fresh_from_fmla (q:fmla) : ident

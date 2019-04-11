@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -222,20 +222,20 @@ let collect_model_ls info ls =
       (t_attr_set ?loc:ls.ls_name.id_loc ls.ls_name.id_attrs t) info.info_model
 
 let number_format = {
-  Number.long_int_support = true;
-  Number.extra_leading_zeros_support = false;
-  Number.negative_int_support = Number.Number_default;
-  Number.dec_int_support = Number.Number_default;
-  Number.hex_int_support = Number.Number_unsupported;
-  Number.oct_int_support = Number.Number_unsupported;
-  Number.bin_int_support = Number.Number_unsupported;
-  Number.def_int_support = Number.Number_unsupported;
-  Number.negative_real_support = Number.Number_default;
-  Number.dec_real_support = Number.Number_unsupported;
-  Number.hex_real_support = Number.Number_unsupported;
-  Number.frac_real_support = Number.Number_custom
-    (Number.PrintFracReal ("%s.0", "(* %s.0 %s.0)", "(/ %s.0 %s.0)"));
-  Number.def_real_support = Number.Number_unsupported;
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Default;
+    Number.dec_int_support = `Default;
+    Number.hex_int_support = `Unsupported;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Default;
+    Number.dec_real_support = `Unsupported;
+    Number.hex_real_support = `Unsupported;
+    Number.frac_real_support =
+      `Custom
+        ((fun fmt i -> fprintf fmt "%s.0" i),
+         (fun fmt i n -> fprintf fmt "(* %s.0 %s.0)" i n),
+         (fun fmt i n -> fprintf fmt "(/ %s.0 %s.0)" i n));
 }
 
 (** expr *)
@@ -706,7 +706,7 @@ let meta_incremental =
                             ~desc:"Internal@ use@ only"
 
 let print_task version args ?old:_ fmt task =
-  let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  let cntexample = Inlining.get_counterexmp task in
   let incremental =
     let incr_meta = Task.find_meta_tds task meta_incremental in
     not (Theory.Stdecl.is_empty incr_meta.Task.tds_set)

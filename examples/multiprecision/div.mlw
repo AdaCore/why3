@@ -3977,6 +3977,656 @@ let wmpn_divrem_1 (q x:t) (y:limb) (sz:int32) : limb
     c_assert (is_not_null ny);
     div_qr q r x y nx ny sx sy;
     free nx;
-    free ny;
+    free ny
+
+  let div_qr_in_place (q x y nx ny:t) (sx sy:int32) : unit
+    requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
+    requires { valid x sx }
+    requires { valid y sy }
+    requires { valid q (sx - sy + 1) }
+    requires { valid nx (sx + 1) }
+    requires { valid ny sy }
+    requires { (pelts y)[y.offset + sy - 1] > 0 }
+    ensures { value (old x) sx
+              = value q (sx - sy + 1) * value y sy
+                + value x sy }
+    ensures { value x sy < value y sy }
+  =
+    label Start in
+    value_sub_tail (pelts y) y.offset (y.offset + p2i sy - 1);
+    value_sub_lower_bound (pelts y) y.offset (y.offset + p2i sy - 1);
+    assert { value y sy >= power radix (sy - 1) };
+    let ghost ox = pure { x } in
+    if (sy = 1)
+    then
+      let lr = wmpn_divrem_1 q x (C.get y) sx in
+      C.set x lr
+    else
+    if (sy = 2)
+    then
+      let clz = clz_ext (C.get_ofs y (sy - 1)) in
+      let ghost p = power 2 (p2i clz) in
+      if clz = 0
+      then begin
+        wmpn_copyi nx x sx;
+        value_sub_shift_no_change (pelts x) x.offset (p2i sx) (p2i sx) 0;
+        C.set_ofs nx sx 0;
+        value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
+        label Div2_ns in
+        let ghost _qh = wmpn_divrem_2 q nx y (sx + 1) in
+        wmpn_copyi x nx sy;
+        assert { value ox sx
+                 = value q (sx - sy + 1) * value y sy
+                 + value x sy
+               by value x sy = value nx sy
+               so value (nx at Div2_ns) (sx + 1) < power radix sx
+               so value (nx at Div2_ns) (sx + 1)
+                  = value (nx at Div2_ns) sx
+               so (_qh = 0
+                   by
+                   power radix sx
+                   > value (nx at Div2_ns) (sx + 1)
+                   = (value q (sx - 1) + power radix (sx - 1) * _qh)
+                    * value y 2
+                    + value nx 2
+                   so value nx 2 >= 0
+                   so value y 2 >= radix
+                   so value q (sx - 1) >= 0
+                   so _qh >= 0
+                   so (value q (sx - 1)
+                           + power radix (sx - 1) * _qh) >= 0
+                   so (value q (sx - 1) + power radix (sx - 1) * _qh)
+                      * value y 2
+                      + value nx 2
+                      >= (value q (sx - 1)
+                           + power radix (sx - 1) * _qh)
+                         * value y 2
+                      >= (value q (sx - 1)
+                           + power radix (sx - 1) * _qh)
+                         * radix
+                      >= power radix (sx - 1) * _qh * radix
+                      = power radix sx * _qh
+                   so power radix sx > power radix sx * _qh
+                  )
+               so value ox sx = value (nx at Div2_ns) sx
+               };
+        ()
+      end
+      else begin
+        let ghost _c = wmpn_lshift ny y sy (Limb.of_int32 clz) in
+        begin
+          ensures { normalized ny sy }
+          ensures { value ny sy = power 2 clz * value y sy }
+          let ghost dh = (pelts y)[y.offset + p2i sy - 1] in
+          assert { value y sy
+                   = value y (sy - 1) + power radix (sy - 1) * dh };
+          value_sub_upper_bound (pelts y) y.offset (y.offset + p2i sy - 1);
+          value_sub_tail (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+          value_sub_upper_bound (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+          let ghost ndh = (pelts ny)[ny.offset + p2i sy - 1] in
+          assert { normalized ny sy
+                   /\ value ny sy = power 2 clz * value y sy
+                   by
+                   value y sy < (dh + 1) * power radix (sy - 1)
+                   so value ny sy + (power radix sy) * _c
+                      = power 2 clz * value y sy
+                      = power 2 clz
+                        * (value y (sy - 1)
+                           + dh * power radix (sy - 1))
+                   so power 2 clz * dh <= radix - power 2 clz
+                   so value ny sy + (power radix sy) * _c
+                      = power 2 clz * value y (sy - 1)
+                        + power 2 clz * dh * power radix (sy - 1)
+                      < power 2 clz * power radix (sy - 1)
+                        + power 2 clz * dh * power radix (sy - 1)
+                      <= power 2 clz * power radix (sy - 1)
+                        + (radix - power 2 clz) * power radix (sy - 1)
+                       = radix * power radix (sy - 1)
+                       = power radix sy
+                   so _c = 0
+                   so value ny sy
+                      = power 2 clz * value y sy
+                   so value y sy >= dh * power radix (sy - 1)
+                   so value ny sy
+                      >= power 2  clz * dh * power radix (sy - 1)
+                   so value ny sy =
+                      value ny (sy - 1) + power radix (sy - 1) * ndh
+                      < power radix (sy - 1) + power radix (sy - 1) * ndh
+                      = power radix (sy - 1) * (ndh + 1)
+                   so power radix (sy - 1) * (ndh + 1)
+                      > power radix (sy - 1) * (power 2 clz * dh)
+                   so ndh + 1 > power 2 clz * dh
+                   so ndh >= power 2 clz * dh
+                   so 2 * power 2 clz * dh >= radix
+                   so 2 * ndh >= radix
+                   so ndh >= div radix 2
+                 };
+        end;
+        let h = wmpn_lshift nx x sx (Limb.of_int32 clz) in
+        C.set_ofs nx sx h;
+        begin
+          ensures { value nx (sx + 1)
+                    = p * value ox sx  }
+          value_sub_tail (pelts nx) nx.offset (nx.offset + p2i sx);
+          assert { value nx (sx + 1)
+                    = p * value ox sx
+                   by
+                   value nx sx + power radix sx * h
+                    = p * value ox sx
+                   so value nx (sx + 1)
+                      = value nx sx + power radix sx * h
+                 }
+        end;
+        label Div2_s in
+        (* TODO don't add 1 when not needed, cf "adjust" in GMP algo *)
+        let ghost _qh = wmpn_divrem_2 q nx ny (sx + 1) in
+        let ghost _l = wmpn_rshift x nx sy (Limb.of_int32 clz) in
+        begin ensures { value nx 2 = p * value x 2 }
+          assert { _l = 0
+                 by
+                   (mod (value nx sy) p = 0
+                    by
+                      value (nx at Div2_s) (sx + 1)
+                   = (value q (sx - 1) + power radix (sx - 1) * _qh)
+                      * value ny sy
+                      + value nx sy
+                   so value (nx at Div2_s) (sx + 1)
+                    = p * value ox sx
+                   so value ny sy = p * value y sy
+                   so value nx sy
+                      = value (nx at Div2_s) (sx + 1)
+                        - (value q (sx - 1)
+                          + power radix (sx - 1) * _qh)
+                          * value ny sy
+                      = p * value ox sx
+                        - p * (value q (sx - 1)
+                               + power radix (sx - 1) * _qh)
+                            * value y sy
+                      = p * (value ox sx
+                             - (value q (sx - 1)
+                               + power radix (sx - 1) * _qh)
+                               * value y sy)
+                   so let n = (value ox sx
+                                - (value q (sx - 1)
+                                   + power radix (sx - 1) * _qh)
+                                   * value y sy)
+                      in
+                      value nx sy = p * n
+                      so value nx sy >= 0
+                      so p > 0
+                      so n >= 0
+                      so mod (value nx sy) p
+                         = mod (p * n) p
+                         = mod ((p*n)+0) p
+                         = mod 0 p
+                         = 0
+                 )
+                 so _l + radix * value x sy
+                    = power 2 (Limb.length - clz) * (value nx sy)
+                 so let a = div (value nx sy) p in
+                    value nx sy = p * a
+                 so power 2 (Limb.length - clz) * p = radix
+                 so power 2 (Limb.length - clz) * (value nx sy)
+                    = power 2 (Limb.length - clz) * (p * a)
+                    = (power 2 (Limb.length - clz) * p) * a
+                    = radix * a
+                 so mod (radix * value x sy + _l) radix
+                    = mod _l radix
+                 so mod (radix * value x sy + _l) radix
+                    = mod (radix * a) radix = 0
+                 so mod _l radix = 0
+                 so 0 <= _l < radix
+               };
+          assert { value nx 2 = p * value x 2
+                   by
+                   radix * value x 2
+                   = power 2 (Limb.length - clz) * value nx 2
+                   so p * power 2 (Limb.length - clz)
+                      = radix
+                   so p * radix * value x 2
+                      = p * power 2 (Limb.length - clz) * value nx 2
+                      = radix * value nx 2
+                   so p * value x 2 = value nx 2
+                 }
+        end;
+        assert { value ox sx
+                 = value q (sx - sy + 1) * value y sy
+                 + value x sy
+                by
+                 value (nx at Div2_s) (sx + 1)
+                 = (value q (sx - 1) + power radix (sx - 1) * _qh)
+                   * value ny 2
+                   + value nx 2
+                so value (nx at Div2_s) (sx + 1)
+                    = p * value ox sx
+                so value ny 2 = p * value y 2
+                so (_qh = 0
+                    by
+                    value ox sx < power radix sx
+                    so value y 2 >= radix
+                    so value ny 2 >= p * radix
+                    so value q (sx - 1) >= 0
+                    so value nx 2 >= 0
+                    so (value q (sx - 1) + power radix (sx - 1) * _qh)
+                        >= 0
+                    so (value q (sx - 1) + power radix (sx - 1) * _qh)
+                         * value ny 2
+                       + value nx 2
+                       >= (value q (sx - 1)
+                           + power radix (sx - 1) * _qh)
+                          * value ny 2
+                       >= (value q (sx - 1)
+                           + power radix (sx - 1) * _qh)
+                          * (p * radix)
+                       >= power radix (sx - 1) * _qh * p * radix
+                       = power radix sx * p * _qh
+                    so power radix sx * p
+                       > value (nx at Div2_s) (sx + 1)
+                       >= power radix sx * p * _qh
+                    )
+                so value nx 2 = p * value x 2
+                so p * value ox sx
+                   = value q (sx - 1) * p * value y 2
+                     + p * value x 2
+                   = p * (value q (sx - 1) * value y 2
+                          + value x 2)
+               };
+        ()
+      end
+    else
+     (* let qn = ref (Int32.(-) (Int32.(+) sx 1) sy) in
+      if (Int32.(>=)  (Int32.(+) !qn !qn) sx)
+      then*) begin
+        let adjust =
+          if (get_ofs x (sx - 1)) >= (get_ofs y (sy - 1))
+          then 1
+          else 0
+        in
+        let clz = clz_ext (C.get_ofs y (sy - 1)) in
+        let ghost p = power 2 (p2i clz) in
+        if clz = 0
+        then begin
+          wmpn_copyi nx x sx;
+          value_sub_shift_no_change (pelts x) x.offset
+                                    (p2i sx) (p2i sx) 0;
+          C.set_ofs nx sx 0;
+          value_sub_frame_shift (pelts x) (pelts nx) x.offset nx.offset (p2i sx);
+          assert { value y sy * (power radix (sx - sy + adjust))
+                   > value nx (sx + adjust)
+                   by
+                   let dh = (pelts y)[y.offset + sy - 1] in
+                   value y sy >= dh * power radix (sy - 1)
+                   so value nx (sx + adjust) = value nx sx = value ox sx
+                   so [@case_split]
+                      ((adjust = 1
+                           so value ox sx < power radix sx
+                           so value y sy * power radix (sx - sy + adjust)
+                              >= dh * power radix (sy - 1)
+                                    * power radix (sx - sy + adjust)
+                              = dh * power radix ((sy - 1) + (sx - sy + adjust))
+                              = dh * power radix sx
+                           so dh >= div radix 2 > 1
+                           so dh * power radix sx > power radix sx )
+                      \/
+                      (adjust = 0
+                           so let ah = (pelts x)[x.offset + sx - 1] in
+                              value ox sx < (ah + 1) * power radix (sx - 1)
+                              so ah + 1 <= dh
+                              so value ox sx < dh * power radix (sx - 1)
+                              so value y sy * power radix (sx - sy + adjust)
+                                 = value y sy * power radix (sx - sy)
+                                 >= dh * power radix (sy - 1)
+                                       * power radix (sx - sy)
+                                 = dh * power radix (sy - 1 + sx - sy)
+                                 = dh * power radix (sx - 1))) };
+          label Div_ns in
+          let ghost _qh = div_sb_qr q nx y (sx + adjust) sy in
+          wmpn_copyi x nx sy;
+          assert { value ox sx
+                   = value q (sx - sy + adjust) * value y sy
+                   + value x sy
+                 by value x sy = value nx sy
+                 so value (nx at Div_ns) (sx + adjust) = value ox sx < power radix sx
+                 so value (nx at Div_ns) (sx + adjust)
+                    = value (nx at Div_ns) sx
+                 so (_qh = 0
+                     by
+                     value (nx at Div_ns) (sx + adjust)
+                     = (value q (sx - sy + adjust)
+                        + power radix (sx - sy + adjust) * _qh)
+                      * value y sy
+                      + value nx sy
+                     so value nx sy >= 0
+                     so value q (sx - sy + adjust) >= 0
+                     so _qh >= 0
+                     so (value q (sx - sy + adjust)
+                             + power radix (sx - sy + adjust) * _qh) >= 0
+                     so (value q (sx - sy + adjust)
+                         + power radix (sx - sy + adjust) * _qh)
+                        * value y sy
+                        + value nx sy
+                        >= (value q (sx - sy + adjust)
+                             + power radix (sx - sy + adjust) * _qh)
+                           * value y sy
+                        >= power radix (sx - sy + adjust) * _qh * value y sy
+                     so _qh <> 1)
+                 so value ox sx = value (nx at Div_ns) sx
+                 };
+           label Ret_ns in
+           begin
+             ensures { value q (sx - sy + 1)
+                       = value (q at Ret_ns) (sx - sy + adjust) }
+             if (adjust = 0)
+             then begin
+               value_sub_shift_no_change (pelts x) x.offset
+                                         (p2i sx) (p2i sx) 0;
+               set_ofs q (sx - sy) 0;
+               value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy);
+               ()
+             end
+           end
+        end
+        else begin
+          let ghost _c = wmpn_lshift ny y sy (Limb.of_int32 clz) in
+          begin
+            ensures { normalized ny sy }
+            ensures { value ny sy
+                      = power 2 clz * value y sy }
+            let ghost dh = (pelts y)[y.offset + p2i sy - 1] in
+            assert { value y sy
+                     = value y (sy - 1) + power radix (sy - 1) * dh };
+            value_sub_upper_bound (pelts y) y.offset (y.offset + p2i sy - 1);
+            value_sub_tail (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+            value_sub_upper_bound (pelts ny) ny.offset (ny.offset + p2i sy - 1);
+            let ghost ndh = (pelts ny)[ny.offset + p2i sy - 1] in
+            assert { normalized ny sy
+                     /\ value ny sy
+                        = power 2 clz * value y sy
+                     by
+                     value y sy < (dh + 1) * power radix (sy - 1)
+                     so value ny sy + (power radix sy) * _c
+                        = power 2 clz * value y sy
+                        = power 2 clz
+                          * (value y (sy - 1)
+                             + dh * power radix (sy - 1))
+                     so power 2 clz * dh <= radix - power 2 clz
+                     so (_c = 0
+                        by
+                          value ny sy + (power radix sy) * _c
+                          = power 2 clz * value y (sy - 1)
+                            + power 2 clz * dh * power radix (sy - 1)
+                          < power 2 clz * power radix (sy - 1)
+                            + power 2 clz * dh * power radix (sy - 1)
+                          <= power 2 clz * power radix (sy - 1)
+                            + (radix - power 2 clz) * power radix (sy - 1)
+                           = radix * power radix (sy - 1)
+                           = power radix sy
+                        so value ny sy >= 0
+                        so power radix sy * _c < power radix sy
+                        so power radix sy > 0
+                        so _c >= 0
+                        )
+                     so value ny sy
+                        = power 2 clz * value y sy
+                     so value y sy >= dh * power radix (sy - 1)
+                     so value ny sy
+                        >= power 2  clz * dh * power radix (sy - 1)
+                     so value ny sy =
+                        value ny (sy - 1) + power radix (sy - 1) * ndh
+                        < power radix (sy - 1) + power radix (sy - 1) * ndh
+                        = power radix (sy - 1) * (ndh + 1)
+                     so power radix (sy - 1) * (ndh + 1)
+                        > power radix (sy - 1) * (power 2 clz * dh)
+                     so ndh + 1 > power 2 clz * dh
+                     so ndh >= power 2 clz * dh
+                     so 2 * power 2 clz * dh >= radix
+                     so 2 * ndh >= radix
+                     so ndh >= div radix 2
+                   };
+          end;
+          let h = wmpn_lshift nx x sx (Limb.of_int32 clz) in
+          label Shifted in
+          C.set_ofs nx sx h;
+          begin
+            ensures { value nx (sx + adjust)
+                      = p * value ox sx  }
+            if (adjust = 1)
+            then begin
+              value_sub_tail (pelts nx) nx.offset (nx.offset + p2i sx);
+              assert { value nx (sx + 1)
+                        = p * value ox sx
+                       by
+                       value nx sx + power radix sx * h
+                        = p * value ox sx
+                       so value nx (sx + 1)
+                          = value nx sx + power radix sx * h
+                     } end
+            else begin
+              assert { adjust = 0 };
+              assert { h = 0
+                       by
+                       let dh = (pelts y)[y.offset + sy - 1] in
+                       let ah = (pelts x)[x.offset + sx - 1] in
+                       p * dh < radix
+                       so 0 <= ah <= dh
+                       so p * ah < radix
+                       so (p * ah <= radix - p
+                           by
+                           let q = power 2 (Limb.length - clz) in
+                           radix = p * q
+                           so p * ah < p * q
+                           so ah < q
+                           so ah <= q - 1
+                           so p * ah <= p * (q - 1) = radix - p
+                           )
+                       so p * (ah + 1) <= radix
+                       so let s = power radix (sx - 1) in
+                          value ox sx < (ah + 1) * s
+                       so p * value ox sx < p * (ah + 1) * s
+                       so (p * (ah + 1) * s
+                           <= radix * s
+                           by
+                           [@case_split]
+                           (p * (ah + 1) = radix
+                           \/ (p * (ah + 1) < radix
+                               so s > 0
+                               so p * (ah + 1) * s
+                                 < radix * s)))
+                       so radix * power radix (sx - 1) = power radix sx
+                       so value (nx at Shifted) sx + power radix sx * h
+                          < power radix sx
+                       so power radix sx * h < power radix sx * 1
+                       so (h < 1 by power radix sx > 0)
+                      }
+            end
+          end;
+          label Div_s in
+          assert { value ny sy * (power radix (sx - sy + adjust))
+                   > value nx (sx + adjust)
+                   by
+                   let dh = (pelts y)[y.offset + sy - 1] in
+                   value ny sy >= p * dh * power radix (sy - 1)
+                   so value nx (sx + adjust) = p * value ox sx
+                   so p > 0
+                   so [@case_split]
+                      ((adjust = 1
+                           so value ox sx < power radix sx
+                           so p * value ox sx < p * power radix sx
+                           so value ny sy * power radix (sx - sy + adjust)
+                              >= p * dh * power radix (sy - 1)
+                                    * power radix (sx - sy + adjust)
+                              = p * dh * power radix ((sy - 1) + (sx - sy + adjust))
+                              = p * dh * power radix sx
+                           so dh >= 1
+                           so p * dh * power radix sx >= p * power radix sx )
+                      \/
+                      (adjust = 0
+                           so let ah = (pelts x)[x.offset + sx - 1] in
+                              value ox sx < (ah + 1) * power radix (sx - 1)
+                              so ah + 1 <= dh
+                              so value ox sx < dh * power radix (sx - 1)
+                              so p * value ox sx < p * dh * power radix (sx - 1)
+                              so value ny sy * power radix (sx - sy + adjust)
+                                 = value ny sy * power radix (sx - sy)
+                                 >= p * dh * power radix (sy - 1)
+                                       * power radix (sx - sy)
+                                 = p * dh * power radix (sy - 1 + sx - sy)
+                                 = p * dh * power radix (sx - 1))) };
+          let ghost _qh = div_sb_qr q nx ny (sx + adjust) sy in
+          let ghost _l = wmpn_rshift x nx sy (Limb.of_int32 clz) in
+          begin ensures { value nx sy = p * value x sy }
+            assert { _l = 0
+                   by
+                     (mod (value nx sy) p = 0
+                      by
+                        value (nx at Div_s) (sx + adjust)
+                     = (value q (sx - sy + adjust)
+                         + power radix (sx - sy + adjust) * _qh)
+                        * value ny sy
+                        + value nx sy
+                     so value (nx at Div_s) (sx + adjust)
+                      = p * value ox sx
+                     so value ny sy = p * value y sy
+                     so value nx sy
+                        = value (nx at Div_s) (sx + adjust)
+                          - (value q (sx - sy + adjust)
+                            + power radix (sx - sy + adjust) * _qh)
+                            * value ny sy
+                        = p * value ox sx
+                          - p * (value q (sx - sy + adjust)
+                                 + power radix (sx - sy + adjust) * _qh)
+                              * value y sy
+                        = p * (value ox sx
+                               - (value q (sx - sy + adjust)
+                                 + power radix (sx - sy + adjust) * _qh)
+                                 * value y sy)
+                     so let n = (value ox sx
+                                  - (value q (sx - sy + adjust)
+                                     + power radix (sx - sy + adjust) * _qh)
+                                     * value y sy)
+                        in
+                        value nx sy = p * n
+                        so value nx sy >= 0
+                        so p > 0
+                        so n >= 0
+                        so mod (value nx sy) p
+                           = mod (p * n) p
+                           = mod ((p*n)+0) p
+                           = mod 0 p
+                           = 0
+                   )
+                   so _l + radix * value x sy
+                      = power 2 (Limb.length - clz) * (value nx sy)
+                   so let a = div (value nx sy) p in
+                      value nx sy = p * a
+                   so power 2 (Limb.length - clz) * p = radix
+                   so power 2 (Limb.length - clz) * (value nx sy)
+                      = power 2 (Limb.length - clz) * (p * a)
+                      = (power 2 (Limb.length - clz) * p) * a
+                      = radix * a
+                   so mod (radix * value x sy + _l) radix
+                      = mod _l radix
+                   so mod (radix * value x sy + _l) radix
+                      = mod (radix * a) radix = 0
+                   so mod _l radix = 0
+                   so 0 <= _l < radix
+                 };
+            assert { value nx sy = p * value x sy
+                     by
+                     radix * value x sy
+                     = power 2 (Limb.length - clz) * value nx sy
+                     so p * power 2 (Limb.length - clz)
+                        = radix
+                     so p * radix * value x sy
+                        = p * power 2 (Limb.length - clz) * value nx sy
+                        = radix * value nx sy
+                     so p * value x sy = value nx sy
+                   }
+          end;
+          assert { value ox sx
+                   = value q (sx - sy + adjust) * value y sy
+                   + value x sy
+                  by
+                   value (nx at Div_s) (sx + adjust)
+                   = (value q (sx - sy + adjust)
+                       + power radix (sx - sy + adjust) * _qh)
+                     * value ny sy
+                     + value nx sy
+                  so value (nx at Div_s) (sx + adjust)
+                      = p * value ox sx
+                  so power radix (sx - sy + 1) * power radix (sy - 1)
+                     = power radix sx
+                  so value ny sy = p * value y sy
+                  so (_qh = 0
+                     by
+                     value (nx at Div_s) (sx + adjust)
+                     = (value q (sx - sy + adjust)
+                        + power radix (sx - sy + adjust) * _qh)
+                      * value ny sy
+                      + value nx sy
+                     so value nx sy >= 0
+                     so value q (sx - sy + adjust) >= 0
+                     so _qh >= 0
+                     so (value q (sx - sy + adjust)
+                             + power radix (sx - sy + adjust) * _qh) >= 0
+                     so (value q (sx - sy + adjust)
+                         + power radix (sx - sy + adjust) * _qh)
+                        * value ny sy
+                        + value nx sy
+                        >= (value q (sx - sy + adjust)
+                             + power radix (sx - sy + adjust) * _qh)
+                           * value ny sy
+                        >= power radix (sx - sy + adjust) * _qh * value ny sy
+                     so _qh <> 1)
+                  so value nx sy = p * value x sy
+                  so p * value ox sx
+                     = value q (sx - sy + adjust) * p * value y sy
+                       + p * value x sy
+                     = p * (value q (sx - sy + adjust)
+                       * value y sy
+                            + value x sy)
+                 };
+          label Ret_s in
+          begin
+            ensures { value q (sx - sy + 1)
+                      = value (q at Ret_s) (sx - sy + adjust) }
+            if (adjust = 0)
+            then begin
+              value_sub_shift_no_change (pelts x) x.offset
+                                        (p2i sx) (p2i sx) 0;
+              set_ofs q (sx - sy) 0;
+              value_sub_tail (pelts q) q.offset (q.offset + p2i sx - p2i sy);
+              assert { value q (sx - sy + 1) = value (q at Ret_s) (sx - sy)
+                       by value q (sx - sy + 1)
+                          = value (q at Ret_s) (sx - sy) + power radix (sx - sy) * 0
+                          = value (q at Ret_s) (sx - sy) }
+            end
+          end;
+          ()
+        end
+        end
+(*    ensures { 0 <= (pelts q)[offset q + (sx - sy)] <= 1 } *)
+    (* call to div_sb_qr with special cases for small sy *)
+
+
+  let wmpn_tdiv_qr_in_place (q x y:t) (sx sy:int32) : unit
+    requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
+    requires { valid x sx }
+    requires { valid y sy }
+    requires { valid q (sx - sy + 1) }
+    requires { (pelts y)[y.offset + sy - 1] > 0 }
+    ensures { value (old x) sx
+              = value q (sx - sy + 1) * value y sy
+                + value x sy }
+    ensures { value x sy < value y sy }
+  =
+    let nx = malloc (UInt32.(+) (UInt32.of_int32 sx) 1) in
+    c_assert (is_not_null nx);
+    let ny = malloc (UInt32.of_int32 sy) in
+    c_assert (is_not_null ny);
+    div_qr_in_place q x y nx ny sx sy;
+    free nx;
+    free ny
+
 
 end

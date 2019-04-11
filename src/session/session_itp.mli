@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -132,6 +132,10 @@ val get_encapsulating_file: session -> any -> file
 (* Check if a transformation already exists *)
 val check_if_already_exists:
     session -> proofNodeID -> string -> string list -> bool
+
+(* true if the exception transformation is fatal (ie: caused by a bug in the
+   code of the transformation) *)
+val is_fatal: exn -> bool
 
 (** {2 iterators on sessions} *)
 

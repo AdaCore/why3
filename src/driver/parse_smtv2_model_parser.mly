@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -243,5 +243,7 @@ ilist_app:
 idata_type:
 | name { }
 | name idata_type { }
+(* Z3 return bv can be "(_ bv 129)" which is not interpreted as a value *)
+| UNDERSCORE name INT_STR { }
 | LPAREN idata_type RPAREN option(idata_type) { }
 (* END IGNORED TYPES *)

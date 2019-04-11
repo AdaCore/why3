@@ -14,8 +14,8 @@ theory Graph
 
   (* the graph is defined by a set of vertices and a set of edges *)
   type vertex
-  constant vertices: set vertex
-  constant edges: set (vertex, vertex)
+  constant vertices: fset vertex
+  constant edges: fset (vertex, vertex)
 
   predicate edge (x y: vertex) = mem (x,y) edges
 
@@ -144,7 +144,7 @@ module BellmanFord
   use Graph
   use int.IntInf as D
   use ref.Ref
-  clone impset.Impset as S with type elt = (vertex, vertex)
+  clone set.SetImp as S with type elt = (vertex, vertex)
   clone impmap.ImpmapNoDom with type key = vertex
 
   type distmap = ImpmapNoDom.t D.t
@@ -159,7 +159,7 @@ module BellmanFord
   (* [inv1 m pass via] means that we already performed [pass-1] steps
      of the main loop, and, in step [pass], we already processed edges
      in [via] *)
-  predicate inv1 (m: distmap) (pass: int) (via: set (vertex, vertex)) =
+  predicate inv1 (m: distmap) (pass: int) (via: fset (vertex, vertex)) =
     forall v: vertex. mem v vertices ->
     match m[v] with
       | D.Finite n ->
@@ -180,7 +180,7 @@ module BellmanFord
           forall lu: list vertex. path s lu u -> length lu >= pass)
     end
 
-  predicate inv2 (m: distmap) (via: set (vertex, vertex)) =
+  predicate inv2 (m: distmap) (via: fset (vertex, vertex)) =
     forall u v: vertex. mem (u, v) via ->
     D.le m[v] (D.add m[u] (D.Finite (weight u v)))
 
@@ -222,7 +222,7 @@ module BellmanFord
      )
 
   let relax (m: distmap) (u v: vertex) (pass: int)
-            (ghost via: set (vertex, vertex))
+            (ghost via: fset (vertex, vertex))
     requires { 1 <= pass /\ mem (u, v) edges /\ not (mem (u, v) via) }
     requires { inv1 m pass via }
     ensures  { inv1 m pass (add (u, v) via) }
@@ -265,8 +265,8 @@ module BellmanFord
       }
     end
 
-  val get_edges (): S.t
-    ensures { result.S.contents = edges }
+  val get_edges (): S.set
+    ensures { result = edges }
 
   exception NegativeCycle
 
@@ -286,9 +286,9 @@ module BellmanFord
       invariant { inv1 m i empty }
       let es = get_edges () in
       while not (S.is_empty es) do
-        invariant { subset es.S.contents edges /\ inv1 m i (diff edges es.S.contents) }
+        invariant { subset es.S.to_fset edges /\ inv1 m i (diff edges es.S.to_fset) }
         variant   { S.cardinal es }
-        let ghost via = diff edges es.S.contents in
+        let ghost via = diff edges es.S.to_fset in
         let (u, v) = S.choose_and_remove es in
         relax m u v i via
       done;
@@ -297,7 +297,7 @@ module BellmanFord
     assert { inv1 m (cardinal vertices) empty };
     let es = get_edges () in
     while not (S.is_empty es) do
-      invariant { subset es.S.contents edges /\ inv2 m (diff edges es.S.contents) }
+      invariant { subset es.S.to_fset edges /\ inv2 m (diff edges es.S.to_fset) }
       variant { S.cardinal es }
       let (u, v) = S.choose_and_remove es in
       if D.lt (D.add m[u] (D.Finite (weight u v))) m[v] then begin

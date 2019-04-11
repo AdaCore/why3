@@ -102,10 +102,19 @@ module MinMax
 end
 
 module Int63
+  use int.Int
   use mach.int.Int63
   use Peano
 
+  val defensive_to_int63 (x:t) : int63
+    requires { Int63.in_bounds x.v }
+    ensures { result = x.v }
+
   val partial to_int63 (x:t) : int63
     ensures { result = x.v }
+
+  val of_int63 (x:int63) (low high: t) : t
+    requires { low.v <= x <= high.v }
+    ensures { result.v = x }
 
 end

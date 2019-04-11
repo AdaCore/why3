@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -136,7 +136,7 @@ exception NotNum
 
 let big_int_of_const c =
   match c with
-    | Number.ConstInt i -> Number.compute_int_constant i
+    | Number.ConstInt i -> i.Number.il_int
     | _ -> raise NotNum
 
 let big_int_of_value v =

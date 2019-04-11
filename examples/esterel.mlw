@@ -25,12 +25,12 @@ module Esterel
 
   use int.Int
   use int.MinMax
-  use set.Fsetint
+  use set.FsetInt
   use bv.BV64
 
   type s = {
           bv : BV64.t;  (* a 64-bit bitvector *)
-    ghost mdl: set int; (* its interpretation as a set *)
+    ghost mdl: fset int; (* its interpretation as a set *)
   }
   invariant {
     forall i: int. (0 <= i < size /\ nth bv i) <-> mem i mdl

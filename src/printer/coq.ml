@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -34,6 +34,9 @@ let char_to_alnumus c =
   match c with
     | '\'' -> String.make 1 c
     | _ -> Ident.char_to_alnumus c
+
+let complex_syntax s =
+  String.contains s '%' || String.contains s ' ' || String.contains s '('
 
 let syntax_arguments s f fmt l =
   let sl = Strings.split ' ' s in
@@ -154,32 +157,39 @@ let protect_on ?(boxed=false) x s =
   else if not boxed then "@[" ^^ s ^^ "@]"
   else s
 
-let rec print_type info fmt ty = print_ty false info fmt ty
-and print_op_type info fmt ty = print_ty true info fmt ty
-and print_ty op info fmt ty =
-  begin match ty.ty_node with
+let rec print_type ?(opr=true) info ~prec fmt ty =
+  match ty.ty_node with
   | Tyvar v -> print_tv info ~whytypes:false fmt v
   | Tyapp (ts, tl) when is_ts_tuple ts ->
-      begin
-        match tl with
-        | [] -> fprintf fmt "unit"
-        | [ty] -> print_ty op info fmt ty
-        | _ -> fprintf fmt "(%a)%%type" (print_list star (print_op_type info)) tl
+      begin match tl with
+      | [] -> fprintf fmt "Init.Datatypes.unit"
+      | [ty] -> print_type ~opr info ~prec fmt ty
+      | _ -> fprintf fmt "(%a)%%type" (print_list star (print_type info ~prec:40)) tl
       end
   | Tyapp (ts, [l;r]) when ts_equal ts ts_func ->
-      fprintf fmt (protect_on op "%a ->@ %a") (print_op_type info) l (print_type info) r
+      fprintf fmt (protect_on (opr && prec < 99) "%a ->@ %a")
+        (print_type info ~prec:98) l
+        (print_type ~opr info ~prec:99) r
   | Tyapp (ts, tl) ->
-    begin match query_syntax info.info_syn ts.ts_name with
-      | Some s -> syntax_arguments s (print_op_type info) fmt tl
+      begin match query_syntax info.info_syn ts.ts_name with
+      | Some s when complex_syntax s ->
+          syntax_arguments s (print_type info ~prec:1) fmt tl
+      | Some s ->
+          begin match tl with
+          | [] -> pp_print_string fmt s
+          | l ->
+              fprintf fmt (protect_on (prec < 10) "%s%a") s
+                (print_list_pre space (print_type info ~prec:9)) l
+          end
       | None ->
-        begin
-          match tl with
-          | [] -> (print_ts_real info) fmt ts
-          | l -> fprintf fmt (protect_on op "%a%a") (print_ts_real info) ts
-             (print_list_pre space (print_op_type info)) l
-        end
-    end
-  end
+          begin match tl with
+          | [] -> print_ts_real info fmt ts
+          | l ->
+              fprintf fmt (protect_on (prec < 10) "%a%a")
+                (print_ts_real info) ts
+                (print_list_pre space (print_type info ~prec:9)) l
+          end
+      end
 
 (* can the type of a value be derived from the type of the arguments? *)
 let unambig_fs fs =
@@ -218,61 +228,70 @@ and print_pat op info fmt p = match p.pat_node with
       print_paren_r (print_pat false info) fmt pl
   | Papp (cs,pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
-        | Some s -> syntax_arguments s (print_pat true info) fmt pl
-        | _ when pl = [] -> print_ls_real info fmt cs
-        | _ -> fprintf fmt (protect_on op "%a@ %a")
-          (print_ls_real info) cs (print_list space (print_pat true info)) pl
+      | Some s when complex_syntax s ->
+          syntax_arguments s (print_pat true info) fmt pl
+      | Some s ->
+          begin match pl with
+          | [] -> pp_print_string fmt s
+          | _ ->
+              fprintf fmt (protect_on op "%s%a") s
+                (print_list_pre space (print_pat true info)) pl
+          end
+      | None ->
+          begin match pl with
+          | [] -> print_ls_real info fmt cs
+          | _ ->
+              fprintf fmt (protect_on op "%a%a")
+                (print_ls_real info) cs
+                (print_list_pre space (print_pat true info)) pl
+          end
       end
 
 let print_vsty info fmt v =
-  fprintf fmt "@[<1>(%a:@,%a)@]" print_vs v (print_type info) v.vs_ty
+  fprintf fmt "@[<1>(%a:@,%a)@]"
+    print_vs v
+    (print_type ~opr:false info ~prec:100) v.vs_ty
 
-let print_binop fmt = function
-  | Tand -> fprintf fmt "/\\"
-  | Tor -> fprintf fmt "\\/"
-  | Timplies -> fprintf fmt "->"
-  | Tiff -> fprintf fmt "<->"
+let number_format info = {
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Custom (fun fmt f -> fprintf fmt "(-%t)%%Z" f);
+    Number.dec_int_support =
+      `Custom (fun fmt i ->
+          fprintf fmt (if info.ssreflect then "%s%%:Z" else "%s%%Z") (BigInt.to_string i));
+    Number.hex_int_support = `Unsupported;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Custom (fun fmt f -> fprintf fmt "(-%t)%%R" f);
+    Number.dec_real_support = `Unsupported;
+    Number.hex_real_support = `Unsupported;
+    Number.frac_real_support =
+      `Custom
+        ((fun fmt i -> fprintf fmt "%s%%R" i),
+         (fun fmt i n -> fprintf fmt "(%s * %s)%%R" i n),
+         (fun fmt i n -> fprintf fmt "(%s / %s)%%R" i n));
+  }
 
-(* [opl] means that there is no delimiter on the left of the term, so
-   parentheses should be put around the term if it does not start with a
-   delimiter; [opr] is similar, but on the right of the term  *)
 
-let rec print_term info fmt t = print_tnode false false info fmt t
-and print_opl_term info fmt f = print_tnode true  false info fmt f
-and print_opr_term info fmt t = print_tnode false true  info fmt t
-and print_tnode ?(boxed=false) opl opr info fmt t =
-  print_comments fmt "(*" ~end_tok:"*)" t;
+(* [opr] means that there is no expected delimiter on the right of the term,
+   so parentheses should be put around the term if it does not end with a
+   delimiter, to avoid any ambiguity *)
+
+let rec print_term ?(boxed=false) ?(opr=true) info ~prec fmt t =
   match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = true;
-          Number.negative_int_support = Number.Number_custom "(-%a)%%Z";
-          Number.dec_int_support =
-            if info.ssreflect then Number.Number_custom "%s%%:Z"
-            else Number.Number_custom "%s%%Z";
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.negative_real_support = Number.Number_custom "(-%a)%%R";
-          Number.dec_real_support = Number.Number_unsupported;
-          Number.hex_real_support = Number.Number_unsupported;
-          Number.frac_real_support = Number.Number_custom
-            (Number.PrintFracReal ("%s%%R", "(%s * %s)%%R", "(%s / %s)%%R"));
-          Number.def_real_support = Number.Number_unsupported;
-        } in
-      Number.print number_format fmt c
+      Number.print (number_format info) fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on opr "let %a :=@ %a in@ %a")
-        print_vs v (print_term info) t1 (print_term info) t2;
+      fprintf fmt (protect_on (opr && prec < 200) "let %a :=@ %a in@ %a")
+        print_vs v
+        (print_term info ~prec:200) t1
+        (print_term ~opr info ~prec:200) t2;
       forget_var v
   | Tcase (t,bl) ->
       fprintf fmt "@[<v>match %a with@,%a@,end@]"
-        (print_term info) t
+        (print_term info ~prec:200) t
         (print_list pp_print_cut (print_tbranch info)) bl
   | Teps _ ->
       let vl,_,t0 = t_open_lambda t in
@@ -280,80 +299,104 @@ and print_tnode ?(boxed=false) opl opr info fmt t =
       else begin
         if t0.t_ty = None then unsupportedTerm t
           "Coq: Prop-typed lambdas are not supported";
-        fprintf fmt (protect_on opr "fun %a =>@ %a")
+        fprintf fmt (protect_on (prec < 200) "fun %a =>@ %a")
           (print_list space (print_vsty info)) vl
-          (print_opl_term info) t0;
+          (print_term info ~prec:200) t0;
         List.iter forget_var vl
       end
   | Tapp (fs,[]) when is_fs_tuple fs ->
-      fprintf fmt "tt"
+      fprintf fmt "Init.Datatypes.tt"
   | Tapp (fs,pl) when is_fs_tuple fs ->
-      fprintf fmt "%a" (print_paren_r (print_term info)) pl
+      fprintf fmt "%a" (print_paren_r (print_term ~prec:250 info)) pl
   | Tapp (fs,[l;r]) when ls_equal fs fs_func_app ->
-      fprintf fmt (protect_on (opl || opr) "%a@ %a") (print_opr_term info) l (print_opl_term info) r
+      fprintf fmt (protect_on (prec < 10) "%a@ %a")
+        (print_term info ~prec:10) l (print_term info ~prec:9) r
   | Tapp (fs, tl) ->
-    begin match query_syntax info.info_syn fs.ls_name with
+      begin match query_syntax info.info_syn fs.ls_name with
+      | Some s when complex_syntax s ->
+          syntax_arguments s (print_term info ~prec:1) fmt tl
       | Some s ->
-          syntax_arguments s (print_opr_term info) fmt tl
-      | _ -> if unambig_fs fs
-          then
-            if tl = [] then fprintf fmt "%a" (print_ls_real info) fs
-            else fprintf fmt (protect_on (opl || opr) "%a@ %a")
-              (print_ls_real info) fs
-              (print_list space (print_opr_term info)) tl
-          else fprintf fmt (protect_on (opl || opr) "@[%a%a@] :@ %a")
-            (print_ls_real info) fs (print_list_pre space (print_opr_term info)) tl
-            (print_type info) (t_type t)
-    end
+          begin match tl with
+          | [] -> pp_print_string fmt s
+          | _ ->
+              fprintf fmt (protect_on (prec < 10) "%s%a") s
+                (print_list_pre space (print_term info ~prec:9)) tl
+          end
+      | None ->
+        if unambig_fs fs then
+          match tl with
+          | [] -> print_ls_real info fmt fs
+          | _ ->
+              fprintf fmt (protect_on (prec < 10) "%a%a")
+                (print_ls_real info) fs
+                (print_list_pre space (print_term info ~prec:9)) tl
+        else
+          fprintf fmt (protect_on (prec < 100) "@[%a%a@] :@ %a")
+            (print_ls_real info) fs
+            (print_list_pre space (print_term ~prec:9 info)) tl
+            (print_type ~opr info ~prec:100) (t_type t)
+      end
   | Tquant (Tforall,fq) ->
       let vl,_tl,f = t_open_quant fq in
-      fprintf fmt (protect_on ~boxed opr "@[<2>forall %a@],@ %a")
+      fprintf fmt (protect_on ~boxed (opr && prec < 200) "@[<2>forall %a@],@ %a")
         (print_list space (print_vsty info)) vl
-        (print_tnode ~boxed:true false false info) f;
+        (print_term ~boxed:true ~opr info ~prec:200) f;
       List.iter forget_var vl
   | Tquant (Texists,fq) ->
       let vl,_tl,f = t_open_quant fq in
       let rec aux fmt vl =
         match vl with
-        | [] -> print_term info fmt f
+        | [] -> print_term ~opr info ~prec:200 fmt f
         | v::vr ->
-            fprintf fmt "exists %a:@,%a,@ %a" print_vs v (print_type info) v.vs_ty aux vr in
-      fprintf fmt (protect_on opr "%a") aux vl;
+            fprintf fmt "exists %a:@,%a,@ %a"
+              print_vs v
+              (print_type ~opr:false info ~prec:100) v.vs_ty
+              aux vr in
+      fprintf fmt (protect_on (opr && prec < 200) "%a") aux vl;
       List.iter forget_var vl
   | Ttrue ->
       fprintf fmt "True"
   | Tfalse ->
       fprintf fmt "False"
   | Tbinop (b,f1,f2) ->
-     (match b with
-     | Tand | Tor ->
-       fprintf fmt (protect_on (opl || opr) "%a %a@ %a")
-               (print_opr_term info) f1 print_binop b (print_opl_term info) f2
-     | Timplies ->
-         (* implication has so low a precedence that its rhs does not need protection *)
-         fprintf fmt (protect_on ~boxed (opl || opr) "%a ->@ %a")
-           (print_opr_term info) f1 (print_tnode ~boxed:true false false info) f2
-     | Tiff ->
-         fprintf fmt (protect_on (opl || opr) "%a <->@ %a")
-           (print_opr_term info) f1 (print_opl_term info) f2)
+      begin match b with
+      | Tand ->
+          fprintf fmt (protect_on (prec < 80) "%a /\\@ %a")
+            (print_term info ~prec:79) f1
+            (print_term info ~prec:80) f2
+      | Tor ->
+          fprintf fmt (protect_on (prec < 85) "%a \\/@ %a")
+            (print_term info ~prec:84) f1
+            (print_term info ~prec:85) f2
+      | Timplies ->
+          fprintf fmt (protect_on ~boxed (prec < 99) "%a ->@ %a")
+            (print_term info ~prec:98) f1
+            (print_term ~boxed:true ~opr info ~prec:99) f2
+      | Tiff ->
+          fprintf fmt (protect_on (prec < 95) "%a <->@ %a")
+            (print_term info ~prec:94) f1
+            (print_term info ~prec:94) f2
+      end
   | Tnot f ->
-      fprintf fmt "~ %a" (print_tnode true true info) f
+      fprintf fmt "~ %a" (print_term info ~prec:75) f
   | Tif (f1,f2,f3) ->
       fprintf fmt (protect_on opr
         "if %a then@ %a@ else@ %a")
-        (print_term info) f1 (print_term info) f2 (print_term info) f3
+        (print_term info ~prec:200) f1
+        (print_term info ~prec:200) f2
+        (print_term info ~prec:200) f3
 
 and print_tbranch info fmt br =
   let p,t = t_open_branch br in
   fprintf fmt "@[<4>| %a =>@ %a@]"
-    (print_pattern info) p (print_term info) t;
+    (print_pattern info) p (print_term info ~prec:200) t;
   Svs.iter forget_var p.pat_vars
 
 (** Declarations *)
 
 let print_constr info ts fmt (cs,_) =
   fprintf fmt "@[<4>| %a : %a%a%a@]" print_ls cs
-    (print_arrow_list (print_op_type info)) cs.ls_args
+    (print_arrow_list (print_type info ~prec:98)) cs.ls_args
     print_ts ts
       (print_list_pre space (print_tv info ~whytypes:false)) ts.ts_args
 
@@ -667,7 +710,7 @@ let print_type_decl ~prev info fmt ts =
         print_ts ts
           (print_list_pre space
              (print_tv_binder info ~whytypes:false ~implicit:false)) ts.ts_args
-        (print_type info) ty
+        (print_type ~opr:false info ~prec:200) ty
 
 let print_type_decl ~prev info fmt ts =
   if not (Mid.mem ts.ts_name info.info_syn) then
@@ -720,7 +763,7 @@ let print_data_decls info fmt tl =
 
 let print_ls_type info fmt = function
   | None -> fprintf fmt "Prop"
-  | Some ty -> print_type info fmt ty
+  | Some ty -> print_type ~opr:false info ~prec:100 fmt ty
 
 let print_param_decl ~prev info fmt ls =
   let _, _, all_ty_params = ls_ty_vars ls in
@@ -731,7 +774,7 @@ let print_param_decl ~prev info fmt ls =
     | Some (Axiom _) ->
       fprintf fmt "(* Why3 goal *)@\n@[<2>Variable %a: %a%a%a.@]@\n@\n"
         print_ls ls (print_params info ~whytypes:true) all_ty_params
-        (print_arrow_list (print_op_type info)) ls.ls_args
+        (print_arrow_list (print_type info ~prec:98)) ls.ls_args
         (print_ls_type info) ls.ls_value
     | (* Some Info *) _ when Mid.mem ls.ls_name info.info_syn ->
       let vl =
@@ -741,19 +784,19 @@ let print_param_decl ~prev info fmt ls =
         "(* Why3 comment *)@\n\
          (* %a is replaced with %a by the coq driver *)@\n@\n"
         print_ls ls
-        (print_term info) e;
+        (print_term info ~prec:1) e;
       List.iter forget_var vl
     | _ ->
       fprintf fmt "(* Why3 goal *)@\n@[<hv 2>Definition @[<h>%a%a@] :@ @[%a%a.@]@]@\n%a@\n"
         print_ls ls
         (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
-        (print_arrow_list (print_op_type info)) ls.ls_args
+        (print_arrow_list (print_type info ~prec:98)) ls.ls_args
         (print_ls_type info) ls.ls_value
         (print_previous_proof None info) prev
   else
     fprintf fmt "@[<hv 2>Parameter %a:@ @[%a%a%a.@]@]@\n@\n"
       print_ls ls (print_params info ~whytypes:true) all_ty_params
-      (print_arrow_list (print_op_type info)) ls.ls_args
+      (print_arrow_list (print_type info ~prec:98)) ls.ls_args
       (print_ls_type info) ls.ls_value
 
 let print_param_decl ~prev info fmt ls =
@@ -768,7 +811,7 @@ let print_logic_decl info fmt (ls,ld) =
     (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
     (print_list_pre space (print_vsty info)) vl
     (print_ls_type info) ls.ls_value
-    (print_term info) e;
+    (print_term ~opr:false info ~prec:200) e;
   List.iter forget_var vl;
   fprintf fmt "@\n"
 
@@ -779,7 +822,7 @@ let print_equivalence_lemma ~prev info fmt name (ls,ld) =
     "(* Why3 goal *)@\n@[<hv 2>Lemma @[<h>%s%a@] :@ @[%a.@]@]@\n%a@\n"
     name
     (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
-    (print_term info) def_formula
+    (print_term ~opr:false info ~prec:200) def_formula
     (print_previous_proof (Some (all_ty_params,def_formula)) info) prev
 
 let print_equivalence_lemma ~old info fmt ((ls,_) as d) =
@@ -809,7 +852,7 @@ let print_recursive_decl info fmt (ls,ld) =
     (print_list_pre space (print_vsty info)) vl
     print_vs (List.nth vl i)
     (print_ls_type info) ls.ls_value
-    (print_term info) e;
+    (print_term ~opr:false info ~prec:200) e;
   List.iter forget_var vl
 
 let print_recursive_decl ~old info fmt dl =
@@ -829,14 +872,16 @@ let print_recursive_decl ~old info fmt dl =
   List.iter (print_equivalence_lemma ~old info fmt) dl_syn
 
 let print_ind info fmt (pr,f) =
-  fprintf fmt "@[<hv 4>| %a :@ @[%a@]@]" print_pr pr (print_term info) f
+  fprintf fmt "@[<hv 4>| %a :@ @[%a@]@]"
+    print_pr pr
+    (print_term ~opr:false info ~prec:200) f
 
 let print_ind_decl info fmt ps bl =
   let _, _, all_ty_params = ls_ty_vars ps in
   fprintf fmt " %a%a: %aProp :=@ @[%a@]"
     print_ls ps
     (print_tv_binders info ~whytypes:true ~implicit:true) all_ty_params
-    (print_arrow_list (print_op_type info)) ps.ls_args
+    (print_arrow_list (print_type info ~prec:98)) ps.ls_args
     (print_list newline (print_ind info)) bl
 
 let print_ind_decls info s fmt tl =
@@ -868,17 +913,17 @@ let print_prop_decl ~prev info fmt (k,pr,f) =
     | Some (Axiom _) when stt = "Lemma" ->
       fprintf fmt "(* Why3 goal *)@\n@[<hv 2>Hypothesis %a :@ @[%a%a.@]@]@\n@\n"
         print_pr pr (print_params info ~whytypes:true) params
-        (print_term info) f
+        (print_term ~opr:false info ~prec:200) f
     | _ ->
       fprintf fmt "(* Why3 goal *)@\n@[<hv 2>%s @[<h>%a%a@] :@ @[%a.@]@]@\n%a@\n"
         stt print_pr pr
         (print_tv_binders info ~whytypes:true ~implicit:true) params
-        (print_term info) f
+        (print_term ~opr:false info ~prec:200) f
         (print_previous_proof (Some (params,f)) info) prev
   else
     fprintf fmt "@[<hv 2>Axiom %a :@ @[%a%a.@]@]@\n@\n"
       print_pr pr (print_params info ~whytypes:true) params
-      (print_term info) f;
+      (print_term ~opr:false info ~prec:200) f;
   forget_tvs ()
 
 let print_decl ~old info fmt d =

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -21,13 +21,13 @@ Require list.Append.
 
 (* Why3 goal *)
 Lemma reverse_def {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)),
+  forall (l:Init.Datatypes.list a),
   ((Lists.List.rev l) =
    match l with
    | Init.Datatypes.nil => Init.Datatypes.nil
-   | (Init.Datatypes.cons x r) =>
-       (Init.Datatypes.app (Lists.List.rev r)
-        (Init.Datatypes.cons x Init.Datatypes.nil))
+   | Init.Datatypes.cons x r =>
+       Init.Datatypes.app (Lists.List.rev r)
+       (Init.Datatypes.cons x Init.Datatypes.nil)
    end).
 Proof.
 now intros [|x l].
@@ -35,7 +35,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma reverse_append {a:Type} {a_WT:WhyType a} :
-  forall (l1:(list a)) (l2:(list a)) (x:a),
+  forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a) (x:a),
   ((Init.Datatypes.app (Lists.List.rev (Init.Datatypes.cons x l1)) l2) =
    (Init.Datatypes.app (Lists.List.rev l1) (Init.Datatypes.cons x l2))).
 Proof.
@@ -46,7 +46,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma reverse_cons {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)) (x:a),
+  forall (l:Init.Datatypes.list a) (x:a),
   ((Lists.List.rev (Init.Datatypes.cons x l)) =
    (Init.Datatypes.app (Lists.List.rev l)
     (Init.Datatypes.cons x Init.Datatypes.nil))).
@@ -57,7 +57,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma cons_reverse {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)) (x:a),
+  forall (l:Init.Datatypes.list a) (x:a),
   ((Init.Datatypes.cons x (Lists.List.rev l)) =
    (Lists.List.rev
     (Init.Datatypes.app l (Init.Datatypes.cons x Init.Datatypes.nil)))).
@@ -67,7 +67,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma reverse_reverse {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)), ((Lists.List.rev (Lists.List.rev l)) = l).
+  forall (l:Init.Datatypes.list a), ((Lists.List.rev (Lists.List.rev l)) = l).
 Proof.
 intros l.
 apply List.rev_involutive.
@@ -75,8 +75,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma reverse_mem {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)) (x:a),
-  (list.Mem.mem x l) <-> (list.Mem.mem x (Lists.List.rev l)).
+  forall (l:Init.Datatypes.list a) (x:a),
+  list.Mem.mem x l <-> list.Mem.mem x (Lists.List.rev l).
 intros l x.
 induction l; simpl; intuition.
 rewrite Append.mem_append.
@@ -91,7 +91,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Reverse_length {a:Type} {a_WT:WhyType a} :
-  forall (l:(list a)),
+  forall (l:Init.Datatypes.list a),
   ((list.Length.length (Lists.List.rev l)) = (list.Length.length l)).
 Proof.
 intros l.

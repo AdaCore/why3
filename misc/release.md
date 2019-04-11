@@ -38,7 +38,7 @@
   - push the commit:
     ```
     git push
-    git push --tag
+    git push --tags
     ```
   - upload `distrib/why3-$VERSION.tar.gz` to https://gforge.inria.fr/frs/?group_id=2990
 
@@ -114,6 +114,4 @@
     - do `make` in `web/gallery/`
     - do `make install-gallery` in `web/`
 
-* once the OPAM package is pulled in the main OPAM repository:
-  - announce the release
-  - What to put in the announcement: see New Features above
+* announce the release using the features of `CHANGES.md`

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -141,7 +141,7 @@ let eliminate_if = Trans.compose eliminate_if_term eliminate_if_fmla
 
 let () =
   Trans.register_transform "eliminate_if_term" eliminate_if_term
-    ~desc:"Replaces@ terms@ of@ the@ form@ [if f1 then t2 else t3]@ by@ \
+    ~desc:"Replace@ terms@ of@ the@ form@ [if f1 then t2 else t3]@ by@ \
            lifting@ them@ at@ the@ level@ of@ formulas.";
   Trans.register_transform "eliminate_if_fmla" eliminate_if_fmla
     ~desc:"Eliminate@ formulas@ of@ the@ form@ [if f1 then f2 else f3].";

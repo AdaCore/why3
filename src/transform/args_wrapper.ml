@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -407,8 +407,6 @@ let rec print_type : type a b. Format.formatter -> (a, b) trans_typ -> unit =
     | Topt (s,t)     -> Format.fprintf fmt "?%s -> %a" s print_type t
     | Toptbool (s,t) -> Format.fprintf fmt "?%s:bool -> %a" s print_type t
 
-exception Unnecessary_arguments of string list
-
 let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.env -> naming_table -> task -> b =
   fun t f l env tables task ->
     match t, l with
@@ -514,6 +512,11 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
             let list =
               List.map (fun id -> id.Ptree.id_str) (parse_list_ident s') in
             wrap_to_store t' (f (Some list)) tail env tables task
+        | Tlist t' ->
+            let pr_list = parse_list_qualid s' in
+            let pr_list =
+              List.map (fun id -> find_symbol id tables) pr_list in
+            wrap_to_store t' (f (Some pr_list)) tail env tables task
         | _ -> raise (Arg_expected (string_of_trans_typ t', s'))
        end
     | Topt (_, t'), _ ->

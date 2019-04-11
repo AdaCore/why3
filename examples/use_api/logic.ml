@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -136,7 +136,7 @@ let result1 : Call_provers.prover_result =
 
 (* prints Alt-Ergo answer *)
 let () = printf "@[On task 1, Alt-Ergo answers %a@."
-  Call_provers.print_prover_result result1
+  (Call_provers.print_prover_result ~json_model:false) result1
 (* END{callprover} *)
 
 (* BEGIN{calltimelimit} *)
@@ -192,7 +192,7 @@ let result3 =
     alt_ergo_driver task3)
 
 let () = printf "@[On task 3, alt-ergo answers %a@."
-  Call_provers.print_prover_result result3
+  (Call_provers.print_prover_result ~json_model:false) result3
 
 (* quantifiers: let's build "forall x:int. x*x >= 0" *)
 (* BEGIN{quantfmla1} *)
@@ -230,7 +230,7 @@ let result4 =
     alt_ergo_driver task4)
 
 let () = printf "@[On task 4, alt-ergo answers %a@."
-  Call_provers.print_prover_result result4
+  (Call_provers.print_prover_result ~json_model:false) result4
 
 (* build a theory with all these goals *)
 

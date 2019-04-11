@@ -159,6 +159,26 @@ execute () {
     fi
 }
 
+extract () {
+    pgm="bin/why3extract$suffix"
+    dir=$1
+    shift
+    for f in $dir/*.mlw; do
+        printf "  $f... "
+        if ($pgm $@ $f -o bench_test.ml && ocaml -noinit bench_test.ml) > /dev/null 2> /dev/null; then
+            echo "ok"
+        else
+            echo "extract test failed!"
+            echo $pgm $@ $f
+            $pgm $@ $f -o bench_test.ml
+            ocaml -noinit bench_test.ml
+            rm -f bench_test.ml
+            exit 1
+        fi
+    done
+    rm -f bench_test.ml
+}
+
 extract_and_run () {
     dir=$1
     shift
@@ -224,8 +244,8 @@ extract_and_test_wmp () {
                     echo "ok"
                 else
                     echo "execution failed!"
-                    echo $dir/main.opt
-                    $dir/main.opt
+                    echo $dir/build/bench-tests
+                    $dir/build/bench-tests
                     exit 1
                 fi
             else
@@ -349,6 +369,7 @@ execute examples/vstte10_queens.mlw NQueens.test8
 echo ""
 
 echo "=== Checking extraction to OCaml ==="
+extract bench/extraction -D ocaml64
 extract_and_run examples/euler001 euler001.ml 1000000
 extract_and_run examples/gcd gcd.ml 6 15
 extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml

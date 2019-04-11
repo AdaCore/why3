@@ -70,18 +70,18 @@ end
 
 module Elements
 
+  use set.Fset
   use List
   use Mem
-  use set.Fset as S
 
-  function elements (l: list 'a) : S.set 'a =
+  function elements (l: list 'a) : fset 'a =
     match l with
-    | Nil -> S.empty
-    | Cons x r -> S.add x (elements r)
+    | Nil -> empty
+    | Cons x r -> add x (elements r)
     end
 
   lemma elements_mem:
-    forall x: 'a, l: list 'a. mem x l <-> S.mem x (elements l)
+    forall x: 'a, l: list 'a. mem x l <-> Fset.mem x (elements l)
 
 end
 
