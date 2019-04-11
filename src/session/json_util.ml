@@ -174,6 +174,7 @@ let convert_request_constructor (r: ide_request) =
   | Reload_req                -> String "Reload_req"
   | Exit_req                  -> String "Exit_req"
   | Interrupt_req             -> String "Interrupt_req"
+  | Reset_proofs_req          -> String "Reset_proofs_req"
   | Get_global_infos          -> String "Get_global_infos"
 
 open Whyconf
@@ -229,6 +230,7 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Reload_req
   | Exit_req
   | Interrupt_req
+  | Reset_proofs_req
   | Get_global_infos ->
      convert_record ["ide_request", cc r])
 
@@ -506,6 +508,8 @@ let parse_request (constr: string) j =
     Save_req
   | "Reload_req" ->
     Reload_req
+  | "Reset_proofs_req" ->
+    Reset_proofs_req
   | "Exit_req" ->
     Exit_req
   | _ -> raise (NotRequest "")

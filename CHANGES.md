@@ -29,6 +29,8 @@ Transformations
 IDE
   * display of counterexamples in the Task view has been improved
   * auto jumping to next unproved goal can now be disabled in the preferences
+  * add a "reset proofs" command in the Tools menu. It removes all proofs in
+    the session
 
 Realizations
   * Added experimental realizations for new Set theories in both Isabelle and

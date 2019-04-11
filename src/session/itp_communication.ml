@@ -124,6 +124,7 @@ type ide_request =
   | Check_need_saving_req
   | Exit_req
   | Interrupt_req
+  | Reset_proofs_req
   | Get_global_infos
 
 
@@ -151,6 +152,7 @@ let print_request fmt r =
   | Check_need_saving_req           -> fprintf fmt "check need saving"
   | Exit_req                        -> fprintf fmt "exit"
   | Interrupt_req                   -> fprintf fmt "interrupt"
+  | Reset_proofs_req                -> fprintf fmt "reset proofs"
   | Get_global_infos                -> fprintf fmt "get_global_infos"
 
 let print_msg fmt m =

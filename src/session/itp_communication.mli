@@ -142,6 +142,8 @@ type ide_request =
   | Check_need_saving_req
   | Exit_req
   | Interrupt_req
+  | Reset_proofs_req
+  (** Remove all proofattempt and transformations even proved ones *)
   | Get_global_infos
 
 

@@ -283,6 +283,14 @@ val clean: controller -> removed:notifier -> any option -> unit
     notifier is called on each removed node.
     On None, clean is done on the whole session. *)
 
+val reset_proofs:
+  controller -> removed:notifier -> notification:notifier ->
+    any option -> unit
+(** Remove each proof attempt or transformation that are below proved
+    goals. The [removed] notifier is called on each removed node.
+    On None, clean is done on the whole session. *)
+
+
 val mark_as_obsolete:
   notification:notifier ->
   controller -> any option -> unit
