@@ -1,0 +1,157 @@
+(** {1 Three idempotent rings are commutative} *)
+
+
+(** {2 Definitions} *)
+
+module ThreeIdempotentRing
+
+       use int.Int
+
+       clone export algebra.Ring with
+       	     axiom .
+
+       (** Define multiplication by an integer recursively *)
+       let rec ghost function mul (x : t) (n : int) : t
+       	   requires { n >= 0 }
+       	   variant { n }
+       =
+       	if n = 0 then pure{zero} else let r = mul x (n-1) in pure {x + r}
+
+       (** We get lemmas from the why3 library *)
+       clone int.Exponentiation with type t = t,
+       	     constant one = zero, function ( * ) = (+), function power = mul,
+       	     lemma .
+
+
+(** {2 General results about rings} *)
+
+(** First results : *)
+
+       lemma simpl_left :
+       	     forall x y z. x + y = x + z -> y = z
+	     by (-x) + (x + y) = (-x) + (x + z)
+
+       lemma simpl_right :
+       	     forall x y z. y + x = z + x -> y = z
+	     by y + x + (-x) = z + x + (-x)
+
+       lemma zero_star_l :
+       	     forall x. zero * x = zero
+
+       lemma zero_star_r :
+       	     forall x. x * zero = zero
+
+       lemma neg_star_r :
+       	     forall x y. x * (-y) = - (x * y)
+	     by x * y + x * (-y) = x * y + (- (x * y))
+
+       lemma neg_star_l :
+       	     forall x y. (-x) * y = - (x * y)
+	     by x * y + (-x) * y = x * y + (- (x * y))
+
+       lemma neg_neg :
+       	     forall x. - (- x) = x
+
+(** Lemmas about nullable elements : *)
+
+       predicate null (x : t) (n : int) = mul x n = zero
+
+       lemma null_add :
+       	     forall x x' n. 0 <= n -> null x n -> null x' n -> null (x + x') n
+
+       let rec lemma mul_star_l (x y : t) (n : int)
+       	   requires { 0 <= n }
+       	   variant { n }
+       	   ensures { mul (x * y) n = (mul x n) * y }
+       =
+	   if n <> 0 then mul_star_l x y (n-1)
+
+       let rec lemma mul_star_r (x y : t) (n : int)
+       	   requires { 0 <= n }
+       	   variant { n }
+       	   ensures { mul (x * y) n = x * (mul y n) }
+       =
+	   if n <> 0 then mul_star_r x y (n-1)
+
+       lemma null_star_l :
+       	     forall x y n. 0 <= n -> null x n -> null (x * y) n
+
+       lemma null_star_r :
+       	     forall x y n. 0 <= n -> null y n -> null (x * y) n
+
+       lemma null_mul_congr :
+       	     forall x k km. k > 0 -> km > 0 -> null x k -> mul x (Int.(+) km k) = mul x km
+
+
+(** {2 ThreeIdem axiom specific results} *)
+
+(** We now add the following axiom and want to prove the commutative property : *)
+
+       axiom ThreeIdem : forall x. x * x * x = x
+
+(** Split the problem in two :
+       one where the ring has characteritic 2
+       and another where the ring has characteristic 3 *)
+
+       (** First show that the characteristic of the ring divides 6 ... *)
+       lemma all_null6 :
+       	     forall x. null x 6
+	     by (x + x) * (x + x) * (x + x) = mul (x * x * x) 8
+	     so mul x 8 = zero + x + x /\ mul x 8 = mul x 6 + x + x
+
+       (** ... use it to show we can split the problem in two ...*)
+       lemma all_split :
+       	     forall x. (exists y z. x = y + z /\ null y 2 /\ null z 3)
+	     by let y = mul x 3 in
+	       	let z = mul (-x) 2 in
+		x = y + z /\ null y 2 /\ null z 3
+
+       (** ... and show that the two problems are independent *)
+       lemma free_split :
+       	     forall x. null x 2 -> null x 3 -> x = zero
+
+(** Show the commutative property in characteristic 2 : *)
+
+       lemma null_2_idem :
+       	     forall x. null x 2 -> x * x = x
+	     by (x + x * x) * (x + x * x) = zero
+	     so (x + x * x) * (x + x * x) * (x + x * x) = zero
+	     so x + x * x = zero
+
+       lemma null2_comm :
+       	     forall x y. null x 2 -> null y 2 -> x * y = y * x
+	     by (x + y) * (x + y) = x * x + y * y + x * y + y * x
+	     so x + y = x + y + x * y + y * x
+
+(** Show the commutative property in characteristic 3 : *)
+
+       lemma swap_equality :
+       	     forall x y. null x 3 -> null y 3 ->
+	     	      	 y * y * x + y * x * y + x * y * y = zero
+             by (forall x y. y * y * x + y * x * y + x * y * y +
+	     		     x * x * y + x * y * x + y * x * x = zero
+	         by ((x + y) * (x + y) * (x + y) = x * x * x + y * y * y + y * y * x +
+		 y * x * y + x * y * y + x * x * y + x * y * x + y * x * x
+		 so x + y + zero = x + y + (y * y * x +
+		 y * x * y + x * y * y + x * x * y + x * y * x + y * x * x)))
+	     so (y * y * x + y * x * y + x * y * y + x * x * y + x * y * x + y * x * x = zero
+	     so (y * y * x + y * x * y + x * y * y +
+	     	(- (x * x * y)) + (- (x * y * x)) + (- (y * x * x)) = zero
+		by (-y) * (-y) * x + (-y) * x * (-y) + x * (-y) * (-y) +
+		    x * x * (-y) + x * (-y) * x + (-y) * x * x = zero))
+	     so mul (y * y * x) 2 + mul (y * x * y) 2 + mul (x * y * y) 2 = zero
+	     so mul (y * y * x) 4 + mul (y * x * y) 4 + mul (x * y * y) 4 = zero
+
+       lemma null3_comm :
+       	     forall x y. null x 3 -> null y 3 -> x * y = y * x
+	     by y * x + y * y * x * y + y * x * y * y = x * y + y * y * x * y + y * x * y * y
+
+(** Finally, combine the previous results to show the commutative property. *)
+
+       lemma commutative :
+       	     forall x y. x * y = y * x
+	     by exists x2 x3 y2 y3. x = x2 + x3 /\ y = y2 + y3 /\ null x2 2 /\ null y2 2 /\
+	     null x3 3 /\ null y3 3
+	     so x2 * y3 = zero /\  y3 * x2 = zero /\ x3 * y2 = zero /\  y2 * x3 = zero
+
+end

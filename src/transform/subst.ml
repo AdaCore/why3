@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -267,7 +267,9 @@ let subst_filtered ~subst_proxy filter =
 let subst_all = subst_filtered ~subst_proxy:false (fun _ -> true)
 
 let () =
-  wrap_and_register ~desc:"substitutes with all equalities between a constant and a term"
+  wrap_and_register
+    ~desc:"Substitute@ with@ all@ equalities@ between@ \
+      a@ constant@ and@ a@ term."
     "subst_all"
     (Ttrans) subst_all
 
@@ -282,7 +284,10 @@ let subst tl =
   subst_filtered ~subst_proxy:true (fun ls -> Sls.mem ls to_subst)
 
 let () =
-  wrap_and_register ~desc:"substitutes with all equalities involving one of the given constants"
+  wrap_and_register
+    ~desc:"subst <constant list>@ \
+      substitutes@ with@ all@ equalities@ involving@ \
+      one@ of@ the@ given@ constants."
     "subst"
     (Ttermlist Ttrans) subst
 

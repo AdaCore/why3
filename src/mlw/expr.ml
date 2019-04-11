@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -490,7 +490,7 @@ let e_const c ity =
 
 let e_nat_const n =
   assert (n >= 0);
-  e_const (Number.const_of_int n) ity_int
+  e_const (Number.int_const_of_int n) ity_int
 
 let e_ghostify gh ({e_effect = eff} as e) =
   if not gh then e else

@@ -2092,5 +2092,22 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
       sfree scratch
     end*)
 
+  meta remove_prop axiom no_borrow
+  meta remove_prop axiom no_borrow_ptr
+  meta remove_prop lemma power_ge_1
+  meta remove_prop axiom valuation_def
+  meta remove_prop axiom valuation_spec
+  meta remove_prop lemma valuation_mul
+  meta remove_prop axiom valuation_times_pow
+  meta remove_prop axiom valuation_lower_bound
+  meta remove_prop axiom valuation_monotonous
+  meta remove_prop lemma valuation_nondiv
+  meta remove_prop lemma valuation_zero_prod
+  meta remove_prop axiom valuation_times_nondiv
+  meta remove_prop lemma valuation_split
+  meta remove_prop lemma valuation_prod
+  meta remove_prop lemma valuation_mod
+  meta remove_prop lemma valuation_decomp
+  meta remove_prop lemma valuation_pow
 
 end

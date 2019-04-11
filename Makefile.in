@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  #
+#  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -1058,7 +1058,7 @@ COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
 COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
 COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
 
-COQLIBS_SET_FILES = Set
+COQLIBS_SET_FILES = Set Cardinal Fset FsetInduction FsetInt FsetSum SetApp SetAppInt SetImp SetImpInt
 COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
 
 COQLIBS_MAP_FILES = Map Const Occ MapPermut MapInjection
@@ -1169,8 +1169,8 @@ update-coq-option: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdl
 update-coq-bv: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/bv.mlw
 	for f in $(COQLIBS_BV_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T bv.$$f -o $(GENERATED_PREFIX_COQ)/bv/; done
 
-update-coq-for-drivers: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux theories/for_drivers.why
-	for f in $(COQLIBS_FOR_DRIVERS_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L theories -D drivers/coq-realize.drv -T for_drivers.$$f -o $(GENERATED_PREFIX_COQ)/for_drivers/; done
+update-coq-for-drivers: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/for_drivers.mlw
+	for f in $(COQLIBS_FOR_DRIVERS_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T for_drivers.$$f -o $(GENERATED_PREFIX_COQ)/for_drivers/; done
 
 update-coq-ieee_float: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/ieee_float.mlw
 	for f in $(COQLIBS_IEEEFLOAT_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ -L stdlib -D drivers/coq-realize.drv -T ieee_float.$$f -o $(GENERATED_PREFIX_COQ)/ieee_float/; done
@@ -1952,6 +1952,21 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f test-session.opt why3session.xml why3shapes why3shapes.gz
 
+test-ce.byte: examples/use_api/counterexample.ml lib/why3/why3.cma
+	$(SHOW) 'Ocaml    $<'
+	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null\
+	|| (rm -f why3session.xml why3shapes why3shapes.gz;  \
+	printf "Test of Why3 API calls for counterexamples failed. Please fix it"; exit 2)
+	@rm -f why3session.xml why3shapes why3shapes.gz
+
+test-ce.opt: examples/use_api/counterexample.ml lib/why3/why3.cmxa
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa  $< \
+	&& ./test-ce.opt > /dev/null) \
+	|| (rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz; \
+	printf "Test of Why3 API calls for counterexamples failed. Please fix it"; exit 2)
+	@rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz
+
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
 	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat clean
@@ -2013,6 +2028,10 @@ doc/generated/mlw_tree__%.ml: examples/use_api/mlw_tree.ml doc/extract_ocaml_cod
 doc/generated/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
 
+doc/generated/counterexample__%.ml: examples/use_api/counterexample.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code $* < $< > $@
+
+
 OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
 	buildtask printtask buildtask2 \
 	getconf getanyaltergo getaltergo200 \
@@ -2030,11 +2049,15 @@ OCAMLCODE_MLWTREE = buildenv openmodule useimport \
 	source1 code1 helper1 source2 code2 source3 code3 \
 	closemodule checkingvcs
 
+OCAMLCODE_COUNTEREXAMPLES =  ce_declarepropvars ce_adaptgoals \
+	ce_get_cvc4ce ce_callprover ce_nobuiltin
+
 OCAMLCODE = \
 	$(addprefix doc/generated/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
 	$(addprefix doc/generated/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
 	$(addprefix doc/generated/transform__, $(addsuffix .ml, $(OCAMLCODE_TRANSFORM))) \
 	$(addprefix doc/generated/mlw_tree__, $(addsuffix .ml, $(OCAMLCODE_MLWTREE))) \
+	$(addprefix doc/generated/counterexample__, $(addsuffix .ml, $(OCAMLCODE_COUNTEREXAMPLES))) \
 	doc/generated/whyconf__provertype.ml
 
 DOC = api glossary ide intro exec macros manpages install \

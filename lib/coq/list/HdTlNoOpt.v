@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,7 +16,7 @@ Require BuiltIn.
 Require list.List.
 
 (* Why3 goal *)
-Definition hd {a:Type} {a_WT:WhyType a} : (list a) -> a.
+Definition hd {a:Type} {a_WT:WhyType a} : Init.Datatypes.list a -> a.
 intros [|h _].
 exact why_inhabitant.
 exact h.
@@ -24,13 +24,15 @@ Defined.
 
 (* Why3 goal *)
 Lemma hd_cons {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (r:(list a)), ((hd (Init.Datatypes.cons x r)) = x).
+  forall (x:a) (r:Init.Datatypes.list a),
+  ((hd (Init.Datatypes.cons x r)) = x).
 Proof.
 now intros x r.
 Qed.
 
 (* Why3 goal *)
-Definition tl {a:Type} {a_WT:WhyType a} : (list a) -> (list a).
+Definition tl {a:Type} {a_WT:WhyType a} :
+  Init.Datatypes.list a -> Init.Datatypes.list a.
 intros [|_ t].
 exact nil.
 exact t.
@@ -38,7 +40,8 @@ Defined.
 
 (* Why3 goal *)
 Lemma tl_cons {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (r:(list a)), ((tl (Init.Datatypes.cons x r)) = r).
+  forall (x:a) (r:Init.Datatypes.list a),
+  ((tl (Init.Datatypes.cons x r)) = r).
 Proof.
 now intros x r.
 Qed.

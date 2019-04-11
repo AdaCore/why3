@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,11 +22,11 @@ Require list.Reverse.
 
 (* Why3 goal *)
 Lemma rev_append_def1 {a:Type} {a_WT:WhyType a} :
-  forall (s:(list a)) (t:(list a)),
+  forall (s:Init.Datatypes.list a) (t:Init.Datatypes.list a),
   ((Lists.List.rev_append s t) =
    match s with
-   | (Init.Datatypes.cons x r) =>
-       (Lists.List.rev_append r (Init.Datatypes.cons x t))
+   | Init.Datatypes.cons x r =>
+       Lists.List.rev_append r (Init.Datatypes.cons x t)
    | Init.Datatypes.nil => t
    end).
 intros s t.
@@ -35,7 +35,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma rev_append_append_l {a:Type} {a_WT:WhyType a} :
-  forall (r:(list a)) (s:(list a)) (t:(list a)),
+  forall (r:Init.Datatypes.list a) (s:Init.Datatypes.list a)
+    (t:Init.Datatypes.list a),
   ((Lists.List.rev_append (Init.Datatypes.app r s) t) =
    (Lists.List.rev_append s (Lists.List.rev_append r t))).
 Proof.
@@ -47,7 +48,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma rev_append_length {a:Type} {a_WT:WhyType a} :
-  forall (s:(list a)) (t:(list a)),
+  forall (s:Init.Datatypes.list a) (t:Init.Datatypes.list a),
   ((list.Length.length (Lists.List.rev_append s t)) =
    ((list.Length.length s) + (list.Length.length t))%Z).
 Proof.
@@ -64,7 +65,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma rev_append_def {a:Type} {a_WT:WhyType a} :
-  forall (r:(list a)) (s:(list a)),
+  forall (r:Init.Datatypes.list a) (s:Init.Datatypes.list a),
   ((Lists.List.rev_append r s) = (Init.Datatypes.app (Lists.List.rev r) s)).
 Proof.
 induction r; simpl.
@@ -76,7 +77,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma rev_append_append_r {a:Type} {a_WT:WhyType a} :
-  forall (r:(list a)) (s:(list a)) (t:(list a)),
+  forall (r:Init.Datatypes.list a) (s:Init.Datatypes.list a)
+    (t:Init.Datatypes.list a),
   ((Lists.List.rev_append r (Init.Datatypes.app s t)) =
    (Lists.List.rev_append (Lists.List.rev_append s r) t)).
 Proof.

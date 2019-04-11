@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -219,35 +219,44 @@ let induction_l attr induct task = match task with
   | Some { task_decl ={ td_node = Decl { d_node = Dprop (Pgoal, pr, f) } };
 	   task_prev = prev;
 	   task_known = kn } ->
-    begin try List.map (add_prop_decl prev Pgoal pr) (induction_l attr induct kn f)
+    begin try List.map (add_prop_decl prev Pgoal pr)
+                       (induction_l attr induct kn f)
     with Ind_not_found -> [task] end
   | _ -> assert false
 
-let induction_on_hyp attr b h =
-  Trans.compose (Ind_itp.revert_tr_symbol [Tsprsymbol h])
+let induction_on_hyp attr b h list_hyp_opt =
+  let l = match list_hyp_opt with
+  | None -> [Tsprsymbol h]
+  | Some l -> Tsprsymbol h :: l in
+  let tr x = match x with
+  | Tsprsymbol pr when Decl.pr_equal pr h -> Some attr
+  | _ -> None in
+  Trans.compose (Ind_itp.revert_tr_symbol ~tr l)
     (Trans.store (induction_l attr b))
 
 let () = wrap_and_register
-    ~desc:"induction_arg_pr <pr> performs induction_pr on pr."
+    ~desc:"induction_arg_pr <name>@ \
+      performs@ 'induction_pr'@ on@ the@ given@ premise. Optional@ <with_gen>@ \
+      arguments@ are@ the@ elements@ to@ be@ generalized@."
     "induction_arg_pr"
-    (Tprsymbol Ttrans_l) (induction_on_hyp attr_ind true)
+    (Tprsymbol (Topt ("with_gen", Tlist Ttrans_l)))
+    (induction_on_hyp attr_ind true)
 
 let () = wrap_and_register
-    ~desc:"induction_arg_pr <pr> performs inversion_pr on pr."
+    ~desc:"inversion_arg_pr <name>@ \
+      performs@ 'inversion_pr'@ on@ the@ given@ premise. Optional@ <with_gen>@ \
+      arguments@ are@ the@ elements@ to@ be@ generalized@."
     "inversion_arg_pr"
-    (Tprsymbol Ttrans_l) (induction_on_hyp attr_inv false)
+    (Tprsymbol (Topt ("with_gen", Tlist Ttrans_l)))
+    (induction_on_hyp attr_inv false)
 
 let () =
-  Trans.register_transform_l "induction_pr" (Trans.store (induction_l attr_ind true))
-    ~desc:"Generate@ induction@ hypotheses@ for@ goals@ over@ inductive@ predicates."
+  Trans.register_transform_l "induction_pr"
+    (Trans.store (induction_l attr_ind true))
+    ~desc:"Generate@ induction@ hypotheses@ \
+      for@ goals@ over@ inductive@ predicates."
 
 let () =
-  Trans.register_transform_l "inversion_pr" (Trans.store (induction_l attr_inv false))
+  Trans.register_transform_l "inversion_pr"
+    (Trans.store (induction_l attr_inv false))
     ~desc:"Invert@ inductive@ predicate."
-
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3.byte"
-End:
-*)

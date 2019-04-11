@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -27,7 +27,6 @@ exception Arg_pr_not_found of Decl.prsymbol
 exception Arg_qid_not_found of Ptree.qualid
 exception Arg_error of string
 exception Arg_parse_type_error of Loc.position * string * exn
-exception Unnecessary_arguments of string list
 
 
 val build_naming_tables : Task.task -> Trans.naming_table

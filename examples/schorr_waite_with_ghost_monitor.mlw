@@ -121,7 +121,7 @@ module GraphShape
   (** DFS invariant. For technical reason, it must refer to different parts
      of the memory at different time. The graph structure is given
      via the initial memory `m`, but the coloring is given via the current one `mark`. *)
-  predicate well_colored_on (graph gray:set loc) (m:memory) (mark:loc -> bool) =
+  predicate well_colored_on (graph gray:fset loc) (m:memory) (mark:loc -> bool) =
     subset gray graph /\
     (forall x. mem x gray -> mark x) /\
     (forall x y. mem x graph /\ edge m x y /\ y <> null /\ mark x ->
@@ -145,7 +145,7 @@ module SchorrWaite
   use Memory
   use GraphShape
 
-  let schorr_waite (root : loc) (ghost graph : set loc) : unit
+  let schorr_waite (root : loc) (ghost graph : fset loc) : unit
     requires { (** Root belong to graph *)
       mem root graph }
     requires { (** Graph is closed by following edges *)
@@ -240,7 +240,7 @@ module SchorrWaite
     else absurd
   in
   let ghost initial_heap = pure {heap} in (* Copy of initial memory *)
-  let rec recursive_monitor (ghost gray_nodes: set loc) : unit
+  let rec recursive_monitor (ghost gray_nodes: fset loc) : unit
       requires { !pc = 1 }
       requires { mem !t graph }
       requires { (* assume DFS invariant *)

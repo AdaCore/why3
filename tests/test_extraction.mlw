@@ -239,6 +239,14 @@ module TestExtraction
      match x with None -> y | Some x -> x + y end
   let constant opt_c = opt_g (Some 40) 2
 
+  let opt_f_poly (x [@ocaml:optional]: option 'a) (y: int) : int =
+    match x with
+    | None -> y
+    | Some _ -> 89
+    end
+
+  let call_f_poly (x: 'a) = opt_f_poly (Some x) 42
+
   (* FIXME: partial application with named arguments not yet supported *)
   let constant opt_b = fun y -> opt_g y 42
   let opt_h () = fun y -> opt_f 40 y
@@ -324,6 +332,13 @@ module TestExtraction
     for x = 1: big_range to 3 do
       ()
     done
+
+  let test_if (b:bool) (t:ty) : int =
+  if b
+  then let r = ref 0 in
+       r := (match t with A -> 1 | B -> 2 | C -> 3 end);
+       !r
+  else match t with A -> 2 | B -> 3 | C -> 1 end
 
 end
 

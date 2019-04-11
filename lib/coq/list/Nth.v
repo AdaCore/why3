@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,16 +18,17 @@ Require list.List.
 Require option.Option.
 
 (* Why3 goal *)
-Definition nth {a:Type} {a_WT:WhyType a} : Z -> (list a) -> (option a).
+Definition nth {a:Type} {a_WT:WhyType a} :
+  Numbers.BinNums.Z -> Init.Datatypes.list a -> Init.Datatypes.option a.
 exact (fix nth n l := match l with nil => None | cons h t => if Zeq_bool n Z0 then Some h else nth (n - 1)%Z t end).
 Defined.
 
 (* Why3 goal *)
 Lemma nth_def {a:Type} {a_WT:WhyType a} :
-  forall (n:Z) (l:(list a)),
+  forall (n:Numbers.BinNums.Z) (l:Init.Datatypes.list a),
   match l with
   | Init.Datatypes.nil => ((nth n l) = Init.Datatypes.None)
-  | (Init.Datatypes.cons x r) =>
+  | Init.Datatypes.cons x r =>
       ((n = 0%Z) -> ((nth n l) = (Init.Datatypes.Some x))) /\
       (~ (n = 0%Z) -> ((nth n l) = (nth (n - 1%Z)%Z r)))
   end.

@@ -1,0 +1,133 @@
+module Sqrt1
+
+use int.Int
+use int.EuclideanDivision
+use real.RealInfix
+use real.Square
+use real.FromInt
+use real.Truncate as Trunc
+use mach.int.UInt64
+use int.Power
+use map.Map
+use mach.c.C
+use lemmas.Lemmas
+use mach.fxp.Fxp
+
+meta coercion function rval
+
+let lemma real_sqr_compat (x y: real)
+  requires { 0. <. x <. y }
+  ensures  { x *. x <. y *. y }
+= ()
+
+meta remove_prop axiom real_sqr_compat
+
+let lemma trunc_lower_bound (x: real) (k:int)
+  ensures { x <. trunc_at x k +. pow2 k }
+= assert { x *. pow2 (-k)
+           <. from_int (Trunc.floor (x *. pow2 (-k)) + 1)
+           = from_int (Trunc.floor (x *. pow2 (-k))) +. 1.
+           = from_int (Trunc.floor (x *. pow2 (-k))) *. (pow2 k *. pow2 (-k))
+             +. 1.
+           = trunc_at x k *. pow2 (-k) +. 1.
+           = (trunc_at x k +. pow2 k) *. pow2 (-k) }
+
+val rsa_estimate (a: fxp): fxp
+  requires { 0.25 <=. a <=. 0xffffffffffffffffp-64 }
+  requires { iexp a = - 64 }
+  ensures { iexp result = -8 }
+  ensures { 256 <= ival result <= 511 }
+  ensures { 1. <=. result <=. 2. }
+  ensures { let rsa = 1. /. sqrt a in
+            let e0 = (result -. rsa) /. rsa in -0.00281 <=. e0 <=. 0.002655 }
+
+let sqrt1 (rp: ptr uint64) (a0: uint64): uint64
+  requires { valid rp 1 }
+  requires { 0x4000000000000000 <= a0 }
+  ensures { result * result <= a0 < (result + 1) * (result + 1) }
+  ensures { result * result + (pelts rp)[offset rp] = a0 }
+  ensures { (pelts rp)[offset rp] <= 2 * result }
+=
+  let a = fxp_init a0 (-64) in
+  assert { 0.25 <=. a <=. 0xffffffffffffffffp-64 };
+  assert { 0. <. a };
+  let rsa = pure { 1. /. sqrt a } in
+  let x0 = rsa_estimate a in
+  let e0 = pure { (x0 -. rsa) /. rsa } in
+  let a1 = fxp_lsr a 31 in
+  let ea1 = pure { (a1 -. a) /. a } in
+  let m1 = fxp_sub (fxp_init 0x2000000000000 (-49)) (fxp_init 0x30000 (-49)) in
+  let t1' = fxp_sub m1 (fxp_mul (fxp_mul x0 x0) a1) in
+  let t1 = fxp_asr t1' 16 in
+  let x1 = fxp_add (fxp_lsl x0 16) (fxp_asr' (fxp_mul x0 t1) 18 1) in
+  let mx1 = pure { x0 +. x0 *. t1' *. 0.5 } in
+  assert { (mx1 -. rsa) /. rsa = -0.5 *. (e0 *. e0 *. (3. +. e0) +. (1. +. e0) *. (1. -. m1 +. (1. +. e0) *. (1. +. e0) *. ea1)) };
+  let e1 = pure { (x1 -. rsa) /. rsa } in
+  let a2 = fxp_lsr a 24 in
+  let ea2 = pure { (a2 -. a) /. a } in
+  let u1 = fxp_mul x1 a2 in
+  let eu1 = pure { (u1 -. sqrt a) /. sqrt a } in
+  assert { eu1 = (1. +. e1) *. (1. +. ea2) -. 1. };
+  let u2 = fxp_lsr u1 25 in
+  let eu2 = pure { (u2 -. u1) /. u1 } in
+  let m2 = fxp_init 0x24000000000 (-78) in
+  let t2' = fxp_sub (fxp_sub (fxp_lsl a 14) (fxp_mul u2 u2)) m2 in
+  assert { sqrt a *. sqrt a = a };
+  let t2 = fxp_asr t2' 24 in
+  let x2 = fxp_add u1 (fxp_asr' (fxp_mul x1 t2) 15 1) in
+  let mx2 = pure { u1 +. x1 *. t2' *. 0.5 } in
+  assert { let ee = (1. +. eu1) *. (1. +. eu1) *. eu2 *. (2. +. eu2) +. eu1 *. eu1 in
+           (mx2 -. sqrt a) /. sqrt a = -0.5 *. (ee +. m2 /. a) *. (1. +. e1) -. e1 *. eu1
+           by x1 <> 0. /\ a2 <> 0. };
+  let x = fxp_lsr x2 32 in
+  let sa = pure { trunc_at (sqrt a) (-32) } in
+  assert { -0x1.p-32 <=. x -. sa <=. 0. };
+  let ref c = ival x in
+  assert { c = Trunc.floor (pow2 32 *. x)
+           by x <=. sa <=. 1.
+           so iexp x = -32
+           so pow2 32 *. x <. pow2 32
+           so 0 <= Trunc.floor (pow2 32 *. x)
+                < power 2 32
+                < radix
+           so c = mod (Trunc.floor (pow2 32 *. x)) radix
+                = Trunc.floor (pow2 32 *. x) };
+  assert { c * c <= a0 < (c+2) * (c+2)
+           by x *. x <=. a
+           so from_int a0 = pow2 64 *. a
+           so from_int c = pow2 32 *. x
+           so pow2 32 *. pow2 32 = pow2 64
+           so from_int (c * c) = from_int c *. from_int c
+              = pow2 64 *. (x *. x) <=. from_int a0
+           so c * c <= a0
+           so let x' = x +. 0x2.p-32 in
+              let sa' = sa +. pow2 (-32) in
+              pow2 (-32) = 0x1.p-32
+           so sa' <=. x'
+           so sqrt a <. trunc_at (sqrt a) (-32) +. pow2 (-32) = sa'
+           so a = sqrt a *. sqrt a <. sa' *. sa'<=. x' *. x'
+           so from_int (c + 2) = from_int c +. from_int 2
+              = from_int c +. 2.
+              = pow2 32 *. x +. 2.
+              = pow2 32 *. (x +. 0x2.p-32)
+              = pow2 32 *. x'
+           so from_int a0
+              = pow2 64 *. a
+              <. pow2 64 *. (x' *. x')
+              = from_int ((c+2) * (c+2))
+           };
+  let ref s = c * c in
+  assert { (c+1) * (c+1) <= radix };
+  assert { s + c <= s + c + c < (c+1) * (c+1) <= radix };
+  if (s + 2 * c <= a0 - 1)
+  then begin
+    assert { (c+1) * (c+1) <= a0 };
+    s <- s + 2 * c + 1;
+    c <- c + 1;
+    assert { s = c * c };
+  end;
+  C.set rp (a0 - s);
+  c
+
+  meta remove_prop axiom trunc_lower_bound
+end

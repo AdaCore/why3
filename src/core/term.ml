@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -330,14 +330,7 @@ let t_compare trigger attr t1 t2 =
           | Tvar v1, Tvar v2 ->
               comp_raise (vs_compare v1 v2)
           | Tconst c1, Tconst c2 ->
-              let open Number in
-              begin match c1, c2 with
-              | ConstInt { ic_negative = s1; ic_abs = IConstRaw b1 },
-                ConstInt { ic_negative = s2; ic_abs = IConstRaw b2 } ->
-                  perv_compare s1 s2;
-                  comp_raise (BigInt.compare b1 b2)
-              | _, _ -> perv_compare c1 c2
-              end
+              comp_raise (Number.compare_const c1 c2)
           | Tapp (s1,l1), Tapp (s2,l2) ->
               comp_raise (ls_compare s1 s2);
               List.iter2 (t_compare bnd vml1 vml2) l1 l2
@@ -412,7 +405,7 @@ let t_similar t1 t2 =
   oty_equal t1.t_ty t2.t_ty &&
   match t1.t_node, t2.t_node with
     | Tvar v1, Tvar v2 -> vs_equal v1 v2
-    | Tconst c1, Tconst c2 -> c1 = c2
+    | Tconst c1, Tconst c2 -> Number.compare_const c1 c2 = 0
     | Tapp (s1,l1), Tapp (s2,l2) -> ls_equal s1 s2 && Lists.equal (==) l1 l2
     | Tif (f1,t1,e1), Tif (f2,t2,e2) -> f1 == f2 && t1 == t2 && e1 == e2
     | Tlet (t1,bv1), Tlet (t2,bv2) -> t1 == t2 && bv1 == bv2
@@ -854,33 +847,30 @@ let ps_app ps tl    = t_app ps tl None
 
 let t_nat_const n =
   assert (n >= 0);
-  t_const (Number.const_of_int n) ty_int
+  t_const (Number.int_const_of_int n) ty_int
 
-let t_bigint_const n = t_const (Number.const_of_big_int n) Ty.ty_int
+let t_int_const n =
+  t_const (Number.int_const n) Ty.ty_int
+
+let t_real_const ?pow2 ?pow5 s =
+  t_const (Number.real_const ?pow2 ?pow5 s) Ty.ty_real
 
 exception InvalidIntegerLiteralType of ty
 exception InvalidRealLiteralType of ty
 
 let check_literal c ty =
-  let ts = match ty.ty_node with
-    | Tyapp (ts,[]) -> ts
-    | _ -> match c with
-           | Number.ConstInt _ -> raise (InvalidIntegerLiteralType ty)
-           | Number.ConstReal _ -> raise (InvalidRealLiteralType ty)
-  in
-  match c with
-  | Number.ConstInt _ when ts_equal ts ts_int -> ()
-  | Number.ConstInt n ->
-     begin match ts.ts_def with
-           | Range ir -> Number.(check_range n ir)
-           | _ -> raise (InvalidIntegerLiteralType ty)
-     end
-  | Number.ConstReal _ when ts_equal ts ts_real -> ()
-  | Number.ConstReal x ->
-     begin match ts.ts_def with
-           | Float fp -> Number.(check_float x.Number.rc_abs fp)
-           | _ -> raise (InvalidRealLiteralType ty)
-     end
+  let open Number in
+  let ts = match ty.ty_node, c with
+    | Tyapp (ts,[]), _ -> ts
+    | _, ConstInt _ -> raise (InvalidIntegerLiteralType ty)
+    | _, ConstReal _ -> raise (InvalidRealLiteralType ty) in
+  match c, ts.ts_def with
+  | ConstInt _, _ when ts_equal ts ts_int -> ()
+  | ConstInt n, Range ir -> check_range n ir
+  | ConstInt _, _ -> raise (InvalidIntegerLiteralType ty)
+  | ConstReal _, _ when ts_equal ts ts_real -> ()
+  | ConstReal x, Float fp -> check_float x fp
+  | ConstReal _, _ -> raise (InvalidRealLiteralType ty)
 
 let t_const c ty = check_literal c ty; t_const c ty
 

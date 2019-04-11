@@ -14,22 +14,22 @@ theory Graph
   type vertex
   type graph
 
-  function vertices graph: S.set vertex
+  function vertices graph: S.fset vertex
 
-  function edges graph: S.set (vertex , vertex)
+  function edges graph: S.fset (vertex , vertex)
 
   axiom edges_use_vertices:
   forall g:graph. forall x y:vertex.
     S.mem (x,y) (edges g) -> (S.mem x (vertices g) /\ S.mem y (vertices g))
 
   (** direct predecessors *)
-  function preds graph vertex: S.set vertex
+  function preds graph vertex: S.fset vertex
 
   axiom preds_def:  forall g:graph. forall v:vertex. forall u:vertex.
    S.mem (u,v) (edges g) <-> S.mem u (preds g v)
 
   (** direct successors *)
-  function succs graph vertex: S.set vertex
+  function succs graph vertex: S.fset vertex
   axiom succs_def:  forall g:graph. forall v:vertex. forall u:vertex.
    S.mem (u,v) (edges g) <-> S.mem v (succs g u)
 
@@ -49,19 +49,19 @@ module Static
   use Graph
   use set.Fset as Fset
 
-  clone impset.Impset as S with type elt = vertex
-  clone appset.Appset as SA with type elt = vertex
+  clone set.SetImp as S with type elt = vertex
+  clone set.SetApp as SA with type elt = vertex
   clone impmap.ImpmapNoDom with type key = vertex
 
-  val ghost function defined_sort (m: t int): Fset.set vertex
+  val ghost function defined_sort (m: t int): Fset.fset vertex
     ensures { forall v: vertex [Fset.mem v result].
               Fset.mem v result <-> 0 <= m[v] }
 
-  val get_preds (g: graph) (v: vertex): S.t
-    ensures { result.S.contents = preds g v }
+  val get_preds (g: graph) (v: vertex): S.set
+    ensures { result.S.to_fset = preds g v }
 
-  val get_vertices (g: graph): S.t
-    ensures { result.S.contents = vertices g }
+  val get_vertices (g: graph): S.set
+    ensures { result.S.to_fset = vertices g }
 
   predicate partial_sort (g: graph) (m: t int) =
     forall v:vertex. forall u:vertex.
@@ -75,10 +75,10 @@ module Static
     partial_sort g m &&
     forall v:vertex. Fset.mem v (defined_sort m) -> m[v] < next
 
-  let rec dfs (g: graph) (v: vertex) (seen: SA.t) (values: t int) (next: ref int): unit
+  let rec dfs (g: graph) (v: vertex) (seen: SA.set) (values: t int) (next: ref int): unit
     requires { inv g values !next }
     requires { Fset.mem v (vertices g) }
-    requires { Fset.subset seen.SA.contents (vertices g) }
+    requires { Fset.subset seen.SA.to_fset (vertices g) }
     variant { Fset.cardinal (vertices g) - SA.cardinal seen }
     ensures { Fset.subset (defined_sort (old values)) (defined_sort values) }
     ensures { 0 <= values[v] <= !next}
@@ -92,9 +92,9 @@ module Static
       let seen = SA.add v seen in
       while not (S.is_empty p) do
         invariant { inv g values !next }
-        invariant { Fset.subset (Fset.diff (preds g v) p.S.contents) (defined_sort values) }
+        invariant { Fset.subset (Fset.diff (preds g v) p.S.to_fset) (defined_sort values) }
         invariant { Fset.subset (defined_sort (old values)) (defined_sort values) }
-        invariant { Fset.subset p.S.contents (preds g v) }
+        invariant { Fset.subset p.S.to_fset (preds g v) }
         invariant { forall x:vertex. SA.mem x seen -> values[x] = old values[x] }
         variant { S.cardinal p }
         let u = S.choose_and_remove p in
@@ -113,11 +113,11 @@ module Static
     let p = get_vertices g in
     while not (S.is_empty p) do
       invariant { inv g values !next }
-      invariant { Fset.subset p.S.contents (vertices g) }
-      invariant { Fset.subset (Fset.diff (vertices g) p.S.contents) (defined_sort values) }
+      invariant { Fset.subset p.S.to_fset (vertices g) }
+      invariant { Fset.subset (Fset.diff (vertices g) p.S.to_fset) (defined_sort values) }
       variant { S.cardinal p }
       let u = S.choose_and_remove p in
-      dfs g u SA.empty values next
+      dfs g u (SA.empty ()) values next
     done;
     values
 
@@ -144,12 +144,12 @@ module Online_Basic
   use Online_graph
   use set.Fset
 
-  clone impset.Impset as S with type elt = vertex
-  clone appset.Appset as SA with type elt = vertex
+  clone set.SetImp as S with type elt = vertex
+  clone set.SetApp as SA with type elt = vertex
   clone import impmap.ImpmapNoDom as M with type key = vertex
 
-  val get_succs (g: graph) (v: vertex): S.t
-    ensures { result.S.contents = succs g v }
+  val get_succs (g: graph) (v: vertex): S.set
+    ensures { result.S.to_fset = succs g v }
 
   exception Cycle_found
 
@@ -166,10 +166,10 @@ module Online_Basic
      ensures  { inv result }
   = { graph = g; values = create 0 }
 
-  let rec dfs (g: t) (v: vertex) (seen: SA.t) (min_depth: int): unit
+  let rec dfs (g: t) (v: vertex) (seen: SA.set) (min_depth: int): unit
     requires { inv g }
     requires { Fset.mem v (vertices g.graph) }
-    requires { Fset.subset seen.SA.contents (vertices g.graph) }
+    requires { Fset.subset seen.SA.to_fset (vertices g.graph) }
     raises  { Cycle_found -> true }
     variant { Fset.cardinal (vertices g.graph) - SA.cardinal seen }
     ensures { min_depth <= g.values[v] }
@@ -184,7 +184,7 @@ module Online_Basic
       while not (S.is_empty p) do
         invariant { inv g }
         invariant { forall s:vertex. Fset.mem s (succs g.graph v) -> not (S.mem s p) -> min_depth < g.values[s] }
-        invariant { S.subset p.S.contents (succs g.graph v) }
+        invariant { S.subset p.S.to_fset (succs g.graph v) }
         invariant { forall x:vertex. SA.mem x seen -> g.values[x] = old g.values[x] }
         invariant { forall x:vertex. old g.values[x] <= g.values[x] }
         variant { S.cardinal p }
@@ -202,7 +202,7 @@ module Online_Basic
     ensures  { g.graph = add_edge (old g.graph) x y }
     raises   { Cycle_found -> true }
   =
-    let seen = SA.empty in
+    let seen = SA.empty () in
     let seen = SA.add x seen in
     dfs g y seen (g.values[x] + 1);
     g.graph <- add_edge g.graph x y

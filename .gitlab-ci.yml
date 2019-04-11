@@ -93,7 +93,7 @@ full-4.07.1:
   variables:
     COMPILER: 4.07.1
     DEBIAN_PACKAGES: hevea rubber texlive-latex-extra lmodern texlive-fonts-recommended
-    OPAM_PACKAGES: coq-flocq.2.6.1 js_of_ocaml-ppx alt-ergo.2.0.0
+    OPAM_PACKAGES: coq-flocq.3.1.0 js_of_ocaml-ppx alt-ergo.2.0.0
   script:
     - misc/ci-docker.sh misc/ci-local.sh bench ide doc
 
@@ -102,7 +102,7 @@ nightly-bench:
   variables:
     COMPILER: 4.05.0
     DEBIAN_PACKAGES: cvc3 spass
-    OPAM_PACKAGES: alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.1 coq-flocq.2.6.1
+    OPAM_PACKAGES: alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.2 coq-flocq.3.1.0
   script:
     - misc/ci-docker.sh misc/ci-local.sh nightly-bench-reduced
 
@@ -111,7 +111,7 @@ ce-bench:
   variables:
     COMPILER: 4.05.0
     DEBIAN_PACKAGES: cvc3 spass
-    OPAM_PACKAGES: alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.1 coq-flocq.2.6.1
+    OPAM_PACKAGES: alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.2 coq-flocq.3.1.0
   script:
     - misc/ci-docker.sh misc/ci-local.sh ce-bench
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -40,7 +40,7 @@ Hypothesis Unit_def_l : forall (x:t), ((infix_as one x) = x).
 Hypothesis Unit_def_r : forall (x:t), ((infix_as x one) = x).
 
 (* Why3 goal *)
-Definition power : t -> Z -> t.
+Definition power : t -> Numbers.BinNums.Z -> t.
 intros x n.
 exact (iter_nat (Zabs_nat n) t (fun acc => infix_as x acc) one).
 Defined.
@@ -53,7 +53,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_s :
-  forall (x:t) (n:Z), (0%Z <= n)%Z ->
+  forall (x:t) (n:Numbers.BinNums.Z), (0%Z <= n)%Z ->
   ((power x (n + 1%Z)%Z) = (infix_as x (power x n))).
 Proof.
 intros x n h1.
@@ -64,7 +64,7 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_s_alt :
-  forall (x:t) (n:Z), (0%Z < n)%Z ->
+  forall (x:t) (n:Numbers.BinNums.Z), (0%Z < n)%Z ->
   ((power x n) = (infix_as x (power x (n - 1%Z)%Z))).
 Proof.
 intros x n h1.
@@ -80,8 +80,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_sum :
-  forall (x:t) (n:Z) (m:Z), (0%Z <= n)%Z -> (0%Z <= m)%Z ->
-  ((power x (n + m)%Z) = (infix_as (power x n) (power x m))).
+  forall (x:t) (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z), (0%Z <= n)%Z ->
+  (0%Z <= m)%Z -> ((power x (n + m)%Z) = (infix_as (power x n) (power x m))).
 Proof.
 intros x n m Hn Hm.
 revert n Hn.
@@ -96,8 +96,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_mult :
-  forall (x:t) (n:Z) (m:Z), (0%Z <= n)%Z -> (0%Z <= m)%Z ->
-  ((power x (n * m)%Z) = (power (power x n) m)).
+  forall (x:t) (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z), (0%Z <= n)%Z ->
+  (0%Z <= m)%Z -> ((power x (n * m)%Z) = (power (power x n) m)).
 Proof.
 intros x n m Hn Hm.
 revert m Hm.
@@ -112,8 +112,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_comm1 :
-  forall (x:t) (y:t), ((infix_as x y) = (infix_as y x)) -> forall (n:Z),
-  (0%Z <= n)%Z -> ((infix_as (power x n) y) = (infix_as y (power x n))).
+  forall (x:t) (y:t), ((infix_as x y) = (infix_as y x)) ->
+  forall (n:Numbers.BinNums.Z), (0%Z <= n)%Z ->
+  ((infix_as (power x n) y) = (infix_as y (power x n))).
 Proof.
 intros x y comm.
 apply natlike_ind.
@@ -130,8 +131,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Power_comm2 :
-  forall (x:t) (y:t), ((infix_as x y) = (infix_as y x)) -> forall (n:Z),
-  (0%Z <= n)%Z ->
+  forall (x:t) (y:t), ((infix_as x y) = (infix_as y x)) ->
+  forall (n:Numbers.BinNums.Z), (0%Z <= n)%Z ->
   ((power (infix_as x y) n) = (infix_as (power x n) (power y n))).
 Proof.
 intros x y comm.

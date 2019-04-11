@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,7 +11,6 @@
 
 %{
   open Driver_ast
-
 %}
 
 %token <int> INTEGER
@@ -31,6 +30,7 @@
 %token FUNCTION PREDICATE TYPE PROP ALL FILENAME TRANSFORM PLUGIN
 %token COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
+%token PREC
 
 %nonassoc SYNTAX REMOVE PRELUDE INTERFACE
 %nonassoc prec_pty
@@ -211,6 +211,11 @@ mrule:
 | trule                          { MRtheory $1 }
 | INTERFACE STRING               { MRinterface ($2) }
 | SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
-| SYNTAX VAL qualid STRING       { MRval ($3, $4) }
+| SYNTAX VAL qualid STRING       { MRval ($3, $4, []) }
+| SYNTAX VAL qualid STRING precedence
+                                 { MRval ($3, $4, $5) }
+
+precedence:
+| PREC list(INTEGER) { $2 }
 
 loc(X): X { Loc.extract ($startpos,$endpos), $1 }

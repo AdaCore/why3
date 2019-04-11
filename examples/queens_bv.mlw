@@ -20,17 +20,18 @@ Verification of the following 2-lines C program solving the N-queens problem:
 
 theory S
 
-  use export set.Fsetint
+  use int.Int
+  use export set.FsetInt
 
-  function succ (set int) : set int
+  function succ (fset int) : fset int
 
   axiom succ_def:
-    forall s: set int, i: int. mem i (succ s) <-> i >= 1 /\ mem (i-1) s
+    forall s: fset int, i: int. mem i (succ s) <-> i >= 1 /\ mem (i-1) s
 
-  function pred (set int) : set int
+  function pred (fset int) : fset int
 
   axiom pred_def:
-    forall s: set int, i: int. mem i (pred s) <-> i >= 0 /\ mem (i+1) s
+    forall s: fset int, i: int. mem i (pred s) <-> i >= 0 /\ mem (i+1) s
 
 end
 
@@ -86,12 +87,13 @@ end
 
 module BitsSpec
 
+  use int.Int
   use S
 
   constant size : int = 32
 
   type t = private {
-    ghost mdl: set int;
+    ghost mdl: fset int;
   }
   invariant { forall i. mem i mdl -> 0 <= i < size }
 
@@ -138,6 +140,7 @@ end
 
 module Bits
 
+  use int.Int
   use S
   use bv.BV32
 
@@ -145,7 +148,7 @@ module Bits
 
   type t = {
           bv : BV32.t;
-    ghost mdl: set int;
+    ghost mdl: fset int;
   }
   invariant {
     forall i: int. (0 <= i < size /\ nth bv i) <-> mem i mdl

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -37,6 +37,7 @@ val file_of_theory : driver -> string -> Theory.theory -> string
 (** [file_of_theory d f th] produces a filename
     for the prover of driver [d], for a theory [th] from filename [f] *)
 
+(* unused outside ?
 val call_on_buffer :
   command      : string ->
   limit        : Call_provers.resource_limit ->
@@ -44,8 +45,8 @@ val call_on_buffer :
   ?inplace     : bool ->
   filename     : string ->
   printer_mapping : Printer.printer_mapping ->
-  driver -> Buffer.t -> Call_provers.server_id
-
+  driver -> Buffer.t -> Call_provers.prover_call
+ *)
 
 val print_task :
   ?old        : in_channel ->

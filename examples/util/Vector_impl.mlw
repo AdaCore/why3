@@ -93,14 +93,13 @@ module Impl
 
   let unsafe_resize (a: t 'a) (n: int63) : unit
     requires { 0 <= n <= max_array_length }
-    writes   { a.data, a.size, a.data.elts, a.view }
     ensures  { n = a.size }
     ensures  { forall i. 0 <= i < MinMax.min ((old a).size) n ->
                  Seq.([]) a.view i = Seq.([]) (old a).view i }
   = let n_old = A.length a.data in
     if n <= a.size then
       (* shrink *)
-      if n < n_old / (of_int 4) then begin (* reallocate into a smaller array *)
+      if n < n_old / 4 then begin (* reallocate into a smaller array *)
         a.data <- A.sub a.data zero n;
         a.view <- a.view[.. to_int n] end
       else begin
@@ -109,12 +108,12 @@ module Impl
     else begin
       (* grow *)
       if n > n_old then begin (* reallocate into a larger array *)
-        let n_div2 = n / of_int 2 in
+        let n_div2 = n / 2 in
         let n' =
           if n_div2 >= n_old then
-            if max_array_length / of_int 2 >= n_div2 then n
+            if max_array_length / 2 >= n_div2 then n
             else max_array_length
-          else if max_array_length / of_int 2 >= n_old then (of_int 2) * n_old
+          else if max_array_length / 2 >= n_old then 2 * n_old
           else max_array_length in
         let a' = A.make n' a.dummy in
         A.blit a.data zero a' zero a.size;
@@ -127,7 +126,6 @@ module Impl
     a.size <- n
 
   let resize (a: t 'a) (n: int63) : unit
-    writes   { a.data, a.size, a.data.elts, a.view }
     ensures  { n = a.size }
     ensures  { forall i. 0 <= i < MinMax.min ((old a).size) n ->
                  Seq.([]) a.view i = Seq.([]) (old a).view i }
@@ -138,7 +136,6 @@ module Impl
   (** Array interface *)
 
   let clear (a: t 'a) : unit
-    writes   { a.data.elts, a.size, a.data, a.view }
     ensures  { a.size = 0 }
   = unsafe_resize a zero
 

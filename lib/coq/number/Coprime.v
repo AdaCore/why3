@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -23,7 +23,8 @@ Require number.Gcd.
 Require number.Prime.
 
 (* Why3 assumption *)
-Definition coprime (a:Z) (b:Z) : Prop := ((number.Gcd.gcd a b) = 1%Z).
+Definition coprime (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) : Prop :=
+  ((number.Gcd.gcd a b) = 1%Z).
 
 Lemma coprime_is_Zrel_prime :
   forall a b, coprime a b <-> Znumtheory.rel_prime a b.
@@ -37,9 +38,10 @@ Qed.
 
 (* Why3 goal *)
 Lemma prime_coprime :
-  forall (p:Z),
-  (number.Prime.prime p) <->
-  ((2%Z <= p)%Z /\ forall (n:Z), ((1%Z <= n)%Z /\ (n < p)%Z) -> coprime n p).
+  forall (p:Numbers.BinNums.Z),
+  number.Prime.prime p <->
+  (2%Z <= p)%Z /\
+  (forall (n:Numbers.BinNums.Z), (1%Z <= n)%Z /\ (n < p)%Z -> coprime n p).
 intros p.
 (*
 Znumtheory.prime_intro:
@@ -64,8 +66,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma Gauss :
-  forall (a:Z) (b:Z) (c:Z),
-  ((number.Divisibility.divides a (b * c)%Z) /\ (coprime a b)) ->
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  number.Divisibility.divides a (b * c)%Z /\ coprime a b ->
   number.Divisibility.divides a c.
 intros a b c (h1,h2).
 apply Znumtheory.Gauss with b; auto.
@@ -74,9 +76,9 @@ Qed.
 
 (* Why3 goal *)
 Lemma Euclid :
-  forall (p:Z) (a:Z) (b:Z),
-  ((number.Prime.prime p) /\ (number.Divisibility.divides p (a * b)%Z)) ->
-  (number.Divisibility.divides p a) \/ (number.Divisibility.divides p b).
+  forall (p:Numbers.BinNums.Z) (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z),
+  number.Prime.prime p /\ number.Divisibility.divides p (a * b)%Z ->
+  number.Divisibility.divides p a \/ number.Divisibility.divides p b.
 intros p a b (h1,h2).
 apply Znumtheory.prime_mult; auto.
 now rewrite <- Prime.prime_is_Zprime.
@@ -84,8 +86,8 @@ Qed.
 
 (* Why3 goal *)
 Lemma gcd_coprime :
-  forall (a:Z) (b:Z) (c:Z), (coprime a b) ->
-  ((number.Gcd.gcd a (b * c)%Z) = (number.Gcd.gcd a c)).
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  coprime a b -> ((number.Gcd.gcd a (b * c)%Z) = (number.Gcd.gcd a c)).
 intros a b c h1.
 apply Z.gcd_unique.
 - apply Z.gcd_nonneg.

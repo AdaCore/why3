@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -53,26 +53,51 @@ let string_list_of_qualid q =
     | Qident id -> id.id_str :: acc in
   sloq [] q
 
-exception UnboundSymbol of qualid
+(* Type of sumbol queried *)
+type symbol_kind =
+  | Prop
+  | Type
+  | Fun_pre
+  | Fun
+  | Predicate
+  | Exc
+  | Prog
 
-let find_qualid get_id find ns q =
+let symbol_kind_to_string qs =
+  match qs with
+  | Prop      -> "proposition"
+  | Type      -> "type"
+  | Fun_pre   -> "function or predicate"
+  | Fun       -> "function"
+  | Predicate -> "predicate"
+  | Exc       -> "exception"
+  | Prog      -> "program function or variable"
+
+(* [UnboundSymbol (s, q)]: s is the type of the qualid searched. It depends on
+   the namespace queried: find_*_ns. *)
+exception UnboundSymbol of (symbol_kind * qualid)
+
+let find_qualid ~ty get_id find ns q =
   let sl = string_list_of_qualid q in
   let r = try find ns sl with Not_found ->
-    Loc.error ~loc:(qloc q) (UnboundSymbol q) in
+    Loc.error ~loc:(qloc q) (UnboundSymbol (ty, q)) in
   if Debug.test_flag Glob.flag then Glob.use ~kind:"" (qloc_last q) (get_id r);
   r
 
-let find_prop_ns     ns q = find_qualid (fun pr -> pr.pr_name) ns_find_pr ns q
-let find_tysymbol_ns ns q = find_qualid (fun ts -> ts.ts_name) ns_find_ts ns q
-let find_lsymbol_ns  ns q = find_qualid (fun ls -> ls.ls_name) ns_find_ls ns q
+let find_prop_ns     ns q =
+  find_qualid ~ty:Prop (fun pr -> pr.pr_name) ns_find_pr ns q
+let find_tysymbol_ns ns q =
+  find_qualid ~ty:Type (fun ts -> ts.ts_name) ns_find_ts ns q
+let find_lsymbol_ns ?ty ns q =
+  find_qualid ~ty:(Opt.get_def Fun_pre ty) (fun ls -> ls.ls_name) ns_find_ls ns q
 
 let find_fsymbol_ns ns q =
-  let ls = find_lsymbol_ns ns q in
+  let ls = find_lsymbol_ns ~ty:Fun ns q in
   if ls.ls_value <> None then ls else
     Loc.error ~loc:(qloc q) (FunctionSymbolExpected ls)
 
 let find_psymbol_ns ns q =
-  let ls = find_lsymbol_ns ns q in
+  let ls = find_lsymbol_ns ~ty:Predicate ns q in
   if ls.ls_value = None then ls else
     Loc.error ~loc:(qloc q) (PredicateSymbolExpected ls)
 
@@ -92,10 +117,10 @@ let find_prop_of_kind k tuc q =
         | Plemma -> "a lemma" | Paxiom -> "an axiom" | Pgoal -> "a goal")
 
 let find_itysymbol_ns ns q =
-  find_qualid (fun s -> s.its_ts.ts_name) Pmodule.ns_find_its ns q
+  find_qualid ~ty:Type (fun s -> s.its_ts.ts_name) Pmodule.ns_find_its ns q
 
 let find_xsymbol_ns ns q =
-  find_qualid (fun s -> s.xs_name) Pmodule.ns_find_xs ns q
+  find_qualid ~ty:Exc (fun s -> s.xs_name) Pmodule.ns_find_xs ns q
 
 let find_prog_symbol_ns ns p =
   let get_id_ps = function
@@ -104,7 +129,7 @@ let find_prog_symbol_ns ns p =
       (* FIXME: this is incorrect, but we cannot
         know the correct symbol at this stage *)
     | OO ss -> (Srs.choose ss).rs_name in
-  find_qualid get_id_ps ns_find_prog_symbol ns p
+  find_qualid ~ty:Prog get_id_ps ns_find_prog_symbol ns p
 
 (** Parsing types *)
 
@@ -1565,6 +1590,7 @@ let add_decl loc d =
 (** Exception printing *)
 
 let () = Exn_printer.register (fun fmt e -> match e with
-  | UnboundSymbol q ->
-      Format.fprintf fmt "unbound symbol '%a'" print_qualid q
+  | UnboundSymbol (ty, q) ->
+      Format.fprintf fmt "unbound %s symbol '%a'" (symbol_kind_to_string ty)
+        print_qualid q
   | _ -> raise e)

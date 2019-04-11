@@ -18,31 +18,31 @@ theory BuiltIn
 
   prelude "Require Import BuiltIn."
 
-  syntax type int "Z"
-  syntax type real "R"
+  syntax type int "Numbers.BinNums.Z"
+  syntax type real "Reals.Rdefinitions.R"
   syntax predicate  (=)   "(%1 = %2)"
 end
 
 
 theory Unit
-  syntax type unit "unit"
+  syntax type unit "Init.Datatypes.unit"
 end
 
 theory Bool
 
-  syntax type bool   "bool"
+  syntax type bool "Init.Datatypes.bool"
 
-  syntax function True  "true"
-  syntax function False "false"
+  syntax function True  "Init.Datatypes.true"
+  syntax function False "Init.Datatypes.false"
 end
 
 theory bool.Bool
 
-  syntax function andb  "(Init.Datatypes.andb %1 %2)"
-  syntax function orb   "(Init.Datatypes.orb %1 %2)"
-  syntax function xorb  "(Init.Datatypes.xorb %1 %2)"
-  syntax function notb  "(Init.Datatypes.negb %1)"
-  syntax function implb "(Init.Datatypes.implb %1 %2)"
+  syntax function andb  "Init.Datatypes.andb"
+  syntax function orb   "Init.Datatypes.orb"
+  syntax function xorb  "Init.Datatypes.xorb"
+  syntax function notb  "Init.Datatypes.negb"
+  syntax function implb "Init.Datatypes.implb"
 
 end
 
@@ -86,7 +86,7 @@ end
 
 theory int.Abs
 
-  syntax function abs "(ZArith.BinInt.Z.abs %1)"
+  syntax function abs "ZArith.BinInt.Z.abs"
 
   remove prop Abs_pos
 
@@ -94,8 +94,8 @@ end
 
 theory int.MinMax
 
-  syntax function min "(ZArith.BinInt.Z.min %1 %2)"
-  syntax function max "(ZArith.BinInt.Z.max %1 %2)"
+  syntax function min "ZArith.BinInt.Z.min"
+  syntax function max "ZArith.BinInt.Z.max"
 
 end
 
@@ -105,8 +105,8 @@ end
 
 theory int.EuclideanDivision
 
-  syntax function div "(ZArith.BinInt.Z.div %1 %2)"
-  syntax function mod "(ZArith.BinInt.Z.modulo %1 %2)"
+  syntax function div "ZArith.BinInt.Z.div"
+  syntax function mod "ZArith.BinInt.Z.modulo"
 
   remove prop Div_mod
   remove prop Div_bound
@@ -123,8 +123,8 @@ theory int.ComputerDivision
      with the same convention as mainstream programming language
      such C, Java, OCaml *)
 
-  syntax function div "(ZArith.BinInt.Z.quot %1 %2)"
-  syntax function mod "(ZArith.BinInt.Z.rem %1 %2)"
+  syntax function div "ZArith.BinInt.Z.quot"
+  syntax function mod "ZArith.BinInt.Z.rem"
 
   remove prop Div_mod
   remove prop Div_bound
@@ -154,7 +154,7 @@ theory real.Real
   syntax function (-_) "(-%1)%R"
   syntax function (*)  "(%1 * %2)%R"
   syntax function (/)  "(%1 / %2)%R"
-  syntax function inv  "(Reals.Rdefinitions.Rinv %1)"
+  syntax function inv  "(/ %1)%R"
 
   syntax predicate (<=) "(%1 <= %2)%R"
   syntax predicate (<)  "(%1 < %2)%R"
@@ -206,7 +206,7 @@ theory real.Abs
 
   prelude "Require Reals.Rbasic_fun."
 
-  syntax function abs "(Reals.Rbasic_fun.Rabs %1)"
+  syntax function abs "Reals.Rbasic_fun.Rabs"
 
   remove prop Abs_le
   remove prop Abs_pos
@@ -215,14 +215,14 @@ end
 
 theory real.MinMax
 
-  syntax function min "(Reals.Rbasic_fun.Rmin %1 %2)"
-  syntax function max "(Reals.Rbasic_fun.Rmax %1 %2)"
+  syntax function min "Reals.Rbasic_fun.Rmin"
+  syntax function max "Reals.Rbasic_fun.Rmax"
 
 end
 
 theory real.FromInt
 
-  syntax function from_int "(BuiltIn.IZR %1)"
+  syntax function from_int "BuiltIn.IZR"
 
   remove prop Zero
   remove prop One
@@ -237,8 +237,8 @@ theory real.Square
 
   prelude "Require Reals.R_sqrt."
 
-  syntax function sqr  "(Reals.RIneq.Rsqr %1)"
-  syntax function sqrt "(Reals.R_sqrt.sqrt %1)"  (* and not Rsqrt *)
+  syntax function sqr  "Reals.RIneq.Rsqr"
+  syntax function sqrt "Reals.R_sqrt.sqrt"  (* and not Rsqrt *)
 
   remove prop Sqrt_positive
   remove prop Sqrt_square
@@ -251,8 +251,8 @@ theory real.ExpLog
   prelude "Require Reals.Rtrigo_def."
   prelude "Require Reals.Rpower."
 
-  syntax function exp "(Reals.Rtrigo_def.exp %1)"
-  syntax function log "(Reals.Rpower.ln %1)"
+  syntax function exp "Reals.Rtrigo_def.exp"
+  syntax function log "Reals.Rpower.ln"
 
   remove prop Exp_zero
   remove prop Exp_sum
@@ -267,7 +267,7 @@ theory real.PowerInt
 
   prelude "Require Reals.Rfunctions."
 
-  syntax function power "(Reals.Rfunctions.powerRZ %1 %2)"
+  syntax function power "Reals.Rfunctions.powerRZ"
 
   remove prop Power_0 (* already as powerRZ_O *)
   (* remove prop Power_s *)
@@ -279,7 +279,7 @@ end
 
 theory real.PowerReal
 
-  syntax function pow "(Reals.Rpower.Rpower %1 %2)"
+  syntax function pow "Reals.Rpower.Rpower"
 
 end
 
@@ -289,14 +289,14 @@ theory real.Trigonometry
   prelude "Require Reals.Rtrigo1."
   prelude "Require Reals.Ratan."
 
-  syntax function cos "(Reals.Rtrigo_def.cos %1)"
-  syntax function sin "(Reals.Rtrigo_def.sin %1)"
+  syntax function cos "Reals.Rtrigo_def.cos"
+  syntax function sin "Reals.Rtrigo_def.sin"
 
   syntax function pi "Reals.Rtrigo1.PI"
 
-  syntax function tan "(Reals.Rtrigo1.tan %1)"
+  syntax function tan "Reals.Rtrigo1.tan"
 
-  syntax function atan "(Reals.Ratan.atan %1)"
+  syntax function atan "Reals.Ratan.atan"
 
   remove prop Pythagorean_identity
   remove prop Cos_le_one
@@ -312,41 +312,41 @@ end
 
 theory list.List
 
-  syntax type list "(list %1)"
+  syntax type list "Init.Datatypes.list"
   syntax function Nil "Init.Datatypes.nil"
-  syntax function Cons "(Init.Datatypes.cons %1 %2)"
+  syntax function Cons "Init.Datatypes.cons"
 
 end
 
 theory list.Append
 
-  syntax function (++) "(Init.Datatypes.app %1 %2)"
+  syntax function (++) "Init.Datatypes.app"
 
 end
 
 theory list.Reverse
 
-  syntax function reverse "(Lists.List.rev %1)"
+  syntax function reverse "Lists.List.rev"
 
 end
 
 theory list.RevAppend
 
-  syntax function rev_append "(Lists.List.rev_append %1 %2)"
+  syntax function rev_append "Lists.List.rev_append"
 
 end
 
 theory list.Combine
 
-  syntax function combine "(Lists.List.combine %1 %2)"
+  syntax function combine "Lists.List.combine"
 
 end
 
 theory option.Option
 
-  syntax type option "(option %1)"
+  syntax type option "Init.Datatypes.option"
   syntax function None "Init.Datatypes.None"
-  syntax function Some "(Init.Datatypes.Some %1)"
+  syntax function Some "Init.Datatypes.Some"
 
 end
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,10 +16,11 @@ Require BuiltIn.
 Require list.List.
 
 (* Why3 assumption *)
-Fixpoint mem {a:Type} {a_WT:WhyType a} (x:a) (l:(list a)) {struct l}: Prop :=
+Fixpoint mem {a:Type} {a_WT:WhyType a} (x:a)
+  (l:Init.Datatypes.list a) {struct l}: Prop :=
   match l with
   | Init.Datatypes.nil => False
-  | (Init.Datatypes.cons y r) => (x = y) \/ (mem x r)
+  | Init.Datatypes.cons y r => (x = y) \/ mem x r
   end.
 
 Lemma mem_std :

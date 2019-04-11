@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -114,8 +114,9 @@ module Print = struct
 
   let print_constant fmt e = begin match e.e_node with
     | Econst c ->
-        let s = BigInt.to_string (Number.compute_int_constant c) in
-        if c.Number.ic_negative then fprintf fmt "(%s)" s
+        let v = c.Number.il_int in
+        let s = BigInt.to_string v in
+        if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" s
         else fprintf fmt "%s" s
     | _ -> assert false end
 
@@ -198,11 +199,11 @@ module Print = struct
     | Lvar (pv, e) ->
         fprintf fmt "@[<hov 2>val %a =@ %a@]" (print_lident info) (pv_name pv)
           (print_expr info) e
-    | Lsym (rs, _, [], ef) ->
+    | Lsym (rs, _, _, [], ef) ->
         (* TODO? zero-arguments functions as Lvar in compile.Translate *)
         fprintf fmt "@[<hov 2>val %a =@ @[%a@]@]"
           (print_lident info) rs.rs_name (print_expr info) ef;
-    | Lsym (rs, _, args, ef) ->
+    | Lsym (rs, _, _, args, ef) ->
         fprintf fmt "@[<hov 2>fun %a @[%a@] =@ @[%a@]@]"
           (print_lident info) rs.rs_name
           (print_list space (print_vs_arg info)) args
@@ -218,13 +219,13 @@ module Print = struct
                 (print_fun_type_args info) (args, s, res, e);
               forget_vars args in
         print_list_next newline print_one fmt rdef;
-    | Lany (rs, _, _) ->
+    | Lany (rs, _, _, _) ->
         check_val_in_drv info rs
 
   and print_expr ?(paren=false) info fmt e =
     match e.e_node with
     | Econst c ->
-        let n = Number.compute_int_constant c in
+        let n = c.Number.il_int in
         let n = BigInt.to_string n in
         let id = match e.e_ity with
           | I { ity_node = Ityapp ({its_ts = ts},_,_) } -> ts.ts_name

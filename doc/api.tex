@@ -19,6 +19,7 @@ with a few other examples.
 \lstset{language={[Objective]Caml}}
 
 \section{Building Propositional Formulas}
+\label{sec:prop_form}
 
 The first step is to know how to build propositional formulas. The
 module \texttt{Term} gives a few functions for building these. Here is
@@ -370,6 +371,75 @@ We can then construct the proofs tasks for our module, and then try to
 call the Alt-Ergo prover. The rest of that code is using OCaml
 functions that were already introduced before.
 \lstinputlisting{generated/mlw_tree__checkingvcs.ml}
+
+\section{Generating counterexamples}
+\label{sec:ce_api}
+
+That feature is presented in details in Section~\ref{sec:idece}, that
+should be read first.  The counterexamples can also be generated using
+the API. The following explains how to change the source code (mainly
+adding attributes) in order to display counterexamples and how to
+parse the result given by Why3.  To illustrate this, we will adapt the
+examples from Section~\ref{sec:prop_form} to display counterexamples.
+
+\subsection{Attributes and locations on identifiers}
+
+For variables to be used for counterexamples they need to contain an attribute
+called \verb|model_trace| and a location. The \verb|model_trace| states the
+name the user wants the variable to be named in the output of the
+counterexamples pass. Usually, people put a reference to their program AST node
+in this attribute: this helps them to parse and display the results given by
+Why3.
+The locations are also necessary as every counterexamples values with no
+location won't be displayed. For example, an assignment of the source language
+such as the following will probably trigger the creation of an ident (for the
+left value) in a user subsequent tasks:
+\begin{lstlisting}
+x := !y + 1
+\end{lstlisting}
+This means that the ident generated for $x$ will hold both a \verb|model_trace|
+and a location.
+
+The example becomes the following:
+\lstinputlisting{generated/counterexample__ce_declarepropvars.ml}
+In the above, we defined a proposition ident with a location and a
+\verb|model_trace|.
+
+\subsection{Attributes in formulas}
+
+Now that variables are tagged, we can define formulas. To define a goal formula
+for counterexamples, we need to tag it with the \verb|vc:annotation|
+attribute. This attribute is automatically added when using the VC generation
+of Why3, but on a user-built task, this needs to be added. We also need to add
+a location for this goal.
+The following is obtained for the simple formula linking $A$ and $B$:
+\lstinputlisting{generated/counterexample__ce_adaptgoals.ml}
+
+Note: the transformations used for counterexamples will create new variables
+for each variable occuring inside the formula tagged by
+\verb|vc:annotation|. These variables are duplicates located at the VC
+line. They allow giving all counterexample values located at that VC line.
+
+
+% \paragraph{Tasks without the builtin modules}
+% TODO Solve the problem and remove this section
+
+% In the context of this example, we made an example that does not even load the
+% builtin theory. Counterexamples drivers are made to add a meta inside the
+% builtin theory of the task so that the printer knows that the task is for
+% counterexamples. So, we need to add the meta ourselves in this examples but in
+% practice users should never need to do this in any real applications:
+% \lstinputlisting{generated/counterexample__ce_nobuiltin.ml}
+
+
+\subsection{Counterexamples output formats}
+
+Several output formats are available for counterexamples. For users who want to
+pretty-print their counterexamples values, we recommend to use the JSON output
+as follows:
+\lstinputlisting{generated/counterexample__ce_callprover.ml}
+
+% TODO Details on the way the JSON is printed can be found in the code.
 
 %%% Local Variables:
 %%% mode: latex

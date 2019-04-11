@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -181,8 +181,8 @@ let rec print_pat info fmt p = match p.pat_node with
       elems' "prod" (print_pat info) fmt pl
   | Papp (cs, pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
-        | Some s -> gen_syntax_arguments_typed p_type (fun _ -> [||])
-            s (print_pat info) (print_ty info) p fmt pl
+        | Some s -> gen_syntax_arguments_typed_prec p_type (fun _ -> [||])
+            s (fun _ fmt p -> print_pat info fmt p) (print_ty info) p [] fmt pl
         | _ -> print_app (print_ls_real info Sls.empty) (print_pat info)
             fmt ((cs, (List.map p_type pl, Some (p.pat_ty))), pl)
       end
@@ -193,37 +193,37 @@ let binop_name = function
   | Timplies -> "HOL.implies"
   | Tiff -> "HOL.eq"
 
-let rec print_term info defs fmt t = match t.t_node with
-  | Tvar v ->
-      print_var info fmt v
-  | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = true;
-          Number.negative_int_support = Number.Number_unsupported;
-          Number.dec_int_support = Number.Number_default;
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.negative_real_support = Number.Number_unsupported;
-          Number.dec_real_support = Number.Number_unsupported;
-          Number.hex_real_support = Number.Number_unsupported;
-          Number.frac_real_support = Number.Number_custom
-            (Number.PrintFracReal
-               ("<num val=\"%s\"><type name=\"Real.real\"/></num>",
+let number_format = {
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Custom (fun _ _ -> assert false);
+    Number.dec_int_support = `Default;
+    Number.hex_int_support = `Unsupported;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Custom (fun _ _ -> assert false);
+    Number.dec_real_support = `Unsupported;
+    Number.hex_real_support = `Unsupported;
+    Number.frac_real_support =
+      `Custom
+        ((fun fmt i -> fprintf fmt "<num val=\"%s\"><type name=\"Real.real\"/></num>" i),
+         (fun fmt i n -> fprintf fmt
                 "<app>\
                    <const name=\"Groups.times_class.times\"/>\
                    <num val=\"%s\"><type name=\"Real.real\"/></num>\
                    <num val=\"%s\"/>\
-                 </app>",
+                 </app>" i n),
+         (fun fmt i n -> fprintf fmt
                 "<app>\
                    <const name=\"Why3_Real.why3_divide\"/>\
                    <num val=\"%s\"><type name=\"Real.real\"/></num>\
                    <num val=\"%s\"/>\
-                 </app>"));
-          Number.def_real_support = Number.Number_unsupported;
-        } in
+                 </app>" i n));
+  }
+
+let rec print_term info defs fmt t = match t.t_node with
+  | Tvar v ->
+      print_var info fmt v
+  | Tconst c ->
       begin match c with
         | Number.ConstInt _ ->
             fprintf fmt "<num val=\"%a\">%a</num>"

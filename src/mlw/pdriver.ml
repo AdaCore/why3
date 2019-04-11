@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -28,6 +28,7 @@ type driver = {
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
   drv_literal     : Printer.syntax_map;
+  drv_prec        : (int list) Mid.t;
 }
 
 type printer_args = {
@@ -38,6 +39,7 @@ type printer_args = {
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   literal     : Printer.syntax_map;
+  prec        : (int list) Mid.t;
 }
 
 let load_file file =
@@ -88,6 +90,7 @@ let load_driver env file extra_files =
   let thinterface = ref Mid.empty in
   let syntax_map = ref Mid.empty in
   let literal_map = ref Mid.empty in
+  let prec_map  = ref Mid.empty in
   let qualid    = ref [] in
 
   let find_pr th (loc,q) = try Theory.ns_find_pr th.th_export q
@@ -184,9 +187,10 @@ let load_driver env file extra_files =
     | MRexception (q,s) ->
         let xs = find_xs m q in
         add_syntax xs.Ity.xs_name s false
-    | MRval (q,s) ->
+    | MRval (q,s,p) ->
         let id = find_val m q in
-        add_syntax id s false
+        add_syntax id s false;
+        prec_map := Mid.add id p !prec_map;
     | MRtheory trule ->
         add_local m.mod_theory (loc,trule)
   in
@@ -222,6 +226,7 @@ let load_driver env file extra_files =
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_syntax      = !syntax_map;
     drv_literal     = !literal_map;
+    drv_prec        = !prec_map;
   }
 
 (* registering printers for programs *)
@@ -277,6 +282,7 @@ let lookup_printer drv =
       blacklist   = drv.drv_blacklist;
       syntax      = drv.drv_syntax;
       literal     = drv.drv_literal;
+      prec        = drv.drv_prec;
     }
   in
   try

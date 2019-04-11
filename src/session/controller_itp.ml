@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,8 +12,6 @@
 open Format
 open Wstdlib
 open Session_itp
-open Generic_arg_trans_utils
-open Args_wrapper
 
 let debug_sched = Debug.register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
@@ -41,7 +39,8 @@ let print_status fmt st =
   | Scheduled         -> fprintf fmt "Scheduled"
   | Running           -> fprintf fmt "Running"
   | Done r            ->
-      fprintf fmt "Done(%a)" Call_provers.print_prover_result r
+      fprintf fmt "Done(%a)"
+        (Call_provers.print_prover_result ~json_model:false) r
   | Interrupted       -> fprintf fmt "Interrupted"
   | Detached          -> fprintf fmt "Detached"
   | InternalFailure e ->
@@ -739,21 +738,14 @@ let schedule_transformation c id name args ~callback ~notification =
         callback (TSdone tid)
       with
       | NoProgress ->
-         (* if result is same as input task, consider it as a failure *)
-         callback (TSfailed (id, NoProgress))
-      | (Arg_trans _ | Arg_trans_decl _ | Arg_trans_missing _
-        | Arg_trans_term _ | Arg_trans_term2 _ | Arg_trans_term3 _
-        | Arg_trans_pattern _ | Arg_trans_type _ | Arg_bad_hypothesis _
-        | Cannot_infer_type _ | Unnecessary_terms _ | Parse_error _
-        | Arg_expected _ | Arg_theory_not_found _ | Arg_expected_none _
-        | Arg_qid_not_found _ | Arg_pr_not_found _ | Arg_error _
-        | Arg_parse_type_error _ | Unnecessary_arguments _
-        | Reflection.NoReification ) as e ->
+          (* if result is same as input task, consider it as a failure *)
+          callback (TSfailed (id, NoProgress))
+      | e when not (is_fatal e) ->
           callback (TSfailed (id, e))
       | e when not (Debug.test_flag Debug.stack_trace) ->
           (* "@[Exception raised in Session_itp.apply_trans_to_goal %s:@ %a@.@]"
           name Exn_printer.exn_printer e; TODO *)
-        callback (TSfatal (id, e))
+          callback (TSfatal (id, e))
     end;
     false
   in
@@ -1031,8 +1023,8 @@ let print_report fmt (r: report) =
   match r with
   | Result (new_r, old_r) ->
     Format.fprintf fmt "new_result = %a, old_result = %a@."
-      Call_provers.print_prover_result new_r
-      Call_provers.print_prover_result old_r
+      (Call_provers.print_prover_result ~json_model:false) new_r
+      (Call_provers.print_prover_result ~json_model:false) old_r
   | CallFailed e ->
     Format.fprintf fmt "Callfailed %a@." Exn_printer.exn_printer e
   | Replay_interrupted ->
@@ -1043,7 +1035,7 @@ let print_report fmt (r: report) =
     Format.fprintf fmt "No edited file@."
   | No_former_result new_r ->
     Format.fprintf fmt "new_result = %a, no former result@."
-      Call_provers.print_prover_result new_r
+      (Call_provers.print_prover_result ~json_model:false) new_r
 
 (* TODO to be removed when we have a better way to print *)
 let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
@@ -1121,16 +1113,16 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
       begin
         let parid = pa.parent in
         let pr = pa.prover in
-        (* TODO: if pr is not installed, lookup for a replacement policy
-         OR: delegate this work to the replay_proof_attempt function *)
-        (* If use_steps, we give only steps as a limit
-         TODO: steps should not be used if prover was replaced above *)
-        let limit =
+        (* If use_steps, we give only steps as a limit *)
+        let step_limit = Call_provers.(empty_limit.limit_steps) in
+        let step_limit =
           if use_steps then
-            Call_provers.{empty_limit with limit_steps = pa.limit.limit_steps}
-          else
-            Call_provers.{ pa.limit with limit_steps = empty_limit.limit_steps }
+            match pa.proof_state with
+            | None -> step_limit
+            | Some r -> r.Call_provers.pr_steps
+          else step_limit
         in
+        let limit = Call_provers.{pa.limit with limit_steps = step_limit } in
         replay_proof_attempt c pr limit parid id
                              ~callback:(fun id s ->
                                         craft_report s parid limit pa;
@@ -1223,7 +1215,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                   | Done res ->
                      assert (res.Call_provers.pr_answer = Call_provers.Valid);
                      Debug.dprintf debug "Bisecting: %a.@."
-                                   Call_provers.print_prover_result res
+                       (Call_provers.print_prover_result ~json_model:false) res
                   end
                 in
                 schedule_proof_attempt ?save_to:None c pn prover ~limit ~callback ~notification

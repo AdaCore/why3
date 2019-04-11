@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,21 +17,23 @@ Require int.Int.
 Require list.List.
 
 (* Why3 goal *)
-Definition nth {a:Type} {a_WT:WhyType a} : Z -> (list a) -> a.
+Definition nth {a:Type} {a_WT:WhyType a} :
+  Numbers.BinNums.Z -> Init.Datatypes.list a -> a.
 exact (fix nth n l := match l with nil => why_inhabitant | cons h t => if Zeq_bool n Z0 then h else nth (n - 1)%Z t end).
 Defined.
 
 (* Why3 goal *)
 Lemma nth_cons_0 {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (r:(list a)), ((nth 0%Z (Init.Datatypes.cons x r)) = x).
+  forall (x:a) (r:Init.Datatypes.list a),
+  ((nth 0%Z (Init.Datatypes.cons x r)) = x).
 Proof.
 now intros x r.
 Qed.
 
 (* Why3 goal *)
 Lemma nth_cons_n {a:Type} {a_WT:WhyType a} :
-  forall (x:a) (r:(list a)) (n:Z), (0%Z < n)%Z ->
-  ((nth n (Init.Datatypes.cons x r)) = (nth (n - 1%Z)%Z r)).
+  forall (x:a) (r:Init.Datatypes.list a) (n:Numbers.BinNums.Z),
+  (0%Z < n)%Z -> ((nth n (Init.Datatypes.cons x r)) = (nth (n - 1%Z)%Z r)).
 Proof.
 intros x r n h1.
 simpl.

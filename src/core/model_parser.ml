@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -279,11 +279,16 @@ let print_float_human fmt f =
   | Float_hexa(s,f) -> fprintf fmt "%s (%g)" s f
 
 let rec print_array_human fmt (arr: model_array) =
-  fprintf fmt "@[(";
-  List.iter (fun e ->
-    fprintf fmt "@[%s =>@ %a,@]" e.arr_index_key print_model_value_human e.arr_index_value)
-    arr.arr_indices;
-  fprintf fmt "@[others =>@ %a@])@]" print_model_value_human arr.arr_others
+  let print_key_val fmt arr =
+    let {arr_index_key = key; arr_index_value = v} = arr in
+    fprintf fmt "@[%s =>@ %a@]"
+      key print_model_value_human v in
+  fprintf fmt
+    "@[(%a%a)@]"
+    (Pp.print_list_delim
+       ~start:Pp.nothing ~stop:Pp.comma ~sep:Pp.comma print_key_val)
+    arr.arr_indices
+    print_key_val {arr_index_key = "others"; arr_index_value=arr.arr_others}
 
 and print_record_human fmt r =
   match r with

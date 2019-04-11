@@ -101,7 +101,7 @@ theory real.Truncate
                                  (to_int %1)
                                  (- (to_int (- %1))))"
   syntax function floor "(to_int %1)"
-  syntax function ceil "(- 1 (to_int (- 1.0 %1)))"
+  syntax function ceil "(- (to_int (- %1)))"
 
   remove allprops
 end

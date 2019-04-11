@@ -7,12 +7,13 @@
 
 theory S
 
-  use export set.Fsetint
+  use int.Int
+  use export set.SetAppInt
 
-  val function succ (s: set int): set int
+  val succ (s: set): set
     ensures { forall i: int. mem i result <-> i >= 1 /\ mem (i - 1) s }
 
-  val function pred (s: set int): set int
+  val pred (s: set): set
     ensures { forall i: int. mem i result <-> i >= 0 /\ mem (i + 1) s }
 
 end
@@ -22,7 +23,7 @@ module NQueensSetsTermination
   use S
   use ref.Refint
 
-  let rec t (a b c : set int) variant { cardinal a } =
+  let rec t (a b c : set) variant { cardinal a } =
     if not (is_empty a) then begin
       let e = ref (diff (diff a b) c) in
       let f = ref 0 in
@@ -89,6 +90,7 @@ end
 
 module NQueensSets
 
+  use int.Int
   use S
   use ref.Refint
   use Solution
@@ -100,7 +102,7 @@ module NQueensSets
   val ghost s  : ref int       (* next slot for a solution
                                   = current number of solutions *)
 
-  let rec t3 (a b c : set int) variant { cardinal a }
+  let rec t3 (a b c : set) variant { cardinal a }
     requires { 0 <= !k /\ !k + cardinal a = n /\ !s >= 0 /\
       (forall i: int. mem i a <->
         (0<=i<n /\ forall j: int. 0 <= j < !k ->  !col[j] <> i)) /\
@@ -164,6 +166,6 @@ module NQueensSets
     ensures { result = !s /\ sorted !sol 0 !s /\
       forall t: solution.
         solution t <-> (exists i: int. 0 <= i < result /\ eq_sol t !sol[i]) }
-  = t3 (interval 0 q) empty empty
+  = t3 (interval 0 q) (empty ()) (empty ())
 
 end

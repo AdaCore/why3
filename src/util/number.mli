@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,57 +15,50 @@ open Format
 
 exception InvalidConstantLiteral of int * string
 
-type integer_literal = private
-  | IConstRaw of BigInt.t
-  | IConstDec of string
-  | IConstHex of string
-  | IConstOct of string
-  | IConstBin of string
+type int_value = BigInt.t
 
-type integer_constant = {
-    ic_negative : bool;
-    ic_abs : integer_literal;
-  }
+type int_literal_kind =
+  ILitUnk | ILitDec | ILitHex | ILitOct | ILitBin
 
-type real_literal = private
-  | RConstDec of string * string * string option (* int / frac / exp *)
-  | RConstHex of string * string * string option
-  (** If you want to write the constant 1/3 you need to use the
-      division function from the real theory *)
+type int_constant = {
+  il_kind : int_literal_kind;
+  il_int  : int_value;
+}
+
+type real_value = private {
+  rv_sig  : BigInt.t;
+  rv_pow2 : BigInt.t;
+  rv_pow5 : BigInt.t;
+}
+
+type real_literal_kind =
+  RLitUnk | RLitDec of int | RLitHex of int
 
 type real_constant = {
-    rc_negative : bool;
-    rc_abs : real_literal;
-  }
+  rl_kind : real_literal_kind;
+  rl_real : real_value
+}
 
 type constant =
-  | ConstInt  of integer_constant
+  | ConstInt  of int_constant
   | ConstReal of real_constant
 
-val is_negative : constant -> bool
+val neg : constant -> constant
+val abs : constant -> constant
 
-val int_literal_dec : string -> integer_literal
-val int_literal_hex : string -> integer_literal
-val int_literal_oct : string -> integer_literal
-val int_literal_bin : string -> integer_literal
-(** these four functions construct integer constant terms from some
-    string [s] of digits in the corresponding base. Exception
-    InvalidConstantLiteral(base,s) is raised if [s] contains invalid
-    characters for the given base. *)
+val compare_real : real_value -> real_value -> int
+(** structural comparison; two ordered values might compare differently *)
 
-val int_literal_raw : BigInt.t -> integer_literal
+val compare_const : constant -> constant -> int
+(** structural comparison; two mathematically equal values might differ *)
 
-val int_const_of_int : int -> integer_constant
-val int_const_of_big_int : BigInt.t -> integer_constant
+val int_literal : int_literal_kind -> neg:bool -> string -> int_constant
+val int_const : BigInt.t -> constant
+val int_const_of_int : int -> constant
 
-val const_of_int : int -> constant
-val const_of_big_int : BigInt.t -> constant
-
-val real_const_dec : string -> string -> string option -> real_literal
-(** [real_const_dec integer_part decimal_part exp] return the real that corresponds to
-    "integer_part.decimal_part * 10^exp". By default exp is 0.
-*)
-val real_const_hex : string -> string -> string option -> real_literal
+val real_literal : radix:int -> neg:bool -> int:string -> frac:string -> exp:string option -> real_constant
+val real_value : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> real_value
+val real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> constant
 
 (** Pretty-printing *)
 
@@ -73,45 +66,35 @@ val print_constant : formatter -> constant -> unit
 
 (** Pretty-printing with conversion *)
 
+type default_format =
+  Format.formatter -> string -> unit
+
 type integer_format =
-  (string -> unit, Format.formatter, unit) format
+  Format.formatter -> BigInt.t -> unit
 
 type real_format =
-  (string -> string -> string -> unit, Format.formatter, unit) format
+  Format.formatter -> string -> string -> string option -> unit
 
-type part_real_format =
-  (string -> string -> unit, Format.formatter, unit) format
-
-type dec_real_format =
-  | PrintDecReal of part_real_format * real_format
+type two_strings_format =
+  Format.formatter -> string -> string -> unit
 
 type frac_real_format =
-  | PrintFracReal of integer_format * part_real_format * part_real_format
+  (Format.formatter -> string -> unit) * two_strings_format * two_strings_format
 
-type 'a number_support_kind =
-  | Number_unsupported
-  | Number_default
-  | Number_custom of 'a
-
-type integer_support_kind = integer_format number_support_kind
-
-type 'a negative_format =
-  ((Format.formatter->'a->unit)->'a->unit, Format.formatter,unit) format
+type delayed_format =
+  Format.formatter -> (Format.formatter -> unit) -> unit
 
 type number_support = {
-  long_int_support  : bool;
-  extra_leading_zeros_support : bool;
-  negative_int_support  : (integer_literal negative_format) number_support_kind;
-  dec_int_support   : integer_support_kind;
-  hex_int_support   : integer_support_kind;
-  oct_int_support   : integer_support_kind;
-  bin_int_support   : integer_support_kind;
-  def_int_support   : integer_support_kind;
-  negative_real_support  : (real_literal negative_format) number_support_kind;
-  dec_real_support  : dec_real_format number_support_kind;
-  hex_real_support  : real_format number_support_kind;
-  frac_real_support : frac_real_format number_support_kind;
-  def_real_support  : integer_support_kind;
+  long_int_support  : [`Default|`Custom of default_format];
+  negative_int_support : [`Default|`Custom of delayed_format];
+  dec_int_support   : [`Default|`Custom of integer_format|`Unsupported of default_format];
+  hex_int_support   : [`Default|`Custom of integer_format|`Unsupported];
+  oct_int_support   : [`Default|`Custom of integer_format|`Unsupported];
+  bin_int_support   : [`Default|`Custom of integer_format|`Unsupported];
+  negative_real_support : [`Default|`Custom of delayed_format];
+  dec_real_support  : [`Default|`Custom of real_format|`Unsupported];
+  hex_real_support  : [`Default|`Custom of real_format|`Unsupported];
+  frac_real_support : [`Custom of frac_real_format|`Unsupported of default_format];
 }
 
 val print : number_support -> formatter -> constant -> unit
@@ -124,11 +107,8 @@ val print_in_base : int -> int option -> formatter -> BigInt.t -> unit
 
 (** Range checking *)
 
-val to_small_integer : integer_literal -> int
+val to_small_integer : int_constant -> int
 (* may raise invalid_argument *)
-
-val compute_int_literal : integer_literal -> BigInt.t
-val compute_int_constant : integer_constant -> BigInt.t
 
 type int_range = {
   ir_lower : BigInt.t;
@@ -137,9 +117,9 @@ type int_range = {
 
 val create_range : BigInt.t -> BigInt.t -> int_range
 
-exception OutOfRange of integer_constant
+exception OutOfRange of int_constant
 
-val check_range : integer_constant -> int_range -> unit
+val check_range : int_constant -> int_range -> unit
 (** [check_range c ir] checks that [c] is in the range described
     by [ir], and raises [OutOfRange c] if not. *)
 
@@ -151,14 +131,14 @@ type float_format = {
   fp_significand_digits : int; (* counting the hidden bit *)
 }
 
-exception NonRepresentableFloat of real_literal
+exception NonRepresentableFloat of real_constant
 
-val compute_float : real_literal -> float_format -> BigInt.t * BigInt.t
+val compute_float : real_constant -> float_format -> BigInt.t * BigInt.t
 (** [compute_float c fp] checks that [c] is a float literal
     representable in the format [fp]. Returns a pair [e,s] with
     [s] the significand (without the hidden bit), and [e] the biased
     exponent. Raises [NonRepresentableFloat c] exception otherwise. *)
 
-val check_float : real_literal -> float_format -> unit
+val check_float : real_constant -> float_format -> unit
 (** [check_float c fp] is the same as [compute_float c fp]
     but does not return any value. *)

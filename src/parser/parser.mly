@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,12 +22,6 @@
     { id with id_ats = List.rev_append id.id_ats l }
 
   let id_anonymous loc = { id_str = "_"; id_ats = []; id_loc = loc }
-
-  let mk_int_const neg lit =
-    Number.{ ic_negative = neg ; ic_abs = lit}
-
-  let mk_real_const neg lit =
-    Number.{ rc_negative = neg ; rc_abs = lit}
 
   let mk_id id s e = { id_str = id; id_ats = []; id_loc = floc s e }
 
@@ -205,9 +199,9 @@
 (* Tokens *)
 
 %token <string> LIDENT CORE_LIDENT UIDENT CORE_UIDENT
-%token <Number.integer_literal> INTEGER
+%token <Number.int_constant> INTEGER
 %token <string> OP1 OP2 OP3 OP4 OPPREF
-%token <Number.real_literal> REAL
+%token <Number.real_constant> REAL
 %token <string> STRING
 %token <string> ATTRIBUTE
 %token <Loc.position> POSITION
@@ -444,8 +438,8 @@ typedefn:
       TDfloat (Number.to_small_integer $4, Number.to_small_integer $5) }
 
 int_constant:
-| INTEGER       { Number.compute_int_literal $1 }
-| MINUS INTEGER { BigInt.minus (Number.compute_int_literal $2) }
+| INTEGER       { $1.Number.il_int }
+| MINUS INTEGER { BigInt.minus ($2.Number.il_int) }
 
 vis_mut:
 | (* epsilon *)     { Public, false }
@@ -684,10 +678,8 @@ single_term_:
     { Tat ($1, $3) }
 | prefix_op single_term %prec prec_prefix_op
     { Tidapp (Qident $1, [$2]) }
-| MINUS INTEGER
-    { Tconst (Number.ConstInt (mk_int_const true $2)) }
-| MINUS REAL
-    { Tconst (Number.ConstReal (mk_real_const true $2)) }
+| MINUS numeral
+    { Tconst (Number.neg $2) }
 | l = single_term ; o = bin_op ; r = single_term
     { Tbinop (l, o, r) }
 | l = single_term ; o = infix_op_1 ; r = single_term
@@ -807,8 +799,8 @@ quant:
 | EXISTS  { Dterm.DTexists }
 
 numeral:
-| INTEGER { Number.ConstInt (mk_int_const false $1) }
-| REAL    { Number.ConstReal (mk_real_const false $1) }
+| INTEGER { Number.ConstInt $1 }
+| REAL    { Number.ConstReal $1 }
 
 (* Program declarations *)
 
@@ -957,10 +949,8 @@ single_expr_:
     { Enot $2 }
 | prefix_op single_expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
-| MINUS INTEGER
-    { Econst (Number.ConstInt (mk_int_const true $2)) }
-| MINUS REAL
-    { Econst (Number.ConstReal (mk_real_const true $2)) }
+| MINUS numeral
+    { Econst (Number.neg $2) }
 | l = single_expr ; o = infix_op_1 ; r = single_expr
     { Einfix (l,o,r) }
 | l = single_expr ; o = infix_op_234 ; r = single_expr

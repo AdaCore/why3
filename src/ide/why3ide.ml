@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2018   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -276,6 +276,11 @@ let erase_color_loc (v:GSourceView.source_view) =
 (*******************)
 
 (* Elements needed for usage of graphical elements *)
+
+(* Hold the node_id on which "next" was called to allow differentiating on
+   automatic jump from a user jump *)
+let manual_next = ref None
+
 
 (* [quit_on_saved] set to true by exit function to delay quiting after Saved
    notification is received *)
@@ -650,11 +655,18 @@ let (_ : GtkSignal.id) =
 
 let task_view =
   let label = GMisc.label ~text:"Task" () in
+  let scrolled_task_view =
+    GBin.scrolled_window
+      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+      ~shadow_type:`ETCHED_OUT
+      ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
+    ()
+  in
   GSourceView.source_view
     ~editable:false
     ~cursor_visible:false
     ~show_line_numbers:true
-    ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
+    ~packing:scrolled_task_view#add
     ()
 
 
@@ -669,21 +681,25 @@ let create_source_view =
       begin
         let label = GMisc.label ~text:(Filename.basename f) () in
         label#misc#set_tooltip_markup f;
-        let source_page, scrolled_source_view =
-          !n, GPack.vbox ~homogeneous:false ~packing:
-            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) ()
+        let source_page (*, scrolled_source_view*) =
+          !n (* , GPack.vbox ~homogeneous:false ~packing:
+            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) () *)
         in
         let scrolled_source_view =
           GBin.scrolled_window
             ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
             ~shadow_type:`ETCHED_OUT
-            ~packing:scrolled_source_view#add () in
+            (*    ~packing:scrolled_source_view#add*)
+            ~packing:
+            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
+            ()
+        in
         let source_view =
           GSourceView.source_view
             ~auto_indent:gconfig.allow_source_editing
             ~insert_spaces_instead_of_tabs:true ~tab_width:2
             ~show_line_numbers:true
-            ~right_margin_position:80 ~show_right_margin:true
+            (* ~right_margin_position:80 ~show_right_margin:true *)
             (* ~smart_home_end:true *)
             ~editable:gconfig.allow_source_editing
             ~packing:scrolled_source_view#add
@@ -710,7 +726,9 @@ let create_source_view =
         (* We have to create the tags for background colors for each view.
            They are not reusable from the other views.  *)
         create_colors source_view;
-        Gconfig.set_fonts ()
+        Gconfig.set_fonts ();
+        (* Focusing on the tabs that was just added *)
+        notebook#goto_page (!n - 1)
       end in
   create_source_view
 
@@ -1258,12 +1276,12 @@ let move_current_row_selection_to_next () =
       goals_view#set_cursor path view_name_column
   | _ -> ()
 
-
 let move_to_next_unproven_node_id () =
   let rows = get_selected_row_references () in
   match rows with
   | [row] ->
       let row_id = get_node_id row#iter in
+      manual_next := Some row_id;
       send_request (Get_first_unproven_node row_id)
   | _ -> ()
 
@@ -2357,8 +2375,13 @@ let treat_notification n =
           | _ -> ()
      end
   | Next_Unproven_Node_Id (asked_id, next_unproved_id) ->
-      if is_selected_alone asked_id then
+      if is_selected_alone asked_id &&
+         (* The user manually asked for next node from this one *)
+         (!manual_next = Some asked_id ||
+          (* or auto next is on *)
+          gconfig.auto_next) then
         begin
+          manual_next := None;
           (* Unselect the potentially selected goal to avoid having two tasks
              selected at once when a prover successfully end. To continue the
              proof, it is better to only have the new goal selected *)
