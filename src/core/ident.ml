@@ -275,7 +275,7 @@ let id_unique printer ?(sanitizer = same) id =
     Hid.replace printer.values id name;
     name
 
-let string_unique printer s = find_unique printer.indices s
+let string_unique printer s = find_unique printer.indices (printer.sanitizer s)
 
 let forget_id printer id =
   try

@@ -338,7 +338,7 @@ let translate ~loc dl =
   Typing.add_decl loc main
 
 let read_channel env path file c =
-  let f = Py_lexer.parse file c in
+  let f : Py_ast.file = Py_lexer.parse file c in
   Debug.dprintf debug "%s parsed successfully.@." file;
   let file = Filename.basename file in
   let file = Filename.chop_extension file in

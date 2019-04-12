@@ -28,7 +28,7 @@ module type Printer = sig
     val tprinter : ident_printer  (* type symbols *)
     val aprinter : ident_printer  (* type variables *)
     val sprinter : ident_printer  (* variables and functions *)
-    val pprinter : ident_printer  (* propoition names *)
+    val pprinter : ident_printer  (* proposition names *)
 
     val forget_all : unit -> unit     (* flush id_unique *)
     val forget_tvs : unit -> unit     (* flush id_unique for type vars *)
@@ -93,3 +93,8 @@ include Printer
 val create :  Ident.ident_printer -> Ident.ident_printer ->
               Ident.ident_printer -> Ident.ident_printer ->
               bool -> (module Printer)
+(** `create spr apr tpr ppr forget` creates a new pretty-printing
+   module from the printer `spr` for variables and functions, `apr`
+   for type variables, `tpr` for type symbols and `ppr for proposition
+   names`. When the Boolean `forget` is true then all recorded names
+   are forgotten between printing of each tasks. *)
