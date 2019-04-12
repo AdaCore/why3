@@ -867,7 +867,26 @@ let clean c ~removed nid =
     if do_remove then
       remove_subtree ~notification ~removed c any
   in
+  match nid with
+  | Some nid ->
+      Session_itp.fold_all_any s clean_aux () nid
+  | None ->
+      Session_itp.fold_all_session s clean_aux ()
 
+let reset_proofs c ~removed ~notification nid =
+  let s = c.controller_session in
+  (* This function is applied on leafs first for the case of removes *)
+  let clean_aux () any =
+    let do_remove =
+      Session_itp.is_detached s any ||
+      match any with
+      | APa _ -> true
+      | ATn _ -> true
+      | _ -> false
+    in
+    if do_remove then
+      remove_subtree ~notification ~removed c any
+  in
   match nid with
   | Some nid ->
       Session_itp.fold_all_any s clean_aux () nid

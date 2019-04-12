@@ -1244,6 +1244,9 @@ end
     let d = get_server_data () in
     C.clean d.cont ~removed nid
 
+  let reset_proofs () =
+    let d = get_server_data () in
+    C.reset_proofs d.cont ~notification:(notify_change_proved d.cont) ~removed None
 
   let remove_node nid =
     let d = get_server_data () in
@@ -1387,7 +1390,8 @@ end
      | Save_req | Check_need_saving_req | Reload_req
      | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
-     | Exit_req | Get_global_infos | Itp_communication.Unfocus_req -> true
+     | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
+     | Reset_proofs_req -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
@@ -1450,6 +1454,9 @@ end
        send_task nid b loc
     | Interrupt_req                ->
        C.interrupt ()
+    | Reset_proofs_req             ->
+       reset_proofs ();
+       session_needs_saving := true
     | Command_req (nid, cmd)       ->
        let snid = any_from_node_ID nid in
        begin

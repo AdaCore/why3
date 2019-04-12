@@ -2141,6 +2141,25 @@ let (_ : GMenu.menu_item) =
     ~callback
 
 let (_ : GMenu.menu_item) =
+  (* This is considered risky command so it is intentionally not added to the
+     context menu. It also trigger the apparition of a popup. *)
+  let callback () =
+    let answer =
+      GToolbox.question_box
+        ~default:2
+        ~title:"Launching unsafe command"
+        ~buttons:["Yes"; "No"]
+        "Do you really want to remove all proofs from this session ?"
+    in
+      match answer with
+      | 1 -> send_request Reset_proofs_req
+      | _ -> ()
+  in
+  tools_factory#add_item "Reset proofs"
+    ~tooltip:"Remove all proofs attempts or transformations"
+    ~callback
+
+let (_ : GMenu.menu_item) =
   let callback =
     on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
       (fun id -> Remove_subtree id) in
