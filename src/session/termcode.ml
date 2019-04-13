@@ -706,14 +706,14 @@ module Checksum = struct
       Buffer.clear b;
       Digest.to_hex dnew
 
-  let task_v2 version =
+  let task_v2 =
     let c = ref 0 in
     let m = ref Ident.Mid.empty in
     let b = Buffer.create 8192 in
     let task_hd t (cold,mold,dold) =
       c := cold;
       m := mold;
-      tdecl (version,c,m,b) t.Task.task_decl;
+      tdecl (CV2,c,m,b) t.Task.task_decl;
       Buffer.add_string b (Digest.to_hex dold);
       let dnew = Digest.string (Buffer.contents b) in
       Buffer.clear b;
@@ -729,10 +729,39 @@ module Checksum = struct
       let _,_,dnew = Trans.apply tr t in
       Digest.to_hex dnew
 
+  (* WARNING: The occurence of [Trans.fold] in [task_v3] needs to be executed
+     once at initialization in order for all the applications of this
+     transformation to share the same Wtask ([h] created on first line of
+     [Trans.fold]). In short, the closure is here just so that Trans.fold is
+     executed once and shared for all functions.
+     So, in particular, don't add arguments to task_v3 here. *)
+  let task_v3 =
+    let c = ref 0 in
+    let m = ref Ident.Mid.empty in
+    let b = Buffer.create 8192 in
+    let task_hd t (cold,mold,dold) =
+      c := cold;
+      m := mold;
+      tdecl (CV3,c,m,b) t.Task.task_decl;
+      Buffer.add_string b (Digest.to_hex dold);
+      let dnew = Digest.string (Buffer.contents b) in
+      Buffer.clear b;
+      let mnew = match t.Task.task_decl.Theory.td_node with
+        | Theory.Decl { Decl.d_news = s } ->
+            Ident.Sid.fold (fun id a ->
+              Ident.Mid.add id (Ident.Mid.find id !m) a) s mold
+        | _ -> !m in
+      !c, mnew, dnew
+    in
+    let tr = Trans.fold task_hd (0, Ident.Mid.empty, Digest.string "") in
+    fun t ->
+      let _,_,dnew = Trans.apply tr t in
+      Digest.to_hex dnew
 
   let task ~version t = match version with
     | CV1 -> task_v1 t
-    | CV2 | CV3 -> task_v2 version t
+    | CV2 -> task_v2 t
+    | CV3 -> task_v3 t
 
 end
 
