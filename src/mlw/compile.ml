@@ -94,6 +94,8 @@ module Translate = struct
         rdef :: filter_out_ghost_rdef l
 
   let rec pat m p = match p.pat_node with
+    | _ when mask_equal m MaskGhost ->
+        ML.Pwild
     | Pwild ->
         ML.Pwild
     | Pvar vs when (restore_pv vs).pv_ghost ->
