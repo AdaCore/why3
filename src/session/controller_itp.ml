@@ -90,6 +90,20 @@ let set_session_max_tasks n =
   session_max_tasks := n;
   Prove_client.set_max_running_provers n
 
+let set_session_memlimit c n =
+  let main = Whyconf.get_main c.controller_config in
+  let timelimit = Whyconf.timelimit main in
+  let run_max = Whyconf.running_provers_max main in
+  let main = Whyconf.set_limits main timelimit n run_max in
+  c.controller_config <- Whyconf.set_main c.controller_config main
+
+let set_session_timelimit c n =
+  let main = Whyconf.get_main c.controller_config in
+  let memlimit = Whyconf.memlimit main in
+  let run_max = Whyconf.running_provers_max main in
+  let main = Whyconf.set_limits main n memlimit run_max in
+  c.controller_config <- Whyconf.set_main c.controller_config main
+
 let set_session_prover_upgrade_policy c p u =
   c.controller_config <- Whyconf.set_prover_upgrade_policy c.controller_config p u
 
@@ -771,6 +785,9 @@ let run_strategy_on_goal
     else
       match Array.get strat pc with
       | Icall_prover(p,timelimit,memlimit) ->
+         let main = Whyconf.get_main c.controller_config in
+         let timelimit = Opt.get_def (Whyconf.timelimit main) timelimit in
+         let memlimit = Opt.get_def (Whyconf.memlimit main) memlimit in
          let callback panid res =
            callback_pa panid res;
            match res with

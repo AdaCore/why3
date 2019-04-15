@@ -1517,8 +1517,8 @@ end
        begin
          match s with
          | "max_tasks" -> Controller_itp.set_session_max_tasks i
-         | "timelimit" -> Server_utils.set_session_timelimit i
-         | "memlimit" -> Server_utils.set_session_memlimit i
+         | "timelimit" -> Controller_itp.set_session_timelimit d.cont i
+         | "memlimit" -> Controller_itp.set_session_memlimit d.cont i
          | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
        end
     | Set_prover_policy(p,u)   ->
