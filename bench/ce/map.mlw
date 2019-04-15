@@ -42,3 +42,11 @@ goal t1 : forall t:map int int, i : int.
    get (set t 0 42) i = get t i
 
 end
+
+module OtherIndices
+
+use map.Map
+
+  goal g : forall m: map real real. m 0.1 = 0.0 \/ m 0.2 = m 0.1 
+
+end
