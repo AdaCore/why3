@@ -102,10 +102,15 @@ val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> contr
 (** creates a controller for the given session.
     The config and env is used to load the drivers for the provers. *)
 
-
 val set_session_max_tasks : int -> unit
 (** sets the maximum number of proof tasks that can be running at the
     same time. Initially set to 1. *)
+
+val set_session_memlimit: controller -> int -> unit
+(** sets the default memlimit for proof attempts *)
+
+val set_session_timelimit: controller -> int -> unit
+(** sets the default timelimit for proof attempts *)
 
 val set_session_prover_upgrade_policy :
   controller -> Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit

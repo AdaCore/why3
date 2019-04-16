@@ -89,8 +89,13 @@
           error "Prover description %s is ambiguous" p
 
   let integer msg s =
-    try int_of_string s
-    with Failure _ -> error "unable to parse %s argument '%s'" msg s
+    try Some (int_of_string s)
+    with Failure _ ->
+      match s with
+      | "%t" -> None
+      | "%m" -> None
+      | _ ->
+          error "unable to parse %s argument '%s'" msg s
 
   let transform code t =
     try
@@ -109,6 +114,8 @@ let integer = ['0'-'9']+
 let goto = 'g' | "goto"
 let call = 'c' | "call"
 let transform = 't' | "transform"
+let timelimit = integer | "%t"
+let memlimit = integer | "%m"
 
 rule scan code = parse
   | space+
@@ -121,12 +128,14 @@ rule scan code = parse
   | goto space+ (ident as id)
       { add_instr code (Igoto (find_label code id));
         scan code lexbuf }
-  | call space+ (ident as p) space+ (integer as t) space+ (integer as m)
+  | call space+ (ident as p) space+ (timelimit as t) space+ (memlimit as m)
       { let p = prover code p in
         let t = integer "timelimit" t in
-        if t <= 0 then error "timelimit %d is invalid" t;
+        if t <> None && Opt.get t <= 0 then
+          error "timelimit %d is invalid" (Opt.get t);
         let m = integer "memlimit" m in
-        if m <= 0 then error "memlimit %d is invalid" m;
+        if m <> None && Opt.get m <= 0 then
+          error "memlimit %d is invalid" (Opt.get m);
         add_instr code (Icall_prover (p.Whyconf.prover, t, m));
         scan code lexbuf }
   | transform space+ (ident as t) space+ (ident as l)

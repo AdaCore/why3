@@ -31,6 +31,8 @@ IDE
   * auto jumping to next unproved goal can now be disabled in the preferences
   * add a "reset proofs" command in the Tools menu. It removes all proofs in
     the session
+  * strategies can now be defined using %t (resp. %m) for using a prover with
+    the default timelimit (resp. memlimit)
 
 Realizations
   * Added experimental realizations for new Set theories in both Isabelle and
