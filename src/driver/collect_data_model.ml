@@ -371,15 +371,6 @@ let refine_variable_value table key t =
   let encountered_key = Hstr.create 16 in
   refine_variable_value ~enc:encountered_key table key t
 
-(* Conversion to value referenced as defined in model_parser.
-   We assume that array indices fit into an integer *)
-let convert_to_indice t =
-  match t with
-  | Sval (Integer i)    -> i
-  | Sval (Bitvector bv) -> bv
-  | Sval (Boolean b)    -> string_of_bool b
-  | _ -> raise Not_value
-
 let convert_simple_to_model_value (v: simple_value) =
   match v with
   | Integer i -> Model_parser.Integer i
@@ -403,7 +394,7 @@ let rec convert_array_value lf (a: array) : Model_parser.model_array =
                    Model_parser.arr_others = convert_to_model_value lf t}
     | Store (a, t1, t2) ->
         let new_index =
-          { Model_parser.arr_index_key = convert_to_indice t1;
+          { Model_parser.arr_index_key = convert_to_model_value lf t1;
             Model_parser.arr_index_value = convert_to_model_value lf t2} in
         array_indices := new_index :: !array_indices;
         create_array_value a in
