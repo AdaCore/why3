@@ -105,7 +105,7 @@ type model_value =
  | Apply of string * model_value list
  | Unparsed of string
 and  arr_index = {
-  arr_index_key : string; (* Even array indices can exceed MAX_INT with Z3 *)
+  arr_index_key : model_value;
   arr_index_value : model_value;
 }
 and model_array = {
@@ -225,7 +225,7 @@ and convert_indices indices =
   match indices with
   | [] -> []
   | index :: tail ->
-    let m = Mstr.add "indice" (Json_base.String index.arr_index_key) Mstr.empty in
+    let m = Mstr.add "indice" (convert_model_value index.arr_index_key) Mstr.empty in
     let m = Mstr.add "value" (convert_model_value index.arr_index_value) m in
     Json_base.Record m :: convert_indices tail
 
@@ -279,16 +279,19 @@ let print_float_human fmt f =
   | Float_hexa(s,f) -> fprintf fmt "%s (%g)" s f
 
 let rec print_array_human fmt (arr: model_array) =
+  let print_others fmt v =
+    fprintf fmt "@[others =>@ %a@]"
+      print_model_value_human v in
   let print_key_val fmt arr =
     let {arr_index_key = key; arr_index_value = v} = arr in
-    fprintf fmt "@[%s =>@ %a@]"
-      key print_model_value_human v in
+    fprintf fmt "@[%a =>@ %a@]"
+      print_model_value_human key print_model_value_human v in
   fprintf fmt
     "@[(%a%a)@]"
     (Pp.print_list_delim
        ~start:Pp.nothing ~stop:Pp.comma ~sep:Pp.comma print_key_val)
     arr.arr_indices
-    print_key_val {arr_index_key = "others"; arr_index_value=arr.arr_others}
+    print_others arr.arr_others
 
 and print_record_human fmt r =
   match r with
