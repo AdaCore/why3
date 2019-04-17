@@ -15,6 +15,7 @@ Tools
 API
   * `Call_provers.print_prover_result` now takes an additional argument
     `~json_model` to indicate whether counterexamples are printed using JSON :x:
+  * Counterexamples: indices of array are now model_value. :x:
 
 Transformations
   * `apply`/`rewrite` behaves better in presence of `let`;
