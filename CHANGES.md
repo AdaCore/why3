@@ -39,6 +39,10 @@ Realizations
   * Added experimental realizations for new Set theories in both Isabelle and
     Coq
 
+Provers
+  * support for CVC4 1.7 (released April 9, 2019)
+  * support for Alt-Ergo 2.3.0 (released February 11, 2019)
+
 Version 1.2.0, February 11, 2019
 --------------------------------
 
