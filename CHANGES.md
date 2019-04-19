@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Provers
+  * support for CVC4 1.7 (released Apr 9, 2019)
+
 Version 1.2.0, February 11, 2019
 --------------------------------
 
