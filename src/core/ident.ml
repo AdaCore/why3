@@ -450,6 +450,15 @@ let extract_field attr =
   with
   | _ -> None
 
+(* Attributes used to name hypothesis *)
+let is_hyp_name_attr a =
+  Strings.has_prefix "hyp_name:" a.attr_string
+
+let get_hyp_name ~attrs =
+  try Some (Strings.remove_prefix "hyp_name:"
+              (Sattr.choose (Sattr.filter is_hyp_name_attr attrs)).attr_string)
+  with Not_found -> None
+
 (* Functions for working with ITP attributes *)
 
 let is_name_attr a =

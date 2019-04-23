@@ -120,7 +120,9 @@ let rec intros kn pr mal expl f =
       (* f is going to be removed, preserve its attributes and location in f2 *)
       let f2 = t_attr_copy f f2 in
       let fl = Split_goal.split_intro_right ?known_map:kn (dequant false f1) in
-      let idx = id_fresh "H" ~attrs:intro_attrs in
+      let idx =
+        let name = Ident.get_hyp_name ~attrs:f1.t_attrs in
+        id_fresh (Opt.get_def "H" name) ~attrs:intro_attrs in
       let add (subst,dl) f =
         let svs = Mvs.set_diff (t_freevars Mvs.empty f) subst in
         let subst, dl = Mvs.fold (fun vs _ (subst,dl) ->

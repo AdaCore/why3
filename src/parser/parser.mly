@@ -1082,8 +1082,13 @@ single_expr_:
     { Ematch ($2, [], $4) }
 | GHOST single_expr
     { Eghost $2 }
-| assertion_kind LEFTBRC term RIGHTBRC
-    { Eassert ($1, $3) }
+| assertion_kind option(name) LEFTBRC term RIGHTBRC
+    { match $2 with
+      | None -> Eassert ($1, $4)
+      | Some name ->
+         let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
+         let t = { $4 with term_desc = Tattr (attr, $4) } in
+         Eassert ($1, t) }
 | attr single_expr %prec prec_attr
     { Eattr ($1, $2) }
 | single_expr cast
@@ -1182,9 +1187,18 @@ spec:
 | (* epsilon *) %prec prec_no_spec  { empty_spec }
 | single_spec spec                  { spec_union $1 $2 }
 
+name:
+| LIDENT { $1 }
+| UIDENT { $1 }
+
 single_spec:
-| REQUIRES LEFTBRC term RIGHTBRC
-    { { empty_spec with sp_pre = [$3] } }
+| REQUIRES option(name) LEFTBRC term RIGHTBRC
+    { match $2 with
+      | None -> { empty_spec with sp_pre = [$4] }
+      | Some name ->
+         let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
+         let t = { $4 with term_desc = Tattr (attr, $4) } in
+         { empty_spec with sp_pre = [t] } }
 | ENSURES LEFTBRC ensures RIGHTBRC
     { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
 | RETURNS LEFTBRC match_cases(term) RIGHTBRC
