@@ -1,0 +1,52 @@
+module M
+
+  use int.Int
+  use ref.Ref
+  use map.Map
+
+  let ghost test_map (ghost x : ref (map int int)) : unit
+    ensures { !x[0] <> !x[1] }
+  =
+    x := Map.set !x 0 3
+
+  (* Multi-dimensional maps *)
+  let ghost test_map_multidim1 (ghost x : ref (map int (map int int))) : unit
+    ensures { !x[0][0] <> !x[1][1] }
+  =
+    x := Map.set !x 0 (Map.get !x 1)
+
+  let ghost test_map_multidim2 (ghost x : ref (map int (map int int))) : unit
+    ensures { !x[0][0] <> !x[1][1] }
+  =
+    let x0 = Map.get !x 0 in
+    let x0 = Map.set x0 0 3 in
+    x := Map.set !x 0 x0
+
+  let ghost proj_map_test1 (ghost x : ref (map int int)) : unit
+    ensures { !x[0] <> !x[1] }
+  =
+    x := Map.set !x 0 3
+
+  let ghost proj_map_test2 (ghost x : ref (map int bool)) : unit
+    ensures { !x[0] <> !x[1] }
+  =
+    x := Map.set !x 0 true
+
+end
+
+theory ModelMap
+
+use map.Map
+
+goal t1 : forall t:map int int, i : int.
+   get (set t 0 42) i = get t i
+
+end
+
+module OtherIndices
+
+use map.Map
+
+  goal g : forall m: map real real. m 0.1 = 0.0 \/ m 0.2 = m 0.1 
+
+end

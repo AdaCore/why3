@@ -1,0 +1,64 @@
+#!/bin/bash
+
+dir=`dirname $0`
+
+updateoracle=false
+files=""
+success=true
+
+while test $# != 0; do
+case "$1" in
+  "-update-oracle")
+      updateoracle=true;;
+  "-"*)
+      printf "unknown option: %s\n" "$1"
+      printf "usage: ide-bench [-update-oracle] <files>\n"
+      printf "  <files> must be given with the '.mlw' suffix\n"
+      printf "  if <files> empty, use all files from directory 'ide'\n"
+      exit 2;;
+  *)
+       files="$files $1"
+esac
+shift
+done
+
+if test "$files" = "" ; then
+    files="$dir/ide/*.mlw"
+fi
+
+# $1 = dir, $2 = filename
+run () {
+    printf "$2..."
+    file_path="$1/$2"
+    oracle_file="$1/oracles/$2.oracle"
+    echo "$file_path"
+    xvfb-run bin/why3ide --batch "down;down;color;" "${file_path}.mlw" > "${file_path}.out"
+    str_oracle=$(tr -d ' \n' < "${oracle_file}")
+    str_out=$(tr -d ' \n' < "${file_path}.out")
+    if [ "$str_oracle" = "$str_out" ] ; then
+        echo "ok"
+    else
+        if $updateoracle; then
+            echo "Updating oracle for ${file_path}"
+            mv "${file_path}.out" "${oracle_file}"
+        else
+            echo "FAILED!"
+            echo "Oracle is ${str_oracle}"
+            echo "Output is ${str_out}"
+            echo "diff is the following:"
+            echo "${file_path}"
+            diff "${oracle_file}" "${file_path}.out"
+            success=false
+        fi
+    fi
+}
+for file in $files; do
+    filedir=`dirname $file`
+    filebase=`basename $file .mlw`
+    run $filedir $filebase
+done
+if $success; then
+    exit 0
+else
+    exit 1
+fi
