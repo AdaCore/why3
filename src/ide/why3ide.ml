@@ -2520,6 +2520,31 @@ let () =
 (* simulate some user actions and take screenshots *)
 (***************************************************)
 
+let pos_cursor_and_color (v:GSourceView.source_view) =
+  let buf = v#source_buffer in
+  let iter = buf#get_iter_at_mark `INSERT in
+  let line, column = iter#line + 1, iter#line_index in
+  (* This is the line that corresponds to the goal *)
+  Format.printf "Cursor is placed at position: (%d, %d)@."
+    line column;
+  let iter = ref buf#start_iter in
+  Format.printf "Recorded colors on the source code are:@.";
+  while not (!iter#is_end) do
+    let l = !iter#get_toggled_tags true in
+    if l = [] then
+      ()
+    else
+      List.iter (fun (tag: GText.tag) ->
+          let tag_name = tag#get_property GtkText.Tag.P.name in
+          if tag_name <> "" then
+            let iter2 = !iter#forward_to_tag_toggle (Some tag) in
+            Format.printf "Color \"%s\" from (%d, %d) to (%d, %d)@."
+              tag_name !iter#line !iter#line_index iter2#line iter2#line_index)
+        l;
+    iter := !iter#forward_char;
+  done;
+  Format.printf "End color@."
+
 let batch s =
   let cmd = ref (Strings.split ';' s) in
   let last = ref (Sys.time ()) in
@@ -2553,6 +2578,18 @@ let batch s =
       let cmd = Strings.join " " cmd in
       let cmd = Printf.sprintf "import -window \"%s\" -define png:include-chunk=none %s" window_title cmd in
       if Sys.command cmd <> 0 then Printf.eprintf "Batch command failed: %s\n%!" cmd
+    | "color" :: cmd ->
+        begin
+          let cmd = Strings.join " " cmd in
+          let v = Hstr.fold (fun _ x acc ->
+              match acc, x with
+              | None, (sp, sv, _, _) when sp = 1 ->
+                  Some sv
+              | _ -> acc) source_view_table None
+          in
+          Opt.iter pos_cursor_and_color v;
+          interp cmd
+        end
     | ["save"] -> send_request Save_req
     | _ -> Printf.eprintf "Unrecognized batch command: %s\n%!" c
     end;
