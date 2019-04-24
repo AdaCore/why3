@@ -8,6 +8,12 @@ Standard library
       - in `set.SetApp` and `set.SetImp`, type `t` becomes `set`;
         field `contents` becomes `to_fset`; call to `empty` becomes `empty ()`
 
+Language
+  * It is now possible to give a name to requires and assertions.
+    `requires Hyp { a = 3 }` tries to give the name `Hyp` to the corresponding
+    hypothesis after introduction. This uses the attribute [@hyp_name:] which is
+    now reserved.
+
 Tools
   * counterexamples given by `why3prove` are no longer printed using JSON
     by default; pass option `--json` to restore the previous behavior
