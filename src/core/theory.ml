@@ -430,7 +430,6 @@ let store_path, store_theory, restore_path, restore_theory =
         Wid.set id_to_th id th;
       end
   in
-
   let restore_path id = Wid.find id_to_path id in
   let restore_theory id = Wid.find id_to_th id in
   store_path, store_theory, restore_path, restore_theory

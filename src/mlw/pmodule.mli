@@ -113,6 +113,10 @@ val restore_path : ident -> string list * string * string list
    If [id] is a module name, the third component is an empty list.
    Raises Not_found if the ident was never declared in/as a module. *)
 
+val restore_module_id : ident -> pmodule
+(** retrieves a module from a program symbol defined in it
+    Raises Not_found if the ident was never declared in/as a module. *)
+
 val restore_module : theory -> pmodule
 (** retrieves a module from its underlying theory
     raises [Not_found] if no such module exists *)
