@@ -43,6 +43,7 @@ type meta_arg_type =
   | MTprsymbol
   | MTstring
   | MTint
+  | MTident
 
 type meta_arg =
   | MAty  of ty
@@ -51,6 +52,7 @@ type meta_arg =
   | MApr  of prsymbol
   | MAstr of string
   | MAint of int
+  | MAident of ident
 
 type meta = private {
   meta_name : string;
@@ -159,6 +161,8 @@ val restore_path : ident -> string list * string * string list
    different theories, the first association is retained.
    If [id] is a theory name, the third component is an empty list.
    Raises [Not_found] if the ident was never declared in/as a theory. *)
+
+val restore_theory : ident -> theory
 
 (** {2 Declaration constructors} *)
 

@@ -509,6 +509,9 @@ let find_xsymbol     muc q = find_xsymbol_ns     (get_namespace muc) q
 let find_itysymbol   muc q = find_itysymbol_ns   (get_namespace muc) q
 let find_prog_symbol muc q = find_prog_symbol_ns (get_namespace muc) q
 
+let find_rsymbol muc q =
+  find_qualid ~ty:Prog (fun rs -> rs.rs_name) ns_find_rs (get_namespace muc) q
+
 let find_special muc test nm q =
   match find_prog_symbol muc q with
   | RS s when test s -> s
@@ -1478,6 +1481,7 @@ let add_decl muc env file d =
         | Ptree.Max q  -> MApr (find_prop_of_kind Paxiom tuc q)
         | Ptree.Mlm q  -> MApr (find_prop_of_kind Plemma tuc q)
         | Ptree.Mgl q  -> MApr (find_prop_of_kind Pgoal  tuc q)
+        | Ptree.Mval q -> MAident (find_rsymbol muc q).rs_name
         | Ptree.Mstr s -> MAstr s
         | Ptree.Mint i -> MAint i in
       add_meta muc (lookup_meta id.id_str) (List.map convert al)

@@ -388,6 +388,7 @@ meta_arg:
 | AXIOM     qualid  { Max $2 }
 | LEMMA     qualid  { Mlm $2 }
 | GOAL      qualid  { Mgl $2 }
+| VAL       qualid  { Mval $2 }
 | STRING            { Mstr $1 }
 | INTEGER           { Mint (Number.to_small_integer $1) }
 

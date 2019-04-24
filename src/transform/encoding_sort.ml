@@ -158,7 +158,9 @@ let fold tenv taskpre task =
           | MAls ls -> MAls (conv_ls tenv ud ls)
           | MApr _ -> raise Exit
           | MAstr _ as s -> s
-          | MAint _ as i -> i in
+          | MAint _ as i -> i
+          | MAident _ as i -> i
+        in
         let arg = List.map map ml in
         add_meta (decl_ud ud task) meta arg
       with

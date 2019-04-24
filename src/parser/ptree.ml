@@ -223,6 +223,7 @@ type metarg =
   | Max  of qualid
   | Mlm  of qualid
   | Mgl  of qualid
+  | Mval of qualid
   | Mstr of string
   | Mint of int
 

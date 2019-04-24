@@ -629,6 +629,7 @@ module Checksum = struct
     | Theory.MTprsymbol -> char b 'p'
     | Theory.MTstring   -> char b 's'
     | Theory.MTint      -> char b 'i'
+    | Theory.MTident    -> char b 'd'
 
   let meta b m =
     string b m.Theory.meta_name;
@@ -642,6 +643,7 @@ module Checksum = struct
     | Theory.MApr pr -> char b 'p'; ident b pr.Decl.pr_name
     | Theory.MAstr s -> char b 's'; string b s
     | Theory.MAint i -> char b 'i'; int b i
+    | Theory.MAident i -> char b 'd'; ident b i
 
   let tdecl b d = match d.Theory.td_node with
     | Theory.Decl d -> decl b d
