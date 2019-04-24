@@ -654,6 +654,8 @@ let predicate eq0_int (x:int) = x = 0
 clone export ringdecision.AssocAlgebraDecision with type r = int, type a = mat, val rzero = Int.zero, val rone = Int.one, val rplus = (+), val ropp = (-_), val rtimes = (*), val azero = mzero, val aone = id, val aplus = add, val aopp = opp, val atimes = mul, val asub = sub, val ($) = extp, goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc, goal A.Mul_distr_l, goal A.Mul_distr_r, goal asub_def, goal A.Inv_def_l, goal A.Inv_def_r,
   axiom . (* FIXME: replace with "goal" and prove *)
 
+meta reflection val norm_f
+
 end
 
 module MatrixTests
