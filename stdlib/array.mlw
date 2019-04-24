@@ -168,12 +168,12 @@ module Sorted
   predicate le elt elt
 
   predicate sorted_sub (a: array elt) (l u: int) =
-    forall i1 i2 : int. l <= i1 <= i2 < u -> le a[i1] a[i2]
+    forall i1 i2 : int. l <= i1 < i2 < u -> le a[i1] a[i2]
   (** `sorted_sub a l u` is true whenever the array segment `a(l..u-1)`
       is sorted w.r.t order relation `le` *)
 
   predicate sorted (a: array elt) =
-    forall i1 i2 : int. 0 <= i1 <= i2 < length a -> le a[i1] a[i2]
+    forall i1 i2 : int. 0 <= i1 < i2 < length a -> le a[i1] a[i2]
   (** `sorted a` is true whenever the array `a` is sorted w.r.t `le` *)
 
 end
