@@ -87,7 +87,7 @@ and interpret_result c pa pas =
      let session = c.Controller_itp.controller_session in
      let goal = Session_itp.get_proof_attempt_parent session pa in
      let answer = r.Call_provers.pr_answer in
-     if answer = Call_provers.HighFailure && Gnat_config.debug &&
+     if answer = Call_provers.HighFailure &&
         not (Gnat_config.is_ce_prover session pa) then
        Gnat_report.add_warning r.Call_provers.pr_output;
      handle_vc_result c goal (answer = Call_provers.Valid)
