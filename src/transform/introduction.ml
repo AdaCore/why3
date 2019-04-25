@@ -122,7 +122,7 @@ let rec intros kn pr mal expl f =
       let fl = Split_goal.split_intro_right ?known_map:kn (dequant false f1) in
       let add (subst,dl) f =
         let idx =
-          let name = Ident.get_hyp_name ~attrs:f1.t_attrs in
+          let name = Ident.get_hyp_name ~attrs:f.t_attrs in
           id_fresh (Opt.get_def "H" name) ~attrs:intro_attrs in
         let svs = Mvs.set_diff (t_freevars Mvs.empty f) subst in
         let subst, dl = Mvs.fold (fun vs _ (subst,dl) ->
