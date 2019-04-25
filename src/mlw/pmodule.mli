@@ -37,9 +37,11 @@ val ns_find_prog_symbol : namespace -> string list -> prog_symbol
 
 val ns_find_its : namespace -> string list -> itysymbol
 val ns_find_pv  : namespace -> string list -> pvsymbol
-val ns_find_rs  : namespace -> string list -> rsymbol
 val ns_find_xs  : namespace -> string list -> xsymbol
 val ns_find_ns  : namespace -> string list -> namespace
+
+(* use this only on an export namespace, which cannot have overloaded symbols *)
+val ns_find_rs  : namespace -> string list -> rsymbol
 
 type overload =
   | FixedRes of ity (* t -> t -> ... -> T *)

@@ -144,6 +144,17 @@ let add (d: decl) (tables: naming_table): naming_table =
       let s = id_unique tables id in
       add_unsafe s (Pr pr) tables
 
+(* Adds meta arguments of type ident to tables *)
+let add_meta_id_args (al: meta_arg list) (tables: naming_table): naming_table =
+  List.fold_left
+    (fun t a ->
+      match a with
+      | MAident id ->
+         let s = id_unique tables id in
+         { tables with meta_id_args = Mstr.add s id tables.meta_id_args }
+      | _ -> t)
+    tables al
+
 (* Takes the set of meta defined in the tasks and build the coercions from it.
    TODO we could have a set of coercions in the task ? Same problem for naming
    table ?
@@ -173,6 +184,7 @@ let build_naming_tables task : naming_table =
       coercion = Coercion.empty;
       printer = pr;
       aprinter = apr;
+      meta_id_args = Mstr.empty;
   } in
 (*  We want conflicting names to be named as follows:
     names closer to the goal should be named with lowest
@@ -182,7 +194,10 @@ let build_naming_tables task : naming_table =
   (* TODO:imported theories should be added in the namespace too *)
   let tables = Task.task_fold
     (fun t d ->
-     match d.td_node with Decl d -> add d t | _ -> t) tables task
+      match d.td_node with
+      | Decl d -> add d t
+      | Meta (_,al) -> add_meta_id_args al t
+      | _ -> t) tables task
   in
   let crc_map = build_coercion_map km_meta in
   {tables with coercion = crc_map}

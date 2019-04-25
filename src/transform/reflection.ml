@@ -442,9 +442,6 @@ let rec reify_term renv t rt =
           Pretty.print_ty (Opt.get t.t_ty)
           Pretty.print_ty (Opt.get rt.t_ty);
         raise NoReification);
-  Debug.dprintf debug_reification "known map: %a@."
-    (Pp.print_list Pp.newline (fun fmt id -> Format.fprintf fmt "%s" id.id_string))
-    (Mid.keys renv.kn);
   match t.t_node, rt.t_node with
   | _, Tapp(interp, {t_node = Tvar vx}::vyl)
        when List.mem vx renv.lv
@@ -647,12 +644,14 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
   let re_dot = Str.regexp_string "." in
   let qs = Str.split re_dot s in
   let fname = List.hd (List.rev qs) in
+  let es = "Symbol "^fname^" not found in reflection metas" in
+  let fid = Mstr.find_exn (Arg_error es) s nt.Trans.meta_id_args in
   Debug.dprintf debug_refl "looking for symbol %s@." fname;
   let (pmod, rs) =
     let fn acc = function
       | [ MAident id ] ->
          Debug.dprintf debug_refl "found symbol %s@." id.id_string;
-         if id.id_string = fname
+         if id_equal id fid
          then id :: acc
          else acc
       | _ -> assert false in
