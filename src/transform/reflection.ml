@@ -32,7 +32,7 @@ let meta_decision_procedure =
   Theory.register_meta
     ~desc:"decision procedure, used for reflection"
     "reflection"
-    [ Theory.MTident ]
+    [ Theory.MTid ]
 
 type reify_env = { kn: known_map;
                    store: (vsymbol * int) Mterm.t;
@@ -649,7 +649,7 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
   Debug.dprintf debug_refl "looking for symbol %s@." fname;
   let (pmod, rs) =
     let fn acc = function
-      | [ MAident id ] ->
+      | [ MAid id ] ->
          Debug.dprintf debug_refl "found symbol %s@." id.id_string;
          if id_equal id fid
          then id :: acc

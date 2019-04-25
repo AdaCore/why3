@@ -149,7 +149,7 @@ let add_meta_id_args (al: meta_arg list) (tables: naming_table): naming_table =
   List.fold_left
     (fun t a ->
       match a with
-      | MAident id ->
+      | MAid id ->
          let s = id_unique tables id in
          { tables with meta_id_args = Mstr.add s id tables.meta_id_args }
       | _ -> t)

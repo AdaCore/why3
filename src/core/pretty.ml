@@ -556,7 +556,7 @@ let print_meta_arg_type fmt = function
   | MTprsymbol -> fprintf fmt "[proposition]"
   | MTstring   -> fprintf fmt "[string]"
   | MTint      -> fprintf fmt "[integer]"
-  | MTident    -> fprintf fmt "[identifier]"
+  | MTid    -> fprintf fmt "[identifier]"
 
 let print_meta_arg fmt = function
   | MAty ty -> fprintf fmt "type %a" print_ty ty; forget_tvs ()
@@ -565,7 +565,7 @@ let print_meta_arg fmt = function
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
   | MAstr s -> fprintf fmt "\"%s\"" s
   | MAint i -> fprintf fmt "%d" i
-  | MAident i -> fprintf fmt "%a" Ident.print_decoded (id_unique sprinter i)
+  | MAid i -> fprintf fmt "%a" Ident.print_decoded (id_unique sprinter i)
 
 let print_qt fmt th =
   if th.th_path = [] then print_th fmt th else

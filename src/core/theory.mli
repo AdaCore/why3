@@ -43,7 +43,7 @@ type meta_arg_type =
   | MTprsymbol
   | MTstring
   | MTint
-  | MTident
+  | MTid
 
 type meta_arg =
   | MAty  of ty
@@ -52,7 +52,7 @@ type meta_arg =
   | MApr  of prsymbol
   | MAstr of string
   | MAint of int
-  | MAident of ident
+  | MAid of ident
 
 type meta = private {
   meta_name : string;

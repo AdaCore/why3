@@ -370,7 +370,7 @@ let print_meta_arg fmt = function
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
   | MAstr s -> fprintf fmt "\"%s\"" s
   | MAint i -> fprintf fmt "%d" i
-  | MAident id -> fprintf fmt "%s" (id_unique iprinter id)
+  | MAid id -> fprintf fmt "%s" (id_unique iprinter id)
 
 let print_qt fmt th =
   if th.th_path = [] then print_th fmt th else

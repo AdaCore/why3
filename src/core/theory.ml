@@ -83,7 +83,7 @@ type meta_arg_type =
   | MTprsymbol
   | MTstring
   | MTint
-  | MTident
+  | MTid
 
 type meta_arg =
   | MAty  of ty
@@ -92,7 +92,7 @@ type meta_arg =
   | MApr  of prsymbol
   | MAstr of string
   | MAint of int
-  | MAident of ident
+  | MAid of ident
 
 type meta = {
   meta_name : string;
@@ -237,7 +237,7 @@ module Hstdecl = Hashcons.Make (struct
     | MApr pr -> pr_hash pr
     | MAstr s -> Hashtbl.hash s
     | MAint i -> Hashtbl.hash i
-    | MAident i -> Ident.id_hash i
+    | MAid i -> Ident.id_hash i
 
   let hs_smap sm h =
     Mts.fold hs_cl_ty sm.sm_ty
@@ -871,7 +871,7 @@ let get_meta_arg_type = function
   | MApr  _ -> MTprsymbol
   | MAstr _ -> MTstring
   | MAint _ -> MTint
-  | MAident _ -> MTident
+  | MAid _ -> MTid
 
 let create_meta m al =
   let get_meta_arg at a =
@@ -970,7 +970,7 @@ let print_meta_arg_type fmt = function
   | MTprsymbol -> fprintf fmt "proposition"
   | MTstring -> fprintf fmt "string"
   | MTint -> fprintf fmt "int"
-  | MTident -> fprintf fmt "identifier"
+  | MTid -> fprintf fmt "identifier"
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
