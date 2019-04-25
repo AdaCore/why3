@@ -34,6 +34,7 @@ Transformations
     generalize in the induction
   * `destruct` now destruct `not p` into `p -> false`. `destruct_rec` is
      allowed to further destruct afterwards.
+    `destruct` can also destruct `true` and `false`.
 
 IDE
   * display of counterexamples in the Task view has been improved
