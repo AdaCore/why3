@@ -988,6 +988,8 @@ use real.FromInt
 
 clone export LinearEquationsDecision with type  C.a = real, function C.(+) = (+.), function C.( * ) = ( *. ), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=int -> real, function C.interp=rinterp, exception C.Unknown = QError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, goal .
 
+meta reflection val decision
+
 end
 
 module LinearDecisionInt
@@ -1109,6 +1111,8 @@ let int_decision (l: context') (g: equality') : bool
   raises  { R.Failure -> true | QError -> true | NError -> true }
 = let l',g' = m_ctx l g in
   R.decision l' g'
+
+meta reflection val int_decision
 
 end
 
@@ -1555,6 +1559,8 @@ let mp_decision (l: context') (g: equality') : bool
 =
   R.decision (m_ctx l) (m_eq g)
 
+meta reflection val mp_decision
+
 end
 
 module EqPropMP
@@ -1968,6 +1974,8 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
   = let l', g' = prop_ctx l g in
     mp_decision l' g'
 
+  meta reflection val prop_mp_decision
+
 end
 
 module TestMP
@@ -2048,6 +2056,9 @@ function interp (f:fmla) (b: int -> value) : bool =
 let f (f:fmla) : bool
   ensures { result -> forall b. interp f b }
 = false
+
+meta reflection val f
+
 end
 (*
 module TestFmla

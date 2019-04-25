@@ -53,7 +53,7 @@ let string_list_of_qualid q =
     | Qident id -> id.id_str :: acc in
   sloq [] q
 
-(* Type of sumbol queried *)
+(* Type of symbol queried *)
 type symbol_kind =
   | Prop
   | Type
@@ -500,6 +500,7 @@ open Dexpr
 let ty_of_pty tuc = ty_of_pty (get_namespace tuc)
 
 let get_namespace muc = List.hd muc.Pmodule.muc_import
+let get_namespace_export muc = List.hd muc.Pmodule.muc_export
 
 let dterm muc =
   let uc = muc.muc_theory in
@@ -508,6 +509,10 @@ let dterm muc =
 let find_xsymbol     muc q = find_xsymbol_ns     (get_namespace muc) q
 let find_itysymbol   muc q = find_itysymbol_ns   (get_namespace muc) q
 let find_prog_symbol muc q = find_prog_symbol_ns (get_namespace muc) q
+
+let find_rsymbol muc q =
+  let ns = get_namespace_export muc in
+  find_qualid ~ty:Prog (fun rs -> rs.rs_name) ns_find_rs ns q
 
 let find_special muc test nm q =
   match find_prog_symbol muc q with
@@ -1478,6 +1483,7 @@ let add_decl muc env file d =
         | Ptree.Max q  -> MApr (find_prop_of_kind Paxiom tuc q)
         | Ptree.Mlm q  -> MApr (find_prop_of_kind Plemma tuc q)
         | Ptree.Mgl q  -> MApr (find_prop_of_kind Pgoal  tuc q)
+        | Ptree.Mval q -> MAid (find_rsymbol muc q).rs_name
         | Ptree.Mstr s -> MAstr s
         | Ptree.Mint i -> MAint i in
       add_meta muc (lookup_meta id.id_str) (List.map convert al)

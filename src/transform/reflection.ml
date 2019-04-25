@@ -28,6 +28,12 @@ let debug_refl = Debug.register_info_flag
 
 let expl_reification_check = Ident.create_attribute "expl:reification check"
 
+let meta_decision_procedure =
+  Theory.register_meta
+    ~desc:"decision procedure, used for reflection"
+    "reflection"
+    [ Theory.MTid ]
+
 type reify_env = { kn: known_map;
                    store: (vsymbol * int) Mterm.t;
                    fr: int;
@@ -312,7 +318,7 @@ let rec reify_term renv t rt =
       end
   and invert_interp renv ls (t:term) =
     let ld = try Opt.get (find_logic_definition renv.kn ls)
-             with Invalid_argument _ ->
+             with Invalid_argument _ | Not_found ->
                Debug.dprintf debug_reification
                  "did not find def of %a@."
                  Pretty.print_ls ls;
@@ -349,10 +355,11 @@ let rec reify_term renv t rt =
            raise NoReification
   and invert_ctx_interp renv ls t l g =
     let ld = try Opt.get (find_logic_definition renv.kn ls)
-             with Invalid_argument _ ->
+             with | Not_found ->
                Debug.dprintf debug_reification "did not find def of %a@."
                  Pretty.print_ls ls;
                raise NoReification
+                  | Invalid_argument _ -> assert false
     in
     let vl, f = open_ls_defn ld in
     Debug.dprintf debug_reification "invert_ctx_interp ls %a @."
@@ -621,6 +628,8 @@ open Expr
 open Ity
 open Wstdlib
 open Mlinterp
+open Theory
+open Pmodule
 
 exception ReductionFail of reify_env
 
@@ -632,21 +641,32 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
   let g, prev = Task.task_separate_goal task in
   let g = Apply.term_decl g in
   let ths = Task.used_theories task in
-  let o =
-    Mid.fold
-      (fun _ th o ->
-        try
-          let pmod = Pmodule.restore_module th in
-          let rs = Pmodule.ns_find_rs pmod.Pmodule.mod_export [s] in
-          if o = None then Some (pmod, rs)
-          else (let es = Format.sprintf "module or function %s found twice" s in
-                raise (Arg_error es))
-        with Not_found -> o)
-      ths None in
-  let (_pmod, rs) = if o = None
-                    then (let es = Format.sprintf "Symbol %s not found@." s in
-                          raise (Arg_error es))
-                   else Opt.get o in
+  let re_dot = Str.regexp_string "." in
+  let qs = Str.split re_dot s in
+  let fname = List.hd (List.rev qs) in
+  let es = "Symbol "^fname^" not found in reflection metas" in
+  let fid = Mstr.find_exn (Arg_error es) s nt.Trans.meta_id_args in
+  Debug.dprintf debug_refl "looking for symbol %s@." fname;
+  let (pmod, rs) =
+    let fn acc = function
+      | [ MAid id ] ->
+         Debug.dprintf debug_refl "found symbol %s@." id.id_string;
+         if id_equal id fid
+         then id :: acc
+         else acc
+      | _ -> assert false in
+    begin match on_meta meta_decision_procedure fn [] task with
+    | [] ->
+       Debug.dprintf debug_refl "symbol not found in current goal@.";
+       let es = Format.sprintf  "Symbol %s not found@." s in
+       raise (Arg_error es)
+    | [id] ->
+       let pm = restore_module_id id in
+       Debug.dprintf debug_refl "symbol in module %s@." pm.mod_theory.th_name.id_string;
+       (pm, ns_find_rs pm.mod_export qs)
+    | _ -> raise (Arg_error "symbol found twice")
+    end
+  in
   let lpost = List.map open_post rs.rs_cty.cty_post in
   if List.exists (fun pv -> pv.pv_ghost) rs.rs_cty.cty_args
   then (Debug.dprintf debug_refl "ghost parameter@.";
@@ -658,7 +678,7 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
                  let pm = Pmodule.restore_module th in
                  Mstr.add id.id_string pm acc
                with Not_found -> acc)
-             ths Mstr.empty in
+             ths (Mstr.singleton pmod.mod_theory.th_name.id_string pmod) in
   Debug.dprintf debug_refl "module map built@.";
   let args = List.map (fun pv -> pv.pv_vs) rs.rs_cty.cty_args in
   let rec reify_post = function

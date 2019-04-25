@@ -83,6 +83,7 @@ type meta_arg_type =
   | MTprsymbol
   | MTstring
   | MTint
+  | MTid
 
 type meta_arg =
   | MAty  of ty
@@ -91,6 +92,7 @@ type meta_arg =
   | MApr  of prsymbol
   | MAstr of string
   | MAint of int
+  | MAid of ident
 
 type meta = {
   meta_name : string;
@@ -235,6 +237,7 @@ module Hstdecl = Hashcons.Make (struct
     | MApr pr -> pr_hash pr
     | MAstr s -> Hashtbl.hash s
     | MAint i -> Hashtbl.hash i
+    | MAid i -> Ident.id_hash i
 
   let hs_smap sm h =
     Mts.fold hs_cl_ty sm.sm_ty
@@ -409,8 +412,9 @@ let add_tdecl uc td = match td.td_node with
 
 (** Declarations *)
 
-let store_path, store_theory, restore_path =
+let store_path, store_theory, restore_path, restore_theory =
   let id_to_path = Wid.create 17 in
+  let id_to_th = Wid.create 17 in
   let store_path uc path id =
     (* this symbol already belongs to some theory *)
     if Wid.mem id_to_path id then () else
@@ -420,10 +424,15 @@ let store_path, store_theory, restore_path =
   let store_theory th =
     let id = th.th_name in
     (* this symbol is already a theory *)
-    if Wid.mem id_to_path id then () else
-    Wid.set id_to_path id (th.th_path, id.id_string, []) in
+    if Wid.mem id_to_path id then () else begin
+        Wid.set id_to_path id (th.th_path, id.id_string, []);
+        Sid.iter (fun id -> Wid.set id_to_th id th) th.th_local;
+        Wid.set id_to_th id th;
+      end
+  in
   let restore_path id = Wid.find id_to_path id in
-  store_path, store_theory, restore_path
+  let restore_theory id = Wid.find id_to_th id in
+  store_path, store_theory, restore_path, restore_theory
 
 let close_theory uc =
   let th = close_theory uc in
@@ -862,6 +871,7 @@ let get_meta_arg_type = function
   | MApr  _ -> MTprsymbol
   | MAstr _ -> MTstring
   | MAint _ -> MTint
+  | MAid _ -> MTid
 
 let create_meta m al =
   let get_meta_arg at a =
@@ -960,6 +970,7 @@ let print_meta_arg_type fmt = function
   | MTprsymbol -> fprintf fmt "proposition"
   | MTstring -> fprintf fmt "string"
   | MTint -> fprintf fmt "int"
+  | MTid -> fprintf fmt "identifier"
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
