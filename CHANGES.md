@@ -35,6 +35,8 @@ Transformations
   * `destruct` now destruct `not p` into `p -> false`. `destruct_rec` is
      allowed to further destruct afterwards.
     `destruct` can also destruct `true` and `false`.
+  * decision procedures used for reflection now must be declared explicitly using
+    `meta reflection val <function_name>` :x:
 
 IDE
   * display of counterexamples in the Task view has been improved
