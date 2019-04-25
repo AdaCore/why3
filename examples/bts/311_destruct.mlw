@@ -1,0 +1,20 @@
+use list.List
+use list.Length
+use int.Int
+
+constant x: int
+
+predicate p int
+
+axiom H: not (p 0)
+axiom H1: p 0
+
+goal g: false
+
+axiom H2: false
+
+goal g5: p 5
+
+axiom H3: true
+
+goal g6: p 5

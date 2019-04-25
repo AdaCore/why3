@@ -248,6 +248,10 @@ let destruct_fmla ~recursive (t: term) =
     in
 
     match t.t_node with
+    | Tfalse ->
+        []
+    | Ttrue ->
+        [[]]
     | Tbinop (Tand, t1, t2) ->
         let l1 = destruct_fmla_exception ~toplevel:false t1 in
         let l2 = destruct_fmla_exception ~toplevel:false t2 in
@@ -321,6 +325,9 @@ let destruct_fmla ~recursive (t: term) =
       else
         (* The hypothesis is trivial because Cs1 <> Cs2 thus useless *)
         [[]]
+    | Tnot t1 ->
+        (* Keep toplevel: this is considered an implication *)
+        destruct_fmla_exception ~toplevel (t_implies t1 t_false)
     | Tif (t1, t2, t3) ->
         let ts2 =
           destruct_fmla_exception ~toplevel:false t2 |>

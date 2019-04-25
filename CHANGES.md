@@ -32,6 +32,9 @@ Transformations
   * `induction_arg_ty_lex` is now equivalent to `induction_ty_lex`
   * `induction_arg_pr` now takes an optional argument that indicates what to
     generalize in the induction
+  * `destruct` now destruct `not p` into `p -> false`. `destruct_rec` is
+     allowed to further destruct afterwards.
+    `destruct` can also destruct `true` and `false`.
 
 IDE
   * display of counterexamples in the Task view has been improved
