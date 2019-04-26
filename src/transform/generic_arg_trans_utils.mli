@@ -22,6 +22,7 @@ exception Arg_trans_missing of (string * Svs.t)
 exception Arg_bad_hypothesis of (string * term)
 exception Cannot_infer_type of string
 exception Unnecessary_terms of term list
+exception Remove_unknown of (Decl.decl * Ident.ident)
 
 val gen_ident :
   ?attrs:Ident.Sattr.t -> ?loc:Loc.position -> string -> Ident.preid

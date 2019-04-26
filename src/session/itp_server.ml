@@ -194,6 +194,18 @@ let bypass_pretty s id =
 
 let get_exception_message ses id e =
   let module P = (val (p ses id)) in
+  let print_id (id: Ident.ident) =
+    (* For the case where there is only an id but not its kind *)
+    if Ident.known_id P.aprinter id then
+      Ident.id_unique P.aprinter id
+    else if Ident.known_id P.pprinter id then
+      Ident.id_unique P.pprinter id
+    else if Ident.known_id P.sprinter id then
+      Ident.id_unique P.sprinter id
+    else if Ident.known_id P.tprinter id then
+      Ident.id_unique P.tprinter id
+    else id.Ident.id_string
+  in
   match e with
   | Session_itp.NoProgress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
@@ -232,6 +244,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Cannot_infer_type s ->
       Pp.sprintf "Error in transformation %s. Cannot infer type of polymorphic element" s, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Remove_unknown (d, id) ->
+      Pp.sprintf "Error while removing ident: %s. The ident is used in the following declaration:\n%a\n\
+        You can try to use recursive remove or to add this declaration to the list of removed symbols"
+        (print_id id) P.print_decl d, Loc.dummy_position, ""
   | Args_wrapper.Arg_qid_not_found q ->
       Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""
   | Args_wrapper.Arg_pr_not_found pr ->

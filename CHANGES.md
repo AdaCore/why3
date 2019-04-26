@@ -37,6 +37,8 @@ Transformations
     `destruct` can also destruct `true` and `false`.
   * decision procedures used for reflection now must be declared explicitly using
     `meta reflection val <function_name>` :x:
+  * `remove` should not raise unnecessary popups anymore. Added `remove_rec`.
+    `bisect` should not raise unnecessary popups too.
 
 IDE
   * display of counterexamples in the Task view has been improved

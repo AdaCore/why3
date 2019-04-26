@@ -24,6 +24,7 @@ exception Arg_trans_missing of (string * Svs.t)
 exception Arg_bad_hypothesis of (string * term)
 exception Cannot_infer_type of string
 exception Unnecessary_terms of term list
+exception Remove_unknown of (decl * Ident.ident)
 
 let gen_ident = Ident.id_fresh
 
