@@ -50,71 +50,42 @@ let assert_tac t name =
   let goal = Trans.add_decls [h_t] in
   Trans.par [goal_cut; goal]
 
+let get_ident_symbol s =
+  match s with
+  | Tstysymbol ty -> ty.ts_name
+  | Tsprsymbol pr -> pr.pr_name
+  | Tslsymbol ls -> ls.ls_name
+
 (* from task [delta, name1, name2, ... namen |- G] build the task [delta |- G] *)
-let remove_list name_list =
-  Trans.decl
-    (fun d ->
-      match d.d_node with
-      | Dprop (k, pr, _) when
-          (k != Pgoal &&
-            List.exists
-             (fun x -> match x with
-                       | Tsprsymbol x -> Ident.id_equal pr.pr_name x.pr_name
-                       | _ -> false
-             )
-             name_list) ->
-        []
-      | Dparam ls when
-          (List.exists
-             (fun x -> match x with
-                       | Tslsymbol x -> Ident.id_equal ls.ls_name x.ls_name
-                       | _ -> false
-             )
-             name_list) ->
-       []
-      | Dlogic dl when
-        (* also remove all dependant recursive declarations (as expected) *)
-          List.exists
-          (fun (ls, _) -> List.exists
-             (fun x -> match x with
-                       | Tslsymbol x -> Ident.id_equal ls.ls_name x.ls_name
-                       | _ -> false
-             )
-             name_list)
-            dl ->
-       []
-      | Dind il when
-        (* also remove all dependant inductive declarations (as expected) *)
-          List.exists
-          (fun (ls, _) -> List.exists
-             (fun x -> match x with
-                       | Tslsymbol x -> Ident.id_equal ls.ls_name x.ls_name
-                       | _ -> false
-             )
-             name_list)
-            (snd il) ->
-       []
-      | Dtype ty when
-          (List.exists
-             (fun x -> match x with
-                       | Tstysymbol x -> Ident.id_equal ty.ts_name x.ts_name
-                       | _ -> false
-             )
-             name_list) ->
-        []
-      | Ddata tyl when
-          (* also remove all dependant recursive declarations (as expected) *)
-          List.exists
-          (fun (ty, _) -> List.exists
-             (fun x -> match x with
-                       | Tstysymbol x -> Ident.id_equal ty.ts_name x.ts_name
-                       | _ -> false
-             )
-             name_list)
-            tyl ->
-       []
-      | _ -> [d])
-    None
+let remove_list ~is_rec (name_list: symbol list) =
+    Trans.fold_map (fun td (removed_ids, task_uc) ->
+      match td.Task.task_decl.Theory.td_node with
+      | Theory.Use _ | Theory.Clone _ | Theory.Meta _ ->
+          (removed_ids, Task.add_tdecl task_uc td.Task.task_decl)
+      | Theory.Decl d ->
+          let removed_in_decls = Ident.Sid.inter removed_ids d.d_syms in
+          begin match d.d_node with
+            | Dprop (Pgoal, _, _) ->
+               begin try
+                   (removed_ids, Task.add_decl task_uc d)
+                 with Decl.UnknownIdent id -> raise (Remove_unknown (d, id))
+               end
+            | _ when Ident.Sid.exists (fun x -> Ident.Sid.mem x d.d_news) removed_ids ->
+                (* The task create an element we want to delete -> removal *)
+                if is_rec then
+                  (Ident.Sid.union removed_ids d.d_news, task_uc)
+                else
+                  (removed_ids, task_uc)
+            | _ when not (Ident.Sid.is_empty removed_in_decls) ->
+                (* The task create an element we want to add but it uses deleted
+                   elements *)
+                if is_rec then
+                  (Ident.Sid.union removed_ids d.d_news, task_uc)
+                else
+                  raise (Remove_unknown (d, Ident.Sid.choose removed_in_decls))
+            | _ ->
+                (removed_ids, Task.add_decl task_uc d)
+          end) (Ident.Sid.of_list (List.map get_ident_symbol name_list)) None
 
 (* from task [delta, name1, name2, ... namen |- G] build the task [name1, name2, ... namen |- G] *)
 let clear_but (l: prsymbol list) local_decls =
@@ -199,7 +170,13 @@ let () = wrap_and_register
 let () = wrap_and_register
     ~desc:"remove <name list>@ removes@ the@ listed@ premises."
      "remove"
-    (Tlist Ttrans) (fun l -> remove_list l)
+    (Tlist Ttrans) (fun l -> remove_list ~is_rec:false l)
+
+let () = wrap_and_register
+    ~desc:"remove <name list>@ removes@ the@ listed@ premises@ and@ everything@ \
+           depending@ on@ that."
+     "remove_rec"
+    (Tlist Ttrans) (fun l -> remove_list ~is_rec:true l)
 
 let () = wrap_and_register
     ~desc:"use_th <theory>@ imports@ the@ given@ theory."

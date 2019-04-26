@@ -35,6 +35,8 @@ Transformations
   * `destruct` now destruct `not p` into `p -> false`. `destruct_rec` is
      allowed to further destruct afterwards.
     `destruct` can also destruct `true` and `false`.
+  * `remove` should not raise unnecessary popups anymore. Added `remove_rec`.
+    `bisect` should not raise unnecessary popups too.
 
 IDE
   * display of counterexamples in the Task view has been improved
