@@ -28,7 +28,7 @@ x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 {"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] } }
 
-bench/ce/map.mlw M VC test_map_multidim1: Timeout or Unknown
+bench/ce/map.mlw M VC test_map_multidim1: Unknown (sat)
 Counter-example model:File map.mlw:
 Line 13:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
@@ -46,8 +46,11 @@ x, [[@introduced], [@field:0:contents],
 Line 16:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" ,
+"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+"val" : "0" } , "value" : {"type" : "Integer" , "val" : "0" } },
+{"others" : {"type" : "Integer" , "val" : "1" } }] } },
+{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] } }] } }
 
 bench/ce/map.mlw M VC test_map_multidim2: Timeout or Unknown
@@ -55,20 +58,24 @@ Counter-example model:File ref.mlw:
 Line 18:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
+"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+"value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "1" } }] } }, {"indice" : {"type" : "Integer" , "val" : "1" } ,
 "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
 "val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "1" } }] } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } },
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] } }] } }
 File map.mlw:
 Line 18:
 x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
+"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+"value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+"val" : "1" } }] } }, {"indice" : {"type" : "Integer" , "val" : "1" } ,
 "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
 "val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "1" } }] } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } },
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] } }] } }
 Line 19:
@@ -78,11 +85,11 @@ x, [[@introduced], [@field:0:contents],
 "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
 "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
 "val" : "0" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "0" } }] } },
+{"others" : {"type" : "Integer" , "val" : "1" } }] } },
 {"indice" : {"type" : "Integer" , "val" : "1" } ,
 "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
 "val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "1" } }] } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } },
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] } }] } }
 Line 23:
@@ -91,11 +98,11 @@ x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
 "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
 "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
 "val" : "0" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "0" } }] } },
+{"others" : {"type" : "Integer" , "val" : "1" } }] } },
 {"indice" : {"type" : "Integer" , "val" : "1" } ,
 "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
 "val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "1" } }] } },
+{"others" : {"type" : "Integer" , "val" : "0" } }] } },
 {"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
 "val" : "0" } }] } }] } }] } }
 

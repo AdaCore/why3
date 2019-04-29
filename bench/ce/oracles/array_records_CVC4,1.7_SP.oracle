@@ -2,159 +2,55 @@ Strongest Postcondition
 bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout or Unknown
 Counter-example model:File array_records.mlw:
 Line 23:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
 i, [[@introduced]] = {"type" : "Integer" ,
 "val" : "-1" }
 Line 27:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-i, [[@introduced],
-[@model_trace:i]] = {"type" : "Integer" ,
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
 "val" : "-1" }
 
 bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout or Unknown
 Counter-example model:File array_records.mlw:
 Line 23:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
 i, [[@introduced]] = {"type" : "Integer" ,
 "val" : "-1" }
 Line 27:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-i, [[@introduced],
-[@model_trace:i]] = {"type" : "Integer" ,
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
 "val" : "-1" }
 
 bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout or Unknown
 Counter-example model:File array_records.mlw:
 Line 23:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
 i, [[@introduced]] = {"type" : "Integer" ,
 "val" : "-1" }
 Line 27:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-i, [[@introduced],
-[@model_trace:i]] = {"type" : "Integer" ,
-"val" : "-1" }
-
-bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout or Unknown
-Counter-example model:File array.mlw:
-Line 23:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-File array_records.mlw:
-Line 23:
-a, [[@introduced],
-[@at:'Old:loc:location],
-[@at:'Old:loc:location] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-i, [[@introduced]] = {"type" : "Integer" ,
-"val" : "-1" }
-Line 27:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-Line 28:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-i, [[@introduced],
-[@model_trace:i]] = {"type" : "Integer" ,
-"val" : "-1" }
-
-bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout or Unknown
-Counter-example model:File array.mlw:
-Line 23:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-File array_records.mlw:
-Line 23:
-a, [[@introduced],
-[@at:'Old:loc:location],
-[@at:'Old:loc:location] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-i, [[@introduced]] = {"type" : "Integer" ,
-"val" : "-1" }
-Line 27:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-Line 28:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-i, [[@introduced],
-[@model_trace:i]] = {"type" : "Integer" ,
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
 "val" : "-1" }
 
 bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout or Unknown
 Counter-example model:File array_records.mlw:
 Line 23:
-a, [[@introduced],
-[@at:'Old:loc:location],
-[@at:'Old:loc:location] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
 i, [[@introduced]] = {"type" : "Integer" ,
 "val" : "-1" }
-Line 27:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
 Line 28:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "first_val" , "value" : {"type" : "Integer" ,
-"val" : "3" } }, {"field" : "flag" , "value" : {"type" : "Boolean" ,
-"val" : true } }, {"field" : "sec_val" , "value" : {"type" : "Integer" ,
-"val" : "5" } }] } }
-i, [[@introduced],
-[@model_trace:i]] = {"type" : "Integer" ,
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout or Unknown
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 28:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
+"val" : "-1" }
+
+bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout or Unknown
+Counter-example model:File array_records.mlw:
+Line 23:
+i, [[@introduced]] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 28:
+i, [[@introduced], [@model_trace:i]] = {"type" : "Integer" ,
 "val" : "-1" }
 
 bench/ce/array_records.mlw Array_records VC var_overwrite: Timeout or Unknown

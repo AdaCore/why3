@@ -25,6 +25,7 @@ let name = (['a'-'z']*'_'*['0'-'9']*)*
 let dummy = ('_''_''_')?
 let float_num = '#'('b' | 'x') hexa_num
 let bv_num = '#'('b' | 'x') hexa_num
+let variable = [^'|']* (* cvc4 variables can now be arbitrary strings *)
 
 rule token = parse
   | '\n'
@@ -82,6 +83,7 @@ rule token = parse
       { DEC_STR (int_part, fract_part)  }
   | '-'space*(num as int_part)"."(num as fract_part)
       {MINUS_DEC_STR (("-"^int_part), fract_part)}
+  | '|' (variable as at) '|' { ATOM (at) }
   | atom+ as at { ATOM (at) }
   | eof
       { EOF }
