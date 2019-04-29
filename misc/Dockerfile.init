@@ -13,6 +13,10 @@ RUN apt-get clean
 RUN wget https://github.com/ocaml/opam/releases/download/2.0.0/opam-2.0.0-x86_64-linux -O /usr/bin/opam && chmod 755 /usr/bin/opam
 
 # install provers
+## CVC4 1.7
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.7-x86_64-linux-opt
+RUN chmod a+x cvc4-1.7-x86_64-linux-opt
+RUN cp cvc4-1.7-x86_64-linux-opt /usr/local/bin/cvc4-1.7
 ## CVC4 1.6
 RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.6-x86_64-linux-opt
 RUN chmod a+x cvc4-1.6-x86_64-linux-opt
