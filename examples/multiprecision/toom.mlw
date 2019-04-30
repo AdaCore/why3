@@ -1059,7 +1059,7 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
       label Adjust2 in
       value_concat scratch n (n+n);
       assert { pelts scratch = pelts sn };
-      let c = wmpn_addmul_1 sn yp1 2 n in
+      let c = wmpn_addmul_1 sn yp1 n 2 in
       assert { pelts scratch = pelts sn };
       value_concat scratch n (n+n);
       value_sub_frame_shift (pelts scratch) (pelts sa)
@@ -2091,6 +2091,31 @@ with wmpn_toom32_mul (r x y scratch: ptr limb) (sx sy:int32) (ghost k: int) : un
       end;
       sfree scratch
     end*)
+
+  (** `wmpn_mul_n r x y sz` multiplies `(x, sz)` and `(y, sz)` and
+  writes the result to `(r, 2*sz)`. `r` must not overlap with either
+  `x` or `y`. Corresponds to `mpn_mul_n`.  *)
+  let wmpn_mul_n (r x y:t) (sz:int32) (ghost k: int) : unit
+    requires { sz > 0 }
+    requires { valid x sz }
+    requires { valid y sz }
+    requires { valid r (sz + sz) }
+    requires { 8 * sz < max_int32 }
+    requires { sz <= toom22_threshold * power 2 k }
+    requires { 0 <= k <= 64 }
+    ensures { value r (sz + sz) = value x sz * value y sz }
+    ensures  { min r = old min r }
+    ensures  { max r = old max r }
+    ensures  { plength r = old plength r }
+    ensures  { forall j. min r <= j < offset r \/ offset r + sz + sz <= j < max r
+                         -> (pelts r)[j] = old (pelts r)[j] }
+    raises   { StackOverflow -> true }
+  =
+    if sz <= toom22_threshold
+    then wmpn_mul_basecase r x y sz sz
+    else
+      let ws = salloc (UInt32.of_int32 (2 * (sz + 64))) in
+      wmpn_toom22_mul r x y ws sz sz 64
 
   meta remove_prop axiom no_borrow
   meta remove_prop axiom no_borrow_ptr
