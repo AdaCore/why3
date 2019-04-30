@@ -12,10 +12,10 @@ module Sub
   use lemmas.Lemmas
 
 
-  (** `wmpn_sub_1 r x y sz` subtracts `y` from `(x, sz)` and writes
+  (** `wmpn_sub_1 r x sz y` subtracts `y` from `(x, sz)` and writes
       the result to `(r, sz)`. Returns borrow, either 0 or
       1. Corresponds to `mpn_sub_1`. *)
-  let wmpn_sub_1 (r x:t) (y:limb) (sz:int32) : limb
+  let wmpn_sub_1 (r x:t) (sz:int32) (y:limb) : limb
     requires { valid x sz }
     requires { valid r sz }
     requires { 0 < sz }
@@ -126,10 +126,10 @@ module Sub
       done;
       !b
 
-  (** `wmpn_sub r x y sx sy` subtracts `(y,sy)` from `(x, sx)` and writes the
+  (** `wmpn_sub r x sx y sy` subtracts `(y,sy)` from `(x, sx)` and writes the
       result in `(r, sx)`. `sx` must be greater than or equal to
       `sy`. Returns borrow, either 0 or 1. Corresponds to `mpn_sub`. *)
-  let wmpn_sub (r x y:t) (sx sy:int32) : limb
+  let wmpn_sub (r x:t) (sx:int32) (y:t) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -220,7 +220,7 @@ module Sub
     done;
     !b
 
-  let wmpn_sub_in_place (x y:t) (sx sy:int32) : limb
+  let wmpn_sub_in_place (x:t) (sx:int32) (y:t) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -317,10 +317,10 @@ module Sub
     value_sub_concat (pelts ox) x.offset (x.offset + p2i !i) (x.offset + p2i sx);
     !b
 
-  (** `wmpn_decr x y sz` subtracts from `x` the value of the limb `y` in place.
+  (** `wmpn_decr x sz y` subtracts from `x` the value of the limb `y` in place.
       `x` has size `sz`. The subtraction must not overflow. This corresponds
       to `mpn_decr` *)
-  let wmpn_decr (x:t) (y:limb) (ghost sz:int32) : unit
+  let wmpn_decr (x:t) (ghost sz:int32) (y:limb) : unit
     requires { valid x sz }
     requires { sz > 0 }
     requires { 0 <= value x sz - y }
@@ -468,7 +468,7 @@ module Sub
                 so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
     value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sz)
 
-  let wmpn_sub_1_in_place (x:t) (y:limb) (sz:int32) : limb
+  let wmpn_sub_1_in_place (x:t) (sz:int32) (y:limb) : limb
     requires { valid x sz }
     requires { sz > 0 }
     ensures  { value x sz - (power radix sz) * result = value (old x) sz - y }

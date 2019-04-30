@@ -14,10 +14,10 @@ module Mul
   use add.Add
 
 
-  (** `wmpn_mul_1 r x y sz` multiplies `x[0..sz-1]` by the limb `y` and
+  (** `wmpn_mul_1 r x sz y` multiplies `x[0..sz-1]` by the limb `y` and
        writes the n least significant limbs in `r`, and returns the most
        significant limb. It corresponds to `mpn_mul_1`. *)
-  let wmpn_mul_1 (r x:t) (y:limb) (sz:int32) : limb
+  let wmpn_mul_1 (r x:t) (sz:int32) (y:limb) : limb
     requires { valid x sz }
     requires { valid r sz }
     ensures { value r sz + (power radix sz) * result
@@ -82,7 +82,7 @@ module Mul
       least significant limbs to `(r, sz)` and writes the result in `(r, sz)`.
       Returns the most significant limb of the product plus the carry
       of the addition. Corresponds to `mpn_addmul_1`.*)
-  let wmpn_addmul_1 (r x: t) (sz: int32) (y:limb) : limb
+  let wmpn_addmul_1 (r x:t) (sz: int32) (y:limb) : limb
     requires { valid x sz }
     requires { valid r sz }
     ensures { value r sz + (power radix sz) * result
@@ -258,10 +258,10 @@ module Mul
     done;
     c
 
-  (** `wmpn_mul_basecase r x y sx sy` multiplies `(x, sx)` and `(y,sy)` and writes
+  (** `wmpn_mul_basecase r x sx y sy` multiplies `(x, sx)` and `(y,sy)` and writes
   the result in `(r, sx+sy)`. `sx` must be greater than or equal to
   `sy`. Corresponds to `mpn_mul`. *)
-  let wmpn_mul_basecase (r x y:t) (sx sy:int32) : unit
+  let wmpn_mul_basecase (r x:t) (sx:int32) (y:t) (sy:int32) : unit
     requires { 0 < sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -272,7 +272,7 @@ module Mul
               -> (pelts r)[j] = old (pelts r)[j] }
     (*ensures  { result = (pelts r)[r.offset + sx + sy - 1] }*)
   =
-    let c = wmpn_mul_1 r x (C.get y) sx in
+    let c = wmpn_mul_1 r x sx (C.get y) in
     value_sub_update_no_change (pelts r) (r.offset + p2i sx)
                                r.offset (r.offset + p2i sx - 1) c;
     set_ofs r sx c;
