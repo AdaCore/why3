@@ -142,8 +142,15 @@ let destruct_term ?names replace (x: term) : Task.task tlist =
                         let cls = List.assoc ts dls in
                         let r = build_decls ~names cls x in
                         ((ls_of_x, r, defined), List.map (add_decl d) task_list)
-                      with Not_found -> ((ls_of_x, r, defined),
-                                         List.map (add_decl d) task_list)
+                      with Not_found ->
+                        let ls_of_x =
+                          Term.Sls.fold (fun ls acc ->
+                              if Ident.Sid.mem ls.ls_name d.d_news then
+                                Term.Sls.remove ls acc
+                              else
+                                acc) ls_of_x ls_of_x in
+                        ((ls_of_x, r, defined),
+                         List.map (add_decl d) task_list)
                     end
                 | Dprop (Pgoal, _, _) ->
                     ((ls_of_x, r, defined), List.map (add_decl d) task_list)

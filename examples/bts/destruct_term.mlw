@@ -1,0 +1,17 @@
+module T
+
+  use int.Int
+  use mach.array.Array31
+  use option.Option
+
+  type t = 
+  { l : array (option int); 
+    l1: array (option int);
+  }
+
+  let f (x : t) : t 
+    ensures { result.l[5] = None }
+  = 
+    x
+
+end
