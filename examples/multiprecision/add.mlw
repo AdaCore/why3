@@ -11,11 +11,11 @@ module Add
   use types.Types
   use lemmas.Lemmas
 
-  (** `wmpn_add_1 r x y sz` adds to `x` the value of the limb `y`,
+  (** `wmpn_add_1 r x sz y` adds to `x` the value of the limb `y`,
       writes the result in `r` and returns the carry. `r` and `x`
       have size `sz`. This corresponds to the function `mpn_add_1` *)
   (* r and x must be separated. This is enforced by Why3 regions in typing *)
-  let wmpn_add_1 (r x:t) (y:limb) (sz:int32) : limb
+  let wmpn_add_1 (r x:t) (sz:int32) (y:limb) : limb
     requires { valid x sz }
     requires { valid r sz }
     requires { sz > 0 } (* ? GMP does the same for 0 and 1*)
@@ -127,10 +127,10 @@ module Add
     done;
     !c
 
-  (** `wmpn_add r x y sx sy` adds `(x, sx)` to `(y, sy)` and writes the
+  (** `wmpn_add r x sx y sy` adds `(x, sx)` to `(y, sy)` and writes the
       result in `(r, sx)`.  `sx` must be greater than or equal to
       `sy`. Returns carry, either 0 or 1. Corresponds to `mpn_add`. *)
-  let wmpn_add (r x y:t) (sx sy:int32) : limb
+  let wmpn_add (r x:t) (sx:int32) (y:t) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -222,7 +222,7 @@ module Add
     done;
     !c
 
-  let wmpn_add_in_place (x y:t) (sx sy:int32) : limb
+  let wmpn_add_in_place (x:t) (sx:int32) (y:t) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx }
     requires { valid y sy }
@@ -324,10 +324,10 @@ module Add
 
   use int.EuclideanDivision
 
-  (** `wmpn_incr x y sz` adds to `x` the value of the limb `y` in place.
+  (** `wmpn_incr x sz y` adds to `x` the value of the limb `y` in place.
       `x` has size `sz`. The addition must not overflow. This corresponds
-      to `mpn_wmpn_incr` *)
-  let wmpn_incr (x:t) (y:limb) (ghost sz:int32) : unit
+      to `mpn_incr` *)
+  let wmpn_incr (x:t) (ghost sz:int32) (y:limb) : unit
     requires { valid x sz }
     requires { sz > 0 }
     requires { value x sz + y < power radix sz }
@@ -339,7 +339,8 @@ module Add
     let ghost ox = { x } in
     let c = ref (0:limb) in
     let lx : ref limb = ref (C.get x) in
-    let i : ref int32 = ref 1 in
+    let ref xp = C.incr x 1 in
+    let ghost i : ref int32 = ref 1 in
     let res = add_mod !lx y in
     C.set x res;
     if (res < !lx)
@@ -348,6 +349,10 @@ module Add
       assert { radix + res = !lx + y };
       while (!c <> 0) do
         invariant { 1 <= !i <= sz }
+        invariant { offset xp = offset x + !i }
+        invariant { pelts xp = pelts x }
+        invariant { plength xp = plength x }
+        invariant { min xp = min x /\ max xp = max x }
         invariant { !i = sz -> !c = 0 }
         invariant { 0 <= !c <= 1 }
         invariant { value x !i + (power radix !i) * !c
@@ -358,13 +363,13 @@ module Add
                     (pelts x)[j] = (pelts ox)[j] }
         variant   { sz - !i }
         assert { !c = 1 };
-        lx := get_ofs x !i;
+        lx := C.get xp;
         assert { !lx = (pelts ox)[ox.offset + !i] };
         let res = add_mod !lx 1 in
         value_sub_update_no_change (pelts x) (x.offset + p2i !i)
                                              (x.offset + p2i !i + 1)
                                              (x.offset + p2i sz) res;
-        set_ofs x !i res;
+        C.set xp res;
         assert { forall j. !i < j < sz ->
                    (pelts x)[x.offset + j]
                    = (pelts ox)[x.offset + j] };
@@ -372,6 +377,7 @@ module Add
         value_tail x !i;
         value_tail ox !i;
         i := !i + 1;
+        xp <- C.incr xp 1;
         if res <> 0
         then begin
           c := 0;
@@ -400,7 +406,7 @@ module Add
 
   (** `wmpn_incr_1 x sz` adds 1 to `x` in place.
       `x` has size `sz`. The addition must not overflow.
-      This corresponds to `mpn_wmpn_incr` *)
+      This corresponds to `mpn_incr_1` *)
   let wmpn_incr_1 (x:t) (ghost sz:int32) : unit
     requires { valid x sz }
     requires { sz > 0 }
@@ -414,10 +420,15 @@ module Add
     let r : ref limb = ref 0 in
     let ghost c : ref limb = ref 1 in
     let lx : ref limb = ref 0 in
-    let i : ref int32 = ref 0 in
+    let ghost i : ref int32 = ref 0 in
+    let ref xp = C.incr x 0 in
     while (!r = 0) do
       invariant { 0 <= !i <= sz }
       invariant { !i = sz -> !r <> 0 }
+      invariant { offset xp = offset x + !i }
+      invariant { pelts xp = pelts x }
+      invariant { plength xp = plength x }
+      invariant { min xp = min x /\ max xp = max x }
       invariant { !r <> 0 <-> !c = 0 }
       invariant { 0 <= !c <= 1 }
       invariant { value x !i + (power radix !i) * !c
@@ -428,7 +439,7 @@ module Add
                   (pelts x)[j] = (pelts ox)[j] }
       variant   { sz - !i }
       label StartLoop in
-      lx := get_ofs x !i;
+      lx := C.get xp;
       assert { !lx = (pelts ox)[ox.offset + !i] };
       let res = add_mod !lx 1 in
       r := res;
@@ -437,7 +448,7 @@ module Add
       value_sub_update_no_change (pelts x) (x.offset + p2i !i)
                                            (x.offset + p2i !i + 1)
                                            (x.offset + p2i sz) res;
-      set_ofs x !i res;
+      C.set xp res;
       assert { forall j. !i < j < sz ->
                  (pelts x)[x.offset + j]
                  = (pelts ox)[x.offset + j] };
@@ -447,6 +458,7 @@ module Add
       assert { value x (!i+1) + power radix (!i+1) * !c =
                value ox (!i+1) + 1 };
       i := !i + 1;
+      xp <- C.incr xp 1;
       assert { !i = sz -> !c = 0
                by value x sz + power radix sz * !c = value ox sz + 1
                   so value ox sz + 1 < power radix sz
@@ -461,7 +473,7 @@ module Add
                 so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
     value_sub_frame (pelts x) (pelts ox) (x.offset + p2i !i) (x.offset + p2i sz)
 
-  let wmpn_add_1_in_place (x:t) (y:limb) (sz:int32) : limb
+  let wmpn_add_1_in_place (x:t) (sz:int32) (y:limb) : limb
     requires { valid x sz }
     requires { sz > 0 }
     ensures  { value x sz + (power radix sz) * result = value (old x) sz + y }
