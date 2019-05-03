@@ -39,6 +39,8 @@ let module_name ?fname path t =
     | Some f, _ -> clean_name f in
   fname ^ "__" ^ t
 
+let known_decls : Mltree.decl Hid.t = Hid.create 17
+
 (** Translation from Mlw to ML *)
 
 module Translate = struct
@@ -609,7 +611,9 @@ module Translate = struct
   let module_ m =
     let from = { ML.from_mod = Some m; ML.from_km = m.mod_known; } in
     let mod_decl = List.concat (List.map (mdecl from) m.mod_units) in
-    let add_decl known_map decl = let idl = ML.get_decl_name decl in
+    let add_decl known_map decl =
+      let idl = ML.get_decl_name decl in
+      List.iter (fun id -> Hid.replace known_decls id decl) idl;
       List.fold_left (ML.add_known_decl decl) known_map idl in
     let mod_known = List.fold_left add_decl Mid.empty mod_decl in {
       ML.mod_from = from;
@@ -621,7 +625,111 @@ end
 
 (** Some transformations *)
 
-module Transform = struct
+module InlineFunctionCalls = struct
+
+  open Expr
+  open Mltree
+  open Translate
+
+  let inline_attr = Ident.create_attribute "ex:inline"
+  let inlined_call_attr = Ident.create_attribute "__ex:inlined__"
+
+  (* invariant: expressions are still in A-normal form *)
+  let rec expr (subst: pvsymbol Mid.t) e =
+    let mk e_node = { e with e_node = e_node } in
+    match e.e_node with
+    | Evar v -> mk (Evar (pv subst v))
+    | Elet (ld, e) ->
+       let ld' = let_def subst ld in
+       mk (Elet (ld', expr subst e))
+    | Eapp (rs, el) when Sattr.mem inline_attr rs.rs_name.id_attrs ->
+       let fname = rs.rs_name in
+       Debug.dprintf debug_compile "inlining call to %s@." fname.id_string;
+       let decl = Hid.find known_decls fname in
+       let call args e =
+         let add_to_subst acc e v =
+            let (id, _ty, _gh) = v in
+            assert (not (Mid.mem id acc));
+            match e.e_node with
+            | Evar pv ->
+               Mid.add id pv acc
+            | _ ->
+               Debug.dprintf debug_compile "call is not in A-normal form@.";
+               assert false in
+          let subst' = List.fold_left2 add_to_subst subst el args in
+          let e' = expr subst' e in
+          { e' with e_attrs = Sattr.add inlined_call_attr e'.e_attrs }
+       in
+       begin match decl with
+       | Dlet (Lsym (_,_,_,args,e)) -> call args e
+       | Dlet (Lrec rdl) ->
+          let rd = List.find (fun rd -> id_equal rd.rec_sym.rs_name fname) rdl in
+          call rd.rec_args rd.rec_exp
+       | _ -> assert false end
+    | Eapp (rs, el) -> mk (Eapp (rs, List.map (expr subst) el))
+    | Efun (vl, e) ->
+       List.iter (fun (id, _ty, _gh) -> assert (not (Mid.mem id subst))) vl;
+       mk (Efun (vl, expr subst e))
+    | Eif (c,t,e) ->
+       mk (Eif (expr subst c, expr subst t, expr subst e))
+    | Eassign al ->
+       let assign (v, rs, e) =
+         let pv' = pv subst v in
+         (pv', rs, expr subst e) in
+       let al' = List.map assign al in
+       mk (Eassign al')
+    | Ewhile (e1, e2) -> mk (Ewhile (expr subst e1, expr subst e2))
+    | Eblock el -> mk (Eblock (List.map (expr subst) el))
+    | Eexn (xs, ty, e) -> mk (Eexn (xs, ty, expr subst e))
+    | Efor (i, st, dir, en, e) ->
+       assert (not (Mid.mem (pv_name i) subst));
+       mk (Efor (i, pv subst st, dir, pv subst en, expr subst e))
+    | Ematch (e, bl, xl) ->
+       let e' = expr subst e in
+       let bl' = List.map (fun (pat, e) -> pat, expr subst e) bl in
+       let xl' = List.map (fun (x, pvl, e) -> x, pvl, expr subst e) xl in
+       mk (Ematch (e', bl', xl'))
+    | Eignore e -> mk (Eignore (expr subst e))
+    | Eraise (_, None) -> e
+    | Eraise (exn, Some e) -> mk (Eraise (exn, Some (expr subst e)))
+    | Econst _ | Eabsurd -> e
+
+  and pv subst v = try pv subst (Mid.find (pv_name v) subst) with Not_found -> v
+
+  and let_def subst = function
+    | Lvar (pv, e) ->
+       assert (not (Mid.mem (pv_name pv) subst));
+       Lvar (pv, expr subst e)
+    | Lsym (rs, svar, res, args, e) ->
+       Lsym (rs, svar, res, args, expr subst e)
+    | Lany _ as lany -> lany
+    | Lrec rl ->
+       Lrec (List.map (rdef subst) rl)
+
+  and rdef subst r =
+    let re = expr subst r.rec_exp in
+    { r with rec_exp = re }
+
+  let rec pdecl d =
+    match d with
+    | Dtype _ | Dexn _ | Dval _ -> d
+    | Dmodule (id, dl) ->
+       Dmodule (id, List.map pdecl dl)
+    | Dlet def ->
+       Dlet (let_def Mid.empty def)
+
+  let module_ m =
+    let mod_decl = List.map pdecl m.mod_decl in
+    let add known_map decl =
+      let idl = Mltree.get_decl_name decl in
+      List.fold_left (Mltree.add_known_decl decl) known_map idl in
+    let mod_known = List.fold_left add Mid.empty m.mod_decl in
+    { m with mod_decl = mod_decl; mod_known = mod_known }
+
+end
+
+
+module InlineProxyVars = struct
 
   open Mltree
 
@@ -761,5 +869,13 @@ module Transform = struct
       List.fold_left (Mltree.add_known_decl decl) known_map idl in
     let mod_known = List.fold_left add Mid.empty mod_decl in
     { m with mod_decl = mod_decl; mod_known = mod_known }
+
+end
+
+module Transform = struct
+
+  let module_ m =
+    let m = InlineFunctionCalls.module_ m in
+    InlineProxyVars.module_ m
 
 end

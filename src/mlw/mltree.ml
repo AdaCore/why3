@@ -76,8 +76,7 @@ and let_def =
   | Lrec of rdef list
 
 and rdef = {
-  rec_sym  : rsymbol; (* exported *)
-  (* rec_rsym : rsymbol;*) (* internal *)
+  rec_sym  : rsymbol;
   rec_args : var list;
   rec_exp  : expr;
   rec_res  : ty;
