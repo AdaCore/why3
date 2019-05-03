@@ -658,13 +658,14 @@ module InlineFunctionCalls = struct
                assert false in
           let subst' = List.fold_left2 add_to_subst subst el args in
           let e' = expr subst' e in
-          { e' with e_attrs = Sattr.add inlined_call_attr e'.e_attrs }
+          let e' = { e' with e_attrs = Sattr.add inlined_call_attr e'.e_attrs } in
+          mk (Eblock [e'])
        in
        begin match decl with
        | Dlet (Lsym (_,_,_,args,e)) -> call args e
-       | Dlet (Lrec rdl) ->
-          let rd = List.find (fun rd -> id_equal rd.rec_sym.rs_name fname) rdl in
-          call rd.rec_args rd.rec_exp
+       | Dlet (Lrec _) ->
+          Debug.dprintf debug_compile "recursive functions cannot be inlined@.";
+          e
        | _ -> assert false end
     | Eapp (rs, el) -> mk (Eapp (rs, List.map (expr subst) el))
     | Efun (vl, e) ->

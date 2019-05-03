@@ -73,6 +73,7 @@ module C = struct
     | Snop
     | Sexpr of expr
     | Sblock of body
+    | Sinline of body
     | Sseq of stmt * stmt
     | Sif of expr * stmt * stmt
     | Swhile of expr * stmt
@@ -98,7 +99,7 @@ module C = struct
 
   let rec is_nop = function
     | Snop | Sexpr Enothing -> true
-    | Sblock ([], s) -> is_nop s
+    | Sblock ([], s) | Sinline ([], s) -> is_nop s
     | Sseq (s1,s2) -> is_nop s1 && is_nop s2
     | _ -> false
 
@@ -113,7 +114,7 @@ module C = struct
   let rec one_stmt = function
     | Snop -> true
     | Sexpr _ -> true
-    | Sblock (d,s) -> d = [] && one_stmt s
+    | Sblock (d,s) | Sinline (d,s) -> d = [] && one_stmt s
     | _ -> false
 
   (** [assignify v] transforms a statement that computes a value into
@@ -122,6 +123,7 @@ module C = struct
     | Snop -> raise NotAValue
     | Sexpr e -> Sexpr (Ebinop (Bassign, v, e))
     | Sblock (ds, s) -> Sblock (ds, assignify v s)
+    | Sinline (ds, s) -> Sinline (ds, assignify v s)
     | Sseq (s1, s2) when not (is_nop s2) -> Sseq (s1, assignify v s2)
     | Sseq (s1,_) -> assignify v s1
     | Sif (c,t,e) -> Sif (c, assignify v t, assignify v e)
@@ -139,6 +141,9 @@ module C = struct
     | Sblock (ds,s) ->
       let s',e = get_last_expr s in
       Sblock(ds,s'), e
+    | Sinline (ds, s) ->
+      let s',e = get_last_expr s in
+      Sinline (ds,s'), e
     | Sseq (s1,s2) when not (is_nop s2) ->
       let s', e = get_last_expr s2 in
       Sseq(s1,s'), e
@@ -185,6 +190,7 @@ module C = struct
   let rec propagate_in_stmt id v = function
     | Sexpr e -> Sexpr (propagate_in_expr id v e)
     | Sblock b -> Sblock(propagate_in_block id v b)
+    | Sinline b -> Sinline (propagate_in_block id v b)
     | Sseq (s1,s2) -> Sseq (propagate_in_stmt id v s1,
                             propagate_in_stmt id v s2)
     | Sif (e,s1,s2) -> Sif (propagate_in_expr id v e,
@@ -240,6 +246,9 @@ module C = struct
     | Sblock (d',s) ->
       let d',s' = flatten_defs d' s in
       d@d', s'
+    | Sinline (d', s) ->
+      let d',s' = flatten_defs d' s in
+      d, Sblock (d', s')
     | Sif (c,t,e) ->
       let d, t' = flatten_defs d t in
       let d, e' = flatten_defs d e in
@@ -250,7 +259,7 @@ module C = struct
     | Sfor (e1,e2,e3,s) ->
       let d, s' = flatten_defs d s in
       d, Sfor(e1,e2,e3,s')
-    | s -> d,s
+    | Sbreak | Snop | Sexpr _ | Sreturn _ as s -> d, s
 
   let rec group_defs_by_type l =
     (* heuristic to reduce the number of lines of defs*)
@@ -285,13 +294,14 @@ module C = struct
     | _ -> l
 
   let rec elim_empty_blocks = function
-    | Sblock ([], s) -> elim_empty_blocks s
+    | Sblock ([], s) | Sinline ([], s) -> elim_empty_blocks s
     | Sblock (d,s) -> Sblock (d, elim_empty_blocks s)
+    | Sinline (d,s) -> Sinline (d, elim_empty_blocks s)
     | Sseq (s1,s2) -> Sseq (elim_empty_blocks s1, elim_empty_blocks s2)
     | Sif (c,t,e) -> Sif(c, elim_empty_blocks t, elim_empty_blocks e)
     | Swhile (c,s) -> Swhile(c, elim_empty_blocks s)
     | Sfor(e1,e2,e3,s) -> Sfor(e1,e2,e3,elim_empty_blocks s)
-    | s -> s
+    | Snop | Sbreak | Sexpr _ | Sreturn _ as s -> s
 
   let rec elim_nop = function
     | Sseq (s1,s2) ->
@@ -308,20 +318,27 @@ module C = struct
       | [], Snop -> Snop
       | _ -> Sblock(d,s)
       end
+    | Sinline (d, s) ->
+      let s = elim_nop s in
+      begin match d, s with
+      | [], Snop -> Snop
+      | _ -> Sinline(d,s)
+      end
     | Sif (c,t,e) -> Sif(c, elim_nop t, elim_nop e)
     | Swhile (c,s) -> Swhile (c, elim_nop s)
     | Sfor(e1,e2,e3,s) -> Sfor(e1,e2,e3,elim_nop s)
-    | s -> s
+    | Snop | Sbreak | Sexpr _ | Sreturn _ as s -> s
 
   let rec add_to_last_call params = function
     | Sblock (d,s) -> Sblock (d, add_to_last_call params s)
+    | Sinline (d,s) -> Sinline (d, add_to_last_call params s)
     | Sseq (s1,s2) when not (is_nop s2) ->
       Sseq (s1, add_to_last_call params s2)
     | Sseq (s1,_) -> add_to_last_call params s1
     | Sexpr (Ecall(fname, args)) ->
       Sexpr (Ecall(fname, params@args)) (*change name to ensure no renaming ?*)
     | Sreturn (Ecall (fname, args)) ->
-      Sreturn (Ecall(fname, params@args))
+       Sreturn (Ecall(fname, params@args))
     | _ -> raise (Unsupported "tuple pattern matching with too complex def")
 
   let rec stmt_of_list (l: stmt list) : stmt =
@@ -336,7 +353,7 @@ module C = struct
 
   let rec simplify_expr (d,s) : expr =
     match (d,elim_empty_blocks(elim_nop s)) with
-    | [], Sblock([],s) -> simplify_expr ([],s)
+    | [], Sblock([],s) | [], Sinline ([], s)-> simplify_expr ([],s)
     | [], Sexpr e -> e
     | [], Sif(c,t,e) ->
        Equestion (c, simplify_expr([],t), simplify_expr([],e))
@@ -411,7 +428,7 @@ module C = struct
     then match elim_empty_blocks (elim_nop s) with
     | Sexpr e -> if is_const_expr e then e
                  else fail ()
-    | Sblock (d, s) -> get_const_expr (d,s)
+    | Sblock (d, s) | Sinline (d, s) -> get_const_expr (d,s)
     | _ -> fail ()
     else fail ()
 
@@ -642,7 +659,8 @@ module Print = struct
     | Sexpr e -> fprintf fmt "%a;" print_expr_no_paren e;
     | Sblock ([] ,s) when not braces ->
       (print_stmt ~braces:false) fmt s
-    | Sblock b -> fprintf fmt "@[<hov>{@\n  @[<hov>%a@]@\n}@]" print_body b
+    | Sblock b | Sinline b ->
+       fprintf fmt "@[<hov>{@\n  @[<hov>%a@]@\n}@]" print_body b
     | Sseq (s1,s2) -> fprintf fmt "%a@\n%a"
       (print_stmt ~braces:false) s1
       (print_stmt ~braces:false) s2
@@ -899,11 +917,15 @@ module MLToC = struct
     then Sreturn e
     else Sexpr e
 
+  let inlined_attr = Compile.InlineFunctionCalls.inlined_call_attr
+
   let rec expr info env (e:Mltree.expr) : C.body =
-    assert (not e.e_effect.eff_ghost);
     match e.e_node with
     | Eblock [] -> ([], expr_or_return env Enothing)
-    | Eblock [_] -> assert false
+    | Eblock [e] when Sattr.mem inlined_attr e.e_attrs ->
+       Debug.dprintf debug_c_extraction "inlined call@.";
+       [], C.Sinline (expr info env e)
+    | Eblock [e] -> [], C.Sblock (expr info env e)
     | Eblock l ->
        let env_f = { env with computes_return_value = false } in
        let rec aux = function
