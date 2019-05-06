@@ -8,13 +8,12 @@
 <prover id="4" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="ProverMain.mlw"/>
+<path name=".."/><path name="ProverMain.mlw"/>
 <theory name="Impl" proved="true">
  <goal name="VC main" expl="VC for main" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC main.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.20"/></proof>
+  <proof prover="5"><result status="valid" time="0.20" steps="132812"/></proof>
   </goal>
   <goal name="VC main.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.11" steps="13"/></proof>

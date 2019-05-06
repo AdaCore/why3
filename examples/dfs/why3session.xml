@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="1" name="Z3" version="4.6.0" timelimit="15" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../dfs.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="dfs.mlw"/>
 <theory name="DFS" proved="true">
  <goal name="VC set" expl="VC for set" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+ <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
  <goal name="VC dfs" expl="VC for dfs" proved="true">
  <proof prover="2"><result status="valid" time="0.12" steps="584"/></proof>
@@ -24,7 +25,7 @@
   <goal name="reformulation.1" proved="true">
   <transf name="simplify_trivial_quantification" proved="true" >
    <goal name="reformulation.1.0" proved="true">
-   <proof prover="1"><result status="valid" time="0.00"/></proof>
+   <proof prover="1"><result status="valid" time="0.00" steps="6509"/></proof>
    <proof prover="2"><result status="valid" time="0.00" steps="16"/></proof>
    </goal>
   </transf>

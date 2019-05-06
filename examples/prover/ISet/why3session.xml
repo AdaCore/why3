@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../ISet.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="ISet.mlw"/>
 <theory name="Logic" proved="true">
  <goal name="VC iset_ok_char" expl="VC for iset_ok_char" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC iset_ok_char.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="3367"/></proof>
   </goal>
   <goal name="VC iset_ok_char.1" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="2956"/></proof>
   </goal>
   <goal name="VC iset_ok_char.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.07"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="13033"/></proof>
   </goal>
  </transf>
  </goal>
@@ -104,7 +105,7 @@
   <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC merge.13" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.45"/></proof>
+  <proof prover="0"><result status="valid" time="0.45" steps="57528"/></proof>
   </goal>
   <goal name="VC merge.14" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="536"/></proof>

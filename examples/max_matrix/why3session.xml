@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="max_matrix.mlw"/>
+<path name=".."/><path name="max_matrix.mlw"/>
 <theory name="MaxMatrixMemo" proved="true">
  <goal name="sum_ind" proved="true">
  <proof prover="4"><result status="valid" time="0.03" steps="66"/></proof>
@@ -37,16 +36,16 @@
     <goal name="VC maximum.4.1.0" expl="right case" proved="true">
     <transf name="split_goal_right" proved="true" >
      <goal name="VC maximum.4.1.0.0" expl="VC for maximum" proved="true">
-     <proof prover="3"><result status="valid" time="0.04"/></proof>
+     <proof prover="3"><result status="valid" time="0.04" steps="9104"/></proof>
      </goal>
      <goal name="VC maximum.4.1.0.1" expl="VC for maximum" proved="true">
-     <proof prover="2"><result status="valid" time="0.10"/></proof>
+     <proof prover="2"><result status="valid" time="0.10" steps="150830"/></proof>
      </goal>
      <goal name="VC maximum.4.1.0.2" expl="VC for maximum" proved="true">
      <proof prover="4" timelimit="1"><result status="valid" time="0.03" steps="59"/></proof>
      </goal>
      <goal name="VC maximum.4.1.0.3" expl="VC for maximum" proved="true">
-     <proof prover="3"><result status="valid" time="0.06"/></proof>
+     <proof prover="3"><result status="valid" time="0.06" steps="15480"/></proof>
      </goal>
      <goal name="VC maximum.4.1.0.4" expl="VC for maximum" proved="true">
      <proof prover="4" memlimit="2000"><result status="valid" time="1.49" steps="1598"/></proof>

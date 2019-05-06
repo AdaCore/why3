@@ -9,8 +9,7 @@
 <prover id="4" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file>
-<path name=".."/>
-<path name="bitvectors.why"/>
+<path name=".."/><path name="bitvectors.why"/>
 <theory name="TestBV">
  <goal name="g1" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
@@ -52,12 +51,12 @@
  <proof prover="4" timelimit="1"><result status="timeout" time="1.00"/></proof>
  </goal>
  <goal name="g3aa">
- <proof prover="0"><result status="timeout" time="1.00"/></proof>
+ <proof prover="0"><result status="timeout" time="1.00" steps="7485145"/></proof>
  <proof prover="1"><result status="timeout" time="1.00"/></proof>
  <proof prover="2"><result status="unknown" time="0.02"/></proof>
  <proof prover="3"><result status="timeout" time="1.00"/></proof>
  <proof prover="4" timelimit="1"><result status="timeout" time="1.00"/></proof>
- <proof prover="5"><result status="unknown" time="0.04"/></proof>
+ <proof prover="5"><result status="unknown" time="0.04" steps="7918"/></proof>
  </goal>
  <goal name="g3bb">
  <proof prover="1"><result status="timeout" time="1.00"/></proof>
@@ -108,7 +107,7 @@
  <proof prover="4" timelimit="1"><result status="timeout" time="1.00"/></proof>
  </goal>
  <goal name="g6a" proved="true">
- <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="71"/></proof>
+ <proof prover="1" timelimit="5"><result status="valid" time="0.03" steps="70"/></proof>
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
  </goal>

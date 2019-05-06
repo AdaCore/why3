@@ -6,67 +6,66 @@
 <prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="array_most_frequent.mlw"/>
+<path name=".."/><path name="array_most_frequent.mlw"/>
 <theory name="Top" proved="true">
  <goal name="VC most_frequent" expl="VC for most_frequent" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC most_frequent.0" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="5456"/></proof>
   </goal>
   <goal name="VC most_frequent.1" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="7754"/></proof>
   </goal>
   <goal name="VC most_frequent.2" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="5565"/></proof>
   </goal>
   <goal name="VC most_frequent.3" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="8067"/></proof>
   </goal>
   <goal name="VC most_frequent.4" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="6014"/></proof>
   </goal>
   <goal name="VC most_frequent.5" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="6016"/></proof>
   </goal>
   <goal name="VC most_frequent.6" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="6184"/></proof>
   </goal>
   <goal name="VC most_frequent.7" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="9616"/></proof>
   </goal>
   <goal name="VC most_frequent.8" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="5728"/></proof>
   </goal>
   <goal name="VC most_frequent.9" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.17"/></proof>
+  <proof prover="2"><result status="valid" time="0.17" steps="32904"/></proof>
   </goal>
   <goal name="VC most_frequent.10" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.07"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="10906"/></proof>
   </goal>
   <goal name="VC most_frequent.11" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="11722"/></proof>
   </goal>
   <goal name="VC most_frequent.12" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.29"/></proof>
+  <proof prover="2"><result status="valid" time="0.29" steps="51787"/></proof>
   </goal>
   <goal name="VC most_frequent.13" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="56370"/></proof>
   </goal>
   <goal name="VC most_frequent.14" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.46" steps="834"/></proof>
   </goal>
   <goal name="VC most_frequent.15" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.09"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="255429"/></proof>
   </goal>
   <goal name="VC most_frequent.16" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.26" steps="1059"/></proof>
   </goal>
   <goal name="VC most_frequent.17" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="6626"/></proof>
   </goal>
   <goal name="VC most_frequent.18" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="5738"/></proof>
   </goal>
  </transf>
  </goal>

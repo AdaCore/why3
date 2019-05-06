@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../largest_prime_factor.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="largest_prime_factor.mlw"/>
 <theory name="PrimeFactor" proved="true">
  <goal name="VC smallest_divisor" expl="VC for smallest_divisor" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -30,7 +31,7 @@
    <goal name="VC smallest_divisor.0.5" expl="assertion" proved="true">
    <transf name="remove" proved="true" arg1="real,bool,tuple0,unit,zero,one,(-),(+),(-),abs,div,mod,even,odd,gcd,prime,coprime,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc2,Mul_distr_l,Mul_distr_r,Comm2,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides_spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_def2,gcd_def3,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,gcd_opp,gcd_euclid,Gcd_computer_mod,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Gauss,Euclid,gcd_coprime">
     <goal name="VC smallest_divisor.0.5.0" expl="assertion" proved="true">
-    <proof prover="3"><result status="valid" time="0.01"/></proof>
+    <proof prover="3"><result status="valid" time="0.01" steps="12549"/></proof>
     </goal>
    </transf>
    </goal>
@@ -147,7 +148,7 @@
   <transf name="split_goal_right" proved="true" >
    <goal name="VC largest_prime_factor.20.0" expl="VC for largest_prime_factor" proved="true">
    <proof prover="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="3" timelimit="11"><result status="valid" time="0.01"/></proof>
+   <proof prover="3" timelimit="11"><result status="valid" time="0.01" steps="17678"/></proof>
    <proof prover="4" timelimit="11"><result status="valid" time="0.01" steps="27"/></proof>
    </goal>
    <goal name="VC largest_prime_factor.20.1" expl="VC for largest_prime_factor" proved="true">

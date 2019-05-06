@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="2" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="11" steplimit="0" memlimit="1000"/>
-<file name="../insertion_sort_list.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="insertion_sort_list.mlw"/>
 <theory name="InsertionSort" proved="true">
  <goal name="Transitive.Trans" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
@@ -18,10 +19,10 @@
   <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="VC insert.2" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.12"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.12" steps="27244"/></proof>
   </goal>
   <goal name="VC insert.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.34"/></proof>
+  <proof prover="2"><result status="valid" time="0.34" steps="56045"/></proof>
   </goal>
  </transf>
  </goal>

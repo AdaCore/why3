@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Coq" version="8.7.1" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="5" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="dfa_example.mlw"/>
+<path name=".."/><path name="dfa_example.mlw"/>
 <theory name="DfaExample" proved="true">
  <goal name="nil_notin_r1" proved="true">
- <proof prover="0" edited="dfa_example_DfaExample_nil_notin_r1_1.v"><result status="valid" time="1.04"/></proof>
+ <proof prover="0"><path name="dfa_example_DfaExample_nil_notin_r1_1.v"/><result status="valid" time="1.04"/></proof>
  <proof prover="4"><result status="valid" time="0.10"/></proof>
  <proof prover="6" memlimit="4000"><result status="valid" time="0.08" steps="436"/></proof>
  </goal>
@@ -20,10 +19,10 @@
  <proof prover="6"><result status="valid" time="0.03" steps="222"/></proof>
  </goal>
  <goal name="words_in_r1_end_with_one" proved="true">
- <proof prover="5"><result status="valid" time="0.33"/></proof>
+ <proof prover="5"><result status="valid" time="0.33" steps="655888"/></proof>
  </goal>
  <goal name="VC words_in_r1_suffix_in_r1" expl="VC for words_in_r1_suffix_in_r1" proved="true">
- <proof prover="9"><result status="valid" time="0.49"/></proof>
+ <proof prover="9"><result status="valid" time="0.49" steps="111854"/></proof>
  </goal>
  <goal name="VC zero_w_in_r1" expl="VC for zero_w_in_r1" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -31,7 +30,7 @@
   <proof prover="6"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
   <goal name="VC zero_w_in_r1.1" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.67"/></proof>
+  <proof prover="5"><result status="valid" time="0.67" steps="1405883"/></proof>
   </goal>
  </transf>
  </goal>

@@ -5,11 +5,10 @@
 <prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="word_common_factor.mlw"/>
+<path name=".."/><path name="word_common_factor.mlw"/>
 <theory name="Top" proved="true">
  <goal name="VC power" expl="VC for power" proved="true">
- <proof prover="2"><result status="valid" time="0.05"/></proof>
+ <proof prover="2"><result status="valid" time="0.05" steps="7586"/></proof>
  </goal>
  <goal name="VC power_add" expl="VC for power_add" proved="true">
  <proof prover="1"><result status="valid" time="0.14" steps="270"/></proof>
@@ -20,48 +19,48 @@
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC common_factor.1" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.14"/></proof>
+  <proof prover="2"><result status="valid" time="0.14" steps="42854"/></proof>
   </goal>
   <goal name="VC common_factor.2" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="15313"/></proof>
   </goal>
   <goal name="VC common_factor.3" expl="precondition" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC common_factor.3.0" expl="precondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.06"/></proof>
+   <proof prover="2"><result status="valid" time="0.06" steps="16781"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC common_factor.4" expl="variant decrease" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="VC common_factor.4.0" expl="variant decrease" proved="true">
-   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   <proof prover="2"><result status="valid" time="0.05" steps="15951"/></proof>
    </goal>
    <goal name="VC common_factor.4.1" expl="variant decrease" proved="true">
-   <proof prover="2"><result status="valid" time="0.05"/></proof>
+   <proof prover="2"><result status="valid" time="0.05" steps="15959"/></proof>
    </goal>
    <goal name="VC common_factor.4.2" expl="variant decrease" proved="true">
-   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   <proof prover="2"><result status="valid" time="0.04" steps="15970"/></proof>
    </goal>
    <goal name="VC common_factor.4.3" expl="variant decrease" proved="true">
-   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   <proof prover="2"><result status="valid" time="0.04" steps="13680"/></proof>
    </goal>
    <goal name="VC common_factor.4.4" expl="variant decrease" proved="true">
-   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   <proof prover="2"><result status="valid" time="0.04" steps="13680"/></proof>
    </goal>
    <goal name="VC common_factor.4.5" expl="variant decrease" proved="true">
-   <proof prover="2"><result status="valid" time="0.03"/></proof>
+   <proof prover="2"><result status="valid" time="0.03" steps="13682"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC common_factor.5" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="9530"/></proof>
   </goal>
   <goal name="VC common_factor.6" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="17710"/></proof>
   </goal>
   <goal name="VC common_factor.7" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.23"/></proof>
+  <proof prover="2"><result status="valid" time="0.23" steps="48849"/></proof>
   </goal>
  </transf>
  </goal>

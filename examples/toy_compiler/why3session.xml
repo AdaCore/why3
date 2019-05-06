@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../toy_compiler.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="toy_compiler.mlw"/>
 <theory name="Compiler" proved="true">
  <goal name="VC soundness_gen" expl="VC for soundness_gen" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -32,7 +33,7 @@
   <goal name="VC soundness_gen.7" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC soundness_gen.7.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.09"/></proof>
+   <proof prover="0"><result status="valid" time="0.09" steps="13906"/></proof>
    </goal>
    <goal name="VC soundness_gen.7.1" expl="postcondition" proved="true">
    <proof prover="2" timelimit="1"><result status="valid" time="0.08" steps="118"/></proof>

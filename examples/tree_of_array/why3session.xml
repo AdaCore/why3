@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="1" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="tree_of_array.mlw"/>
+<path name=".."/><path name="tree_of_array.mlw"/>
 <theory name="TreeOfArray" proved="true">
  <goal name="VC tree_of_array_aux" expl="VC for tree_of_array_aux" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC tree_of_array_aux.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.03"/></proof>
+  <proof prover="3"><result status="valid" time="0.03" steps="8730"/></proof>
   </goal>
   <goal name="VC tree_of_array_aux.1" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="10679"/></proof>
   </goal>
   <goal name="VC tree_of_array_aux.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  <proof prover="3"><result status="valid" time="0.06" steps="11743"/></proof>
   </goal>
   <goal name="VC tree_of_array_aux.3" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="11651"/></proof>
   </goal>
   <goal name="VC tree_of_array_aux.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.10"/></proof>
+  <proof prover="3"><result status="valid" time="0.10" steps="17644"/></proof>
   </goal>
   <goal name="VC tree_of_array_aux.5" expl="index in array bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.07"/></proof>
+  <proof prover="3"><result status="valid" time="0.07" steps="14424"/></proof>
   </goal>
   <goal name="VC tree_of_array_aux.6" expl="postcondition" proved="true">
   <transf name="split_all_full" proved="true" >
@@ -44,7 +43,7 @@
    <goal name="VC tree_of_array_aux.6.2" expl="VC for tree_of_array_aux" proved="true">
    <transf name="case" proved="true" arg1="hi=lo">
     <goal name="VC tree_of_array_aux.6.2.0" expl="true case" proved="true">
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
+    <proof prover="3"><result status="valid" time="0.04" steps="11975"/></proof>
     </goal>
     <goal name="VC tree_of_array_aux.6.2.1" expl="false case" proved="true">
     <transf name="case" proved="true" arg1="hi=lo+1">
@@ -69,19 +68,19 @@
    <goal name="VC tree_of_array_aux.6.3" expl="VC for tree_of_array_aux" proved="true">
    <transf name="case" proved="true" arg1="hi=lo">
     <goal name="VC tree_of_array_aux.6.3.0" expl="true case" proved="true">
-    <proof prover="3"><result status="valid" time="0.04"/></proof>
+    <proof prover="3"><result status="valid" time="0.04" steps="11990"/></proof>
     </goal>
     <goal name="VC tree_of_array_aux.6.3.1" expl="false case" proved="true">
     <transf name="case" proved="true" arg1="hi=lo+1">
      <goal name="VC tree_of_array_aux.6.3.1.0" expl="false case (true case)" proved="true">
      <transf name="assert" proved="true" arg1="left=Empty">
       <goal name="VC tree_of_array_aux.6.3.1.0.0" expl="asserted formula" proved="true">
-      <proof prover="3"><result status="valid" time="0.08"/></proof>
+      <proof prover="3"><result status="valid" time="0.08" steps="16061"/></proof>
       </goal>
       <goal name="VC tree_of_array_aux.6.3.1.0.1" expl="false case (true case)" proved="true">
       <transf name="assert" proved="true" arg1="right=Empty">
        <goal name="VC tree_of_array_aux.6.3.1.0.1.0" expl="asserted formula" proved="true">
-       <proof prover="3"><result status="valid" time="0.06"/></proof>
+       <proof prover="3"><result status="valid" time="0.06" steps="15912"/></proof>
        </goal>
        <goal name="VC tree_of_array_aux.6.3.1.0.1.1" expl="false case (true case)" proved="true">
        <proof prover="2" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="95"/></proof>
@@ -106,7 +105,7 @@
  </transf>
  </goal>
  <goal name="VC tree_of_array" expl="VC for tree_of_array" proved="true">
- <proof prover="3"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="11756"/></proof>
  </goal>
 </theory>
 </file>

@@ -1,81 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="ropes.mlw"/>
+<path name=".."/><path name="ropes.mlw"/>
 <theory name="String" proved="true">
  <goal name="app_assoc" proved="true">
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="4704"/></proof>
  </goal>
 </theory>
 <theory name="Rope" proved="true">
  <goal name="rope_length_is_string_length" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="rope_length_is_string_length.0" proved="true">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9057"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC empty" expl="VC for empty" proved="true">
- <proof prover="5"><result status="valid" time="0.02"/></proof>
+ <proof prover="5"><result status="valid" time="0.02" steps="3311"/></proof>
  </goal>
  <goal name="VC is_empty" expl="VC for is_empty" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
+ <proof prover="5"><result status="valid" time="0.01" steps="4000"/></proof>
  </goal>
  <goal name="VC of_string" expl="VC for of_string" proved="true">
- <proof prover="5"><result status="valid" time="0.04"/></proof>
+ <proof prover="5"><result status="valid" time="0.04" steps="10288"/></proof>
  </goal>
  <goal name="VC get" expl="VC for get" proved="true">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="8561"/></proof>
  </goal>
  <goal name="VC concat" expl="VC for concat" proved="true">
- <proof prover="5"><result status="valid" time="0.04"/></proof>
+ <proof prover="5"><result status="valid" time="0.04" steps="9582"/></proof>
  </goal>
  <goal name="VC sub" expl="VC for sub" proved="true">
- <proof prover="3"><result status="valid" time="0.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.04" steps="34660"/></proof>
  </goal>
 </theory>
 <theory name="Balance" proved="true">
  <goal name="VC string_of_array_concat" expl="VC for string_of_array_concat" proved="true">
- <proof prover="5"><result status="valid" time="0.09"/></proof>
+ <proof prover="5"><result status="valid" time="0.09" steps="17824"/></proof>
  </goal>
  <goal name="VC string_of_array_concat_right" expl="VC for string_of_array_concat_right" proved="true">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="17211"/></proof>
  </goal>
  <goal name="VC string_of_array_length" expl="VC for string_of_array_length" proved="true">
- <proof prover="5"><result status="valid" time="0.04"/></proof>
+ <proof prover="5"><result status="valid" time="0.04" steps="10761"/></proof>
  </goal>
  <goal name="VC string_of_array_eq" expl="VC for string_of_array_eq" proved="true">
- <proof prover="5"><result status="valid" time="0.07"/></proof>
+ <proof prover="5"><result status="valid" time="0.07" steps="20777"/></proof>
  </goal>
  <goal name="string_of_array_frame" proved="true">
  <proof prover="0"><result status="valid" time="0.02" steps="66"/></proof>
  </goal>
  <goal name="VC string_of_array_concat_empty" expl="VC for string_of_array_concat_empty" proved="true">
- <proof prover="5"><result status="valid" time="0.05"/></proof>
+ <proof prover="5"><result status="valid" time="0.05" steps="16208"/></proof>
  </goal>
  <goal name="VC insert" expl="VC for insert" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC insert.0" expl="index in array bounds" proved="true">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="8846"/></proof>
   </goal>
   <goal name="VC insert.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9891"/></proof>
   </goal>
   <goal name="VC insert.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9009"/></proof>
   </goal>
   <goal name="VC insert.3" expl="index in array bounds" proved="true">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9160"/></proof>
   </goal>
   <goal name="VC insert.4" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.05"/></proof>
+  <proof prover="5"><result status="valid" time="0.05" steps="12488"/></proof>
   </goal>
   <goal name="VC insert.5" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="90"/></proof>
@@ -87,34 +86,34 @@
   <proof prover="1"><result status="valid" time="0.13"/></proof>
   </goal>
   <goal name="VC insert.8" expl="index in array bounds" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="9160"/></proof>
   </goal>
   <goal name="VC insert.9" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.99"/></proof>
   </goal>
   <goal name="VC insert.10" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="12313"/></proof>
   </goal>
   <goal name="VC insert.11" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="9396"/></proof>
   </goal>
   <goal name="VC insert.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="75835"/></proof>
   </goal>
   <goal name="VC insert.13" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="8385"/></proof>
   </goal>
   <goal name="VC insert.14" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="95"/></proof>
   </goal>
   <goal name="VC insert.15" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="13158"/></proof>
   </goal>
   <goal name="VC insert.16" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.24"/></proof>
   </goal>
   <goal name="VC insert.17" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.04"/></proof>
+  <proof prover="5"><result status="valid" time="0.04" steps="13682"/></proof>
   </goal>
   <goal name="VC insert.18" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="69"/></proof>
@@ -126,10 +125,10 @@
     <goal name="VC insert.19.0.0" expl="postcondition" proved="true">
     <transf name="split_goal_right" proved="true" >
      <goal name="VC insert.19.0.0.0" expl="VC for insert" proved="true">
-     <proof prover="5"><result status="valid" time="0.05"/></proof>
+     <proof prover="5"><result status="valid" time="0.05" steps="13830"/></proof>
      </goal>
      <goal name="VC insert.19.0.0.1" expl="VC for insert" proved="true">
-     <proof prover="5"><result status="valid" time="0.05"/></proof>
+     <proof prover="5"><result status="valid" time="0.05" steps="14204"/></proof>
      </goal>
     </transf>
     </goal>
@@ -140,7 +139,7 @@
  </transf>
  </goal>
  <goal name="VC insert_leaves" expl="VC for insert_leaves" proved="true">
- <proof prover="3"><result status="valid" time="0.05"/></proof>
+ <proof prover="3"><result status="valid" time="0.05" steps="56926"/></proof>
  </goal>
  <goal name="VC balance" expl="VC for balance" proved="true">
  <proof prover="0"><result status="valid" time="0.18" steps="489"/></proof>

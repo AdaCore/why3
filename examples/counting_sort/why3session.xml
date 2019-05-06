@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="counting_sort.mlw"/>
+<path name=".."/><path name="counting_sort.mlw"/>
 <theory name="Spec" proved="true">
  <goal name="VC eqlt" expl="VC for eqlt" proved="true">
  <proof prover="1"><result status="valid" time="0.76" steps="777"/></proof>
@@ -76,10 +75,10 @@
   <proof prover="1"><result status="valid" time="0.04" steps="79"/></proof>
   </goal>
   <goal name="VC counting_sort.20" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="93272"/></proof>
   </goal>
   <goal name="VC counting_sort.21" expl="loop invariant preservation" proved="true">
-  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="1.12"/></proof>
+  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="1.12" steps="2654258"/></proof>
   </goal>
   <goal name="VC counting_sort.22" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.10" steps="204"/></proof>
@@ -178,10 +177,10 @@
   <proof prover="1"><result status="valid" time="0.05" steps="84"/></proof>
   </goal>
   <goal name="VC in_place_counting_sort.21" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="65062"/></proof>
   </goal>
   <goal name="VC in_place_counting_sort.22" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.53"/></proof>
+  <proof prover="0"><result status="valid" time="0.53" steps="1323423"/></proof>
   </goal>
   <goal name="VC in_place_counting_sort.23" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.13" steps="234"/></proof>
@@ -199,7 +198,7 @@
   <proof prover="1"><result status="valid" time="0.15" steps="331"/></proof>
   </goal>
   <goal name="VC in_place_counting_sort.28" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.03"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="41312"/></proof>
   </goal>
   <goal name="VC in_place_counting_sort.29" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="27"/></proof>
@@ -226,16 +225,16 @@
   <proof prover="1"><result status="valid" time="0.00" steps="35"/></proof>
   </goal>
   <goal name="VC harness.3" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="45291"/></proof>
   </goal>
   <goal name="VC harness.4" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.04"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="115171"/></proof>
   </goal>
   <goal name="VC harness.5" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="92715"/></proof>
   </goal>
   <goal name="VC harness.6" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.08"/></proof>
+  <proof prover="0"><result status="valid" time="0.08" steps="219869"/></proof>
   </goal>
   <goal name="VC harness.7" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.14" steps="254"/></proof>

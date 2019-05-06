@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -9,8 +9,7 @@
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="optimal_replay.mlw"/>
+<path name=".."/><path name="optimal_replay.mlw"/>
 <theory name="OptimalReplay" proved="true">
  <goal name="VC distance" expl="VC for distance" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -80,7 +79,7 @@
    <goal name="VC distance.19.0" expl="loop invariant preservation" proved="true">
    <transf name="split_goal_right" proved="true" >
     <goal name="VC distance.19.0.0" expl="loop invariant preservation" proved="true">
-    <proof prover="0"><result status="valid" time="0.38"/></proof>
+    <proof prover="0"><result status="valid" time="0.38" steps="56550"/></proof>
     </goal>
     <goal name="VC distance.19.0.1" expl="loop invariant preservation" proved="true">
     <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.39"/></proof>

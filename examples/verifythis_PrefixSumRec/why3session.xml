@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -11,8 +11,7 @@
 <prover id="6" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="10" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="verifythis_PrefixSumRec.mlw"/>
+<path name=".."/><path name="verifythis_PrefixSumRec.mlw"/>
 <theory name="PrefixSumRec" proved="true">
  <goal name="Div_mod_2" proved="true">
  <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -61,7 +60,7 @@
   <transf name="remove" proved="true" arg1="real,bool,tuple0,unit,map,container,zero,one,( * ),(&lt;=),(&gt;=),abs,mod,power,get,set,([&lt;-]),length,([]&#39;),([&lt;-]&#39;),make,is_power_of_2,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,Sum_def_empty,Sum_def_non_empty,Sum_right_extension,Sum_transitivity,Sum_eq,array&#39;invariant,([&lt;-])_spec,make_spec,Div_mod_2,is_power_of_2_1">
    <goal name="VC phase1_frame.6.0" expl="postcondition" proved="true">
    <proof prover="0" timelimit="1"><result status="valid" time="0.02"/></proof>
-   <proof prover="2"><result status="valid" time="0.07"/></proof>
+   <proof prover="2"><result status="valid" time="0.07" steps="111920"/></proof>
    </goal>
   </transf>
   </goal>
@@ -106,7 +105,7 @@
  <goal name="VC upsweep" expl="VC for upsweep" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC upsweep.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="7361"/></proof>
   </goal>
   <goal name="VC upsweep.1" expl="variant decrease" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="12"/></proof>
@@ -130,7 +129,7 @@
   <proof prover="5"><result status="valid" time="0.03" steps="79"/></proof>
   </goal>
   <goal name="VC upsweep.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7603"/></proof>
   </goal>
   <goal name="VC upsweep.6" expl="variant decrease" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="20"/></proof>
@@ -320,7 +319,7 @@
   <proof prover="5" memlimit="1000"><result status="valid" time="0.12" steps="74"/></proof>
   </goal>
   <goal name="VC downsweep.11" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7599"/></proof>
   </goal>
   <goal name="VC downsweep.12" expl="variant decrease" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="25"/></proof>
@@ -351,7 +350,7 @@
   <goal name="VC downsweep.17" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.74"/></proof>
   <proof prover="5"><result status="valid" time="6.57" steps="779"/></proof>
-  <proof prover="6"><result status="valid" time="0.60"/></proof>
+  <proof prover="6"><result status="valid" time="0.60" steps="41597"/></proof>
   </goal>
   <goal name="VC downsweep.18" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.02"/></proof>
@@ -359,7 +358,7 @@
   <proof prover="5"><result status="valid" time="0.04" steps="91"/></proof>
   </goal>
   <goal name="VC downsweep.19" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7878"/></proof>
   </goal>
   <goal name="VC downsweep.20" expl="variant decrease" proved="true">
   <proof prover="5"><result status="valid" time="0.06" steps="47"/></proof>
@@ -443,7 +442,7 @@
  <goal name="VC compute_sums" expl="VC for compute_sums" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC compute_sums.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7528"/></proof>
   </goal>
   <goal name="VC compute_sums.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01"/></proof>

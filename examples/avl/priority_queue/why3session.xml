@@ -1,69 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="priority_queue.mlw"/>
+<path name=".."/><path name="priority_queue.mlw"/>
 <theory name="PQueue" proved="true">
  <goal name="M.VC assoc_m" expl="VC for assoc_m" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC assoc_m.0" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="11117"/></proof>
   </goal>
   <goal name="VC assoc_m.1" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="11117"/></proof>
   </goal>
   <goal name="VC assoc_m.2" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="11117"/></proof>
   </goal>
   <goal name="VC assoc_m.3" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="11117"/></proof>
   </goal>
   <goal name="VC assoc_m.4" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="11117"/></proof>
   </goal>
   <goal name="VC assoc_m.5" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="11117"/></proof>
   </goal>
   <goal name="VC assoc_m.6" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
+  <proof prover="1"><result status="valid" time="0.03" steps="11117"/></proof>
   </goal>
   <goal name="VC assoc_m.7" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC assoc_m.7.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   <proof prover="1"><result status="valid" time="0.06" steps="12130"/></proof>
    </goal>
    <goal name="VC assoc_m.7.1" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   <proof prover="1"><result status="valid" time="0.06" steps="12384"/></proof>
    </goal>
    <goal name="VC assoc_m.7.2" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   <proof prover="1"><result status="valid" time="0.06" steps="12400"/></proof>
    </goal>
    <goal name="VC assoc_m.7.3" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.05"/></proof>
+   <proof prover="1"><result status="valid" time="0.05" steps="12968"/></proof>
    </goal>
    <goal name="VC assoc_m.7.4" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   <proof prover="1"><result status="valid" time="0.06" steps="12393"/></proof>
    </goal>
    <goal name="VC assoc_m.7.5" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   <proof prover="1"><result status="valid" time="0.06" steps="12424"/></proof>
    </goal>
    <goal name="VC assoc_m.7.6" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.03"/></proof>
+   <proof prover="1"><result status="valid" time="0.03" steps="12454"/></proof>
    </goal>
    <goal name="VC assoc_m.7.7" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.06"/></proof>
+   <proof prover="1"><result status="valid" time="0.06" steps="17938"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="M.VC neutral_m" expl="VC for neutral_m" proved="true">
- <proof prover="1"><result status="valid" time="0.04"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="12411"/></proof>
  </goal>
  <goal name="M.assoc" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
@@ -110,13 +109,13 @@
   <goal name="VC monoid_sum_is_min.4" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC monoid_sum_is_min.4.0" expl="VC for monoid_sum_is_min" proved="true">
-   <proof prover="1"><result status="valid" time="0.09"/></proof>
+   <proof prover="1"><result status="valid" time="0.09" steps="27404"/></proof>
    </goal>
    <goal name="VC monoid_sum_is_min.4.1" expl="VC for monoid_sum_is_min" proved="true">
-   <proof prover="1"><result status="valid" time="1.69"/></proof>
+   <proof prover="1"><result status="valid" time="1.69" steps="173172"/></proof>
    </goal>
    <goal name="VC monoid_sum_is_min.4.2" expl="VC for monoid_sum_is_min" proved="true">
-   <proof prover="1"><result status="valid" time="0.10"/></proof>
+   <proof prover="1"><result status="valid" time="0.10" steps="29054"/></proof>
    </goal>
   </transf>
   </goal>
@@ -133,10 +132,10 @@
    <proof prover="4"><result status="valid" time="0.64" steps="1705"/></proof>
    </goal>
    <goal name="VC selected_is_min.1.1" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="1.74"/></proof>
+   <proof prover="1"><result status="valid" time="1.74" steps="174551"/></proof>
    </goal>
    <goal name="VC selected_is_min.1.2" expl="assertion" proved="true">
-   <proof prover="1"><result status="valid" time="0.27"/></proof>
+   <proof prover="1"><result status="valid" time="0.27" steps="58617"/></proof>
    </goal>
    <goal name="VC selected_is_min.1.3" expl="assertion" proved="true">
    <proof prover="4"><result status="valid" time="0.02" steps="9"/></proof>
@@ -355,7 +354,7 @@
  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
  </goal>
  <goal name="Sel.M.agg_sing" proved="true">
- <proof prover="1"><result status="valid" time="0.08"/></proof>
+ <proof prover="1"><result status="valid" time="0.08" steps="20156"/></proof>
  </goal>
  <goal name="Sel.M.agg_cat" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="5"/></proof>
@@ -459,7 +458,7 @@
   <proof prover="4"><result status="valid" time="0.15" steps="144"/></proof>
   </goal>
   <goal name="VC split_gives_minimum.4" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.52"/></proof>
+  <proof prover="1"><result status="valid" time="0.52" steps="116712"/></proof>
   </goal>
   <goal name="VC split_gives_minimum.5" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.31" steps="584"/></proof>
@@ -509,10 +508,10 @@
   <proof prover="4"><result status="valid" time="0.03" steps="67"/></proof>
   </goal>
   <goal name="VC remove_count.1" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="4.69"/></proof>
+  <proof prover="1" timelimit="10"><result status="valid" time="4.69" steps="655730"/></proof>
   </goal>
   <goal name="VC remove_count.2" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="10"><result status="valid" time="0.47"/></proof>
+  <proof prover="1" timelimit="10"><result status="valid" time="0.47" steps="120144"/></proof>
   </goal>
  </transf>
  </goal>

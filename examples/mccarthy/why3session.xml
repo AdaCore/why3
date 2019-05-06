@@ -5,8 +5,7 @@
 <prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="mccarthy.mlw"/>
+<path name=".."/><path name="mccarthy.mlw"/>
 <theory name="McCarthy91" proved="true">
  <goal name="VC f91" expl="VC for f91" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="31"/></proof>
@@ -14,26 +13,26 @@
  <goal name="VC f91_tco" expl="VC for f91_tco" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC f91_tco.0" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="979"/></proof>
   </goal>
   <goal name="VC f91_tco.1" expl="variant decrease" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="VC f91_tco.1.0" expl="variant decrease" proved="true">
-   <proof prover="1"><result status="valid" time="0.04"/></proof>
+   <proof prover="1"><result status="valid" time="0.04" steps="1097"/></proof>
    </goal>
    <goal name="VC f91_tco.1.1" expl="variant decrease" proved="true">
-   <proof prover="1"><result status="valid" time="0.02"/></proof>
+   <proof prover="1"><result status="valid" time="0.02" steps="1099"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="VC f91_tco.2" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="1578"/></proof>
   </goal>
   <goal name="VC f91_tco.3" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="1682"/></proof>
   </goal>
   <goal name="VC f91_tco.4" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="1531"/></proof>
   </goal>
  </transf>
  </goal>
@@ -46,16 +45,16 @@
 </theory>
 <theory name="McCarthyWithGhostMonitor" proved="true">
  <goal name="VC monitor" expl="VC for monitor" proved="true">
- <proof prover="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="1"><result status="valid" time="0.07" steps="13039"/></proof>
  </goal>
  <goal name="VC mccarthy" expl="VC for mccarthy" proved="true">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="5330"/></proof>
  </goal>
  <goal name="VC monitor2" expl="VC for monitor2" proved="true">
- <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="4916"/></proof>
  </goal>
  <goal name="VC mccarthy2" expl="VC for mccarthy2" proved="true">
- <proof prover="1"><result status="valid" time="0.02"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="2994"/></proof>
  </goal>
 </theory>
 <theory name="McCarthy91Mach" proved="true">
