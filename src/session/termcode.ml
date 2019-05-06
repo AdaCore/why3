@@ -420,19 +420,16 @@ let t_shape_task ~version ~expl t =
       | SV3 | SV4 | SV5 -> push expl end;
       (* goal shape *)
       t_shape ~version c m f;
-      (* introduced premises shape *)
+      (* All declarations shape *)
       begin match version with
       | SV1 | SV2 | SV3 -> ()
       | SV4 | SV5 ->
          let open Decl in
-         let introduced id = Ident.Sattr.mem
-                               Inlining.intro_attr
-                               id.Ident.id_attrs in
          let do_td td = match td.Theory.td_node with
            | Theory.Decl d ->
               begin match d.d_node with
               | Dparam _ls -> ()
-              | Dprop (_, pr, f) when introduced pr.pr_name ->
+              | Dprop (_, _pr, f) ->
                  t_shape ~version c m f
               | _ -> ()
               end
