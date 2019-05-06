@@ -2,6 +2,22 @@ open Why3
 open Format
 open Json_util
 
+(* Initialization: Add all libexec executables to PATH (to be able to launch
+   cvc4, z3, altergo etc) *)
+let () =
+  let path_separator =
+    match Sys.os_type with
+    | "Unix" | "Cygwin" -> ":"
+    | "Win32" -> ";"
+    | _ -> assert false in
+  (* ??? This does not always return the absolute location of gnat_server but
+     this use case should be ok (see documentation of Ocaml
+     Sys.executable_name). *)
+  let gnat_server_path = Filename.dirname (Sys.executable_name) in
+  let cur_env = Unix.getenv "PATH" in
+  let new_env = cur_env ^ path_separator ^ gnat_server_path in
+  Unix.putenv "PATH" new_env
+
 let debug_server = Debug.register_flag ~desc:"Debug gnat_server" "gnat_server"
 let debug = false
 
