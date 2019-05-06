@@ -986,7 +986,8 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
           Debug.dprintf debug "tab switch to page %d@." n;
           notebook#goto_page n;
         end;
-      move_to_line ~yalign:0.0 v l
+      (* 0.5 to focus on the middle of the screen *)
+      move_to_line ~yalign:0.5 v l
     with Nosourceview f ->
       Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
 
@@ -1132,18 +1133,11 @@ let color_loc ?(ce=false) ~color loc =
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
-let apply_loc_on_source (l: (Loc.position * color) list) =
+let apply_loc_on_source (l: (Loc.position * color) list) loc_goal =
   Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table;
   List.iter (fun (loc, color) ->
     color_loc ~color loc) l;
-  let loc_of_goal =
-    (* TODO the last location sent seems more relevant thus the rev. This
-       should be changed, the sent task should contain the information of where
-       to scroll and the list of locations is far too long. *)
-    try Some (List.find (fun (_, color) -> color = Goal_color) (List.rev l))
-    with Not_found -> None
-  in
-  scroll_to_loc ~force_tab_switch:false (Opt.map fst loc_of_goal)
+  scroll_to_loc ~force_tab_switch:false loc_goal
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to the counterexample tab *)
@@ -2461,14 +2455,14 @@ let treat_notification n =
         exit_function_safe ()
   | Saving_needed b -> exit_function_handler b
   | Message (msg)                 -> treat_message_notification msg
-  | Task (id, s, list_loc)        ->
+  | Task (id, s, list_loc, goal_loc)        ->
      if is_selected_alone id then
        begin
          task_view#source_buffer#set_text s;
          (* Avoid erasing colors at startup when selecting the first node. In
             all other cases, it should change nothing. *)
          if list_loc != [] then
-           apply_loc_on_source list_loc;
+           apply_loc_on_source list_loc goal_loc;
          (* scroll to end of text *)
          task_view#scroll_to_mark `INSERT
        end
