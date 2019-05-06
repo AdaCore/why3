@@ -422,6 +422,7 @@ exception No_loc_on_goal
 
 let get_locations (task: Task.task) =
   let list = ref [] in
+  let goal_loc = ref None in
   let file_cache = Hstr.create 17 in
   let session_dir =
     let d = get_server_data () in
@@ -438,6 +439,16 @@ let get_locations (task: Task.task) =
     let (f,l,b,e) = Loc.get loc in
     let loc = Loc.user_position (relativize f) l b e in
     list := (loc, color) :: !list in
+  let get_goal_loc ~loc pr_loc =
+    (* We get the task loc in priority. If it is not there, we take the pr
+       ident loc. No loc can happen in completely ghost function. *)
+    let loc = Opt.fold (fun _ x -> Some x) pr_loc loc in
+    match loc with
+    | Some loc ->
+        let (f,l,b,e) = Loc.get loc in
+        let loc = Loc.user_position (relativize f) l b e in
+        goal_loc := Some loc
+    | _ -> () in
   let rec color_locs ~color formula =
     Opt.iter (fun loc -> color_loc ~color ~loc) formula.Term.t_loc;
     Term.t_iter (fun subf -> color_locs ~color subf) formula in
@@ -476,9 +487,11 @@ let get_locations (task: Task.task) =
         { Task.task_prev = prev;
           Task.task_decl =
             { Theory.td_node =
-                Theory.Decl { Decl.d_node = Decl.Dprop (k, _, f) }}} ->
+                Theory.Decl { Decl.d_node = Decl.Dprop (k, pr, f) }}} ->
       begin match k with
-      | Decl.Pgoal  -> color_t_locs ~premise:false f
+      | Decl.Pgoal  ->
+          get_goal_loc ~loc:f.Term.t_loc pr.Decl.pr_name.Ident.id_loc;
+          color_t_locs ~premise:false f
       | Decl.Paxiom -> color_t_locs ~premise:true  f
       | _ -> assert false
       end;
@@ -486,7 +499,7 @@ let get_locations (task: Task.task) =
     | Some { Task.task_prev = prev } -> scan prev
     | _ -> () in
   scan task;
-  !list
+  !goal_loc, !list
 
 let get_modified_node n =
   match n with
@@ -499,7 +512,7 @@ let get_modified_node n =
   | Saved | Saving_needed _ -> None
   | Message _ -> None
   | Dead _ -> None
-  | Task (nid, _, _) -> Some nid
+  | Task (nid, _, _, _) -> Some nid
   | File_contents _ -> None
   | Source_and_ce _ -> None
 
@@ -846,14 +859,15 @@ end
   let task_of_id d id show_full_context loc =
     let task,tables = get_task_name_table d.cont.controller_session id in
     (* This function also send source locations associated to the task *)
-    let loc_color_list = if loc then get_locations task else [] in
+    let goal_loc, loc_color_list =
+      if loc then get_locations task else (None, []) in
     let task_text =
       let pr = tables.Trans.printer in
       let apr = tables.Trans.aprinter in
       let module P = (val Pretty.create pr apr pr pr false) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in
-    task_text, loc_color_list
+    task_text, loc_color_list, goal_loc
 
   let create_ce_tab ~print_attrs s res any list_loc =
     let f = get_encapsulating_file s any in
@@ -874,34 +888,35 @@ end
       match any with
       | APn _id ->
         let s = "Goal is detached and cannot be printed" in
-        P.notify (Task (nid, s, []))
+        P.notify (Task (nid, s, [], None))
       | ATh t ->
-          P.notify (Task (nid, "Detached theory " ^ (theory_name t).Ident.id_string, []))
+          P.notify (Task (nid, "Detached theory " ^ (theory_name t).Ident.id_string, [], None))
       | APa pid ->
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
           let prover_text = "Detached prover\n====================> Prover: " ^ name ^ "\n" in
-          P.notify (Task (nid, prover_text, []))
+          P.notify (Task (nid, prover_text, [], None))
       | AFile f ->
-          P.notify (Task (nid, "Detached file " ^ (basename (file_path f)), []))
+          P.notify (Task (nid, "Detached file " ^ (basename (file_path f)), [], None))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
           P.notify (Task (nid, "Detached transformation\n====================> Transformation: " ^
-                          String.concat " " (name :: args) ^ "\n", []))
+                          String.concat " " (name :: args) ^ "\n", [], None))
     else
       match any with
       | APn id ->
-          let s, list_loc = task_of_id d id show_full_context loc in
-          P.notify (Task (nid, s, list_loc))
+          let s, list_loc, goal_loc = task_of_id d id show_full_context loc in
+          P.notify (Task (nid, s, list_loc, goal_loc))
       | ATh t ->
-          P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
+          P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, [], None))
       | APa pid ->
           let print_attrs = Debug.test_flag debug_attrs in
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let parid = pa.parent in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
-          let s, old_list_loc = task_of_id d parid show_full_context loc in
+          let s, old_list_loc, old_goal_loc =
+            task_of_id d parid show_full_context loc in
           let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
           (* Display the result of the prover *)
           begin
@@ -919,7 +934,7 @@ end
                   let result_pr =
                     result ^ "\n\n" ^ "The prover did not return counterexamples."
                   in
-                  P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
+                  P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc))
                 else
                   begin
                     let result_pr =
@@ -929,19 +944,20 @@ end
                       create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc
                     in
                     P.notify (Source_and_ce (source_result, list_loc));
-                    P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
+                    P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc))
                   end
-            | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc))
+            | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc))
           end
       | AFile f ->
-          P.notify (Task (nid, "File " ^ (basename (file_path f)), []))
+          P.notify (Task (nid, "File " ^ (basename (file_path f)), [], None))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
           let parid = get_trans_parent d.cont.controller_session tid in
-          let s, list_loc = task_of_id d parid show_full_context loc in
+          let s, list_loc, goal_loc = task_of_id d parid show_full_context loc in
           P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
-                          String.concat " " (name :: args) ^ "\n", list_loc))
+                          String.concat " " (name :: args) ^ "\n",
+                          list_loc, goal_loc))
 
   (* -------------------- *)
 

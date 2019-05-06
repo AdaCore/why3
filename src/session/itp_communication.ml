@@ -98,7 +98,7 @@ type notification =
   (* an informative message, can be an error message *)
   | Dead         of string
   (* server exited *)
-  | Task         of node_ID * string * (Loc.position * color) list
+  | Task         of node_ID * string * (Loc.position * color) list * Loc.position option
   (* the node_ID's task together with information that allows to color the
      source code corresponding to different part of the task (premise, goal,
      etc) *)
@@ -205,6 +205,6 @@ let print_notify fmt n =
   | Dead s                            -> fprintf fmt "dead :%s" s
   | File_contents (f, _s)             -> fprintf fmt "file contents %s" f
   | Source_and_ce (_s, _list_loc)     -> fprintf fmt "source and ce"
-  | Task (ni, _s, list_loc)           ->
+  | Task (ni, _s, list_loc, _g_loc)   ->
       fprintf fmt "task for node_ID %d which contains a list of %d locations"
               ni (List.length list_loc) (* print_list_loc list_loc *)
