@@ -51,7 +51,7 @@ type proof_attempt_node = {
   mutable proof_state    : Call_provers.prover_result option;
   (* None means that the call was not done or never returned *)
   mutable proof_obsolete : bool;
-  mutable proof_script   : string option;  (* non empty for external ITP *)
+  mutable proof_script   : Sysutil.file_path option;  (* non empty for external ITP *)
 }
 
 let set_proof_script pa file =
@@ -74,14 +74,9 @@ type transformation_node = {
   transf_is_detached               : bool;
 }
 
-type file_path = string list
-let string_of_file_path p = String.concat "/" p
-
 type file = {
   file_id                : int;
-  mutable file_path      : file_path;
-  (* access path to the source, in the normal order
-  i.e. ["..";"foo.mlw"] *)
+  mutable file_path      : Sysutil.file_path;
   file_format            : string option;
   file_is_detached       : bool;
   mutable file_theories  : theory list;
@@ -99,17 +94,9 @@ type any =
   | APn of proofNodeID
   | APa of proofAttemptID
 
-let rec basename p =
-  match p with
-  | [] -> raise Not_found
-  | [f] -> f
-  | _ :: tl -> basename tl
-
-let print_file_path fmt p = Format.fprintf fmt "%a" (Pp.print_list Pp.slash Pp.string) p
-
 let fprintf_any fmt a =
   match a with
-  | AFile f -> Format.fprintf fmt "<AFile [%a]>" print_file_path f.file_path
+  | AFile f -> Format.fprintf fmt "<AFile [%a]>" Sysutil.print_file_path f.file_path
   | ATh th ->  Format.fprintf fmt "<ATh %s>" th.theory_name.Ident.id_string
   | ATn trid -> Format.fprintf fmt "<ATn %d>" trid
   | APn pnid -> Format.fprintf fmt "<APn %d>" pnid
@@ -520,7 +507,7 @@ let print_theory s fmt th : unit =
     (Pp.print_list Pp.semi (fun fmt a -> print_proof_node s fmt a)) th.theory_goals
 
 let print_file s fmt (file, thl) =
-  fprintf fmt "@[<hv 2> File [%a];@ [%a]@]" print_file_path file.file_path
+  fprintf fmt "@[<hv 2> File [%a];@ [%a]@]" Sysutil.print_file_path file.file_path
     (Pp.print_list Pp.semi (print_theory s)) thl
 
 let print_s s fmt =
@@ -562,7 +549,7 @@ let empty_session ?from dir =
 
 exception AlreadyExist
 
-let add_proof_attempt session prover limit state ~obsolete edit parentID =
+let add_proof_attempt session prover limit state ~obsolete (edit : Sysutil.file_path option) parentID =
   let pn = get_proofNode session parentID in
   try
     let _ = Hprover.find pn.proofn_attempts prover in
@@ -941,9 +928,16 @@ let default_unknown_result =
        Call_provers.pr_model = Model_parser.default_model;
      }
 
-let load_result r =
+let load_result a (path,acc) r =
   match r.Xml.name with
   | "result" ->
+     begin
+       match acc with
+       | Some _ ->
+          Warning.emit "[Error] Too many result elements@.";
+          raise (LoadError (a,"too many result elements"))
+       | None -> ()
+     end;
      let status = string_attribute "status" r in
      let answer =
        match status with
@@ -969,19 +963,23 @@ let load_result r =
        try int_of_string (List.assoc "steps" r.Xml.attributes)
        with Not_found -> -1
      in
-     {
+     let res = {
        Call_provers.pr_answer = answer;
        Call_provers.pr_time = time;
        Call_provers.pr_output = "";
        Call_provers.pr_status = Unix.WEXITED 0;
        Call_provers.pr_steps = steps;
        Call_provers.pr_model = Model_parser.default_model;
-     }
-  | "undone" | "unedited" -> default_unknown_result
+       }
+     in (path,Some res)
+  | "undone" | "unedited" -> (path,acc)
+  | "path" ->
+     let fn = string_attribute "name" r in
+     (Sysutil.add_to_path path fn,acc)
   | s ->
     Warning.emit "[Warning] Session.load_result: unexpected element '%s'@."
       s;
-    default_unknown_result
+    (path,acc)
 
 let load_option attr g =
   try Some (List.assoc attr g.Xml.attributes)
@@ -1044,15 +1042,21 @@ and load_proof_or_transf session old_provers pid a =
         try
           let prover = int_of_string prover in
           let (p,timelimit,steplimit,memlimit) = Mint.find prover old_provers in
-          let res = match a.Xml.elements with
-            | [r] -> load_result r
-            | [] -> default_unknown_result
-            | _ ->
-              Warning.emit "[Error] Too many result elements@.";
-              raise (LoadError (a,"too many result elements"))
+          let path,res =
+            List.fold_left (load_result a) (Sysutil.empty_path,None) a.Xml.elements
           in
-          let edit = load_option "edited" a in
-          let edit = match edit with None | Some "" -> None | _ -> edit in
+          let res = match res with
+            | None -> default_unknown_result
+            | Some r -> r
+          in
+          let edit =
+            if Sysutil.is_empty_path path then
+              match load_option "edited" a with
+              | None | Some "" -> None
+              | Some s -> Some (Sysutil.system_independent_path_of_file s)
+            else
+              Some path
+          in
           let obsolete = bool_attribute "obsolete" a false in
           let timelimit = int_attribute_def "timelimit" a timelimit in
 	  let steplimit = int_attribute_def "steplimit" a steplimit in
@@ -1114,7 +1118,7 @@ let load_theory session parent_name old_provers (path,acc) th =
     (path,mth::acc)
   | "path" ->
      let fn = string_attribute "name" th in
-     (fn::path,acc)
+     (Sysutil.add_to_path path fn,acc)
   | s ->
     Warning.emit "[Warning] Session.load_theory: unexpected element '%s'@."
       s;
@@ -1128,15 +1132,17 @@ let load_file session old_provers f =
     let fid = gen_fileID session in
     let path,ft =
       List.fold_left
-        (load_theory session fid old_provers) ([],[]) f.Xml.elements
+        (load_theory session fid old_provers) (Sysutil.empty_path,[]) f.Xml.elements
     in
-    let path = match path,fn with
-      | [], Some fn ->
-         let l = Sysutil.system_independent_path_of_file fn in
-         Debug.dprintf debug "Loaded path from concrete file name: %a@." print_file_path l;
-         l
-      | [],None -> assert false
-      | p,_ -> List.rev p
+    let path =
+      if Sysutil.is_empty_path path then
+        match fn with
+        | Some fn ->
+           let l = Sysutil.system_independent_path_of_file fn in
+           Debug.dprintf debug "Loaded path from concrete file name: %a@." Sysutil.print_file_path l;
+           l
+        | None -> assert false
+      else path
     in
     let mf = { file_id = fid;
                file_path = path;
@@ -1618,7 +1624,7 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
 let add_file_section (s:session) (fn:string) ~file_is_detached
     (theories:Theory.theory list) format : file =
   let fn = Sysutil.relativize_filename s.session_dir fn in
-  Debug.dprintf debug "[Session_itp.add_file_section] fn = %a@." print_file_path fn;
+  Debug.dprintf debug "[Session_itp.add_file_section] fn = %a@." Sysutil.print_file_path fn;
 (*
   if Hfile.mem s.session_files fn then
     begin
@@ -1858,10 +1864,12 @@ let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfreq
 let save_string_attrib name fmt s =
   if s <> "" then fprintf fmt "@ %s=\"%a\"" name save_string s
 
+(*
 let save_option_def name fmt opt =
   match opt with
   | None -> ()
   | Some s -> save_string_attrib name fmt s
+ *)
 
 let save_bool_def name def fmt b =
   if b <> def then fprintf fmt "@ %s=\"%b\"" name b
@@ -1893,15 +1901,23 @@ let save_status fmt s =
   | Some result -> save_result fmt result
   | None -> fprintf fmt "<undone/>"
 
+let save_file_path fmt p =
+  List.iter
+    (fun s -> fprintf fmt "@[<hov 1><path@ name=\"%s\"/>@]" s)
+    (Sysutil.decompose_path p)
+
 let save_proof_attempt fmt ((id,tl,sl,ml),a) =
   fprintf fmt
-    "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a%a>"
+    "@\n@[<h><proof@ prover=\"%i\"%a%a%a%a>"
     id
     (save_int_def "timelimit" tl) (a.limit.Call_provers.limit_time)
     (save_int_def "steplimit" sl) (a.limit.Call_provers.limit_steps)
     (save_int_def "memlimit" ml) (a.limit.Call_provers.limit_mem)
-    (save_bool_def "obsolete" false) a.proof_obsolete
-    (save_option_def "edited") a.proof_script;
+    (save_bool_def "obsolete" false) a.proof_obsolete;
+  begin match a.proof_script with
+  | None -> ()
+  | Some p -> save_file_path fmt p
+  end;
   save_status fmt a.proof_state;
   fprintf fmt "</proof>@]"
 
@@ -1970,10 +1986,10 @@ let save_theory s ctxt fmt t =
 
 let save_file s ctxt fmt _ f =
   fprintf fmt
-    "@\n@[<v 0>@[<h><file%a%a>@]"
+    "@\n@[<v 0>@[<h><file%a%a>@]@\n%a"
     (opt_string "format") f.file_format
-    (save_bool_def "proved" false) (file_proved s f);
-  List.iter (fun s -> fprintf fmt "@\n@[<hov 1><path@ name=\"%s\"/>@]" s) f.file_path;
+    (save_bool_def "proved" false) (file_proved s f)
+    save_file_path f.file_path;
   List.iter (save_theory s ctxt fmt) f.file_theories;
   fprintf fmt "@]@\n</file>"
 

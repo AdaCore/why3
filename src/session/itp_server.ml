@@ -632,7 +632,7 @@ end
   let get_node_name (node: any) =
     let d = get_server_data () in
     match node with
-    | AFile file -> Session_itp.basename (file_path file)
+    | AFile file -> Sysutil.basename (file_path file)
     | ATh th -> (theory_name th).Ident.id_string
     | ATn tn ->
        let name = get_transf_name d.cont.controller_session tn in
@@ -883,7 +883,7 @@ end
           let prover_text = "Detached prover\n====================> Prover: " ^ name ^ "\n" in
           P.notify (Task (nid, prover_text, []))
       | AFile f ->
-          P.notify (Task (nid, "Detached file " ^ (basename (file_path f)), []))
+          P.notify (Task (nid, "Detached file " ^ (Sysutil.basename (file_path f)), []))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
@@ -934,7 +934,7 @@ end
             | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc))
           end
       | AFile f ->
-          P.notify (Task (nid, "File " ^ (basename (file_path f)), []))
+          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), []))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
