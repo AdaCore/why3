@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="logic.mlw"/>
+<path name=".."/><path name="logic.mlw"/>
 <theory name="Compiler_logic" proved="true">
  <goal name="VC hl" expl="VC for hl" proved="true">
  <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
@@ -60,7 +59,7 @@
   <goal name="VC make_loop.0" expl="assertion" proved="true">
   <transf name="induction_pr" proved="true" >
    <goal name="VC make_loop.0.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.26"/></proof>
+   <proof prover="2"><result status="valid" time="0.26" steps="59915"/></proof>
    </goal>
   </transf>
   </goal>

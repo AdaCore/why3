@@ -187,7 +187,7 @@ and stats_of_transf prefix_name stats ses transf =
 
 let stats_of_theory file stats ses theory =
   let goals = theory_goals theory in
-  let prefix_name = string_of_file_path (file_path file) ^ " / " ^
+  let prefix_name = Pp.sprintf "%a" Sysutil.print_file_path (file_path file) ^ " / " ^
                       (theory_name theory).Ident.id_string ^  " / " in
   List.iter (stats_of_goal ~root:true prefix_name stats ses) goals
 
@@ -293,7 +293,7 @@ let stats2_of_session ~nb_proofs ses acc =
     (get_files ses) acc
 
 let print_file_stats ~time ses (f,r) =
-  printf "+-- file [%a]@\n" print_file_path (file_path f);
+  printf "+-- file [%a]@\n" Sysutil.print_file_path (file_path f);
   List.iter (print_theory_stats ~time ses) r
 
 let print_session_stats ~time ses = List.iter (print_file_stats ~time ses)

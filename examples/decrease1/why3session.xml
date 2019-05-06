@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="1" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="decrease1.mlw"/>
+<path name=".."/><path name="decrease1.mlw"/>
 <theory name="Decrease1" proved="true">
  <goal name="VC decrease1_induction" expl="VC for decrease1_induction" proved="true">
  <proof prover="2"><result status="valid" time="0.02" steps="35"/></proof>
@@ -38,7 +37,7 @@
   <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
   <goal name="VC search.8" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="11716"/></proof>
   </goal>
   <goal name="VC search.9" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
@@ -78,7 +77,7 @@
   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="VC search_rec.7" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="22635"/></proof>
   </goal>
  </transf>
  </goal>

@@ -244,13 +244,13 @@ val schedule_edition :
     session).  *)
 
 val prepare_edition :
-  controller -> ?file:string -> proofNodeID -> Whyconf.prover ->
+  controller -> ?file:Sysutil.file_path -> proofNodeID -> Whyconf.prover ->
   notification:notifier -> proofAttemptID * string * Call_provers.prover_result option
 (** [prepare_edition c ?file id pr] prepare for editing the proof of
-    node [id] with prover [pr]. The editor is not launched. The result
-    is [(pid,name,res)] where [pid] is the node id the proof_attempt,
-    [name] is the name of the file to edit, made relative to the
-    session directory, and [res] is the former result if any. *)
+   node [id] with prover [pr]. The editor is not launched. The result
+   is [(pid,name,res)] where [pid] is the node id the proof_attempt,
+   [name] is the system-dependent absolute path of the file to edit,
+   and [res] is the former result if any. *)
 
 exception TransAlreadyExists of string * string
 exception GoalNodeDetached of proofNodeID

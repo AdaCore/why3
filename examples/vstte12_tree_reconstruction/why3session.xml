@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../vstte12_tree_reconstruction.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="vstte12_tree_reconstruction.mlw"/>
 <theory name="Tree" proved="true">
  <goal name="depths_head" proved="true">
  <transf name="induction_ty_lex" proved="true" >
@@ -27,7 +28,7 @@
  </transf>
  </goal>
  <goal name="depths_prefix_simple" proved="true">
- <proof prover="1"><result status="valid" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="74416"/></proof>
  </goal>
  <goal name="VC depths_subtree" expl="VC for depths_subtree" proved="true">
  <proof prover="0"><result status="valid" time="0.21" steps="540"/></proof>
@@ -43,7 +44,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
   <goal name="VC build_rec.1" expl="exceptional postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="9716"/></proof>
   </goal>
   <goal name="VC build_rec.2" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
@@ -58,10 +59,12 @@
   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC build_rec.6" expl="exceptional postcondition" proved="true">
-  <proof prover="5" edited="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_1.v"><result status="valid" time="0.48"/></proof>
+  <proof prover="5"><path
+                     name="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_1.v"/><result status="valid" time="1.31"/></proof>
   </goal>
   <goal name="VC build_rec.7" expl="exceptional postcondition" proved="true">
-  <proof prover="5" edited="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_2.v"><result status="valid" time="0.36"/></proof>
+  <proof prover="5"><path
+                     name="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_2.v"/><result status="valid" time="1.20"/></proof>
   </goal>
  </transf>
  </goal>
@@ -73,25 +76,29 @@
  <goal name="VC harness" expl="VC for harness" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC harness.0" expl="postcondition" proved="true">
-  <proof prover="5" edited="vstte12_tree_reconstruction_Harness_VC_harness_1.v"><result status="valid" time="0.33"/></proof>
+  <proof prover="5"><path
+                     name="vstte12_tree_reconstruction_Harness_VC_harness_1.v"/><result status="valid" time="1.18"/></proof>
   </goal>
   <goal name="VC harness.1" expl="exceptional postcondition" proved="true">
-  <proof prover="5" edited="vstte12_tree_reconstruction_Harness_VC_harness_2.v"><result status="valid" time="0.35"/></proof>
+  <proof prover="5"><path
+                     name="vstte12_tree_reconstruction_Harness_VC_harness_2.v"/><result status="valid" time="1.22"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC harness2" expl="VC for harness2" proved="true">
- <proof prover="5" edited="vstte12_tree_reconstruction_Harness_VC_harness2_1.v"><result status="valid" time="0.49"/></proof>
+ <proof prover="5"><path
+                    name="vstte12_tree_reconstruction_Harness_VC_harness2_1.v"/><result status="valid" time="1.26"/></proof>
  </goal>
 </theory>
 <theory name="ZipperBasedTermination" proved="true">
  <goal name="VC tc" expl="VC for tc" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.56"/></proof>
+ <proof prover="4" timelimit="1"><result status="valid" time="0.56" steps="86066"/></proof>
  </goal>
 </theory>
 <theory name="ZipperBased" proved="true">
  <goal name="forest_depths_append" proved="true">
- <proof prover="5" timelimit="10" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"><result status="valid" time="0.30"/></proof>
+ <proof prover="5" timelimit="10" memlimit="0"><path
+                                                name="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"/><result status="valid" time="1.12"/></proof>
  </goal>
  <goal name="g_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
@@ -103,122 +110,124 @@
  <goal name="depths_length" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="depths_length.0" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.04" steps="8241"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="forest_depths_length" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="forest_depths_length.0" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.06"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.06" steps="11131"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="g_tail" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="g_tail.0" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.08"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.08" steps="14429"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="key_lemma" proved="true">
- <proof prover="5" edited="vstte12_tree_reconstruction_ZipperBased_key_lemma_2.v"><result status="valid" time="0.53"/></proof>
+ <proof prover="5"><path
+                    name="vstte12_tree_reconstruction_ZipperBased_key_lemma_2.v"/><result status="valid" time="1.46"/></proof>
  </goal>
  <goal name="right_nil" proved="true">
- <proof prover="5" timelimit="29" memlimit="0" edited="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"><result status="valid" time="0.24"/></proof>
+ <proof prover="5" timelimit="29" memlimit="0"><path
+                                                name="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"/><result status="valid" time="1.20"/></proof>
  </goal>
  <goal name="main_lemma" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.07"/></proof>
+ <proof prover="4" timelimit="1"><result status="valid" time="0.07" steps="13420"/></proof>
  </goal>
  <goal name="VC tc" expl="VC for tc" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC tc.0" expl="exceptional postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.16"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.16" steps="18270"/></proof>
   </goal>
   <goal name="VC tc.1" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.04" steps="14755"/></proof>
   </goal>
   <goal name="VC tc.2" expl="exceptional postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.05" steps="15510"/></proof>
   </goal>
   <goal name="VC tc.3" expl="variant decrease" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.04"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.04" steps="14926"/></proof>
   </goal>
   <goal name="VC tc.4" expl="precondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.11"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.11" steps="15175"/></proof>
   </goal>
   <goal name="VC tc.5" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.13"/></proof>
+  <proof prover="4"><result status="valid" time="0.13" steps="30920"/></proof>
   </goal>
   <goal name="VC tc.6" expl="exceptional postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.33"/></proof>
+  <proof prover="4"><result status="valid" time="0.33" steps="48380"/></proof>
   </goal>
   <goal name="VC tc.7" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="14677"/></proof>
   </goal>
   <goal name="VC tc.8" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.39" steps="618"/></proof>
   </goal>
   <goal name="VC tc.9" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="13743"/></proof>
   </goal>
   <goal name="VC tc.10" expl="exceptional postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="16125"/></proof>
   </goal>
   <goal name="VC tc.11" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="13292"/></proof>
   </goal>
   <goal name="VC tc.12" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="14527"/></proof>
   </goal>
   <goal name="VC tc.13" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="13120"/></proof>
   </goal>
   <goal name="VC tc.14" expl="exceptional postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="14878"/></proof>
   </goal>
   <goal name="VC tc.15" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="15073"/></proof>
   </goal>
   <goal name="VC tc.16" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="15526"/></proof>
   </goal>
   <goal name="VC tc.17" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.24"/></proof>
+  <proof prover="4"><result status="valid" time="0.24" steps="32689"/></proof>
   </goal>
   <goal name="VC tc.18" expl="exceptional postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.27"/></proof>
+  <proof prover="4"><result status="valid" time="0.27" steps="52216"/></proof>
   </goal>
   <goal name="VC tc.19" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="14887"/></proof>
   </goal>
   <goal name="VC tc.20" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.68" steps="1043"/></proof>
   </goal>
   <goal name="VC tc.21" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="13785"/></proof>
   </goal>
   <goal name="VC tc.22" expl="exceptional postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="16255"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="map_leaf_depths" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="map_leaf_depths.0" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.05" steps="13967"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="map_leaf_only_leaf" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="map_leaf_only_leaf.0" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.05"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.05" steps="11951"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC build" expl="VC for build" proved="true">
- <proof prover="4" timelimit="1"><result status="valid" time="0.06"/></proof>
+ <proof prover="4" timelimit="1"><result status="valid" time="0.06" steps="20777"/></proof>
  </goal>
 </theory>
 </file>

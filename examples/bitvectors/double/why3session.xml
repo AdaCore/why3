@@ -8,8 +8,7 @@
 <prover id="4" name="Coq" version="8.7.1" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="double.why"/>
+<path name=".."/><path name="double.why"/>
 <theory name="TestDouble" proved="true">
  <goal name="nth_one1" proved="true">
  <proof prover="2" timelimit="3"><result status="valid" time="0.05" steps="79"/></proof>
@@ -28,11 +27,11 @@
  </goal>
  <goal name="exp_one" proved="true">
  <proof prover="2" timelimit="30"><result status="valid" time="0.16" steps="210"/></proof>
- <proof prover="4" edited="double_TestDouble_exp_one_1.v"><result status="valid" time="1.23"/></proof>
+ <proof prover="4"><path name="double_TestDouble_exp_one_1.v"/><result status="valid" time="1.23"/></proof>
  </goal>
  <goal name="mantissa_one" proved="true">
  <proof prover="2"><result status="valid" time="0.09" steps="88"/></proof>
- <proof prover="3"><result status="valid" time="1.04"/></proof>
+ <proof prover="3"><result status="valid" time="0.10"/></proof>
  <proof prover="5" timelimit="11"><result status="valid" time="2.58"/></proof>
  </goal>
  <goal name="double_value_of_1" proved="true">

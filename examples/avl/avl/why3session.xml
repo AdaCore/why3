@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="avl.mlw"/>
+<path name=".."/><path name="avl.mlw"/>
 <theory name="AVL" proved="true">
  <goal name="M.M.assoc" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
@@ -125,7 +124,7 @@
  <proof prover="1"><result status="valid" time="0.10" steps="286"/></proof>
  </goal>
  <goal name="VC decompose_back_node" expl="VC for decompose_back_node" proved="true">
- <proof prover="1"><result status="valid" time="1.11" steps="6525"/></proof>
+ <proof prover="1"><result status="valid" time="1.41" steps="6525"/></proof>
  </goal>
  <goal name="VC decompose_back" expl="VC for decompose_back" proved="true">
  <proof prover="1"><result status="valid" time="0.05" steps="286"/></proof>
@@ -156,7 +155,7 @@
   <goal name="VC fuse.3" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC fuse.3.0" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.65" steps="3698"/></proof>
+   <proof prover="1"><result status="valid" time="0.82" steps="3698"/></proof>
    </goal>
    <goal name="VC fuse.3.1" expl="postcondition" proved="true">
    <proof prover="1"><result status="valid" time="0.70" steps="3398"/></proof>

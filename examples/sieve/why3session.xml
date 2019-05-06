@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -9,39 +9,38 @@
 <prover id="5" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="sieve.mlw"/>
+<path name=".."/><path name="sieve.mlw"/>
 <theory name="Sieve" proved="true">
  <goal name="VC incr" expl="VC for incr" proved="true">
- <proof prover="4"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="7934"/></proof>
  </goal>
  <goal name="VC sieve" expl="VC for sieve" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC sieve.0" expl="array creation size" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="8287"/></proof>
   </goal>
   <goal name="VC sieve.1" expl="index in array bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="9506"/></proof>
   </goal>
   <goal name="VC sieve.2" expl="index in array bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="9230"/></proof>
   </goal>
   <goal name="VC sieve.3" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="8841"/></proof>
   </goal>
   <goal name="VC sieve.4" expl="loop invariant init" proved="true">
   <proof prover="6"><result status="valid" time="0.04" steps="74"/></proof>
   </goal>
   <goal name="VC sieve.5" expl="index in array bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="10421"/></proof>
   </goal>
   <goal name="VC sieve.6" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="10365"/></proof>
   </goal>
   <goal name="VC sieve.7" expl="loop invariant init" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC sieve.7.0" expl="loop invariant init" proved="true">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="11611"/></proof>
    </goal>
    <goal name="VC sieve.7.1" expl="loop invariant init" proved="true">
    <proof prover="1"><result status="valid" time="0.08"/></proof>
@@ -52,7 +51,7 @@
    </transf>
    </goal>
    <goal name="VC sieve.7.2" expl="loop invariant init" proved="true">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="11944"/></proof>
    </goal>
   </transf>
   </goal>
@@ -60,23 +59,23 @@
   <proof prover="6"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
   <goal name="VC sieve.9" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="9601"/></proof>
   </goal>
   <goal name="VC sieve.10" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC sieve.10.0" expl="VC for sieve" proved="true">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="12377"/></proof>
    </goal>
    <goal name="VC sieve.10.1" expl="VC for sieve" proved="true">
    <proof prover="5"><result status="valid" time="0.02"/></proof>
    <transf name="remove" proved="true" arg1="real,tuple0,unit,map,ref,zero,one,(-),(-),(&gt;=),abs,div1,mod1,get,even,odd,divides,prime,(!),Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides_spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,array&#39;invariant,make_spec">
     <goal name="VC sieve.10.1.0" expl="VC for sieve" proved="true">
-    <proof prover="2"><result status="valid" time="0.02"/></proof>
+    <proof prover="2"><result status="valid" time="0.02" steps="14834"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="VC sieve.10.2" expl="VC for sieve" proved="true">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="9577"/></proof>
    </goal>
   </transf>
   </goal>
@@ -95,7 +94,7 @@
    <proof prover="6"><result status="valid" time="0.03" steps="118"/></proof>
    </goal>
    <goal name="VC sieve.12.3" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="7888"/></proof>
    </goal>
    <goal name="VC sieve.12.4" expl="assertion" proved="true">
    <proof prover="6"><result status="valid" time="0.01" steps="97"/></proof>
@@ -103,10 +102,10 @@
   </transf>
   </goal>
   <goal name="VC sieve.13" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="9821"/></proof>
   </goal>
   <goal name="VC sieve.14" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.03"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="12583"/></proof>
   </goal>
   <goal name="VC sieve.15" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.09" steps="148"/></proof>
@@ -126,7 +125,7 @@
    <proof prover="6"><result status="valid" time="0.01" steps="56"/></proof>
    </goal>
    <goal name="VC sieve.16.4" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="7888"/></proof>
    </goal>
    <goal name="VC sieve.16.5" expl="assertion" proved="true">
    <proof prover="6"><result status="valid" time="0.04" steps="44"/></proof>
@@ -134,10 +133,10 @@
   </transf>
   </goal>
   <goal name="VC sieve.17" expl="loop variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="9323"/></proof>
   </goal>
   <goal name="VC sieve.18" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="11169"/></proof>
   </goal>
   <goal name="VC sieve.19" expl="loop invariant preservation" proved="true">
   <proof prover="6"><result status="valid" time="0.05" steps="82"/></proof>
@@ -149,7 +148,7 @@
     <goal name="VC sieve.20.0.0" expl="assertion" proved="true">
     <transf name="split_goal_right" proved="true" >
      <goal name="VC sieve.20.0.0.0" expl="VC for sieve" proved="true">
-     <proof prover="4"><result status="valid" time="0.03"/></proof>
+     <proof prover="4"><result status="valid" time="0.03" steps="10615"/></proof>
      </goal>
      <goal name="VC sieve.20.0.0.1" expl="VC for sieve" proved="true">
      <transf name="introduce_premises" proved="true" >
@@ -176,7 +175,7 @@
    <goal name="VC sieve.21.1" expl="assertion" proved="true">
    <transf name="inline_all" proved="true" >
     <goal name="VC sieve.21.1.0" expl="assertion" proved="true">
-    <proof prover="4"><result status="valid" time="0.04"/></proof>
+    <proof prover="4"><result status="valid" time="0.04" steps="19141"/></proof>
     </goal>
    </transf>
    </goal>

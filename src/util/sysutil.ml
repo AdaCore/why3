@@ -105,6 +105,22 @@ let rec copy_dir from to_ =
 let concat f1 f2 =
   if Filename.is_relative f2 then Filename.concat f1 f2 else f2
 
+type file_path = string list
+let empty_path = []
+let add_to_path p fn = p @ [fn]
+let is_empty_path p = match p with [] -> true | _ -> false
+let decompose_path p = p
+
+let rec basename p =
+  match p with
+  | [] -> raise Not_found
+  | [f] -> f
+  | _ :: tl -> basename tl
+
+(* deprecated: let string_of_file_path p = String.concat "/" p *)
+let print_file_path fmt p = Format.fprintf fmt "%a" (Pp.print_list Pp.slash Pp.string) p
+
+
 let system_independent_path_of_file f =
   let rec aux acc f =
     let d = Filename.dirname f in

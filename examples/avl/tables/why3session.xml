@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="4" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="tables.mlw"/>
+<path name=".."/><path name="tables.mlw"/>
 <theory name="MapBase" proved="true">
  <goal name="M.VC neutral_" expl="VC for neutral_" proved="true">
  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
@@ -15,13 +14,13 @@
  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="M.neutral" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="9471"/></proof>
  </goal>
  <goal name="M.M.assoc" proved="true">
  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
  <goal name="M.M.neutral" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="10937"/></proof>
  </goal>
  <goal name="M.VC zero" expl="VC for zero" proved="true">
  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
@@ -72,7 +71,7 @@
  <proof prover="5"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
  <goal name="Sel.M.neutral" proved="true">
- <proof prover="4"><result status="valid" time="0.04"/></proof>
+ <proof prover="4"><result status="valid" time="0.04" steps="11993"/></proof>
  </goal>
  <goal name="Sel.M.VC zero" expl="VC for zero" proved="true">
  <proof prover="5"><result status="valid" time="0.00" steps="4"/></proof>
@@ -84,7 +83,7 @@
  <proof prover="5"><result status="valid" time="0.02" steps="4"/></proof>
  </goal>
  <goal name="Sel.M.agg_sing" proved="true">
- <proof prover="4"><result status="valid" time="0.05"/></proof>
+ <proof prover="4"><result status="valid" time="0.05" steps="17492"/></proof>
  </goal>
  <goal name="Sel.M.agg_cat" proved="true">
  <proof prover="5"><result status="valid" time="0.01" steps="4"/></proof>
@@ -219,13 +218,13 @@
   <proof prover="5"><result status="valid" time="0.03" steps="44"/></proof>
   </goal>
   <goal name="VC insert.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.19"/></proof>
+  <proof prover="4"><result status="valid" time="0.19" steps="50842"/></proof>
   </goal>
   <goal name="VC insert.5" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.05" steps="59"/></proof>
   </goal>
   <goal name="VC insert.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.18"/></proof>
+  <proof prover="4"><result status="valid" time="0.18" steps="49862"/></proof>
   </goal>
   <goal name="VC insert.7" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="583"/></proof>
@@ -805,7 +804,7 @@
   </transf>
   </goal>
   <goal name="VC symdiff.12" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="1"><result status="valid" time="0.63"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.63" steps="113570"/></proof>
   </goal>
   <goal name="VC symdiff.13" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.26" steps="601"/></proof>
@@ -841,7 +840,7 @@
   <proof prover="5"><result status="valid" time="0.03" steps="25"/></proof>
   </goal>
   <goal name="VC correction.1" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="27584"/></proof>
   </goal>
  </transf>
  </goal>

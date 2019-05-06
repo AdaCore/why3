@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="gnome_sort.mlw"/>
+<path name=".."/><path name="gnome_sort.mlw"/>
 <theory name="GnomeSort" proved="true">
  <goal name="VC gnome_sort" expl="VC for gnome_sort" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -26,7 +25,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
   <goal name="VC gnome_sort.5" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.08"/></proof>
+  <proof prover="1"><result status="valid" time="0.08" steps="53021"/></proof>
   </goal>
   <goal name="VC gnome_sort.6" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
@@ -41,7 +40,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
   <goal name="VC gnome_sort.10" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.13"/></proof>
+  <proof prover="1"><result status="valid" time="0.13" steps="283204"/></proof>
   </goal>
   <goal name="VC gnome_sort.11" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>

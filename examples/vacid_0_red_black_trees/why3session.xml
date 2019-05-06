@@ -1,100 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../vacid_0_red_black_trees.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="vacid_0_red_black_trees.mlw"/>
 <theory name="RedBlackTree" proved="true">
  <goal name="memt_color" proved="true">
  <proof prover="0" timelimit="5"><result status="valid" time="0.00" steps="21"/></proof>
  </goal>
  <goal name="lt_leaf" proved="true">
- <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="695"/></proof>
  </goal>
  <goal name="gt_leaf" proved="true">
- <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="723"/></proof>
  </goal>
  <goal name="lt_tree_node" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="1606"/></proof>
  </goal>
  <goal name="gt_tree_node" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="1980"/></proof>
  </goal>
  <goal name="lt_node_lt" proved="true">
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="3989"/></proof>
  </goal>
  <goal name="gt_node_gt" proved="true">
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="4081"/></proof>
  </goal>
  <goal name="lt_left" proved="true">
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="2902"/></proof>
  </goal>
  <goal name="lt_right" proved="true">
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="3068"/></proof>
  </goal>
  <goal name="gt_left" proved="true">
- <proof prover="3"><result status="valid" time="0.00"/></proof>
+ <proof prover="3"><result status="valid" time="0.00" steps="3002"/></proof>
  </goal>
  <goal name="gt_right" proved="true">
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="3168"/></proof>
  </goal>
  <goal name="lt_tree_not_in" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="3127"/></proof>
  </goal>
  <goal name="lt_tree_trans" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="3578"/></proof>
  </goal>
  <goal name="gt_tree_not_in" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="3683"/></proof>
  </goal>
  <goal name="gt_tree_trans" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="4147"/></proof>
  </goal>
  <goal name="bst_Leaf" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="4297"/></proof>
  </goal>
  <goal name="bst_left" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="4703"/></proof>
  </goal>
  <goal name="bst_right" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="4787"/></proof>
  </goal>
  <goal name="bst_color" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="4904"/></proof>
  </goal>
  <goal name="rotate_left" proved="true">
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="5768"/></proof>
  </goal>
  <goal name="rotate_right" proved="true">
- <proof prover="3"><result status="valid" time="0.01"/></proof>
+ <proof prover="3"><result status="valid" time="0.01" steps="5942"/></proof>
  </goal>
  <goal name="rbtree_Leaf" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="5284"/></proof>
  </goal>
  <goal name="rbtree_Node1" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="5473"/></proof>
  </goal>
  <goal name="rbtree_left" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="6015"/></proof>
  </goal>
  <goal name="rbtree_right" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="6202"/></proof>
  </goal>
  <goal name="VC find" expl="VC for find" proved="true">
- <proof prover="4"><result status="valid" time="0.13"/></proof>
+ <proof prover="4"><result status="valid" time="0.13" steps="25583"/></proof>
  </goal>
  <goal name="rbtree_almost_rbtree" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="6476"/></proof>
  </goal>
  <goal name="rbtree_almost_rbtree_ex" proved="true">
- <proof prover="4"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="10729"/></proof>
  </goal>
  <goal name="almost_rbtree_rbtree_black" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="7199"/></proof>
  </goal>
  <goal name="VC lbalance" expl="VC for lbalance" proved="true">
  <proof prover="1"><result status="valid" time="0.60"/></proof>
@@ -105,100 +106,100 @@
   <proof prover="0"><result status="valid" time="0.50" steps="2230"/></proof>
   </goal>
   <goal name="VC rbalance.1" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="16724"/></proof>
   </goal>
   <goal name="VC rbalance.2" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.43" steps="1939"/></proof>
   </goal>
   <goal name="VC rbalance.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="17370"/></proof>
   </goal>
   <goal name="VC rbalance.4" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.36" steps="1662"/></proof>
   </goal>
   <goal name="VC rbalance.5" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="14901"/></proof>
   </goal>
   <goal name="VC rbalance.6" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.50" steps="2185"/></proof>
   </goal>
   <goal name="VC rbalance.7" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="17370"/></proof>
   </goal>
   <goal name="VC rbalance.8" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="18490"/></proof>
   </goal>
   <goal name="VC rbalance.9" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="15902"/></proof>
   </goal>
   <goal name="VC rbalance.10" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.40" steps="1853"/></proof>
   </goal>
   <goal name="VC rbalance.11" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="15051"/></proof>
   </goal>
   <goal name="VC rbalance.12" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="15897"/></proof>
   </goal>
   <goal name="VC rbalance.13" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="15681"/></proof>
   </goal>
   <goal name="VC rbalance.14" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="9485"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC insert" expl="VC for insert" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC insert.0" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="6593"/></proof>
   </goal>
   <goal name="VC insert.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7634"/></proof>
   </goal>
   <goal name="VC insert.2" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="6650"/></proof>
   </goal>
   <goal name="VC insert.3" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7709"/></proof>
   </goal>
   <goal name="VC insert.4" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="6593"/></proof>
   </goal>
   <goal name="VC insert.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7598"/></proof>
   </goal>
   <goal name="VC insert.6" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.10"/></proof>
+  <proof prover="4"><result status="valid" time="0.10" steps="30645"/></proof>
   </goal>
   <goal name="VC insert.7" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="6650"/></proof>
   </goal>
   <goal name="VC insert.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7673"/></proof>
   </goal>
   <goal name="VC insert.9" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.11"/></proof>
+  <proof prover="4"><result status="valid" time="0.11" steps="32486"/></proof>
   </goal>
   <goal name="VC insert.10" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC insert.10.0" expl="VC for insert" proved="true">
-   <proof prover="4"><result status="valid" time="0.73"/></proof>
+   <proof prover="4"><result status="valid" time="0.73" steps="118186"/></proof>
    </goal>
    <goal name="VC insert.10.1" expl="VC for insert" proved="true">
-   <proof prover="3"><result status="valid" time="0.02"/></proof>
+   <proof prover="3"><result status="valid" time="0.02" steps="27154"/></proof>
    </goal>
    <goal name="VC insert.10.2" expl="VC for insert" proved="true">
-   <proof prover="4"><result status="valid" time="0.30"/></proof>
+   <proof prover="4"><result status="valid" time="0.30" steps="77790"/></proof>
    </goal>
    <goal name="VC insert.10.3" expl="VC for insert" proved="true">
-   <proof prover="4"><result status="valid" time="0.05"/></proof>
+   <proof prover="4"><result status="valid" time="0.05" steps="18200"/></proof>
    </goal>
    <goal name="VC insert.10.4" expl="VC for insert" proved="true">
    <proof prover="1"><result status="valid" time="0.45"/></proof>
    </goal>
    <goal name="VC insert.10.5" expl="VC for insert" proved="true">
-   <proof prover="4"><result status="valid" time="0.28"/></proof>
+   <proof prover="4"><result status="valid" time="0.28" steps="50726"/></proof>
    </goal>
    <goal name="VC insert.10.6" expl="VC for insert" proved="true">
    <proof prover="0"><result status="valid" time="0.24" steps="795"/></proof>
@@ -210,30 +211,31 @@
  <goal name="VC add" expl="VC for add" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC add.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="6379"/></proof>
   </goal>
   <goal name="VC add.1" expl="unreachable point" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7168"/></proof>
   </goal>
   <goal name="VC add.2" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC add.2.0" expl="VC for add" proved="true">
-   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="7539"/></proof>
    </goal>
    <goal name="VC add.2.1" expl="VC for add" proved="true">
-   <proof prover="5" edited="vacid_0_red_black_trees_RedBlackTree_VC_add_1.v"><result status="valid" time="0.35"/></proof>
+   <proof prover="5"><path
+                      name="vacid_0_red_black_trees_RedBlackTree_VC_add_1.v"/><result status="valid" time="1.06"/></proof>
    </goal>
    <goal name="VC add.2.2" expl="VC for add" proved="true">
-   <proof prover="4"><result status="valid" time="0.02"/></proof>
+   <proof prover="4"><result status="valid" time="0.02" steps="7565"/></proof>
    </goal>
    <goal name="VC add.2.3" expl="VC for add" proved="true">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="9523"/></proof>
    </goal>
    <goal name="VC add.2.4" expl="VC for add" proved="true">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="9558"/></proof>
    </goal>
    <goal name="VC add.2.5" expl="VC for add" proved="true">
-   <proof prover="4"><result status="valid" time="0.03"/></proof>
+   <proof prover="4"><result status="valid" time="0.03" steps="9928"/></proof>
    </goal>
   </transf>
   </goal>
@@ -242,16 +244,16 @@
 </theory>
 <theory name="Vacid0" proved="true">
  <goal name="VC create" expl="VC for create" proved="true">
- <proof prover="4"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="7960"/></proof>
  </goal>
  <goal name="VC replace" expl="VC for replace" proved="true">
- <proof prover="4"><result status="valid" time="0.04"/></proof>
+ <proof prover="4"><result status="valid" time="0.04" steps="10468"/></proof>
  </goal>
  <goal name="VC lookup" expl="VC for lookup" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="7422"/></proof>
  </goal>
  <goal name="VC remove" expl="VC for remove" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="7813"/></proof>
  </goal>
 </theory>
 </file>

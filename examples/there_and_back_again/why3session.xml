@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../there_and_back_again.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="there_and_back_again.mlw"/>
 <theory name="Convolution" proved="true">
  <goal name="VC convolution_rec" expl="VC for convolution_rec" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -19,7 +20,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC convolution_rec.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.06"/></proof>
+  <proof prover="4"><result status="valid" time="0.06" steps="22700"/></proof>
   </goal>
  </transf>
  </goal>
@@ -67,7 +68,8 @@
   <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="VC palindrome_rec.12" expl="exceptional postcondition" proved="true">
-  <proof prover="1" edited="there_and_back_again_Palindrome_VC_palindrome_rec_1.v"><result status="valid" time="0.51"/></proof>
+  <proof prover="1"><path
+                     name="there_and_back_again_Palindrome_VC_palindrome_rec_1.v"/><result status="valid" time="1.23"/></proof>
   </goal>
   <goal name="VC palindrome_rec.13" expl="unreachable point" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="18"/></proof>

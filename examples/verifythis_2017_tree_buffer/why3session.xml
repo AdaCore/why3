@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.8-001" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="verifythis_2017_tree_buffer.mlw"/>
+<path name=".."/><path name="verifythis_2017_tree_buffer.mlw"/>
 <theory name="Spec" proved="true">
  <goal name="VC take_lemma" expl="VC for take_lemma" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -27,7 +26,7 @@
    <proof prover="3"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="VC take_lemma.2.1" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.74"/></proof>
+   <proof prover="2"><result status="valid" time="0.74" steps="2178378"/></proof>
    </goal>
    <goal name="VC take_lemma.2.2" expl="postcondition" proved="true">
    <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="33"/></proof>

@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="Firstorder_semantics.mlw"/>
+<path name=".."/><path name="Firstorder_semantics.mlw"/>
 <theory name="Sem" proved="true">
  <goal name="model_rename_id" proved="true">
  <proof prover="6"><result status="valid" time="0.07" steps="7"/></proof>
@@ -115,22 +114,22 @@
  <goal name="VC term_semantic_depend_only_free_var" expl="VC for term_semantic_depend_only_free_var" proved="true">
  <transf name="split_all_full" proved="true" >
   <goal name="VC term_semantic_depend_only_free_var.0" expl="variant decrease" proved="true">
-  <proof prover="7"><result status="valid" time="0.73"/></proof>
+  <proof prover="7"><result status="valid" time="0.73" steps="205634"/></proof>
   </goal>
   <goal name="VC term_semantic_depend_only_free_var.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.71"/></proof>
+  <proof prover="7"><result status="valid" time="0.71" steps="209078"/></proof>
   </goal>
   <goal name="VC term_semantic_depend_only_free_var.2" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.71"/></proof>
+  <proof prover="7"><result status="valid" time="0.71" steps="212270"/></proof>
   </goal>
   <goal name="VC term_semantic_depend_only_free_var.3" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.72"/></proof>
+  <proof prover="7"><result status="valid" time="0.72" steps="205800"/></proof>
   </goal>
   <goal name="VC term_semantic_depend_only_free_var.4" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.71"/></proof>
+  <proof prover="7"><result status="valid" time="0.71" steps="200635"/></proof>
   </goal>
   <goal name="VC term_semantic_depend_only_free_var.5" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.68"/></proof>
+  <proof prover="7"><result status="valid" time="0.68" steps="207333"/></proof>
   </goal>
  </transf>
  </goal>
@@ -254,10 +253,10 @@
    <proof prover="6" timelimit="1"><result status="valid" time="0.10" steps="9"/></proof>
    </goal>
    <goal name="VC formula_semantic_depend_only_free_var.18.14" expl="postcondition" proved="true">
-   <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="1.72"/></proof>
+   <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="1.72" steps="467504"/></proof>
    </goal>
    <goal name="VC formula_semantic_depend_only_free_var.18.15" expl="postcondition" proved="true">
-   <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="1.70"/></proof>
+   <proof prover="7" timelimit="5" memlimit="2000"><result status="valid" time="1.70" steps="467502"/></proof>
    </goal>
   </transf>
   </goal>
@@ -281,16 +280,16 @@
   <proof prover="6" timelimit="1"><result status="valid" time="0.10" steps="26"/></proof>
   </goal>
   <goal name="VC formula_list_conj_semantic_depend_only_free_var.3" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.73"/></proof>
+  <proof prover="7"><result status="valid" time="0.73" steps="214217"/></proof>
   </goal>
   <goal name="VC formula_list_conj_semantic_depend_only_free_var.4" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.78"/></proof>
+  <proof prover="7"><result status="valid" time="0.78" steps="214254"/></proof>
   </goal>
   <goal name="VC formula_list_conj_semantic_depend_only_free_var.5" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.59"/></proof>
+  <proof prover="7"><result status="valid" time="0.59" steps="209981"/></proof>
   </goal>
   <goal name="VC formula_list_conj_semantic_depend_only_free_var.6" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.62"/></proof>
+  <proof prover="7"><result status="valid" time="0.62" steps="215082"/></proof>
   </goal>
  </transf>
  </goal>
@@ -312,10 +311,10 @@
   <proof prover="6" timelimit="1"><result status="valid" time="0.10" steps="20"/></proof>
   </goal>
   <goal name="VC formula_list_disj_semantic_depend_only_free_var.5" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.62"/></proof>
+  <proof prover="7"><result status="valid" time="0.62" steps="217249"/></proof>
   </goal>
   <goal name="VC formula_list_disj_semantic_depend_only_free_var.6" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.66"/></proof>
+  <proof prover="7"><result status="valid" time="0.66" steps="222189"/></proof>
   </goal>
  </transf>
  </goal>

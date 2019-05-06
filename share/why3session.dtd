@@ -30,7 +30,7 @@
 <!ATTLIST goal shape CDATA #IMPLIED>
 <!ATTLIST goal proved CDATA #IMPLIED>
 
-<!ELEMENT proof (result|undone|internalfailure|unedited)>
+<!ELEMENT proof (path*, (result|undone|internalfailure|unedited))>
 <!ATTLIST proof prover CDATA #REQUIRED>
 <!ATTLIST proof timelimit CDATA #IMPLIED>
 <!ATTLIST proof memlimit CDATA #IMPLIED>

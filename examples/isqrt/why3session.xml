@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="6">
 <prover id="0" name="Z3" version="4.6.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="isqrt.mlw"/>
+<path name=".."/><path name="isqrt.mlw"/>
 <theory name="Square" proved="true">
  <goal name="sqr_non_neg" proved="true">
- <proof prover="2"><result status="valid" time="0.02"/></proof>
+ <proof prover="2"><result status="valid" time="0.02" steps="870"/></proof>
  <proof prover="3" timelimit="5"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
  <goal name="sqr_increasing" proved="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <proof prover="0"><result status="valid" time="0.01" steps="1434"/></proof>
  </goal>
  <goal name="sqr_sum" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
@@ -65,10 +64,10 @@
   <goal name="VC sqrt.10" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC sqrt.10.0" expl="VC for sqrt" proved="true">
-   <proof prover="4"><result status="valid" time="0.01"/></proof>
+   <proof prover="4"><result status="valid" time="0.01" steps="8098"/></proof>
    </goal>
    <goal name="VC sqrt.10.1" expl="VC for sqrt" proved="true">
-   <proof prover="2"><result status="valid" time="0.09"/></proof>
+   <proof prover="2"><result status="valid" time="0.09" steps="12875"/></proof>
    </goal>
    <goal name="VC sqrt.10.2" expl="VC for sqrt" proved="true">
    <proof prover="3"><result status="valid" time="0.04" steps="28"/></proof>
@@ -115,7 +114,7 @@
   <proof prover="3"><result status="valid" time="0.02" steps="59"/></proof>
   </goal>
   <goal name="VC sqrt.18" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="5875"/></proof>
   </goal>
  </transf>
  </goal>

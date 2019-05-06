@@ -7,8 +7,7 @@
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="bellman_ford.mlw"/>
+<path name=".."/><path name="bellman_ford.mlw"/>
 <theory name="Graph" proved="true">
  <goal name="vertices_cardinal_pos" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
@@ -330,7 +329,7 @@
   <goal name="VC bellman_ford.6" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC bellman_ford.6.0" expl="VC for bellman_ford" proved="true">
-   <proof prover="3"><result status="valid" time="0.10"/></proof>
+   <proof prover="3"><result status="valid" time="0.10" steps="31466"/></proof>
    </goal>
    <goal name="VC bellman_ford.6.1" expl="VC for bellman_ford" proved="true">
    <proof prover="2"><result status="valid" time="0.99" steps="7429"/></proof>
