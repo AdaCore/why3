@@ -1,0 +1,22 @@
+module Simple
+
+  use int.Int
+  use ref.Refint
+
+  let isqrt (x:int) : int
+    requires { x >= 0 }
+  = let ref count = 0 in
+    let ref sum = 1 in
+    while sum <= x do
+      invariant { count >= 0 }
+      variant   { x - count }
+      count += 1;
+      sum += 2 * count + 1
+    done;
+    count
+
+  let main ()
+    ensures { result = 4 }
+  = isqrt 17
+
+end
