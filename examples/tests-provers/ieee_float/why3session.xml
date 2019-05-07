@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="6">
+<why3session shape_version="7">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.4" timelimit="10" steplimit="0" memlimit="1000"/>
@@ -57,7 +57,7 @@
   <proof prover="3"><result status="timeout" time="5.00"/></proof>
   <proof prover="4"><result status="timeout" time="5.00"/></proof>
   <proof prover="5"><result status="valid" time="3.86"/></proof>
-  <proof prover="6"><result status="valid" time="5.76" steps="5428367"/></proof>
+  <proof prover="6"><result status="valid" time="4.90" steps="5428367"/></proof>
   <proof prover="10"><result status="timeout" time="5.00"/></proof>
   </goal>
   <goal name="VC triplet.4" expl="assertion" proved="true">
@@ -79,10 +79,10 @@
   </goal>
   <goal name="VC triplet.7" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="6.20" steps="7126555"/></proof>
-  <proof prover="6" timelimit="60"><result status="valid" time="31.36" steps="16301045"/></proof>
+  <proof prover="6" timelimit="60"><result status="valid" time="26.44" steps="16301045"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="5238563"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="530426"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="5479184"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="762334"/></proof>
   </goal>
   <goal name="VC triplet.8" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
@@ -94,8 +94,8 @@
   </goal>
   <goal name="VC triplet.9" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="3.63" steps="5412284"/></proof>
-  <proof prover="5"><result status="valid" time="3.36"/></proof>
-  <proof prover="6"><result status="timeout" time="5.00" steps="5419418"/></proof>
+  <proof prover="5"><result status="valid" time="2.73"/></proof>
+  <proof prover="6"><result status="timeout" time="5.00"/></proof>
   </goal>
  </transf>
  </goal>
@@ -152,10 +152,10 @@
   <goal name="VC test.0" expl="assertion">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
-  <proof prover="6"><result status="timeout" time="5.00"/></proof>
+  <proof prover="6"><result status="timeout" time="5.00" steps="9315283"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="8042440"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="911432"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="8475308"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="929039"/></proof>
   <proof prover="10"><result status="timeout" time="5.00"/></proof>
   </goal>
   <goal name="VC test.1" expl="assertion" proved="true">
@@ -191,19 +191,19 @@
   </goal>
   <goal name="VC test.6" expl="assertion" proved="true">
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
-  <proof prover="6"><result status="timeout" time="5.00" steps="9127853"/></proof>
+  <proof prover="6"><result status="timeout" time="5.00" steps="9662327"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="8822255"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="9087845"/></proof>
   <proof prover="9"><result status="valid" time="0.16" steps="37223"/></proof>
   <proof prover="10"><result status="timeout" time="5.00"/></proof>
   </goal>
   <goal name="VC test.7" expl="assertion">
-  <proof prover="2"><result status="timeout" time="10.00" steps="13274259"/></proof>
+  <proof prover="2"><result status="timeout" time="10.00" steps="13428699"/></proof>
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
-  <proof prover="6"><result status="timeout" time="5.00" steps="7144466"/></proof>
+  <proof prover="6"><result status="timeout" time="5.00"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="6842341"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="510554"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="6903523"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="516651"/></proof>
   <proof prover="10"><result status="timeout" time="5.00"/></proof>
   </goal>
   <goal name="VC test.8" expl="assertion" proved="true">
@@ -231,17 +231,17 @@
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="2" timelimit="1"><result status="timeout" time="1.00"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="15423943"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="1069259"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="17435314"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="1090650"/></proof>
   <proof prover="10" timelimit="1"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC fti.1" expl="postcondition">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
-  <proof prover="2" timelimit="1"><result status="timeout" time="1.00" steps="2438343"/></proof>
-  <proof prover="6"><result status="unknown" time="2.32" steps="4268487"/></proof>
+  <proof prover="2" timelimit="1"><result status="timeout" time="1.00" steps="2703672"/></proof>
+  <proof prover="6"><result status="unknown" time="1.82" steps="4268487"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="7370410"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="1340845"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="8075003"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="1356609"/></proof>
   <proof prover="10" timelimit="1"><result status="timeout" time="1.00"/></proof>
   </goal>
   <goal name="VC fti.2" expl="postcondition" proved="true">

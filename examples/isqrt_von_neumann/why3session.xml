@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="6">
+<why3session shape_version="7">
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -384,10 +384,10 @@
   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.29" steps="728486"/></proof>
   </goal>
   <goal name="VC isqrt64.23" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="60"><result status="valid" time="1.99" steps="621839"/></proof>
+  <proof prover="3" timelimit="60"><result status="valid" time="1.54" steps="621839"/></proof>
   </goal>
   <goal name="VC isqrt64.24" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.49" steps="242432"/></proof>
+  <proof prover="3"><result status="valid" time="0.34" steps="242432"/></proof>
   </goal>
   <goal name="VC isqrt64.25" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="4779"/></proof>
@@ -420,7 +420,7 @@
   <proof prover="3"><result status="valid" time="0.54" steps="279151"/></proof>
   </goal>
   <goal name="VC isqrt64.30" expl="loop variant decrease" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="1.25" steps="395564"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="1.00" steps="395564"/></proof>
   </goal>
   <goal name="VC isqrt64.31" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.30" steps="234167"/></proof>
@@ -516,7 +516,7 @@
                 <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1" expl="false case" proved="true">
                 <transf name="case" proved="true" arg1="(res_g = (0:t))">
                  <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.0" expl="false case (true case)" proved="true">
-                 <proof prover="3" timelimit="5"><result status="valid" time="3.28" steps="605048"/></proof>
+                 <proof prover="3" timelimit="5"><result status="valid" time="2.84" steps="605048"/></proof>
                  </goal>
                  <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1" expl="false case" proved="true">
                  <transf name="rewrite" proved="true" arg1="to_uint_sub_bounded">
@@ -588,7 +588,7 @@
                              <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="2.80" steps="571"/></proof>
                              </goal>
                              <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.0.0.1.0.0.0.1" expl="rewrite premises" proved="true">
-                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.19" steps="597822"/></proof>
+                             <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.86" steps="597822"/></proof>
                              </goal>
                             </transf>
                             </goal>
@@ -612,7 +612,7 @@
                        </transf>
                        </goal>
                        <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.0.1" expl="rewrite premises" proved="true">
-                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.59" steps="597621"/></proof>
+                       <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.94" steps="597621"/></proof>
                        </goal>
                       </transf>
                       </goal>
@@ -643,7 +643,7 @@
                                <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0.1" expl="asserted formula" proved="true">
                                <transf name="rewrite" proved="true" arg1="h1">
                                 <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.0.1.0" expl="asserted formula" proved="true">
-                                <proof prover="3"><result status="timeout" time="1.00" steps="541916"/></proof>
+                                <proof prover="3"><result status="timeout" time="1.00" steps="549107"/></proof>
                                 <proof prover="4"><result status="valid" time="0.02" steps="132"/></proof>
                                 </goal>
                                </transf>
@@ -651,7 +651,7 @@
                               </transf>
                               </goal>
                               <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.0.1.0.0.0.0.1" expl="rewrite premises" proved="true">
-                              <proof prover="3" timelimit="5"><result status="valid" time="2.73" steps="597836"/></proof>
+                              <proof prover="3" timelimit="5"><result status="valid" time="1.88" steps="597836"/></proof>
                               </goal>
                              </transf>
                              </goal>
@@ -675,12 +675,12 @@
                         </transf>
                         </goal>
                         <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.0.1" expl="rewrite premises" proved="true">
-                        <proof prover="3" timelimit="5"><result status="valid" time="1.72" steps="562259"/></proof>
+                        <proof prover="3" timelimit="5"><result status="valid" time="1.27" steps="562259"/></proof>
                         </goal>
                        </transf>
                        </goal>
                        <goal name="VC isqrt64.40.0.0.0.1.0.0.1.0.1.1.0.0.1.1.1.0.0.1.0.1.1" expl="rewrite premises" proved="true">
-                       <proof prover="3" timelimit="5"><result status="valid" time="2.62" steps="597621"/></proof>
+                       <proof prover="3" timelimit="5"><result status="valid" time="1.86" steps="597621"/></proof>
                        </goal>
                       </transf>
                       </goal>

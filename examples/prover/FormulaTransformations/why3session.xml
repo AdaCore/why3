@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="6">
+<why3session shape_version="7">
 <prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="30" steplimit="0" memlimit="1000"/>
@@ -311,7 +311,7 @@
  <goal name="VC smart_or" expl="VC for smart_or" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC smart_or.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.20" steps="12"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="12"/></proof>
   </goal>
   <goal name="VC smart_or.1" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.14" steps="419"/></proof>
@@ -335,7 +335,7 @@
   <proof prover="4"><result status="valid" time="0.16" steps="405"/></proof>
   </goal>
   <goal name="VC smart_or.8" expl="assertion" proved="true">
-  <proof prover="11" timelimit="30"><result status="valid" time="1.59"/></proof>
+  <proof prover="11" timelimit="30"><result status="valid" time="1.32"/></proof>
   </goal>
   <goal name="VC smart_or.9" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.74" steps="4648"/></proof>
@@ -1861,7 +1861,7 @@
   <proof prover="4"><result status="valid" time="0.12" steps="67"/></proof>
   </goal>
   <goal name="VC skolemize.108" expl="assertion" proved="true">
-  <proof prover="11" timelimit="30"><result status="valid" time="8.03"/></proof>
+  <proof prover="11" timelimit="30"><result status="valid" time="6.97"/></proof>
   </goal>
   <goal name="VC skolemize.109" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="37"/></proof>
@@ -2381,7 +2381,7 @@
   </transf>
   </goal>
   <goal name="VC collect_free_var_formula.32" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="1.06" steps="3777"/></proof>
+  <proof prover="4"><result status="valid" time="0.83" steps="3777"/></proof>
   </goal>
  </transf>
  </goal>

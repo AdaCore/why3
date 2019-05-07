@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="6">
+<why3session shape_version="7">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -62,7 +62,7 @@
   <proof prover="11"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
   <goal name="VC eval_2.1" expl="variant decrease" proved="true">
-  <proof prover="10"><result status="valid" time="0.02" steps="4193"/></proof>
+  <proof prover="10"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC eval_2.2" expl="postcondition" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="49"/></proof>
@@ -79,7 +79,7 @@
   <goal name="cps_correct_expr.0" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="cps_correct_expr.0.0" proved="true">
-   <proof prover="10" timelimit="1"><result status="valid" time="0.01" steps="4046"/></proof>
+   <proof prover="10" timelimit="1"><result status="valid" time="0.01"/></proof>
    </goal>
    <goal name="cps_correct_expr.0.1" proved="true">
    <transf name="introduce_premises" proved="true" >
