@@ -1,0 +1,81 @@
+
+(** Huffman coding with two queues (instead of a priority queue)
+
+  Huffman coding is an algorithm to build a prefix code given a frequency
+  for each symbol. See https://en.wikipedia.org/wiki/Huffman_coding
+
+  Huffman coding is typically implemented with a priority queue.
+  We pick up the two trees with the smallest frequencies frequencies,
+  we build a new tree with the sum of the frequencies, we put it
+  back in the priority queue, until there is a single tree.
+
+  However, when the initial list of frequencies is sorted,
+  we can implement the algorithm in a simpler (and more efficient way),
+  using two (regular) queues instead of a priority queue.
+  See http://www.staff.science.uu.nl/~leeuw112/huffman.pdf
+
+  In the following, we implement and prove the core of this algorithm,
+  using a sorted list of integers as input and its sum as output
+  (we do not build Huffman trees here). The key here is to prove that the
+  two queues remain sorted.
+*)
+
+use int.Int
+use seq.Seq
+use seq.SortedInt
+use int.Sum as S
+
+function sum (s: seq int) : int = S.sum (fun i -> s[i]) 0 (length s)
+
+function last (s: seq int) : int = s[length s - 1]
+
+lemma add_last:
+  forall s: seq int, x.
+  length s > 0 -> sorted s -> last s <= x -> sorted (snoc s x)
+lemma sorted_tail:
+  forall s. sorted s -> length s >= 1 -> sorted s[1 .. ]
+lemma sorted_tail_tail:
+  forall s. sorted s -> length s >= 2 -> sorted s[2 .. ]
+lemma sum_tail:
+  forall s. length s >= 1 -> sum s = s[0] + sum s[1 .. ]
+lemma sum_tail_tail:
+  forall s. length s >= 2 -> sum s = s[0] + s[1] + sum s[2 .. ]
+
+let huffman_coding (s: seq int) : int
+  requires { length s > 0 }
+  requires { sorted s }
+  ensures  { result = sum s }
+= let ref x = s in
+  let ref y = empty in
+  while length x + length y >= 2 do
+    invariant { length x + length y > 0 }
+    invariant { sum x + sum y = sum s }
+    invariant { sorted x } invariant { sorted y }
+    invariant { length x >= 2 -> length y >= 1 -> last y <= x[0] + x[1] }
+    invariant { length x >= 1 -> length y >= 2 -> last y <= x[0] + y[0] }
+    invariant {                  length y >= 2 -> last y <= y[0] + y[1] }
+    variant   { length x + length y }
+    if length y = 0 then begin
+      y <- snoc y (x[0] + x[1]);
+      x <- x[2 .. ]
+    end else if length x = 0 then begin
+      y <- snoc y[2 .. ] (y[0] + y[1]);
+    end else begin (* both non-empty *)
+      if x[0] <= y[0] then
+        if length x >= 2 && x[1] <= y[0] then begin
+          y <- snoc y (x[0] + x[1]);
+          x <- x[2 .. ]
+        end else begin
+          y <- snoc y[1 .. ] (x[0] + y[0]);
+          x <- x[1 .. ]
+        end
+      else
+        if length y >= 2 && y[1] <= x[0] then begin
+          y <- snoc y[2 .. ] (y[0] + y[1]);
+        end else begin
+          y <- snoc y[1 .. ] (x[0] + y[0]);
+          x <- x[1 .. ]
+        end
+    end
+  done;
+  if length x > 0 then x[0] else y[0]
