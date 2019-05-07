@@ -222,9 +222,9 @@ let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
          session@ trees@ after@ modification@ of@ source@ files."
 
-let current_shape_version = 6
+let current_shape_version = 7
 
-type shape_version = SV1 | SV2 | SV3 | SV4 | SV5
+type shape_version = SV1 | SV2 | SV3 | SV4 | SV5 | SV6
 
 module Shape = struct
 
@@ -272,11 +272,26 @@ let pushc c =
   Buffer.add_char shape_buffer c;
   check ()
 
-let ident h id =
+(* Remove infix and mixfix. (prefix should be rare enough) *)
+let decoded si =
+  Ident.(match sn_decode si with
+  | SNword s | SNinfix s | SNtight s | SNprefix s | SNget s | SNset s
+  | SNupdate s | SNcut s | SNlcut s | SNrcut s -> s)
+
+let ident_v5 h id =
   let x =
     try Ident.Mid.find id !h
     with Not_found ->
       let s = id.Ident.id_string in
+      h := Ident.Mid.add id s !h; s
+  in
+  push x
+
+let ident_v6 h id =
+  let x =
+    try Ident.Mid.find id !h
+    with Not_found ->
+      let s = decoded id.Ident.id_string in
       h := Ident.Mid.add id s !h; s
   in
   push x
@@ -304,56 +319,58 @@ let const_shape v c =
   let fmt = Format.formatter_of_buffer shape_buffer in
   begin match v with
   | SV1 | SV2 | SV3 | SV4 -> Common.const_v1 fmt c
-  | SV5 -> Common.const_v2 fmt c
+  | SV5 | SV6 -> Common.const_v2 fmt c
   end;
   Format.pp_print_flush fmt ();
   check ()
 
-let rec pat_shape c m p : 'a =
+let rec pat_shape ~version c m p : 'a =
   match p.pat_node with
     | Pwild -> pushc tag_wild
     | Pvar _ -> pushc tag_var
     | Papp (f, l) ->
        pushc tag_app;
-       ident m f.ls_name;
-       List.iter (pat_shape c m) l
-    | Pas (p, _) -> pat_shape c m p; pushc tag_as
+       (if version = SV6 then ident_v6 m f.ls_name
+       else ident_v5 m f.ls_name);
+       List.iter (pat_shape ~version c m) l
+    | Pas (p, _) -> pat_shape ~version c m p; pushc tag_as
     | Por (p, q) ->
-       pat_shape c m q; pushc tag_or; pat_shape c m p
+       pat_shape ~version c m q; pushc tag_or; pat_shape ~version c m p
 
 let rec t_shape ~version c m t =
   let fn = t_shape ~version c m in
   match t.t_node with
     | Tconst c -> pushc tag_const; const_shape version c
-    | Tvar v -> pushc tag_var; ident m v.vs_name
+    | Tvar v -> pushc tag_var;
+        if version = SV6 then ident_v6 m v.vs_name else ident_v5 m v.vs_name
     | Tapp (s,l) ->
        pushc tag_app;
-       ident m s.ls_name;
+       if version = SV6 then ident_v6 m s.ls_name else ident_v5 m s.ls_name;
        List.iter fn l
     | Tif (f,t1,t2) ->
       begin match version with
       | SV1 | SV2 -> pushc tag_if; fn f; fn t1; fn t2
-      | SV3 | SV4 | SV5 -> pushc tag_if; fn t2; fn t1; fn f
+      | SV3 | SV4 | SV5 | SV6 -> pushc tag_if; fn t2; fn t1; fn f
       end
     | Tcase (t1,bl) ->
         let br_shape b =
           let p,t2 = t_open_branch b in
           match version with
           | SV1 | SV2 ->
-            pat_shape c m p;
+            pat_shape ~version c m p;
             pat_rename_alpha c m p;
             t_shape ~version c m t2
-          | SV3 | SV4 | SV5 ->
+          | SV3 | SV4 | SV5 | SV6 ->
             pat_rename_alpha c m p;
             t_shape ~version c m t2;
-            pat_shape c m p
+            pat_shape ~version c m p
         in
         begin match version with
         | SV1 | SV2 ->
                  pushc tag_case;
                  fn t1;
                  List.iter br_shape bl
-        | SV3 | SV4 | SV5 ->
+        | SV3 | SV4 | SV5 | SV6 ->
            pushc tag_case;
            List.iter br_shape bl;
            fn t1
@@ -395,14 +412,14 @@ let rec t_shape ~version c m t =
           match version with
             | SV1 ->
                pushc tag_let; fn t1; t_shape ~version c m t2
-            | SV2 | SV3 | SV4 | SV5 ->
+            | SV2 | SV3 | SV4 | SV5 | SV6 ->
                      (* t2 first, intentionally *)
                      t_shape ~version c m t2; pushc tag_let; fn t1
         end
     | Tnot f ->
       begin match version with
       | SV1 | SV2 -> fn f; pushc tag_not
-      | SV3 | SV4 | SV5 -> pushc tag_not; fn f
+      | SV3 | SV4 | SV5 | SV6 -> pushc tag_not; fn f
       end
     | Ttrue -> pushc tag_true
     | Tfalse -> pushc tag_false
@@ -417,13 +434,13 @@ let t_shape_task ~version ~expl t =
       (* expl *)
       begin match version with
       | SV1 | SV2 -> ()
-      | SV3 | SV4 | SV5 -> push expl end;
+      | SV3 | SV4 | SV5 | SV6 -> push expl end;
       (* goal shape *)
       t_shape ~version c m f;
       (* All declarations shape *)
       begin match version with
       | SV1 | SV2 | SV3 -> ()
-      | SV4 | SV5 ->
+      | SV4 | SV5 | SV6 ->
          let open Decl in
          let do_td td = match td.Theory.td_node with
            | Theory.Decl d ->
@@ -449,7 +466,7 @@ let time = ref 0.0
 
 let t_shape_task ?(version=current_shape_version) ~expl t =
   let version = match version with
-    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5
+    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5 | 7 -> SV6
     | _ -> assert false
   in
 (*
@@ -764,7 +781,7 @@ let task_checksum ?(version=current_shape_version) t =
   let version = match version with
     | 1 | 2 | 3 -> CV1
     | 4 | 5 -> CV2
-    | 6 -> CV3
+    | 6 | 7 -> CV3
     | _ -> assert false
   in
 (*
