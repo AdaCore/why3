@@ -18,14 +18,15 @@
   using a sorted list of integers as input and its sum as output
   (we do not build Huffman trees here). The key here is to prove that the
   two queues remain sorted.
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+  Thanks to Judicaël Courant for pointing this paper out.
 *)
 
 use int.Int
 use seq.Seq
 use seq.SortedInt
-use int.Sum as S
-
-function sum (s: seq int) : int = S.sum (fun i -> s[i]) 0 (length s)
+use seq.Sum
 
 function last (s: seq int) : int = s[length s - 1]
 
@@ -36,10 +37,6 @@ lemma sorted_tail:
   forall s. sorted s -> length s >= 1 -> sorted s[1 .. ]
 lemma sorted_tail_tail:
   forall s. sorted s -> length s >= 2 -> sorted s[2 .. ]
-lemma sum_tail:
-  forall s. length s >= 1 -> sum s = s[0] + sum s[1 .. ]
-lemma sum_tail_tail:
-  forall s. length s >= 2 -> sum s = s[0] + s[1] + sum s[2 .. ]
 
 let huffman_coding (s: seq int) : int
   requires { length s > 0 }

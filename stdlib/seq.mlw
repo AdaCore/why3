@@ -406,6 +406,23 @@ module SortedInt (** sorted sequences of integers *)
 
 end
 
+module Sum
+
+  use int.Int
+  use Seq
+  use int.Sum as S
+
+  function sum (s: seq int) : int = S.sum (fun i -> s[i]) 0 (length s)
+
+  lemma sum_snoc:
+    forall s x. sum (snoc s x) = sum s + x
+  lemma sum_tail:
+    forall s. length s >= 1 -> sum s = s[0] + sum s[1 .. ]
+  lemma sum_tail_tail:
+    forall s. length s >= 2 -> sum s = s[0] + s[1] + sum s[2 .. ]
+
+end
+
 (** {2 Number of occurences in a sequence} *)
 
 module Occ
