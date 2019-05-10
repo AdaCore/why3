@@ -30,8 +30,8 @@ theory List
 end
 
 theory Length
-  use import List
-  use import int.Int
+  use List
+  use int.Int
 
   function length (l : list 'a) : int =
     match l with
@@ -43,8 +43,8 @@ theory Length
 end
 
 theory Sorted
-  use import List
-  use import int.Int
+  use List
+  use int.Int
 
   inductive sorted (list int) =
     | Sorted_Nil :
@@ -74,13 +74,12 @@ We deliberately make this theory that short, for reasons which will be
 discussed later.
 
 The next theory, \texttt{Length}, introduces the notion of list
-length. The \texttt{use import List} command indicates that this new
+length. The \texttt{use List} command indicates that this new
 theory may refer to symbols from theory \texttt{List}. These symbols
 are accessible in a qualified form, such as \texttt{List.list} or
-\texttt{List.Cons}. The \texttt{import} qualifier additionally allows
-us to use them without qualification.
+\texttt{List.Cons} or without qualification.
 
-Similarly, the next command \texttt{use import int.Int} adds to our
+Similarly, the next command \texttt{use int.Int} adds to our
 context the theory \texttt{int.Int} from the standard library. The
 prefix \texttt{int} indicates the file in the standard library
 containing theory \texttt{Int}. Theories referred to without prefix
@@ -154,7 +153,7 @@ theory Order
 end
 
 theory SortedGen
-  use import List
+  use List
   clone import Order as O
 
   inductive sorted (l : list t) =
@@ -168,7 +167,7 @@ theory SortedGen
 end
 
 theory SortedIntList
-  use import int.Int
+  use int.Int
   clone SortedGen with type O.t = int, predicate O.(<=) = (<=)
 end
 \end{whycode}

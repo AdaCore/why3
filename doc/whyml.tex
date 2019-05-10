@@ -195,7 +195,7 @@ The next theory contains the 15 hypotheses. It starts by importing
 theory \texttt{Einstein}.
 \begin{whycode}
 theory EinsteinHints
-  use import Einstein
+  use Einstein
 \end{whycode}
 Then each hypothesis is stated in terms of \texttt{to\_} and \texttt{of}
 functions. For instance, the hypothesis ``The Englishman lives in a
@@ -215,8 +215,8 @@ end
 Finally, we declare the goal in a fourth theory:
 \begin{whycode}
 theory Problem
-  use import Einstein
-  use import EinsteinHints
+  use Einstein
+  use EinsteinHints
 
   goal G: Pet.to_ Fish = German
 end
@@ -253,13 +253,13 @@ module MaxAndSum
 We are obviously needing arithmetic, so we import the corresponding
 theory, exactly as we would do within a theory definition:
 \begin{whycode}
-  use import int.Int
+  use int.Int
 \end{whycode}
 We are also going to use references and arrays from \why\ standard
 library, so we import the corresponding modules:
 \begin{whycode}
-  use import ref.Ref
-  use import array.Array
+  use ref.Ref
+  use array.Array
 \end{whycode}
 Modules \texttt{Ref} and \texttt{Array} respectively provide a type
 \texttt{ref 'a} for references and a type \texttt{array 'a} for
@@ -340,9 +340,9 @@ Figure~\ref{fig:MaxAndSum} shows the whole code.
 \begin{whycode}
 module MaxAndSum
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use ref.Ref
+  use array.Array
 
   let max_sum (a: array int) (n: int) : (int, int)
     requires { n = length a }
@@ -392,8 +392,8 @@ with as much automation as possible. In a new file, we start a new
 module and we import arithmetic and arrays:
 \begin{whycode}
 module InvertingAnInjection
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 \end{whycode}
 It is convenient to introduce predicate definitions for the properties
 of being injective and surjective. These are purely logical
@@ -448,8 +448,8 @@ discharged automatically, thanks to the lemma.
 \begin{whycode}
 module InvertingAnInjection
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   predicate injective (a: array int) (n: int) =
     forall i j. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
@@ -505,8 +505,8 @@ for the $n$-th element of a list. The latter returns an option type,
 depending on whether the index is meaningful or not.
 \begin{whycode}
 module SearchingALinkedList
-  use import int.Int
-  use import option.Option
+  use int.Int
+  use option.Option
   use export list.List
   use export list.Length
   use export list.Nth
@@ -576,7 +576,7 @@ The verification conditions are all discharged automatically.
 \begin{whycode}
 module SearchingALinkedList
 
-  use import int.Int
+  use int.Int
   use export list.List
   use export list.Length
   use export list.Nth
@@ -614,8 +614,8 @@ To do this, we need to import references from the standard library,
 together with theory \texttt{list.HdTl} which defines functions
 \texttt{hd} and \texttt{tl} over lists.
 \begin{whycode}
-  use import ref.Ref
-  use import list.HdTl
+  use ref.Ref
+  use list.HdTl
 \end{whycode}
 Being partial functions, \texttt{hd} and \texttt{tl} return options.
 For the purpose of our code, though, it is simpler to have functions
@@ -673,8 +673,8 @@ $N$-element array which assigns the queen on row $i$ to its column.
 Thus we start our module by importing arithmetic and arrays:
 \begin{whycode}
 module NQueens
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 \end{whycode}
 The code is a simple backtracking algorithm, which tries to put a queen
 on each row of the chess board, one by one (there is basically no
@@ -741,8 +741,8 @@ This first part of the solution is given in Figure~\ref{fig:NQueens1}.
 %END LATEX
 \begin{whycode}
 module NQueens
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   predicate consistent_row (board: array int) (pos: int) (q: int) =
     board[q] <> board[pos] /\
@@ -954,8 +954,8 @@ In a new module, we import arithmetic and theory
 operations we will require: length, reversal, and concatenation.
 \begin{whycode}
 module AmortizedQueue
-  use import int.Int
-  use import option.Option
+  use int.Int
+  use option.Option
   use export list.ListRich
 \end{whycode}
 The queue data type is naturally introduced as a polymorphic record type.
@@ -1062,9 +1062,9 @@ The verification conditions are all discharged automatically.
 \begin{whycode}
 module AmortizedQueue
 
-  use import int.Int
-  use import option.Option
-  use import list.ListRich
+  use int.Int
+  use option.Option
+  use list.ListRich
 
   type queue 'a = { front: list 'a; lenf: int;
                     rear : list 'a; lenr: int; }
