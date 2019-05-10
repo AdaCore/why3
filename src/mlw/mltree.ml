@@ -366,8 +366,7 @@ let ld_map fn ld = match ld with
 let e_map fn e =
   let mk en = { e with e_node = en } in
   match e.e_node with
-  | Econst _ | Evar _-> e
-  | Efun (_,_) | Eabsurd -> e
+  | Econst _ | Evar _ | Efun (_,_) | Eabsurd -> e
   | Eapp (rs,el) -> mk (Eapp(rs,(List.map fn el)))
   | Elet (ld,e) -> mk (Elet (ld_map fn ld, fn e))
   | Eif (c,t,e) -> mk (Eif (fn c, fn t, fn e))
