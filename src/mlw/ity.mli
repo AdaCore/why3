@@ -362,6 +362,8 @@ type effect = private {
 }
 
 val eff_empty : effect
+(** Effect of a non-ghost total function without any observational effect of any
+    kinds *)
 
 val eff_equal : effect -> effect -> bool
 val eff_pure : effect -> bool
