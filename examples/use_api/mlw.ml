@@ -118,7 +118,7 @@ let ref_fun : Expr.rsymbol =
 
 (* the "!" function *)
 let get_fun : Expr.rsymbol =
-  Pmodule.ns_find_rs ref_module.Pmodule.mod_export ["prefix !"]
+  Pmodule.ns_find_rs ref_module.Pmodule.mod_export [Ident.op_prefix "!"]
 
 let d2 =
   let id = Ident.id_fresh "f" in
@@ -187,11 +187,12 @@ let d2 =
 
 let d2' =
   let id = Ident.id_fresh "f" in
-  let result =
-    Term.create_vsymbol (Ident.id_fresh "result") Ty.ty_int
-  in
   let post =
-    Term.ps_app Term.ps_equ [Term.t_var result; Term.t_nat_const 0]
+    let result =
+      Term.create_vsymbol (Ident.id_fresh "result") Ty.ty_int
+    in
+    let post = Term.ps_app Term.ps_equ [Term.t_var result; Term.t_nat_const 0] in
+    Ity.create_post result post
   in
   let body =
     (* building expression "ref 0" *)
@@ -214,7 +215,7 @@ let d2' =
     Ity.create_pvsymbol unit Ity.ity_unit
   in
   let def,rs = Expr.let_sym id
-      (Expr.c_fun [arg_unit] [post] [] Ity.Mxs.empty Ity.Mpv.empty body) in
+      (Expr.c_fun [arg_unit] [] [post] Ity.Mxs.empty Ity.Mpv.empty body) in
   try
     let def = Pdecl.create_let_decl def in
     Format.eprintf "It works!@.";

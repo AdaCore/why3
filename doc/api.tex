@@ -312,9 +312,16 @@ from an OCaml program.
 
 \section{ML Programs}
 
-The simplest way to build \whyml programs from OCaml is to build
-untyped syntax trees for such programs, and then
-call the \why typing procedure to build typed declarations.
+One can build \whyml programs starting at different steps of the \whyml pipeline
+(parsing, typing, VC generation). We present here two choices. The first is to build
+an untyped syntax trees, and then
+call the \why typing procedure to build typed declarations. The second choice is
+to directly build the typed declaration. The first choice use concepts similar
+to the \whyml language but errors in the generation are harder to debug since
+they are lost inside the typing phase, the second choice use more internal
+notions but it is easier to pinpoint the functions wrongly used.
+
+\subsection{Untyped syntax tree}
 
 The examples of this section are available in the file
 \verb|examples/use_api/mlw_tree.ml| of the distribution.
@@ -371,6 +378,36 @@ We can then construct the proofs tasks for our module, and then try to
 call the Alt-Ergo prover. The rest of that code is using OCaml
 functions that were already introduced before.
 \lstinputlisting{generated/mlw_tree__checkingvcs.ml}
+
+\subsection{Typed declaration}
+
+The examples of this section are available in the file
+\verb|examples/use_api/mlw_expr.ml| of the distribution.
+
+The first step to build an environment as already illustrated in
+Section~\ref{sec:api:callingprovers}.
+\lstinputlisting{generated/mlw_expr__buildenv.ml}
+
+To write our programs, we need to import some other modules from the
+standard library integers and references. The only subtleties is to get logic
+functions from the logical part of the modules
+\verb|mod_theory.Theory.th_export| and the program functions from \verb|mod_export|.
+\lstinputlisting{generated/mlw_expr__code2_import.ml}
+
+We want now to build a program equivalent to the following code in concrete Why3 syntax.
+\lstinputlisting[language=why3]{generated/mlw_expr__source2.ml}
+
+The OCaml code that programmatically build this Why3 function is as follows.
+\lstinputlisting{generated/mlw_expr__code2.ml}
+
+Having declared all the programs we wanted to write, we can now create the
+module and generate the VCs.
+\lstinputlisting{generated/mlw_expr__createmodule.ml}
+
+We can then construct the proofs tasks for our module, and then try to
+call the Alt-Ergo prover. The rest of that code is using OCaml
+functions that were already introduced before.
+\lstinputlisting{generated/mlw_expr__checkingvcs.ml}
 
 \section{Generating counterexamples}
 \label{sec:ce_api}

@@ -1768,6 +1768,7 @@ bench-api:
 	$(MAKE) test-api-logic.@OCAMLBEST@
 	$(MAKE) test-api-transform.@OCAMLBEST@
 	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
+	$(MAKE) test-api-mlw-expr.@OCAMLBEST@
 #	$(MAKE) test-api-mlw.@OCAMLBEST@
 	$(MAKE) test-session.@OCAMLBEST@
 
@@ -1831,6 +1832,19 @@ test-api-mlw-tree.opt: examples/use_api/mlw_tree.ml lib/why3/why3.cmxa
 	&& ./test-api-mlw-tree.opt > /dev/null) \
 	|| (rm -f test-api-mlw-tree.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw-tree.opt
+
+test-api-mlw-expr.byte: examples/use_api/mlw_expr.ml lib/why3/why3.cma
+	$(SHOW) 'Ocaml    $<'
+	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(EXTCMA) lib/why3/why3.cma $< > /dev/null\
+	|| (rm -f test-api-mlw-expr.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-mlw-expr.byte;
+
+test-api-mlw-expr.opt: examples/use_api/mlw_expr.ml lib/why3/why3.cmxa
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(EXTCMXA) lib/why3/why3.cmxa $< \
+	&& ./test-api-mlw-expr.opt > /dev/null) \
+	|| (rm -f test-api-mlw-expr.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
+	@rm -f test-api-mlw-expr.opt
 
 test-api-mlw.byte: examples/use_api/mlw.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
@@ -1936,6 +1950,9 @@ doc/generated/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_c
 doc/generated/mlw_tree__%.ml: examples/use_api/mlw_tree.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
 
+doc/generated/mlw_expr__%.ml: examples/use_api/mlw_expr.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code $* < $< > $@
+
 doc/generated/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
 
@@ -1960,6 +1977,8 @@ OCAMLCODE_MLWTREE = buildenv openmodule useimport \
 	source1 code1 helper1 source2 code2 source3 code3 \
 	closemodule checkingvcs
 
+OCAMLCODE_MLWEXPR = buildenv source2 code2_import code2 createmodule checkingvcs
+
 OCAMLCODE_COUNTEREXAMPLES =  ce_declarepropvars ce_adaptgoals \
 	ce_get_cvc4ce ce_callprover ce_nobuiltin
 
@@ -1968,6 +1987,7 @@ OCAMLCODE = \
 	$(addprefix doc/generated/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
 	$(addprefix doc/generated/transform__, $(addsuffix .ml, $(OCAMLCODE_TRANSFORM))) \
 	$(addprefix doc/generated/mlw_tree__, $(addsuffix .ml, $(OCAMLCODE_MLWTREE))) \
+	$(addprefix doc/generated/mlw_expr__, $(addsuffix .ml, $(OCAMLCODE_MLWEXPR))) \
 	$(addprefix doc/generated/counterexample__, $(addsuffix .ml, $(OCAMLCODE_COUNTEREXAMPLES))) \
 	doc/generated/whyconf__provertype.ml
 

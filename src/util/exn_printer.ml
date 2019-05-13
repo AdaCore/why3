@@ -16,14 +16,12 @@ let exn_printers =
 
 let register exn_printer = Stack.push exn_printer exn_printers
 
-let () =
-  let all_exn_printer fmt exn =
-    Format.fprintf fmt "anomaly: %s" (Printexc.to_string exn) in
-  register all_exn_printer
+let anomaly_exn_printer fmt exn =
+  Format.fprintf fmt "anomaly: %s" (Printexc.to_string exn)
 
 exception Exit_loop
 
-let exn_printer fmt exn =
+let registered_exn_printer fmt exn =
   let test f =
     try
       Format.fprintf fmt "@[%a@]" f exn;
@@ -32,6 +30,24 @@ let exn_printer fmt exn =
       | Exit_loop -> raise Exit_loop
       | _ -> ()
   in
-  try Stack.iter test exn_printers
+  Stack.iter test exn_printers
+
+
+let exn_printer fmt exn =
+  try
+    registered_exn_printer fmt exn;
+    anomaly_exn_printer fmt exn
   with Exit_loop -> ()
 
+
+let () =
+  Printexc.register_printer (fun exn ->
+      let b = Buffer.create 10 in
+      let fmt = Format.formatter_of_buffer b in
+      try
+        registered_exn_printer fmt exn;
+        None
+      with Exit_loop ->
+        Format.pp_print_flush fmt ();
+        Some (Buffer.contents b)
+    )
