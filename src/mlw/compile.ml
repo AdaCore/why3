@@ -625,6 +625,92 @@ end
 
 (** Some transformations *)
 
+module RefreshLetBindings = struct
+
+  open Expr
+  open Translate
+  open Mltree
+
+  let clone_rs rs =
+    let rsn' = id_clone rs.rs_name in
+    Expr.create_rsymbol rsn' ~kind:(rs_kind rs) rs.rs_cty
+
+  let clone_pv pv =
+    let id' = id_clone (pv_name pv) in
+    create_pvsymbol id' pv.pv_ity
+
+  let rec expr ((accv, accf) as acc) e =
+    let acc,e = e_map_fold expr acc e in
+    let mk e_node = { e with e_node = e_node } in
+    match e.e_node with
+    (* collect let-bindings *)
+    | Elet (ld, e) ->
+       let acc, ld' = ldef acc ld in
+       let acc, e' = expr acc e in
+       acc, mk (Elet (ld', e'))
+    (* apply transformation under lambdas *)
+    | Efun (vl, e) ->
+       assert (List.for_all (fun (id,_,_) -> not (Mid.mem id accv)) vl);
+       let acc, e' = expr acc e in
+       acc, mk (Efun (vl, e'))
+    (* apply substitution *)
+    | Evar pv ->
+       let pv' = pvs accv pv in
+       acc, mk (Evar pv')
+    | Eapp (rs, el) ->
+       let rs' = Mrs.find_def rs rs accf in
+       acc, mk (Eapp (rs', el))
+    | Eassign al ->
+       let al' =
+         List.map
+           (fun (pv, rs, e) ->
+             let pv' = pvs accv pv in
+             assert (not (Mrs.mem rs accf));
+             (pv', rs, e))
+           al in
+       acc, mk (Eassign al')
+    | _ -> acc, e
+
+  and pvs accv pv = Mid.find_def pv (pv_name pv) accv
+
+  and ldef ((accv, accf) as acc) ld =
+    match ld with
+    | Lvar (pv, e) ->
+      let id = Translate.pv_name pv in
+      assert (not (Mid.mem id accv));
+      let pv' = clone_pv pv in
+      let acc = (Mid.add id pv' accv, accf) in
+      let acc', e' = expr acc e in
+      acc', Lvar (pv', e')
+    | Lsym (rs, tv, rty, vl, e) ->
+       assert (List.for_all (fun (id,_,_) -> not (Mid.mem id accv)) vl);
+       let rs' = clone_rs rs in
+       let acc = (accv, Mrs.add rs rs' accf) in
+       let acc', e' = expr acc e in
+       acc', Lsym (rs, tv, rty, vl, e')
+    | Lany _ -> acc, ld
+    | Lrec rl ->
+       let accf, rl =
+         Lists.map_fold_left
+           (fun acc rd ->
+             let rs = rd.rec_sym in
+             let rs' = clone_rs rs in
+             Mrs.add rs rs' acc, { rd with rec_sym = rs' })
+           accf rl in
+       let acc, rl =
+         Lists.map_fold_left
+           (fun acc rd ->
+             assert (List.for_all
+                       (fun (id,_,_) -> not (Mid.mem id accv))
+                       rd.rec_args);
+             let acc, e = expr acc rd.rec_exp in
+             acc, { rd with rec_exp = e }) (accv, accf) rl in
+       acc, Lrec rl
+
+  let expr e = let _, e' = expr (Mid.empty, Mrs.empty) e in e'
+
+end
+
 module InlineFunctionCalls = struct
 
   open Expr
@@ -635,8 +721,8 @@ module InlineFunctionCalls = struct
   let inlined_call_attr = Ident.create_attribute "__ex:inlined__"
 
   (* invariant: expressions are still in A-normal form *)
-  let rec expr subst ex =
-    let e = e_map (expr subst) ex in
+  let rec expr subst e =
+    let e = e_map (expr subst) e in
     let mk e_node = { e with e_node = e_node } in
     match e.e_node with
     | Evar v -> mk (Evar (pv subst v))
@@ -654,6 +740,8 @@ module InlineFunctionCalls = struct
             | _ ->
                Debug.dprintf debug_compile "call is not in A-normal form@.";
                assert false in
+         (* refresh all let-bindings to maintain ident unicity *)
+         let body = RefreshLetBindings.expr body in
          let subst' = List.fold_left2 add_to_subst subst el args in
          let e' = expr subst' body in
          let e' = { e' with e_attrs = Sattr.add inlined_call_attr e'.e_attrs } in

@@ -73,7 +73,6 @@ module C = struct
     | Snop
     | Sexpr of expr
     | Sblock of body
-    | Sinline of body
     | Sseq of stmt * stmt
     | Sif of expr * stmt * stmt
     | Swhile of expr * stmt
@@ -99,7 +98,7 @@ module C = struct
 
   let rec is_nop = function
     | Snop | Sexpr Enothing -> true
-    | Sblock ([], s) | Sinline ([], s) -> is_nop s
+    | Sblock ([], s) -> is_nop s
     | Sseq (s1,s2) -> is_nop s1 && is_nop s2
     | _ -> false
 
@@ -114,7 +113,7 @@ module C = struct
   let rec one_stmt = function
     | Snop -> true
     | Sexpr _ -> true
-    | Sblock (d,s) | Sinline (d,s) -> d = [] && one_stmt s
+    | Sblock (d,s) -> d = [] && one_stmt s
     | _ -> false
 
   (** [assignify v] transforms a statement that computes a value into
@@ -123,7 +122,6 @@ module C = struct
     | Snop -> raise NotAValue
     | Sexpr e -> Sexpr (Ebinop (Bassign, v, e))
     | Sblock (ds, s) -> Sblock (ds, assignify v s)
-    | Sinline (ds, s) -> Sinline (ds, assignify v s)
     | Sseq (s1, s2) when not (is_nop s2) -> Sseq (s1, assignify v s2)
     | Sseq (s1,_) -> assignify v s1
     | Sif (c,t,e) -> Sif (c, assignify v t, assignify v e)
@@ -141,9 +139,6 @@ module C = struct
     | Sblock (ds,s) ->
       let s',e = get_last_expr s in
       Sblock(ds,s'), e
-    | Sinline (ds, s) ->
-      let s',e = get_last_expr s in
-      Sinline (ds,s'), e
     | Sseq (s1,s2) when not (is_nop s2) ->
       let s', e = get_last_expr s2 in
       Sseq(s1,s'), e
@@ -190,7 +185,6 @@ module C = struct
   let rec propagate_in_stmt id v = function
     | Sexpr e -> Sexpr (propagate_in_expr id v e)
     | Sblock b -> Sblock(propagate_in_block id v b)
-    | Sinline b -> Sinline (propagate_in_block id v b)
     | Sseq (s1,s2) -> Sseq (propagate_in_stmt id v s1,
                             propagate_in_stmt id v s2)
     | Sif (e,s1,s2) -> Sif (propagate_in_expr id v e,
@@ -246,9 +240,6 @@ module C = struct
     | Sblock (d',s) ->
       let d',s' = flatten_defs d' s in
       d@d', s'
-    | Sinline (d', s) ->
-      let d',s' = flatten_defs d' s in
-      d, Sblock (d', s')
     | Sif (c,t,e) ->
       let d, t' = flatten_defs d t in
       let d, e' = flatten_defs d e in
@@ -294,9 +285,8 @@ module C = struct
     | _ -> l
 
   let rec elim_empty_blocks = function
-    | Sblock ([], s) | Sinline ([], s) -> elim_empty_blocks s
+    | Sblock ([], s) -> elim_empty_blocks s
     | Sblock (d,s) -> Sblock (d, elim_empty_blocks s)
-    | Sinline (d,s) -> Sinline (d, elim_empty_blocks s)
     | Sseq (s1,s2) -> Sseq (elim_empty_blocks s1, elim_empty_blocks s2)
     | Sif (c,t,e) -> Sif(c, elim_empty_blocks t, elim_empty_blocks e)
     | Swhile (c,s) -> Swhile(c, elim_empty_blocks s)
@@ -318,12 +308,6 @@ module C = struct
       | [], Snop -> Snop
       | _ -> Sblock(d,s)
       end
-    | Sinline (d, s) ->
-      let s = elim_nop s in
-      begin match d, s with
-      | [], Snop -> Snop
-      | _ -> Sinline(d,s)
-      end
     | Sif (c,t,e) -> Sif(c, elim_nop t, elim_nop e)
     | Swhile (c,s) -> Swhile (c, elim_nop s)
     | Sfor(e1,e2,e3,s) -> Sfor(e1,e2,e3,elim_nop s)
@@ -331,7 +315,6 @@ module C = struct
 
   let rec add_to_last_call params = function
     | Sblock (d,s) -> Sblock (d, add_to_last_call params s)
-    | Sinline (d,s) -> Sinline (d, add_to_last_call params s)
     | Sseq (s1,s2) when not (is_nop s2) ->
       Sseq (s1, add_to_last_call params s2)
     | Sseq (s1,_) -> add_to_last_call params s1
@@ -353,7 +336,7 @@ module C = struct
 
   let rec simplify_expr (d,s) : expr =
     match (d,elim_empty_blocks(elim_nop s)) with
-    | [], Sblock([],s) | [], Sinline ([], s)-> simplify_expr ([],s)
+    | [], Sblock([],s) -> simplify_expr ([],s)
     | [], Sexpr e -> e
     | [], Sif(c,t,e) ->
        Equestion (c, simplify_expr([],t), simplify_expr([],e))
@@ -428,7 +411,7 @@ module C = struct
     then match elim_empty_blocks (elim_nop s) with
     | Sexpr e -> if is_const_expr e then e
                  else fail ()
-    | Sblock (d, s) | Sinline (d, s) -> get_const_expr (d,s)
+    | Sblock (d, s) -> get_const_expr (d,s)
     | _ -> fail ()
     else fail ()
 
@@ -659,7 +642,7 @@ module Print = struct
     | Sexpr e -> fprintf fmt "%a;" print_expr_no_paren e;
     | Sblock ([] ,s) when not braces ->
       (print_stmt ~braces:false) fmt s
-    | Sblock b | Sinline b ->
+    | Sblock b ->
        fprintf fmt "@[<hov>{@\n  @[<hov>%a@]@\n}@]" print_body b
     | Sseq (s1,s2) -> fprintf fmt "%a@\n%a"
       (print_stmt ~braces:false) s1
@@ -922,9 +905,6 @@ module MLToC = struct
   let rec expr info env (e:Mltree.expr) : C.body =
     match e.e_node with
     | Eblock [] -> ([], expr_or_return env Enothing)
-    | Eblock [e] when Sattr.mem inlined_attr e.e_attrs ->
-       Debug.dprintf debug_c_extraction "inlined call@.";
-       [], C.Sinline (expr info env e)
     | Eblock [e] -> [], C.Sblock (expr info env e)
     | Eblock l ->
        let env_f = { env with computes_return_value = false } in
@@ -1028,12 +1008,19 @@ module MLToC = struct
 	 C.([d_struct], Sseq(assigns args 0, Sreturn(e_struct)))
 	 end
        else
-	 let e' =
-           let unboxed_params =
-	     List.map
-               (fun e ->
-                 (simplify_expr (expr info env_f e),
-                  ty_of_ty info (ty_of_ity (ity_of_expr e))))
+	 let (prdefs, prstmt), e' =
+           let prelude, unboxed_params =
+	     Lists.map_fold_left
+               (fun ((accd, accs) as acc) e ->
+                 let d, s = expr info env_f e in
+                 let pty = ty_of_ty info (ty_of_ity (ity_of_expr e)) in
+                 try
+                   acc,
+                   (simplify_expr (d,s), pty)
+                 with Invalid_argument _ ->
+                   let s', e' = get_last_expr s in
+                   (accd@d, Sseq(accs, s')), (e', pty))
+               ([], Snop)
 	       args in
            let params =
              List.map2
@@ -1044,6 +1031,7 @@ module MLToC = struct
                     C.(Eunop(Uaddr, ce), Tptr (Tstruct s))
                  | p, _ -> p)
                unboxed_params args in
+           prelude,
            match query_syntax info.syntax rs.rs_name with
            | Some s ->
               let complex s =
@@ -1082,16 +1070,19 @@ module MLToC = struct
                     else C.Edot (ce, (pv_name pv).id_string)
                  | _ -> C.Edot (fst (List.hd params), (pv_name pv).id_string) end
          in
-	 C.([],
-            if env.computes_return_value
-	    then
-              begin match e.e_ity with
-              | I ity when ity_equal ity Ity.ity_unit ->
-                 Sseq(Sexpr e', Sreturn Enothing)
-              | I _ -> Sreturn e'
-              | _ -> assert false
-              end
-            else Sexpr e')
+         let s =
+           if env.computes_return_value
+	   then
+             begin match e.e_ity with
+             | I ity when ity_equal ity Ity.ity_unit ->
+                Sseq(Sexpr e', Sreturn Enothing)
+             | I _ -> Sreturn e'
+             | _ -> assert false
+             end
+           else Sexpr e' in
+         if is_nop prstmt
+         then prdefs, s
+         else C.(prdefs, Sseq(prstmt, s))
     | Eif (cond, th, el) ->
        let cd,cs = expr info {env with computes_return_value = false} cond in
        let t = expr info env th in

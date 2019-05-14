@@ -385,6 +385,35 @@ let e_map fn e =
   | Eexn (x,t,e) -> mk (Eexn (x, t, fn e))
   | Eignore e -> mk (Eignore (fn e))
 
+
+let ld_fold fn acc ld = match ld with
+  | Lsym (_,_,_,_, e) | Lvar (_, e)-> fn acc e
+  | Lany _ -> acc
+  | Lrec rl -> List.fold_left (fun acc rd -> fn acc rd.rec_exp) acc rl
+
+let e_fold fn acc e =
+  match e.e_node with
+  | Econst _ | Evar _
+  | Efun (_,_) | Eabsurd -> acc
+  | Eapp (rs,el) -> List.fold_left fn acc el
+  | Elet (ld,e) -> fn (ld_fold fn acc ld) e
+  | Eif (c,t,e) ->
+     let acc = fn acc c in
+     let acc = fn acc t in
+     fn acc e
+  | Eassign al -> List.fold_left (fun acc (_,_,e) -> fn acc e) acc al
+  | Ematch (e,bl,xl) ->
+     let acc = List.fold_left (fun acc (_p,e) -> fn acc e) acc bl in
+     let acc = List.fold_left (fun acc (_x, _vl, e) -> fn acc e) acc xl in
+     fn acc e
+  | Eblock el -> List.fold_left fn acc el
+  | Ewhile (c,b) -> fn (fn acc c) b
+  | Efor (_,_,_,_,e) -> fn acc e
+  | Eraise (_, None) -> acc
+  | Eraise (x, Some e) -> fn acc e
+  | Eexn (_x,_t,e) -> fn acc e
+  | Eignore e -> fn acc e
+
 let ld_map_fold fn acc ld = match ld with
   | Lsym (rs, tv, ty, vl, e) ->
      let acc, e = fn acc e in

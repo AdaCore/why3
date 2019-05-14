@@ -19,6 +19,15 @@ module Translate : sig
   val pdecl_m : Pmodule.pmodule -> Pdecl.pdecl -> Mltree.decl list
 end
 
+
+module RefreshLetBindings : sig
+
+  (* Replace all let-bindings in the expression by fresh idents.
+     This helps preserve unicity of let-bindings in presence of inlining. *)
+  val expr : Mltree.expr -> Mltree.expr
+
+end
+
 module InlineFunctionCalls : sig
 
   val inline_attr : Ident.attribute
