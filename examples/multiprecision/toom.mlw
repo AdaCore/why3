@@ -1626,7 +1626,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
   let rs = s + t - n in
   begin ensures { value r (4*n) + m * m * m * m * value r4n rs
                   = (value x sx) * (value y sy) }
-  if [@ex:likely] (s + t > n)
+  if [@extraction:likely] (s + t > n)
   then begin
     let r2n = incr r (2 * n) in
     label Sub2 in

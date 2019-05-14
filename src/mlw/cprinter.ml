@@ -759,10 +759,10 @@ module MLToC = struct
   let structs : struct_def Hid.t = Hid.create 16
   let aliases : C.ty Hid.t = Hid.create 16
 
-  let array = create_attribute "ex:array"
-  let array_mk = create_attribute "ex:array_make"
-  let likely = create_attribute "ex:likely"
-  let unlikely = create_attribute "ex:unlikely"
+  let array = create_attribute "extraction:array"
+  let array_mk = create_attribute "extraction:array_make"
+  let likely = create_attribute "extraction:likely"
+  let unlikely = create_attribute "extraction:unlikely"
 
   let rec ty_of_ty info ty = (*FIXME try to use only ML tys*)
     match ty.ty_node with

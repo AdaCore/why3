@@ -340,15 +340,15 @@ module TestExtraction
        !r
   else match t with A -> 2 | B -> 3 | C -> 1 end
 
-  let i1 [@ex:inline] (x:int63) = x+2
+  let i1 [@extraction:inline] (x:int63) = x+2
 
-  let i2 [@ex:inline] (x:int63) (y:int63) =
+  let i2 [@extraction:inline] (x:int63) (y:int63) =
     requires { y <> 0 }
     let d = x / y in
     let m = x % y in
     y * d + m
 
-  let i3 [@ex:inline] (n:int63) =
+  let i3 [@extraction:inline] (n:int63) =
     i1 (i2 n n)
 
   let inlining () =

@@ -1000,7 +1000,7 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
                   so !q1 * d + cr = u };
     assert { !q1 * d + !r0 + radix * !r1 = u };
     label PreRemAdjust in
-    if [@ex:unlikely] (!r1 > dh) || (!r1 = dh && !r0 >= dl)
+    if [@extraction:unlikely] (!r1 > dh) || (!r1 = dh && !r0 >= dl)
     then begin
       let bl, b = sub_with_borrow !r0 dl 0 in
       let bh, ghost b'= sub_with_borrow !r1 dh b in
@@ -1556,7 +1556,7 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
       xp.contents <- C.incr !xp (-1);
       let xd = C.incr !xp mdn in
       let nx0 = C.get_ofs !xp 1 in
-      if [@ex:unlikely] (!x1 = dh && nx0 = dl)
+      if [@extraction:unlikely] (!x1 = dh && nx0 = dl)
       then begin
         ql := Limb.uint64_max;
         value_sub_concat (pelts x) x.offset xd.offset (xd.offset + p2i sy);
@@ -2248,7 +2248,7 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
                     (* nonlinear *)
            end;
         end;
-        if [@ex:unlikely] (not (cy2 = 0))
+        if [@extraction:unlikely] (not (cy2 = 0))
         then begin
           label Adjust in
           assert { cy2 = 1 };

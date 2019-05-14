@@ -24,10 +24,10 @@ type fxp =
   invariant { ival = Div.mod (Trunc.floor (rval *. pow2 (-iexp))) (uint64'maxInt + 1) }
   by { ival = 0; rval = 0.; iexp = 0 }
 
-let fxp_init [@ex:inline] (x: uint64) (ghost k: int): fxp
+let fxp_init [@extraction:inline] (x: uint64) (ghost k: int): fxp
 = { ival = x; rval = FromInt.from_int (to_int x) *. pow2 k; iexp = k }
 
-let fxp_id [@ex:inline] (x: fxp) (ghost k: int): fxp
+let fxp_id [@extraction:inline] (x: fxp) (ghost k: int): fxp
 = { ival = ival x; rval = rval x *. pow2 k; iexp = iexp x + k }
 
 val fxp_add (x y: fxp): fxp

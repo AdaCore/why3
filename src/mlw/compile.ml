@@ -717,8 +717,8 @@ module InlineFunctionCalls = struct
   open Mltree
   open Translate
 
-  let inline_attr = Ident.create_attribute "ex:inline"
-  let inlined_call_attr = Ident.create_attribute "__ex:inlined__"
+  let inline_attr = Ident.create_attribute "extraction:inline"
+  let inlined_call_attr = Ident.create_attribute "__extraction:inlined__"
 
   (* invariant: expressions are still in A-normal form *)
   let rec expr subst e =
