@@ -857,10 +857,39 @@ module InlineProxyVars = struct
 
 end
 
+module InlineTrivialLets = struct
+
+  open Mltree
+
+  let rec expr e =
+    let e = e_map expr e in
+    match e.e_node with
+    | Elet (Lvar (pv1, e'), { e_node = Evar pv2 }) when pv_equal pv1 pv2 -> e'
+    | _ -> e
+
+  let let_def ld = ld_map expr ld
+
+  let rec pdecl d =
+    match d with
+    | Dtype _ | Dexn _ | Dval _ -> d
+    | Dmodule (id, dl) -> Dmodule (id, List.map pdecl dl)
+    | Dlet def -> Dlet (let_def def)
+
+  let module_ m =
+    let decls = List.map pdecl m.mod_decl in
+    let add known_map decl =
+      let idl = Mltree.get_decl_name decl in
+      List.fold_left (Mltree.add_known_decl decl) known_map idl in
+    let mod_known = List.fold_left add Mid.empty decls in
+    { m with mod_decl = decls; mod_known = mod_known }
+
+end
+
 module Transform = struct
 
   let module_ m =
-    let m' = InlineFunctionCalls.module_ m in
-    InlineProxyVars.module_ m'
+    let m = InlineFunctionCalls.module_ m in
+    let m = InlineProxyVars.module_ m in
+    InlineTrivialLets.module_ m
 
 end

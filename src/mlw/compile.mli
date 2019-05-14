@@ -46,6 +46,13 @@ module InlineProxyVars : sig
 
 end
 
+module InlineTrivialLets : sig
+
+  (* Optimizes trivial let-ins of the form `let x = e in x`. *)
+  val module_ : Mltree.pmodule -> Mltree.pmodule
+
+end
+
 module Transform : sig
 
   (* Applies all the above transformations. *)
