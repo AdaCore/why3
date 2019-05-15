@@ -9,6 +9,22 @@ let add_path p = Queue.add p paths
 
 let prefix = ref "IND"
 
+type kind = Inductive
+
+let kind = ref Inductive
+
+let set_kind = function
+  | "inductive" -> kind := Inductive
+  | str -> ksprintf invalid_arg "kind: %s" str
+
+type output = Latex
+
+let output = ref Latex
+
+let set_output = function
+  | "latex" -> output := Latex
+  | str -> ksprintf invalid_arg "output: %s" str
+
 let records = Hashtbl.create 5
 
 let add_record str =
@@ -20,11 +36,14 @@ let add_record str =
   | _ -> failwith "add_record"
 
 let usage =
-  "why3 latex [options] [--prefix PREFIX] [--record NAME:FIELD,...] ... <module>.<Theory>.<ind_type> ..."
+  "Pretty print Why3 declarations (currently only inductive types in LaTeX using mathpartir).\n\
+why3 pretty [options] [--kind=inductive] [--output=latex] [--prefix <prefix>] [--record <name>:<field>,...] ... <module>.<Theory>.<ind_type> ..."
 
 let options = [
-  "--prefix", Arg.String ((:=) prefix), sprintf "PREFIX Prefix for LaTeX commands (default: %s)" !prefix;
-  "--record", Arg.String add_record,    "NAME:FIELD,... Reconstruct record update {v with f=e; ...} from record constructions {f=e; ...}";
+  "--kind",   Arg.String set_kind,      "<category> Syntactic category to be printed (only: inductive)";
+  "--output", Arg.String set_output,    "<output> Output format (only: latex)";
+  "--prefix", Arg.String ((:=) prefix), "<prefix> Prefix for LaTeX commands (default for output latex: IND)";
+  "--record", Arg.String add_record,    "<name>:<field>,... Reconstruct record update {v with f=e; ...} from record constructions {f=e; ...}";
 ]
 
 let config, _, env = Whyconf.Args.initialize options add_path usage
@@ -398,7 +417,7 @@ let find_module path m =
 
 exception Found of Term.lsymbol * (Decl.prsymbol * Term.term) list
 
-let search_sym pm s =
+let search_inductive pm s =
   let open Pdecl in
   let open Decl in
   let search_ind (lsym, ts) =
@@ -426,11 +445,15 @@ let search_sym pm s =
 let latex_main fmt path =
   let path, m, s = split_path path in
   let pm = find_module path m in
-  let lsym, ind_rules = search_sym pm s in
-  let ind_rules = List.map (fun (psym, t) -> psym, flatten_implies t) ind_rules in
-  pp_requires fmt !requirements;
-  fprintf fmt "\\begin{mathparpagebreakable} %% %s@." lsym.Term.ls_name.Ident.id_string;
-  List.iter (latex_rule fmt) ind_rules;
-  fprintf fmt "\\end{mathparpagebreakable}@."
+  match !kind with
+  | Inductive ->
+      let lsym, ind_rules = search_inductive pm s in
+      match !output with
+      | Latex ->
+          let ind_rules = List.map (fun (psym, t) -> psym, flatten_implies t) ind_rules in
+          pp_requires fmt !requirements;
+          fprintf fmt "\\begin{mathparpagebreakable} %% %s@." lsym.Term.ls_name.Ident.id_string;
+          List.iter (latex_rule fmt) ind_rules;
+          fprintf fmt "\\end{mathparpagebreakable}@."
 
 let () = Queue.iter (latex_main std_formatter) paths

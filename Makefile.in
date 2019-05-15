@@ -1520,49 +1520,49 @@ clean::
 endif
 
 ###############
-# Why3 LaTeX
+# Why3 pretty
 ###############
 
-WHYTEX_FILES = why3latex
+PRETTY_FILES = why3pretty
 
-WHYTEXMODULES = $(addprefix src/tools/, $(WHYTEX_FILES))
+PRETTYMODULES = $(addprefix src/tools/, $(PRETTY_FILES))
 
-WHYTEXDEP = $(addsuffix .dep, $(WHYTEXMODULES))
-WHYTEXCMO = $(addsuffix .cmo, $(WHYTEXMODULES))
-WHYTEXCMX = $(addsuffix .cmx, $(WHYTEXMODULES))
+PRETTYDEP = $(addsuffix .dep, $(PRETTYMODULES))
+PRETTYCMO = $(addsuffix .cmo, $(PRETTYMODULES))
+PRETTYCMX = $(addsuffix .cmx, $(PRETTYMODULES))
 
-$(WHYTEXDEP): DEPFLAGS += -I src/tools
-$(WHYTEXCMO) $(WHYTEXCMX): INCLUDES += -I src/tools
+$(PRETTYDEP): DEPFLAGS += -I src/tools
+$(PRETTYCMO) $(PRETTYCMX): INCLUDES += -I src/tools
 
 # build targets
 
-byte: bin/why3latex.byte
-opt:  bin/why3latex.opt
+byte: bin/why3pretty.byte
+opt:  bin/why3pretty.opt
 
-bin/why3latex.opt: $(WHY3CMXA) $(WHYTEXCMX)
+bin/why3pretty.opt: $(WHY3CMXA) $(PRETTYCMX)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3latex.byte: $(WHY3CMA) $(WHYTEXCMO)
+bin/why3pretty.byte: $(WHY3CMA) $(PRETTYCMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(WHYTEXDEP)
+-include $(PRETTYDEP)
 endif
 
-depend: $(WHYTEXDEP)
+depend: $(PRETTYDEP)
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3latex$(EXE)
+	rm -f $(TOOLDIR)/why3pretty$(EXE)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3latex.@OCAMLBEST@ $(TOOLDIR)/why3latex$(EXE)
+	$(INSTALL) bin/why3pretty.@OCAMLBEST@ $(TOOLDIR)/why3pretty$(EXE)
 
-install_local:: bin/why3latex
+install_local:: bin/why3pretty
 
 #########
 # why3doc
@@ -2240,7 +2240,7 @@ clean::
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
-# src/tools/why3latex.cmx: %.cmx: %.ml
+# src/tools/why3pretty.cmx: %.cmx: %.ml
 # 	$(SHOW) 'Ocamlopt $<'
 # 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
