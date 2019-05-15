@@ -19,6 +19,7 @@ The following commands are available:
   input files.
 \item[\texttt{extract}] generates an OCaml program corresponding to
   \whyml input files.
+\item[\texttt{latex}] print an inductive type definition in LaTeX.
 \item[\texttt{ide}] provides a graphical interface to display goals
   and to run provers and transformations on them.
 \item[\texttt{prove}] reads \whyml input files and calls
@@ -1132,6 +1133,43 @@ A CSS file \verb|style.css| suitable for rendering is generated in the
 same directory as output files. This CSS style can be modified manually,
 since regenerating the HTML documentation will not overwrite an existing
 \verb|style.css| file.
+
+\section{The \texttt{latex} Command}
+
+This tool prints inductive rules defined in Why3 in LaTeX using the
+\texttt{mathpartir} package\index{latex@\texttt{latex}}.
+
+The typesetting of variables, record fields, and functions is
+parameterized by LaTeX commands. Dummy definitions of these commands are
+printed in comments and have to be defined by the user. Trailing digits
+and quotes are removed from the command names to reduce the number of
+commands. The commands have a common, configurable prefix (default: \texttt{IND}).
+
+\paragraph{Reconstruction of record updates}
+Due to the technical workings of the Why3 parser, record updates in the
+source code \texttt{\{x with f=e; ...\}} are normally printed as record
+constructions \texttt{\{f=e; g=x.g; ...\}}. However, such record
+constructions in the LaTeX export tend to be quite verbose in comparison
+to record updates.
+
+The \texttt{why3 latex} allows for detecting and converting record
+constructions back to record updates. It works as follows: Record shapes
+(names of the record type and its fields) are specified as command line
+arguments \texttt{-{}-record}. Record constructions are then tested,
+whether a majority of the assigned expressions have the form
+\texttt{x.g} for one variable \texttt{x} and a field \texttt{g}
+corresponding to the order given in the record shape. In this case, the
+other field assignments \texttt{f=e} constitute the record update of the
+form \texttt{\{x with f=e; ...\}}.
+
+\paragraph{Options}
+
+\begin{description}
+  \item[\texttt{-{}-prefix~\textsl{<prefix}}] Set the prefix for LaTeX
+    commands to \textsl{<prefix>}.
+  \item[\texttt{-{}-record~\textsl{<name>}:\textsl{<field>},\ldots}]
+    Convert constructions of record \textsl{<name>} to record updates.
+\end{description}
 
 \section{The \texttt{execute} Command}
 \label{sec:why3execute}
