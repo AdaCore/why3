@@ -212,19 +212,38 @@ end
 
 type shape = string
 
-let string_of_shape s = s
+type bound_shape = int list
 
-let shape_of_string s = s
+type shape_v =
+  | Old_shape of shape
+  | Bound_shape of bound_shape
 
-let equal_shape (x:string) y = x = y
+let string_of_shape sv =
+  match sv with
+  | Old_shape s -> s
+  | Bound_shape l ->
+      Format.asprintf "%a" (Pp.print_list (Pp.constant_string "H") Pp.int) l
+
+let shape_of_string ~version s =
+  if version >= 8 then
+    Bound_shape (List.fold_right (fun x acc ->
+        try int_of_string x :: acc with
+        | _ -> acc)
+        (Strings.split 'H' s) [])
+  else
+    Old_shape s
+
+let empty_shape = ""
+
+let empty_bound_shape = []
 
 let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
          session@ trees@ after@ modification@ of@ source@ files."
 
-let current_shape_version = 7
+let current_shape_version = 8
 
-type shape_version = SV1 | SV2 | SV3 | SV4 | SV5 | SV6
+type shape_version = SV1 | SV2 | SV3 | SV4 | SV5 | SV6 | SV7
 
 module Shape = struct
 
@@ -319,7 +338,7 @@ let const_shape v c =
   let fmt = Format.formatter_of_buffer shape_buffer in
   begin match v with
   | SV1 | SV2 | SV3 | SV4 -> Common.const_v1 fmt c
-  | SV5 | SV6 -> Common.const_v2 fmt c
+  | SV5 | SV6 | SV7 -> Common.const_v2 fmt c
   end;
   Format.pp_print_flush fmt ();
   check ()
@@ -330,8 +349,10 @@ let rec pat_shape ~version c m p : 'a =
     | Pvar _ -> pushc tag_var
     | Papp (f, l) ->
        pushc tag_app;
-       (if version = SV6 then ident_v6 m f.ls_name
-       else ident_v5 m f.ls_name);
+       begin match version with
+       | SV1 | SV2 | SV3 | SV4 | SV5 -> ident_v5 m f.ls_name
+       | SV6 | SV7 -> ident_v6 m f.ls_name
+       end;
        List.iter (pat_shape ~version c m) l
     | Pas (p, _) -> pat_shape ~version c m p; pushc tag_as
     | Por (p, q) ->
@@ -342,15 +363,21 @@ let rec t_shape ~version c m t =
   match t.t_node with
     | Tconst c -> pushc tag_const; const_shape version c
     | Tvar v -> pushc tag_var;
-        if version = SV6 then ident_v6 m v.vs_name else ident_v5 m v.vs_name
+        begin match version with
+        | SV1 | SV2 | SV3 | SV4 | SV5 -> ident_v5 m v.vs_name
+        | SV6 | SV7 -> ident_v6 m v.vs_name
+        end
     | Tapp (s,l) ->
        pushc tag_app;
-       if version = SV6 then ident_v6 m s.ls_name else ident_v5 m s.ls_name;
+       begin match version with
+       | SV1 | SV2 | SV3 | SV4 | SV5 -> ident_v5 m s.ls_name
+       | SV6 | SV7 -> ident_v6 m s.ls_name
+       end;
        List.iter fn l
     | Tif (f,t1,t2) ->
       begin match version with
       | SV1 | SV2 -> pushc tag_if; fn f; fn t1; fn t2
-      | SV3 | SV4 | SV5 | SV6 -> pushc tag_if; fn t2; fn t1; fn f
+      | SV3 | SV4 | SV5 | SV6 | SV7 -> pushc tag_if; fn t2; fn t1; fn f
       end
     | Tcase (t1,bl) ->
         let br_shape b =
@@ -360,7 +387,7 @@ let rec t_shape ~version c m t =
             pat_shape ~version c m p;
             pat_rename_alpha c m p;
             t_shape ~version c m t2
-          | SV3 | SV4 | SV5 | SV6 ->
+          | SV3 | SV4 | SV5 | SV6 | SV7 ->
             pat_rename_alpha c m p;
             t_shape ~version c m t2;
             pat_shape ~version c m p
@@ -370,7 +397,7 @@ let rec t_shape ~version c m t =
                  pushc tag_case;
                  fn t1;
                  List.iter br_shape bl
-        | SV3 | SV4 | SV5 | SV6 ->
+        | SV3 | SV4 | SV5 | SV6 | SV7 ->
            pushc tag_case;
            List.iter br_shape bl;
            fn t1
@@ -412,14 +439,14 @@ let rec t_shape ~version c m t =
           match version with
             | SV1 ->
                pushc tag_let; fn t1; t_shape ~version c m t2
-            | SV2 | SV3 | SV4 | SV5 | SV6 ->
+            | SV2 | SV3 | SV4 | SV5 | SV6 | SV7 ->
                      (* t2 first, intentionally *)
                      t_shape ~version c m t2; pushc tag_let; fn t1
         end
     | Tnot f ->
       begin match version with
       | SV1 | SV2 -> fn f; pushc tag_not
-      | SV3 | SV4 | SV5 | SV6 -> pushc tag_not; fn f
+      | SV3 | SV4 | SV5 | SV6 | SV7 -> pushc tag_not; fn f
       end
     | Ttrue -> pushc tag_true
     | Tfalse -> pushc tag_false
@@ -434,13 +461,13 @@ let t_shape_task ~version ~expl t =
       (* expl *)
       begin match version with
       | SV1 | SV2 -> ()
-      | SV3 | SV4 | SV5 | SV6 -> push expl end;
+      | SV3 | SV4 | SV5 | SV6 | SV7 -> push expl end;
       (* goal shape *)
       t_shape ~version c m f;
       (* All declarations shape *)
       begin match version with
       | SV1 | SV2 | SV3 -> ()
-      | SV4 | SV5 | SV6 ->
+      | SV4 | SV5 | SV6 | SV7 ->
          let open Decl in
          let do_td td = match td.Theory.td_node with
            | Theory.Decl d ->
@@ -460,19 +487,122 @@ let t_shape_task ~version ~expl t =
 
 end
 
+let int_to_shape_version n =
+  match n with
+  | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5 | 7 -> SV6
+  | 8 -> SV7
+  | _ -> assert false
+
+let is_bound_shape_version v =
+  match int_to_shape_version v with
+  | SV1 | SV2 | SV3 | SV4 | SV5 | SV6 -> false
+  | SV7 -> true
+
+module Gshape = struct
+
+  open Wstdlib
+
+  (* [hyp_shape] associate a shape to its index in the file;
+     [index_sh] associate an index to a shape;
+     [n] is the last shape variable *)
+  type gshape = { mutable hyp_shape: int Mstr.t;
+                  mutable index_sh: string Mint.t;
+                  mutable n: int }
+
+  let create () =
+    { hyp_shape = Mstr.empty;
+      index_sh = Mint.empty;
+      n = 0 }
+
+  let copy from_s to_s =
+    to_s.hyp_shape <- from_s.hyp_shape;
+    to_s.index_sh <- from_s.index_sh;
+    to_s.n <- from_s.n
+
+  let clear_gs gs =
+    gs.hyp_shape <- Mstr.empty;
+    gs.index_sh <- Mint.empty;
+    gs.n <- 0
+
+  let add_shape gs s =
+    try Mstr.find s gs.hyp_shape with
+    | Not_found ->
+        gs.hyp_shape <- Mstr.add s gs.n gs.hyp_shape;
+        gs.index_sh  <- Mint.add gs.n s gs.index_sh;
+        gs.n <- gs.n + 1;
+        gs.n - 1
+
+  let add_and_prepend gs current_shape s : unit =
+    (* Do not save empty: could be confused with end of assingments (TODO to be improved)  *)
+    if s = "" then () else
+      current_shape := add_shape gs s :: !current_shape
+
+  let add_shape_g gs s =
+    let (_: int) = add_shape gs s in ()
+
+  let write_shape_to_file s csh =
+    Mint.iter (fun _ s -> Compress.Compress_z.output_string csh s;
+                Compress.Compress_z.output_string csh "\n")
+      s.index_sh
+
+  let goal_and_expl_shapes (gs: gshape) li =
+    try
+      match li with
+      | expl :: goal :: _ ->
+          Mint.find expl gs.index_sh ^ Mint.find goal gs.index_sh
+      | _ ->
+          ""
+    with Not_found -> ""
+
+  let t_shape_task_v7 ~expl gs t =
+    let current_shape = ref [] in
+    Buffer.clear Shape.shape_buffer;
+    let c = ref (-1) in
+    let m = ref Ident.Mid.empty in
+    (* All declarations shape *)
+    let local_decls =
+      let ut = Task.used_symbols (Task.used_theories t) in
+      Task.local_decls t ut in
+    let open Decl in
+    let do_d d =
+      match d.d_node with
+      | Dparam _ls -> ()
+      | Dprop (_, _pr, f) ->
+          let sh =
+            (try Shape.t_shape ~version:SV7 c m f with Shape.ShapeTooLong -> ());
+            Buffer.contents Shape.shape_buffer in
+          Buffer.clear Shape.shape_buffer;
+          add_and_prepend gs current_shape sh
+      | _ -> () in
+    List.iter do_d local_decls;
+    (* TODO don't save empty shapes as \n as it could be confused with end of assignments *)
+    let expl = if expl = "" then "empty_shape" else expl in
+    add_and_prepend gs current_shape expl;
+    (* The order should be [|shape|] :: [|goal|] :: [|rest of decl|] *)
+    !current_shape
+
+  let t_bound_shape_task gs ~version ~expl t =
+    if is_bound_shape_version version then
+      t_shape_task_v7 gs ~expl t
+    else
+      assert false
+
+end
+
 (*
 let time = ref 0.0
  *)
 
-let t_shape_task ?(version=current_shape_version) ~expl t =
-  let version = match version with
-    | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5 | 7 -> SV6
-    | _ -> assert false
-  in
+let t_shape_task ~version ~expl t =
+  let version = int_to_shape_version version in
 (*
   let tim = Unix.gettimeofday () in
  *)
-  let s = Shape.t_shape_task ~version ~expl t in
+  let s =
+    match version with
+    | SV1 | SV2 | SV3 | SV4 | SV5 | SV6 -> Shape.t_shape_task ~version ~expl t
+    | _ -> assert false
+  in
 (*
   let tim = Unix.gettimeofday () -. tim in
   time := !time +. tim;
@@ -781,7 +911,7 @@ let task_checksum ?(version=current_shape_version) t =
   let version = match version with
     | 1 | 2 | 3 -> CV1
     | 4 | 5 -> CV2
-    | 6 | 7 -> CV3
+    | 6 | 7 | 8 -> CV3
     | _ -> assert false
   in
 (*
@@ -824,7 +954,7 @@ module type S = sig
   val name     : 'a t -> Ident.ident
 end
 
-module Pairing(Old: S)(New: S) = struct
+module Pairing (Old: S)(New: S) = struct
 
   let rec lcp n s1 s2 =
     if String.length s1 <= n || String.length s2 <= n then n

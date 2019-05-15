@@ -159,7 +159,7 @@ val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
 (** {2 session operations} *)
 
 
-val empty_session : ?from:session -> string -> session
+val empty_session : shape_version:int option -> ?from:session -> string -> session
 (** create an empty_session in the directory specified by the
     argument *)
 
