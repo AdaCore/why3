@@ -670,7 +670,7 @@ module Print = struct
   and print_def fmt def =
     try match def with
       | Dfun (id,(rt,args),body) ->
-         let s = sprintf "%a %a(@[%a@])@ @[<hov>{@;<1 2>@[<hov>%a@]@\n}@\n@]"
+         let s = sprintf "@[@[<hv 2>%a %a(@[%a@]) {@\n@[%a@]@]\n}\n@]"
                    (print_ty ~paren:false) rt
                    print_global_ident id
                    (print_list comma
