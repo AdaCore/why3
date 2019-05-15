@@ -1134,25 +1134,26 @@ same directory as output files. This CSS style can be modified manually,
 since regenerating the HTML documentation will not overwrite an existing
 \verb|style.css| file.
 
-\section{The \texttt{latex} Command}
+\section{The \texttt{pretty} Command}
 
-This tool prints inductive rules defined in Why3 in LaTeX using the
-\texttt{mathpartir} package\index{latex@\texttt{latex}}.
+This tool pretty prints Why3 declarations. Currenty only the pretty
+printing of inductive rules to \LaTeX{} is supported (using the
+\texttt{mathpartir} package). \index{latex@\texttt{pretty}}
 
-The typesetting of variables, record fields, and functions is
-parameterized by LaTeX commands. Dummy definitions of these commands are
-printed in comments and have to be defined by the user. Trailing digits
-and quotes are removed from the command names to reduce the number of
-commands. The commands have a common, configurable prefix (default: \texttt{IND}).
+For the \LaTeX{} output, the typesetting of variables, record fields,
+and functions is parameterized by commands. Dummy definitions of these
+commands are printed in comments and have to be defined by the user.
+Trailing digits and quotes are removed from the command names to reduce
+the number of commands. The commands share a common, configurable prefix.
 
 \paragraph{Reconstruction of record updates}
 Due to the technical workings of the Why3 parser, record updates in the
 source code \texttt{\{x with f=e; ...\}} are normally printed as record
 constructions \texttt{\{f=e; g=x.g; ...\}}. However, such record
-constructions in the LaTeX export tend to be quite verbose in comparison
+constructions in the \LaTeX{} export tend to be quite verbose in comparison
 to record updates.
 
-The \texttt{why3 latex} allows for detecting and converting record
+The \texttt{why3 pretty} allows for detecting and converting record
 constructions back to record updates. It works as follows: Record shapes
 (names of the record type and its fields) are specified as command line
 arguments \texttt{-{}-record}. Record constructions are then tested,
@@ -1162,13 +1163,26 @@ corresponding to the order given in the record shape. In this case, the
 other field assignments \texttt{f=e} constitute the record update of the
 form \texttt{\{x with f=e; ...\}}.
 
+\subsection*{Usage}
+
+\texttt{why3 pretty [options] [--kind=inductive] [--output=latex]\\
+\indent [--prefix \textsl{<prefix>}] [--record \textsl{<name>}:\textsl{<field>},\ldots] \ldots{}\\
+\indent \textsl{<module>}.\textsl{<Theory>}.\textsl{<ind\_type>} \ldots}
+
 \paragraph{Options}
 
 \begin{description}
-  \item[\texttt{-{}-prefix~\textsl{<prefix}}] Set the prefix for LaTeX
-    commands to \textsl{<prefix>}.
-  \item[\texttt{-{}-record~\textsl{<name>}:\textsl{<field>},\ldots}]
-    Convert constructions of record \textsl{<name>} to record updates.
+\item[\texttt{-{}-kind~\textsl{<kind>}}] Set the syntactic kind to be
+  pretty printed. Currently, only the pretty printing of inductive types
+  is supported using \texttt{-{}-kind inductive}.
+\item[\texttt{-{}-output~\textsl{<output>}}] Set the output format.
+  Currently, only the pretty printing to \LaTeX{} is supported using
+  \texttt{--output latex}.
+\item[\texttt{-{}-prefix~\textsl{<prefix>}}] Set the prefix for \LaTeX{}
+  commands to \texttt{\textsl{<prefix>}}. The default is \texttt{IND}.
+\item[\texttt{-{}-record~\textsl{<name>}:\textsl{<field>},\ldots}]
+  Reconstruct record updates for record type \texttt{\textsl{<name>}}
+  with field names \texttt{\textsl{<field>},\ldots}
 \end{description}
 
 \section{The \texttt{execute} Command}
