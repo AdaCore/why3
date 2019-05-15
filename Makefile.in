@@ -1519,6 +1519,51 @@ clean::
 
 endif
 
+###############
+# Why3 LaTeX
+###############
+
+WHYTEX_FILES = why3latex
+
+WHYTEXMODULES = $(addprefix src/tools/, $(WHYTEX_FILES))
+
+WHYTEXDEP = $(addsuffix .dep, $(WHYTEXMODULES))
+WHYTEXCMO = $(addsuffix .cmo, $(WHYTEXMODULES))
+WHYTEXCMX = $(addsuffix .cmx, $(WHYTEXMODULES))
+
+$(WHYTEXDEP): DEPFLAGS += -I src/tools
+$(WHYTEXCMO) $(WHYTEXCMX): INCLUDES += -I src/tools
+
+# build targets
+
+byte: bin/why3latex.byte
+opt:  bin/why3latex.opt
+
+bin/why3latex.opt: $(WHY3CMXA) $(WHYTEXCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3latex.byte: $(WHY3CMA) $(WHYTEXCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+-include $(WHYTEXDEP)
+endif
+
+depend: $(WHYTEXDEP)
+
+uninstall-bin::
+	rm -f $(TOOLDIR)/why3latex$(EXE)
+
+install-bin::
+	$(MKDIR_P) $(TOOLDIR)
+	$(INSTALL) bin/why3latex.@OCAMLBEST@ $(TOOLDIR)/why3latex$(EXE)
+
+install_local:: bin/why3latex
+
 #########
 # why3doc
 #########
@@ -2194,6 +2239,10 @@ clean::
 %.cmx: %.ml %.mli
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
+
+# src/tools/why3latex.cmx: %.cmx: %.ml
+# 	$(SHOW) 'Ocamlopt $<'
+# 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
 %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
