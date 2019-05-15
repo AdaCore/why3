@@ -201,7 +201,7 @@ module Print = struct
     | None ->
        fprintf fmt "%a" (print_lident info) rs.rs_name
     | Some s when complex_syntax s ->
-       failwith "Unsupported: complex record field"
+       Loc.errorm ?loc:rs.rs_name.id_loc "Unsupported: complex record field"
     | Some s -> fprintf fmt "%s" s
 
   (** Types *)
@@ -408,41 +408,47 @@ module Print = struct
             List.exists (rs_equal rs) its.itd_constructors in
           List.exists is_constructor its
       | _ -> false in
-    match query_syntax info.info_syn rs.rs_name, pvl with
-    | Some s, _ when complex_syntax s || pvl = [] ->
-       let p = Mid.find rs.rs_name info.info_prec in
-       syntax_arguments_prec s (print_expr info) p fmt pvl
-    | _, [t1] when is_field rs ->
-        fprintf fmt "%a.%a" (print_expr info 2) t1 (print_record_proj info) rs
-    | Some s, _ ->
-       fprintf fmt "@[<hov 2>%s %a@]"
-         s
-         (print_apply_args info) (pvl, rs.rs_cty.cty_args)
-    | None, [t] when is_rs_tuple rs ->
-        fprintf fmt "@[%a@]" (print_expr info 1) t
-    | None, tl when is_rs_tuple rs ->
-        fprintf fmt "@[(%a)@]" (print_list comma (print_expr info 14)) tl
-    | None, tl when isconstructor () ->
-        let pjl = get_record info rs in
-        begin match pjl, tl with
-          | [], [] ->
-              (print_uident info) fmt rs.rs_name
-          | [], [t] ->
-              fprintf fmt "@[<hov 2>%a %a@]" (print_uident info) rs.rs_name
-                (print_expr info 2) t
-          | [], tl ->
-              fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
-                (print_list comma (print_expr info 14)) tl
-          | pjl, tl -> let equal fmt () = fprintf fmt " =@ " in
-              fprintf fmt "@[<hov 2>{ %a }@]"
-                (print_list2 semi equal (print_record_proj info)
-                   (print_expr info 17)) (pjl, tl) end
-    | None, [] ->
-        (print_lident info) fmt rs.rs_name
-    | _, tl ->
-        fprintf fmt "@[<hov 2>%a %a@]"
-          (print_lident info) rs.rs_name
-          (print_apply_args info) (tl, rs.rs_cty.cty_args)
+    if rs_equal rs rs_ref_proj
+    then
+      match pvl with
+      | [x] -> fprintf fmt "!%a" (print_expr info 1) x
+      | _ -> assert false
+    else
+      match query_syntax info.info_syn rs.rs_name, pvl with
+      | Some s, _ when complex_syntax s || pvl = [] ->
+         let p = Mid.find rs.rs_name info.info_prec in
+         syntax_arguments_prec s (print_expr info) p fmt pvl
+      | _, [t1] when is_field rs ->
+         fprintf fmt "%a.%a" (print_expr info 2) t1 (print_record_proj info) rs
+      | Some s, _ ->
+         fprintf fmt "@[<hov 2>%s %a@]"
+           s
+           (print_apply_args info) (pvl, rs.rs_cty.cty_args)
+      | None, [t] when is_rs_tuple rs ->
+         fprintf fmt "@[%a@]" (print_expr info 1) t
+      | None, tl when is_rs_tuple rs ->
+         fprintf fmt "@[(%a)@]" (print_list comma (print_expr info 14)) tl
+      | None, tl when isconstructor () ->
+         let pjl = get_record info rs in
+         begin match pjl, tl with
+         | [], [] ->
+            (print_uident info) fmt rs.rs_name
+         | [], [t] ->
+            fprintf fmt "@[<hov 2>%a %a@]" (print_uident info) rs.rs_name
+              (print_expr info 2) t
+         | [], tl ->
+            fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
+              (print_list comma (print_expr info 14)) tl
+         | pjl, tl -> let equal fmt () = fprintf fmt " =@ " in
+                      fprintf fmt "@[<hov 2>{ %a }@]"
+                        (print_list2 semi equal (print_record_proj info)
+                           (print_expr info 17)) (pjl, tl) end
+      | None, [] ->
+         (print_lident info) fmt rs.rs_name
+      | _, tl ->
+         fprintf fmt "@[<hov 2>%a %a@]"
+           (print_lident info) rs.rs_name
+           (print_apply_args info) (tl, rs.rs_cty.cty_args)
 
   and print_svar fmt s =
     print_list space (print_tv ~use_quote:false) fmt (Stv.elements s)
@@ -543,11 +549,14 @@ module Print = struct
           (print_list newline (print_branch info)) pl
     | Eassign al ->
         let assign fmt (rho, rs, e) =
-          if is_field rs
+          if rs_equal rs rs_ref_proj
+          then fprintf fmt "@[<hv 2>%a :=@ %a@]"
+                 (print_lident info) (pv_name rho) (print_expr info 15) e
+          else if is_field rs
           then fprintf fmt "@[<hv 2>%a.%a <-@ %a@]"
                  (print_lident info) (pv_name rho) (print_record_proj info) rs
                 (print_expr info 15) e
-          else 
+          else
             match query_syntax info.info_syn rs.rs_name with
             | Some s ->
                fprintf fmt "@[<hv 2>%a <-@ %a@]"
