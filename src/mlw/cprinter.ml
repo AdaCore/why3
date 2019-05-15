@@ -1312,7 +1312,14 @@ module MLToC = struct
                 Hreg.add boxed r ();
                 C.Tptr cty, id
               | _ -> (cty, id)) ngvl ngargs in
-        let params = List.filter (fun (ty, _) -> ty <> C.Tvoid) params in
+        let params =
+          List.filter
+            (fun (ty, id) ->
+              if ty <> C.Tvoid
+              then true
+              else if Sattr.mem Dexpr.dummy_var_attr id.id_attrs
+              then (* remove dummy variable *) false
+              else raise (Unsupported "non-dummy unit parameter")) params in
         let ret_regs = ity_exp_fold Sreg.add_left Sreg.empty rs.rs_cty.cty_result in
 	let rity = rs.rs_cty.cty_result in
 	let is_simple_tuple ity =
