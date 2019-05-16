@@ -52,6 +52,7 @@ type reason =
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
    | VC_Inconsistent_Post
+   | VC_Inconsistent_Assume
    | VC_Unreachable_Branch
    | VC_Dead_Code
 

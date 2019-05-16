@@ -48,6 +48,7 @@ type reason =
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
    | VC_Inconsistent_Post
+   | VC_Inconsistent_Assume
    | VC_Unreachable_Branch
    | VC_Dead_Code
 
@@ -100,6 +101,7 @@ let is_warning_reason r =
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre
    | VC_Inconsistent_Post
+   | VC_Inconsistent_Assume
    | VC_Unreachable_Branch
    | VC_Dead_Code
      -> true
@@ -142,7 +144,7 @@ let reason_from_string s =
    | "VC_PREDICATE_CHECK"           -> VC_Predicate_Check
    | "VC_PREDICATE_CHECK_ON_DEFAULT_VALUE" ->
       VC_Predicate_Check_On_Default_Value
-   | "VC_NULL_POINTER_DEREFERENCE"  -> VC_Null_Pointer_Dereference 
+   | "VC_NULL_POINTER_DEREFERENCE"  -> VC_Null_Pointer_Dereference
    | "VC_NULL_EXCLUSION"            -> VC_Null_Exclusion
    | "VC_INVARIANT_CHECK"           -> VC_Invariant_Check
    | "VC_INVARIANT_CHECK_ON_DEFAULT_VALUE" ->
@@ -181,6 +183,7 @@ let reason_from_string s =
    (* VC_Warning_Kind - warnings *)
    | "VC_INCONSISTENT_PRE"          -> VC_Inconsistent_Pre
    | "VC_INCONSISTENT_POST"         -> VC_Inconsistent_Post
+   | "VC_INCONSISTENT_ASSUME"       -> VC_Inconsistent_Assume
    | "VC_UNREACHABLE_BRANCH"        -> VC_Unreachable_Branch
    | "VC_DEAD_CODE"                 -> VC_Dead_Code
    | _                              ->
@@ -237,6 +240,7 @@ let reason_to_ada reason =
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre          -> "VC_INCONSISTENT_PRE"
    | VC_Inconsistent_Post         -> "VC_INCONSISTENT_POST"
+   | VC_Inconsistent_Assume       -> "VC_INCONSISTENT_ASSUME"
    | VC_Unreachable_Branch        -> "VC_UNREACHABLE_BRANCH"
    | VC_Dead_Code                 -> "VC_DEAD_CODE"
 
@@ -288,6 +292,7 @@ let reason_to_string reason =
    (* VC_Warning_Kind - warnings *)
    | VC_Inconsistent_Pre          -> "inconsistent_pre"
    | VC_Inconsistent_Post         -> "inconsistent_post"
+   | VC_Inconsistent_Assume       -> "inconsistent_assume"
    | VC_Unreachable_Branch        -> "unreachable_branch"
    | VC_Dead_Code                 -> "dead_code"
 
