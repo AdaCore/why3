@@ -10,36 +10,34 @@ module Util
   use types.Types
   use lemmas.Lemmas
 
-  let wmpn_copyi (r x:t) (sz:int32) : unit
+  let wmpn_copyi [@extraction:inline] (r x:t) (sz:int32) : unit
     requires { valid x sz }
     requires { valid r sz }
     ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
     ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
               (pelts r)[j] = old (pelts r)[j] }
   =
-    let zero = (0:int32) in
-    let one = (1:int32) in
-    let i = ref zero in
-    let xp = ref (C.incr x zero) in
-    let rp = ref (C.incr r zero) in
-    while (Int32.(<) !i sz) do
-      variant { p2i sz - p2i !i }
-      invariant { 0 <= !i <= sz }
-      invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset !i }
-      invariant { pelts !xp = pelts x }
-      invariant { pelts !rp = pelts r }
-      invariant { !xp.min = min x }
-      invariant { !xp.max = x.max }
-      invariant { !rp.min = r.min }
-      invariant { !rp.max = r.max }
-      invariant { !xp.offset = x.offset + !i }
-      invariant { !rp.offset = r.offset + !i }
+    let ref i = 0 in
+    let ref xp = C.incr x 0 in
+    let ref rp = C.incr r 0 in
+    while (Int32.(<) i sz) do
+      variant { p2i sz - p2i i }
+      invariant { 0 <= i <= sz }
+      invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset i }
+      invariant { pelts xp = pelts x }
+      invariant { pelts rp = pelts r }
+      invariant { xp.min = min x }
+      invariant { xp.max = x.max }
+      invariant { rp.min = r.min }
+      invariant { rp.max = r.max }
+      invariant { xp.offset = x.offset + i }
+      invariant { rp.offset = r.offset + i }
       invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
                   (pelts r)[j] = old (pelts r)[j] }
-      C.set !rp (C.get !xp);
-      rp.contents <- C.incr !rp one;
-      xp.contents <- C.incr !xp one;
-      i := Int32.(+) !i one;
+      C.set rp (C.get xp);
+      rp <- C.incr rp 1;
+      xp <- C.incr xp 1;
+      i <- i+1;
     done
 
    (* `wmpn_zero_p` checks if `x[0..sz-1]` is zero. It corresponds to `mpn_zero_p`. *)

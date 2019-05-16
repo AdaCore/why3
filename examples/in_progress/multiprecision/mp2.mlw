@@ -3490,7 +3490,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   so !q1 * d + cr = u };
     assert { !q1 * d + !r0 + radix * !r1 = u };
     label PreRemAdjust in
-    if [@ex:unlikely] (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
+    if [@extraction:unlikely] (Limb.(>) !r1 dh) || (Limb.(=) !r1 dh && Limb.(>=) !r0 dl)
     then begin
       let (bh, bl) = sub_double_nb !r1 !r0 dh dl in
       assert { bl + radix * bh = !r0 + radix * !r1 - d };
@@ -4062,7 +4062,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
       xp.contents <- C.incr !xp (-1);
       let xd = C.incr !xp mdn in
       let nx0 = C.get_ofs !xp one in
-      if [@ex:unlikely] (Limb.(=) !x1 dh && Limb.(=) nx0 dl)
+      if [@extraction:unlikely] (Limb.(=) !x1 dh && Limb.(=) nx0 dl)
       then begin
         ql := Limb.uint64_max;
         value_sub_concat (pelts x) x.offset xd.offset (xd.offset + p2i sy);
@@ -4870,7 +4870,7 @@ let divmod_1 (q x:t) (y:limb) (sz:int32) : limb
                   }*)
            end;
         end;
-        if [@ex:unlikely] (not (Limb.(=) cy2 limb_zero))
+        if [@extraction:unlikely] (not (Limb.(=) cy2 limb_zero))
         then begin
           label Adjust in
           assert { cy2 = 1 };

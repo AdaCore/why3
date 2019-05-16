@@ -250,7 +250,7 @@ module C = struct
     | Sfor (e1,e2,e3,s) ->
       let d, s' = flatten_defs d s in
       d, Sfor(e1,e2,e3,s')
-    | s -> d,s
+    | Sbreak | Snop | Sexpr _ | Sreturn _ as s -> d, s
 
   let rec group_defs_by_type l =
     (* heuristic to reduce the number of lines of defs*)
@@ -291,7 +291,7 @@ module C = struct
     | Sif (c,t,e) -> Sif(c, elim_empty_blocks t, elim_empty_blocks e)
     | Swhile (c,s) -> Swhile(c, elim_empty_blocks s)
     | Sfor(e1,e2,e3,s) -> Sfor(e1,e2,e3,elim_empty_blocks s)
-    | s -> s
+    | Snop | Sbreak | Sexpr _ | Sreturn _ as s -> s
 
   let rec elim_nop = function
     | Sseq (s1,s2) ->
@@ -311,7 +311,7 @@ module C = struct
     | Sif (c,t,e) -> Sif(c, elim_nop t, elim_nop e)
     | Swhile (c,s) -> Swhile (c, elim_nop s)
     | Sfor(e1,e2,e3,s) -> Sfor(e1,e2,e3,elim_nop s)
-    | s -> s
+    | Snop | Sbreak | Sexpr _ | Sreturn _ as s -> s
 
   let rec add_to_last_call params = function
     | Sblock (d,s) -> Sblock (d, add_to_last_call params s)
@@ -321,7 +321,7 @@ module C = struct
     | Sexpr (Ecall(fname, args)) ->
       Sexpr (Ecall(fname, params@args)) (*change name to ensure no renaming ?*)
     | Sreturn (Ecall (fname, args)) ->
-      Sreturn (Ecall(fname, params@args))
+       Sreturn (Ecall(fname, params@args))
     | _ -> raise (Unsupported "tuple pattern matching with too complex def")
 
   let rec stmt_of_list (l: stmt list) : stmt =
@@ -642,7 +642,8 @@ module Print = struct
     | Sexpr e -> fprintf fmt "%a;" print_expr_no_paren e;
     | Sblock ([] ,s) when not braces ->
       (print_stmt ~braces:false) fmt s
-    | Sblock b -> fprintf fmt "@[<hov>{@\n  @[<hov>%a@]@\n}@]" print_body b
+    | Sblock b ->
+       fprintf fmt "@[<hov>{@\n  @[<hov>%a@]@\n}@]" print_body b
     | Sseq (s1,s2) -> fprintf fmt "%a@\n%a"
       (print_stmt ~braces:false) s1
       (print_stmt ~braces:false) s2
@@ -758,10 +759,10 @@ module MLToC = struct
   let structs : struct_def Hid.t = Hid.create 16
   let aliases : C.ty Hid.t = Hid.create 16
 
-  let array = create_attribute "ex:array"
-  let array_mk = create_attribute "ex:array_make"
-  let likely = create_attribute "ex:likely"
-  let unlikely = create_attribute "ex:unlikely"
+  let array = create_attribute "extraction:array"
+  let array_mk = create_attribute "extraction:array_make"
+  let likely = create_attribute "extraction:likely"
+  let unlikely = create_attribute "extraction:unlikely"
 
   let rec ty_of_ty info ty = (*FIXME try to use only ML tys*)
     match ty.ty_node with
@@ -899,11 +900,12 @@ module MLToC = struct
     then Sreturn e
     else Sexpr e
 
+  let inlined_attr = Compile.InlineFunctionCalls.inlined_call_attr
+
   let rec expr info env (e:Mltree.expr) : C.body =
-    assert (not e.e_effect.eff_ghost);
     match e.e_node with
     | Eblock [] -> ([], expr_or_return env Enothing)
-    | Eblock [_] -> assert false
+    | Eblock [e] -> [], C.Sblock (expr info env e)
     | Eblock l ->
        let env_f = { env with computes_return_value = false } in
        let rec aux = function
@@ -1006,12 +1008,19 @@ module MLToC = struct
 	 C.([d_struct], Sseq(assigns args 0, Sreturn(e_struct)))
 	 end
        else
-	 let e' =
-           let unboxed_params =
-	     List.map
-               (fun e ->
-                 (simplify_expr (expr info env_f e),
-                  ty_of_ty info (ty_of_ity (ity_of_expr e))))
+	 let (prdefs, prstmt), e' =
+           let prelude, unboxed_params =
+	     Lists.map_fold_left
+               (fun ((accd, accs) as acc) e ->
+                 let d, s = expr info env_f e in
+                 let pty = ty_of_ty info (ty_of_ity (ity_of_expr e)) in
+                 try
+                   acc,
+                   (simplify_expr (d,s), pty)
+                 with Invalid_argument _ ->
+                   let s', e' = get_last_expr s in
+                   (accd@d, Sseq(accs, s')), (e', pty))
+               ([], Snop)
 	       args in
            let params =
              List.map2
@@ -1022,6 +1031,7 @@ module MLToC = struct
                     C.(Eunop(Uaddr, ce), Tptr (Tstruct s))
                  | p, _ -> p)
                unboxed_params args in
+           prelude,
            match query_syntax info.syntax rs.rs_name with
            | Some s ->
               let complex s =
@@ -1060,16 +1070,19 @@ module MLToC = struct
                     else C.Edot (ce, (pv_name pv).id_string)
                  | _ -> C.Edot (fst (List.hd params), (pv_name pv).id_string) end
          in
-	 C.([],
-            if env.computes_return_value
-	    then
-              begin match e.e_ity with
-              | I ity when ity_equal ity Ity.ity_unit ->
-                 Sseq(Sexpr e', Sreturn Enothing)
-              | I _ -> Sreturn e'
-              | _ -> assert false
-              end
-            else Sexpr e')
+         let s =
+           if env.computes_return_value
+	   then
+             begin match e.e_ity with
+             | I ity when ity_equal ity Ity.ity_unit ->
+                Sseq(Sexpr e', Sreturn Enothing)
+             | I _ -> Sreturn e'
+             | _ -> assert false
+             end
+           else Sexpr e' in
+         if is_nop prstmt
+         then prdefs, s
+         else C.(prdefs, Sseq(prstmt, s))
     | Eif (cond, th, el) ->
        let cd,cs = expr info {env with computes_return_value = false} cond in
        let t = expr info env th in

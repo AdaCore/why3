@@ -73,7 +73,7 @@ data: alltests
 	./build/gmpdivbench > bench/gmpdiv
 	./build/minigmpaddbench > bench/minigmpadd
 	./build/minigmpmulbench > bench/minigmpmul
-	./build/minigmptoombench > bench/minigmptoom # minigmp uses schoolbook mul in that case too
+	./build/minigmptoombench > bench/minigmptoom
 	./build/minigmpdivbench > bench/minigmpdiv
 
 plots: data
