@@ -395,7 +395,7 @@ let e_fold fn acc e =
   match e.e_node with
   | Econst _ | Evar _
   | Efun (_,_) | Eabsurd -> acc
-  | Eapp (rs,el) -> List.fold_left fn acc el
+  | Eapp (_,el) -> List.fold_left fn acc el
   | Elet (ld,e) -> fn (ld_fold fn acc ld) e
   | Eif (c,t,e) ->
      let acc = fn acc c in
@@ -410,7 +410,7 @@ let e_fold fn acc e =
   | Ewhile (c,b) -> fn (fn acc c) b
   | Efor (_,_,_,_,e) -> fn acc e
   | Eraise (_, None) -> acc
-  | Eraise (x, Some e) -> fn acc e
+  | Eraise (_, Some e) -> fn acc e
   | Eexn (_x,_t,e) -> fn acc e
   | Eignore e -> fn acc e
 
