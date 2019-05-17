@@ -1,0 +1,12 @@
+WMP
+===
+
+- library compatible with GMP with 64-bit limbs
+- all function names are prefixed by w, e.g., wmpn_add
+- for documentation, see https://gmplib.org/manual/Low_002dlevel-Functions.html
+- C files are generated from verified WhyML files,
+  see https://gitlab.inria.fr/why3/why3/tree/master/examples/multiprecision
+- implemented algorithms: ...
+- performances comparable to Mini-GMP, if not better;
+  twice as slow as GMP with hand-coded assembly;
+  even slower on large inputs

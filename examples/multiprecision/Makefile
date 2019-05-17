@@ -77,3 +77,10 @@ data: alltests
 
 plots: data
 	make all -C plots
+
+dist: extract
+	mkdir -p distrib/lib
+	touch distrib/ChangeLog
+	cp build/*.c build/*.h include/sqrtinit.h distrib/lib/
+	cd distrib; ./autogen.sh
+	cd distrib; make distcheck
