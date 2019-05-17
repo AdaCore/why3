@@ -44,14 +44,14 @@ struct __mul64_double_result
   uint64_t __field_1;
 };
 
-static struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
+static inline struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
 {
   uint128_t z = (uint128_t)x * (uint128_t)y;
   struct __mul64_double_result result = { z, z >> 64 };
   return result;
 }
 
-static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
+static inline uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
 {
   return (((uint128_t)uh << 64) | ul) / d;
 }

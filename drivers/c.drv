@@ -338,7 +338,7 @@ struct __add64_with_carry_result
   uint64_t __field_1;
 };
 
-static struct __add64_with_carry_result
+static inline struct __add64_with_carry_result
 add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
 {
   struct __add64_with_carry_result result;
@@ -354,7 +354,7 @@ struct __sub64_with_borrow_result
   uint64_t __field_1;
 };
 
-static struct __sub64_with_borrow_result
+static inline struct __sub64_with_borrow_result
 sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
 {
   struct __sub64_with_borrow_result result;
@@ -371,7 +371,7 @@ struct __add64_3_result
   uint64_t __field_1;
 };
 
-static struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)
+static inline struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)
 {
   struct __add64_3_result result;
   uint64_t r, c1, c2;
@@ -389,7 +389,7 @@ struct __lsld64_result
   uint64_t __field_1;
 };
 
-static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
+static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 {
   struct __lsld64_result result;
   result.__field_1 = x >> (64 - cnt);
