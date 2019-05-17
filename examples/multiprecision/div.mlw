@@ -1172,11 +1172,11 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
     let u2, b2 = sub_with_borrow u1 z 0 in
     (u2, (b1 + b2))
 
-  (** `wmpn_submul_1 r x y sz` multiplies `(x, sz)` by `y`, subtracts the `sz`
+  (** `wmpn_submul_1 r x sz y` multiplies `(x, sz)` by `y`, subtracts the `sz`
       least significant limbs from `(r, sz)` and writes the result in `(r, sz)`.
       Returns the most significant limb of the product plus the borrow
       of the subtraction. Corresponds to `mpn_submul_1`.*)
-  let wmpn_submul_1 (r x:t) (y:limb) (sz:int32):limb
+  let wmpn_submul_1 (r x:t) (sz:int32) (y:limb):limb
     requires { valid x sz }
     requires { valid r sz }
     ensures { value r sz - (power radix sz) * result
@@ -1616,7 +1616,7 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
         label SubMax in
         let ghost xc = Array.copy (x.data) in
         value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
-        let ghost b = wmpn_submul_1 xd y !ql sy in
+        let ghost b = wmpn_submul_1 xd y sy !ql in
         begin
           ensures { value x !i
                  = value (x at SubMax) !i }
@@ -2121,7 +2121,7 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
                            (x.offset + p2i sy + k - 1);
         let ghost xc = Array.copy (x.data) in
         value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
-        let cy = wmpn_submul_1 xd y !ql (sy - 2) in
+        let cy = wmpn_submul_1 xd y (sy - 2) !ql in
         label PostSub in
         begin
           ensures { value x !i
