@@ -7,7 +7,6 @@
 #else
 #define TEST_GMP
 #endif
-#define TEST_WHY3
 #define TEST_ADD
 #define TEST_MUL
 #define TEST_TOOM
@@ -22,7 +21,16 @@
 #include <gmp.h>
 #endif
 
-#ifdef TEST_WHY3
+#ifdef TEST_LIB
+#include "wmp.h"
+extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
+#endif
+
+#ifndef TEST_WHY3
+#define TEST_WHY3
+#endif
+
+#if defined(TEST_WHY3) && !defined(TEST_LIB)
 #include "build/add.h"
 #include "build/mul.h"
 #include "build/div.h"

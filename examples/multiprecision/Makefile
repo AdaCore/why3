@@ -16,7 +16,7 @@ else
   GMPFLAGS = -march=native -O2 -fomit-frame-pointer
 endif
 
-CFLAGS = $(GMPFLAGS) -Wall -Wno-unused-function -g -std=c11
+CFLAGS = $(GMPFLAGS) -Wall -Wno-unused -g -std=c11
 
 all: why3 extract
 
@@ -84,3 +84,7 @@ dist: extract
 	cp build/*.c build/*.h include/sqrtinit.h distrib/lib/
 	cd distrib; ./autogen.sh
 	cd distrib; make distcheck
+
+tests-dist:
+	gcc $(CFLAGS) tests.c -DTEST_LIB -Irandom -Idistrib -lgmp -Ldistrib -lwmp -o build/disttests
+	./build/disttests
