@@ -1,12 +1,35 @@
 WMP
 ===
 
-- library compatible with GMP with 64-bit limbs
-- all function names are prefixed by w, e.g., wmpn_add
-- for documentation, see https://gmplib.org/manual/Low_002dlevel-Functions.html
-- C files are generated from verified WhyML files,
-  see https://gitlab.inria.fr/why3/why3/tree/master/examples/multiprecision
-- implemented algorithms: ...
-- performances comparable to Mini-GMP, if not better;
-  twice as slow as GMP with hand-coded assembly;
-  even slower on large inputs
+wmp is a formally verified arbitrary-precision library.  It is
+compatible with GMP's mpn layer, and implements a subset of the
+functions found at
+https://gmplib.org/manual/Low_002dlevel-Functions.html (which also
+serves as documentation). The function names are prefixed by the
+letter w, e.g. wmpn_add. wmp uses 64-bit limbs and 32-bit sizes.
+
+The proofs assume that the source operands (of type wmpn_srcptr) are
+entirely separated from the destination operands. This is a departure
+from GMP, which allows them to be either equal or separated. When they
+are equal, you should use the *_in_place versions instead. In
+practice, using the baseline versions should work even in place, but
+this fact is not formally verified.
+
+The C files are generated using the Why3 platform. The algorithms were
+reimplemented and verified in WhyML (see
+https://gitlab.inria.fr/why3/why3/tree/master/examples/multiprecision),
+and extracted to C.
+
+The implemented algorithms are addition, subtraction, multiplication
+(basecase and Toom-2), division, logical shifts and square root. A
+more complete list of exported functions can be found in the header
+wmpn.h.
+
+For operands under about 1000 bits, the performances are comparable to
+GMP's standalone version, mini-gmp, and about twice as slow as GMP
+with hand-coded assembly. For multiplication, this comparison holds
+until about 100000 bits. Above those thresholds, GMP uses
+asymptotically faster algorithms that we have not implemented, so the
+gap widens.
+
+
