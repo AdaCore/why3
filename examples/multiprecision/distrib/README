@@ -8,6 +8,16 @@ https://gmplib.org/manual/Low_002dlevel-Functions.html (which also
 serves as documentation). The function names are prefixed by the
 letter w, e.g. wmpn_add. wmp uses 64-bit limbs and 32-bit sizes.
 
+All declarations needed to use wmp are collected in the include file
+wmp.h. It is designed to work with both C and C++ compilers.
+
+    #include <wmp.h>
+
+All programs using wmp must link against the libwmp library. On a
+typical Unix-like system this can be done with `-lwmp`, for example
+
+    gcc myprogram.c -lwmp
+
 The proofs assume that the source operands (of type wmpn_srcptr) are
 entirely separated from the destination operands. This is a departure
 from GMP, which allows them to be either equal or separated. When they
@@ -22,8 +32,8 @@ and extracted to C.
 
 The implemented algorithms are addition, subtraction, multiplication
 (basecase and Toom-2), division, logical shifts and square root. A
-more complete list of exported functions can be found in the header
-wmpn.h.
+complete list of exported functions can be found in the header
+wmp.h.
 
 For operands under about 1000 bits, the performances are comparable to
 GMP's standalone version, mini-gmp, and about twice as slow as GMP
