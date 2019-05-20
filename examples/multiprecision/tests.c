@@ -46,7 +46,7 @@ extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
 #include <sys/time.h>
 #include <time.h>
 
-#define TMP_ALLOC_LIMBS(n) malloc((n) * 8)
+#define TMP_ALLOC_LIMBS(n) (mp_ptr)malloc((n) * 8)
 
 void mpn_dump(mp_ptr ap, mp_size_t an) {
   for (mp_size_t i = 0; i != an; ++i)
@@ -66,7 +66,7 @@ void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
 
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr;
-  mp_size_t max_n, max_add, max_mul, max_toom, max_div, max_sqrt, an, bn, rn;
+  mp_size_t max_n, max_add, max_mul, max_toom, max_div, max_sqrt, an, bn, rn, cn;
   int nb, nb_iter;
   double elapsed;
 #ifdef BENCH
@@ -448,7 +448,7 @@ int main () {
             rn = mpn_sqrtrem(refq, refr, ap, an);
 #endif
 #ifdef TEST_WHY3
-            c = wmpn_sqrtrem(rq, rr, ap, an);
+            cn = wmpn_sqrtrem(rq, rr, ap, an);
 #endif
 
 #ifdef BENCH
@@ -465,14 +465,14 @@ int main () {
       printf ("\n"); //for gnuplot
 #endif
 #ifdef COMPARE
-      if (c != rn)
+      if (cn != rn)
         {
           printf ("ERROR, an = %d, expected rn = %d, actual rn = %d\n",
-                  (int) an, (int) rn, (int) c);
+                  (int) an, (int) rn, (int) cn);
           printf ("a: "); mpn_dump (ap, an);
           printf ("s: "); mpn_dump (rq, (an+1)/2);
           printf ("refs: "); mpn_dump (refq, (an+1)/2);
-          printf ("r: "); mpn_dump (rr, c);
+          printf ("r: "); mpn_dump (rr, cn);
           printf ("refr: "); mpn_dump (refr, rn);
           abort ();
         }
@@ -483,7 +483,7 @@ int main () {
           printf ("a: "); mpn_dump (ap, an);
           printf ("s: "); mpn_dump (rq, (an+1)/2);
           printf ("refs: "); mpn_dump (refq, (an+1)/2);
-          printf ("r: "); mpn_dump (rr, c);
+          printf ("r: "); mpn_dump (rr, rn);
           printf ("refr: "); mpn_dump (refr, rn);
           abort();
         }
@@ -494,7 +494,7 @@ int main () {
           printf ("a: "); mpn_dump (ap, an);
           printf ("s: "); mpn_dump (rq, (an+1)/2);
           printf ("refs: "); mpn_dump (refq, (an+1)/2);
-          printf ("r: "); mpn_dump (rr, c);
+          printf ("r: "); mpn_dump (rr, rn);
           printf ("refr: "); mpn_dump (refr, rn);
           abort();
         }
