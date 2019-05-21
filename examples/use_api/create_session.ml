@@ -54,7 +54,7 @@ let provers =
     []
 
 (* create an empty session in the current directory *)
-let session = Session_itp.empty_session "."
+let session = Session_itp.empty_session ~shape_version:None "."
 (*
 let env_session,_,_ =
   let dummy_session : unit Session.session = Session.create_session "." in
