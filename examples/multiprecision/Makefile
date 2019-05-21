@@ -26,28 +26,30 @@ clean:
 why3:
 	make -C ../..
 
-dir:
-	mkdir -p build
-
 MLWFILES= $(addsuffix .mlw, sqrtrem sqrt toom logical div mul sub add compare util)
 
-cfiles: why3 dir
+cfiles: why3
+	mkdir -p build
 	$(WHY3) extract -D wmpn.drv -D c -L . --recursive --modular --interface -o build/ \
 	wmpn.mlw
 	#$(MLWFILES)
 
-extract: why3 dir cfiles
+build/sqrtinit.h: sqrtinit.ml
+	mkdir -p build
+	ocaml sqrtinit.ml > build/sqrtinit.h
+
+extract: cfiles build/sqrtinit.h
 
 CFILES = build/uint64gmp.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/mul.c build/sub.c build/add.c build/compare.c build/util.c build/int32.c
 
 tests: extract
-	gcc $(CFLAGS) tests.c $(CFILES) -Iinclude -Irandom -lgmp -o build/tests
-	gcc $(CFLAGS) -DCOMPARE_MINI tests.c $(CFILES) -Iinclude -Irandom -Imini-gmp -o build/minitests
+	gcc $(CFLAGS) tests.c $(CFILES) -Irandom -lgmp -o build/tests
+	gcc $(CFLAGS) -DCOMPARE_MINI tests.c $(CFILES) -Irandom -Imini-gmp -o build/minitests
 	./build/tests
 	./build/minitests
 
 bench-tests: extract
-	gcc $(CFLAGS) tests.c $(CFILES) -Iinclude -Ibench-include -Irandom -lgmp -o build/bench-tests
+	gcc $(CFLAGS) tests.c $(CFILES) -Irandom -lgmp -o build/bench-tests
 
 build/why3%bench: extract
 	gcc $(CFLAGS) -DTEST_WHY3 -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -Iinclude -Irandom -lgmp -o $@
@@ -81,10 +83,11 @@ plots: data
 dist: extract
 	mkdir -p distrib/lib
 	touch distrib/ChangeLog
-	cp build/*.c build/*.h include/sqrtinit.h distrib/lib/
+	cp build/*.c build/*.h distrib/lib/
 	cd distrib; ./autogen.sh
 	cd distrib; make distcheck
 
 tests-dist:
+	make -C distrib
 	gcc $(CFLAGS) tests.c -DTEST_LIB -Irandom -Idistrib -lgmp -Ldistrib -lwmp -o build/disttests
 	./build/disttests
