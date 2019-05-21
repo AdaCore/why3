@@ -366,11 +366,12 @@ module Translate = struct
         Debug.dprintf debug_compile "pvl: %d@." (List.length pvl);
         Debug.dprintf debug_compile "cty_args: %d@." (List.length cty.cty_args);
         let rs = Hrs.find_def ht_rs rs rs in
-        let add_unit = function [] -> [ML.e_unit] | args -> args in
+        let add_unit = function [] -> [ML.e_dummy_unit] | args -> args in
         let id_f = fun x -> x in
         let f_zero = match rs.rs_logic with
           | RLnone when cty.cty_args = []  ->
               Debug.dprintf debug_compile "it is a fully applied RLnone@.";
+              (* FIXME: ideally this should be done in ocaml_printer *)
               add_unit
           | _ -> id_f in
         let pvl = app pvl rs.rs_cty.cty_args f_zero in

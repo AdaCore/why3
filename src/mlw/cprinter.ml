@@ -960,6 +960,7 @@ module MLToC = struct
          List.filter
            (fun e ->
              assert (not e.e_effect.eff_ghost);
+             (not (Sattr.mem dummy_expr_attr e.e_attrs)) &&
              match e.e_ity with
              | I i when ity_equal i Ity.ity_unit -> false
              | _ -> true)
@@ -1299,9 +1300,21 @@ module MLToC = struct
       if rs_ghost rs
       then begin Debug.dprintf debug_c_extraction "is ghost@."; [] end
       else
+        let is_dummy id = Sattr.mem Dexpr.dummy_var_attr id.id_attrs in
         let boxed = Hreg.create 16 in
-        let ngvl = List.filter (fun (_,_, gh) -> not gh) vl in
-        let ngargs = List.filter (fun pv -> not pv.pv_ghost) rs.rs_cty.cty_args in
+        let keep_var (id, mlty, gh) =
+          not gh &&
+            match mlty with
+            | Ttuple [] ->
+               if is_dummy id
+               then false
+               else raise (Unsupported "non-dummy unit parameter")
+            | _ -> true in
+        let keep_pv pv =
+          not pv.pv_ghost &&
+            not (ity_equal pv.pv_ity Ity.ity_unit && is_dummy pv.pv_vs.vs_name) in
+        let ngvl = List.filter keep_var vl in
+        let ngargs = List.filter keep_pv rs.rs_cty.cty_args in
         let params =
           List.map2 (fun (id, mlty, _gh) pv ->
               let cty = ty_of_mlty info mlty in
@@ -1312,14 +1325,6 @@ module MLToC = struct
                 Hreg.add boxed r ();
                 C.Tptr cty, id
               | _ -> (cty, id)) ngvl ngargs in
-        let params =
-          List.filter
-            (fun (ty, id) ->
-              if ty <> C.Tvoid
-              then true
-              else if Sattr.mem Dexpr.dummy_var_attr id.id_attrs
-              then (* remove dummy variable *) false
-              else raise (Unsupported "non-dummy unit parameter")) params in
         let ret_regs = ity_exp_fold Sreg.add_left Sreg.empty rs.rs_cty.cty_result in
 	let rity = rs.rs_cty.cty_result in
 	let is_simple_tuple ity =

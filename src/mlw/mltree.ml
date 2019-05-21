@@ -285,14 +285,20 @@ let enope = Eblock []
 let mk_var id ty ghost = (id, ty, ghost)
 
 let mk_var_unit =
-  mk_var (id_register (id_fresh "_")) tunit false
+  let attrs = Sattr.singleton Dexpr.dummy_var_attr in
+  mk_var (id_register (id_fresh ~attrs "_")) tunit false
 
 let mk_its_defn its_name its_args its_private its_def =
   { its_name; its_args; its_private; its_def; }
 
 (* smart constructors *)
-let e_unit =
-  mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty Sattr.empty
+let e_unit attrs =
+  mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty attrs
+
+let dummy_expr_attr = Ident.create_attribute "__dummy_expr__"
+
+let e_dummy_unit = e_unit (Sattr.singleton dummy_expr_attr)
+let e_unit = e_unit Sattr.empty
 
 let e_const c =
   mk_expr (Econst c)
