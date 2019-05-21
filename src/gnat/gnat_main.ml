@@ -20,45 +20,34 @@
 *)
 
 open Why3
-open Term
 open Gnat_scheduler
 
 module C = Gnat_objectives.Make (Gnat_scheduler)
 
-let rec is_trivial fml =
-   (* Check wether the formula is trivial.  *)
-   match fml.t_node with
-   | Ttrue -> true
-   | Tquant (_,tq) ->
-         let _,_,t = t_open_quant tq in
-         is_trivial t
-   | Tlet (_,tb) ->
-         let _, t = t_open_bound tb in
-         is_trivial t
-   | Tbinop (Timplies,_,t2) ->
-         is_trivial t2
-   | Tcase (_,tbl) ->
-         List.for_all (fun b ->
-            let _, t = t_open_branch b in
-            is_trivial t) tbl
-   | _ -> false
-
-let register_goal s goal_id =
-   (* Register the goal by extracting the explanation and trace. If the goal is
-    * trivial, do not register *)
-     let task = Session_itp.get_task s goal_id in
-     let fml = Task.task_goal_fmla task in
-     match is_trivial fml, Gnat_expl.search_labels fml with
-     | true, None ->
-         Gnat_objectives.set_not_interesting goal_id
-     | false, None ->
-         Gnat_util.abort_with_message ~internal:true
-           "Task has no tracability label."
-     | _, Some c ->
-         if c.Gnat_expl.already_proved then
-           Gnat_objectives.set_not_interesting goal_id
-         else
-           Gnat_objectives.add_to_objective c goal_id
+let register_goal cont goal_id =
+  (* Register the goal by extracting the explanation and trace. If the goal is
+   * trivial, do not register. We check triviality by adding a transformation
+     that only succeed on trivial goals. *)
+  C.apply_trivial cont goal_id;
+  let s = cont.Controller_itp.controller_session in
+  let task = Session_itp.get_task s goal_id in
+  let fml = Task.task_goal_fmla task in
+  let is_trivial s goal_id =
+    Session_itp.pn_proved s goal_id &&
+    let tr_list = Session_itp.get_transformations s goal_id in
+    List.exists (fun x -> Session_itp.get_transf_name s x = "trivial_true") tr_list
+  in
+  match is_trivial s goal_id, Gnat_expl.search_labels fml with
+  | true, None ->
+      Gnat_objectives.set_not_interesting goal_id
+  | false, None ->
+      Gnat_util.abort_with_message ~internal:true
+        "Task has no tracability label."
+  | _, Some c ->
+      if c.Gnat_expl.already_proved then
+        Gnat_objectives.set_not_interesting goal_id
+      else
+        Gnat_objectives.add_to_objective c goal_id
 
 let rec handle_vc_result c goal result =
    (* This function is called when the prover has returned from a VC.
@@ -141,7 +130,7 @@ let handle_obj c obj =
 let all_split_subp c subp =
   let s = c.Controller_itp.controller_session in
    C.init_subp_vcs c subp;
-   Gnat_objectives.iter_leaf_goals s subp (register_goal s);
+   Gnat_objectives.iter_leaf_goals s subp (register_goal c);
    C.all_split_leaf_goals ();
    Gnat_objectives.clear ()
 
@@ -168,8 +157,9 @@ let report_messages c obj =
   let s = c.Controller_itp.controller_session in
   let result =
     if C.session_proved_status c obj then
-      let (stats, stat_tr) = C.Save_VCs.extract_stats c obj in
-      Gnat_report.Proved (stats, stat_tr)
+      let (stats, stat_checker, stat_trivial) =
+        C.Save_VCs.extract_stats c obj in
+      Gnat_report.Proved (stats, stat_checker, stat_trivial)
     else
       let unproved_pa = C.session_find_unproved_pa c obj in
       let unproved_goal =
@@ -229,7 +219,7 @@ let ending c () =
 let normal_handle_one_subp c subp =
    C.init_subp_vcs c subp;
    let s = c.Controller_itp.controller_session in
-   Gnat_objectives.iter_leaf_goals s subp (register_goal s)
+   Gnat_objectives.iter_leaf_goals s subp (register_goal c)
 
 (* save session on interrupt initiated by the user *)
 let save_session_and_exit c signum =

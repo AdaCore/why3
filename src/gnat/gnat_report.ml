@@ -11,7 +11,7 @@ type prover_stat =
 type stats = prover_stat Whyconf.Hprover.t
 
 type result_info =
-  | Proved of stats * int
+  | Proved of stats * int * int
   | Not_Proved of
        Task.task option *
        Model_parser.model option *
@@ -21,7 +21,8 @@ type result_info =
 type msg =
   { result        : bool;
     stats         : stats option;
-    stats_tr      : int;
+    stats_checker : int;
+    stats_trivial : int;
     check_tree    : Json_base.json;
     extra_info    : int option;
     tracefile     : string;
@@ -59,7 +60,8 @@ let adapt_stats statsopt =
 let register check check_tree result =
   let valid, extra_info, stats, tracefile, model, manual =
     match result with
-    | Proved (stats, stats_tr) -> true, None, Some (stats, stats_tr), "", None, None
+    | Proved (stats, stats_checker, stat_trivial) ->
+        true, None, Some (stats, stats_checker, stat_trivial), "", None, None
     | Not_Proved (task, model, tracefile, manual) ->
         let extra_info =
           match task with
@@ -69,11 +71,15 @@ let register check check_tree result =
   in
   if (Gnat_expl.HCheck.mem msg_set check) then assert false
   else begin
+    let stats_g = Opt.map (fun x -> let (stats, _, _) = x in stats) stats in
+    let stats_checker = Opt.map (fun x -> let (_, sc, _) = x in sc) stats in
+    let stats_trivial = Opt.map (fun x -> let (_, _, st) = x in st) stats in
     let msg =
     { result        = valid;
       extra_info    = extra_info;
-      stats         = adapt_stats (Opt.map fst stats);
-      stats_tr      = Opt.get_def 0 (Opt.map snd stats);
+      stats         = adapt_stats stats_g;
+      stats_checker = Opt.get_def 0 stats_checker;
+      stats_trivial = Opt.get_def 0 stats_trivial;
       check_tree    = check_tree;
       tracefile     = tracefile;
       cntexmp_model = model;
@@ -129,16 +135,21 @@ let print_prover_stats fmt stat =
    (print_json_field "max_steps" int) stat.max_steps
    (print_json_field "max_time" standard_float) stat.max_time
 
-let print_stats fmt (stats, stat_tr) =
+let print_stats fmt (stats, stat_checker, stat_trivial) =
   (* Print the stats for goal solved by transformations as a fake prover. *)
-  let fake_prover_tr =
+  let fake_prover_ch =
     Whyconf.{prover_name = "Checker"; prover_version = ""; prover_altern = ""}
+  in
+  let fake_prover_tr =
+    Whyconf.{prover_name = "Trivial"; prover_version = ""; prover_altern = ""}
   in
   match stats with
   | None -> ()
   | Some s ->
-    if stat_tr <> 0 then
-      Whyconf.Hprover.add s fake_prover_tr {count = stat_tr; max_steps = 0; max_time = 0.0};
+    if stat_checker <> 0 then
+      Whyconf.Hprover.add s fake_prover_ch {count = stat_checker; max_steps = 0; max_time = 0.0};
+    if stat_trivial <> 0 then
+      Whyconf.Hprover.add s fake_prover_tr {count = stat_trivial; max_steps = 0; max_time = 0.0};
     let kv_list = Whyconf.Hprover.fold (fun k v acc -> (k,v)::acc) s [] in
     let get_name pr = pr.Whyconf.prover_name in
     Format.fprintf fmt ", ";
@@ -156,7 +167,7 @@ let print_json_msg fmt (check, m) =
     (print_json_field "result" bool) m.result
     (print_json_field "extra_info" int) (get_info m.extra_info)
     (print_json_field "check_tree" Json_base.print_json) m.check_tree
-    print_stats (m.stats, m.stats_tr)
+    print_stats (m.stats, m.stats_checker, m.stats_trivial)
     print_trace_file m.tracefile
     print_cntexmp_model m.cntexmp_model
     print_manual_proof_info m.manual_proof

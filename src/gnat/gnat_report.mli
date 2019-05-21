@@ -98,9 +98,10 @@ type prover_stat =
 type stats = prover_stat Whyconf.Hprover.t
 
 type result_info =
-  | Proved of stats * int           (* extra information about the run. The
-                                       integer is the number of subgoals proven
-                                       by transformations *)
+  | Proved of stats * int * int
+  (* extra information about the run. The first integer is the number of
+     subgoals proven by transformations (except trivial_true).
+     The second integer is the number of subgoals proven by trivial_true. *)
   | Not_Proved of
        Task.task option *              (* task of the last goal *)
        Model_parser.model option *     (* counterexample model *)

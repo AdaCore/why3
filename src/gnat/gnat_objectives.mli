@@ -128,6 +128,9 @@ end
 module Make (S: Controller_itp.Scheduler) : sig
 
 
+val apply_trivial: Controller_itp.controller -> goal_id -> unit
+(* Apply the transformation that recognize if a goal ends by true. If it ends
+   by true, add this to the session *)
 
 val register_result : Controller_itp.controller -> goal_id -> bool -> objective * status
 (* Register the result of a prover for a given goal_id, and return the updated
@@ -165,7 +168,11 @@ module Save_VCs : sig
    (* Provide saving of VCs, traces *)
 
    val extract_stats :
-     Controller_itp.controller -> objective -> Gnat_report.stats * int
+     Controller_itp.controller -> objective -> Gnat_report.stats * int * int
+   (* The second field of the return tuple is the number of goal proved by a
+      transformation that is not trivial_true (Checker prover).
+      The third field of the return tuple is the number of goals proved by
+      exactly trivial_true (Trivial prover).*)
 
    val save_trace : Session_itp.session -> goal_id -> (string * Gnat_loc.S.t)
    (* compute the trace from the goal and save it to a file; return the trace
@@ -207,7 +214,6 @@ val session_find_unproved_pa :
 val session_find_unproved_goal :
     Controller_itp.controller -> objective -> Session_itp.proofNodeID option
 (* find the first unproved goal in a session (in subforest of objective) *)
-
 
 
 val replay : Controller_itp.controller -> unit
