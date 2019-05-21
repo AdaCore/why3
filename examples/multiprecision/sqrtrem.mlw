@@ -1069,7 +1069,7 @@ module Sqrt
       assert { value tp tn + power radix tn * rl = vr + 2 * vs0 * vs };
       value_concat tp 1 tn;
       let ghost otp = pure { tp } in
-      let ref cc = wmpn_submul_1 tp s0 s00 1 in
+      let ref cc = wmpn_submul_1 tp s0 1 s00 in
       value_sub_frame (pelts tp) (pelts otp) (offset tp + 1)
                                   (offset tp + int32'int tn);
       value_concat tp 1 tn;

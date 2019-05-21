@@ -12,3 +12,69 @@ uint64_t rsa_estimate (uint64_t a) {
 "
 
 end
+
+module mach.int.UInt64GMP
+
+  prelude "
+typedef unsigned __int128 uint128_t;
+
+struct __mul64_double_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
+{
+  uint128_t z = (uint128_t)x * (uint128_t)y;
+  struct __mul64_double_result result = { z, z >> 64 };
+  return result;
+}
+
+uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
+{
+  return (((uint128_t)uh << 64) | ul) / d;
+}
+"
+
+  interface "
+typedef unsigned __int128 uint128_t;
+
+struct __mul64_double_result
+{ uint64_t __field_0;
+  uint64_t __field_1;
+};
+
+static inline struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
+{
+  uint128_t z = (uint128_t)x * (uint128_t)y;
+  struct __mul64_double_result result = { z, z >> 64 };
+  return result;
+}
+
+static inline uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
+{
+  return (((uint128_t)uh << 64) | ul) / d;
+}
+"
+
+(* "
+static struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
+{
+  struct __mul64_double_result result;
+  umul_ppmm(result.__field_1,result.__field_0,x,y);
+  return result;
+}
+
+static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
+{
+  uint64_t q;
+  uint64_t _dummy __attribute__((unused));
+  udiv_qrnnd(q,_dummy,uh,ul,d);
+  return q;
+}
+" *)
+
+  syntax val mul_double "mul64_double"
+  syntax val div2by1 "div64_2by1"
+
+end
