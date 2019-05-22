@@ -10,6 +10,7 @@
 (********************************************************************)
 
 let socket : Unix.file_descr option ref = ref None
+let socket_path : string option ref = ref None
 
 exception NotConnected
 exception AlreadyConnected
@@ -47,6 +48,14 @@ let client_connect ~fail socket_name =
                     (Printexc.to_string e) in
      raise (ConnectionError s)
 
+(* Remove internal socket at the end of execution *)
+let remove_socket () =
+  match !socket_path with
+  | None -> ()
+  | Some socket_path ->
+      if Sys.file_exists socket_path then
+        Sys.remove socket_path
+
 let client_disconnect () =
   match !socket with
   | None -> raise NotConnected
@@ -54,7 +63,8 @@ let client_disconnect () =
       socket := None;
       if Sys.os_type <> "Win32" then
         Unix.shutdown sock Unix.SHUTDOWN_ALL;
-      Unix.close sock
+      Unix.close sock;
+      remove_socket ()
 
 let send_request_string msg =
   match !socket with
@@ -136,6 +146,7 @@ let connect_internal () =
       "-j"; string_of_int !max_running_provers|]
     Unix.stdin Unix.stdout Unix.stderr
   in
+  socket_path := Some socket_name;
   Unix.chdir cwd;
   (* sleep before connecting, or the server will not be ready yet *)
   let rec try_connect n d =
