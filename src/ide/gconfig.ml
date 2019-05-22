@@ -270,6 +270,7 @@ let save_config t =
   let ide = set_int ide "max_boxes" t.max_boxes in
   let ide = set_bool ide "allow_source_editing" t.allow_source_editing in
   let ide = set_int ide "saving_policy" t.saving_policy in
+  let ide = set_bool ide "auto_next" t.auto_next in
   let ide = set_string ide "premise_color" t.premise_color in
   let ide = set_string ide "neg_premise_color" t.neg_premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
