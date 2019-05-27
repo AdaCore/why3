@@ -64,7 +64,7 @@ end
 
 module Ref
   syntax type     ref      "%1 ref"
-  syntax val contents "!%1" prec 1 0
+  syntax val contents "Pervasives.contents" prec 1 0
   syntax val      ref      "ref %1" prec 4 3
 end
 

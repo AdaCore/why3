@@ -97,6 +97,22 @@ module TestExtraction
   exception Empty (list int, int)
   exception Out_of_bounds int
 
+  let ref_f (y:int63) =
+    let ref x = 42 in
+    let ref z = 13 in
+    x <- y;
+    x <- z
+
+  let ref_g (r: ref int63) (c: int63) = {r with contents = c}
+
+  let ref_h (r : ref int63) = match r with {contents = c} -> c end
+
+  type r' = { x : int63; y : int63 }
+
+  let r_g (x: r') (c:int63) = { x with x = c }
+
+  let r_h (x: r') = match x with { x = a; y = b } -> a + b end
+
   (* exception are unary constructors *)
 (*
   let raise1 () =
