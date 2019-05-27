@@ -35,10 +35,6 @@ build: [
 
 install: [make "install-coq"]
 
-remove: ["rm" "-rf" "%{why3:lib}%/coq"]
-
-flags: [ light-uninstall ]
-
 depends: [
   "ocaml" {>= "4.02.3"}
   "ocamlfind" {build}

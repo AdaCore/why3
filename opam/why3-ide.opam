@@ -35,13 +35,6 @@ build: [
 
 install: [make "install-ide"]
 
-remove: [
-  ["rm" "-f" "%{why3:lib}%/commands/why3ide"]
-  ["rm" "-rf" "%{why3:share}%/images"]
-]
-
-flags: [ light-uninstall ]
-
 depends: [
   "ocaml" {>= "4.02.3"}
   "ocamlfind" {build}
