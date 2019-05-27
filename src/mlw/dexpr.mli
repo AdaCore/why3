@@ -55,6 +55,10 @@ type ghost = bool
 
 type dbinder = preid option * ghost * dity
 
+val dummy_var_attr : Ident.attribute
+(* pvsymbols created from dbinders with a None ident are dummy variables,
+   they are decorated with this attribute. *)
+
 (** Specifications *)
 
 exception UnboundLabel of string

@@ -923,8 +923,11 @@ let dexpr ?loc node =
 
 (** Binders *)
 
+let dummy_var_attr = create_attribute "__dummy__"
+
 let binders ghost bl =
   let sn = ref Sstr.empty in
+  let dummy = Sattr.singleton dummy_var_attr in
   let binder (id, gh, dity) =
     let id = match id with
       | Some ({pre_name = n} as id) ->
@@ -932,7 +935,7 @@ let binders ghost bl =
             | Some loc -> Loc.Located (loc, Dterm.DuplicateVar n)
             | None -> Dterm.DuplicateVar n in
           sn := Sstr.add_new exn n !sn; id
-      | None -> id_fresh "_" in
+      | None -> id_fresh ~attrs:dummy "_" in
     create_pvsymbol id ~ghost:(ghost || gh) (ity_of_dity dity) in
   List.map binder bl
 
