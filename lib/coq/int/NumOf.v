@@ -54,8 +54,8 @@ split ; intros h1.
   rewrite <- Z2Nat.inj_pred.
   simpl numof_aux.
   rewrite Z2Nat.id by omega.
-  replace (a + Zpred (b - a))%Z with (b - 1)%Z by (unfold Zpred ; ring).
-  replace (Zpred (b - a)) with (b - 1 - a)%Z by (unfold Zpred ; ring).
+  replace (a + Z.pred (b - a))%Z with (b - 1)%Z by (unfold Z.pred ; ring).
+  replace (Z.pred (b - a)) with (b - 1 - a)%Z by (unfold Z.pred ; ring).
   split ; intros h2.
   rewrite h2.
   apply Zplus_comm.

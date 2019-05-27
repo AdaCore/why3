@@ -44,7 +44,7 @@ rewrite (Z2Nat.inj_sub _ 1) by easy.
 destruct (u - l)%Z ; try easy.
 simpl.
 assert (exists n, Pos.to_nat p = S n) as [n ->].
-  exists (Z.to_nat (Zpred (Zpos p))).
+  exists (Z.to_nat (Z.pred (Zpos p))).
   rewrite Z2Nat.inj_pred.
   apply (S_pred _ O).
   apply Pos2Nat.is_pos.

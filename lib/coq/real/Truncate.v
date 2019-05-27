@@ -18,7 +18,7 @@ Require real.Real.
 Require real.FromInt.
 
 Require Import Flocq.Core.Core.
-Require Import Fourier.
+Require Import Lra.
 
 (* Why3 goal *)
 Notation truncate := Ztrunc.
@@ -55,12 +55,12 @@ Proof.
   split;[|apply Zceil_ub].
   case (Req_dec (IZR (Zfloor x)) x); intro.
   rewrite <-H, Zceil_IZR, H, minus_IZR; simpl.
-  fourier.
+  lra.
   rewrite (Zceil_floor_neq _ H).
   rewrite minus_IZR, plus_IZR; simpl.
   pose proof (Zfloor_lb x).
   destruct (Rle_lt_or_eq_dec _ _ H0); try easy.
-  fourier.
+  lra.
 Qed.
 
 (* Why3 goal *)
@@ -73,15 +73,15 @@ Proof.
   destruct (Rle_lt_dec x 0).
   + rewrite Ztrunc_ceil; auto.
     destruct (Req_dec (IZR (Zfloor x)) x).
-    rewrite <-H at 2 3; rewrite Zceil_IZR, H; split; fourier.
+    rewrite <-H at 2 3; rewrite Zceil_IZR, H; split; lra.
     rewrite Zceil_floor_neq; auto.
     pose proof (Zfloor_lb x);
       pose proof (Zfloor_ub x).
-    rewrite plus_IZR; split; fourier.
-  + rewrite Ztrunc_floor by fourier.
+    rewrite plus_IZR; split; lra.
+  + rewrite Ztrunc_floor by lra.
     pose proof (Zfloor_lb x);
       pose proof (Zfloor_ub x).
-    split; fourier.
+    split; lra.
 Qed.
 
 (* Why3 goal *)
@@ -101,7 +101,7 @@ Proof.
   destruct (Rle_lt_dec x 0).
   + rewrite Ztrunc_ceil; auto.
     apply Zceil_glb; assumption.
-  + rewrite Ztrunc_floor by fourier.
+  + rewrite Ztrunc_floor by lra.
     apply le_IZR.
     apply Rle_trans with (r2:=x);[apply Zfloor_lb|assumption].
 Qed.
@@ -116,7 +116,7 @@ Proof.
   + rewrite Ztrunc_ceil; auto.
     apply le_IZR.
     apply Rle_trans with (r2:=x);[assumption|apply Zceil_ub].
-  + rewrite Ztrunc_floor by fourier.
+  + rewrite Ztrunc_floor by lra.
     apply Zfloor_lub; assumption.
 Qed.
 
@@ -152,16 +152,16 @@ Proof.
   apply Zfloor_ub.
 Qed.
 
-Lemma ceil_lb: forall x, ((IZR (ceil x) - 1) < x).
+Lemma ceil_lb: forall x, ((IZR (ceil x) - 1) < x)%R.
 Proof.
   intro.
   case (Req_dec (IZR (Zfloor x)) x); intro.
-  rewrite <-H, Zceil_IZR, H; simpl; fourier.
+  rewrite <-H, Zceil_IZR, H; simpl; lra.
   rewrite (Zceil_floor_neq _ H).
   rewrite plus_IZR; simpl.
   pose proof (Zfloor_lb x).
   destruct (Rle_lt_or_eq_dec _ _ H0); try easy.
-  fourier.
+  lra.
 Qed.
 
 (* Why3 goal *)
