@@ -70,8 +70,7 @@
 * next commit: add `+git` to the version in file `Version`
 
 * prepare the OPAM package
-  - update `why3{,-ide,-coq}.opam/descr` if necessary
-  - update `why3{,-ide,-coq}.opam/opam` with correct dependencies on external packages
+  - update `opam/why3{,-ide,-coq}.opam` with correct dependencies on external packages
   - clone https://github.com/ocaml/opam-repository if not already done:
     ```
     git clone git@github.com:.../opam-repository.git
@@ -87,8 +86,8 @@
     ```
   - create version directories:
     - `mkdir packages/why3/why3.$VERSION packages/why3-coq/why3-coq.$VERSION packages/why3-ide/why3-ide.$VERSION`
-    - copy the opam files from the directories of the previous release (Opam 2.0 format)
-  - update `why3{-ide,-coq}.$VERSION/opam` with the dependency on why3
+    - copy the `opam` files from the directories of the previous release
+    - reconcile with the changes from Why3's repository
   - url and checksum of `why3.tar.gz`:
     - `md5sum .../distrib/why3-$VERSION.tar.gz`
     - update the `url` section of all three opam files

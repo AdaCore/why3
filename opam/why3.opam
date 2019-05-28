@@ -39,15 +39,6 @@ install: [
   [make "DOCDIR=%{_:doc}%" "install-doc"] {with-doc}
 ]
 
-remove: [
-  ["rm" "%{_:bin}%/why3"]
-  ["rm" "-r" "%{_:lib}%"]
-  ["rm" "-r" "%{_:share}%"]
-  ["rm" "-r" "%{_:doc}%"] {with-doc}
-]
-
-flags: [ light-uninstall ]
-
 depends: [
   "ocaml" {>= "4.02.3"}
   "ocamlfind" {build}
