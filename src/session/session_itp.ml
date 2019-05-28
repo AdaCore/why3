@@ -1457,26 +1457,27 @@ let load_session (dir : string) =
 module Goal_Shape = struct
   type 'a t = proofNodeID * session
   let checksum (id,s) = Some (Hpn.find s.shapes.session_sum_table id)
-  let shape (id,s)    = Hpn.find s.shapes.session_shape_table id
+  let shape (id,s)    =
+    (Hpn.find s.shapes.session_shape_table id, Termcode.Gshape.empty_bshape)
   let name (id,s)     = (get_proofNode s id).proofn_name
 end
 
 module OldAssoGoals = Termcode.Pairing(Goal_Shape)(Goal_Shape)
 
-(* TODO using this should yield exactly the same shape as before *)
-module Goal_Int_Shape = struct
+module Goal_Bound_Shape = struct
 
   type 'a t = proofNodeID * session
 
   let checksum (id,s) = Some (Hpn.find s.shapes.session_sum_table id)
   let shape (id,s) =
     let li = Hpn.find s.shapes.session_bound_shape_table id in
-    Termcode.Gshape.goal_and_expl_shapes s.shapes.session_global_shapes li
+    (Termcode.Gshape.goal_and_expl_shapes s.shapes.session_global_shapes li, li)
   let name (id,s) = (get_proofNode s id).proofn_name
 
 end
 
-module IntAssoGoals = Termcode.Pairing(Goal_Int_Shape)(Goal_Int_Shape)
+
+module BoundAssoGoals = Termcode.Pairing(Goal_Bound_Shape)(Goal_Bound_Shape)
 
 let found_obsolete = ref false
 let found_detached = ref false
@@ -1500,6 +1501,7 @@ let rec save_detached_goal old_s s parent detached_goal_id id =
   List.iter (save_detached_trans old_s s id) detached_goal.proofn_transformations;
   let new_trans = (get_proofNode s id) in
   new_trans.proofn_transformations <- List.rev new_trans.proofn_transformations
+
 
 and save_detached_goals old_s detached_goals_id s parent =
   List.map
@@ -1573,6 +1575,7 @@ let apply_trans_to_goal ~allow_no_effect s env name args id =
      raise NoProgress
   | _ -> subtasks
 
+
 let add_registered_transformation s env old_tr goal_id =
   let goal = get_proofNode s goal_id in
   try
@@ -1634,7 +1637,7 @@ and merge_trans ~shape_version env old_s new_s new_goal_id old_tr_id =
           OldAssoGoals.associate ~use_shapes:false old_subtasks new_subtasks
       | Some shape_version ->
           if Termcode.is_bound_shape_version shape_version then
-            IntAssoGoals.associate ~use_shapes:true old_subtasks new_subtasks
+            BoundAssoGoals.associate ~use_shapes:true old_subtasks new_subtasks
           else
             OldAssoGoals.associate ~use_shapes:true old_subtasks new_subtasks
     in
@@ -1667,6 +1670,7 @@ and merge_trans ~shape_version env old_s new_s new_goal_id old_tr_id =
     (* Printexc.print_backtrace stderr; (* Will appear with stack_trace *) *)
     Warning.emit "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
     exit 2
+
 
 let merge_theory ~shape_version env old_s old_th s th : unit =
   let get_goal_name goal_node =
@@ -1717,7 +1721,7 @@ let merge_theory ~shape_version env old_s old_th s th : unit =
         OldAssoGoals.associate ~use_shapes:false detached_goals !new_goals
     | Some shape_version ->
         if Termcode.is_bound_shape_version shape_version then
-          IntAssoGoals.associate ~use_shapes:true detached_goals !new_goals
+          BoundAssoGoals.associate ~use_shapes:true detached_goals !new_goals
         else
           OldAssoGoals.associate ~use_shapes:true detached_goals !new_goals
   in
@@ -1904,6 +1908,7 @@ let merge_files ~shape_version env (ses:session) (old_ses : session) =
         ()
     end;
   (errors,!found_obsolete,!found_detached)
+
 
 (************************)
 (* saving state on disk *)
@@ -2173,6 +2178,7 @@ let save fname shfname session =
   fprintf fmt "@.";
   close_out ch;
   Compress.Compress_z.close_out chsh
+
 
 let save_session (s : session) =
   let uniformize_shape () =

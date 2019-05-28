@@ -587,6 +587,8 @@ module Gshape = struct
     else
       assert false
 
+  let empty_bshape = []
+
 end
 
 (*
@@ -950,7 +952,7 @@ let task_checksum ?(version=current_shape_version) t =
 module type S = sig
   type 'a t
   val checksum : 'a t -> checksum option
-  val shape    : 'a t -> string
+  val shape    : 'a t -> string * (int list)
   val name     : 'a t -> Ident.ident
 end
 
@@ -960,6 +962,26 @@ module Pairing (Old: S)(New: S) = struct
     if String.length s1 <= n || String.length s2 <= n then n
     else if s1.[n] = s2.[n] then lcp (n+1) s1 s2 else n
   let lcp = lcp 0
+
+  let rec count_same_sorted n l1 l2 =
+    match l1, l2 with
+    | hd1 :: tl1, hd2 :: _ when hd1 < hd2 ->
+        count_same_sorted n tl1 l2
+    | hd1 :: _, hd2 :: tl2 when hd1 > hd2 ->
+        count_same_sorted n l1 tl2
+    | hd1 :: tl1, hd2 :: tl2 when hd1 = hd2 ->
+        count_same_sorted (n + 1) tl1 tl2
+    | _ -> n
+
+  let count_common sl1 sl2 =
+    (* The lists are sorted in mk_node *)
+    count_same_sorted 0 sl1 sl2
+
+  (* An implicit invariant when comparing lists is that the session share part
+     of their global_shape (int -> shape) because this global value is copied
+     from old session to new session at the start of the merge process *)
+  let lcp_list (sh1, sl1) (sh2, sl2) =
+    (lcp sh1 sh2, count_common sl1 sl2)
 
   open Ident
 
@@ -974,7 +996,7 @@ module Pairing (Old: S)(New: S) = struct
 
   type node = {
     mutable  prev: node;
-            shape: string;
+            shape: string * (int list);
               elt: goal_index;
     mutable valid: bool;
     mutable  next: node;
@@ -982,8 +1004,14 @@ module Pairing (Old: S)(New: S) = struct
 
   let mk_node table g =
     let s = match g with
-      | Old g -> Old.shape table.table_old.(g)
-      | New g -> New.shape table.table_new.(g)
+      | Old g ->
+          let (sh, l) = Old.shape table.table_old.(g) in
+          (* Sanitazing: sort the lists only once *)
+          (sh, List.sort Pervasives.compare l)
+      | New g ->
+          let (sh, l) = New.shape table.table_new.(g) in
+          (* Sanitazing: sort the lists only once *)
+          (sh, List.sort Pervasives.compare l)
     in
     let rec n = { prev = n; shape = s; elt = g; next = n; valid = true }
     in n
@@ -1061,15 +1089,15 @@ module Pairing (Old: S)(New: S) = struct
     build_list allgoals;
     if allgoals <> [] then begin
       let module E = struct
-        let dummy = let n = List.hd allgoals (* safe *) in 0, (n, n)
-        type t = int * (node * node)
+        let dummy = let n = List.hd allgoals (* safe *) in (0, 0), (n, n)
+        type t = (int * int) * (node * node)
         let compare (v1, _) (v2, _) = Pervasives.compare v2 v1
       end in
       let module PQ = Pqueue.Make(E) in
       let pq = PQ.create () in
       let add x y = match x.elt, y.elt with
         | Old _, New _ | New _, Old _ ->
-            PQ.insert (lcp x.shape y.shape, (x, y)) pq
+            PQ.insert (lcp_list x.shape y.shape, (x, y)) pq
         | Old _, Old _ | New _, New _ -> () in
       iter_pairs add allgoals;
       (* FIXME: exit earlier, as soon as we get min(old,new) pairs *)
