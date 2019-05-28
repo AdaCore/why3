@@ -81,6 +81,7 @@ module Gshape : sig
   val t_bound_shape_task:
     gshape -> version:int -> expl:string -> Task.task -> bound_shape
 
+  val empty_bshape: bound_shape
 end
 
 (** Checksums *)
@@ -101,7 +102,7 @@ val task_checksum : ?version:int -> Task.task -> checksum
 module type S = sig
   type 'a t
   val checksum : 'a t -> checksum option
-  val shape    : 'a t -> shape
+  val shape    : 'a t -> shape * bound_shape
   val name     : 'a t -> Ident.ident
 end
 
