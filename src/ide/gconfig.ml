@@ -730,20 +730,33 @@ let general_settings (c : t) (notebook:GPack.notebook) =
       (fun () -> c.session_cntexample <- not c.session_cntexample)
   in
 *)
+  (* IDE options *)
+  let ide_options_frame =
+    GBin.frame ~label:"IDE options" ~packing:page_pack ()
+  in
+  let ide_options_box =
+    GPack.button_box
+      `VERTICAL ~border_width:5 ~spacing:5
+      ~packing:ide_options_frame#add ()
+  in
+  let ide_options_box_pack =
+    ide_options_box#pack ?from:None ?expand:None ?fill:None ?padding:None
+  in
   (* source editing allowed *)
-  let source_editing_check = GButton.check_button ~label:"allow editing source files"
-    ~packing:vb#add ()
-    ~active:c.allow_source_editing
+  let source_editing_check = GButton.check_button
+    ~label:"allow editing source files"
+    ~packing:ide_options_box_pack
+    ~active:c.allow_source_editing ()
   in
   let (_: GtkSignal.id) =
     source_editing_check#connect#toggled ~callback:
       (fun () -> c.allow_source_editing <- not c.allow_source_editing)
   in
-  (* Auto jump to next unproved goals *)
+  (* jump to the next unproved goal *)
   let auto_next_check = GButton.check_button
-      ~label:"Allow auto jumping to next unproved goal"
-      ~packing:vb#add ()
-      ~active:c.auto_next
+      ~label:"jump to the next unproved goal"
+      ~packing:ide_options_box_pack
+      ~active:c.auto_next ()
   in
   let (_: GtkSignal.id) =
     auto_next_check#connect#toggled ~callback:
