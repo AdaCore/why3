@@ -130,7 +130,7 @@ Lemma seqZ_rev: forall len x l, (l <= x < l + Z.of_nat len)%Z -> List.In x (seqZ
 Proof.
 induction len; intros; simpl in *.
 + omega.
-+ destruct (Z_eq_dec l x); eauto. 
++ destruct (Z.eq_dec l x); eauto.
   right. eapply IHlen; eauto. zify; omega.
 Qed.
 

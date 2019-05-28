@@ -132,7 +132,7 @@ Qed.
 Lemma Refl : forall (x:Numbers.BinNums.Z), (x <= x)%Z.
 Proof.
 intros x.
-apply Zle_refl.
+apply Z.le_refl.
 Qed.
 
 (* Why3 goal *)
@@ -140,7 +140,7 @@ Lemma Trans :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (z:Numbers.BinNums.Z),
   (x <= y)%Z -> (y <= z)%Z -> (x <= z)%Z.
 Proof.
-exact Zle_trans.
+exact Z.le_trans.
 Qed.
 
 (* Why3 goal *)

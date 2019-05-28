@@ -26,8 +26,8 @@ Lemma min_def :
 Proof.
 intros x y.
 split ; intros H.
-now apply Zmin_l.
-apply Zmin_r.
+now apply Z.min_l.
+apply Z.min_r.
 omega.
 Qed.
 
@@ -42,8 +42,8 @@ Lemma max_def :
 Proof.
 intros x y.
 split ; intros H.
-now apply Zmax_r.
-apply Zmax_l.
+now apply Z.max_r.
+apply Z.max_l.
 omega.
 Qed.
 
@@ -51,28 +51,28 @@ Qed.
 Lemma Min_r :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), (y <= x)%Z ->
   ((ZArith.BinInt.Z.min x y) = y).
-exact Zmin_r.
+exact Z.min_r.
 Qed.
 
 (* Why3 goal *)
 Lemma Max_l :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), (y <= x)%Z ->
   ((ZArith.BinInt.Z.max x y) = x).
-exact Zmax_l.
+exact Z.max_l.
 Qed.
 
 (* Why3 goal *)
 Lemma Min_comm :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((ZArith.BinInt.Z.min x y) = (ZArith.BinInt.Z.min y x)).
-exact Zmin_comm.
+exact Z.min_comm.
 Qed.
 
 (* Why3 goal *)
 Lemma Max_comm :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((ZArith.BinInt.Z.max x y) = (ZArith.BinInt.Z.max y x)).
-exact Zmax_comm.
+exact Z.max_comm.
 Qed.
 
 (* Why3 goal *)
@@ -82,7 +82,7 @@ Lemma Min_assoc :
    (ZArith.BinInt.Z.min x (ZArith.BinInt.Z.min y z))).
 Proof.
 intros x y z.
-apply eq_sym, Zmin_assoc.
+apply eq_sym, Z.min_assoc.
 Qed.
 
 (* Why3 goal *)
@@ -92,6 +92,6 @@ Lemma Max_assoc :
    (ZArith.BinInt.Z.max x (ZArith.BinInt.Z.max y z))).
 Proof.
 intros x y z.
-apply eq_sym, Zmax_assoc.
+apply eq_sym, Z.max_assoc.
 Qed.
 
