@@ -297,6 +297,19 @@ module Args : sig
 
 end
 
+module NewArgs : sig
+
+  val initialize :
+    ?extra_help:string ->
+    Getopt.opt list ->
+    (string -> unit) -> string ->
+    config * config * Env.env
+
+  val exit_with_usage :
+    ?exit_code:int -> ?extra_help:string ->
+    Getopt.opt list -> string -> 'a
+
+end
 
 (** Loading drivers with relative names *)
 

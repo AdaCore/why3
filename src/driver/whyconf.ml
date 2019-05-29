@@ -1020,7 +1020,52 @@ module Args = struct
     exit exit_code
 end
 
+module NewArgs = struct
+  let opt_config = ref None
+  let opt_extra = ref []
+  let opt_loadpath = ref []
 
+  let common_options =
+    let open Getopt in
+    [ Key ('C', "config"), Hnd1 (AString, fun s -> opt_config := Some s),
+      "<file> read configuration from <file>";
+      KLong "extra-config", Hnd1 (AString, fun s -> opt_extra := !opt_extra @ [s]),
+      "<file> read additional configuration from <file>";
+      Key ('L', "library"), Hnd1 (AString, fun s -> opt_loadpath := s :: !opt_loadpath),
+      "<dir> add <dir> to the library search path";
+    Debug.NewArgs.desc_debug;
+    Debug.NewArgs.desc_debug_all;
+    Debug.NewArgs.desc_debug_list; ]
+
+  let do_usage options header footer =
+    Printf.printf "%s\n%s" header (Getopt.format options);
+    if footer <> "" then Printf.printf "\n%s" footer;
+    Printf.printf "%!"
+
+  let all_options options header footer =
+    let options = common_options @ options in
+    let open Getopt in
+    (Key ('h', "help"), Hnd0 (fun () -> do_usage options header footer; exit 0),
+     " display this help and exit") ::
+      options
+
+  let initialize ?(extra_help="") options default usage =
+    let options = all_options options usage extra_help in
+    Getopt.parse_all options default Sys.argv;
+    let base_config = read_config !opt_config in
+    let config = List.fold_left merge_config base_config !opt_extra in
+    let main = get_main config in
+    load_plugins main;
+    Debug.NewArgs.set_flags_selected ();
+    if Debug.NewArgs.option_list () then exit 0;
+    let lp = List.rev_append !opt_loadpath (loadpath main) in
+    config, base_config, Env.create_env lp
+
+  let exit_with_usage ?(exit_code=1) ?(extra_help="") options usage =
+    let options = common_options @ options in
+    do_usage options usage extra_help;
+    exit exit_code
+end
 
 (** Loading drivers with relative names *)
 

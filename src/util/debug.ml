@@ -148,6 +148,62 @@ module Args = struct
     if test_flag stack_trace then Printexc.record_backtrace true
 end
 
+module NewArgs = struct
+  open Getopt
+
+  type spec = key * handler * doc
+
+  let desc_debug_list, option_list =
+    let opt_list_flags = ref false in
+    let desc =
+      KLong "list-debug-flags", Hnd0 (fun () -> opt_list_flags := true),
+      " list known debug flags" in
+    let list () =
+      if !opt_list_flags then begin
+        let list =
+          Hashtbl.fold (fun s (_,info,desc) acc -> (s,info,desc)::acc)
+            flag_table [] in
+        let print fmt (p,info,desc) =
+          Format.fprintf fmt "@[%s%s@\n  @[%a@]@]"
+            p (if info then " *" else "")
+            Pp.formatted desc
+        in
+        Format.eprintf "@[<hov 2>Known debug flags \
+            ('*' marks the flags selected by --debug-all):@\n%a@]@."
+          (Pp.print_list Pp.newline print)
+          (List.sort Pervasives.compare list);
+      end;
+      !opt_list_flags in
+    desc,list
+
+  let opt_list_flags = Queue.create ()
+
+  let add_flag s = Queue.add s opt_list_flags
+
+  let desc_shortcut flag option desc =
+    let set_flag () = add_flag flag in
+    let desc = Printf.sprintf "%s (same as --debug=%s)" desc flag in
+    (option, Hnd0 set_flag, desc)
+
+  let desc_debug =
+    KLong "debug", Hnd1 (AString, add_flag),
+    "<flag> set a debug flag"
+
+  let opt_debug_all = ref false
+
+  let desc_debug_all =
+    KLong "debug-all", Hnd0 (fun () -> opt_debug_all := true),
+    " set all debug flags that do not change Why3 behavior"
+
+  let set_flags_selected () =
+    if !opt_debug_all then
+      List.iter
+        (fun (s,f,_,_) -> if is_info_flag s then set_flag f)
+        (list_flags ());
+    Queue.iter (fun flag -> let flag = lookup_flag flag in set_flag flag)
+      opt_list_flags;
+    if test_flag stack_trace then Printexc.record_backtrace true
+end
 
 (** Stats *)
 let stats = register_info_flag "stats"

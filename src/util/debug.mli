@@ -81,6 +81,31 @@ module Args : sig
       prevent errors due to unknown plugin flags. *)
 end
 
+(** Command line arguments *)
+module NewArgs : sig
+  type spec = Getopt.key * Getopt.handler * Getopt.doc
+
+  val desc_debug_list : spec
+  (** Option for printing the list of debug flags *)
+
+  val option_list : unit -> bool
+  (** Print the list of flags if requested (in this case return [true]).
+      You should run this function after the plugins have been loaded. *)
+
+  val desc_debug_all : spec
+  (** Option for setting all info flags *)
+
+  val desc_debug : spec
+  (** Option for specifying a debug flag to set *)
+
+  val desc_shortcut : string -> Getopt.key -> Getopt.doc -> spec
+  (** Option for setting a specific flag *)
+
+  val set_flags_selected : unit -> unit
+  (** Set the flags selected by debug_all, debug or a shortcut.
+      You should run this function after the plugins have been loaded. *)
+end
+
 val stats: flag
 type 'a stat
 
