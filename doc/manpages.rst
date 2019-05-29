@@ -740,11 +740,8 @@ displayed in the *Counterexample* tab of the bottom right window, this time inte
 with the code, as shown in :numref:`fig.ce_example0_p2`.
 
 
-.. %%Generation of the screenshots:
-.. %%Those commands follow the style of starting.tex. To execute them one needs to
-.. %%do make update-doc-png.
-.. %EXECUTE bin/why3 ide --batch "down;down;type cvc4;wait 2;down;snap -crop 1024x600+0+0 doc/images/ce_example0_p1.png" doc/cedoc.mlw
-.. %EXECUTE bin/why3 ide --batch "down;down;type cvc4;wait 2;down;type get-ce;wait 2;down;faketype get-ce;snap -crop 1024x600+0+0 doc/images/ce_example0_p2.png" doc/cedoc.mlw
+.. %EXECUTE bin/why3 ide --batch="down;down;type cvc4;wait 2;down;snap -crop 1024x600+0+0 doc/images/ce_example0_p1.png" doc/cedoc.mlw
+.. %EXECUTE bin/why3 ide --batch="down;down;type cvc4;wait 2;down;type get-ce;wait 2;down;faketype get-ce;snap -crop 1024x600+0+0 doc/images/ce_example0_p2.png" doc/cedoc.mlw
 
 .. _fig.ce_example0_p1:
 
