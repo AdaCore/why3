@@ -219,7 +219,7 @@ LIBGENERATED = src/util/config.ml \
 
 LIB_UTIL = config bigInt mlmpfr_wrapper util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl diffmap \
-	   hashcons wstdlib exn_printer \
+	   hashcons wstdlib exn_printer getopt \
 	   json_base json_parser json_lexer \
 	   debug loc lexlib print_tree \
 	   cmdline warning sysutil rc plugin bigInt number constant vector pqueue
@@ -2035,7 +2035,7 @@ endif
 .PHONY: apidoc apidot
 
 MODULESTODOC = \
-	util/util util/opt util/lists util/strings \
+	util/util util/opt util/lists util/strings util/getopt \
 	util/extmap util/extset util/exthtbl \
 	util/weakhtbl util/wstdlib util/rc util/debug \
 	util/loc util/pp util/bigInt util/number \
