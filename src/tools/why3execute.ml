@@ -14,7 +14,8 @@ open Why3
 open Wstdlib
 
 let usage_msg = sprintf
-  "Usage: %s [options] file module.ident..."
+  "Usage: %s [options] <file> <module>.<ident>...\n\
+   Run the interpreter on the given module symbols.\n"
   (Filename.basename Sys.argv.(0))
 
 let opt_file = ref None
@@ -39,24 +40,23 @@ let precision () =
 let opt_parser = ref None
 
 let option_list =
-  let real_spec = [Arg.Set_int real_emin; Arg.Set_int real_emax;
-                   Arg.Set_int real_prec] in
-  [
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-  "--real", Arg.Tuple real_spec,
-      " Takes 3 integers for the precision used in real computations \
-       [emin emax prec]. Example value for the precision of float32:\
-       -148 128 24";
+  let open Getopt in
+  [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
+    "<format> select input format (default: \"why\")";
+    KLong "real", Hnd1 (AString, fun s ->
+      let fail () = raise (GetoptFailure (sprintf "invalid --real argument '%s'" s)) in
+      match List.map int_of_string (Strings.split ',' s) with
+      | [i1;i2;i3] -> real_emin := i1; real_emax := i2; real_prec := i3
+      | _ -> fail ()
+      | exception Failure _ -> fail ()),
+    "<emin>,<emax>,<prec> set format used for real computations (e.g., -148,128,24 for float32)"
   ]
 
 let config, _, env =
-  Whyconf.Args.initialize option_list add_opt usage_msg
+  Whyconf.NewArgs.initialize option_list add_opt usage_msg
 
 let () =
-  if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
+  if !opt_file = None then Whyconf.NewArgs.exit_with_usage option_list usage_msg
 
 let do_input f =
   let format = !opt_parser in
