@@ -331,7 +331,7 @@ module mach.onetime.OneTime
 end
 
 module string.Char
-  syntax type char "Pervasives.char"
+  syntax type char "char"
   syntax val chr "Char.chr (Z.to_int %1)" prec 4 3
   syntax val code "Z.of_int (Char.code %1)" prec 4 3
   syntax val uppercase "Char.uppercase %1" prec 4 3
@@ -413,7 +413,7 @@ module mach.matrix.Matrix63
 
   syntax val rows     "Array.length %1" prec 4
   syntax val columns  "Array.length %1.(0)" prec 4 1
-  syntax val rows          "Array.length %1" prec 4 
+  syntax val rows          "Array.length %1" prec 4
   syntax val columns       "Array.length %1.(0)" prec 4 1
   syntax val get           "%1.(%2).(%3)" prec 2 1 18 18
   syntax val set           "%1.(%2).(%3) <- %4" prec 15 1 18 18 15
