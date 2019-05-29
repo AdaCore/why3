@@ -42,7 +42,7 @@ build/extracted: $(addsuffix .mlw, $(MLWFILES))
 	mkdir -p build
 	rm -f $@
 	$(WHY3) extract -D wmpn.drv -D c -L . --recursive --modular --interface -o build/ \
-	  --debug c_no_error_msgs wmpn.mlw
+	  --debug=c_no_error_msgs wmpn.mlw
 	touch $@
 
 build/sqrtinit.h: sqrtinit.ml

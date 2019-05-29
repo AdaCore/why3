@@ -17,8 +17,8 @@ open Compile
 open Theory
 
 let usage_msg = sprintf
-    "Usage: %s [options] -D <driver> [-o <dir|file>] \
-               [<file>.<Module>*.<symbol>?|-]"
+    "Usage: %s [options] -D <driver> [<file>.<Module>*.<symbol>?|-]\n\
+     Extract some WhyML code to the target language.\n"
     (Filename.basename Sys.argv.(0))
 
 type extract_target =
@@ -59,38 +59,32 @@ let add_opt_file x =
         end in
   Queue.push target opt_queue
 
-let option_list = [
-  "-", Arg.Unit (fun () -> add_opt_file "-"),
-  " read the input file from stdin";
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-  "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-  " same as -F";
-  "-D", Arg.String (fun s -> opt_driver := s::!opt_driver),
-  "<file> specify an extraction driver";
-  "--driver", Arg.String (fun s -> opt_driver := s::!opt_driver),
-  " same as -D";
-  "--recursive", Arg.Unit (fun () -> opt_rec_single := Recursive),
-  " recursively extract dependencies, including used modules";
-  "--recursive-deps", Arg.Unit (fun () -> opt_rec_single := RecursiveDeps),
-  " recursively extract all program dependencies";
-  "--flat", Arg.Unit (fun () -> opt_modu_flat := Flat),
-  " perform a flat extraction (default option)";
-  "--modular", Arg.Unit (fun () -> opt_modu_flat := Modular),
-  " perform a modular extraction";
-  "--interface", Arg.Unit (fun () -> opt_interface := true),
-  " also extract interface files (requires modular extraction)";
-  "-o", Arg.String (fun s -> opt_output := Some s),
-  "<file|dir> destination of extracted code";
-  "--output", Arg.String (fun s -> opt_output := Some s),
-  " same as -o" ]
+let option_list =
+  let open Getopt in
+  [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
+    "<format> select input format (default: \"why\")";
+    Key ('D', "driver"), Hnd1 (AString, fun s -> opt_driver := s::!opt_driver),
+    "<file> specify an extraction driver";
+    KLong "recursive", Hnd0 (fun () -> opt_rec_single := Recursive),
+    " recursively extract dependencies, including used\nmodules";
+    KLong "recursive-deps", Hnd0 (fun () -> opt_rec_single := RecursiveDeps),
+    " recursively extract all program dependencies";
+    KLong "flat", Hnd0 (fun () -> opt_modu_flat := Flat),
+    " perform a flat extraction (default)";
+    KLong "modular", Hnd0 (fun () -> opt_modu_flat := Modular),
+    " perform a modular extraction";
+    KLong "interface", Hnd0 (fun () -> opt_interface := true),
+    " also extract interface files (requires modular\nextraction)";
+    Key ('o', "output"), Hnd1 (AString, fun s -> opt_output := Some s),
+    "<file|dir> destination of extracted code";
+  ]
 
 let config, _, env =
-  Whyconf.Args.initialize option_list add_opt_file usage_msg
+  Whyconf.NewArgs.initialize option_list add_opt_file usage_msg
 
 let () =
   if Queue.is_empty opt_queue then begin
-    Whyconf.Args.exit_with_usage option_list usage_msg
+    Whyconf.NewArgs.exit_with_usage option_list usage_msg
   end
 
 let opt_modu_flat  = !opt_modu_flat
