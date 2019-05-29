@@ -2147,7 +2147,7 @@ stdlibdoc: $(STDLIBFILES) bin/why3doc.@OCAMLBEST@
 	sed -e "s/use Int/use int.Int/" stdlib/int.mlw > int.mlw
 	rm -f doc/stdlibdoc/style.css
 	WHY3CONFIG="" bin/why3doc.@OCAMLBEST@ $(LOCAL_STDLIB) \
-          -o doc/stdlibdoc --title "Why3 Standard Library" \
+          -o doc/stdlibdoc --title="Why3 Standard Library" \
 	  $(subst stdlib/int.mlw,int.mlw,$(STDLIBFILES))
 	rm int.mlw
 	cd doc/stdlibdoc; \
