@@ -17,6 +17,7 @@ type key =
 type _ arg =
   | AInt : int arg
   | AString : string arg
+  | ASymbol : string list -> string arg
 
 type handler =
   | Hnd0 of (unit -> unit)
@@ -84,6 +85,9 @@ let parse_kind key (type a) (k:a arg) (f:a -> unit) arg i =
   let s = String.sub arg i (String.length arg - i) in
   match k with
   | AString -> f s
+  | ASymbol l ->
+      if List.mem s l then f s
+      else raise (GetoptFailure (sprintf "invalid %s argument '%s'" key s))
   | AInt ->
     match int_of_string s with
     | i -> f i

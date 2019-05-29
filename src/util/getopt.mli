@@ -40,6 +40,7 @@ type key =
 type _ arg =
   | AInt : int arg
   | AString : string arg
+  | ASymbol : string list -> string arg
 
 type handler =
   | Hnd0 of (unit -> unit)
