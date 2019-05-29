@@ -129,34 +129,29 @@ let files : string Queue.t = Queue.create ()
 
 let opt_parser = ref None
 
-let spec = [
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-(*
-  "-f",
-   Arg.String (fun s -> input_files := s :: !input_files),
-   "<file> add file to the project (ignored if it is already there)";
-*)
-  Termcode.arg_extra_expl_prefix
-]
+let spec =
+  let open Getopt in
+  [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
+    "<format> select input format (default: \"why\")";
+    Termcode.opt_extra_expl_prefix;
+  ]
 
 let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]..."
+  "Usage: %s [options] [<file.why>|<project directory>]...\n\
+   Launch a web server that provides a graphical interface for Why3.\n"
   (Filename.basename Sys.argv.(0))
 
 
 let () =
     let config, _base_config, env =
-      Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
+      Whyconf.NewArgs.initialize spec (fun f -> Queue.add f files) usage_str
     in
     let dir =
       try
         Server_utils.get_session_dir ~allow_mkdir:true files
       with Invalid_argument s ->
         Format.eprintf "Error: %s@." s;
-        Whyconf.Args.exit_with_usage spec usage_str
+        Whyconf.NewArgs.exit_with_usage spec usage_str
     in
     S.init_server config env dir;
     Queue.iter (fun f -> P.push_request (Add_file_req f)) files;
