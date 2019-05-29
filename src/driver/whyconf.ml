@@ -1049,9 +1049,7 @@ module NewArgs = struct
      " display this help and exit") ::
       options
 
-  let initialize ?(extra_help="") options default usage =
-    let options = all_options options usage extra_help in
-    Getopt.parse_all options default Sys.argv;
+  let complete_initialization () =
     let base_config = read_config !opt_config in
     let config = List.fold_left merge_config base_config !opt_extra in
     let main = get_main config in
@@ -1060,6 +1058,11 @@ module NewArgs = struct
     if Debug.NewArgs.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
     config, base_config, Env.create_env lp
+
+  let initialize ?(extra_help="") options default usage =
+    let options = all_options options usage extra_help in
+    Getopt.parse_all options default Sys.argv;
+    complete_initialization ()
 
   let exit_with_usage ?(exit_code=1) ?(extra_help="") options usage =
     let options = common_options @ options in

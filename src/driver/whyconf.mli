@@ -305,9 +305,13 @@ module NewArgs : sig
     (string -> unit) -> string ->
     config * config * Env.env
 
+  val complete_initialization : unit -> config * config * Env.env
+
   val exit_with_usage :
     ?exit_code:int -> ?extra_help:string ->
     Getopt.opt list -> string -> 'a
+
+  val common_options : Getopt.opt list
 
 end
 
