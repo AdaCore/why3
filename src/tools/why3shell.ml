@@ -381,22 +381,23 @@ let files = Queue.create ()
 
 let quiet = ref false
 
-let set_quiet () = quiet := true
-
 let spec =
-  ["--quiet", Arg.Unit set_quiet, "Remove all printing to stdout"]
+  let open Getopt in
+  [KLong "quiet", Hnd0 (fun () -> quiet := true),
+   " remove all printing to stdout"]
 
 (* --help *)
-let usage_str = sprintf
-  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]"
+let usage_str = Format.sprintf
+  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]\n\
+   Launch a command-line interface for Why3.\n"
   (Filename.basename Sys.argv.(0))
 
 (* Parse files *)
 let config, base_config, env =
   let config, base_config, env =
-    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
+    Whyconf.NewArgs.initialize spec (fun f -> Queue.add f files) usage_str in
   if Queue.is_empty files then
-    Whyconf.Args.exit_with_usage spec usage_str;
+    Whyconf.NewArgs.exit_with_usage spec usage_str;
   (config, base_config, env)
 
 let () =
@@ -407,7 +408,7 @@ let () =
       Server_utils.get_session_dir ~allow_mkdir:true files
     with Invalid_argument s ->
       eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage spec usage_str
+      Whyconf.NewArgs.exit_with_usage spec usage_str
   in
   Server.init_server config env dir;
   Unix_scheduler.timeout ~ms:100
