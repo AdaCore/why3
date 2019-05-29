@@ -17,7 +17,8 @@ open Theory
 open Task
 
 let usage_msg = sprintf
-  "Usage: %s [options] [[file|-] [-T <theory> [-G <goal>]...]...]..."
+  "Usage: %s [options] [[<file>|-] [-T <theory> [-G <goal>]...]...]...\n\
+   Run some transformation or prover on the given goals.\n"
   (Filename.basename Sys.argv.(0))
 
 let opt_queue = Queue.create ()
@@ -96,63 +97,43 @@ let opt_task = ref None
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
 
-let option_list = [
-  "-", Arg.Unit (fun () -> add_opt_file "-"),
-      " read the input file from stdin";
-  "-T", Arg.String add_opt_theory,
-      "<theory> select <theory> in the input file or in the library";
-  "--theory", Arg.String add_opt_theory,
-      " same as -T";
-  "-G", Arg.String add_opt_goal,
-      "<goal> select <goal> in the last selected theory";
-  "--goal", Arg.String add_opt_goal,
-      " same as -G";
-  "-P", Arg.String (fun s -> opt_prover := Some s),
-      "<prover> prove or print (with -o) the selected goals";
-  "--prover", Arg.String (fun s -> opt_prover := Some s),
-      " same as -P";
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-  "-t", Arg.Int (fun i -> opt_timelimit := Some i),
-      "<sec> set the prover's time limit (default=10, no limit=0)";
-  "--timelimit", Arg.Int (fun i -> opt_timelimit := Some i),
-      " same as -t";
-  "-m", Arg.Int (fun i -> opt_memlimit := Some i),
-      "<MiB> set the prover's memory limit (default: no limit)";
-  "--memlimit", Arg.Int (fun i -> opt_timelimit := Some i),
-      " same as -m";
-  "-a", Arg.String add_opt_trans,
-      "<transformation> apply a transformation to every task";
-  "--apply-transform", Arg.String add_opt_trans,
-      " same as -a";
-  "-M", Arg.String add_opt_meta,
-      "<meta_name>[=<string>] add a meta to every task";
-  "--meta", Arg.String add_opt_meta,
-      " same as -M";
-  "-D", Arg.String (fun s -> opt_driver := s::!opt_driver),
-      "<file> specify a prover's driver (conflicts with -P)";
-  "--driver", Arg.String (fun s -> opt_driver := s::!opt_driver),
-      " same as -D";
-  "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir> print the selected goals to separate files in <dir>";
-  "--output", Arg.String (fun s -> opt_output := Some s),
-      " same as -o";
-  "--json", Arg.Set opt_json,
-      " print counterexamples in JSON format";
-  "--print-theory", Arg.Set opt_print_theory,
-      " print selected theories";
-  "--print-namespace", Arg.Set opt_print_namespace,
-      " print namespaces of selected theories";
-  Debug.Args.desc_shortcut
-    "parse_only" "--parse-only" " stop after parsing";
-  Debug.Args.desc_shortcut
-    "type_only" "--type-only" " stop after type checking";
-  Termcode.arg_extra_expl_prefix ]
+let option_list =
+  let open Getopt in
+  [ Key ('T', "theory"), Hnd1 (AString, add_opt_theory),
+    "<theory> select <theory> in the input file or in the library";
+    Key ('G', "goal"), Hnd1 (AString, add_opt_goal),
+    "<goal> select <goal> in the last selected theory";
+    Key ('P', "prover"), Hnd1 (AString, fun s -> opt_prover := Some s),
+    "<prover> prove or print (with -o) the selected goals";
+    Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
+    "<format> select input format (default: \"why\")";
+    Key ('t', "timelimit"), Hnd1 (AInt, fun i -> opt_timelimit := Some i),
+    "<sec> set the prover's time limit (default=10, no limit=0)";
+    Key ('m', "memlimit"), Hnd1 (AInt, fun i -> opt_memlimit := Some i),
+    "<MiB> set the prover's memory limit (default: no limit)";
+    Key ('a', "apply-transform"), Hnd1 (AString, add_opt_trans),
+    "<transf> apply a transformation to every task";
+    Key ('M', "meta"), Hnd1 (AString, add_opt_meta),
+    "<meta>[=<string>] add a meta to every task";
+    Key ('D', "driver"), Hnd1 (AString, fun s -> opt_driver := s::!opt_driver),
+    "<file> specify a prover's driver (conflicts with -P)";
+    Key ('o', "output"), Hnd1 (AString, fun s -> opt_output := Some s),
+    "<dir> print the selected goals to separate files in <dir>";
+    KLong "json", Hnd0 (fun () -> opt_json := true),
+    " print counterexamples in JSON format";
+    KLong "print-theory", Hnd0 (fun () -> opt_print_theory := true),
+    " print selected theories";
+    KLong "print-namespace", Hnd0 (fun () -> opt_print_namespace := true),
+    " print namespaces of selected theories";
+    Debug.NewArgs.desc_shortcut
+      "parse_only" (KLong "parse-only") " stop after parsing";
+    Debug.NewArgs.desc_shortcut
+      "type_only" (KLong "type-only") " stop after type checking";
+    Termcode.opt_extra_expl_prefix
+  ]
 
 let config, _, env =
-  Whyconf.Args.initialize option_list add_opt_file usage_msg
+  Whyconf.NewArgs.initialize option_list add_opt_file usage_msg
 
 let opt_driver = ref (match !opt_driver with
   | f::ef -> Some (f, ef)
@@ -160,7 +141,7 @@ let opt_driver = ref (match !opt_driver with
 
 let () = try
   if Queue.is_empty opt_queue then
-    Whyconf.Args.exit_with_usage option_list usage_msg;
+    Whyconf.NewArgs.exit_with_usage option_list usage_msg;
 
   if !opt_prover <> None && !opt_driver <> None then begin
     eprintf "Options '-P'/'--prover' and \
