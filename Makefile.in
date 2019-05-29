@@ -619,8 +619,8 @@ bin/why3realize.opt: $(WHY3CMXA) src/tools/why3realize.cmx
 bin/why3realize.byte: $(WHY3CMA) src/tools/why3realize.cmo
 bin/why3replay.opt: $(WHY3CMXA) src/tools/why3replay.cmx
 bin/why3replay.byte: $(WHY3CMA) src/tools/why3replay.cmo
-bin/why3wc.opt: src/tools/why3wc.cmx
-bin/why3wc.byte: src/tools/why3wc.cmo
+bin/why3wc.opt: $(WHY3CMXA) src/tools/why3wc.cmx
+bin/why3wc.byte: $(WHY3CMA) src/tools/why3wc.cmo
 
 uninstall-bin::
 	rm -f $(BINDIR)/why3$(EXE)
