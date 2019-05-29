@@ -54,60 +54,42 @@ type smoke_detector =
 let opt_smoke = ref SD_None
 
 let set_opt_smoke = function
-  | "none" -> opt_smoke := SD_None
-  | "top" ->  opt_smoke := SD_Top
-  | "deep" ->  opt_smoke := SD_Deep
-  | _ -> assert false
+  | Some "none" -> opt_smoke := SD_None
+  | Some "top"  -> opt_smoke := SD_Top
+  | Some "deep" -> opt_smoke := SD_Deep
+  | Some _ -> assert false
+  | None -> opt_smoke := SD_Top
 
 let usage_msg = Format.sprintf
-  "Usage: %s [options] <project directory>"
+  "Usage: %s [options] <dir>\n\
+   Replay the session stored in the given directory.\n"
   (Filename.basename Sys.argv.(0))
 
-let option_list = [
-  ("-f",
-   Arg.Set opt_force,
-   " enforce saving the session after replay");
-  ("--force",
-   Arg.Set opt_force,
-   " same as -f");
-  ("--use-steps",
-   Arg.Set opt_use_steps,
-   " replay using recorded number of proof steps (when possible)");
-  ("--obsolete-only",
-   Arg.Set opt_obsolete_only,
-   " replay only if session is obsolete");
-  ("--merging-only",
-   Arg.Set opt_merging_only,
-   " check merging of session");
-  ("-P",
-   Arg.String (fun s ->
-     opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
-   "<prover> restrict replay to given prover");
-  ("--prover",
-   Arg.String (fun s ->
-     opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
-   " same as -P");
-  ("--smoke-detector",
-   Arg.Symbol (["none";"top";"deep"],set_opt_smoke),
-   " try to detect if the context is self-contradicting") ;
-(*
-  ("--bench",
-   Arg.Set opt_bench, " run as bench (experimental)");
- *)
-  ("--no-stats",
-   Arg.Clear opt_stats,
-   " do not print statistics") ;
-  ("-q",
-   Arg.Clear opt_verbose,
-   " run quietly");
-  ("--quiet",
-   Arg.Clear opt_verbose,
-   " same as -q") ]
+let option_list =
+  let open Getopt in
+  [ Key ('f', "force"), Hnd0 (fun () -> opt_force := true),
+    " enforce saving the session after replay";
+    KLong "use-steps", Hnd0 (fun () -> opt_use_steps := true),
+    " replay using recorded number of proof steps (when\npossible)";
+    KLong "obsolete-only", Hnd0 (fun () -> opt_obsolete_only := true),
+    " replay only if session is obsolete";
+    KLong "merging-only", Hnd0 (fun () -> opt_merging_only := true),
+    " check merging of session";
+    Key ('P', "prove"),
+    Hnd1 (AString, fun s -> opt_provers := Whyconf.parse_filter_prover s :: !opt_provers),
+    "<prover> restrict replay to given prover";
+    KLong "smoke-detector", HndOpt (ASymbol ["none";"top";"deep"], set_opt_smoke),
+    "none|top|deep try to detect if the context is\nself-contradicting (default: top)";
+    KLong "no-stats", Hnd0 (fun () -> opt_stats := false),
+    " do not print statistics";
+    Key ('q', "quiet"), Hnd0 (fun () -> opt_verbose := false),
+    " run quietly";
+  ]
 
 let add_file f = Queue.push f files
 
 let config, _, env =
-  Whyconf.Args.initialize option_list add_file usage_msg
+  Whyconf.NewArgs.initialize option_list add_file usage_msg
 
 module C = Controller_itp.Make(Unix_scheduler.Unix_scheduler)
 
@@ -379,10 +361,10 @@ let () =
       Server_utils.get_session_dir ~allow_mkdir:false files
     with Invalid_argument s ->
       Format.eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage option_list usage_msg
+      Whyconf.NewArgs.exit_with_usage option_list usage_msg
   in
   if not (Queue.is_empty files) then
-    Whyconf.Args.exit_with_usage option_list usage_msg;
+    Whyconf.NewArgs.exit_with_usage option_list usage_msg;
   try
     Debug.dprintf debug "Opening session '%s'...@?" dir;
     let ses = S.load_session dir in
