@@ -21,6 +21,8 @@ do
             ;;
         doc)
             make doc
+            make stdlibdoc
+            make apidoc
             ;;
         ce-bench)
             bin/why3config --detect-provers

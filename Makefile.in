@@ -2114,46 +2114,25 @@ install:: install-bash
 
 .PHONY: stdlibdoc
 
+STDMACHLIBS = \
+	array int matrix onetime peano
+# bv, c, float, fxp, tagset?
+
 STDLIBS = \
-	algebra \
-	appmap \
-	appset \
-	array \
-	bag \
-	bintree \
-	bool \
-	bv \
-	floating_point \
-	graph \
-	hashtbl \
-	ieee_float \
-	impmap \
-	impset \
-	int \
+	algebra appmap array \
+	bag bintree bool bv \
+	floating_point graph hashtbl \
+	ieee_float impmap int \
 	list \
-	map \
-	matrix \
-	number \
-	option \
-	pigeon \
-	pqueue \
+	map matrix \
+	number option \
+	pigeon pqueue \
 	queue \
-	random \
-	real \
-	ref \
-	relations \
-	seq \
-	set \
-	stack \
-	string \
-	sum \
+	random real ref relations \
+	seq set stack string sum \
 	witness \
-        mach/array \
-	mach/int \
-        mach/matrix \
-	mach/onetime \
-	mach/peano
-# function ? tptp ?
+	$(addprefix mach/, $(STDMACHLIBS))
+# cursor, debug, exn, for_drivers, function, io, null, ocaml, regexp, tptp, tree?
 
 STDLIBFILES = $(patsubst %,stdlib/%.mlw, $(STDLIBS))
 
