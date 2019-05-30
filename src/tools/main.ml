@@ -197,6 +197,9 @@ let () = try
 
   do_usage ();
 
-  with e when not (Debug.test_flag Debug.stack_trace) ->
+  with
+  | Getopt.GetoptFailure _ as exn ->
+      Getopt.handle_exn Sys.argv exn
+  | e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

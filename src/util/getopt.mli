@@ -66,9 +66,7 @@ val parse_one : ?mm:bool -> opt list -> (string -> unit) -> string array -> int 
 val parse_all : opt list -> (string -> unit) -> string array -> unit
 (** [parse_all opts extra args] parses all the arguments, starting from
     [args.(1)], calling [parse_one] in turn. When [GetoptFailure] is raised,
-    the function terminates the program after printing the error followed by
-    the usage message [msg]. [args.(0)] is used as the program name for the
-    error message. *)
+    the function calls [handle_exn] to terminate the program. *)
 
 val format : ?margin:int -> opt list -> string
 (** [format ~margin opts] turns the option list [opts] into a string that
@@ -77,3 +75,7 @@ val format : ?margin:int -> opt list -> string
     at column [margin] (25 by default). If an option does not support
     arguments, its description string should start with a space. *)
 
+val handle_exn : string array -> exn -> unit
+(** [handle_exn args exn] terminates the program after printing the content
+    of the [GetoptFailure] exception. [args.(0)] is used as the program name
+    for the error message. *)
