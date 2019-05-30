@@ -1,4 +1,5 @@
 open Term
+open Generic_arg_trans_utils
 
 let rec is_trivial fml =
    (* Check wether the formula is trivial.  *)
@@ -23,9 +24,9 @@ let is_trivial_trans =
       if is_trivial t then
         [] (* Goal is proved *)
       else
-        (* Fail to be clean. Should be equivalent to rebuilding the goal (it
-           would raise the NoProgress error) *)
-        raise Exit)
+        (* Should be equivalent to a transformation that makes no progress
+           (Arg_trans is not [is_fatal]). *)
+        raise (Arg_trans "Error in trivial_true"))
 
 let () = Args_wrapper.wrap_and_register ~desc:"Prove goals whose positive part is just [true]"
     "trivial_true"
