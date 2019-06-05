@@ -40,57 +40,59 @@ let fetch_and_add (r:ref tick)
   r := { v = res.v + 1; b = mod (res.b + 1) (k*n) };
   res
 
-predicate lt (tick1 tick2: tick) = tick1.v < tick2.v
+predicate lt (tick1 tick2: tick) = tick1.v <= tick2.v
 
-use list.List
-use list.HdTl
-use list.Append
-clone list.Sorted with type t = tick, predicate le = lt, lemma Transitive.Trans
+use import seq.Seq as S
+use seq.Mem
+use seq.FreeMonoid
 
-inductive consecutive (l:list tick) =
-  | Consecutive_Nil : consecutive Nil
+predicate sorted (s: seq tick) =
+  forall i j. 0 <= i < j < length s -> lt s[i] s[j]
+
+predicate consecutive (l: seq tick) =
+  forall i. 0 < i < length l -> l[i].v = l[i-1].v + 1
+(*
+| Consecutive_Nil : consecutive Nil
   | Consecutive_One : forall t. consecutive (Cons t Nil)
   | Consecutive_Two : forall t1 t2 l.
                       t2.v = t1.v + 1 -> consecutive (Cons t2 l)
                                       -> consecutive (Cons t1 (Cons t2 l))
+*)
 
-function last (l:list tick) : option tick
+function last (l: seq tick) : option tick =
+  if length l = 0 then None else Some l[length l - 1]
+(*
 = match l with
   | Nil -> None
   | Cons x Nil -> Some x
   | Cons _ l -> last l
   end
+*)
 
-let rec lemma last_push (l: list tick) (x:tick)
-  ensures { last (l ++ (Cons x Nil)) = Some x }
-  variant { l }
-= match l with
-  | Nil -> ()
-  | Cons _ l -> last_push l x
-  end
+let lemma last_push (l: seq tick) (x:tick)
+  ensures { last (l ++ (cons x empty)) = Some x }
+= ()
 
-let rec lemma consecutive_last_push (l: list tick) (x:tick)
+let lemma consecutive_last_push (l: seq tick) (x:tick)
   requires { consecutive l }
   requires { match last l with
              | None -> true
              | Some y -> x.v = y.v + 1 end }
-  ensures  { consecutive (l ++ (Cons x Nil)) }
-  variant  { l }
-= match l with
-  | Nil -> ()
-  | Cons _ l -> consecutive_last_push l x
-  end
+  ensures  { consecutive (l ++ (cons x empty)) }
+= ()
 
-lemma hd_push: forall l,x:tick. hd l = None \/ hd (l ++ (Cons x Nil)) = hd l
+function hd (l: seq tick) : option tick =
+  if length l = 0 then None else Some l[0]
 
-let rec lemma consecutive_implies_sorted (l:list tick)
+lemma hd_push:
+  forall l,x:tick. hd l = None \/ hd (l ++ (cons x empty)) = hd l
+
+let rec lemma consecutive_implies_sorted (l: seq tick) (i j: int)
   requires { consecutive l }
-  ensures  { sorted l }
-  variant  { l }
-= match l with
-  | Nil -> ()
-  | Cons _ t -> consecutive_implies_sorted t
-  end
+  requires { 0 <= i < j < length l }
+  ensures  { lt l[i] l[j] }
+  variant  { j - i }
+= if i+1 < j then consecutive_implies_sorted l (i+1) j
 
 (*
   we associate a program counter to each thread
@@ -131,9 +133,7 @@ val scheduler () : int
 
 use array.NumOfEq
 use queue.Queue
-use list.NumOcc
-use list.Mem
-
+use array.Array
 
 let lemma numof_equiv (a1 a2: array 'a) (v:'a) (l u: int)
   requires { forall i. l <= i < u -> a1[i]=v <-> a2[i]=v }
@@ -209,51 +209,52 @@ let main () : unit
     invariant { forall th. 0 <= th < n ->
                           (memo[th] <> None <->
                           has_ticket (pcs[th])) }
-    invariant { forall tick. mem tick waiting_list.elts ->
+    invariant { forall tick. mem tick waiting_list ->
                        match owners[tick.b] with
                          | None -> false
                          | Some th -> pcs[th] = A2
                                       /\ memo[th] = Some tick end }
     invariant { forall th. 0 <= th < n ->
                        match memo[th] with
-                         | Some tick -> mem tick waiting_list.elts
+                         | Some tick -> mem tick waiting_list
                                         \/ !active_tick = Some tick
                          | None -> true end }
     invariant { forall th. 0 <= th < n -> not has_lock pcs[th] ->
                        match memo[th] with
                          | None -> pcs[th] <> A2
-                         | Some tick -> mem tick waiting_list.elts end }
-    invariant { consecutive waiting_list.elts } (* also implies unicity *)
-    invariant { length waiting_list = numof pcs A2 0 n }
-    invariant { forall tick. mem tick waiting_list.elts ->
-                       !next.v - length waiting_list <= tick.v < !next.v }
-    invariant { match last waiting_list.elts with
+                         | Some tick -> mem tick waiting_list end }
+    invariant { consecutive waiting_list } (* also implies unicity *)
+    invariant { S.length waiting_list = numof pcs A2 0 n }
+    invariant { forall tick. mem tick waiting_list ->
+                       !next.v - S.length waiting_list <= tick.v < !next.v }
+    invariant { match last waiting_list with
                       | None -> true
                       | Some t -> t.v = !next.v - 1 end}
-    invariant { match hd waiting_list.elts with
+    invariant { match hd waiting_list with
                       | None -> true
-                      | Some t -> t.v = !next.v - length waiting_list end }
+                      | Some t -> t.v = !next.v - S.length waiting_list end }
     invariant { match !active_tick with
                       | None -> !lock_holder = -1
                       | Some tick ->
-                          (match hd waiting_list.elts with
+                          (match hd waiting_list with
                              | None -> !next.v = tick.v + 1
                              | Some t -> t.v = tick.v + 1 end)
-                          /\ tick.v = !next.v - length waiting_list - 1
+                          /\ tick.v = !next.v - S.length waiting_list - 1
                           /\ 0 <= !lock_holder < n
                           /\ memo[!lock_holder] = Some tick end }
-    invariant { 0 <= length waiting_list <= n }
+    invariant { 0 <= S.length waiting_list <= n }
    (* invariant { length waiting_list = n \/ owners[!next.b] = None } *)
     invariant { [@expl:liveness]
               !lock_holder = - 1 ->
                  (* someone is in the critical section... *)
-                 ((match waiting_list.elts with
-                   | Nil -> false
-                   | Cons tick _ -> pass[tick.b] = true end)
+                 ((if S.length waiting_list = 0
+                   then false
+                   else let tick = S.get waiting_list 0 in
+                        pass[tick.b] = true)
                  (* ...or someone has a ticket to the critical section... *)
               \/ (exists th. 0 <= th < n /\ memo[th] = None
                                          /\ pass[!next.b] = true)
-                                         /\ waiting_list.elts = Nil)
+                                         /\ waiting_list = empty)
                  (* ...or someone can take one *) }
     let th = scheduler () in (*choose a thread*)
     (* make it progress by 1 step *)
@@ -264,8 +265,8 @@ let main () : unit
       | A1 ->
           let tick = fetch_and_add next in
           assert { is_none owners[tick.b]
-                   by length waiting_list <= n < 2*n - 1 <= k*n - 1
-                   so ((forall tick'. mem tick' waiting_list.elts
+                   by S.length waiting_list <= n < 2*n - 1 <= k*n - 1
+                   so ((forall tick'. mem tick' waiting_list
                                     -> (tick'.b <> tick.b)
                                     by 0 < tick.v - tick'.v < k*n
                                     so mod (tick.v - tick'.v) (k*n) <> 0
@@ -275,7 +276,7 @@ let main () : unit
                                    | None -> false
                                    | Some tick' -> false
                                        by tick'.b = tick.b
-                                       so not mem tick' waiting_list.elts
+                                       so not mem tick' waiting_list
                                        so !active_tick = Some tick'
                                        so 0 < tick.v - tick'.v < k*n
                                        so mod (tick.v - tick'.v) (k*n) <> 0
@@ -287,9 +288,9 @@ let main () : unit
           pcs[th] <- A2;
           assert { numof pcs A2 0 n = numof pcs A2 0 n at Step + 1 };
           assert { !lock_holder = !lock_holder at Step <> th };
-          assert { forall tick'. mem tick' waiting_list.elts ->
+          assert { forall tick'. mem tick' waiting_list ->
                           tick'.b <> tick.b /\ owners[tick'.b] <> Some th };
-          assert { forall tick'. mem tick' waiting_list.elts ->
+          assert { forall tick'. mem tick' waiting_list ->
                           match owners[tick'.b] with
                             | None -> false
                             | Some th' ->
@@ -299,46 +300,47 @@ let main () : unit
                               so pcs[th'] = pcs[th'] at Step
                               so memo[th'] = memo[th'] at Step end };
           push tick waiting_list;
-          assert { consecutive waiting_list.elts
-                   by waiting_list.elts
-                      = waiting_list.elts at Step ++ (Cons tick Nil) };
+          assert { consecutive waiting_list
+                   by waiting_list
+                      = waiting_list at Step ++ (cons tick empty) };
           assert { match !active_tick with
                       | None -> !lock_holder = -1
                       | Some tick' ->
-                          (match hd waiting_list.elts with
+                          (match hd waiting_list with
                              | None -> false
                              | Some t ->
                                t.v = tick'.v + 1
-                               by match hd waiting_list.elts at Step with
+                               by match hd waiting_list at Step with
                                | None -> t = tick
                                          so
                                          tick.v = !next.v at Step = tick'.v + 1
                                | Some t -> t.v = tick'.v + 1
-                                           /\ hd waiting_list.elts = Some t end
+                                           /\ hd waiting_list = Some t end
                            end)
                    end };
            assert { !lock_holder = -1 ->
-                     match waiting_list.elts with
-                      | Nil -> false
-                      | Cons t1 _ ->
+                     if S.length waiting_list = 0 then
+                       false
+                     else
+                       let t1 = S.get waiting_list 0 in
                          pass[t1.b]
                          by
-                         match waiting_list.elts at Step with
-                         | Nil -> pass[t1.b]
+                         if S.length (waiting_list at Step) = 0
+                         then pass[t1.b]
                                   by (t1 = tick /\
                                   pass[tick.b] by pass[!next.b at Step])
-                         | Cons t _ -> pass[t1.b] by t=t1 so pass[t.b] end
-                     end };
-           assert { match hd waiting_list.elts with
+                         else let t = S.get (waiting_list at Step) 0 in pass[t1.b] by t=t1 so pass[t.b]
+                  };
+           assert { match hd waiting_list with
                     | None -> true
                     | Some t ->
                         if t = tick
-                        then t.v = !next.v - length waiting_list
-                             by waiting_list.elts at Step = Nil
-                             so length waiting_list = 1
-                        else t.v = !next.v - length waiting_list
-                             by hd waiting_list.elts at Step = Some t
-                             so t.v = !next.v - length waiting_list at Step
+                        then t.v = !next.v - S.length waiting_list
+                             by waiting_list at Step = empty
+                             so S.length waiting_list = 1
+                        else t.v = !next.v - S.length waiting_list
+                             by hd waiting_list at Step = Some t
+                             so t.v = !next.v - S.length waiting_list at Step
                     end };
       | A2 ->
           match memo[th] with
@@ -354,29 +356,31 @@ let main () : unit
                assert { pass[tick'.b] };
                assert { [@expl:fairness] tick=tick'
                         by tick.b = tick'.b
-                        so mem tick waiting_list.elts at Step
-                        so mem tick' waiting_list.elts at Step };
-               assert { not mem tick waiting_list.elts
-                        by waiting_list.elts at Step
-                           = Cons tick waiting_list.elts
-                        so consecutive waiting_list.elts at Step
-                        so (forall t. mem t waiting_list.elts -> tick.v < t.v)
-                        so consecutive waiting_list.elts
-                        so match waiting_list.elts with
-                           | Nil -> not mem tick waiting_list.elts
-                           | Cons x l -> not mem tick waiting_list.elts
+                        so mem tick waiting_list at Step
+                        so mem tick' waiting_list at Step };
+               assert { not mem tick waiting_list
+                        by waiting_list at Step
+                           = cons tick waiting_list
+                        so consecutive waiting_list at Step
+                        so (forall t. mem t waiting_list -> tick.v < t.v)
+                        so consecutive waiting_list
+                        so if S.length waiting_list = 0
+                           then not mem tick waiting_list
+                           else let x = S.get waiting_list 0 in
+                                let l = waiting_list[1 .. ] in
+                                not mem tick waiting_list
                                          by tick.v < x.v
                                          so (forall t. mem t l -> x.v < t.v)
-                                          end };
-              assert { forall tick1 tick2. mem tick1 waiting_list.elts at Step
-                                        -> mem tick2 waiting_list.elts at Step
+                                         };
+              assert { forall tick1 tick2. mem tick1 waiting_list at Step
+                                        -> mem tick2 waiting_list at Step
                                         -> tick1.v < tick2.v
                                         -> tick1.b <> tick2.b
-                       by length waiting_list at Step <= n < 2*n - 1 <= k*n - 1
+                       by S.length waiting_list at Step <= n < 2*n - 1 <= k*n - 1
                        so 0 < tick2.v - tick1.v < k*n
                        so mod (tick2.v - tick1.v) (k*n) <> 0
                        so mod tick1.v (k*n) <> mod tick2.v (k*n) };
-              assert { forall t. mem t waiting_list.elts ->
+              assert { forall t. mem t waiting_list ->
                           match owners[t.b] with
                             | None -> false
                             | Some n ->
@@ -390,23 +394,24 @@ let main () : unit
               assert { numof pcs A2 0 n at Step = numof pcs A2 0 n + 1
                        by numof pcs A2 0 n at Step
                           = numof pcs[th <- A2] A2 0 n };
-              assert { forall t. mem t waiting_list.elts ->
-                       !next.v - length waiting_list <= t.v
-                       by mem t waiting_list.elts at Step
+              assert { forall t. mem t waiting_list ->
+                       !next.v - S.length waiting_list <= t.v
+                       by mem t waiting_list at Step
                        so t <> tick
-                       so waiting_list.elts at Step
-                          = Cons tick waiting_list.elts
-                       so !next.v - length waiting_list at Step = tick.v
-                       so !next.v - length waiting_list at Step < t.v };
-              assert { match waiting_list.elts with
-                       | Nil -> true
-                       | Cons t l ->
-                         hd waiting_list.elts = Some t
-                         /\ t.v = !next.v - waiting_list.length
-                         by waiting_list.elts at Step
-                            = Cons tick (Cons t l)
-                         so consecutive waiting_list.elts at Step
-                         so t.v = tick.v + 1 end };
+                       so waiting_list at Step
+                          = cons tick waiting_list
+                       so !next.v - S.length waiting_list at Step = tick.v
+                       so !next.v - S.length waiting_list at Step < t.v };
+              assert { if S.length waiting_list = 0
+                       then true
+                       else let t = S.get waiting_list 0 in
+                            let l = waiting_list[1 .. ] in
+                         hd waiting_list = Some t
+                         /\ t.v = !next.v - S.length waiting_list
+                         by waiting_list at Step
+                            = cons tick (cons t l)
+                         so consecutive waiting_list at Step
+                         so t.v = tick.v + 1 };
                end
           end
       | A3 -> pcs[th] <- W
@@ -440,16 +445,17 @@ let main () : unit
                          so mod (tick.v + 1) (k*n)
                             = mod ((k*n) * d + (tick.b + 1)) (k*n)
                             = mod (tick.b + 1) (k*n) = nt };
-                assert { match waiting_list.elts with
-                         | Nil -> pass[!next.b] = true
+                assert { if S.length waiting_list = 0
+                         then pass[!next.b] = true
                                   by !next.v = tick.v + 1
                                   so !next.b = nt
                                   /\
                                   exists th. memo[th] = None
-                         | Cons x _ -> pass[x.b]
+                         else let x = S.get waiting_list 0 in
+                              pass[x.b]
                                        by x.v = tick.v + 1
                                        so x.b = nt
-                         end };
+                        };
           end
       end
   done
