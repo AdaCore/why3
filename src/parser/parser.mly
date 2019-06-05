@@ -194,6 +194,10 @@
           )
           dl
     | _ -> ()
+
+  let name_term name term =
+    let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name.id_str)) in
+    { term_loc = term.term_loc; term_desc = Tattr (attr, term) }
 %}
 
 (* Tokens *)
@@ -1192,12 +1196,13 @@ single_spec:
 | REQUIRES option(ident_nq) LEFTBRC term RIGHTBRC
     { match $2 with
       | None -> { empty_spec with sp_pre = [$4] }
+      | Some name -> { empty_spec with sp_pre = [name_term name $4] } }
+| ENSURES option(ident_nq) LEFTBRC ensures RIGHTBRC
+    { match $2 with
+      | None -> { empty_spec with sp_post = [floc $startpos($4) $endpos($4), $4] }
       | Some name ->
-         let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name.id_str)) in
-         let t = { $4 with term_desc = Tattr (attr, $4) } in
-         { empty_spec with sp_pre = [t] } }
-| ENSURES LEFTBRC ensures RIGHTBRC
-    { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
+         let bindings = List.map (fun (p, t) -> p, name_term name t) $4 in
+         { empty_spec with sp_post = [floc $startpos($4) $endpos($4), bindings] } }
 | RETURNS LEFTBRC match_cases(term) RIGHTBRC
     { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
 | RAISES LEFTBRC bar_list1(raises) RIGHTBRC
