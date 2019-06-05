@@ -105,16 +105,24 @@ let intro_var (subst, mal) vs =
 let get_expls f =
   Sattr.filter (fun a -> Strings.has_prefix "expl:" a.attr_string) f.t_attrs
 
-let rec intros kn pr mal expl f =
-  let fexpl = get_expls f in
-  let expl = if Sattr.is_empty fexpl then expl else fexpl in
-  let move_expl f = if Sattr.is_empty fexpl && not (Sattr.is_empty expl)
-                    then t_attr_add (Sattr.min_elt expl) f else f in
+let get_hyp_names f =
+  Sattr.filter (fun a -> Strings.has_prefix "hyp_name:" a.attr_string) f.t_attrs
+
+let rec intros kn pr mal (expl, hyp_name) f =
+  let aux_move attrs fattrs = (* attrs may be [expl] or [hyp_name] *)
+    let attrs = if Sattr.is_empty fattrs then attrs else fattrs in
+    let move f =
+      if Sattr.is_empty fattrs && not (Sattr.is_empty attrs)
+      then t_attr_add (Sattr.min_elt attrs) f else f in
+    attrs, move in
+  let expl, move_expl = aux_move expl (get_expls f) in
+  let hyp_name, move_hyp_name = aux_move hyp_name (get_hyp_names f) in
+  let move_attrs f = move_expl (move_hyp_name f) in
   match f.t_node with
   (* (f2 \/ True) => _ *)
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },_)
       when Sattr.mem Term.asym_split f2.t_attrs ->
-        [create_prop_decl Pgoal pr (move_expl f)]
+        [create_prop_decl Pgoal pr (move_attrs f)]
   | Tbinop (Timplies,f1,f2) ->
       (* split f1 *)
       (* f is going to be removed, preserve its attributes and location in f2 *)
@@ -139,21 +147,21 @@ let rec intros kn pr mal expl f =
         | Theory.MApr _ :: mal -> mal
         | _ -> mal in
       let _, fl = List.fold_left add (Mvs.empty, []) fl in
-      List.rev_append fl (intros kn pr mal expl f2)
+      List.rev_append fl (intros kn pr mal (expl, hyp_name) f2)
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
       let (subst, mal), dl =
         Lists.map_fold_left intro_var (Mvs.empty, mal) vsl in
       (* preserve attributes and location of f  *)
       let f = t_attr_copy f (t_subst subst f_t) in
-      dl @ intros kn pr mal expl f
+      dl @ intros kn pr mal (expl, hyp_name) f
   | Tlet (t,fb) ->
       let vs, f = t_open_bound fb in
       let ls, mal = ls_of_vs mal vs in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
-      d :: intros kn pr mal expl f
-  | _ -> [create_prop_decl Pgoal pr (move_expl f)]
+      d :: intros kn pr mal (expl, hyp_name) f
+  | _ -> [create_prop_decl Pgoal pr (move_attrs f)]
 
 let intros kn mal pr f =
   let tvs = t_ty_freevars Stv.empty f in
@@ -162,7 +170,7 @@ let intros kn mal pr f =
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   let f = t_ty_subst subst Mvs.empty f in
-  let dl = intros kn pr mal Sattr.empty f in
+  let dl = intros kn pr mal (Sattr.empty, Sattr.empty) f in
   Mtv.values decls @ dl
 
 let rec introduce hd =
