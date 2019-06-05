@@ -297,7 +297,7 @@ mlw_file:
 | mlw_module mlw_module_no_decl* EOF
     { Typing.close_file () }
 | module_decl module_decl_no_head* EOF
-    { let loc = floc $startpos($2) $endpos($2) in
+    { let loc = floc $startpos($3) $endpos($3) in
       Typing.close_module loc; Typing.close_file () }
 
 mlw_module:
@@ -324,16 +324,14 @@ module_decl:
 | use_clone { () }
 
 mlw_module_no_decl:
-| error
-/* | SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl */
+| SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
    { let loc = floc $startpos $endpos in
      Loc.errorm ~loc "trying to open a module inside another module" }
 | mlw_module
    { $1 }
 
 module_decl_no_head:
-| error
-/* | THEORY | MODULE */
+| THEORY | MODULE
    { let loc = floc $startpos $endpos in
      Loc.errorm ~loc "trying to open a module inside another module" }
 | module_decl
