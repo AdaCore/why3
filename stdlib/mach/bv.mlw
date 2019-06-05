@@ -1,4 +1,11 @@
-(* Reasoning on bitvectors with precondition enforcing absence of overflow *)
+(** {1 Program functions on bitvectors with preconditions enforcing absence of overflow}
+
+   Warning: this module is mostly obsolete, it should be improved by using the `bv` module
+
+*)
+
+(** {2 Generic module, for a parametric size} *)
+
 module BVCheck_Gen
   use int.Int
 
@@ -30,48 +37,57 @@ module BVCheck_Gen
   predicate uge t t
   predicate ugt t t
 
+  (** addition with overflow check *)
   val add_check (a b:t) : t
-    requires { 0 <= to_uint a + to_uint b < two_power_size }
+    requires { [@expl:arithmetic overflow] 0 <= to_uint a + to_uint b < two_power_size }
     ensures  { to_uint result = to_uint a + to_uint b }
     ensures  { result = add a b }
 
+  (** subtraction with overflow check *)
   val sub_check (a b:t) : t
-    requires { 0 <= to_uint a - to_uint b < two_power_size }
+    requires { [@expl:arithmetic overflow] 0 <= to_uint a - to_uint b < two_power_size }
     ensures  { result = sub a b }
     ensures  { to_uint result = to_uint a - to_uint b }
 
+  (** multiplication with overflow check *)
   val mul_check (a b:t) : t
-    requires { 0 <= to_uint a * to_uint b < two_power_size }
+    requires { [@expl:arithmetic overflow] 0 <= to_uint a * to_uint b < two_power_size }
     ensures  { result = mul a b }
     ensures  { to_uint result = to_uint a * to_uint b }
 
+  (** logical shift left requires the second argument to be smaller than bitvector size *)
   val lsl_check (a b:t) : t
-    requires { 0 <= to_uint b < size }
+    requires { [@expl:out-of-bounds shifting] 0 <= to_uint b < size }
     ensures  { result = lsl_bv a b }
     ensures  { result = lsl a (to_uint b) }
 
+  (** logical shift right requires the second argument to be smaller than bitvector size *)
   val lsr_check (a b:t) : t
-    requires { 0 <= to_uint b < size }
+    requires { [@expl:out-of-bounds shifting] 0 <= to_uint b < size }
     ensures  { result = lsr_bv a b }
     ensures  { result = lsr a (to_uint b) }
 
+  (** arithmetic shift right requires the second argument to be smaller than bitvector size *)
   val asr_check (a b:t) : t
-    requires { 0 <= to_uint b < size }
+    requires { [@expl:out-of-bounds shifting] 0 <= to_uint b < size }
     ensures  { result = asr_bv a b }
     ensures  { result = asr a (to_uint b) }
 
   use int.EuclideanDivision
 
+  (** unsigned division requires the second argument to be non-zero *)
   val udiv_check (a b:t) : t
-    requires {b <> zeros}
+    requires { [@expl:division by zero] b <> zeros}
     ensures  { to_uint result = div (to_uint a) (to_uint b) }
     ensures  { result = udiv a b }
 
+  (** unsigned remainder requires the second argument to be non-zero *)
   val urem_check (a b:t) : t
-    requires {b <> zeros}
+    requires { [@expl:remainder by zero] b <> zeros}
     ensures  { to_uint result = mod (to_uint a) (to_uint b) }
     ensures  { result = urem a b }
 
+  (** comparison operators have no preconditions *)
   val eq_check (a b:t) : bool
     ensures { result <-> a = b }
 
@@ -95,6 +111,8 @@ module BVCheck_Gen
     ensures { result <-> ugt a b }
 
 end
+
+(** {2 Modules for specific sizes} obtained by cloning the previous generic module *)
 
 module BVCheck8
   use export bv.BV8

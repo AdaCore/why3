@@ -1,3 +1,8 @@
+
+(** {1 Polymorphic n-ary trees} *)
+
+(** {2 Basic theory with polymorphic lists of children} *)
+
 module Tree
 
   use list.List
@@ -6,6 +11,8 @@ module Tree
   with tree 'a   = Node 'a (forest 'a)
 
 end
+
+(** {2 Tree size} *)
 
 module Size
 
@@ -27,6 +34,8 @@ module Size
 
 end
 
+(** {2 Forests} *)
+
 module Forest
 
   use int.Int
@@ -36,6 +45,8 @@ module Forest
     | N 'a (forest 'a) (forest 'a)
 
 end
+
+(** {2 Forest size} *)
 
 module SizeForest
 
@@ -50,6 +61,8 @@ module SizeForest
     end
 
 end
+
+(** {2 Membership in a forest} *)
 
 module MemForest
 
