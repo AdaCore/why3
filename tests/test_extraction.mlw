@@ -16,6 +16,12 @@ module TestExtraction
   let test_int63 () =
     to_int (f63 31 + (33 / 3 + 2 - 4) - (-1))
 
+  use list.List
+
+  type ttt = T (list int63)
+
+  let test_list (t: ttt) = match t with T (Cons x Nil) -> x | _ -> absurd end
+
   use int.Int
   use ref.Ref
   use ref.Refint
