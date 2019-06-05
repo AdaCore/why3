@@ -367,17 +367,14 @@ else
   COMPILERLIBSPKG=
 fi
 
-# checking for rubber
+# checking for rubber or latexmk or pdflatex
 if test "$enable_doc" = yes ; then
-   AC_CHECK_PROG(RUBBER,rubber,rubber,no)
-   if test "$RUBBER" = no ; then
+   AC_CHECK_PROGS(LATEX,rubber latexmk pdflatex,no)
+   if test "$LATEX" = no ; then
       enable_doc=no
-      enable_html_doc=no
-      reason_doc=" (rubber not found)"
-      AC_MSG_WARN([Cannot find rubber, documentation disabled.])
+      reason_doc=" ((rubber|latexmk|pdflatex) not found)"
+      AC_MSG_WARN([Cannot find any latex compiler, documentation disabled.])
    fi
-else
-   enable_html_doc=no
 fi
 
 # checking for hevea (note that the pdf documentation DOES NOT use hevea.sty)
@@ -971,7 +968,7 @@ AC_SUBST(enable_hypothesis_selection)
 AC_SUBST(enable_doc)
 AC_SUBST(enable_html_doc)
 
-AC_SUBST(RUBBER)
+AC_SUBST(LATEX)
 AC_SUBST(HEVEA)
 AC_SUBST(HACHA)
 
@@ -1047,7 +1044,7 @@ if test "$enable_frama_c" = yes ; then
 fi
 echo "Documentation               : $enable_doc$reason_doc"
 if test "$enable_doc" = yes ; then
-   echo "    PDF                     : yes"
+   echo "    PDF                     : with $LATEX"
    echo "    HTML                    : $enable_html_doc$reason_html_doc"
 fi
 echo "Support for interactive proof assistants"
