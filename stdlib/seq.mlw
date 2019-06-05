@@ -369,7 +369,7 @@ module Sorted
 
   type t
   predicate le t t
-  clone relations.TotalOrder as TO with
+  clone relations.TotalPreOrder as TO with
     type t = t, predicate rel = le, axiom .
 
   predicate sorted_sub (s: seq t) (l u: int) =
