@@ -267,14 +267,13 @@ rule token = parse
   let debug = Debug.register_info_flag "print_modules"
     ~desc:"Print@ program@ modules@ after@ typechecking."
 
-  exception Error of string
+  exception Error of string option
 
   let () = Exn_printer.register (fun fmt exn -> match exn with
   (* This ad hoc switch allows to not edit the automatically generated
      handcrafted.messages in ad hoc ways. *)
-  | Error s when s = "<YOUR SYNTAX ERROR MESSAGE HERE>\n" ->
-      Format.fprintf fmt "syntax error"
-  | Error s -> Format.fprintf fmt "syntax error:\n %s" s
+  | Error None -> Format.fprintf fmt "syntax error"
+  | Error (Some s) -> Format.fprintf fmt "syntax error:\n %s" s
   | _ -> raise exn)
 
   (* Associate each token to a text representing it *)
@@ -298,7 +297,7 @@ rule token = parse
       let fname = lb.Lexing.lex_curr_p.Lexing.pos_fname in
       (* TODO/FIXME: ad-hoc fix for TryWhy3/Str incompatibility *)
       let s = if Strings.has_prefix "/trywhy3_input." fname
-        then "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        then None
         else Report.report (t, token) checkpoint in
       (* Typing.close_file is supposedly done at the end of the file in
          parsing.mly. If there is a syntax error, we still need to close it (to

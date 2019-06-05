@@ -40,7 +40,7 @@ run () {
      else
        echo "FAILED!"
        echo "diff is the following:"
-       diff "$f.oracle" "$f.out"
+       diff -u "$f.oracle" "$f.out"
      fi
   fi
 }

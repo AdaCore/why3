@@ -68,20 +68,15 @@
      (fragment text)
      message
 
- let report text checkpoint : string =
+ let report text checkpoint : string option =
    (* Find out in which state the parser failed. *)
    let s : int = state checkpoint in
    (* Choose an error message, based on the state number [s].
       Then, customize it, based on dynamic information. *)
-   let message = try
-     Parser_messages.message s |>
-     fragments text
-   with Not_found ->
-     (* If the state number cannot be found -- which, in principle,
-        should not happen, since our list of erroneous states is
-        supposed to be complete! -- produce a generic message. *)
-     Printf.sprintf "This is an unknown syntax error (%d).\n\
-                     Please report.\n" s
-   in
-   (* Construct the full error message. *)
-   Printf.sprintf "%s" message
+   try
+     let message =
+       Parser_messages.message s |>
+       fragments text
+     in
+     Some message
+   with Not_found -> None
