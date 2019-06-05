@@ -1,3 +1,6 @@
+
+(** {1 A lightweight memory model dedicated to extraction to C code} *)
+
 module C
 
   use mach.int.Unsigned
@@ -14,6 +17,7 @@ module C
 
   constant null_zone : zone
 
+  (** The pointer type *)
   type ptr 'a = abstract {
     mutable data : array 'a ;
     offset : int ;
@@ -28,12 +32,14 @@ module C
   let ghost function pelts (p:ptr 'a) : int -> 'a
   = p.data.elts
 
+  (** the NULL pointer *)
   val null () : ptr 'a
     ensures { result.zone = null_zone }
 
   val predicate is_not_null (p:ptr 'a) : bool
     ensures { result <-> p.zone <> null_zone }
 
+  (** pointer incrementation *)
   val incr (p:ptr 'a) (ofs:int32) : ptr 'a
     requires { p.min <= p.offset + ofs <= p.max }
     ensures { result.offset = p.offset + ofs }
@@ -45,20 +51,24 @@ module C
     ensures { result.zone = p.zone }
     alias { p.data with result.data }
 
+  (** pointer dereference *)
   val get (p:ptr 'a) : 'a
     requires { p.min <= p.offset < p.max }
     ensures { result = (pelts p)[p.offset] }
 
+  (** pointer dereference with offset *)
   let get_ofs (p:ptr 'a) (ofs:int32) : 'a
     requires { p.min <= p.offset + ofs < p.max }
     ensures { result = (pelts p)[p.offset + ofs] }
   = get (incr p ofs)
 
+  (** pointer assignment *)
   val set (p:ptr 'a) (v:'a) : unit
     requires { p.min <= p.offset < p.max }
     ensures { pelts p = Map.set (pelts (old p)) p.offset v }
     writes { p.data.elts }
 
+  (** pointer assignment with offset *)
   let set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
     requires { p.min <= p.offset + ofs < p.max }
     ensures { pelts p = Map.set (pelts (old p))
@@ -79,6 +89,9 @@ module C
     requires { valid p sz }
     ensures { forall i. 0 <= i < sz -> valid_ptr_shift p i }
   = ()
+
+
+  (** {2 basic C functions for memory handling} *)
 
   val malloc (sz:UInt32.uint32) : ptr 'a
     requires { 0 <= sz }
@@ -195,7 +208,7 @@ module C
   val partial c_assert (e:bool) : unit
     ensures { e }
 
-  (** Printing *)
+  (** {2 Printing} *)
 
   val print_space () : unit
   val print_newline () : unit
