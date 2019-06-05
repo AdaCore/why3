@@ -371,7 +371,7 @@ module Translate = struct
         let add_unit = function [] -> [ML.e_dummy_unit] | args -> args in
         let id_f = fun x -> x in
         let f_zero = match rs.rs_logic with
-          | RLnone when cty.cty_args = []  ->
+          | RLnone when cty.cty_args = [] ->
               Debug.dprintf debug_compile "it is a fully applied RLnone@.";
               (* FIXME: ideally this should be done in ocaml_printer *)
               add_unit
@@ -550,7 +550,7 @@ module Translate = struct
         let new_svar = new_svar args res Stv.empty in
         [ML.Dlet (ML.Lany (rs, new_svar, res, []))]
     | PDlet (LDsym ({rs_cty = cty; rs_logic} as rs, {c_node = Cfun e; c_cty}))
-      when c_cty.cty_args = [] ->
+      when filter_params c_cty.cty_args = [] ->
         Debug.dprintf debug_compile "compiling zero-arguments function %a@."
           Expr.print_rs rs;
         Debug.dprintf debug_compile "rs_cty_eff:%b@. c_cty_eff:%b@."
