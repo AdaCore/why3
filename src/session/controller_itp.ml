@@ -316,6 +316,7 @@ let prover_tasks_in_progress :
 let prover_tasks_edited = Queue.create ()
 
 let idle_handler_running = ref false
+let timeout_handler_running = ref false
 
 
 let number_of_running_provers = ref 0
@@ -437,7 +438,7 @@ let update_observer () =
   let running = !number_of_running_provers in
   !observer scheduled (waiting_or_running - running) running
 
-let idle_handler () =
+let timeout_handler () =
   (* examine all the prover tasks in progress *)
   (* When no tasks are there, probably no tasks were scheduled and the server
      was not launched so getting results could fail. *)
@@ -498,6 +499,11 @@ let idle_handler () =
     done;
     Queue.transfer q prover_tasks_edited;
   end;
+  update_observer ();
+  true
+
+
+let idle_handler () =
 
   (* if the number of prover tasks is less than S.multiplier times the maximum
      number of running provers, then we heuristically decide to add
@@ -511,10 +517,10 @@ let idle_handler () =
         try build_prover_call spa
         with e when not (Debug.test_flag Debug.stack_trace) ->
           spa.spa_callback (InternalFailure e)
-    with Queue.Empty -> ()
+    with Queue.Empty -> idle_handler_running := false
   end;
   update_observer ();
-  true
+  !idle_handler_running
 
 let interrupt () =
   (* Interrupt provers *)
@@ -545,6 +551,11 @@ let run_idle_handler () =
       (* The prio should be at least 100. From testing, it seems that the GTK
          tooling is using a prio of 100 or higher for the display of IDE. *)
       S.idle ~prio:300 idle_handler;
+    end;
+  if not !timeout_handler_running then
+    begin
+      timeout_handler_running := true;
+      S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
 let schedule_proof_attempt c id pr ?save_to ~limit ~callback ~notification =
