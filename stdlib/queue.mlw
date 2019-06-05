@@ -3,56 +3,64 @@
 
 module Queue
 
+  use seq.Seq
   use mach.peano.Peano
-  use list.List
-  use list.Append
-  use list.Length as L
+  use int.Int
 
-  type t 'a = abstract { mutable elts: list 'a }
+  type t 'a = abstract {
+    mutable seq: Seq.seq 'a;
+  }
 
-  val create () : t 'a ensures { result.elts = Nil }
+  meta coercion function seq
 
-  val push (x: 'a) (q: t 'a) : unit writes {q}
-    ensures { q.elts = old q.elts ++ Cons x Nil }
+  val create () : t 'a
+    ensures { result = empty }
+
+  val push (x: 'a) (q: t 'a) : unit
+    writes { q }
+    ensures { q = snoc (old q) x }
 
   exception Empty
 
-  val pop (q: t 'a) : 'a writes {q}
-    ensures { match old q.elts with Nil -> false
-      | Cons x t -> result = x /\ q.elts = t end }
-    raises  { Empty -> q.elts = old q.elts = Nil }
+  val pop (q: t 'a) : 'a
+    writes { q }
+    ensures { q <> empty }
+    ensures { result = (old q)[0] }
+    ensures { q = (old q)[1 ..] }
+    raises  { Empty -> q = old q = empty }
 
   val peek (q: t 'a) : 'a
-    ensures { match q.elts with Nil -> false
-      | Cons x _ -> result = x end }
-    raises  { Empty -> q.elts = Nil }
+    ensures { q <> empty }
+    ensures { result = q[0] }
+    raises  { Empty -> q = empty }
 
-  val safe_pop (q: t 'a) : 'a writes {q}
-    requires { q.elts <> Nil }
-    ensures { match old q.elts with Nil -> false
-      | Cons x t -> result = x /\ q.elts = t end }
+  val safe_pop (q: t 'a) : 'a
+    requires { q <> empty }
+    writes { q }
+    ensures { result = (old q)[0] }
+    ensures { q = (old q)[1 ..] }
 
   val safe_peek (q: t 'a) : 'a
-    requires { q.elts <> Nil }
-    ensures { match q.elts with Nil -> false
-      | Cons x _ -> result = x end }
+    requires { q <> empty }
+    ensures { result = q[0] }
 
-  val clear (q: t 'a) : unit writes {q} ensures { q.elts = Nil }
+  val clear (q: t 'a) : unit
+    writes { q }
+    ensures { q = empty }
 
-  val copy (q: t 'a) : t 'a ensures { result = q }
+  val copy (q: t 'a) : t 'a
+    ensures { result == q }
 
   val is_empty (q: t 'a) : bool
-    ensures { result = True <-> q.elts = Nil }
-
-  function length (q: t 'a) : int = L.length q.elts
+    ensures { result <-> (q = empty) }
 
   val length (q: t 'a) : Peano.t
-    ensures { result = L.length q.elts }
+    ensures { result = length q }
 
   val transfer (q1 q2: t 'a) : unit
     writes  { q1, q2 }
-    ensures { q1.elts = Nil }
-    ensures { q2.elts = old q2.elts ++ old q1.elts }
+    ensures { q1 = empty }
+    ensures { q2 = (old q2) ++ (old q1) }
 
 end
 
