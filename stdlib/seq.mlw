@@ -435,7 +435,26 @@ module Occ
 
   function occ (x: 'a) (s: seq 'a) (l u: int) : int = N.numof (iseq x s) l u
 
-  (* TODO: lemmas for cons, snoc, etc. *)
+  lemma occ_cons:
+    forall k: 'a, s: seq 'a, x: 'a.
+    (occ k (cons x s) 0 (length (cons x s)) =
+    if k = x then 1 + occ k s 0 (length s)
+    else occ k s 0 (length s)
+    ) by (cons x s == (cons x empty) ++ s)
+
+  lemma occ_snoc:
+    forall k: 'a, s: seq 'a, x: 'a.
+    occ k (snoc s x) 0 (length (snoc s x)) =
+    if k = x then 1 + occ k s 0 (length s)
+    else occ k s 0 (length s)
+
+  lemma occ_tail:
+    forall k: 'a, s: seq 'a.
+    length s > 0 ->
+    (occ k s[1..] 0 (length s[1..]) =
+    if k = s[0] then (occ k s 0 (length s)) - 1
+    else occ k s 0 (length s)
+    ) by (s == cons s[0] s[1..])
 
   lemma append_num_occ:
     forall x: 'a, s1 s2: seq 'a.
