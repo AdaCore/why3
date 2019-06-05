@@ -315,7 +315,7 @@ let prover_tasks_in_progress :
    rely on a loop on why3server's results. *)
 let prover_tasks_edited = Queue.create ()
 
-let timeout_handler_running = ref false
+let idle_handler_running = ref false
 
 
 let number_of_running_provers = ref 0
@@ -437,7 +437,7 @@ let update_observer () =
   let running = !number_of_running_provers in
   !observer scheduled (waiting_or_running - running) running
 
-let timeout_handler () =
+let idle_handler () =
   (* examine all the prover tasks in progress *)
   (* When no tasks are there, probably no tasks were scheduled and the server
      was not launched so getting results could fail. *)
@@ -504,14 +504,14 @@ let timeout_handler () =
      more tasks *)
   begin
     try
-      for _i = Hashtbl.length prover_tasks_in_progress
-          to S.multiplier * !session_max_tasks do
+      if Hashtbl.length prover_tasks_in_progress <
+         S.multiplier * !session_max_tasks
+      then
         let spa = Queue.pop scheduled_proof_attempts in
         try build_prover_call spa
         with e when not (Debug.test_flag Debug.stack_trace) ->
           spa.spa_callback (InternalFailure e)
-      done
-  with Queue.Empty -> ()
+    with Queue.Empty -> ()
   end;
   update_observer ();
   true
@@ -538,11 +538,13 @@ let interrupt () =
   done;
   !observer 0 0 0
 
-let run_timeout_handler () =
-  if not !timeout_handler_running then
+let run_idle_handler () =
+  if not !idle_handler_running then
     begin
-      timeout_handler_running := true;
-      S.timeout ~ms:default_delay_ms timeout_handler;
+      idle_handler_running := true;
+      (* The prio should be at least 100. From testing, it seems that the GTK
+         tooling is using a prio of 100 or higher for the display of IDE. *)
+      S.idle ~prio:300 idle_handler;
     end
 
 let schedule_proof_attempt c id pr ?save_to ~limit ~callback ~notification =
@@ -605,7 +607,7 @@ let schedule_proof_attempt c id pr ?save_to ~limit ~callback ~notification =
       spa_ores     = ores } in
   Queue.add spa scheduled_proof_attempts;
   callback panid Scheduled;
-  run_timeout_handler ()
+  run_idle_handler ()
 
 
 
@@ -727,7 +729,7 @@ let schedule_edition c id pr ~callback ~notification =
   let call = Call_provers.call_editor ~command:editor file in
   callback panid Running;
   Queue.add (callback panid,call,old_res) prover_tasks_edited;
-  run_timeout_handler ()
+  run_idle_handler ()
 
 exception TransAlreadyExists of string * string
 exception GoalNodeDetached of proofNodeID
