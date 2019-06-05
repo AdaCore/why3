@@ -24,7 +24,7 @@ module Queue
 
   val pop (q: t 'a) : 'a
     writes { q }
-    ensures { q <> empty }
+    ensures { old q <> empty }
     ensures { result = (old q)[0] }
     ensures { q = (old q)[1 ..] }
     raises  { Empty -> q = old q = empty }
@@ -45,7 +45,7 @@ module Queue
     ensures { result = q[0] }
 
   val clear (q: t 'a) : unit
-    writes { q }
+    writes  { q }
     ensures { q = empty }
 
   val copy (q: t 'a) : t 'a
