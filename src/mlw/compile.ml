@@ -299,7 +299,8 @@ module Translate = struct
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         let new_svar = new_svar args res svar in
-        let ld = ML.sym_defn rs new_svar res args (expr info svar cty.cty_mask ef) in
+        let e_let = expr info svar cty.cty_mask ef in
+        let ld = ML.sym_defn rs new_svar res args e_let in
         ML.e_let ld (expr info svar mask ein) (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rs, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app -> (* partial application of constructor *)
@@ -479,36 +480,43 @@ module Translate = struct
         (rs.rs_name, List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)) in
     let drecord_fields ({rs_cty = cty} as rs) =
       (List.exists (pv_equal (fd_of_rs rs)) s.its_mfields,
-      rs.rs_name,
-      mlty_of_ity cty.cty_mask cty.cty_result) in
+       rs.rs_name,
+       mlty_of_ity cty.cty_mask cty.cty_result) in
     let id = s.its_ts.ts_name in
     let is_private = s.its_private in
     let args = s.its_ts.ts_args in
     begin match s.its_def, itd.itd_constructors, itd.itd_fields with
       | NoDef, [], [] ->
-          ML.mk_its_defn id args is_private None
+          ML.mk_its_defn id args is_private None, []
       | NoDef, cl, [] ->
           let cl = ddata_constructs cl in
-          ML.mk_its_defn id args is_private (Some (ML.Ddata cl))
+          ML.mk_its_defn id args is_private (Some (ML.Ddata cl)), []
       | NoDef, _, pjl ->
           let p e = not (rs_ghost e) in
+          let pjl_rs = filter_ghost_params p (fun x -> x) pjl in
           let pjl = filter_ghost_params p drecord_fields pjl in
           begin match pjl with
             | [] ->
-                ML.mk_its_defn id args is_private (Some (ML.Dalias ML.tunit))
+                ML.mk_its_defn id args is_private (Some (ML.Dalias ML.tunit)),
+                pjl_rs
             | [_, _, ty_pj] when is_optimizable_record_itd itd ->
-                ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj))
+                ML.mk_its_defn id args is_private (Some (ML.Dalias ty_pj)),
+                pjl_rs
             | pjl ->
-                ML.mk_its_defn id args is_private (Some (ML.Drecord pjl)) end
+                ML.mk_its_defn id args is_private (Some (ML.Drecord pjl)),
+                pjl_rs end
       | Alias t, _, _ ->
           ML.mk_its_defn id args is_private (* FIXME ? is this a good mask ? *)
-            (Some (ML.Dalias (mlty_of_ity MaskVisible t)))
+            (Some (ML.Dalias (mlty_of_ity MaskVisible t))),
+          []
       | Range r, [], [] ->
           assert (args = []); (* a range type is not polymorphic *)
-          ML.mk_its_defn id [] is_private (Some (ML.Drange r))
+          ML.mk_its_defn id [] is_private (Some (ML.Drange r)),
+          []
       | Float ff, [], [] ->
           assert (args = []); (* a float type is not polymorphic *)
-          ML.mk_its_defn id [] is_private (Some (ML.Dfloat ff))
+          ML.mk_its_defn id [] is_private (Some (ML.Dfloat ff)),
+          []
       | (Range _ | Float _), _, _ ->
           assert false (* cannot have constructors or fields *)
     end
@@ -516,6 +524,16 @@ module Translate = struct
   let is_val = function
     | Eexec ({c_node = Cany}, _) -> true
     | _ -> false
+
+  let dlet_of_pj ({rs_cty = cty} as rs) =
+    assert (rs.rs_field <> None);
+    let res = mlty_of_ity cty.cty_mask cty.cty_result in
+    let args = params cty.cty_args in
+    let args_app = app cty.cty_args cty.cty_args (fun x -> x) in
+    let ity_res = ML.I cty.cty_result in
+    let attrs = Sattr.empty in
+    let ml_app = ML.e_app rs args_app ity_res MaskVisible eff_empty attrs in
+    ML.Dlet (ML.Lsym (rs, Stv.empty, res, args, ml_app))
 
   let pdecl info pd =
     match pd.pd_node with
@@ -589,8 +607,11 @@ module Translate = struct
     | PDlet (LDsym _) | PDpure ->
         []
     | PDtype itl ->
-        let itsd = List.map tdef itl in
-        [ML.Dtype itsd]
+        let itsd_pjl = List.map tdef itl in
+        let itsd = List.map (fun (its, _) -> its) itsd_pjl in
+        let pjl = List.map (fun (_, pjl) -> List.map dlet_of_pj pjl) itsd_pjl in
+        let pjl = match pjl with [] | [_] -> [] | l -> l in
+        ML.Dtype itsd :: (List.concat pjl)
     | PDexn xs ->
         if ity_equal xs.xs_ity ity_unit || xs.xs_mask = MaskGhost then
           [ML.Dexn (xs, None)]
