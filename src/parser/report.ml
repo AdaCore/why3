@@ -4,7 +4,6 @@
  *)
 
  open Parser.MenhirInterpreter
- module S = MenhirLib.General (* Streams *)
 
  (* -------------------------------------------------------------------------- *)
 
@@ -17,12 +16,12 @@
 
  (* -------------------------------------------------------------------------- *)
 
- (* [stack checkpoint] extracts the parser's stack out of a checkpoint. *)
+ (* [env checkpoint] extracts the parser's environment out of a checkpoint. *)
 
- let stack checkpoint =
+ let env checkpoint =
    match checkpoint with
    | HandlingError env ->
-       stack env
+       env
    | _ ->
        assert false (* this cannot happen, I promise *)
 
@@ -32,12 +31,12 @@
     parser checkpoint. *)
 
  let state checkpoint : int =
-   match Lazy.force (stack checkpoint) with
-   | S.Nil ->
+   match top (env checkpoint) with
+   | None ->
        (* Hmm... The parser is in its initial state. Its number is
           usually 0. This is a BIG HACK. TEMPORARY *)
        0
-   | S.Cons (Element (s, _, _, _), _) ->
+   | Some Element (s, _, _, _) ->
        number s
 
  (* -------------------------------------------------------------------------- *)
@@ -49,8 +48,8 @@
    try
      let i = int_of_string (Str.matched_group 1 message) in
      match i with
-     | 0 -> fst text
-     | _ -> snd text
+     | 0 -> text
+     | _ -> text
    with
    | Failure _ ->
        (* In principle, this should not happen, but if it does, let's cover up
@@ -68,15 +67,27 @@
      (fragment text)
      message
 
- let report text checkpoint : string option =
-   (* Find out in which state the parser failed. *)
-   let s : int = state checkpoint in
-   (* Choose an error message, based on the state number [s].
-      Then, customize it, based on dynamic information. *)
-   try
-     let message =
-       Parser_messages.message s |>
-       fragments text
-     in
-     Some message
-   with Not_found -> None
+exception Found of string
+
+let message_from_token text =
+  match text with
+  | "module" ->
+      raise (Found "Trying to open a module inside a module")
+  | _ -> ()
+
+let message_from_state_id text checkpoint =
+  (* Find out in which state the parser failed. *)
+  let s : int = state checkpoint in
+  (* Choose an error message, based on the state number [s].
+     Then, customize it, based on dynamic information. *)
+  match Parser_messages.message s with
+  | exception Not_found -> ()
+  | message ->
+      raise (Found (fragments text message))
+
+let report text checkpoint : string option =
+  try
+    message_from_token text;
+    message_from_state_id text checkpoint;
+    None
+   with Found s -> Some s

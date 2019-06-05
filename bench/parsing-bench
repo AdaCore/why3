@@ -40,6 +40,7 @@ run () {
      else
        echo "FAILED!"
        echo "diff is the following:"
+       touch "$f.oracle"
        diff -u "$f.oracle" "$f.out"
      fi
   fi

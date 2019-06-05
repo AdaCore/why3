@@ -1,2 +1,2 @@
-val report: string * string ->
+val report: string ->
   'a Parser.MenhirInterpreter.checkpoint -> string option

@@ -276,13 +276,6 @@ rule token = parse
   | Error (Some s) -> Format.fprintf fmt "syntax error:\n %s" s
   | _ -> raise exn)
 
-  (* Associate each token to a text representing it *)
-  let match_tokens t =
-    (* TODO generate this automatically *)
-    match t with
-    | None -> assert false
-    | Some _t -> "NOT IMPLEMENTED"
-
   let build_parsing_function (parser_entry: Lexing.position -> 'a) lb =
     (* This records the last token which was read (for error messages) *)
     let last = ref None in
@@ -292,13 +285,12 @@ rule token = parse
       I.lexer_lexbuf_to_supplier (fun x -> let t = token x in last := Some t; t) lb
     and succeed t = t
     and fail checkpoint =
-      let t = Lexing.lexeme lb in
-      let token = match_tokens !last in
+      let text = Lexing.lexeme lb in
       let fname = lb.Lexing.lex_curr_p.Lexing.pos_fname in
       (* TODO/FIXME: ad-hoc fix for TryWhy3/Str incompatibility *)
       let s = if Strings.has_prefix "/trywhy3_input." fname
         then None
-        else Report.report (t, token) checkpoint in
+        else Report.report text checkpoint in
       (* Typing.close_file is supposedly done at the end of the file in
          parsing.mly. If there is a syntax error, we still need to close it (to
          be able to reload). *)

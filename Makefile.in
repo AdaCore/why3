@@ -295,7 +295,7 @@ endif
 .PHONY: initialize_messages
 
 initialize_messages: src/parser/parser.mly
-	$(MENHIR) --explain --strict src/parser/parser.mly --list-errors > src/parser/handcrafted.messages
+	$(MENHIR) --explain --strict src/parser/parser.mly --list-errors > src/parser/handcrafted.messages.new
 
 src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.messages
 	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
