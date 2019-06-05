@@ -1757,6 +1757,8 @@ endif
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
   share/Makefile.config bin/why3extract.@OCAMLBEST@
 	bash bench/bench ".@OCAMLBEST@"
+	@echo "=== Check parsing message ==="
+	bench/parsing-bench
 	$(MAKE) bench-api
 	@echo ""
 	@echo "=== Checking extraction ==="
