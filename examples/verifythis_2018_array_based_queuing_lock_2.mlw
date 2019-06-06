@@ -40,7 +40,7 @@ let fetch_and_add (r:ref tick)
   r := { v = res.v + 1; b = mod (res.b + 1) (k*n) };
   res
 
-predicate lt (tick1 tick2: tick) = tick1.v <= tick2.v
+predicate lt (tick1 tick2: tick) = tick1.v < tick2.v
 
 use import seq.Seq as S
 use seq.Mem
@@ -362,16 +362,18 @@ let main () : unit
                         by waiting_list at Step
                            = cons tick waiting_list
                         so consecutive waiting_list at Step
-                        so (forall t. mem t waiting_list -> tick.v < t.v)
                         so consecutive waiting_list
                         so if S.length waiting_list = 0
                            then not mem tick waiting_list
                            else let x = S.get waiting_list 0 in
                                 let l = waiting_list[1 .. ] in
                                 not mem tick waiting_list
-                                         by tick.v < x.v
-                                         so (forall t. mem t l -> x.v < t.v)
-                                         };
+                                    by tick.v < x.v
+                                    so (forall t. mem t l -> lt x t
+                                        by forall i. 0 <= i < S.length l ->
+                                           t = S.([]) l i ->
+                                           (lt x t
+                                           by t = S.([]) waiting_list (i+1))) };
               assert { forall tick1 tick2. mem tick1 waiting_list at Step
                                         -> mem tick2 waiting_list at Step
                                         -> tick1.v < tick2.v
@@ -456,6 +458,17 @@ let main () : unit
                                        by x.v = tick.v + 1
                                        so x.b = nt
                         };
+                assert { forall th'. 0 <= th' < n ->
+                         th <> th' ->
+                         match memo[th'] with
+                           | None -> true
+                           | Some tick1 -> mem tick1 waiting_list
+                             by waiting_list = waiting_list at Step
+                             so (mem tick1 waiting_list at Step
+                                \/ !active_tick at Step = Some tick1)
+                             so tick <> tick1
+                             so !active_tick at Step <> Some tick1
+                         end };
           end
       end
   done
