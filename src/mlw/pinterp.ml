@@ -248,12 +248,6 @@ let exec_array_empty _ args =
     | _ ->
       raise CannotCompute
 
-let exec_array_copy _ args =
-  match args with
-    | [Varray a] -> Varray(Array.copy a)
-    | _ ->
-      raise CannotCompute
-
 let exec_array_get _ args =
   match args with
     | [Varray a;Vnum i] ->
@@ -318,7 +312,6 @@ let built_in_modules =
      Ident.op_get "", exec_array_get ;
      "length", exec_array_length ;
      Ident.op_set "", exec_array_set ;
-     "copy", exec_array_copy ;
     ] ;
   ]
 

@@ -205,12 +205,6 @@ let exec_bigarray_make _ args =
   | _ ->
      assert false
 
-let exec_bigarray_copy _ args =
-  match args with
-  | [Varray a] -> Varray(Array.copy a)
-  | _ ->
-     assert false
-
 let exec_bigarray_get _ args =
   match args with
   | [Varray a;Vbigint i] ->
@@ -472,7 +466,6 @@ let built_in_modules =
      "length", exec_bigarray_length ;
      Ident.op_get "", exec_bigarray_get ;
      Ident.op_set "", exec_bigarray_set ;
-     "copy", exec_bigarray_copy ;
     ] ;
     ["mach"; "array"],"Array31", [],
     ["make", exec_array_make ;
