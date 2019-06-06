@@ -99,27 +99,6 @@ let config, base_config, env =
 
 module Server = Itp_server.Make (Unix_scheduler) (Protocol_shell)
 
-
-(*************************)
-(* Notification Handling *)
-(*************************)
-
-let treat_message_notification fmt msg = match msg with
-  (* TODO: do something ! *)
-  | Proof_error (_id, s)                           -> fprintf fmt "%s@." s
-  | Transf_error (_b, _id, _tr_name, _arg, _loc, s, _) -> fprintf fmt "%s@." s
-  | Strat_error (_id, s)                           -> fprintf fmt "%s@." s
-  | Replay_Info s                                  -> fprintf fmt "%s@." s
-  | Query_Info (_id, s)                            -> fprintf fmt "%s@." s
-  | Query_Error (_id, s)                           -> fprintf fmt "%s@." s
-  | File_Saved s                                   -> fprintf fmt "%s@." s
-  | Information s          -> fprintf fmt "%s@." s
-  | Task_Monitor (_t, _s, _r) -> () (* TODO do we want to print something for this? *)
-  | Parse_Or_Type_Error (_, _, s)  -> fprintf fmt "%s@." s
-  | Error s                ->
-      fprintf fmt "%s@." s
-  | Open_File_Error s -> fprintf fmt "%s@." s
-
 type shell_node_type =
   | SRoot
   | SFile
@@ -253,6 +232,7 @@ let print_session fmt =
   let l = root_node.children_nodes in
   fprintf fmt "root %a@." print_s l
 
+
 let convert_to_shell_type t =
   match t with
   | NRoot           -> SRoot
@@ -311,6 +291,30 @@ let is_proof_attempt node_type =
   | NProofAttempt -> true
   | _ -> false
 
+(*************************)
+(* Notification Handling *)
+(*************************)
+
+let treat_message_notification fmt msg = match msg with
+  (* TODO: do something ! *)
+  | Proof_error (_id, s)                           -> fprintf fmt "%s@." s
+  | Transf_error (_b, _id, _tr_name, _arg, _loc, s, _) -> fprintf fmt "%s@." s
+  | Strat_error (_id, s)                           -> fprintf fmt "%s@." s
+  | Replay_Info s                                  -> fprintf fmt "%s@." s
+  | Query_Info (_id, s)                            -> fprintf fmt "%s@." s
+  | Query_Error (_id, s)                           -> fprintf fmt "%s@." s
+  | File_Saved s                                   -> fprintf fmt "%s@." s
+  | Information s when s = "Session initialized successfully" ->
+      fprintf fmt "%s@." s;
+      print_session fmt
+  | Information s ->
+      fprintf fmt "%s@." s
+  | Task_Monitor (_t, _s, _r) -> () (* TODO do we want to print something for this? *)
+  | Parse_Or_Type_Error (_, _, s)  -> fprintf fmt "%s@." s
+  | Error s                ->
+      fprintf fmt "%s@." s
+  | Open_File_Error s -> fprintf fmt "%s@." s
+
 let treat_notification fmt n =
   match n with
   | Reset_whole_tree                        -> print_session fmt
@@ -349,6 +353,7 @@ let additional_help = "Additionally for shell:\n\
                        goto n -> focuse on n\n\
                        ng -> next node\n\
                        g -> print the current task\n\
+                       gf -> print the current task with full context\n\
                        p -> print the session\n"
 
 (******************)
@@ -370,8 +375,9 @@ let interp fmt cmd =
           match cmd with
           | "ng" -> cur_id := (!cur_id + 1) mod !max_ID; print_session fmt
           | "g" ->
-             let c = false (* TODO *) in
-             send_request (Get_task(!cur_id,c,false))
+              send_request (Get_task(!cur_id,false,false))
+          | "gf" ->
+              send_request (Get_task(!cur_id, true, false))
           | "p" -> print_session fmt
           | "help" ->
               Format.fprintf fmt "%s@." additional_help;
@@ -394,7 +400,6 @@ let () =
       Whyconf.Args.exit_with_usage spec usage_str
   in
   Server.init_server config env dir;
-  Queue.iter (fun f -> send_request (Add_file_req f)) files;
   Unix_scheduler.timeout ~ms:100
     (fun () -> List.iter
         (fun n -> treat_notification fmt n) (get_notified ()); true);
