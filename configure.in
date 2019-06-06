@@ -372,9 +372,12 @@ if test "$enable_doc" = yes ; then
    AC_CHECK_PROGS(LATEX,rubber latexmk pdflatex,no)
    if test "$LATEX" = no ; then
       enable_doc=no
+      enable_html_doc=no
       reason_doc=" ((rubber|latexmk|pdflatex) not found)"
       AC_MSG_WARN([Cannot find any latex compiler, documentation disabled.])
    fi
+else
+   enable_html_doc=no
 fi
 
 # checking for hevea (note that the pdf documentation DOES NOT use hevea.sty)
