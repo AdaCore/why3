@@ -1,6 +1,7 @@
 :x: marks a potential source of incompatibility
 
 Standard library
+  * `queue.Queue` now modeled using sequences instead of lists :x:
   * the `set` library has been revamped :x:
       - in `set.Fset`, type `set` becomes `fset`; `choose` becomes `pick`
       - module `appset.Appset` becomes `set.SetApp`;
