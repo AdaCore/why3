@@ -85,7 +85,7 @@ let files = Queue.create ()
 let spec = []
 
 (* --help *)
-let usage_str = Format.sprintf
+let usage_str = sprintf
   "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]"
   (Filename.basename Sys.argv.(0))
 
@@ -137,10 +137,7 @@ let root_node = {
   node_detached = false
 }
 
-open Wstdlib
-open Format
-
-module Hnode = Hint
+module Hnode = Wstdlib.Hint
 let nodes : node Hnode.t = Hnode.create 17
 let () = Hnode.add nodes root_node_ID root_node
 
@@ -173,7 +170,7 @@ let print_proof_attempt fmt pa_id =
       (Pp.print_option (Call_provers.print_prover_result ~json_model:false))
       (get_result pa.node_proof)
 
-let rec print_proof_node (fmt: Format.formatter) goal_id =
+let rec print_proof_node (fmt: formatter) goal_id =
   let goal = Hnode.find nodes goal_id in
   let parent = Hnode.find nodes goal.node_parent in
   let parent_name = parent.node_name in
@@ -380,7 +377,7 @@ let interp fmt cmd =
               send_request (Get_task(!cur_id, true, false))
           | "p" -> print_session fmt
           | "help" ->
-              Format.fprintf fmt "%s@." additional_help;
+              fprintf fmt "%s@." additional_help;
               send_request (Command_req (!cur_id, cmd))
           | _ -> send_request (Command_req (!cur_id, cmd))
         end
@@ -390,13 +387,13 @@ let interp fmt cmd =
     print_goal fmt !cur_id
 
 let () =
-  Format.printf "Welcome to Why3 shell. Type 'help' for help.@.";
-  let fmt = Format.std_formatter in
+  let fmt = std_formatter in
+  fprintf fmt "Welcome to Why3 shell. Type 'help' for help.@.";
   let dir =
     try
       Server_utils.get_session_dir ~allow_mkdir:true files
     with Invalid_argument s ->
-      Format.eprintf "Error: %s@." s;
+      eprintf "Error: %s@." s;
       Whyconf.Args.exit_with_usage spec usage_str
   in
   Server.init_server config env dir;
