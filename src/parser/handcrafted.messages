@@ -11,3 +11,15 @@ mlw_file: MODULE WRITES
 module name expected.
 found "$0".
 expecting a capitalized identifier (token UIDENT_NQ)
+
+mlw_file: MODULE UIDENT END TYPE
+##
+## Ends in an error in state: 1240.
+##
+## list(mlw_module) -> mlw_module . list(mlw_module) [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## mlw_module
+##
+
+Toplevel declarations can't follow module declaration
