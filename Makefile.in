@@ -292,32 +292,32 @@ src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
 
-.PHONY: initialize_messages
+.PHONY: initialize_messages update-parsing-error-handling
 
 initialize_messages: src/parser/parser.mly
 	$(MENHIR) --explain --strict src/parser/parser.mly --list-errors > src/parser/handcrafted.messages.new
 
-src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.messages
+update-parsing-error-handling:
 	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
-src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp;
-# If the update fails, the exit code is 0 so we also try to compile-errors directly
-# before replacing handcrafted.messages. If the following line fails, exit code
-# 1 is returned stopping the command. And empty file parser_messages.ml is
-# deleted by .DELETE_ON_ERROR. This behavior ensures that second run of make
-# will not continue with a fake parser_messages.ml.
-	$(MENHIR) --explain --strict src/parser/parser.mly --compile-errors \
-src/parser/handcrafted.messages.temp > src/parser/parser_messages.ml;
-	if cmp -s src/parser/handcrafted.messages.temp src/parser/handcrafted.messages; then \
-	echo "parser_messages.ml OK"; \
-	else \
-	echo "Regenerating handcrafted.messages"; \
-	rm -f src/parser/parser_messages.ml; \
-	cp src/parser/handcrafted.messages.temp src/parser/handcrafted.messages; \
-	rm -f src/parser/handcrafted.messages.temp; \
-	fi
+		src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
+	@mv src/parser/handcrafted.messages.temp src/parser/handcrafted.messages
 
-clean ::
+src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.messages
+	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
+	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
+	src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
+	@if ! cmp -s src/parser/handcrafted.messages src/parser/handcrafted.messages.temp; then \
+		echo "Parsing error handling must be updated using 'make update-parsing-error-handling'"; \
+		rm -f src/parser/handcrafted.messages.temp; \
+		exit 1; \
+	fi
 	rm -f src/parser/handcrafted.messages.temp
+	$(MENHIR) --explain --strict src/parser/parser.mly --compile-errors \
+	src/parser/handcrafted.messages > src/parser/parser_messages.ml.tmp
+	mv src/parser/parser_messages.ml.tmp src/parser/parser_messages.ml
+
+clean::
+	rm -f src/parser/parser_messages.ml.tmp src/parser/handcrafted.messages.temp
 
 # hide deprecated warnings for strings
 
