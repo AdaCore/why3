@@ -75,28 +75,6 @@ let get_notified = Protocol_shell.get_notified
 
 let send_request = Protocol_shell.send_request
 
-(************************)
-(* parsing command line *)
-(************************)
-
-(* files of the current task *)
-let files = Queue.create ()
-
-let spec = []
-
-(* --help *)
-let usage_str = sprintf
-  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]"
-  (Filename.basename Sys.argv.(0))
-
-(* Parse files *)
-let config, base_config, env =
-  let config, base_config, env =
-    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
-  if Queue.is_empty files then
-    Whyconf.Args.exit_with_usage spec usage_str;
-  (config, base_config, env)
-
 module Server = Itp_server.Make (Unix_scheduler) (Protocol_shell)
 
 type shell_node_type =
@@ -316,21 +294,23 @@ let treat_notification fmt n =
   match n with
   | Reset_whole_tree                        -> print_session fmt
   | Node_change (id, info)                  ->
-    change_node fmt id info
+      change_node fmt id info
   | New_node (id, pid, typ, name, detached) ->
-    add_new_node fmt id pid typ name detached
+      add_new_node fmt id pid typ name detached
   | Remove _id                              -> (* TODO *)
-    fprintf fmt "got a Remove notification not yet supported@."
+      fprintf fmt "got a Remove notification not yet supported@."
   | Initialized _g_info                     ->
-    (* TODO *)
-    fprintf fmt "Initialized@."
+      (* TODO *)
+      fprintf fmt "Initialized@."
   | Saved                                   -> (* TODO *)
-    fprintf fmt "got a Saved notification not yet supported@."
+      fprintf fmt "Session is saved@."
   | Saving_needed _b                        -> (* TODO *)
-    fprintf fmt "got a Saving_needed notification not yet supported@."
+      fprintf fmt "got a Saving_needed notification not yet supported@."
   | Message (msg)                           -> treat_message_notification fmt msg
-  | Dead _s                                 -> (* TODO *)
-    fprintf fmt "got a Dead notification not yet supported@."
+  | Dead s                                 ->
+      fprintf fmt "Dead notification: %s\nExiting.@." s;
+      (* This exception is matched in Unix_Scheduler *)
+      raise Exit
   | File_contents (f, s)                    ->
       fprintf fmt "File %s is:\n%s" f s (* TODO print this correctly *)
   | Source_and_ce _                         ->
@@ -351,7 +331,9 @@ let additional_help = "Additionally for shell:\n\
                        ng -> next node\n\
                        g -> print the current task\n\
                        gf -> print the current task with full context\n\
-                       p -> print the session\n"
+                       p -> print the session\n\
+                       Exit -> quit the shell\n\
+                       Save -> save the session\n"
 
 (******************)
 (*    actions     *)
@@ -379,6 +361,8 @@ let interp fmt cmd =
           | "help" ->
               fprintf fmt "%s@." additional_help;
               send_request (Command_req (!cur_id, cmd))
+          | "Save" -> send_request Save_req
+          | "Exit" -> send_request Exit_req
           | _ -> send_request (Command_req (!cur_id, cmd))
         end
   end;
@@ -386,8 +370,35 @@ let interp fmt cmd =
   if node.node_type = SGoal then
     print_goal fmt !cur_id
 
+(************************)
+(* parsing command line *)
+(************************)
+
+(* files of the current task *)
+let files = Queue.create ()
+
+let quiet = ref false
+
+let set_quiet () = quiet := true
+
+let spec =
+  ["--quiet", Arg.Unit set_quiet, "Remove all printing to stdout"]
+
+(* --help *)
+let usage_str = sprintf
+  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]"
+  (Filename.basename Sys.argv.(0))
+
+(* Parse files *)
+let config, base_config, env =
+  let config, base_config, env =
+    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
+  if Queue.is_empty files then
+    Whyconf.Args.exit_with_usage spec usage_str;
+  (config, base_config, env)
+
 let () =
-  let fmt = std_formatter in
+  let fmt = if !quiet then str_formatter else std_formatter in
   fprintf fmt "Welcome to Why3 shell. Type 'help' for help.@.";
   let dir =
     try
