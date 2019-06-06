@@ -5,6 +5,7 @@
 <prover id="0" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Coq" version="8.9.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
@@ -22,8 +23,11 @@
  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
  <proof prover="7"><result status="valid" time="0.01" steps="2281"/></proof>
  </goal>
+ <goal name="VC copy" expl="VC for copy" proved="true">
+ <proof prover="8"><result status="valid" time="0.05" steps="6809"/></proof>
+ </goal>
  <goal name="VC sub" expl="VC for sub" proved="true">
- <proof prover="8"><result status="valid" time="0.08" steps="9312"/></proof>
+ <proof prover="8"><result status="valid" time="0.08" steps="9086"/></proof>
  </goal>
  <goal name="VC fill" expl="VC for fill" proved="true">
  <proof prover="8"><result status="valid" time="0.08" steps="10641"/></proof>
@@ -71,7 +75,12 @@
  <proof prover="8"><result status="valid" time="0.04" steps="9472"/></proof>
  </goal>
  <goal name="VC self_blit" expl="VC for self_blit" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.06" steps="287"/></proof>
+ <proof prover="3"><result status="valid" time="0.07" steps="255"/></proof>
+ </goal>
+</theory>
+<theory name="Init" proved="true">
+ <goal name="VC init" expl="VC for init" proved="true">
+ <proof prover="8"><result status="valid" time="0.05" steps="6980"/></proof>
  </goal>
 </theory>
 <theory name="ArrayPermut" proved="true">
