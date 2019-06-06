@@ -278,11 +278,11 @@ rule token = parse
 
   let build_parsing_function (parser_entry: Lexing.position -> 'a) lb =
     (* This records the last token which was read (for error messages) *)
-    let last = ref None in
+    let last = ref EOF in
     let module I = Parser.MenhirInterpreter in
     let checkpoint = parser_entry lb.Lexing.lex_curr_p
     and supplier =
-      I.lexer_lexbuf_to_supplier (fun x -> let t = token x in last := Some t; t) lb
+      I.lexer_lexbuf_to_supplier (fun x -> let t = token x in last := t; t) lb
     and succeed t = t
     and fail checkpoint =
       let text = Lexing.lexeme lb in
@@ -290,7 +290,7 @@ rule token = parse
       (* TODO/FIXME: ad-hoc fix for TryWhy3/Str incompatibility *)
       let s = if Strings.has_prefix "/trywhy3_input." fname
         then None
-        else Report.report text checkpoint in
+        else Report.report text !last checkpoint in
       (* Typing.close_file is supposedly done at the end of the file in
          parsing.mly. If there is a syntax error, we still need to close it (to
          be able to reload). *)

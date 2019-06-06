@@ -69,9 +69,9 @@
 
 exception Found of string
 
-let message_from_token text =
-  match text with
-  | "module" ->
+let message_from_token token =
+  match token with
+  | Parser.MODULE ->
       raise (Found "Trying to open a module inside a module")
   | _ -> ()
 
@@ -85,9 +85,9 @@ let message_from_state_id text checkpoint =
   | message ->
       raise (Found (fragments text message))
 
-let report text checkpoint : string option =
+let report text token checkpoint : string option =
   try
-    message_from_token text;
+    message_from_token token;
     message_from_state_id text checkpoint;
     None
    with Found s -> Some s
