@@ -239,6 +239,15 @@ let exec_array_make _ args =
     | _ ->
       raise CannotCompute
 
+let exec_array_empty _ args =
+  match args with
+    | [Vconstr(_, [])] ->
+        (* we know by typing that the constructor
+           will be the Tuple0 constructor *)
+        Varray([||])
+    | _ ->
+      raise CannotCompute
+
 let exec_array_copy _ args =
   match args with
     | [Varray a] -> Varray(Array.copy a)
@@ -305,6 +314,7 @@ let built_in_modules =
    ["array"],"Array",
     ["array", builtin_array_type],
     ["make", exec_array_make ;
+     "empty", exec_array_empty ;
      Ident.op_get "", exec_array_get ;
      "length", exec_array_length ;
      Ident.op_set "", exec_array_set ;

@@ -54,6 +54,9 @@ module Array
     ensures { forall i:int. 0 <= i < n -> result[i] = v }
     ensures { result.length = n }
 
+  val empty () : array 'a
+    ensures { result.length = 0 }
+
   val copy (a: array 'a) : array 'a
     ensures  { length result = length a }
     ensures  { forall i:int. 0 <= i < length result -> result[i] = a[i] }

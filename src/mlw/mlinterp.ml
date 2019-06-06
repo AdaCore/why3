@@ -242,6 +242,11 @@ let exec_array_make _ args =
   | [Vint n;def] -> Varray(Array.make n def)
   | _ -> assert false
 
+let exec_array_empty _ args =
+  match args with
+  | [Vtuple []] -> Varray([||])
+  | _ -> assert false
+
 let exec_array_copy _ args =
   match args with
   | [Varray a] -> Varray(Array.copy a)
@@ -463,6 +468,7 @@ let built_in_modules =
     ] ;
     ["array"],"Array", [],
     ["make", exec_bigarray_make ;
+     "empty", exec_array_empty ;
      "length", exec_bigarray_length ;
      Ident.op_get "", exec_bigarray_get ;
      Ident.op_set "", exec_bigarray_set ;
