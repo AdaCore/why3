@@ -299,7 +299,8 @@ module Translate = struct
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         let new_svar = new_svar args res svar in
-        let ld = ML.sym_defn rs new_svar res args (expr info svar cty.cty_mask ef) in
+        let e_let = expr info svar cty.cty_mask ef in
+        let ld = ML.sym_defn rs new_svar res args e_let in
         ML.e_let ld (expr info svar mask ein) (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rs, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app -> (* partial application of constructor *)
@@ -371,14 +372,30 @@ module Translate = struct
         let add_unit = function [] -> [ML.e_dummy_unit] | args -> args in
         let id_f = fun x -> x in
         let f_zero = match rs.rs_logic with
-          | RLnone when cty.cty_args = []  ->
+          | RLnone when cty.cty_args = [] ->
               Debug.dprintf debug_compile "it is a fully applied RLnone@.";
               (* FIXME: ideally this should be done in ocaml_printer *)
               add_unit
           | _ -> id_f in
         let pvl = app pvl rs.rs_cty.cty_args f_zero in
+        let eta_exp_pj is_optimizable =
+          Debug.dprintf debug_compile "record projection@.";
+          let params = filter_params rs.rs_cty.cty_args in
+          let args = rs.rs_cty.cty_args in
+          let app_args = app args args (fun x -> x) in
+          (* create the identity function *)
+          let ml_app = if is_optimizable then
+              match app_args with [a] -> a | _ -> assert false
+            else let ity_res = (ML.I rs.rs_cty.cty_result) in
+              ML.e_app rs app_args ity_res MaskVisible eff_empty attrs in
+          let ity = ML.C rs.rs_cty in
+          let attrs = Sattr.empty in
+          ML.e_fun params ml_app ity rs.rs_cty.cty_mask eff_empty attrs in
         begin match pvl with
           | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
+          | []        when is_optimizable_record_rs info rs ->
+              eta_exp_pj true
+          | [] when rs.rs_field <> None -> eta_exp_pj false
           | _ -> ML.e_app rs pvl (ML.I e.e_ity) mask eff attrs end
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
         (* abstract block *)
@@ -479,8 +496,8 @@ module Translate = struct
         (rs.rs_name, List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)) in
     let drecord_fields ({rs_cty = cty} as rs) =
       (List.exists (pv_equal (fd_of_rs rs)) s.its_mfields,
-      rs.rs_name,
-      mlty_of_ity cty.cty_mask cty.cty_result) in
+       rs.rs_name,
+       mlty_of_ity cty.cty_mask cty.cty_result) in
     let id = s.its_ts.ts_name in
     let is_private = s.its_private in
     let args = s.its_ts.ts_args in
