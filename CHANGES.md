@@ -47,6 +47,11 @@ IDE
   * auto jumping to next unproved goal can now be disabled in the preferences
   * add a "reset proofs" command in the Tools menu. It removes all proofs in
     the session
+  * default proof strategies "Auto level 1" and "Auto level 2"
+    have been respectively renamed "Auto level 2" and "Auto level 3"
+    and there is a new "Auto level 1" similar to "Auto level 0" but with a longer
+    time limit.
+    More details in the manual, section 9.6 "Proof Strategies". :x:
   * strategies can now be defined using %t (resp. %m) for using a prover with
     the default timelimit (resp. memlimit)
 
