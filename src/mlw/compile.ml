@@ -378,13 +378,13 @@ module Translate = struct
               add_unit
           | _ -> id_f in
         let pvl = app pvl rs.rs_cty.cty_args f_zero in
-        let eta_exp_pj is_optimazible =
+        let eta_exp_pj is_optimizable =
           Debug.dprintf debug_compile "record projection@.";
           let params = filter_params rs.rs_cty.cty_args in
           let args = rs.rs_cty.cty_args in
           let app_args = app args args (fun x -> x) in
           (* create the identity function *)
-          let ml_app = if is_optimazible then
+          let ml_app = if is_optimizable then
               match app_args with [a] -> a | _ -> assert false
             else let ity_res = (ML.I rs.rs_cty.cty_result) in
               ML.e_app rs app_args ity_res MaskVisible eff_empty attrs in
