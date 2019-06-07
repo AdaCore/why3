@@ -416,8 +416,20 @@ module Print = struct
     else
       match query_syntax info.info_syn rs.rs_name, pvl with
       | Some s, _ when complex_syntax s || pvl = [] ->
-         let p = Mid.find rs.rs_name info.info_prec in
-         syntax_arguments_prec s (print_expr info) p fmt pvl
+          let arity = syntax_arity s in
+          if List.length pvl >= arity then begin
+            let p = Mid.find rs.rs_name info.info_prec in
+            syntax_arguments_prec s (print_expr info) p fmt pvl
+          end else begin
+            let ids =
+              let id i = id_register (id_fresh ("x" ^ string_of_int i)) in
+              Lists.init arity id in
+            fprintf fmt "@[<hov 2>@[(fun %a -> %a)@]%t%a@]"
+              (print_list space (print_lident info)) ids
+              (syntax_arguments s (print_lident info)) ids
+              (fun fmt -> if pvl = [] then () else fprintf fmt "@;<1 2>")
+              (print_apply_args info) (pvl, [])
+          end
       | _, [t1] when is_field rs ->
          fprintf fmt "%a.%a" (print_expr info 2) t1 (print_record_proj info) rs
       | Some s, _ ->
