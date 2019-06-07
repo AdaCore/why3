@@ -1090,10 +1090,7 @@ single_expr_:
 | assertion_kind option(ident_nq) LEFTBRC term RIGHTBRC
     { match $2 with
       | None -> Eassert ($1, $4)
-      | Some name ->
-         let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name.id_str)) in
-         let t = { $4 with term_desc = Tattr (attr, $4) } in
-         Eassert ($1, t) }
+      | Some name -> Eassert ($1, name_term name $4) }
 | attr single_expr %prec prec_attr
     { Eattr ($1, $2) }
 | single_expr cast
@@ -1238,7 +1235,10 @@ xsymbol:
 | uqualid { $1, None }
 
 invariant:
-| INVARIANT LEFTBRC term RIGHTBRC { $3 }
+| INVARIANT option(ident_nq) LEFTBRC term RIGHTBRC
+    { match $2 with
+      | None -> $4
+      | Some name -> name_term name $4 }
 
 variant:
 | VARIANT LEFTBRC comma_list1(single_variant) RIGHTBRC { $3 }
