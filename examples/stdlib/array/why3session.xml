@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
 <prover id="0" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Coq" version="8.9.0" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.7.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
@@ -76,10 +76,10 @@
 </theory>
 <theory name="ArrayPermut" proved="true">
  <goal name="exchange_permut_sub" proved="true">
- <proof prover="1"><path name="array_ArrayPermut_exchange_permut_sub_1.v"/><result status="valid" time="1.23"/></proof>
+ <proof prover="3"><path name="array_ArrayPermut_exchange_permut_sub_1.v"/><result status="valid" time="2.41"/></proof>
  </goal>
  <goal name="permut_sub_weakening" proved="true">
- <proof prover="1"><path name="array_ArrayPermut_permut_sub_weakening_2.v"/><result status="valid" time="0.43"/></proof>
+ <proof prover="3"><path name="array_ArrayPermut_permut_sub_weakening_2.v"/><result status="valid" time="1.38"/></proof>
  </goal>
  <goal name="exchange_permut_all" proved="true">
  <proof prover="7"><result status="valid" time="0.06" steps="14625"/></proof>
@@ -179,7 +179,7 @@
   <goal name="VC exchange_inversion.3" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="VC exchange_inversion.3.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="1.85" steps="6629390"/></proof>
+   <proof prover="0"><result status="valid" time="2.26" steps="6629390"/></proof>
    </goal>
   </transf>
   </goal>
