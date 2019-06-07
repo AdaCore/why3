@@ -195,9 +195,11 @@
           dl
     | _ -> ()
 
-  let name_term name term =
-    let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name.id_str)) in
-    { term_loc = term.term_loc; term_desc = Tattr (attr, term) }
+  let name_term id_opt def t =
+    let name = Opt.fold (fun _ id -> id.id_str) def id_opt in
+    let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
+    { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
+
 %}
 
 (* Tokens *)
@@ -1088,9 +1090,7 @@ single_expr_:
 | GHOST single_expr
     { Eghost $2 }
 | assertion_kind option(ident_nq) LEFTBRC term RIGHTBRC
-    { match $2 with
-      | None -> Eassert ($1, $4)
-      | Some name -> Eassert ($1, name_term name $4) }
+    { Eassert (snd $1, name_term $2 (fst $1) $4) }
 | attr single_expr %prec prec_attr
     { Eattr ($1, $2) }
 | single_expr cast
@@ -1175,9 +1175,9 @@ exn_handler:
 | uqualid pat_arg? ARROW seq_expr { $1, $2, $4 }
 
 assertion_kind:
-| ASSERT  { Expr.Assert }
-| ASSUME  { Expr.Assume }
-| CHECK   { Expr.Check }
+| ASSERT  { "Assert", Expr.Assert }
+| ASSUME  { "Assume", Expr.Assume }
+| CHECK   { "Check", Expr.Check }
 
 for_dir:
 | TO      { Expr.To }
@@ -1191,15 +1191,10 @@ spec:
 
 single_spec:
 | REQUIRES option(ident_nq) LEFTBRC term RIGHTBRC
-    { match $2 with
-      | None -> { empty_spec with sp_pre = [$4] }
-      | Some name -> { empty_spec with sp_pre = [name_term name $4] } }
+    { { empty_spec with sp_pre = [name_term $2 "Requires" $4] } }
 | ENSURES option(ident_nq) LEFTBRC ensures RIGHTBRC
-    { match $2 with
-      | None -> { empty_spec with sp_post = [floc $startpos($4) $endpos($4), $4] }
-      | Some name ->
-         let bindings = List.map (fun (p, t) -> p, name_term name t) $4 in
-         { empty_spec with sp_post = [floc $startpos($4) $endpos($4), bindings] } }
+    { let bindings = List.map (fun (p, t) -> p, name_term $2 "Ensures" t) $4 in
+      { empty_spec with sp_post = [floc $startpos($4) $endpos($4), bindings] } }
 | RETURNS LEFTBRC match_cases(term) RIGHTBRC
     { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
 | RAISES LEFTBRC bar_list1(raises) RIGHTBRC
@@ -1236,9 +1231,7 @@ xsymbol:
 
 invariant:
 | INVARIANT option(ident_nq) LEFTBRC term RIGHTBRC
-    { match $2 with
-      | None -> $4
-      | Some name -> name_term name $4 }
+    { name_term $2 "LoopInvariant" $4 }
 
 variant:
 | VARIANT LEFTBRC comma_list1(single_variant) RIGHTBRC { $3 }

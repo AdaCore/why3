@@ -29,7 +29,7 @@ module Simple
 
   let isqrt (x:int) : int
     requires { x >= 0 }
-    ensures { isqrt_spec x result }
+    ensures  { isqrt_spec x result }
   = let ref count = 0 in
     let ref sum = 1 in
     while sum <= x do
