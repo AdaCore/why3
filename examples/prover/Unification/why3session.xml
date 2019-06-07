@@ -38,15 +38,15 @@
  <goal name="VC bottomvar" expl="VC for bottomvar" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC bottomvar.0" expl="assertion" proved="true">
-  <transf name="unfold" proved="true" arg1="unassigned" arg2="in" arg3="H">
+  <transf name="unfold" proved="true" arg1="unassigned" arg2="in" arg3="Requires">
    <goal name="VC bottomvar.0.0" expl="assertion" proved="true">
    <transf name="unfold" proved="true" arg1="eval">
     <goal name="VC bottomvar.0.0.0" expl="assertion" proved="true">
-    <transf name="unfold" proved="true" arg1="unifier_subst_ok" arg2="in" arg3="H1">
+    <transf name="unfold" proved="true" arg1="unifier_subst_ok" arg2="in" arg3="Requires1">
      <goal name="VC bottomvar.0.0.0.0" expl="assertion" proved="true">
-     <transf name="destruct" proved="true" arg1="H1">
+     <transf name="destruct" proved="true" arg1="Requires1">
       <goal name="VC bottomvar.0.0.0.0.0" expl="assertion" proved="true">
-      <transf name="rewrite" proved="true" arg1="&lt;-" arg2="H2">
+      <transf name="rewrite" proved="true" arg1="&lt;-" arg2="Requires2">
        <goal name="VC bottomvar.0.0.0.0.0.0" expl="assertion" proved="true">
        <transf name="split_all_full" proved="true" >
         <goal name="VC bottomvar.0.0.0.0.0.0.0" expl="assertion" proved="true">
@@ -58,10 +58,10 @@
            <goal name="VC bottomvar.0.0.0.0.0.0.0.0.0.0" expl="assertion" proved="true">
            <transf name="destruct_term" proved="true" arg1="t">
             <goal name="VC bottomvar.0.0.0.0.0.0.0.0.0.0.0" expl="assertion" proved="true">
-            <proof prover="13"><result status="valid" time="0.17" steps="66470"/></proof>
+            <proof prover="13"><result status="valid" time="0.22" steps="66470"/></proof>
             </goal>
             <goal name="VC bottomvar.0.0.0.0.0.0.0.0.0.0.1" expl="assertion" proved="true">
-            <proof prover="13"><result status="valid" time="0.23" steps="64215"/></proof>
+            <proof prover="13"><result status="valid" time="0.18" steps="64215"/></proof>
             </goal>
            </transf>
            </goal>

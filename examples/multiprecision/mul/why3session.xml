@@ -595,23 +595,23 @@
   <proof prover="6"><result status="valid" time="0.22"/></proof>
   </goal>
   <goal name="VC wmpn_addmul_n.46" expl="assertion" proved="true">
-  <transf name="rewrite" proved="true" arg1="H4" arg2="in" arg3="H3">
+  <transf name="rewrite" proved="true" arg1="Ensures1" arg2="in" arg3="Ensures">
    <goal name="VC wmpn_addmul_n.46.0" expl="assertion" proved="true">
-   <transf name="rewrite" proved="true" arg1="H8" arg2="in" arg3="H7">
+   <transf name="rewrite" proved="true" arg1="Ensures3" arg2="in" arg3="Ensures2">
     <goal name="VC wmpn_addmul_n.46.0.0" expl="assertion" proved="true">
-    <transf name="rewrite" proved="true" arg1="H62" arg2="in" arg3="H61">
+    <transf name="rewrite" proved="true" arg1="Ensures13" arg2="in" arg3="Ensures12">
      <goal name="VC wmpn_addmul_n.46.0.0.0" expl="assertion" proved="true">
      <transf name="use_th" proved="true" arg1="lineardecision.LinearDecisionIntMP">
       <goal name="VC wmpn_addmul_n.46.0.0.0.0" expl="assertion" proved="true">
       <transf name="reflection_f" proved="true" arg1="mp_decision">
        <goal name="VC wmpn_addmul_n.46.0.0.0.0.0" expl="assertion" proved="true">
-       <proof prover="6"><result status="valid" time="0.15"/></proof>
+       <proof prover="6"><result status="valid" time="0.09"/></proof>
        </goal>
        <goal name="VC wmpn_addmul_n.46.0.0.0.0.1" proved="true">
-       <proof prover="4"><result status="valid" time="0.36" steps="72643"/></proof>
+       <proof prover="4"><result status="valid" time="0.27" steps="72643"/></proof>
        </goal>
        <goal name="VC wmpn_addmul_n.46.0.0.0.0.2" proved="true">
-       <proof prover="4"><result status="valid" time="0.38" steps="72921"/></proof>
+       <proof prover="4"><result status="valid" time="0.25" steps="72921"/></proof>
        </goal>
       </transf>
       </goal>
@@ -873,11 +873,11 @@
   <proof prover="1"><result status="valid" time="0.21"/></proof>
   </goal>
   <goal name="VC wmpn_mul_basecase.46" expl="assertion" proved="true">
-  <transf name="rewrite" proved="true" arg1="H4" arg2="in" arg3="H3">
+  <transf name="rewrite" proved="true" arg1="Ensures1" arg2="in" arg3="Ensures">
    <goal name="VC wmpn_mul_basecase.46.0" expl="assertion" proved="true">
-   <transf name="rewrite" proved="true" arg1="H7" arg2="in" arg3="H6">
+   <transf name="rewrite" proved="true" arg1="Ensures4" arg2="in" arg3="Ensures3">
     <goal name="VC wmpn_mul_basecase.46.0.0" expl="assertion" proved="true">
-    <transf name="rewrite" proved="true" arg1="H53" arg2="in" arg3="H52">
+    <transf name="rewrite" proved="true" arg1="Ensures11" arg2="in" arg3="Ensures10">
      <goal name="VC wmpn_mul_basecase.46.0.0.0" expl="assertion" proved="true">
      <transf name="use_th" proved="true" arg1="lineardecision.LinearDecisionIntMP">
       <goal name="VC wmpn_mul_basecase.46.0.0.0.0" expl="assertion" proved="true">
@@ -886,7 +886,7 @@
        <proof prover="6"><result status="valid" time="0.10"/></proof>
        </goal>
        <goal name="VC wmpn_mul_basecase.46.0.0.0.0.1" proved="true">
-       <proof prover="4"><result status="valid" time="0.32" steps="73328"/></proof>
+       <proof prover="4"><result status="valid" time="0.26" steps="73328"/></proof>
        </goal>
       </transf>
       </goal>
