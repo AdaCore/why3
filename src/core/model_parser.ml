@@ -321,7 +321,7 @@ and print_integer fmt (i: string) =
         to_hexa (BigInt.to_int bn)
       else
         let (q, r) = BigInt.euclidean_div_mod bn base in
-        to_hexa (BigInt.to_int q) ^ convert_big_int_hexa r
+        convert_big_int_hexa q ^ to_hexa (BigInt.to_int r)
     in
     fprintf fmt "%s (%s0x%s)" (BigInt.to_string bn)
       (if (BigInt.sign bn) >= 0 then "" else "-")
