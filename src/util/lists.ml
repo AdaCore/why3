@@ -138,3 +138,9 @@ let rec chop_last = function
   | [] -> invalid_arg "Util.chop_last"
   | [r] -> [], r
   | x :: s -> let s, r = chop_last s in x :: s, r
+
+let init n f =
+  let rec loop acc i =
+    if i >= n then List.rev acc
+    else loop (f i :: acc) (i + 1) in
+  loop [] 0
