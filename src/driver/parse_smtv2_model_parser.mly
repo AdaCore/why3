@@ -36,7 +36,8 @@ open Smt2_model_defs
 %token DIV
 %token <Model_parser.float_type> FLOAT_VALUE
 %token <string> COMMENT
-%token <string> BITVECTOR_VALUE
+%token <string> BITVECTOR_VALUE_SHARP
+%token <string> BITVECTOR_VALUE_INT
 %token <string> BITVECTOR_EXTRACT
 %token <string> INT_TO_BV
 %token BITVECTOR_TYPE
@@ -210,8 +211,10 @@ fraction:
 (* Example:
    (_ bv2048 16) *)
 bitvector:
-| BITVECTOR_VALUE
-    { $1 }
+| BITVECTOR_VALUE_INT
+    { Bv_int $1 }
+| BITVECTOR_VALUE_SHARP
+    { Bv_sharp $1 }
 
 boolean:
 | TRUE  { true  }

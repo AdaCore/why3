@@ -337,6 +337,13 @@ and print_integer fmt (i: string) =
   with Failure _ (* "int_of_big_int" *) ->
     print_big_int fmt bn
 
+and print_bv fmt (bv: string) =
+  (* TODO Not implemented yet. Ideally, fix the differentiation made in the
+     parser between Bv_int and Bv_sharp -> convert Bv_int to Bitvector not
+     Integer. And print Bv_int exactly like Bv_sharp.
+  *)
+  Format.fprintf fmt "%s" bv
+
 and print_model_value_human fmt (v: model_value) =
   match v with
   | Integer s -> print_integer fmt s
@@ -351,8 +358,8 @@ and print_model_value_human fmt (v: model_value) =
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Proj p -> print_proj_human fmt p
-  | Bitvector s -> (* Bitvector are returned with the same format as integer *)
-      print_integer fmt s
+  | Bitvector s ->
+      print_bv fmt s
   | Unparsed s -> fprintf fmt "%s" s
 
 (*

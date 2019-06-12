@@ -82,7 +82,8 @@ let print_value fmt v =
   | Fraction (s1, s2) -> Format.fprintf fmt "Fraction: %s / %s" s1 s2
   | Float f -> Format.fprintf fmt "Float: %a" print_float f
   | Other s -> Format.fprintf fmt "Other: %s" s
-  | Bitvector bv -> Format.fprintf fmt "Bv: %s" bv
+  | Bitvector (Bv_int bv) -> Format.fprintf fmt "Bv: %s" bv
+  | Bitvector (Bv_sharp bv) -> Format.fprintf fmt "Bv: %s" bv
   | Boolean b -> Format.fprintf fmt "Boolean: %b " b
 
 let rec print_array fmt a =
@@ -377,7 +378,8 @@ let convert_simple_to_model_value (v: simple_value) =
   | Decimal (d1, d2) -> Model_parser.Decimal (d1, d2)
   | Fraction (s1, s2) -> Model_parser.Fraction (s1, s2)
   | Float f -> Model_parser.Float f
-  | Bitvector bv -> Model_parser.Bitvector bv
+  | Bitvector (Bv_int bv) -> Model_parser.Integer bv
+  | Bitvector (Bv_sharp bv) -> Model_parser.Bitvector bv
   | Boolean b -> Model_parser.Boolean b
   | Other _s -> raise Not_value
 

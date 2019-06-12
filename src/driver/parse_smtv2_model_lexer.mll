@@ -62,7 +62,7 @@ rule token = parse
   | "LAMBDA" { LAMBDA }
   | "lambda" { LAMBDA }
   | "ARRAY_LAMBDA" { ARRAY_LAMBDA }
-  | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE bv_value }
+  | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE_INT bv_value }
   | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
   | "(_" space+ "extract" space+ num space+ num ")" as s { BITVECTOR_EXTRACT s }
   | "(_" space+ "int2bv" space+ num ")" as s { INT_TO_BV s}
@@ -74,7 +74,7 @@ rule token = parse
   | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Not_a_number }
   | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
       { FLOAT_VALUE (Model_parser.interp_float b eb sb) }
-  | bv_num as bv_value { BITVECTOR_VALUE bv_value }
+  | bv_num as bv_value { BITVECTOR_VALUE_SHARP bv_value }
 
   | num as integer
       { INT_STR (integer) }
