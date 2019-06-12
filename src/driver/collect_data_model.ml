@@ -671,7 +671,7 @@ let create_list (projections_list: Ident.ident Mstr.t)
   Mstr.fold
     (fun key value list_acc ->
       try (convert_to_model_element ~set_str field_list key value :: list_acc)
-      with Not_value when not (Debug.test_flag Debug.stack_trace) ->
+      with Not_value when not (Debug.test_flag debug_cntex) ->
         Debug.dprintf debug_cntex "Element creation failed: %s@." key; list_acc
       | e -> raise e)
     table
