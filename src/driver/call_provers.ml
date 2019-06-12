@@ -223,12 +223,7 @@ let analyse_result res_parser printer_mapping out =
       result_list
       []
   in
-(*
-  List.iter
-    (function Answer s -> eprintf "answer: %a@." print_prover_answer s
-    | Model s -> eprintf "model: %s@." s)
-    result_list;
- *)
+
   let rec analyse saved_model saved_res l =
     match l with
     | [] ->
@@ -262,12 +257,19 @@ let analyse_result res_parser printer_mapping out =
           let m = res_parser.prp_model_parser model printer_mapping in
           Debug.dprintf debug "Call_provers: model:@.";
           debug_print_model ~print_attrs:false m;
-          let m = if is_model_empty m then saved_model else
-                    (*match res with
-                    | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") ->
-                       (* we keep the previous model if it was there *)
-                       Some (Opt.get_def m saved_model)
-                    | _ ->*) Some m
+          (* TODO remove this use_incremental_choice when choice of the model
+             in incremental mode gives satisfying results *)
+          let use_incremental_choice = false in
+          let m =
+            if is_model_empty m then saved_model else
+              match res with
+              | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") ->
+                  (* we keep the previous model if it was there *)
+                  if use_incremental_choice then
+                    Some (Opt.get_def m saved_model)
+                  else
+                    Some m
+              | _ -> Some m
           in
           analyse m (Some res) tl
     | Answer res :: tl ->
