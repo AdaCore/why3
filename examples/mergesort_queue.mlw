@@ -6,31 +6,33 @@
 module MergesortQueue
 
   use int.Int
-  use list.List
-  use list.Mem
-  use list.Length
-  use list.Append
-  use list.Permut
+  use seq.Seq
+  use seq.Mem
+  use seq.FreeMonoid
+  use seq.Occ
+  use seq.Permut
   use queue.Queue
 
   type elt
   val predicate le elt elt
   clone relations.TotalPreOrder with
     type t = elt, predicate rel = le, axiom .
-  clone export list.Sorted with
-    type t = elt, predicate le  = le, goal Transitive.Trans
+  clone export seq.Sorted with
+    type t = elt, predicate le = le, goal .
 
   let merge (q1: t elt) (q2: t elt) (q: t elt)
-    requires { q.elts = Nil /\ sorted q1.elts /\ sorted q2.elts }
-    ensures  { sorted q.elts }
-    ensures  { permut q.elts (old q1.elts ++ old q2.elts) }
+    requires { q = empty /\ sorted q1 /\ sorted q2 }
+    ensures  { sorted q }
+    ensures  { length q = length (old q1) + length (old q2) }
+    ensures  { forall x. occ_all x q = occ_all x (old q1) + occ_all x (old q2) }
   = while not (is_empty q1 && is_empty q2) do
-      invariant { sorted q1.elts /\ sorted q2.elts /\ sorted q.elts }
-      invariant { forall x y: elt. mem x q.elts -> mem y q1.elts -> le x y }
-      invariant { forall x y: elt. mem x q.elts -> mem y q2.elts -> le x y }
-      invariant { permut (q.elts ++ q1.elts ++ q2.elts)
-                         (old (q1.elts ++ q2.elts)) }
-      variant { length q1 + length q2 }
+      invariant { sorted q1 /\ sorted q2 /\ sorted q }
+      invariant { forall x y: elt. mem x q -> mem y q1 -> le x y }
+      invariant { forall x y: elt. mem x q -> mem y q2 -> le x y }
+      invariant { length q + length q1 + length q2 = length (old q1) + length (old q2) }
+      invariant { forall x. occ_all x q + occ_all x q1 + occ_all x q2
+                          = occ_all x (old q1) + occ_all x (old q2) }
+      variant   { length q1 + length q2 }
       if is_empty q1 then
         push (safe_pop q2) q
       else if is_empty q2 then
@@ -45,25 +47,26 @@ module MergesortQueue
     done
 
   let rec mergesort (q: t elt) : unit
-    ensures { sorted q.elts /\ permut q.elts (old q.elts) }
+    ensures { sorted q /\ permut_all q (old q) }
     variant { length q }
   = if Peano.gt (length q) Peano.one then begin
       let q1 = create () : t elt in
       let q2 = create () : t elt in
       while not (is_empty q) do
-        invariant { permut (q1.elts ++ q2.elts ++ q.elts) (old q.elts) }
+        invariant { forall x. occ_all x q1 + occ_all x q2 + occ_all x q = occ_all x (old q) }
+        invariant { length (old q) = length q1 + length q2 + length q }
         invariant { length q1 = length q2 \/
-                    length q = 0 /\ length q1 = length q2 +1 }
+                    length q = 0 /\ length q1 = length q2 + 1 }
         variant   { length q }
         let x = safe_pop q in push x q1;
         if not (is_empty q) then let x = safe_pop q in push x q2
       done;
-      assert { q.elts = Nil };
-      assert { permut (q1.elts ++ q2.elts) (old q.elts) };
+      assert { q = empty };
+      assert { forall x. occ_all x q1 + occ_all x q2 = occ_all x (old q) };
       mergesort q1;
       mergesort q2;
       merge q1 q2 q
     end else
-      assert { q.elts = Nil \/ exists x: elt. q.elts = Cons x Nil }
+      assert { q = empty \/ exists x: elt. q = cons x empty }
 
 end

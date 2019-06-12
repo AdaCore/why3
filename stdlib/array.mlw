@@ -54,19 +54,26 @@ module Array
     ensures { forall i:int. 0 <= i < n -> result[i] = v }
     ensures { result.length = n }
 
-  val append (a1: array 'a) (a2: array 'a) : array 'a
-    ensures { length result = length a1 + length a2 }
-    ensures { forall i. 0 <= i < length a1 -> result[i] = a1[i] }
-    ensures { forall i. 0 <= i < length a2 -> result[length a1 + i] = a2[i] }
-
-  val sub (a: array 'a) (ofs: int) (len: int) : array 'a
-    requires { 0 <= ofs /\ 0 <= len /\ ofs + len <= length a }
-    ensures  { length result = len }
-    ensures  { forall i:int. 0 <= i < len -> result[i] = a[ofs + i] }
-
   val copy (a: array 'a) : array 'a
     ensures  { length result = length a }
     ensures  { forall i:int. 0 <= i < length result -> result[i] = a[i] }
+
+  let sub (a: array 'a) (ofs: int) (len: int) : array 'a
+    requires { 0 <= ofs /\ 0 <= len /\ ofs + len <= length a }
+    ensures  { length result = len }
+    ensures  { forall i:int. 0 <= i < len -> result[i] = a[ofs + i] }
+  =
+    if length a = 0 then begin
+     assert { len = 0 };
+     copy a
+    end else begin
+      let b = make len a[0] in
+      for i = 0 to len-1 do
+        invariant { forall k. 0 <= k < i -> b[k] = a[ofs+k] }
+        b[i] <- a[ofs+i];
+      done;
+      b
+    end
 
   let fill (a: array 'a) (ofs: int) (len: int) (v: 'a)
     requires { 0 <= ofs /\ 0 <= len /\ ofs + len <= length a }
@@ -81,7 +88,7 @@ module Array
       a[ofs + k] <- v
     done
 
-  val blit (a1: array 'a) (ofs1: int)
+  let blit (a1: array 'a) (ofs1: int)
                  (a2: array 'a) (ofs2: int) (len: int) : unit writes {a2}
     requires { 0 <= ofs1 /\ 0 <= len /\ ofs1 + len <= length a1 }
     requires { 0 <= ofs2 /\             ofs2 + len <= length a2 }
@@ -89,6 +96,25 @@ module Array
       (0 <= i < ofs2 \/ ofs2 + len <= i < length a2) -> a2[i] = old a2[i] }
     ensures  { forall i:int.
       ofs2 <= i < ofs2 + len -> a2[i] = a1[ofs1 + i - ofs2] }
+  =
+    for i = 0 to len - 1 do
+      invariant { forall k. not (0 <= k < i) -> a2[ofs2 + k] = old a2[ofs2 + k] }
+      invariant { forall k. 0 <= k < i -> a2[ofs2 + k] = a1[ofs1 + k] }
+      a2[ofs2 + i] <- a1[ofs1 + i];
+    done
+
+  let append (a1: array 'a) (a2: array 'a) : array 'a
+    ensures { length result = length a1 + length a2 }
+    ensures { forall i. 0 <= i < length a1 -> result[i] = a1[i] }
+    ensures { forall i. 0 <= i < length a2 -> result[length a1 + i] = a2[i] }
+  =
+    if length a1 = 0 then copy a2
+    else begin
+      let a = make (length a1 + length a2) a1[0] in
+      blit a1 0 a 0 (length a1);
+      blit a2 0 a (length a1) (length a2);
+      a
+    end
 
   let self_blit (a: array 'a) (ofs1: int) (ofs2: int) (len: int) : unit
     writes {a}
