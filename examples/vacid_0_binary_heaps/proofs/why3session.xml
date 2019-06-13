@@ -5,8 +5,8 @@
 <prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
 <path name=".."/><path name="heapsort.mlw"/>
 <theory name="HeapSort" proved="true">
@@ -235,16 +235,16 @@
  <proof prover="0"><result status="valid" time="0.03" steps="6991"/></proof>
  </goal>
  <goal name="Elements_union" proved="true">
- <proof prover="6"><path name="elements_Elements_Elements_union_1.v"/><result status="valid" time="1.14"/></proof>
+ <proof prover="3"><path name="elements_Elements_Elements_union_1.v"/><result status="valid" time="0.40"/></proof>
  </goal>
  <goal name="Elements_add1" proved="true">
- <proof prover="6"><path name="elements_Elements_Elements_add1_1.v"/><result status="valid" time="1.14"/></proof>
+ <proof prover="3"><path name="elements_Elements_Elements_add1_1.v"/><result status="valid" time="0.33"/></proof>
  </goal>
  <goal name="Elements_remove_last" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="Occ_elements" proved="true">
- <proof prover="6"><path name="elements_Elements_Occ_elements_1.v"/><result status="valid" time="1.22"/></proof>
+ <proof prover="3"><path name="elements_Elements_Occ_elements_1.v"/><result status="valid" time="0.34"/></proof>
  </goal>
  <goal name="VC elements_set_outside" expl="VC for elements_set_outside" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -260,7 +260,7 @@
  </transf>
  </goal>
  <goal name="Elements_set_inside" proved="true">
- <proof prover="6"><path name="elements_Elements_Elements_set_inside_1.v"/><result status="valid" time="1.27"/></proof>
+ <proof prover="3"><path name="elements_Elements_Elements_set_inside_1.v"/><result status="valid" time="0.36"/></proof>
  </goal>
  <goal name="Elements_set_inside2" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="44"/></proof>

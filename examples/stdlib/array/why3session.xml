@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
 <prover id="0" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.9.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Coq" version="8.7.1" timelimit="6" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
@@ -76,10 +76,10 @@
 </theory>
 <theory name="ArrayPermut" proved="true">
  <goal name="exchange_permut_sub" proved="true">
- <proof prover="3"><path name="array_ArrayPermut_exchange_permut_sub_1.v"/><result status="valid" time="2.41"/></proof>
+ <proof prover="1"><path name="array_ArrayPermut_exchange_permut_sub_1.v"/><result status="valid" time="1.42"/></proof>
  </goal>
  <goal name="permut_sub_weakening" proved="true">
- <proof prover="3"><path name="array_ArrayPermut_permut_sub_weakening_2.v"/><result status="valid" time="1.38"/></proof>
+ <proof prover="1"><path name="array_ArrayPermut_permut_sub_weakening_2.v"/><result status="valid" time="0.48"/></proof>
  </goal>
  <goal name="exchange_permut_all" proved="true">
  <proof prover="7"><result status="valid" time="0.06" steps="14625"/></proof>
@@ -151,10 +151,10 @@
    <proof prover="0"><result status="valid" time="0.04" steps="95441"/></proof>
    </goal>
    <goal name="VC exchange_inversion.2.2" expl="assertion" proved="true">
-   <proof prover="0" timelimit="1"><result status="valid" time="0.84" steps="2552269"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="1.06" steps="2552269"/></proof>
    </goal>
    <goal name="VC exchange_inversion.2.3" expl="assertion" proved="true">
-   <proof prover="0" timelimit="1"><result status="valid" time="0.69" steps="1975409"/></proof>
+   <proof prover="0" timelimit="1"><result status="valid" time="0.88" steps="1975409"/></proof>
    </goal>
    <goal name="VC exchange_inversion.2.4" expl="assertion" proved="true">
    <transf name="remove" proved="true" arg1="real,tuple0,unit,map,zero,one,( * ),sum,get,set,([&lt;-]),([&lt;-]&#39;),make,inversions_for,inversions,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,numof_def,Numof_bounds,Numof_append,Numof_left_no_add,Numof_left_add,Empty,Full,numof_increasing,numof_strictly_increasing,numof_change_some,numof_change_equiv,sum_def,sum_left,sum_ext,sum_le,sum_zero,sum_nonneg,sum_decomp,shift_left,exchange_set,array&#39;invariant,([&lt;-])_spec,make_spec">
@@ -167,7 +167,7 @@
    <goal name="VC exchange_inversion.2.5" expl="assertion" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="VC exchange_inversion.2.5.0" expl="assertion" proved="true">
-    <proof prover="0"><result status="valid" time="8.29" steps="25508615"/></proof>
+    <proof prover="0"><result status="valid" time="9.27" steps="25508615"/></proof>
     </goal>
    </transf>
    </goal>

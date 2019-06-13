@@ -3,8 +3,8 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Coq" version="8.9.1" timelimit="0" steplimit="0" memlimit="0"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Coq" version="8.7.1" timelimit="0" steplimit="0" memlimit="0"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
 <path name=".."/><path name="gcd_vc_sp.mlw"/>
@@ -32,7 +32,7 @@
  <proof prover="4"><result status="valid" time="0.01" steps="31"/></proof>
  </goal>
  <goal name="gcd_even_odd" proved="true">
- <proof prover="3"><path name="gcd_vc_sp_BinaryGcd_gcd_even_odd_1.v"/><result status="valid" time="1.06"/></proof>
+ <proof prover="1"><path name="gcd_vc_sp_BinaryGcd_gcd_even_odd_1.v"/><result status="valid" time="0.32"/></proof>
  </goal>
  <goal name="gcd_even_odd2" proved="true">
  <proof prover="4"><result status="valid" time="0.05" steps="29"/></proof>

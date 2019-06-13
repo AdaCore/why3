@@ -2,21 +2,21 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
-<prover id="0" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.6.0" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="0"/>
 <file proved="true">
 <path name=".."/><path name="euler001.mlw"/>
 <theory name="DivModHints" proved="true">
  <goal name="mod_div_unique" proved="true">
- <proof prover="0"><path name="euler001_DivModHints_mod_div_unique_1.v"/><result status="valid" time="1.14"/></proof>
+ <proof prover="4"><path name="euler001_DivModHints_mod_div_unique_1.v"/><result status="valid" time="0.31"/></proof>
  </goal>
  <goal name="mod_succ_1" proved="true">
- <proof prover="0"><path name="euler001_DivModHints_mod_succ_1_1.v"/><result status="valid" time="1.18"/></proof>
+ <proof prover="4"><path name="euler001_DivModHints_mod_succ_1_1.v"/><result status="valid" time="0.39"/></proof>
  </goal>
  <goal name="mod_succ_2" proved="true">
- <proof prover="0"><path name="euler001_DivModHints_mod_succ_2_1.v"/><result status="valid" time="1.12"/></proof>
+ <proof prover="4"><path name="euler001_DivModHints_mod_succ_2_1.v"/><result status="valid" time="0.46"/></proof>
  </goal>
  <goal name="div_succ_1" proved="true">
  <proof prover="1" timelimit="30"><result status="valid" time="0.04"/></proof>
@@ -61,8 +61,8 @@
 </theory>
 <theory name="TriangularNumbers" proved="true">
  <goal name="tr_mod_2" proved="true">
- <proof prover="0" memlimit="1000"><path
-                                    name="euler001_TriangularNumbers_tr_mod_2_1.v"/><result status="valid" time="1.18"/></proof>
+ <proof prover="4" memlimit="1000"><path
+                                    name="euler001_TriangularNumbers_tr_mod_2_1.v"/><result status="valid" time="0.31"/></proof>
  </goal>
  <goal name="tr_repr" proved="true">
  <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
@@ -113,8 +113,8 @@
  <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="Closed_Formula" proved="true">
- <proof prover="0" timelimit="30" memlimit="1000"><path
-                                                   name="euler001_SumMultiple_Closed_Formula_1.v"/><result status="valid" time="1.10"/></proof>
+ <proof prover="4" timelimit="30" memlimit="1000"><path
+                                                   name="euler001_SumMultiple_Closed_Formula_1.v"/><result status="valid" time="0.40"/></proof>
  </goal>
 </theory>
 <theory name="Euler001" proved="true">

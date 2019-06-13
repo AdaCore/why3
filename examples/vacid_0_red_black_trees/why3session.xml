@@ -4,9 +4,9 @@
 <why3session shape_version="8">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
 <path name=".."/><path name="vacid_0_red_black_trees.mlw"/>
 <theory name="RedBlackTree" proved="true">
@@ -222,8 +222,8 @@
    <proof prover="4"><result status="valid" time="0.02" steps="7539"/></proof>
    </goal>
    <goal name="VC add.2.1" expl="VC for add" proved="true">
-   <proof prover="5"><path
-                      name="vacid_0_red_black_trees_RedBlackTree_VC_add_1.v"/><result status="valid" time="1.06"/></proof>
+   <proof prover="2"><path
+                      name="vacid_0_red_black_trees_RedBlackTree_VC_add_1.v"/><result status="valid" time="0.32"/></proof>
    </goal>
    <goal name="VC add.2.2" expl="VC for add" proved="true">
    <proof prover="4"><result status="valid" time="0.02" steps="7565"/></proof>

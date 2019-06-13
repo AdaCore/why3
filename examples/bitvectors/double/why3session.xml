@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
+<prover id="0" name="Coq" version="8.9.1" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Coq" version="8.7.1" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
 <path name=".."/><path name="double.why"/>
@@ -26,8 +26,8 @@
  <proof prover="5"><result status="valid" time="0.11"/></proof>
  </goal>
  <goal name="exp_one" proved="true">
+ <proof prover="0"><path name="double_TestDouble_exp_one_1.v"/><result status="valid" time="0.42"/></proof>
  <proof prover="2" timelimit="30"><result status="valid" time="0.16" steps="210"/></proof>
- <proof prover="4"><path name="double_TestDouble_exp_one_1.v"/><result status="valid" time="1.23"/></proof>
  </goal>
  <goal name="mantissa_one" proved="true">
  <proof prover="2"><result status="valid" time="0.09" steps="88"/></proof>
