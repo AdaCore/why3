@@ -2071,13 +2071,16 @@ MODULESTODOC = \
 	util/loc util/pp util/bigInt util/number \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task core/trans core/pretty core/printer \
+	parser/typing \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
 	session/session_itp session/controller_itp \
 	session/itp_communication session/itp_server \
 	mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc
 
-FILESTODOC = $(MODULESTODOC:%=src/%.mli)
+MODULESMLTODOC = parser/ptree
+
+FILESTODOC = $(MODULESTODOC:%=src/%.mli) $(MODULESMLTODOC:%=src/%.ml)
 
 doc/apidoc:
 	mkdir -p doc/apidoc
