@@ -3,6 +3,7 @@
 Provers
   * support for CVC4 1.7 (released Apr 9, 2019)
   * support for Alt-Ergo 2.3.0 (released Feb 11, 2019)
+  * support for Coq 8.9.1 (released May 20, 2019)
 
 Version 1.2.0, February 11, 2019
 --------------------------------
