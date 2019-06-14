@@ -549,10 +549,10 @@ let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt
         me_name
         print_model_value m_element.me_value
 
-let print_model_elements ~at_loc ~print_attrs ?(sep = "\n")
+let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
     print_model_value me_name_trans fmt m_elements
   =
-  Pp.print_list (fun fmt () -> Pp.string fmt sep)
+  Pp.print_list sep
     (print_model_element ~at_loc ~print_attrs print_model_value me_name_trans)
     fmt m_elements
 
@@ -562,13 +562,15 @@ let print_model_file ~print_attrs ~print_model_value fmt
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths.  *)
   let filename = Filename.basename filename  in
-  fprintf fmt "File %s:" filename;
+  fprintf fmt "@[<v 0>File %s:@\n" filename;
   IntMap.iter
     (fun line m_elements ->
-      fprintf fmt "@\nLine %d:@\n" line;
-      print_model_elements ~at_loc:(filename,line) ~print_attrs print_model_value me_name_trans fmt m_elements)
+      fprintf fmt "  @[<v 2>Line %d:@\n" line;
+      print_model_elements ~at_loc:(filename,line) ~print_attrs print_model_value me_name_trans fmt m_elements;
+      fprintf fmt "@]@\n"
+    )
     model_file;
-  fprintf fmt "@\n"
+  fprintf fmt "@]"
 
 let why_name_trans me_name =
   match me_name.men_kind with
@@ -658,10 +660,10 @@ let interleave_line
   try
     let model_elements = IntMap.find line_number model_file in
     let cntexmp_line =
-      asprintf "%s%s%a%s"
+      asprintf "@[<h 0>%s%s%a%s@]"
         (get_padding line)
         start_comment
-        (print_model_elements ~at_loc:(filename,line_number) ~print_attrs ~sep:"; " print_model_value_human me_name_trans) model_elements
+        (print_model_elements ~sep:Pp.semi ~at_loc:(filename,line_number) ~print_attrs print_model_value_human me_name_trans) model_elements
         end_comment in
 
     (* We need to know how many lines will be taken by the counterexample. This
