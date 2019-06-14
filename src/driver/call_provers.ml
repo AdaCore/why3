@@ -214,12 +214,16 @@ let analyse_result res_parser printer_mapping out =
   let list_re = List.map (fun (a, b) -> Str.regexp a, b) list_re in
   let result_list = Str.full_split re out in
   let result_list =
-    List.map
-      (function
-        | Str.Delim r -> Answer (grep r list_re)
-        | Str.Text t -> Model t)
+    List.fold_right
+      (fun s acc ->
+        match s with
+        | Str.Delim r -> Answer (grep r list_re) :: acc
+        | Str.Text "\n" -> acc
+        | Str.Text t -> Model t :: acc)
       result_list
+      []
   in
+
   let rec analyse saved_model saved_res l =
     match l with
     | [] ->
@@ -236,10 +240,10 @@ let analyse_result res_parser printer_mapping out =
             analyse saved_model saved_res (Answer StepLimitExceeded :: tl)
          | Unknown _, Unknown "timeout" ->
             analyse saved_model saved_res (Answer Timeout :: tl)
+         | (Unknown _, Unknown "")| (_, Unknown "(not unknown!)") ->
+            analyse saved_model saved_res (Answer res1 :: tl)
          | Unknown "", Unknown _ ->
             analyse saved_model saved_res tl1
-         | Unknown s1, Unknown "" ->
-            analyse saved_model saved_res (Answer (Unknown s1) :: tl)
          | Unknown s1, Unknown s2 ->
             analyse saved_model saved_res (Answer (Unknown (s1 ^ " + " ^ s2)) :: tl)
          | _,_ ->
@@ -253,7 +257,20 @@ let analyse_result res_parser printer_mapping out =
           let m = res_parser.prp_model_parser model printer_mapping in
           Debug.dprintf debug "Call_provers: model:@.";
           debug_print_model ~print_attrs:false m;
-          let m = if is_model_empty m then saved_model else (Some m) in
+          (* TODO remove this use_incremental_choice when choice of the model
+             in incremental mode gives satisfying results *)
+          let use_incremental_choice = false in
+          let m =
+            if is_model_empty m then saved_model else
+              match res with
+              | StepLimitExceeded | Timeout | Unknown ("resourceout" | "timeout") ->
+                  (* we keep the previous model if it was there *)
+                  if use_incremental_choice then
+                    Some (Opt.get_def m saved_model)
+                  else
+                    Some m
+              | _ -> Some m
+          in
           analyse m (Some res) tl
     | Answer res :: tl ->
         if res = Valid then

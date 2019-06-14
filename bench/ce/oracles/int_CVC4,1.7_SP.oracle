@@ -1,0 +1,44 @@
+Strongest Postcondition
+bench/ce/int.mlw T g_lab: Unknown (sat)
+Counter-example model:File int.mlw:
+Line 5:
+x, [[@introduced], [@model]] = {"type" : "Integer" ,
+"val" : "48" }
+
+bench/ce/int.mlw T g_no_lab: Unknown (sat)
+Counter-example model:File int.mlw:
+Line 7:
+x, [[@introduced]] = {"type" : "Integer" ,
+"val" : "48" }
+
+bench/ce/int.mlw T g2_lab: Unknown (sat)
+Counter-example model:File int.mlw:
+Line 9:
+g, [] = {"type" : "Integer" ,
+"val" : "-1" }
+Line 11:
+x, [[@introduced]] = {"type" : "Integer" ,
+"val" : "0" }
+
+bench/ce/int.mlw T newgoal: Unknown (sat)
+Counter-example model:File int.mlw:
+Line 9:
+g, [] = {"type" : "Integer" , "val" : "0" }
+Line 13:
+X, [[@introduced], [@model], [@model_trace:X]] = {"type" : "Integer" ,
+"val" : "1" }
+x2, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
+x3, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
+x4, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
+x5, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
+x6, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
+x7, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
+x8, [[@introduced]] = {"type" : "Integer" ,
+"val" : "1" }
+

@@ -142,6 +142,7 @@ type info = {
   info_cntexample: bool;
   info_incremental: bool;
   info_set_incremental: bool;
+  info_supports_reason_unknown : bool;
   mutable info_labels: Sattr.t Mstr.t;
   mutable incr_list: (prsymbol * term) list;
 }
@@ -525,9 +526,8 @@ let add_check_sat info fmt =
   if info.info_cntexample && info.info_cntexample_need_push then
     fprintf fmt "@[(push)@]@\n";
   fprintf fmt "@[(check-sat)@]@\n";
-  (* unfortunately we can't do that unconditionally, since it will make
-     CVC4 fail and immediately exit if last answer was not 'unknown' *)
-  (* fprintf fmt "@[(get-info :reason-unknown)@]@\n"; *)
+  if info.info_supports_reason_unknown then
+    fprintf fmt "@[(get-info :reason-unknown)@]@\n";
   if info.info_cntexample then
     fprintf fmt "@[(get-model)@]@\n"
 
@@ -696,6 +696,11 @@ let meta_incremental =
   Theory.register_meta_excl "meta_incremental" [Theory.MTstring]
                             ~desc:"Internal@ use@ only"
 
+let meta_supports_reason_unknown =
+  Theory.register_meta_excl "supports_smt_get_info_unknown_reason" [Theory.MTstring]
+                            ~desc:"Internal@ use@ only"
+
+
 let print_task version args ?old:_ fmt task =
   let cntexample = Inlining.get_counterexmp task in
   let incremental =
@@ -706,6 +711,10 @@ let print_task version args ?old:_ fmt task =
   let need_push =
     let need_push_meta = Task.find_meta_tds task meta_counterexmp_need_push in
     not (Theory.Stdecl.is_empty need_push_meta.Task.tds_set)
+  in
+  let supports_reason_unknown =
+    let m = Task.find_meta_tds task meta_supports_reason_unknown in
+    not (Theory.Stdecl.is_empty m.Task.tds_set)
   in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
@@ -726,11 +735,12 @@ let print_task version args ?old:_ fmt task =
     info_cntexample_need_push = need_push;
     info_cntexample = cntexample;
     info_incremental = incremental;
+    info_labels = Mstr.empty;
     (* info_set_incremental add the incremental option to the header. It is not
        needed for some provers
     *)
-    info_labels = Mstr.empty;
     info_set_incremental = not need_push && incremental;
+    info_supports_reason_unknown = supports_reason_unknown;
     incr_list = [];
     }
   in
