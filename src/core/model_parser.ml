@@ -685,14 +685,10 @@ let interleave_line
 
 
 let interleave_with_source
-    ~print_attrs
-    ?(start_comment="(* ")
-    ?(end_comment=" *)")
+    ~print_attrs ?(start_comment="(* ") ?(end_comment=" *)")
     ?(me_name_trans = why_name_trans)
-    model
-    ~rel_filename
-    ~source_code
-    ~locations =
+    model ~rel_filename ~source_code ~locations
+  =
   let locations =
     List.sort (fun x y -> compare (fst x) (fst y))
       (List.filter (fun x -> let (f, _, _, _) = Loc.get (fst x) in f = rel_filename) locations)

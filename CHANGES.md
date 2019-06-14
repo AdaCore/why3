@@ -24,6 +24,7 @@ API
     `~json_model` to indicate whether counterexamples are printed using JSON :x:
   * Counterexamples: indices of array are now model_value. :x:
   * ITP constructor Task now contain the location of the goal :x:
+  * ITP constructor Source_and_ce now has 3 arguments instead of 2 :x:
 
 Transformations
   * `apply`/`rewrite` behaves better in presence of `let`;
