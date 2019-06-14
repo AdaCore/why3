@@ -511,8 +511,7 @@ let inv_of_pure {known_map = kn} loc fl k =
    [res] names the result of the normal execution of [e]
    [xmap] maps every raised exception to a pair [i,xres]:
    - [i] is a positive int assigned at the catching site
-   - [xres] names the value carried by the exception
-   [case_xmap] is used for match-with-exceptions *)
+   - [xres] names the value carried by the exception *)
 let rec k_expr env lps e res xmap =
   let loc = e.e_loc and eff = e.e_effect in
   let attrs = Sattr.diff e.e_attrs vc_attrs in

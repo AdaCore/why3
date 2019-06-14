@@ -32,6 +32,10 @@ do
             bin/why3config --detect-provers
             sed -i why3.conf -e "s/running_provers_max = [0-9]*/running_provers_max = 1/"
             cat misc/bench-few-provers-why3-conf >> why3.conf
+            COQVER=$(bin/why3 --list-provers | sed -n -e 's/  Coq (\?\([0-9.]\+\).*/\1/p')
+            if test "$COQVER" != "" ; then
+              sed misc/bench-coq-why3-conf -e "s/@COQVER@/$COQVER/g" >> why3.conf
+            fi
             examples/regtests.sh --reduced-mode
             ;;
     esac
