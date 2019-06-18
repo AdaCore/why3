@@ -17,6 +17,8 @@ val debug_parse_only : Debug.flag
 
 val debug_type_only : Debug.flag
 
+val type_mlw_file : Env.env -> string list -> string -> Ptree.mlw_file -> Pmodule.pmodule Wstdlib.Mstr.t
+
 (** {2 Incremental typing of parsed modules} *)
 
 val open_file : Env.env -> Env.pathname -> unit
@@ -32,8 +34,6 @@ val close_module : Loc.position -> unit
 val open_scope : Loc.position -> Ptree.ident -> unit
 
 val close_scope : Loc.position -> import:bool -> unit
-
-val import_scope : Loc.position -> Ptree.qualid -> unit
 
 val add_decl : Loc.position -> Ptree.decl -> unit
 

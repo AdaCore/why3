@@ -263,7 +263,19 @@ type decl =
   (** declaration of global exceptions *)
   | Dmeta of ident * metarg list
   (** `meta` *)
-  | Dclone of qualid * clone_subst list
+  | Dcloneexport of qualid * clone_subst list
   (** `clone` *)
-  | Duse of qualid
+  | Duseexport of qualid
   (** `use` *)
+  | Dcloneimport of Loc.position * bool * qualid * ident option * clone_subst list
+  (** `clone import ... as ...` *)
+  | Duseimport of Loc.position * bool * (qualid * ident option) list
+  (** `use import ... as ...` *)
+  | Dimport of qualid
+  (** `import` *)
+  | Dscope of Loc.position * bool * ident * decl list
+  (** `scope` *)
+
+type mlw_file =
+  | Modules of (ident * decl list) list
+  | Decls of decl list

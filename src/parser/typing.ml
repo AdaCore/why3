@@ -35,6 +35,11 @@ let debug_ignore_useless_at = Debug.register_flag "ignore_useless_at"
 
 (** symbol lookup *)
 
+
+let qualid_last = function Qident x | Qdot (_, x) -> x
+
+let use_as q = function Some x -> x | None -> qualid_last q
+
 let rec qloc = function
   | Qdot (p, id) -> Loc.join (qloc p) id.id_loc
   | Qident id    -> id.id_loc
@@ -1463,7 +1468,7 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
   in
   List.fold_left add_inst (empty_mod_inst m) s
 
-let add_decl muc env file d =
+let rec add_decl muc env file d =
   let vc = muc.muc_theory.uc_path = [] &&
     Debug.test_noflag debug_type_only in
   match d with
@@ -1501,12 +1506,57 @@ let add_decl muc env file d =
       let ity = ity_of_pty muc pty in
       let xs = create_xsymbol (create_user_id id) ~mask ity in
       add_pdecl ~vc muc (create_exn_decl xs)
-  | Ptree.Duse use ->
+  | Ptree.Duseexport use ->
       use_export muc (find_module env file use)
-  | Ptree.Dclone (use, inst) ->
+  | Ptree.Dcloneexport (use, inst) ->
       let m = find_module env file use in
       warn_clone_not_abstract (qloc use) m.mod_theory;
       clone_export muc m (type_inst muc m inst)
+  | Ptree.Duseimport (_loc,import,uses) ->
+      let add_import muc (m, q) =
+        let import = import || q = None in
+        let muc = open_scope muc (use_as m q).id_str in
+        let m = find_module env file m in
+        let muc = use_export muc m in
+        close_scope muc ~import in
+      List.fold_left add_import muc uses
+  | Ptree.Dcloneimport (_loc,import,qid,as_opt,inst) ->
+      let import = import || as_opt = None in
+      let muc = open_scope muc (use_as qid as_opt).id_str in
+      let m = find_module env file qid in
+      warn_clone_not_abstract (qloc qid) m.mod_theory;
+      let muc = clone_export muc m (type_inst muc m inst) in
+      let muc = close_scope muc ~import in
+      muc
+  | Ptree.Dimport q ->
+      import_scope muc (string_list_of_qualid q)
+  | Ptree.Dscope (_loc,import,qid,decls) ->
+      let muc = open_scope muc qid.id_str in
+      let add_decl_env_file muc d = add_decl muc env file d in
+      let muc = List.fold_left add_decl_env_file muc decls in
+      let muc = close_scope muc ~import in
+      muc
+
+
+let type_module file env loc path (id,dl) =
+  let muc = create_module env ~path (create_user_id id) in
+  let add_decl_env_file muc d = add_decl muc env file d in
+  let muc = List.fold_left add_decl_env_file muc dl in
+  let m = Loc.try1 ~loc close_module muc in
+  let file = Mstr.add m.mod_theory.th_name.id_string m file in
+  file
+
+let type_mlw_file env path filename mlw_file =
+  let file = Mstr.empty in
+  let loc = Loc.user_position filename 0 0 0 in
+  let file =
+    match mlw_file with
+    | Ptree.Decls decls -> type_module file env loc path ({id_str=""; id_ats=[]; id_loc=loc},decls)
+    | Ptree.Modules m_or_t ->
+        let type_module_env_loc_path file (id,dl) = type_module file env loc path (id,dl) in
+        List.fold_left type_module_env_loc_path file m_or_t
+  in
+  file
 
 (* incremental parsing *)
 
@@ -1572,14 +1622,6 @@ let close_scope loc ~import =
   if Debug.test_noflag debug_parse_only then
     let slice = Stack.top state in
     let muc = Loc.try1 ~loc (close_scope ~import) (Opt.get slice.muc) in
-    slice.muc <- Some muc
-
-let import_scope loc q =
-  assert (not (Stack.is_empty state));
-  let slice = Stack.top state in
-  let muc = top_muc_on_demand loc slice in
-  if Debug.test_noflag debug_parse_only then
-    let muc = Loc.try2 ~loc import_scope muc (string_list_of_qualid q) in
     slice.muc <- Some muc
 
 let add_decl loc d =

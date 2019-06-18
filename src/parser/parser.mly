@@ -12,10 +12,6 @@
 %{
   open Ptree
 
-  let qualid_last = function Qident x | Qdot (_, x) -> x
-
-  let use_as q = function Some x -> x | None -> qualid_last q
-
   let floc s e = Loc.extract (s,e)
 
   let add_attr id l = (* id.id_ats is usually nil *)
@@ -322,7 +318,7 @@ module_decl:
 | scope_head module_decl* END
     { Typing.close_scope (floc $startpos($1) $endpos($1)) ~import:$1 }
 | IMPORT uqualid
-    { Typing.import_scope (floc $startpos $endpos) $2 }
+    { Typing.add_decl (floc $startpos $endpos) (Dimport($2)) }
 | d = pure_decl | d = prog_decl | d = meta_decl
     { Typing.add_decl (floc $startpos $endpos) d;
       add_record_projections d
@@ -347,27 +343,33 @@ module_decl_no_head:
 
 use_clone:
 | USE EXPORT tqualid
-    { Typing.add_decl (floc $startpos $endpos) (Duse $3) }
+    { let loc = floc $startpos $endpos in
+      let decl = Ptree.Duseexport $3 in
+      Typing.add_decl loc decl
+    }
 | CLONE EXPORT tqualid clone_subst
-    { Typing.add_decl (floc $startpos $endpos) (Dclone ($3, $4)) }
+    { let loc = floc $startpos $endpos in
+      let decl = Ptree.Dcloneexport($3,$4) in
+      Typing.add_decl loc decl
+    }
 | USE boption(IMPORT) m_as_list = comma_list1(use_as)
     { let loc = floc $startpos $endpos in
       let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
-      if $2 && not exists_as then Warning.emit ~loc
+      let import = $2 in
+      if import && not exists_as then Warning.emit ~loc
         "the keyword `import' is redundant here and can be omitted";
-      let add_import (m, q) = let import = $2 || q = None in
-        Typing.open_scope loc (use_as m q);
-        Typing.add_decl loc (Duse m);
-        Typing.close_scope loc ~import  in
-      List.iter add_import m_as_list }
+      let decl = Ptree.Duseimport(loc,import,m_as_list) in
+      Typing.add_decl loc decl
+    }
 | CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
     { let loc = floc $startpos $endpos in
-      if $2 && $4 = None then Warning.emit ~loc
+      let import = $2 in
+      let as_opt = $4 in
+      if import && as_opt = None then Warning.emit ~loc
         "the keyword `import' is redundant here and can be omitted";
-      let import = $2 || $4 = None in
-      Typing.open_scope loc (use_as $3 $4);
-      Typing.add_decl loc (Dclone ($3, $5));
-      Typing.close_scope loc ~import }
+      let decl = Ptree.Dcloneimport(loc,import,$3,as_opt,$5) in
+      Typing.add_decl loc decl
+    }
 
 use_as:
 | n = tqualid q = option(preceded(AS, uident)) { (n, q) }
