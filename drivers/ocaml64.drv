@@ -13,10 +13,9 @@ module HighOrd
 end
 
 module option.Option
-  syntax type option  "%1 option"
+  syntax type      option  "%1 option"
   syntax val  None    "None"
   syntax val  Some    "Some %1" prec 4 3
-  syntax val  is_none "Option.is_none %1" prec 4 3
 end
 
 module Bool
@@ -65,7 +64,7 @@ end
 
 module Ref
   syntax type     ref      "%1 ref"
-  syntax val contents "Stdlib.contents" prec 1 0
+  syntax val contents "Pervasives.contents" prec 1 0
   syntax val      ref      "ref %1" prec 4 3
 end
 
@@ -340,9 +339,9 @@ module string.Char
 end
 
 module io.StdIO
-  syntax val print_char "Stdlib.print_char %1" prec 4 3
-  syntax val print_int "Stdlib.print_string (Z.to_string %1)" prec 4 3
-  syntax val print_newline "Stdlib.print_newline %1" prec 4 3
+  syntax val print_char "Pervasives.print_char %1" prec 4 3
+  syntax val print_int "Pervasives.print_string (Z.to_string %1)" prec 4 3
+  syntax val print_newline "Pervasives.print_newline %1" prec 4 3
 end
 
 module random.Random
@@ -357,8 +356,8 @@ module mach.int.Refint63
   syntax val ( *= ) "%1 := !%1 * %2" prec 15 0 7
 end
 module mach.int.MinMax63
-  syntax val min "Stdlib.min %1 %2" prec 4 3 3
-  syntax val max "Stdlib.max %1 %2" prec 4 3 3
+  syntax val min "Pervasives.min %1 %2" prec 4 3 3
+  syntax val max "Pervasives.max %1 %2" prec 4 3 3
 end
 
 module mach.array.Array32
@@ -429,7 +428,7 @@ module ocaml.Sys
 end
 
 module ocaml.Pervasives
-  syntax exception Exit             "Stdlib.Exit"
+  syntax exception Exit             "Pervasives.Exit"
   syntax exception Not_found        "Not_found"
   syntax exception AssertFailure    "REMOVE"
   syntax val       ocaml_assert     "assert %1" prec 4

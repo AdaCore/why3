@@ -272,10 +272,6 @@ module TestExtraction
 
   use ocaml.Pervasives
 
-  (** is_none is now part of the OCaml standard library (since 4.08) *)
-  let test_is_none () raises { AssertFailure } =
-    ocaml_assert (is_none None)
-
   let test1 () raises { AssertFailure } =
     ocaml_assert ((1:int) + 1 = 2)
 
@@ -318,7 +314,6 @@ module TestExtraction
     ocaml_assert (res = 42)
 
   let main () raises { AssertFailure } =
-    test_is_none ();
     test1 ();
     test2 ();
     test3 ();
