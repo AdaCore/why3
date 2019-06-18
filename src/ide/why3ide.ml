@@ -991,6 +991,14 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
     with Nosourceview f ->
       Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
 
+let scroll_to_loc_ce loc_of_goal =
+  match loc_of_goal with
+  | None -> ()
+  | Some loc ->
+      let _, l, _, _= Loc.get loc in
+      (* 0.5 to focus on the middle of the screen *)
+      move_to_line ~yalign:0.5 counterexample_view l
+
 (* Reposition the cursor to the place it was saved *)
 let reposition_ide_cursor () =
   scroll_to_loc ~force_tab_switch:false !current_cursor_loc
@@ -1135,16 +1143,14 @@ let color_loc ?(ce=false) ~color loc =
    to appropriate source files *)
 let apply_loc_on_source (l: (Loc.position * color) list) loc_goal =
   Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table;
-  List.iter (fun (loc, color) ->
-    color_loc ~color loc) l;
+  List.iter (fun (loc, color) -> color_loc ~color loc) l;
   scroll_to_loc ~force_tab_switch:false loc_goal
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to the counterexample tab *)
 let apply_loc_on_ce (l: (Loc.position * color) list) =
   erase_color_loc counterexample_view;
-  List.iter (fun (loc, color) ->
-    color_loc ~ce:true ~color loc) l
+  List.iter (fun (loc, color) -> color_loc ~ce:true ~color loc) l
 
 let collapse_iter iter =
   let path = goals_model#get_path iter in
@@ -2480,11 +2486,12 @@ let treat_notification n =
       with
       | Not_found -> create_source_view file_name content
     end
-  | Source_and_ce (content, list_loc) ->
+  | Source_and_ce (content, list_loc, goal_loc) ->
     begin
       messages_notebook#goto_page counterexample_page;
       counterexample_view#source_buffer#set_text content;
-      apply_loc_on_ce list_loc
+      apply_loc_on_ce list_loc;
+      scroll_to_loc_ce goal_loc
     end
   | Dead _ ->
      print_message ~kind:1 ~notif_kind:"Server Dead ?"

@@ -104,8 +104,9 @@ type notification =
      etc) *)
   | File_contents of string * string
   (* File_contents (filename, contents) *)
-  | Source_and_ce of string * (Loc.position * color) list
-  (* Source interleaved with counterexamples: contents and list color loc *)
+  | Source_and_ce of string * (Loc.position * color) list * Loc.position option
+  (* Source interleaved with counterexamples: contents, list color loc,
+     loc of the goal *)
 
 type ide_request =
   | Command_req             of node_ID * string
@@ -204,7 +205,7 @@ let print_notify fmt n =
       print_msg fmt msg
   | Dead s                            -> fprintf fmt "dead :%s" s
   | File_contents (f, _s)             -> fprintf fmt "file contents %s" f
-  | Source_and_ce (_s, _list_loc)     -> fprintf fmt "source and ce"
+  | Source_and_ce (_, _list_loc, _gl) -> fprintf fmt "source and ce"
   | Task (ni, _s, list_loc, _g_loc)   ->
       fprintf fmt "task for node_ID %d which contains a list of %d locations"
               ni (List.length list_loc) (* print_list_loc list_loc *)
