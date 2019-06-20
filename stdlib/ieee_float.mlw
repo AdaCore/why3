@@ -61,7 +61,7 @@ module GenericFloat
   (** {3 Constructors and Constants} *)
 
   val constant zeroF     : t   (** +0.0 *)
-  (* exp_bias = 2^(sb - 1) - 1 *)
+  (* exp_bias = 2^(eb - 1) - 1 *)
   (* max_finite_exp = 2^sb - 2 - exp_bias = exp_bias *)
   (* max_significand = (2^eb + 2^eb - 1) * 2^(1-eb) *)
   (* max_value = (2^eb + 2^eb - 1) * 2^(1-eb) * 2 ^ max_finite_exp *)
