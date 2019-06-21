@@ -1,5 +1,4 @@
 
-open Why3extract
 open Format
 
 let usage () =
@@ -16,11 +15,11 @@ let input_grid =
   for i=0 to 79 do
     if input.[i+i+1] <> ',' then usage ();
   done;
-  let a = Array.make 81 Why3__BigInt.zero in
+  let a = Array.make 81 Z.zero in
   for i=0 to 80 do
     match input.[i+i] with
       | '0'..'9' as c -> a.(i) <-
-        Why3__BigInt.of_int (Char.code c - Char.code '0')
+        Z.of_int (Char.code c - Char.code '0')
       | _ -> usage ()
   done;
   a
@@ -29,8 +28,8 @@ let print_grid fmt a =
   fprintf fmt "@[";
   for i=0 to 80 do
     if i mod 9 = 8
-    then fprintf fmt "%s@\n" (Why3__BigInt.to_string a.(i))
-    else fprintf fmt "%s " (Why3__BigInt.to_string a.(i))
+    then fprintf fmt "%s@\n" (Z.to_string a.(i))
+    else fprintf fmt "%s " (Z.to_string a.(i))
   done;
   fprintf fmt "@]"
 
