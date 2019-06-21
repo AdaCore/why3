@@ -1,5 +1,4 @@
 
-open Why3extract
 open Format
 
 let usage () =
@@ -21,10 +20,10 @@ let () =
 
 let input_num =
   try
-    Why3__BigInt.of_string input
+    Z.of_string input
   with _ -> usage ()
 
 let () =
   let a = Euler001.solve input_num in
   printf "The sum of all the multiples of 3 or 5 below %s is %s@."
-    (Why3__BigInt.to_string input_num) (Why3__BigInt.to_string a)
+    (Z.to_string input_num) (Z.to_string a)

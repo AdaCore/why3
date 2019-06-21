@@ -373,8 +373,7 @@ extract bench/extraction -D ocaml64
 extract_and_run examples/euler001 euler001.ml 1000000
 extract_and_run examples/gcd gcd.ml 6 15
 extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml
-# needs to port
-# extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
+extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
 extract_and_run examples/defunctionalization defunctionalization.ml
 extract_and_run examples/sudoku sudoku.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
 echo ""

@@ -39,7 +39,7 @@ doc:
 	$(WHY3) session html .
 
 $(MAIN).opt: $(CMX)  $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
@@ -58,11 +58,10 @@ clean::
 
 JSMAIN=jsmain
 
-JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
-          -syntax camlp4o
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx -package js_of_ocaml-lwt
 
 $(JSMAIN).js: $(JSMAIN).byte
-	js_of_ocaml -pretty -noinline $(JSMAIN).byte
+	js_of_ocaml --pretty --noinline $(JSMAIN).byte
 
 
 $(JSMAIN).byte: $(ML) jsmain.ml
