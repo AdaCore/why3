@@ -372,6 +372,10 @@ module TestExtraction
     let b = i1 a + i1 a in
     let c = i2 b b in
     i3 c
+
+  type poly_r 'a = { l : int63; b : bool }
+  let test_underapplied_l () = l
+  
 end
 
 (*

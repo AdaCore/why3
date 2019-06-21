@@ -380,17 +380,17 @@ module Translate = struct
         let pvl = app pvl rs.rs_cty.cty_args f_zero in
         let eta_exp_pj is_optimizable =
           Debug.dprintf debug_compile "record projection@.";
-          let params = filter_params rs.rs_cty.cty_args in
-          let args = rs.rs_cty.cty_args in
+          let params = filter_params cty.cty_args in
+          let args = cty.cty_args in
           let app_args = app args args (fun x -> x) in
           (* create the identity function *)
           let ml_app = if is_optimizable then
               match app_args with [a] -> a | _ -> assert false
             else let ity_res = (ML.I rs.rs_cty.cty_result) in
               ML.e_app rs app_args ity_res MaskVisible eff_empty attrs in
-          let ity = ML.C rs.rs_cty in
+          let ity = ML.C cty in
           let attrs = Sattr.empty in
-          ML.e_fun params ml_app ity rs.rs_cty.cty_mask eff_empty attrs in
+          ML.e_fun params ml_app ity cty.cty_mask eff_empty attrs in
         begin match pvl with
           | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
           | []        when is_optimizable_record_rs info rs ->
