@@ -163,12 +163,12 @@ end
 
 module HeapSort
 
-  use SkewHeaps
-  use int.Int
-  use ref.Ref
   use array.Array
   use array.ArrayPermut
+  use SkewHeaps
   clone export array.Sorted with type elt = elt, predicate le = le, axiom .
+  use int.Int
+  use ref.Ref
   use map.Occ as M
   use bintree.Occ as H
 

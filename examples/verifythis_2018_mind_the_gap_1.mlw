@@ -24,7 +24,7 @@ invariant { a.length = content.S.length + r - l }
 invariant { forall i. 0 <= i < l -> S.get content i = a.elts i }
 invariant { forall i. l <= i < content.S.length ->
                         S.get content i = a.elts (i+r-l) }
-by { a = make 0 any_char; l = 0; r = 0; content = empty }
+by { a = make 0 any_char; l = 0; r = 0; content = S.empty }
 
 let left (g:gap_buffer) : unit
   ensures  { g.l = old (if g.l = 0 then g.l else g.l - 1) }
