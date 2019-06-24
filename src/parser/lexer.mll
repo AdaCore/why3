@@ -306,6 +306,8 @@ rule token = parse
   let parse_term lb =
     build_parsing_function Parser.Incremental.term_eof lb
 
+  let parse_decl = build_parsing_function Parser.decl_eof
+
   let parse_term_list lb = build_parsing_function Parser.Incremental.term_comma_list_eof lb
 
   let parse_qualid lb = build_parsing_function Parser.Incremental.qualid_eof lb
@@ -313,6 +315,8 @@ rule token = parse
   let parse_list_ident lb = build_parsing_function Parser.Incremental.ident_comma_list_eof lb
 
   let parse_list_qualid lb = build_parsing_function Parser.Incremental.qualid_comma_list_eof lb
+
+  let parse_mlw_file = build_parsing_function Parser.mlw_file_parsing_only
 
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
