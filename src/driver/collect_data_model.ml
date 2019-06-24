@@ -379,7 +379,15 @@ let convert_simple_to_model_value (v: simple_value) =
   | Fraction (s1, s2) -> Model_parser.Fraction (s1, s2)
   | Float f -> Model_parser.Float f
   | Bitvector (Bv_int bv) -> Model_parser.Integer bv
-  | Bitvector (Bv_sharp bv) -> Model_parser.Bitvector bv
+  | Bitvector (Bv_sharp bv) ->
+      (* Convert "#x0032" to "0x0032" then to "50" for uniformity with Bv_int *)
+      begin try
+        let a = ref 0 in
+        let bv = "0" ^ String.sub bv 1 (String.length bv - 1) in
+        Scanf.sscanf bv "%i" (fun x -> a := x);
+        let bv = Format.asprintf "%d" !a in
+        Model_parser.Integer bv
+      with _ -> Model_parser.Bitvector bv end
   | Boolean b -> Model_parser.Boolean b
   | Other _s -> raise Not_value
 
