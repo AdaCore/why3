@@ -373,10 +373,11 @@ while cursor is on a given row of the proof session tree.
   %   follwoed by \verb|inline_goal|.
   \item[Auto level 0] is a basic proof search strategy that applies a few provers
     on the goal with a short time limit.
-  \item[Auto level 1] is a strategy that first applies a few provers
+  \item[Auto level 1] is the same as level 0 but with a longer time limit.
+  \item[Auto level 2] is a strategy that first applies a few provers
     on the goal with a short time limit, then splits the goal and
     tries again on the subgoals
-  \item[Auto level 2] is a strategy more elaborate than level 1, that
+  \item[Auto level 3] is a strategy more elaborate than level 1, that
     attempts to apply a few transformations that are typically
     useful. It also tries the provers with a larger time limit.
   \end{description}

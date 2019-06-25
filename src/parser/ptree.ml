@@ -9,7 +9,12 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*s Parse trees. *)
+(** Parse trees *)
+
+
+(** {1 Parse trees} *)
+
+(** {2 Identifiers and attributes} *)
 
 type attr =
   | ATstr of Ident.attribute
@@ -21,11 +26,11 @@ type ident = {
   id_loc : Loc.position;
 }
 
-(*s Types *)
-
 type qualid =
   | Qident of ident
   | Qdot of qualid * ident
+
+(** {2 Types} *)
 
 type pty =
   | PTtyvar of ident
@@ -37,7 +42,7 @@ type pty =
   | PTparen of pty
   | PTpure  of pty
 
-(*s Patterns *)
+(** {2 Patterns} *)
 
 type ghost = bool
 
@@ -59,7 +64,7 @@ and pat_desc =
   | Pparen of pattern
   | Pghost of pattern
 
-(*s Logical terms and formulas *)
+(** {2 Logical terms and formulas} *)
 
 type binder = Loc.position * ident option * ghost * pty option
 type param  = Loc.position * ident option * ghost * pty
@@ -94,7 +99,7 @@ and term_desc =
   | Tscope of qualid * term
   | Tat of term * ident
 
-(*s Program expressions *)
+(** {2 Program expressions} *)
 
 type invariant = term list
 type variant = (term * qualid option) list
@@ -126,7 +131,7 @@ and expr_desc =
   | Etrue
   | Efalse
   | Econst of Number.constant
-  (* lambda-calculus *)
+  (** lambda-calculus *)
   | Eident of qualid
   | Easref of qualid
   | Eidapp of qualid * expr list
@@ -141,7 +146,7 @@ and expr_desc =
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
   | Eassign of (expr * qualid option * expr) list
-  (* control *)
+  (** control *)
   | Esequence of expr * expr
   | Eif of expr * expr * expr
   | Ewhile of expr * invariant * variant * expr
@@ -156,7 +161,7 @@ and expr_desc =
   | Eexn of ident * pty * Ity.mask * expr
   | Eoptexn of ident * Ity.mask * expr
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
-  (* annotations *)
+  (** annotations *)
   | Eassert of Expr.assertion_kind * term
   | Escope of qualid * expr
   | Elabel of ident * expr
@@ -171,7 +176,7 @@ and exn_branch = qualid * pattern option * expr
 and fundef = ident * ghost * Expr.rs_kind *
   binder list * pty option * Ity.mask * spec * expr
 
-(*s Declarations *)
+(** {2 Declarations} *)
 
 type field = {
   f_loc     : Loc.position;
@@ -188,15 +193,15 @@ type type_def =
   | TDrange     of BigInt.t * BigInt.t
   | TDfloat     of int * int
 
-type visibility = Public | Private | Abstract (* = Private + ghost fields *)
+type visibility = Public | Private | Abstract (** = Private + ghost fields *)
 
 type type_decl = {
   td_loc    : Loc.position;
   td_ident  : ident;
   td_params : ident list;
-  td_vis    : visibility; (* records only *)
-  td_mut    : bool;       (* records or abstract types *)
-  td_inv    : invariant;  (* records only *)
+  td_vis    : visibility; (** records only *)
+  td_mut    : bool;       (** records or abstract types *)
+  td_inv    : invariant;  (** records only *)
   td_wit    : (qualid * expr) list;
   td_def    : type_def;
 }
@@ -216,6 +221,7 @@ type ind_decl = {
   in_def    : (Loc.position * ident * term) list;
 }
 
+(** Arguments of `meta` declarations *)
 type metarg =
   | Mty  of pty
   | Mfs  of qualid
@@ -227,6 +233,7 @@ type metarg =
   | Mstr of string
   | Mint of int
 
+(** The possible `clone` substitution elements *)
 type clone_subst =
   | CStsym  of qualid * ident list * pty
   | CSfsym  of qualid * qualid
@@ -238,14 +245,25 @@ type clone_subst =
   | CSlemma of qualid
   | CSgoal  of qualid
 
+(** top-level declarations *)
 type decl =
   | Dtype of type_decl list
+  (** Type declaration *)
   | Dlogic of logic_decl list
+  (** `function` and `predicate`, mutually recursively declared *)
   | Dind of Decl.ind_sign * ind_decl list
+  (** inductive or co-inductive predicate *)
   | Dprop of Decl.prop_kind * ident * term
+  (** propositions: `lemma` or `goal` or `axiom` *)
   | Dlet of ident * ghost * Expr.rs_kind * expr
+  (** global program variable *)
   | Drec of fundef list
+  (** program functions, mutually recursively defined *)
   | Dexn of ident * pty * Ity.mask
+  (** declaration of global exceptions *)
   | Dmeta of ident * metarg list
+  (** `meta` *)
   | Dclone of qualid * clone_subst list
+  (** `clone` *)
   | Duse of qualid
+  (** `use` *)

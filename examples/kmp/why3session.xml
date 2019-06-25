@@ -4,9 +4,11 @@
 <why3session shape_version="8">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.8.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
 <path name=".."/><path name="kmp.mlw"/>
 <theory name="KnuthMorrisPratt" proved="true">
@@ -29,8 +31,8 @@
  <proof prover="5"><result status="valid" time="0.00" steps="21"/></proof>
  </goal>
  <goal name="matches_left_weakening" proved="true">
- <proof prover="3"><path
-                    name="kmp_WP_KnuthMorrisPratt_matches_left_weakening_1.v"/><result status="valid" time="1.10"/></proof>
+ <proof prover="7"><path
+                    name="kmp_WP_KnuthMorrisPratt_matches_left_weakening_1.v"/><result status="valid" time="0.22"/></proof>
  </goal>
  <goal name="matches_sym" proved="true">
  <proof prover="0"><result status="valid" time="0.02" steps="4111"/></proof>
@@ -44,7 +46,7 @@
  <proof prover="1" timelimit="5"><result status="valid" time="0.02" steps="54610"/></proof>
  </goal>
  <goal name="next_is_maximal" proved="true">
- <proof prover="3"><path name="kmp_WP_KnuthMorrisPratt_next_is_maximal_1.v"/><result status="valid" time="1.18"/></proof>
+ <proof prover="7"><path name="kmp_WP_KnuthMorrisPratt_next_is_maximal_1.v"/><result status="valid" time="0.18"/></proof>
  </goal>
  <goal name="next_1_0" proved="true">
  <proof prover="0"><result status="valid" time="0.01" steps="5726"/></proof>
@@ -102,9 +104,9 @@
   <goal name="VC initnext.12" expl="loop invariant preservation" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC initnext.12.0" expl="loop invariant preservation" proved="true">
-   <transf name="instantiate" proved="true" arg1="H12" arg2="(z-1)">
+   <transf name="instantiate" proved="true" arg1="LoopInvariant3" arg2="(z-1)">
     <goal name="VC initnext.12.0.0" expl="loop invariant preservation" proved="true">
-    <proof prover="0"><result status="valid" time="0.03" steps="8521"/></proof>
+    <proof prover="6"><result status="valid" time="0.04" steps="8674"/></proof>
     </goal>
    </transf>
    </goal>
@@ -130,7 +132,7 @@
   <proof prover="5"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
   <goal name="VC initnext.18" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><path name="kmp_KnuthMorrisPratt_VC_initnext_1.v"/><result status="valid" time="1.17"/></proof>
+  <proof prover="7"><path name="kmp_KnuthMorrisPratt_VC_initnext_1.v"/><result status="valid" time="0.42"/></proof>
   </goal>
   <goal name="VC initnext.19" expl="loop invariant preservation" proved="true">
   <proof prover="5" timelimit="1"><result status="valid" time="0.22" steps="407"/></proof>
@@ -152,7 +154,7 @@
   <proof prover="5"><result status="valid" time="0.03" steps="89"/></proof>
   </goal>
   <goal name="VC initnext.24" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><path name="kmp_KnuthMorrisPratt_VC_initnext_2.v"/><result status="valid" time="1.28"/></proof>
+  <proof prover="7"><path name="kmp_KnuthMorrisPratt_VC_initnext_2.v"/><result status="valid" time="0.48"/></proof>
   </goal>
   <goal name="VC initnext.25" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.04" steps="12543"/></proof>
@@ -245,9 +247,9 @@
   <goal name="VC kmp.18" expl="loop invariant preservation" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC kmp.18.0" expl="loop invariant preservation" proved="true">
-   <transf name="instantiate" proved="true" arg1="H9" arg2="(k-1)">
+   <transf name="instantiate" proved="true" arg1="LoopInvariant2" arg2="(k-1)">
     <goal name="VC kmp.18.0.0" expl="loop invariant preservation" proved="true">
-    <proof prover="1"><result status="valid" time="0.06" steps="103817"/></proof>
+    <proof prover="2"><result status="valid" time="0.06" steps="115391"/></proof>
     </goal>
    </transf>
    </goal>

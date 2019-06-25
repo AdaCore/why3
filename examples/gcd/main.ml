@@ -1,5 +1,4 @@
 
-open Why3extract
 open Format
 
 let () =

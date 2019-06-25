@@ -5,7 +5,7 @@ module Regexp
 
   type char
 
-  (** Syntax *)
+  (** {2 Syntax} *)
 
   type regexp =
     | Empty
@@ -15,7 +15,7 @@ module Regexp
     | Concat  regexp regexp
     | Star    regexp
 
-  (** Semantics *)
+  (** {2 Semantics} *)
 
   (** Words are list of characters. *)
 
@@ -46,4 +46,3 @@ module Regexp
         mem w1 r -> mem w2 (Star r) -> mem (w1 ++ w2) (Star r)
 
 end
-

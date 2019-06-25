@@ -114,8 +114,9 @@ type notification =
      etc). Last parameter is the location of the goal for scrolling  *)
   | File_contents of string * string
   (** File_contents (filename, contents) *)
-  | Source_and_ce of string * (Loc.position * color) list
-  (** Source interleaved with counterexamples: contents and list color loc *)
+  | Source_and_ce of string * (Loc.position * color) list * Loc.position option
+  (** Source interleaved with counterexamples: contents and list color loc,
+      loc of the goal *)
 
 type ide_request =
   | Command_req             of node_ID * string

@@ -428,10 +428,11 @@ let print_notification_to_json (n: notification): json =
       convert_record ["notification", cc n;
            "file", String f;
            "content", String s]
-  | Source_and_ce (s, list_loc) ->
+  | Source_and_ce (s, list_loc, goal_loc) ->
       convert_record ["notification", cc n;
                       "content", String s;
-                      "loc_list", convert_list_loc list_loc])
+                      "loc_list", convert_list_loc list_loc;
+                      "goal_loc", convert_option_loc goal_loc])
 
 let print_notification fmt (n: notification) =
   Format.fprintf fmt "%a" print_json (print_notification_to_json n)
@@ -806,7 +807,8 @@ let parse_notification constr j =
   | "Source_and_ce" ->
     let s = get_string (get_field j "content") in
     let l = get_field j "loc_list" in
-    Source_and_ce(s, parse_list_loc l)
+    let gl = get_field j "goal_loc" in
+    Source_and_ce(s, parse_list_loc l, parse_opt_loc gl)
 
 
   | s -> raise (NotNotification ("<from parse_notification> " ^ s))

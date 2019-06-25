@@ -13,6 +13,10 @@ open Wstdlib
 
 type variable = string
 
+type bv_value =
+  | Bv_int of string
+  | Bv_sharp of string
+
 (* Simple counterexample that already represent a complete value *)
 type simple_value =
   | Integer of string
@@ -20,7 +24,7 @@ type simple_value =
   | Fraction of (string * string)
   | Float of Model_parser.float_type
   | Other of string
-  | Bitvector of string
+  | Bitvector of bv_value
   | Boolean of bool
 
 type array =

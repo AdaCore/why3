@@ -37,7 +37,6 @@ module M
   let incr (x23: ref1): unit
   ensures { !x23 = old !x23 + 2 + !y }
   =
-  (*#"random_path.random" 62 27 32#*)
   y := !y + 1;
   x23 := !x23 + 1;
   x23 := !x23 + 1

@@ -38,6 +38,12 @@ decide_fail () {
         # Inconsistent results between two runs
         "bench/ce/algebraic_types_mono_Z3,4.6.0_WP")
            is_xfail=integer_values;;
+        # Inconsistent result values between two runs
+        "bench/ce/algebraic_types_mono_CVC4,1.7_SP")
+           is_xfail=full;;
+        # Inconsistent results between two runs
+        "bench/ce/algebraic_types_mono_CVC4,1.7_WP")
+           is_xfail=full;;
         # Inconsistent results between two runs
         "bench/ce/ref_mono_Z3,4.6.0_WP")
             is_xfail=integer_values;;
@@ -77,7 +83,7 @@ run () {
         sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
         # This ad hoc sed removes diff between Timeout and Unknown (unknown)
         # when running from platform with different speed.
-        sed -r 's/(Timeout.*$|Unknown \(unknown\).*$)/Timeout or Unknown/' | \
+        sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/' | \
         # ad hoc sed to remove the directory of the stdlib that can be found
         # inside labels attribute [@at:'Old:loc:/home/.../stdlib/array.mlw
         # TODO temporary as this comes from incorrect locations generated in
@@ -109,8 +115,8 @@ run () {
             mv "$f.out" "${oracle_file}"
         else
             echo "FAILED!"
-            echo "Oracle is ${str_oracle}"
-            echo "Output is ${str_out}"
+            # echo "Oracle is ${str_oracle}"
+            # echo "Output is ${str_out}"
             echo "diff is the following:"
             echo "$f"
             diff "${oracle_file}" "$f.out"
@@ -127,8 +133,8 @@ for file in $files; do
     filedir=`dirname $file`
     filebase=`basename $file .mlw`
     printf "Running provers on $filedir/$filebase.mlw\n";
-    run CVC4,1.5 $filedir $filebase true
-    run CVC4,1.5 $filedir $filebase false
+    run CVC4,1.7 $filedir $filebase true
+    run CVC4,1.7 $filedir $filebase false
     run Z3,4.6.0 $filedir $filebase true
     run Z3,4.6.0 $filedir $filebase false
 done

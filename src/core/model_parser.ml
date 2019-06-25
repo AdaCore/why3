@@ -36,61 +36,110 @@ type float_type =
   | Float_value of string * string * string
   | Float_hexa of string * float
 
+type repr = BinRepr | HexaRepr
 
 let interp_float ?(interp=true) b eb sb =
-    try
-      (* We don't interpret when this is disable *)
-      if not interp then
-        raise Exit;
-      let is_neg = match b with
-        | "#b0" -> false
-        | "#b1" -> true
-        | _ -> raise Exit
-      in
-      if String.length eb = 13 && String.sub eb 0 2 = "#b" &&
-         String.length sb = 15 && String.sub sb 0 2 = "#x" then
-         (* binary 64 *)
-         let exp_base2 = String.sub eb 2 11 in
-         let mant_base16 = String.sub sb 2 13 in
-         let exp = int_of_string ("0b" ^ exp_base2) in
-         if exp = 0 then (* subnormals *)
-           let s = (if is_neg then "-" else "")^
-                   "0x0."^mant_base16^"p-1023"
-            in Float_hexa(s,float_of_string s)
-           else if exp = 2047 then (* infinities and NaN *)
-             if mant_base16="0000000000000" then
-                if is_neg then Minus_infinity else Plus_infinity
-                else Not_a_number
-           else
-           let exp = exp - 1023 in
-           let s = (if is_neg then "-" else "")^
-                   "0x1."^mant_base16^"p"^(string_of_int exp)
-           in Float_hexa(s,float_of_string s)
-      else
-      if String.length eb = 4 && String.sub eb 0 2 = "#x" &&
-         String.length sb = 25 && String.sub sb 0 2 = "#b" then
-         (* binary 32 *)
-         let exp_base16 = String.sub eb 2 2 in
-         let mant_base2 = String.sub sb 2 23 in
-         let mant_base16 =
-           Format.asprintf "%06x" (2*int_of_string ("0b" ^ mant_base2))
-         in
-         let exp = int_of_string ("0x" ^ exp_base16) in
-         if exp = 0 then (* subnormals *)
-           let s = (if is_neg then "-" else "")^
-                   "0x0."^mant_base16^"p-127"
-            in Float_hexa(s,float_of_string s)
-           else if exp = 255 then (* infinities and NaN *)
-             if mant_base16="0000000" then
-                if is_neg then Minus_infinity else Plus_infinity
-                else Not_a_number
-           else
-           let exp = exp - 127 in
-           let s = (if is_neg then "-" else "")^
-                   "0x1."^mant_base16^"p"^(string_of_int exp)
-           in Float_hexa(s,float_of_string s)
-      else raise Exit
-   with Exit -> Float_value (b, eb, sb)
+  let convert (r: repr) s =
+    (* Convert number of less than 63 bits TODO *)
+    match r with
+    | BinRepr when String.length s <= 62 -> int_of_string ("0b" ^ s)
+    | HexaRepr when String.length s <= 15 -> int_of_string ("0x" ^ s)
+    | _ -> (* Too big to fit into an integer *) raise Exit in
+
+  let rec pow x n =
+    assert (n <= 63);
+    match n with
+    | p when p <= 0 -> 1
+    | 1 -> x
+    | p -> x * pow x (p-1) in
+
+  let get_repr s len =
+    if String.sub s 0 2 = "#b" then
+      BinRepr, String.sub s 2 (len - 2), (len - 2)
+    else if String.sub s 0 2 = "#x" then
+      HexaRepr, String.sub s 2 (len - 2), (len - 2) * 4
+    else raise Exit in
+
+  let pad_with_zeros width s =
+    let s_len = String.length s in
+    let filled =
+      let len = width - s_len in
+      if len <= 0 then "" else String.make len '0' in
+    filled ^ s in
+
+  let only_zeros s =
+    (* Check that there is only 0 in the string *)
+    let b = ref true in
+    for i = 0 to String.length s - 1 do
+      b := !b && (s.[i] = '0')
+    done;
+    !b in
+
+  try
+    (* We don't interpret when this is disable *)
+    if not interp then
+      raise Exit;
+    let is_neg = match b with
+      | "#b0" -> false
+      | "#b1" -> true
+      | _ -> raise Exit
+    in
+    let eb_len = String.length eb in
+    let sb_len = String.length sb in
+    if eb_len < 2 || sb_len < 2 then raise Exit;
+    let eb_repr, eb, eb_size = get_repr eb eb_len in
+    let sb_repr, sb, sb_size = get_repr sb sb_len in
+
+    (* Values for the type of float obtained *)
+    (* Exponent bias *)
+    let exp_bias = (pow 2 (eb_size - 1)) - 1 in
+    (* Maximum exponent value *)
+    let max_exp = (pow 2 eb_size) - 1 in
+    (* Length of the hexadecimal representation (after the ".") *)
+    let length_of_number =
+      if sb_size mod 4 = 0 then sb_size / 4 else sb_size / 4 + 1 in
+
+    (* Compute exponent (int) and mantissa (string of hexa) *)
+    let exp = convert eb_repr eb in
+    let mant_base16 =
+      let c = convert sb_repr sb in
+      let c =
+        (* The hex value is used after the decimal point. So we need to adjust
+           it to the number of binary elements there are.
+           Example in 32bits: significand is 23 bits, and the hexadecimal
+           representation will have a multiple of 4 bits (ie 24). So, we need to
+           multiply by two to account the difference. *)
+        if sb_repr = BinRepr then
+          let adjust = 4 - sb_size mod 4 in
+          (* No adjustment needed *)
+          if adjust = 4 then
+            c
+          else
+            (pow 2 adjust) * c
+        else
+          c in
+      pad_with_zeros length_of_number (Format.asprintf "%x" c)
+    in
+    match exp with
+    | 0 (* subnormals and zero *) ->
+        (* Case for zero *)
+        if only_zeros mant_base16 then
+          if is_neg then Minus_zero else Plus_zero
+        else
+          (* Subnormals *)
+          let s = (if is_neg then "-" else "")^
+                  "0x0."^mant_base16^"p-"^(string_of_int exp_bias)
+          in Float_hexa (s, float_of_string s)
+    | e when e = max_exp (* infinities and NaN *) ->
+        if only_zeros mant_base16 then
+          if is_neg then Minus_infinity else Plus_infinity
+        else Not_a_number
+    | _ (* Normal floats *) ->
+        let exp = exp - exp_bias in
+        let s = (if is_neg then "-" else "")^
+                "0x1."^mant_base16^"p"^(string_of_int exp)
+        in Float_hexa(s,float_of_string s)
+  with Exit -> Float_value (b, eb, sb)
 
 type model_value =
  | Integer of string
@@ -275,7 +324,7 @@ let print_float_human fmt f =
   | Not_a_number ->
       fprintf fmt "NaN"
   | Float_value (b, eb, sb) ->
-     fprintf fmt "float_bits(%s,%s,%s)" b eb sb
+      fprintf fmt "float_bits(%s,%s,%s)" b eb sb
   | Float_hexa(s,f) -> fprintf fmt "%s (%g)" s f
 
 let rec print_array_human fmt (arr: model_array) =
@@ -321,7 +370,7 @@ and print_integer fmt (i: string) =
         to_hexa (BigInt.to_int bn)
       else
         let (q, r) = BigInt.euclidean_div_mod bn base in
-        to_hexa (BigInt.to_int q) ^ convert_big_int_hexa r
+        convert_big_int_hexa q ^ to_hexa (BigInt.to_int r)
     in
     fprintf fmt "%s (%s0x%s)" (BigInt.to_string bn)
       (if (BigInt.sign bn) >= 0 then "" else "-")
@@ -337,6 +386,13 @@ and print_integer fmt (i: string) =
   with Failure _ (* "int_of_big_int" *) ->
     print_big_int fmt bn
 
+and print_bv fmt (bv: string) =
+  (* TODO Not implemented yet. Ideally, fix the differentiation made in the
+     parser between Bv_int and Bv_sharp -> convert Bv_int to Bitvector not
+     Integer. And print Bv_int exactly like Bv_sharp.
+  *)
+  Format.fprintf fmt "%s" bv
+
 and print_model_value_human fmt (v: model_value) =
   match v with
   | Integer s -> print_integer fmt s
@@ -351,8 +407,8 @@ and print_model_value_human fmt (v: model_value) =
   | Array arr -> print_array_human fmt arr
   | Record r -> print_record_human fmt r
   | Proj p -> print_proj_human fmt p
-  | Bitvector s -> (* Bitvector are returned with the same format as integer *)
-      print_integer fmt s
+  | Bitvector s ->
+      print_bv fmt s
   | Unparsed s -> fprintf fmt "%s" s
 
 (*
@@ -549,10 +605,10 @@ let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt
         me_name
         print_model_value m_element.me_value
 
-let print_model_elements ~at_loc ~print_attrs ?(sep = "\n")
+let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
     print_model_value me_name_trans fmt m_elements
   =
-  Pp.print_list (fun fmt () -> Pp.string fmt sep)
+  Pp.print_list sep
     (print_model_element ~at_loc ~print_attrs print_model_value me_name_trans)
     fmt m_elements
 
@@ -562,13 +618,15 @@ let print_model_file ~print_attrs ~print_model_value fmt
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths.  *)
   let filename = Filename.basename filename  in
-  fprintf fmt "File %s:" filename;
+  fprintf fmt "@[<v 0>File %s:@\n" filename;
   IntMap.iter
     (fun line m_elements ->
-      fprintf fmt "@\nLine %d:@\n" line;
-      print_model_elements ~at_loc:(filename,line) ~print_attrs print_model_value me_name_trans fmt m_elements)
+      fprintf fmt "  @[<v 2>Line %d:@\n" line;
+      print_model_elements ~at_loc:(filename,line) ~print_attrs print_model_value me_name_trans fmt m_elements;
+      fprintf fmt "@]@\n"
+    )
     model_file;
-  fprintf fmt "@\n"
+  fprintf fmt "@]"
 
 let why_name_trans me_name =
   match me_name.men_kind with
@@ -658,10 +716,10 @@ let interleave_line
   try
     let model_elements = IntMap.find line_number model_file in
     let cntexmp_line =
-      asprintf "%s%s%a%s"
+      asprintf "@[<h 0>%s%s%a%s@]"
         (get_padding line)
         start_comment
-        (print_model_elements ~at_loc:(filename,line_number) ~print_attrs ~sep:"; " print_model_value_human me_name_trans) model_elements
+        (print_model_elements ~sep:Pp.semi ~at_loc:(filename,line_number) ~print_attrs print_model_value_human me_name_trans) model_elements
         end_comment in
 
     (* We need to know how many lines will be taken by the counterexample. This
@@ -676,14 +734,10 @@ let interleave_line
 
 
 let interleave_with_source
-    ~print_attrs
-    ?(start_comment="(* ")
-    ?(end_comment=" *)")
+    ~print_attrs ?(start_comment="(* ") ?(end_comment=" *)")
     ?(me_name_trans = why_name_trans)
-    model
-    ~rel_filename
-    ~source_code
-    ~locations =
+    model ~rel_filename ~source_code ~locations
+  =
   let locations =
     List.sort (fun x y -> compare (fst x) (fst y))
       (List.filter (fun x -> let (f, _, _, _) = Loc.get (fst x) in f = rel_filename) locations)

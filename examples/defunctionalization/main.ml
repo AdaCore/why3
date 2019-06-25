@@ -1,5 +1,4 @@
 
-open Why3extract
 open Format
 
 let usage () =
@@ -15,14 +14,14 @@ open Defunctionalization
 
 let rec p_expr fmt e =
   match e with
-    | Cte n -> fprintf fmt "%s" (Why3__BigInt.to_string n)
+    | Cte n -> fprintf fmt "%s" (Z.to_string n)
     | Sub(e1,e2) ->
       fprintf fmt "(%a - %a)" p_expr e1 p_expr e2
 
 let p_prog fmt p = p_expr fmt p
 
 let p_value fmt v =
-  fprintf fmt "%s" (Why3__BigInt.to_string v)
+  fprintf fmt "%s" (Z.to_string v)
 
 let run s f p =
   let v = f p in

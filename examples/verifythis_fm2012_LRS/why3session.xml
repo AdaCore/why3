@@ -2,6 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
+<prover id="0" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -353,9 +354,9 @@
   <goal name="VC lrs.20" expl="postcondition" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="VC lrs.20.0" expl="postcondition" proved="true">
-   <transf name="instantiate" proved="true" arg1="H7" arg2="x,y">
+   <transf name="instantiate" proved="true" arg1="Assert" arg2="x,y">
     <goal name="VC lrs.20.0.0" expl="postcondition" proved="true">
-    <proof prover="2"><result status="valid" time="0.04" steps="14083"/></proof>
+    <proof prover="0"><result status="valid" time="0.06" steps="14685"/></proof>
     </goal>
    </transf>
    </goal>

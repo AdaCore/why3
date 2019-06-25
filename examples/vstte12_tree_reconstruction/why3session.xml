@@ -5,8 +5,8 @@
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
 <path name=".."/><path name="vstte12_tree_reconstruction.mlw"/>
 <theory name="Tree" proved="true">
@@ -59,12 +59,12 @@
   <proof prover="0"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC build_rec.6" expl="exceptional postcondition" proved="true">
-  <proof prover="5"><path
-                     name="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_1.v"/><result status="valid" time="1.31"/></proof>
+  <proof prover="3"><path
+                     name="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_1.v"/><result status="valid" time="0.41"/></proof>
   </goal>
   <goal name="VC build_rec.7" expl="exceptional postcondition" proved="true">
-  <proof prover="5"><path
-                     name="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_2.v"/><result status="valid" time="1.20"/></proof>
+  <proof prover="3"><path
+                     name="vstte12_tree_reconstruction_TreeReconstruction_VC_build_rec_2.v"/><result status="valid" time="0.33"/></proof>
   </goal>
  </transf>
  </goal>
@@ -76,18 +76,18 @@
  <goal name="VC harness" expl="VC for harness" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC harness.0" expl="postcondition" proved="true">
-  <proof prover="5"><path
-                     name="vstte12_tree_reconstruction_Harness_VC_harness_1.v"/><result status="valid" time="1.18"/></proof>
+  <proof prover="3"><path
+                     name="vstte12_tree_reconstruction_Harness_VC_harness_1.v"/><result status="valid" time="0.30"/></proof>
   </goal>
   <goal name="VC harness.1" expl="exceptional postcondition" proved="true">
-  <proof prover="5"><path
-                     name="vstte12_tree_reconstruction_Harness_VC_harness_2.v"/><result status="valid" time="1.22"/></proof>
+  <proof prover="3"><path
+                     name="vstte12_tree_reconstruction_Harness_VC_harness_2.v"/><result status="valid" time="0.30"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="VC harness2" expl="VC for harness2" proved="true">
- <proof prover="5"><path
-                    name="vstte12_tree_reconstruction_Harness_VC_harness2_1.v"/><result status="valid" time="1.26"/></proof>
+ <proof prover="3"><path
+                    name="vstte12_tree_reconstruction_Harness_VC_harness2_1.v"/><result status="valid" time="0.45"/></proof>
  </goal>
 </theory>
 <theory name="ZipperBasedTermination" proved="true">
@@ -97,8 +97,8 @@
 </theory>
 <theory name="ZipperBased" proved="true">
  <goal name="forest_depths_append" proved="true">
- <proof prover="5" timelimit="10" memlimit="0"><path
-                                                name="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"/><result status="valid" time="1.12"/></proof>
+ <proof prover="3" timelimit="10" memlimit="0"><path
+                                                name="vstte12_tree_reconstruction_WP_ZipperBased_forest_depths_append_1.v"/><result status="valid" time="0.29"/></proof>
  </goal>
  <goal name="g_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
@@ -129,12 +129,12 @@
  </transf>
  </goal>
  <goal name="key_lemma" proved="true">
- <proof prover="5"><path
-                    name="vstte12_tree_reconstruction_ZipperBased_key_lemma_2.v"/><result status="valid" time="1.46"/></proof>
+ <proof prover="3"><path
+                    name="vstte12_tree_reconstruction_ZipperBased_key_lemma_2.v"/><result status="valid" time="0.52"/></proof>
  </goal>
  <goal name="right_nil" proved="true">
- <proof prover="5" timelimit="29" memlimit="0"><path
-                                                name="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"/><result status="valid" time="1.20"/></proof>
+ <proof prover="3" timelimit="29" memlimit="0"><path
+                                                name="vstte12_tree_reconstruction_WP_ZipperBased_right_nil_1.v"/><result status="valid" time="0.33"/></proof>
  </goal>
  <goal name="main_lemma" proved="true">
  <proof prover="4" timelimit="1"><result status="valid" time="0.07" steps="13420"/></proof>

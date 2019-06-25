@@ -511,8 +511,7 @@ let inv_of_pure {known_map = kn} loc fl k =
    [res] names the result of the normal execution of [e]
    [xmap] maps every raised exception to a pair [i,xres]:
    - [i] is a positive int assigned at the catching site
-   - [xres] names the value carried by the exception
-   [case_xmap] is used for match-with-exceptions *)
+   - [xres] names the value carried by the exception *)
 let rec k_expr env lps e res xmap =
   let loc = e.e_loc and eff = e.e_effect in
   let attrs = Sattr.diff e.e_attrs vc_attrs in
@@ -824,7 +823,11 @@ let rec k_expr env lps e res xmap =
         let prev = sp_of_inv None attrs expl_loop_init invl in
         let keep = wp_of_inv None attrs expl_loop_keep invl in
         let oldies, ovarl = oldify_variant varl in
-        let decr = decrease env loc attrs expl_loop_vari ovarl varl in
+        let variant_loc = (* Compute the location of the variant. *)
+          match varl with
+          | (var_t, _) :: _ when var_t.t_loc <> None -> var_t.t_loc
+          | _ -> loc in
+        let decr = decrease env variant_loc attrs expl_loop_vari ovarl varl in
         let keep = wp_and decr keep in
         let iinv = inv_of_loop env e.e_loc invl varl in
         let j = List.fold_right assert_inv iinv (Kstop init) in

@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
-<prover id="1" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -30,7 +30,7 @@
  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
  <goal name="steps_non_neg" proved="true">
- <proof prover="1"><path name="blocking_semantics5_SemOp_steps_non_neg_1.v"/><result status="valid" time="1.18"/></proof>
+ <proof prover="0"><path name="blocking_semantics5_SemOp_steps_non_neg_1.v"/><result status="valid" time="0.31"/></proof>
  </goal>
 </theory>
 <theory name="TestSemantics" proved="true">
@@ -100,8 +100,8 @@
    <proof prover="2"><result status="valid" time="0.06" steps="143"/></proof>
    </goal>
    <goal name="eval_type_term.0.3" proved="true">
-   <proof prover="1"><path
-                      name="blocking_semantics5_TypingAndSemantics_eval_type_term_1.v"/><result status="valid" time="1.32"/></proof>
+   <proof prover="0"><path
+                      name="blocking_semantics5_TypingAndSemantics_eval_type_term_1.v"/><result status="valid" time="0.39"/></proof>
    </goal>
   </transf>
   </goal>
@@ -483,8 +483,8 @@
  <proof prover="2"><result status="valid" time="0.17" steps="833"/></proof>
  </goal>
  <goal name="while_rule" proved="true">
- <proof prover="1"><path
-                    name="blocking_semantics5_HoareLogic_while_rule_1.v"/><result status="valid" time="1.40"/></proof>
+ <proof prover="0"><path
+                    name="blocking_semantics5_HoareLogic_while_rule_1.v"/><result status="valid" time="0.52"/></proof>
  </goal>
 </theory>
 <theory name="WP" proved="true">
@@ -544,7 +544,7 @@
    <proof prover="3"><result status="valid" time="0.09"/></proof>
    </goal>
    <goal name="monotonicity.0.5" proved="true">
-   <proof prover="1"><path name="blocking_semantics5_WP_monotonicity_3.v"/><result status="valid" time="1.36"/></proof>
+   <proof prover="0"><path name="blocking_semantics5_WP_monotonicity_3.v"/><result status="valid" time="0.36"/></proof>
    </goal>
   </transf>
   </goal>
@@ -585,7 +585,7 @@
    <proof prover="2"><result status="valid" time="0.04" steps="175"/></proof>
    </goal>
    <goal name="distrib_conj.0.5" proved="true">
-   <proof prover="1"><path name="blocking_semantics5_WP_distrib_conj_3.v"/><result status="valid" time="1.22"/></proof>
+   <proof prover="0"><path name="blocking_semantics5_WP_distrib_conj_3.v"/><result status="valid" time="0.41"/></proof>
    </goal>
   </transf>
   </goal>
@@ -627,7 +627,7 @@
    <proof prover="2"><result status="valid" time="0.02" steps="11"/></proof>
    </goal>
    <goal name="progress.0.1" proved="true">
-   <proof prover="1"><path name="blocking_semantics5_WP_progress_1.v"/><result status="valid" time="1.25"/></proof>
+   <proof prover="0"><path name="blocking_semantics5_WP_progress_1.v"/><result status="valid" time="0.34"/></proof>
    <proof prover="10"><result status="valid" time="0.20"/></proof>
    </goal>
    <goal name="progress.0.2" proved="true">
@@ -672,22 +672,22 @@
    </transf>
    </goal>
    <goal name="progress.0.3" proved="true">
-   <proof prover="1"><path name="blocking_semantics5_WP_progress_3.v"/><result status="valid" time="1.28"/></proof>
+   <proof prover="0"><path name="blocking_semantics5_WP_progress_3.v"/><result status="valid" time="0.45"/></proof>
    <proof prover="10" timelimit="10" memlimit="4000"><result status="valid" time="3.91"/></proof>
    </goal>
    <goal name="progress.0.4" proved="true">
    <proof prover="2"><result status="valid" time="0.05" steps="179"/></proof>
    </goal>
    <goal name="progress.0.5" proved="true">
-   <proof prover="1"><path name="blocking_semantics5_WP_progress_5.v"/><result status="valid" time="1.24"/></proof>
+   <proof prover="0"><path name="blocking_semantics5_WP_progress_5.v"/><result status="valid" time="0.42"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="wp_soundness" proved="true">
- <proof prover="1" timelimit="30"><path
-                                   name="blocking_semantics5_WP_wp_soundness_1.v"/><result status="valid" time="1.38"/></proof>
+ <proof prover="0" timelimit="30"><path
+                                   name="blocking_semantics5_WP_wp_soundness_1.v"/><result status="valid" time="0.44"/></proof>
  </goal>
 </theory>
 </file>

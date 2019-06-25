@@ -4,12 +4,3 @@ archive(byte) = "why3.cma"
 archive(native) = "why3.cmxa"
 plugin(native) = "why3.cmxs"
 requires = "str unix num dynlink menhirLib @ZIPLIB@"
-
-package "extract" (
-  description = "Why3 support library for extracted code"
-  version = "@VERSION@"
-  requires = "@BIGINTPKG@"
-  archive(byte) = "why3extract.cma"
-  archive(native) = "why3extract.cmxa"
-  plugin(native) = "why3extract.cmxs"
-)

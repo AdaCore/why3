@@ -39,10 +39,10 @@ doc:
 	@echo firefox ../defunctionalization.html why3session.html
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
-	ocamlc -g $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ $^
+	ocamlc -g $(INCLUDE) $(BIGINTLIB).cma -o $@ $^
 
 $(MAIN).opt: $(CMX) $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 

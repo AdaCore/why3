@@ -869,13 +869,34 @@ end
     in
     task_text, loc_color_list, goal_loc
 
-  let create_ce_tab ~print_attrs s res any list_loc =
+  type loc_type =
+    | Goal_loc
+    | Color_loc of Itp_communication.color
+
+  let create_ce_tab ~print_attrs s res any list_loc goal_loc =
     let f = get_encapsulating_file s any in
     let filename = Session_itp.system_path s f in
     let source_code = Sysutil.file_contents filename in
-    Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
+    (* Convert the color location and location of the goal at the same time *)
+    let list_loc = List.map (fun (x, y) -> x, Color_loc y) list_loc in
+    let list_loc =
+      match goal_loc with
+      | Some goal_loc -> (goal_loc, Goal_loc) :: list_loc
+      | None          -> list_loc in
+    let (source_result, list_loc) =
+      Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
       ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:filename
       ~source_code:source_code ~locations:list_loc
+    in
+    let goal_loc, list_loc = List.partition (fun (_, y) -> y = Goal_loc) list_loc in
+    let goal_loc =
+      match goal_loc with
+      | [(x, _)] -> Some x
+      | _        -> None in
+    let list_loc =
+      List.map (fun (x, y) ->
+          match y with | Color_loc y -> (x, y) | _ -> assert false) list_loc in
+    (source_result, list_loc, goal_loc)
 
   let send_task nid show_full_context loc =
     let d = get_server_data () in
@@ -940,10 +961,10 @@ end
                     let result_pr =
                       result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
                     in
-                    let (source_result, list_loc) =
-                      create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc
+                    let (source_result, list_loc, goal_loc) =
+                      create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc old_goal_loc
                     in
-                    P.notify (Source_and_ce (source_result, list_loc));
+                    P.notify (Source_and_ce (source_result, list_loc, goal_loc));
                     P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc))
                   end
             | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc))

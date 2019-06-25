@@ -30,7 +30,7 @@ let debug_parse_only = Debug.register_flag "parse_only"
 let debug_type_only  = Debug.register_flag "type_only"
   ~desc:"Stop@ after@ type-checking."
 
-let debug_useless_at = Debug.register_flag "ignore_useless_at"
+let debug_ignore_useless_at = Debug.register_flag "ignore_useless_at"
   ~desc:"Remove@ warning@ for@ useless@ at/old."
 
 (** symbol lookup *)
@@ -458,7 +458,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       (* check if the label has actually been defined *)
       ignore (Loc.try2 ~loc gvars (Some l) (Qident id));
       let e1 = dterm ns km crcmap gvars (Some l) denv e1 in
-      if not (Hstr.find at_uses l) && Debug.test_noflag debug_useless_at then
+      if not (Hstr.find at_uses l) && Debug.test_noflag debug_ignore_useless_at then
         Warning.emit ~loc "this `at'/`old' operator is never used";
       Hstr.remove at_uses l;
       DTattr (e1, Sattr.empty)
@@ -1060,7 +1060,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let gvars _at q = try match find_prog_symbol muc q with
         | PV v -> Some v | _ -> None with _ -> None in
       let get_dty pure_denv =
+        let nw = Debug.test_noflag debug_ignore_useless_at in
+        if nw then Debug.set_flag debug_ignore_useless_at;
         let dt = dterm muc gvars None pure_denv t in
+        if nw then Debug.unset_flag debug_ignore_useless_at;
         match dt.dt_dty with Some dty -> dty | None -> dty_bool in
       DEpure (get_term, denv_pure denv get_dty)
   | Ptree.Eassert (ak, f) ->

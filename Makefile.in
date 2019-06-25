@@ -65,7 +65,21 @@ ifeq (@OCAMLBEST@,opt)
 #DEPFLAGS += -native
 endif
 
-RUBBER = @RUBBER@
+ifeq (@LATEX@,rubber)
+   LATEXCOMP=rubber --warn all --pdf
+   LATEXCLEAN=rubber --pdf --clean
+endif
+
+ifeq (@LATEX@,latexmk)
+   LATEXCOMP=latexmk --pdf
+   LATEXCLEAN=latexmk --pdf -C
+endif
+
+ifeq (@LATEX@,pdflatex)
+   LATEXCOMP=pdflatex
+   LATEXCLEAN=true
+endif
+
 HEVEA = @HEVEA@
 HACHA = @HACHA@
 EMACS = @EMACS@
@@ -181,8 +195,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/driver/parse_smtv2_model_parser.mli src/driver/parse_smtv2_model_parser.ml \
 	       src/driver/parse_smtv2_model_lexer.ml \
 	       src/session/compress.ml src/session/xml.ml \
-	       src/session/strategy_parser.ml \
-	       lib/ocaml/why3__BigInt_compat.ml
+	       src/session/strategy_parser.ml
 
 LIB_UTIL = config bigInt util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl \
@@ -255,16 +268,6 @@ $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
-
-# Zarith
-
-ifeq (@enable_zarith@,yes)
-lib/ocaml/why3__BigInt_compat.ml: config.status lib/ocaml/why3__BigInt_zarith.ml
-	cp lib/ocaml/why3__BigInt_zarith.ml $@
-else
-lib/ocaml/why3__BigInt_compat.ml: config.status lib/ocaml/why3__BigInt_num.ml
-	cp lib/ocaml/why3__BigInt_num.ml $@
-endif
 
 # Ocamlzip
 
@@ -1445,57 +1448,6 @@ endif
 clean::
 	rm -f bin/isabelle_client.byte bin/isabelle_client.opt bin/isabelle_client
 
-#######################
-# Ocaml realizations
-#######################
-
-OCAMLLIBS_FILES = why3__BigInt_compat why3__BigInt why3__IntAux why3__Array \
-	          why3__Matrix
-
-OCAMLLIBS_MODULES := $(addprefix lib/ocaml/, $(OCAMLLIBS_FILES))
-
-OCAMLLIBS_DEP = $(addsuffix .dep, $(OCAMLLIBS_MODULES))
-OCAMLLIBS_CMO = $(addsuffix .cmo, $(OCAMLLIBS_MODULES))
-OCAMLLIBS_CMX = $(addsuffix .cmx, $(OCAMLLIBS_MODULES))
-
-$(OCAMLLIBS_DEP): DEPFLAGS += -I src/util -I lib/ocaml @BIGINTINCLUDE@
-$(OCAMLLIBS_CMO) $(OCAMLLIBS_CMX): INCLUDES += -I src/util -I lib/ocaml @BIGINTINCLUDE@
-$(OCAMLLIBS_CMX): OFLAGS += -for-pack Why3extract
-
-byte: $(OCAMLLIBS_CMO)
-opt:  $(OCAMLLIBS_CMX)
-
-byte: lib/why3/why3extract.cma
-opt:  lib/why3/why3extract.cmxa lib/why3/why3extract.cmxs
-
-lib/why3/why3extract.cma: lib/why3/why3extract.cmo
-lib/why3/why3extract.cmxa: lib/why3/why3extract.cmx
-lib/why3/why3extract.cmxs: lib/why3/why3extract.cmx
-
-lib/why3/why3extract.cmo: $(OCAMLLIBS_CMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
-
-lib/why3/why3extract.cmx: $(OCAMLLIBS_CMX) lib/why3/why3extract.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) $(CMIHACK) -pack -o $@ $(filter %.cmx, $^)
-
-install-lib::
-	$(MKDIR_P) $(OCAMLINSTALLLIB)/why3
-	$(INSTALL_DATA) $(wildcard $(addprefix lib/why3/why3extract., $(INSTALLED_LIB_EXTS))) \
-	  $(OCAMLINSTALLLIB)/why3
-
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(OCAMLLIBS_DEP)
-endif
-
-$(OCAMLLIBS_DEP): lib/ocaml/why3__BigInt_compat.ml
-
-depend: $(OCAMLLIBS_DEP)
-
-CLEANDIRS += lib/ocaml
-CLEANLIBS += lib/why3/why3extract
-
 ################
 # Jessie3 plugin
 ################
@@ -1998,7 +1950,15 @@ DOC = api glossary ide intro exec macros manpages install \
 DOCTEX = $(DOC:%=doc/%.tex)
 
 doc/manual.pdf: $(BNFTEX) $(OCAMLCODE) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
-	cd doc; $(RUBBER) --warn all --pdf manual.tex
+	cd doc; $(LATEXCOMP) manual.tex
+ifeq (@LATEX@,pdflatex)
+	cd doc; if grep 'may have changed. Rerun to get' manual.log; then \
+		bibtex manual ; makeindex manual; pdflatex manual; \
+	fi
+	cd doc; if grep 'may have changed. Rerun to get' manual.log; then \
+		pdflatex manual; \
+	fi
+endif
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
@@ -2028,7 +1988,7 @@ endif
 
 clean::
 	rm -rf doc/bnf$(EXE) $(BNFTEX) doc/html doc/manual.image.out; \
-	cd doc; $(RUBBER) --pdf --clean manual.tex
+	cd doc; $(LATEXCLEAN) manual.tex
 
 else
 
@@ -2049,13 +2009,16 @@ MODULESTODOC = \
 	util/loc util/pp util/bigInt util/number \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task core/trans core/pretty core/printer \
+	parser/typing \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
 	session/session_itp session/controller_itp \
 	session/itp_communication session/itp_server \
 	mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc
 
-FILESTODOC = $(MODULESTODOC:%=src/%.mli)
+MODULESMLTODOC = parser/ptree
+
+FILESTODOC = $(MODULESTODOC:%=src/%.mli) $(MODULESMLTODOC:%=src/%.ml)
 
 doc/apidoc:
 	mkdir -p doc/apidoc
@@ -2115,24 +2078,32 @@ install:: install-bash
 .PHONY: stdlibdoc
 
 STDMACHLIBS = \
-	array int matrix onetime peano
-# bv, c, float, fxp, tagset?
+	array bv c float fxp int matrix onetime peano tagset
 
 STDLIBS = \
 	algebra appmap array \
 	bag bintree bool bv \
-	floating_point graph hashtbl \
+	cursor \
+	exn \
+	floating_point function \
+	graph hashtbl \
 	ieee_float impmap int \
 	list \
 	map matrix \
-	number option \
+	null number option ocaml \
 	pigeon pqueue \
 	queue \
-	random real ref relations \
+	random real ref regexp relations \
 	seq set stack string sum \
+	tree \
 	witness \
 	$(addprefix mach/, $(STDMACHLIBS))
-# cursor, debug, exn, for_drivers, function, io, null, ocaml, regexp, tptp, tree?
+
+# NO NEED DOC:
+# debug: too basic, needs large improvement
+# io: too basic, needs large improvement
+# tptp: for TPTP provers ?
+# for_drivers: used only in drivers
 
 STDLIBFILES = $(patsubst %,stdlib/%.mlw, $(STDLIBS))
 
@@ -2177,12 +2148,6 @@ clean::
 	$(HIDE)$(OCAMLC) -c $(BFLAGS) $<
 
 %.cmx: %.ml %.mli
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
-
-# the generic rule cannot be applied since ocaml would confuse
-# lib/why3/why3extract.cmi for the interface (!!!)
-src/tools/why3extract.cmx: %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 

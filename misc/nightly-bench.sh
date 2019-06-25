@@ -94,7 +94,7 @@ perl -pi -e 's/running_provers_max = 2/running_provers_max = 4/' why3.conf
 COQVER=$(bin/why3 --list-provers | sed -n -e 's/  Coq (\?\([0-9.]\+\).*/\1/p')
 echo "Coq version detected: $COQVER" >> $REPORT
 if test "$COQVER" != "" ; then
-sed bench-coq-why3-conf -e "s/@COQVER@/$COQVER/g"  >> why3.conf
+  sed misc/bench-coq-why3-conf -e "s/@COQVER@/$COQVER/g" >> why3.conf
 fi
 
 # run the bench

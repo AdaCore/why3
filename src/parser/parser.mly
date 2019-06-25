@@ -194,6 +194,12 @@
           )
           dl
     | _ -> ()
+
+  let name_term id_opt def t =
+    let name = Opt.fold (fun _ id -> id.id_str) def id_opt in
+    let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
+    { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
+
 %}
 
 (* Tokens *)
@@ -293,14 +299,15 @@ term_eof:
 (* Modules and scopes *)
 
 mlw_file:
-| mlw_module* EOF
+| EOF
+| mlw_module mlw_module_no_decl* EOF
     { Typing.close_file () }
-| module_decl+ EOF
-    { let loc = floc $startpos($2) $endpos($2) in
+| module_decl module_decl_no_head* EOF
+    { let loc = floc $startpos($3) $endpos($3) in
       Typing.close_module loc; Typing.close_file () }
 
 mlw_module:
-| module_head module_decl* END
+| module_head module_decl_no_head* END
     { Typing.close_module (floc $startpos($3) $endpos($3)) }
 
 module_head:
@@ -321,6 +328,20 @@ module_decl:
       add_record_projections d
     }
 | use_clone { () }
+
+mlw_module_no_decl:
+| SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| mlw_module
+   { $1 }
+
+module_decl_no_head:
+| THEORY | MODULE
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| module_decl
+   { $1 }
 
 (* Use and clone *)
 
@@ -1084,12 +1105,7 @@ single_expr_:
 | GHOST single_expr
     { Eghost $2 }
 | assertion_kind option(ident_nq) LEFTBRC term RIGHTBRC
-    { match $2 with
-      | None -> Eassert ($1, $4)
-      | Some name ->
-         let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name.id_str)) in
-         let t = { $4 with term_desc = Tattr (attr, $4) } in
-         Eassert ($1, t) }
+    { Eassert (snd $1, name_term $2 (fst $1) $4) }
 | attr single_expr %prec prec_attr
     { Eattr ($1, $2) }
 | single_expr cast
@@ -1174,9 +1190,9 @@ exn_handler:
 | uqualid pat_arg? ARROW seq_expr { $1, $2, $4 }
 
 assertion_kind:
-| ASSERT  { Expr.Assert }
-| ASSUME  { Expr.Assume }
-| CHECK   { Expr.Check }
+| ASSERT  { "Assert", Expr.Assert }
+| ASSUME  { "Assume", Expr.Assume }
+| CHECK   { "Check", Expr.Check }
 
 for_dir:
 | TO      { Expr.To }
@@ -1190,14 +1206,10 @@ spec:
 
 single_spec:
 | REQUIRES option(ident_nq) LEFTBRC term RIGHTBRC
-    { match $2 with
-      | None -> { empty_spec with sp_pre = [$4] }
-      | Some name ->
-         let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name.id_str)) in
-         let t = { $4 with term_desc = Tattr (attr, $4) } in
-         { empty_spec with sp_pre = [t] } }
-| ENSURES LEFTBRC ensures RIGHTBRC
-    { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
+    { { empty_spec with sp_pre = [name_term $2 "Requires" $4] } }
+| ENSURES option(ident_nq) LEFTBRC ensures RIGHTBRC
+    { let bindings = List.map (fun (p, t) -> p, name_term $2 "Ensures" t) $4 in
+      { empty_spec with sp_post = [floc $startpos($4) $endpos($4), bindings] } }
 | RETURNS LEFTBRC match_cases(term) RIGHTBRC
     { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
 | RAISES LEFTBRC bar_list1(raises) RIGHTBRC
@@ -1233,7 +1245,8 @@ xsymbol:
 | uqualid { $1, None }
 
 invariant:
-| INVARIANT LEFTBRC term RIGHTBRC { $3 }
+| INVARIANT option(ident_nq) LEFTBRC term RIGHTBRC
+    { name_term $2 "LoopInvariant" $4 }
 
 variant:
 | VARIANT LEFTBRC comma_list1(single_variant) RIGHTBRC { $3 }

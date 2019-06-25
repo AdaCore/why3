@@ -421,8 +421,7 @@ module Print = struct
       | _, [t1] when is_field rs ->
          fprintf fmt "%a.%a" (print_expr info 2) t1 (print_record_proj info) rs
       | Some s, _ ->
-         fprintf fmt "@[<hov 2>%s %a@]"
-           s
+         fprintf fmt "@[<hov 2>%s %a@]" s
            (print_apply_args info) (pvl, rs.rs_cty.cty_args)
       | None, [t] when is_rs_tuple rs ->
          fprintf fmt "@[%a@]" (print_expr info 1) t

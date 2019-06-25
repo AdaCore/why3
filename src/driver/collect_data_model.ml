@@ -82,7 +82,8 @@ let print_value fmt v =
   | Fraction (s1, s2) -> Format.fprintf fmt "Fraction: %s / %s" s1 s2
   | Float f -> Format.fprintf fmt "Float: %a" print_float f
   | Other s -> Format.fprintf fmt "Other: %s" s
-  | Bitvector bv -> Format.fprintf fmt "Bv: %s" bv
+  | Bitvector (Bv_int bv) -> Format.fprintf fmt "Bv: %s" bv
+  | Bitvector (Bv_sharp bv) -> Format.fprintf fmt "Bv: %s" bv
   | Boolean b -> Format.fprintf fmt "Boolean: %b " b
 
 let rec print_array fmt a =
@@ -377,7 +378,16 @@ let convert_simple_to_model_value (v: simple_value) =
   | Decimal (d1, d2) -> Model_parser.Decimal (d1, d2)
   | Fraction (s1, s2) -> Model_parser.Fraction (s1, s2)
   | Float f -> Model_parser.Float f
-  | Bitvector bv -> Model_parser.Bitvector bv
+  | Bitvector (Bv_int bv) -> Model_parser.Integer bv
+  | Bitvector (Bv_sharp bv) ->
+      (* Convert "#x0032" to "0x0032" then to "50" for uniformity with Bv_int *)
+      begin try
+        let a = ref 0 in
+        let bv = "0" ^ String.sub bv 1 (String.length bv - 1) in
+        Scanf.sscanf bv "%i" (fun x -> a := x);
+        let bv = Format.asprintf "%d" !a in
+        Model_parser.Integer bv
+      with _ -> Model_parser.Bitvector bv end
   | Boolean b -> Model_parser.Boolean b
   | Other _s -> raise Not_value
 
@@ -671,7 +681,7 @@ let create_list (projections_list: Ident.ident Mstr.t)
   Mstr.fold
     (fun key value list_acc ->
       try (convert_to_model_element ~set_str field_list key value :: list_acc)
-      with Not_value when not (Debug.test_flag Debug.stack_trace) ->
+      with Not_value when not (Debug.test_flag debug_cntex) ->
         Debug.dprintf debug_cntex "Element creation failed: %s@." key; list_acc
       | e -> raise e)
     table
