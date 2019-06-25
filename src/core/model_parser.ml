@@ -599,22 +599,23 @@ let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt
     let attrs = m_element.me_name.men_attrs in
     let me_name = apply_location_label ~at_loc ~attrs me_name in
     if print_attrs then
-      fprintf fmt  "%s, [%a] = %a"
+      fprintf fmt  "@[%s, @[[%a]@] =@ %a@]"
         me_name
         (Pp.print_list Pp.comma Pretty.print_attr)
         (Sattr.elements m_element.me_name.men_attrs)
         print_model_value m_element.me_value
     else
-      fprintf fmt  "%s = %a"
+      fprintf fmt  "@[%s =@ %a@]"
         me_name
         print_model_value m_element.me_value
 
 let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
     print_model_value me_name_trans fmt m_elements
   =
-  Pp.print_list sep
-    (print_model_element ~at_loc ~print_attrs print_model_value me_name_trans)
-    fmt m_elements
+  fprintf fmt "@[%a@]"
+    (Pp.print_list sep
+       (print_model_element ~at_loc ~print_attrs print_model_value me_name_trans))
+    m_elements
 
 let print_model_file ~print_attrs ~print_model_value fmt
     me_name_trans filename model_file

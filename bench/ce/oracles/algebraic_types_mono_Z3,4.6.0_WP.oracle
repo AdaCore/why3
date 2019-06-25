@@ -1,55 +1,57 @@
 Weakest Precondition
 bench/ce/algebraic_types_mono.mlw M G: Unknown (sat)
-Counter-example model:File algebraic_types_mono.mlw:
-Line 6:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "0" }
+Counter-example model:
+File algebraic_types_mono.mlw:
+  Line 6:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
 
 bench/ce/algebraic_types_mono.mlw M g2: Unknown (sat)
-Counter-example model:File algebraic_types_mono.mlw:
-Line 10:
-x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "B" ,
-"list" : [{"type" : "Integer" ,
-"val" : "0" }] } }
+Counter-example model:
+File algebraic_types_mono.mlw:
+  Line 10:
+    x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "B" ,
+    "list" : [{"type" : "Integer" , "val" : "0" }] } }
 
 bench/ce/algebraic_types_mono.mlw M g4: Unknown (sat)
-Counter-example model:File algebraic_types_mono.mlw:
-Line 12:
-x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "A" ,
-"list" : [] } }
+Counter-example model:
+File algebraic_types_mono.mlw:
+  Line 12:
+    x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "A" ,
+    "list" : [] } }
 
 bench/ce/algebraic_types_mono.mlw M g5: Unknown (sat)
-Counter-example model:File algebraic_types_mono.mlw:
-Line 16:
-x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Au" ,
-"list" : [{"type" : "Integer" , "val" : "1" }, {"type" : "Integer" ,
-"val" : "0" }] } }
+Counter-example model:
+File algebraic_types_mono.mlw:
+  Line 16:
+    x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Au" ,
+    "list" : [{"type" : "Integer" , "val" : "1" }, {"type" : "Integer" ,
+    "val" : "0" }] } }
 
 bench/ce/algebraic_types_mono.mlw M g1: Timeout or Unknown
-Counter-example model:File algebraic_types_mono.mlw:
-Line 25:
-l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-"list" : [{"type" : "Integer" , "val" : "17" }, {"type" : "Apply" ,
-"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "164" },
-{"type" : "Apply" , "val" : {"apply" : "Cons" ,
-"list" : [{"type" : "Integer" , "val" : "162" }, {"type" : "Apply" ,
-"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "160" },
-{"type" : "Apply" , "val" : {"apply" : "Cons" ,
-"list" : [{"type" : "Integer" , "val" : "158" }, {"type" : "Apply" ,
-"val" : {"apply" : "Nil" ,
-"list" : [] } }] } }] } }] } }] } }] } }
+Counter-example model:
+File algebraic_types_mono.mlw:
+  Line 25:
+    l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
+    "list" : [{"type" : "Integer" , "val" : "17" }, {"type" : "Apply" ,
+    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
+    "val" : "165" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
+    "list" : [{"type" : "Integer" , "val" : "163" }, {"type" : "Apply" ,
+    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
+    "val" : "161" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
+    "list" : [{"type" : "Integer" , "val" : "159" }, {"type" : "Apply" ,
+    "val" : {"apply" : "Nil" , "list" : [] } }] } }] } }] } }] } }] } }
 
 bench/ce/algebraic_types_mono.mlw M g7: Timeout or Unknown
-Counter-example model:File algebraic_types_mono.mlw:
-Line 27:
-l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-"list" : [{"type" : "Integer" , "val" : "21" }, {"type" : "Apply" ,
-"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "10" },
-{"type" : "Apply" , "val" : {"apply" : "Cons" ,
-"list" : [{"type" : "Integer" , "val" : "9" }, {"type" : "Apply" ,
-"val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" , "val" : "7" },
-{"type" : "Apply" , "val" : {"apply" : "Cons" ,
-"list" : [{"type" : "Integer" , "val" : "8" }, {"type" : "Apply" ,
-"val" : {"apply" : "Nil" ,
-"list" : [] } }] } }] } }] } }] } }] } }
+Counter-example model:
+File algebraic_types_mono.mlw:
+  Line 27:
+    l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
+    "list" : [{"type" : "Integer" , "val" : "21" }, {"type" : "Apply" ,
+    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
+    "val" : "10" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
+    "list" : [{"type" : "Integer" , "val" : "9" }, {"type" : "Apply" ,
+    "val" : {"apply" : "Cons" , "list" : [{"type" : "Integer" ,
+    "val" : "7" }, {"type" : "Apply" , "val" : {"apply" : "Cons" ,
+    "list" : [{"type" : "Integer" , "val" : "8" }, {"type" : "Apply" ,
+    "val" : {"apply" : "Nil" , "list" : [] } }] } }] } }] } }] } }] } }
 

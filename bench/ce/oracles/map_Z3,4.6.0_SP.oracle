@@ -1,246 +1,234 @@
 Strongest Postcondition
 bench/ce/map.mlw M VC test_map: Timeout or Unknown
-Counter-example model:File map.mlw:
-Line 7:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] } }] } }
-Line 8:
-x, [[@introduced], [@field:0:contents],
-[@model_trace:x]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] } }] } }
-Line 10:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] } }] } }
+Counter-example model:
+File map.mlw:
+  Line 7:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } }] } }
+  Line 8:
+    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Integer" , "val" : "3" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } }] } }
+  Line 10:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } }] } }
 
 bench/ce/map.mlw M VC test_map_multidim1: Timeout or Unknown
-Counter-example model:File map.mlw:
-Line 13:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "0" } , "value" : {"type" : "Integer" , "val" : "2" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "2" } },
-{"others" : {"type" : "Integer" , "val" : "3" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "4" } }] } }] } }] } }
-Line 14:
-x, [[@introduced], [@field:0:contents],
-[@model_trace:x]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "0" } , "value" : {"type" : "Integer" , "val" : "2" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "2" } },
-{"others" : {"type" : "Integer" , "val" : "3" } }] } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "0" } , "value" : {"type" : "Integer" , "val" : "2" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "2" } },
-{"others" : {"type" : "Integer" , "val" : "3" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "4" } }] } }] } }] } }
-Line 16:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "0" } , "value" : {"type" : "Integer" , "val" : "2" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "2" } },
-{"others" : {"type" : "Integer" , "val" : "3" } }] } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "0" } , "value" : {"type" : "Integer" , "val" : "2" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "2" } },
-{"others" : {"type" : "Integer" , "val" : "3" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "4" } }] } }] } }] } }
+Counter-example model:
+File map.mlw:
+  Line 13:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Integer" , "val" : "2" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "2" } },
+    {"others" : {"type" : "Integer" , "val" : "3" } }] } },
+    {"others" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" , "val" : "4" } }] } }] } }] } }
+  Line 14:
+    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Integer" , "val" : "2" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "2" } },
+    {"others" : {"type" : "Integer" , "val" : "3" } }] } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Integer" , "val" : "2" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "2" } },
+    {"others" : {"type" : "Integer" , "val" : "3" } }] } },
+    {"others" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" , "val" : "4" } }] } }] } }] } }
+  Line 16:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Integer" , "val" : "2" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "2" } },
+    {"others" : {"type" : "Integer" , "val" : "3" } }] } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Integer" , "val" : "2" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "2" } },
+    {"others" : {"type" : "Integer" , "val" : "3" } }] } },
+    {"others" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" , "val" : "4" } }] } }] } }] } }
 
 bench/ce/map.mlw M VC test_map_multidim2: Timeout or Unknown
-Counter-example model:File ref.mlw:
-Line 18:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "4" } }] } }, {"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "2" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "5" } }] } }] } }] } }
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+    "val" : "4" } }] } }, {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } },
+    {"others" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" , "val" : "5" } }] } }] } }] } }
 File map.mlw:
-Line 18:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "4" } }] } }, {"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "2" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "5" } }] } }] } }] } }
-Line 19:
-x, [[@introduced], [@field:0:contents],
-[@model_trace:x]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "0" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "4" } }] } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "2" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "5" } }] } }] } }] } }
-Line 23:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "0" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "4" } }] } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
-"val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" , "val" : "2" } }] } },
-{"others" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
-"val" : "5" } }] } }] } }] } }
+  Line 18:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Array" , "val" : [{"others" : {"type" : "Integer" ,
+    "val" : "4" } }] } }, {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } },
+    {"others" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" , "val" : "5" } }] } }] } }] } }
+  Line 19:
+    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "4" } }] } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } },
+    {"others" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" , "val" : "5" } }] } }] } }] } }
+  Line 23:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "4" } }] } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "1" } , "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } },
+    {"others" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" , "val" : "5" } }] } }] } }] } }
 
 bench/ce/map.mlw M VC proj_map_test1: Timeout or Unknown
-Counter-example model:File ref.mlw:
-Line 18:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] } }] } }
-Line 20:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] } }] } }
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } }] } }
+  Line 20:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } }] } }
 File map.mlw:
-Line 25:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] } }] } }
-Line 26:
-x, [[@introduced], [@field:0:contents],
-[@model_trace:x]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] } }] } }
-Line 28:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Integer" , "val" : "3" } },
-{"others" : {"type" : "Integer" ,
-"val" : "2" } }] } }] } }
+  Line 25:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } }] } }
+  Line 26:
+    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Integer" , "val" : "3" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } }] } }
+  Line 28:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Integer" , "val" : "3" } },
+    {"others" : {"type" : "Integer" , "val" : "2" } }] } }] } }
 
 bench/ce/map.mlw M VC proj_map_test2: Timeout or Unknown
-Counter-example model:File ref.mlw:
-Line 18:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"others" : {"type" : "Boolean" ,
-"val" : false } }] } }] } }
-Line 20:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"others" : {"type" : "Boolean" ,
-"val" : false } }] } }] } }
+Counter-example model:
+File ref.mlw:
+  Line 18:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Boolean" , "val" : true } },
+    {"others" : {"type" : "Boolean" , "val" : false } }] } }] } }
+  Line 20:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Boolean" , "val" : true } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Boolean" , "val" : true } },
+    {"others" : {"type" : "Boolean" , "val" : false } }] } }] } }
 File map.mlw:
-Line 30:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"others" : {"type" : "Boolean" ,
-"val" : false } }] } }] } }
-Line 31:
-x, [[@introduced], [@field:0:contents],
-[@model_trace:x]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"others" : {"type" : "Boolean" ,
-"val" : false } }] } }] } }
-Line 33:
-x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"indice" : {"type" : "Integer" , "val" : "1" } ,
-"value" : {"type" : "Boolean" , "val" : true } },
-{"others" : {"type" : "Boolean" ,
-"val" : false } }] } }] } }
+  Line 30:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Boolean" , "val" : true } },
+    {"others" : {"type" : "Boolean" , "val" : false } }] } }] } }
+  Line 31:
+    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
+    "value" : {"type" : "Array" , "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } , "value" : {"type" : "Boolean" , "val" : true } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Boolean" , "val" : true } },
+    {"others" : {"type" : "Boolean" , "val" : false } }] } }] } }
+  Line 33:
+    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "contents" , "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Boolean" , "val" : true } },
+    {"indice" : {"type" : "Integer" , "val" : "1" } ,
+    "value" : {"type" : "Boolean" , "val" : true } },
+    {"others" : {"type" : "Boolean" , "val" : false } }] } }] } }
 
 bench/ce/map.mlw ModelMap t1: Unknown (sat)
-Counter-example model:File map.mlw:
-Line 41:
-i, [[@introduced]] = {"type" : "Integer" ,
-"val" : "0" }
-t, [[@introduced]] = {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Integer" , "val" : "1" } },
-{"others" : {"type" : "Integer" ,
-"val" : "1" } }] }
+Counter-example model:
+File map.mlw:
+  Line 41:
+    i, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
+    t, [[@introduced]] = {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
+    "value" : {"type" : "Integer" , "val" : "1" } },
+    {"others" : {"type" : "Integer" , "val" : "1" } }] }
 
 bench/ce/map.mlw OtherIndices g: Unknown (sat)
-Counter-example model:File map.mlw:
-Line 50:
-m, [[@introduced]] = {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Fraction" , "val" : "1\/5" } ,
-"value" : {"type" : "Decimal" , "val" : "2.0" } },
-{"indice" : {"type" : "Fraction" , "val" : "1\/10" } ,
-"value" : {"type" : "Decimal" , "val" : "1.0" } },
-{"others" : {"type" : "Decimal" ,
-"val" : "1.0" } }] }
+Counter-example model:
+File map.mlw:
+  Line 50:
+    m, [[@introduced]] = {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Fraction" , "val" : "1\/5" } ,
+    "value" : {"type" : "Decimal" , "val" : "2.0" } },
+    {"indice" : {"type" : "Fraction" , "val" : "1\/10" } ,
+    "value" : {"type" : "Decimal" , "val" : "1.0" } },
+    {"others" : {"type" : "Decimal" , "val" : "1.0" } }] }
 
