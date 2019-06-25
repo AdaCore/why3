@@ -102,16 +102,16 @@ use array.Array
 
 let main () : unit
 = let count = Array.make 51 (czero ()) in
-  count[0] <- cone empty;
+  count[0] <- cone S.empty;
   assert { forall s. mem s count[0].cset <-> valid_coloring_l 0 s };
-  count[1] <- cone (black ++ empty);
+  count[1] <- cone (black ++ S.empty);
   assert { forall s. mem s count[1].cset <-> valid_coloring_l 1 s };
-  count[2] <- cone (black ++ (black ++ empty));
+  count[2] <- cone (black ++ (black ++ S.empty));
   assert { forall s. mem s count[2].cset <-> valid_coloring_l 2 s };
   count[3] <- { card = 2;
-                cset = F.add (red 3 ++ empty)
+                cset = F.add (red 3 ++ S.empty)
                              (F.singleton (black ++ (black ++
-                                                    (black ++ empty)))); };
+                                                    (black ++ S.empty)))); };
   assert { forall s. mem s count[3].cset <-> valid_coloring_l 3 s };
   for n = 4 to 50 do
     invariant { forall i s. 0 <= i < n ->
