@@ -377,9 +377,15 @@ module TestExtraction
     let c = i2 b b in
     i3 c
 
+  let function letf (ghost x:int63) : int63 = 42
+
+  let test_letf () =
+    let y = letf 26 in
+    y + 2
+
   type poly_r 'a = { l : int63; b : bool }
   let test_underapplied_l () = l
-  
+
 end
 
 (*
