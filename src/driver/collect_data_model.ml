@@ -107,7 +107,9 @@ and print_term fmt t =
   | TCvc4_Variable _ -> Format.fprintf fmt "CVC4VAR: TREE"
   | TFunction_Local_Variable v -> Format.fprintf fmt "LOCAL: %s" v
   | TVariable v -> Format.fprintf fmt "VAR: %s" v
-  | TIte _ -> Format.fprintf fmt "ITE"
+  | TIte (teq1, teq2, tthen, telse) ->
+      Format.fprintf fmt "ITE (%a = %a) then %a else %a"
+        print_term teq1 print_term teq2 print_term tthen print_term telse
   | TRecord (n, l) ->
       Format.fprintf fmt "record_type: %s; list_fields: %a" n
         (Pp.print_list Pp.semi
@@ -206,6 +208,62 @@ let remove_end_num s =
 (* Used to handle case of badly formed table *)
 exception Incorrect_table
 
+(* Simplify if-then-else in value so that it can be read by
+   add_vars_to_table. *)
+let rec simplify_value v =
+  match v with
+  | TIte (
+      TIte (TFunction_Local_Variable x,
+            TCvc4_Variable cvc,
+            TCvc4_Variable cvc1,
+            _),
+      TCvc4_Variable cvc2,
+      tth,
+      tel) when cvc = cvc1 && cvc = cvc2 ->
+      (* Here we chose what we keep from the model. This case is not complete
+         but good enough. *)
+      let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc, tth, tel) in
+      simplify_value t
+  | TIte (
+      TIte (TCvc4_Variable cvc,
+            TFunction_Local_Variable x,
+            TCvc4_Variable cvc1,
+            _),
+      TCvc4_Variable cvc2,
+      tth,
+      tel) when cvc = cvc1 && cvc = cvc2 (* Same as above *) ->
+      (* Here we chose what we keep from the model. This case is not complete
+         but good enough. *)
+      let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc, tth, tel) in
+      simplify_value t
+  | TIte (
+      TIte (TFunction_Local_Variable x,
+            TCvc4_Variable cvc,
+            TCvc4_Variable cvc1,
+            TCvc4_Variable cvc3),
+      TCvc4_Variable cvc2,
+      tth,
+      tel) when cvc = cvc1 && cvc <> cvc2 && cvc3 = cvc2 ->
+      (* Here we chose what we keep from the model. This case is not complete
+         but good enough. *)
+      let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc3, tth, tel) in
+      simplify_value t
+  | TIte (
+      TIte (TCvc4_Variable cvc,
+            TFunction_Local_Variable x,
+            TCvc4_Variable cvc1,
+            TCvc4_Variable cvc3),
+      TCvc4_Variable cvc2,
+      tth,
+      tel) when cvc = cvc1 && cvc <> cvc2 && cvc3 = cvc2 (* Same as above *) ->
+      (* Here we chose what we keep from the model. This case is not complete
+         but good enough. *)
+      let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc3, tth, tel) in
+      simplify_value t
+  | TIte (eq1, eq2, tthen, telse) ->
+      TIte (eq1, eq2, simplify_value tthen, simplify_value telse)
+  | _ -> v
+
 (* Add the variables that can be deduced from ITE to the table of variables *)
 let add_vars_to_table (table: correspondence_table) key value : correspondence_table =
 
@@ -228,6 +286,7 @@ let add_vars_to_table (table: correspondence_table) key value : correspondence_t
           Mstr.add cvc (Node (Mpr.add key t1 Mpr.empty)) table
     in
 
+    let value = simplify_value value in
     match value with
     | TIte (TCvc4_Variable (Var cvc), TFunction_Local_Variable _x, t1, t2) ->
         let table = add_var_ite cvc t1 table in
@@ -241,7 +300,7 @@ let add_vars_to_table (table: correspondence_table) key value : correspondence_t
     | TIte (TFunction_Local_Variable _x, t, TCvc4_Variable (Var cvc), t2) ->
         let table = add_var_ite cvc t table in
         add_vars_to_table ~type_value table t2
-    | TIte (_, _, _, _) -> table
+    | TIte _ -> table
     | _ ->
       begin
         match type_value with
@@ -681,8 +740,10 @@ let create_list (projections_list: Ident.ident Mstr.t)
   Mstr.fold
     (fun key value list_acc ->
       try (convert_to_model_element ~set_str field_list key value :: list_acc)
-      with Not_value when not (Debug.test_flag debug_cntex) ->
-        Debug.dprintf debug_cntex "Element creation failed: %s@." key; list_acc
+      with Not_value when not (Debug.test_flag debug_cntex &&
+                               Debug.test_flag Debug.stack_trace) ->
+        Debug.dprintf debug_cntex "Element creation failed: %s@." key;
+        list_acc
       | e -> raise e)
     table
     []
