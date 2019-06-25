@@ -9,12 +9,12 @@ After unpacking, installation is done by
 
     ./configure
     make
-    make install (as root)
+    make install (as super-user if needed)
 
 To install also the Ocaml library, do
 
     make byte
-    make install-lib (as root)
+    make install-lib (as super-user if needed)
 
 
 Installation from the git repository
