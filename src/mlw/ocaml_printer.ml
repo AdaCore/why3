@@ -58,6 +58,17 @@ type info = {
    ;           | 17 right
    let fun try | 18 *)
 
+(* pattern precedence, from http://caml.inria.fr/pub/docs/manual-ocaml/patterns.html#pattern
+
+  ..           | 1
+  lazy         | 2
+  cstr/tag app | 3 right
+  ::           | 4 right
+  ,            | 5
+  |            | 6 left
+  as           | 7
+ *)
+
 module Print = struct
 
   open Mltree
@@ -301,41 +312,43 @@ module Print = struct
         List.filter (fun e -> not (rs_ghost e)) itd.itd_fields
     | _ -> []
 
-  let rec print_pat ?(paren=false) info fmt = function
+  let rec print_pat info prec fmt = function
     | Pwild ->
         fprintf fmt "_"
     | Pvar {vs_name=id} ->
         (print_lident info) fmt id
     | Pas (p, {vs_name=id}) ->
-        fprintf fmt (protect_on paren "%a as %a") (print_pat info) p
+        fprintf fmt (protect_on (prec < 7) "%a as %a") (print_pat info 6) p
           (print_lident info) id
     | Por (p1, p2) ->
-        fprintf fmt (protect_on paren "%a | %a") (print_pat info) p1
-          (print_pat info) p2
+        fprintf fmt (protect_on (prec < 6) "%a | %a")
+          (print_pat info 6) p1
+          (print_pat info 5) p2
     | Ptuple pl ->
-        fprintf fmt "(%a)" (print_list comma (print_pat ~paren:true info)) pl
+        fprintf fmt "(%a)" (print_list comma (print_pat info 4)) pl
     | Papp (ls, pl) ->
         match query_syntax info.info_syn ls.ls_name with
         | Some s when complex_syntax s || pl = [] ->
-           syntax_arguments s (print_pat info) fmt pl
+           fprintf fmt (protect_on (prec < 4) "%a")
+             (syntax_arguments s (print_pat info 1)) pl
         | Some s ->
-           fprintf fmt (protect_on paren "%s (%a)")
-             s (print_list comma (print_pat ~paren:true info)) pl
+           fprintf fmt (protect_on (prec < 3) "%s (%a)")
+             s (print_list comma (print_pat info 4)) pl
         | None ->
             let pjl = let rs = restore_rs ls in get_record info rs in
             match pjl with
             | []  -> print_papp info ls fmt pl
             | pjl ->
-                fprintf fmt (protect_on paren "@[<hov 2>{ %a }@]")
+                fprintf fmt (protect_on (prec < 3) "@[<hov 2>{ %a }@]")
                   (print_list2 semi equal (print_record_proj info)
-                  (print_pat ~paren: true info)) (pjl, pl)
+                  (print_pat info 6)) (pjl, pl)
 
   and print_papp info ls fmt = function
     | []  -> fprintf fmt "%a"      (print_uident info) ls.ls_name
     | [p] -> fprintf fmt "%a %a"   (print_uident info) ls.ls_name
-               (print_pat info) p
+               (print_pat info 3) p
     | pl  -> fprintf fmt "%a (%a)" (print_uident info) ls.ls_name
-               (print_list comma (print_pat info)) pl
+               (print_list comma (print_pat info 4)) pl
 
   (** Expressions *)
 
@@ -549,7 +562,7 @@ module Print = struct
        fprintf fmt (protect_on (prec < 4) "%a") (print_apply info rs) pvl
     | Ematch (e1, [p, e2], []) ->
         fprintf fmt (protect_on (opr && prec < 18) "let %a =@ %a in@ %a")
-          (print_pat info) p (print_expr ~opr:false info 18) e1
+          (print_pat info 6) p (print_expr ~opr:false info 18) e1
           (print_expr ~opr info 18) e2
     | Ematch (e, pl, []) ->
         fprintf fmt
@@ -673,7 +686,7 @@ module Print = struct
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hv 2>| %a ->@ @[%a@]@]"
-      (print_pat info) p (print_expr info 17) e;
+      (print_pat info 5) p (print_expr info 17) e;
     forget_pat p
 
   and print_raise ~paren info xs fmt e_opt =
