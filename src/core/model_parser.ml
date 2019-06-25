@@ -578,7 +578,11 @@ let apply_location_label ~at_loc ~attrs me_name =
           if at_loc = (Filename.basename loc_file, loc_line) &&
              not (Sstr.mem label labels_added)
           then
-            (Sstr.add label labels_added, me_name ^ " at " ^ label)
+            (* Specific case for printing old *)
+            if label = "'Old" then
+              (Sstr.add label labels_added, "old " ^ me_name)
+            else
+              (Sstr.add label labels_added, me_name ^ " at " ^ label)
           else
             (labels_added, me_name)
       | _ -> (labels_added, me_name))

@@ -1,65 +1,102 @@
 Weakest Precondition
 bench/ce/array_mono.mlw Array VC array: Valid
 bench/ce/array_mono.mlw A VC f1: Timeout or Unknown
-Counter-example model:File array_mono.mlw:
-Line 16:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
-{"field" : "length" , "value" : {"type" : "Integer" ,
-"val" : "0" } }] } }
-Line 35:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
-{"field" : "length" , "value" : {"type" : "Integer" ,
-"val" : "0" } }] } }
-Line 36:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" , "val" : "0" } }] } },
-{"field" : "length" , "value" : {"type" : "Integer" ,
-"val" : "0" } }] } }
+Counter-example model:
+File array_mono.mlw:
+  Line 16:
+    a, [[@introduced]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "elts" ,
+    "value" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" ,
+    "val" : "0" } }] } },
+    {"field" : "length" ,
+    "value" : {"type" : "Integer" ,
+    "val" : "0" } }] } }
+  Line 35:
+    a, [[@introduced]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "elts" ,
+    "value" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" ,
+    "val" : "0" } }] } },
+    {"field" : "length" ,
+    "value" : {"type" : "Integer" ,
+    "val" : "0" } }] } }
+  Line 36:
+    a, [[@introduced],
+    [@model_trace:a]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "elts" ,
+    "value" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" ,
+    "val" : "0" } }] } },
+    {"field" : "length" ,
+    "value" : {"type" : "Integer" ,
+    "val" : "0" } }] } }
 
 bench/ce/array_mono.mlw A VC f2: Valid
 bench/ce/array_mono.mlw A VC f2: Timeout or Unknown
-Counter-example model:File array_mono.mlw:
-Line 25:
-a at 'Old, [[@introduced], [@at:'Old],
-[@at:'Old:loc:location],
-[@at:'Old:loc:location] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" , "val" : "4" } }] } },
-{"field" : "length" , "value" : {"type" : "Integer" ,
-"val" : "2" } }] } }
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Integer" , "val" : "42" } },
-{"others" : {"type" : "Integer" , "val" : "4" } }] } }, {"field" : "length" ,
-"value" : {"type" : "Integer" ,
-"val" : "2" } }] } }
-Line 38:
-a, [[@introduced], [@at:'Old], [@at:'Old:loc:location],
-[@at:'Old:loc:location] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
-"val" : [{"others" : {"type" : "Integer" , "val" : "4" } }] } },
-{"field" : "length" , "value" : {"type" : "Integer" ,
-"val" : "2" } }] } }
-Line 40:
-a, [[@introduced], [@model_trace:a]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Integer" , "val" : "42" } },
-{"others" : {"type" : "Integer" , "val" : "4" } }] } }, {"field" : "length" ,
-"value" : {"type" : "Integer" ,
-"val" : "2" } }] } }
-Line 41:
-a, [[@introduced]] = {"type" : "Record" ,
-"val" : {"Field" : [{"field" : "elts" , "value" : {"type" : "Array" ,
-"val" : [{"indice" : {"type" : "Integer" , "val" : "0" } ,
-"value" : {"type" : "Integer" , "val" : "42" } },
-{"others" : {"type" : "Integer" , "val" : "4" } }] } }, {"field" : "length" ,
-"value" : {"type" : "Integer" ,
-"val" : "2" } }] } }
+Counter-example model:
+File array_mono.mlw:
+  Line 25:
+    old a, [[@introduced],
+    [@at:'Old],
+    [@at:'Old:loc:location],
+    [@at:'Old:loc:location] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "elts" ,
+    "value" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" ,
+    "val" : "4" } }] } },
+    {"field" : "length" ,
+    "value" : {"type" : "Integer" ,
+    "val" : "2" } }] } }
+    a, [[@introduced]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "elts" ,
+    "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } ,
+    "value" : {"type" : "Integer" ,
+    "val" : "42" } },
+    {"others" : {"type" : "Integer" ,
+    "val" : "4" } }] } },
+    {"field" : "length" ,
+    "value" : {"type" : "Integer" ,
+    "val" : "2" } }] } }
+  Line 38:
+    a, [[@introduced],
+    [@at:'Old],
+    [@at:'Old:loc:location],
+    [@at:'Old:loc:location] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "elts" ,
+    "value" : {"type" : "Array" ,
+    "val" : [{"others" : {"type" : "Integer" ,
+    "val" : "4" } }] } },
+    {"field" : "length" ,
+    "value" : {"type" : "Integer" ,
+    "val" : "2" } }] } }
+  Line 40:
+    a, [[@introduced],
+    [@model_trace:a]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "elts" ,
+    "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } ,
+    "value" : {"type" : "Integer" ,
+    "val" : "42" } },
+    {"others" : {"type" : "Integer" ,
+    "val" : "4" } }] } },
+    {"field" : "length" ,
+    "value" : {"type" : "Integer" ,
+    "val" : "2" } }] } }
+  Line 41:
+    a, [[@introduced]] = {"type" : "Record" ,
+    "val" : {"Field" : [{"field" : "elts" ,
+    "value" : {"type" : "Array" ,
+    "val" : [{"indice" : {"type" : "Integer" ,
+    "val" : "0" } ,
+    "value" : {"type" : "Integer" ,
+    "val" : "42" } },
+    {"others" : {"type" : "Integer" ,
+    "val" : "4" } }] } },
+    {"field" : "length" ,
+    "value" : {"type" : "Integer" ,
+    "val" : "2" } }] } }
 
