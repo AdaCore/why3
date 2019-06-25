@@ -7,6 +7,7 @@ fail "\\*\\*\\* \\(.*\\)$" "\\1"
 time "why3cpulimit time : %s s"
 
 transformation "eliminate_negative_constants"
+transformation "eliminate_literal"
 transformation "eliminate_if_fmla"
 transformation "eliminate_epsilon"
 transformation "eliminate_let_fmla"
@@ -216,7 +217,24 @@ theory real.Trigonometry
 end
 
 theory bv.BV_Gen
+  meta "literal:keep" type t
   syntax function to_int "<app><const name=\"Word.sint\"/>%1</app>"
+end
+
+theory bv.BV64
+  meta "literal:keep" type t
+end
+
+theory bv.BV32
+  meta "literal:keep" type t
+end
+
+theory bv.BV16
+  meta "literal:keep" type t
+end
+
+theory bv.BV8
+  meta "literal:keep" type t
 end
 
 (* this file has an extension .aux rather than .gen since it should not be distributed *)

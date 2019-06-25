@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="7">
+<why3session shape_version="8">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.4" timelimit="10" steplimit="0" memlimit="1000"/>
@@ -13,26 +13,30 @@
 <prover id="8" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="11" name="Z3" version="4.8.4" alternative="counterexamples" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="12" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="13" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="14" name="Isabelle" version="2018" timelimit="0" steplimit="0" memlimit="0"/>
 <file>
 <path name=".."/><path name="ieee_float.mlw"/>
-<theory name="A" proved="true">
- <goal name="ebsb32" proved="true">
- <proof prover="0"><result status="valid" time="0.06"/></proof>
- <proof prover="5"><result status="valid" time="0.00"/></proof>
- <proof prover="10"><result status="valid" time="0.05" steps="154"/></proof>
+<theory name="A">
+ <goal name="ebsb32">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
+ <proof prover="5" obsolete="true"><result status="valid" time="0.00"/></proof>
+ <proof prover="10" obsolete="true"><result status="valid" time="0.05" steps="154"/></proof>
  </goal>
- <goal name="ebsb64" proved="true">
- <proof prover="0"><result status="valid" time="0.06"/></proof>
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="10"><result status="valid" time="0.05" steps="154"/></proof>
+ <goal name="ebsb64">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="10" obsolete="true"><result status="valid" time="0.05" steps="154"/></proof>
  </goal>
- <goal name="a" proved="true">
- <proof prover="0"><result status="valid" time="0.08"/></proof>
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="10"><result status="valid" time="0.04" steps="162"/></proof>
+ <goal name="a">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.08"/></proof>
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="10" obsolete="true"><result status="valid" time="0.04" steps="162"/></proof>
  </goal>
 </theory>
-<theory name="M603_018" proved="true">
+<theory name="M603_018">
  <goal name="VC triplet" expl="VC for triplet" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="VC triplet.0" expl="assertion" proved="true">
@@ -99,51 +103,51 @@
   </goal>
  </transf>
  </goal>
- <goal name="G1" proved="true">
- <proof prover="0"><result status="valid" time="0.06"/></proof>
- <proof prover="1"><result status="valid" time="0.14"/></proof>
- <proof prover="3"><result status="valid" time="0.08"/></proof>
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="10"><result status="valid" time="0.04" steps="146"/></proof>
+ <goal name="G1">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.14"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.08"/></proof>
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="10" obsolete="true"><result status="valid" time="0.04" steps="146"/></proof>
  </goal>
- <goal name="G2" proved="true">
- <proof prover="0"><result status="valid" time="0.06"/></proof>
- <proof prover="3"><result status="valid" time="0.08"/></proof>
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="10"><result status="valid" time="0.10" steps="431"/></proof>
+ <goal name="G2">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.08"/></proof>
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="10" obsolete="true"><result status="valid" time="0.10" steps="431"/></proof>
  </goal>
- <goal name="G3" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
+ <goal name="G3">
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="G4" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
+ <goal name="G4">
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="G5" proved="true">
- <proof prover="0"><result status="valid" time="0.06"/></proof>
- <proof prover="1"><result status="valid" time="0.14"/></proof>
- <proof prover="3"><result status="valid" time="0.08"/></proof>
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="10"><result status="valid" time="0.04" steps="146"/></proof>
+ <goal name="G5">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
+ <proof prover="1" obsolete="true"><result status="valid" time="0.14"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.08"/></proof>
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="10" obsolete="true"><result status="valid" time="0.04" steps="146"/></proof>
  </goal>
- <goal name="G6" proved="true">
- <proof prover="0"><result status="valid" time="0.06"/></proof>
- <proof prover="3"><result status="valid" time="0.07"/></proof>
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="10"><result status="valid" time="0.12" steps="431"/></proof>
+ <goal name="G6">
+ <proof prover="0" obsolete="true"><result status="valid" time="0.06"/></proof>
+ <proof prover="3" obsolete="true"><result status="valid" time="0.07"/></proof>
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="10" obsolete="true"><result status="valid" time="0.12" steps="431"/></proof>
  </goal>
- <goal name="G7" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
+ <goal name="G7">
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="G8" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
+ <goal name="G8">
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
  </goal>
- <goal name="G9" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="10"><result status="valid" time="0.45" steps="3119"/></proof>
+ <goal name="G9">
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="10" obsolete="true"><result status="valid" time="0.45" steps="3119"/></proof>
  </goal>
- <goal name="G10" proved="true">
- <proof prover="5"><result status="valid" time="0.01"/></proof>
- <proof prover="10"><result status="valid" time="0.32" steps="2118"/></proof>
+ <goal name="G10">
+ <proof prover="5" obsolete="true"><result status="valid" time="0.01"/></proof>
+ <proof prover="10" obsolete="true"><result status="valid" time="0.32" steps="2118"/></proof>
  </goal>
 </theory>
 <theory name="M121_039_nonlinear">
@@ -262,6 +266,23 @@
   <goal name="VC fti_purely_float.2" expl="postcondition">
   </goal>
  </transf>
+ </goal>
+</theory>
+<theory name="Literals">
+ <goal name="wrong">
+ <proof prover="11"><result status="unknown" time="0.02"/></proof>
+ </goal>
+ <goal name="ok" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.02" steps="6274"/></proof>
+ <proof prover="12"><result status="valid" time="0.05" steps="18918"/></proof>
+ <proof prover="13"><result status="valid" time="0.16" steps="679"/></proof>
+ <proof prover="14"><path name="ieee_float_Literals_ok_1.xml"/><result status="failure" time="6.58"/></proof>
+ </goal>
+ <goal name="more" proved="true">
+ <proof prover="2" timelimit="5"><result status="valid" time="0.01" steps="354"/></proof>
+ <proof prover="12"><result status="valid" time="0.02" steps="1940"/></proof>
+ <proof prover="13"><result status="valid" time="0.14" steps="690"/></proof>
+ <proof prover="14"><path name="ieee_float_Literals_more_1.xml"/><result status="failure" time="6.76"/></proof>
  </goal>
 </theory>
 </file>
