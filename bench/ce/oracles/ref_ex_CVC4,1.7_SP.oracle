@@ -1,7 +1,7 @@
 Strongest Postcondition
-bench/ce/ref.mlw M VC test_post: Timeout or Unknown
+bench/ce/ref_ex.mlw M VC test_post: Timeout or Unknown
 Counter-example model:
-File ref.mlw:
+File ref_ex.mlw:
   Line 6:
     x, [[@introduced]] = {"type" : "Integer" ,
     "val" : "1" }
@@ -30,9 +30,9 @@ File ref.mlw:
     "value" : {"type" : "Integer" ,
     "val" : "0" } }] } }
 
-bench/ce/ref.mlw M VC test_post2: Timeout or Unknown
+bench/ce/ref_ex.mlw M VC test_post2: Timeout or Unknown
 Counter-example model:
-File ref.mlw:
+File ref_ex.mlw:
   Line 11:
     x, [[@introduced]] = {"type" : "Integer" ,
     "val" : "43" }
@@ -67,7 +67,7 @@ File ref.mlw:
     "value" : {"type" : "Integer" ,
     "val" : "42" } }] } }
 
-bench/ce/ref.mlw M VC incr: Timeout or Unknown
+bench/ce/ref_ex.mlw M VC incr: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
   Line 18:
@@ -83,7 +83,7 @@ File ref.mlw:
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" ,
     "val" : "0" } }] } }
-File ref.mlw:
+File ref_ex.mlw:
   Line 21:
     y, [[@introduced],
     [@field:0:contents],
@@ -140,9 +140,9 @@ File ref.mlw:
     "value" : {"type" : "Integer" ,
     "val" : "2" } }] } }
 
-bench/ce/ref.mlw M VC test_loop: Timeout or Unknown
+bench/ce/ref_ex.mlw M VC test_loop: Timeout or Unknown
 Counter-example model:
-File ref.mlw:
+File ref_ex.mlw:
   Line 21:
     y, [[@introduced],
     [@field:0:contents],
@@ -205,8 +205,8 @@ File ref.mlw:
     "value" : {"type" : "Integer" ,
     "val" : "0" } }] } }
 
-bench/ce/ref.mlw M VC test_loop: Valid
-bench/ce/ref.mlw M VC test_loop: Timeout or Unknown
+bench/ce/ref_ex.mlw M VC test_loop: Valid
+bench/ce/ref_ex.mlw M VC test_loop: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
   Line 18:
@@ -221,7 +221,7 @@ File ref.mlw:
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" ,
     "val" : "0" } }] } }
-File ref.mlw:
+File ref_ex.mlw:
   Line 21:
     y, [[@introduced],
     [@field:0:contents],
@@ -296,7 +296,7 @@ File ref.mlw:
     "value" : {"type" : "Integer" ,
     "val" : "0" } }] } }
 
-bench/ce/ref.mlw M VC test_loop: Timeout or Unknown
+bench/ce/ref_ex.mlw M VC test_loop: Timeout or Unknown
 Counter-example model:
 File ref.mlw:
   Line 18:
@@ -305,7 +305,7 @@ File ref.mlw:
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" ,
     "val" : "0" } }] } }
-File ref.mlw:
+File ref_ex.mlw:
   Line 21:
     y, [[@introduced],
     [@field:0:contents],
