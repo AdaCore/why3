@@ -27,12 +27,16 @@ module TestExtraction
     decr r;
     !r
 
+  let test_underapplied_plus () = (+) (0:int63)
+
   use array.Array
 
   let test_array () =
     let a = Array.make 43 (0:int63) in
     for i = 1 to 42 do a[i] <- a[i-1] + 1 done;
     a[42]
+
+  let test_underapplied_length () = length
 
   use mach.array.Array63
 

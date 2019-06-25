@@ -180,14 +180,26 @@ let int_of_string s =
     Format.eprintf "bad argument for int_of_string: %s@." s;
     assert false
 
-let check_syntax s len =
+let iter_on_syntax_parameters s f =
   let arg s b e =
     let i = int_of_string (String.sub s b (e-b)) in
+    f i in
+  iter_group opt_search_forward arg s
+
+(** [check_syntax s len] checks that all %i arguments in [s]
+    satisfy [0 < i <= len]. *)
+let check_syntax s len =
+  iter_on_syntax_parameters s (fun i ->
     if i <= 0 then raise (BadSyntaxIndex i);
     if i > len then raise (BadSyntaxArity (len,i));
-    ()
-  in
-  iter_group opt_search_forward arg s
+    ())
+
+let syntax_arity s =
+  let arity = ref 0 in
+  iter_on_syntax_parameters s (fun i ->
+    if i <= 0 then raise (BadSyntaxIndex i);
+    arity := max i !arity);
+  !arity
 
 let check_syntax_logic ls s =
   let len = List.length ls.ls_args in
