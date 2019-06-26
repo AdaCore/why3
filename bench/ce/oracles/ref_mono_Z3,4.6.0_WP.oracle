@@ -9,28 +9,28 @@ File ref_mono.mlw:
     y, [[@introduced], [@field:0:contents],
        [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "4350" } }] } }
+    "value" : {"type" : "Integer" , "val" : "3934" } }] } }
   Line 11:
     y, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "11036" } }] } }
+    "value" : {"type" : "Integer" , "val" : "7868" } }] } }
   Line 20:
-    x, [[@introduced]] = {"type" : "Integer" , "val" : "6687" }
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "3935" }
     y, [[@introduced], [@field:0:contents],
        [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "4350" } }] } }
+    "value" : {"type" : "Integer" , "val" : "3934" } }] } }
   Line 21:
     x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
-    "val" : "6687" }
+    "val" : "3935" }
     old y, [[@introduced], [@field:0:contents], [@at:'Old], [@model_trace:y],
            [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "4350" } }] } }
+    "value" : {"type" : "Integer" , "val" : "3934" } }] } }
   Line 23:
     y, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "11036" } }] } }
+    "value" : {"type" : "Integer" , "val" : "7868" } }] } }
 
 bench/ce/ref_mono.mlw M VC test_post2: Timeout or Unknown
 Counter-example model:
@@ -39,31 +39,31 @@ File ref_mono.mlw:
     y, [[@introduced], [@field:0:contents],
        [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-6082" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-7868" } }] } }
   Line 11:
     y, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-5987" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-7826" } }] } }
   Line 25:
-    x, [[@introduced]] = {"type" : "Integer" , "val" : "96" }
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "43" }
     y, [[@introduced], [@field:0:contents],
        [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-6082" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-7868" } }] } }
   Line 27:
     x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
-    "val" : "96" }
+    "val" : "43" }
     y, [[@introduced], [@field:0:contents], [@model_trace:y]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-5987" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-7826" } }] } }
     old y, [[@introduced], [@field:0:contents], [@at:'Old], [@model_trace:y],
            [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-6082" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-7868" } }] } }
   Line 29:
     y, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-5987" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-7826" } }] } }
 
 bench/ce/ref_mono.mlw M VC incr: Timeout or Unknown
 Counter-example model:
@@ -125,34 +125,34 @@ File ref_mono.mlw:
            [@at:'Old:loc:location],
            [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "53" } }] } }
+    "value" : {"type" : "Integer" , "val" : "400" } }] } }
     x, [[@introduced], [@field:0:contents],
        [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "55" } }] } }
+    "value" : {"type" : "Integer" , "val" : "402" } }] } }
   Line 44:
     x, [[@introduced], [@field:0:contents], [@at:'Old],
        [@at:'Old:loc:location],
        [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "53" } }] } }
+    "value" : {"type" : "Integer" , "val" : "400" } }] } }
   Line 48:
     x, [[@introduced], [@field:0:contents],
        [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "55" } }] } }
+    "value" : {"type" : "Integer" , "val" : "402" } }] } }
   Line 51:
     x at L, [[@introduced], [@field:0:contents], [@at:L], [@model_trace:x],
             [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "53" } }] } }
+    "value" : {"type" : "Integer" , "val" : "400" } }] } }
     x at M, [[@introduced], [@field:0:contents], [@at:M], [@model_trace:x],
             [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "55" } }] } }
+    "value" : {"type" : "Integer" , "val" : "402" } }] } }
     x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "55" } }] } }
+    "value" : {"type" : "Integer" , "val" : "402" } }] } }
 
 bench/ce/ref_mono.mlw M VC test_loop: Valid
 bench/ce/ref_mono.mlw M VC test_loop: Timeout or Unknown
@@ -161,57 +161,57 @@ File ref_mono.mlw:
   Line 9:
     x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "6083" } }] } }
+    "value" : {"type" : "Integer" , "val" : "54" } }] } }
   Line 11:
     x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "6082" } }] } }
+    "value" : {"type" : "Integer" , "val" : "53" } }] } }
   Line 35:
     y, [[@introduced], [@field:0:contents],
        [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "18248" } }] } }
+    "value" : {"type" : "Integer" , "val" : "155" } }] } }
   Line 38:
     old x, [[@introduced], [@field:0:contents], [@at:'Old],
            [@at:'Old:loc:location],
            [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-6084" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-52" } }] } }
     x, [[@introduced], [@field:0:contents],
        [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "12166" } }] } }
+    "value" : {"type" : "Integer" , "val" : "105" } }] } }
   Line 44:
     x, [[@introduced], [@field:0:contents], [@at:'Old],
        [@at:'Old:loc:location],
        [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-6084" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-52" } }] } }
   Line 48:
     x, [[@introduced], [@field:0:contents],
        [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "12166" } }] } }
+    "value" : {"type" : "Integer" , "val" : "105" } }] } }
   Line 50:
     x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "6083" } }] } }
+    "value" : {"type" : "Integer" , "val" : "54" } }] } }
   Line 51:
     x at L, [[@introduced], [@field:0:contents], [@at:L], [@model_trace:x],
             [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-6084" } }] } }
+    "value" : {"type" : "Integer" , "val" : "-52" } }] } }
     x at M, [[@introduced], [@field:0:contents], [@at:M], [@model_trace:x],
             [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "12166" } }] } }
+    "value" : {"type" : "Integer" , "val" : "105" } }] } }
     x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "6082" } }] } }
+    "value" : {"type" : "Integer" , "val" : "53" } }] } }
   Line 53:
     x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "6082" } }] } }
+    "value" : {"type" : "Integer" , "val" : "53" } }] } }
 
 bench/ce/ref_mono.mlw M VC test_loop: Timeout or Unknown
 Counter-example model:
@@ -219,12 +219,12 @@ File ref_mono.mlw:
   Line 9:
     x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-175" } }] } }
+    "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 35:
     y, [[@introduced], [@field:0:contents],
        [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "622" } }] } }
+    "value" : {"type" : "Integer" , "val" : "797" } }] } }
   Line 38:
     old x, [[@introduced], [@field:0:contents], [@at:'Old],
            [@at:'Old:loc:location],
@@ -235,7 +235,7 @@ File ref_mono.mlw:
     x, [[@introduced], [@field:0:contents],
        [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "224" } }] } }
+    "value" : {"type" : "Integer" , "val" : "399" } }] } }
   Line 44:
     x, [[@introduced], [@field:0:contents], [@at:'Old],
        [@at:'Old:loc:location],
@@ -246,7 +246,7 @@ File ref_mono.mlw:
   Line 45:
     x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-175" } }] } }
+    "value" : {"type" : "Integer" , "val" : "0" } }] } }
     old x, [[@introduced], [@field:0:contents], [@at:'Old], [@model_trace:x],
            [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
@@ -255,9 +255,9 @@ File ref_mono.mlw:
     x, [[@introduced], [@field:0:contents],
        [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "224" } }] } }
+    "value" : {"type" : "Integer" , "val" : "399" } }] } }
   Line 50:
     x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
-    "value" : {"type" : "Integer" , "val" : "-175" } }] } }
+    "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
