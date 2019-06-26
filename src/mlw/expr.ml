@@ -757,6 +757,7 @@ let e_exec c =
           eff_catch eff xs) x_lost e.e_effect in
         let eff = if cty.cty_effect.eff_ghost then
           try_effect [e] eff_ghostify true eff else eff in
+        let eff = eff_bind (Mpv.domain cty.cty_oldies) eff in
         eff_union_par cty.cty_effect eff
     | _ -> cty.cty_effect in
   mk_expr (Eexec (c, cty)) cty.cty_result cty.cty_mask eff
