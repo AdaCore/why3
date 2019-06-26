@@ -1,96 +1,86 @@
 Strongest Postcondition
 bench/ce/int_overflow.mlw ModelInt test0: Valid
 bench/ce/int_overflow.mlw ModelInt test1: Unknown (sat)
-Counter-example model:File int_overflow.mlw:
-Line 9:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "0" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 9:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
 
 bench/ce/int_overflow.mlw ModelInt test2: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 14:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "0" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 14:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow: Valid
 bench/ce/int_overflow.mlw ModelInt test_overflow: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 18:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "65535" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "1" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 18:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "65535" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow2: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 23:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "-2" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "-1" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 23:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "-2" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "-1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow2: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 23:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "65535" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "1" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 23:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "65535" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int16: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 30:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "65361" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "175" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 30:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "65361" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "175" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int16_alt: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 35:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "-65536" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "-1" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 35:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "-65536" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "-1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int16_alt: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 35:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "65535" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "1" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 35:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "65535" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "1" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int16_bis: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 40:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "54" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "65482" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 40:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "54" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "65482" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int32: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 48:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "2147483473" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "175" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 48:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "2147483473" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "175" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 53:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "54" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "2147483594" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 53:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "54" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "2147483594" }
 
 bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline: Valid
 bench/ce/int_overflow.mlw ModelInt test_overflow_int32_bis_inline: Timeout or Unknown
-Counter-example model:File int_overflow.mlw:
-Line 58:
-x, [[@introduced]] = {"type" : "Integer" ,
-"val" : "1073741824" }
-y, [[@introduced]] = {"type" : "Integer" ,
-"val" : "1073741824" }
+Counter-example model:
+File int_overflow.mlw:
+  Line 58:
+    x, [[@introduced]] = {"type" : "Integer" , "val" : "1073741824" }
+    y, [[@introduced]] = {"type" : "Integer" , "val" : "1073741824" }
 

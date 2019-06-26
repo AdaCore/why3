@@ -1,17 +1,18 @@
 Weakest Precondition
 bench/ce/list.mlw List_int g1: Timeout or Unknown
-Counter-example model:File list.mlw:
-Line 14:
-l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Nil" ,
-"list" : [] } }
+Counter-example model:
+File list.mlw:
+  Line 14:
+    l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Nil" ,
+    "list" : [] } }
 
 bench/ce/list.mlw List_int g2: Timeout or Unknown
-Counter-example model:File list.mlw:
-Line 16:
-l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
-"list" : [{"type" : "Integer" , "val" : "3" }, {"type" : "Apply" ,
-"val" : {"apply" : "Nil" ,
-"list" : [] } }] } }
+Counter-example model:
+File list.mlw:
+  Line 16:
+    l, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "Cons" ,
+    "list" : [{"type" : "Integer" , "val" : "3" }, {"type" : "Apply" ,
+    "val" : {"apply" : "Nil" , "list" : [] } }] } }
 
 bench/ce/list.mlw List_poly g1: Timeout or Unknown
 bench/ce/list.mlw List_poly g2: Timeout or Unknown
