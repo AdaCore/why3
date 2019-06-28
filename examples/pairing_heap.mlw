@@ -71,6 +71,12 @@ module HeapType
   type elt
   type heap = E | T elt (list heap)
 
+  (* TODO: may be a better type would be
+
+     type tree = T elt (list tree)
+     type heap = E | H tree
+  *)
+
 end
 
 module Size
