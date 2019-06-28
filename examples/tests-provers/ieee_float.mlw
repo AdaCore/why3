@@ -1,3 +1,6 @@
+
+
+
 theory A
 
   use ieee_float.Float32 as Float32
@@ -112,4 +115,18 @@ module LB09_025_conversion
   =
     to_int RNE x
 
+end
+
+
+
+theory Literals
+
+  use ieee_float.Float32
+
+  goal wrong : forall x:t. x .* (0.0:t) .= (0.0:t)
+
+  goal ok : forall x:t. t'isFinite x -> x .* (0.0:t) .= (0.0:t)
+
+  goal more : (1.5:t) .* (0.5:t) .= (0.75:t)
+  
 end

@@ -8,12 +8,14 @@
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Isabelle" version="2018" timelimit="0" steplimit="0" memlimit="0"/>
 <file>
 <path name=".."/><path name="bitvectors.why"/>
 <theory name="TestBV">
  <goal name="g1" proved="true">
  <proof prover="2"><result status="valid" time="0.01"/></proof>
  <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="6"><path name="bitvectors_TestBV_g1_1.xml"/><result status="valid" time="5.26"/></proof>
  </goal>
  <goal name="f1">
  <proof prover="1"><result status="timeout" time="1.00"/></proof>
