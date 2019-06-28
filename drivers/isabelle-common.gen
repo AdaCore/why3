@@ -3,7 +3,9 @@
 
 
 valid "Finished Why3 theory"
-fail "\\*\\*\\* \\(.*\\)$" "\\1"
+valid "All verification conditions have been proved"
+unknown "The following verification conditions remain to be proved" "incomplete proof"
+(* fail "\\*\\*\\* \\(.*\\)$" "\\1" *)
 time "why3cpulimit time : %s s"
 
 transformation "eliminate_negative_constants"
