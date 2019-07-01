@@ -762,7 +762,8 @@ module InlineFunctionCalls = struct
          let body = RefreshLetBindings.expr body in
          let subst' = List.fold_left2 add_to_subst subst el args in
          let e' = expr subst' body in
-         let e' = { e' with e_attrs = Sattr.add inlined_call_attr e'.e_attrs } in
+         let e' =
+           { e' with e_attrs = Sattr.add inlined_call_attr e'.e_attrs } in
          mk (Eblock [e'])
        in
        begin match decl with
