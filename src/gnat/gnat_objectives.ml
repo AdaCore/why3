@@ -255,39 +255,6 @@ let has_already_been_applied s trans (goal: goal_id) =
       transformation *)
    List.exists (fun x -> Session_itp.get_transf_name s x = trans) (Session_itp.get_transformations s goal)
 
-(* TODO get_project_dir is the one from Session. We should be able to not use it *)
-let db_filename = "why3session.xml"
-
-let get_project_dir fname =
-  if not (Sys.file_exists fname) then raise Not_found;
-  let d =
-    if Sys.is_directory fname then fname
-    else if Filename.basename fname = db_filename then begin
-      Filename.dirname fname
-    end
-    else
-      begin
-        try Filename.chop_extension fname
-        with Invalid_argument _ -> fname^".w3s"
-      end
-  in
-  d
-
-let get_session_dir () =
-  let session_dir =
-     let project_dir =
-      try get_project_dir Gnat_config.filename
-      with Not_found ->
-      Gnat_util.abort_with_message ~internal:true
-        (Pp.sprintf "could not compute session file for %s" Gnat_config.filename)
-     in
-     match Gnat_config.proof_dir with
-     | None -> project_dir
-     | Some dir_name ->
-        Filename.concat (Filename.concat dir_name "sessions")
-                        (Filename.basename project_dir) in
-  session_dir
-
 let has_file (session: Session_itp.session) =
    (* Check whether the session has a file associated with it. Sessions without
       files can happen in strange cases (gnatwhy3 crashes in the wrong moment)
@@ -308,7 +275,7 @@ let init () =
 (* This creates initializes and returns the controller. It also creates the
    session *)
 let init_cont () =
-  let session_dir = get_session_dir () in
+  let session_dir = Gnat_config.session_dir in
   (* Shape version is only used for pairing of goals in session_itp.ml
      (nothing else). *)
   let is_new_session, (session, shape_version) =

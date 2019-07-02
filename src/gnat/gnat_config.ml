@@ -770,3 +770,36 @@ let is_ce_prover s p =
       cep = prover
 
 let replay = !opt_replay
+
+(* TODO get_project_dir is the one from Session. We should be able to not use it *)
+let db_filename = "why3session.xml"
+
+let get_project_dir fname =
+  if not (Sys.file_exists fname) then raise Not_found;
+  let d =
+    if Sys.is_directory fname then fname
+    else if Filename.basename fname = db_filename then begin
+      Filename.dirname fname
+    end
+    else
+      begin
+        try Filename.chop_extension fname
+        with Invalid_argument _ -> fname^".w3s"
+      end
+  in
+  d
+
+let session_dir =
+  let project_dir =
+    try get_project_dir filename
+    with Not_found ->
+    Gnat_util.abort_with_message ~internal:true
+      (Pp.sprintf "could not compute session file for %s" filename)
+  in
+  match proof_dir with
+  | None -> project_dir
+  | Some dir_name ->
+     Filename.concat (Filename.concat dir_name "sessions")
+                     (Filename.basename project_dir)
+
+let session_file = Filename.concat session_dir "why3ession.xml"

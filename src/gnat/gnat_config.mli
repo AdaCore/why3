@@ -8,6 +8,10 @@ val env : Env.env
 val provers : Whyconf.prover list
 (* the provers, either the default prover, or as given by --prover *)
 
+val session_dir : string
+val session_file : string
+(* the directory in which the session file is stored, and the session file itself *)
+
 val is_selected_prover : Whyconf.prover -> Whyconf.prover option
 (* test if the given prover is a selected prover, i.e. in the [provers] list
    above *)

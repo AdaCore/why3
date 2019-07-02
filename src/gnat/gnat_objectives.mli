@@ -104,11 +104,6 @@ val init_cont : unit -> Controller_itp.controller
 val clear : unit -> unit
 (* delete all info from the database, except for the session tree itself *)
 
-
-val get_session_dir: unit -> string
-(* Return the session_dir guessed by gnat tools (it is then passed to the
-   Server_utils function which really get the session). *)
-
 module GoalSet : sig
    (* module to provide mutable sets on goals *)
    type t
