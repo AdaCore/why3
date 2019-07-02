@@ -9,57 +9,111 @@ module Pqueue
   type elt
   (** the abstract type of elements *)
 
-  clone export relations.TotalOrder with type t = elt, axiom .
-  (** `elt` is equipped with a total order `rel` *)
+  predicate le elt elt
+  (** `elt` is equipped with a total pre order `le` *)
 
-  use list.List
-  use list.Mem
-  use list.Permut
-  use list.Length
+  clone export relations.TotalPreOrder
+    with type t = elt, predicate rel = le, axiom .
 
-  type t = abstract { mutable elts: list elt }
-  (** the priority queue is modeled as a list of elements *)
+  use int.Int
+  use seq.Seq
+  use seq.Occ
+
+  (** the priority queue is modeled as a sorted sequence of elements *)
+  type t = abstract { mutable elts: seq elt }
+    invariant { forall i1 i2.
+                0 <= i1 <= i2 < length elts -> le elts[i1] elts[i2] }
+  meta coercion function elts
 
   (** {3 Operations} *)
 
-  val create () : t ensures { result.elts = Nil }
+  val create () : t ensures { result = empty }
   (** create a fresh, empty queue *)
 
-  val push (x: elt) (q: t) : unit writes {q}
-    ensures { q.elts = Cons x (old q.elts) }
+  val push (x: elt) (q: t) : unit
+    writes  { q }
+    ensures { length q = 1 + length (old q) }
+    ensures { occ_all x q = 1 + occ_all x (old q) }
+    ensures { forall y. y <> x -> occ_all y q = occ_all y (old q) }
   (** push an element in a queue *)
 
   exception Empty
   (** exception raised by `pop` and `peek` to signal an empty queue *)
 
-  predicate minimal_elt (x: elt) (s: list elt) =
-     mem x s /\ forall e: elt. mem e s -> rel x e
-  (** property of the element returned by `pop` and `peek` *)
+  val pop (q: t) : elt
+    writes {q}
+    ensures { length (old q) > 0 }
+    ensures { result = (old q)[0] }
+    ensures { q = (old q)[1..] }
+    raises  { Empty -> q = old q = empty }
+  (** remove and return the minimal element *)
 
-  val pop (q: t) : elt writes {q}
-    ensures { permut (Cons result q.elts) (old q.elts) }
-    ensures { minimal_elt result (old q.elts) }
-    raises  { Empty -> q.elts = (old q.elts) = Nil }
+  val safe_pop (q: t) : elt
+    requires { length q > 0 }
+    writes   { q }
+    ensures  { result = (old q)[0] }
+    ensures  { q = (old q)[1..] }
   (** remove and return the minimal element *)
 
   val peek (q: t) : elt
-    ensures { minimal_elt result q.elts }
-    raises  { Empty -> q.elts = Nil }
+    ensures { length q > 0 }
+    ensures { result = q[0] }
+    raises  { Empty -> q = empty }
   (** return the minimal element, without modifying the queue *)
 
-  val clear (q: t) : unit writes {q} ensures { q.elts = Nil }
+  val clear (q: t) : unit
+    writes  { q }
+    ensures { q = empty }
   (** empty the queue *)
 
-  val copy (q: t) : t ensures { result = q }
+  val copy (q: t) : t
+    ensures { result == q }
   (** return a fresh copy of the queue *)
 
   val is_empty (q: t) : bool
-    ensures { result = True <-> q.elts = Nil }
+    ensures { result <-> q = empty }
   (** check whether the queue is empty *)
 
   val length (q: t) : int
-    ensures { result = length q.elts }
+    ensures { result = length q }
   (** return the number of elements in the queue *)
+
+end
+
+(** Test the interface above using an external heapsort *)
+module Harness
+
+  use int.Int
+  use array.Array
+  use array.IntArraySorted
+  use array.ArrayPermut
+  use map.Occ as MO
+  use seq.Seq
+  use seq.FreeMonoid
+  use seq.Occ as SO
+
+  clone Pqueue as PQ with type elt = int, predicate le = (<=)
+
+  let heapsort (a: array int) : unit
+    ensures { sorted a }
+    ensures { permut_all (old a) a }
+  = let n = length a in
+    let pq = PQ.create () in
+    for i = 0 to n - 1 do
+      invariant { length pq = i }
+      invariant { forall x. MO.occ x a.elts 0 n =
+                  MO.occ x a.elts i n + SO.occ_all x pq }
+      PQ.push (Array.([]) a i) pq
+    done;
+    for i = 0 to n - 1 do
+      invariant { length pq = n - i }
+      invariant { sorted_sub a 0 i }
+      invariant { forall j k. 0 <= j < i -> 0 <= k < length pq ->
+                  Array.([]) a j <= pq[k] }
+      invariant { forall x. MO.occ x (old a.elts) 0 n =
+                  MO.occ x a.elts 0 i + SO.occ_all x pq }
+      a[i] <- PQ.safe_pop pq
+    done
 
 end
 
@@ -76,53 +130,63 @@ module PqueueNoDup
   type elt
   (** the abstract type of elements *)
 
-  clone export relations.TotalOrder with type t = elt, axiom .
-  (** `elt` is equipped with a total order `rel` *)
+  predicate le elt elt
+  (** `elt` is equipped with a total pre order `le` *)
+
+  clone export relations.TotalPreOrder
+    with type t = elt, predicate rel = le, axiom .
 
   use set.Fset
 
   type t = abstract { mutable elts: fset elt }
   (** the priority queue is modeled as a finite set of elements *)
+  meta coercion function elts
 
   (** {3 Operations} *)
 
-  val create () : t ensures { result.elts = empty }
+  val create () : t
+    ensures { result = empty }
   (** create a fresh, empty queue *)
 
-  val push (x: elt) (q: t) : unit writes {q}
-    ensures { q.elts = add x (old q.elts) }
+  val push (x: elt) (q: t) : unit
+    writes  { q }
+    ensures { q = add x (old q) }
   (** push an element in a queue *)
 
   exception Empty
   (** exception raised by `pop` and `peek` to signal an empty queue *)
 
   predicate minimal_elt (x: elt) (s: fset elt) =
-     mem x s /\ forall e: elt. mem e s -> rel x e
+     mem x s /\ forall e: elt. mem e s -> le x e
   (** property of the element returned by `pop` and `peek` *)
 
-  val pop (q: t) : elt writes {q}
-    ensures { q.elts = remove result (old q.elts) }
-    ensures { minimal_elt result (old q.elts) }
-    raises  { Empty -> q.elts = (old q.elts) = empty }
+  val pop (q: t) : elt
+    writes  { q }
+    ensures { q = remove result (old q) }
+    ensures { minimal_elt result (old q) }
+    raises  { Empty -> q = old q = empty }
   (** remove and returns the minimal element *)
 
   val peek (q: t) : elt
-    ensures { minimal_elt result q.elts }
-    raises  { Empty -> q.elts = empty }
+    ensures { minimal_elt result q }
+    raises  { Empty -> q = empty }
   (** return the minimal element, without modifying the queue *)
 
-  val clear (q: t) : unit writes {q} ensures {q.elts = empty }
+  val clear (q: t) : unit
+    writes  { q }
+    ensures { q = empty }
   (** empty the queue *)
 
-  val copy (q: t) : t ensures { result = q }
+  val copy (q: t) : t
+    ensures { result = q }
   (** return a fresh copy of the queue *)
 
   val is_empty (q: t) : bool
-    ensures { result=True <-> q.elts = empty }
+    ensures { result <-> q = empty }
   (** check whether the queue is empty *)
 
   val length (q: t) : int
-    ensures { result = cardinal q.elts }
+    ensures { result = cardinal q }
   (** return the number of elements in the queue *)
 
 end
