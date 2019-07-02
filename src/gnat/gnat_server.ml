@@ -1,5 +1,4 @@
 open Why3
-open Format
 open Json_util
 
 (* Initialization: Add all libexec executables to PATH (to be able to launch
@@ -223,29 +222,7 @@ end
 
 module Server = Itp_server.Make (Gnat_Scheduler) (Gnat_Protocol)
 
-(************************)
-(* parsing command line *)
-(************************)
-
 let files : string Queue.t = Queue.create ()
-let opt_parser = ref None
-
-let spec = Arg.align [
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-(*
-  "-f",
-   Arg.String (fun s -> input_files := s :: !input_files),
-   "<file> add file to the project (ignored if it is already there)";
-*)
-  Termcode.arg_extra_expl_prefix
-]
-
-let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]..."
-  (Filename.basename Sys.argv.(0))
 
 let env, gconfig =
   Gnat_config.env, Gnat_config.config
@@ -254,16 +231,7 @@ let env, gconfig =
 let () =
   let session_dir = Gnat_objectives.get_session_dir () in
   Queue.add session_dir files;
- (* Queue.add Gnat_config.filename files; *)
   let session_dir = Server_utils.get_session_dir ~allow_mkdir:true files in
-(*
-    try
-      Server_utils.get_session_dir ~allow_mkdir:true files
-    with Invalid_argument s ->
-      Format.eprintf "Error: %s@." s;
-      Whyconf.Args.exit_with_usage spec usage_str
-  in
-*)
   (match Gnat_config.limit_line with
 
   | Some (Gnat_config.Limit_Check check) ->
