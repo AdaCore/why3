@@ -152,6 +152,12 @@ end
 
 module Server = Itp_server.Make (Scheduler) (Protocol_why3ide)
 
+let when_idle (f:unit->unit) =
+  let (_:GMain.Idle.id) =
+    GMain.Idle.add (fun () -> f (); false)
+  in ()
+
+
 (************************)
 (* parsing command line *)
 (************************)
@@ -876,7 +882,9 @@ let add_to_log =
   if n>1 then
     log_zone#buffer#insert (" (repeated " ^ (string_of_int n) ^ " times)");
   log_zone#buffer#insert ("] " ^ s ^ "\n");
-  log_zone#scroll_to_mark `INSERT
+  (* scroll to end of text. Since Gtk3 we must do it in idle() because
+     of the "smooth scrolling". *)
+  when_idle (fun () -> log_zone#scroll_to_mark `INSERT)
 
 let clear_message_zone () =
   let buf = message_zone#buffer in
@@ -986,8 +994,9 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
           Debug.dprintf debug "tab switch to page %d@." n;
           notebook#goto_page n;
         end;
-      (* 0.5 to focus on the middle of the screen *)
-      move_to_line ~yalign:0.5 v l
+      when_idle (fun () ->
+          (* 0.5 to focus on the middle of the screen *)
+          move_to_line ~yalign:0.5 v l)
     with Nosourceview f ->
       Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
 
@@ -997,7 +1006,7 @@ let scroll_to_loc_ce loc_of_goal =
   | Some loc ->
       let _, l, _, _= Loc.get loc in
       (* 0.5 to focus on the middle of the screen *)
-      move_to_line ~yalign:0.5 counterexample_view l
+      when_idle (fun () -> move_to_line ~yalign:0.5 counterexample_view l)
 
 (* Reposition the cursor to the place it was saved *)
 let reposition_ide_cursor () =
@@ -2469,8 +2478,9 @@ let treat_notification n =
             all other cases, it should change nothing. *)
          if list_loc != [] then
            apply_loc_on_source list_loc goal_loc;
-         (* scroll to end of text *)
-         task_view#scroll_to_mark `INSERT
+         (* scroll to end of text. Since Gtk3 we must do it in idle() because
+            of the "smooth scrolling". *)
+         when_idle (fun () -> task_view#scroll_to_mark `INSERT)
        end
   | File_contents (file_name, content) ->
      let content = try_convert content in
