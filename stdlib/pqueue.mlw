@@ -61,6 +61,11 @@ module Pqueue
     raises  { Empty -> q = empty }
   (** return the minimal element, without modifying the queue *)
 
+  val safe_peek (q: t) : elt
+    requires { length q > 0 }
+    ensures { result = q[0] }
+  (** return the minimal element, without modifying the queue *)
+
   val clear (q: t) : unit
     writes  { q }
     ensures { q = empty }
@@ -167,9 +172,21 @@ module PqueueNoDup
     raises  { Empty -> q = old q = empty }
   (** remove and returns the minimal element *)
 
+  val safe_pop (q: t) : elt
+    writes  { q }
+    requires { not q = empty }
+    ensures { q = remove result (old q) }
+    ensures { minimal_elt result (old q) }
+  (** remove and returns the minimal element *)
+
   val peek (q: t) : elt
     ensures { minimal_elt result q }
     raises  { Empty -> q = empty }
+  (** return the minimal element, without modifying the queue *)
+
+  val safe_peek (q: t) : elt
+    requires { not q = empty }
+    ensures { minimal_elt result q }
   (** return the minimal element, without modifying the queue *)
 
   val clear (q: t) : unit
