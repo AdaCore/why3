@@ -28,56 +28,56 @@ module InverseInPlace
     NumOf.numof (fun n -> m n >= 0) l r
 
   predicate is_permutation (a: array int) =
-    forall i: int. 0 <= i < length a ->
+    forall i. 0 <= i < length a ->
       0 <= a[i] < length a /\
-      forall j: int. 0 <= j < length a -> i <> j -> a[i] <> a[j]
+      forall j. 0 <= j < length a -> i <> j -> a[i] <> a[j]
 
   lemma is_permutation_inverse:
     forall a b: array int. length a = length b ->
     is_permutation a ->
-    (forall i: int. 0 <= i < length b -> 0 <= b[i] < length b) ->
-    (forall i: int. 0 <= i < length b -> a[b[i]] = i) ->
+    (forall i. 0 <= i < length b -> 0 <= b[i] < length b) ->
+    (forall i. 0 <= i < length b -> a[b[i]] = i) ->
     is_permutation b
 
   predicate loopinvariant (olda a: array int) (m m' n: int) =
-      (forall e: int. 0 <= e < n -> -n <= a[e] < n)
-   /\ (forall e: int. m < e < n -> 0 <= a[e])
-   /\ (forall e: int. m < e < n -> olda[a[e]] = e)
-   /\ (forall e: int. 0 <= e <= m' -> a[e] >= 0 -> olda[e] = a[e])
-   /\ (forall e: int. 0 <= e <= m -> a[e] <= m)
-   /\ (forall e: int. 0 <= e <= m' -> a[e] < 0 ->
+      (forall e. 0 <= e < n -> -n <= a[e] < n)
+   /\ (forall e. m < e < n -> 0 <= a[e])
+   /\ (forall e. m < e < n -> olda[a[e]] = e)
+   /\ (forall e. 0 <= e <= m' -> a[e] >= 0 -> olda[e] = a[e])
+   /\ (forall e. 0 <= e <= m -> a[e] <= m)
+   /\ (forall e. 0 <= e <= m' -> a[e] < 0 ->
         olda[~ a[e]] = e /\ (~a[e] <= m -> a[~a[e]] < 0))
 
   let inverse_in_place (a: array int)
     requires { is_permutation a }
     ensures  { is_permutation a }
-    ensures  { forall i: int. 0 <= i < length a -> (old a)[a[i]] = i }
+    ensures  { forall i. 0 <= i < length a -> (old a)[a[i]] = i }
   = let n = length a in
-    for m = n-1 downto 0 do
+    for m = n - 1 downto 0 do
       invariant { loopinvariant (old a) a m m n }
-      let i = ref a[m] in
-      if !i >= 0 then begin
+      let ref i = a[m] in
+      if i >= 0 then begin
         (* unrolled loop once *)
         a[m] <- -1;
-        let j = ref (~m) in
-        let k = ref !i in
-        i := a[!i];
-        while !i >= 0 do
-          invariant { a[!k] = !i <= m /\ 0 <= !k <= m /\ ~m <= !j < 0 /\
-                      (old a)[~ !j] = !k /\ a[~ !j] < 0 /\ a[m] < 0 }
-          invariant { forall e: int. 0 <= e < m -> a[e] < 0 -> a[e] <> !j }
+        let ref j = (~m) in
+        let ref k = i in
+        i := a[i];
+        while i >= 0 do
+          invariant { a[k] = i <= m /\ 0 <= k <= m /\ ~m <= j < 0 /\
+                      (old a)[~ j] = k /\ a[~ j] < 0 /\ a[m] < 0 }
+          invariant { forall e. 0 <= e < m -> a[e] < 0 -> a[e] <> j }
           invariant { loopinvariant (old a) a m (m-1) n }
           variant   { numof a.elts 0 n }
-          a[!k] <- !j;
-          j := ~ !k;
-          k := !i;
-          i := a[!k]
+          a[k] <- j;
+          j := ~ k;
+          k := i;
+          i := a[k]
         done;
-        assert { !k = m };
-        i := !j
+        assert { k = m };
+        i := j
       end;
-      assert { (old a)[~ !i] = m };
-      a[m] <- ~ !i
+      assert { (old a)[~ i] = m };
+      a[m] <- ~ i
     done
 
 end
@@ -105,6 +105,6 @@ end
 
 (*
 Local Variables:
-compile-command: "why3ide inverse_in_place.mlw"
+compile-command: "why3 ide inverse_in_place.mlw"
 End:
 *)
