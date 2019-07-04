@@ -295,7 +295,15 @@ let commands_table = Hstr.create 17
 
 let register_command c d f = Hstr.add commands_table c (d,f)
 
+
 let () =
+  let doc_list_strategies c _ =
+    let l = list_strategies c in
+    let print_str fmt (short, name) =
+      Format.fprintf fmt "(Prooftree shortcut: %s  Name: %s)" short name in
+    Pp.sprintf "%a" (Pp.print_list Pp.newline print_str) l
+  in
+
   List.iter (fun (c,d,f) -> register_command c d f)
     [
     "interrupt", "interrupt all scheduled or running proof tasks",
@@ -304,9 +312,8 @@ let () =
     Qnotask list_transforms_query;
     "list-provers", "list available provers",
     Qnotask list_provers;
-(*
-    "list-strategies", "list available strategies", list_strategies;
-*)
+    "list-strategies", "list available strategies",
+    Qnotask doc_list_strategies;
     "print", "<id> print the declaration where <id> was defined",
     Qtask print_id;
     "search", "<ids> print the declarations where all <ids> appears",
