@@ -331,6 +331,14 @@ let editor_merge me1 me2 =
 let shortcut_merge s1 s2 =
   Mstr.merge merge_opt_keep_first s1 s2
 
+let check_config_for_builtin_provers config =
+  List.iter (fun prover ->
+      try
+        let _ = Whyconf.filter_one_prover config (Whyconf.mk_filter_prover prover) in
+        Gnat_util.abort_with_message ~internal:false
+          (Format.sprintf "%s attempts to redefine built-in prover %s" (Opt.get !opt_why3_conf_file) prover)
+      with Whyconf.ProverNotFound _ -> ()) builtin_provers
+
 let find_driver_file ~conf_file fn =
   (* Here we search for the driver file. The argument [fn] is the driver path
      as returned by the Why3 API. It simply returns the path as is in the
@@ -434,14 +442,16 @@ let provers, prover_ce, prover_warn, config, env =
   let builtin_provers_only = List.for_all is_builtin_prover prover_str_list in
   (* now load the configuration of Why3 *)
   let config =
-     (* We only read the default config file ($HOME/.why3.conf) in replay mode,
-        or if the option --prover was given, with a non-builtin prover *)
      try
        let gnatprove_config =
          get_gnatprove_config (Whyconf.read_config (Some (gnatprove_why3conf_file ()))) in
-       if not !opt_replay && builtin_provers_only then gnatprove_config
+       (* We read the user-provided why3.conf file, if any. We never use a file
+          like $HOME/.why3.conf. We make sure of that by not calling
+          Whyconf.read_config with a None argument. *)
+       if !opt_why3_conf_file = None then gnatprove_config
        else begin
            let conf = get_gnatprove_config (Whyconf.read_config !opt_why3_conf_file) in
+           check_config_for_builtin_provers conf;
            let provers =
              prover_merge
                (Whyconf.get_provers gnatprove_config)
