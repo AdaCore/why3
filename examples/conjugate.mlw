@@ -50,47 +50,47 @@ module Conjugate
     (* at least one element *)
     a.length > 0 &&
     (* sorted in non-increasing order *)
-    (forall i j: int. 0 <= i <= j < a.length -> a[i] >= a[j]) &&
+    (forall i j. 0 <= i <= j < a.length -> a[i] >= a[j]) &&
     (* at least one 0 sentinel *)
     a[a.length - 1] = 0
 
   (* values in a[0..n[ are > v, and a[n] <= v *)
   predicate numofgt (a: array int) (n: int) (v: int) =
     0 <= n < a.length &&
-    (forall j: int. 0 <= j < n -> v < a[j]) &&
+    (forall j. 0 <= j < n -> v < a[j]) &&
     v >= a[n]
 
   predicate is_conjugate (a b: array int) =
     b.length > a[0] &&
-    forall j: int. 0 <= j < b.length -> numofgt a b[j] j
+    forall j. 0 <= j < b.length -> numofgt a b[j] j
 
   let conjugate (a: array int) : array int
     requires { is_partition a }
     ensures  { is_conjugate a result }
   =
     let b = Array.make (a[0] + 1) 0 in
-    let partc = ref 0 in
-    while a[!partc] <> 0 do
-      invariant { 0 <= !partc < a.length }
-      invariant { forall j: int. a[!partc] <= j < b.length -> numofgt a b[j] j }
-      variant   { a.length - !partc }
+    let ref partc = 0 in
+    while a[partc] <> 0 do
+      invariant { 0 <= partc < a.length }
+      invariant { forall j. a[partc] <= j < b.length -> numofgt a b[j] j }
+      variant   { a.length - partc }
       label L in
-      let ghost start = !partc in
-      let edge = a[!partc] in
+      let ghost start = partc in
+      let edge = a[partc] in
       incr partc;
-      while a[!partc] = edge do
-        invariant { start <= !partc < a.length }
-        invariant { forall j: int. start <= j < !partc -> a[j] = edge }
-        variant   { a.length - !partc }
+      while a[partc] = edge do
+        invariant { start <= partc < a.length }
+        invariant { forall j. start <= j < partc -> a[j] = edge }
+        variant   { a.length - partc }
         incr partc
       done;
-      for i = a[!partc] to edge - 1 do
-        invariant { forall j: int. edge <= j < b.length -> b[j] = (b at L)[j] }
-        invariant { forall j: int. a[!partc] <= j < i -> b[j] = !partc }
-        b[i] <- !partc
+      for i = a[partc] to edge - 1 do
+        invariant { forall j. edge <= j < b.length -> b[j] = (b at L)[j] }
+        invariant { forall j. a[partc] <= j < i -> b[j] = partc }
+        b[i] <- partc
       done
     done;
-    assert { a[!partc] = 0 };
+    assert { a[partc] = 0 };
     b
 
 end
