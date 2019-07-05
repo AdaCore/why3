@@ -105,13 +105,14 @@ let deref env t =
 let rec has_stmt p s =
   p s || begin match s.stmt_desc with
     | Sskip | Sbreak  | Sreturn _ | Svar _ | Sassign _ | Slabel _
-    | Seval _ | Sset _ | Sassert _ | Swhile _ -> false
-    | Sif (_, bl1, bl2) -> has_stmtl p bl1 || has_stmtl p bl2
-    | Sfor (_, _, _, _, bl) -> has_stmtl p bl end
+    | Seval _ | Sset _ | Sassert _ -> false
+    | Sif (_, s1, s2) -> has_stmt p s1 || has_stmt p s2
+    | Swhile (_, _, s) -> has_stmt p s
+    | Sblock sl -> has_stmtl p sl end
 and has_stmtl p bl = List.exists (has_stmt p) bl
 
-let has_breakl = has_stmtl (fun s -> s.stmt_desc = Sbreak)
-let has_returnl = has_stmtl (function { stmt_desc = Sreturn _ } -> true | _ -> false)
+let has_break = has_stmt (fun s -> s.stmt_desc = Sbreak)
+let has_return = has_stmt (function { stmt_desc = Sreturn _ } -> true | _ -> false)
 
 let rec expr_has_call id e = match e.Mc_ast.expr_desc with
   | Eint _ | Estring _ | Eaddr _ | Mc_ast.Eident _ -> false
@@ -125,12 +126,13 @@ let rec stmt_has_call id s = match s.stmt_desc with
   | Sreturn e | Svar (_, _, e) | Sassign (_, e) | Seval e -> expr_has_call id e
   | Sset (e1, e2, e3) ->
     expr_has_call id e1 || expr_has_call id e2 || expr_has_call id e3
-  | Sif (e, s1, s2) -> expr_has_call id e || block_has_call id s1 || block_has_call id s2
-  | Sfor (s1, e, s2, _, s) -> stmt_has_call id s1 || expr_has_call id e || stmt_has_call id s2 || block_has_call id s
-  | Swhile (e, _, _, s) -> expr_has_call id e || block_has_call id s
+  | Sif (e, s1, s2) -> expr_has_call id e || stmt_has_call id s1 || stmt_has_call id s2
+  | Swhile (e, _, s) -> expr_has_call id e || stmt_has_call id s
+  | Sblock bl -> block_has_call id bl
 and block_has_call id = has_stmtl (stmt_has_call id)
 
-let rec expr env {Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } = match d with
+let rec expr env ({Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } as e) =
+  match d with
   | Mc_ast.Eint s ->
     constant_s ~loc s
   | Mc_ast.Estring _s ->
@@ -144,32 +146,53 @@ let rec expr env {Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } = match d with
     if not (Mstr.mem id.id_str env.vars) then
       Loc.errorm ~loc "unbound variable %s" id.id_str;
     deref_id ~loc id
-  | Mc_ast.Ebinop (op, e1, e2) ->
+  | Mc_ast.Ebinop (Mc_ast.Badd | Mc_ast.Bsub | Mc_ast.Bmul |
+                   Mc_ast.Bdiv | Mc_ast.Bmod as op, e1, e2) ->
     let e1 = expr env e1 in
     let e2 = expr env e2 in
     mk_expr ~loc (match op with
-      | Mc_ast.Band -> Eand (e1, e2)
-      | Mc_ast.Bor  -> Eor  (e1, e2)
       | Mc_ast.Badd -> Eidapp (infix ~loc "+", [e1; e2])
       | Mc_ast.Bsub -> Eidapp (infix ~loc "-", [e1; e2])
       | Mc_ast.Bmul -> Eidapp (infix ~loc "*", [e1; e2])
       | Mc_ast.Bdiv -> Eidapp (infix ~loc "/", [e1; e2])
       | Mc_ast.Bmod -> Eidapp (infix ~loc "%", [e1; e2])
-      | Mc_ast.Beq  -> Eidapp (infix ~loc "=", [e1; e2])
-      | Mc_ast.Bneq -> Eidapp (infix ~loc "<>", [e1; e2])
-      | Mc_ast.Blt  -> Eidapp (infix ~loc "<", [e1; e2])
-      | Mc_ast.Ble  -> Eidapp (infix ~loc "<=", [e1; e2])
-      | Mc_ast.Bgt  -> Eidapp (infix ~loc ">", [e1; e2])
-      | Mc_ast.Bge  -> Eidapp (infix ~loc ">=", [e1; e2])
-    )
+      | _ -> assert false)
+  | Mc_ast.Ebinop _ | Mc_ast.Eunop (Mc_ast.Unot, _) ->
+     mk_expr ~loc (Eif (bool env e, constant ~loc 1, constant ~loc 0))
   | Mc_ast.Eunop (Mc_ast.Uneg, e) ->
     mk_expr ~loc (Eidapp (prefix ~loc "-", [expr env e]))
-  | Mc_ast.Eunop (Mc_ast.Unot, e) ->
-    mk_expr ~loc (Eidapp (Qident (mk_id ~loc "not"), [expr env e]))
   | Mc_ast.Ecall (id, el) ->
     mk_expr ~loc (Eidapp (Qident id, List.map (expr env) el))
   | Mc_ast.Eget (e1, e2) ->
     mk_expr ~loc (Eidapp (get_op ~loc, [expr env e1; expr env e2]))
+
+and bool env ({Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } as e) =
+  match d with
+  | Mc_ast.Ebinop (Mc_ast.Band | Mc_ast.Bor as op, e1, e2) ->
+    let e1 = bool env e1 in
+    let e2 = bool env e2 in
+    mk_expr ~loc (match op with
+      | Mc_ast.Band -> Eand (e1, e2)
+      | Mc_ast.Bor  -> Eor  (e1, e2)
+      | _ -> assert false)
+  | Mc_ast.Ebinop (Mc_ast.Beq | Mc_ast.Bneq | Mc_ast.Blt |
+                   Mc_ast.Ble | Mc_ast.Bgt | Mc_ast.Bge as op, e1, e2) ->
+    let e1 = expr env e1 in
+    let e2 = expr env e2 in
+    mk_expr ~loc (match op with
+      | Mc_ast.Beq  -> Eidapp (infix ~loc "=", [e1; e2])
+      | Mc_ast.Bneq ->
+         Enot (mk_expr ~loc (Eidapp (infix ~loc "=", [e1; e2])))
+      | Mc_ast.Blt  -> Eidapp (infix ~loc "<", [e1; e2])
+      | Mc_ast.Ble  -> Eidapp (infix ~loc "<=", [e1; e2])
+      | Mc_ast.Bgt  -> Eidapp (infix ~loc ">", [e1; e2])
+      | Mc_ast.Bge  -> Eidapp (infix ~loc ">=", [e1; e2])
+      | _ -> assert false)
+  | Mc_ast.Eunop (Mc_ast.Unot, e) ->
+    mk_expr ~loc (Eidapp (Qident (mk_id ~loc "not"), [bool env e]))
+  | _ ->
+     let e = Eidapp (infix ~loc "=", [expr env e; constant ~loc 0]) in
+     mk_expr ~loc (Enot (mk_expr ~loc e))
 
 let no_params ~loc = [loc, None, false, Some (PTtuple [])]
 
@@ -181,7 +204,7 @@ let rec stmt env ({Mc_ast.stmt_loc = loc; Mc_ast.stmt_desc = d } as s) =
      let dummy = mk_id ~loc "_" in
      mk_expr ~loc (Elet (dummy, false, Expr.RKnone, expr env e, mk_unit ~loc))
   | Mc_ast.Sif (e, s1, s2) ->
-    mk_expr ~loc (Eif (expr env e, block env ~loc s1, block env ~loc s2))
+    mk_expr ~loc (Eif (bool env e, stmt env s1, stmt env s2))
   | Mc_ast.Sreturn e ->
     mk_expr ~loc (Eraise (return ~loc, Some (expr env e)))
   | Mc_ast.Svar _ ->
@@ -197,51 +220,23 @@ let rec stmt env ({Mc_ast.stmt_loc = loc; Mc_ast.stmt_desc = d } as s) =
     array_set ~loc (expr env e1) (expr env e2) (expr env e3)
   | Mc_ast.Sassert (k, t) ->
     mk_expr ~loc (Eassert (k, deref env t))
-  | Mc_ast.Swhile (e, inv, var, s) ->
-    let inv = List.map (deref env) inv in
-    let var = List.map (fun (t, o) -> deref env t, o) var in
+  | Mc_ast.Swhile (e, iv, s) ->
+     let inv, var = loop_annotation env iv in
     let loop = mk_expr ~loc
-      (Ewhile (expr env e, inv, var, block env ~loc s)) in
-    if has_breakl s then mk_expr ~loc (Ematch (loop, [], break_handler ~loc))
+      (Ewhile (bool env e, inv, var, stmt env s)) in
+    if has_break s then mk_expr ~loc (Ematch (loop, [], break_handler ~loc))
     else loop
   | Mc_ast.Sbreak ->
     mk_expr ~loc (Eraise (break ~loc, None))
   | Mc_ast.Slabel _ ->
     mk_unit ~loc (* ignore lonely marks *)
-  (* otherwise, translate
-       for id in e:
-         #@ invariant inv
-         body
-    to
-       let l = e in
-       for i = 0 to len(l)-1 do
-         invariant { let id = l[i] in I }
-         let id = ref l[i] in
-         body
-       done
-    *)
-  | Mc_ast.Sfor (_s1, _e, _s2, _inv, _body) ->
-     assert false (*TODO*)
-(*
-    let i, l, env = for_vars ~loc env in
-    let e = expr env e in
-    mk_expr ~loc (Elet (l, false, Expr.RKnone, e, (* evaluate e only once *)
-    let lb = constant ~loc 0 in
-    let lenl = mk_expr ~loc (Eidapp (len ~loc, [mk_var ~loc l])) in
-    let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [lenl; constant ~loc 1])) in
-    let invariant inv =
-      let loc = inv.term_loc in
-      let li = mk_term ~loc
-        (Tidapp (get_op ~loc, [mk_tvar ~loc l; mk_tvar ~loc i])) in
-      mk_term ~loc (Tlet (id, li, deref env inv)) in
-    mk_expr ~loc (Efor (i, lb, Expr.To, ub, List.map invariant inv,
-    let li = mk_expr ~loc
-      (Eidapp (get_op ~loc, [mk_var ~loc l; mk_var ~loc i])) in
-    mk_expr ~loc (Elet (id, false, Expr.RKnone, mk_ref ~loc li,
-    let env = add_var env id in
-    block ~loc env body
-    ))))))
-*)
+  | Mc_ast.Sblock bl ->
+     block env ~loc bl
+
+and loop_annotation env (inv, var) =
+  let inv = List.map (deref env) inv in
+  let var = List.map (fun (t, o) -> deref env t, o) var in
+  inv, var
 
 and block env ~loc = function
   | [] ->
@@ -274,8 +269,8 @@ let decl = function
         try body with Return x -> x *)
     let loc = id.id_loc in
     let env' = List.fold_left add_var empty_env idl in
-    let body = block env' ~loc:id.id_loc bl in
-    let body = if not (has_returnl bl) then body else
+    let body = stmt env' bl in
+    let body = if not (has_return bl) then body else
       let loc = id.id_loc in
       mk_expr ~loc (Ematch (body, [], return_handler ~loc)) in
     let local bl (_ty, id) =
@@ -285,7 +280,7 @@ let decl = function
     let body = List.fold_left local body idl in
     let param (_ty, id) = id.id_loc, Some id, false, None in
     let params = if idl = [] then no_params ~loc else List.map param idl in
-    let d = if block_has_call id bl then
+    let d = if stmt_has_call id bl then
         assert false (*TODO*)
     (* Drec ([id, false, Expr.RKnone, params, None, Ity.MaskVisible, sp, body], s) *)
     else

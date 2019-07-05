@@ -25,6 +25,9 @@ type binop =
 type ty =
   | Tint
 
+type loop_annotation =
+  Ptree.invariant * Ptree.variant
+
 type expr = {
   expr_desc: expr_desc;
   expr_loc : Loc.position;
@@ -47,26 +50,25 @@ and stmt = {
 
 and stmt_desc =
   | Sskip
-  | Sif of expr * block * block
+  | Sif of expr * stmt * stmt
   | Sreturn of expr
   | Svar of ty * ident * expr
   | Sassign of ident * expr
-  | Swhile of expr * Ptree.invariant * Ptree.variant * block
-  | Sfor of stmt * expr * stmt * Ptree.invariant * block
+  | Swhile of expr * loop_annotation * stmt
+  (* | Sfor of stmt * expr * stmt * loop_annotation * block *)
   | Seval of expr
   | Sset of expr * expr * expr (* e1[e2] = e3 *)
   | Sassert of Expr.assertion_kind * Ptree.term
   | Sbreak
   | Slabel of ident
-
-and block = stmt list
+  | Sblock of stmt list
 
 type param =
   ty * ident
 
 type decl =
   | Dinclude of ident
-  | Dfun     of ty * ident * param list * Ptree.spec * block
+  | Dfun     of ty * ident * param list * Ptree.spec * stmt
   | Dlogic   of bool (*is_func*) * ident * ident list
 
 type file = decl list

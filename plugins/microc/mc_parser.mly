@@ -78,6 +78,7 @@
 (* precedences *)
 
 %nonassoc IN
+%nonassoc no_else
 %nonassoc DOT ELSE
 %right ARROW LRARROW
 %right OR
@@ -118,8 +119,8 @@ func:
 
 def:
 | ty=type_ f=ident LEFTPAR x=separated_list(COMMA, param) RIGHTPAR
-  s=spec LBRC l=list(stmt) RBRC
-    { Dfun (ty, f, x, s, l) }
+  s=spec bl=block
+    { Dfun (ty, f, x, s, bl) }
 ;
 
 type_:
@@ -200,38 +201,24 @@ located(X):
 | X { mk_stmt (floc $startpos $endpos) $1 }
 ;
 
-block:
-| s = simple_stmt
-    { [s] }
-| LBRC l = list(stmt) RBRC
-    { l }
-;
-
 stmt:
-| located(stmt_desc) { $1 }
-| s = simple_stmt    { s }
-
-stmt_desc:
-| IF LEFTPAR c = expr RIGHTPAR s1 = block s2=else_branch
-    { Sif (c, s1, s2) }
-| WHILE LEFTPAR e=expr RIGHTPAR b=loop_body
-    { let i, v, l = b in Swhile (e, i, v, l) }
-| FOR LEFTPAR s1=simple_stmt SEMICOLON e=expr SEMICOLON s2=simple_stmt
-  RIGHTPAR b=loop_body
-    { let i, _, l = b in Sfor (s1, e, s2, i, l) }
+| simple_stmt { $1 }
+| block       { $1 }
 ;
 
-else_branch:
-| /* epsilon */
-    { [] }
-| ELSE s2=block
-    { s2 }
+block:
+| located(block_desc) { $1 }
+;
+
+block_desc:
+| LBRC l = list(stmt) RBRC { Sblock l }
+;
 
 loop_body:
 | s = simple_stmt
-  { [], [], [s] }
+  { ([], []), s }
 | LBRC a=loop_annotation l=list(stmt) RBRC
-  { fst a, snd a, l }
+  { a, mk_stmt (floc $startpos $endpos) (Sblock l) }
 
 loop_annotation:
 | (* epsilon *)
@@ -271,6 +258,15 @@ simple_stmt_desc:
     { Sbreak }
 | LABEL id=ident SEMICOLON
     { Slabel id }
+| IF LEFTPAR c = expr RIGHTPAR s1 = stmt %prec no_else
+    { Sif (c, s1, mk_stmt (floc $startpos $endpos) Sskip) }
+| IF LEFTPAR c = expr RIGHTPAR s1 = stmt ELSE s2=stmt
+    { Sif (c, s1, s2) }
+| WHILE LEFTPAR e=expr RIGHTPAR b=loop_body
+    { let iv, l = b in Swhile (e, iv, l) }
+| FOR LEFTPAR s1=simple_stmt SEMICOLON e=expr SEMICOLON s2=simple_stmt
+  RIGHTPAR b=loop_body
+    { assert false (*TODO*) }
 ;
 
 assignop:
