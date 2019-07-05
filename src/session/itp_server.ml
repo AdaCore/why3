@@ -918,7 +918,10 @@ end
         let s = "Goal is detached and cannot be printed" in
         P.notify (Task (nid, s, [], None))
       | ATh t ->
-          P.notify (Task (nid, "Detached theory " ^ (theory_name t).Ident.id_string, [], None))
+          let th_id   = theory_name t in
+          let th_name = th_id.Ident.id_string in
+          let th_loc  = th_id.Ident.id_loc in
+          P.notify (Task (nid, "Detached theory " ^ th_name, [], th_loc))
       | APa pid ->
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
@@ -937,7 +940,10 @@ end
           let s, list_loc, goal_loc = task_of_id d id show_full_context loc in
           P.notify (Task (nid, s, list_loc, goal_loc))
       | ATh t ->
-          P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, [], None))
+          let th_id   = theory_name t in
+          let th_name = th_id.Ident.id_string in
+          let th_loc  = th_id.Ident.id_loc in
+          P.notify (Task (nid, "Theory " ^ th_name, [], th_loc))
       | APa pid ->
           let print_attrs = Debug.test_flag debug_attrs in
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
