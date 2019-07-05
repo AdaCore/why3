@@ -2477,7 +2477,10 @@ let treat_notification n =
          (* Avoid erasing colors at startup when selecting the first node. In
             all other cases, it should change nothing. *)
          if list_loc != [] then
-           apply_loc_on_source list_loc goal_loc;
+           apply_loc_on_source list_loc goal_loc
+         else
+           (* Still scroll to the ident (for example for modules) *)
+           scroll_to_loc ~force_tab_switch:false goal_loc;
          (* scroll to end of text. Since Gtk3 we must do it in idle() because
             of the "smooth scrolling". *)
          when_idle (fun () -> task_view#scroll_to_mark `INSERT)
