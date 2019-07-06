@@ -20,30 +20,31 @@
   | Lexing_error s -> Format.fprintf fmt "syntax error: %s" s
   | _ -> raise exn)
 
+  type state = Code | OneLineSpec | MultiLineSpec
+  let state = ref Code
+
   let id_or_kwd =
-    let h = Hashtbl.create 32 in
-    List.iter (fun (s, tok) -> Hashtbl.add h s tok)
+    let h1 = Hashtbl.create 32 in
+    List.iter (fun (s, tok) -> Hashtbl.add h1 s tok)
       ["if", IF; "else", ELSE;
        "return", RETURN; "while", WHILE;
        "for", FOR; "break", BREAK;
        "void", VOID; "int", INT; "scanf", SCANF;
-       (* annotations *)
-       "true", TRUE; "false", FALSE;
+      ];
+    let h2 = Hashtbl.create 32 in
+    List.iter (fun (s, tok) -> Hashtbl.add h2 s tok)
+      ["true", TRUE; "false", FALSE;
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET; "in", LET;
        "at", AT; "old", OLD;
-      ];
-   fun s -> try Hashtbl.find h s with Not_found -> IDENT s
-
-  let annotation =
-    let h = Hashtbl.create 32 in
-    List.iter (fun (s, tok) -> Hashtbl.add h s tok)
-      ["invariant", INVARIANT; "variant", VARIANT;
+       "invariant", INVARIANT; "variant", VARIANT;
        "assert", ASSERT; "assume", ASSUME; "check", CHECK;
        "requires", REQUIRES; "ensures", ENSURES;
        "label", LABEL; "function", FUNCTION; "predicate", PREDICATE;
       ];
-    fun s -> try Hashtbl.find h s with Not_found ->
-      raise (Lexing_error ("no such annotation '" ^ s ^ "'"))
+    fun s ->
+      try Hashtbl.find h1 s with Not_found ->
+      if !state = Code then IDENT s else
+      try Hashtbl.find h2 s with Not_found -> IDENT s
 
   let string_buffer = Buffer.create 1024
 
@@ -57,17 +58,24 @@ let space = ' ' | '\t'
 let comment = "//" [^'@''\n'] [^'\n']*
 
 rule next_token = parse
-  | '\n'    { new_line lexbuf; next_token lexbuf }
-  | (space | comment)+
-            { next_token lexbuf }
+  | '\n'    { new_line lexbuf;
+              if !state = OneLineSpec then state := Code;
+              next_token lexbuf }
+  | space+  { next_token lexbuf }
+  | "//\n"  { new_line lexbuf; next_token lexbuf }
+  | comment { next_token lexbuf }
   | '#' space* "include" space* '<' ([^ '>' '\n']* as file) '>' space* '\n'
             { new_line lexbuf; INCLUDE file }
   | "/*"    { comment lexbuf }
-  | "\\" space* '\n' space* "//@"?
-            { next_token lexbuf }
-  | "//@" space* (ident as id)
-            { annotation id }
-  | "//@"    { raise (Lexing_error "expecting an annotation") }
+  | "*/"    { if !state <> MultiLineSpec
+              then raise (Lexing_error "no comment to be closed");
+              state := Code;
+              next_token lexbuf }
+  | "//@"   { state := OneLineSpec; next_token lexbuf }
+  | "/*@"   { state := MultiLineSpec; next_token lexbuf }
+  | "@"     { if !state <> MultiLineSpec
+              then raise (Lexing_error "illegal character '@'");
+              next_token lexbuf }
   | ident as id
             { id_or_kwd id }
   | '+'     { PLUS }

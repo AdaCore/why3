@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//@ function int x();
+//@ assume x() < 2;
+
 int foo(int a[]) {
-  //@ requires length(a) >= 1;
-  //@ ensures  a[0] == old(a[0]) + 1;
-  a[0] = a[0] + 1;
+  //@ requires length(a) >= 1; ensures  a[0] == old(a[0]);
+  a[0] /= 1;
 }
 
 int main()

@@ -18,9 +18,9 @@ int triangular(int n)
 }
 
 int triangular2(int n)
-//@ requires n >= 0;
-//@ ensures  result == n * (n + 1) / 2;
-//@ variant  n;
+/*@ requires n >= 0;
+  @ ensures  result == n * (n + 1) / 2;
+  @ variant  n; */
 {
   if (n == 0) return 0;
   return n + triangular2(n - 1);

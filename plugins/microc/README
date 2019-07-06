@@ -11,8 +11,7 @@ Differences/limitations wrt C:
 - a call to printf is ignored (but arguments are evaluated first)
 - rand() returns a nonnegative integer, but with no upper limit (no RAND_MAX);
   not an issue when used in expressions such as a+rand()%(b-a+1)
+- assignments expressions do not have a value (so one cannot write x=y=0)
 
 Todo:
-- ++ -- += -= *= /= for array elements
-- axioms
 - lemma function?

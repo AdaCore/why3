@@ -27,8 +27,24 @@
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
   let mk_expr loc d = { expr_desc = d; expr_loc = loc }
   let mk_stmt loc d = { stmt_desc = d; stmt_loc = loc }
-  let postop op loc = { id_str = "post" ^ op; id_ats = []; id_loc = loc }
-  let preop op loc = { id_str = "pre" ^ op; id_ats = []; id_loc = loc }
+  let postop op loc = { id_str = "__post" ^ op; id_ats = []; id_loc = loc }
+  let preop op loc = { id_str = "__pre" ^ op; id_ats = []; id_loc = loc }
+  let arrpostop op loc = { id_str = "__arrpost" ^ op; id_ats=[]; id_loc = loc }
+  let arrpreop op loc = { id_str = "__arrpre" ^ op; id_ats=[]; id_loc = loc }
+  let assignop loc op =
+    { id_str = Ident.op_infix op; id_ats = []; id_loc = loc }
+  let arr_assignop loc op =
+    let s = match op with
+      | "+=" -> "__array_add"
+      | "-=" -> "__array_sub"
+      | "*=" -> "__array_mul"
+      | "/=" -> "__array_div"
+      | s -> raise (Unsupported ("no such operator " ^ s)) in
+    { id_str = s; id_ats = []; id_loc = loc }
+
+  let new_axiom =
+    let r = ref 0 in
+    fun s e -> incr r; mk_id ("Axiom_" ^ string_of_int !r) s e
 
   let variant_union v1 v2 = match v1, v2 with
     | _, [] -> v1
@@ -92,7 +108,6 @@
 %left PLUS MINUS
 %left TIMES DIV MOD
 %nonassoc unary_minus prec_prefix_op
-%nonassoc LEFTSQ
 
 %start file
 
@@ -110,6 +125,7 @@ decl:
 | include_ { $1 }
 | def      { $1 }
 | func     { $1 }
+| axiom    { $1 }
 
 include_:
 | f=INCLUDE
@@ -128,6 +144,10 @@ func:
 | PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
   EQUAL t=term SEMICOLON
  { Dlogic (None, id, l, Some t) }
+
+axiom:
+| ASSUME t=term SEMICOLON
+  { Daxiom (new_axiom $startpos $endpos, t) }
 
 def:
 | ty=return_type f=ident LEFTPAR x=separated_list(COMMA, param) RIGHTPAR
@@ -189,8 +209,22 @@ expr_desc:
     { Estring s }
 | id = ident
     { Eident id }
-| e1 = expr LEFTSQ e2 = expr RIGHTSQ
-    { Eget (e1, e2) }
+| id=ident op=incdec
+    { let loc = floc $startpos $endpos in
+      Ecall (postop op loc, [mk_expr loc (Eaddr id)]) }
+| op=incdec id=ident
+    { let loc = floc $startpos $endpos in
+      Ecall (preop op loc, [mk_expr loc (Eaddr id)]) }
+| id=ident LEFTSQ e2 = expr RIGHTSQ
+    { Eget (mk_expr (floc $startpos(id) $endpos(id)) (Eident id), e2) }
+| id=ident LEFTSQ e2 = expr RIGHTSQ op=incdec
+    { let loc = floc $startpos $endpos in
+      let e1 = mk_expr (floc $startpos(id) $endpos(id)) (Eident id) in
+      Ecall (arrpostop op loc, [e1; e2]) }
+| op=incdec id=ident LEFTSQ e2 = expr RIGHTSQ
+    { let loc = floc $startpos $endpos in
+      let e1 = mk_expr (floc $startpos(id) $endpos(id)) (Eident id) in
+      Ecall (arrpreop op loc, [e1; e2]) }
 | MINUS e1 = expr %prec unary_minus
     { Eunop (Uneg, e1) }
 | NOT e1 = expr
@@ -205,12 +239,6 @@ expr_desc:
       Ecall (mk_id "scanf" $startpos $endpos, [id]) }
 | LEFTPAR e = expr RIGHTPAR
    { e.expr_desc }
-| id=ident op=incdec
-   { let loc = floc $startpos $endpos in
-     Ecall (postop op loc, [mk_expr loc (Eaddr id)]) }
-| op=incdec id=ident
-   { let loc = floc $startpos $endpos in
-     Ecall (preop op loc, [mk_expr loc (Eaddr id)]) }
 ;
 
 incdec:
@@ -322,18 +350,24 @@ expr_stmt_desc:
     { Sassign (id, e) }
 | id = ident op=assignop e = expr
     { let loc = floc $startpos $endpos in
-      Seval (mk_expr loc (Ecall (op, [mk_expr loc (Eaddr id); e]))) }
-| e1 = expr LEFTSQ e2 = expr RIGHTSQ EQUAL e3 = expr
-    { Sset (e1, e2, e3) }
+      let id = mk_expr loc (Eaddr id) in
+      Seval (mk_expr loc (Ecall (assignop loc op, [id; e]))) }
+| id=ident LEFTSQ e2 = expr RIGHTSQ EQUAL e3 = expr
+    { let e1 = mk_expr (floc $startpos(id) $endpos(id)) (Eident id) in
+      Sset (e1, e2, e3) }
+| id=ident LEFTSQ e2 = expr RIGHTSQ op=assignop e3 = expr
+    { let loc = floc $startpos $endpos in
+      let e1 = mk_expr (floc $startpos(id) $endpos(id)) (Eident id) in
+      Seval (mk_expr loc (Ecall (arr_assignop loc op, [e1; e2; e3]))) }
 | e = expr
     { Seval e }
 ;
 
 assignop:
-| PLUSEQUAL  { mk_id (Ident.op_infix "+=") $startpos $endpos }
-| MINUSEQUAL { mk_id (Ident.op_infix "-=") $startpos $endpos }
-| TIMESEQUAL { mk_id (Ident.op_infix "*=") $startpos $endpos }
-| DIVEQUAL   { mk_id (Ident.op_infix "/=") $startpos $endpos }
+| PLUSEQUAL  { "+=" }
+| MINUSEQUAL { "-=" }
+| TIMESEQUAL { "*=" }
+| DIVEQUAL   { "/=" }
 ;
 
 assertion_kind:

@@ -301,6 +301,8 @@ let decl = function
               ld_type = Opt.map (type_ id.id_loc) ty;
               ld_def = def } in
     Typing.add_decl id.id_loc (Dlogic [d])
+  | Mc_ast.Daxiom (id, t) ->
+     Typing.add_decl id.id_loc (Dprop (Decl.Paxiom, id, t))
 
 let translate dl =
   List.iter decl dl

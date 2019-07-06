@@ -15,9 +15,9 @@ int mult(int a, int b)
     //@ invariant r + p * q == a * b;
     //@ variant   q;
     if (q % 2 == 1)
-      r = r + p;
-    p = p + p;
-    q = q / 2;
+      r += p;
+    p *= 2;
+    q /= 2;
   }
   return r;
 }

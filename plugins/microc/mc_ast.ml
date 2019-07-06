@@ -73,5 +73,6 @@ type decl =
   | Dinclude of ident
   | Dfun     of ty * ident * param list * Ptree.spec * stmt
   | Dlogic   of ty option * ident * param list * Ptree.term option
+  | Daxiom   of ident * Ptree.term
 
 type file = decl list
