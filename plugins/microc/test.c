@@ -1,11 +1,21 @@
 
 #include <stdio.h>
+#include <stdlib.h>
+
+int foo(int a[])
+//@ requires length(a) >= 1;
+//@ ensures result == 0 ;
+{
+  return a[0];
+}
 
 int main()
 {
-  int x;
-  //@ assert x == 0;
-  printf("%d", 2);
+  int a[10];
+  int r = foo(a);
+  //@ assert r == 0;
+  int x = 10 + rand() % 10;
+  //@ assert 10 <= x <= 19;
 }
 
 

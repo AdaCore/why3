@@ -71,7 +71,7 @@
 %token EOF
 %token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL SEMICOLON LBRC RBRC
 %token PLUS MINUS TIMES DIV MOD
-%token INT
+%token VOID INT
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
 %token FUNCTION PREDICATE TRUE FALSE
@@ -122,18 +122,21 @@ func:
   { Dlogic (false, id, l) }
 
 def:
-| ty=type_ f=ident LEFTPAR x=separated_list(COMMA, param) RIGHTPAR
+| ty=return_type f=ident LEFTPAR x=separated_list(COMMA, param) RIGHTPAR
   s=spec bl=block
     { Dfun (ty, f, x, s, bl) }
 ;
 
-type_:
-| INT { Tint }
+return_type:
+| VOID { Tvoid }
+| INT  { Tint }
 ;
 
 param:
-| ty=type_ id=ident
-   { ty, id }
+| INT id=ident
+   { Tint, id }
+| INT id=ident LEFTSQ RIGHTSQ
+   { Tarray, id }
 ;
 
 spec:
@@ -249,24 +252,18 @@ simple_stmt_desc:
     { Sskip }
 | RETURN e = expr SEMICOLON
     { Sreturn e }
-| ty=type_ id=ident EQUAL e = expr SEMICOLON
-    { Svar (ty, id, e) }
-| ty=type_ id=ident SEMICOLON
+| INT id=ident SEMICOLON
     { let any_int = mk_id "any_int" $startpos $endpos in
       let loc = floc $startpos $endpos in
       let e = mk_expr loc (Ecall (any_int, [mk_expr loc Eunit])) in
-      Svar (ty, id, e) }
-| id = ident EQUAL e = expr SEMICOLON
-    { Sassign (id, e) }
-| id = ident op=assignop e = expr SEMICOLON
-   { let loc = floc $startpos $endpos in
-     Seval (mk_expr loc (Ecall (op, [mk_expr loc (Eaddr id); e]))) }
-| e1 = expr LEFTSQ e2 = expr RIGHTSQ EQUAL e3 = expr SEMICOLON
-    { Sset (e1, e2, e3) }
+      Svar (Tint, id, e) }
+| INT id=ident LEFTSQ e=expr RIGHTSQ SEMICOLON
+    { let alloc_array = mk_id "alloc_array" $startpos $endpos in
+      let loc = floc $startpos $endpos in
+      let e = mk_expr loc (Ecall (alloc_array, [e])) in
+      Svar (Tarray, id, e) }
 | k=assertion_kind t = term SEMICOLON
     { Sassert (k, t) }
-| e = expr SEMICOLON
-    { Seval e }
 | BREAK SEMICOLON
     { Sbreak }
 | LABEL id=ident SEMICOLON
@@ -277,10 +274,31 @@ simple_stmt_desc:
     { Sif (c, s1, s2) }
 | WHILE LEFTPAR e=expr RIGHTPAR b=loop_body
     { let iv, l = b in Swhile (e, iv, l) }
-(* TODO: below, do not accept simple_stmt for e1 and e2, only expr *)
-| FOR LEFTPAR s1=simple_stmt SEMICOLON e=expr SEMICOLON s2=simple_stmt
+| FOR LEFTPAR e1=expr_stmt SEMICOLON e=expr SEMICOLON e2=expr_stmt
   RIGHTPAR b=loop_body
-    { assert false (*TODO*) }
+   { let loc = floc $startpos $endpos in
+     let iv, l = b in
+     Sblock [e1;
+             mk_stmt loc (Swhile (e, iv, mk_stmt loc (Sblock [l; e2])))]
+   }
+| s=expr_stmt_desc SEMICOLON
+   { s }
+;
+
+expr_stmt: located(expr_stmt_desc) { $1 };
+
+expr_stmt_desc:
+| INT id=ident EQUAL e = expr
+    { Svar (Tint, id, e) }
+| id = ident EQUAL e = expr
+    { Sassign (id, e) }
+| id = ident op=assignop e = expr
+    { let loc = floc $startpos $endpos in
+      Seval (mk_expr loc (Ecall (op, [mk_expr loc (Eaddr id); e]))) }
+| e1 = expr LEFTSQ e2 = expr RIGHTSQ EQUAL e3 = expr
+    { Sset (e1, e2, e3) }
+| e = expr
+    { Seval e }
 ;
 
 assignop:

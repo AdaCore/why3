@@ -23,7 +23,9 @@ type binop =
   | Band | Bor                          (* && || *)
 
 type ty =
+  | Tvoid
   | Tint
+  | Tarray
 
 type loop_annotation =
   Ptree.invariant * Ptree.variant

@@ -48,8 +48,6 @@ let constant ~loc i =
   mk_expr ~loc (Econst (Number.int_const_of_int i))
 let constant_s ~loc s =
   mk_expr ~loc (Econst (Number.(ConstInt (int_literal ILitDec ~neg:false s))))
-let len ~loc =
-  Qident (mk_id ~loc "len")
 let break ~loc =
   Qident (mk_id ~loc "Break")
 let break_handler ~loc =
@@ -85,8 +83,8 @@ let empty_env =
   { vars = Mstr.empty;
     for_index = 0; }
 
-let add_var env = function
-  | Tint, id -> { env with vars = Mstr.add id.id_str id env.vars }
+let add_var env (_, id) =
+  { env with vars = Mstr.add id.id_str id env.vars }
 
 let for_vars ~loc env =
   let i = env.for_index in
@@ -173,7 +171,8 @@ let rec expr env ({Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } as e) =
         (Elet (mk_id ~loc "_", false, Expr.RKnone, expr env e, res)) in
     List.fold_left eval (mk_unit ~loc) el
   | Mc_ast.Ecall (id, el) ->
-    mk_expr ~loc (Eidapp (Qident id, List.map (expr env) el))
+     let el = if el = [] then [mk_unit ~loc] else List.map (expr env) el in
+     mk_expr ~loc (Eidapp (Qident id, el))
   | Mc_ast.Eget (e1, e2) ->
     mk_expr ~loc (Eidapp (get_op ~loc, [expr env e1; expr env e2]))
 
@@ -292,8 +291,7 @@ let decl = function
     let param (_ty, id) = id.id_loc, Some id, false, None in
     let params = if idl = [] then no_params ~loc else List.map param idl in
     let d = if stmt_has_call id bl then
-        assert false (*TODO*)
-    (* Drec ([id, false, Expr.RKnone, params, None, Ity.MaskVisible, sp, body], s) *)
+      Drec ([id, false, Expr.RKnone, params, None, Ity.MaskVisible, sp, body])
     else
       let e = Efun (params, None, Ity.MaskVisible, sp, body) in
       Dlet (id, false, Expr.RKnone, mk_expr ~loc e) in
@@ -308,10 +306,6 @@ let decl = function
 
 let translate dl =
   List.iter decl dl
-  (* let bl = block empty_env ~loc dl in *)
-  (* let fd = Efun (no_params ~loc, None, Ity.MaskVisible, empty_spec, bl) in *)
-  (* let main = Dlet (mk_id ~loc "main", false, Expr.RKnone, mk_expr ~loc fd) in *)
-  (* Typing.add_decl loc main *)
 
 let read_channel env path file c =
   let f : Mc_ast.file = Mc_lexer.parse file c in

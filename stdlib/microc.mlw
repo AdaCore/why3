@@ -7,6 +7,9 @@ module MicroC
   use ref.Ref
   use array.Array
 
+  function length (a: array 'a) : int =
+    Array.length a
+
   function ([]) (l: array 'a) (i: int) : 'a =
     Array.([]) l i
 

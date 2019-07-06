@@ -26,7 +26,7 @@
       ["if", IF; "else", ELSE;
        "return", RETURN; "while", WHILE;
        "for", FOR; "break", BREAK;
-       "int", INT; "scanf", SCANF;
+       "void", VOID; "int", INT; "scanf", SCANF;
        (* annotations *)
        "true", TRUE; "false", FALSE;
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET; "in", LET;
