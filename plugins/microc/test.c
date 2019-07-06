@@ -2,30 +2,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//@ function int foo(int x) = x+1;
-//@ predicate bar(int x, int y) = x>y;
-
-int foo(int a[], int x)
-//@ requires length(a) >= 1;
-//@ requires a[0] == 0;
-//@ ensures  result == 0;
-{
-  x = 2;
-  a[0] = 1;
-  return 0;
+int foo(int a[]) {
+  //@ requires length(a) >= 1;
+  //@ ensures  a[0] == old(a[0]) + 1;
+  a[0] = a[0] + 1;
 }
 
 int main()
 {
-  int s = 0;
+  int x = 42;
+  //@ label L;
+  //@ assert x == 42;
+  x = x+1;
+  //@ assert at(x, L) == 42;
+  while (x > 0) {
+    //@ invariant x >= 0;
+    //@ variant x;
+    x--;
+  }
+  //@ assert x == 0;
   int a[10];
-  a[0] = 0;
-  int r = foo(a, 10);
-  //@ assert r == 0;
-  //@ assert bar(1, r);
-  int x = 10 + rand() % 10;
-  //@ assert 10 <= x <= 19;
-  s++;
+  a[0] = 41;
+  //@ label ICI;
+  foo(a);
+  //@ assert a[0] == 42;
+  //@ assert at(a[0], ICI) == 41;
 }
 
 

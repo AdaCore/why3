@@ -46,6 +46,7 @@ while i < 10:
   i = i+1
 
 sum = 0
+#@ label L
 for x in [42]*3:
   #@ invariant sum >= 0
   print(x)
@@ -55,6 +56,8 @@ for x in [42]*3:
 foo = [1,2,3]
 #@ assert len(foo)==3
 #@ assert foo[1]==2
+
+#@ assert at(sum, L) == 0
 
 
 # Python's division is neither Euclidean division, nor computer division

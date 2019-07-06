@@ -44,6 +44,20 @@ goods () {
     fi
 }
 
+plugins () {
+    pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
+    for f in $1/*.$3 ; do
+	printf "  $f... "
+	if ! $pgm $2 $f > /dev/null 2>&1; then
+	    echo "FAILED!"
+            echo "invocation: $pgm $2 $f"
+	    exit 1
+	fi
+	echo "ok"
+    done
+}
+
 bads () {
     pgm="bin/why3prove$suffix"
     test -d $1 || exit 1
@@ -323,6 +337,8 @@ goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
 goods examples/prover "-L examples/prover --debug ignore_unused_vars"
 goods examples/in_progress
+plugins tests/python --type-only py
+plugins tests/microc --type-only c
 echo ""
 
 echo "=== Checking valid goals ==="

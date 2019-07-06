@@ -46,8 +46,6 @@ let mk_tvar ~loc id =
   mk_term ~loc (Tident (Qident id))
 let mk_ref ~loc e =
   mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e]))
-let deref_id ~loc id =
-  mk_expr ~loc (Eidapp (prefix ~loc "!", [mk_expr ~loc (Eident (Qident id))]))
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (set_op ~loc, [a; i; v]))
 let constant ~loc i =
@@ -68,6 +66,8 @@ let return_handler ~loc =
 let array_make ~loc n v =
   mk_expr ~loc (Eidapp (Qdot (Qident (mk_id ~loc "Array"), mk_id ~loc "make"),
                         [n; v]))
+let set_ref id =
+  { id with id_ats = ATstr Pmodule.ref_attr :: id.id_ats }
 
 let empty_spec = {
   sp_pre     = [];
@@ -99,14 +99,6 @@ let for_vars ~loc env =
   let env = { env with for_index = i + 1 } in
   let i = string_of_int env.for_index in
   mk_id ~loc ("for index " ^ i ), mk_id ~loc ("for list " ^ i), env
-
-(* dereference all variables from the environment *)
-let deref env t =
-  let deref _ ({id_loc=loc} as id) t =
-    let tid = mk_term ~loc (Tident (Qident id)) in
-    let tid = mk_term ~loc (Tidapp (prefix ~loc "!", [tid])) in
-    mk_term ~loc:t.term_loc (Tlet (id, tid, t)) in
-  Mstr.fold deref env.vars t
 
 let rec has_stmt p = function
   | Dstmt s -> p s || begin match s.stmt_desc with
@@ -149,7 +141,7 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
   | Py_ast.Eident id ->
     if not (Mstr.mem id.id_str env.vars) then
       Loc.errorm ~loc "unbound variable %s" id.id_str;
-    deref_id ~loc id
+     mk_expr ~loc (Eident (Qident id))
   | Py_ast.Ebinop (op, e1, e2) ->
     let e1 = expr env e1 in
     let e2 = expr env e2 in
@@ -217,10 +209,8 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
   | Py_ast.Sset (e1, e2, e3) ->
     array_set ~loc (expr env e1) (expr env e2) (expr env e3)
   | Py_ast.Sassert (k, t) ->
-    mk_expr ~loc (Eassert (k, deref env t))
+    mk_expr ~loc (Eassert (k, t))
   | Py_ast.Swhile (e, inv, var, s) ->
-    let inv = List.map (deref env) inv in
-    let var = List.map (fun (t, o) -> deref env t, o) var in
     let loop = mk_expr ~loc
       (Ewhile (expr env e, inv, var, block env ~loc s)) in
     if has_breakl s then mk_expr ~loc (Ematch (loop, [], break_handler ~loc))
@@ -234,11 +224,10 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
     *)
   | Py_ast.Sfor (id, {Py_ast.expr_desc=Ecall ({id_str="range"}, [e1;e2])},
                  inv, body) ->
-    let inv = List.map (deref env) inv in
     let e_to = expr env e2 in
     let ub = mk_expr ~loc (Eidapp (infix ~loc "-", [e_to; constant ~loc 1])) in
     mk_expr ~loc (Efor (id, expr env e1, Expr.To, ub, inv,
-    mk_expr ~loc (Elet (id, false, Expr.RKnone, mk_ref ~loc (mk_var ~loc id),
+    mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, mk_ref ~loc (mk_var ~loc id),
     let env = add_var env id in
     block ~loc env body))))
   (* otherwise, translate
@@ -264,11 +253,11 @@ let rec stmt env ({Py_ast.stmt_loc = loc; Py_ast.stmt_desc = d } as s) =
       let loc = inv.term_loc in
       let li = mk_term ~loc
         (Tidapp (get_op ~loc, [mk_tvar ~loc l; mk_tvar ~loc i])) in
-      mk_term ~loc (Tlet (id, li, deref env inv)) in
+      mk_term ~loc (Tlet (id, li, inv)) in
     mk_expr ~loc (Efor (i, lb, Expr.To, ub, List.map invariant inv,
     let li = mk_expr ~loc
       (Eidapp (get_op ~loc, [mk_var ~loc l; mk_var ~loc i])) in
-    mk_expr ~loc (Elet (id, false, Expr.RKnone, mk_ref ~loc li,
+    mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, mk_ref ~loc li,
     let env = add_var env id in
     block ~loc env body
     ))))))
@@ -282,7 +271,7 @@ and block env ~loc = function
     when not (Mstr.mem id.id_str env.vars) ->
     let e = expr env e in (* check e *before* adding id to environment *)
     let env = add_var env id in
-    mk_expr ~loc (Elet (id, false, Expr.RKnone, mk_ref ~loc e, block env ~loc sl))
+    mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, mk_ref ~loc e, block env ~loc sl))
   | Dstmt ({ Py_ast.stmt_loc = loc } as s) :: sl ->
     let s = stmt env s in
     if sl = [] then s else mk_expr ~loc (Esequence (s, block env ~loc sl))
@@ -299,7 +288,7 @@ and block env ~loc = function
     let local bl id =
       let loc = id.id_loc in
       let ref = mk_ref ~loc (mk_var ~loc id) in
-      mk_expr ~loc (Elet (id, false, Expr.RKnone, ref, bl)) in
+      mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, ref, bl)) in
     let body = List.fold_left local body idl in
     let param id = id.id_loc, Some id, false, None in
     let params = if idl = [] then no_params ~loc else List.map param idl in

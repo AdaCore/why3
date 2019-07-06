@@ -40,8 +40,6 @@ let mk_tvar ~loc id =
   mk_term ~loc (Tident (Qident id))
 let mk_ref ~loc e =
   mk_expr ~loc (Eidapp (Qident (mk_id ~loc "ref"), [e]))
-let deref_id ~loc id =
-  mk_expr ~loc (Eidapp (prefix ~loc "!", [mk_expr ~loc (Eident (Qident id))]))
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (set_op ~loc, [a; i; v]))
 let constant ~loc i =
@@ -60,6 +58,8 @@ let return_handler ~loc =
 let array_make ~loc n v =
   mk_expr ~loc (Eidapp (Qdot (Qident (mk_id ~loc "Array"), mk_id ~loc "make"),
                         [n; v]))
+let set_ref id =
+  { id with id_ats = ATstr Pmodule.ref_attr :: id.id_ats }
 
 let empty_spec = {
   sp_pre     = [];
@@ -91,14 +91,6 @@ let for_vars ~loc env =
   let env = { env with for_index = i + 1 } in
   let i = string_of_int env.for_index in
   mk_id ~loc ("for index " ^ i ), mk_id ~loc ("for list " ^ i), env
-
-(* dereference all variables from the environment *)
-let deref env t =
-  let deref _ ({id_loc=loc} as id) t =
-    let tid = mk_term ~loc (Tident (Qident id)) in
-    let tid = mk_term ~loc (Tidapp (prefix ~loc "!", [tid])) in
-    mk_term ~loc:t.term_loc (Tlet (id, tid, t)) in
-  Mstr.fold deref env.vars t
 
 let rec has_stmt p s =
   p s || begin match s.stmt_desc with
@@ -145,7 +137,7 @@ let rec expr env ({Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } as e) =
   | Mc_ast.Eident id ->
     if not (Mstr.mem id.id_str env.vars) then
       Loc.errorm ~loc "unbound variable %s" id.id_str;
-    deref_id ~loc id
+    mk_expr ~loc (Eident (Qident id))
   | Mc_ast.Ebinop (Mc_ast.Badd | Mc_ast.Bsub | Mc_ast.Bmul |
                    Mc_ast.Bdiv | Mc_ast.Bmod as op, e1, e2) ->
     let e1 = expr env e1 in
@@ -229,9 +221,8 @@ let rec stmt env ({Mc_ast.stmt_loc = loc; Mc_ast.stmt_desc = d } as s) =
   | Mc_ast.Sset (e1, e2, e3) ->
     array_set ~loc (expr env e1) (expr env e2) (expr env e3)
   | Mc_ast.Sassert (k, t) ->
-    mk_expr ~loc (Eassert (k, deref env t))
-  | Mc_ast.Swhile (e, iv, s) ->
-     let inv, var = loop_annotation env iv in
+    mk_expr ~loc (Eassert (k, t))
+  | Mc_ast.Swhile (e, (inv, var), s) ->
     let loop = mk_expr ~loc
       (Ewhile (bool env e, inv, var, stmt env s)) in
     if has_break s then mk_expr ~loc (Ematch (loop, [], break_handler ~loc))
@@ -243,11 +234,6 @@ let rec stmt env ({Mc_ast.stmt_loc = loc; Mc_ast.stmt_desc = d } as s) =
   | Mc_ast.Sblock bl ->
      block env ~loc bl
 
-and loop_annotation env (inv, var) =
-  let inv = List.map (deref env) inv in
-  let var = List.map (fun (t, o) -> deref env t, o) var in
-  inv, var
-
 and block env ~loc = function
   | [] ->
     mk_unit ~loc
@@ -256,7 +242,8 @@ and block env ~loc = function
   | { Mc_ast.stmt_loc = loc; stmt_desc = Mc_ast.Svar (ty, id, e) } :: sl ->
     let e = expr env e in (* check e *before* adding id to environment *)
     let env = add_var env (ty, id) in
-    mk_expr ~loc (Elet (id, false, Expr.RKnone, mk_ref ~loc e, block env ~loc sl))
+    let ee = mk_ref ~loc e in
+    mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, ee, block env ~loc sl))
   | ({ Mc_ast.stmt_loc = loc } as s) :: sl ->
     let s = stmt env s in
     if sl = [] then s else mk_expr ~loc (Esequence (s, block env ~loc sl))
@@ -291,10 +278,13 @@ let decl = function
     let body = if not (has_return bl) then body else
       let loc = id.id_loc in
       mk_expr ~loc (Ematch (body, [], return_handler ~loc)) in
-    let local bl (_ty, id) =
-      let loc = id.id_loc in
-      let ref = mk_ref ~loc (mk_var ~loc id) in
-      mk_expr ~loc (Elet (id, false, Expr.RKnone, ref, bl)) in
+    let local bl = function
+      | Tint, id ->
+        let loc = id.id_loc in
+        let ref = mk_ref ~loc (mk_var ~loc id) in
+        mk_expr ~loc (Elet (set_ref id, false, Expr.RKnone, ref, bl))
+      | Tarray, _ -> bl
+      | Tvoid, _ -> assert false in
     let body = List.fold_left local body idl in
     let param (_ty, id) = id.id_loc, Some id, false, None in
     let params = if idl = [] then no_params ~loc else List.map param idl in
