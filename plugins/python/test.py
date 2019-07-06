@@ -1,6 +1,12 @@
 
 from random import randint
 
+def foo():
+  return 0
+
+def bar():
+  return foo()
+
 def f(x):
   #@ ensures result > x
   return x+1

@@ -177,7 +177,8 @@ let rec expr env {Py_ast.expr_loc = loc; Py_ast.expr_desc = d } = match d with
       mk_expr ~loc (Elet (mk_id ~loc "_", false, Expr.RKnone, expr env e, res)) in
     List.fold_left eval (mk_unit ~loc) el
   | Py_ast.Ecall (id, el) ->
-    mk_expr ~loc (Eidapp (Qident id, List.map (expr env) el))
+    let el = if el = [] then [mk_unit ~loc] else List.map (expr env) el in
+    mk_expr ~loc (Eidapp (Qident id, el))
   | Py_ast.Emake (e1, e2) -> (* [e1]*e2 *)
     array_make ~loc (expr env e2) (expr env e1)
   | Py_ast.Elist [] ->
