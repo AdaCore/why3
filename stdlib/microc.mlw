@@ -1,0 +1,83 @@
+
+(** Support library for the Micro-C format. *)
+
+module MicroC
+
+  use int.Int
+  use ref.Ref
+  use array.Array
+
+  function length (a: array 'a) : int =
+    Array.length a
+
+  function ([]) (l: array 'a) (i: int) : 'a =
+    Array.([]) l i
+
+  function ([<-]) (l: array 'a) (i: int) (v: 'a) : array 'a =
+    Array.([<-]) l i v
+
+  let ([]) (l: array 'a) (i: int) : 'a
+    requires { [@expl:index in array bounds] 0 <= i < Array.length l }
+    ensures  { result = l[i] }
+  = Array.([]) l i
+
+  let ([]<-) (l: array 'a) (i: int) (v: 'a) : unit
+    requires { [@expl:index in array bounds] 0 <= i < Array.length l }
+    writes   { l }
+    ensures  { l = Array.([<-]) (old l) i v }
+  = Array.([]<-) l i v
+
+  use map.Occ
+
+  function occurrence (v: 'a) (l: array 'a) : int =
+    Occ.occ v l.Array.elts 0 l.Array.length
+
+  use export int.ComputerDivision
+
+  val (/) (x y: int) : int
+    requires { y <> 0 }
+    ensures  { result = div x y }
+
+  val (/=) (ref x: int) (y: int) : unit
+    requires { y <> 0 }
+    ensures  { x = div (old x) y }
+
+  val (%) (x y: int) : int
+    requires { y <> 0 }
+    ensures  { result = mod x y }
+
+  let postinc (ref r: int) : int
+    ensures { r = old r + 1 }
+    ensures { result = old r }
+  = let v = r in r <- r + 1; v
+
+  let postdec (ref r: int) : int
+    ensures { r = old r - 1 }
+    ensures { result = old r }
+  = let v = r in r <- r - 1; v
+
+  let preinc (ref r: int) : int
+    ensures { result = r = old r + 1 }
+  = r <- r + 1; r
+
+  let predec (ref r: int) : int
+    ensures { result = r = old r - 1 }
+  = r <- r - 1; r
+
+  val any_int () : int
+
+  val alloc_array (n: int) : array int
+    requires { n >= 0 }
+    ensures  { length result = n }
+
+  val rand () : int
+    ensures  { 0 <= result }
+
+  val scanf (ref r: int) : unit
+    writes { r }
+
+  exception Break
+
+  exception Return int
+
+end
