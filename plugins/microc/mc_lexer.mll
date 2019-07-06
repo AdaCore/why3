@@ -30,6 +30,7 @@
        (* annotations *)
        "true", TRUE; "false", FALSE;
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET; "in", LET;
+       "at", AT; "old", OLD;
       ];
    fun s -> try Hashtbl.find h s with Not_found -> IDENT s
 

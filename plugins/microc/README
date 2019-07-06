@@ -1,5 +1,5 @@
 A plugin to verify programs written in a (microscopic) fragment of C.
-Designed for teaching purposes .
+Designed for teaching purposes.
 
 Differences/limitations wrt C:
 - types are limited to integers and arrays of integers
@@ -11,14 +11,14 @@ Differences/limitations wrt C:
   not an issue when used in expressions such as a+rand()%(b-a+1)
 
 Todo:
+- ++ -- += -= *= /= for array elements
 - spec before or after {
 - function/predicate, possibly with a definition
 //@ function int foo(int x, int y);
 //@ function int bar(int x, int y) = x+y;
 //@ predicate buz(int x, int y) = x+y >= 0;
-- at/old
-// at(term, label)
-// old(term)
+
+- at/old/labels (currently parsed but not supported)
 
 - lemma function?
 

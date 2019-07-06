@@ -1,26 +1,19 @@
 
 from random import randint
 
-def foo():
-  return 0
-
-def bar():
-  return foo()
-
 def f(x):
   #@ ensures result > x
   return x+1
 
 def swap(a, i, j):
   #@ requires 0 <= i < len(a) and 0 <= j < len(a)
-  #@ ensures  a[i] == old(a[j])
   t = a[i]
   a[i] = a[j]
   a[j] = t
 
 def t10():
   s = 0
-  for i in range(0, 10):
+  for i in range(0, 11):
     #@ invariant 2 * s == i * (i-1)
     s = s + i
   #@ assert s == 55

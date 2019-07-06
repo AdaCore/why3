@@ -31,6 +31,7 @@
        "from", FROM; "import", IMPORT; "break", BREAK;
        (* annotations *)
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET;
+       "old", OLD; "at", AT;
       ];
    fun s -> try Hashtbl.find h s with Not_found -> IDENT s
 

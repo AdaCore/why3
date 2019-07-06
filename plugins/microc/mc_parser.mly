@@ -72,12 +72,12 @@
 %token LEFTPAR RIGHTPAR LEFTSQ RIGHTSQ COMMA EQUAL SEMICOLON LBRC RBRC
 %token PLUS MINUS TIMES DIV MOD
 %token VOID INT
+%token PLUSPLUS MINUSMINUS PLUSEQUAL MINUSEQUAL TIMESEQUAL DIVEQUAL
+%token AMPERSAND SCANF
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
 %token FUNCTION PREDICATE TRUE FALSE
-%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET IN
-%token PLUSPLUS MINUSMINUS PLUSEQUAL MINUSEQUAL TIMESEQUAL DIVEQUAL
-%token AMPERSAND SCANF
+%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET IN OLD AT
 
 (* precedences *)
 
@@ -266,8 +266,9 @@ simple_stmt_desc:
     { Sassert (k, t) }
 | BREAK SEMICOLON
     { Sbreak }
-| LABEL id=ident SEMICOLON
-    { Slabel id }
+| LABEL _id=ident SEMICOLON
+    (* { Slabel id } *)
+    { raise (Unsupported "labels are not yet supported") }
 | IF LEFTPAR c = expr RIGHTPAR s1 = stmt %prec no_else
     { Sif (c, s1, mk_stmt (floc $startpos $endpos) Sskip) }
 | IF LEFTPAR c = expr RIGHTPAR s1 = stmt ELSE s2=stmt
@@ -331,6 +332,12 @@ term_:
       | d -> d }
 | NOT term
     { Tnot $2 }
+| OLD LEFTPAR _t=term RIGHTPAR
+    (* { Tat (t, mk_id Dexpr.old_label $startpos($1) $endpos($1)) } *)
+    { raise (Unsupported "at/old are not yet supported") }
+| AT LEFTPAR _t=term COMMA _l=ident RIGHTPAR
+    (* { Tat (t, l) } *)
+    { raise (Unsupported "at/old are not yet supported") }
 | o = prefix_op ; t = term %prec prec_prefix_op
     { Tidapp (Qident o, [t]) }
 | l = term ; o = bin_op ; r = term

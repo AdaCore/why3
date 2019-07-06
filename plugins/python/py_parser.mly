@@ -14,8 +14,11 @@
   open Ptree
   open Py_ast
 
+  exception Unsupported of string
+
   let () = Exn_printer.register (fun fmt exn -> match exn with
     | Error -> Format.fprintf fmt "syntax error"
+    | Unsupported s -> Format.fprintf fmt "unsupported feature: %s" s
     | _ -> raise exn)
 
   let floc s e = Loc.extract (s,e)
@@ -68,7 +71,7 @@
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
 %token FUNCTION PREDICATE
-%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET
+%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET OLD AT
 
 (* precedences *)
 
@@ -253,8 +256,9 @@ simple_stmt_desc:
     { Seval e }
 | BREAK
     { Sbreak }
-| LABEL id=ident
-    { Slabel id }
+| LABEL _id=ident
+    (* { Slabel id } *)
+    { raise (Unsupported "labels are not yet supported") }
 ;
 
 assertion_kind:
@@ -280,6 +284,12 @@ term_:
       | d -> d }
 | NOT term
     { Tnot $2 }
+| OLD LEFTPAR _t=term RIGHTPAR
+    (* { Tat (t, mk_id Dexpr.old_label $startpos($1) $endpos($1)) } *)
+    { raise (Unsupported "at/old are not yet supported") }
+| AT LEFTPAR _t=term COMMA _l=ident RIGHTPAR
+    (* { Tat (t, l) } *)
+    { raise (Unsupported "at/old are not yet supported") }
 | o = prefix_op ; t = term %prec prec_prefix_op
     { Tidapp (Qident o, [t]) }
 | l = term ; o = bin_op ; r = term
