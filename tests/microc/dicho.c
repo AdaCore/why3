@@ -4,13 +4,12 @@
 
 // recherche dichotomique dans un tableau trié
 
-int dicho(int a[], int n, int v)
-//@ requires length(a) == n;
-//@ requires forall i1, i2. 0 <= i1 <= i2 < n -> a[i1] <= a[i2];
-//@ ensures  -1 <= result < n;
-//@ ensures  result == -1 -> forall i. 0 <= i < n -> a[i] != v;
-//@ ensures  result >= 0  -> a[result] == v;
-{
+int dicho(int a[], int n, int v) {
+  //@ requires length(a) == n;
+  //@ requires forall i1, i2. 0 <= i1 <= i2 < n -> a[i1] <= a[i2];
+  //@ ensures  -1 <= result < n;
+  //@ ensures  result == -1 -> forall i. 0 <= i < n -> a[i] != v;
+  //@ ensures  result >= 0  -> a[result] == v;
   int l = 0;
   int u = n-1;
   int r = -1;

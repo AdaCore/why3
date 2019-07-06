@@ -37,10 +37,9 @@ int main() {
   }
   printf("\n");
   sort(a, n);
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++)
     //@ invariant 0 <= i <= n;    //@ variant n - i;
     printf("%d, ", a[i]);
-  }
   printf("\n");
   return 0;
 }

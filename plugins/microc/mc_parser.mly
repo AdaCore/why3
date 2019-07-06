@@ -116,15 +116,30 @@ include_:
   { Dinclude (mk_id f $startpos $endpos) }
 
 func:
-| FUNCTION id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR
-  { Dlogic (true, id, l) }
-| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, ident) RIGHTPAR
-  { Dlogic (false, id, l) }
+| FUNCTION INT id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  SEMICOLON
+  { Dlogic (Some Tint, id, l, None) }
+| FUNCTION INT id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  EQUAL t=term SEMICOLON
+  { Dlogic (Some Tint, id, l, Some t) }
+| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  SEMICOLON
+ { Dlogic (None, id, l, None) }
+| PREDICATE id=ident LEFTPAR l=separated_list(COMMA, param) RIGHTPAR
+  EQUAL t=term SEMICOLON
+ { Dlogic (None, id, l, Some t) }
 
 def:
 | ty=return_type f=ident LEFTPAR x=separated_list(COMMA, param) RIGHTPAR
-  s=spec bl=block
-    { Dfun (ty, f, x, s, bl) }
+  sbl=block_with_spec
+    { let s, bl = sbl in Dfun (ty, f, x, s, bl) }
+;
+
+block_with_spec:
+| s=non_empty_spec  bl=block
+   { s, bl }
+| LBRC s=spec l=list(stmt) RBRC
+   { s, mk_stmt (floc $startpos $endpos) (Sblock l) }
 ;
 
 return_type:
@@ -140,8 +155,14 @@ param:
 ;
 
 spec:
-| (* epsilon *)     { empty_spec }
-| single_spec spec  { spec_union $1 $2 }
+| (* epsilon *)  { empty_spec }
+| non_empty_spec { $1 }
+;
+
+non_empty_spec:
+| single_spec                { $1 }
+| single_spec non_empty_spec { spec_union $1 $2 }
+;
 
 single_spec:
 | REQUIRES t=term SEMICOLON
@@ -226,14 +247,21 @@ block_desc:
 ;
 
 loop_body:
-| s = simple_stmt
-  { ([], []), s }
+| a=loop_annotation  s=simple_stmt
+  { a, s }
 | LBRC a=loop_annotation l=list(stmt) RBRC
+  { a, mk_stmt (floc $startpos $endpos) (Sblock l) }
+| a=non_empty_loop_annotation LBRC l=list(stmt) RBRC
   { a, mk_stmt (floc $startpos $endpos) (Sblock l) }
 
 loop_annotation:
 | (* epsilon *)
     { [], [] }
+| non_empty_loop_annotation
+   { $1 }
+;
+
+non_empty_loop_annotation:
 | invariant loop_annotation
     { let (i, v) = $2 in ($1::i, v) }
 | variant loop_annotation

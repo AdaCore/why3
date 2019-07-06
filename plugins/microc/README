@@ -1,6 +1,8 @@
 A plugin to verify programs written in a (microscopic) fragment of C.
 Designed for teaching purposes.
 
+See tests/microc/*.c for examples.
+
 Differences/limitations wrt C:
 - types are limited to integers and arrays of integers
 - integers of type 'int' only, and assumed to be of arbitrary precision
@@ -12,13 +14,6 @@ Differences/limitations wrt C:
 
 Todo:
 - ++ -- += -= *= /= for array elements
-- spec before or after {
-- function/predicate, possibly with a definition
-//@ function int foo(int x, int y);
-//@ function int bar(int x, int y) = x+y;
-//@ predicate buz(int x, int y) = x+y >= 0;
-
+- axioms
 - at/old/labels (currently parsed but not supported)
-
 - lemma function?
-

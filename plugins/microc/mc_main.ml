@@ -15,8 +15,8 @@ open Mc_ast
 open Ptree
 open Wstdlib
 
-let debug = Debug.register_flag "python"
-  ~desc:"mini-python plugin debug flag"
+let debug = Debug.register_flag "micro-C"
+  ~desc:"micro-C plugin debug flag"
 
 let mk_id ~loc name =
   { id_str = name; id_ats = []; id_loc = loc }
@@ -266,8 +266,16 @@ let fresh_type_var =
   fun loc -> incr r;
     PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
 
-let logic_param id =
-  id.id_loc, Some id, false, fresh_type_var id.id_loc
+let type_int loc = PTtyapp (Qident (mk_id ~loc "int"), [])
+let type_array loc ty = PTtyapp (Qident (mk_id ~loc "array"), [ty])
+
+let type_ loc = function
+  | Tvoid -> assert false
+  | Tint -> type_int loc
+  | Tarray -> type_array loc (type_int loc)
+
+let logic_param (ty, id) =
+  id.id_loc, Some id, false, type_ id.id_loc ty
 
 let decl = function
   | Mc_ast.Dinclude _ ->
@@ -296,12 +304,12 @@ let decl = function
       let e = Efun (params, None, Ity.MaskVisible, sp, body) in
       Dlet (id, false, Expr.RKnone, mk_expr ~loc e) in
     Typing.add_decl loc d
-  | Mc_ast.Dlogic (func, id, idl) ->
+  | Mc_ast.Dlogic (ty, id, idl, def) ->
     let d = { ld_loc = id.id_loc;
               ld_ident = id;
               ld_params = List.map logic_param idl;
-              ld_type = if func then Some (fresh_type_var id.id_loc) else None;
-              ld_def = None } in
+              ld_type = Opt.map (type_ id.id_loc) ty;
+              ld_def = def } in
     Typing.add_decl id.id_loc (Dlogic [d])
 
 let translate dl =

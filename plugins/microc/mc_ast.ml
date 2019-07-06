@@ -72,6 +72,6 @@ type param =
 type decl =
   | Dinclude of ident
   | Dfun     of ty * ident * param list * Ptree.spec * stmt
-  | Dlogic   of bool (*is_func*) * ident * ident list
+  | Dlogic   of ty option * ident * param list * Ptree.term option
 
 type file = decl list

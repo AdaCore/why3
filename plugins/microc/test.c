@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//@ function int foo(int x) = x+1;
+//@ predicate bar(int x, int y) = x>y;
+
 int foo(int a[], int x)
 //@ requires length(a) >= 1;
 //@ requires a[0] == 0;
-//@ ensures  old(a[0]) == 0 ;
 //@ ensures  result == 0;
 {
   x = 2;
@@ -19,7 +21,8 @@ int main()
   int a[10];
   a[0] = 0;
   int r = foo(a, 10);
-  //@ assert old(r) == 0;
+  //@ assert r == 0;
+  //@ assert bar(1, r);
   int x = 10 + rand() % 10;
   //@ assert 10 <= x <= 19;
   s++;
