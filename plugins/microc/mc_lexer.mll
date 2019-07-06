@@ -26,7 +26,7 @@
       ["if", IF; "else", ELSE;
        "return", RETURN; "while", WHILE;
        "for", FOR; "break", BREAK;
-       "int", INT;
+       "int", INT; "scanf", SCANF;
        (* annotations *)
        "true", TRUE; "false", FALSE;
        "forall", FORALL; "exists", EXISTS; "then", THEN; "let", LET; "in", LET;
@@ -98,6 +98,7 @@ rule next_token = parse
   | "!"     { NOT }
   | "++"    { PLUSPLUS }
   | "--"    { MINUSMINUS }
+  | '&'     { AMPERSAND }
   (* logic symbols *)
   | "->"    { ARROW }
   | "<-"    { LARROW }

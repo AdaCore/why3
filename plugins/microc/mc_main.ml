@@ -115,7 +115,7 @@ let has_break = has_stmt (fun s -> s.stmt_desc = Sbreak)
 let has_return = has_stmt (function { stmt_desc = Sreturn _ } -> true | _ -> false)
 
 let rec expr_has_call id e = match e.Mc_ast.expr_desc with
-  | Eint _ | Estring _ | Eaddr _ | Mc_ast.Eident _ -> false
+  | Eunit | Eint _ | Estring _ | Eaddr _ | Mc_ast.Eident _ -> false
   | Eget (e1, e2) | Ebinop (_, e1, e2) ->
     expr_has_call id e1 || expr_has_call id e2
   | Eunop (_, e1) -> expr_has_call id e1
@@ -133,6 +133,8 @@ and block_has_call id = has_stmtl (stmt_has_call id)
 
 let rec expr env ({Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } as e) =
   match d with
+  | Mc_ast.Eunit ->
+    mk_unit ~loc
   | Mc_ast.Eint s ->
     constant_s ~loc s
   | Mc_ast.Estring _s ->
@@ -161,6 +163,15 @@ let rec expr env ({Mc_ast.expr_loc = loc; Mc_ast.expr_desc = d } as e) =
      mk_expr ~loc (Eif (bool env e, constant ~loc 1, constant ~loc 0))
   | Mc_ast.Eunop (Mc_ast.Uneg, e) ->
     mk_expr ~loc (Eidapp (prefix ~loc "-", [expr env e]))
+  | Mc_ast.Ecall ({id_str = "printf"}, el) ->
+     let el = match el with
+       | {Mc_ast.expr_desc=Estring _} :: el -> el
+       | _ :: _ -> Loc.errorm ~loc "first argument of printf must be a string"
+       | [] -> Loc.errorm ~loc "two few arguments to function printf" in
+    let eval res e =
+      mk_expr ~loc
+        (Elet (mk_id ~loc "_", false, Expr.RKnone, expr env e, res)) in
+    List.fold_left eval (mk_unit ~loc) el
   | Mc_ast.Ecall (id, el) ->
     mk_expr ~loc (Eidapp (Qident id, List.map (expr env) el))
   | Mc_ast.Eget (e1, e2) ->

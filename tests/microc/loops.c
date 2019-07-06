@@ -1,4 +1,6 @@
 
+#include <stdio.h>
+
 int loop1(int b)
 //@ requires b > 0;
 {

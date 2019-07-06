@@ -3,7 +3,23 @@ A plugin to verify programs written in a (microscopic) fragment of C.
 Differences/limitations wrt C:
 - types are limited to integers and arrays of integers
 - integers of type 'int' only, and assumed to be of arbitrary precision
+- scanf is limited to scanf("%d", &x)
+- a call to printf is ignored (but arguments are evaluated first)
 
 Todo:
-- arrays
+- spec before or after {
+- rand() returns a nonnegative integer
+- arrays, stack-allocated
+    int a[n]; --> array_create n
+- functions return either void or int, not int*
 - for loop
+- function/predicate, possibly with a definition
+//@ function int foo(int x, int y);
+//@ function int bar(int x, int y) = x+y;
+//@ predicate buz(int x, int y) = x+y >= 0;
+- at/old
+// at(term, label)
+// old(term)
+
+- lemma function?
+

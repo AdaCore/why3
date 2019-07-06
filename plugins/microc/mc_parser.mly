@@ -14,8 +14,11 @@
   open Ptree
   open Mc_ast
 
+  exception Unsupported of string
+
   let () = Exn_printer.register (fun fmt exn -> match exn with
     | Error -> Format.fprintf fmt "syntax error"
+    | Unsupported s -> Format.fprintf fmt "unsupported feature: %s" s
     | _ -> raise exn)
 
   let floc s e = Loc.extract (s,e)
@@ -74,6 +77,7 @@
 %token FUNCTION PREDICATE TRUE FALSE
 %token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET IN
 %token PLUSPLUS MINUSMINUS PLUSEQUAL MINUSEQUAL TIMESEQUAL DIVEQUAL
+%token AMPERSAND SCANF
 
 (* precedences *)
 
@@ -171,6 +175,10 @@ expr_desc:
     { Ebinop (o, e1, e2) }
 | f = ident LEFTPAR e = separated_list(COMMA, expr) RIGHTPAR
     { Ecall (f, e) }
+| SCANF LEFTPAR s=STRING COMMA AMPERSAND id=ident RIGHTPAR
+    { if s <> "%d" then raise (Unsupported "scanf is limited to \"%d\"");
+      let id = mk_expr (floc $startpos $endpos) (Eaddr id) in
+      Ecall (mk_id "scanf" $startpos $endpos, [id]) }
 | LEFTPAR e = expr RIGHTPAR
    { e.expr_desc }
 | id=ident op=incdec
@@ -243,6 +251,11 @@ simple_stmt_desc:
     { Sreturn e }
 | ty=type_ id=ident EQUAL e = expr SEMICOLON
     { Svar (ty, id, e) }
+| ty=type_ id=ident SEMICOLON
+    { let any_int = mk_id "any_int" $startpos $endpos in
+      let loc = floc $startpos $endpos in
+      let e = mk_expr loc (Ecall (any_int, [mk_expr loc Eunit])) in
+      Svar (ty, id, e) }
 | id = ident EQUAL e = expr SEMICOLON
     { Sassign (id, e) }
 | id = ident op=assignop e = expr SEMICOLON
@@ -264,6 +277,7 @@ simple_stmt_desc:
     { Sif (c, s1, s2) }
 | WHILE LEFTPAR e=expr RIGHTPAR b=loop_body
     { let iv, l = b in Swhile (e, iv, l) }
+(* TODO: below, do not accept simple_stmt for e1 and e2, only expr *)
 | FOR LEFTPAR s1=simple_stmt SEMICOLON e=expr SEMICOLON s2=simple_stmt
   RIGHTPAR b=loop_body
     { assert false (*TODO*) }

@@ -61,10 +61,17 @@ module MicroC
     ensures { result = r = old r - 1 }
   = r <- r - 1; r
 
+  val any_int () : int
+
+  val alloc_array (n: int) : array int
+    requires { n >= 0 }
+    ensures  { length result = n }
+
   val rand () : int
     ensures  { 0 <= result }
 
-  val input () : int
+  val scanf (ref r: int) : unit
+    writes { r }
 
   exception Break
 

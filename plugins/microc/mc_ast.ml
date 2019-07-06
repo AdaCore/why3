@@ -34,6 +34,7 @@ type expr = {
 }
 
 and expr_desc =
+  | Eunit
   | Eint of string
   | Estring of string
   | Eaddr of ident
