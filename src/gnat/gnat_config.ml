@@ -675,8 +675,10 @@ module Steps_conversion : sig
 end = struct
 
   let convert_data =
-    ["cvc4", { add = 15000; mult = 35 };
-     "z3",   { add = 450000; mult = 800 }]
+    ["cvc4",    { add = 15000;  mult = 35  };
+     "z3",      { add = 450000; mult = 800 };
+     "altergo", { add = 0;      mult = 1   };
+    ]
 
   let starts_with a b =
     if String.length a > String.length b then false
@@ -695,7 +697,8 @@ end = struct
   let find_convert prover =
     let rec aux l =
       match l with
-      | [] -> { add = 0 ; mult = 1 }
+      | [] -> (* Default *)
+         { add = 0 ; mult = 1 }
       | (name, conv) :: rest ->
           if starts_with name prover then conv
           else aux rest

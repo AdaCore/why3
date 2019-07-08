@@ -912,7 +912,16 @@ let run_goal ?save_to ?limit ~callback c prover g =
     let limit =
       match limit with
 (* TODO we should pass the type prover not a string here ? *)
-      | None -> Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:warn
+      | None ->
+         let limit =
+           Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:warn in
+         (* In the case where the command_steps do not exist in the .conf file,
+            calling prover with steps <> 0 would fail. Many provers don't
+            support steps (external ones). *)
+         if config_prover.Whyconf.command_steps = None then
+           Call_provers.{ limit with limit_steps = 0 }
+         else
+           limit
       | Some x -> x in
     C.schedule_proof_attempt ?save_to ~limit ~callback ~notification c g prover
 
