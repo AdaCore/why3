@@ -26,6 +26,10 @@ let autoprovers = ref false
 let autoplugins = ref false
 let resetloadpath = ref false
 
+(* When no arguments are given, activate the fallback to auto mode on error.
+   true <-> fallback *)
+let auto_fb = Array.length Sys.argv = 1
+
 let opt_list_prover_families = ref false
 
 let save = ref true
@@ -120,6 +124,13 @@ let plugins_auto_detection config =
   in
   set_main config main
 
+(*  Activate the fallback to auto mode on error *)
+let auto_fallback () =
+  if auto_fb then begin
+      autoprovers := true;
+      autoplugins := true;
+    end
+
 let main () =
   (* Parse the command line *)
   Arg.parse option_list anon_file usage_msg;
@@ -147,8 +158,7 @@ let main () =
       | Rc.CannotOpen (f, s)
       | Whyconf.ConfigFailure (f, s) ->
          eprintf "warning: cannot read config file %s:@\n  %s@." f s;
-         autoprovers := true;
-         autoplugins := true;
+         auto_fallback ();
          default_config f
   in
   let main = get_main config in
@@ -162,10 +172,8 @@ let main () =
     try Queue.fold add_prover_binary config prover_bins with Exit -> exit 1 in
 
   let conf_file = get_conf_file config in
-  if not (Sys.file_exists conf_file) then begin
-    autoprovers := true;
-    autoplugins := true;
-    end;
+  if not (Sys.file_exists conf_file) then
+    auto_fallback ();
   let config =
     if !resetloadpath then
       set_main config (set_loadpath (get_main config) default_loadpath)
