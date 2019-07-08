@@ -76,7 +76,7 @@ else
 fi
 
 # detection of provers
-bin/why3config --detect-provers &> $OUT
+bin/why3config --detect &> $OUT
 if test "$?" != "0" ; then
     echo "Prover detection failed" >> $REPORT
     cat $OUT >> $REPORT
