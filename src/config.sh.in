@@ -11,11 +11,9 @@ libobjdir="(Sys.getcwd ())"
 
 if [ "@enable_relocation@" = "yes" ]; then
     libdir='Filename.concat (Filename.concat (Filename.dirname
-        (Filename.dirname (Filename.dirname
-        (Filename.dirname Sys.executable_name)))) "lib") "why3"'
+        (Filename.dirname Sys.executable_name)) "lib") "why3"'
     datadir='Filename.concat (Filename.concat (Filename.dirname
-        (Filename.dirname (Filename.dirname
-        (Filename.dirname Sys.executable_name)))) "share") "why3"'
+        (Filename.dirname Sys.executable_name)) "share") "why3"'
     localdir="None"
 elif [ "@enable_local@" = "yes" ]; then
     bindir="\"@LOCALDIR@/bin\""

@@ -12,10 +12,14 @@ type limit_mode =
   | Limit_Check of Gnat_expl.check
   | Limit_Line of Gnat_loc.loc
 
+(* executable is in <prefix>/libexec/spark/bin
+   why3-prefix is <prefix>/libexec/spark
+   spark-prefix is <prefix> *)
+let why3_prefix =
+  Filename.dirname (Filename.dirname Sys.executable_name)
 let spark_prefix =
-  (Filename.dirname
-          (Filename.dirname (Filename.dirname
-          (Filename.dirname Sys.executable_name))))
+  Filename.dirname (Filename.dirname why3_prefix)
+
 
 let rec file_concat l =
   match l with
@@ -27,8 +31,8 @@ let rec file_concat l =
 let builtin_provers = ["altergo"; "cvc4"; "z3"]
 
 let spark_loadpath =
-  [ file_concat [spark_prefix; "share"; "why3"; "theories"];
-    file_concat [spark_prefix; "share"; "why3"; "modules"];
+  [ file_concat [why3_prefix; "share"; "why3"; "theories"];
+    file_concat [why3_prefix; "share"; "why3"; "modules"];
     file_concat [spark_prefix; "share"; "spark"; "theories"]
   ]
 
@@ -362,7 +366,7 @@ let find_driver_file ~conf_file fn =
   with Exit ->
       let driver_file = Filename.basename fn in
       let full_path =
-        file_concat [spark_prefix;"share";"why3";"drivers";driver_file] in
+        file_concat [why3_prefix;"share";"why3";"drivers";driver_file] in
       if Sys.file_exists full_path then full_path
       else
         Gnat_util.abort_with_message ~internal:false
