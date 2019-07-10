@@ -33,11 +33,8 @@ let get_global ident =
 let int_of_js_string s = int_of_string (Js.to_string s)
 
 let blob_url_of_string s =
-  let s = JSU.inject (Js.string (Sys_js.read_file ~name:s)) in
-  let _Blob  = get_global "Blob" in
-  let blob =
-    new%js _Blob (Js.array [| s |])
-  in
+  let s = Sys_js.read_file ~name:s in
+  let blob = File.blob_from_string s in
   let _URL = JSU.(get (get_global "window") (Js.string "URL")) in
   let url : Js.js_string Js.t =
     JSU.(meth_call _URL "createObjectURL" [| JSU.inject blob |])
@@ -655,12 +652,10 @@ module ToolBar =
 
 
 
-    let mk_save =
-      let _Blob  = get_global "Blob" in
-      fun () ->
+    let mk_save () =
       let blob =
-        new%js _Blob (Js.array [| (Editor.get_value ()) |],
-                     JSU.(obj [| "type", inject (Js.string "application/octet-stream") |]))
+        let code = Js.to_string (Editor.get_value ()) in
+        File.blob_from_string ~contentType:"text/plain" ~endings:`Native code
       in
       let name =
 	if !Editor.name ##. length == 0 then Js.string "test.mlw" else !Editor.name
