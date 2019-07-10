@@ -41,14 +41,14 @@ val manual_prover : Whyconf.prover option
 
 (* Configuration settings given or determined by the command line *)
 
-val steps : prover : string -> int
-(* value of the --steps option adjusted for given prover, if no steps are
- * given, return None *)
+val steps: config_prover:Whyconf.config_prover -> int
+(* value of the --steps option adjusted for given prover config, if no steps are
+ * given, return 0 *)
 
 val back_convert_steps : prover : string -> int -> int
 (* given the raw steps a prover has taken, reconvert them to SPARK steps *)
 
-val limit : prover : string -> warning:bool -> Call_provers.resource_limit
+val limit: prover:Whyconf.prover -> warning:bool -> Call_provers.resource_limit
 
 type proof_mode =
     Progressive

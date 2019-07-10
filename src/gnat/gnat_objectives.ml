@@ -364,7 +364,7 @@ let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
        options *)
     (not pa.Session_itp.proof_obsolete &&
     pa.Session_itp.limit =
-      Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:false)
+      Gnat_config.limit ~prover ~warning:false)
   with Not_found -> false
 
 let all_provers_tried s g =
@@ -911,17 +911,7 @@ let run_goal ?save_to ?limit ~callback c prover g =
     let warn = Gnat_expl.is_warning_reason (Gnat_expl.get_reason check) in
     let limit =
       match limit with
-(* TODO we should pass the type prover not a string here ? *)
-      | None ->
-         let limit =
-           Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:warn in
-         (* In the case where the command_steps do not exist in the .conf file,
-            calling prover with steps <> 0 would fail. Many provers don't
-            support steps (external ones). *)
-         if config_prover.Whyconf.command_steps = None then
-           Call_provers.{ limit with limit_steps = 0 }
-         else
-           limit
+      | None -> Gnat_config.limit ~prover ~warning:warn
       | Some x -> x in
     C.schedule_proof_attempt ?save_to ~limit ~callback ~notification c g prover
 
@@ -962,7 +952,7 @@ let clean_automatic_proofs c =
           if not pan.Session_itp.proof_obsolete &&
             pan.Session_itp.prover = prover &&
             pan.Session_itp.limit =
-              Gnat_config.limit ~prover:prover.Whyconf.prover_name ~warning:false
+              Gnat_config.limit ~prover ~warning:false
           then
             Controller_itp.remove_subtree c (Session_itp.APa panid)
               ~removed:(fun _ -> ()) ~notification:(fun _ -> ())

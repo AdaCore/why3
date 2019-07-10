@@ -718,10 +718,14 @@ end = struct
 end
 
 
-let steps ~prover =
-  match manual_prover, !opt_steps with
-  | Some _, _ | _, None -> Call_provers.empty_limit.Call_provers.limit_steps
-  | _, Some c -> Steps_conversion.convert ~prover c
+let steps ~config_prover =
+  if config_prover.Whyconf.command_steps = None then
+    Call_provers.empty_limit.Call_provers.limit_steps
+  else
+    let prover = config_prover.Whyconf.prover.Whyconf.prover_name in
+    match manual_prover, !opt_steps with
+    | Some _, _ | _, None -> Call_provers.empty_limit.Call_provers.limit_steps
+    | _, Some c -> Steps_conversion.convert ~prover c
 
 let limit_mem () =
   match manual_prover, !opt_memlimit with
@@ -731,9 +735,11 @@ let limit_mem () =
 let back_convert_steps = Steps_conversion.back_convert
 
 let limit ~prover ~warning =
+  let config_prover = Whyconf.get_prover_config config prover in
+  let prover_name = prover.Whyconf.prover_name in
   { Call_provers.limit_mem = limit_mem ();
-    Call_provers.limit_time = limit_time ~prover ~warning;
-    limit_steps = steps ~prover}
+    Call_provers.limit_time = limit_time ~prover:prover_name ~warning;
+    limit_steps = steps ~config_prover}
 
 let proof_mode = !opt_proof_mode
 let lazy_ = !opt_lazy
