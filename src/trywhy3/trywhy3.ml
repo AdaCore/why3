@@ -114,7 +114,7 @@ let appendChild o c =
 let addMouseEventListener prevent o e f =
   let cb = Js.wrap_callback
 	     (fun (e : Dom_html.mouseEvent Js.t) ->
-	      if prevent then ignore (JSU.(meth_call e "preventDefault" [| |]));
+	      if prevent then Dom.preventDefault e;
 	      f e;
 	      Js._false)
   in
@@ -664,7 +664,7 @@ module ToolBar =
       let url = Dom_html.window ##. _URL ## createObjectURL blob in
       real_save ##. href := url;
       JSU.(set real_save (Js.string "download") name);
-      ignore JSU.(meth_call real_save "click" [| |])
+      real_save ## click
     (* does not work with firefox *)
     (*ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |]) *)
 
@@ -762,7 +762,7 @@ module Dialogs =
     let show diag () =
       dialog_panel ##. style ##. display := Js.string "flex";
       diag ##. style ##. display := Js.string "inline-block";
-      ignore JSU.(meth_call diag "focus" [| |])
+      diag ## focus
 
     let close () =
       List.iter (fun d -> d ##. style ##. display := Js.string "none") all_dialogs;
@@ -793,7 +793,7 @@ module KeyBinding =
            match t.(pack (ev ##. ctrlKey) (ev ##. shiftKey) (ev ##. metaKey) (ev ##. altKey)) with
              None -> Js._true
            | Some f ->
-              ignore JSU.(meth_call ev "preventDefault" [| |]);
+              Dom.preventDefault ev;
               f ();
               Js._false)
 
