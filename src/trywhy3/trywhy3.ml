@@ -394,9 +394,8 @@ module ExampleList =
       select_example ##. selectedIndex := 0
 
     let () =
-      let sessionStorage : Dom_html.storage Js.t =
-	get_global "sessionStorage"
-      in
+      let sessionStorage =
+        check_def "sessionStorage" (Dom_html.window ##. sessionStorage) in
       let filename url =
 	let arr = url ## split (Js.string "/") in
 	let arr = Js.to_array (Js.str_array arr) in
@@ -849,8 +848,8 @@ module KeyBinding =
 module Session =
   struct
 
-    let localStorage : Dom_html.storage Js.t =
-      get_global "localStorage"
+    let localStorage =
+      check_def "localStorage" (Dom_html.window ##. localStorage)
 
     let save_num_threads i =
       localStorage ## setItem (Js.string "why3-num-threads") (Js.string (string_of_int i))
