@@ -35,10 +35,7 @@ let int_of_js_string s = int_of_string (Js.to_string s)
 let blob_url_of_string s =
   let s = Sys_js.read_file ~name:s in
   let blob = File.blob_from_string s in
-  let _URL = JSU.(get (get_global "window") (Js.string "URL")) in
-  let url : Js.js_string Js.t =
-    JSU.(meth_call _URL "createObjectURL" [| JSU.inject blob |])
-  in
+  let url = Dom_html.window ##. _URL ## createObjectURL blob in
   Js.to_string url
 
 
@@ -662,11 +659,9 @@ module ToolBar =
       in
       blob, name
 
-    let save_default  =
-      let _URL = JSU.(get Dom_html.window (Js.string "URL")) in
-      fun () ->
+    let save_default () =
       let blob, name = mk_save () in
-      let url = JSU.(meth_call _URL "createObjectURL" [| inject blob |]) in
+      let url = Dom_html.window ##. _URL ## createObjectURL blob in
       real_save ##. href := url;
       JSU.(set real_save (Js.string "download") name);
       ignore JSU.(meth_call real_save "click" [| |])
