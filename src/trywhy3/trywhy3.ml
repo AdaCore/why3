@@ -1126,23 +1126,20 @@ let () =
 
 
 let () =
-  Dom_html.window ##. onunload := Dom.handler (fun _ -> Js._false);
   (* restore the session *)
   let name, buffer = Session.load_buffer () in
   Editor.name := name;
   Editor.set_value buffer;
   Panel.set_wide (Session.load_view_mode () = (Js.string "wide"));
   ExampleList.unselect();
-  Dom_html.window ##. onbeforeunload :=
-    Dom.handler (Obj.magic (fun _ ->
+  Dom_html.window ##. onunload :=
+    Dom.handler (fun _ ->
                    Session.save_buffer !Editor.name (Editor.get_value ());
                    Session.save_num_threads (Array.length !Controller.alt_ergo_workers);
                    Session.save_num_steps !Controller.alt_ergo_steps;
                    Session.save_view_mode (if Panel.is_wide () then Js.string "wide"
                                            else Js.string "column");
-
-                   (Js.string "Do you wish to quit TryWhy3 (your current session will be saved to your browser local storage) ?"))
-                )
+                   Js._true)
 
 (*
 Local Variables:
