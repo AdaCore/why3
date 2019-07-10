@@ -6,15 +6,16 @@ open Why3
 
    The output format is:
 
-     file = { "error"    : string,
-              "internal" : bool,
-              "warnings" : list string,
-              "results"  : list result }
+     file = { "error"        : string,
+              "internal"     : bool,
+              "session_file" : string,
+              "warnings"     : list string,
+              "results"      : list result }
 
-   The "error", "internal" and "warnings" fields are optional. If the "error"
-   field is present, the "results" and "warnings" fields will be empty; if the
-   "error" field is not present, the "results" field contains the list of proof
-   results.
+   The "error", "internal", "session_file" and "warnings" fields are optional.
+   If the "error" field is present, the "results" and "warnings" fields will be
+   empty; if the "error" field is not present, the "results" field contains the
+   list of proof results.
 
    If the "error" field is present, some error happened and the value of that
    field contains the reason for it. The "internal" field is present and
@@ -26,6 +27,9 @@ open Why3
 
    The "warnings" field is optional. If present, it contains a list of warnings
    that occured during execution of gnatwhy3.
+
+   The "session_file" field is always present if "error" is not present. It
+   contains the session file information for this run of gnatwhy3.
 
 
      result = { "id"             : int,

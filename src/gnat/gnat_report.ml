@@ -187,10 +187,13 @@ let print_timing_entry fmt t =
     print_json_field "timings" (map_bindings get_name standard_float) fmt l
   else ()
 
+let print_session_file = print_json_field "session_file" string
+
 let print_messages () =
   let msg_set = Gnat_expl.HCheck.fold (fun k v acc -> (k,v) :: acc) msg_set []
   in
-  Format.printf "{%a%a%a}@."
+  Format.printf "{%a, %a%a%a}@."
+  print_session_file Gnat_config.session_file
   (print_json_field "results" (list print_json_msg)) (sort_messages msg_set)
   print_warning_list !warning_list
   print_timing_entry (Util.get_timings ())
