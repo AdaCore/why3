@@ -37,18 +37,17 @@ module FactLoop
 
   use int.Int
   use int.Fact
-  use ref.Ref
 
   let fact_loop (n: int) : int
     requires { true }
     ensures  { result = fact n }
-  = let m = ref 0 in
-    let r = ref 1 in
-    while !m < n do
+  = let ref m = 0 in
+    let ref r = 1 in
+    while m < n do
       invariant { true }
-      m := !m + 1;
-      r := !r * !m
+      m <- m + 1;
+      r <- r * m
     done;
-    !r
+    r
 
 end
