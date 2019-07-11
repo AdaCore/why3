@@ -108,9 +108,6 @@ let getElement cast id =
     log ("Element " ^ id ^ " does not exist or has invalid type");
     assert false
 
-let appendChild o c =
-  ignore (o ## appendChild ( (c :> Dom.node Js.t)))
-
 let addMouseEventListener prevent o e f =
   let cb = Js.wrap_callback
 	     (fun (e : Dom_html.mouseEvent Js.t) ->
@@ -429,7 +426,7 @@ module ExampleList =
       let option = Dom_html.createOption Dom_html.document in
       option ##. value := url;
       option ##. innerHTML := text;
-      appendChild select_example option
+      Dom.appendChild select_example option
 
     let enable () =
       select_example ##. disabled := Js._false
@@ -481,12 +478,12 @@ module TaskList =
           Not_found ->
           let ul = Dom_html.createUl doc in
           ul ##. id := Js.string parent_id;
-          appendChild task_list ul;
+          Dom.appendChild task_list ul;
           ul
       in
       let li = Dom_html.createLi doc in
       li ##. id := Js.string id;
-      appendChild ul li;
+      Dom.appendChild ul li;
       li ##. innerHTML := mk_li_content id expl
 
 
@@ -565,11 +562,11 @@ module TaskList =
       | Result sl ->
          clear ();
          let ul = Dom_html.createUl doc in
-         appendChild task_list ul;
+         Dom.appendChild task_list ul;
          List.iter (fun (s : string) ->
                     let li = Dom_html.createLi doc in
                     li ##. innerHTML := (Js.string s);
-                    appendChild ul li;) sl
+                    Dom.appendChild ul li;) sl
 
       | Theory (th_id, th_name) ->
 	 attach_to_parent th_id "why3-theory-list" th_name []
