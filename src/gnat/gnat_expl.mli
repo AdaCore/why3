@@ -72,6 +72,10 @@ type check =
    A check can be proved already (e.g. by CodePeer).
    *)
 
+type limit_mode =
+  | Limit_Check of check
+  | Limit_Line of Gnat_loc.loc
+
 type subp_entity = Gnat_loc.loc
 
 (* the type of labels that are used by gnatprove and recognized by gnatwhy3 *)
@@ -138,3 +142,6 @@ val get_extra_info : Task.task -> int option
 
 val search_labels: Why3.Term.term -> check option
 (* Search for check labels inside a term *)
+
+val parse_line_spec : string -> limit_mode
+val parse_region_spec : string -> Gnat_loc.region

@@ -117,6 +117,14 @@ type check =
     already_proved : bool
   }
 
+type limit_mode =
+  | Limit_Check of check
+  | Limit_Line of Gnat_loc.loc
+(* This type is used only to differenciate the two different uses of
+   --limit-line: - --limit-line=file:line -> Limit_Line
+                 - --limit-line=file:line:checkkind -> Limit_Check *)
+
+
 let check_compare a b =
   let c = Pervasives.compare a.id b.id in
   if c <> 0 then c
@@ -464,6 +472,60 @@ let search_labels =
     | _ -> assert false
     end
   with Exit -> None
+
+let parse_line_spec s =
+   try
+     let args = Str.split (Str.regexp_string ":") s in
+     match args with
+     | [] ->
+        Gnat_util.abort_with_message ~internal:true
+        ("limit-line: incorrect line specification - missing ':'")
+     | [fn;line] ->
+         let line = int_of_string line in
+         Limit_Line (Gnat_loc.mk_loc_line fn line)
+     | [fn;line;col;check] ->
+         let line = int_of_string line in
+         let col = int_of_string col in
+         let check = reason_from_string check in
+         let loc = Gnat_loc.mk_loc fn line col None in
+         Limit_Check (mk_check check 0 loc false)
+     | _ ->
+      Gnat_util.abort_with_message ~internal:true
+      (
+        "limit-line: incorrect line specification -\
+         invalid parameter number, must be \
+         2 or 4")
+  with
+   | e when Debug.test_flag Debug.stack_trace -> raise e
+   | Failure "int_of_string" ->
+      Gnat_util.abort_with_message ~internal:true
+      ("limit-line: incorrect line specification -\
+        line or column field isn't a number")
+
+let parse_region_spec s =
+   try
+     let args = Str.split (Str.regexp_string ":") s in
+     match args with
+     | [] ->
+        Gnat_util.abort_with_message ~internal:true
+        ("limit-region: incorrect region specification - missing ':'")
+     | [fn;l_start;l_end] ->
+         let l_start = int_of_string l_start in
+         let l_end = int_of_string l_end in
+         Gnat_loc.mk_region fn l_start l_end
+     | _ ->
+      Gnat_util.abort_with_message ~internal:true
+      (
+        "limit-region: incorrect line specification -\
+         invalid parameter number, must be \
+         3")
+  with
+   | e when Debug.test_flag Debug.stack_trace -> raise e
+   | Failure "int_of_string" ->
+      Gnat_util.abort_with_message ~internal:true
+      ("limit-region: incorrect line specification -\
+        first or last line field isn't a number")
+
 
 module CheckCmp = struct
    type t = check

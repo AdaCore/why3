@@ -9,33 +9,7 @@ type proof_mode =
   | Per_Path
   | Per_Check
 
-type limit_mode =
-  | Limit_Check of Gnat_expl.check
-  | Limit_Line of Gnat_loc.loc
-
-(* executable is in <prefix>/libexec/spark/bin
-   why3-prefix is <prefix>/libexec/spark
-   spark-prefix is <prefix> *)
-let why3_prefix =
-  Filename.dirname (Filename.dirname Sys.executable_name)
-let spark_prefix =
-  Filename.dirname (Filename.dirname why3_prefix)
-
-
-let rec file_concat l =
-  match l with
-  | [] -> ""
-  | [x] -> x
-  | [x;y] -> Filename.concat x y
-  | x :: xs -> Filename.concat x (file_concat xs)
-
 let builtin_provers = ["altergo"; "cvc4"; "z3"]
-
-let spark_loadpath =
-  [ file_concat [why3_prefix; "share"; "why3"; "theories"];
-    file_concat [why3_prefix; "share"; "why3"; "modules"];
-    file_concat [spark_prefix; "share"; "spark"; "theories"]
-  ]
 
 let is_builtin_prover =
   let builtin_provers_set =
@@ -43,6 +17,8 @@ let is_builtin_prover =
   (fun s ->
     let s = String.lowercase_ascii s in
     Sstr.mem s builtin_provers_set)
+
+let () = Gnat_util.set_debug_flags_gnatprove ()
 
 let opt_timeout : int option ref = ref None
 let opt_memlimit : int option ref = ref None
@@ -62,7 +38,7 @@ let opt_ce_mode = ref false
 let opt_ce_prover = ref "cvc4_ce"
 let opt_warn_prover = ref None
 
-let opt_limit_line : limit_mode option ref = ref None
+let opt_limit_line : Gnat_expl.limit_mode option ref = ref None
 let opt_limit_region : Gnat_loc.region option ref = ref None
 let opt_socket_name : string ref = ref ""
 let opt_standalone = ref false
@@ -71,29 +47,6 @@ let opt_replay = ref false
 let opt_prepare_shared = ref false
 
 let opt_why3_conf_file : string option ref = ref None
-
-(* Always set the debug flag that prevents from adding "model" labels everywhere
-   during parsing. In SPARK, these labels are inserted during transformations
-   from Ada code.
-*)
-let debug_no_auto_model =
-  Debug.register_flag ~desc:"When set, model labels are not added during parsing"
-    "no_auto_model"
-
-let () = Debug.set_flag debug_no_auto_model
-
-(* Set the vc_sp (fast_wp) everywhere. *)
-let debug_sp = Debug.register_flag "vc_sp"
-  ~desc:"Use@ 'Efficient@ Weakest@ Preconditions'@ for@ verification."
-let () = Debug.set_flag debug_sp
-
-let debug_useless_at = Debug.register_flag "ignore_useless_at"
-  ~desc:"Remove@ warning@ for@ useless@ at/old."
-let () = Debug.set_flag debug_useless_at
-
-
-(* Disable warnings for unused variables *)
-let () = Debug.set_flag Dterm.debug_ignore_unused_var
 
 let set_why3_conf s =
   if s != "" then
@@ -154,63 +107,11 @@ let set_steps t =
 let set_socket_name s =
   opt_socket_name := s
 
-let parse_line_spec s =
-   try
-     let args = Str.split (Str.regexp_string ":") s in
-     match args with
-     | [] ->
-        Gnat_util.abort_with_message ~internal:true
-        ("limit-line: incorrect line specification - missing ':'")
-     | [fn;line] ->
-         let line = int_of_string line in
-         Limit_Line (Gnat_loc.mk_loc_line fn line)
-     | [fn;line;col;check] ->
-         let line = int_of_string line in
-         let col = int_of_string col in
-         let check = Gnat_expl.reason_from_string check in
-         let loc = Gnat_loc.mk_loc fn line col None in
-         Limit_Check (Gnat_expl.mk_check check 0 loc false)
-     | _ ->
-      Gnat_util.abort_with_message ~internal:true
-      (
-        "limit-line: incorrect line specification -\
-         invalid parameter number, must be \
-         2 or 4")
-  with
-   | e when Debug.test_flag Debug.stack_trace -> raise e
-   | Failure "int_of_string" ->
-      Gnat_util.abort_with_message ~internal:true
-      ("limit-line: incorrect line specification -\
-        line or column field isn't a number")
-
-let parse_region_spec s =
-   try
-     let args = Str.split (Str.regexp_string ":") s in
-     match args with
-     | [] ->
-        Gnat_util.abort_with_message ~internal:true
-        ("limit-region: incorrect region specification - missing ':'")
-     | [fn;l_start;l_end] ->
-         let l_start = int_of_string l_start in
-         let l_end = int_of_string l_end in
-         Gnat_loc.mk_region fn l_start l_end
-     | _ ->
-      Gnat_util.abort_with_message ~internal:true
-      (
-        "limit-region: incorrect line specification -\
-         invalid parameter number, must be \
-         3")
-  with
-   | e when Debug.test_flag Debug.stack_trace -> raise e
-   | Failure "int_of_string" ->
-      Gnat_util.abort_with_message ~internal:true
-      ("limit-region: incorrect line specification -\
-        first or last line field isn't a number")
-
 let set_proof_dir s = opt_proof_dir := Some  s
 
-let set_limit_line s = opt_limit_line := Some (parse_line_spec s)
-let set_limit_region s = opt_limit_region := Some (parse_region_spec s)
+let set_limit_line s = opt_limit_line := Some (Gnat_expl.parse_line_spec s)
+let set_limit_region s =
+  opt_limit_region := Some (Gnat_expl.parse_region_spec s)
 
 let usage_msg =
   "Usage: gnatwhy3 [options] file"
@@ -320,8 +221,6 @@ let options = Arg.align [
 
 let () = Arg.parse options set_filename usage_msg
 
-let gnatprove_why3conf_file = "why3.conf"
-
 let merge_opt_keep_first _ v1 v2 =
   match v1, v2 with
   | None, x -> x
@@ -343,37 +242,6 @@ let check_config_for_builtin_provers config =
         Gnat_util.abort_with_message ~internal:false
           (Format.sprintf "%s attempts to redefine built-in prover %s" (Opt.get !opt_why3_conf_file) prover)
       with ProverNotFound _ -> ()) builtin_provers
-
-let find_driver_file ~conf_file fn =
-  (* Here we search for the driver file. The argument [fn] is the driver path
-     as returned by the Why3 API. It simply returns the path as is in the
-     configuration file. We first check if the path as is points to a file.
-     Then we try to find the file relative to the why3.conf file. If that also
-     fails, we look into the SPARK drivers dir.
-     If everything fails, we return an error message stating that we cannot find
-     the driver: it also returns the configuration file [conf_file] used. *)
-  (* In Why3, driver names are stored in the configuration file(s) without the
-     suffix, so we add it here; for robustness we still check if it's already
-     there. *)
-  let fn = if Strings.ends_with fn ".drv" then fn else fn ^ ".drv" in
-  try
-    if Sys.file_exists fn then fn
-    else match !opt_why3_conf_file with
-    | Some f ->
-        let dir = Filename.dirname f in
-        let fn = Filename.concat dir fn in
-        if Sys.file_exists fn then fn else raise Exit
-    | None -> raise Exit
-  with Exit ->
-      let driver_file = Filename.basename fn in
-      let full_path =
-        file_concat [why3_prefix;"share";"why3";"drivers";driver_file] in
-      if Sys.file_exists full_path then full_path
-      else
-        Gnat_util.abort_with_message ~internal:false
-          (Format.sprintf "Could not find driver file %s referenced from %s. \
-                           If this is a user-generated file, consider removing \
-                           it. If not, please report." fn conf_file)
 
 let computer_prover_str_list () =
   (* this is a string list of the requested provers by the user *)
@@ -427,17 +295,6 @@ let compute_base_provers config str_list =
     Gnat_util.abort_with_message ~internal:false
       "Several provers match the selection."
 
-(* we slightly change the config so that drivers files are referenced
-   with the right prefix. *)
-let get_gnatprove_config config =
-  let conf_file = get_conf_file config in
-  let transform_driver (base_prover: config_prover) =
-    {base_prover with driver =
-       find_driver_file ~conf_file base_prover.driver}
-  in
-  set_provers config
-    (Mprover.map transform_driver (get_provers config))
-
 (* Depending on what kinds of provers are requested, environment loading is a
  * bit different, hence we do this all together here *)
 
@@ -449,13 +306,16 @@ let provers, prover_ce, prover_warn, config, env =
   let config =
      try
        let gnatprove_config =
-         get_gnatprove_config (read_config (Some gnatprove_why3conf_file)) in
+         Gnat_util.get_gnatprove_config ?extra_conf_file:!opt_why3_conf_file
+           (read_config (Some Gnat_util.gnatprove_why3conf_file)) in
        (* We read the user-provided why3.conf file, if any. We never use a file
           like $HOME/.why3.conf. We make sure of that by not calling
           Whyconf.read_config with a None argument. *)
        if !opt_why3_conf_file = None then gnatprove_config
        else begin
-           let conf = get_gnatprove_config (read_config !opt_why3_conf_file) in
+           let conf =
+             Gnat_util.get_gnatprove_config ?extra_conf_file:!opt_why3_conf_file
+                (read_config !opt_why3_conf_file) in
            check_config_for_builtin_provers conf;
            let provers =
              prover_merge
@@ -489,17 +349,10 @@ let provers, prover_ce, prover_warn, config, env =
   let base_provers, base_prover_ce, base_prover_warn =
     compute_base_provers config prover_str_list in
   let env =
-    let config_main = get_main config in
-    (* load plugins; may be needed for external provers *)
-    if not builtin_provers_only then
-      load_plugins config_main;
-    let base_loadpath = spark_loadpath @ loadpath config_main in
-    let extended_loadpath =
-      match !opt_proof_dir with
-      | Some dir -> (Filename.concat dir "_theories") :: base_loadpath
-      | None -> base_loadpath
-    in
-    Env.create_env extended_loadpath  in
+    Gnat_util.build_env_from_config
+      ~load_plugins:(not builtin_provers_only)
+      ~proof_dir:!opt_proof_dir
+      config in
   let provers =
     List.map (fun x -> x.prover) base_provers in
   let prover_ce =

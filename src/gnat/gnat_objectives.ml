@@ -125,9 +125,9 @@ let add_to_objective ~toplevel ex go =
    * top-level, that is obtained by transformation. *)
    let filter_line =
       match Gnat_config.limit_line with
-      | Some (Gnat_config.Limit_Line l) ->
+      | Some (Gnat_expl.Limit_Line l) ->
          Gnat_loc.equal_line l (Gnat_expl.get_loc ex)
-      | Some (Gnat_config.Limit_Check c) ->
+      | Some (Gnat_expl.Limit_Check c) ->
          (c.Gnat_expl.reason = Gnat_expl.get_reason ex)
          && (Gnat_loc.equal_orig_loc c.Gnat_expl.sloc (Gnat_expl.get_loc ex))
       | None -> true

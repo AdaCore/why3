@@ -222,19 +222,100 @@ end
 
 module Server = Itp_server.Make (Gnat_Scheduler) (Gnat_Protocol)
 
+let () = Gnat_util.set_debug_flags_gnatprove ()
+
+
 let files : string Queue.t = Queue.create ()
 
+let opt_filename : string option ref = ref None
+let opt_proof_dir : string option ref = ref None
+let opt_limit_line : Gnat_expl.limit_mode option ref = ref None
+
+let set_limit_line s = opt_limit_line := Some (Gnat_expl.parse_line_spec s)
+
+let debug_gnat_server () = Debug.set_flag debug_server
+
+let set_filename s =
+   if !opt_filename = None then
+      opt_filename := Some s
+   else
+      Gnat_util.abort_with_message ~internal:true
+      "Only one file name should be given."
+
+let set_proof_dir s = opt_proof_dir := Some  s
+
+let usage_msg =
+  "Usage: gnat_server [options] mlw-file"
+
+let options = Arg.align [
+   "--limit-line", Arg.String set_limit_line,
+          " Limit proof to a file and line, given \
+           by \"file:line[:column:checkkind]\"";
+   "--debug-stack-trace",
+            Arg.Unit (fun () -> Debug.set_flag Debug.stack_trace;
+                                Printexc.record_backtrace true),
+          " Enable debug mode; and gives stack_trace on any exception raised";
+   "--debug-gnat-server", Arg.Unit debug_gnat_server,
+          " Enable debug mode for gnat_server";
+   "--proof-dir", Arg.String set_proof_dir,
+          " Specify directory to save session and manual proofs files";
+   ]
+
+let () = Arg.parse options set_filename usage_msg
+
+let filename =
+   match !opt_filename with
+   | None -> Gnat_util.abort_with_message ~internal:true "No file given."
+   | Some s -> s
+
 let env, gconfig =
-  Gnat_config.env, Gnat_config.config
+  let config =
+   Gnat_util.get_gnatprove_config
+     (Whyconf.read_config (Some Gnat_util.gnatprove_why3conf_file)) in
+  let env = Gnat_util.build_env_from_config ~load_plugins:true
+                                            ~proof_dir:!opt_proof_dir
+                                            config in
+  env, config
+
+(* TODO This code is copy-pasted from gnat_config.ml. It will be removed in a second step.
+*)
+let db_filename = "why3session.xml"
+
+let get_project_dir fname =
+  if not (Sys.file_exists fname) then raise Not_found;
+  let d =
+    if Sys.is_directory fname then fname
+    else if Filename.basename fname = db_filename then begin
+      Filename.dirname fname
+    end
+    else
+      begin
+        try Filename.chop_extension fname
+        with Invalid_argument _ -> fname^".w3s"
+      end
+  in
+  d
+
+let session_dir =
+  let project_dir =
+    try get_project_dir filename
+    with Not_found ->
+    Gnat_util.abort_with_message ~internal:true
+      (Pp.sprintf "could not compute session file for %s" filename)
+  in
+  match !opt_proof_dir with
+  | None -> project_dir
+  | Some dir_name ->
+     Filename.concat (Filename.concat dir_name "sessions")
+                     (Filename.basename project_dir)
 
 (* Initialization of config, provers, task_driver and controller in the server *)
 let () =
-  let session_dir = Gnat_config.session_dir in
   Queue.add session_dir files;
   let session_dir = Server_utils.get_session_dir ~allow_mkdir:true files in
-  (match Gnat_config.limit_line with
+  (match !opt_limit_line with
 
-  | Some (Gnat_config.Limit_Check check) ->
+  | Some (Gnat_expl.Limit_Check check) ->
       let f task : bool =
         let fml = Task.task_goal_fmla task in
         let expl = Gnat_expl.search_labels fml in

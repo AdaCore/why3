@@ -57,13 +57,6 @@ type proof_mode =
   | Per_Path
   | Per_Check
 
-type limit_mode =
-  | Limit_Check of Gnat_expl.check
-  | Limit_Line of Gnat_loc.loc
-(* This type is used only to differenciate the two different uses of
-   --limit-line: - --limit-line=file:line -> Limit_Line
-                 - --limit-line=file:line:checkkind -> Limit_Check *)
-
 val proof_mode : proof_mode
 (* reflects value of option --proof, default "Then_Split" *)
 
@@ -89,7 +82,7 @@ val filename : string
 val unit_name : string
 (* the name of the Ada unit to which the input file corresponds *)
 
-val limit_line : limit_mode option
+val limit_line : Gnat_expl.limit_mode option
 (* set if option --limit-line was given; we only prove VCs from that line *)
 
 val limit_region : Gnat_loc.region option
