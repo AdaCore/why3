@@ -319,7 +319,7 @@ let options = Arg.align [
 
 let () = Arg.parse options set_filename usage_msg
 
-let gnatprove_why3conf_file () = "why3.conf"
+let gnatprove_why3conf_file = "why3.conf"
 
 let merge_opt_keep_first _ v1 v2 =
   match v1, v2 with
@@ -448,7 +448,7 @@ let provers, prover_ce, prover_warn, config, env =
   let config =
      try
        let gnatprove_config =
-         get_gnatprove_config (Whyconf.read_config (Some (gnatprove_why3conf_file ()))) in
+         get_gnatprove_config (Whyconf.read_config (Some gnatprove_why3conf_file )) in
        (* We read the user-provided why3.conf file, if any. We never use a file
           like $HOME/.why3.conf. We make sure of that by not calling
           Whyconf.read_config with a None argument. *)
