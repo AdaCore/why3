@@ -275,7 +275,7 @@ let rec descend vml t = match t.t_node with
       find vs vml
   | _ -> Trm (t, vml)
 
-let t_compare trigger attr t1 t2 =
+let t_compare trigger attr loc t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
   let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
@@ -320,7 +320,8 @@ let t_compare trigger attr t1 t2 =
   let rec t_compare bnd vml1 vml2 t1 t2 =
     if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
       comp_raise (oty_compare t1.t_ty t2.t_ty);
-      if attr then comp_raise (Sattr.compare t1.t_attrs t2.t_attrs) else ();
+      if attr then comp_raise (Sattr.compare t1.t_attrs t2.t_attrs);
+      if loc then comp_raise (Opt.compare Loc.compare t1.t_loc t2.t_loc);
       match descend vml1 t1, descend vml2 t2 with
       | Bnd i1, Bnd i2 -> perv_compare i1 i2
       | Bnd _, Trm _ -> raise CompLT
@@ -395,11 +396,11 @@ let t_compare trigger attr t1 t2 =
   try t_compare 0 [] [] t1 t2; 0
   with CompLT -> -1 | CompGT -> 1
 
-let t_equal t1 t2 = (t_compare true true t1 t2 = 0)
+let t_equal t1 t2 = (t_compare true true true t1 t2 = 0)
 
-let t_equal_nt_na t1 t2 = (t_compare false false t1 t2 = 0)
+let t_equal_nt_na t1 t2 = (t_compare false false false t1 t2 = 0)
 
-let t_compare = t_compare true true
+let t_compare = t_compare true true true
 
 let t_similar t1 t2 =
   oty_equal t1.t_ty t2.t_ty &&
