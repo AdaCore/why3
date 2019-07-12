@@ -27,8 +27,6 @@ exception Remove_unknown of (Decl.decl * Ident.ident)
 val gen_ident :
   ?attrs:Ident.Sattr.t -> ?loc:Loc.position -> string -> Ident.preid
 
-val replace_in_term: term -> term -> term -> term
-
 val subst_quant: quant -> term_quant -> term -> term
 
 (* Transform the term (exists v, f) into f[x/v] *)

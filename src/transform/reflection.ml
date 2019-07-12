@@ -121,7 +121,7 @@ let rec reify_term renv t rt =
     if is_eq_true f && not (is_eq_true t)
     then invert_nonvar_pat vl renv (p, lhs_eq_true f) t else
     match p.pat_node, f.t_node, t.t_node with
-    | Pwild , _, _ | Pvar _,_,_ when t_equal_nt_na f t ->
+    | Pwild , _, _ | Pvar _,_,_ when t_equal f t ->
        Debug.dprintf debug_reification "case equal@.";
        renv, t
     | Papp (cs, pl), _,_

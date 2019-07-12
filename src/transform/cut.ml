@@ -142,7 +142,7 @@ let hide (clear: bool) (name: string) (t: term) =
       match d.d_node with
       | _ when (Decl.d_equal d hyp || Decl.d_equal d new_constant) -> [d]
       | Dprop (p, pr, t1) ->
-        let new_decl = create_prop_decl p pr (replace_in_term t ls_term t1) in
+        let new_decl = create_prop_decl p pr (t_replace t ls_term t1) in
         [new_decl]
       | _ -> [d]) None
   in

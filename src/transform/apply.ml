@@ -132,7 +132,7 @@ let with_terms ~trans_name subst_ty subst lv withed_terms =
       in
       let subst =
         Mvs.union (fun _x y z ->
-          if Term.t_equal_nt_na y z then
+          if Term.t_equal y z then
             Some y
           else
             raise (Arg_trans_term2 (trans_name ^ ": ", y, z)))
@@ -242,7 +242,7 @@ let apply pr withed_terms : Task.task Trans.tlist = Trans.store (fun task ->
       let inst_nt = t_ty_subst subst_ty subst nt in
       (* Safety guard: we check that the goal was indeed the instantiated
          hypothesis *)
-      if (Term.t_equal_nt_na inst_nt g) then
+      if (Term.t_equal inst_nt g) then
         let new_goals = generate_new_subgoals ~subst ~subst_ty llet lp in
         Debug.dprintf debug_matching "Printing new_goals to introduce:\n%a@."
           (Pp.print_list Pp.newline Pretty.print_term) new_goals;
@@ -258,21 +258,21 @@ let apply pr withed_terms : Task.task Trans.tlist = Trans.store (fun task ->
 
 let replace rev f1 f2 t =
   match rev with
-  | true -> replace_in_term f1 f2 t
-  | false -> replace_in_term f2 f1 t
+  | true -> t_replace f1 f2 t
+  | false -> t_replace f2 f1 t
 
-(* - If f1 unifiable to t with substitution s then return s.f2 and replace every
-     occurences of s.f1 with s.f2 in the rest of the term
+(* - If f1 is unifiable to t with substitution s then return s.f2 and replace every
+     occurrences of s.f1 with s.f2 in the rest of the term
    - Else call recursively on subterms of t *)
 (* If a substitution s is found then new premises are computed as e -> s.e *)
 let replace_subst lp lv llet f1 f2 withed_terms t =
-  (* is_replced is common to the whole execution of replace_subst. Once an
-     occurence is found, it changes to Some (s) so that only one instanciation
-     is rewrritten during execution *)
+  (* is_replaced is common to the whole execution of replace_subst. Once an
+     occurrence is found, it changes to Some (s) so that only one instanciation
+     is rewritten during execution *)
   let rec replace is_replaced f1 f2 t : _ * Term.term =
     match is_replaced with
     | Some(subst_ty,subst) ->
-        is_replaced, replace_in_term (t_ty_subst subst_ty subst f1) (t_ty_subst subst_ty subst f2) t
+        is_replaced, t_replace (t_ty_subst subst_ty subst f1) (t_ty_subst subst_ty subst f2) t
     | None ->
       begin
         (* Generate the list of variables that are here from let bindings *)
@@ -288,7 +288,7 @@ let replace_subst lp lv llet f1 f2 withed_terms t =
                 is_replaced t
         | subst_ty, subst ->
               let sf1 = t_ty_subst subst_ty subst f1 in
-              if (Term.t_equal_nt_na sf1 t) then
+              if (Term.t_equal sf1 t) then
                 Some (subst_ty, subst), t_ty_subst subst_ty subst f2
               else
                 t_map_fold (fun is_replaced t -> replace is_replaced f1 f2 t)
