@@ -227,7 +227,7 @@ let () = Gnat_util.set_debug_flags_gnatprove ()
 
 let files : string Queue.t = Queue.create ()
 
-let opt_filename : string option ref = ref None
+let opt_session_dir : string option ref = ref None
 let opt_proof_dir : string option ref = ref None
 let opt_limit_line : Gnat_expl.limit_mode option ref = ref None
 
@@ -236,8 +236,8 @@ let set_limit_line s = opt_limit_line := Some (Gnat_expl.parse_line_spec s)
 let debug_gnat_server () = Debug.set_flag debug_server
 
 let set_filename s =
-   if !opt_filename = None then
-      opt_filename := Some s
+   if !opt_session_dir = None then
+      opt_session_dir := Some s
    else
       Gnat_util.abort_with_message ~internal:true
       "Only one file name should be given."
@@ -263,8 +263,8 @@ let options = Arg.align [
 
 let () = Arg.parse options set_filename usage_msg
 
-let filename =
-   match !opt_filename with
+let session_dir =
+   match !opt_session_dir with
    | None -> Gnat_util.abort_with_message ~internal:true "No file given."
    | Some s -> s
 
@@ -276,38 +276,6 @@ let env, gconfig =
                                             ~proof_dir:!opt_proof_dir
                                             config in
   env, config
-
-(* TODO This code is copy-pasted from gnat_config.ml. It will be removed in a second step.
-*)
-let db_filename = "why3session.xml"
-
-let get_project_dir fname =
-  if not (Sys.file_exists fname) then raise Not_found;
-  let d =
-    if Sys.is_directory fname then fname
-    else if Filename.basename fname = db_filename then begin
-      Filename.dirname fname
-    end
-    else
-      begin
-        try Filename.chop_extension fname
-        with Invalid_argument _ -> fname^".w3s"
-      end
-  in
-  d
-
-let session_dir =
-  let project_dir =
-    try get_project_dir filename
-    with Not_found ->
-    Gnat_util.abort_with_message ~internal:true
-      (Pp.sprintf "could not compute session file for %s" filename)
-  in
-  match !opt_proof_dir with
-  | None -> project_dir
-  | Some dir_name ->
-     Filename.concat (Filename.concat dir_name "sessions")
-                     (Filename.basename project_dir)
 
 (* Initialization of config, provers, task_driver and controller in the server *)
 let () =
