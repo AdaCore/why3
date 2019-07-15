@@ -17,11 +17,11 @@
  </goal>
  <goal name="VC defensive_get" expl="VC for defensive_get" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
- <proof prover="7"><result status="valid" time="0.01" steps="2112"/></proof>
+ <proof prover="7"><result status="valid" time="0.01" steps="2110"/></proof>
  </goal>
  <goal name="VC defensive_set" expl="VC for defensive_set" proved="true">
  <proof prover="2"><result status="valid" time="0.02" steps="4"/></proof>
- <proof prover="7"><result status="valid" time="0.01" steps="2281"/></proof>
+ <proof prover="7"><result status="valid" time="0.01" steps="2272"/></proof>
  </goal>
  <goal name="VC copy" expl="VC for copy" proved="true">
  <proof prover="8"><result status="valid" time="0.05" steps="6809"/></proof>
@@ -30,15 +30,15 @@
  <proof prover="8"><result status="valid" time="0.08" steps="9086"/></proof>
  </goal>
  <goal name="VC fill" expl="VC for fill" proved="true">
- <proof prover="8"><result status="valid" time="0.08" steps="10641"/></proof>
+ <proof prover="8"><result status="valid" time="0.08" steps="10419"/></proof>
  </goal>
  <goal name="VC blit" expl="VC for blit" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC blit.0" expl="loop invariant init" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="2350"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="1739"/></proof>
   </goal>
   <goal name="VC blit.1" expl="loop invariant init" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="2427"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="2370"/></proof>
   </goal>
   <goal name="VC blit.2" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="3062"/></proof>
@@ -67,7 +67,7 @@
   </transf>
   </goal>
   <goal name="VC blit.8" expl="out of loop bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.01" steps="2721"/></proof>
+  <proof prover="8"><result status="valid" time="0.01" steps="2458"/></proof>
   </goal>
  </transf>
  </goal>
@@ -91,13 +91,13 @@
  <proof prover="1"><path name="array_ArrayPermut_permut_sub_weakening_2.v"/><result status="valid" time="0.48"/></proof>
  </goal>
  <goal name="exchange_permut_all" proved="true">
- <proof prover="7"><result status="valid" time="0.06" steps="14625"/></proof>
+ <proof prover="7"><result status="valid" time="0.06" steps="14626"/></proof>
  </goal>
 </theory>
 <theory name="ArraySwap" proved="true">
  <goal name="VC swap" expl="VC for swap" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="33"/></proof>
- <proof prover="7"><result status="valid" time="0.04" steps="6752"/></proof>
+ <proof prover="7"><result status="valid" time="0.04" steps="6753"/></proof>
  </goal>
 </theory>
 <theory name="ToList" proved="true">
