@@ -134,12 +134,6 @@ let show_config () =
   Format.printf "enable_relocation: %s@." Config.enable_relocation;
   exit 0
 
-let debug_gnat_server () =
-  let debug_server =
-    Debug.register_flag ~desc:"Debug gnat_server" "gnat_server"
-  in
-  Debug.set_flag debug_server
-
 let options = Arg.align [
    "--version", Arg.Unit print_version_info,
           " Print version information and exit";
@@ -195,8 +189,6 @@ let options = Arg.align [
           " Enable a debug flag from Why3";
    "--debug-server", Arg.Set opt_debug,
           " Enable debug mode and keep why3server activated";
-   "--debug-gnat-server", Arg.Unit debug_gnat_server,
-          " Enable debug mode for gnat_server";
    "--debug-stack-trace", Arg.Tuple [Arg.Set opt_debug;
             Arg.Unit (fun () -> Debug.set_flag Debug.stack_trace;
                                 Printexc.record_backtrace true)],

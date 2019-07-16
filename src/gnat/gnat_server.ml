@@ -259,6 +259,14 @@ let options = Arg.align [
           " Enable debug mode for gnat_server";
    "--proof-dir", Arg.String set_proof_dir,
           " Specify directory to save session and manual proofs files";
+   "--debug-why3", Arg.String (fun s -> let debug = Debug.register_flag s ~desc:"" in
+                                (* Record backtrace is done in a part of Why3
+                                   that is not executed by gnatwhy3: we have to
+                                   do it here. *)
+                                if s = "stack_trace" then
+                                  Printexc.record_backtrace true;
+                                Debug.set_flag debug),
+          " Enable a debug flag from Why3";
    ]
 
 let () = Arg.parse options set_filename usage_msg
