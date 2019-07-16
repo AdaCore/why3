@@ -458,7 +458,9 @@ let localize_divergence el =
     Loc.error ?loc GhostDivergence) el;
   raise GhostDivergence
 
-let try_effect el fn x y = try fn x y with
+let try_effect el fn x y =
+  if Debug.test_flag Debug.stack_trace then fn x y else
+  try fn x y with
   | BadGhostWrite (v,r) -> localize_ghost_write v r el
   | IllegalUpdate (v,r) -> localize_immut_write v r el
   | StaleVariable (v,r) -> localize_reset_stale v r el
