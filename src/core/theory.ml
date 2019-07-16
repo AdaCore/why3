@@ -338,7 +338,10 @@ let close_scope uc ~import =
   | _ -> assert false
 
 let import_namespace ns ql =
-  let e0 = ns_find_ns ns ql in merge_ns false e0 ns
+  match ns_find_ns ns ql with
+  | e0 -> merge_ns false e0 ns
+  | exception Not_found ->
+      Loc.errorm "unknown scope %s" (String.concat "." ql)
 
 let import_scope uc ql =
   match uc.uc_import with
