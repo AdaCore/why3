@@ -57,7 +57,7 @@ module PigeonHole
   (** `range f n m` is true when `f` maps the domain
       `(0..n-1)` into `(0..m-1)` *)
 
-  predicate injective (f: int -> int) (n: int) (m:int) =
+  predicate injective (f: int -> int) (n: int) =
     forall i j: int. 0 <= i < j < n -> f i <> f j
   (** `injective f n m` is true when `f` is an injection
       from `(0..n-1)` to `(0..m-1)` *)
@@ -84,7 +84,7 @@ module PigeonHole
     requires { range f n m }
     requires { n > m >= 0 }
     variant  { m }
-    ensures  { not (injective f n m) }
+    ensures  { not (injective f n) }
   =
       for i = 0 to n-1 do
         invariant { forall k. 0 <= k < i -> f k <> m-1 }
@@ -494,24 +494,26 @@ module PatienceAbstract
     assert {  (* non-injectivity *)
       forall sigma: seq int.
         increasing_subsequence sigma input /\ sigma.seqlen > s.num_stacks ->
-        let f = fun i ->
-          let si = sigma.seqval[i] in
-          let stack_i,_ = s.positions[si] in
-          stack_i
-        in range f sigma.seqlen s.num_stacks &&
-           not (injective f sigma.seqlen s.num_stacks)
-
-    };
-    assert {  (* non-injectivity *)
-      forall sigma: seq int.
-        increasing_subsequence sigma input /\ sigma.seqlen > s.num_stacks ->
-        exists i,j.
+        (exists i,j.
           0 <= i < j < sigma.seqlen &&
           let si = sigma.seqval[i] in
           let sj = sigma.seqval[j] in
           let stack_i,_pi = s.positions[si] in
           let stack_j,_pj = s.positions[sj] in
-          stack_i = stack_j
+          stack_i = stack_j)
+        by let f i =
+          let si = sigma.seqval[i] in
+          let stack_i,_ = s.positions[si] in
+          stack_i
+        in
+           (forall i. 0 <= i < sigma.seqlen ->
+            let si = sigma.seqval[i] in
+            0 <= si < length input &&
+            let stack_i,_ = s.positions[si] in
+            0 <= stack_i < s.num_stacks
+           )
+           so range f sigma.seqlen s.num_stacks 
+           so not (injective f sigma.seqlen)
     };
     assert { (* contradiction from non-injectivity *)
       forall sigma: seq int.
