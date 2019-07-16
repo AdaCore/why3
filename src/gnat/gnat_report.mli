@@ -8,11 +8,11 @@ open Why3
 
      file = { "error"        : string,
               "internal"     : bool,
-              "session_file" : string,
+              "session_dir" : string,
               "warnings"     : list string,
               "results"      : list result }
 
-   The "error", "internal", "session_file" and "warnings" fields are optional.
+   The "error", "internal", "session_dir" and "warnings" fields are optional.
    If the "error" field is present, the "results" and "warnings" fields will be
    empty; if the "error" field is not present, the "results" field contains the
    list of proof results.
@@ -28,8 +28,8 @@ open Why3
    The "warnings" field is optional. If present, it contains a list of warnings
    that occured during execution of gnatwhy3.
 
-   The "session_file" field is always present if "error" is not present. It
-   contains the session file information for this run of gnatwhy3.
+   The "session_dir" field is always present if "error" is not present. It
+   contains the session directory information for this run of gnatwhy3.
 
 
      result = { "id"             : int,
