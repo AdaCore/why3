@@ -68,7 +68,7 @@ let open_ls_defn_cb ld =
   let ls,_,_ = ld in
   let vl,t = open_ls_defn ld in
   let close ls' vl' t' =
-    if t_equal t t' && Lists.equal vs_equal vl vl' && ls_equal ls ls'
+    if t_equal_strict t t' && Lists.equal vs_equal vl vl' && ls_equal ls ls'
     then ls,ld else make_ls_defn ls' vl' t'
   in
   vl,t,close
@@ -345,10 +345,10 @@ module Hsdecl = Hashcons.Make (struct
     ts_equal ts1 ts2 && Lists.equal cs_equal td1 td2
 
   let eq_ld (ls1,(_,f1,_)) (ls2,(_,f2,_)) =
-    ls_equal ls1 ls2 && t_equal f1 f2
+    ls_equal ls1 ls2 && t_equal_strict f1 f2
 
   let eq_iax (pr1,fr1) (pr2,fr2) =
-    pr_equal pr1 pr2 && t_equal fr1 fr2
+    pr_equal pr1 pr2 && t_equal_strict fr1 fr2
 
   let eq_ind (ps1,al1) (ps2,al2) =
     ls_equal ps1 ps2 && Lists.equal eq_iax al1 al2
@@ -360,7 +360,7 @@ module Hsdecl = Hashcons.Make (struct
     | Dlogic l1, Dlogic l2 -> Lists.equal eq_ld l1 l2
     | Dind   (s1,l1), Dind (s2,l2) -> s1 = s2 && Lists.equal eq_ind l1 l2
     | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
-        k1 = k2 && pr_equal pr1 pr2 && t_equal f1 f2
+        k1 = k2 && pr_equal pr1 pr2 && t_equal_strict f1 f2
     | _,_ -> false
 
   let cs_hash (cs,pl) =
@@ -368,9 +368,9 @@ module Hsdecl = Hashcons.Make (struct
 
   let hs_td (ts,td) = Hashcons.combine_list cs_hash (ts_hash ts) td
 
-  let hs_ld (ls,(_,f,_)) = Hashcons.combine (ls_hash ls) (t_hash f)
+  let hs_ld (ls,(_,f,_)) = Hashcons.combine (ls_hash ls) (t_hash_strict f)
 
-  let hs_prop (pr,f) = Hashcons.combine (pr_hash pr) (t_hash f)
+  let hs_prop (pr,f) = Hashcons.combine (pr_hash pr) (t_hash_strict f)
 
   let hs_ind (ps,al) = Hashcons.combine_list hs_prop (ls_hash ps) al
 

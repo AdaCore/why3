@@ -206,7 +206,7 @@ let () = Trans.register_transform "introduce_premises" introduce_premises
    then copy attributes back on the term again.
 *)
 let rec t_replace t1 t2 t =
-  if t_equal_nt_na t t1 then t_attr_copy t t2 else t_map (t_replace t1 t2) t
+  if t_equal t t1 then t_attr_copy t t2 else t_map (t_replace t1 t2) t
 
 let rec generalize hd =
   match hd.Task.task_decl.Theory.td_node with
