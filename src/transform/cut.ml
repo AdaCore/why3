@@ -70,6 +70,13 @@ let remove_list ~is_rec (name_list: symbol list) =
                 if is_rec then
                   (Ident.Sid.union removed_ids d.d_news, task_uc)
                 else
+                  let task_uc = match d.d_node with
+                    | Dprop _ -> task_uc
+                    | Dtype _ | Ddata _ | Dparam _ -> Task.add_decl task_uc d
+                    | Dlogic dl -> List.fold_left (fun t (ls,_) ->
+                        Task.add_param_decl t ls) task_uc dl
+                    | Dind (_,il) -> List.fold_left (fun t (ls,_) ->
+                        Task.add_param_decl t ls) task_uc il in
                   (removed_ids, task_uc)
             | _ when not (Ident.Sid.is_empty removed_in_decls) ->
                 (* The task create an element we want to add but it uses deleted
