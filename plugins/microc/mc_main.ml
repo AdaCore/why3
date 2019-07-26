@@ -319,9 +319,9 @@ let read_channel env path file c =
   Typing.open_module (mk_id ~loc name);
   let use_import (f, m) =
     let m = mk_id ~loc m in
-    Typing.open_scope loc m;
-    Typing.add_decl loc (Ptree.Duse (Qdot (Qident (mk_id ~loc f), m)));
-    Typing.close_scope loc ~import:true in
+    let qid = Qdot (Qident (mk_id ~loc f), m) in
+    let decl = Ptree.Duseimport(loc,false,[(qid,None)]) in
+    Typing.add_decl loc decl in
   List.iter use_import
     ["int", "Int"; "ref", "Refint"; "microc", "MicroC"];
   translate f;
