@@ -299,7 +299,7 @@ and block env ~loc = function
       let e = Efun (params, None, Ity.MaskVisible, sp, body) in
       Elet (id, false, Expr.RKnone, mk_expr ~loc e, s) in
     mk_expr ~loc e
-  | (Dimport _ | Py_ast.Dlogic _) :: sl ->
+  | (Py_ast.Dimport _ | Py_ast.Dlogic _) :: sl ->
     block env ~loc sl
 
 let fresh_type_var =
@@ -340,7 +340,8 @@ let read_channel env path file c =
   let use_import (f, m) =
     let m = mk_id ~loc m in
     Typing.open_scope loc m;
-    Typing.add_decl loc (Ptree.Duse (Qdot (Qident (mk_id ~loc f), m)));
+    let decl = Ptree.Duseimport(loc,false,[((Qdot (Qident (mk_id ~loc f), m)),None)]) in
+    Typing.add_decl loc decl ;
     Typing.close_scope loc ~import:true in
   List.iter use_import
     ["int", "Int"; "ref", "Refint"; "python", "Python"];

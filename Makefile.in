@@ -1934,9 +1934,9 @@ OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
 
 OCAMLCODE_TRANSFORM = negate register
 
-OCAMLCODE_MLWTREE = buildenv openmodule useimport \
-	source1 code1 helper1 source2 code2 source3 code3 \
-	closemodule checkingvcs
+OCAMLCODE_MLWTREE = buildenv \
+	source1 code1 helper1 source2 code2 source3 code3 source4 code4 \
+	getmodules checkingvcs
 
 OCAMLCODE_MLWEXPR = buildenv source2 code2_import code2 createmodule checkingvcs
 
