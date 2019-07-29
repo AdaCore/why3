@@ -512,7 +512,18 @@ let print_info_model info =
       let model_map =
 	S.fold (fun f acc ->
           let s = asprintf "%a" (print_fmla info) f in
-          Mstr.add s f acc)
+          try
+            (* We keep the location attribute of every equal terms that were
+               collected during printing in order to provide a complete
+               counterexample. *)
+            let former_elem = Mstr.find s acc in
+            let fa = Sattr.fold t_attr_add f.t_attrs former_elem in
+            let fa = if f.t_loc <> None then
+                       t_attr_add (Ident.create_written_attr (Opt.get f.t_loc)) fa
+                     else
+                       fa in
+            Mstr.add s fa acc
+          with Not_found -> Mstr.add s f acc)
 	info_model
 	Mstr.empty in
 
