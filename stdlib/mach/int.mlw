@@ -201,6 +201,9 @@ module UnsignedGMP
       to_int r + radix * to_int d =
       to_int x * to_int y }
 
+  val minus_mod (x:t) : t
+    ensures { to_int result = mod (- (to_int x)) radix }
+
 end
 
 module Int31
@@ -354,6 +357,12 @@ module UInt32GMP
     ensures { (power 2 (Int32.to_int result)) * to_int x <= max_uint32 }
     ensures { 2 * (power 2 (Int32.to_int result)) * to_int x > max_uint32 }
     ensures { 0 <= Int32.to_int result < 32 }
+
+  val count_trailing_zeros (x:uint32) : int32
+    requires { to_int x > 0 }
+    ensures  { 0 <= result < 32 }
+    ensures  { mod x (power 2 result) = 0 }
+    ensures  { mod x (power 2 (result + 1)) <> 0 }
 
   val of_int32(x:int32) : uint32
     requires { Int32.to_int x >= 0 }
@@ -631,6 +640,12 @@ module UInt64GMP
     ensures { (power 2 (Int32.to_int result)) * to_int x <= max_uint64 }
     ensures { 2 * (power 2 (Int32.to_int result)) * to_int x > max_uint64 }
     ensures { 0 <= Int32.to_int result < 64 }
+
+  val count_trailing_zeros (x:uint64) : int32
+    requires { to_int x > 0 }
+    ensures  { 0 <= result < 64 }
+    ensures  { mod x (power 2 result) = 0 }
+    ensures  { mod x (power 2 (result + 1)) <> 0 }
 
   val to_int32(x:uint64) : int32
     requires { x <= max_int32 }

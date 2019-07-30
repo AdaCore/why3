@@ -100,18 +100,18 @@ module C
     ensures { result.min = 0 }
     ensures { result.max = plength result }
 
-  exception StackOverflow
+  val partial c_assert (e:bool) : unit
+    ensures { e }
 
-  let salloc sz
+  let partial salloc sz
     requires { 0 <= sz }
     ensures { plength result = sz }
     ensures { result.offset = 0 }
     ensures { result.min = 0 }
     ensures { result.max = sz }
-    raises  { StackOverflow -> true }
   = let p = malloc sz in
-    if is_not_null p then p
-    else raise StackOverflow
+    c_assert (is_not_null p);
+    p
 
   val free (p:ptr 'a) : unit
     requires { p.offset = 0 }
@@ -204,9 +204,6 @@ module C
                          (pelts p2)[i] = old (pelts p1)[i] }
     ensures  { forall i. old p2.min <= i < old p2.max ->
                          (pelts p2)[i] = old (pelts p2)[i] }
-
-  val partial c_assert (e:bool) : unit
-    ensures { e }
 
   (** {2 Printing} *)
 

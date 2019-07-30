@@ -1725,7 +1725,7 @@ let rec lemma interp_ctx_impl' (ctx: context') (g1 g2:equality')
   variant  { ctx }
 = match ctx with Nil -> () | Cons _ t -> interp_ctx_impl' t g1 g2 end
 
-let lemma impl_cons (c1 c2:context') (e:equality') (y z:vars)
+let lemma impl_cons (c1 c2:context') (e:equality')
   requires { ctx_impl_ctx' c1 c2 }
   requires { forall y z. interp_ctx' c1 e y z }
   ensures  { ctx_impl_ctx' c1 (Cons e c2) }

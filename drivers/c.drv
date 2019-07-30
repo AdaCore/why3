@@ -201,6 +201,7 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 
   syntax val add_mod "%1 + %2" prec 4 4 3
   syntax val sub_mod "%1 - %2" prec 4 4 3
+  syntax val minus_mod "-%2"   prec 2 1
   syntax val mul_mod "%1 * %2" prec 3 3 2
 
   syntax val div2by1
@@ -213,6 +214,7 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
   syntax val is_msb_set "%1 & 0x80000000U" prec 8 8
 
   syntax val count_leading_zeros "__builtin_clz(%1)" prec 1 15
+  syntax val count_trailing_zeros "__builtin_ctz(%1)" prec 1 15
 
   syntax val of_int32 "(uint32_t)%1" prec 2 2
 
@@ -420,6 +422,7 @@ static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 
   syntax val add_mod "%1 + %2" prec 4 4 3
   syntax val sub_mod "%1 - %2" prec 4 4 3
+  syntax val minus_mod "-%2"   prec 2 1
   syntax val mul_mod "%1 * %2" prec 3 3 2
 
   syntax val lsl "%1 << %2" prec 5 5 2
@@ -430,6 +433,7 @@ static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   syntax val is_msb_set "%1 & 0x8000000000000000UL" prec 8 7
 
   syntax val count_leading_zeros "__builtin_clzll(%1)" prec 1 15
+  syntax val count_trailing_zeros "__builtin_ctzll(%1)" prec 1 15
 
   syntax val to_int32 "(int32_t)%1" prec 2 2
   syntax val of_int32 "(uint64_t)%1" prec 2 2

@@ -60,7 +60,6 @@ let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
                        -> (pelts r)[j] = old (pelts r)[j] }
   ensures  { forall j. min scratch <= j < offset scratch
                        -> (pelts scratch)[j] = old (pelts scratch)[j] }
-  raises   { StackOverflow -> true }
   variant { k + k }
 =
   let s = sx / 2 in (* TODO sx >> 1 *)
@@ -800,7 +799,6 @@ with wmpn_toom22_mul_rec (r x: ptr limb) (sx:int32) (y:ptr limb) (sy: int32)
   ensures  { min scratch = old min scratch }
   ensures  { max scratch = old max scratch }
   ensures  { plength scratch = old plength scratch }
-  raises   { StackOverflow -> true }
   variant  { k + k + 1 }
 =
   if sy <= toom22_threshold
@@ -830,7 +828,6 @@ with wmpn_toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) :
   ensures  { min scratch = old min scratch }
   ensures  { max scratch = old max scratch }
   ensures  { plength scratch = old plength scratch }
-  raises   { StackOverflow -> true }
   variant  { k + k + 1 }
 =
   if sz <= toom22_threshold
@@ -860,7 +857,6 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
                        -> (pelts r)[j] = old (pelts r)[j] }
   ensures  { forall j. min scratch <= j < offset scratch
                        -> (pelts scratch)[j] = old (pelts scratch)[j] }
-  raises   { StackOverflow -> true }
   variant { k + k }
 =
   let n = 1 + (if 2 * sx >= 3 * sy
@@ -1775,7 +1771,6 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
     ensures  { value r (sx + sy) = value x sx * value y sy }
     ensures  { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
                          -> (pelts r)[j] = old (pelts r)[j] }
-    raises   { StackOverflow -> true }
     variant  { k+k+1 }
   =
     if sy <= toom22_threshold
@@ -2111,7 +2106,6 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
     ensures  { plength r = old plength r }
     ensures  { forall j. min r <= j < offset r \/ offset r + sz + sz <= j < max r
                          -> (pelts r)[j] = old (pelts r)[j] }
-    raises   { StackOverflow -> true }
   =
     if sz <= toom22_threshold
     then wmpn_mul_basecase r x sz y sz
