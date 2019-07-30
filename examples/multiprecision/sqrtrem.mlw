@@ -246,7 +246,6 @@ module Sqrt
     requires { valid scratch (1 + div n 2) }
     requires { (pelts np)[offset np + n + n - 1] >= power 2 (Limb.length - 2) }
     requires { 4 * n < max_int32 }
-    raises   { StackOverflow -> true }
 (*    writes   { np, sp, scratch }*)
     ensures  { (value sp n) * (value sp n)
                + value np n + (power radix n) * result
@@ -857,7 +856,6 @@ module Sqrt
     requires { 1 <= n }
     requires { 4 * n < max_int32 }
     requires { (pelts np)[offset np + n - 1] > 0 }
-    raises   { StackOverflow -> true }
     ensures  { value np n = value sp (ceilhalf n) * value sp (ceilhalf n)
                             + value rp result }
     ensures  { 0 <= result <= n }

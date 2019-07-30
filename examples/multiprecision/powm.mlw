@@ -1,0 +1,1562 @@
+module Powm
+
+  use array.Array
+  use map.Map
+  use mach.c.C
+  use ref.Ref
+  use mach.int.Int32
+  use mach.int.UInt32GMP
+  use import mach.int.UInt64GMP as Limb
+  use int.Int
+  use int.Power
+  use types.Types
+  use lemmas.Lemmas
+  use compare.Compare
+  use valuation.Valuation
+  use util.Util
+  use add.Add
+  use sub.Sub
+  use mul.Mul
+  use logical.Logical
+  use div.Div
+  use toom.Toom
+  use int.EuclideanDivision
+
+  predicate redc (ur u n m : int) =
+    mod ur m = mod (power radix n * u) m
+
+  let lemma mod_mul (a b c d m:int)
+    requires { mod a m = mod b m }
+    requires { 0 < m }
+    requires { mod c m = mod d m }
+    ensures  { mod (c * a) m = mod (d * b) m }
+  =
+    let da = div a m in
+    let db = div b m in
+    let ma = mod a m in
+    assert { a = m * da + ma };
+    assert { b = m * db + ma };
+    assert { c * a = m * (c * da) + (c * ma) /\
+             d * b = m * (d * db) + (d * ma) };
+    assert { mod (c * a) m = mod (m * (c * da) + (c * ma)) m = mod (c * ma) m };
+    assert { mod (d * b) m = mod (m * (d * db) + (d * ma)) m = mod (d * ma) m };
+    let dc = div c m in
+    let dd = div d m in
+    let mc = mod c m in
+    assert { c * ma = m * (dc * ma) + ma * mc /\
+             d * ma = m * (dd * ma) + ma * mc };
+    assert { mod (c * ma) m = mod (m * (dc * ma) + (ma * mc)) m
+                            = mod (ma * mc) m };
+    assert { mod (d * ma) m = mod (m * (dd * ma) + (ma * mc)) m
+                            = mod (ma * mc) m }
+
+  let lemma mod_sum (a b m:int)
+    requires { 0 < m }
+    ensures  { mod (a + b) m = mod (mod a m + mod b m) m }
+  = let da = div a m in
+    let db = div b m in
+    let ma = mod a m in
+    let mb = mod b m in
+    assert { mod (a+b) m = mod (m * (da + db) + (ma + mb)) m = mod (ma + mb) m }
+
+  let lemma mod_id (a m:int)
+    requires { 0 <= a < m }
+    ensures { mod a m = a }
+  = ()
+
+  let lemma mod_prod (a b c:int)
+    requires { 0 < b }
+    requires { 0 < c }
+    ensures { c * mod a b = mod (a * c) (b * c) }
+  = let d = div a b in
+    let m = mod a b in
+    assert { a * c = (d * b + m) * c = (b * c) * d + m * c };
+    assert { mod (a * c) (b * c) = mod ((b * c) * d + m * c) (b * c)
+             = mod (m * c) (b * c) = m * c }
+  meta remove_prop axiom mod_prod
+
+  let lemma unredc_inv (u1 ur u2 n m invpn : int)
+    requires { redc ur u1 n m }
+    requires { redc ur u2 n m }
+    requires { 0 < m }
+    requires { odd m }
+    requires { mod (invpn * power radix n) m = 1 }
+    ensures  { mod u1 m = mod u2 m }
+  = assert { mod (power radix n * u1) m = mod (power radix n * u2) m };
+    assert { mod (invpn * (power radix n * u1)) m
+             = mod (invpn * (power radix n * u2)) m };
+    assert { mod ((invpn * power radix n) * u1) m = mod (1 * u1) m };
+    assert { mod ((invpn * power radix n) * u2) m = mod (1 * u2) m }
+
+  let lemma unredc (u1 ur u2 n m : int)
+    requires { redc ur u1 n m }
+    requires { redc ur u2 n m }
+    requires { 0 < m }
+    requires { 0 < n }
+    requires { odd m }
+    ensures  { mod u1 m = mod u2 m }
+  = let rec lemma mod_pow (a b k m:int)
+      requires { mod a m = mod b m }
+      requires { 0 < k }
+      requires { 0 < m }
+      ensures  { mod (power a k) m = mod (power b k) m }
+      variant  { k }
+    = if k = 1 then ()
+      else begin
+        mod_pow a b (k-1) m;
+        mod_mul (power a (k-1)) (power b (k-1)) a b m;
+      end
+    in
+    let rec lemma pow_1 (k:int)
+      requires { 0 <= k }
+      variant  { k }
+      ensures  { power 1 k = 1 }
+    = if k > 0 then pow_1 (k-1) in
+    let hm = div (m+1) 2 in
+    assert { mod (2 * hm) m = 1
+             by 2 * hm = m + 1
+             so mod (2 * hm) m = mod (m * 1 + 1) m = 1 };
+    let hm64 = power hm 64 in
+    mod_pow (2*hm) 1 64 m;
+    pow_1 64;
+    assert { mod (radix * hm64) m = 1
+             by radix * hm64 = (power 2 64) * (power hm 64) = power (2 * hm) 64
+             so mod (power 1 64) m = mod 1 m = 1 };
+    let hm64n = power hm64 n in
+    mod_pow (radix * hm64) 1 n m;
+    pow_1 n;
+    assert { mod ((power radix n) * hm64n) m = 1
+             by power radix n * hm64n = power (radix * hm64) n
+             so mod (power 1 n) m = mod 1 m = 1 };
+    unredc_inv u1 ur u2 n m hm64n
+
+  meta remove_prop axiom unredc_inv
+  meta remove_prop axiom unredc
+
+  let wmpn_redc_1 (rp up mp : t) (n: int32) (invm : limb)
+    requires { n > 0 }
+    requires { valid mp n /\ valid up (2 * n) /\ valid rp n }
+    requires { odd (value mp n) }
+    requires { mod ((value mp n) * invm) radix = radix - 1 }
+    ensures  { redc (value (old up) (2*n)) (value rp n) n (value mp n) }
+    ensures  { forall j. j < offset rp \/ j >= offset rp + n
+                         -> (pelts rp)[j] = (pelts (old rp))[j] }
+    ensures  { value (old up) (2*n) < power radix n * value mp n
+               -> value rp n < 2 * value mp n }
+  =
+    label Start in
+    let ref cy = 0 in
+    let ref u = C.incr up 0 in
+    let ghost vm = value mp (int32'int n) in
+    value_sub_head (pelts mp) (offset mp) (offset mp + int32'int n);
+    assert { mod ((pelts mp)[offset mp] * invm) radix = radix - 1
+             by radix - 1 = mod (vm * invm) radix
+                = mod (radix *
+                   (value_sub (pelts mp) (offset mp + 1) (offset mp + n) * invm)
+                       + (pelts mp)[offset mp] * invm) radix
+                = mod ((pelts mp)[offset mp] * invm) radix };
+    let ghost ref added : int = 0 in
+    for j = 0 to n-1 do
+      invariant { offset u = offset up + j }
+      invariant { pelts u = pelts up }
+      invariant { u.min = up.min }
+      invariant { u.max = up.max }
+      invariant { plength u = plength up }
+      (*invariant { mod (value u n + value up j) (power radix j) = 0 }*)
+      invariant { power radix j * value u (n+n-j) + power radix n * value up j
+                  = value (old up) (n+n) + vm * added }
+      invariant { 0 <= added < power radix j }
+      invariant { mod (power radix j * value u (n + n - j)
+                      + power radix n * value up j) vm =
+                  mod (value (old up) (n+n)) vm }
+      let m = mul_mod (C.get u) invm in
+      let ghost nnj = n + n - j in
+      let ghost m0 = uint64'int (pelts mp)[offset mp] in
+      let ghost u0 = uint64'int (pelts u)[offset u] in
+      mod_mul (uint64'int m) (u0 * uint64'int invm) m0 m0 radix;
+      assert { mod (m * m0) radix
+               = mod ((u0 * invm) * m0) radix };
+      assert { mod ((u0 * invm) * m0) radix
+               = mod (- u0) radix
+               by let d = div (invm * m0) radix in
+                  invm * m0 = d * radix + radix - 1
+               so mod ((u0 * invm) * m0) radix
+                  = mod (u0 * (d * radix + radix - 1)) radix
+                  = mod (radix * (u0 * d + u0) - u0) radix
+                  = mod (- u0) radix };
+      assert { mod (u0 + m * m0) radix = 0
+               by mod (m * m0) radix
+                  = mod (- u0) radix
+               so let dm = div (m * m0) radix in
+                  let du = div (-u0) radix in
+                  m * m0 = - u0 + radix * (dm - du)
+               so mod (u0 + m * m0) radix = mod (radix * (dm - du) + 0) radix
+                  = 0 };
+      label Addmul in
+      let ghost oup = pure { up } in
+      value_sub_head (pelts u) (offset u) (offset u + int32'int nnj);
+      assert { u0 = mod (value u nnj) radix
+               by value u nnj = radix *
+                   (value_sub (pelts u) (offset u + 1) (offset u + nnj)) + u0 };
+      value_concat u n nnj;
+      cy <- wmpn_addmul_1 u mp n m;
+      value_concat u n nnj;
+      value_sub_frame (pelts up) (pelts oup) (offset u + int32'int n)
+                                           (offset u + int32'int nnj);
+      assert { value u nnj + power radix n * cy = value u nnj at Addmul + vm * m
+               by value_sub (pelts u) (offset u + n) (offset u + nnj)
+                  = value_sub (pelts u) (offset u + n) (offset u + nnj)
+                    at Addmul
+               so value u nnj = value u n + power radix n * value_sub (pelts u)
+                                                (offset u + n) (offset u + nnj)
+               so value u nnj at Addmul
+                  = value u n at Addmul
+                    + power radix n * value_sub (pelts u)
+                                        (offset u + n) (offset u + nnj) };
+      value_sub_head (pelts u) (offset u) (offset u + int32'int nnj);
+      value_sub_head (pelts mp) (offset mp) (offset mp + int32'int n);
+      assert { vm = m0 + radix * value_sub (pelts mp) (offset mp + 1)
+                                                      (offset mp + n) };
+      assert { (pelts u)[offset u] = 0
+                by value u nnj = radix * (value_sub (pelts u) (offset u + 1)
+                                                  (offset u + nnj))
+                                 + (pelts u)[offset u]
+                so (pelts u)[offset u] = mod (value u nnj) radix
+                so value u nnj = value u nnj at Addmul + m * vm
+                               - power radix n * cy
+                             = radix * (power radix (n-1) *(- cy))
+                               + (value u nnj at Addmul + m * vm)
+                so mod (m * vm) radix
+                   = mod (radix * m * value_sub (pelts mp) (offset mp + 1)
+                                                           (offset mp + n)
+                          + m * m0) radix
+                   = mod (m * m0) radix
+                so mod (value u nnj) radix
+                   = mod (radix * (power radix (n-1) *(- cy))
+                          + (value u nnj at Addmul + m * vm)) radix
+                   = mod (value u nnj at Addmul + m * vm) radix
+                   = mod (mod (value u nnj at Addmul) radix
+                          + mod (m * vm) radix)radix
+                   = mod (u0 + mod (m * m0) radix) radix
+                   = mod (mod u0 radix + mod (m * m0) radix) radix
+                   = mod (mod (u0 + m * m0) radix) radix
+                   = 0 };
+      value_sub_head (pelts u) (offset u) (offset u + int32'int nnj);
+      assert { value u nnj = radix * value_sub (pelts u) (offset u + 1)
+                                                       (offset u + nnj) };
+      value_sub_frame (pelts up) (pelts oup) (offset up)
+                               (offset up + int32'int j);
+      assert { value up j = value up j at Addmul };
+      label Carry in
+      value_sub_update_no_change (pelts up) (up.offset + int32'int j) up.offset
+                                            (up.offset + int32'int j) cy;
+      value_sub_update_no_change (pelts up) (up.offset + int32'int j)
+                                        (up.offset + int32'int j + 1)
+                                      (up.offset + int32'int nnj) cy;
+      C.set u cy;
+      added <- added + uint64'int m * power radix (int32'int j);
+      assert { added < power radix (j+1)
+               by m <= radix - 1
+               so added at Carry < power radix j
+               so added <= added at Carry + (radix - 1) * power radix j
+                  < power radix j + (radix - 1) * power radix j
+                  = radix * power radix j = power radix (j+1) };
+      value_tail up j;
+      assert { value up (j+1) = value up j at Addmul + power radix j * cy };
+      label Incr in
+      u <- C.incr u 1;
+      assert { radix * value u (n + n - (j + 1))
+               = radix * (value_sub (pelts u) (offset u + 1)
+                                   (offset u + nnj) at Incr)
+               = radix * (value_sub (pelts u) (offset u + 1)
+                                   (offset u + nnj) at Carry)
+               = value (u at Carry) nnj };
+      assert {  power radix (j+1) * value u (n + n - (j + 1))
+                 + power radix n * value up (j+1)
+               = vm * (power radix j * m)
+                   + ((power radix j * value u nnj + power radix n * value up j)
+                    at Addmul)
+               by
+               power radix (j+1) * value u (n + n - (j + 1))
+                 + power radix n * value up (j+1)
+               = power radix j * (radix * value u (n + n - (j + 1)))
+                 + power radix n * value up (j+1)
+               = power radix j * (value u nnj at Addmul + vm * m
+                                 - power radix n * cy)
+                 + power radix n * (value up j at Addmul + power radix j * cy)
+               = (power radix j * value u nnj + power radix n * value up j)
+                    at Addmul
+                 + vm * (power radix j * m) };
+      assert { 0 <= added
+               by 0 <= added at Carry so 0 <= m
+               so 0 <= m * power radix j };
+      assert { mod (power radix (j+1) * value u (n + n - (j + 1))
+                    + power radix n * value up (j+1)) vm
+               = mod (vm * (power radix j * m)
+                      + ((power radix j * value u nnj
+                        + power radix n * value up j) at Addmul)) vm
+               = mod (power radix j * value u nnj
+                      + power radix n * value up j) vm at Addmul };
+    done;
+    let u' = C.incr u (-n) in
+    assert { pelts u' = pelts up /\ offset u' = offset up };
+    cy <- wmpn_add_n rp u (C.incr u (-n)) n;
+    assert { mod (power radix n * (value rp n + power radix n * cy)) vm
+             = mod (value (old up) (n+n)) vm
+             by power radix n * (value rp n + power radix n * cy)
+                = power radix n * value u n + power radix n * value up n
+             so mod (power radix n * value u n + power radix n * value up n) vm
+                = mod (value (old up) (n+n)) vm };
+    assert { redc (value (old up) (2 * n))
+                  (value rp n + power radix n * cy)
+                  n vm };
+    assert { power radix n * (value rp n + power radix n * cy)
+             = value (old up) (2*n) + vm * added };
+    assert { value rp n + power radix n * cy < vm + power radix n
+             by value (old up) (2 * n) < power radix n * power radix n
+             so added < power radix n
+             so vm * added < vm * power radix n
+             so power radix n * (value rp n + power radix n * cy)
+                = value (old up) (2 * n) + vm * added
+                < power radix n * power radix n + vm * power radix n
+                = power radix n * (vm + power radix n) };
+    assert { value (old up) (2 * n) < power radix n * vm
+             -> (value rp n + power radix n * cy < 2 * vm)
+             by value (old up) (2 * n) < power radix n * vm
+             so added < power radix n
+             so vm * added < vm * power radix n
+             so power radix n * (value rp n + power radix n * cy)
+                = value (old up) (2 * n) + vm * added
+                < vm * power radix n + vm * power radix n
+                = power radix n * (2 * vm) };
+    label Sub in
+    begin
+      ensures { mod (value rp n) vm
+                = old mod (value rp n + power radix n * cy) vm }
+      ensures { forall j. j < offset rp \/ j >= offset rp + n
+                           -> (pelts rp)[j] = (pelts (old rp))[j] }
+      ensures { value (up at Start) (2 * n) < power radix n * vm
+                -> (value rp n < 2 * vm) }
+    if cy <> 0
+    then begin
+      assert { cy = 1 };
+      let ghost b = wmpn_sub_in_place rp n mp n in
+      assert { value rp n + power radix n * (cy - b)
+               = (value rp n at Sub + power radix n * cy) - vm };
+      assert { b = 1
+               by value rp n + power radix n * (cy - b)
+               = (value rp n at Sub + power radix n * cy) - vm
+               < power radix n
+               so cy - b < 1 };
+      assert { mod (value rp n) vm
+               = mod (value rp n at Sub + power radix n * cy) vm
+               by value rp n = (value rp n at Sub + power radix n * cy) - vm
+               so mod (value rp n) vm
+                  = mod (vm * -1 + (value rp n at Sub + power radix n * cy)) vm
+                  = mod (value rp n at Sub + power radix n * cy) vm }
+      end
+    end;
+    assert { mod (power radix n * value rp n) vm
+             = mod (power radix n * (value rp n at Sub + power radix n * cy))
+                   vm };
+    assert { redc (value (old up) (2 * n))
+                  (value rp n) n vm }
+
+  (* TODO table like sqrt1 *)
+  val binvert_limb_table (n:limb) : limb
+    requires { 0 <= n < 128 }
+    ensures { 0 <= result < 256 }
+    ensures { mod (result * (2 * n + 1)) (power 2 8) = 1 }
+
+  let binvert_limb (n:limb) : limb
+    requires { odd n }
+    ensures { mod (result * n) radix = 1 }
+  =
+    let lemma double_prec (n inv:int) (prec:int)
+      requires { 0 <= n /\ 0 <= inv }
+      requires { mod (inv * n) (power 2 prec) = 1 }
+      requires { 0 <= 2 * prec <= Limb.length }
+      ensures  { let inv' = mod (2 * inv - inv * (inv * n)) radix in
+                 mod (inv' * n) (power 2 (2 * prec)) = 1 }
+    =
+      let d = div (inv * n) (power 2 prec) in
+      assert { inv * n = d * power 2 prec + 1 };
+      let inv' = 2 * inv - inv * (inv * n) in
+      assert { inv' = 2 * inv - inv * (d * power 2 prec + 1)
+                    = inv * (1 - d * power 2 prec) };
+      assert { inv' * n = inv * n * (1 - d * power 2 prec)
+                 = (d * power 2 prec + 1) * (1 - d * power 2 prec)
+                 = 1 - d * d * (power 2 prec * power 2 prec)
+                 = 1 - d * d * (power 2 (2 * prec))
+                 = power 2 (2 * prec) * (-1 * d * d) + 1 };
+      assert { mod (inv' * n) (power 2 (2 * prec)) = 1
+               by mod (inv' * n) (power 2 (2 * prec))
+                  = mod (power 2 (2 * prec) * (-1 * d * d) + 1)
+                    (power 2 (2 * prec))
+                  = 1};
+      let inv'' = mod inv' radix in
+      let d' = div inv' radix in
+      assert { inv' = d' * radix + inv''
+                    = d' * power 2 Limb.length + inv''
+                    = d' * (power 2 (Limb.length - 2 * prec)
+                        * power 2 (2 * prec))
+                      + inv'' };
+      assert { mod (inv' * n) (power 2 (2 * prec))
+               = mod (inv'' * n) (power 2 (2 * prec))
+               by mod (inv' * n) (power 2 (2 * prec))
+                  = mod (power 2 (2 * prec)
+                         * ((d' * power 2 (Limb.length - 2 * prec)) * n)
+                         + inv'' * n) (power 2 (2 * prec))
+                  = mod (inv'' * n) (power 2 (2 * prec)) }
+    in
+    let h = (n/2) % 128 in
+    assert { power 2 8 = 256
+             by power 2 2 = 4
+             so power 2 4 = 16
+             so power 2 8 = power 2 4 * power 2 4 };
+    assert { 2 * h + 1 = mod n 256 };
+    let ref inv = binvert_limb_table h in
+    assert { mod (inv * n) (power 2 8) = 1 };
+    label P8 in
+    double_prec (uint64'int n) (uint64'int inv) 8;
+    inv <- sub_mod (mul_mod 2 inv) (mul_mod inv (mul_mod inv n));
+    assert { inv =
+             mod (2 * (inv at P8) - (inv at P8) * ((inv at P8) * n)) radix
+             by mod (2 * (inv at P8) - (inv at P8) * ((inv at P8) * n)) radix
+                = mod (mod (2 * (inv at P8)) radix
+                      - mod ((inv at P8) * ((inv at P8) * n)) radix) radix
+                = mod (mod (2 * (inv at P8)) radix
+                      - mod ((inv at P8) * mod ((inv at P8) * n) radix) radix)
+                      radix
+                = inv };
+    assert { mod (inv * n) (power 2 16) = 1 };
+    label P16 in
+    double_prec (uint64'int n) (uint64'int inv) 16;
+    inv <- sub_mod (mul_mod 2 inv) (mul_mod inv (mul_mod inv n));
+    assert { inv =
+             mod (2 * (inv at P16) - (inv at P16) * ((inv at P16) * n)) radix
+             by mod (2 * (inv at P16) - (inv at P16) * ((inv at P16) * n)) radix
+                = mod (mod (2 * (inv at P16)) radix
+                      - mod ((inv at P16) * ((inv at P16) * n)) radix) radix
+                = mod (mod (2 * (inv at P16)) radix
+                      - mod ((inv at P16) * mod ((inv at P16) * n) radix) radix)
+                      radix
+                = inv };
+    assert { mod (inv * n) (power 2 32) = 1 };
+    label P32 in
+    double_prec (uint64'int n) (uint64'int inv) 32;
+    inv <- sub_mod (mul_mod 2 inv) (mul_mod inv (mul_mod inv n));
+    assert { inv =
+             mod (2 * (inv at P32) - (inv at P32) * ((inv at P32) * n)) radix
+             by mod (2 * (inv at P32) - (inv at P32) * ((inv at P32) * n)) radix
+                = mod (mod (2 * (inv at P32)) radix
+                      - mod ((inv at P32) * ((inv at P32) * n)) radix) radix
+                = mod (mod (2 * (inv at P32)) radix
+                      - mod ((inv at P32) * mod ((inv at P32) * n) radix) radix)
+                      radix
+                = inv };
+    assert { mod (inv * n) (power 2 64) = 1 };
+    inv
+
+  (* TODO rewrite this with array literal once they exist *)
+  let win_size [@extraction:inline] (eb:int32) : int32
+    ensures { 0 <= result <= 10 }
+    ensures { eb > 0 -> result > 0 }
+  = if eb = 0 then 0
+    else if eb <= 7 then 1
+    else if eb <= 25 then 2
+    else if eb <= 81 then 3
+    else if eb <= 214 then 4
+    else if eb <= 673 then 5
+    else if eb <= 1793 then 6
+    else if eb <= 4609 then 7
+    else if eb <= 11521 then 8
+    else if eb <= 28161 then 9
+    else 10
+
+  let redcify [@extraction:inline] (rp up: t) (un: int32) (mp: t) (n: int32)
+    requires { valid rp n /\ valid up un /\ valid mp n }
+    requires { 1 <= n /\ 1 <= un }
+    requires { un + n < max_int32 }
+    requires { (pelts mp)[offset mp + n - 1] > 0 }
+    ensures { value rp n = mod (power radix n * value up un) (value mp n) }
+    ensures { redc (value rp n) (value up un) n (value mp n) }
+  =
+    let tp = salloc (UInt32.of_int32 (un + n)) in
+    let qp = salloc (UInt32.of_int32 (un + 1)) in
+    wmpn_zero tp n;
+    label Copy in
+    wmpn_copyi (C.incr tp n) up un;
+    value_concat tp n (un+n);
+    value_sub_frame (pelts tp) (pure { pelts tp at Copy })
+                    (offset tp) (offset tp + int32'int n);
+    assert { value tp (un + n) = power radix n * value up un };
+    wmpn_tdiv_qr qp rp tp (un+n) mp n;
+    assert { mod (power radix n * value up un) (value mp n)
+             = mod (value tp (un + n)) (value mp n)
+             = mod (value rp n) (value mp n)
+             by value tp (un + n) = value mp n * value qp (un + 1)
+                                    + value rp n };
+    assert { 0 <= value rp n < value mp n };
+    assert { mod (value rp n) (value mp n) = value rp n };
+
+  function valueb (p:t) (nbits:int) : int
+  =
+    if nbits < 0 then 0 else
+    let i = div nbits 64 in
+    value p i
+      + power radix i * mod ((pelts p)[offset p + i]) (power 2 (nbits - 64*i))
+
+  let lemma valueb_lower_bound (p:t) (nbits:int)
+    ensures { 0 <= valueb p nbits }
+  = if nbits < 0 then ()
+    else
+      let i = div nbits 64 in
+      value_sub_lower_bound (pelts p) (offset p) (offset p + i)
+
+  let lemma valueb_upper_bound (p:t) (nbits:int)
+    requires { 0 <= nbits }
+    ensures { valueb p nbits < power 2 nbits }
+  = if nbits < 0 then ()
+    else
+      let i = div nbits 64 in
+      value_sub_upper_bound (pelts p) (offset p) (offset p + i);
+      assert { valueb p nbits < power 2 nbits
+               by valueb p nbits
+                  = value p i
+                    + power radix i
+                      * mod ((pelts p)[offset p + i]) (power 2 (nbits - 64*i))
+               so power radix i = power 2 (64 * i)
+               so mod ((pelts p)[offset p + i]) (power 2 (nbits - 64*i))
+                  <= power 2 (nbits - 64 * i) - 1
+               so value p i < power 2 (64 * i)
+               so valueb p nbits < power 2 (64 * i)
+                                   * (1 + power 2 (nbits - 64 * i) - 1)
+                                 = power 2 (64 * i + (nbits - 64 * i))
+                                 = power 2 nbits }
+
+  let getbit [@extraction:inline] (p:t) (ghost pn:int32) (bi:int32) : limb
+    requires { valid p pn }
+    requires { 1 <= bi }
+    requires { pn >= (div (bi + 63) 64) }
+    ensures  { 0 <= result <= 1 }
+    ensures  { result = mod (div (value p pn) (power 2 (bi-1))) 2 }
+    ensures  { valueb p bi = valueb p (bi-1) + power 2 (bi-1) * result }
+  =
+    let i = Int32.(/) (bi - 1) 64 in
+    let mi = Limb.of_int32 (bi - 1) % 64 in
+    assert { bi - 1 = 64 * i + mi };
+    let lp = C.get_ofs p i in
+    value_concat p i (i+1);
+    value_concat p (i+1) pn;
+    let ghost p' = C.incr p (i+1) in
+    assert { value p pn = value p i + power radix i * lp
+             + power radix (i+1) * value p' (pn - (i+1)) };
+    let lps = lsr_mod lp mi in
+    let ghost lpm = mod (uint64'int lp) (power 2 (uint64'int mi)) in
+    assert { lp = lpm + power 2 mi * lps };
+    assert { power radix i * power 2 mi = power 2 (bi-1)
+             by power radix i = power (power 2 64) i = power 2 (64 * i)
+             so power radix i * power 2 mi = power 2 (64 * i + mi) };
+    assert { value p pn = value p i + power radix i * lpm + power 2 (bi-1) * lps
+                          + power radix (i + 1) * value p' (pn - (i+1)) };
+    assert { valueb p (bi-1) = value p i + power radix i * lpm
+             by valueb p (bi-1)
+                = value p i + power radix i
+                  * mod ((pelts p)[offset p + i]) (power 2 (bi - 1 - 64 * i))
+                = value p i + power radix i * lpm };
+    let ghost res = lps % 2 in
+    assert { value p pn = valueb p (bi-1) + power 2 (bi-1) * lps
+                          + power radix (i+1) * value p' (pn - (i+1)) };
+    let ghost dps = div (uint64'int lps) 2 in
+    assert { lps = res + 2 * dps };
+    assert { valueb p bi = valueb p (bi-1) + power 2 (bi-1) * res
+             by bi = 64 * i + (mi+1)
+             so (valueb p bi
+                = value p i + power radix i * mod lp (power 2 (mi+1))
+                by
+                if mi < 63
+                then
+                  div bi 64 = i && mod bi 64 = mi + 1
+                  so valueb p bi
+                  = value p i + power radix i
+                    * mod ((pelts p)[offset p + i]) (power 2 (bi - 64 * i))
+                  = value p i + power radix i * mod lp (power 2 (bi - 64 * i))
+                  = value p i + power radix i * mod lp (power 2 (mi+1))
+                else
+                  mi = 63
+                  so div bi 64 = (i+1) && mod bi 64 = 0
+                  so valueb p bi
+                     = value p (i+1)
+                       + power radix (i+1) *
+                         mod ((pelts p)[offset p + i + 1]) (power 2 0)
+                     = value p (i+1)
+                  so mod lp (power 2 (mi+1))
+                     = mod lp (power 2 64) = mod lp radix = lp
+                  so value p (i+1) = value p i
+                     + power radix i * mod lp (power 2 (mi + 1)))
+             so lp = lpm + power 2 mi * (res + 2 * dps)
+                   = power 2 (mi+1) * dps + lpm + power 2 mi * res
+             so (0 <= lpm + power 2 mi * res < power 2 (mi+1)
+                 by 0 <= lpm < power 2 mi
+                 so 0 <= res <= 1
+                 so 0 <= power 2 mi * res <= power 2 mi
+                 so 0 <= lpm + power 2 mi * res < power 2 mi + power 2 mi
+                      = power 2 (mi+1))
+             so mod lp (power 2 (mi + 1))
+                = mod (power 2 (mi + 1) * dps + (lpm + power 2 mi * res))
+                      (power 2 (mi + 1))
+                = mod (lpm + power 2 mi * res) (power 2 (mi + 1))
+                = lpm + power 2 mi * res };
+    assert { power radix (i+1) = power 2 (bi-1) * 2 * power 2 (64 - mi - 1)
+             by power 2 (bi - 1) = power radix i * power 2 mi
+             so power 2 (bi - 1) * 2 * power 2 (64 -  mi - 1)
+                = power radix i * power 2 mi * power 2 1 * power 2 (64 - mi - 1)
+                = power radix i * (power 2 (mi + 1) * power 2 (64 - mi - 1))
+                = power radix i * power 2 (mi + 1 + (64 - mi - 1))
+                = power radix i * power 2 64
+                = power radix i * radix = power radix (i+1) };
+    let ghost d = dps + power 2 (64 - uint64'int mi - 1)
+                  * value p' (int32'int pn - (int32'int i+1)) in
+    assert { value p pn = power 2 (bi-1) * (res + 2 * d) + valueb p (bi-1)
+             by power 2 (bi - 1) * 2 = power 2 bi
+             so power 2 (bi - 1) * lps
+                = power 2 (bi - 1) * (res + 2 * dps)
+             so value p pn
+             = valueb p (bi-1) + power 2 (bi-1) * (res + 2 * dps)
+                          + power radix (i+1) * value p' (pn - (i+1))
+             = valueb p (bi-1) + power 2 (bi-1) * (res + 2 * dps)
+               + power 2 (bi-1) * (2 * power 2 (64 - mi - 1)
+                                * value p' (pn - (i+1)))
+             = power 2 (bi-1) * (res + 2 * d) + valueb p (bi-1) };
+    assert { mod (value p pn) (power 2 (bi-1))
+             = mod (valueb p (bi-1)) (power 2 (bi-1))
+             = valueb p (bi-1) };
+    assert { div (value p pn) (power 2 (bi-1)) = res + 2 * d
+             by valueb p (bi - 1) = mod (value p pn) (power 2 (bi-1))
+             so power 2 (bi - 1) * div (value p pn) (power 2 (bi - 1))
+                  + mod (value p pn) (power 2 (bi - 1))
+                = value p pn
+                = power 2 (bi - 1) * (res + 2 * d) + valueb p (bi - 1)
+             so power 2 (bi - 1) * (res + 2 * d)
+                = power 2 (bi - 1) * (div (value p pn) (power 2 (bi-1)))};
+    assert { mod (div (value p pn) (power 2 (bi-1))) 2
+             = mod (2 * d + res) 2 = mod res 2 = res };
+    lps % 2
+
+  let getbits [@extraction:inline] (p: t) (ghost pn: int32) (bi:int32)
+                                                            (nbits:int32) : limb
+    requires { 1 <= nbits < 64 }
+    requires { 0 <= bi }
+    requires { 1 <= pn }
+    requires { valid p pn }
+    requires { pn >= (div (bi + 63) 64) }
+    ensures  { nbits <= bi ->
+                 valueb p bi = valueb p (bi - nbits)
+                                    + power 2 (bi - nbits) * result }
+    ensures  { bi < nbits -> valueb p bi = result }
+    ensures  { 0 <= result < power 2 nbits }
+    ensures  { result = mod (div (value p pn) (power 2 (bi - nbits)))
+                                                      (power 2 nbits)  }
+  =
+    if bi < nbits
+    then (C.get p) % (lsl 1 (Limb.of_int32 bi))
+    else
+      let ghost obi = bi in
+      label Start in
+      let ref bi = bi - nbits in
+      let ghost bni = bi in
+      assert { bni = obi - nbits };
+      let ref i = bi / 64 in
+      bi <- bi % 64;
+      assert { i < pn };
+      let pr = get_ofs p i in
+      let ghost p' = C.incr p (i+1) in
+      value_concat p i (i+1);
+      value_concat p (i+1) pn;
+      assert { value p pn = value p i + power radix i * pr
+               + power radix (i+1) * value p' (pn - (i+1)) };
+      let ref r = lsr_mod pr (Limb.of_int32 bi) in
+      let ghost prm = mod (uint64'int pr) (power 2 (int32'int bi)) in
+      assert { pr = prm + power 2 bi * r };
+      let nbits_in_r = 64 - bi in
+      assert { radix = power 2 nbits_in_r * power 2 bi
+               by radix = power 2 64 = power 2 (nbits_in_r + bi)};
+      assert { r < power 2 nbits_in_r
+               by r = div pr (power 2 bi)
+               so r * power 2 bi <= pr
+                  < power 2 64
+                  = power 2 (nbits_in_r + bi)
+                  = power 2 nbits_in_r * power 2 bi
+                so r * power 2 bi < power 2 nbits_in_r * power 2 bi};
+      assert { power radix i * power 2 bi = power 2 bni
+               by power radix i = power (power 2 64) i = power 2 (64 * i)
+               so power radix i * power 2 bi = power 2 (64 * i + bi)
+                  = power 2 bni };
+      assert { value p pn = value p i + power radix i * prm + power 2 bni * r
+                            + power radix (i+1) * value p' (pn - (i+1)) };
+      assert { valueb p bni = value p i + power radix i * prm
+               by valueb p bni
+                  = value p i + power radix i
+                      * mod ((pelts p)[offset p + i]) (power 2 (bni - 64 * i))
+                  = value p i + power radix i * prm };
+      if nbits_in_r < nbits
+      then begin
+        assert { i + 1 < pn
+                 by obi
+                    = 64 * i + bi + nbits
+                    > 64 * i + bi + 64 - bi
+                    = 64 * (i+1)
+                 so (obi + 63) >= 64 * (i+1) + 64 = 64 * (i+2)
+                 so pn >= div (obi + 63) 64 >= i+2 };
+        let pr' = get_ofs p (i+1) in
+        let prs = lsl_mod_ext pr' (Limb.of_int32 nbits_in_r) in
+        let ghost p'' = C.incr p (i+2) in
+        value_concat p (i+1) (i+2);
+        value_concat p (i+2) pn;
+        assert { value p pn
+                 = value p i + power radix i * prm + power 2 bni * r
+                   + power radix (i+1) * pr'
+                   + power radix (i+2) * value p'' (pn - (i+2))
+                 by value p pn
+                    = value p i + power radix i * prm + power 2 bni * r
+                      + power radix (i+1) * value p' (pn - (i+1))
+                 so value p' (pn - (i+1))
+                    = pr' + radix * value p'' (pn - (i+2)) };
+        let ghost prd = div ((power 2 (int32'int nbits_in_r)) * uint64'int pr')
+                            radix in
+        assert { power 2 nbits_in_r * pr' = radix * prd + prs };
+        assert { radix * pr' =  radix * (power 2 bi * prd) + power 2 bi * prs
+                 by radix * pr'
+                 = power 2 bi * power 2 nbits_in_r * pr'
+                 = radix * (power 2 bi * prd) + power 2 bi * prs };
+        assert { power radix (i+1) * pr'
+                 = power radix (i+1) * (power 2 bi * prd)
+                   + power 2 bni * prs
+                 by power radix (i+1) = radix * power radix i
+                 so power radix (i+1) * pr'
+                 = radix * power radix i * pr'
+                 = power radix i * (radix * pr')
+                 = power radix i * radix * power 2 bi * prd
+                   + power radix i * power 2 bi * prs
+                 = power radix (i+1) * (power 2 bi * prd)
+                   + power radix i * power 2 bi * prs
+                 = power radix (i+1) * (power 2 bi * prd)
+                   + power 2 bni * prs };
+        assert { value p pn
+                 = value p i + power radix i * prm
+                   + power 2 bni * (r + prs)
+                   + power radix (i+1) * (power 2 bi * prd)
+                   + power radix (i+2) * value p'' (pn - (i+2)) };
+        let ghost or = pure { r } in
+        r <- r + prs;
+        let ghost res = pure { mod r (power 2 (int32'int nbits)) } in
+        let ghost drs = pure { div r (power 2 (int32'int nbits)) } in
+        assert { r = res + power 2 nbits * drs };
+        assert { power radix (i+1) = power 2 bni * power 2 nbits_in_r
+                 by power radix (i+1) = power radix i * radix
+                    = power radix i * power 2 bi * power 2 nbits_in_r
+                    = power 2 bni * power 2 nbits_in_r };
+        assert { valueb p obi
+                 = valueb p bni + power 2 bni * res
+                 by bni = 64 * i + bi
+                 so obi = bni + nbits > bni + 64 - bi = 64 * (i+1)
+                 so div obi 64 = i+1
+                 so obi - 64 * (i+1)
+                    = 64 *i + bi + nbits - 64 * (i+1)
+                    = bi + nbits - 64
+                    = nbits - nbits_in_r
+                 so valueb p obi
+                     = value p (i+1)
+                       + power radix (i+1)
+                         * mod ((pelts p)[offset p + (i+1)])
+                               (power 2 (obi - (64 * (i+1))))
+                     = value p (i+1)
+                       + power radix (i+1)
+                         * mod pr' (power 2 (nbits - nbits_in_r))
+                 so value p (i+1) = value p i + power radix i * pr
+                    = value p i + power radix i * (prm + power 2 bi * or)
+                    = valueb p bni + power 2 bni * or
+                 so valueb p obi
+                    = valueb p bni
+                      + power 2 bni * or
+                      + power 2 bni * power 2 nbits_in_r
+                        * mod pr' (power 2 (nbits - nbits_in_r))
+                 so power 2 nbits_in_r * power 2 (nbits - nbits_in_r)
+                    = power 2 nbits
+                 so power 2 nbits_in_r * mod pr' (power 2 (nbits - nbits_in_r))
+                    = mod (pr' * power 2 nbits_in_r)
+                          (power 2 (nbits - nbits_in_r) * power 2 nbits_in_r)
+                    = mod (power 2 nbits_in_r * pr') (power 2 nbits)
+                    = mod (radix * prd + prs) (power 2 nbits)
+                 so radix * prd = power 2 64 * prd
+                    = power 2 nbits * power 2 (64 - nbits) * prd
+                 so mod (radix * prd + prs) (power 2 nbits)
+                    = mod (power 2 nbits * (power 2 (64 - nbits) * prd) + prs)
+                          (power 2 nbits)
+                    = mod prs (power 2 nbits)
+                 so valueb p obi
+                    = valueb p bni
+                      + power 2 bni * (or + mod prs (power 2 nbits))
+                 so prs <= radix - power 2 nbits_in_r
+                (* so radix = power 2 nbits_in_r * power 2 bi *)
+                 so prs = power 2 nbits_in_r * pr' - radix * prd
+                         = power 2 nbits_in_r * (pr' - power 2 bi * prd) + 0
+                 so mod prs (power 2 nbits_in_r) = mod 0 (power 2 nbits_in_r)
+                    = 0
+                 so (mod prs (power 2 nbits)
+                     <= power 2 nbits - power 2 (nbits_in_r)
+                    by let nbr = nbits - nbits_in_r in
+                       let k = div prs (power 2 nbits_in_r) in
+                       power 2 nbits = power 2 (nbr + nbits_in_r)
+                       = power 2 nbr * power 2 nbits_in_r
+                    so prs = k * power 2 nbits_in_r
+                    so mod prs (power 2 nbits)
+                       = mod (k * power 2 nbits_in_r)
+                             (power 2 nbr * power 2 nbits_in_r)
+                       = power 2 nbits_in_r * (mod k (power 2 nbr))
+                    so mod k (power 2 nbr) <= power 2 nbr - 1
+                    so mod prs (power 2 nbits)
+                       <= (power 2 nbits_in_r) * (power 2 nbr - 1)
+                       = power 2 nbits - power 2 nbits_in_r)
+                 so or < power 2 nbits_in_r < power 2 nbits
+                 so mod or (power 2 nbits) = or
+                 so mod or (power 2 nbits) + mod prs (power 2 nbits)
+                    < power 2 nbits_in_r + (power 2 nbits - power 2 nbits_in_r)
+                    <= power 2 nbits
+                 so mod or (power 2 nbits) + mod prs (power 2 nbits)
+                    = mod (mod or (power 2 nbits) + mod prs (power 2 nbits))
+                          (power 2 nbits)
+                    = mod (or + prs) (power 2 nbits)
+                    = mod r (power 2 nbits)
+                    = res };
+        assert { power radix (i+1) * power 2 bi * prd
+                 = power 2 bni * radix * prd };
+        assert { power radix (i+2) = power 2 bni * radix * power 2 nbits_in_r };
+        assert { value p pn
+                 = value p i + power radix i * prm
+                   + power 2 bni * (res + power 2 nbits * drs)
+                   + power 2 bni * radix * prd
+                   + power 2 bni * radix * power 2 nbits_in_r
+                     * value p'' (pn - (i+2)) };
+        let ghost d = pure { prd + power 2 nbits_in_r
+                                   * value p'' (pn - (i+2)) } in
+        assert { value p pn
+                 = power 2 bni * (res + power 2 nbits * drs + radix * d)
+                   + valueb p bni };
+        assert { mod (value p pn) (power 2 bni)
+                 = mod (valueb p bni) (power 2 bni)
+                 = valueb p bni };
+        assert { div (value p pn) (power 2 bni)
+                 = res + power 2 nbits * drs + radix * d
+                 by valueb p bni = mod (value p pn) (power 2 bni)
+                 so power 2 bni * div (value p pn) (power 2 bni)
+                      + mod (value p pn) (power 2 bni)
+                    = value p pn
+                    = power 2 bni * (res + power 2 nbits * drs + radix * d)
+                      + valueb p bni
+                 so power 2 bni * (res + power 2 nbits * drs + radix * d)
+                    = power 2 bni * div (value p pn) (power 2 bni) };
+        assert { radix = power 2 64 = power 2 nbits * power 2 (64 - nbits) };
+        let ghost d' = pure { drs + power 2 (64 - nbits) * d } in
+        assert { div (value p pn) (power 2 bni)
+                 = power 2 nbits * drs
+                   + power 2 nbits * power 2 (64 - nbits) * d + res
+                 = power 2 nbits * d' + res };
+        assert { mod (div (value p pn) (power 2 bni)) (power 2 nbits)
+                 = mod (power 2 nbits * d' + res) (power 2 nbits)
+                 = mod res (power 2 nbits)
+                 = res };
+      end
+      else begin
+        let ghost res = pure { mod r (power 2 nbits) } in
+        let ghost drs = pure { div r (power 2 nbits) } in
+        assert { r = power 2 nbits * drs + res };
+        assert { valueb p obi = valueb p bni + power 2 bni * res
+                 by obi = 64 * i + bi + nbits
+                        <= 64 * i + bi + (64 - bi)
+                        = 64 * (i+1)
+                 so if obi < 64 * (i+1)
+                    then
+                      div obi 64 = i
+                      so valueb p obi
+                         = value p i
+                           + power radix i * mod ((pelts p)[offset p + i])
+                                               (power 2 (obi - 64 * i))
+                         = value p i
+                           + power radix i * mod pr (power 2 (bi + nbits))
+                      so pr = prm + power 2 bi * r
+                            = prm + power 2 bi * (res + power 2 nbits * drs)
+                            = prm + power 2 bi * res
+                              + power 2 bi * power 2 nbits * drs
+                            = power 2 (bi + nbits) * drs
+                              + prm + power 2 bi * res
+                      so (0 <= prm + power 2 bi * res < power 2 (bi + nbits)
+                          by 0 <= prm < power 2 bi
+                          so 0 <= res <= power 2 nbits - 1
+                          so power 2 bi * res
+                             <= power 2 bi * (power 2 nbits - 1)
+                             = power 2 (bi + nbits) - power 2 bi)
+                      so mod pr (power 2 (bi + nbits))
+                         = mod (power 2 (bi + nbits) * drs
+                                 + (prm + power 2 bi * res))
+                               (power 2 (bi + nbits))
+                         = mod (prm + power 2 bi * res) (power 2 (bi + nbits))
+                         = prm + power 2 bi * res
+                      so valueb p obi
+                         = value p i + power radix i * (prm + power 2 bi * res)
+                         = value p i + power radix i * prm + power 2 bni * res
+                         = valueb p bni + power 2 bni * res
+                    else
+                      obi = 64 * (i+1)
+                      so div obi 64 = (i+1)
+                      so bi + nbits = 64
+                      so valueb p obi
+                         = value p (i+1)
+                           + power radix (i+1)
+                             * (mod (pelts p)[offset p + (i + 1)]) (power 2 0)
+                         = value p (i+1)
+                         = value p i + power radix i * pr
+                      so nbits_in_r = nbits
+                      so r < power 2 nbits
+                      so res = r
+                      so pr = prm + power 2 bi * res
+                      so valueb p obi
+                         = value p i + power radix i * prm
+                           + power radix i * power 2 bi * res
+                         = valueb p bni + power 2 bni * res };
+        assert { mod (div (value p pn) (power 2 bni)) (power 2 nbits) = res
+                 by power radix (i+1)
+                    = power radix i * radix
+                    = power radix i * power 2 bi * power 2 nbits_in_r
+                    = power 2 bni * power 2 nbits_in_r
+                 so value p pn
+                    = valueb p bni + power 2 bni * r
+                      + power radix (i+1) * value p' (pn - (i+1))
+                    = valueb p bni + power 2 bni * r
+                      + power 2 bni
+                        * (power 2 nbits_in_r * value p' (pn - (i+1)))
+                 so value p pn
+                    = power 2 bni
+                        * (r + power 2 nbits_in_r * value p' (pn - (i+1)))
+                      + valueb p bni
+                 so mod (value p pn) (power 2 bni)
+                    = mod (valueb p bni) (power 2 bni) = valueb p bni
+                 so let d = power 2 (nbits_in_r - nbits)
+                            * value p' (pn - (i+1)) in
+                    power 2 nbits_in_r
+                    = power 2 (nbits_in_r - nbits) * power 2 nbits
+                 so value p pn
+                    = valueb p bni
+                      + power 2 bni * (r + power 2 nbits * d)
+                 so value p pn
+                    = mod (value p pn) (power 2 bni)
+                      + power 2 bni * (div (value p pn) (power 2 bni))
+                 so power 2 bni * (r + power 2 nbits * d)
+                    = power 2 bni * (div (value p pn) (power 2 bni))
+                 so r + power 2 nbits * d
+                    = div (value p pn) (power 2 bni)
+                 so r + power 2 nbits * d
+                    = power 2 nbits * (drs + d) + res
+                 so mod (r + power 2 nbits * d) (power 2 nbits)
+                    = mod res (power 2 nbits)
+                    = res };
+      end;
+      r % (lsl 1 (Limb.of_int32 nbits))
+
+  let lemma valueb_mod (p:t) (nbits:int) (n:int32)
+    requires { nbits >= 0 }
+    requires { 64 * n >= nbits }
+    ensures  { valueb p nbits = mod (value p n) (power 2 nbits) }
+  = let i = div nbits 64 in
+    assert { i <= n };
+    if i = int32'int n then return else ();
+    assert { mod (power 2 (64 * i) * (pelts p)[offset p + i]) (power 2 nbits)
+             = power 2 (64 * i)
+               * mod (pelts p)[offset p + i] (power 2 (nbits - 64 * i))
+             by power 2 nbits = power 2 (64 * i) * power 2 (nbits - 64 * i)
+             so power 2 (64 * i)
+                * mod (pelts p)[offset p + i] (power 2 (nbits - 64 * i))
+                = mod (power 2 (64 * i) * (pelts p)[offset p + i])
+                      (power 2 (64 * i) * power 2 (nbits - 64 * i)) };
+    assert { valueb p nbits
+             = value p i
+               + power radix i * mod (pelts p)[offset p + i]
+                                     (power 2 (nbits - 64 * i))
+             = value p i
+               + power 2 (64 * i) * mod (pelts p)[offset p + i]
+                                        (power 2 (nbits - 64 * i))
+             = value p i + mod (power 2 (64 * i) * (pelts p)[offset p + i])
+                               (power 2 nbits) };
+    mod_id (value p i) (power 2 nbits);
+    assert { mod (power 2 (64 * i) * (pelts p)[offset p + i]) (power 2 nbits)
+                 <= power 2 nbits - power 2 (64 * i)
+             by mod (power 2 (64 * i) * (pelts p)[offset p + i]) (power 2 nbits)
+                = power 2 (64 * i)
+                  * mod (pelts p)[offset p + i] (power 2 (nbits - 64 * i))
+             so mod (pelts p)[offset p + i] (power 2 (nbits - 64 * i))
+                <= power 2 (nbits - 64 * i) - 1
+            so power 2 (64 * i)
+               * mod (pelts p)[offset p + i] (power 2 (nbits - 64 * i))
+               <= power 2 (64 * i) * (power 2 (nbits - 64 * i) - 1)
+               = power 2 (64 * i) * power 2 (nbits - 64 * i) - power 2 (64 * i)
+               = power 2 nbits - power 2 (64 * i) };
+    mod_id (mod (value p i) (power 2 nbits)
+           + mod (power 2 (64 * i) * uint64'int (pelts p)[offset p + i])
+                 (power 2 nbits))
+           (power 2 nbits);
+    mod_sum (value p i) (power 2 (64 * i) * uint64'int (pelts p)[offset p + i])
+            (power 2 nbits);
+    value_tail p (Int32.of_int i);
+    assert { valueb p nbits
+             = mod (value p i + power 2 (64 * i) * (pelts p)[offset p + i])
+                   (power 2 nbits)
+             = mod (value p i + power radix i * (pelts p)[offset p + i])
+                   (power 2 nbits)
+             = mod (value p (i+1)) (power 2 nbits) };
+    value_concat p (Int32.of_int i+1) n;
+    let x = value_sub (pelts p) (offset p + (i+1)) (offset p + int32'int n) in
+    let d = 64 * (i+1) - nbits in
+    assert { d >= 0 };
+    assert { power radix (i+1) = power 2 (64 * (i+1))
+             = power 2 nbits * power 2 d };
+    assert { value p n = value p (i+1) + power radix (i+1) * x
+             = power 2 nbits * (power 2 d * x) + value p (i+1) };
+    assert { mod (value p n) (power 2 nbits)
+             = mod (power 2 nbits * (power 2 d * x) + value p (i+1))
+                   (power 2 nbits)
+             = mod (value p (i+1)) (power 2 nbits)
+             = valueb p nbits }
+
+  let lemma valueb_mon (p:t) (pn:int32) (bi1 bi2:int32)
+    requires { 0 <= bi1 <= bi2 }
+    requires { valid p pn }
+    requires { pn >= div (bi2 + 63) 64 }
+    ensures  { valueb p bi1 <= valueb p bi2 }
+  =
+    if bi2 - bi1 >= 64
+    then begin
+      let i1 = bi1 / 64 in
+      let i2 = bi2 / 64 in
+      assert { i1 < i2 };
+      value_concat p (i1+1) i2;
+      value_tail p i1;
+      assert { valueb p bi1
+               = value p i1 + power radix i1
+                    * mod ((pelts p)[offset p + i1]) (power 2 (bi1 - 64 * i1))
+               <= value p i1 + power radix i1 * (pelts p)[offset p + i1]
+               = value p (i1 + 1)
+               by mod ((pelts p)[offset p + i1]) (power 2 (bi1 - 64 * i1))
+                  <= (pelts p)[offset p + i1]
+             };
+      assert { valueb p bi2
+               = value p i2 + power radix i2
+                    * mod ((pelts p)[offset p + i2]) (power 2 (bi2 - 64 * i2))
+               >= value p i2
+               by div bi2 64 = i2
+               so mod ((pelts p)[offset p + i2]) (power 2 (bi2 - 64 * i2)) >= 0
+               so power radix i2 >= 0 };
+      assert { value p i2
+               = value p (i1+1) + power radix (i1 + 1)
+                       * value_sub (pelts p) (offset p + i1 + 1) (offset p + i2)
+               >= value p (i1 + 1) }
+    end
+    else if bi1 = bi2 then ()
+    else
+      begin
+      let x = getbits p pn bi2 (bi2-bi1) in
+      assert { valueb p bi2 = valueb p bi1 + power 2 bi1 * x };
+      assert { power 2 bi1 * x >= 0 by x >= 0 }
+    end
+
+  let lemma redc_mul (p q a b c n m : int)
+    requires { redc p a n m }
+    requires { redc q b n m }
+    requires { redc (p*q) c n m }
+    requires { odd m }
+    requires { 0 < m /\ 0 < n }
+    ensures  { redc c (a * b) n m }
+  = assert { mod p m = mod (power radix n * a) m
+             /\ mod q m = mod (power radix n * b) m };
+    mod_mul p (power radix n * a) q (power radix n * b) m;
+    assert { mod (p * q) m = mod (power radix n * c) m
+             = mod (power radix n * (power radix n * a * b)) m };
+    unredc c (p * q) (power radix n * (a * b)) n m
+
+  let wmpn_powm (rp bp : t) (bn : int32) (ep : t) (en : int32) (mp : t)
+                (n : int32) (tp : t) : unit
+    requires { valid rp n /\ valid bp bn /\ valid ep en /\ valid mp n }
+    requires { valid tp (2*n) }
+    requires { odd (value mp n) }
+    requires { value ep en > 1 }
+    requires { en >= 1 }
+    requires { (pelts ep)[offset ep + en - 1] > 0 }
+    requires { (pelts mp)[offset mp + n - 1] > 0 }
+    requires { n >= 1 }
+    requires { bn >= 1 }
+    requires { bn + n < max_int32 }
+    requires { n * 512 <= max_int32 }
+    requires { 64 * en < max_int32 - 64 }
+    ensures  { value rp n
+               = mod (power (value bp bn) (value ep en)) (value mp n) }
+  =
+    let ghost vb = value bp (int32'int bn) in
+    let ghost vm = value mp (int32'int n) in
+    let ghost ve = value ep (int32'int en) in
+    (* SIZEINBASE_2EXP start, move to function? *)
+    let le = C.get_ofs ep (en - 1) in
+    let ref cnt = count_leading_zeros le in
+    let ref ebi = 64 * en - cnt in
+    (* ep has ebi bits *)
+    value_tail ep (en-1);
+    assert { ve = value ep (en - 1) + power radix (en - 1) * le };
+    assert { power 2 ebi = power radix (en - 1) * power 2 (64 - cnt)
+             by power radix (en - 1) = power (power 2 64) (en - 1)
+                = power 2 (64 * (en - 1))
+             so power radix (en - 1) * power 2 (64 - cnt)
+                = power 2 (64 * (en - 1)) * power 2 (64 - cnt)
+                = power 2 (64 * (en - 1) + (64 - cnt))
+                = power 2 ebi };
+    assert { le < power 2 (64 - cnt)
+             by radix = power 2 cnt * power 2 (64 - cnt) > power 2 cnt * le };
+    assert { le >= power 2 (64 - (cnt + 1))
+                 by radix = power 2 (cnt + 1) * power 2 (64 - (cnt + 1))
+                 so power 2 (cnt + 1) * power 2 (64 - (cnt + 1))
+                    <= power 2 (cnt + 1) * le};
+    assert { power 2 (ebi-1) <= ve < power 2 ebi
+             by power radix (en - 1) = power (power 2 64) (en - 1)
+                = power 2 (64 * (en - 1))
+             so 0 <= value ep (en - 1) < power radix (en - 1)
+             so power radix (en - 1) * le
+                <= ve < power radix (en - 1) * (1 + le) };
+    assert { ve = valueb ep ebi
+             by ebi > 0
+             so 0 <= cnt < 64
+             so 64 * (en - 1) < ebi <= 64 * en
+             so if cnt = 0
+             then
+               ebi = 64 * en
+               so div ebi 64 = en
+               so valueb ep ebi
+                  = value ep en
+                    + power radix en * mod (pelts ep)[offset ep + en] 1
+                  = value ep en
+                  = ve
+             else
+               ebi < 64 * en
+               so div ebi 64 = en - 1
+               so ebi - 64 * (en - 1) = 64 - cnt
+               so mod le (power 2 (64 - cnt)) = le
+               so valueb ep ebi
+                  = value ep (en - 1)
+                    + power radix (en - 1)
+                      * mod le (power 2 (ebi - 64 * (en - 1)))
+                  = value ep (en - 1)
+                    + power radix (en - 1) * le = ve };
+    let windowsize = win_size ebi in
+    assert { n <= n * power 2 (windowsize - 1) <= max_int32
+             by windowsize - 1 <= 9
+             so power 2 (windowsize - 1) <= power 2 9
+             so power 2 2 = 4
+             so power 2 4 = power 2 2 * power 2 2
+             so power 2 8 = power 2 4 * power 2 4 = 256
+             so power 2 9 = 2 * power 2 8 = 512 };
+    let m0 = C.get mp in
+    value_concat mp 1 n;
+    assert { vm = m0 + radix *
+                (value_sub (pelts mp) (offset mp + 1) (offset mp + n)) };
+    let im = binvert_limb m0 in
+    let mip = minus_mod im in
+    assert { mod (vm * mip) radix = radix - 1
+             by mod (im * m0) radix = 1
+             so (im <> 0
+                 by mod (0 * m0) radix = 0)
+             so mod (m0 * mip) radix
+                = mod (m0 * (mod (- im) radix)) radix
+             so mod (- im) radix
+                = mod (radix - im) radix
+                = radix - im
+             so mod (m0 * mip) radix
+                = mod (m0 * (radix - im)) radix
+                = mod (radix * m0 - im * m0) radix
+                = mod (- im * m0) radix
+                = mod ((-1)  * (im * m0)) radix
+                = mod ((mod (-1) radix)
+                       * (mod (im * m0) radix)) radix
+                = mod ((radix - 1) * 1) radix
+                = radix - 1
+             so mod (vm * mip) radix
+                = mod ((radix *
+                         (value_sub (pelts mp) (offset mp + 1) (offset mp + n))
+                       + m0) * mip) radix
+                = mod (radix *
+                         (value_sub (pelts mp) (offset mp + 1) (offset mp + n)
+                         * mip)
+                       + m0 * mip) radix
+                = mod (m0 * mip) radix };
+    let pp = salloc
+               (UInt32GMP.lsl (UInt32.of_int32 n)
+                              (UInt32.of_int32 windowsize-1)) in
+    let ref this_pp = C.incr pp 0 in
+    redcify this_pp bp bn mp n;
+    let ghost vp = value pp (int32'int n) in
+    assert { vp = value this_pp n = mod (power radix n * vb) vm };
+    assert { value this_pp n < vm };
+    assert { redc (value pp n) vb n vm };
+    wmpn_mul_n tp this_pp this_pp n 64;
+    assert { value tp (2 * n) = vp * vp };
+    wmpn_redc_1 rp tp mp n mip;
+    redc_mul vp vp vb vb (value rp (int32'int n)) (int32'int n) vm;
+    assert { redc (value rp n) (power vb 2) n vm };
+    let ghost ref j = (0:int) in
+    label Window in
+    for i = UInt32GMP.lsl 1 (UInt32.of_int32 windowsize-1) - 1 downto 1 do
+      invariant { j = power 2 (windowsize-1) - 1 - i }
+      invariant { min pp = 0 <= j * n }
+      invariant { windowsize > 1 -> i > 1 ->
+                  j*n + n + n <= power 2 (windowsize-1) * n = max pp }
+      invariant { offset this_pp = j * n }
+      invariant { pelts this_pp = pelts pp }
+      invariant { min this_pp = min pp }
+      invariant { max this_pp = max pp }
+      invariant { plength this_pp = plength pp }
+      invariant { plength tp = plength (tp at Window) }
+      invariant { min tp = min (tp at Window) }
+      invariant { max tp = max (tp at Window) }
+      invariant { forall k. 0 <= k <= j ->
+                  redc (value_sub (pelts pp) (k*n) (k*n + n))
+                        (power vb (2*k+1)) n vm }
+      assert { redc (value this_pp n) (power vb (2*j + 1)) n vm };
+      label Mul in
+      let ghost ovp = value this_pp (int32'int n) in
+      wmpn_mul_n tp this_pp rp n 64;
+      this_pp <- C.incr this_pp n;
+      assert { offset this_pp = j*n + n };
+      assert { forall j. 0 <= j < max pp ->
+               (pelts pp)[j] = (pelts pp at Mul)[j] };
+      label Redc in
+      wmpn_redc_1 this_pp tp mp n mip;
+      assert { forall k. 0 <= k < j*n + n ->
+               (pelts pp)[k] = (pelts pp at Redc)[k] = (pelts pp at Mul)[k]
+               by pelts pp = pelts this_pp
+               so pelts pp at Redc = pelts this_pp at Redc
+               so k < j*n + n = offset this_pp
+               so (pelts this_pp)[k] = (pelts this_pp)[k] at Redc };
+      assert { forall k. 0 <= k <= j ->
+               redc (value_sub (pelts pp) (k*n) (k*n + n))
+                    (power vb (2*k+1)) n vm
+               by (forall l. k*n <= l < k*n + n ->
+                   (pelts pp)[l] = (pelts pp)[l] at Mul
+                   by k*n <= j*n
+                   so l < j*n+n)
+               so value_sub (pelts pp) (k*n) (k*n + n)
+                  = value_sub (pelts pp) (k*n) (k*n + n) at Mul };
+      j <- j+1;
+      redc_mul ovp (value rp (int32'int n))
+               (power vb (2 * j - 1)) (power vb 2)
+               (value this_pp (int32'int n)) (int32'int n) vm;
+      assert { redc (value this_pp n) (power vb (2*j + 1)) n vm
+               by power vb (2*j + 1) = power vb (2*j - 1) * power vb 2 };
+    done;
+    assert RedcW { forall k. 0 <= k < power 2 (windowsize - 1) ->
+                    redc (value_sub (pelts pp) (k*n) (k*n + n))
+                         (power vb (2*k+1)) n vm };
+    let ref expbits = getbits ep en ebi windowsize in
+    begin ensures { ve = valueb ep ebi + power 2 ebi * expbits }
+          ensures { 0 <= ebi <= old ebi }
+          ensures { expbits < power 2 windowsize }
+      if ebi < windowsize
+      then begin
+        ebi <- 0;
+        assert { expbits = valueb ep ebi + power 2 ebi * expbits };
+        assert { expbits = ve };
+      end
+      else ebi <- ebi - windowsize
+    end;
+    label Shift in
+    cnt <- count_trailing_zeros expbits;
+    ebi <- ebi + cnt;
+    expbits <- lsr expbits (Limb.of_int32 cnt);
+    assert { odd expbits
+             by expbits at Shift = power 2 cnt * expbits
+             so mod (expbits at Shift) (power 2 (cnt+1)) <> 0
+             so let d = div expbits 2 in
+                let m = mod expbits 2 in
+                expbits = 2*d+m
+             so expbits at Shift = power 2 (cnt+1) * d + power 2 cnt * m
+             so mod (expbits at Shift) (power 2 (cnt + 1))
+                = mod (power 2 cnt * m) (power 2 (cnt + 1))
+             so m <> 0 };
+    assert { ebi <= 64 * en
+             by expbits >= 1
+             so ve = valueb ep (ebi - cnt)
+                   + (power 2 (ebi-cnt) * power 2 cnt * expbits)
+                   = valueb ep (ebi - cnt) + power 2 ebi * expbits
+                >= power 2 ebi * expbits
+                >= power 2 ebi
+             so power 2 ebi <= ve < power radix en = power 2 (64 * en) };
+    valueb_mod ep (int32'int ebi) en;
+    assert { ve = valueb ep ebi + power 2 ebi * expbits
+             by expbits at Shift = power 2 cnt * expbits
+             so ebi at Shift = ebi - cnt
+             so (power 2 ebi * expbits) at Shift
+                 = power 2 (ebi - cnt) * power 2 cnt * expbits
+                 = power 2 ebi * expbits
+             so valueb ep (ebi at Shift) = valueb ep (ebi - cnt)
+                < power 2 (ebi - cnt) <= power 2 ebi
+             so valueb ep ebi = mod ve (power 2 ebi)
+                = mod (power 2 ebi * expbits + valueb ep (ebi at Shift))
+                      (power 2 ebi)
+                = mod (valueb ep (ebi at Shift))
+                      (power 2 ebi)
+                = valueb ep (ebi at Shift) };
+    assert { div expbits 2 <= max_int32
+             by power 2 10 = power 2 4 * power 2 4 * power 2 2 = 16 * 16 * 4
+                = 1024
+             so expbits <= power 2 windowsize <= power 2 10 < max_int32 };
+    let ebh = Limb.to_int32 (lsr_mod expbits 1) in
+    assert { 2 * ebh + 1 = expbits
+             by expbits = 2 * (div expbits 2) + mod expbits 2
+             so div expbits 2 = ebh so mod expbits 2 = 1 };
+    assert { n * ebh + n <= n * power 2 (windowsize - 1)
+             by 2 * ebh < expbits <= expbits at Shift < power 2 windowsize
+                = 2 * power 2 (windowsize-1)
+             so ebh < power 2 (windowsize-1)
+             so ebh <= power 2 (windowsize-1) - 1
+             so n * ebh <= n * (power 2 (windowsize-1) - 1)
+                = n * power 2 (windowsize-1) - n };
+    let ppn = C.incr pp (n * ebh) in
+    wmpn_copyi rp ppn n;
+    assert { redc (value rp n) (power vb expbits) n vm
+             by value rp n = value ppn n
+                = value_sub (pelts pp) (ebh * n) (ebh * n + n)
+             so redc (value_sub (pelts pp) (ebh * n) (ebh * n + n))
+                     (power vb (2 * ebh + 1)) n vm };
+    let ghost ref expdone = uint64'int expbits in
+    let ref this_windowsize = windowsize in
+    label Loop in
+    while (ebi <> 0) do
+      variant { ebi }
+      invariant { 0 <= ebi <= ebi at Loop }
+      invariant { 0 <= expdone }
+      invariant { en >= div (ebi + 63) 64 }
+      invariant { redc (value rp n) (power vb expdone) n vm }
+      invariant { ve = valueb ep ebi + power 2 ebi * expdone }
+      invariant { plength tp = plength (tp at Window) }
+      invariant { min tp = min (tp at Window) }
+      invariant { max tp = max (tp at Window) }
+      label ILoop in
+      while getbit ep en ebi = 0 do
+        variant { ebi }
+        invariant { 1 <= ebi <= ebi at ILoop }
+        invariant { 0 <= expdone }
+        invariant { en >= div (ebi + 63) 64 }
+        invariant { redc (value rp n) (power vb expdone) n vm }
+        invariant { ve = valueb ep ebi + power 2 ebi * expdone }
+        invariant { plength tp = plength (tp at Window) }
+        invariant { min tp = min (tp at Window) }
+        invariant { max tp = max (tp at Window) }
+        let ghost orp = value rp (int32'int n) in
+        wmpn_mul_n tp rp rp n 64;
+        wmpn_redc_1 rp tp mp n mip;
+        redc_mul orp orp (power vb expdone) (power vb expdone)
+                 (value rp (int32'int n)) (int32'int n) vm;
+        assert { redc (value rp n) (power vb (expdone + expdone)) n vm };
+        assert { valueb ep ebi = valueb ep (ebi - 1) };
+        assert { ve = valueb ep (ebi-1) + power 2 (ebi-1) * (2 * expdone)
+                 by power 2 (ebi - 1) * 2 = power 2 ebi };
+        expdone <- 2 * expdone;
+        ebi <- ebi - 1;
+        if ebi = 0 then begin
+          assert { redc (value rp n) (power vb expdone) n vm };
+          assert { ve = valueb ep ebi + power 2 ebi * expdone
+                      = expdone };
+          break (* TODO GMP uses a goto to break twice *)
+        end
+      done;
+      if ebi = 0 then begin
+        assert { redc (value rp n) (power vb ve) n vm };
+        assert { ve = expdone };
+        break
+      end;
+      assert { valueb ep ebi = valueb ep (ebi - 1) + power 2 (ebi - 1) * 1 };
+      label WindowL in
+      let ghost oebi = ebi in
+      expbits <- getbits ep en ebi windowsize;
+      this_windowsize <- windowsize;
+      begin ensures { 0 <= ebi < old ebi }
+            ensures { ebi + this_windowsize = oebi }
+            ensures { valueb ep (old ebi)
+                      = valueb ep ebi + power 2 ebi * expbits }
+            ensures { 0 < expbits < power 2 this_windowsize }
+            ensures { 0 < this_windowsize <= windowsize }
+      if (ebi < windowsize)
+      then begin
+        this_windowsize <- this_windowsize - (windowsize - ebi);
+        ebi <- 0;
+        assert { expbits = valueb ep (oebi)
+                 < power 2 (oebi) = power 2 this_windowsize };
+      end
+      else ebi <- ebi - windowsize
+      end;
+      valueb_mon ep en ebi (oebi - 1);
+      assert { 0 < expbits
+               by valueb ep (oebi)
+                   = valueb ep (oebi - 1) + power 2 (oebi - 1) * 1
+               so valueb ep (oebi) > valueb ep (oebi-1)
+               so valueb ep (oebi) = valueb ep ebi + power 2 ebi * expbits
+               so valueb ep ebi <= valueb ep (oebi - 1) };
+      label ShiftL in
+      cnt <- count_trailing_zeros expbits;
+      assert { this_windowsize >= cnt
+               by expbits < power 2 this_windowsize
+               so mod expbits (power 2 cnt) = 0
+               so expbits >= power 2 cnt };
+      this_windowsize <- this_windowsize - cnt;
+      ebi <- ebi + cnt;
+      expbits <- lsr expbits (Limb.of_int32 cnt);
+      assert { odd expbits
+               by expbits at ShiftL = power 2 cnt * expbits
+               so mod (expbits at ShiftL) (power 2 (cnt+1)) <> 0
+               so let d = div expbits 2 in
+                  let m = mod expbits 2 in
+                  expbits = 2*d+m
+               so expbits at ShiftL = power 2 (cnt+1) * d + power 2 cnt * m
+               so mod (expbits at ShiftL) (power 2 (cnt + 1))
+                  = mod (power 2 cnt * m) (power 2 (cnt + 1))
+               so m <> 0 };
+      assert { ebi <= 64 * en
+               by ebi <= ebi at Loop <= 64 * en };
+      valueb_mod ep (int32'int ebi) en;
+      assert { valueb ep oebi
+               = valueb ep ebi + power 2 ebi * expbits
+               /\ ve = valueb ep ebi + power 2 ebi * expbits
+                                     + power 2 oebi * expdone
+               by expbits at ShiftL = power 2 cnt * expbits
+               so (ebi at ShiftL) = ebi - cnt
+               so (power 2 ebi * expbits) at ShiftL
+                  = power 2 (ebi-cnt) * power 2 cnt * expbits
+                  = power 2 ebi * expbits
+               so valueb ep (ebi at ShiftL) = valueb ep (ebi - cnt)
+                  < power 2 (ebi - cnt) <= power 2 ebi
+               so oebi = ebi + this_windowsize
+               so power 2 oebi = power 2 ebi * power 2 this_windowsize
+               so ve = valueb ep (ebi at ShiftL) + power 2 ebi * expbits
+                       + power 2 oebi * expdone
+                     = valueb ep (ebi at ShiftL) + power 2 ebi * expbits
+                       + power 2 ebi * (power 2 this_windowsize * expdone)
+                     = valueb ep (ebi at ShiftL)
+                       + power 2 ebi
+                         * (expbits + power 2 this_windowsize * expdone)
+               so valueb ep ebi = mod ve (power 2 ebi)
+                  = mod (power 2 ebi
+                         * (expbits + power 2 this_windowsize * expdone)
+                         + valueb ep (ebi at ShiftL))
+                        (power 2 ebi)
+                  = mod (valueb ep (ebi at ShiftL)) (power 2 ebi)
+                  = valueb ep (ebi at ShiftL) };
+      assert { ebi + this_windowsize = oebi };
+      assert { ve =
+                 valueb ep ebi + power 2 ebi *
+                         (expbits + power 2 this_windowsize * expdone)
+               by power 2 ebi * power 2 this_windowsize = power 2 oebi };
+      label WLoop in
+      while this_windowsize <> 0 do
+        variant { this_windowsize }
+        invariant { 0 <= this_windowsize <= this_windowsize at WLoop }
+        invariant { 0 <= expdone }
+        invariant { redc (value rp n) (power vb expdone) n vm }
+        invariant { ve = valueb ep ebi + power 2 ebi *
+                         (expbits + power 2 this_windowsize * expdone) }
+        invariant { plength tp = plength (tp at Window) }
+        invariant { min tp = min (tp at Window) }
+        invariant { max tp = max (tp at Window) }
+        let ghost orp = value rp (int32'int n) in
+        wmpn_mul_n tp rp rp n 64;
+        wmpn_redc_1 rp tp mp n mip;
+        redc_mul orp orp (power vb expdone) (power vb expdone)
+                 (value rp (int32'int n)) (int32'int n) vm;
+        assert { redc (value rp n) (power vb (expdone + expdone)) n vm };
+        assert { power 2 (this_windowsize - 1) * (2 * expdone)
+                 = power 2 this_windowsize * expdone };
+        this_windowsize <- this_windowsize - 1;
+        expdone <- 2 * expdone;
+      done;
+      assert { div expbits 2 <= max_int32
+               by power 2 10 = power 2 4 * power 2 4 * power 2 2 = 16 * 16 * 4
+                  = 1024
+               so expbits <= power 2 windowsize <= power 2 10 < max_int32 };
+      let ebh = Limb.to_int32 (lsr_mod expbits 1) in
+      assert { 2 * ebh + 1 = expbits
+               by expbits = 2 * (div expbits 2) + mod expbits 2
+               so div expbits 2 = ebh so mod expbits 2 = 1 };
+      assert { ebh < power 2 (windowsize - 1)
+               by 2 * ebh < expbits <= expbits at ShiftL < power 2 windowsize
+                  = 2 * power 2 (windowsize-1)
+               so ebh < power 2 (windowsize-1) };
+      assert { n * ebh + n <= n * power 2 (windowsize - 1)
+               by ebh <= power 2 (windowsize-1) - 1
+               so n * ebh <= n * (power 2 (windowsize-1) - 1)
+                  = n * power 2 (windowsize-1) - n };
+      let ppn = C.incr pp (n * ebh) in
+      assert { redc (value ppn n) (power vb expbits) n vm
+               by value ppn n = value_sub (pelts pp) (ebh * n) (ebh * n + n)
+               so redc (value_sub (pelts pp) (ebh * n) (ebh * n + n))
+                       (power vb (2 * ebh + 1)) n vm };
+      let ghost orp = value rp (int32'int n) in
+      wmpn_mul_n tp rp ppn n 64;
+      wmpn_redc_1 rp tp mp n mip;
+      redc_mul orp (value ppn (int32'int n))
+               (power vb expdone) (power vb (uint64'int expbits))
+               (value rp (int32'int n)) (int32'int n) vm;
+      assert { redc (value rp n) (power vb (expdone + expbits)) n vm };
+      expdone <- expdone + uint64'int expbits
+    done;
+    assert { redc (value rp n) (power vb ve) n vm };
+    wmpn_copyi tp rp n;
+    let ghost otp = pure { tp } in
+    wmpn_zero (C.incr tp n) n;
+    value_sub_frame (pelts tp) (pelts otp)
+                    (offset tp) (offset tp + int32'int n);
+    assert { value tp n = value rp n };
+    assert { value_sub (pelts tp) (offset tp + n) (offset tp + (n+n)) = 0 };
+    value_concat tp n (2 * n);
+    assert { value tp (2*n)
+                = value rp n + power radix n * 0
+                = value rp n };
+    assert { redc (value tp (2 * n)) (power vb ve) n vm };
+    label Reduce in
+    wmpn_redc_1 rp tp mp n mip;
+    unredc (value rp (int32'int n))
+           (value (pure { rp at Reduce }) (int32'int n))
+           (power vb ve) (int32'int n) vm;
+    assert { mod (value rp n) vm = mod (power vb ve) vm };
+    assert { value rp n < 2 * vm
+             by value tp (2 * n) at Reduce
+                = value rp n at Reduce
+                < power radix n = power radix n * 1 <= power radix n * vm };
+   begin ensures { mod (value rp n) vm = mod (power vb ve) vm }
+         ensures { value rp n < vm }
+     if (wmpn_cmp rp mp n >= 0)
+      then begin
+        label Sub in
+        let ghost _b = wmpn_sub_in_place rp n mp n in
+        assert { _b = 0
+                 by value rp n - power radix n * _b
+                    = value rp n at Sub - vm
+                    >= 0
+                 so value rp n < power radix n
+                 so 0 <= value rp n - power radix n * _b
+                    < power radix n * (1 - _b)
+                 so _b < 1 };
+        assert { value rp n = value rp n at Sub - vm };
+        assert { mod (value rp n) vm
+                 = mod (vm * (-1) + value rp n at Sub) vm
+                 = mod (value rp n at Sub) vm
+                 = mod (power vb ve) vm };
+        ()
+      end
+    end;
+    assert { value rp n = mod (value rp n) vm }
+
+end

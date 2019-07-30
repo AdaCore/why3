@@ -74,7 +74,7 @@ module Util
      end
 
   (** `wmpn_zero r sz` sets `(r,sz)` to zero. Corresponds to `mpn_zero`. *)
-  let wmpn_zero (r:t) (sz:int32) : unit
+  let wmpn_zero [@extraction:inline] (r:t) (sz:int32) : unit
     requires { valid r sz }
     ensures { value r sz = 0 }
     ensures { forall j. (j < offset r \/ offset r + sz <= j)
