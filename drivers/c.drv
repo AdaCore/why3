@@ -201,7 +201,7 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 
   syntax val add_mod "%1 + %2" prec 4 4 3
   syntax val sub_mod "%1 - %2" prec 4 4 3
-  syntax val minus_mod "-%2"   prec 2 1
+  syntax val minus_mod "-%1"   prec 2 1
   syntax val mul_mod "%1 * %2" prec 3 3 2
 
   syntax val div2by1
@@ -422,7 +422,7 @@ static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 
   syntax val add_mod "%1 + %2" prec 4 4 3
   syntax val sub_mod "%1 - %2" prec 4 4 3
-  syntax val minus_mod "-%2"   prec 2 1
+  syntax val minus_mod "-%1"   prec 2 1
   syntax val mul_mod "%1 * %2" prec 3 3 2
 
   syntax val lsl "%1 << %2" prec 5 5 2

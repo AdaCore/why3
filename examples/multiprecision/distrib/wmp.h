@@ -50,6 +50,9 @@ void wmpn_tdiv_qr_in_place (wmp_ptr, wmp_srcptr, wmp_size_t, wmp_srcptr, wmp_siz
 
 wmp_size_t wmpn_sqrtrem (wmp_ptr, wmp_ptr, wmp_srcptr, wmp_size_t);
 
+void wmpn_powm (wmp_ptr, wmp_srcptr, wmp_size_t, wmp_srcptr, wmp_size_t,
+                wmp_srcptr, wmp_size_t, wmp_ptr);
+
 #ifdef __cplusplus
 }
 #endif
