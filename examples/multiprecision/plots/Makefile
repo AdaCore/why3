@@ -10,5 +10,7 @@ all:
 #	./gmpdivplot &
 #	./gmpmulplot &
 #	./gmpaddplot &
-	./toomrelative
-	./minitoomrelative
+	./toomrelative &
+	./minitoomrelative &
+	./powmrelative
+

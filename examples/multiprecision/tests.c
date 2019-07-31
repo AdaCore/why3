@@ -13,12 +13,15 @@
 #define TEST_DIV
 #define TEST_SQRT1
 #define TEST_SQRTREM
+#define TEST_POWM
 #endif
 
 #ifdef TEST_MINIGMP
 #include "mini-gmp.c"
 #else
 #include <gmp.h>
+extern void __gmpn_powm (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t,
+                      mp_srcptr, mp_size_t, mp_ptr);
 #endif
 
 #ifdef TEST_LIB
@@ -37,6 +40,7 @@ extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
 #include "build/toom.h"
 #include "build/sqrt1.h"
 #include "build/sqrt.h"
+#include "build/powm.h"
 #endif
 
 #include "mt19937-64.c"
@@ -64,9 +68,18 @@ void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
   return;
 }
 
+void init_valid_1(mp_ptr ap, mp_size_t an) {
+  for (int i = 0; i < an; i++)
+    ap[i] = genrand64_int64();
+  while (ap[an-1]<2)
+    ap[an-1] = genrand64_int64();
+  return;
+}
+
 int main () {
-  mp_ptr ap, bp, rp, refp, rq, rr, refq, refr;
-  mp_size_t max_n, max_add, max_mul, max_toom, max_div, max_sqrt, an, bn, rn, cn;
+  mp_ptr ap, bp, rp, refp, rq, rr, refq, refr, ep, rep, mp, tp;
+  mp_size_t max_n, max_add, max_mul, max_toom, max_div, max_sqrt, max_powm,
+    an, bn, rn, cn;
   int nb, nb_iter;
   double elapsed;
 #ifdef BENCH
@@ -95,6 +108,7 @@ int main () {
   max_toom = 95;
   max_div = 20;
   max_sqrt = 95;
+  max_powm = 50;
   ap = TMP_ALLOC_LIMBS (max_n + 1);
   bp = TMP_ALLOC_LIMBS (max_n + 1);
   /* nap = TMP_ALLOC_LIMBS (max_n + 1); */
@@ -105,6 +119,9 @@ int main () {
   rr = TMP_ALLOC_LIMBS (max_n + 1);
   refq = TMP_ALLOC_LIMBS (max_n + 1);
   refr = TMP_ALLOC_LIMBS (max_n + 1);
+  tp = TMP_ALLOC_LIMBS(2 * max_n);
+  ep = TMP_ALLOC_LIMBS(max_n + 1);
+  mp = TMP_ALLOC_LIMBS(max_n + 1);
 
 #ifdef TEST_ADD
 #ifdef BENCH
@@ -142,7 +159,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%d %d %g\n", an, bn, elapsed);
+          printf ("%ld %ld %g\n", an, bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -210,7 +227,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%d %d %g\n", an, bn, elapsed);
+          printf ("%ld %ld %g\n", an, bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -271,7 +288,7 @@ int main () {
       }
       elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-      printf ("%d %d %g\n", an, bn, elapsed);
+      printf ("%ld %ld %g\n", an, bn, elapsed);
       if (an==bn)
         printf ("\n"); //for gnuplot
 #endif
@@ -336,7 +353,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%d %d %g\n", an, bn, elapsed);
+          printf ("%ld %ld %g\n", an, bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -504,6 +521,75 @@ int main () {
   printf ("sqrtrem ok\n");
 #endif
 #endif
+
+#ifdef TEST_POWM
+#ifdef TEST_MINIGMP
+  printf ("powm not available in mini-GMP\n");
+  goto skip;
+#endif
+#ifdef BENCH
+  printf ("#an bn t(µs)\n");
+#endif
+  for (an = 2; an <= max_powm; an += 5)
+    {
+      for (rn = 1; rn <= max_powm; rn += 5)
+	{
+          elapsed = 0;
+          nb_iter = 1;
+          for (int iter = 0; iter != nb_iter; ++iter) {
+            init_valid_1 (ap, an);
+            init_valid_1 (ep, an);
+            init_valid_1 (tp, 2 * rn);
+            init_valid_1 (mp, rn);
+            mp[0] |= 1;
+            nb = 150 / an;
+#ifdef BENCH
+            gettimeofday(&begin, NULL);
+            for (int i = 0; i != nb; ++i)
+              {
+#endif
+#ifdef TEST_GMP
+                __gmpn_powm(refr, ap, an, ep, an, mp, rn, tp);
+#endif
+#ifdef TEST_WHY3
+                wmpn_powm(rr, ap, an, ep, an, mp, rn, tp);
+#endif
+
+#ifdef BENCH
+              }
+            gettimeofday(&end, NULL);
+            elapsed +=
+              (end.tv_sec - begin.tv_sec) * 1000000.0
+              + (end.tv_usec - begin.tv_usec);
+#endif
+          }
+          elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+          printf ("%ld %ld %g\n", an, rn, elapsed);
+          if (an==rn)
+            printf ("\n"); //for gnuplot
+#endif
+#ifdef COMPARE
+          if (mpn_cmp (refr, rr, rn))
+	    {
+          printf ("ERROR, an = %d, rn = %d\n",
+            (int) an, (int) rn);
+          printf ("b: "); mpn_dump (ap, an);
+          printf ("e: "); mpn_dump (ep, an);
+          printf ("m: "); mpn_dump (mp, rn);
+          printf ("r:    "); mpn_dump (rr, rn);
+          printf ("refr: "); mpn_dump (refr, rn);
+          abort();
+        }
+#endif
+	}
+        }
+#ifdef COMPARE
+  printf ("powm ok\n");
+#endif
+ skip:
+#endif
+
   //TMP_FREE;
   //tests_end ();
   return 0;

@@ -13,6 +13,17 @@ uint64_t rsa_estimate (uint64_t a) {
 
 end
 
+module powm.Powm
+
+prelude "#include \"binverttab.h\"
+
+uint64_t binvert_limb_table (uint64_t n) {
+  return (uint64_t)binverttab[n];
+}
+"
+
+end
+
 module mach.int.UInt64GMP
 
   prelude "
