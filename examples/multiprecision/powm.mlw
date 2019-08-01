@@ -459,7 +459,7 @@ module Powm
     inv
 
   (* TODO rewrite this with array literal once they exist *)
-  let win_size [@extraction:c_inline] (eb:int32) : int32
+  let win_size [@extraction:c_static_inline] (eb:int32) : int32
     ensures { 0 <= result <= 10 }
     ensures { eb > 0 -> result > 0 }
   = if eb = 0 then 0
@@ -474,7 +474,7 @@ module Powm
     else if eb <= 28161 then 9
     else 10
 
-  let redcify [@extraction:inline] (rp up: t) (un: int32) (mp: t) (n: int32)
+  let redcify [@extraction:c_static_inline] (rp up: t) (un: int32) (mp: t) (n: int32)
     requires { valid rp n /\ valid up un /\ valid mp n }
     requires { 1 <= n /\ 1 <= un }
     requires { un + n < max_int32 }
@@ -535,7 +535,7 @@ module Powm
                                  = power 2 (64 * i + (nbits - 64 * i))
                                  = power 2 nbits }
 
-  let getbit [@extraction:inline] (p:t) (ghost pn:int32) (bi:int32) : limb
+  let getbit [@extraction:c_static_inline] (p:t) (ghost pn:int32) (bi:int32) : limb
     requires { valid p pn }
     requires { 1 <= bi }
     requires { pn >= (div (bi + 63) 64) }
@@ -644,7 +644,7 @@ module Powm
              = mod (2 * d + res) 2 = mod res 2 = res };
     lps % 2
 
-  let getbits [@extraction:c_inline] (p: t) (ghost pn: int32) (bi:int32)
+  let getbits [@extraction:c_static_inline] (p: t) (ghost pn: int32) (bi:int32)
                                                            (nbits:int32) : limb
     requires { 1 <= nbits < 64 }
     requires { 0 <= bi }

@@ -145,9 +145,9 @@ module C = struct
       Sseq(s1,s'), e
     | Sseq (s1,_) -> get_last_expr s1
     | Sif (c,Sexpr t,Sexpr e) -> Snop, Equestion(c,t,e)
-    | Sif _ -> raise (Unsupported "while (complex if)")
-    | Swhile (_c,_s) -> raise (Unsupported "while (while) {}")
-    | Sfor _ -> raise (Unsupported "while (for)")
+    | Sif _ -> raise (Unsupported "for/while (complex if)")
+    | Swhile (_c,_s) -> raise (Unsupported "for/while (while) {}")
+    | Sfor _ -> raise (Unsupported "for/while (for)")
     | Sbreak -> raise NotAValue
     | Sreturn _ -> raise NotAValue
 
@@ -489,7 +489,7 @@ module Print = struct
   let local_printer = create_ident_printer c_keywords ~sanitizer
   let global_printer = create_ident_printer c_keywords ~sanitizer
 
-  let c_inline = create_attribute "extraction:c_inline"
+  let c_static_inline = create_attribute "extraction:c_static_inline"
   (* prints the c inline keyword *)
 
   let print_local_ident fmt id = fprintf fmt "%s" (id_unique local_printer id)
@@ -663,7 +663,7 @@ module Print = struct
     | Swhile (e,b) -> fprintf fmt "@[<hov 2>while (%a) {@\n@[<hov>%a@]@]@\n}"
       print_expr_no_paren e (print_stmt ~braces:false) b
     | Sfor (einit, etest, eincr, s) ->
-       fprintf fmt "@[<hov 2>for (%a; %a; %a) {@\n@[<hov>%a@]@\n}@]"
+       fprintf fmt "@[<hov 2>for (%a; %a; %a) {@\n@[<hov>%a@]@]@\n}"
          print_expr_no_paren einit
          print_expr_no_paren etest
          print_expr_no_paren eincr
@@ -674,8 +674,8 @@ module Print = struct
 
   and print_def fmt def =
     let print_inline fmt id =
-      if Sattr.mem c_inline id.id_attrs
-      then fprintf fmt "inline "
+      if Sattr.mem c_static_inline id.id_attrs
+      then fprintf fmt "static inline "
       else fprintf fmt "" in
     try match def with
       | Dfun (id,(rt,args),body) ->
@@ -1170,6 +1170,75 @@ module MLToC = struct
     | Eraise (xs, None) when Sid.mem xs.xs_name env.returns ->
        assert false (* nothing to pass to return *)
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
+    | Elet (Lvar(eb, ee),
+            { e_node = Elet(Lvar (sb, se),
+                 { e_node = Efor (i, sb', dir, eb', body) })})
+         when pv_equal sb sb' && pv_equal eb eb' ->
+       Debug.dprintf debug_c_extraction "LETFOR@.";
+       let open Number in
+       begin match i.pv_vs.vs_ty.ty_node with
+       | Tyapp ({ ts_def = Range { ir_lower = lb; ir_upper = ub }},_) ->
+          let init_test_ok =
+            match se.e_node, ee.e_node with
+            | Mltree.Econst sc, Mltree.Econst ec ->
+               let cmp = compare_const (ConstInt sc) (ConstInt ec) in
+               if dir = To then cmp <= 0 else cmp >= 0
+            | Mltree.Econst sc, _ ->
+               (* for i = 0 to n, on unsigned types *)
+               if dir = To
+               then BigInt.eq sc.il_int lb
+               else BigInt.eq sc.il_int ub
+            | _, Mltree.Econst ec ->
+               (* for i = n downto 0 *)
+               if dir = To
+               then BigInt.eq ec.il_int ub
+               else BigInt.eq ec.il_int lb
+            | _ -> false
+          in
+          let end_test_ok =
+            match ee.e_node with
+            | Mltree.Econst ec ->
+               if dir = To
+               then BigInt.lt ec.il_int ub
+               else BigInt.lt lb ec.il_int
+            | _ -> false
+          in
+          let ty = ty_of_ty info i.pv_vs.vs_ty in
+          let di = C.Ddecl(ty, [i.pv_vs.vs_name, Enothing]) in
+          let ei = C.Evar (i.pv_vs.vs_name) in
+          let env_f = { env with computes_return_value = false } in
+          let ds, is = expr info env_f se in
+          let is, se = get_last_expr is in
+          let init_e = C.Ebinop (Bassign, ei, se) in
+          let de, es = expr info env_f ee in
+          let es, ee = get_last_expr es in
+          let d = di :: ds @ de in
+          let incr_op = match dir with To -> Upreincr | DownTo -> Upredecr in
+          let incr_e = C.Eunop (incr_op, ei) in
+          let env' = { env with computes_return_value = false;
+                                in_unguarded_loop = true;
+                                breaks =
+                                  if env.in_unguarded_loop
+                                  then Sid.empty else env.breaks } in
+          let bd, bs = expr info env' body in
+          let test_op = match dir with | To -> C.Ble | DownTo -> C.Bge in
+          let sloop =
+            if end_test_ok
+            then C.Sfor(init_e, C.Ebinop (test_op, ei, ee),
+                        incr_e, C.Sblock(bd, bs))
+            else
+              let end_test = C.Sif (C.Ebinop (C.Beq, ei, ee),
+                                    Sbreak, Snop) in
+              let bs = C.Sseq (bs, end_test) in
+              C.Sfor(init_e, Enothing, incr_e, C.Sblock(bd,bs)) in
+          let ise = C.Sseq (is, es) in
+          let s = if init_test_ok
+                  then sloop
+                  else C.(Sif (Ebinop (test_op, se, ee), sloop, Snop)) in
+          d, C.Sseq (ise, s)
+       |  _ ->
+           raise (Unsupported "for loops where loop index is not a range type")
+                 end
     | Efor (i, sb, dir, eb, body) ->
        Debug.dprintf debug_c_extraction "FOR@.";
        begin match i.pv_vs.vs_ty.ty_node with
@@ -1178,7 +1247,7 @@ module MLToC = struct
           let di = C.Ddecl(ty, [i.pv_vs.vs_name, Enothing]) in
           let ei = C.Evar (i.pv_vs.vs_name) in
           let init_e = C.Ebinop (Bassign, ei, C.Evar (sb.pv_vs.vs_name)) in
-          let incr_op = match dir with To -> C.Upreincr | DownTo -> C.Upredecr in
+          let incr_op = match dir with To -> Upreincr | DownTo -> Upredecr in
           let incr_e = C.Eunop (incr_op, ei) in
           let end_test = C.Sif (C.Ebinop (C.Beq, ei, C.Evar eb.pv_vs.vs_name),
                                 Sbreak, Snop) in
@@ -1195,7 +1264,8 @@ module MLToC = struct
                                 C.Evar (sb.pv_vs.vs_name)),
                        C.Sfor(init_e, Enothing, incr_e, C.Sblock(bd,bs)),
                        Snop)
-       |  _ -> raise (Unsupported "for loops")
+       |  _ ->
+           raise (Unsupported "for loops where loop index is not a range type")
        end
     | Ematch (({e_node = Eapp(rs,_)} as e1), [Ptuple rets,e2], [])
          when List.for_all
@@ -1455,7 +1525,9 @@ module MLToC = struct
       Debug.dprintf debug_c_extraction "Unsupported : %s@." s; []
 
   let translate_decl (info:info) (d:Mltree.decl) ~header : C.definition list =
-    let decide_print id = query_syntax info.syntax id = None in
+    let decide_print id =
+      (not (header && (Sattr.mem Print.c_static_inline id.id_attrs)))
+      && query_syntax info.syntax id = None in
     let names = Mltree.get_decl_name d in
     match List.filter decide_print names with
     | [] -> []
