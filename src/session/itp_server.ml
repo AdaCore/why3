@@ -1346,6 +1346,16 @@ end
     Ident.Hid.clear th_to_node_ID;
     Hfile.clear file_to_node_ID
 
+  let notify_parsing_errors l =
+    List.iter
+         (function (loc,rel_loc,s) ->
+                   P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
+         l
+
+  (* Save the last parsing errors that occured. Report them when an invalid
+     command (transformation/etc) is entered before reloading. *)
+  let parsing_errors = ref []
+
   let reload_session () : unit =
     let d = get_server_data () in
     (* interrupt all running provers and unfocus before reload *)
@@ -1360,13 +1370,12 @@ end
     | [] ->
        (* TODO: try to restore the previous focus : focused_node := old_focus; *)
        (* Only reset the tree when there is no errors (for efficiency of ide) *)
+       parsing_errors := [];
        reset_and_send_the_whole_tree ();
        P.notify (Message (Information "Session refresh successful"))
     | l ->
-       List.iter
-         (function (loc,rel_loc,s) ->
-                   P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
-         l
+       parsing_errors := l;
+       notify_parsing_errors l
 
   let replay ~valid_only nid : unit =
     let d = get_server_data () in
@@ -1599,6 +1608,14 @@ end
     (* Check that the request does not refer to obsolete node_ids *)
     if not (request_is_valid r) then
       begin
+        if !parsing_errors <> [] then begin
+          (* There were parsing errors and no reloads. *)
+          P.notify (Message (Error "Cannot handle this command while the \
+                                    parsing error is not resolved. You can try \
+                                    reloading the session or removing detached \
+                                    files."));
+          notify_parsing_errors !parsing_errors
+          end;
         (* These errors come from the client-server behavior of itp. They cannot
            be completely avoided and could be safely ignored.
            They are ignored if a debug flag is not added.
