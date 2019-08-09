@@ -29,17 +29,14 @@ let get_file_extension filename =
   | Invalid_argument _ -> ""
 
 (* Return the absolute dir in which we want to put provers file. *)
-let prover_files_dir proj wc_prover =
+let prover_files_dir wc_prover =
   match Gnat_config.proof_dir with
   | None -> Filename.dirname Gnat_config.filename
   | Some dir ->
      let prover_dir = Filename.concat dir wc_prover.Whyconf.prover_name in
      if not (Sys.file_exists prover_dir) then
        Unix.mkdir prover_dir 0o750;
-     let punit_dir = Filename.concat prover_dir proj in
-     if not (Sys.file_exists punit_dir) then
-       Unix.mkdir punit_dir 0o750;
-     punit_dir
+     prover_dir
 
 let resize_shape sh limit =
   let index = ref 0 in
@@ -92,9 +89,8 @@ let create_prover_file c goal expl prover =
   let s = c.Controller_itp.controller_session in
   let driver = snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
   let th = find_goal_theory s goal in
-  let proj_name = Filename.basename (Session_itp.get_dir s) in
   let filename =
-    compute_filename s (prover_files_dir proj_name prover) th goal expl driver in
+    compute_filename s (prover_files_dir prover) th goal expl driver in
   make_filename (Sysutil.relativize_filename (Session_itp.get_dir s) filename)
 (*
   let cout = open_out filename in
