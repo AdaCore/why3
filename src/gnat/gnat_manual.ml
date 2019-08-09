@@ -31,7 +31,7 @@ let get_file_extension filename =
 (* Return the absolute dir in which we want to put provers file. *)
 let prover_files_dir proj wc_prover =
   match Gnat_config.proof_dir with
-  | None -> [Filename.dirname Gnat_config.filename]
+  | None -> Filename.dirname Gnat_config.filename
   | Some dir ->
      let prover_dir = Filename.concat dir wc_prover.Whyconf.prover_name in
      if not (Sys.file_exists prover_dir) then
@@ -39,7 +39,7 @@ let prover_files_dir proj wc_prover =
      let punit_dir = Filename.concat prover_dir proj in
      if not (Sys.file_exists punit_dir) then
        Unix.mkdir punit_dir 0o750;
-     [punit_dir]
+     punit_dir
 
 let resize_shape sh limit =
   let index = ref 0 in
@@ -56,10 +56,9 @@ let resize_shape sh limit =
 let make_filename sl =
   List.fold_left (fun acc x -> Filename.concat acc x) "" sl
 
-let compute_filename s (contain_dir: string list) theory goal expl driver =
+let compute_filename s (contain_dir: string) theory goal expl driver =
   let th_name_no_sanit = (Session_itp.theory_name theory).Ident.id_string in
   let task = Session_itp.get_task s goal in
-  let contain_dir = make_filename contain_dir in
   let why_fn =
     Driver.file_of_task driver
                         th_name_no_sanit
