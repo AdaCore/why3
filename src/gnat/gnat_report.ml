@@ -179,13 +179,10 @@ let print_warning_list fmt l =
     Format.fprintf fmt ", %a" (print_json_field "warnings" (list string)) l
 
 let print_timing_entry fmt t =
-  (* Timing data is only printed when --debug switch is active *)
-  if Gnat_config.debug then
-    let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) t [] in
-    let get_name s = s in
-    Format.fprintf fmt ", ";
-    print_json_field "timings" (map_bindings get_name standard_float) fmt l
-  else ()
+  let l = Hashtbl.fold (fun k v acc -> (k,v)::acc) t [] in
+  let get_name s = s in
+  Format.fprintf fmt ", ";
+  print_json_field "timings" (map_bindings get_name standard_float) fmt l
 
 let print_session_dir = print_json_field "session_dir" string
 
