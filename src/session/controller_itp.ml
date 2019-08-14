@@ -230,9 +230,6 @@ let print_session fmt c =
 
 let reload_files (c : controller) ~shape_version =
   let old_ses = c.controller_session in
-  c.controller_env <- Env.create_env (Env.get_loadpath c.controller_env);
-  Whyconf.Hprover.reset c.controller_provers;
-  load_drivers c;
   c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
   merge_files ~shape_version c.controller_env c.controller_session old_ses
 
