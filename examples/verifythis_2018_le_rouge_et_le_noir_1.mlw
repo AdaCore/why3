@@ -24,8 +24,8 @@ predicate tworedneighbors (c: coloring) (i:int)
 predicate valid (c:coloring) =
   forall i. 0 <= i < length c -> c[i] = Red -> tworedneighbors c i
 
-function black (n:int) : color = Black
-function red (n:int) : color = Red
+function black (_n:int) : color = Black
+function red (_n:int) : color = Red
 
 function colorings0 : fset coloring = add (create 0 black) Fset.empty
 function colorings1 : fset coloring = add (create 1 black) Fset.empty

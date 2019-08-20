@@ -37,7 +37,7 @@ module StdIO
       and flushes standard output. *)
 
   (** prints a newline character on standard output, and flushes standard output. *)
-  val print_newline (u:unit) : unit
+  val print_newline (_u:unit) : unit
     writes  { cur_pos, current_line, cur_linenum, flushed }
     ensures { !cur_pos = 0 }
     ensures { !current_line = Nil }

@@ -18,7 +18,7 @@ module Multiplication
   use int.Int
   use int.ComputerDivision
 
-  let multiplication (a b: int) : int
+  let multiplication (a b: int) : (_r: int)
     requires { true }
     ensures  { true }
   = let ref x = a in

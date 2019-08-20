@@ -116,7 +116,7 @@ module NQueens
 
   use ref.Refint
 
-  let rec count_bt_queens (board: array int) (n: int) (pos: int) : int
+  let rec count_bt_queens (board: array int) (n: int) (pos: int) : (_r: int)
     variant  { n - pos }
     requires { length board = n /\ 0 <= pos <= n /\ solution board pos }
     ensures  { eq_board board (old board) pos }
@@ -133,7 +133,7 @@ module NQueens
       !s
     end
 
-  let count_queens (board: array int) (n: int) : int
+  let count_queens (board: array int) (n: int) : (_r: int)
     requires { length board = n }
     ensures  { true }
   = count_bt_queens board n 0
@@ -204,7 +204,7 @@ module NQueens63
         i := !i + 1
       done
 
-  let count_queens (n: int63) : P.t
+  let count_queens (n: int63) : (_p: P.t)
     requires { n >= 0 }
     ensures  { true }
   =

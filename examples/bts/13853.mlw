@@ -13,7 +13,7 @@ use int.Int
 
 exception MyExc
 
-let rec f (x:int) : int variant { 0 } raises { MyExc } = raise MyExc
+let rec f (_x:int) : int variant { 0 } raises { MyExc } = raise MyExc
 with    g (x:int) : int variant { 1 } raises { MyExc } = f x
 
 end

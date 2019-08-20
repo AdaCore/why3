@@ -5,7 +5,6 @@ use ref.Ref
 
 val t : ref int
 
-val m (a:int) (b:int) : unit raises { Exception }
+val m (_a:int) (_b:int) : unit raises { Exception }
 
 let test () raises { Exception } = (m ( assert { true } ; 0) 0)
-

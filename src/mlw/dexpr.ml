@@ -1189,6 +1189,96 @@ let add_binders env pvl = List.fold_left add_pvsymbol env pvl
 let add_xsymbol ({xsm = xsm} as env) xs =
   { env with xsm = Mstr.add xs.xs_name.id_string xs xsm }
 
+(** Check usage of variables *)
+
+exception Unused of Loc.position option * string
+
+(* Check that [pv] is used according to [check_present] *)
+let check_used_gen ~check_present pv =
+  if not (Sattr.mem Dterm.attr_w_unused_var_no pv.pv_vs.vs_name.id_attrs) &&
+      Debug.test_noflag Dterm.debug_ignore_unused_var then
+    begin
+      let s = pv.pv_vs.vs_name.id_string in
+      if (s = "" || s.[0] <> '_') && not (check_present pv) then
+        raise (Unused (pv.pv_vs.vs_name.id_loc, "unused variable " ^ s))
+    end
+
+(* Check usage of [pv] in [e] *)
+let check_used_pv e pv =
+  let check_present pv = Spv.mem pv e.e_effect.eff_reads in
+  try check_used_gen ~check_present pv with
+  | Unused (loc, msg) -> Warning.emit ?loc "%s" msg
+
+(* Return warnings if unused variables are found in functions spec/body:
+   [bl] is the list of arguments,
+   [dsp] is the spec of the function,
+   [eff_reads] are the read effects of the body of the function (if any)
+   No warnings are returned on result variables of type [unit].
+   No warnings are returned if there are no body, no pre, and no (x)post.
+*)
+let check_unused_vars_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
+  (* TBD: When there is no pre/post contract and body, no warnings. *)
+  if dsp.ds_pre = [] && dsp.ds_post = [] && Ity.Mxs.is_empty dsp.ds_xpost &&
+     eff_reads = None then
+    ()
+  else begin
+    let aggregate_post res_var fvars_uc post =
+      (* Calculate free vars of postconditions list *)
+      List.fold_left
+        (fun (res_var, fvars_uc) (v,t) ->
+           (* Do not collect result variables of type unit: they can be unused *)
+           let res_var = if Ity.ity_equal Ity.ity_unit v.pv_ity then res_var
+             else v :: res_var in
+           (res_var, t_freevars fvars_uc t))
+        (res_var, fvars_uc) post in
+    (* Generate freevars of (x)postconditions before the rest *)
+    let res_var, fvars_uc_post =
+      aggregate_post [] Mvs.empty dsp.ds_post in
+    (* Collect exceptional postcondition freevars and result vars *)
+    let res_var, fvars_uc_post =
+      Mxs.fold (fun _ xposts (res_var, fvars_uc) ->
+          aggregate_post res_var fvars_uc xposts) dsp.ds_xpost (res_var, fvars_uc_post)
+    in
+    (* Collect preconditions freevars *)
+    let fvars_uc = List.fold_left t_freevars fvars_uc_post dsp.ds_pre in
+    (* Add variables that are marked read by the function. Those are considered
+       used in particular when we only have the spec of a function.  *)
+    let fvars_uc =
+      List.fold_left (fun fvars_uc pv -> Mvs.add pv.pv_vs 1 fvars_uc)
+        fvars_uc dsp.ds_reads in
+    (* Add terms that are marked writes *)
+    let fvars_uc =
+      List.fold_left t_freevars fvars_uc dsp.ds_writes in
+    (* Add variables used in the body of the function (if there is one) *)
+    let fvars_uc =
+      Opt.fold (fun fvars_uc eff ->
+          List.fold_left (fun fvars_uc pv -> Mvs.add pv.pv_vs 1 fvars_uc)
+            fvars_uc eff) fvars_uc eff_reads in
+    let check_present pv = Mvs.mem pv.pv_vs fvars_uc in
+    let check_used pv =
+      try check_used_gen ~check_present pv with
+      | Unused (loc, msg) -> Warning.emit ?loc "%s" msg
+    in
+    (* Check the usage of normal arguments *)
+    List.iter check_used bl;
+    (* The case is different for result variables of postcondition. Those can
+       occur only in postconditions but each "post" is newly quantified on a
+       new result variable. In this case, we report an unused variables only if
+       all the generated result variables are unused. *)
+    try
+      let unused =
+        List.fold_left (fun _ pv ->
+            (* Exit if we find a result variable that is used *)
+            try check_used_gen ~check_present pv; raise Exit with
+            | Unused (loc, msg) -> Some (loc, msg)) None res_var
+      in
+      match unused with
+      | Some (loc, msg) when loc <> None
+         (* loc = None not supported for results *) -> Warning.emit ?loc "%s" msg
+      | _ -> ()
+    with Exit -> ()
+  end
+
 (** Abstract values *)
 
 let cty_of_spec env bl mask dsp dity =
@@ -1204,18 +1294,11 @@ let cty_of_spec env bl mask dsp dity =
   let p = rebase_pre env preold old dsp.ds_pre in
   let q = create_post ity dsp.ds_post in
   let xq = create_xpost dsp.ds_xpost in
+  (* Check for unused variables *)
+  check_unused_vars_fun bl dsp None;
   create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity
 
 (** Expressions *)
-
-let check_used_pv e pv =
-  if not (Sattr.mem Dterm.attr_w_unused_var_no pv.pv_vs.vs_name.id_attrs) &&
-      Debug.test_noflag Dterm.debug_ignore_unused_var then
-    begin
-      let s = pv.pv_vs.vs_name.id_string in
-      if (s = "" || s.[0] <> '_') && not (Spv.mem pv e.e_effect.eff_reads) then
-        Warning.emit ?loc:pv.pv_vs.vs_name.id_loc "unused variable %s" s
-    end
 
 let e_let_check e ld = match ld with
   | LDvar (v,_) -> check_used_pv e v; e_let ld e
@@ -1652,6 +1735,8 @@ and lambda uloc env pvl mask dsp dvl de =
   let xq = create_xpost dsp.ds_xpost in
   let e = if not dsp.ds_diverge then e
           else e_attr_add Vc.nt_attr e in
+  (* Check for unused variables *)
+  check_unused_vars_fun pvl dsp (Some (Ity.Spv.elements e.e_effect.eff_reads));
   c_fun ~mask pvl p q xq (get_oldies old) e, dsp, dvl
 
 let rec_defn ?(keep_loc=true) drdf =
