@@ -484,7 +484,7 @@ let built_in_modules =
   in
   let real_trigo_module =
     ["real"], "Trigonometry", [],
-    ["pi", eval_real Modeconst Big_real.pi;
+    ["pi", eval_real Modeconst (Big_real.pi());
     ]
   in
   bool_module :: (int_modules @ [array_module;

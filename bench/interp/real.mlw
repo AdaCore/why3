@@ -7,9 +7,21 @@ module R
   exception BenchFailure
 
 
-  let bench0 () =
-    let x : real = 1.0 / 3.0 in
-    (x, 3.0 * x)
+  let test0 () =
+     let x:real = 42.0 in
+     let y:real = 1.5 in
+     let z:real = 0.1 in
+     (x,y,z)
+
+  let test1 () =
+    let x : real = 0.1 in
+    let y : real = 10.0 * x in
+    (x, y)
+
+  let test2 () =
+    let x : real = 3.0 in
+    let y : real = 1.0 / x in
+    (x, y, 3.0 * y)
 
   let bench1 ()
     (* Tries to calculate sqrt(2) *)
@@ -24,9 +36,12 @@ module R
     !i
 
   let bench2 ()
-(*    raises { BenchFailure -> false }*)
-    ensures { result = 4.0 } =
-    sqrt (16.0)
+    raises { BenchFailure -> false }
+    ensures { result = 4.0 }
+  =
+    let r = sqrt 16.0 in
+    if r <> 4.0 then raise BenchFailure;
+    r
 
   use real.Trigonometry
 

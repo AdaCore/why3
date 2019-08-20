@@ -22,6 +22,8 @@ val sqrt: real -> real
 val eq: real -> real -> bool
 val lt: real -> real -> bool
 val le: real -> real -> bool
+val gt: real -> real -> bool
+val ge: real -> real -> bool
 
 (* Constants *)
-val pi: real
+val pi: unit -> real
