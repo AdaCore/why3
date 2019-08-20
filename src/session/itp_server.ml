@@ -627,9 +627,10 @@ end
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~shape_version =
+    let hard_reload = true in
     capture_parse_or_type_errors
       (fun c ->
-        try let (_,_) = reload_files ~shape_version c in [] with
+        try let (_,_) = reload_files ~hard_reload ~shape_version c in [] with
         | Errors_list le -> le) cont
 
   let add_file cont ?format fname =

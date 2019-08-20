@@ -122,7 +122,8 @@ val print_session : Format.formatter -> controller -> unit
 
 exception Errors_list of exn list
 
-val reload_files : controller -> shape_version:int option -> bool * bool
+val reload_files : ?hard_reload:bool -> controller ->
+  shape_version:int option -> bool * bool
 (** [reload_files] returns a pair [(o,d)]: [o] true means there are
     obsolete goals, [d] means there are missed objects (goals,
     transformations, theories or files) that are now detached in the
@@ -175,6 +176,8 @@ val reload_files : controller -> shape_version:int option -> bool * bool
       proof attempts and transformations, but no task is associated to
       it, neither to its subgoals.
 
+  When the option [hard_reload] is true (false by default), libraries and
+  drivers are also reloaded.
 
  *)
 
