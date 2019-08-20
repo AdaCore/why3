@@ -150,14 +150,14 @@ theory List
   | Cons x xs -> if p x then (dropWhile p xs) else (Cons x xs)
   end
 
-  predicate pfalse (x: 'a) = false
+  predicate pfalse (_x: 'a) = false
 
   function dropWhile_False (l : list 'a) : list 'a = match l with
   | Nil -> Nil
   | Cons x xs -> if pfalse x then (dropWhile_False xs) else (Cons x xs)
   end
 
-  predicate ptrue (x: 'a) = true
+  predicate ptrue (_x: 'a) = true
 
  function takeWhile_True (l : list 'a) : list 'a = match l with
   | Nil -> Nil

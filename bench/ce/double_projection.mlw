@@ -6,17 +6,17 @@ module Test
   type t
 
   function d (x : t) : int
-  
+
   meta "model_projection" function d
 
   function c (x : t) : int
-  
+
   meta "model_projection" function c
 
 (* Here the counterexample should not be a record *)
-  let f (x: t) : t
+  let f (x: t) : (_t: t)
     requires { c x > 0 }
-    ensures {  d x < 0 }
+    ensures  { d x < 0 }
   =
     x
 end

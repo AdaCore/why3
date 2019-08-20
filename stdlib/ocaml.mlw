@@ -28,7 +28,7 @@ module Pervasives
 
   exception AssertFailure
 
-  val ocaml_assert (b: bool) : unit
+  val ocaml_assert (_b: bool) : unit
     raises { AssertFailure }
 
   exception Invalid_argument

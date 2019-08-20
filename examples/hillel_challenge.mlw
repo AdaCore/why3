@@ -170,7 +170,7 @@ module FulcrumNoOverflow
 
   meta coercion function v
 
-  predicate biginv (b: big) = 89>55 (* used to enforce the type invariant *)
+  predicate biginv (_b: big) = 89>55 (* used to enforce the type invariant *)
 
   constant min_big : int = -m*m
   constant max_big : int =  m*m - 1

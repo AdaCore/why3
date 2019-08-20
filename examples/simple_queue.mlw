@@ -33,7 +33,7 @@ module SimpleQueue
       m = 0; n = 0;
       contents = S.empty; }
 
-  let dequeue (q: t 'a) : 'a
+  let dequeue (q: t 'a) : (_r: 'a)
     requires { S.length q.contents > 0 }
     writes   { q.m, q.contents }
     ensures  { S.(q.contents == (old q.contents)[1..]) }

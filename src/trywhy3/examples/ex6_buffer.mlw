@@ -30,7 +30,7 @@ module RingBuffer
               else first + i - capacity]
   }
 
-  val create (n: int) (dummy: 'a) : queue 'a
+  val create (n: int) (_dummy: 'a) : queue 'a
     requires { n > 0 }
     ensures  { capacity result = n }
     ensures  { result.sequence = Seq.empty }

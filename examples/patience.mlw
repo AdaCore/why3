@@ -512,7 +512,7 @@ module PatienceAbstract
             let stack_i,_ = s.positions[si] in
             0 <= stack_i < s.num_stacks
            )
-           so range f sigma.seqlen s.num_stacks 
+           so range f sigma.seqlen s.num_stacks
            so not (injective f sigma.seqlen)
     };
     assert { (* contradiction from non-injectivity *)

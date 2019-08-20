@@ -34,7 +34,7 @@ module MapBase
   scope M
     type t = unit
     constant zero : unit = ()
-    function op (x y:unit) : unit = ()
+    function op (_x _y:unit) : unit = ()
     let lemma neutral_ (x:unit) : unit
       ensures { op zero x = x = op x zero }
     = match x with _ -> () end
@@ -43,7 +43,7 @@ module MapBase
     clone export monoid.MonoidSumDef with type M.t = t,
       constant M.zero = zero,function M.op = op,goal M.assoc,goal M.neutral
     let zero () : unit ensures { result = () } = ()
-    let op (x y:unit) : unit ensures { result = () } = ()
+    let op (_x _y:unit) : unit ensures { result = () } = ()
   end
 
   (** In associative tables, elements are selected
@@ -74,7 +74,7 @@ module MapBase
 
   (** Comparison-based binary search *)
   let selected_part (ghost lseq rseq:seq (D.t 'a))
-    (k:K.t) (l:'e) (d:D.t 'a) (r:'f) : part_base K.t
+    (k:K.t) (_l:'e) (d:D.t 'a) (_r:'f) : part_base K.t
     requires { selection_possible k (lseq ++ cons d rseq) }
     returns { Here -> let e2 = { left = lseq;
         middle = Some d;
@@ -937,4 +937,3 @@ module IMapAndSet
     val CO.compare = compare
 
 end
-

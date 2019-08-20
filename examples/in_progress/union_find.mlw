@@ -91,7 +91,7 @@ module Impl
     (forall i. 0 <= i < size -> path size link i (dist i) (repr i))
   } by {
     size = 0; link = Array.make 0 0; rank = Array.make 0 0;
-    repr = (fun i -> i); dist = (fun i -> 0)
+    repr = (fun i -> i); dist = (fun _i -> 0)
   }
 
   let create (n: int) : t
@@ -105,7 +105,7 @@ module Impl
     done;
     let rank = Array.make n 0 in
     { size = n; link = link; rank = rank;
-      repr = (fun i -> i); dist = (fun i -> 0) }
+      repr = (fun i -> i); dist = (fun _i -> 0) }
 
   let rec lemma path_dist (size: int) (link: array int) (dist: int -> int)
                           (x d y: int)

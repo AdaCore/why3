@@ -1304,6 +1304,14 @@ let tyl_of_params {muc_theory = tuc} pl =
     ty_of_pty tuc ty in
   List.map ty_of_param pl
 
+(* Used to check unused variables in logic declarations *)
+let check_unused_vars ldl =
+  List.iter
+    (fun (_name, ld) ->
+       let (vsl, t) = open_ls_defn ld in
+       List.iter (Dterm.check_used_var t) vsl)
+    ldl
+
 let add_logics muc dl =
   let lsymbols = Hstr.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
@@ -1339,7 +1347,10 @@ let add_logics muc dl =
         abst, (make_ls_defn ls vl t) :: defn in
   let abst,defn = List.fold_right type_decl dl ([],[]) in
   let add_param muc s = add_decl muc (create_param_decl s) in
-  let add_logic muc l = add_decl muc (create_logic_decl l) in
+  let add_logic muc l =
+    (* Check for unused vars in logic declaration *)
+    check_unused_vars l;
+    add_decl muc (create_logic_decl l) in
   let muc = List.fold_left add_param muc abst in
   if defn = [] then muc else add_logic muc defn
 

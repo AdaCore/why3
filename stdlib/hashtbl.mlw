@@ -19,7 +19,7 @@ module Hashtbl
 
   function ([]) (h: t 'a) (k: key) : list 'a = Map.([]) h.contents k
 
-  val create (n:int) : t 'a ensures { forall k: key. result[k] = Nil }
+  val create (_n:int) : t 'a ensures { forall k: key. result[k] = Nil }
 
   val clear (h: t 'a) : unit writes {h} ensures { forall k: key. h[k] = Nil }
 
