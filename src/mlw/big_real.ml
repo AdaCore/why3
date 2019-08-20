@@ -4,23 +4,16 @@ exception Undetermined
 
 open Mlmpfr_wrapper
 type real = mpfr_float * mpfr_float
+(* computationally, a real is represented as an interval of two floating-point numbers.
+   such an interval `[a;b]` represents the set of real numbers between `a` and `b` *)
 
-(* TODO in all the following getting to plus_infinity or to zero on both side of
-   the interval should always be seen as an error. The precision should be
-   increased in those cases.
-   For example, we cannot simplify multiplication of [0; 0] with ]+inf; +inf[
-   because both may mean that the underlying floats overflow/underflow and the
-   result can be far from the solutions we get. Example: divide a number by 10 a
-   lot and then multiply the result by 10 the same number of time + 1. You would
-   obtain 0 whereas you would like to obtain number * 10.
-*)
-
-(* TODO precision cannot be changed once launched the first time. So we need
-   to init it once. *)
 let init, set_exponents, get_prec =
-  let emin = ref (-148) in
-  let emax = ref 128 in
-  let prec = ref 24 in
+(*
+   By default, for approximating real numbers, let's use binary128 floats
+*)
+  let emin = ref (-16493) in
+  let emax = ref 16384 in
+  let prec = ref 113 in
   (fun emin_i emax_i prec_i ->
     emin := emin_i;
     emax := emax_i;
@@ -65,8 +58,7 @@ let mul (xmin, xmax) (ymin, ymax) =
 let inv (xmin, xmax) =
   set_exponents ();
   let prec = get_prec () in
-  (* If 0 is inside the interval we cannot compute the expression. The precision
-     should be increased. *)
+  (* If 0 is inside the interval we cannot compute the expression *)
   if signbit xmin <> signbit xmax then
     raise Undetermined
   else

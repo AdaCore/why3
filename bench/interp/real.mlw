@@ -6,6 +6,11 @@ module R
 
   exception BenchFailure
 
+
+  let bench0 () =
+    let x : real = 1.0 / 3.0 in
+    (x, 3.0 * x)
+
   let bench1 ()
     (* Tries to calculate sqrt(2) *)
     diverges
@@ -26,6 +31,6 @@ module R
   use real.Trigonometry
 
   let bench3 () =
-    sqrt (pi)
+    (pi, sqrt (pi))
 
 end
