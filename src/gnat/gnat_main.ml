@@ -80,6 +80,11 @@ and interpret_result c pa pas =
         not (Gnat_config.is_ce_prover session pa) then
        Gnat_report.add_warning r.Call_provers.pr_output;
      handle_vc_result c goal (answer = Call_provers.Valid)
+   | Controller_itp.InternalFailure e ->
+       let s = Format.asprintf "Internal Why3 unexpected error during \
+                                elaboration of prover file:\n %a"
+           Exn_printer.exn_printer e in
+       Gnat_report.add_warning s
    | _ ->
          ()
 
