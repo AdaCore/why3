@@ -118,7 +118,7 @@ module Harness
     raises  { Failure -> false }
   = build (Cons 1 (Cons 3 (Cons 3 (Cons 2 Nil))))
 
-  let harness2 () : (_t : tree)
+  let harness2 () : (_:tree)
     ensures { false } raises { Failure -> true }
   = build (Cons 1 (Cons 3 (Cons 2 (Cons 2 Nil))))
 
