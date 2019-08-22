@@ -230,18 +230,17 @@ let use_fmode (fmode: int) =
 let eval_float:
   type a. int -> a float_arity -> a -> Expr.rsymbol -> value list -> value =
   (fun fmode ty op ls l ->
-     (* Simulate IEEE behavior *)
-     let subnormalize = subnormalize ~rnd:To_Nearest in
      (* Set the exponent depending on Float type that are used: 32 or 64 *)
      use_fmode fmode;
      try
        begin match ty, l with
          | Mode1, [Vfloat_mode mode; Vfloat f] ->
-             Vfloat (subnormalize (op mode f))
+             (* Subnormalize used to simulate IEEE behavior *)
+             Vfloat (subnormalize ~rnd:mode (op mode f))
          | Mode2, [Vfloat_mode mode; Vfloat f1; Vfloat f2] ->
-             Vfloat (subnormalize (op mode f1 f2))
+             Vfloat (subnormalize ~rnd:mode (op mode f1 f2))
          | Mode3, [Vfloat_mode mode; Vfloat f1; Vfloat f2; Vfloat f3] ->
-             Vfloat (subnormalize (op mode f1 f2 f3))
+             Vfloat (subnormalize ~rnd:mode (op mode f1 f2 f3))
          | Mode_rel, [Vfloat f1; Vfloat f2] ->
              Vbool (op f1 f2)
          | Mode_rel1, [Vfloat f] ->

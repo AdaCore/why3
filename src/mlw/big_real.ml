@@ -75,12 +75,9 @@ let inv (xmin, xmax) =
     raise Undetermined
   else
     let one = get_one () in
-    let inv1_min = div ~prec ~rnd:Toward_Minus_Infinity one xmin in
-    let inv2_min = div ~prec ~rnd:Toward_Minus_Infinity one xmax in
-    let res_min = min ~prec ~rnd:Toward_Minus_Infinity inv1_min inv2_min in
-    let inv1_max = div ~prec ~rnd:Toward_Plus_Infinity one xmin in
-    let inv2_max = div ~prec ~rnd:Toward_Plus_Infinity one xmax in
-    let res_max = max  ~prec ~rnd:Toward_Plus_Infinity inv1_max inv2_max in
+    (* Inverse is decreasing on ]-inf; 0[ and on ]0; inf[ *)
+    let res_min = div ~prec ~rnd:Toward_Minus_Infinity one xmax in
+    let res_max = div ~prec ~rnd:Toward_Plus_Infinity one xmin in
     (res_min, res_max)
 
 let div x y =
@@ -109,10 +106,15 @@ let real_from_fraction p q =
   div p q
 
 let eq (xmin, xmax) (ymin, ymax) =
-  if (equal_p xmin xmax) && (equal_p ymin ymax) then
-    equal_p xmin ymin
+  if less_p ymax xmin || less_p xmax ymin then
+    (* Intervals are disjoint *)
+    false
   else
-    raise Undetermined
+    if (equal_p xmin xmax) && (equal_p ymin ymax) then
+      (* Intervals are singleton and not disjoint, hence are equal *)
+      true
+    else
+      raise Undetermined
 
 let lt (x1,x2) (y1,y2) =
   if less_p x2 y1 then true else
