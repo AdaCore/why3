@@ -221,17 +221,17 @@ type 'a float_arity =
   | Mode_rel: (big_float -> big_float -> bool) float_arity (* binary predicates *)
   | Mode_rel1: (big_float -> bool) float_arity (* Unary predicate *)
 
-let use_fmode (fmode: int) =
-  match fmode with
+let use_float_format (float_format: int) =
+  match float_format with
   | 32 -> initialize_float32 ()
   | 64 -> initialize_float64 ()
   | _ -> raise CannotCompute
 
 let eval_float:
   type a. int -> a float_arity -> a -> Expr.rsymbol -> value list -> value =
-  (fun fmode ty op ls l ->
+  (fun float_format ty op ls l ->
      (* Set the exponent depending on Float type that are used: 32 or 64 *)
-     use_fmode fmode;
+     use_float_format float_format;
      try
        begin match ty, l with
          | Mode1, [Vfloat_mode mode; Vfloat f] ->
