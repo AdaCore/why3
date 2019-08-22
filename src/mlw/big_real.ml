@@ -153,7 +153,7 @@ let log (xmin, xmax) =
   set_exponents ();
   let prec = get_prec () in
   let zero = get_zero () in
-  if lessequal_p zero xmin then
+  if less_p zero xmin then
     (log ~rnd:Toward_Minus_Infinity ~prec xmin,
      log ~rnd:Toward_Plus_Infinity ~prec xmax)
   else
