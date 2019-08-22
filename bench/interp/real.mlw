@@ -35,6 +35,15 @@ module R
     if z < 0.99999 || z > 1.00001 then raise BenchFailure;
     (x, y, z)
 
+  let test3 ()
+    raises { BenchFailure -> false }
+  =
+    let ref x : real = 2.0 in
+    for i=1 to 14 do x <- x * x done;
+    let y : real = 0.0 * x in
+    if y <> 0.0 then raise BenchFailure;
+    (x,y)
+
   let test_exp ()
     raises { BenchFailure -> false }
   =
@@ -78,15 +87,6 @@ module R
     let r = sqrt 16.0 in
     if r <> 4.0 then raise BenchFailure;
     r
-
-  let test3 ()
-    raises { BenchFailure -> false }
-  =
-    let ref x : real = 2.0 in
-    for i=1 to 14 do x <- x * x done;
-    let y : real = 0.0 * x in
-    if y <> 0.0 then raise BenchFailure;
-    (x,y)
 
   use real.Trigonometry
 

@@ -7,6 +7,8 @@
 # export WHY3DATA=.
 # export WHY3LOADPATH=theories
 
+has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
+
 shopt -s nullglob
 
 suffix=$1
@@ -382,6 +384,21 @@ execute examples/vstte10_queens.mlw NQueens.test8
 # examples/queens.mlw NQueensBits.test8
 # fails: cannot find definition of routine eq
 # examples/residual.mlw Test.test_astar
+# test of execution on real numbers; only if mpfr installed
+if test -n "$has_mpfr"; then
+    execute bench/interp/real.mlw R.test0
+    execute bench/interp/real.mlw R.test1
+    execute bench/interp/real.mlw R.test2
+    execute bench/interp/real.mlw R.test3
+    execute bench/interp/real.mlw R.test_exp
+    execute bench/interp/real.mlw R.test_log
+    execute bench/interp/real.mlw R.test_exp_log
+    execute bench/interp/real.mlw R.bench1
+    execute bench/interp/real.mlw R.bench2
+    execute bench/interp/real.mlw R.bench3
+else
+    echo "MPFR not installed, skipping tests"
+fi
 echo ""
 
 echo "=== Checking extraction to OCaml ==="
