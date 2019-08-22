@@ -87,7 +87,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @WHY3INCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@
+INCLUDES = @WHY3INCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -113,8 +113,8 @@ WARNINGS = A-4-9-41-44-45-50-52@5@8@48
 OFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
 BFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
 
-OLINKFLAGS = -linkall $(EXTCMXA)
-BLINKFLAGS = -linkall $(EXTCMA)
+OLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMXA)
+BLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMA)
 
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
@@ -126,7 +126,7 @@ CMIHACK = -intf-suffix .cmi
 # external libraries common to all binaries
 
 EXTOBJS = menhirLib
-EXTLIBS = str unix nums dynlink @ZIPLIB@ @WHY3LIB@
+EXTLIBS = str unix nums dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -187,7 +187,7 @@ GENERATED =
 LIBGENERATED = src/util/config.ml \
 	       src/util/rc.ml src/util/lexlib.ml \
 	       src/util/json_parser.mli src/util/json_parser.ml \
-	       src/util/json_lexer.ml \
+	       src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
 	       src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
@@ -197,7 +197,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/session/compress.ml src/session/xml.ml \
 	       src/session/strategy_parser.ml
 
-LIB_UTIL = config bigInt util opt lists strings \
+LIB_UTIL = config bigInt mlmpfr_wrapper util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl \
 	   hashcons wstdlib exn_printer \
 	   json_base json_parser json_lexer \
@@ -213,7 +213,7 @@ LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer dri
 		collect_data_model parse_smtv2_model_lexer parse_smtv2_model \
 		parse_smtv2_model
 
-LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr \
+LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
           pinterp mltree compile mlinterp pdriver cprinter ml_printer \
 	  ocaml_printer cakeml_printer
 
@@ -268,6 +268,16 @@ $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
+
+# Mlmpfr
+
+ifeq (@found_mlmpfr@,yes)
+src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_real.ml
+	cp src/util/mlmpfr_real.ml $@
+else
+src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_dummy.ml
+	cp src/util/mlmpfr_dummy.ml $@
+endif
 
 # Ocamlzip
 
@@ -2018,6 +2028,7 @@ MODULESTODOC = \
 	util/extmap util/extset util/exthtbl \
 	util/weakhtbl util/wstdlib util/rc util/debug \
 	util/loc util/pp util/bigInt util/number \
+	util/mlmpfr_wrapper \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task core/trans core/pretty core/printer \
 	parser/typing \

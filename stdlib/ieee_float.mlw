@@ -127,11 +127,11 @@ module GenericFloat
 
   predicate is_normal    t
   predicate is_subnormal t
-  predicate is_zero      t
-  predicate is_infinite  t
-  predicate is_nan       t
-  predicate is_positive  t
-  predicate is_negative  t
+  val predicate is_zero      t
+  val predicate is_infinite  t
+  val predicate is_nan       t
+  val predicate is_positive  t
+  val predicate is_negative  t
 
   (** helper predicate for zeros, normals and subnormals. not defined
      so that the axiomatisation below can use it without talking about

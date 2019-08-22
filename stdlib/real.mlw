@@ -202,7 +202,7 @@ module Square
 
   function sqr (x : real) : real = x * x
 
-  function sqrt real : real
+  val function sqrt real : real
 
   axiom Sqrt_positive:
     forall x:real. x >= 0.0 -> sqrt x >= 0.0
@@ -228,13 +228,13 @@ module ExpLog
 
   use Real
 
-  function exp real : real
+  val function exp real : real
   axiom Exp_zero : exp(0.0) = 1.0
   axiom Exp_sum : forall x y:real. exp (x+y) = exp x * exp y
 
   constant e : real = exp 1.0
 
-  function log real : real
+  val function log real : real
   axiom Log_one : log 1.0 = 0.0
   axiom Log_mul :
     forall x y:real. x > 0.0 /\ y > 0.0 -> log (x*y) = log x + log y
@@ -335,7 +335,7 @@ module Trigonometry
   axiom Cos_0: cos 0.0 = 1.0
   axiom Sin_0: sin 0.0 = 0.0
 
-  constant pi : real
+  val constant pi : real
 
   axiom Pi_double_precision_bounds:
     0x1.921fb54442d18p+1 < pi < 0x1.921fb54442d19p+1

@@ -1,0 +1,74 @@
+module N
+
+  use ieee_float.Float32
+
+  let f (x: t)
+  =
+    add RNE x (1.0: t)
+
+  let g () =
+    add RNE (24.0: t) (1.0: t)
+
+  exception BenchFailure
+
+  let bench1 () raises { BenchFailure -> false } =
+    let x = f (1.0: t) in
+    if not (eq x (2.0: t)) then raise BenchFailure;
+    x
+
+  let bench2 () raises { BenchFailure -> false } =
+    let o = (0x1p-23: t) in
+    let x = sqrt RNE ((1.0: t) .+ o .- (1.0: t) .- o) in (* Expected result: 0.0 *)
+    if not (eq x (0.0: t)) then raise BenchFailure;
+    let o = (0x1p-24: t) in
+    let x = sqrt RNE ((1.0: t) .+ o .- (1.0: t) .- o) in (* Expected result: Nan *)
+    if eq x x then raise BenchFailure;
+    x
+
+  let bench3 ()
+    raises { BenchFailure -> false }
+    ensures { eq result (0.0: t)} =
+    let o = (0x1p-129: t) in
+    let v = o .* o in
+    if not (eq v (0.0:t)) then raise BenchFailure;
+    v
+
+  let bench4 ()
+    raises { BenchFailure -> false }
+    ensures { is_infinite result } =
+    let o = (0x1p+64: t) in
+    let res = o .* o in
+    if not (is_infinite res) then raise BenchFailure;
+    res
+
+  let bench5 ()
+    raises { BenchFailure -> false }
+    ensures { eq result (1.0:t) } =
+    let o = add RNE (1.0:t) (0x1p-24:t) in
+    if not (eq o (1.0:t)) then raise BenchFailure;
+    o
+
+  let bench6 ()
+    raises { BenchFailure -> false }
+    ensures { not (eq result (1.0:t)) } =
+    let o = add RNE (1.0:t) (0x1p-23:t) in
+    if eq o (1.0:t) then raise BenchFailure;
+    o
+
+  let bench7 ()
+    raises { BenchFailure -> false }
+    ensures { eq result (0.0: t)} =
+    let o = (0x1p-149: t) in
+    let o2 = o ./ (2.0: t) in
+    if not (eq o2 (0.0:t)) then raise BenchFailure;
+    o2
+
+  let bench8 ()
+    raises { BenchFailure -> false }
+    ensures { not (eq result (0.0: t))} =
+    let o = (0x1p-148: t) in
+    let o2 = o ./ (2.0: t) in
+    if (eq o2 (0.0:t)) then raise BenchFailure;
+    o2
+
+end
