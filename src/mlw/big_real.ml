@@ -49,22 +49,71 @@ let neg (xmin, xmax) =
   let res_max = neg ~prec ~rnd:Toward_Plus_Infinity xmin in
   (res_min, res_max)
 
-let mul (xmin, xmax) (ymin, ymax) =
+(* Properties on intervals:
+   - Mixed are intervals (a,b) such that a < 0 and b > 0
+   - Pos are intervals (a, b) such that a >= 0 and b > 0
+   - Neg are intervals (a, b) such that a < 0 and b <= 0
+   - Zero is the singleton interval (0, 0)
+*)
+(* This code is largely inspired by a proved frama-c implementation *)
+let mul (xl, xu) (yl, yu) =
+  (* Reset the correct float approx. exponents *)
   set_exponents ();
+  (* abbreviation functions *)
   let prec = get_prec () in
   let min = min ~prec ~rnd:Toward_Minus_Infinity in
   let max = max ~prec ~rnd:Toward_Plus_Infinity in
-  let mul1_min = mul ~prec ~rnd:Toward_Minus_Infinity xmin ymin in
-  let mul2_min = mul ~prec ~rnd:Toward_Minus_Infinity xmin ymax in
-  let mul3_min = mul ~prec ~rnd:Toward_Minus_Infinity xmax ymin in
-  let mul4_min = mul ~prec ~rnd:Toward_Minus_Infinity xmax ymax in
-  let res_min = List.fold_left min mul1_min [mul2_min; mul3_min; mul4_min] in
-  let mul1_max = mul ~prec ~rnd:Toward_Plus_Infinity xmin ymin in
-  let mul2_max = mul ~prec ~rnd:Toward_Plus_Infinity xmin ymax in
-  let mul3_max = mul ~prec ~rnd:Toward_Plus_Infinity xmax ymin in
-  let mul4_max = mul ~prec ~rnd:Toward_Plus_Infinity xmax ymax in
-  let res_max = List.fold_left max mul1_max [mul2_max; mul3_max; mul4_max] in
-  (res_min, res_max)
+  let zero = get_zero () in
+
+  if less_p xl zero then
+    if less_p zero xu then
+      if less_p yl zero then
+        if less_p zero yu then (* Mixed * Mixed *)
+          (min (mul ~prec ~rnd:Toward_Minus_Infinity xl yu)
+               (mul ~prec ~rnd:Toward_Minus_Infinity xu yl),
+           max (mul ~prec ~rnd:Toward_Plus_Infinity xl yl)
+               (mul ~prec ~rnd:Toward_Plus_Infinity xu yu))
+        else                   (* Mixed * Neg *)
+          (* yl < 0 so NaN cannot be produced by this *)
+          ((mul ~prec ~rnd:Toward_Minus_Infinity xu yl),
+           (mul ~prec ~rnd:Toward_Plus_Infinity xl yl))
+      else
+        if less_p zero yu then (* Mixed * Pos *)
+          (mul ~prec ~rnd:Toward_Minus_Infinity xl yu,
+           mul ~prec ~rnd:Toward_Plus_Infinity xu yu)
+        else                   (* Mixed * Zero *)
+          (zero, zero)
+    else
+      if less_p yl zero then
+        if less_p zero yu then (* Neg * Mixed *)
+          (mul ~prec ~rnd:Toward_Minus_Infinity xl yu,
+           mul ~prec ~rnd:Toward_Plus_Infinity xl yl)
+        else                   (* Neg * Neg *)
+          (mul ~prec ~rnd:Toward_Minus_Infinity xu yu,
+           mul ~prec ~rnd:Toward_Plus_Infinity xl yl)
+      else
+        if less_p zero yu then (* Neg * Pos *)
+          (mul ~prec ~rnd:Toward_Minus_Infinity xl yu,
+           mul ~prec ~rnd:Toward_Plus_Infinity xu yl)
+        else                   (* Neg * Zero *)
+          (zero, zero)
+  else
+    if less_p zero xu then
+      if less_p yl zero then
+        if less_p zero yu then (* Pos * Mixed *)
+          (mul ~prec ~rnd:Toward_Minus_Infinity xu yl,
+           mul ~prec ~rnd:Toward_Plus_Infinity xu yu)
+        else                   (* Pos * Neg *)
+          (mul ~prec ~rnd:Toward_Minus_Infinity xu yl,
+           mul ~prec ~rnd:Toward_Plus_Infinity xl yu)
+      else
+        if less_p zero yu then (* Pos * Pos *)
+          (mul ~prec ~rnd:Toward_Minus_Infinity xl yl,
+           mul ~prec ~rnd:Toward_Plus_Infinity xu yu)
+        else                   (* Pos * Zero *)
+          (zero, zero)
+    else                       (* Zero * Mixed *)
+      (zero, zero)
 
 let inv (xmin, xmax) =
   set_exponents ();
