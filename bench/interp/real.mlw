@@ -48,4 +48,10 @@ module R
   let bench3 () =
     (pi, sqrt (pi))
 
+  let test3 () =
+    let ref x = 2.0 in
+    for i=1 to 14 do x <- x * x done;
+    let y = 0.0 * x in
+    (x,y)
+
 end
