@@ -19,6 +19,9 @@ do
             bin/why3config --detect
             bench/ide-bench
             ;;
+        web_ide)
+            make web_ide
+            ;;
         doc)
             make doc
             make stdlibdoc

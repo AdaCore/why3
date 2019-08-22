@@ -1701,8 +1701,10 @@ src/ide/why3_js.byte: lib/why3/why3.cma src/ide/why3_js.cmo
 src/ide/why3_js.js: src/ide/why3_js.byte
 	js_of_ocaml +nat.js +dynlink.js +toplevel.js $<
 
-opt: bin/why3webserver.opt src/ide/why3_js.js
-byte: bin/why3webserver.byte src/ide/why3_js.js
+web_ide: src/ide/why3_js.js
+
+opt: bin/why3webserver.opt
+byte: bin/why3webserver.byte src/ide/why3_js.cmo
 
 endif
 
