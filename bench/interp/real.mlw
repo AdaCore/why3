@@ -1,5 +1,6 @@
 module R
 
+  use int.Int
   use real.Real
   use ref.Ref
   use real.Square
@@ -8,45 +9,67 @@ module R
   exception BenchFailure
 
 
-  let test0 () =
-     let x:real = 42.0 in
-     let y:real = 1.5 in
-     let z:real = 0.1 in
-     (x,y,z)
+  let test0 ()
+    raises { BenchFailure -> false }
+  =
+    let x:real = 42.0 in
+    let y:real = 1.5 in
+    let z:real = 0.1 in
+    if z < 0.099999 || z > 0.100001 then raise BenchFailure;
+    (x,y,z)
 
-  let test1 () =
+  let test1 ()
+    raises { BenchFailure -> false }
+  =
     let x : real = 0.1 in
     let y : real = 10.0 * x in
+    if y < 0.99999 || y > 1.00001 then raise BenchFailure;
     (x, y)
 
-  let test2 () =
+  let test2 ()
+    raises { BenchFailure -> false }
+  =
     let x : real = 3.0 in
     let y : real = 1.0 / x in
-    (x, y, 3.0 * y)
+    let z : real = 3.0 * y in
+    if z < 0.99999 || z > 1.00001 then raise BenchFailure;
+    (x, y, z)
 
-  let test_exp () =
-    let x: real = 1.0 in
-    exp x
+  let test_exp ()
+    raises { BenchFailure -> false }
+  =
+    let x : real = 1.0 in
+    let y : real = exp x in
+    if y < 2.71828182845 || y > 2.71828182846 then raise BenchFailure;
+    y
 
-  let test_log () =
-    let x: real = 1.0 in
-    log x
+  let test_log ()
+    raises { BenchFailure -> false }
+  =
+    let x : real = 1.0 in
+    let y : real = log x in
+    if y <> 0.0 then raise BenchFailure;
+    y
 
-  let test_exp_log () =
-    let x: real = 42.0 in
-    exp (log x), log x, exp x
+  let test_exp_log ()
+    raises { BenchFailure -> false }
+  =
+    let x : real = 42.0 in
+    let y : real = exp (log x) in
+    if y < 41.99999 || y > 42.00001 then raise BenchFailure;
+    log x, exp x, y
 
   let bench1 ()
     (* Tries to calculate sqrt(2) *)
     diverges
     raises { BenchFailure -> false }
-    ensures { result = 10.0 } =
+  =
     let incr = 0.002 (*(1.0 / 10000.0)*) in
-    let i : ref real = ref 0.0 in
-    while (!i * !i <= 2.0) do
-      i := !i + incr;
+    let ref i : real = 0.0 in
+    while (i * i <= 2.0) do
+      i <- i + incr;
     done;
-    !i
+    i
 
   let bench2 ()
     raises { BenchFailure -> false }
@@ -56,15 +79,19 @@ module R
     if r <> 4.0 then raise BenchFailure;
     r
 
+  let test3 ()
+    raises { BenchFailure -> false }
+  =
+    let ref x : real = 2.0 in
+    for i=1 to 14 do x <- x * x done;
+    let y : real = 0.0 * x in
+    if y <> 0.0 then raise BenchFailure;
+    (x,y)
+
   use real.Trigonometry
 
   let bench3 () =
     (pi, sqrt (pi))
 
-  let test3 () =
-    let ref x = 2.0 in
-    for i=1 to 14 do x <- x * x done;
-    let y = 0.0 * x in
-    (x,y)
 
 end
