@@ -17,6 +17,8 @@ val add: real -> real -> real
 val mul: real -> real -> real
 val div: real -> real -> real
 val sqrt: real -> real
+val exp: real -> real
+val log: real -> real
 
 (* Real comparisons *)
 val eq: real -> real -> bool

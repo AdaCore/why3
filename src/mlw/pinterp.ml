@@ -486,10 +486,16 @@ let built_in_modules =
     ["pi", eval_real Modeconst (Big_real.pi());
     ]
   in
+  let real_exp_log =
+    ["real"], "ExpLog", [],
+    ["exp", eval_real Mode1r Big_real.exp;
+     "log", eval_real Mode1r Big_real.log]
+  in
   bool_module :: (int_modules @ [array_module;
                                  real_module;
                                  real_square_module;
                                  real_trigo_module;
+                                 real_exp_log;
                                  mode_module;
                                  float_modules 32 ~prec:24 "Float32";
                                  float_modules 64 ~prec:53 "Float64";])

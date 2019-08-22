@@ -228,13 +228,13 @@ module ExpLog
 
   use Real
 
-  function exp real : real
+  val function exp real : real
   axiom Exp_zero : exp(0.0) = 1.0
   axiom Exp_sum : forall x y:real. exp (x+y) = exp x * exp y
 
   constant e : real = exp 1.0
 
-  function log real : real
+  val function log real : real
   axiom Log_one : log 1.0 = 0.0
   axiom Log_mul :
     forall x y:real. x > 0.0 /\ y > 0.0 -> log (x*y) = log x + log y

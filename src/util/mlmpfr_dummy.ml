@@ -28,6 +28,9 @@ let sub ?rnd:_ ?prec:_ _ _ = raise Not_Implemented
 let abs ?rnd:_ ?prec:_ _ = raise Not_Implemented
 let fma ?rnd:_ ?prec:_ _ _ _ = raise Not_Implemented
 let rint ?rnd:_ ?prec:_ _ = raise Not_Implemented
+let exp ?rnd:_ ?prec:_ _ = raise Not_Implemented
+let log ?rnd:_ ?prec:_ _ = raise Not_Implemented
+
 
 let min ?rnd:_ ?prec:_ _ _ = raise Not_Implemented
 let max ?rnd:_ ?prec:_ _ _ = raise Not_Implemented

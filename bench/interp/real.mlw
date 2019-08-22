@@ -3,6 +3,7 @@ module R
   use real.Real
   use ref.Ref
   use real.Square
+  use real.ExpLog
 
   exception BenchFailure
 
@@ -22,6 +23,18 @@ module R
     let x : real = 3.0 in
     let y : real = 1.0 / x in
     (x, y, 3.0 * y)
+
+  let test_exp () =
+    let x: real = 1.0 in
+    exp x
+
+  let test_log () =
+    let x: real = 1.0 in
+    log x
+
+  let test_exp_log () =
+    let x: real = 42.0 in
+    exp (log x), log x, exp x
 
   let bench1 ()
     (* Tries to calculate sqrt(2) *)

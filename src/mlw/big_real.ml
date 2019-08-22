@@ -134,12 +134,28 @@ let div x y =
 
 let sqrt (xmin, xmax) =
   set_exponents ();
-  let prec = get_prec() in
+  let prec = get_prec () in
   let zero = get_zero () in
   if lessequal_p zero xmin then
     let res_min = sqrt ~rnd:Toward_Minus_Infinity ~prec xmin in
     let res_max = sqrt ~rnd:Toward_Plus_Infinity ~prec xmax in
     (res_min, res_max)
+  else
+    raise Undetermined
+
+let exp (xmin, xmax) =
+  set_exponents ();
+  let prec = get_prec () in
+  (exp ~rnd:Toward_Minus_Infinity ~prec xmin,
+   exp ~rnd:Toward_Plus_Infinity ~prec xmax)
+
+let log (xmin, xmax) =
+  set_exponents ();
+  let prec = get_prec () in
+  let zero = get_zero () in
+  if lessequal_p zero xmin then
+    (log ~rnd:Toward_Minus_Infinity ~prec xmin,
+     log ~rnd:Toward_Plus_Infinity ~prec xmax)
   else
     raise Undetermined
 

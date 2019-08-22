@@ -36,6 +36,8 @@ val sub: ?rnd:mpfr_rnd_t -> ?prec:int -> mpfr_float -> mpfr_float -> mpfr_float
 val abs: ?rnd:mpfr_rnd_t -> ?prec:int -> mpfr_float -> mpfr_float
 val fma: ?rnd:mpfr_rnd_t -> ?prec:int -> mpfr_float -> mpfr_float -> mpfr_float -> mpfr_float
 val rint: ?rnd:mpfr_rnd_t -> ?prec:int -> mpfr_float -> mpfr_float
+val exp : ?rnd:mpfr_rnd_t -> ?prec:int -> mpfr_float -> mpfr_float
+val log : ?rnd:mpfr_rnd_t -> ?prec:int -> mpfr_float -> mpfr_float
 
 
 val min: ?rnd:mpfr_rnd_t -> ?prec:int -> mpfr_float -> mpfr_float -> mpfr_float
