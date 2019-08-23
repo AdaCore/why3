@@ -694,7 +694,7 @@ Qed.
 
 Lemma factor_sub : forall n m p, (n * m - n * p = n * (m - p))%Z.
   intros.
-  rewrite Int.infix_mn_def, Int.infix_mn_def, Zopp_mult_distr_r.
+  rewrite Int.infix_mn'def, Int.infix_mn'def, Zopp_mult_distr_r.
   apply Zred_factor4.
 Qed.
 
@@ -1193,11 +1193,12 @@ Definition to_int : t -> Numbers.BinNums.Z.
 Defined.
 
 (* Why3 goal *)
-Lemma to_int_def :
+Lemma to_int'def :
   forall (x:t),
   (is_signed_positive x -> ((to_int x) = (to_uint x))) /\
   (~ is_signed_positive x ->
    ((to_int x) = (-(two_power_size - (to_uint x))%Z)%Z)).
+Proof.
   intros. split.
   - unfold to_int, to_uint,is_signed_positive, twos_complement, size_nat.
     intros.

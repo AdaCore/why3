@@ -28,11 +28,11 @@ why3_vc Mul_distr_l by (simp add: ring_distribs)
 
 why3_vc Mul_distr_r by (simp add: ring_distribs)
 
-why3_vc infix_mn_def by simp
+why3_vc infix_mnqtdef by simp
 
 why3_vc NonTrivialRing by simp
 
-why3_vc infix_lseq_def by auto
+why3_vc infix_lseqqtdef by auto
 
 why3_vc Refl by simp
 
@@ -55,7 +55,7 @@ section {* Absolute Value *}
 
 why3_open "int/Abs.xml"
 
-why3_vc abs_def by simp
+why3_vc absqtdef by simp
 
 why3_vc Abs_le by auto
 
@@ -80,9 +80,9 @@ why3_vc Min_comm by simp
 
 why3_vc Min_assoc by simp
 
-why3_vc max_def by auto
+why3_vc maxqtdef by auto
 
-why3_vc min_def by auto
+why3_vc minqtdef by auto
 
 why3_end
 

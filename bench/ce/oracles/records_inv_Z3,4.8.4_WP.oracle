@@ -1,6 +1,6 @@
 Weakest Precondition
-bench/ce/records_inv.mlw M VC r: Valid
-bench/ce/records_inv.mlw M VC record_match_eval_test1: Timeout or Unknown
+bench/ce/records_inv.mlw M r'VC: Valid
+bench/ce/records_inv.mlw M record_match_eval_test1'VC: Timeout or Unknown
 Counter-example model:
 File records_inv.mlw:
   Line 15:
@@ -11,8 +11,8 @@ File records_inv.mlw:
   Line 16:
     result, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
 
-bench/ce/records_inv.mlw M VC record_match_eval_test1: Valid
-bench/ce/records_inv.mlw M VC record_match_eval_test2: Timeout or Unknown
+bench/ce/records_inv.mlw M record_match_eval_test1'VC: Valid
+bench/ce/records_inv.mlw M record_match_eval_test2'VC: Timeout or Unknown
 Counter-example model:
 File records_inv.mlw:
   Line 23:
@@ -22,16 +22,16 @@ File records_inv.mlw:
     x, [[@introduced], [@model_trace:x]] = {"proj_name" : ".my_field_f" ,
     "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "0" } }
 
-bench/ce/records_inv.mlw M VC record_match_eval_test3: Timeout or Unknown
-bench/ce/records_inv.mlw M VC record_match_eval_test3: Valid
-bench/ce/records_inv.mlw M VC record_match_eval_test4: Timeout or Unknown
-bench/ce/records_inv.mlw M VC record_match_eval_test4: Valid
-bench/ce/records_inv.mlw M VC record_match_eval_test44: Timeout or Unknown
-bench/ce/records_inv.mlw M VC record_match_eval_test44: Valid
-bench/ce/records_inv.mlw M VC record_match_eval_test44: Valid
-bench/ce/records_inv.mlw M VC test_record_match_eval_test5: Timeout or Unknown
-bench/ce/records_inv.mlw M VC test_record_match_eval_test5: Valid
-bench/ce/records_inv.mlw Mutable VC record_match_eval_test1: Unknown (sat)
+bench/ce/records_inv.mlw M record_match_eval_test3'VC: Timeout or Unknown
+bench/ce/records_inv.mlw M record_match_eval_test3'VC: Valid
+bench/ce/records_inv.mlw M record_match_eval_test4'VC: Timeout or Unknown
+bench/ce/records_inv.mlw M record_match_eval_test4'VC: Valid
+bench/ce/records_inv.mlw M record_match_eval_test44'VC: Timeout or Unknown
+bench/ce/records_inv.mlw M record_match_eval_test44'VC: Valid
+bench/ce/records_inv.mlw M record_match_eval_test44'VC: Valid
+bench/ce/records_inv.mlw M test_record_match_eval_test5'VC: Timeout or Unknown
+bench/ce/records_inv.mlw M test_record_match_eval_test5'VC: Valid
+bench/ce/records_inv.mlw Mutable record_match_eval_test1'VC: Unknown (sat)
 Counter-example model:
 File records_inv.mlw:
   Line 65:
@@ -42,8 +42,8 @@ File records_inv.mlw:
   Line 66:
     result, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
 
-bench/ce/records_inv.mlw Mutable VC record_match_eval_test1: Valid
-bench/ce/records_inv.mlw Mutable VC record_match_eval_test2: Unknown (sat)
+bench/ce/records_inv.mlw Mutable record_match_eval_test1'VC: Valid
+bench/ce/records_inv.mlw Mutable record_match_eval_test2'VC: Unknown (sat)
 Counter-example model:
 File records_inv.mlw:
   Line 73:
@@ -57,7 +57,7 @@ File records_inv.mlw:
     "value" : {"type" : "Integer" , "val" : "0" } }, {"field" : "g" ,
     "value" : {"type" : "Boolean" , "val" : false } }] } }
 
-bench/ce/records_inv.mlw Mutable VC record_match_eval_test3: Unknown (sat)
+bench/ce/records_inv.mlw Mutable record_match_eval_test3'VC: Unknown (sat)
 Counter-example model:
 File records_inv.mlw:
   Line 78:
@@ -76,7 +76,7 @@ File records_inv.mlw:
     "value" : {"type" : "Integer" , "val" : "6" } }, {"field" : "g" ,
     "value" : {"type" : "Boolean" , "val" : false } }] } }
 
-bench/ce/records_inv.mlw Mutable VC record_match_eval_test4: Unknown (sat)
+bench/ce/records_inv.mlw Mutable record_match_eval_test4'VC: Unknown (sat)
 Counter-example model:
 File records_inv.mlw:
   Line 83:

@@ -7,89 +7,89 @@
 <file proved="true">
 <path name=".."/><path name="mccarthy.mlw"/>
 <theory name="McCarthy91" proved="true">
- <goal name="VC f91" expl="VC for f91" proved="true">
+ <goal name="f91&#39;VC" expl="VC for f91" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="31"/></proof>
  </goal>
- <goal name="VC f91_tco" expl="VC for f91_tco" proved="true">
+ <goal name="f91_tco&#39;VC" expl="VC for f91_tco" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="VC f91_tco.0" expl="loop invariant init" proved="true">
+  <goal name="f91_tco&#39;VC.0" expl="loop invariant init" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="979"/></proof>
   </goal>
-  <goal name="VC f91_tco.1" expl="variant decrease" proved="true">
+  <goal name="f91_tco&#39;VC.1" expl="variant decrease" proved="true">
   <transf name="split_vc" proved="true" >
-   <goal name="VC f91_tco.1.0" expl="variant decrease" proved="true">
+   <goal name="f91_tco&#39;VC.1.0" expl="variant decrease" proved="true">
    <proof prover="1"><result status="valid" time="0.04" steps="1097"/></proof>
    </goal>
-   <goal name="VC f91_tco.1.1" expl="variant decrease" proved="true">
+   <goal name="f91_tco&#39;VC.1.1" expl="variant decrease" proved="true">
    <proof prover="1"><result status="valid" time="0.02" steps="1099"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC f91_tco.2" expl="loop variant decrease" proved="true">
+  <goal name="f91_tco&#39;VC.2" expl="loop variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="1578"/></proof>
   </goal>
-  <goal name="VC f91_tco.3" expl="loop invariant preservation" proved="true">
+  <goal name="f91_tco&#39;VC.3" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="1682"/></proof>
   </goal>
-  <goal name="VC f91_tco.4" expl="postcondition" proved="true">
+  <goal name="f91_tco&#39;VC.4" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="1531"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC f91_nonrec" expl="VC for f91_nonrec" proved="true">
+ <goal name="f91_nonrec&#39;VC" expl="VC for f91_nonrec" proved="true">
  <proof prover="3"><result status="valid" time="0.29" steps="523"/></proof>
  </goal>
- <goal name="VC f91_pseudorec" expl="VC for f91_pseudorec" proved="true">
+ <goal name="f91_pseudorec&#39;VC" expl="VC for f91_pseudorec" proved="true">
  <proof prover="3"><result status="valid" time="0.01" steps="49"/></proof>
  </goal>
 </theory>
 <theory name="McCarthyWithGhostMonitor" proved="true">
- <goal name="VC monitor" expl="VC for monitor" proved="true">
+ <goal name="monitor&#39;VC" expl="VC for monitor" proved="true">
  <proof prover="1"><result status="valid" time="0.07" steps="13039"/></proof>
  </goal>
- <goal name="VC mccarthy" expl="VC for mccarthy" proved="true">
+ <goal name="mccarthy&#39;VC" expl="VC for mccarthy" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="5330"/></proof>
  </goal>
- <goal name="VC monitor2" expl="VC for monitor2" proved="true">
+ <goal name="monitor2&#39;VC" expl="VC for monitor2" proved="true">
  <proof prover="1"><result status="valid" time="0.03" steps="4916"/></proof>
  </goal>
- <goal name="VC mccarthy2" expl="VC for mccarthy2" proved="true">
+ <goal name="mccarthy2&#39;VC" expl="VC for mccarthy2" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="2994"/></proof>
  </goal>
 </theory>
 <theory name="McCarthy91Mach" proved="true">
- <goal name="VC f91" expl="VC for f91" proved="true">
+ <goal name="f91&#39;VC" expl="VC for f91" proved="true">
  <proof prover="3" timelimit="5"><result status="valid" time="0.07" steps="293"/></proof>
  </goal>
- <goal name="VC f91_nonrec" expl="VC for f91_nonrec" proved="true">
+ <goal name="f91_nonrec&#39;VC" expl="VC for f91_nonrec" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="VC f91_nonrec.0" expl="loop invariant init" proved="true">
+  <goal name="f91_nonrec&#39;VC.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC f91_nonrec.1" expl="integer overflow" proved="true">
+  <goal name="f91_nonrec&#39;VC.1" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC f91_nonrec.2" expl="loop variant decrease" proved="true">
+  <goal name="f91_nonrec&#39;VC.2" expl="loop variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC f91_nonrec.3" expl="loop invariant preservation" proved="true">
+  <goal name="f91_nonrec&#39;VC.3" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="58"/></proof>
   </goal>
-  <goal name="VC f91_nonrec.4" expl="integer overflow" proved="true">
+  <goal name="f91_nonrec&#39;VC.4" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC f91_nonrec.5" expl="loop variant decrease" proved="true">
+  <goal name="f91_nonrec&#39;VC.5" expl="loop variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC f91_nonrec.6" expl="loop invariant preservation" proved="true">
+  <goal name="f91_nonrec&#39;VC.6" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="1.60" steps="1960"/></proof>
   </goal>
-  <goal name="VC f91_nonrec.7" expl="postcondition" proved="true">
+  <goal name="f91_nonrec&#39;VC.7" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC f91_pseudorec" expl="VC for f91_pseudorec" proved="true">
+ <goal name="f91_pseudorec&#39;VC" expl="VC for f91_pseudorec" proved="true">
  <proof prover="3" timelimit="5"><result status="valid" time="0.08" steps="222"/></proof>
  </goal>
 </theory>

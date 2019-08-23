@@ -21,7 +21,7 @@ Require Import Rbasic_fun.
 (* min is replaced with (Reals.Rbasic_fun.Rmin x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma min_def :
+Lemma min'def :
   forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = x)) /\
   (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = y)).
@@ -37,7 +37,7 @@ Qed.
 (* max is replaced with (Reals.Rbasic_fun.Rmax x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma max_def :
+Lemma max'def :
   forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = y)) /\
   (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = x)).

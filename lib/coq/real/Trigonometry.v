@@ -204,7 +204,7 @@ apply sin_plus.
 Qed.
 
 (* Why3 goal *)
-Lemma tan_def :
+Lemma tan'def :
   forall (x:Reals.Rdefinitions.R),
   ((Reals.Rtrigo1.tan x) =
    ((Reals.Rtrigo_def.sin x) / (Reals.Rtrigo_def.cos x))%R).

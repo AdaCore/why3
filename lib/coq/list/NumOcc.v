@@ -32,7 +32,7 @@ exact (fix num_occ (l : list a) : int :=
 Defined.
 
 (* Why3 goal *)
-Lemma num_occ_def {a:Type} {a_WT:WhyType a} :
+Lemma num_occ'def {a:Type} {a_WT:WhyType a} :
   forall (x:a) (l:Init.Datatypes.list a),
   match l with
   | Init.Datatypes.nil => ((num_occ x l) = 0%Z)

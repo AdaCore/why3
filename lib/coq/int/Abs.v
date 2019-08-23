@@ -19,10 +19,11 @@ Require int.Int.
 (* abs is replaced with (ZArith.BinInt.Z.abs x) by the coq driver *)
 
 (* Why3 goal *)
-Lemma abs_def :
+Lemma abs'def :
   forall (x:Numbers.BinNums.Z),
   ((0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = x)) /\
   (~ (0%Z <= x)%Z -> ((ZArith.BinInt.Z.abs x) = (-x)%Z)).
+Proof.
 intros x.
 split ; intros H.
 now apply Z.abs_eq.

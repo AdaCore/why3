@@ -506,7 +506,7 @@ let built_in_modules =
     ] ;
     ["why3"; "Ref"],"Ref", [],
     ["ref", exec_ref_make ;
-     "mk ref", exec_ref_make ;
+     "ref'mk", exec_ref_make ;
      "contents", exec_ref_get ;
     ] ;
     ["ref"],"Ref", [],

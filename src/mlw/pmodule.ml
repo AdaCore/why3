@@ -1048,7 +1048,7 @@ let clone_type_decl inst cl tdl kn =
 let add_vc uc (its, f) =
   let {id_string = nm; id_loc = loc} = its.its_ts.ts_name in
   let attrs = Sattr.singleton (Ident.create_attribute ("expl:VC for " ^ nm)) in
-  let pr = create_prsymbol (id_fresh ~attrs ?loc ("VC " ^ nm)) in
+  let pr = create_prsymbol (id_fresh ~attrs ?loc (nm ^ "'VC")) in
   let d = create_pure_decl (create_prop_decl Pgoal pr f) in
   add_pdecl ~warn:false ~vc:false uc d
 

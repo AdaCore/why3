@@ -21,7 +21,7 @@ Require list.Append.
 Require list.Reverse.
 
 (* Why3 goal *)
-Lemma rev_append_def1 {a:Type} {a_WT:WhyType a} :
+Lemma rev_append'def {a:Type} {a_WT:WhyType a} :
   forall (s:Init.Datatypes.list a) (t:Init.Datatypes.list a),
   ((Lists.List.rev_append s t) =
    match s with
@@ -29,6 +29,7 @@ Lemma rev_append_def1 {a:Type} {a_WT:WhyType a} :
        Lists.List.rev_append r (Init.Datatypes.cons x t)
    | Init.Datatypes.nil => t
    end).
+Proof.
 intros s t.
 destruct s; simpl; auto.
 Qed.

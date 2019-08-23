@@ -77,7 +77,7 @@ let create_semi_constructor id s fdl pjl invl =
 
 let create_plain_record_decl ~priv ~mut id args fdl invl witn =
   let exn = Invalid_argument "Pdecl.create_plain_record_decl" in
-  let cid = id_fresh ?loc:id.pre_loc ("mk " ^ id.pre_name) in
+  let cid = id_fresh ?loc:id.pre_loc (id.pre_name ^ "'mk") in
   let add_fd fds (mut, fd) = Mpv.add_new exn fd mut fds in
   let fds = List.fold_left add_fd Mpv.empty fdl in
   let fdl = List.map snd fdl in
@@ -103,7 +103,7 @@ let create_rec_record_decl s fdl =
   let exn = Invalid_argument "Pdecl.create_rec_record_decl" in
   if not (its_recursive s) then raise exn;
   let id = s.its_ts.ts_name in
-  let cid = id_fresh ?loc:id.id_loc ("mk " ^ id.id_string) in
+  let cid = id_fresh ?loc:id.id_loc (id.id_string ^ "'mk") in
   List.iter (check_field (Stv.of_list s.its_ts.ts_args)) fdl;
   let cs = create_constructor ~constr:1 cid s fdl in
   let pjl = List.map (create_projection s) fdl in
@@ -496,13 +496,13 @@ let create_let_decl ld =
         let vl = List.map (fun v -> v.pv_vs) cty.cty_args in
         let hd = t_app ls (List.map t_var vl) ls.ls_value in
         let f = t_and_simp_l (conv_post hd cty.cty_post) in
-        let nm = id.id_string ^ "_spec" in
+        let nm = id.id_string ^ "'spec" in
         let axms = cty_axiom (id_derive ~attrs nm id) cty f axms in
         let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
         begin match c.c_node with
         | Cany | Capp _ | Cpur _ ->
             (* the full spec of c is inherited by the rsymbol and
-               so appears in the "_spec" axiom above. Even if this
+               so appears in the "'spec" axiom above. Even if this
                spec contains "result = ...", we do not try to extract
                a definition from it. We only produce definitions via
                term_of_expr from a Cfun, and the user must eta-expand
@@ -513,13 +513,13 @@ let create_let_decl ld =
             | Some f when cty.cty_pre = [] ->
                 abst, (ls, vl, f) :: defn, axms
             | Some f ->
-                let f = t_insert hd f and nm = id.id_string ^ "_def" in
+                let f = t_insert hd f and nm = id.id_string ^ "'def" in
                 let axms = cty_axiom (id_derive ~attrs nm id) cty f axms in
                 create_param_decl ls :: abst, defn, axms
             | None when cty.cty_post = [] ->
                 let axms = match post_of_expr hd e with
                   | Some f ->
-                      let nm = id.id_string ^ "_def" in
+                      let nm = id.id_string ^ "'def" in
                       cty_axiom (id_derive ~attrs nm id) cty f axms
                   | None -> axms in
                 create_param_decl ls :: abst, defn, axms
@@ -544,7 +544,7 @@ let create_let_decl ld =
     try [create_logic_decl dl] with Decl.NoTerminationProof _ ->
     let abst = List.map (fun (s,_) -> create_param_decl s) dl in
     let mk_ax ({ls_name = id} as s, vl, t) =
-      let nm = id.id_string ^ "_def" in
+      let nm = id.id_string ^ "'def" in
       let pr = create_prsymbol (id_derive ~attrs nm id) in
       let hd = t_app s (List.map t_var vl) t.t_ty in
       let ax = t_forall_close vl [] (t_insert hd t) in
@@ -669,7 +669,7 @@ let print_its_defn fst fmt itd =
         (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
     | NoDef, fl, [{rs_name = {id_string = n}}]
-      when n = "mk " ^ s.its_ts.ts_name.id_string -> fprintf fmt " =%s { %a }"
+      when n = s.its_ts.ts_name.id_string ^ "'mk" -> fprintf fmt " =%s { %a }"
         (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
     | NoDef, fl, cl ->

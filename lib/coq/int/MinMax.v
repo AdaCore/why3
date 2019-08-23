@@ -19,7 +19,7 @@ Require int.Int.
 (* min is replaced with (ZArith.BinInt.Z.min x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma min_def :
+Lemma min'def :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((x <= y)%Z -> ((ZArith.BinInt.Z.min x y) = x)) /\
   (~ (x <= y)%Z -> ((ZArith.BinInt.Z.min x y) = y)).
@@ -35,7 +35,7 @@ Qed.
 (* max is replaced with (ZArith.BinInt.Z.max x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma max_def :
+Lemma max'def :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((x <= y)%Z -> ((ZArith.BinInt.Z.max x y) = y)) /\
   (~ (x <= y)%Z -> ((ZArith.BinInt.Z.max x y) = x)).

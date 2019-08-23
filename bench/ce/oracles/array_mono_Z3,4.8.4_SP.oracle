@@ -1,6 +1,6 @@
 Strongest Postcondition
-bench/ce/array_mono.mlw Array VC array: Valid
-bench/ce/array_mono.mlw A VC f1: Timeout or Unknown
+bench/ce/array_mono.mlw Array array'VC: Valid
+bench/ce/array_mono.mlw A f1'VC: Timeout or Unknown
 Counter-example model:
 File array_mono.mlw:
   Line 16:
@@ -13,8 +13,8 @@ File array_mono.mlw:
     a, [[@introduced], [@model_trace:a]] = {"proj_name" : "length" ,
     "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "0" } }
 
-bench/ce/array_mono.mlw A VC f2: Valid
-bench/ce/array_mono.mlw A VC f2: Timeout or Unknown
+bench/ce/array_mono.mlw A f2'VC: Valid
+bench/ce/array_mono.mlw A f2'VC: Timeout or Unknown
 Counter-example model:
 File array_mono.mlw:
   Line 25:
@@ -55,4 +55,3 @@ File array_mono.mlw:
     {"others" : {"type" : "Integer" , "val" : "4" } }] } },
     {"field" : "length" , "value" : {"type" : "Integer" ,
     "val" : "2" } }] } }
-

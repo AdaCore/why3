@@ -26,19 +26,19 @@ Definition divides (d:Numbers.BinNums.Z) (n:Numbers.BinNums.Z) : Prop :=
   ((d = 0%Z) -> (n = 0%Z)) /\
   (~ (d = 0%Z) -> ((ZArith.BinInt.Z.rem n d) = 0%Z)).
 
-*)
-
-Require Import Znumtheory.
-Notation divides := Z.divide (only parsing).
-
 (* Why3 goal *)
-Lemma divides_spec :
+Lemma divides'spec :
   forall (d:Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
   divides d n <-> (exists q:Numbers.BinNums.Z, (n = (q * d)%Z)).
 Proof.
 intros d n.
-easy.
+
 Qed.
+
+*)
+
+Require Import Znumtheory.
+Notation divides := Z.divide (only parsing).
 
 (* Why3 goal *)
 Lemma divides_refl : forall (n:Numbers.BinNums.Z), divides n n.

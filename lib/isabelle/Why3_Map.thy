@@ -6,7 +6,7 @@ section {* Generic Maps *}
 
 why3_open "map/Map.xml"
 
-why3_vc set_def by auto
+why3_vc setqtdef by auto
 
 why3_end
 
@@ -20,7 +20,7 @@ why3_open "map/Const.xml"
   constants
     const=abs_const
 
-why3_vc const_def
+why3_vc constqtdef
   by (simp add: abs_const_def)
 
 why3_end

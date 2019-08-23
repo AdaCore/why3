@@ -339,7 +339,7 @@ let print_statement s pr id info fmt f =
 
 let print_equivalence_lemma info fmt (ls, ld) =
   let name = Ident.string_unique iprinter
-    ((id_unique iprinter ls.ls_name) ^ "_def") in
+    ((id_unique iprinter ls.ls_name) ^ "'def") in
   print_statement "lemma" (attrib "name" string) name info fmt (ls_defn_axiom ld)
 
 let print_fun_eqn s info defs fmt (ls, ld) =

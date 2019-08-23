@@ -31,7 +31,7 @@ Proof.
 Defined.
 
 (* Why3 goal *)
-Lemma numof_def :
+Lemma numof'def :
   forall (p:Numbers.BinNums.Z -> Init.Datatypes.bool) (a:Numbers.BinNums.Z)
     (b:Numbers.BinNums.Z),
   ((b <= a)%Z -> ((numof p a b) = 0%Z)) /\
@@ -68,7 +68,7 @@ Lemma Numof_empty :
   forall p a b, (b <= a)%Z -> numof p a b = 0%Z.
 Proof.
   intros p a b h1.
-  now apply numof_def.
+  now apply numof'def.
 Qed.
 
 (* Why3 goal *)
@@ -103,9 +103,9 @@ Proof.
   intro e; rewrite e.
   rewrite Numof_empty with (a := x) (b := x); omega.
   intro H6.
-  refine (_ (proj2 (numof_def p a x) _)).
+  refine (_ (proj2 (numof'def p a x) _)).
   intros [H1 H2].
-  refine (_ (proj2 (numof_def p b x) _)).
+  refine (_ (proj2 (numof'def p b x) _)).
   intros [H3 H4].
   destruct (Bool.bool_dec (p (x - 1)%Z) true) as [H5|H5].
   rewrite H1, H3, H ; auto with zarith.

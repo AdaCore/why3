@@ -598,7 +598,7 @@ let flush_impl ~strict env uc impl =
           | _ -> f in
         let f = Mstr.fold add env t_true in
         let uc = if t_equal f t_true then uc else
-          let id = ls.ls_name.id_string ^ "_def" in
+          let id = ls.ls_name.id_string ^ "'def" in
           let pr = create_prsymbol (id_fresh id) in
           add_prop_decl uc Paxiom pr f in
         Mstr.add s e env, uc

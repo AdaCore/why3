@@ -24,7 +24,7 @@ exact (fix nth n l := match l with nil => None | cons h t => if Zeq_bool n Z0 th
 Defined.
 
 (* Why3 goal *)
-Lemma nth_def {a:Type} {a_WT:WhyType a} :
+Lemma nth'def {a:Type} {a_WT:WhyType a} :
   forall (n:Numbers.BinNums.Z) (l:Init.Datatypes.list a),
   match l with
   | Init.Datatypes.nil => ((nth n l) = Init.Datatypes.None)

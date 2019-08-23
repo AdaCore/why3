@@ -16,13 +16,15 @@ Require Reals.R_sqrt.
 Require BuiltIn.
 Require real.Real.
 
-Import R_sqrt.
-
 (* Why3 goal *)
-Lemma sqr_def :
+Lemma sqr'def :
   forall (x:Reals.Rdefinitions.R), ((Reals.RIneq.Rsqr x) = (x * x)%R).
+Proof.
+intros x.
 reflexivity.
 Qed.
+
+Import R_sqrt.
 
 (* Why3 comment *)
 (* sqrt is replaced with (Reals.R_sqrt.sqrt x) by the coq driver *)

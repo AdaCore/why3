@@ -15,6 +15,10 @@ Language
     `requires Hyp { a = 3 }` tries to give the name `Hyp` to the corresponding
     hypothesis after introduction. This uses the attribute [@hyp_name:] which is
     now reserved.
+  * Ident suffix introduced for specification (resp definition) of a function
+    are renamed from "_spec" (resp. "_def" to "'spec" (resp. "'def" :x:
+  * Ident prefix introduced for goals "VC " and record constructor "mk "
+    becomes suffix "'VC" and "'mk".
 
 Tools
   * counterexamples given by `why3prove` are no longer printed using JSON

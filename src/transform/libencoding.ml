@@ -285,6 +285,6 @@ let defn_or_axiom ls f =
   match Decl.ls_defn_of_axiom f with
     | Some ld -> [create_logic_decl [ld]]
     | None ->
-        let nm = ls.ls_name.id_string ^ "_def" in
+        let nm = ls.ls_name.id_string ^ "'def" in
         let pr = create_prsymbol (id_derive nm ls.ls_name) in
         [create_param_decl ls; create_prop_decl Paxiom pr f]
