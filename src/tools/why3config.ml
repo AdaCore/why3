@@ -63,7 +63,7 @@ let option_list = Arg.align [
      [Arg.Set_string id;
       Arg.Set_string shortcut;
       Arg.String (fun name -> Queue.add (!id, !shortcut, name) prover_bins)]),
-  "<id> <shortcut> <file> add a new prover executable";
+  "<id><shortcut><file> add a new prover executable";
   "--no-builtin-provers-at-statup", Arg.Unit (fun () -> provers_at_startup := false; autoprovers := true),
   " write in .why3.conf the parameter of the provers";
   "--list-prover-families", Arg.Set opt_list_prover_families,
