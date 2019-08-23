@@ -30,14 +30,8 @@
  (* [state checkpoint] extracts the number of the current state out of a
     parser checkpoint. *)
 
- let state checkpoint : int =
-   match top (env checkpoint) with
-   | None ->
-       (* Hmm... The parser is in its initial state. Its number is
-          usually 0. This is a BIG HACK. TEMPORARY *)
-       0
-   | Some Element (s, _, _, _) ->
-       number s
+let state checkpoint : int =
+  current_state_number (env checkpoint)
 
  (* -------------------------------------------------------------------------- *)
 

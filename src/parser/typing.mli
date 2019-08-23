@@ -25,6 +25,8 @@ val open_file : Env.env -> Env.pathname -> unit
 
 val close_file : unit -> Pmodule.pmodule Wstdlib.Mstr.t
 
+val discard_file : unit -> unit
+
 val open_module : Ptree.ident -> unit
 
 val close_module : Loc.position -> unit

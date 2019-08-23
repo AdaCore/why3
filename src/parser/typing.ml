@@ -1588,6 +1588,10 @@ let close_file () =
   assert (not (Stack.is_empty state) && (Stack.top state).muc = None);
   (Stack.pop state).file
 
+let discard_file () =
+  assert (not (Stack.is_empty state));
+  ignore (Stack.pop state)
+
 let open_module ({id_str = nm; id_loc = loc} as id) =
   assert (not (Stack.is_empty state) && (Stack.top state).muc = None);
   let slice = Stack.top state in

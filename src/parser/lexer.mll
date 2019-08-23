@@ -321,7 +321,12 @@ rule token = parse
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
     Typing.open_file env path;
-    let mm = build_parsing_function Parser.Incremental.mlw_file lb in
+    let mm =
+      try
+        build_parsing_function Parser.Incremental.mlw_file lb
+      with
+        e -> ignore (Typing.discard_file ()); raise e
+    in
     if path = [] && Debug.test_flag debug then begin
       let print_m _ m = Format.eprintf "%a@\n@." print_module m in
       let add_m _ m mm = Mid.add m.mod_theory.th_name m mm in
