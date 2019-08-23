@@ -500,7 +500,9 @@ let detect_exec env data exec_name =
       in_place = data.prover_in_place;
       interactive = (match data.kind with ITP -> true | ATP -> false);
       extra_options = [];
-      extra_drivers = [] } in
+      extra_drivers = [];
+      added_at_startup = false;
+    } in
   (* if unknown, temporarily put the prover away *)
   if not (good || old) then begin
     let priority = next_priority () in
@@ -626,6 +628,9 @@ let provers_from_detected_provers config =
         (Some detected.output))
     (get_detected_provers config);
   let detected = run_auto_detection' env config in
+  let detected =
+    Whyconf.Mprover.map (fun c -> { c with added_at_startup = true }) detected
+  in
   generate_builtin_config (env,detected) config
 
 let () = Whyconf.provers_from_detected_provers :=

@@ -138,6 +138,7 @@ type config_prover = {
   interactive : bool;
   extra_options : string list;
   extra_drivers : string list;
+  added_at_startup : bool;
 }
 
 type config_editor = {
@@ -476,6 +477,7 @@ let load_prover (provers,shortcuts) section =
         interactive = get_bool ~default:false section "interactive";
         extra_options = [];
         extra_drivers = [];
+        added_at_startup = false;
       } provers in
     let lshort = get_stringl section ~default:[] "shortcut" in
     let shortcuts = add_prover_shortcuts shortcuts prover lshort in
@@ -835,10 +837,14 @@ let set_main config main =
 
 let set_provers config ?shortcuts provers =
   let shortcuts = Opt.get_def config.prover_shortcuts shortcuts in
+  let rc_config =
+    let provers = Mprover.filter (fun _ c -> not c.added_at_startup) provers in
+    set_provers_shortcuts config.config shortcuts provers;
+  in
   {config with
-    config = set_provers_shortcuts config.config shortcuts provers;
-    provers = provers;
-    prover_shortcuts = shortcuts;
+   config = rc_config;
+   provers = provers;
+   prover_shortcuts = shortcuts;
   }
 
 let set_detected_provers config detected_provers =
@@ -1001,7 +1007,8 @@ module Args = struct
       exit 0
     end;
     let base_config = read_config !opt_config in
-    let config = List.fold_left merge_config base_config !opt_extra in
+    let config = { base_config with conf_file = "" } in
+    let config = List.fold_left merge_config config !opt_extra in
     let apply_not_default f o b = if !o then b else f !o b in
     let config = apply_not_default set_stdlib opt_stdlib config in
     let config = apply_not_default set_autoplugins opt_autoplugins config in
