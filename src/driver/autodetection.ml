@@ -53,6 +53,12 @@ let info = Debug.register_info_flag "autodetect"
   ~desc:"Print@ informational@ messages@ about@ auto-detection@ \
          of@ external@ provers."
 
+let is_config_command = ref false
+
+let print_info () =
+  if !is_config_command
+  then Format.printf
+  else Debug.dprintf info
 
 (* auto-detection of provers *)
 
@@ -354,10 +360,10 @@ let check_prover_auto_level env prover =
   with Not_found -> ()
 
 let generate_auto_strategies env =
-  Debug.dprintf info "Generating strategies:@.";
+  print_info () "Generating strategies:@.";
   Hprover.iter
     (fun p (lev,b) ->
-     if b then Debug.dprintf info "  Prover %a will be used in Auto level >= %d@."
+     if b then print_info () "  Prover %a will be used in Auto level >= %d@."
                        Whyconf.print_prover p lev) env.prover_auto_levels;
   (* Split VCs *)
   let code = "t split_vc exit" in
@@ -445,13 +451,13 @@ let check_support_library data ver =
     if support_ver = ver then true
     else if support_ver = "" then raise Not_found
     else begin
-      Debug.dprintf info
+      print_info ()
         "Found prover %s version %s, but the compiled Why3 library supports only version %s@."
         data.prover_name ver support_ver;
       false
     end
   with Sys_error _ | Not_found ->
-    Debug.dprintf info
+    print_info ()
       "Found prover %s version %s, but no Why3 libraries were compiled for it@."
       data.prover_name ver;
     false
@@ -476,7 +482,7 @@ let detect_exec env data exec_name =
     | None ->
       (* empty prover: a matching version means known problems *)
       if not (good || old) then raise Skip;
-      Debug.dprintf info "Found prover %s version %s%s@."
+      print_info () "Found prover %s version %s%s@."
         data.prover_name ver
         (Opt.get_def
            ". This version of the prover is known to have problems."
@@ -513,7 +519,7 @@ let detect_exec env data exec_name =
   if data.support_library <> "" && not (check_support_library data ver) then
     raise Discard;
   let priority = next_priority () in
-  Debug.dprintf info "Found prover %s version %s%s@."
+  print_info () "Found prover %s version %s%s@."
     data.prover_name ver
     (Opt.get_def
        (if old then
@@ -554,10 +560,10 @@ let detect_unknown env pc =
   let prover = prover_config.prover in
   let ver = prover.prover_version in
   if data.support_library <> "" && not (check_support_library data ver) then raise Skip;
-  Debug.dprintf info
-    "@[Prover %s version %s is not known to be supported.@\n\
-     Known versions for this prover:@ %a@\n\
-     Known old versions for this prover:@ %a@]@."
+  print_info ()
+    "@[<v>@[Prover %s version %s is not known to be supported.@]@ \
+     @[Known versions for this prover:@ %a.@]@ \
+     @[Known old versions for this prover:@ %a.@]@]@."
     prover.Wc.prover_name ver
     pp_versions data.versions_ok
     pp_versions data.versions_old;
@@ -607,11 +613,11 @@ let run_auto_detection' env config =
   let detected = detect_unknown env detected in
   let length_detected = Mprover.cardinal detected in
   if length_detected > length_recognized then
-    Debug.dprintf info
+    print_info ()
       "%d prover(s) added (including %d prover(s) with an unrecognized version)@."
       length_detected (length_detected - length_recognized)
   else
-    Debug.dprintf info "%d prover(s) added@." length_detected;
+    print_info () "%d prover(s) added@." length_detected;
   detected
 
 let run_auto_detection config =

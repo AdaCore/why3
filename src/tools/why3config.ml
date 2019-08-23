@@ -120,8 +120,7 @@ let main () =
   Arg.parse option_list anon_file usage_msg;
 
   let opt_list = ref false in
-  (* set info flags for detection *)
-  Debug.set_flag Autodetection.info;
+  Autodetection.is_config_command := true;
 
   (* Debug flag *)
   Debug.Args.set_flags_selected ();

@@ -11,6 +11,7 @@
 
 val debug: Debug.flag
 val info: Debug.flag
+val is_config_command: bool ref
 
 (** Lists prover family names from detection config *)
 val list_prover_families : unit -> string list
