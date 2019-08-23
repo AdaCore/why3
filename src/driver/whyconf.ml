@@ -148,8 +148,6 @@ type config_editor = {
 
 type detected_prover = {
   exec_name  : string;
-  version_switch : string;
-  version_regexp : string;
   output : string;
 }
 
@@ -363,9 +361,6 @@ let set_provers rc provers =
 let set_detected_prover prover =
   let section = empty_section in
   let section = set_string section "exec_name" prover.exec_name in
-  let section = set_string section "version_switch" prover.version_switch in
-  let section = set_string ~escape_eol:true
-      section "version_regexp" prover.version_regexp in
   let section = set_string section "output" prover.output in
   section
 
@@ -494,8 +489,6 @@ let load_detected_prover acc section =
   try
     let v = {
       exec_name = get_string section "exec_name";
-      version_switch = get_string section "version_switch";
-      version_regexp = get_string section "version_regexp";
       output = get_string section "output"
     } in
     v::acc

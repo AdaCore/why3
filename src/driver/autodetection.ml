@@ -157,6 +157,8 @@ type env =
     (* memoization of (exec_name,version_switch,version_regexp)
         -> Some output | None doesn't exists *)
     prover_output : string option Hstr3.t;
+    (* stored (exec_name -> output) from config file *)
+    prover_output_stored : string option Hstr.t;
     (* existing executable table:
         exec_name -> | Some (priority, id, prover_config)
                                   unknown version (neither good or bad)
@@ -171,14 +173,15 @@ type env =
     prover_auto_levels : (int * bool) Hprover.t;
   }
 
-let create_env ~exec_commands () =
-{ prover_output = Hstr3.create 10;
+let create_env ~exec_commands () = {
+  prover_output = Hstr3.create 10;
+  prover_output_stored = Hstr.create 10;
   prover_unknown_version = Hstr.create 10;
   prover_shortcuts = Hstr.create 5;
   possible_prover_shortcuts = [];
   exec_commands;
   prover_auto_levels = Hprover.create 5;
- }
+}
 
 let next_priority =
   let r = ref 0 in
@@ -270,6 +273,11 @@ let ask_prover_version exec_name version_switch version_regexp =
     None
 
 let ask_prover_version env exec_name version_switch version_regexp =
+  try
+    let res = Hstr.find env.prover_output_stored exec_name in
+    Hstr3.add env.prover_output (exec_name,version_switch,version_regexp) res;
+    res
+  with Not_found ->
   try
     Hstr3.find env.prover_output (exec_name,version_switch,version_regexp)
   with Not_found ->
@@ -507,12 +515,12 @@ let detect_exec env data exec_name =
     data.prover_name ver
     (Opt.get_def
        (if old then
-	   " (old version, please consider upgrading)."
-	else
-	   if data.prover_altern <> "" then
-	     " (alternative: " ^ data.prover_altern ^ ")"
-	   else
-	     ", OK.")
+           " (old version, please consider upgrading)."
+        else
+           if data.prover_altern <> "" then
+             " (alternative: " ^ data.prover_altern ^ ")"
+           else
+             ", OK.")
        data.message);
   add_prover_shortcuts env prover;
   add_id_prover_shortcut env data.prover_id prover priority;
@@ -581,9 +589,9 @@ let generate_builtin_config ((env,detected):autodetection_result) config =
   config
 
 let generate_detected_config ((env,_):autodetection_result) =
-  let fold (exec_name,version_switch,version_regexp) output acc =
+  let fold (exec_name,_,_) output acc =
     match output with
-    | Some output -> { Whyconf.exec_name; version_switch; version_regexp; output }::acc
+    | Some output -> { Whyconf.exec_name; output }::acc
     | None -> acc
   in
   Hstr3.fold fold env.prover_output []
@@ -612,9 +620,9 @@ let provers_from_detected_provers config =
   let env = create_env ~exec_commands:false () in
   let open Whyconf in
   List.iter (fun detected ->
-      Hstr3.add
-        env.prover_output
-        (detected.exec_name,detected.version_switch,detected.version_regexp)
+      Hstr.add
+        env.prover_output_stored
+        detected.exec_name
         (Some detected.output))
     (get_detected_provers config);
   let detected = run_auto_detection' env config in
