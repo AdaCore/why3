@@ -174,7 +174,7 @@ exact (fun x => orb (s1 x) (s2 x)).
 Defined.
 
 (* Why3 goal *)
-Lemma union_def {a:Type} {a_WT:WhyType a} :
+Lemma union'def {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool) (x:a),
   ((union s1 s2 x) = Init.Datatypes.true) <-> mem x s1 \/ mem x s2.
 Proof.
@@ -216,7 +216,7 @@ exact (fun x => andb (s1 x) (s2 x)).
 Defined.
 
 (* Why3 goal *)
-Lemma inter_def {a:Type} {a_WT:WhyType a} :
+Lemma inter'def {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool) (x:a),
   ((inter s1 s2 x) = Init.Datatypes.true) <-> mem x s1 /\ mem x s2.
 Proof.
@@ -258,7 +258,7 @@ exact (fun x => andb (s1 x) (negb (s2 x))).
 Defined.
 
 (* Why3 goal *)
-Lemma diff_def {a:Type} {a_WT:WhyType a} :
+Lemma diff'def {a:Type} {a_WT:WhyType a} :
   forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool) (x:a),
   ((diff s1 s2 x) = Init.Datatypes.true) <-> mem x s1 /\ ~ mem x s2.
 Proof.
@@ -276,7 +276,7 @@ Lemma subset_diff {a:Type} {a_WT:WhyType a} :
 Proof.
 intros s1 s2 x.
 unfold mem.
-rewrite diff_def. intuition.
+rewrite diff'def. intuition.
 Qed.
 
 (* Why3 goal *)
@@ -288,7 +288,7 @@ exact (fun x => negb (s x)).
 Defined.
 
 (* Why3 goal *)
-Lemma complement_def {a:Type} {a_WT:WhyType a} :
+Lemma complement'def {a:Type} {a_WT:WhyType a} :
   forall (s:a -> Init.Datatypes.bool) (x:a),
   ((complement s x) = Init.Datatypes.true) <-> ~ mem x s.
 Proof.
@@ -393,7 +393,7 @@ exact false.
 Defined.
 
 (* Why3 goal *)
-Lemma map_def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+Lemma map'def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
   forall (f:a -> b) (u:a -> Init.Datatypes.bool) (y:b),
   ((map f u y) = Init.Datatypes.true) <->
   (exists x:a, mem x u /\ (y = (f x))).
@@ -425,7 +425,7 @@ Lemma mem_map {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
   mem (f x) (map f u).
 Proof.
 intros f u x h1.
-generalize (map_def f u (f x)).
+generalize (map'def f u (f x)).
 intuition.
 apply H1.
 exists x; intuition.

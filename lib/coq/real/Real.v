@@ -27,10 +27,11 @@ Require BuiltIn.
 (* infix_ls is replaced with (x < x1)%R by the coq driver *)
 
 (* Why3 goal *)
-Lemma infix_lseq_def :
+Lemma infix_lseq'def :
   forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   (x <= y)%R <-> (x < y)%R \/ (x = y).
 Proof.
+intros x y.
 reflexivity.
 Qed.
 
@@ -136,18 +137,20 @@ exact Rinv_r.
 Qed.
 
 (* Why3 goal *)
-Lemma infix_mn_def :
+Lemma infix_mn'def :
   forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((x - y)%R = (x + (-y)%R)%R).
 Proof.
+intros x y.
 reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma infix_sl_def :
+Lemma infix_sl'def :
   forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((x / y)%R = (x * (/ y)%R)%R).
 Proof.
+intros x y.
 reflexivity.
 Qed.
 

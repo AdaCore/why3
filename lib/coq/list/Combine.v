@@ -19,7 +19,7 @@ Require list.List.
 (* combine is replaced with (Lists.List.combine x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma combine_def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+Lemma combine'def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
   forall (x:Init.Datatypes.list a) (y:Init.Datatypes.list b),
   match (x, y) with
   | (Init.Datatypes.cons x0 x1, Init.Datatypes.cons y0 y1) =>

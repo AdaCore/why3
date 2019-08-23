@@ -77,7 +77,7 @@ let add_ld (ls,ld) (abst,defn,axl) =
   let vl,e,close = open_ls_defn_cb ld in
   match e.t_ty with
     | Some _ when has_if e ->
-        let nm = ls.ls_name.id_string ^ "_def" in
+        let nm = ls.ls_name.id_string ^ "'def" in
         let pr = create_prsymbol (id_derive nm ls.ls_name) in
         let hd = t_app ls (List.map t_var vl) e.t_ty in
         let ax = t_forall_close vl [] (elim_f (t_equ hd e)) in

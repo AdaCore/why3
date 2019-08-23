@@ -390,7 +390,7 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
-why3_vc to_int_def by (simp add: to_int_eq)
+why3_vc to_intqtdef by (simp add: to_int_eq)
 
 why3_vc to_int_extensionality using assms by simp
 
@@ -591,7 +591,7 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
-why3_vc to_int_def by (simp add: to_int_eq)
+why3_vc to_intqtdef by (simp add: to_int_eq)
 
 why3_vc to_int_extensionality using assms by simp
 
@@ -792,7 +792,7 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
-why3_vc to_int_def by (simp add: to_int_eq)
+why3_vc to_intqtdef by (simp add: to_int_eq)
 
 why3_vc to_int_extensionality using assms by simp
 
@@ -993,7 +993,7 @@ why3_vc lsl_zeros by simp
 
 why3_vc to_uint_extensionality using assms by simp
 
-why3_vc to_int_def by (simp add: to_int_eq)
+why3_vc to_intqtdef by (simp add: to_int_eq)
 
 why3_vc to_int_extensionality using assms by simp
 

@@ -15,7 +15,7 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 goal *)
-Lemma andb_def :
+Lemma andb'def :
   forall (x:Init.Datatypes.bool) (y:Init.Datatypes.bool),
   ((Init.Datatypes.andb x y) =
    match x with
@@ -28,7 +28,7 @@ apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma orb_def :
+Lemma orb'def :
   forall (x:Init.Datatypes.bool) (y:Init.Datatypes.bool),
   ((Init.Datatypes.orb x y) =
    match x with
@@ -41,7 +41,7 @@ apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma notb_def :
+Lemma notb'def :
   forall (x:Init.Datatypes.bool),
   ((Init.Datatypes.negb x) =
    match x with
@@ -54,7 +54,7 @@ apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma xorb_def :
+Lemma xorb'def :
   forall (x:Init.Datatypes.bool) (y:Init.Datatypes.bool),
   ((Init.Datatypes.xorb x y) =
    match x with
@@ -67,7 +67,7 @@ destruct x; destruct y; auto.
 Qed.
 
 (* Why3 goal *)
-Lemma implb_def :
+Lemma implb'def :
   forall (x:Init.Datatypes.bool) (y:Init.Datatypes.bool),
   ((Init.Datatypes.implb x y) =
    match x with

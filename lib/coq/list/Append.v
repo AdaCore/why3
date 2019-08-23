@@ -19,7 +19,7 @@ Require list.Length.
 Require list.Mem.
 
 (* Why3 goal *)
-Lemma infix_plpl_def {a:Type} {a_WT:WhyType a} :
+Lemma infix_plpl'def {a:Type} {a_WT:WhyType a} :
   forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a),
   ((Init.Datatypes.app l1 l2) =
    match l1 with

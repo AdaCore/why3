@@ -8,9 +8,9 @@ section {* Parity properties *}
 
 why3_open "number/Parity.xml"
 
-why3_vc even_def by arith
+why3_vc evenqtdef by arith
 
-why3_vc odd_def by arith
+why3_vc oddqtdef by arith
 
 why3_vc even_or_odd by auto
 
@@ -31,7 +31,7 @@ why3_vc even_2k by simp
 why3_vc odd_2k1 by simp
 
 why3_vc even_mod2
-  by (auto simp add: even_def cmod_def sgn_if minus_equation_iff [of n])
+  by (auto simp add: evenqtdef cmod_def sgn_if minus_equation_iff [of n])
 
 why3_end
 
@@ -40,7 +40,7 @@ section {* Divisibility *}
 
 why3_open "number/Divisibility.xml"
 
-why3_vc divides_def
+why3_vc dividesqtdef
   by (auto simp add: cmod_def sgn_if minus_equation_iff [of n])
 
 why3_vc divides_refl by simp
@@ -106,7 +106,7 @@ why3_vc even_divides ..
 
 why3_vc odd_divides ..
 
-why3_vc divides_spec
+why3_vc dividesqtspec
   by (simp add: dvd_def mult.commute)
 
 why3_end
@@ -139,16 +139,16 @@ why3_vc gcd_opp by simp
 
 why3_vc gcd_euclid
   using gcd_add_mult [of a "- q" b]
-  by (simp add: sign_simps)
+  by (simp add: algebra_simps)
 
 why3_vc Gcd_computer_mod
   using assms gcd_add_mult [of b "- 1" "a mod b"]
-  by (simp add: cmod_def zabs_def gcd_red_int [symmetric] sgn_if sign_simps del: gcd_mod_right)
+  by (simp add: cmod_def zabs_def gcd_red_int [symmetric] sgn_if algebra_simps del: gcd_mod_right)
     (simp add: zmod_zminus2_eq_if gcd_red_int [of a b] del: gcd_mod_right)
 
 why3_vc Gcd_euclidean_mod
   using assms gcd_add_mult [of b "- 1" "a mod b"]
-  by (simp add: emod_def zabs_def gcd_red_int [symmetric] sign_simps del: gcd_mod_right)
+  by (simp add: emod_def zabs_def gcd_red_int [symmetric] algebra_simps del: gcd_mod_right)
     (simp add: zmod_zminus2_eq_if gcd_red_int [of a b] del: gcd_mod_right)
 
 why3_vc gcd_mult using assms
@@ -161,7 +161,7 @@ section {* Prime numbers *}
 
 why3_open "number/Prime.xml"
 
-why3_vc prime_def
+why3_vc primeqtdef
   by (auto simp add: prime_int_iff')
 
 why3_vc not_prime_1 by simp
@@ -210,7 +210,7 @@ proof (induct n rule: less_induct)
 qed
 
 why3_vc small_divisors
-  unfolding prime_def
+  unfolding primeqtdef
 proof
   show "2 \<le> p" by fact
 
@@ -223,12 +223,12 @@ proof
       assume "n dvd p"
       with `1 < n \<and> n < p`
       have "1 < nat n" "nat n < nat p" "nat n dvd nat p"
-        by (simp_all add: transfer_nat_int_relations)
+        by (simp_all add: nat_dvd_iff)
       then have "\<exists>d. prime d \<and> d * d \<le> nat p \<and> d dvd (nat p)"
         by (rule small_divisors_aux)
       with `2 \<le> p` obtain d
         where d: "prime (int d)" "int d * int d \<le> p" "int d dvd p"
-        by (auto simp add: int_dvd_iff le_nat_iff)
+        using le_nat_iff zdvd_int by auto
       from `prime (int d)` have "2 \<le> int d" by (simp add: prime_ge_2_int)
       then have "2 \<le> int d" by simp
       with `2 \<le> int d` have "2 * 2 \<le> int d * int d"
@@ -240,7 +240,7 @@ qed
 
 why3_vc even_prime
 proof -
-  from `prime p` have "0 \<le> p" by (simp add: prime_def)
+  from `prime p` have "0 \<le> p" by (simp add: primeqtdef)
   from `prime p` have "2 \<le> p" by (simp add: prime_ge_2_int)
   with `prime p` `even p` `0 \<le> p` show ?thesis
     by (auto simp add: order_le_less prime_odd_int)
@@ -260,7 +260,7 @@ section {* Coprime numbers *}
 
 why3_open "number/Coprime.xml"
 
-why3_vc coprime_def ..
+why3_vc coprimeqtdef by (auto)
 
 why3_vc prime_coprime
 proof -
@@ -286,7 +286,7 @@ proof -
         qed
       }
       then show "coprime n p"
-        by (auto simp add: coprime_int)
+        by auto
     qed
   next
     assume H: "\<forall>n. 1 \<le> n \<and> n < p \<longrightarrow> coprime n p"
@@ -296,17 +296,18 @@ proof -
       assume H': "1 < n \<and> n < p" "n dvd p"
       then have "1 \<le> n \<and> n < p" by simp
       with H have "coprime n p" by simp
-      with H' show False by (simp add: coprime_int)
+      with H' show False by auto
     qed
   qed
-  then show ?thesis by (simp add: prime_def)
+  then show ?thesis by (simp add: primeqtdef)
 qed
 
 why3_vc Gauss
 proof -
   from assms
   have "coprime a b" "a dvd c * b" by (simp_all add: mult.commute)
-  then show ?thesis by (rule coprime_dvd_mult)
+  then show ?thesis
+    using coprime_dvd_mult_iff by blast
 qed
 
 why3_vc Euclid
@@ -316,8 +317,8 @@ why3_vc Euclid
 why3_vc gcd_coprime
 proof -
   have "gcd a (b * c) = gcd (b * c) a" by (simp add: gcd.commute)
-  also from assms have "coprime b a" by (simp add: gcd.commute)
-  then have "gcd (b * c) a = gcd c a" by (simp add: gcd_mult_cancel)
+  also from assms have "coprime a b" by (simp add: gcd.commute)
+  then have "gcd (b * c) a = gcd c a" by (metis gcd.commute gcd_mult_cancel)
   finally show ?thesis by (simp add: gcd.commute)
 qed
 

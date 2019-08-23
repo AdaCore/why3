@@ -22,7 +22,7 @@ Definition is_nil {a:Type} {a_WT:WhyType a} (l:Init.Datatypes.list a) : Prop :=
   end.
 
 (* Why3 goal *)
-Lemma is_nil_spec {a:Type} {a_WT:WhyType a} :
+Lemma is_nil'spec {a:Type} {a_WT:WhyType a} :
   forall (l:Init.Datatypes.list a), is_nil l <-> (l = Init.Datatypes.nil).
 Proof.
 intros l.

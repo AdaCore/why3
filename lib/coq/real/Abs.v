@@ -22,10 +22,12 @@ Import Rbasic_fun.
 (* abs is replaced with (Reals.Rbasic_fun.Rabs x) by the coq driver *)
 
 (* Why3 goal *)
-Lemma abs_def :
+Lemma abs'def :
   forall (x:Reals.Rdefinitions.R),
   ((0%R <= x)%R -> ((Reals.Rbasic_fun.Rabs x) = x)) /\
   (~ (0%R <= x)%R -> ((Reals.Rbasic_fun.Rabs x) = (-x)%R)).
+Proof.
+intros x.
 split ; intros H.
 apply Rabs_right.
 now apply Rle_ge.

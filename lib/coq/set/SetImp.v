@@ -37,7 +37,7 @@ intros. apply true.
 Defined.
 
 (* Why3 goal *)
-Lemma choose_spec :
+Lemma choose'spec :
   forall (s:set), ~ set.Fset.is_empty (to_fset s) ->
   set.Fset.mem (choose s) (to_fset s).
 Proof.

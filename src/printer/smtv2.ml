@@ -629,7 +629,7 @@ let print_constructor_decl info fmt (ls,args) =
         List.rev field_names)
   in
 
-  if Strings.has_prefix "mk " ls.ls_name.id_string then
+  if Strings.has_suffix "'mk" ls.ls_name.id_string then
     begin
       info.list_records <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name) field_names info.list_records;
     end

@@ -23,7 +23,7 @@ Definition is_none {a:Type} {a_WT:WhyType a} (o:Init.Datatypes.option a) :
   end.
 
 (* Why3 goal *)
-Lemma is_none_spec {a:Type} {a_WT:WhyType a} :
+Lemma is_none'spec {a:Type} {a_WT:WhyType a} :
   forall (o:Init.Datatypes.option a), is_none o <-> (o = Init.Datatypes.None).
 Proof.
 intros o.

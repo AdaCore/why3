@@ -9,7 +9,7 @@ section {* Real numbers and the basic unary and binary operators *}
 
 why3_open "real/Real.xml"
 
-why3_vc infix_lseq_def by auto
+why3_vc infix_lseqqtdef by auto
 
 why3_vc Assoc by auto
 
@@ -29,7 +29,7 @@ why3_vc Mul_distr_l by (simp add: Fields.linordered_field_class.sign_simps)
 
 why3_vc Mul_distr_r by (simp add: Rings.comm_semiring_class.distrib)
 
-why3_vc infix_mn_def by auto
+why3_vc infix_mnqtdef by auto
 
 why3_vc Comm1 by auto
 
@@ -73,7 +73,7 @@ why3_vc CompatOrderMult
   using assms
   by (simp add: Rings.ordered_semiring_class.mult_right_mono)
 
-why3_vc infix_sl_def by (simp add: Real.divide_real_def)
+why3_vc infix_slqtdef by (simp add: Real.divide_real_def)
 
 why3_end
 
@@ -93,7 +93,7 @@ why3_vc Abs_pos by auto
 
 why3_vc Abs_sum by auto
 
-why3_vc abs_def by (simp add: Real.abs_real_def)
+why3_vc absqtdef by (simp add: Real.abs_real_def)
 
 why3_vc Abs_prod by (simp add: abs_mult)
 
@@ -113,9 +113,9 @@ why3_vc Min_r
   using assms
   by auto
 
-why3_vc max_def by auto
+why3_vc maxqtdef by auto
 
-why3_vc min_def by auto
+why3_vc minqtdef by auto
 
 why3_vc Max_comm by auto
 
@@ -338,7 +338,7 @@ why3_vc Sin_pi2 by auto
 
 why3_vc Sin_sum by (simp add: Transcendental.sin_add)
 
-why3_vc tan_def by (simp add: Transcendental.tan_def)
+why3_vc tanqtdef by (simp add: Transcendental.tan_def)
 
 why3_vc Tan_atan by (simp add: Transcendental.tan_arctan)
 

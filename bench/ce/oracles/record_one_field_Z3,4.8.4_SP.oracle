@@ -1,11 +1,11 @@
 Strongest Postcondition
-bench/ce/record_one_field.mlw Ref VC ref1: Valid
-bench/ce/record_one_field.mlw Ref VC ref11: Valid
-bench/ce/record_one_field.mlw Ref VC ref11: Valid
-bench/ce/record_one_field.mlw Ref VC prefix !: Valid
-bench/ce/record_one_field.mlw Ref VC infix :=: Valid
-bench/ce/record_one_field.mlw Ref VC infix :=: Valid
-bench/ce/record_one_field.mlw M VC test_post: Timeout or Unknown
+bench/ce/record_one_field.mlw Ref ref1'VC: Valid
+bench/ce/record_one_field.mlw Ref ref11'VC: Valid
+bench/ce/record_one_field.mlw Ref ref11'VC: Valid
+bench/ce/record_one_field.mlw Ref prefix !'VC: Valid
+bench/ce/record_one_field.mlw Ref infix :='VC: Valid
+bench/ce/record_one_field.mlw Ref infix :='VC: Valid
+bench/ce/record_one_field.mlw M test_post'VC: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
   Line 13:
@@ -31,7 +31,7 @@ File record_one_field.mlw:
     y, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
     "value" : {"type" : "Integer" , "val" : "0" } }
 
-bench/ce/record_one_field.mlw M VC test_post2: Timeout or Unknown
+bench/ce/record_one_field.mlw M test_post2'VC: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
   Line 13:
@@ -59,7 +59,7 @@ File record_one_field.mlw:
     y, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
     "value" : {"type" : "Integer" , "val" : "42" } }
 
-bench/ce/record_one_field.mlw M VC incr: Timeout or Unknown
+bench/ce/record_one_field.mlw M incr'VC: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
   Line 13:
@@ -98,7 +98,7 @@ File record_one_field.mlw:
     x23, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
     "value" : {"type" : "Integer" , "val" : "2" } }
 
-bench/ce/record_one_field.mlw M VC test_loop: Timeout or Unknown
+bench/ce/record_one_field.mlw M test_loop'VC: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
   Line 39:
@@ -136,8 +136,8 @@ File record_one_field.mlw:
     x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
     "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "2" } }
 
-bench/ce/record_one_field.mlw M VC test_loop: Valid
-bench/ce/record_one_field.mlw M VC test_loop: Timeout or Unknown
+bench/ce/record_one_field.mlw M test_loop'VC: Valid
+bench/ce/record_one_field.mlw M test_loop'VC: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
   Line 13:
@@ -187,7 +187,7 @@ File record_one_field.mlw:
     x, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
     "value" : {"type" : "Integer" , "val" : "2" } }
 
-bench/ce/record_one_field.mlw M VC test_loop: Timeout or Unknown
+bench/ce/record_one_field.mlw M test_loop'VC: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
   Line 13:

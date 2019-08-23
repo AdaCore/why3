@@ -171,14 +171,14 @@ destruct a2 as (Hx1dup, Hx1eq).
   + intuition.
   + intuition.
   + intros. rewrite List.in_app_iff. rewrite Hx1eq. rewrite Hx0eq.
-    rewrite Hdieq. rewrite set.Set.diff_def. unfold set.Set.mem.
+    rewrite Hdieq. rewrite set.Set.diff'def. unfold set.Set.mem.
     split; intros.
     - destruct (Bool.bool_dec (sf1 e) true); intuition.
     - intuition.
   + eapply Cardinal.NoDup_app; eauto.
-    - intros. rewrite Hx1eq in H0. rewrite Hdieq. rewrite set.Set.diff_def.
+    - intros. rewrite Hx1eq in H0. rewrite Hdieq. rewrite set.Set.diff'def.
       intuition.
-    - intros. rewrite Hx1eq. rewrite Hdieq in H0. rewrite set.Set.diff_def in H0.
+    - intros. rewrite Hx1eq. rewrite Hdieq in H0. rewrite set.Set.diff'def in H0.
       intuition.
 }
 omega.
@@ -206,7 +206,7 @@ destruct a2 as (Hx1dup, Hx1eq).
   + intuition.
   + intuition.
   + intros. rewrite List.in_app_iff. rewrite Hx1eq. rewrite Hx0eq. rewrite Huneq.
-    rewrite set.Set.union_def. clear - e. intuition.
+    rewrite set.Set.union'def. clear - e. intuition.
   + eapply Cardinal.NoDup_app; eauto.
     * intros. intro. apply Hx0eq in H0. apply Hx1eq in H.
       specialize (Hdisj e). intuition.
