@@ -1,6 +1,6 @@
-(* Driver for Alt-Ergo versions >= 2.3.0 *)
+(* Driver for Alt-Ergo versions >= 0.95.2 *)
 
-prelude "(* this is the prelude for Alt-Ergo, version >= 2.3.0 *)"
+prelude "(* this is the prelude for Alt-Ergo, version >= 0.95.2 and <= 2.2.0 *)"
 
 
 transformation "inline_trivial"
@@ -12,7 +12,7 @@ transformation "eliminate_algebraic"
 transformation "eliminate_literal"
 transformation "eliminate_if"
 transformation "eliminate_epsilon"
-transformation "eliminate_let_term"
+transformation "eliminate_let"
 
 transformation "split_premise_right"
 transformation "simplify_formula"
