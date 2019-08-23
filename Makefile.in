@@ -294,21 +294,13 @@ endif
 
 .PHONY: initialize_messages update-parsing-error-handling
 
-initialize_messages: src/parser/parser.mly
-	$(MENHIR) --explain --strict src/parser/parser.mly --list-errors > src/parser/handcrafted.messages.new
-
-update-parsing-error-handling:
-	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
-		src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
-	@mv src/parser/handcrafted.messages.temp src/parser/handcrafted.messages
-
 src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.messages
 	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
 	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
 	src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
 	@if ! cmp -s src/parser/handcrafted.messages src/parser/handcrafted.messages.temp; then \
-		echo "Parsing error handling must be updated using 'make update-parsing-error-handling'"; \
-		rm -f src/parser/handcrafted.messages.temp; \
+		echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
+contains an updated version that must be checked before replacing 'src/parser/handcrafted.messages'"; \
 		exit 1; \
 	fi
 	rm -f src/parser/handcrafted.messages.temp
