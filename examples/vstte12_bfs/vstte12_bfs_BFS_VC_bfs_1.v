@@ -13,7 +13,7 @@ Existing Instance vertex_WhyType.
 
 Parameter eq: vertex -> vertex -> Prop.
 
-Axiom eq_spec : forall (x:vertex) (y:vertex), eq x y <-> (x = y).
+Axiom eq'spec : forall (x:vertex) (y:vertex), eq x y <-> (x = y).
 
 Parameter succ: vertex -> set.Fset.fset vertex.
 
@@ -52,21 +52,21 @@ Parameter to_fset: set -> set.Fset.fset vertex.
 
 Parameter choose: set -> vertex.
 
-Axiom choose_spec :
+Axiom choose'spec :
   forall (s:set), ~ set.Fset.is_empty (to_fset s) ->
   set.Fset.mem (choose s) (to_fset s).
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
+  | ref'mk : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Arguments mk_ref {a}.
+Arguments ref'mk {a}.
 
 (* Why3 assumption *)
 Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | mk_ref x => x
+  | ref'mk x => x
   end.
 
 (* Why3 assumption *)
@@ -94,7 +94,7 @@ Definition closure (visited:set.Fset.fset vertex)
   set.Fset.mem y visited.
 
 (* Why3 goal *)
-Theorem VC_bfs :
+Theorem bfs'VC :
   forall (s:vertex) (t:vertex), forall (visited:set),
   ((to_fset visited) = (set.Fset.empty : set.Fset.fset vertex)) /\
   ((set.Fset.cardinal (to_fset visited)) = 0%Z) -> forall (o:set),
@@ -124,9 +124,6 @@ Theorem VC_bfs :
   (0%Z <= d)%Z -> set.Fset.is_empty (to_fset current1) ->
   ~ set.Fset.mem t (to_fset visited2) -> forall (d1:Numbers.BinNums.Z),
   ~ path s t d1.
-(* Why3 intros s t visited (h1,h2) o (h3,h4) o1 (h5,h6) visited1 (h7,h8)
-        current (h9,h10) d next current1 visited2 (h11,(h12,(h13,h14))) h15
-        h16 d1. *)
 Proof.
 intros s t1 visited h1 o h2 o1 h3 visited1 h4 current h5 d next current1
 visited2 (h6,(h7,(h8,h9))) h10 h11 d1 H.
@@ -144,4 +141,3 @@ apply path_empty.
 assumption.
 exact (h11 H0).
 Qed.
-

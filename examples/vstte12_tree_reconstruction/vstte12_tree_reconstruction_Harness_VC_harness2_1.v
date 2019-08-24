@@ -71,15 +71,14 @@ Proof.
   omega.
 Qed.
 
-
 (* Why3 goal *)
-Theorem VC_harness2 :
+Theorem harness2'VC :
   forall (us:tree),
   ~ ((depths 0%Z us) =
      (Init.Datatypes.cons 1%Z
       (Init.Datatypes.cons 3%Z
        (Init.Datatypes.cons 2%Z (Init.Datatypes.cons 2%Z Init.Datatypes.nil))))).
-(* Why3 intros us. *)
+Proof.
 intro result.
 intuition.
 destruct result; simpl in H.
@@ -129,4 +128,3 @@ do 4 (rewrite Append.Append_length).
 omega.
 
 Qed.
-

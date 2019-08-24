@@ -115,7 +115,7 @@ Axiom zero_unsigned_is_zero2 : ((uint32'int zero_unsigned2) = 0%Z).
 
 Parameter is_msb_set: uint32 -> Prop.
 
-Axiom is_msb_set_spec :
+Axiom is_msb_set'spec :
   forall (x:uint32),
   is_msb_set x <-> (4294967295%Z < (2%Z * (uint32'int x))%Z)%Z.
 
@@ -143,7 +143,7 @@ Parameter mixfix_lblsmnrb:
   forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
   array a.
 
-Axiom mixfix_lblsmnrb_spec :
+Axiom mixfix_lblsmnrb'spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
   ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
@@ -152,7 +152,7 @@ Axiom mixfix_lblsmnrb_spec :
 Parameter make:
   forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom make_spec :
+Axiom make'spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
@@ -169,15 +169,15 @@ Definition in_bounds4 (n:Numbers.BinNums.Z) : Prop :=
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
+  | ref'mk : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Arguments mk_ref {a}.
+Arguments ref'mk {a}.
 
 (* Why3 assumption *)
 Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | mk_ref x => x
+  | ref'mk x => x
   end.
 
 Axiom zone : Type.
@@ -211,7 +211,7 @@ Definition pelts {a:Type} {a_WT:WhyType a} (p:ptr a) : Numbers.BinNums.Z -> a :=
 
 Parameter is_not_null: forall {a:Type} {a_WT:WhyType a}, ptr a -> Prop.
 
-Axiom is_not_null_spec :
+Axiom is_not_null'spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (p:ptr a), is_not_null p <-> ~ ((zone1 p) = null_zone).
 
@@ -297,11 +297,11 @@ Axiom zero_unsigned_is_zero3 : ((uint64'int zero_unsigned3) = 0%Z).
 
 Parameter uint64_max: uint64.
 
-Axiom uint64_max_def : ((uint64'int uint64_max) = 18446744073709551615%Z).
+Axiom uint64_max'def : ((uint64'int uint64_max) = 18446744073709551615%Z).
 
 Parameter is_msb_set1: uint64 -> Prop.
 
-Axiom is_msb_set_spec1 :
+Axiom is_msb_set'spec1 :
   forall (x:uint64),
   is_msb_set1 x <-> (18446744073709551615%Z < (2%Z * (uint64'int x))%Z)%Z.
 
@@ -325,7 +325,7 @@ Parameter value_sub:
   (Numbers.BinNums.Z -> uint64) -> Numbers.BinNums.Z -> Numbers.BinNums.Z ->
   Numbers.BinNums.Z.
 
-Axiom value_sub_def :
+Axiom value_sub'def :
   forall (x:Numbers.BinNums.Z -> uint64) (n:Numbers.BinNums.Z)
     (m:Numbers.BinNums.Z),
   ((n < m)%Z ->
@@ -492,7 +492,6 @@ Axiom Assert :
   ((rval a) <= (18446744073709551615 / 18446744073709551616)%R)%R.
 
 Axiom Assert1 : (0%R < (rval a))%R.
-(* 6 *)
 
 Parameter x0: fxp.
 
@@ -528,7 +527,6 @@ Axiom H7 : ((ival o) = rliteral).
 Axiom H8 : ((rval o) = ((BuiltIn.IZR 196608%Z) * (pow2 (-49%Z)%Z))%R).
 
 Axiom H9 : ((iexp o) = (-49%Z)%Z).
-(* 17 *)
 
 Parameter o1: fxp.
 
@@ -564,7 +562,6 @@ Axiom Ensures9 : ((iexp o3) = ((iexp o2) + (iexp a1))%Z).
 Parameter t1': fxp.
 
 Axiom Ensures10 : ((rval t1') = ((rval m1) - (rval o3))%R).
-(* 27 *)
 
 Axiom Ensures11 : ((iexp t1') = (iexp m1)).
 
@@ -587,7 +584,6 @@ Axiom Ensures16 :
    (trunc_at ((rval o4) * (pow2 (-1%Z)%Z))%R (((iexp o4) + 18%Z)%Z - 1%Z)%Z)).
 
 Axiom Ensures17 : ((iexp o5) = (((iexp o4) + 18%Z)%Z - 1%Z)%Z).
-(* 34 *)
 
 Parameter o6: fxp.
 
@@ -640,7 +636,6 @@ Axiom Ensures23 : ((iexp a2) = ((iexp a) + 24%Z)%Z).
 Parameter u1: fxp.
 
 Axiom Ensures24 : ((rval u1) = ((rval x1) * (rval a2))%R).
-(* 42 *)
 
 Axiom Ensures25 : ((iexp u1) = ((iexp x1) + (iexp a2))%Z).
 
@@ -676,7 +671,6 @@ Axiom H15 : ((iexp m2) = (-78%Z)%Z).
 Parameter o7: fxp.
 
 Axiom Ensures28 : ((rval o7) = ((rval u2) * (rval u2))%R).
-(* 50 *)
 
 Axiom Ensures29 : ((iexp o7) = ((iexp u2) + (iexp u2))%Z).
 
@@ -695,10 +689,8 @@ Axiom Ensures33 : ((iexp o9) = (iexp o8)).
 Parameter t2': fxp.
 
 Axiom Ensures34 : ((rval t2') = ((rval o9) - (rval m2))%R).
-(* 56 *)
 
 Axiom Ensures35 : ((iexp t2') = (iexp o9)).
-(* 58 *)
 
 Axiom Assert4 :
   (((Reals.R_sqrt.sqrt (rval a)) * (Reals.R_sqrt.sqrt (rval a)))%R =
@@ -732,7 +724,7 @@ Axiom Ensures42 : ((rval x2) = ((rval u1) + (rval o11))%R).
 Axiom Ensures43 : ((iexp x2) = (iexp u1)).
 
 (* Why3 goal *)
-Theorem VC_sqrt1 :
+Theorem sqrt1'VC :
   ~ ((rval x1) = 0%R) /\ ~ ((rval a2) = 0%R) ->
   (((((rval u1) + (((rval x1) * (rval t2'))%R * (5 / 10)%R)%R)%R -
      (Reals.R_sqrt.sqrt (rval a)))%R
@@ -765,7 +757,6 @@ Theorem VC_sqrt1 :
      *
      (((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
       (Reals.R_sqrt.sqrt (rval a)))%R)%R)%R).
-(* Why3 intros (h1,h2). *)
 Proof.
 intros (h1,h2).
 rewrite Ensures34, Ensures32, Ensures30, Ensures28, Ensures24.
@@ -778,4 +769,3 @@ easy.
 rewrite <- Rsqr_pow2.
 apply Rsqr_sqrt, Rlt_le, Assert1.
 Qed.
-

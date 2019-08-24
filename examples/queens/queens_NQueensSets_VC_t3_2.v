@@ -12,15 +12,15 @@ Require set.SetAppInt.
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
+  | ref'mk : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Arguments mk_ref {a}.
+Arguments ref'mk {a}.
 
 (* Why3 assumption *)
 Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | mk_ref x => x
+  | ref'mk x => x
   end.
 
 Parameter n: Numbers.BinNums.Z.
@@ -71,7 +71,7 @@ Axiom no_duplicate :
   (a <= i)%Z /\ (i < j)%Z /\ (j < b)%Z -> ~ eq_prefix (s i) (s j) n.
 
 (* Why3 goal *)
-Theorem VC_t3 :
+Theorem t3'VC :
   forall (col:Numbers.BinNums.Z -> Numbers.BinNums.Z) (k:Numbers.BinNums.Z)
     (sol:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
     (s:Numbers.BinNums.Z) (a:set.SetAppInt.set) (b:set.SetAppInt.set)
@@ -238,7 +238,7 @@ red; intros l hl.
 rewrite <- H3; try omega.
 rewrite <- h38; try omega.
 subst col2.
-generalize (Map.set_def col1 k d l).
+generalize (Map.set'def col1 k d l).
 intros (_,h).
 rewrite h.
 rewrite <- ha; omega.
@@ -250,7 +250,7 @@ auto.
 rewrite <- H3; try omega.
 rewrite <- h38; try omega.
 subst col2.
-generalize (Map.set_def col1 k d k).
+generalize (Map.set'def col1 k d k).
 intros (h,_).
 rewrite h; try omega.
 generalize (set.FsetInt.min_elt_def (SetAppInt.to_fset e)); intuition.
