@@ -1178,30 +1178,19 @@ module MLToC = struct
        let open Number in
        begin match i.pv_vs.vs_ty.ty_node with
        | Tyapp ({ ts_def = Range { ir_lower = lb; ir_upper = ub }},_) ->
-          let init_test_ok =
+          let init_test_ok, end_test_ok =
             match se.e_node, ee.e_node with
-            | Mltree.Econst sc, Mltree.Econst ec ->
-               let cmp = compare_const (ConstInt sc) (ConstInt ec) in
-               if dir = To then cmp <= 0 else cmp >= 0
-            | Mltree.Econst sc, _ ->
-               (* for i = 0 to n, on unsigned types *)
-               if dir = To
-               then BigInt.eq sc.il_int lb
-               else BigInt.eq sc.il_int ub
             | _, Mltree.Econst ec ->
-               (* for i = n downto 0 *)
-               if dir = To
-               then BigInt.eq ec.il_int ub
-               else BigInt.eq ec.il_int lb
-            | _ -> false
-          in
-          let end_test_ok =
-            match ee.e_node with
-            | Mltree.Econst ec ->
+               true,
                if dir = To
                then BigInt.lt ec.il_int ub
                else BigInt.lt lb ec.il_int
-            | _ -> false
+            | Mltree.Econst sc, _ ->
+               (if dir = To
+                then BigInt.eq sc.il_int lb
+                else BigInt.eq sc.il_int ub),
+               false
+            | _, _ -> false, false
           in
           let ty = ty_of_ty info i.pv_vs.vs_ty in
           let di = C.Ddecl(ty, [i.pv_vs.vs_name, Enothing]) in
