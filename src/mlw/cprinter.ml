@@ -1197,10 +1197,22 @@ module MLToC = struct
           let ei = C.Evar (i.pv_vs.vs_name) in
           let env_f = { env with computes_return_value = false } in
           let ds, is = expr info env_f se in
-          let is, se = get_last_expr is in
-          let init_e = C.Ebinop (Bassign, ei, se) in
+          let ds, is, ie = match is with
+            | Sexpr (Econst _ | Evar _ as e) ->
+               ds, Snop, e
+            | _ ->
+               let iv = Evar (pv_name sb) in
+               let is = assignify iv is in
+               C.Ddecl (ty, [pv_name sb, Enothing]) :: ds, is, iv in
+          let init_e = C.Ebinop (Bassign, ei, ie) in
           let de, es = expr info env_f ee in
-          let es, ee = get_last_expr es in
+          let de, es, ee = match es with
+            | Sexpr (Econst _ | Evar _ as e) ->
+               de, Snop, e
+            | _ ->
+               let ev = Evar (pv_name eb) in
+               let es = assignify ev es in
+               C.Ddecl (ty, [pv_name eb, Enothing]) :: de, es, ev in
           let d = di :: ds @ de in
           let incr_op = match dir with To -> Upreincr | DownTo -> Upredecr in
           let incr_e = C.Eunop (incr_op, ei) in
@@ -1223,7 +1235,7 @@ module MLToC = struct
           let ise = C.Sseq (is, es) in
           let s = if init_test_ok
                   then sloop
-                  else C.(Sif (Ebinop (test_op, se, ee), sloop, Snop)) in
+                  else C.(Sif (Ebinop (test_op, ie, ee), sloop, Snop)) in
           d, C.Sseq (ise, s)
        |  _ ->
            raise (Unsupported "for loops where loop index is not a range type")
