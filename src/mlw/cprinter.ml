@@ -471,6 +471,10 @@ type info = {
 let debug_c_extraction = Debug.register_info_flag
                            ~desc:"C extraction"
                            "c_extraction"
+let debug_c_no_error_msgs =
+  Debug.register_flag
+    ~desc:"Disable the printing of the error messages in the C extraction"
+    "c_no_error_msgs"
 
 module Print = struct
 
@@ -732,10 +736,13 @@ module Print = struct
          let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
                    (print_ty ~paren:false) ty print_global_ident id in
          fprintf fmt "%s" s
-    with Unprinted s ->
-      Format.eprintf
-        "Could not print declaration of %s. Unsupported: %s@."
-        !current_decl_name s
+    with
+      Unprinted s ->
+       if Debug.test_noflag debug_c_no_error_msgs
+       then
+         Format.eprintf
+           "Could not print declaration of %s. Unsupported: %s@."
+           !current_decl_name s
 
   and print_body fmt (def, s) =
     if def = []
@@ -1528,11 +1535,14 @@ module MLToC = struct
            let protos = List.flatten (List.map proto_of_fun defs) in
            protos@defs
       | _ -> [] (*TODO exn ? *) end
-    with Unsupported s ->
-      Format.eprintf
-        "Could not translate declaration of %s. Unsupported : %s@."
-        !current_decl_name s;
-      []
+    with
+      Unsupported s ->
+       if Debug.test_noflag debug_c_no_error_msgs
+       then
+         Format.eprintf
+           "Could not translate declaration of %s. Unsupported : %s@."
+           !current_decl_name s;
+       []
 
   let translate_decl (info:info) (d:Mltree.decl) ~header : C.definition list =
     let decide_print id =
