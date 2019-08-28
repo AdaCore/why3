@@ -12,6 +12,7 @@
 open Ident
 
 exception Unsupported = Printer.Unsupported
+let current_decl_name = ref ""
 
 module C = struct
 
@@ -732,7 +733,9 @@ module Print = struct
                    (print_ty ~paren:false) ty print_global_ident id in
          fprintf fmt "%s" s
     with Unprinted s ->
-      Debug.dprintf debug_c_extraction "Missed a def because : %s@." s
+      Format.eprintf
+        "Could not print declaration of %s. Unsupported: %s@."
+        !current_decl_name s
 
   and print_body fmt (def, s) =
     if def = []
@@ -946,7 +949,8 @@ module MLToC = struct
           Format.fprintf fmt "-%a" (print_in_base 10 None) (BigInt.abs n)
         else
           match ic.il_kind with
-          | ILitHex | ILitBin -> Format.fprintf fmt "0x%a" (print_in_base 16 None) n
+          | ILitHex | ILitBin
+            -> Format.fprintf fmt "0x%a" (print_in_base 16 None) n
           | ILitOct -> Format.fprintf fmt "0%a" (print_in_base 8 None) n
           | ILitDec | ILitUnk ->
              (* default to base 10 *)
@@ -1389,7 +1393,9 @@ module MLToC = struct
        end
 
   let translate_decl (info:info) (d:decl) ~header : C.definition list =
+    current_decl_name := "";
     let translate_fun rs mlty vl e =
+      current_decl_name := rs.rs_name.id_string;
       Debug.dprintf debug_c_extraction "print %s@." rs.rs_name.id_string;
       if rs_ghost rs
       then begin Debug.dprintf debug_c_extraction "is ghost@."; [] end
@@ -1471,6 +1477,7 @@ module MLToC = struct
       begin match d with
       | Dlet (Lsym(rs, _, mlty, vl, e)) -> translate_fun rs mlty vl e
       | Dtype [{its_name=id; its_def=idef}] ->
+         current_decl_name := id.id_string;
          Debug.dprintf debug_c_extraction "PDtype %s@." id.id_string;
          begin match query_syntax info.syntax id with
          | Some _ -> []
@@ -1522,7 +1529,10 @@ module MLToC = struct
            protos@defs
       | _ -> [] (*TODO exn ? *) end
     with Unsupported s ->
-      Debug.dprintf debug_c_extraction "Unsupported : %s@." s; []
+      Format.eprintf
+        "Could not translate declaration of %s. Unsupported : %s@."
+        !current_decl_name s;
+      []
 
   let translate_decl (info:info) (d:Mltree.decl) ~header : C.definition list =
     let decide_print id =
