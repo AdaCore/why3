@@ -841,7 +841,7 @@ exception QError
 let constant rzero = (0,1)
 let constant rone = (1,1)
 
-function rinterp (t:t) (v:rvars) : real
+function rinterp (t:t) (_v:rvars) : real
 = match t with
   | (n,d) ->  from_int n /. from_int d
   end
@@ -998,7 +998,7 @@ use int.Int
 
 type t' =  IC int | Error
 
-function interp_id (t:t') (v:int -> int) : int
+function interp_id (t:t') (_v:int -> int) : int
 = match t with
   | IC i -> i
   | Error -> 0 (* never created *)
@@ -1008,7 +1008,7 @@ let constant izero = IC 0
 
 let constant ione = IC 1
 
-let predicate ieq (a b:t') = false
+let predicate ieq (_a _b:t') = false
 
 exception NError
 
@@ -1027,7 +1027,7 @@ let iopp (a:t') : t'
   raises  { NError -> true }
 = raise NError
 
-let iinv (t:t') : t'
+let iinv (_t:t') : t'
   (*ensures { forall v: int -> int. id result v * id t v = one }*)
   ensures { not (ieq result izero) }
   raises { NError -> true }
@@ -1450,7 +1450,7 @@ let predicate mpeq (a b:t)
   (n1, e1), (n2, e2) -> n1=n2 && (n1 = 0 || same_exp e1 e2)
   end*)
 
-let mpinv (a:t) : t
+let mpinv (_a:t) : t
   ensures { not mpeq result mpzero }
   raises  { MPError -> true }
 = raise MPError
