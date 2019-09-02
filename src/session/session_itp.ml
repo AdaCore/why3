@@ -1699,7 +1699,7 @@ let merge_theory ~shape_version env old_s old_th s th : unit =
          Hstr.remove old_goals_table new_goal_name;
          let goal_obsolete =
              let s1 = Sshape.find_sum s ng_id in
-             let s2 = Sshape.find_sum s old_id in
+             let s2 = Sshape.find_sum old_s old_id in
              Debug.dprintf debug "[merge_theory] goal has checksum@.";
              not (Termcode.equal_checksum s1 s2)
          in
