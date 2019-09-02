@@ -1347,6 +1347,10 @@ end
     Ident.Hid.clear th_to_node_ID;
     Hfile.clear file_to_node_ID
 
+  let read_and_send_files s =
+    let fs = Session_itp.get_files s in
+    Hfile.iter (fun _ f -> read_and_send (Session_itp.system_path s f)) fs
+
   let notify_parsing_errors l =
     List.iter
          (function (loc,rel_loc,s) ->
@@ -1369,14 +1373,16 @@ end
     in
     match l with
     | [] ->
-       (* TODO: try to restore the previous focus : focused_node := old_focus; *)
-       (* Only reset the tree when there is no errors (for efficiency of ide) *)
-       parsing_errors := [];
-       reset_and_send_the_whole_tree ();
-       P.notify (Message (Information "Session refresh successful"))
+        (* TODO: try to restore the previous focus : focused_node := old_focus; *)
+        (* Only reset the tree when there is no errors (for efficiency of ide) *)
+        parsing_errors := [];
+        reset_and_send_the_whole_tree ();
+        P.notify (Message (Information "Session refresh successful"))
     | l ->
-       parsing_errors := l;
-       notify_parsing_errors l
+        parsing_errors := l;
+        (* Resend the files to the IDE on errors (for Emacs users) *)
+        read_and_send_files d.cont.controller_session;
+        notify_parsing_errors l
 
   let replay ~valid_only nid : unit =
     let d = get_server_data () in
