@@ -1,0 +1,548 @@
+module Z
+
+use int.Int
+use int.Abs
+use mach.int.Int32
+use mach.c.C
+use map.Map
+use types.Types
+use lemmas.Lemmas
+use import mach.int.UInt64GMP as Limb
+use int.Power
+
+type mpz_ptr
+
+val predicate mpz_eq (x y: mpz_ptr)
+  ensures { result <-> x = y }
+
+type mpz_memo = abstract {
+  mutable abs_value_of : map mpz_ptr int;
+  mutable alloc : map mpz_ptr int;
+  mutable abs_size : map mpz_ptr int;
+  mutable sgn : map mpz_ptr int;
+  mutable readers : map mpz_ptr int;
+  mutable zones : map mpz_ptr C.zone;
+} invariant { forall p. 0 <= alloc p
+                        /\ (sgn p = 1 \/ sgn p = -1)
+                        /\ abs_size p <= alloc p
+                        /\ 0 <= abs_size p <= max_int32
+                        /\ 0 <= abs_value_of p
+                        /\ (abs_size p >= 1 ->
+                           power radix (abs_size p - 1) <= abs_value_of p)
+                        /\ abs_value_of p < power radix (abs_size p) }
+  by { abs_value_of = (fun _ -> 0);
+       alloc = (fun _ -> 0);
+       abs_size = (fun _ -> 0);
+       sgn = (fun _ -> 1);
+       readers = (fun _ -> 0);
+       zones = (fun _ -> null_zone) }
+
+(* readers : = 0 means there is currently no access
+             = -1 means exactly one read-write access
+             = n > 0 means there are n read-only accesses *)
+
+val ghost mpz : mpz_memo
+
+function value_of (x:mpz_ptr) (memo: mpz_memo) : int
+  = memo.sgn[x] * memo.abs_value_of[x]
+
+function sgn_value (p:ptr limb) (sz:int32) : int
+  = if sz >= 0 then value p sz else - value p (- sz)
+
+predicate mpz_unchanged (x: mpz_ptr) (memo1 memo2: mpz_memo)
+  = memo1.abs_value_of[x] = memo2.abs_value_of[x]
+    /\ memo1.alloc[x] = memo2.alloc[x]
+    /\ memo1.abs_size[x] = memo2.abs_size[x]
+    /\ memo1.sgn[x] = memo2.sgn[x]
+    /\ memo1.readers[x] = memo2.readers[x]
+    /\ memo1.zones[x] = memo2.zones[x]
+
+lemma unchanged_transitive:
+  forall x m1 m2 m3. mpz_unchanged x m1 m2 -> mpz_unchanged x m2 m3
+                     -> mpz_unchanged x m1 m3
+
+(* SIZ mpz macro *)
+val size_of (x: mpz_ptr) : int32
+  ensures { result = mpz.sgn[x] * mpz.abs_size[x] }
+
+let abs [@extraction:inline] (x:int32) : int32
+  requires { x > min_int32 }
+  ensures { result = abs x }
+= if Int32.(>=) x 0 then x else Int32.(-_) x
+
+(* ABSIZ mpz macro *)
+let abs_size_of [@extraction:inline] (x: mpz_ptr) : int32
+  ensures { result = mpz.abs_size[x] }
+= abs (size_of x)
+
+(* Sets the size of an mpz_ptr, leaving other fields unchanged. *)
+val set_size (x:mpz_ptr) (sz:int32) (ghost p: ptr limb) : unit
+  requires { mpz.zones[x] = zone p }
+  requires { mpz.readers[x] = -1 }
+  requires { offset p = 0 }
+  requires { min p = 0 }
+  requires { max p = plength p }
+  requires { abs sz <= plength p }
+  requires { plength p = mpz.alloc[x] }
+  writes  { mpz.sgn }
+  writes  { mpz.abs_size }
+  writes  { mpz.abs_value_of }
+  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures { mpz.sgn[x] = 1 <-> 0 <= sz }
+  ensures { mpz.sgn[x] = - 1 <-> sz < 0 }
+  ensures { mpz.abs_size[x] = abs sz }
+  ensures { mpz.abs_value_of[x] = value p (abs sz) }
+  (* ensures size_of x = sz *)
+
+(* Sets all fields of an mpz_ptr, maintaining the invariant *)
+val set_fields (x:mpz_ptr) (p:ptr limb) (al sz: int32) : unit
+  requires { offset p = 0 }
+  requires { writable p }
+  requires { min p = 0 }
+  requires { max p = plength p }
+  requires { abs sz <= al = plength p }
+  writes  { mpz.abs_value_of }
+  writes  { mpz.abs_size }
+  writes  { mpz.zones }
+  writes  { mpz.alloc }
+  writes  { mpz.readers }
+  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures { mpz.abs_size[x] = abs sz }
+  ensures { mpz.abs_value_of[x] = value p (abs sz) }
+  ensures { mpz.zones[x] = zone p }
+  ensures { mpz.alloc[x] = al }
+  ensures { mpz.readers[x] = -1 } (* p survives and is a writable pointer *)
+
+(* Sets the data and alloc fields of an mpz_ptr, leaving size unchanged.
+   In order to maintain the invariant, the data must not shrink. *)
+val set_ptr_and_alloc (x:mpz_ptr) (p:ptr limb) (al: int32) : unit
+  requires { offset p = 0 }
+  requires { writable p }
+  requires { min p = 0 }
+  requires { max p = plength p }
+  requires { al = plength p }
+  requires { mpz.abs_size[x] <= al } (* data must not shrink *)
+  writes  { mpz.abs_value_of }
+  writes  { mpz.zones }
+  writes  { mpz.alloc }
+  writes  { mpz.readers }
+  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures { mpz.abs_value_of[x] = value p (mpz.abs_size[x]) }
+  ensures { mpz.zones[x] = zone p }
+  ensures { mpz.alloc[x] = al }
+  ensures { mpz.readers[x] = -1 } (* p survives and is a writable pointer *)
+
+val ghost alloc_of (x: mpz_ptr) : int
+  ensures { result = mpz.alloc[x] }
+
+val ghost value_of (x: mpz_ptr) : int
+  ensures { result = mpz.sgn[x] * mpz.abs_value_of[x] }
+
+val get_read_ptr (x: mpz_ptr) : ptr limb
+  requires { mpz.readers[x] >= 0 }
+  writes   { mpz.readers }
+  ensures  { mpz.readers[x] = old mpz.readers[x] + 1 }
+  ensures  { forall y. x <> y -> mpz.readers[y] = old mpz.readers[y] }
+  ensures  { value result (mpz.abs_size[x]) = mpz.abs_value_of[x] }
+  ensures  { plength result = mpz.alloc[x] }
+  ensures  { offset result = 0 }
+  ensures  { min result = 0 }
+  ensures  { max result = plength result }
+  ensures  { zone result = mpz.zones[x] }
+
+val get_write_ptr (x: mpz_ptr) : ptr limb
+  requires { mpz.readers[x] = 0 }
+  writes   { mpz.readers }
+  ensures  { mpz.readers[x] = -1 }
+  ensures  { forall y. x <> y -> mpz.readers[y] = old mpz.readers[y] }
+  ensures  { value result (mpz.abs_size[x]) = mpz.abs_value_of[x] }
+  ensures  { plength result = mpz.alloc[x] }
+  ensures  { offset result = 0 }
+  ensures  { min result = 0 }
+  ensures  { max result = plength result }
+  ensures  { writable result }
+  ensures  { zone result = mpz.zones[x] }
+
+val release_reader (x: mpz_ptr) (p:ptr limb) : unit
+  requires { mpz.zones[x] = zone p }
+  requires { mpz.readers[x] >= 1 }
+  requires { min p = 0 }
+  requires { max p = plength p }
+  writes   { mpz.readers }
+  writes   { p } (* invalidates p and its aliases *)
+  ensures  { mpz.readers[x] = old mpz.readers[x] - 1 }
+  ensures  { forall y. y <> x -> mpz.readers[y] = old mpz.readers[y] }
+
+val release_writer (x: mpz_ptr) (p:ptr limb) : unit
+  requires { mpz.zones[x] = zone p }
+  requires { mpz.readers[x] = -1 }
+  requires { min p = 0 }
+  requires { max p = plength p }
+  requires { writable p } (* maybe not needed? *)
+  writes   { mpz.readers }
+  writes   { p } (* invalidates p and its aliases *)
+  ensures  { mpz.readers[x] = 0 }
+  ensures  { forall y. y <> x -> mpz.readers[y] = old mpz.readers[y] }
+
+(* in C:
+   mpz_ptr x;
+   mpz_init(x);
+
+   extraction:
+   prelude defining _mpz_init as malloc + set fields
+   syntax val mpz_init "_mpz_init(%0)"
+   *)
+val partial mpz_init () : mpz_ptr
+  writes  { mpz }
+  ensures { forall x. old mpz.alloc[result] > 0 -> result <> x }
+          (*result is fresh*)
+  ensures { forall x. x <> result -> mpz_unchanged x mpz (old mpz) }
+  ensures { mpz.readers[result] = 0 }
+  ensures { mpz.abs_value_of[result] = 0 }
+  ensures { mpz.abs_size[result] = 0 }
+  ensures { mpz.sgn[result] = 1 }
+  ensures { mpz.alloc[result] = 1 }
+  ensures { mpz.zones[result] <> null_zone }
+
+val mpz_clear (x:mpz_ptr) : unit (* scrambles mpz._[x] *)
+  writes { mpz }
+  requires { mpz.readers[x] = 0 }
+  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+
+let partial mpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
+  requires { 1 <= sz } (* GMP does sz = max (sz,1) instead, do that if needed *)
+  requires { mpz.readers[x] = 0 }
+  requires { 1 <= mpz.alloc[x] }
+  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.readers[x] = -1 }
+  ensures  { mpz.alloc[x] = sz }
+  ensures  { mpz.abs_value_of[x] = value result (mpz.abs_size[x]) }
+  ensures  { mpz.zones[x] = zone result }
+  ensures  { offset result = 0 }
+  ensures  { plength result = sz }
+  ensures  { min result = 0 }
+  ensures  { max result = sz }
+  ensures  { writable result }
+  ensures  { if sz >= old mpz.abs_size[x]
+             then mpz.abs_size[x] = old mpz.abs_size[x]
+                  /\ value result (old mpz.abs_size[x])
+                     = old mpz.abs_value_of[x]
+             else mpz.abs_size[x] = 0 }
+= let p = get_write_ptr x in
+  assert { forall y. y <> x -> mpz_unchanged y mpz (old mpz) };
+  let ghost op = { p } in
+  let ghost os = abs_size_of x in
+  label Realloc in
+  let q = realloc p sz in
+  c_assert (is_not_null q);
+  if Int32.(>) (abs_size_of x) sz
+  then set_fields x q sz 0 (* data has shrunk, reset size to 0 *)
+  else begin
+    value_sub_frame (pelts q) (pelts op) 0 (p2i os);
+  set_ptr_and_alloc x q sz;
+  end;
+  q
+
+let mpz_ptr_swap [@extraction:inline] (ref x y: mpz_ptr)
+  requires { mpz.readers[x] = 0 /\ mpz.readers[y] = 0 }
+  ensures  { mpz.readers[x] = 0 /\ mpz.readers[y] = 0 }
+  ensures  { x = old y }
+  ensures  { y = old x }
+= let z = x in
+  x <- y;
+  y <- z
+
+let normalize [@extraction:inline] (p: ptr limb) (ref n: int32)
+  requires { n >= 0 }
+  requires { valid p n }
+  ensures  { 0 <= n <= old n }
+  ensures  { value p n = value p (old n) }
+  ensures  { n = 0 \/ (pelts p)[offset p + n-1] > 0 }
+= label Start in
+  while n > 0 do
+    invariant { value p n = value p n at Start }
+    invariant { 0 <= n <= n at Start }
+    variant   { n }
+    if get_ofs p (n-1) <> 0 then break;
+    n <- n-1;
+  done
+
+end
+
+module Add
+
+use int.Int
+use int.Power
+use map.Map
+use mach.int.Int32
+use ref.Ref
+use mach.c.C
+use lemmas.Lemmas
+use util.Util
+use compare.Compare
+use import mach.int.UInt64GMP as Limb
+use add.Add
+use sub.Sub
+use int.Abs
+use Z
+
+(* TODO eliminate calls to salloc/copy *)
+
+let wmpz_add (w u v: mpz_ptr) : unit
+  requires { mpz.alloc[w] >= 1 }
+  requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
+  requires { mpz.abs_size[u] < max_int32 /\ mpz.abs_size[v] < max_int32 }
+  ensures  { value_of w mpz = old (value_of u mpz + value_of v mpz) }
+  ensures  { forall x. x <> w -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
+=
+  label Start in
+  let ref u = u in
+  let ref v = v in
+  let ref usize = size_of u in
+  let ref vsize = size_of v in
+  let ref abs_usize = abs usize in
+  let ref abs_vsize = abs vsize in
+  begin
+    ensures { mpz.abs_size[u] = abs_usize /\ mpz.abs_size[v] = abs_vsize }
+    ensures { abs_vsize <= abs_usize < max_int32 }
+    ensures { 0 <= abs_vsize <= mpz.alloc[v] }
+    ensures { 0 <= abs_usize <= mpz.alloc[u] }
+    ensures { mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
+    ensures { abs_usize * mpz.sgn[u] = usize /\
+              abs_vsize * mpz.sgn[v] = vsize }
+    ensures { value_of u mpz + value_of v mpz
+              = old (value_of u mpz + value_of v mpz) }
+    ensures { mpz_unchanged u mpz (old mpz) }
+    ensures { mpz_unchanged v mpz (old mpz) }
+    if Int32.(<) abs_usize abs_vsize
+    then begin
+      mpz_ptr_swap u v;
+      let ref tmp_size = vsize in
+      vsize <- usize;
+      usize <- tmp_size;
+      tmp_size <- abs_vsize;
+      abs_vsize <- abs_usize;
+      abs_usize <- tmp_size;
+    end
+  end;
+  let ref wsize = Int32.(+) abs_usize 1 in
+  let uw = mpz_eq u w in
+  let vw = mpz_eq v w in
+  label Realloc in
+  let ompz = pure { mpz } in
+  let wp = mpz_realloc w wsize in
+  assert { uw \/ mpz_unchanged u mpz ompz };
+  assert { vw \/ mpz_unchanged v mpz ompz };
+  assert { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) };
+  (* TODO remplacer par usize ^ vsize < 0 *)
+  label Op in
+  if ((Int32.(>) usize 0 && Int32.(<) vsize 0)
+     || (Int32.(>) vsize 0 && Int32.(<) usize 0))
+  then begin (*ensures { value wp (abs wsize)
+                      = old (abs(mpz.abs_value_of[u] - mpz.abs_value_of[v])) }*)
+            ensures { sgn_value wp wsize
+                      = old (value_of u mpz + value_of v mpz) }
+            ensures { uw \/ mpz.readers[u] = 0 }
+            ensures { vw \/ mpz.readers[v] = 0 }
+            ensures { mpz.readers[w] = -1 }
+            ensures { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) }
+            ensures { abs wsize <= plength wp }
+    if abs_usize <> abs_vsize
+    then begin
+      begin ensures { value wp abs_usize
+                      = old (mpz.abs_value_of[u] - mpz.abs_value_of[v]) }
+            ensures { uw \/ mpz.readers[u] = 0 }
+            ensures { vw \/ mpz.readers[v] = 0 }
+            ensures { mpz.readers[w] = -1 }
+            ensures { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) }
+      if uw
+      then begin
+        assert { not vw };
+        let vp = get_read_ptr v in
+        let _b = wmpn_sub_in_place wp abs_usize vp abs_vsize in
+        assert { _b = 0 };
+        release_reader v vp
+      end else if vw
+      then begin
+        let up = get_read_ptr u in
+        let vp = salloc (UInt32.of_int32 abs_vsize) in
+        wmpn_copyi vp wp abs_vsize;
+        let _b = wmpn_sub wp up abs_usize vp abs_vsize in
+        assert { _b = 0 };
+        release_reader u up
+      end else begin
+        let up = get_read_ptr u in
+        let vp = get_read_ptr v in
+        let _b = wmpn_sub wp up abs_usize vp abs_vsize in
+        assert { _b = 0 };
+        release_reader u up;
+        release_reader v vp
+      end
+      end;
+      wsize <- abs_usize;
+      normalize wp wsize;
+      if usize < 0 then wsize <- -wsize
+    end
+    else begin
+      wsize <- abs_usize;
+      if uw
+      then begin
+        assert { not vw };
+        let vp = get_read_ptr v in
+        if wmpn_cmp wp vp abs_usize < 0
+        then begin
+          let up = salloc (UInt32.of_int32 abs_usize) in
+          wmpn_copyi up wp abs_usize;
+          assert { value up abs_usize = value wp abs_usize };
+          let _b = wmpn_sub_n wp vp up abs_usize in
+          assert { _b = 0 };
+          normalize wp wsize;
+          if usize >= 0
+          then wsize <- -wsize
+        end else begin
+          let _b = wmpn_sub_in_place wp abs_usize vp abs_usize in
+          assert { _b = 0 };
+          normalize wp wsize;
+          if usize < 0 then wsize <- -wsize
+        end;
+        release_reader v vp
+      end else if vw
+      then begin
+        let up = get_read_ptr u in
+        if wmpn_cmp up wp abs_usize < 0
+        then begin
+          let _b = wmpn_sub_in_place wp abs_usize up abs_usize in
+          assert { _b = 0 };
+          normalize wp wsize;
+          if usize >= 0 then wsize <- - wsize
+        end else begin
+          let vp = salloc (UInt32.of_int32 abs_usize) in
+          wmpn_copyi vp wp abs_usize;
+          assert { value vp abs_usize = value wp abs_usize };
+          let _b = wmpn_sub_n wp up vp abs_usize in
+          assert { _b = 0 };
+          normalize wp wsize;
+          if usize < 0 then wsize <- - wsize
+        end;
+        release_reader u up
+      end else begin
+        let up = get_read_ptr u in
+        let vp = get_read_ptr v in
+        if wmpn_cmp up vp abs_usize < 0
+        then begin
+          let _b = wmpn_sub_n wp vp up abs_usize in
+          assert { _b = 0 };
+          normalize wp wsize;
+          if usize >= 0 then wsize <- -wsize
+        end else begin
+          let _b = wmpn_sub_n wp up vp abs_usize in
+          assert { _b = 0 };
+          normalize wp wsize;
+          if usize < 0 then wsize <- -wsize
+        end;
+        release_reader u up;
+        release_reader v vp
+      end
+    end
+  end
+  else begin
+    let ref cy = 0 in
+    begin ensures { value wp wsize = old abs (value_of u mpz + value_of v mpz) }
+          ensures { uw \/ mpz.readers[u] = 0 }
+          ensures { vw \/ mpz.readers[v] = 0 }
+          ensures { mpz.readers[w] = -1 }
+          ensures { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) }
+          ensures { abs_usize <= wsize <= plength wp }
+    assert { abs (value_of u mpz + value_of v mpz)
+             = abs (value_of u mpz) + abs (value_of v mpz)
+             by if usize >= 0
+                then vsize >= 0
+                     so abs (value_of u mpz) = value_of u mpz
+                     so abs (value_of v mpz) = value_of v mpz
+                else vsize <= 0
+                     so abs (value_of u mpz) = - value_of u mpz
+                     so abs (value_of v mpz) = - value_of v mpz };
+    if uw
+    then if vw
+      then begin
+        (* problem: add_in_place does not cover r = x = y *)
+        (* TODO double_in_place or something *)
+        let vp = salloc (UInt32.of_int32 abs_vsize) in
+        wmpn_copyi vp wp abs_vsize;
+        assert { value vp abs_vsize = value wp abs_vsize };
+        cy <- wmpn_add_in_place wp abs_vsize vp abs_vsize;
+        assert { value wp abs_usize + power radix abs_usize * cy
+                 = abs (value_of u mpz + value_of v mpz)
+                 by value vp abs_vsize = abs (value_of u mpz)
+                    = abs (value_of v mpz) };
+      end
+      else begin
+        let vp = get_read_ptr v in
+        cy <- wmpn_add_in_place wp abs_usize vp abs_vsize;
+        assert { value wp abs_usize + power radix abs_usize * cy
+                 = abs (value_of u mpz + value_of v mpz)
+                 by value vp abs_vsize = abs (value_of v mpz)
+                 so value wp abs_usize at Op = abs (value_of u mpz)};
+        release_reader v vp
+      end
+    else if vw
+      then begin
+        let up = get_read_ptr u in
+        let vp = salloc (UInt32.of_int32 abs_vsize) in
+        wmpn_copyi vp wp abs_vsize;
+        assert { value vp abs_vsize = value wp abs_vsize
+                 = abs (value_of v mpz) };
+        cy <- wmpn_add wp up abs_usize vp abs_vsize;
+        assert { value wp abs_usize + power radix abs_usize * cy
+                 = abs (value_of u mpz + value_of v mpz)
+                 by value up abs_usize = abs (value_of u mpz) };
+        release_reader u up
+      end
+      else begin
+        let up = get_read_ptr u in
+        let vp = get_read_ptr v in
+        cy <- wmpn_add wp up abs_usize vp abs_vsize;
+        assert { value wp abs_usize + power radix abs_usize * cy
+                 = abs (value_of u mpz + value_of v mpz)
+                 by value up abs_usize = abs (value_of u mpz)
+                 so value vp abs_vsize = abs (value_of v mpz) };
+        release_reader u up;
+        release_reader v vp;
+      end;
+    label Set in
+    value_sub_update_no_change (pelts wp) (int32'int abs_usize)
+                                    0 (int32'int abs_usize) cy;
+    set_ofs wp abs_usize cy;
+    value_tail wp abs_usize;
+    assert { value wp (abs_usize + 1)
+             = value wp abs_usize at Set + power radix abs_usize * cy
+             = abs (value_of u mpz + value_of v mpz) };
+    begin ensures { if cy = 0 then wsize = abs_usize
+                              else wsize = abs_usize + 1 }
+      wsize <- abs_usize + Limb.to_int32 cy
+    end
+    end;
+    label Minus in
+    if Int32.(<) usize 0
+    then begin
+      wsize <- Int32.(-_) wsize;
+      assert { sgn_value wp wsize = - value wp (wsize at Minus)
+               = (value_of u mpz + value_of v mpz) at Op
+               by usize < 0 so vsize <= 0 }
+    end
+    else begin
+      assert { sgn_value wp wsize = value wp wsize
+               = (value_of u mpz + value_of v mpz) at Op
+               by usize >= 0 so vsize >= 0
+               so wsize >= abs_usize >= 0 }
+    end;
+    assert { sgn_value wp wsize = (value_of u mpz + value_of v mpz) at Op }
+  end;
+  set_size w wsize wp;
+  assert { value_of w mpz = sgn_value wp wsize
+           = (value_of u mpz + value_of v mpz) at Op };
+  release_writer w wp
+
+
+end
