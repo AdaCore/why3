@@ -194,6 +194,7 @@ module C
     requires { writable p }
     writes   { p.min }
     writes   { p.data }
+    ensures  { writable result }
     ensures  { result.offset = p.offset - i }
     ensures  { p.min = p.offset - i }
     ensures  { result.min = old p.min }

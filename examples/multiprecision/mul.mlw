@@ -20,6 +20,7 @@ module Mul
   let wmpn_mul_1 (r x:t) (sz:int32) (y:limb) : limb
     requires { valid x sz }
     requires { valid r sz }
+    requires { writable r }
     ensures { value r sz + (power radix sz) * result
                 = value x sz * y }
     ensures { forall j. (j < offset r \/ offset r + sz <= j)
@@ -41,6 +42,7 @@ module Mul
       invariant { plength rp = plength r }
       invariant { rp.min = r.min }
       invariant { rp.max = r.max }
+      invariant { writable rp }
       invariant { pelts rp = pelts r }
       invariant { up.offset = x.offset + i }
       invariant { plength up = plength x }
@@ -85,6 +87,7 @@ module Mul
   let wmpn_addmul_1 (r x:t) (sz: int32) (y:limb) : limb
     requires { valid x sz }
     requires { valid r sz }
+    requires { writable r }
     ensures { value r sz + (power radix sz) * result
             = value (old r) sz
               + value x sz * y }
@@ -108,6 +111,7 @@ module Mul
       invariant { (rp).offset = r.offset + i }
       invariant { rp.min = r.min }
       invariant { rp.max = r.max }
+      invariant { writable rp }
       invariant { pelts rp = pelts r }
       invariant { up.offset = x.offset + i }
       invariant { plength up = plength x }
@@ -165,6 +169,7 @@ module Mul
     requires { valid x sz }
     requires { valid y sz }
     requires { valid r (sz + sz) }
+    requires { writable r }
     writes { r.data.elts }
     ensures { value r (sz + sz)
                 + power radix (sz + sz) * result
@@ -187,6 +192,7 @@ module Mul
       invariant { rp.offset = r.offset + i }
       invariant { rp.min = r.min }
       invariant { rp.max = r.max }
+      invariant { writable rp }
       invariant { pelts rp = pelts r }
       invariant { plength rp = plength r }
       invariant { vp.offset = y.offset + i }
@@ -266,6 +272,7 @@ module Mul
     requires { valid x sx }
     requires { valid y sy }
     requires { valid r (sy + sx) }
+    requires { writable r }
     writes   { r.data.elts }
     ensures  { value r (sy + sx) = value x sx * value y sy }
     ensures { forall j. (j < offset r \/ offset r + (sy + sx) <= j)
@@ -293,6 +300,7 @@ module Mul
       invariant { rp.min = r.min }
       invariant { rp.max = r.max }
       invariant { pelts rp = pelts r }
+      invariant { writable rp }
       invariant { vp.offset = y.offset + i }
       invariant { plength vp = plength y }
       invariant { vp.min = y.min }

@@ -44,6 +44,7 @@ val rsa_estimate (a: fxp): fxp
 let sqrt1 (rp: ptr uint64) (a0: uint64): uint64
   requires { valid rp 1 }
   requires { 0x4000000000000000 <= a0 }
+  requires { writable rp }
   ensures { result * result <= a0 < (result + 1) * (result + 1) }
   ensures { result * result + (pelts rp)[offset rp] = a0 }
   ensures { (pelts rp)[offset rp] <= 2 * result }

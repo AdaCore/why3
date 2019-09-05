@@ -46,6 +46,7 @@ let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
   requires { 0 < k <= 64 }
   requires { sx <= toom22_threshold * power 2 k }
   requires { valid scratch (2 * (sx + k)) } (*TODO faire en fonction de sy *)
+  requires { writable r /\ writable scratch }
   requires { 8 * sx < max_int32 }
   requires { 2 < sy <= sx < sy + sy - 1 }
   requires { 4 * sx < 5 * sy }
@@ -783,6 +784,7 @@ with wmpn_toom22_mul_rec (r x: ptr limb) (sx:int32) (y:ptr limb) (sy: int32)
   requires { valid x sx }
   requires { valid y sy }
   requires { valid r (sx + sy) }
+  requires { writable r /\ writable scratch }
   requires { 0 < sy <= sx <= sy + sy }
   requires { 8 * sx < max_int32 }
   requires { 0 <= k <= 64 }
@@ -812,6 +814,7 @@ with wmpn_toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) :
   requires { valid x sz }
   requires { valid y sz }
   requires { valid r (sz + sz) }
+  requires { writable r /\ writable scratch }
   requires { 0 < sz }
   requires { 8 * sz < max_int32 }
   requires { 0 <= k <= 64 }
@@ -839,6 +842,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
   requires { valid x sx }
   requires { valid y sy }
   requires { valid r (sx + sy) }
+  requires { writable r /\ writable scratch }
   requires { toom22_threshold < sy }
   requires { 0 < k <= 64 }
   requires { sx <= toom22_threshold * power 2 k }
@@ -1761,6 +1765,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
     requires { valid x sx }
     requires { valid y sy }
     requires { valid r (sx + sy) }
+    requires { writable r }
     requires { 0 < sy <= sx }
     requires { 8 * sx < max_int32 }
     requires { sx <= toom22_threshold * power 2 k }
@@ -1812,6 +1817,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
           invariant { plength !up = plength x }
           invariant { min !rp = min r /\ max !rp = max r }
           invariant { plength !rp = plength r }
+          invariant { writable !rp }
           invariant { min ws = 0 /\ max ws = plength ws = 4 * sy }
           invariant { min scratch = 0 /\ max scratch = plength scratch }
           invariant { plength scratch = 5 * sy + 128 }
@@ -1959,6 +1965,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
         assert { value r !ou = value o_r !ou };
         assert { value !rp sy + (power radix sy) * cy
                  = value o_rp sy + value ws sy };
+        assert { valid !rp sy };
         let rpn = C.incr !rp sy in
         let wsy = C.incr ws sy in
         let orp = { rpn } in
@@ -2097,6 +2104,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
     requires { valid x sz }
     requires { valid y sz }
     requires { valid r (sz + sz) }
+    requires { writable r }
     requires { 8 * sz < max_int32 }
     requires { sz <= toom22_threshold * power 2 k }
     requires { 0 <= k <= 64 }

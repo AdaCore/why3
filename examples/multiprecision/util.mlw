@@ -13,6 +13,7 @@ module Util
   let wmpn_copyi [@extraction:inline] (r x:t) (sz:int32) : unit
     requires { valid x sz }
     requires { valid r sz }
+    requires { writable r }
     ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
     ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
               (pelts r)[j] = old (pelts r)[j] }
@@ -30,6 +31,7 @@ module Util
       invariant { xp.max = x.max }
       invariant { rp.min = r.min }
       invariant { rp.max = r.max }
+      invariant { writable rp }
       invariant { xp.offset = x.offset + i }
       invariant { rp.offset = r.offset + i }
       invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
@@ -76,6 +78,7 @@ module Util
   (** `wmpn_zero r sz` sets `(r,sz)` to zero. Corresponds to `mpn_zero`. *)
   let wmpn_zero [@extraction:inline] (r:t) (sz:int32) : unit
     requires { valid r sz }
+    requires { writable r }
     ensures { value r sz = 0 }
     ensures { forall j. (j < offset r \/ offset r + sz <= j)
               -> (pelts r)[j] = old (pelts r)[j] }
