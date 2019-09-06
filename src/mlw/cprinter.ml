@@ -914,6 +914,84 @@ module MLToC = struct
   let inlined_attr = Compile.InlineFunctionCalls.inlined_call_attr
 
   let rec expr info env (e:Mltree.expr) : C.body =
+    let do_for (eb: pvsymbol) (ee: Mltree.expr option)
+          (sb: pvsymbol) (se: Mltree.expr option)  i dir body =
+      let open Number in
+      match i.pv_vs.vs_ty.ty_node with
+      | Tyapp ({ ts_def = Range { ir_lower = lb; ir_upper = ub }},_) ->
+         let init_test_ok, end_test_ok =
+           match se, ee with
+           | _, Some { e_node = Mltree.Econst ec } ->
+              true,
+              if dir = To
+              then BigInt.lt ec.il_int ub
+              else BigInt.lt lb ec.il_int
+           | Some { e_node = Mltree.Econst sc }, _ ->
+              (if dir = To
+               then BigInt.eq sc.il_int lb
+               else BigInt.eq sc.il_int ub),
+              false
+           | _, _ -> false, false
+         in
+         let ty = ty_of_ty info i.pv_vs.vs_ty in
+         let di = C.Ddecl(ty, [i.pv_vs.vs_name, Enothing]) in
+         let ei = C.Evar (i.pv_vs.vs_name) in
+         let env_f = { env with computes_return_value = false } in
+         let ds, is, ie = match se with
+           | Some se ->
+              let ds, is = expr info env_f se in
+               begin match is with
+                | Sexpr (Econst _ | Evar _ as e) ->
+                   ds, Snop, e
+                | _ ->
+                   let iv = Evar (pv_name sb) in
+                   let is = assignify iv is in
+                   C.Ddecl (ty, [pv_name sb, Enothing]) :: ds, is, iv
+                               end
+           | None -> [], Snop, Evar(pv_name sb)
+         in
+         let init_e = C.Ebinop (Bassign, ei, ie) in
+         let de, es, ee =
+           match ee with
+           | Some ee ->
+              let de, es = expr info env_f ee in
+              begin match es with
+              | Sexpr (Econst _ | Evar _ as e) ->
+                 de, Snop, e
+              | _ ->
+                 let ev = Evar (pv_name eb) in
+                 let es = assignify ev es in
+                 C.Ddecl (ty, [pv_name eb, Enothing]) :: de, es, ev
+              end
+           | None -> [], Snop, Evar (pv_name eb)
+         in
+         let d = di :: ds @ de in
+         let incr_op = match dir with To -> Upreincr | DownTo -> Upredecr in
+         let incr_e = C.Eunop (incr_op, ei) in
+         let env' = { env with computes_return_value = false;
+                               in_unguarded_loop = true;
+                               breaks =
+                                 if env.in_unguarded_loop
+                                 then Sid.empty else env.breaks } in
+         let bd, bs = expr info env' body in
+         let test_op = match dir with | To -> C.Ble | DownTo -> C.Bge in
+         let sloop =
+           if end_test_ok
+           then C.Sfor(init_e, C.Ebinop (test_op, ei, ee),
+                       incr_e, C.Sblock(bd, bs))
+           else
+             let end_test = C.Sif (C.Ebinop (C.Beq, ei, ee),
+                                   Sbreak, Snop) in
+             let bs = C.Sseq (bs, end_test) in
+             C.Sfor(init_e, Enothing, incr_e, C.Sblock(bd,bs)) in
+         let ise = C.Sseq (is, es) in
+         let s = if init_test_ok
+                 then sloop
+                 else C.(Sif (Ebinop (test_op, ie, ee), sloop, Snop)) in
+         d, C.Sseq (ise, s)
+      |  _ ->
+          raise (Unsupported "for loops where loop index is not a range type")
+      in
     match e.e_node with
     | Eblock [] -> ([], expr_or_return env Enothing)
     | Eblock [e] -> [], C.Sblock (expr info env e)
@@ -1174,99 +1252,19 @@ module MLToC = struct
             { e_node = Elet(Lvar (sb, se),
                  { e_node = Efor (i, sb', dir, eb', body) })})
          when pv_equal sb sb' && pv_equal eb eb' ->
-       Debug.dprintf debug_c_extraction "LETFOR@.";
-       let open Number in
-       begin match i.pv_vs.vs_ty.ty_node with
-       | Tyapp ({ ts_def = Range { ir_lower = lb; ir_upper = ub }},_) ->
-          let init_test_ok =
-            match se.e_node, ee.e_node with
-            | Mltree.Econst sc, Mltree.Econst ec ->
-               let cmp = compare_const (ConstInt sc) (ConstInt ec) in
-               if dir = To then cmp <= 0 else cmp >= 0
-            | Mltree.Econst sc, _ ->
-               (* for i = 0 to n, on unsigned types *)
-               if dir = To
-               then BigInt.eq sc.il_int lb
-               else BigInt.eq sc.il_int ub
-            | _, Mltree.Econst ec ->
-               (* for i = n downto 0 *)
-               if dir = To
-               then BigInt.eq ec.il_int ub
-               else BigInt.eq ec.il_int lb
-            | _ -> false
-          in
-          let end_test_ok =
-            match ee.e_node with
-            | Mltree.Econst ec ->
-               if dir = To
-               then BigInt.lt ec.il_int ub
-               else BigInt.lt lb ec.il_int
-            | _ -> false
-          in
-          let ty = ty_of_ty info i.pv_vs.vs_ty in
-          let di = C.Ddecl(ty, [i.pv_vs.vs_name, Enothing]) in
-          let ei = C.Evar (i.pv_vs.vs_name) in
-          let env_f = { env with computes_return_value = false } in
-          let ds, is = expr info env_f se in
-          let is, se = get_last_expr is in
-          let init_e = C.Ebinop (Bassign, ei, se) in
-          let de, es = expr info env_f ee in
-          let es, ee = get_last_expr es in
-          let d = di :: ds @ de in
-          let incr_op = match dir with To -> Upreincr | DownTo -> Upredecr in
-          let incr_e = C.Eunop (incr_op, ei) in
-          let env' = { env with computes_return_value = false;
-                                in_unguarded_loop = true;
-                                breaks =
-                                  if env.in_unguarded_loop
-                                  then Sid.empty else env.breaks } in
-          let bd, bs = expr info env' body in
-          let test_op = match dir with | To -> C.Ble | DownTo -> C.Bge in
-          let sloop =
-            if end_test_ok
-            then C.Sfor(init_e, C.Ebinop (test_op, ei, ee),
-                        incr_e, C.Sblock(bd, bs))
-            else
-              let end_test = C.Sif (C.Ebinop (C.Beq, ei, ee),
-                                    Sbreak, Snop) in
-              let bs = C.Sseq (bs, end_test) in
-              C.Sfor(init_e, Enothing, incr_e, C.Sblock(bd,bs)) in
-          let ise = C.Sseq (is, es) in
-          let s = if init_test_ok
-                  then sloop
-                  else C.(Sif (Ebinop (test_op, se, ee), sloop, Snop)) in
-          d, C.Sseq (ise, s)
-       |  _ ->
-           raise (Unsupported "for loops where loop index is not a range type")
-                 end
+       Debug.dprintf debug_c_extraction "LETLETFOR@.";
+       do_for eb (Some ee) sb (Some se) i dir body
+    | Elet (Lvar (eb, ee), { e_node = Efor (i, sb, dir, eb', body) })
+         when pv_equal eb eb' ->
+       Debug.dprintf debug_c_extraction "ENDLETFOR@.";
+       do_for eb (Some ee) sb None i dir body
+    | Elet (Lvar (sb, se), { e_node = Efor (i, sb', dir, eb, body) })
+         when pv_equal sb sb' ->
+       Debug.dprintf debug_c_extraction "STARTLETFOR@.";
+       do_for eb None sb (Some se) i dir body
     | Efor (i, sb, dir, eb, body) ->
        Debug.dprintf debug_c_extraction "FOR@.";
-       begin match i.pv_vs.vs_ty.ty_node with
-       | Tyapp ({ ts_def = Range _ },_) ->
-          let ty = ty_of_ty info i.pv_vs.vs_ty in
-          let di = C.Ddecl(ty, [i.pv_vs.vs_name, Enothing]) in
-          let ei = C.Evar (i.pv_vs.vs_name) in
-          let init_e = C.Ebinop (Bassign, ei, C.Evar (sb.pv_vs.vs_name)) in
-          let incr_op = match dir with To -> Upreincr | DownTo -> Upredecr in
-          let incr_e = C.Eunop (incr_op, ei) in
-          let end_test = C.Sif (C.Ebinop (C.Beq, ei, C.Evar eb.pv_vs.vs_name),
-                                Sbreak, Snop) in
-          let env' = { env with computes_return_value = false;
-                                in_unguarded_loop = true;
-                                breaks =
-                                  if env.in_unguarded_loop
-                                  then Sid.empty else env.breaks } in
-          let bd, bs = expr info env' body in
-          let bs = C.Sseq (bs, end_test) in
-          let init_test_op = match dir with | To -> C.Bge | DownTo -> C.Ble in
-          [di], C.Sif (C.Ebinop(init_test_op,
-                                C.Evar (eb.pv_vs.vs_name),
-                                C.Evar (sb.pv_vs.vs_name)),
-                       C.Sfor(init_e, Enothing, incr_e, C.Sblock(bd,bs)),
-                       Snop)
-       |  _ ->
-           raise (Unsupported "for loops where loop index is not a range type")
-       end
+       do_for eb None sb None i dir body
     | Ematch (({e_node = Eapp(rs,_)} as e1), [Ptuple rets,e2], [])
          when List.for_all
                 (function | Pwild (*ghost*) | Pvar _ -> true |_-> false)
