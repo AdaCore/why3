@@ -31,7 +31,7 @@ MLWFILES= $(addsuffix .mlw, powm sqrtrem sqrt toom logical div mul sub add compa
 cfiles: why3
 	mkdir -p build
 	$(WHY3) extract -D wmpn.drv -D c -L . --recursive --modular --interface -o build/ \
-	wmpn.mlw
+	--debug c_no_error_msgs wmpn.mlw
 	#$(MLWFILES)
 
 build/sqrtinit.h: sqrtinit.ml
