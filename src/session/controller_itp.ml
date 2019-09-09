@@ -515,8 +515,9 @@ let idle_handler () =
      more tasks *)
   begin
     try
-      if Hashtbl.length prover_tasks_in_progress <
-         S.multiplier * !session_max_tasks
+      if S.blocking ||
+         (Hashtbl.length prover_tasks_in_progress <
+          S.multiplier * !session_max_tasks)
       then
         let spa = Queue.pop scheduled_proof_attempts in
         try build_prover_call spa
