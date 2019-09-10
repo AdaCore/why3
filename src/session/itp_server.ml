@@ -194,6 +194,18 @@ let bypass_pretty s id =
 
 let get_exception_message ses id e =
   let module P = (val (p ses id)) in
+  let print_id (id: Ident.ident) =
+    (* For the case where there is only an id but not its kind *)
+    if Ident.known_id P.aprinter id then
+      Ident.id_unique P.aprinter id
+    else if Ident.known_id P.pprinter id then
+      Ident.id_unique P.pprinter id
+    else if Ident.known_id P.sprinter id then
+      Ident.id_unique P.sprinter id
+    else if Ident.known_id P.tprinter id then
+      Ident.id_unique P.tprinter id
+    else id.Ident.id_string
+  in
   match e with
   | Session_itp.NoProgress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
@@ -232,6 +244,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Cannot_infer_type s ->
       Pp.sprintf "Error in transformation %s. Cannot infer type of polymorphic element" s, Loc.dummy_position, ""
+  | Generic_arg_trans_utils.Remove_unknown (d, id) ->
+      Pp.sprintf "Error while removing ident: %s. The ident is used in the following declaration:\n%a\n\
+        You can try to use recursive remove or to add this declaration to the list of removed symbols"
+        (print_id id) P.print_decl d, Loc.dummy_position, ""
   | Args_wrapper.Arg_qid_not_found q ->
       Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""
   | Args_wrapper.Arg_pr_not_found pr ->
@@ -279,7 +295,15 @@ let commands_table = Hstr.create 17
 
 let register_command c d f = Hstr.add commands_table c (d,f)
 
+
 let () =
+  let doc_list_strategies c _ =
+    let l = list_strategies c in
+    let print_str fmt (short, name) =
+      Format.fprintf fmt "(Prooftree shortcut: %s  Name: %s)" short name in
+    Pp.sprintf "%a" (Pp.print_list Pp.newline print_str) l
+  in
+
   List.iter (fun (c,d,f) -> register_command c d f)
     [
     "interrupt", "interrupt all scheduled or running proof tasks",
@@ -288,9 +312,8 @@ let () =
     Qnotask list_transforms_query;
     "list-provers", "list available provers",
     Qnotask list_provers;
-(*
-    "list-strategies", "list available strategies", list_strategies;
-*)
+    "list-strategies", "list available strategies",
+    Qnotask doc_list_strategies;
     "print", "<id> print the declaration where <id> was defined",
     Qtask print_id;
     "search", "<ids> print the declarations where all <ids> appears",
@@ -406,6 +429,7 @@ exception No_loc_on_goal
 
 let get_locations (task: Task.task) =
   let list = ref [] in
+  let goal_loc = ref None in
   let file_cache = Hstr.create 17 in
   let session_dir =
     let d = get_server_data () in
@@ -422,6 +446,16 @@ let get_locations (task: Task.task) =
     let (f,l,b,e) = Loc.get loc in
     let loc = Loc.user_position (relativize f) l b e in
     list := (loc, color) :: !list in
+  let get_goal_loc ~loc pr_loc =
+    (* We get the task loc in priority. If it is not there, we take the pr
+       ident loc. No loc can happen in completely ghost function. *)
+    let loc = Opt.fold (fun _ x -> Some x) pr_loc loc in
+    match loc with
+    | Some loc ->
+        let (f,l,b,e) = Loc.get loc in
+        let loc = Loc.user_position (relativize f) l b e in
+        goal_loc := Some loc
+    | _ -> () in
   let rec color_locs ~color formula =
     Opt.iter (fun loc -> color_loc ~color ~loc) formula.Term.t_loc;
     Term.t_iter (fun subf -> color_locs ~color subf) formula in
@@ -460,9 +494,11 @@ let get_locations (task: Task.task) =
         { Task.task_prev = prev;
           Task.task_decl =
             { Theory.td_node =
-                Theory.Decl { Decl.d_node = Decl.Dprop (k, _, f) }}} ->
+                Theory.Decl { Decl.d_node = Decl.Dprop (k, pr, f) }}} ->
       begin match k with
-      | Decl.Pgoal  -> color_t_locs ~premise:false f
+      | Decl.Pgoal  ->
+          get_goal_loc ~loc:f.Term.t_loc pr.Decl.pr_name.Ident.id_loc;
+          color_t_locs ~premise:false f
       | Decl.Paxiom -> color_t_locs ~premise:true  f
       | _ -> assert false
       end;
@@ -470,7 +506,7 @@ let get_locations (task: Task.task) =
     | Some { Task.task_prev = prev } -> scan prev
     | _ -> () in
   scan task;
-  !list
+  !goal_loc, !list
 
 let get_modified_node n =
   match n with
@@ -483,7 +519,7 @@ let get_modified_node n =
   | Saved | Saving_needed _ -> None
   | Message _ -> None
   | Dead _ -> None
-  | Task (nid, _, _) -> Some nid
+  | Task (nid, _, _, _) -> Some nid
   | File_contents _ -> None
   | Source_and_ce _ -> None
 
@@ -591,9 +627,10 @@ end
   (* Reload_files that is used even if the controller is not correct. It can
      be incorrect and end up in a correct state. *)
   let reload_files cont ~shape_version =
+    let hard_reload = true in
     capture_parse_or_type_errors
       (fun c ->
-        try let (_,_) = reload_files ~shape_version c in [] with
+        try let (_,_) = reload_files ~hard_reload ~shape_version c in [] with
         | Errors_list le -> le) cont
 
   let add_file cont ?format fname =
@@ -616,7 +653,7 @@ end
   let get_node_name (node: any) =
     let d = get_server_data () in
     match node with
-    | AFile file -> Session_itp.basename (file_path file)
+    | AFile file -> Sysutil.basename (file_path file)
     | ATh th -> (theory_name th).Ident.id_string
     | ATn tn ->
        let name = get_transf_name d.cont.controller_session tn in
@@ -830,22 +867,44 @@ end
   let task_of_id d id show_full_context loc =
     let task,tables = get_task_name_table d.cont.controller_session id in
     (* This function also send source locations associated to the task *)
-    let loc_color_list = if loc then get_locations task else [] in
+    let goal_loc, loc_color_list =
+      if loc then get_locations task else (None, []) in
     let task_text =
       let pr = tables.Trans.printer in
       let apr = tables.Trans.aprinter in
       let module P = (val Pretty.create pr apr pr pr false) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in
-    task_text, loc_color_list
+    task_text, loc_color_list, goal_loc
 
-  let create_ce_tab ~print_attrs s res any list_loc =
+  type loc_type =
+    | Goal_loc
+    | Color_loc of Itp_communication.color
+
+  let create_ce_tab ~print_attrs s res any list_loc goal_loc =
     let f = get_encapsulating_file s any in
     let filename = Session_itp.system_path s f in
     let source_code = Sysutil.file_contents filename in
-    Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
+    (* Convert the color location and location of the goal at the same time *)
+    let list_loc = List.map (fun (x, y) -> x, Color_loc y) list_loc in
+    let list_loc =
+      match goal_loc with
+      | Some goal_loc -> (goal_loc, Goal_loc) :: list_loc
+      | None          -> list_loc in
+    let (source_result, list_loc) =
+      Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
       ?me_name_trans:None res.Call_provers.pr_model ~rel_filename:filename
       ~source_code:source_code ~locations:list_loc
+    in
+    let goal_loc, list_loc = List.partition (fun (_, y) -> y = Goal_loc) list_loc in
+    let goal_loc =
+      match goal_loc with
+      | [(x, _)] -> Some x
+      | _        -> None in
+    let list_loc =
+      List.map (fun (x, y) ->
+          match y with | Color_loc y -> (x, y) | _ -> assert false) list_loc in
+    (source_result, list_loc, goal_loc)
 
   let send_task nid show_full_context loc =
     let d = get_server_data () in
@@ -858,34 +917,41 @@ end
       match any with
       | APn _id ->
         let s = "Goal is detached and cannot be printed" in
-        P.notify (Task (nid, s, []))
+        P.notify (Task (nid, s, [], None))
       | ATh t ->
-          P.notify (Task (nid, "Detached theory " ^ (theory_name t).Ident.id_string, []))
+          let th_id   = theory_name t in
+          let th_name = th_id.Ident.id_string in
+          let th_loc  = th_id.Ident.id_loc in
+          P.notify (Task (nid, "Detached theory " ^ th_name, [], th_loc))
       | APa pid ->
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
           let prover_text = "Detached prover\n====================> Prover: " ^ name ^ "\n" in
-          P.notify (Task (nid, prover_text, []))
+          P.notify (Task (nid, prover_text, [], None))
       | AFile f ->
-          P.notify (Task (nid, "Detached file " ^ (basename (file_path f)), []))
+          P.notify (Task (nid, "Detached file " ^ (Sysutil.basename (file_path f)), [], None))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
           P.notify (Task (nid, "Detached transformation\n====================> Transformation: " ^
-                          String.concat " " (name :: args) ^ "\n", []))
+                          String.concat " " (name :: args) ^ "\n", [], None))
     else
       match any with
       | APn id ->
-          let s, list_loc = task_of_id d id show_full_context loc in
-          P.notify (Task (nid, s, list_loc))
+          let s, list_loc, goal_loc = task_of_id d id show_full_context loc in
+          P.notify (Task (nid, s, list_loc, goal_loc))
       | ATh t ->
-          P.notify (Task (nid, "Theory " ^ (theory_name t).Ident.id_string, []))
+          let th_id   = theory_name t in
+          let th_name = th_id.Ident.id_string in
+          let th_loc  = th_id.Ident.id_loc in
+          P.notify (Task (nid, "Theory " ^ th_name, [], th_loc))
       | APa pid ->
           let print_attrs = Debug.test_flag debug_attrs in
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let parid = pa.parent in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
-          let s, old_list_loc = task_of_id d parid show_full_context loc in
+          let s, old_list_loc, old_goal_loc =
+            task_of_id d parid show_full_context loc in
           let prover_text = s ^ "\n====================> Prover: " ^ name ^ "\n" in
           (* Display the result of the prover *)
           begin
@@ -903,29 +969,30 @@ end
                   let result_pr =
                     result ^ "\n\n" ^ "The prover did not return counterexamples."
                   in
-                  P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
+                  P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc))
                 else
                   begin
                     let result_pr =
                       result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
                     in
-                    let (source_result, list_loc) =
-                      create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc
+                    let (source_result, list_loc, goal_loc) =
+                      create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc old_goal_loc
                     in
-                    P.notify (Source_and_ce (source_result, list_loc));
-                    P.notify (Task (nid, prover_text ^ result_pr, old_list_loc))
+                    P.notify (Source_and_ce (source_result, list_loc, goal_loc));
+                    P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc))
                   end
-            | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc))
+            | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc))
           end
       | AFile f ->
-          P.notify (Task (nid, "File " ^ (basename (file_path f)), []))
+          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], None))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
           let parid = get_trans_parent d.cont.controller_session tid in
-          let s, list_loc = task_of_id d parid show_full_context loc in
+          let s, list_loc, goal_loc = task_of_id d parid show_full_context loc in
           P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
-                          String.concat " " (name :: args) ^ "\n", list_loc))
+                          String.concat " " (name :: args) ^ "\n",
+                          list_loc, goal_loc))
 
   (* -------------------- *)
 
@@ -1243,6 +1310,9 @@ end
     let d = get_server_data () in
     C.clean d.cont ~removed nid
 
+  let reset_proofs () =
+    let d = get_server_data () in
+    C.reset_proofs d.cont ~notification:(notify_change_proved d.cont) ~removed None
 
   let remove_node nid =
     let d = get_server_data () in
@@ -1276,6 +1346,20 @@ end
     Ident.Hid.clear th_to_node_ID;
     Hfile.clear file_to_node_ID
 
+  let read_and_send_files s =
+    let fs = Session_itp.get_files s in
+    Hfile.iter (fun _ f -> read_and_send (Session_itp.system_path s f)) fs
+
+  let notify_parsing_errors l =
+    List.iter
+         (function (loc,rel_loc,s) ->
+                   P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
+         l
+
+  (* Save the last parsing errors that occured. Report them when an invalid
+     command (transformation/etc) is entered before reloading. *)
+  let parsing_errors = ref []
+
   let reload_session () : unit =
     let d = get_server_data () in
     (* interrupt all running provers and unfocus before reload *)
@@ -1286,16 +1370,18 @@ end
     let l = reload_files d.cont
                          ~shape_version:(Some Termcode.current_shape_version)
     in
-    reset_and_send_the_whole_tree ();
     match l with
     | [] ->
-       (* TODO: try to restore the previous focus : focused_node := old_focus; *)
-       P.notify (Message (Information "Session refresh successful"))
+        (* TODO: try to restore the previous focus : focused_node := old_focus; *)
+        (* Only reset the tree when there is no errors (for efficiency of ide) *)
+        parsing_errors := [];
+        reset_and_send_the_whole_tree ();
+        P.notify (Message (Information "Session refresh successful"))
     | l ->
-       List.iter
-         (function (loc,rel_loc,s) ->
-                   P.notify (Message (Parse_Or_Type_Error(loc,rel_loc,s))))
-         l
+        parsing_errors := l;
+        (* Resend the files to the IDE on errors (for Emacs users) *)
+        read_and_send_files d.cont.controller_session;
+        notify_parsing_errors l
 
   let replay ~valid_only nid : unit =
     let d = get_server_data () in
@@ -1386,7 +1472,8 @@ end
      | Save_req | Check_need_saving_req | Reload_req
      | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
-     | Exit_req | Get_global_infos | Itp_communication.Unfocus_req -> true
+     | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
+     | Reset_proofs_req -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
@@ -1449,6 +1536,9 @@ end
        send_task nid b loc
     | Interrupt_req                ->
        C.interrupt ()
+    | Reset_proofs_req             ->
+       reset_proofs ();
+       session_needs_saving := true
     | Command_req (nid, cmd)       ->
        let snid = any_from_node_ID nid in
        begin
@@ -1509,8 +1599,8 @@ end
        begin
          match s with
          | "max_tasks" -> Controller_itp.set_session_max_tasks i
-         | "timelimit" -> Server_utils.set_session_timelimit i
-         | "memlimit" -> Server_utils.set_session_memlimit i
+         | "timelimit" -> Controller_itp.set_session_timelimit d.cont i
+         | "memlimit" -> Controller_itp.set_session_memlimit d.cont i
          | _ -> P.notify (Message (Error ("Unknown config parameter "^s)))
        end
     | Set_prover_policy(p,u)   ->
@@ -1524,6 +1614,14 @@ end
     (* Check that the request does not refer to obsolete node_ids *)
     if not (request_is_valid r) then
       begin
+        if !parsing_errors <> [] then begin
+          (* There were parsing errors and no reloads. *)
+          P.notify (Message (Error "Cannot handle this command while the \
+                                    parsing error is not resolved. You can try \
+                                    reloading the session or removing detached \
+                                    files."));
+          notify_parsing_errors !parsing_errors
+          end;
         (* These errors come from the client-server behavior of itp. They cannot
            be completely avoided and could be safely ignored.
            They are ignored if a debug flag is not added.

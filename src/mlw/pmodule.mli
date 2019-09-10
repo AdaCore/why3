@@ -37,9 +37,11 @@ val ns_find_prog_symbol : namespace -> string list -> prog_symbol
 
 val ns_find_its : namespace -> string list -> itysymbol
 val ns_find_pv  : namespace -> string list -> pvsymbol
-val ns_find_rs  : namespace -> string list -> rsymbol
 val ns_find_xs  : namespace -> string list -> xsymbol
 val ns_find_ns  : namespace -> string list -> namespace
+
+(* use this only on an export namespace, which cannot have overloaded symbols *)
+val ns_find_rs  : namespace -> string list -> rsymbol
 
 type overload =
   | FixedRes of ity (* t -> t -> ... -> T *)
@@ -112,6 +114,10 @@ val restore_path : ident -> string list * string * string list
    different modules, the first association is retained.
    If [id] is a module name, the third component is an empty list.
    Raises Not_found if the ident was never declared in/as a module. *)
+
+val restore_module_id : ident -> pmodule
+(** retrieves a module from a program symbol defined in it
+    Raises Not_found if the ident was never declared in/as a module. *)
 
 val restore_module : theory -> pmodule
 (** retrieves a module from its underlying theory

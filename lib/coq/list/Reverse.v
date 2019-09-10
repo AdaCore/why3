@@ -20,7 +20,7 @@ Require list.Mem.
 Require list.Append.
 
 (* Why3 goal *)
-Lemma reverse_def {a:Type} {a_WT:WhyType a} :
+Lemma reverse'def {a:Type} {a_WT:WhyType a} :
   forall (l:Init.Datatypes.list a),
   ((Lists.List.rev l) =
    match l with

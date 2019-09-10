@@ -13,6 +13,14 @@ RUN apt-get clean
 RUN wget https://github.com/ocaml/opam/releases/download/2.0.0/opam-2.0.0-x86_64-linux -O /usr/bin/opam && chmod 755 /usr/bin/opam
 
 # install provers
+## CVC4 1.7
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.7-x86_64-linux-opt
+RUN chmod a+x cvc4-1.7-x86_64-linux-opt
+RUN cp cvc4-1.7-x86_64-linux-opt /usr/local/bin/cvc4-1.7
+## CVC4 1.6
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.6-x86_64-linux-opt
+RUN chmod a+x cvc4-1.6-x86_64-linux-opt
+RUN cp cvc4-1.6-x86_64-linux-opt /usr/local/bin/cvc4-1.6
 ## CVC4 1.5
 RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.5-x86_64-linux-opt
 RUN chmod a+x cvc4-1.5-x86_64-linux-opt
@@ -21,10 +29,15 @@ RUN cp cvc4-1.5-x86_64-linux-opt /usr/local/bin/cvc4-1.5
 RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.4-x86_64-linux-opt
 RUN chmod a+x cvc4-1.4-x86_64-linux-opt
 RUN cp cvc4-1.4-x86_64-linux-opt /usr/local/bin/cvc4-1.4
-## Z3
+## Z3 4.6.0
 RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.6.0/z3-4.6.0-x64-debian-8.10.zip
 RUN unzip z3-4.6.0-x64-debian-8.10.zip
 RUN cp z3-4.6.0-x64-debian-8.10/bin/z3 /usr/local/bin/z3-4.6.0
+## Z3 4.8.4
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.8.4/z3-4.8.4.d6df51951f4c-x64-debian-8.11.zip
+RUN unzip z3-4.8.4.d6df51951f4c-x64-debian-8.11.zip
+RUN cp z3-4.8.4.d6df51951f4c-x64-debian-8.11/bin/z3 /usr/local/bin/z3-4.8.4
+
 
 # create user
 RUN adduser --disabled-password --gecos '' why3

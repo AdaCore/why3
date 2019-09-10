@@ -228,7 +228,13 @@ let rec print_term info defs fmt t = match t.t_node with
         | Number.ConstInt _ ->
             fprintf fmt "<num val=\"%a\">%a</num>"
               (Number.print number_format) c (print_ty info) (t_type t)
-        | _ -> Number.print number_format fmt c
+        | Number.ConstReal _ ->
+           match t.t_ty with
+           | None -> assert false (* impossible *)
+           | Some ty ->
+              if ty_equal ty ty_real then
+                Number.print number_format fmt c
+              else raise (UnsupportedTerm (t, "floating-point literal"))
       end
   | Tif (f, t1, t2) ->
       print_app print_const (print_term info defs) fmt ("HOL.If", [f; t1; t2])
@@ -333,7 +339,7 @@ let print_statement s pr id info fmt f =
 
 let print_equivalence_lemma info fmt (ls, ld) =
   let name = Ident.string_unique iprinter
-    ((id_unique iprinter ls.ls_name) ^ "_def") in
+    ((id_unique iprinter ls.ls_name) ^ "'def") in
   print_statement "lemma" (attrib "name" string) name info fmt (ls_defn_axiom ld)
 
 let print_fun_eqn s info defs fmt (ls, ld) =

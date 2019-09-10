@@ -27,14 +27,14 @@ Axiom uint64 : Type.
 Parameter uint64_WhyType : WhyType uint64.
 Existing Instance uint64_WhyType.
 
-Parameter uint64'int: uint64 -> Z.
+Parameter uint64'int: uint64 -> Numbers.BinNums.Z.
 
 Axiom uint64'axiom :
   forall (i:uint64),
   (0%Z <= (uint64'int i))%Z /\ ((uint64'int i) <= 18446744073709551615%Z)%Z.
 
 (* Why3 assumption *)
-Definition in_bounds (n:Z) : Prop :=
+Definition in_bounds (n:Numbers.BinNums.Z) : Prop :=
   (0%Z <= n)%Z /\ (n <= 18446744073709551615%Z)%Z.
 
 Axiom to_int_in_bounds : forall (n:uint64), in_bounds (uint64'int n).
@@ -50,12 +50,13 @@ Axiom t : Type.
 Parameter t_WhyType : WhyType t.
 Existing Instance t_WhyType.
 
-Parameter max: Z.
+Parameter max: Numbers.BinNums.Z.
 
-Parameter to_int: t -> Z.
+Parameter to_int: t -> Numbers.BinNums.Z.
 
 (* Why3 assumption *)
-Definition in_bounds1 (n:Z) : Prop := (0%Z <= n)%Z /\ (n <= max)%Z.
+Definition in_bounds1 (n:Numbers.BinNums.Z) : Prop :=
+  (0%Z <= n)%Z /\ (n <= max)%Z.
 
 Axiom to_int_in_bounds1 : forall (n:t), in_bounds1 (to_int n).
 
@@ -66,7 +67,7 @@ Parameter zero_unsigned1: t.
 
 Axiom zero_unsigned_is_zero1 : ((to_int zero_unsigned1) = 0%Z).
 
-Parameter radix: Z.
+Parameter radix: Numbers.BinNums.Z.
 
 Axiom radix_def : (radix = (max + 1%Z)%Z).
 
@@ -74,14 +75,14 @@ Axiom int32 : Type.
 Parameter int32_WhyType : WhyType int32.
 Existing Instance int32_WhyType.
 
-Parameter int32'int: int32 -> Z.
+Parameter int32'int: int32 -> Numbers.BinNums.Z.
 
 Axiom int32'axiom :
   forall (i:int32),
   ((-2147483648%Z)%Z <= (int32'int i))%Z /\ ((int32'int i) <= 2147483647%Z)%Z.
 
 (* Why3 assumption *)
-Definition in_bounds2 (n:Z) : Prop :=
+Definition in_bounds2 (n:Numbers.BinNums.Z) : Prop :=
   ((-2147483648%Z)%Z <= n)%Z /\ (n <= 2147483647%Z)%Z.
 
 Axiom to_int_in_bounds2 : forall (n:int32), in_bounds2 (int32'int n).
@@ -93,14 +94,15 @@ Axiom uint32 : Type.
 Parameter uint32_WhyType : WhyType uint32.
 Existing Instance uint32_WhyType.
 
-Parameter uint32'int: uint32 -> Z.
+Parameter uint32'int: uint32 -> Numbers.BinNums.Z.
 
 Axiom uint32'axiom :
   forall (i:uint32),
   (0%Z <= (uint32'int i))%Z /\ ((uint32'int i) <= 4294967295%Z)%Z.
 
 (* Why3 assumption *)
-Definition in_bounds3 (n:Z) : Prop := (0%Z <= n)%Z /\ (n <= 4294967295%Z)%Z.
+Definition in_bounds3 (n:Numbers.BinNums.Z) : Prop :=
+  (0%Z <= n)%Z /\ (n <= 4294967295%Z)%Z.
 
 Axiom to_int_in_bounds3 : forall (n:uint32), in_bounds3 (uint32'int n).
 
@@ -113,64 +115,69 @@ Axiom zero_unsigned_is_zero2 : ((uint32'int zero_unsigned2) = 0%Z).
 
 Parameter is_msb_set: uint32 -> Prop.
 
-Axiom is_msb_set_spec :
+Axiom is_msb_set'spec :
   forall (x:uint32),
-  (is_msb_set x) <-> (4294967295%Z < (2%Z * (uint32'int x))%Z)%Z.
+  is_msb_set x <-> (4294967295%Z < (2%Z * (uint32'int x))%Z)%Z.
 
 Axiom array : forall (a:Type), Type.
 Parameter array_WhyType :
   forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 
-Parameter elts: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z -> a.
+Parameter elts:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a.
 
-Parameter length: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z.
+Parameter length:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z.
 
 Axiom array'invariant :
   forall {a:Type} {a_WT:WhyType a},
   forall (self:array a), (0%Z <= (length self))%Z.
 
 (* Why3 assumption *)
-Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:array a) (i:Z) : a :=
-  (elts a1) i.
+Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:array a)
+    (i:Numbers.BinNums.Z) : a :=
+  elts a1 i.
 
 Parameter mixfix_lblsmnrb:
-  forall {a:Type} {a_WT:WhyType a}, (array a) -> Z -> a -> array a.
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
+  array a.
 
-Axiom mixfix_lblsmnrb_spec :
+Axiom mixfix_lblsmnrb'spec :
   forall {a:Type} {a_WT:WhyType a},
-  forall (a1:array a) (i:Z) (v:a),
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
   ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
   ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
 
-Parameter make: forall {a:Type} {a_WT:WhyType a}, Z -> a -> array a.
+Parameter make:
+  forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom make_spec :
+Axiom make'spec :
   forall {a:Type} {a_WT:WhyType a},
-  forall (n:Z) (v:a), (0%Z <= n)%Z ->
-  (forall (i:Z), ((0%Z <= i)%Z /\ (i < n)%Z) ->
+  forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
    ((mixfix_lbrb (make n v) i) = v)) /\
   ((length (make n v)) = n).
 
 (* Why3 assumption *)
-Definition in_us_bounds (n:Z) : Prop :=
+Definition in_us_bounds (n:Numbers.BinNums.Z) : Prop :=
   (0%Z <= n)%Z /\ (n <= 4294967295%Z)%Z.
 
 (* Why3 assumption *)
-Definition in_bounds4 (n:Z) : Prop :=
+Definition in_bounds4 (n:Numbers.BinNums.Z) : Prop :=
   ((-2147483648%Z)%Z <= n)%Z /\ (n <= 2147483647%Z)%Z.
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
+  | ref'mk : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Arguments mk_ref {a}.
+Arguments ref'mk {a}.
 
 (* Why3 assumption *)
 Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | mk_ref x => x
+  | ref'mk x => x
   end.
 
 Axiom zone : Type.
@@ -183,73 +190,83 @@ Axiom ptr : forall (a:Type), Type.
 Parameter ptr_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ptr a).
 Existing Instance ptr_WhyType.
 
-Parameter data: forall {a:Type} {a_WT:WhyType a}, (ptr a) -> array a.
+Parameter data: forall {a:Type} {a_WT:WhyType a}, ptr a -> array a.
 
-Parameter offset: forall {a:Type} {a_WT:WhyType a}, (ptr a) -> Z.
+Parameter offset:
+  forall {a:Type} {a_WT:WhyType a}, ptr a -> Numbers.BinNums.Z.
 
-Parameter min: forall {a:Type} {a_WT:WhyType a}, (ptr a) -> Z.
+Parameter min: forall {a:Type} {a_WT:WhyType a}, ptr a -> Numbers.BinNums.Z.
 
-Parameter max1: forall {a:Type} {a_WT:WhyType a}, (ptr a) -> Z.
+Parameter max1: forall {a:Type} {a_WT:WhyType a}, ptr a -> Numbers.BinNums.Z.
 
-Parameter zone1: forall {a:Type} {a_WT:WhyType a}, (ptr a) -> zone.
+Parameter zone1: forall {a:Type} {a_WT:WhyType a}, ptr a -> zone.
 
 (* Why3 assumption *)
-Definition plength {a:Type} {a_WT:WhyType a} (p:ptr a) : Z :=
+Definition plength {a:Type} {a_WT:WhyType a} (p:ptr a) : Numbers.BinNums.Z :=
   length (data p).
 
 (* Why3 assumption *)
-Definition pelts {a:Type} {a_WT:WhyType a} (p:ptr a) : Z -> a :=
+Definition pelts {a:Type} {a_WT:WhyType a} (p:ptr a) : Numbers.BinNums.Z -> a :=
   elts (data p).
 
-Parameter is_not_null: forall {a:Type} {a_WT:WhyType a}, (ptr a) -> Prop.
+Parameter is_not_null: forall {a:Type} {a_WT:WhyType a}, ptr a -> Prop.
 
-Axiom is_not_null_spec :
+Axiom is_not_null'spec :
   forall {a:Type} {a_WT:WhyType a},
-  forall (p:ptr a), (is_not_null p) <-> ~ ((zone1 p) = null_zone).
+  forall (p:ptr a), is_not_null p <-> ~ ((zone1 p) = null_zone).
 
 (* Why3 assumption *)
-Definition valid_ptr_shift {a:Type} {a_WT:WhyType a} (p:ptr a) (i:Z) : Prop :=
+Definition valid_ptr_shift {a:Type} {a_WT:WhyType a} (p:ptr a)
+    (i:Numbers.BinNums.Z) : Prop :=
   ((min p) <= ((offset p) + i)%Z)%Z /\ (((offset p) + i)%Z < (max1 p))%Z.
 
 (* Why3 assumption *)
-Definition valid {a:Type} {a_WT:WhyType a} (p:ptr a) (sz:Z) : Prop :=
-  (in_bounds4 sz) /\
-  ((0%Z <= sz)%Z /\
-   (((0%Z <= (min p))%Z /\ ((min p) <= (offset p))%Z) /\
-    ((((offset p) + sz)%Z <= (max1 p))%Z /\ ((max1 p) <= (plength p))%Z))).
+Definition valid {a:Type} {a_WT:WhyType a} (p:ptr a) (sz:Numbers.BinNums.Z) :
+    Prop :=
+  in_bounds4 sz /\
+  (0%Z <= sz)%Z /\
+  ((0%Z <= (min p))%Z /\ ((min p) <= (offset p))%Z) /\
+  (((offset p) + sz)%Z <= (max1 p))%Z /\ ((max1 p) <= (plength p))%Z.
 
 Axiom valid_itv_to_shift :
   forall {a:Type} {a_WT:WhyType a},
-  forall (p:ptr a) (sz:Z), (valid p sz) -> forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < sz)%Z) -> valid_ptr_shift p i.
+  forall (p:ptr a) (sz:Numbers.BinNums.Z), valid p sz ->
+  forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < sz)%Z ->
+  valid_ptr_shift p i.
 
 (* Why3 assumption *)
-Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:Z -> a) (a2:Z -> a) 
-    (l:Z) (u:Z) : Prop :=
-  forall (i:Z), ((l <= i)%Z /\ (i < u)%Z) -> ((a1 i) = (a2 i)).
+Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:Numbers.BinNums.Z -> a)
+    (a2:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z) :
+    Prop :=
+  forall (i:Numbers.BinNums.Z), (l <= i)%Z /\ (i < u)%Z -> ((a1 i) = (a2 i)).
 
 (* Why3 assumption *)
-Definition map_eq_sub_shift {a:Type} {a_WT:WhyType a} (x:Z -> a) (y:Z -> a)
-    (xi:Z) (yi:Z) (sz:Z) : Prop :=
-  forall (i:Z), ((0%Z <= i)%Z /\ (i < sz)%Z) ->
+Definition map_eq_sub_shift {a:Type} {a_WT:WhyType a}
+    (x:Numbers.BinNums.Z -> a) (y:Numbers.BinNums.Z -> a)
+    (xi:Numbers.BinNums.Z) (yi:Numbers.BinNums.Z) (sz:Numbers.BinNums.Z) :
+    Prop :=
+  forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < sz)%Z ->
   ((x (xi + i)%Z) = (y (yi + i)%Z)).
 
 Axiom map_eq_shift :
   forall {a:Type} {a_WT:WhyType a},
-  forall (x:Z -> a) (y:Z -> a) (xi:Z) (yi:Z) (sz:Z) (k:Z),
-  (map_eq_sub_shift x y xi yi sz) -> ((0%Z <= k)%Z /\ (k < sz)%Z) ->
+  forall (x:Numbers.BinNums.Z -> a) (y:Numbers.BinNums.Z -> a)
+    (xi:Numbers.BinNums.Z) (yi:Numbers.BinNums.Z) (sz:Numbers.BinNums.Z)
+    (k:Numbers.BinNums.Z),
+  map_eq_sub_shift x y xi yi sz -> (0%Z <= k)%Z /\ (k < sz)%Z ->
   ((x (xi + k)%Z) = (y (yi + k)%Z)).
 
 Axiom map_eq_shift_zero :
   forall {a:Type} {a_WT:WhyType a},
-  forall (x:Z -> a) (y:Z -> a) (n:Z) (m:Z),
-  (map_eq_sub_shift x y n n (m - n)%Z) -> map_eq_sub x y n m.
+  forall (x:Numbers.BinNums.Z -> a) (y:Numbers.BinNums.Z -> a)
+    (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z),
+  map_eq_sub_shift x y n n (m - n)%Z -> map_eq_sub x y n m.
 
 Axiom int64 : Type.
 Parameter int64_WhyType : WhyType int64.
 Existing Instance int64_WhyType.
 
-Parameter int64'int: int64 -> Z.
+Parameter int64'int: int64 -> Numbers.BinNums.Z.
 
 Axiom int64'axiom :
   forall (i:int64),
@@ -257,7 +274,7 @@ Axiom int64'axiom :
   ((int64'int i) <= 9223372036854775807%Z)%Z.
 
 (* Why3 assumption *)
-Definition in_bounds5 (n:Z) : Prop :=
+Definition in_bounds5 (n:Numbers.BinNums.Z) : Prop :=
   ((-9223372036854775808%Z)%Z <= n)%Z /\ (n <= 9223372036854775807%Z)%Z.
 
 Axiom to_int_in_bounds4 : forall (n:int64), in_bounds5 (int64'int n).
@@ -266,7 +283,7 @@ Axiom extensionality4 :
   forall (x:int64) (y:int64), ((int64'int x) = (int64'int y)) -> (x = y).
 
 (* Why3 assumption *)
-Definition in_bounds6 (n:Z) : Prop :=
+Definition in_bounds6 (n:Numbers.BinNums.Z) : Prop :=
   (0%Z <= n)%Z /\ (n <= 18446744073709551615%Z)%Z.
 
 Axiom to_int_in_bounds5 : forall (n:uint64), in_bounds6 (uint64'int n).
@@ -280,13 +297,13 @@ Axiom zero_unsigned_is_zero3 : ((uint64'int zero_unsigned3) = 0%Z).
 
 Parameter uint64_max: uint64.
 
-Axiom uint64_max_def : ((uint64'int uint64_max) = 18446744073709551615%Z).
+Axiom uint64_max'def : ((uint64'int uint64_max) = 18446744073709551615%Z).
 
 Parameter is_msb_set1: uint64 -> Prop.
 
-Axiom is_msb_set_spec1 :
+Axiom is_msb_set'spec1 :
   forall (x:uint64),
-  (is_msb_set1 x) <-> (18446744073709551615%Z < (2%Z * (uint64'int x))%Z)%Z.
+  is_msb_set1 x <-> (18446744073709551615%Z < (2%Z * (uint64'int x))%Z)%Z.
 
 (* Why3 assumption *)
 Definition limb := uint64.
@@ -297,17 +314,20 @@ Definition t1 := ptr uint64.
 Axiom limb_max_bound : (1%Z <= 18446744073709551615%Z)%Z.
 
 Axiom prod_compat_strict_r :
-  forall (a:Z) (b:Z) (c:Z), ((0%Z <= a)%Z /\ (a < b)%Z) -> (0%Z < c)%Z ->
-  ((c * a)%Z < (c * b)%Z)%Z.
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  (0%Z <= a)%Z /\ (a < b)%Z -> (0%Z < c)%Z -> ((c * a)%Z < (c * b)%Z)%Z.
 
 Axiom prod_compat_r :
-  forall (a:Z) (b:Z) (c:Z), ((0%Z <= a)%Z /\ (a <= b)%Z) -> (0%Z <= c)%Z ->
-  ((c * a)%Z <= (c * b)%Z)%Z.
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  (0%Z <= a)%Z /\ (a <= b)%Z -> (0%Z <= c)%Z -> ((c * a)%Z <= (c * b)%Z)%Z.
 
-Parameter value_sub: (Z -> uint64) -> Z -> Z -> Z.
+Parameter value_sub:
+  (Numbers.BinNums.Z -> uint64) -> Numbers.BinNums.Z -> Numbers.BinNums.Z ->
+  Numbers.BinNums.Z.
 
-Axiom value_sub_def :
-  forall (x:Z -> uint64) (n:Z) (m:Z),
+Axiom value_sub'def :
+  forall (x:Numbers.BinNums.Z -> uint64) (n:Numbers.BinNums.Z)
+    (m:Numbers.BinNums.Z),
   ((n < m)%Z ->
    ((value_sub x n m) =
     ((uint64'int (x n)) +
@@ -315,85 +335,105 @@ Axiom value_sub_def :
   (~ (n < m)%Z -> ((value_sub x n m) = 0%Z)).
 
 Axiom value_sub_frame :
-  forall (x:Z -> uint64) (y:Z -> uint64) (n:Z) (m:Z), (map_eq_sub x y n m) ->
-  ((value_sub x n m) = (value_sub y n m)).
+  forall (x:Numbers.BinNums.Z -> uint64) (y:Numbers.BinNums.Z -> uint64)
+    (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z),
+  map_eq_sub x y n m -> ((value_sub x n m) = (value_sub y n m)).
 
 Axiom value_sub_frame_shift :
-  forall (x:Z -> uint64) (y:Z -> uint64) (xi:Z) (yi:Z) (sz:Z),
-  (map_eq_sub_shift x y xi yi sz) ->
+  forall (x:Numbers.BinNums.Z -> uint64) (y:Numbers.BinNums.Z -> uint64)
+    (xi:Numbers.BinNums.Z) (yi:Numbers.BinNums.Z) (sz:Numbers.BinNums.Z),
+  map_eq_sub_shift x y xi yi sz ->
   ((value_sub x xi (xi + sz)%Z) = (value_sub y yi (yi + sz)%Z)).
 
 Axiom value_sub_tail :
-  forall (x:Z -> uint64) (n:Z) (m:Z), (n <= m)%Z ->
+  forall (x:Numbers.BinNums.Z -> uint64) (n:Numbers.BinNums.Z)
+    (m:Numbers.BinNums.Z),
+  (n <= m)%Z ->
   ((value_sub x n (m + 1%Z)%Z) =
    ((value_sub x n m) +
     ((uint64'int (x m)) *
      (int.Power.power (18446744073709551615%Z + 1%Z)%Z (m - n)%Z))%Z)%Z).
 
 Axiom value_sub_concat :
-  forall (x:Z -> uint64) (n:Z) (m:Z) (l:Z), ((n <= m)%Z /\ (m <= l)%Z) ->
+  forall (x:Numbers.BinNums.Z -> uint64) (n:Numbers.BinNums.Z)
+    (m:Numbers.BinNums.Z) (l:Numbers.BinNums.Z),
+  (n <= m)%Z /\ (m <= l)%Z ->
   ((value_sub x n l) =
    ((value_sub x n m) +
     ((value_sub x m l) *
      (int.Power.power (18446744073709551615%Z + 1%Z)%Z (m - n)%Z))%Z)%Z).
 
 Axiom value_sub_head :
-  forall (x:Z -> uint64) (n:Z) (m:Z), (n < m)%Z ->
+  forall (x:Numbers.BinNums.Z -> uint64) (n:Numbers.BinNums.Z)
+    (m:Numbers.BinNums.Z),
+  (n < m)%Z ->
   ((value_sub x n m) =
    ((uint64'int (x n)) +
     ((18446744073709551615%Z + 1%Z)%Z * (value_sub x (n + 1%Z)%Z m))%Z)%Z).
 
 Axiom value_sub_update :
-  forall (x:Z -> uint64) (i:Z) (n:Z) (m:Z) (v:uint64),
-  ((n <= i)%Z /\ (i < m)%Z) ->
+  forall (x:Numbers.BinNums.Z -> uint64) (i:Numbers.BinNums.Z)
+    (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z) (v:uint64),
+  (n <= i)%Z /\ (i < m)%Z ->
   ((value_sub (map.Map.set x i v) n m) =
    ((value_sub x n m) +
     ((int.Power.power (18446744073709551615%Z + 1%Z)%Z (i - n)%Z) *
      ((uint64'int v) - (uint64'int (x i)))%Z)%Z)%Z).
 
 Axiom value_zero :
-  forall (x:Z -> uint64) (n:Z) (m:Z),
-  (map_eq_sub x (map.Const.const zero_unsigned3 : Z -> uint64) n m) ->
-  ((value_sub x n m) = 0%Z).
+  forall (x:Numbers.BinNums.Z -> uint64) (n:Numbers.BinNums.Z)
+    (m:Numbers.BinNums.Z),
+  map_eq_sub x (map.Const.const zero_unsigned3 : Numbers.BinNums.Z -> uint64)
+  n m -> ((value_sub x n m) = 0%Z).
 
 Axiom value_sub_update_no_change :
-  forall (x:Z -> uint64) (i:Z) (n:Z) (m:Z) (v:uint64), (n <= m)%Z ->
-  ((i < n)%Z \/ (m <= i)%Z) ->
+  forall (x:Numbers.BinNums.Z -> uint64) (i:Numbers.BinNums.Z)
+    (n:Numbers.BinNums.Z) (m:Numbers.BinNums.Z) (v:uint64),
+  (n <= m)%Z -> (i < n)%Z \/ (m <= i)%Z ->
   ((value_sub x n m) = (value_sub (map.Map.set x i v) n m)).
 
 Axiom value_sub_shift_no_change :
-  forall (x:Z -> uint64) (ofs:Z) (i:Z) (sz:Z) (v:uint64),
-  ((i < 0%Z)%Z \/ (sz <= i)%Z) -> (0%Z <= sz)%Z ->
+  forall (x:Numbers.BinNums.Z -> uint64) (ofs:Numbers.BinNums.Z)
+    (i:Numbers.BinNums.Z) (sz:Numbers.BinNums.Z) (v:uint64),
+  (i < 0%Z)%Z \/ (sz <= i)%Z -> (0%Z <= sz)%Z ->
   ((value_sub x ofs (ofs + sz)%Z) =
    (value_sub (map.Map.set x (ofs + i)%Z v) ofs (ofs + sz)%Z)).
 
 Axiom value_sub_lower_bound :
-  forall (x:Z -> uint64) (x1:Z) (x2:Z), (0%Z <= (value_sub x x1 x2))%Z.
+  forall (x:Numbers.BinNums.Z -> uint64) (x1:Numbers.BinNums.Z)
+    (x2:Numbers.BinNums.Z),
+  (0%Z <= (value_sub x x1 x2))%Z.
 
 Axiom value_sub_upper_bound :
-  forall (x:Z -> uint64) (x1:Z) (x2:Z), (x1 <= x2)%Z ->
+  forall (x:Numbers.BinNums.Z -> uint64) (x1:Numbers.BinNums.Z)
+    (x2:Numbers.BinNums.Z),
+  (x1 <= x2)%Z ->
   ((value_sub x x1 x2) <
    (int.Power.power (18446744073709551615%Z + 1%Z)%Z (x2 - x1)%Z))%Z.
 
 Axiom value_sub_lower_bound_tight :
-  forall (x:Z -> uint64) (x1:Z) (x2:Z), (x1 < x2)%Z ->
+  forall (x:Numbers.BinNums.Z -> uint64) (x1:Numbers.BinNums.Z)
+    (x2:Numbers.BinNums.Z),
+  (x1 < x2)%Z ->
   (((int.Power.power (18446744073709551615%Z + 1%Z)%Z ((x2 - x1)%Z - 1%Z)%Z)
     * (uint64'int (x (x2 - 1%Z)%Z)))%Z
    <= (value_sub x x1 x2))%Z.
 
 Axiom value_sub_upper_bound_tight :
-  forall (x:Z -> uint64) (x1:Z) (x2:Z), (x1 < x2)%Z ->
+  forall (x:Numbers.BinNums.Z -> uint64) (x1:Numbers.BinNums.Z)
+    (x2:Numbers.BinNums.Z),
+  (x1 < x2)%Z ->
   ((value_sub x x1 x2) <
    ((int.Power.power (18446744073709551615%Z + 1%Z)%Z ((x2 - x1)%Z - 1%Z)%Z)
     * ((uint64'int (x (x2 - 1%Z)%Z)) + 1%Z)%Z)%Z)%Z.
 
 (* Why3 assumption *)
-Definition value (x:ptr uint64) (sz:Z) : Z :=
+Definition value (x:ptr uint64) (sz:Numbers.BinNums.Z) : Numbers.BinNums.Z :=
   value_sub (pelts x) (offset x) ((offset x) + sz)%Z.
 
 Axiom value_concat :
   forall (x:ptr uint64) (n:int32) (m:int32),
-  ((0%Z <= (int32'int n))%Z /\ ((int32'int n) <= (int32'int m))%Z) ->
+  (0%Z <= (int32'int n))%Z /\ ((int32'int n) <= (int32'int m))%Z ->
   ((value x (int32'int m)) =
    ((value x (int32'int n)) +
     ((int.Power.power (18446744073709551615%Z + 1%Z)%Z (int32'int n)) *
@@ -401,10 +441,12 @@ Axiom value_concat :
       ((offset x) + (int32'int m))%Z))%Z)%Z).
 
 (* Why3 assumption *)
-Definition pow2 (k:Z) : R := (Reals.Rpower.Rpower 2%R (BuiltIn.IZR k)).
+Definition pow2 (k:Numbers.BinNums.Z) : Reals.Rdefinitions.R :=
+  Reals.Rpower.Rpower 2%R (BuiltIn.IZR k).
 
 (* Why3 assumption *)
-Definition trunc_at (x:R) (k:Z) : R :=
+Definition trunc_at (x:Reals.Rdefinitions.R) (k:Numbers.BinNums.Z) :
+    Reals.Rdefinitions.R :=
   ((BuiltIn.IZR (real.Truncate.floor (x * (pow2 (-k)%Z))%R)) * (pow2 k))%R.
 
 Axiom fxp : Type.
@@ -413,9 +455,9 @@ Existing Instance fxp_WhyType.
 
 Parameter ival: fxp -> uint64.
 
-Parameter rval: fxp -> R.
+Parameter rval: fxp -> Reals.Rdefinitions.R.
 
-Parameter iexp: fxp -> Z.
+Parameter iexp: fxp -> Numbers.BinNums.Z.
 
 Axiom fxp'invariant :
   forall (self:fxp),
@@ -425,50 +467,54 @@ Axiom fxp'invariant :
     (real.Truncate.floor ((rval self) * (pow2 (-(iexp self))%Z))%R)
     (18446744073709551615%Z + 1%Z)%Z)).
 
+Axiom trunc_lower_bound :
+  forall (x:Reals.Rdefinitions.R) (k:Numbers.BinNums.Z),
+  (x < ((trunc_at x k) + (pow2 k))%R)%R.
+
 Parameter rp: ptr uint64.
 
 Parameter a0: uint64.
 
-Axiom H : valid rp 1%Z.
+Axiom Requires : valid rp 1%Z.
 
-Axiom H1 : (4611686018427387904%Z <= (uint64'int a0))%Z.
+Axiom Requires1 : (4611686018427387904%Z <= (uint64'int a0))%Z.
 
 Parameter a: fxp.
 
-Axiom H2 : ((ival a) = a0).
+Axiom H : ((ival a) = a0).
 
-Axiom H3 : ((rval a) = ((BuiltIn.IZR (uint64'int a0)) * (pow2 (-64%Z)%Z))%R).
+Axiom H1 : ((rval a) = ((BuiltIn.IZR (uint64'int a0)) * (pow2 (-64%Z)%Z))%R).
 
-Axiom H4 : ((iexp a) = (-64%Z)%Z).
+Axiom H2 : ((iexp a) = (-64%Z)%Z).
 
-Axiom H5 :
-  ((025 / 100)%R <= (rval a))%R /\
+Axiom Assert :
+  ((25 / 100)%R <= (rval a))%R /\
   ((rval a) <= (18446744073709551615 / 18446744073709551616)%R)%R.
 
-Axiom H6 : (0%R < (rval a))%R.
+Axiom Assert1 : (0%R < (rval a))%R.
 
 Parameter x0: fxp.
 
-Axiom H7 : ((iexp x0) = (-8%Z)%Z).
+Axiom Ensures : ((iexp x0) = (-8%Z)%Z).
 
-Axiom H8 : (256%Z <= (uint64'int (ival x0)))%Z.
+Axiom H3 : (256%Z <= (uint64'int (ival x0)))%Z.
 
-Axiom H9 : ((uint64'int (ival x0)) <= 511%Z)%Z.
+Axiom H4 : ((uint64'int (ival x0)) <= 511%Z)%Z.
 
-Axiom H10 : (1%R <= (rval x0))%R.
+Axiom H5 : (1%R <= (rval x0))%R.
 
-Axiom H11 : ((rval x0) <= 2%R)%R.
+Axiom H6 : ((rval x0) <= 2%R)%R.
 
-Axiom H12 :
+Axiom Ensures1 :
   let rsa := (1%R / (Reals.R_sqrt.sqrt (rval a)))%R in
   let e0 := (((rval x0) - rsa)%R / rsa)%R in
-  ((-(000281 / 100000)%R)%R <= e0)%R /\ (e0 <= (0002655 / 1000000)%R)%R.
+  ((-(00281 / 100000)%R)%R <= e0)%R /\ (e0 <= (002655 / 1000000)%R)%R.
 
 Parameter a1: fxp.
 
-Axiom H13 : ((rval a1) = (trunc_at (rval a) ((iexp a) + 31%Z)%Z)).
+Axiom Ensures2 : ((rval a1) = (trunc_at (rval a) ((iexp a) + 31%Z)%Z)).
 
-Axiom H14 : ((iexp a1) = ((iexp a) + 31%Z)%Z).
+Axiom Ensures3 : ((iexp a1) = ((iexp a) + 31%Z)%Z).
 
 Parameter o: fxp.
 
@@ -476,11 +522,11 @@ Parameter rliteral: uint64.
 
 Axiom rliteral_axiom : ((uint64'int rliteral) = 196608%Z).
 
-Axiom H15 : ((ival o) = rliteral).
+Axiom H7 : ((ival o) = rliteral).
 
-Axiom H16 : ((rval o) = ((BuiltIn.IZR 196608%Z) * (pow2 (-49%Z)%Z))%R).
+Axiom H8 : ((rval o) = ((BuiltIn.IZR 196608%Z) * (pow2 (-49%Z)%Z))%R).
 
-Axiom H17 : ((iexp o) = (-49%Z)%Z).
+Axiom H9 : ((iexp o) = (-49%Z)%Z).
 
 Parameter o1: fxp.
 
@@ -488,75 +534,75 @@ Parameter rliteral1: uint64.
 
 Axiom rliteral_axiom1 : ((uint64'int rliteral1) = 562949953421312%Z).
 
-Axiom H18 : ((ival o1) = rliteral1).
+Axiom H10 : ((ival o1) = rliteral1).
 
-Axiom H19 :
+Axiom H11 :
   ((rval o1) = ((BuiltIn.IZR 562949953421312%Z) * (pow2 (-49%Z)%Z))%R).
 
-Axiom H20 : ((iexp o1) = (-49%Z)%Z).
+Axiom H12 : ((iexp o1) = (-49%Z)%Z).
 
 Parameter m1: fxp.
 
-Axiom H21 : ((rval m1) = ((rval o1) - (rval o))%R).
+Axiom Ensures4 : ((rval m1) = ((rval o1) - (rval o))%R).
 
-Axiom H22 : ((iexp m1) = (iexp o1)).
+Axiom Ensures5 : ((iexp m1) = (iexp o1)).
 
 Parameter o2: fxp.
 
-Axiom H23 : ((rval o2) = ((rval x0) * (rval x0))%R).
+Axiom Ensures6 : ((rval o2) = ((rval x0) * (rval x0))%R).
 
-Axiom H24 : ((iexp o2) = ((iexp x0) + (iexp x0))%Z).
+Axiom Ensures7 : ((iexp o2) = ((iexp x0) + (iexp x0))%Z).
 
 Parameter o3: fxp.
 
-Axiom H25 : ((rval o3) = ((rval o2) * (rval a1))%R).
+Axiom Ensures8 : ((rval o3) = ((rval o2) * (rval a1))%R).
 
-Axiom H26 : ((iexp o3) = ((iexp o2) + (iexp a1))%Z).
+Axiom Ensures9 : ((iexp o3) = ((iexp o2) + (iexp a1))%Z).
 
 Parameter t1': fxp.
 
-Axiom H27 : ((rval t1') = ((rval m1) - (rval o3))%R).
+Axiom Ensures10 : ((rval t1') = ((rval m1) - (rval o3))%R).
 
-Axiom H28 : ((iexp t1') = (iexp m1)).
+Axiom Ensures11 : ((iexp t1') = (iexp m1)).
 
 Parameter t11: fxp.
 
-Axiom H29 : ((rval t11) = (trunc_at (rval t1') ((iexp t1') + 16%Z)%Z)).
+Axiom Ensures12 : ((rval t11) = (trunc_at (rval t1') ((iexp t1') + 16%Z)%Z)).
 
-Axiom H30 : ((iexp t11) = ((iexp t1') + 16%Z)%Z).
+Axiom Ensures13 : ((iexp t11) = ((iexp t1') + 16%Z)%Z).
 
 Parameter o4: fxp.
 
-Axiom H31 : ((rval o4) = ((rval x0) * (rval t11))%R).
+Axiom Ensures14 : ((rval o4) = ((rval x0) * (rval t11))%R).
 
-Axiom H32 : ((iexp o4) = ((iexp x0) + (iexp t11))%Z).
+Axiom Ensures15 : ((iexp o4) = ((iexp x0) + (iexp t11))%Z).
 
 Parameter o5: fxp.
 
-Axiom H33 :
+Axiom Ensures16 :
   ((rval o5) =
    (trunc_at ((rval o4) * (pow2 (-1%Z)%Z))%R (((iexp o4) + 18%Z)%Z - 1%Z)%Z)).
 
-Axiom H34 : ((iexp o5) = (((iexp o4) + 18%Z)%Z - 1%Z)%Z).
+Axiom Ensures17 : ((iexp o5) = (((iexp o4) + 18%Z)%Z - 1%Z)%Z).
 
 Parameter o6: fxp.
 
-Axiom H35 : ((rval o6) = (rval x0)).
+Axiom Ensures18 : ((rval o6) = (rval x0)).
 
-Axiom H36 : ((iexp o6) = ((iexp x0) - 16%Z)%Z).
+Axiom Ensures19 : ((iexp o6) = ((iexp x0) - 16%Z)%Z).
 
 Parameter x1: fxp.
 
-Axiom H37 : ((rval x1) = ((rval o6) + (rval o5))%R).
+Axiom Ensures20 : ((rval x1) = ((rval o6) + (rval o5))%R).
 
-Axiom H38 : ((iexp x1) = (iexp o6)).
+Axiom Ensures21 : ((iexp x1) = (iexp o6)).
 
-Axiom H39 :
-  (((((rval x0) + (((rval x0) * (rval t1'))%R * (05 / 10)%R)%R)%R -
+Axiom Assert2 :
+  (((((rval x0) + (((rval x0) * (rval t1'))%R * (5 / 10)%R)%R)%R -
      (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R
     / (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R
    =
-   ((-(05 / 10)%R)%R *
+   ((-(5 / 10)%R)%R *
     ((((((rval x0) - (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R /
         (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R
        *
@@ -583,18 +629,18 @@ Axiom H39 :
 
 Parameter a2: fxp.
 
-Axiom H40 : ((rval a2) = (trunc_at (rval a) ((iexp a) + 24%Z)%Z)).
+Axiom Ensures22 : ((rval a2) = (trunc_at (rval a) ((iexp a) + 24%Z)%Z)).
 
-Axiom H41 : ((iexp a2) = ((iexp a) + 24%Z)%Z).
+Axiom Ensures23 : ((iexp a2) = ((iexp a) + 24%Z)%Z).
 
 Parameter u1: fxp.
 
-Axiom H42 : ((rval u1) = ((rval x1) * (rval a2))%R).
+Axiom Ensures24 : ((rval u1) = ((rval x1) * (rval a2))%R).
 
-Axiom H43 : ((iexp u1) = ((iexp x1) + (iexp a2))%Z).
+Axiom Ensures25 : ((iexp u1) = ((iexp x1) + (iexp a2))%Z).
 
 (* Why3 goal *)
-Theorem VC_sqrt1 :
+Theorem sqrt1'VC :
   ((((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
     (Reals.R_sqrt.sqrt (rval a)))%R
    =
@@ -604,12 +650,11 @@ Theorem VC_sqrt1 :
      * (1%R + (((rval a2) - (rval a))%R / (rval a))%R)%R)%R
     - 1%R)%R).
 Proof.
-rewrite H42.
+rewrite Ensures24.
 set (sa := sqrt (rval a)).
 replace (rval a) with (sa^2)%R.
 field.
-apply Rgt_not_eq, sqrt_lt_R0, H6.
+apply Rgt_not_eq, sqrt_lt_R0, Assert1.
 rewrite <- Rsqr_pow2.
-apply Rsqr_sqrt, Rlt_le, H6.
+apply Rsqr_sqrt, Rlt_le, Assert1.
 Qed.
-

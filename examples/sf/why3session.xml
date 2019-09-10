@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.4" timelimit="6" steplimit="0" memlimit="1000"/>
-<file name="../sf.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="sf.mlw"/>
 <theory name="HoareLogic" proved="true">
- <goal name="VC slow_subtraction" expl="VC for slow_subtraction" proved="true">
+ <goal name="slow_subtraction&#39;VC" expl="VC for slow_subtraction" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
- <goal name="VC reduce_to_zero" expl="VC for reduce_to_zero" proved="true">
+ <goal name="reduce_to_zero&#39;VC" expl="VC for reduce_to_zero" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="VC slow_addition" expl="VC for slow_addition" proved="true">
+ <goal name="slow_addition&#39;VC" expl="VC for slow_addition" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
  <goal name="even_noneg" proved="true">
@@ -37,21 +38,21 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC parity" expl="VC for parity" proved="true">
+ <goal name="parity&#39;VC" expl="VC for parity" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="58"/></proof>
  </goal>
- <goal name="VC sqrt" expl="VC for sqrt" proved="true">
+ <goal name="sqrt&#39;VC" expl="VC for sqrt" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
  </goal>
- <goal name="VC factorial" expl="VC for factorial" proved="true">
+ <goal name="factorial&#39;VC" expl="VC for factorial" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="29"/></proof>
  </goal>
 </theory>
 <theory name="MoreHoareLogic" proved="true">
- <goal name="VC list_sum" expl="VC for list_sum" proved="true">
+ <goal name="list_sum&#39;VC" expl="VC for list_sum" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="124"/></proof>
  </goal>
- <goal name="VC list_member" expl="VC for list_member" proved="true">
+ <goal name="list_member&#39;VC" expl="VC for list_member" proved="true">
  <proof prover="1"><result status="valid" time="0.12" steps="814"/></proof>
  </goal>
 </theory>

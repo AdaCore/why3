@@ -102,10 +102,15 @@ val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> contr
 (** creates a controller for the given session.
     The config and env is used to load the drivers for the provers. *)
 
-
 val set_session_max_tasks : int -> unit
 (** sets the maximum number of proof tasks that can be running at the
     same time. Initially set to 1. *)
+
+val set_session_memlimit: controller -> int -> unit
+(** sets the default memlimit for proof attempts *)
+
+val set_session_timelimit: controller -> int -> unit
+(** sets the default timelimit for proof attempts *)
 
 val set_session_prover_upgrade_policy :
   controller -> Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit
@@ -117,7 +122,8 @@ val print_session : Format.formatter -> controller -> unit
 
 exception Errors_list of exn list
 
-val reload_files : controller -> shape_version:int option -> bool * bool
+val reload_files : ?hard_reload:bool -> controller ->
+  shape_version:int option -> bool * bool
 (** [reload_files] returns a pair [(o,d)]: [o] true means there are
     obsolete goals, [d] means there are missed objects (goals,
     transformations, theories or files) that are now detached in the
@@ -170,6 +176,8 @@ val reload_files : controller -> shape_version:int option -> bool * bool
       proof attempts and transformations, but no task is associated to
       it, neither to its subgoals.
 
+  When the option [hard_reload] is true (false by default), libraries and
+  drivers are also reloaded.
 
  *)
 
@@ -239,13 +247,13 @@ val schedule_edition :
     session).  *)
 
 val prepare_edition :
-  controller -> ?file:string -> proofNodeID -> Whyconf.prover ->
+  controller -> ?file:Sysutil.file_path -> proofNodeID -> Whyconf.prover ->
   notification:notifier -> proofAttemptID * string * Call_provers.prover_result option
 (** [prepare_edition c ?file id pr] prepare for editing the proof of
-    node [id] with prover [pr]. The editor is not launched. The result
-    is [(pid,name,res)] where [pid] is the node id the proof_attempt,
-    [name] is the name of the file to edit, made relative to the
-    session directory, and [res] is the former result if any. *)
+   node [id] with prover [pr]. The editor is not launched. The result
+   is [(pid,name,res)] where [pid] is the node id the proof_attempt,
+   [name] is the system-dependent absolute path of the file to edit,
+   and [res] is the former result if any. *)
 
 exception TransAlreadyExists of string * string
 exception GoalNodeDetached of proofNodeID
@@ -282,6 +290,14 @@ val clean: controller -> removed:notifier -> any option -> unit
     goals, that are either obsolete or not valid. The [removed]
     notifier is called on each removed node.
     On None, clean is done on the whole session. *)
+
+val reset_proofs:
+  controller -> removed:notifier -> notification:notifier ->
+    any option -> unit
+(** Remove each proof attempt or transformation that are below proved
+    goals. The [removed] notifier is called on each removed node.
+    On None, clean is done on the whole session. *)
+
 
 val mark_as_obsolete:
   notification:notifier ->

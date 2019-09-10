@@ -283,7 +283,7 @@ let init_cont () =
       false, Session_itp.load_session session_dir
     else begin
       if not (Sys.file_exists session_dir) then Unix.mkdir session_dir 0o700;
-      true, (Session_itp.empty_session session_dir, None)
+      true, (Session_itp.empty_session ~shape_version:None session_dir, None)
     end
   in
   let c = Controller_itp.create_controller Gnat_config.config Gnat_config.env session in
@@ -324,7 +324,7 @@ let init_cont () =
       let abs_file = Session_itp.system_path ses file in
       (if abs_file != Gnat_config.filename then
          (* rename_file takes absolute filenames *)
-         let (_: string list * string list) =
+         let (_: Sysutil.file_path * Sysutil.file_path) =
            Session_itp.rename_file ses abs_file Gnat_config.filename in
          ());
       try
@@ -894,7 +894,8 @@ let run_goal ?save_to ?limit ~callback c prover g =
       match old_file with
       | None ->
         let check = get_objective g in
-        let new_file = Gnat_manual.create_prover_file c g check prover in
+        let new_file = Sysutil.system_independent_path_of_file
+            (Gnat_manual.create_prover_file c g check prover) in
         let _paid, _file, _ores = C.prepare_edition c ~file:new_file
           g prover ~notification in
         C.schedule_proof_attempt ?save_to ~limit:Call_provers.empty_limit

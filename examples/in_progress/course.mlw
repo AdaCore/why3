@@ -30,7 +30,7 @@ module M
 
 val alloc : ref first_free_addr
 
-val new_pointer (tt:unit) : pointer writes { alloc }
+val new_pointer (_tt:unit) : pointer writes { alloc }
   ensures { !alloc = old !alloc + 1 /\ result = old !alloc }
 
 (*

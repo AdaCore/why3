@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="6">
+<why3session shape_version="8">
 <prover id="2" name="Z3" version="3.2" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="vstte10_queens.mlw"/>
+<path name=".."/><path name="vstte10_queens.mlw"/>
 <theory name="NQueens" proved="true">
  <goal name="eq_board_set" proved="true">
  <proof prover="4"><result status="valid" time="0.00" steps="15"/></proof>
@@ -36,7 +35,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
   <goal name="VC bt_queens.1" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.01"/></proof>
+  <proof prover="3"><result status="valid" time="0.01" steps="4427"/></proof>
   </goal>
   <goal name="VC bt_queens.2" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
@@ -51,10 +50,10 @@
   <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="VC bt_queens.6" expl="precondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.16"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.16" steps="25411"/></proof>
   </goal>
   <goal name="VC bt_queens.7" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.08"/></proof>
+  <proof prover="3"><result status="valid" time="0.08" steps="15637"/></proof>
   </goal>
   <goal name="VC bt_queens.8" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.06" steps="129"/></proof>
@@ -63,13 +62,13 @@
   <proof prover="4"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
   <goal name="VC bt_queens.10" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="8003"/></proof>
   </goal>
   <goal name="VC bt_queens.11" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.16" steps="278"/></proof>
   </goal>
   <goal name="VC bt_queens.12" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.00"/></proof>
+  <proof prover="3"><result status="valid" time="0.00" steps="3877"/></proof>
   </goal>
   <goal name="VC bt_queens.13" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="28"/></proof>
@@ -97,16 +96,16 @@
 </theory>
 <theory name="NQueens63" proved="true">
  <goal name="VC check_is_consistent" expl="VC for check_is_consistent" proved="true">
- <proof prover="4"><result status="valid" time="0.36" steps="1210"/></proof>
+ <proof prover="4"><result status="valid" time="0.18" steps="606"/></proof>
  </goal>
  <goal name="VC count_bt_queens" expl="VC for count_bt_queens" proved="true">
- <proof prover="4"><result status="valid" time="4.08" steps="3587"/></proof>
+ <proof prover="4"><result status="valid" time="1.71" steps="1875"/></proof>
  </goal>
  <goal name="VC count_queens" expl="VC for count_queens" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
  </goal>
  <goal name="VC test_count_8" expl="VC for test_count_8" proved="true">
- <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
 </theory>
 </file>

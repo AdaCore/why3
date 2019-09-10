@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="bag.mlw"/>
+<path name=".."/><path name="bag.mlw"/>
 <theory name="BagSpec" proved="true">
  <goal name="VC t" expl="VC for t" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
@@ -42,7 +41,7 @@
    <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
    </goal>
    <goal name="VC add.1.2" expl="VC for add" proved="true">
-   <proof prover="0"><result status="valid" time="0.03"/></proof>
+   <proof prover="0"><result status="valid" time="0.03" steps="35123"/></proof>
    </goal>
   </transf>
   </goal>
@@ -101,7 +100,7 @@
    <proof prover="1"><result status="valid" time="0.07" steps="163"/></proof>
    </goal>
    <goal name="VC remove.4.4" expl="VC for remove" proved="true">
-   <proof prover="0"><result status="valid" time="0.07"/></proof>
+   <proof prover="0"><result status="valid" time="0.07" steps="106513"/></proof>
    </goal>
   </transf>
   </goal>

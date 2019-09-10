@@ -26,13 +26,13 @@ why3_open "set/Set.xml"
     all = top
     map = mapi
 
-why3_vc diff_def by (simp add: mem_def)
+why3_vc diffqtdef by (simp add: mem_def)
 
-why3_vc inter_def by (simp add: mem_def)
+why3_vc interqtdef by (simp add: mem_def)
 
-why3_vc is_empty_empty by (simp add: const_def mem_def set.Set.is_empty_def)
+why3_vc is_empty_empty by (simp add: constqtdef mem_def set.Set.is_empty_def)
 
-why3_vc union_def by (simp add: mem_def)
+why3_vc unionqtdef by (simp add: mem_def)
 
 why3_vc add_remove
   using assms
@@ -45,7 +45,7 @@ why3_vc pick_def
   by (auto simp add: mem_def is_empty_def intro: someI_ex)
 
 why3_vc subset_diff
-  by (simp add: mem_def diff_def subset_def)
+  by (simp add: mem_def diffqtdef subset_def)
 
 why3_vc subset_refl
   by (simp add: subset_def)
@@ -57,21 +57,21 @@ why3_vc subset_trans
 why3_vc subset_remove
   by (simp add: mem_def remove_def subset_def)
 
-why3_vc complement_def
+why3_vc complementqtdef
   by (simp add: mem_def complement_def)
 
 why3_vc extensionality
   using assms
   by (auto simp add: infix_eqeq_def mem_def)
 
-why3_vc map_def by (simp add: mem_def mapi_def image_iff)
+why3_vc mapqtdef by (simp add: mem_def mapi_def image_iff)
 
 why3_vc mem_map
   using assms
-  by (meson facts.map_def mem_def)
+  by (meson facts.mapqtdef mem_def)
 
 why3_vc mem_singleton
-  by (metis assms const_def fun_upd_other mem_def) 
+  by (metis assms constqtdef fun_upd_other mem_def) 
 
 why3_vc empty_is_empty
   using assms
@@ -90,7 +90,7 @@ why3_vc subset_union_2
   by (simp add: set.Set.subset_def mem_def)
 
 why3_vc disjoint_diff_eq
-  by (smt diff_def disjoint_def extensionality infix_eqeq_def mem_def)
+  by (smt diffqtdef disjoint_def extensionality infix_eqeq_def mem_def)
 
 why3_vc disjoint_diff_s2
   by (simp add: disjoint_def mem_def)
@@ -221,7 +221,8 @@ why3_vc cardinal_map
   by (metis card_def card_image_le finite_fset)
 
 why3_vc cardinal_diff
-  by (smt fcard_funion_fsubset fcard_mono finter_lower1 fminus_finter2 inf.idem inf_commute int_ops(6) of_nat_mono)
+  by (metis fcard_funion_fsubset fcard_mono fminus_finter2 inf.idem inf_commute inf_sup_ord(1) of_nat_diff)
+(*  by (smt fcard_funion_fsubset fcard_mono finter_lower1 fminus_finter2 inf.idem inf_commute int_ops(6) of_nat_mono)*)
 
 why3_vc mem_singleton
   using assms by auto

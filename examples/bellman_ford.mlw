@@ -119,7 +119,7 @@ theory Graph
     requires { path s l v /\ path_weight l v < n }
     (* then there exists a negative cycle. *)
     ensures  { exists u. negative_cycle u }
-  = let rec aux (m: int) : 'a
+  = let rec aux (m: int) : (_a: 'a)
       requires { forall u. not negative_cycle u }
       requires { exists l. path s l v /\ path_weight l v < n /\ length l <= m }
       ensures  { false }

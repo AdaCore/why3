@@ -223,15 +223,15 @@ rewrite mag_F2R with (1 := H).
 rewrite (mag_unique _ _ prec).
 ring_simplify (prec + (emax - prec))%Z.
 unfold FLT_exp.
-rewrite Zmax_l.
-apply Zle_refl.
+rewrite Z.max_l.
+apply Z.le_refl.
 unfold emin.
 generalize Hprec' Hemax' ; clear ; omega.
-rewrite <- abs_IZR, Zabs_eq, <- 2!IZR_Zpower.
+rewrite <- abs_IZR, Z.abs_eq, <- 2!IZR_Zpower.
 split.
 apply IZR_le.
 apply Zlt_succ_le.
-change (2 ^ prec - 1)%Z with (Zpred (2^prec))%Z.
+change (2 ^ prec - 1)%Z with (Z.pred (2^prec))%Z.
 rewrite <- Zsucc_pred.
 apply lt_IZR.
 change 2%Z with (radix_val radix2).
@@ -247,7 +247,7 @@ apply Zlt_le_weak.
 exact Hprec'.
 generalize Hprec' ; clear ; omega.
 apply Zlt_succ_le.
-change (2 ^ prec - 1)%Z with (Zpred (2^prec))%Z.
+change (2 ^ prec - 1)%Z with (Z.pred (2^prec))%Z.
 rewrite <- Zsucc_pred.
 change 2%Z with (radix_val radix2).
 apply Zpower_gt_0.
@@ -307,7 +307,7 @@ rewrite mag_bpow.
 ring_simplify (emax+1-1)%Z.
 rewrite Req_bool_true by easy.
 unfold FLT_exp, emin.
-rewrite Zmax_l.
+rewrite Z.max_l.
 unfold max, F2R; simpl.
 pattern emax at 1; replace emax with (prec+(emax-prec))%Z by ring.
 rewrite bpow_plus.
@@ -332,7 +332,7 @@ Lemma Exact_rounding_for_integers : forall (m:floating_point.Rounding.mode)
 Proof with auto with typeclass_instances.
 intros m z Hz.
 apply round_generic...
-assert (Zabs z <= max_representable_integer)%Z.
+assert (Z.abs z <= max_representable_integer)%Z.
 apply Abs_le with (1:=Hz).
 destruct (Zle_lt_or_eq _ _ H) as [Bz|Bz] ; clear H Hz.
 apply generic_format_FLT.

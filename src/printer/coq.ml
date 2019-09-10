@@ -828,7 +828,7 @@ let print_equivalence_lemma ~prev info fmt name (ls,ld) =
 let print_equivalence_lemma ~old info fmt ((ls,_) as d) =
   if info.realization && (Mid.mem ls.ls_name info.info_syn) then
     let name = Ident.string_unique iprinter
-      ((id_unique iprinter ls.ls_name)^"_def") in
+      ((id_unique iprinter ls.ls_name)^"'def") in
     let prev = output_till_statement fmt old name in
     (print_equivalence_lemma ~prev info fmt name d; forget_tvs ())
 

@@ -1,0 +1,6 @@
+use int.Int
+
+(* y unused *)
+let eq2 (x: int) (y : int) : bool
+    ensures { result <-> (x = x) }
+= true

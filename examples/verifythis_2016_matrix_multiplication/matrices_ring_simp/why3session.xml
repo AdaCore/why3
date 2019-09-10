@@ -1,88 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="matrices_ring_simp.mlw"/>
+<path name=".."/><path name="matrices_ring_simp.mlw"/>
 <theory name="Symb" proved="true">
- <goal name="LOCAL.VC l_mdl_ok" expl="VC for l_mdl_ok" proved="true">
+ <goal name="LOCAL.l_mdl_ok&#39;VC" expl="VC for l_mdl_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.03" steps="112"/></proof>
  </goal>
- <goal name="LOCAL.VC m_mdl_ok" expl="VC for m_mdl_ok" proved="true">
+ <goal name="LOCAL.m_mdl_ok&#39;VC" expl="VC for m_mdl_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="39"/></proof>
  </goal>
- <goal name="LOCAL.VC lm_mdl_ok" expl="VC for lm_mdl_ok" proved="true">
+ <goal name="LOCAL.lm_mdl_ok&#39;VC" expl="VC for lm_mdl_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.03" steps="122"/></proof>
  </goal>
- <goal name="LOCAL.VC lm_mdl_same" expl="VC for lm_mdl_same" proved="true">
+ <goal name="LOCAL.lm_mdl_same&#39;VC" expl="VC for lm_mdl_same" proved="true">
  <proof prover="1"><result status="valid" time="0.06" steps="179"/></proof>
  </goal>
- <goal name="LOCAL.VC l_compare_zero" expl="VC for l_compare_zero" proved="true">
+ <goal name="LOCAL.l_compare_zero&#39;VC" expl="VC for l_compare_zero" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="83"/></proof>
  </goal>
- <goal name="LOCAL.VC m_collapse_ok" expl="VC for m_collapse_ok" proved="true">
- <proof prover="3"><result status="valid" time="0.11"/></proof>
+ <goal name="LOCAL.m_collapse_ok&#39;VC" expl="VC for m_collapse_ok" proved="true">
+ <proof prover="3"><result status="valid" time="0.11" steps="30565"/></proof>
  </goal>
- <goal name="LOCAL.VC lm_collapse_ok" expl="VC for lm_collapse_ok" proved="true">
+ <goal name="LOCAL.lm_collapse_ok&#39;VC" expl="VC for lm_collapse_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.13" steps="382"/></proof>
  </goal>
- <goal name="LOCAL.VC cat_rev_ok" expl="VC for cat_rev_ok" proved="true">
+ <goal name="LOCAL.cat_rev_ok&#39;VC" expl="VC for cat_rev_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.10" steps="295"/></proof>
  </goal>
- <goal name="LOCAL.VC lm_dump_ok" expl="VC for lm_dump_ok" proved="true">
+ <goal name="LOCAL.lm_dump_ok&#39;VC" expl="VC for lm_dump_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.21" steps="581"/></proof>
  </goal>
- <goal name="LOCAL.VC lm_merge_ok" expl="VC for lm_merge_ok" proved="true">
+ <goal name="LOCAL.lm_merge_ok&#39;VC" expl="VC for lm_merge_ok" proved="true">
  <proof prover="1" timelimit="5"><result status="valid" time="2.65" steps="4960"/></proof>
  </goal>
- <goal name="LOCAL.VC cat_ok" expl="VC for cat_ok" proved="true">
+ <goal name="LOCAL.cat_ok&#39;VC" expl="VC for cat_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.16" steps="490"/></proof>
  </goal>
- <goal name="LOCAL.VC m_mul_ok" expl="VC for m_mul_ok" proved="true">
+ <goal name="LOCAL.m_mul_ok&#39;VC" expl="VC for m_mul_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.09" steps="267"/></proof>
  </goal>
- <goal name="LOCAL.VC m_distribute_ok" expl="VC for m_distribute_ok" proved="true">
+ <goal name="LOCAL.m_distribute_ok&#39;VC" expl="VC for m_distribute_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.11" steps="364"/></proof>
  </goal>
- <goal name="LOCAL.VC lm_distribute_ok" expl="VC for lm_distribute_ok" proved="true">
+ <goal name="LOCAL.lm_distribute_ok&#39;VC" expl="VC for lm_distribute_ok" proved="true">
  <proof prover="1"><result status="valid" time="0.17" steps="772"/></proof>
  </goal>
- <goal name="LOCAL.VC lm_opp_ok" expl="VC for lm_opp_ok" proved="true">
+ <goal name="LOCAL.lm_opp_ok&#39;VC" expl="VC for lm_opp_ok" proved="true">
  <proof prover="1" timelimit="5"><result status="valid" time="1.51" steps="2817"/></proof>
  </goal>
  <goal name="extends_rw" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="VC symb_env" expl="VC for symb_env" proved="true">
+ <goal name="symb_env&#39;VC" expl="VC for symb_env" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
  </goal>
- <goal name="VC symb_reg" expl="VC for symb_reg" proved="true">
+ <goal name="symb_reg&#39;VC" expl="VC for symb_reg" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="63"/></proof>
  </goal>
- <goal name="VC symb_opp" expl="VC for symb_opp" proved="true">
+ <goal name="symb_opp&#39;VC" expl="VC for symb_opp" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="37"/></proof>
  </goal>
- <goal name="VC symb_add" expl="VC for symb_add" proved="true">
+ <goal name="symb_add&#39;VC" expl="VC for symb_add" proved="true">
  <proof prover="1"><result status="valid" time="0.04" steps="171"/></proof>
  </goal>
- <goal name="VC symb_sub" expl="VC for symb_sub" proved="true">
+ <goal name="symb_sub&#39;VC" expl="VC for symb_sub" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="52"/></proof>
  </goal>
- <goal name="VC symb_mul" expl="VC for symb_mul" proved="true">
+ <goal name="symb_mul&#39;VC" expl="VC for symb_mul" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="70"/></proof>
  </goal>
- <goal name="VC harness" expl="VC for harness" proved="true">
+ <goal name="harness&#39;VC" expl="VC for harness" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC harness.0" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.0" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.0.0" expl="precondition" proved="true">
+   <goal name="harness&#39;VC.0.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.0.0.0" expl="precondition" proved="true">
+    <goal name="harness&#39;VC.0.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
-     <goal name="VC harness.0.0.0.0" expl="precondition" proved="true">
+     <goal name="harness&#39;VC.0.0.0.0" expl="precondition" proved="true">
      <proof prover="1"><result status="valid" time="0.02" steps="61"/></proof>
      </goal>
     </transf>
@@ -91,16 +90,16 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC harness.1" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="141"/></proof>
   </goal>
-  <goal name="VC harness.2" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.2" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.2.0" expl="precondition" proved="true">
+   <goal name="harness&#39;VC.2.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.2.0.0" expl="precondition" proved="true">
+    <goal name="harness&#39;VC.2.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
-     <goal name="VC harness.2.0.0.0" expl="precondition" proved="true">
+     <goal name="harness&#39;VC.2.0.0.0" expl="precondition" proved="true">
      <proof prover="1"><result status="valid" time="0.03" steps="65"/></proof>
      </goal>
     </transf>
@@ -109,22 +108,22 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC harness.3" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.3" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="166"/></proof>
   </goal>
-  <goal name="VC harness.4" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.4" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="41"/></proof>
   </goal>
-  <goal name="VC harness.5" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.5" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="114"/></proof>
   </goal>
-  <goal name="VC harness.6" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.6" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.6.0" expl="precondition" proved="true">
+   <goal name="harness&#39;VC.6.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.6.0.0" expl="precondition" proved="true">
+    <goal name="harness&#39;VC.6.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
-     <goal name="VC harness.6.0.0.0" expl="precondition" proved="true">
+     <goal name="harness&#39;VC.6.0.0.0" expl="precondition" proved="true">
      <proof prover="1"><result status="valid" time="0.04" steps="73"/></proof>
      </goal>
     </transf>
@@ -133,16 +132,16 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC harness.7" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.7" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.06" steps="192"/></proof>
   </goal>
-  <goal name="VC harness.8" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.8" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.8.0" expl="precondition" proved="true">
+   <goal name="harness&#39;VC.8.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.8.0.0" expl="precondition" proved="true">
+    <goal name="harness&#39;VC.8.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
-     <goal name="VC harness.8.0.0.0" expl="precondition" proved="true">
+     <goal name="harness&#39;VC.8.0.0.0" expl="precondition" proved="true">
      <proof prover="1"><result status="valid" time="0.04" steps="76"/></proof>
      </goal>
     </transf>
@@ -151,16 +150,16 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC harness.9" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.9" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.06" steps="200"/></proof>
   </goal>
-  <goal name="VC harness.10" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.10" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.10.0" expl="precondition" proved="true">
+   <goal name="harness&#39;VC.10.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.10.0.0" expl="precondition" proved="true">
+    <goal name="harness&#39;VC.10.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
-     <goal name="VC harness.10.0.0.0" expl="precondition" proved="true">
+     <goal name="harness&#39;VC.10.0.0.0" expl="precondition" proved="true">
      <proof prover="1"><result status="valid" time="0.04" steps="80"/></proof>
      </goal>
     </transf>
@@ -169,22 +168,22 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC harness.11" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.11" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.05" steps="217"/></proof>
   </goal>
-  <goal name="VC harness.12" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.12" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="53"/></proof>
   </goal>
-  <goal name="VC harness.13" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.13" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="150"/></proof>
   </goal>
-  <goal name="VC harness.14" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.14" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.14.0" expl="precondition" proved="true">
+   <goal name="harness&#39;VC.14.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.14.0.0" expl="precondition" proved="true">
+    <goal name="harness&#39;VC.14.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
-     <goal name="VC harness.14.0.0.0" expl="precondition" proved="true">
+     <goal name="harness&#39;VC.14.0.0.0" expl="precondition" proved="true">
      <proof prover="1"><result status="valid" time="0.06" steps="88"/></proof>
      </goal>
     </transf>
@@ -193,16 +192,16 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC harness.15" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.15" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.06" steps="231"/></proof>
   </goal>
-  <goal name="VC harness.16" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.16" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.16.0" expl="precondition" proved="true">
+   <goal name="harness&#39;VC.16.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.16.0.0" expl="precondition" proved="true">
+    <goal name="harness&#39;VC.16.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
-     <goal name="VC harness.16.0.0.0" expl="precondition" proved="true">
+     <goal name="harness&#39;VC.16.0.0.0" expl="precondition" proved="true">
      <proof prover="1"><result status="valid" time="0.06" steps="92"/></proof>
      </goal>
     </transf>
@@ -211,40 +210,40 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC harness.17" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.17" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.07" steps="254"/></proof>
   </goal>
-  <goal name="VC harness.18" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.18" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="62"/></proof>
   </goal>
-  <goal name="VC harness.19" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.19" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.08" steps="268"/></proof>
   </goal>
-  <goal name="VC harness.20" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.20" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="65"/></proof>
   </goal>
-  <goal name="VC harness.21" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.21" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.13" steps="352"/></proof>
   </goal>
-  <goal name="VC harness.22" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.22" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="68"/></proof>
   </goal>
-  <goal name="VC harness.23" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.23" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.08" steps="268"/></proof>
   </goal>
-  <goal name="VC harness.24" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.24" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="71"/></proof>
   </goal>
-  <goal name="VC harness.25" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.25" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.29" steps="686"/></proof>
   </goal>
-  <goal name="VC harness.26" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.26" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.26.0" expl="precondition" proved="true">
+   <goal name="harness&#39;VC.26.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.26.0.0" expl="precondition" proved="true">
+    <goal name="harness&#39;VC.26.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
-     <goal name="VC harness.26.0.0.0" expl="precondition" proved="true">
+     <goal name="harness&#39;VC.26.0.0.0" expl="precondition" proved="true">
      <proof prover="1"><result status="valid" time="0.08" steps="110"/></proof>
      </goal>
     </transf>
@@ -253,16 +252,16 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC harness.27" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.27" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="223"/></proof>
   </goal>
-  <goal name="VC harness.28" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.28" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.28.0" expl="precondition" proved="true">
+   <goal name="harness&#39;VC.28.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.28.0.0" expl="precondition" proved="true">
+    <goal name="harness&#39;VC.28.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
-     <goal name="VC harness.28.0.0.0" expl="precondition" proved="true">
+     <goal name="harness&#39;VC.28.0.0.0" expl="precondition" proved="true">
      <proof prover="1"><result status="valid" time="0.11" steps="114"/></proof>
      </goal>
     </transf>
@@ -271,20 +270,20 @@
    </goal>
   </transf>
   </goal>
-  <goal name="VC harness.29" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.29" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="232"/></proof>
   </goal>
-  <goal name="VC harness.30" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.30" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="80"/></proof>
   </goal>
-  <goal name="VC harness.31" expl="precondition" proved="true">
+  <goal name="harness&#39;VC.31" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.08" steps="316"/></proof>
   </goal>
-  <goal name="VC harness.32" expl="assertion" proved="true">
+  <goal name="harness&#39;VC.32" expl="assertion" proved="true">
   <transf name="compute_specified" proved="true" >
-   <goal name="VC harness.32.0" expl="assertion" proved="true">
+   <goal name="harness&#39;VC.32.0" expl="assertion" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="VC harness.32.0.0" expl="assertion" proved="true">
+    <goal name="harness&#39;VC.32.0.0" expl="assertion" proved="true">
     <transf name="compute_specified" proved="true" >
     </transf>
     </goal>

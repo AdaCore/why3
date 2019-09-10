@@ -4,6 +4,7 @@ prelude "#include <stdlib.h>"
 prelude "#include <stdint.h>"
 prelude "#include <stdio.h>"
 prelude "#include <assert.h>"
+prelude "#include <alloca.h>"
 
 module Ref
   syntax type ref "%1"
@@ -67,9 +68,7 @@ end
 
 module mach.int.UInt32GMP
 
-  prelude
-
-"
+  prelude "
 #define LOW_MASK 0x00000000FFFFFFFFUL
 
 struct __add32_with_carry_result
@@ -143,8 +142,7 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)
 }
 "
 
-  interface
-"
+  interface "
 struct __add32_with_carry_result
 { uint32_t __field_0;
   uint32_t __field_1;
@@ -203,6 +201,7 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
 
   syntax val add_mod "%1 + %2" prec 4 4 3
   syntax val sub_mod "%1 - %2" prec 4 4 3
+  syntax val minus_mod "-%1"   prec 2 1
   syntax val mul_mod "%1 * %2" prec 3 3 2
 
   syntax val div2by1
@@ -215,6 +214,7 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
   syntax val is_msb_set "%1 & 0x80000000U" prec 8 8
 
   syntax val count_leading_zeros "__builtin_clz(%1)" prec 1 15
+  syntax val count_trailing_zeros "__builtin_ctz(%1)" prec 1 15
 
   syntax val of_int32 "(uint32_t)%1" prec 2 2
 
@@ -268,15 +268,7 @@ end
 
 module mach.int.UInt64GMP
 
-  prelude
-
-"
-#include \"gmp.h\"
-#include \"gmp-impl.h\"
-#include \"longlong.h\"
-
-#undef invert_limb
-
+  prelude "
 struct __add64_with_carry_result
 { uint64_t __field_0;
   uint64_t __field_1;
@@ -290,19 +282,6 @@ add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
   result.__field_0 = r;
   if (r == x) result.__field_1 = c;
   else result.__field_1 = (r < x);
-  return result;
-}
-
-struct __add64_double_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-struct __add64_double_result
-add64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0)
-{
-  struct __add64_double_result result;
-  add_ssaaaa(result.__field_0, result.__field_1, a1, a0, b1, b0);
   return result;
 }
 
@@ -321,39 +300,6 @@ sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
   else if (r == x) result.__field_1 = b;
   else result.__field_1 = 0;
   return result;
-}
-
-struct __sub64_double_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-struct __sub64_double_result
-sub64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0)
-{
-  struct __sub64_double_result result;
-  sub_ddmmss(result.__field_0, result.__field_1, a1, a0, b1, b0);
-  return result;
-}
-
-struct __mul64_double_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
-{
-  struct __mul64_double_result result;
-  umul_ppmm(result.__field_1,result.__field_0,x,y);
-  return result;
-}
-
-uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
-{
-  uint64_t q;
-  uint64_t _dummy __attribute__((unused));
-  udiv_qrnnd(q,_dummy,uh,ul,d);
-  return q;
 }
 
 struct __add64_3_result
@@ -388,19 +334,13 @@ struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 }
 "
 
-  interface
-"
-#include \"gmp.h\"
-#include \"gmp-impl.h\"
-#include \"longlong.h\"
-
-#undef invert_limb
+  interface "
 struct __add64_with_carry_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-static struct __add64_with_carry_result
+static inline struct __add64_with_carry_result
 add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
 {
   struct __add64_with_carry_result result;
@@ -411,25 +351,12 @@ add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
   return result;
 }
 
-struct __add64_double_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-static struct __add64_double_result
-add64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0)
-{
-  struct __add64_double_result result;
-  add_ssaaaa(result.__field_0, result.__field_1, a1, a0, b1, b0);
-  return result;
-}
-
 struct __sub64_with_borrow_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-static struct __sub64_with_borrow_result
+static inline struct __sub64_with_borrow_result
 sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
 {
   struct __sub64_with_borrow_result result;
@@ -441,45 +368,12 @@ sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
   return result;
 }
 
-struct __sub64_double_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-static struct __sub64_double_result
-sub64_double(uint64_t a1, uint64_t a0, uint64_t b1, uint64_t b0)
-{
-  struct __sub64_double_result result;
-  sub_ddmmss(result.__field_0, result.__field_1, a1, a0, b1, b0);
-  return result;
-}
-
-struct __mul64_double_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-static struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
-{
-  struct __mul64_double_result result;
-  umul_ppmm(result.__field_1,result.__field_0,x,y);
-  return result;
-}
-
-static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
-{
-  uint64_t q;
-  uint64_t _dummy __attribute__((unused));
-  udiv_qrnnd(q,_dummy,uh,ul,d);
-  return q;
-}
-
 struct __add64_3_result
 { uint64_t __field_0;
   uint64_t __field_1;
 };
 
-static struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)
+static inline struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)
 {
   struct __add64_3_result result;
   uint64_t r, c1, c2;
@@ -497,7 +391,7 @@ struct __lsld64_result
   uint64_t __field_1;
 };
 
-static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
+static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
 {
   struct __lsld64_result result;
   result.__field_1 = x >> (64 - cnt);
@@ -522,20 +416,13 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   syntax val (>)     "%1 > %2"   prec 6 6 5
 
   syntax val add_with_carry "add64_with_carry"
-  syntax val add_double "add64_double"
-  syntax val add_double_nc "add64_double"
-  syntax val add_double_gc "add64_double"
-  syntax val sub_double "sub64_double"
-  syntax val sub_double_nb "sub64_double"
-  syntax val sub_double_gb "sub64_double"
   syntax val sub_with_borrow "sub64_with_borrow"
-  syntax val mul_double "mul64_double"
-  syntax val div2by1 "div64_2by1"
   syntax val add3 "add64_3"
   syntax val lsld "lsld64"
 
   syntax val add_mod "%1 + %2" prec 4 4 3
   syntax val sub_mod "%1 - %2" prec 4 4 3
+  syntax val minus_mod "-%1"   prec 2 1
   syntax val mul_mod "%1 * %2" prec 3 3 2
 
   syntax val lsl "%1 << %2" prec 5 5 2
@@ -546,6 +433,7 @@ static struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
   syntax val is_msb_set "%1 & 0x8000000000000000UL" prec 8 7
 
   syntax val count_leading_zeros "__builtin_clzll(%1)" prec 1 15
+  syntax val count_trailing_zeros "__builtin_ctzll(%1)" prec 1 15
 
   syntax val to_int32 "(int32_t)%1" prec 2 2
   syntax val of_int32 "(uint64_t)%1" prec 2 2

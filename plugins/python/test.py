@@ -7,14 +7,13 @@ def f(x):
 
 def swap(a, i, j):
   #@ requires 0 <= i < len(a) and 0 <= j < len(a)
-  #@ ensures  a[i] == old(a[j])
   t = a[i]
   a[i] = a[j]
   a[j] = t
 
 def t10():
   s = 0
-  for i in range(0, 10):
+  for i in range(0, 11):
     #@ invariant 2 * s == i * (i-1)
     s = s + i
   #@ assert s == 55
@@ -47,6 +46,7 @@ while i < 10:
   i = i+1
 
 sum = 0
+#@ label L
 for x in [42]*3:
   #@ invariant sum >= 0
   print(x)
@@ -56,6 +56,8 @@ for x in [42]*3:
 foo = [1,2,3]
 #@ assert len(foo)==3
 #@ assert foo[1]==2
+
+#@ assert at(sum, L) == 0
 
 
 # Python's division is neither Euclidean division, nor computer division

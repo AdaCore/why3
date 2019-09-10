@@ -5,10 +5,10 @@ Require BuiltIn.
 Require int.Int.
 
 (* Why3 assumption *)
-Definition key := Z.
+Definition key := Numbers.BinNums.Z.
 
 (* Why3 assumption *)
-Definition value := Z.
+Definition value := Numbers.BinNums.Z.
 
 (* Why3 assumption *)
 Inductive color :=
@@ -20,156 +20,202 @@ Existing Instance color_WhyType.
 (* Why3 assumption *)
 Inductive tree :=
   | Leaf : tree
-  | Node : color -> tree -> Z -> Z -> tree -> tree.
+  | Node : color -> tree -> Numbers.BinNums.Z -> Numbers.BinNums.Z -> tree ->
+      tree.
 Axiom tree_WhyType : WhyType tree.
 Existing Instance tree_WhyType.
 
 (* Why3 assumption *)
-Fixpoint memt (t:tree) (k:Z) (v:Z) {struct t}: Prop :=
+Fixpoint memt (t:tree) (k:Numbers.BinNums.Z)
+  (v:Numbers.BinNums.Z) {struct t}: Prop :=
   match t with
   | Leaf => False
-  | (Node _ l k' v' r) => ((k = k') /\ (v = v')) \/ ((memt l k v) \/ (memt r
-      k v))
+  | Node _ l k' v' r => (k = k') /\ (v = v') \/ memt l k v \/ memt r k v
   end.
 
-Axiom memt_color : forall (l:tree) (r:tree) (k:Z) (k':Z) (v:Z) (v':Z)
-  (c:color) (c':color), (memt (Node c l k v r) k' v') -> (memt (Node c' l k v
-  r) k' v').
+Axiom memt_color :
+  forall (l:tree) (r:tree) (k:Numbers.BinNums.Z) (k':Numbers.BinNums.Z)
+    (v:Numbers.BinNums.Z) (v':Numbers.BinNums.Z) (c:color) (c':color),
+  memt (Node c l k v r) k' v' -> memt (Node c' l k v r) k' v'.
 
 (* Why3 assumption *)
-Definition lt_tree (x:Z) (t:tree): Prop := forall (k:Z), forall (v:Z), (memt
-  t k v) -> (k < x)%Z.
+Definition lt_tree (x:Numbers.BinNums.Z) (t:tree) : Prop :=
+  forall (k:Numbers.BinNums.Z), forall (v:Numbers.BinNums.Z), memt t k v ->
+  (k < x)%Z.
 
 (* Why3 assumption *)
-Definition gt_tree (x:Z) (t:tree): Prop := forall (k:Z), forall (v:Z), (memt
-  t k v) -> (x < k)%Z.
+Definition gt_tree (x:Numbers.BinNums.Z) (t:tree) : Prop :=
+  forall (k:Numbers.BinNums.Z), forall (v:Numbers.BinNums.Z), memt t k v ->
+  (x < k)%Z.
 
-Axiom lt_leaf : forall (x:Z), (lt_tree x Leaf).
+Axiom lt_leaf : forall (x:Numbers.BinNums.Z), lt_tree x Leaf.
 
-Axiom gt_leaf : forall (x:Z), (gt_tree x Leaf).
+Axiom gt_leaf : forall (x:Numbers.BinNums.Z), gt_tree x Leaf.
 
-Axiom lt_tree_node : forall (x:Z) (y:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (lt_tree x l) -> ((lt_tree x r) -> ((y < x)%Z -> (lt_tree x (Node c l y v
-  r)))).
+Axiom lt_tree_node :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (v:Numbers.BinNums.Z)
+    (l:tree) (r:tree) (c:color),
+  lt_tree x l -> lt_tree x r -> (y < x)%Z -> lt_tree x (Node c l y v r).
 
-Axiom gt_tree_node : forall (x:Z) (y:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (gt_tree x l) -> ((gt_tree x r) -> ((x < y)%Z -> (gt_tree x (Node c l y v
-  r)))).
+Axiom gt_tree_node :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (v:Numbers.BinNums.Z)
+    (l:tree) (r:tree) (c:color),
+  gt_tree x l -> gt_tree x r -> (x < y)%Z -> gt_tree x (Node c l y v r).
 
-Axiom lt_node_lt : forall (x:Z) (y:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (lt_tree x (Node c l y v r)) -> (y < x)%Z.
+Axiom lt_node_lt :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (v:Numbers.BinNums.Z)
+    (l:tree) (r:tree) (c:color),
+  lt_tree x (Node c l y v r) -> (y < x)%Z.
 
-Axiom gt_node_gt : forall (x:Z) (y:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (gt_tree x (Node c l y v r)) -> (x < y)%Z.
+Axiom gt_node_gt :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (v:Numbers.BinNums.Z)
+    (l:tree) (r:tree) (c:color),
+  gt_tree x (Node c l y v r) -> (x < y)%Z.
 
-Axiom lt_left : forall (x:Z) (y:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (lt_tree x (Node c l y v r)) -> (lt_tree x l).
+Axiom lt_left :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (v:Numbers.BinNums.Z)
+    (l:tree) (r:tree) (c:color),
+  lt_tree x (Node c l y v r) -> lt_tree x l.
 
-Axiom lt_right : forall (x:Z) (y:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (lt_tree x (Node c l y v r)) -> (lt_tree x r).
+Axiom lt_right :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (v:Numbers.BinNums.Z)
+    (l:tree) (r:tree) (c:color),
+  lt_tree x (Node c l y v r) -> lt_tree x r.
 
-Axiom gt_left : forall (x:Z) (y:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (gt_tree x (Node c l y v r)) -> (gt_tree x l).
+Axiom gt_left :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (v:Numbers.BinNums.Z)
+    (l:tree) (r:tree) (c:color),
+  gt_tree x (Node c l y v r) -> gt_tree x l.
 
-Axiom gt_right : forall (x:Z) (y:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (gt_tree x (Node c l y v r)) -> (gt_tree x r).
+Axiom gt_right :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (v:Numbers.BinNums.Z)
+    (l:tree) (r:tree) (c:color),
+  gt_tree x (Node c l y v r) -> gt_tree x r.
 
-Axiom lt_tree_not_in : forall (x:Z) (t:tree), (lt_tree x t) -> forall (v:Z),
-  ~ (memt t x v).
+Axiom lt_tree_not_in :
+  forall (x:Numbers.BinNums.Z) (t:tree), lt_tree x t ->
+  forall (v:Numbers.BinNums.Z), ~ memt t x v.
 
-Axiom lt_tree_trans : forall (x:Z) (y:Z), (x < y)%Z -> forall (t:tree),
-  (lt_tree x t) -> (lt_tree y t).
+Axiom lt_tree_trans :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), (x < y)%Z ->
+  forall (t:tree), lt_tree x t -> lt_tree y t.
 
-Axiom gt_tree_not_in : forall (x:Z) (t:tree), (gt_tree x t) -> forall (v:Z),
-  ~ (memt t x v).
+Axiom gt_tree_not_in :
+  forall (x:Numbers.BinNums.Z) (t:tree), gt_tree x t ->
+  forall (v:Numbers.BinNums.Z), ~ memt t x v.
 
-Axiom gt_tree_trans : forall (x:Z) (y:Z), (y < x)%Z -> forall (t:tree),
-  (gt_tree x t) -> (gt_tree y t).
+Axiom gt_tree_trans :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), (y < x)%Z ->
+  forall (t:tree), gt_tree x t -> gt_tree y t.
 
 (* Why3 assumption *)
 Fixpoint bst (t:tree) {struct t}: Prop :=
   match t with
   | Leaf => True
-  | (Node _ l k _ r) => (bst l) /\ ((bst r) /\ ((lt_tree k l) /\ (gt_tree k
-      r)))
+  | Node _ l k _ r => bst l /\ bst r /\ lt_tree k l /\ gt_tree k r
   end.
 
-Axiom bst_Leaf : (bst Leaf).
+Axiom bst_Leaf : bst Leaf.
 
-Axiom bst_left : forall (k:Z) (v:Z) (l:tree) (r:tree) (c:color), (bst (Node c
-  l k v r)) -> (bst l).
+Axiom bst_left :
+  forall (k:Numbers.BinNums.Z) (v:Numbers.BinNums.Z) (l:tree) (r:tree)
+    (c:color),
+  bst (Node c l k v r) -> bst l.
 
-Axiom bst_right : forall (k:Z) (v:Z) (l:tree) (r:tree) (c:color), (bst
-  (Node c l k v r)) -> (bst r).
+Axiom bst_right :
+  forall (k:Numbers.BinNums.Z) (v:Numbers.BinNums.Z) (l:tree) (r:tree)
+    (c:color),
+  bst (Node c l k v r) -> bst r.
 
-Axiom bst_color : forall (c:color) (c':color) (k:Z) (v:Z) (l:tree) (r:tree),
-  (bst (Node c l k v r)) -> (bst (Node c' l k v r)).
+Axiom bst_color :
+  forall (c:color) (c':color) (k:Numbers.BinNums.Z) (v:Numbers.BinNums.Z)
+    (l:tree) (r:tree),
+  bst (Node c l k v r) -> bst (Node c' l k v r).
 
-Axiom rotate_left : forall (kx:Z) (ky:Z) (vx:Z) (vy:Z) (a:tree) (b:tree)
-  (c:tree) (c1:color) (c2:color) (c3:color) (c4:color), (bst (Node c1 a kx vx
-  (Node c2 b ky vy c))) -> (bst (Node c3 (Node c4 a kx vx b) ky vy c)).
+Axiom rotate_left :
+  forall (kx:Numbers.BinNums.Z) (ky:Numbers.BinNums.Z) (vx:Numbers.BinNums.Z)
+    (vy:Numbers.BinNums.Z) (a:tree) (b:tree) (c:tree) (c1:color) (c2:color)
+    (c3:color) (c4:color),
+  bst (Node c1 a kx vx (Node c2 b ky vy c)) ->
+  bst (Node c3 (Node c4 a kx vx b) ky vy c).
 
-Axiom rotate_right : forall (kx:Z) (ky:Z) (vx:Z) (vy:Z) (a:tree) (b:tree)
-  (c:tree) (c1:color) (c2:color) (c3:color) (c4:color), (bst (Node c3
-  (Node c4 a kx vx b) ky vy c)) -> (bst (Node c1 a kx vx (Node c2 b ky vy
-  c))).
+Axiom rotate_right :
+  forall (kx:Numbers.BinNums.Z) (ky:Numbers.BinNums.Z) (vx:Numbers.BinNums.Z)
+    (vy:Numbers.BinNums.Z) (a:tree) (b:tree) (c:tree) (c1:color) (c2:color)
+    (c3:color) (c4:color),
+  bst (Node c3 (Node c4 a kx vx b) ky vy c) ->
+  bst (Node c1 a kx vx (Node c2 b ky vy c)).
 
 (* Why3 assumption *)
-Definition is_not_red (t:tree): Prop :=
+Definition is_not_red (t:tree) : Prop :=
   match t with
-  | (Node Red _ _ _ _) => False
-  | (Leaf|(Node Black _ _ _ _)) => True
+  | Node Red _ _ _ _ => False
+  | Leaf|(Node Black _ _ _ _) => True
   end.
 
 (* Why3 assumption *)
-Fixpoint rbtree (n:Z) (t:tree) {struct t}: Prop :=
-  match t with
-  | Leaf => (n = 0%Z)
-  | (Node Red l _ _ r) => (rbtree n l) /\ ((rbtree n r) /\ ((is_not_red l) /\
-      (is_not_red r)))
-  | (Node Black l _ _ r) => (rbtree (n - 1%Z)%Z l) /\ (rbtree (n - 1%Z)%Z r)
-  end.
-
-Axiom rbtree_Leaf : (rbtree 0%Z Leaf).
-
-Axiom rbtree_Node1 : forall (k:Z) (v:Z), (rbtree 0%Z (Node Red Leaf k v
-  Leaf)).
-
-Axiom rbtree_left : forall (x:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (exists n:Z, (rbtree n (Node c l x v r))) -> exists n:Z, (rbtree n l).
-
-Axiom rbtree_right : forall (x:Z) (v:Z) (l:tree) (r:tree) (c:color),
-  (exists n:Z, (rbtree n (Node c l x v r))) -> exists n:Z, (rbtree n r).
-
-(* Why3 assumption *)
-Definition almost_rbtree (n:Z) (t:tree): Prop :=
+Fixpoint rbtree (n:Numbers.BinNums.Z) (t:tree) {struct t}: Prop :=
   match t with
   | Leaf => (n = 0%Z)
-  | (Node Red l _ _ r) => (rbtree n l) /\ (rbtree n r)
-  | (Node Black l _ _ r) => (rbtree (n - 1%Z)%Z l) /\ (rbtree (n - 1%Z)%Z r)
+  | Node Red l _ _ r =>
+      rbtree n l /\ rbtree n r /\ is_not_red l /\ is_not_red r
+  | Node Black l _ _ r => rbtree (n - 1%Z)%Z l /\ rbtree (n - 1%Z)%Z r
   end.
 
-Axiom rbtree_almost_rbtree : forall (n:Z) (t:tree), (rbtree n t) ->
-  (almost_rbtree n t).
+Axiom rbtree_Leaf : rbtree 0%Z Leaf.
 
-Axiom rbtree_almost_rbtree_ex : forall (s:tree), (exists n:Z, (rbtree n
-  s)) -> exists n:Z, (almost_rbtree n s).
+Axiom rbtree_Node1 :
+  forall (k:Numbers.BinNums.Z) (v:Numbers.BinNums.Z),
+  rbtree 0%Z (Node Red Leaf k v Leaf).
 
-Axiom almost_rbtree_rbtree_black : forall (x:Z) (v:Z) (l:tree) (r:tree)
-  (n:Z), (almost_rbtree n (Node Black l x v r)) -> (rbtree n (Node Black l x
-  v r)).
+Axiom rbtree_left :
+  forall (x:Numbers.BinNums.Z) (v:Numbers.BinNums.Z) (l:tree) (r:tree)
+    (c:color),
+  (exists n:Numbers.BinNums.Z, rbtree n (Node c l x v r)) ->
+  exists n:Numbers.BinNums.Z, rbtree n l.
+
+Axiom rbtree_right :
+  forall (x:Numbers.BinNums.Z) (v:Numbers.BinNums.Z) (l:tree) (r:tree)
+    (c:color),
+  (exists n:Numbers.BinNums.Z, rbtree n (Node c l x v r)) ->
+  exists n:Numbers.BinNums.Z, rbtree n r.
+
+(* Why3 assumption *)
+Definition almost_rbtree (n:Numbers.BinNums.Z) (t:tree) : Prop :=
+  match t with
+  | Leaf => (n = 0%Z)
+  | Node Red l _ _ r => rbtree n l /\ rbtree n r
+  | Node Black l _ _ r => rbtree (n - 1%Z)%Z l /\ rbtree (n - 1%Z)%Z r
+  end.
+
+Axiom rbtree_almost_rbtree :
+  forall (n:Numbers.BinNums.Z) (t:tree), rbtree n t -> almost_rbtree n t.
+
+Axiom rbtree_almost_rbtree_ex :
+  forall (s:tree), (exists n:Numbers.BinNums.Z, rbtree n s) ->
+  exists n:Numbers.BinNums.Z, almost_rbtree n s.
+
+Axiom almost_rbtree_rbtree_black :
+  forall (x:Numbers.BinNums.Z) (v:Numbers.BinNums.Z) (l:tree) (r:tree)
+    (n:Numbers.BinNums.Z),
+  almost_rbtree n (Node Black l x v r) -> rbtree n (Node Black l x v r).
 
 (* Why3 goal *)
-Theorem VC_add : forall (t:tree) (k:Z) (v:Z), ((bst t) /\ exists n:Z, (rbtree
-  n t)) -> forall (o:tree), ((bst o) /\ ((forall (n:Z), (rbtree n t) ->
-  ((almost_rbtree n o) /\ ((is_not_red t) -> (rbtree n o)))) /\ ((memt o k
-  v) /\ forall (k':Z) (v':Z), ((memt o k' v') \/ (((k' = k) -> (v' = v)) /\
-  ((~ (k' = k)) -> (memt t k' v')))) -> ((memt o k' v') /\ (((k' = k) /\
-  (v' = v)) \/ ((~ (k' = k)) /\ (memt t k' v'))))))) -> forall (result:tree),
+Theorem add'VC :
+  forall (t:tree) (k:Numbers.BinNums.Z) (v:Numbers.BinNums.Z),
+  bst t /\ (exists n:Numbers.BinNums.Z, rbtree n t) -> forall (o:tree),
+  bst o /\
+  (forall (n:Numbers.BinNums.Z), rbtree n t ->
+   almost_rbtree n o /\ (is_not_red t -> rbtree n o)) /\
+  memt o k v /\
+  (forall (k':Numbers.BinNums.Z) (v':Numbers.BinNums.Z),
+   memt o k' v' \/ ((k' = k) -> (v' = v)) /\ (~ (k' = k) -> memt t k' v') ->
+   memt o k' v' /\ ((k' = k) /\ (v' = v) \/ ~ (k' = k) /\ memt t k' v')) ->
+  forall (result:tree),
   match o with
-  | (Node x x1 x2 x3 x4) => (result = (Node Black x1 x2 x3 x4))
+  | Node x x1 x2 x3 x4 => (result = (Node Black x1 x2 x3 x4))
   | Leaf => False
-  end -> exists n:Z, (rbtree n result).
+  end -> exists n:Numbers.BinNums.Z, rbtree n result.
 Proof.
 intros t k v (_,(n,h2)) o (_,(h4,_)).
 destruct o. easy.
@@ -184,4 +230,3 @@ apply h4.
 (* c = Black *)
 now exists n.
 Qed.
-

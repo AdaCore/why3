@@ -1,0 +1,6 @@
+use int.Int
+
+(* Should not output any unused variable *)
+val v (x : int) (y : int) : bool
+  ensures {x = y <-> result}
+  ensures {x = y}

@@ -51,7 +51,7 @@ Defined.
 Fixpoint nth_aux {l} (v : Vector.t bool l) (m : Z) : bool :=
   match v with
     | Vector.nil _ => false
-    | Vector.cons _ b _ tl => if Z_eq_dec m 0 then b else nth_aux tl (Z.pred m)
+    | Vector.cons _ b _ tl => if Z.eq_dec m 0 then b else nth_aux tl (Z.pred m)
   end.
 
 (* nth helper lemmas *)
@@ -694,7 +694,7 @@ Qed.
 
 Lemma factor_sub : forall n m p, (n * m - n * p = n * (m - p))%Z.
   intros.
-  rewrite Int.infix_mn_def, Int.infix_mn_def, Zopp_mult_distr_r.
+  rewrite Int.infix_mn'def, Int.infix_mn'def, Zopp_mult_distr_r.
   apply Zred_factor4.
 Qed.
 
@@ -724,7 +724,7 @@ Lemma twos_complement_neg : forall {n} v, Bsign n v = true -> (twos_complement (
   unfold twos_complement.
   rewrite H.
   apply Z.lt_sub_0.
-  apply Zlt_le_trans with (m := Pow2int.pow2 (Z.of_nat (S n))).
+  apply Z.lt_le_trans with (m := Pow2int.pow2 (Z.of_nat (S n))).
   rewrite Z2Nat.inj_lt.
   rewrite Nat2Z.id.
   apply bvec_to_nat_range.
@@ -760,7 +760,7 @@ Lemma twos_complement_extensionality : forall {m} (v v' : Bvector m),
         + rewrite <- H. generalize (bvec_to_nat_range v). intros.
           eapply Z.lt_sub_0. rewrite <- Z2Nat.id.
           apply inj_lt. assumption.
-          eapply Zle_trans. apply (max_int_nat (S m)).
+          eapply Z.le_trans. apply (max_int_nat (S m)).
           omega.
       }
       omega.
@@ -774,7 +774,7 @@ Lemma twos_complement_extensionality : forall {m} (v v' : Bvector m),
         + rewrite H. generalize (bvec_to_nat_range v'). intros.
           eapply Z.lt_sub_0. rewrite <- Z2Nat.id.
           apply inj_lt. assumption.
-          eapply Zle_trans. apply (max_int_nat (S m)).
+          eapply Z.le_trans. apply (max_int_nat (S m)).
           omega.
       }
       omega.
@@ -986,7 +986,7 @@ Lemma mod1_succ_low : forall x y, y > 0 -> mod1 x y < (Z.pred y) -> mod1 (Z.succ
   intros x y H.
   rewrite mod1_is_mod, mod1_is_mod by trivial.
   rewrite Z.mod_eq, Z.mod_eq by omega.
-  intro; cut (Zsucc x / y = x / y).
+  intro; cut (Z.succ x / y = x / y).
   intro e; rewrite e; omega.
   rewrite Z.div_unique_pos with (a := Z.succ x) (b := y) (r := (x mod y) + 1) (q := x / y).
   trivial.
@@ -1202,11 +1202,12 @@ Definition to_int : t -> Numbers.BinNums.Z.
 Defined.
 
 (* Why3 goal *)
-Lemma to_int_def :
+Lemma to_int'def :
   forall (x:t),
   (is_signed_positive x -> ((to_int x) = (to_uint x))) /\
   (~ is_signed_positive x ->
    ((to_int x) = (-(two_power_size - (to_uint x))%Z)%Z)).
+Proof.
   intros. split.
   - unfold to_int, to_uint,is_signed_positive, twos_complement, size_nat.
     intros.
@@ -1317,10 +1318,9 @@ Qed.
 Lemma to_uint_lsl_aux : forall (v:t) (n:nat), ((to_uint (lsl v
   (Z.of_nat n))) = (mod1 ((to_uint v) * (Pow2int.pow2 (Z.of_nat n)))%Z
   two_power_size)).
+Proof.
   intros v n.
-  rewrite mod1_is_mod.
-  Focus 2.
-  easy.
+  rewrite mod1_is_mod by easy.
   induction n.
   simpl.
   apply Zmod_unique with (q := 0).
@@ -1470,7 +1470,7 @@ Lemma positive_is_ge_zeros :
   omega. unfold size_nat in *.
   apply Z2Nat.inj_le in H1; try omega.
   rewrite Nat2Z.id in H1; try omega.
-  eapply Zle_trans. apply (max_int_nat (S last_bit)). omega.
+  eapply Z.le_trans. apply (max_int_nat (S last_bit)). omega.
 
   intuition.
   unfold zeros, zeros_aux.
@@ -1967,9 +1967,7 @@ Proof.
   rewrite mask_succ_2; simpl.
   unfold bw_or, nth.
   rewrite <-nth_aux_map2.
-  Focus 2.
-  split; auto with zarith.
-  apply to_uint_bounds.
+  2: split; auto with zarith; apply to_uint_bounds.
 
   apply orb_true_iff.
   case (Z_lt_le_dec (to_uint i) 1); intro.
@@ -2121,10 +2119,6 @@ Proof.
   unfold eq_sub, eq_sub_bv.
   transitivity (eq_aux (bw_and b (lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i))
                        (bw_and a (lsl_bv (sub (lsl_bv (of_int 1) n) (of_int 1)) i))); unfold eq_aux.
-  Focus 2.
-  split.
-  apply Extensionality_aux.
-  intro e; rewrite e; reflexivity.
   split; intros.
 
   fold nth; rewrite Nth_bw_and, Nth_bw_and by auto.
@@ -2151,6 +2145,10 @@ Proof.
   auto.
 
   unfold nth, nth; rewrite nth_high, nth_high by auto with zarith; reflexivity.
+
+  split.
+  apply Extensionality_aux.
+  intro e; rewrite e; reflexivity.
 Qed.
 
 (* Why3 goal *)

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="euler011.mlw"/>
+<path name=".."/><path name="euler011.mlw"/>
 <theory name="ProductFour" proved="true">
  <goal name="VC right_diag_c" expl="VC for right_diag_c" proved="true">
  <transf name="split_vc" proved="true" >
@@ -90,7 +89,7 @@
   <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="VC find_max.1" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="7290"/></proof>
   </goal>
   <goal name="VC find_max.2" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>

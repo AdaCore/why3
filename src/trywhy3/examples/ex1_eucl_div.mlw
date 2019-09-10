@@ -13,20 +13,19 @@
 module Division
 
   use int.Int
-  use ref.Ref
 
   let division (a b: int) : int
     requires { true }
     ensures  { exists r: int. a = b * result + r /\ 0 <= r < b }
   =
-    let q = ref 0 in
-    let r = ref a in
-    while !r >= b do
+    let ref q = 0 in
+    let ref r = a in
+    while r >= b do
       invariant { true }
-      q := !q + 1;
-      r := !r - b
+      q <- q + 1;
+      r <- r - b
     done;
-    !q
+    q
 
   let main () =
     division 1000 42

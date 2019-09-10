@@ -6,6 +6,8 @@ Require HighOrd.
 Require int.Int.
 Require map.Map.
 Require bool.Bool.
+Require set.Fset.
+Require set.SetApp.
 
 (* Why3 assumption *)
 Inductive datatype :=
@@ -24,13 +26,13 @@ Axiom operator_WhyType : WhyType operator.
 Existing Instance operator_WhyType.
 
 (* Why3 assumption *)
-Definition ident := Z.
+Definition ident := Numbers.BinNums.Z.
 
 (* Why3 assumption *)
 Inductive term :=
-  | Tconst : Z -> term
-  | Tvar : Z -> term
-  | Tderef : Z -> term
+  | Tconst : Numbers.BinNums.Z -> term
+  | Tvar : Numbers.BinNums.Z -> term
+  | Tderef : Numbers.BinNums.Z -> term
   | Tbin : term -> operator -> term -> term.
 Axiom term_WhyType : WhyType term.
 Existing Instance term_WhyType.
@@ -41,24 +43,24 @@ Inductive fmla :=
   | Fand : fmla -> fmla -> fmla
   | Fnot : fmla -> fmla
   | Fimplies : fmla -> fmla -> fmla
-  | Flet : Z -> term -> fmla -> fmla
-  | Fforall : Z -> datatype -> fmla -> fmla.
+  | Flet : Numbers.BinNums.Z -> term -> fmla -> fmla
+  | Fforall : Numbers.BinNums.Z -> datatype -> fmla -> fmla.
 Axiom fmla_WhyType : WhyType fmla.
 Existing Instance fmla_WhyType.
 
 (* Why3 assumption *)
 Inductive value :=
-  | Vint : Z -> value
-  | Vbool : bool -> value.
+  | Vint : Numbers.BinNums.Z -> value
+  | Vbool : Init.Datatypes.bool -> value.
 Axiom value_WhyType : WhyType value.
 Existing Instance value_WhyType.
 
 (* Why3 assumption *)
-Definition env := Z -> value.
+Definition env := Numbers.BinNums.Z -> value.
 
 Parameter eval_bin: value -> operator -> value -> value.
 
-Axiom eval_bin_def :
+Axiom eval_bin'def :
   forall (x:value) (op:operator) (y:value),
   match (x, y) with
   | (Vint x1, Vint y1) =>
@@ -67,15 +69,16 @@ Axiom eval_bin_def :
       | Ominus => ((eval_bin x op y) = (Vint (x1 - y1)%Z))
       | Omult => ((eval_bin x op y) = (Vint (x1 * y1)%Z))
       | Ole =>
-          ((x1 <= y1)%Z -> ((eval_bin x op y) = (Vbool true))) /\
-          (~ (x1 <= y1)%Z -> ((eval_bin x op y) = (Vbool false)))
+          ((x1 <= y1)%Z -> ((eval_bin x op y) = (Vbool Init.Datatypes.true))) /\
+          (~ (x1 <= y1)%Z ->
+           ((eval_bin x op y) = (Vbool Init.Datatypes.false)))
       end
-  | (_, _) => ((eval_bin x op y) = (Vbool false))
+  | (_, _) => ((eval_bin x op y) = (Vbool Init.Datatypes.false))
   end.
 
 (* Why3 assumption *)
-Fixpoint eval_term (sigma:Z -> value) (pi:Z -> value)
-  (t:term) {struct t}: value :=
+Fixpoint eval_term (sigma:Numbers.BinNums.Z -> value)
+  (pi:Numbers.BinNums.Z -> value) (t:term) {struct t}: value :=
   match t with
   | Tconst n => Vint n
   | Tvar id => pi id
@@ -85,25 +88,27 @@ Fixpoint eval_term (sigma:Z -> value) (pi:Z -> value)
   end.
 
 (* Why3 assumption *)
-Fixpoint eval_fmla (sigma:Z -> value) (pi:Z -> value)
-  (f:fmla) {struct f}: Prop :=
+Fixpoint eval_fmla (sigma:Numbers.BinNums.Z -> value)
+  (pi:Numbers.BinNums.Z -> value) (f:fmla) {struct f}: Prop :=
   match f with
-  | Fterm t => ((eval_term sigma pi t) = (Vbool true))
-  | Fand f1 f2 => (eval_fmla sigma pi f1) /\ (eval_fmla sigma pi f2)
-  | Fnot f1 => ~ (eval_fmla sigma pi f1)
-  | Fimplies f1 f2 => (eval_fmla sigma pi f1) -> eval_fmla sigma pi f2
+  | Fterm t => ((eval_term sigma pi t) = (Vbool Init.Datatypes.true))
+  | Fand f1 f2 => eval_fmla sigma pi f1 /\ eval_fmla sigma pi f2
+  | Fnot f1 => ~ eval_fmla sigma pi f1
+  | Fimplies f1 f2 => eval_fmla sigma pi f1 -> eval_fmla sigma pi f2
   | Flet x t f1 =>
       eval_fmla sigma (map.Map.set pi x (eval_term sigma pi t)) f1
   | Fforall x Tint f1 =>
-      forall (n:Z), eval_fmla sigma (map.Map.set pi x (Vint n)) f1
+      forall (n:Numbers.BinNums.Z),
+      eval_fmla sigma (map.Map.set pi x (Vint n)) f1
   | Fforall x Tbool f1 =>
-      forall (b:bool), eval_fmla sigma (map.Map.set pi x (Vbool b)) f1
+      forall (b:Init.Datatypes.bool),
+      eval_fmla sigma (map.Map.set pi x (Vbool b)) f1
   end.
 
-Parameter subst_term: term -> Z -> Z -> term.
+Parameter subst_term: term -> Numbers.BinNums.Z -> Numbers.BinNums.Z -> term.
 
-Axiom subst_term_def :
-  forall (e:term) (r:Z) (v:Z),
+Axiom subst_term'def :
+  forall (e:term) (r:Numbers.BinNums.Z) (v:Numbers.BinNums.Z),
   match e with
   | Tconst _ => ((subst_term e r v) = e)
   | Tvar _ => ((subst_term e r v) = e)
@@ -116,39 +121,41 @@ Axiom subst_term_def :
   end.
 
 (* Why3 assumption *)
-Fixpoint fresh_in_term (id:Z) (t:term) {struct t}: Prop :=
+Fixpoint fresh_in_term (id:Numbers.BinNums.Z) (t:term) {struct t}: Prop :=
   match t with
   | Tconst _ => True
   | Tvar v => ~ (id = v)
   | Tderef _ => True
-  | Tbin t1 _ t2 => (fresh_in_term id t1) /\ (fresh_in_term id t2)
+  | Tbin t1 _ t2 => fresh_in_term id t1 /\ fresh_in_term id t2
   end.
 
 Axiom eval_subst_term :
-  forall (sigma:Z -> value) (pi:Z -> value) (e:term) (x:Z) (v:Z),
-  (fresh_in_term v e) ->
+  forall (sigma:Numbers.BinNums.Z -> value) (pi:Numbers.BinNums.Z -> value)
+    (e:term) (x:Numbers.BinNums.Z) (v:Numbers.BinNums.Z),
+  fresh_in_term v e ->
   ((eval_term sigma pi (subst_term e x v)) =
    (eval_term (map.Map.set sigma x (pi v)) pi e)).
 
 Axiom eval_term_change_free :
-  forall (t:term) (sigma:Z -> value) (pi:Z -> value) (id:Z) (v:value),
-  (fresh_in_term id t) ->
+  forall (t:term) (sigma:Numbers.BinNums.Z -> value)
+    (pi:Numbers.BinNums.Z -> value) (id:Numbers.BinNums.Z) (v:value),
+  fresh_in_term id t ->
   ((eval_term sigma (map.Map.set pi id v) t) = (eval_term sigma pi t)).
 
 (* Why3 assumption *)
-Fixpoint fresh_in_fmla (id:Z) (f:fmla) {struct f}: Prop :=
+Fixpoint fresh_in_fmla (id:Numbers.BinNums.Z) (f:fmla) {struct f}: Prop :=
   match f with
   | Fterm e => fresh_in_term id e
   | (Fand f1 f2)|(Fimplies f1 f2) =>
-      (fresh_in_fmla id f1) /\ (fresh_in_fmla id f2)
+      fresh_in_fmla id f1 /\ fresh_in_fmla id f2
   | Fnot f1 => fresh_in_fmla id f1
-  | Flet y t f1 =>
-      ~ (id = y) /\ ((fresh_in_term id t) /\ (fresh_in_fmla id f1))
-  | Fforall y _ f1 => ~ (id = y) /\ (fresh_in_fmla id f1)
+  | Flet y t f1 => ~ (id = y) /\ fresh_in_term id t /\ fresh_in_fmla id f1
+  | Fforall y _ f1 => ~ (id = y) /\ fresh_in_fmla id f1
   end.
 
 (* Why3 assumption *)
-Fixpoint subst (f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
+Fixpoint subst (f:fmla) (x:Numbers.BinNums.Z)
+  (v:Numbers.BinNums.Z) {struct f}: fmla :=
   match f with
   | Fterm e => Fterm (subst_term e x v)
   | Fand f1 f2 => Fand (subst f1 x v) (subst f2 x v)
@@ -159,27 +166,31 @@ Fixpoint subst (f:fmla) (x:Z) (v:Z) {struct f}: fmla :=
   end.
 
 Axiom eval_subst :
-  forall (f:fmla) (sigma:Z -> value) (pi:Z -> value) (x:Z) (v:Z),
-  (fresh_in_fmla v f) ->
-  (eval_fmla sigma pi (subst f x v)) <->
-  (eval_fmla (map.Map.set sigma x (pi v)) pi f).
+  forall (f:fmla) (sigma:Numbers.BinNums.Z -> value)
+    (pi:Numbers.BinNums.Z -> value) (x:Numbers.BinNums.Z)
+    (v:Numbers.BinNums.Z),
+  fresh_in_fmla v f ->
+  eval_fmla sigma pi (subst f x v) <->
+  eval_fmla (map.Map.set sigma x (pi v)) pi f.
 
 Axiom eval_swap :
-  forall (f:fmla) (sigma:Z -> value) (pi:Z -> value) (id1:Z) (id2:Z)
-    (v1:value) (v2:value),
+  forall (f:fmla) (sigma:Numbers.BinNums.Z -> value)
+    (pi:Numbers.BinNums.Z -> value) (id1:Numbers.BinNums.Z)
+    (id2:Numbers.BinNums.Z) (v1:value) (v2:value),
   ~ (id1 = id2) ->
-  (eval_fmla sigma (map.Map.set (map.Map.set pi id1 v1) id2 v2) f) <->
-  (eval_fmla sigma (map.Map.set (map.Map.set pi id2 v2) id1 v1) f).
+  eval_fmla sigma (map.Map.set (map.Map.set pi id1 v1) id2 v2) f <->
+  eval_fmla sigma (map.Map.set (map.Map.set pi id2 v2) id1 v1) f.
 
 Axiom eval_change_free :
-  forall (f:fmla) (sigma:Z -> value) (pi:Z -> value) (id:Z) (v:value),
-  (fresh_in_fmla id f) ->
-  (eval_fmla sigma (map.Map.set pi id v) f) <-> (eval_fmla sigma pi f).
+  forall (f:fmla) (sigma:Numbers.BinNums.Z -> value)
+    (pi:Numbers.BinNums.Z -> value) (id:Numbers.BinNums.Z) (v:value),
+  fresh_in_fmla id f ->
+  eval_fmla sigma (map.Map.set pi id v) f <-> eval_fmla sigma pi f.
 
 (* Why3 assumption *)
 Inductive stmt :=
   | Sskip : stmt
-  | Sassign : Z -> term -> stmt
+  | Sassign : Numbers.BinNums.Z -> term -> stmt
   | Sseq : stmt -> stmt -> stmt
   | Sif : term -> stmt -> stmt -> stmt
   | Sassert : fmla -> stmt
@@ -190,272 +201,176 @@ Existing Instance stmt_WhyType.
 Axiom check_skip : forall (s:stmt), (s = Sskip) \/ ~ (s = Sskip).
 
 (* Why3 assumption *)
-Inductive one_step: (Z -> value) -> (Z -> value) -> stmt -> (Z -> value) ->
-  (Z -> value) -> stmt -> Prop :=
+Inductive one_step: (Numbers.BinNums.Z -> value) ->
+  (Numbers.BinNums.Z -> value) -> stmt -> (Numbers.BinNums.Z -> value) ->
+  (Numbers.BinNums.Z -> value) -> stmt -> Prop :=
   | one_step_assign :
-      forall (sigma:Z -> value) (pi:Z -> value) (x:Z) (e:term),
+      forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value) (x:Numbers.BinNums.Z) (e:term),
       one_step sigma pi (Sassign x e)
       (map.Map.set sigma x (eval_term sigma pi e)) pi Sskip
   | one_step_seq :
-      forall (sigma:Z -> value) (pi:Z -> value) (sigma':Z -> value)
-        (pi':Z -> value) (i1:stmt) (i1':stmt) (i2:stmt),
-      (one_step sigma pi i1 sigma' pi' i1') ->
+      forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value) (sigma':Numbers.BinNums.Z -> value)
+        (pi':Numbers.BinNums.Z -> value) (i1:stmt) (i1':stmt) (i2:stmt),
+      one_step sigma pi i1 sigma' pi' i1' ->
       one_step sigma pi (Sseq i1 i2) sigma' pi' (Sseq i1' i2)
   | one_step_seq_skip :
-      forall (sigma:Z -> value) (pi:Z -> value) (i:stmt),
+      forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value) (i:stmt),
       one_step sigma pi (Sseq Sskip i) sigma pi i
   | one_step_if_true :
-      forall (sigma:Z -> value) (pi:Z -> value) (e:term) (i1:stmt) (i2:stmt),
-      ((eval_term sigma pi e) = (Vbool true)) ->
+      forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value) (e:term) (i1:stmt) (i2:stmt),
+      ((eval_term sigma pi e) = (Vbool Init.Datatypes.true)) ->
       one_step sigma pi (Sif e i1 i2) sigma pi i1
   | one_step_if_false :
-      forall (sigma:Z -> value) (pi:Z -> value) (e:term) (i1:stmt) (i2:stmt),
-      ((eval_term sigma pi e) = (Vbool false)) ->
+      forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value) (e:term) (i1:stmt) (i2:stmt),
+      ((eval_term sigma pi e) = (Vbool Init.Datatypes.false)) ->
       one_step sigma pi (Sif e i1 i2) sigma pi i2
   | one_step_assert :
-      forall (sigma:Z -> value) (pi:Z -> value) (f:fmla),
-      (eval_fmla sigma pi f) -> one_step sigma pi (Sassert f) sigma pi Sskip
+      forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value) (f:fmla),
+      eval_fmla sigma pi f -> one_step sigma pi (Sassert f) sigma pi Sskip
   | one_step_while_true :
-      forall (sigma:Z -> value) (pi:Z -> value) (e:term) (inv:fmla) (i:stmt),
-      (eval_fmla sigma pi inv) -> ((eval_term sigma pi e) = (Vbool true)) ->
+      forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value) (e:term) (inv:fmla) (i:stmt),
+      eval_fmla sigma pi inv ->
+      ((eval_term sigma pi e) = (Vbool Init.Datatypes.true)) ->
       one_step sigma pi (Swhile e inv i) sigma pi (Sseq i (Swhile e inv i))
   | one_step_while_false :
-      forall (sigma:Z -> value) (pi:Z -> value) (e:term) (inv:fmla) (i:stmt),
-      (eval_fmla sigma pi inv) -> ((eval_term sigma pi e) = (Vbool false)) ->
+      forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value) (e:term) (inv:fmla) (i:stmt),
+      eval_fmla sigma pi inv ->
+      ((eval_term sigma pi e) = (Vbool Init.Datatypes.false)) ->
       one_step sigma pi (Swhile e inv i) sigma pi Sskip.
 
 (* Why3 assumption *)
-Inductive many_steps: (Z -> value) -> (Z -> value) -> stmt -> (Z -> value) ->
-  (Z -> value) -> stmt -> Z -> Prop :=
+Inductive many_steps: (Numbers.BinNums.Z -> value) ->
+  (Numbers.BinNums.Z -> value) -> stmt -> (Numbers.BinNums.Z -> value) ->
+  (Numbers.BinNums.Z -> value) -> stmt -> Numbers.BinNums.Z -> Prop :=
   | many_steps_refl :
-      forall (sigma:Z -> value) (pi:Z -> value) (i:stmt),
+      forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value) (i:stmt),
       many_steps sigma pi i sigma pi i 0%Z
   | many_steps_trans :
-      forall (sigma1:Z -> value) (pi1:Z -> value) (sigma2:Z -> value)
-        (pi2:Z -> value) (sigma3:Z -> value) (pi3:Z -> value) (i1:stmt)
-        (i2:stmt) (i3:stmt) (n:Z),
-      (one_step sigma1 pi1 i1 sigma2 pi2 i2) ->
-      (many_steps sigma2 pi2 i2 sigma3 pi3 i3 n) ->
+      forall (sigma1:Numbers.BinNums.Z -> value)
+        (pi1:Numbers.BinNums.Z -> value) (sigma2:Numbers.BinNums.Z -> value)
+        (pi2:Numbers.BinNums.Z -> value) (sigma3:Numbers.BinNums.Z -> value)
+        (pi3:Numbers.BinNums.Z -> value) (i1:stmt) (i2:stmt) (i3:stmt)
+        (n:Numbers.BinNums.Z),
+      one_step sigma1 pi1 i1 sigma2 pi2 i2 ->
+      many_steps sigma2 pi2 i2 sigma3 pi3 i3 n ->
       many_steps sigma1 pi1 i1 sigma3 pi3 i3 (n + 1%Z)%Z.
 
 Axiom steps_non_neg :
-  forall (sigma1:Z -> value) (pi1:Z -> value) (sigma2:Z -> value)
-    (pi2:Z -> value) (i1:stmt) (i2:stmt) (n:Z),
-  (many_steps sigma1 pi1 i1 sigma2 pi2 i2 n) -> (0%Z <= n)%Z.
+  forall (sigma1:Numbers.BinNums.Z -> value) (pi1:Numbers.BinNums.Z -> value)
+    (sigma2:Numbers.BinNums.Z -> value) (pi2:Numbers.BinNums.Z -> value)
+    (i1:stmt) (i2:stmt) (n:Numbers.BinNums.Z),
+  many_steps sigma1 pi1 i1 sigma2 pi2 i2 n -> (0%Z <= n)%Z.
 
 Axiom many_steps_seq :
-  forall (sigma1:Z -> value) (pi1:Z -> value) (sigma3:Z -> value)
-    (pi3:Z -> value) (i1:stmt) (i2:stmt) (n:Z),
-  (many_steps sigma1 pi1 (Sseq i1 i2) sigma3 pi3 Sskip n) ->
-  exists sigma2:Z -> value, exists pi2:Z -> value, exists n1:Z, exists n2:
-  Z,
-  (many_steps sigma1 pi1 i1 sigma2 pi2 Sskip n1) /\
-  ((many_steps sigma2 pi2 i2 sigma3 pi3 Sskip n2) /\
-   (n = ((1%Z + n1)%Z + n2)%Z)).
+  forall (sigma1:Numbers.BinNums.Z -> value) (pi1:Numbers.BinNums.Z -> value)
+    (sigma3:Numbers.BinNums.Z -> value) (pi3:Numbers.BinNums.Z -> value)
+    (i1:stmt) (i2:stmt) (n:Numbers.BinNums.Z),
+  many_steps sigma1 pi1 (Sseq i1 i2) sigma3 pi3 Sskip n ->
+  exists sigma2:Numbers.BinNums.Z -> value, exists pi2:
+  Numbers.BinNums.Z -> value, exists n1:Numbers.BinNums.Z, exists n2:
+  Numbers.BinNums.Z,
+  many_steps sigma1 pi1 i1 sigma2 pi2 Sskip n1 /\
+  many_steps sigma2 pi2 i2 sigma3 pi3 Sskip n2 /\ (n = ((1%Z + n1)%Z + n2)%Z).
 
 (* Why3 assumption *)
 Definition valid_fmla (p:fmla) : Prop :=
-  forall (sigma:Z -> value) (pi:Z -> value), eval_fmla sigma pi p.
+  forall (sigma:Numbers.BinNums.Z -> value) (pi:Numbers.BinNums.Z -> value),
+  eval_fmla sigma pi p.
 
 (* Why3 assumption *)
 Definition valid_triple (p:fmla) (i:stmt) (q:fmla) : Prop :=
-  forall (sigma:Z -> value) (pi:Z -> value), (eval_fmla sigma pi p) ->
-  forall (sigma':Z -> value) (pi':Z -> value) (n:Z),
-  (many_steps sigma pi i sigma' pi' Sskip n) -> eval_fmla sigma' pi' q.
+  forall (sigma:Numbers.BinNums.Z -> value) (pi:Numbers.BinNums.Z -> value),
+  eval_fmla sigma pi p ->
+  forall (sigma':Numbers.BinNums.Z -> value) (pi':Numbers.BinNums.Z -> value)
+    (n:Numbers.BinNums.Z),
+  many_steps sigma pi i sigma' pi' Sskip n -> eval_fmla sigma' pi' q.
 
-Axiom set : forall (a:Type), Type.
-Parameter set_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (set a).
+Axiom set : Type.
+Parameter set_WhyType : WhyType set.
 Existing Instance set_WhyType.
 
-Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> Prop.
+Parameter to_fset: set -> set.Fset.fset Numbers.BinNums.Z.
 
-Parameter infix_eqeq:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> Prop.
+Parameter choose: set -> Numbers.BinNums.Z.
 
-Axiom infix_eqeq_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a),
-  (infix_eqeq s1 s2) <-> forall (x:a), (mem x s1) <-> (mem x s2).
-
-Axiom extensionality :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (infix_eqeq s1 s2) -> (s1 = s2).
-
-Parameter subset:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> Prop.
-
-Axiom subset_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a),
-  (subset s1 s2) <-> forall (x:a), (mem x s1) -> mem x s2.
-
-Axiom subset_refl :
-  forall {a:Type} {a_WT:WhyType a}, forall (s:set a), subset s s.
-
-Axiom subset_trans :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a) (s3:set a), (subset s1 s2) ->
-  (subset s2 s3) -> subset s1 s3.
-
-Parameter is_empty: forall {a:Type} {a_WT:WhyType a}, (set a) -> Prop.
-
-Axiom is_empty_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), (is_empty s) <-> forall (x:a), ~ (mem x s).
-
-Parameter empty: forall {a:Type} {a_WT:WhyType a}, set a.
-
-Axiom empty_def : forall {a:Type} {a_WT:WhyType a}, is_empty (empty : set a).
-
-Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> set a.
-
-Axiom add_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), forall (y:a),
-  (mem y (add x s)) <-> ((y = x) \/ (mem y s)).
-
-Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> (set a) -> set a.
-
-Axiom remove_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), forall (y:a),
-  (mem y (remove x s)) <-> (~ (y = x) /\ (mem y s)).
-
-Axiom add_remove :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), (mem x s) -> ((add x (remove x s)) = s).
-
-Axiom remove_add :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), ((remove x (add x s)) = (remove x s)).
-
-Axiom subset_remove :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:set a), subset (remove x s) s.
-
-Parameter union:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> set a.
-
-Axiom union_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a),
-  (mem x (union s1 s2)) <-> ((mem x s1) \/ (mem x s2)).
-
-Parameter inter:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> set a.
-
-Axiom inter_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a),
-  (mem x (inter s1 s2)) <-> ((mem x s1) /\ (mem x s2)).
-
-Parameter diff:
-  forall {a:Type} {a_WT:WhyType a}, (set a) -> (set a) -> set a.
-
-Axiom diff_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), forall (x:a),
-  (mem x (diff s1 s2)) <-> ((mem x s1) /\ ~ (mem x s2)).
-
-Axiom subset_diff :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), subset (diff s1 s2) s1.
-
-Parameter choose: forall {a:Type} {a_WT:WhyType a}, (set a) -> a.
-
-Axiom choose_spec :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), ~ (is_empty s) -> mem (choose s) s.
-
-Parameter cardinal: forall {a:Type} {a_WT:WhyType a}, (set a) -> Z.
-
-Axiom cardinal_nonneg :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), (0%Z <= (cardinal s))%Z.
-
-Axiom cardinal_empty :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), ((cardinal s) = 0%Z) <-> (is_empty s).
-
-Axiom cardinal_add :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a), forall (s:set a), ~ (mem x s) ->
-  ((cardinal (add x s)) = (1%Z + (cardinal s))%Z).
-
-Axiom cardinal_remove :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a), forall (s:set a), (mem x s) ->
-  ((cardinal s) = (1%Z + (cardinal (remove x s)))%Z).
-
-Axiom cardinal_subset :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (subset s1 s2) ->
-  ((cardinal s1) <= (cardinal s2))%Z.
-
-Axiom subset_eq :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:set a) (s2:set a), (subset s1 s2) ->
-  ((cardinal s1) = (cardinal s2)) -> infix_eqeq s1 s2.
-
-Axiom cardinal1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:set a), ((cardinal s) = 1%Z) -> forall (x:a), (mem x s) ->
-  (x = (choose s)).
+Axiom choose'spec :
+  forall (s:set), ~ set.Fset.is_empty (to_fset s) ->
+  set.Fset.mem (choose s) (to_fset s).
 
 (* Why3 assumption *)
-Definition assigns (sigma:Z -> value) (a:set Z) (sigma':Z -> value) : Prop :=
-  forall (i:Z), ~ (mem i a) -> ((sigma i) = (sigma' i)).
+Definition assigns (sigma:Numbers.BinNums.Z -> value)
+    (a:set.Fset.fset Numbers.BinNums.Z) (sigma':Numbers.BinNums.Z -> value) :
+    Prop :=
+  forall (i:Numbers.BinNums.Z), ~ set.Fset.mem i a ->
+  ((sigma i) = (sigma' i)).
 
 Axiom assigns_refl :
-  forall (sigma:Z -> value) (a:set Z), assigns sigma a sigma.
+  forall (sigma:Numbers.BinNums.Z -> value)
+    (a:set.Fset.fset Numbers.BinNums.Z),
+  assigns sigma a sigma.
 
 Axiom assigns_trans :
-  forall (sigma1:Z -> value) (sigma2:Z -> value) (sigma3:Z -> value)
-    (a:set Z),
-  ((assigns sigma1 a sigma2) /\ (assigns sigma2 a sigma3)) ->
+  forall (sigma1:Numbers.BinNums.Z -> value)
+    (sigma2:Numbers.BinNums.Z -> value) (sigma3:Numbers.BinNums.Z -> value)
+    (a:set.Fset.fset Numbers.BinNums.Z),
+  assigns sigma1 a sigma2 /\ assigns sigma2 a sigma3 ->
   assigns sigma1 a sigma3.
 
 Axiom assigns_union_left :
-  forall (sigma:Z -> value) (sigma':Z -> value) (s1:set Z) (s2:set Z),
-  (assigns sigma s1 sigma') -> assigns sigma (union s1 s2) sigma'.
+  forall (sigma:Numbers.BinNums.Z -> value)
+    (sigma':Numbers.BinNums.Z -> value) (s1:set.Fset.fset Numbers.BinNums.Z)
+    (s2:set.Fset.fset Numbers.BinNums.Z),
+  assigns sigma s1 sigma' -> assigns sigma (set.Fset.union s1 s2) sigma'.
 
 Axiom assigns_union_right :
-  forall (sigma:Z -> value) (sigma':Z -> value) (s1:set Z) (s2:set Z),
-  (assigns sigma s2 sigma') -> assigns sigma (union s1 s2) sigma'.
+  forall (sigma:Numbers.BinNums.Z -> value)
+    (sigma':Numbers.BinNums.Z -> value) (s1:set.Fset.fset Numbers.BinNums.Z)
+    (s2:set.Fset.fset Numbers.BinNums.Z),
+  assigns sigma s2 sigma' -> assigns sigma (set.Fset.union s1 s2) sigma'.
 
 (* Why3 assumption *)
-Fixpoint stmt_writes (i:stmt) (w:set Z) {struct i}: Prop :=
+Fixpoint stmt_writes (i:stmt)
+  (w:set.Fset.fset Numbers.BinNums.Z) {struct i}: Prop :=
   match i with
   | Sskip|(Sassert _) => True
-  | Sassign id _ => mem id w
-  | (Sseq s1 s2)|(Sif _ s1 s2) => (stmt_writes s1 w) /\ (stmt_writes s2 w)
+  | Sassign id _ => set.Fset.mem id w
+  | (Sseq s1 s2)|(Sif _ s1 s2) => stmt_writes s1 w /\ stmt_writes s2 w
   | Swhile _ _ s => stmt_writes s w
   end.
 
 Axiom consequence_rule :
   forall (p:fmla) (p':fmla) (q:fmla) (q':fmla) (i:stmt),
-  (valid_fmla (Fimplies p' p)) -> (valid_triple p i q) ->
-  (valid_fmla (Fimplies q q')) -> valid_triple p' i q'.
+  valid_fmla (Fimplies p' p) -> valid_triple p i q ->
+  valid_fmla (Fimplies q q') -> valid_triple p' i q'.
 
 Axiom skip_rule : forall (q:fmla), valid_triple q Sskip q.
 
 Axiom assign_rule :
-  forall (q:fmla) (x:Z) (id:Z) (e:term), (fresh_in_fmla id q) ->
+  forall (q:fmla) (x:Numbers.BinNums.Z) (id:Numbers.BinNums.Z) (e:term),
+  fresh_in_fmla id q ->
   valid_triple (Flet id e (subst q x id)) (Sassign x e) q.
 
 Axiom seq_rule :
   forall (p:fmla) (q:fmla) (r:fmla) (i1:stmt) (i2:stmt),
-  ((valid_triple p i1 r) /\ (valid_triple r i2 q)) ->
-  valid_triple p (Sseq i1 i2) q.
+  valid_triple p i1 r /\ valid_triple r i2 q -> valid_triple p (Sseq i1 i2) q.
 
 Axiom if_rule :
   forall (e:term) (p:fmla) (q:fmla) (i1:stmt) (i2:stmt),
-  ((valid_triple (Fand p (Fterm e)) i1 q) /\
-   (valid_triple (Fand p (Fnot (Fterm e))) i2 q)) ->
+  valid_triple (Fand p (Fterm e)) i1 q /\
+  valid_triple (Fand p (Fnot (Fterm e))) i2 q ->
   valid_triple p (Sif e i1 i2) q.
 
 Axiom assert_rule :
-  forall (f:fmla) (p:fmla), (valid_fmla (Fimplies p f)) ->
+  forall (f:fmla) (p:fmla), valid_fmla (Fimplies p f) ->
   valid_triple p (Sassert f) p.
 
 Axiom assert_rule_ext :
@@ -463,32 +378,34 @@ Axiom assert_rule_ext :
 
 Axiom while_rule :
   forall (e:term) (inv:fmla) (i:stmt),
-  (valid_triple (Fand (Fterm e) inv) i inv) ->
+  valid_triple (Fand (Fterm e) inv) i inv ->
   valid_triple inv (Swhile e inv i) (Fand (Fnot (Fterm e)) inv).
 
 Axiom while_rule_ext :
   forall (e:term) (inv:fmla) (inv':fmla) (i:stmt),
-  (valid_fmla (Fimplies inv' inv)) ->
-  (valid_triple (Fand (Fterm e) inv') i inv') ->
+  valid_fmla (Fimplies inv' inv) ->
+  valid_triple (Fand (Fterm e) inv') i inv' ->
   valid_triple inv' (Swhile e inv i) (Fand (Fnot (Fterm e)) inv').
 
 (* Why3 goal *)
-Theorem VC_wp :
+Theorem wp'VC :
   forall (i:stmt) (q:fmla), forall (result:fmla),
   (exists x:term, exists x1:fmla, exists x2:stmt,
    (i = (Swhile x x1 x2)) /\
-   exists o:fmla,
-   (valid_triple o x2 x1) /\
-   exists o1:fmla,
-   (forall (sigma:Z -> value) (pi:Z -> value), (eval_fmla sigma pi o1) ->
-    (eval_fmla sigma pi
-     (Fand (Fimplies (Fand (Fterm x) x1) o)
-      (Fimplies (Fand (Fnot (Fterm x)) x1) q))) /\
-    forall (sigma':Z -> value) (pi':Z -> value) (n:Z),
-    (many_steps sigma pi x2 sigma' pi' Sskip n) -> eval_fmla sigma' pi' o1) /\
-   (result = (Fand x1 o1))) ->
+   (exists o:fmla,
+    valid_triple o x2 x1 /\
+    (exists o1:fmla,
+     (forall (sigma:Numbers.BinNums.Z -> value)
+        (pi:Numbers.BinNums.Z -> value),
+      eval_fmla sigma pi o1 ->
+      eval_fmla sigma pi
+      (Fand (Fimplies (Fand (Fterm x) x1) o)
+       (Fimplies (Fand (Fnot (Fterm x)) x1) q)) /\
+      (forall (sigma':Numbers.BinNums.Z -> value)
+         (pi':Numbers.BinNums.Z -> value) (n:Numbers.BinNums.Z),
+       many_steps sigma pi x2 sigma' pi' Sskip n -> eval_fmla sigma' pi' o1)) /\
+     (result = (Fand x1 o1))))) ->
   valid_triple result i q.
-(* Why3 intros i q result (x,(x1,(x2,(h1,(o,(h2,(o1,(h3,h4)))))))). *)
 Proof.
 (* intros i q result (x,(x1,(x2,(h1,(o,(h2,(o1,(h3,h4)))))))). *)
 intros i Post result.
@@ -531,4 +448,3 @@ clear H_abstracted.
 apply Hfalse; split; auto.
 rewrite H11; discriminate.
 Qed.
-

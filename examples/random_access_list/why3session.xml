@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="0" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="random_access_list.mlw"/>
+<path name=".."/><path name="random_access_list.mlw"/>
 <theory name="RandomAccessList" proved="true">
  <goal name="VC length_flatten" expl="VC for length_flatten" proved="true">
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <proof prover="4"><result status="valid" time="0.06" steps="15147"/></proof>
  </goal>
  <goal name="VC size" expl="VC for size" proved="true">
  <proof prover="3"><result status="valid" time="0.02" steps="132"/></proof>
  </goal>
  <goal name="VC cons" expl="VC for cons" proved="true">
- <proof prover="4"><result status="valid" time="0.10"/></proof>
+ <proof prover="4"><result status="valid" time="0.10" steps="23130"/></proof>
  </goal>
  <goal name="VC nth_flatten" expl="VC for nth_flatten" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -27,7 +26,7 @@
   <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="VC nth_flatten.2" expl="postcondition" proved="true">
-  <proof prover="4" timelimit="5"><result status="valid" time="3.03"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="3.03" steps="2179536"/></proof>
   </goal>
  </transf>
  </goal>
@@ -35,7 +34,7 @@
  <proof prover="3"><result status="valid" time="0.34" steps="670"/></proof>
  </goal>
  <goal name="VC tail" expl="VC for tail" proved="true">
- <proof prover="4"><result status="valid" time="0.08"/></proof>
+ <proof prover="4"><result status="valid" time="0.08" steps="22945"/></proof>
  </goal>
  <goal name="VC update" expl="VC for update" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -81,7 +80,7 @@
    <proof prover="3"><result status="valid" time="0.31" steps="576"/></proof>
    </goal>
    <goal name="VC update.11.2" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.56"/></proof>
+   <proof prover="0"><result status="valid" time="0.56" steps="118967"/></proof>
    </goal>
   </transf>
   </goal>
@@ -102,19 +101,19 @@
 </theory>
 <theory name="RAL" proved="true">
  <goal name="VC t" expl="VC for t" proved="true">
- <proof prover="4"><result status="valid" time="0.01"/></proof>
+ <proof prover="4"><result status="valid" time="0.01" steps="7481"/></proof>
  </goal>
  <goal name="VC empty" expl="VC for empty" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="9170"/></proof>
  </goal>
  <goal name="VC size" expl="VC for size" proved="true">
- <proof prover="4"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="8380"/></proof>
  </goal>
  <goal name="VC cons" expl="VC for cons" proved="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <proof prover="4"><result status="valid" time="0.02" steps="9639"/></proof>
  </goal>
  <goal name="VC lookup" expl="VC for lookup" proved="true">
- <proof prover="4"><result status="valid" time="0.03"/></proof>
+ <proof prover="4"><result status="valid" time="0.03" steps="10299"/></proof>
  </goal>
 </theory>
 <theory name="RandomAccessListWithSeq" proved="true">
@@ -236,7 +235,7 @@
  </transf>
  </goal>
  <goal name="VC update" expl="VC for update" proved="true">
- <proof prover="4"><result status="valid" time="0.06"/></proof>
+ <proof prover="4"><result status="valid" time="0.06" steps="16651"/></proof>
  </goal>
 </theory>
 </file>

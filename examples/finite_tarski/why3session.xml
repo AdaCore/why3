@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="6">
+<why3session shape_version="8">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="finite_tarski.mlw"/>
+<path name=".."/><path name="finite_tarski.mlw"/>
 <theory name="Tarski_rec" proved="true">
  <goal name="VC least_fix_point" expl="VC for least_fix_point" proved="true">
  <proof prover="0"><result status="valid" time="0.10" steps="379"/></proof>
@@ -43,7 +42,7 @@
   <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="VC least_fix_point.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04"/></proof>
+  <proof prover="3"><result status="valid" time="0.04" steps="13017"/></proof>
   </goal>
  </transf>
  </goal>

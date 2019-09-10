@@ -30,8 +30,7 @@ module FlexibleArray
   use import seq.Seq as S
   use import queue.Queue as Q
   use list.List
-  use list.Append
-  use list.Mem
+  use seq.Mem
 
   (* to be a Braun tree *)
   predicate inv (t: tree 'a) = match t with
@@ -233,25 +232,22 @@ module FlexibleArray
     | Node _ _ _ -> true
     end
 
-  function size_list (l: list (tree 'a)) : int =
-    match l with
-    | Nil      -> 0
-    | Cons t s -> size t + size_list s
-    end
+  use int.Sum
 
-  let rec lemma size_list_nonneg (l: list (tree 'a)) : unit
-    variant { l }
+  function size_list (l: seq (tree 'a)) : int =
+    sum (fun i -> size l[i]) 0 (Seq.length l)
+
+  let lemma size_list_nonneg (l: seq (tree 'a)) : unit
     ensures { size_list l >= 0 }
-  = match l with Nil -> () | Cons _ s -> size_list_nonneg s end
+  = ()(* match l with Nil -> () | Cons _ s -> size_list_nonneg s end *)
 
-  let rec lemma size_list_append (l1 l2: list (tree 'a)) : unit
-    variant { l1 }
+  let lemma size_list_append (l1 l2: seq (tree 'a)) : unit
     ensures { size_list (l1 ++ l2) = size_list l1 + size_list l2 }
-  = match l1 with Nil -> () | Cons _ s1 -> size_list_append s1 l2 end
+  = ()(* match l1 with Nil -> () | Cons _ s1 -> size_list_append s1 l2 end *)
 
   lemma size_list_snoc:
-    forall l: list (tree 'a), t: tree 'a.
-    size_list (l ++ Cons t Nil) = size_list l + size t
+    forall l: seq (tree 'a), t: tree 'a.
+    size_list (l ++ cons t empty) = size_list l + size t
 
   (* FIXME: In practice, such a function iter would have a visitor function
      as argument. Here, we only intend to prove the soundness of such
@@ -267,14 +263,14 @@ module FlexibleArray
     if non_empty a.tree then begin
       Q.push a.tree q;
       while not (Q.is_empty q) do
-        invariant { not (mem Empty q.elts) }
-        invariant { not (mem Empty left.elts) }
-        invariant { not (mem Empty right.elts) }
-        invariant { S.length !visited + size_list q.elts +
-                    size_list left.elts + size_list right.elts = a.length }
+        invariant { not (mem Empty q) }
+        invariant { not (mem Empty left) }
+        invariant { not (mem Empty right) }
+        invariant { S.length !visited + size_list q +
+                    size_list left + size_list right = a.length }
         invariant { forall i. 0 <= i < S.length !visited ->
                     !visited[i] = get a i }
-        invariant { Q.length q = 0 -> Q.length left = Q.length right = 0 }
+        invariant { S.length q = 0 -> S.length left = S.length right = 0 }
         variant   { a.length - S.length !visited }
         let x = Q.safe_pop q in
         match x with

@@ -12,10 +12,6 @@
 %{
   open Ptree
 
-  let qualid_last = function Qident x | Qdot (_, x) -> x
-
-  let use_as q = function Some x -> x | None -> qualid_last q
-
   let floc s e = Loc.extract (s,e)
 
   let add_attr id l = (* id.id_ats is usually nil *)
@@ -194,6 +190,12 @@
           )
           dl
     | _ -> ()
+
+  let name_term id_opt def t =
+    let name = Opt.fold (fun _ id -> id.id_str) def id_opt in
+    let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
+    { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
+
 %}
 
 (* Tokens *)
@@ -293,14 +295,15 @@ term_eof:
 (* Modules and scopes *)
 
 mlw_file:
-| mlw_module* EOF
+| EOF
+| mlw_module mlw_module_no_decl* EOF
     { Typing.close_file () }
-| module_decl+ EOF
-    { let loc = floc $startpos($2) $endpos($2) in
+| module_decl module_decl_no_head* EOF
+    { let loc = floc $startpos($3) $endpos($3) in
       Typing.close_module loc; Typing.close_file () }
 
 mlw_module:
-| module_head module_decl* END
+| module_head module_decl_no_head* END
     { Typing.close_module (floc $startpos($3) $endpos($3)) }
 
 module_head:
@@ -315,38 +318,58 @@ module_decl:
 | scope_head module_decl* END
     { Typing.close_scope (floc $startpos($1) $endpos($1)) ~import:$1 }
 | IMPORT uqualid
-    { Typing.import_scope (floc $startpos $endpos) $2 }
+    { Typing.add_decl (floc $startpos $endpos) (Dimport($2)) }
 | d = pure_decl | d = prog_decl | d = meta_decl
     { Typing.add_decl (floc $startpos $endpos) d;
       add_record_projections d
     }
 | use_clone { () }
 
+mlw_module_no_decl:
+| SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| mlw_module
+   { $1 }
+
+module_decl_no_head:
+| THEORY | MODULE
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| module_decl
+   { $1 }
+
 (* Use and clone *)
 
 use_clone:
 | USE EXPORT tqualid
-    { Typing.add_decl (floc $startpos $endpos) (Duse $3) }
+    { let loc = floc $startpos $endpos in
+      let decl = Ptree.Duseexport $3 in
+      Typing.add_decl loc decl
+    }
 | CLONE EXPORT tqualid clone_subst
-    { Typing.add_decl (floc $startpos $endpos) (Dclone ($3, $4)) }
+    { let loc = floc $startpos $endpos in
+      let decl = Ptree.Dcloneexport($3,$4) in
+      Typing.add_decl loc decl
+    }
 | USE boption(IMPORT) m_as_list = comma_list1(use_as)
     { let loc = floc $startpos $endpos in
       let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
-      if $2 && not exists_as then Warning.emit ~loc
+      let import = $2 in
+      if import && not exists_as then Warning.emit ~loc
         "the keyword `import' is redundant here and can be omitted";
-      let add_import (m, q) = let import = $2 || q = None in
-        Typing.open_scope loc (use_as m q);
-        Typing.add_decl loc (Duse m);
-        Typing.close_scope loc ~import  in
-      List.iter add_import m_as_list }
+      let decl = Ptree.Duseimport(loc,import,m_as_list) in
+      Typing.add_decl loc decl
+    }
 | CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
     { let loc = floc $startpos $endpos in
-      if $2 && $4 = None then Warning.emit ~loc
+      let import = $2 in
+      let as_opt = $4 in
+      if import && as_opt = None then Warning.emit ~loc
         "the keyword `import' is redundant here and can be omitted";
-      let import = $2 || $4 = None in
-      Typing.open_scope loc (use_as $3 $4);
-      Typing.add_decl loc (Dclone ($3, $5));
-      Typing.close_scope loc ~import }
+      let decl = Ptree.Dcloneimport(loc,import,$3,as_opt,$5) in
+      Typing.add_decl loc decl
+    }
 
 use_as:
 | n = tqualid q = option(preceded(AS, uident)) { (n, q) }
@@ -388,6 +411,7 @@ meta_arg:
 | AXIOM     qualid  { Max $2 }
 | LEMMA     qualid  { Mlm $2 }
 | GOAL      qualid  { Mgl $2 }
+| VAL       qualid  { Mval $2 }
 | STRING            { Mstr $1 }
 | INTEGER           { Mint (Number.to_small_integer $1) }
 
@@ -1085,8 +1109,8 @@ single_expr_:
     { Ematch ($2, [], $4) }
 | GHOST single_expr
     { Eghost $2 }
-| assertion_kind LEFTBRC term RIGHTBRC
-    { Eassert ($1, $3) }
+| assertion_kind option(ident_nq) LEFTBRC term RIGHTBRC
+    { Eassert (snd $1, name_term $2 (fst $1) $4) }
 | attr single_expr %prec prec_attr
     { Eattr ($1, $2) }
 | single_expr cast
@@ -1171,9 +1195,9 @@ exn_handler:
 | uqualid pat_arg? ARROW seq_expr { $1, $2, $4 }
 
 assertion_kind:
-| ASSERT  { Expr.Assert }
-| ASSUME  { Expr.Assume }
-| CHECK   { Expr.Check }
+| ASSERT  { "Assert", Expr.Assert }
+| ASSUME  { "Assume", Expr.Assume }
+| CHECK   { "Check", Expr.Check }
 
 for_dir:
 | TO      { Expr.To }
@@ -1186,10 +1210,11 @@ spec:
 | single_spec spec                  { spec_union $1 $2 }
 
 single_spec:
-| REQUIRES LEFTBRC term RIGHTBRC
-    { { empty_spec with sp_pre = [$3] } }
-| ENSURES LEFTBRC ensures RIGHTBRC
-    { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
+| REQUIRES option(ident_nq) LEFTBRC term RIGHTBRC
+    { { empty_spec with sp_pre = [name_term $2 "Requires" $4] } }
+| ENSURES option(ident_nq) LEFTBRC ensures RIGHTBRC
+    { let bindings = List.map (fun (p, t) -> p, name_term $2 "Ensures" t) $4 in
+      { empty_spec with sp_post = [floc $startpos($4) $endpos($4), bindings] } }
 | RETURNS LEFTBRC match_cases(term) RIGHTBRC
     { { empty_spec with sp_post = [floc $startpos($3) $endpos($3), $3] } }
 | RAISES LEFTBRC bar_list1(raises) RIGHTBRC
@@ -1225,7 +1250,8 @@ xsymbol:
 | uqualid { $1, None }
 
 invariant:
-| INVARIANT LEFTBRC term RIGHTBRC { $3 }
+| INVARIANT option(ident_nq) LEFTBRC term RIGHTBRC
+    { name_term $2 "LoopInvariant" $4 }
 
 variant:
 | VARIANT LEFTBRC comma_list1(single_variant) RIGHTBRC { $3 }
@@ -1256,7 +1282,7 @@ ret_ident:
     { let ats = ATstr Dterm.attr_w_unused_var_no :: id.id_ats in
       mk_pat (Pvar {id with id_ats = ats}) $startpos $endpos }
 | UNDERSCORE
-    { mk_pat Pwild $startpos $endpos }
+    { mk_pat (Pvar (id_anonymous (floc $startpos $endpos))) $startpos $endpos }
 
 return:
 |               ty            { $1, Ity.MaskVisible }

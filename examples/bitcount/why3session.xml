@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="6">
+<why3session shape_version="8">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="4000"/>
@@ -9,8 +9,7 @@
 <prover id="5" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="6" steplimit="0" memlimit="4000"/>
 <file proved="true">
-<path name=".."/>
-<path name="bitcount.mlw"/>
+<path name=".."/><path name="bitcount.mlw"/>
 <theory name="BitCount8bit_fact" proved="true">
  <goal name="nth_as_bv_is_int" proved="true">
  <proof prover="0"><result status="valid" time="0.05"/></proof>
@@ -86,7 +85,7 @@
   <transf name="split_goal_right" proved="true" >
    <goal name="VC step2.4.0" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.11"/></proof>
-   <proof prover="2"><result status="valid" time="0.69"/></proof>
+   <proof prover="2"><result status="valid" time="0.47"/></proof>
    <proof prover="4"><result status="valid" time="0.10"/></proof>
    <proof prover="6"><result status="valid" time="0.10" steps="104"/></proof>
    </goal>
@@ -103,7 +102,7 @@
    <proof prover="0"><result status="valid" time="0.04"/></proof>
    </goal>
    <goal name="VC step2.4.4" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="3.60"/></proof>
+   <proof prover="0"><result status="valid" time="2.73"/></proof>
    </goal>
   </transf>
   </goal>
@@ -111,7 +110,7 @@
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="4"><result status="valid" time="0.12"/></proof>
   <proof prover="5"><result status="valid" time="0.04"/></proof>
-  <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="3.17" steps="1399"/></proof>
+  <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="2.70" steps="1399"/></proof>
   </goal>
   <goal name="VC step2.6" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.10"/></proof>
@@ -302,7 +301,7 @@
    <proof prover="5"><result status="valid" time="0.12"/></proof>
    </goal>
    <goal name="VC proof1.6.2" expl="VC for proof1" proved="true">
-   <proof prover="4"><result status="valid" time="1.41"/></proof>
+   <proof prover="4"><result status="valid" time="1.04"/></proof>
    <proof prover="6"><result status="valid" time="0.04" steps="96"/></proof>
    </goal>
   </transf>
@@ -453,7 +452,7 @@
   <proof prover="6"><result status="valid" time="0.04" steps="87"/></proof>
   </goal>
   <goal name="VC proof3.8" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.67"/></proof>
+  <proof prover="2"><result status="valid" time="0.49"/></proof>
   <proof prover="4"><result status="valid" time="0.10"/></proof>
   <proof prover="6"><result status="valid" time="0.05" steps="114"/></proof>
   </goal>
@@ -478,7 +477,7 @@
    </goal>
    <goal name="VC proof3.11.2" expl="VC for proof3" proved="true">
    <proof prover="4"><result status="valid" time="0.08"/></proof>
-   <proof prover="5"><result status="valid" time="4.08"/></proof>
+   <proof prover="5"><result status="valid" time="3.27"/></proof>
    <proof prover="6"><result status="valid" time="0.03" steps="101"/></proof>
    </goal>
   </transf>
@@ -645,8 +644,8 @@
  <proof prover="6"><result status="valid" time="0.23" steps="450"/></proof>
  </goal>
  <goal name="numof_ytpmE" proved="true">
- <proof prover="0"><result status="valid" time="1.42"/></proof>
- <proof prover="4"><result status="valid" time="1.52"/></proof>
+ <proof prover="0"><result status="valid" time="1.04"/></proof>
+ <proof prover="4"><result status="valid" time="1.11"/></proof>
  </goal>
  <goal name="VC separation" expl="VC for separation" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -686,7 +685,7 @@
    <proof prover="6"><result status="valid" time="0.03" steps="79"/></proof>
    </goal>
    <goal name="VC triangleInequalityInt.0.1" expl="VC for triangleInequalityInt" proved="true">
-   <proof prover="0" timelimit="10"><result status="valid" time="7.41"/></proof>
+   <proof prover="0" timelimit="10"><result status="valid" time="4.86"/></proof>
    </goal>
   </transf>
   </goal>
@@ -744,7 +743,7 @@
  </goal>
  <goal name="VC numof_or" expl="VC for numof_or" proved="true">
  <proof prover="0"><result status="valid" time="0.31"/></proof>
- <proof prover="4"><result status="valid" time="0.60"/></proof>
+ <proof prover="4"><result status="valid" time="0.44"/></proof>
  <proof prover="5"><result status="valid" time="0.06"/></proof>
  </goal>
  <goal name="VC count_or" expl="VC for count_or" proved="true">
@@ -762,7 +761,7 @@
   <proof prover="5"><result status="valid" time="0.04"/></proof>
   </goal>
   <goal name="VC count_or.3" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="2.59"/></proof>
+  <proof prover="4"><result status="valid" time="1.95"/></proof>
   </goal>
   <goal name="VC count_or.4" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08"/></proof>
@@ -774,28 +773,28 @@
  </goal>
  <goal name="VC ascii" expl="VC for ascii" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC ascii.0" expl="precondition" proved="true">
+  <goal name="VC ascii.0" expl="out-of-bounds shifting" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="4"><result status="valid" time="0.11"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
-  <proof prover="6" timelimit="5"><result status="valid" time="0.09" steps="81"/></proof>
+  <proof prover="6" timelimit="5"><result status="valid" time="0.09" steps="80"/></proof>
   </goal>
   <goal name="VC ascii.1" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC ascii.2" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.18" steps="403"/></proof>
+  <proof prover="6"><result status="valid" time="0.18" steps="432"/></proof>
   </goal>
   <goal name="VC ascii.3" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="VC ascii.3.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.24"/></proof>
+   <proof prover="2"><result status="valid" time="0.11"/></proof>
    <proof prover="4"><result status="valid" time="0.10"/></proof>
    <proof prover="6" timelimit="5"><result status="valid" time="0.02" steps="89"/></proof>
    </goal>
    <goal name="VC ascii.3.1" expl="assertion" proved="true">
    <proof prover="4"><result status="valid" time="0.14"/></proof>
-   <proof prover="6" timelimit="5"><result status="valid" time="0.04" steps="157"/></proof>
+   <proof prover="6" timelimit="5"><result status="valid" time="0.04" steps="158"/></proof>
    </goal>
    <goal name="VC ascii.3.2" expl="assertion" proved="true">
    <proof prover="0"><result status="valid" time="0.17"/></proof>
@@ -808,16 +807,16 @@
   </transf>
   </goal>
   <goal name="VC ascii.4" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.09"/></proof>
+  <proof prover="1"><result status="valid" time="0.09" steps="21726"/></proof>
   </goal>
   <goal name="VC ascii.5" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.11"/></proof>
-  <proof prover="4"><result status="valid" time="1.91"/></proof>
+  <proof prover="4"><result status="valid" time="1.41"/></proof>
   </goal>
   <goal name="VC ascii.6" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.71"/></proof>
+  <proof prover="4"><result status="valid" time="0.53"/></proof>
   <proof prover="5"><result status="valid" time="0.06"/></proof>
-  <proof prover="6"><result status="valid" time="0.21" steps="374"/></proof>
+  <proof prover="6"><result status="valid" time="0.21" steps="378"/></proof>
   </goal>
  </transf>
  </goal>
@@ -838,7 +837,7 @@
   <proof prover="6"><result status="valid" time="0.02" steps="80"/></proof>
   </goal>
   <goal name="VC tmp.2" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.87"/></proof>
+  <proof prover="5"><result status="valid" time="0.66"/></proof>
   </goal>
  </transf>
  </goal>

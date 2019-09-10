@@ -9,7 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Ident
 open Ty
 open Term
 
@@ -21,10 +20,10 @@ exception NoMatch of term * term
    (matching is done modulo those) *)
 let rec remove_bp = function
   | {t_node = Tapp(ls,[t;tt])}
-    when ls_equal ls ps_equ && t_equal_nt_na tt t_bool_true -> remove_bp t
+    when ls_equal ls ps_equ && t_equal tt t_bool_true -> remove_bp t
   | {t_node = Tif (t,tt,tf)}
-    when t_equal_nt_na tt t_bool_true
-      && t_equal_nt_na tf t_bool_false -> remove_bp t
+    when t_equal tt t_bool_true
+      && t_equal tf t_bool_false -> remove_bp t
   | t -> t
 
 
@@ -48,7 +47,7 @@ let rec matching bnd mty mv tp tm =
     begin match Mvs.find vp mv with
     (* FIXME? If term have distinct attributes/triggers,
        only the attributes/triggers coming from the first match are kept. *)
-    | tb -> if t_equal_nt_na (remove_bp tb) tm then mty, mv else fail ()
+    | tb -> if t_equal (remove_bp tb) tm then mty, mv else fail ()
     | exception Not_found -> match oty_match mty tp.t_ty tmf.t_ty with
     | mty ->
       if Mvs.set_disjoint bnd (t_vars tm)
@@ -57,7 +56,7 @@ let rec matching bnd mty mv tp tm =
       else fail ()
     | exception TypeMismatch _ -> fail ()
     end
-  | (Tconst _ | Ttrue | Tfalse), _ when t_equal_nt_na tp tm ->
+  | (Tconst _ | Ttrue | Tfalse), _ when t_equal tp tm ->
     mty, mv
   | Tapp (lsp,lp), Tapp (lsm,lm) when ls_equal lsp lsm ->
     let mty = try oty_match mty tp.t_ty tm.t_ty
@@ -160,11 +159,7 @@ module C = struct
     | Crigid vs1, Crigid vs2 -> vs_compare vs1 vs2
     | Cbound n1, Cbound n2 | Ccase n1, Ccase n2 -> n1 -- n2
     | Cconst t1, Cconst t2 ->
-      (* FIXME? is there a better way to achieve
-         attribute-independent comparison ?
-         (Note that terms are not nested here, so that
-          code actually works) *)
-      t_compare (t_attr_set Sattr.empty t1) (t_attr_set Sattr.empty t2)
+      t_compare t1 t2
     | Capp ls1, Capp ls2 -> ls_compare ls1 ls2
     | Cquant (q1,n1), Cquant (q2,n2) ->
       let c = q1 -- q2 in if c <> 0 then c else n1 -- n2
@@ -476,7 +471,7 @@ let instr ms = function
       | exception Not_found -> false
       end
     | (Tconst _ | Ttrue | Tfalse), Cconst tp
-      when t_equal (t_attr_set Sattr.empty t) (t_attr_set Sattr.empty tp) ->
+      when t_equal t tp ->
       add_dty ms t l; true
     | Tapp (lsm,tl), Capp lsp when ls_equal lsm lsp ->
       ms.term_stack <- List.rev_append tl ms.term_stack;
@@ -565,7 +560,7 @@ let instr ms = function
       | None -> t_if t t_bool_true t_bool_false
     in
     begin match Mvs.find vs ms.term_match with
-    | t0 -> t_equal_nt_na t t0
+    | t0 -> t_equal t t0
     | exception Not_found ->
       ms.term_match <- Mvs.add vs t ms.term_match; true
     end

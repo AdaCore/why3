@@ -39,6 +39,8 @@ let module_name ?fname path t =
     | Some f, _ -> clean_name f in
   fname ^ "__" ^ t
 
+let known_decls : Mltree.decl Hid.t = Hid.create 17
+
 (** Translation from Mlw to ML *)
 
 module Translate = struct
@@ -94,6 +96,8 @@ module Translate = struct
         rdef :: filter_out_ghost_rdef l
 
   let rec pat m p = match p.pat_node with
+    | _ when mask_equal m MaskGhost ->
+        ML.Pwild
     | Pwild ->
         ML.Pwild
     | Pvar vs when (restore_pv vs).pv_ghost ->
@@ -295,7 +299,8 @@ module Translate = struct
         let args = params cty.cty_args in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
         let new_svar = new_svar args res svar in
-        let ld = ML.sym_defn rs new_svar res args (expr info svar cty.cty_mask ef) in
+        let e_let = expr info svar cty.cty_mask ef in
+        let ld = ML.sym_defn rs new_svar res args e_let in
         ML.e_let ld (expr info svar mask ein) (ML.I e.e_ity) mask eff attrs
     | Elet (LDsym (rs, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein)
       when isconstructor info rs_app -> (* partial application of constructor *)
@@ -364,16 +369,33 @@ module Translate = struct
         Debug.dprintf debug_compile "pvl: %d@." (List.length pvl);
         Debug.dprintf debug_compile "cty_args: %d@." (List.length cty.cty_args);
         let rs = Hrs.find_def ht_rs rs rs in
-        let add_unit = function [] -> [ML.e_unit] | args -> args in
+        let add_unit = function [] -> [ML.e_dummy_unit] | args -> args in
         let id_f = fun x -> x in
         let f_zero = match rs.rs_logic with
-          | RLnone when cty.cty_args = []  ->
+          | RLnone when cty.cty_args = [] ->
               Debug.dprintf debug_compile "it is a fully applied RLnone@.";
+              (* FIXME: ideally this should be done in ocaml_printer *)
               add_unit
           | _ -> id_f in
         let pvl = app pvl rs.rs_cty.cty_args f_zero in
+        let eta_exp_pj is_optimizable =
+          Debug.dprintf debug_compile "record projection@.";
+          let params = filter_params cty.cty_args in
+          let args = cty.cty_args in
+          let app_args = app args args (fun x -> x) in
+          (* create the identity function *)
+          let ml_app = if is_optimizable then
+              match app_args with [a] -> a | _ -> assert false
+            else let ity_res = (ML.I rs.rs_cty.cty_result) in
+              ML.e_app rs app_args ity_res MaskVisible eff_empty attrs in
+          let ity = ML.C cty in
+          let attrs = Sattr.empty in
+          ML.e_fun params ml_app ity cty.cty_mask eff_empty attrs in
         begin match pvl with
           | [pv_expr] when is_optimizable_record_rs info rs -> pv_expr
+          | []        when is_optimizable_record_rs info rs ->
+              eta_exp_pj true
+          | [] when rs.rs_field <> None -> eta_exp_pj false
           | _ -> ML.e_app rs pvl (ML.I e.e_ity) mask eff attrs end
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
         (* abstract block *)
@@ -474,8 +496,8 @@ module Translate = struct
         (rs.rs_name, List.map (fun {pv_vs = vs} -> type_ vs.vs_ty) args)) in
     let drecord_fields ({rs_cty = cty} as rs) =
       (List.exists (pv_equal (fd_of_rs rs)) s.its_mfields,
-      rs.rs_name,
-      mlty_of_ity cty.cty_mask cty.cty_result) in
+       rs.rs_name,
+       mlty_of_ity cty.cty_mask cty.cty_result) in
     let id = s.its_ts.ts_name in
     let is_private = s.its_private in
     let args = s.its_ts.ts_args in
@@ -545,7 +567,7 @@ module Translate = struct
         let new_svar = new_svar args res Stv.empty in
         [ML.Dlet (ML.Lany (rs, new_svar, res, []))]
     | PDlet (LDsym ({rs_cty = cty; rs_logic} as rs, {c_node = Cfun e; c_cty}))
-      when c_cty.cty_args = [] ->
+      when filter_params c_cty.cty_args = [] ->
         Debug.dprintf debug_compile "compiling zero-arguments function %a@."
           Expr.print_rs rs;
         Debug.dprintf debug_compile "rs_cty_eff:%b@. c_cty_eff:%b@."
@@ -607,7 +629,9 @@ module Translate = struct
   let module_ m =
     let from = { ML.from_mod = Some m; ML.from_km = m.mod_known; } in
     let mod_decl = List.concat (List.map (mdecl from) m.mod_units) in
-    let add_decl known_map decl = let idl = ML.get_decl_name decl in
+    let add_decl known_map decl =
+      let idl = ML.get_decl_name decl in
+      List.iter (fun id -> Hid.replace known_decls id decl) idl;
       List.fold_left (ML.add_known_decl decl) known_map idl in
     let mod_known = List.fold_left add_decl Mid.empty mod_decl in {
       ML.mod_from = from;
@@ -619,7 +643,172 @@ end
 
 (** Some transformations *)
 
-module Transform = struct
+module RefreshLetBindings = struct
+
+  open Expr
+  open Translate
+  open Mltree
+
+  let clone_rs rs =
+    let rsn' = id_clone rs.rs_name in
+    Expr.create_rsymbol rsn' ~kind:(rs_kind rs) rs.rs_cty
+
+  let clone_pv pv =
+    let id' = id_clone (pv_name pv) in
+    create_pvsymbol id' pv.pv_ity
+
+  let rec expr ((accv, accf) as acc) e =
+    let acc,e = e_map_fold expr acc e in
+    let mk e_node = { e with e_node = e_node } in
+    match e.e_node with
+    (* collect let-bindings *)
+    | Elet (ld, e) ->
+       let acc, ld' = ldef acc ld in
+       let acc, e' = expr acc e in
+       acc, mk (Elet (ld', e'))
+    (* apply transformation under lambdas *)
+    | Efun (vl, e) ->
+       assert (List.for_all (fun (id,_,_) -> not (Mid.mem id accv)) vl);
+       let acc, e' = expr acc e in
+       acc, mk (Efun (vl, e'))
+    (* apply substitution *)
+    | Evar pv ->
+       let pv' = pvs accv pv in
+       acc, mk (Evar pv')
+    | Eapp (rs, el) ->
+       let rs' = Mrs.find_def rs rs accf in
+       acc, mk (Eapp (rs', el))
+    | Eassign al ->
+       let al' =
+         List.map
+           (fun (pv, rs, e) ->
+             let pv' = pvs accv pv in
+             assert (not (Mrs.mem rs accf));
+             (pv', rs, e))
+           al in
+       acc, mk (Eassign al')
+    | _ -> acc, e
+
+  and pvs accv pv = Mid.find_def pv (pv_name pv) accv
+
+  and ldef ((accv, accf) as acc) ld =
+    match ld with
+    | Lvar (pv, e) ->
+      let id = Translate.pv_name pv in
+      assert (not (Mid.mem id accv));
+      let pv' = clone_pv pv in
+      let acc = (Mid.add id pv' accv, accf) in
+      let acc', e' = expr acc e in
+      acc', Lvar (pv', e')
+    | Lsym (rs, tv, rty, vl, e) ->
+       assert (List.for_all (fun (id,_,_) -> not (Mid.mem id accv)) vl);
+       let rs' = clone_rs rs in
+       let acc = (accv, Mrs.add rs rs' accf) in
+       let acc', e' = expr acc e in
+       acc', Lsym (rs, tv, rty, vl, e')
+    | Lany _ -> acc, ld
+    | Lrec rl ->
+       let accf, rl =
+         Lists.map_fold_left
+           (fun acc rd ->
+             let rs = rd.rec_sym in
+             let rs' = clone_rs rs in
+             Mrs.add rs rs' acc, { rd with rec_sym = rs' })
+           accf rl in
+       let acc, rl =
+         Lists.map_fold_left
+           (fun acc rd ->
+             assert (List.for_all
+                       (fun (id,_,_) -> not (Mid.mem id accv))
+                       rd.rec_args);
+             let acc, e = expr acc rd.rec_exp in
+             acc, { rd with rec_exp = e }) (accv, accf) rl in
+       acc, Lrec rl
+
+  let expr e = let _, e' = expr (Mid.empty, Mrs.empty) e in e'
+
+end
+
+module InlineFunctionCalls = struct
+
+  open Expr
+  open Mltree
+  open Translate
+
+  let inline_attr = Ident.create_attribute "extraction:inline"
+  let inlined_call_attr = Ident.create_attribute "__extraction:inlined__"
+
+  (* invariant: expressions are still in A-normal form *)
+  let rec expr subst e =
+    let e = e_map (expr subst) e in
+    let mk e_node = { e with e_node = e_node } in
+    match e.e_node with
+    | Evar v -> mk (Evar (pv subst v))
+    | Eapp (rs, el) when Sattr.mem inline_attr rs.rs_name.id_attrs ->
+       let fname = rs.rs_name in
+       Debug.dprintf debug_compile "inlining call to %s@." fname.id_string;
+       let decl = Hid.find known_decls fname in
+       let call args body =
+         let add_to_subst acc e v =
+            let (id, _ty, _gh) = v in
+            assert (not (Mid.mem id acc));
+            match e.e_node with
+            | Evar pv ->
+               Mid.add id pv acc
+            | _ ->
+               Debug.dprintf debug_compile "call is not in A-normal form@.";
+               assert false in
+         (* refresh all let-bindings to maintain ident unicity *)
+         let body = RefreshLetBindings.expr body in
+         let subst' = List.fold_left2 add_to_subst subst el args in
+         let e' = expr subst' body in
+         let e' =
+           { e' with e_attrs = Sattr.add inlined_call_attr e'.e_attrs } in
+         mk (Eblock [e'])
+       in
+       begin match decl with
+       | Dlet (Lsym (_,_,_,args,e)) -> call args e
+       | Dlet (Lrec _) ->
+          Debug.dprintf debug_compile "recursive functions cannot be inlined@.";
+          e
+       | _ -> assert false end
+    | Efun (vl, e) ->
+       List.iter (fun (id, _ty, _gh) -> assert (not (Mid.mem id subst))) vl;
+       mk (Efun (vl, expr subst e))
+    | Eassign al ->
+       let assign (v, rs, e) =
+         let pv' = pv subst v in
+         (pv', rs, e) in
+       let al' = List.map assign al in
+       mk (Eassign al')
+    | Efor (i, st, dir, en, e) ->
+       assert (not (Mid.mem (pv_name i) subst));
+       mk (Efor (i, pv subst st, dir, pv subst en, e))
+    | _ -> e
+
+  and pv subst v = try pv subst (Mid.find (pv_name v) subst) with Not_found -> v
+
+  and let_def subst ld = ld_map (expr subst) ld
+
+  let rec pdecl d =
+    match d with
+    | Dtype _ | Dexn _ | Dval _ -> d
+    | Dmodule (id, dl) ->
+       Dmodule (id, List.map pdecl dl)
+    | Dlet def ->
+       Dlet (let_def Mid.empty def)
+
+  let module_ m =
+    let decls = List.map pdecl m.mod_decl in
+    let add known_map decl =
+      let idl = Mltree.get_decl_name decl in
+      List.fold_left (Mltree.add_known_decl decl) known_map idl in
+    let mod_known = List.fold_left add Mid.empty decls in
+    { m with mod_decl = decls; mod_known = mod_known }
+
+end
+
+module InlineProxyVars = struct
 
   open Mltree
 
@@ -635,34 +824,21 @@ module Transform = struct
        && can_inline e1 e2'
     | _ -> no_effect_conflict eff1.eff_reads eff2
 
-  let mk_list_eb ebl f =
-    let mk_acc e (e_acc, s_acc) =
-      let e, s = f e in e::e_acc, Spv.union s s_acc in
-    List.fold_right mk_acc ebl ([], Spv.empty)
-
-  let rec expr info subst e =
+  let rec expr info subst (vars: Spv.t) e =
+    let vars, e = e_map_fold (expr info subst) vars e in
     let mk e_node = { e with e_node = e_node } in
-    let add_subst pv e1 e2 = expr info (Mpv.add pv e1 subst) e2 in
     match e.e_node with
-    | Evar pv -> begin try Mpv.find pv subst, Spv.singleton pv
-        with Not_found -> e, Spv.empty end
+    | Evar pv -> begin try Spv.add pv vars, Mpv.find pv subst
+        with Not_found -> vars, e end
     | Elet (Lvar (pv, ({e_effect = eff1} as e1)), e2)
       when Sattr.mem proxy_attr pv.pv_vs.vs_name.id_attrs &&
-           eff_pure eff1 &&
-           can_inline e1 e2 ->
-        let e1, s1 = expr info subst e1 in
-        let e2, s2 = add_subst pv e1 e2 in
-        let s_union = Spv.union s1 s2 in
-        if Spv.mem pv s2 then e2, s_union (* [pv] was substituted in [e2] *)
+           eff_pure eff1 && can_inline e1 e2 ->
+        let subst' = Mpv.add pv e1 Mpv.empty in
+        let s_union, e2 = expr info subst' vars e2 in
+        if Spv.mem pv s_union
+        then s_union, e2 (* [pv] was substituted in [e2] *)
         else (* [pv] was not substituted in [e2], e.g [e2] is an [Efun] *)
-          mk (Elet (Lvar (pv, e1), e2)), s_union
-    | Elet (ld, e) ->
-        let e, spv = expr info subst e in
-        let e_let, spv_let = let_def info subst ld in
-        mk (Elet (e_let, e)), Spv.union spv spv_let
-    | Eapp (rs, el) ->
-        let e_app, spv = mk_list_eb el (expr info subst) in
-        mk (Eapp (rs, e_app)), spv
+          s_union, mk (Elet (Lvar (pv, e1), e2))
     | Efun (vl, e) ->
         (* For now, we accept to inline constants and constructors
            with zero arguments inside a [Efun]. *)
@@ -674,75 +850,12 @@ module Transform = struct
         (* We begin the inlining of proxy variables in an [Efun] with a
            restricted substitution. This keeps some proxy lets, preventing
            undiserable captures inside the [Efun] expression. *)
-        let e, spv = expr info restrict_subst e in
-        mk (Efun (vl, e)), spv
-    | Eif (e1, e2, e3) ->
-        let e1, s1 = expr info subst e1 in
-        let e2, s2 = expr info subst e2 in
-        let e3, s3 = expr info subst e3 in
-        mk (Eif (e1, e2, e3)), Spv.union (Spv.union s1 s2) s3
-    | Eexn (xs, ty, e1) ->
-        let e1, s1 = expr info subst e1 in
-        mk (Eexn (xs, ty, e1)), s1
-    | Ematch (e, bl, xl) ->
-        let e, spv = expr info subst e in
-        let e_bl, spv_bl = mk_list_eb bl (branch info subst) in
-        let e_xl, spv_xl = mk_list_eb xl (xbranch info subst) in
-        mk (Ematch (e, e_bl, e_xl)), Spv.union (Spv.union spv spv_bl) spv_xl
-(*
-    | Etry (e, case, bl) ->
-        let e, spv = expr info subst e in
-        let e_bl, spv_bl = mk_list_eb bl (xbranch info subst) in
-        mk (Etry (e, case, e_bl)), Spv.union spv spv_bl
-*)
-    | Eblock el ->
-        let e_app, spv = mk_list_eb el (expr info subst) in
-        mk (Eblock e_app), spv
-    | Ewhile (e1, e2) ->
-        let e1, s1 = expr info subst e1 in
-        let e2, s2 = expr info subst e2 in
-        mk (Ewhile (e1, e2)), Spv.union s1 s2
-    | Efor (x, pv1, dir, pv2, e) ->
-        let e, spv = expr info subst e in
-        mk (Efor (x, pv1, dir, pv2, e)), spv
-    | Eraise (exn, None) -> mk (Eraise (exn, None)), Spv.empty
-    | Eraise (exn, Some e) ->
-        let e, spv = expr info subst e in
-        mk (Eraise (exn, Some e)), spv
-    | Eassign al ->
-       let al, s =
-         List.fold_left
-           (fun (accl, spv) (pv,rs,e) ->
-             let e, s = expr info subst e in
-             ((pv, rs, e)::accl, Spv.union spv s))
-           ([], Spv.empty) al in
-       mk (Eassign (List.rev al)), s
-    | Econst _ | Eabsurd -> e, Spv.empty
-    | Eignore e ->
-        let e, spv = expr info subst e in
-        mk (Eignore e), spv
+        let spv, e = expr info restrict_subst vars e in
+        spv, mk (Efun (vl, e))
+    | _ -> vars, e
 
-  and branch info subst (pat, e) =
-    let e, spv = expr info subst e in (pat, e), spv
-  and xbranch info subst (exn, pvl, e) =
-    let e, spv = expr info subst e in (exn, pvl, e), spv
-
-  and let_def info subst = function
-    | Lvar (pv, e) ->
-        assert (not (Mpv.mem pv subst)); (* no capture *)
-        let e, spv = expr info subst e in
-        Lvar (pv, e), spv
-    | Lsym (rs, svar, res, args, e) ->
-        let e, spv = expr info subst e in
-        Lsym (rs, svar, res, args, e), spv
-    | Lany _ as lany -> lany, Mpv.empty
-    | Lrec rl ->
-        let rdef, spv = mk_list_eb rl (rdef info subst) in
-        Lrec rdef, spv
-
-  and rdef info subst r =
-    let rec_exp, spv = expr info subst r.rec_exp in
-    { r with rec_exp = rec_exp }, spv
+  and let_def info subst vars ld =
+    ld_map_fold (expr info subst) vars ld
 
   let rec pdecl info = function
     | Dtype _ | Dexn _ | Dval _ as d -> d
@@ -750,7 +863,8 @@ module Transform = struct
         let dl = List.map (pdecl info) dl in Dmodule (id, dl)
     | Dlet def ->
         (* for top-level symbols we can forget the set of inlined variables *)
-        let e, _ = let_def info Mpv.empty def in Dlet e
+        let _, e = let_def info Mpv.empty Spv.empty def in
+        Dlet e
 
   let module_ m =
     let mod_decl = List.map (pdecl m.mod_from) m.mod_decl in
@@ -759,5 +873,42 @@ module Transform = struct
       List.fold_left (Mltree.add_known_decl decl) known_map idl in
     let mod_known = List.fold_left add Mid.empty mod_decl in
     { m with mod_decl = mod_decl; mod_known = mod_known }
+
+end
+
+module InlineTrivialLets = struct
+
+  open Mltree
+
+  let rec expr e =
+    let e = e_map expr e in
+    match e.e_node with
+    | Elet (Lvar (pv1, e'), { e_node = Evar pv2 }) when pv_equal pv1 pv2 -> e'
+    | _ -> e
+
+  let let_def ld = ld_map expr ld
+
+  let rec pdecl d =
+    match d with
+    | Dtype _ | Dexn _ | Dval _ -> d
+    | Dmodule (id, dl) -> Dmodule (id, List.map pdecl dl)
+    | Dlet def -> Dlet (let_def def)
+
+  let module_ m =
+    let decls = List.map pdecl m.mod_decl in
+    let add known_map decl =
+      let idl = Mltree.get_decl_name decl in
+      List.fold_left (Mltree.add_known_decl decl) known_map idl in
+    let mod_known = List.fold_left add Mid.empty decls in
+    { m with mod_decl = decls; mod_known = mod_known }
+
+end
+
+module Transform = struct
+
+  let module_ m =
+    let m = InlineFunctionCalls.module_ m in
+    let m = InlineProxyVars.module_ m in
+    InlineTrivialLets.module_ m
 
 end

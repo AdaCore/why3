@@ -1,12 +1,24 @@
 :x: marks a potential source of incompatibility
 
 Standard library
+  * `pqueue.Pqueue` now modeled using sequences instead of lists :x:
+  * `queue.Queue` now modeled using sequences instead of lists :x:
   * the `set` library has been revamped :x:
       - in `set.Fset`, type `set` becomes `fset`; `choose` becomes `pick`
       - module `appset.Appset` becomes `set.SetApp`;
         `impset.Impset` becomes `set.SetImp`
       - in `set.SetApp` and `set.SetImp`, type `t` becomes `set`;
         field `contents` becomes `to_fset`; call to `empty` becomes `empty ()`
+
+Language
+  * It is now possible to give a name to requires and assertions.
+    `requires Hyp { a = 3 }` tries to give the name `Hyp` to the corresponding
+    hypothesis after introduction. This uses the attribute [@hyp_name:] which is
+    now reserved.
+  * Ident suffix introduced for specification (resp definition) of a function
+    are renamed from "_spec" (resp. "_def" to "'spec" (resp. "'def" :x:
+  * Ident prefix introduced for goals "VC " and record constructor "mk "
+    becomes suffix "'VC" and "'mk".
 
 Tools
   * counterexamples given by `why3prove` are no longer printed using JSON
@@ -15,6 +27,9 @@ Tools
 API
   * `Call_provers.print_prover_result` now takes an additional argument
     `~json_model` to indicate whether counterexamples are printed using JSON :x:
+  * Counterexamples: indices of array are now model_value. :x:
+  * ITP constructor Task now contain the location of the goal :x:
+  * ITP constructor Source_and_ce now has 3 arguments instead of 2 :x:
 
 Transformations
   * `apply`/`rewrite` behaves better in presence of `let`;
@@ -25,14 +40,35 @@ Transformations
   * `induction_arg_ty_lex` is now equivalent to `induction_ty_lex`
   * `induction_arg_pr` now takes an optional argument that indicates what to
     generalize in the induction
+  * `destruct` now destruct `not p` into `p -> false`. `destruct_rec` is
+     allowed to further destruct afterwards.
+    `destruct` can also destruct `true` and `false`.
+  * decision procedures used for reflection now must be declared explicitly using
+    `meta reflection val <function_name>` :x:
+  * `remove` should not raise unnecessary popups anymore. Added `remove_rec`.
+    `bisect` should not raise unnecessary popups too.
 
 IDE
   * display of counterexamples in the Task view has been improved
   * auto jumping to next unproved goal can now be disabled in the preferences
+  * add a "reset proofs" command in the Tools menu. It removes all proofs in
+    the session
+  * default proof strategies "Auto level 1" and "Auto level 2"
+    have been respectively renamed "Auto level 2" and "Auto level 3"
+    and there is a new "Auto level 1" similar to "Auto level 0" but with a longer
+    time limit.
+    More details in the manual, section 9.6 "Proof Strategies". :x:
+  * strategies can now be defined using %t (resp. %m) for using a prover with
+    the default timelimit (resp. memlimit)
 
 Realizations
   * Added experimental realizations for new Set theories in both Isabelle and
     Coq
+
+Provers
+  * support for CVC4 1.7 (released April 9, 2019)
+  * support for Alt-Ergo 2.3.0 (released February 11, 2019)
+  * support for Coq 8.9.1 (released May 20, 2019)
 
 Version 1.2.0, February 11, 2019
 --------------------------------

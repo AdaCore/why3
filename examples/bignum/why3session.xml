@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../bignum.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="bignum.mlw"/>
 <theory name="BigNum" proved="true">
  <goal name="VC nonneg" expl="VC for nonneg" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -17,7 +18,7 @@
   <proof prover="3"><result status="valid" time="0.02"/></proof>
   </goal>
   <goal name="VC nonneg.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="21219"/></proof>
   </goal>
  </transf>
  </goal>
@@ -30,7 +31,7 @@
   <proof prover="3"><result status="valid" time="0.01"/></proof>
   </goal>
   <goal name="VC msd.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="19949"/></proof>
   </goal>
  </transf>
  </goal>

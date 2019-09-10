@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="7">
+<prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file proved="true">
+<path name=".."/><path name="subsequence.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="VC is_subsequence" expl="VC for is_subsequence" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC is_subsequence.0" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.28"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.5" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.6" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.9" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.10" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC is_subsequence.10.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="VC is_subsequence.10.0.0" expl="postcondition" proved="true">
+    <transf name="exists" proved="true" arg1="f">
+     <goal name="VC is_subsequence.10.0.0.0" proved="true">
+     <proof prover="2"><result status="valid" time="0.06"/></proof>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="VC is_subsequence.10.0.1" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.04"/></proof>
+    </goal>
+    <goal name="VC is_subsequence.10.0.2" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.03"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="VC is_subsequence.10.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.04"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC is_subsequence.11" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.12" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.13" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.14" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="VC is_subsequence.15" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

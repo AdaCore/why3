@@ -22,7 +22,7 @@ module DijkstraShortestPath
 
   constant v: fset vertex
 
-  val ghost function g_succ (x: vertex) : fset vertex
+  val ghost function g_succ (_x: vertex) : fset vertex
     ensures { subset result v }
 
   val get_succs (x: vertex): set
@@ -151,13 +151,13 @@ module DijkstraShortestPath
     (* there are paths for vertices in Q *)
     (forall v: vertex. mem v q -> path src v d[v])
 
-  predicate inv_succ (src: vertex) (s q: set) (d: t int) =
+  predicate inv_succ (_src: vertex) (s q: set) (d: t int) =
     (* successors of vertices in S are either in S or in Q *)
     forall x: vertex. mem x s ->
     forall y: vertex. mem y (g_succ x) ->
     (mem y s \/ mem y q) /\ d[y] <= d[x] + weight x y
 
-  predicate inv_succ2 (src: vertex) (s q: set) (d: t int) (u: vertex) (su: set) =
+  predicate inv_succ2 (_src: vertex) (s q: set) (d: t int) (u: vertex) (su: set) =
     (* successors of vertices in S are either in S or in Q,
        unless they are successors of u still in su *)
     forall x: vertex. mem x s ->

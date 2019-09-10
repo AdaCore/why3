@@ -33,4 +33,9 @@ val eval_global_expr:
 *)
 
 val eval_global_symbol:
-  Env.env -> Pmodule.pmodule -> Format.formatter -> Expr.rsymbol -> unit
+  ?real_param:(int*int*int) -> Env.env -> Pmodule.pmodule ->
+    Format.formatter -> Expr.rsymbol -> unit
+(* [eval_global_symbol ?real_param env m fmt rs] evaluate global symbol [rs] of
+   module [m] in environment [env]. It prints output to [fmt].
+   [real_param] is an optional argument used to give a precision on real
+   computation if necessary *)

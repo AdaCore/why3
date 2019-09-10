@@ -44,7 +44,7 @@ rewrite (Z2Nat.inj_sub _ 1) by easy.
 destruct (u - l)%Z ; try easy.
 simpl.
 assert (exists n, Pos.to_nat p = S n) as [n ->].
-  exists (Z.to_nat (Zpred (Zpos p))).
+  exists (Z.to_nat (Z.pred (Zpos p))).
   rewrite Z2Nat.inj_pred.
   apply (S_pred _ O).
   apply Pos2Nat.is_pos.
@@ -361,14 +361,14 @@ intros m l u i x y H.
 rewrite 2!(occ_append _ _ l i u) by omega.
 rewrite 2!(occ_append _ _ i (i + 1) u) by omega.
 rewrite 2!occ_single.
-rewrite (proj1 (Map.set_def _ _ _ _) eq_refl).
+rewrite (proj1 (Map.set'def _ _ _ _) eq_refl).
 rewrite 2!(occ_eq _ (Map.set m i x) m).
 ring.
 intros j H1.
-apply Map.set_def.
+apply Map.set'def.
 omega.
 intros j H1.
-apply Map.set_def.
+apply Map.set'def.
 omega.
 Qed.
 
@@ -384,7 +384,7 @@ Proof.
 intros m l u i j x y z h1 h2 h3.
 rewrite 4!occ_set by assumption.
 apply not_eq_sym in h3.
-rewrite 2!(proj2 (Map.set_def _ _ _ _) h3).
+rewrite 2!(proj2 (Map.set'def _ _ _ _) h3).
 ring.
 Qed.
 

@@ -297,8 +297,15 @@ and print_fmla_node info fmt f = match f.t_node with
       fprintf fmt "((%a and@ %a)@ or@ (not@ %a and@ %a))"
         (print_fmla info) f1 (print_fmla info) f2 (print_fmla info)
         f1 (print_fmla info) f3
-  | Tlet _ -> unsupportedTerm f
-      "alt-ergo: you must eliminate let in formula"
+  | Tlet (t1, tb) ->
+      let v, f2 = t_open_bound tb in
+      fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
+        (print_ident info) v.vs_name
+        (print_term info) t1
+         (** some version of alt-ergo have an inefficient typing of let *)
+        (print_type info) v.vs_ty
+        (print_fmla info) f2;
+      forget_var info v
   | Tcase _ -> unsupportedTerm f
       "alt-ergo: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)

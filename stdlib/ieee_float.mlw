@@ -61,7 +61,7 @@ module GenericFloat
   (** {3 Constructors and Constants} *)
 
   val constant zeroF     : t   (** +0.0 *)
-  (* exp_bias = 2^(sb - 1) - 1 *)
+  (* exp_bias = 2^(eb - 1) - 1 *)
   (* max_finite_exp = 2^sb - 2 - exp_bias = exp_bias *)
   (* max_significand = (2^eb + 2^eb - 1) * 2^(1-eb) *)
   (* max_value = (2^eb + 2^eb - 1) * 2^(1-eb) * 2 ^ max_finite_exp *)
@@ -127,11 +127,11 @@ module GenericFloat
 
   predicate is_normal    t
   predicate is_subnormal t
-  predicate is_zero      t
-  predicate is_infinite  t
-  predicate is_nan       t
-  predicate is_positive  t
-  predicate is_negative  t
+  val predicate is_zero      t
+  val predicate is_infinite  t
+  val predicate is_nan       t
+  val predicate is_positive  t
+  val predicate is_negative  t
 
   (** helper predicate for zeros, normals and subnormals. not defined
      so that the axiomatisation below can use it without talking about

@@ -97,7 +97,7 @@ let rec t_insert hd t = match t.t_node with
 let add_ld which meta_rewrite_def (ls,ld) (abst,defn,axl,metas) =
   if which ls then
     let vl,e = open_ls_defn ld in
-    let nm = ls.ls_name.id_string ^ "_def" in
+    let nm = ls.ls_name.id_string ^ "'def" in
     let pr = create_prsymbol (id_derive nm ls.ls_name) in
     let hd = t_app ls (List.map t_var vl) e.t_ty in
     let ax = t_forall_close vl [[hd]] (t_insert hd e) in

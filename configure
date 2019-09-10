@@ -675,6 +675,10 @@ BIGINTPKG
 BIGINTLIB
 BIGINTINCLUDE
 enable_zarith
+found_mlmpfr
+MLMPFR_LINK
+MLMPFR
+MLMPFRINCLUDE
 NUMINCLUDE
 COMPILERLIBSPKG
 COMPILERLIBS
@@ -706,7 +710,7 @@ COQC
 EMACS
 HACHA
 HEVEA
-RUBBER
+LATEX
 USEOCAMLFIND
 MENHIR
 OCAMLDOCOPT
@@ -750,6 +754,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -838,6 +843,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1090,6 +1096,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1227,7 +1242,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1380,6 +1395,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -4173,17 +4189,19 @@ else
   COMPILERLIBSPKG=
 fi
 
-# checking for rubber
+# checking for rubber or latexmk or pdflatex
 if test "$enable_doc" = yes ; then
-   # Extract the first word of "rubber", so it can be a program name with args.
-set dummy rubber; ac_word=$2
+   for ac_prog in rubber latexmk pdflatex
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_RUBBER+:} false; then :
+if ${ac_cv_prog_LATEX+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  if test -n "$RUBBER"; then
-  ac_cv_prog_RUBBER="$RUBBER" # Let the user override the test.
+  if test -n "$LATEX"; then
+  ac_cv_prog_LATEX="$LATEX" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -4192,7 +4210,7 @@ do
   test -z "$as_dir" && as_dir=.
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_RUBBER="rubber"
+    ac_cv_prog_LATEX="$ac_prog"
     $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -4200,25 +4218,28 @@ done
   done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_prog_RUBBER" && ac_cv_prog_RUBBER="no"
 fi
 fi
-RUBBER=$ac_cv_prog_RUBBER
-if test -n "$RUBBER"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RUBBER" >&5
-$as_echo "$RUBBER" >&6; }
+LATEX=$ac_cv_prog_LATEX
+if test -n "$LATEX"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LATEX" >&5
+$as_echo "$LATEX" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
 
-   if test "$RUBBER" = no ; then
+  test -n "$LATEX" && break
+done
+test -n "$LATEX" || LATEX="no"
+
+   if test "$LATEX" = no ; then
       enable_doc=no
       enable_html_doc=no
-      reason_doc=" (rubber not found)"
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find rubber, documentation disabled." >&5
-$as_echo "$as_me: WARNING: Cannot find rubber, documentation disabled." >&2;}
+      reason_doc=" ((rubber|latexmk|pdflatex) not found)"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find any latex compiler, documentation disabled." >&5
+$as_echo "$as_me: WARNING: Cannot find any latex compiler, documentation disabled." >&2;}
    fi
 else
    enable_html_doc=no
@@ -5046,6 +5067,67 @@ elif test "$enable_js_of_ocaml" != yes; then
    reason_web_ide=" (Javascript support not available)"
 fi
 
+# Mlmpfr
+MLMPFR_LINK=
+if test "$enable_js_of_ocaml" != no; then
+   found_mlmpfr=no
+   reason_mlmpfr=" (Cannot allow mlmpfr with js_of_ocaml) "
+else
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query mlmpfr)
+      if test -n "$DIR"; then
+         echo "ocamlfind found mlmpfr in $DIR"
+         # Test that mpfr version is higher than 4.0.0 (because of
+         # Faithful constructor incompatibility).
+         MPFR_VER=$(grep -q "4.0.0" $DIR/META 2> /dev/null)
+         EXIT_CODE=$?
+         if test $EXIT_CODE = 0; then
+            MLMPFRINCLUDE="-I $DIR"
+            MLMPFR=mlmpfr
+            found_mlmpfr=yes
+            MLMPFR_LINK="-cclib -lmpfr"
+            as_ac_File=`$as_echo "ac_cv_file_$DIR/mlmpfr.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/mlmpfr.cma" >&5
+$as_echo_n "checking for $DIR/mlmpfr.cma... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/mlmpfr.cma"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  found_mlmpfr=yes
+fi
+
+         else
+            reason_mlmpfr=" (Version of mlmpfr is not 4.0.0) "
+            found_mlmpfr=no
+         fi
+      else
+         reason_mlmpfr=" (Could not find mlmpfr) "
+         found_mlmpfr=no
+      fi
+   else
+      reason_mlmpfr=" (Should use ocamlfind to use mlmpfr) "
+      found_mlmpfr=no
+   fi
+fi
+if test "$found_mlmpfr" = no; then
+   MLMPFRINCLUDE=
+   MLMPFR=
+fi
+
+
 # Coq
 
 enable_coq_support=yes
@@ -5463,6 +5545,10 @@ fi
 VERSION=$PACKAGE_VERSION
 
 # substitutions to perform
+
+
+
+
 
 
 
@@ -6790,6 +6876,7 @@ echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
 echo "    Compiler plugins        : $enable_compiler_plugins$reason_compiler_plugins"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
+echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"
@@ -6805,7 +6892,7 @@ if test "$enable_frama_c" = yes ; then
 fi
 echo "Documentation               : $enable_doc$reason_doc"
 if test "$enable_doc" = yes ; then
-   echo "    PDF                     : yes"
+   echo "    PDF                     : with $LATEX"
    echo "    HTML                    : $enable_html_doc$reason_html_doc"
 fi
 echo "Support for interactive proof assistants"

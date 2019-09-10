@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Z3" version="3.2" timelimit="3" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../bitvector.why" proved="true">
+<file proved="true">
+<path name=".."/><path name="bitvector.why"/>
 <theory name="BitVector" proved="true">
  <goal name="Nth_bw_xor_v1true" proved="true">
  <proof prover="3"><result status="valid" time="0.01"/></proof>
@@ -35,10 +36,10 @@
   <goal name="to_nat_of_zero2.0" proved="true">
   <transf name="induction" proved="true" arg1="j">
    <goal name="to_nat_of_zero2.0.0" expl="base case" proved="true">
-   <proof prover="5"><result status="valid" time="0.10"/></proof>
+   <proof prover="5"><result status="valid" time="0.10" steps="20597"/></proof>
    </goal>
    <goal name="to_nat_of_zero2.0.1" expl="recursive case" proved="true">
-   <proof prover="5"><result status="valid" time="0.17"/></proof>
+   <proof prover="5"><result status="valid" time="0.17" steps="31924"/></proof>
    </goal>
   </transf>
   </goal>
@@ -49,10 +50,10 @@
   <goal name="to_nat_of_zero.0" proved="true">
   <transf name="induction" proved="true" arg1="j">
    <goal name="to_nat_of_zero.0.0" expl="base case" proved="true">
-   <proof prover="5"><result status="valid" time="0.09"/></proof>
+   <proof prover="5"><result status="valid" time="0.09" steps="20561"/></proof>
    </goal>
    <goal name="to_nat_of_zero.0.1" expl="recursive case" proved="true">
-   <proof prover="5"><result status="valid" time="0.15"/></proof>
+   <proof prover="5"><result status="valid" time="0.15" steps="31668"/></proof>
    </goal>
   </transf>
   </goal>
@@ -61,16 +62,16 @@
  <goal name="VC to_nat_of_one" expl="VC for to_nat_of_one" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC to_nat_of_one.0" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.02"/></proof>
+  <proof prover="5"><result status="valid" time="0.02" steps="8110"/></proof>
   </goal>
   <goal name="VC to_nat_of_one.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.03"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="8394"/></proof>
   </goal>
   <goal name="VC to_nat_of_one.2" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.06"/></proof>
+  <proof prover="5"><result status="valid" time="0.06" steps="14754"/></proof>
   </goal>
   <goal name="VC to_nat_of_one.3" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.16"/></proof>
+  <proof prover="5"><result status="valid" time="0.16" steps="35782"/></proof>
   </goal>
  </transf>
  </goal>
@@ -79,10 +80,10 @@
   <goal name="to_nat_sub_footprint.0" proved="true">
   <transf name="induction" proved="true" arg1="j">
    <goal name="to_nat_sub_footprint.0.0" expl="base case" proved="true">
-   <proof prover="5"><result status="valid" time="0.13"/></proof>
+   <proof prover="5"><result status="valid" time="0.13" steps="23944"/></proof>
    </goal>
    <goal name="to_nat_sub_footprint.0.1" expl="recursive case" proved="true">
-   <proof prover="5"><result status="valid" time="0.36"/></proof>
+   <proof prover="5"><result status="valid" time="0.36" steps="58185"/></proof>
    </goal>
   </transf>
   </goal>
@@ -181,7 +182,7 @@
  <proof prover="4" timelimit="30"><result status="valid" time="6.45" steps="2706"/></proof>
  </goal>
  <goal name="to_nat_0x00000003" proved="true">
- <proof prover="6" timelimit="120"><result status="valid" time="68.07"/></proof>
+ <proof prover="6" timelimit="120"><result status="valid" time="53.28"/></proof>
  </goal>
  <goal name="to_nat_0x00000007" proved="true">
  <proof prover="4" timelimit="30"><result status="valid" time="9.99" steps="2976"/></proof>
@@ -229,7 +230,7 @@
  <proof prover="4" timelimit="30"><result status="valid" time="2.31" steps="1259"/></proof>
  </goal>
  <goal name="to_nat_0x0003FFFF" proved="true">
- <proof prover="6" timelimit="30"><result status="valid" time="1.64"/></proof>
+ <proof prover="6" timelimit="30"><result status="valid" time="1.35"/></proof>
  </goal>
  <goal name="to_nat_0x0007FFFF" proved="true">
  <proof prover="6" timelimit="30"><result status="valid" time="1.13"/></proof>
@@ -241,7 +242,7 @@
  <proof prover="4" timelimit="1"><result status="valid" time="0.92" steps="665"/></proof>
  </goal>
  <goal name="to_nat_0xFFFFFFFF" proved="true">
- <proof prover="5"><result status="valid" time="0.10"/></proof>
+ <proof prover="5"><result status="valid" time="0.10" steps="23400"/></proof>
  </goal>
 </theory>
 </file>

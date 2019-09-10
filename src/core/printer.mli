@@ -111,6 +111,11 @@ val add_rliteral_map : tdecl -> syntax_map -> syntax_map
 
 val query_syntax : syntax_map -> ident -> string option
 
+val syntax_arity : string -> int
+(** [syntax_arity s] returns the largest [i] such that the parameter
+    [%i] occurs in [s]. Formatting an argument list for [s] will only
+    succeed if the argument list has size [syntax_arity s] or more. *)
+
 val syntax_arguments_prec : string -> (int -> 'a Pp.pp) -> int list -> 'a list Pp.pp
 (** (syntax_arguments_prec templ print_arg prec_list fmt l) prints in the formatter
      fmt the list l using the template templ, the printer print_arg, and the

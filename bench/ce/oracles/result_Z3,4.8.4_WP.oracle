@@ -1,0 +1,100 @@
+Weakest Precondition
+bench/ce/result.mlw M p1'VC: Timeout or Unknown
+Counter-example model:File result.mlw:
+                                                                     
+                                                                   Line 7:
+                                                                    a, 
+                                                                    [[@introduced],
+                                                                    [@field:0:contents]] =
+                                                                    {"type" : "Record" ,
+                                                                    "val" : {"Field" : [{"field" : "contents" ,
+                                                                    "value" : {"type" : "Integer" ,
+                                                                    "val" : "0" } }] } }
+                                                                     
+                                                                   Line 9:
+                                                                    b, 
+                                                                    [[@introduced],
+                                                                    [@field:0:contents]] =
+                                                                    {"type" : "Record" ,
+                                                                    "val" : {"Field" : [{"field" : "contents" ,
+                                                                    "value" : {"type" : "Integer" ,
+                                                                    "val" : "3" } }] } }
+                                                                     
+                                                                   Line 11:
+                                                                    a, 
+                                                                    [[@introduced],
+                                                                    [@field:0:contents],
+                                                                    [@model_trace:a]] =
+                                                                    {"type" : "Record" ,
+                                                                    "val" : {"Field" : [{"field" : "contents" ,
+                                                                    "value" : {"type" : "Integer" ,
+                                                                    "val" : "3" } }] } }
+                                                                    result, 
+                                                                    [[@introduced]] =
+                                                                    {"type" : "Integer" ,
+                                                                    "val" : "4" }
+                                                                     
+                                                                   Line 12:
+                                                                    a, 
+                                                                    [[@introduced],
+                                                                    [@field:0:contents]] =
+                                                                    {"type" : "Record" ,
+                                                                    "val" : {"Field" : [{"field" : "contents" ,
+                                                                    "value" : {"type" : "Integer" ,
+                                                                    "val" : "3" } }] } }
+                                                                   
+bench/ce/result.mlw M f'VC: Timeout or Unknown
+Counter-example model:File result.mlw:
+                                                                    Line 16:
+                                                                    A, 
+                                                                    [[@introduced],
+                                                                    [@field:0:contents],
+                                                                    [@model],
+                                                                    [@model_trace:A],
+                                                                    [@at:'Old:loc:location] =
+                                                                    {"type" : "Record" ,
+                                                                    "val" : {"Field" : [{"field" : "contents" ,
+                                                                    "value" : {"type" : "Integer" ,
+                                                                    "val" : "42" } }] } }
+                                                                    Line 18:
+                                                                    A, 
+                                                                    [[@introduced],
+                                                                    [@field:0:contents],
+                                                                    [@model],
+                                                                    [@model_trace:A]] =
+                                                                    {"type" : "Record" ,
+                                                                    "val" : {"Field" : [{"field" : "contents" ,
+                                                                    "value" : {"type" : "Integer" ,
+                                                                    "val" : "1" } }] } }
+                                                                    old A, 
+                                                                    [[@introduced],
+                                                                    [@at:'Old],
+                                                                    [@field:0:contents],
+                                                                    [@model],
+                                                                    [@model_trace:A],
+                                                                    [@at:'Old:loc:location] =
+                                                                    {"type" : "Record" ,
+                                                                    "val" : {"Field" : [{"field" : "contents" ,
+                                                                    "value" : {"type" : "Integer" ,
+                                                                    "val" : "42" } }] } }
+                                                                    Line 19:
+                                                                    A, 
+                                                                    [[@introduced],
+                                                                    [@field:0:contents],
+                                                                    [@model],
+                                                                    [@model_trace:A]] =
+                                                                    {"type" : "Record" ,
+                                                                    "val" : {"Field" : [{"field" : "contents" ,
+                                                                    "value" : {"type" : "Integer" ,
+                                                                    "val" : "0" } }] } }
+                                                                    Line 20:
+                                                                    A, 
+                                                                    [[@introduced],
+                                                                    [@field:0:contents],
+                                                                    [@model],
+                                                                    [@model_trace:A]] =
+                                                                    {"type" : "Record" ,
+                                                                    "val" : {"Field" : [{"field" : "contents" ,
+                                                                    "value" : {"type" : "Integer" ,
+                                                                    "val" : "1" } }] } }
+                                                                  

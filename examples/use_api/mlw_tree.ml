@@ -24,19 +24,10 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 open Ptree
 (* END{buildenv} *)
 
-(* start a module *)
-(* BEGIN{openmodule} *)
-let () = Typing.open_file env [] (* empty pathname *)
+(* BEGIN{helper1} *)
 let mk_ident s = { id_str = s; id_ats = []; id_loc = Loc.dummy_position }
-let () = Typing.open_module (mk_ident "Program")
-(* END{openmodule} *)
 
-
-(* use int.Int *)
-
-
-(* BEGIN{useimport} *)
-let mk_qid l =
+let mk_qualid l =
   let rec aux l =
     match l with
       | [] -> assert false
@@ -45,17 +36,10 @@ let mk_qid l =
   in
   aux (List.rev l)
 
-let use_import (f, m) =
-  let m = mk_ident m in
-  let loc = Loc.dummy_position in
-  Typing.open_scope loc m;
-  Typing.add_decl loc (Ptree.Duse (Qdot (Qident (mk_ident f), m)));
-  Typing.close_scope loc ~import:true
+let use_import l =
+  let qid_id_opt = (mk_qualid l, None) in
+  Duseimport(Loc.dummy_position,false,[qid_id_opt])
 
-let use_int_Int = use_import ("int","Int")
-(* END{useimport} *)
-
-(* BEGIN{helper1} *)
 let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
 
 let mk_term t = { term_desc = t; term_loc = Loc.dummy_position }
@@ -84,162 +68,236 @@ let mk_evar x = mk_expr(Eident(Qident x))
 
 (* declaration of
   BEGIN{source1}
-     let f1 (x:int) : unit
-        requires { x=6 }
-        ensures { result=42 }
-      = x*7
+module M1
+  use int.Int
+  goal g : 2 + 2 = 4
+end
   END{source1}
  *)
 
 (* BEGIN{code1} *)
-let eq_symb = mk_qid [Ident.op_infix "="]
-let int_type_id = mk_qid ["int"]
-let int_type = PTtyapp(int_type_id,[])
-let mul_int = mk_qid ["Int";Ident.op_infix "*"]
-
-let d1 : decl =
-  let id_x = mk_ident "x" in
-  let pre = mk_tapp eq_symb [mk_var id_x; mk_tconst 6] in
-  let result = mk_ident "result" in
-  let post = mk_tapp eq_symb [mk_var result; mk_tconst 42] in
-  let spec = {
-    sp_pre = [pre];
-    sp_post = [Loc.dummy_position,[pat_var result,post]];
-    sp_xpost = [];
-    sp_reads = [];
-    sp_writes = [];
-    sp_alias = [];
-    sp_variant = [];
-    sp_checkrw = false;
-    sp_diverge = false;
-    sp_partial = false;
-  }
+let mod_M1 =
+  (* use int.Int *)
+  let use_int_Int = use_import (["int";"Int"]) in
+  (* goal g : 2 + 2 = 4 *)
+  let g =
+    let two = mk_tconst 2 in
+    let four = mk_tconst 4 in
+    let add_int = mk_qualid ["Int";Ident.op_infix "+"] in
+    let two_plus_two = mk_tapp add_int [two ; two] in
+    let eq_int = mk_qualid ["Int";Ident.op_infix "="] in
+    let goal_term = mk_tapp eq_int  [four ; two_plus_two] in
+    Dprop(Pgoal,mk_ident "g",goal_term)
   in
-  let body = mk_eapp mul_int [mk_evar id_x; mk_econst 7] in
-  let f1 =
-    Efun(param1 id_x int_type, None, Ity.MaskVisible, spec, body)
-  in
-  Dlet(mk_ident "f1",false,Expr.RKnone, mk_expr f1)
-
-let () =
-  try Typing.add_decl Loc.dummy_position d1
-  with e ->
-    Format.printf "Exception raised during typing of d:@ %a@."
-      Exn_printer.exn_printer e
+  (mk_ident "M1",[use_int_Int ; g])
 (* END{code1} *)
 
-
-(*
-
-declaration of
-BEGIN{source2}
-     let f2 () : int
-        requires { true }
-        ensures { result >= 0 }
-      = let x = ref 42 in !x
-END{source2}
-
-*)
+(* declaration of
+  BEGIN{source2}
+module M2
+  let f (x:int) : int
+    requires { x=6 }
+    ensures { result=42 }
+   = x*7
+end
+  END{source2}
+ *)
 
 (* BEGIN{code2} *)
-let ge_int = mk_qid ["Int";Ident.op_infix ">="]
+let eq_symb = mk_qualid [Ident.op_infix "="]
+let int_type_id = mk_qualid ["int"]
+let int_type = PTtyapp(int_type_id,[])
+let mul_int = mk_qualid ["Int";Ident.op_infix "*"]
 
-let use_ref_Ref = use_import ("ref","Ref")
-
-let d2 =
-  let result = mk_ident "result" in
-  let post = mk_term(Tidapp(ge_int,[mk_var result;mk_tconst 0])) in
-  let spec = {
-    sp_pre = [];
-    sp_post = [Loc.dummy_position,[pat_var result,post]];
-    sp_xpost = [];
-    sp_reads = [];
-    sp_writes = [];
-    sp_alias = [];
-    sp_variant = [];
-    sp_checkrw = false;
-    sp_diverge = false;
-    sp_partial = false;
-  }
-  in
-  let body =
-    let e1 = mk_eapp (mk_qid ["Ref";"ref"]) [mk_econst 42] in
+let mod_M2 =
+  (* use int.Int *)
+  let use_int_Int = use_import (["int";"Int"]) in
+  (* f *)
+  let f =
     let id_x = mk_ident "x" in
-    let e2 = mk_eapp (mk_qid ["Ref";Ident.op_prefix "!"]) [mk_evar id_x] in
-    mk_expr(Elet(id_x,false,Expr.RKlocal,e1,e2))
+    let pre = mk_tapp eq_symb [mk_var id_x; mk_tconst 6] in
+    let result = mk_ident "result" in
+    let post = mk_tapp eq_symb [mk_var result; mk_tconst 42] in
+    let spec = {
+      sp_pre = [pre];
+      sp_post = [Loc.dummy_position,[pat_var result,post]];
+      sp_xpost = [];
+      sp_reads = [];
+      sp_writes = [];
+      sp_alias = [];
+      sp_variant = [];
+      sp_checkrw = false;
+      sp_diverge = false;
+      sp_partial = false;
+    }
+    in
+    let body = mk_eapp mul_int [mk_evar id_x; mk_econst 7] in
+    let f =
+      Efun(param1 id_x int_type, None, Ity.MaskVisible, spec, body)
+    in
+    Dlet(mk_ident "f",false,Expr.RKnone, mk_expr f)
   in
-  let f = Efun(param0,None,Ity.MaskVisible,spec,body)
-  in
-  Dlet(mk_ident "f2",false,Expr.RKnone, mk_expr f)
-
-let () =
-  try Typing.add_decl Loc.dummy_position d2
-  with e ->
-    Format.printf "Exception raised during typing of d2:@ %a@."
-      Exn_printer.exn_printer e
+  (mk_ident "M2",[use_int_Int ; f])
 (* END{code2} *)
 
-(*
-BEGIN{source3}
-let f (a:array int) : unit
-      requires { a.length >= 1 }
-      ensures { a[0] = 42 }
-    = a[0] <- 42
-END{source3}
-*)
+
+(* declaration of
+  BEGIN{source3}
+module M3
+  let f() : int
+     requires { true }
+     ensures { result >= 0 }
+   = let x = ref 42 in !x
+end
+  END{source3}
+ *)
 
 (* BEGIN{code3} *)
-let () = use_import ("array","Array")
+let ge_int = mk_qualid ["Int";Ident.op_infix ">="]
 
-let array_int_type = PTtyapp(mk_qid ["Array";"array"],[int_type])
-
-let length = mk_qid ["Array";"length"]
-
-let array_get = mk_qid ["Array"; Ident.op_get ""]
-
-let array_set = mk_qid ["Array"; Ident.op_set ""]
-
-let d3 =
-  let id_a = mk_ident "a" in
-  let pre =
-    mk_tapp ge_int [mk_tapp length [mk_var id_a]; mk_tconst 1]
+let mod_M3 =
+  (* use int.Int *)
+  let use_int_Int = use_import (["int";"Int"]) in
+  (* use ref.Ref *)
+  let use_ref_Ref = use_import (["ref";"Ref"]) in
+  (* f *)
+  let f =
+    let result = mk_ident "result" in
+    let post = mk_term(Tidapp(ge_int,[mk_var result;mk_tconst 0])) in
+    let spec = {
+      sp_pre = [];
+      sp_post = [Loc.dummy_position,[pat_var result,post]];
+      sp_xpost = [];
+      sp_reads = [];
+      sp_writes = [];
+      sp_alias = [];
+      sp_variant = [];
+      sp_checkrw = false;
+      sp_diverge = false;
+      sp_partial = false;
+    }
+    in
+    let body =
+      let e1 = mk_eapp (mk_qualid ["Ref";"ref"]) [mk_econst 42] in
+      let id_x = mk_ident "x" in
+      let qid = mk_qualid ["Ref";Ident.op_prefix "!"] in
+      let e2 = mk_eapp qid [mk_evar id_x] in
+      mk_expr(Elet(id_x,false,Expr.RKnone,e1,e2))
+    in
+    let f = Efun(param0,None,Ity.MaskVisible,spec,body)
+    in
+    Dlet(mk_ident "f",false,Expr.RKnone, mk_expr f)
   in
-  let post =
-    mk_tapp eq_symb [mk_tapp array_get [mk_var id_a; mk_tconst 0];
-                     mk_tconst 42]
-  in
-  let spec = {
-    sp_pre = [pre];
-    sp_post = [Loc.dummy_position,[mk_pat Pwild,post]];
-    sp_xpost = [];
-    sp_reads = [];
-    sp_writes = [];
-    sp_alias = [];
-    sp_variant = [];
-    sp_checkrw = false;
-    sp_diverge = false;
-    sp_partial = false;
-  }
-  in
-  let body =
-    mk_eapp array_set [mk_evar id_a; mk_econst 0; mk_econst 42]
-  in
-  let f = Efun(param1 id_a array_int_type,
-               None,Ity.MaskVisible,spec,body)
-  in
-  Dlet(mk_ident "f3", false, Expr.RKnone, mk_expr f)
-
-let () =
-  try Typing.add_decl Loc.dummy_position d3
-  with e ->
-    Format.printf "Exception raised during typing of d3:@ %a@."
-      Exn_printer.exn_printer e
+  (mk_ident "M3",[use_int_Int ; use_ref_Ref ; f])
 (* END{code3} *)
 
-(* BEGIN{closemodule} *)
-let () = Typing.close_module Loc.dummy_position
-let mods : Pmodule.pmodule Wstdlib.Mstr.t = Typing.close_file ()
-(* END{closemodule} *)
+(* declaration of
+  BEGIN{source4}
+module M4
+  let f (a:array int) : unit
+    requires { a.length >= 1 }
+    ensures { a[0] = 42 }
+   = a[0] <- 42
+end
+  END{source4}
+ *)
+
+(* BEGIN{code4} *)
+
+let array_int_type = PTtyapp(mk_qualid ["Array";"array"],[int_type])
+
+let length = mk_qualid ["Array";"length"]
+
+let array_get = mk_qualid ["Array"; Ident.op_get ""]
+
+let array_set = mk_qualid ["Array"; Ident.op_set ""]
+
+let mod_M4 =
+  (* use int.Int *)
+  let use_int_Int = use_import (["int";"Int"]) in
+  (* use array.Array *)
+  let use_array_Array = use_import (["array";"Array"]) in
+  (* use f *)
+  let f =
+    let id_a = mk_ident "a" in
+    let pre =
+      mk_tapp ge_int [mk_tapp length [mk_var id_a]; mk_tconst 1]
+    in
+    let post =
+      mk_tapp eq_symb [mk_tapp array_get [mk_var id_a; mk_tconst 0];
+                       mk_tconst 42]
+    in
+    let spec = {
+      sp_pre = [pre];
+      sp_post = [Loc.dummy_position,[mk_pat Pwild,post]];
+      sp_xpost = [];
+      sp_reads = [];
+      sp_writes = [];
+      sp_alias = [];
+      sp_variant = [];
+      sp_checkrw = false;
+      sp_diverge = false;
+      sp_partial = false;
+    }
+    in
+    let body =
+      mk_eapp array_set [mk_evar id_a; mk_econst 0; mk_econst 42]
+    in
+    let f = Efun(param1 id_a array_int_type,
+                 None,Ity.MaskVisible,spec,body)
+    in
+    Dlet(mk_ident "f", false, Expr.RKnone, mk_expr f)
+  in
+  (mk_ident "M4",[use_int_Int ; use_array_Array ; f])
+(* END{code4} *)
+
+(* The following example is not in the manual
+ * it shows how to use Ptree API for scope/import declarations
+module M5
+  scope S
+      function f (x : int) : int = x
+  end
+
+  import S
+  goal g : f 2 = 2
+end
+*)
+
+let mod_M5 =
+  (* use int.Int *)
+  let use_int_Int = use_import (["int";"Int"]) in
+  (* scope S *)
+  let scope_S =
+    (* f *)
+    let f =
+      let logic = {
+        ld_loc = Loc.dummy_position;
+        ld_ident = mk_ident "f";
+        ld_params = [(Loc.dummy_position,Some (mk_ident "x"),false,int_type)] ;
+        ld_type = Some int_type;
+        ld_def = Some (mk_var (mk_ident "x")) ;
+      } in
+      Dlogic([logic])
+    in
+    Dscope(Loc.dummy_position,false,mk_ident "S",[f])
+  in
+  (* import S *)
+  let import_S = Dimport (mk_qualid ["S"]) in
+  (* goal g : f 2 = 2 *)
+  let g =
+    let two = mk_tconst 2 in
+    let eq_int = mk_qualid ["Int";Ident.op_infix "="] in
+    let f_of_two = mk_tapp (mk_qualid ["f"]) [two] in
+    let goal_term = mk_tapp eq_int [f_of_two ; two] in
+    Dprop(Pgoal,mk_ident "g",goal_term)
+  in
+  (mk_ident "M5",[use_int_Int ; scope_S ; import_S ; g])
+
+(* BEGIN{getmodules} *)
+let mods =
+  let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4] in
+  Typing.type_mlw_file env [] "myfile.mlw" mlw_file
+(* END{getmodules} *)
 
 (* Checking the VCs *)
 

@@ -28,13 +28,29 @@ let add_opt x =
     Format.eprintf "extra arguments must be of the form 'module.ident'@.";
     exit 1
 
+(* Used for real numbers approximation *)
+let real_prec = ref 0
+let real_emin = ref 0
+let real_emax = ref 0
+
+let precision () =
+  (!real_emin, !real_emax, !real_prec)
+
 let opt_parser = ref None
 
-let option_list = [
+let option_list =
+  let real_spec = [Arg.Set_int real_emin; Arg.Set_int real_emax;
+                   Arg.Set_int real_prec] in
+  [
   "-F", Arg.String (fun s -> opt_parser := Some s),
       "<format> select input format (default: \"why\")";
   "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F" ]
+      " same as -F";
+  "--real", Arg.Tuple real_spec,
+      " Takes 3 integers for the precision used in real computations \
+       [emin emax prec]. Example value for the precision of float32:\
+       -148 128 24";
+  ]
 
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt usage_msg
@@ -67,8 +83,14 @@ let do_input f =
     | Some d ->
 *)
       try
+        let real_param = precision () in
+        let res =
+          if real_param <> (0, 0, 0) then
+            Pinterp.eval_global_symbol ~real_param env m
+          else
+            Pinterp.eval_global_symbol env m in
         printf "@[<hov 2>Execution of %s.%s ():@\n%a" mid name
-          (Pinterp.eval_global_symbol env m) rs
+          res rs
       with e when Debug.test_noflag Debug.stack_trace ->
         printf "@\n@]@.";
         raise e in

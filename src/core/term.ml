@@ -275,7 +275,7 @@ let rec descend vml t = match t.t_node with
       find vs vml
   | _ -> Trm (t, vml)
 
-let t_compare trigger attr t1 t2 =
+let t_compare trigger attr loc t1 t2 =
   let comp_raise c =
     if c < 0 then raise CompLT else if c > 0 then raise CompGT in
   let perv_compare h1 h2 = comp_raise (Pervasives.compare h1 h2) in
@@ -320,7 +320,8 @@ let t_compare trigger attr t1 t2 =
   let rec t_compare bnd vml1 vml2 t1 t2 =
     if t1 != t2 || vml1 <> [] || vml2 <> [] then begin
       comp_raise (oty_compare t1.t_ty t2.t_ty);
-      if attr then comp_raise (Sattr.compare t1.t_attrs t2.t_attrs) else ();
+      if attr then comp_raise (Sattr.compare t1.t_attrs t2.t_attrs);
+      if loc then comp_raise (Opt.compare Loc.compare t1.t_loc t2.t_loc);
       match descend vml1 t1, descend vml2 t2 with
       | Bnd i1, Bnd i2 -> perv_compare i1 i2
       | Bnd _, Trm _ -> raise CompLT
@@ -394,12 +395,6 @@ let t_compare trigger attr t1 t2 =
     end in
   try t_compare 0 [] [] t1 t2; 0
   with CompLT -> -1 | CompGT -> 1
-
-let t_equal t1 t2 = (t_compare true true t1 t2 = 0)
-
-let t_equal_nt_na t1 t2 = (t_compare false false t1 t2 = 0)
-
-let t_compare = t_compare true true
 
 let t_similar t1 t2 =
   oty_equal t1.t_ty t2.t_ty &&
@@ -503,6 +498,36 @@ let t_hash trigger attr t =
     end in
   t_hash 0 [] t
 
+let t_hash_strict t = t_hash true true t
+let t_equal_strict t1 t2 = t_compare true true true t1 t2 = 0
+let t_compare_strict t1 t2 = t_compare true true true t1 t2
+
+module TermOHT_strict = struct
+  type t = term
+  let hash = t_hash_strict
+  let equal = t_equal_strict
+  let compare = t_compare_strict
+end
+
+module Mterm_strict = Extmap.Make(TermOHT_strict)
+module Sterm_strict = Extset.MakeOfMap(Mterm_strict)
+module Hterm_strict = Exthtbl.Make(TermOHT_strict)
+
+let t_hash t = t_hash false false t
+let t_equal t1 t2 = t_compare false false false t1 t2 = 0
+let t_compare t1 t2 = t_compare false false false t1 t2
+
+module TermOHT = struct
+  type t = term
+  let hash = t_hash
+  let equal = t_equal
+  let compare = t_compare
+end
+
+module Mterm = Extmap.Make(TermOHT)
+module Sterm = Extset.MakeOfMap(Mterm)
+module Hterm = Exthtbl.Make(TermOHT)
+
 (* type checking *)
 
 exception TermExpected of term
@@ -564,27 +589,6 @@ and add_t_vars s t = vars_union s (t_vars t)
 
 let add_nt_vars _ n t s = vars_union s
   (if n = 1 then t_vars t else Mvs.map (( * ) n) (t_vars t))
-
-module TermOHT = struct
-  type t = term
-  let hash = t_hash true true
-  let equal = t_equal
-  let compare = t_compare
-end
-
-module Mterm = Extmap.Make(TermOHT)
-module Sterm = Extset.MakeOfMap(Mterm)
-module Hterm = Exthtbl.Make(TermOHT)
-
-module TermOHT_nt_na = struct
-  type t = term
-  let hash = t_hash false false
-  let equal = t_equal_nt_na
-end
-
-module Hterm_nt_na = Exthtbl.Make(TermOHT_nt_na)
-
-let t_hash = t_hash true true
 
 (* hash-consing constructors for terms *)
 

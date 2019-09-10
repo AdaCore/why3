@@ -6,6 +6,7 @@ var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
 var Why3HighlightRules = function() {
 
+    // keep synchronized with src/why3doc/doc_lexer.mll
     var keywords = (
         "as|axiom|by|clone|coinductive|constant|" +
         "else|end|epsilon|exists|export|" +
@@ -17,7 +18,7 @@ var Why3HighlightRules = function() {
         "abstract|any|at|" +
         "begin|break|continue|do|done|downto|exception|" +
         "for|fun|ghost|label|module|mutable|" +
-        "old|private|pure|raise|rec|return|" +
+        "old|private|pure|raise|rec|ref|return|" +
         "to|try|val|while|" +
         // specification
         "absurd|alias|assert|assume|" +

@@ -275,7 +275,7 @@ let id_unique printer ?(sanitizer = same) id =
     Hid.replace printer.values id name;
     name
 
-let string_unique printer s = find_unique printer.indices s
+let string_unique printer s = find_unique printer.indices (printer.sanitizer s)
 
 let forget_id printer id =
   try
@@ -449,6 +449,15 @@ let extract_field attr =
     | _ -> None
   with
   | _ -> None
+
+(* Attributes used to name hypothesis *)
+let is_hyp_name_attr a =
+  Strings.has_prefix "hyp_name:" a.attr_string
+
+let get_hyp_name ~attrs =
+  try Some (Strings.remove_prefix "hyp_name:"
+              (Sattr.choose (Sattr.filter is_hyp_name_attr attrs)).attr_string)
+  with Not_found -> None
 
 (* Functions for working with ITP attributes *)
 

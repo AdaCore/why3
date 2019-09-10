@@ -361,7 +361,7 @@ let () =
     let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
     Queue.iter (do_input env drv) opt_queue;
-    if !unproved then exit 1
+    if !unproved then exit 2
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

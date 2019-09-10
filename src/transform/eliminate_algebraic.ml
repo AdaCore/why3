@@ -295,7 +295,7 @@ let add_projections (state,task) _ts _ty csl =
             create_lsymbol id [Opt.get cs.ls_value] t.t_ty
       in
       let tsk = add_param_decl tsk ls in
-      let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
+      let id = id_derive (ls.ls_name.id_string ^ "'def") ls.ls_name in
       let pr = create_prsymbol id in
       let hh = t_app ls [hd] t.t_ty in
       let ax = t_forall_close (List.rev vl) [] (t_equ hh t) in

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../power_vc_sp.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="power_vc_sp.mlw"/>
 <theory name="FastExponentiation" proved="true">
  <goal name="VC fast_exp" expl="VC for fast_exp" proved="true">
  <transf name="split_vc" proved="true" >
@@ -28,19 +29,19 @@
  <goal name="VC fast_exp_imperative" expl="VC for fast_exp_imperative" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC fast_exp_imperative.0" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="3399"/></proof>
   </goal>
   <goal name="VC fast_exp_imperative.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="3439"/></proof>
   </goal>
   <goal name="VC fast_exp_imperative.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="3508"/></proof>
   </goal>
   <goal name="VC fast_exp_imperative.3" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="5079"/></proof>
   </goal>
   <goal name="VC fast_exp_imperative.4" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.02"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="4870"/></proof>
   </goal>
   <goal name="VC fast_exp_imperative.5" expl="loop invariant preservation" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="1.07" steps="66"/></proof>

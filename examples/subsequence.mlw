@@ -1,0 +1,45 @@
+
+(** {1 Subsequences}
+
+  A subsequence is a sequence that can be derived from another
+  sequence by deleting some or no elements without changing the order
+  of the remaining elements (Wikipedia).
+
+  Checking whether a word is a subsequence of another word can be done in
+  linear time (in the length of the second word) and is a nice example of
+  an optimal greedy algorithm.
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+
+*)
+
+use int.Int
+use map.Map
+use seq.Seq
+
+type char
+type word = seq char
+
+predicate subsequence (v u: word) (f: int -> int) =
+  (* f maps v's characters to u's characters *)
+  (forall i. 0 <= i < length v -> 0 <= f i < length u /\ v[i] = u[f i]) /\
+  (* in a strictly increasing way *)
+  (forall i j. 0 <= i < j < length v -> f i < f j)
+
+val eq (x y: char) : bool ensures { result <-> x = y }
+
+let is_subsequence (v u: word) : bool
+  ensures { result <-> exists f. subsequence v u f }
+= let rec aux i j (ghost f)
+    requires { 0 <= i <= length v }
+    requires { 0 <= j <= length u }
+    requires { subsequence v[0..i] u[0..j] f }
+    requires { forall f. subsequence v u f -> i < length v -> f i >= j }
+    variant  { length u - j }
+    ensures  { result <-> exists f. subsequence v u f }
+  = i = length v ||
+    j < length u && if eq v[i] u[j] then aux (i+1) (j+1) (Map.set f i j)
+                                    else aux     i (j+1) f
+  in
+  aux 0 0 (fun i -> i)
+

@@ -75,3 +75,5 @@ val chop : int -> 'a list -> 'a list
 
 val chop_last : 'a list -> 'a list * 'a
 (** removes (and returns) the last element of a list *)
+
+val init : int -> (int -> 'a) -> 'a list

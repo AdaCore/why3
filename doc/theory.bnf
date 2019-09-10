@@ -12,7 +12,8 @@
     | "goal"  ident-nq ":" formula 	   ;
     | "use" imp-exp tqualid ("as" uident)?     ;
     | "clone" imp-exp tqualid ("as" uident)? subst? ;
-    | "namespace" "import"? uident-nq decl* "end" ;
+    | "scope" "import"? uident-nq decl* "end" ;
+    | "import" uident ;
   \
   logic-decl ::= function-decl ;
     | predicate-decl
@@ -38,7 +39,7 @@
   subst-elt ::= "type" lqualid "=" lqualid ;
     | "function" lqualid "=" lqualid          ;
     | "predicate" lqualid "=" lqualid         ;
-    | "namespace" (uqualid | ".") "=" (uqualid | ".")  ;
+    | "scope" (uqualid | ".") "=" (uqualid | ".")  ;
     | "lemma" qualid 	  		   ;
     | "goal"  qualid			   ;
   \

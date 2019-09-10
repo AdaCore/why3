@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../79_compute_unsound.mlw">
+<file>
+<path name=".."/><path name="79_compute_unsound.mlw"/>
 <theory name="Soundness">
  <goal name="A" proved="true">
- <proof prover="0"><result status="valid" time="0.17"/></proof>
+ <proof prover="0"><result status="valid" time="0.17" steps="10747"/></proof>
  </goal>
  <goal name="Fail">
  <transf name="compute_specified" >
@@ -15,7 +16,7 @@
  </transf>
  </goal>
  <goal name="Absurd" proved="true">
- <proof prover="0"><result status="valid" time="0.02"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="860"/></proof>
  </goal>
 </theory>
 </file>

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="1" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="vacid_0_sparse_array.mlw"/>
+<path name=".."/><path name="vacid_0_sparse_array.mlw"/>
 <theory name="SparseArray" proved="true">
  <goal name="VC sparse_array" expl="VC for sparse_array" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
@@ -26,7 +25,7 @@
   <proof prover="3"><result status="valid" time="0.00" steps="50"/></proof>
   </goal>
   <goal name="permutation.1" proved="true">
-  <proof prover="1"><result status="valid" time="0.01"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="39333"/></proof>
   </goal>
   <goal name="permutation.2" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="61"/></proof>

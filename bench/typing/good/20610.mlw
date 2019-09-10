@@ -14,7 +14,7 @@ module M
     | Some b ->
       if b then
         (
-          let rec aux (x: unit) : unit
+          let rec aux (_x: unit) : unit
             diverges
             raises { A -> true }
           =

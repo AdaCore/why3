@@ -55,16 +55,25 @@ val copy_dir : string -> string -> unit
 val concat : string -> string -> string
 (** like [Filename.concat] but returns only second string when it is already absolute *)
 
-val system_independent_path_of_file : string -> string list
+type file_path
+val empty_path : file_path
+val add_to_path : file_path -> string -> file_path
+val is_empty_path : file_path -> bool
+val decompose_path : file_path -> string list
+val basename : file_path -> string
+
+val print_file_path : Format.formatter -> file_path -> unit
+
+val system_independent_path_of_file : string -> file_path
 (** [system_independent_path_of_file filename] return the access path
     of [filename], in a system-independent way *)
 
-val system_dependent_absolute_path : string -> string list -> string
+val system_dependent_absolute_path : string -> file_path -> string
 (** [system_dependent_absolute_path d p] returns the
     system-dependent absolute path for the abstract path [p] relative
     to directory [d] *)
 
-val relativize_filename : string -> string -> string list
+val relativize_filename : string -> string -> file_path
 (** [relativize_filename base filename] returns an access path for
     filename [filename] relatively to [base]. The [filename] is split
     into path components using the system-dependent calls to

@@ -1,0 +1,17 @@
+Weakest Precondition
+bench/ce/polymorphism.mlw Test gm: Unknown (sat)
+Counter-example model:
+File polymorphism.mlw:
+  Line 7:
+    x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "B" ,
+    "list" : [{"type" : "Integer" , "val" : "1" }] } }
+
+bench/ce/polymorphism.mlw Test gm2: Unknown (sat)
+Counter-example model:
+File polymorphism.mlw:
+  Line 11:
+    x, [[@introduced]] = {"type" : "Apply" , "val" : {"apply" : "C" ,
+    "list" : [{"type" : "Integer" , "val" : "1" }, {"type" : "Boolean" ,
+    "val" : false }] } }
+
+bench/ce/polymorphism.mlw Test g: Timeout or Unknown

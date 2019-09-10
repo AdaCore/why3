@@ -95,7 +95,7 @@ destruct (List.in_dec why_decidable_eq x l1).
 - exists (List.cons x l1). 
   split; [| split]; intros.
   + constructor; eauto.
-  + destruct H. eapply Map.set_def; eauto.
+  + destruct H. eapply Map.set'def; eauto.
     eapply h1 in H. unfold Map.set. destruct why_decidable_eq; eauto.
   + unfold Map.set in *. destruct why_decidable_eq. left. auto.
     right. eapply h1; eauto.
@@ -256,7 +256,7 @@ destruct H as [l [Hdupl H]].
 exists l. 
 split.
 - assumption.
-- intros. rewrite (set.Set.map_def f s e).
+- intros. rewrite (set.Set.map'def f s e).
   rewrite H. 
   rewrite (List.in_map_iff f l1 e).
   split; intros. destruct H0. destruct H0.
@@ -592,8 +592,8 @@ destruct H1 as [lun_lint [Hduplun_lint Heqlun_lint]].
 assert (List.length lun_lint = List.length lun - List.length lint).
 {
 eapply length_prop; eauto. apply why_decidable_eq.
-intro. intros. eapply Heq_un. eapply set.Set.union_def. eapply Heq_int in H1.
-eapply set.Set.inter_def in H1. intuition.
+intro. intros. eapply Heq_un. eapply set.Set.union'def. eapply Heq_int in H1.
+eapply set.Set.inter'def in H1. intuition.
 }
 
 assert (exists l1_lint, List.NoDup l1_lint /\
@@ -607,7 +607,7 @@ assert (List.length l1_lint = List.length l1 - List.length lint).
 {
   eapply length_prop; eauto. apply why_decidable_eq.
   intro. intros. eapply Heqs2. eapply Heq_int in H2.
-  eapply set.Set.inter_def in H2. intuition.
+  eapply set.Set.inter'def in H2. intuition.
 }
 assert (exists l2_lint, List.NoDup l2_lint /\
   forall e, List.In e l2_lint <-> (List.In e l2 /\ not (List.In e lint))).
@@ -620,7 +620,7 @@ assert (List.length l2_lint = List.length l2 - List.length lint).
 {
   eapply length_prop; eauto. apply why_decidable_eq.
   intro. intros. eapply Heqs1. eapply Heq_int in H3.
-  eapply set.Set.inter_def in H3. intuition.
+  eapply set.Set.inter'def in H3. intuition.
 }
 assert (List.NoDup (List.app l1_lint l2_lint) /\
   forall e, List.In e lun_lint <-> List.In e (List.app l1_lint l2_lint)).
@@ -629,15 +629,15 @@ assert (List.NoDup (List.app l1_lint l2_lint) /\
   - eapply NoDup_app; eauto. 
     + intros. rewrite Heql2_lint. eapply Heql1_lint in H4.
       rewrite Heqs2 in H4. rewrite Heq_int in H4. rewrite Heq_int.
-      rewrite Heqs1. rewrite set.Set.inter_def in H4. rewrite set.Set.inter_def.
+      rewrite Heqs1. rewrite set.Set.inter'def in H4. rewrite set.Set.inter'def.
       unfold set.Set.mem in *. intuition.
     + intros. rewrite Heql2_lint in H4. rewrite Heql1_lint.
       rewrite Heqs2. rewrite Heq_int. rewrite Heq_int in H4.
-      rewrite Heqs1 in H4. rewrite set.Set.inter_def in H4. rewrite set.Set.inter_def.
+      rewrite Heqs1 in H4. rewrite set.Set.inter'def in H4. rewrite set.Set.inter'def.
       unfold set.Set.mem in *. intuition.
   - intros. rewrite List.in_app_iff. rewrite Heqlun_lint.
   rewrite Heql1_lint. rewrite Heql2_lint. rewrite Heq_un, Heqs2, Heqs1, Heq_int.
-  rewrite set.Set.union_def. rewrite set.Set.inter_def. unfold set.Set.mem.
+  rewrite set.Set.union'def. rewrite set.Set.inter'def. unfold set.Set.mem.
   clear - s1. intuition.
 }
 assert (List.length (List.app l1_lint l2_lint) = List.length lun_lint).
@@ -652,17 +652,17 @@ assert (List.length (List.app l1_lint l2_lint) = List.length lun_lint).
 assert (length l1 >= length lint).
 {
   eapply List.NoDup_incl_length; intuition. intros e Hincl. eapply Heq_int in Hincl.
-  eapply Heqs2. eapply set.Set.inter_def in Hincl. intuition.
+  eapply Heqs2. eapply set.Set.inter'def in Hincl. intuition.
 }
 assert (length l2 >= length lint).
 {
   eapply List.NoDup_incl_length; intuition. intros e Hincl. eapply Heq_int in Hincl.
-  eapply Heqs1. eapply set.Set.inter_def in Hincl. intuition.
+  eapply Heqs1. eapply set.Set.inter'def in Hincl. intuition.
 }
 assert (length lun >= length lint).
 {
   eapply List.NoDup_incl_length; intuition. intros e Hincl. eapply Heq_int in Hincl.
-  eapply Heq_un. eapply set.Set.inter_def in Hincl. eapply set.Set.union_def. intuition.
+  eapply Heq_un. eapply set.Set.inter'def in Hincl. eapply set.Set.union'def. intuition.
 }
 rewrite List.app_length in H5. omega.
 Qed.
@@ -707,15 +707,15 @@ assert (List.length x = List.length x0 - List.length x1).
 {
   eapply length_prop; eauto.
   - apply why_decidable_eq.
-  - intros e Hin. eapply H6 in Hin. eapply H4. eapply set.Set.inter_def in Hin.
+  - intros e Hin. eapply H6 in Hin. eapply H4. eapply set.Set.inter'def in Hin.
     apply Hin.
-  - intros. rewrite H6. rewrite H4. rewrite H2. rewrite set.Set.diff_def.
-    rewrite set.Set.inter_def. intuition.
+  - intros. rewrite H6. rewrite H4. rewrite H2. rewrite set.Set.diff'def.
+    rewrite set.Set.inter'def. intuition.
 }
 assert (List.length x0 >= List.length x1).
 eapply List.NoDup_incl_length; intuition.
 {
-  intros e Hincl. eapply H4. eapply H6 in Hincl. rewrite set.Set.inter_def in Hincl.
+  intros e Hincl. eapply H4. eapply H6 in Hincl. rewrite set.Set.inter'def in Hincl.
   intuition.
 }
 omega.
@@ -740,7 +740,7 @@ assert (List.length x <= List.length x0).
 {
   eapply le_trans with (List.length (List.map f x0)).
   - assert (List.incl x (List.map f x0)).
-    { intro. intros. eapply H1 in H4. rewrite set.Set.map_def in H4.
+    { intro. intros. eapply H1 in H4. rewrite set.Set.map'def in H4.
       destruct H4. destruct H4. subst.
       eapply List.in_map. eapply H3; eauto.
     }

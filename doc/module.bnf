@@ -8,7 +8,7 @@
     | "let" "rec" rec-defn                      ;
     | "val" "ghost"? lident-nq label* pgm-decl     ;
     | "exception" lident-nq label* type?           ;
-    | "namespace" "import"? uident-nq mdecl* "end" ;
+    | "scope" "import"? uident-nq mdecl* "end" ;
   \
   mtype-decl ::= lident-nq label* ("'" lident-nq label*)* ;
                               mtype-defn            ;

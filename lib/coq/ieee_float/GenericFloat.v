@@ -889,7 +889,7 @@ Proof.
   fold sb.
   change 2%Z with (radix_val radix2).
   rewrite IZR_Zpower by easy.
-  rewrite Int.infix_mn_def, bpow_plus.
+  rewrite Int.infix_mn'def, bpow_plus.
   rewrite Rmult_comm, Rmult_assoc, Rmult_comm, Rmult_minus_distr_l.
   rewrite <-bpow_plus.
   replace (- sb + sb)%Z with 0%Z by auto with zarith.
@@ -2071,7 +2071,7 @@ Proof.
     2: split; [easy|apply div_finite; easy].
     pose proof max_real_ge_6.
     destruct x, y; try easy; try (rewrite B754_zero_to_real).
-    rewrite Real.infix_sl_def, Rmult_0_l.
+    rewrite Real.infix_sl'def, Rmult_0_l.
     apply Bounded_real_no_overflow; split; lra.
     set (x := B754_finite s m0 e e0).
     set (y := B754_finite s0 m1 e1 e2).
@@ -4704,7 +4704,7 @@ Proof.
         - assert (
                round RNE (to_real x - to_real (roundToIntegral RTN x)) =
                to_real x - to_real (roundToIntegral RTN x)) as aux1.
-           { rewrite Real.infix_mn_def, <-(proj2 (neg_finite _ (h1 RTN))).
+           { rewrite Real.infix_mn'def, <-(proj2 (neg_finite _ (h1 RTN))).
              apply round_plus_weak.
              rewrite (proj2 (neg_finite _ (h1 RTN))).
              rewrite to_real_roundToIntegral; auto.
@@ -4754,7 +4754,7 @@ Proof.
         - assert (
                round RNE (to_real (roundToIntegral RTP x) - to_real x) =
                to_real (roundToIntegral RTP x) - to_real x) as aux1.
-           { rewrite Real.infix_mn_def, <-(proj2 (neg_finite _ x_fin)).
+           { rewrite Real.infix_mn'def, <-(proj2 (neg_finite _ x_fin)).
              apply round_plus_weak.
              rewrite (proj2 (neg_finite _ x_fin)).
              rewrite to_real_roundToIntegral by easy.
@@ -4775,7 +4775,7 @@ Proof.
            apply Rlt_le in H2.
            replace (1+-/2) with (5/10) in H2 by field.
            rewrite <-half_to_real in H2.
-           rewrite <-Real.infix_mn_def in H2.
+           rewrite <-Real.infix_mn'def in H2.
            apply (Round_monotonic RNE) in H2.
            rewrite Round_to_real in H2 by easy.
            rewrite half_to_real in H2.

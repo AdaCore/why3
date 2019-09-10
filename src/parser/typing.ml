@@ -30,10 +30,15 @@ let debug_parse_only = Debug.register_flag "parse_only"
 let debug_type_only  = Debug.register_flag "type_only"
   ~desc:"Stop@ after@ type-checking."
 
-let debug_useless_at = Debug.register_flag "ignore_useless_at"
+let debug_ignore_useless_at = Debug.register_flag "ignore_useless_at"
   ~desc:"Remove@ warning@ for@ useless@ at/old."
 
 (** symbol lookup *)
+
+
+let qualid_last = function Qident x | Qdot (_, x) -> x
+
+let use_as q = function Some x -> x | None -> qualid_last q
 
 let rec qloc = function
   | Qdot (p, id) -> Loc.join (qloc p) id.id_loc
@@ -53,7 +58,7 @@ let string_list_of_qualid q =
     | Qident id -> id.id_str :: acc in
   sloq [] q
 
-(* Type of sumbol queried *)
+(* Type of symbol queried *)
 type symbol_kind =
   | Prop
   | Type
@@ -464,7 +469,7 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       (* check if the label has actually been defined *)
       ignore (Loc.try2 ~loc gvars (Some l) (Qident id));
       let e1 = dterm ns km crcmap gvars (Some l) denv e1 in
-      if not (Hstr.find at_uses l) && Debug.test_noflag debug_useless_at then
+      if not (Hstr.find at_uses l) && Debug.test_noflag debug_ignore_useless_at then
         Warning.emit ~loc "this `at'/`old' operator is never used";
       Hstr.remove at_uses l;
       DTattr (e1, Sattr.empty)
@@ -506,6 +511,7 @@ open Dexpr
 let ty_of_pty tuc = ty_of_pty (get_namespace tuc)
 
 let get_namespace muc = List.hd muc.Pmodule.muc_import
+let get_namespace_export muc = List.hd muc.Pmodule.muc_export
 
 let dterm muc =
   let uc = muc.muc_theory in
@@ -514,6 +520,10 @@ let dterm muc =
 let find_xsymbol     muc q = find_xsymbol_ns     (get_namespace muc) q
 let find_itysymbol   muc q = find_itysymbol_ns   (get_namespace muc) q
 let find_prog_symbol muc q = find_prog_symbol_ns (get_namespace muc) q
+
+let find_rsymbol muc q =
+  let ns = get_namespace_export muc in
+  find_qualid ~ty:Prog (fun rs -> rs.rs_name) ns_find_rs ns q
 
 let find_special muc test nm q =
   match find_prog_symbol muc q with
@@ -1061,7 +1071,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let gvars _at q = try match find_prog_symbol muc q with
         | PV v -> Some v | _ -> None with _ -> None in
       let get_dty pure_denv =
+        let nw = Debug.test_noflag debug_ignore_useless_at in
+        if nw then Debug.set_flag debug_ignore_useless_at;
         let dt = dterm muc gvars None pure_denv t in
+        if nw then Debug.unset_flag debug_ignore_useless_at;
         match dt.dt_dty with Some dty -> dty | None -> dty_bool in
       DEpure (get_term, denv_pure denv get_dty)
   | Ptree.Eassert (ak, f) ->
@@ -1297,6 +1310,14 @@ let tyl_of_params {muc_theory = tuc} pl =
     ty_of_pty tuc ty in
   List.map ty_of_param pl
 
+(* Used to check unused variables in logic declarations *)
+let check_unused_vars ldl =
+  List.iter
+    (fun (_name, ld) ->
+       let (vsl, t) = open_ls_defn ld in
+       List.iter (Dterm.check_used_var t) vsl)
+    ldl
+
 let add_logics muc dl =
   let lsymbols = Hstr.create 17 in
   (* 1. create all symbols and make an environment with these symbols *)
@@ -1332,7 +1353,10 @@ let add_logics muc dl =
         abst, (make_ls_defn ls vl t) :: defn in
   let abst,defn = List.fold_right type_decl dl ([],[]) in
   let add_param muc s = add_decl muc (create_param_decl s) in
-  let add_logic muc l = add_decl muc (create_logic_decl l) in
+  let add_logic muc l =
+    (* Check for unused vars in logic declaration *)
+    check_unused_vars l;
+    add_decl muc (create_logic_decl l) in
   let muc = List.fold_left add_param muc abst in
   if defn = [] then muc else add_logic muc defn
 
@@ -1461,7 +1485,7 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
   in
   List.fold_left add_inst (empty_mod_inst m) s
 
-let add_decl muc env file d =
+let rec add_decl muc env file d =
   let vc = muc.muc_theory.uc_path = [] &&
     Debug.test_noflag debug_type_only in
   match d with
@@ -1484,6 +1508,7 @@ let add_decl muc env file d =
         | Ptree.Max q  -> MApr (find_prop_of_kind Paxiom tuc q)
         | Ptree.Mlm q  -> MApr (find_prop_of_kind Plemma tuc q)
         | Ptree.Mgl q  -> MApr (find_prop_of_kind Pgoal  tuc q)
+        | Ptree.Mval q -> MAid (find_rsymbol muc q).rs_name
         | Ptree.Mstr s -> MAstr s
         | Ptree.Mint i -> MAint i in
       add_meta muc (lookup_meta id.id_str) (List.map convert al)
@@ -1498,12 +1523,57 @@ let add_decl muc env file d =
       let ity = ity_of_pty muc pty in
       let xs = create_xsymbol (create_user_id id) ~mask ity in
       add_pdecl ~vc muc (create_exn_decl xs)
-  | Ptree.Duse use ->
+  | Ptree.Duseexport use ->
       use_export muc (find_module env file use)
-  | Ptree.Dclone (use, inst) ->
+  | Ptree.Dcloneexport (use, inst) ->
       let m = find_module env file use in
       warn_clone_not_abstract (qloc use) m.mod_theory;
       clone_export muc m (type_inst muc m inst)
+  | Ptree.Duseimport (_loc,import,uses) ->
+      let add_import muc (m, q) =
+        let import = import || q = None in
+        let muc = open_scope muc (use_as m q).id_str in
+        let m = find_module env file m in
+        let muc = use_export muc m in
+        close_scope muc ~import in
+      List.fold_left add_import muc uses
+  | Ptree.Dcloneimport (_loc,import,qid,as_opt,inst) ->
+      let import = import || as_opt = None in
+      let muc = open_scope muc (use_as qid as_opt).id_str in
+      let m = find_module env file qid in
+      warn_clone_not_abstract (qloc qid) m.mod_theory;
+      let muc = clone_export muc m (type_inst muc m inst) in
+      let muc = close_scope muc ~import in
+      muc
+  | Ptree.Dimport q ->
+      import_scope muc (string_list_of_qualid q)
+  | Ptree.Dscope (_loc,import,qid,decls) ->
+      let muc = open_scope muc qid.id_str in
+      let add_decl_env_file muc d = add_decl muc env file d in
+      let muc = List.fold_left add_decl_env_file muc decls in
+      let muc = close_scope muc ~import in
+      muc
+
+
+let type_module file env loc path (id,dl) =
+  let muc = create_module env ~path (create_user_id id) in
+  let add_decl_env_file muc d = add_decl muc env file d in
+  let muc = List.fold_left add_decl_env_file muc dl in
+  let m = Loc.try1 ~loc close_module muc in
+  let file = Mstr.add m.mod_theory.th_name.id_string m file in
+  file
+
+let type_mlw_file env path filename mlw_file =
+  let file = Mstr.empty in
+  let loc = Loc.user_position filename 0 0 0 in
+  let file =
+    match mlw_file with
+    | Ptree.Decls decls -> type_module file env loc path ({id_str=""; id_ats=[]; id_loc=loc},decls)
+    | Ptree.Modules m_or_t ->
+        let type_module_env_loc_path file (id,dl) = type_module file env loc path (id,dl) in
+        List.fold_left type_module_env_loc_path file m_or_t
+  in
+  file
 
 (* incremental parsing *)
 
@@ -1569,14 +1639,6 @@ let close_scope loc ~import =
   if Debug.test_noflag debug_parse_only then
     let slice = Stack.top state in
     let muc = Loc.try1 ~loc (close_scope ~import) (Opt.get slice.muc) in
-    slice.muc <- Some muc
-
-let import_scope loc q =
-  assert (not (Stack.is_empty state));
-  let slice = Stack.top state in
-  let muc = top_muc_on_demand loc slice in
-  if Debug.test_noflag debug_parse_only then
-    let muc = Loc.try2 ~loc import_scope muc (string_list_of_qualid q) in
     slice.muc <- Some muc
 
 let add_decl loc d =

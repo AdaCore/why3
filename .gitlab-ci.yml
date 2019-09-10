@@ -95,7 +95,7 @@ full-4.07.1:
     DEBIAN_PACKAGES: hevea rubber texlive-latex-extra lmodern texlive-fonts-recommended
     OPAM_PACKAGES: coq-flocq.3.1.0 js_of_ocaml-ppx alt-ergo.2.0.0
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench ide doc
+    - misc/ci-docker.sh misc/ci-local.sh bench ide doc web_ide
 
 nightly-bench:
   stage: nightly

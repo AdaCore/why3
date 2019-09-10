@@ -50,16 +50,13 @@ let resize_shape sh limit =
   with
   | _ -> "")
 
-let make_filename sl =
-  List.fold_left (fun acc x -> Filename.concat acc x) "" sl
-
 let compute_filename s (contain_dir: string) theory goal expl driver =
   let th_name_no_sanit = (Session_itp.theory_name theory).Ident.id_string in
   let task = Session_itp.get_task s goal in
   let why_fn =
     Driver.file_of_task driver
                         th_name_no_sanit
-                        (Session_itp.string_of_file_path (Session_itp.file_path (Session_itp.theory_parent s theory)))
+                        (Session_itp.system_path s (Session_itp.theory_parent s theory))
                         task in
   let ext = get_file_extension why_fn in
   let thname = (Ident.sanitizer Ident.char_to_alnumus
@@ -91,7 +88,7 @@ let create_prover_file c goal expl prover =
   let th = find_goal_theory s goal in
   let filename =
     compute_filename s (prover_files_dir prover) th goal expl driver in
-  make_filename (Sysutil.relativize_filename (Session_itp.get_dir s) filename)
+  Format.asprintf "%a" Sysutil.print_file_path (Sysutil.relativize_filename (Session_itp.get_dir s) filename)
 (*
   let cout = open_out filename in
   let fmt = Format.formatter_of_out_channel cout in
@@ -131,12 +128,13 @@ let manual_proof_info session pa =
   match pa.Session_itp.proof_script with
   | None -> None
   | Some fn ->
-      let fn = Filename.concat (Session_itp.get_dir session) fn in
+      let fn = Filename.concat (Session_itp.get_dir session)
+          (Format.asprintf "%a" Sysutil.print_file_path fn) in
       let fn = Sysutil.relativize_filename (Filename.dirname Gnat_config.filename) fn in
       let base_prover = pa.Session_itp.prover in
       let real_prover =
         List.find (fun p ->
           p = base_prover)
         Gnat_config.provers in
-      let fn = make_filename fn in
+      let fn = Format.asprintf "%a" Sysutil.print_file_path fn in
       Some (fn, editor_command real_prover fn)

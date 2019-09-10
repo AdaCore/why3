@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
-<prover id="0" name="Coq" version="8.7.1" timelimit="5" steplimit="0" memlimit="0"/>
+<why3session shape_version="8">
+<prover id="1" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="4" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../sorted_list.why" proved="true">
+<file proved="true">
+<path name=".."/><path name="sorted_list.why"/>
 <theory name="SortedList" proved="true">
  <goal name="sorted_inf" proved="true">
- <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="11262"/></proof>
  </goal>
  <goal name="sorted_mem" proved="true">
- <proof prover="0" edited="sorted_list_SortedList_sorted_mem_1.v"><result status="valid" time="0.31"/></proof>
+ <proof prover="1"><path name="sorted_list_SortedList_sorted_mem_1.v"/><result status="valid" time="0.24"/></proof>
  </goal>
 </theory>
 <theory name="SortedIntList" proved="true">
@@ -28,9 +29,9 @@
  </goal>
  <goal name="sorted123" proved="true">
  <proof prover="3"><result status="valid" time="0.00"/></proof>
- <proof prover="4"><result status="valid" time="0.00"/></proof>
+ <proof prover="4"><result status="valid" time="0.00" steps="10134"/></proof>
  <proof prover="5"><result status="valid" time="0.01" steps="5"/></proof>
- <proof prover="8"><result status="valid" time="0.00"/></proof>
+ <proof prover="8"><result status="valid" time="0.00" steps="3721"/></proof>
  </goal>
 </theory>
 </file>

@@ -118,7 +118,7 @@ let ref_fun : Expr.rsymbol =
 
 (* the "!" function *)
 let get_fun : Expr.rsymbol =
-  Pmodule.ns_find_rs ref_module.Pmodule.mod_export ["prefix !"]
+  Pmodule.ns_find_rs ref_module.Pmodule.mod_export [Ident.op_prefix "!"]
 
 let d2 =
   let id = Ident.id_fresh "f" in
@@ -184,6 +184,45 @@ let d2 =
   def
   with exn -> Format.eprintf "error: %a@." Exn_printer.exn_printer exn;
               exit 1
+
+let d2' =
+  let id = Ident.id_fresh "f" in
+  let post =
+    let result =
+      Term.create_vsymbol (Ident.id_fresh "result") Ty.ty_int
+    in
+    let post = Term.ps_app Term.ps_equ [Term.t_var result; Term.t_nat_const 0] in
+    Ity.create_post result post
+  in
+  let body =
+    (* building expression "ref 0" *)
+    let e =
+      let c0 = Expr.e_const (Number.int_const_of_int 0) Ity.ity_int in
+      let refzero_type = Ity.ity_app ref_type [Ity.ity_int] [] in
+      let f = Expr.e_app ref_fun [c0] [] refzero_type in
+      Expr.e_func_app f c0
+    in
+    (* building the first part of the let x = ref 0 *)
+    let id_x = Ident.id_fresh "x" in
+    let letdef, var_x = Expr.let_var id_x e in
+    (* building expression "!x" *)
+    let bang_x = Expr.e_app get_fun [Expr.e_var var_x] [] Ity.ity_int in
+    (* the complete body *)
+    Expr.e_let letdef bang_x
+  in
+  let arg_unit =
+    let unit = Ident.id_fresh "unit" in
+    Ity.create_pvsymbol unit Ity.ity_unit
+  in
+  let def,rs = Expr.let_sym id
+      (Expr.c_fun [arg_unit] [] [post] Ity.Mxs.empty Ity.Mpv.empty body) in
+  try
+    let def = Pdecl.create_let_decl def in
+    Format.eprintf "It works!@.";
+    def
+  with exn -> Format.eprintf "error: %a@." Exn_printer.exn_printer exn;
+    exit 1
+
 
 (*
  (* let f (a:array int)

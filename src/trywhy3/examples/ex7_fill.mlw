@@ -33,7 +33,7 @@ module Fill
     | Node l y r -> contains l x || x = y || contains r x
   end
 
-  let rec fill (t: tree) (a: array elt) (start: int) : int
+  let rec fill (t: tree) (a: array elt) (start: int) : (_r: int)
     requires { 0 <= length a }
     ensures  { true }
   =

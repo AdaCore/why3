@@ -6,6 +6,7 @@ Require int.Int.
 Require list.List.
 Require list.Length.
 Require list.Mem.
+Require list.HdTlNoOpt.
 Require list.Append.
 
 (* Why3 assumption *)
@@ -16,58 +17,49 @@ Axiom tree_WhyType : WhyType tree.
 Existing Instance tree_WhyType.
 
 (* Why3 assumption *)
-Fixpoint depths (d:Z) (t:tree) {struct t}: (list Z) :=
+Fixpoint depths (d:Numbers.BinNums.Z)
+  (t:tree) {struct t}: Init.Datatypes.list Numbers.BinNums.Z :=
   match t with
-  | Leaf => (Init.Datatypes.cons d Init.Datatypes.nil)
+  | Leaf => Init.Datatypes.cons d Init.Datatypes.nil
   | Node l r =>
-      (Init.Datatypes.app (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r))
+      Init.Datatypes.app (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r)
   end.
 
 Axiom depths_head :
-  forall (t:tree) (d:Z),
+  forall (t:tree) (d:Numbers.BinNums.Z),
   match depths d t with
-  | (Init.Datatypes.cons x _) => (d <= x)%Z
+  | Init.Datatypes.cons x _ => (d <= x)%Z
   | Init.Datatypes.nil => False
   end.
 
 Axiom depths_unique :
-  forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z)) (s2:(list Z)),
+  forall (t1:tree) (t2:tree) (d:Numbers.BinNums.Z)
+    (s1:Init.Datatypes.list Numbers.BinNums.Z)
+    (s2:Init.Datatypes.list Numbers.BinNums.Z),
   ((Init.Datatypes.app (depths d t1) s1) =
    (Init.Datatypes.app (depths d t2) s2)) ->
   (t1 = t2) /\ (s1 = s2).
 
 Axiom depths_prefix :
-  forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z)) (s2:(list Z)),
+  forall (t:tree) (d1:Numbers.BinNums.Z) (d2:Numbers.BinNums.Z)
+    (s1:Init.Datatypes.list Numbers.BinNums.Z)
+    (s2:Init.Datatypes.list Numbers.BinNums.Z),
   ((Init.Datatypes.app (depths d1 t) s1) =
    (Init.Datatypes.app (depths d2 t) s2)) ->
   (d1 = d2).
 
 Axiom depths_prefix_simple :
-  forall (t:tree) (d1:Z) (d2:Z), ((depths d1 t) = (depths d2 t)) -> (d1 = d2).
+  forall (t:tree) (d1:Numbers.BinNums.Z) (d2:Numbers.BinNums.Z),
+  ((depths d1 t) = (depths d2 t)) -> (d1 = d2).
 
 Axiom depths_subtree :
-  forall (t1:tree) (t2:tree) (d1:Z) (d2:Z) (s1:(list Z)),
+  forall (t1:tree) (t2:tree) (d1:Numbers.BinNums.Z) (d2:Numbers.BinNums.Z)
+    (s1:Init.Datatypes.list Numbers.BinNums.Z),
   ((Init.Datatypes.app (depths d1 t1) s1) = (depths d2 t2)) -> (d2 <= d1)%Z.
 
 Axiom depths_unique2 :
-  forall (t1:tree) (t2:tree) (d1:Z) (d2:Z),
+  forall (t1:tree) (t2:tree) (d1:Numbers.BinNums.Z) (d2:Numbers.BinNums.Z),
   ((depths d1 t1) = (depths d2 t2)) -> (d1 = d2) /\ (t1 = t2).
-
-(* Why3 assumption *)
-Definition lex (x1:((list Z)* Z)%type) (x2:((list Z)* Z)%type) : Prop :=
-  match x1 with
-  | (s1, d1) =>
-      match x2 with
-      | (s2, d2) =>
-          ((list.Length.length s1) < (list.Length.length s2))%Z \/
-          (((list.Length.length s1) = (list.Length.length s2)) /\
-           match (s1, s2) with
-           | ((Init.Datatypes.cons h1 _), (Init.Datatypes.cons h2 _)) =>
-               (d2 < d1)%Z /\ ((d1 <= h1)%Z /\ (h1 = h2))
-           | _ => False
-           end)
-      end
-  end.
 
 Lemma depths_length: 
   forall t d, (Length.length (depths d t) >= 1)%Z.
@@ -79,16 +71,15 @@ Proof.
   omega.
 Qed.
 
-
 (* Why3 goal *)
-Theorem VC_harness2 :
-  forall (result:tree),
-  ~ ((depths 0%Z result) =
+Theorem harness2'VC :
+  forall (us:tree),
+  ~ ((depths 0%Z us) =
      (Init.Datatypes.cons 1%Z
       (Init.Datatypes.cons 3%Z
        (Init.Datatypes.cons 2%Z (Init.Datatypes.cons 2%Z Init.Datatypes.nil))))).
-(* Why3 intros result. *)
-
+Proof.
+intro result.
 intuition.
 destruct result; simpl in H.
 discriminate H.
@@ -137,4 +128,3 @@ do 4 (rewrite Append.Append_length).
 omega.
 
 Qed.
-

@@ -28,7 +28,7 @@ module Logical
     ensures { mod (x * y + z) x = mod z x }
   =
     ()
-let lsl_mod_ext (x cnt: limb) : limb
+let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
     requires { 0 <= cnt < Limb.length }
     ensures  { result = mod (x * power 2 cnt) radix }
     ensures  { result <= radix - power 2 cnt }
@@ -117,7 +117,7 @@ let lsl_mod_ext (x cnt: limb) : limb
     (r,d)
     end
 
-  let clz_ext (x:limb) : int32
+  let clz_ext [@extraction:inline] (x:limb) : int32
     requires { x > 0 }
     ensures { power 2 result * x < radix }
     ensures { 2 * power 2 result * x >= radix }

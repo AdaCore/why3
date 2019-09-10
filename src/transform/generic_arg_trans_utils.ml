@@ -24,15 +24,9 @@ exception Arg_trans_missing of (string * Svs.t)
 exception Arg_bad_hypothesis of (string * term)
 exception Cannot_infer_type of string
 exception Unnecessary_terms of term list
+exception Remove_unknown of (decl * Ident.ident)
 
 let gen_ident = Ident.id_fresh
-
-let rec t_replace_nt_na t1 t2 t =
-  if t_equal_nt_na t t1 then t2 else t_map (t_replace_nt_na t1 t2) t
-
-(* Replace all occurences of f1 by f2 in t *)
-let replace_in_term = t_replace_nt_na
-(* TODO be careful with attribute copy in t_map *)
 
 let subst_quant c tq x : term =
   let (vsl, tr, te) = t_open_quant tq in
@@ -170,7 +164,7 @@ type term_subst = term Mterm.t
 let replace_subst (subst: term_subst) t =
   (* TODO improve efficiency of this ? *)
   Mterm.fold (fun t_from t_to acc ->
-    t_replace_nt_na t_from t_to acc) subst t
+    t_replace t_from t_to acc) subst t
 
 let replace_decl (subst: term_subst) (d: decl) =
   decl_map (replace_subst subst) d

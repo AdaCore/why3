@@ -38,10 +38,6 @@ module Hpn: Exthtbl.S with type key = proofNodeID
 module Htn: Exthtbl.S with type key = transID
 module Hpan: Exthtbl.S with type key = proofAttemptID
 
-type file_path
-val string_of_file_path : file_path -> string
-val print_file_path : Format.formatter -> file_path -> unit
-
 (* Any proof node of the tree *)
 type any =
   | AFile of file
@@ -66,30 +62,29 @@ val get_dir : session -> string
 
 (** File *)
 val file_id : file -> fileID
-val file_path : file -> file_path
+val file_path : file -> Sysutil.file_path
 val file_format : file -> string option
 val file_theories : file -> theory list
 val system_path : session -> file -> string
 (** the system-dependent absolute path associated to that file *)
-
-val basename : file_path -> string
 
 (** Theory *)
 val theory_name : theory -> Ident.ident
 val theory_goals : theory -> proofNodeID list
 val theory_parent : session -> theory -> file
 
-type proof_attempt_node = private {
-  parent                 : proofNodeID;
-  mutable prover         : Whyconf.prover;
-  limit                  : Call_provers.resource_limit;
-  mutable proof_state    : Call_provers.prover_result option;
-  (* None means that there is a prover call in progress *)
-  mutable proof_obsolete : bool;
-  mutable proof_script   : string option;  (* non empty for external ITP *)
-                            }
+type proof_attempt_node =
+  private {
+      parent                 : proofNodeID;
+      mutable prover         : Whyconf.prover;
+      limit                  : Call_provers.resource_limit;
+      mutable proof_state    : Call_provers.prover_result option;
+      (* None means that there is a prover call in progress *)
+      mutable proof_obsolete : bool;
+      mutable proof_script   : Sysutil.file_path option;  (* non empty for external ITP *)
+    }
 
-val set_proof_script : proof_attempt_node -> string -> unit
+val set_proof_script : proof_attempt_node -> Sysutil.file_path -> unit
 
 (* [is_below s a b] true if a is below b in the session tree *)
 val is_below: session -> any -> any -> bool
@@ -164,7 +159,7 @@ val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
 (** {2 session operations} *)
 
 
-val empty_session : ?from:session -> string -> session
+val empty_session : shape_version:int option -> ?from:session -> string -> session
 (** create an empty_session in the directory specified by the
     argument *)
 
@@ -200,7 +195,7 @@ val merge_files :
     where found and [d] is true if detached theories, goals or
     transformations were found.  *)
 
-val graft_proof_attempt : ?file:string -> session -> proofNodeID ->
+val graft_proof_attempt : ?file:Sysutil.file_path -> session -> proofNodeID ->
   Whyconf.prover -> limit:Call_provers.resource_limit -> proofAttemptID
 (** [graft_proof_attempt s id pr file l] adds a proof attempt with prover
     [pr] and limits [l] in the session [s] as a child of the task
@@ -304,10 +299,10 @@ val change_prover : notifier -> session -> proofNodeID -> Whyconf.prover -> Whyc
 
 (** Extra session update operations *)
 
-val find_file_from_path: session -> string list -> file
+val find_file_from_path: session -> Sysutil.file_path -> file
 (** raise [Not_found] of path does not appear in session *)
 
-val rename_file: session -> string -> string -> (string list) * (string list)
+val rename_file: session -> string -> string -> Sysutil.file_path * Sysutil.file_path
 (** [rename_file s from_file to_file] renames the
     file section in session [s] named [from_file] into [to_file]
     @return the paths relative to the session dir

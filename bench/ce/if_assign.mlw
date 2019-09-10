@@ -6,13 +6,13 @@ use ref.Ref
 
 val x : ref int
 
-let f (a : int) : int
+let f (_a : int) : int
   ensures { result  = 0}
 =
   x := 42;
   !x
 
-let f2 (a : int) : int
+let f2 (_a : int) : int
   ensures { result  = 0}
 =
   x := 42;

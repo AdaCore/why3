@@ -33,15 +33,9 @@ let get_global ident =
 let int_of_js_string s = int_of_string (Js.to_string s)
 
 let blob_url_of_string s =
-  let s = JSU.inject (Js.string (Sys_js.read_file ~name:s)) in
-  let _Blob  = get_global "Blob" in
-  let blob =
-    new%js _Blob (Js.array [| s |])
-  in
-  let _URL = JSU.(get (get_global "window") (Js.string "URL")) in
-  let url : Js.js_string Js.t =
-    JSU.(meth_call _URL "createObjectURL" [| JSU.inject blob |])
-  in
+  let s = Sys_js.read_file ~name:s in
+  let blob = File.blob_from_string s in
+  let url = Dom_html.window ##. _URL ## createObjectURL blob in
   Js.to_string url
 
 
@@ -114,13 +108,10 @@ let getElement cast id =
     log ("Element " ^ id ^ " does not exist or has invalid type");
     assert false
 
-let appendChild o c =
-  ignore (o ## appendChild ( (c :> Dom.node Js.t)))
-
 let addMouseEventListener prevent o e f =
   let cb = Js.wrap_callback
 	     (fun (e : Dom_html.mouseEvent Js.t) ->
-	      if prevent then ignore (JSU.(meth_call e "preventDefault" [| |]));
+	      if prevent then Dom.preventDefault e;
 	      f e;
 	      Js._false)
   in
@@ -130,102 +121,146 @@ let addMouseEventListener prevent o e f =
 			   inject Js._false |])
 
 
-
-
-module Editor =
+module Ace =
   struct
-    type range
-    type marker
-    let name = ref (Js.string "")
-    let saved = ref false
-    let ace = get_global "ace"
+    open Js
 
-    let _Range : (int -> int -> int -> int -> range Js.t) Js.constr =
+    type marker
+
+    class type annotation =
+      object
+        method row : int readonly_prop
+        method column : int readonly_prop
+        method text : js_string t readonly_prop
+        method _type : js_string t readonly_prop
+      end
+
+    class type range =
+      object
+      end
+
+    class type selection =
+      object
+        method setSelectionRange : range t -> bool t -> unit meth
+      end
+
+    class type editSession =
+      object
+        method addMarker : range t -> js_string t -> js_string t -> bool t -> marker meth
+        method clearAnnotations : unit meth
+        method getLength : int meth
+        method removeMarker : marker -> unit meth
+        method setAnnotations : annotation t js_array t -> unit meth
+        method setMode : js_string t -> unit meth
+      end
+
+    class type editor =
+      object
+        method focus : unit meth
+        method getSelection : selection t meth
+        method getSession : editSession t meth
+        method getValue : js_string t meth
+        method gotoLine : int -> int -> bool t -> unit meth
+        method redo : unit meth
+        method setReadOnly : bool t -> unit meth
+        method setTheme : js_string t -> unit meth
+        method setValue : js_string t -> int -> unit meth
+        method undo : unit meth
+      end
+
+    class type ace =
+      object
+        method edit : js_string t -> editor t optdef meth
+      end
+
+    let ace : ace Js.t = get_global "ace"
+    let edit s = ace ## edit s
+
+    let range : (int -> int -> int -> int -> range Js.t) Js.constr =
       let r =
 	JSU.(get (meth_call ace "require" [| inject (Js.string "ace/range") |])
 		 (Js.string "Range"))
       in
       check_def "Range" r
 
+    let annotation row col text kind : annotation t =
+      object%js
+        val row = row
+        val column = col
+        val text = text
+        val _type = kind
+      end
+  end
+
+module Editor =
+  struct
+    let name = ref (Js.string "")
+    let saved = ref false
+
     let editor =
-      let e =
-	JSU.(meth_call ace "edit" [| inject (Js.string "why3-editor") |])
-      in
+      let e = Ace.edit (Js.string "why3-editor") in
       check_def "why3-editor" e
 
     let task_viewer =
-      let e =
-	JSU.(meth_call ace "edit" [| inject (Js.string "why3-task-viewer") |])
-      in
+      let e = Ace.edit (Js.string "why3-task-viewer") in
       check_def "why3-task-viewer" e
-
-    let get_session ed =
-      JSU.(meth_call ed "getSession" [| |])
-
-
-    let mk_annotation row col text kind =
-      JSU.(obj [| "row", inject row; "column", inject col;
-		  "text", inject text; "type", inject kind |])
 
     let set_annotations l =
       let a =
-	Array.map (fun (r,c,t,k) -> mk_annotation r c t k) (Array.of_list l)
+	Array.map (fun (r,c,t,k) -> Ace.annotation r c t k) (Array.of_list l)
       in
       let a = Js.array a in
-      JSU.(meth_call (get_session editor) "setAnnotations" [| inject a |])
+      editor ## getSession ## setAnnotations a
 
     let clear_annotations () =
-      ignore (JSU.(meth_call (get_session editor) "clearAnnotations" [| |]))
+      editor ## getSession ## clearAnnotations
 
-    let _Infinity = get_global "Infinity"
+    let _Infinity : int = get_global "Infinity"
 
     let scroll_to_end e =
-      let len : int  = JSU.(meth_call (get_session e) "getLength" [| |]) in
+      let len = e ## getSession ## getLength in
       let last_line = len - 1 in
-      ignore JSU.(meth_call e "gotoLine" [| inject last_line; inject _Infinity; inject Js._false |])
+      e ## gotoLine last_line _Infinity Js._false
 
     let () =
       let editor_theme : Js.js_string Js.t = get_global "editor_theme" in
       let editor_mode : Js.js_string Js.t = get_global "editor_mode" in
       let task_viewer_mode : Js.js_string Js.t = get_global "task_viewer_mode" in
 
-      ignore (JSU.(meth_call editor "setTheme" [| inject editor_theme |]));
-      ignore (JSU.(meth_call (get_session editor) "setMode" [| inject editor_mode |]));
+      editor ## setTheme editor_theme;
+      editor ## getSession ## setMode editor_mode;
       JSU.(set editor (Js.string "$blockScrolling") _Infinity);
 
-      ignore (JSU.(meth_call task_viewer "setTheme" [| inject editor_theme |]));
-      ignore (JSU.(meth_call (get_session task_viewer) "setMode" [| inject task_viewer_mode |]));
+      task_viewer ## setTheme editor_theme;
+      task_viewer ## getSession ## setMode task_viewer_mode;
       JSU.(set task_viewer (Js.string "$blockScrolling") _Infinity);
 
-      JSU.(meth_call task_viewer "setReadOnly" [| inject Js._true|])
+      task_viewer ## setReadOnly Js._true
 
     let undo () =
-      ignore JSU.(meth_call editor "undo" [| |])
+      editor ## undo
 
     let redo () =
-      ignore JSU.(meth_call editor "redo" [| |])
+      editor ## redo
 
-    let get_value ?(editor=editor) () : Js.js_string Js.t =
-      JSU.meth_call editor "getValue" [| |]
+    let get_value ?(editor=editor) () =
+      editor ## getValue
 
-    let set_value ?(editor=editor) (str : Js.js_string Js.t) =
-      ignore JSU.(meth_call editor "setValue" [| inject (str); inject ~-1 |])
+    let set_value ?(editor=editor) str =
+      editor ## setValue str ~-1
 
     let mk_range l1 c1 l2 c2 =
-      new%js _Range l1 c1 l2 c2
+      new%js Ace.range l1 c1 l2 c2
 
     let set_selection_range r =
-      let selection = JSU.meth_call editor "getSelection" [| |] in
-      ignore JSU.(meth_call selection "setSelectionRange" [| inject r |])
+      let selection = editor ## getSelection in
+      selection ## setSelectionRange r Js._false
 
-    let add_marker cls r : marker =
-      JSU.(meth_call (get_session editor) "addMarker"
-                     [| inject r;
-			inject (Js.string cls);
-			inject (Js.string "text") |])
+    let add_marker cls r =
+      editor ## getSession ## addMarker r (Js.string cls) (Js.string "text") Js._false
 
     let remove_marker m =
-      ignore JSU.(meth_call  (get_session editor) "removeMarker" [| inject  m|])
+      editor ## getSession ## removeMarker m
 
     let get_char buffer i = int_of_float (buffer ## charCodeAt(i))
     let why3_loc_to_range buffer loc =
@@ -250,9 +285,6 @@ module Editor =
       let l2, c2 = convert_range l1 b (i+b) (e-b) in
       mk_range (l1-1) c1 (l2-1) c2
 
-    let focus e =
-      ignore JSU.(meth_call e "focus" [| |])
-
       let set_on_event e f =
 	ignore JSU.(meth_call editor "on" [| inject (Js.string e);
 					   inject f|])
@@ -261,12 +293,12 @@ module Editor =
       let editor_bg = getElement AsHtml.div "why3-editor-bg"
 
       let disable () =
-        ignore JSU.(meth_call editor "setReadOnly" [| inject Js._true|]);
+        editor ## setReadOnly Js._true;
         editor_bg ##. style ##. display := Js.string "block"
 
 
       let enable () =
-        ignore JSU.(meth_call editor "setReadOnly" [| inject Js._false|]);
+        editor ## setReadOnly Js._false;
         editor_bg ##. style ##. display := Js.string "none"
 
 
@@ -334,7 +366,7 @@ module ContextMenu =
       b ##. onclick := Dom.handler (fun _ ->
 				   hide ();
 				   f ();
-				   Editor.(focus editor);
+				   Editor.editor ## focus;
 				   Js._false)
     let () = addMouseEventListener false task_menu "mouseleave"
 	(fun _ -> hide())
@@ -359,9 +391,8 @@ module ExampleList =
       select_example ##. selectedIndex := 0
 
     let () =
-      let sessionStorage : Dom_html.storage Js.t =
-	get_global "sessionStorage"
-      in
+      let sessionStorage =
+        check_def "sessionStorage" (Dom_html.window ##. sessionStorage) in
       let filename url =
 	let arr = url ## split (Js.string "/") in
 	let arr = Js.to_array (Js.str_array arr) in
@@ -395,7 +426,7 @@ module ExampleList =
       let option = Dom_html.createOption Dom_html.document in
       option ##. value := url;
       option ##. innerHTML := text;
-      appendChild select_example option
+      Dom.appendChild select_example option
 
     let enable () =
       select_example ##. disabled := Js._false
@@ -447,12 +478,12 @@ module TaskList =
           Not_found ->
           let ul = Dom_html.createUl doc in
           ul ##. id := Js.string parent_id;
-          appendChild task_list ul;
+          Dom.appendChild task_list ul;
           ul
       in
       let li = Dom_html.createLi doc in
       li ##. id := Js.string id;
-      appendChild ul li;
+      Dom.appendChild ul li;
       li ##. innerHTML := mk_li_content id expl
 
 
@@ -531,11 +562,11 @@ module TaskList =
       | Result sl ->
          clear ();
          let ul = Dom_html.createUl doc in
-         appendChild task_list ul;
+         Dom.appendChild task_list ul;
          List.iter (fun (s : string) ->
                     let li = Dom_html.createLi doc in
                     li ##. innerHTML := (Js.string s);
-                    appendChild ul li;) sl
+                    Dom.appendChild ul li;) sl
 
       | Theory (th_id, th_name) ->
 	 attach_to_parent th_id "why3-theory-list" th_name []
@@ -626,7 +657,7 @@ module ToolBar =
     let add_action b f =
       let cb = fun _ ->
 	f ();
-	Editor.(focus editor);
+	Editor.editor ## focus;
 	Js._false
       in
       b ##. onclick := Dom.handler cb
@@ -655,26 +686,22 @@ module ToolBar =
 
 
 
-    let mk_save =
-      let _Blob  = get_global "Blob" in
-      fun () ->
+    let mk_save () =
       let blob =
-        new%js _Blob (Js.array [| (Editor.get_value ()) |],
-                     JSU.(obj [| "type", inject (Js.string "application/octet-stream") |]))
+        let code = Js.to_string (Editor.get_value ()) in
+        File.blob_from_string ~contentType:"text/plain" ~endings:`Native code
       in
       let name =
 	if !Editor.name ##. length == 0 then Js.string "test.mlw" else !Editor.name
       in
       blob, name
 
-    let save_default  =
-      let _URL = JSU.(get Dom_html.window (Js.string "URL")) in
-      fun () ->
+    let save_default () =
       let blob, name = mk_save () in
-      let url = JSU.(meth_call _URL "createObjectURL" [| inject blob |]) in
+      let url = Dom_html.window ##. _URL ## createObjectURL blob in
       real_save ##. href := url;
       JSU.(set real_save (Js.string "download") name);
-      ignore JSU.(meth_call real_save "click" [| |])
+      real_save ## click
     (* does not work with firefox *)
     (*ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |]) *)
 
@@ -772,7 +799,7 @@ module Dialogs =
     let show diag () =
       dialog_panel ##. style ##. display := Js.string "flex";
       diag ##. style ##. display := Js.string "inline-block";
-      ignore JSU.(meth_call diag "focus" [| |])
+      diag ## focus
 
     let close () =
       List.iter (fun d -> d ##. style ##. display := Js.string "none") all_dialogs;
@@ -803,7 +830,7 @@ module KeyBinding =
            match t.(pack (ev ##. ctrlKey) (ev ##. shiftKey) (ev ##. metaKey) (ev ##. altKey)) with
              None -> Js._true
            | Some f ->
-              ignore JSU.(meth_call ev "preventDefault" [| |]);
+              Dom.preventDefault ev;
               f ();
               Js._false)
 
@@ -818,8 +845,8 @@ module KeyBinding =
 module Session =
   struct
 
-    let localStorage : Dom_html.storage Js.t =
-      get_global "localStorage"
+    let localStorage =
+      check_def "localStorage" (Dom_html.window ##. localStorage)
 
     let save_num_threads i =
       localStorage ## setItem (Js.string "why3-num-threads") (Js.string (string_of_int i))
@@ -1096,23 +1123,20 @@ let () =
 
 
 let () =
-  Dom_html.window ##. onunload := Dom.handler (fun _ -> Js._false);
   (* restore the session *)
   let name, buffer = Session.load_buffer () in
   Editor.name := name;
   Editor.set_value buffer;
   Panel.set_wide (Session.load_view_mode () = (Js.string "wide"));
   ExampleList.unselect();
-  Dom_html.window ##. onbeforeunload :=
-    Dom.handler (Obj.magic (fun _ ->
+  Dom_html.window ##. onunload :=
+    Dom.handler (fun _ ->
                    Session.save_buffer !Editor.name (Editor.get_value ());
                    Session.save_num_threads (Array.length !Controller.alt_ergo_workers);
                    Session.save_num_steps !Controller.alt_ergo_steps;
                    Session.save_view_mode (if Panel.is_wide () then Js.string "wide"
                                            else Js.string "column");
-
-                   (Js.string "Do you wish to quit TryWhy3 (your current session will be saved to your browser local storage) ?"))
-                )
+                   Js._true)
 
 (*
 Local Variables:

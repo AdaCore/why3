@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../tree_of_list.mlw" proved="true">
+<file proved="true">
+<path name=".."/><path name="tree_of_list.mlw"/>
 <theory name="TreeOfList" proved="true">
  <goal name="VC tree_of_list_aux" expl="VC for tree_of_list_aux" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="VC tree_of_list_aux.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7263"/></proof>
   </goal>
   <goal name="VC tree_of_list_aux.1" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.07"/></proof>
+  <proof prover="4"><result status="valid" time="0.07" steps="8751"/></proof>
   </goal>
   <goal name="VC tree_of_list_aux.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="9569"/></proof>
   </goal>
   <goal name="VC tree_of_list_aux.3" expl="unreachable point" proved="true">
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10444"/></proof>
   </goal>
   <goal name="VC tree_of_list_aux.4" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.05"/></proof>
+  <proof prover="4"><result status="valid" time="0.05" steps="10383"/></proof>
   </goal>
   <goal name="VC tree_of_list_aux.5" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="37"/></proof>
@@ -29,17 +30,17 @@
   <goal name="VC tree_of_list_aux.6" expl="postcondition" proved="true">
   <transf name="destruct_term_subst" proved="true" arg1="l&#39;1">
    <goal name="VC tree_of_list_aux.6.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.04"/></proof>
+   <proof prover="4"><result status="valid" time="0.22" steps="40240"/></proof>
    </goal>
    <goal name="VC tree_of_list_aux.6.1" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.22"/></proof>
+   <proof prover="4"><result status="valid" time="0.04" steps="9418"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="VC tree_of_list" expl="VC for tree_of_list" proved="true">
- <proof prover="4"><result status="valid" time="0.08"/></proof>
+ <proof prover="4"><result status="valid" time="0.08" steps="16159"/></proof>
  </goal>
 </theory>
 </file>

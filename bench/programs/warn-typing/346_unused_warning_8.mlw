@@ -1,0 +1,13 @@
+use int.Int
+
+exception E
+exception F
+exception G
+exception H
+
+val f (x: int) : int
+    ensures { x = 42       }
+    raises  { F -> x = -42 }
+    raises  { E -> x <> x  }
+    raises  { G -> x = x   }
+    raises  { H -> false   }

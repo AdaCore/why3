@@ -12,7 +12,7 @@ module Array32
   use mach.int.Int32
   use map.Map as M
 
-  type array [@ex:array] 'a = private {
+  type array [@extraction:array] 'a = private {
     mutable ghost elts : int -> 'a;
                 length : int32;
   } invariant { 0 <= length }
@@ -45,7 +45,7 @@ module Array32
   = if i < of_int 0 || i >= length a then raise OutOfBounds;
     a[i] <- v
 
-  val make [@ex:array_make] (n: int32) (v: 'a) : array 'a
+  val make [@extraction:array_make] (n: int32) (v: 'a) : array 'a
     requires { [@expl:array creation size] n >= 0 }
     ensures  { forall i:int. 0 <= i < n -> result[i] = v }
     ensures  { result.length = n }

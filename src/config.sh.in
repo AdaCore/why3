@@ -46,8 +46,9 @@ let enable_relocation = \"@enable_relocation@\"
 echo "
 OCAMLBEST   = @OCAMLBEST@
 BIGINTLIB   = @BIGINTLIB@
-INCLUDE     = @BIGINTINCLUDE@ -I @OCAMLINSTALLLIB@/why3
-INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ -I @OCAMLINSTALLLIB@/why3
+MPFRLIB     = @MLMPFR@
+INCLUDE     = @BIGINTINCLUDE@ -I \"$ocamllib\"
+INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ -I \"$ocamllib\"
 " > $makefileconfig
 
 if [ "@enable_relocation@" = "no" ]; then

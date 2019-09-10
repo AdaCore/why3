@@ -841,7 +841,7 @@ exception QError
 let constant rzero = (0,1)
 let constant rone = (1,1)
 
-function rinterp (t:t) (v:rvars) : real
+function rinterp (t:t) (_v:rvars) : real
 = match t with
   | (n,d) ->  from_int n /. from_int d
   end
@@ -988,6 +988,8 @@ use real.FromInt
 
 clone export LinearEquationsDecision with type  C.a = real, function C.(+) = (+.), function C.( * ) = ( *. ), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=int -> real, function C.interp=rinterp, exception C.Unknown = QError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=rzero, val C.cone=rone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=radd, val C.mul=rmul, val C.opp=ropp, val C.eq=req, val C.inv=rinv, goal .
 
+meta reflection val decision
+
 end
 
 module LinearDecisionInt
@@ -996,7 +998,7 @@ use int.Int
 
 type t' =  IC int | Error
 
-function interp_id (t:t') (v:int -> int) : int
+function interp_id (t:t') (_v:int -> int) : int
 = match t with
   | IC i -> i
   | Error -> 0 (* never created *)
@@ -1006,7 +1008,7 @@ let constant izero = IC 0
 
 let constant ione = IC 1
 
-let predicate ieq (a b:t') = false
+let predicate ieq (_a _b:t') = false
 
 exception NError
 
@@ -1025,7 +1027,7 @@ let iopp (a:t') : t'
   raises  { NError -> true }
 = raise NError
 
-let iinv (t:t') : t'
+let iinv (_t:t') : t'
   (*ensures { forall v: int -> int. id result v * id t v = one }*)
   ensures { not (ieq result izero) }
   raises { NError -> true }
@@ -1109,6 +1111,8 @@ let int_decision (l: context') (g: equality') : bool
   raises  { R.Failure -> true | QError -> true | NError -> true }
 = let l',g' = m_ctx l g in
   R.decision l' g'
+
+meta reflection val int_decision
 
 end
 
@@ -1446,7 +1450,7 @@ let predicate mpeq (a b:t)
   (n1, e1), (n2, e2) -> n1=n2 && (n1 = 0 || same_exp e1 e2)
   end*)
 
-let mpinv (a:t) : t
+let mpinv (_a:t) : t
   ensures { not mpeq result mpzero }
   raises  { MPError -> true }
 = raise MPError
@@ -1554,6 +1558,8 @@ let mp_decision (l: context') (g: equality') : bool
   raises  { R.Failure -> true | MPError -> true | Q.QError -> true }
 =
   R.decision (m_ctx l) (m_eq g)
+
+meta reflection val mp_decision
 
 end
 
@@ -1719,7 +1725,7 @@ let rec lemma interp_ctx_impl' (ctx: context') (g1 g2:equality')
   variant  { ctx }
 = match ctx with Nil -> () | Cons _ t -> interp_ctx_impl' t g1 g2 end
 
-let lemma impl_cons (c1 c2:context') (e:equality') (y z:vars)
+let lemma impl_cons (c1 c2:context') (e:equality')
   requires { ctx_impl_ctx' c1 c2 }
   requires { forall y z. interp_ctx' c1 e y z }
   ensures  { ctx_impl_ctx' c1 (Cons e c2) }
@@ -1968,6 +1974,8 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
   = let l', g' = prop_ctx l g in
     mp_decision l' g'
 
+  meta reflection val prop_mp_decision
+
 end
 
 module TestMP
@@ -2048,6 +2056,9 @@ function interp (f:fmla) (b: int -> value) : bool =
 let f (f:fmla) : bool
   ensures { result -> forall b. interp f b }
 = false
+
+meta reflection val f
+
 end
 (*
 module TestFmla

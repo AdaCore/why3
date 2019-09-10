@@ -232,3 +232,7 @@ val extract_field: attribute -> (int * string) option
 val get_model_trace_attr : attrs:Sattr.t -> attribute
 (** Return an attribute of the form ["model_trace:*"].
     Raises [Not_found] if there is no such attribute. *)
+
+val get_hyp_name: attrs:Sattr.t -> string option
+(** If attrs contains an attribute of the form ["hyp_name:<s>"] returns
+    [Some <s>] or [None] if no attribute have this form *)

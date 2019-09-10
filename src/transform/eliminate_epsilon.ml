@@ -179,7 +179,7 @@ let rec lift_f el acc t0 =
 	          let acc, f = lift_f el acc f in
 	          let (abst,axml), t = lift_f el acc t in
                   let f = t_forall_close_merge vl (t_subst_single vs t f) in
-                  let id = id_derive (vs.vs_name.id_string ^ "_def") vs.vs_name
+                  let id = id_derive (vs.vs_name.id_string ^ "'def") vs.vs_name
 		  in
                   let ax = (create_prsymbol id, f) in
                   (abst, ax :: axml), t
@@ -189,7 +189,7 @@ let rec lift_f el acc t0 =
                   let ls = create_fsymbol (id_clone vs.vs_name) tyl vs.vs_ty in
                   let t = fs_app ls (List.map t_var vl) vs.vs_ty in
                   let f = t_forall_close_merge vl (t_subst_single vs t f) in
-                  let id = id_derive (vs.vs_name.id_string ^ "_def") vs.vs_name
+                  let id = id_derive (vs.vs_name.id_string ^ "'def") vs.vs_name
                   in
                   let ax = (create_prsymbol id, f) in
                   (create_param_decl ls :: abst, ax :: axml), t
@@ -244,7 +244,7 @@ let lift_l el (acc,dl) (ls,ld) =
       let (abst,axml), f = lift_f el acc f in
       let t = t_app ls (List.map t_var vl) t.t_ty in
       let f = t_forall_close_merge vl (t_subst_single vs t f) in
-      let id = id_derive (ls.ls_name.id_string ^ "_def") ls.ls_name in
+      let id = id_derive (ls.ls_name.id_string ^ "'def") ls.ls_name in
       let ax = (create_prsymbol id, f) in
       (create_param_decl ls :: abst, ax :: axml), dl
   | _ ->

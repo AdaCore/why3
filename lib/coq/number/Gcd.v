@@ -23,7 +23,7 @@ Require number.Divisibility.
 Import Znumtheory.
 
 (* Why3 goal *)
-Notation gcd := Zgcd (only parsing).
+Notation gcd := Z.gcd (only parsing).
 
 (* Why3 goal *)
 Lemma gcd_nonneg :
@@ -88,7 +88,7 @@ Qed.
 Lemma Comm :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), ((gcd x y) = (gcd y x)).
 Proof.
-exact Zgcd_comm.
+exact Z.gcd_comm.
 Qed.
 
 (* Why3 goal *)
@@ -96,7 +96,7 @@ Lemma gcd_0_pos :
   forall (a:Numbers.BinNums.Z), (0%Z <= a)%Z -> ((gcd a 0%Z) = a).
 Proof.
 intros a H.
-rewrite <- (Zabs_eq a H) at 2.
+rewrite <- (Z.abs_eq a H) at 2.
 apply Zgcd_0.
 Qed.
 
@@ -142,7 +142,7 @@ Lemma Gcd_computer_mod :
   ((gcd b (ZArith.BinInt.Z.rem a b)) = (gcd a b)).
 Proof.
 intros a b _.
-rewrite (Zgcd_comm a b).
+rewrite (Z.gcd_comm a b).
 rewrite (gcd_euclid b a (Z.quot a b)).
 apply f_equal.
 rewrite (Z.quot_rem' a b) at 2.
@@ -155,7 +155,7 @@ Lemma Gcd_euclidean_mod :
   ((gcd b (int.EuclideanDivision.mod1 a b)) = (gcd a b)).
 Proof.
 intros a b Zb.
-rewrite (Zgcd_comm a b).
+rewrite (Z.gcd_comm a b).
 rewrite (gcd_euclid b a (EuclideanDivision.div a b)).
 apply f_equal.
 rewrite (EuclideanDivision.Div_mod a b Zb) at 2.

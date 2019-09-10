@@ -312,65 +312,101 @@ from an OCaml program.
 
 \section{ML Programs}
 
-The simplest way to build \whyml programs from OCaml is to build
-untyped syntax trees for such programs, and then
-call the \why typing procedure to build typed declarations.
+One can build \whyml programs starting at different steps of the \whyml pipeline
+(parsing, typing, VC generation). We present here two choices. The first is to build
+an untyped syntax trees, and then
+call the \why typing procedure to build typed declarations. The second choice is
+to directly build the typed declaration. The first choice use concepts similar
+to the \whyml language but errors in the generation are harder to debug since
+they are lost inside the typing phase, the second choice use more internal
+notions but it is easier to pinpoint the functions wrongly used.
+
+\subsection{Untyped syntax tree}
 
 The examples of this section are available in the file
 \verb|examples/use_api/mlw_tree.ml| of the distribution.
 
 The first step is to build an environment as already illustrated in
 Section~\ref{sec:api:callingprovers}, and open the OCaml module
-\verb|Ptree| which contains most of the OCaml functions we need in
+\verb|Ptree| (``parse tree'') which contains most of the OCaml functions we need in
 this section.
 \lstinputlisting{generated/mlw_tree__buildenv.ml}
 
-To contain all the example programs we are going to build we need a
-module. We start the creation of that module using the following
-declarations, that first introduces a pseudo ``file'' to hold the
-module, then the module itself called \verb|Program|.
-\lstinputlisting{generated/mlw_tree__openmodule.ml}
-Notice the use of a first
-simple helper function \verb|mk_ident| to build an identifier without
-any attributes nor any location.
-
-To write our programs, we need to import some other modules from the
-standard library. The following introduces two helper functions for
-building qualified identifiers and importing modules, and finally
-imports \verb|int.Int|.
-\lstinputlisting{generated/mlw_tree__useimport.ml}
-
-We want now to build a program equivalent to the following code in concrete Why3 syntax.
+Each of our example programs will build a module.
+Let's consider the Why3 code.
 \lstinputlisting[language=why3]{generated/mlw_tree__source1.ml}
-
-The OCaml code that programmatically build this Why3 function is as follows.
+The Ocaml code that programmatically builds it is as follows.
 \lstinputlisting{generated/mlw_tree__code1.ml}
-This code makes uses of helper functions that are given in Figure~\ref{fig:helpers}.
+
+Most of the code is not using directly the \verb|Ptree| constructors
+but instead makes uses of the helper
+functions that are given in Figure~\ref{fig:helpers}.
+Notice \verb|mk_ident| which builds an identifier (\verb|Ptree.ident|) without
+any attributes nor any location and \verb|use_import| which lets us to import
+some other modules and in particular the ones from the standard library. At the end,
+our module is no more than the identifier and a list of two declarations (\verb|Ptree.decl list|)
 \begin{figure}[t]
   \lstinputlisting{generated/mlw_tree__helper1.ml}
   \caption{Helper functions for building WhyML programs}
   \label{fig:helpers}
 \end{figure}
 
+
 We want now to build a program equivalent to the following code in concrete Why3 syntax.
 \lstinputlisting[language=why3]{generated/mlw_tree__source2.ml}
-We need to import the \verb|ref.Ref| module first. The rest is similar to the first example, the code is as follows
+
+The OCaml code that programmatically build this Why3 function is as follows.
 \lstinputlisting{generated/mlw_tree__code2.ml}
 
-The next example makes use of arrays.
+We want now to build a program equivalent to the following code in concrete Why3 syntax.
 \lstinputlisting[language=why3]{generated/mlw_tree__source3.ml}
-The corresponding OCaml code is as follows
+We need to import the \verb|ref.Ref| module first. The rest is similar to the first example, the code is as follows
 \lstinputlisting{generated/mlw_tree__code3.ml}
 
-Having declared all the programs we wanted to write, we can now close
-the module and the file, and get as a result the set of modules of our
+The next example makes use of arrays.
+\lstinputlisting[language=why3]{generated/mlw_tree__source4.ml}
+The corresponding OCaml code is as follows
+\lstinputlisting{generated/mlw_tree__code4.ml}
+
+Having declared all the modules we wanted to write, we can now call the \why typing procedure
+and get as a result the set of modules of our
 file, under the form of a map of module names to modules.
-\lstinputlisting{generated/mlw_tree__closemodule.ml}
+\lstinputlisting{generated/mlw_tree__getmodules.ml}
 
 We can then construct the proofs tasks for our module, and then try to
 call the Alt-Ergo prover. The rest of that code is using OCaml
 functions that were already introduced before.
 \lstinputlisting{generated/mlw_tree__checkingvcs.ml}
+
+\subsection{Typed declaration}
+
+The examples of this section are available in the file
+\verb|examples/use_api/mlw_expr.ml| of the distribution.
+
+The first step to build an environment as already illustrated in
+Section~\ref{sec:api:callingprovers}.
+\lstinputlisting{generated/mlw_expr__buildenv.ml}
+
+To write our programs, we need to import some other modules from the
+standard library integers and references. The only subtleties is to get logic
+functions from the logical part of the modules
+\verb|mod_theory.Theory.th_export| and the program functions from \verb|mod_export|.
+\lstinputlisting{generated/mlw_expr__code2_import.ml}
+
+We want now to build a program equivalent to the following code in concrete Why3 syntax.
+\lstinputlisting[language=why3]{generated/mlw_expr__source2.ml}
+
+The OCaml code that programmatically build this Why3 function is as follows.
+\lstinputlisting{generated/mlw_expr__code2.ml}
+
+Having declared all the programs we wanted to write, we can now create the
+module and generate the VCs.
+\lstinputlisting{generated/mlw_expr__createmodule.ml}
+
+We can then construct the proofs tasks for our module, and then try to
+call the Alt-Ergo prover. The rest of that code is using OCaml
+functions that were already introduced before.
+\lstinputlisting{generated/mlw_expr__checkingvcs.ml}
 
 \section{Generating counterexamples}
 \label{sec:ce_api}

@@ -5,277 +5,22 @@ Require BuiltIn.
 Require HighOrd.
 Require int.Int.
 Require map.Map.
-
-Axiom fset : forall (a:Type), Type.
-Parameter fset_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (fset a).
-Existing Instance fset_WhyType.
-
-Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> Prop.
-
-(* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) :
-    Prop :=
-  forall (x:a), mem x s1 <-> mem x s2.
-
-Axiom extensionality :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), infix_eqeq s1 s2 -> (s1 = s2).
-
-(* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) : Prop :=
-  forall (x:a), mem x s1 -> mem x s2.
-
-Axiom subset_refl :
-  forall {a:Type} {a_WT:WhyType a}, forall (s:fset a), subset s s.
-
-Axiom subset_trans :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a) (s3:fset a), subset s1 s2 -> subset s2 s3 ->
-  subset s1 s3.
-
-(* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a} (s:fset a) : Prop :=
-  forall (x:a), ~ mem x s.
-
-Parameter empty: forall {a:Type} {a_WT:WhyType a}, fset a.
-
-Axiom is_empty_empty :
-  forall {a:Type} {a_WT:WhyType a}, is_empty (empty : fset a).
-
-Axiom empty_is_empty :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), is_empty s -> (s = (empty : fset a)).
-
-Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> fset a.
-
-Axiom add_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a) (y:a), mem y (add x s) <-> mem y s \/ (y = x).
-
-Axiom mem_singleton :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (y:a), mem y (add x (empty : fset a)) -> (y = x).
-
-Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> fset a.
-
-Axiom remove_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a) (y:a), mem y (remove x s) <-> mem y s /\ ~ (y = x).
-
-Axiom add_remove :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a), mem x s -> ((add x (remove x s)) = s).
-
-Axiom remove_add :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a), ((remove x (add x s)) = (remove x s)).
-
-Axiom subset_remove :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a), subset (remove x s) s.
-
-Parameter union:
-  forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
-
-Axiom union_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a) (x:a),
-  mem x (union s1 s2) <-> mem x s1 \/ mem x s2.
-
-Axiom subset_union_1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset s1 (union s1 s2).
-
-Axiom subset_union_2 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset s2 (union s1 s2).
-
-Parameter inter:
-  forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
-
-Axiom inter_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a) (x:a),
-  mem x (inter s1 s2) <-> mem x s1 /\ mem x s2.
-
-Axiom subset_inter_1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset (inter s1 s2) s1.
-
-Axiom subset_inter_2 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset (inter s1 s2) s2.
-
-Parameter diff: forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
-
-Axiom diff_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a) (x:a),
-  mem x (diff s1 s2) <-> mem x s1 /\ ~ mem x s2.
-
-Axiom subset_diff :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset (diff s1 s2) s1.
-
-Parameter pick: forall {a:Type} {a_WT:WhyType a}, fset a -> a.
-
-Axiom pick_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), ~ is_empty s -> mem (pick s) s.
-
-(* Why3 assumption *)
-Definition disjoint {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) : Prop :=
-  forall (x:a), ~ mem x s1 \/ ~ mem x s2.
-
-Axiom disjoint_inter_empty :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), disjoint s1 s2 <-> is_empty (inter s1 s2).
-
-Axiom disjoint_diff_eq :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), disjoint s1 s2 <-> ((diff s1 s2) = s1).
-
-Axiom disjoint_diff_s2 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), disjoint (diff s1 s2) s2.
-
-Parameter filter:
-  forall {a:Type} {a_WT:WhyType a}, fset a -> (a -> Init.Datatypes.bool) ->
-  fset a.
-
-Axiom filter_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a) (p:a -> Init.Datatypes.bool) (x:a),
-  mem x (filter s p) <-> mem x s /\ ((p x) = Init.Datatypes.true).
-
-Axiom subset_filter :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a) (p:a -> Init.Datatypes.bool), subset (filter s p) s.
-
-Parameter map:
-  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}, (a -> b) ->
-  fset a -> fset b.
-
-Axiom map_def :
-  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (f:a -> b) (u:fset a) (y:b),
-  mem y (map f u) <-> (exists x:a, mem x u /\ (y = (f x))).
-
-Axiom mem_map :
-  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (f:a -> b) (u:fset a), forall (x:a), mem x u -> mem (f x) (map f u).
-
-Parameter cardinal:
-  forall {a:Type} {a_WT:WhyType a}, fset a -> Numbers.BinNums.Z.
-
-Axiom cardinal_nonneg :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), (0%Z <= (cardinal s))%Z.
-
-Axiom cardinal_empty :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), is_empty s <-> ((cardinal s) = 0%Z).
-
-Axiom cardinal_add :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a), forall (s:fset a),
-  (mem x s -> ((cardinal (add x s)) = (cardinal s))) /\
-  (~ mem x s -> ((cardinal (add x s)) = ((cardinal s) + 1%Z)%Z)).
-
-Axiom cardinal_remove :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a), forall (s:fset a),
-  (mem x s -> ((cardinal (remove x s)) = ((cardinal s) - 1%Z)%Z)) /\
-  (~ mem x s -> ((cardinal (remove x s)) = (cardinal s))).
-
-Axiom cardinal_subset :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset s1 s2 ->
-  ((cardinal s1) <= (cardinal s2))%Z.
-
-Axiom subset_eq :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset s1 s2 ->
-  ((cardinal s1) = (cardinal s2)) -> (s1 = s2).
-
-Axiom cardinal1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), ((cardinal s) = 1%Z) -> forall (x:a), mem x s ->
-  (x = (pick s)).
-
-Axiom cardinal_union :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a),
-  ((cardinal (union s1 s2)) =
-   (((cardinal s1) + (cardinal s2))%Z - (cardinal (inter s1 s2)))%Z).
-
-Axiom cardinal_inter_disjoint :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), disjoint s1 s2 ->
-  ((cardinal (inter s1 s2)) = 0%Z).
-
-Axiom cardinal_diff :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a),
-  ((cardinal (diff s1 s2)) = ((cardinal s1) - (cardinal (inter s1 s2)))%Z).
-
-Axiom cardinal_filter :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a) (p:a -> Init.Datatypes.bool),
-  ((cardinal (filter s p)) <= (cardinal s))%Z.
-
-Axiom cardinal_map :
-  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (f:a -> b) (s:fset a), ((cardinal (map f s)) <= (cardinal s))%Z.
-
-Parameter min_elt: fset Numbers.BinNums.Z -> Numbers.BinNums.Z.
-
-Axiom min_elt_def :
-  forall (s:fset Numbers.BinNums.Z), ~ is_empty s ->
-  mem (min_elt s) s /\
-  (forall (x:Numbers.BinNums.Z), mem x s -> ((min_elt s) <= x)%Z).
-
-Parameter max_elt: fset Numbers.BinNums.Z -> Numbers.BinNums.Z.
-
-Axiom max_elt_def :
-  forall (s:fset Numbers.BinNums.Z), ~ is_empty s ->
-  mem (max_elt s) s /\
-  (forall (x:Numbers.BinNums.Z), mem x s -> (x <= (max_elt s))%Z).
-
-Parameter interval:
-  Numbers.BinNums.Z -> Numbers.BinNums.Z -> fset Numbers.BinNums.Z.
-
-Axiom interval_def :
-  forall (l:Numbers.BinNums.Z) (r:Numbers.BinNums.Z) (x:Numbers.BinNums.Z),
-  mem x (interval l r) <-> (l <= x)%Z /\ (x < r)%Z.
-
-Axiom cardinal_interval :
-  forall (l:Numbers.BinNums.Z) (r:Numbers.BinNums.Z),
-  ((l <= r)%Z -> ((cardinal (interval l r)) = (r - l)%Z)) /\
-  (~ (l <= r)%Z -> ((cardinal (interval l r)) = 0%Z)).
-
-Axiom set : Type.
-Parameter set_WhyType : WhyType set.
-Existing Instance set_WhyType.
-
-Parameter to_fset: set -> fset Numbers.BinNums.Z.
-
-Parameter choose: set -> Numbers.BinNums.Z.
-
-Axiom choose_spec :
-  forall (s:set), ~ is_empty (to_fset s) -> mem (choose s) (to_fset s).
+Require set.Fset.
+Require set.FsetInt.
+Require set.SetApp.
+Require set.SetAppInt.
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
+  | ref'mk : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Arguments mk_ref {a}.
+Arguments ref'mk {a}.
 
 (* Why3 assumption *)
 Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | mk_ref x => x
+  | ref'mk x => x
   end.
 
 Parameter n: Numbers.BinNums.Z.
@@ -326,71 +71,102 @@ Axiom no_duplicate :
   (a <= i)%Z /\ (i < j)%Z /\ (j < b)%Z -> ~ eq_prefix (s i) (s j) n.
 
 (* Why3 goal *)
-Theorem VC_t3 :
+Theorem t3'VC :
   forall (col:Numbers.BinNums.Z -> Numbers.BinNums.Z) (k:Numbers.BinNums.Z)
     (sol:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
-    (s:Numbers.BinNums.Z) (a:set) (b:set) (c:set),
-  (0%Z <= k)%Z -> ((k + (cardinal (to_fset a)))%Z = n) -> (0%Z <= s)%Z ->
+    (s:Numbers.BinNums.Z) (a:set.SetAppInt.set) (b:set.SetAppInt.set)
+    (c:set.SetAppInt.set),
+  (0%Z <= k)%Z ->
+  ((k + (set.Fset.cardinal (set.SetAppInt.to_fset a)))%Z = n) ->
+  (0%Z <= s)%Z ->
   (forall (i:Numbers.BinNums.Z),
-   mem i (to_fset a) <->
+   set.Fset.mem i (set.SetAppInt.to_fset a) <->
    ((0%Z <= i)%Z /\ (i < n)%Z) /\
    (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < k)%Z ->
     ~ ((col j) = i))) ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z ->
-   ~ mem i (to_fset b) <->
+   ~ set.Fset.mem i (set.SetAppInt.to_fset b) <->
    (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < k)%Z ->
     ~ ((col j) = ((i + j)%Z - k)%Z))) ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z ->
-   ~ mem i (to_fset c) <->
+   ~ set.Fset.mem i (set.SetAppInt.to_fset c) <->
    (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < k)%Z ->
     ~ ((col j) = ((i + k)%Z - j)%Z))) ->
-  partial_solution k col -> ~ is_empty (to_fset a) -> forall (o:set),
-  ((to_fset o) = (diff (to_fset a) (to_fset b))) -> forall (o1:set),
-  ((to_fset o1) = (diff (to_fset o) (to_fset c))) ->
+  partial_solution k col -> ~ set.Fset.is_empty (set.SetAppInt.to_fset a) ->
+  forall (o:set.SetAppInt.set),
+  ((set.SetAppInt.to_fset o) =
+   (set.Fset.diff (set.SetAppInt.to_fset a) (set.SetAppInt.to_fset b))) ->
+  forall (o1:set.SetAppInt.set),
+  ((set.SetAppInt.to_fset o1) =
+   (set.Fset.diff (set.SetAppInt.to_fset o) (set.SetAppInt.to_fset c))) ->
   (forall (u:Numbers.BinNums.Z -> Numbers.BinNums.Z),
-   partial_solution n u /\ eq_prefix col u k -> mem (u k) (to_fset o1)) ->
-  forall (f:Numbers.BinNums.Z) (e:set) (s1:Numbers.BinNums.Z)
+   partial_solution n u /\ eq_prefix col u k ->
+   set.Fset.mem (u k) (set.SetAppInt.to_fset o1)) ->
+  forall (f:Numbers.BinNums.Z) (e:set.SetAppInt.set) (s1:Numbers.BinNums.Z)
     (sol1:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
     (k1:Numbers.BinNums.Z) (col1:Numbers.BinNums.Z -> Numbers.BinNums.Z),
   (f = (s1 - s)%Z) -> (0%Z <= (s1 - s)%Z)%Z -> (k1 = k) ->
-  subset (to_fset e) (diff (diff (to_fset a) (to_fset b)) (to_fset c)) ->
+  set.Fset.subset (set.SetAppInt.to_fset e)
+  (set.Fset.diff
+   (set.Fset.diff (set.SetAppInt.to_fset a) (set.SetAppInt.to_fset b))
+   (set.SetAppInt.to_fset c)) ->
   partial_solution k1 col1 -> sorted sol1 s s1 ->
   (forall (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
-   mem i (diff (to_fset o1) (to_fset e)) -> mem j (to_fset e) -> (i < j)%Z) ->
+   set.Fset.mem i
+   (set.Fset.diff (set.SetAppInt.to_fset o1) (set.SetAppInt.to_fset e)) ->
+   set.Fset.mem j (set.SetAppInt.to_fset e) -> (i < j)%Z) ->
   (forall (i:Numbers.BinNums.Z), (s <= i)%Z /\ (i < s1)%Z ->
    partial_solution n (sol1 i) /\
    eq_prefix col1 (sol1 i) k1 /\
-   mem (sol1 i k1) (diff (to_fset o1) (to_fset e))) ->
+   set.Fset.mem (sol1 i k1)
+   (set.Fset.diff (set.SetAppInt.to_fset o1) (set.SetAppInt.to_fset e))) ->
   (forall (t:Numbers.BinNums.Z -> Numbers.BinNums.Z),
    partial_solution n t /\
-   eq_prefix col1 t k1 /\ mem (t k1) (diff (to_fset o1) (to_fset e)) ->
-   mem (t k1) (to_fset o1) /\
-   ~ mem (t k1) (to_fset e) /\
+   eq_prefix col1 t k1 /\
+   set.Fset.mem (t k1)
+   (set.Fset.diff (set.SetAppInt.to_fset o1) (set.SetAppInt.to_fset e)) ->
+   set.Fset.mem (t k1) (set.SetAppInt.to_fset o1) /\
+   ~ set.Fset.mem (t k1) (set.SetAppInt.to_fset e) /\
    (exists i:Numbers.BinNums.Z,
     ((s <= i)%Z /\ (i < s1)%Z) /\ eq_prefix t (sol1 i) n)) ->
-  eq_prefix col col1 k1 -> eq_prefix sol sol1 s -> ~ is_empty (to_fset e) ->
-  let d := min_elt (to_fset e) in
+  eq_prefix col col1 k1 -> eq_prefix sol sol1 s ->
+  ~ set.Fset.is_empty (set.SetAppInt.to_fset e) ->
+  let d := set.FsetInt.min_elt (set.SetAppInt.to_fset e) in
   forall (col2:Numbers.BinNums.Z -> Numbers.BinNums.Z),
   (col2 = (map.Map.set col1 k1 d)) -> forall (k2:Numbers.BinNums.Z),
-  (k2 = (k1 + 1%Z)%Z) -> forall (o2:set),
-  ((to_fset o2) = (add d (to_fset c))) ->
-  mem d (to_fset c) /\ ((cardinal (to_fset o2)) = (cardinal (to_fset c))) \/
-  ~ mem d (to_fset c) /\
-  ((cardinal (to_fset o2)) = ((cardinal (to_fset c)) + 1%Z)%Z) ->
-  forall (o3:set),
+  (k2 = (k1 + 1%Z)%Z) -> forall (o2:set.SetAppInt.set),
+  ((set.SetAppInt.to_fset o2) = (set.Fset.add d (set.SetAppInt.to_fset c))) ->
+  set.Fset.mem d (set.SetAppInt.to_fset c) /\
+  ((set.Fset.cardinal (set.SetAppInt.to_fset o2)) =
+   (set.Fset.cardinal (set.SetAppInt.to_fset c))) \/
+  ~ set.Fset.mem d (set.SetAppInt.to_fset c) /\
+  ((set.Fset.cardinal (set.SetAppInt.to_fset o2)) =
+   ((set.Fset.cardinal (set.SetAppInt.to_fset c)) + 1%Z)%Z) ->
+  forall (o3:set.SetAppInt.set),
   (forall (i:Numbers.BinNums.Z),
-   mem i (to_fset o3) <-> (0%Z <= i)%Z /\ mem (i + 1%Z)%Z (to_fset o2)) ->
-  forall (o4:set), ((to_fset o4) = (add d (to_fset b))) ->
-  mem d (to_fset b) /\ ((cardinal (to_fset o4)) = (cardinal (to_fset b))) \/
-  ~ mem d (to_fset b) /\
-  ((cardinal (to_fset o4)) = ((cardinal (to_fset b)) + 1%Z)%Z) ->
-  forall (o5:set),
+   set.Fset.mem i (set.SetAppInt.to_fset o3) <->
+   (0%Z <= i)%Z /\ set.Fset.mem (i + 1%Z)%Z (set.SetAppInt.to_fset o2)) ->
+  forall (o4:set.SetAppInt.set),
+  ((set.SetAppInt.to_fset o4) = (set.Fset.add d (set.SetAppInt.to_fset b))) ->
+  set.Fset.mem d (set.SetAppInt.to_fset b) /\
+  ((set.Fset.cardinal (set.SetAppInt.to_fset o4)) =
+   (set.Fset.cardinal (set.SetAppInt.to_fset b))) \/
+  ~ set.Fset.mem d (set.SetAppInt.to_fset b) /\
+  ((set.Fset.cardinal (set.SetAppInt.to_fset o4)) =
+   ((set.Fset.cardinal (set.SetAppInt.to_fset b)) + 1%Z)%Z) ->
+  forall (o5:set.SetAppInt.set),
   (forall (i:Numbers.BinNums.Z),
-   mem i (to_fset o5) <-> (1%Z <= i)%Z /\ mem (i - 1%Z)%Z (to_fset o4)) ->
-  forall (o6:set), ((to_fset o6) = (remove d (to_fset a))) ->
-  mem d (to_fset a) /\
-  ((cardinal (to_fset o6)) = ((cardinal (to_fset a)) - 1%Z)%Z) \/
-  ~ mem d (to_fset a) /\ ((cardinal (to_fset o6)) = (cardinal (to_fset a))) ->
+   set.Fset.mem i (set.SetAppInt.to_fset o5) <->
+   (1%Z <= i)%Z /\ set.Fset.mem (i - 1%Z)%Z (set.SetAppInt.to_fset o4)) ->
+  forall (o6:set.SetAppInt.set),
+  ((set.SetAppInt.to_fset o6) =
+   (set.Fset.remove d (set.SetAppInt.to_fset a))) ->
+  set.Fset.mem d (set.SetAppInt.to_fset a) /\
+  ((set.Fset.cardinal (set.SetAppInt.to_fset o6)) =
+   ((set.Fset.cardinal (set.SetAppInt.to_fset a)) - 1%Z)%Z) \/
+  ~ set.Fset.mem d (set.SetAppInt.to_fset a) /\
+  ((set.Fset.cardinal (set.SetAppInt.to_fset o6)) =
+   (set.Fset.cardinal (set.SetAppInt.to_fset a))) ->
   forall (s2:Numbers.BinNums.Z)
     (sol2:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
     (k3:Numbers.BinNums.Z) (col3:Numbers.BinNums.Z -> Numbers.BinNums.Z),
@@ -401,12 +177,21 @@ Theorem VC_t3 :
     ((s1 <= i)%Z /\ (i < s2)%Z) /\ eq_prefix t (sol2 i) n)) ->
   eq_prefix col2 col3 k3 -> eq_prefix sol1 sol2 s1 ->
   forall (f1:Numbers.BinNums.Z), (f1 = (f + (s2 - s1)%Z)%Z) ->
-  forall (k4:Numbers.BinNums.Z), (k4 = (k3 - 1%Z)%Z) -> forall (e1:set),
-  ((to_fset e1) = (remove d (to_fset e))) ->
-  mem d (to_fset e) /\
-  ((cardinal (to_fset e1)) = ((cardinal (to_fset e)) - 1%Z)%Z) \/
-  ~ mem d (to_fset e) /\ ((cardinal (to_fset e1)) = (cardinal (to_fset e))) ->
+  forall (k4:Numbers.BinNums.Z), (k4 = (k3 - 1%Z)%Z) ->
+  forall (e1:set.SetAppInt.set),
+  ((set.SetAppInt.to_fset e1) =
+   (set.Fset.remove d (set.SetAppInt.to_fset e))) ->
+  set.Fset.mem d (set.SetAppInt.to_fset e) /\
+  ((set.Fset.cardinal (set.SetAppInt.to_fset e1)) =
+   ((set.Fset.cardinal (set.SetAppInt.to_fset e)) - 1%Z)%Z) \/
+  ~ set.Fset.mem d (set.SetAppInt.to_fset e) /\
+  ((set.Fset.cardinal (set.SetAppInt.to_fset e1)) =
+   (set.Fset.cardinal (set.SetAppInt.to_fset e))) ->
   sorted sol2 s s2.
+(* Why3 intros col k sol s a b c h1 h2 h3 h4 h5 h6 h7 h8 o h9 o1 h10 h11 f e
+        s1 sol1 k1 col1 h12 h13 h14 h15 h16 h17 h18 h19 h20 h21 h22 h23 d
+        col2 h24 k2 h25 o2 h26 h27 o3 h28 o4 h29 h30 o5 h31 o6 h32 h33 s2
+        sol2 k3 col3 h34 h35 h36 h37 h38 h39 f1 h40 k4 h41 e1 h42 h43. *)
 Proof.
 intros col k sol s a b c h1 h2 h3 h4 h5 h6 h7 h8 o h9 o1 h10 h11 f e
         s1 sol1 k1 col1 h12 h13 h14 h15 h16 h17 h18 h19 h20 h21 h22 h23 d
@@ -422,15 +207,16 @@ apply h36; omega.
 red.
 subst k1. (* rename k1 into k.*)
 assert (k < n)%Z.
-generalize (cardinal_nonneg (to_fset a)).
-generalize (cardinal_empty (to_fset a)).
+generalize (Fset.cardinal_nonneg (SetAppInt.to_fset a)).
+generalize (Fset.cardinal_empty (SetAppInt.to_fset a)).
 intros.
-assert (case: (cardinal (to_fset a) = 0 \/ cardinal (to_fset a) > 0)%Z) by omega. destruct case.
-absurd (is_empty (to_fset a)). auto. intuition.
+assert (case: (Fset.cardinal (SetAppInt.to_fset a) = 0 \/ 
+              Fset.cardinal (SetAppInt.to_fset a) > 0)%Z) by omega. destruct case.
+absurd (Fset.is_empty (SetAppInt.to_fset a)). auto. intuition.
 omega.
 
 assert (ha: eq_prefix col1 (sol1 i) k /\ 
-       mem (sol1 i k) (diff (to_fset o1) (to_fset e))).
+       Fset.mem (sol1 i k) (Fset.diff (SetAppInt.to_fset o1) (SetAppInt.to_fset e))).
   apply (h19 i).
   omega.
 destruct ha as (ha,hb).
@@ -452,7 +238,7 @@ red; intros l hl.
 rewrite <- H3; try omega.
 rewrite <- h38; try omega.
 subst col2.
-generalize (Map.set_def col1 k d l).
+generalize (Map.set'def col1 k d l).
 intros (_,h).
 rewrite h.
 rewrite <- ha; omega.
@@ -464,9 +250,9 @@ auto.
 rewrite <- H3; try omega.
 rewrite <- h38; try omega.
 subst col2.
-generalize (Map.set_def col1 k d k).
+generalize (Map.set'def col1 k d k).
 intros (h,_).
 rewrite h; try omega.
-generalize (min_elt_def (to_fset e)); intuition.
+generalize (set.FsetInt.min_elt_def (SetAppInt.to_fset e)); intuition.
 Qed.
 

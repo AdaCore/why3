@@ -17,21 +17,20 @@ module Multiplication
 
   use int.Int
   use int.ComputerDivision
-  use ref.Ref
 
-  let multiplication (a b: int) : int
+  let multiplication (a b: int) : (_r: int)
     requires { true }
     ensures  { true }
-  = let x = ref a in
-    let y = ref b in
-    let z = ref 0 in
-    while !y <> 0 do
+  = let ref x = a in
+    let ref y = b in
+    let ref z = 0 in
+    while y <> 0 do
       invariant { true }
-      if mod !y 2 = 1 then z := !z + !x;
-      x := 2 * !x;
-      y := div !y 2
+      if mod y 2 = 1 then z <- z + x;
+      x <- 2 * x;
+      y <- div y 2
     done;
-    !z
+    z
 
   let main () =
     multiplication 10 13

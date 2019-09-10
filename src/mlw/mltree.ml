@@ -76,8 +76,7 @@ and let_def =
   | Lrec of rdef list
 
 and rdef = {
-  rec_sym  : rsymbol; (* exported *)
-  (* rec_rsym : rsymbol;*) (* internal *)
+  rec_sym  : rsymbol;
   rec_args : var list;
   rec_exp  : expr;
   rec_res  : ty;
@@ -285,14 +284,20 @@ let enope = Eblock []
 let mk_var id ty ghost = (id, ty, ghost)
 
 let mk_var_unit =
-  mk_var (id_register (id_fresh "_")) tunit false
+  let attrs = Sattr.singleton Dexpr.dummy_var_attr in
+  mk_var (id_register (id_fresh ~attrs "_")) tunit false
 
 let mk_its_defn its_name its_args its_private its_def =
   { its_name; its_args; its_private; its_def; }
 
 (* smart constructors *)
-let e_unit =
-  mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty Sattr.empty
+let e_unit attrs =
+  mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty attrs
+
+let dummy_expr_attr = Ident.create_attribute "__dummy_expr__"
+
+let e_dummy_unit = e_unit (Sattr.singleton dummy_expr_attr)
+let e_unit = e_unit Sattr.empty
 
 let e_const c =
   mk_expr (Econst c)
@@ -356,3 +361,137 @@ let var_list_of_pv_list pvl =
   let mk_var pv = mk_expr (Evar pv) (I pv.pv_ity)
       MaskVisible eff_empty Sattr.empty in
   List.map mk_var pvl
+
+let ld_map fn ld = match ld with
+  | Lsym (rs, tv, ty, vl, e) -> Lsym (rs, tv, ty, vl, fn e)
+  | Lvar (pv, e) -> Lvar (pv, fn e)
+  | Lany _ -> ld
+  | Lrec rl ->
+     Lrec (List.map (fun rd -> { rd with rec_exp = fn rd.rec_exp }) rl)
+
+let e_map fn e =
+  let mk en = { e with e_node = en } in
+  match e.e_node with
+  | Econst _ | Evar _ | Efun (_,_) | Eabsurd -> e
+  | Eapp (rs,el) -> mk (Eapp(rs,(List.map fn el)))
+  | Elet (ld,e) -> mk (Elet (ld_map fn ld, fn e))
+  | Eif (c,t,e) -> mk (Eif (fn c, fn t, fn e))
+  | Eassign al ->
+     let al' = List.map (fun (pv, rs, e) -> pv, rs, fn e) al in
+     mk (Eassign al')
+  | Ematch (e,bl,xl) ->
+     let bl' = List.map (fun (p,e) -> (p, fn e)) bl in
+     let xl' = List.map (fun (x, vl, e) -> (x, vl, fn e)) xl in
+     mk (Ematch (fn e, bl', xl'))
+  | Eblock el -> mk (Eblock (List.map fn el))
+  | Ewhile (c,b) -> mk (Ewhile (fn c, fn b))
+  | Efor (i,vb,d,ve,e) -> mk (Efor (i, vb, d, ve, fn e))
+  | Eraise (_, None) -> e
+  | Eraise (x, Some e) -> mk (Eraise (x, Some (fn e)))
+  | Eexn (x,t,e) -> mk (Eexn (x, t, fn e))
+  | Eignore e -> mk (Eignore (fn e))
+
+
+let ld_fold fn acc ld = match ld with
+  | Lsym (_,_,_,_, e) | Lvar (_, e)-> fn acc e
+  | Lany _ -> acc
+  | Lrec rl -> List.fold_left (fun acc rd -> fn acc rd.rec_exp) acc rl
+
+let e_fold fn acc e =
+  match e.e_node with
+  | Econst _ | Evar _
+  | Efun (_,_) | Eabsurd -> acc
+  | Eapp (_,el) -> List.fold_left fn acc el
+  | Elet (ld,e) -> fn (ld_fold fn acc ld) e
+  | Eif (c,t,e) ->
+     let acc = fn acc c in
+     let acc = fn acc t in
+     fn acc e
+  | Eassign al -> List.fold_left (fun acc (_,_,e) -> fn acc e) acc al
+  | Ematch (e,bl,xl) ->
+     let acc = List.fold_left (fun acc (_p,e) -> fn acc e) acc bl in
+     let acc = List.fold_left (fun acc (_x, _vl, e) -> fn acc e) acc xl in
+     fn acc e
+  | Eblock el -> List.fold_left fn acc el
+  | Ewhile (c,b) -> fn (fn acc c) b
+  | Efor (_,_,_,_,e) -> fn acc e
+  | Eraise (_, None) -> acc
+  | Eraise (_, Some e) -> fn acc e
+  | Eexn (_x,_t,e) -> fn acc e
+  | Eignore e -> fn acc e
+
+let ld_map_fold fn acc ld = match ld with
+  | Lsym (rs, tv, ty, vl, e) ->
+     let acc, e = fn acc e in
+     acc, Lsym (rs, tv, ty, vl, e)
+  | Lvar (pv, e) ->
+     let acc, e = fn acc e in
+     acc, Lvar (pv, e)
+  | Lany _ -> acc, ld
+  | Lrec rl ->
+     let acc, rl =
+       Lists.map_fold_left
+         (fun acc rd ->
+           let acc, re = fn acc rd.rec_exp in
+           acc, { rd with rec_exp = re })
+         acc rl in
+     acc, Lrec rl
+
+let e_map_fold fn acc e =
+  let mk en = { e with e_node = en } in
+  match e.e_node with
+  | Econst _ | Evar _
+  | Efun (_,_) | Eabsurd -> acc, e
+  | Eapp (rs,el) ->
+     let acc,el = Lists.map_fold_left fn acc el in
+     acc,mk (Eapp(rs,el))
+  | Elet (ld,e) ->
+     let acc, ld = ld_map_fold fn acc ld in
+     let acc, e = fn acc e in
+     acc, mk (Elet (ld, e))
+  | Eif (c,t,e) ->
+     let acc, c = fn acc c in
+     let acc, t = fn acc t in
+     let acc, e = fn acc e in
+     acc, mk (Eif (c, t, e))
+  | Eassign al ->
+     let acc,al' =
+       Lists.map_fold_left
+         (fun acc (pv, rs, e) ->
+           let acc, e = fn acc e in
+           acc, (pv, rs, e))
+         acc al in
+     acc, mk (Eassign al')
+  | Ematch (e,bl,xl) ->
+     let acc, bl' =
+       Lists.map_fold_left
+         (fun acc (p,e) ->
+           let acc, e = fn acc e in
+           acc, (p, e)) acc bl in
+     let acc, xl' =
+       Lists.map_fold_left
+         (fun acc (x, vl, e) ->
+           let acc, e = fn acc e in
+           acc, (x, vl, e)) acc xl in
+     let acc, e = fn acc e in
+     acc, mk (Ematch (e, bl', xl'))
+  | Eblock el ->
+     let acc, el' = Lists.map_fold_left fn acc el in
+     acc, mk (Eblock el')
+  | Ewhile (c,b) ->
+     let acc, c' = fn acc c in
+     let acc, b' = fn acc b in
+     acc, mk (Ewhile (c', b'))
+  | Efor (i,vb,d,ve,e) ->
+     let acc, e' = fn acc e in
+     acc, mk (Efor (i, vb, d, ve, e'))
+  | Eraise (_, None) -> acc, e
+  | Eraise (x, Some e) ->
+     let acc, e' = fn acc e in
+     acc, mk (Eraise (x, Some e'))
+  | Eexn (x,t,e) ->
+     let acc, e' = fn acc e in
+     acc, mk (Eexn (x, t, e'))
+  | Eignore e ->
+     let acc, e' = fn acc e in
+     acc, mk (Eignore e')

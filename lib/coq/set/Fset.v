@@ -192,7 +192,7 @@ Proof.
 intros s1 s2 x.
 unfold mem, union.
 destruct s1, s2.
-eapply set.Set.union_def.
+eapply set.Set.union'def.
 Qed.
 
 (* Why3 goal *)
@@ -232,7 +232,7 @@ Proof.
 intros s1 s2 x.
 unfold mem, inter.
 destruct s1, s2.
-eapply set.Set.inter_def.
+eapply set.Set.inter'def.
 Qed.
 
 (* Why3 goal *)
@@ -272,7 +272,7 @@ Proof.
 intros s1 s2 x.
 unfold mem, diff.
 destruct s1, s2.
-eapply set.Set.diff_def.
+eapply set.Set.diff'def.
 Qed.
 
 (* Why3 goal *)
@@ -413,7 +413,7 @@ Proof.
 intros f u y.
 unfold map, mem.
 destruct u.
-eapply set.Set.map_def.
+eapply set.Set.map'def.
 Qed.
 
 (* Why3 goal *)

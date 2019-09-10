@@ -266,12 +266,6 @@ let return_prover name config =
   end else
     Some (snd (Whyconf.Mprover.choose provers))
 
-let session_timelimit = ref 2
-let session_memlimit = ref 1000
-let set_session_timelimit n = session_timelimit := n
-let set_session_memlimit n = session_memlimit := n
-
-
 type command_prover =
   | Bad_Arguments of Whyconf.prover
   | Not_Prover
@@ -289,14 +283,18 @@ let parse_prover_name config name args : command_prover =
         if (List.length args > 2) then Bad_Arguments prover else
         match args with
         | [] ->
+            let limit_time = Whyconf.timelimit (Whyconf.get_main config) in
+            let limit_mem = Whyconf.memlimit (Whyconf.get_main config) in
             let default_limit = Call_provers.{empty_limit with
-                                              limit_time = !session_timelimit;
-                                              limit_mem = !session_memlimit} in
+                                              limit_time = limit_time;
+                                              limit_mem = limit_mem} in
             Prover (prover_config, default_limit)
-        | [timeout] -> Prover (prover_config,
-                               Call_provers.{empty_limit with
-                                             limit_time = int_of_string timeout;
-                                             limit_mem = !session_memlimit})
+        | [timeout] ->
+            let limit_mem = Whyconf.memlimit (Whyconf.get_main config) in
+            Prover (prover_config,
+                    Call_provers.{empty_limit with
+                                  limit_time = int_of_string timeout;
+                                  limit_mem = limit_mem})
         | [timeout; oom ] ->
             Prover (prover_config, Call_provers.{empty_limit with
                                                  limit_time = int_of_string timeout;

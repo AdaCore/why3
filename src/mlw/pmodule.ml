@@ -287,19 +287,27 @@ let add_meta uc m al = { uc with
   muc_theory = Theory.add_meta uc.muc_theory m al;
   muc_units  = Umeta (m,al) :: uc.muc_units; }
 
-let store_path, store_module, restore_path =
+let store_path, store_module, restore_path, restore_module_id =
   let id_to_path = Wid.create 17 in
+  let id_to_pmod = Wid.create 17 in
   let store_path {muc_theory = uc} path id =
     (* this symbol already belongs to some theory *)
     if Wid.mem id_to_path id then () else
     let prefix = List.rev (id.id_string :: path @ uc.uc_prefix) in
     Wid.set id_to_path id (uc.uc_path, uc.uc_name.id_string, prefix) in
-  let store_module {mod_theory = {th_name = id} as th} =
+  let store_module pmod  =
+    let th = pmod.mod_theory in
+    let id = th.th_name in
     (* this symbol is already a module *)
-    if Wid.mem id_to_path id then () else
-    Wid.set id_to_path id (th.th_path, id.id_string, []) in
+    if Wid.mem id_to_path id then () else begin
+        Wid.set id_to_path id (th.th_path, id.id_string, []);
+        Sid.iter (fun id -> Wid.set id_to_pmod id pmod) pmod.mod_local;
+        Wid.set id_to_pmod id pmod;
+      end
+  in
   let restore_path id = Wid.find id_to_path id in
-  store_path, store_module, restore_path
+  let restore_module_id id = Wid.find id_to_pmod id in
+  store_path, store_module, restore_path, restore_module_id
 
 let close_module uc =
   let m = close_module uc in
@@ -1040,7 +1048,7 @@ let clone_type_decl inst cl tdl kn =
 let add_vc uc (its, f) =
   let {id_string = nm; id_loc = loc} = its.its_ts.ts_name in
   let attrs = Sattr.singleton (Ident.create_attribute ("expl:VC for " ^ nm)) in
-  let pr = create_prsymbol (id_fresh ~attrs ?loc ("VC " ^ nm)) in
+  let pr = create_prsymbol (id_fresh ~attrs ?loc (nm ^ "'VC")) in
   let d = create_pure_decl (create_prop_decl Pgoal pr f) in
   add_pdecl ~warn:false ~vc:false uc d
 

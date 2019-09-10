@@ -68,7 +68,7 @@
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
 %token FUNCTION PREDICATE
-%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET
+%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET OLD AT
 
 (* precedences *)
 
@@ -280,6 +280,10 @@ term_:
       | d -> d }
 | NOT term
     { Tnot $2 }
+| OLD LEFTPAR t=term RIGHTPAR
+    { Tat (t, mk_id Dexpr.old_label $startpos($1) $endpos($1)) }
+| AT LEFTPAR t=term COMMA l=ident RIGHTPAR
+    { Tat (t, l) }
 | o = prefix_op ; t = term %prec prec_prefix_op
     { Tidapp (Qident o, [t]) }
 | l = term ; o = bin_op ; r = term

@@ -10,7 +10,7 @@
 The simplest way to install Why3 is via \opam, the OCaml
 package manager. It is as simple as
 \begin{verbatim}
-> opam install why3
+opam install why3 why3-ide why3-coq
 \end{verbatim}
 Then jump to Section~\ref{provers} to install external provers.
 
@@ -18,16 +18,20 @@ Then jump to Section~\ref{provers} to install external provers.
 
 In short, installation from sources proceeds as follows.
 \begin{flushleft}\ttfamily
-  > ./configure\\
-  > make\\
-  > make install \mbox{\rmfamily (as super-user)}
+./configure\\
+make\\
+make install \mbox{\rmfamily (as super-user if needed)}
+make install-lib \mbox{\rmfamily (as super-user if needed)}
 \end{flushleft}
+Beware that if your OCaml installation relies on \opam installed in
+your own user space, then \texttt{make install-lib} should \emph{not}
+be run as super-user.
 
 After unpacking the distribution, go to the newly created directory
 \texttt{why3-\whyversion}. Compilation must start with a
 configuration phase which is run as
 \begin{verbatim}
-> ./configure
+./configure
 \end{verbatim}
 This analyzes your current configuration and checks if requirements hold.
 Compilation requires:
@@ -91,15 +95,23 @@ Installation can be tested as follows:
 obtain the following (provided the required provers are installed on
 your machine):
 \begin{verbatim}
-$ cd examples
-$ why3 replay logic/scottish-private-club
+cd examples
+why3 replay logic/scottish-private-club
  1/1 (replay OK)
-$ why3 replay same_fringe
+why3 replay same_fringe
  18/18 (replay OK)
 \end{verbatim}
 \end{enumerate}
 
-\subsubsection{Local Use, Without Installation}
+\subsubsection{Removing Installation}
+
+Removing installation can be done using
+\begin{verbatim}
+make uninstall
+make uninstall-lib
+\end{verbatim}
+
+\subsubsection{Local Use, Without  Installation}
 
 It is not mandatory to install \why into system directories.
 \why can be configured and compiled for local use as follows:
@@ -116,7 +128,7 @@ The \why executables are then available in the subdirectory
 By default, the \why API is not installed. It can be installed using
 \begin{flushleft}\ttfamily
 make byte opt \\
-make install-lib \mbox{\rmfamily (as super-user)}
+make install-lib \mbox{\rmfamily (as super-user if needed)}
 \end{flushleft}
 
 \section{Installing External Provers}
@@ -134,7 +146,7 @@ SMT solver Alt-Ergo via \opam as well.)
 Once you have installed a prover, or a new version of a prover, you
 have to run the following command:
 \begin{verbatim}
-> why3 config --detect
+why3 config --detect
 \end{verbatim}
 It scans your \texttt{PATH} for provers and updates your configuration
 file (see Section~\ref{sec:why3config}) accordingly.

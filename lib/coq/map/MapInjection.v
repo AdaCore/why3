@@ -166,10 +166,10 @@ Theorem lifting:
       forall i:nat, Z_of_nat i < n -> Z_of_nat (g i) = f (Z_of_nat i).
 Proof.
 intros n f Hpos.
-exists (fun n => Zabs_nat (f (Z_of_nat n))).
+exists (fun n => Z.abs_nat (f (Z_of_nat n))).
 intros i Hi_inf_n.
 rewrite inj_Zabs_nat.
-rewrite Zabs_eq; auto.
+rewrite Z.abs_eq; auto.
 generalize (Hpos (Z_of_nat i)); auto with *.
 Qed.
 

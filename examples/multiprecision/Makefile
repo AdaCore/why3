@@ -13,10 +13,10 @@ endif
 ifdef GMP_DIR
   GMPFLAGS = $(shell sed -n -e 's/^CFLAGS = \(.*\)/\1/p' $(GMP_DIR)/Makefile)
 else
-  GMPFLAGS = -O2 -pedantic -fomit-frame-pointer
+  GMPFLAGS = -march=native -O2 -fomit-frame-pointer
 endif
 
-CFLAGS = $(GMPFLAGS) -Wall -Wno-unused-function -g -std=c11
+CFLAGS = $(GMPFLAGS) -Wall -Wno-unused -g -std=c11
 
 all: why3 extract
 
@@ -26,40 +26,45 @@ clean:
 why3:
 	make -C ../..
 
-dir:
+MLWFILES= $(addsuffix .mlw, powm sqrtrem sqrt toom logical div mul sub add compare util)
+
+cfiles: why3
 	mkdir -p build
-
-MLWFILES= $(addsuffix .mlw, sqrtrem sqrt toom logical div mul sub add compare util)
-
-cfiles: why3 dir
 	$(WHY3) extract -D wmpn.drv -D c -L . --recursive --modular --interface -o build/ \
 	wmpn.mlw
 	#$(MLWFILES)
 
-extract: why3 dir cfiles
+build/sqrtinit.h: sqrtinit.ml
+	mkdir -p build
+	ocaml sqrtinit.ml > build/sqrtinit.h
 
-CFILES = build/uint64gmp.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/mul.c build/sub.c build/add.c build/compare.c build/util.c build/int32.c
+build/binverttab.h: binverttab.ml
+	mkdir -p build
+	ocaml binverttab.ml > build/binverttab.h
 
-tests: extract check-gmp
-	gcc $(CFLAGS) tests.c $(CFILES) -Iinclude -I$(GMP_DIR) -Irandom -L$(GMP_LIB) -lgmp -o build/tests
-	gcc $(CFLAGS) -DCOMPARE_MINI tests.c $(CFILES) -Iinclude -I$(GMP_DIR) -Irandom -Imini-gmp -o build/minitests
+extract: cfiles build/sqrtinit.h build/binverttab.h
+
+CFILES = build/uint64gmp.c build/powm.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/mul.c build/sub.c build/add.c build/compare.c build/util.c build/int32.c
+
+tests: extract
+	gcc $(CFLAGS) tests.c $(CFILES) -Irandom -lgmp -o build/tests
+	gcc $(CFLAGS) -DCOMPARE_MINI tests.c $(CFILES) -Irandom -Imini-gmp -o build/minitests
 	./build/tests
 	./build/minitests
 
 bench-tests: extract
-	gcc $(CFLAGS) tests.c $(CFILES) -Iinclude -Ibench-include -Irandom -lgmp -o build/bench-tests
+	gcc $(CFLAGS) tests.c $(CFILES) -Irandom -lgmp -o build/bench-tests
 
+build/why3%bench: extract
+	gcc $(CFLAGS) -DTEST_WHY3 -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -Iinclude -Irandom -lgmp -o $@
 
-build/why3%bench: extract check-gmp
-	gcc $(CFLAGS) -DTEST_WHY3 -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -Iinclude -I$(GMP_DIR) -Irandom -L$(GMP_LIB) -lgmp -o $@
-
-build/gmp%bench: extract check-gmp
-	gcc $(CFLAGS) -DTEST_GMP -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -Iinclude -I$(GMP_DIR) -Irandom -L$(GMP_LIB) -lgmp -o $@
+build/gmp%bench: extract
+	gcc $(CFLAGS) -DTEST_GMP -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -Iinclude -Irandom -lgmp -o $@
 
 build/minigmp%bench: extract
-	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -Iinclude -I$(GMP_DIR) -Imini-gmp -Irandom -o $@
+	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_`echo $* | tr [:lower:] [:upper:]` tests.c $(CFILES) -Iinclude -Imini-gmp -Irandom -o $@
 
-alltests: tests build/why3addbench build/why3mulbench build/why3toombench build/why3divbench build/gmpaddbench build/gmpmulbench build/gmptoombench build/gmpdivbench build/minigmpaddbench build/minigmpmulbench build/minigmpdivbench build/minigmptoombench
+alltests: tests build/why3addbench build/why3mulbench build/why3toombench build/why3divbench build/gmpaddbench build/gmpmulbench build/gmptoombench build/gmpdivbench build/minigmpaddbench build/minigmpmulbench build/minigmpdivbench build/minigmptoombench build/gmppowmbench build/why3powmbench
 
 data: alltests
 	mkdir -p bench
@@ -67,22 +72,28 @@ data: alltests
 	./build/why3mulbench > bench/why3mul
 	./build/why3toombench > bench/why3toom
 	./build/why3divbench > bench/why3div
+	./build/why3powmbench > bench/why3powm
 	./build/gmpaddbench > bench/gmpadd
 	./build/gmpmulbench > bench/gmpmul
 	./build/gmptoombench > bench/gmptoom
 	./build/gmpdivbench > bench/gmpdiv
+	./build/gmppowmbench > bench/gmppowm
 	./build/minigmpaddbench > bench/minigmpadd
 	./build/minigmpmulbench > bench/minigmpmul
-	./build/minigmptoombench > bench/minigmptoom # minigmp uses schoolbook mul in that case too
+	./build/minigmptoombench > bench/minigmptoom
 	./build/minigmpdivbench > bench/minigmpdiv
 
 plots: data
 	make all -C plots
 
-check-gmp:
-ifndef GMP_DIR
-	$(error GMP_DIR is undefined)
-endif
-ifndef GMP_LIB
-	$(error GMP_LIB is undefined)
-endif
+dist: extract
+	mkdir -p distrib/lib
+	touch distrib/ChangeLog
+	cp build/*.c build/*.h distrib/lib/
+	cd distrib; ./autogen.sh
+	cd distrib; make distcheck
+
+tests-dist:
+	make -C distrib
+	gcc $(CFLAGS) tests.c -DTEST_LIB -Irandom -Idistrib -lgmp -Ldistrib -lwmp -o build/disttests
+	./build/disttests

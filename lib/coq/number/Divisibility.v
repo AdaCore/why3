@@ -26,24 +26,24 @@ Definition divides (d:Numbers.BinNums.Z) (n:Numbers.BinNums.Z) : Prop :=
   ((d = 0%Z) -> (n = 0%Z)) /\
   (~ (d = 0%Z) -> ((ZArith.BinInt.Z.rem n d) = 0%Z)).
 
-*)
-
-Require Import Znumtheory.
-Notation divides := Zdivide (only parsing).
-
 (* Why3 goal *)
-Lemma divides_spec :
+Lemma divides'spec :
   forall (d:Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
   divides d n <-> (exists q:Numbers.BinNums.Z, (n = (q * d)%Z)).
 Proof.
 intros d n.
-easy.
+
 Qed.
+
+*)
+
+Require Import Znumtheory.
+Notation divides := Z.divide (only parsing).
 
 (* Why3 goal *)
 Lemma divides_refl : forall (n:Numbers.BinNums.Z), divides n n.
 Proof.
-exact Zdivide_refl.
+exact Z.divide_refl.
 Qed.
 
 (* Why3 goal *)
@@ -165,7 +165,7 @@ Lemma divides_antisym :
   forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), divides a b ->
   divides b a -> (a = b) \/ (a = (-b)%Z).
 Proof.
-exact Zdivide_antisym.
+exact Z.divide_antisym.
 Qed.
 
 (* Why3 goal *)
@@ -173,7 +173,7 @@ Lemma divides_trans :
   forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
   divides a b -> divides b c -> divides a c.
 Proof.
-exact Zdivide_trans.
+exact Z.divide_trans.
 Qed.
 
 (* Why3 goal *)

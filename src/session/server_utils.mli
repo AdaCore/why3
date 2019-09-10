@@ -27,13 +27,6 @@ val get_session_dir : allow_mkdir:bool -> string Queue.t -> string
 
  *)
 
-val set_session_timelimit : int -> unit
-(** sets the default timelimit in seconds. Initially set to 2. *)
-
-val set_session_memlimit : int -> unit
-(** sets the default mem in Mb. Initially set to 1000. *)
-
-
 (** Simple queries *)
 
 (* The id you are trying to use is undefined *)
@@ -50,7 +43,7 @@ type query =
 val print_id: 'a -> Trans.naming_table -> string list -> string
 val search_id: search_both:bool -> 'a -> Trans.naming_table -> string list -> string
 
-val list_strategies : Controller_itp.controller -> (string * string) list
+val list_strategies: Controller_itp.controller -> (string * string) list
 val list_provers: Controller_itp.controller -> _ -> string
 val list_transforms: unit -> (string * Pp.formatted) list
 val list_transforms_query: _ -> _ -> string

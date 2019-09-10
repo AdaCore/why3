@@ -12,6 +12,9 @@
 open Format
 open Why3
 
+(* Ignore unused variables in why3realize too *)
+let () = Debug.set_flag Dterm.debug_ignore_unused_var
+
 let usage_msg = sprintf
   "Usage: %s [options] -D <driver> -o <dir> -T <theory> ..."
   (Filename.basename Sys.argv.(0))

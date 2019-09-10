@@ -7,6 +7,8 @@
 # export WHY3DATA=.
 # export WHY3LOADPATH=theories
 
+has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
+
 shopt -s nullglob
 
 suffix=$1
@@ -42,6 +44,20 @@ goods () {
         rm bench_errors
         exit 1
     fi
+}
+
+plugins () {
+    pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
+    for f in $1/*.$3 ; do
+	printf "  $f... "
+	if ! $pgm $2 $f > /dev/null 2>&1; then
+	    echo "FAILED!"
+            echo "invocation: $pgm $2 $f"
+	    exit 1
+	fi
+	echo "ok"
+    done
 }
 
 bads () {
@@ -323,6 +339,8 @@ goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
 goods examples/prover "-L examples/prover --debug ignore_unused_vars"
 goods examples/in_progress
+plugins tests/python --type-only py
+plugins tests/microc --type-only c
 echo ""
 
 echo "=== Checking valid goals ==="
@@ -366,6 +384,21 @@ execute examples/vstte10_queens.mlw NQueens.test8
 # examples/queens.mlw NQueensBits.test8
 # fails: cannot find definition of routine eq
 # examples/residual.mlw Test.test_astar
+# test of execution on real numbers; only if mpfr installed
+if test -n "$has_mpfr"; then
+    execute bench/interp/real.mlw R.test0
+    execute bench/interp/real.mlw R.test1
+    execute bench/interp/real.mlw R.test2
+    execute bench/interp/real.mlw R.test3
+    execute bench/interp/real.mlw R.test_exp
+    execute bench/interp/real.mlw R.test_log
+    execute bench/interp/real.mlw R.test_exp_log
+    execute bench/interp/real.mlw R.bench1
+    execute bench/interp/real.mlw R.bench2
+    execute bench/interp/real.mlw R.bench3
+else
+    echo "MPFR not installed, skipping tests"
+fi
 echo ""
 
 echo "=== Checking extraction to OCaml ==="
@@ -373,14 +406,12 @@ extract bench/extraction -D ocaml64
 extract_and_run examples/euler001 euler001.ml 1000000
 extract_and_run examples/gcd gcd.ml 6 15
 extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml
-# needs to port
-# extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
+extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
 extract_and_run examples/defunctionalization defunctionalization.ml
 extract_and_run examples/sudoku sudoku.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
 echo ""
 
 echo "=== Checking extraction to C ==="
-extract_and_test_wmp examples/in_progress/multiprecision
 extract_and_test_wmp examples/multiprecision
 echo ""
 
@@ -404,7 +435,6 @@ replay examples/in_progress/ring_decision "-L examples/in_progress/ring_decision
 replay examples/multiprecision "-L examples/multiprecision --merging-only"
 replay examples/prover "-L examples/prover --merging-only --debug ignore_unused_vars"
 #replay examples/in_progress --merging-only
-#replay examples/in_progress/multiprecision "-L examples/in_progress/multiprecision --merging-only"
 echo ""
 
 echo "=== Checking --list-* ==="

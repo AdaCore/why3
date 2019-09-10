@@ -414,6 +414,7 @@ type naming_table = {
     coercion : Coercion.t;
     printer : Ident.ident_printer;
     aprinter : Ident.ident_printer;
+    meta_id_args : Ident.ident Mstr.t;
   }
 
 exception Bad_name_table of string

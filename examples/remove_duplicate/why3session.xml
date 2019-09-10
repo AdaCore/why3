@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="10" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="remove_duplicate.mlw"/>
+<path name=".."/><path name="remove_duplicate.mlw"/>
 <theory name="RemoveDuplicateQuadratic" proved="true">
  <goal name="VC test_appears" expl="VC for test_appears" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="66"/></proof>
@@ -29,10 +28,10 @@
   <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
   <goal name="VC remove_duplicate.5" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
   <goal name="VC remove_duplicate.6" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
   <goal name="VC remove_duplicate.7" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
@@ -92,7 +91,7 @@
   <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
   <goal name="VC remove_duplicate.26" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="9008"/></proof>
   </goal>
   <goal name="VC remove_duplicate.27" expl="out of loop bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>

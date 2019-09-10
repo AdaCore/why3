@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="20" steplimit="0" memlimit="2000"/>
 <prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="verifythis_2017_odd_even_sort_rearranging.mlw"/>
+<path name=".."/><path name="verifythis_2017_odd_even_sort_rearranging.mlw"/>
 <theory name="Top" proved="true">
  <goal name="VC array_max" expl="VC for array_max" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -53,7 +52,7 @@
  </transf>
  </goal>
  <goal name="aux_pos" proved="true">
- <proof prover="3"><result status="valid" time="0.02"/></proof>
+ <proof prover="3"><result status="valid" time="0.02" steps="56478"/></proof>
  </goal>
  <goal name="VC entropy_pos" expl="VC for entropy_pos" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -221,7 +220,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="VC odd_even_sort.5" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.00" steps="9"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
   <goal name="VC odd_even_sort.6" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
@@ -236,7 +235,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="VC odd_even_sort.10" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
   <goal name="VC odd_even_sort.11" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
@@ -311,7 +310,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="VC odd_even_sort.35" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
   <goal name="VC odd_even_sort.36" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
@@ -365,7 +364,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
   <goal name="VC odd_even_sort.53" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.10"/></proof>
+  <proof prover="3"><result status="valid" time="0.10" steps="126815"/></proof>
   </goal>
   <goal name="VC odd_even_sort.54" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>

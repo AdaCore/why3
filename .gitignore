@@ -153,9 +153,6 @@ why3.conf
 # /lib/why3/
 /lib/why3/META
 
-# /lib/ocaml/
-/lib/ocaml/why3__BigInt_compat.ml
-
 # /share/
 /share/emacs/semantic.cache
 /share/Makefile.config
@@ -197,6 +194,7 @@ pvsbin/
 /src/driver/parse_smtv2_model_lexer.ml
 /src/driver/parse_smtv2_model_parser.ml
 /src/driver/parse_smtv2_model_parser.mli
+/src/driver/parse_smtv2_model_parser.conflicts
 
 # /src/parser/
 /src/parser/lexer.ml
@@ -214,6 +212,7 @@ pvsbin/
 /src/util/json_lexer.ml
 /src/util/json_parser.mli
 /src/util/json_parser.ml
+/src/util/json_parser.conflicts
 
 # /src/session
 /src/session/xml.ml
@@ -243,6 +242,13 @@ pvsbin/
 /plugins/python/test/
 /plugins/python/py_parser.conflicts
 
+# /plugins/microc/
+/plugins/microc/mc_lexer.ml
+/plugins/microc/mc_parser.ml
+/plugins/microc/mc_parser.mli
+/plugins/microc/test/
+/plugins/microc/mc_parser.conflicts
+
 # /drivers
 /drivers/coq-realizations.aux
 /drivers/pvs-realizations.aux
@@ -257,6 +263,8 @@ pvsbin/
 !/tests/test-extraction/main.ml
 /tests/python/*/why3session.xml
 /tests/python/*/why3shapes.gz
+/tests/microc/*/why3session.xml
+/tests/microc/*/why3shapes.gz
 
 # /examples/
 /examples/in_progress/course/
@@ -311,7 +319,6 @@ pvsbin/
 /examples/prover/bench2
 /examples/prover/macro_generator/depend
 /examples/prover/macro_generator/build
-/examples/in_progress/multiprecision/build/
 
 # Try Why3
 /src/trywhy3/trywhy3.byte

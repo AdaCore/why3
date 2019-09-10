@@ -6,6 +6,8 @@ Require HighOrd.
 Require int.Int.
 Require map.Map.
 Require bool.Bool.
+Require set.Fset.
+Require set.SetApp.
 
 (* Why3 assumption *)
 Inductive datatype :=
@@ -58,7 +60,7 @@ Definition env := Numbers.BinNums.Z -> value.
 
 Parameter eval_bin: value -> operator -> value -> value.
 
-Axiom eval_bin_def :
+Axiom eval_bin'def :
   forall (x:value) (op:operator) (y:value),
   match (x, y) with
   | (Vint x1, Vint y1) =>
@@ -105,7 +107,7 @@ Fixpoint eval_fmla (sigma:Numbers.BinNums.Z -> value)
 
 Parameter subst_term: term -> Numbers.BinNums.Z -> Numbers.BinNums.Z -> term.
 
-Axiom subst_term_def :
+Axiom subst_term'def :
   forall (e:term) (r:Numbers.BinNums.Z) (v:Numbers.BinNums.Z),
   match e with
   | Tconst _ => ((subst_term e r v) = e)
@@ -292,278 +294,61 @@ Definition valid_triple (p:fmla) (i:stmt) (q:fmla) : Prop :=
     (n:Numbers.BinNums.Z),
   many_steps sigma pi i sigma' pi' Sskip n -> eval_fmla sigma' pi' q.
 
-Axiom fset : forall (a:Type), Type.
-Parameter fset_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (fset a).
-Existing Instance fset_WhyType.
-
-Parameter mem: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> Prop.
-
-(* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) :
-    Prop :=
-  forall (x:a), mem x s1 <-> mem x s2.
-
-Axiom extensionality :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), infix_eqeq s1 s2 -> (s1 = s2).
-
-(* Why3 assumption *)
-Definition subset {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) : Prop :=
-  forall (x:a), mem x s1 -> mem x s2.
-
-Axiom subset_refl :
-  forall {a:Type} {a_WT:WhyType a}, forall (s:fset a), subset s s.
-
-Axiom subset_trans :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a) (s3:fset a), subset s1 s2 -> subset s2 s3 ->
-  subset s1 s3.
-
-(* Why3 assumption *)
-Definition is_empty {a:Type} {a_WT:WhyType a} (s:fset a) : Prop :=
-  forall (x:a), ~ mem x s.
-
-Parameter empty: forall {a:Type} {a_WT:WhyType a}, fset a.
-
-Axiom is_empty_empty :
-  forall {a:Type} {a_WT:WhyType a}, is_empty (empty : fset a).
-
-Axiom empty_is_empty :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), is_empty s -> (s = (empty : fset a)).
-
-Parameter add: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> fset a.
-
-Axiom add_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a) (y:a), mem y (add x s) <-> mem y s \/ (y = x).
-
-Axiom mem_singleton :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (y:a), mem y (add x (empty : fset a)) -> (y = x).
-
-Parameter remove: forall {a:Type} {a_WT:WhyType a}, a -> fset a -> fset a.
-
-Axiom remove_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a) (y:a), mem y (remove x s) <-> mem y s /\ ~ (y = x).
-
-Axiom add_remove :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a), mem x s -> ((add x (remove x s)) = s).
-
-Axiom remove_add :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a), ((remove x (add x s)) = (remove x s)).
-
-Axiom subset_remove :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a) (s:fset a), subset (remove x s) s.
-
-Parameter union:
-  forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
-
-Axiom union_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a) (x:a),
-  mem x (union s1 s2) <-> mem x s1 \/ mem x s2.
-
-Axiom subset_union_1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset s1 (union s1 s2).
-
-Axiom subset_union_2 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset s2 (union s1 s2).
-
-Parameter inter:
-  forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
-
-Axiom inter_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a) (x:a),
-  mem x (inter s1 s2) <-> mem x s1 /\ mem x s2.
-
-Axiom subset_inter_1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset (inter s1 s2) s1.
-
-Axiom subset_inter_2 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset (inter s1 s2) s2.
-
-Parameter diff: forall {a:Type} {a_WT:WhyType a}, fset a -> fset a -> fset a.
-
-Axiom diff_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a) (x:a),
-  mem x (diff s1 s2) <-> mem x s1 /\ ~ mem x s2.
-
-Axiom subset_diff :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset (diff s1 s2) s1.
-
-Parameter pick: forall {a:Type} {a_WT:WhyType a}, fset a -> a.
-
-Axiom pick_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), ~ is_empty s -> mem (pick s) s.
-
-(* Why3 assumption *)
-Definition disjoint {a:Type} {a_WT:WhyType a} (s1:fset a) (s2:fset a) : Prop :=
-  forall (x:a), ~ mem x s1 \/ ~ mem x s2.
-
-Axiom disjoint_inter_empty :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), disjoint s1 s2 <-> is_empty (inter s1 s2).
-
-Axiom disjoint_diff_eq :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), disjoint s1 s2 <-> ((diff s1 s2) = s1).
-
-Axiom disjoint_diff_s2 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), disjoint (diff s1 s2) s2.
-
-Parameter filter:
-  forall {a:Type} {a_WT:WhyType a}, fset a -> (a -> Init.Datatypes.bool) ->
-  fset a.
-
-Axiom filter_def :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a) (p:a -> Init.Datatypes.bool) (x:a),
-  mem x (filter s p) <-> mem x s /\ ((p x) = Init.Datatypes.true).
-
-Axiom subset_filter :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a) (p:a -> Init.Datatypes.bool), subset (filter s p) s.
-
-Parameter map:
-  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b}, (a -> b) ->
-  fset a -> fset b.
-
-Axiom map_def :
-  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (f:a -> b) (u:fset a) (y:b),
-  mem y (map f u) <-> (exists x:a, mem x u /\ (y = (f x))).
-
-Axiom mem_map :
-  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (f:a -> b) (u:fset a), forall (x:a), mem x u -> mem (f x) (map f u).
-
-Parameter cardinal:
-  forall {a:Type} {a_WT:WhyType a}, fset a -> Numbers.BinNums.Z.
-
-Axiom cardinal_nonneg :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), (0%Z <= (cardinal s))%Z.
-
-Axiom cardinal_empty :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), is_empty s <-> ((cardinal s) = 0%Z).
-
-Axiom cardinal_add :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a), forall (s:fset a),
-  (mem x s -> ((cardinal (add x s)) = (cardinal s))) /\
-  (~ mem x s -> ((cardinal (add x s)) = ((cardinal s) + 1%Z)%Z)).
-
-Axiom cardinal_remove :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (x:a), forall (s:fset a),
-  (mem x s -> ((cardinal (remove x s)) = ((cardinal s) - 1%Z)%Z)) /\
-  (~ mem x s -> ((cardinal (remove x s)) = (cardinal s))).
-
-Axiom cardinal_subset :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset s1 s2 ->
-  ((cardinal s1) <= (cardinal s2))%Z.
-
-Axiom subset_eq :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), subset s1 s2 ->
-  ((cardinal s1) = (cardinal s2)) -> (s1 = s2).
-
-Axiom cardinal1 :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a), ((cardinal s) = 1%Z) -> forall (x:a), mem x s ->
-  (x = (pick s)).
-
-Axiom cardinal_union :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a),
-  ((cardinal (union s1 s2)) =
-   (((cardinal s1) + (cardinal s2))%Z - (cardinal (inter s1 s2)))%Z).
-
-Axiom cardinal_inter_disjoint :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a), disjoint s1 s2 ->
-  ((cardinal (inter s1 s2)) = 0%Z).
-
-Axiom cardinal_diff :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s1:fset a) (s2:fset a),
-  ((cardinal (diff s1 s2)) = ((cardinal s1) - (cardinal (inter s1 s2)))%Z).
-
-Axiom cardinal_filter :
-  forall {a:Type} {a_WT:WhyType a},
-  forall (s:fset a) (p:a -> Init.Datatypes.bool),
-  ((cardinal (filter s p)) <= (cardinal s))%Z.
-
-Axiom cardinal_map :
-  forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (f:a -> b) (s:fset a), ((cardinal (map f s)) <= (cardinal s))%Z.
-
 Axiom set : Type.
 Parameter set_WhyType : WhyType set.
 Existing Instance set_WhyType.
 
-Parameter to_fset: set -> fset Numbers.BinNums.Z.
+Parameter to_fset: set -> set.Fset.fset Numbers.BinNums.Z.
 
 Parameter choose: set -> Numbers.BinNums.Z.
 
-Axiom choose_spec :
-  forall (s:set), ~ is_empty (to_fset s) -> mem (choose s) (to_fset s).
+Axiom choose'spec :
+  forall (s:set), ~ set.Fset.is_empty (to_fset s) ->
+  set.Fset.mem (choose s) (to_fset s).
 
 (* Why3 assumption *)
 Definition assigns (sigma:Numbers.BinNums.Z -> value)
-    (a:fset Numbers.BinNums.Z) (sigma':Numbers.BinNums.Z -> value) : Prop :=
-  forall (i:Numbers.BinNums.Z), ~ mem i a -> ((sigma i) = (sigma' i)).
+    (a:set.Fset.fset Numbers.BinNums.Z) (sigma':Numbers.BinNums.Z -> value) :
+    Prop :=
+  forall (i:Numbers.BinNums.Z), ~ set.Fset.mem i a ->
+  ((sigma i) = (sigma' i)).
 
 Axiom assigns_refl :
-  forall (sigma:Numbers.BinNums.Z -> value) (a:fset Numbers.BinNums.Z),
+  forall (sigma:Numbers.BinNums.Z -> value)
+    (a:set.Fset.fset Numbers.BinNums.Z),
   assigns sigma a sigma.
 
 Axiom assigns_trans :
   forall (sigma1:Numbers.BinNums.Z -> value)
     (sigma2:Numbers.BinNums.Z -> value) (sigma3:Numbers.BinNums.Z -> value)
-    (a:fset Numbers.BinNums.Z),
+    (a:set.Fset.fset Numbers.BinNums.Z),
   assigns sigma1 a sigma2 /\ assigns sigma2 a sigma3 ->
   assigns sigma1 a sigma3.
 
 Axiom assigns_union_left :
   forall (sigma:Numbers.BinNums.Z -> value)
-    (sigma':Numbers.BinNums.Z -> value) (s1:fset Numbers.BinNums.Z)
-    (s2:fset Numbers.BinNums.Z),
-  assigns sigma s1 sigma' -> assigns sigma (union s1 s2) sigma'.
+    (sigma':Numbers.BinNums.Z -> value) (s1:set.Fset.fset Numbers.BinNums.Z)
+    (s2:set.Fset.fset Numbers.BinNums.Z),
+  assigns sigma s1 sigma' -> assigns sigma (set.Fset.union s1 s2) sigma'.
 
 Axiom assigns_union_right :
   forall (sigma:Numbers.BinNums.Z -> value)
-    (sigma':Numbers.BinNums.Z -> value) (s1:fset Numbers.BinNums.Z)
-    (s2:fset Numbers.BinNums.Z),
-  assigns sigma s2 sigma' -> assigns sigma (union s1 s2) sigma'.
+    (sigma':Numbers.BinNums.Z -> value) (s1:set.Fset.fset Numbers.BinNums.Z)
+    (s2:set.Fset.fset Numbers.BinNums.Z),
+  assigns sigma s2 sigma' -> assigns sigma (set.Fset.union s1 s2) sigma'.
 
 (* Why3 assumption *)
-Fixpoint stmt_writes (i:stmt) (w:fset Numbers.BinNums.Z) {struct i}: Prop :=
+Fixpoint stmt_writes (i:stmt)
+  (w:set.Fset.fset Numbers.BinNums.Z) {struct i}: Prop :=
   match i with
   | Sskip|(Sassert _) => True
-  | Sassign id _ => mem id w
+  | Sassign id _ => set.Fset.mem id w
   | (Sseq s1 s2)|(Sif _ s1 s2) => stmt_writes s1 w /\ stmt_writes s2 w
   | Swhile _ _ s => stmt_writes s w
   end.
 
 (* Why3 goal *)
-Theorem VC_compute_writes :
+Theorem compute_writes'VC :
   forall (s:stmt), forall (result:set),
   (exists x:term, exists x1:fmla, exists x2:stmt,
    (s = (Swhile x x1 x2)) /\
@@ -602,4 +387,3 @@ inversion H0; subst; clear H0.
 apply assigns_refl.
 inversion H.
 Qed.
-

@@ -39,10 +39,10 @@ doc:
 	$(WHY3) session html .
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
-	ocamlc -g $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ $^
+	ocamlc -g $(INCLUDE) $(BIGINTLIB).cma -o $@ $^
 
 $(MAIN).opt: $(CMX) $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
@@ -54,14 +54,13 @@ $(GENML): ../sudoku.mlw
 
 JSMAIN=jsmain
 
-JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.syntax \
-          -syntax camlp4o
+JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx -package js_of_ocaml-lwt
 
 $(JSMAIN).js: $(JSMAIN).byte
 	js_of_ocaml +nat.js $(JSMAIN).byte
 
 $(JSMAIN).byte: $(CMO) $(JSMAIN).cmo
-	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ -linkpkg $^
+	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma -o $@ -linkpkg $^
 
 %.cmo: %.ml
 	$(JSOCAMLC) $(INCLUDE) -annot -c $<

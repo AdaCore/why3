@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
+<why3session shape_version="8">
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file proved="true">
-<path name=".."/>
-<path name="unraveling_a_card_trick.mlw"/>
+<path name=".."/><path name="unraveling_a_card_trick.mlw"/>
 <theory name="GilbreathCardTrickPure" proved="true">
  <goal name="shuffle_nil_nil_nil" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
@@ -36,10 +35,10 @@
   <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
   <goal name="shuffle_length.2" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="9472"/></proof>
   </goal>
   <goal name="shuffle_length.3" proved="true">
-  <proof prover="3"><result status="valid" time="0.02"/></proof>
+  <proof prover="3"><result status="valid" time="0.02" steps="9476"/></proof>
   </goal>
  </transf>
  </goal>

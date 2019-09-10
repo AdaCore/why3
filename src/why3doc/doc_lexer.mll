@@ -26,6 +26,7 @@
     List.iter (fun s -> Hashtbl.add ht s ()) l;
     Hashtbl.mem ht
 
+  (* keep synchronized with src/trywhy3/mode-why3.js *)
   let is_keyword1 = make_table [ "as"; "axiom"; "by";
     "clone"; "coinductive"; "constant";
     "else"; "end"; "epsilon"; "exists"; "export";
@@ -36,7 +37,7 @@
     (* programs *) "abstract"; "any"; "at";
     "begin"; "break"; "continue"; "do"; "done"; "downto"; "exception";
     "for"; "fun"; "ghost"; "label"; "module"; "mutable";
-    "old"; "private"; "pure"; "raise"; "rec"; "return";
+    "old"; "private"; "pure"; "raise"; "rec"; "ref"; "return";
     "to"; "try"; "val"; "while"; ]
 
   let is_keyword2 = make_table [ "absurd"; "alias"; "assert"; "assume";

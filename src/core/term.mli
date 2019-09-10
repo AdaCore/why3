@@ -143,18 +143,25 @@ and term_quant
 
 and trigger = term list list
 
+(** {2 Term equality modulo alpha-equivalence} *)
+
+val t_equal_strict : term -> term -> bool
+val t_compare_strict : term -> term -> int
+val t_hash_strict : term -> int
+
+module Mterm_strict : Extmap.S with type key = term
+module Sterm_strict : Extset.S with module M = Mterm_strict
+module Hterm_strict : Exthtbl.S with type key = term
+
+(** {2 Term equality modulo alpha-equivalence, attributes, triggers, and locations} *)
+
+val t_equal : term -> term -> bool
+val t_compare : term -> term -> int
+val t_hash : term -> int
+
 module Mterm : Extmap.S with type key = term
 module Sterm : Extset.S with module M = Mterm
 module Hterm : Exthtbl.S with type key = term
-
-(** {2 Term equality modulo alpha-equivalence and location} *)
-
-val t_compare : term -> term -> int
-val t_equal : term -> term -> bool
-val t_hash : term -> int
-(* Equality modulo attributes and triggers *)
-val t_equal_nt_na : term -> term -> bool
-module Hterm_nt_na : Exthtbl.S with type key = term
 
 (** {2 Bindings} *)
 

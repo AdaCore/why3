@@ -8,9 +8,9 @@ section {* Parity properties *}
 
 why3_open "number/Parity.xml"
 
-why3_vc even_def by arith
+why3_vc evenqtdef by arith
 
-why3_vc odd_def by arith
+why3_vc oddqtdef by arith
 
 why3_vc even_or_odd by auto
 
@@ -31,7 +31,7 @@ why3_vc even_2k by simp
 why3_vc odd_2k1 by simp
 
 why3_vc even_mod2
-  by (auto simp add: even_def cmod_def sgn_if minus_equation_iff [of n])
+  by (auto simp add: evenqtdef cmod_def sgn_if minus_equation_iff [of n])
 
 why3_end
 
@@ -40,7 +40,7 @@ section {* Divisibility *}
 
 why3_open "number/Divisibility.xml"
 
-why3_vc divides_def
+why3_vc dividesqtdef
   by (auto simp add: cmod_def sgn_if minus_equation_iff [of n])
 
 why3_vc divides_refl by simp
@@ -106,7 +106,7 @@ why3_vc even_divides ..
 
 why3_vc odd_divides ..
 
-why3_vc divides_spec
+why3_vc dividesqtspec
   by (simp add: dvd_def mult.commute)
 
 why3_end
@@ -161,7 +161,7 @@ section {* Prime numbers *}
 
 why3_open "number/Prime.xml"
 
-why3_vc prime_def
+why3_vc primeqtdef
   by (auto simp add: prime_int_iff')
 
 why3_vc not_prime_1 by simp
@@ -210,7 +210,7 @@ proof (induct n rule: less_induct)
 qed
 
 why3_vc small_divisors
-  unfolding prime_def
+  unfolding primeqtdef
 proof
   show "2 \<le> p" by fact
 
@@ -240,7 +240,7 @@ qed
 
 why3_vc even_prime
 proof -
-  from `prime p` have "0 \<le> p" by (simp add: prime_def)
+  from `prime p` have "0 \<le> p" by (simp add: primeqtdef)
   from `prime p` have "2 \<le> p" by (simp add: prime_ge_2_int)
   with `prime p` `even p` `0 \<le> p` show ?thesis
     by (auto simp add: order_le_less prime_odd_int)
@@ -260,7 +260,7 @@ section {* Coprime numbers *}
 
 why3_open "number/Coprime.xml"
 
-why3_vc coprime_def by (rule coprime_iff_gcd_eq_1)
+why3_vc coprimeqtdef by (rule coprime_iff_gcd_eq_1)
 
 why3_vc prime_coprime
 proof -
@@ -299,7 +299,7 @@ proof -
       with H' show False by (simp add: coprime_iff_gcd_eq_1)
     qed
   qed
-  then show ?thesis by (simp add: prime_def)
+  then show ?thesis by (simp add: primeqtdef)
 qed
 
 why3_vc Gauss

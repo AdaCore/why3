@@ -152,6 +152,12 @@ end
 
 module Server = Itp_server.Make (Scheduler) (Protocol_why3ide)
 
+let when_idle (f:unit->unit) =
+  let (_:GMain.Idle.id) =
+    GMain.Idle.add (fun () -> f (); false)
+  in ()
+
+
 (************************)
 (* parsing command line *)
 (************************)
@@ -876,7 +882,9 @@ let add_to_log =
   if n>1 then
     log_zone#buffer#insert (" (repeated " ^ (string_of_int n) ^ " times)");
   log_zone#buffer#insert ("] " ^ s ^ "\n");
-  log_zone#scroll_to_mark `INSERT
+  (* scroll to end of text. Since Gtk3 we must do it in idle() because
+     of the "smooth scrolling". *)
+  when_idle (fun () -> log_zone#scroll_to_mark `INSERT)
 
 let clear_message_zone () =
   let buf = message_zone#buffer in
@@ -986,9 +994,19 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
           Debug.dprintf debug "tab switch to page %d@." n;
           notebook#goto_page n;
         end;
-      move_to_line ~yalign:0.0 v l
+      when_idle (fun () ->
+          (* 0.5 to focus on the middle of the screen *)
+          move_to_line ~yalign:0.5 v l)
     with Nosourceview f ->
       Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
+
+let scroll_to_loc_ce loc_of_goal =
+  match loc_of_goal with
+  | None -> ()
+  | Some loc ->
+      let _, l, _, _= Loc.get loc in
+      (* 0.5 to focus on the middle of the screen *)
+      when_idle (fun () -> move_to_line ~yalign:0.5 counterexample_view l)
 
 (* Reposition the cursor to the place it was saved *)
 let reposition_ide_cursor () =
@@ -1132,25 +1150,16 @@ let color_loc ?(ce=false) ~color loc =
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
-let apply_loc_on_source (l: (Loc.position * color) list) =
+let apply_loc_on_source (l: (Loc.position * color) list) loc_goal =
   Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table;
-  List.iter (fun (loc, color) ->
-    color_loc ~color loc) l;
-  let loc_of_goal =
-    (* TODO the last location sent seems more relevant thus the rev. This
-       should be changed, the sent task should contain the information of where
-       to scroll and the list of locations is far too long. *)
-    try Some (List.find (fun (_, color) -> color = Goal_color) (List.rev l))
-    with Not_found -> None
-  in
-  scroll_to_loc ~force_tab_switch:false (Opt.map fst loc_of_goal)
+  List.iter (fun (loc, color) -> color_loc ~color loc) l;
+  scroll_to_loc ~force_tab_switch:false loc_goal
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to the counterexample tab *)
 let apply_loc_on_ce (l: (Loc.position * color) list) =
   erase_color_loc counterexample_view;
-  List.iter (fun (loc, color) ->
-    color_loc ~ce:true ~color loc) l
+  List.iter (fun (loc, color) -> color_loc ~ce:true ~color loc) l
 
 let collapse_iter iter =
   let path = goals_model#get_path iter in
@@ -2141,6 +2150,25 @@ let (_ : GMenu.menu_item) =
     ~callback
 
 let (_ : GMenu.menu_item) =
+  (* This is considered risky command so it is intentionally not added to the
+     context menu. It also trigger the apparition of a popup. *)
+  let callback () =
+    let answer =
+      GToolbox.question_box
+        ~default:2
+        ~title:"Launching unsafe command"
+        ~buttons:["Yes"; "No"]
+        "Do you really want to remove all proofs from this session ?"
+    in
+      match answer with
+      | 1 -> send_request Reset_proofs_req
+      | _ -> ()
+  in
+  tools_factory#add_item "Reset proofs"
+    ~tooltip:"Remove all proofs attempts or transformations"
+    ~callback
+
+let (_ : GMenu.menu_item) =
   let callback =
     on_selected_rows ~multiple:true ~notif_kind:"Remove_subtree error" ~action:"remove"
       (fun id -> Remove_subtree id) in
@@ -2442,16 +2470,20 @@ let treat_notification n =
         exit_function_safe ()
   | Saving_needed b -> exit_function_handler b
   | Message (msg)                 -> treat_message_notification msg
-  | Task (id, s, list_loc)        ->
+  | Task (id, s, list_loc, goal_loc)        ->
      if is_selected_alone id then
        begin
          task_view#source_buffer#set_text s;
          (* Avoid erasing colors at startup when selecting the first node. In
             all other cases, it should change nothing. *)
          if list_loc != [] then
-           apply_loc_on_source list_loc;
-         (* scroll to end of text *)
-         task_view#scroll_to_mark `INSERT
+           apply_loc_on_source list_loc goal_loc
+         else
+           (* Still scroll to the ident (for example for modules) *)
+           scroll_to_loc ~force_tab_switch:false goal_loc;
+         (* scroll to end of text. Since Gtk3 we must do it in idle() because
+            of the "smooth scrolling". *)
+         when_idle (fun () -> task_view#scroll_to_mark `INSERT)
        end
   | File_contents (file_name, content) ->
      let content = try_convert content in
@@ -2467,11 +2499,12 @@ let treat_notification n =
       with
       | Not_found -> create_source_view file_name content
     end
-  | Source_and_ce (content, list_loc) ->
+  | Source_and_ce (content, list_loc, goal_loc) ->
     begin
       messages_notebook#goto_page counterexample_page;
       counterexample_view#source_buffer#set_text content;
-      apply_loc_on_ce list_loc
+      apply_loc_on_ce list_loc;
+      scroll_to_loc_ce goal_loc
     end
   | Dead _ ->
      print_message ~kind:1 ~notif_kind:"Server Dead ?"
@@ -2500,6 +2533,31 @@ let () =
 (***************************************************)
 (* simulate some user actions and take screenshots *)
 (***************************************************)
+
+let pos_cursor_and_color (v:GSourceView.source_view) =
+  let buf = v#source_buffer in
+  let iter = buf#get_iter_at_mark `INSERT in
+  let line, column = iter#line + 1, iter#line_index in
+  (* This is the line that corresponds to the goal *)
+  Format.printf "Cursor is placed at position: (%d, %d)@."
+    line column;
+  let iter = ref buf#start_iter in
+  Format.printf "Recorded colors on the source code are:@.";
+  while not (!iter#is_end) do
+    let l = !iter#get_toggled_tags true in
+    if l = [] then
+      ()
+    else
+      List.iter (fun (tag: GText.tag) ->
+          let tag_name = tag#get_property GtkText.Tag.P.name in
+          if tag_name <> "" then
+            let iter2 = !iter#forward_to_tag_toggle (Some tag) in
+            Format.printf "Color \"%s\" from (%d, %d) to (%d, %d)@."
+              tag_name !iter#line !iter#line_index iter2#line iter2#line_index)
+        l;
+    iter := !iter#forward_char;
+  done;
+  Format.printf "End color@."
 
 let batch s =
   let cmd = ref (Strings.split ';' s) in
@@ -2534,6 +2592,18 @@ let batch s =
       let cmd = Strings.join " " cmd in
       let cmd = Printf.sprintf "import -window \"%s\" -define png:include-chunk=none %s" window_title cmd in
       if Sys.command cmd <> 0 then Printf.eprintf "Batch command failed: %s\n%!" cmd
+    | "color" :: cmd ->
+        begin
+          let cmd = Strings.join " " cmd in
+          let v = Hstr.fold (fun _ x acc ->
+              match acc, x with
+              | None, (sp, sv, _, _) when sp = 1 ->
+                  Some sv
+              | _ -> acc) source_view_table None
+          in
+          Opt.iter pos_cursor_and_color v;
+          interp cmd
+        end
     | ["save"] -> send_request Save_req
     | _ -> Printf.eprintf "Unrecognized batch command: %s\n%!" c
     end;

@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="5">
-<file name="../126_apply.mlw" proved="true">
+<why3session shape_version="8">
+<file proved="true">
+<path name=".."/><path name="126_apply.mlw"/>
 <theory name="A" proved="true">
  <goal name="a" proved="true">
  <transf name="replace" proved="true" arg1="4" arg2="(2+2)">
   <goal name="a.0" proved="true">
   <transf name="apply" proved="true" arg1="Pair">
-   <goal name="a.0.0" proved="true">
+   <goal name="a.0.0" expl="apply premises" proved="true">
    <transf name="replace" proved="true" arg1="2" arg2="(0 + 2)">
-    <goal name="a.0.0.0" proved="true">
+    <goal name="a.0.0.0" expl="apply premises" proved="true">
     <transf name="apply" proved="true" arg1="Pair">
-     <goal name="a.0.0.0.0" proved="true">
+     <goal name="a.0.0.0.0" expl="apply premises" proved="true">
      <transf name="apply" proved="true" arg1="Zero">
      </transf>
      </goal>
     </transf>
     </goal>
-    <goal name="a.0.0.1" proved="true">
+    <goal name="a.0.0.1" expl="equality hypothesis" proved="true">
     <transf name="compute_in_goal" proved="true" >
     </transf>
     </goal>
@@ -26,7 +27,7 @@
    </goal>
   </transf>
   </goal>
-  <goal name="a.1" proved="true">
+  <goal name="a.1" expl="equality hypothesis" proved="true">
   <transf name="compute_in_goal" proved="true" >
   </transf>
   </goal>

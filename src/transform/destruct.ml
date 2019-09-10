@@ -122,28 +122,31 @@ let destruct_term ?names replace (x: term) : Task.task tlist =
                                acc_task_list r)
                            [] task_list in
                        List.map (add_decl d) add_r)
-                | Dlogic dls          ->
+                | Dlogic _ | Dind _ ->
                     let ls_of_x =
-                      List.fold_left
-                        (fun acc (ls, _) -> Term.Sls.remove ls acc)
-                        ls_of_x dls in
+                      Term.Sls.fold (fun ls acc ->
+                        if Ident.Sid.mem ls.ls_name d.d_news then
+                          Term.Sls.remove ls acc
+                        else
+                          acc) ls_of_x ls_of_x in
                     ((ls_of_x, r, defined), List.map (add_decl d) task_list)
                 | Dparam ls ->
                     let ls_of_x = Term.Sls.remove ls ls_of_x in
-                    ((ls_of_x, r, defined), List.map (add_decl d) task_list)
-                | Dind (_, ils) ->
-                    let ls_of_x =
-                      List.fold_left
-                        (fun acc (ls, _) -> Term.Sls.remove ls acc)
-                        ls_of_x ils in
                     ((ls_of_x, r, defined), List.map (add_decl d) task_list)
                 | Ddata dls ->
                     begin try
                         let cls = List.assoc ts dls in
                         let r = build_decls ~names cls x in
                         ((ls_of_x, r, defined), List.map (add_decl d) task_list)
-                      with Not_found -> ((ls_of_x, r, defined),
-                                         List.map (add_decl d) task_list)
+                      with Not_found ->
+                        let ls_of_x =
+                          Term.Sls.fold (fun ls acc ->
+                              if Ident.Sid.mem ls.ls_name d.d_news then
+                                Term.Sls.remove ls acc
+                              else
+                                acc) ls_of_x ls_of_x in
+                        ((ls_of_x, r, defined),
+                         List.map (add_decl d) task_list)
                     end
                 | Dprop (Pgoal, _, _) ->
                     ((ls_of_x, r, defined), List.map (add_decl d) task_list)
@@ -248,6 +251,10 @@ let destruct_fmla ~recursive (t: term) =
     in
 
     match t.t_node with
+    | Tfalse ->
+        []
+    | Ttrue ->
+        [[]]
     | Tbinop (Tand, t1, t2) ->
         let l1 = destruct_fmla_exception ~toplevel:false t1 in
         let l2 = destruct_fmla_exception ~toplevel:false t2 in
@@ -321,6 +328,9 @@ let destruct_fmla ~recursive (t: term) =
       else
         (* The hypothesis is trivial because Cs1 <> Cs2 thus useless *)
         [[]]
+    | Tnot t1 ->
+        (* Keep toplevel: this is considered an implication *)
+        destruct_fmla_exception ~toplevel (t_implies t1 t_false)
     | Tif (t1, t2, t3) ->
         let ts2 =
           destruct_fmla_exception ~toplevel:false t2 |>

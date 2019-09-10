@@ -1,0 +1,332 @@
+(** {1 VerifyThis 2019 : Cartesian Trees }
+This is challenge 2 of the
+{h <a href = "http://www.pm.inf.ethz.ch/research/verifythis/Challenges.html"> verifythis challenges 2019 </a>} *)
+
+
+use int.Int
+use list.ListRich
+use array.Array
+use exn.Exn
+
+
+(** {2 PART A : All nearest smaller value} *)
+
+clone list.Sorted as Decr with type t = int, predicate le = (>=)
+
+(* Implement the stack with a list *)
+let function destruct l
+    requires { not is_nil l }
+    =
+    match l with
+    | Cons h t -> h, t end
+
+let function peek l
+    requires { not is_nil l }
+    ensures { mem result l }
+    =
+    let h, _ = destruct l in
+    h
+
+let function tail l
+    requires { not is_nil l }
+    =
+    let _, t = destruct l in
+    t
+
+lemma destruct_peek_tail :
+      forall l : list 'a. not is_nil l -> l = Cons (peek l) (tail l)
+
+let smaller_left (s : array int) : array int
+    (* Task 1 : left neighbor has smaller index *)
+    ensures { forall y. 0 <= y < s.length -> result[y] < y }
+    (* Task 2 : left neighbor has smaller value *)
+    ensures { forall y. 0 <= y < s.length -> 0 <= result[y] ->
+                        s[result[y]] < s[y] }
+    (* Task 3 : no smaller value between an element and its left neighbor *)
+    ensures { forall x z. 0 <= x < s.length ->
+                          result[x] < z < x -> s[z] >= s[x] }
+    ensures { result.length = s.length }
+    =
+    let n = s.length in
+    let left = make n (-1) in
+    let ref my_stack = Nil in
+    for x = 0 to s.length - 1 do
+        (* To show that the access are correct *)
+        invariant { forall z. mem z my_stack -> 0 <= z < x }
+        (* Good formation of the stack *)
+        invariant { is_nil my_stack -> x = 0 }
+        invariant { not is_nil my_stack -> peek my_stack = x-1 }
+        invariant { Decr.sorted my_stack }
+        (* Task 1 *)
+        invariant { forall y. 0 <= y < x -> left[y] < y }
+        (* Task 2 *)
+        invariant { forall y. 0 <= y < x -> 0 <= left[y] ->
+                              s[left[y]] < s[y] }
+        (* Show that we only need to look in the stack to find the nearest smaller value *)
+        invariant { forall z. 0 <= z < x ->
+                    exists y. z <= y < x /\ mem y my_stack /\ s[y] <= s[z] }
+        (* Task 3 *)
+        invariant { forall y z. 0 <= y < x -> left[y] < z < y ->
+                                 s[z] >= s[y] }
+        label BeforeLoop in
+        while not is_nil my_stack && s[peek my_stack] >= s[x] do
+              (* Good formation of the stack *)
+              invariant { forall z. mem z my_stack -> 0 <= z < x }
+              invariant { Decr.sorted my_stack }
+              (* Remember that what was removed from the stack was too big *)
+              invariant { forall z. mem z (my_stack at BeforeLoop) ->
+                                    s[z] >= s[x] \/ mem z my_stack }
+              (* Make sure that stack elements at the right of the current top of the stack
+                 were previously removed *)
+              invariant { forall z. not is_nil my_stack ->
+                                    mem z my_stack -> z <= peek my_stack }
+              (* Task 3 *)
+              invariant { forall z. not is_nil my_stack ->
+                                    peek my_stack < z < x -> s[z] >= s[x] }
+              invariant { forall z. is_nil my_stack -> 0 <= z < x ->
+                                    s[z] >= s[x] }
+              variant { Length.length my_stack }
+              my_stack <- tail my_stack
+        done;
+        assert { not is_nil my_stack -> s[peek my_stack] < s[x] };
+        if is_nil my_stack
+        then left[x] <- -1
+        else left[x] <- peek my_stack;
+        assert { 0 <= left[x] -> s[left[x]] < s[x] };
+        my_stack <- Cons x my_stack
+    done;
+    left
+
+(* Same thing but for closest smaller right value :
+   when there is no such value, return an integer greater than the length *)
+val smaller_right (s : array int) : array int
+    (* Task 1 : right neighbor has greater index *)
+    ensures { forall y. 0 <= y < s.length -> result[y] > y }
+    (* Task 2 : right neighbor has smaller value *)
+    ensures { forall y. 0 <= y < s.length -> result[y] < s.length ->
+                        s[result[y]] < s[y] }
+    (* Task 3 : no smaller value between an element and its right neighbor *)
+    ensures { forall x z. 0 <= x < s.length ->
+                          x < z < result[x] -> s[z] >= s[x] }
+    ensures { result.length = s.length }
+
+
+(** {2 PART B : Construction of a Cartesian Tree} *)
+
+
+use option.Option
+
+type dir = { left : option int;
+             right : option int }
+
+type dirs = array dir
+
+predicate parent (t : dirs) (p s : int) =
+   t[p].left = Some s \/ t[p].right = Some s
+
+inductive descendant dirs int int =
+   | Self : forall t p s. p = s -> descendant t p s
+   | Son_left  : forall t p s1 s2. descendant t p s1 -> t[s1].left  = Some s2 ->
+                 descendant t p s2
+   | Son_right : forall t p s1 s2. descendant t p s1 -> t[s1].right = Some s2 ->
+                 descendant t p s2
+
+predicate is_smallest (a : array int) (i : int) =
+   0 <= i < a.length /\
+   forall j. 0 <= j < a.length -> a[i] <= a[j]
+
+let construct_dirs (a : array int) : dirs
+    requires { forall i j. 0 <= i < j < a.length -> a[i] <> a[j] }
+    ensures { result.length = a.length }
+    (* Task 2 ++, heap property :
+       left and right sons have greater value than the parent
+       left son is on the left in the array, right son is on the right
+       between indices of parent and son there is no smaller value *)
+    ensures { forall j v. 0 <= j < a.length ->
+                    (result[j].left = Some v ->
+                    a[v] > a[j] /\ 0 <= v < j /\ forall x. v < x < j -> a[x] > a[j]) /\
+                    (result[j].right = Some v ->
+                    a[v] > a[j] /\ j < v < a.length /\ forall x. j < x < v -> a[x] > a[j]) }
+    ensures { forall p s. 0 <= p < a.length -> descendant result p s ->
+              0 <= s < a.length /\ a[s] >= a[p] }
+    (* Task3, in-order traversal :
+       every "left-descendant" is located on the left in the array
+       every "right-descendant" is located on the right in the array *)
+    ensures { forall p1 p2 s. 0 <= p1 < a.length -> descendant result p2 s ->
+              (result[p1].left  = Some p2 -> s < p1) /\
+              (result[p1].right = Some p2 -> s > p1) }
+    (* Task 1, well-formedness *)
+    (* Every non-minimal element has a parent *)
+    ensures { forall i k. 0 <= i < a.length -> 0 <= k < a.length -> a[k] < a[i] ->
+              exists sm. 0 <= sm < a.length /\ parent result sm i }
+    ensures { forall i. 0 <= i < a.length ->
+              (is_smallest a i \/
+              (exists sm. 0 <= sm < a.length /\ parent result sm i)) }
+    (* Every element has at most one parent *)
+    ensures { forall p1 p2 s. 0 <= p1 < a.length -> 0 <= p2 < a.length -> 0 <= s < a.length ->
+              parent result p1 s -> parent result p2 s -> p1 = p2 }
+    (* No cycles *)
+    ensures { forall p1 p2 s. 0 <= p1 < a.length -> 0 <= p2 < a.length -> 0 <= s < a.length ->
+              parent result p1 p2 -> descendant result p2 s -> p1 <> s }
+    =
+    let n = a.length in
+    let s_left = smaller_left a in
+    let s_right = smaller_right a in
+    let dirs = Array.make n {left = None; right = None} in
+    for i = 0 to n-1 do
+        (* Task 2 ++ *)
+        invariant { forall j v. 0 <= j < a.length ->
+                    (dirs[j].left = Some v ->
+                    a[v] > a[j] /\ 0 <= v < j /\ forall x. v < x < j -> a[x] >= a[j]) /\
+                    (dirs[j].right = Some v ->
+                    a[v] > a[j] /\ j < v < a.length /\ forall x. j < x < v -> a[x] >= a[j]) }
+        (* Show that once a parent is set-up in <dirs>, it does not change *)
+        invariant { forall j. 0 <= j < i ->
+                    if s_left[j] >= 0 && s_right[j] >= n
+                    then dirs[s_left[j]].right = Some j
+                    else if s_left[j] < 0 && s_right[j] < n
+                    then dirs[s_right[j]].left = Some j
+                    else if s_left[j] >= 0 && s_right[j] < n
+                    then if a[s_left[j]] > a[s_right[j]]
+                         then dirs[s_left[j]].right = Some j
+                         else dirs[s_right[j]].left = Some j
+                    else true
+                   }
+        invariant { forall j p. 0 <= j < a.length -> 0 <= p < a.length ->
+                    (dirs[p].right = Some j -> p = s_left[j] /\
+                    (s_right[j] < n -> a[s_left[j]] > a[s_right[j]]) ) /\
+                    (dirs[p].left  = Some j -> p = s_right[j] /\
+                    (s_left[j] >= 0 -> a[s_left[j]] <= a[s_right[j]])) }
+        let li = s_left[i] in
+        let ri = s_right[i] in
+        if li >= 0
+        then if ri < n
+             then if a[li] > a[ri]
+                  then dirs[li] <- { dirs[li] with right = Some i }
+                  else dirs[ri] <- { dirs[ri] with left  = Some i }
+             else dirs[li] <- { dirs[li] with right = Some i }
+        else if ri < n
+             then dirs[ri] <- { dirs[ri] with left  = Some i }
+    done;
+    dirs
+
+
+(* <par> is used to define <all_descendant_root>. This lemma function is useful to show that
+   every node is reachable from the root *)
+
+let par (a : array int) (dirs : array dir) (j : int)
+    requires { exists sm. 0 <= sm < a.length /\ parent dirs sm j }
+    requires { a.length = dirs.length }
+    requires { forall j v. 0 <= j < a.length ->
+                    (dirs[j].left = Some v ->
+                    a[v] > a[j] /\ 0 <= v < j /\ forall x. v < x < j -> a[x] > a[j]) /\
+                    (dirs[j].right = Some v ->
+                    a[v] > a[j] /\ j < v < a.length /\ forall x. j < x < v -> a[x] > a[j]) }
+    ensures { 0 <= result < a.length }
+    ensures { parent dirs result j }
+    =
+    assert { not a.length = 0 };
+    let ref res = 0 in
+    for i = 0 to a.length - 1 do
+        invariant { 0 <= res < a.length }
+        invariant { parent dirs res j \/ exists sm. i <= sm < a.length /\ parent dirs sm j }
+        match dirs[i].left with
+        | Some jl -> if jl = j then res <- i
+        | None -> ()
+        end;
+        match dirs[i].right with
+        | Some jr -> if jr = j then res <- i
+        | None -> ()
+        end
+    done;
+    res
+
+
+let rec lemma all_descendant_root a dirs root j
+    variant { a[j] - a[root] }
+    requires { a.length = dirs.length }
+    requires { forall j v. 0 <= j < a.length ->
+                    (dirs[j].left = Some v ->
+                    a[v] > a[j] /\ 0 <= v < j /\ forall x. v < x < j -> a[x] > a[j]) /\
+                    (dirs[j].right = Some v ->
+                    a[v] > a[j] /\ j < v < a.length /\ forall x. j < x < v -> a[x] > a[j]) }
+    requires { forall i j. 0 <= i < j < a.length -> a[i] <> a[j] }
+    requires { 0 <= j < a.length /\ 0 <= root < a.length }
+    requires { is_smallest a root }
+    requires { forall i. 0 <= i < a.length ->
+              (is_smallest a i \/
+              (exists sm. 0 <= sm < a.length /\ parent dirs sm i)) }
+    ensures { descendant dirs root j }
+    =
+    if a[j] <> a[root]
+    then all_descendant_root a dirs root (par a dirs j)
+
+(* Finds the root of the direction tree : it's the smallest element in the array *)
+let find_smaller a =
+    ensures { match result with
+              | Some mv -> is_smallest a mv
+              | None -> a.length = 0
+              end }
+    let ref m = None in
+    for i = 0 to a.length - 1 do
+        invariant { match m with
+              | Some mv -> 0 <= mv < a.length /\ forall j. 0 <= j < i -> a[mv] <= a[j]
+              | None -> i = 0
+              end }
+        match m with
+        | Some mv -> if a[mv] > a[i] then m <- Some i
+        | _ -> m <- Some i
+        end
+    done;
+    m
+
+(* The other way to define descendant. Useful here because it follows the definition of
+   <traversal> *)
+
+lemma other_descendant :
+   forall t p1 p2 s. parent t p1 p2 -> descendant t p2 s ->
+                     descendant t p1 s
+
+lemma inv_other_descendant :
+   forall t p1 s. descendant t p1 s ->
+   p1 = s \/
+   exists p2. parent t p1 p2 /\ descendant t p2 s
+
+clone list.Sorted as StrictIncr with type t = int, predicate le = (<)
+
+(* in-order traversal, we store the indices we traversed *)
+
+let rec traversal (a : array int) dirs top (ghost s : int) (ghost e)
+    variant { e - s }
+    requires { dirs.length = a.length }
+    requires { 0 <= s <= e <= a.length }
+    requires { forall p1 p2 s. 0 <= p1 < a.length -> descendant dirs p2 s ->
+               (dirs[p1].left  = Some p2 -> s < p1) /\
+               (dirs[p1].right = Some p2 -> s > p1) }
+    requires { forall i j. 0 <= i < j < a.length -> a[i] <> a[j] }
+    requires { match top with
+               | Some top -> forall son. descendant dirs top son <-> s <= son < e
+               | None -> s = e end }
+    ensures { forall x. mem x result <-> s <= x < e }
+    ensures { StrictIncr.sorted result }
+    =
+    match top with
+    | None -> Nil
+    | Some top ->
+           assert { s <= top < e by descendant dirs top top };
+           let dir = dirs[top] in
+           traversal a dirs dir.left s top ++
+           Cons top (
+           traversal a dirs dir.right (top+1) e)
+    end
+
+(* We traverse the tree <construct_dirs a> in-order from the root <find_smaller a>,
+   and we collect the indices. Last 2 arguments of <traversal> are ghost.
+   We show that the result is the list [0..(a.length-1)]
+*)
+let in_order a
+    requires { forall i j. 0 <= i < j < a.length -> a[i] <> a[j] }
+    ensures { forall x. mem x result <-> 0 <= x < a.length }
+    ensures { StrictIncr.sorted result }
+    =
+    traversal a (construct_dirs a) (find_smaller a) 0 a.length

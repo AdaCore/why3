@@ -660,7 +660,7 @@ module GenFloatSpecMultiRounding
   constant eps_normalized : real
   constant eta_normalized : real
 
-  predicate add_post (m:mode) (x y res:t) =
+  predicate add_post (_m:mode) (x y res:t) =
     ((* CASE 1 : normalized numbers *)
      (abs(value x + value y) >= min_normalized ->
       abs(value res - (value x + value y)) <= eps_normalized * abs(value x + value y))
@@ -674,7 +674,7 @@ module GenFloatSpecMultiRounding
     model res = model x + model y
 
 
-  predicate sub_post (m:mode) (x y res:t) =
+  predicate sub_post (_m:mode) (x y res:t) =
     ((* CASE 1 : normalized numbers *)
      (abs(value x - value y) >= min_normalized ->
       abs(value res - (value x - value y)) <= eps_normalized * abs(value x - value y))
@@ -688,7 +688,7 @@ module GenFloatSpecMultiRounding
     model res = model x - model y
 
 
-  predicate mul_post (m:mode) (x y res:t) =
+  predicate mul_post (_m:mode) (x y res:t) =
     ((* CASE 1 : normalized numbers *)
      (abs(value x * value y) >= min_normalized ->
       abs(value res - (value x * value y)) <= eps_normalized * abs(value x * value y))
@@ -700,7 +700,7 @@ module GenFloatSpecMultiRounding
    /\ model res = model x * model y
 
 
-  predicate neg_post (m:mode) (x res:t) =
+  predicate neg_post (_m:mode) (x res:t) =
    ((abs(value x) >= min_normalized ->
      abs(value res - (- value x)) <= eps_normalized * abs(- value x))
     /\

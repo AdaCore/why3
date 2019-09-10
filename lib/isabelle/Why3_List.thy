@@ -6,7 +6,7 @@ section {* Length of a list *}
 
 why3_open "list/Length.xml"
 
-why3_vc length_def by (cases l) simp_all
+why3_vc lengthqtdef by (cases l) simp_all
 
 why3_vc Length_nil by simp
 
@@ -19,7 +19,7 @@ section {* Membership in a list *}
 
 why3_open "list/Mem.xml"
 
-why3_vc mem_def by (simp split: list.split)
+why3_vc memqtdef by (simp split: list.split)
 
 why3_end
 
@@ -31,7 +31,7 @@ why3_open "list/Nth.xml"
 lemma nth_eq: "0 \<le> i \<Longrightarrow> nat i < length xs \<Longrightarrow> nth i xs = Some (xs ! nat i)"
   by (induct xs arbitrary: i) (auto simp add: nat_diff_distrib)
 
-why3_vc is_none_spec
+why3_vc is_noneqtspec
   by (simp add: is_none_def split: option.split)
 
 why3_end
@@ -76,7 +76,7 @@ next
   qed simp
 qed
 
-why3_vc is_none_spec
+why3_vc is_noneqtspec
   by (simp add: is_none_def split: option.split)
 
 why3_end
@@ -86,7 +86,7 @@ section {* Head and tail *}
 
 why3_open "list/HdTl.xml"
 
-why3_vc is_none_spec
+why3_vc is_noneqtspec
   by (simp add: is_none_def split: option.split)
 
 why3_end
@@ -112,7 +112,7 @@ why3_vc Nth_tl
 why3_vc Nth0_head
   by (simp add: hd_def split: list.split)
 
-why3_vc is_none_spec
+why3_vc is_noneqtspec
   by (simp add: is_none_def split: option.split)
 
 why3_end
@@ -122,7 +122,7 @@ section {* Appending two lists *}
 
 why3_open "list/Append.xml"
 
-why3_vc infix_plpl_def by (simp split: list.split)
+why3_vc infix_plplqtdef by (simp split: list.split)
 
 why3_vc Append_assoc by simp
 
@@ -162,7 +162,7 @@ next
   with assms show ?thesis by (simp add: nth_none_2)
 qed
 
-why3_vc is_none_spec
+why3_vc is_noneqtspec
   by (simp add: is_none_def split: option.split)
 
 why3_end
@@ -172,7 +172,7 @@ section {* Reversing a list *}
 
 why3_open "list/Reverse.xml"
 
-why3_vc reverse_def by (simp split: list.split)
+why3_vc reverseqtdef by (simp split: list.split)
 
 why3_vc Reverse_length by simp
 

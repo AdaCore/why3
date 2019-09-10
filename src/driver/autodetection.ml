@@ -334,7 +334,7 @@ let generate_auto_strategies config =
       strategy_shortcut = "s";
       strategy_code = code }
   in
-  (* Auto level 0 and 1 *)
+  (* Auto level 0 and 1 and 2 *)
   let provers_level1 =
     Hprover.fold
       (fun p (lev,b) acc ->
@@ -350,19 +350,27 @@ let generate_auto_strategies config =
       strategy_shortcut = "0";
       strategy_code = code }
   in
-  fprintf str_formatter "start:@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
-  fprintf str_formatter "t split_all_full start@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 10 4000@\n" s) provers_level1;
+  List.iter (fun s -> fprintf str_formatter "c %s 5 1000@\n" s) provers_level1;
   let code = flush_str_formatter () in
   let auto1 = {
       strategy_name = "Auto_level_1";
-      strategy_desc = "Automatic@ run@ of@ main@ provers";
+      strategy_desc = "Automatic@ run@ of@ main@ provers for longer times";
       strategy_shortcut = "1";
       strategy_code = code }
   in
-  (* Auto level 2 *)
-  let provers_level2 =
+  fprintf str_formatter "start:@\n";
+  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
+  fprintf str_formatter "t split_vc start@\n";
+  List.iter (fun s -> fprintf str_formatter "c %s 10 4000@\n" s) provers_level1;
+  let code = flush_str_formatter () in
+  let auto2 = {
+      strategy_name = "Auto_level_2";
+      strategy_desc = "Automatic@ run@ of@ main@ provers and splitting";
+      strategy_shortcut = "2";
+      strategy_code = code }
+  in
+  (* Auto level 3 *)
+  let provers_level3 =
     Hprover.fold
       (fun p (lev,b) acc ->
        if b && lev >= 1 && lev <= 2 then
@@ -370,9 +378,9 @@ let generate_auto_strategies config =
        else acc) prover_auto_levels []
   in
   fprintf str_formatter "start:@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level2;
-  fprintf str_formatter "t split_all_full start@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 5 2000@\n" s) provers_level2;
+  List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level3;
+  fprintf str_formatter "t split_vc start@\n";
+  List.iter (fun s -> fprintf str_formatter "c %s 5 2000@\n" s) provers_level3;
   fprintf str_formatter "t introduce_premises afterintro@\n";
   fprintf str_formatter "afterintro:@\n";
   fprintf str_formatter "t inline_goal afterinline@\n";
@@ -380,18 +388,15 @@ let generate_auto_strategies config =
   fprintf str_formatter "afterinline:@\n";
   fprintf str_formatter "t split_all_full start@\n";
   fprintf str_formatter "trylongertime:@\n";
-  List.iter (fun s -> fprintf str_formatter "c %s 30 4000@\n" s) provers_level2;
+  List.iter (fun s -> fprintf str_formatter "c %s 30 4000@\n" s) provers_level3;
   let code = flush_str_formatter () in
-  let auto2 = {
-      strategy_name = "Auto_level_2";
+  let auto3 = {
+      strategy_name = "Auto_level_3";
       strategy_desc = "Automatic@ run@ of@ provers@ and@ most@ useful@ transformations";
-      strategy_shortcut = "2";
+      strategy_shortcut = "3";
       strategy_code = code }
   in
-  add_strategy
-    (add_strategy
-       (add_strategy
-          (add_strategy config split) auto0) auto1) auto2
+  List.fold_left add_strategy config [split ; auto0 ; auto1 ; auto2 ; auto3]
 
 let check_support_library data ver =
   let cmd_regexp = Str.regexp "%\\(.\\)" in

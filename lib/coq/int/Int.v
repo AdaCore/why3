@@ -27,16 +27,19 @@ Require BuiltIn.
 (* infix_ls is replaced with (x < x1)%Z by the coq driver *)
 
 (* Why3 goal *)
-Lemma infix_mn_def :
+Lemma infix_mn'def :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   ((x - y)%Z = (x + (-y)%Z)%Z).
+Proof.
+intros x y.
 reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma infix_lseq_def :
+Lemma infix_lseq'def :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
   (x <= y)%Z <-> (x < y)%Z \/ (x = y).
+Proof.
 exact Zle_lt_or_eq_iff.
 Qed.
 
@@ -132,7 +135,7 @@ Qed.
 Lemma Refl : forall (x:Numbers.BinNums.Z), (x <= x)%Z.
 Proof.
 intros x.
-apply Zle_refl.
+apply Z.le_refl.
 Qed.
 
 (* Why3 goal *)
@@ -140,7 +143,7 @@ Lemma Trans :
   forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (z:Numbers.BinNums.Z),
   (x <= y)%Z -> (y <= z)%Z -> (x <= z)%Z.
 Proof.
-exact Zle_trans.
+exact Z.le_trans.
 Qed.
 
 (* Why3 goal *)

@@ -174,6 +174,7 @@ let convert_request_constructor (r: ide_request) =
   | Reload_req                -> String "Reload_req"
   | Exit_req                  -> String "Exit_req"
   | Interrupt_req             -> String "Interrupt_req"
+  | Reset_proofs_req          -> String "Reset_proofs_req"
   | Get_global_infos          -> String "Get_global_infos"
 
 open Whyconf
@@ -229,6 +230,7 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Reload_req
   | Exit_req
   | Interrupt_req
+  | Reset_proofs_req
   | Get_global_infos ->
      convert_record ["ide_request", cc r])
 
@@ -253,6 +255,15 @@ let convert_loc (loc: Loc.position) : Json_base.json =
                           "line", Json_base.Int line;
                           "col1", Json_base.Int col1;
                           "col2", Json_base.Int col2])
+
+(* Converted to a Json list for simplicity *)
+let convert_option_loc (loc: Loc.position option) : Json_base.json =
+  let l =
+    match loc with
+    | None -> []
+    | Some loc -> [convert_loc loc]
+  in
+  List l
 
 let convert_message (m: message_notification) =
   let cc = convert_constructor_message in
@@ -363,6 +374,13 @@ let parse_list_loc (j: json): (Loc.position * color) list =
   | List l -> List.map parse_loc_color l
   | _ -> raise Notposition
 
+(* Option is represented by a list *)
+let parse_opt_loc (j: json): Loc.position option =
+  match j with
+  | List [] -> None
+  | List [loc] -> Some (parse_loc loc)
+  | _ -> None (* Ignore this case that should not happen *)
+
 let print_notification_to_json (n: notification): json =
   let cc = convert_notification_constructor in
   Record (
@@ -400,19 +418,21 @@ let print_notification_to_json (n: notification): json =
   | Dead s ->
       convert_record ["notification", cc n;
            "message", String s]
-  | Task (nid, s, list_loc) ->
+  | Task (nid, s, list_loc, goal_loc) ->
       convert_record ["notification", cc n;
            "node_ID", Int nid;
            "task", String s;
-           "loc_list", convert_list_loc list_loc]
+           "loc_list", convert_list_loc list_loc;
+           "goal_loc", convert_option_loc goal_loc]
   | File_contents (f, s) ->
       convert_record ["notification", cc n;
            "file", String f;
            "content", String s]
-  | Source_and_ce (s, list_loc) ->
+  | Source_and_ce (s, list_loc, goal_loc) ->
       convert_record ["notification", cc n;
                       "content", String s;
-                      "loc_list", convert_list_loc list_loc])
+                      "loc_list", convert_list_loc list_loc;
+                      "goal_loc", convert_option_loc goal_loc])
 
 let print_notification fmt (n: notification) =
   Format.fprintf fmt "%a" print_json (print_notification_to_json n)
@@ -506,6 +526,8 @@ let parse_request (constr: string) j =
     Save_req
   | "Reload_req" ->
     Reload_req
+  | "Reset_proofs_req" ->
+    Reset_proofs_req
   | "Exit_req" ->
     Exit_req
   | _ -> raise (NotRequest "")
@@ -769,7 +791,8 @@ let parse_notification constr j =
     let nid = get_int (get_field j "node_ID") in
     let s = get_string (get_field j "task") in
     let l = get_field j "loc_list" in
-    Task (nid, s, parse_list_loc l)
+    let gl = get_field j "goal_loc" in
+    Task (nid, s, parse_list_loc l, parse_opt_loc gl)
 
   | "Next_Unproven_Node_Id" ->
     let nid1 = get_int (get_field j "node_ID1") in
@@ -784,7 +807,8 @@ let parse_notification constr j =
   | "Source_and_ce" ->
     let s = get_string (get_field j "content") in
     let l = get_field j "loc_list" in
-    Source_and_ce(s, parse_list_loc l)
+    let gl = get_field j "goal_loc" in
+    Source_and_ce(s, parse_list_loc l, parse_opt_loc gl)
 
 
   | s -> raise (NotNotification ("<from parse_notification> " ^ s))

@@ -246,7 +246,6 @@ module Sqrt
     requires { valid scratch (1 + div n 2) }
     requires { (pelts np)[offset np + n + n - 1] >= power 2 (Limb.length - 2) }
     requires { 4 * n < max_int32 }
-    raises   { StackOverflow -> true }
 (*    writes   { np, sp, scratch }*)
     ensures  { (value sp n) * (value sp n)
                + value np n + (power radix n) * result
@@ -334,7 +333,8 @@ module Sqrt
                     <= 2 * value spl h
                  so value np' h < power radix h
                  so value np' h + value np' h < 2 * value spl h };
-        let ghost b = wmpn_sub_in_place np' spl h h in assert { b = 1 };
+        let ghost b = wmpn_sub_in_place np' h spl h in
+        assert { b = 1 };
         assert { value np' h = r' - value spl h
                  by value np' h - power radix h = value np' h at Sub - value spl h
                     = r' - power radix h - value spl h };
@@ -356,7 +356,7 @@ module Sqrt
       value_concat npl l n;
       assert { value npl n = n1 + power radix l * value onp' h };
       label DivS in
-      wmpn_tdiv_qr_in_place scratch npl spl n h; (* FIXME *)
+      wmpn_tdiv_qr_in_place scratch npl n spl h;
       assert { n1 + power radix l * (r' - q * value spl h)
                = value scratch (l+1) * value spl h + value npl h };
       value_tail scratch l;
@@ -463,7 +463,7 @@ module Sqrt
           assert { n1 + power radix l * r'
                = 2 * value spl h * (value sp l + power radix l * q)
                  + value spl h + value npl h };
-          let c' = wmpn_add_in_place npl spl h h in
+          let c' = wmpn_add_in_place npl h spl h in
           c <- to_int64 c';
           end
       end;
@@ -505,7 +505,7 @@ module Sqrt
                   = n0 + power radix l * value onpl h
                     + power radix l * (power radix h * c) };
       let npn = C.incr_split np n in
-      wmpn_mul npn sp sp l l 64;
+      wmpn_mul npn sp l sp l 64;
       let ll = 2 * l in
       assert { value npn ll + power radix ll * q = dq * dq
                by 0 <= q <= 1 so q * q = q
@@ -524,7 +524,7 @@ module Sqrt
       label Sub2 in
       let ghost onp = pure { np } in
       value_concat np ll n;
-      let bo = wmpn_sub_in_place np npn ll ll in
+      let bo = wmpn_sub_in_place np ll npn ll in
       value_concat np ll n;
       value_sub_frame (pelts np) (pelts onp) (offset np + int32'int ll)
                                              (offset np + int32'int n);
@@ -572,7 +572,7 @@ module Sqrt
           label Borrow in
           let ghost onp = pure { np } in
           value_concat np ll n;
-          let bo = wmpn_sub_1_in_place nll b 1 in
+          let bo = wmpn_sub_1_in_place nll 1 b in
           value_sub_frame (pelts np) (pelts onp) (offset np)
                           (offset np + int32'int ll);
           value_concat np ll n;
@@ -657,7 +657,7 @@ module Sqrt
         assert { vr < 0
                  by value np n < power radix n
                  so power radix n * c <= - power radix n };
-        q <- wmpn_add_1_in_place spl q h;
+        q <- wmpn_add_1_in_place spl h q;
         assert { q = 0 \/ q = 1 };
         assert { value sp l + power radix l * value spl h + power radix n * q
                    = vs
@@ -686,7 +686,7 @@ module Sqrt
                  so if q = 1
                     then value sp n = 0
                     else q = 0 };
-        let c' = wmpn_addmul_1 np sp 2 n in
+        let c' = wmpn_addmul_1 np sp n 2 in
         assert { c' = 0 \/ (q = 0 /\ c' <= 2)
                  by if q = 1
                     then value sp n = 0
@@ -709,7 +709,7 @@ module Sqrt
                  = vr + power radix n * (2 * q)
                       + 2 * value sp n
                  = vr + 2 * vs };
-        c <- Int64.(-) c (to_int64 (wmpn_sub_1_in_place np 1 n));
+        c <- Int64.(-) c (to_int64 (wmpn_sub_1_in_place np n 1));
         assert { value np n + power radix n * c = vr + 2 * vs - 1 };
         assert { 0 <= c
                  by 0 <= vr + 2 * vs - 1
@@ -717,7 +717,7 @@ module Sqrt
                  so value np n < power radix n
                  so -1 < c };
         label AdjS in
-        let bo = wmpn_sub_1_in_place sp 1 n in
+        let bo = wmpn_sub_1_in_place sp n 1 in
         assert { bo = 1 -> q = 1
                  by value sp n - power radix n * bo
                     = value sp n at AdjS - 1
@@ -856,7 +856,6 @@ module Sqrt
     requires { 1 <= n }
     requires { 4 * n < max_int32 }
     requires { (pelts np)[offset np + n - 1] > 0 }
-    raises   { StackOverflow -> true }
     ensures  { value np n = value sp (ceilhalf n) * value sp (ceilhalf n)
                             + value rp result }
     ensures  { 0 <= result <= n }
@@ -1052,7 +1051,7 @@ module Sqrt
                      = s00 };
       C.set s0 s00;
       assert { value s0 1 = s00 };
-      let rc = wmpn_addmul_1 tp sp (2 * s00) tn in
+      let rc = wmpn_addmul_1 tp sp tn (2 * s00) in
       assert { value tp tn + power radix tn * (rl + rc) = vr + 2 * vs0 * vs };
       assert { rl + rc < radix
                by vr <= 2 * vs
@@ -1068,7 +1067,7 @@ module Sqrt
       assert { value tp tn + power radix tn * rl = vr + 2 * vs0 * vs };
       value_concat tp 1 tn;
       let ghost otp = pure { tp } in
-      let ref cc = submul_limb tp s0 s00 1 in
+      let ref cc = wmpn_submul_1 tp s0 1 s00 in
       value_sub_frame (pelts tp) (pelts otp) (offset tp + 1)
                                   (offset tp + int32'int tn);
       value_concat tp 1 tn;
@@ -1085,7 +1084,7 @@ module Sqrt
           let ghost otp = pure { tp } in
           let ghost otp1 = pure { tp1 } in
           assert { value tp tn = value tp 1 + radix * value tp1 (tn-1) };
-          cc <- wmpn_sub_1_in_place tp1 cc (tn - 1);
+          cc <- wmpn_sub_1_in_place tp1 (tn - 1) cc;
           value_sub_frame (pelts tp) (pelts otp1) (offset tp)
                                              (offset tp + 1);
           assert { value tp 1 = value tp 1 at Sub };
