@@ -1428,7 +1428,8 @@ let load_session (dir : string) =
       None
   in
   let session = empty_session ~shape_version dir in
-  let _ =
+  (* This shape is switched to None when the shape file is not found *)
+  let shape_version =
     if Sys.file_exists file then
       try
         let xml,has_shapes =
@@ -1436,7 +1437,7 @@ let load_session (dir : string) =
           read_file_session_and_shapes ~shape_version shapes.session_global_shapes dir file in
         try
           let (_: int) = build_session session xml.Xml.content in
-          if has_shapes then Some shape_version else None
+          if has_shapes then shape_version else None
         with Sys_error msg ->
           failwith ("Open session: sys error " ^ msg)
       with
