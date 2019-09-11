@@ -73,6 +73,24 @@ let unproven_goals_below_id cont id =
   | ATh th     ->
      List.rev (unproven_goals_below_th cont [] th)
 
+
+module type Protocol = sig
+  val get_requests : unit -> ide_request list
+  val notify : notification -> unit
+  val print_ext: (int -> Term.term Pp.pp) -> (int -> Term.term Pp.pp)
+
+end
+
+module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
+
+module C = Controller_itp.Make(S)
+
+let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
+
+let debug_attrs = Debug.register_info_flag "print_model_attrs"
+  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
+
+
 (****** Exception handling *********)
 
 let p s id =
@@ -82,7 +100,8 @@ let p s id =
   *)
   let pr = Ident.duplicate_ident_printer tables.Trans.printer in
   let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
-  (Pretty.create pr apr pr pr false)
+  (* Use the external printer for exception reporting (default is identity) *)
+  (Pretty.create ~print_ext:Pr.print_ext pr apr pr pr false)
 
 let print_opt_type ~print_type fmt t =
   match t with
@@ -93,6 +112,7 @@ let print_opt_type ~print_type fmt t =
 
 (* TODO remove references to id.id_string in this function *)
 let bypass_pretty s id =
+  (* For task errors, we use the external printer if one is given *)
   let module P = (val (p s id)) in
   begin fun fmt exn -> match exn with
   | Ty.TypeMismatch (t1,t2) ->
@@ -269,21 +289,6 @@ let get_exception_message ses id e =
       Pp.sprintf "An argument was expected of type %s, none were given" s, Loc.dummy_position, ""
   | e ->
       (Pp.sprintf "%a" (bypass_pretty ses id) e), Loc.dummy_position, ""
-
-
-module type Protocol = sig
-  val get_requests : unit -> ide_request list
-  val notify : notification -> unit
-end
-
-module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
-
-module C = Controller_itp.Make(S)
-
-let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
-
-let debug_attrs = Debug.register_info_flag "print_model_attrs"
-  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
 
 (****************)
 (* Command list *)
@@ -872,7 +877,9 @@ end
     let task_text =
       let pr = tables.Trans.printer in
       let apr = tables.Trans.aprinter in
-      let module P = (val Pretty.create pr apr pr pr false) in
+      (* For task printing we use the external printer (the default one is
+         identity). *)
+      let module P = (val Pretty.create ~print_ext:Pr.print_ext pr apr pr pr false) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in
     task_text, loc_color_list, goal_loc

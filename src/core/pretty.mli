@@ -58,7 +58,7 @@ module type Printer = sig
     val print_quant : formatter -> quant -> unit      (* quantifier *)
     val print_binop : asym:bool -> formatter -> binop -> unit (* binary operator *)
     val print_pat : formatter -> pattern -> unit      (* pattern *)
-    val print_term : formatter -> term -> unit        (* term *)
+    val print_term : formatter -> term -> unit   (* term *)
 
     val print_attr : formatter -> attribute -> unit
     val print_loc : formatter -> Loc.position -> unit
@@ -90,9 +90,11 @@ module type Printer = sig
 
 include Printer
 
-val create :  Ident.ident_printer -> Ident.ident_printer ->
-              Ident.ident_printer -> Ident.ident_printer ->
-              bool -> (module Printer)
+val create :
+  ?print_ext:((int -> Term.term Pp.pp) -> int -> Term.term Pp.pp) ->
+  Ident.ident_printer -> Ident.ident_printer ->
+  Ident.ident_printer -> Ident.ident_printer ->
+  bool -> (module Printer)
 (** `create spr apr tpr ppr forget` creates a new pretty-printing
    module from the printer `spr` for variables and functions, `apr`
    for type variables, `tpr` for type symbols and `ppr for proposition

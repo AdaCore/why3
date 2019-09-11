@@ -69,6 +69,10 @@ module Protocol_shell = struct
     notification_list := [];
     l
 
+  (* print_ext is just the identity here *)
+  let print_ext print_tnode pri fmt t =
+    print_tnode pri fmt t
+
 end
 
 let get_notified = Protocol_shell.get_notified

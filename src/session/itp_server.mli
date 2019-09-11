@@ -16,8 +16,13 @@ open Itp_communication
 (* The server part of the protocol *)
 module type Protocol = sig
 
+  (* Getting request *)
   val get_requests : unit -> ide_request list
+  (* Notify *)
   val notify : notification -> unit
+  (* A specific external way to print task. This is combined with the
+     standard printer (see Pretty). *)
+  val print_ext: (int -> Term.term Pp.pp) -> (int -> Term.term Pp.pp)
 
 end
 

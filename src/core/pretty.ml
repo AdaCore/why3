@@ -63,7 +63,7 @@ module type Printer = sig
     val print_quant : formatter -> quant -> unit      (* quantifier *)
     val print_binop : asym:bool -> formatter -> binop -> unit (* binary operator *)
     val print_pat : formatter -> pattern -> unit      (* pattern *)
-    val print_term : formatter -> term -> unit        (* term *)
+    val print_term : formatter -> term -> unit   (* term *)
 
     val print_attr : formatter -> attribute -> unit
     val print_loc : formatter -> Loc.position -> unit
@@ -106,7 +106,8 @@ let debug_print_coercions = Debug.register_info_flag "print_coercions"
 let debug_print_qualifs = Debug.register_info_flag "print_qualifs"
   ~desc:"Print@ qualifiers@ of@ identifiers@ in@ error@ messages."*)
 
-let create sprinter aprinter tprinter pprinter do_forget_all =
+let create ?(print_ext=(fun printer pri -> printer pri)) sprinter aprinter
+    tprinter pprinter do_forget_all =
   (module (struct
 
 let forget_tvs () =
@@ -288,7 +289,8 @@ let prio_binop = function
   | Timplies -> 1
   | Tiff -> 1
 
-let rec print_term fmt t = print_lterm 0 fmt t
+let rec print_term fmt t =
+  print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
   let print_tattr pri fmt t =
@@ -341,7 +343,11 @@ and print_app pri ls fmt tl =
       fprintf fmt (protect_on (pri > 6) "@[%s@ %a@]")
         s (print_list space (print_lterm 7)) tl
 
-and print_tnode pri fmt t = match t.t_node with
+and print_tnode ?(ext_printer=true) pri fmt t =
+  if ext_printer then
+    print_ext (print_tnode ~ext_printer:false) pri fmt t
+  else begin
+    match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
@@ -412,6 +418,7 @@ and print_tnode pri fmt t = match t.t_node with
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
   | Tnot f ->
       fprintf fmt (protect_on (pri > 5) "not %a") (print_lterm 5) f
+  end
 
 and print_tbranch fmt br =
   let p,t = t_open_branch br in
