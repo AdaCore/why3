@@ -122,59 +122,95 @@ type spec = {
 }
 
 type expr = {
-  expr_desc : expr_desc;
-  expr_loc  : Loc.position;
-}
+    expr_desc : expr_desc;
+    expr_loc  : Loc.position;
+  }
 
 and expr_desc =
   | Eref
+  (** TODO: document *)
   | Etrue
+  (** literal `true` *)
   | Efalse
+  (** literal `false` *)
   | Econst of Number.constant
-  (** lambda-calculus *)
+  (** numeric literals *)
   | Eident of qualid
+  (** variable identifier *)
   | Easref of qualid
+  (** TODO: document *)
   | Eidapp of qualid * expr list
+  (** uncurried application of a function identifier to a list of arguments *)
   | Eapply of expr * expr
+  (** curried application *)
   | Einfix of expr * ident * expr
+  (** infix operation *)
   | Einnfix of expr * ident * expr
+  (** infix operation (TODO: document the difference with the former) *)
   | Elet of ident * ghost * Expr.rs_kind * expr * expr
+  (** `let ... in ...` expression *)
   | Erec of fundef list * expr
+  (** local definition of function, possibly mutually recursive *)
   | Efun of binder list * pty option * Ity.mask * spec * expr
+  (** anonymous function *)
   | Eany of param list * Expr.rs_kind * pty option * Ity.mask * spec
+  (** `any`: abstract expression with a specification, generating of VC for existence *)
   | Etuple of expr list
+  (** tuple of expressions *)
   | Erecord of (qualid * expr) list
+  (** record expressions *)
   | Eupdate of expr * (qualid * expr) list
+  (** TODO: record update ? *)
   | Eassign of (expr * qualid option * expr) list
-  (** control *)
+  (** assignment ? TODO: document *)
   | Esequence of expr * expr
+  (** sequence of two expressions *)
   | Eif of expr * expr * expr
+  (** `if .. then .. else ..` expression *)
   | Ewhile of expr * invariant * variant * expr
+  (** `while` loop *)
   | Eand of expr * expr
+  (** lazy conjunction *)
   | Eor of expr * expr
+  (** lazy disjunction *)
   | Enot of expr
+  (** negation *)
   | Ematch of expr * reg_branch list * exn_branch list
+  (** match expression, including both regular patterns and exception
+     patterns (those lists cannot be both empty) *)
   | Eabsurd
+  (** `absurd` statement to mark unreachable branches *)
   | Epure of term
+  (** turns a logical term into a pure expression *)
   | Eidpur of qualid
+  (** TODO: document *)
   | Eraise of qualid * expr option
+  (** raise an exception *)
   | Eexn of ident * pty * Ity.mask * expr
+  (** local declaration of an exception *)
   | Eoptexn of ident * Ity.mask * expr
+  (** TODO: document *)
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
-  (** annotations *)
+  (** `for` loop *)
   | Eassert of Expr.assertion_kind * term
+  (** `assert` expression *)
   | Escope of qualid * expr
+  (** TODO: document *)
   | Elabel of ident * expr
+  (** introduction of a label *)
   | Ecast of expr * pty
+  (** cast an expression to a given type *)
   | Eghost of expr
+  (** forces an expression to be ghost *)
   | Eattr of attr * expr
+  (** attach an attribute to an expression *)
 
 and reg_branch = pattern * expr
 
 and exn_branch = qualid * pattern option * expr
 
 and fundef = ident * ghost * Expr.rs_kind *
-  binder list * pty option * Ity.mask * spec * expr
+               binder list * pty option * Ity.mask * spec * expr
 
 (** {2 Declarations} *)
 
