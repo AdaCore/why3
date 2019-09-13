@@ -343,7 +343,7 @@ module Powm
     if cy <> 0
     then begin
       assert { cy = 1 };
-      let ghost b = wmpn_sub_in_place rp n mp n in
+      let ghost b = wmpn_sub_n_in_place rp mp n in
       assert { value rp n + power radix n * (cy - b)
                = (value rp n at Sub + power radix n * cy) - vm };
       assert { b = 1
@@ -1547,7 +1547,7 @@ module Powm
      if (wmpn_cmp rp mp n >= 0)
       then begin
         label Sub in
-        let ghost _b = wmpn_sub_in_place rp n mp n in
+        let ghost _b = wmpn_sub_n_in_place rp mp n in
         assert { _b = 0
                  by value rp n - power radix n * _b
                     = value rp n at Sub - vm

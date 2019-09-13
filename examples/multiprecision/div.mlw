@@ -1356,7 +1356,7 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
     if (not (qh = 0))
     then begin
          assert { qh = 1 };
-         let ghost b = wmpn_sub_in_place xd sy y sy in
+         let ghost b = wmpn_sub_n_in_place xd y sy in
          begin
              ensures { value (x at PreAdjust) sx =
                   (value !qp (sx - sy - !i)
@@ -2387,7 +2387,7 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
                    so 0 <= j < xc.Array.length
                  } ;
           value_sub_frame (pelts x) xc.elts x.offset (x.offset + p2i !i);
-          let c = wmpn_add_in_place xd (sy - 1) y (sy - 1) in
+          let c = wmpn_add_n_in_place xd y (sy - 1) in
           begin
           ensures { value x !i
                  = value (x at Adjust) !i }

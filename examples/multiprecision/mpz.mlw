@@ -401,7 +401,7 @@ let wmpz_add (w u v: mpz_ptr) : unit
           if usize >= 0
           then wsize <- -wsize
         end else begin
-          let _b = wmpn_sub_in_place wp abs_usize vp abs_usize in
+          let _b = wmpn_sub_n_in_place wp vp abs_usize in
           assert { _b = 0 };
           normalize wp wsize;
           if usize < 0 then wsize <- -wsize
@@ -412,7 +412,7 @@ let wmpz_add (w u v: mpz_ptr) : unit
         let up = get_read_ptr u in
         if wmpn_cmp up wp abs_usize < 0
         then begin
-          let _b = wmpn_sub_in_place wp abs_usize up abs_usize in
+          let _b = wmpn_sub_n_in_place wp up abs_usize in
           assert { _b = 0 };
           normalize wp wsize;
           if usize >= 0 then wsize <- - wsize
@@ -471,7 +471,7 @@ let wmpz_add (w u v: mpz_ptr) : unit
         let vp = salloc (UInt32.of_int32 abs_vsize) in
         wmpn_copyi vp wp abs_vsize;
         assert { value vp abs_vsize = value wp abs_vsize };
-        cy <- wmpn_add_in_place wp abs_vsize vp abs_vsize;
+        cy <- wmpn_add_n_in_place wp vp abs_vsize;
         assert { value wp abs_usize + power radix abs_usize * cy
                  = abs (value_of u mpz + value_of v mpz)
                  by value vp abs_vsize = abs (value_of u mpz)

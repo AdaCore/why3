@@ -335,7 +335,7 @@ module Sqrt
                     <= 2 * value spl h
                  so value np' h < power radix h
                  so value np' h + value np' h < 2 * value spl h };
-        let ghost b = wmpn_sub_in_place np' h spl h in
+        let ghost b = wmpn_sub_n_in_place np' spl h in
         assert { b = 1 };
         assert { value np' h = r' - value spl h
                  by value np' h - power radix h = value np' h at Sub - value spl h
@@ -465,7 +465,7 @@ module Sqrt
           assert { n1 + power radix l * r'
                = 2 * value spl h * (value sp l + power radix l * q)
                  + value spl h + value npl h };
-          let c' = wmpn_add_in_place npl h spl h in
+          let c' = wmpn_add_n_in_place npl spl h in
           c <- to_int64 c';
           end
       end;
@@ -526,7 +526,7 @@ module Sqrt
       label Sub2 in
       let ghost onp = pure { np } in
       value_concat np ll n;
-      let bo = wmpn_sub_in_place np ll npn ll in
+      let bo = wmpn_sub_n_in_place np npn ll in
       value_concat np ll n;
       value_sub_frame (pelts np) (pelts onp) (offset np + int32'int ll)
                                              (offset np + int32'int n);
