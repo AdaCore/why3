@@ -281,7 +281,7 @@ use lemmas.Lemmas
 use util.Util
 use compare.Compare
 use import mach.int.UInt64GMP as Limb
-use add.Add
+use add_raw.Add_raw
 use sub.Sub
 use int.Abs
 use Z
@@ -453,6 +453,7 @@ let wmpz_add (w u v: mpz_ptr) : unit
           ensures { vw \/ mpz.readers[v] = 0 }
           ensures { mpz.readers[w] = -1 }
           ensures { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) }
+          ensures { plength wp = old plength wp /\ max wp = old max wp }
           ensures { abs_usize <= wsize <= plength wp }
     assert { abs (value_of u mpz + value_of v mpz)
              = abs (value_of u mpz) + abs (value_of v mpz)
@@ -466,20 +467,13 @@ let wmpz_add (w u v: mpz_ptr) : unit
     if uw
     then if vw
       then begin
-        (* problem: add_in_place does not cover r = x = y *)
-        (* TODO double_in_place or something *)
-        let vp = salloc (UInt32.of_int32 abs_vsize) in
-        wmpn_copyi vp wp abs_vsize;
-        assert { value vp abs_vsize = value wp abs_vsize };
-        cy <- wmpn_add_n_in_place wp vp abs_vsize;
+        cy <- wmpn_add_rxy wp abs_vsize;
         assert { value wp abs_usize + power radix abs_usize * cy
-                 = abs (value_of u mpz + value_of v mpz)
-                 by value vp abs_vsize = abs (value_of u mpz)
-                    = abs (value_of v mpz) };
+                 = abs (value_of u mpz + value_of v mpz) };
       end
       else begin
         let vp = get_read_ptr v in
-        cy <- wmpn_add_in_place wp abs_usize vp abs_vsize;
+        cy <- wmpn_add_rx wp abs_usize vp abs_vsize;
         assert { value wp abs_usize + power radix abs_usize * cy
                  = abs (value_of u mpz + value_of v mpz)
                  by value vp abs_vsize = abs (value_of v mpz)
@@ -489,11 +483,9 @@ let wmpz_add (w u v: mpz_ptr) : unit
     else if vw
       then begin
         let up = get_read_ptr u in
-        let vp = salloc (UInt32.of_int32 abs_vsize) in
-        wmpn_copyi vp wp abs_vsize;
-        assert { value vp abs_vsize = value wp abs_vsize
-                 = abs (value_of v mpz) };
-        cy <- wmpn_add wp up abs_usize vp abs_vsize;
+        assert { value wp abs_vsize = abs (value_of v mpz) };
+        assert { value up abs_usize = abs (value_of u mpz) };
+        cy <- wmpn_add_ry up abs_usize wp abs_vsize;
         assert { value wp abs_usize + power radix abs_usize * cy
                  = abs (value_of u mpz + value_of v mpz)
                  by value up abs_usize = abs (value_of u mpz) };
@@ -502,6 +494,8 @@ let wmpz_add (w u v: mpz_ptr) : unit
       else begin
         let up = get_read_ptr u in
         let vp = get_read_ptr v in
+        assert { value up abs_usize = abs (value_of u mpz)
+                 /\ value vp abs_vsize = abs (value_of v mpz) };
         cy <- wmpn_add wp up abs_usize vp abs_vsize;
         assert { value wp abs_usize + power radix abs_usize * cy
                  = abs (value_of u mpz + value_of v mpz)

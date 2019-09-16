@@ -151,7 +151,7 @@ module Raw
                /\ C.zone y = m.y.zone }
     writes   { r.C.max, r.C.data, x.C.max, x.C.data, y.C.max, y.C.data,
                m.data, m.r, m.x, m.y }
-    ensures  { conform r (old m).r /\ conform x (old m).r
+    ensures  { conform r (old m).r /\ conform x (old m).x
                /\ conform y (old m).y }
     ensures  { plength r = old plength r /\ plength x = old plength x
                /\ plength y = old plength y }
@@ -448,6 +448,10 @@ module Add_raw
               -> (pelts xp)[j] = old (pelts xp)[j] }
     ensures { forall j. (0 <= j < plength yp)
               -> (pelts yp)[j] = old (pelts yp)[j] }
+    ensures { C.max xp = old C.max xp /\ C.max yp = old C.max yp
+              /\ C.max rp = old C.max rp }
+    ensures { plength xp = old plength xp /\ plength yp = old plength yp
+              /\ plength rp = old plength rp }
     ensures { 0 <= result <= 1 }
   =
     let ox = pure { xp } in
@@ -519,6 +523,9 @@ module Add_raw
               -> (pelts xp)[j] = old (pelts xp)[j] }
     ensures { forall j. (0 <= j < plength yp)
               -> (pelts yp)[j] = old (pelts yp)[j] }
+    ensures { C.max xp = old C.max xp /\ C.max yp = old C.max yp }
+    ensures { plength xp = old plength xp /\ plength yp = old plength yp }
+
     ensures { 0 <= result <= 1 }
   =
     let ox = pure { xp } in
@@ -574,6 +581,8 @@ module Add_raw
               -> (pelts yp)[j] = old (pelts yp)[j] }
     ensures { forall j. 0 <= j < plength xp ->
                  (pelts xp)[j] = old (pelts xp)[j] }
+    ensures { C.max xp = old C.max xp /\ C.max yp = old C.max yp }
+    ensures { plength xp = old plength xp /\ plength yp = old plength yp }
     ensures { 0 <= result <= 1 }
   =
     let ox = pure { xp } in
@@ -624,6 +633,8 @@ module Add_raw
                = old (value xp sx + value xp sx) }
     ensures { forall j. (0 <= j < offset xp \/ offset xp + sx <= j < plength xp)
               -> (pelts xp)[j] = old (pelts xp)[j] }
+    ensures { C.max xp = old C.max xp }
+    ensures { plength xp = old plength xp }
     ensures { 0 <= result <= 1 }
   = let ox = pure { xp } in
     let m = open_rxy xp in
@@ -664,6 +675,10 @@ module Add_raw
               -> (pelts xp)[j] = old (pelts xp)[j] }
     ensures { forall j. (0 <= j < plength yp)
               -> (pelts yp)[j] = old (pelts yp)[j] }
+    ensures { C.max xp = old C.max xp /\ C.max yp = old C.max yp
+              /\ C.max rp = old C.max rp }
+    ensures { plength xp = old plength xp /\ plength yp = old plength yp
+              /\ plength rp = old plength rp }
     ensures { 0 <= result <= 1 }
   =
     let ox = pure { xp } in
@@ -730,6 +745,8 @@ module Add_raw
               -> (pelts xp)[j] = old (pelts xp)[j] }
     ensures { forall j. (0 <= j < plength yp)
               -> (pelts yp)[j] = old (pelts yp)[j] }
+    ensures { C.max xp = old C.max xp /\ C.max yp = old C.max yp }
+    ensures { plength xp = old plength xp /\ plength yp = old plength yp }
     ensures { 0 <= result <= 1 }
   =
     let ox = pure { xp } in
@@ -785,6 +802,8 @@ module Add_raw
               -> (pelts yp)[j] = old (pelts yp)[j] }
     ensures { forall j. 0 <= j < plength xp ->
                  (pelts xp)[j] = old (pelts xp)[j] }
+    ensures { C.max xp = old C.max xp /\ C.max yp = old C.max yp }
+    ensures { plength xp = old plength xp /\ plength yp = old plength yp }
     ensures { 0 <= result <= 1 }
   =
     let ox = pure { xp } in
