@@ -201,6 +201,11 @@ let report_messages c obj =
       Gnat_report.Not_Proved (unproved_task, model, tracefile, manual_info) in
   Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
 
+(* Escaping all debug printings *)
+let escape_buffer = Buffer.create 42
+let escape_formatter = Format.formatter_of_buffer escape_buffer
+let () = Debug.set_debug_formatter escape_formatter
+
 (* This is to be executed when scheduling ends *)
 let ending c () =
   C.remove_all_valid_ce_attempt c.Controller_itp.controller_session;
@@ -208,6 +213,8 @@ let ending c () =
   C.save_session c;
   Util.timing_step_completed "gnatwhy3.save_session";
   Gnat_objectives.iter (report_messages c);
+  let s = Buffer.contents escape_buffer in
+  Gnat_report.add_warning s;
   Gnat_report.print_messages ();
   (* Dump profiling data (when compiled with profiling enabled) to file whose
      name is based on the processed .mlw file; otherwise profile data from
