@@ -43,6 +43,7 @@ INSTALL_DATA = @INSTALL_DATA@
 OCAMLC    = @OCAMLC@
 OCAMLOPT  = @OCAMLOPT@
 OCAMLDEP  = @OCAMLDEP@
+OCAMLFIND = @OCAMLFIND@
 OCAMLLEX  = @OCAMLLEX@
 OCAMLYACC = @OCAMLYACC@
 OCAMLDOC  = @OCAMLDOC@
@@ -294,16 +295,19 @@ endif
 src/util/strings.cmo: WARNINGS:=$(WARNINGS)-3
 src/util/strings.cmx: WARNINGS:=$(WARNINGS)-3
 
-# compiler plugins
+# debug optimisation ppx
 
-ifeq (@enable_compiler_plugins@,yes)
-src/util/debug_optim.cmxs: src/util/debug_optim.ml
+ifeq (@enable_ppx@,yes)
+src/util/ppx_debug_optim: src/util/debug_optim.ml
 	$(SHOW) 'Linking $@'
-	$(HIDE)$(OCAMLOPT) -I @COMPILERLIBS@ -shared src/util/debug_optim.ml -o $@
-src/transform/reflection.cmx: src/util/debug_optim.cmxs
-src/transform/reflection.cmx: OFLAGS += -plugin debug_optim.cmxs
-src/mlw/mlinterp.cmx: src/util/debug_optim.cmxs
-src/mlw/mlinterp.cmx: OFLAGS += -plugin debug_optim.cmxs
+	$(HIDE) $(OCAMLFIND) opt -package compiler-libs.common -linkpkg src/util/debug_optim.ml -o $@
+src/transform/reflection.cmx: src/util/ppx_debug_optim
+src/transform/reflection.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
+src/mlw/mlinterp.cmx: src/util/ppx_debug_optim
+src/mlw/mlinterp.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
+
+clean::
+	rm -f src/util/ppx_debug_optim
 endif
 
 # build targets
