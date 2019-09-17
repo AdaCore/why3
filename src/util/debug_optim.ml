@@ -14,7 +14,7 @@ open Ast_mapper
 open Asttypes
 open Longident
 
-let ast_mapper =
+let ast_mapper argv =
   { Ast_mapper.default_mapper with
     expr = fun mapper expr ->
       match expr with
@@ -32,7 +32,4 @@ let ast_mapper =
            None
       | other -> default_mapper.expr mapper other; }
 
-let transform _hook_info structure =
-  ast_mapper.structure ast_mapper structure
-
-let () = Pparse.ImplementationHooks.add_hook "Debug hook" transform
+let () = register "Debug hook" ast_mapper

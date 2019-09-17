@@ -336,35 +336,25 @@ fi
 #if ocamlfind is used it gives the install path for ocaml library
 if test "$USEOCAMLFIND" = yes; then
    OCAMLINSTALLLIB=$(ocamlfind printconf destdir)
+   OCAMLFIND=ocamlfind
 else
    OCAMLINSTALLLIB=$OCAMLLIB
+   OCAMLFIND=no
 fi
 
-# compiler plugins
+# ppx
 
-AX_VERSION_GE([$OCAMLVERSION], 4.05.0,
-  [if test "$USEOCAMLFIND" = yes; then
-     COMPILERLIBS=$(ocamlfind query compiler-libs)
-   fi
-   if test -n "$COMPILERLIBS"; then
-     echo "ocamlfind found compiler-libs in $COMPILERLIBS"
-     enable_compiler_plugins="yes"
-   else
-     COMPILERLIBS="+compiler-libs"
-     AC_CHECK_FILE($OCAMLLIB/compiler-libs/,
-                   enable_compiler_plugins=yes,
-                   enable_compiler_plugins=no)
-     if test "$enable_compiler_plugins" = no; then
-       reason_compiler_plugins=" (compiler-libs not found)"
-     fi
-   fi],
-  [enable_compiler_plugins="no"
-   reason_compiler_plugins=" (Ocaml version 4.05.0 required)"])
-
-if test "$enable_compiler_plugins" = yes; then
-  COMPILERLIBSPKG="compiler-libs"
+if test "$USEOCAMLFIND" = yes; then
+  COMPILERLIBS=$(ocamlfind query compiler-libs)
+  if test -n "$COMPILERLIBS"; then
+    echo "ocamlfind found compiler-libs in $COMPILERLIBS"
+    enable_ppx=yes
+  else
+    enable_ppx=no
+    reason_ppx=" (compiler-libs not found)"
+  fi
 else
-  COMPILERLIBSPKG=
+  enable_ppx=no
 fi
 
 # checking for rubber
@@ -905,6 +895,7 @@ AC_SUBST(STRIP)
 AC_SUBST(OCAMLC)
 AC_SUBST(OCAMLOPT)
 AC_SUBST(OCAMLDEP)
+AC_SUBST(OCAMLFIND)
 AC_SUBST(OCAMLLEX)
 AC_SUBST(OCAMLYACC)
 AC_SUBST(OCAMLDOC)
@@ -932,9 +923,7 @@ AC_SUBST(JSOFOCAMLPKG)
 
 AC_SUBST(META_OCAMLGRAPH)
 
-AC_SUBST(enable_compiler_plugins)
-AC_SUBST(COMPILERLIBS)
-AC_SUBST(COMPILERLIBSPKG)
+AC_SUBST(enable_ppx)
 
 AC_SUBST(NUMINCLUDE)
 
@@ -1030,7 +1019,7 @@ echo "    Version                 : $OCAMLVERSION"
 echo "    Library path            : $OCAMLLIB"
 echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
-echo "    Compiler plugins        : $enable_compiler_plugins$reason_compiler_plugins"
+echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
