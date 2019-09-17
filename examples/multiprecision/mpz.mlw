@@ -122,6 +122,8 @@ val set_ptr_and_alloc (x:mpz_ptr) (p:ptr limb) (al: int32) : unit
   requires { max p = plength p }
   requires { al = plength p }
   requires { mpz.abs_size[x] <= al } (* data must not shrink *)
+  writes  { p }
+  writes  { p.data }
   writes  { mpz.abs_value_of }
   writes  { mpz.zones }
   writes  { mpz.alloc }
@@ -236,10 +238,12 @@ let partial mpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
   let q = realloc p sz in
   c_assert (is_not_null q);
   if Int32.(>) (abs_size_of x) sz
-  then set_fields x q sz 0 (* data has shrunk, reset size to 0 *)
+  then begin
+    set_fields x q sz 0 (* data has shrunk, reset size to 0 *)
+  end
   else begin
     value_sub_frame (pelts q) (pelts op) 0 (p2i os);
-  set_ptr_and_alloc x q sz;
+    set_ptr_and_alloc x q sz;
   end;
   q
 
