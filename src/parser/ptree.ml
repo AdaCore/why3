@@ -140,8 +140,8 @@ and expr_desc =
   | Einnfix of expr * ident * expr
   | Elet of ident * ghost * Expr.rs_kind * expr * expr
   | Erec of fundef list * expr
-  | Efun of binder list * pty option * Ity.mask * spec * expr
-  | Eany of param list * Expr.rs_kind * pty option * Ity.mask * spec
+  | Efun of binder list * pty option * pattern * Ity.mask * spec * expr
+  | Eany of param list * Expr.rs_kind * pty option * pattern * Ity.mask * spec
   | Etuple of expr list
   | Erecord of (qualid * expr) list
   | Eupdate of expr * (qualid * expr) list
@@ -174,7 +174,7 @@ and reg_branch = pattern * expr
 and exn_branch = qualid * pattern option * expr
 
 and fundef = ident * ghost * Expr.rs_kind *
-  binder list * pty option * Ity.mask * spec * expr
+  binder list * pty option * pattern * Ity.mask * spec * expr
 
 (** {2 Declarations} *)
 

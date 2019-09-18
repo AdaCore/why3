@@ -90,10 +90,10 @@
   let apply_partial part e =
     if part <> Partial then e else
     let ed = match e.expr_desc with
-      | Efun (_::_ as bl, op, m, s, ex) ->
-          Efun (bl, op, m, apply_partial_sp part s, ex)
-      | Eany (_::_ as pl, rsk, op, m, s) ->
-          Eany (pl, rsk, op, m, apply_partial_sp part s)
+      | Efun (_::_ as bl, op, p, m, s, ex) ->
+          Efun (bl, op, p, m, apply_partial_sp part s, ex)
+      | Eany (_::_ as pl, rsk, op, p,  m, s) ->
+          Eany (pl, rsk, op, p, m, apply_partial_sp part s)
       | _ ->
           Loc.errorm ~loc:e.expr_loc
             "this expression cannot be declared partial" in
@@ -872,7 +872,7 @@ rec_defn:
       let spec = apply_return pat (spec_union $6 $8) in
       let id = mk_id return_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id, mask, $9) } in
-      $3, ghost $1, $2, $4, ty, mask, apply_partial_sp $1 spec, e }
+      $3, ghost $1, $2, $4, ty, pat, mask, apply_partial_sp $1 spec, e }
 
 fun_defn:
 | binders return_opt spec EQUAL spec seq_expr
@@ -880,17 +880,17 @@ fun_defn:
       let spec = apply_return pat (spec_union $3 $5) in
       let id = mk_id return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, mask, $6) } in
-      Efun ($1, ty, mask, spec, e) }
+      Efun ($1, ty, pat, mask, spec, e) }
 
 fun_decl:
 | params1 return_opt spec
     { let pat, ty, mask = $2 in
-      Eany ($1, Expr.RKnone, ty, mask, apply_return pat $3) }
+      Eany ($1, Expr.RKnone, ty, pat, mask, apply_return pat $3) }
 
 const_decl:
 | return_opt spec
     { let pat, ty, mask = $1 in
-      Eany ([], Expr.RKnone, ty, mask, apply_return pat $2) }
+      Eany ([], Expr.RKnone, ty, pat, mask, apply_return pat $2) }
 
 const_defn:
 | cast EQUAL seq_expr   { { $3 with expr_desc = Ecast ($3, $1) } }
@@ -909,7 +909,8 @@ seq_expr:
 contract_expr:
 | assign_expr %prec prec_no_spec  { $1 }
 | assign_expr single_spec spec
-    { let d = Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $1) in
+    { let p = mk_pat Pwild $startpos $endpos in
+      let d = Efun ([], None, p, Ity.MaskVisible, spec_union $2 $3, $1) in
       let d = Eattr (ATstr Vc.wb_attr, mk_expr d $startpos $endpos) in
       mk_expr d $startpos $endpos }
 
@@ -1019,7 +1020,8 @@ single_expr_:
 | FUN binders spec ARROW spec seq_expr
     { let id = mk_id return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, Ity.MaskVisible, $6) } in
-      Efun ($2, None, Ity.MaskVisible, spec_union $3 $5, e) }
+      let p = mk_pat Pwild $startpos $endpos in
+      Efun ($2, None, p, Ity.MaskVisible, spec_union $3 $5, e) }
 | ANY return_named spec
     { let pat, ty, mask = $2 in
       let loc = floc $startpos $endpos in
@@ -1034,7 +1036,8 @@ single_expr_:
         "this expression must terminate";
       let pre = pre_of_any loc ty spec.sp_post in
       let spec = { spec with sp_pre = spec.sp_pre @ pre } in
-      Eany ([], Expr.RKnone, Some ty, mask, spec) }
+      let p = mk_pat Pwild $startpos $endpos in
+      Eany ([], Expr.RKnone, Some ty, p, mask, spec) }
 | VAL ghost kind attrs(lident_rich) mk_expr(fun_decl) IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | VAL ghost kind sym_binder mk_expr(const_decl) IN seq_expr
@@ -1132,10 +1135,12 @@ expr_dot_:
 
 expr_block_:
 | BEGIN single_spec spec seq_expr END
-    { Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $4) }
+    { let p = mk_pat Pwild $startpos $endpos in
+      Efun ([], None, p, Ity.MaskVisible, spec_union $2 $3, $4) }
 | BEGIN single_spec spec END
     { let e = mk_expr (Etuple []) $startpos $endpos in
-      Efun ([], None, Ity.MaskVisible, spec_union $2 $3, e) }
+      let p = mk_pat Pwild $startpos $endpos in
+      Efun ([], None, p, Ity.MaskVisible, spec_union $2 $3, e) }
 | BEGIN seq_expr END                                { $2.expr_desc }
 | LEFTPAR seq_expr RIGHTPAR                         { $2.expr_desc }
 | BEGIN END                                         { Etuple [] }

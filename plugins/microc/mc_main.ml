@@ -288,10 +288,12 @@ let decl = function
     let body = List.fold_left local body idl in
     let param (_ty, id) = id.id_loc, Some id, false, None in
     let params = if idl = [] then no_params ~loc else List.map param idl in
+    let p = mk_pat ~loc Pwild in
     let d = if stmt_has_call id bl then
-      Drec ([id, false, Expr.RKnone, params, None, Ity.MaskVisible, sp, body])
+      Drec ([id, false, Expr.RKnone, params, None,
+             p, Ity.MaskVisible, sp, body])
     else
-      let e = Efun (params, None, Ity.MaskVisible, sp, body) in
+      let e = Efun (params, None, p, Ity.MaskVisible, sp, body) in
       Dlet (id, false, Expr.RKnone, mk_expr ~loc e) in
     Typing.add_decl loc d
   | Mc_ast.Dlogic (ty, id, idl, def) ->
