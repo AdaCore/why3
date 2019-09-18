@@ -91,7 +91,7 @@ let rec fmla_find_subst boundvars var sign f =
         fmla_find_subst boundvars var sign f'
     | Tbinop (_, _, _) | Tif ( _, _, _)  | Tcase (_, _)
     | Tapp _ | Tfalse | Ttrue -> ()
-    | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+    | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
 
 (* Simplify out equalities that could be selected. *)
 let rec equ_simp f = t_attr_copy f (match f.t_node with

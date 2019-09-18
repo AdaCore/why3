@@ -80,7 +80,7 @@ let rec dequant pos f = t_attr_copy f (match f.t_node with
       let _,_,f1 = t_open_quant fq in
       dequant false f1
   | Tquant _ | Ttrue | Tfalse | Tapp _ -> f
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f))
+  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f))
 
 and dequant_if_case pos f = if case f then dequant pos f else f
 

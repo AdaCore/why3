@@ -627,9 +627,10 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     end
                 | _ -> raise (NoMatch (Some (t1, t2, None)))
                 end
-            | (Tconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
+            | (Tconst _ | Tsconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
                 loop bound_vars sigma r1 r2
-            | Tconst _ | Ttrue | Tfalse -> raise (NoMatch (Some (t1, t2, None)))
+            | Tconst _ | Tsconst _ | Ttrue | Tfalse ->
+               raise (NoMatch (Some (t1, t2, None)))
         end
       | _ -> raise (NoMatch None)
   in
@@ -867,7 +868,7 @@ and reduce_eval st t ~orig sigma rem =
     { value_stack = st;
       cont_stack = List.rev_append args ((Kapp(ls,t.t_ty),orig) :: rem);
     }
-  | Ttrue | Tfalse | Tconst _ ->
+  | Ttrue | Tfalse | Tconst _ | Tsconst _ ->
     { value_stack = Term orig :: st;
       cont_stack = rem;
     }

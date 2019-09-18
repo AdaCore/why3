@@ -255,6 +255,8 @@ let rec print_term info fmt t =
             the literal. Do we ensure that preserved literal types
             are exactly those that have a dedicated syntax? *)
       end
+  | Tsconst s ->
+      fprintf fmt "\"%s\"" s
   | Tvar v -> print_var info fmt v
   | Tapp (ls, tl) ->
     begin match query_syntax info.info_syn ls.ls_name with
@@ -399,7 +401,7 @@ and print_fmla info fmt f =
             (print_branches info subject print_fmla) bl;
           forget_var info subject
     end
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f) in
+  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f) in
 
   check_exit_vc_term f info.info_in_goal info.info_vc_term
 

@@ -240,12 +240,14 @@ val ty_unit : ty
 val its_int  : itysymbol
 val its_real : itysymbol
 val its_bool : itysymbol
+val its_str  : itysymbol
 val its_unit : itysymbol
 val its_func : itysymbol
 
 val ity_int  : ity
 val ity_real : ity
 val ity_bool : ity
+val ity_str  : ity
 val ity_unit : ity
 val ity_func : ity -> ity -> ity
 val ity_pred : ity -> ity (* ity_pred 'a == ity_func 'a ity_bool *)

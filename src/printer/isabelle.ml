@@ -236,6 +236,8 @@ let rec print_term info defs fmt t = match t.t_node with
                 Number.print number_format fmt c
               else raise (UnsupportedTerm (t, "floating-point literal"))
       end
+  | Tsconst _ -> unsupportedTerm t
+      "isabelle: strings not supported"
   | Tif (f, t1, t2) ->
       print_app print_const (print_term info defs) fmt ("HOL.If", [f; t1; t2])
   | Tlet (t1, tb) ->

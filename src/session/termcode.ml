@@ -261,6 +261,7 @@ let tag_and = 'A'
 let tag_app = 'a'
 let tag_case = 'C'
 let tag_const = 'c'
+let tag_sconst = 'S'
 let tag_exists = 'E'
 let tag_eps = 'e'
 let tag_forall = 'F'
@@ -343,6 +344,12 @@ let const_shape v c =
   Format.pp_print_flush fmt ();
   check ()
 
+let sconst_shape s =
+  let fmt = Format.formatter_of_buffer shape_buffer in
+  Format.fprintf fmt "\"%s\"" s;
+  Format.pp_print_flush fmt ();
+  check ()
+
 let rec pat_shape ~version c m p : 'a =
   match p.pat_node with
     | Pwild -> pushc tag_wild
@@ -362,6 +369,7 @@ let rec t_shape ~version c m t =
   let fn = t_shape ~version c m in
   match t.t_node with
     | Tconst c -> pushc tag_const; const_shape version c
+    | Tsconst s -> pushc tag_sconst; sconst_shape s
     | Tvar v -> pushc tag_var;
         begin match version with
         | SV1 | SV2 | SV3 | SV4 | SV5 -> ident_v5 m v.vs_name
@@ -664,6 +672,11 @@ module Checksum = struct
     end;
     Format.pp_print_flush fmt ()
 
+  let sconst (_,_,_,buf) s =
+    let fmt = Format.formatter_of_buffer buf in
+    Format.fprintf fmt "\"%s\"" s;
+    Format.pp_print_flush fmt ()
+
   let tvsymbol b tv = ident b tv.Ty.tv_name
 
   let rec ty b t = match t.Ty.ty_node with
@@ -685,6 +698,7 @@ module Checksum = struct
   (* start: c V v i m e F E A O I q l n t f *)
   let rec term b t = match t.t_node with
     | Tconst c -> const b c
+    | Tsconst s -> sconst b s
     | Tvar v -> char b 'v'; ident b v.vs_name
     | Tapp (s, l) -> char b 'a'; ident b s.ls_name; list term b l
     | Tif (f, t1, t2) -> char b 'i'; term b f; term b t1; term b t2

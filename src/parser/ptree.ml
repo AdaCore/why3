@@ -78,6 +78,7 @@ and term_desc =
   | Ttrue
   | Tfalse
   | Tconst of Number.constant
+  | Tsconst of string
   | Tident of qualid
   | Tasref of qualid
   | Tidapp of qualid * term list
@@ -131,6 +132,7 @@ and expr_desc =
   | Etrue
   | Efalse
   | Econst of Number.constant
+  (* | Esconst of string *)
   (** lambda-calculus *)
   | Eident of qualid
   | Easref of qualid

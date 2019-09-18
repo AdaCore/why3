@@ -25,6 +25,7 @@ valid "^unsat$"
 theory BuiltIn
   syntax type int   "Int"
   syntax type real  "Real"
+  syntax type string "String"
   syntax predicate (=)  "(= %1 %2)"
 
   meta "encoding:kept" type int
@@ -195,4 +196,24 @@ end
 theory map.Const
   meta "encoding:lskept" function const
 (*  syntax function const "(const[%t0] %1)" *)
+end
+
+theory newstring.String
+
+  prelude ";;; SMT-LIB2: string theory"
+
+  syntax function concat2    "(str.++ %1 %2)"
+  syntax function concat3    "(str.++ %1 %2 %3)"
+  syntax function concat4    "(str.++ %1 %2 %3 %4)"
+  syntax function concat5    "(str.++ %1 %2 %3 %4 %5)"
+  syntax function length     "(str.len %1)"
+  syntax function indexof    "(str.indexof %1 %2 %3)"
+  syntax function replace    "(str.replace %1 %2 %3)"
+  syntax function replaceall "(str.replaceall %1 %2 %3)"
+  syntax function substring  "(str.substr %1 %2 %3)"
+  syntax function ([])       "(str.at %1 %2)"
+
+  syntax predicate contains "(str.contains %1 %2)"
+  syntax predicate prefixof "(str.prefixof %1 %2)"
+  syntax predicate suffixof "(str.suffixof %1 %2)"
 end

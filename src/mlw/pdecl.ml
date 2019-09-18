@@ -571,10 +571,12 @@ open Theory
    Therefore we match the exact contents of th_decls, and crash if it
    is not what we expect. *)
 
-let pd_int, pd_real, pd_equ = match builtin_theory.th_decls with
-  | [{td_node = Decl di}; {td_node = Decl dr}; {td_node = Decl de}] ->
+let pd_int, pd_real, pd_str, pd_equ = match builtin_theory.th_decls with
+  | [{td_node = Decl di}; {td_node = Decl dr};
+     {td_node = Decl ds}; {td_node = Decl de}] ->
       mk_decl (PDtype [mk_itd its_int  [] [] [] []]) [di],
       mk_decl (PDtype [mk_itd its_real [] [] [] []]) [dr],
+      mk_decl (PDtype [mk_itd its_str  [] [] [] []]) [ds],
       mk_decl PDpure [de]
   | _ -> assert false
 

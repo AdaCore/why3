@@ -388,6 +388,8 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       chain loc (dterm ns km crcmap gvars at denv e1) op1 e23
   | Ptree.Tconst (Number.ConstInt _ as c) ->
       DTconst (c, dty_int)
+  | Ptree.Tsconst s ->
+      DTsconst s
   | Ptree.Tconst (Number.ConstReal _ as c) ->
       DTconst (c, dty_real)
   | Ptree.Tlet (x, e1, e2) ->
@@ -841,11 +843,11 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
       let d1 = eff_dterm muc denv e1 in
       DEcast (d1, dity_of_pty muc pty)
   | Ptree.Tat _ -> Loc.errorm ~loc "`at' and `old' cannot be used here"
-  | Ptree.Tidapp _ | Ptree.Tconst _ | Ptree.Tinfix _ | Ptree.Tinnfix _
-  | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tcase _ | Ptree.Tif _
-  | Ptree.Ttrue | Ptree.Tfalse | Ptree.Tnot _ | Ptree.Tbinop _ | Ptree.Tbinnop _
-  | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ ->
-      Loc.errorm ~loc "unsupported effect expression")
+  | Ptree.Tidapp _ | Ptree.Tconst _ | Ptree.Tsconst _ | Ptree.Tinfix _
+  | Ptree.Tinnfix _ | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tcase _
+  | Ptree.Tif _ | Ptree.Ttrue | Ptree.Tfalse | Ptree.Tnot _
+  | Ptree.Tbinop _ | Ptree.Tbinnop _ | Ptree.Tquant _ | Ptree.Trecord _
+  | Ptree.Tupdate _ -> Loc.errorm ~loc "unsupported effect expression")
 
 let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   let expr_app loc e el =

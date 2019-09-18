@@ -103,6 +103,8 @@ let ls_of_const =
       match t.t_node with
       | Tconst c ->
         cst (Pp.string_of_wnl (Number.print ls_of_const_format) c)
+      | Tsconst s ->
+         cst s
       | _ -> assert false))
 
 (* unprotected and unprotecting idents *)
@@ -132,10 +134,10 @@ let t_monomorph ty_base kept lsmap consts vmap t =
   let rec t_mono vmap t = t_attr_copy t (match t.t_node with
     | Tvar v ->
         Mvs.find v vmap
-    | Tconst _ when ty_equal (t_type t) ty_base ||
+    | Tconst _ | Tsconst _ when ty_equal (t_type t) ty_base ||
                     Sty.mem  (t_type t) kept ->
         t
-    | Tconst _ ->
+    | Tconst _ | Tsconst _ ->
         let ls = ls_of_const ty_base t in
         consts := Sls.add ls !consts;
         fs_app ls [] ty_base

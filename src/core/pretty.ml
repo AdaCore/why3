@@ -354,6 +354,7 @@ and print_tnode pri fmt t = match t.t_node with
                             print_ty ty
        | None -> assert false
      end
+  | Tsconst s -> fprintf fmt "\"%s\"" s
   | Tapp (_, [t1]) when Sattr.mem coercion_attr t.t_attrs &&
                         Debug.test_noflag debug_print_coercions ->
       print_lterm pri fmt (t_attr_set t1.t_attrs t1)

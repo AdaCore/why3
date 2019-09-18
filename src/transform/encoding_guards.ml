@@ -47,7 +47,7 @@ let ps_sort =
 (* add to [svs] each variable that [t] may be equal to *)
 let rec collect svs t = match t.t_node with
   | Tvar v -> Svs.add v svs
-  | Tapp _ | Tconst _ -> svs
+  | Tapp _ | Tconst _ | Tsconst _ -> svs
   | Tif (_,t1,t2) ->
       collect (collect svs t1) t2
   | Tlet (t1, b) ->

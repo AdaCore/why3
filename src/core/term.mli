@@ -126,6 +126,7 @@ type term = private {
 and term_node =
   | Tvar of vsymbol
   | Tconst of Number.constant
+  | Tsconst of string
   | Tapp of lsymbol * term list
   | Tif of term * term * term
   | Tlet of term * term_bound
@@ -223,6 +224,7 @@ val check_literal : Number.constant -> ty -> unit
 
 val t_var : vsymbol -> term
 val t_const : Number.constant -> ty -> term
+val t_sconst : string -> term
 val t_if : term -> term -> term -> term
 val t_let : term -> term_bound -> term
 val t_case : term -> term_branch list -> term

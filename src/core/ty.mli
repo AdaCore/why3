@@ -142,10 +142,12 @@ val ty_equal_check : ty -> ty -> unit
 val ts_int  : tysymbol
 val ts_real : tysymbol
 val ts_bool : tysymbol
+val ts_str  : tysymbol
 
 val ty_int  : ty
 val ty_real : ty
 val ty_bool : ty
+val ty_str  : ty
 
 val ts_func : tysymbol
 

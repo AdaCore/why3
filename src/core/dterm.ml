@@ -106,6 +106,7 @@ let rec dty_unify dty1 dty2 = match dty1,dty2 with
 let dty_int  = Duty ty_int
 let dty_real = Duty ty_real
 let dty_bool = Duty ty_bool
+let dty_str  = Duty ty_str
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
@@ -207,6 +208,7 @@ and dterm_node =
   | DTvar of string * dty
   | DTgvar of vsymbol
   | DTconst of Number.constant * dty
+  | DTsconst of string
   | DTapp of lsymbol * dterm list
   | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm
@@ -433,6 +435,8 @@ let dterm crcmap ?loc node =
         mk_dty (Some (dty_of_ty vs.vs_ty))
     | DTconst (_,dty) ->
         mk_dty (Some dty)
+    | DTsconst _ ->
+        mk_dty (Some dty_str)
     | DTapp (ls, dtl) when ls_equal ls ps_equ ->
        let dtyl, dty = specialize_ls ls in
        let max = max_dty crcmap dtl in
@@ -623,6 +627,8 @@ and try_term strict keep_loc uloc env prop dty node =
       t_var vs
   | DTconst (c,dty) ->
       t_const c (term_ty_of_dty ~strict dty)
+  | DTsconst s ->
+      t_sconst s
   | DTapp (ls,[]) when ls_equal ls fs_bool_true ->
       if prop then t_true else t_bool_true
   | DTapp (ls,[]) when ls_equal ls fs_bool_false ->

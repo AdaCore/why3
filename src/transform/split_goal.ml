@@ -430,7 +430,7 @@ let rec split_core sp f =
       in
       let side = map (fun t -> Zero t) (t_forall_close vsl trl) sf.side in
       ret pos neg bwd fwd side cpos cneg
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
   in
   let r = if case f then
     { r with cpos = sp.cpos_split; cneg = sp.cneg_split } else r in

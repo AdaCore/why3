@@ -173,6 +173,8 @@ let rec print_term info fmt t =
   let () = match t.t_node with
   | Tconst c ->
       Number.print number_format fmt c
+  | Tsconst _ -> unsupportedTerm t
+      "alt-ergo: strings not supported"
   | Tvar { vs_name = id } ->
       print_ident info fmt id
   | Tapp (ls, tl) ->
@@ -308,7 +310,7 @@ and print_fmla_node info fmt f = match f.t_node with
       forget_var info v
   | Tcase _ -> unsupportedTerm f
       "alt-ergo: you must eliminate match"
-  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)

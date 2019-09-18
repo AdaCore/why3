@@ -225,6 +225,7 @@ type term = {
 and term_node =
   | Tvar of vsymbol
   | Tconst of Number.constant
+  | Tsconst of string
   | Tapp of lsymbol * term list
   | Tif of term * term * term
   | Tlet of term * term_bound
@@ -332,6 +333,8 @@ let t_compare trigger attr loc t1 t2 =
               comp_raise (vs_compare v1 v2)
           | Tconst c1, Tconst c2 ->
               comp_raise (Number.compare_const c1 c2)
+          | Tsconst s1, Tsconst s2 ->
+              comp_raise (Pervasives.compare s1 s2)
           | Tapp (s1,l1), Tapp (s2,l2) ->
               comp_raise (ls_compare s1 s2);
               List.iter2 (t_compare bnd vml1 vml2) l1 l2
@@ -380,17 +383,18 @@ let t_compare trigger attr loc t1 t2 =
               t_compare bnd vml1 vml2 f1 f2
           | Ttrue, Ttrue -> ()
           | Tfalse, Tfalse -> ()
-          | Tvar _, _   -> raise CompLT | _, Tvar _   -> raise CompGT
-          | Tconst _, _ -> raise CompLT | _, Tconst _ -> raise CompGT
-          | Tapp _, _   -> raise CompLT | _, Tapp _   -> raise CompGT
-          | Tif _, _    -> raise CompLT | _, Tif _    -> raise CompGT
-          | Tlet _, _   -> raise CompLT | _, Tlet _   -> raise CompGT
-          | Tcase _, _  -> raise CompLT | _, Tcase _  -> raise CompGT
-          | Teps _, _   -> raise CompLT | _, Teps _   -> raise CompGT
-          | Tquant _, _ -> raise CompLT | _, Tquant _ -> raise CompGT
-          | Tbinop _, _ -> raise CompLT | _, Tbinop _ -> raise CompGT
-          | Tnot _, _   -> raise CompLT | _, Tnot _   -> raise CompGT
-          | Ttrue, _    -> raise CompLT | _, Ttrue    -> raise CompGT
+          | Tvar _, _    -> raise CompLT | _, Tvar _    -> raise CompGT
+          | Tconst _, _  -> raise CompLT | _, Tconst _  -> raise CompGT
+          | Tsconst _, _ -> raise CompLT | _, Tsconst _ -> raise CompGT
+          | Tapp _, _    -> raise CompLT | _, Tapp _    -> raise CompGT
+          | Tif _, _     -> raise CompLT | _, Tif _     -> raise CompGT
+          | Tlet _, _    -> raise CompLT | _, Tlet _    -> raise CompGT
+          | Tcase _, _   -> raise CompLT | _, Tcase _   -> raise CompGT
+          | Teps _, _    -> raise CompLT | _, Teps _    -> raise CompGT
+          | Tquant _, _  -> raise CompLT | _, Tquant _  -> raise CompGT
+          | Tbinop _, _  -> raise CompLT | _, Tbinop _  -> raise CompGT
+          | Tnot _, _    -> raise CompLT | _, Tnot _    -> raise CompGT
+          | Ttrue, _     -> raise CompLT | _, Ttrue     -> raise CompGT
           end
     end in
   try t_compare 0 [] [] t1 t2; 0
@@ -450,6 +454,7 @@ let t_hash trigger attr t =
           begin match t.t_node with
           | Tvar v -> vs_hash v
           | Tconst c -> Hashtbl.hash c
+          | Tsconst s -> Hashtbl.hash s
           | Tapp (s,l) ->
               Hashcons.combine_list (t_hash bnd vml) (ls_hash s) l
           | Tif (f,t,e) ->
@@ -574,7 +579,7 @@ let add_b_vars s (_,b,_) = vars_union s b.bv_vars
 
 let rec t_vars t = match t.t_node with
   | Tvar v -> Mvs.singleton v 1
-  | Tconst _ -> Mvs.empty
+  | Tconst _ | Tsconst _ -> Mvs.empty
   | Tapp (_,tl) -> List.fold_left add_t_vars Mvs.empty tl
   | Tif (f,t,e) -> add_t_vars (add_t_vars (t_vars f) t) e
   | Tlet (t,bt) -> add_b_vars (t_vars t) bt
@@ -601,6 +606,7 @@ let mk_term n ty = {
 
 let t_var v         = mk_term (Tvar v) (Some v.vs_ty)
 let t_const c ty    = mk_term (Tconst c) (Some ty)
+let t_sconst s      = mk_term (Tsconst s) (Some ty_str)
 let t_app f tl ty   = mk_term (Tapp (f, tl)) ty
 let t_if f t1 t2    = mk_term (Tif (f, t1, t2)) t2.t_ty
 let t_let t1 bt ty  = mk_term (Tlet (t1, bt)) ty
@@ -630,7 +636,7 @@ let t_attr_copy s t =
 let bound_map fn (u,b,e) = (u, bnd_map fn b, fn e)
 
 let t_map_unsafe fn t = t_attr_copy t (match t.t_node with
-  | Tvar _ | Tconst _ -> t
+  | Tvar _ | Tconst _ | Tsconst _ -> t
   | Tapp (f,tl) -> t_app f (List.map fn tl) t.t_ty
   | Tif (f,t1,t2) -> t_if (fn f) (fn t1) (fn t2)
   | Tlet (e,b) -> t_let (fn e) (bound_map fn b) t.t_ty
@@ -646,7 +652,7 @@ let t_map_unsafe fn t = t_attr_copy t (match t.t_node with
 let bound_fold fn acc (_,b,e) = fn (bnd_fold fn acc b) e
 
 let t_fold_unsafe fn acc t = match t.t_node with
-  | Tvar _ | Tconst _ -> acc
+  | Tvar _ | Tconst _ | Tsconst _ -> acc
   | Tapp (_,tl) -> List.fold_left fn acc tl
   | Tif (f,t1,t2) -> fn (fn (fn acc f) t1) t2
   | Tlet (e,b) -> fn (bound_fold fn acc b) e
@@ -665,7 +671,7 @@ let bound_map_fold fn acc (u,b,e) =
   acc, (u,b,e)
 
 let t_map_fold_unsafe fn acc t = match t.t_node with
-  | Tvar _ | Tconst _ ->
+  | Tvar _ | Tconst _ | Tsconst _ ->
       acc, t
   | Tapp (f,tl) ->
       let acc,sl = Lists.map_fold_left fn acc tl in
@@ -1045,6 +1051,8 @@ let rec t_gen_map fnT fnL m t =
         t_var u
     | Tconst _ ->
         t
+    | Tsconst _ ->
+        t
     | Tapp (fs, tl) ->
         t_app (fnL fs) (List.map fn tl) (Opt.map fnT t.t_ty)
     | Tif (f, t1, t2) ->
@@ -1104,7 +1112,7 @@ let rec t_gen_fold fnT fnL acc t =
   let fn = t_gen_fold fnT fnL in
   let acc = Opt.fold fnT acc t.t_ty in
   match t.t_node with
-  | Tconst _ | Tvar _ -> acc
+  | Tsconst _ | Tconst _ | Tvar _ -> acc
   | Tapp (f, tl) -> List.fold_left fn (fnL acc f) tl
   | Tif (f, t1, t2) -> fn (fn (fn acc f) t1) t2
   | Tlet (t1, (_,b,t2)) -> fn (bnd_fold fn (fn acc t1) b) t2
@@ -1281,7 +1289,7 @@ let rec list_map_cont fnL contL = function
 let t_map_cont fn contT t =
   let contT e = contT (t_attr_copy t e) in
   match t.t_node with
-  | Tvar _ | Tconst _ -> contT t
+  | Tvar _ | Tconst _ | Tsconst _ -> contT t
   | Tapp (fs, tl) ->
       let cont_app tl = contT (t_app fs tl t.t_ty) in
       list_map_cont fn cont_app tl
