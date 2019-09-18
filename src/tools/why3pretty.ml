@@ -1,92 +1,12 @@
 open Format
 open Why3
-open Wstdlib
-open Pmodule
-
-let paths = Queue.create ()
-
-let add_path p = Queue.add p paths
-
-let prefix = ref "IND"
-
-type kind = Inductive
-
-let kind = ref Inductive
-
-let set_kind = function
-  | "inductive" -> kind := Inductive
-  | str -> ksprintf invalid_arg "kind: %s" str
-
-type output = Latex
-
-let output = ref Latex
-
-let set_output = function
-  | "latex" -> output := Latex
-  | str -> ksprintf invalid_arg "output: %s" str
-
-let records = Hashtbl.create 5
-
-let add_record str =
-  let split sep = Str.split (Str.regexp_string sep) in
-  match split ":" str with
-  | [name; fields_str] ->
-      let fields = split "," fields_str in
-      Hashtbl.replace records name fields
-  | _ -> failwith "add_record"
-
-let usage =
-  "Pretty print Why3 declarations (currently only inductive types in LaTeX using mathpartir).\n\
-why3 pretty [options] [--kind=inductive] [--output=latex] [--prefix <prefix>] [--record <name>:<field>,...] ... <module>.<Theory>.<ind_type> ..."
-
-let options = [
-  "--kind",   Arg.String set_kind,      "<category> Syntactic category to be printed (only: inductive)";
-  "--output", Arg.String set_output,    "<output> Output format (only: latex)";
-  "--prefix", Arg.String ((:=) prefix), "<prefix> Prefix for LaTeX commands (default for output latex: IND)";
-  "--record", Arg.String add_record,    "<name>:<field>,... Reconstruct record update {v with f=e; ...} from record constructions {f=e; ...}";
-]
-
-let config, _, env = Whyconf.Args.initialize options add_path usage
-
-(** {2 Simplified tree}*)
-
-type myid = string
-
-type mypattern =
-  | Wild
-  | Var' of myid
-  | Or of mypattern * mypattern
-  | As of mypattern * myid
-  | App' of string * mypattern list
-
-type myterm =
-  | True
-  | False
-  | Var of myid
-  | Int of BigInt.t
-  | Not of myterm
-  | Quant of Term.quant * myid list * myterm
-  | Binop of Term.binop * myterm * myterm
-  | App of string * myterm list
-  | Equality of myid * myterm
-  | Nonequality of myterm * myterm
-  | Let of myid * myterm * myterm
-  | Case of myterm * (mypattern * myterm) list
-  | If of myterm * myterm * myterm
-  | Update of myid * (string * myterm) list
+open Ptree
 
 (** {2 Pretty print simplified AST}*)
 
 let sanitize =
   let my_char_to_alpha = function
-    | '_' | ' ' -> ""
-    | c -> Ident.char_to_alpha c
-  in
-  Ident.sanitizer my_char_to_alpha my_char_to_alpha
-
-let sanitize2 =
-  let my_char_to_alpha = function
-    | '\'' -> "\'"
+    (* | '_' | '.' -> "" *)
     | c -> Ident.char_to_alpha c
   in
   Ident.sanitizer my_char_to_alpha my_char_to_alpha
@@ -113,10 +33,28 @@ let split_word str =
   with Not_found ->
     None
 
+(** Requirements *)
+
+type command_shape = {name: string; arity: int}
+
+module Requirements = Set.Make (struct type t = command_shape let compare = compare end)
+
+let requirements = ref Requirements.empty
+
+let record_requirement name arity =
+  let name =
+    match split_word name with
+    | None -> name
+    | Some (base, _, _) -> base
+  in
+  requirements := Requirements.add {name; arity} !requirements
+
+(** {2 Printers} *)
+
 (** Print a string suitable as a LaTeX command name *)
-let latex_command' fmt str =
+let pp_command' ~prefix fmt str =
   let open Ident in
-  pp_print_string fmt !prefix;
+  pp_print_string fmt prefix;
   match sn_decode str with
   | SNword str ->
     begin match split_word str with
@@ -149,241 +87,35 @@ let latex_command' fmt str =
   | SNrcut str -> fprintf fmt "rcut%s" (sanitize str)
 
 (** Print a string as a LaTeX command *)
-let latex_command fmt str =
-  fprintf fmt "\\%a" latex_command' str
+let pp_command ~prefix ~arity fmt str =
+  record_requirement str arity;
+  let str =
+    let suffix =
+      if arity = 0 then
+        ""
+      else
+        Ident.sanitizer Ident.char_to_alpha Ident.char_to_alpha
+          (string_of_int arity) in
+    str^suffix in
+  fprintf fmt "\\%a" (pp_command' ~prefix) str
 
-(** {2 Import from Why3 [pmodule]}*)
+let pp_str str fmt () = fprintf fmt str
 
-(** {3 Record command names with arity to print dummy command definitions as comments}*)
-
-type command_shape = {name: string; arity: int}
-
-module Requirements = Set.Make (struct type t = command_shape let compare = compare end)
-
-let requirements = ref Requirements.empty
-
-let record_requirement name arity =
-  let name =
-    match split_word name with
-    | None -> name
-    | Some (base, _, _) -> base
-  in
-  requirements := Requirements.add {name; arity} !requirements
-
-let pp_requires fmt requirements =
+let pp_requirement ~prefix ~comment_macros fmt {name; arity} =
   let rec mk_args acc = function
     | 0 -> acc
-    | n -> mk_args (sprintf "#%d" n::acc) (n-1)
-  in
+    | n -> mk_args (sprintf "#%d" n::acc) (pred n) in
   let pp_args fmt n =
     if n = 0 then
       ()
     else
       let args = mk_args [] n in
-      let pp_sep fmt () = fprintf fmt ", " in
-      fprintf fmt "(%a)" (pp_print_list ~pp_sep pp_print_string) args
-  in
-  let aux {name; arity} =
-    fprintf fmt "%% \\newcommand{%a}[%d]{\\texttt{%a}%a}@."
-      latex_command name arity latex_command' name pp_args arity
-  in
-  Requirements.iter aux requirements
+      fprintf fmt "(%a)" (pp_print_list ~pp_sep:(pp_str ", ") pp_print_string) args in
+  fprintf fmt "%s\\newcommand{%a}[%d]{\\texttt{%s}%a}@."
+    (if comment_macros then "%% " else "")
+    (pp_command ~prefix ~arity) name arity name pp_args arity
 
-let rec import_pattern p : mypattern =
-  let open Term in
-  match p.pat_node with
-  | Pwild -> Wild
-  | Pvar v ->
-    let s = v.vs_name.Ident.id_string in
-    record_requirement s 0;
-    Var' s
-  | Papp (ls, ps) ->
-      let s = ls.ls_name.Ident.id_string in
-      record_requirement s (List.length ps);
-      App' (s, List.map import_pattern ps)
-  | Por (p1, p2) -> Or (import_pattern p1, import_pattern p2)
-  | Pas (p, s) -> As (import_pattern p, s.vs_name.Ident.id_string)
-
-(** {2 Reconstruct record update}
-
-    It's a hack but it seems to work, and is required, as long as there is
-    no [Ptree] AST available from the parser.*)
-
-(** A field value is either the field value of a variable [f=x.f] or an assignment of a
-   term [f=t] *)
-type field_value = Copy_field of string | Other_term of myterm
-module FVMap = Map.Make (struct type t = field_value let compare = compare end)
-
-let reconstruct_record ts fs =
-  let copy_assigns =
-    let aux f = function
-      | App (s, [Var x]) when s = f ->
-          Copy_field x
-      | t ->
-          Other_term t
-    in
-    List.map2 aux fs ts
-  in
-  let counts =
-    let aux fmap ca =
-      let n = try 1 + FVMap.find ca fmap with Not_found -> 1 in
-      FVMap.add ca n fmap
-    in
-    List.fold_left aux FVMap.empty copy_assigns |>
-    FVMap.bindings |>
-    List.sort (fun (_, x) (_, y) -> compare y x)
-  in
-  match counts with
-  | (Copy_field x, n) :: _ ->
-      if float_of_int (List.length fs) /. 2. <= float_of_int n then
-        let aux f = function
-          | Copy_field y when y = x -> None
-          | Copy_field y -> Some (f, App (f,  [Var y]))
-          | Other_term t -> Some (f, t)
-        in
-        let fields =
-          List.map2 aux fs copy_assigns |>
-          List.filter (fun o -> o <> None) |>
-          List.map (function Some x -> x | None -> assert false)
-        in
-        Update (x,  fields)
-      else
-        invalid_arg "Not enough copies"
-  | _ -> invalid_arg "Max not copy"
-
-let rec reconstruct_records ts = function
-  | [] -> invalid_arg "Empty records"
-  | fs :: records' ->
-      try reconstruct_record ts fs
-      with Invalid_argument _ ->
-        reconstruct_records ts records'
-
-(** {2 Import Why3 [Pmodule] AST to simplified AST} *)
-
-let rec import_term t : myterm =
-  let open Term in
-  match t.t_node with
-  | Tvar v ->
-    let s = v.vs_name.Ident.id_string in
-    record_requirement s 0;
-    Var s
-  | Tconst (Number.ConstInt i) -> Int i.Number.il_int
-  | Tconst (Number.ConstReal _) -> failwith "import_term: real"
-  | Tquant (q, t') ->
-      let vsl, _, t = t_open_quant t' in
-      let aux vs =
-        let s = vs.vs_name.Ident.id_string in
-        record_requirement s 0;
-        s
-      in
-      Quant (q, List.map aux vsl, import_term t)
-  | Tbinop (op, t1, t2) ->
-      Binop (op, import_term t1, import_term t2)
-  | Tapp (ls, ts) -> begin
-      let s = ls.ls_name.Ident.id_string in
-      let ts = List.map import_term ts in
-      try
-        let re = Str.regexp "mk \\(.*\\)" in
-        if Str.string_match re s 0 then (* Is record constructor *)
-          let name = Str.matched_group 1 s in
-          try
-            let fs = Hashtbl.find records name in
-            reconstruct_record ts fs
-          with Not_found ->
-            invalid_arg "Unknown record"
-        else
-          invalid_arg "Not a record constructor"
-      with Invalid_argument _ ->
-        record_requirement s (List.length ts);
-        App (s, ts)
-    end
-  | Tlet (t1, t2') ->
-      let vs, t2 = t_open_bound t2' in
-      let s = vs.vs_name.Ident.id_string in
-      record_requirement s 0;
-      Let (s, import_term t1, import_term t2)
-  | Tnot {t_node=Tapp (ls, [t1; t2])} when ls.ls_name.Ident.id_string = "infix =" ->
-      Nonequality (import_term t1, import_term t2)
-  | Tnot t' -> Not (import_term t')
-  | Ttrue -> True
-  | Tfalse -> False
-  | Tcase (t, bs) ->
-      let aux b =
-        let p, t = t_open_branch b in
-        import_pattern p, import_term t
-      in
-      Case (import_term t, List.map aux bs)
-  | Tif (t1, t2, t3) -> If (import_term t1, import_term t2, import_term t3)
-  | Teps _ -> failwith "import_term: epsilone not implemented"
-
-(** Flatten toplevel implies, let bindings, and universal quantifications *)
-let rec flatten_implies t : myterm list =
-  let open Term in
-  match t.t_node with
-  | Tbinop (Timplies, t1, t2) ->
-      import_term t1 :: flatten_implies t2
-  | Tquant (Tforall, t') ->
-      let _, _, t = t_open_quant t' in
-      flatten_implies t
-  | Tlet (t1, t2') ->
-    let vs, t2 = t_open_bound t2' in
-    let s = vs.vs_name.Ident.id_string in
-    record_requirement s 0;
-    Equality (s, import_term t1) ::
-    flatten_implies t2
-  | _ -> [import_term t]
-
-(** {2 Print simplified AST in LaTeX}*)
-
-let rec latex_pattern fmt p =
-  match p with
-  | Wild -> fprintf fmt "\\textit{anything}"
-  | Var' s -> latex_command fmt s
-  | App' (s, ps) ->
-      let pp_sep fmt () = pp_print_string fmt "" in
-      let pp fmt = fprintf fmt "{%a}" latex_pattern in
-      fprintf fmt "%a%a" latex_command s (pp_print_list ~pp_sep pp) ps
-  | Or (p1, p2) -> fprintf fmt "%a~\\text{or}~%a" latex_pattern p1 latex_pattern p2
-  | As (p, s) -> fprintf fmt "%a~\\text{as}~%a" latex_pattern p latex_command s
-
-let rec latex_term fmt t =
-  let open Term in
-  match t with
-  | True -> fprintf fmt "\\top"
-  | False -> fprintf fmt "\\bot"
-  | Var s -> latex_command fmt s
-  | Int i -> fprintf fmt "%s" (BigInt.to_string i)
-  | Not t -> fprintf fmt "\\neg %a" latex_term t
-  | Quant (q, vs, t) ->
-      let q = match q with Tforall -> "\\forall" | Texists -> "\\exists" in
-      let pp_sep fmt () = pp_print_string fmt " " in
-      fprintf fmt "%s %a.~%a" q (pp_print_list ~pp_sep latex_command) vs latex_term t
-  | Binop (op, t1, t2) ->
-      let op = match op with Tand -> "\\wedge" | Tor -> "\\vee" | Timplies -> "\\rightarrow" | Tiff -> "\\leftrightarrow" in
-      fprintf fmt "%a %s %a" latex_term t1 op latex_term t2
-  | Update (id, fs) ->
-      let pp_sep fmt () = fprintf fmt ";@ " in
-      let pp_f fmt (s, t) = fprintf fmt "%afield \\leftarrow %a" latex_command s latex_term t in
-      fprintf fmt "%a[%a]" latex_command id (pp_print_list ~pp_sep pp_f) fs
-  | App (s, ts) -> begin
-      let pp_sep fmt () = pp_print_string fmt "" in
-      let pp fmt = fprintf fmt "{%a}" latex_term in
-      fprintf fmt "%a%a" latex_command s (pp_print_list ~pp_sep pp) ts
-    end
-  | Equality (id, t) ->
-      fprintf fmt "%a = %a" latex_command id latex_term t
-  | Nonequality (t1, t2) ->
-      fprintf fmt "%a \\neq %a" latex_term t1 latex_term t2
-  | Let (v, t1, t2) ->
-      fprintf fmt "\\textbf{let}~%a = %a~\\textbf{in}~%a" latex_command v latex_term t1 latex_term t2
-  | Case (t, bs) ->
-      let pp_sep fmt () = fprintf fmt " | " in
-      let pp_b fmt (p, t') = fprintf fmt "%a \\rightarrow %a" latex_pattern p latex_term t' in
-      fprintf fmt "\\texttt{match}~%a~\\texttt{with}~%a" latex_term t
-        (pp_print_list ~pp_sep pp_b) bs
-  | If (t1, t2, t3) ->
-      fprintf fmt "\\texttt{if}~%a~\\texttt{then}~%a~\\texttt{else}~%a"
-        latex_term t1 latex_term t2 latex_term t3
+(** {2 Pretty-print inductive definition to latex }*)
 
 let latex_rule_name fmt s =
   let f = function
@@ -392,68 +124,269 @@ let latex_rule_name fmt s =
   in
   String.iter f s
 
-let latex_rule fmt (psym, t) =
-  match List.rev t with
+let rec str_of_qualid = function
+  | Qident id -> id.id_str
+  | Qdot (qid, id) -> str_of_qualid qid^"."^id.id_str
+
+let pp_arg pp fmt =
+  fprintf fmt "{%a}" pp
+
+let pp_field ~prefix pp fmt (qid, x) =
+  let str = str_of_qualid qid in
+  fprintf fmt "%a\\texttt{=}%a" (pp_command ~prefix ~arity:0) str (pp ~prefix) x
+
+let rec pp_type ~prefix fmt = function
+  | PTtyvar id ->
+      pp_command ~prefix ~arity:0 fmt id.id_str
+  | PTtyapp (qid, ts) ->
+      let str = str_of_qualid qid in
+      let arity = List.length ts in
+      fprintf fmt "%a%a" (pp_command ~prefix ~arity) str
+        (pp_print_list ~pp_sep:(pp_str "") (pp_arg (pp_type ~prefix))) ts
+  | PTtuple ts ->
+      fprintf fmt "(%a)"
+        (pp_print_list ~pp_sep:(pp_str "") (pp_type ~prefix)) ts
+  | PTarrow (ty1, ty2) ->
+      fprintf fmt "%a \\rightarrow %a"
+        (pp_type ~prefix) ty1 (pp_type ~prefix) ty2
+  | PTscope (qid, ty) ->
+      let str = str_of_qualid qid in
+      fprintf fmt "%a.\\texttt{(}%a\\texttt{)}" (pp_command ~prefix ~arity:0) str (pp_type ~prefix) ty
+  | PTparen ty ->
+      fprintf fmt "(%a)" (pp_type ~prefix) ty
+  | PTpure ty ->
+      fprintf fmt "\\texttt{\\{}%a\\texttt{\\}}" (pp_type ~prefix) ty
+  | PTref _ -> failwith "pp_type: ref"
+
+let rec pp_pattern ~prefix fmt p =
+  match p.pat_desc with
+  | Pwild ->
+      fprintf fmt "\\texttt{anything}"
+  | Pvar id ->
+      fprintf fmt "%a" (pp_command ~prefix ~arity:0) id.id_str
+  | Papp (qid, ps) ->
+      let str = str_of_qualid qid in
+      let arity = List.length ps in
+      fprintf fmt "%a%a" (pp_command ~prefix ~arity) str
+        (pp_print_list ~pp_sep:(pp_str "") (pp_arg (pp_pattern ~prefix))) ps
+  | Prec fs ->
+      fprintf fmt "\\texttt{\\{}%a\texttt{\\}}"
+        (pp_print_list ~pp_sep:(pp_str "\\texttt{;} ") (pp_field ~prefix pp_pattern)) fs
+  | Ptuple ps ->
+      fprintf fmt "(%a)" (pp_print_list ~pp_sep:(pp_str ", ") (pp_pattern ~prefix)) ps
+  | Pas (p, id, _) ->
+      fprintf fmt "%a \texttt{as} %a" (pp_pattern ~prefix) p (pp_command ~prefix ~arity:0) id.id_str
+  | Por (p1, p2) ->
+      fprintf fmt "%a \texttt{|} %a" (pp_pattern ~prefix) p1 (pp_pattern ~prefix) p2
+  | Pcast (p, ty) ->
+      fprintf fmt "%a : %a" (pp_pattern ~prefix) p (pp_type ~prefix) ty
+  | Pscope (qid, p) ->
+      let str = str_of_qualid qid in
+      fprintf fmt "%a.\\texttt{(}%a\\texttt{)}" (pp_command ~prefix ~arity:0) str (pp_pattern ~prefix) p
+  | Pparen p ->
+      fprintf fmt "(%a)" (pp_pattern ~prefix) p
+  | Pghost p ->
+      pp_pattern ~prefix fmt p
+
+let rec pp_term ~prefix fmt t =
+  match t.term_desc with
+  | Ttrue ->
+      fprintf fmt "\\top"
+  | Tfalse ->
+      fprintf fmt "\\bot"
+  | Tconst n ->
+      Number.print_constant fmt n
+  | Tident qid ->
+      let str = str_of_qualid qid in
+      pp_command ~prefix ~arity:0 fmt str
+  | Tidapp (qid, ts) ->
+      let str = str_of_qualid qid in
+      let arity = List.length ts in
+      fprintf fmt "%a%a" (pp_command ~prefix ~arity) str (pp_print_list ~pp_sep:(pp_str "") (pp_term ~prefix)) ts
+  | Tinnfix (t1, id, t2)
+  | Tinfix (t1, id, t2) ->
+      fprintf fmt "%a %s %a" (pp_term ~prefix) t1 id.id_str (pp_term ~prefix) t2
+      (* (match Ident.sn_decode id.id_str with
+       *  | Ident.SNinfix s ->
+       *  | _ ->
+       *      failwith ("pp_term infix: "^id.id_str)) *)
+  | Tapply (t1, t2) ->
+      fprintf fmt "%a %a" (pp_term ~prefix) t1 (pp_term ~prefix) t2
+  | Tbinop (t1, op, t2)
+  | Tbinnop (t1, op, t2) ->
+      let str =
+        let open Dterm in
+        match op with
+        | DTimplies -> "\\rightarrow"
+        | DTiff -> "\\leftrightarrow"
+        | DTand -> "\\wedge"
+        | DTand_asym -> "\\bar\\wedge"
+        | DTor -> "\\vee"
+        | DTor_asym -> "\\bar\\vee"
+        | DTby -> "\\texttt{by}"
+        | DTso -> "\\texttt{so}" in
+      fprintf fmt "%a %s %a" (pp_term ~prefix) t1 str (pp_term ~prefix) t2
+  | Tnot {term_desc=Tinfix (t1, op, t2)} when
+      Ident.sn_decode op.id_str = Ident.SNinfix "=" ->
+      fprintf fmt "%a \\neq %a" (pp_term ~prefix) t1 (pp_term ~prefix) t2
+  | Tnot t ->
+      fprintf fmt "\\neg %a" (pp_term ~prefix) t
+  | Tif (t1, t2, t3) ->
+      fprintf fmt "\\texttt{if}~%a~\\texttt{then}~%a~\\texttt{else}~%a"
+        (pp_term ~prefix) t1 (pp_term ~prefix) t2 (pp_term ~prefix) t3
+  | Tlet (id, t1, t2) ->
+      fprintf fmt "\\textbf{let}~%a = %a~\\textbf{in}~%a" (pp_command ~prefix ~arity:0) id.id_str
+        (pp_term ~prefix) t1 (pp_term ~prefix) t2
+  | Tquant (_, _, _, t) ->
+      pp_term ~prefix fmt t
+  | Tcase (t, bs) ->
+      let pp_sep = pp_str " \\texttt{|} " in
+      let pp_branch fmt (p, t') = fprintf fmt "%a \\rightarrow %a" (pp_pattern ~prefix) p (pp_term ~prefix) t' in
+      fprintf fmt "\\texttt{match}~%a~\\texttt{with}~%a" (pp_term ~prefix) t
+        (pp_print_list ~pp_sep pp_branch) bs
+  | Tcast (t, ty) ->
+      fprintf fmt "%a \texttt{:} %a" (pp_term ~prefix) t (pp_type ~prefix) ty
+  | Ttuple ts ->
+      fprintf fmt "(%a)" (pp_print_list ~pp_sep:(pp_str ", ") (pp_term ~prefix)) ts
+  | Trecord fs ->
+      let pp = pp_print_list ~pp_sep:(pp_str "\\texttt{;} ") (pp_field ~prefix pp_term) in
+      fprintf fmt "\\{%a\\}" pp fs
+  | Tupdate (t, fs) ->
+      let pp_fs = pp_print_list ~pp_sep:(pp_str "\\texttt{;} ") (pp_field ~prefix pp_term) in
+      fprintf fmt "\\{%a \\texttt{with} %a\\}" (pp_term ~prefix) t pp_fs fs
+  | Tscope (qid, t) ->
+      let str = str_of_qualid qid in
+      fprintf fmt "%a.\\texttt{(}%a\\texttt{)}"
+        (pp_command ~prefix ~arity:0) str (pp_term ~prefix) t
+  | Tattr _ -> failwith "pp_term: attr"
+  | Tat _ -> failwith "pp_term: at"
+  | Tasref _ -> failwith "pp_term: asref"
+
+let pp_rule ~prefix fmt (id, terms) : unit =
+  match List.rev terms with
   | [] -> invalid_arg "latex_rule: empty rule"
   | concl :: precs ->
-    let pp_sep fmt () = fprintf fmt "@ \\\\@ " in
-    fprintf fmt "  \\inferrule[%a]@.    {%s%a}@.    {%a} \\\\@."
-      latex_rule_name psym.Decl.pr_name.Ident.id_string
-      (if precs = [] then "~" else "")
-      (pp_print_list ~pp_sep latex_term) (List.rev precs)
-      latex_term concl
+      fprintf fmt "  \\inferrule[%a]@.    {%s%a}@.    {%a} \\\\@."
+        latex_rule_name id.id_str
+        (if precs = [] then "~" else "")
+        (pp_print_list ~pp_sep:(pp_str "@ \\\\@ ") (pp_term ~prefix)) (List.rev precs)
+        (pp_term ~prefix) concl
 
-(** {2 Search inductive type corresponding to ["<module>.<Theory>.<ind_type>"] } *)
+let pp_rules ~prefix fmt path defs =
+  fprintf fmt "\\begin{mathparpagebreakable} %% %s@." (String.concat "." path);
+  List.iter (pp_rule ~prefix fmt) defs;
+  fprintf fmt "\\end{mathparpagebreakable}@."
 
-let split_path path =
-  let path = Strings.split '.' path in
-  let path, s = Lists.chop_last path in
-  let path, m = Lists.chop_last path in
-  path, m, s
-
-let find_module path m =
-  Mstr.find m @@
-  Env.read_library Pmodule.mlw_language env path
-
-exception Found of Term.lsymbol * (Decl.prsymbol * Term.term) list
-
-let search_inductive pm s =
-  let open Pdecl in
-  let open Decl in
-  let search_ind (lsym, ts) =
-    if lsym.Term.ls_name.Ident.id_string = s then
-      raise (Found (lsym, ts))
-  in
-  let search_pure = function
-    | {Decl.d_node=Dind (Ind, li)} ->
-        List.iter search_ind li
-    | _ -> ()
-  in
-  let search_unit = function
-    | Udecl {pd_node=PDpure; pd_pure} ->
-        List.iter search_pure pd_pure
-    | _ -> ()
-  in
+(** Search an inductive type in mlw file by path (module.Theory.type or module.type) *)
+let search_inductive (path: string list) (mlw_file: mlw_file) : ind_decl =
+  let name, decls =
+    match path, mlw_file with
+    | [name], Decls decls -> name, decls
+    | [module_name; name], Modules modules ->
+        let aux (id, _) = String.equal id.id_str module_name in
+        name, snd (List.find aux modules)
+    | _ -> raise Not_found in
+  let exception Found of ind_decl in
   try
-    List.iter search_unit pm.mod_units;
+    let aux = function
+      | Dind (Decl.Ind, ind_decls) ->
+          let aux decl =
+            if String.equal decl.in_ident.id_str name then
+              raise (Found decl) in
+          List.iter aux ind_decls
+      | _ -> () in
+    List.iter aux decls;
     raise Not_found
-  with Found (lsym, def) ->
-    lsym, def
+  with Found decl -> decl
 
-(** {2 Main program}*)
+(** Flatten toplevel implies, let bindings, and universal quantifications *)
+let rec flatten_implies (t: term) : term list =
+  match t.term_desc with
+  | Tbinop (t1, Dterm.DTimplies, t2) ->
+      t1 :: flatten_implies t2
+  | Tquant (Dterm.DTforall, _, _, t) ->
+      flatten_implies t
+  | Tlet (id, t1, t2) ->
+      let equality = (* id = t2 *)
+        let id_term = {term_loc=Loc.dummy_position; term_desc=Tident (Qident id)} in
+        let op = {id_str=Ident.op_infix ""; id_loc=Loc.dummy_position; id_ats=[]} in
+        Tinfix (id_term, op, t1) in
+      {term_loc=Loc.dummy_position; term_desc=equality} ::
+      flatten_implies t2
+  | _ -> [t]
 
-let latex_main fmt path =
-  let path, m, s = split_path path in
-  let pm = find_module path m in
-  match !kind with
-  | Inductive ->
-      let lsym, ind_rules = search_inductive pm s in
-      match !output with
-      | Latex ->
-          let ind_rules = List.map (fun (psym, t) -> psym, flatten_implies t) ind_rules in
-          pp_requires fmt !requirements;
-          fprintf fmt "\\begin{mathparpagebreakable} %% %s@." lsym.Term.ls_name.Ident.id_string;
-          List.iter (latex_rule fmt) ind_rules;
-          fprintf fmt "\\end{mathparpagebreakable}@."
+let main_latex_ind fmt ~prefix mlw_file paths =
+    let buf = Buffer.create 42 in
+    let fmt' = formatter_of_buffer buf in
+    let for_path path =
+      try
+        let decl = search_inductive path mlw_file in
+        let defs = List.map (fun (_, id, t) -> id, flatten_implies t) decl.in_def in
+        pp_rules ~prefix fmt' path defs
+      with Not_found ->
+        eprintf "Could not find %s" (Strings.join "." path) in
+    List.iter for_path paths;
+    Requirements.iter (pp_requirement ~prefix ~comment_macros:true fmt) !requirements;
+    pp_print_string fmt (Buffer.contents buf)
 
-let () = Queue.iter (latex_main std_formatter) paths
+(** {2 Command line interface} *)
+
+let filename = ref None
+
+let paths = Queue.create ()
+
+let add_filename_then_path p =
+  if !filename = None then
+    filename := Some p
+  else
+    Queue.add (Strings.split '.' p) paths
+
+let prefix = ref "IND"
+
+type kind = Inductive
+
+let kind = ref Inductive
+
+let set_kind = function
+  | "inductive" -> kind := Inductive
+  | str -> ksprintf invalid_arg "kind: %s" str
+
+type output = Latex (* | Mlw *)
+
+let output = ref Latex
+
+let set_output = function
+  | "latex" -> output := Latex
+  | str -> ksprintf invalid_arg "output: %s" str
+
+let usage =
+  "Pretty print Why3 declarations (currently only inductive types in LaTeX using mathpartir).\n\
+   why3 pretty [--output=latex] [--kind=inductive] [--prefix <prefix>] <filename> [<Module>.]<type> ..."
+
+let options = [
+  "--output", Arg.String set_output,    "<output> Output format (only: latex)";
+  "--kind",   Arg.String set_kind,      "<category> Syntactic category to be printed (only: inductive)";
+  "--prefix", Arg.String ((:=) prefix), "<prefix> Prefix for LaTeX commands (default for output latex: IND)";
+]
+
+let parse_mlw_file filename =
+  let c = open_in filename in
+  let lexbuf = Lexing.from_channel c in
+  let mlw_file = Why3.Lexer.parse_mlw_file lexbuf in
+  close_in c;
+  mlw_file
+
+let () =
+  Arg.parse options add_filename_then_path usage;
+  try
+    match !filename with
+    | Some filename ->
+        let mlw_file = parse_mlw_file filename in
+        (match !output, !kind with
+         | Latex, Inductive ->
+             let paths = List.rev (Queue.fold (fun l x -> x :: l) [] paths) in
+             main_latex_ind std_formatter ~prefix:!prefix mlw_file paths)
+    | None -> invalid_arg "no filename given"
+  with Invalid_argument msg ->
+    eprintf "Error: %s@." msg;
+    exit 1
