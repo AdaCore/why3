@@ -214,7 +214,8 @@ let ending c () =
   Util.timing_step_completed "gnatwhy3.save_session";
   Gnat_objectives.iter (report_messages c);
   let s = Buffer.contents escape_buffer in
-  Gnat_report.add_warning s;
+  if s <> "" then
+    Gnat_report.add_warning s;
   Gnat_report.print_messages ();
   (* Dump profiling data (when compiled with profiling enabled) to file whose
      name is based on the processed .mlw file; otherwise profile data from
