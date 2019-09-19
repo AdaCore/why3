@@ -115,6 +115,20 @@ let create ?(print_ext_any=(fun (printer: any_pp Pp.pp) -> printer)) sprinter ap
     tprinter pprinter do_forget_all =
   (module (struct
 
+(* Using a reference for customized external printer. This avoids changing the
+   rest of this module to make it recursive with print_any *)
+let print_any_ref = ref None
+
+let set_print_any (f: any_pp Pp.pp) =
+  print_any_ref := Some f
+
+let get_print_any () =
+  match !print_any_ref with
+  | None -> (* As soon as the module is created the only call to set_print_any
+               is executed so there is always a value in this reference *)
+      assert false
+  | Some f -> f
+
 let forget_tvs () =
   (* we always forget type variables between each declaration *)
   (* if do_forget_all then *) forget_all aprinter
@@ -214,6 +228,7 @@ let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
 let rec print_ty_node ?(ext_printer=true) q pri fmt ty =
   if ext_printer then
+    let print_any = get_print_any () in
     print_ext_any print_any fmt (Pp_ty (ty, pri, q))
   else begin match ty.ty_node with
   | Tyvar v -> print_tv fmt v
@@ -231,20 +246,20 @@ let rec print_ty_node ?(ext_printer=true) q pri fmt ty =
       (print_list space (print_ty_node q 2)) tl
   end
 
-and print_ty fmt ty = print_ty_node false 0 fmt ty
+let print_ty fmt ty = print_ty_node false 0 fmt ty
 
-and print_ty_qualified fmt ty = print_ty_node true 0 fmt ty
+let print_ty_qualified fmt ty = print_ty_node true 0 fmt ty
 
-and print_vsty fmt v =
+let print_vsty fmt v =
   fprintf fmt "%a%a:@,%a" print_vs v
     print_id_attrs v.vs_name print_ty v.vs_ty
 
-and print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
-and print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node false 2) ty
-and print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
+let print_tv_arg fmt tv = fprintf fmt "@ %a" print_tv tv
+let print_ty_arg fmt ty = fprintf fmt "@ %a" (print_ty_node false 2) ty
+let print_vs_arg fmt vs = fprintf fmt "@ (%a)" print_vsty vs
 
 (* can the type of a value be derived from the type of the arguments? *)
-and unambig_fs fs =
+let unambig_fs fs =
   let rec lookup v ty = match ty.ty_node with
     | Tyvar u when tv_equal u v -> true
     | _ -> ty_any (lookup v) ty
@@ -258,7 +273,7 @@ and unambig_fs fs =
 
 (** Patterns, terms, and formulas *)
 
-and print_pat_node pri fmt p = match p.pat_node with
+let rec print_pat_node pri fmt p = match p.pat_node with
   | Pwild ->
       fprintf fmt "_"
   | Pvar v ->
@@ -278,11 +293,13 @@ and print_pat_node pri fmt p = match p.pat_node with
       fprintf fmt (protect_on (pri > 1) "%a@ %a")
         print_cs cs (print_list space (print_pat_node 2)) pl
 
-and print_quant fmt = function
+let print_pat = print_pat_node 0
+
+let print_quant fmt = function
   | Tforall -> fprintf fmt "forall"
   | Texists -> fprintf fmt "exists"
 
-and print_binop ~asym fmt = function
+let print_binop ~asym fmt = function
   | Tand when asym -> fprintf fmt "&&"
   | Tor when asym -> fprintf fmt "||"
   | Tand -> fprintf fmt "/\\"
@@ -290,13 +307,13 @@ and print_binop ~asym fmt = function
   | Timplies -> fprintf fmt "->"
   | Tiff -> fprintf fmt "<->"
 
-and prio_binop = function
+let prio_binop = function
   | Tand -> 4
   | Tor -> 3
   | Timplies -> 1
   | Tiff -> 1
 
-and print_term fmt t =
+let rec print_term fmt t =
   print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
@@ -352,6 +369,7 @@ and print_app pri ls fmt tl =
 
 and print_tnode ?(ext_printer=true) pri fmt t =
   if ext_printer then
+    let print_any = get_print_any () in
     print_ext_any print_any fmt (Pp_term (t, pri))
   else begin
     match t.t_node with
@@ -427,22 +445,14 @@ and print_tnode ?(ext_printer=true) pri fmt t =
       fprintf fmt (protect_on (pri > 5) "not %a") (print_lterm 5) f
   end
 
-(* TODO this needs to be completed in the other cases *)
-and print_any fmt t =
-  match t with
-  | Pp_term (t, pri) -> print_tnode ~ext_printer:false pri fmt t
-  | Pp_ty (ty, pri, q) -> print_ty_node ~ext_printer:false q pri fmt ty
-
 and print_tbranch fmt br =
   let p,t = t_open_branch br in
-  fprintf fmt "@[<hov 4>| %a ->@ %a@]" (print_pat_node 0) p print_term t;
+  fprintf fmt "@[<hov 4>| %a ->@ %a@]" print_pat p print_term t;
   Svs.iter forget_var p.pat_vars
 
 and print_tl fmt tl =
   if tl = [] then () else fprintf fmt "@ [%a]"
     (print_list alt (print_list comma print_term)) tl
-
-let print_pat = print_pat_node 0
 
 (** Declarations *)
 
@@ -691,6 +701,15 @@ let print_sequent fmt task =
   fprintf fmt "@[<v 0>%a@]" aux ld;
   fprintf fmt "------------------------------- Goal --------------------------------@\n@\n";
   fprintf fmt "@[<v 0>%a@]" last ld
+
+(* TODO this needs to be completed in the other cases *)
+let print_any fmt t =
+  match t with
+  | Pp_term (t, pri) -> print_tnode ~ext_printer:false pri fmt t
+  | Pp_ty (ty, pri, q) -> print_ty_node ~ext_printer:false q pri fmt ty
+
+(* When this module is loaded, the function is always set in the reference *)
+let () = set_print_any print_any
 
 let sprinter = sprinter
 let aprinter = aprinter
