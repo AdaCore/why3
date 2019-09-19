@@ -12,6 +12,7 @@
 (** Server for a client/server communication with an external graphical interface *)
 
 open Itp_communication
+open Pretty
 
 (* The server part of the protocol *)
 module type Protocol = sig
@@ -22,7 +23,7 @@ module type Protocol = sig
   val notify : notification -> unit
   (* A specific external way to print task. This is combined with the
      standard printer (see Pretty). *)
-  val print_ext: (int -> Term.term Pp.pp) -> (int -> Term.term Pp.pp)
+  val print_ext_any: any_pp Pp.pp -> any_pp Pp.pp
 
 end
 

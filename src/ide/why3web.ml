@@ -28,9 +28,9 @@ module P = struct
  let get_requests () =
    let l = !requests in requests := []; List.rev l
 
- (* print_ext is just the identity here *)
- let print_ext print_tnode pri fmt t =
-   print_tnode pri fmt t
+ (* print_ext_any just use the argument function here *)
+ let print_ext_any print_any fmt t =
+   print_any fmt t
 
 end
 

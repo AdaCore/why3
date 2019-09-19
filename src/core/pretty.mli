@@ -90,8 +90,12 @@ module type Printer = sig
 
 include Printer
 
+type any_pp =
+  | Pp_term of (Term.term * int) (* Term and priority *)
+  | Pp_ty of (Ty.ty * int * bool) (* ty * prio * q *)
+
 val create :
-  ?print_ext:((int -> Term.term Pp.pp) -> int -> Term.term Pp.pp) ->
+  ?print_ext_any:(any_pp Pp.pp -> any_pp Pp.pp) ->
   Ident.ident_printer -> Ident.ident_printer ->
   Ident.ident_printer -> Ident.ident_printer ->
   bool -> (module Printer)

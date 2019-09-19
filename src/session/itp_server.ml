@@ -77,7 +77,7 @@ let unproven_goals_below_id cont id =
 module type Protocol = sig
   val get_requests : unit -> ide_request list
   val notify : notification -> unit
-  val print_ext: (int -> Term.term Pp.pp) -> (int -> Term.term Pp.pp)
+  val print_ext_any: Pretty.any_pp Pp.pp -> Pretty.any_pp Pp.pp
 
 end
 
@@ -101,7 +101,7 @@ let p s id =
   let pr = Ident.duplicate_ident_printer tables.Trans.printer in
   let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
   (* Use the external printer for exception reporting (default is identity) *)
-  (Pretty.create ~print_ext:Pr.print_ext pr apr pr pr false)
+  (Pretty.create ~print_ext_any:Pr.print_ext_any pr apr pr pr false)
 
 let print_opt_type ~print_type fmt t =
   match t with
@@ -879,7 +879,8 @@ end
       let apr = tables.Trans.aprinter in
       (* For task printing we use the external printer (the default one is
          identity). *)
-      let module P = (val Pretty.create ~print_ext:Pr.print_ext pr apr pr pr false) in
+      let module P = (val Pretty.create ~print_ext_any:Pr.print_ext_any pr apr
+                         pr pr false) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in
     task_text, loc_color_list, goal_loc

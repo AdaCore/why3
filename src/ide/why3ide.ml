@@ -101,9 +101,9 @@ module Protocol_why3ide = struct
     notification_list := [];
     l
 
-  (* print_ext is just the identity here *)
-  let print_ext print_tnode pri fmt t =
-    print_tnode pri fmt t
+  (* print_ext_any just use the pretty function here *)
+  let print_ext_any print_any fmt t =
+    print_any fmt t
 
 end
 

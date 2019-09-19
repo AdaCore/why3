@@ -69,9 +69,9 @@ module Protocol_shell = struct
     notification_list := [];
     l
 
-  (* print_ext is just the identity here *)
-  let print_ext print_tnode pri fmt t =
-    print_tnode pri fmt t
+  (* print_ext just use the argument function here *)
+  let print_ext_any print_any fmt t =
+    print_any fmt t
 
 end
 
