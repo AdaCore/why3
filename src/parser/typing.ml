@@ -883,6 +883,20 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         -> DEgexn (find_xsymbol muc q))
     | _ -> DEgexn (find_xsymbol muc q)
   in
+  let handle_alias denv alias pat dity =
+    let pp = dpattern muc pat in
+    let denv = denv_add_pat denv pp dity in
+    let res = Some (id_fresh "result"), false, dity in
+    let denv = denv_add_args denv [res] in
+    let add_alias (t1, t2) =
+      let bty = dity_fresh () in
+      let dt1 = eff_dterm muc denv t1 in
+      let dt2 = eff_dterm muc denv t2 in
+      ignore (Dexpr.dexpr ~loc:t1.term_loc (DEcast (dt1, bty)));
+      ignore (Dexpr.dexpr ~loc:t2.term_loc (DEcast (dt2, bty)));
+    in
+    List.iter add_alias alias
+  in
   Dexpr.dexpr ~loc begin match desc with
   | Ptree.Eident q ->
       qualid_app loc q []
@@ -958,11 +972,12 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let fdl = List.map update_kind fdl in
       let denv, rd = drec_defn muc denv fdl in
       DErec (rd, dexpr muc denv e1)
-  | Ptree.Efun (bl, pty, _pat, msk, sp, e) ->
+  | Ptree.Efun (bl, pty, pat, msk, sp, e) ->
       let bl = List.map (dbinder muc) bl in
       let ds = dspec_no_variant muc sp in
       let dity = dity_of_opt muc pty in
       let denv = denv_add_args denv bl in
+      handle_alias denv sp.sp_alias pat dity;
       DEfun (bl, dity, msk, ds, dexpr muc denv e)
   | Ptree.Eany (pl, kind, pty, pat, msk, sp) ->
       let pl = List.map (dparam muc) pl in
@@ -973,21 +988,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | RKpred, None -> ity_bool
         | _ -> Loc.errorm ~loc "cannot determine the type of the result" in
       let dity = dity_of_ity ity in
-      let res = Some (id_fresh "result"), false, dity in
-      let denv = denv_add_args denv (res::pl) in
-      let handle_alias alias pat dity =
-        let pp = dpattern muc pat in
-        let denv = denv_add_pat denv pp dity in
-        let add_alias (t1, t2) =
-          let bty = dity_fresh () in
-          let dt1 = eff_dterm muc denv t1 in
-          let dt2 = eff_dterm muc denv t2 in
-          ignore (Dexpr.dexpr ~loc:t1.term_loc (DEcast (dt1, bty)));
-          ignore (Dexpr.dexpr ~loc:t2.term_loc (DEcast (dt2, bty)));
-        in
-        List.iter add_alias alias
-      in
-      handle_alias sp.sp_alias pat dity;
+      let denv = denv_add_args denv pl in
+      handle_alias denv sp.sp_alias pat dity;
       DEany (pl, dity, msk, ds)
   | Ptree.Ematch (e1, bl, xl) ->
       let e1 = dexpr muc denv e1 in
