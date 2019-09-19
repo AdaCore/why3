@@ -410,7 +410,7 @@ type dexpr = {
 and dexpr_node =
   | DEvar of string * dvty * dref
   | DEsym of prog_symbol
-  | DEconst of Number.constant * dity
+  | DEconst of Constant.constant * dity
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dity * mask * dspec later * dexpr
   | DEany of dbinder list * dity * mask * dspec later

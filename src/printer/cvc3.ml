@@ -116,9 +116,7 @@ let number_format = {
 (** expr *)
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
-      Number.print number_format fmt c
-  | Tsconst _ -> unsupportedTerm t
-      "cvc3: strings not supported"
+      Constant.print number_format fmt c
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments_typed s (print_term info)
@@ -195,7 +193,7 @@ and print_fmla info fmt f = match f.t_node with
       forget_var v
   | Tcase _ -> unsupportedTerm f
       "cvc3: you must eliminate match"
-  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)

@@ -117,7 +117,7 @@ let number_format_metitarski = {
          (fun fmt i n -> fprintf fmt "(%s / %s)" i n));
   }
 
-let print_number info fmt c = Number.print (match info.info_num with
+let print_number info fmt c = Constant.print (match info.info_num with
   | TPTP -> number_format | MetiTarski -> number_format_metitarski) fmt c
 
 let rec print_app info fmt ls tl oty =
@@ -143,8 +143,6 @@ and print_term info fmt t = match t.t_node with
       print_app info fmt ls tl t.t_ty
   | Tconst c ->
       print_number info fmt c
-  | Tsconst _ ->
-      unsupportedTerm t "TPTP does not support strings"
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt "$let_tt(%a@ =@ %a,@ %a)"
@@ -191,7 +189,7 @@ and print_fmla info fmt f = match f.t_node with
         (print_fmla info) f1 (print_fmla info) t1 (print_fmla info) t2
   | Tcase _ -> unsupportedTerm f
       "TPTP does not support pattern matching, use eliminate_algebraic"
-  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 let print_tvarg fmt tv = fprintf fmt "%a : $tType" print_tvar tv
 let print_tvargs fmt tvs = print_iter1 Stv.iter comma print_tvarg fmt tvs
@@ -386,9 +384,7 @@ and print_term info fmt t = match t.t_node with
   | Tapp (ls, tl) ->
       print_app info fmt ls tl t.t_ty
   | Tconst c ->
-      Number.print number_format fmt c
-  | Tsconst _ ->
-      unsupportedTerm t "TPTP does not support strings"
+      Constant.print number_format fmt c
   | Tlet _ -> unsupportedTerm t
       "DFG does not support let, use eliminate_let"
   | Tif _ -> unsupportedTerm t
@@ -427,7 +423,7 @@ let rec print_fmla info fmt f = match f.t_node with
       "DFG does not support if, use eliminate_if"
   | Tcase _ -> unsupportedTerm f
       "DFG does not support pattern matching, use eliminate_algebraic"
-  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 let print_axiom info fmt d = match d.d_node with
   | Dprop (Paxiom, pr, _) when Mid.mem pr.pr_name info.info_syn -> ()

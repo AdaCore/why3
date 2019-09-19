@@ -1518,7 +1518,7 @@ and wp_expr kn k q = match k with
   | Ktag ((Push _|WP), _) -> assert false (* cannot happen *)
 
 let rec simp_cast_projections env t = match t.t_node with
-  | Tapp (ls, [{t_node = Tconst (Number.ConstInt _ as c);
+  | Tapp (ls, [{t_node = Tconst (Constant.ConstInt _ as c);
                 t_ty = Some {ty_node = Tyapp (ts,_)}}])
     when is_range_type_def ts.ts_def
       && ls_equal ls (int_of_range env ts) ->

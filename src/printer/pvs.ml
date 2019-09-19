@@ -314,9 +314,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Number.print number_format fmt c
-  | Tsconst _ -> unsupportedTerm t
-      "pcs: strings not supported"
+      Constant.print number_format fmt c
   | Tif (f, t1, t2) ->
       fprintf fmt "IF %a@ THEN %a@ ELSE %a ENDIF"
         (print_fmla info) f (print_term info) t1 (print_opl_term info) t2
@@ -426,7 +424,7 @@ and print_fnode opl opr info fmt f = match f.t_node with
           fprintf fmt "%a(%a)" (print_ls_real info) ps
             (print_comma_list (print_term info)) tl
     end
-  | Tvar _ | Tconst _ | Tsconst _ | Teps _ ->
+  | Tvar _ | Tconst _ | Teps _ ->
       raise (FmlaExpected f)
 
 and print_tuple_pat info t fmt p =

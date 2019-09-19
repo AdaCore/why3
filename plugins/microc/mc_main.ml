@@ -43,9 +43,10 @@ let mk_ref ~loc e =
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (set_op ~loc, [a; i; v]))
 let constant ~loc i =
-  mk_expr ~loc (Econst (Number.int_const_of_int i))
+  mk_expr ~loc (Econst (Constant.int_const_of_int i))
 let constant_s ~loc s =
-  mk_expr ~loc (Econst (Number.(ConstInt (int_literal ILitDec ~neg:false s))))
+  let int_lit = Number.(int_literal ILitDec ~neg:false s) in
+  mk_expr ~loc (Econst (Constant.ConstInt int_lit))
 let break ~loc =
   Qident (mk_id ~loc "Break")
 let break_handler ~loc =

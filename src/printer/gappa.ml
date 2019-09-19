@@ -173,10 +173,10 @@ type constant = Enum of term * int | Value of term | Varying
 let rec constant_value defs t =
   match t.t_node with
   | Tconst c ->
-      asprintf "%a" (Number.print number_format) c
+      asprintf "%a" (Constant.print number_format) c
   | Tapp (ls, [{ t_node = Tconst c}])
       when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-      asprintf "-%a" (Number.print number_format) c
+      asprintf "-%a" (Constant.print number_format) c
   | Tapp (ls, []) ->
     begin
       match Hid.find defs ls.ls_name with
@@ -201,8 +201,6 @@ let rec print_term info defs fmt t =
   with Not_found ->
   match t.t_node with
   | Tconst _ -> assert false
-  | Tsconst _ -> unsupportedTerm t
-      "gappa: strings not supported"
   | Tvar { vs_name = id } ->
       print_ident fmt id
   | Tapp ( { ls_name = id }, [] ) ->
@@ -310,7 +308,7 @@ let rec print_fmla info defs fmt f =
       "gappa: you must eliminate let in formula"
   | Tcase _ -> unsupportedTerm f
       "gappa: you must eliminate match"
-  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 let get_constant defs t =
   let rec follow neg_ls t =

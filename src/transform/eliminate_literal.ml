@@ -40,17 +40,17 @@ let add_literal (known_lit, decl as acc) t c ls_proj fin =
    NOTE: in this case, [add_literal] above is incorrect. *)
 let rec abstract_terms kn range_metas float_metas type_kept acc t =
   match t.t_node, t.t_ty with
-  | Tapp (ls, [{ t_node = Tconst (Number.ConstInt _ as c); t_ty = Some {ty_node = Tyapp (ts,[])} }]), _
+  | Tapp (ls, [{ t_node = Tconst (Constant.ConstInt _ as c); t_ty = Some {ty_node = Tyapp (ts,[])} }]), _
     when not (ts_equal ts ts_int || Sts.mem ts type_kept) && ls_equal ls (Mts.find ts range_metas) ->
       acc, t_const c ty_int
-  | Tapp (ls, [{ t_node = Tconst (Number.ConstReal _ as c); t_ty = Some {ty_node = Tyapp (ts,[])} }]), _
+  | Tapp (ls, [{ t_node = Tconst (Constant.ConstReal _ as c); t_ty = Some {ty_node = Tyapp (ts,[])} }]), _
     when not (ts_equal ts ts_real || Sts.mem ts type_kept) && ls_equal ls (fst (Mts.find ts float_metas)) ->
       acc, t_const c ty_real
-  | Tconst (Number.ConstInt _ as c), Some {ty_node = Tyapp (ts,[])}
+  | Tconst (Constant.ConstInt _ as c), Some {ty_node = Tyapp (ts,[])}
     when not (ts_equal ts ts_int || Sts.mem ts type_kept) ->
       let to_int = Mts.find ts range_metas in
       add_literal acc t c to_int None
-  | Tconst (Number.ConstReal _ as c), Some {ty_node = Tyapp (ts,[])}
+  | Tconst (Constant.ConstReal _ as c), Some {ty_node = Tyapp (ts,[])}
     when not (ts_equal ts ts_real || Sts.mem ts type_kept) ->
       let to_real,isF = Mts.find ts float_metas in
       add_literal acc t c to_real (Some isF)
@@ -102,7 +102,7 @@ let elim le_int le_real neg_real type_kept kn
       let emax = BigInt.pow_int_pos_bigint 2 (BigInt.pred eb) in
       let m = BigInt.pred (BigInt.pow_int_pos_bigint 2 sb) in
       let e = BigInt.sub emax sb in
-      let e_val = Number.real_const m ~pow2:e ?pow5:None in
+      let e_val = Constant.real_const m ~pow2:e ?pow5:None in
       let max_term = t_const e_val ty_real in
       (* compose axiom *)
       let f = t_and (t_app le_real [t_app neg_real [max_term] (Some ty_real); v_term] None)
@@ -169,18 +169,19 @@ let () =
    of 'prefix -' to positive constant *)
 
 open Number
+open Constant
 
-let rec replace_negative_constants neg_int neg_real t =
+let rec replace_negative_constants ls_neg_int ls_neg_real t =
   match t.t_ty, t.t_node with
-  | Some ty, Tconst (ConstInt i as c) ->
+  | Some ty, Tconst (ConstInt i) ->
      if BigInt.lt i.il_int BigInt.zero && ty_equal ty ty_int then
-       t_app neg_int [t_const (neg c) ty_int] (Some ty_int)
+       t_app ls_neg_int [t_const (ConstInt (neg_int i)) ty_int] (Some ty_int)
      else t
-  | Some ty, Tconst (ConstReal r as c) ->
+  | Some ty, Tconst (ConstReal r) ->
      if BigInt.lt r.rl_real.rv_sig BigInt.zero && ty_equal ty ty_real then
-       t_app neg_real [t_const (neg c) ty_real] (Some ty_real)
+       t_app ls_neg_real [t_const (ConstReal (neg_real r)) ty_real] (Some ty_real)
      else t
-  | _ -> t_map (replace_negative_constants neg_int neg_real) t
+  | _ -> t_map (replace_negative_constants ls_neg_int ls_neg_real) t
 
 let eliminate_negative_constants env =
   (* FIXME: int.Int should be imported in the task *)

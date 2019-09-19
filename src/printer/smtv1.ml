@@ -91,9 +91,7 @@ let number_format = {
 
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
-      Number.print number_format fmt c
-  | Tsconst s ->
-      fprintf fmt "\"%s\"" s
+      Constant.print number_format fmt c
   | Tvar v -> print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
       | Some s -> syntax_arguments s (print_term info) fmt tl
@@ -164,7 +162,7 @@ and print_fmla info fmt f = match f.t_node with
       forget_var v
   | Tcase _ -> unsupportedTerm f
       "smtv1: you must eliminate match"
-  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 (*
 and _print_expr info fmt =

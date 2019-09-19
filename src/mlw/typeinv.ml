@@ -240,7 +240,6 @@ let inspect kn tl =
           c in
         unwind c pjl
     | Tconst _ -> V
-    | Tsconst _ -> V
     | Tapp (ls,[t1;t2]) when ls_equal ls ps_equ ->
         let c1 = down caps pjl t1 in
         let c2 = down caps pjl t2 in
@@ -457,8 +456,6 @@ let cap_of_term kn uf pins caps t =
         unwind t (Mvs.find_def V v caps) pjl
     | Tconst _ -> (* constants are valid *)
         unroll t pjl, V
-    | Tsconst _ -> (* constants are valid *)
-        unroll t pjl, V
     | Tapp (ls,[t1;t2]) when ls_equal ls ps_equ ->
         let t1, c1 = down caps pjl t1 in
         let t2, c2 = down caps pjl t2 in
@@ -648,7 +645,7 @@ let uf_inter uf1 uf2 =
   Mint.inter inter uf1 uf2
 
 let rec inject kn uf pins caps pos f = match f.t_node with
-  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> assert false (* never *)
+  | Tvar _ | Tconst _ | Teps _ -> assert false (* never *)
   | Tapp (ls,[t]) when pos && ls_equal ls ls_valid ->
       let _, c = cap_of_term kn uf pins caps t in
       let n = match c with

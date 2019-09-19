@@ -225,19 +225,17 @@ let rec print_term info defs fmt t = match t.t_node with
       print_var info fmt v
   | Tconst c ->
       begin match c with
-        | Number.ConstInt _ ->
+        | Constant.ConstInt _ ->
             fprintf fmt "<num val=\"%a\">%a</num>"
-              (Number.print number_format) c (print_ty info) (t_type t)
-        | Number.ConstReal _ ->
+              (Constant.print number_format) c (print_ty info) (t_type t)
+        | Constant.ConstReal _ ->
            match t.t_ty with
            | None -> assert false (* impossible *)
            | Some ty ->
               if ty_equal ty ty_real then
-                Number.print number_format fmt c
+                Constant.print number_format fmt c
               else raise (UnsupportedTerm (t, "floating-point literal"))
       end
-  | Tsconst _ -> unsupportedTerm t
-      "isabelle: strings not supported"
   | Tif (f, t1, t2) ->
       print_app print_const (print_term info defs) fmt ("HOL.If", [f; t1; t2])
   | Tlet (t1, tb) ->

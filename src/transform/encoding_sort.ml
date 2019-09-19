@@ -72,7 +72,7 @@ let rec rewrite_term tenv ud vm t =
   let fnT = rewrite_term tenv ud in
   let fnF = rewrite_fmla tenv ud in
   match t.t_node with
-  | Tconst _ | Tsconst _ -> t
+  | Tconst _ -> t
   | Tvar x ->
       Mvs.find x vm
   | Tapp (fs,tl) ->

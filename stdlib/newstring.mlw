@@ -1,9 +1,13 @@
 module String
 
-  (** indexes of strings are starting from `0` *)
+  use int.Int
+
+  (** indexes for strings start at `0` *)
 
   (** type string is built-in *)
-  (** the abstract type for strings. *)
+
+  (** UC refers to the code points from 0x00000 to 0x2FFFF (Unicode
+  characters in Planes 0-2) *) (* CHECK *)
 
   constant empty : string = ""
   (** the empty string. *)
@@ -25,12 +29,41 @@ module String
 
   function length string : int
   (** `length s` returns the length of the string `s`. *)
+  (* `length s` returns the number of UC characters in `s`. *)
+  (* CHECK *)
+
+  predicate lt string string
+  (** `lt s1 s2` returns `True` iff `s1` is smaller than `s2` in the
+  lexicographic order of UC *) (* CHECK UC *)
+
+  predicate le string string
+  (** `le s1 s2` returns `True` iff `s1` is smaller or equal to `s2`
+  in the lexicographic order of UC *) (* CHECK UC *)
+
+  function ([]) string int : string
+  (** `s[i]` returns the `empty` string if either `i < 0` or `i >=
+  length s`. Returns the string of size `1` with the content of
+  position `i` in string `s`. *)
+
+  function substring string int int : string
+  (** `substring s i x` returns the `empty` string if `i < 0` or `i >=
+  length s'. Otherwise, it returns the substring of `s` starting at
+  `i` and of size `min x (length s - i)`. *)
+
+  (* continue here *)
+
+
+
 
   function indexof string string int : int
   (** `indexof s1 s2 i`, where `i >= 0`, returns the initial
   position greater than `i` in which `s2` occurs in `s1`. It returns
   `-1` if `s2` does not occur in `s1` after position `i`. *)
 
+  (* axiom substring_length_0: forall s i. *)
+  (*   substring s i 0 = "" *)
+
+  (* TODO define replace in terms of indexof and substring *)
   function replace string string string : string
   (** `replace s1 s2 s3`, where `length s2 > 0` replaces the first
   occurrence of `s2` by `s3` in `s1`. *)
@@ -39,15 +72,6 @@ module String
   (** `replace s1 s2 s3`, where `length s2 > 0` replaces all the
   occurrences of `s2` by `s3` in `s1`. *)
 
-  function substring string int int : string
-  (** `substring s i j` returns the `empty` string if `i <
-  0`. Otherwise, it returns the substring of `s` starting at `i` and
-  of size `min j (length s - i)`. *)
-
-  function ([]) string int : string
-  (** `s[i]` returns the `empty` string if either `i < 0` or `i >=
-  length s`; otherwise, it returns the string of size `1` with the
-  content of position `i` in string `s`. *)
 
   predicate contains string string
   (** `contains s1 s2` returns true if `s1` contains `s2`, or false

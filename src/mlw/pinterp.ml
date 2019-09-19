@@ -700,9 +700,9 @@ let rec eval_expr env (e : expr) : result =
         Normal v
       with Not_found -> assert false (* Irred e ? *)
     end
-  | Econst (Number.ConstInt c) ->
+  | Econst (Constant.ConstInt c) ->
       Normal (Vnum (big_int_of_const c))
-  | Econst (Number.ConstReal r) ->
+  | Econst (Constant.ConstReal r) ->
       (* ConstReal can be float or real *)
       let is_real ity = ity_equal ity ity_real in
       if is_real e.e_ity then
@@ -711,7 +711,7 @@ let rec eval_expr env (e : expr) : result =
         try Normal (Vreal (real_from_fraction sp sq)) with
         | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
       else
-        let s = Format.asprintf "%a" Number.print_constant (Number.ConstReal r) in
+        let s = Format.asprintf "%a" Constant.print_constant (Constant.ConstReal r) in
         Normal (Vfloat (make_from_str s))
   | Eexec (ce,cty) ->
     assert (cty.cty_args = []);

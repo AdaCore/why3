@@ -628,7 +628,7 @@ let run_match (type i) icmp cp mty mv t =
               | n -> Cbound n
               | exception Not_found -> Crigid vs
               end
-            | (Tconst _ | Tsconst _ | Ttrue | Tfalse) -> Cconst t
+            | (Tconst _ | Ttrue | Tfalse) -> Cconst t
             | Tapp (ls,_) -> Capp ls
             | Tif _ -> Cif
             | Tlet _ -> Clet
@@ -950,7 +950,7 @@ let compile rigid_tv rigid_vs tp =
       end;
       emitr r tyg;
       tyg
-    | (Tconst _ | Tsconst _ | Ttrue | Tfalse) ->
+    | (Tconst _ | Ttrue | Tfalse) ->
       let r = ref false in
       emit (Fragment ([r],Cconst tp));
       begin match tp.t_ty with

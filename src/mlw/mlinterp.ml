@@ -73,7 +73,7 @@ open Format
 let rec print_value fmt = function
   | Vvoid -> fprintf fmt "()"
   | Vbool b -> fprintf fmt "%b" b
-  | Vbigint i -> Number.print_constant fmt (Number.int_const i)
+  | Vbigint i -> Constant.print_constant fmt (Constant.int_const i)
   | Vint i -> fprintf fmt "%d" i
   | Vtuple l -> fprintf fmt "@[<hov 2>(%a)@]"
                         (Pp.print_list Pp.comma print_value) l
@@ -830,7 +830,7 @@ let rec value_of_term kn t =
               | Vbool b -> Vbool (not b)
               | _ -> assert false end
   (* TODO Tbinop maybe *)
-  | Tconst (Number.ConstInt ic) -> value_of_const ic t.t_ty
+  | Tconst (Constant.ConstInt ic) -> value_of_const ic t.t_ty
   | Term.Tapp (ls,[]) ->
      begin match find_logic_definition kn ls with
      | None -> raise CannotReduce

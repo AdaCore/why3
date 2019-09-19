@@ -173,9 +173,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Number.print_constant fmt c
-  | Tsconst s ->
-      fprintf fmt "\"%s\"" s
+      Constant.print_constant fmt c
   | Tapp (fs, tl) when unambig_fs fs ->
       print_app pri fs fmt tl
   | Tapp (fs, tl) ->

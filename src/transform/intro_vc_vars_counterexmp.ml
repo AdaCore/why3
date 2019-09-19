@@ -181,7 +181,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
   | Tcase (t, _) ->
     do_intro t
     (* todo: handle the second argument of Tcase *)
-  | Tconst _ | Tsconst _ -> []
+  | Tconst _ -> []
   | Ttrue -> []
   | Tfalse -> []
   | Teps _ -> []

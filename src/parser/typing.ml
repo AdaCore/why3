@@ -386,11 +386,9 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dterm ns km crcmap gvars at denv e23) in
       chain loc (dterm ns km crcmap gvars at denv e1) op1 e23
-  | Ptree.Tconst (Number.ConstInt _ as c) ->
+  | Ptree.Tconst (Constant.ConstInt _ as c) ->
       DTconst (c, dty_int)
-  | Ptree.Tsconst s ->
-      DTsconst s
-  | Ptree.Tconst (Number.ConstReal _ as c) ->
+  | Ptree.Tconst (Constant.ConstReal _ as c) ->
       DTconst (c, dty_real)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
@@ -843,11 +841,11 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
       let d1 = eff_dterm muc denv e1 in
       DEcast (d1, dity_of_pty muc pty)
   | Ptree.Tat _ -> Loc.errorm ~loc "`at' and `old' cannot be used here"
-  | Ptree.Tidapp _ | Ptree.Tconst _ | Ptree.Tsconst _ | Ptree.Tinfix _
-  | Ptree.Tinnfix _ | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tcase _
-  | Ptree.Tif _ | Ptree.Ttrue | Ptree.Tfalse | Ptree.Tnot _
-  | Ptree.Tbinop _ | Ptree.Tbinnop _ | Ptree.Tquant _ | Ptree.Trecord _
-  | Ptree.Tupdate _ -> Loc.errorm ~loc "unsupported effect expression")
+  | Ptree.Tidapp _ | Ptree.Tconst _ | Ptree.Tinfix _ | Ptree.Tinnfix _
+  | Ptree.Ttuple _ | Ptree.Tlet _ | Ptree.Tcase _ | Ptree.Tif _
+  | Ptree.Ttrue | Ptree.Tfalse | Ptree.Tnot _ | Ptree.Tbinop _ | Ptree.Tbinnop _
+  | Ptree.Tquant _ | Ptree.Trecord _ | Ptree.Tupdate _ ->
+      Loc.errorm ~loc "unsupported effect expression")
 
 let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   let expr_app loc e el =
@@ -919,11 +917,11 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dexpr muc denv e23) in
       chain "q1 " "q2 " loc (dexpr muc denv e1) op1 e23
-  | Ptree.Econst (Number.ConstInt _ as c) ->
+  | Ptree.Econst (Constant.ConstInt _ as c) ->
       let dty = if Mts.is_empty muc.muc_theory.uc_ranges
                 then dity_int else dity_fresh () in
       DEconst(c, dty)
-  | Ptree.Econst (Number.ConstReal _ as c) ->
+  | Ptree.Econst (Constant.ConstReal _ as c) ->
       let dty = if Mts.is_empty muc.muc_theory.uc_floats
                 then dity_real else dity_fresh () in
       DEconst(c, dty)

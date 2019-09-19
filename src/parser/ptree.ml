@@ -77,8 +77,7 @@ type term = {
 and term_desc =
   | Ttrue
   | Tfalse
-  | Tconst of Number.constant
-  | Tsconst of string
+  | Tconst of Constant.constant
   | Tident of qualid
   | Tasref of qualid
   | Tidapp of qualid * term list
@@ -131,8 +130,7 @@ and expr_desc =
   | Eref
   | Etrue
   | Efalse
-  | Econst of Number.constant
-  (* | Esconst of string *)
+  | Econst of Constant.constant
   (** lambda-calculus *)
   | Eident of qualid
   | Easref of qualid

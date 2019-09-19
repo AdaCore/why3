@@ -39,30 +39,19 @@ type real_constant = {
   rl_real : real_value
 }
 
-type constant =
-  | ConstInt  of int_constant
-  | ConstReal of real_constant
+val neg_int : int_constant -> int_constant
+val abs_int : int_constant -> int_constant
 
-val neg : constant -> constant
-val abs : constant -> constant
+val neg_real : real_constant -> real_constant
+val abs_real : real_constant -> real_constant
 
 val compare_real : real_value -> real_value -> int
 (** structural comparison; two ordered values might compare differently *)
 
-val compare_const : constant -> constant -> int
-(** structural comparison; two mathematically equal values might differ *)
-
 val int_literal : int_literal_kind -> neg:bool -> string -> int_constant
-val int_const : BigInt.t -> constant
-val int_const_of_int : int -> constant
 
 val real_literal : radix:int -> neg:bool -> int:string -> frac:string -> exp:string option -> real_constant
 val real_value : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> real_value
-val real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> constant
-
-(** Pretty-printing *)
-
-val print_constant : formatter -> constant -> unit
 
 (** Pretty-printing with conversion *)
 
@@ -97,7 +86,10 @@ type number_support = {
   frac_real_support : [`Custom of frac_real_format|`Unsupported of default_format];
 }
 
-val print : number_support -> formatter -> constant -> unit
+val full_support : number_support
+
+val print_int_constant : number_support -> formatter -> int_constant -> unit
+val print_real_constant : number_support -> formatter -> real_constant -> unit
 
 val print_in_base : int -> int option -> formatter -> BigInt.t -> unit
 (** [print_in_base radix digits fmt i] prints the value of [i] in base

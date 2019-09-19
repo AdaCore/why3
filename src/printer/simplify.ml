@@ -49,9 +49,7 @@ let number_format = {
 
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
-      Number.print number_format fmt c
-  | Tsconst _ -> unsupportedTerm t
-      "simplify: strings not supported"
+      Constant.print number_format fmt c
   | Tvar v ->
       print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with
@@ -109,7 +107,7 @@ and print_fmla info fmt f = match f.t_node with
       unsupportedTerm f "simplify: you must eliminate let"
   | Tcase _ ->
       unsupportedTerm f "simplify: you must eliminate match"
-  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 and print_expr info fmt =
   TermTF.t_select (print_term info fmt) (print_fmla info fmt)

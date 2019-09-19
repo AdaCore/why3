@@ -319,7 +319,7 @@ type expr = {
 
 and expr_node =
   | Evar    of pvsymbol
-  | Econst  of Number.constant
+  | Econst  of Constant.constant
   | Eexec   of cexp * cty
   | Eassign of assign list
   | Elet    of let_defn * expr
@@ -492,7 +492,7 @@ let e_const c ity =
 
 let e_nat_const n =
   assert (n >= 0);
-  e_const (Number.int_const_of_int n) ity_int
+  e_const (Constant.int_const_of_int n) ity_int
 
 let e_ghostify gh ({e_effect = eff} as e) =
   if not gh then e else
@@ -633,9 +633,9 @@ let rec post_of_expr res e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_true
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Evar v -> post_of_term res (t_var v.pv_vs)
-  | Econst (Number.ConstInt _ as c)->
+  | Econst (Constant.ConstInt _ as c)->
       post_of_term res (t_const c ty_int)
-  | Econst (Number.ConstReal _ as c)->
+  | Econst (Constant.ConstReal _ as c)->
       post_of_term res (t_const c ty_real)
   | Epure t -> post_of_term res t
   | Eghost e | Eexn (_,e) -> post_of_expr res e
@@ -1381,7 +1381,7 @@ and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
 
 and print_enode pri fmt e = match e.e_node with
   | Evar v -> print_pv fmt v
-  | Econst c -> Number.print_constant fmt c
+  | Econst c -> Constant.print_constant fmt c
   | Eexec (c,_) -> print_cexp true pri fmt c
   | Elet (LDvar (v,e1), e2)
     when v.pv_vs.vs_name.id_string = "_" && ity_equal v.pv_ity ity_unit ->

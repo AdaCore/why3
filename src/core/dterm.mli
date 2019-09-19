@@ -70,8 +70,7 @@ type dterm = private {
 and dterm_node =
   | DTvar of string * dty
   | DTgvar of vsymbol
-  | DTconst of Number.constant * dty
-  | DTsconst of string
+  | DTconst of Constant.constant * dty
   | DTapp of lsymbol * dterm list
   | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm

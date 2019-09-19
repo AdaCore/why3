@@ -130,7 +130,7 @@ let number_format = {
   }
 
 let print_const fmt c =
-  (Number.print number_format) fmt c
+  (Constant.print number_format) fmt c
 
 let constant_value =
   fun t -> match t.t_node with
@@ -162,8 +162,6 @@ let rec print_term info fmt t =
   | Tconst c ->
       (*Pretty.print_const fmt c*)
       print_const fmt c
-  | Tsconst _ -> unsupportedTerm t
-      "yices: strings not supported"
   | Tvar { vs_name = id } ->
       print_ident fmt id
   | Tapp ( { ls_name = id } ,[] ) ->
@@ -301,7 +299,7 @@ let rec print_term info fmt t =
   (*| Tcase (t,bl) ->
       print_case print_fmla info fmt t bl*)
 
-  | Tvar _ | Tconst _ | Tsconst _ | Teps _ -> raise (FmlaExpected f)
+  | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 
 exception AlreadyDefined

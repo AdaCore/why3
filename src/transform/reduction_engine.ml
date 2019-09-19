@@ -35,8 +35,8 @@ exception NotNum
 
 let big_int_of_const c =
   match c with
-  | Number.ConstInt i -> i.Number.il_int
-  | Number.ConstReal _ -> assert false
+  | Constant.ConstInt i -> i.Number.il_int
+  | Constant.ConstReal _ -> assert false
 
 let big_int_of_value v =
   match v with
@@ -47,8 +47,8 @@ let big_int_of_value v =
 
 let real_of_const c =
   match c with
-  | Number.ConstReal r -> r.Number.rl_real
-  | Number.ConstInt _ -> assert false
+  | Constant.ConstReal r -> r.Number.rl_real
+  | Constant.ConstInt _ -> assert false
 
 let real_of_value v =
   match v with
@@ -627,10 +627,9 @@ let first_order_matching (vars : Svs.t) (largs : term list)
                     end
                 | _ -> raise (NoMatch (Some (t1, t2, None)))
                 end
-            | (Tconst _ | Tsconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
+            | (Tconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
                 loop bound_vars sigma r1 r2
-            | Tconst _ | Tsconst _ | Ttrue | Tfalse ->
-               raise (NoMatch (Some (t1, t2, None)))
+            | Tconst _ | Ttrue | Tfalse -> raise (NoMatch (Some (t1, t2, None)))
         end
       | _ -> raise (NoMatch None)
   in
@@ -868,7 +867,7 @@ and reduce_eval st t ~orig sigma rem =
     { value_stack = st;
       cont_stack = List.rev_append args ((Kapp(ls,t.t_ty),orig) :: rem);
     }
-  | Ttrue | Tfalse | Tconst _ | Tsconst _ ->
+  | Ttrue | Tfalse | Tconst _ ->
     { value_stack = Term orig :: st;
       cont_stack = rem;
     }
@@ -1167,7 +1166,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
   | Tconst c1, Tconst c2 ->
     begin
       match c1,c2 with
-      | Number.ConstInt i1, Number.ConstInt i2 ->
+      | Constant.ConstInt i1, Constant.ConstInt i2 ->
         let b =
           BigInt.eq i1.Number.il_int i2.Number.il_int
         in

@@ -8,7 +8,7 @@ module Harness
 
   goal Empty2: empty = ""
 
-  goal Test:
+  goal Test1:
     let s = "abcdef" in substring s 2 3 = "cde"
 
   goal TestConcat2:
@@ -40,14 +40,96 @@ module Harness
   goal TestConcat6:
     concat2 "" "" = ""
 
-  goal TestLength1: length "" = 0
-  goal TestLength2: length "a" = 1
-  goal TestLength3: length "ab" = 2
-  goal TestLength4: length "abc" = 3
-  goal TestLength5: length (concat2 "ab" "12") = 4
+  lemma concat2_assoc: forall s1 s2 s3.
+    concat2 (concat2 s1 s2) s3 = concat2 s1 (concat2 s2 s3)
 
-  goal TestLength6: forall s1 s2.
+  lemma concat3_concat2: forall s1 s2 s3.
+    concat3 s1 s2 s3 = concat2 s1 (concat2 s2 s3)
+
+  lemma concat4_concat2: forall s1 s2 s3 s4.
+    concat4 s1 s2 s3 s4 = concat2 s1 (concat2 s2 (concat2 s3 s4))
+
+  lemma concat5_concat2: forall s1 s2 s3 s4 s5.
+    concat5 s1 s2 s3 s4 s5 = concat2 s1 (concat2 s2 (concat2 s3 (concat2 s4 s5)))
+
+  lemma concat_empty: forall s.
+    concat2 s empty = concat2 empty s = s
+
+  goal TestLength1: length "a" = 1
+  goal TestLength2: length "ab" = 2
+  goal TestLength3: length "abc" = 3
+  goal TestLength4: length (concat2 "ab" "12") = 4
+
+  lemma length_empty: length "" = 0
+
+  lemma length_concat: forall s1 s2.
     length (concat2 s1 s2) = length s1 + length s2
+
+  goal TestLt1: lt "" "a"
+  goal TestLt2: lt "a" "b"
+  goal TestLt3: lt "ab" "b"
+  goal TestLt4: lt "abcde" "b"
+  goal TestLt5: lt "a" "1"
+  goal TestLt6: lt "A" "a"
+
+  lemma lt_empty: forall s.
+    s <> empty -> lt empty s
+
+  lemma lt_transitive: forall s1 s2 s3. (* CHECK - not proved *)
+    lt s1 s2 && lt s2 s3 -> lt s1 s3
+
+  lemma lt_not_com: forall s1 s2.
+    lt s1 s2 -> not (lt s2 s1)
+
+  lemma le: forall s1.
+    le s1 s1
+
+  lemma lt_le: forall s1 s2.
+    lt s1 s2 -> le s1 s2
+
+  lemma lt_le_eq: forall s1 s2.
+    le s1 s2 -> lt s1 s2 || s1 = s2
+
+  lemma le_transitive: forall s1 s2 s3. (* CHECK - not proved *)
+    le s1 s2 && le s2 s3 -> le s1 s3
+
+  lemma at_out_of_range: forall s i.
+    i >= length s || i < 0 -> s[i] = empty
+
+  lemma at_empty: forall i.
+    empty[i] = empty
+
+  goal TestSubstring1: forall i x.
+    substring "" i x = ""
+
+  goal TestSubstring2: forall s i x.
+    i < 0 -> substring s i x = ""
+
+  goal TestSubstring3: forall s i x.
+    i > length s -> substring s i x = ""
+
+  goal TestSubstring4:
+    substring "abcdef" 1 3 = "bcd"
+
+  goal TestSubstring5:
+    substring "abcdef" 1 10 = "bcdef"
+
+  lemma substring_of_length_zero: forall s i.
+    substring s i 0 = ""
+
+  lemma substring_out_of_range: forall s i x.
+    i < 0 || i >= length s -> substring s i x = empty
+
+  lemma substring_smaller: forall s i x.
+    length (substring s i x) <= length s
+
+  lemma substring_smaller_x: forall s i x.
+    i + x >= length s -> length (substring s i x) < x
+
+  (* continue here *)
+
+
+
 
   goal TestIndefof1:
     indexof "" "" 0 = 0
@@ -115,20 +197,6 @@ module Harness
   goal TestReplaceAll2:
     replaceall "abcdefabcdefabcdef" "de" "1234" = "abc1234fabc1234fabc1234f"
 
-  goal TestSubstring1: forall i x.
-    substring "" i x = ""
-
-  goal TestSubstring2: forall s i x.
-    i < 0 -> substring s i x = ""
-
-  goal TestSubstring3: forall s i x.
-    i > length s -> substring s i x = ""
-
-  goal TestSubstring4:
-    substring "abcdef" 1 3 = "bcd"
-
-  goal TestSubstring5:
-    substring "abcdef" 1 10 = "bcdef"
 
 
   lemma replace_substring_indexof: forall s t1 t2.
@@ -143,9 +211,6 @@ module Harness
     let j = indexof s t i in
     j >= 0 && 0 <= i <= length s ->
       substring s j (length t) = t
-
-  lemma x: forall s i.
-    substring s i 0 = ""
 
   lemma y: forall s i.
     0 <= i <= length s -> indexof s "" i = i

@@ -349,12 +349,11 @@ and print_tnode pri fmt t = match t.t_node with
        match t.t_ty with
        | Some {ty_node = Tyapp (ts,[])}
             when ts_equal ts ts_int || ts_equal ts ts_real ->
-          Number.print_constant fmt c
-       | Some ty -> fprintf fmt "(%a:%a)" Number.print_constant c
+          Constant.print_constant fmt c
+       | Some ty -> fprintf fmt "(%a:%a)" Constant.print_constant c
                             print_ty ty
        | None -> assert false
      end
-  | Tsconst s -> fprintf fmt "\"%s\"" s
   | Tapp (_, [t1]) when Sattr.mem coercion_attr t.t_attrs &&
                         Debug.test_noflag debug_print_coercions ->
       print_lterm pri fmt (t_attr_set t1.t_attrs t1)

@@ -176,7 +176,7 @@ let rec reify_term renv t rt =
                            assert (v = []);
                            check_nonvar f t
             else ()
-         | Tconst (Number.ConstInt c1), Tconst (Number.ConstInt c2) ->
+         | Tconst (Constant.ConstInt c1), Tconst (Constant.ConstInt c2) ->
             let open Number in
             if not (BigInt.eq c1.il_int c2.il_int)
             then raise NoReification
@@ -293,7 +293,7 @@ let rec reify_term renv t rt =
                let fr = renv.fr in
                let store = Mterm.add t (vy, fr) renv.store in
                { renv with store = store; fr = fr + 1 }, fr in
-           let const = Number.int_const_of_int i in
+           let const = Constant.int_const_of_int i in
            (renv, app_pat (t_const const Ty.ty_int))
          end
     | _ -> raise NoReification

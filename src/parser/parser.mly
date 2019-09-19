@@ -702,8 +702,8 @@ single_term_:
     { Tat ($1, $3) }
 | prefix_op single_term %prec prec_prefix_op
     { Tidapp (Qident $1, [$2]) }
-| MINUS numeral
-    { Tconst (Number.neg $2) }
+| minus_numeral
+    { Tconst $1 }
 | l = single_term ; o = bin_op ; r = single_term
     { Tbinop (l, o, r) }
 | l = single_term ; o = infix_op_1 ; r = single_term
@@ -756,7 +756,7 @@ term_arg_:
 | qualid                    { Tident $1 }
 | AMP qualid                { Tasref $2 }
 | numeral                   { Tconst $1 }
-| STRING                    { Tsconst $1 }
+(* | STRING                    { Tsconst $1 } *)
 | TRUE                      { Ttrue }
 | FALSE                     { Tfalse }
 | o = oppref ; a = term_arg { Tidapp (Qident o, [a]) }
@@ -820,9 +820,13 @@ quant:
 | FORALL  { Dterm.DTforall }
 | EXISTS  { Dterm.DTexists }
 
+minus_numeral:
+| MINUS INTEGER { Constant.(ConstInt (Number.neg_int $2)) }
+| MINUS REAL    { Constant.(ConstReal (Number.neg_real $2))}
+
 numeral:
-| INTEGER { Number.ConstInt $1 }
-| REAL    { Number.ConstReal $1 }
+| INTEGER { Constant.ConstInt $1 }
+| REAL    { Constant.ConstReal $1 }
 
 (* Program declarations *)
 
@@ -971,8 +975,8 @@ single_expr_:
     { Enot $2 }
 | prefix_op single_expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
-| MINUS numeral
-    { Econst (Number.neg $2) }
+| minus_numeral
+    { Econst $1 }
 | l = single_expr ; o = infix_op_1 ; r = single_expr
     { Einfix (l,o,r) }
 | l = single_expr ; o = infix_op_234 ; r = single_expr
