@@ -1,0 +1,20 @@
+use map.Map
+use array.Array
+use mach.c.C
+use int.Int
+use mach.int.UInt64
+
+val f (p1 p2: ptr uint64) : unit
+  requires { valid p1 2 }
+  requires { valid p2 2 }
+  requires { offset p1 = 0 }
+  requires { offset p2 = 1 }
+  alias { p1.data with p2.data }
+  writes { p1.data.elts,p2.data.elts }
+
+let g () : unit
+=
+  let p1 = malloc 5 in
+  let p2 = malloc 5 in
+  let p3 = incr p2 1 in
+  f p1 p3

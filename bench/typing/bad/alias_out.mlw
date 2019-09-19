@@ -1,0 +1,24 @@
+use map.Map
+use array.Array
+use mach.c.C
+use int.Int
+use mach.int.UInt64
+
+val alloc2 () : (r1:ptr uint64, r2:ptr uint64)
+  ensures { offset r1 = 0 /\ offset r2 = 0 }
+  ensures { valid r1 0 /\ valid r2 0 }
+  alias { r1.data with r2.data }
+
+let free2_sep (p1 p2:ptr uint64) : unit
+  requires { offset p1 = 0 }
+  requires { offset p2 = 0 }
+  requires { valid p1 0 }
+  requires { valid p2 0 }
+  writes   { p1, p1.data, p2, p2.data }
+=
+  free p1;
+  free p2
+
+let bad () =
+  let r1, r2 = alloc2 () in
+  free2_sep r1 r2
