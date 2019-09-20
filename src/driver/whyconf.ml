@@ -523,7 +523,7 @@ let load_editor editors (id, section) =
     Warning.emit "[Warning] cannot load an editor: missing field '%s'@." s;
     editors
 
-let load_policy provers acc (_,section) =
+let load_policy acc (_,section) =
   try
     let source =
       {prover_name = get_string section "name";
@@ -541,7 +541,6 @@ let load_policy provers acc (_,section) =
             prover_altern = get_string ~default:"" section "target_alternative";
           }
         in
-        let _target = Mprover.find target provers in
         Mprover.add source (CPU_upgrade target) acc
       | "duplicate" ->
         let target =
@@ -550,7 +549,6 @@ let load_policy provers acc (_,section) =
             prover_altern = get_string ~default:"" section "target_alternative";
           }
         in
-        let _target = Mprover.find target provers in
         Mprover.add source (CPU_duplicate target) acc
       | _ -> raise Not_found
     with Not_found -> acc
@@ -638,7 +636,7 @@ let get_config (filename,rc) =
   let editors = get_family rc "editor" in
   let editors = List.fold_left load_editor Meditor.empty editors in
   let policy = get_family rc "uninstalled_prover" in
-  let policy = List.fold_left (load_policy provers) Mprover.empty policy in
+  let policy = List.fold_left load_policy Mprover.empty policy in
   let strategies = get_strategies ~default:[] rc in
   let strategies = List.fold_left load_strategy Mstr.empty strategies in
   { conf_file = filename;
