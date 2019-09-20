@@ -94,45 +94,39 @@ val set_size (x:mpz_ptr) (sz:int32) (ghost p: ptr limb) : unit
   ensures { mpz.abs_value_of[x] = value p (abs sz) }
   (* ensures size_of x = sz *)
 
-(* Sets all fields of an mpz_ptr, maintaining the invariant *)
-val set_fields (x:mpz_ptr) (p:ptr limb) (al sz: int32) : unit
-  requires { offset p = 0 }
-  requires { writable p }
-  requires { min p = 0 }
-  requires { max p = plength p }
-  requires { abs sz <= al = plength p }
-  writes  { mpz.abs_value_of }
-  writes  { mpz.abs_size }
-  writes  { mpz.zones }
-  writes  { mpz.alloc }
-  writes  { mpz.readers }
-  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
-  ensures { mpz.abs_size[x] = abs sz }
-  ensures { mpz.abs_value_of[x] = value p (abs sz) }
-  ensures { mpz.zones[x] = zone p }
-  ensures { mpz.alloc[x] = al }
-  ensures { mpz.readers[x] = -1 } (* p survives and is a writable pointer *)
+(* Sets the size of an mpz_ptr to 0 *)
+val set_size_0 (x:mpz_ptr) : unit
+  requires { mpz.readers[x] = -1 }
+  writes   { mpz.abs_size }
+  writes   { mpz.abs_value_of }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.abs_size[x] = 0 }
+  ensures  { mpz.abs_value_of[x] = 0 }
 
-(* Sets the data and alloc fields of an mpz_ptr, leaving size unchanged.
-   In order to maintain the invariant, the data must not shrink. *)
-val set_ptr_and_alloc (x:mpz_ptr) (p:ptr limb) (al: int32) : unit
+val set_alloc (x:mpz_ptr) (al:int32) : unit
+  requires { mpz.abs_size[x] <= al }
+  writes   { mpz.alloc }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.alloc[x] = al }
+
+
+val set_ptr (x:mpz_ptr) (p:ptr limb) : unit
   requires { offset p = 0 }
   requires { writable p }
   requires { min p = 0 }
   requires { max p = plength p }
-  requires { al = plength p }
-  requires { mpz.abs_size[x] <= al } (* data must not shrink *)
-  writes  { p }
-  writes  { p.data }
-  writes  { mpz.abs_value_of }
-  writes  { mpz.zones }
-  writes  { mpz.alloc }
-  writes  { mpz.readers }
-  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
-  ensures { mpz.abs_value_of[x] = value p (mpz.abs_size[x]) }
-  ensures { mpz.zones[x] = zone p }
-  ensures { mpz.alloc[x] = al }
-  ensures { mpz.readers[x] = -1 } (* p survives and is a writable pointer *)
+  requires { plength p = mpz.alloc[x] }
+  writes   { p }
+  writes   { p.data }    (* FIXME resets p *)
+  writes   { mpz.abs_value_of }
+  writes   { mpz.zones }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.abs_value_of[x] = value p (mpz.abs_size[x]) }
+  ensures  { mpz.zones[x] = zone p }
+  ensures  { min p = 0 }
+  ensures  { max p = plength p }
+  ensures  { plength p = old plength p }
+  ensures  { pelts p = old pelts p }
 
 val ghost alloc_of (x: mpz_ptr) : int
   ensures { result = mpz.alloc[x] }
@@ -239,12 +233,13 @@ let partial mpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
   c_assert (is_not_null q);
   if Int32.(>) (abs_size_of x) sz
   then begin
-    set_fields x q sz 0 (* data has shrunk, reset size to 0 *)
+    set_size_0 x; (* data has shrunk, reset x to 0 *)
   end
   else begin
     value_sub_frame (pelts q) (pelts op) 0 (p2i os);
-    set_ptr_and_alloc x q sz;
   end;
+  set_alloc x sz;
+  set_ptr x q;
   q
 
 let mpz_ptr_swap [@extraction:inline] (ref x y: mpz_ptr)
@@ -346,7 +341,7 @@ let wmpz_add (w u v: mpz_ptr) : unit
   then begin (*ensures { value wp (abs wsize)
                       = old (abs(mpz.abs_value_of[u] - mpz.abs_value_of[v])) }*)
             ensures { sgn_value wp wsize
-                      = old (value_of u mpz + value_of v mpz) }
+                      = (value_of u mpz + value_of v mpz) at Op }
             ensures { uw \/ mpz.readers[u] = 0 }
             ensures { vw \/ mpz.readers[v] = 0 }
             ensures { mpz.readers[w] = -1 }
