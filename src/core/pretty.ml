@@ -745,6 +745,8 @@ let () = Exn_printer.register
       fprintf fmt "Cannot cast an integer literal to type %a" print_ty ty
   | Term.InvalidRealLiteralType ty ->
       fprintf fmt "Cannot cast a real literal to type %a" print_ty ty
+  | Term.InvalidStringLiteralType ty ->
+      fprintf fmt "Cannot cast a string literal to type %a" print_ty ty
   | Pattern.ConstructorExpected (ls,ty) ->
       fprintf fmt "%s %a is not a constructor of type %a"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls

@@ -224,6 +224,7 @@ let rec dity_unify d1 d2 = match d1,d2 with
 
 let dity_int  = Dapp (its_int,  [], [])
 let dity_real = Dapp (its_real, [], [])
+let dity_str  = Dapp (its_str,  [], [])
 let dity_bool = Dapp (its_bool, [], [])
 let dity_unit = Dapp (its_unit, [], [])
 

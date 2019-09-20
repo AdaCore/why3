@@ -198,6 +198,8 @@ let const_v1 fmt c =
           Format.fprintf fmt "%a.0p%se%s"
             (Number.print_in_base 16 None) i (BigInt.to_string p2) (BigInt.to_string p5)
       end
+  | ConstStr c ->
+      print_string_constant fmt c
 
 let const_v2 fmt c =
   match c with
@@ -206,6 +208,8 @@ let const_v2 fmt c =
   | ConstReal { rl_kind=_; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
       Format.fprintf fmt "%s.p%se%s"
         (BigInt.to_string i) (BigInt.to_string p2) (BigInt.to_string p5)
+  | ConstStr c ->
+      print_string_constant fmt c
 
 end
 

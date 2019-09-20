@@ -228,6 +228,8 @@ let rec print_term info defs fmt t = match t.t_node with
         | Constant.ConstInt _ ->
             fprintf fmt "<num val=\"%a\">%a</num>"
               (Constant.print number_format) c (print_ty info) (t_type t)
+        | Constant.ConstStr _ ->
+           Constant.print number_format fmt c
         | Constant.ConstReal _ ->
            match t.t_ty with
            | None -> assert false (* impossible *)

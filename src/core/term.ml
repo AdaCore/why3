@@ -861,13 +861,15 @@ let t_real_const ?pow2 ?pow5 s =
 
 exception InvalidIntegerLiteralType of ty
 exception InvalidRealLiteralType of ty
+exception InvalidStringLiteralType of ty
 
 let check_literal c ty =
   let open Constant in
   let ts = match ty.ty_node, c with
     | Tyapp (ts,[]), _ -> ts
     | _, ConstInt _ -> raise (InvalidIntegerLiteralType ty)
-    | _, ConstReal _ -> raise (InvalidRealLiteralType ty) in
+    | _, ConstReal _ -> raise (InvalidRealLiteralType ty)
+    | _, ConstStr _ -> raise (InvalidRealLiteralType ty) in
   match c, ts.ts_def with
   | ConstInt _, _ when ts_equal ts ts_int -> ()
   | ConstInt n, Range ir -> Number.check_range n ir
@@ -875,6 +877,8 @@ let check_literal c ty =
   | ConstReal _, _ when ts_equal ts ts_real -> ()
   | ConstReal x, Float fp -> Number.check_float x fp
   | ConstReal _, _ -> raise (InvalidRealLiteralType ty)
+  | ConstStr _, _ when ts_equal ts ts_str -> ()
+  | ConstStr _, _ -> raise (InvalidStringLiteralType ty)
 
 let t_const c ty = check_literal c ty; t_const c ty
 

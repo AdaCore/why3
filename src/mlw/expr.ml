@@ -637,6 +637,8 @@ let rec post_of_expr res e = match e.e_node with
       post_of_term res (t_const c ty_int)
   | Econst (Constant.ConstReal _ as c)->
       post_of_term res (t_const c ty_real)
+  | Econst (Constant.ConstStr _ as c) ->
+      post_of_term res (t_const c ty_str)
   | Epure t -> post_of_term res t
   | Eghost e | Eexn (_,e) -> post_of_expr res e
   | Eexec (_,c) ->

@@ -124,7 +124,7 @@ module Harness
     length (substring s i x) <= length s
 
   lemma substring_smaller_x: forall s i x.
-    i + x >= length s -> length (substring s i x) < x
+    i + x >= length s -> length (substring s i x) <= x
 
   (* continue here *)
 

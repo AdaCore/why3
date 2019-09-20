@@ -423,7 +423,7 @@ term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
 | ident       { Tident (Qident $1) }
-| INTEGER     { Tconst Number.(ConstInt (int_literal ILitDec ~neg:false $1)) }
+| INTEGER     { Tconst (Constant.ConstInt Number.(int_literal ILitDec ~neg:false $1)) }
 | TRUE        { Ttrue }
 | FALSE       { Tfalse }
 | term_sub_                 { $1 }

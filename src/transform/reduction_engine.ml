@@ -37,6 +37,7 @@ let big_int_of_const c =
   match c with
   | Constant.ConstInt i -> i.Number.il_int
   | Constant.ConstReal _ -> assert false
+  | Constant.ConstStr _ -> assert false
 
 let big_int_of_value v =
   match v with
@@ -49,6 +50,7 @@ let real_of_const c =
   match c with
   | Constant.ConstReal r -> r.Number.rl_real
   | Constant.ConstInt _ -> assert false
+  | Constant.ConstStr _ -> assert false
 
 let real_of_value v =
   match v with

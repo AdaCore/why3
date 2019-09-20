@@ -249,6 +249,7 @@ let rec print_term info fmt t =
             | Float fp -> fp
             | _ -> assert false in
           syntax_float_literal st fp fmt c
+        | _, Constant.ConstStr _ 
         | None, _ -> Constant.print number_format fmt c
         (* TODO/FIXME: we must assert here that the type is either
             ty_int or ty_real, otherwise it makes no sense to print

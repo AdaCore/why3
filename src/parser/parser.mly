@@ -756,7 +756,7 @@ term_arg_:
 | qualid                    { Tident $1 }
 | AMP qualid                { Tasref $2 }
 | numeral                   { Tconst $1 }
-(* | STRING                    { Tsconst $1 } *)
+| STRING                    { Tconst (Constant.ConstStr $1) }
 | TRUE                      { Ttrue }
 | FALSE                     { Tfalse }
 | o = oppref ; a = term_arg { Tidapp (Qident o, [a]) }
@@ -1125,7 +1125,7 @@ expr_arg_:
 | qualid                    { Eident $1 }
 | AMP qualid                { Easref $2 }
 | numeral                   { Econst $1 }
-(* | string                    { Esconst $1 } *)
+| STRING                    { Econst (Constant.ConstStr $1) }
 | TRUE                      { Etrue }
 | FALSE                     { Efalse }
 | o = oppref ; a = expr_arg { Eidapp (Qident o, [a]) }

@@ -26,6 +26,7 @@ val dity_of_ity : ity -> dity
 
 val dity_int  : dity
 val dity_real : dity
+val dity_str  : dity
 val dity_bool : dity
 val dity_unit : dity
 

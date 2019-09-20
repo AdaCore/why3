@@ -390,6 +390,8 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       DTconst (c, dty_int)
   | Ptree.Tconst (Constant.ConstReal _ as c) ->
       DTconst (c, dty_real)
+  | Ptree.Tconst (Constant.ConstStr _ as c) ->
+      DTconst (c, dty_str)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm ns km crcmap gvars at denv e1 in
@@ -925,6 +927,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let dty = if Mts.is_empty muc.muc_theory.uc_floats
                 then dity_real else dity_fresh () in
       DEconst(c, dty)
+  | Ptree.Econst (Constant.ConstStr _ as c) ->
+      DEconst(c, dity_str)
   | Ptree.Eref ->
       DEsym (RS rs_ref)
   | Ptree.Erecord fl ->

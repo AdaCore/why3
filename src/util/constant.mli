@@ -15,6 +15,7 @@ open Number
 type constant =
   | ConstInt  of int_constant
   | ConstReal of real_constant
+  | ConstStr  of string
 
 val compare_const : constant -> constant -> int
 (** structural comparison; two mathematically equal values might differ *)
@@ -25,6 +26,8 @@ val int_const_of_int : int -> constant
 val real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> constant
 
 (** Pretty-printing *)
+
+val print_string_constant : formatter -> string -> unit
 
 val print : number_support -> formatter -> constant -> unit
 

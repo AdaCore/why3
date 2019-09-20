@@ -34,6 +34,7 @@ type value =
   | Vreal of real
   | Vfloat_mode of float_mode
   | Vfloat of big_float
+  | Vstring of string
   | Vbool of bool
   | Vvoid
   | Varray of value array
@@ -75,6 +76,8 @@ let rec print_value fmt v =
       fprintf fmt "%s (%s)" decimal hexadecimal
   | Vfloat_mode m ->
       fprintf fmt "%s" (mode_to_string m)
+  | Vstring s ->
+      fprintf fmt "%s" s
   | Vvoid ->
     fprintf fmt "()"
   | Varray a ->
@@ -713,6 +716,7 @@ let rec eval_expr env (e : expr) : result =
       else
         let s = Format.asprintf "%a" Constant.print_constant (Constant.ConstReal r) in
         Normal (Vfloat (make_from_str s))
+  | Econst (Constant.ConstStr s) -> Normal (Vstring s)
   | Eexec (ce,cty) ->
     assert (cty.cty_args = []);
     assert (ce.c_cty.cty_args = []);

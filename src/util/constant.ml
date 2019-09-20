@@ -16,6 +16,7 @@ open Number
 type constant =
   | ConstInt  of int_constant
   | ConstReal of real_constant
+  | ConstStr  of string
 
 let compare_const c1 c2 =
   match c1, c2 with
@@ -37,8 +38,12 @@ let int_const_of_int n =
 let real_const ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) i =
   ConstReal { rl_kind = RLitUnk; rl_real = real_value ~pow2 ~pow5 i }
 
+let print_string_constant fmt s =
+  Format.fprintf fmt "\"%s\"" s
+
 let print support fmt = function
   | ConstInt i -> print_int_constant support fmt i
   | ConstReal r -> print_real_constant support fmt r
+  | ConstStr s -> print_string_constant fmt s
 
 let print_constant = print full_support
