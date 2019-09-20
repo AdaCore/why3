@@ -294,10 +294,7 @@ rule token = parse
       (* Typing.close_file is supposedly done at the end of the file in
          parsing.mly. If there is a syntax error, we still need to close it (to
          be able to reload). *)
-      Loc.with_location (fun _x ->
-        (try ignore(Typing.close_file ()) with
-        | _e -> ());
-        raise (Error s)) lb
+      Loc.with_location (fun _x -> raise (Error s)) lb
     in
     I.loop_handle succeed fail supplier checkpoint
 
