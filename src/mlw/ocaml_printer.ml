@@ -383,11 +383,13 @@ module Print = struct
     | _ -> false
 
   let print_constant fmt e = begin match e.e_node with
-    | Econst c ->
+    | Econst (Constant.ConstInt c) ->
         let v = c.Number.il_int in
         let s = BigInt.to_string v in
         if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" s
         else fprintf fmt "%s" s
+    | Econst (Constant.ConstStr s) ->
+        fprintf fmt "\"%s\"" s
     | _ -> assert false end
 
   let print_for_direction fmt = function
@@ -533,7 +535,7 @@ module Print = struct
     let protect_on_be ?(boxed=false) b s = protect_on ~boxed ~be:true b s in
     let protect_on ?(boxed=false) b s = protect_on ~boxed ~be b s in
     match e.e_node with
-    | Econst c ->
+    | Econst (Constant.ConstInt c) ->
         let n = c.Number.il_int in
         let n = BigInt.to_string n in
         let id = match e.e_ity with
@@ -544,6 +546,9 @@ module Print = struct
          | None when n = "0" -> fprintf fmt "Z.zero"
          | None when n = "1" -> fprintf fmt "Z.one"
          | None   -> fprintf fmt (protect_on (prec < 4) "Z.of_string \"%s\"") n)
+    | Econst (Constant.ConstStr s) ->
+        fprintf fmt "\"%s\"" (String.escaped s)
+    | Econst (Constant.ConstReal _) -> assert false (* TODO *)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->

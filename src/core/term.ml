@@ -859,6 +859,9 @@ let t_int_const n =
 let t_real_const ?pow2 ?pow5 s =
   t_const (Constant.real_const ?pow2 ?pow5 s) Ty.ty_real
 
+let t_string_const s =
+  t_const (Constant.string_const s) Ty.ty_str
+
 exception InvalidIntegerLiteralType of ty
 exception InvalidRealLiteralType of ty
 exception InvalidStringLiteralType of ty

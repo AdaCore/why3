@@ -5,6 +5,7 @@ printer "ocaml"
 
 module BuiltIn
   syntax type int "Z.t"
+  syntax type string "string"
 end
 
 module HighOrd
@@ -331,19 +332,23 @@ module mach.onetime.OneTime
   syntax val split    "(%1-%2, %2)" prec 0 13 13
 end
 
-module string.Char
-  syntax type char "char"
-  syntax val chr "Char.chr (Z.to_int %1)" prec 4 3
-  syntax val code "Z.of_int (Char.code %1)" prec 4 3
-  syntax val uppercase "Char.uppercase %1" prec 4 3
-  syntax val lowercase "Char.lowercase %1" prec 4 3
+(* module string.Char                                    *)
+(*   syntax type char "char"                             *)
+(*   syntax val chr "Char.chr (Z.to_int %1)" prec 4 3    *)
+(*   syntax val code "Z.of_int (Char.code %1)" prec 4 3  *)
+(*   syntax val uppercase "Char.uppercase %1" prec 4 3   *)
+(*   syntax val lowercase "Char.lowercase %1" prec 4 3   *)
+(* end                                                   *)
+
+module newio.StdIO
+   syntax val print_string "Pervasives.print_string %1" prec 4 3
 end
 
-module io.StdIO
-  syntax val print_char "Pervasives.print_char %1" prec 4 3
-  syntax val print_int "Pervasives.print_string (Z.to_string %1)" prec 4 3
-  syntax val print_newline "Pervasives.print_newline %1" prec 4 3
-end
+(* module io.StdIO                                                             *)
+(*   syntax val print_char "Pervasives.print_char %1" prec 4 3                 *)
+(*   syntax val print_int "Pervasives.print_string (Z.to_string %1)" prec 4 3  *)
+(*   syntax val print_newline "Pervasives.print_newline %1" prec 4 3           *)
+(* end                                                                         *)
 
 module random.Random
   syntax val random_int    "Z.of_int (Random.int (Z.to_int %1))" prec 4 3

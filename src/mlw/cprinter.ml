@@ -931,12 +931,12 @@ module MLToC = struct
       | Tyapp ({ ts_def = Range { ir_lower = lb; ir_upper = ub }},_) ->
          let init_test_ok, end_test_ok =
            match se, ee with
-           | _, Some { e_node = Mltree.Econst ec } ->
+           | _, Some { e_node = Mltree.Econst (Constant.ConstInt ec) } ->
               true,
               if dir = To
               then BigInt.lt ec.il_int ub
               else BigInt.lt lb ec.il_int
-           | Some { e_node = Mltree.Econst sc }, _ ->
+           | Some { e_node = Mltree.Econst (Constant.ConstInt sc) }, _ ->
               (if dir = To
                then BigInt.eq sc.il_int lb
                else BigInt.eq sc.il_int ub),
@@ -1024,7 +1024,8 @@ module MLToC = struct
        let id = pv_name pv in
        let e = C.Evar id in
        ([], expr_or_return env e)
-    | Mltree.Econst ic ->
+    | Mltree.Econst Constant.(ConstStr _ | ConstReal _) -> assert false (* TODO *)
+    | Mltree.Econst (Constant.ConstInt ic) ->
        let open Number in
        let print fmt ic =
         let n = ic.il_int in

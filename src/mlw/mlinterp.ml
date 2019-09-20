@@ -30,6 +30,7 @@ type value =
   | Vbigint of BigInt.t
   | Vint of int
   | Vbool of bool
+  | Vstring of string
   | Vvoid
   | Varray of value array
   | Vmatrix of value array array
@@ -60,19 +61,23 @@ let is_range_small_int ir =
 
 (* a value with a range type included in [min_int, max_int]
    can be interpreted as an int *)
-let value_of_const ic ty =
-  let bc = ic.Number.il_int in
-  match ty with
-  | Some { ty_node = Tyapp ({ ts_def = Range ir }, [])}
-       when is_range_small_int ir
-    -> Vint (BigInt.to_int bc)
-  | _ -> Vbigint bc
+let value_of_const c ty = match c with
+  | Constant.ConstInt ic ->
+     let bc = ic.Number.il_int in
+     begin match ty with
+     | Some { ty_node = Tyapp ({ ts_def = Range ir }, [])}
+          when is_range_small_int ir
+       -> Vint (BigInt.to_int bc)
+     | _ -> Vbigint bc end
+  | Constant.ConstStr s -> Vstring s
+  | Constant.ConstReal _ -> assert false
 
 open Format
 
 let rec print_value fmt = function
   | Vvoid -> fprintf fmt "()"
   | Vbool b -> fprintf fmt "%b" b
+  | Vstring s -> fprintf fmt "\"%s\"" s
   | Vbigint i -> Constant.print_constant fmt (Constant.int_const i)
   | Vint i -> fprintf fmt "%d" i
   | Vtuple l -> fprintf fmt "@[<hov 2>(%a)@]"
@@ -600,9 +605,9 @@ let rec matching info v pat =
 
 let rec interp_expr info (e:Mltree.expr) : value =
   Mltree.(match e.e_node with
-  | Econst nc ->
+  | Econst c ->
      begin match e.e_ity with
-     | I i -> value_of_const nc (Some (ty_of_ity i))
+     | I i -> value_of_const c (Some (ty_of_ity i))
      | _ -> assert false
      end
   | Evar pv ->
@@ -830,7 +835,8 @@ let rec value_of_term kn t =
               | Vbool b -> Vbool (not b)
               | _ -> assert false end
   (* TODO Tbinop maybe *)
-  | Tconst (Constant.ConstInt ic) -> value_of_const ic t.t_ty
+  | Tconst (Constant.ConstInt _ as c) -> value_of_const c t.t_ty
+  | Tconst (Constant.ConstStr _ as c) -> value_of_const c t.t_ty
   | Term.Tapp (ls,[]) ->
      begin match find_logic_definition kn ls with
      | None -> raise CannotReduce
@@ -843,6 +849,7 @@ let rec value_of_term kn t =
 let rec term_of_value = function
   | Vbool true -> t_bool_true
   | Vbool false -> t_bool_false
+  | Vstring s -> t_string_const s
   | Vbigint i -> t_int_const i
   | Vint _ -> raise CannotReduce
   | Vtuple l -> t_tuple (List.map term_of_value l)

@@ -38,6 +38,9 @@ let int_const_of_int n =
 let real_const ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) i =
   ConstReal { rl_kind = RLitUnk; rl_real = real_value ~pow2 ~pow5 i }
 
+let string_const s =
+  ConstStr s
+
 let print_string_constant fmt s =
   Format.fprintf fmt "\"%s\"" s
 
