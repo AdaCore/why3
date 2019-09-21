@@ -123,13 +123,34 @@ module Harness
   lemma substring_smaller: forall s i x.
     length (substring s i x) <= length s
 
+  lemma substring_negative: forall i x s.
+    i < 0 || x < 0 -> substring s i x = ""
+
+  lemma substring_negative2: forall i x s.
+    i < 0 || x < 0 -> length (substring s i x) = 0
+
   lemma substring_smaller_x: forall s i x.
-    i + x >= length s -> length (substring s i x) <= x
+    x > 0 && i + x > length s -> length (substring s i x) <= x
 
-  (* continue here *)
+  lemma prefix_substring: forall s1 s2.
+    prefixof s1 s2 <-> s1 = substring s2 0 (length s1)
 
+  lemma prefix_concat: forall s1 s2.
+    prefixof s1 (concat2 s1 s2)
 
+  lemma suffix_substring: forall s1 s2.
+    suffixof s1 s2 <-> s1 = substring s2 (length s2 - length s1) (length s1)
 
+  lemma suffix_concat: forall s1 s2.
+    suffixof s2 (concat2 s1 s2)
+
+  lemma contains_substring: forall s1 s2. (* CHECK can we write this w/o exists? *)
+    contains s1 s2 <-> exists i. i > 0 && substring s2 i (length s1) = s1
+
+  lemma contains_concat: forall s1 s2 s3.
+    contains s1 (concat2 s1 s2) && contains s2 (concat2 s1 s2) &&
+      contains s1 (concat3 s1 s2 s3) && contains s2 (concat3 s1 s2 s3) &&
+        contains s3 (concat3 s1 s2 s3)
 
   goal TestIndefof1:
     indexof "" "" 0 = 0
@@ -140,13 +161,13 @@ module Harness
   goal TestIndefof3:
     indexof "" "a" 0 = -1
 
-  goal TestIndefof4: (* CHECK THIS *)
+  goal TestIndefof4:
     indexof "a" "" 1 = 1
 
   goal TestIndefof5:
     indexof "a" "" 2 = -1
 
-  goal TestIndefof6: (* CHECK THIS *)
+  goal TestIndefof6:
     indexof "ab" "" 2 = 2
 
   goal TestIndefof7:
@@ -164,17 +185,35 @@ module Harness
   goal TestIndexof11: forall s1.
     indexof s1 "" 0 = 0
 
-  goal TestIndexof12: forall s2.
-    s2 <> "" -> indexof "" s2 0 = -1
+  lemma indexof_empty1: forall s.
+    s <> "" -> indexof "" s 0 = -1
 
-  goal TestIndexof13: (* check this *)
-    indexof "abc" "c" (-1) = -1
+  lemma indexof_empty2: forall s i.
+    0 <= i <= length s -> indexof s "" i = i
 
-  goal TestIndefof14:
-    indexof "abcdefgh" "" 4 = 4
+  lemma indexof_contains: forall s1 s2.
+    let j = indexof s1 s2 0 in
+    contains s1 s2 && s2 <> empty ->
+      0 <= j <= length s1 && substring s1 j (length s2) = s2
 
-  goal TestIndefof15:
-    indexof "ab" "" 4 = -1
+  lemma contains_indexof: forall s1 s2 i.
+    0 <= indexof s1 s2 i -> contains s1 s2
+
+  lemma not_contains_indexof: forall s1 s2 i.
+    not (contains s1 s2)  -> indexof s1 s2 i = -1
+
+  lemma substring_indexof: forall s t i.
+    let j = indexof s t i in
+    j >= 0 && 0 <= i <= length s ->
+      substring s j (length t) = t
+
+  lemma indexof_out_of_range: forall i s t.
+    not (0 <= i <= length s) -> indexof s t i = -1
+
+  lemma indexof_in_range: forall i s t.
+    0 <= i <= length s ->
+      indexof s t i = -1 || i <= indexof s t i <= length s
+
 
   goal TestReplace1: forall s2 s3.
    s2 <> "" -> replace "" s2 s3 = ""
@@ -191,13 +230,14 @@ module Harness
   goal TestReplace5:
    replace "abcdefabcdef" "bc" "123" = "a123defabcdef"
 
-  goal TestReplaceAll1: forall s1 s3. (* it has not the same behavior as replace *)
-    s1 <> "" -> replaceall s1 "" s3 = concat2 s3 s1
+  lemma not_contains_replace: forall s1 s2 s3.
+    not(contains s1 s2) -> replace s1 s2 s3 = s1
 
-  goal TestReplaceAll2:
-    replaceall "abcdefabcdefabcdef" "de" "1234" = "abc1234fabc1234fabc1234f"
+  lemma replace_empty1: forall s1 s2.
+    replace s1 s2 "" = s1
 
-
+  lemma replace_empty2: forall s1 s3.
+    replace s1 "" s3 = concat2 s1 s3
 
   lemma replace_substring_indexof: forall s t1 t2.
     let i = indexof s t1 0 in
@@ -207,22 +247,13 @@ module Harness
                 t2
                 (substring s (i + length t1) (length s - i - length t1))
 
-  lemma substring_indexof: forall s t i.
-    let j = indexof s t i in
-    j >= 0 && 0 <= i <= length s ->
-      substring s j (length t) = t
+  lemma not_contains_replaceall: forall s1 s2 s3.
+    not(contains s1 s2) -> replaceall s1 s2 s3 = s1
 
-  lemma y: forall s i.
-    0 <= i <= length s -> indexof s "" i = i
+  lemma replaceall_empty1: forall s1 s2.
+    replaceall s1 s2 "" = s1
 
-  lemma z: forall i s t.
-    not (0 <= i <= length s) -> indexof s t i = -1
-
-  lemma w: forall i s t.
-    0 <= i <= length s ->
-      indexof s t i = -1 || i <= indexof s t i <= length s
-
-  (* goal ConcatAssoc: forall s1 s2 s3. *)
-  (*   concat2 s1 (concat2 s2 s3) = concat2 (concat2 s1 s2) s3 *)
+  lemma replaceall_empty2: forall s1 s3. (* TODO Whaattt??? *)
+    replaceall s1 "" s3 = "abc"
 
 end
