@@ -872,7 +872,7 @@ let check_literal c ty =
     | Tyapp (ts,[]), _ -> ts
     | _, ConstInt _ -> raise (InvalidIntegerLiteralType ty)
     | _, ConstReal _ -> raise (InvalidRealLiteralType ty)
-    | _, ConstStr _ -> raise (InvalidRealLiteralType ty) in
+    | _, ConstStr _ -> raise (InvalidStringLiteralType ty) in
   match c, ts.ts_def with
   | ConstInt _, _ when ts_equal ts ts_int -> ()
   | ConstInt n, Range ir -> Number.check_range n ir
