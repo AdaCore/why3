@@ -69,10 +69,6 @@ module Protocol_shell = struct
     notification_list := [];
     l
 
-  (* print_ext just use the argument function here *)
-  let print_ext_any print_any fmt t =
-    print_any fmt t
-
 end
 
 let get_notified = Protocol_shell.get_notified
