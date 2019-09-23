@@ -135,13 +135,14 @@ module Harness
   lemma suffix_concat: forall s1 s2.
     suffixof s2 (concat s1 s2)
 
-  lemma contains_substring: forall s1 s2. (* CHECK can we write this w/o exists? *)
-    contains s1 s2 <-> exists i. i > 0 && substring s2 i (length s1) = s1
+  (* lemma contains_substring: forall s1 s2. *)
+  (*   contains s1 s2 <-> exists i. i >= 0 && *)
+  (*     substring s1 i (length s2) = s2 *)
 
-  lemma contains_concat: forall s1 s2 s3.
-    contains s1 (concat s1 s2) && contains s2 (concat s1 s2) &&
-      contains s1 (concat (concat s1 s2) s3) && contains s2 (concat (concat s1 s2) s3) &&
-        contains s3 (concat (concat s1 s2) s3)
+  (* lemma contains_concat: forall s1 s2 s3. *)
+  (*   contains s1 (concat s1 s2) && contains s2 (concat s1 s2) && *)
+  (*     contains s1 (concat (concat s1 s2) s3) && contains s2 (concat (concat s1 s2) s3) && *)
+  (*       contains s3 (concat (concat s1 s2) s3) *)
 
   goal TestIndefof1:
     indexof "" "" 0 = 0
@@ -245,5 +246,7 @@ module Harness
 
   lemma replaceall_empty2: forall s1 s3. (* TODO Whaattt??? *)
     replaceall s1 "" s3 = "abc"
+
+
 
 end

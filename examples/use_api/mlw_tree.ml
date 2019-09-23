@@ -53,7 +53,7 @@ let param0 = [Loc.dummy_position, None, false, Some (PTtuple [])]
 let param1 id ty = [Loc.dummy_position, Some id, false, Some ty]
 
 let mk_const i =
-  Number.(ConstInt { il_kind = ILitDec; il_int = BigInt.of_int i })
+  Constant.(ConstInt Number.{ il_kind = ILitDec; il_int = BigInt.of_int i })
 
 let mk_tconst i = mk_term (Tconst (mk_const i))
 

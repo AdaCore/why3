@@ -14,12 +14,12 @@ use seq.FreeMonoid
 type char
 val constant space: char
 val function eq (x y: char): bool ensures { result <-> x = y }
-type string = seq char
+type char_string = seq char
 
 (** The specification uses a function `remove_spaces`.
     It is recursively defined over a string, from left to right. *)
 
-let rec function remove_spaces (s: string) : string
+let rec function remove_spaces (s: char_string) : char_string
   variant { length s }
 =      if length s = 0  then s
   else if eq s[0] space then remove_spaces s[1..]
@@ -36,7 +36,7 @@ let rec function remove_spaces (s: string) : string
    So instead we use an invariant which refers to the *suffixes* of `x`
    and `y`. *)
 
-let rec compare_up_to_spaces (x y: string) : bool
+let rec compare_up_to_spaces (x y: char_string) : bool
   ensures { result <-> remove_spaces x = remove_spaces y }
 = let n = length x in
   let m = length y in

@@ -29,9 +29,9 @@ module Leftpad
   use array.Array
 
   type char (* whatever it is *)
-  type string = array char
+  type char_string = array char
 
-  let leftpad (pad: char) (n: int) (s: string) : string
+  let leftpad (pad: char) (n: int) (s: char_string) : char_string
     ensures { length result = max n (length s) }
     ensures { forall i. 0 <= i < length result - length s -> result[i] = pad }
     ensures { forall i. 0 <= i < length s ->
