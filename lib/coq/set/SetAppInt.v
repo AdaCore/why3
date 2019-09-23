@@ -11,24 +11,32 @@ Require set.SetApp.
 (* Why3 goal *)
 Definition set : Type.
 Proof.
-(* TODO find something more interesting. *)
-apply bool.
+exact (Fset.fset Z).
 Defined.
 
 (* Why3 goal *)
 Definition to_fset : set -> set.Fset.fset Numbers.BinNums.Z.
 Proof.
-(* TODO find something more interesting. *)
-intros. exists (fun _ => false).
-exists nil. intuition.
-constructor. inversion H.
+exact (fun x => x).
 Defined.
+
+(* Why3 goal *)
+Definition mk : set.Fset.fset Numbers.BinNums.Z -> set.
+Proof.
+exact (fun x => x).
+Defined.
+
+(* Why3 goal *)
+Lemma mk'spec :
+  forall (s:set.Fset.fset Numbers.BinNums.Z), ((to_fset (mk s)) = s).
+Proof.
+trivial.
+Qed.
 
 (* Why3 goal *)
 Definition choose : set -> Numbers.BinNums.Z.
 Proof.
-(* TODO find something more interesting. *)
-intros. apply Z.zero.
+exact Fset.pick.
 Defined.
 
 (* Why3 goal *)
@@ -36,8 +44,6 @@ Lemma choose'spec :
   forall (s:set), ~ set.Fset.is_empty (to_fset s) ->
   set.Fset.mem (choose s) (to_fset s).
 Proof.
-intros s h1.
-destruct h1. unfold to_fset, Fset.is_empty, Fset.mem, set.Set.mem.
-intuition.
+apply Fset.pick_def.
 Qed.
 
