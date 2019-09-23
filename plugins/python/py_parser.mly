@@ -85,6 +85,10 @@
 %nonassoc LEFTSQ
 
 %start file
+(* Transformations entries *)
+%start <Why3.Ptree.term> term_eof
+%start <Why3.Ptree.term list> term_comma_list_eof
+%start <Why3.Ptree.ident list> ident_comma_list_eof
 
 %type <Py_ast.file> file
 %type <Py_ast.decl> stmt
@@ -352,3 +356,18 @@ term_sub_:
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }
+
+(* Parsing of a list of qualified identifiers for the ITP *)
+
+(* parsing of a single term *)
+
+term_eof:
+| term EOF { $1 }
+
+ident_comma_list_eof:
+| comma_list1(ident) EOF { $1 }
+
+term_comma_list_eof:
+| comma_list1(term) EOF { $1 }
+(* we use single_term to avoid conflict with tuples, that
+   do not need parentheses *)

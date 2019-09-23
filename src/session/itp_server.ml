@@ -105,10 +105,18 @@ let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 let debug_attrs = Debug.register_info_flag "print_model_attrs"
   ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
 
+(* Return the language associated to the following goals. It uses the extension
+   of the ancester file goal for this *)
+let lang ses any =
+  let file = Session_itp.get_encapsulating_file ses any in
+  match Filename.extension (Sysutil.basename (Session_itp.file_path file)) with
+  | ".py" -> "python"
+  | _ -> "why3" (* TODO to be completed *)
 
 (****** Exception handling *********)
 
 let p s id =
+  let lang = lang s (APn id) in
   let _,tables = Session_itp.get_task_name_table s id in
   (* We use snapshots of printers to avoid registering new values inside it
      only for exception messages.
@@ -116,7 +124,7 @@ let p s id =
   let pr = Ident.duplicate_ident_printer tables.Trans.printer in
   let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
   (* Use the external printer for exception reporting (default is identity) *)
-  (Pretty.create ~print_ext_any:(print_ext_any "why3") pr apr pr pr false)
+  (Pretty.create ~print_ext_any:(print_ext_any lang) pr apr pr pr false)
 
 let print_opt_type ~print_type fmt t =
   match t with
@@ -886,6 +894,7 @@ end
   (* -- send the task -- *)
   let task_of_id d id show_full_context loc =
     let task,tables = get_task_name_table d.cont.controller_session id in
+    let lang = lang d.cont.controller_session (APn id) in
     (* This function also send source locations associated to the task *)
     let goal_loc, loc_color_list =
       if loc then get_locations task else (None, []) in
@@ -894,7 +903,7 @@ end
       let apr = tables.Trans.aprinter in
       (* For task printing we use the external printer (the default one is
          identity). *)
-      let module P = (val Pretty.create ~print_ext_any:(print_ext_any "why3") pr apr
+      let module P = (val Pretty.create ~print_ext_any:(print_ext_any lang) pr apr
                          pr pr false) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in

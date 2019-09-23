@@ -261,9 +261,9 @@ exception Arg_parse_type_error of Loc.position * string * exn
 
 let parse_term_ref        = ref (fun _nt lb -> Lexer.parse_term lb)
 let parse_term_list_ref   = ref (fun _nt lb -> Lexer.parse_term_list lb)
-let parse_qualid_ref      = ref (fun _nt lb -> Lexer.parse_qualid lb)
-let parse_list_qualid_ref = ref (fun _nt lb -> Lexer.parse_list_qualid lb)
-let parse_list_ident_ref  = ref (fun _nt lb -> Lexer.parse_list_ident lb)
+let parse_qualid_ref      = ref (fun lb -> Lexer.parse_qualid lb)
+let parse_list_qualid_ref = ref (fun lb -> Lexer.parse_list_qualid lb)
+let parse_list_ident_ref  = ref (fun lb -> Lexer.parse_list_ident lb)
 
 let set_argument_parsing_functions ~parse_term ~parse_term_list
     ~parse_qualid ~parse_list_qualid ~parse_list_ident =

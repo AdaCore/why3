@@ -354,6 +354,31 @@ let read_channel env path file c =
   end;
   mm
 
+(* Register the transformations functions *)
+let rec python_ext_printer print_any fmt a =
+  match a with
+
+  | Pretty.Pp_term (t, pri) ->
+      begin match t.Term.t_node with
+        | Term.Tapp (ls, [t1; t2]) when Term.ls_equal ls Term.ps_equ ->
+            (* TODO use priorities *)
+            Format.fprintf fmt "@[(%a == %a)@]"
+              (python_ext_printer print_any) (Pretty.Pp_term (t1, pri))
+              (python_ext_printer print_any) (Pretty.Pp_term (t2, pri))
+        | _ -> print_any fmt a
+      end
+  | _ -> print_any fmt a
+
+let () = Itp_server.add_registered_lang "python" python_ext_printer
+
+let () = Args_wrapper.set_argument_parsing_functions
+    ~parse_term:(fun _ lb -> Py_lexer.parse_term lb)
+    ~parse_term_list:(fun _ lb -> Py_lexer.parse_term_list lb)
+    ~parse_list_ident:(fun lb -> Py_lexer.parse_list_ident lb)
+    (* TODO for qualids, add a similar funciton *)
+    ~parse_qualid:(fun lb -> Lexer.parse_qualid lb)
+    ~parse_list_qualid:(fun lb -> Lexer.parse_list_qualid lb)
+
 let () =
   Env.register_format mlw_language "python" ["py"] read_channel
     ~desc:"mini-Python format"
