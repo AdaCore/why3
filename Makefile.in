@@ -190,6 +190,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
 	       src/parser/lexer.ml \
 	       src/parser/parser.mli src/parser/parser.ml \
+	       src/parser/parser_messages.ml \
 	       src/driver/driver_parser.mli src/driver/driver_parser.ml \
 	       src/driver/driver_lexer.ml \
 	       src/driver/parse_smtv2_model_parser.mli src/driver/parse_smtv2_model_parser.ml \
@@ -217,7 +218,7 @@ LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
           pinterp mltree compile mlinterp pdriver cprinter ml_printer \
 	  ocaml_printer cakeml_printer
 
-LIB_PARSER = ptree glob typing parser typing lexer
+LIB_PARSER = ptree glob typing parser_messages parser typing report lexer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper detect_polymorphism reduction_engine compute \
@@ -288,6 +289,25 @@ else
 src/session/compress.ml: config.status src/session/compress_none.ml
 	cp src/session/compress_none.ml $@
 endif
+
+.PHONY: initialize_messages update-parsing-error-handling
+
+src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.messages
+	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
+	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
+	src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
+	@if ! cmp -s src/parser/handcrafted.messages src/parser/handcrafted.messages.temp; then \
+		echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
+contains an updated version that must be checked before replacing 'src/parser/handcrafted.messages'"; \
+		exit 1; \
+	fi
+	rm -f src/parser/handcrafted.messages.temp
+	$(MENHIR) --explain --strict src/parser/parser.mly --compile-errors \
+	src/parser/handcrafted.messages > src/parser/parser_messages.ml.tmp
+	mv src/parser/parser_messages.ml.tmp src/parser/parser_messages.ml
+
+clean::
+	rm -f src/parser/parser_messages.ml.tmp src/parser/handcrafted.messages.temp
 
 # hide deprecated warnings for strings
 
@@ -1727,6 +1747,8 @@ endif
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
   share/Makefile.config bin/why3extract.@OCAMLBEST@
 	bash bench/bench ".@OCAMLBEST@"
+	@echo "=== Check parsing message ==="
+	bench/parsing-bench
 	$(MAKE) bench-api
 	@echo ""
 	@echo "=== Checking extraction ==="
