@@ -77,9 +77,24 @@ let unproven_goals_below_id cont id =
 module type Protocol = sig
   val get_requests : unit -> ide_request list
   val notify : notification -> unit
-  val print_ext_any: Pretty.any_pp Pp.pp -> Pretty.any_pp Pp.pp
 
 end
+
+let registered_lang = Hashtbl.create 42
+
+exception Task_language_error
+
+let add_registered_lang lang print_ext_any =
+  if Hashtbl.mem registered_lang lang then
+    raise Task_language_error
+  else
+    Hashtbl.add registered_lang lang print_ext_any
+
+(* Printing of task *)
+let print_ext_any (lang:string) print_any =
+  match Hashtbl.find registered_lang lang with
+  | print_ext_any -> print_ext_any print_any
+  | exception Not_found -> print_any
 
 module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
 
@@ -101,7 +116,7 @@ let p s id =
   let pr = Ident.duplicate_ident_printer tables.Trans.printer in
   let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
   (* Use the external printer for exception reporting (default is identity) *)
-  (Pretty.create ~print_ext_any:Pr.print_ext_any pr apr pr pr false)
+  (Pretty.create ~print_ext_any:(print_ext_any "why3") pr apr pr pr false)
 
 let print_opt_type ~print_type fmt t =
   match t with
@@ -879,7 +894,7 @@ end
       let apr = tables.Trans.aprinter in
       (* For task printing we use the external printer (the default one is
          identity). *)
-      let module P = (val Pretty.create ~print_ext_any:Pr.print_ext_any pr apr
+      let module P = (val Pretty.create ~print_ext_any:(print_ext_any "why3") pr apr
                          pr pr false) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in

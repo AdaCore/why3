@@ -21,11 +21,13 @@ module type Protocol = sig
   val get_requests : unit -> ide_request list
   (* Notify *)
   val notify : notification -> unit
-  (* A specific external way to print task. This is combined with the
-     standard printer (see Pretty). *)
-  val print_ext_any: any_pp Pp.pp -> any_pp Pp.pp
 
 end
+
+(* A specific external way to print task. This registered an external printer
+   for printing tasks. This is combined with the standard printer (see Pretty).
+*)
+val add_registered_lang: string -> (any_pp Pp.pp -> any_pp Pp.pp) -> unit
 
 module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
 

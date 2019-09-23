@@ -259,27 +259,41 @@ let type_ptree ~as_fmla t tables =
 
 exception Arg_parse_type_error of Loc.position * string * exn
 
-let parse_and_type ~as_fmla s task =
+let parse_term_ref        = ref (fun _nt lb -> Lexer.parse_term lb)
+let parse_term_list_ref   = ref (fun _nt lb -> Lexer.parse_term_list lb)
+let parse_qualid_ref      = ref (fun _nt lb -> Lexer.parse_qualid lb)
+let parse_list_qualid_ref = ref (fun _nt lb -> Lexer.parse_list_qualid lb)
+let parse_list_ident_ref  = ref (fun _nt lb -> Lexer.parse_list_ident lb)
+
+let set_argument_parsing_functions ~parse_term ~parse_term_list
+    ~parse_qualid ~parse_list_qualid ~parse_list_ident =
+  parse_term_ref        := parse_term;
+  parse_term_list_ref   := parse_term_list;
+  parse_qualid_ref      := parse_qualid;
+  parse_list_qualid_ref := parse_list_qualid;
+  parse_list_ident_ref  := parse_list_ident
+
+let parse_and_type ~as_fmla s naming_table =
   try
     let lb = Lexing.from_string s in
     let t =
-      Lexer.parse_term lb
+      !parse_term_ref naming_table lb
     in
     let t =
-      type_ptree ~as_fmla:as_fmla t task
+      type_ptree ~as_fmla:as_fmla t naming_table
     in
     t
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
-let parse_and_type_list ~as_fmla s task =
+let parse_and_type_list ~as_fmla s naming_table =
   try
     let lb = Lexing.from_string s in
     let t_list =
-      Lexer.parse_term_list lb
+      !parse_term_list_ref naming_table lb
     in
     let t_list =
-      List.map (fun t -> type_ptree ~as_fmla:as_fmla t task) t_list
+      List.map (fun t -> type_ptree ~as_fmla:as_fmla t naming_table) t_list
     in
     t_list
   with
@@ -288,21 +302,21 @@ let parse_and_type_list ~as_fmla s task =
 let parse_qualid s =
   try
     let lb = Lexing.from_string s in
-    Lexer.parse_qualid lb
+    !parse_qualid_ref lb
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
 let parse_list_qualid s =
   try
     let lb = Lexing.from_string s in
-    Lexer.parse_list_qualid lb
+    !parse_list_qualid_ref lb
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
 let parse_list_ident s =
   try
     let lb = Lexing.from_string s in
-    Lexer.parse_list_ident lb
+    !parse_list_ident_ref lb
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
