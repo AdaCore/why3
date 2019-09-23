@@ -12,20 +12,8 @@ module String
   constant empty : string = ""
   (** the empty string. *)
 
-  function concat2 string string : string
-  (** `concat2 s1 s2` returns the concatenation of `s1` and `s2`.  *)
-
-  function concat3 string string string : string
-  (** `concat2 s1 s2 s3` returns the concatenation of `s1`, `s2`, and
-  `s3`. *)
-
-  function concat4 string string string string : string
-  (** `concat2 s1 s2 s3 s4` returns the concatenation of `s1`, `s2`,
-  `s3`, and `s4`. *)
-
-  function concat5 string string string string string : string
-  (** `concat2 s1 s2 s3 s4 s5` returns the concatenation of `s1`, `s2`,
-  `s3`, `s4`, and `s5`. *)
+  function concat string string : string
+  (** `concat s1 s2` returns the concatenation of `s1` and `s2`.  *)
 
   function length string : int
   (** `length s` returns the length of the string `s`. *)
@@ -71,7 +59,7 @@ module String
   function replace string string string : string
   (** `replace s1 s2 s3` is:
          - `s1`, if `s2` does not occur in `s1` or `s3 = empty`;
-         - `concat2 s1 s3`, if `s2 = empty`;
+         - `concat s1 s3`, if `s2 = empty`;
          - the string obtained by replacing the first occurrence of s2
            (if any) by s3 in s1. *)
 
@@ -130,39 +118,40 @@ module LadderStringMelseqiQR
 
   val function concat2 (s1 s2: astring) : astring
     requires {satisfy_size s1 && satisfy_size s2}
-    ensures  {result = S.substring (S.concat2 s1 s2) 0 256}
+    ensures  {result = S.substring (S.concat s1 s2) 0 256}
              (* TODO check if this actually happens in iQ-R *)
 
   val function concat3 (s1 s2 s3: astring) : astring
     requires {satisfy_size s1 && satisfy_size s2 && satisfy_size s3}
-    ensures  {result = S.substring (S.concat3 s1 s2 s3) 0 256}
+    ensures  {result = S.substring (S.concat (S.concat s1 s2) s3) 0 256}
              (* TODO check if this actually happens in iQ-R *)
 
   val function concat4 (s1 s2 s3 s4: astring) : astring
     requires {satisfy_size s1 && satisfy_size s2 && satisfy_size s3 &&
               satisfy_size s4}
-    ensures  {result = S.substring (S.concat4 s1 s2 s3 s4) 0 256}
+    ensures  {result = S.substring (S.concat (S.concat s1 s2) (S.concat s3 s4)) 0 256}
              (* TODO check if this actually happens in iQ-R *)
 
   val function concat5 (s1 s2 s3 s4 s5: astring) : astring
     requires {satisfy_size s1 && satisfy_size s2 && satisfy_size s3 &&
               satisfy_size s4 && satisfy_size s5}
-    ensures  {result = S.substring (S.concat5 s1 s2 s3 s4 s5) 0 256}
+    ensures  {result =
+      S.substring (S.concat (S.concat s1 s2) (S.concat s3 (S.concat s4 s5))) 0 256}
              (* TODO check if this actually happens in iQ-R *)
 
   val function insert  (s1: astring) (s2: astring) (i: aint) : astring
     requires {satisfy_size s1 && satisfy_size s2}
     requires {0 < i <= S.length s1}
     requires {length s1 + length s2 < 256}
-    ensures  {result = S.concat3 (S.substring s1 0 i)
-                               s2
-                               (S.substring s1 i (length s1))}
+    ensures  {result = S.concat (S.concat (S.substring s1 0 i)
+                                          s2)
+                                (S.substring s1 i (length s1))}
 
   val function delete (s:  astring) (x i: aint) : astring
     requires {satisfy_size s}
     requires {0 < i < S.length s}
     requires {0 <= x <= S.length s - i + 1}
-    ensures  {result = S.concat2 (S.substring s 0 (i - 1))
+    ensures  {result = S.concat (S.substring s 0 (i - 1))
                                  (S.substring s (i + x - 1)
                                                 (S.length s - i - x + 1))}
 
@@ -173,9 +162,9 @@ module LadderStringMelseqiQR
     requires {S.length s2 >= x}
     (* this is not part of MELSEQ iQ-R manual, but the simulator seems
        to have this behavior *)
-    ensures {result = S.concat3 (S.substring s1 0 i)
-                                (S.substring s2 0 x)
-                                (S.substring s1 (i + x - 1) (S.length s1))}
+    ensures {result = S.concat (S.concat (S.substring s1 0 i)
+                                         (S.substring s2 0 x))
+                               (S.substring s1 (i + x - 1) (S.length s1))}
 
   val function find (s1: astring) (s2: astring) : aint
     requires {satisfy_size s1 && satisfy_size s2}

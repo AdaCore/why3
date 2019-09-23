@@ -11,59 +11,50 @@ module Harness
   goal Test1:
     let s = "abcdef" in substring s 2 3 = "cde"
 
+  goal TestConcat1:
+    let s1 = "abc" in
+    let s2 = "defg" in
+    concat s1 s2 = "abcdefg"
+
   goal TestConcat2:
     let s1 = "abc" in
     let s2 = "defg" in
-    concat2 s1 s2 = "abcdefg"
+    let s3 = "hij" in
+    concat (concat s1 s2) s3 = "abcdefghij"
 
   goal TestConcat3:
     let s1 = "abc" in
     let s2 = "defg" in
     let s3 = "hij" in
-    concat3 s1 s2 s3 = "abcdefghij"
+    let s4 = "klmnop" in
+    concat (concat s1 s2) (concat s3 s4) = "abcdefghijklmnop"
 
   goal TestConcat4:
     let s1 = "abc" in
     let s2 = "defg" in
     let s3 = "hij" in
     let s4 = "klmnop" in
-    concat4 s1 s2 s3 s4 = "abcdefghijklmnop"
+    let s5 = "qrst" in
+    concat (concat s1 s2) (concat (concat s3 s4) s5) = "abcdefghijklmnopqrst"
 
   goal TestConcat5:
-    let s1 = "abc" in
-    let s2 = "defg" in
-    let s3 = "hij" in
-    let s4 = "klmnop" in
-    let s5 = "qrst" in
-    concat5 s1 s2 s3 s4 s5 = "abcdefghijklmnopqrst"
+    concat "" "" = ""
 
-  goal TestConcat6:
-    concat2 "" "" = ""
-
-  lemma concat2_assoc: forall s1 s2 s3.
-    concat2 (concat2 s1 s2) s3 = concat2 s1 (concat2 s2 s3)
-
-  lemma concat3_concat2: forall s1 s2 s3.
-    concat3 s1 s2 s3 = concat2 s1 (concat2 s2 s3)
-
-  lemma concat4_concat2: forall s1 s2 s3 s4.
-    concat4 s1 s2 s3 s4 = concat2 s1 (concat2 s2 (concat2 s3 s4))
-
-  lemma concat5_concat2: forall s1 s2 s3 s4 s5.
-    concat5 s1 s2 s3 s4 s5 = concat2 s1 (concat2 s2 (concat2 s3 (concat2 s4 s5)))
+  lemma concat_assoc: forall s1 s2 s3.
+    concat (concat s1 s2) s3 = concat s1 (concat s2 s3)
 
   lemma concat_empty: forall s.
-    concat2 s empty = concat2 empty s = s
+    concat s empty = concat empty s = s
 
   goal TestLength1: length "a" = 1
   goal TestLength2: length "ab" = 2
   goal TestLength3: length "abc" = 3
-  goal TestLength4: length (concat2 "ab" "12") = 4
+  goal TestLength4: length (concat "ab" "12") = 4
 
   lemma length_empty: length "" = 0
 
   lemma length_concat: forall s1 s2.
-    length (concat2 s1 s2) = length s1 + length s2
+    length (concat s1 s2) = length s1 + length s2
 
   goal TestLt1: lt "" "a"
   goal TestLt2: lt "a" "b"
@@ -136,21 +127,21 @@ module Harness
     prefixof s1 s2 <-> s1 = substring s2 0 (length s1)
 
   lemma prefix_concat: forall s1 s2.
-    prefixof s1 (concat2 s1 s2)
+    prefixof s1 (concat s1 s2)
 
   lemma suffix_substring: forall s1 s2.
     suffixof s1 s2 <-> s1 = substring s2 (length s2 - length s1) (length s1)
 
   lemma suffix_concat: forall s1 s2.
-    suffixof s2 (concat2 s1 s2)
+    suffixof s2 (concat s1 s2)
 
   lemma contains_substring: forall s1 s2. (* CHECK can we write this w/o exists? *)
     contains s1 s2 <-> exists i. i > 0 && substring s2 i (length s1) = s1
 
   lemma contains_concat: forall s1 s2 s3.
-    contains s1 (concat2 s1 s2) && contains s2 (concat2 s1 s2) &&
-      contains s1 (concat3 s1 s2 s3) && contains s2 (concat3 s1 s2 s3) &&
-        contains s3 (concat3 s1 s2 s3)
+    contains s1 (concat s1 s2) && contains s2 (concat s1 s2) &&
+      contains s1 (concat (concat s1 s2) s3) && contains s2 (concat (concat s1 s2) s3) &&
+        contains s3 (concat (concat s1 s2) s3)
 
   goal TestIndefof1:
     indexof "" "" 0 = 0
@@ -214,12 +205,11 @@ module Harness
     0 <= i <= length s ->
       indexof s t i = -1 || i <= indexof s t i <= length s
 
-
   goal TestReplace1: forall s2 s3.
    s2 <> "" -> replace "" s2 s3 = ""
 
   goal TestReplace2: forall s1 s3. (* check standard to see if this makes sense *)
-   replace s1 "" s3 = concat2 s3 s1
+   replace s1 "" s3 = concat s3 s1
 
   goal TestReplace3:
    replace "abcde" "bc" "1234" = "a1234de"
@@ -237,14 +227,14 @@ module Harness
     replace s1 s2 "" = s1
 
   lemma replace_empty2: forall s1 s3.
-    replace s1 "" s3 = concat2 s1 s3
+    replace s1 "" s3 = concat s1 s3
 
   lemma replace_substring_indexof: forall s t1 t2.
     let i = indexof s t1 0 in
     replace s t1 t2 =
       if i < 0 then s else
-        concat3 (substring s 0 i)
-                t2
+        concat (concat (substring s 0 i)
+                       t2)
                 (substring s (i + length t1) (length s - i - length t1))
 
   lemma not_contains_replaceall: forall s1 s2 s3.

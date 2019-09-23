@@ -202,13 +202,10 @@ theory newstring.String
 
   prelude ";;; SMT-LIB2: string theory"
 
-  syntax function concat2    "(str.++ %1 %2)"
-  syntax function concat3    "(str.++ %1 %2 %3)"
-  syntax function concat4    "(str.++ %1 %2 %3 %4)"
-  syntax function concat5    "(str.++ %1 %2 %3 %4 %5)"
+  syntax function concat     "(str.++ %1 %2)"
   syntax function length     "(str.len %1)"
-  syntax predicate lt         "(str.< %1 %2)"
-  syntax predicate le         "(str.<= %1 %2)"
+  syntax predicate lt        "(str.< %1 %2)"
+  syntax predicate le        "(str.<= %1 %2)"
 
   syntax function indexof    "(str.indexof %1 %2 %3)"
   syntax function replace    "(str.replace %1 %2 %3)"
