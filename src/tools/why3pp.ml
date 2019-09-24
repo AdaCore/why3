@@ -841,7 +841,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
              fprintf fmt "%a[\\ldots %a]%s" pp_term t1 pp_term t2 s
          | SNrcut s, [t1; t2] ->
              fprintf fmt "%a[%a \\ldots]%s" pp_term t1 pp_term t2 s
-         | _ -> kasprintf failwith "pp_term Tidapp %s %d" id.id_str (List.length ts))
+         | _ -> failwith (sprintf "pp_term Tidapp %s %d" id.id_str (List.length ts)))
     | Tapply (t1, t2) ->
         (match
            if flatten_applies
