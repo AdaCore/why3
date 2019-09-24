@@ -42,7 +42,7 @@ let string_const s =
   ConstStr s
 
 let print_string_constant fmt s =
-  Format.fprintf fmt "\"%s\"" s
+  Format.fprintf fmt "\"%s\"" (String.escaped s)
 
 let print support fmt = function
   | ConstInt i -> print_int_constant support fmt i

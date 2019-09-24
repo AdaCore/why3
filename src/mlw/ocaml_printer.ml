@@ -389,7 +389,7 @@ module Print = struct
         if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" s
         else fprintf fmt "%s" s
     | Econst (Constant.ConstStr s) ->
-        fprintf fmt "\"%s\"" s
+        fprintf fmt "\"%s\"" (String.escaped s)
     | _ -> assert false end
 
   let print_for_direction fmt = function
