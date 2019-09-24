@@ -113,6 +113,7 @@ val wrap   : ('a, task) trans_typ -> 'a -> Trans.trans_with_args
 val wrap_and_register : desc:Pp.formatted -> string -> ('a, 'b) trans_typ -> 'a -> unit
 
 val set_argument_parsing_functions:
+  Env.fformat ->
   parse_term:(Trans.naming_table -> Lexing.lexbuf -> Ptree.term) ->
   parse_term_list:(Trans.naming_table -> Lexing.lexbuf -> Ptree.term list) ->
   parse_qualid:(Lexing.lexbuf -> Ptree.qualid) ->

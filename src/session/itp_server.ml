@@ -80,7 +80,7 @@ module type Protocol = sig
 
 end
 
-let registered_lang = Hashtbl.create 42
+let registered_lang = Hashtbl.create 63
 
 exception Task_language_error
 
@@ -105,13 +105,10 @@ let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
 let debug_attrs = Debug.register_info_flag "print_model_attrs"
   ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
 
-(* Return the language associated to the following goals. It uses the extension
-   of the ancester file goal for this *)
+(* Return the source language associated to the following goals. *)
 let lang ses any =
   let file = Session_itp.get_encapsulating_file ses any in
-  match Filename.extension (Sysutil.basename (Session_itp.file_path file)) with
-  | ".py" -> "python"
-  | _ -> "why3" (* TODO to be completed *)
+  Session_itp.file_format file
 
 (****** Exception handling *********)
 

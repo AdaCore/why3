@@ -371,7 +371,7 @@ let rec python_ext_printer print_any fmt a =
 
 let () = Itp_server.add_registered_lang "python" python_ext_printer
 
-let () = Args_wrapper.set_argument_parsing_functions
+let () = Args_wrapper.set_argument_parsing_functions "python"
     ~parse_term:(fun _ lb -> Py_lexer.parse_term lb)
     ~parse_term_list:(fun _ lb -> Py_lexer.parse_term_list lb)
     ~parse_list_ident:(fun lb -> Py_lexer.parse_list_ident lb)
