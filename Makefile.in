@@ -1520,49 +1520,49 @@ clean::
 endif
 
 ###############
-# Why3 pretty
+# Why3 pp
 ###############
 
-PRETTY_FILES = why3pretty
+PRETTYPRINT_FILES = why3pp
 
-PRETTYMODULES = $(addprefix src/tools/, $(PRETTY_FILES))
+PRETTYPRINTMODULES = $(addprefix src/tools/, $(PRETTYPRINT_FILES))
 
-PRETTYDEP = $(addsuffix .dep, $(PRETTYMODULES))
-PRETTYCMO = $(addsuffix .cmo, $(PRETTYMODULES))
-PRETTYCMX = $(addsuffix .cmx, $(PRETTYMODULES))
+PRETTYPRINTDEP = $(addsuffix .dep, $(PRETTYPRINTMODULES))
+PRETTYPRINTCMO = $(addsuffix .cmo, $(PRETTYPRINTMODULES))
+PRETTYPRINTCMX = $(addsuffix .cmx, $(PRETTYPRINTMODULES))
 
-$(PRETTYDEP): DEPFLAGS += -I src/tools
-$(PRETTYCMO) $(PRETTYCMX): INCLUDES += -I src/tools
+$(PRETTYPRINTDEP): DEPFLAGS += -I src/tools
+$(PRETTYPRINTCMO) $(PRETTYPRINTCMX): INCLUDES += -I src/tools
 
 # build targets
 
-byte: bin/why3pretty.byte
-opt:  bin/why3pretty.opt
+byte: bin/why3pp.byte
+opt:  bin/why3pp.opt
 
-bin/why3pretty.opt: $(WHY3CMXA) $(PRETTYCMX)
+bin/why3pp.opt: $(WHY3CMXA) $(PRETTYPRINTCMX)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
 
-bin/why3pretty.byte: $(WHY3CMA) $(PRETTYCMO)
+bin/why3pp.byte: $(WHY3CMA) $(PRETTYPRINTCMO)
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(PRETTYDEP)
+-include $(PRETTYPRINTDEP)
 endif
 
-depend: $(PRETTYDEP)
+depend: $(PRETTYPRINTDEP)
 
 uninstall-bin::
-	rm -f $(TOOLDIR)/why3pretty$(EXE)
+	rm -f $(TOOLDIR)/why3pp(EXE)
 
 install-bin::
 	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3pretty.@OCAMLBEST@ $(TOOLDIR)/why3pretty$(EXE)
+	$(INSTALL) bin/why3pp.@OCAMLBEST@ $(TOOLDIR)/why3pp$(EXE)
 
-install_local:: bin/why3pretty
+install_local:: bin/why3pp
 
 #########
 # why3doc

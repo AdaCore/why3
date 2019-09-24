@@ -15,8 +15,8 @@ module Mlw_printer = struct
   (* TODO parenthesis and associativity *)
 
   (* Test with
-     $ why3 pretty --output=mlw test.mlw > test1.mlw
-     $ why3 pretty --output=mlw test1.mlw > test2.mlw
+     $ why3 pp --output=mlw test.mlw > test1.mlw
+     $ why3 pp --output=mlw test1.mlw > test2.mlw
      $ diff test1.mlw test2.mlw *)
 
   open Format
@@ -607,8 +607,6 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
 
   open Conf
 
-  (** {2 Pretty print simplified AST}*)
-
   let sanitize =
     let my_char_to_alpha = function
       (* | '_' | '.' -> "" *)
@@ -997,7 +995,7 @@ let prefix = ref "IND"
 
 let usage =
   "Pretty print Why3 declarations (currently only inductive types in LaTeX using mathpartir).\n\
-   why3 pretty [--output=latex|mlw|ast] [--kind=inductive] [--prefix <prefix>] <filename> [<Module>.]<type> ..."
+   why3 pp [--output=latex|mlw|ast] [--kind=inductive] [--prefix <prefix>] <filename> [<Module>.]<type> ..."
 
 let options = [
   "--output", Arg.String set_output,    "<output> Output format";
