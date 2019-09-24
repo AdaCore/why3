@@ -16,27 +16,6 @@ module Harness
     let s2 = "defg" in
     concat s1 s2 = "abcdefg"
 
-  goal TestConcat2:
-    let s1 = "abc" in
-    let s2 = "defg" in
-    let s3 = "hij" in
-    concat (concat s1 s2) s3 = "abcdefghij"
-
-  goal TestConcat3:
-    let s1 = "abc" in
-    let s2 = "defg" in
-    let s3 = "hij" in
-    let s4 = "klmnop" in
-    concat (concat s1 s2) (concat s3 s4) = "abcdefghijklmnop"
-
-  goal TestConcat4:
-    let s1 = "abc" in
-    let s2 = "defg" in
-    let s3 = "hij" in
-    let s4 = "klmnop" in
-    let s5 = "qrst" in
-    concat (concat s1 s2) (concat (concat s3 s4) s5) = "abcdefghijklmnopqrst"
-
   goal TestConcat5:
     concat "" "" = ""
 
@@ -50,6 +29,8 @@ module Harness
   goal TestLength2: length "ab" = 2
   goal TestLength3: length "abc" = 3
   goal TestLength4: length (concat "ab" "12") = 4
+  goal TestLength5: length "é" = 2 (* only z3 aggrees with this *)
+  goal TestLength6: length "\\u00E9" = 3
 
   lemma length_empty: length "" = 0
 
@@ -66,7 +47,7 @@ module Harness
   lemma lt_empty: forall s.
     s <> empty -> lt empty s
 
-  lemma lt_transitive: forall s1 s2 s3. (* CHECK - not proved *)
+  goal lt_transitive: forall s1 s2 s3. (* CHECK - not proved *)
     lt s1 s2 && lt s2 s3 -> lt s1 s3
 
   lemma lt_not_com: forall s1 s2.
@@ -81,68 +62,79 @@ module Harness
   lemma lt_le_eq: forall s1 s2.
     le s1 s2 -> lt s1 s2 || s1 = s2
 
-  lemma le_transitive: forall s1 s2 s3. (* CHECK - not proved *)
+  goal le_transitive: forall s1 s2 s3. (* CHECK - not proved *)
     le s1 s2 && le s2 s3 -> le s1 s3
 
+  goal TestAt1:
+    "abc"[3] = empty
+
   lemma at_out_of_range: forall s i.
-    i >= length s || i < 0 -> s[i] = empty
+    i < 0 || i >= length s -> s[i] = empty
 
   lemma at_empty: forall i.
     empty[i] = empty
 
-  goal TestSubstring1: forall i x.
-    substring "" i x = ""
-
-  goal TestSubstring2: forall s i x.
-    i < 0 -> substring s i x = ""
-
-  goal TestSubstring3: forall s i x.
-    i > length s -> substring s i x = ""
-
-  goal TestSubstring4:
+  goal TestSubstring1:
     substring "abcdef" 1 3 = "bcd"
 
-  goal TestSubstring5:
+  goal TestSubstring2:
     substring "abcdef" 1 10 = "bcdef"
 
-  lemma substring_of_length_zero: forall s i.
-    substring s i 0 = ""
+  lemma substring_of_empty: forall i x.
+    substring "" i x = ""
 
   lemma substring_out_of_range: forall s i x.
     i < 0 || i >= length s -> substring s i x = empty
 
+  lemma substring_of_length_zero_or_less: forall s i x.
+    x <= 0 -> substring s i x = ""
+
   lemma substring_smaller: forall s i x.
     length (substring s i x) <= length s
-
-  lemma substring_negative: forall i x s.
-    i < 0 || x < 0 -> substring s i x = ""
-
-  lemma substring_negative2: forall i x s.
-    i < 0 || x < 0 -> length (substring s i x) = 0
 
   lemma substring_smaller_x: forall s i x.
     x > 0 && i + x > length s -> length (substring s i x) <= x
 
-  lemma prefix_substring: forall s1 s2.
+  lemma prefixof_substring: forall s1 s2.
     prefixof s1 s2 <-> s1 = substring s2 0 (length s1)
 
-  lemma prefix_concat: forall s1 s2.
+  lemma prefixof_concat: forall s1 s2.
     prefixof s1 (concat s1 s2)
 
-  lemma suffix_substring: forall s1 s2.
+  lemma prefixof_empty: forall s2.
+    prefixof "" s2
+
+  lemma prefixof_empty2: forall s1.
+    s1 <> empty -> not (prefixof s1 "")
+
+  lemma suffixof_substring: forall s1 s2.
     suffixof s1 s2 <-> s1 = substring s2 (length s2 - length s1) (length s1)
 
-  lemma suffix_concat: forall s1 s2.
+  lemma suffixof_concat: forall s1 s2.
     suffixof s2 (concat s1 s2)
 
-  (* lemma contains_substring: forall s1 s2. *)
-  (*   contains s1 s2 <-> exists i. i >= 0 && *)
-  (*     substring s1 i (length s2) = s2 *)
+  lemma suffixof_empty: forall s2.
+    suffixof "" s2
 
-  (* lemma contains_concat: forall s1 s2 s3. *)
-  (*   contains s1 (concat s1 s2) && contains s2 (concat s1 s2) && *)
-  (*     contains s1 (concat (concat s1 s2) s3) && contains s2 (concat (concat s1 s2) s3) && *)
-  (*       contains s3 (concat (concat s1 s2) s3) *)
+  lemma suffiof_empty2: forall s1.
+    s1 <> empty -> not (suffixof s1 "")
+
+  goal containsTest1: contains "" ""
+
+  lemma contains_empty: forall s2.
+    not (contains "" s2) || s2 = empty
+
+  lemma contains_empty2: forall s1.
+    contains s1 ""
+
+  lemma contains_substring: forall s1 s2 i.
+    substring s1 i (length s2) = s2 -> contains s1 s2
+
+  lemma contains_concat: forall s1 s2.
+    contains (concat s1 s2) s1 && contains (concat s1 s2) s2
+
+  goal substring_contains: forall s1 s2.
+    contains s1 s2 -> exists i. substring s1 i (length s2) = s2
 
   goal TestIndefof1:
     indexof "" "" 0 = 0
@@ -177,11 +169,11 @@ module Harness
   goal TestIndexof11: forall s1.
     indexof s1 "" 0 = 0
 
-  lemma indexof_empty1: forall s.
-    s <> "" -> indexof "" s 0 = -1
-
-  lemma indexof_empty2: forall s i.
+  lemma indexof_empty: forall s i.
     0 <= i <= length s -> indexof s "" i = i
+
+  lemma indexof_empty1: forall s.
+    indexof "" s 0 = -1 || s = ""
 
   lemma indexof_contains: forall s1 s2.
     let j = indexof s1 s2 0 in
@@ -194,17 +186,20 @@ module Harness
   lemma not_contains_indexof: forall s1 s2 i.
     not (contains s1 s2)  -> indexof s1 s2 i = -1
 
-  lemma substring_indexof: forall s t i.
-    let j = indexof s t i in
-    j >= 0 && 0 <= i <= length s ->
-      substring s j (length t) = t
+  lemma substring_indexof: forall s1 s2 i.
+    let j = indexof s1 s2 i in
+    j >= 0 -> substring s1 j (length s2) = s2
 
-  lemma indexof_out_of_range: forall i s t.
-    not (0 <= i <= length s) -> indexof s t i = -1
+  lemma indexof_out_of_range: forall i s1 s2.
+    not (0 <= i <= length s1) -> indexof s1 s2 i = -1
 
-  lemma indexof_in_range: forall i s t.
-    0 <= i <= length s ->
-      indexof s t i = -1 || i <= indexof s t i <= length s
+  lemma indexof_in_range: forall s1 s2 i.
+    let j = indexof s1 s2 i in
+    0 <= i <= length s1 -> j = -1 || i <= j <= length s1
+
+  lemma indexof_contains_substring: forall s1 s2 i.
+    0 <= i <= length s1 && contains (substring s1 i (length s1 - i)) s2 ->
+      i <= indexof s1 s2 i <= length s1
 
   goal TestReplace1: forall s2 s3.
    s2 <> "" -> replace "" s2 s3 = ""
@@ -222,31 +217,27 @@ module Harness
    replace "abcdefabcdef" "bc" "123" = "a123defabcdef"
 
   lemma not_contains_replace: forall s1 s2 s3.
-    not(contains s1 s2) -> replace s1 s2 s3 = s1
+    not (contains s1 s2) -> replace s1 s2 s3 = s1
 
-  lemma replace_empty1: forall s1 s2.
-    replace s1 s2 "" = s1
+  lemma replace_empty: forall s1 s3.
+    replace s1 "" s3 = concat s3 s1
 
-  lemma replace_empty2: forall s1 s3.
-    replace s1 "" s3 = concat s1 s3
+  lemma replace_empty2: forall s2 s3.
+    let s4 = replace "" s2 s3 in
+    if s2 = empty then s4 = s3 else s4 = empty
 
-  lemma replace_substring_indexof: forall s t1 t2.
-    let i = indexof s t1 0 in
-    replace s t1 t2 =
-      if i < 0 then s else
-        concat (concat (substring s 0 i)
-                       t2)
-                (substring s (i + length t1) (length s - i - length t1))
+  lemma replace_substring_indexof: forall s1 s2 s3.
+    let j = indexof s1 s2 0 in
+    replace s1 s2 s3 =
+      if j < 0 then s1 else
+        concat (concat (substring s1 0 j)
+                       s3)
+                (substring s1 (j + length s2) (length s1 - j - length s2))
 
   lemma not_contains_replaceall: forall s1 s2 s3.
-    not(contains s1 s2) -> replaceall s1 s2 s3 = s1
+    not (contains s1 s2) -> replaceall s1 s2 s3 = s1
 
-  lemma replaceall_empty1: forall s1 s2.
-    replaceall s1 s2 "" = s1
-
-  lemma replaceall_empty2: forall s1 s3. (* TODO Whaattt??? *)
-    replaceall s1 "" s3 = "abc"
-
-
+  lemma replaceall_empty1: forall s1 s3.
+    replaceall s1 "" s3 = s1
 
 end

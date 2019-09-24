@@ -4,6 +4,7 @@
 <why3session shape_version="8">
 <prover id="0" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file>
 <path name=".."/><path name="test-strings.mlw"/>
 <theory name="Harness">
@@ -14,19 +15,10 @@
  <proof prover="1"><result status="valid" time="0.02" steps="165"/></proof>
  </goal>
  <goal name="Test1" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="190"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="190"/></proof>
  </goal>
  <goal name="TestConcat1" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="186"/></proof>
- </goal>
- <goal name="TestConcat2" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="195"/></proof>
- </goal>
- <goal name="TestConcat3" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="204"/></proof>
- </goal>
- <goal name="TestConcat4" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="213"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="186"/></proof>
  </goal>
  <goal name="TestConcat5" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="183"/></proof>
@@ -38,225 +30,259 @@
  <proof prover="1"><result status="valid" time="0.03" steps="278"/></proof>
  </goal>
  <goal name="TestLength1" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="295"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="295"/></proof>
  </goal>
  <goal name="TestLength2" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="296"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="296"/></proof>
  </goal>
  <goal name="TestLength3" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="296"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="296"/></proof>
  </goal>
  <goal name="TestLength4" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="305"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="305"/></proof>
+ </goal>
+ <goal name="TestLength5" proved="true">
+ <proof prover="0"><path name="testmnstrings-Harness-TestLength5_1.smt2"/><result status="valid" time="0.02" steps="46"/></proof>
+ <proof prover="1"><result status="highfailure" time="0.04"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.02"/></proof>
+ </goal>
+ <goal name="TestLength6">
+ <proof prover="0"><result status="unknown" time="0.01" steps="771"/></proof>
+ <proof prover="1"><path name="testmnstrings-Harness-TestLength6_1.smt2"/><result status="failure" time="0.00"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.02"/></proof>
  </goal>
  <goal name="length_empty" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="293"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="293"/></proof>
  </goal>
  <goal name="length_concat" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="345"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="345"/></proof>
  </goal>
  <goal name="TestLt1" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="372"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="372"/></proof>
  </goal>
  <goal name="TestLt2" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="373"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="373"/></proof>
  </goal>
  <goal name="TestLt3" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="373"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="373"/></proof>
  </goal>
  <goal name="TestLt4" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="373"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="373"/></proof>
  </goal>
  <goal name="TestLt5" proved="true">
  <proof prover="1"><result status="valid" time="0.03" steps="373"/></proof>
  </goal>
  <goal name="TestLt6" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="373"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="373"/></proof>
  </goal>
  <goal name="lt_empty" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="440"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="440"/></proof>
  </goal>
  <goal name="lt_transitive">
- <proof prover="1"><result status="timeout" time="5.00" steps="271756"/></proof>
+ <proof prover="0"><result status="unknown" time="0.02" steps="783"/></proof>
+ <proof prover="1"><result status="timeout" time="5.00" steps="269413"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.01"/></proof>
  </goal>
  <goal name="lt_not_com" proved="true">
- <proof prover="1"><result status="valid" time="0.42" steps="43049"/></proof>
+ <proof prover="1"><result status="valid" time="0.51" steps="42776"/></proof>
  </goal>
  <goal name="le" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="809"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="596"/></proof>
  </goal>
  <goal name="lt_le" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="901"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="688"/></proof>
  </goal>
  <goal name="lt_le_eq" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="1377"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="1163"/></proof>
  </goal>
  <goal name="le_transitive">
- <proof prover="1"><result status="timeout" time="5.00" steps="311459"/></proof>
+ <proof prover="0"><result status="unknown" time="0.02" steps="783"/></proof>
+ <proof prover="1"><result status="timeout" time="5.00" steps="300976"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.01"/></proof>
+ </goal>
+ <goal name="TestAt1" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="825"/></proof>
  </goal>
  <goal name="at_out_of_range" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="2438"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="2147"/></proof>
  </goal>
  <goal name="at_empty" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="1356"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="1072"/></proof>
  </goal>
  <goal name="TestSubstring1" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="1391"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="1098"/></proof>
  </goal>
  <goal name="TestSubstring2" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="2712"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="1098"/></proof>
  </goal>
- <goal name="TestSubstring3" proved="true">
- <proof prover="1"><result status="valid" time="0.07" steps="2762"/></proof>
- </goal>
- <goal name="TestSubstring4" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="1382"/></proof>
- </goal>
- <goal name="TestSubstring5" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="1382"/></proof>
- </goal>
- <goal name="substring_of_length_zero" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="1404"/></proof>
+ <goal name="substring_of_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="1107"/></proof>
  </goal>
  <goal name="substring_out_of_range" proved="true">
- <proof prover="1"><result status="valid" time="0.06" steps="2818"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="2519"/></proof>
+ </goal>
+ <goal name="substring_of_length_zero_or_less" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="2725"/></proof>
  </goal>
  <goal name="substring_smaller" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="3135"/></proof>
- </goal>
- <goal name="substring_negative" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="3264"/></proof>
- </goal>
- <goal name="substring_negative2" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="2384"/></proof>
- <proof prover="1"><result status="valid" time="0.02" steps="3503"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="3080"/></proof>
  </goal>
  <goal name="substring_smaller_x" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="3174"/></proof>
- <proof prover="1"><result status="valid" time="0.03" steps="3826"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="3305"/></proof>
  </goal>
- <goal name="prefix_substring" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="2802"/></proof>
+ <goal name="prefixof_substring" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="2278"/></proof>
  </goal>
- <goal name="prefix_concat" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="2875"/></proof>
+ <goal name="prefixof_concat" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="2351"/></proof>
  </goal>
- <goal name="suffix_substring" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="3216"/></proof>
+ <goal name="prefixof_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="2373"/></proof>
  </goal>
- <goal name="suffix_concat" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="3315"/></proof>
+ <goal name="prefixof_empty2" proved="true">
+ <proof prover="0" obsolete="true"><result status="unknown" time="2.51" steps="3166202"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="2457"/></proof>
+ <proof prover="2" obsolete="true"><result status="highfailure" time="0.01"/></proof>
+ </goal>
+ <goal name="suffixof_substring" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="2798"/></proof>
+ </goal>
+ <goal name="suffixof_concat" proved="true">
+ <proof prover="1"><result status="valid" time="0.05" steps="2897"/></proof>
+ </goal>
+ <goal name="suffixof_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="2919"/></proof>
+ </goal>
+ <goal name="suffiof_empty2" proved="true">
+ <proof prover="1"><result status="valid" time="0.06" steps="3003"/></proof>
+ </goal>
+ <goal name="containsTest1" proved="true">
+ <proof prover="0" obsolete="true"><result status="unknown" time="0.01" steps="783"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="3014"/></proof>
+ <proof prover="2" obsolete="true"><result status="highfailure" time="0.01"/></proof>
+ </goal>
+ <goal name="contains_empty" proved="true">
+ <proof prover="0" obsolete="true"><result status="failure" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="3086"/></proof>
+ <proof prover="2" obsolete="true"><result status="highfailure" time="0.01"/></proof>
+ </goal>
+ <goal name="contains_empty2" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="3108"/></proof>
+ </goal>
+ <goal name="contains_substring" proved="true">
+ <proof prover="0" obsolete="true"><result status="failure" time="0.00"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="5078"/></proof>
+ <proof prover="2" obsolete="true"><result status="highfailure" time="0.00"/></proof>
+ </goal>
+ <goal name="contains_concat" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="272"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="3424"/></proof>
+ </goal>
+ <goal name="substring_contains">
+ <proof prover="0"><result status="timeout" time="5.00" steps="12891837"/></proof>
+ <proof prover="1"><result status="timeout" time="5.00" steps="1024758"/></proof>
+ <proof prover="2"><result status="highfailure" time="0.01"/></proof>
  </goal>
  <goal name="TestIndefof1" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="3336"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="3445"/></proof>
  </goal>
  <goal name="TestIndefof2" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="3337"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="3446"/></proof>
  </goal>
  <goal name="TestIndefof3" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="3340"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="3449"/></proof>
  </goal>
  <goal name="TestIndefof4" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="3338"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="3447"/></proof>
  </goal>
  <goal name="TestIndefof5" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="3341"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="3450"/></proof>
  </goal>
  <goal name="TestIndefof6" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="3338"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="3447"/></proof>
  </goal>
  <goal name="TestIndefof7" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="3340"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="3449"/></proof>
  </goal>
  <goal name="TestIndefof8" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="3339"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="3448"/></proof>
  </goal>
  <goal name="TestIndefof9" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="3342"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="3451"/></proof>
  </goal>
  <goal name="TestIndefof10" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="3340"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="3449"/></proof>
  </goal>
  <goal name="TestIndexof11" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="3354"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="3463"/></proof>
+ </goal>
+ <goal name="indexof_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="4693"/></proof>
  </goal>
  <goal name="indexof_empty1" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="4202"/></proof>
- </goal>
- <goal name="indexof_empty2" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="4700"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="4585"/></proof>
  </goal>
  <goal name="indexof_contains" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="8899"/></proof>
+ <proof prover="1"><result status="valid" time="0.08" steps="9015"/></proof>
  </goal>
  <goal name="contains_indexof" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="8836"/></proof>
+ <proof prover="1"><result status="valid" time="0.07" steps="8952"/></proof>
  </goal>
  <goal name="not_contains_indexof" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="9046"/></proof>
+ <proof prover="1"><result status="valid" time="0.07" steps="9162"/></proof>
  </goal>
  <goal name="substring_indexof" proved="true">
- <proof prover="1"><result status="valid" time="0.11" steps="13851"/></proof>
+ <proof prover="1"><result status="valid" time="0.08" steps="13881"/></proof>
  </goal>
  <goal name="indexof_out_of_range" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="7462"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="7509"/></proof>
  </goal>
  <goal name="indexof_in_range" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="7996"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="8061"/></proof>
+ </goal>
+ <goal name="indexof_contains_substring" proved="true">
+ <proof prover="0" timelimit="60" obsolete="true"><result status="timeout" time="60.00" steps="166528362"/></proof>
+ <proof prover="1"><result status="valid" time="0.06" steps="8621"/></proof>
+ <proof prover="2" obsolete="true"><result status="highfailure" time="0.01"/></proof>
  </goal>
  <goal name="TestReplace1" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="7202"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="7877"/></proof>
  </goal>
  <goal name="TestReplace2" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="5866"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="6516"/></proof>
  </goal>
  <goal name="TestReplace3" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="5856"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="6506"/></proof>
  </goal>
  <goal name="TestReplace4" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="398"/></proof>
- <proof prover="1"><result status="valid" time="0.02" steps="5854"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="6504"/></proof>
  </goal>
  <goal name="TestReplace5" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="5856"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="6506"/></proof>
  </goal>
  <goal name="not_contains_replace" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="8393"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="9068"/></proof>
  </goal>
- <goal name="replace_empty1">
- <proof prover="0"><result status="timeout" time="5.00" steps="12910304"/></proof>
- <proof prover="1"><result status="unknown" time="0.15" steps="44170"/></proof>
+ <goal name="replace_empty" proved="true">
+ <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="12828564"/></proof>
+ <proof prover="1"><result status="valid" time="0.05" steps="6756"/></proof>
+ <proof prover="2" obsolete="true"><result status="highfailure" time="0.01"/></proof>
  </goal>
  <goal name="replace_empty2" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="28500"/></proof>
+ <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="12866814"/></proof>
+ <proof prover="1"><result status="valid" time="0.06" steps="8338"/></proof>
+ <proof prover="2" obsolete="true"><result status="highfailure" time="0.02"/></proof>
  </goal>
  <goal name="replace_substring_indexof" proved="true">
- <proof prover="1"><result status="valid" time="0.10" steps="18918"/></proof>
+ <proof prover="1"><result status="valid" time="0.11" steps="19622"/></proof>
  </goal>
  <goal name="not_contains_replaceall" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="23602"/></proof>
+ <proof prover="1"><result status="valid" time="0.10" steps="28807"/></proof>
  </goal>
  <goal name="replaceall_empty1" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="23913"/></proof>
- </goal>
- <goal name="replaceall_empty2" proved="true">
- <proof prover="1"><result status="valid" time="0.02" steps="12959"/></proof>
- </goal>
- <goal name="contains_concat">
- <proof prover="1" obsolete="true"><result status="timeout" time="5.00" steps="1363117"/></proof>
- </goal>
- <goal name="contains_substring">
- <proof prover="0"><result status="timeout" time="5.00" steps="11852468"/></proof>
- <proof prover="1"><result status="timeout" time="4.28" steps="1821432"/></proof>
- <transf name="split_vc" >
-  <goal name="contains_substring.0">
-  <proof prover="0"><result status="timeout" time="5.00" steps="14169032"/></proof>
-  <proof prover="1"><result status="timeout" time="5.00" steps="1038429"/></proof>
-  </goal>
-  <goal name="contains_substring.1">
-  <proof prover="1"><result status="valid" time="0.04" steps="5040"/></proof>
-  </goal>
- </transf>
+ <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="16166864"/></proof>
+ <proof prover="1"><result status="valid" time="0.04" steps="10063"/></proof>
+ <proof prover="2" obsolete="true"><result status="highfailure" time="0.02"/></proof>
  </goal>
 </theory>
 </file>

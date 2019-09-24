@@ -29,14 +29,16 @@ module String
   in the lexicographic order of UC *) (* CHECK UC *)
 
   function ([]) string int : string
-  (** `s[i]` returns the `empty` string if either `i < 0` or `i >=
-  length s`. Returns the string of size `1` with the content of
-  position `i` in string `s`. *)
+  (** `s[i]` is:
+       (1) `empty`, if either `i < 0` or `i >= length s`;
+       (2) the string of length `1` containing the character of
+           position `i` in string `s`, if `0 <= i < length s`. *)
 
   function substring string int int : string
-  (** `substring s i x` returns the `empty` string if `i < 0` or `i >=
-  length s'. Otherwise, it returns the substring of `s` starting at
-  `i` and of size `min x (length s - i)`. *)
+  (** `substring s i x` is:
+      (1) the `empty` string if `i < 0`, `i >= length s`, or `x <= 0`;
+      (2) the substring of `s` starting at `i` and of length
+          `min x (length s - i)`. *)
 
   predicate prefixof string string
   (** `prefixof s1 s2` is `True` iff `s1` is a prefix of `s2`. *)
@@ -49,23 +51,23 @@ module String
 
   function indexof string string int : int
   (** `indexof s1 s2 i` is:
-        - `i`, if `0 <= i <= length s1` and `s2 = empty`;
-        - the first occurence of `s2` in `s1` after `i`, if
-          `0 <= i < length s1`, 't <> empty` and `s2` occurs in `s1`
-          after `i`;
-        - `-1`, if `i < 0`, `i >= length s1`, or if `0 <= i < length s1` and
-          `s2` does not occur in `s1` after `i`.  *)
+      (1) the first occurence of `s2` in `s1` after `i`, if
+          `0 <= i <= length s1` (note: the result is `i`, if
+          `s2 = empty` and `0 <= i <= length s1`);
+      (2) `-1`, if `i < 0`, `i > length s1`, or `0 <= i <= length s1`
+          and `s2` does not occur in `s1` after `i`.  *)
 
   function replace string string string : string
   (** `replace s1 s2 s3` is:
-         - `s1`, if `s2` does not occur in `s1` or `s3 = empty`;
-         - `concat s1 s3`, if `s2 = empty`;
-         - the string obtained by replacing the first occurrence of s2
-           (if any) by s3 in s1. *)
+      (1) `concat s3 s1`, if `s2 = empty`;
+      (2) the string obtained by replacing the first occurrence of `s2`
+          (if any) by `s3` in `s1`. *)
 
-  (* NOT IN SMT-LIB unsound check example *)
+  (* NOT IN SMT-LIB *)
   function replaceall string string string : string
-  (** `replace s1 s2 s3`, TODO *)
-
+  (** `replace s1 s2 s3` is:
+      (1) `s1`, if `s2 = empty`;
+      (2) the string obtained by replacing all occurences of `s2` by
+          `s3` in `s1` *)
 
 end
