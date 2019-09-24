@@ -4,49 +4,49 @@
 <why3session shape_version="8">
 <prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="binary_sqrt.mlw"/>
 <theory name="BinarySqrt" proved="true">
- <goal name="VC sqrt" expl="VC for sqrt" proved="true">
+ <goal name="sqrt&#39;VC" expl="VC for sqrt" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC sqrt.0" expl="assertion" proved="true">
+  <goal name="sqrt&#39;VC.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC sqrt.1" expl="assertion" proved="true">
+  <goal name="sqrt&#39;VC.1" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC sqrt.2" expl="assertion" proved="true">
+  <goal name="sqrt&#39;VC.2" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="VC sqrt.3" expl="assertion" proved="true">
+  <goal name="sqrt&#39;VC.3" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
-  <goal name="VC sqrt.4" expl="assertion" proved="true">
+  <goal name="sqrt&#39;VC.4" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="26"/></proof>
   </goal>
-  <goal name="VC sqrt.5" expl="variant decrease" proved="true">
+  <goal name="sqrt&#39;VC.5" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="VC sqrt.6" expl="precondition" proved="true">
+  <goal name="sqrt&#39;VC.6" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC sqrt.7" expl="precondition" proved="true">
+  <goal name="sqrt&#39;VC.7" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC sqrt.8" expl="precondition" proved="true">
+  <goal name="sqrt&#39;VC.8" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.22" steps="135"/></proof>
   </goal>
-  <goal name="VC sqrt.9" expl="postcondition" proved="true">
+  <goal name="sqrt&#39;VC.9" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="VC sqrt.9.0" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;VC.9.0" expl="VC for sqrt" proved="true">
    <proof prover="3" timelimit="5"><result status="valid" time="0.01" steps="16"/></proof>
    </goal>
-   <goal name="VC sqrt.9.1" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;VC.9.1" expl="VC for sqrt" proved="true">
    <transf name="split_goal_right" proved="true" >
-    <goal name="VC sqrt.9.1.0" expl="VC for sqrt" proved="true">
+    <goal name="sqrt&#39;VC.9.1.0" expl="VC for sqrt" proved="true">
     <proof prover="2"><result status="valid" time="0.02" steps="5013"/></proof>
     </goal>
-    <goal name="VC sqrt.9.1.1" expl="VC for sqrt" proved="true">
+    <goal name="sqrt&#39;VC.9.1.1" expl="VC for sqrt" proved="true">
     <proof prover="3" timelimit="5"><result status="valid" time="0.00" steps="16"/></proof>
     </goal>
    </transf>
@@ -55,7 +55,7 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC sqrt_main" expl="VC for sqrt_main" proved="true">
+ <goal name="sqrt_main&#39;VC" expl="VC for sqrt_main" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>

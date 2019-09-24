@@ -10,7 +10,7 @@
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="sub.mlw"/>
 <theory name="Sub" proved="true">
  <goal name="wmpn_sub_1&#39;VC" expl="VC for wmpn_sub_1" proved="true">
@@ -422,7 +422,7 @@
     <goal name="wmpn_sub&#39;VC.16.0.0" expl="assertion" proved="true">
     <transf name="inline_goal" proved="true" >
      <goal name="wmpn_sub&#39;VC.16.0.0.0" expl="assertion" proved="true">
-     <proof prover="5"><result status="valid" time="0.35" steps="84"/></proof>
+     <proof prover="5"><result status="valid" time="0.21" steps="84"/></proof>
      </goal>
     </transf>
     </goal>
@@ -458,7 +458,7 @@
   <proof prover="3"><result status="valid" time="0.04" steps="36006"/></proof>
   </goal>
   <goal name="wmpn_sub&#39;VC.26" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.64"/></proof>
+  <proof prover="0"><result status="valid" time="0.43"/></proof>
   </goal>
   <goal name="wmpn_sub&#39;VC.27" expl="assertion" proved="true">
   <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.30" steps="75"/></proof>
@@ -613,7 +613,7 @@
   <proof prover="3"><result status="valid" time="0.04" steps="28943"/></proof>
   </goal>
   <goal name="wmpn_sub&#39;VC.74" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.55"/></proof>
+  <proof prover="0"><result status="valid" time="0.30"/></proof>
   </goal>
   <goal name="wmpn_sub&#39;VC.75" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -622,7 +622,7 @@
     <goal name="wmpn_sub&#39;VC.75.0.0" expl="assertion" proved="true">
     <transf name="reflection_f" proved="true" arg1="mp_decision">
      <goal name="wmpn_sub&#39;VC.75.0.0.0" expl="assertion" proved="true">
-     <proof prover="0"><result status="valid" time="0.44"/></proof>
+     <proof prover="0"><result status="valid" time="0.24"/></proof>
      </goal>
      <goal name="wmpn_sub&#39;VC.75.0.0.1" proved="true">
      <proof prover="3"><result status="valid" time="0.28" steps="251879"/></proof>

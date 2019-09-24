@@ -7,7 +7,7 @@
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="heapsort.mlw"/>
 <theory name="HeapSort" proved="true">
  <goal name="min_of_sorted&#39;VC" expl="VC for min_of_sorted" proved="true">
@@ -46,7 +46,7 @@
    <proof prover="0"><result status="valid" time="0.02" steps="11244"/></proof>
    </goal>
    <goal name="heapSort&#39;VC.3.2" expl="VC for heapSort" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.01" steps="15"/></proof>
+   <proof prover="1" timelimit="1"><result status="valid" time="0.01" steps="13"/></proof>
    </goal>
    <goal name="heapSort&#39;VC.3.3" expl="VC for heapSort" proved="true">
    <proof prover="0"><result status="valid" time="0.06" steps="13292"/></proof>
@@ -63,7 +63,7 @@
   <proof prover="0"><result status="valid" time="0.03" steps="13212"/></proof>
   </goal>
   <goal name="heapSort&#39;VC.7" expl="assertion" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="100"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="111"/></proof>
   </goal>
   <goal name="heapSort&#39;VC.8" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -80,7 +80,7 @@
    <proof prover="0"><result status="valid" time="0.11" steps="22654"/></proof>
    </goal>
    <goal name="heapSort&#39;VC.8.4" expl="VC for heapSort" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.04" steps="83"/></proof>
+   <proof prover="1" timelimit="1"><result status="valid" time="0.04" steps="78"/></proof>
    </goal>
    <goal name="heapSort&#39;VC.8.5" expl="VC for heapSort" proved="true">
    <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="93"/></proof>
@@ -100,7 +100,7 @@
  </goal>
 </theory>
 </file>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="heap.why"/>
 <theory name="Heap" proved="true">
  <goal name="Parent_inf" proved="true">
@@ -172,7 +172,7 @@
  </goal>
 </theory>
 </file>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="bag_of_integers.why"/>
 <theory name="Bag_integers" proved="true">
  <goal name="Min_bag_union1" proved="true">
@@ -183,7 +183,7 @@
  </goal>
 </theory>
 </file>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="test_harness.mlw"/>
 <theory name="TestHarness" proved="true">
  <goal name="testHarness&#39;VC" expl="VC for testHarness" proved="true">
@@ -228,7 +228,7 @@
  </goal>
 </theory>
 </file>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="elements.why"/>
 <theory name="Elements" proved="true">
  <goal name="Elements_singleton" proved="true">
@@ -267,7 +267,7 @@
  </goal>
 </theory>
 </file>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="heap_implem.mlw"/>
 <theory name="Implementation" proved="true">
  <goal name="is_heap_min&#39;VC" expl="VC for is_heap_min" proved="true">
@@ -616,10 +616,10 @@
  </goal>
 </theory>
 </file>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="abstract_heap.mlw"/>
 </file>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="heap_model.why"/>
 <theory name="Model" proved="true">
  <goal name="Model_empty" proved="true">

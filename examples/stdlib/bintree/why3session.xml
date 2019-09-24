@@ -3,16 +3,16 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="6" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="bintree.mlw"/>
 <theory name="Tree" proved="true">
- <goal name="VC is_empty" expl="VC for is_empty" proved="true">
+ <goal name="is_empty&#39;VC" expl="VC for is_empty" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC is_empty.0" expl="postcondition" proved="true">
+  <goal name="is_empty&#39;VC.0" expl="postcondition" proved="true">
   <proof prover="2" timelimit="5"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC is_empty.1" expl="postcondition" proved="true">
+  <goal name="is_empty&#39;VC.1" expl="postcondition" proved="true">
   <proof prover="2" timelimit="5"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
  </transf>

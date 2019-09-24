@@ -8,25 +8,25 @@
 <prover id="4" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Coq" version="8.9.1" timelimit="0" steplimit="0" memlimit="0"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="queens.mlw"/>
 <theory name="NQueensSetsTermination" proved="true">
  <goal name="t&#39;VC" expl="VC for t" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="t&#39;VC.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="8655"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="8696"/></proof>
   </goal>
   <goal name="t&#39;VC.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="6368"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="6399"/></proof>
   </goal>
   <goal name="t&#39;VC.2" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.22" steps="51445"/></proof>
+  <proof prover="0"><result status="valid" time="0.22" steps="51486"/></proof>
   </goal>
   <goal name="t&#39;VC.3" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="17309"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="17350"/></proof>
   </goal>
   <goal name="t&#39;VC.4" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="17460"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="17501"/></proof>
   </goal>
  </transf>
  </goal>
@@ -46,42 +46,42 @@
   <proof prover="2"><result status="valid" time="0.36" steps="2750"/></proof>
   </goal>
   <goal name="t3&#39;VC.1" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="20895"/></proof>
+  <proof prover="0"><result status="valid" time="0.10" steps="20936"/></proof>
   </goal>
   <goal name="t3&#39;VC.2" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="12271"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="12302"/></proof>
   </goal>
   <goal name="t3&#39;VC.3" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="15468"/></proof>
+  <proof prover="0"><result status="valid" time="0.07" steps="15509"/></proof>
   </goal>
   <goal name="t3&#39;VC.4" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="12282"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="12323"/></proof>
   </goal>
   <goal name="t3&#39;VC.5" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="12810"/></proof>
+  <proof prover="0"><result status="valid" time="0.04" steps="12851"/></proof>
   </goal>
   <goal name="t3&#39;VC.6" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="10118"/></proof>
+  <proof prover="0"><result status="valid" time="0.03" steps="10149"/></proof>
   </goal>
   <goal name="t3&#39;VC.7" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.42" steps="64054"/></proof>
+  <proof prover="0"><result status="valid" time="0.42" steps="64095"/></proof>
   </goal>
   <goal name="t3&#39;VC.8" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="t3&#39;VC.8.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.05" steps="12125"/></proof>
+   <proof prover="0"><result status="valid" time="0.05" steps="12166"/></proof>
    </goal>
    <goal name="t3&#39;VC.8.1" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.40" steps="64044"/></proof>
+   <proof prover="0"><result status="valid" time="0.40" steps="64085"/></proof>
    </goal>
    <goal name="t3&#39;VC.8.2" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.05" steps="12144"/></proof>
+   <proof prover="0"><result status="valid" time="0.05" steps="12185"/></proof>
    </goal>
    <goal name="t3&#39;VC.8.3" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.07" steps="16294"/></proof>
+   <proof prover="0"><result status="valid" time="0.07" steps="16335"/></proof>
    </goal>
    <goal name="t3&#39;VC.8.4" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.08" steps="16343"/></proof>
+   <proof prover="0"><result status="valid" time="0.08" steps="16384"/></proof>
    </goal>
    <goal name="t3&#39;VC.8.5" expl="precondition" proved="true">
    <proof prover="2"><result status="valid" time="0.26" steps="1335"/></proof>
@@ -127,21 +127,21 @@
   </transf>
   </goal>
   <goal name="t3&#39;VC.9" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.09" steps="19922"/></proof>
+  <proof prover="0"><result status="valid" time="0.09" steps="19963"/></proof>
   </goal>
   <goal name="t3&#39;VC.10" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="t3&#39;VC.10.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.06" steps="12937"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="12978"/></proof>
    </goal>
    <goal name="t3&#39;VC.10.1" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.05" steps="12980"/></proof>
+   <proof prover="0"><result status="valid" time="0.05" steps="13021"/></proof>
    </goal>
    <goal name="t3&#39;VC.10.2" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.04" steps="11074"/></proof>
+   <proof prover="0"><result status="valid" time="0.04" steps="11105"/></proof>
    </goal>
    <goal name="t3&#39;VC.10.3" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.09" steps="20149"/></proof>
+   <proof prover="0"><result status="valid" time="0.09" steps="20190"/></proof>
    </goal>
    <goal name="t3&#39;VC.10.4" expl="loop invariant preservation" proved="true">
    <proof prover="5"><result status="valid" time="1.20" steps="2170"/></proof>
@@ -149,7 +149,7 @@
    <goal name="t3&#39;VC.10.5" expl="loop invariant preservation" proved="true">
    <transf name="generalize_introduced" proved="true" >
     <goal name="t3&#39;VC.10.5.0" expl="loop invariant preservation" proved="true">
-    <proof prover="6"><path name="queens_NQueensSets_VC_t3_2.v"/><result status="valid" time="15.64"/></proof>
+    <proof prover="6"><path name="queens_NQueensSets_VC_t3_2.v"/><result status="valid" time="13.73"/></proof>
     </goal>
    </transf>
    </goal>
@@ -162,7 +162,7 @@
   <proof prover="5"><result status="valid" time="1.56" steps="2836"/></proof>
   <transf name="remove" proved="true" arg1="real,bool,tuple0,unit,ref,map,solutions,zero,one,( * ),(&gt;),get,(==),is_empty,empty,add,singleton,union,inter,pick,disjoint,filter,map,cardinal,max_elt,interval,choose,(!),o,o1,o2,o3,o4,o6,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,extensionality,subset_refl,subset_trans,is_empty_empty,empty_is_empty,add_def,mem_singleton,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,min_elt_def,max_elt_def,interval_def,cardinal_interval,choose&#39;spec,partial_solution_eq_prefix,no_duplicate,H5,H6,H7,Ensures,H8,H9,H10,H11,H12,H14,LoopInvariant1,H15,Ensures3,Ensures4,Ensures5,Ensures6,Ensures7,Ensures8,Ensures9,Ensures10,Ensures11,H16,H17,H18,H19,H20,Ensures12,Ensures14,Ensures15,H22">
    <goal name="t3&#39;VC.11.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0" timelimit="5"><result status="valid" time="0.97" steps="145813"/></proof>
+   <proof prover="0" timelimit="5"><result status="valid" time="0.97" steps="145944"/></proof>
    <proof prover="2" timelimit="5"><result status="valid" time="0.29" steps="921"/></proof>
    <proof prover="5" timelimit="1"><result status="valid" time="0.12" steps="272"/></proof>
    </goal>
@@ -171,10 +171,10 @@
   <goal name="t3&#39;VC.12" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="t3&#39;VC.12.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.06" steps="15953"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="15994"/></proof>
    </goal>
    <goal name="t3&#39;VC.12.1" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.06" steps="15966"/></proof>
+   <proof prover="0"><result status="valid" time="0.06" steps="16007"/></proof>
    </goal>
    <goal name="t3&#39;VC.12.2" expl="loop invariant preservation" proved="true">
    <transf name="instantiate" proved="true" arg1="LoopInvariant3" arg2="t">
@@ -198,31 +198,31 @@
   <goal name="t3&#39;VC.15" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="t3&#39;VC.15.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.03" steps="9842"/></proof>
+   <proof prover="0"><result status="valid" time="0.03" steps="9873"/></proof>
    </goal>
    <goal name="t3&#39;VC.15.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.03" steps="9842"/></proof>
+   <proof prover="0"><result status="valid" time="0.03" steps="9873"/></proof>
    </goal>
    <goal name="t3&#39;VC.15.2" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.04" steps="9842"/></proof>
+   <proof prover="0"><result status="valid" time="0.04" steps="9873"/></proof>
    </goal>
    <goal name="t3&#39;VC.15.3" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.04" steps="10524"/></proof>
+   <proof prover="0"><result status="valid" time="0.04" steps="10555"/></proof>
    </goal>
    <goal name="t3&#39;VC.15.4" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.43" steps="87753"/></proof>
+   <proof prover="0"><result status="valid" time="0.43" steps="87801"/></proof>
    </goal>
    <goal name="t3&#39;VC.15.5" expl="postcondition" proved="true">
    <proof prover="2"><result status="valid" time="0.18" steps="1341"/></proof>
    </goal>
    <goal name="t3&#39;VC.15.6" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.54" steps="108325"/></proof>
+   <proof prover="0"><result status="valid" time="0.54" steps="108363"/></proof>
    </goal>
    <goal name="t3&#39;VC.15.7" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.03" steps="10050"/></proof>
+   <proof prover="0"><result status="valid" time="0.03" steps="10081"/></proof>
    </goal>
    <goal name="t3&#39;VC.15.8" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.03" steps="10415"/></proof>
+   <proof prover="0"><result status="valid" time="0.03" steps="10446"/></proof>
    </goal>
   </transf>
   </goal>
@@ -232,7 +232,7 @@
  </transf>
  </goal>
  <goal name="queens3&#39;VC" expl="VC for queens3" proved="true">
- <proof prover="0"><result status="valid" time="0.09" steps="21902"/></proof>
+ <proof prover="0"><result status="valid" time="0.09" steps="21943"/></proof>
  </goal>
 </theory>
 </file>

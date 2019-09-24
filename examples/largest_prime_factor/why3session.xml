@@ -6,7 +6,7 @@
 <prover id="1" name="CVC4" version="1.4" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="largest_prime_factor.mlw"/>
 <theory name="PrimeFactor" proved="true">
  <goal name="smallest_divisor&#39;VC" expl="VC for smallest_divisor" proved="true">
@@ -78,7 +78,7 @@
  <goal name="largest_prime_factor&#39;VC" expl="VC for largest_prime_factor" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="largest_prime_factor&#39;VC.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
   <goal name="largest_prime_factor&#39;VC.1" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
