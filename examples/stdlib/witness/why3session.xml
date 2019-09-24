@@ -5,47 +5,47 @@
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="15" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="2.0" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="witness.mlw"/>
 <theory name="Nat" proved="true">
- <goal name="VC witness" expl="VC for witness" proved="true">
+ <goal name="witness&#39;VC" expl="VC for witness" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="VC witness.0" expl="postcondition" proved="true">
+  <goal name="witness&#39;VC.0" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="4167"/></proof>
   </goal>
-  <goal name="VC witness.1" expl="postcondition" proved="true">
+  <goal name="witness&#39;VC.1" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="3996"/></proof>
   </goal>
-  <goal name="VC witness.2" expl="variant decrease" proved="true">
+  <goal name="witness&#39;VC.2" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="2815"/></proof>
   </goal>
-  <goal name="VC witness.3" expl="precondition" proved="true">
+  <goal name="witness&#39;VC.3" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3486"/></proof>
   </goal>
-  <goal name="VC witness.4" expl="postcondition" proved="true">
+  <goal name="witness&#39;VC.4" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="54"/></proof>
   </goal>
-  <goal name="VC witness.5" expl="variant decrease" proved="true">
+  <goal name="witness&#39;VC.5" expl="variant decrease" proved="true">
   <transf name="split_vc" proved="true" >
-   <goal name="VC witness.5.0" expl="variant decrease" proved="true">
+   <goal name="witness&#39;VC.5.0" expl="variant decrease" proved="true">
    <proof prover="2" timelimit="5"><result status="valid" time="0.02" steps="4117"/></proof>
    </goal>
-   <goal name="VC witness.5.1" expl="variant decrease" proved="true">
+   <goal name="witness&#39;VC.5.1" expl="variant decrease" proved="true">
    <proof prover="1"><result status="valid" time="0.27"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC witness.6" expl="precondition" proved="true">
+  <goal name="witness&#39;VC.6" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="4034"/></proof>
   </goal>
-  <goal name="VC witness.7" expl="postcondition" proved="true">
+  <goal name="witness&#39;VC.7" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.00" steps="3741"/></proof>
   </goal>
-  <goal name="VC witness.8" expl="precondition" proved="true">
+  <goal name="witness&#39;VC.8" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3533"/></proof>
   </goal>
-  <goal name="VC witness.9" expl="postcondition" proved="true">
+  <goal name="witness&#39;VC.9" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3288"/></proof>
   </goal>
  </transf>
