@@ -354,17 +354,18 @@ let read_channel env path file c =
   end;
   mm
 
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
 (* Register the transformations functions *)
 let rec python_ext_printer print_any fmt a =
   match a with
-
   | Pretty.Pp_term (t, pri) ->
       begin match t.Term.t_node with
         | Term.Tapp (ls, [t1; t2]) when Term.ls_equal ls Term.ps_equ ->
             (* TODO use priorities *)
-            Format.fprintf fmt "@[(%a == %a)@]"
-              (python_ext_printer print_any) (Pretty.Pp_term (t1, pri))
-              (python_ext_printer print_any) (Pretty.Pp_term (t2, pri))
+            Format.fprintf fmt (protect_on (pri > 0) "@[(%a == %a)@]")
+              (python_ext_printer print_any) (Pretty.Pp_term (t1, 0))
+              (python_ext_printer print_any) (Pretty.Pp_term (t2, 0))
         | _ -> print_any fmt a
       end
   | _ -> print_any fmt a

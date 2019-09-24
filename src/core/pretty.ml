@@ -373,76 +373,76 @@ and print_tnode ?(ext_printer=true) pri fmt t =
     print_ext_any print_any fmt (Pp_term (t, pri))
   else begin
     match t.t_node with
-  | Tvar v ->
-      print_vs fmt v
-  | Tconst c ->
-     begin
-       match t.t_ty with
-       | Some {ty_node = Tyapp (ts,[])}
+    | Tvar v ->
+        print_vs fmt v
+    | Tconst c ->
+        begin
+          match t.t_ty with
+          | Some {ty_node = Tyapp (ts,[])}
             when ts_equal ts ts_int || ts_equal ts ts_real ->
-          Number.print_constant fmt c
-       | Some ty -> fprintf fmt "(%a:%a)" Number.print_constant c
-                            print_ty ty
-       | None -> assert false
-     end
-  | Tapp (_, [t1]) when Sattr.mem coercion_attr t.t_attrs &&
-                        Debug.test_noflag debug_print_coercions ->
-      print_lterm pri fmt (t_attr_set t1.t_attrs t1)
-  | Tapp (fs, tl) when is_fs_tuple fs ->
-      fprintf fmt "(%a)" (print_list comma print_term) tl
-  | Tapp (fs, tl) when unambig_fs fs ->
-      print_app pri fs fmt tl
-  | Tapp (fs, tl) ->
-      fprintf fmt (protect_on (pri > 0) "@[%a:@ %a@]")
-        (print_app 5 fs) tl print_ty (t_type t)
-  | Tif (f,t1,t2) ->
-      fprintf fmt (protect_on (pri > 0) "@[if %a@ then %a@ else %a@]")
-        print_term f print_term t1 print_term t2
-  | Tlet (t1,tb) ->
-      let v,t2 = t_open_bound tb in
-      fprintf fmt (protect_on (pri > 0)
-                              "@[@[<hv 0>let %a%a =@;<1 2>%a@;<1 0>in@]@ %a@]")
-        print_vs v print_id_attrs v.vs_name (print_lterm 5) t1 print_term t2;
-      forget_var v
-  | Tcase (t1,bl) ->
-      fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
-        print_term t1 (print_list newline print_tbranch) bl
-  | Teps fb ->
-      let vl,tl,e = t_open_lambda t in
-      if vl = [] then begin
-        let v,f = t_open_bound fb in
-        fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
-          print_vsty v print_term f;
+              Number.print_constant fmt c
+          | Some ty -> fprintf fmt "(%a:%a)" Number.print_constant c
+                         print_ty ty
+          | None -> assert false
+        end
+    | Tapp (_, [t1]) when Sattr.mem coercion_attr t.t_attrs &&
+                          Debug.test_noflag debug_print_coercions ->
+        print_lterm pri fmt (t_attr_set t1.t_attrs t1)
+    | Tapp (fs, tl) when is_fs_tuple fs ->
+        fprintf fmt "(%a)" (print_list comma print_term) tl
+    | Tapp (fs, tl) when unambig_fs fs ->
+        print_app pri fs fmt tl
+    | Tapp (fs, tl) ->
+        fprintf fmt (protect_on (pri > 0) "@[%a:@ %a@]")
+          (print_app 5 fs) tl print_ty (t_type t)
+    | Tif (f,t1,t2) ->
+        fprintf fmt (protect_on (pri > 0) "@[if %a@ then %a@ else %a@]")
+          print_term f print_term t1 print_term t2
+    | Tlet (t1,tb) ->
+        let v,t2 = t_open_bound tb in
+        fprintf fmt (protect_on (pri > 0)
+                       "@[@[<hv 0>let %a%a =@;<1 2>%a@;<1 0>in@]@ %a@]")
+          print_vs v print_id_attrs v.vs_name (print_lterm 5) t1 print_term t2;
         forget_var v
-      end else begin
-        fprintf fmt (protect_on (pri > 0) "@[<hov 1>fun%a%a ->@ %a@]")
-          (print_list nothing print_vs_arg) vl print_tl tl print_term e;
+    | Tcase (t1,bl) ->
+        fprintf fmt "match @[%a@] with@\n@[<hov>%a@]@\nend"
+          print_term t1 (print_list newline print_tbranch) bl
+    | Teps fb ->
+        let vl,tl,e = t_open_lambda t in
+        if vl = [] then begin
+          let v,f = t_open_bound fb in
+          fprintf fmt (protect_on (pri > 0) "epsilon %a.@ %a")
+            print_vsty v print_term f;
+          forget_var v
+        end else begin
+          fprintf fmt (protect_on (pri > 0) "@[<hov 1>fun%a%a ->@ %a@]")
+            (print_list nothing print_vs_arg) vl print_tl tl print_term e;
+          List.iter forget_var vl
+        end
+    | Tquant (q,fq) ->
+        let vl,tl,f = t_open_quant fq in
+        fprintf fmt (protect_on (pri > 0) "@[<hov 1>%a %a%a.@ %a@]") print_quant q
+          (print_list comma print_vsty) vl print_tl tl print_term f;
         List.iter forget_var vl
-      end
-  | Tquant (q,fq) ->
-      let vl,tl,f = t_open_quant fq in
-      fprintf fmt (protect_on (pri > 0) "@[<hov 1>%a %a%a.@ %a@]") print_quant q
-        (print_list comma print_vsty) vl print_tl tl print_term f;
-      List.iter forget_var vl
-  | Ttrue ->
-      fprintf fmt "true"
-  | Tfalse ->
-      fprintf fmt "false"
-  | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
-    when Sattr.mem Term.asym_split f2.t_attrs ->
-      fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a so@ %a@]")
-        (print_lterm 2) f1 (print_lterm 1) f2
-  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },f1)
-    when Sattr.mem Term.asym_split f2.t_attrs ->
-      fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a by@ %a@]")
-        (print_lterm 2) f1 (print_lterm 1) f2
-  | Tbinop (b,f1,f2) ->
-      let asym = Sattr.mem Term.asym_split f1.t_attrs in
-      let p = prio_binop b in
-      fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
-        (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
-  | Tnot f ->
-      fprintf fmt (protect_on (pri > 5) "not %a") (print_lterm 5) f
+    | Ttrue ->
+        fprintf fmt "true"
+    | Tfalse ->
+        fprintf fmt "false"
+    | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) })
+      when Sattr.mem Term.asym_split f2.t_attrs ->
+        fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a so@ %a@]")
+          (print_lterm 2) f1 (print_lterm 1) f2
+    | Tbinop (Timplies,{ t_node = Tbinop (Tor,f2,{ t_node = Ttrue }) },f1)
+      when Sattr.mem Term.asym_split f2.t_attrs ->
+        fprintf fmt (protect_on (pri > 1) "@[<hov 1>%a by@ %a@]")
+          (print_lterm 2) f1 (print_lterm 1) f2
+    | Tbinop (b,f1,f2) ->
+        let asym = Sattr.mem Term.asym_split f1.t_attrs in
+        let p = prio_binop b in
+        fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
+          (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
+    | Tnot f ->
+        fprintf fmt (protect_on (pri > 5) "not %a") (print_lterm 5) f
   end
 
 and print_tbranch fmt br =
