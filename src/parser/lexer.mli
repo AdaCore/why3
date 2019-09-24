@@ -19,6 +19,9 @@ val parse_list_qualid: Lexing.lexbuf -> Ptree.qualid list
 
 val parse_list_ident: Lexing.lexbuf -> Ptree.ident list
 
+(* Name of the registered format for whyml *)
+val whyml_format: Env.fformat
+
 (*
 val parse_program_file : Ptree.incremental -> Lexing.lexbuf -> unit
 *)

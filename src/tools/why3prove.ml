@@ -340,8 +340,10 @@ let do_input env drv = function
       let fname, m = match f with
         | "-" -> "stdin",
             Env.read_channel Env.base_language ?format env "stdin" stdin
-        | fname -> fname,
-            Env.read_file Env.base_language ?format env fname
+        | fname ->
+            let (mlw_files, _) =
+              Env.read_file Env.base_language ?format env fname in
+            (fname, mlw_files)
       in
       if Debug.test_flag Typing.debug_type_only then ()
       else
