@@ -240,4 +240,37 @@ module Harness
   lemma replaceall_empty1: forall s1 s3.
     replaceall s1 "" s3 = s1
 
+  goal TestTo_int: to_int "1" = 1
+
+  goal TestFrom_int: from_int 1 = "1"
+
+end
+
+module HarnessRegExpr
+  use string.String
+  use string.RegExpr
+
+  lemma TestToReInRe: forall s.
+    in_re s (to_re s)
+
+  lemma in_re_none: forall s: string.
+    not (in_re s none)
+
+  (* lemma in_re_all: forall s. *)
+  (*   in_re s all *)
+
+  (* lemma in_all_char_in_all: forall s. *)
+  (*   in_re s allchar -> in_re s all *)
+
+  lemma concat: forall s1 s2.
+    let re1 = to_re s1 in
+    let re2 = to_re s2 in
+    in_re (S.concat s1 s2) (concat re1 re2)
+
+  lemma in_union: forall s1 r1 r2.
+    in_re s1 r1 -> in_re s1 (union r1 r2)
+
+  lemma in_inter: forall s1 r1 r2.
+    in_re s1 (inter r1 r2) -> in_re s1 r1 && in_re s1 r2
+
 end

@@ -70,4 +70,51 @@ module String
       (2) the string obtained by replacing all occurences of `s2` by
           `s3` in `s1` *)
 
+  (* TODO Below is still WORK IN PROGRESS *)
+
+  predicate is_digit string (* NOT in z3/cvc4 *)
+  (** `is_digit s` returns `True` iff `s` is of length `1` and
+      corresponds to a decimal digit, that is, to a code point in the
+      range 0x0030 ... 0x0039 *)
+
+  function to_int string : int
+  (** `to_int s` is:
+      (1) an `int` consisting on the digits of `s`, if `s` is formed only
+          by characters corresponding to digits, that is, to code points in
+          the range 0x0030 ... 0x0039;
+      (2) `-1`, if `s` contains a character that is not a digit. *)
+
+  function from_int int : string
+  (** `from_int i` is:
+      (1) the corresponding string in the decimal notation if `i >= 0`;
+      (2) `empty`, if `i < 0`. *)
+
+end
+
+module RegExpr
+
+  use String as S
+
+  type re
+
+  function to_re string : re
+
+  predicate in_re string re
+
+  constant none : re
+
+  (* constant all : re *)
+
+  constant allchar : re
+
+  function concat re re : re (* left assoc *)
+
+  function union re re : re (* left assoc *)
+
+  function inter re re : re (* left assoc *)
+
+  function star re : re
+
+  function plus re : re
+
 end

@@ -10,3 +10,21 @@ theory BuiltIn
   meta "supports_smt_get_info_unknown_reason" ""
 
 end
+
+theory string.RegExpr
+
+  syntax type re             "RegLan"
+
+  syntax function to_re      "(str.to.re %1)"
+  syntax predicate in_re     "(str.in.re %1 %2)"
+
+  syntax function none       "re.nostr"
+  (*  syntax functiona all        "re.all" *)
+  syntax function allchar    "re.allchar"
+  syntax function concat     "(re.++ %1 %2)"
+  syntax function union      "(re.union %1 %2)"
+  syntax function inter      "(re.inter %1 %2)"
+  syntax function star       "(re.* %1)"
+  syntax function plus       "(re.+ %1)"
+
+end
