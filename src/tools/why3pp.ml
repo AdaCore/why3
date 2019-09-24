@@ -912,14 +912,14 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
       match path, mlw_file with
       | [name], Decls decls -> name, decls
       | [module_name; name], Modules modules ->
-          let aux (id, _) = String.equal id.id_str module_name in
+          let aux (id, _) = String.compare id.id_str module_name = 0 in
           name, snd (List.find aux modules)
       | _ -> raise Not_found in
     try
       let aux = function
         | Dind (Decl.Ind, ind_decls) ->
             let aux decl =
-              if String.equal decl.in_ident.id_str name then
+              if String.compare decl.in_ident.id_str name = 0 then
                 raise (Found decl) in
             List.iter aux ind_decls
         | _ -> () in
