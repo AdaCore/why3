@@ -348,8 +348,8 @@ term_sub_:
 | MINUS { mk_id (Ident.op_prefix "-")  $startpos $endpos }
 
 %inline infix_op_234:
-| DIV    { mk_id "div" $startpos $endpos }
-| MOD    { mk_id "mod" $startpos $endpos }
+| DIV    { mk_id (Ident.op_infix "//") $startpos $endpos }
+| MOD    { mk_id (Ident.op_infix "%") $startpos $endpos }
 | PLUS   { mk_id (Ident.op_infix "+") $startpos $endpos }
 | MINUS  { mk_id (Ident.op_infix "-") $startpos $endpos }
 | TIMES  { mk_id (Ident.op_infix "*") $startpos $endpos }
