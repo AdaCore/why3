@@ -19,13 +19,6 @@ module AddAlias
     data p1 = data p2 /\ offset p1 = offset p2
     /\ min p1 = min p2 /\ max p1 = max p2 /\ zone p1 = zone p2
 
-  let lemma map_eq_trans (m1 m2 m3: map int 'a) (i1 i2 sz:int)
-    requires { map_eq_sub_shift m2 m1 i2 i1 sz }
-    requires { map_eq_sub_shift m2 m3 i2 i1 sz }
-    ensures  { forall j. i1 <= j < i1 + sz -> m1[j] = m3[j] }
-  = assert { forall j. i1 <= j < i1 + sz -> m1[j] = m3[j]
-             by let ofs = j - i1 in
-                m1[j] = m1[i1 + ofs] = m2[i2 + ofs] = m3[i1 + ofs] = m3[j] }
 
   val open_sep (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
                (nr:ptr limb, nx:ptr limb, ny:ptr limb, m:mem)
@@ -106,7 +99,7 @@ module AddAlias
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
 
-val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
+  val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
                (nr:ptr limb, nx:ptr limb, ny:ptr limb, m:mem)
     requires { valid x sx /\ valid y sx }
     requires { 0 <= sy <= sx }
@@ -128,6 +121,28 @@ val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
+
+  val open_rxy (x:ptr limb) (sx:int32) :
+               (nr:ptr limb, nx:ptr limb, ny:ptr limb, m:mem)
+    requires { valid x sx }
+    requires { 0 <= sx }
+    ensures  { value nx sx = old value x sx }
+    ensures  { valid nx sx }
+    ensures  { identical nr nx }
+    ensures  { identical nr ny }
+    ensures  { 0 <= offset nr }
+    ensures  { m.zx = zone x }
+    ensures  { m.mx = max x }
+    ensures  { m.lx = sx }
+    ensures  { m.ok }
+    ensures  { map_eq_sub_shift (pelts nx) (pelts x) (offset nx) (offset x) sx }
+    ensures  { pelts x = old pelts x }
+    ensures  { plength x = old plength x }
+    ensures  { min x = old min x }
+    writes   { x.max, x }
+    alias    { nr.data with nx.data }
+    alias    { nr.data with ny.data }
+    alias    { nx.data with ny.data }
 
   val close_rx (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
                 (nr nx ny:ptr limb) (m:mem) : unit
@@ -179,19 +194,24 @@ val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
     writes { nr, nx, ny, nr.data, nx.data, ny.data,
              x.data, x.max, y.data, y.max, m.ok }
 
-  let id (r x y:ptr limb)
-    requires { valid r 5 /\ valid x 5 /\ valid y 5 }
-    ensures  { forall j. (pelts r)[j] = old (pelts r)[j] }
-    ensures  { forall j. (pelts x)[j] = old (pelts x)[j] }
-    ensures  { forall j. (pelts y)[j] = old (pelts y)[j] }
-    ensures  { plength r = old plength r /\ plength y = old plength y
-               /\ plength x = old plength x }
-    ensures  { max r = old max r /\ max y = old max y /\ max x = old max x }
-  =
-    let nr, nx, ny, m = open_sep r x 4 y 4 in
-    close_sep r x 4 y 4 nr nx ny m;
-    let nr, nx, ny, m = open_rx x 4 y 4 in
-    close_rx x 4 y 4 nr nx ny m
+  val close_rxy (x:ptr limb) (sx:int32) (nr nx ny:ptr limb) (m:mem) : unit
+    alias { nr.data with nx.data }
+    alias { nr.data with ny.data }
+    alias { nx.data with ny.data }
+    requires { m.ok }
+    requires { 0 <= sx }
+    requires { identical nr ny }
+    requires { identical nr nx }
+    requires { 0 <= offset nr }
+    requires { m.zx = x.zone /\ m.lx = sx }
+    ensures  { x.max = m.mx }
+    ensures  { map_eq_sub_shift (old pelts nx) (pelts x)
+                                (offset nx) (offset x) sx }
+    ensures  { forall j. j < offset x \/ offset x + sx <= j
+                      -> (pelts x)[j] = (old pelts x)[j] }
+    ensures  { plength x = old plength x /\ min x = old min x }
+    writes   { nr, nx, ny, nr.data, nx.data, ny.data,
+               x.data, x.max, m.ok }
 
 (*
   let double_open (r x y: ptr limb)
@@ -407,7 +427,6 @@ val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
     let nr, nx, ny, m = open_sep r x sz y sz in
     label Add in
     let res = add_n_aliased nr nx ny sz in
-    label Close in
     let ghost onx = pure { nx } in
     let ghost ony = pure { ny } in
     close_sep r x sz y sz nr nx ny m;
@@ -417,6 +436,30 @@ val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
                 = (pelts onx)[offset onx + j]
                 = (pelts nx at Add)[offset onx + j]
                 = (pelts ox)[offset x + j] };
+    assert { forall j. 0 <= j < sz
+                       -> (pelts y)[offset y + j] = (pelts oy)[offset y + j]
+             by (pelts y)[offset y + j]
+                = (pelts ony)[offset ony + j]
+                = (pelts ny at Add)[offset ony + j]
+                = (pelts oy)[offset y + j] };
+    res
+
+  let add_n_rx (x y:ptr limb) (sz:int32) : limb
+    requires { 0 <= sz }
+    requires { valid x sz /\ valid y sz }
+    ensures  { value x sz + power radix sz * result
+               = old (value x sz + value y sz) }
+    ensures  { 0 <= result <= 1 }
+    ensures  { forall j. (j < offset x \/ offset x + sz <= j)
+                      -> (pelts x)[j] = old (pelts x)[j] }
+    ensures  { forall j. (pelts y)[j] = old (pelts y)[j] }
+    ensures  { value y sz = old value y sz }
+  = let ghost oy = pure { y } in
+    let nr, nx, ny, m = open_rx x sz y sz in
+    label Add in
+    let res = add_n_aliased nr nx ny sz in
+    let ghost ony = pure { ny } in
+    close_rx x sz y sz nr nx ny m;
     assert { forall j. 0 <= j < sz
                        -> (pelts y)[offset y + j] = (pelts oy)[offset y + j]
              by (pelts y)[offset y + j]
@@ -443,7 +486,6 @@ val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
     let nr, nx, ny, m = open_sep r x sx y sy in
     label Add in
     let res = add_aliased nr nx sx ny sy in
-    label Close in
     let ghost onx = pure { nx } in
     let ghost ony = pure { ny } in
     close_sep r x sx y sy nr nx ny m;
@@ -476,7 +518,6 @@ val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
     let nr, nx, ny, m = open_rx x sx y sy in
     label Add in
     let res = add_aliased nr nx sx ny sy in
-    label Close in
     let ghost ony = pure { ny } in
     close_rx x sx y sy nr nx ny m;
     assert { forall j. 0 <= j < sy
@@ -499,24 +540,31 @@ val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
     ensures  { value x sx = old value x sx }
   =
     let ghost ox = pure { x } in
-    let ghost oy = pure { y } in
     let nr, nx, ny, m = open_ry x sx y sy in
-    assert { value ny sy = value oy sy }; 
     label Add in
     let res = add_aliased nr nx sx ny sy in
-    label Close in
     let ghost onx = pure { nx } in
-    assert { value ny sx + power radix sx * res
-             = value nr sx + power radix sx * res
-             = (value nx sx + value ny sy) at Add };
     close_ry x sx y sy nr nx ny m;
-    assert { value y sx = value ny sx at Close };
     assert { forall j. 0 <= j < sx
                        -> (pelts x)[offset x + j] = (pelts ox)[offset x + j]
              by (pelts x)[offset x + j]
                 = (pelts onx)[offset onx + j]
                 = (pelts nx at Add)[offset onx + j]
                 = (pelts ox)[offset x + j] };
+    res
+
+  let add_n_rxy (x:ptr limb) (sx:int32) : limb
+    requires { 0 <= sx }
+    requires { valid x sx }
+    ensures  { value x sx + power radix sx * result
+               = old (value x sx + value x sx) }
+    ensures  { 0 <= result <= 1 }
+    ensures  { forall j. (j < offset x \/ offset x + sx <= j)
+                      -> (pelts x)[j] = old (pelts x)[j] }
+  =
+    let nr, nx, ny, m = open_rxy x sx in
+    let res = add_n_aliased nr nx ny sx in
+    close_rxy x sx nr nx ny m;
     res
 
 end
