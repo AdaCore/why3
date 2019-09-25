@@ -362,7 +362,7 @@ let rec python_ext_printer print_any fmt a =
   | Pretty.Pp_term (t, pri) ->
       begin match t.Term.t_node with
         | Term.Tapp (ls, [t1; t2]) when Term.ls_equal ls Term.ps_equ ->
-            (* TODO use priorities *)
+            (* == *)
             Format.fprintf fmt (protect_on (pri > 0) "@[(%a == %a)@]")
               (python_ext_printer print_any) (Pretty.Pp_term (t1, 0))
               (python_ext_printer print_any) (Pretty.Pp_term (t2, 0))
