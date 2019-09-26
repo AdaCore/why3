@@ -165,7 +165,7 @@ let rec pp_pty fmt = function
       fprintf fmt "@[<hv 2>(%a@ %a)@]" pp_qualid qid pp_ptys ptys
   | PTtuple ptys ->
       pp_tuple pp_pty fmt ptys
-  | PTref _ ->
+  | PTref _ptys ->
       todo fmt "PTref"
   | PTarrow (pty1, pty2) ->
       fprintf fmt "%a -> %a" pp_pty pty1 pp_pty pty2
@@ -208,7 +208,7 @@ let pp_attr pp fmt attr x =
   match attr with
   | ATstr a ->
       fprintf fmt "@[[@%s]@ %a@]" a.attr_string pp x
-  | ATpos loc ->
+  | ATpos _loc ->
       (* fprintf fmt "[# %a] %a" Loc.pp loc pp x *)
       todo fmt "attr-loc"
 
@@ -232,14 +232,14 @@ let pp_match pp pp_pattern fmt x cases xcases =
     (pp_print_opt_list ~prefix:" " pp_reg_branch) cases
     (pp_print_opt_list ~prefix:" " pp_exn_branch) xcases
 
-let pp_let pp fmt (id, ghost, kind, x) =
+let pp_let pp fmt (id, ghost, _kind, x) =
   (* TODO kind *)
   let pp_ghost fmt = function
     | false -> ()
     | true -> pp_print_string fmt " ghost" in
   fprintf fmt "@[<hv 2>let%a %a =@ %a@]" pp_ghost ghost pp_id id pp x
 
-let rec pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, mask, spec, x)) =
+let rec pp_let_fun pp fmt (id, ghost, _kind, (binders, opt_pty, _mask, spec, x)) =
   (* TODO mask *)
   let pp_ghost fmt = function
     | false -> ()
@@ -249,7 +249,7 @@ let rec pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, mask, spec, x)) =
     | Some pty -> fprintf fmt " : %a" pp_pty pty in
   fprintf fmt "@[<hv 2>let%a %a%a%a%a =@ %a@]" pp_ghost ghost pp_id id pp_binders binders pp_opt_pty opt_pty pp_spec spec pp x
 
-and pp_let_any fmt (id, ghost, kind, (params, kind', opt_pty, mask, spec)) =
+and pp_let_any fmt (id, ghost, _kind, (params, _kind', opt_pty, _mask, spec)) =
   (* TODO mask, kind, kind' *)
   let pp_ghost fmt = function
     | false -> ()
@@ -259,7 +259,7 @@ and pp_let_any fmt (id, ghost, kind, (params, kind', opt_pty, mask, spec)) =
     | Some pty -> fprintf fmt " : %a" pp_pty pty in
   fprintf fmt "@[<hv 2>val%a %a%a%a%a@]" pp_ghost ghost pp_id id pp_params params pp_opt_pty opt_pty pp_spec spec
 
-and pp_fundef fmt (id, ghost, kind, binders, pty_opt, mask, spec, e) =
+and pp_fundef fmt (id, ghost, _kind, binders, pty_opt, _mask, spec, e) =
   (* TODO mask, kind *)
   if ghost then
     pp_print_string fmt " ghost";
@@ -391,7 +391,7 @@ and pp_expr fmt e = match e.expr_desc with
       fprintf fmt "raise %a%a" pp_qualid qid pp_opt_arg opt_arg
   | Eexn (id, pty, mask, e) ->
       fprintf fmt "@[%a in@ %a@]" pp_exn (id, pty, mask) pp_expr e
-  | Eoptexn (id, mask, e) ->
+  | Eoptexn (id, _mask, e) ->
       (* TODO mask *)
       fprintf fmt "@[<v>exception %a in@ %a@]" pp_id id pp_expr e
   | Efor (id, start, dir, end_, invs, body) ->
@@ -461,7 +461,7 @@ and pp_term fmt t =
       pp_infix pp_term fmt t1 op t2 (* TODO ??? *)
   | Tbinop (t1, op, t2) ->
       fprintf fmt "@[<hv 2>(%a %a@ %a)@]" pp_term t1 pp_binop op pp_term t2
-  | Tbinnop (t1, op, t2) ->
+  | Tbinnop _ ->
       todo fmt "Tbinnop"
   | Tnot t ->
       pp_not pp_term fmt t
