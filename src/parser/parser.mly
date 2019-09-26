@@ -164,7 +164,7 @@
   let error_loc loc = Loc.error ~loc Error
 
   let () = Exn_printer.register (fun fmt exn -> match exn with
-    | Error -> Format.fprintf fmt "syntax error"
+    | Error -> Format.fprintf fmt "syntax error %s" (Parser_messages.message 1)
     | _ -> raise exn)
 
   let core_ident_error  = format_of_string
