@@ -50,8 +50,12 @@ let get loc = loc
 
 let dummy_position = ("",0,0,0)
 
-let join (f1,l1,b1,e1) (f2,_,b2,e2) =
-  assert (f1 = f2); (f1,l1,b1,e1+e2-b2)
+let join (f1,l1,b1,e1) (f2,l2,_b2,e2) =
+  assert (f1 = f2);
+  if l1 = l2 then (f1,l1,b1,e2)
+  else
+    (* There is no way to get an always right join in this case *)
+    (f1, l1, b1, e1 + e2)
 
 let extract (b,e) =
   let f = b.pos_fname in
