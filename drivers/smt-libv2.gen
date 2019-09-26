@@ -28,6 +28,7 @@ theory BuiltIn
   syntax type string "String"
   syntax predicate (=)  "(= %1 %2)"
 
+  meta "literal:keep" type string
   meta "encoding:kept" type int
   meta "encoding:ignore_polymorphism_ls" predicate (=)
 end

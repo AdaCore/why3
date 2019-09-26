@@ -250,6 +250,12 @@ module HarnessRegExpr
   use string.String
   use string.RegExpr
 
+  goal T:
+    in_re "aaa" (star (to_re "a"))
+
+  goal T2:
+    not (in_re "aba" (star (to_re "a")))
+
   lemma TestToReInRe: forall s.
     in_re s (to_re s)
 

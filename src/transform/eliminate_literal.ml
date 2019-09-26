@@ -54,6 +54,10 @@ let rec abstract_terms kn range_metas float_metas type_kept acc t =
     when not (ts_equal ts ts_real || Sts.mem ts type_kept) ->
       let to_real,isF = Mts.find ts float_metas in
       add_literal acc t c to_real (Some isF)
+  | Tconst (Constant.ConstStr _), Some ({ty_node = Tyapp (ts,[])} as ty)
+    when not (Sts.mem ts type_kept) ->
+     let vs = create_vsymbol (id_fresh "s") ty in
+     acc, t_eps (t_close_bound vs t_true)
   | _ ->
       t_map_fold (abstract_terms kn range_metas float_metas type_kept) acc t
 
