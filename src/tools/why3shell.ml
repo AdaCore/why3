@@ -317,7 +317,7 @@ let treat_notification fmt n =
       fprintf fmt "got a Source_and_ce notification not yet supported@." (* TODO *)
   | Next_Unproven_Node_Id _                 ->
       fprintf fmt "got a Next_Unproven_Node_Id notification not yet supported@." (* TODO *)
-  | Task (id, s, _list_loc, _)              ->
+  | Task (id, s, _list_loc, _, _)           ->
     (* coloring the source is useless in shell *)
     try
       let node = Hnode.find nodes id in

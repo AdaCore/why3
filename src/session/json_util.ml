@@ -418,12 +418,14 @@ let print_notification_to_json (n: notification): json =
   | Dead s ->
       convert_record ["notification", cc n;
            "message", String s]
-  | Task (nid, s, list_loc, goal_loc) ->
+  | Task (nid, s, list_loc, goal_loc, lang) ->
       convert_record ["notification", cc n;
-           "node_ID", Int nid;
-           "task", String s;
-           "loc_list", convert_list_loc list_loc;
-           "goal_loc", convert_option_loc goal_loc]
+                      "node_ID", Int nid;
+                      "task", String s;
+                      "loc_list", convert_list_loc list_loc;
+                      "goal_loc", convert_option_loc goal_loc;
+                      "lang", String lang;
+                     ]
   | File_contents (f, s) ->
       convert_record ["notification", cc n;
            "file", String f;
@@ -792,7 +794,8 @@ let parse_notification constr j =
     let s = get_string (get_field j "task") in
     let l = get_field j "loc_list" in
     let gl = get_field j "goal_loc" in
-    Task (nid, s, parse_list_loc l, parse_opt_loc gl)
+    let lang = get_string (get_field j "lang") in
+    Task (nid, s, parse_list_loc l, parse_opt_loc gl, lang)
 
   | "Next_Unproven_Node_Id" ->
     let nid1 = get_int (get_field j "node_ID1") in

@@ -108,10 +108,14 @@ type notification =
   (** an informative message, can be an error message *)
   | Dead         of string
   (** server exited *)
-  | Task         of node_ID * string * (Loc.position * color) list * Loc.position option
-  (** the node_ID's task together with information that allows to color the
-     source code corresponding to different part of the task (premise, goal,
-     etc). Last parameter is the location of the goal for scrolling  *)
+  | Task         of node_ID * string * (Loc.position * color) list * Loc.position option * string
+  (** [n, s, list_loc, goal_loc, lang] with
+     - [n] the node_ID's task,
+     - [s] the task to be displayed
+     - [list_loc] a list of location to color the source,
+     - [goal_loc] the location of the goal,
+     - [lang] the language to load in Why3ide for syntax coloring
+  *)
   | File_contents of string * string
   (** File_contents (filename, contents) *)
   | Source_and_ce of string * (Loc.position * color) list * Loc.position option

@@ -207,7 +207,7 @@ let env, gconfig = try
 (********************************)
 
 
-let (why_lang, any_lang) =
+let (why_lang, any_lang, why3py_lang) =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
@@ -226,7 +226,14 @@ let (why_lang, any_lang) =
     match languages_manager#guess_language ~filename () with
     | None -> why_lang
     | Some _ as l -> l in
-  (why_lang, any_lang)
+  let why3py_lang =
+    match languages_manager#language "why3py" with
+    | None ->
+        eprintf "language file for 'Why3python' not found in directory %s@."
+          load_path;
+        exit 1
+    | Some _ as l -> l in
+  (why_lang, any_lang, why3py_lang)
 
 (* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
@@ -2356,6 +2363,13 @@ let check_uninstalled_prover =
       uninstalled_prover_dialog ~parent:main_window ~callback gconfig p
     end
 
+let change_lang view lang =
+  let lang =
+    match lang with
+    | "python" -> why3py_lang
+    | _ -> why_lang in
+  view#source_buffer#set_language lang
+
 let treat_notification n =
   Protocol_why3ide.print_notify_debug n;
   begin match n with
@@ -2474,9 +2488,10 @@ let treat_notification n =
         exit_function_safe ()
   | Saving_needed b -> exit_function_handler b
   | Message (msg)                 -> treat_message_notification msg
-  | Task (id, s, list_loc, goal_loc)        ->
+  | Task (id, s, list_loc, goal_loc, lang)        ->
      if is_selected_alone id then
        begin
+         change_lang task_view lang;
          task_view#source_buffer#set_text s;
          (* Avoid erasing colors at startup when selecting the first node. In
             all other cases, it should change nothing. *)
