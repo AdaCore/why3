@@ -8,6 +8,15 @@ module Harness
 
   goal Empty2: empty = ""
 
+  goal Test00: not ("a" = "b")
+
+  constant a: string
+
+  goal Test0:
+    (if 2 + 2 = 4 then "a" = a else "b" = a) -> "a" = a
+    (* this should be proved even with alt-ergo due to the sharing of
+       literals *)
+
   goal Test1:
     let s = "abcdef" in substring s 2 3 = "cde"
 

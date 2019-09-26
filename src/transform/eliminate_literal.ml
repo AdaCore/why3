@@ -27,8 +27,11 @@ let add_literal (known_lit, decl as acc) t c ls_proj fin =
     let ls_decl = create_param_decl ls in
     let pr = create_prsymbol (id_fresh (litname^"_axiom")) in
     let ls_t = t_app ls [] t.t_ty in
-    let f = t_app ls_proj [ls_t] ls_proj.ls_value in
-    let f = t_equ f (t_const c (Opt.get f.t_ty)) in
+    let f = match ls_proj with
+      | Some ls_proj ->
+         let f = t_app ls_proj [ls_t] ls_proj.ls_value in
+         t_equ f (t_const c (Opt.get f.t_ty))
+      | None -> t_true in
     let f = match fin with
       | None -> f
       | Some isF -> t_and (t_app isF [ls_t] None) f in
@@ -49,15 +52,14 @@ let rec abstract_terms kn range_metas float_metas type_kept acc t =
   | Tconst (Constant.ConstInt _ as c), Some {ty_node = Tyapp (ts,[])}
     when not (ts_equal ts ts_int || Sts.mem ts type_kept) ->
       let to_int = Mts.find ts range_metas in
-      add_literal acc t c to_int None
+      add_literal acc t c (Some to_int) None
   | Tconst (Constant.ConstReal _ as c), Some {ty_node = Tyapp (ts,[])}
     when not (ts_equal ts ts_real || Sts.mem ts type_kept) ->
       let to_real,isF = Mts.find ts float_metas in
-      add_literal acc t c to_real (Some isF)
-  | Tconst (Constant.ConstStr _), Some ({ty_node = Tyapp (ts,[])} as ty)
+      add_literal acc t c (Some to_real) (Some isF)
+  | Tconst (Constant.ConstStr _ as c), Some {ty_node = Tyapp (ts,[])}
     when not (Sts.mem ts type_kept) ->
-     let vs = create_vsymbol (id_fresh "s") ty in
-     acc, t_eps (t_close_bound vs t_true)
+     add_literal acc t c None None
   | _ ->
       t_map_fold (abstract_terms kn range_metas float_metas type_kept) acc t
 
