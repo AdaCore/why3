@@ -357,22 +357,41 @@ let read_channel env path file c =
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
 open Term
+open Format
+open Pretty
+
+(* python print_binop *)
+let print_binop ~asym fmt = function
+  | Tand when asym -> fprintf fmt "&&"
+  | Tor when asym  -> fprintf fmt "||"
+  | Tand           -> fprintf fmt "and"
+  | Tor            -> fprintf fmt "or"
+  | Timplies       -> fprintf fmt "->"
+  | Tiff           -> fprintf fmt "<->"
 
 (* Register the transformations functions *)
 let rec python_ext_printer print_any fmt a =
   match a with
-  | Pretty.Pp_term (t, pri) ->
+  | Pp_term (t, pri) ->
       begin match t.t_node with
         | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
             (* == *)
-            Format.fprintf fmt (protect_on (pri > 0) "@[%a == %a@]")
-              (python_ext_printer print_any) (Pretty.Pp_term (t1, 0))
-              (python_ext_printer print_any) (Pretty.Pp_term (t2, 0))
+            fprintf fmt (protect_on (pri > 0) "@[%a == %a@]")
+              (python_ext_printer print_any) (Pp_term (t1, 0))
+              (python_ext_printer print_any) (Pp_term (t2, 0))
         | Tnot {t_node = Tapp (ls, [t1; t2]) } when ls_equal ls ps_equ ->
             (* != *)
-            Format.fprintf fmt (protect_on (pri > 0) "@[%a != %a@]")
-              (python_ext_printer print_any) (Pretty.Pp_term (t1, 0))
-              (python_ext_printer print_any) (Pretty.Pp_term (t2, 0))
+            fprintf fmt (protect_on (pri > 0) "@[%a != %a@]")
+              (python_ext_printer print_any) (Pp_term (t1, 0))
+              (python_ext_printer print_any) (Pp_term (t2, 0))
+        | Tbinop (b, f1, f2) ->
+            (* and, or *)
+            let asym = Ident.Sattr.mem asym_split f1.t_attrs in
+            let p = prio_binop b in
+            fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
+              (python_ext_printer print_any) (Pp_term (f1, (p + 1)))
+              (print_binop ~asym) b
+              (python_ext_printer print_any) (Pp_term (f2, p))
         | _ -> print_any fmt a
       end
   | _ -> print_any fmt a

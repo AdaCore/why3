@@ -28,6 +28,12 @@ let why3_keywords =
 
 let coercion_attr = create_attribute "coercion"
 
+let prio_binop = function
+  | Tand -> 4
+  | Tor -> 3
+  | Timplies -> 1
+  | Tiff -> 1
+
 type any_pp =
   | Pp_term of (Term.term * int) (* term and priority *)
   | Pp_ty of (Ty.ty * int * bool) (* ty * prio * q *)
@@ -306,12 +312,6 @@ let print_binop ~asym fmt = function
   | Tor -> fprintf fmt "\\/"
   | Timplies -> fprintf fmt "->"
   | Tiff -> fprintf fmt "<->"
-
-let prio_binop = function
-  | Tand -> 4
-  | Tor -> 3
-  | Timplies -> 1
-  | Tiff -> 1
 
 let rec print_term fmt t =
   print_lterm 0 fmt t

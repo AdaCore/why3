@@ -23,6 +23,8 @@ open Decl
 open Theory
 open Task
 
+val prio_binop: binop -> int
+
 module type Printer = sig
 
     val tprinter : ident_printer  (* type symbols *)
