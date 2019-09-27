@@ -9,6 +9,8 @@
 (*                                                                  *)
 (********************************************************************)
 
+(* TODO Use less parenthesis to deal with precedence and associativity *)
+
 (* Test with
    $ why3 pp --output=mlw test.mlw > test1.mlw
    $ why3 pp --output=mlw test1.mlw > test2.mlw
