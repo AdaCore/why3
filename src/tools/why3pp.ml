@@ -371,8 +371,8 @@ end
 
 (** {2 Command line interface} *)
 
-open Why3
 open Format
+open Why3
 
 let filename = ref None
 
@@ -417,7 +417,7 @@ let options = [
 let parse_mlw_file filename =
   let c = open_in filename in
   let lexbuf = Lexing.from_channel c in
-  let mlw_file = Why3.Lexer.parse_mlw_file lexbuf in
+  let mlw_file = Lexer.parse_mlw_file lexbuf in
   close_in c;
   mlw_file
 
@@ -430,14 +430,15 @@ let () =
         (match !output, !kind, Queue.length paths with
          | Some Latex, Some Inductive, _ ->
              let paths = List.rev (Queue.fold (fun l x -> x :: l) [] paths) in
-             let module M = LatexInd(struct let prefix = !prefix let flatten_applies = true let comment_macros = false end) in
+             let module Conf = struct let prefix = !prefix let flatten_applies = true let comment_macros = false end in
+             let module M = LatexInd(Conf) in
              M.main std_formatter mlw_file paths
          | Some Mlw, None, 0 ->
              Mlw_printer.pp_mlw_file std_formatter mlw_file
          (* | Some Ast, None, 0 ->
           *     Ptree.pp_mlw_file std_formatter mlw_file *)
          | _, _, _ ->
-             failwith "command line arguments" (* |ast *)
+             failwith "command line arguments"
         )
     | None -> invalid_arg "no filename given"
   with Invalid_argument msg ->

@@ -9,8 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* TODO move to src/mlw/mlw_printer.ml ? *)
-
 (* Test with
    $ why3 pp --output=mlw test.mlw > test1.mlw
    $ why3 pp --output=mlw test1.mlw > test2.mlw
