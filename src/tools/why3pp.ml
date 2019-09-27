@@ -430,7 +430,7 @@ let () =
         (match !output, !kind, Queue.length paths with
          | Some Latex, Some Inductive, _ ->
              let paths = List.rev (Queue.fold (fun l x -> x :: l) [] paths) in
-             let module Conf = struct let prefix = !prefix let flatten_applies = true let comment_macros = false end in
+             let module Conf = struct let prefix = !prefix let flatten_applies = true let comment_macros = true end in
              let module M = LatexInd(Conf) in
              M.main std_formatter mlw_file paths
          | Some Mlw, None, 0 ->
