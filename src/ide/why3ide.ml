@@ -315,12 +315,6 @@ let get_source_view_table (file:string) =
   | v -> v
   | exception Not_found -> raise (Nosourceview file)
 
-(* This returns the source_view of a file *)
-let get_source_view (file: string) : GSourceView.source_view =
-  match Hstr.find source_view_table file with
-  | (_, v, _, _) -> v
-  | exception Not_found -> raise (Nosourceview file)
-
 (* Saving function for sources *)
 let save_sources () =
   Hstr.iter
@@ -670,11 +664,12 @@ let task_view =
   in
   GSourceView.source_view
     ~editable:false
-    ~cursor_visible:false
+    ~cursor_visible:true
     ~show_line_numbers:true
     ~packing:scrolled_task_view#add
     ()
 
+let () = create_colors task_view
 
 (* Creating a page for source code view *)
 let create_source_view =
@@ -738,6 +733,12 @@ let create_source_view =
       end in
   create_source_view
 
+(* This returns the source_view of a file *)
+let get_source_view (file: string) : GSourceView.source_view =
+  if file = "Task" then task_view else
+  match Hstr.find source_view_table file with
+  | (_, v, _, _) -> v
+  | exception Not_found -> raise (Nosourceview file)
 
 
 (* End of notebook *)
@@ -988,7 +989,9 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
   | Some loc ->
     let f, l, _, _ = Loc.get loc in
     try
-      let (n, v, _, _) = get_source_view_table f in
+      let (n, v) = if f = "Task" then (0, task_view) else
+          let (n, v, _, _) = get_source_view_table f in
+          (n, v) in
       if force_tab_switch then
         begin
           Debug.dprintf debug "tab switch to page %d@." n;
@@ -1012,12 +1015,17 @@ let scroll_to_loc_ce loc_of_goal =
 let reposition_ide_cursor () =
   scroll_to_loc ~force_tab_switch:false !current_cursor_loc
 
+let find_current_file_view () =
+  let n = notebook#current_page in
+  if n = 0 then Some ("Task", task_view) else
+    let acc = ref None in
+    Hstr.iter (fun k (x, v, _, _) -> if x = n then acc := Some (k, v)) source_view_table;
+    !acc
+
 (* Save the current location of the cursor to be reused after reload *)
 let save_cursor_loc () =
-  let n = notebook#current_page in
-  let acc = ref None in
-  Hstr.iter (fun k (x, v, _, _) -> if x = n then acc := Some (k, v)) source_view_table;
-  match !acc with
+  let cur_fv = find_current_file_view () in
+  match cur_fv with
   | None -> ()
   | Some (cur_file, view) ->
     (* Get current line *)
@@ -1887,6 +1895,95 @@ let (_: GMenu.menu_item) =
     ~modi:[`CONTROL] ~key:GdkKeysyms._Q
     ~tooltip:"See the Preferences for setting the policy on automatic file saving at exit."
     ~callback:exit_function_safe
+
+(* Remove a specific color at a specific location *)
+let uncolor ~color loc =
+  match loc with
+  | None -> ()
+  | Some loc ->
+      let f, l, b, e = Loc.get loc in
+      try
+        let v = get_source_view f in
+        let color = convert_color color in
+        let buf = v#buffer in
+        let top = buf#start_iter in
+        let start = top#forward_lines (l-1) in
+        let start = start#forward_chars b in
+        let stop = start#forward_chars (e-b) in
+        buf#remove_tag_by_name ~start ~stop color;
+      with
+      | Nosourceview _ -> ()
+
+(* TODO replace the default color for finding an element "Premise_Color" by
+   something else *)
+let search_forward =
+  let last_search = ref "" in
+  let last_colored = ref None in
+  let search_forward ~forward () =
+    let cur_fv = find_current_file_view () in
+    match cur_fv with
+    | None -> print_message ~kind:0 ~notif_kind:"Search"
+                "Cannot search. No current file view exist"
+    | Some (cur_file, view) ->
+        (* Get current line *)
+        let iter = view#buffer#get_iter_at_mark `SEL_BOUND in
+        let search_string =
+          let find = if forward then "Forward search" else "Backward search" in
+          GToolbox.input_string ~title:find ~ok:"Search"
+            ~cancel:"Cancel" ~text:!last_search
+            "Type a string to find in the current document"
+        in
+        match search_string with
+        | None -> uncolor ~color:Premise_color !last_colored
+        | Some search ->
+            last_search := search;
+            let searched =
+              if forward then
+                GtkText.Iter.forward_search iter#as_iter search None
+              else
+                GtkText.Iter.backward_search iter#as_iter search None
+            in
+            match searched with
+            | None ->
+                uncolor ~color:Premise_color !last_colored;
+                print_message ~kind:1 ~notif_kind:"Search"
+                        "Searched string not found in the rest of the document"
+            | Some (iter_begin, iter_end) ->
+                let n1 = GtkText.Iter.get_line iter_begin in
+                let l1 = GtkText.Iter.get_line_index iter_begin in
+                let l2 = GtkText.Iter.get_line_index iter_end in
+                let loc1 = Loc.user_position cur_file (n1 + 1) l1 l2 in
+                (* TODO find a new color *)
+                color_loc ~color:Premise_color loc1;
+                if not (Opt.equal Loc.equal !last_colored (Some loc1)) then
+                  uncolor ~color:Premise_color !last_colored;
+                last_colored := Some loc1;
+                (* Get to the line after to be able to call Ctrl+F on the same
+                   string right away *)
+                let loc2 = if forward then
+                    Loc.user_position cur_file (n1 + 2) 0 0
+                  else
+                    Loc.user_position cur_file n1 0 0
+                in
+                scroll_to_loc ~force_tab_switch:false (Some loc2);
+  in
+  search_forward
+
+let edit_menu = factory#add_submenu "_Edit"
+let edit_factory = new menu_factory edit_menu ~accel_path:"<Why3-Main>/Edit/" ~accel_group
+
+let (_: GMenu.menu_item) =
+  edit_factory#add_item "Search forward"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._F
+    ~tooltip:"Search in the source file."
+    ~callback:(search_forward ~forward:true)
+
+let (_: GMenu.menu_item) =
+  edit_factory#add_item "Search backward"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._B
+    ~tooltip:"Search backward in the source file."
+    ~callback:(search_forward ~forward:false)
+
 
 (* "Tools" menu items *)
 
