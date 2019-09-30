@@ -1024,7 +1024,7 @@ module MLToC = struct
        let id = pv_name pv in
        let e = C.Evar id in
        ([], expr_or_return env e)
-    | Mltree.Econst Constant.(ConstStr _ | ConstReal _) -> assert false (* TODO *)
+    | Mltree.Econst (Constant.ConstStr _ | Constant.ConstReal _) -> assert false (* TODO *)
     | Mltree.Econst (Constant.ConstInt ic) ->
        let open Number in
        let print fmt ic =
