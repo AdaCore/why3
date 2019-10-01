@@ -98,7 +98,7 @@ type notification =
   (* an informative message, can be an error message *)
   | Dead         of string
   (* server exited *)
-  | Task         of node_ID * string * (Loc.position * color) list * Loc.position option * string
+  | Task         of node_ID * string * (Loc.position * color) list * Loc.position option * Env.fformat
   (* [n, s, list_loc, goal_loc, lang] with
      - [n] the node_ID's task,
      - [s] the task to be displayed
@@ -106,11 +106,11 @@ type notification =
      - [goal_loc] the location of the goal,
      - [lang] the language to load in Why3ide for syntax coloring
   *)
-  | File_contents of string * string
-  (* File_contents (filename, contents) *)
-  | Source_and_ce of string * (Loc.position * color) list * Loc.position option
+  | File_contents of string * string * Env.fformat
+  (* File_contents (filename, contents, format) *)
+  | Source_and_ce of string * (Loc.position * color) list * Loc.position option * Env.fformat
   (* Source interleaved with counterexamples: contents, list color loc,
-     loc of the goal *)
+     loc of the goal, format of the source *)
 
 type ide_request =
   | Command_req             of node_ID * string
@@ -208,8 +208,8 @@ let print_notify fmt n =
   | Message msg                       ->
       print_msg fmt msg
   | Dead s                            -> fprintf fmt "dead :%s" s
-  | File_contents (f, _s)             -> fprintf fmt "file contents %s" f
-  | Source_and_ce (_, _list_loc, _gl) -> fprintf fmt "source and ce"
-  | Task (ni, _s, list_loc, _g_loc, _lang)   ->
+  | File_contents (f, _s, _)          -> fprintf fmt "file contents %s" f
+  | Source_and_ce (_, _list_loc, _gl, _) -> fprintf fmt "source and ce"
+  | Task (ni, _s, list_loc, _g_loc, _lang) ->
       fprintf fmt "task for node_ID %d which contains a list of %d locations"
               ni (List.length list_loc) (* print_list_loc list_loc *)

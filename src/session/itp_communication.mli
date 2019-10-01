@@ -116,11 +116,11 @@ type notification =
      - [goal_loc] the location of the goal,
      - [lang] the language to load in Why3ide for syntax coloring
   *)
-  | File_contents of string * string
-  (** File_contents (filename, contents) *)
-  | Source_and_ce of string * (Loc.position * color) list * Loc.position option
+  | File_contents of string * string * Env.fformat
+  (** File_contents (filename, contents, format) *)
+  | Source_and_ce of string * (Loc.position * color) list * Loc.position option * Env.fformat
   (** Source interleaved with counterexamples: contents and list color loc,
-      loc of the goal *)
+      loc of the goal, format of the source *)
 
 type ide_request =
   | Command_req             of node_ID * string

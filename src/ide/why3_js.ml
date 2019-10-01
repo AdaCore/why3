@@ -553,7 +553,7 @@ let interpNotif (n: notification) =
       TaskList.attach_new_node nid parent ntype name detached;
       TaskList.onclick_do_something (string_of_int nid);
       sendRequest (Get_task (string_of_int nid))
-  | File_contents (_f,_s) ->
+  | File_contents (_f,_s,_) ->
      PE.error_print_msg "Notification File_contents not handled yet"
   | Source_and_ce _ ->
      PE.error_print_msg "Notification Source_and_ce not handled yet"

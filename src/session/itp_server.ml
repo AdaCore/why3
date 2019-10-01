@@ -602,7 +602,7 @@ end
   (* File input/output *)
   (*********************)
 
-  let read_and_send f =
+  let read_and_send f file_format =
     try
       let d = get_server_data() in
       if d.send_source then
@@ -611,7 +611,7 @@ end
             (Session_itp.get_dir d.cont.controller_session) f in
  *)
         let s = Sysutil.file_contents f in
-        P.notify (File_contents (f, s))
+        P.notify (File_contents (f, s, file_format))
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
@@ -881,6 +881,7 @@ end
     let ses = d.cont.controller_session in
     let on_file f =
       read_and_send (Session_itp.system_path ses f)
+        (Session_itp.file_format f)
     in
     iter_on_files ~on_file ~on_subtree:create_node
 
@@ -912,6 +913,7 @@ end
 
   let create_ce_tab ~print_attrs s res any list_loc goal_loc =
     let f = get_encapsulating_file s any in
+    let file_format = Session_itp.file_format f in
     let filename = Session_itp.system_path s f in
     let source_code = Sysutil.file_contents filename in
     (* Convert the color location and location of the goal at the same time *)
@@ -933,7 +935,7 @@ end
     let list_loc =
       List.map (fun (x, y) ->
           match y with | Color_loc y -> (x, y) | _ -> assert false) list_loc in
-    (source_result, list_loc, goal_loc)
+    (source_result, list_loc, goal_loc, file_format)
 
   let send_task nid show_full_context loc =
     let d = get_server_data () in
@@ -1005,10 +1007,10 @@ end
                     let result_pr =
                       result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
                     in
-                    let (source_result, list_loc, goal_loc) =
+                    let (source_result, list_loc, goal_loc, file_format) =
                       create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc old_goal_loc
                     in
-                    P.notify (Source_and_ce (source_result, list_loc, goal_loc));
+                    P.notify (Source_and_ce (source_result, list_loc, goal_loc, file_format));
                     P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc, lang))
                   end
             | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc, lang))
@@ -1043,7 +1045,8 @@ end
         let l = add_file cont f in
         let file = find_file_from_path cont.controller_session fn in
         send_new_subtree_from_file file;
-        read_and_send (Session_itp.system_path cont.controller_session file);
+        read_and_send (Session_itp.system_path cont.controller_session file)
+          (Session_itp.file_format file);
         begin
           match l with
           | [] ->
@@ -1379,7 +1382,9 @@ end
 
   let read_and_send_files s =
     let fs = Session_itp.get_files s in
-    Hfile.iter (fun _ f -> read_and_send (Session_itp.system_path s f)) fs
+    Hfile.iter (fun _ f ->
+        read_and_send (Session_itp.system_path s f) (Session_itp.file_format f))
+      fs
 
   let notify_parsing_errors l =
     List.iter
@@ -1558,7 +1563,12 @@ end
           end
        end
     | Get_file_contents f          ->
-       read_and_send f
+        (* TODO warning this request is not tested *)
+        let ses = d.cont.controller_session in
+        let file = Session_itp.find_file_from_path ses
+            (Sysutil.system_independent_path_of_file f) in
+        let file_format = Session_itp.file_format file in
+        read_and_send f file_format
     | Save_file_req (name, text)   ->
        save_file name text
     | Check_need_saving_req ->

@@ -30,6 +30,8 @@ API
   * Counterexamples: indices of array are now model_value. :x:
   * ITP constructor Task now contain the location of the goal :x:
   * ITP constructor Source_and_ce now has 3 arguments instead of 2 :x:
+  * ITP constructors File_contents and Source_and_ce has a new arguments which
+    is the file format :x:
 
 Transformations
   * `apply`/`rewrite` behaves better in presence of `let`;
