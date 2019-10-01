@@ -257,12 +257,15 @@ let create_colors v =
       ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
   let error_font_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"error_font_tag" [`BACKGROUND gconfig.error_color] in
+  let search_tag (v: GSourceView.source_view) = v#buffer#create_tag
+      ~name:"search_tag" [`BACKGROUND gconfig.search_color] in
   let _ : GText.tag = premise_tag v in
   let _ : GText.tag = neg_premise_tag v in
   let _ : GText.tag = goal_tag v in
   let _ : GText.tag = error_line_tag v in
   let _ : GText.tag = error_tag v in
   let _ : GText.tag = error_font_tag v in
+  let _ : GText.tag = search_tag v in
   ()
 
 (* Erase all the source location tags in a source file *)
@@ -1104,11 +1107,12 @@ let () = send_session_config_to_server ()
 let convert_color (color: color): string =
   match color with
   | Neg_premise_color -> "neg_premise_tag"
-  | Premise_color -> "premise_tag"
-  | Goal_color -> "goal_tag"
-  | Error_color -> "error_tag"
-  | Error_line_color -> "error_line_tag"
-  | Error_font_color -> "error_font_tag"
+  | Premise_color     -> "premise_tag"
+  | Goal_color        -> "goal_tag"
+  | Error_color       -> "error_tag"
+  | Error_line_color  -> "error_line_tag"
+  | Error_font_color  -> "error_font_tag"
+  | Search_color      -> "search_tag"
 
 let color_line ~color loc =
   let color_line (v:GSourceView.source_view) ~color l =
@@ -1914,8 +1918,6 @@ let uncolor ~color loc =
       with
       | Nosourceview _ -> ()
 
-(* TODO replace the default color for finding an element "Premise_Color" by
-   something else *)
 let search_forward =
   let last_search = ref "" in
   let last_colored = ref None in
@@ -1934,7 +1936,7 @@ let search_forward =
             "Type a string to find in the current document"
         in
         match search_string with
-        | None -> uncolor ~color:Premise_color !last_colored
+        | None -> uncolor ~color:Search_color !last_colored
         | Some search ->
             last_search := search;
             let searched =
@@ -1945,7 +1947,7 @@ let search_forward =
             in
             match searched with
             | None ->
-                uncolor ~color:Premise_color !last_colored;
+                uncolor ~color:Search_color !last_colored;
                 print_message ~kind:1 ~notif_kind:"Search"
                         "Searched string not found in the rest of the document"
             | Some (iter_begin, iter_end) ->
@@ -1953,10 +1955,9 @@ let search_forward =
                 let l1 = GtkText.Iter.get_line_index iter_begin in
                 let l2 = GtkText.Iter.get_line_index iter_end in
                 let loc1 = Loc.user_position cur_file (n1 + 1) l1 l2 in
-                (* TODO find a new color *)
-                color_loc ~color:Premise_color loc1;
+                color_loc ~color:Search_color loc1;
                 if not (Opt.equal Loc.equal !last_colored (Some loc1)) then
-                  uncolor ~color:Premise_color !last_colored;
+                  uncolor ~color:Search_color !last_colored;
                 last_colored := Some loc1;
                 (* Get to the line after to be able to call Ctrl+F on the same
                    string right away *)
