@@ -121,7 +121,7 @@ theory string.RegExpr
 
   syntax function opt        "(re.opt %1)"
   syntax function range      "(re.range %1 %2)"
-  syntax function power      "((_ re.^ %1) %2)"
-  syntax function loop       "((_ re.loop %1 %2) %3)"
+  syntax function power      "(re.loop %2 %1 %1)"
+  syntax function loop       "(re.loop %3 %1 %2)"
 
 end

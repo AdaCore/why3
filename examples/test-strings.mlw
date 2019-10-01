@@ -462,4 +462,23 @@ module HarnessRegExpr
 
   goal range_not_singleton: forall s.
     not (in_re s (range "ba" "a"))
+
+  (* power, loop *)
+
+  goal TestPower1:
+    let a = to_re "a" in
+    in_re "aa" (power 2 a)
+
+  goal TestPower2:
+    let ab = to_re "ab" in
+    in_re "ababab" (power 3 ab)
+
+  goal TestPower3: forall i.
+    let ab = to_re "ab" in
+    in_re "ababab" (power i ab)
+
+  goal TestLoop1:
+    let a = to_re "a" in
+    in_re "aa" (loop 2 3 a)
+
 end
