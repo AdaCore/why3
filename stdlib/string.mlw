@@ -96,25 +96,58 @@ module RegExpr
   use String as S
 
   type re
+  (** type for regular expressions *)
 
   function to_re string : re
+  (** string to regular expression injection *)
 
   predicate in_re string re
-
-  constant none : re
-
-  (* constant all : re *)
-
-  constant allchar : re
+  (** regular expression membership *)
 
   function concat re re : re (* left assoc *)
+  (** regular expressions concatenation *)
 
   function union re re : re (* left assoc *)
+  (** regular expressions union *)
 
-  function inter re re : re (* left assoc *)
+  function inter re re : re (* left assoc *) (* NOT SUPPORTED BY Z3 *)
+  (** regular expressions intersection *)
 
   function star re : re
+  (** Kleene closure *)
 
   function plus re : re
+  (** Kleene cross *)
+  (* forall re. plus re = concat re (star re) *)
+
+  constant none : re
+  (** the empty set of strings *)
+
+  constant allchar : re
+  (** the set of all strings of length 1 *)
+
+  constant all : re = star allchar
+  (** the set of all strings *)
+
+  function opt re : re
+  (** regular expression option *)
+  (* forall re. opt re = union re (to_re "") *)
+
+  function range string string : re
+  (** `range s1 s2` is the set of singleton strings such that all
+  element `s` of `range s1 s2` satisfies the condition `Str.<= s1 s`
+  and `Str.<= s s2`. *)
+
+  function power int re : re
+  (** `power n r` is the `n`th power of `r`; `n` must be an
+      integer literal. *)
+  (* power 0 e = to_re ""
+     power n e = concat e (power (n-1) e) *)
+
+  function loop int int re : re
+  (* loop n1 n2 r = if n1 > ne then none else
+                    if n1 = n2 then power n1 r else
+                    union (power n1 e) (loop (n1+1) n2 e) *)
+  (* `n1` and `n2` must be literals. *)
 
 end

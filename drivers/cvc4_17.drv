@@ -18,13 +18,18 @@ theory string.RegExpr
   syntax function to_re      "(str.to.re %1)"
   syntax predicate in_re     "(str.in.re %1 %2)"
 
-  syntax function none       "re.nostr"
-  (*  syntax functiona all        "re.all" *)
-  syntax function allchar    "re.allchar"
   syntax function concat     "(re.++ %1 %2)"
   syntax function union      "(re.union %1 %2)"
   syntax function inter      "(re.inter %1 %2)"
   syntax function star       "(re.* %1)"
   syntax function plus       "(re.+ %1)"
+
+  syntax function none       "re.nostr"
+  syntax function allchar    "re.allchar"
+
+  syntax function opt        "(re.opt %1)"
+  syntax function range      "(re.range %1 %2)"
+  syntax function power      "((_ re.^ %1) %2)"
+  syntax function loop       "((_ re.loop %1 %2) %3)"
 
 end

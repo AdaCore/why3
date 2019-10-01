@@ -8,16 +8,26 @@ module Harness
 
   goal Empty2: empty = ""
 
-  goal Test00: not ("a" = "b")
+  goal Test0: not ("a" = "b")
 
   constant a: string
 
-  goal Test0:
+  goal Test1:
     (if 2 + 2 = 4 then "a" = a else "b" = a) -> "a" = a
     (* this should be proved even with alt-ergo due to the sharing of
        literals *)
 
-  goal Test1:
+  goal Test2:
+    let a = if 2 + 2 = 4 then "a" else "" in
+    let b = if 2 + 2 = 4 then "b" else "" in
+    not (a = b)
+
+  goal Test3:
+    let a = if 2 + 2 = 4 then "a" else "" in
+    let b = if 2 + 2 = 4 then "a" else "" in
+    a = b
+
+  goal Test4:
     let s = "abcdef" in substring s 2 3 = "cde"
 
   goal TestConcat1:
@@ -256,36 +266,200 @@ module Harness
 end
 
 module HarnessRegExpr
-  use string.String
+  use string.String as S
   use string.RegExpr
 
-  goal T:
-    in_re "aaa" (star (to_re "a"))
+  (* in_re and to_re *)
+  goal TestIn1:
+    in_re "a" (to_re "a")
 
-  goal T2:
-    not (in_re "aba" (star (to_re "a")))
+  goal TestIn2:
+    in_re "abc" (to_re "abc")
+
+  goal TestIn3:
+    not (in_re "abc" (to_re "abd"))
 
   lemma TestToReInRe: forall s.
     in_re s (to_re s)
 
+  (* concat *)
+
+  goal TestConcat1:
+    let r1 = to_re "a" in
+    let r2 = to_re "b" in
+    in_re "ab" (concat r1 r2)
+
+  goal TestConcat2:
+    let r1 = to_re "a" in
+    let r2 = to_re "b" in
+    not (in_re "ba" (concat r1 r2))
+
+  goal TestConcat3:
+    let r1 = to_re "abc" in
+    let r2 = to_re "def" in
+    in_re "abcdef" (concat r1 r2)
+
+  goal TestConcat4:
+    let r1 = to_re "a" in
+    in_re (S.concat "a" "a") (concat r1 r1)
+
+  lemma concat: forall s1 s2.
+    let r1 = to_re s1 in
+    let r2 = to_re s2 in
+    in_re (S.concat s1 s2) (concat r1 r2)
+
+  goal concat_exists: forall s r1 r2.
+    in_re s (concat r1 r2) -> exists s1 s2.
+      S.concat s1 s2 = s && in_re s1 r1 && in_re s2 r2
+
+  (* union *)
+
+  goal TestUnion1:
+    let r1 = to_re "a" in
+    let r2 = to_re "b" in
+    in_re "a" (union r1 r2) && in_re "b" (union r1 r2)
+
+  goal TestUnion2:
+    let r1 = to_re "a" in
+    forall re. in_re "a" (union r1 re) && in_re "a" (union re r1)
+
+  goal in_union1: forall s1 r1 r2.
+    in_re s1 r1 -> in_re s1 (union r1 r2)
+
+  goal in_union2: forall s1 r1 r2.
+    in_re s1 r2 -> in_re s1 (union r1 r2)
+
+  goal in_union: forall s1 r1 r2.
+    in_re s1 r1 || in_re s1 r2 -> in_re s1 (union r1 r2)
+
+  (* inter *)
+
+  goal TestInter1:
+    let r1 = to_re "a" in
+    let r2 = to_re "b" in
+    not (in_re "a" (inter r1 r2))
+
+  goal TestInter2:
+    let r1 = to_re "a" in
+    let r = to_re "b" in
+    let r2 = union r1 r in
+    in_re "a" (inter r1 r2)
+
+  lemma in_inter1: forall s1:string, r1:re, r2:re.
+    in_re s1 (inter r1 r2) -> in_re s1 r1
+
+  lemma in_inter2: forall s1:string, r1:re, r2:re.
+    in_re s1 (inter r1 r2) -> in_re s1 r2
+
+  (* star *)
+
+  goal TestInStar1:
+    let a = star (to_re "a") in
+    in_re "aaa" a &&
+    not (in_re "aba" a)
+
+  goal TestInStar2:
+    let a = to_re "a" in
+    let b = to_re "b" in
+    let ab = star (union a b) in
+    in_re "a" ab &&
+    in_re "b" ab &&
+    in_re "babab" ab &&
+    in_re "baaa" ab &&
+    in_re "aaaa" ab &&
+    in_re "bbbb" ab &&
+    not (in_re "acaab") ab
+
+  goal TestDigit:
+    let d = union (to_re "0") (union (to_re "1") (union (to_re "2")
+           (union (to_re "3") (union (to_re "4") (union (to_re "5")
+           (union (to_re "6") (union (to_re "7") (union (to_re "8")
+            (to_re "9"))))))))) in
+    let ds = star d in
+    let is_digit x = in_re x d in
+    let are_digits x = in_re x ds in
+    is_digit "1" && is_digit "9" && is_digit "0" &&
+    not (is_digit "a") && not (is_digit "12") &&
+    are_digits "0" && are_digits "4" && are_digits "9" &&
+    are_digits "1850" && are_digits "10" && are_digits "000" &&
+    not (are_digits "1 ") && not (are_digits " 1") &&
+    not (are_digits "1a") && not (are_digits "a1") &&
+    not (are_digits "a")
+
+  goal star1: forall s re.
+    in_re s re -> in_re s (star re)
+
+  lemma star2: forall re.
+    in_re S.empty (star re)
+
+  (* plus *)
+
+  goal TestPlus1:
+    let a = plus (to_re "a") in
+    in_re "a" a && in_re "aaa" a && not (in_re "b" a) &&
+    not (in_re "ab" a) && not (in_re "" a)
+
+  lemma def_plus: forall re.
+    plus re = concat re (star re)
+
+  goal plus_star: forall s r.
+    in_re s (plus r) -> in_re s (star r)
+
+  (* none, all, allchar *)
+
+  goal TestAllChar:
+    in_re "a" allchar && in_re "1" allchar && in_re "!" allchar &&
+    not (in_re "aa" allchar) && not (in_re "!!" allchar)
+
+  goal TestAll:
+    in_re "as 3hoiqjndhfgasohn123^*&(T@GIGDSOA" all
+
+  lemma allchar: forall s.
+    S.length s = 1 -> in_re s allchar
+
   lemma in_re_none: forall s: string.
     not (in_re s none)
 
-  (* lemma in_re_all: forall s. *)
-  (*   in_re s all *)
+  lemma all_allchar: forall s.
+    in_re s (star allchar)
 
-  (* lemma in_all_char_in_all: forall s. *)
-  (*   in_re s allchar -> in_re s all *)
+  lemma in_re_all: forall s.
+    in_re s all
 
-  lemma concat: forall s1 s2.
-    let re1 = to_re s1 in
-    let re2 = to_re s2 in
-    in_re (S.concat s1 s2) (concat re1 re2)
+  lemma union_all: forall r.
+    union all r = union r all = all
 
-  lemma in_union: forall s1 r1 r2.
-    in_re s1 r1 -> in_re s1 (union r1 r2)
+  lemma inter_all: forall r.
+    inter r all = inter all r = r
 
-  lemma in_inter: forall s1 r1 r2.
-    in_re s1 (inter r1 r2) -> in_re s1 r1 && in_re s1 r2
+  lemma star_all: star all = all
 
+  (* opt *)
+
+  goal TestOpt1:
+    let a = to_re "a" in
+    in_re "a" (opt a) && in_re "" (opt a) && not (in_re "ab" (opt a))
+
+  lemma empty_opt: forall re.
+    in_re "" (opt re)
+
+  lemma in_opt: forall s.
+    in_re s (opt (to_re s))
+
+  (* range *)
+
+  goal TestRange1:
+    in_re "b" (range "a" "c") &&
+    in_re "b" (range "b" "c") &&
+    in_re "b" (range "a" "b") &&
+    not (in_re "d" (range "a" "c"))
+
+  goal TestRange2:
+    not (in_re "abc" (range "a" "b"))
+
+  goal range_negative: forall s.
+    not (in_re s (range "b" "a"))
+
+  goal range_not_singleton: forall s.
+    not (in_re s (range "ba" "a"))
 end
