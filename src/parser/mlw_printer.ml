@@ -221,13 +221,13 @@ let pp_exn fmt (id, pty, _mask) =
 
 let pp_match pp pp_pattern fmt x cases xcases =
   let pp_reg_branch fmt (p, x) =
-    fprintf fmt " | %a -> %a" pp_pattern p pp x in
+    fprintf fmt "@ | %a -> %a" pp_pattern p pp x in
   let pp_exn_branch fmt (qid, p_opt, x) =
     let pp_p_opt fmt = function
       | None -> ()
       | Some p -> fprintf fmt " %a" pp_pattern p in
-    fprintf fmt " | exception (%a%a) -> %a" pp_qualid qid pp_p_opt p_opt pp x in
-  fprintf fmt "@[(@[<hv 2>match@ %a@]@ @[<hv 2>with@ %a%a@])@ end@]"
+    fprintf fmt " | exception %a%a -> %a" pp_qualid qid pp_p_opt p_opt pp x in
+  fprintf fmt "@[(@[<hv 2>match@ %a@]@ @[<hv 2>with@ %a%a@]@ end)@]"
     pp x
     (pp_print_opt_list ~prefix:" " pp_reg_branch) cases
     (pp_print_opt_list ~prefix:" " pp_exn_branch) xcases
