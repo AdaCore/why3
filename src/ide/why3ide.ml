@@ -977,20 +977,20 @@ let update_monitor =
 (* Current position in the source files *)
 let current_cursor_loc = ref None
 
-let move_to_line ~yalign (v : GSourceView.source_view) line =
+let move_to_line ?(character=0) ~yalign (v : GSourceView.source_view) line =
   let line = max 0 (line - 1) in
   let line = min line v#buffer#line_count in
-  let it = v#buffer#get_iter (`LINE line) in
+  let it = v#buffer#get_iter (`LINECHAR (line, character)) in
   v#buffer#place_cursor ~where:it;
   let mark = `MARK (v#buffer#create_mark it) in
-  v#scroll_to_mark ~use_align:true ~yalign mark
+  v#scroll_to_mark ~use_align:true ~yalign ~xalign:0.5 mark
 
 (* Scroll to a specific locations *)
 let scroll_to_loc ~force_tab_switch loc_of_goal =
   match loc_of_goal with
   | None -> ()
   | Some loc ->
-    let f, l, _, _ = Loc.get loc in
+    let f, l, e, _ = Loc.get loc in
     try
       let (n, v) = if f = "Task" then (0, task_view) else
           let (n, v, _, _) = get_source_view_table f in
@@ -1002,7 +1002,7 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
         end;
       when_idle (fun () ->
           (* 0.5 to focus on the middle of the screen *)
-          move_to_line ~yalign:0.5 v l)
+          move_to_line ~character:e ~yalign:0.5 v l)
     with Nosourceview f ->
       Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
 
@@ -1962,9 +1962,9 @@ let search_forward =
                 (* Get to the line after to be able to call Ctrl+F on the same
                    string right away *)
                 let loc2 = if forward then
-                    Loc.user_position cur_file (n1 + 2) 0 0
+                    Loc.user_position cur_file (n1 + 1) l2 l2
                   else
-                    Loc.user_position cur_file n1 0 0
+                    Loc.user_position cur_file (n1 + 1) l1 l1
                 in
                 scroll_to_loc ~force_tab_switch:false (Some loc2);
   in
