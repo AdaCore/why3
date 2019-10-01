@@ -78,7 +78,16 @@ on linking described in file LICENSE.
 	    <context ref="def:in-comment:*"/>
 	  </include>
 	</context>
-	<context id="decimal" style-ref="decimal">
+	<context id="comment2" style-ref="comment">
+	  <start>#[^@]</start>
+	  <end>$</end>
+	  <include>
+	    <context ref="symbol-star"/>
+	    <context ref="string"/>
+	    <context ref="def:in-comment:*"/>
+	  </include>
+	</context>
+        <context id="decimal" style-ref="decimal">
 	  <match>[-]?[0-9][0-9_]*[lLn]?</match>
 	</context>
 	<context id="hex-number" style-ref="base-n-integer">
@@ -167,21 +176,26 @@ on linking described in file LICENSE.
           <keyword>clone</keyword>
           <keyword>coinductive</keyword>
           <keyword>constant</keyword>
+          <keyword>def</keyword>
+          <keyword>elif</keyword>
           <keyword>end</keyword>
           <keyword>exception</keyword>
           <keyword>export</keyword>
+          <keyword>from</keyword>
           <keyword>function</keyword>
           <keyword>goal</keyword>
           <keyword>ghost</keyword>
           <keyword>import</keyword>
           <keyword>inductive</keyword>
           <keyword>lemma</keyword>
+          <keyword>len</keyword>
           <keyword>meta</keyword>
           <keyword>mutable</keyword>
           <keyword>module</keyword>
           <keyword>or</keyword>
           <keyword>predicate</keyword>
           <keyword>private</keyword>
+          <keyword>range</keyword>
           <keyword>scope</keyword>
           <keyword>theory</keyword>
           <keyword>type</keyword>
