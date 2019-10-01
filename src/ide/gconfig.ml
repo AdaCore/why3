@@ -52,6 +52,7 @@ type t =
       mutable error_color : string;
       mutable error_color_bg : string;
       mutable error_line_color : string;
+      mutable search_color : string;
       mutable iconset : string;
       (** colors *)
       mutable config : Whyconf.config;
@@ -88,6 +89,7 @@ type ide = {
   ide_error_color : string;
   ide_error_color_bg : string;
   ide_error_line_color : string;
+  ide_search_color : string;
   ide_iconset : string;
   (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
@@ -116,6 +118,7 @@ let default_ide =
     ide_error_color_bg = "yellow";
     ide_error_color = "red";
     ide_error_line_color = "yellow";
+    ide_search_color = "lightblue"; (* TODO color TBD *)
     ide_iconset = "fatcow";
     ide_hidden_provers = [];
   }
@@ -174,6 +177,9 @@ let load_ide section =
     ide_error_line_color =
       get_string section ~default:default_ide.ide_error_line_color
         "error_line_color";
+    ide_search_color =
+      get_string section ~default:default_ide.ide_search_color
+        "search_color";
     ide_iconset =
       get_string section ~default:default_ide.ide_iconset
         "iconset";
@@ -227,6 +233,7 @@ let load_config config original_config =
     error_color = ide.ide_error_color;
     error_color_bg = ide.ide_error_color_bg;
     error_line_color = ide.ide_error_line_color;
+    search_color = ide.ide_search_color;
     iconset = ide.ide_iconset;
     config         = config;
     original_config = original_config;
@@ -277,6 +284,7 @@ let save_config t =
   let ide = set_string ide "error_color" t.error_color in
   let ide = set_string ide "error_color_bg" t.error_color_bg in
   let ide = set_string ide "error_line_color" t.error_line_color in
+  let ide = set_string ide "search_color" t.search_color in
   let ide = set_string ide "iconset" t.iconset in
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = Whyconf.set_section config "ide" ide in
