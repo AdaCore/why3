@@ -409,16 +409,18 @@ let usage =
    why3 pp [--output=latex|mlw|ast] [--kind=inductive] [--prefix <prefix>] <filename> [<Module>.]<type> ..."
 
 let options = [
-  "--output", Arg.String set_output,    "<output> Output format";
-  "--kind",   Arg.String set_kind,      "<category> Syntactic category to be printed (--kind=inductive only possible value for --output=latex)";
-  "--prefix", Arg.String ((:=) prefix), "<prefix> Prefix for LaTeX commands (default for output latex: IND)";
+  "--output", Arg.String set_output,                "<output> Output format";
+  "--kind",   Arg.String set_kind,                  "<category> Syntactic category to be printed (--kind=inductive only possible value for --output=latex)";
+  "--prefix", Arg.String ((:=) prefix),             "<prefix> Prefix for LaTeX commands (default for output latex: IND)";
+  "-",        Arg.Unit (fun () -> filename := Some "-"), " Read from stdin";
 ]
 
 let parse_mlw_file filename =
-  let c = open_in filename in
+  let c = if filename = "-" then stdin else open_in filename in
   let lexbuf = Lexing.from_channel c in
   let mlw_file = Lexer.parse_mlw_file lexbuf in
-  close_in c;
+  if filename <> "-" then
+    close_in c;
   mlw_file
 
 let () =
