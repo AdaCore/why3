@@ -239,30 +239,36 @@ let pp_let pp fmt (id, ghost, _kind, x) =
     | true -> pp_print_string fmt " ghost" in
   fprintf fmt "@[<hv 2>let%a %a =@ %a@]" pp_ghost ghost pp_id id pp x
 
-let rec pp_let_fun pp fmt (id, ghost, _kind, (binders, opt_pty, _mask, spec, x)) =
+let kind_suffix = function
+  | Expr.RKnone
+  | Expr.RKlocal -> ""
+  | Expr.RKfunc -> " function"
+  | Expr.RKpred -> " predicate"
+  | Expr.RKlemma -> " lemma"
+
+let ghost_suffix = function
+  | true -> " ghost"
+  | false -> ""
+
+let rec pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, _mask, spec, x)) =
+  let pp_opt_pty fmt = function
+    | None -> ()
+    | Some pty -> fprintf fmt " : %a" pp_pty pty in
+  fprintf fmt "@[<hv 2>let%s%s %a%a%a%a =@ %a@]"
+    (ghost_suffix ghost) (kind_suffix kind)
+    pp_id id pp_binders binders pp_opt_pty opt_pty pp_spec spec pp x
+
+and pp_let_any fmt (id, ghost, kind, (params, _kind', opt_pty, _mask, spec)) =
+  (* TODO kind', mask *)
+  let pp_opt_pty fmt = function
+    | None -> ()
+    | Some pty -> fprintf fmt " : %a" pp_pty pty in
+  fprintf fmt "@[<hv 2>val%s%s %a%a%a%a@]" (ghost_suffix ghost) (kind_suffix kind) pp_id id pp_params params pp_opt_pty opt_pty pp_spec spec
+
+and pp_fundef fmt (id, ghost, kind, binders, pty_opt, _mask, spec, e) =
   (* TODO mask *)
-  let pp_ghost fmt = function
-    | false -> ()
-    | true -> pp_print_string fmt " ghost" in
-  let pp_opt_pty fmt = function
-    | None -> ()
-    | Some pty -> fprintf fmt " : %a" pp_pty pty in
-  fprintf fmt "@[<hv 2>let%a %a%a%a%a =@ %a@]" pp_ghost ghost pp_id id pp_binders binders pp_opt_pty opt_pty pp_spec spec pp x
-
-and pp_let_any fmt (id, ghost, _kind, (params, _kind', opt_pty, _mask, spec)) =
-  (* TODO mask, kind, kind' *)
-  let pp_ghost fmt = function
-    | false -> ()
-    | true -> pp_print_string fmt " ghost" in
-  let pp_opt_pty fmt = function
-    | None -> ()
-    | Some pty -> fprintf fmt " : %a" pp_pty pty in
-  fprintf fmt "@[<hv 2>val%a %a%a%a%a@]" pp_ghost ghost pp_id id pp_params params pp_opt_pty opt_pty pp_spec spec
-
-and pp_fundef fmt (id, ghost, _kind, binders, pty_opt, _mask, spec, e) =
-  (* TODO mask, kind *)
-  if ghost then
-    pp_print_string fmt " ghost";
+  pp_print_string fmt (ghost_suffix ghost);
+  pp_print_string fmt (kind_suffix kind);
   pp_id fmt id;
   pp_print_opt_list ~prefix:" " pp_binder fmt binders;
   (match pty_opt with
