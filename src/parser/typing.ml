@@ -136,6 +136,12 @@ let find_prog_symbol_ns ns p =
     | OO ss -> (Srs.choose ss).rs_name in
   find_qualid ~ty:Prog get_id_ps ns_find_prog_symbol ns p
 
+let import_namespace ~loc ns sl =
+  Loc.try2 ~loc import_namespace ns sl
+
+let import_scope ~loc ns sl =
+  Loc.try2 ~loc import_scope ns sl
+
 (** Parsing types *)
 
 let rec ty_of_pty ns = function
@@ -153,7 +159,8 @@ let rec ty_of_pty ns = function
   | PTarrow (ty1, ty2) ->
       ty_func (ty_of_pty ns ty1) (ty_of_pty ns ty2)
   | PTscope (q, ty) ->
-      let ns = import_namespace ns (string_list_of_qualid q) in
+      let loc = qloc q in
+      let ns = import_namespace ~loc ns (string_list_of_qualid q) in
       ty_of_pty ns ty
   | PTpure ty | PTparen ty ->
       ty_of_pty ns ty
@@ -198,7 +205,8 @@ let rec dpattern ns km { pat_desc = desc; pat_loc = loc } =
   match desc with
     | Ptree.Pparen p -> dpattern ns km p
     | Ptree.Pscope (q,p) ->
-        let ns = import_namespace ns (string_list_of_qualid q) in
+        let loc = qloc q in
+        let ns = import_namespace ~loc ns (string_list_of_qualid q) in
         dpattern ns km p
     | _ -> (* creative indentation ahead *)
   Dterm.dpattern ~loc (match desc with
@@ -468,7 +476,8 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       Hstr.remove at_uses l;
       DTattr (e1, Sattr.empty)
   | Ptree.Tscope (q, e1) ->
-      let ns = import_namespace ns (string_list_of_qualid q) in
+      let loc = qloc q in
+      let ns = import_namespace ~loc ns (string_list_of_qualid q) in
       DTattr (dterm ns km crcmap gvars at denv e1, Sattr.empty)
   | Ptree.Tasref q ->
       let e1 = { term_desc = Tident q; term_loc = loc } in
@@ -547,8 +556,9 @@ let rec ity_of_pty muc = function
   | PTpure ty ->
       ity_purify (ity_of_pty muc ty)
   | PTscope (q, ty) ->
+      let loc = qloc q in
       let muc = open_scope muc "dummy" in
-      let muc = import_scope muc (string_list_of_qualid q) in
+      let muc = import_scope ~loc muc (string_list_of_qualid q) in
       ity_of_pty muc ty
   | PTparen ty ->
       ity_of_pty muc ty
@@ -611,8 +621,9 @@ let rec dpattern muc gh { pat_desc = desc; pat_loc = loc } =
     | Ptree.Pparen p -> dpattern muc gh p
     | Ptree.Pghost p -> dpattern muc true p
     | Ptree.Pscope (q,p) ->
+        let loc = qloc q in
         let muc = open_scope muc "dummy" in
-        let muc = import_scope muc (string_list_of_qualid q) in
+        let muc = import_scope ~loc muc (string_list_of_qualid q) in
         dpattern muc gh p
     | _ -> (* creative indentation ahead *)
   Dexpr.dpattern ~loc (match desc with
@@ -826,8 +837,9 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tapply (e1, e2) ->
       DEapp (eff_dterm muc denv e1, eff_dterm muc denv e2)
   | Ptree.Tscope (q, e1) ->
+      let loc = qloc q in
       let muc = open_scope muc "dummy" in
-      let muc = import_scope muc (string_list_of_qualid q) in
+      let muc = import_scope ~loc muc (string_list_of_qualid q) in
       DEattr (eff_dterm muc denv e1, Sattr.empty)
   | Ptree.Tasref q ->
       let e1 = { term_desc = Tident q; term_loc = loc } in
@@ -1081,8 +1093,9 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Elabel (id, e1) ->
       DElabel (create_user_id id, dexpr muc denv e1)
   | Ptree.Escope (q, e1) ->
+      let loc = qloc q in
       let muc = open_scope muc "dummy" in
-      let muc = import_scope muc (string_list_of_qualid q) in
+      let muc = import_scope ~loc muc (string_list_of_qualid q) in
       DEattr (dexpr muc denv e1, Sattr.empty)
   | Ptree.Easref q ->
       let e1 = { expr_desc = Eident q; expr_loc = loc } in
