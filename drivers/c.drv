@@ -453,8 +453,14 @@ end
 
 module mach.c.C
 
-  prelude "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
-  interface "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
+  prelude
+  "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
+  prelude
+  "#define IGNORE3(x,y,z) do { (void(x); (void)(y); (void)(z); } while (0)"
+  interface
+  "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
+  interface
+  "#define IGNORE3(x,y,z) do { (void(x); (void)(y); (void)(z); } while (0)"
 
   syntax type ptr "%1 *"
   syntax type bool "int" (* ? *)

@@ -21,7 +21,7 @@ module AddAlias
 
 
   val open_sep (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
-               (nr:ptr limb, nx:ptr limb, ny:ptr limb, m:mem)
+               (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid r sx /\ valid x sx /\ valid y sy }
     requires { 0 <= sy <= sx }
     ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
@@ -41,13 +41,13 @@ module AddAlias
               /\ plength y = old plength y }
     ensures { min r = old min r /\ min x = old min x /\ min y = old min y }
     ensures { data nr = data nx = data ny }
-    writes  { r.max, x.max, y.max, r, x, y }
+    writes  { r, x, y }
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
 
   val close_sep (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
-                (nr nx ny:ptr limb) (m:mem) : unit
+                (nr nx ny:ptr limb) (ghost m:mem) : unit
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
@@ -77,7 +77,7 @@ module AddAlias
              r.data, r.max, x.data, x.max, y.data, y.max, m.ok }
 
   val open_rx (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
-               (nr:ptr limb, nx:ptr limb, ny:ptr limb, m:mem)
+               (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid x sx /\ valid y sy }
     requires { 0 <= sy <= sx }
     ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
@@ -94,13 +94,13 @@ module AddAlias
     ensures { plength x = old plength x /\ plength y = old plength y }
     ensures { min x = old min x /\ min y = old min y }
     ensures { data nr = data nx = data ny }
-    writes  { x.max, y.max, x, y }
+    writes  { x, y }
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
 
   val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
-               (nr:ptr limb, nx:ptr limb, ny:ptr limb, m:mem)
+               (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid x sx /\ valid y sx }
     requires { 0 <= sy <= sx }
     ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
@@ -117,13 +117,13 @@ module AddAlias
     ensures { plength x = old plength x /\ plength y = old plength y }
     ensures { min x = old min x /\ min y = old min y }
     ensures { data nr = data nx = data ny }
-    writes  { x.max, y.max, x, y }
+    writes  { x, y }
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
 
   val open_rxy (x:ptr limb) (sx:int32) :
-               (nr:ptr limb, nx:ptr limb, ny:ptr limb, m:mem)
+               (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid x sx }
     requires { 0 <= sx }
     ensures  { value nx sx = old value x sx }
@@ -139,13 +139,13 @@ module AddAlias
     ensures  { pelts x = old pelts x }
     ensures  { plength x = old plength x }
     ensures  { min x = old min x }
-    writes   { x.max, x }
+    writes   { x }
     alias    { nr.data with nx.data }
     alias    { nr.data with ny.data }
     alias    { nx.data with ny.data }
 
   val close_rx (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
-                (nr nx ny:ptr limb) (m:mem) : unit
+                (nr nx ny:ptr limb) (ghost m:mem) : unit
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
@@ -170,7 +170,7 @@ module AddAlias
              x.data, x.max, y.data, y.max, m.ok }
 
   val close_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
-               (nr nx ny:ptr limb) (m:mem) : unit
+               (nr nx ny:ptr limb) (ghost m:mem) : unit
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
@@ -194,7 +194,7 @@ module AddAlias
     writes { nr, nx, ny, nr.data, nx.data, ny.data,
              x.data, x.max, y.data, y.max, m.ok }
 
-  val close_rxy (x:ptr limb) (sx:int32) (nr nx ny:ptr limb) (m:mem) : unit
+  val close_rxy (x:ptr limb) (sx:int32) (nr nx ny:ptr limb) (ghost m:mem) : unit
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
@@ -409,7 +409,7 @@ module AddAlias
      done;
      c
 
-  let add_n (r x y:ptr limb) (sz:int32) : limb
+  let add_n [@extraction:inline] (r x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid r sz /\ valid x sz /\ valid y sz }
     ensures  { value r sz + power radix sz * result
@@ -444,7 +444,7 @@ module AddAlias
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_n_rx (x y:ptr limb) (sz:int32) : limb
+  let add_n_rx [@extraction:inline] (x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid x sz /\ valid y sz }
     ensures  { value x sz + power radix sz * result
@@ -468,7 +468,8 @@ module AddAlias
                 = (pelts oy)[offset y + j] };
     res
 
-  let add (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
+  let add [@extraction:inline] (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+                               : limb
     requires { 0 <= sy <= sx }
     requires { valid r sx /\ valid x sx /\ valid y sy }
     ensures  { value r sx + power radix sx * result
@@ -503,7 +504,8 @@ module AddAlias
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_rx (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
+  let add_rx [@extraction:inline] (x:ptr limb) (sx:int32)
+                                  (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sy }
     ensures  { value x sx + power radix sx * result
@@ -528,7 +530,8 @@ module AddAlias
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
+  let add_ry [@extraction:inline] (x:ptr limb) (sx:int32)
+                                  (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sx }
     ensures  { value y sx + power radix sx * result
@@ -553,7 +556,7 @@ module AddAlias
                 = (pelts ox)[offset x + j] };
     res
 
-  let add_n_rxy (x:ptr limb) (sx:int32) : limb
+  let add_n_rxy [@extraction:inline] (x:ptr limb) (sx:int32) : limb
     requires { 0 <= sx }
     requires { valid x sx }
     ensures  { value x sx + power radix sx * result
