@@ -293,10 +293,11 @@ and block env ~loc = function
     let param id = id.id_loc, Some id, false, None in
     let params = if idl = [] then no_params ~loc else List.map param idl in
     let s = block env ~loc sl in
+    let p = mk_pat ~loc Pwild in
     let e = if block_has_call id bl then
-      Erec ([id, false, Expr.RKnone, params, None, Ity.MaskVisible, sp, body], s)
+      Erec ([id, false, Expr.RKnone, params, None, p, Ity.MaskVisible, sp, body], s)
     else
-      let e = Efun (params, None, Ity.MaskVisible, sp, body) in
+      let e = Efun (params, None, p, Ity.MaskVisible, sp, body) in
       Elet (id, false, Expr.RKnone, mk_expr ~loc e, s) in
     mk_expr ~loc e
   | (Py_ast.Dimport _ | Py_ast.Dlogic _) :: sl ->
@@ -323,7 +324,8 @@ let logic = function
 let translate ~loc dl =
   List.iter logic dl;
   let bl = block empty_env ~loc dl in
-  let fd = Efun (no_params ~loc, None, Ity.MaskVisible, empty_spec, bl) in
+  let p = mk_pat ~loc Pwild in
+  let fd = Efun (no_params ~loc, None, p, Ity.MaskVisible, empty_spec, bl) in
   let main = Dlet (mk_id ~loc "main", false, Expr.RKnone, mk_expr ~loc fd) in
   Typing.add_decl loc main
 

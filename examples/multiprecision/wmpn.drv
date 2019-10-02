@@ -89,3 +89,122 @@ static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
   syntax val div2by1 "div64_2by1"
 
 end
+
+module add_alias.AddAlias
+
+  prelude "
+struct __open_sep_result
+{ uint64_t *__field_0;
+  uint64_t *__field_1;
+  uint64_t *__field_2;
+}
+
+struct __open_rx_result
+{ uint64_t *__field_0;
+  uint64_t *__field_1;
+  uint64_t *__field_2;
+}
+
+struct __open_ry_result
+{ uint64_t *__field_0;
+  uint64_t *__field_1;
+  uint64_t *__field_2;
+}
+
+struct __open_rxy_result
+{ uint64_t *__field_0;
+  uint64_t *__field_1;
+  uint64_t *__field_2;
+}
+
+struct __open_sep_result open_sep (uint64_t * r, uint64_t * x, int32_t sx,
+                                   uint64_t * y, int32_t sy)
+{
+  struct __open_sep_result result;
+  result.__field_0 = r;
+  result.__field_1 = x;
+  result.__field_2 = y;
+  return result;
+}
+
+
+struct __open_rx_result open_rx (uint64_t * x, int32_t sx,
+                                 uint64_t * y, int32_t sy)
+{
+  struct __open_sep_result result;
+  result.__field_0 = x;
+  result.__field_1 = x;
+  result.__field_2 = y;
+  return result;
+}
+
+struct __open_ry_result open_ry (uint64_t * x, int32_t sx,
+                                 uint64_t * y, int32_t sy)
+{
+  struct __open_sep_result result;
+  result.__field_0 = y;
+  result.__field_1 = x;
+  result.__field_2 = y;
+  return result;
+}
+
+struct __open_rxy_result open_rxy (uint64_t * x, int32_t sx)
+{
+  struct __open_sep_result result;
+  result.__field_0 = x;
+  result.__field_1 = x;
+  result.__field_2 = x;
+  return result;
+}
+"
+
+  interface "
+struct __open_sep_result
+{ uint64_t *__field_0;
+  uint64_t *__field_1;
+  uint64_t *__field_2;
+}
+
+struct __open_rx_result
+{ uint64_t *__field_0;
+  uint64_t *__field_1;
+  uint64_t *__field_2;
+}
+
+struct __open_ry_result
+{ uint64_t *__field_0;
+  uint64_t *__field_1;
+  uint64_t *__field_2;
+}
+
+struct __open_rxy_result
+{ uint64_t *__field_0;
+  uint64_t *__field_1;
+  uint64_t *__field_2;
+}
+
+struct __open_sep_result open_sep (uint64_t * r, uint64_t * x, int32_t sx,
+                                   uint64_t * y, int32_t sy);
+
+struct __open_rx_result open_rx (uint64_t * x, int32_t sx,
+                                 uint64_t * y, int32_t sy);
+
+struct __open_ry_result open_ry (uint64_t * x, int32_t sx,
+                                 uint64_t * y, int32_t sy);
+
+struct __open_rxy_result open_rxy (uint64_t * x, int32_t sx);
+"
+
+  syntax val open_sep "open_sep"
+  syntax val open_rx "open_rx"
+  syntax val open_ry "open_ry"
+  syntax val open_rxy "open_rxy"
+  syntax val close_sep "IGNORE3(%1,%2,%4)"
+  syntax val close_rx "IGNORE3(%1,%2,%4)"
+  syntax val close_ry "IGNORE3(%1,%2,%4)"
+  syntax val close_rxy "IGNORE3(%1,%2,%4)"
+
+
+
+
+end

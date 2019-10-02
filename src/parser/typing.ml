@@ -800,8 +800,8 @@ let mk_let ~loc n de node =
   DElet ((id_user n loc, false, RKnone, de), de1)
 
 let update_any kind e = match e.expr_desc with
-  | Ptree.Eany (pl, _, pty, msk, sp) ->
-      { e with expr_desc = Ptree.Eany (pl, kind, pty, msk, sp) }
+  | Ptree.Eany (pl, _, pty, pat, msk, sp) ->
+      { e with expr_desc = Ptree.Eany (pl, kind, pty, pat, msk, sp) }
   | _ -> e
 
 let local_kind = function
@@ -895,6 +895,20 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         -> DEgexn (find_xsymbol muc q))
     | _ -> DEgexn (find_xsymbol muc q)
   in
+  let handle_alias denv alias pat dity =
+    let pp = dpattern muc pat in
+    let denv = denv_add_pat denv pp dity in
+    let res = Some (id_fresh "result"), false, dity in
+    let denv = denv_add_args denv [res] in
+    let add_alias (t1, t2) =
+      let bty = dity_fresh () in
+      let dt1 = eff_dterm muc denv t1 in
+      let dt2 = eff_dterm muc denv t2 in
+      ignore (Dexpr.dexpr ~loc:t1.term_loc (DEcast (dt1, bty)));
+      ignore (Dexpr.dexpr ~loc:t2.term_loc (DEcast (dt2, bty)));
+    in
+    List.iter add_alias alias
+  in
   Dexpr.dexpr ~loc begin match desc with
   | Ptree.Eident q ->
       qualid_app loc q []
@@ -965,18 +979,19 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let ld = create_user_prog_id id, gh, kind, dexpr muc denv e1 in
       DElet (ld, dexpr muc (denv_add_let denv ld) e2)
   | Ptree.Erec (fdl, e1) ->
-      let update_kind (id, gh, k, bl, pty, msk, sp, e) =
-        id, gh, local_kind k, bl, pty, msk, sp, e in
+      let update_kind (id, gh, k, bl, pty, pat, msk, sp, e) =
+        id, gh, local_kind k, bl, pty, pat, msk, sp, e in
       let fdl = List.map update_kind fdl in
       let denv, rd = drec_defn muc denv fdl in
       DErec (rd, dexpr muc denv e1)
-  | Ptree.Efun (bl, pty, msk, sp, e) ->
+  | Ptree.Efun (bl, pty, pat, msk, sp, e) ->
       let bl = List.map (dbinder muc) bl in
       let ds = dspec_no_variant muc sp in
       let dity = dity_of_opt muc pty in
       let denv = denv_add_args denv bl in
+      handle_alias denv sp.sp_alias pat dity;
       DEfun (bl, dity, msk, ds, dexpr muc denv e)
-  | Ptree.Eany (pl, kind, pty, msk, sp) ->
+  | Ptree.Eany (pl, kind, pty, pat, msk, sp) ->
       let pl = List.map (dparam muc) pl in
       let ds = dspec_no_variant muc sp in
       let ity = match kind, pty with
@@ -985,16 +1000,8 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | RKpred, None -> ity_bool
         | _ -> Loc.errorm ~loc "cannot determine the type of the result" in
       let dity = dity_of_ity ity in
-      let res = Some (id_fresh "result"), false, dity in
-      let denv = denv_add_args denv (res::pl) in
-      let add_alias (t1, t2) =
-        let bty = dity_fresh () in
-        let dt1 = eff_dterm muc denv t1 in
-        let dt2 = eff_dterm muc denv t2 in
-        ignore (Dexpr.dexpr ~loc:t1.term_loc (DEcast (dt1, bty)));
-        ignore (Dexpr.dexpr ~loc:t2.term_loc (DEcast (dt2, bty)));
-      in
-      List.iter add_alias sp.sp_alias;
+      let denv = denv_add_args denv pl in
+      handle_alias denv sp.sp_alias pat dity;
       DEany (pl, dity, msk, ds)
   | Ptree.Ematch (e1, bl, xl) ->
       let e1 = dexpr muc denv e1 in
@@ -1113,7 +1120,10 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   end
 
 and drec_defn muc denv fdl =
-  let prep (id, gh, kind, bl, pty, msk, sp, e) =
+  let prep (id, gh, kind, bl, pty, _pat, msk, sp, e) =
+    if sp.sp_alias <> []
+    then Loc.errorm ~loc:id.id_loc
+           "alias is forbidden in recursive functions";
     let bl = List.map (dbinder muc) bl in
     let dity = dity_of_opt muc pty in
     let pre denv =

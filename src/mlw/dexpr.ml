@@ -1058,7 +1058,7 @@ let check_aliases recu c =
       Loc.errorm
         "The type of this function contains an alias with \
         external local exception %a" print_xs (Sxs.choose sxs)
-    else Loc.errorm "The type of this function contains an alias" in
+     else Loc.errorm "The type of this function contains an alias" in
   (* we allow the value in a non-recursive function to contain
      regions coming the function's arguments or from the context.
      It is safe and sometimes useful to write a function around
@@ -1068,11 +1068,16 @@ let check_aliases recu c =
      aliases inside the type of an argument or a result, which
      may break the type inference, but we have a safety net
      type checking in Expr. *)
+  let add_ity_noreport regs ity =
+    let frz = ity_freeze isb_empty ity in
+    Mreg.union (fun _ r _ -> Some r) regs frz.isb_reg in
   let add_ity regs ity =
     let frz = ity_freeze isb_empty ity in
     Mreg.union report regs frz.isb_reg in
-  let add_arg regs v = add_ity regs v.pv_ity in
-  let regs = List.fold_left add_arg rds_regs c.cty_args in
+  let add = if recu then add_ity else add_ity_noreport in
+  let add_arg regs v = add regs v.pv_ity in
+  let argregs = List.fold_left add_arg Mreg.empty c.cty_args in
+  let regs = Mreg.union report rds_regs argregs in
   if recu then ignore (add_ity regs c.cty_result)
 
 let check_fun inr rsym dsp ce =
