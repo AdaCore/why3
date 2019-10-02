@@ -5,7 +5,7 @@
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="sudoku.mlw"/>
 <theory name="Grid" proved="true">
  <goal name="grid_eq_sub" proved="true">
@@ -239,7 +239,7 @@
   <proof prover="8"><result status="valid" time="0.02" steps="7700"/></proof>
   </goal>
   <goal name="solve_aux&#39;VC.23" expl="exceptional postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="6703"/></proof>
+  <proof prover="8"><result status="valid" time="0.02" steps="6496"/></proof>
   </goal>
   <goal name="solve_aux&#39;VC.24" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="8065"/></proof>
@@ -459,7 +459,7 @@
  </transf>
  </goal>
  <goal name="solve&#39;VC" expl="VC for solve" proved="true">
- <proof prover="8"><result status="valid" time="0.02" steps="8306"/></proof>
+ <proof prover="8"><result status="valid" time="0.02" steps="8280"/></proof>
  </goal>
  <goal name="check_then_solve&#39;VC" expl="VC for check_then_solve" proved="true">
  <proof prover="8"><result status="valid" time="0.04" steps="7270"/></proof>

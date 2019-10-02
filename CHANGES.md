@@ -60,6 +60,7 @@ IDE
     More details in the manual, section 9.6 "Proof Strategies". :x:
   * strategies can now be defined using %t (resp. %m) for using a prover with
     the default timelimit (resp. memlimit)
+  * added minimal search menu
 
 Realizations
   * Added experimental realizations for new Set theories in both Isabelle and

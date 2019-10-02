@@ -331,7 +331,9 @@ rule token = parse
     end;
     mm
 
-  let () = Env.register_format mlw_language "whyml" ["mlw";"why"] read_channel
-    ~desc:"WhyML@ programming@ and@ specification@ language"
+  let whyml_format = "whyml"
+
+  let () = Env.register_format mlw_language whyml_format ["mlw";"why"]
+      read_channel ~desc:"WhyML@ programming@ and@ specification@ language"
 
 }

@@ -12,7 +12,7 @@
 <prover id="11" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="12" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="13" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="FormulaTransformations.mlw"/>
 <theory name="Logic" proved="true">
  <goal name="is_nnf_subst&#39;VC" expl="VC for is_nnf_subst" proved="true">
@@ -73,7 +73,7 @@
  <goal name="is_nnf_renaming&#39;VC" expl="VC for is_nnf_renaming" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="is_nnf_renaming&#39;VC.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="4"/></proof>
   </goal>
   <goal name="is_nnf_renaming&#39;VC.1" expl="postcondition" proved="true">
   <proof prover="11"><result status="valid" time="1.82"/></proof>
@@ -147,7 +147,7 @@
  <goal name="is_simpl_renaming&#39;VC" expl="VC for is_simpl_renaming" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="is_simpl_renaming&#39;VC.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="4"/></proof>
   </goal>
   <goal name="is_simpl_renaming&#39;VC.1" expl="postcondition" proved="true">
   <proof prover="11"><result status="valid" time="1.36"/></proof>
@@ -212,7 +212,7 @@
  <goal name="no_existential_renaming&#39;VC" expl="VC for no_existential_renaming" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="no_existential_renaming&#39;VC.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="5"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="4"/></proof>
   </goal>
   <goal name="no_existential_renaming&#39;VC.1" expl="postcondition" proved="true">
   <proof prover="11"><result status="valid" time="1.25"/></proof>
@@ -489,7 +489,7 @@
    <proof prover="1"><result status="valid" time="0.71" steps="251129"/></proof>
    </goal>
    <goal name="smart_forall&#39;VC.10.2" expl="postcondition" proved="true">
-   <proof prover="6" timelimit="1"><result status="valid" time="0.35" steps="1772"/></proof>
+   <proof prover="6" timelimit="1"><result status="valid" time="0.35" steps="2454"/></proof>
    </goal>
    <goal name="smart_forall&#39;VC.10.3" expl="postcondition" proved="true">
    <proof prover="3" timelimit="5"><result status="valid" time="0.38" steps="1725496"/></proof>
@@ -501,7 +501,7 @@
    <proof prover="3"><result status="valid" time="0.44" steps="1733445"/></proof>
    </goal>
    <goal name="smart_forall&#39;VC.10.6" expl="postcondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.34" steps="1760"/></proof>
+   <proof prover="6"><result status="valid" time="0.34" steps="2419"/></proof>
    </goal>
    <goal name="smart_forall&#39;VC.10.7" expl="postcondition" proved="true">
    <proof prover="3"><result status="valid" time="0.43" steps="1700568"/></proof>
@@ -2189,7 +2189,7 @@
  <goal name="term_free_vars_noghost&#39;VC" expl="VC for term_free_vars_noghost" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="term_free_vars_noghost&#39;VC.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="9"/></proof>
   </goal>
   <goal name="term_free_vars_noghost&#39;VC.1" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.11" steps="95"/></proof>
@@ -2211,7 +2211,7 @@
  <goal name="term_list_free_vars_noghost&#39;VC" expl="VC for term_list_free_vars_noghost" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="term_list_free_vars_noghost&#39;VC.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="9"/></proof>
   </goal>
   <goal name="term_list_free_vars_noghost&#39;VC.1" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.18" steps="94"/></proof>
@@ -2245,7 +2245,7 @@
  <goal name="collect_free_var_formula&#39;VC" expl="VC for collect_free_var_formula" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="collect_free_var_formula&#39;VC.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.17" steps="9"/></proof>
   </goal>
   <goal name="collect_free_var_formula&#39;VC.1" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.12" steps="82"/></proof>
@@ -2389,7 +2389,7 @@
  <goal name="collect_free_var_formula_list&#39;VC" expl="VC for collect_free_var_formula_list" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="collect_free_var_formula_list&#39;VC.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.09" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.09" steps="9"/></proof>
   </goal>
   <goal name="collect_free_var_formula_list&#39;VC.1" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.09" steps="45"/></proof>
@@ -2650,7 +2650,7 @@
  <goal name="preprocessing&#39;VC" expl="VC for preprocessing" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="preprocessing&#39;VC.0" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="10"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="9"/></proof>
   </goal>
   <goal name="preprocessing&#39;VC.1" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.08" steps="11"/></proof>
@@ -2792,7 +2792,7 @@
   <proof prover="4"><result status="valid" time="0.14" steps="101"/></proof>
   </goal>
   <goal name="preprocessing&#39;VC.40" expl="exceptional postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="16"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="9"/></proof>
   </goal>
  </transf>
  </goal>

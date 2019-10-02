@@ -77,7 +77,7 @@ type transformation_node = {
 type file = {
   file_id                : int;
   mutable file_path      : Sysutil.file_path;
-  file_format            : string option;
+  file_format            : string;
   file_is_detached       : bool;
   mutable file_theories  : theory list;
 }
@@ -1206,7 +1206,7 @@ let load_file ~version session old_provers f =
   match f.Xml.name with
   | "file" ->
     let fn = string_attribute_opt "name" f in
-    let fmt = load_option "format" f in
+    let fmt = string_attribute_def "format" f Lexer.whyml_format in
     let fid = gen_fileID session in
     let path,ft =
       List.fold_left
@@ -1838,7 +1838,7 @@ let merge_file_section ~shape_version ~old_ses ~old_theories ~file_is_detached ~
   update_file_node (fun _ -> ()) s f
 
 let read_file env ?format fn =
-  let theories = Env.read_file Env.base_language env ?format fn in
+  let theories, format = Env.read_file Env.base_language env ?format fn in
   let ltheories =
     Mstr.fold
       (fun name th acc ->
@@ -1854,7 +1854,7 @@ let read_file env ?format fn =
       (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
       ltheories
   in
-  List.map (fun (_,_,a) -> a) th
+  (List.map (fun (_,_,a) -> a) th), format
 
 let merge_file ~shape_version env (ses : session) (old_ses : session) file =
   let format = file_format file in
@@ -1862,7 +1862,7 @@ let merge_file ~shape_version env (ses : session) (old_ses : session) file =
   let file_name = Sysutil.system_dependent_absolute_path (get_dir old_ses) (file_path file) in
   Debug.dprintf debug "merging file %s@." file_name;
   try
-    let new_theories = read_file env file_name ?format in
+    let new_theories, format = read_file env file_name ~format in
     merge_file_section
       ses ~shape_version ~old_ses ~old_theories ~file_is_detached:false
       ~env file_name new_theories format;
@@ -1996,8 +1996,6 @@ let get_prover_to_save prover_ids p (timelimits,steplimits,memlimits) provers =
 let opt pr lab fmt = function
   | None -> ()
   | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
-
-let opt_string = opt save_string
 
 let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) =
   let steplimit =
@@ -2140,7 +2138,7 @@ let save_theory s ctxt fmt t =
 let save_file s ctxt fmt _ f =
   fprintf fmt
     "@\n@[<v 0>@[<h><file%a%a>@]@\n%a"
-    (opt_string "format") f.file_format
+    (save_string_attrib "format") f.file_format
     (save_bool_def "proved" false) (file_proved s f)
     save_file_path f.file_path;
   List.iter (save_theory s ctxt fmt) f.file_theories;

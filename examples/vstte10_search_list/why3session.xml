@@ -6,7 +6,7 @@
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="20" steplimit="0" memlimit="0"/>
 <prover id="3" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="0"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="vstte10_search_list.mlw"/>
 <theory name="SearchingALinkedList" proved="true">
  <goal name="search&#39;VC" expl="VC for search" proved="true">
@@ -56,9 +56,9 @@
    <proof prover="6"><result status="valid" time="0.02"/></proof>
    </goal>
    <goal name="search_loop&#39;VC.4.1" expl="VC for search_loop" proved="true">
-   <proof prover="1" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="1"><result status="timeout" time="5.00"/></proof>
    <proof prover="2"><result status="valid" time="0.02" steps="33"/></proof>
-   <proof prover="6" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <proof prover="6"><result status="timeout" time="5.00"/></proof>
    </goal>
    <goal name="search_loop&#39;VC.4.2" expl="VC for search_loop" proved="true">
    <proof prover="3"><path

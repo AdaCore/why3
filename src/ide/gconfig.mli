@@ -34,6 +34,7 @@ type t =
       mutable error_color : string;
       mutable error_color_bg : string;
       mutable error_line_color : string;
+      mutable search_color : string;
       mutable iconset : string;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;

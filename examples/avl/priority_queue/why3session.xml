@@ -5,7 +5,7 @@
 <prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="priority_queue.mlw"/>
 <theory name="PQueue" proved="true">
  <goal name="M.assoc_m&#39;VC" expl="VC for assoc_m" proved="true">
@@ -497,10 +497,10 @@
  <proof prover="4"><result status="valid" time="0.03" steps="85"/></proof>
  </goal>
  <goal name="is_empty&#39;VC" expl="VC for is_empty" proved="true">
- <proof prover="4"><result status="valid" time="0.04" steps="119"/></proof>
+ <proof prover="4"><result status="valid" time="0.04" steps="125"/></proof>
  </goal>
  <goal name="merge&#39;VC" expl="VC for merge" proved="true">
- <proof prover="4"><result status="valid" time="0.10" steps="378"/></proof>
+ <proof prover="4"><result status="valid" time="0.48" steps="993"/></proof>
  </goal>
  <goal name="remove_count&#39;VC" expl="VC for remove_count" proved="true">
  <transf name="split_goal_right" proved="true" >

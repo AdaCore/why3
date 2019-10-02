@@ -8,7 +8,7 @@
 <prover id="9" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="defunctionalization.mlw"/>
 <theory name="DirectSem" proved="true">
  <goal name="eval_p3" proved="true">
@@ -20,10 +20,10 @@
  </goal>
 </theory>
 <theory name="CPS" proved="true">
- <goal name="VC eval_1" expl="VC for eval_1" proved="true">
+ <goal name="eval_1&#39;VC" expl="VC for eval_1" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="46"/></proof>
  </goal>
- <goal name="VC interpret_1" expl="VC for interpret_1" proved="true">
+ <goal name="interpret_1&#39;VC" expl="VC for interpret_1" proved="true">
  <proof prover="11"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
 </theory>
@@ -42,34 +42,34 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC continue_2" expl="VC for continue_2" proved="true">
+ <goal name="continue_2&#39;VC" expl="VC for continue_2" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="82"/></proof>
  </goal>
- <goal name="VC eval_2" expl="VC for eval_2" proved="true">
+ <goal name="eval_2&#39;VC" expl="VC for eval_2" proved="true">
  <proof prover="11"><result status="valid" time="0.02" steps="116"/></proof>
  </goal>
- <goal name="VC interpret_2" expl="VC for interpret_2" proved="true">
+ <goal name="interpret_2&#39;VC" expl="VC for interpret_2" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="18"/></proof>
  </goal>
 </theory>
 <theory name="Defunctionalization2" proved="true">
- <goal name="VC continue_2" expl="VC for continue_2" proved="true">
+ <goal name="continue_2&#39;VC" expl="VC for continue_2" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="106"/></proof>
  </goal>
- <goal name="VC eval_2" expl="VC for eval_2" proved="true">
+ <goal name="eval_2&#39;VC" expl="VC for eval_2" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC eval_2.0" expl="variant decrease" proved="true">
+  <goal name="eval_2&#39;VC.0" expl="variant decrease" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC eval_2.1" expl="variant decrease" proved="true">
+  <goal name="eval_2&#39;VC.1" expl="variant decrease" proved="true">
   <proof prover="10"><result status="valid" time="0.02" steps="4193"/></proof>
   </goal>
-  <goal name="VC eval_2.2" expl="postcondition" proved="true">
+  <goal name="eval_2&#39;VC.2" expl="postcondition" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="49"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC interpret_2" expl="VC for interpret_2" proved="true">
+ <goal name="interpret_2&#39;VC" expl="VC for interpret_2" proved="true">
  <proof prover="11"><result status="valid" time="0.00" steps="15"/></proof>
  </goal>
 </theory>
@@ -138,23 +138,23 @@
  <proof prover="10"><result status="valid" time="0.03" steps="5236"/></proof>
  <proof prover="11"><result status="valid" time="0.02" steps="17"/></proof>
  </goal>
- <goal name="VC cps3_correct_expr" expl="VC for cps3_correct_expr" proved="true">
+ <goal name="cps3_correct_expr&#39;VC" expl="VC for cps3_correct_expr" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC cps3_correct_expr.0" expl="variant decrease" proved="true">
+  <goal name="cps3_correct_expr&#39;VC.0" expl="variant decrease" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC cps3_correct_expr.1" expl="variant decrease" proved="true">
+  <goal name="cps3_correct_expr&#39;VC.1" expl="variant decrease" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC cps3_correct_expr.2" expl="assertion" proved="true">
+  <goal name="cps3_correct_expr&#39;VC.2" expl="assertion" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC cps3_correct_expr.3" expl="postcondition" proved="true">
+  <goal name="cps3_correct_expr&#39;VC.3" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="VC cps3_correct_expr.3.0" expl="postcondition" proved="true">
+   <goal name="cps3_correct_expr&#39;VC.3.0" expl="postcondition" proved="true">
    <proof prover="11" timelimit="1"><result status="valid" time="0.01" steps="63"/></proof>
    </goal>
-   <goal name="VC cps3_correct_expr.3.1" expl="postcondition" proved="true">
+   <goal name="cps3_correct_expr&#39;VC.3.1" expl="postcondition" proved="true">
    <proof prover="9" timelimit="1"><result status="valid" time="0.02" steps="41069"/></proof>
    </goal>
   </transf>
@@ -181,21 +181,21 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC continue_4" expl="VC for continue_4" proved="true">
+ <goal name="continue_4&#39;VC" expl="VC for continue_4" proved="true">
  <proof prover="11"><result status="valid" time="0.02" steps="170"/></proof>
  </goal>
- <goal name="VC eval_4" expl="VC for eval_4" proved="true">
+ <goal name="eval_4&#39;VC" expl="VC for eval_4" proved="true">
  <proof prover="11"><result status="valid" time="0.12" steps="724"/></proof>
  </goal>
- <goal name="VC interpret_4" expl="VC for interpret_4" proved="true">
+ <goal name="interpret_4&#39;VC" expl="VC for interpret_4" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="40"/></proof>
  </goal>
 </theory>
 <theory name="ReductionSemantics" proved="true">
- <goal name="VC contract" expl="VC for contract" proved="true">
+ <goal name="contract&#39;VC" expl="VC for contract" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="44"/></proof>
  </goal>
- <goal name="VC recompose_values" expl="VC for recompose_values" proved="true">
+ <goal name="recompose_values&#39;VC" expl="VC for recompose_values" proved="true">
  <proof prover="11"><result status="valid" time="0.04" steps="294"/></proof>
  </goal>
  <goal name="size_c_pos" proved="true">
@@ -205,53 +205,53 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC decompose_term" expl="VC for decompose_term" proved="true">
+ <goal name="decompose_term&#39;VC" expl="VC for decompose_term" proved="true">
  <proof prover="11"><result status="valid" time="0.03" steps="132"/></proof>
  </goal>
- <goal name="VC decompose_cont" expl="VC for decompose_cont" proved="true">
+ <goal name="decompose_cont&#39;VC" expl="VC for decompose_cont" proved="true">
  <proof prover="11"><result status="valid" time="0.03" steps="163"/></proof>
  </goal>
- <goal name="VC decompose" expl="VC for decompose" proved="true">
+ <goal name="decompose&#39;VC" expl="VC for decompose" proved="true">
  <proof prover="11"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
- <goal name="VC reduce" expl="VC for reduce" proved="true">
+ <goal name="reduce&#39;VC" expl="VC for reduce" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
- <goal name="VC itere" expl="VC for itere" proved="true">
+ <goal name="itere&#39;VC" expl="VC for itere" proved="true">
  <proof prover="11"><result status="valid" time="0.00" steps="18"/></proof>
  </goal>
- <goal name="VC refocus" expl="VC for refocus" proved="true">
- <proof prover="11"><result status="valid" time="0.00" steps="7"/></proof>
+ <goal name="refocus&#39;VC" expl="VC for refocus" proved="true">
+ <proof prover="11"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="VC itere_opt" expl="VC for itere_opt" proved="true">
+ <goal name="itere_opt&#39;VC" expl="VC for itere_opt" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC itere_opt.0" expl="precondition" proved="true">
+  <goal name="itere_opt&#39;VC.0" expl="precondition" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC itere_opt.1" expl="postcondition" proved="true">
+  <goal name="itere_opt&#39;VC.1" expl="postcondition" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC itere_opt.2" expl="assertion" proved="true">
+  <goal name="itere_opt&#39;VC.2" expl="assertion" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC itere_opt.3" expl="unreachable point" proved="true">
+  <goal name="itere_opt&#39;VC.3" expl="unreachable point" proved="true">
   <proof prover="11"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC itere_opt.4" expl="postcondition" proved="true">
+  <goal name="itere_opt&#39;VC.4" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.55"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC normalize" expl="VC for normalize" proved="true">
+ <goal name="normalize&#39;VC" expl="VC for normalize" proved="true">
  <proof prover="11"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
- <goal name="VC eval_1" expl="VC for eval_1" proved="true">
+ <goal name="eval_1&#39;VC" expl="VC for eval_1" proved="true">
  <proof prover="11"><result status="valid" time="0.05" steps="51"/></proof>
  </goal>
- <goal name="VC eval_2" expl="VC for eval_2" proved="true">
+ <goal name="eval_2&#39;VC" expl="VC for eval_2" proved="true">
  <proof prover="11"><result status="valid" time="0.04" steps="112"/></proof>
  </goal>
- <goal name="VC interpret" expl="VC for interpret" proved="true">
+ <goal name="interpret&#39;VC" expl="VC for interpret" proved="true">
  <proof prover="11"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
 </theory>
@@ -263,19 +263,19 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC recompose_values" expl="VC for recompose_values" proved="true">
+ <goal name="recompose_values&#39;VC" expl="VC for recompose_values" proved="true">
  <proof prover="11"><result status="valid" time="0.25" steps="1710"/></proof>
  </goal>
- <goal name="VC recompose_underflow" expl="VC for recompose_underflow" proved="true">
+ <goal name="recompose_underflow&#39;VC" expl="VC for recompose_underflow" proved="true">
  <proof prover="11"><result status="valid" time="0.11" steps="541"/></proof>
  </goal>
- <goal name="VC eval_1" expl="VC for eval_1" proved="true">
+ <goal name="eval_1&#39;VC" expl="VC for eval_1" proved="true">
  <proof prover="11"><result status="valid" time="0.04" steps="155"/></proof>
  </goal>
- <goal name="VC eval_2" expl="VC for eval_2" proved="true">
+ <goal name="eval_2&#39;VC" expl="VC for eval_2" proved="true">
  <proof prover="11"><result status="valid" time="0.17" steps="879"/></proof>
  </goal>
- <goal name="VC interpret" expl="VC for interpret" proved="true">
+ <goal name="interpret&#39;VC" expl="VC for interpret" proved="true">
  <proof prover="11"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
 </theory>

@@ -7,23 +7,23 @@
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="vstte12_tree_reconstruction.mlw"/>
 <theory name="Tree" proved="true">
  <goal name="depths_head" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="depths_head.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="99"/></proof>
+  <proof prover="0"><result status="valid" time="0.01" steps="98"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="depths_unique&#39;VC" expl="VC for depths_unique" proved="true">
- <proof prover="0"><result status="valid" time="0.09" steps="660"/></proof>
+ <proof prover="0"><result status="valid" time="0.09" steps="629"/></proof>
  </goal>
  <goal name="depths_prefix" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="depths_prefix.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="105"/></proof>
+  <proof prover="0"><result status="valid" time="0.02" steps="100"/></proof>
   </goal>
  </transf>
  </goal>
@@ -103,7 +103,7 @@
  <goal name="g_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="g_append.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.58" steps="1150"/></proof>
+  <proof prover="0"><result status="valid" time="0.58" steps="1201"/></proof>
   </goal>
  </transf>
  </goal>
@@ -166,7 +166,7 @@
   <proof prover="4"><result status="valid" time="0.04" steps="14677"/></proof>
   </goal>
   <goal name="tc&#39;VC.8" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.96" steps="2229"/></proof>
+  <proof prover="0"><result status="valid" time="0.32" steps="618"/></proof>
   </goal>
   <goal name="tc&#39;VC.9" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="13743"/></proof>
@@ -202,7 +202,7 @@
   <proof prover="4"><result status="valid" time="0.06" steps="14887"/></proof>
   </goal>
   <goal name="tc&#39;VC.20" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="1.70" steps="3286"/></proof>
+  <proof prover="0"><result status="valid" time="0.56" steps="1043"/></proof>
   </goal>
   <goal name="tc&#39;VC.21" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.04" steps="13785"/></proof>
