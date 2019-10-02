@@ -160,8 +160,8 @@ let print_id s tables =
   (* Different constructs are printed differently *)
   match d.Decl.d_node, table_id with
   | Decl.Dind (_, il), Args_wrapper.Tsprsymbol pr ->
-      print_constr_string ~print_term:P.print_term ~print_pr:P.print_pr il pr
-  | _ -> Pp.string_of P.print_decl d
+      (d, print_constr_string ~print_term:P.print_term ~print_pr:P.print_pr il pr)
+  | _ -> (d, Pp.string_of P.print_decl d)
 
 (* searching ids in declarations *)
 
@@ -230,9 +230,16 @@ let search ~search_both s tables =
       let module P = (val Pretty.create pr apr pr pr false) in
       Pp.string_of (Pp.print_list Pp.newline2 P.print_decl) l
 
+let locate_id _cont task args =
+  match args with
+  | [s] -> let (d, _) = print_id s task in
+      let id = Ident.Sid.choose d.Decl.d_news in
+      id.Ident.id_loc
+  | _ -> raise Number_of_arguments
+
 let print_id _cont task args =
   match args with
-  | [s] -> print_id s task
+  | [s] -> let (_, s) = print_id s task in s
   | _ -> raise Number_of_arguments
 
 let search_id ~search_both _cont task args =
@@ -243,7 +250,6 @@ let search_id ~search_both _cont task args =
 type query =
   | Qnotask of (Controller_itp.controller -> string list -> string)
   | Qtask of (Controller_itp.controller -> Trans.naming_table -> string list -> string)
-
 
 let help_on_queries fmt commands =
   let l = Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
@@ -352,6 +358,7 @@ type command =
   | Mark_Obsolete
   | Focus_req
   | Unfocus_req
+  | Locate       of string
   | Help_message of string
   | Query        of string
   | QError       of string
@@ -443,6 +450,11 @@ let interp commands_table cont id s =
                | Some _ -> Strategies cmd
              else
                match cmd, args with
+               | "locate", args ->
+                   begin match args with
+                     | [id] -> Locate id
+                     | _ -> QError "locate expects only one argument"
+                   end
                | "edit", _ ->
                   begin
                     match id with
