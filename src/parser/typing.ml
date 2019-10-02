@@ -1108,6 +1108,9 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
 
 and drec_defn muc denv fdl =
   let prep (id, gh, kind, bl, pty, _pat, msk, sp, e) =
+    if sp.sp_alias <> []
+    then Loc.errorm ~loc:id.id_loc
+           "alias is forbidden in recursive functions";
     let bl = List.map (dbinder muc) bl in
     let dity = dity_of_opt muc pty in
     let pre denv =

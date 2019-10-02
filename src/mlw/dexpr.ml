@@ -1074,7 +1074,8 @@ let check_aliases recu c =
   let add_ity regs ity =
     let frz = ity_freeze isb_empty ity in
     Mreg.union report regs frz.isb_reg in
-  let add_arg regs v = add_ity_noreport regs v.pv_ity in
+  let add = if recu then add_ity else add_ity_noreport in
+  let add_arg regs v = add regs v.pv_ity in
   let argregs = List.fold_left add_arg Mreg.empty c.cty_args in
   let regs = Mreg.union report rds_regs argregs in
   if recu then ignore (add_ity regs c.cty_result)

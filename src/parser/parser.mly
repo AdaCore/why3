@@ -1235,7 +1235,7 @@ single_spec:
     { { empty_spec with sp_variant = $1 } }
 
 alias:
-| term WITH term  { $1, $3 }
+| single_term WITH single_term  { $1, $3 }
 
 ensures:
 | term
