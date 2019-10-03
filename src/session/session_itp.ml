@@ -1457,9 +1457,13 @@ let load_session (dir : string) =
 
 module Goal_Shape = struct
   type 'a t = proofNodeID * session
-  let checksum (id,s) = Some (Hpn.find s.shapes.session_sum_table id)
+  let checksum (id,s) =
+    try Some (Hpn.find s.shapes.session_sum_table id) with
+    | Not_found -> None
   let shape (id,s)    =
-    (Hpn.find s.shapes.session_shape_table id, Termcode.Gshape.empty_bshape)
+    try
+      (Hpn.find s.shapes.session_shape_table id, Termcode.Gshape.empty_bshape)
+    with Not_found -> (Termcode.empty_shape, Termcode.Gshape.empty_bshape)
   let name (id,s)     = (get_proofNode s id).proofn_name
 end
 
@@ -1469,10 +1473,14 @@ module Goal_Bound_Shape = struct
 
   type 'a t = proofNodeID * session
 
-  let checksum (id,s) = Some (Hpn.find s.shapes.session_sum_table id)
+  let checksum (id,s) =
+    try Some (Hpn.find s.shapes.session_sum_table id) with
+    | Not_found -> None
   let shape (id,s) =
-    let li = Hpn.find s.shapes.session_bound_shape_table id in
-    (Termcode.Gshape.goal_and_expl_shapes s.shapes.session_global_shapes li, li)
+    try
+      let li = Hpn.find s.shapes.session_bound_shape_table id in
+      (Termcode.Gshape.goal_and_expl_shapes s.shapes.session_global_shapes li, li)
+    with Not_found -> (Termcode.empty_shape, Termcode.Gshape.empty_bshape)
   let name (id,s) = (get_proofNode s id).proofn_name
 
 end
