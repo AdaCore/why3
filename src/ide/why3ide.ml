@@ -101,6 +101,10 @@ module Protocol_why3ide = struct
     notification_list := [];
     l
 
+  (* print_ext_any just use the pretty function here *)
+  let print_ext_any print_any fmt t =
+    print_any fmt t
+
 end
 
 let get_notified = Protocol_why3ide.get_notified
@@ -203,7 +207,7 @@ let env, gconfig = try
 (********************************)
 
 
-let (why_lang, any_lang) =
+let (why_lang, any_lang, why3py_lang) =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
@@ -222,7 +226,14 @@ let (why_lang, any_lang) =
     match languages_manager#guess_language ~filename () with
     | None -> why_lang
     | Some _ as l -> l in
-  (why_lang, any_lang)
+  let why3py_lang =
+    match languages_manager#language "why3py" with
+    | None ->
+        eprintf "language file for 'Why3python' not found in directory %s@."
+          load_path;
+        exit 1
+    | Some _ as l -> l in
+  (why_lang, any_lang, why3py_lang)
 
 (* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
@@ -674,13 +685,20 @@ let task_view =
 
 let () = create_colors task_view
 
+let change_lang view lang =
+  let lang =
+    match lang with
+    | "python" -> why3py_lang
+    | _ -> why_lang in
+  view#source_buffer#set_language lang
+
 (* Creating a page for source code view *)
 let create_source_view =
   (* Counter for pages *)
   let n = ref 1 in
   (* Create a page with tabname [f] and buffer equal to [content] in the
      notebook. Also add a corresponding page in source_view_table. *)
-  let create_source_view f content =
+  let create_source_view f content f_format =
     if not (Hstr.mem source_view_table f) then
       begin
         let label = GMisc.label ~text:(Filename.basename f) () in
@@ -726,7 +744,7 @@ let create_source_view =
               ()
             with Not_found -> () ) in
         Gconfig.add_modifiable_mono_font_view source_view#misc;
-        source_view#source_buffer#set_language why_lang;
+        change_lang source_view f_format;
         (* We have to create the tags for background colors for each view.
            They are not reusable from the other views.  *)
         create_colors source_view;
@@ -2568,9 +2586,10 @@ let treat_notification n =
         exit_function_safe ()
   | Saving_needed b -> exit_function_handler b
   | Message (msg)                 -> treat_message_notification msg
-  | Task (id, s, list_loc, goal_loc)        ->
+  | Task (id, s, list_loc, goal_loc, lang)        ->
      if is_selected_alone id then
        begin
+         change_lang task_view lang;
          task_view#source_buffer#set_text s;
          (* Avoid erasing colors at startup when selecting the first node. In
             all other cases, it should change nothing. *)
@@ -2583,7 +2602,7 @@ let treat_notification n =
             of the "smooth scrolling". *)
          when_idle (fun () -> task_view#scroll_to_mark `INSERT)
        end
-  | File_contents (file_name, content) ->
+  | File_contents (file_name, content, f_format) ->
      let content = try_convert content in
     begin
       try
@@ -2595,12 +2614,13 @@ let treat_notification n =
         b := false;
         reposition_ide_cursor ()
       with
-      | Not_found -> create_source_view file_name content
+      | Not_found -> create_source_view file_name content f_format
     end
-  | Source_and_ce (content, list_loc, goal_loc) ->
+  | Source_and_ce (content, list_loc, goal_loc, f_format) ->
     begin
       messages_notebook#goto_page counterexample_page;
       counterexample_view#source_buffer#set_text content;
+      change_lang counterexample_view f_format;
       apply_loc_on_ce list_loc;
       scroll_to_loc_ce goal_loc
     end

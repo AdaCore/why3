@@ -553,13 +553,13 @@ let interpNotif (n: notification) =
       TaskList.attach_new_node nid parent ntype name detached;
       TaskList.onclick_do_something (string_of_int nid);
       sendRequest (Get_task (string_of_int nid))
-  | File_contents (_f,_s) ->
+  | File_contents (_f,_s,_) ->
      PE.error_print_msg "Notification File_contents not handled yet"
   | Source_and_ce _ ->
      PE.error_print_msg "Notification Source_and_ce not handled yet"
   | Next_Unproven_Node_Id (_nid1,_nid2) ->
      PE.error_print_msg "Notification Next_Unproven_Node_Id not handled yet"
-  | Task (nid, task, _list_loc, _goal_loc) -> (* TODO add color on sources *)
+  | Task (nid, task, _list_loc, _goal_loc, _lang) -> (* TODO add color on sources *)
       Hashtbl.add TaskList.printed_task_list (string_of_int nid) task
   | Remove nid ->
       TaskList.remove_node (string_of_int nid)

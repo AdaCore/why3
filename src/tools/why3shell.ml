@@ -307,17 +307,17 @@ let treat_notification fmt n =
   | Saving_needed _b                        -> (* TODO *)
       fprintf fmt "got a Saving_needed notification not yet supported@."
   | Message (msg)                           -> treat_message_notification fmt msg
-  | Dead s                                 ->
+  | Dead s                                  ->
       fprintf fmt "Dead notification: %s\nExiting.@." s;
       (* This exception is matched in Unix_Scheduler *)
       raise Exit
-  | File_contents (f, s)                    ->
+  | File_contents (f, s, _)                 ->
       fprintf fmt "File %s is:\n%s" f s (* TODO print this correctly *)
   | Source_and_ce _                         ->
       fprintf fmt "got a Source_and_ce notification not yet supported@." (* TODO *)
   | Next_Unproven_Node_Id _                 ->
       fprintf fmt "got a Next_Unproven_Node_Id notification not yet supported@." (* TODO *)
-  | Task (id, s, _list_loc, _)              ->
+  | Task (id, s, _list_loc, _, _)           ->
     (* coloring the source is useless in shell *)
     try
       let node = Hnode.find nodes id in

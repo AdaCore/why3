@@ -420,21 +420,27 @@ let print_notification_to_json (n: notification): json =
   | Dead s ->
       convert_record ["notification", cc n;
            "message", String s]
-  | Task (nid, s, list_loc, goal_loc) ->
+  | Task (nid, s, list_loc, goal_loc, lang) ->
       convert_record ["notification", cc n;
-           "node_ID", Int nid;
-           "task", String s;
-           "loc_list", convert_list_loc list_loc;
-           "goal_loc", convert_option_loc goal_loc]
-  | File_contents (f, s) ->
+                      "node_ID", Int nid;
+                      "task", String s;
+                      "loc_list", convert_list_loc list_loc;
+                      "goal_loc", convert_option_loc goal_loc;
+                      "lang", String lang;
+                     ]
+  | File_contents (f, s, f_format) ->
       convert_record ["notification", cc n;
-           "file", String f;
-           "content", String s]
-  | Source_and_ce (s, list_loc, goal_loc) ->
+                      "file", String f;
+                      "content", String s;
+                      "file_format", String f_format;
+                     ]
+  | Source_and_ce (s, list_loc, goal_loc, f_format) ->
       convert_record ["notification", cc n;
                       "content", String s;
                       "loc_list", convert_list_loc list_loc;
-                      "goal_loc", convert_option_loc goal_loc])
+                      "goal_loc", convert_option_loc goal_loc;
+                      "file_format", String f_format
+                     ])
 
 let print_notification fmt (n: notification) =
   Format.fprintf fmt "%a" print_json (print_notification_to_json n)
@@ -794,7 +800,8 @@ let parse_notification constr j =
     let s = get_string (get_field j "task") in
     let l = get_field j "loc_list" in
     let gl = get_field j "goal_loc" in
-    Task (nid, s, parse_list_loc l, parse_opt_loc gl)
+    let lang = get_string (get_field j "lang") in
+    Task (nid, s, parse_list_loc l, parse_opt_loc gl, lang)
 
   | "Next_Unproven_Node_Id" ->
     let nid1 = get_int (get_field j "node_ID1") in
@@ -804,13 +811,15 @@ let parse_notification constr j =
   | "File_contents" ->
     let f = get_string (get_field j "file") in
     let s = get_string (get_field j "content") in
-    File_contents(f,s)
+    let f_format = get_string (get_field j "file_format") in
+    File_contents(f,s, f_format)
 
   | "Source_and_ce" ->
     let s = get_string (get_field j "content") in
     let l = get_field j "loc_list" in
     let gl = get_field j "goal_loc" in
-    Source_and_ce(s, parse_list_loc l, parse_opt_loc gl)
+    let f_format = get_string (get_field j "file_format") in
+    Source_and_ce(s, parse_list_loc l, parse_opt_loc gl, f_format)
 
 
   | s -> raise (NotNotification ("<from parse_notification> " ^ s))

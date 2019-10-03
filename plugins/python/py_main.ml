@@ -356,6 +356,58 @@ let read_channel env path file c =
   end;
   mm
 
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
+open Term
+open Format
+open Pretty
+
+(* python print_binop *)
+let print_binop ~asym fmt = function
+  | Tand when asym -> fprintf fmt "&&"
+  | Tor when asym  -> fprintf fmt "||"
+  | Tand           -> fprintf fmt "and"
+  | Tor            -> fprintf fmt "or"
+  | Timplies       -> fprintf fmt "->"
+  | Tiff           -> fprintf fmt "<->"
+
+(* Register the transformations functions *)
+let rec python_ext_printer print_any fmt a =
+  match a with
+  | Pp_term (t, pri) ->
+      begin match t.t_node with
+        | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
+            (* == *)
+            fprintf fmt (protect_on (pri > 0) "@[%a == %a@]")
+              (python_ext_printer print_any) (Pp_term (t1, 0))
+              (python_ext_printer print_any) (Pp_term (t2, 0))
+        | Tnot {t_node = Tapp (ls, [t1; t2]) } when ls_equal ls ps_equ ->
+            (* != *)
+            fprintf fmt (protect_on (pri > 0) "@[%a != %a@]")
+              (python_ext_printer print_any) (Pp_term (t1, 0))
+              (python_ext_printer print_any) (Pp_term (t2, 0))
+        | Tbinop (b, f1, f2) ->
+            (* and, or *)
+            let asym = Ident.Sattr.mem asym_split f1.t_attrs in
+            let p = prio_binop b in
+            fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
+              (python_ext_printer print_any) (Pp_term (f1, (p + 1)))
+              (print_binop ~asym) b
+              (python_ext_printer print_any) (Pp_term (f2, p))
+        | _ -> print_any fmt a
+      end
+  | _ -> print_any fmt a
+
+let () = Itp_server.add_registered_lang "python" python_ext_printer
+
+let () = Args_wrapper.set_argument_parsing_functions "python"
+    ~parse_term:(fun _ lb -> Py_lexer.parse_term lb)
+    ~parse_term_list:(fun _ lb -> Py_lexer.parse_term_list lb)
+    ~parse_list_ident:(fun lb -> Py_lexer.parse_list_ident lb)
+    (* TODO for qualids, add a similar funciton *)
+    ~parse_qualid:(fun lb -> Lexer.parse_qualid lb)
+    ~parse_list_qualid:(fun lb -> Lexer.parse_list_qualid lb)
+
 let () =
   Env.register_format mlw_language "python" ["py"] read_channel
     ~desc:"mini-Python format"

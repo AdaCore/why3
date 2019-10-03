@@ -77,7 +77,7 @@ type transformation_node = {
 type file = {
   file_id                : int;
   mutable file_path      : Sysutil.file_path;
-  file_format            : string;
+  file_format            : Env.fformat;
   file_is_detached       : bool;
   mutable file_theories  : theory list;
 }
@@ -1575,7 +1575,8 @@ let () = Exn_printer.register
 
 let apply_trans_to_goal ~allow_no_effect s env name args id =
   let task,table = get_task_name_table s id in
-  let subtasks = Trans.apply_transform_args name env args table task in
+  let lang = (get_encapsulating_file s (APn id)).file_format in
+  let subtasks = Trans.apply_transform_args name env args table lang task in
   (* If any generated task is equal to the former task, then we made no
      progress because we need to prove more lemmas than before *)
   match subtasks with
