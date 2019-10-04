@@ -23,7 +23,9 @@ Language
 Tools
   * counterexamples given by `why3prove` are no longer printed using JSON
     by default; pass option `--json` to restore the previous behavior
-
+  * new tool `why3pp` to pretty print Why3 source code (inductive definitions to LaTeX,
+    formatting of mlw files)
+  
 API
   * `Call_provers.print_prover_result` now takes an additional argument
     `~json_model` to indicate whether counterexamples are printed using JSON :x:
