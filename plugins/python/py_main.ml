@@ -356,11 +356,18 @@ let read_channel env path file c =
   end;
   mm
 
-let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+let () =
+  Env.register_format mlw_language "python" ["py"] read_channel
+    ~desc:"mini-Python format"
+
+(* Python pretty-printer, to print tasks with a little bit
+   of Python syntax *)
 
 open Term
 open Format
 open Pretty
+
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
 (* python print_binop *)
 let print_binop ~asym fmt = function
@@ -407,7 +414,3 @@ let () = Args_wrapper.set_argument_parsing_functions "python"
     (* TODO for qualids, add a similar funciton *)
     ~parse_qualid:(fun lb -> Lexer.parse_qualid lb)
     ~parse_list_qualid:(fun lb -> Lexer.parse_list_qualid lb)
-
-let () =
-  Env.register_format mlw_language "python" ["py"] read_channel
-    ~desc:"mini-Python format"
