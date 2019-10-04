@@ -19,6 +19,8 @@ Language
     are renamed from "_spec" (resp. "_def" to "'spec" (resp. "'def" :x:
   * Ident prefix introduced for goals "VC " and record constructor "mk "
     becomes suffix "'VC" and "'mk".
+  * The 'alias' clause can now be used in program functions to force the aliasing
+    of function parameters and/or named returns.
 
 Tools
   * counterexamples given by `why3prove` are no longer printed using JSON
