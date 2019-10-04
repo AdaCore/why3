@@ -6,7 +6,7 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2019-06-20"
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2019-10-04"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
 build-image:
@@ -39,21 +39,6 @@ build-system:
     COMPILER: ocaml-system
   <<: *build_definition
 
-build-4.02.3:
-  variables:
-    COMPILER: 4.02.3
-  <<: *build_definition
-
-build-4.03.0:
-  variables:
-    COMPILER: 4.03.0
-  <<: *build_definition
-
-build-4.04.2:
-  variables:
-    COMPILER: 4.04.2
-  <<: *build_definition
-
 build-4.05.0:
   variables:
     COMPILER: 4.05.0
@@ -67,6 +52,16 @@ build-4.06.1:
 build-4.07.1:
   variables:
     COMPILER: 4.07.1
+  <<: *build_definition
+
+build-4.08.1:
+  variables:
+    COMPILER: 4.08.1
+  <<: *build_definition
+
+build-4.09.0:
+  variables:
+    COMPILER: 4.09.0
   <<: *build_definition
 
 .bench_template1: &bench_definition_always
@@ -84,21 +79,6 @@ build-4.07.1:
 bench-system:
   <<: *bench_definition_always
 
-bench-4.02.3:
-  variables:
-    COMPILER: 4.02.3
-  <<: *bench_definition
-
-bench-4.03.0:
-  variables:
-    COMPILER: 4.03.0
-  <<: *bench_definition
-
-bench-4.04.2:
-  variables:
-    COMPILER: 4.04.2
-  <<: *bench_definition
-
 bench-4.05.0:
   variables:
     COMPILER: 4.05.0
@@ -113,6 +93,16 @@ bench-4.07.1:
   variables:
     COMPILER: 4.07.1
   <<: *bench_definition_always
+
+bench-4.08.1:
+  variables:
+    COMPILER: 4.08.1
+  <<: *bench_definition
+
+bench-4.09.0:
+  variables:
+    COMPILER: 4.09.1
+  <<: *bench_definition
 
 full:
   stage: test

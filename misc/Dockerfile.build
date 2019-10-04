@@ -1,6 +1,6 @@
 # If you modify this file, make sure to update the BUILD_IMAGE variable in .gitlab-ci.yml.
 
-FROM debian:stable
+FROM debian:buster
 
 USER root
 
@@ -8,7 +8,7 @@ USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev xvfb unzip build-essential autoconf automake ocaml-nox ca-certificates git xauth hevea texlive-latex-extra lmodern texlive-fonts-recommended cvc3 spass && \
+    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev xvfb unzip build-essential autoconf automake ocaml-nox ca-certificates git xauth hevea texlive-latex-extra lmodern texlive-plain-generic texlive-fonts-recommended && \
     apt-get clean
 
 RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.0/opam-2.0.0-x86_64-linux -O /usr/local/bin/opam && \
@@ -48,12 +48,11 @@ WORKDIR /home/why3
 ENV OPAM_PACKAGES="menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo"
 RUN opam init -y --no-setup -j1 --compiler=ocaml-system --disable-sandboxing && \
     opam install -y $OPAM_PACKAGES && \
-    opam switch create 4.02.3 ocaml-base-compiler.4.02.3 && opam install -y $OPAM_PACKAGES && \
-    opam switch create 4.03.0 ocaml-base-compiler.4.03.0 && opam install -y $OPAM_PACKAGES && \
-    opam switch create 4.04.2 ocaml-base-compiler.4.04.2 && opam install -y $OPAM_PACKAGES && \
     opam switch create 4.05.0 ocaml-base-compiler.4.05.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create 4.06.1 ocaml-base-compiler.4.06.1 && opam install -y $OPAM_PACKAGES && \
     opam switch create 4.07.1 ocaml-base-compiler.4.07.1 && opam install -y $OPAM_PACKAGES && \
+    opam switch create 4.08.1 ocaml-base-compiler.4.08.1 && opam install -y $OPAM_PACKAGES && \
+    opam switch create 4.09.0 ocaml-base-compiler.4.09.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create bench  ocaml-base-compiler.4.05.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create full   ocaml-base-compiler.4.07.1 && opam install -y $OPAM_PACKAGES && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
