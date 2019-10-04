@@ -6,8 +6,10 @@ module String
 
   (** type string is built-in *)
 
-  (** UC refers to the code points from 0x00000 to 0x2FFFF (Unicode
-  characters in Planes 0-2) *) (* CHECK *)
+  (** Currently UC refers to ASCII due to the limitations of SMT solvers *)
+
+  (* TODO UC refers to the code points from 0x00000 to 0x2FFFF (Unicode
+  characters in Planes 0-2) *)
 
   constant empty : string = ""
   (** the empty string. *)
@@ -15,18 +17,46 @@ module String
   function concat string string : string
   (** `concat s1 s2` returns the concatenation of `s1` and `s2`.  *)
 
+  axiom concat_assoc: forall s1 s2 s3.
+    concat (concat s1 s2) s3 = concat s1 (concat s2 s3)
+
+  axiom concat_empty: forall s.
+    concat s empty = concat empty s = s
+
   function length string : int
   (** `length s` returns the length of the string `s`. *)
   (* `length s` returns the number of UC characters in `s`. *)
-  (* CHECK *)
+
+  axiom length_empty: length "" = 0
+
+  axiom length_concat: forall s1 s2.
+    length (concat s1 s2) = length s1 + length s2
 
   predicate lt string string
   (** `lt s1 s2` returns `True` iff `s1` is smaller than `s2` in the
-  lexicographic order of UC *) (* CHECK UC *)
+  lexicographic order of UC *)
+
+  axiom lt_empty: forall s.
+    s <> empty -> lt empty s
+
+  axiom lt_not_com: forall s1 s2.
+    lt s1 s2 -> not (lt s2 s1)
 
   predicate le string string
   (** `le s1 s2` returns `True` iff `s1` is smaller or equal to `s2`
-  in the lexicographic order of UC *) (* CHECK UC *)
+  in the lexicographic order of UC *)
+
+  axiom le_empty: forall s.
+    le empty s
+
+  axiom le: forall s1.
+    le s1 s1
+
+  axiom lt_le: forall s1 s2.
+    lt s1 s2 -> le s1 s2
+
+  axiom lt_le_eq: forall s1 s2.
+    le s1 s2 -> lt s1 s2 || s1 = s2
 
   function ([]) string int : string
   (** `s[i]` is:
@@ -34,20 +64,90 @@ module String
        (2) the string of length `1` containing the character of
            position `i` in string `s`, if `0 <= i < length s`. *)
 
+  axiom at_out_of_range: forall s i.
+    i < 0 || i >= length s -> s[i] = empty
+
+  axiom at_empty: forall i.
+    empty[i] = empty
+
   function substring string int int : string
   (** `substring s i x` is:
       (1) the `empty` string if `i < 0`, `i >= length s`, or `x <= 0`;
       (2) the substring of `s` starting at `i` and of length
           `min x (length s - i)`. *)
 
+  axiom substring_of_empty: forall i x.
+    substring "" i x = ""
+
+  axiom substring_out_of_range: forall s i x.
+    i < 0 || i >= length s -> substring s i x = empty
+
+  axiom substring_of_length_zero_or_less: forall s i x.
+    x <= 0 -> substring s i x = ""
+
+  axiom substring_smaller: forall s i x.
+    length (substring s i x) <= length s
+
+
+  axiom substring_smaller_x: forall s i x.
+    x > 0 -> length (substring s i x) <= x
+
+  axiom substring_length: forall s i x.
+    x > 0 && 0 <= i < length s ->
+      if i + x > length s then
+        length (substring s i x) = length s - i
+      else length (substring s i x) = x
+
   predicate prefixof string string
   (** `prefixof s1 s2` is `True` iff `s1` is a prefix of `s2`. *)
+
+  axiom prefixof_substring: forall s1 s2.
+    prefixof s1 s2 <-> s1 = substring s2 0 (length s1)
+
+  axiom prefixof_concat: forall s1 s2.
+    prefixof s1 (concat s1 s2)
+
+  axiom prefixof_empty: forall s2.
+    prefixof "" s2
+
+  axiom prefixof_empty2: forall s1.
+    s1 <> empty -> not (prefixof s1 "")
 
   predicate suffixof string string
   (** `suffixof s1 s2` is `True` iff `s1` is a suffix of `s2`. *)
 
+  axiom suffixof_substring: forall s1 s2.
+    suffixof s1 s2 <-> s1 = substring s2 (length s2 - length s1) (length s1)
+
+  axiom suffixof_concat: forall s1 s2.
+    suffixof s2 (concat s1 s2)
+
+  axiom suffixof_empty: forall s2.
+    suffixof "" s2
+
+  axiom suffiof_empty2: forall s1.
+    s1 <> empty -> not (suffixof s1 "")
+
   predicate contains string string
   (** `contains s1 s2` is `True` iff `s1` contains `s2`. *)
+
+  axiom contains_prefixof: forall s1 s2.
+    prefixof s1 s2 -> contains s2 s1
+
+  axiom contains_suffixof: forall s1 s2.
+    suffixof s1 s2 -> contains s2 s1
+
+  axiom contains_empty: forall s2.
+    contains "" s2 -> s2 = empty
+
+  axiom contains_empty2: forall s1.
+    contains s1 ""
+
+  axiom contains_substring: forall s1 s2 i.
+    substring s1 i (length s2) = s2 -> contains s1 s2
+
+  axiom contains_concat: forall s1 s2.
+    contains (concat s1 s2) s1 && contains (concat s1 s2) s2
 
   function indexof string string int : int
   (** `indexof s1 s2 i` is:
@@ -57,11 +157,61 @@ module String
       (2) `-1`, if `i < 0`, `i > length s1`, or `0 <= i <= length s1`
           and `s2` does not occur in `s1` after `i`.  *)
 
+  axiom indexof_empty: forall s i.
+    0 <= i <= length s -> indexof s "" i = i
+
+  axiom indexof_empty1: forall s.
+    let j = indexof "" s 0 in
+    j = -1 || (s = "" && j = 0)
+
+  axiom indexof_contains: forall s1 s2.
+    let j = indexof s1 s2 0 in
+    contains s1 s2 && s2 <> empty ->
+      0 <= j <= length s1 && substring s1 j (length s2) = s2
+
+  axiom contains_indexof: forall s1 s2 i.
+    0 <= indexof s1 s2 i -> contains s1 s2
+
+  axiom not_contains_indexof: forall s1 s2 i.
+    not (contains s1 s2)  -> indexof s1 s2 i = -1
+
+  axiom substring_indexof: forall s1 s2 i.
+    let j = indexof s1 s2 i in
+    j >= 0 -> substring s1 j (length s2) = s2
+
+  axiom indexof_out_of_range: forall i s1 s2.
+    not (0 <= i <= length s1) -> indexof s1 s2 i = -1
+
+  axiom indexof_in_range: forall s1 s2 i.
+    let j = indexof s1 s2 i in
+    0 <= i <= length s1 -> j = -1 || i <= j <= length s1
+
+  axiom indexof_contains_substring: forall s1 s2 i.
+    0 <= i <= length s1 && contains (substring s1 i (length s1 - i)) s2 ->
+      i <= indexof s1 s2 i <= length s1
+
   function replace string string string : string
   (** `replace s1 s2 s3` is:
       (1) `concat s3 s1`, if `s2 = empty`;
       (2) the string obtained by replacing the first occurrence of `s2`
           (if any) by `s3` in `s1`. *)
+
+  axiom not_contains_replace: forall s1 s2 s3.
+    not (contains s1 s2) -> replace s1 s2 s3 = s1
+
+  axiom replace_empty: forall s1 s3.
+    replace s1 "" s3 = concat s3 s1
+
+  axiom replace_empty2: forall s2 s3.
+    let s4 = replace "" s2 s3 in
+    if s2 = empty then s4 = s3 else s4 = empty
+
+  axiom replace_substring_indexof: forall s1 s2 s3.
+    let j = indexof s1 s2 0 in
+    replace s1 s2 s3 =
+      if j < 0 then s1 else
+        concat (concat (substring s1 0 j) s3)
+               (substring s1 (j + length s2) (length s1 - j - length s2))
 
   (* NOT IN SMT-LIB *)
   function replaceall string string string : string
@@ -70,24 +220,63 @@ module String
       (2) the string obtained by replacing all occurences of `s2` by
           `s3` in `s1` *)
 
-  (* TODO Below is still WORK IN PROGRESS *)
+  axiom not_contains_replaceall: forall s1 s2 s3.
+    not (contains s1 s2) -> replaceall s1 s2 s3 = s1
 
-  predicate is_digit string (* NOT in z3/cvc4 *)
-  (** `is_digit s` returns `True` iff `s` is of length `1` and
-      corresponds to a decimal digit, that is, to a code point in the
-      range 0x0030 ... 0x0039 *)
+  axiom replaceall_empty1: forall s1 s3.
+    replaceall s1 "" s3 = s1
 
   function to_int string : int
   (** `to_int s` is:
       (1) an `int` consisting on the digits of `s`, if `s` is formed only
-          by characters corresponding to digits, that is, to code points in
-          the range 0x0030 ... 0x0039;
+          by characters corresponding to digits, that is, to code points
+          in the range 0x0030 ... 0x0039;
       (2) `-1`, if `s` contains a character that is not a digit. *)
+
+  (* TODO: axioms about to_int -- the following are not proved *)
+
+  (* axiom to_int: forall s i. *)
+  (*   0 <= i < length s && lt "9" s[i] -> to_int s = -1 *)
+
+  (* axiom to_int2: forall s. *)
+  (*   forall i. 0 <= i < length s && le "0" s[i] && le s[i] "9" -> *)
+  (*     to_int s > 0 *)
+
+  (* In SMT-Lib, but NOT in z3/cvc4 *)
+  predicate is_digit (s:string) = 0 <= to_int s <= 9
+  (** `is_digit s` returns `True` iff `s` is of length `1` and
+      corresponds to a decimal digit, that is, to a code point in the
+      range 0x0030 ... 0x0039 *)
+
+  axiom is_digit_definition: forall s.
+    is_digit s <-> length s = 1 && le "0" s[0] && le s[0] "9"
+
+  axiom is_digit_length_no_one: forall s.
+    length s <> 1 -> not (is_digit s)
 
   function from_int int : string
   (** `from_int i` is:
       (1) the corresponding string in the decimal notation if `i >= 0`;
       (2) `empty`, if `i < 0`. *)
+
+  axiom from_int_negative: forall i.
+    i < 0 <-> from_int i = empty
+
+  axiom from_int_to_int: forall i.
+    i >= 0 -> to_int (from_int i) = i
+
+  axiom from_int_to_int2: forall i.
+    to_int (from_int i) = i -> i >= -1
+
+end
+
+module StringRealization
+  (* For realization only *)
+
+  clone export String
+    with goal .
+  (* trick to remove axioms from the theory String. See file
+     examples/stdlib/stringCheck.mlw *)
 
 end
 
@@ -110,7 +299,7 @@ module RegExpr
   function union re re : re (* left assoc *)
   (** regular expressions union *)
 
-  function inter re re : re (* left assoc *) (* NOT SUPPORTED BY Z3 *)
+  function inter re re : re (* left assoc *)
   (** regular expressions intersection *)
 
   function star re : re

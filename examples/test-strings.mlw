@@ -1,5 +1,5 @@
 
-module Harness
+module TestString
 
   use string.String
   use int.Int
@@ -38,23 +38,12 @@ module Harness
   goal TestConcat5:
     concat "" "" = ""
 
-  lemma concat_assoc: forall s1 s2 s3.
-    concat (concat s1 s2) s3 = concat s1 (concat s2 s3)
-
-  lemma concat_empty: forall s.
-    concat s empty = concat empty s = s
-
   goal TestLength1: length "a" = 1
   goal TestLength2: length "ab" = 2
   goal TestLength3: length "abc" = 3
   goal TestLength4: length (concat "ab" "12") = 4
-  goal TestLength5: length "é" = 2 (* only z3 aggrees with this *)
-  goal TestLength6: length "\\u00E9" = 3
-
-  lemma length_empty: length "" = 0
-
-  lemma length_concat: forall s1 s2.
-    length (concat s1 s2) = length s1 + length s2
+  (* TODO \xC3\xA9 is the encoding of 'é' *)
+  (* TODO goal TestLength5: length "\xC3\xA9" = 2 *)
 
   goal TestLt1: lt "" "a"
   goal TestLt2: lt "a" "b"
@@ -63,23 +52,8 @@ module Harness
   goal TestLt5: lt "a" "1"
   goal TestLt6: lt "A" "a"
 
-  lemma lt_empty: forall s.
-    s <> empty -> lt empty s
-
   goal lt_transitive: forall s1 s2 s3. (* CHECK - not proved *)
     lt s1 s2 && lt s2 s3 -> lt s1 s3
-
-  lemma lt_not_com: forall s1 s2.
-    lt s1 s2 -> not (lt s2 s1)
-
-  lemma le: forall s1.
-    le s1 s1
-
-  lemma lt_le: forall s1 s2.
-    lt s1 s2 -> le s1 s2
-
-  lemma lt_le_eq: forall s1 s2.
-    le s1 s2 -> lt s1 s2 || s1 = s2
 
   goal le_transitive: forall s1 s2 s3. (* CHECK - not proved *)
     le s1 s2 && le s2 s3 -> le s1 s3
@@ -87,70 +61,13 @@ module Harness
   goal TestAt1:
     "abc"[3] = empty
 
-  lemma at_out_of_range: forall s i.
-    i < 0 || i >= length s -> s[i] = empty
-
-  lemma at_empty: forall i.
-    empty[i] = empty
-
   goal TestSubstring1:
     substring "abcdef" 1 3 = "bcd"
 
   goal TestSubstring2:
     substring "abcdef" 1 10 = "bcdef"
 
-  lemma substring_of_empty: forall i x.
-    substring "" i x = ""
-
-  lemma substring_out_of_range: forall s i x.
-    i < 0 || i >= length s -> substring s i x = empty
-
-  lemma substring_of_length_zero_or_less: forall s i x.
-    x <= 0 -> substring s i x = ""
-
-  lemma substring_smaller: forall s i x.
-    length (substring s i x) <= length s
-
-  lemma substring_smaller_x: forall s i x.
-    x > 0 && i + x > length s -> length (substring s i x) <= x
-
-  lemma prefixof_substring: forall s1 s2.
-    prefixof s1 s2 <-> s1 = substring s2 0 (length s1)
-
-  lemma prefixof_concat: forall s1 s2.
-    prefixof s1 (concat s1 s2)
-
-  lemma prefixof_empty: forall s2.
-    prefixof "" s2
-
-  lemma prefixof_empty2: forall s1.
-    s1 <> empty -> not (prefixof s1 "")
-
-  lemma suffixof_substring: forall s1 s2.
-    suffixof s1 s2 <-> s1 = substring s2 (length s2 - length s1) (length s1)
-
-  lemma suffixof_concat: forall s1 s2.
-    suffixof s2 (concat s1 s2)
-
-  lemma suffixof_empty: forall s2.
-    suffixof "" s2
-
-  lemma suffiof_empty2: forall s1.
-    s1 <> empty -> not (suffixof s1 "")
-
   goal containsTest1: contains "" ""
-
-  lemma contains_empty: forall s2.
-    not (contains "" s2) || s2 = empty
-
-  lemma contains_empty2: forall s1.
-    contains s1 ""
-
-  lemma contains_substring: forall s1 s2 i.
-    substring s1 i (length s2) = s2 -> contains s1 s2
-
-  lemma contains_concat: forall s1 s2.
-    contains (concat s1 s2) s1 && contains (concat s1 s2) s2
 
   goal substring_contains: forall s1 s2.
     contains s1 s2 -> exists i. substring s1 i (length s2) = s2
@@ -188,38 +105,6 @@ module Harness
   goal TestIndexof11: forall s1.
     indexof s1 "" 0 = 0
 
-  lemma indexof_empty: forall s i.
-    0 <= i <= length s -> indexof s "" i = i
-
-  lemma indexof_empty1: forall s.
-    indexof "" s 0 = -1 || s = ""
-
-  lemma indexof_contains: forall s1 s2.
-    let j = indexof s1 s2 0 in
-    contains s1 s2 && s2 <> empty ->
-      0 <= j <= length s1 && substring s1 j (length s2) = s2
-
-  lemma contains_indexof: forall s1 s2 i.
-    0 <= indexof s1 s2 i -> contains s1 s2
-
-  lemma not_contains_indexof: forall s1 s2 i.
-    not (contains s1 s2)  -> indexof s1 s2 i = -1
-
-  lemma substring_indexof: forall s1 s2 i.
-    let j = indexof s1 s2 i in
-    j >= 0 -> substring s1 j (length s2) = s2
-
-  lemma indexof_out_of_range: forall i s1 s2.
-    not (0 <= i <= length s1) -> indexof s1 s2 i = -1
-
-  lemma indexof_in_range: forall s1 s2 i.
-    let j = indexof s1 s2 i in
-    0 <= i <= length s1 -> j = -1 || i <= j <= length s1
-
-  lemma indexof_contains_substring: forall s1 s2 i.
-    0 <= i <= length s1 && contains (substring s1 i (length s1 - i)) s2 ->
-      i <= indexof s1 s2 i <= length s1
-
   goal TestReplace1: forall s2 s3.
    s2 <> "" -> replace "" s2 s3 = ""
 
@@ -235,37 +120,30 @@ module Harness
   goal TestReplace5:
    replace "abcdefabcdef" "bc" "123" = "a123defabcdef"
 
-  lemma not_contains_replace: forall s1 s2 s3.
-    not (contains s1 s2) -> replace s1 s2 s3 = s1
+  goal TestIsDigit:
+    is_digit "0" && is_digit "1" && is_digit "2" && is_digit "3" &&
+    is_digit "4" && is_digit "5" && is_digit "6" && is_digit "7" &&
+    is_digit "8" && is_digit "9"
 
-  lemma replace_empty: forall s1 s3.
-    replace s1 "" s3 = concat s3 s1
+  goal TestIsDigit2:
+    not (is_digit "00") && not (is_digit "q") && not (is_digit "-1") &&
+    not (is_digit "10") && not (is_digit "!") && not (is_digit "\xAA")
 
-  lemma replace_empty2: forall s2 s3.
-    let s4 = replace "" s2 s3 in
-    if s2 = empty then s4 = s3 else s4 = empty
-
-  lemma replace_substring_indexof: forall s1 s2 s3.
-    let j = indexof s1 s2 0 in
-    replace s1 s2 s3 =
-      if j < 0 then s1 else
-        concat (concat (substring s1 0 j)
-                       s3)
-                (substring s1 (j + length s2) (length s1 - j - length s2))
-
-  lemma not_contains_replaceall: forall s1 s2 s3.
-    not (contains s1 s2) -> replaceall s1 s2 s3 = s1
-
-  lemma replaceall_empty1: forall s1 s3.
-    replaceall s1 "" s3 = s1
-
-  goal TestTo_int: to_int "1" = 1
+  goal TestTo_int1: to_int "1" = 1
+  goal TestTo_int2: to_int "11" = 11
+  goal TestTo_int3: to_int "123" = 123
+  goal TestTo_int4: to_int "" = -1
+  goal TestTo_int5: to_int "a" = -1
+  goal TestTo_int6: to_int "-1" = -1
+  goal TestTo_int7: to_int "-2" = -1
+  goal TestTo_int8: to_int "-11" = -1
+  goal TestTo_int9: to_int "1a1" = -1
 
   goal TestFrom_int: from_int 1 = "1"
 
 end
 
-module HarnessRegExpr
+module TestRegExpr
   use string.String as S
   use string.RegExpr
 
