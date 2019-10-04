@@ -93,55 +93,59 @@ let pp_ident fmt id =
 let pp_asref fmt qid =
   fprintf fmt "@[<h>&%a@]" pp_qualid qid
 
-let pp_idapp pp fmt qid xs =
+let parens pp fmt =
+  fprintf fmt "@[<hv 1>(%a)@]" pp
+
+let pp_idapp pp' fmt qid xs =
+  let pp = parens pp' in
   match qid with
   | Qident id ->
       (match sn_decode id.id_str, xs with
        | SNword s, _ ->
            let pp_args = pp_print_list ~pp_sep:(pp_sep "@ ") pp in
-           fprintf fmt "@[<hv 2>(%s@ %a)@]" s pp_args xs
+           fprintf fmt "@[<hv 2>%s@ %a@]" s pp_args xs
        | SNinfix s, [x1; x2] ->
-          fprintf fmt "@[<hv 2>(%a@ %s %a)@]" pp x1 s pp x2
+           fprintf fmt "@[<hv 2>%a@ %s %a@]" pp x1 s pp x2
        | SNprefix s, [x] -> (* TODO ??? *)
-           fprintf fmt "@[<h>(%s) %a@]" s pp x
+           fprintf fmt "@[<h>%s@ %a@]" s pp x
        | SNtight s, [x] ->
-          fprintf fmt "@[<h>(%s %a)@]" s pp x
+           fprintf fmt "@[<h>%s@ %a@]" s pp x
        | SNget s, [x1; x2] ->
-          fprintf fmt "@[<h>(%a[%a]%s)@]" pp x1 pp x2 s
+           fprintf fmt "@[<hv 1>%a[%a]%s@]" pp x1 pp' x2 s
        | SNset s, [x1; x2; x3] ->
-          fprintf fmt "@[<h>(%a[%a]%s <- %a)@]" pp x1 pp x2 s pp x3
+           fprintf fmt "@[<hv 1>%a[%a]%s <- %a@]" pp x1 pp' x2 s pp x3
        | SNupdate s, [x1; x2; x3] ->
-          fprintf fmt "@[<h>(%a[%a <- %a]%s)@]" pp x1 pp x2 pp x3 s
+           fprintf fmt "@[<h>%a[%a <- %a]%s@]" pp x1 pp' x2 pp' x3 s
        | SNcut s, [x] ->
-          fprintf fmt "@[<h>(%a[..]%s)@]" pp x s
+           fprintf fmt "@[<h>%a[..]%s@]" pp x s
        | SNlcut s, [x1; x2] ->
-          fprintf fmt "@[<h>(%a[.. %a]%s)@]" pp x1 pp x2 s
+           fprintf fmt "@[<h>%a[.. %a]%s@]" pp x1 pp' x2 s
        | SNrcut s, [x1; x2] ->
-          fprintf fmt "@[<h>(%a[%a ..]%s)@]" pp x1 pp x2 s
+           fprintf fmt "@[<h>%a[%a ..]%s@]" pp x1 pp' x2 s
        | _ -> failwith "pp_expr")
   | _ ->
       let pp_args = pp_print_list ~pp_sep:pp_print_space pp in
-      fprintf fmt "@[<hv 2>(%a@ %a)@]" pp_qualid qid pp_args xs
+      fprintf fmt "@[<hv 3>%a@ %a@]" pp_qualid qid pp_args xs
 
 let pp_apply pp fmt x1 x2 =
-  fprintf fmt "@[<hv 2>(%a@ %a)@]" pp x1 pp x2
+  fprintf fmt "@[<hv 3>(%a)@ (%a)@]" pp x1 pp x2
 
 let pp_infix pp fmt x1 op x2 =
   let op =
     match sn_decode op.id_str with
     | SNinfix s -> s
     | _ -> failwith ("pp_infix: "^op.id_str) in
-  fprintf fmt "@[<hv 2>(%a@ %s %a)@]" pp x1 op pp x2
+  fprintf fmt "@[<hv 3>(%a)@ %s (%a)@]" pp x1 op pp x2
 
 let pp_not pp fmt x =
-  fprintf fmt "@[<h>(not@ %a)@]" pp x
+  fprintf fmt "@[<h>not@ (%a)@]" pp x
 
 let pp_scope pp fmt qid x =
   fprintf fmt "@[<hv 2>%a.(%a)@]" pp_qualid qid pp x
 
 let pp_tuple pp fmt xs =
-  let pp_xs = pp_print_list ~pp_sep:(pp_sep ", ") pp in
-  fprintf fmt "@[<hv 2>(%a)@]" pp_xs xs
+  let pp_xs = pp_print_list ~pp_sep:(pp_sep ",@ ") pp in
+  fprintf fmt "@[<hv 1>(%a)@]" pp_xs xs
 
 let pp_field pp fmt (qid, x) =
   fprintf fmt "@[<hv 2>%a =@ %a@]" pp_qualid qid pp x
@@ -162,13 +166,13 @@ let rec pp_pty fmt = function
       pp_qualid fmt qid
   | PTtyapp (qid, ptys) ->
       let pp_ptys = pp_print_list ~pp_sep:(pp_sep " ") pp_pty in
-      fprintf fmt "@[<hv 2>(%a@ %a)@]" pp_qualid qid pp_ptys ptys
+      fprintf fmt "@[<hv 2>%a@ (%a)@]" pp_qualid qid pp_ptys ptys
   | PTtuple ptys ->
       pp_tuple pp_pty fmt ptys
   | PTref _ptys ->
       todo fmt "PTref"
   | PTarrow (pty1, pty2) ->
-      fprintf fmt "%a -> %a" pp_pty pty1 pp_pty pty2
+      fprintf fmt "@[<hv 2>(%a) ->@ (%a)@]" pp_pty pty1 pp_pty pty2
   | PTscope (qid, pty) ->
       pp_scope pp_pty fmt qid pty
   | PTparen pty ->
@@ -199,7 +203,7 @@ let pp_params fmt =
   pp_print_opt_list ~prefix:" " pp_param fmt
 
 let pp_if pp fmt x1 x2 x3 =
-  fprintf fmt "@[(@[<hv 2>if %a@]@ @[<hv 2>then %a@]@ @[<hv 2>else %a@])@]" pp x1 pp x2 pp x3
+  fprintf fmt "@[@[<hv 2>if %a@]@ @[<hv 2>then %a@]@ @[<hv 2>else %a@]@]" pp x1 pp x2 pp x3
 
 let pp_cast pp fmt x pty =
   fprintf fmt "(%a : %a)" pp x pp_pty pty
@@ -221,23 +225,21 @@ let pp_exn fmt (id, pty, _mask) =
 
 let pp_match pp pp_pattern fmt x cases xcases =
   let pp_reg_branch fmt (p, x) =
-    fprintf fmt "@ | %a -> %a" pp_pattern p pp x in
+    fprintf fmt "@[<hv 2>%a ->@ %a@]" pp_pattern p pp x in
   let pp_exn_branch fmt (qid, p_opt, x) =
     let pp_p_opt fmt = function
       | None -> ()
       | Some p -> fprintf fmt " %a" pp_pattern p in
-    fprintf fmt " | exception %a%a -> %a" pp_qualid qid pp_p_opt p_opt pp x in
-  fprintf fmt "@[(@[<hv 2>match@ %a@]@ @[<hv 2>with@ %a%a@]@ end)@]"
+    fprintf fmt "@[<hv 2>%a%a -> %a@]" pp_qualid qid pp_p_opt p_opt pp x in
+  fprintf fmt "@[@[<hv 2>match@ %a@]@ @[<hv 2>with@ | %a%a@]@ end@]"
     pp x
-    (pp_print_opt_list ~prefix:" " pp_reg_branch) cases
-    (pp_print_opt_list ~prefix:" " pp_exn_branch) xcases
+    (pp_print_list ~pp_sep:(pp_sep "@ | ") pp_reg_branch) cases
+    (pp_print_list ~pp_sep:(pp_sep "@ | exception ") pp_exn_branch) xcases
 
 let pp_let pp fmt (id, ghost, _kind, x) =
   (* TODO kind *)
-  let pp_ghost fmt = function
-    | false -> ()
-    | true -> pp_print_string fmt " ghost" in
-  fprintf fmt "@[<hv 2>let%a %a =@ %a@]" pp_ghost ghost pp_id id pp x
+  let ghost = if ghost then " ghost" else "" in
+  fprintf fmt "@[<hv 2>let%s %a =@ %a@]" ghost pp_id id pp x
 
 let kind_suffix = function
   | Expr.RKnone
@@ -267,6 +269,7 @@ and pp_let_any fmt (id, ghost, kind, (params, _kind', opt_pty, _mask, spec)) =
 
 and pp_fundef fmt (id, ghost, kind, binders, pty_opt, _mask, spec, e) =
   (* TODO mask *)
+  fprintf fmt "@[<hv 2>";
   pp_print_string fmt (ghost_suffix ghost);
   pp_print_string fmt (kind_suffix kind);
   pp_id fmt id;
@@ -275,7 +278,7 @@ and pp_fundef fmt (id, ghost, kind, binders, pty_opt, _mask, spec, e) =
    | None -> ()
    | Some pty -> fprintf fmt " : %a" pp_pty pty);
   pp_spec fmt spec;
-  fprintf fmt " = %a" pp_expr e
+  fprintf fmt " =@ %a@]" pp_expr e;
 
 and pp_variant fmt (t, qid_opt) =
   let pp_optwith fmt = function
@@ -315,19 +318,19 @@ and pp_expr fmt e = match e.expr_desc with
   | Einnfix (e1, op, e2) ->
       pp_infix pp_expr fmt e1 op e2 (* TODO ??? *)
   | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, mask, spec, e1)}, e2) ->
-      fprintf fmt "@[%a in %a@]"
+      fprintf fmt "@[<v>%a in@ %a@]"
         (pp_let_fun pp_expr) (id, ghost, kind, (binders, pty_opt, mask, spec, e1))
         pp_expr e2
   | Elet (id, ghost, kind, {expr_desc=Eany (params, kind', pty_opt, mask, spec)}, e2) ->
-    fprintf fmt "@[%a in %a@]"
+    fprintf fmt "@[<v>%a in@ %a@]"
       pp_let_any (id, ghost, kind, (params, kind', pty_opt, mask, spec))
       pp_expr e2
   | Elet (id, ghost, kind, e1, e2) ->
-      fprintf fmt "@[(%a in@ %a)@]" (pp_let pp_expr) (id, ghost, kind, e1) pp_expr e2
+      fprintf fmt "@[<v>%a in@ %a@]" (pp_let pp_expr) (id, ghost, kind, e1) pp_expr e2
   | Erec (defs, e) ->
       let pp_fundefs =
-        pp_print_list ~pp_sep:(pp_sep " and ") pp_fundef in
-      fprintf fmt "let rec %a in %a" pp_fundefs defs pp_expr e
+        pp_print_list ~pp_sep:(pp_sep "@ and ") pp_fundef in
+      fprintf fmt "@[<v>let rec %a in@ %a@]" pp_fundefs defs pp_expr e
   | Efun _ ->
       todo fmt "Efun"
   | Eany _ ->
@@ -339,23 +342,23 @@ and pp_expr fmt e = match e.expr_desc with
   | Eupdate (e, fs) ->
       pp_update pp_expr fmt e fs
   | Eassign [e1, None, e2] ->
-      fprintf fmt "@[<hv 2>(%a <-@ %a)@]" pp_expr e1 pp_expr e2
+      fprintf fmt "@[<hv 2>(%a) <-@ (%a)@]" pp_expr e1 pp_expr e2
   | Eassign [e1, Some qid, e2] ->
-      fprintf fmt "@[<hv 2>(%a.%a <-@ %a)@]" pp_expr e1 pp_qualid qid pp_expr e2
+      fprintf fmt "@[<hv 2>(%a).%a <-@ (%a)@]" pp_expr e1 pp_qualid qid pp_expr e2
   | Eassign _ ->
       todo fmt "Eassign"
   (** control *)
   | Esequence (e1, e2) ->
-      fprintf fmt "@[<v>let _ = %a in@ %a@]" pp_expr e1 pp_expr e2
+      fprintf fmt "@[<v>%a;@ %a@]" pp_expr e1 pp_expr e2
   | Eif (e1, e2, e3) ->
       pp_if pp_expr fmt e1 e2 e3
   | Ewhile (e1, invs, vars, e2) ->
     fprintf fmt "@[<v>@[<hv 2>while@ %a@] do@,  @[<hv>%a%a%a@]@,done@]"
       pp_expr e1 pp_variants vars pp_invariants invs pp_expr e2
   | Eand (e1, e2) ->
-      fprintf fmt "@[(@[<hv 2>%a@]@ @[<hv 2> &&@ %a@])@]" pp_expr e1 pp_expr e2
+      fprintf fmt "@[@[<hv 3>(%a)@]@ @[<hv 3> &&@ (%a)@]@]" pp_expr e1 pp_expr e2
   | Eor (e1, e2) ->
-      fprintf fmt "@[(@[<hv 2>%a@]@ @[<hv 2> ||@ %a@])@]" pp_expr e1 pp_expr e2
+      fprintf fmt "@[@[<hv 3>(%a)@]@ @[<hv 3> ||@ (%a)@]@]" pp_expr e1 pp_expr e2
   | Enot e ->
       pp_not pp_expr fmt e
   | Ematch (e, [], xcases) ->
@@ -373,7 +376,7 @@ and pp_expr fmt e = match e.expr_desc with
   | Eabsurd ->
       pp_print_string fmt "absurd"
   | Epure t ->
-      fprintf fmt "@[<hv 2>pure {@ %a }@]" pp_term t
+      fprintf fmt "@[@[<hv 2>pure {@ %a@] }@]" pp_term t
   | Eidpur _ ->
       todo fmt "Eidpur"
   | Eraise (Qident {id_str="'Return"|"'Break"|"'Continue" as str}, opt_arg) ->
@@ -466,7 +469,7 @@ and pp_term fmt t =
   | Tinnfix (t1, op, t2) ->
       pp_infix pp_term fmt t1 op t2 (* TODO ??? *)
   | Tbinop (t1, op, t2) ->
-      fprintf fmt "@[<hv 2>(%a %a@ %a)@]" pp_term t1 pp_binop op pp_term t2
+      fprintf fmt "@[<hv 2>(%a) %a@ (%a)@]" pp_term t1 pp_binop op pp_term t2
   | Tbinnop _ ->
       todo fmt "Tbinnop"
   | Tnot t ->
@@ -481,7 +484,7 @@ and pp_term fmt t =
   | Tattr (attr, t) ->
       pp_attr pp_term fmt attr t
   | Tlet (id, t1, t2) ->
-      pp_let pp_term fmt (id, false, t1, t2)
+      fprintf fmt "@[<v>%a in@ %a@]" (pp_let pp_term) (id, false, ((**)), t1) pp_term t2
   | Tcase (t, cases) ->
       pp_match pp_term pp_pattern fmt t cases []
   | Tcast (t, pty) ->
@@ -542,7 +545,7 @@ and pp_pattern fmt p =
       let pp_ghost fmt = function
         | false -> ()
         | true -> pp_print_string fmt " ghost" in
-      fprintf fmt "%a as %a%a" pp_pattern p pp_id id pp_ghost ghost
+      fprintf fmt "@[<hv 1>(%a@]) as@ %a%a" pp_pattern p pp_id id pp_ghost ghost
   | Por (p1, p2) ->
       fprintf fmt "%a | %a" pp_pattern p1 pp_pattern p2
   | Pcast (p, pty) ->
@@ -552,7 +555,7 @@ and pp_pattern fmt p =
   | Pparen p ->
       fprintf fmt "(%a)" pp_pattern p
   | Pghost p ->
-      fprintf fmt "ghost %a" pp_pattern p
+      fprintf fmt "[@<h>ghost@ %a@]" pp_pattern p
 
 and pp_type_decl fmt d =
   let pp_def fmt = function
