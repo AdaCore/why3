@@ -167,14 +167,14 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
         fprintf fmt "%a%a" (pp_command ~arity) str
           (pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_pattern)) ps
     | Prec fs ->
-        fprintf fmt "\\texttt{\\{}%a\texttt{\\}}"
+        fprintf fmt "\\texttt{\\{}%a\\texttt{\\}}"
           (pp_print_list ~pp_sep:(pp_str "\\texttt{;} ") (pp_field pp_pattern)) fs
     | Ptuple ps ->
         fprintf fmt "(%a)" (pp_print_list ~pp_sep:(pp_str ", ") pp_pattern) ps
     | Pas (p, id, _) ->
-        fprintf fmt "%a \texttt{as} %a" pp_pattern p pp_var id
+        fprintf fmt "%a \\texttt{as} %a" pp_pattern p pp_var id
     | Por (p1, p2) ->
-        fprintf fmt "%a \texttt{|} %a" pp_pattern p1 pp_pattern p2
+        fprintf fmt "%a \\texttt{|} %a" pp_pattern p1 pp_pattern p2
     | Pcast (p, ty) ->
         fprintf fmt "%a : %a" pp_pattern p pp_type ty
     | Pscope (_, p) ->
@@ -285,7 +285,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
         fprintf fmt "\\texttt{match}~%a~\\texttt{with}~%a" pp_term t
           (pp_print_list ~pp_sep pp_branch) bs
     | Tcast (t, ty) ->
-        fprintf fmt "%a \texttt{:} %a" pp_term t pp_type ty
+        fprintf fmt "%a \\texttt{:} %a" pp_term t pp_type ty
     | Ttuple ts ->
         fprintf fmt "(%a)" (pp_print_list ~pp_sep:(pp_str ", ") pp_term) ts
     | Trecord fs ->
