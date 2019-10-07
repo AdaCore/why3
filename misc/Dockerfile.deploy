@@ -1,15 +1,30 @@
-FROM bench-image-system-stable
+FROM debian:stable
 
 USER root
 
+# install dependencies
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -yq && \
+    apt-get upgrade -yq --with-new-pkgs --auto-remove && \
+    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module build-essential autoconf automake ocaml-nox ca-certificates xauth unzip && \
+    apt-get clean
+
+RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.0/opam-2.0.0-x86_64-linux -O /usr/local/bin/opam && \
+    chmod a+x /usr/local/bin/opam
+
+# create user
 RUN adduser --disabled-password --gecos '' guest
+USER guest
+ENV HOME /home/guest
 
-USER why3
+RUN opam init -y --auto-setup -j1 --compiler=ocaml-system --disable-sandboxing && \
+    opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo && \
+    opam clean -a
 
-COPY --chown=why3:why3 . why3
-WORKDIR /home/why3/why3
-
-RUN eval `opam config env` && \
+COPY --chown=guest:guest . /home/guest/why3
+WORKDIR /home/guest/why3
+RUN eval `opam env` && \
+    ./autogen.sh && \
     ./configure && \
     make
 
@@ -18,7 +33,6 @@ USER root
 RUN make install
 
 USER guest
-ENV HOME /home/guest
 WORKDIR /home/guest
 
 RUN why3 config --detect
