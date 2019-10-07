@@ -1205,8 +1205,8 @@ let load_theory ~version session parent_name old_provers (path,acc) th =
 let load_file ~version session old_provers f =
   match f.Xml.name with
   | "file" ->
+    (* This "name" attribute only exists in old sessions *)
     let fn = string_attribute_opt "name" f in
-    let fmt = string_attribute_def "format" f Lexer.whyml_format in
     let fid = gen_fileID session in
     let path,ft =
       List.fold_left
@@ -1222,6 +1222,12 @@ let load_file ~version session old_provers f =
         | None -> assert false
       else path
     in
+    let fmt =
+      (* If the session is ill-formed and the format is absent, we use the
+         extension to decide the format *)
+      let def_fmt =
+        Env.get_format (Format.asprintf "%a" Sysutil.print_file_path path) in
+      string_attribute_def "format" f def_fmt in
     let mf = { file_id = fid;
                file_path = path;
                file_format = fmt;
