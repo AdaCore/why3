@@ -20,16 +20,10 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
 
   let sanitize =
     let my_char_to_alpha = function
-      (* | '_' | '.' -> "" *)
+      | '_' -> ""
       | c -> char_to_alpha c
     in
     sanitizer my_char_to_alpha my_char_to_alpha
-
-  let sanitize2 =
-    let aux = function
-      | '_' -> "" (* "\\_" *)
-      | c -> char_to_alpha c in
-    sanitizer aux aux
 
   let sanitize_op = function
     | "<>" -> "\\neq"
@@ -113,7 +107,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
         fprintf fmt "(%a)" (pp_print_list ~pp_sep:(pp_str ", ") pp_print_string) args in
     fprintf fmt "%s\\newcommand{%a}[%d]{\\mathsf{%s}%a}@."
       (if comment_macros then "% " else "")
-      (pp_command' ~suffix:"") name arity (sanitize2 name') pp_args arity
+      (pp_command' ~suffix:"") name arity (sanitize name') pp_args arity
 
   (** {2 Pretty-print inductive definition to latex }*)
 
