@@ -45,7 +45,7 @@ ENV HOME /home/why3
 WORKDIR /home/why3
 
 # install opam
-ENV OPAM_PACKAGES="menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo"
+ENV OPAM_PACKAGES="menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo.2.3.0"
 RUN opam init -y --no-setup -j1 --compiler=ocaml-system --disable-sandboxing && \
     opam install -y $OPAM_PACKAGES && \
     opam switch create 4.05.0 ocaml-base-compiler.4.05.0 && opam install -y $OPAM_PACKAGES && \
@@ -56,8 +56,8 @@ RUN opam init -y --no-setup -j1 --compiler=ocaml-system --disable-sandboxing && 
     opam switch create bench  ocaml-base-compiler.4.05.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create full   ocaml-base-compiler.4.07.1 && opam install -y $OPAM_PACKAGES && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
-    opam install -y --switch=bench alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.2 coq-flocq.3.1.0 && \
-    opam install -y --switch=full alt-ergo.2.0.0 coq-flocq.3.1.0 js_of_ocaml-ppx && \
+    opam install -y --switch=bench zenon.0.8.0 coq.8.7.2 coq-flocq.3.1.0 && \
+    opam install -y --switch=full coq-flocq.3.1.0 js_of_ocaml-ppx && \
     opam clean -a
 
 RUN opam switch ocaml-system
