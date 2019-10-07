@@ -216,8 +216,10 @@ LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer dri
 		parse_smtv2_model
 
 LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
-          pinterp mltree compile mlinterp pdriver cprinter ml_printer \
-	  ocaml_printer cakeml_printer
+          pinterp
+
+LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
+              c ocaml cakeml
 
 LIB_PARSER = ptree glob typing parser_messages parser typing report lexer mlw_printer
 
@@ -253,12 +255,13 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/mlw/, $(LIB_MLW)) \
+	      $(addprefix src/extract/, $(LIB_EXTRACT)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
 	      $(addprefix src/session/, $(LIB_SESSION))
 
-LIBDIRS = util core driver mlw parser transform printer session
+LIBDIRS = util core driver mlw extract parser transform printer session
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 LIBDEP = $(addsuffix .dep, $(LIBMODULES))
@@ -321,10 +324,11 @@ ifeq (@enable_ppx@,yes)
 src/util/ppx_debug_optim: src/util/debug_optim.ml
 	$(SHOW) 'Linking $@'
 	$(HIDE) $(OCAMLFIND) opt -package compiler-libs.common -linkpkg src/util/debug_optim.ml -o $@
+
 src/transform/reflection.cmx: src/util/ppx_debug_optim
 src/transform/reflection.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
-src/mlw/mlinterp.cmx: src/util/ppx_debug_optim
-src/mlw/mlinterp.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
+src/extract/mlinterp.cmx: src/util/ppx_debug_optim
+src/extract/mlinterp.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
 
 clean::
 	rm -f src/util/ppx_debug_optim
