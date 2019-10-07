@@ -252,7 +252,8 @@ let ghost_suffix = function
   | true -> " ghost"
   | false -> ""
 
-let rec pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, _mask, spec, x)) =
+let rec pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, _pat, _mask, spec, x)) =
+  (* TODO _pat, _mask *)
   let pp_opt_pty fmt = function
     | None -> ()
     | Some pty -> fprintf fmt " : %a" pp_pty pty in
@@ -260,15 +261,15 @@ let rec pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, _mask, spec, x)) 
     (ghost_suffix ghost) (kind_suffix kind)
     pp_id id pp_binders binders pp_opt_pty opt_pty pp_spec spec pp x
 
-and pp_let_any fmt (id, ghost, kind, (params, _kind', opt_pty, _mask, spec)) =
-  (* TODO kind', mask *)
+and pp_let_any fmt (id, ghost, kind, (params, _kind', opt_pty, _pat, _mask, spec)) =
+  (* TODO kind', mask, pat *)
   let pp_opt_pty fmt = function
     | None -> ()
     | Some pty -> fprintf fmt " : %a" pp_pty pty in
   fprintf fmt "@[<hv 2>val%s%s %a%a%a%a@]" (ghost_suffix ghost) (kind_suffix kind) pp_id id pp_params params pp_opt_pty opt_pty pp_spec spec
 
-and pp_fundef fmt (id, ghost, kind, binders, pty_opt, _mask, spec, e) =
-  (* TODO mask *)
+and pp_fundef fmt (id, ghost, kind, binders, pty_opt, _pat, _mask, spec, e) =
+  (* TODO mask, pat *)
   fprintf fmt "@[<hv 2>";
   pp_print_string fmt (ghost_suffix ghost);
   pp_print_string fmt (kind_suffix kind);
@@ -317,14 +318,16 @@ and pp_expr fmt e = match e.expr_desc with
       pp_infix pp_expr fmt e1 op e2
   | Einnfix (e1, op, e2) ->
       pp_infix pp_expr fmt e1 op e2 (* TODO ??? *)
-  | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, mask, spec, e1)}, e2) ->
+  | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e1)}, e2) ->
+      (* TODO _pat *)
       fprintf fmt "@[<v>%a in@ %a@]"
-        (pp_let_fun pp_expr) (id, ghost, kind, (binders, pty_opt, mask, spec, e1))
+        (pp_let_fun pp_expr) (id, ghost, kind, (binders, pty_opt, pat, mask, spec, e1))
         pp_expr e2
-  | Elet (id, ghost, kind, {expr_desc=Eany (params, kind', pty_opt, mask, spec)}, e2) ->
-    fprintf fmt "@[<v>%a in@ %a@]"
-      pp_let_any (id, ghost, kind, (params, kind', pty_opt, mask, spec))
-      pp_expr e2
+  | Elet (id, ghost, kind, {expr_desc=Eany (params, kind', pty_opt, pat, mask, spec)}, e2) ->
+      (* TODO _pat *)
+      fprintf fmt "@[<v>%a in@ %a@]"
+        pp_let_any (id, ghost, kind, (params, kind', pty_opt, pat, mask, spec))
+        pp_expr e2
   | Elet (id, ghost, kind, e1, e2) ->
       fprintf fmt "@[<v>%a in@ %a@]" (pp_let pp_expr) (id, ghost, kind, e1) pp_expr e2
   | Erec (defs, e) ->
@@ -632,10 +635,10 @@ and pp_decl fmt = function
         | Decl.Paxiom -> "axiom"
         | Decl.Pgoal -> "goal" in
       fprintf fmt "%s %a = %a" keyword pp_id id pp_term t
-  | Dlet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, mask, spec, e)}) ->
-      pp_let_fun pp_expr fmt (id, ghost, kind, (binders, pty_opt, mask, spec, e))
-  | Dlet (id, ghost, kind, {expr_desc=Eany (params, kind', pty_opt, mask, spec)}) ->
-    pp_let_any fmt (id, ghost, kind, (params, kind', pty_opt, mask, spec))
+  | Dlet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e)}) ->
+      pp_let_fun pp_expr fmt (id, ghost, kind, (binders, pty_opt, pat, mask, spec, e))
+  | Dlet (id, ghost, kind, {expr_desc=Eany (params, kind', pty_opt, pat, mask, spec)}) ->
+    pp_let_any fmt (id, ghost, kind, (params, kind', pty_opt, pat, mask, spec))
   | Dlet (id, ghost, kind, e) ->
       pp_let pp_expr fmt (id, ghost, kind, e)
   | Drec defs ->
