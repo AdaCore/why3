@@ -31,6 +31,12 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
       | c -> char_to_alpha c in
     sanitizer aux aux
 
+  let sanitize_op = function
+    | "<>" -> "\\neq"
+    | "^" -> "\\string^"
+    | "++" -> "\\mathbin{+\\mkern-10mu+}"
+    | s -> s
+
   (** Optionally extract trailing numbers and quotes, after an optional single or double
       underscore *)
   let split_base_suffixes str =
@@ -210,8 +216,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Tinfix (t1, id, t2) ->
         let op =
           match sn_decode id.id_str with
-          | SNinfix "<>" -> "\\neq"
-          | SNinfix op -> op
+          | SNinfix s -> sanitize_op s
           | _ -> failwith ("pp_term: op not infix: |"^id.id_str^"|") in
         fprintf fmt "%a %s %a" pp_term t1 op pp_term t2
     | Tbinop (t1, op, t2)
@@ -236,7 +241,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
              let pp_args = pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_term) in
              fprintf fmt "%a%a" (pp_command ~arity) s pp_args ts
          | SNinfix s, [t1; t2] ->
-             fprintf fmt "%a %s %a" pp_term t1 s pp_term t2
+             fprintf fmt "%a %s %a" pp_term t1 (sanitize_op s) pp_term t2
          | SNprefix s, [t]
          | SNtight s, [t] ->
              fprintf fmt "%s %a" s pp_term t
