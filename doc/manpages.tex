@@ -19,6 +19,8 @@ The following commands are available:
   input files.
 \item[\texttt{extract}] generates an OCaml program corresponding to
   \whyml input files.
+\item[\texttt{pp}] pretty print \whyml definitions (formatting mlw files
+  or printing inductive definitions to \LaTeX).
 \item[\texttt{ide}] provides a graphical interface to display goals
   and to run provers and transformations on them.
 \item[\texttt{prove}] reads \whyml input files and calls
@@ -1132,6 +1134,42 @@ A CSS file \verb|style.css| suitable for rendering is generated in the
 same directory as output files. This CSS style can be modified manually,
 since regenerating the HTML documentation will not overwrite an existing
 \verb|style.css| file.
+
+\section{The \texttt{pp} Command}
+
+This tool pretty prints Why3 declarations. Currenty it can be used to
+print \whyml inductive definitions to \LaTeX{} (using the
+\texttt{mathpartir} package), and to format \whyml source code.
+\index{latex@\texttt{pretty}}
+
+\subsection*{Usage}
+
+\texttt{why3 pp [-{}-output=latex|mlw] [-{}-kind=inductive] [-{}-prefix \textsl{<prefix>}]\\%
+  \indent \textsl{<filename>} \textsl{<file>}[.\textsl{<Module>}].\textsl{<ind\_type>} \ldots}
+
+\paragraph{Options}
+
+\begin{description}
+\item[\texttt{-{}-output=\textsl{<output>}}] Set the output format.
+  Currently, only the pretty printing to \LaTeX{} is supported using
+  \texttt{-{}-output=latex}, and formatting of \whyml source code using
+  \texttt{-{}-output=mlw}.
+\item[\texttt{-{}-kind=\textsl{<kind>}}] Set the syntactic kind to be
+  pretty printed. Currently, the only supported kind are inductive types
+  (\texttt{-{}-kind=inductive}) when using the \LaTeX-output
+  (\texttt{-{}-output=latex}).
+\item[\texttt{-{}-prefix=\textsl{<prefix>}}] Set the prefix for \LaTeX{}
+  commands to \texttt{\textsl{<prefix>}}. The default is \texttt{IND}.
+\item[\texttt{\textsl{<file>}[.\textsl{<Module>}].\textsl{<ind\_type>}}] One or
+  more inductive definitions for \texttt{-{}-output=latex} and
+  \texttt{-{}-kind=inductive}.
+\end{description}
+
+For the \LaTeX{} output, the typesetting of variables, record fields,
+and functions can be configured by \LaTeX{} commands. Dummy definitions
+of these commands are printed in comments and have to be defined by the
+user. Trailing digits and quotes are removed from the command names to
+reduce the number of commands.
 
 \section{The \texttt{execute} Command}
 \label{sec:why3execute}

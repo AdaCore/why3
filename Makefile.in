@@ -219,7 +219,7 @@ LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
           pinterp mltree compile mlinterp pdriver cprinter ml_printer \
 	  ocaml_printer cakeml_printer
 
-LIB_PARSER = ptree glob typing parser_messages parser typing report lexer
+LIB_PARSER = ptree glob typing parser_messages parser typing report lexer mlw_printer
 
 LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper detect_polymorphism reduction_engine compute \
@@ -1523,6 +1523,51 @@ clean::
 
 endif
 
+###############
+# Why3 pp
+###############
+
+PRETTYPRINT_FILES = why3pp
+
+PRETTYPRINTMODULES = $(addprefix src/tools/, $(PRETTYPRINT_FILES))
+
+PRETTYPRINTDEP = $(addsuffix .dep, $(PRETTYPRINTMODULES))
+PRETTYPRINTCMO = $(addsuffix .cmo, $(PRETTYPRINTMODULES))
+PRETTYPRINTCMX = $(addsuffix .cmx, $(PRETTYPRINTMODULES))
+
+$(PRETTYPRINTDEP): DEPFLAGS += -I src/tools
+$(PRETTYPRINTCMO) $(PRETTYPRINTCMX): INCLUDES += -I src/tools
+
+# build targets
+
+byte: bin/why3pp.byte
+opt:  bin/why3pp.opt
+
+bin/why3pp.opt: $(WHY3CMXA) $(PRETTYPRINTCMX)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
+
+bin/why3pp.byte: $(WHY3CMA) $(PRETTYPRINTCMO)
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+
+# depend and clean targets
+
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+-include $(PRETTYPRINTDEP)
+endif
+
+depend: $(PRETTYPRINTDEP)
+
+uninstall-bin::
+	rm -f $(TOOLDIR)/why3pp(EXE)
+
+install-bin::
+	$(MKDIR_P) $(TOOLDIR)
+	$(INSTALL) bin/why3pp.@OCAMLBEST@ $(TOOLDIR)/why3pp$(EXE)
+
+install_local:: bin/why3pp
+
 #########
 # why3doc
 #########
@@ -2198,6 +2243,10 @@ clean::
 %.cmx: %.ml %.mli
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
+
+# src/tools/why3pretty.cmx: %.cmx: %.ml
+# 	$(SHOW) 'Ocamlopt $<'
+# 	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
 
 %.cmx: %.ml
 	$(SHOW) 'Ocamlopt $<'

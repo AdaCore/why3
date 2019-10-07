@@ -279,7 +279,9 @@
 (* Entry points *)
 
 %start <Pmodule.pmodule Wstdlib.Mstr.t> mlw_file
+%start <Ptree.mlw_file> mlw_file_parsing_only
 %start <Ptree.term> term_eof
+%start <Ptree.decl> decl_eof
 %start <Ptree.qualid> qualid_eof
 %start <Ptree.qualid list> qualid_comma_list_eof
 %start <Ptree.term list> term_comma_list_eof
@@ -287,10 +289,14 @@
 
 %%
 
-(* parsing of a single term *)
+(* parsing of a single term or a single decl *)
 
 term_eof:
 | term EOF { $1 }
+
+decl_eof:
+| pure_decl EOF { $1 }
+| prog_decl EOF { $1 }
 
 (* Modules and scopes *)
 
@@ -302,17 +308,33 @@ mlw_file:
     { let loc = floc $startpos($3) $endpos($3) in
       Typing.close_module loc; Typing.close_file () }
 
+mlw_file_parsing_only:
+| EOF { (Modules([])) }
+| mlw_module_parsing_only mlw_module_no_decl_parsing_only* EOF { (Modules( [$1] @ $2)) }
+| module_decl_parsing_only module_decl_no_head_parsing_only* EOF { (Decls( [$1] @ $2)) }
+
 mlw_module:
 | module_head module_decl_no_head* END
     { Typing.close_module (floc $startpos($3) $endpos($3)) }
+
+mlw_module_parsing_only:
+| module_head_parsing_only module_decl_no_head_parsing_only* END { ($1,$2) }
 
 module_head:
 | THEORY attrs(uident_nq)  { Typing.open_module $2 }
 | MODULE attrs(uident_nq)  { Typing.open_module $2 }
 
+module_head_parsing_only:
+| THEORY attrs(uident_nq)  { $2 }
+| MODULE attrs(uident_nq)  { $2 }
+
 scope_head:
-| SCOPE boption(IMPORT) uident
+| SCOPE boption(IMPORT) attrs(uident_nq)
     { Typing.open_scope (floc $startpos $endpos) $3; $2 }
+
+scope_head_parsing_only:
+| SCOPE boption(IMPORT) attrs(uident_nq)
+    { let loc = floc $startpos $endpos in (loc, $2, $3) }
 
 module_decl:
 | scope_head module_decl* END
@@ -325,6 +347,15 @@ module_decl:
     }
 | use_clone { () }
 
+module_decl_parsing_only:
+| scope_head_parsing_only module_decl_parsing_only* END
+    { let loc,import,qid = $1 in (Dscope(loc,import,qid,$2))}
+| IMPORT uqualid { (Dimport $2) }
+| d = pure_decl | d = prog_decl | d = meta_decl { d }
+| use_clone_parsing_only { $1 }
+
+(* Do not open inside another module *)
+
 mlw_module_no_decl:
 | SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
    { let loc = floc $startpos $endpos in
@@ -332,11 +363,25 @@ mlw_module_no_decl:
 | mlw_module
    { $1 }
 
+mlw_module_no_decl_parsing_only:
+| SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| mlw_module_parsing_only
+   { $1 }
+
 module_decl_no_head:
 | THEORY | MODULE
    { let loc = floc $startpos $endpos in
      Loc.errorm ~loc "trying to open a module inside another module" }
 | module_decl
+   { $1 }
+
+module_decl_no_head_parsing_only:
+| THEORY | MODULE
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| module_decl_parsing_only
    { $1 }
 
 (* Use and clone *)
@@ -370,6 +415,22 @@ use_clone:
       let decl = Ptree.Dcloneimport(loc,import,$3,as_opt,$5) in
       Typing.add_decl loc decl
     }
+use_clone_parsing_only:
+| USE EXPORT tqualid
+    { (Duseexport $3) }
+| CLONE EXPORT tqualid clone_subst
+    { (Dcloneexport ($3, $4)) }
+| USE boption(IMPORT) m_as_list = comma_list1(use_as)
+    { let loc = floc $startpos $endpos in
+      let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
+      if $2 && not exists_as then Warning.emit ~loc
+        "the keyword `import' is redundant here and can be omitted";
+      (Duseimport (loc, $2, m_as_list)) }
+| CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
+    { let loc = floc $startpos $endpos in
+      if $2 && $4 = None then Warning.emit ~loc
+        "the keyword `import' is redundant here and can be omitted";
+      (Dcloneimport (loc, $2, $3, $4, $5)) }
 
 use_as:
 | n = tqualid q = option(preceded(AS, uident)) { (n, q) }

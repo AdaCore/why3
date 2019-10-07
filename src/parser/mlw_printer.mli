@@ -9,23 +9,16 @@
 (*                                                                  *)
 (********************************************************************)
 
-val parse_term : Lexing.lexbuf -> Ptree.term
+(** Pretty printing of Why3 parse trees ([Ptree]) as Why3 source code *)
 
-val parse_decl : Lexing.lexbuf -> Ptree.decl
+val pp_pattern : Format.formatter -> Ptree.pattern -> unit
 
-val parse_term_list: Lexing.lexbuf -> Ptree.term list
+val pp_expr : Format.formatter -> Ptree.expr -> unit
 
-val parse_qualid: Lexing.lexbuf -> Ptree.qualid
+val pp_term : Format.formatter -> Ptree.term -> unit
 
-val parse_list_qualid: Lexing.lexbuf -> Ptree.qualid list
+val pp_pty : Format.formatter -> Ptree.pty -> unit
 
-val parse_list_ident: Lexing.lexbuf -> Ptree.ident list
+val pp_decl : Format.formatter -> Ptree.decl -> unit
 
-val parse_mlw_file: Lexing.lexbuf -> Ptree.mlw_file
-
-(* Name of the registered format for whyml *)
-val whyml_format: Env.fformat
-
-(*
-val parse_program_file : Ptree.incremental -> Lexing.lexbuf -> unit
-*)
+val pp_mlw_file : Format.formatter -> Ptree.mlw_file -> unit
