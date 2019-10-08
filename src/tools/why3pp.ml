@@ -29,6 +29,8 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | "<>" -> "\\neq"
     | "^" -> "\\string^"
     | "++" -> "\\mathbin{+\\mkern-10mu+}"
+    | "<=" -> "\\le"
+    | ">=" -> "\\ge"
     | s -> s
 
   (** Optionally extract trailing numbers and quotes, after an optional single or double
