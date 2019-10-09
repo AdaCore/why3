@@ -1527,34 +1527,6 @@ end
          else
            true
 
-   (* This function takes a module and a qualification and it tries to
-      recover the oldest module (A.B.C.D -> A). *)
-   let traverse_modules (qualif: string list) pmod =
-     (* Heuristics to find modules used *)
-     let find_mod mod_units =
-       List.fold_left (fun acc mu -> match mu with
-           | Pmodule.Uuse pm   -> Some pm
-           | Pmodule.Uclone mi -> Some mi.Pmodule.mi_mod
-           | _                 -> acc) None mod_units in
-
-     let search_scope mod_units mod_name =
-       let found_mod = ref None in
-       List.iter (fun munit ->
-           match munit with
-           | Pmodule.Uscope (scope, munit_list) when scope = mod_name ->
-               found_mod := Some munit_list
-           | _ -> ()) mod_units;
-       match !found_mod with
-       | None -> None
-       | Some fm -> find_mod fm in
-
-     List.fold_left (fun pmod fst_mod ->
-         let mod_units = pmod.Pmodule.mod_units in
-         match search_scope mod_units fst_mod with
-         | None -> pmod (* Fallback on last module when one is not found *)
-         | Some new_pmod -> new_pmod)
-       pmod qualif
-
    (* Sends a notification of a location together with the file in which this
       location appear. (TODO: TBI only send the file if it is not in the
       session) *)
@@ -1565,32 +1537,49 @@ end
      P.notify (File_contents (f, s, format, true));
      P.notify (Ident_notif_loc loc)
 
+   let find_id_ns (ns_logic: Theory.namespace) (ns_prog: Pmodule.namespace) qs =
+     Pmodule.(Theory.(
+     begin match ns_find_ls ns_logic qs with
+     | ls -> ls.Term.ls_name
+     | exception Not_found ->
+         begin match ns_find_pr ns_logic qs with
+         | pr -> pr.Decl.pr_name
+         | exception Not_found ->
+             begin match ns_find_ts ns_logic qs with
+             | ty -> ty.Ty.ts_name
+             | exception Not_found ->
+                 begin match ns_find_pv ns_prog qs with
+                 | pv -> pv.Ity.pv_vs.Term.vs_name
+                 | exception Not_found ->
+                     begin match ns_find_its ns_prog qs with
+                     | ity -> ity.Ity.its_ts.Ty.ts_name
+                     | exception Not_found ->
+                         begin match ns_find_xs ns_prog qs with
+                         | xs -> xs.Ity.xs_name
+                         | exception Not_found ->
+                             begin match ns_find_rs ns_prog qs with
+                               | rs -> rs.Expr.rs_name
+                             end
+                         end
+                     end
+                 end
+             end
+         end
+     end))
+
    let find_ident d qualif (encaps_module: string) (f:string) (id: string) =
      try
        let (r, _) = Env.read_file Pmodule.mlw_language d.controller_env f in
        let pmod = Mstr.find encaps_module r in
-       (* Find the modules in which ident appear *)
-       let pmod = traverse_modules qualif pmod in
-       let mod_known = pmod.Pmodule.mod_known in
-       let find_ident = ref [] in
-       let () =
-         Ident.Mid.iter (fun id' _ -> if id'.Ident.id_string = id then
-                            find_ident := id' :: !find_ident) mod_known in
+       let ns_prog = pmod.Pmodule.mod_export in
+       let ns_logic = pmod.Pmodule.mod_theory.Theory.th_export in
+       let found_id = find_id_ns ns_logic ns_prog (qualif @ [id]) in
        let treat_ident found_id =
          match found_id.Ident.id_loc with
          | None -> P.notify (Message (Error "No location found on ident"))
          | Some loc ->
              notify_loc loc in
-       (match !find_ident with
-        | [found_id] ->
-            treat_ident found_id
-        | [] ->
-            let msg = "Ident not found: it may be a local ident" in
-            P.notify (Message (Error msg))
-        | _ ->
-            List.iter treat_ident !find_ident;
-            let msg = "Several Ident found: location may be imprecise" in
-            P.notify (Message (Error msg)))
+       treat_ident found_id
      with Not_found -> P.notify (Message (Error "Ident not found"))
 
    (* Locate a string in the task *)
