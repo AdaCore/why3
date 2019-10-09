@@ -649,127 +649,12 @@ let clear_tree_and_table goals_model =
      2.2.2.2.2 a scrolled window to hold the output of the commands
  *)
 
-(***********************************)
-(*    notebook on the top 2.2.2.1  *)
-(***********************************)
-
-(* notebook is composed of a Task page and several source files pages *)
-let notebook = GPack.notebook ~packing:vpan222#add ()
-
-let (_ : GtkSignal.id) =
-  vpan222#set_position gconfig.task_height;
-  notebook#misc#connect#size_allocate
-    ~callback:
-    (fun {Gtk.width=_w;Gtk.height=h} ->
-       gconfig.task_height <- h)
-
-(********************************)
-(* Task view (part of notebook) *)
-(********************************)
-
-let task_view =
-  let label = GMisc.label ~text:"Task" () in
-  let scrolled_task_view =
-    GBin.scrolled_window
-      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-      ~shadow_type:`ETCHED_OUT
-      ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
-    ()
-  in
-  GSourceView.source_view
-    ~editable:false
-    ~cursor_visible:true
-    ~show_line_numbers:true
-    ~packing:scrolled_task_view#add
-    ()
-
-let () = create_colors task_view
-
-let change_lang view lang =
-  let lang =
-    match lang with
-    | "python" -> why3py_lang
-    | _ -> why_lang in
-  view#source_buffer#set_language lang
-
-(* Creating a page for source code view *)
-let create_source_view =
-  (* Counter for pages *)
-  let n = ref 1 in
-  (* Create a page with tabname [f] and buffer equal to [content] in the
-     notebook. Also add a corresponding page in source_view_table. *)
-  let create_source_view f content f_format =
-    if not (Hstr.mem source_view_table f) then
-      begin
-        let label = GMisc.label ~text:(Filename.basename f) () in
-        label#misc#set_tooltip_markup f;
-        let source_page (*, scrolled_source_view*) =
-          !n (* , GPack.vbox ~homogeneous:false ~packing:
-            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) () *)
-        in
-        let scrolled_source_view =
-          GBin.scrolled_window
-            ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-            ~shadow_type:`ETCHED_OUT
-            (*    ~packing:scrolled_source_view#add*)
-            ~packing:
-            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
-            ()
-        in
-        let source_view =
-          GSourceView.source_view
-            ~auto_indent:gconfig.allow_source_editing
-            ~insert_spaces_instead_of_tabs:true ~tab_width:2
-            ~show_line_numbers:true
-            (* ~right_margin_position:80 ~show_right_margin:true *)
-            (* ~smart_home_end:true *)
-            ~editable:gconfig.allow_source_editing
-            ~packing:scrolled_source_view#add
-            () in
-        let has_changed = ref false in
-        Hstr.add source_view_table f (source_page, source_view, has_changed, label);
-        n := !n + 1;
-        source_view#source_buffer#begin_not_undoable_action ();
-        source_view#source_buffer#set_text content;
-        source_view#source_buffer#end_not_undoable_action ();
-        (* At initialization, file has not changed. When it changes, changes the
-           name of the tab and update has_changed boolean. *)
-        let (_: GtkSignal.id) = source_view#source_buffer#connect#changed
-          ~callback:(fun () ->
-            try
-              let _source_page, _source_view, has_changed, label =
-                Hstr.find source_view_table f in
-              update_label_change label;
-              has_changed := true;
-              ()
-            with Not_found -> () ) in
-        Gconfig.add_modifiable_mono_font_view source_view#misc;
-        change_lang source_view f_format;
-        (* We have to create the tags for background colors for each view.
-           They are not reusable from the other views.  *)
-        create_colors source_view;
-        Gconfig.set_fonts ();
-        (* Focusing on the tabs that was just added *)
-        notebook#goto_page (!n - 1)
-      end in
-  create_source_view
-
-(* This returns the source_view of a file *)
-let get_source_view (file: string) : GSourceView.source_view =
-  if file = "Task" then task_view else
-  match Hstr.find source_view_table file with
-  | (_, v, _, _) -> v
-  | exception Not_found -> raise (Nosourceview file)
-
-
-(* End of notebook *)
-
 (*
   2.2.2.2 a vertical pan which contains [vbox2222]
     2.2.2.2.1 the input field to type commands [hbox22221]
     2.2.2.2.2 a scrolled window to hold the output of the commands [message_zone]
 *)
-let vbox2222 = GPack.vbox ~packing:vpan222#add  ()
+let vbox2222 = GPack.vbox  ()
 
 (* 2.2.2.2.1 Horizontal box [hbox22221]
      [monitor] number of scheduled/running provers
@@ -962,8 +847,152 @@ let display_warnings () =
 let print_message ~kind ~notif_kind fmt =
   display_warnings (); print_message ~kind ~notif_kind fmt
 
+(***********************************)
+(*    notebook on the top 2.2.2.1  *)
+(***********************************)
+
+(* notebook is composed of a Task page and several source files pages *)
+let notebook = GPack.notebook ~packing:vpan222#add ()
+
+(* Pack vbox2222 after packing the notebook (for vertical order) *)
+let () = vpan222#add vbox2222#coerce
+
+let (_ : GtkSignal.id) =
+  vpan222#set_position gconfig.task_height;
+  notebook#misc#connect#size_allocate
+    ~callback:
+    (fun {Gtk.width=_w;Gtk.height=h} ->
+       gconfig.task_height <- h)
+
+(********************************)
+(* Task view (part of notebook) *)
+(********************************)
+
+let task_view =
+  let label = GMisc.label ~text:"Task" () in
+  let scrolled_task_view =
+    GBin.scrolled_window
+      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+      ~shadow_type:`ETCHED_OUT
+      ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
+    ()
+  in
+  GSourceView.source_view
+    ~editable:false
+    ~cursor_visible:true
+    ~show_line_numbers:true
+    ~packing:scrolled_task_view#add
+    ()
+
+let () = create_colors task_view
+
+let change_lang view lang =
+  let lang =
+    match lang with
+    | "python" -> why3py_lang
+    | _ -> why_lang in
+  view#source_buffer#set_language lang
+
+(* Create an eventbox for the title label of the notebook tab *)
+let create_eventbox ~read_only file =
+  let eventbox = GBin.event_box () in
+  let right_click_label_menu = GMenu.menu () in
+  (* Create a menu for this eventbox *)
+  let () =
+    let close_item = GMenu.menu_item ~label:"close" () in
+    if read_only then
+      let (_: GtkSignal.id) = close_item#connect#activate
+          ~callback:(fun () ->
+              match Hstr.find source_view_table file with
+              | exception Not_found ->
+                  print_message ~kind:1 ~notif_kind:"ide_error"
+                    "Error of the graphic interface: cannot find %s" file
+              | (page_number, _, _, _)  ->
+                  notebook#remove_page page_number;
+                  Hstr.remove source_view_table file) in
+      right_click_label_menu#append close_item in
+  (* Connect the menu in the eventbox *)
+  let (_: GtkSignal.id) =
+    eventbox#event#connect#button_press ~callback:(fun v ->
+        let n = GdkEvent.Button.button v in
+        if n = 3 then
+          right_click_label_menu#popup ~button:3 ~time:(GdkEvent.Button.time v);
+        false (* Allow other handlers *)
+      ) in
+  eventbox
+
+(* Create a page with tabname [f] and buffer equal to [content] in the
+   notebook. Also add a corresponding page in source_view_table. *)
+let create_source_view ~read_only f content f_format =
+  let markup_read_only txt =
+    "<span font-style=\"italic\">" ^ txt ^
+    "</span> <span font-weight=\"bold\">(read-only)</span>" in
+
+  if not (Hstr.mem source_view_table f) then
+    begin
+      let fl = Filename.basename f in
+      let markup_fl = if read_only then markup_read_only fl else fl in
+      let eventbox = create_eventbox ~read_only f in
+      let label = GMisc.label ~packing:(fun w -> eventbox#add w)
+          ~markup:markup_fl () in
+      label#misc#set_tooltip_markup f;
+      (* let source_page = !n in*)
+      let scrolled_source_view =
+        GBin.scrolled_window
+          ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+          ~shadow_type:`ETCHED_OUT
+          (*    ~packing:scrolled_source_view#add*)
+          () in
+      let source_page = notebook#append_page ~tab_label:eventbox#coerce
+          scrolled_source_view#coerce in
+      let editable = gconfig.allow_source_editing && (not read_only) in
+      let source_view =
+        GSourceView.source_view
+          ~auto_indent:editable
+          ~insert_spaces_instead_of_tabs:true ~tab_width:2
+          ~show_line_numbers:true
+          (* ~right_margin_position:80 ~show_right_margin:true *)
+          (* ~smart_home_end:true *)
+          ~editable:editable
+          ~packing:scrolled_source_view#add
+          () in
+      let has_changed = ref false in
+      Hstr.add source_view_table f (source_page, source_view, has_changed, label);
+      source_view#source_buffer#begin_not_undoable_action ();
+      source_view#source_buffer#set_text content;
+      source_view#source_buffer#end_not_undoable_action ();
+      (* At initialization, file has not changed. When it changes, changes the
+         name of the tab and update has_changed boolean. *)
+      let (_: GtkSignal.id) = source_view#source_buffer#connect#changed
+          ~callback:(fun () ->
+              try
+                let _source_page, _source_view, has_changed, label =
+                  Hstr.find source_view_table f in
+                if not read_only then
+                  begin
+                    update_label_change label;
+                    has_changed := true;
+                  end
+              with Not_found -> () ) in
+      Gconfig.add_modifiable_mono_font_view source_view#misc;
+      change_lang source_view f_format;
+      (* We have to create the tags for background colors for each view.
+         They are not reusable from the other views.  *)
+      create_colors source_view;
+      Gconfig.set_fonts ();
+      (* Focusing on the tabs that was just added *)
+      notebook#goto_page source_page
+    end
+
+(* This returns the source_view of a file *)
+let get_source_view (file: string) : GSourceView.source_view =
+  if file = "Task" then task_view else
+  match Hstr.find source_view_table file with
+  | (_, v, _, _) -> v
+  | exception Not_found -> raise (Nosourceview file)
 
 
+(* End of notebook *)
 
 (**** Monitor *****)
 
@@ -1044,21 +1073,22 @@ let find_current_file_view () =
     !acc
 
 (* Save the current location of the cursor to be reused after reload *)
-let save_cursor_loc () =
+let save_cursor_loc cursor_ref =
   let cur_fv = find_current_file_view () in
   match cur_fv with
   | None -> ()
   | Some (cur_file, view) ->
     (* Get current line *)
     let line = (view#buffer#get_iter_at_mark `INSERT)#line + 1 in
-    current_cursor_loc := Some (Loc.user_position cur_file line 1 1)
+    cursor_ref := Some (Loc.user_position cur_file line 0 0)
 
 (******************)
 (* Reload actions *)
 (******************)
 
 let reload_unsafe () =
-  save_cursor_loc (); clear_message_zone (); send_request Reload_req
+  save_cursor_loc current_cursor_loc; clear_message_zone ();
+  send_request Reload_req
 
 let save_and_reload () = save_sources (); reload_unsafe ()
 
@@ -2003,6 +2033,111 @@ let (_: GMenu.menu_item) =
     ~tooltip:"Search backward in the source file."
     ~callback:(search_forward ~forward:false)
 
+exception SearchLimit
+
+(* Use a specific function to read words under cursor (for Ctrl+L) because GTK
+   functions for forward_word_end/backward_word_start does not skip "_" in
+   particular. *)
+let get_word_around_iter iter =
+
+  let is_letter c =
+    match c with
+    | '0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '_' | '\'' -> true
+    | _ -> false in
+
+  let get_right_words (iter: GText.iter) =
+    let rec get_words n start_iter =
+      if n = 0 then raise SearchLimit; (* Forbid too long search *)
+      let incr_iter = start_iter#forward_char in
+      let s = start_iter#get_text ~stop:incr_iter in
+      if not (is_letter s.[0]) then
+        start_iter
+      else
+        get_words (n-1) incr_iter
+    in
+    get_words 80 iter in
+
+  let get_left_words (iter: GText.iter) =
+    let rec get_words n (end_iter: GText.iter) =
+      if n = 0 then raise SearchLimit; (* Forbid too long search *)
+      let incr_iter = end_iter#backward_char in
+      let s = incr_iter#get_text ~stop:incr_iter#forward_char in
+      if not (is_letter s.[0]) then
+        incr_iter#forward_char
+      else
+        get_words (n-1) incr_iter
+    in
+    get_words 80 iter in
+
+  let start_iter = get_left_words iter in
+  let end_iter = get_right_words iter in
+  let text = start_iter#get_text ~stop:end_iter in
+  (start_iter, text)
+
+(* This function check for immediate quantification (not for scope yet) *)
+let rec get_qualif acc start_iter =
+  if start_iter#get_text ~stop:start_iter#forward_char = "." then
+    let (start_iter, text) = get_word_around_iter start_iter#backward_char in
+    if Strings.char_is_uppercase
+        (start_iter#get_text ~stop:start_iter#forward_char).[0] then
+      get_qualif (text :: acc) start_iter#backward_char
+    else
+      acc
+  else
+    acc
+
+let get_module (iter: GText.iter) =
+  match iter#backward_search "module" with
+  | None -> print_message ~kind:1 ~notif_kind:"Error"
+              "cannot find encapsulating module"; None
+  | Some (_, end_iter) ->
+      let (_, text) = get_word_around_iter end_iter#forward_char in
+      Some text
+
+(* find_cursor_ident: finds the ident under cursor and scroll to its definition
+   get_back_loc: returns to the last position of a searched ident. *)
+let find_cursor_ident, get_back_loc =
+  let last_loc = ref None in
+  (fun () ->
+    save_cursor_loc last_loc;
+    match find_current_file_view () with
+    | None -> print_message ~notif_kind:"Ide_error" ~kind:1
+                "Cannot determine current source file"
+    | Some (file, view) ->
+        try
+          if file = "Task" then
+            let iter = view#buffer#get_iter `SEL_BOUND in
+            let (_, text) = get_word_around_iter iter in
+            interp ("locate " ^ text)
+          else
+            let iter = view#buffer#get_iter `SEL_BOUND in
+            let (start_iter, text) = get_word_around_iter iter in
+            if text = "" then
+              ()
+            else
+              let qualif = get_qualif [] start_iter#backward_char in
+              match get_module start_iter with
+              | Some enc_module ->
+                  send_request (Find_ident_req (file, qualif, enc_module, text))
+              | None -> ()
+        with SearchLimit ->
+          print_message ~notif_kind:"Ide_error" ~kind:1
+            "Search limit overflow: the word is too long"
+  ),
+  (fun () -> scroll_to_loc ~force_tab_switch:true !last_loc)
+
+let (_: GMenu.menu_item) =
+  edit_factory#add_item "Find cursor ident"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._L
+    ~tooltip:"This finds the definition of the ident under user cursor"
+    ~callback:find_cursor_ident
+
+let (_: GMenu.menu_item) =
+  edit_factory#add_item "Back"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._ampersand (* & *)
+    ~tooltip:"After find cursor ident, return back to cursor"
+    ~callback:get_back_loc
+
 
 (* "Tools" menu items *)
 
@@ -2602,20 +2737,26 @@ let treat_notification n =
             of the "smooth scrolling". *)
          when_idle (fun () -> task_view#scroll_to_mark `INSERT)
        end
-  | File_contents (file_name, content, f_format) ->
+  | File_contents (file_name, content, f_format, read_only) ->
      let content = try_convert content in
-    begin
-      try
-        let (_, sc_view, b, l) = Hstr.find source_view_table file_name in
-        sc_view#source_buffer#begin_not_undoable_action ();
-        sc_view#source_buffer#set_text content;
-        sc_view#source_buffer#end_not_undoable_action ();
-        update_label_saved l;
-        b := false;
-        reposition_ide_cursor ()
-      with
-      | Not_found -> create_source_view file_name content f_format
-    end
+     begin
+       try
+         let (_, sc_view, b, l) = Hstr.find source_view_table file_name in
+         (* read_only means it was sent by ctrl+l not by reload. So, if the file
+            already exists, we dont want to erase users changes. *)
+         if not read_only then
+           begin
+             sc_view#source_buffer#begin_not_undoable_action ();
+             sc_view#source_buffer#set_text content;
+             sc_view#source_buffer#end_not_undoable_action ();
+             update_label_saved l;
+             b := false;
+             reposition_ide_cursor ()
+           end
+       with
+       | Not_found ->
+           create_source_view ~read_only file_name content f_format
+     end
   | Source_and_ce (content, list_loc, goal_loc, f_format) ->
     begin
       messages_notebook#goto_page counterexample_page;
@@ -2628,6 +2769,8 @@ let treat_notification n =
      print_message ~kind:1 ~notif_kind:"Server Dead ?"
                         "Server sent the notification '%a'. Please report."
         print_notify n
+  | Ident_notif_loc loc ->
+      scroll_to_loc ~force_tab_switch:true (Some loc)
   end;
   ()
 

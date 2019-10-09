@@ -547,6 +547,7 @@ let get_modified_node n =
   | Task (nid, _, _, _, _) -> Some nid
   | File_contents _ -> None
   | Source_and_ce _ -> None
+  | Ident_notif_loc _ -> None
 
 
 type focus =
@@ -602,7 +603,7 @@ end
   (* File input/output *)
   (*********************)
 
-  let read_and_send f file_format =
+  let read_and_send ~read_only f file_format =
     try
       let d = get_server_data() in
       if d.send_source then
@@ -611,7 +612,7 @@ end
             (Session_itp.get_dir d.cont.controller_session) f in
  *)
         let s = Sysutil.file_contents f in
-        P.notify (File_contents (f, s, file_format))
+        P.notify (File_contents (f, s, file_format, read_only))
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
@@ -880,7 +881,7 @@ end
     let d = get_server_data () in
     let ses = d.cont.controller_session in
     let on_file f =
-      read_and_send (Session_itp.system_path ses f)
+      read_and_send ~read_only:false (Session_itp.system_path ses f)
         (Session_itp.file_format f)
     in
     iter_on_files ~on_file ~on_subtree:create_node
@@ -1045,7 +1046,8 @@ end
         let l = add_file cont f in
         let file = find_file_from_path cont.controller_session fn in
         send_new_subtree_from_file file;
-        read_and_send (Session_itp.system_path cont.controller_session file)
+        read_and_send ~read_only:false
+          (Session_itp.system_path cont.controller_session file)
           (Session_itp.file_format file);
         begin
           match l with
@@ -1383,7 +1385,8 @@ end
   let read_and_send_files s =
     let fs = Session_itp.get_files s in
     Hfile.iter (fun _ f ->
-        read_and_send (Session_itp.system_path s f) (Session_itp.file_format f))
+        read_and_send ~read_only:false (Session_itp.system_path s f)
+          (Session_itp.file_format f))
       fs
 
   let notify_parsing_errors l =
@@ -1509,7 +1512,7 @@ end
      | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
      | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
-     | Reset_proofs_req -> true
+     | Reset_proofs_req | Find_ident_req _ -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
@@ -1523,6 +1526,86 @@ end
            Hint.mem model_any nid
          else
            true
+
+   (* Sends a notification of a location together with the file in which this
+      location appear. (TODO: TBI only send the file if it is not in the
+      session) *)
+   let notify_loc loc =
+     let (f, _, _, _) = Loc.get loc in
+     let s = Sysutil.file_contents f in
+     let format = Env.get_format f in
+     P.notify (File_contents (f, s, format, true));
+     P.notify (Ident_notif_loc loc)
+
+   let find_id_ns (ns_logic: Theory.namespace) (ns_prog: Pmodule.namespace) qs =
+     Pmodule.(Theory.(
+     begin match ns_find_ls ns_logic qs with
+     | ls -> ls.Term.ls_name
+     | exception Not_found ->
+         begin match ns_find_pr ns_logic qs with
+         | pr -> pr.Decl.pr_name
+         | exception Not_found ->
+             begin match ns_find_ts ns_logic qs with
+             | ty -> ty.Ty.ts_name
+             | exception Not_found ->
+                 begin match ns_find_pv ns_prog qs with
+                 | pv -> pv.Ity.pv_vs.Term.vs_name
+                 | exception Not_found ->
+                     begin match ns_find_its ns_prog qs with
+                     | ity -> ity.Ity.its_ts.Ty.ts_name
+                     | exception Not_found ->
+                         begin match ns_find_xs ns_prog qs with
+                         | xs -> xs.Ity.xs_name
+                         | exception Not_found ->
+                             begin match ns_find_rs ns_prog qs with
+                               | rs -> rs.Expr.rs_name
+                             end
+                         end
+                     end
+                 end
+             end
+         end
+     end))
+
+   let find_ident d qualif (encaps_module: string) (f:string) (id: string) =
+     try
+       let (r, _) = Env.read_file Pmodule.mlw_language d.controller_env f in
+       let pmod = Mstr.find encaps_module r in
+       let ns_prog = pmod.Pmodule.mod_export in
+       let ns_logic = pmod.Pmodule.mod_theory.Theory.th_export in
+       let found_id = find_id_ns ns_logic ns_prog (qualif @ [id]) in
+       let treat_ident found_id =
+         match found_id.Ident.id_loc with
+         | None -> P.notify (Message (Error "No location found on ident"))
+         | Some loc ->
+             notify_loc loc in
+       treat_ident found_id
+     with Not_found -> P.notify (Message (Error "Ident not found"))
+
+   (* Locate a string in the task *)
+   let locate_id d (id: string) nid =
+     let any = any_from_node_ID nid in
+     let ses = d.cont.Controller_itp.controller_session in
+     let locate_in_goal nid =
+       let _,table = Session_itp.get_task_name_table ses nid in
+         begin match locate_id d.cont table [id] with
+           | None -> P.notify (Message (Error "No location found"))
+           | exception Server_utils.Undefined_id _ ->
+               P.notify (Message (Error "No location found"))
+           | Some loc -> notify_loc loc
+         end in
+     match any with
+     | None -> P.notify (Message (Error "Please select a node id"));
+     | Some (APn nid) ->
+         locate_in_goal nid
+     | Some (APa nid) ->
+         let nid = Session_itp.get_proof_attempt_parent ses nid in
+         locate_in_goal nid
+     | Some (ATn nid) ->
+         let nid = Session_itp.get_trans_parent ses nid in
+         locate_in_goal nid
+     | Some (AFile _) | Some (ATh _) ->
+         P.notify (Message (Error "Please select a goal id"))
 
   (* ----------------- treat_request -------------------- *)
 
@@ -1538,7 +1621,9 @@ end
        reload_session ();
        session_needs_saving := true
     | Get_first_unproven_node ni   ->
-       notify_first_unproven_node d ni
+        notify_first_unproven_node d ni
+    | Find_ident_req (f, qualif, encaps_module, s) ->
+        find_ident d.cont qualif encaps_module f s
     | Remove_subtree nid           ->
        remove_node nid;
        session_needs_saving := true
@@ -1568,7 +1653,7 @@ end
         let file = Session_itp.find_file_from_path ses
             (Sysutil.system_independent_path_of_file f) in
         let file_format = Session_itp.file_format file in
-        read_and_send f file_format
+        read_and_send ~read_only:false f file_format
     | Save_file_req (name, text)   ->
        save_file name text
     | Check_need_saving_req ->
@@ -1595,6 +1680,8 @@ end
          | Strategies st           ->
              run_strategy_on_task nid st;
              session_needs_saving := true
+         | Locate id               ->
+             locate_id d id nid
          | Edit p                  ->
              schedule_edition nid p;
              session_needs_saving := true

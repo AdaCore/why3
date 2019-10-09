@@ -143,6 +143,7 @@ let convert_notification_constructor n =
   | Task _                       -> String "Task"
   | File_contents _              -> String "File_contents"
   | Source_and_ce _              -> String "Source_and_ce"
+  | Ident_notif_loc _            -> String "Ident_notif_loc"
 
 let convert_node_type_string nt =
   match nt with
@@ -168,6 +169,7 @@ let convert_request_constructor (r: ide_request) =
   | Remove_subtree _          -> String "Remove_subtree"
   | Copy_paste _              -> String "Copy_paste"
   | Get_first_unproven_node _ -> String "Get_first_unproven_node"
+  | Find_ident_req _          -> String "Find_ident_req"
   | Unfocus_req               -> String "Unfocus_req"
   | Save_req                  -> String "Save_req"
   | Check_need_saving_req     -> String "Check_need_saving_req"
@@ -214,6 +216,12 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Get_file_contents s ->
       convert_record ["ide_request", cc r;
            "file", String s]
+  | Find_ident_req (f, qualif, m, s) ->
+      convert_record ["ide_request", cc r;
+                      "file", String f;
+                      "qualif", List (List.map (fun x -> String x) qualif);
+                      "module", String m;
+                      "ident", String s]
   | Remove_subtree n ->
       convert_record ["ide_request", cc r;
            "node_ID", Int n]
@@ -428,11 +436,12 @@ let print_notification_to_json (n: notification): json =
                       "goal_loc", convert_option_loc goal_loc;
                       "lang", String lang;
                      ]
-  | File_contents (f, s, f_format) ->
+  | File_contents (f, s, f_format, read_only) ->
       convert_record ["notification", cc n;
                       "file", String f;
                       "content", String s;
                       "file_format", String f_format;
+                      "read_only", Bool read_only;
                      ]
   | Source_and_ce (s, list_loc, goal_loc, f_format) ->
       convert_record ["notification", cc n;
@@ -440,7 +449,11 @@ let print_notification_to_json (n: notification): json =
                       "loc_list", convert_list_loc list_loc;
                       "goal_loc", convert_option_loc goal_loc;
                       "file_format", String f_format
-                     ])
+                     ]
+  | Ident_notif_loc loc ->
+      convert_record ["notification", cc n;
+                      "ident_loc", convert_loc loc]
+)
 
 let print_notification fmt (n: notification) =
   Format.fprintf fmt "%a" print_json (print_notification_to_json n)
@@ -510,6 +523,12 @@ let parse_request (constr: string) j =
           | _ -> raise (NotRequest "")
     end
 
+  | "Find_ident_req" ->
+      let file = get_string (get_field j "file") in
+      let ident = get_string (get_field j "ident") in
+      let qualif = List.map get_string (get_list (get_field j "qualif")) in
+      let m = get_string (get_field j "module") in
+      Find_ident_req (file, qualif, m, ident)
 
   | "Get_task" ->
     let n = get_int (get_field j "node_ID") in
@@ -812,7 +831,8 @@ let parse_notification constr j =
     let f = get_string (get_field j "file") in
     let s = get_string (get_field j "content") in
     let f_format = get_string (get_field j "file_format") in
-    File_contents(f,s, f_format)
+    let read_only = get_bool (get_field j "read_only") in
+    File_contents(f,s, f_format, read_only)
 
   | "Source_and_ce" ->
     let s = get_string (get_field j "content") in
@@ -821,6 +841,9 @@ let parse_notification constr j =
     let f_format = get_string (get_field j "file_format") in
     Source_and_ce(s, parse_list_loc l, parse_opt_loc gl, f_format)
 
+  | "Ident_notif_loc" ->
+      let loc = parse_loc (get_field j "ident_loc") in
+      Ident_notif_loc loc
 
   | s -> raise (NotNotification ("<from parse_notification> " ^ s))
 

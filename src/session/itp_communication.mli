@@ -117,11 +117,13 @@ type notification =
      - [goal_loc] the location of the goal,
      - [lang] the language to load in Why3ide for syntax coloring
   *)
-  | File_contents of string * string * Env.fformat
-  (** File_contents (filename, contents, format) *)
+  | File_contents of string * string * Env.fformat * bool
+  (** File_contents (filename, contents, format, read_only) *)
   | Source_and_ce of string * (Loc.position * color) list * Loc.position option * Env.fformat
   (** Source interleaved with counterexamples: contents and list color loc,
       loc of the goal, format of the source *)
+  | Ident_notif_loc of Loc.position
+  (** Answer the position where an ident is defined *)
 
 type ide_request =
   | Command_req             of node_ID * string
@@ -142,6 +144,8 @@ type ide_request =
   | Save_file_req           of string * string
   (** [Save_file_req(filename, content_of_file)] saves the file *)
   | Get_first_unproven_node of node_ID
+  | Find_ident_req          of string * string list * string * string
+  (** [Find_ident_req (filename, qualification, encapsulating_module, ident] *)
   | Unfocus_req
   | Save_req
   | Reload_req

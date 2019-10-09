@@ -35,6 +35,9 @@ API
   * ITP constructor `Source_and_ce` now has 3 arguments instead of 2 :x:
   * ITP constructors `File_contents` and `Source_and_ce` has a new argument for
     the file format :x:
+  * ITP constructor `File_contents` has a new boolean argument for
+    interpretation of the file in the IDE as `read_only` :x:
+  * New ITP constructor `Ident_notif_loc`
 
 Transformations
   * `apply`/`rewrite` behaves better in presence of `let`;
@@ -65,6 +68,10 @@ IDE
   * strategies can now be defined using `%t` (resp. `%m`) to call a prover with
     the default timelimit (resp. memlimit)
   * added minimal search menu
+  * A merlin-like feature to find the ident located under the cursor has been
+    added in the Edit menu.
+  * Read only file can now be displayed and removed by right clicking on their
+    tab titles
 
 Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq
