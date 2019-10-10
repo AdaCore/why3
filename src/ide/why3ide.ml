@@ -1027,10 +1027,15 @@ let current_cursor_loc = ref None
 let move_to_line ?(character=0) ~yalign (v : GSourceView.source_view) line =
   let line = max 0 (line - 1) in
   let line = min line v#buffer#line_count in
-  let it = v#buffer#get_iter (`LINECHAR (line, character)) in
+  (* Warning : Do not use LINECHAR here as it fails when there is not enough
+     char on the line. *)
+  let it = v#buffer#get_iter (`LINE line) in
+  let it = it#forward_chars character in
   v#buffer#place_cursor ~where:it;
   let mark = `MARK (v#buffer#create_mark it) in
-  v#scroll_to_mark ~use_align:true ~yalign ~xalign:0.5 mark
+  (* Make the left side of the code always visible *)
+  let xalign = 1.0 in
+  v#scroll_to_mark ~use_align:true ~yalign ~xalign mark
 
 (* Scroll to a specific locations *)
 let scroll_to_loc ~force_tab_switch loc_of_goal =
@@ -2137,7 +2142,6 @@ let (_: GMenu.menu_item) =
     ~modi:[`CONTROL] ~key:GdkKeysyms._ampersand (* & *)
     ~tooltip:"After find cursor ident, return back to cursor"
     ~callback:get_back_loc
-
 
 (* "Tools" menu items *)
 
