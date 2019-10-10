@@ -1030,7 +1030,9 @@ let move_to_line ?(character=0) ~yalign (v : GSourceView.source_view) line =
   let it = v#buffer#get_iter (`LINECHAR (line, character)) in
   v#buffer#place_cursor ~where:it;
   let mark = `MARK (v#buffer#create_mark it) in
-  v#scroll_to_mark ~use_align:true ~yalign ~xalign:0.5 mark
+  (* Make the left side of the code always visible *)
+  let xalign = 1.0 in
+  v#scroll_to_mark ~use_align:true ~yalign ~xalign mark
 
 (* Scroll to a specific locations *)
 let scroll_to_loc ~force_tab_switch loc_of_goal =
