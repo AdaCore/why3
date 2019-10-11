@@ -29,6 +29,8 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | "<>" -> "\\neq"
     | "^" -> "\\string^"
     | "++" -> "\\mathbin{+\\mkern-10mu+}"
+    | "<=" -> "\\le"
+    | ">=" -> "\\ge"
     | s -> s
 
   (** Optionally extract trailing numbers and quotes, after an optional single or double
@@ -410,7 +412,7 @@ let set_output = function
   | "ast" -> output := Some Ast
   | str -> ksprintf invalid_arg "output: --%s--" str
 
-let prefix = ref "IND"
+let prefix = ref "WHY"
 
 let usage =
   "Pretty print Why3 declarations (currently only inductive types in LaTeX using mathpartir).\n\
@@ -419,7 +421,7 @@ let usage =
 let options = [
   "--output", Arg.String set_output,                "<output> Output format";
   "--kind",   Arg.String set_kind,                  "<category> Syntactic category to be printed (--kind=inductive only possible value for --output=latex)";
-  "--prefix", Arg.String ((:=) prefix),             "<prefix> Prefix for LaTeX commands (default for output latex: IND)";
+  "--prefix", Arg.String ((:=) prefix),             "<prefix> Prefix for LaTeX commands (default for output latex: WHY)";
   "-",        Arg.Unit (fun () -> filename := Some "-"), " Read from stdin";
 ]
 
