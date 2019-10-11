@@ -1581,6 +1581,7 @@ let type_module file env loc path (id,dl) =
   file
 
 let type_mlw_file env path filename mlw_file =
+  if Debug.test_flag Glob.flag then Glob.clear filename;
   let file = Mstr.empty in
   let loc = Loc.user_position filename 0 0 0 in
   let file =
