@@ -6,173 +6,173 @@
 <file format="whyml" proved="true">
 <path name=".."/><path name="resizable_array.mlw"/>
 <theory name="ResizableArrayImplem" proved="true">
- <goal name="rarray&#39;VC" expl="VC for rarray" proved="true">
+ <goal name="rarray&#39;vc" expl="VC for rarray" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="make&#39;VC" expl="VC for make" proved="true">
+ <goal name="make&#39;vc" expl="VC for make" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="make&#39;VC.0" expl="array creation size" proved="true">
+  <goal name="make&#39;vc.0" expl="array creation size" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="make&#39;VC.1" expl="precondition" proved="true">
+  <goal name="make&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="make&#39;VC.2" expl="precondition" proved="true">
+  <goal name="make&#39;vc.2" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="make&#39;VC.3" expl="postcondition" proved="true">
+  <goal name="make&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="make&#39;VC.4" expl="postcondition" proved="true">
+  <goal name="make&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="make&#39;VC.5" expl="postcondition" proved="true">
+  <goal name="make&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="mixfix []&#39;VC" expl="VC for mixfix []" proved="true">
+ <goal name="mixfix []&#39;vc" expl="VC for mixfix []" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="mixfix []&#39;VC.0" expl="index in array bounds" proved="true">
+  <goal name="mixfix []&#39;vc.0" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="mixfix []&lt;-&#39;VC" expl="VC for mixfix []&lt;-" proved="true">
+ <goal name="mixfix []&lt;-&#39;vc" expl="VC for mixfix []&lt;-" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="mixfix []&lt;-&#39;VC.0" expl="index in array bounds" proved="true">
+  <goal name="mixfix []&lt;-&#39;vc.0" expl="index in array bounds" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="mixfix []&lt;-&#39;VC.1" expl="type invariant" proved="true">
+  <goal name="mixfix []&lt;-&#39;vc.1" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="mixfix []&lt;-&#39;VC.2" expl="type invariant" proved="true">
+  <goal name="mixfix []&lt;-&#39;vc.2" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="mixfix []&lt;-&#39;VC.3" expl="postcondition" proved="true">
+  <goal name="mixfix []&lt;-&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="resize&#39;VC" expl="VC for resize" proved="true">
+ <goal name="resize&#39;vc" expl="VC for resize" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="resize&#39;VC.0" expl="array creation size" proved="true">
+  <goal name="resize&#39;vc.0" expl="array creation size" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="resize&#39;VC.1" expl="precondition" proved="true">
+  <goal name="resize&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="resize&#39;VC.2" expl="precondition" proved="true">
+  <goal name="resize&#39;vc.2" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
-  <goal name="resize&#39;VC.3" expl="type invariant" proved="true">
+  <goal name="resize&#39;vc.3" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="23"/></proof>
   </goal>
-  <goal name="resize&#39;VC.4" expl="type invariant" proved="true">
+  <goal name="resize&#39;vc.4" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="resize&#39;VC.5" expl="postcondition" proved="true">
+  <goal name="resize&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
-  <goal name="resize&#39;VC.6" expl="postcondition" proved="true">
+  <goal name="resize&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="resize&#39;VC.7" expl="precondition" proved="true">
+  <goal name="resize&#39;vc.7" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="resize&#39;VC.8" expl="type invariant" proved="true">
+  <goal name="resize&#39;vc.8" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="resize&#39;VC.9" expl="type invariant" proved="true">
+  <goal name="resize&#39;vc.9" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="resize&#39;VC.10" expl="postcondition" proved="true">
+  <goal name="resize&#39;vc.10" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="resize&#39;VC.11" expl="postcondition" proved="true">
+  <goal name="resize&#39;vc.11" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="30"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="append&#39;VC" expl="VC for append" proved="true">
+ <goal name="append&#39;vc" expl="VC for append" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="append&#39;VC.0" expl="precondition" proved="true">
+  <goal name="append&#39;vc.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="append&#39;VC.1" expl="precondition" proved="true">
+  <goal name="append&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="append&#39;VC.2" expl="precondition" proved="true">
+  <goal name="append&#39;vc.2" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="25"/></proof>
   </goal>
-  <goal name="append&#39;VC.3" expl="type invariant" proved="true">
+  <goal name="append&#39;vc.3" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="26"/></proof>
   </goal>
-  <goal name="append&#39;VC.4" expl="type invariant" proved="true">
+  <goal name="append&#39;vc.4" expl="type invariant" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="append&#39;VC.5" expl="postcondition" proved="true">
+  <goal name="append&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="append&#39;VC.6" expl="postcondition" proved="true">
+  <goal name="append&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="Test" proved="true">
- <goal name="test1&#39;VC" expl="VC for test1" proved="true">
+ <goal name="test1&#39;vc" expl="VC for test1" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="test1&#39;VC.0" expl="precondition" proved="true">
+  <goal name="test1&#39;vc.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="test1&#39;VC.1" expl="assertion" proved="true">
+  <goal name="test1&#39;vc.1" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="test1&#39;VC.2" expl="precondition" proved="true">
+  <goal name="test1&#39;vc.2" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="test1&#39;VC.3" expl="precondition" proved="true">
+  <goal name="test1&#39;vc.3" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="test1&#39;VC.4" expl="assertion" proved="true">
+  <goal name="test1&#39;vc.4" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="test1&#39;VC.5" expl="assertion" proved="true">
+  <goal name="test1&#39;vc.5" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="test2&#39;VC" expl="VC for test2" proved="true">
+ <goal name="test2&#39;vc" expl="VC for test2" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="test2&#39;VC.0" expl="precondition" proved="true">
+  <goal name="test2&#39;vc.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="test2&#39;VC.1" expl="precondition" proved="true">
+  <goal name="test2&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="test2&#39;VC.2" expl="precondition" proved="true">
+  <goal name="test2&#39;vc.2" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="test2&#39;VC.3" expl="precondition" proved="true">
+  <goal name="test2&#39;vc.3" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="test2&#39;VC.4" expl="assertion" proved="true">
+  <goal name="test2&#39;vc.4" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="30"/></proof>
   </goal>
-  <goal name="test2&#39;VC.5" expl="assertion" proved="true">
+  <goal name="test2&#39;vc.5" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
-  <goal name="test2&#39;VC.6" expl="precondition" proved="true">
+  <goal name="test2&#39;vc.6" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="test2&#39;VC.7" expl="assertion" proved="true">
+  <goal name="test2&#39;vc.7" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="61"/></proof>
   </goal>
-  <goal name="test2&#39;VC.8" expl="precondition" proved="true">
+  <goal name="test2&#39;vc.8" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="33"/></proof>
   </goal>
-  <goal name="test2&#39;VC.9" expl="assertion" proved="true">
+  <goal name="test2&#39;vc.9" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
  </transf>

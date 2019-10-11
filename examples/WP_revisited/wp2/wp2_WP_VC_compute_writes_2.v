@@ -353,7 +353,7 @@ Fixpoint stmt_writes (i:stmt)
   end.
 
 (* Why3 goal *)
-Theorem compute_writes'VC :
+Theorem compute_writes'vc :
   forall (s:stmt), forall (result:set),
   (exists x:term, exists x1:fmla, exists x2:stmt,
    (s = (Swhile x x1 x2)) /\

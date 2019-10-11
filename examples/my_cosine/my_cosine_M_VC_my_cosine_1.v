@@ -21,7 +21,7 @@ Require floating_point.Single.
 Require Import Interval.Interval_tactic.
 
 (* Why3 goal *)
-Theorem my_cosine'VC :
+Theorem my_cosine'vc :
   forall (x:floating_point.SingleFormat.single),
   ((Reals.Rbasic_fun.Rabs (floating_point.Single.value x)) <= (1 / 32)%R)%R ->
   ((Reals.Rbasic_fun.Rabs

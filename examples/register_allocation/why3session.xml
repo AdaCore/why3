@@ -6,80 +6,80 @@
 <file format="whyml" proved="true">
 <path name=".."/><path name="register_allocation.mlw"/>
 <theory name="Spec" proved="true">
- <goal name="exec_append&#39;VC" expl="VC for exec_append" proved="true">
+ <goal name="exec_append&#39;vc" expl="VC for exec_append" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="42"/></proof>
  </goal>
 </theory>
 <theory name="DWP" proved="true">
- <goal name="prefix $&#39;VC" expl="VC for prefix $" proved="true">
+ <goal name="prefix $&#39;vc" expl="VC for prefix $" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
- <goal name="wrap&#39;VC" expl="VC for wrap" proved="true">
+ <goal name="wrap&#39;vc" expl="VC for wrap" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="infix --&#39;VC" expl="VC for infix --" proved="true">
+ <goal name="infix --&#39;vc" expl="VC for infix --" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
  </goal>
- <goal name="cons&#39;VC" expl="VC for cons" proved="true">
+ <goal name="cons&#39;vc" expl="VC for cons" proved="true">
  <proof prover="1"><result status="valid" time="0.11" steps="123"/></proof>
  </goal>
- <goal name="nil&#39;VC" expl="VC for nil" proved="true">
+ <goal name="nil&#39;vc" expl="VC for nil" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
  </goal>
 </theory>
 <theory name="InfinityOfRegisters" proved="true">
- <goal name="compile&#39;VC" expl="VC for compile" proved="true">
+ <goal name="compile&#39;vc" expl="VC for compile" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="compile&#39;VC.0" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="compile&#39;VC.1" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="compile&#39;VC.2" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.2" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="compile&#39;VC.3" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.3" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="compile&#39;VC.4" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.4" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="compile&#39;VC.5" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.5" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="compile&#39;VC.6" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.6" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="compile&#39;VC.7" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.7" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="compile&#39;VC.8" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.8" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="compile&#39;VC.9" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.9" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-  <goal name="compile&#39;VC.10" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.10" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="compile&#39;VC.11" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.11" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="compile&#39;VC.12" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.12" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="compile&#39;VC.13" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.13" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="compile&#39;VC.13.0" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.13.0" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.13.0.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.13.0.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.13.0.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.13.0.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.13.0.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.13.0.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.13.0.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.13.0.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
        </goal>
       </transf>
@@ -90,15 +90,15 @@
     </goal>
    </transf>
    </goal>
-   <goal name="compile&#39;VC.13.1" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.13.1" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.13.1.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.13.1.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.13.1.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.13.1.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.13.1.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.13.1.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.13.1.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.13.1.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
        </goal>
       </transf>
@@ -109,15 +109,15 @@
     </goal>
    </transf>
    </goal>
-   <goal name="compile&#39;VC.13.2" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.13.2" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.13.2.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.13.2.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.13.2.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.13.2.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.13.2.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.13.2.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.13.2.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.13.2.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.01" steps="41"/></proof>
        </goal>
       </transf>
@@ -130,113 +130,113 @@
    </goal>
   </transf>
   </goal>
-  <goal name="compile&#39;VC.14" expl="postcondition" proved="true">
+  <goal name="compile&#39;vc.14" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="3"/></proof>
   </goal>
-  <goal name="compile&#39;VC.15" expl="postcondition" proved="true">
+  <goal name="compile&#39;vc.15" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="recover&#39;VC" expl="VC for recover" proved="true">
+ <goal name="recover&#39;vc" expl="VC for recover" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
  </goal>
 </theory>
 <theory name="FiniteNumberOfRegisters" proved="true">
- <goal name="compile&#39;VC" expl="VC for compile" proved="true">
+ <goal name="compile&#39;vc" expl="VC for compile" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="compile&#39;VC.0" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="compile&#39;VC.1" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="compile&#39;VC.2" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.2" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="31"/></proof>
   </goal>
-  <goal name="compile&#39;VC.3" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.3" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="compile&#39;VC.4" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.4" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="compile&#39;VC.5" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.5" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
-  <goal name="compile&#39;VC.6" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.6" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="compile&#39;VC.7" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.7" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="compile&#39;VC.8" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.8" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="compile&#39;VC.9" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.9" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="compile&#39;VC.10" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.10" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="40"/></proof>
   </goal>
-  <goal name="compile&#39;VC.11" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.11" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="compile&#39;VC.12" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.12" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="compile&#39;VC.13" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.13" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
-  <goal name="compile&#39;VC.14" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.14" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="compile&#39;VC.15" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.15" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="compile&#39;VC.16" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.16" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="compile&#39;VC.17" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.17" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="48"/></proof>
   </goal>
-  <goal name="compile&#39;VC.18" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.18" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
   </goal>
-  <goal name="compile&#39;VC.19" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.19" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="compile&#39;VC.20" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.20" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="52"/></proof>
   </goal>
-  <goal name="compile&#39;VC.21" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.21" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="compile&#39;VC.22" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.22" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="compile&#39;VC.23" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.23" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="compile&#39;VC.24" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.24" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
   </goal>
-  <goal name="compile&#39;VC.25" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.25" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="compile&#39;VC.26" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.26" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="10"/></proof>
   </goal>
-  <goal name="compile&#39;VC.27" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.27" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="compile&#39;VC.27.0" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.27.0" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.27.0.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.27.0.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.27.0.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.27.0.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.27.0.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.27.0.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.27.0.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.27.0.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.01" steps="14"/></proof>
        </goal>
       </transf>
@@ -247,15 +247,15 @@
     </goal>
    </transf>
    </goal>
-   <goal name="compile&#39;VC.27.1" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.27.1" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.27.1.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.27.1.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.27.1.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.27.1.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.27.1.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.27.1.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.27.1.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.27.1.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
        </goal>
       </transf>
@@ -266,15 +266,15 @@
     </goal>
    </transf>
    </goal>
-   <goal name="compile&#39;VC.27.2" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.27.2" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.27.2.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.27.2.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.27.2.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.27.2.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.27.2.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.27.2.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.27.2.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.27.2.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.05" steps="45"/></proof>
        </goal>
       </transf>
@@ -285,15 +285,15 @@
     </goal>
    </transf>
    </goal>
-   <goal name="compile&#39;VC.27.3" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.27.3" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.27.3.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.27.3.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.27.3.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.27.3.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.27.3.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.27.3.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.27.3.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.27.3.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.02" steps="135"/></proof>
        </goal>
       </transf>
@@ -306,17 +306,17 @@
    </goal>
   </transf>
   </goal>
-  <goal name="compile&#39;VC.28" expl="postcondition" proved="true">
+  <goal name="compile&#39;vc.28" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
-  <goal name="compile&#39;VC.29" expl="postcondition" proved="true">
+  <goal name="compile&#39;vc.29" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="OptimalNumberOfRegisters" proved="true">
- <goal name="n&#39;VC" expl="VC for n" proved="true">
+ <goal name="n&#39;vc" expl="VC for n" proved="true">
  <proof prover="1"><result status="valid" time="0.03" steps="60"/></proof>
  </goal>
  <goal name="measure_nonneg" proved="true">
@@ -326,109 +326,109 @@
   </goal>
  </transf>
  </goal>
- <goal name="compile&#39;VC" expl="VC for compile" proved="true">
+ <goal name="compile&#39;vc" expl="VC for compile" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="compile&#39;VC.0" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="compile&#39;VC.1" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
-  <goal name="compile&#39;VC.2" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.2" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="13"/></proof>
   </goal>
-  <goal name="compile&#39;VC.3" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.3" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="compile&#39;VC.4" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.4" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="compile&#39;VC.5" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.5" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="compile&#39;VC.6" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.6" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="compile&#39;VC.7" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.7" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="compile&#39;VC.8" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.8" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="compile&#39;VC.9" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.9" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="compile&#39;VC.10" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.10" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="40"/></proof>
   </goal>
-  <goal name="compile&#39;VC.11" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.11" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
   </goal>
-  <goal name="compile&#39;VC.12" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.12" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="compile&#39;VC.13" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.13" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="compile&#39;VC.14" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.14" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="compile&#39;VC.15" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.15" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="compile&#39;VC.16" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.16" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="compile&#39;VC.17" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.17" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="43"/></proof>
   </goal>
-  <goal name="compile&#39;VC.18" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.18" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="compile&#39;VC.19" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.19" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="compile&#39;VC.20" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.20" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
-  <goal name="compile&#39;VC.21" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.21" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="compile&#39;VC.22" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.22" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   </goal>
-  <goal name="compile&#39;VC.23" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.23" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="compile&#39;VC.24" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.24" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="compile&#39;VC.25" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.25" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="25"/></proof>
   </goal>
-  <goal name="compile&#39;VC.26" expl="variant decrease" proved="true">
+  <goal name="compile&#39;vc.26" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="33"/></proof>
   </goal>
-  <goal name="compile&#39;VC.27" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.27" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="compile&#39;VC.28" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.28" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="compile&#39;VC.29" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.29" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="compile&#39;VC.30" expl="precondition" proved="true">
+  <goal name="compile&#39;vc.30" expl="precondition" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="compile&#39;VC.30.0" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.30.0" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.30.0.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.30.0.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.30.0.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.30.0.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.30.0.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.30.0.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.30.0.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.30.0.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.03" steps="16"/></proof>
        </goal>
       </transf>
@@ -439,15 +439,15 @@
     </goal>
    </transf>
    </goal>
-   <goal name="compile&#39;VC.30.1" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.30.1" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.30.1.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.30.1.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.30.1.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.30.1.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.30.1.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.30.1.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.30.1.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.30.1.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
        </goal>
       </transf>
@@ -458,15 +458,15 @@
     </goal>
    </transf>
    </goal>
-   <goal name="compile&#39;VC.30.2" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.30.2" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.30.2.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.30.2.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.30.2.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.30.2.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.30.2.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.30.2.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.30.2.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.30.2.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.01" steps="67"/></proof>
        </goal>
       </transf>
@@ -477,15 +477,15 @@
     </goal>
    </transf>
    </goal>
-   <goal name="compile&#39;VC.30.3" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.30.3" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.30.3.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.30.3.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.30.3.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.30.3.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.30.3.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.30.3.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.30.3.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.30.3.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.02" steps="186"/></proof>
        </goal>
       </transf>
@@ -496,15 +496,15 @@
     </goal>
    </transf>
    </goal>
-   <goal name="compile&#39;VC.30.4" expl="precondition" proved="true">
+   <goal name="compile&#39;vc.30.4" expl="precondition" proved="true">
    <transf name="compute_specified" proved="true" >
-    <goal name="compile&#39;VC.30.4.0" expl="precondition" proved="true">
+    <goal name="compile&#39;vc.30.4.0" expl="precondition" proved="true">
     <transf name="simplify_trivial_quantification_in_goal" proved="true" >
-     <goal name="compile&#39;VC.30.4.0.0" expl="precondition" proved="true">
+     <goal name="compile&#39;vc.30.4.0.0" expl="precondition" proved="true">
      <transf name="introduce_premises" proved="true" >
-      <goal name="compile&#39;VC.30.4.0.0.0" expl="precondition" proved="true">
+      <goal name="compile&#39;vc.30.4.0.0.0" expl="precondition" proved="true">
       <transf name="compute_specified" proved="true" >
-       <goal name="compile&#39;VC.30.4.0.0.0.0" expl="precondition" proved="true">
+       <goal name="compile&#39;vc.30.4.0.0.0.0" expl="precondition" proved="true">
        <proof prover="1"><result status="valid" time="0.06" steps="27"/></proof>
        </goal>
       </transf>
@@ -517,10 +517,10 @@
    </goal>
   </transf>
   </goal>
-  <goal name="compile&#39;VC.31" expl="postcondition" proved="true">
+  <goal name="compile&#39;vc.31" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
-  <goal name="compile&#39;VC.32" expl="postcondition" proved="true">
+  <goal name="compile&#39;vc.32" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="6"/></proof>
   </goal>
  </transf>
