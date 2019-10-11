@@ -16,7 +16,7 @@ Language
     to give the name `Foo` to the corresponding hypothesis after introduction
   * identifiers used for specification (resp. definition) of a function `foo`
     have been renamed from `foo_spec` (resp. `foo_def`) to `foo'spec` (resp. `foo'def`) :x:
-  * identifiers used for goals `VC foo` have been renamed to `foo'VC`
+  * identifiers used for goals `VC foo` have been renamed to `foo'vc`
   * identifiers used for record constructor `mk foo` have been renamed to `foo'mk` :x:
   * the `alias` clause can now be used in program functions to force the aliasing
     of function parameters and/or named returns
