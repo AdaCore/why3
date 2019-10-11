@@ -179,6 +179,13 @@ let convert_request_constructor (r: ide_request) =
   | Reset_proofs_req          -> String "Reset_proofs_req"
   | Get_global_infos          -> String "Get_global_infos"
 
+let convert_loc (loc: Loc.position) : Json_base.json =
+  let (file, line, col1, col2) = Loc.get loc in
+  Record (convert_record ["file", Json_base.String file;
+                          "line", Json_base.Int line;
+                          "col1", Json_base.Int col1;
+                          "col2", Json_base.Int col2])
+
 open Whyconf
 
 let convert_policy u =
@@ -216,12 +223,9 @@ let print_request_to_json (r: ide_request): Json_base.json =
   | Get_file_contents s ->
       convert_record ["ide_request", cc r;
            "file", String s]
-  | Find_ident_req (f, qualif, m, s) ->
+  | Find_ident_req loc ->
       convert_record ["ide_request", cc r;
-                      "file", String f;
-                      "qualif", List (List.map (fun x -> String x) qualif);
-                      "module", String m;
-                      "ident", String s]
+                      "loc", convert_loc loc]
   | Remove_subtree n ->
       convert_record ["ide_request", cc r;
            "node_ID", Int n]
@@ -256,13 +260,6 @@ let convert_constructor_message (m: message_notification) =
   | Error _               -> String "Error"
   | Open_File_Error _     -> String "Open_File_Error"
   | File_Saved _          -> String "File_Saved"
-
-let convert_loc (loc: Loc.position) : Json_base.json =
-  let (file, line, col1, col2) = Loc.get loc in
-  Record (convert_record ["file", Json_base.String file;
-                          "line", Json_base.Int line;
-                          "col1", Json_base.Int col1;
-                          "col2", Json_base.Int col2])
 
 (* Converted to a Json list for simplicity *)
 let convert_option_loc (loc: Loc.position option) : Json_base.json =
@@ -524,11 +521,8 @@ let parse_request (constr: string) j =
     end
 
   | "Find_ident_req" ->
-      let file = get_string (get_field j "file") in
-      let ident = get_string (get_field j "ident") in
-      let qualif = List.map get_string (get_list (get_field j "qualif")) in
-      let m = get_string (get_field j "module") in
-      Find_ident_req (file, qualif, m, ident)
+      let loc = parse_loc (get_field j "loc") in
+      Find_ident_req loc
 
   | "Get_task" ->
     let n = get_int (get_field j "node_ID") in

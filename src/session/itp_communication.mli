@@ -144,8 +144,8 @@ type ide_request =
   | Save_file_req           of string * string
   (** [Save_file_req(filename, content_of_file)] saves the file *)
   | Get_first_unproven_node of node_ID
-  | Find_ident_req          of string * string list * string * string
-  (** [Find_ident_req (filename, qualification, encapsulating_module, ident] *)
+  | Find_ident_req          of Loc.position
+  (** [Find_ident_req (position)] *)
   | Unfocus_req
   | Save_req
   | Reload_req

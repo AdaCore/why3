@@ -16,6 +16,7 @@ open Controller_itp
 open Server_utils
 open Itp_communication
 
+
 (**********************************)
 (* list unproven goal and related *)
 (**********************************)
@@ -1537,50 +1538,15 @@ end
      P.notify (File_contents (f, s, format, true));
      P.notify (Ident_notif_loc loc)
 
-   let find_id_ns (ns_logic: Theory.namespace) (ns_prog: Pmodule.namespace) qs =
-     Pmodule.(Theory.(
-     begin match ns_find_ls ns_logic qs with
-     | ls -> ls.Term.ls_name
-     | exception Not_found ->
-         begin match ns_find_pr ns_logic qs with
-         | pr -> pr.Decl.pr_name
-         | exception Not_found ->
-             begin match ns_find_ts ns_logic qs with
-             | ty -> ty.Ty.ts_name
-             | exception Not_found ->
-                 begin match ns_find_pv ns_prog qs with
-                 | pv -> pv.Ity.pv_vs.Term.vs_name
-                 | exception Not_found ->
-                     begin match ns_find_its ns_prog qs with
-                     | ity -> ity.Ity.its_ts.Ty.ts_name
-                     | exception Not_found ->
-                         begin match ns_find_xs ns_prog qs with
-                         | xs -> xs.Ity.xs_name
-                         | exception Not_found ->
-                             begin match ns_find_rs ns_prog qs with
-                               | rs -> rs.Expr.rs_name
-                             end
-                         end
-                     end
-                 end
-             end
-         end
-     end))
-
-   let find_ident d qualif (encaps_module: string) (f:string) (id: string) =
+   let find_ident (loc: Loc.position) =
      try
-       let (r, _) = Env.read_file Pmodule.mlw_language d.controller_env f in
-       let pmod = Mstr.find encaps_module r in
-       let ns_prog = pmod.Pmodule.mod_export in
-       let ns_logic = pmod.Pmodule.mod_theory.Theory.th_export in
-       let found_id = find_id_ns ns_logic ns_prog (qualif @ [id]) in
-       let treat_ident found_id =
-         match found_id.Ident.id_loc with
-         | None -> P.notify (Message (Error "No location found on ident"))
-         | Some loc ->
-             notify_loc loc in
-       treat_ident found_id
-     with Not_found -> P.notify (Message (Error "Ident not found"))
+       let (id, _, _) = Glob.find loc in
+       begin match id.Ident.id_loc with
+         | None -> ()
+         | Some loc -> notify_loc loc
+       end
+     with Not_found ->
+       P.notify (Message (Error "Ident not found: try saving the file."))
 
    (* Locate a string in the task *)
    let locate_id d (id: string) nid =
@@ -1622,8 +1588,8 @@ end
        session_needs_saving := true
     | Get_first_unproven_node ni   ->
         notify_first_unproven_node d ni
-    | Find_ident_req (f, qualif, encaps_module, s) ->
-        find_ident d.cont qualif encaps_module f s
+    | Find_ident_req loc ->
+        find_ident loc
     | Remove_subtree nid           ->
        remove_node nid;
        session_needs_saving := true
