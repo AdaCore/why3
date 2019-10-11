@@ -71,7 +71,7 @@ Axiom no_duplicate :
   (a <= i)%Z /\ (i < j)%Z /\ (j < b)%Z -> ~ eq_prefix (s i) (s j) n.
 
 (* Why3 goal *)
-Theorem t3'VC :
+Theorem t3'vc :
   forall (col:Numbers.BinNums.Z -> Numbers.BinNums.Z) (k:Numbers.BinNums.Z)
     (sol:Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z)
     (s:Numbers.BinNums.Z) (a:set.SetAppInt.set) (b:set.SetAppInt.set)

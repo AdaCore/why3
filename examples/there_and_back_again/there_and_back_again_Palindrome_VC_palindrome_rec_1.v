@@ -27,7 +27,7 @@ Parameter eq: elt -> elt -> Prop.
 Axiom eq'spec : forall (x:elt) (y:elt), eq x y <-> (x = y).
 
 (* Why3 goal *)
-Theorem palindrome_rec'VC :
+Theorem palindrome_rec'vc :
   forall (x:Init.Datatypes.list elt) (y:Init.Datatypes.list elt),
   ((list.Length.length y) <= (list.Length.length x))%Z ->
   forall (x1:elt) (x2:Init.Datatypes.list elt),

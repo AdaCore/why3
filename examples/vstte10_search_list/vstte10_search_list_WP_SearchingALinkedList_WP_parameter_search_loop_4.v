@@ -36,7 +36,7 @@ Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   end.
 
 (* Why3 goal *)
-Theorem search_loop'VC :
+Theorem search_loop'vc :
   forall (l:Init.Datatypes.list Numbers.BinNums.Z),
   forall (s:Init.Datatypes.list Numbers.BinNums.Z) (i:Numbers.BinNums.Z),
   (0%Z <= i)%Z /\

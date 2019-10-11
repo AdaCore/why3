@@ -393,7 +393,7 @@ Axiom while_rule_ext :
   valid_triple inv' (Swhile e inv i) (Fand (Fnot (Fterm e)) inv').
 
 (* Why3 goal *)
-Theorem wp'VC :
+Theorem wp'vc :
   forall (i:stmt) (q:fmla), forall (result:fmla),
   (exists x:term, exists x1:fmla, exists x2:stmt,
    (i = (Swhile x x1 x2)) /\

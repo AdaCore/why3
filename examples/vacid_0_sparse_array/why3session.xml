@@ -7,16 +7,16 @@
 <file format="whyml" proved="true">
 <path name=".."/><path name="vacid_0_sparse_array.mlw"/>
 <theory name="SparseArray" proved="true">
- <goal name="sparse_array&#39;VC" expl="VC for sparse_array" proved="true">
+ <goal name="sparse_array&#39;vc" expl="VC for sparse_array" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="create&#39;VC" expl="VC for create" proved="true">
+ <goal name="create&#39;vc" expl="VC for create" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="25"/></proof>
  </goal>
- <goal name="test&#39;VC" expl="VC for test" proved="true">
+ <goal name="test&#39;vc" expl="VC for test" proved="true">
  <proof prover="3"><result status="valid" time="0.02" steps="34"/></proof>
  </goal>
- <goal name="get&#39;VC" expl="VC for get" proved="true">
+ <goal name="get&#39;vc" expl="VC for get" proved="true">
  <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
  </goal>
  <goal name="permutation" proved="true">
@@ -32,43 +32,43 @@
   </goal>
  </transf>
  </goal>
- <goal name="set&#39;VC" expl="VC for set" proved="true">
+ <goal name="set&#39;vc" expl="VC for set" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="set&#39;VC.0" expl="index in array bounds" proved="true">
+  <goal name="set&#39;vc.0" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
   </goal>
-  <goal name="set&#39;VC.1" expl="type invariant" proved="true">
+  <goal name="set&#39;vc.1" expl="type invariant" proved="true">
   <proof prover="3"><result status="valid" time="0.08" steps="303"/></proof>
   </goal>
-  <goal name="set&#39;VC.2" expl="precondition" proved="true">
+  <goal name="set&#39;vc.2" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="set&#39;VC.3" expl="assertion" proved="true">
+  <goal name="set&#39;vc.3" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.08" steps="91"/></proof>
   </goal>
-  <goal name="set&#39;VC.4" expl="index in array bounds" proved="true">
+  <goal name="set&#39;vc.4" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="set&#39;VC.5" expl="index in array bounds" proved="true">
+  <goal name="set&#39;vc.5" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="63"/></proof>
   </goal>
-  <goal name="set&#39;VC.6" expl="type invariant" proved="true">
+  <goal name="set&#39;vc.6" expl="type invariant" proved="true">
   <proof prover="3"><result status="valid" time="0.68" steps="772"/></proof>
   </goal>
-  <goal name="set&#39;VC.7" expl="postcondition" proved="true">
+  <goal name="set&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.67" steps="732"/></proof>
   </goal>
-  <goal name="set&#39;VC.8" expl="postcondition" proved="true">
+  <goal name="set&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.06" steps="118"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="Harness" proved="true">
- <goal name="harness&#39;VC" expl="VC for harness" proved="true">
+ <goal name="harness&#39;vc" expl="VC for harness" proved="true">
  <proof prover="3"><result status="valid" time="0.12" steps="729"/></proof>
  </goal>
- <goal name="bench&#39;VC" expl="VC for bench" proved="true">
+ <goal name="bench&#39;vc" expl="VC for bench" proved="true">
  <proof prover="3"><result status="valid" time="0.02" steps="172"/></proof>
  </goal>
 </theory>

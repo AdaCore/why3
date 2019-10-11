@@ -8,7 +8,7 @@
 <file format="whyml" proved="true">
 <path name=".."/><path name="sumrange.mlw"/>
 <theory name="ArraySum" proved="true">
- <goal name="sum&#39;VC" expl="VC for sum" proved="true">
+ <goal name="sum&#39;vc" expl="VC for sum" proved="true">
  <proof prover="3"><result status="valid" time="0.01" steps="2629"/></proof>
  </goal>
  <goal name="sum_right" proved="true">
@@ -46,21 +46,21 @@
  </goal>
 </theory>
 <theory name="Simple" proved="true">
- <goal name="query&#39;VC" expl="VC for query" proved="true">
+ <goal name="query&#39;vc" expl="VC for query" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="query&#39;VC.0" expl="loop invariant init" proved="true">
+  <goal name="query&#39;vc.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="3485"/></proof>
   </goal>
-  <goal name="query&#39;VC.1" expl="index in array bounds" proved="true">
+  <goal name="query&#39;vc.1" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="3479"/></proof>
   </goal>
-  <goal name="query&#39;VC.2" expl="loop invariant preservation" proved="true">
+  <goal name="query&#39;vc.2" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="4105"/></proof>
   </goal>
-  <goal name="query&#39;VC.3" expl="postcondition" proved="true">
+  <goal name="query&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="2950"/></proof>
   </goal>
-  <goal name="query&#39;VC.4" expl="postcondition" proved="true">
+  <goal name="query&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="2917"/></proof>
   </goal>
  </transf>
@@ -142,60 +142,60 @@
  </goal>
 </theory>
 <theory name="CumulativeArray" proved="true">
- <goal name="create&#39;VC" expl="VC for create" proved="true">
+ <goal name="create&#39;vc" expl="VC for create" proved="true">
  <proof prover="2"><result status="valid" time="0.02" steps="15023"/></proof>
  </goal>
- <goal name="query&#39;VC" expl="VC for query" proved="true">
+ <goal name="query&#39;vc" expl="VC for query" proved="true">
  <proof prover="3"><result status="valid" time="0.06" steps="12546"/></proof>
  </goal>
- <goal name="update&#39;VC" expl="VC for update" proved="true">
+ <goal name="update&#39;vc" expl="VC for update" proved="true">
  <proof prover="2"><result status="valid" time="0.05" steps="59537"/></proof>
  </goal>
 </theory>
 <theory name="CumulativeTree" proved="true">
- <goal name="tree_of_array&#39;VC" expl="VC for tree_of_array" proved="true">
+ <goal name="tree_of_array&#39;vc" expl="VC for tree_of_array" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="tree_of_array&#39;VC.0" expl="index in array bounds" proved="true">
+  <goal name="tree_of_array&#39;vc.0" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="7000"/></proof>
   </goal>
-  <goal name="tree_of_array&#39;VC.1" expl="precondition" proved="true">
+  <goal name="tree_of_array&#39;vc.1" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="6431"/></proof>
   </goal>
-  <goal name="tree_of_array&#39;VC.2" expl="assertion" proved="true">
+  <goal name="tree_of_array&#39;vc.2" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="8079"/></proof>
   </goal>
-  <goal name="tree_of_array&#39;VC.3" expl="variant decrease" proved="true">
+  <goal name="tree_of_array&#39;vc.3" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="7122"/></proof>
   </goal>
-  <goal name="tree_of_array&#39;VC.4" expl="precondition" proved="true">
+  <goal name="tree_of_array&#39;vc.4" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="7125"/></proof>
   </goal>
-  <goal name="tree_of_array&#39;VC.5" expl="variant decrease" proved="true">
+  <goal name="tree_of_array&#39;vc.5" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="7235"/></proof>
   </goal>
-  <goal name="tree_of_array&#39;VC.6" expl="precondition" proved="true">
+  <goal name="tree_of_array&#39;vc.6" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="7220"/></proof>
   </goal>
-  <goal name="tree_of_array&#39;VC.7" expl="assertion" proved="true">
+  <goal name="tree_of_array&#39;vc.7" expl="assertion" proved="true">
   <transf name="introduce_premises" proved="true" >
-   <goal name="tree_of_array&#39;VC.7.0" expl="assertion" proved="true">
+   <goal name="tree_of_array&#39;vc.7.0" expl="assertion" proved="true">
    <transf name="destruct_term" proved="true" arg1="l">
-    <goal name="tree_of_array&#39;VC.7.0.0" expl="assertion" proved="true">
+    <goal name="tree_of_array&#39;vc.7.0.0" expl="assertion" proved="true">
     <transf name="destruct_term" proved="true" arg1="r">
-     <goal name="tree_of_array&#39;VC.7.0.0.0" expl="assertion" proved="true">
+     <goal name="tree_of_array&#39;vc.7.0.0.0" expl="assertion" proved="true">
      <proof prover="3"><result status="valid" time="0.08" steps="15166"/></proof>
      </goal>
-     <goal name="tree_of_array&#39;VC.7.0.0.1" expl="assertion" proved="true">
+     <goal name="tree_of_array&#39;vc.7.0.0.1" expl="assertion" proved="true">
      <proof prover="3"><result status="valid" time="0.04" steps="9195"/></proof>
      </goal>
     </transf>
     </goal>
-    <goal name="tree_of_array&#39;VC.7.0.1" expl="assertion" proved="true">
+    <goal name="tree_of_array&#39;vc.7.0.1" expl="assertion" proved="true">
     <transf name="destruct_term" proved="true" arg1="r" arg2="using" arg3="b1,b2,b3">
-     <goal name="tree_of_array&#39;VC.7.0.1.0" expl="assertion" proved="true">
+     <goal name="tree_of_array&#39;vc.7.0.1.0" expl="assertion" proved="true">
      <proof prover="3" timelimit="5"><result status="valid" time="0.11" steps="13643"/></proof>
      </goal>
-     <goal name="tree_of_array&#39;VC.7.0.1.1" expl="assertion" proved="true">
+     <goal name="tree_of_array&#39;vc.7.0.1.1" expl="assertion" proved="true">
      <proof prover="3" timelimit="5"><result status="valid" time="0.04" steps="12674"/></proof>
      </goal>
     </transf>
@@ -204,14 +204,14 @@
    </goal>
   </transf>
   </goal>
-  <goal name="tree_of_array&#39;VC.8" expl="postcondition" proved="true">
+  <goal name="tree_of_array&#39;vc.8" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="tree_of_array&#39;VC.8.0" expl="postcondition" proved="true">
+   <goal name="tree_of_array&#39;vc.8.0" expl="postcondition" proved="true">
    <proof prover="3"><result status="valid" time="0.02" steps="8219"/></proof>
    </goal>
-   <goal name="tree_of_array&#39;VC.8.1" expl="postcondition" proved="true">
+   <goal name="tree_of_array&#39;vc.8.1" expl="postcondition" proved="true">
    <transf name="unfold" proved="true" arg1="is_tree_for">
-    <goal name="tree_of_array&#39;VC.8.1.0" expl="VC for tree_of_array" proved="true">
+    <goal name="tree_of_array&#39;vc.8.1.0" expl="VC for tree_of_array" proved="true">
     <proof prover="3"><result status="valid" time="0.22" steps="36066"/></proof>
     </goal>
    </transf>
@@ -220,20 +220,20 @@
   </goal>
  </transf>
  </goal>
- <goal name="create&#39;VC" expl="VC for create" proved="true">
+ <goal name="create&#39;vc" expl="VC for create" proved="true">
  <proof prover="3"><result status="valid" time="0.02" steps="6434"/></proof>
  </goal>
- <goal name="query_aux&#39;VC" expl="VC for query_aux" proved="true">
+ <goal name="query_aux&#39;vc" expl="VC for query_aux" proved="true">
  <proof prover="3"><result status="valid" time="0.25" steps="40435"/></proof>
  </goal>
- <goal name="query&#39;VC" expl="VC for query" proved="true">
+ <goal name="query&#39;vc" expl="VC for query" proved="true">
  <transf name="introduce_premises" proved="true" >
-  <goal name="query&#39;VC.0" expl="VC for query" proved="true">
+  <goal name="query&#39;vc.0" expl="VC for query" proved="true">
   <transf name="destruct_term" proved="true" arg1="t">
-   <goal name="query&#39;VC.0.0" expl="VC for query" proved="true">
+   <goal name="query&#39;vc.0.0" expl="VC for query" proved="true">
    <proof prover="3"><result status="valid" time="0.03" steps="9788"/></proof>
    </goal>
-   <goal name="query&#39;VC.0.1" expl="VC for query" proved="true">
+   <goal name="query&#39;vc.0.1" expl="VC for query" proved="true">
    <proof prover="3"><result status="valid" time="0.04" steps="8441"/></proof>
    </goal>
   </transf>
@@ -247,54 +247,54 @@
   </goal>
  </transf>
  </goal>
- <goal name="update_aux&#39;VC" expl="VC for update_aux" proved="true">
+ <goal name="update_aux&#39;vc" expl="VC for update_aux" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="update_aux&#39;VC.0" expl="assertion" proved="true">
+  <goal name="update_aux&#39;vc.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.05" steps="7292"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.1" expl="variant decrease" proved="true">
+  <goal name="update_aux&#39;vc.1" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="7951"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.2" expl="precondition" proved="true">
+  <goal name="update_aux&#39;vc.2" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="7504"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.3" expl="precondition" proved="true">
+  <goal name="update_aux&#39;vc.3" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="7602"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.4" expl="assertion" proved="true">
+  <goal name="update_aux&#39;vc.4" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="8667"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.5" expl="assertion" proved="true">
+  <goal name="update_aux&#39;vc.5" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="9295"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.6" expl="variant decrease" proved="true">
+  <goal name="update_aux&#39;vc.6" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="7962"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.7" expl="precondition" proved="true">
+  <goal name="update_aux&#39;vc.7" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="7526"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.8" expl="precondition" proved="true">
+  <goal name="update_aux&#39;vc.8" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="7701"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.9" expl="assertion" proved="true">
+  <goal name="update_aux&#39;vc.9" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="9311"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.10" expl="assertion" proved="true">
+  <goal name="update_aux&#39;vc.10" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="8744"/></proof>
   </goal>
-  <goal name="update_aux&#39;VC.11" expl="postcondition" proved="true">
+  <goal name="update_aux&#39;vc.11" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.55" steps="78054"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="update&#39;VC" expl="VC for update" proved="true">
+ <goal name="update&#39;vc" expl="VC for update" proved="true">
  <transf name="introduce_premises" proved="true" >
-  <goal name="update&#39;VC.0" expl="VC for update" proved="true">
+  <goal name="update&#39;vc.0" expl="VC for update" proved="true">
   <transf name="destruct_term" proved="true" arg1="t">
-   <goal name="update&#39;VC.0.0" expl="VC for update" proved="true">
+   <goal name="update&#39;vc.0.0" expl="VC for update" proved="true">
    <proof prover="3"><result status="valid" time="0.04" steps="10204"/></proof>
    </goal>
-   <goal name="update&#39;VC.0.1" expl="VC for update" proved="true">
+   <goal name="update&#39;vc.0.1" expl="VC for update" proved="true">
    <proof prover="3"><result status="valid" time="0.03" steps="9404"/></proof>
    </goal>
   </transf>
@@ -308,130 +308,130 @@
   </goal>
  </transf>
  </goal>
- <goal name="depth_is_log&#39;VC" expl="VC for depth_is_log" proved="true">
+ <goal name="depth_is_log&#39;vc" expl="VC for depth_is_log" proved="true">
  <proof prover="0" timelimit="1"><result status="valid" time="0.77" steps="1034"/></proof>
  </goal>
- <goal name="update_aux_complexity&#39;VC" expl="VC for update_aux_complexity" proved="true">
+ <goal name="update_aux_complexity&#39;vc" expl="VC for update_aux_complexity" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="update_aux_complexity&#39;VC.0" expl="assertion" proved="true">
+  <goal name="update_aux_complexity&#39;vc.0" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="8589"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.1" expl="postcondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="8134"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.2" expl="postcondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.09" steps="14405"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.3" expl="variant decrease" proved="true">
+  <goal name="update_aux_complexity&#39;vc.3" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="9314"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.4" expl="precondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.4" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="8808"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.5" expl="precondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.5" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.05" steps="8913"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.6" expl="assertion" proved="true">
+  <goal name="update_aux_complexity&#39;vc.6" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="10039"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.7" expl="assertion" proved="true">
+  <goal name="update_aux_complexity&#39;vc.7" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="10791"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.8" expl="postcondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="11382"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.9" expl="postcondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.9" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.12" steps="22777"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.10" expl="variant decrease" proved="true">
+  <goal name="update_aux_complexity&#39;vc.10" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="9325"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.11" expl="precondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.11" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="8830"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.12" expl="precondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.12" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="9012"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.13" expl="assertion" proved="true">
+  <goal name="update_aux_complexity&#39;vc.13" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="10807"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.14" expl="assertion" proved="true">
+  <goal name="update_aux_complexity&#39;vc.14" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="10116"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.15" expl="postcondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.15" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="11475"/></proof>
   </goal>
-  <goal name="update_aux_complexity&#39;VC.16" expl="postcondition" proved="true">
+  <goal name="update_aux_complexity&#39;vc.16" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.13" steps="21893"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="query_aux_complexity&#39;VC" expl="VC for query_aux_complexity" proved="true">
+ <goal name="query_aux_complexity&#39;vc" expl="VC for query_aux_complexity" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="query_aux_complexity&#39;VC.0" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.0" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="9078"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.1" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.05" steps="10853"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.2" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="9285"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.3" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.06" steps="11586"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.4" expl="variant decrease" proved="true">
+  <goal name="query_aux_complexity&#39;vc.4" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="10256"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.5" expl="precondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.5" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="9744"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.6" expl="precondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.6" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="9948"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.7" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="11578"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.8" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="8088"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.9" expl="variant decrease" proved="true">
+  <goal name="query_aux_complexity&#39;vc.9" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="10327"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.10" expl="precondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.10" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="9824"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.11" expl="precondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.11" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="10099"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.12" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.12" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.05" steps="11703"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.13" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.13" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="8114"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.14" expl="variant decrease" proved="true">
+  <goal name="query_aux_complexity&#39;vc.14" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.05" steps="10325"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.15" expl="precondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.15" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="9822"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.16" expl="precondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.16" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="10131"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.17" expl="variant decrease" proved="true">
+  <goal name="query_aux_complexity&#39;vc.17" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="10527"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.18" expl="precondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.18" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="9991"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.19" expl="precondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.19" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.04" steps="10244"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.20" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.20" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="12243"/></proof>
   </goal>
-  <goal name="query_aux_complexity&#39;VC.21" expl="postcondition" proved="true">
+  <goal name="query_aux_complexity&#39;vc.21" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.06" steps="13348"/></proof>
   </goal>
  </transf>

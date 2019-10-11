@@ -62,7 +62,7 @@ Axiom depths_unique2 :
   ((depths d1 t1) = (depths d2 t2)) -> (d1 = d2) /\ (t1 = t2).
 
 (* Why3 goal *)
-Theorem build_rec'VC :
+Theorem build_rec'vc :
   forall (d:Numbers.BinNums.Z) (s:Init.Datatypes.list Numbers.BinNums.Z),
   forall (x:Numbers.BinNums.Z) (x1:Init.Datatypes.list Numbers.BinNums.Z),
   (s = (Init.Datatypes.cons x x1)) -> ~ (x < d)%Z -> ~ (x = d) ->

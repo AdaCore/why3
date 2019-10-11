@@ -693,7 +693,7 @@ Axiom Ensures34 : ((rval t2') = ((rval o9) - (rval m2))%R).
 Axiom Ensures35 : ((iexp t2') = (iexp o9)).
 
 (* Why3 goal *)
-Theorem sqrt1'VC :
+Theorem sqrt1'vc :
   (((Reals.R_sqrt.sqrt (rval a)) * (Reals.R_sqrt.sqrt (rval a)))%R =
    (rval a)).
 Proof.
