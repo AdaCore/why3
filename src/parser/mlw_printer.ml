@@ -432,7 +432,7 @@ and pp_expr fmt e = match e.expr_desc with
   | Escope (qid, e) ->
       pp_scope pp_expr fmt qid e
   | Elabel (id, e) ->
-      fprintf fmt "label %a in %a" pp_id id pp_expr e
+      fprintf fmt "@[<hv 2>label %a in@ %a@]" pp_id id pp_expr e
   | Ecast (e, pty) ->
       pp_cast pp_expr fmt e pty
   | Eghost e ->
