@@ -500,8 +500,10 @@ and pp_term fmt t =
       pp_update pp_term fmt t fs
   | Tscope (qid, t) ->
       pp_scope pp_term fmt qid t
+  | Tat (t, {id_str="'Old"}) ->
+      fprintf fmt "old (%a)" pp_term t
   | Tat (t, id) ->
-      fprintf fmt "(%a at %a)" pp_term t pp_id id
+      fprintf fmt "(%a) at %a" pp_term t pp_id id
 
 and pp_spec fmt s =
   if s.sp_reads <> [] then
