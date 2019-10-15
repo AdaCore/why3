@@ -352,7 +352,14 @@ and pp_expr fmt e = match e.expr_desc with
       todo fmt "Eassign"
   (** control *)
   | Esequence (e1, e2) ->
-      fprintf fmt "@[<v>%a;@ %a@]" pp_expr e1 pp_expr e2
+      let rec flatten_sequence e = match e.expr_desc with
+        | Esequence (e1, e2) ->
+            e1 :: flatten_sequence e2
+        | _ -> [e] in
+      let es = flatten_sequence e in
+      let pp = pp_print_list ~pp_sep:(pp_sep ";@ ") pp_expr in
+      fprintf fmt "@[<v 1>(%a)@]" pp es
+      (* fprintf fmt "@[<v>%a;@ %a@]" pp_expr e1 pp_expr e2 *)
   | Eif (e1, e2, e3) ->
       pp_if pp_expr fmt e1 e2 e3
   | Ewhile (e1, invs, vars, e2) ->
