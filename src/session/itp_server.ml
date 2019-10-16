@@ -720,13 +720,16 @@ end
     | APa pa ->
       let pa = get_proof_attempt_node s pa in
       let obs = pa.proof_obsolete in
+      let detached = get_node_detached node in
+      let appear_obs = obs || detached in
       let limit = pa.limit in
       let res =
         match pa.Session_itp.proof_state with
         | Some pa -> Done pa
         | _ -> Undone
       in
-      P.notify (Node_change (new_id, Proof_status_change(res, obs, limit)))
+      P.notify (Node_change (new_id,
+                             Proof_status_change(res, appear_obs, limit)))
 
 
 (*
