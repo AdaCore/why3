@@ -23,6 +23,10 @@ external reset_gc : unit -> unit = "ml_reset_gc"
 let debug = Debug.lookup_flag "ide_info"
 let debug_stack_trace = Debug.lookup_flag "stack_trace"
 
+let () =
+  (* Allow global locations to be saved for Find_ident_req *)
+  Debug.set_flag Glob.flag
+
 (***************************)
 (* Debugging Json protocol *)
 (***************************)
@@ -2077,12 +2081,12 @@ let get_word_around_iter iter =
   let start_iter = get_left_words iter in
   let end_iter = get_right_words iter in
   let text = start_iter#get_text ~stop:end_iter in
-  (start_iter, text)
+  (start_iter, text, end_iter)
 
 (* This function check for immediate quantification (not for scope yet) *)
 let rec get_qualif acc start_iter =
   if start_iter#get_text ~stop:start_iter#forward_char = "." then
-    let (start_iter, text) = get_word_around_iter start_iter#backward_char in
+    let (start_iter, text, _) = get_word_around_iter start_iter#backward_char in
     if Strings.char_is_uppercase
         (start_iter#get_text ~stop:start_iter#forward_char).[0] then
       get_qualif (text :: acc) start_iter#backward_char
@@ -2096,7 +2100,7 @@ let get_module (iter: GText.iter) =
   | None -> print_message ~kind:1 ~notif_kind:"Error"
               "cannot find encapsulating module"; None
   | Some (_, end_iter) ->
-      let (_, text) = get_word_around_iter end_iter#forward_char in
+      let (_, text, _) = get_word_around_iter end_iter#forward_char in
       Some text
 
 (* find_cursor_ident: finds the ident under cursor and scroll to its definition
@@ -2112,19 +2116,20 @@ let find_cursor_ident, get_back_loc =
         try
           if file = "Task" then
             let iter = view#buffer#get_iter `SEL_BOUND in
-            let (_, text) = get_word_around_iter iter in
+            let (_, text, _) = get_word_around_iter iter in
             interp ("locate " ^ text)
           else
             let iter = view#buffer#get_iter `SEL_BOUND in
-            let (start_iter, text) = get_word_around_iter iter in
+            let (start_iter, text, end_iter) = get_word_around_iter iter in
             if text = "" then
               ()
             else
-              let qualif = get_qualif [] start_iter#backward_char in
-              match get_module start_iter with
-              | Some enc_module ->
-                  send_request (Find_ident_req (file, qualif, enc_module, text))
-              | None -> ()
+              let l = start_iter#line + 1 in
+              let b = start_iter#line_offset in
+              let e = end_iter#line_offset in
+              let f = file in
+              let loc = Loc.user_position f l b e in
+              send_request (Find_ident_req loc)
         with SearchLimit ->
           print_message ~notif_kind:"Ide_error" ~kind:1
             "Search limit overflow: the word is too long"

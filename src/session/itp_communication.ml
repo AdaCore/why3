@@ -126,7 +126,7 @@ type ide_request =
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string
   | Get_first_unproven_node of node_ID
-  | Find_ident_req          of string * string list * string * string
+  | Find_ident_req          of Loc.position
   | Unfocus_req
   | Save_req
   | Reload_req
@@ -151,7 +151,7 @@ let print_request fmt r =
              Whyconf.print_prover_upgrade_policy p2
   | Get_file_contents _f            -> fprintf fmt "get file contents"
   | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
-  | Find_ident_req (_, _, _, _)     -> fprintf fmt "find ident"
+  | Find_ident_req _                -> fprintf fmt "find ident"
   | Get_task(nid,b,loc)             -> fprintf fmt "get task(%d,%b,%b)" nid b loc
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
   | Copy_paste _                    -> fprintf fmt "copy paste"
