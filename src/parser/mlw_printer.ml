@@ -31,7 +31,7 @@ let pp_opt ?(prefix:(unit, formatter, unit) format="") ?(suffix:(unit, formatter
     fprintf fmt suffix
 
 let todo fmt str =
-  fprintf fmt "<%s>" str
+  fprintf fmt "<NOT IMPLEMENTED: %s>" str
 
 let pp_print_opt_list ?(prefix:(unit, formatter, unit) format="") ?(sep:(unit, formatter, unit) format=" ") ?(suffix:(unit, formatter, unit) format="") pp fmt = function
   | [] -> ()
@@ -199,7 +199,7 @@ let rec pp_pty fmt =
   | PTtuple ptys ->
       pp_tuple pp_pty fmt ptys
   | PTref _ptys ->
-      todo fmt "PTref"
+      todo fmt "PTref _"
   | PTarrow (pty1, pty2) ->
       fprintf fmt "@[<hv 2>%a ->@ %a@]" pp_pty' pty1 pp_pty' pty2
   | PTscope (qid, pty) ->
@@ -225,6 +225,10 @@ let pp_binder fmt (_, opt_id, ghost, opt_pty) =
 let pp_binders fmt =
   pp_print_opt_list ~prefix:" " pp_binder fmt
 
+let pp_opt_pty fmt = function
+  | None -> ()
+  | Some pty -> fprintf fmt " : %a" pp_pty pty
+
 let pp_param fmt (loc, opt_id, ghost, pty) =
   pp_binder fmt (loc, opt_id, ghost, Some pty)
 
@@ -245,7 +249,7 @@ let pp_attr pp closed fmt attr x =
       fprintf fmt "@[[@%s]@ %a@]" a.attr_string pp x
   | ATpos _loc ->
       (* fprintf fmt "[# %a] %a" Loc.pp loc pp x *)
-      todo fmt "attr-loc"
+      todo fmt "ATpos _"
 
 let pp_exn fmt (id, pty, _mask) =
   (* TODO _mask *)
@@ -285,11 +289,12 @@ let ghost_suffix = function
   | true -> " ghost"
   | false -> ""
 
-let rec pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, _pat, _mask, spec, x)) =
+let rec pp_fun pp fmt (binders, opt_pty, _pat, _mask, spec, e) =
   (* TODO _pat, _mask *)
-  let pp_opt_pty fmt = function
-    | None -> ()
-    | Some pty -> fprintf fmt " : %a" pp_pty pty in
+  fprintf fmt "@[<hv 2>fun %a%a%a ->@ @[%a@]@]" pp_binders binders pp_opt_pty opt_pty pp_spec spec pp e
+
+and pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, _pat, _mask, spec, x)) =
+  (* TODO _pat, _mask *)
   fprintf fmt "@[<hv 2>let%s%s %a%a%a%a =@ %a@]"
     (ghost_suffix ghost) (kind_suffix kind)
     pp_id id pp_binders binders pp_opt_pty opt_pty pp_spec spec pp x
@@ -355,7 +360,7 @@ and pp_expr fmt e =
   | Einfix (e1, op, e2) ->
       pp_infix pp_expr expr_closed fmt e1 op e2
   | Einnfix (e1, op, e2) ->
-      pp_infix pp_expr expr_closed fmt e1 op e2 (* TODO ??? *)
+      todo fmt "Einnfix _"
   | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e1)}, e2) ->
       (* TODO _pat *)
       fprintf fmt "@[<v>%a in@ %a@]"
@@ -372,10 +377,12 @@ and pp_expr fmt e =
       let pp_fundefs =
         pp_print_list ~pp_sep:(pp_sep "@ and ") pp_fundef in
       fprintf fmt "@[<v>let rec %a in@ %a@]" pp_fundefs defs pp_expr' e
-  | Efun _ ->
-      todo fmt "Efun"
+  | Efun (binders, opt_pty, pat, mask, spec, e) ->
+      pp_fun pp_expr fmt (binders, opt_pty, pat, mask, spec, e)
+  | Eany (params, _kind, Some pty, _pat, _mask, spec) ->
+      fprintf fmt "@[<hv 2>any %a%a@]" pp_pty pty pp_spec spec
   | Eany _ ->
-      todo fmt "Eany"
+      todo fmt "Eany _"
   | Etuple es ->
       pp_tuple pp_expr fmt es
   | Erecord fs ->
@@ -387,7 +394,7 @@ and pp_expr fmt e =
   | Eassign [e1, Some qid, e2] ->
       fprintf fmt "@[<hv 2>%a.%a <-@ %a@]" pp_expr' e1 pp_qualid qid pp_expr' e2
   | Eassign _ ->
-      todo fmt "Eassign"
+      todo fmt "Eassign _"
   (** control *)
   | Esequence _ ->
       let rec flatten_sequence e = match e.expr_desc with
@@ -424,8 +431,8 @@ and pp_expr fmt e =
       pp_print_string fmt "absurd"
   | Epure t ->
       fprintf fmt "@[@[<hv 2>pure {@ %a@] }@]" pp_term t
-  | Eidpur _ ->
-      todo fmt "Eidpur"
+  | Eidpur qid ->
+      fprintf fmt "@[<h>{ %a }@]" pp_qualid qid
   | Eraise (Qident {id_str="'Return"|"'Break"|"'Continue" as str}, opt_arg) ->
       let pp_opt_arg fmt = function
         | None -> ()
@@ -516,8 +523,8 @@ and pp_term fmt t =
       pp_apply pp_term term_closed fmt t1 t2
   | Tinfix (t1, op, t2) ->
       pp_infix pp_term term_closed fmt t1 op t2
-  | Tinnfix (t1, op, t2) ->
-      pp_infix pp_term term_closed fmt t1 op t2 (* TODO ??? *)
+  | Tinnfix _ ->
+      todo fmt "Tinnfix _"
   | Tbinop (t1, op, t2) ->
       fprintf fmt "@[<hv 2>%a %a@ %a@]" pp_term t1 pp_binop op pp_term t2
   | Tbinnop _ ->
@@ -529,8 +536,8 @@ and pp_term fmt t =
   | Tquant (quant, binders, [], t) ->
       let quant = match quant with Dterm.DTforall -> "forall" | Dterm.DTexists -> "exists" | Dterm.DTlambda -> "lambda" in
       fprintf fmt "@[<hv 2>%s%a.@ %a@]" quant pp_binders binders pp_term t
-  | Tquant _ ->
-      todo fmt "Tquant"
+  | Tquant (_, _, _::_, _) ->
+      todo fmt "Tquant (_, _, _::_, _)"
   | Tattr (attr, t) ->
       pp_attr pp_term term_closed fmt attr t
   | Tlet (id, t1, t2) ->
@@ -593,7 +600,7 @@ and pp_pattern fmt p =
   | Papp (qid, args) ->
       pp_idapp pp_pattern pattern_closed fmt qid args
   | Prec _ ->
-      todo fmt "Prec"
+      todo fmt "Prec _"
   | Ptuple ps ->
       pp_tuple pp_pattern fmt ps
   | Pas (p, id, ghost) ->
@@ -700,13 +707,18 @@ and pp_decl fmt = function
   | Dexn (id, pty, mask) ->
       fprintf fmt "%a" pp_exn (id, pty, mask)
   | Dmeta _ ->
-      todo fmt "Dmeta"
-  | Dcloneexport _ ->
-      todo fmt "Dcloneexport"
+      todo fmt "Dmeta _"
+  | Dcloneexport (qid, []) ->
+      fprintf fmt "@[<h>clone export %a@]" pp_qualid qid
+  | Dcloneexport (_, _::_) ->
+      todo fmt "Dcloneexport (_, _::_)"
   | Duseexport qid ->
-      fprintf fmt "clone %a" pp_qualid qid
+      fprintf fmt "use export %a" pp_qualid qid
+  | Dcloneimport (_, import, qid, None, []) ->
+      let import = if import then " import" else "" in
+      fprintf fmt "clone%s %a" import pp_qualid qid
   | Dcloneimport _ ->
-      todo fmt "Dcloneimport"
+      todo fmt "Dcloneimport _"
   | Duseimport (_, import, binds) ->
       let import = if import then " import" else "" in
       let pp_opt_id = pp_opt ~prefix:" as " pp_id in
@@ -717,8 +729,7 @@ and pp_decl fmt = function
   | Dimport qid ->
       fprintf fmt "import %a" pp_qualid qid
   | Dscope _ ->
-      (* TODO syntax? Dscope isn't mentioned in parser.mly *)
-      todo fmt "Dscope"
+      todo fmt "Dscope _"
 
 let pp_decls =
   pp_print_list ~pp_sep:(pp_sep "@,@,") pp_decl
