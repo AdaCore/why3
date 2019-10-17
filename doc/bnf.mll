@@ -78,6 +78,9 @@ and syntax = parse
       Buffer.clear idx;
       Buffer.clear full_kw;
       inquote lexbuf }
+  | '"' '"' {
+      print_char '"';
+      syntax lexbuf }
   | '"' {
       Buffer.clear idx;
       Buffer.clear full_kw;
