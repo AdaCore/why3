@@ -369,7 +369,7 @@ void run_request (prequest r) {
        }
    }
    if (r->timeout!=0||r->memlimit!=0) {
-     ULONGLONG timeout;
+     LONGLONG timeout;
      ZeroMemory(&limits, sizeof(limits));
      limits.BasicLimitInformation.LimitFlags =
        ((r->timeout==0)?0:JOB_OBJECT_LIMIT_PROCESS_TIME)
@@ -377,11 +377,11 @@ void run_request (prequest r) {
 
      // seconds to W32 kernel ticks
      if (r->timeout!=0) {
-       timeout = 1000ULL * 1000ULL * 10ULL * r->timeout;
+       timeout = 1000LL * 1000LL * 10LL * (LONGLONG)r->timeout;
        limits.BasicLimitInformation.PerProcessUserTimeLimit.QuadPart=timeout;
      }
      if (r->memlimit!=0) {
-       size_t memory = 1024 * 1024 * r->memlimit;
+       size_t memory = 1024 * 1024 * (size_t)r->memlimit;
        limits.ProcessMemoryLimit = memory;
      }
 
