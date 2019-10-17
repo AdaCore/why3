@@ -1,0 +1,29 @@
+module Test
+  use string.String
+
+  goal T1: length "\x17" = 1
+  goal T2: length "\o027" = 1
+  goal T3: length "\t" = 1
+  goal T4: length "\\" = 1
+  goal T5: length "\"" = 1
+  goal T6: length "\n" = 1
+  (* goal T7: length "\p" = 1 *)
+(*   goal T9: length "a *)
+
+(* b" = 2 *)
+  goal T10: length "'" = 1
+  goal T11: length "/" = 1
+  goal T12: length "`" = 1
+  (* à is the same as \195\160 *)
+  (* goal T13: length "à" = 1 *)
+  (* goal T14: length "Ϯ" = 1 *)
+  (* á is the same as \195\161, \o303\o241, \xC3\xA1 *)
+  (* goal T15: length "á" = 1 *)
+  goal T16: length "\o303\o241" = 2
+  goal T17: length "\xC3\xA1" = 2
+  (* goal T18: length "\o477" = 2 *)
+  goal T19: length "\xFFA" = 2
+  goal T20: length "\000" = 2
+  goal T21: length "\161" = 2
+  (* goal T22: length "\256" = 2 *)
+end

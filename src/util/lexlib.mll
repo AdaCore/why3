@@ -12,12 +12,28 @@
 {
   open Lexing
 
+  exception IllegalEscape
+  exception IllegalCharInString
+
+  let () = Exn_printer.register (fun fmt e -> match e with
+    | IllegalEscape -> Format.fprintf fmt "illegal escape"
+    | IllegalCharInString -> Format.fprintf fmt "illegal character in string"
+    | _ -> raise e)
+
+  let loc lb = Loc.extract (lb.lex_start_p,lb.lex_curr_p)
+
   let char_for_backslash = function
-    | 'n' -> '\n'
-    | 't' -> '\t'
-    | c -> c
+    | '\\' -> '\\'
+    | 'n'  -> '\n'
+    | 't'  -> '\t'
+    | '\"' -> '\"'
+    | _ -> raise IllegalCharInString
 
 }
+
+let dec     = ['0'-'9']
+let oct     = ['0'-'7']
+let hex     = ['0'-'9' 'a'-'f' 'A'-'F']
 
 let newline = '\r'* '\n'
 
@@ -46,25 +62,29 @@ and comment = parse
 and string buf = parse
   | "\""
       { Buffer.contents buf }
-  | "\\" newline
-      { new_line lexbuf;
-        string_skip_spaces buf lexbuf }
+  | "\\" (['0'-'1'] dec dec as dec) | "\\" ('2' ['0'-'5'] ['0'-'5'] as dec)
+      { Buffer.add_char buf (Char.chr (int_of_string dec));
+        string buf lexbuf }
+  | "\\x" (hex hex as hex)
+      { Buffer.add_char buf (Char.chr (int_of_string ("0x" ^ hex)));
+        string buf lexbuf }
+  | "\\o" (['0'-'3'] oct oct as oct)
+      { Buffer.add_char buf (Char.chr (int_of_string ("0o" ^ oct)));
+        string buf lexbuf }
   | "\\" (_ as c)
-      { Buffer.add_char buf (char_for_backslash c);
-        string buf lexbuf }
+      { try Buffer.add_char buf (char_for_backslash c);
+            string buf lexbuf
+        with IllegalCharInString ->
+          raise (Loc.Located (loc lexbuf,IllegalEscape))}
   | newline
-      { new_line lexbuf;
-        Buffer.add_char buf '\n';
-        string buf lexbuf }
+      { raise (Loc.Located (loc lexbuf,IllegalCharInString)) }
   | eof
       { raise Not_found }
-  | _ as c
+  | ['\000'-'\127'] as c
       { Buffer.add_char buf c;
         string buf lexbuf }
-
-and string_skip_spaces buf = parse
-  | [' ' '\t']*
-      { string buf lexbuf }
+  | _
+      { raise (Loc.Located (loc lexbuf, IllegalCharInString)) }
 
 {
   exception UnterminatedComment
