@@ -76,8 +76,12 @@ and string buf = parse
             string buf lexbuf
         with IllegalCharInString ->
           raise (Loc.Located (loc lexbuf,IllegalEscape))}
-  | newline
-      { raise (Loc.Located (loc lexbuf,IllegalCharInString)) }
+  | newline (* TODO drivers contain strings and they have new lines feed
+               option 1: fix all drivers so they just use single-line stdin               option 2: allow for multiline stdin
+               option 3: have two classes of strings *)
+      { new_line lexbuf;
+        Buffer.add_char buf '\n';
+        string buf lexbuf}
   | eof
       { raise Not_found }
   | ['\000'-'\127'] as c
