@@ -680,9 +680,14 @@ and pp_decl fmt = function
   | Dtype decls ->
       let pp_type_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_type_decl in
       fprintf fmt "@[<v>type %a@]" pp_type_decls decls
-  | Dlogic decls ->
+  | Dlogic decls when List.for_all (fun d -> d.ld_type = None) decls ->
       let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_logic_decl in
       fprintf fmt "@[<v>predicate %a@]" pp_logic_decls decls
+  | Dlogic decls when List.for_all (fun d -> d.ld_type <> None) decls ->
+      let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_logic_decl in
+      fprintf fmt "@[<v>function %a@]" pp_logic_decls decls
+  | Dlogic _ ->
+      todo fmt "Dlogic _"
   | Dind (sign, decls) ->
       let keyword = match sign with Decl.Ind -> "inductive" | Decl.Coind -> "coinductive" in
       let pp_ind_decls = pp_print_list ~pp_sep:(pp_sep " with ") pp_ind_decl in
