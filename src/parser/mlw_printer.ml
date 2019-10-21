@@ -53,7 +53,7 @@ let pp_closed is_closed pp fmt x =
     fprintf fmt "(%a)" pp x
 
 let expr_closed e = match e.expr_desc with
-  | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Ematch _ | Eabsurd | Escope _ | Eidapp (_, []) ->
+  | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Eabsurd | Escope _ | Eidapp (_, []) ->
       true
   | _ -> false
 
