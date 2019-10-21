@@ -225,6 +225,22 @@ let pp_binder fmt (_, opt_id, ghost, opt_pty) =
 let pp_binders fmt =
   pp_print_opt_list ~prefix:" " pp_binder fmt
 
+let pp_comma_binder fmt (_, opt_id, ghost, opt_pty) =
+  let pp_opt_id fmt = function
+    | None ->
+        pp_print_string fmt "_"
+    | Some id ->
+        pp_id fmt id in
+  let ghost = if ghost then "ghost " else "" in
+  match opt_pty with
+  | Some pty ->
+      fprintf fmt "%s%a: %a" ghost pp_opt_id opt_id pp_pty pty
+  | None ->
+      fprintf fmt "%s%a" ghost pp_opt_id opt_id
+
+let pp_comma_binders fmt =
+  pp_print_opt_list ~prefix:" " ~sep:", " pp_comma_binder fmt
+
 let pp_opt_pty fmt = function
   | None -> ()
   | Some pty -> fprintf fmt " : %a" pp_pty pty
@@ -535,7 +551,7 @@ and pp_term fmt t =
       pp_if pp_term term_closed fmt t1 t2 t3
   | Tquant (quant, binders, [], t) ->
       let quant = match quant with Dterm.DTforall -> "forall" | Dterm.DTexists -> "exists" | Dterm.DTlambda -> "lambda" in
-      fprintf fmt "@[<hv 2>%s%a.@ %a@]" quant pp_binders binders pp_term t
+      fprintf fmt "@[<hv 2>%s%a.@ %a@]" quant pp_comma_binders binders pp_term t
   | Tquant (_, _, _::_, _) ->
       todo fmt "Tquant (_, _, _::_, _)"
   | Tattr (attr, t) ->
@@ -674,7 +690,7 @@ and pp_logic_decl fmt d =
   pp_id fmt d.ld_ident;
   pp_print_opt_list ~prefix:" " ~sep:" " pp_param fmt d.ld_params;
   pp_opt ~prefix:" : " pp_pty fmt d.ld_type;
-  pp_opt ~prefix:" = " pp_term fmt d.ld_def
+  pp_opt ~prefix:" =@ " pp_term fmt d.ld_def
 
 and pp_decl fmt = function
   | Dtype decls ->
