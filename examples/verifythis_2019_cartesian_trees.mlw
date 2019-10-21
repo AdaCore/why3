@@ -13,7 +13,8 @@ use exn.Exn
 
 clone list.Sorted as Decr with type t = int, predicate le = (>=)
 
-(* Implement the stack with a list *)
+(** Implement the stack with a list *)
+
 let function destruct l
     requires { not is_nil l }
     =
@@ -35,6 +36,8 @@ let function tail l
 
 lemma destruct_peek_tail :
       forall l : list 'a. not is_nil l -> l = Cons (peek l) (tail l)
+
+(** Compute the sequence of left neighbors *)
 
 let smaller_left (s : array int) : array int
     (* Task 1 : left neighbor has smaller index *)
@@ -97,8 +100,9 @@ let smaller_left (s : array int) : array int
     done;
     left
 
-(* Same thing but for closest smaller right value :
+(** Same thing but for closest smaller right value :
    when there is no such value, return an integer greater than the length *)
+
 val smaller_right (s : array int) : array int
     (* Task 1 : right neighbor has greater index *)
     ensures { forall y. 0 <= y < s.length -> result[y] > y }
@@ -134,6 +138,8 @@ inductive descendant dirs int int =
 predicate is_smallest (a : array int) (i : int) =
    0 <= i < a.length /\
    forall j. 0 <= j < a.length -> a[i] <= a[j]
+
+(** Construct an array storing the eventual sons of a node *)
 
 let construct_dirs (a : array int) : dirs
     requires { forall i j. 0 <= i < j < a.length -> a[i] <> a[j] }
@@ -211,8 +217,8 @@ let construct_dirs (a : array int) : dirs
     dirs
 
 
-(* <par> is used to define <all_descendant_root>. This lemma function is useful to show that
-   every node is reachable from the root *)
+(** The function <par> finds the parent of a node and is used to define <all_descendant_root>.
+This last lemma function is useful to show that every node is reachable from the root *)
 
 let par (a : array int) (dirs : array dir) (j : int)
     requires { exists sm. 0 <= sm < a.length /\ parent dirs sm j }
@@ -261,7 +267,8 @@ let rec lemma all_descendant_root a dirs root j
     if a[j] <> a[root]
     then all_descendant_root a dirs root (par a dirs j)
 
-(* Finds the root of the direction tree : it's the smallest element in the array *)
+(** Finds the root of the direction tree : it's the smallest element in the array *)
+
 let find_smaller a =
     ensures { match result with
               | Some mv -> is_smallest a mv
@@ -280,7 +287,7 @@ let find_smaller a =
     done;
     m
 
-(* The other way to define descendant. Useful here because it follows the definition of
+(** The other way to define descendant. Useful here because it follows the definition of
    <traversal> *)
 
 lemma other_descendant :
@@ -294,7 +301,7 @@ lemma inv_other_descendant :
 
 clone list.Sorted as StrictIncr with type t = int, predicate le = (<)
 
-(* in-order traversal, we store the indices we traversed *)
+(** In-order traversal, we store the indices we traversed *)
 
 let rec traversal (a : array int) dirs top (ghost s : int) (ghost e)
     variant { e - s }
@@ -320,10 +327,13 @@ let rec traversal (a : array int) dirs top (ghost s : int) (ghost e)
            traversal a dirs dir.right (top+1) e)
     end
 
-(* We traverse the tree <construct_dirs a> in-order from the root <find_smaller a>,
+(** We traverse the tree <construct_dirs a> in-order from the root <find_smaller a>,
    and we collect the indices. Last 2 arguments of <traversal> are ghost.
-   We show that the result is the list [0..(a.length-1)]
+
+   We show that the result is the list [0..(a.length-1)], the in-order traversal of
+   the tree traverses elements from 0 to (a.length-1)
 *)
+
 let in_order a
     requires { forall i j. 0 <= i < j < a.length -> a[i] <> a[j] }
     ensures { forall x. mem x result <-> 0 <= x < a.length }
