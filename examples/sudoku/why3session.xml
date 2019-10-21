@@ -5,7 +5,7 @@
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="8" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="sudoku.mlw"/>
 <theory name="Grid" proved="true">
  <goal name="grid_eq_sub" proved="true">
@@ -19,141 +19,141 @@
  </goal>
 </theory>
 <theory name="TheClassicalSudokuGrid" proved="true">
- <goal name="classical_sudoku&#39;VC" expl="VC for classical_sudoku" proved="true">
+ <goal name="classical_sudoku&#39;vc" expl="VC for classical_sudoku" proved="true">
  <proof prover="5"><result status="valid" time="0.91" steps="2094835"/></proof>
  </goal>
 </theory>
 <theory name="Solver" proved="true">
- <goal name="check_valid_chunk&#39;VC" expl="VC for check_valid_chunk" proved="true">
+ <goal name="check_valid_chunk&#39;vc" expl="VC for check_valid_chunk" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="check_valid_chunk&#39;VC.0" expl="index in array bounds" proved="true">
+  <goal name="check_valid_chunk&#39;vc.0" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="5956"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.1" expl="array creation size" proved="true">
+  <goal name="check_valid_chunk&#39;vc.1" expl="array creation size" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="5200"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.2" expl="loop invariant init" proved="true">
+  <goal name="check_valid_chunk&#39;vc.2" expl="loop invariant init" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="6969"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.3" expl="loop invariant init" proved="true">
+  <goal name="check_valid_chunk&#39;vc.3" expl="loop invariant init" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6216"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.4" expl="loop invariant init" proved="true">
+  <goal name="check_valid_chunk&#39;vc.4" expl="loop invariant init" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7462"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.5" expl="index in array bounds" proved="true">
+  <goal name="check_valid_chunk&#39;vc.5" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="8271"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.6" expl="index in array bounds" proved="true">
+  <goal name="check_valid_chunk&#39;vc.6" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="8768"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.7" expl="index in array bounds" proved="true">
+  <goal name="check_valid_chunk&#39;vc.7" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="8011"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.8" expl="exceptional postcondition" proved="true">
+  <goal name="check_valid_chunk&#39;vc.8" expl="exceptional postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.05" steps="9516"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.9" expl="index in array bounds" proved="true">
+  <goal name="check_valid_chunk&#39;vc.9" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8063"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.10" expl="loop invariant preservation" proved="true">
+  <goal name="check_valid_chunk&#39;vc.10" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="61"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.11" expl="loop invariant preservation" proved="true">
+  <goal name="check_valid_chunk&#39;vc.11" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="53"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.12" expl="loop invariant preservation" proved="true">
+  <goal name="check_valid_chunk&#39;vc.12" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="66"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.13" expl="loop invariant preservation" proved="true">
+  <goal name="check_valid_chunk&#39;vc.13" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="50"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.14" expl="loop invariant preservation" proved="true">
+  <goal name="check_valid_chunk&#39;vc.14" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="10157"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.15" expl="loop invariant preservation" proved="true">
+  <goal name="check_valid_chunk&#39;vc.15" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="10467"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.16" expl="postcondition" proved="true">
+  <goal name="check_valid_chunk&#39;vc.16" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7881"/></proof>
   </goal>
-  <goal name="check_valid_chunk&#39;VC.17" expl="postcondition" proved="true">
+  <goal name="check_valid_chunk&#39;vc.17" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6089"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="check_valid&#39;VC" expl="VC for check_valid" proved="true">
+ <goal name="check_valid&#39;vc" expl="VC for check_valid" proved="true">
  <proof prover="8"><result status="valid" time="0.04" steps="12279"/></proof>
  </goal>
  <goal name="full_up_to_change" proved="true">
  <proof prover="8"><result status="valid" time="0.02" steps="6532"/></proof>
  </goal>
- <goal name="full_up_to_frame&#39;VC" expl="VC for full_up_to_frame" proved="true">
+ <goal name="full_up_to_frame&#39;vc" expl="VC for full_up_to_frame" proved="true">
  <proof prover="8"><result status="valid" time="0.03" steps="8247"/></proof>
  </goal>
- <goal name="full_up_to_frame_all&#39;VC" expl="VC for full_up_to_frame_all" proved="true">
+ <goal name="full_up_to_frame_all&#39;vc" expl="VC for full_up_to_frame_all" proved="true">
  <proof prover="8"><result status="valid" time="0.02" steps="6922"/></proof>
  </goal>
- <goal name="valid_chunk_frame&#39;VC" expl="VC for valid_chunk_frame" proved="true">
+ <goal name="valid_chunk_frame&#39;vc" expl="VC for valid_chunk_frame" proved="true">
  <proof prover="8"><result status="valid" time="0.08" steps="15069"/></proof>
  </goal>
- <goal name="valid_up_to_frame&#39;VC" expl="VC for valid_up_to_frame" proved="true">
+ <goal name="valid_up_to_frame&#39;vc" expl="VC for valid_up_to_frame" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="valid_up_to_frame&#39;VC.0" expl="assertion" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.0" expl="assertion" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7713"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.1" expl="variant decrease" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.1" expl="variant decrease" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6024"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.2" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.2" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6003"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.3" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.3" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="6534"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.4" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.4" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6045"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.5" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.5" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6052"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.6" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.6" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6600"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.7" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.7" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6586"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.8" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.8" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6072"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.9" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.9" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8272"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.10" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.10" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="6655"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.11" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.11" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6645"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.12" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.12" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6100"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.13" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.13" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8465"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.14" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.14" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="6710"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.15" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.15" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="6704"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.16" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.16" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6128"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.17" expl="precondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.17" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="8658"/></proof>
   </goal>
-  <goal name="valid_up_to_frame&#39;VC.18" expl="postcondition" proved="true">
+  <goal name="valid_up_to_frame&#39;vc.18" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.08" steps="16897"/></proof>
   </goal>
  </transf>
@@ -164,315 +164,315 @@
  <goal name="valid_changed_chunks" proved="true">
  <proof prover="5"><result status="valid" time="0.02" steps="20346"/></proof>
  </goal>
- <goal name="valid_up_to_change&#39;VC" expl="VC for valid_up_to_change" proved="true">
+ <goal name="valid_up_to_change&#39;vc" expl="VC for valid_up_to_change" proved="true">
  <proof prover="8"><result status="valid" time="0.06" steps="13539"/></proof>
  </goal>
- <goal name="solve_aux&#39;VC" expl="VC for solve_aux" proved="true">
+ <goal name="solve_aux&#39;vc" expl="VC for solve_aux" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="solve_aux&#39;VC.0" expl="exceptional postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.0" expl="exceptional postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="8886"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.1" expl="index in array bounds" proved="true">
+  <goal name="solve_aux&#39;vc.1" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="7244"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.2" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.2" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6569"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.3" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.3" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6576"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.4" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.4" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="7541"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.5" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.5" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7196"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.6" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.6" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6597"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.7" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.7" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6604"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.8" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.8" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7728"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.9" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.9" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7243"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.10" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.10" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6625"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.11" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.11" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6632"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.12" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.12" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7889"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.13" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.13" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7290"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.14" expl="variant decrease" proved="true">
+  <goal name="solve_aux&#39;vc.14" expl="variant decrease" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6705"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.15" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.15" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="6653"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.16" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.16" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="6660"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.17" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.17" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6667"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.18" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.18" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7303"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.19" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.19" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="8892"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.20" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.20" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="9213"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.21" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.21" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="6775"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.22" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.22" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7700"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.23" expl="exceptional postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.02" steps="6703"/></proof>
+  <goal name="solve_aux&#39;vc.23" expl="exceptional postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.02" steps="6496"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.24" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.24" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="8065"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.25" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.25" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="10197"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.26" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.26" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="7904"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.27" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.27" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="10022"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.28" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.28" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="7743"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.29" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.29" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="9847"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.30" expl="loop invariant init" proved="true">
+  <goal name="solve_aux&#39;vc.30" expl="loop invariant init" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7993"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.31" expl="loop invariant init" proved="true">
+  <goal name="solve_aux&#39;vc.31" expl="loop invariant init" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="6616"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.32" expl="loop invariant init" proved="true">
+  <goal name="solve_aux&#39;vc.32" expl="loop invariant init" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="6736"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.33" expl="index in array bounds" proved="true">
+  <goal name="solve_aux&#39;vc.33" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7878"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.34" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.34" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="7250"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.35" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.35" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="8109"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.36" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.36" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8604"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.37" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.37" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7390"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.38" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.38" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8202"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.39" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.39" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="10713"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.40" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.40" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="9228"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.41" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.41" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8442"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.42" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.42" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="8297"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.43" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.43" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="10934"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.44" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.44" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="9461"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.45" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.45" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8535"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.46" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.46" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="8392"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.47" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.47" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.06" steps="11147"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.48" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.48" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="9668"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.49" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.49" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="8628"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.50" expl="assertion" proved="true">
+  <goal name="solve_aux&#39;vc.50" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="solve_aux&#39;VC.50.0" expl="assertion" proved="true">
+   <goal name="solve_aux&#39;vc.50.0" expl="assertion" proved="true">
    <proof prover="8"><result status="valid" time="0.06" steps="12036"/></proof>
    </goal>
-   <goal name="solve_aux&#39;VC.50.1" expl="assertion" proved="true">
+   <goal name="solve_aux&#39;vc.50.1" expl="assertion" proved="true">
    <proof prover="8"><result status="valid" time="0.09" steps="16021"/></proof>
    </goal>
-   <goal name="solve_aux&#39;VC.50.2" expl="assertion" proved="true">
+   <goal name="solve_aux&#39;vc.50.2" expl="assertion" proved="true">
    <proof prover="8"><result status="valid" time="0.10" steps="16210"/></proof>
    </goal>
-   <goal name="solve_aux&#39;VC.50.3" expl="assertion" proved="true">
+   <goal name="solve_aux&#39;vc.50.3" expl="assertion" proved="true">
    <proof prover="8"><result status="valid" time="0.09" steps="16399"/></proof>
    </goal>
-   <goal name="solve_aux&#39;VC.50.4" expl="assertion" proved="true">
+   <goal name="solve_aux&#39;vc.50.4" expl="assertion" proved="true">
    <proof prover="8"><result status="valid" time="0.29" steps="41402"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="solve_aux&#39;VC.51" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.51" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7759"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.52" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.52" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="10691"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.53" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.53" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="7805"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.54" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.54" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="8968"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.55" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.55" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="9036"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.56" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.56" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="9096"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.57" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.57" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="9156"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.58" expl="variant decrease" proved="true">
+  <goal name="solve_aux&#39;vc.58" expl="variant decrease" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="7811"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.59" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.59" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7766"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.60" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.60" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8946"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.61" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.61" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="13227"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.62" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.62" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="9085"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.63" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.63" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="11362"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.64" expl="precondition" proved="true">
+  <goal name="solve_aux&#39;vc.64" expl="precondition" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="12720"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.65" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.65" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.07" steps="16654"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.66" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.66" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.10" steps="17411"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.67" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.67" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.12" steps="21872"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.68" expl="exceptional postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.68" expl="exceptional postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.09" steps="18780"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.69" expl="assertion" proved="true">
+  <goal name="solve_aux&#39;vc.69" expl="assertion" proved="true">
   <proof prover="8"><result status="valid" time="0.12" steps="17031"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.70" expl="assertion" proved="true">
+  <goal name="solve_aux&#39;vc.70" expl="assertion" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8774"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.71" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.71" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="9098"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.72" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.72" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.06" steps="12835"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.73" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.73" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="solve_aux&#39;VC.73.0" expl="loop invariant preservation" proved="true">
+   <goal name="solve_aux&#39;vc.73.0" expl="loop invariant preservation" proved="true">
    <proof prover="8"><result status="valid" time="0.05" steps="11471"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="solve_aux&#39;VC.74" expl="assertion" proved="true">
+  <goal name="solve_aux&#39;vc.74" expl="assertion" proved="true">
   <proof prover="8"><result status="valid" time="0.10" steps="16815"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.75" expl="assertion" proved="true">
+  <goal name="solve_aux&#39;vc.75" expl="assertion" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="8675"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.76" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.76" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="9007"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.77" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.77" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.06" steps="12622"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.78" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.78" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="11262"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.79" expl="assertion" proved="true">
+  <goal name="solve_aux&#39;vc.79" expl="assertion" proved="true">
   <proof prover="8"><result status="valid" time="0.11" steps="16631"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.80" expl="assertion" proved="true">
+  <goal name="solve_aux&#39;vc.80" expl="assertion" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="8576"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.81" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.81" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="8916"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.82" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.82" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.06" steps="12409"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.83" expl="loop invariant preservation" proved="true">
+  <goal name="solve_aux&#39;vc.83" expl="loop invariant preservation" proved="true">
   <proof prover="8"><result status="valid" time="0.04" steps="11053"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.84" expl="index in array bounds" proved="true">
+  <goal name="solve_aux&#39;vc.84" expl="index in array bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.02" steps="7628"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.85" expl="assertion" proved="true">
+  <goal name="solve_aux&#39;vc.85" expl="assertion" proved="true">
   <proof prover="8"><result status="valid" time="0.06" steps="10842"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.86" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.86" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.03" steps="7913"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.87" expl="postcondition" proved="true">
+  <goal name="solve_aux&#39;vc.87" expl="postcondition" proved="true">
   <proof prover="8"><result status="valid" time="0.08" steps="15028"/></proof>
   </goal>
-  <goal name="solve_aux&#39;VC.88" expl="out of loop bounds" proved="true">
+  <goal name="solve_aux&#39;vc.88" expl="out of loop bounds" proved="true">
   <proof prover="8"><result status="valid" time="0.01" steps="7043"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="solve&#39;VC" expl="VC for solve" proved="true">
- <proof prover="8"><result status="valid" time="0.02" steps="8306"/></proof>
+ <goal name="solve&#39;vc" expl="VC for solve" proved="true">
+ <proof prover="8"><result status="valid" time="0.02" steps="8280"/></proof>
  </goal>
- <goal name="check_then_solve&#39;VC" expl="VC for check_then_solve" proved="true">
+ <goal name="check_then_solve&#39;vc" expl="VC for check_then_solve" proved="true">
  <proof prover="8"><result status="valid" time="0.04" steps="7270"/></proof>
  </goal>
 </theory>
 <theory name="Test" proved="true">
- <goal name="test0&#39;VC" expl="VC for test0" proved="true">
+ <goal name="test0&#39;vc" expl="VC for test0" proved="true">
  <proof prover="8"><result status="valid" time="0.03" steps="7997"/></proof>
  </goal>
- <goal name="test1&#39;VC" expl="VC for test1" proved="true">
+ <goal name="test1&#39;vc" expl="VC for test1" proved="true">
  <proof prover="5"><result status="valid" time="0.12" steps="182892"/></proof>
  </goal>
- <goal name="test2&#39;VC" expl="VC for test2" proved="true">
+ <goal name="test2&#39;vc" expl="VC for test2" proved="true">
  <proof prover="8"><result status="valid" time="0.03" steps="7986"/></proof>
  </goal>
 </theory>

@@ -9,10 +9,10 @@
 <prover id="5" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="8" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="koda_ruskey.mlw"/>
 <theory name="KodaRuskey_Spec" proved="true">
- <goal name="eq_color&#39;VC" expl="VC for eq_color" proved="true">
+ <goal name="eq_color&#39;vc" expl="VC for eq_color" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
  <proof prover="4"><result status="valid" time="0.01" steps="3212"/></proof>
  </goal>
@@ -130,9 +130,9 @@
   </goal>
  </transf>
  </goal>
- <goal name="inverse_any&#39;VC" expl="VC for inverse_any" proved="true">
+ <goal name="inverse_any&#39;vc" expl="VC for inverse_any" proved="true">
  <transf name="induction_ty_lex" proved="true" >
-  <goal name="inverse_any&#39;VC.0" expl="VC for inverse_any" proved="true">
+  <goal name="inverse_any&#39;vc.0" expl="VC for inverse_any" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="65"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="9245"/></proof>
   </goal>
@@ -152,7 +152,7 @@
   </goal>
  </transf>
  </goal>
- <goal name="white_final_exclusive&#39;VC" expl="VC for white_final_exclusive" proved="true">
+ <goal name="white_final_exclusive&#39;vc" expl="VC for white_final_exclusive" proved="true">
  <proof prover="1"><result status="valid" time="0.02" steps="27"/></proof>
  <proof prover="4"><result status="valid" time="0.03" steps="7849"/></proof>
  </goal>
@@ -170,7 +170,7 @@
   </goal>
  </transf>
  </goal>
- <goal name="inverse_inverse&#39;VC" expl="VC for inverse_inverse" proved="true">
+ <goal name="inverse_inverse&#39;vc" expl="VC for inverse_inverse" proved="true">
  <proof prover="1"><result status="valid" time="0.26" steps="739"/></proof>
  <proof prover="4"><result status="valid" time="0.35" steps="46542"/></proof>
  </goal>
@@ -448,73 +448,73 @@
  <goal name="white_white" proved="true">
  <proof prover="4"><result status="valid" time="0.04" steps="10838"/></proof>
  </goal>
- <goal name="sub_valid_coloring_white&#39;VC" expl="VC for sub_valid_coloring_white" proved="true">
+ <goal name="sub_valid_coloring_white&#39;vc" expl="VC for sub_valid_coloring_white" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="sub_valid_coloring_white&#39;VC.0" expl="variant decrease" proved="true">
+  <goal name="sub_valid_coloring_white&#39;vc.0" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="35"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="11467"/></proof>
   </goal>
-  <goal name="sub_valid_coloring_white&#39;VC.1" expl="precondition" proved="true">
+  <goal name="sub_valid_coloring_white&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="23"/></proof>
   <proof prover="4"><result status="valid" time="0.03" steps="10362"/></proof>
   </goal>
-  <goal name="sub_valid_coloring_white&#39;VC.2" expl="precondition" proved="true">
+  <goal name="sub_valid_coloring_white&#39;vc.2" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="61"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="11043"/></proof>
   </goal>
-  <goal name="sub_valid_coloring_white&#39;VC.3" expl="precondition" proved="true">
+  <goal name="sub_valid_coloring_white&#39;vc.3" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="9723"/></proof>
   </goal>
-  <goal name="sub_valid_coloring_white&#39;VC.4" expl="variant decrease" proved="true">
+  <goal name="sub_valid_coloring_white&#39;vc.4" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="35"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="12564"/></proof>
   </goal>
-  <goal name="sub_valid_coloring_white&#39;VC.5" expl="precondition" proved="true">
+  <goal name="sub_valid_coloring_white&#39;vc.5" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="23"/></proof>
   <proof prover="4"><result status="valid" time="0.03" steps="11368"/></proof>
   </goal>
-  <goal name="sub_valid_coloring_white&#39;VC.6" expl="precondition" proved="true">
+  <goal name="sub_valid_coloring_white&#39;vc.6" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="55"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="11419"/></proof>
   </goal>
-  <goal name="sub_valid_coloring_white&#39;VC.7" expl="precondition" proved="true">
+  <goal name="sub_valid_coloring_white&#39;vc.7" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="10588"/></proof>
   </goal>
-  <goal name="sub_valid_coloring_white&#39;VC.8" expl="postcondition" proved="true">
+  <goal name="sub_valid_coloring_white&#39;vc.8" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="sub_valid_coloring_white&#39;VC.8.0" expl="postcondition" proved="true">
+   <goal name="sub_valid_coloring_white&#39;vc.8.0" expl="postcondition" proved="true">
    <proof prover="4"><result status="valid" time="0.05" steps="11264"/></proof>
    </goal>
-   <goal name="sub_valid_coloring_white&#39;VC.8.1" expl="postcondition" proved="true">
+   <goal name="sub_valid_coloring_white&#39;vc.8.1" expl="postcondition" proved="true">
    <transf name="introduce_premises" proved="true" >
-    <goal name="sub_valid_coloring_white&#39;VC.8.1.0" expl="postcondition" proved="true">
+    <goal name="sub_valid_coloring_white&#39;vc.8.1.0" expl="postcondition" proved="true">
     <transf name="destruct_term" proved="true" arg1="f0">
-     <goal name="sub_valid_coloring_white&#39;VC.8.1.0.0" expl="postcondition" proved="true">
+     <goal name="sub_valid_coloring_white&#39;vc.8.1.0.0" expl="postcondition" proved="true">
      <transf name="compute_in_goal" proved="true" >
-      <goal name="sub_valid_coloring_white&#39;VC.8.1.0.0.0" expl="postcondition" proved="true">
+      <goal name="sub_valid_coloring_white&#39;vc.8.1.0.0.0" expl="postcondition" proved="true">
       <transf name="split_goal_right" proved="true" >
-       <goal name="sub_valid_coloring_white&#39;VC.8.1.0.0.0.0" expl="VC for sub_valid_coloring_white" proved="true">
+       <goal name="sub_valid_coloring_white&#39;vc.8.1.0.0.0.0" expl="VC for sub_valid_coloring_white" proved="true">
        <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="1.37" steps="135117"/></proof>
        </goal>
-       <goal name="sub_valid_coloring_white&#39;VC.8.1.0.0.0.1" expl="VC for sub_valid_coloring_white" proved="true">
-       <proof prover="2" timelimit="5"><result status="valid" time="2.62"/></proof>
+       <goal name="sub_valid_coloring_white&#39;vc.8.1.0.0.0.1" expl="VC for sub_valid_coloring_white" proved="true">
+       <proof prover="2" timelimit="5"><result status="valid" time="2.21"/></proof>
        <transf name="remove" proved="true" arg1="real,bool,tuple0,unit,tuple2,map,coloring,stack,zero,one,(-_),(+),( * ),(&lt;),(-),(&gt;),(&lt;=),(&gt;=),get,set,([&lt;-]),is_nil,length,mem,size_forest,between_range_forest,valid_nums_forest,count_forest,eq_coloring,size_stack,even_forest,final_forest,any_forest,unchanged,inverse,any_stack,disjoint_stack,x,x1,x2,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,is_nil&#39;spec,Length_nonnegative,Length_nil,Append_assoc,Append_l_nil,Append_length,mem_append,mem_decomp,size_forest_nonneg,count_forest_nonneg,mem_app,size_stack_nonneg,any_forest_frame,any_stack_frame,inverse_frame,inverse_frame2,inverse_any,inverse_final,inverse_white,white_final_exclusive,final_unique,inverse_inverse,sub_not_nil,sub_empty,sub_weaken1,sub_weaken2,not_mem_st,sub_frame,sub_no_rep2,white_valid,final_valid,valid_coloring_set,head_and_tail,sub_valid_coloring_f1,sub_valid_coloring,white_white,Ensures,Ensures1,H1">
-        <goal name="sub_valid_coloring_white&#39;VC.8.1.0.0.0.1.0" expl="VC for sub_valid_coloring_white" proved="true">
+        <goal name="sub_valid_coloring_white&#39;vc.8.1.0.0.0.1.0" expl="VC for sub_valid_coloring_white" proved="true">
         <proof prover="2" timelimit="1"><result status="valid" time="0.16"/></proof>
         <proof prover="5"><result status="valid" time="0.87" steps="111992"/></proof>
         </goal>
        </transf>
        </goal>
-       <goal name="sub_valid_coloring_white&#39;VC.8.1.0.0.0.2" expl="VC for sub_valid_coloring_white" proved="true">
+       <goal name="sub_valid_coloring_white&#39;vc.8.1.0.0.0.2" expl="VC for sub_valid_coloring_white" proved="true">
        <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="7.73" steps="522463"/></proof>
        </goal>
       </transf>
       </goal>
      </transf>
      </goal>
-     <goal name="sub_valid_coloring_white&#39;VC.8.1.0.1" expl="postcondition" proved="true">
+     <goal name="sub_valid_coloring_white&#39;vc.8.1.0.1" expl="postcondition" proved="true">
      <proof prover="4"><result status="valid" time="0.03" steps="10571"/></proof>
      </goal>
     </transf>
@@ -532,360 +532,360 @@
   </goal>
  </transf>
  </goal>
- <goal name="stored_trans1&#39;VC" expl="VC for stored_trans1" proved="true">
+ <goal name="stored_trans1&#39;vc" expl="VC for stored_trans1" proved="true">
  <proof prover="1" timelimit="1"><result status="valid" time="0.39" steps="438"/></proof>
  </goal>
- <goal name="stored_trans2&#39;VC" expl="VC for stored_trans2" proved="true">
+ <goal name="stored_trans2&#39;vc" expl="VC for stored_trans2" proved="true">
  <proof prover="1" timelimit="1"><result status="valid" time="0.39" steps="438"/></proof>
  </goal>
 </theory>
 <theory name="KodaRuskey" proved="true">
- <goal name="enum&#39;VC" expl="VC for enum" proved="true">
+ <goal name="enum&#39;vc" expl="VC for enum" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="enum&#39;VC.0" expl="unreachable point" proved="true">
+  <goal name="enum&#39;vc.0" expl="unreachable point" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="14"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21036"/></proof>
   </goal>
-  <goal name="enum&#39;VC.1" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.1" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21115"/></proof>
   </goal>
-  <goal name="enum&#39;VC.2" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="18994"/></proof>
   </goal>
-  <goal name="enum&#39;VC.3" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="53"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="27956"/></proof>
   </goal>
-  <goal name="enum&#39;VC.4" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
   <proof prover="4"><result status="valid" time="0.05" steps="24991"/></proof>
   </goal>
-  <goal name="enum&#39;VC.5" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.04" steps="108"/></proof>
   </goal>
-  <goal name="enum&#39;VC.6" expl="variant decrease" proved="true">
+  <goal name="enum&#39;vc.6" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="26"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="24106"/></proof>
   </goal>
-  <goal name="enum&#39;VC.7" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.7" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="17"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21179"/></proof>
   </goal>
-  <goal name="enum&#39;VC.8" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.8" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.00" steps="17"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21192"/></proof>
   </goal>
-  <goal name="enum&#39;VC.9" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.9" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="43"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="22485"/></proof>
   </goal>
-  <goal name="enum&#39;VC.10" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.10" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="23"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="22466"/></proof>
   </goal>
-  <goal name="enum&#39;VC.11" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.11" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="45"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="22511"/></proof>
   </goal>
-  <goal name="enum&#39;VC.12" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.12" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21318"/></proof>
   </goal>
-  <goal name="enum&#39;VC.13" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.13" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="56"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="24689"/></proof>
   </goal>
-  <goal name="enum&#39;VC.14" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.14" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="94"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="24868"/></proof>
   </goal>
-  <goal name="enum&#39;VC.15" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.15" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="22"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21290"/></proof>
   </goal>
-  <goal name="enum&#39;VC.16" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.16" expl="postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.08" steps="217"/></proof>
   </goal>
-  <goal name="enum&#39;VC.17" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.17" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.54" steps="333"/></proof>
   <proof prover="4"><result status="valid" time="0.16" steps="38269"/></proof>
   </goal>
-  <goal name="enum&#39;VC.18" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.18" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="101"/></proof>
   <proof prover="4"><result status="valid" time="0.18" steps="38116"/></proof>
   </goal>
-  <goal name="enum&#39;VC.19" expl="index in array bounds" proved="true">
+  <goal name="enum&#39;vc.19" expl="index in array bounds" proved="true">
   <proof prover="9"><result status="valid" time="0.37"/></proof>
   </goal>
-  <goal name="enum&#39;VC.20" expl="variant decrease" proved="true">
+  <goal name="enum&#39;vc.20" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.04" steps="80"/></proof>
   <proof prover="4"><result status="valid" time="0.10" steps="29220"/></proof>
   </goal>
-  <goal name="enum&#39;VC.21" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.21" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21253"/></proof>
   </goal>
-  <goal name="enum&#39;VC.22" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.22" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21270"/></proof>
   </goal>
-  <goal name="enum&#39;VC.23" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.23" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.06" steps="60"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="22561"/></proof>
   </goal>
-  <goal name="enum&#39;VC.24" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.24" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="18994"/></proof>
   </goal>
-  <goal name="enum&#39;VC.25" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.25" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.23" steps="321"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="24574"/></proof>
   </goal>
-  <goal name="enum&#39;VC.26" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.26" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="21"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21367"/></proof>
   </goal>
-  <goal name="enum&#39;VC.27" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.27" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.71" steps="661"/></proof>
   <proof prover="4"><result status="valid" time="0.23" steps="48083"/></proof>
   </goal>
-  <goal name="enum&#39;VC.28" expl="index in array bounds" proved="true">
+  <goal name="enum&#39;vc.28" expl="index in array bounds" proved="true">
   <proof prover="9"><result status="valid" time="0.35"/></proof>
   </goal>
-  <goal name="enum&#39;VC.29" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.29" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.38" steps="405"/></proof>
   <proof prover="4"><result status="valid" time="0.42" steps="68172"/></proof>
   </goal>
-  <goal name="enum&#39;VC.30" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.30" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.48" steps="75517"/></proof>
   <proof prover="9"><result status="valid" time="0.15"/></proof>
   </goal>
-  <goal name="enum&#39;VC.31" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.31" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.07" steps="145"/></proof>
   <proof prover="4"><result status="valid" time="0.09" steps="26776"/></proof>
   </goal>
-  <goal name="enum&#39;VC.32" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.32" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="37"/></proof>
   <proof prover="4"><result status="valid" time="0.07" steps="23743"/></proof>
   </goal>
-  <goal name="enum&#39;VC.33" expl="variant decrease" proved="true">
+  <goal name="enum&#39;vc.33" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="47"/></proof>
   <proof prover="4"><result status="valid" time="0.09" steps="27137"/></proof>
   </goal>
-  <goal name="enum&#39;VC.34" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.34" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="31"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="23783"/></proof>
   </goal>
-  <goal name="enum&#39;VC.35" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.35" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="32"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="23857"/></proof>
   </goal>
-  <goal name="enum&#39;VC.36" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.36" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.09" steps="97"/></proof>
   <proof prover="4"><result status="valid" time="0.07" steps="24221"/></proof>
   </goal>
-  <goal name="enum&#39;VC.37" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.37" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
   <proof prover="4"><result status="valid" time="0.03" steps="18994"/></proof>
   </goal>
-  <goal name="enum&#39;VC.38" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.38" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.16"/></proof>
   <proof prover="4"><result status="valid" time="0.10" steps="27509"/></proof>
   </goal>
-  <goal name="enum&#39;VC.39" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.39" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.14"/></proof>
   <proof prover="4"><result status="valid" time="0.10" steps="27363"/></proof>
   </goal>
-  <goal name="enum&#39;VC.40" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.40" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.34" steps="330"/></proof>
   <proof prover="4"><result status="valid" time="0.11" steps="28926"/></proof>
   </goal>
-  <goal name="enum&#39;VC.41" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.41" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.16" steps="160"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="24875"/></proof>
   </goal>
-  <goal name="enum&#39;VC.42" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.42" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.13"/></proof>
   <proof prover="4"><result status="valid" time="0.12" steps="31366"/></proof>
   </goal>
-  <goal name="enum&#39;VC.43" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.43" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="37"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="25444"/></proof>
   </goal>
-  <goal name="enum&#39;VC.44" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.44" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.57"/></proof>
   </goal>
-  <goal name="enum&#39;VC.45" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.45" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.19" steps="44006"/></proof>
   </goal>
-  <goal name="enum&#39;VC.46" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.46" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.16"/></proof>
   <proof prover="4"><result status="valid" time="0.18" steps="44389"/></proof>
   </goal>
-  <goal name="enum&#39;VC.47" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.47" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.16"/></proof>
   <proof prover="4"><result status="valid" time="0.17" steps="44546"/></proof>
   </goal>
-  <goal name="enum&#39;VC.48" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.48" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="40"/></proof>
   <proof prover="4"><result status="valid" time="0.05" steps="26522"/></proof>
   </goal>
-  <goal name="enum&#39;VC.49" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.49" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="40"/></proof>
   <proof prover="4"><result status="valid" time="0.05" steps="25816"/></proof>
   </goal>
-  <goal name="enum&#39;VC.50" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.50" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="1.41"/></proof>
   <proof prover="4"><result status="valid" time="0.32" steps="57928"/></proof>
   </goal>
-  <goal name="enum&#39;VC.51" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.51" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.42" steps="65016"/></proof>
   </goal>
-  <goal name="enum&#39;VC.52" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.52" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="39"/></proof>
   <proof prover="4"><result status="valid" time="0.03" steps="21779"/></proof>
   </goal>
-  <goal name="enum&#39;VC.53" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.53" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="39"/></proof>
   <proof prover="4"><result status="valid" time="0.05" steps="24470"/></proof>
   </goal>
-  <goal name="enum&#39;VC.54" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.54" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.19" steps="389"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="24310"/></proof>
   </goal>
-  <goal name="enum&#39;VC.55" expl="variant decrease" proved="true">
+  <goal name="enum&#39;vc.55" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="41"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="25165"/></proof>
   </goal>
-  <goal name="enum&#39;VC.56" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.56" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21334"/></proof>
   </goal>
-  <goal name="enum&#39;VC.57" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.57" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21351"/></proof>
   </goal>
-  <goal name="enum&#39;VC.58" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.58" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="76"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="24599"/></proof>
   </goal>
-  <goal name="enum&#39;VC.59" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.59" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="8"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="18994"/></proof>
   </goal>
-  <goal name="enum&#39;VC.60" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.60" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.61" steps="699"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="25169"/></proof>
   </goal>
-  <goal name="enum&#39;VC.61" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.61" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="21"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21459"/></proof>
   </goal>
-  <goal name="enum&#39;VC.62" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.62" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.90" steps="118605"/></proof>
   </goal>
-  <goal name="enum&#39;VC.63" expl="index in array bounds" proved="true">
+  <goal name="enum&#39;vc.63" expl="index in array bounds" proved="true">
   <proof prover="9"><result status="valid" time="0.39"/></proof>
   </goal>
-  <goal name="enum&#39;VC.64" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.64" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.29" steps="216"/></proof>
   <proof prover="4"><result status="valid" time="0.13" steps="34224"/></proof>
   </goal>
-  <goal name="enum&#39;VC.65" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.65" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="35"/></proof>
   <proof prover="4"><result status="valid" time="0.07" steps="23734"/></proof>
   </goal>
-  <goal name="enum&#39;VC.66" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.66" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="1.01" steps="657"/></proof>
   <proof prover="4"><result status="valid" time="0.27" steps="49368"/></proof>
   </goal>
-  <goal name="enum&#39;VC.67" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.67" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="3.21" steps="2381"/></proof>
   <proof prover="4"><result status="valid" time="0.40" steps="68699"/></proof>
   </goal>
-  <goal name="enum&#39;VC.68" expl="variant decrease" proved="true">
+  <goal name="enum&#39;vc.68" expl="variant decrease" proved="true">
   <proof prover="1"><result status="valid" time="0.21" steps="133"/></proof>
   <proof prover="4"><result status="valid" time="0.12" steps="34698"/></proof>
   </goal>
-  <goal name="enum&#39;VC.69" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.69" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="30"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="24079"/></proof>
   </goal>
-  <goal name="enum&#39;VC.70" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.70" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="31"/></proof>
   <proof prover="4"><result status="valid" time="0.07" steps="24153"/></proof>
   </goal>
-  <goal name="enum&#39;VC.71" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.71" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.09" steps="88"/></proof>
   <proof prover="4"><result status="valid" time="0.07" steps="24270"/></proof>
   </goal>
-  <goal name="enum&#39;VC.72" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.72" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   <proof prover="4"><result status="valid" time="0.03" steps="18994"/></proof>
   </goal>
-  <goal name="enum&#39;VC.73" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.73" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.17" steps="39811"/></proof>
   </goal>
-  <goal name="enum&#39;VC.74" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.74" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="29017"/></proof>
   </goal>
-  <goal name="enum&#39;VC.75" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.75" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.18" steps="172"/></proof>
   <proof prover="4"><result status="valid" time="0.10" steps="29330"/></proof>
   </goal>
-  <goal name="enum&#39;VC.76" expl="assertion" proved="true">
+  <goal name="enum&#39;vc.76" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="1.39" steps="137665"/></proof>
   </goal>
-  <goal name="enum&#39;VC.77" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.77" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="36"/></proof>
   <proof prover="4"><result status="valid" time="0.07" steps="25300"/></proof>
   </goal>
-  <goal name="enum&#39;VC.78" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.78" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.61"/></proof>
   </goal>
-  <goal name="enum&#39;VC.79" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.79" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="1.46"/></proof>
   <proof prover="4"><result status="valid" time="0.22" steps="44279"/></proof>
   </goal>
-  <goal name="enum&#39;VC.80" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.80" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.17"/></proof>
   <proof prover="4"><result status="valid" time="0.16" steps="42577"/></proof>
   </goal>
-  <goal name="enum&#39;VC.81" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.81" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.16"/></proof>
   <proof prover="1"><result status="valid" time="0.44" steps="331"/></proof>
   <proof prover="4"><result status="valid" time="0.17" steps="42966"/></proof>
   </goal>
-  <goal name="enum&#39;VC.82" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.82" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="39"/></proof>
   <proof prover="4"><result status="valid" time="0.05" steps="26444"/></proof>
   </goal>
-  <goal name="enum&#39;VC.83" expl="precondition" proved="true">
+  <goal name="enum&#39;vc.83" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="39"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="25820"/></proof>
   </goal>
-  <goal name="enum&#39;VC.84" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.84" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="1.23"/></proof>
   <proof prover="4"><result status="valid" time="0.17" steps="40872"/></proof>
   </goal>
-  <goal name="enum&#39;VC.85" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.85" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="1.40"/></proof>
   <proof prover="1"><result status="valid" time="2.42" steps="1598"/></proof>
   <proof prover="4"><result status="valid" time="0.39" steps="64120"/></proof>
   </goal>
-  <goal name="enum&#39;VC.86" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.86" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="38"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="21783"/></proof>
   </goal>
-  <goal name="enum&#39;VC.87" expl="postcondition" proved="true">
+  <goal name="enum&#39;vc.87" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.02" steps="38"/></proof>
   <proof prover="4"><result status="valid" time="0.04" steps="24330"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="main&#39;VC" expl="VC for main" proved="true">
+ <goal name="main&#39;vc" expl="VC for main" proved="true">
  <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="135"/></proof>
  </goal>
 </theory>

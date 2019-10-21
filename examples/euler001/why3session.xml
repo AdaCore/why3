@@ -6,7 +6,7 @@
 <prover id="2" name="Z3" version="4.6.0" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="0"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="euler001.mlw"/>
 <theory name="DivModHints" proved="true">
  <goal name="mod_div_unique" proved="true">
@@ -118,13 +118,13 @@
  </goal>
 </theory>
 <theory name="Euler001" proved="true">
- <goal name="VC solve" expl="VC for solve" proved="true">
+ <goal name="solve&#39;vc" expl="VC for solve" proved="true">
  <proof prover="3"><result status="valid" time="1.72" steps="349"/></proof>
  </goal>
- <goal name="VC run" expl="VC for run" proved="true">
+ <goal name="run&#39;vc" expl="VC for run" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="VC bench" expl="VC for bench" proved="true">
+ <goal name="bench&#39;vc" expl="VC for bench" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
 </theory>

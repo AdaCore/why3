@@ -62,7 +62,7 @@ Axiom depths_unique2 :
   ((depths d1 t1) = (depths d2 t2)) -> (d1 = d2) /\ (t1 = t2).
 
 (* Why3 goal *)
-Theorem harness'VC :
+Theorem harness'vc :
   ~ (forall (t:tree),
      ~ ((depths 0%Z t) =
         (Init.Datatypes.cons 1%Z

@@ -62,7 +62,7 @@ Definition range (a:array Numbers.BinNums.Z) (n:Numbers.BinNums.Z) : Prop :=
   map.MapInjection.range (elts a) n.
 
 (* Why3 goal *)
-Theorem inverting2'VC :
+Theorem inverting2'vc :
   forall (a:array Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
   (n = (length a)) /\ injective a n /\ range a n ->
   let b := make n 0%Z in

@@ -1,32 +1,42 @@
 stages:
+  - docker
   - build
   - test
   - nightly
   - deploy
 
+variables:
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2019-10-04"
+  GIT_CLEAN_FLAGS: "-ffdxq"
+
+build-image:
+  stage: docker
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
+    - if docker pull "$BUILD_IMAGE"; then echo "Image already exists!"; exit 1; fi
+    - docker build --force-rm -t "$BUILD_IMAGE" - < misc/Dockerfile.build
+    - docker push "$BUILD_IMAGE"
+    - docker rmi "$BUILD_IMAGE"
+  only:
+    variables:
+      - $NEW_BUILD_IMAGE
+  tags:
+    - shell
+
+.docker_template: &docker_definition
+  image: "$BUILD_IMAGE"
+  tags:
+    - docker
+
 .build_template: &build_definition
   stage: build
   script:
-    - misc/ci-docker.sh misc/ci-local.sh
+    - misc/ci-local.sh
+  <<: *docker_definition
 
 build-system:
   variables:
-    COMPILER: system
-  <<: *build_definition
-
-build-4.02.3:
-  variables:
-    COMPILER: 4.02.3
-  <<: *build_definition
-
-build-4.03.0:
-  variables:
-    COMPILER: 4.03.0
-  <<: *build_definition
-
-build-4.04.2:
-  variables:
-    COMPILER: 4.04.2
+    COMPILER: ocaml-system
   <<: *build_definition
 
 build-4.05.0:
@@ -44,10 +54,21 @@ build-4.07.1:
     COMPILER: 4.07.1
   <<: *build_definition
 
+build-4.08.1:
+  variables:
+    COMPILER: 4.08.1
+  <<: *build_definition
+
+build-4.09.0:
+  variables:
+    COMPILER: 4.09.0
+  <<: *build_definition
+
 .bench_template1: &bench_definition_always
   stage: test
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench ide
+    - misc/ci-local.sh bench ide
+  <<: *docker_definition
 
 .bench_template2: &bench_definition
   <<: *bench_definition_always
@@ -57,21 +78,6 @@ build-4.07.1:
 
 bench-system:
   <<: *bench_definition_always
-
-bench-4.02.3:
-  variables:
-    COMPILER: 4.02.3
-  <<: *bench_definition
-
-bench-4.03.0:
-  variables:
-    COMPILER: 4.03.0
-  <<: *bench_definition
-
-bench-4.04.2:
-  variables:
-    COMPILER: 4.04.2
-  <<: *bench_definition
 
 bench-4.05.0:
   variables:
@@ -88,45 +94,59 @@ bench-4.07.1:
     COMPILER: 4.07.1
   <<: *bench_definition_always
 
-full-4.07.1:
+bench-4.08.1:
+  variables:
+    COMPILER: 4.08.1
+  <<: *bench_definition
+
+bench-4.09.0:
+  variables:
+    COMPILER: 4.09.1
+  <<: *bench_definition
+
+full:
   stage: test
   variables:
-    COMPILER: 4.07.1
-    DEBIAN_PACKAGES: hevea rubber texlive-latex-extra lmodern texlive-fonts-recommended
-    OPAM_PACKAGES: coq-flocq.3.1.0 js_of_ocaml-ppx alt-ergo.2.0.0
+    COMPILER: full
   script:
-    - misc/ci-docker.sh misc/ci-local.sh bench ide doc web_ide
+    - misc/ci-local.sh bench ide doc web_ide
+  <<: *docker_definition
 
 nightly-bench:
   stage: nightly
   variables:
-    COMPILER: 4.05.0
-    DEBIAN_PACKAGES: cvc3 spass
-    OPAM_PACKAGES: alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.2 coq-flocq.3.1.0
+    COMPILER: bench
   script:
-    - misc/ci-docker.sh misc/ci-local.sh nightly-bench-reduced
+    - misc/ci-local.sh nightly-bench-reduced
+  <<: *docker_definition
 
 ce-bench:
   stage: nightly
   variables:
-    COMPILER: 4.05.0
-    DEBIAN_PACKAGES: cvc3 spass
-    OPAM_PACKAGES: alt-ergo.2.0.0 zenon.0.8.0 coq.8.7.2 coq-flocq.3.1.0
+    COMPILER: bench
   script:
-    - misc/ci-docker.sh misc/ci-local.sh ce-bench
+    - misc/ci-local.sh ce-bench
+  <<: *docker_definition
 
 opam:
   stage: build
-  variables:
-    COMPILER: system
   script:
-    - misc/ci-docker.sh misc/ci-opam.sh
+    - opam pin -v -y add why3 .
+    - opam pin -v -y add why3-ide .
+  <<: *docker_definition
 
 deploy:
   stage: deploy
   script:
-    - misc/ci-deploy.sh
+    - IMAGE=$CI_REGISTRY_IMAGE:$(echo $CI_COMMIT_REF_NAME | tr -cs "[:alnum:].\n" "-")
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
+    - docker pull "$IMAGE" || true
+    - docker build --force-rm --cache-from "$IMAGE" -t "$IMAGE" -f misc/Dockerfile.deploy .
+    - docker push "$IMAGE"
+    - docker rmi "$IMAGE"
   only:
     - master
     - /^bugfix[/]v[0-9.]*$/
     - tags
+  tags:
+    - shell

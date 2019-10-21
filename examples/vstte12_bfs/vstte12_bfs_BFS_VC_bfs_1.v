@@ -94,7 +94,7 @@ Definition closure (visited:set.Fset.fset vertex)
   set.Fset.mem y visited.
 
 (* Why3 goal *)
-Theorem bfs'VC :
+Theorem bfs'vc :
   forall (s:vertex) (t:vertex), forall (visited:set),
   ((to_fset visited) = (set.Fset.empty : set.Fset.fset vertex)) /\
   ((set.Fset.cardinal (to_fset visited)) = 0%Z) -> forall (o:set),

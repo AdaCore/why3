@@ -6,7 +6,7 @@
 <prover id="2" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="warshall_algorithm.mlw"/>
 <theory name="WarshallAlgorithm" proved="true">
  <goal name="weakening" proved="true">
@@ -23,58 +23,58 @@
  <proof prover="2"><path
                     name="warshall_algorithm_WarshallAlgorithm_decomposition_1.v"/><result status="valid" time="0.78"/></proof>
  </goal>
- <goal name="VC transitive_closure" expl="VC for transitive_closure" proved="true">
+ <goal name="transitive_closure&#39;vc" expl="VC for transitive_closure" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC transitive_closure.0" expl="loop invariant init" proved="true">
+  <goal name="transitive_closure&#39;vc.0" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="34"/></proof>
   </goal>
-  <goal name="VC transitive_closure.1" expl="loop invariant init" proved="true">
+  <goal name="transitive_closure&#39;vc.1" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="33"/></proof>
   </goal>
-  <goal name="VC transitive_closure.2" expl="loop invariant init" proved="true">
+  <goal name="transitive_closure&#39;vc.2" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="50"/></proof>
   </goal>
-  <goal name="VC transitive_closure.3" expl="index in matrix bounds" proved="true">
+  <goal name="transitive_closure&#39;vc.3" expl="index in matrix bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC transitive_closure.4" expl="index in matrix bounds" proved="true">
+  <goal name="transitive_closure&#39;vc.4" expl="index in matrix bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="19"/></proof>
   </goal>
-  <goal name="VC transitive_closure.5" expl="index in matrix bounds" proved="true">
+  <goal name="transitive_closure&#39;vc.5" expl="index in matrix bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC transitive_closure.6" expl="index in matrix bounds" proved="true">
+  <goal name="transitive_closure&#39;vc.6" expl="index in matrix bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC transitive_closure.7" expl="loop invariant preservation" proved="true">
+  <goal name="transitive_closure&#39;vc.7" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="VC transitive_closure.7.0" expl="loop invariant preservation" proved="true">
+   <goal name="transitive_closure&#39;vc.7.0" expl="loop invariant preservation" proved="true">
    <proof prover="3"><result status="valid" time="0.14" steps="292"/></proof>
    </goal>
-   <goal name="VC transitive_closure.7.1" expl="loop invariant preservation" proved="true">
+   <goal name="transitive_closure&#39;vc.7.1" expl="loop invariant preservation" proved="true">
    <proof prover="3"><result status="valid" time="0.03" steps="163"/></proof>
    </goal>
-   <goal name="VC transitive_closure.7.2" expl="loop invariant preservation" proved="true">
+   <goal name="transitive_closure&#39;vc.7.2" expl="loop invariant preservation" proved="true">
    <proof prover="0"><result status="valid" time="0.02" steps="36732"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC transitive_closure.8" expl="loop invariant preservation" proved="true">
+  <goal name="transitive_closure&#39;vc.8" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="65"/></proof>
   </goal>
-  <goal name="VC transitive_closure.9" expl="loop invariant preservation" proved="true">
+  <goal name="transitive_closure&#39;vc.9" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC transitive_closure.10" expl="loop invariant preservation" proved="true">
+  <goal name="transitive_closure&#39;vc.10" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="23"/></proof>
   </goal>
-  <goal name="VC transitive_closure.11" expl="loop invariant preservation" proved="true">
+  <goal name="transitive_closure&#39;vc.11" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC transitive_closure.12" expl="postcondition" proved="true">
+  <goal name="transitive_closure&#39;vc.12" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="15"/></proof>
   </goal>
-  <goal name="VC transitive_closure.13" expl="postcondition" proved="true">
+  <goal name="transitive_closure&#39;vc.13" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
  </transf>

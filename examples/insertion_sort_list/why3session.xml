@@ -4,29 +4,29 @@
 <why3session shape_version="8">
 <prover id="2" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="11" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="insertion_sort_list.mlw"/>
 <theory name="InsertionSort" proved="true">
  <goal name="Transitive.Trans" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
- <goal name="VC insert" expl="VC for insert" proved="true">
+ <goal name="insert&#39;vc" expl="VC for insert" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC insert.0" expl="variant decrease" proved="true">
+  <goal name="insert&#39;vc.0" expl="variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC insert.1" expl="precondition" proved="true">
+  <goal name="insert&#39;vc.1" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC insert.2" expl="postcondition" proved="true">
+  <goal name="insert&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.12" steps="27244"/></proof>
   </goal>
-  <goal name="VC insert.3" expl="postcondition" proved="true">
+  <goal name="insert&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.34" steps="56045"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC insertion_sort" expl="VC for insertion_sort" proved="true">
+ <goal name="insertion_sort&#39;vc" expl="VC for insertion_sort" proved="true">
  <proof prover="3"><result status="valid" time="0.11" steps="548"/></proof>
  </goal>
 </theory>

@@ -1,9 +1,11 @@
 #!/bin/bash
 
 set -e
-eval `opam config env`
+opam switch $COMPILER
+eval `opam env`
 
 export OCAMLRUNPARAM=o=20,O=200
+./autogen.sh
 ./configure --enable-local
 make
 

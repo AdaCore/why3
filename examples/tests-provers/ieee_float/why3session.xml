@@ -17,7 +17,7 @@
 <prover id="12" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="13" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="14" name="Isabelle" version="2018" timelimit="0" steplimit="0" memlimit="0"/>
-<file>
+<file format="whyml">
 <path name=".."/><path name="ieee_float.mlw"/>
 <theory name="A" proved="true">
  <goal name="ebsb32" proved="true">
@@ -37,25 +37,25 @@
  </goal>
 </theory>
 <theory name="M603_018" proved="true">
- <goal name="triplet&#39;VC" expl="VC for triplet" proved="true">
+ <goal name="triplet&#39;vc" expl="VC for triplet" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="triplet&#39;VC.0" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.0" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.23"/></proof>
   <proof prover="6"><result status="valid" time="0.66" steps="1100298"/></proof>
   </goal>
-  <goal name="triplet&#39;VC.1" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.1" expl="assertion" proved="true">
   <proof prover="4"><result status="valid" time="0.73"/></proof>
   <proof prover="5"><result status="valid" time="0.78"/></proof>
   <proof prover="10"><result status="valid" time="0.47" steps="2836"/></proof>
   </goal>
-  <goal name="triplet&#39;VC.2" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.2" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.21"/></proof>
   <proof prover="1"><result status="valid" time="0.55"/></proof>
   <proof prover="3"><result status="valid" time="0.22"/></proof>
   <proof prover="5"><result status="valid" time="0.06"/></proof>
   <proof prover="10"><result status="valid" time="0.08" steps="176"/></proof>
   </goal>
-  <goal name="triplet&#39;VC.3" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.3" expl="assertion" proved="true">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="1"><result status="outofmemory" time="4.28"/></proof>
   <proof prover="3"><result status="timeout" time="5.00"/></proof>
@@ -64,16 +64,16 @@
   <proof prover="6"><result status="valid" time="4.90" steps="5428367"/></proof>
   <proof prover="10"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="triplet&#39;VC.4" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.4" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.14"/></proof>
   <proof prover="1"><result status="valid" time="0.56"/></proof>
   <proof prover="3"><result status="valid" time="0.26"/></proof>
   <proof prover="10"><result status="valid" time="0.31" steps="1307"/></proof>
   </goal>
-  <goal name="triplet&#39;VC.5" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.5" expl="assertion" proved="true">
   <proof prover="10" timelimit="10" memlimit="4000"><result status="valid" time="0.75" steps="4256"/></proof>
   </goal>
-  <goal name="triplet&#39;VC.6" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.6" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.25"/></proof>
   <proof prover="1"><result status="valid" time="0.55"/></proof>
   <proof prover="3"><result status="valid" time="0.27"/></proof>
@@ -81,14 +81,14 @@
   <proof prover="5"><result status="valid" time="0.12"/></proof>
   <proof prover="10"><result status="valid" time="0.08" steps="184"/></proof>
   </goal>
-  <goal name="triplet&#39;VC.7" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.7" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="6.20" steps="7126555"/></proof>
   <proof prover="6" timelimit="60"><result status="valid" time="26.44" steps="16301045"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="5479184"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="762334"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="5207850"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="646800"/></proof>
   </goal>
-  <goal name="triplet&#39;VC.8" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.8" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="3"><result status="valid" time="0.07"/></proof>
@@ -96,7 +96,7 @@
   <proof prover="5"><result status="valid" time="0.12"/></proof>
   <proof prover="10"><result status="valid" time="0.03" steps="186"/></proof>
   </goal>
-  <goal name="triplet&#39;VC.9" expl="assertion" proved="true">
+  <goal name="triplet&#39;vc.9" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="3.63" steps="5412284"/></proof>
   <proof prover="5"><result status="valid" time="2.73"/></proof>
   <proof prover="6"><result status="timeout" time="5.00"/></proof>
@@ -151,104 +151,104 @@
  </goal>
 </theory>
 <theory name="M121_039_nonlinear">
- <goal name="test&#39;VC" expl="VC for test">
+ <goal name="test&#39;vc" expl="VC for test">
  <transf name="split_goal_right" >
-  <goal name="test&#39;VC.0" expl="assertion">
+  <goal name="test&#39;vc.0" expl="assertion">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
-  <proof prover="6"><result status="timeout" time="5.00" steps="9315283"/></proof>
+  <proof prover="6"><result status="timeout" time="5.00" steps="9205785"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="8475308"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="929039"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="8080585"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="918515"/></proof>
   <proof prover="10"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="test&#39;VC.1" expl="assertion" proved="true">
+  <goal name="test&#39;vc.1" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.03" steps="172"/></proof>
   </goal>
-  <goal name="test&#39;VC.2" expl="assertion" proved="true">
+  <goal name="test&#39;vc.2" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.03" steps="172"/></proof>
   </goal>
-  <goal name="test&#39;VC.3" expl="assertion" proved="true">
+  <goal name="test&#39;vc.3" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.05"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.06"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.03" steps="172"/></proof>
   </goal>
-  <goal name="test&#39;VC.4" expl="assertion" proved="true">
+  <goal name="test&#39;vc.4" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   <proof prover="1"><result status="valid" time="0.15"/></proof>
   <proof prover="3"><result status="valid" time="0.09"/></proof>
   <proof prover="5"><result status="valid" time="0.02"/></proof>
   <proof prover="10"><result status="valid" time="0.03" steps="174"/></proof>
   </goal>
-  <goal name="test&#39;VC.5" expl="assertion" proved="true">
+  <goal name="test&#39;vc.5" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.73"/></proof>
   </goal>
-  <goal name="test&#39;VC.6" expl="assertion" proved="true">
-  <proof prover="5"><result status="timeout" time="5.00"/></proof>
-  <proof prover="6"><result status="timeout" time="5.00" steps="9662327"/></proof>
-  <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="9087845"/></proof>
-  <proof prover="9"><result status="valid" time="0.16" steps="37223"/></proof>
-  <proof prover="10"><result status="timeout" time="5.00"/></proof>
-  </goal>
-  <goal name="test&#39;VC.7" expl="assertion">
-  <proof prover="2"><result status="timeout" time="10.00" steps="13428699"/></proof>
+  <goal name="test&#39;vc.6" expl="assertion" proved="true">
   <proof prover="5"><result status="timeout" time="5.00"/></proof>
   <proof prover="6"><result status="timeout" time="5.00"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="6903523"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="516651"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="8980253"/></proof>
+  <proof prover="9"><result status="valid" time="0.16" steps="37223"/></proof>
   <proof prover="10"><result status="timeout" time="5.00"/></proof>
   </goal>
-  <goal name="test&#39;VC.8" expl="assertion" proved="true">
+  <goal name="test&#39;vc.7" expl="assertion">
+  <proof prover="2"><result status="timeout" time="10.00" steps="13212471"/></proof>
+  <proof prover="5"><result status="timeout" time="5.00"/></proof>
+  <proof prover="6"><result status="timeout" time="5.00" steps="7628270"/></proof>
+  <proof prover="7"><result status="timeout" time="5.00"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="6819008"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="510582"/></proof>
+  <proof prover="10"><result status="timeout" time="5.00"/></proof>
+  </goal>
+  <goal name="test&#39;vc.8" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.06"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.07"/></proof>
   <proof prover="5"><result status="valid" time="0.01"/></proof>
   <proof prover="10"><result status="valid" time="0.04" steps="180"/></proof>
   </goal>
-  <goal name="test&#39;VC.9" expl="assertion" proved="true">
+  <goal name="test&#39;vc.9" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.17"/></proof>
   <proof prover="3"><result status="valid" time="0.19"/></proof>
   <proof prover="5"><result status="valid" time="0.10"/></proof>
   </goal>
-  <goal name="test&#39;VC.10" expl="postcondition" proved="true">
+  <goal name="test&#39;vc.10" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="1.00"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="LB09_025_conversion">
- <goal name="fti&#39;VC" expl="VC for fti">
+ <goal name="fti&#39;vc" expl="VC for fti">
  <transf name="split_goal_right" >
-  <goal name="fti&#39;VC.0" expl="postcondition">
+  <goal name="fti&#39;vc.0" expl="postcondition">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
   <proof prover="2" timelimit="1"><result status="timeout" time="1.00"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="17435314"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="1090650"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="16542039"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="1076647"/></proof>
   <proof prover="10" timelimit="1"><result status="timeout" time="1.00"/></proof>
   </goal>
-  <goal name="fti&#39;VC.1" expl="postcondition">
+  <goal name="fti&#39;vc.1" expl="postcondition">
   <proof prover="0"><result status="timeout" time="5.00"/></proof>
-  <proof prover="2" timelimit="1"><result status="timeout" time="1.00" steps="2703672"/></proof>
+  <proof prover="2" timelimit="1"><result status="timeout" time="1.00" steps="2745548"/></proof>
   <proof prover="6"><result status="unknown" time="1.82" steps="4268487"/></proof>
   <proof prover="7"><result status="timeout" time="5.00"/></proof>
-  <proof prover="8"><result status="timeout" time="5.00" steps="8075003"/></proof>
-  <proof prover="9"><result status="timeout" time="5.00" steps="1356609"/></proof>
+  <proof prover="8"><result status="timeout" time="5.00" steps="8136816"/></proof>
+  <proof prover="9"><result status="timeout" time="5.00" steps="1346204"/></proof>
   <proof prover="10" timelimit="1"><result status="timeout" time="1.00"/></proof>
   </goal>
-  <goal name="fti&#39;VC.2" expl="postcondition" proved="true">
+  <goal name="fti&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.04"/></proof>
   <proof prover="1"><result status="valid" time="0.01"/></proof>
   <proof prover="3"><result status="valid" time="0.04"/></proof>
@@ -257,13 +257,13 @@
   </goal>
  </transf>
  </goal>
- <goal name="fti_purely_float&#39;VC" expl="VC for fti_purely_float">
+ <goal name="fti_purely_float&#39;vc" expl="VC for fti_purely_float">
  <transf name="split_vc" >
-  <goal name="fti_purely_float&#39;VC.0" expl="postcondition">
+  <goal name="fti_purely_float&#39;vc.0" expl="postcondition">
   </goal>
-  <goal name="fti_purely_float&#39;VC.1" expl="postcondition">
+  <goal name="fti_purely_float&#39;vc.1" expl="postcondition">
   </goal>
-  <goal name="fti_purely_float&#39;VC.2" expl="postcondition">
+  <goal name="fti_purely_float&#39;vc.2" expl="postcondition">
   </goal>
  </transf>
  </goal>

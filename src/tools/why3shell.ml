@@ -299,6 +299,8 @@ let treat_notification fmt n =
       add_new_node fmt id pid typ name detached
   | Remove _id                              -> (* TODO *)
       fprintf fmt "got a Remove notification not yet supported@."
+  | Ident_notif_loc _loc                    ->
+      fprintf fmt "Ident_notif_loc notification not yet supported@."
   | Initialized _g_info                     ->
       (* TODO *)
       fprintf fmt "Initialized@."
@@ -306,18 +308,18 @@ let treat_notification fmt n =
       fprintf fmt "Session is saved@."
   | Saving_needed _b                        -> (* TODO *)
       fprintf fmt "got a Saving_needed notification not yet supported@."
-  | Message (msg)                           -> treat_message_notification fmt msg
-  | Dead s                                 ->
+  | Message msg                             -> treat_message_notification fmt msg
+  | Dead s                                  ->
       fprintf fmt "Dead notification: %s\nExiting.@." s;
       (* This exception is matched in Unix_Scheduler *)
       raise Exit
-  | File_contents (f, s)                    ->
+  | File_contents (f, s, _, _)              ->
       fprintf fmt "File %s is:\n%s" f s (* TODO print this correctly *)
   | Source_and_ce _                         ->
       fprintf fmt "got a Source_and_ce notification not yet supported@." (* TODO *)
   | Next_Unproven_Node_Id _                 ->
       fprintf fmt "got a Next_Unproven_Node_Id notification not yet supported@." (* TODO *)
-  | Task (id, s, _list_loc, _)              ->
+  | Task (id, s, _list_loc, _, _)           ->
     (* coloring the source is useless in shell *)
     try
       let node = Hnode.find nodes id in

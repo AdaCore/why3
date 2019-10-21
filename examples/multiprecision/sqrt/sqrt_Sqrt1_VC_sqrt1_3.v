@@ -640,7 +640,7 @@ Axiom Ensures24 : ((rval u1) = ((rval x1) * (rval a2))%R).
 Axiom Ensures25 : ((iexp u1) = ((iexp x1) + (iexp a2))%Z).
 
 (* Why3 goal *)
-Theorem sqrt1'VC :
+Theorem sqrt1'vc :
   ((((rval u1) - (Reals.R_sqrt.sqrt (rval a)))%R /
     (Reals.R_sqrt.sqrt (rval a)))%R
    =

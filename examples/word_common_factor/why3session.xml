@@ -4,62 +4,62 @@
 <why3session shape_version="8">
 <prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="word_common_factor.mlw"/>
 <theory name="Top" proved="true">
- <goal name="VC power" expl="VC for power" proved="true">
+ <goal name="power&#39;vc" expl="VC for power" proved="true">
  <proof prover="2"><result status="valid" time="0.05" steps="7586"/></proof>
  </goal>
- <goal name="VC power_add" expl="VC for power_add" proved="true">
+ <goal name="power_add&#39;vc" expl="VC for power_add" proved="true">
  <proof prover="1"><result status="valid" time="0.14" steps="270"/></proof>
  </goal>
- <goal name="VC common_factor" expl="VC for common_factor" proved="true">
+ <goal name="common_factor&#39;vc" expl="VC for common_factor" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="VC common_factor.0" expl="precondition" proved="true">
+  <goal name="common_factor&#39;vc.0" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC common_factor.1" expl="postcondition" proved="true">
+  <goal name="common_factor&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.14" steps="42854"/></proof>
   </goal>
-  <goal name="VC common_factor.2" expl="variant decrease" proved="true">
+  <goal name="common_factor&#39;vc.2" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.05" steps="15313"/></proof>
   </goal>
-  <goal name="VC common_factor.3" expl="precondition" proved="true">
+  <goal name="common_factor&#39;vc.3" expl="precondition" proved="true">
   <transf name="split_all_full" proved="true" >
-   <goal name="VC common_factor.3.0" expl="precondition" proved="true">
+   <goal name="common_factor&#39;vc.3.0" expl="precondition" proved="true">
    <proof prover="2"><result status="valid" time="0.06" steps="16781"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC common_factor.4" expl="variant decrease" proved="true">
+  <goal name="common_factor&#39;vc.4" expl="variant decrease" proved="true">
   <transf name="split_all_full" proved="true" >
-   <goal name="VC common_factor.4.0" expl="variant decrease" proved="true">
+   <goal name="common_factor&#39;vc.4.0" expl="variant decrease" proved="true">
    <proof prover="2"><result status="valid" time="0.05" steps="15951"/></proof>
    </goal>
-   <goal name="VC common_factor.4.1" expl="variant decrease" proved="true">
+   <goal name="common_factor&#39;vc.4.1" expl="variant decrease" proved="true">
    <proof prover="2"><result status="valid" time="0.05" steps="15959"/></proof>
    </goal>
-   <goal name="VC common_factor.4.2" expl="variant decrease" proved="true">
+   <goal name="common_factor&#39;vc.4.2" expl="variant decrease" proved="true">
    <proof prover="2"><result status="valid" time="0.04" steps="15970"/></proof>
    </goal>
-   <goal name="VC common_factor.4.3" expl="variant decrease" proved="true">
+   <goal name="common_factor&#39;vc.4.3" expl="variant decrease" proved="true">
    <proof prover="2"><result status="valid" time="0.04" steps="13680"/></proof>
    </goal>
-   <goal name="VC common_factor.4.4" expl="variant decrease" proved="true">
+   <goal name="common_factor&#39;vc.4.4" expl="variant decrease" proved="true">
    <proof prover="2"><result status="valid" time="0.04" steps="13680"/></proof>
    </goal>
-   <goal name="VC common_factor.4.5" expl="variant decrease" proved="true">
+   <goal name="common_factor&#39;vc.4.5" expl="variant decrease" proved="true">
    <proof prover="2"><result status="valid" time="0.03" steps="13682"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC common_factor.5" expl="precondition" proved="true">
+  <goal name="common_factor&#39;vc.5" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.03" steps="9530"/></proof>
   </goal>
-  <goal name="VC common_factor.6" expl="postcondition" proved="true">
+  <goal name="common_factor&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.06" steps="17710"/></proof>
   </goal>
-  <goal name="VC common_factor.7" expl="postcondition" proved="true">
+  <goal name="common_factor&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.23" steps="48849"/></proof>
   </goal>
  </transf>

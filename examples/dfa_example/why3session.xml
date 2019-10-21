@@ -7,7 +7,7 @@
 <prover id="5" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="dfa_example.mlw"/>
 <theory name="DfaExample" proved="true">
  <goal name="nil_notin_r1" proved="true">
@@ -15,26 +15,26 @@
  <proof prover="4"><result status="valid" time="0.10"/></proof>
  <proof prover="6" memlimit="4000"><result status="valid" time="0.08" steps="436"/></proof>
  </goal>
- <goal name="VC all_in_r0" expl="VC for all_in_r0" proved="true">
+ <goal name="all_in_r0&#39;vc" expl="VC for all_in_r0" proved="true">
  <proof prover="6"><result status="valid" time="0.03" steps="222"/></proof>
  </goal>
  <goal name="words_in_r1_end_with_one" proved="true">
  <proof prover="5"><result status="valid" time="0.33" steps="655888"/></proof>
  </goal>
- <goal name="VC words_in_r1_suffix_in_r1" expl="VC for words_in_r1_suffix_in_r1" proved="true">
+ <goal name="words_in_r1_suffix_in_r1&#39;vc" expl="VC for words_in_r1_suffix_in_r1" proved="true">
  <proof prover="9"><result status="valid" time="0.49" steps="111854"/></proof>
  </goal>
- <goal name="VC zero_w_in_r1" expl="VC for zero_w_in_r1" proved="true">
+ <goal name="zero_w_in_r1&#39;vc" expl="VC for zero_w_in_r1" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC zero_w_in_r1.0" expl="assertion" proved="true">
+  <goal name="zero_w_in_r1&#39;vc.0" expl="assertion" proved="true">
   <proof prover="6"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
-  <goal name="VC zero_w_in_r1.1" expl="postcondition" proved="true">
+  <goal name="zero_w_in_r1&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.67" steps="1405883"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC one_w_in_r1" expl="VC for one_w_in_r1" proved="true">
+ <goal name="one_w_in_r1&#39;vc" expl="VC for one_w_in_r1" proved="true">
  <proof prover="6"><result status="valid" time="1.15" steps="3853"/></proof>
  </goal>
  <goal name="zero_w_in_r2" proved="true">
@@ -43,10 +43,10 @@
  <goal name="one_w_in_r2" proved="true">
  <proof prover="6"><result status="valid" time="0.01" steps="51"/></proof>
  </goal>
- <goal name="VC astate1" expl="VC for astate1" proved="true">
+ <goal name="astate1&#39;vc" expl="VC for astate1" proved="true">
  <proof prover="6"><result status="valid" time="0.18" steps="1270"/></proof>
  </goal>
- <goal name="VC astate2" expl="VC for astate2" proved="true">
+ <goal name="astate2&#39;vc" expl="VC for astate2" proved="true">
  <proof prover="6"><result status="valid" time="0.27" steps="1817"/></proof>
  </goal>
 </theory>

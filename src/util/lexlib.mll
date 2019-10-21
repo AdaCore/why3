@@ -112,7 +112,6 @@ and string_skip_spaces buf = parse
     with Not_found -> raise (Loc.Located (start, UnterminatedComment))
 
   let string lexbuf =
-    let start = loc lexbuf in
     string (Buffer.create 128) lexbuf
 
   let update_loc lexbuf file line chars =

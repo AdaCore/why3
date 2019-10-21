@@ -87,7 +87,7 @@ let mod_M1 =
     let two_plus_two = mk_tapp add_int [two ; two] in
     let eq_int = mk_qualid ["Int";Ident.op_infix "="] in
     let goal_term = mk_tapp eq_int  [four ; two_plus_two] in
-    Dprop(Pgoal,mk_ident "g",goal_term)
+    Dprop(Decl.Pgoal,mk_ident "g",goal_term)
   in
   (mk_ident "M1",[use_int_Int ; g])
 (* END{code1} *)
@@ -133,7 +133,8 @@ let mod_M2 =
     in
     let body = mk_eapp mul_int [mk_evar id_x; mk_econst 7] in
     let f =
-      Efun(param1 id_x int_type, None, Ity.MaskVisible, spec, body)
+      Efun(param1 id_x int_type, None, mk_pat Pwild,
+           Ity.MaskVisible, spec, body)
     in
     Dlet(mk_ident "f",false,Expr.RKnone, mk_expr f)
   in
@@ -184,7 +185,7 @@ let mod_M3 =
       let e2 = mk_eapp qid [mk_evar id_x] in
       mk_expr(Elet(id_x,false,Expr.RKnone,e1,e2))
     in
-    let f = Efun(param0,None,Ity.MaskVisible,spec,body)
+    let f = Efun(param0,None,mk_pat Pwild,Ity.MaskVisible,spec,body)
     in
     Dlet(mk_ident "f",false,Expr.RKnone, mk_expr f)
   in
@@ -244,7 +245,7 @@ let mod_M4 =
       mk_eapp array_set [mk_evar id_a; mk_econst 0; mk_econst 42]
     in
     let f = Efun(param1 id_a array_int_type,
-                 None,Ity.MaskVisible,spec,body)
+                 None,mk_pat Pwild,Ity.MaskVisible,spec,body)
     in
     Dlet(mk_ident "f", false, Expr.RKnone, mk_expr f)
   in
@@ -289,7 +290,7 @@ let mod_M5 =
     let eq_int = mk_qualid ["Int";Ident.op_infix "="] in
     let f_of_two = mk_tapp (mk_qualid ["f"]) [two] in
     let goal_term = mk_tapp eq_int [f_of_two ; two] in
-    Dprop(Pgoal,mk_ident "g",goal_term)
+    Dprop(Decl.Pgoal,mk_ident "g",goal_term)
   in
   (mk_ident "M5",[use_int_Int ; scope_S ; import_S ; g])
 

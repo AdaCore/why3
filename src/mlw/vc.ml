@@ -1547,7 +1547,7 @@ let mk_vc_decl ({known_map = kn} as env) id f =
   let {id_string = nm; id_attrs = attrs; id_loc = loc} = id in
   let attrs = if attrs_has_expl attrs then attrs else
     Sattr.add (Ident.create_attribute ("expl:VC for " ^ nm)) attrs in
-  let pr = create_prsymbol (id_fresh ~attrs ?loc (nm ^ "'VC")) in
+  let pr = create_prsymbol (id_fresh ~attrs ?loc (nm ^ "'vc")) in
   let f = wp_forall (Mvs.keys (t_freevars Mvs.empty f)) f in
   let f = Typeinv.inject kn f in
   let f = if Debug.test_flag debug_no_eval then f else

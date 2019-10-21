@@ -201,7 +201,7 @@ Axiom almost_rbtree_rbtree_black :
   almost_rbtree n (Node Black l x v r) -> rbtree n (Node Black l x v r).
 
 (* Why3 goal *)
-Theorem add'VC :
+Theorem add'vc :
   forall (t:tree) (k:Numbers.BinNums.Z) (v:Numbers.BinNums.Z),
   bst t /\ (exists n:Numbers.BinNums.Z, rbtree n t) -> forall (o:tree),
   bst o /\

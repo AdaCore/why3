@@ -63,7 +63,7 @@ val get_dir : session -> string
 (** File *)
 val file_id : file -> fileID
 val file_path : file -> Sysutil.file_path
-val file_format : file -> string option
+val file_format : file -> string
 val file_theories : file -> theory list
 val system_path : session -> file -> string
 (** the system-dependent absolute path associated to that file *)
@@ -165,7 +165,7 @@ val empty_session : shape_version:int option -> ?from:session -> string -> sessi
 
 val add_file_section :
   session -> string -> file_is_detached:bool -> Theory.theory list->
-  Env.fformat option -> file
+  Env.fformat -> file
 (** [add_file_section s fn ths] adds a new
     'file' section in session [s], named [fn], containing fresh theory
     subsections corresponding to theories [ths]. The tasks of each
@@ -177,10 +177,12 @@ val add_file_section :
  *)
 
 val read_file :
-  Env.env -> ?format:Env.fformat -> string -> Theory.theory list
+  Env.env -> ?format:Env.fformat -> string -> (Theory.theory list) * Env.fformat
 (* [read_file env ~format fn] parses the source file [fn], types it
    and extract its theories. A parse error or a typing error is
-   signaled with exceptions .  *)
+   signaled with exceptions.
+   The second returned element is the format of the file that was read.
+*)
 
 val merge_files :
   shape_version:int option ->

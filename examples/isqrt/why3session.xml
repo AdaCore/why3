@@ -6,7 +6,7 @@
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="isqrt.mlw"/>
 <theory name="Square" proved="true">
  <goal name="sqr_non_neg" proved="true">
@@ -21,99 +21,99 @@
  </goal>
 </theory>
 <theory name="Simple" proved="true">
- <goal name="VC isqrt" expl="VC for isqrt" proved="true">
+ <goal name="isqrt&#39;vc" expl="VC for isqrt" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="101"/></proof>
  </goal>
- <goal name="VC main" expl="VC for main" proved="true">
+ <goal name="main&#39;vc" expl="VC for main" proved="true">
  <proof prover="3"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
 </theory>
 <theory name="NewtonMethod" proved="true">
- <goal name="VC sqrt" expl="VC for sqrt" proved="true">
+ <goal name="sqrt&#39;vc" expl="VC for sqrt" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC sqrt.0" expl="postcondition" proved="true">
+  <goal name="sqrt&#39;vc.0" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC sqrt.1" expl="postcondition" proved="true">
+  <goal name="sqrt&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
-  <goal name="VC sqrt.2" expl="check division by zero" proved="true">
+  <goal name="sqrt&#39;vc.2" expl="check division by zero" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC sqrt.3" expl="loop invariant init" proved="true">
+  <goal name="sqrt&#39;vc.3" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC sqrt.4" expl="loop invariant init" proved="true">
+  <goal name="sqrt&#39;vc.4" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC sqrt.5" expl="loop invariant init" proved="true">
+  <goal name="sqrt&#39;vc.5" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="VC sqrt.6" expl="loop invariant init" proved="true">
+  <goal name="sqrt&#39;vc.6" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC sqrt.7" expl="loop invariant init" proved="true">
+  <goal name="sqrt&#39;vc.7" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC sqrt.8" expl="check division by zero" proved="true">
+  <goal name="sqrt&#39;vc.8" expl="check division by zero" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC sqrt.9" expl="check division by zero" proved="true">
+  <goal name="sqrt&#39;vc.9" expl="check division by zero" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC sqrt.10" expl="assertion" proved="true">
+  <goal name="sqrt&#39;vc.10" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
-   <goal name="VC sqrt.10.0" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;vc.10.0" expl="VC for sqrt" proved="true">
    <proof prover="4"><result status="valid" time="0.01" steps="8098"/></proof>
    </goal>
-   <goal name="VC sqrt.10.1" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;vc.10.1" expl="VC for sqrt" proved="true">
    <proof prover="2"><result status="valid" time="0.09" steps="12875"/></proof>
    </goal>
-   <goal name="VC sqrt.10.2" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;vc.10.2" expl="VC for sqrt" proved="true">
    <proof prover="3"><result status="valid" time="0.04" steps="28"/></proof>
    </goal>
-   <goal name="VC sqrt.10.3" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;vc.10.3" expl="VC for sqrt" proved="true">
    <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
    </goal>
-   <goal name="VC sqrt.10.4" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;vc.10.4" expl="VC for sqrt" proved="true">
    <proof prover="3"><result status="valid" time="0.00" steps="28"/></proof>
    </goal>
-   <goal name="VC sqrt.10.5" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;vc.10.5" expl="VC for sqrt" proved="true">
    <proof prover="3"><result status="valid" time="0.00" steps="28"/></proof>
    </goal>
-   <goal name="VC sqrt.10.6" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;vc.10.6" expl="VC for sqrt" proved="true">
    <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
    </goal>
-   <goal name="VC sqrt.10.7" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;vc.10.7" expl="VC for sqrt" proved="true">
    <proof prover="3"><result status="valid" time="0.00" steps="30"/></proof>
    </goal>
-   <goal name="VC sqrt.10.8" expl="VC for sqrt" proved="true">
+   <goal name="sqrt&#39;vc.10.8" expl="VC for sqrt" proved="true">
    <proof prover="3"><result status="valid" time="0.01" steps="38"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC sqrt.11" expl="loop variant decrease" proved="true">
+  <goal name="sqrt&#39;vc.11" expl="loop variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="24"/></proof>
   </goal>
-  <goal name="VC sqrt.12" expl="loop invariant preservation" proved="true">
+  <goal name="sqrt&#39;vc.12" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.10" steps="90"/></proof>
   </goal>
-  <goal name="VC sqrt.13" expl="loop invariant preservation" proved="true">
+  <goal name="sqrt&#39;vc.13" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="26"/></proof>
   </goal>
-  <goal name="VC sqrt.14" expl="loop invariant preservation" proved="true">
+  <goal name="sqrt&#39;vc.14" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="27"/></proof>
   </goal>
-  <goal name="VC sqrt.15" expl="loop invariant preservation" proved="true">
+  <goal name="sqrt&#39;vc.15" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="28"/></proof>
   </goal>
-  <goal name="VC sqrt.16" expl="loop invariant preservation" proved="true">
+  <goal name="sqrt&#39;vc.16" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.00" steps="29"/></proof>
   </goal>
-  <goal name="VC sqrt.17" expl="assertion" proved="true">
+  <goal name="sqrt&#39;vc.17" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="59"/></proof>
   </goal>
-  <goal name="VC sqrt.18" expl="postcondition" proved="true">
+  <goal name="sqrt&#39;vc.18" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.06" steps="5875"/></proof>
   </goal>
  </transf>

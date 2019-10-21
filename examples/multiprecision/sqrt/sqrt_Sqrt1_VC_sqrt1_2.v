@@ -598,7 +598,7 @@ Axiom Ensures20 : ((rval x1) = ((rval o6) + (rval o5))%R).
 Axiom Ensures21 : ((iexp x1) = (iexp o6)).
 
 (* Why3 goal *)
-Theorem sqrt1'VC :
+Theorem sqrt1'vc :
   (((((rval x0) + (((rval x0) * (rval t1'))%R * (5 / 10)%R)%R)%R -
      (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R
     / (1%R / (Reals.R_sqrt.sqrt (rval a)))%R)%R

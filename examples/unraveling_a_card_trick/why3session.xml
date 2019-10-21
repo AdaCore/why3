@@ -4,7 +4,7 @@
 <why3session shape_version="8">
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="unraveling_a_card_trick.mlw"/>
 <theory name="GilbreathCardTrickPure" proved="true">
  <goal name="shuffle_nil_nil_nil" proved="true">
@@ -44,10 +44,10 @@
  </goal>
 </theory>
 <theory name="GilbreathCardTrick" proved="true">
- <goal name="VC shuffle" expl="VC for shuffle" proved="true">
+ <goal name="shuffle&#39;vc" expl="VC for shuffle" proved="true">
  <proof prover="2"><result status="valid" time="1.13" steps="3281"/></proof>
  </goal>
- <goal name="VC card_trick" expl="VC for card_trick" proved="true">
+ <goal name="card_trick&#39;vc" expl="VC for card_trick" proved="true">
  <proof prover="2"><result status="valid" time="0.16" steps="616"/></proof>
  </goal>
 </theory>

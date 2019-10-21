@@ -104,6 +104,11 @@ val list_formats :
     be translated to [lang]. Use [list_formats base_language] to obtain
     the list of all registered formats. *)
 
+val get_format: ?format:fformat -> string -> fformat
+(** [get_format ?format fname] returns the format of the given file if None
+    is given. Otherwise returns the given format.
+*)
+
 (** {2 Language-specific parsers} *)
 
 exception InvalidFormat of fformat
@@ -126,7 +131,8 @@ val read_channel :
     @raise UnspecifiedFormat if format is not given and [file]
       has no extension *)
 
-val read_file : ?format:fformat -> 'a language -> env -> filename -> 'a
+val read_file :
+  ?format:fformat -> 'a language -> env -> filename -> 'a * fformat
 (** an open-close wrapper around [read_channel] *)
 
 exception LibraryNotFound of pathname

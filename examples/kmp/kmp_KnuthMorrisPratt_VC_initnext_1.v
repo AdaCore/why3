@@ -145,7 +145,7 @@ Axiom next_1_0 :
   forall (p:array char), (1%Z <= (length p))%Z -> is_next p 1%Z 0%Z.
 
 (* Why3 goal *)
-Theorem initnext'VC :
+Theorem initnext'vc :
   forall (p:array char), (1%Z <= (length p))%Z ->
   let m := length p in
   let next := make m 0%Z in

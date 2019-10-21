@@ -72,7 +72,7 @@ Proof.
 Qed.
 
 (* Why3 goal *)
-Theorem harness2'VC :
+Theorem harness2'vc :
   forall (us:tree),
   ~ ((depths 0%Z us) =
      (Init.Datatypes.cons 1%Z

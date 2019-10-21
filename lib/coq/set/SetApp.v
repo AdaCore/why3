@@ -10,30 +10,37 @@ Require set.Fset.
 Definition elt : Type.
 Proof.
 (* TODO find something more interesting *)
-apply bool.
+exact Z.
 Defined.
 
 (* Why3 goal *)
 Definition set : Type.
 Proof.
-(* TODO find something more interesting *)
-apply bool.
+exact (set.Fset.fset elt).
 Defined.
 
 (* Why3 goal *)
 Definition to_fset : set -> set.Fset.fset elt.
 Proof.
-(* TODO find something more interesting *)
-intros. exists (fun _ => false).
-exists nil. split. constructor. intros. split.
-intros. destruct H. intro. inversion H.
+exact (fun x => x).
 Defined.
+
+(* Why3 goal *)
+Definition mk : set.Fset.fset elt -> set.
+Proof.
+exact (fun x => x).
+Defined.
+
+(* Why3 goal *)
+Lemma mk'spec : forall (s:set.Fset.fset elt), ((to_fset (mk s)) = s).
+Proof.
+trivial.
+Qed.
 
 (* Why3 goal *)
 Definition choose : set -> elt.
 Proof.
-intros.
-apply true.
+exact Fset.pick.
 Defined.
 
 (* Why3 goal *)
@@ -41,9 +48,6 @@ Lemma choose'spec :
   forall (s:set), ~ set.Fset.is_empty (to_fset s) ->
   set.Fset.mem (choose s) (to_fset s).
 Proof.
-intros s h1.
-destruct h1. unfold set.Fset.is_empty. intros.
-unfold to_fset. simpl. unfold set.Set.mem.
-intuition.
+apply Fset.pick_def.
 Qed.
 

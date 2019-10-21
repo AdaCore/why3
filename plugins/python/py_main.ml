@@ -294,10 +294,11 @@ and block env ~loc = function
     let param id = id.id_loc, Some id, false, None in
     let params = if idl = [] then no_params ~loc else List.map param idl in
     let s = block env ~loc sl in
+    let p = mk_pat ~loc Pwild in
     let e = if block_has_call id bl then
-      Erec ([id, false, Expr.RKnone, params, None, Ity.MaskVisible, sp, body], s)
+      Erec ([id, false, Expr.RKnone, params, None, p, Ity.MaskVisible, sp, body], s)
     else
-      let e = Efun (params, None, Ity.MaskVisible, sp, body) in
+      let e = Efun (params, None, p, Ity.MaskVisible, sp, body) in
       Elet (id, false, Expr.RKnone, mk_expr ~loc e, s) in
     mk_expr ~loc e
   | (Py_ast.Dimport _ | Py_ast.Dlogic _) :: sl ->
@@ -324,7 +325,8 @@ let logic = function
 let translate ~loc dl =
   List.iter logic dl;
   let bl = block empty_env ~loc dl in
-  let fd = Efun (no_params ~loc, None, Ity.MaskVisible, empty_spec, bl) in
+  let p = mk_pat ~loc Pwild in
+  let fd = Efun (no_params ~loc, None, p, Ity.MaskVisible, empty_spec, bl) in
   let main = Dlet (mk_id ~loc "main", false, Expr.RKnone, mk_expr ~loc fd) in
   Typing.add_decl loc main
 
@@ -358,3 +360,58 @@ let read_channel env path file c =
 let () =
   Env.register_format mlw_language "python" ["py"] read_channel
     ~desc:"mini-Python format"
+
+(* Python pretty-printer, to print tasks with a little bit
+   of Python syntax *)
+
+open Term
+open Format
+open Pretty
+
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
+(* python print_binop *)
+let print_binop ~asym fmt = function
+  | Tand when asym -> fprintf fmt "&&"
+  | Tor when asym  -> fprintf fmt "||"
+  | Tand           -> fprintf fmt "and"
+  | Tor            -> fprintf fmt "or"
+  | Timplies       -> fprintf fmt "->"
+  | Tiff           -> fprintf fmt "<->"
+
+(* Register the transformations functions *)
+let rec python_ext_printer print_any fmt a =
+  match a with
+  | Pp_term (t, pri) ->
+      begin match t.t_node with
+        | Tapp (ls, [t1; t2]) when ls_equal ls ps_equ ->
+            (* == *)
+            fprintf fmt (protect_on (pri > 0) "@[%a == %a@]")
+              (python_ext_printer print_any) (Pp_term (t1, 0))
+              (python_ext_printer print_any) (Pp_term (t2, 0))
+        | Tnot {t_node = Tapp (ls, [t1; t2]) } when ls_equal ls ps_equ ->
+            (* != *)
+            fprintf fmt (protect_on (pri > 0) "@[%a != %a@]")
+              (python_ext_printer print_any) (Pp_term (t1, 0))
+              (python_ext_printer print_any) (Pp_term (t2, 0))
+        | Tbinop (b, f1, f2) ->
+            (* and, or *)
+            let asym = Ident.Sattr.mem asym_split f1.t_attrs in
+            let p = prio_binop b in
+            fprintf fmt (protect_on (pri > p) "@[%a %a@ %a@]")
+              (python_ext_printer print_any) (Pp_term (f1, (p + 1)))
+              (print_binop ~asym) b
+              (python_ext_printer print_any) (Pp_term (f2, p))
+        | _ -> print_any fmt a
+      end
+  | _ -> print_any fmt a
+
+let () = Itp_server.add_registered_lang "python" python_ext_printer
+
+let () = Args_wrapper.set_argument_parsing_functions "python"
+    ~parse_term:(fun _ lb -> Py_lexer.parse_term lb)
+    ~parse_term_list:(fun _ lb -> Py_lexer.parse_term_list lb)
+    ~parse_list_ident:(fun lb -> Py_lexer.parse_list_ident lb)
+    (* TODO for qualids, add a similar funciton *)
+    ~parse_qualid:(fun lb -> Lexer.parse_qualid lb)
+    ~parse_list_qualid:(fun lb -> Lexer.parse_list_qualid lb)
