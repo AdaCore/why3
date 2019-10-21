@@ -143,9 +143,9 @@
  <proof prover="1"><result status="valid" time="0.04" steps="10127"/></proof>
  </goal>
  <goal name="TestIsDigit2" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="9223"/></proof>
- <proof prover="1"><result status="unknown" time="0.08" steps="15286"/></proof>
- <proof prover="2"><result status="unknown" time="0.01"/></proof>
+ <proof prover="0" obsolete="true"><result status="valid" time="0.02" steps="9223"/></proof>
+ <proof prover="1" obsolete="true"><result status="unknown" time="0.08" steps="15286"/></proof>
+ <proof prover="2" obsolete="true"><result status="unknown" time="0.01"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="TestIsDigit2.0" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="8896"/></proof>
@@ -169,8 +169,9 @@
   <proof prover="1"><result status="valid" time="0.04" steps="9992"/></proof>
   </goal>
   <goal name="TestIsDigit2.5" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="9436"/></proof>
-  <proof prover="1"><result status="valid" time="0.04" steps="10027"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.02" steps="9436"/></proof>
+  <proof prover="1"><path
+                     name="testmnstrings-TestString-TestIsDigit2_1.smt2"/><result status="valid" time="0.04" steps="10027"/></proof>
   </goal>
  </transf>
  </goal>
@@ -252,10 +253,16 @@
  <goal name="in_union2" proved="true">
  <proof prover="1"><result status="valid" time="0.04" steps="9969"/></proof>
  </goal>
- <goal name="in_union">
+ <goal name="in_union" proved="true">
  <proof prover="0"><result status="unknown" time="0.02" steps="9599"/></proof>
- <proof prover="1"><result status="highfailure" time="0.03" steps="10289"/></proof>
+ <proof prover="1" obsolete="true"><path
+                                    name="testmnstrings-TestRegExpr-in_union_2.smt2"/><result status="highfailure" time="0.03" steps="10289"/></proof>
  <proof prover="2"><result status="unknown" time="0.02"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="in_union.0" proved="true">
+  <proof prover="1"><path name="testmnstrings-TestRegExpr-in_union_1.smt2"/><result status="valid" time="0.06" steps="9952"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="TestInter1" proved="true">
  <proof prover="1"><result status="valid" time="0.04" steps="9934"/></proof>

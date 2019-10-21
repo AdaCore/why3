@@ -1,6 +1,7 @@
 module Test
   use string.String
 
+  goal T0: length "this is a test" = 14
   goal T1: length "\x17" = 1
   goal T2: length "\o027" = 1
   goal T3: length "\t" = 1
@@ -25,5 +26,10 @@ module Test
   goal T19: length "\xFFA" = 2
   goal T20: length "\000" = 2
   goal T21: length "\161" = 2
-  (* goal T22: length "\256" = 2 *)
+  goal T22: length "\r" = 1
+  goal T23: length "\'" = 1
+  (* goal T24: length "\256" = 2 *)
+  goal T25: length "this \
+                    is a \
+                    test" = 14
 end

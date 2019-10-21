@@ -14,10 +14,12 @@
 
   exception IllegalEscape
   exception IllegalCharInString
+  exception UnterminatedString
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalEscape -> Format.fprintf fmt "illegal escape"
     | IllegalCharInString -> Format.fprintf fmt "illegal character in string"
+    | UnterminatedString -> Format.fprintf fmt "unterminated string"
     | _ -> raise e)
 
   let loc lb = Loc.extract (lb.lex_start_p,lb.lex_curr_p)
@@ -25,8 +27,10 @@
   let char_for_backslash = function
     | '\\' -> '\\'
     | 'n'  -> '\n'
+    | 'r'  -> '\r'
     | 't'  -> '\t'
     | '\"' -> '\"'
+    | '\'' -> '\''
     | _ -> raise IllegalCharInString
 
 }
@@ -62,6 +66,9 @@ and comment = parse
 and string buf = parse
   | "\""
       { Buffer.contents buf }
+  | "\\" newline
+      { new_line lexbuf;
+        string_skip_spaces buf lexbuf }
   | "\\" (['0'-'1'] dec dec as dec) | "\\" ('2' ['0'-'5'] ['0'-'5'] as dec)
       { Buffer.add_char buf (Char.chr (int_of_string dec));
         string buf lexbuf }
@@ -76,28 +83,24 @@ and string buf = parse
             string buf lexbuf
         with IllegalCharInString ->
           raise (Loc.Located (loc lexbuf,IllegalEscape))}
-  | newline (* TODO drivers contain strings and they have new lines feed
-               option 1: fix all drivers so they just use single-line stdin               option 2: allow for multiline stdin
-               option 3: have two classes of strings *)
-      { new_line lexbuf;
-        Buffer.add_char buf '\n';
-        string buf lexbuf}
   | eof
-      { raise Not_found }
-  | ['\000'-'\127'] as c
+      { raise (Loc.Located (loc lexbuf, UnterminatedString)) }
+  | ['\032'-'\126'] as c
       { Buffer.add_char buf c;
         string buf lexbuf }
   | _
       { raise (Loc.Located (loc lexbuf, IllegalCharInString)) }
 
+and string_skip_spaces buf = parse
+  | [' ' '\t']*
+      { string buf lexbuf }
+
 {
   exception UnterminatedComment
-  exception UnterminatedString
   exception IllegalCharacter of string
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | UnterminatedComment -> Format.fprintf fmt "unterminated comment"
-    | UnterminatedString -> Format.fprintf fmt "unterminated string"
     | IllegalCharacter s -> Format.fprintf fmt "illegal character %s" s
     | _ -> raise e)
 
@@ -110,8 +113,7 @@ and string buf = parse
 
   let string lexbuf =
     let start = loc lexbuf in
-    try string (Buffer.create 128) lexbuf
-    with Not_found -> raise (Loc.Located (start, UnterminatedString))
+    string (Buffer.create 128) lexbuf
 
   let update_loc lexbuf file line chars =
     let pos = lexbuf.lex_curr_p in
