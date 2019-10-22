@@ -41,12 +41,34 @@ let real_const ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) i =
 let string_const s =
   ConstStr s
 
-let print_string_constant fmt s =
-  Format.fprintf fmt "\"%s\"" (String.escaped s)
+type escape_map = char -> string
 
-let print support fmt = function
-  | ConstInt i -> print_int_constant support fmt i
+let default_escape c = match c with
+  | '\\' -> "\\\\"
+  | '\n' -> "\\n"
+  | '\r' -> "\\r"
+  | '\t' -> "\\t"
+  | '\"'  -> "\\\""
+  | '\032' .. '\126' -> Format.sprintf "%c" c
+  | '\000' .. '\031'
+  | '\127' .. '\255' -> Format.sprintf "\\x%02X" (Char.code c)
+
+let unsupported_escape = fun _ -> assert false
+
+let escape f s =
+  let ss = ref "" in
+  String.iter (fun c -> ss := !ss ^ f c) s;
+  !ss
+
+let print_string_constant string_escape fmt s =
+  Format.fprintf fmt "\"%s\"" (escape string_escape s)
+
+let print_string_default fmt s =
+  print_string_constant default_escape fmt s
+
+let print support string_escape fmt = function
+  | ConstInt i  -> print_int_constant support fmt i
   | ConstReal r -> print_real_constant support fmt r
-  | ConstStr s -> print_string_constant fmt s
+  | ConstStr s  -> print_string_constant string_escape fmt s
 
-let print_constant = print full_support
+let print_constant = print full_support default_escape

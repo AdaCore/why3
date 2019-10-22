@@ -314,7 +314,7 @@ and print_tnode opl opr info fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Constant.print number_format fmt c
+      Constant.(print number_format unsupported_escape) fmt c
   | Tif (f, t1, t2) ->
       fprintf fmt "IF %a@ THEN %a@ ELSE %a ENDIF"
         (print_fmla info) f (print_term info) t1 (print_opl_term info) t2

@@ -27,8 +27,14 @@ val string_const : string -> constant
 
 (** Pretty-printing *)
 
-val print_string_constant : formatter -> string -> unit
+type escape_map = char -> string
 
-val print : number_support -> formatter -> constant -> unit
+val default_escape     : escape_map
+val unsupported_escape : escape_map
+val escape             : escape_map -> string -> string
 
+val print_string_constant : escape_map -> formatter -> string -> unit
+val print_string_default  : formatter -> string -> unit
+
+val print : number_support -> escape_map -> formatter -> constant -> unit
 val print_constant : formatter -> constant -> unit

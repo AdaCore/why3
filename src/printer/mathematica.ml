@@ -130,7 +130,7 @@ let number_format = {
   }
 
 let print_const fmt c =
-  (Constant.print number_format) fmt c
+  Constant.(print number_format unsupported_escape) fmt c
 
 let constant_value =
   fun t -> match t.t_node with

@@ -226,6 +226,14 @@ let number_format = {
          (fun fmt i n -> fprintf fmt "(/ %s.0 %s.0)" i n));
 }
 
+let escape c = match c with
+  | '\\'  -> "\\x5C"
+  | '\"'  -> "\\x22"
+  | '\032' .. '\126' -> Format.sprintf "%c" c
+  | '\000' .. '\031'
+  | '\127' .. '\255' -> Format.sprintf "\\x%02X" (Char.code c)
+
+
 (** expr *)
 let rec print_term info fmt t =
   debug_print_term "Printing term: " t;
@@ -250,7 +258,7 @@ let rec print_term info fmt t =
             | _ -> assert false in
           syntax_float_literal st fp fmt c
         | _, Constant.ConstStr _
-        | None, _ -> Constant.print number_format fmt c
+        | None, _ -> Constant.print number_format escape fmt c
         (* TODO/FIXME: we must assert here that the type is either
             ty_int or ty_real, otherwise it makes no sense to print
             the literal. Do we ensure that preserved literal types

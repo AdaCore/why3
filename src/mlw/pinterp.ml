@@ -77,7 +77,7 @@ let rec print_value fmt v =
   | Vfloat_mode m ->
       fprintf fmt "%s" (mode_to_string m)
   | Vstring s ->
-      fprintf fmt "%s" (String.escaped s)
+      Constant.print_string_default fmt s
   | Vvoid ->
     fprintf fmt "()"
   | Varray a ->
@@ -714,7 +714,8 @@ let rec eval_expr env (e : expr) : result =
         try Normal (Vreal (real_from_fraction sp sq)) with
         | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
       else
-        let s = Format.asprintf "%a" Constant.print_constant (Constant.ConstReal r) in
+        let c = Constant.ConstReal r in
+        let s = Format.asprintf "%a" Constant.print_constant c in
         Normal (Vfloat (make_from_str s))
   | Econst (Constant.ConstStr s) -> Normal (Vstring s)
   | Eexec (ce,cty) ->

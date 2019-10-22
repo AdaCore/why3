@@ -30,7 +30,6 @@
     | 'r'  -> '\r'
     | 't'  -> '\t'
     | '\"' -> '\"'
-    | '\'' -> '\''
     | _ -> raise IllegalCharInString
 
 }
