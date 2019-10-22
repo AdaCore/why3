@@ -70,6 +70,10 @@ module String
   axiom at_empty: forall i.
     empty[i] = empty
 
+  axiom at_length: forall s i.
+    let j = s[i] in
+    if 0 <= i < length s then length j = 1 else length j = 0
+
   function substring string int int : string
   (** `substring s i x` is:
       (1) the `empty` string if `i < 0`, `i >= length s`, or `x <= 0`;
