@@ -56,9 +56,10 @@ let default_escape c = match c with
 let unsupported_escape = fun _ -> assert false
 
 let escape f s =
-  let ss = ref "" in
-  String.iter (fun c -> ss := !ss ^ f c) s;
-  !ss
+  let open Buffer in
+  let b = create (String.length s) in
+  String.iter (fun c -> add_string b (f c)) s;
+  contents b
 
 let print_string_constant string_escape fmt s =
   Format.fprintf fmt "\"%s\"" (escape string_escape s)
