@@ -199,7 +199,7 @@ let const_v1 fmt c =
             (Number.print_in_base 16 None) i (BigInt.to_string p2) (BigInt.to_string p5)
       end
   | ConstStr c ->
-      print_string_default fmt c
+      print_string_def fmt c
 
 let const_v2 fmt c =
   match c with
@@ -209,7 +209,7 @@ let const_v2 fmt c =
       Format.fprintf fmt "%s.p%se%s"
         (BigInt.to_string i) (BigInt.to_string p2) (BigInt.to_string p5)
   | ConstStr c ->
-      print_string_default fmt c
+      print_string_def fmt c
 
 end
 

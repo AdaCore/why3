@@ -77,7 +77,7 @@ let rec print_value fmt v =
   | Vfloat_mode m ->
       fprintf fmt "%s" (mode_to_string m)
   | Vstring s ->
-      Constant.print_string_default fmt s
+      Constant.print_string_def fmt s
   | Vvoid ->
     fprintf fmt "()"
   | Varray a ->

@@ -34,7 +34,7 @@ val unsupported_escape : escape_map
 val escape             : escape_map -> string -> string
 
 val print_string_constant : escape_map -> formatter -> string -> unit
-val print_string_default  : formatter -> string -> unit
+val print_string_def  : formatter -> string -> unit
 
 val print : number_support -> escape_map -> formatter -> constant -> unit
 val print_def : formatter -> constant -> unit

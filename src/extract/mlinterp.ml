@@ -77,7 +77,7 @@ open Format
 let rec print_value fmt = function
   | Vvoid -> fprintf fmt "()"
   | Vbool b -> fprintf fmt "%b" b
-  | Vstring s -> Constant.(print_string_default fmt s)
+  | Vstring s -> Constant.(print_string_def fmt s)
   | Vbigint i -> Constant.print_def fmt (Constant.int_const i)
   | Vint i -> fprintf fmt "%d" i
   | Vtuple l -> fprintf fmt "@[<hov 2>(%a)@]"

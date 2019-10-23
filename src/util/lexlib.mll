@@ -33,7 +33,7 @@
     | _ -> raise IllegalCharInString
 
   let string_to_char s fmt =
-    Scanf.sscanf s fmt (fun x -> Char.chr x)
+    Scanf.sscanf s fmt Char.chr
 }
 
 let dec     = ['0'-'9']

@@ -64,7 +64,7 @@ let escape f s =
 let print_string_constant string_escape fmt s =
   Format.fprintf fmt "\"%s\"" (escape string_escape s)
 
-let print_string_default fmt s =
+let print_string_def fmt s =
   print_string_constant default_escape fmt s
 
 let print support string_escape fmt = function
