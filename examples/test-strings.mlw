@@ -58,6 +58,9 @@ module TestString
   goal le_transitive: forall s1 s2 s3. (* CHECK - not proved *)
     le s1 s2 && le s2 s3 -> le s1 s3
 
+  goal TestLT: not (lt "" "")
+  goal TestLE: not (le "A" "")
+
   goal TestAt1:
     "abc"[3] = empty
 

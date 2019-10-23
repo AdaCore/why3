@@ -26,7 +26,8 @@ let string fmt s =
     | '\n' -> Buffer.add_string b "\\n"
     | '\r' -> Buffer.add_string b "\\r"
     | '\t' -> Buffer.add_string b "\\t"
-    | c    -> Buffer.add_char b c);
+    | '\032' .. '\126' as c -> Buffer.add_char b c
+    | c    -> Buffer.add_string b (Format.sprintf "\\u%04x" (Char.code c)));
     i := !i + 1
   done;
   Buffer.add_char b '"';

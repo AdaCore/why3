@@ -5,6 +5,7 @@
 <prover id="0" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.7" alternative="counterexamples" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="test-strings.mlw"/>
 <theory name="TestString">
@@ -68,13 +69,22 @@
  </goal>
  <goal name="lt_transitive">
  <proof prover="0"><result status="timeout" time="5.00" steps="1160459"/></proof>
- <proof prover="1"><result status="highfailure" time="0.05" steps="10806"/></proof>
  <proof prover="2"><result status="unknown" time="0.02"/></proof>
+ <proof prover="3" obsolete="true"><path
+                                    name="testmnstrings-TestString-lt_transitive_5.smt2"/><result status="timeout" time="5.00" steps="360307"/></proof>
  </goal>
  <goal name="le_transitive">
  <proof prover="0"><result status="timeout" time="5.00" steps="1160459"/></proof>
- <proof prover="1"><result status="highfailure" time="0.05" steps="10480"/></proof>
  <proof prover="2"><result status="unknown" time="0.02"/></proof>
+ <proof prover="3"><result status="timeout" time="5.00" steps="287629"/></proof>
+ </goal>
+ <goal name="TestLT" proved="true">
+ <proof prover="0"><result status="outofmemory" time="3.52"/></proof>
+ <proof prover="1"><result status="valid" time="0.03" steps="10026"/></proof>
+ <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+ </goal>
+ <goal name="TestLE" proved="true">
+ <proof prover="1"><result status="valid" time="0.04" steps="10018"/></proof>
  </goal>
  <goal name="TestAt1" proved="true">
  <proof prover="1"><result status="valid" time="0.04" steps="10033"/></proof>
