@@ -1383,7 +1383,7 @@ and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
 
 and print_enode pri fmt e = match e.e_node with
   | Evar v -> print_pv fmt v
-  | Econst c -> Constant.print_constant fmt c
+  | Econst c -> Constant.print_def fmt c
   | Eexec (c,_) -> print_cexp true pri fmt c
   | Elet (LDvar (v,e1), e2)
     when v.pv_vs.vs_name.id_string = "_" && ity_equal v.pv_ity ity_unit ->

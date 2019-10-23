@@ -72,4 +72,4 @@ let print support string_escape fmt = function
   | ConstReal r -> print_real_constant support fmt r
   | ConstStr s  -> print_string_constant string_escape fmt s
 
-let print_constant = print full_support default_escape
+let print_def = print full_support default_escape

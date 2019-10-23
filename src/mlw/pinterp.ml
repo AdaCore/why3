@@ -715,7 +715,7 @@ let rec eval_expr env (e : expr) : result =
         | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
       else
         let c = Constant.ConstReal r in
-        let s = Format.asprintf "%a" Constant.print_constant c in
+        let s = Format.asprintf "%a" Constant.print_def c in
         Normal (Vfloat (make_from_str s))
   | Econst (Constant.ConstStr s) -> Normal (Vstring s)
   | Eexec (ce,cty) ->

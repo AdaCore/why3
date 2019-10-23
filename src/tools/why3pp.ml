@@ -212,7 +212,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Tfalse ->
         fprintf fmt "\\bot"
     | Tconst n ->
-        Constant.print_constant fmt n
+        Constant.print_def fmt n
     | Tident qid ->
         let id = id_of_qualid qid in
         (match sn_decode id.id_str with

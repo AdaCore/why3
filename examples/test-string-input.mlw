@@ -33,4 +33,7 @@ module Test
   goal T25: length "this \
                     is a \
                     test" = 14
+  goal T26: length "\065" = 1
+  goal T27: length "\x41" = 1
+  goal T28: length "\o101" = 1
 end

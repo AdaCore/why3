@@ -380,8 +380,8 @@ and print_tnode ?(ext_printer=true) pri fmt t =
           match t.t_ty with
           | Some {ty_node = Tyapp (ts,[])}
             when ts_equal ts ts_int || ts_equal ts ts_real ->
-              Constant.print_constant fmt c
-          | Some ty -> fprintf fmt "(%a:%a)" Constant.print_constant c
+              Constant.print_def fmt c
+          | Some ty -> fprintf fmt "(%a:%a)" Constant.print_def c
                          print_ty ty
           | None -> assert false
         end

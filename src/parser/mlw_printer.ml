@@ -111,7 +111,7 @@ let pp_false fmt () =
   pp_print_string fmt "false"
 
 let pp_const fmt c =
-  Constant.print_constant fmt c
+  Constant.print_def fmt c
 
 let pp_ident fmt id =
   pp_qualid fmt id

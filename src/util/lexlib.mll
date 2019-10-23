@@ -32,6 +32,8 @@
     | '\"' -> '\"'
     | _ -> raise IllegalCharInString
 
+  let string_to_char s fmt =
+    Scanf.sscanf s fmt (fun x -> Char.chr x)
 }
 
 let dec     = ['0'-'9']
@@ -68,14 +70,14 @@ and string buf = parse
   | "\\" newline
       { new_line lexbuf;
         string_skip_spaces buf lexbuf }
-  | "\\" (['0'-'1'] dec dec as dec) | "\\" ('2' ['0'-'5'] ['0'-'5'] as dec)
-      { Buffer.add_char buf (Char.chr (int_of_string dec));
+  | "\\" (['0'-'1'] dec dec as c) | "\\" ('2' ['0'-'5'] ['0'-'5'] as c)
+      { Buffer.add_char buf (string_to_char c "%3d");
         string buf lexbuf }
-  | "\\x" (hex hex as hex)
-      { Buffer.add_char buf (Char.chr (int_of_string ("0x" ^ hex)));
+  | "\\x" (hex hex as c)
+      { Buffer.add_char buf (string_to_char c "%2x");
         string buf lexbuf }
-  | "\\o" (['0'-'3'] oct oct as oct)
-      { Buffer.add_char buf (Char.chr (int_of_string ("0o" ^ oct)));
+  | "\\o" (['0'-'3'] oct oct as c)
+      { Buffer.add_char buf (string_to_char c "%3o");
         string buf lexbuf }
   | "\\" (_ as c)
       { try Buffer.add_char buf (char_for_backslash c);

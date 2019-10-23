@@ -37,4 +37,4 @@ val print_string_constant : escape_map -> formatter -> string -> unit
 val print_string_default  : formatter -> string -> unit
 
 val print : number_support -> escape_map -> formatter -> constant -> unit
-val print_constant : formatter -> constant -> unit
+val print_def : formatter -> constant -> unit
