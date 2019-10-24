@@ -205,11 +205,8 @@ theory string.String
 
   syntax function concat     "(str.++ %1 %2)"
   syntax function length     "(str.len %1)"
-  syntax predicate lt        "(str.< %1 %2)"
-  syntax predicate le        "(str.<= %1 %2)"
   syntax function indexof    "(str.indexof %1 %2 %3)"
   syntax function replace    "(str.replace %1 %2 %3)"
-  syntax function replaceall "(str.replaceall %1 %2 %3)"
   syntax function substring  "(str.substr %1 %2 %3)"
   syntax function ([])       "(str.at %1 %2)"
   syntax predicate contains  "(str.contains %1 %2)"

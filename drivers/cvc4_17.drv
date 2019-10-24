@@ -11,6 +11,15 @@ theory BuiltIn
 
 end
 
+theory string.String
+
+  syntax predicate lt        "(str.< %1 %2)"
+  syntax predicate le        "(str.<= %1 %2)"
+
+  syntax function replaceall "(str.replaceall %1 %2 %3)"
+
+end
+
 theory string.RegExpr
 
   syntax type re             "RegLan"
