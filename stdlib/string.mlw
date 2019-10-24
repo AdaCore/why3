@@ -42,6 +42,8 @@ module String
   axiom lt_not_com: forall s1 s2.
     lt s1 s2 -> not (lt s2 s1)
 
+  axiom lt_ref: forall s1. not (lt s1 s1)
+
   predicate le string string
   (** `le s1 s2` returns `True` iff `s1` is smaller or equal to `s2`
   in the lexicographic order of UC *)

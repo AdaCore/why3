@@ -52,6 +52,8 @@ module TestString
   goal TestLt5: lt "a" "1"
   goal TestLt6: lt "A" "a"
 
+  goal AAA: forall s. s = ""
+
   goal lt_transitive: forall s1 s2 s3. (* CHECK - not proved *)
     lt s1 s2 && lt s2 s3 -> lt s1 s3
 
@@ -143,6 +145,48 @@ module TestString
   goal TestTo_int9: to_int "1a1" = -1
 
   goal TestFrom_int: from_int 1 = "1"
+
+end
+
+module TestInput
+
+  use string.String
+
+  goal T0: length "this is a test" = 14
+  goal T1: length "\x17" = 1
+  goal T2: length "\o027" = 1
+  goal T3: length "\023" = 1
+  goal T4: length "\t" = 1
+  goal T5: length "\\" = 1
+  goal T6: length "\"" = 1
+  goal T7: length "\n" = 1
+  (* goal T8: length "\p" = 1 *)
+  (*   goal T9: length "a *)
+  (* b" = 2 *)
+  goal T10: length "'" = 1
+  goal T11: length "/" = 1
+  goal T12: length "`" = 1
+  (* à is the same as \195\160 *)
+  (* goal T13: length "à" = 1 *)
+  (* goal T14: length "Ϯ" = 1 *)
+  (* á is the same as \195\161, \o303\o241, \xC3\xA1 *)
+  (* goal T15: length "á" = 1 *)
+  goal T16: length "\o303\o241" = 2
+  goal T17: length "\xC3\xA1" = 2
+  (* goal T18: length "\o477" = 2 *)
+  goal T19: length "\xFFA" = 2
+  goal T20: length "\000" = 1
+  goal T21: length "\161" = 1
+  goal T22: length "\r" = 1
+  goal T23: length "'" = 1
+  (* goal T24: length "\256" = 2 *)
+  goal T25: length "this \
+                    is a \
+                    test" = 14
+  goal T26: length "\065" = 1
+  goal T27: length "\x41" = 1
+  goal T28: length "\o101" = 1
+  goal T29: "A" = "\065" = "\x41" = "\o101"
 
 end
 
@@ -361,5 +405,7 @@ module TestRegExpr
   goal TestLoop1:
     let a = to_re "a" in
     in_re "aa" (loop 2 3 a)
+
+
 
 end
