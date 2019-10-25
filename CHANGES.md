@@ -77,6 +77,8 @@ Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq
 
 Provers
+  * support for Z3 4.8.6 (released Sep 20, 2019)
+  * support for Z3 4.8.5 (released Jun 3, 2019)
   * support for CVC4 1.7 (released April 9, 2019)
   * support for Alt-Ergo 2.3.0 (released February 11, 2019)
   * support for Coq 8.9.1 (released May 20, 2019)
