@@ -188,12 +188,12 @@ module TestString
   (*     (\* s[0] = d4 || s[0] = d5 || s[0] = d6 || s[0] = d7 || s[0] = d8 || s[0] = d9 *\) *)
   (*   then to_int s >= 0 else to_int s = -1 *)
 
-  axiom to_int: forall s i.
-    0 <= i < length s && lt "9" s[i] -> to_int s = -1
-
-  axiom to_int2: forall s.
-    forall i. 0 <= i < length s && le "0" s[i] && le s[i] "9" ->
-      to_int s > 0
+  (* axiom to_int: forall s i. *)
+  (*   0 <= i < length s && lt "9" s[i] -> to_int s = -1 *)
+  
+  (* axiom to_int2: forall s. *)
+  (*   forall i. 0 <= i < length s && le "0" s[i] && le s[i] "9" -> *)
+  (*     to_int s > 0 *)
 
 end
 
