@@ -70,7 +70,7 @@ and string buf = parse
   | "\\" newline
       { new_line lexbuf;
         string_skip_spaces buf lexbuf }
-  | "\\" (['0'-'1'] dec dec as c) | "\\" ('2' ['0'-'5'] ['0'-'5'] as c)
+  | "\\" (['0'-'1'] dec dec as c) | "\\" ('2' ['0'-'4'] dec as c) | "\\" ('2' '5' ['0'-'5'] as c)
       { Buffer.add_char buf (string_to_char c "%3d");
         string buf lexbuf }
   | "\\x" (hex hex as c)
