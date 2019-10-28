@@ -1,0 +1,9 @@
+module Transitivity
+
+  val constant b : int
+
+  axiom H: forall x y z a: int. x = y -> y = z -> b = z -> z = a
+
+  goal G: 3 = 22
+
+end
