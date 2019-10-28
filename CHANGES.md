@@ -1,5 +1,12 @@
 :x: marks a potential source of incompatibility
 
+Version 1.2.1, October 28, 2019
+-------------------------------
+
+Bug fixes
+  * fixed compilation with OCaml 4.09
+  * fixed compilation with Lablgtk3
+
 Provers
   * support for Z3 4.8.6 (released Sep 20, 2019)
   * support for Z3 4.8.5 (released Jun 3, 2019)
@@ -208,8 +215,8 @@ Standard library
     commutative :x:
 
 Miscellaneous
-  * fixed support for `--enable_relocation=yes` (issue #50)
-  * fixed support for Windows (issue #70)
+  * fixed support for `--enable_relocation=yes`
+  * fixed support for Windows
 
 Version 0.88.2, December 7, 2017
 --------------------------------
