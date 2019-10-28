@@ -82,6 +82,9 @@ module String
       (2) the substring of `s` starting at `i` and of length
           `min x (length s - i)`. *)
 
+  axiom substring_at: forall s i.
+    s[i] = substring s i 1
+
   axiom substring_of_empty: forall i x.
     substring "" i x = ""
 
@@ -235,18 +238,12 @@ module String
   function to_int string : int
   (** `to_int s` is:
       (1) an `int` consisting on the digits of `s`, if `s` is formed only
-          by characters corresponding to digits, that is, to code points
-          in the range 0x0030 ... 0x0039;
-      (2) `-1`, if `s` contains a character that is not a digit. *)
+          by characters corresponding to digits, that is, ascii characters
+          in the range 0x30 ... 0x39;
+      (2) `-1`, if `s` contains a character that is not in the range
+          0x30 ... 0x39. *)
 
-  (*** TODO: axioms about to_int -- the following are not proved *)
-
-  (*** axiom to_int: forall s i. *)
-  (***   0 <= i < length s && lt "9" s[i] -> to_int s = -1 *)
-
-  (*** axiom to_int2: forall s. *)
-  (***   forall i. 0 <= i < length s && le "0" s[i] && le s[i] "9" -> *)
-  (***     to_int s > 0 *)
+  axiom to_int_gt_minus_1: forall s. to_int s >= -1
 
   (*** In SMT-Lib, but NOT in z3/cvc4 *)
   predicate is_digit (s:string) = 0 <= to_int s <= 9
