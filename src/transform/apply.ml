@@ -88,14 +88,16 @@ let with_terms ~trans_name subst_ty subst lv withed_terms =
   match diff with
   | _ when diff < 0 ->
       Debug.dprintf debug_matching "Too many withed terms@.";
-      raise (Arg_trans (trans_name ^ ": the last " ^
-                        string_of_int (-diff)
-                        ^ " terms in with are useless"))
+      let msg = ": Not the right number of missing arguments. Expected arguments for:" in
+      raise (Arg_trans_missing (trans_name ^ msg, slv))
   | _ when diff > 0 ->
       Debug.dprintf debug_matching "Not enough withed terms@.";
-      raise (Arg_trans_missing (trans_name ^ ": there are " ^
-                        string_of_int diff
-                        ^ " terms missing:", slv))
+      let msg =
+        if withed_terms = [] then
+          ": Unable to infer arguments (try using \"with\") for:"
+        else
+          ": Not the right number of missing arguments. Expected arguments for:" in
+      raise (Arg_trans_missing (trans_name ^ msg, slv))
   | _ (* when diff = 0 *) ->
       let new_subst_ty, new_subst =
         (* TODO Here we match on a list of variable against a list of terms. It

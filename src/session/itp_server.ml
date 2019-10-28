@@ -251,7 +251,7 @@ let get_exception_message ses id e =
   | Session_itp.NoProgress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans s ->
-      Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
+      Pp.sprintf "Error in transformation function:\n%s \n" s, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_decl (s, ld) ->
       Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
         (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") P.print_tdecl) ld,
@@ -278,8 +278,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Error in transformation %s during unification of the following types:\n %a \n %a"
         s P.print_ty ty1 P.print_ty ty2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_missing (s, svs) ->
-      Pp.sprintf "Error in transformation function: %s %a\n" s
-        (Pp.print_list Pp.space P.print_vs) (Term.Svs.elements svs),
+      Pp.sprintf "Error in transformation function:\n%s %a\n" s
+        (* The arguments should appear on one line (no @) *)
+        (Pp.print_list (fun fmt () -> fprintf fmt ", ") P.print_vs)
+        (Term.Svs.elements svs),
       Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
       Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
