@@ -9,13 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* Replace with Char.uppercase_ascii as soon as we can assume
-  OCaml version at least 4.03.0  *)
-let char_is_uppercase c = c = Char.uppercase c
+let char_is_uppercase c = c = Char.uppercase_ascii c
 
-let lowercase = String.lowercase
-let capitalize = String.capitalize
-let uncapitalize = String.uncapitalize
+let lowercase = String.lowercase_ascii
+let capitalize = String.capitalize_ascii
+let uncapitalize = String.uncapitalize_ascii
 
 
 let rev_split c s =
