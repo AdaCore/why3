@@ -313,11 +313,6 @@ contains an updated version that must be checked before replacing 'src/parser/ha
 clean::
 	rm -f src/parser/parser_messages.ml.tmp src/parser/handcrafted.messages.temp
 
-# hide deprecated warnings for strings
-
-src/util/strings.cmo: WARNINGS:=$(WARNINGS)-3
-src/util/strings.cmx: WARNINGS:=$(WARNINGS)-3
-
 # debug optimisation ppx
 
 ifeq (@enable_ppx@,yes)
