@@ -36,7 +36,7 @@ build: [
 install: [make "install-ide"]
 
 depends: [
-  "ocaml" {>= "4.02.3"}
+  "ocaml" {>= "4.05.0"}
   "ocamlfind" {build}
   "why3" {= version}
   (("lablgtk" & "conf-gtksourceview") | ("lablgtk3" & "lablgtk3-sourceview3"))
