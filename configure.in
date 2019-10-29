@@ -185,8 +185,8 @@ fi
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 echo "ocaml version is $OCAMLVERSION"
 
-AX_VERSION_GE([$OCAMLVERSION], 4.02.3, [],
-  [AC_MSG_ERROR(You need Objective Caml 4.02.3 or higher.)])
+AX_VERSION_GE([$OCAMLVERSION], 4.05.0, [],
+  [AC_MSG_ERROR(You need Objective Caml 4.05.0 or higher.)])
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
