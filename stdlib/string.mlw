@@ -245,17 +245,19 @@ module String
 
   axiom to_int_gt_minus_1: forall s. to_int s >= -1
 
+  axiom to_int_empty: to_int "" = -1
+
+  axiom to_int_only_digits: forall s.
+    s <> empty &&
+      (forall i. 0 <= i < length s -> le s[i] "0" && lt "9" s[i])
+        -> to_int s >= 0
+
+
   (*** In SMT-Lib, but NOT in z3/cvc4 *)
   predicate is_digit (s:string) = 0 <= to_int s <= 9
   (** `is_digit s` returns `True` iff `s` is of length `1` and
       corresponds to a decimal digit, that is, to a code point in the
-      range 0x0030 ... 0x0039 *)
-
-  axiom is_digit_definition: forall s.
-    is_digit s <-> length s = 1 && le "0" s[0] && le s[0] "9"
-
-  axiom is_digit_length_no_one: forall s.
-    length s <> 1 -> not (is_digit s)
+      range 0x30 ... 0x39 *)
 
   function from_int int : string
   (** `from_int i` is:
@@ -266,10 +268,7 @@ module String
     i < 0 <-> from_int i = empty
 
   axiom from_int_to_int: forall i.
-    i >= 0 -> to_int (from_int i) = i
-
-  axiom from_int_to_int2: forall i.
-    to_int (from_int i) = i -> i >= -1
+    if i >= 0 then to_int (from_int i) = i else to_int (from_int i) = -1
 
 end
 

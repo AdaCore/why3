@@ -123,6 +123,14 @@ module TestString
   goal TestReplace5:
    replace "abcdefabcdef" "bc" "123" = "a123defabcdef"
 
+  goal to_int_lt_0: forall s i.
+    0 <= i < length s && lt s[i] "0"
+        -> to_int s = -1
+
+  goal to_int_gt_9: forall s i.
+    0 <= i < length s && lt "9" s[i]
+        -> to_int s = -1
+
   goal TestIsDigit:
     is_digit "0" && is_digit "1" && is_digit "2" && is_digit "3" &&
     is_digit "4" && is_digit "5" && is_digit "6" && is_digit "7" &&
@@ -151,49 +159,6 @@ module TestString
   goal TestProvedInAltergo2: forall s1 s2.
     prefixof s1 s2 -> exists i. substring s2 0 i = s1
   (*** TODO: axioms about to_int -- the following are not proved *)
-
-  lemma to_int_def1: to_int "" = -1
-
-  lemma to_int_def2: forall s.
-    s <> empty &&
-      (forall i. 0 <= i < length s -> le "0" s[i] && lt s[i] "9")
-        -> to_int s >= 0
-
-  lemma to_int_def3: forall s i.
-    0 <= i < length s && lt "9" s[i]
-        -> to_int s = -1
-
-  (* lemma to_int_def: forall s. *)
-  (*   s <> empty && *)
-  (*   (forall i. 0 <= i < length s -> le "0" s[i] && lt s[i] "9") *)
-  (*   -> *)
-  (*   to_int s >= 0 *)
-  lemma to_int_all: forall s.
-    (forall i. 0 <= i < length s -> to_int s[i] >= 0) && s <> empty
-      -> to_int s >= 0
-
-  (* axiom to_int_def: forall s. *)
-  (*   let d0 = "0" in *)
-  (*   let d1 = "1" in *)
-  (*   let d2 = "2" in *)
-  (*   let d3 = "3" in *)
-  (*   let d4 = "4" in *)
-  (*   let d5 = "5" in *)
-  (*   let d6 = "6" in *)
-  (*   let d7 = "7" in *)
-  (*   let d8 = "8" in *)
-  (*   let d9 = "9" in *)
-  (*   if length s = 1 -> to_int s[0] >= 0 *)
-  (*     (\* s[0] = d0 || s[0] = d1 || s[0] = d1 || s[0] = d2 || s[0] = d3 || *\) *)
-  (*     (\* s[0] = d4 || s[0] = d5 || s[0] = d6 || s[0] = d7 || s[0] = d8 || s[0] = d9 *\) *)
-  (*   then to_int s >= 0 else to_int s = -1 *)
-
-  (* axiom to_int: forall s i. *)
-  (*   0 <= i < length s && lt "9" s[i] -> to_int s = -1 *)
-  
-  (* axiom to_int2: forall s. *)
-  (*   forall i. 0 <= i < length s && le "0" s[i] && le s[i] "9" -> *)
-  (*     to_int s > 0 *)
 
 end
 
@@ -237,31 +202,6 @@ module TestInput
   goal T28: length "\o101" = 1
   goal T29: "A" = "\065" = "\x41" = "\o101"
 
-end
-
-module TestCounterexample
-
-  use string.String
-  use int.Int
-
-  goal T1: forall s. length s <> 1
-  goal T2: forall s. (length s) < 4
-  goal T3: forall s1 s2. concat s1 s2 = concat s2 s1
-  goal T4: forall s. length s > 10 -> s = "qwertyuiop["
-  goal T5: forall s. let x = "b\123u\111h\ti" in lt s x -> length s < length x
-  goal T6: forall s. let x = "b\123u\111h\ti" in lt s x -> length s <= length x
-  goal T7: forall s. let x = "b\123u\111h\ti" in lt s x -> length s > length x
-  goal T8: forall s. let x = "b\123u\111h\ti" in lt s x -> length s >= length x
-  goal T9: forall s. let x = "b\123u\111h\ti" in le s x -> length s < length x
-  goal T10: forall s. let x = "b\123u\111h\ti" in le s x -> length s <= length x
-  goal T11: forall s. let x = "b\123u\111h\ti" in le s x -> length s > length x
-  goal T12: forall s. let x = "b\123u\111h\ti" in le s x -> length s >= length x
-  goal T13: forall s. lt s s
-  goal T14: forall s. not (le s s)
-  goal T15: forall s i. length s[i] = 1
-  goal T16: forall s. prefixof "abc" s
-  goal T17: forall s. prefixof "abc" s -> length s > 3
-  
 end
 
 module TestRegExpr
