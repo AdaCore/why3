@@ -329,17 +329,25 @@ let split_args s =
   in
   let push_char c = Buffer.add_char b c in
   let state = ref 0 in
+  (* state 0 : normal mode (no '"' and no ",")
+     state 1 : encountered one '"' waiting for another one to go back to 0
+     state 2 : encountered one ',': immediately followed whitespace are not
+               argument separations
+     par_depth : number of nested opened parenthesis *)
   for i = 0 to String.length s - 1 do
     let c = s.[i] in
     match !state, c with
     | 0,' ' -> if !par_depth > 0 then push_char c else push_arg ()
+    | 0,',' -> push_char c; if !par_depth > 0 then () else state := 2
     | 0,'(' -> incr par_depth; push_char c
     | 0,')' -> decr par_depth; push_char c
     | 0,'"' -> state := 1; if !par_depth > 0 then push_char c
-    | 0,_ -> push_char c
+    | 0,_   -> push_char c
     | 1,'"' -> state := 0; if !par_depth > 0 then push_char c
-    | 1,_ -> push_char c
-    | _ -> assert false
+    | 1,_   -> push_char c
+    | 2,' ' -> push_char c
+    | 2,_   -> push_char c; state := 0
+    | _     -> assert false
   done;
   push_arg ();
   match List.rev !args with
