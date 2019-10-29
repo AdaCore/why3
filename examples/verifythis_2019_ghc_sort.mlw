@@ -50,6 +50,8 @@ let extend a lseq
     { list = Cons a lseq.list;
       seq = snoc lseq.seq a }
 
+(** Compute the monotonic cutpoints of a sequence *)
+
 let cutpoints (s : array int)
     requires { Array.length s > 0 }
     (* Begin-to-end property *)

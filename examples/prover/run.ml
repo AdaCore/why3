@@ -5,16 +5,16 @@ open Prover
 let pr_symbol fmt s =
   match s with
   | NLFVar_symbol v ->
-    fprintf fmt "f%s" (Why3extract.Why3__BigInt.to_string v)
+    fprintf fmt "f%s" (Z.to_string v)
   | NLBruijn_symbol n ->
-    fprintf fmt "v%s" (Why3extract.Why3__BigInt.to_string n)
+    fprintf fmt "v%s" (Z.to_string n)
 
 let rec pr_term fmt t =
   match t with
   | NLFVar_fo_term v ->
-    fprintf fmt "f%s" (Why3extract.Why3__BigInt.to_string v)
+    fprintf fmt "f%s" (Z.to_string v)
   | NLBruijn_fo_term n ->
-    fprintf fmt "v%s" (Why3extract.Why3__BigInt.to_string n)
+    fprintf fmt "v%s" (Z.to_string n)
   | NL_App(s,tl) ->
     fprintf fmt "%a%a" pr_symbol s pr_term_list tl
 
@@ -63,7 +63,7 @@ let pr_formula_impl fmt f = pr_formula fmt f.nlrepr_fo_formula_field
 let pr_formula_list_impl fmt l =
   pr_formula_list fmt l.nlrepr_fo_formula_list_field
 
-let n = Why3extract.Why3__BigInt.of_int
+let n = Z.of_int
 
 let run_test name l =
   Format.printf "Running the test '%s'@." name;
@@ -72,7 +72,7 @@ let run_test name l =
   let n = Prover.main l (n 1) in
   let t = Unix.gettimeofday () -. t in
   Format.printf "Unsat (time = %.02f, depth=%s)@.@." t
-                (Why3extract.Why3__BigInt.to_string n)
+                (Z.to_string n)
 
 let run_all_tests () =
   run_test "drinker" (Prover.drinker ());
@@ -116,10 +116,10 @@ let mk_not f =
 
 type env =
   { cnf : bool;
-    var_cnt : Why3extract.Why3__BigInt.t;
-    var_assoc : (string * Why3extract.Why3__BigInt.t) list;
-    sym_cnt : Why3extract.Why3__BigInt.t;
-    sym_assoc : (string * Why3extract.Why3__BigInt.t) list }
+    var_cnt : Z.t;
+    var_assoc : (string * Z.t) list;
+    sym_cnt : Z.t;
+    sym_assoc : (string * Z.t) list }
 
 let find_var env v =
   try
@@ -129,7 +129,7 @@ let find_var env v =
     if env.cnf then
       let n = env.var_cnt in
       { env with
-        var_cnt = Why3extract.Why3__BigInt.succ n;
+        var_cnt = Z.succ n;
         var_assoc = (v,n)::env.var_assoc }, n
     else
       ill_typed ("unknown variable id " ^ v)
@@ -137,7 +137,7 @@ let find_var env v =
 let add_var env (v,_ty) =
   let n = env.var_cnt in
   { env with
-    var_cnt = Why3extract.Why3__BigInt.succ n;
+    var_cnt = Z.succ n;
     var_assoc = (v,n)::env.var_assoc }, n
 
 let find_sym env s =
@@ -147,7 +147,7 @@ let find_sym env s =
   with Not_found ->
     let n = env.sym_cnt in
     { env with
-      sym_cnt = Why3extract.Why3__BigInt.succ n;
+      sym_cnt = Z.succ n;
       sym_assoc = (s,n)::env.sym_assoc }, n
 
 let rec tr_term env e =
@@ -321,14 +321,14 @@ let tr_cnf env e =
       env.var_assoc phi
   in
   { env with
-    var_cnt = Why3extract.Why3__BigInt.zero;
+    var_cnt = Z.zero;
     var_assoc = [] }, phi
 
 let empty_env () =
 { cnf = false;
-  var_cnt = Why3extract.Why3__BigInt.zero;
+  var_cnt = Z.zero;
   var_assoc = [];
-  sym_cnt = Why3extract.Why3__BigInt.zero;
+  sym_cnt = Z.zero;
   sym_assoc = [] }
 
 let tr_top_formula env kind role f =
