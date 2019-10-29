@@ -7,14 +7,43 @@
 
 \subsection{Installation via \opam}
 
-The simplest way to install Why3 is via \opam, the OCaml
+The simplest way to install \why is via \opam, the OCaml
 package manager. It is as simple as
 \begin{verbatim}
 opam install why3 why3-ide why3-coq
 \end{verbatim}
 Then jump to Section~\ref{provers} to install external provers.
 
-\subsection{Installation Instructions from Source Distribution}
+\subsection{Installation via Docker}
+
+Instead of compiling \why, one can also execute a precompiled version
+(for \emph{amd64} architecture) using Docker. The image containing \why
+as well as a few provers can be recovered using
+\begin{alltt}
+docker pull registry.gitlab.inria.fr/why3/why3:\whyversion
+docker tag registry.gitlab.inria.fr/why3/why3:\whyversion why3
+\end{alltt}
+
+Let us suppose that there is a file \texttt{foo.mlw} in your current
+directory. If you want to verify it using Z3, you can type
+\begin{verbatim}
+docker run --rm --volume `pwd`:/data --workdir /data why3 prove foo.mlw -P z3
+\end{verbatim}
+
+If you want to verify \texttt{foo.mlw} using the graphical user
+interface, the invocation is slightly more complicated as the
+containerized application needs to access your X server:
+\begin{verbatim}
+docker run --rm --network host --user `id -u` --volume $HOME/.Xauthority:/home/guest/.Xauthority --env DISPLAY=$DISPLAY --volume `pwd`:/data --workdir /data why3 ide foo.mlw
+\end{verbatim}
+
+It certainly makes sense to turn this command line into a shell script for easier use:
+\begin{verbatim}
+#!/bin/sh
+exec docker run --rm --network host --user `id -u` --volume $HOME/.Xauthority:/home/guest/.Xauthority --env DISPLAY=$DISPLAY --volume `pwd`:/data --workdir /data why3 "$@"
+\end{verbatim}
+
+\subsection{Installation from Source Distribution}
 
 In short, installation from sources proceeds as follows.
 \begin{flushleft}\ttfamily
