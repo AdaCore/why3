@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
-<prover id="1" name="CVC3" version="2.4.1" timelimit="20" steplimit="0" memlimit="0"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="20" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="3" name="Z3" version="4.6.0" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.0.0" timelimit="20" steplimit="0" memlimit="0"/>
@@ -22,7 +22,7 @@
   <proof prover="6" timelimit="5" memlimit="1000"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
   <goal name="inverting&#39;vc.3" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.00"/></proof>
+  <proof prover="1" memlimit="0"><result status="valid" time="0.00"/></proof>
   </goal>
   <goal name="inverting&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="2"><path
@@ -60,10 +60,10 @@
                                       name="vstte10_inverting_InvertingAnInjection_VC_inverting2_1.v"/><result status="valid" time="0.34"/></proof>
    </goal>
    <goal name="inverting2&#39;vc.5.2" expl="VC for inverting2" proved="true">
-   <proof prover="1" timelimit="30" memlimit="1000"><result status="valid" time="0.01"/></proof>
+   <proof prover="1" timelimit="30"><result status="valid" time="0.01"/></proof>
    <proof prover="3"><result status="valid" time="0.00" steps="21276"/></proof>
    <proof prover="6" timelimit="30" memlimit="1000"><result status="valid" time="0.01" steps="16"/></proof>
-   <proof prover="7"><result status="valid" time="0.01" steps="7396"/></proof>
+   <proof prover="7"><result status="valid" time="0.01" steps="7397"/></proof>
    </goal>
   </transf>
   </goal>
