@@ -1,7 +1,7 @@
-(** {Fixed-point computations}
+(** {1 Fixed-point computations}
 
-   experimental
-
+This module provides an interpretation of 64-bit machine integers as
+fixed-point numbers. The C driver for extraction supports it.
 *)
 
 module Fxp
@@ -24,46 +24,71 @@ function pow2 (k: int): real =
 function trunc_at (x: real) (k: int): real =
   FromInt.from_int (Trunc.floor (x *. pow2 (-k))) *. pow2 k
 
+(** This is the type of fixed-point numbers. The two ghost fields explain
+how the integer value `ival` is related to the real value `rval` and the
+position `iexp` of the binary point. As a first approximation, one can
+think of the invariants as meaning `rval = ival * pow2 iexp`. The
+interpretation is slightly more subtle as the operations below support
+overflows, that is, as long as the final real result is in the valid
+range, intermediate computations can safely overflow (which invalidates
+the naive invariant above). *)
 type fxp =
     { ival: uint64; ghost rval: real; ghost iexp: int }
   invariant { rval = trunc_at rval iexp }
   invariant { ival = Div.mod (Trunc.floor (rval *. pow2 (-iexp))) (uint64'maxInt + 1) }
   by { ival = 0; rval = 0.; iexp = 0 }
 
+(** Initialize a fixed-point number with an integer `x` by setting the
+position `k` of its binary point. *)
 let fxp_init [@extraction:inline] (x: uint64) (ghost k: int): fxp
 = { ival = x; rval = FromInt.from_int (to_int x) *. pow2 k; iexp = k }
 
+(** Multiply the real value represented by `x` by a power of two. The
+integer value is left unchanged, as only the binary point is moved. See
+also `fxp_lsl`. *)
 let fxp_id [@extraction:inline] (x: fxp) (ghost k: int): fxp
 = { ival = ival x; rval = rval x *. pow2 k; iexp = iexp x + k }
 
+(** Add two fixed-point numbers that have aligned binary points. *)
 val fxp_add (x y: fxp): fxp
   requires { [@expl:fxp alignment] iexp x = iexp y }
   ensures { rval result = rval x +. rval y }
   ensures { iexp result = iexp x }
 
+(** Subtract two fixed-point numbers that have aligned binary points. *)
 val fxp_sub (x y: fxp): fxp
   requires { [@expl:fxp alignment] iexp x = iexp y }
   ensures { rval result = rval x -. rval y }
   ensures { iexp result = iexp x }
 
+(** Multiply two fixed-point numbers. *)
 val fxp_mul (x y: fxp): fxp
   ensures { rval result = rval x *. rval y }
   ensures { iexp result = iexp x + iexp y }
 
+(** Move the binary point of `x` to the right. The real value of `x` is
+left unchanged, while its integer value is multiplied by a power of two. *)
 val fxp_lsl (x: fxp) (k: uint64): fxp
   ensures { rval result = rval x }
   ensures { iexp result = iexp x - to_int k }
 
+(** Move the binary point of `x` to the left. The real value of `x` is
+truncated, while its integer value is divided by a power of two. See
+also `fxp_asr`. *)
 val fxp_lsr (x: fxp) (k: uint64): fxp
   requires { [@expl:fxp overflow] 0. <=. rval x <=. FromInt.from_int uint64'maxInt *. pow2 (iexp x) }
   ensures { rval result = trunc_at (rval x) (iexp x + k) }
   ensures { iexp result = iexp x + k }
 
+(** Move the binary point of `x` to the left. The real value of `x` is
+truncated, while its integer value (seen as a signed number) is divided
+by a power of two. *)
 val fxp_asr (x: fxp) (k: uint64): fxp
   requires { [@expl:fxp overflow] FromInt.from_int Int64.int64'minInt *. pow2 (iexp x) <=. rval x <=. FromInt.from_int Int64.int64'maxInt *. pow2 (iexp x) }
   ensures { rval result = trunc_at (rval x) (iexp x + k) }
   ensures { iexp result = iexp x + k }
 
+(** Perform `fxp_id` followed by `fxp_asr`. *)
 val fxp_asr' (x: fxp) (k: uint64) (ghost l: int): fxp
   requires { [@expl:fxp overflow] FromInt.from_int Int64.int64'minInt *. pow2 (iexp x) <=. rval x <=. FromInt.from_int Int64.int64'maxInt *. pow2 (iexp x) }
   ensures { rval result = trunc_at (rval x *. pow2 (-l)) (iexp x + k - l) }
