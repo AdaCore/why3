@@ -856,10 +856,10 @@ let print_message ~kind ~notif_kind fmt =
 (***********************************)
 
 (* notebook is composed of a Task page and several source files pages *)
-let notebook = GPack.notebook ~packing:vpan222#add ()
+let notebook = GPack.notebook ~packing:(vpan222#pack1 ~resize:true ~shrink:true) ()
 
 (* Pack vbox2222 after packing the notebook (for vertical order) *)
-let () = vpan222#add vbox2222#coerce
+let () = vpan222#pack2 ~resize:false ~shrink:true vbox2222#coerce
 
 let (_ : GtkSignal.id) =
   vpan222#set_position gconfig.task_height;
