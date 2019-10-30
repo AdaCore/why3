@@ -58,10 +58,10 @@ decide_fail () {
             is_xfail=integer_values;;
         # Inconsistent results between two runs
         "bench/ce/strings_CVC4,1.7_SP")
-           is_xfail=full;;
+           is_xfail=string_values;;
         # Inconsistent results between two runs
         "bench/ce/strings_CVC4,1.7_WP")
-           is_xfail=full;;
+           is_xfail=string_values;;
         *) is_xfail=none;;
     esac
 }
@@ -104,6 +104,11 @@ run () {
     case $is_xfail in
         "full") is_xfail=true;;
         "none") is_xfail=false;;
+	"string_values")
+	    is_xfail=false
+            str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"\([^"]\|\\"\)\+"/"val":"ANYSTRING"/g')
+            str_out=$(echo ${str_out} | sed -e 's/"val":"\([^"]\|\\"\)\+"/"val":"ANYSTRING"/g')
+            ;;
         "integer_values")
             is_xfail=false
             str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"-\?[0-9]\+"/"val":"ANYINT"/g')
