@@ -52,12 +52,6 @@ module TestString
   goal TestLt5: lt "a" "1"
   goal TestLt6: lt "A" "a"
 
-  goal lt_transitive: forall s1 s2 s3. (* CHECK - not proved *)
-    lt s1 s2 && lt s2 s3 -> lt s1 s3
-
-  goal le_transitive: forall s1 s2 s3. (* CHECK - not proved *)
-    le s1 s2 && le s2 s3 -> le s1 s3
-
   goal TestLT: not (lt "" "")
   goal TestLE: not (le "A" "")
 
