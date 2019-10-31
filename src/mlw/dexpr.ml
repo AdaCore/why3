@@ -224,6 +224,7 @@ let rec dity_unify d1 d2 = match d1,d2 with
 
 let dity_int  = Dapp (its_int,  [], [])
 let dity_real = Dapp (its_real, [], [])
+let dity_str  = Dapp (its_str,  [], [])
 let dity_bool = Dapp (its_bool, [], [])
 let dity_unit = Dapp (its_unit, [], [])
 
@@ -410,7 +411,7 @@ type dexpr = {
 and dexpr_node =
   | DEvar of string * dvty * dref
   | DEsym of prog_symbol
-  | DEconst of Number.constant * dity
+  | DEconst of Constant.constant * dity
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dity * mask * dspec later * dexpr
   | DEany of dbinder list * dity * mask * dspec later

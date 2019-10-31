@@ -6,25 +6,25 @@ module String
   type char
   constant dummy_char: char
 
-  type string = { length: int; chars: int -> char }
+  type char_string = { length: int; chars: int -> char }
 
-  function ([]) (s: string) (i: int) : char = s.chars i
+  function ([]) (s: char_string) (i: int) : char = s.chars i
 
-  constant empty : string = { length = 0; chars = fun (_: int) -> dummy_char }
+  constant empty : char_string = { length = 0; chars = fun (_: int) -> dummy_char }
 
-  val get (s: string) (i:int) : char
+  val get (s: char_string) (i:int) : char
     requires { 0 <= i < s.length }
     ensures  { result = s.chars i }
 
-  function app (s1 s2: string) : string =
+  function app (s1 s2: char_string) : char_string =
     { length = s1.length + s2.length;
       chars = fun i ->
         if i < s1.length then s1.chars i else s2.chars (i - s1.length) }
 
-  function sub (s: string) (ofs: int) (len: int) : string =
+  function sub (s: char_string) (ofs: int) (len: int) : char_string =
     { length = len; chars = fun i -> s.chars (i - ofs) }
 
-  predicate (==) (s1 s2: string) =
+  predicate (==) (s1 s2: char_string) =
     s1.length = s2.length /\
     forall i:int. 0 <= i < s1.length -> s1.chars i = s2.chars i
 

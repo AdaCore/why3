@@ -173,10 +173,10 @@ type constant = Enum of term * int | Value of term | Varying
 let rec constant_value defs t =
   match t.t_node with
   | Tconst c ->
-      asprintf "%a" (Number.print number_format) c
+      asprintf "%a" Constant.(print number_format unsupported_escape) c
   | Tapp (ls, [{ t_node = Tconst c}])
       when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-      asprintf "-%a" (Number.print number_format) c
+      asprintf "-%a" Constant.(print number_format unsupported_escape) c
   | Tapp (ls, []) ->
     begin
       match Hid.find defs ls.ls_name with

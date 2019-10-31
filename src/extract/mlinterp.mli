@@ -17,6 +17,7 @@ type value =
   | Vbigint of BigInt.t
   | Vint of int
   | Vbool of bool
+  | Vstring of string
   | Vvoid
   | Varray of value array
   | Vmatrix of value array array

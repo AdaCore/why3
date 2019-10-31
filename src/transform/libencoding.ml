@@ -102,7 +102,8 @@ let ls_of_const =
     Hterm.memo 63 (fun t ->
       match t.t_node with
       | Tconst c ->
-        cst (Pp.string_of_wnl (Number.print ls_of_const_format) c)
+         let pp = Constant.(print ls_of_const_format unsupported_escape) in
+         cst (Pp.string_of_wnl pp c)
       | _ -> assert false))
 
 (* unprotected and unprotecting idents *)

@@ -1,0 +1,419 @@
+
+module TestString
+
+  use string.String
+  use int.Int
+
+  goal Empty: "" = ""
+
+  goal Empty2: empty = ""
+
+  goal Test0: not ("a" = "b")
+
+  constant a: string
+
+  goal Test1:
+    (if 2 + 2 = 4 then "a" = a else "b" = a) -> "a" = a
+    (* this should be proved even with alt-ergo due to the sharing of
+       literals *)
+
+  goal Test2:
+    let a = if 2 + 2 = 4 then "a" else "" in
+    let b = if 2 + 2 = 4 then "b" else "" in
+    not (a = b)
+
+  goal Test3:
+    let a = if 2 + 2 = 4 then "a" else "" in
+    let b = if 2 + 2 = 4 then "a" else "" in
+    a = b
+
+  goal Test4:
+    let s = "abcdef" in substring s 2 3 = "cde"
+
+  goal TestConcat1:
+    let s1 = "abc" in
+    let s2 = "defg" in
+    concat s1 s2 = "abcdefg"
+
+  goal TestConcat5:
+    concat "" "" = ""
+
+  goal TestLength1: length "a" = 1
+  goal TestLength2: length "ab" = 2
+  goal TestLength3: length "abc" = 3
+  goal TestLength4: length (concat "ab" "12") = 4
+  (* TODO \xC3\xA9 is the encoding of 'é' *)
+  (* TODO goal TestLength5: length "\xC3\xA9" = 2 *)
+
+  goal TestLt1: lt "" "a"
+  goal TestLt2: lt "a" "b"
+  goal TestLt3: lt "ab" "b"
+  goal TestLt4: lt "abcde" "b"
+  goal TestLt5: lt "a" "1"
+  goal TestLt6: lt "A" "a"
+
+  goal TestLT: not (lt "" "")
+  goal TestLE: not (le "A" "")
+
+  goal TestAt1:
+    "abc"[3] = empty
+
+  goal TestSubstring1:
+    substring "abcdef" 1 3 = "bcd"
+
+  goal TestSubstring2:
+    substring "abcdef" 1 10 = "bcdef"
+
+  goal containsTest1: contains "" ""
+
+  goal substring_contains: forall s1 s2.
+    contains s1 s2 -> exists i. substring s1 i (length s2) = s2
+
+  goal TestIndefof1:
+    indexof "" "" 0 = 0
+
+  goal TestIndefof2:
+    indexof "a" "" 0 = 0
+
+  goal TestIndefof3:
+    indexof "" "a" 0 = -1
+
+  goal TestIndefof4:
+    indexof "a" "" 1 = 1
+
+  goal TestIndefof5:
+    indexof "a" "" 2 = -1
+
+  goal TestIndefof6:
+    indexof "ab" "" 2 = 2
+
+  goal TestIndefof7:
+    indexof "abcdef" "c" 0 = 2
+
+  goal TestIndefof8:
+    indexof "abcdef" "c" 2 = 2
+
+  goal TestIndefof9:
+    indexof "abcdef" "c" 3 = -1
+
+  goal TestIndefof10:
+    indexof "abcdef" "cdef" 0 = 2
+
+  goal TestIndexof11: forall s1.
+    indexof s1 "" 0 = 0
+
+  goal TestReplace1: forall s2 s3.
+   s2 <> "" -> replace "" s2 s3 = ""
+
+  goal TestReplace2: forall s1 s3. (* check standard to see if this makes sense *)
+   replace s1 "" s3 = concat s3 s1
+
+  goal TestReplace3:
+   replace "abcde" "bc" "1234" = "a1234de"
+
+  goal TestReplace4:
+   replace "abcdefg" "fg" "" = "abcde"
+
+  goal TestReplace5:
+   replace "abcdefabcdef" "bc" "123" = "a123defabcdef"
+
+  goal to_int_lt_0: forall s i.
+    0 <= i < length s && lt s[i] "0"
+        -> to_int s = -1
+
+  goal to_int_gt_9: forall s i.
+    0 <= i < length s && lt "9" s[i]
+        -> to_int s = -1
+
+  goal TestIsDigit:
+    is_digit "0" && is_digit "1" && is_digit "2" && is_digit "3" &&
+    is_digit "4" && is_digit "5" && is_digit "6" && is_digit "7" &&
+    is_digit "8" && is_digit "9"
+
+  goal TestIsDigit2:
+    not (is_digit "00") && not (is_digit "q") && not (is_digit "-1") &&
+    not (is_digit "10") && not (is_digit "!") && not (is_digit "\xAA")
+
+  goal TestTo_int1: to_int "1" = 1
+  goal TestTo_int2: to_int "11" = 11
+  goal TestTo_int3: to_int "123" = 123
+  goal TestTo_int4: to_int "" = -1
+  goal TestTo_int5: to_int "a" = -1
+  goal TestTo_int6: to_int "-1" = -1
+  goal TestTo_int7: to_int "-2" = -1
+  goal TestTo_int8: to_int "-11" = -1
+  goal TestTo_int9: to_int "1a1" = -1
+
+  goal TestFrom_int: from_int 1 = "1"
+
+  goal TestProvedInAltergo1: forall s1 s2.
+    length s1 = length (concat s1 s2) -> s2 = ""
+
+  (* proved with alt-ergo but not with CVC4 *)
+  goal TestProvedInAltergo2: forall s1 s2.
+    prefixof s1 s2 -> exists i. substring s2 0 i = s1
+  (*** TODO: axioms about to_int -- the following are not proved *)
+
+end
+
+module TestInput
+
+  use string.String
+
+  goal T0: length "this is a test" = 14
+  goal T1: length "\x17" = 1
+  goal T2: length "\o027" = 1
+  goal T3: length "\023" = 1
+  goal T4: length "\t" = 1
+  goal T5: length "\\" = 1
+  goal T6: length "\"" = 1
+  goal T7: length "\n" = 1
+  (* goal T8: length "\p" = 1 *)
+  (*   goal T9: length "a *)
+  (* b" = 2 *)
+  goal T10: length "'" = 1
+  goal T11: length "/" = 1
+  goal T12: length "`" = 1
+  (* à is the same as \195\160 *)
+  (* goal T13: length "à" = 1 *)
+  (* goal T14: length "Ϯ" = 1 *)
+  (* á is the same as \195\161, \o303\o241, \xC3\xA1 *)
+  (* goal T15: length "á" = 1 *)
+  goal T16: length "\o303\o241" = 2
+  goal T17: length "\xC3\xA1" = 2
+  (* goal T18: length "\o477" = 2 *)
+  goal T19: length "\xFFA" = 2
+  goal T20: length "\000" = 1
+  goal T21: length "\161" = 1
+  goal T22: length "\r" = 1
+  goal T23: length "'" = 1
+  (* goal T24: length "\256" = 2 *)
+  goal T25: length "this \
+                    is a \
+                    test" = 14
+  goal T26: length "\065" = 1
+  goal T27: length "\x41" = 1
+  goal T28: length "\o101" = 1
+  goal T29: "A" = "\065" = "\x41" = "\o101"
+
+end
+
+module TestRegExpr
+  use string.String as S
+  use string.RegExpr
+
+  (* in_re and to_re *)
+  goal TestIn1:
+    in_re "a" (to_re "a")
+
+  goal TestIn2:
+    in_re "abc" (to_re "abc")
+
+  goal TestIn3:
+    not (in_re "abc" (to_re "abd"))
+
+  lemma TestToReInRe: forall s.
+    in_re s (to_re s)
+
+  (* concat *)
+
+  goal TestConcat1:
+    let r1 = to_re "a" in
+    let r2 = to_re "b" in
+    in_re "ab" (concat r1 r2)
+
+  goal TestConcat2:
+    let r1 = to_re "a" in
+    let r2 = to_re "b" in
+    not (in_re "ba" (concat r1 r2))
+
+  goal TestConcat3:
+    let r1 = to_re "abc" in
+    let r2 = to_re "def" in
+    in_re "abcdef" (concat r1 r2)
+
+  goal TestConcat4:
+    let r1 = to_re "a" in
+    in_re (S.concat "a" "a") (concat r1 r1)
+
+  lemma concat: forall s1 s2.
+    let r1 = to_re s1 in
+    let r2 = to_re s2 in
+    in_re (S.concat s1 s2) (concat r1 r2)
+
+  goal concat_exists: forall s r1 r2.
+    in_re s (concat r1 r2) -> exists s1 s2.
+      S.concat s1 s2 = s && in_re s1 r1 && in_re s2 r2
+
+  (* union *)
+
+  goal TestUnion1:
+    let r1 = to_re "a" in
+    let r2 = to_re "b" in
+    in_re "a" (union r1 r2) && in_re "b" (union r1 r2)
+
+  goal TestUnion2:
+    let r1 = to_re "a" in
+    forall re. in_re "a" (union r1 re) && in_re "a" (union re r1)
+
+  goal in_union1: forall s1 r1 r2.
+    in_re s1 r1 -> in_re s1 (union r1 r2)
+
+  goal in_union2: forall s1 r1 r2.
+    in_re s1 r2 -> in_re s1 (union r1 r2)
+
+  goal in_union: forall s1 r1 r2.
+    in_re s1 r1 || in_re s1 r2 -> in_re s1 (union r1 r2)
+
+  (* inter *)
+
+  goal TestInter1:
+    let r1 = to_re "a" in
+    let r2 = to_re "b" in
+    not (in_re "a" (inter r1 r2))
+
+  goal TestInter2:
+    let r1 = to_re "a" in
+    let r = to_re "b" in
+    let r2 = union r1 r in
+    in_re "a" (inter r1 r2)
+
+  lemma in_inter1: forall s1:string, r1:re, r2:re.
+    in_re s1 (inter r1 r2) -> in_re s1 r1
+
+  lemma in_inter2: forall s1:string, r1:re, r2:re.
+    in_re s1 (inter r1 r2) -> in_re s1 r2
+
+  (* star *)
+
+  goal TestInStar1:
+    let a = star (to_re "a") in
+    in_re "aaa" a &&
+    not (in_re "aba" a)
+
+  goal TestInStar2:
+    let a = to_re "a" in
+    let b = to_re "b" in
+    let ab = star (union a b) in
+    in_re "a" ab &&
+    in_re "b" ab &&
+    in_re "babab" ab &&
+    in_re "baaa" ab &&
+    in_re "aaaa" ab &&
+    in_re "bbbb" ab &&
+    not (in_re "acaab") ab
+
+  goal TestDigit:
+    let d = union (to_re "0") (union (to_re "1") (union (to_re "2")
+           (union (to_re "3") (union (to_re "4") (union (to_re "5")
+           (union (to_re "6") (union (to_re "7") (union (to_re "8")
+            (to_re "9"))))))))) in
+    let ds = star d in
+    let is_digit x = in_re x d in
+    let are_digits x = in_re x ds in
+    is_digit "1" && is_digit "9" && is_digit "0" &&
+    not (is_digit "a") && not (is_digit "12") &&
+    are_digits "0" && are_digits "4" && are_digits "9" &&
+    are_digits "1850" && are_digits "10" && are_digits "000" &&
+    not (are_digits "1 ") && not (are_digits " 1") &&
+    not (are_digits "1a") && not (are_digits "a1") &&
+    not (are_digits "a")
+
+  goal star1: forall s re.
+    in_re s re -> in_re s (star re)
+
+  lemma star2: forall re.
+    in_re S.empty (star re)
+
+  (* plus *)
+
+  goal TestPlus1:
+    let a = plus (to_re "a") in
+    in_re "a" a && in_re "aaa" a && not (in_re "b" a) &&
+    not (in_re "ab" a) && not (in_re "" a)
+
+  lemma def_plus: forall re.
+    plus re = concat re (star re)
+
+  goal plus_star: forall s r.
+    in_re s (plus r) -> in_re s (star r)
+
+  (* none, all, allchar *)
+
+  goal TestAllChar:
+    in_re "a" allchar && in_re "1" allchar && in_re "!" allchar &&
+    not (in_re "aa" allchar) && not (in_re "!!" allchar)
+
+  goal TestAll:
+    in_re "as 3hoiqjndhfgasohn123^*&(T@GIGDSOA" all
+
+  lemma allchar: forall s.
+    S.length s = 1 -> in_re s allchar
+
+  lemma in_re_none: forall s: string.
+    not (in_re s none)
+
+  lemma all_allchar: forall s.
+    in_re s (star allchar)
+
+  lemma in_re_all: forall s.
+    in_re s all
+
+  lemma union_all: forall r.
+    union all r = union r all = all
+
+  lemma inter_all: forall r.
+    inter r all = inter all r = r
+
+  lemma star_all: star all = all
+
+  (* opt *)
+
+  goal TestOpt1:
+    let a = to_re "a" in
+    in_re "a" (opt a) && in_re "" (opt a) && not (in_re "ab" (opt a))
+
+  lemma empty_opt: forall re.
+    in_re "" (opt re)
+
+  lemma in_opt: forall s.
+    in_re s (opt (to_re s))
+
+  (* range *)
+
+  goal TestRange1:
+    in_re "b" (range "a" "c") &&
+    in_re "b" (range "b" "c") &&
+    in_re "b" (range "a" "b") &&
+    not (in_re "d" (range "a" "c"))
+
+  goal TestRange2:
+    not (in_re "abc" (range "a" "b"))
+
+  goal range_negative: forall s.
+    not (in_re s (range "b" "a"))
+
+  goal range_not_singleton: forall s.
+    not (in_re s (range "ba" "a"))
+
+  (* power, loop *)
+
+  goal TestPower1:
+    let a = to_re "a" in
+    in_re "aa" (power 2 a)
+
+  goal TestPower2:
+    let ab = to_re "ab" in
+    in_re "ababab" (power 3 ab)
+
+  goal TestPower3: forall i.
+    let ab = to_re "ab" in
+    in_re "ababab" (power i ab)
+
+  goal TestLoop1:
+    let a = to_re "a" in
+    in_re "aa" (loop 2 3 a)
+
+
+
+end

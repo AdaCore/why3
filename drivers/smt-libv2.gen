@@ -25,8 +25,10 @@ valid "^unsat$"
 theory BuiltIn
   syntax type int   "Int"
   syntax type real  "Real"
+  syntax type string "String"
   syntax predicate (=)  "(= %1 %2)"
 
+  meta "literal:keep" type string
   meta "encoding:kept" type int
   meta "encoding:ignore_polymorphism_ls" predicate (=)
 end
@@ -132,8 +134,8 @@ theory real.FromInt
 end
 
 theory real.Truncate
-  syntax function truncate "(ite (>= %1 0.0)
-                                 (to_int %1)
+  syntax function truncate "(ite (>= %1 0.0) \
+                                 (to_int %1) \
                                  (- (to_int (- %1))))"
   syntax function floor "(to_int %1)"
   syntax function ceil "(- (to_int (- %1)))"
@@ -195,4 +197,47 @@ end
 theory map.Const
   meta "encoding:lskept" function const
 (*  syntax function const "(const[%t0] %1)" *)
+end
+
+theory string.String
+
+  prelude ";;; SMT-LIB2: string theory"
+
+  syntax function concat     "(str.++ %1 %2)"
+  syntax function length     "(str.len %1)"
+  syntax function indexof    "(str.indexof %1 %2 %3)"
+  syntax function replace    "(str.replace %1 %2 %3)"
+  syntax function substring  "(str.substr %1 %2 %3)"
+  syntax function ([])       "(str.at %1 %2)"
+  syntax predicate contains  "(str.contains %1 %2)"
+  syntax predicate prefixof  "(str.prefixof %1 %2)"
+  syntax predicate suffixof  "(str.suffixof %1 %2)"
+
+  (* syntax function is_digit  "(str.is_digit %1)" *)
+  syntax function to_int     "(str.to.int %1)"
+  syntax function from_int   "(int.to.str %1)"
+
+end
+
+theory string.StringRealization
+
+  prelude ";;; SMT-LIB2: string theory"
+
+  syntax function concat     "(str.++ %1 %2)"
+  syntax function length     "(str.len %1)"
+  syntax predicate lt        "(str.< %1 %2)"
+  syntax predicate le        "(str.<= %1 %2)"
+  syntax function indexof    "(str.indexof %1 %2 %3)"
+  syntax function replace    "(str.replace %1 %2 %3)"
+  syntax function replaceall "(str.replaceall %1 %2 %3)"
+  syntax function substring  "(str.substr %1 %2 %3)"
+  syntax function ([])       "(str.at %1 %2)"
+  syntax predicate contains  "(str.contains %1 %2)"
+  syntax predicate prefixof  "(str.prefixof %1 %2)"
+  syntax predicate suffixof  "(str.suffixof %1 %2)"
+
+  (* syntax function is_digit  "(str.is_digit %1)" *)
+  syntax function to_int     "(str.to.int %1)"
+  syntax function from_int   "(int.to.str %1)"
+
 end

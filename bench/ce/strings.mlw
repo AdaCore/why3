@@ -1,0 +1,24 @@
+module TestCounterexample
+
+  use string.String
+  use int.Int
+
+  goal T1: forall s. length s <> 1
+  goal T2: forall s. (length s) < 4
+  goal T3: forall s1 s2. concat s1 s2 = concat s2 s1
+  goal T4: forall s. length s > 10 -> s = "qwertyuiop["
+  goal T5: forall s. let x = "b\123u\111h\ti" in lt s x -> length s < length x
+  goal T6: forall s. let x = "b\123u\111h\ti" in lt s x -> length s <= length x
+  goal T7: forall s. let x = "b\123u\111h\ti" in lt s x -> length s > length x
+  goal T8: forall s. let x = "b\123u\111h\ti" in lt s x -> length s >= length x
+  goal T9: forall s. let x = "b\123u\111h\ti" in le s x -> length s < length x
+  goal T10: forall s. let x = "b\123u\111h\ti" in le s x -> length s <= length x
+  goal T11: forall s. let x = "b\123u\111h\ti" in le s x -> length s > length x
+  goal T12: forall s. let x = "b\123u\111h\ti" in le s x -> length s >= length x
+  goal T13: forall s. lt s s
+  goal T14: forall s. not (le s s)
+  goal T15: forall s i. length s[i] = 1
+  goal T16: forall s. prefixof "abc" s
+  goal T17: forall s. prefixof "abc" s -> length s > 3
+
+end

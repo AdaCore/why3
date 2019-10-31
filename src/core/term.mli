@@ -73,6 +73,7 @@ exception PredicateSymbolExpected of lsymbol
 exception ConstructorExpected of lsymbol
 exception InvalidIntegerLiteralType of ty
 exception InvalidRealLiteralType of ty
+exception InvalidStringLiteralType of ty
 
 (** {2 Patterns} *)
 
@@ -125,7 +126,7 @@ type term = private {
 
 and term_node =
   | Tvar of vsymbol
-  | Tconst of Number.constant
+  | Tconst of Constant.constant
   | Tapp of lsymbol * term list
   | Tif of term * term * term
   | Tlet of term * term_bound
@@ -219,10 +220,10 @@ val t_app_infer : lsymbol -> term list -> term
 val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
 val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
-val check_literal : Number.constant -> ty -> unit
+val check_literal : Constant.constant -> ty -> unit
 
 val t_var : vsymbol -> term
-val t_const : Number.constant -> ty -> term
+val t_const : Constant.constant -> ty -> term
 val t_if : term -> term -> term -> term
 val t_let : term -> term_bound -> term
 val t_case : term -> term_branch list -> term
@@ -244,6 +245,7 @@ val t_nat_const : int -> term
     n must be non-negative *)
 val t_int_const : BigInt.t -> term
 val t_real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> term
+val t_string_const : string -> term
 
 val stop_split : attribute
 val asym_split : attribute

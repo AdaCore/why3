@@ -172,7 +172,7 @@ let rec print_term info fmt t =
 
   let () = match t.t_node with
   | Tconst c ->
-      Number.print number_format fmt c
+      Constant.(print number_format unsupported_escape) fmt c
   | Tvar { vs_name = id } ->
       print_ident info fmt id
   | Tapp (ls, tl) ->

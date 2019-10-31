@@ -48,7 +48,7 @@ type expr = {
 }
 
 and expr_node =
-  | Econst  of Number.int_constant
+  | Econst  of Constant.constant
   | Evar    of pvsymbol
   | Eapp    of rsymbol * expr list
   | Efun    of var list * expr

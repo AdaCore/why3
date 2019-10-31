@@ -394,10 +394,12 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dterm ns km crcmap gvars at denv e23) in
       chain loc (dterm ns km crcmap gvars at denv e1) op1 e23
-  | Ptree.Tconst (Number.ConstInt _ as c) ->
+  | Ptree.Tconst (Constant.ConstInt _ as c) ->
       DTconst (c, dty_int)
-  | Ptree.Tconst (Number.ConstReal _ as c) ->
+  | Ptree.Tconst (Constant.ConstReal _ as c) ->
       DTconst (c, dty_real)
+  | Ptree.Tconst (Constant.ConstStr _ as c) ->
+      DTconst (c, dty_str)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm ns km crcmap gvars at denv e1 in
@@ -943,14 +945,16 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dexpr muc denv e23) in
       chain "q1 " "q2 " loc (dexpr muc denv e1) op1 e23
-  | Ptree.Econst (Number.ConstInt _ as c) ->
+  | Ptree.Econst (Constant.ConstInt _ as c) ->
       let dty = if Mts.is_empty muc.muc_theory.uc_ranges
                 then dity_int else dity_fresh () in
       DEconst(c, dty)
-  | Ptree.Econst (Number.ConstReal _ as c) ->
+  | Ptree.Econst (Constant.ConstReal _ as c) ->
       let dty = if Mts.is_empty muc.muc_theory.uc_floats
                 then dity_real else dity_fresh () in
       DEconst(c, dty)
+  | Ptree.Econst (Constant.ConstStr _ as c) ->
+      DEconst(c, dity_str)
   | Ptree.Eref ->
       DEsym (RS rs_ref)
   | Ptree.Erecord fl ->

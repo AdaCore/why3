@@ -20,6 +20,7 @@ type bv_value =
 
 (* Simple counterexample that already represent a complete value *)
 type simple_value =
+  | String of string
   | Integer of string
   | Decimal of (string * string)
   | Fraction of (string * string)

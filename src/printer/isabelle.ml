@@ -225,15 +225,18 @@ let rec print_term info defs fmt t = match t.t_node with
       print_var info fmt v
   | Tconst c ->
       begin match c with
-        | Number.ConstInt _ ->
-            fprintf fmt "<num val=\"%a\">%a</num>"
-              (Number.print number_format) c (print_ty info) (t_type t)
-        | Number.ConstReal _ ->
+        | Constant.ConstInt _ ->
+           let pp = Constant.(print number_format unsupported_escape) in
+           fprintf fmt "<num val=\"%a\">%a</num>"
+             pp c (print_ty info) (t_type t)
+        | Constant.ConstStr _ ->
+           Constant.(print number_format unsupported_escape) fmt c
+        | Constant.ConstReal _ ->
            match t.t_ty with
            | None -> assert false (* impossible *)
            | Some ty ->
               if ty_equal ty ty_real then
-                Number.print number_format fmt c
+                Constant.(print number_format unsupported_escape) fmt c
               else raise (UnsupportedTerm (t, "floating-point literal"))
       end
   | Tif (f, t1, t2) ->

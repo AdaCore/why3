@@ -112,12 +112,23 @@ module Print = struct
         query_syntax info.info_syn ts.ts_name = Some "int"
     | _ -> false
 
+  let escape c = match c with
+    | '\\'  -> "\\\\"
+    | '\n'  -> "\\n"
+    | '\t'  -> "\\t"
+    | '\"'  -> "\\\""
+    | '\032' .. '\126' -> Format.sprintf "%c" c
+    | '\000' .. '\031'
+    | '\127' .. '\255' -> assert false
+
   let print_constant fmt e = begin match e.e_node with
-    | Econst c ->
+    | Econst (Constant.ConstInt c) ->
         let v = c.Number.il_int in
         let s = BigInt.to_string v in
         if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" s
         else fprintf fmt "%s" s
+    | Econst (Constant.ConstStr s) ->
+       Constant.print_string_constant escape fmt s
     | _ -> assert false end
 
   let print_for_direction fmt = function
@@ -224,7 +235,7 @@ module Print = struct
 
   and print_expr ?(paren=false) info fmt e =
     match e.e_node with
-    | Econst c ->
+    | Econst (Constant.ConstInt c) ->
         let n = c.Number.il_int in
         let n = BigInt.to_string n in
         let id = match e.e_ity with
@@ -233,6 +244,9 @@ module Print = struct
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
          | None   -> fprintf fmt (protect_on paren "%s") n)
+    | Econst (Constant.ConstStr s) ->
+        Constant.print_string_constant escape fmt s
+    | Econst (Constant.ConstReal _) -> assert false (* TODO *)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->

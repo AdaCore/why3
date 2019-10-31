@@ -142,6 +142,7 @@ let interp_float ?(interp=true) b eb sb =
   with Exit -> Float_value (b, eb, sb)
 
 type model_value =
+ | String of string
  | Integer of string
  | Decimal of (string * string)
  | Fraction of (string * string)
@@ -217,6 +218,10 @@ let convert_float_value f =
 
 let rec convert_model_value value : Json_base.json =
   match value with
+  | String s ->
+      let m = Mstr.add "type" (Json_base.String "String") Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String s) m in
+      Json_base.Record m
   | Integer s ->
       let m = Mstr.add "type" (Json_base.String "Integer") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String s) m in
@@ -395,6 +400,7 @@ and print_bv fmt (bv: string) =
 
 and print_model_value_human fmt (v: model_value) =
   match v with
+  | String s -> Constant.print_string_def fmt s
   | Integer s -> print_integer fmt s
   | Decimal (s1,s2) -> fprintf fmt "%s" (s1 ^ "." ^ s2)
   | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
@@ -933,7 +939,7 @@ let recover_name list_projs term_map raw_name =
 let rec replace_projection (const_function: string -> string) model_value =
   match model_value with
   | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
-    | Unparsed _ -> model_value
+    | String  _ | Unparsed _ -> model_value
   | Array a ->
       Array (replace_projection_array const_function a)
   | Record r ->

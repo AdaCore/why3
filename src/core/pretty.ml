@@ -380,8 +380,8 @@ and print_tnode ?(ext_printer=true) pri fmt t =
           match t.t_ty with
           | Some {ty_node = Tyapp (ts,[])}
             when ts_equal ts ts_int || ts_equal ts ts_real ->
-              Number.print_constant fmt c
-          | Some ty -> fprintf fmt "(%a:%a)" Number.print_constant c
+              Constant.print_def fmt c
+          | Some ty -> fprintf fmt "(%a:%a)" Constant.print_def c
                          print_ty ty
           | None -> assert false
         end
@@ -786,6 +786,8 @@ let () = Exn_printer.register
       fprintf fmt "Cannot cast an integer literal to type %a" print_ty ty
   | Term.InvalidRealLiteralType ty ->
       fprintf fmt "Cannot cast a real literal to type %a" print_ty ty
+  | Term.InvalidStringLiteralType ty ->
+      fprintf fmt "Cannot cast a string literal to type %a" print_ty ty
   | Pattern.ConstructorExpected (ls,ty) ->
       fprintf fmt "%s %a is not a constructor of type %a"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls

@@ -77,6 +77,8 @@ let print_float fmt f =
 
 let print_value fmt v =
   match v with
+  | String s ->
+     Format.fprintf fmt "String: %a" Constant.print_string_def s
   | Integer s -> Format.fprintf fmt "Integer: %s" s
   | Decimal (s1, s2) -> Format.fprintf fmt "Decimal: %s . %s" s1 s2
   | Fraction (s1, s2) -> Format.fprintf fmt "Fraction: %s / %s" s1 s2
@@ -433,6 +435,7 @@ let refine_variable_value table key t =
 
 let convert_simple_to_model_value (v: simple_value) =
   match v with
+  | String s -> Model_parser.String s
   | Integer i -> Model_parser.Integer i
   | Decimal (d1, d2) -> Model_parser.Decimal (d1, d2)
   | Fraction (s1, s2) -> Model_parser.Fraction (s1, s2)

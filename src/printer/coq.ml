@@ -281,7 +281,7 @@ let rec print_term ?(boxed=false) ?(opr=true) info ~prec fmt t =
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Number.print (number_format info) fmt c
+      Constant.(print (number_format info)  unsupported_escape) fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt (protect_on (opr && prec < 200) "let %a :=@ %a in@ %a")
