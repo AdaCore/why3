@@ -23,7 +23,9 @@ module AddAlias
   val open_sep (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
                (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid r sx /\ valid x sx /\ valid y sy }
+    requires { writable r }
     requires { 0 <= sy <= sx }
+    ensures { writable nr }
     ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
     ensures { valid nr sx /\ valid nx sx /\ valid ny sy }
     ensures { 0 <= offset nr /\ offset nr + sx <= offset nx
@@ -57,6 +59,7 @@ module AddAlias
     requires { m.lr = sx /\ m.lx = sx /\ m.ly = sy }
     requires { 0 <= offset nr /\ offset nr + sx <= offset nx
                /\ offset nx + sx <= offset ny }
+    requires { writable r /\ writable nr }
     ensures { r.max = m.mr /\ x.max = m.mx /\ y.max = m.my }
     ensures { map_eq_sub_shift (old pelts nr) (pelts r)
                                (offset nr) (offset r) sx }
@@ -80,6 +83,8 @@ module AddAlias
                (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid x sx /\ valid y sy }
     requires { 0 <= sy <= sx }
+    requires { writable x }
+    ensures { writable nr }
     ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
     ensures { valid nx sx /\ valid ny sy }
     ensures { identical nr nx }
@@ -103,6 +108,8 @@ module AddAlias
                (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid x sx /\ valid y sx }
     requires { 0 <= sy <= sx }
+    requires { writable y }
+    ensures { writable nr }
     ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
     ensures { valid nx sx /\ valid ny sx }
     ensures { identical nr ny }
@@ -126,13 +133,15 @@ module AddAlias
                (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
     requires { valid x sx }
     requires { 0 <= sx }
+    requires { writable x }
+    ensures  { writable nr }
     ensures  { value nx sx = old value x sx }
     ensures  { valid nx sx }
     ensures  { identical nr nx }
     ensures  { identical nr ny }
     ensures  { 0 <= offset nr }
     ensures  { m.zx = zone x }
-    ensures  { m.mx = max x }
+    ensures  { m.mx = old x.max }
     ensures  { m.lx = sx }
     ensures  { m.ok }
     ensures  { map_eq_sub_shift (pelts nx) (pelts x) (offset nx) (offset x) sx }
@@ -149,6 +158,7 @@ module AddAlias
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
+    requires { writable x /\ writable nr }
     requires { m.ok }
     requires { 0 <= sy <= sx }
     requires { identical nr nx }
@@ -174,6 +184,7 @@ module AddAlias
     alias { nr.data with nx.data }
     alias { nr.data with ny.data }
     alias { nx.data with ny.data }
+    requires { writable y /\ writable nr }
     requires { m.ok }
     requires { 0 <= sy <= sx }
     requires { identical nr ny }
@@ -204,6 +215,7 @@ module AddAlias
     requires { identical nr nx }
     requires { 0 <= offset nr }
     requires { m.zx = x.zone /\ m.lx = sx }
+    requires { writable x /\ writable nr }
     ensures  { x.max = m.mx }
     ensures  { map_eq_sub_shift (old pelts nx) (pelts x)
                                 (offset nx) (offset x) sx }
@@ -247,6 +259,7 @@ module AddAlias
     requires { offset r = offset x \/ offset r + sz <= offset x }
     requires { offset r = offset y \/ offset r + sz <= offset y }
     requires { r.data = x.data = y.data }
+    requires { writable r }
     alias    { r.data with x.data }
     alias    { r.data with y.data }
     alias    { x.data with y.data }
@@ -310,6 +323,7 @@ module AddAlias
     requires { offset r = offset x \/ offset r + sx <= offset x }
     requires { offset r = offset y \/ offset r + sx <= offset y }
     requires { r.data = x.data = y.data }
+    requires { writable r }
     alias    { r.data with x.data }
     alias    { r.data with y.data }
     alias    { x.data with y.data }
@@ -409,9 +423,10 @@ module AddAlias
      done;
      c
 
-  let add_n [@extraction:inline] (r x y:ptr limb) (sz:int32) : limb
+  let wmpn_add_n [@extraction:inline] (r x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid r sz /\ valid x sz /\ valid y sz }
+    requires { writable r }
     ensures  { value r sz + power radix sz * result
                = old (value x sz + value y sz) }
     ensures  { 0 <= result <= 1 }
@@ -421,6 +436,12 @@ module AddAlias
     ensures { forall j. (pelts y)[j] = old (pelts y)[j] }
     ensures { value x sz = old value x sz }
     ensures { value y sz = old value y sz }
+    ensures  { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
+    ensures  { min y = old min y /\ max y = old max y
+               /\ plength y = old plength y }
+    ensures  { min r = old min r /\ max r = old max r
+               /\ plength r = old plength r }
   =
     let ghost ox = pure { x } in
     let ghost oy = pure { y } in
@@ -444,9 +465,10 @@ module AddAlias
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_n_rx [@extraction:inline] (x y:ptr limb) (sz:int32) : limb
+  let wmpn_add_n_rx [@extraction:inline] (x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid x sz /\ valid y sz }
+    requires { writable x }
     ensures  { value x sz + power radix sz * result
                = old (value x sz + value y sz) }
     ensures  { 0 <= result <= 1 }
@@ -454,6 +476,10 @@ module AddAlias
                       -> (pelts x)[j] = old (pelts x)[j] }
     ensures  { forall j. (pelts y)[j] = old (pelts y)[j] }
     ensures  { value y sz = old value y sz }
+    ensures  { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
+    ensures  { min y = old min y /\ max y = old max y
+               /\ plength y = old plength y }
   = let ghost oy = pure { y } in
     let nr, nx, ny, m = open_rx x sz y sz in
     label Add in
@@ -468,10 +494,11 @@ module AddAlias
                 = (pelts oy)[offset y + j] };
     res
 
-  let add [@extraction:inline] (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
-                               : limb
+  let wmpn_add [@extraction:inline] (r x:ptr limb) (sx:int32)
+                                      (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid r sx /\ valid x sx /\ valid y sy }
+    requires { writable r }
     ensures  { value r sx + power radix sx * result
                = old (value x sx + value y sy) }
     ensures  { 0 <= result <= 1 }
@@ -481,6 +508,12 @@ module AddAlias
     ensures { forall j. (pelts y)[j] = old (pelts y)[j] }
     ensures { value x sx = old value x sx }
     ensures { value y sy = old value y sy }
+    ensures  { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
+    ensures  { min y = old min y /\ max y = old max y
+               /\ plength y = old plength y }
+    ensures  { min r = old min r /\ max r = old max r
+               /\ plength r = old plength r }
   =
     let ghost ox = pure { x } in
     let ghost oy = pure { y } in
@@ -504,10 +537,11 @@ module AddAlias
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_rx [@extraction:inline] (x:ptr limb) (sx:int32)
+  let wmpn_add_rx [@extraction:inline] (x:ptr limb) (sx:int32)
                                   (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sy }
+    requires { writable x }
     ensures  { value x sx + power radix sx * result
                = old (value x sx + value y sy) }
     ensures  { 0 <= result <= 1 }
@@ -515,6 +549,10 @@ module AddAlias
                -> (pelts x)[j] = old (pelts x)[j] }
     ensures  { forall j. (pelts y)[j] = (old pelts y)[j] }
     ensures  { value y sy = old value y sy }
+    ensures  { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
+    ensures  { min y = old min y /\ max y = old max y
+               /\ plength y = old plength y }
   =
     let ghost oy = pure { y } in
     let nr, nx, ny, m = open_rx x sx y sy in
@@ -530,10 +568,11 @@ module AddAlias
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_ry [@extraction:inline] (x:ptr limb) (sx:int32)
+  let wmpn_add_ry [@extraction:inline] (x:ptr limb) (sx:int32)
                                   (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sx }
+    requires { writable y }
     ensures  { value y sx + power radix sx * result
                = old (value x sx + value y sy) }
     ensures  { 0 <= result <= 1 }
@@ -541,6 +580,10 @@ module AddAlias
                -> (pelts y)[j] = old (pelts y)[j] }
     ensures  { forall j. (pelts x)[j] = (old pelts x)[j] }
     ensures  { value x sx = old value x sx }
+    ensures  { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
+    ensures  { min y = old min y /\ max y = old max y
+               /\ plength y = old plength y }
   =
     let ghost ox = pure { x } in
     let nr, nx, ny, m = open_ry x sx y sy in
@@ -556,14 +599,17 @@ module AddAlias
                 = (pelts ox)[offset x + j] };
     res
 
-  let add_n_rxy [@extraction:inline] (x:ptr limb) (sx:int32) : limb
+  let wmpn_add_n_rxy [@extraction:inline] (x:ptr limb) (sx:int32) : limb
     requires { 0 <= sx }
+    requires { writable x }
     requires { valid x sx }
     ensures  { value x sx + power radix sx * result
                = old (value x sx + value x sx) }
     ensures  { 0 <= result <= 1 }
     ensures  { forall j. (j < offset x \/ offset x + sx <= j)
                       -> (pelts x)[j] = old (pelts x)[j] }
+    ensures  { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
   =
     let nr, nx, ny, m = open_rxy x sx in
     let res = add_n_aliased nr nx ny sx in
