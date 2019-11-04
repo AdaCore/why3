@@ -300,7 +300,9 @@ src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.mess
 	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
 	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
 	src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
-	@if ! cmp -s src/parser/handcrafted.messages src/parser/handcrafted.messages.temp; then \
+	diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; \
+	RET_CODE=$$?; \
+	if [ $$RET_CODE -ne 0 ]; then \
 		echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
 contains an updated version that must be checked before replacing 'src/parser/handcrafted.messages'"; \
 		exit 1; \
