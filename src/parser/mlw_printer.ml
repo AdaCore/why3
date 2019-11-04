@@ -375,7 +375,7 @@ and pp_expr fmt e =
       pp_apply pp_expr expr_closed fmt e1 e2
   | Einfix (e1, op, e2) ->
       pp_infix pp_expr expr_closed fmt e1 op e2
-  | Einnfix (e1, op, e2) ->
+  | Einnfix _ ->
       todo fmt "Einnfix _"
   | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e1)}, e2) ->
       (* TODO _pat *)
