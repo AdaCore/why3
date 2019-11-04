@@ -937,7 +937,7 @@ end
     let goal_loc, list_loc = List.partition (fun (_, y) -> y = Goal_loc) list_loc in
     let goal_loc =
       match goal_loc with
-      | [(x, _)] -> Some x
+      | (x, _) :: _ -> Some x
       | _        -> None in
     let list_loc =
       List.map (fun (x, y) ->
