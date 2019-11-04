@@ -137,15 +137,34 @@ let pose (clear: bool) (name: string) (t: term) =
    equal to a term). It may also help provers to completely remove reference to
    stuff *)
 let hide (clear: bool) (name: string) (t: term) =
+  let add_decls list_decl task =
+    List.fold_left (fun task d -> Task.add_decl task d) task list_decl in
+
+  let replace_all hyp new_constant ls_term task =
+    let (_, new_task) =
+      let decls = Task.task_tdecls task in
+      List.fold_left (fun (to_add, task_uc) td ->
+          match td.Theory.td_node with
+          | Theory.Decl {d_node = Dprop (Decl.Pgoal, pr, t1); _} ->
+              (* Add declaration that depends on the rewriting of declaration
+                 *after* the declaration of the new_constant *)
+              let task_uc = add_decls to_add task_uc in
+              let new_decl = create_prop_decl Decl.Pgoal pr (t_replace t ls_term t1) in
+              let task_uc = Task.add_decl task_uc new_decl in
+              ([], task_uc)
+          | Theory.Decl d when (Decl.d_equal d hyp || Decl.d_equal d new_constant) ->
+              (to_add, Task.add_tdecl task_uc td)
+          | Theory.Decl ({d_node = Dprop (p, pr, t1); _} as d) ->
+              let new_decl = create_prop_decl p pr (t_replace t ls_term t1) in
+              if d_equal new_decl d then
+                (to_add, Task.add_decl task_uc d)
+              else
+                (new_decl :: to_add, task_uc)
+          | _ -> (to_add, Task.add_tdecl task_uc td)
+        ) ([], None) decls in
+    new_task in
   let replace_all hyp new_constant ls_term =
-    Trans.decl (fun d ->
-      match d.d_node with
-      | _ when (Decl.d_equal d hyp || Decl.d_equal d new_constant) -> [d]
-      | Dprop (p, pr, t1) ->
-        let new_decl = create_prop_decl p pr (t_replace t ls_term t1) in
-        [new_decl]
-      | _ -> [d]) None
-  in
+    Trans.store (replace_all hyp new_constant ls_term) in
   Trans.bind_comp (pose clear name t)
      (fun (hyp,new_constant,ls_term) -> replace_all hyp new_constant ls_term)
 
