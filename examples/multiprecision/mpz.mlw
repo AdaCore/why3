@@ -280,8 +280,8 @@ use lemmas.Lemmas
 use util.Util
 use compare.Compare
 use import mach.int.UInt64GMP as Limb
-use add_raw.Add_raw
-use sub.Sub
+use add_alias.AddAlias
+use sub_alias.SubAlias
 use int.Abs
 use Z
 
@@ -347,6 +347,8 @@ let wmpz_add (w u v: mpz_ptr) : unit
             ensures { mpz.readers[w] = -1 }
             ensures { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) }
             ensures { abs wsize <= plength wp }
+            ensures { min wp = old min wp /\ max wp = old max wp
+                      /\ plength wp = old plength wp }
     if abs_usize <> abs_vsize
     then begin
       begin ensures { value wp abs_usize
@@ -355,19 +357,19 @@ let wmpz_add (w u v: mpz_ptr) : unit
             ensures { vw \/ mpz.readers[v] = 0 }
             ensures { mpz.readers[w] = -1 }
             ensures { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) }
+            ensures { min wp = old min wp /\ max wp = old max wp
+                      /\ plength wp = old plength wp }
       if uw
       then begin
         assert { not vw };
         let vp = get_read_ptr v in
-        let _b = wmpn_sub_in_place wp abs_usize vp abs_vsize in
+        let _b = wmpn_sub_rx wp abs_usize vp abs_vsize in
         assert { _b = 0 };
         release_reader v vp
       end else if vw
       then begin
         let up = get_read_ptr u in
-        let vp = salloc (UInt32.of_int32 abs_vsize) in
-        wmpn_copyi vp wp abs_vsize;
-        let _b = wmpn_sub wp up abs_usize vp abs_vsize in
+        let _b = wmpn_sub_ry up abs_usize wp abs_vsize in
         assert { _b = 0 };
         release_reader u up
       end else begin
@@ -391,16 +393,13 @@ let wmpz_add (w u v: mpz_ptr) : unit
         let vp = get_read_ptr v in
         if wmpn_cmp wp vp abs_usize < 0
         then begin
-          let up = salloc (UInt32.of_int32 abs_usize) in
-          wmpn_copyi up wp abs_usize;
-          assert { value up abs_usize = value wp abs_usize };
-          let _b = wmpn_sub_n wp vp up abs_usize in
+          let _b = wmpn_sub_n_ry vp wp abs_usize in
           assert { _b = 0 };
           normalize wp wsize;
           if usize >= 0
           then wsize <- -wsize
         end else begin
-          let _b = wmpn_sub_n_in_place wp vp abs_usize in
+          let _b = wmpn_sub_n_rx wp vp abs_usize in
           assert { _b = 0 };
           normalize wp wsize;
           if usize < 0 then wsize <- -wsize
@@ -411,15 +410,12 @@ let wmpz_add (w u v: mpz_ptr) : unit
         let up = get_read_ptr u in
         if wmpn_cmp up wp abs_usize < 0
         then begin
-          let _b = wmpn_sub_n_in_place wp up abs_usize in
+          let _b = wmpn_sub_n_rx wp up abs_usize in
           assert { _b = 0 };
           normalize wp wsize;
           if usize >= 0 then wsize <- - wsize
         end else begin
-          let vp = salloc (UInt32.of_int32 abs_usize) in
-          wmpn_copyi vp wp abs_usize;
-          assert { value vp abs_usize = value wp abs_usize };
-          let _b = wmpn_sub_n wp up vp abs_usize in
+          let _b = wmpn_sub_n_ry up wp abs_usize in
           assert { _b = 0 };
           normalize wp wsize;
           if usize < 0 then wsize <- - wsize
@@ -452,7 +448,8 @@ let wmpz_add (w u v: mpz_ptr) : unit
           ensures { vw \/ mpz.readers[v] = 0 }
           ensures { mpz.readers[w] = -1 }
           ensures { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) }
-          ensures { plength wp = old plength wp /\ max wp = old max wp }
+          ensures { min wp = old min wp /\ max wp = old max wp
+                    /\ plength wp = old plength wp }
           ensures { abs_usize <= wsize <= plength wp }
     assert { abs (value_of u mpz + value_of v mpz)
              = abs (value_of u mpz) + abs (value_of v mpz)
@@ -466,7 +463,7 @@ let wmpz_add (w u v: mpz_ptr) : unit
     if uw
     then if vw
       then begin
-        cy <- wmpn_add_rxy wp abs_vsize;
+        cy <- wmpn_add_n_rxy wp abs_vsize;
         assert { value wp abs_usize + power radix abs_usize * cy
                  = abs (value_of u mpz + value_of v mpz) };
       end
