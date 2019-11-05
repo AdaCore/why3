@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<prover id="0" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="mpz_getset.mlw"/>
+<theory name="Set" proved="true">
+ <goal name="wmpz_set_ui&#39;vc" expl="VC for wmpz_set_ui" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="wmpz_set_ui&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="13714"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="13378"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="13381"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15677"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="14197"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="133"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="15680"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="14245"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="14972"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="14990"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="16666"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.12" steps="23135"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="14601"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.13" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="75"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.14" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="267"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.15" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="73"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="16149"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.16" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="74"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="15955"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="75"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="15315"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.18" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="87"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="17081"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.19" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="78"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="15030"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.20" expl="postcondition" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="6193518"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="96"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.00" steps="322702"/></proof>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.21" expl="postcondition" proved="true">
+  <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
+   <goal name="wmpz_set_ui&#39;vc.21.0" expl="apply premises" proved="true">
+   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
+    <goal name="wmpz_set_ui&#39;vc.21.0.0" expl="apply premises" proved="true">
+    <proof prover="1"><result status="valid" time="0.07" steps="243"/></proof>
+    </goal>
+    <goal name="wmpz_set_ui&#39;vc.21.0.1" expl="apply premises" proved="true">
+    <proof prover="1"><result status="valid" time="0.02" steps="100"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="wmpz_set_ui&#39;vc.21.1" expl="apply premises" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="100"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="wmpz_set_ui&#39;vc.22" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="87"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="14718"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="wmpz_get_ui&#39;vc" expl="VC for wmpz_get_ui" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="wmpz_get_ui&#39;vc.0" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="191"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.00" steps="513339"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="15274"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="13497"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="13467"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="47"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="47"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.6" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.44" steps="230"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="14119"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="13960"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="14647"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="14835"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.11" steps="16162"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.12" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.68" steps="246"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.20" steps="28450"/></proof>
+  </goal>
+  <goal name="wmpz_get_ui&#39;vc.14" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="14515"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
