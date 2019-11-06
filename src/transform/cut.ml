@@ -21,8 +21,7 @@ open Args_wrapper
 (* Explanation for assert and cut *)
 let assert_expl = "asserted formula"
 
-(* From task [delta |- G] , build the tasks [delta, t | - G] and [delta] |- t] *)
-let cut t name =
+let assert_aux ~is_cut t name =
   let name =
     match name with
     | Some name -> name
@@ -33,22 +32,18 @@ let cut t name =
   let h_t = Decl.create_prop_decl Decl.Paxiom h t in
   let goal_cut = Trans.goal (fun _ _ -> [g_t]) in
   let goal = Trans.add_decls [h_t] in
-  Trans.par [goal; goal_cut]
+  if is_cut then
+    Trans.par [goal; goal_cut]
+  else
+    Trans.par [goal_cut; goal]
 
+(* From task [delta |- G] , build the tasks [delta, t | - G] and [delta] |- t] *)
+let cut t name =
+  assert_aux ~is_cut:true t name
 
 (* From task [delta |- G] , build the tasks [delta] |- t] and [delta, t | - G] *)
 let assert_tac t name =
-  let name =
-    match name with
-    | Some name -> name
-    | None -> "h"
-  in
-  let h = Decl.create_prsymbol (gen_ident name) in
-  let g_t = create_goal ~expl:assert_expl h t in
-  let h_t = Decl.create_prop_decl Decl.Paxiom h t in
-  let goal_cut = Trans.goal (fun _ _ -> [g_t]) in
-  let goal = Trans.add_decls [h_t] in
-  Trans.par [goal_cut; goal]
+  assert_aux ~is_cut:false t name
 
 let get_ident_symbol s =
   match s with
