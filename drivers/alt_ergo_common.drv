@@ -87,6 +87,25 @@ theory int.ComputerDivision
 
 end
 
+theory int.Power
+
+  syntax function power "(%1 ** %2)"
+
+  remove prop Power_0
+  remove prop Power_s
+  remove prop Power_s_alt
+  remove prop Power_1
+  remove prop Power_sum
+  remove prop Power_mult
+  remove prop Power_comm1
+  remove prop Power_comm2
+  remove prop Unit_def_l
+  remove prop Unit_def_r
+  remove prop Power_non_neg
+  remove prop Power_pos
+  remove prop Power_monotonic
+  remove prop Assoc
+end
 
 theory real.Real
 
