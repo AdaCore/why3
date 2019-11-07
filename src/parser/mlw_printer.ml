@@ -53,17 +53,17 @@ let pp_closed is_closed pp fmt x =
     fprintf fmt "(%a)" pp x
 
 let expr_closed e = match e.expr_desc with
-  | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Eabsurd | Escope _ | Eidapp (_, []) ->
+  | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Eabsurd | Escope _ | Eidapp (_, []) | Ecast _ ->
       true
   | _ -> false
 
 let term_closed t = match t.term_desc with
-  | Ttrue | Tfalse | Tconst _ | Tident _ | Tupdate _ | Trecord _ | Ttuple _ | Tscope _ | Tidapp (_, []) ->
+  | Ttrue | Tfalse | Tconst _ | Tident _ | Tupdate _ | Trecord _ | Ttuple _ | Tscope _ | Tidapp (_, []) | Tcast _ ->
       true
   | _ -> false
 
 let pattern_closed p = match p.pat_desc with
-  | Pwild | Pvar _ | Ptuple _ | Pparen _ | Pscope _ | Papp (_, []) ->
+  | Pwild | Pvar _ | Ptuple _ | Pparen _ | Pscope _ | Papp (_, []) | Pcast _ ->
       true
   | _ -> false
 
