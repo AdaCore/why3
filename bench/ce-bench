@@ -68,6 +68,12 @@ decide_fail () {
         # Inconsistent results between two runs
         "bench/ce/strings_CVC4,1.7_WP")
            is_xfail=string_values;;
+        # Inconsistent results in CI
+        "bench/ce/records_CVC4,1.7_WP")
+           is_xfail=integer_values;;
+        # Inconsistent results in CI
+        "bench/ce/records_CVC4,1.7_SP")
+           is_xfail=integer_values;;
         *) is_xfail=none;;
     esac
 }
