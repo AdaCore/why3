@@ -1,0 +1,252 @@
+module Alias
+
+  use mach.c.C
+  use lemmas.Lemmas
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use types.Types
+  use array.Array
+  use map.Map
+
+  type mem = abstract { zr:zone; zx:zone; zy:zone;
+                        mr: int32; mx: int32; my: int32;
+                        lr: int32; lx: int32; ly: int32;
+                        mutable ok: bool }
+
+  predicate identical (p1 p2:ptr limb) =
+    data p1 = data p2 /\ offset p1 = offset p2
+    /\ min p1 = min p2 /\ max p1 = max p2 /\ zone p1 = zone p2
+
+
+  val open_sep (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
+               (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
+    requires { valid r sx /\ valid x sx /\ valid y sy }
+    requires { writable r }
+    requires { 0 <= sy <= sx }
+    ensures { writable nr }
+    ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
+    ensures { valid nr sx /\ valid nx sx /\ valid ny sy }
+    ensures { 0 <= offset nr /\ offset nr + sx <= offset nx
+              /\ offset nx + sx <= offset ny }
+    ensures { m.zr = r.zone /\ m.zx = x.zone /\ m.zy = y.zone }
+    ensures { m.mr = old r.max /\ m.mx = old x.max /\ m.my = old y.max }
+    ensures { m.lr = sx /\ m.lx = sx /\ m.ly = sy }
+    ensures { m.ok }
+    ensures { map_eq_sub_shift (pelts nr) (pelts r) (offset nr) (offset r) sx }
+    ensures { map_eq_sub_shift (pelts nx) (pelts x) (offset nx) (offset x) sx }
+    ensures { map_eq_sub_shift (pelts ny) (pelts y) (offset ny) (offset y) sy }
+    ensures { pelts r = old pelts r /\ pelts x = old pelts x
+              /\ pelts y = old pelts y }
+    ensures { plength r = old plength r /\ plength x = old plength x
+              /\ plength y = old plength y }
+    ensures { min r = old min r /\ min x = old min x /\ min y = old min y }
+    ensures { data nr = data nx = data ny }
+    writes  { r, x, y }
+    alias { nr.data with nx.data }
+    alias { nr.data with ny.data }
+    alias { nx.data with ny.data }
+
+  val close_sep (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+                (nr nx ny:ptr limb) (ghost m:mem) : unit
+    alias { nr.data with nx.data }
+    alias { nr.data with ny.data }
+    alias { nx.data with ny.data }
+    requires { m.ok }
+    requires { 0 <= sy <= sx }
+    requires { m.zr = r.zone /\ m.zx = x.zone /\ m.zy = y.zone }
+    requires { m.lr = sx /\ m.lx = sx /\ m.ly = sy }
+    requires { 0 <= offset nr /\ offset nr + sx <= offset nx
+               /\ offset nx + sx <= offset ny }
+    requires { writable r /\ writable nr }
+    ensures { r.max = m.mr /\ x.max = m.mx /\ y.max = m.my }
+    ensures { map_eq_sub_shift (old pelts nr) (pelts r)
+                               (offset nr) (offset r) sx }
+    ensures { map_eq_sub_shift (old pelts nx) (pelts x)
+                               (offset nx) (offset x) sx }
+    ensures { map_eq_sub_shift (old pelts ny) (pelts y)
+                               (offset ny) (offset y) sy }
+    ensures { forall j. j < offset r \/ offset r + sx <= j
+              -> (pelts r)[j] = old (pelts r)[j] }
+    ensures { forall j. j < offset x \/ offset x + sx <= j
+              -> (pelts x)[j] = old (pelts x)[j] }
+    ensures { forall j. j < offset y \/ offset y + sy <= j
+              -> (pelts y)[j] = old (pelts y)[j] }
+    ensures { plength r = old plength r /\ plength x = old plength x
+              /\ plength y = old plength y }
+    ensures { min r = old min r /\ min x = old min x /\ min y = old min y }
+    writes { nr, nx, ny, nr.data, nx.data, ny.data,
+             r.data, r.max, x.data, x.max, y.data, y.max, m.ok }
+
+  val open_rx (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
+               (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
+    requires { valid x sx /\ valid y sy }
+    requires { 0 <= sy <= sx }
+    requires { writable x }
+    ensures { writable nr }
+    ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
+    ensures { valid nx sx /\ valid ny sy }
+    ensures { identical nr nx }
+    ensures { 0 <= offset nx /\ offset nx + sx <= offset ny }
+    ensures { m.zx = x.zone /\ m.zy = y.zone }
+    ensures { m.mx = old x.max /\ m.my = old y.max }
+    ensures { m.lx = sx /\ m.ly = sy }
+    ensures { m.ok }
+    ensures { map_eq_sub_shift (pelts nx) (pelts x) (offset nx) (offset x) sx }
+    ensures { map_eq_sub_shift (pelts ny) (pelts y) (offset ny) (offset y) sy }
+    ensures { pelts x = old pelts x /\ pelts y = old pelts y }
+    ensures { plength x = old plength x /\ plength y = old plength y }
+    ensures { min x = old min x /\ min y = old min y }
+    ensures { data nr = data nx = data ny }
+    writes  { x, y }
+    alias { nr.data with nx.data }
+    alias { nr.data with ny.data }
+    alias { nx.data with ny.data }
+
+  val open_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) :
+               (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
+    requires { valid x sx /\ valid y sx }
+    requires { 0 <= sy <= sx }
+    requires { writable y }
+    ensures { writable nr }
+    ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
+    ensures { valid nx sx /\ valid ny sx }
+    ensures { identical nr ny }
+    ensures { 0 <= offset nr /\ offset nr + sx <= offset nx }
+    ensures { m.zx = x.zone /\ m.zy = y.zone }
+    ensures { m.mx = old x.max /\ m.my = old y.max }
+    ensures { m.lx = sx /\ m.ly = sx }
+    ensures { m.ok }
+    ensures { map_eq_sub_shift (pelts nx) (pelts x) (offset nx) (offset x) sx }
+    ensures { map_eq_sub_shift (pelts ny) (pelts y) (offset ny) (offset y) sy }
+    ensures { pelts x = old pelts x /\ pelts y = old pelts y }
+    ensures { plength x = old plength x /\ plength y = old plength y }
+    ensures { min x = old min x /\ min y = old min y }
+    ensures { data nr = data nx = data ny }
+    writes  { x, y }
+    alias { nr.data with nx.data }
+    alias { nr.data with ny.data }
+    alias { nx.data with ny.data }
+
+  val open_rxy (x:ptr limb) (sx:int32) :
+               (nr:ptr limb, nx:ptr limb, ny:ptr limb, ghost m:mem)
+    requires { valid x sx }
+    requires { 0 <= sx }
+    requires { writable x }
+    ensures  { writable nr }
+    ensures  { value nx sx = old value x sx }
+    ensures  { valid nx sx }
+    ensures  { identical nr nx }
+    ensures  { identical nr ny }
+    ensures  { 0 <= offset nr }
+    ensures  { m.zx = zone x }
+    ensures  { m.mx = old x.max }
+    ensures  { m.lx = sx }
+    ensures  { m.ok }
+    ensures  { map_eq_sub_shift (pelts nx) (pelts x) (offset nx) (offset x) sx }
+    ensures  { pelts x = old pelts x }
+    ensures  { plength x = old plength x }
+    ensures  { min x = old min x }
+    writes   { x }
+    alias    { nr.data with nx.data }
+    alias    { nr.data with ny.data }
+    alias    { nx.data with ny.data }
+
+  val close_rx (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+                (nr nx ny:ptr limb) (ghost m:mem) : unit
+    alias { nr.data with nx.data }
+    alias { nr.data with ny.data }
+    alias { nx.data with ny.data }
+    requires { writable x /\ writable nr }
+    requires { m.ok }
+    requires { 0 <= sy <= sx }
+    requires { identical nr nx }
+    requires { 0 <= offset nx /\ offset nx + sx <= offset ny }
+    requires { m.zx = x.zone /\ m.zy = y.zone }
+    requires { m.lx = sx /\ m.ly = sy }
+    ensures { x.max = m.mx /\ y.max = m.my }
+    ensures { map_eq_sub_shift (old pelts nx) (pelts x)
+                               (offset nx) (offset x) sx }
+    ensures { map_eq_sub_shift (old pelts ny) (pelts y)
+                               (offset ny) (offset y) sy }
+    ensures { forall j. j < offset x \/ offset x + sx <= j
+              -> (pelts x)[j] = old (pelts x)[j] }
+    ensures { forall j. j < offset y \/ offset y + sy <= j
+              -> (pelts y)[j] = old (pelts y)[j] }
+    ensures { plength x = old plength x /\ plength y = old plength y }
+    ensures { min x = old min x /\ min y = old min y }
+    writes { nr, nx, ny, nr.data, nx.data, ny.data,
+             x.data, x.max, y.data, y.max, m.ok }
+
+  val close_ry (x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+               (nr nx ny:ptr limb) (ghost m:mem) : unit
+    alias { nr.data with nx.data }
+    alias { nr.data with ny.data }
+    alias { nx.data with ny.data }
+    requires { writable y /\ writable nr }
+    requires { m.ok }
+    requires { 0 <= sy <= sx }
+    requires { identical nr ny }
+    requires { 0 <= offset nr /\ offset nr + sx <= offset nx }
+    requires { m.zx = x.zone /\ m.zy = y.zone }
+    requires { m.lx = sx /\ m.ly = sx }
+    ensures { x.max = m.mx /\ y.max = m.my }
+    ensures { map_eq_sub_shift (old pelts nx) (pelts x)
+                               (offset nx) (offset x) sx }
+    ensures { map_eq_sub_shift (old pelts ny) (pelts y)
+                               (offset ny) (offset y) sx }
+    ensures { forall j. j < offset x \/ offset x + sx <= j
+              -> (pelts x)[j] = old (pelts x)[j] }
+    ensures { forall j. j < offset y \/ offset y + sx <= j
+              -> (pelts y)[j] = old (pelts y)[j] }
+    ensures { plength x = old plength x /\ plength y = old plength y }
+    ensures { min x = old min x /\ min y = old min y }
+    writes { nr, nx, ny, nr.data, nx.data, ny.data,
+             x.data, x.max, y.data, y.max, m.ok }
+
+  val close_rxy (x:ptr limb) (sx:int32) (nr nx ny:ptr limb) (ghost m:mem) : unit
+    alias { nr.data with nx.data }
+    alias { nr.data with ny.data }
+    alias { nx.data with ny.data }
+    requires { m.ok }
+    requires { 0 <= sx }
+    requires { identical nr ny }
+    requires { identical nr nx }
+    requires { 0 <= offset nr }
+    requires { m.zx = x.zone /\ m.lx = sx }
+    requires { writable x /\ writable nr }
+    ensures  { x.max = m.mx }
+    ensures  { map_eq_sub_shift (old pelts nx) (pelts x)
+                                (offset nx) (offset x) sx }
+    ensures  { forall j. j < offset x \/ offset x + sx <= j
+                      -> (pelts x)[j] = (old pelts x)[j] }
+    ensures  { plength x = old plength x /\ min x = old min x }
+    writes   { nr, nx, ny, nr.data, nx.data, ny.data,
+               x.data, x.max, m.ok }
+
+(*
+  let double_open (r x y: ptr limb)
+    requires { valid r 0 /\ valid x 0 /\ valid y 0 }
+  =
+    let nr, nx, ny, m = open_sep r x 0 y 0 in
+    let nr, nx, ny, m = open_sep r x 0 y 0 in
+        (* invalid precondition valid _ 0 *)
+    close_sep r x 0 y 0 nr nx ny m
+
+  let double_free (r x y: ptr limb)
+    requires { valid r 0 /\ valid x 0 /\ valid y 0 }
+  =
+    let nr, nx, ny, m = open_sep r x 0 y 0 in
+    close_sep r x 0 y 0 nr nx ny m;
+    close_sep r x 0 y 0 nr nx ny m (* invalid precondition m.ok *)
+
+  let use_after_open (r x y: ptr limb)
+    requires { valid x 1 }
+  =
+    let x' = incr x 0 in
+    let nr, nx, ny, m = open_sep r x 0 y 0 in (* forbids x'*)
+    let a = C.get x' in
+    close_sep r x 0 y 0 nr nx ny m
+*)
+
+end
