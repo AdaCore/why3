@@ -549,6 +549,10 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
              by
              um + radix * uh < d
              so radix * uh < d
+             so radix * radix * radix - 1
+                = d * (div (radix * radix * radix - 1) d)
+                  + mod (radix * radix * radix - 1) d
+                >= d * (div (radix * radix * radix - 1) d)
              so radix * (um + radix * uh + v * uh)
                 < radix * (d + v * uh)
                 = radix * d + v * radix * uh
@@ -578,14 +582,20 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
     let bh, ghost b2' = sub_with_borrow ih dh b2 in
     assert { bl + radix * bh - radix * radix * b2'
              = il + radix * ih - dl - radix * dh };
-    mod_mult (radix * radix) (l2i b')
-             (l2i ul + radix * l2i !r1 - l2i sh * l2i dl - l2i dl
-                - radix * l2i dh);
+    mod_mult (radix * radix) (uint64'int b')
+             (uint64'int ul + radix * uint64'int !r1
+                - uint64'int sh * uint64'int dl - uint64'int dl
+                - radix * uint64'int dh);
     assert { bl + radix * bh
              = mod (ul + radix * !r1
                 - sh * dl- dl
                 - radix * dh) (radix * radix)
              by
+             mod (il + radix * ih - dl - radix * dh) (radix * radix)
+             = mod (radix * radix * (-b2') + bl + radix * bh) (radix * radix)
+             = mod (bl + radix * bh) (radix * radix)
+             = bl + radix * bh
+             so
              bl + radix * bh
              = mod (il + radix * ih
                 - dl - radix * dh) (radix * radix)
@@ -1209,11 +1219,12 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
       assert { !lr = (pelts (old r))[r.offset + !i] };
       let rl, rh = mul_double !lx y in
       let res, borrow = sub3 !lr rl !b in
-      value_sub_tail (pelts r) r.offset (r.offset + k);
-      value_sub_tail (pelts x) x.offset (x.offset + k);
+      value_tail r !i;
+      value_tail x !i;
       value_sub_update (pelts r) (r.offset + p2i !i)
                        r.offset (r.offset + p2i !i +1) res;
       set_ofs r !i res;
+      value_tail r !i;
       assert { forall j. (!i + 1) <= j < sz ->
                (pelts (old r))[r.offset+j] = (pelts r)[r.offset+j]
                by

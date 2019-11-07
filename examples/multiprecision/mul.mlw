@@ -118,8 +118,8 @@ module Mul
       invariant { up.min = x.min }
       invariant { up.max = x.max }
       invariant { pelts up = pelts x }
-      invariant { forall j. i <= j < sz ->
-                 (pelts (old r)) [r.offset+j] = (pelts r)[r.offset + j]  }
+      invariant { forall j. r.offset + i <= j < r.offset + sz ->
+                 (pelts (old r)) [j] = (pelts r)[j]  }
       invariant { forall j. j < r.offset \/ r.offset + sz <= j ->
                  (pelts r)[j] = (pelts (old r))[j] }
       variant { sz - i }

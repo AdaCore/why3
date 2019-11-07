@@ -296,10 +296,11 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
     let xp = ref (C.incr x 0) in
     let rp = ref (C.incr r 0) in
     let high = ref (C.get !xp) in
+    assert { value x 1 = !high };
     let retval, h = lsld_ext !high tnc in
     let low = ref h in
     let i = ref 0 in
-    let ghost c = power 2 (l2i tnc) in
+    let ghost c = power 2 (uint64'int tnc) in
     while (!i < msb) do
       variant { sz - !i }
       invariant { 0 <= !i <= msb }
@@ -413,7 +414,8 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
       let ghost olow = C.get !oxp in
       assert { olow = !low
                by pelts !oxp = pelts ox
-               so offset !oxp = offset x + (!i-1) = offset !xp };
+               so offset !oxp = offset x + (!i-1) = offset !xp
+               so (pelts x)[offset !xp] = (pelts ox)[offset !xp] };
       let l, h = lsld_ext !low cnt in
       assert { !high + h < radix };
       let ghost v = !high + h in
@@ -423,8 +425,10 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
       value_sub_update_no_change (pelts x) (x.offset + p2i !i)
                                             x.offset (x.offset + p2i !i) v;
       C.set_ofs !xp 1 (!high + h);
+      value_sub_frame (pelts x) (pure { pelts x at StartLoop })
+                      (x.offset + int32'int !i + 1) (x.offset + int32'int sz);
       assert { value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
-             = (value_sub (pelts x) (x.offset + !i + 1) (x.offset + sz)
+             = (value_sub (pelts x at StartLoop) (x.offset + !i + 1) (x.offset + sz)
                 at StartLoop) };
       assert { (pelts x)[x.offset + !i] = !high + h };
       high := l;
@@ -434,7 +438,12 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
       assert { radix * value_sub (pelts x) (x.offset + !i) (x.offset + sz) =
                radix * (!high at StartLoop) + radix * h
                + (power radix 2) * value_sub (pelts x) (x.offset + !i + 1)
-                                           (x.offset + sz) };
+                                           (x.offset + sz)
+               by value_sub (pelts x) (x.offset + !i) (x.offset + sz)
+                  = !high at StartLoop + h
+                    + radix * value_sub (pelts x) (x.offset + !i + 1)
+                                                  (x.offset + sz)
+               so radix * radix = power radix 2 };
       assert { value !oxp (sz - !i + 1) * c
                = radix * (value (!oxp at StartLoop) (sz - !i) * c) + !low * c
                by value !oxp (sz - !i + 1) * c
@@ -514,9 +523,9 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
       let l, h = lsld_ext !high tnc in
       assert { !low + l < radix };
       let ghost v = !low + l in
-      value_sub_shift_no_change (pelts x) (x.offset) (p2i !i) (p2i !i) v;
-      value_sub_update_no_change (pelts x) (x.offset + p2i !i)
-                                 (x.offset + 1 + p2i !i) (x.offset + p2i sz) v;
+      value_sub_shift_no_change (pelts x) (x.offset) (int32'int !i) (int32'int !i) v;
+      value_sub_update_no_change (pelts x) (x.offset + int32'int !i)
+                                 (x.offset + 1 + int32'int !i) (x.offset + int32'int sz) v;
       C.set_ofs !xp (-1) (!low + l);
       assert { value x !i = value (x at StartLoop) !i };
       value_tail x !i;
@@ -541,10 +550,10 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
     label EndLoop in
     assert { retval + radix * (value x msb + (power radix msb) * !low)
              = value ox sz * c };
-    value_sub_tail (pelts x) x.offset (x.offset + p2i msb);
+    value_sub_tail (pelts x) x.offset (x.offset + int32'int msb);
     assert { (!xp).offset = x.offset + msb };
-    value_sub_shift_no_change (pelts x) x.offset (x.offset + p2i msb)
-                                        (x.offset + p2i msb) !low;
+    value_sub_shift_no_change (pelts x) x.offset (x.offset + int32'int msb)
+                                        (x.offset + int32'int msb) !low;
     C.set_ofs x msb !low;
     value_tail x msb;
     assert { value x sz = value (x at EndLoop) msb + (power radix msb) * !low };
