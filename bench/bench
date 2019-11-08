@@ -386,6 +386,7 @@ execute examples/vstte10_queens.mlw NQueens.test8
 # examples/residual.mlw Test.test_astar
 # test of execution on real numbers; only if mpfr installed
 if test -n "$has_mpfr"; then
+    # Reals
     execute bench/interp/real.mlw R.test0
     execute bench/interp/real.mlw R.test1
     execute bench/interp/real.mlw R.test2
@@ -396,6 +397,24 @@ if test -n "$has_mpfr"; then
     execute bench/interp/real.mlw R.bench1
     execute bench/interp/real.mlw R.bench2
     execute bench/interp/real.mlw R.bench3
+    # Float32
+    execute bench/interp/float32.mlw N.bench1
+    execute bench/interp/float32.mlw N.bench2
+    execute bench/interp/float32.mlw N.bench3
+    execute bench/interp/float32.mlw N.bench4
+    execute bench/interp/float32.mlw N.bench5
+    execute bench/interp/float32.mlw N.bench6
+    execute bench/interp/float32.mlw N.bench7
+    execute bench/interp/float32.mlw N.bench8
+    # Float64
+    execute bench/interp/float64.mlw N.bench1
+    execute bench/interp/float64.mlw N.bench2
+    execute bench/interp/float64.mlw N.bench3
+    execute bench/interp/float64.mlw N.bench4
+    execute bench/interp/float64.mlw N.bench5
+    execute bench/interp/float64.mlw N.bench6
+    execute bench/interp/float64.mlw N.bench7
+    execute bench/interp/float64.mlw N.bench8
 else
     echo "MPFR not installed, skipping tests"
 fi

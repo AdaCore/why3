@@ -383,7 +383,9 @@ let builtin_mode _kn _its = ()
 let builtin_float_type _kn _its = ()
 
 (** Description of modules *)
-let built_in_modules =
+(* Described as a function so that this code is not executed outside of
+   why3execute. *)
+let built_in_modules () =
   let bool_module =
     ["bool"],"Bool", [],
     [ "True", eval_true ;
@@ -527,7 +529,7 @@ let add_builtin_mo env (l,n,t,d) =
     d
 
 let get_builtin_progs lib =
-  List.iter (add_builtin_mo lib) built_in_modules
+  List.iter (add_builtin_mo lib) (built_in_modules ())
 
 let get_pvs env pvs =
   let t =
