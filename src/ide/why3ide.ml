@@ -369,9 +369,14 @@ let exit_function_handler b =
       | _ -> ()
     end
 
+(* Erase colors in all source views *)
+let erase_loc_all_view () =
+  Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table
+
 (* Update name of the tab when the label changes so that it has a * as prefix *)
 let update_label_change (label: GMisc.label) =
   let s = label#text in
+  erase_loc_all_view ();
   if not (Strings.has_prefix "*" s) then
     label#set_text ("*" ^ s)
 
@@ -1220,7 +1225,7 @@ let color_loc ?(ce=false) ~color loc =
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
 let apply_loc_on_source (l: (Loc.position * color) list) loc_goal =
-  Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table;
+  erase_loc_all_view ();
   List.iter (fun (loc, color) -> color_loc ~color loc) l;
   scroll_to_loc ~force_tab_switch:false loc_goal
 
