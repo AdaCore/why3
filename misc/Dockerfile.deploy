@@ -28,7 +28,7 @@ USER guest
 ENV HOME /home/guest
 
 RUN opam init -y --auto-setup -j1 --compiler=ocaml-system --disable-sandboxing && \
-    opam install -y menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo && \
+    opam install -y re menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo && \
     opam clean -a
 
 COPY --chown=guest:guest . /home/guest/why3
