@@ -109,7 +109,7 @@ full:
   variables:
     COMPILER: full
   script:
-    - misc/ci-local.sh bench ide doc web_ide
+    - misc/ci-local.sh ide doc web_ide bench
   <<: *docker_definition
 
 nightly-bench:
