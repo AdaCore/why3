@@ -3,7 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
 <prover id="0" name="Z3" version="4.7.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="three_idem_ring.mlw"/>
@@ -27,19 +27,19 @@
  <proof prover="4"><result status="valid" time="0.01" steps="1580"/></proof>
  </goal>
  <goal name="simpl_left" proved="true">
- <proof prover="1"><result status="valid" time="0.08" steps="22"/></proof>
+ <proof prover="2"><result status="valid" time="0.08" steps="22"/></proof>
  </goal>
  <goal name="simpl_right" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="2312"/></proof>
  </goal>
  <goal name="zero_star_l" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="36"/></proof>
+ <proof prover="2"><result status="valid" time="0.03" steps="36"/></proof>
  </goal>
  <goal name="zero_star_r" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="42"/></proof>
+ <proof prover="2"><result status="valid" time="0.05" steps="42"/></proof>
  </goal>
  <goal name="neg_star_r" proved="true">
- <proof prover="1"><result status="valid" time="3.28" steps="152"/></proof>
+ <proof prover="2"><result status="valid" time="3.28" steps="152"/></proof>
  </goal>
  <goal name="neg_star_l" proved="true">
  <transf name="split_vc" proved="true" >
@@ -70,7 +70,7 @@
  <proof prover="4"><result status="valid" time="0.01" steps="3243"/></proof>
  </goal>
  <goal name="null_mul_congr" proved="true">
- <proof prover="1"><result status="valid" time="0.03" steps="18"/></proof>
+ <proof prover="2"><result status="valid" time="0.03" steps="18"/></proof>
  </goal>
  <goal name="all_null6" proved="true">
  <transf name="split_vc" proved="true" >
@@ -157,7 +157,7 @@
  <goal name="commutative" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="commutative.0" proved="true">
-  <proof prover="1"><result status="valid" time="0.22" steps="88"/></proof>
+  <proof prover="2"><result status="valid" time="0.22" steps="88"/></proof>
   </goal>
   <goal name="commutative.1" proved="true">
   <proof prover="4"><result status="valid" time="0.09" steps="30459"/></proof>
