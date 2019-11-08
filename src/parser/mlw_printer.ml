@@ -53,17 +53,17 @@ let pp_closed is_closed pp fmt x =
     fprintf fmt "(%a)" pp x
 
 let expr_closed e = match e.expr_desc with
-  | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Ematch _ | Eabsurd | Escope _ | Eidapp (_, []) ->
+  | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Eabsurd | Escope _ | Eidapp (_, []) | Ecast _ ->
       true
   | _ -> false
 
 let term_closed t = match t.term_desc with
-  | Ttrue | Tfalse | Tconst _ | Tident _ | Tupdate _ | Trecord _ | Ttuple _ | Tscope _ | Tidapp (_, []) ->
+  | Ttrue | Tfalse | Tconst _ | Tident _ | Tupdate _ | Trecord _ | Ttuple _ | Tscope _ | Tidapp (_, []) | Tcast _ ->
       true
   | _ -> false
 
 let pattern_closed p = match p.pat_desc with
-  | Pwild | Pvar _ | Ptuple _ | Pparen _ | Pscope _ | Papp (_, []) ->
+  | Pwild | Pvar _ | Ptuple _ | Pparen _ | Pscope _ | Papp (_, []) | Pcast _ ->
       true
   | _ -> false
 
@@ -225,6 +225,22 @@ let pp_binder fmt (_, opt_id, ghost, opt_pty) =
 let pp_binders fmt =
   pp_print_opt_list ~prefix:" " pp_binder fmt
 
+let pp_comma_binder fmt (_, opt_id, ghost, opt_pty) =
+  let pp_opt_id fmt = function
+    | None ->
+        pp_print_string fmt "_"
+    | Some id ->
+        pp_id fmt id in
+  let ghost = if ghost then "ghost " else "" in
+  match opt_pty with
+  | Some pty ->
+      fprintf fmt "%s%a: %a" ghost pp_opt_id opt_id pp_pty pty
+  | None ->
+      fprintf fmt "%s%a" ghost pp_opt_id opt_id
+
+let pp_comma_binders fmt =
+  pp_print_opt_list ~prefix:" " ~sep:", " pp_comma_binder fmt
+
 let pp_opt_pty fmt = function
   | None -> ()
   | Some pty -> fprintf fmt " : %a" pp_pty pty
@@ -359,7 +375,7 @@ and pp_expr fmt e =
       pp_apply pp_expr expr_closed fmt e1 e2
   | Einfix (e1, op, e2) ->
       pp_infix pp_expr expr_closed fmt e1 op e2
-  | Einnfix (e1, op, e2) ->
+  | Einnfix _ ->
       todo fmt "Einnfix _"
   | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e1)}, e2) ->
       (* TODO _pat *)
@@ -535,7 +551,7 @@ and pp_term fmt t =
       pp_if pp_term term_closed fmt t1 t2 t3
   | Tquant (quant, binders, [], t) ->
       let quant = match quant with Dterm.DTforall -> "forall" | Dterm.DTexists -> "exists" | Dterm.DTlambda -> "lambda" in
-      fprintf fmt "@[<hv 2>%s%a.@ %a@]" quant pp_binders binders pp_term t
+      fprintf fmt "@[<hv 2>%s%a.@ %a@]" quant pp_comma_binders binders pp_term t
   | Tquant (_, _, _::_, _) ->
       todo fmt "Tquant (_, _, _::_, _)"
   | Tattr (attr, t) ->
@@ -674,15 +690,20 @@ and pp_logic_decl fmt d =
   pp_id fmt d.ld_ident;
   pp_print_opt_list ~prefix:" " ~sep:" " pp_param fmt d.ld_params;
   pp_opt ~prefix:" : " pp_pty fmt d.ld_type;
-  pp_opt ~prefix:" = " pp_term fmt d.ld_def
+  pp_opt ~prefix:" =@ " pp_term fmt d.ld_def
 
 and pp_decl fmt = function
   | Dtype decls ->
       let pp_type_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_type_decl in
       fprintf fmt "@[<v>type %a@]" pp_type_decls decls
-  | Dlogic decls ->
+  | Dlogic decls when List.for_all (fun d -> d.ld_type = None) decls ->
       let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_logic_decl in
       fprintf fmt "@[<v>predicate %a@]" pp_logic_decls decls
+  | Dlogic decls when List.for_all (fun d -> d.ld_type <> None) decls ->
+      let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_logic_decl in
+      fprintf fmt "@[<v>function %a@]" pp_logic_decls decls
+  | Dlogic _ ->
+      todo fmt "Dlogic _"
   | Dind (sign, decls) ->
       let keyword = match sign with Decl.Ind -> "inductive" | Decl.Coind -> "coinductive" in
       let pp_ind_decls = pp_print_list ~pp_sep:(pp_sep " with ") pp_ind_decl in
