@@ -271,7 +271,7 @@ let create_colors v =
   let error_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
   let error_font_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_font_tag" [`BACKGROUND gconfig.error_color] in
+      ~name:"error_font_tag" [`FOREGROUND gconfig.error_color_fg] in
   let search_tag (v: GSourceView.source_view) = v#buffer#create_tag
       ~name:"search_tag" [`BACKGROUND gconfig.search_color] in
   let _ : GText.tag = premise_tag v in
@@ -769,7 +769,8 @@ let log_zone =
 
 (* Create a tag for errors in the message zone. *)
 let message_zone_error_tag = message_zone#buffer#create_tag
-  ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg; `FOREGROUND gconfig.error_color]
+    ~name:"error_tag" [`BACKGROUND gconfig.error_color_msg_zone_bg;
+                       `FOREGROUND gconfig.error_color_msg_zone_fg]
 
 (**** Message-zone printing functions *****)
 
@@ -1635,6 +1636,7 @@ let treat_message_notification msg = match msg with
        begin
          scroll_to_loc ~force_tab_switch:true (Some loc);
          color_line ~color:Error_line_color loc;
+         color_loc ~color:Error_color loc;
          color_loc ~color:Error_font_color loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
