@@ -351,7 +351,7 @@ let why3_run f lang code =
     output_string ch code;
     close_out ch;
 
-    let theories = Env.read_file lang env temp_file_name in
+    let (theories, _) = Env.read_file lang env temp_file_name in
     W.send (Warning !Task.warnings);
     f theories
   with
