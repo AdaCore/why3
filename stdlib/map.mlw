@@ -224,39 +224,3 @@ module MapInjection
 
 end
 
-(***
-
-(** {2 Parametric Maps} *)
-
-module MapParam
-
-  type idx
-  type elt
-  type map
-
-  (** if `'b` is an infinite type, then `map 'a 'b` is infinite *)
-  meta "material_type_arg" type map, 1
-
-  function get (map 'a 'b) 'a : 'b
-  function set (map 'a 'b) 'a 'b : map 'a 'b
-
-  (** syntactic sugar *)
-  function ([])   (a : map 'a 'b) (i : 'a) : 'b = get a i
-  function ([<-]) (a : map 'a 'b) (i : 'a) (v : 'b) : map 'a 'b = set a i v
-
-  axiom Select_eq :
-    forall m : map 'a 'b. forall a1 a2 : 'a.
-    forall b : 'b [m[a1 <- b][a2]].
-    a1 = a2 -> m[a1 <- b][a2]  = b
-
-  axiom Select_neq :
-    forall m : map 'a 'b. forall a1 a2 : 'a.
-    forall b : 'b [m[a1 <- b][a2]].
-    a1 <> a2 -> m[a1 <- b][a2] = m[a2]
-
-  function const 'b : map 'a 'b
-
-  axiom Const : forall b:'b, a:'a. (const b)[a] = b
-
-end
-*)

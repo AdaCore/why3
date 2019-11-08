@@ -154,8 +154,21 @@ module queue.Queue
   syntax val       clear     "Queue.clear"
   syntax val       copy      "Queue.copy"
   syntax val       is_empty  "Queue.is_empty"
-  syntax val       length    "Queue.length %1" prec 4 3
+  syntax val       length    "Z.of_int (Queue.length %1)" prec 4 3
   syntax val       transfer  "Queue.transfer"
+end
+
+module fmap.MapImpInt
+  (* prelude "let create () = Hashtbl.create 8" *)
+  syntax type t        "(Z.t, %1) Hashtbl.t"
+  syntax val  create   "(fun () -> Hashtbl.create 8) %1" prec 4 3
+  syntax val  is_empty "Hashtbl.length %1 = 0" prec 11 3
+  syntax val  add      "Hashtbl.replace %3 %1 %2" prec 4 3 3 3
+  syntax val  find     "Hashtbl.find %2 %1" prec 4 3 3
+  syntax val  mem      "Hashtbl.mem %2 %1" prec 4 3 3
+  syntax val  remove   "Hashtbl.find %2 %1" prec 4 3 3
+  syntax val  size     "Z.of_int (Hashtbl.length %1)" prec 4 3
+  syntax val  clear    "Hashtbl.clear"
 end
 
 module array.Array

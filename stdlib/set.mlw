@@ -264,7 +264,7 @@ module Fset
   constant empty: fset 'a
   (* axiom empty_def: (empty: fset 'a).to_map = const false *)
 
-  lemma is_empty_empty: is_empty (empty: fset 'a)
+  axiom is_empty_empty: is_empty (empty: fset 'a)
 
   lemma empty_is_empty:
     forall s: fset 'a. is_empty s -> s = empty
@@ -514,7 +514,7 @@ module SetApp
   }
   meta coercion function to_fset
 
-  val ghost function mk (s:fset elt) : set
+  val ghost function mk (s: fset elt) : set
     ensures { result.to_fset = s }
 
   val mem (x: elt) (s: set) : bool

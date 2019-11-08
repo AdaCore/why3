@@ -9,6 +9,10 @@ Standard library
         `impset.Impset` becomes `set.SetImp`
       - in `set.SetApp` and `set.SetImp`, type `t` becomes `set`;
         field `contents` becomes `to_fset`; call to `empty` becomes `empty ()`
+  * new library `fmap` for finite maps
+      - Fmap: polymorphic, logic finite maps to be used in logic
+      - MapApp, MapAppInt, MapImp, MapImpInt: monomorphic finite maps to
+        be used in programs
 
 Language
   * it is now possible to give a name to preconditions and assertions;
