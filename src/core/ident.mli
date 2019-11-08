@@ -166,7 +166,8 @@ val id_unique_attr :
     the "name:" attribute to generate the name instead of id.id_string *)
 
 val proxy_attr: attribute
-
+val useraxiom_attr: attribute
+  
 (** {2 Attributes for handling counterexamples} *)
 
 val model_projected_attr : attribute

@@ -485,7 +485,7 @@ pure_decl:
 | PREDICATE predicate_decl with_logic_decl* { Dlogic ($2::$3) }
 | INDUCTIVE   with_list1(inductive_decl)    { Dind (Decl.Ind, $2) }
 | COINDUCTIVE with_list1(inductive_decl)    { Dind (Decl.Coind, $2) }
-| AXIOM attrs(ident_nq) COLON term          { Dprop (Decl.Paxiom, $2, $4) }
+| AXIOM attrs(ident_nq) COLON term          { Dprop (Decl.Paxiom, { $2 with id_ats = (Ptree.ATstr Ident.useraxiom_attr)::$2.id_ats; }, $4) }
 | LEMMA attrs(ident_nq) COLON term          { Dprop (Decl.Plemma, $2, $4) }
 | GOAL  attrs(ident_nq) COLON term          { Dprop (Decl.Pgoal, $2, $4) }
 
