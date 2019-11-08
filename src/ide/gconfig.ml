@@ -49,8 +49,10 @@ type t =
       mutable premise_color : string;
       mutable neg_premise_color : string;
       mutable goal_color : string;
-      mutable error_color : string;
+      mutable error_color_fg : string;
       mutable error_color_bg : string;
+      mutable error_color_msg_zone_fg : string;
+      mutable error_color_msg_zone_bg : string;
       mutable error_line_color : string;
       mutable search_color : string;
       mutable iconset : string;
@@ -86,8 +88,10 @@ type ide = {
   ide_premise_color : string;
   ide_neg_premise_color : string;
   ide_goal_color : string;
-  ide_error_color : string;
+  ide_error_color_fg : string;
   ide_error_color_bg : string;
+  ide_error_color_msg_zone_fg : string;
+  ide_error_color_msg_zone_bg : string;
   ide_error_line_color : string;
   ide_search_color : string;
   ide_iconset : string;
@@ -115,8 +119,10 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_neg_premise_color = "pink";
     ide_goal_color = "gold";
-    ide_error_color_bg = "yellow";
-    ide_error_color = "red";
+    ide_error_color_bg = "white";
+    ide_error_color_fg = "red";
+    ide_error_color_msg_zone_bg = "yellow";
+    ide_error_color_msg_zone_fg = "red";
     ide_error_line_color = "yellow";
     ide_search_color = "lightblue"; (* TODO color TBD *)
     ide_iconset = "fatcow";
@@ -168,12 +174,18 @@ let load_ide section =
     ide_goal_color =
       get_string section ~default:default_ide.ide_goal_color
         "goal_color";
-    ide_error_color =
-      get_string section ~default:default_ide.ide_error_color
-        "error_color";
+    ide_error_color_fg =
+      get_string section ~default:default_ide.ide_error_color_fg
+        "error_color_fg";
     ide_error_color_bg =
       get_string section ~default:default_ide.ide_error_color_bg
         "error_color_bg";
+    ide_error_color_msg_zone_bg =
+      get_string section ~default:default_ide.ide_error_color_msg_zone_bg
+        "error_color_msg_zone_bg";
+    ide_error_color_msg_zone_fg =
+      get_string section ~default:default_ide.ide_error_color_msg_zone_fg
+        "error_color_msg_zone_fg";
     ide_error_line_color =
       get_string section ~default:default_ide.ide_error_line_color
         "error_line_color";
@@ -230,9 +242,11 @@ let load_config config original_config =
     premise_color = ide.ide_premise_color;
     neg_premise_color = ide.ide_neg_premise_color;
     goal_color = ide.ide_goal_color;
-    error_color = ide.ide_error_color;
+    error_color_fg = ide.ide_error_color_fg;
     error_color_bg = ide.ide_error_color_bg;
     error_line_color = ide.ide_error_line_color;
+    error_color_msg_zone_fg = ide.ide_error_color_msg_zone_fg;
+    error_color_msg_zone_bg = ide.ide_error_color_msg_zone_bg;
     search_color = ide.ide_search_color;
     iconset = ide.ide_iconset;
     config         = config;
@@ -281,9 +295,11 @@ let save_config t =
   let ide = set_string ide "premise_color" t.premise_color in
   let ide = set_string ide "neg_premise_color" t.neg_premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
-  let ide = set_string ide "error_color" t.error_color in
+  let ide = set_string ide "error_color_fg" t.error_color_fg in
   let ide = set_string ide "error_color_bg" t.error_color_bg in
   let ide = set_string ide "error_line_color" t.error_line_color in
+  let ide = set_string ide "error_color_msg_zone_fg" t.error_color_msg_zone_fg in
+  let ide = set_string ide "error_color_msg_zone_bg" t.error_color_msg_zone_bg in
   let ide = set_string ide "search_color" t.search_color in
   let ide = set_string ide "iconset" t.iconset in
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
