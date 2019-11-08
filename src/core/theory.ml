@@ -649,7 +649,8 @@ let cl_find_pr cl pr =
   try Mpr.find pr cl.pr_table with Not_found -> raise EmptyDecl
 
 let cl_clone_pr cl pr =
-  let pr' = create_prsymbol (id_clone pr.pr_name) in
+  let attr = Sattr.remove Ident.useraxiom_attr pr.pr_name.id_attrs in
+  let pr' = create_prsymbol (id_attr pr.pr_name attr) in
   cl.pr_table <- Mpr.add pr pr' cl.pr_table;
   pr'
 

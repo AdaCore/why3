@@ -541,10 +541,18 @@ let sprint_pkind = function
 
 let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
+let print_axiom fmt (pr, f) =
+  (fprintf fmt "@[<hov 2>%a%a :@ %a@]"
+       print_pr pr print_id_attrs pr.pr_name print_term f;
+     forget_tvs ())
+                      
 let print_prop_decl fmt (k,pr,f) =
-  fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
-    print_pr pr print_id_attrs pr.pr_name print_term f;
-  forget_tvs ()
+  if k == Paxiom && not (Sattr.exists (Ident.attr_equal Ident.useraxiom_attr) pr.pr_name.id_attrs) then
+    print_axiom fmt (pr, f)
+  else
+    (fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
+       print_pr pr print_id_attrs pr.pr_name print_term f;
+     forget_tvs ())
 
 let print_list_next sep print fmt = function
   | [] -> ()
