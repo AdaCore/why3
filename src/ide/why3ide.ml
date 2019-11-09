@@ -258,30 +258,44 @@ let try_convert s =
 (* Color handling in source *)
 (****************************)
 
-(* For each view, we have to recreate the tags *)
-let create_colors v =
-  let premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"premise_tag" [`BACKGROUND gconfig.premise_color] in
-  let neg_premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color] in
-  let goal_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
-  let error_line_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
-  let error_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
-  let error_font_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_font_tag" [`FOREGROUND gconfig.error_color_fg] in
-  let search_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"search_tag" [`BACKGROUND gconfig.search_color] in
-  let _ : GText.tag = premise_tag v in
-  let _ : GText.tag = neg_premise_tag v in
-  let _ : GText.tag = goal_tag v in
-  let _ : GText.tag = error_line_tag v in
-  let _ : GText.tag = error_tag v in
-  let _ : GText.tag = error_font_tag v in
-  let _ : GText.tag = search_tag v in
-  ()
+(* Generates the tag list (using the current config) *)
+let color_tags_list config =
+  (* The order of this list influences the priorities of tags *)
+  [("error_line_tag", [`BACKGROUND config.error_line_color]); (* less priority *)
+   ("premise_tag", [`BACKGROUND config.premise_color]);
+   ("neg_premise_tag", [`BACKGROUND config.neg_premise_color]);
+   ("goal_tag", [`BACKGROUND config.goal_color]);
+   ("error_tag", [`BACKGROUND config.error_color_bg]);
+   ("error_tag_msg_zone", [`BACKGROUND gconfig.error_color_msg_zone_bg;
+                           `FOREGROUND gconfig.error_color_msg_zone_fg]);
+   ("error_font_tag", [`FOREGROUND config.error_color_fg]);
+   ("search_tag", [`BACKGROUND config.search_color]);
+  ]
+
+(* For each view, we have to recreate the tags.
+   TODO The type annotatin is necessary for the type inference to know that <name> is optional. *)
+let create_colors config
+    (v: <buffer: < create_tag: ?name:string -> GText.tag_property list -> GText.tag;..>; ..>) =
+  let list_tags = color_tags_list config in
+  List.iter (fun (name, props) ->
+      let (_: GText.tag) = v#buffer#create_tag ~name props in ()) list_tags
+
+let remove_tag v tag_name =
+  let tag = GtkText.TagTable.lookup v#buffer#tag_table tag_name in
+  match tag with
+  | None -> ()
+  | Some tag -> GtkText.TagTable.remove v#buffer#tag_table tag
+
+let remove_all_tags config v =
+  List.iter (fun (s, _) -> remove_tag v s) (color_tags_list config)
+
+(* When colors are changed in the preferences, the tag need to change so we
+   remove and regenerate the tags.
+   This works only on sourceview (not on message_zone where tags are not added
+   by name *)
+let update_tags config v =
+  remove_all_tags config  v;
+  create_colors config v
 
 (* Erase all the source location tags in a source file *)
 let erase_color_loc (v:GSourceView.source_view) =
@@ -752,7 +766,7 @@ let counterexample_view =
     ()
 
 (* Allow colors locations on counterexample view *)
-let () = create_colors counterexample_view
+let () = create_colors gconfig counterexample_view
 
 let message_zone =
   let sv = GBin.scrolled_window
@@ -771,9 +785,11 @@ let log_zone =
     ~packing:sv#add ()
 
 (* Create a tag for errors in the message zone. *)
-let message_zone_error_tag = message_zone#buffer#create_tag
-    ~name:"error_tag" [`BACKGROUND gconfig.error_color_msg_zone_bg;
-                       `FOREGROUND gconfig.error_color_msg_zone_fg]
+let create_msg_zone_error_tag () =
+  message_zone#buffer#create_tag
+    ~name:"error_tag_msg_zone" [`BACKGROUND gconfig.error_color_msg_zone_bg;
+                                `FOREGROUND gconfig.error_color_msg_zone_fg]
+let message_zone_error_tag = ref (create_msg_zone_error_tag ())
 
 (**** Message-zone printing functions *****)
 
@@ -803,7 +819,7 @@ let add_to_log =
 
 let clear_message_zone () =
   let buf = message_zone#buffer in
-  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_tag_msg_zone" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#delete ~start:buf#start_iter ~stop:buf#end_iter
 
 (* Function used to print stuff on the message_zone *)
@@ -819,7 +835,7 @@ let print_message ~kind ~notif_kind fmt =
                   if Strings.ends_with notif_kind "error" ||
                      Strings.ends_with notif_kind "Error"
                   then
-                    buf#insert ~tags:[message_zone_error_tag] (s ^ "\n")
+                    buf#insert ~tags:[!message_zone_error_tag] (s ^ "\n")
                   else
                     buf#insert (s ^ "\n");
                   messages_notebook#goto_page error_page;
@@ -892,7 +908,7 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
-let () = create_colors task_view
+let () = create_colors gconfig task_view
 
 let change_lang view lang =
   let lang =
@@ -986,7 +1002,7 @@ let create_source_view ~read_only f content f_format =
       change_lang source_view f_format;
       (* We have to create the tags for background colors for each view.
          They are not reusable from the other views.  *)
-      create_colors source_view;
+      create_colors gconfig source_view;
       Gconfig.set_fonts ();
       (* Focusing on the tabs that was just added *)
       notebook#goto_page source_page
@@ -1926,6 +1942,11 @@ let (_: GMenu.menu_item) =
 let (_: GMenu.menu_item) =
   let callback () =
     Gconfig.preferences ~parent:main_window gconfig;
+    (* Source view tags *)
+    Opt.iter (fun (_, v) -> update_tags gconfig v) (find_current_file_view ());
+    (* Update message zone tags *)
+    remove_all_tags gconfig message_zone;
+    message_zone_error_tag := create_msg_zone_error_tag ();
     make_sources_editable gconfig.allow_source_editing;
     send_session_config_to_server ()
   in
