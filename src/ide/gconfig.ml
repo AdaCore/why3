@@ -1101,6 +1101,53 @@ let alternatives_frame c (notebook:GPack.notebook) =
   let _fillbox = GPack.vbox ~packing:page_pack () in
   ()
 
+let colors_frame c (notebook:GPack.notebook) =
+  let editable_colors =
+    [("error_color_bg", "#FFFFFF", fun x -> c.error_color_bg <- x);
+     ("error_color_fg", "#FF0000", fun x -> c.error_color_fg <- x);
+     ("error_color_msg_zone_fg", "#FF0000", fun x -> c.error_color_msg_zone_fg <- x);
+     ("error_color_msg_zone_bg", "#FFFF00", fun x -> c.error_color_msg_zone_bg <- x);
+     ("error_line_color", "#FFFF00", fun x -> c.error_line_color <- x);
+    ] in
+  let label = GMisc.label ~text:"Colors" () in
+  let page = GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) () in
+  let page_pack = page#pack ?fill:None ~expand:true ?from:None ?padding:None in
+  let frame = GBin.frame ~label:"Choosing colors" ~packing:page_pack () in
+  let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
+  let box_pack = box#pack ?fill:None ?expand:None ?from:None ?padding:None in
+  let add_choice (desc, default, set) =
+    (* Check the color is of the form #FFFFFF *)
+    let check_color s =
+      String.length s = 7 && s.[0] = '#' &&
+      match int_of_string ("0x" ^ (String.sub s 1 6)) with
+      | _ -> true
+      | exception Failure _ -> false in
+    let text = "Color for " ^ desc in
+    let hb = GPack.hbox ~homogeneous:false ~packing:box_pack () in
+    let hb_pack_fill_expand =
+      hb#pack ~fill:true ~expand:true ?from:None ?padding:None in
+    let hb_pack = hb#pack ?fill:None ?expand:None ?from:None ?padding:None in
+    let (_: GMisc.label) = GMisc.label ~width:150 ~xalign:0.0 ~text
+      ~packing:hb_pack_fill_expand () in
+    let entry = GEdit.entry ~text:default ~packing:hb_pack () in
+    let (_: GtkSignal.id) = entry#event#connect#key_press
+        ~callback:(fun (ev: 'a Gdk.event) ->
+            match GdkEvent.Key.keyval ev with
+            | k when k = GdkKeysyms._Return ->
+                let data = entry#text in
+                if check_color data then begin
+                    set data;
+                    entry#set_text "";
+                  end;
+                false
+            | _ -> false
+          ) in
+    () in
+  List.iter add_choice editable_colors;
+  let _ = GPack.vbox ~packing:page_pack () in
+  ()
+
 let editors_page c (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"Editors" () in
   let page =
@@ -1203,6 +1250,8 @@ let preferences ~parent (c : t) =
   (* page "uninstalled provers" *)
   alternatives_frame c notebook;
   (* page "Colors" **)
+  colors_frame c notebook;
+
 (*
   let label2 = GMisc.label ~text:"Colors" () in
   let _color_sel = GMisc.color_selection (* ~title:"Goal color" *)
