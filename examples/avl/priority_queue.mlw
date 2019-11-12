@@ -145,8 +145,8 @@ module PQueue
     returns { Here -> let e2 = { left = lseq;
         middle = Some d;
         right = rseq } in selected s e2
-      | Left sl -> selection_possible sl lseq /\
-        forall e. selected sl e /\ rebuild e = lseq ->
+      | Left rsl -> selection_possible rsl lseq /\
+        forall e. selected rsl e /\ rebuild e = lseq ->
           selected s (right_extend e d rseq)
           by match e.middle with
             | None -> false
@@ -154,8 +154,8 @@ module PQueue
               so lower_bound d2.key (cons d rseq)
               /\ lower_bound d2.key e.right
             end
-      | Right sr -> selection_possible sr rseq /\
-        forall e. selected sr e /\ rebuild e = rseq ->
+      | Right rsr -> selection_possible rsr rseq /\
+        forall e. selected rsr e /\ rebuild e = rseq ->
           selected s (left_extend lseq d e)
           by match e.middle with
             | None -> false

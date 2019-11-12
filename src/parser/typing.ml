@@ -719,7 +719,23 @@ let dpost muc ql lvm old ity =
     | _ -> mk_case loc pfl in
   List.map dpost ql
 
-let dxpost muc ql lvm xsm old =
+let dpost muc ids ql lvm old ity =
+  let check_id id =
+    if Sstr.mem id.id_str ids then Loc.errorm ~loc:id.id_loc
+      "Result %s has the same name as a formal parameter" id.id_str in
+  let rec check p = match p.pat_desc with
+    | Ptree.Pwild -> ()
+    | Ptree.Pvar id -> check_id id
+    | Ptree.Papp (_, pl) | Ptree.Ptuple pl -> List.iter check pl
+    | Ptree.Prec fl -> List.iter (fun (_, p) -> check p) fl
+    | Ptree.Pas (p, id, _) -> check_id id; check p
+    | Ptree.Por (p, _) | Ptree.Pcast (p, _)
+    | Ptree.Pscope (_, p) | Ptree.Pparen p | Ptree.Pghost p -> check p in
+  let check (p, _) = check p in
+  List.iter (fun (_,pfl) -> List.iter check pfl) ql;
+  dpost muc ql lvm old ity
+
+let dxpost muc ids ql lvm xsm old =
   let add_exn (q,pf) m =
     let xs = match q with
       | Qident i ->
@@ -733,7 +749,7 @@ let dxpost muc ql lvm xsm old =
       | None,    Some _ -> l) xs m in
   let mk_xpost loc xs pfl =
     if pfl = [] then [] else
-    dpost muc [loc,pfl] lvm old xs.xs_ity in
+    dpost muc ids [loc,pfl] lvm old xs.xs_ity in
   let exn_map (loc,xpfl) =
     let m = List.fold_right add_exn xpfl Mxs.empty in
     Mxs.mapi (fun xs pfl -> mk_xpost loc xs pfl) m in
@@ -761,20 +777,29 @@ let dvariant muc varl lvm _xsm old =
   let dvar (t,q) = dvar t, Opt.map (find_variant_ls muc) q in
   List.map dvar varl
 
-let dspec muc sp lvm xsm old ity = {
+let dspec muc ids sp lvm xsm old ity = {
   ds_pre     = dpre muc sp.sp_pre lvm old;
-  ds_post    = dpost muc sp.sp_post lvm old ity;
-  ds_xpost   = dxpost muc sp.sp_xpost lvm xsm old;
+  ds_post    = dpost muc ids sp.sp_post lvm old ity;
+  ds_xpost   = dxpost muc ids sp.sp_xpost lvm xsm old;
   ds_reads   = dreads muc sp.sp_reads lvm;
   ds_writes  = dwrites muc sp.sp_writes lvm;
   ds_checkrw = sp.sp_checkrw;
   ds_diverge = sp.sp_diverge;
   ds_partial = sp.sp_partial; }
 
-let dspec_no_variant muc sp = match sp.sp_variant with
+let dspec muc pl sp =
+  let add_ident acc (a,_,_) = match a with
+    | None -> acc
+    | Some { pre_name = s ; pre_loc = loc } ->
+        if String.equal s "result" then Loc.errorm ?loc
+          "Formal parameters of program functions cannot be named 'result'";
+        Sstr.add s acc in
+  dspec muc (List.fold_left add_ident Sstr.empty pl) sp
+
+let dspec_no_variant muc pl sp = match sp.sp_variant with
   | ({term_loc = loc},_)::_ ->
       Loc.errorm ~loc "unexpected 'variant' clause"
-  | _ -> dspec muc sp
+  | _ -> dspec muc pl sp
 
 let dassert muc f lvm _xsm old = type_fmla muc lvm old f
 
@@ -990,14 +1015,14 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DErec (rd, dexpr muc denv e1)
   | Ptree.Efun (bl, pty, pat, msk, sp, e) ->
       let bl = List.map (dbinder muc) bl in
-      let ds = dspec_no_variant muc sp in
+      let ds = dspec_no_variant muc bl sp in
       let dity = dity_of_opt muc pty in
       let denv = denv_add_args denv bl in
       handle_alias denv sp.sp_alias pat dity;
       DEfun (bl, dity, msk, ds, dexpr muc denv e)
   | Ptree.Eany (pl, kind, pty, pat, msk, sp) ->
       let pl = List.map (dparam muc) pl in
-      let ds = dspec_no_variant muc sp in
+      let ds = dspec_no_variant muc pl sp in
       let ity = match kind, pty with
         | _, Some pty -> ity_of_pty muc pty
         | RKlemma, None -> ity_unit
@@ -1133,7 +1158,7 @@ and drec_defn muc denv fdl =
     let pre denv =
       let denv = denv_add_args denv bl in
       let dv = dvariant muc sp.sp_variant in
-      dspec muc sp, dv, dexpr muc denv e in
+      dspec muc bl sp, dv, dexpr muc denv e in
     create_user_prog_id id, gh, kind, bl, dity, msk, pre in
   Dexpr.drec_defn denv (List.map prep fdl)
 
