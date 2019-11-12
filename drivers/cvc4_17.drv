@@ -1,8 +1,21 @@
+(** Why3 driver for CVC4 1.7 *)
 
 prelude ";; produced by cvc4_17.drv ;;"
 
+prelude "(set-logic AUFBVFPDTSNIRA)"
+(*
+    A    : Array
+    UF   : Uninterpreted Function
+    BV   : BitVectors
+    FP   : FloatingPoint
+    DT   : Datatypes
+    S    : Strings
+    NIRA : NonLinear Integer+Real Arithmetic
+*)
+
 unknown "^(error \"Can't get-info :reason-unknown when the last result wasn't unknown!\")$" "(not unknown!)"
 
+import "smtlib-strings.gen"
 import "cvc4_16.gen"
 
 theory BuiltIn

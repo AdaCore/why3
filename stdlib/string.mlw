@@ -1,3 +1,13 @@
+(** {1 Theory of strings}
+
+This file provides a theory over strings. It contains all the
+predicates and functions currently supported by the smt-solvers CVC4
+and Z3.
+
+*)
+
+(** {2 String operations} *)
+
 module String
 
   use int.Int
@@ -299,15 +309,23 @@ module String
 
 end
 
+(** {2 String realization}
+
+This module is inteded for string realization. It clones the `String`
+module replacing axioms by goals.
+
+*)
+
 module StringRealization
-  (** For realization only *)
 
   clone export String
     with goal .
-  (** trick to remove axioms from the theory String. See file
+  (** trick to remove axioms from the String theory. See file
      examples/stdlib/stringCheck.mlw *)
 
 end
+
+(** {2 Regular expressions} *)
 
 module RegExpr
 
