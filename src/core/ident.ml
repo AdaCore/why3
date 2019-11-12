@@ -473,9 +473,9 @@ let get_element_name ~attrs =
   | None -> None
   | Some name_attr ->
     let splitted1 = Strings.bounded_split ':' name_attr.attr_string 2 in
-    let correct_word = Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_']*\\)$" in
+    let correct_word = Re.Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_']*\\)$" in
     match splitted1 with
-    | ["name"; content] when Str.string_match correct_word content 0 ->
+    | ["name"; content] when Re.Str.string_match correct_word content 0 ->
         Some content
     | _ -> None
 

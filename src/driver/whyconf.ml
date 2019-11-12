@@ -35,9 +35,9 @@ let magicnumber = 14
 exception WrongMagicNumber
 
 let why3_regexp_of_string s = (* define a regexp in why3 *)
-  if s = "" then Str.regexp "^$" else
-  if s.[0] = '^' then Str.regexp s else
-  Str.regexp ("^" ^ Str.quote s ^ "$")
+  if s = "" then Re.Str.regexp "^$" else
+  if s.[0] = '^' then Re.Str.regexp s else
+  Re.Str.regexp ("^" ^ Re.Str.quote s ^ "$")
 
 (* lib and shared dirs *)
 
@@ -603,7 +603,7 @@ let read_config conf_file =
     raise (ConfigFailure (fst filenamerc, s))
 
 (** filter prover *)
-type regexp_desc = { reg : Str.regexp; desc : string}
+type regexp_desc = { reg : Re.Str.regexp; desc : string}
 
 let mk_regexp s = { reg = why3_regexp_of_string s; desc = s}
 
@@ -650,7 +650,7 @@ let parse_filter_prover s =
   | _ -> raise (ParseFilterProver s)
 
 let filter_prover fp p =
-  let check s schema = Str.string_match schema.reg s 0 in
+  let check s schema = Re.Str.string_match schema.reg s 0 in
   check p.prover_name fp.filter_name
   && Opt.fold (fun _ -> check p.prover_version) true fp.filter_version
   && Opt.fold (fun _ -> check p.prover_altern) true fp.filter_altern

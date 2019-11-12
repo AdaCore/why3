@@ -503,6 +503,51 @@ if test "$found_menhirlib" = no; then
    AC_MSG_ERROR([Library menhirLib not found.])
 fi
 
+# checking for seq
+# (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
+found_seq=no
+if test "$USEOCAMLFIND" = yes; then
+   DIR=$(ocamlfind query seq)
+   if test -n "$DIR"; then
+      echo "ocamlfind found seq in $DIR"
+      SEQINCLUDE="-I $DIR"
+      SEQLIB=seq
+      found_seq=yes
+      AC_CHECK_FILE($DIR/seq.cma,,found_seq=no)
+      AC_CHECK_FILE($DIR/seq.cmi,,found_seq=no)
+   fi
+fi
+if test "$found_seq" = no; then
+   DIR="$OCAMLLIB"
+   SEQINCLUDE=
+   SEQLIB=
+   found_seq=yes
+   AC_CHECK_FILE($DIR/stdlib__seq.cmi,,found_seq=no)
+fi
+if test "$found_seq" = no; then
+   AC_MSG_ERROR([Library seq not found.])
+fi
+
+# checking for re
+found_re=yes
+DIR=
+if test "$USEOCAMLFIND" = yes; then
+   DIR=$(ocamlfind query re)
+   if test -n "$DIR"; then
+      echo "ocamlfind found re in $DIR"
+      REINCLUDE="-I $DIR"
+   fi
+fi
+if test -z "$DIR"; then
+   REINCLUDE="-I +re"
+   DIR="$OCAMLLIB/re"
+   AC_CHECK_FILE($DIR/re.cmx,,found_re=no)
+fi
+AC_CHECK_FILE($DIR/re.cmi,,found_re=no)
+if test "$found_re" = no; then
+   AC_MSG_ERROR([Library re not found.])
+fi
+
 # checking for lablgtk3
 if test "$enable_ide" != yes ; then
    reason_ide=" (disabled by user)"
@@ -980,6 +1025,11 @@ AC_SUBST(ZIPINCLUDE)
 AC_SUBST(ZIPLIB)
 
 AC_SUBST(MENHIRINCLUDE)
+
+AC_SUBST(SEQINCLUDE)
+AC_SUBST(SEQLIB)
+
+AC_SUBST(REINCLUDE)
 
 AC_SUBST(enable_coq_libs)
 AC_SUBST(enable_coq_fp_libs)

@@ -240,7 +240,7 @@ val filter_one_prover : config -> filter_prover -> config_prover
 (** find the uniq prover that verify the filter. If it doesn't exists
     raise ProverNotFound or raise ProverAmbiguity *)
 
-val why3_regexp_of_string : string -> Str.regexp
+val why3_regexp_of_string : string -> Re.Str.regexp
 
 (** {2 For accesing other parts of the configuration } *)
 

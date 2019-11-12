@@ -88,7 +88,7 @@ let () = register_printer
 
 (*
 let opt_search_forward re s pos =
-  try Some (Str.search_forward re s pos) with Not_found -> None
+  try Some (Re.Str.search_forward re s pos) with Not_found -> None
 *)
 
 (* specialized version of opt_search_forward, searching for strings

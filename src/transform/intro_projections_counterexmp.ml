@@ -16,7 +16,7 @@ open Theory
 open Ty
 
 let is_proj_for_array_attr proj_name =
-  match Str.search_forward (Str.regexp "'First\\|'Last") proj_name 0 with
+  match Re.Str.search_forward (Re.Str.regexp "'First\\|'Last") proj_name 0 with
   | _ -> true
   | exception Not_found -> false
 

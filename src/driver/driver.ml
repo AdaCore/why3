@@ -249,7 +249,7 @@ let syntax_map drv =
 
 exception UnknownSpec of string
 
-let filename_regexp = Str.regexp "%\\(.\\)"
+let filename_regexp = Re.Str.regexp "%\\(.\\)"
 
 let get_filename drv input_file theory_name goal_name =
   let sanitize = Ident.sanitizer
@@ -258,14 +258,14 @@ let get_filename drv input_file theory_name goal_name =
     | Some f -> f
     | None -> "%f-%t-%g.dump"
   in
-  let replace s = match Str.matched_group 1 s with
+  let replace s = match Re.Str.matched_group 1 s with
     | "%" -> "%"
     | "f" -> sanitize input_file
     | "t" -> sanitize theory_name
     | "g" -> sanitize goal_name
     | s   -> raise (UnknownSpec s)
   in
-  Str.global_substitute filename_regexp replace file
+  Re.Str.global_substitute filename_regexp replace file
 
 let file_of_task drv input_file theory_name task =
   get_filename drv input_file theory_name (task_goal task).pr_name.id_string
