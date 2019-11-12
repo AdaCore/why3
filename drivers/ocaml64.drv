@@ -139,7 +139,7 @@ module stack.Stack
   syntax val       clear    "Stack.clear"
   syntax val       copy     "Stack.copy"
   syntax val       is_empty "Stack.is_empty"
-  syntax val       length   "Stack.length %1" prec 4 3
+  syntax val       length   "Z.of_int (Stack.length %1)" prec 4 3
 end
 
 module queue.Queue
@@ -158,6 +158,45 @@ module queue.Queue
   syntax val       transfer  "Queue.transfer"
 end
 
+module set.SetAppInt
+  prelude "module SetAppInt = Set.Make(Z)"
+  syntax type set      "SetAppInt.t"
+  syntax val  empty    "%1; SetAppInt.empty" prec 17 16
+  syntax val  is_empty "SetAppInt.is_empty %1" prec 4 3
+  syntax val  add      "SetAppInt.add %1 %2" prec 4 3 3
+  syntax val  mem      "SetAppInt.mem %1 %2" prec 4 3 3
+  syntax val  remove   "SetAppInt.remove %1 %2" prec 4 3 3
+  syntax val  cardinal "Z.of_int (SetAppInt.cardinal %1)" prec 4 3
+  syntax val  min_elt  "SetAppInt.min_elt %1" prec 4 3
+  syntax val  max_elt  "SetAppInt.max_elt %1" prec 4 3
+  (* TODO interval *)
+end
+
+module set.SetImpInt
+  syntax type set      "(Z.t, unit) Hashtbl.t"
+  syntax val  empty    "(fun () -> Hashtbl.create 8) %1" prec 4 3
+  syntax val  is_empty "Hashtbl.length %1 = 0" prec 11 3
+  syntax val  add      "Hashtbl.replace %2 %1 ()" prec 4 3 3
+  syntax val  mem      "Hashtbl.mem %2 %1" prec 4 3 3
+  syntax val  remove   "Hashtbl.remove %2 %1" prec 4 3 3
+  syntax val  cardinal "Z.of_int (Hashtbl.length %1)" prec 4 3
+  syntax val  clear    "Hashtbl.clear"
+  (* TODO: disjoint, choose_and_remove, choose, singleton, subset, == *)
+end
+
+module fmap.MapAppInt
+  prelude "module MapAppInt = Map.Make(Z)"
+  syntax type t        "%1 MapAppInt.t"
+  syntax val  create   "%1; MapAppInt.empty" prec 17 16
+  syntax val  is_empty "MapAppInt.is_empty"
+  syntax val  add      "MapAppInt.add"
+  syntax val  find     "MapAppInt.find"
+  syntax val  find_exn "MapAppInt.find"
+  syntax val  mem      "MapAppInt.mem"
+  syntax val  remove   "MapAppInt.remove"
+  syntax val  size     "Z.of_int (MapAppInt.cardinal %1)" prec 4 3
+end
+
 module fmap.MapImpInt
   (* prelude "let create () = Hashtbl.create 8" *)
   syntax type t        "(Z.t, %1) Hashtbl.t"
@@ -165,6 +204,7 @@ module fmap.MapImpInt
   syntax val  is_empty "Hashtbl.length %1 = 0" prec 11 3
   syntax val  add      "Hashtbl.replace %3 %1 %2" prec 4 3 3 3
   syntax val  find     "Hashtbl.find %2 %1" prec 4 3 3
+  syntax val  find_exn "Hashtbl.find %2 %1" prec 4 3 3
   syntax val  mem      "Hashtbl.mem %2 %1" prec 4 3 3
   syntax val  remove   "Hashtbl.remove %2 %1" prec 4 3 3
   syntax val  size     "Z.of_int (Hashtbl.length %1)" prec 4 3
@@ -442,9 +482,12 @@ module ocaml.Sys
   syntax val max_array_length "Sys.max_array_length"
 end
 
-module ocaml.Pervasives
+module ocaml.Exceptions
   syntax exception Exit             "Pervasives.Exit"
   syntax exception Not_found        "Not_found"
+end
+
+module ocaml.Pervasives
   syntax exception AssertFailure    "REMOVE"
   syntax val       ocaml_assert     "assert %1" prec 4
   syntax exception Invalid_argument "Invalid_argument \"\""

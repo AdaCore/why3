@@ -43,11 +43,22 @@ module Fmap
   predicate is_empty (m: fmap 'k 'v) =
     S.is_empty m.domain
 
+  function mk (d: S.fset 'k) (m: 'k -> 'v) : fmap 'k 'v
+
+  axiom mk_domain:
+    forall d: S.fset 'k, m: 'k -> 'v. domain (mk d m) = d
+
+  axiom mk_contents:
+    forall d: S.fset 'k, m: 'k -> 'v, k: 'k.
+    S.mem k d -> (mk d m)[k] = m[k]
+
   constant empty: fmap 'k 'v
 
   axiom is_empty_empty: is_empty (empty: fmap 'k 'v)
 
   function add (k: 'k) (v: 'v) (m: fmap 'k 'v) : fmap 'k 'v
+
+  (*FIXME? (add k v m).contents = m.contents[k <- v] *)
 
   axiom add_contents_k:
     forall k v, m: fmap 'k 'v. (add k v m)[k] = v
@@ -57,6 +68,8 @@ module Fmap
 
   axiom add_domain:
     forall k v, m: fmap 'k 'v. (add k v m).domain = S.add k m.domain
+
+  (* FIXME? find_opt (k: 'k) (m: fmap 'k 'v) : option 'v *)
 
   function find (k: 'k) (m: fmap 'k 'v) : 'v
 
@@ -113,6 +126,13 @@ module MapApp
     ensures  { result = m[k] }
     ensures  { result = find k m }
 
+  use ocaml.Exceptions
+
+  val find_exn (k: key) (m: t 'v) : 'v
+    ensures { S.mem k m.domain }
+    ensures { result = m[k] }
+    raises  { Not_found ->  not (S.mem k m.domain) }
+
   val remove (k: key) (m: t 'v) : t 'v
     ensures { result = remove k m }
 
@@ -166,6 +186,13 @@ module MapImp
     requires { mem k m }
     ensures  { result = m[k] }
     ensures  { result = find k m }
+
+  use ocaml.Exceptions
+
+  val find_exn (k: key) (m: t 'v) : 'v
+    ensures { S.mem k m.domain }
+    ensures { result = m[k] }
+    raises  { Not_found ->  not (S.mem k m.domain) }
 
   val remove (k: key) (m: t 'v) : unit
     writes  { m }
