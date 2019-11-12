@@ -597,9 +597,9 @@ let generate_builtin_config ((env,detected):autodetection_result) config =
   config
 
 let generate_detected_config ((env,_):autodetection_result) =
-  let fold (exec_name,_,_) output acc =
-    match output with
-    | Some output -> { Whyconf.exec_name; output }::acc
+  let fold (exec_name,_,_) version acc =
+    match version with
+    | Some version -> { Whyconf.exec_name; version }::acc
     | None -> acc
   in
   Hstr3.fold fold env.prover_output []
@@ -631,7 +631,7 @@ let provers_from_detected_provers config =
       Hstr.add
         env.prover_output_stored
         detected.exec_name
-        (Some detected.output))
+        (Some detected.version))
     (get_detected_provers config);
   let detected = run_auto_detection' env config in
   let detected =

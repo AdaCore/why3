@@ -149,7 +149,7 @@ type config_editor = {
 
 type detected_prover = {
   exec_name  : string;
-  output : string;
+  version : string;
 }
 
 (** Strategies *)
@@ -362,7 +362,7 @@ let set_provers rc provers =
 let set_detected_prover prover =
   let section = empty_section in
   let section = set_string section "exec_name" prover.exec_name in
-  let section = set_string section "output" prover.output in
+  let section = set_string section "version" prover.version in
   section
 
 let set_detected_provers rc detected_provers =
@@ -491,7 +491,7 @@ let load_detected_prover acc section =
   try
     let v = {
       exec_name = get_string section "exec_name";
-      output = get_string section "output"
+      version = get_string section "version"
     } in
     v::acc
   with MissingField s ->

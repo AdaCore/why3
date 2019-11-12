@@ -218,7 +218,7 @@ val add_strategy : config -> config_strategy -> config
 (** detected provers *)
 type detected_prover = {
   exec_name  : string;
-  output : string;
+  version : string;
 }
 
 val set_detected_provers: config -> detected_prover list -> config
