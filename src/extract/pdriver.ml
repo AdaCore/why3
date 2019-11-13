@@ -112,6 +112,7 @@ let load_driver env file extra_files =
     syntax_map := Mid.add id (s,if b then 1 else 0) !syntax_map in
   let add_literal id s b =
     literal_map := Mid.add id (s,if b then 1 else 0) !literal_map in
+
   let add_local th = function
     | Rprelude s ->
         let l = Mid.find_def [] th.th_name !thprelude in
@@ -120,14 +121,14 @@ let load_driver env file extra_files =
         let ts = find_ts th q in
         Printer.check_syntax_type ts s;
         add_syntax ts.ts_name s b
-    | Rsyntaxfs (q,s,b) ->
-        let fs = find_fs th q in
-        Printer.check_syntax_logic fs s;
-        add_syntax fs.ls_name s b
-    | Rsyntaxps (q,s,b) ->
-        let ps = find_ps th q in
-        Printer.check_syntax_logic ps s;
-        add_syntax ps.ls_name s b
+    | Rsyntaxfs _ | Rsyntaxps _ as r ->
+        let syntaxes =
+          match r with
+          | Rsyntaxfs _ -> "`syntax constant' and `syntax function' are"
+          | Rsyntaxps _ -> "`syntax predicate' is"
+          | _ -> assert false in
+        Format.eprintf "%s invalid in extraction drivers, use `syntax val' instead." syntaxes;
+        exit 1
     | Rliteral (q,s,b) ->
         let ts = find_ts th q in
         add_literal ts.ts_name s b
