@@ -24,7 +24,7 @@ let usage_msg =
 let conf_file = ref None
 let autoprovers = ref false
 let autoplugins = ref false
-let provers_at_startup = ref true
+let partial_config = ref true
 let resetloadpath = ref false
 
 (* When no arguments are given, activate the fallback to auto mode on error.
@@ -64,8 +64,8 @@ let option_list = Arg.align [
       Arg.Set_string shortcut;
       Arg.String (fun name -> Queue.add (!id, !shortcut, name) prover_bins)]),
   "<id><shortcut><file> add a new prover executable";
-  "--no-builtin-provers-at-statup", Arg.Unit (fun () -> provers_at_startup := false; autoprovers := true),
-  " write in .why3.conf the parameter of the provers";
+  "--full-config", Arg.Unit (fun () -> partial_config := false; autoprovers := true),
+  " write in .why3.conf the default config for provers, shortcut, strategies and plugins instead of loading it at startup";
   "--list-prover-families", Arg.Set opt_list_prover_families,
   " list known prover families";
   "--install-plugin", Arg.String add_plugin,
@@ -169,18 +169,20 @@ let main () =
     if !autoprovers
     then
       let config = Whyconf.set_provers config Mprover.empty in
-      let config = Whyconf.set_autoprovers !provers_at_startup config in
+      let config = Whyconf.set_load_default_config !partial_config config in
       let env = Autodetection.run_auto_detection config in
-      if !provers_at_startup then
+      if !partial_config then
         let detected_provers = Autodetection.generate_detected_config env in
         Whyconf.set_detected_provers config detected_provers
-      else
+      else begin
+        let config = Whyconf.set_detected_provers config [] in
         Autodetection.generate_builtin_config env config
+      end
     else config
   in
   let config =
     if !autoplugins then
-      (** temporary 13/06/18 after introduction of --no-auto-plugins *)
+      (** To remove after 13/06/21, two years after introduction of partial config *)
       set_main config (set_plugins (get_main config) [])
     else config
   in

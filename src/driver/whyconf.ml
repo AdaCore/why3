@@ -186,9 +186,9 @@ type main = {
   loadpath  : string list;  (* "/usr/local/lib/why/stdlib" *)
   stdlib  : bool;
   (* add the standard library in the loadpath (default true) *)
-  autoplugins  : bool;
+  load_default_plugins  : bool;
   (* autoload the plugins in libdir (default true) *)
-  autoprovers  : bool;
+  load_default_config  : bool;
   (* generate on the fly provers, editors, shortcut config from
      previously detected provers data (default true) *)
   timelimit : int;
@@ -286,7 +286,7 @@ let load_plugins main =
     with exn ->
       Format.eprintf "%s can't be loaded: %a@." x
         Exn_printer.exn_printer exn in
-  if main.autoplugins then List.iter load (plugins_auto_detection main);
+  if main.load_default_plugins then List.iter load (plugins_auto_detection main);
   List.iter load main.plugins
 
 type config = {
@@ -307,8 +307,8 @@ let empty_main =
     datadir = Config.datadir;
     loadpath = [];
     stdlib = true;
-    autoplugins = true;
-    autoprovers = true;
+    load_default_plugins = true;
+    load_default_config = true;
     timelimit = 5;   (* 5 seconds *)
     memlimit = 1000; (* 1 Mb *)
     running_provers_max = 2; (* two provers run in parallel *)
@@ -325,8 +325,8 @@ let set_main rc main =
   let section = set_string ~default:empty_main.datadir
       section "datadir" main.datadir in
   let section = set_bool ~default:true section "stdlib" main.stdlib in
-  let section = set_bool ~default:true section "autoplugins" main.autoplugins in
-  let section = set_bool ~default:true section "onthefly_provers" main.autoprovers in
+  let section = set_bool ~default:true section "load_default_plugins" main.load_default_plugins in
+  let section = set_bool ~default:true section "load_default_config" main.load_default_config in
   let section = set_stringl section "loadpath" main.loadpath in
   let section = set_int section "timelimit" main.timelimit in
   let section = set_int section "memlimit" main.memlimit in
@@ -590,8 +590,8 @@ let load_main dirname section =
     loadpath  = List.map (Sysutil.concat dirname)
         (get_stringl ~default:[] section "loadpath");
     stdlib = get_bool ~default:true section "stdlib";
-    autoplugins = get_bool ~default:true section "autoplugins";
-    autoprovers = get_bool ~default:true section "onthefly_provers";
+    load_default_plugins = get_bool ~default:true section "load_default_plugins";
+    load_default_config = get_bool ~default:true section "load_default_config";
     timelimit = get_int ~default:empty_main.timelimit section "timelimit";
     memlimit  = get_int ~default:empty_main.memlimit section "memlimit";
     running_provers_max = get_int ~default:empty_main.running_provers_max
@@ -921,11 +921,12 @@ let set_family config name section = assert (name <> "prover");
 let set_stdlib stdlib config =
   {config with main = {config.main with stdlib}}
 
-let set_autoplugins autoplugins config =
-  {config with main = {config.main with autoplugins}}
+let set_load_default_plugins load_default_plugins config =
+  {config with main = {config.main with load_default_plugins}}
 
-let set_autoprovers autoprovers config =
-  {config with main = {config.main with autoprovers}}
+let set_load_default_config load_default_config config =
+  {config with main = {config.main with load_default_config}}
+
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | ConfigFailure (f, s) ->
@@ -965,8 +966,7 @@ module Args = struct
   let opt_loadpath = ref []
   let opt_help = ref false
   let opt_stdlib = ref true
-  let opt_autoplugins = ref true
-  let opt_autoprovers = ref true
+  let opt_load_default_plugins = ref true
 
   let common_options_head = [
     "-C", Arg.String (fun s -> opt_config := Some s),
@@ -981,10 +981,8 @@ module Args = struct
         " same as -L";
     "--no-stdlib", Arg.Clear opt_stdlib,
     " do not add the standard library to the loadpath";
-    "--no-autoplugins", Arg.Clear opt_autoplugins,
+    "--no-load-default-plugins", Arg.Clear opt_load_default_plugins,
     " do not load the plugins from the standard path";
-    "--no-builtin-provers-at-statup", Arg.Clear opt_autoprovers,
-    " do not generate builtin provers at startup";
     Debug.Args.desc_debug;
     Debug.Args.desc_debug_all;
     Debug.Args.desc_debug_list; ]
@@ -1009,14 +1007,13 @@ module Args = struct
     let config = List.fold_left merge_config config !opt_extra in
     let apply_not_default f o b = if !o then b else f !o b in
     let config = apply_not_default set_stdlib opt_stdlib config in
-    let config = apply_not_default set_autoplugins opt_autoplugins config in
-    let config = apply_not_default set_autoprovers opt_autoprovers config in
+    let config = apply_not_default set_load_default_plugins opt_load_default_plugins config in
     let main = get_main config in
     load_plugins main;
     Debug.Args.set_flags_selected ();
     if Debug.Args.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
-    let config = if config.main.autoprovers then add_builtin_provers config else config in
+    let config = if config.main.load_default_config then add_builtin_provers config else config in
     config, base_config, Env.create_env lp
 
   let exit_with_usage ?(exit_code=1) ?(extra_help=Format.pp_print_newline) options usage =

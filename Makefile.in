@@ -1103,7 +1103,7 @@ drivers/coq-realizations.aux: Makefile
 
 update-coq: update-coq-int update-coq-bool update-coq-real update-coq-number update-coq-set update-coq-map update-coq-list update-coq-option update-coq-fp update-coq-bv update-coq-ieee_float update-coq-for-drivers
 
-LOCAL_STDLIB=-L stdlib --no-stdlib --no-autoplugins --no-builtin-provers-at-statup
+LOCAL_STDLIB=-L stdlib --no-stdlib --no-load-default-plugins
 
 update-coq-int: bin/why3realize.@OCAMLBEST@ drivers/coq-realizations.aux stdlib/int.mlw
 	for f in $(COQLIBS_INT_ALL_FILES); do WHY3CONFIG="" bin/why3realize.@OCAMLBEST@ $(LOCAL_STDLIB) -D drivers/coq-realize.drv -T int.$$f -o $(GENERATED_PREFIX_COQ)/int/; done

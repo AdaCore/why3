@@ -74,11 +74,11 @@ val set_main : config -> main -> config
 val set_stdlib: bool -> config -> config
 (** Set if the standard library should be added to loadpath *)
 
-val set_autoplugins: bool -> config -> config
+val set_load_default_plugins: bool -> config -> config
 (** Set if the plugins in the default path should be loaded *)
 
-val set_autoprovers: bool -> config -> config
-(** Set if the provers, strategies, ... must be created at startup *)
+val set_load_default_config: bool -> config -> config
+(** Set if the default strategies should be automatically generated *)
 
 val libdir: main -> string
 val datadir: main -> string
