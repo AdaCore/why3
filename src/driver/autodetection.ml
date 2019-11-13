@@ -45,14 +45,8 @@ open Whyconf
 module Wc = Whyconf
 open Rc
 
-(** For debug *)
-let debug = Debug.register_info_flag "autodetect-debug"
+let debug = Debug.register_info_flag "autodetect"
   ~desc:"Print@ debugging@ messages@ about@ auto-detection@ \
-         of@ external@ provers."
-
-(** Usual output of why3 detect, on by default in why3 config *)
-let info = Debug.register_info_flag "autodetect"
-  ~desc:"Print@ informational@ messages@ about@ auto-detection@ \
          of@ external@ provers."
 
 let is_config_command = ref false
@@ -60,7 +54,7 @@ let is_config_command = ref false
 let print_info fmt =
   if !is_config_command
   then Format.printf fmt
-  else Debug.dprintf info fmt
+  else Debug.dprintf debug fmt
 
 (* auto-detection of provers *)
 
