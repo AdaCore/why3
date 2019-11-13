@@ -131,7 +131,7 @@ void print_request(prequest r) {
   if (r) {
     switch (r->req_type) {
     case REQ_RUN:
-      printf("req_type=REQ_RUN, timeout=%d, memlimit=%d, cmd=%s", r->timeout, r->memlimit, r->cmd);
+      printf("req_type=REQ_RUN, timeout=%d, memlimit=%u, cmd=%s", r->timeout, r->memlimit, r->cmd);
       for (int i = 0; i < r->numargs; i++) {
         printf(" %s", r->args[i]);
       }
