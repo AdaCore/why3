@@ -225,8 +225,9 @@ let rec print_term info fmt t =
      end
   | Tlet _ -> unsupportedTerm t
       "alt-ergo: you must eliminate let in term"
-  | Tif _ -> unsupportedTerm t
-      "alt-ergo: you must eliminate if_then_else"
+  | Tif(t1,t2,t3) ->
+     fprintf fmt "(if %a then %a else %a)"
+       (print_fmla info) t1 (print_term info) t2 (print_term info) t3
   | Tcase _ -> unsupportedTerm t
       "alt-ergo: you must eliminate match"
   | Teps _ -> unsupportedTerm t
@@ -240,7 +241,7 @@ and print_tapp info fmt = function
   | [] -> ()
   | tl -> fprintf fmt "(%a)" (print_list comma (print_term info)) tl
 
-let rec print_fmla info fmt f =
+and print_fmla info fmt f =
   if check_for_counterexample f then
     info.info_model <- add_model_element f info.info_model;
 
@@ -293,10 +294,9 @@ and print_fmla_node info fmt f = match f.t_node with
       fprintf fmt "true"
   | Tfalse ->
       fprintf fmt "false"
-  | Tif (f1, f2, f3) ->
-      fprintf fmt "((%a and@ %a)@ or@ (not@ %a and@ %a))"
-        (print_fmla info) f1 (print_fmla info) f2 (print_fmla info)
-        f1 (print_fmla info) f3
+  | Tif(t1,t2,t3) ->
+     fprintf fmt "(if %a then %a else %a)"
+       (print_fmla info) t1 (print_fmla info) t2 (print_fmla info) t3
   | Tlet (t1, tb) ->
       let v, f2 = t_open_bound tb in
       fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
