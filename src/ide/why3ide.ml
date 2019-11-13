@@ -427,7 +427,10 @@ let () =
       Whyconf.Args.exit_with_usage spec usage_str
   in
   Server.init_server gconfig.config env dir;
-  Queue.iter (fun f -> send_request (Add_file_req f)) files;
+  Queue.iter (fun f ->
+      (* Sanitize the command line arguments so that they are always absolute *)
+      let f = Sysutil.concat (Sys.getcwd()) f in
+      send_request (Add_file_req f)) files;
   send_request Get_global_infos;
   Debug.dprintf debug "Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());

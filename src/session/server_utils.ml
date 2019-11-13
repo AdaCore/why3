@@ -21,6 +21,9 @@ let has_extension f =
 let get_session_dir ~allow_mkdir files =
   if Queue.is_empty files then invalid_arg "no files given";
   let first = Queue.pop files in
+  (* The session should always return an absolute path. It will be used for
+     relative calculus of every other paths *)
+  let first = Sysutil.concat (Sys.getcwd ()) first in
   let dir =
     if Sys.file_exists first then
       if Sys.is_directory first then
@@ -53,7 +56,6 @@ let get_session_dir ~allow_mkdir files =
         invalid_arg ("session directory '" ^ dir ^ "' not found")
     end;
   dir
-
 
 (******************)
 (* Simple queries *)

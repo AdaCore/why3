@@ -131,6 +131,8 @@ type ide_request =
      interpreted by Server_utils.interp. This includes calling
      provers, applying transformations, stategies.  *)
   | Add_file_req            of string
+  (* The file argument should be absolute. Or, at least, contain the session
+     directory path: relative path will be taken from there *)
   | Set_config_param        of string * int
   | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
