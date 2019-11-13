@@ -1,0 +1,99 @@
+#!/bin/sh
+
+print_info () {
+  printf "usage: drv_depgraph <input-folder> [<output-folder>]\n"
+  printf "  <input-folder> the folder containing .gen and .drv files\n"
+  printf "  <output-folder> the folder in which files are going to be generated\n"
+  printf "  if <output-folder> empty, files will be generated in the current directory\n"
+}
+
+if [ ! -d "$1" ] ; then
+  print_info
+  exit 2
+else
+  files="$(ls $1/*.drv $1/*.gen)"
+fi
+
+if test $# = 1; then
+  dir1="./"
+else if test $# = 2 && [ -d "$2" ] ; then
+    dir1=$2
+  else
+    print_info
+    exit 2
+  fi
+fi
+
+# $1 = input file, $2 = output file
+run_on_file () {
+  file=`basename $1`
+  echo "Calculating dependencies for $file"
+  depends="$(sed -n -e 's/^import "\([^"]*\)"/\1/p' $1)"
+  for d in $depends; do
+    if test "$d" != "discrimination.gen" ; then
+      echo "  \"$file\" -> \"$d\";" >> $2
+    fi
+  done
+}
+
+outdir="$dir1/drv_dependencies"
+mkdir -p "$outdir"
+
+output="$outdir/all_drivers.dot"
+echo "Graph will be generated in file $output"
+
+echo "digraph G {" > "$output"
+echo "  rankdir=RL;" >> "$output"
+echo "  nodesep=0.4" >> "$output"
+echo "  ranksep=0.6" >> "$output"
+echo "  node [shape=box,margin=0.05]" >> "$output"
+
+for file in $files; do
+  run_on_file $file $output
+done
+
+echo "}" >> "$output"
+
+echo "Graph generated in file $output"
+
+output_connected="drivers"
+
+echo "Generating connected components in different files"
+ccomps "$output" -x -o "$outdir/$output_connected.dot"
+
+echo "Converting to PDF"
+
+dotfiles="$(ls $outdir/$output_connected*.dot)"
+
+for f in $dotfiles; do
+  out="${f%.*}"
+  dot "$f" -Tpdf -o "$out.pdf"
+done
+
+echo "Generating tex file"
+
+pdffiles="$(ls $outdir/$output_connected*.pdf)"
+texfile="$outdir/drivers_dependency.tex"
+
+figcount=0
+
+# $1 = input pdf file, $2 = output tex file
+print_figure () {
+  echo "\\\begin{figure}" >> $2
+  echo "  \\\begin{center}" >> $2
+  echo "    \\\framebox{\\\includegraphics[scale=0.5]{$1}}" >> $2
+  echo "  \\\end{center}" >> $2
+  echo "  \\\caption{Drivers dependencies $figcount.}" >> $2
+  echo "  \\\label{fig:drv:$figcount}" >> $2
+  echo "\\\end{figure}" >> $2
+  echo "\n" >> $2
+  figcount=$((figcount + 1))
+}
+
+echo "" > $texfile
+
+for f in $pdffiles; do
+  print_figure $f $texfile
+done
+
+echo "Done"
