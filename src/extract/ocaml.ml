@@ -430,9 +430,9 @@ module Print = struct
       | _ -> assert false
     else
       match query_syntax info.info_syn rs.rs_name, pvl with
-      | Some s, _ when complex_syntax s || pvl = [] ->
+      | Some s, _ when complex_syntax s ->
           let arity = syntax_arity s in
-          if List.length pvl >= arity then begin
+          if List.length pvl = arity then begin
             let p = Mid.find rs.rs_name info.info_prec in
             syntax_arguments_prec s (print_expr info) p fmt pvl
           end else begin
@@ -563,6 +563,8 @@ module Print = struct
         fprintf fmt "false"
     | Eapp (rs, [])  -> (* avoids parenthesis around values *)
         fprintf fmt "%a" (print_apply info rs) []
+    | Eapp (rs, [e]) when query_syntax info.info_syn rs.rs_name = Some "%1" ->
+        print_expr ~boxed ~opr ~be info prec fmt e
     | Eapp (rs, pvl) ->
        fprintf fmt (protect_on (prec < 4) "%a") (print_apply info rs) pvl
     | Ematch (e1, [p, e2], []) ->

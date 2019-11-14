@@ -610,12 +610,9 @@ module Print = struct
     | Earrow (e,s) ->
        fprintf fmt (protect_on (prec <= 1) "%a->%s")
          (print_expr ~prec:1) e s
+    | Esyntax ("%1", _, _, [e,_], _) ->
+        print_expr ~prec fmt e
     | Esyntax (s, t, args, lte, pl) ->
-       if s = "%1" (*identity*)
-       then begin
-         assert (List.length lte = 1);
-         print_expr ~prec fmt (fst (List.hd lte)) end
-       else
          let s =
            if pl = [] || prec < List.hd pl
            then Format.sprintf "(%s)" s
