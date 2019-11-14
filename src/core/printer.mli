@@ -17,6 +17,8 @@ open Decl
 open Theory
 open Task
 
+exception BadSyntaxKind of char
+
 (** Register printers *)
 
 type prelude = string list
@@ -115,9 +117,9 @@ val syntax_arguments_prec : string -> (int -> 'a Pp.pp) -> int list -> 'a list P
 
 val syntax_arguments : string -> 'a Pp.pp -> 'a list Pp.pp
 
-val gen_syntax_arguments_typed_prec :
-  ('a -> 'b) -> ('a -> 'b array) -> string -> (int -> 'a Pp.pp)
-  -> 'b Pp.pp -> 'a -> int list -> 'a list Pp.pp
+val gen_syntax_arguments_prec :
+  Format.formatter -> string ->
+  (Format.formatter -> int -> char option -> int -> unit) -> int list -> unit
 
 val syntax_arguments_typed_prec :
   string -> (int -> term Pp.pp) -> ty Pp.pp -> term -> int list -> term list Pp.pp

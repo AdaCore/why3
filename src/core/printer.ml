@@ -238,22 +238,6 @@ let check_syntax_literal _ts s =
   (* if !count <> 1 then *)
     (* raise (BadSyntaxArity (1,!count)) *)
 
-let syntax_arguments_prec s print pl fmt l =
-  let args = Array.of_list l in
-  let precs = Array.of_list pl in
-  let lp = Array.length precs in
-  let repl_fun s b e fmt =
-    let i = int_of_string (String.sub s b (e-b)) in
-    let p =
-      if i < lp then precs.(i)
-      else if lp = 0 then 0
-      else precs.(0) - 1 in
-    print p fmt args.(i-1) in
-  global_substitute_fmt opt_search_forward repl_fun s fmt
-
-let syntax_arguments s print fmt l =
-  syntax_arguments_prec s (fun _ f a -> print f a) [] fmt l
-
 (* return the type arguments of a symbol application, sorted according
    to their (formal) names *)
 let get_type_arguments t = match t.t_node with
@@ -267,34 +251,46 @@ let get_type_arguments t = match t.t_node with
   | _ ->
       [||]
 
-let gen_syntax_arguments_typed_prec
-      ty_of tys_of s print_arg print_type t pl fmt l =
-  let args = Array.of_list l in
+let gen_syntax_arguments_prec fmt s print pl =
   let precs = Array.of_list pl in
   let lp = Array.length precs in
   let repl_fun s b e fmt =
-    if s.[b] = 't' then
-      let grp = String.sub s (b+1) (e-b-1) in
-      let i = int_of_string grp in
-      if i = 0
-      then print_type fmt (ty_of t)
-      else print_type fmt (ty_of args.(i-1))
-    else if s.[b] = 'v' then
-      let grp = String.sub s (b+1) (e-b-1) in
-      let m = tys_of t in
-      print_type fmt m.(int_of_string grp)
-    else
-      let grp = String.sub s b (e-b) in
-      let i = int_of_string grp in
-      let p =
-        if i < lp then precs.(i)
-        else if lp = 0 then 0
-        else precs.(0) - 1 in
-      print_arg p fmt args.(i-1) in
+    let (c, i) =
+      match s.[b] with
+      | 'a'..'z' as c -> (Some c, String.sub s (b + 1) (e - b - 1))
+      | _ -> (None, String.sub s b (e - b)) in
+    let i = int_of_string i in
+    let p =
+      if i < lp then precs.(i)
+      else if lp = 0 then 0
+      else precs.(0) - 1 in
+    print fmt p c i in
   global_substitute_fmt opt_search_forward repl_fun s fmt
 
-let syntax_arguments_typed_prec =
-  gen_syntax_arguments_typed_prec t_type get_type_arguments
+let syntax_arguments_prec s print pl fmt l =
+  let args = Array.of_list l in
+  let pr fmt p c i =
+    match c with
+    | None -> print p fmt args.(i - 1)
+    | Some c -> raise (BadSyntaxKind c) in
+  gen_syntax_arguments_prec fmt s pr pl
+
+let syntax_arguments s print fmt l =
+  syntax_arguments_prec s (fun _ f a -> print f a) [] fmt l
+
+let syntax_arguments_typed_prec s print_arg print_type t pl fmt l =
+  let args = Array.of_list l in
+  let tys = lazy (get_type_arguments t) in
+  let pr fmt p c i =
+    match c with
+    | None -> print_arg p fmt args.(i - 1)
+    | Some 't' ->
+        let v = if i = 0 then t else args.(i - 1) in
+        print_type fmt (t_type v)
+    | Some 'v' ->
+        print_type fmt (Lazy.force tys).(i)
+    | Some c -> raise (BadSyntaxKind c) in
+  gen_syntax_arguments_prec fmt s pr pl
 
 let syntax_arguments_typed s print_arg print_type t fmt l =
   syntax_arguments_typed_prec s (fun _ f a -> print_arg f a) print_type t [] fmt l
