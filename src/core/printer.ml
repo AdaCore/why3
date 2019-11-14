@@ -110,7 +110,8 @@ let opt_search_forward s pos =
         incr i;
         b := !i;
         begin match s.[!i] with
-        | 't' | 'v' -> incr i
+        | '%' -> incr i; raise Exit
+        | 'a'..'z' -> incr i
         | _ -> ()
         end;
         let e = !i in
@@ -132,6 +133,7 @@ let opt_search_forward_literal_format s pos =
         incr i;
         b := !i;
         begin match s.[!i] with
+        | '%' -> incr i; raise Exit
         | 's' | 'e' | 'm' -> incr i; (* float literals *)
         | _ -> ()
         end;
@@ -154,25 +156,25 @@ let global_substitute_fmt search_fun repl_fun text fmt =
       pp_print_string fmt (String.sub text start (len - start))
     | Some(pos,end_pos) ->
       pp_print_string fmt (String.sub text start (pos - start - 1));
-      repl_fun text pos end_pos fmt;
+      if text.[pos] = '%' then pp_print_char fmt '%'
+      else repl_fun text pos end_pos fmt;
       replace end_pos
   in
   replace 0
 
 let iter_group search_fun iter_fun text =
-  let rec iter start last_was_empty =
-    let startpos = if last_was_empty then start + 1 else start in
-    if startpos < String.length text then
-      match search_fun text startpos with
-      | None -> ()
-      | Some (pos,end_pos) ->
-          iter_fun text pos end_pos;
-          iter end_pos (end_pos = pos)
+  let rec iter start =
+    match search_fun text start with
+    | None -> ()
+    | Some (pos, end_pos) ->
+        if text.[pos] <> '%' then iter_fun text pos end_pos;
+        iter end_pos
   in
-  iter 0 false
+  iter 0
 
 exception BadSyntaxIndex of int
 exception BadSyntaxArity of int * int
+exception BadSyntaxKind of char
 
 let int_of_string s =
   try int_of_string s
@@ -206,21 +208,23 @@ let check_syntax_logic ls s =
   let ret = ls.ls_value <> None in
   let nfv = Stv.cardinal (ls_ty_freevars ls) in
   let arg s b e =
-    if s.[b] = 't' then begin
+    match s.[b] with
+    | 't' ->
       let grp = String.sub s (b+1) (e-b-1) in
       let i = int_of_string grp in
       if i < 0 || (not ret && i = 0) then raise (BadSyntaxIndex i);
       if i > len then raise (BadSyntaxArity (len,i))
-    end else if s.[b] = 'v' then begin
+    | 'v' ->
       let grp = String.sub s (b+1) (e-b-1) in
       let i = int_of_string grp in
       if i < 0 || i >= nfv then raise (BadSyntaxIndex i)
-    end else begin
+    | 'a'..'z' as c ->
+      raise (BadSyntaxKind c)
+    | _ ->
       let grp = String.sub s b (e-b) in
       let i = int_of_string grp in
       if i <= 0 then raise (BadSyntaxIndex i);
       if i > len then raise (BadSyntaxArity (len,i));
-    end
   in
   iter_group opt_search_forward arg s
 
@@ -587,6 +591,8 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       fprintf fmt "Bad argument index %d, must start with 1" i
   | BadSyntaxArity (i1,i2) ->
       fprintf fmt "Bad argument index %d, must end with %d" i2 i1
+  | BadSyntaxKind c ->
+      fprintf fmt "Unrecognized argument kind '%c'" c
   | Unsupported s ->
       fprintf fmt "@[<hov 3> Uncaught exception 'Unsupported %s'@]" s
   | UnsupportedType (e,s) ->
