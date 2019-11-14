@@ -109,9 +109,9 @@ val syntax_arity : string -> int
     succeed if the argument list has size [syntax_arity s] or more. *)
 
 val syntax_arguments_prec : string -> (int -> 'a Pp.pp) -> int list -> 'a list Pp.pp
-(** (syntax_arguments_prec templ print_arg prec_list fmt l) prints in the formatter
-     fmt the list l using the template templ, the printer print_arg, and the
-     precedence list prec_list *)
+(** [syntax_arguments_prec templ print_arg prec_list fmt l] prints in the
+    formatter [fmt] the list [l] using the template [templ], the printer
+    [print_arg], and the precedence list [prec_list] *)
 
 val syntax_arguments : string -> 'a Pp.pp -> 'a list Pp.pp
 
@@ -121,9 +121,11 @@ val gen_syntax_arguments_typed_prec :
 
 val syntax_arguments_typed_prec :
   string -> (int -> term Pp.pp) -> ty Pp.pp -> term -> int list -> term list Pp.pp
-(** (syntax_arguments_typed_prec templ print_arg prec_list fmt l) prints in the
-    formatter fmt the list l using the template templ, the printer print_arg
-    and the precedence list prec_list  *)
+(** [syntax_arguments_typed_prec templ print_arg print_type t prec_list fmt l]
+    prints in the formatter [fmt] the list [l] using the template [templ], the
+    printers [print_arg] and [print_type], and the precedence list [prec_list].
+    The term [t] should be akin to [Tapp (_, l)] and is used to fill ["%t0"]
+    and ["%si"]. *)
 
 val syntax_arguments_typed :
   string -> term Pp.pp -> ty Pp.pp -> term -> term list Pp.pp
