@@ -254,6 +254,7 @@ let get_type_arguments t = match t.t_node with
 let gen_syntax_arguments_prec fmt s print pl =
   let precs = Array.of_list pl in
   let lp = Array.length precs in
+  let num = ref 1 in
   let repl_fun s b e fmt =
     let (c, i) =
       match s.[b] with
@@ -261,9 +262,10 @@ let gen_syntax_arguments_prec fmt s print pl =
       | _ -> (None, String.sub s b (e - b)) in
     let i = int_of_string i in
     let p =
-      if i < lp then precs.(i)
+      if !num < lp then precs.(!num)
       else if lp = 0 then 0
       else precs.(0) - 1 in
+    incr num;
     print fmt p c i in
   global_substitute_fmt opt_search_forward repl_fun s fmt
 
