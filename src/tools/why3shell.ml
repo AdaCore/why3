@@ -342,8 +342,8 @@ let additional_help = "Additionally for shell:\n\
 (******************)
 
 let interp fmt cmd =
-  (* TODO dont use Str. *)
-  let l = Str.split (Str.regexp " ") cmd in
+  (* TODO dont use Re.Str. *)
+  let l = Re.Str.split (Re.Str.regexp " ") cmd in
   begin
     match l with
     | ["goto"; n] when int_of_string n < !max_ID ->

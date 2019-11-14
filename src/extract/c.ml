@@ -1321,8 +1321,8 @@ module MLToC = struct
          | Some s ->
             let _ =
               try
-                Str.search_forward
-                  (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0
+                Re.Str.search_forward
+                  (Re.Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0
               with Not_found -> raise (Unsupported "assign field format")  in
             let st = if boxed
                      then C.(Eunop(Ustar, Evar id))

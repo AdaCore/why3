@@ -1144,7 +1144,7 @@ let add_completion_entry (s,desc) =
 let match_function s iter =
   let candidate = completion_model#get ~row:iter ~column:completion_col in
   try
-    ignore (Str.search_forward (Str.regexp_string_case_fold s) candidate 0);
+    ignore (Re.Str.search_forward (Re.Str.regexp_string_case_fold s) candidate 0);
     true
   with Not_found -> false
 

@@ -508,8 +508,8 @@ type chunk =
   | Edition of string * contents (* name contents *)
   | Other of contents            (* contents *)
 
-let re_blank = Str.regexp "[ ]*$"
-let re_why3 = Str.regexp "% Why3 \\([^ ]+\\)"
+let re_blank = Re.Str.regexp "[ ]*$"
+let re_why3 = Re.Str.regexp "% Why3 \\([^ ]+\\)"
 
 (* Reads an old version of the file, as a list of chunks.
    Each chunk is either identified as a Why3 symbol (Edition)
@@ -524,16 +524,16 @@ let read_old_script ch =
   in
   (* skip first lines, until we find a blank line *)
   begin try while true do
-    let s = read_line () in if Str.string_match re_blank s 0 then raise Exit
+    let s = read_line () in if Re.Str.string_match re_blank s 0 then raise Exit
   done with End_of_file | Exit -> () end;
   (* then read chunks *)
   let rec read ?name () =
     let s = read_line () in
     if s = "" then begin
       new_chunk ?name (); read ()
-    end else if Str.string_match re_why3 s 0 then begin
+    end else if Re.Str.string_match re_why3 s 0 then begin
       new_chunk ?name ();
-      let name = Str.matched_group 1 s in
+      let name = Re.Str.matched_group 1 s in
       read ~name ()
     end else begin
       contents := s :: !contents;
@@ -668,9 +668,9 @@ let print_arguments info fmt = function
   | [] -> ()
   | vl -> fprintf fmt "(%a)" (print_comma_list (print_vsty_nopar info)) vl
 
-let re_macro = Str.regexp "\\bMACRO\\b"
+let re_macro = Re.Str.regexp "\\bMACRO\\b"
 let has_macro s =
-  try let _ = Str.search_forward re_macro s 0 in true with Not_found -> false
+  try let _ = Re.Str.search_forward re_macro s 0 in true with Not_found -> false
 let is_macro info fmt = function
   | Some (Edition (_, c)) when info.realization && List.exists has_macro c ->
       fprintf fmt "MACRO "
@@ -751,11 +751,11 @@ let print_ind_decl info fmt d =
     forget_tvs ()
   end
 
-let re_lemma = Str.regexp "\\(\\bLEMMA\\b\\|\\bTHEOREM\\b\\)"
+let re_lemma = Re.Str.regexp "\\(\\bLEMMA\\b\\|\\bTHEOREM\\b\\)"
 let rec find_lemma = function
   | [] -> "AXIOM"
   | s :: sl ->
-      (try let _ = Str.search_forward re_lemma s 0 in Str.matched_group 1 s
+      (try let _ = Re.Str.search_forward re_lemma s 0 in Re.Str.matched_group 1 s
        with Not_found -> find_lemma sl)
 let axiom_or_lemma = function
   | Some (Edition (_, c)) -> find_lemma c

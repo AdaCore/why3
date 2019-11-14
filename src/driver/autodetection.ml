@@ -61,9 +61,9 @@ type prover_autodetection_data =
       execs : string list;
       version_switch : string;
       version_regexp : string;
-      versions_ok : (string * Str.regexp) list;
-      versions_old : (string * Str.regexp) list;
-      versions_bad : (string * Str.regexp) list;
+      versions_ok : (string * Re.Str.regexp) list;
+      versions_old : (string * Re.Str.regexp) list;
+      versions_bad : (string * Re.Str.regexp) list;
       (** If none it's a fake prover (very bad version) *)
       prover_command : string option;
       prover_command_steps : string option;
@@ -205,13 +205,13 @@ let read_editors main =
         Loc.errorm "provers-detection-data.conf not found at %s@." filename
 
 let make_command =
-  let cmd_regexp = Str.regexp "%\\(.\\)" in
+  let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
   fun exec com ->
-    let replace s = match Str.matched_group 1 s with
+    let replace s = match Re.Str.matched_group 1 s with
       | "e" -> exec
       | c -> "%"^c
     in
-    Str.global_substitute cmd_regexp replace com
+    Re.Str.global_substitute cmd_regexp replace com
 
 (* dead code
 let sanitize_exec =
@@ -253,7 +253,7 @@ let ask_prover_version env exec_name version_switch =
     Hstr2.add env.prover_output (exec_name,version_switch) res;
     res
 
-let check_version version (_,schema) = Str.string_match schema version 0
+let check_version version (_,schema) = Re.Str.string_match schema version 0
 
 let known_version env exec_name =
   Hstr.replace env.prover_unknown_version exec_name None
@@ -399,12 +399,12 @@ let generate_auto_strategies config =
   List.fold_left add_strategy config [split ; auto0 ; auto1 ; auto2 ; auto3]
 
 let check_support_library data ver =
-  let cmd_regexp = Str.regexp "%\\(.\\)" in
-  let replace s = match Str.matched_group 1 s with
+  let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
+  let replace s = match Re.Str.matched_group 1 s with
     | "l" -> Config.libdir
     | "d" -> Config.datadir
     | c -> c in
-  let sl = Str.global_substitute cmd_regexp replace data.support_library in
+  let sl = Re.Str.global_substitute cmd_regexp replace data.support_library in
   try
     let f = open_in sl in
     let support_ver = input_line f in
@@ -432,11 +432,11 @@ let detect_exec env data exec_name =
     match s with
     | None -> raise Skip
     | Some s -> s in
-  let re = Str.regexp data.version_regexp in
+  let re = Re.Str.regexp data.version_regexp in
   let ver =
     try
-      ignore (Str.search_forward re s 0);
-      Str.matched_group 1 s
+      ignore (Re.Str.search_forward re s 0);
+      Re.Str.matched_group 1 s
     with Not_found ->
       Debug.dprintf debug "Warning: found prover %s but name/version not \
                        recognized by regexp `%s'@."

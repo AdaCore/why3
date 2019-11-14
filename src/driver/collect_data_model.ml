@@ -311,8 +311,8 @@ let add_vars_to_table (table: correspondence_table) key value : correspondence_t
             Mstr.fold (fun key_val l_elt acc ->
               let match_str_z3 = type_value ^ "!" in
               let match_str_cvc4 = "_" ^ type_value ^ "_" in
-              let match_str = Str.regexp ("\\(" ^ match_str_z3 ^ "\\|" ^ match_str_cvc4 ^ "\\)") in
-              match Str.search_forward match_str (remove_end_num key_val) 0 with
+              let match_str = Re.Str.regexp ("\\(" ^ match_str_z3 ^ "\\|" ^ match_str_cvc4 ^ "\\)") in
+              match Re.Str.search_forward match_str (remove_end_num key_val) 0 with
               | exception Not_found -> acc
               | _ ->
                   if l_elt = Leaf TNoelement then

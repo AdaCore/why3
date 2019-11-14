@@ -680,9 +680,9 @@ let get_elements model_file line_number =
 
 let get_padding line =
   try
-    let r = Str.regexp " *" in
-    ignore (Str.search_forward r line 0);
-    Str.matched_string line
+    let r = Re.Str.regexp " *" in
+    ignore (Re.Str.search_forward r line 0);
+    Re.Str.matched_string line
   with Not_found -> ""
 
 (* This assumes that l is sorted and split the list of locations in two:
@@ -766,7 +766,7 @@ let interleave_with_source
     let model_file = snd (StringMap.choose model_files) in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
       let (last_cntexmp_line, _) = IntMap.max_binding model_file in
-      Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1)
+      Re.Str.bounded_split (Re.Str.regexp "^") source_code (last_cntexmp_line+1)
     in
     let (source_code, _, _, _, gen_loc) =
       List.fold_left
