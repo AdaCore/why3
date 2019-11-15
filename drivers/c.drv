@@ -6,15 +6,9 @@ prelude "#include <stdio.h>"
 prelude "#include <assert.h>"
 prelude "#include <alloca.h>"
 
-module Ref
-  syntax type ref "%1"
-  syntax val ref "%1"            prec 0
-  syntax val contents "%1"       prec 0
-end
-
 module ref.Ref
-  syntax val (!_) "%1"           prec 0
-  syntax val (:=) "%1 = %2"      prec 14 13 14
+  syntax val (!_) "%d1"           prec 2 2
+  syntax val (:=) "%d1 = %2"      prec 14 2 14
 end
 
 module mach.int.Bounded_int
