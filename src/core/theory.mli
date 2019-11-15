@@ -236,8 +236,14 @@ val add_decl_with_tuples : theory_uc -> decl -> theory_uc
 
 (* {2 Exceptions} *)
 
+type badinstance_error =
+  | BadI of ident
+  | BadI_type_proj of ident * string (* Incompatible proj type *)
+  | BadI_ghost_proj of ident * string (* Incompatible ghost *)
+  | BadI_not_found of ident * string (* Field not found in implem *)
+
 exception NonLocal of ident
-exception BadInstance of ident
+exception BadInstance of badinstance_error
 exception CannotInstantiate of ident
 
 exception CloseTheory
