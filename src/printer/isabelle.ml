@@ -181,8 +181,16 @@ let rec print_pat info fmt p = match p.pat_node with
       elems' "prod" (print_pat info) fmt pl
   | Papp (cs, pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
-        | Some s -> gen_syntax_arguments_typed_prec p_type (fun _ -> [||])
-            s (fun _ fmt p -> print_pat info fmt p) (print_ty info) p [] fmt pl
+      | Some s ->
+          let pl = Array.of_list pl in
+          let pr fmt _ c i =
+            match c with
+            | None -> print_pat info fmt pl.(i - 1)
+            | Some 't' ->
+                let v = if i = 0 then p else pl.(i - 1) in
+                print_ty info fmt (p_type v)
+            | Some c -> raise (BadSyntaxKind c) in
+          gen_syntax_arguments_prec fmt s pr []
         | _ -> print_app (print_ls_real info Sls.empty) (print_pat info)
             fmt ((cs, (List.map p_type pl, Some (p.pat_ty))), pl)
       end

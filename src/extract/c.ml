@@ -610,20 +610,24 @@ module Print = struct
     | Earrow (e,s) ->
        fprintf fmt (protect_on (prec <= 1) "%a->%s")
          (print_expr ~prec:1) e s
+    | Esyntax ("%1", _, _, [e,_], _) ->
+        print_expr ~prec fmt e
     | Esyntax (s, t, args, lte, pl) ->
-       if s = "%1" (*identity*)
-       then begin
-         assert (List.length lte = 1);
-         print_expr ~prec fmt (fst (List.hd lte)) end
-       else
-         let s =
-           if pl = [] || prec < List.hd pl
-           then Format.sprintf "(%s)" s
-           else s in
-         gen_syntax_arguments_typed_prec snd (fun _ -> args)
-           s
-           (fun p fmt (e,_t) -> print_expr ~prec:p fmt e)
-           (print_ty ~paren:false) (C.Enothing,t) pl fmt lte
+        let s =
+          if pl = [] || prec < List.hd pl
+          then Format.sprintf "(%s)" s
+          else s in
+        let lte = Array.of_list lte in
+        let pr fmt p c i =
+          match c with
+          | None -> print_expr ~prec:p fmt (fst lte.(i - 1))
+          | Some 't' ->
+              let v = if i = 0 then t else snd lte.(i - 1) in
+              print_ty ~paren:false fmt v
+          | Some 'v' ->
+              print_ty ~paren:false fmt args.(i)
+          | Some c -> raise (BadSyntaxKind c) in
+        gen_syntax_arguments_prec fmt s pr pl
 
   and print_const  fmt = function
     | Cint s | Cfloat s | Cchar s | Cstring s -> fprintf fmt "%s" s
