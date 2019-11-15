@@ -93,12 +93,12 @@ module PE = struct
 
 end
 
-let readBody (xhr: XmlHttpRequest.xmlHttpRequest Js.t) =
+let readBody (xhr: XmlHttpRequest.xmlHttpRequest Js.t) : string =
   let data = ref None in
   data := Some (xhr ##. responseText);
   match !data with
   | None -> raise Not_found
-  | Some data -> Js.to_string data
+  | Some data -> Js.Opt.case data (fun () -> "") (fun x -> Js.to_string x)
 
 module Tabs =
   struct
