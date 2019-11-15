@@ -408,16 +408,15 @@ module ExampleList =
 		           match Js.Opt.to_option (sessionStorage ## getItem (url)) with
 			     Some s -> Editor.set_value s; Editor.name := name
 		           | None ->
-                              XHR.update_file
-                                (function `New mlw ->
-                  Js.Opt.case mlw (fun () -> ()) (fun mlw ->
-				              sessionStorage ## setItem url mlw;
-				              Editor.name := name;
-				              Editor.set_value mlw;
-				              set_loading_label false)
-                                        | _ -> ()
-			        ) url
-                         end
+                  let upd mlw =
+                    sessionStorage ## setItem url mlw;
+                    Editor.name := name;
+                    Editor.set_value mlw;
+                    set_loading_label false
+                  in
+                  XHR.update_file (function `New mlw -> Js.Opt.iter mlw upd
+                                          | _ -> ()) url
+             end
                        end
                      else
                        select_example ##. selectedIndex := !selected_index;
@@ -1108,20 +1107,18 @@ let () =
 
 
 let () =
-  XHR.update_file (function `New content ->
-                      let aux content =
-	                      let examples = content ## split (Js.string "\n") in
-	                      let examples = Js.to_array (Js.str_array examples) in
-	                      for i = 0 to ((Array.length examples) / 2) - 1 do
-	                        ExampleList.add_example
-	                          examples.(2*i)
-	                          ((Js.string "examples/") ## concat (examples.(2*i+1)))
-	                      done;
-	                      ExampleList.set_loading_label false
-                      in Js.Opt.case content (fun () -> ()) aux
-                          | _ ->
-	                     ExampleList.set_loading_label false
-                  ) (Js.string "examples/index.txt");
+  let upd content =
+	  let examples = content ## split (Js.string "\n") in
+	  let examples = Js.to_array (Js.str_array examples) in
+	  for i = 0 to ((Array.length examples) / 2) - 1 do
+	    ExampleList.add_example
+	      examples.(2*i)
+	      ((Js.string "examples/") ## concat (examples.(2*i+1)))
+	  done;
+	  ExampleList.set_loading_label false in
+  XHR.update_file (function `New content -> Js.Opt.iter content upd
+                          | _ -> ExampleList.set_loading_label false
+    ) (Js.string "examples/index.txt");
   ExampleList.set_loading_label true
 
 
