@@ -632,6 +632,11 @@ module Print = struct
               print_ty ~paren:false fmt v
           | Some 'v' ->
               print_ty ~paren:false fmt args.(i)
+          | Some 'd' -> (* dereference the value *)
+              begin match fst lte.(i - 1) with
+              | Eunop (Uaddr, e) -> print_expr ~prec:p fmt e
+              | e -> print_expr ~prec:p fmt (Eunop (Ustar, e))
+              end
           | Some c -> raise (BadSyntaxKind c) in
         gen_syntax_arguments_prec fmt s pr pl
 
