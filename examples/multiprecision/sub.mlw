@@ -387,7 +387,137 @@ module Sub
                 = (pelts ox)[offset x + j] };
     res
 
-  (* TODO remove when sub_rx can be used instead *)
+
+end
+
+(* TODO remove when sub_rx can be used instead *)
+module SubOld
+
+  use mach.c.C
+  use lemmas.Lemmas
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use types.Types
+  use array.Array
+  use map.Map
+  use int.Power
+  use map.MapEq
+  use ptralias.Alias
+  use ref.Ref
+
+  let wmpn_sub_n (r x y:t) (sz:int32) : limb
+    requires { valid x sz }
+    requires { valid y sz }
+    requires { valid r sz }
+    requires { writable r }
+    ensures { 0 <= result <= 1 }
+    ensures { value r sz - power radix sz * result
+              = value x sz - value y sz }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+    writes { r.data.elts }
+  =
+    let lx = ref 0 in
+    let ly = ref 0 in
+    let b = ref 0 in
+    let i = ref 0 in
+    while !i < sz do
+      variant { sz - !i }
+      invariant { 0 <= !i <= sz }
+      invariant { value r !i - (power radix !i) * !b
+                  = value x !i - value y !i }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      invariant { 0 <= !b <= 1 }
+      label StartLoop in
+      lx := get_ofs x !i;
+      ly := get_ofs y !i;
+      let res, borrow = sub_with_borrow !lx !ly !b in
+      set_ofs r !i res;
+      assert { value r !i - (power radix !i) * !b =
+      value x !i - value y !i };
+      b := borrow;
+      value_tail r !i;
+      value_tail x !i;
+      value_tail y !i;
+      assert { value r (!i+1) - (power radix (!i+1)) * !b
+                  = value x (!i+1) - value y (!i+1) };
+      i := !i + 1;
+      done;
+      !b
+
+  let wmpn_sub (r x:t) (sx:int32) (y:t) (sy:int32) : limb
+    requires { 0 <= sy <= sx }
+    requires { valid x sx }
+    requires { valid y sy }
+    requires { valid r sx }
+    requires { writable r }
+    ensures { value r sx  - power radix sx * result
+              = value x sx - value y sy }
+    ensures { forall j. (j < offset r \/ offset r + sx <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+    ensures { 0 <= result <= 1 }
+    writes { r.data.elts }
+  =
+    let ref lx = 0 in
+    let ref b = wmpn_sub_n r x y sy in
+    let ref i = sy in
+    if b <> 0
+    then begin
+      while i < sx do
+        variant { sx - i }
+        invariant { sy <= i <= sx }
+        invariant { value r i - power radix i * b =
+                    value x i - value y sy }
+        invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                  -> (pelts r)[j] = old (pelts r)[j] }
+        invariant { 0 <= b <= 1 }
+        invariant { i = sx \/ b = 1 }
+        assert { b = 1 };
+        lx <- get_ofs x i;
+        let res = sub_mod lx 1 in
+        value_sub_update_no_change (pelts x) (x.offset + int32'int i)
+                                             (x.offset + int32'int i + 1)
+                                             (x.offset + int32'int sx) res;
+        set_ofs r i res;
+        assert { value r i - (power radix i) * b = value x i - value y sy };
+        value_tail r i;
+        value_tail x i;
+        i <- i + 1;
+        if (lx <> 0)
+        then begin
+          b <- 0;
+          assert { res = lx - 1 };
+          assert { value r i = value x i - value y sy};
+          break;
+        end
+        else begin
+          assert { res = radix - 1 };
+          assert { value r i - power radix i = value x i - value y sy }
+        end
+      done
+    end;
+    while i < sx do
+      variant { sx - i }
+      invariant { sy <= i <= sx }
+      invariant { i = sx \/ b = 0 }
+      invariant { value r i - power radix i * b =
+                value x i - value y sy }
+      invariant { forall j. (j < offset r \/ offset r + sx <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      assert { b = 0 by i < sx };
+      lx <- get_ofs x i;
+      set_ofs r i lx;
+      value_tail r i;
+      value_tail x i;
+      assert { value r i = value x i - value y sy };
+      assert { value r (i+1) - power radix (i+1) * b
+               = value x (i+1) - value y sy };
+      i <- i + 1;
+    done;
+    b
+
   let wmpn_sub_n_in_place (x y:t) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid x sz }
@@ -473,9 +603,9 @@ module Sub
         lx <- get_ofs x i;
         assert { lx = (pelts ox)[ox.offset + i] };
         let res = sub_mod lx 1 in
-        value_sub_update_no_change (pelts x) (x.offset + p2i i)
-                                             (x.offset + p2i i + 1)
-                                             (x.offset + p2i sx) res;
+        value_sub_update_no_change (pelts x) (x.offset + int32'int i)
+                                             (x.offset + int32'int i + 1)
+                                             (x.offset + int32'int sx) res;
         set_ofs x i res;
         assert { value x i - power radix i * b = value ox i - value y sy };
         assert { forall j. i < j < sx ->
@@ -506,6 +636,5 @@ module Sub
     value_concat x i sx;
     value_concat ox i sx;
     b
-
 
 end
