@@ -8,7 +8,7 @@ USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev xvfb unzip build-essential autoconf automake ocaml-nox ca-certificates git xauth hevea texlive-latex-extra lmodern texlive-plain-generic texlive-fonts-recommended && \
+    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev xvfb unzip build-essential autoconf automake ocaml-nox ca-certificates git xauth hevea texlive-latex-extra lmodern texlive-plain-generic texlive-fonts-recommended graphviz && \
     apt-get clean
 
 RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.5/opam-2.0.5-x86_64-linux -O /usr/local/bin/opam && \

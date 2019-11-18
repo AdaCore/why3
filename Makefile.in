@@ -1983,6 +1983,9 @@ doc/bnf$(EXE): doc/bnf.mll
 	$(OCAMLLEX) $<
 	$(OCAMLC) -o $@ doc/bnf.ml
 
+doc/generated/drivers_dependency.tex: doc/drv_depgraph drivers/*.drv drivers/*.gen
+	doc/drv_depgraph$(EXE) drivers doc/generated
+
 doc/extract_ocaml_code: doc/extract_ocaml_code.ml
 	$(OCAMLC) str.cma -o $@ $<
 
@@ -2006,7 +2009,6 @@ doc/generated/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_c
 
 doc/generated/counterexample__%.ml: examples/use_api/counterexample.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
-
 
 OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
 	buildtask printtask buildtask2 \
@@ -2045,7 +2047,7 @@ DOC = api glossary ide intro exec macros manpages install \
 
 DOCTEX = $(DOC:%=doc/%.tex)
 
-doc/manual.pdf: $(BNFTEX) $(OCAMLCODE) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf
+doc/manual.pdf: $(BNFTEX) $(OCAMLCODE) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf doc/generated/drivers_dependency.tex
 	cd doc; $(LATEXCOMP) manual.tex
 ifeq (@LATEX@,pdflatex)
 	cd doc; if grep 'may have changed. Rerun to get' manual.log; then \
@@ -2084,7 +2086,8 @@ endif
 
 clean::
 	rm -rf doc/bnf$(EXE) $(BNFTEX) doc/html doc/manual.image.out; \
-	cd doc; $(LATEXCLEAN) manual.tex
+	cd doc; $(LATEXCLEAN) manual.tex; \
+	rm -rf doc/generated/drivers*
 
 else
 
