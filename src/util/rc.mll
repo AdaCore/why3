@@ -25,7 +25,7 @@ type rc_value =
   | RCint of int
   | RCbool of bool
   | RCfloat of float
-  | RCstring of string
+  | RCstring of string * bool
   | RCident of string
 
 
@@ -84,7 +84,10 @@ let print_rc_value fmt = function
   | RCint i -> fprintf fmt "%d" i
   | RCbool b -> fprintf fmt "%B" b
   | RCfloat f -> fprintf fmt "%f" f
-  | RCstring s -> fprintf fmt "\"%s\"" (escape_string s)
+  | RCstring (s,false) ->
+    fprintf fmt "\"%s\"" (escape_string s)
+  | RCstring (s,true) ->
+    fprintf fmt "\"%s\"" (String.escaped s)
   | RCident s -> fprintf fmt "%s" s
 
 let () = Exn_printer.register (fun fmt e -> match e with
@@ -246,10 +249,10 @@ let rbool k = function
 let wbool b = RCbool b
 
 let rstring k = function
-  | RCident s | RCstring s -> s
+  | RCident s | RCstring (s,_) -> s
   | v -> raise (StringExpected (k,v))
 
-let wstring s = RCstring s
+let wstring ?(escape_eol=false) s = RCstring (s,escape_eol)
 
 let get_int = get_value rint
 let get_intl = get_valuel rint
@@ -267,8 +270,8 @@ let set_booll = set_valuel wbool
 let get_string = get_value rstring
 let get_stringl = get_valuel rstring
 let get_stringo = get_valueo rstring
-let set_string = set_value wstring
-let set_stringl = set_valuel wstring
+let set_string ?escape_eol ?default s = set_value (wstring ?escape_eol) ?default s
+let set_stringl ?escape_eol ?default s = set_valuel (wstring ?escape_eol) ?default s
 
 let check_exhaustive section keyl =
   let test k _ = if Sstr.mem k keyl then ()
@@ -340,7 +343,7 @@ and value key = parse
         record lexbuf }
   | '"'
       { Buffer.clear buf;
-        string_val key lexbuf }
+        string_val key false lexbuf }
   | "true"
       { push_field key (RCbool true);
         record lexbuf }
@@ -355,24 +358,24 @@ and value key = parse
   | _ as c
       { syntax_error ("invalid value starting with " ^ String.make 1 c) }
 
-and string_val key = parse
+and string_val key escape_eol = parse
   | '"'
-      { push_field key (RCstring (Buffer.contents buf));
+      { push_field key (RCstring (Buffer.contents buf,escape_eol));
         record lexbuf
       }
   | [^ '\\' '"'] as c
       { Buffer.add_char buf c;
-        string_val key lexbuf }
+        string_val key escape_eol lexbuf }
   | '\\' (['\\' '"' 'n' 'r' 't'] as c)
       { Buffer.add_char buf
           (match c with 'n' -> '\n' | 'r' -> '\r' | 't' -> '\t' | _ -> c);
-        string_val key lexbuf }
+        string_val key (escape_eol || c = 'n') lexbuf }
   | '\\' '\n'
-      { string_val key lexbuf }
+      { string_val key escape_eol lexbuf }
   | '\\' (_ as c)
       { Buffer.add_char buf '\\';
         Buffer.add_char buf c;
-        string_val key lexbuf }
+        string_val key escape_eol lexbuf }
   | eof
       { syntax_error "unterminated string" }
 
