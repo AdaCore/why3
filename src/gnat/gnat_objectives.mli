@@ -169,11 +169,6 @@ module Save_VCs : sig
       The third field of the return tuple is the number of goals proved by
       exactly trivial_true (Trivial prover).*)
 
-   val save_trace : Session_itp.session -> goal_id -> (string * Gnat_loc.S.t)
-   (* compute the trace from the goal and save it to a file; return the trace
-      file name and the computed trace,
-      ("", Gnat_loc.S.empty) if no trace was saved *)
-
    val vc_file : goal_id -> string
    (* get the file name for a given goal *)
 

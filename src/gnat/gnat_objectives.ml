@@ -760,12 +760,6 @@ module Save_VCs = struct
   let vc_file goal =
     GM.find goal_map goal
 
-  let with_fmt_channel filename f =
-    let cout = open_out filename in
-    let fmt  = Format.formatter_of_out_channel cout in
-    f fmt;
-    close_out cout
-
   let vc_name check (dr: Driver.driver) =
     let r = find check in
     incr r;
@@ -785,37 +779,6 @@ module Save_VCs = struct
     GM.add goal_map goal vc_fn;
     Sysutil.write_file vc_fn "";
     vc_fn
-
-  let compute_trace s =
-    let rec compute_trace acc f =
-      let acc = Term.t_fold compute_trace acc f in
-      match Gnat_expl.extract_sloc f.Term.t_attrs with
-      (* it should be enough to look at the "sloc"s here, and not take into
-         account the explanations. *)
-      | Some loc -> Gnat_loc.S.add loc acc
-      | _ -> acc
-    in
-    fun goal ->
-      let task = Session_itp.get_task s goal in
-      let f = Task.task_goal_fmla task in
-      compute_trace Gnat_loc.S.empty f
-
-  let save_trace s goal =
-    let check = get_objective goal in
-    let trace_fn = Pp.sprintf "%a.trace" Gnat_expl.to_filename check in
-    let trace = compute_trace s goal in
-    (* Do not generate an empty file if there is no location at all.
-       Do not generate a file with a single location for the goal, as this
-       is not useful. *)
-    if Gnat_loc.S.cardinal trace > 1 then begin
-      with_fmt_channel trace_fn
-        (fun fmt ->
-          Gnat_loc.S.iter (fun l ->
-              Format.fprintf fmt "%a@." Gnat_loc.simple_print_loc
-                (Gnat_loc.orig_loc l)) trace);
-      (trace_fn, trace)
-    end
-    else ("", Gnat_loc.S.empty)
 
   (* Group of functions to build a json object for a session tree.
      More precisely a session forest, because we start with a list of

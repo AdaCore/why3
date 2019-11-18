@@ -36,7 +36,6 @@ open Why3
                 "reason"         : string,
                 "result"         : bool,
                 "extra_info"     : int,
-                "trace_file"     : string,
                 "vc_file"        : string,
                 "editor_cmd"     : string,
                 "check_tree"     : list goal,
@@ -47,12 +46,10 @@ open Why3
    kind of the VC, such as "overflow_check" etc. The field "result" tells if
    the VC has been proved or not. The field "extra_info" specifies more
    precisely the part of the VC, it may be "0" if no extra information is
-   available. The field "trace_file" is optional and contains the name of a
-   file which contains some explanation of the VC. The fields "vc_file" and
-   "editor_cmd" are both optional and should be present at the same time. If
-   present, "vc_file" contains the name of a VC file to be used for manual
-   proof, and "editor_cmd" the command to spawn for an external editor for this
-   VC.
+   available. The fields "vc_file" and "editor_cmd" are both optional and
+   should be present at the same time. If present, "vc_file" contains the name
+   of a VC file to be used for manual proof, and "editor_cmd" the command to
+   spawn for an external editor for this VC.
 
   The counter example information is stored in the cntexmp field. At the top
   level, this is a mapping from file names to linesentry record.
@@ -109,8 +106,6 @@ type result_info =
   | Not_Proved of
        Task.task option *              (* task of the last goal *)
        Model_parser.model option *     (* counterexample model *)
-       string *                        (* the name of the trace file, empty
-                                          string if none *)
        (string * string) option        (* for manual provers,
                                           pair of (vc_file, editor_cmd) *)
 

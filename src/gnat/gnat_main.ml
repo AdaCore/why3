@@ -139,25 +139,6 @@ let all_split_subp c subp =
    C.all_split_leaf_goals ();
    Gnat_objectives.clear ()
 
-let filter_model m trace =
-  if trace = Gnat_loc.S.empty then
-    m
-  else
-    let trace_to_list trace =
-    (* Build list of locations (pairs of filename and line number) from trace *)
-      Gnat_loc.S.fold
-        (fun loc list ->
-          let sloc = Gnat_loc.orig_loc loc in
-          let col = Gnat_loc.get_col sloc in
-          let pos = Why3.Loc.user_position
-            (Gnat_loc.get_file sloc) (Gnat_loc.get_line sloc) col col in
-          (pos::list)
-        )
-        trace
-        [] in
-    let positions = trace_to_list trace in
-    Model_parser.model_for_positions_and_decls m ~positions
-
 let report_messages c obj =
   let s = c.Controller_itp.controller_session in
   let result =
@@ -176,11 +157,6 @@ let report_messages c obj =
           Opt.map (fun pa -> Session_itp.get_proof_attempt_parent s pa) unproved_pa
       in
       let unproved_task = Opt.map (fun x -> Session_itp.get_task s x) unproved_goal in
-      let (tracefile, trace) =
-        match unproved_goal, Gnat_config.proof_mode with
-        | Some goal, (Gnat_config.Progressive | Gnat_config.Per_Path) ->
-            C.Save_VCs.save_trace s goal
-        | _ -> ("", Gnat_loc.S.empty) in
       let model =
         let unproved_pa = Opt.map (Session_itp.get_proof_attempt_node s) unproved_pa in
         match unproved_pa with
@@ -191,14 +167,14 @@ let report_messages c obj =
             None
         | Some { Session_itp.proof_state =
                   Some ({Call_provers.pr_answer = _} as r)} ->
-          Some (filter_model r.Call_provers.pr_model trace)
+          Some r.Call_provers.pr_model
         | _ -> None
       in
       let manual_info =
         match unproved_pa with
         | None -> None
         | Some pa -> Gnat_manual.manual_proof_info s pa in
-      Gnat_report.Not_Proved (unproved_task, model, tracefile, manual_info) in
+      Gnat_report.Not_Proved (unproved_task, model, manual_info) in
   Gnat_report.register obj (C.Save_VCs.check_to_json s obj) result
 
 (* Escaping all debug printings *)

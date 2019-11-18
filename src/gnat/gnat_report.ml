@@ -15,7 +15,6 @@ type result_info =
   | Not_Proved of
        Task.task option *
        Model_parser.model option *
-       string *
        (string * string) option
 
 type msg =
@@ -25,7 +24,6 @@ type msg =
     stats_trivial : int;
     check_tree    : Json_base.json;
     extra_info    : int option;
-    tracefile     : string;
     cntexmp_model : Model_parser.model option;
     manual_proof  : (string * string) option
   }
@@ -58,16 +56,16 @@ let adapt_stats statsopt =
       Some newstats
 
 let register check check_tree result =
-  let valid, extra_info, stats, tracefile, model, manual =
+  let valid, extra_info, stats, model, manual =
     match result with
     | Proved (stats, stats_checker, stat_trivial) ->
-        true, None, Some (stats, stats_checker, stat_trivial), "", None, None
-    | Not_Proved (task, model, tracefile, manual) ->
+        true, None, Some (stats, stats_checker, stat_trivial), None, None
+    | Not_Proved (task, model, manual) ->
         let extra_info =
           match task with
           | None -> None
           | Some t -> Gnat_expl.get_extra_info t in
-        false, extra_info, None, tracefile, model, manual
+        false, extra_info, None, model, manual
   in
   if (Gnat_expl.HCheck.mem msg_set check) then assert false
   else begin
@@ -81,7 +79,6 @@ let register check check_tree result =
       stats_checker = Opt.get_def 0 stats_checker;
       stats_trivial = Opt.get_def 0 stats_trivial;
       check_tree    = check_tree;
-      tracefile     = tracefile;
       cntexmp_model = model;
       manual_proof  = manual } in
     Gnat_expl.HCheck.add msg_set check msg
@@ -91,13 +88,6 @@ let get_info info  =
     match info with
     | None -> 0
     | Some info -> info
-
-let print_trace_file fmt trace  =
-  if trace = "" then ()
-  else begin
-    Format.fprintf fmt ", ";
-    print_json_field "tracefile" string fmt trace
-  end
 
 let spark_counterexample_transform me_name =
   (* Just return the name of the model element. Transformation of model
@@ -160,7 +150,7 @@ let sort_messages (l : (Gnat_expl.check * msg) list) =
   List.sort (fun x y -> compare (fst x).Gnat_expl.id (fst y).Gnat_expl.id) l
 
 let print_json_msg fmt (check, m) =
-  Format.fprintf fmt "{%a, %a, %a, %a, %a%a%a%a%a}"
+  Format.fprintf fmt "{%a, %a, %a, %a, %a%a%a%a}"
     (print_json_field "id" int) check.Gnat_expl.id
     (print_json_field "reason" string)
       (Gnat_expl.reason_to_ada check.Gnat_expl.reason)
@@ -168,7 +158,6 @@ let print_json_msg fmt (check, m) =
     (print_json_field "extra_info" int) (get_info m.extra_info)
     (print_json_field "check_tree" Json_base.print_json) m.check_tree
     print_stats (m.stats, m.stats_checker, m.stats_trivial)
-    print_trace_file m.tracefile
     print_cntexmp_model m.cntexmp_model
     print_manual_proof_info m.manual_proof
 
