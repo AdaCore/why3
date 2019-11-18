@@ -57,22 +57,35 @@ case, the relative order of these associations matters.
 \section{Drivers for External Provers}
 \label{sec:drivers}
 
-Drivers for external provers are readable files from directory
-\texttt{drivers}. Experimented users can modify them to change the way
-the external provers are called, in particular which transformations
-are applied to goals.
+Drivers for external provers are readable files located in the
+\texttt{drivers} directory. They describe how \why should interact
+with external provers.
 
-[TO BE COMPLETED LATER]
+% Experienced users can modify them to
+% change the way \why interacts with external provers.
 
-Document differences between .drv and .gen\todo{TODO} namely the need
-for printer section, any other ?
+%  namely the need
+% for printer section, any other ?
 
-Show the current dependency graph of drivers\todo{TODO} Need to filter
+% , in particular which transformations
+% are applied to goals.
 
+
+Files with \texttt{.drv} extension represent drivers that might be
+associated to a specific solver in the \texttt{why3.conf}
+configuration file (see \ref{sec:whyconffile} for more information);
+files with \texttt{.gen} extension are intended to be imported by
+other drivers; finally, files with \texttt{.aux} extension are
+automatically generated from the main \texttt{Makefile}.
+%
 \input{./generated/drivers_dependency.tex}
-
-
-The drivers dependencies are in Figs.~\driversref.
+%
+The most important drivers dependencies are shown in
+Figs.~\driversref. Fig.~\ref{fig:drv:smt} shows the drivers files
+related to the \texttt{SMT} solvers, Fig.~\ref{fig:drv:coq} the files
+for \texttt{Coq}, Fig.~\ref{fig:drv:tptp} the files for \texttt{TPTP},
+Fig.~\ref{fig:drv:isabelle} the files for \texttt{Isabelle}, and
+finally Fig.~\ref{fig:drv:pvs} shows the files for \texttt{PVS}.
 
 \section{Transformations}
 \label{sec:transformations}

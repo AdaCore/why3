@@ -2084,7 +2084,8 @@ endif
 
 clean::
 	rm -rf doc/bnf$(EXE) $(BNFTEX) doc/html doc/manual.image.out; \
-	cd doc; $(LATEXCLEAN) manual.tex
+	cd doc; $(LATEXCLEAN) manual.tex; \
+	rm -rf doc/generated/drivers*
 
 else
 
