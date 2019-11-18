@@ -90,32 +90,32 @@ static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
 
 end
 
-module add_alias.AddAlias
+module ptralias.Alias
 
   prelude "
 struct __open_sep_result
 { uint64_t *__field_0;
   uint64_t *__field_1;
   uint64_t *__field_2;
-}
+};
 
 struct __open_rx_result
 { uint64_t *__field_0;
   uint64_t *__field_1;
   uint64_t *__field_2;
-}
+};
 
 struct __open_ry_result
 { uint64_t *__field_0;
   uint64_t *__field_1;
   uint64_t *__field_2;
-}
+};
 
 struct __open_rxy_result
 { uint64_t *__field_0;
   uint64_t *__field_1;
   uint64_t *__field_2;
-}
+};
 
 struct __open_sep_result open_sep (uint64_t * r, uint64_t * x, int32_t sx,
                                    uint64_t * y, int32_t sy)
@@ -163,25 +163,25 @@ struct __open_sep_result
 { uint64_t *__field_0;
   uint64_t *__field_1;
   uint64_t *__field_2;
-}
+};
 
 struct __open_rx_result
 { uint64_t *__field_0;
   uint64_t *__field_1;
   uint64_t *__field_2;
-}
+};
 
 struct __open_ry_result
 { uint64_t *__field_0;
   uint64_t *__field_1;
   uint64_t *__field_2;
-}
+};
 
 struct __open_rxy_result
 { uint64_t *__field_0;
   uint64_t *__field_1;
   uint64_t *__field_2;
-}
+};
 
 struct __open_sep_result open_sep (uint64_t * r, uint64_t * x, int32_t sx,
                                    uint64_t * y, int32_t sy);
@@ -199,12 +199,9 @@ struct __open_rxy_result open_rxy (uint64_t * x, int32_t sx);
   syntax val open_rx "open_rx"
   syntax val open_ry "open_ry"
   syntax val open_rxy "open_rxy"
-  syntax val close_sep "IGNORE3(%1,%2,%4)"
-  syntax val close_rx "IGNORE3(%1,%2,%4)"
-  syntax val close_ry "IGNORE3(%1,%2,%4)"
-  syntax val close_rxy "IGNORE3(%1,%2,%4)"
-
-
-
+  syntax val close_sep "IGNORE3(%1,%2,%4)" prec 1 15 15 15
+  syntax val close_rx "IGNORE3(%1,%2,%4)" prec 1 15 15 15
+  syntax val close_ry "IGNORE3(%1,%2,%4)" prec 1 15 15 15
+  syntax val close_rxy "IGNORE3(%1,%2,%4)" prec 1 15 15 15
 
 end
