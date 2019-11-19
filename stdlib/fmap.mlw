@@ -40,6 +40,12 @@ module Fmap
   predicate mem (k: 'k) (m: fmap 'k 'v) =
     S.mem k m.domain
 
+  predicate mapsto (k: 'k) (v: 'v) (m: fmap 'k 'v) =
+    mem k m /\ m[k] = v
+
+  lemma mem_mapsto:
+    forall k: 'k, m: fmap 'k 'v. mem k m -> mapsto k m[k] m
+
   predicate is_empty (m: fmap 'k 'v) =
     S.is_empty m.domain
 
@@ -57,6 +63,9 @@ module Fmap
   axiom is_empty_empty: is_empty (empty: fmap 'k 'v)
 
   function add (k: 'k) (v: 'v) (m: fmap 'k 'v) : fmap 'k 'v
+
+  function ([<-]) (m: fmap 'k 'v) (k: 'k) (v: 'v) : fmap 'k 'v =
+    add k v m
 
   (*FIXME? (add k v m).contents = m.contents[k <- v] *)
 
