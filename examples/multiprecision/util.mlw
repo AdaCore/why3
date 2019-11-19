@@ -96,4 +96,21 @@ module Util
       i := Int32.(+) !i (1:int32);
     done
 
+  (** `normalize p n` sets n to the smallest number such that the value `(p,n)`
+       remains unchanged *)
+  let normalize [@extraction:inline] (p: ptr limb) (ref n: int32)
+    requires { n >= 0 }
+    requires { valid p n }
+    ensures  { 0 <= n <= old n }
+    ensures  { value p n = value p (old n) }
+    ensures  { n = 0 \/ (pelts p)[offset p + n-1] > 0 }
+  = label Start in
+    while n > 0 do
+      invariant { value p n = value p n at Start }
+      invariant { 0 <= n <= n at Start }
+      variant   { n }
+      if get_ofs p (n-1) <> 0 then break;
+      n <- n-1;
+    done
+
 end
