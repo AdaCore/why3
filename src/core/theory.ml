@@ -656,34 +656,40 @@ let cl_clone_pr cl pr =
 
 (* initialize the clone structure *)
 
+type badinstance_error =
+  | BadI of ident
+  | BadI_type_proj of ident * string
+  | BadI_ghost_proj of ident * string
+  | BadI_not_found of ident * string
+
 exception NonLocal of ident
-exception BadInstance of ident
+exception BadInstance of badinstance_error
 
 let cl_init_ty cl ({ts_name = id} as ts) ty =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let stv = Stv.of_list ts.ts_args in
-  if not (ty_v_all (Stv.contains stv) ty) then raise (BadInstance id);
+  if not (ty_v_all (Stv.contains stv) ty) then raise (BadInstance (BadI id));
   cl.ty_table <- Mts.add ts ty cl.ty_table
 
 let cl_init_ts cl ({ts_name = id} as ts) ts' =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   if List.length ts.ts_args <> List.length ts'.ts_args then
-    raise (BadInstance id);
+    raise (BadInstance (BadI id));
   cl.ts_table <- Mts.add ts ts' cl.ts_table
 
 let cl_init_ls cl ({ls_name = id} as ls) ls' =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let mtch sb ty ty' =
     try ty_match sb ty' (cl_trans_ty cl ty)
-    with TypeMismatch _ -> raise (BadInstance id)
+    with TypeMismatch _ -> raise (BadInstance (BadI id))
   in
   let sb = match ls.ls_value,ls'.ls_value with
     | Some ty, Some ty' -> mtch Mtv.empty ty ty'
     | None, None -> Mtv.empty
-    | _ -> raise (BadInstance id)
+    | _ -> raise (BadInstance (BadI id))
   in
   ignore (try List.fold_left2 mtch sb ls.ls_args ls'.ls_args
-    with Invalid_argument _ -> raise (BadInstance id));
+    with Invalid_argument _ -> raise (BadInstance (BadI id)));
   cl.ls_table <- Mls.add ls ls' cl.ls_table
 
 let cl_init_pr cl {pr_name = id} _ =
@@ -989,8 +995,21 @@ let () = Exn_printer.register
       Format.fprintf fmt "Non-local symbol: %a" print_id id
   | CannotInstantiate id ->
       Format.fprintf fmt "Cannot instantiate a defined symbol %a" print_id id
-  | BadInstance id ->
+  | BadInstance (BadI id) ->
       Format.fprintf fmt "Illegal instantiation for symbol %a" print_id id
+  | BadInstance (BadI_type_proj (id, pr_name)) ->
+      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
+                          projection types for %s are not compatible"
+        print_id id pr_name
+  | BadInstance (BadI_ghost_proj (id, pr_name)) ->
+      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
+                          projection %s cannot be ghost if the \
+                          cloned projection is not"
+        print_id id pr_name
+  | BadInstance (BadI_not_found (id, pj_str)) ->
+      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
+                          projection %s cannot be found in instance type"
+        print_id id pj_str
   | CloseTheory ->
       Format.fprintf fmt "Cannot close theory: some namespaces are still open"
   | NoOpenedNamespace ->
