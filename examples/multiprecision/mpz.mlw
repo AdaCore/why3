@@ -84,6 +84,7 @@ val set_size (x:mpz_ptr) (sz:int32) (ghost p: ptr limb) : unit
   requires { max p = plength p }
   requires { abs sz <= plength p }
   requires { plength p = mpz.alloc[x] }
+  requires { sz <> 0 -> value p (abs sz) >= power radix (abs sz - 1) }
   writes  { mpz.sgn }
   writes  { mpz.abs_size }
   writes  { mpz.abs_value_of }

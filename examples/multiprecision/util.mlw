@@ -104,12 +104,17 @@ module Util
     ensures  { 0 <= n <= old n }
     ensures  { value p n = value p (old n) }
     ensures  { n = 0 \/ (pelts p)[offset p + n-1] > 0 }
+    ensures  { n = 0 \/ value p n >= power radix (n-1) }
   = label Start in
     while n > 0 do
       invariant { value p n = value p n at Start }
       invariant { 0 <= n <= n at Start }
       variant   { n }
-      if get_ofs p (n-1) <> 0 then break;
+      if get_ofs p (n-1) <> 0
+      then begin
+        value_tail p (n-1);
+        break
+      end;
       n <- n-1;
     done
 
