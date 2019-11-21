@@ -254,14 +254,14 @@ extract_and_test_wmp () {
         printf "extract... "
         if BENCH=yes make -C $dir extract > /dev/null; then
             printf "compile... "
-            if BENCH=yes make -C $dir bench-tests > /dev/null; then
+            if BENCH=yes make -C $dir build/tests > /dev/null; then
                 printf "execute... "
-                if $dir/build/bench-tests > /dev/null; then
+                if $dir/build/tests > /dev/null; then
                     echo "ok"
                 else
                     echo "execution failed!"
-                    echo $dir/build/bench-tests
-                    $dir/build/bench-tests
+                    echo $dir/build/tests
+                    $dir/build/tests
                     exit 1
                 fi
             else
