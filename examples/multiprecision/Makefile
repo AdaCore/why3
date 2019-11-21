@@ -24,7 +24,7 @@ all: extract
 
 clean:
 	rm -rf build bench
-	make -C distrib clean
+	test -f distrib/Makefile && make -C distrib clean
 
 why3:
 	make -C ../..
