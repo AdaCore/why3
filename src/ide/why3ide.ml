@@ -364,12 +364,12 @@ let files_need_saving () =
 let exit_function_safe () =
   send_request Check_need_saving_req
 
-let exit_function_handler b =
+let exit_function_handler main_window b =
   if not b && not (files_need_saving ()) then
     exit_function_unsafe ()
   else
     let answer =
-      GToolbox.question_box
+      GToolbox.question_box ~parent:main_window
         ~title:"Why3 saving session and files"
         ~buttons:["Yes"; "No"; "Cancel"]
         "Do you want to save the session and unsaved files?"
@@ -2016,7 +2016,7 @@ let search_forward =
         let iter = view#buffer#get_iter_at_mark `SEL_BOUND in
         let search_string =
           let find = if forward then "Forward search" else "Backward search" in
-          GToolbox.input_string ~title:find ~ok:"Search"
+          GToolbox.input_string ~title:find ~parent:main_window ~ok:"Search"
             ~cancel:"Cancel" ~text:!last_search
             "Type a string to find in the current document"
         in
@@ -2763,7 +2763,7 @@ let treat_notification n =
                         "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
-  | Saving_needed b -> exit_function_handler b
+  | Saving_needed b -> exit_function_handler main_window b
   | Message (msg)                 -> treat_message_notification msg
   | Task (id, s, list_loc, goal_loc, lang)        ->
      if is_selected_alone id then
