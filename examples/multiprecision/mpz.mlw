@@ -97,12 +97,23 @@ val set_size (x:mpz_ptr) (sz:int32) (ghost p: ptr limb) : unit
 
 (* Sets the size of an mpz_ptr to 0 *)
 val set_size_0 (x:mpz_ptr) : unit
-  requires { mpz.readers[x] = -1 }
+  requires { mpz.readers[x] = - 1 \/ mpz.readers[x] = 0 }
   writes   { mpz.abs_size }
   writes   { mpz.abs_value_of }
   ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
   ensures  { mpz.abs_size[x] = 0 }
   ensures  { mpz.abs_value_of[x] = 0 }
+
+(* Sets the size of an mpz_ptr to minus its former size. *)
+val wmpz_minus (x:mpz_ptr) : unit
+  requires { mpz.readers[x] = -1 }
+  writes   { mpz.abs_size }
+  writes   { mpz.abs_value_of }
+  writes   { mpz.sgn }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.sgn[x] = - old mpz.sgn[x] }
+  ensures  { mpz.abs_size[x] = old mpz.abs_size[x] }
+  ensures  { mpz.abs_value_of[x] = old mpz.abs_value_of[x] }
 
 val set_alloc (x:mpz_ptr) (al:int32) : unit
   requires { mpz.abs_size[x] <= al }
