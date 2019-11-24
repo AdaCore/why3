@@ -1,0 +1,262 @@
+module Apply
+
+  predicate is_even (x: int)
+  predicate is_zero (x: int)
+  axiom zero_is_even: forall x: int. is_zero x -> is_even x
+
+  goal G: is_even 0
+
+end
+
+
+module Transitivity
+
+  (* Apply *)
+  val constant a : int
+  val constant b : int
+  val constant c : int
+
+  axiom ac: a = c
+  axiom cb: c = b
+  axiom transitivity : forall x y z:int. x = y -> y = z -> x = z
+  goal G : a = b
+end
+
+module Transitivity2
+
+  (* Apply *)
+  val constant a : int
+  val constant b : int
+  val constant c : int
+
+  axiom ac: a = c
+  axiom cb: c = b
+  axiom t : forall x y z k:int. k = k -> x = y -> y = z -> x = z
+  goal G : a = b
+end
+
+module Assert
+
+  predicate is_prime int
+  val constant n : int
+
+  goal G: not (is_prime n)
+
+end
+
+module Case
+
+  val constant y : int
+  val constant x : int
+  goal G: if x = 0 then y = 2 else y = 3
+
+end
+
+module Destruct
+
+  val constant p1 : bool
+  predicate p2 int
+
+  axiom h: p1 /\ forall x. p2 x
+
+  goal G: p2 0
+
+end
+
+module Destruct_rec
+
+  predicate a
+  predicate b
+  predicate c
+
+  axiom H: (a -> b) /\ (b /\ c)
+
+  goal G: false
+
+end
+
+module Destruct_term
+
+  type t = A | B int
+
+  val constant a : t
+
+  goal G: a = A
+
+
+end
+
+module Exists
+
+  goal G: exists x. x = 0
+
+end
+
+module Hide
+
+  use int.Int
+  val constant y : int
+  axiom h: forall x. x = 1 + 1
+
+  goal G: y - (1 + 1) = (1+1) - (1+ 1)
+
+end
+
+module Induction
+
+  use int.Int
+
+  val constant n : int
+  predicate p int
+  predicate p1 int
+  axiom h: p1 n
+
+  goal G: p n
+
+end
+
+
+module Instantiate
+
+  use int.Int
+
+  predicate p int
+  axiom h: forall x y. x <= y -> p x /\ p y
+  goal G: p 0
+
+end
+
+module Intros
+
+  predicate p int int int
+  goal G: forall x y z: int. p x y z
+
+end
+
+module Left
+
+  val constant x: int
+  goal G: x = 0 \/ x = 1
+
+end
+
+
+module Pose
+
+  use int.Int
+
+  val constant x: int
+  goal G : true
+
+end
+
+module Remove
+
+  axiom h: true
+
+  goal G: true
+
+end
+
+module Replace
+
+  use int.Int
+
+  val constant x: int
+  val constant y: int
+  axiom h : x >= y + 1
+
+  goal G: true
+end
+
+module Revert
+
+  val constant x: int
+  val constant y: int
+  axiom h: x = y
+
+  goal G: true
+
+end
+
+module Rewrite
+
+  (* rewrite *)
+  function a int : bool
+  function b int : bool
+
+  val constant y: int
+  axiom eq: forall x. x <> 0 -> a x = b x
+
+  goal G : a y = true
+end
+
+module Rewrite2
+
+  (* rewrite *)
+
+  function a int : bool
+  function b int : bool
+
+  val constant y: int
+  axiom eq: forall x z. z = 0 -> x <> 0 -> a x = b x
+
+  goal G : a y = true
+end
+
+
+module Right
+
+  val constant x: int
+  goal G: x = 0 \/ x = 1
+
+end
+
+module Subst
+
+  use int.Int
+
+  val constant x: int
+  val constant y: int
+  val constant z: int
+  axiom h: x = y + 1
+  axiom h1 : z = x + y
+
+  goal G: x = z
+
+end
+
+module Subst_all
+
+  use int.Int
+
+  val constant x: int
+  val constant x1: int
+  val constant y: int
+  val constant z: int
+  axiom h: x = y + 1
+  axiom hx1: x = x1
+  axiom h1 : z = x + y
+
+  goal G: x = z
+
+end
+
+module Unfold
+
+  use int.Int
+
+  predicate p (x: int) = x <= 22
+
+  axiom h: forall x. p x -> p (x - 1)
+
+  goal G: p 21
+
+end
+
+module Use_th
+
+  predicate p int
+
+  goal G: p 5
+end
