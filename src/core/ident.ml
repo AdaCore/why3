@@ -342,7 +342,7 @@ let sanitizer head rest n = sanitizer' head rest rest n
 let proxy_attr = create_attribute "mlw:proxy_symbol"
 
 let useraxiom_attr = create_attribute "useraxiom"
-               
+
 let model_projected_attr = create_attribute "model_projected"
 let model_vc_post_attr = create_attribute "model_vc_post"
 
@@ -480,6 +480,13 @@ let get_element_name ~attrs =
     | ["name"; content] when Re.Str.string_match correct_word content 0 ->
         Some content
     | _ -> None
+
+let suffix_attr_name ~attrs suffix =
+  Sattr.fold (fun x acc ->
+      if is_name_attr x then
+          Sattr.add (create_attribute (x.attr_string ^ suffix)) acc
+      else
+        Sattr.add x acc) attrs Sattr.empty
 
 let id_unique_attr printer ?(sanitizer = same) id =
   try

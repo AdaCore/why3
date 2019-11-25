@@ -10,6 +10,7 @@
 (********************************************************************)
 
 {
+  open Why3
   open Ada_parser
 
   let keywords = Hashtbl.create 97
@@ -17,84 +18,34 @@
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
       [
-        "alias", ALIAS;
+        "all", ALL; (* Ada specific *)
+        "and", AND;  (* Ada specific *)
         "as", AS;
-        "axiom", AXIOM;
         "by", BY;
-        "clone", CLONE;
-        "coinductive", COINDUCTIVE;
-        "constant", CONSTANT;
         "else", ELSE;
         "end", END;
-        "epsilon", EPSILON;
-        "exists", EXISTS;
-        "export", EXPORT;
         "false", FALSE;
         "float", FLOAT;
-        "forall", FORALL;
-        "function", FUNCTION;
-        "goal", GOAL;
+        "for", FOR; (* Ada specific *)
         "if", IF;
-        "import", IMPORT;
         "in", IN;
-        "inductive", INDUCTIVE;
-        "lemma", LEMMA;
         "let", LET;
         "match", MATCH;
-        "meta", META;
         "not", NOT;
-        "partial", PARTIAL;
-        "predicate", PREDICATE;
+        "or", OR; (* Ada specific *)
         "range", RANGE;
-        "scope", SCOPE;
         "so", SO;
+        "some", SOME; (* Ada specific *)
         "then", THEN;
-        "theory", THEORY;
         "true", TRUE;
-        "type", TYPE;
-        "use", USE;
         "with", WITH;
         (* programs *)
-        "abstract", ABSTRACT;
-        "absurd", ABSURD;
-        "any", ANY;
-        "assert", ASSERT;
-        "assume", ASSUME;
         "at", AT;
         "begin", BEGIN;
-        "break", BREAK;
-        "check", CHECK;
-        "continue", CONTINUE;
-        "diverges", DIVERGES;
-        "do", DO;
-        "done", DONE;
-        "downto", DOWNTO;
-        "ensures", ENSURES;
-        "exception", EXCEPTION;
-        "for", FOR;
         "fun", FUN;
         "ghost", GHOST;
-        "invariant", INVARIANT;
-        "label", LABEL;
-        "module", MODULE;
-        "mutable", MUTABLE;
         "old", OLD;
-        "private", PRIVATE;
-        "pure", PURE;
-        "raise", RAISE;
-        "raises", RAISES;
-        "reads", READS;
-        "rec", REC;
         "ref", REF;
-        "requires", REQUIRES;
-        "return", RETURN;
-        "returns", RETURNS;
-        "to", TO;
-        "try", TRY;
-        "val", VAL;
-        "variant", VARIANT;
-        "while", WHILE;
-        "writes", WRITES;
       ]
 }
 
@@ -115,11 +66,11 @@ let lalpha = ['a'-'z']
 let ualpha = ['A'-'Z']
 let alpha  = ['a'-'z' 'A'-'Z']
 
-let suffix = (alpha | quote* dec_sep)* quote*
+let suffix = (alpha | dec_sep)*
 let lident = ['a'-'z' '_'] suffix
 let uident = ['A'-'Z'] suffix
 
-let core_suffix = quote alpha suffix
+let core_suffix = alpha suffix
 let core_lident = lident core_suffix+
 let core_uident = uident core_suffix+
 
@@ -149,6 +100,7 @@ rule token = parse
       { Lexing.new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
+  | quote { QUOTE }
   | '_'
       { UNDERSCORE }
   | lident as id
@@ -201,6 +153,8 @@ rule token = parse
       { COLON }
   | ";"
       { SEMICOLON }
+  | "=>"
+      { DARROW }
   | "->"
       { ARROW }
   | "->'"
@@ -209,14 +163,6 @@ rule token = parse
       { LARROW }
   | "<->"
       { LRARROW }
-  | "&&"
-      { AMPAMP }
-  | "||"
-      { BARBAR }
-  | "/\\"
-      { AND }
-  | "\\/"
-      { OR }
   | "."
       { DOT }
   | ".."
@@ -229,8 +175,8 @@ rule token = parse
       { LT }
   | ">"
       { GT }
-  | "<>"
-      { LTGT }
+  | "/="
+      { LTGT } (* Ada specific *)
   | "="
       { EQUAL }
   | "-"
@@ -255,14 +201,14 @@ rule token = parse
       { OP3 s }
   | op_char_4+ as s
       { OP4 s }
-  | "\""
-      { STRING (Lexlib.string lexbuf) }
   | eof
       { EOF }
   | _ as c
       { Lexlib.illegal_character c lexbuf }
 
 {
+
+  open Why3
 
   let debug = Debug.register_info_flag "print_modules"
     ~desc:"Print@ program@ modules@ after@ typechecking."
@@ -279,18 +225,17 @@ rule token = parse
   let build_parsing_function (parser_entry: Lexing.position -> 'a) lb =
     (* This records the last token which was read (for error messages) *)
     let last = ref EOF in
-    let module I = Parser.MenhirInterpreter in
+    let module I = Ada_parser.MenhirInterpreter in
     let checkpoint = parser_entry lb.Lexing.lex_curr_p
     and supplier =
       I.lexer_lexbuf_to_supplier (fun x -> let t = token x in last := t; t) lb
     and succeed t = t
-    and fail checkpoint =
+    and fail _ =
       let text = Lexing.lexeme lb in
-      let fname = lb.Lexing.lex_curr_p.Lexing.pos_fname in
       (* TODO/FIXME: ad-hoc fix for TryWhy3/Str incompatibility *)
-      let s = if Strings.has_prefix "/trywhy3_input." fname
+      let s = (* TODO changed if Strings.has_prefix "/trywhy3_input." fname
         then None
-        else Report.report text !last checkpoint in
+        else Report.report text !last checkpoint*) Some text in
       (* Typing.close_file is supposedly done at the end of the file in
          parsing.mly. If there is a syntax error, we still need to close it (to
          be able to reload). *)
@@ -298,46 +243,18 @@ rule token = parse
     in
     I.loop_handle succeed fail supplier checkpoint
 
-  open Wstdlib
-  open Ident
-  open Theory
-  open Pmodule
+  let parse_term nt lb =
+    Ada_nametable.set_naming_table nt;
+    build_parsing_function Ada_parser.Incremental.term_eof lb
 
-  let parse_term lb =
-    build_parsing_function Parser.Incremental.term_eof lb
+  let parse_term_list nt lb =
+    Ada_nametable.set_naming_table nt;
+    build_parsing_function Ada_parser.Incremental.term_comma_list_eof lb
 
-  let parse_decl lb = build_parsing_function Parser.Incremental.decl_eof lb
+  let parse_qualid lb = build_parsing_function Ada_parser.Incremental.qualid_eof lb
 
-  let parse_term_list lb = build_parsing_function Parser.Incremental.term_comma_list_eof lb
+  let parse_list_ident lb = build_parsing_function Ada_parser.Incremental.ident_comma_list_eof lb
 
-  let parse_qualid lb = build_parsing_function Parser.Incremental.qualid_eof lb
-
-  let parse_list_ident lb = build_parsing_function Parser.Incremental.ident_comma_list_eof lb
-
-  let parse_list_qualid lb = build_parsing_function Parser.Incremental.qualid_comma_list_eof lb
-
-  let parse_mlw_file lb = build_parsing_function Parser.Incremental.mlw_file_parsing_only lb
-
-  let read_channel env path file c =
-    let lb = Lexing.from_channel c in
-    Loc.set_file file lb;
-    Typing.open_file env path;
-    let mm =
-      try
-        build_parsing_function Parser.Incremental.mlw_file lb
-      with
-        e -> ignore (Typing.discard_file ()); raise e
-    in
-    if path = [] && Debug.test_flag debug then begin
-      let print_m _ m = Format.eprintf "%a@\n@." print_module m in
-      let add_m _ m mm = Mid.add m.mod_theory.th_name m mm in
-      Mid.iter print_m (Mstr.fold add_m mm Mid.empty)
-    end;
-    mm
-
-  let whyml_format = "whyml"
-
-  let () = Env.register_format mlw_language whyml_format ["mlw";"why"]
-      read_channel ~desc:"WhyML@ programming@ and@ specification@ language"
+  let parse_list_qualid lb = build_parsing_function Ada_parser.Incremental.qualid_comma_list_eof lb
 
 }
