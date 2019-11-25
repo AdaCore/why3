@@ -23,6 +23,9 @@ val parse_list_ident: Lexing.lexbuf -> Ptree.ident list
 
 val parse_mlw_file: Lexing.lexbuf -> Ptree.mlw_file
 
+val read_channel: Env.env -> Env.pathname -> string -> in_channel ->
+  Pmodule.mlw_file
+
 (* Name of the registered format for whyml *)
 val whyml_format: Env.fformat
 

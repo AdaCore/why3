@@ -92,9 +92,9 @@ let add_registered_lang lang print_ext_any =
     Hashtbl.add registered_lang lang print_ext_any
 
 (* Printing of task *)
-let print_ext_any (lang:string) print_any =
+let print_ext_any task (lang:string) print_any =
   match Hashtbl.find registered_lang lang with
-  | print_ext_any -> print_ext_any print_any
+  | print_ext_any -> print_ext_any task print_any
   | exception Not_found -> print_any
 
 module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
@@ -115,14 +115,14 @@ let lang ses any =
 
 let p s id =
   let lang = lang s (APn id) in
-  let _,tables = Session_itp.get_task_name_table s id in
+  let task,tables = Session_itp.get_task_name_table s id in
   (* We use snapshots of printers to avoid registering new values inside it
      only for exception messages.
   *)
   let pr = Ident.duplicate_ident_printer tables.Trans.printer in
   let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
   (* Use the external printer for exception reporting (default is identity) *)
-  (Pretty.create ~print_ext_any:(print_ext_any lang) pr apr pr pr false)
+  (Pretty.create ~print_ext_any:(print_ext_any task lang) pr apr pr pr false)
 
 let print_opt_type ~print_type fmt t =
   match t with
@@ -908,7 +908,7 @@ end
       let apr = tables.Trans.aprinter in
       (* For task printing we use the external printer (the default one is
          identity). *)
-      let module P = (val Pretty.create ~print_ext_any:(print_ext_any lang) pr apr
+      let module P = (val Pretty.create ~print_ext_any:(print_ext_any task lang) pr apr
                          pr pr false) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in

@@ -27,7 +27,7 @@ end
 (* A specific external way to print task. This registered an external printer
    for printing tasks. This is combined with the standard printer (see Pretty).
 *)
-val add_registered_lang: string -> (any_pp Pp.pp -> any_pp Pp.pp) -> unit
+val add_registered_lang: string -> (Task.task -> any_pp Pp.pp -> any_pp Pp.pp) -> unit
 
 module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
 
