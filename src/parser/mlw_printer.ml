@@ -541,10 +541,9 @@ and pp_term fmt t =
       pp_infix pp_term term_closed fmt t1 op t2
   | Tinnfix _ ->
       todo fmt "Tinnfix _"
-  | Tbinop (t1, op, t2) ->
-      fprintf fmt "@[<hv 2>%a %a@ %a@]" pp_term t1 pp_binop op pp_term t2
-  | Tbinnop _ ->
-      todo fmt "Tbinnop"
+  | Tbinop (t1, op, t2)
+  | Tbinnop (t1, op, t2) ->
+      fprintf fmt "@[<hv 2>%a %a@ %a@]" pp_term' t1 pp_binop op pp_term' t2
   | Tnot t ->
       pp_not pp_term term_closed fmt t
   | Tif (t1, t2, t3) ->
