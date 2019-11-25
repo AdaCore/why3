@@ -287,7 +287,7 @@ let wmpz_add (w u v: mpz_ptr) : unit
 use add_1.Add_1
 use sub_1.Sub_1
 
-let mpz_add_ui (w u: mpz_ptr) (v: uint64) : unit
+let wmpz_add_ui (w u: mpz_ptr) (v: uint64) : unit
   requires { mpz.alloc[w] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 }
   requires { mpz.abs_size[u] < max_int32 }

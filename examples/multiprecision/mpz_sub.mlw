@@ -279,7 +279,7 @@ let wmpz_sub (w u v: mpz_ptr) : unit
 use add_1.Add_1
 use sub_1.Sub_1
 
-let mpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
+let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
   requires { mpz.alloc[w] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 }
   requires { mpz.abs_size[u] < max_int32 }
@@ -456,5 +456,184 @@ let mpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
   release_writer w wp;
   return
 
+
+let wmpz_ui_sub (w: mpz_ptr) (uval: uint64) (v:mpz_ptr) : unit
+  requires { mpz.alloc[w] >= 1 }
+  requires { mpz.readers[w] = 0 /\ mpz.readers[v] = 0 }
+  requires { mpz.abs_size[v] < max_int32 }
+  ensures  { value_of w mpz = old (uval - value_of v mpz) }
+  ensures  { forall x. x <> w -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[w] = 0 /\ mpz.readers[v] = 0 }
+=
+  label Start in
+  let ref vsize = size_of v in
+  let ref wsize = 0 in
+  let vw = mpz_eq v w in
+  if vsize > 1
+  then begin
+    let wp = mpz_realloc w vsize in
+    if vw
+    then begin
+      let ghost _b = wmpn_sub_1_in_place wp vsize uval in
+      assert { _b = 0 };
+    end else begin
+      let vp = get_read_ptr v in
+      assert { mpz.abs_size[v] = vsize };
+      let ghost _b = wmpn_sub_1 wp vp vsize uval in
+      assert { _b = 0
+               by value vp vsize >= power radix (vsize - 1)
+               so vsize - 1 >= 1
+               so uval < radix <= power radix (vsize - 1) };
+      release_reader v vp;
+    end;
+    value_tail wp (vsize - 1);
+    assert { (pelts wp)[vsize - 1] = 0
+             -> value wp (vsize - 1) = value wp vsize };
+    wsize <- - (vsize - (if C.get_ofs wp (vsize - 1) = 0 then 1 else 0));
+    assert { sgn_value wp wsize = old (uval - value_of v mpz)
+             by sgn_value wp wsize = - value wp (-wsize)
+             so if (pelts wp)[vsize - 1] = 0
+                then value wp (-wsize) = value wp (vsize - 1) = value wp vsize
+                else value wp (-wsize) = value wp vsize
+             so - value wp (-wsize) = - value wp vsize
+                = old (uval - value_of v mpz) };
+    assert { wsize = 0 \/ value wp (abs wsize) >= power radix (abs wsize - 1)
+             by value wp (abs wsize) = value wp vsize
+                = value_of v mpz - uval
+                >= power radix (abs wsize - 1)
+                by power radix (vsize - 2) + uval
+                   <= power radix (vsize - 2)
+                      + (radix - 1) * power radix (vsize - 2)
+                   = radix * power radix (vsize - 2)
+                   = power radix (vsize - 1)
+                so if (pelts wp)[vsize - 1] = 0
+                then abs wsize = vsize - 1
+                so value_of v mpz >= power radix (vsize - 1)
+                so value_of v mpz - uval
+                   >= power radix (vsize - 1) - uval
+                   >= power radix (vsize - 2)
+                   = power radix (abs wsize - 1)
+                else value wp (abs wsize)
+                     = value wp vsize
+                     = value wp (vsize - 1)
+                       + power radix (vsize - 1) * (pelts wp)[vsize - 1]
+                     >= power radix (vsize - 1) * (pelts wp)[vsize - 1]
+                     >= power radix (vsize - 1)
+                     = power radix (abs wsize - 1)};
+    set_size w wsize wp;
+    release_writer w wp
+  end else if vsize = 1 then begin
+    let wp = get_write_ptr w in
+    if vw
+    then if uval >= C.get wp
+      then begin
+        C.set wp (uval - C.get wp);
+        wsize <- (if C.get wp <> 0 then 1 else 0);
+        assert { sgn_value wp wsize = old (uval - value_of v mpz)
+                 by if (pelts wp)[0] = 0
+                 then uval = old value_of v mpz
+                      so value wp 0 = 0
+                 else sgn_value wp wsize = value wp 1
+                      = old (uval - value_of v mpz) };
+      end else begin
+        C.set wp (C.get wp - uval);
+        wsize <- -1;
+        assert { sgn_value wp wsize = - value wp 1
+                 = old (uval - value_of v mpz) };
+      end
+    else begin
+      let vp = get_read_ptr v in
+      if uval >= C.get vp
+      then begin
+        C.set wp (uval - C.get vp);
+        wsize <- (if C.get wp <> 0 then 1 else 0);
+        assert { sgn_value wp wsize = old (uval - value_of v mpz)
+                 by if (pelts wp)[0] = 0
+                 then uval = old value_of v mpz
+                      so value wp 0 = 0
+                 else sgn_value wp wsize = value wp 1
+                      = old (uval - value_of v mpz) };
+      end else begin
+        C.set wp (C.get vp - uval);
+        wsize <- -1;
+        assert { sgn_value wp wsize = - value wp 1
+                 = old (uval - value_of v mpz) };
+      end;
+      release_reader v vp;
+    end;
+    set_size w wsize wp;
+    release_writer w wp
+  end else if vsize = 0 then begin
+    let wp = get_write_ptr w in
+    C.set wp uval;
+    wsize <- (if uval <> 0 then 1 else 0);
+    assert { wsize <> 0 -> value wp (abs wsize)
+             = uval >= power radix (abs wsize - 1)
+             by wsize = 1 };
+    set_size w wsize wp;
+    release_writer w wp
+  end else begin
+    assert { vsize < 0 };
+    label Opp in
+    vsize <- -vsize;
+    let wp = mpz_realloc w (vsize+1) in
+    if vw
+    then begin
+      let cy = wmpn_add_1_in_place wp vsize uval in
+      assert { value wp vsize + power radix vsize * cy
+               = - value_of v mpz + uval };
+      C.set_ofs wp vsize cy;
+      value_tail wp vsize;
+      wsize <- vsize + (if cy <> 0 then 1 else 0);
+      assert { value wp (vsize + 1) = value wp vsize + power radix vsize * cy };
+      assert { value wp (abs wsize) = value wp wsize
+               = value wp vsize + power radix vsize * cy
+               = - value_of v mpz + uval };
+      assert { wsize = 0 \/ value wp (abs wsize) >= power radix (abs wsize - 1)
+               by value wp (abs wsize)
+                  = uval - value_of v mpz
+                  >= power radix (abs wsize - 1)
+                  by if cy <> 0
+                  then abs wsize = vsize + 1
+                       so value wp (abs wsize)
+                          = value wp vsize + power radix vsize * cy
+                          >= power radix vsize
+                  else abs wsize = vsize
+                       so mpz.abs_value_of[v] >= power radix (vsize - 1)
+                       so value_of v mpz < 0
+                       so value wp (abs wsize) = uval + mpz.abs_value_of[v]
+                          >= power radix (vsize - 1) };
+    end else begin
+      let vp = get_read_ptr v in
+      assert { vsize = mpz.abs_size[v] };
+      let cy = wmpn_add_1 wp vp vsize uval in
+      assert { value wp vsize + power radix vsize * cy
+               = - value_of v mpz + uval };
+      C.set_ofs wp vsize cy;
+      value_tail wp vsize;
+      wsize <- vsize + (if cy <> 0 then 1 else 0);
+      assert { value wp (vsize + 1) = value wp vsize + power radix vsize * cy };
+      assert { value wp (abs wsize) = value wp wsize
+               = value wp vsize + power radix vsize * cy
+               = - value_of v mpz + uval };
+      assert { wsize = 0 \/ value wp (abs wsize) >= power radix (abs wsize - 1)
+               by value wp (abs wsize)
+                  = uval - value_of v mpz
+                  >= power radix (abs wsize - 1)
+                  by if cy <> 0
+                  then abs wsize = vsize + 1
+                       so value wp (abs wsize)
+                          = value wp vsize + power radix vsize * cy
+                          >= power radix vsize
+                  else abs wsize = vsize
+                       so mpz.abs_value_of[v] >= power radix (vsize - 1)
+                       so value_of v mpz < 0
+                       so value wp (abs wsize) = uval + mpz.abs_value_of[v]
+                          >= power radix (vsize - 1) };
+      release_reader v vp;
+    end;
+    set_size w wsize wp;
+    release_writer w wp
+  end
 
 end
