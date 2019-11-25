@@ -41,10 +41,10 @@ let prover_files_dir wc_prover =
 let resize_shape sh limit =
   let index = ref 0 in
   let sh_len = String.length sh in
-  let separator_re = Str.regexp "__" in
+  let separator_re = Re.Str.regexp "__" in
   (try
     while (sh_len - !index) >= limit do
-      index := (Str.search_forward separator_re sh !index) + 2
+      index := (Re.Str.search_forward separator_re sh !index) + 2
     done;
     String.sub sh !index (sh_len - !index)
   with

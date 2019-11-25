@@ -90,10 +90,10 @@
   let apply_partial part e =
     if part <> Partial then e else
     let ed = match e.expr_desc with
-      | Efun (_::_ as bl, op, m, s, ex) ->
-          Efun (bl, op, m, apply_partial_sp part s, ex)
-      | Eany (_::_ as pl, rsk, op, m, s) ->
-          Eany (pl, rsk, op, m, apply_partial_sp part s)
+      | Efun (_::_ as bl, op, p, m, s, ex) ->
+          Efun (bl, op, p, m, apply_partial_sp part s, ex)
+      | Eany (_::_ as pl, rsk, op, p,  m, s) ->
+          Eany (pl, rsk, op, p, m, apply_partial_sp part s)
       | _ ->
           Loc.errorm ~loc:e.expr_loc
             "this expression cannot be declared partial" in
@@ -164,7 +164,7 @@
   let error_loc loc = Loc.error ~loc Error
 
   let () = Exn_printer.register (fun fmt exn -> match exn with
-    | Error -> Format.fprintf fmt "syntax error"
+    | Error -> Format.fprintf fmt "syntax error %s" (Parser_messages.message 1)
     | _ -> raise exn)
 
   let core_ident_error  = format_of_string
@@ -279,7 +279,9 @@
 (* Entry points *)
 
 %start <Pmodule.pmodule Wstdlib.Mstr.t> mlw_file
+%start <Ptree.mlw_file> mlw_file_parsing_only
 %start <Ptree.term> term_eof
+%start <Ptree.decl> decl_eof
 %start <Ptree.qualid> qualid_eof
 %start <Ptree.qualid list> qualid_comma_list_eof
 %start <Ptree.term list> term_comma_list_eof
@@ -287,10 +289,14 @@
 
 %%
 
-(* parsing of a single term *)
+(* parsing of a single term or a single decl *)
 
 term_eof:
 | term EOF { $1 }
+
+decl_eof:
+| pure_decl EOF { $1 }
+| prog_decl EOF { $1 }
 
 (* Modules and scopes *)
 
@@ -302,17 +308,33 @@ mlw_file:
     { let loc = floc $startpos($3) $endpos($3) in
       Typing.close_module loc; Typing.close_file () }
 
+mlw_file_parsing_only:
+| EOF { (Modules([])) }
+| mlw_module_parsing_only mlw_module_no_decl_parsing_only* EOF { (Modules( [$1] @ $2)) }
+| module_decl_parsing_only module_decl_no_head_parsing_only* EOF { (Decls( [$1] @ $2)) }
+
 mlw_module:
 | module_head module_decl_no_head* END
     { Typing.close_module (floc $startpos($3) $endpos($3)) }
+
+mlw_module_parsing_only:
+| module_head_parsing_only module_decl_no_head_parsing_only* END { ($1,$2) }
 
 module_head:
 | THEORY attrs(uident_nq)  { Typing.open_module $2 }
 | MODULE attrs(uident_nq)  { Typing.open_module $2 }
 
+module_head_parsing_only:
+| THEORY attrs(uident_nq)  { $2 }
+| MODULE attrs(uident_nq)  { $2 }
+
 scope_head:
-| SCOPE boption(IMPORT) uident
+| SCOPE boption(IMPORT) attrs(uident_nq)
     { Typing.open_scope (floc $startpos $endpos) $3; $2 }
+
+scope_head_parsing_only:
+| SCOPE boption(IMPORT) attrs(uident_nq)
+    { let loc = floc $startpos $endpos in (loc, $2, $3) }
 
 module_decl:
 | scope_head module_decl* END
@@ -325,6 +347,15 @@ module_decl:
     }
 | use_clone { () }
 
+module_decl_parsing_only:
+| scope_head_parsing_only module_decl_parsing_only* END
+    { let loc,import,qid = $1 in (Dscope(loc,import,qid,$2))}
+| IMPORT uqualid { (Dimport $2) }
+| d = pure_decl | d = prog_decl | d = meta_decl { d }
+| use_clone_parsing_only { $1 }
+
+(* Do not open inside another module *)
+
 mlw_module_no_decl:
 | SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
    { let loc = floc $startpos $endpos in
@@ -332,11 +363,25 @@ mlw_module_no_decl:
 | mlw_module
    { $1 }
 
+mlw_module_no_decl_parsing_only:
+| SCOPE | IMPORT | USE | CLONE | pure_decl | prog_decl | meta_decl
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| mlw_module_parsing_only
+   { $1 }
+
 module_decl_no_head:
 | THEORY | MODULE
    { let loc = floc $startpos $endpos in
      Loc.errorm ~loc "trying to open a module inside another module" }
 | module_decl
+   { $1 }
+
+module_decl_no_head_parsing_only:
+| THEORY | MODULE
+   { let loc = floc $startpos $endpos in
+     Loc.errorm ~loc "trying to open a module inside another module" }
+| module_decl_parsing_only
    { $1 }
 
 (* Use and clone *)
@@ -370,6 +415,22 @@ use_clone:
       let decl = Ptree.Dcloneimport(loc,import,$3,as_opt,$5) in
       Typing.add_decl loc decl
     }
+use_clone_parsing_only:
+| USE EXPORT tqualid
+    { (Duseexport $3) }
+| CLONE EXPORT tqualid clone_subst
+    { (Dcloneexport ($3, $4)) }
+| USE boption(IMPORT) m_as_list = comma_list1(use_as)
+    { let loc = floc $startpos $endpos in
+      let exists_as = List.exists (fun (_, q) -> q <> None) m_as_list in
+      if $2 && not exists_as then Warning.emit ~loc
+        "the keyword `import' is redundant here and can be omitted";
+      (Duseimport (loc, $2, m_as_list)) }
+| CLONE boption(IMPORT) tqualid option(preceded(AS, uident)) clone_subst
+    { let loc = floc $startpos $endpos in
+      if $2 && $4 = None then Warning.emit ~loc
+        "the keyword `import' is redundant here and can be omitted";
+      (Dcloneimport (loc, $2, $3, $4, $5)) }
 
 use_as:
 | n = tqualid q = option(preceded(AS, uident)) { (n, q) }
@@ -424,7 +485,7 @@ pure_decl:
 | PREDICATE predicate_decl with_logic_decl* { Dlogic ($2::$3) }
 | INDUCTIVE   with_list1(inductive_decl)    { Dind (Decl.Ind, $2) }
 | COINDUCTIVE with_list1(inductive_decl)    { Dind (Decl.Coind, $2) }
-| AXIOM attrs(ident_nq) COLON term          { Dprop (Decl.Paxiom, $2, $4) }
+| AXIOM attrs(ident_nq) COLON term          { Dprop (Decl.Paxiom, { $2 with id_ats = (Ptree.ATstr Ident.useraxiom_attr)::$2.id_ats; }, $4) }
 | LEMMA attrs(ident_nq) COLON term          { Dprop (Decl.Plemma, $2, $4) }
 | GOAL  attrs(ident_nq) COLON term          { Dprop (Decl.Pgoal, $2, $4) }
 
@@ -702,8 +763,8 @@ single_term_:
     { Tat ($1, $3) }
 | prefix_op single_term %prec prec_prefix_op
     { Tidapp (Qident $1, [$2]) }
-| MINUS numeral
-    { Tconst (Number.neg $2) }
+| minus_numeral
+    { Tconst $1 }
 | l = single_term ; o = bin_op ; r = single_term
     { Tbinop (l, o, r) }
 | l = single_term ; o = infix_op_1 ; r = single_term
@@ -756,6 +817,7 @@ term_arg_:
 | qualid                    { Tident $1 }
 | AMP qualid                { Tasref $2 }
 | numeral                   { Tconst $1 }
+| STRING                    { Tconst (Constant.ConstStr $1) }
 | TRUE                      { Ttrue }
 | FALSE                     { Tfalse }
 | o = oppref ; a = term_arg { Tidapp (Qident o, [a]) }
@@ -822,9 +884,13 @@ quant:
 | FORALL  { Dterm.DTforall }
 | EXISTS  { Dterm.DTexists }
 
+minus_numeral:
+| MINUS INTEGER { Constant.(ConstInt (Number.neg_int $2)) }
+| MINUS REAL    { Constant.(ConstReal (Number.neg_real $2))}
+
 numeral:
-| INTEGER { Number.ConstInt $1 }
-| REAL    { Number.ConstReal $1 }
+| INTEGER { Constant.ConstInt $1 }
+| REAL    { Constant.ConstReal $1 }
 
 (* Program declarations *)
 
@@ -875,7 +941,7 @@ rec_defn:
       let spec = apply_return pat (spec_union $6 $8) in
       let id = mk_id return_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id, mask, $9) } in
-      $3, ghost $1, $2, $4, ty, mask, apply_partial_sp $1 spec, e }
+      $3, ghost $1, $2, $4, ty, pat, mask, apply_partial_sp $1 spec, e }
 
 fun_defn:
 | binders return_opt spec EQUAL spec seq_expr
@@ -883,17 +949,17 @@ fun_defn:
       let spec = apply_return pat (spec_union $3 $5) in
       let id = mk_id return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, mask, $6) } in
-      Efun ($1, ty, mask, spec, e) }
+      Efun ($1, ty, pat, mask, spec, e) }
 
 fun_decl:
 | params1 return_opt spec
     { let pat, ty, mask = $2 in
-      Eany ($1, Expr.RKnone, ty, mask, apply_return pat $3) }
+      Eany ($1, Expr.RKnone, ty, pat, mask, apply_return pat $3) }
 
 const_decl:
 | return_opt spec
     { let pat, ty, mask = $1 in
-      Eany ([], Expr.RKnone, ty, mask, apply_return pat $2) }
+      Eany ([], Expr.RKnone, ty, pat, mask, apply_return pat $2) }
 
 const_defn:
 | cast EQUAL seq_expr   { { $3 with expr_desc = Ecast ($3, $1) } }
@@ -912,7 +978,8 @@ seq_expr:
 contract_expr:
 | assign_expr %prec prec_no_spec  { $1 }
 | assign_expr single_spec spec
-    { let d = Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $1) in
+    { let p = mk_pat Pwild $startpos $endpos in
+      let d = Efun ([], None, p, Ity.MaskVisible, spec_union $2 $3, $1) in
       let d = Eattr (ATstr Vc.wb_attr, mk_expr d $startpos $endpos) in
       mk_expr d $startpos $endpos }
 
@@ -973,8 +1040,8 @@ single_expr_:
     { Enot $2 }
 | prefix_op single_expr %prec prec_prefix_op
     { Eidapp (Qident $1, [$2]) }
-| MINUS numeral
-    { Econst (Number.neg $2) }
+| minus_numeral
+    { Econst $1 }
 | l = single_expr ; o = infix_op_1 ; r = single_expr
     { Einfix (l,o,r) }
 | l = single_expr ; o = infix_op_234 ; r = single_expr
@@ -1022,7 +1089,8 @@ single_expr_:
 | FUN binders spec ARROW spec seq_expr
     { let id = mk_id return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, Ity.MaskVisible, $6) } in
-      Efun ($2, None, Ity.MaskVisible, spec_union $3 $5, e) }
+      let p = mk_pat Pwild $startpos $endpos in
+      Efun ($2, None, p, Ity.MaskVisible, spec_union $3 $5, e) }
 | ANY return_named spec
     { let pat, ty, mask = $2 in
       let loc = floc $startpos $endpos in
@@ -1037,7 +1105,8 @@ single_expr_:
         "this expression must terminate";
       let pre = pre_of_any loc ty spec.sp_post in
       let spec = { spec with sp_pre = spec.sp_pre @ pre } in
-      Eany ([], Expr.RKnone, Some ty, mask, spec) }
+      let p = mk_pat Pwild $startpos $endpos in
+      Eany ([], Expr.RKnone, Some ty, p, mask, spec) }
 | VAL ghost kind attrs(lident_rich) mk_expr(fun_decl) IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | VAL ghost kind sym_binder mk_expr(const_decl) IN seq_expr
@@ -1123,6 +1192,7 @@ expr_arg_:
 | qualid                    { Eident $1 }
 | AMP qualid                { Easref $2 }
 | numeral                   { Econst $1 }
+| STRING                    { Econst (Constant.ConstStr $1) }
 | TRUE                      { Etrue }
 | FALSE                     { Efalse }
 | o = oppref ; a = expr_arg { Eidapp (Qident o, [a]) }
@@ -1135,10 +1205,12 @@ expr_dot_:
 
 expr_block_:
 | BEGIN single_spec spec seq_expr END
-    { Efun ([], None, Ity.MaskVisible, spec_union $2 $3, $4) }
+    { let p = mk_pat Pwild $startpos $endpos in
+      Efun ([], None, p, Ity.MaskVisible, spec_union $2 $3, $4) }
 | BEGIN single_spec spec END
     { let e = mk_expr (Etuple []) $startpos $endpos in
-      Efun ([], None, Ity.MaskVisible, spec_union $2 $3, e) }
+      let p = mk_pat Pwild $startpos $endpos in
+      Efun ([], None, p, Ity.MaskVisible, spec_union $2 $3, e) }
 | BEGIN seq_expr END                                { $2.expr_desc }
 | LEFTPAR seq_expr RIGHTPAR                         { $2.expr_desc }
 | BEGIN END                                         { Etuple [] }
@@ -1233,7 +1305,7 @@ single_spec:
     { { empty_spec with sp_variant = $1 } }
 
 alias:
-| term WITH term  { $1, $3 }
+| single_term WITH single_term  { $1, $3 }
 
 ensures:
 | term

@@ -85,6 +85,10 @@
 %nonassoc LEFTSQ
 
 %start file
+(* Transformations entries *)
+%start <Why3.Ptree.term> term_eof
+%start <Why3.Ptree.term list> term_comma_list_eof
+%start <Why3.Ptree.ident list> ident_comma_list_eof
 
 %type <Py_ast.file> file
 %type <Py_ast.decl> stmt
@@ -310,7 +314,7 @@ term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
 | ident       { Tident (Qident $1) }
-| INTEGER     { Tconst Number.(ConstInt (int_literal ILitDec ~neg:false $1)) }
+| INTEGER     { Tconst (Constant.ConstInt Number.(int_literal ILitDec ~neg:false $1)) }
 | NONE        { Ttuple [] }
 | TRUE        { Ttrue }
 | FALSE       { Tfalse }
@@ -344,11 +348,26 @@ term_sub_:
 | MINUS { mk_id (Ident.op_prefix "-")  $startpos $endpos }
 
 %inline infix_op_234:
-| DIV    { mk_id "div" $startpos $endpos }
-| MOD    { mk_id "mod" $startpos $endpos }
+| DIV    { mk_id (Ident.op_infix "//") $startpos $endpos }
+| MOD    { mk_id (Ident.op_infix "%") $startpos $endpos }
 | PLUS   { mk_id (Ident.op_infix "+") $startpos $endpos }
 | MINUS  { mk_id (Ident.op_infix "-") $startpos $endpos }
 | TIMES  { mk_id (Ident.op_infix "*") $startpos $endpos }
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }
+
+(* Parsing of a list of qualified identifiers for the ITP *)
+
+(* parsing of a single term *)
+
+term_eof:
+| term EOF { $1 }
+
+ident_comma_list_eof:
+| comma_list1(ident) EOF { $1 }
+
+term_comma_list_eof:
+| comma_list1(term) EOF { $1 }
+(* we use single_term to avoid conflict with tuples, that
+   do not need parentheses *)

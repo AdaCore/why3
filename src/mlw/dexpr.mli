@@ -26,6 +26,7 @@ val dity_of_ity : ity -> dity
 
 val dity_int  : dity
 val dity_real : dity
+val dity_str  : dity
 val dity_bool : dity
 val dity_unit : dity
 
@@ -108,7 +109,7 @@ type dexpr = private {
 and dexpr_node =
   | DEvar of string * dvty * dref
   | DEsym of prog_symbol
-  | DEconst of Number.constant * dity
+  | DEconst of Constant.constant * dity
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dity * mask * dspec later * dexpr
   | DEany of dbinder list * dity * mask * dspec later

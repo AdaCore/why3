@@ -94,7 +94,7 @@ Axiom make'spec :
 Import Zquot.
 
 (* Why3 goal *)
-Theorem prime_numbers'VC :
+Theorem prime_numbers'vc :
   forall (m:Numbers.BinNums.Z), (2%Z <= m)%Z ->
   let p := make m 0%Z in
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < m)%Z ->

@@ -300,6 +300,11 @@ Existing Instance set_WhyType.
 
 Parameter to_fset: set -> set.Fset.fset Numbers.BinNums.Z.
 
+Parameter mk: set.Fset.fset Numbers.BinNums.Z -> set.
+
+Axiom mk'spec :
+  forall (s:set.Fset.fset Numbers.BinNums.Z), ((to_fset (mk s)) = s).
+
 Parameter choose: set -> Numbers.BinNums.Z.
 
 Axiom choose'spec :
@@ -388,7 +393,7 @@ Axiom while_rule_ext :
   valid_triple inv' (Swhile e inv i) (Fand (Fnot (Fterm e)) inv').
 
 (* Why3 goal *)
-Theorem wp'VC :
+Theorem wp'vc :
   forall (i:stmt) (q:fmla), forall (result:fmla),
   (exists x:term, exists x1:fmla, exists x2:stmt,
    (i = (Swhile x x1 x2)) /\
@@ -406,6 +411,7 @@ Theorem wp'VC :
        many_steps sigma pi x2 sigma' pi' Sskip n -> eval_fmla sigma' pi' o1)) /\
      (result = (Fand x1 o1))))) ->
   valid_triple result i q.
+(* Why3 intros i q result (x,(x1,(x2,(h1,(o,(h2,(o1,(h3,h4)))))))). *)
 Proof.
 (* intros i q result (x,(x1,(x2,(h1,(o,(h2,(o1,(h3,h4)))))))). *)
 intros i Post result.

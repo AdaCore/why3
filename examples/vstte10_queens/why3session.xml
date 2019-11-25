@@ -5,7 +5,7 @@
 <prover id="2" name="Z3" version="3.2" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="vstte10_queens.mlw"/>
 <theory name="NQueens" proved="true">
  <goal name="eq_board_set" proved="true">
@@ -23,88 +23,88 @@
  <goal name="consistent_row_eq" proved="true">
  <proof prover="4" timelimit="20" memlimit="0"><result status="valid" time="0.06" steps="41"/></proof>
  </goal>
- <goal name="VC check_is_consistent" expl="VC for check_is_consistent" proved="true">
+ <goal name="check_is_consistent&#39;vc" expl="VC for check_is_consistent" proved="true">
  <proof prover="4"><result status="valid" time="0.02" steps="66"/></proof>
  </goal>
  <goal name="solution_eq_board" proved="true">
  <proof prover="2"><result status="valid" time="0.06"/></proof>
  </goal>
- <goal name="VC bt_queens" expl="VC for bt_queens" proved="true">
+ <goal name="bt_queens&#39;vc" expl="VC for bt_queens" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC bt_queens.0" expl="exceptional postcondition" proved="true">
+  <goal name="bt_queens&#39;vc.0" expl="exceptional postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
-  <goal name="VC bt_queens.1" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.01" steps="4427"/></proof>
+  <goal name="bt_queens&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="4428"/></proof>
   </goal>
-  <goal name="VC bt_queens.2" expl="loop invariant init" proved="true">
+  <goal name="bt_queens&#39;vc.2" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="VC bt_queens.3" expl="index in array bounds" proved="true">
+  <goal name="bt_queens&#39;vc.3" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="VC bt_queens.4" expl="precondition" proved="true">
+  <goal name="bt_queens&#39;vc.4" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC bt_queens.5" expl="variant decrease" proved="true">
+  <goal name="bt_queens&#39;vc.5" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC bt_queens.6" expl="precondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.16" steps="25411"/></proof>
+  <goal name="bt_queens&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.16" steps="25412"/></proof>
   </goal>
-  <goal name="VC bt_queens.7" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.08" steps="15637"/></proof>
+  <goal name="bt_queens&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="15638"/></proof>
   </goal>
-  <goal name="VC bt_queens.8" expl="loop invariant preservation" proved="true">
+  <goal name="bt_queens&#39;vc.8" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.06" steps="129"/></proof>
   </goal>
-  <goal name="VC bt_queens.9" expl="exceptional postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="bt_queens&#39;vc.9" expl="exceptional postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="1"/></proof>
   </goal>
-  <goal name="VC bt_queens.10" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.04" steps="8003"/></proof>
+  <goal name="bt_queens&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="8004"/></proof>
   </goal>
-  <goal name="VC bt_queens.11" expl="loop invariant preservation" proved="true">
+  <goal name="bt_queens&#39;vc.11" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.16" steps="278"/></proof>
   </goal>
-  <goal name="VC bt_queens.12" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.00" steps="3877"/></proof>
+  <goal name="bt_queens&#39;vc.12" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.00" steps="3878"/></proof>
   </goal>
-  <goal name="VC bt_queens.13" expl="postcondition" proved="true">
+  <goal name="bt_queens&#39;vc.13" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC bt_queens.14" expl="out of loop bounds" proved="true">
+  <goal name="bt_queens&#39;vc.14" expl="out of loop bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC queens" expl="VC for queens" proved="true">
+ <goal name="queens&#39;vc" expl="VC for queens" proved="true">
  <proof prover="4"><result status="valid" time="0.00" steps="27"/></proof>
  </goal>
- <goal name="VC test8" expl="VC for test8" proved="true">
+ <goal name="test8&#39;vc" expl="VC for test8" proved="true">
  <proof prover="4"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="VC count_bt_queens" expl="VC for count_bt_queens" proved="true">
+ <goal name="count_bt_queens&#39;vc" expl="VC for count_bt_queens" proved="true">
  <proof prover="4"><result status="valid" time="1.80" steps="624"/></proof>
  </goal>
- <goal name="VC count_queens" expl="VC for count_queens" proved="true">
+ <goal name="count_queens&#39;vc" expl="VC for count_queens" proved="true">
  <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
  </goal>
- <goal name="VC test_count_8" expl="VC for test_count_8" proved="true">
+ <goal name="test_count_8&#39;vc" expl="VC for test_count_8" proved="true">
  <proof prover="4"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
 <theory name="NQueens63" proved="true">
- <goal name="VC check_is_consistent" expl="VC for check_is_consistent" proved="true">
+ <goal name="check_is_consistent&#39;vc" expl="VC for check_is_consistent" proved="true">
  <proof prover="4"><result status="valid" time="0.18" steps="606"/></proof>
  </goal>
- <goal name="VC count_bt_queens" expl="VC for count_bt_queens" proved="true">
+ <goal name="count_bt_queens&#39;vc" expl="VC for count_bt_queens" proved="true">
  <proof prover="4"><result status="valid" time="1.71" steps="1875"/></proof>
  </goal>
- <goal name="VC count_queens" expl="VC for count_queens" proved="true">
+ <goal name="count_queens&#39;vc" expl="VC for count_queens" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
  </goal>
- <goal name="VC test_count_8" expl="VC for test_count_8" proved="true">
+ <goal name="test_count_8&#39;vc" expl="VC for test_count_8" proved="true">
  <proof prover="4"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
 </theory>

@@ -185,8 +185,8 @@ fi
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 echo "ocaml version is $OCAMLVERSION"
 
-AX_VERSION_GE([$OCAMLVERSION], 4.02.3, [],
-  [AC_MSG_ERROR(You need Objective Caml 4.02.3 or higher.)])
+AX_VERSION_GE([$OCAMLVERSION], 4.05.0, [],
+  [AC_MSG_ERROR(You need Objective Caml 4.05.0 or higher.)])
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
@@ -336,35 +336,25 @@ fi
 #if ocamlfind is used it gives the install path for ocaml library
 if test "$USEOCAMLFIND" = yes; then
    OCAMLINSTALLLIB=$(ocamlfind printconf destdir)
+   OCAMLFIND=ocamlfind
 else
    OCAMLINSTALLLIB=$OCAMLLIB
+   OCAMLFIND=no
 fi
 
-# compiler plugins
+# ppx
 
-AX_VERSION_GE([$OCAMLVERSION], 4.05.0,
-  [if test "$USEOCAMLFIND" = yes; then
-     COMPILERLIBS=$(ocamlfind query compiler-libs)
-   fi
-   if test -n "$COMPILERLIBS"; then
-     echo "ocamlfind found compiler-libs in $COMPILERLIBS"
-     enable_compiler_plugins="yes"
-   else
-     COMPILERLIBS="+compiler-libs"
-     AC_CHECK_FILE($OCAMLLIB/compiler-libs/,
-                   enable_compiler_plugins=yes,
-                   enable_compiler_plugins=no)
-     if test "$enable_compiler_plugins" = no; then
-       reason_compiler_plugins=" (compiler-libs not found)"
-     fi
-   fi],
-  [enable_compiler_plugins="no"
-   reason_compiler_plugins=" (Ocaml version 4.05.0 required)"])
-
-if test "$enable_compiler_plugins" = yes; then
-  COMPILERLIBSPKG="compiler-libs"
+if test "$USEOCAMLFIND" = yes; then
+  COMPILERLIBS=$(ocamlfind query compiler-libs)
+  if test -n "$COMPILERLIBS"; then
+    echo "ocamlfind found compiler-libs in $COMPILERLIBS"
+    enable_ppx=yes
+  else
+    enable_ppx=no
+    reason_ppx=" (compiler-libs not found)"
+  fi
 else
-  COMPILERLIBSPKG=
+  enable_ppx=no
 fi
 
 # checking for rubber or latexmk or pdflatex
@@ -511,6 +501,51 @@ fi
 AC_CHECK_FILE($DIR/menhirLib.cmi,,found_menhirlib=no)
 if test "$found_menhirlib" = no; then
    AC_MSG_ERROR([Library menhirLib not found.])
+fi
+
+# checking for seq
+# (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
+found_seq=no
+if test "$USEOCAMLFIND" = yes; then
+   DIR=$(ocamlfind query seq)
+   if test -n "$DIR"; then
+      echo "ocamlfind found seq in $DIR"
+      SEQINCLUDE="-I $DIR"
+      SEQLIB=seq
+      found_seq=yes
+      AC_CHECK_FILE($DIR/seq.cma,,found_seq=no)
+      AC_CHECK_FILE($DIR/seq.cmi,,found_seq=no)
+   fi
+fi
+if test "$found_seq" = no; then
+   DIR="$OCAMLLIB"
+   SEQINCLUDE=
+   SEQLIB=
+   found_seq=yes
+   AC_CHECK_FILE($DIR/stdlib__seq.cmi,,found_seq=no)
+fi
+if test "$found_seq" = no; then
+   AC_MSG_ERROR([Library seq not found.])
+fi
+
+# checking for re
+found_re=yes
+DIR=
+if test "$USEOCAMLFIND" = yes; then
+   DIR=$(ocamlfind query re)
+   if test -n "$DIR"; then
+      echo "ocamlfind found re in $DIR"
+      REINCLUDE="-I $DIR"
+   fi
+fi
+if test -z "$DIR"; then
+   REINCLUDE="-I +re"
+   DIR="$OCAMLLIB/re"
+   AC_CHECK_FILE($DIR/re.cmx,,found_re=no)
+fi
+AC_CHECK_FILE($DIR/re.cmi,,found_re=no)
+if test "$found_re" = no; then
+   AC_MSG_ERROR([Library re not found.])
 fi
 
 # checking for lablgtk3
@@ -944,6 +979,7 @@ AC_SUBST(STRIP)
 AC_SUBST(OCAMLC)
 AC_SUBST(OCAMLOPT)
 AC_SUBST(OCAMLDEP)
+AC_SUBST(OCAMLFIND)
 AC_SUBST(OCAMLLEX)
 AC_SUBST(OCAMLYACC)
 AC_SUBST(OCAMLDOC)
@@ -971,9 +1007,7 @@ AC_SUBST(JSOFOCAMLPKG)
 
 AC_SUBST(META_OCAMLGRAPH)
 
-AC_SUBST(enable_compiler_plugins)
-AC_SUBST(COMPILERLIBS)
-AC_SUBST(COMPILERLIBSPKG)
+AC_SUBST(enable_ppx)
 
 AC_SUBST(NUMINCLUDE)
 AC_SUBST(MLMPFRINCLUDE)
@@ -991,6 +1025,11 @@ AC_SUBST(ZIPINCLUDE)
 AC_SUBST(ZIPLIB)
 
 AC_SUBST(MENHIRINCLUDE)
+
+AC_SUBST(SEQINCLUDE)
+AC_SUBST(SEQLIB)
+
+AC_SUBST(REINCLUDE)
 
 AC_SUBST(enable_coq_libs)
 AC_SUBST(enable_coq_fp_libs)
@@ -1073,7 +1112,7 @@ echo "    Version                 : $OCAMLVERSION"
 echo "    Library path            : $OCAMLLIB"
 echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
-echo "    Compiler plugins        : $enable_compiler_plugins$reason_compiler_plugins"
+echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
 echo "Components"

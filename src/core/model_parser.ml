@@ -142,6 +142,7 @@ let interp_float ?(interp=true) b eb sb =
   with Exit -> Float_value (b, eb, sb)
 
 type model_value =
+ | String of string
  | Integer of string
  | Decimal of (string * string)
  | Fraction of (string * string)
@@ -217,6 +218,10 @@ let convert_float_value f =
 
 let rec convert_model_value value : Json_base.json =
   match value with
+  | String s ->
+      let m = Mstr.add "type" (Json_base.String "String") Mstr.empty in
+      let m = Mstr.add "val" (Json_base.String s) m in
+      Json_base.Record m
   | Integer s ->
       let m = Mstr.add "type" (Json_base.String "Integer") Mstr.empty in
       let m = Mstr.add "val" (Json_base.String s) m in
@@ -395,6 +400,7 @@ and print_bv fmt (bv: string) =
 
 and print_model_value_human fmt (v: model_value) =
   match v with
+  | String s -> Constant.print_string_def fmt s
   | Integer s -> print_integer fmt s
   | Decimal (s1,s2) -> fprintf fmt "%s" (s1 ^ "." ^ s2)
   | Fraction (s1, s2) -> fprintf fmt "%s" (s1 ^ "/" ^ s2)
@@ -674,9 +680,9 @@ let get_elements model_file line_number =
 
 let get_padding line =
   try
-    let r = Str.regexp " *" in
-    ignore (Str.search_forward r line 0);
-    Str.matched_string line
+    let r = Re.Str.regexp " *" in
+    ignore (Re.Str.search_forward r line 0);
+    Re.Str.matched_string line
   with Not_found -> ""
 
 (* This assumes that l is sorted and split the list of locations in two:
@@ -760,7 +766,7 @@ let interleave_with_source
     let model_file = snd (StringMap.choose model_files) in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
       let (last_cntexmp_line, _) = IntMap.max_binding model_file in
-      Str.bounded_split (Str.regexp "^") source_code (last_cntexmp_line+1)
+      Re.Str.bounded_split (Re.Str.regexp "^") source_code (last_cntexmp_line+1)
     in
     let (source_code, _, _, _, gen_loc) =
       List.fold_left
@@ -933,7 +939,7 @@ let recover_name list_projs term_map raw_name =
 let rec replace_projection (const_function: string -> string) model_value =
   match model_value with
   | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
-    | Unparsed _ -> model_value
+    | String  _ | Unparsed _ -> model_value
   | Array a ->
       Array (replace_projection_array const_function a)
   | Record r ->

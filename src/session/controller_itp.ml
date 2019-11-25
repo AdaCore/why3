@@ -264,9 +264,10 @@ let reload_files ?(hard_reload=false) (c: controller) ~shape_version =
   | _ -> raise (Errors_list errors)
 
 let add_file c ?format fname =
-  let file_is_detached,theories,errors =
-    try false,(Session_itp.read_file c.controller_env ?format fname), None
-    with e -> true,[], Some e
+  let format = Env.get_format ?format fname in
+  let file_is_detached,(theories,format),errors =
+    try false,(Session_itp.read_file c.controller_env ~format fname), None
+    with e -> true,([], format), Some e
   in
   let (_ : file) = add_file_section c.controller_session fname ~file_is_detached theories format in
   errors
@@ -515,8 +516,9 @@ let idle_handler () =
      more tasks *)
   begin
     try
-      if S.blocking || (Hashtbl.length prover_tasks_in_progress <
-         S.multiplier * !session_max_tasks)
+      if S.blocking ||
+         (Hashtbl.length prover_tasks_in_progress <
+          S.multiplier * !session_max_tasks)
       then
         let spa = Queue.pop scheduled_proof_attempts in
         try build_prover_call spa

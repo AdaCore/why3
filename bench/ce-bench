@@ -45,6 +45,12 @@ decide_fail () {
         "bench/ce/algebraic_types_mono_CVC4,1.7_WP")
            is_xfail=full;;
         # Inconsistent results between two runs
+        "bench/ce/list_CVC4,1.7_WP")
+           is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/list_CVC4,1.7_SP")
+           is_xfail=integer_values;;
+        # Inconsistent results between two runs
         "bench/ce/ref_mono_Z3,4.8.4_WP")
             is_xfail=integer_values;;
         # Inconsistent results between two runs
@@ -56,6 +62,24 @@ decide_fail () {
         # Inconsistent results between two runs
         "bench/ce/floats_Z3,4.8.4_SP")
             is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/strings_CVC4,1.7_SP")
+           is_xfail=string_values;;
+        # Inconsistent results between two runs
+        "bench/ce/strings_CVC4,1.7_WP")
+           is_xfail=string_values;;
+        # Inconsistent results between two runs
+        "bench/ce/strings_Z3,4.8.4_SP")
+           is_xfail=full;;
+        # Inconsistent results between two runs
+        "bench/ce/strings_Z3,4.8.4_WP")
+           is_xfail=full;;
+        # Inconsistent results in CI
+        "bench/ce/records_CVC4,1.7_WP")
+           is_xfail=integer_values;;
+        # Inconsistent results in CI
+        "bench/ce/records_CVC4,1.7_SP")
+           is_xfail=integer_values;;
         *) is_xfail=none;;
     esac
 }
@@ -98,6 +122,11 @@ run () {
     case $is_xfail in
         "full") is_xfail=true;;
         "none") is_xfail=false;;
+	"string_values")
+	    is_xfail=false
+            str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"\([^"]\|\\"\)\+"/"val":"ANYSTRING"/g')
+            str_out=$(echo ${str_out} | sed -e 's/"val":"\([^"]\|\\"\)\+"/"val":"ANYSTRING"/g')
+            ;;
         "integer_values")
             is_xfail=false
             str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"-\?[0-9]\+"/"val":"ANYINT"/g')

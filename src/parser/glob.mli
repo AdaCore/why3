@@ -19,6 +19,9 @@ val def: kind:string -> ident -> unit
 val use: kind:string -> Loc.position -> ident -> unit
   (** [use loc id] registers that [id] is used at position [loc] *)
 
+val clear: string -> unit
+  (** [clear file] clears the locations association for said [file] *)
+
 type def_use = Def | Use
 
 val find: Loc.position -> ident * def_use * string

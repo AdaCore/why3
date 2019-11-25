@@ -6,475 +6,447 @@
 <prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<prover id="7" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
 <path name=".."/><path name="hillel_challenge.mlw"/>
 <theory name="Leftpad" proved="true">
- <goal name="VC leftpad" expl="VC for leftpad" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="7009"/></proof>
+ <goal name="leftpad&#39;vc" expl="VC for leftpad" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="7010"/></proof>
  </goal>
 </theory>
 <theory name="Unique" proved="true">
- <goal name="VC unique" expl="VC for unique" proved="true">
+ <goal name="unique&#39;vc" expl="VC for unique" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="VC unique.0" expl="array creation size" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="4270"/></proof>
+  <goal name="unique&#39;vc.0" expl="array creation size" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="10105"/></proof>
   </goal>
-  <goal name="VC unique.1" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="3597"/></proof>
+  <goal name="unique&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="9000"/></proof>
   </goal>
-  <goal name="VC unique.2" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="4349"/></proof>
+  <goal name="unique&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="11238"/></proof>
   </goal>
-  <goal name="VC unique.3" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="4622"/></proof>
+  <goal name="unique&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="10474"/></proof>
   </goal>
-  <goal name="VC unique.4" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="4586"/></proof>
+  <goal name="unique&#39;vc.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="10142"/></proof>
   </goal>
-  <goal name="VC unique.5" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="4468"/></proof>
+  <goal name="unique&#39;vc.5" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="9892"/></proof>
   </goal>
-  <goal name="VC unique.6" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="4515"/></proof>
+  <goal name="unique&#39;vc.6" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="9927"/></proof>
   </goal>
-  <goal name="VC unique.7" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="4781"/></proof>
+  <goal name="unique&#39;vc.7" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="10119"/></proof>
   </goal>
-  <goal name="VC unique.8" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="5111"/></proof>
+  <goal name="unique&#39;vc.8" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="10587"/></proof>
   </goal>
-  <goal name="VC unique.9" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="4932"/></proof>
+  <goal name="unique&#39;vc.9" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="10408"/></proof>
   </goal>
-  <goal name="VC unique.10" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.84" steps="2512485"/></proof>
+  <goal name="unique&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="89939"/></proof>
   </goal>
-  <goal name="VC unique.11" expl="loop invariant preservation" proved="true">
+  <goal name="unique&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="7"><result status="valid" time="0.19" steps="952"/></proof>
+  </goal>
+  <goal name="unique&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="7"><result status="valid" time="0.04" steps="151"/></proof>
+  </goal>
+  <goal name="unique&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="9766"/></proof>
+  </goal>
+  <goal name="unique&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <proof prover="7"><result status="valid" time="0.02" steps="163"/></proof>
+  </goal>
+  <goal name="unique&#39;vc.15" expl="loop invariant preservation" proved="true">
   <transf name="case" proved="true" arg1="x=a[i]">
-   <goal name="VC unique.11.0" expl="true case (loop invariant preservation)" proved="true">
-   <proof prover="1"><result status="valid" time="0.01" steps="75"/></proof>
+   <goal name="unique&#39;vc.15.0" expl="true case (loop invariant preservation)" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="27"/></proof>
    </goal>
-   <goal name="VC unique.11.1" expl="false case (loop invariant preservation)" proved="true">
+   <goal name="unique&#39;vc.15.1" expl="false case (loop invariant preservation)" proved="true">
    <transf name="assert" proved="true" arg1="(mem x a (i+1) &lt;-&gt; mem x a i)">
-    <goal name="VC unique.11.1.0" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.04" steps="8317"/></proof>
+    <goal name="unique&#39;vc.15.1.0" expl="asserted formula" proved="true">
+    <proof prover="0"><result status="valid" time="0.04" steps="10835"/></proof>
     </goal>
-    <goal name="VC unique.11.1.1" expl="false case (loop invariant preservation)" proved="true">
-    <proof prover="2"><result status="valid" time="0.02" steps="105"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="VC unique.12" expl="loop invariant preservation" proved="true">
-  <transf name="case" proved="true" arg1="(j &lt; len-1)">
-   <goal name="VC unique.12.0" expl="true case (loop invariant preservation)" proved="true">
-   <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
-   </goal>
-   <goal name="VC unique.12.1" expl="false case (loop invariant preservation)" proved="true">
-   <transf name="assert" proved="true" arg1="(not (mem a[i1] a i1))">
-    <goal name="VC unique.12.1.0" expl="asserted formula" proved="true">
-    <proof prover="4"><result status="valid" time="0.04" steps="7266"/></proof>
-    </goal>
-    <goal name="VC unique.12.1.1" expl="false case (loop invariant preservation)" proved="true">
-    <proof prover="1"><result status="valid" time="0.01" steps="92"/></proof>
+    <goal name="unique&#39;vc.15.1.1" expl="false case (loop invariant preservation)" proved="true">
+    <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
-  <goal name="VC unique.13" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="4227"/></proof>
+  <goal name="unique&#39;vc.16" expl="loop invariant preservation" proved="true">
+  <proof prover="7"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="VC unique.14" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.02" steps="20621"/></proof>
+  <goal name="unique&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="10345"/></proof>
   </goal>
-  <goal name="VC unique.15" expl="loop invariant preservation" proved="true">
-  <transf name="case" proved="true" arg1="(x=n-1)">
-   <goal name="VC unique.15.0" expl="true case (loop invariant preservation)" proved="true">
-   <proof prover="4"><result status="valid" time="0.03" steps="5645"/></proof>
-   </goal>
-   <goal name="VC unique.15.1" expl="false case (loop invariant preservation)" proved="true">
-   <transf name="assert" proved="true" arg1="(mem x a (i+1) &lt;-&gt; mem x a i)">
-    <goal name="VC unique.15.1.0" expl="asserted formula" proved="true">
-    <proof prover="0"><result status="valid" time="0.02" steps="4983"/></proof>
-    </goal>
-    <goal name="VC unique.15.1.1" expl="false case (loop invariant preservation)" proved="true">
-    <proof prover="2"><result status="valid" time="0.00" steps="25"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <goal name="unique&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="42744"/></proof>
   </goal>
-  <goal name="VC unique.16" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="5396"/></proof>
+  <goal name="unique&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="12140"/></proof>
   </goal>
-  <goal name="VC unique.17" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="4778"/></proof>
-  </goal>
-  <goal name="VC unique.18" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.04" steps="20112"/></proof>
-  </goal>
-  <goal name="VC unique.19" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="5860"/></proof>
-  </goal>
-  <goal name="VC unique.20" expl="out of loop bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="5290"/></proof>
+  <goal name="unique&#39;vc.20" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="11125"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="Fulcrum" proved="true">
- <goal name="VC fulcrum" expl="VC for fulcrum" proved="true">
+ <goal name="fulcrum&#39;vc" expl="VC for fulcrum" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="VC fulcrum.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="3900"/></proof>
+  <goal name="fulcrum&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="3901"/></proof>
   </goal>
-  <goal name="VC fulcrum.1" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="3473"/></proof>
+  <goal name="fulcrum&#39;vc.1" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3474"/></proof>
   </goal>
-  <goal name="VC fulcrum.2" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="4619"/></proof>
+  <goal name="fulcrum&#39;vc.2" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="4620"/></proof>
   </goal>
-  <goal name="VC fulcrum.3" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="3926"/></proof>
+  <goal name="fulcrum&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="3927"/></proof>
   </goal>
-  <goal name="VC fulcrum.4" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="3460"/></proof>
+  <goal name="fulcrum&#39;vc.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3461"/></proof>
   </goal>
-  <goal name="VC fulcrum.5" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="3063"/></proof>
+  <goal name="fulcrum&#39;vc.5" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3064"/></proof>
   </goal>
-  <goal name="VC fulcrum.6" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="4396"/></proof>
+  <goal name="fulcrum&#39;vc.6" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="4397"/></proof>
   </goal>
-  <goal name="VC fulcrum.7" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="3447"/></proof>
+  <goal name="fulcrum&#39;vc.7" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3448"/></proof>
   </goal>
-  <goal name="VC fulcrum.8" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="3682"/></proof>
+  <goal name="fulcrum&#39;vc.8" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3683"/></proof>
   </goal>
-  <goal name="VC fulcrum.9" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="3719"/></proof>
+  <goal name="fulcrum&#39;vc.9" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3720"/></proof>
   </goal>
-  <goal name="VC fulcrum.10" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="8088"/></proof>
+  <goal name="fulcrum&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="8089"/></proof>
   </goal>
-  <goal name="VC fulcrum.11" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6510"/></proof>
+  <goal name="fulcrum&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6511"/></proof>
   </goal>
-  <goal name="VC fulcrum.12" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="4088"/></proof>
+  <goal name="fulcrum&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="4089"/></proof>
   </goal>
-  <goal name="VC fulcrum.13" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6336"/></proof>
+  <goal name="fulcrum&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6337"/></proof>
   </goal>
-  <goal name="VC fulcrum.14" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="5212"/></proof>
+  <goal name="fulcrum&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="5213"/></proof>
   </goal>
-  <goal name="VC fulcrum.15" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="7207"/></proof>
+  <goal name="fulcrum&#39;vc.15" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="7208"/></proof>
   </goal>
-  <goal name="VC fulcrum.16" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6231"/></proof>
+  <goal name="fulcrum&#39;vc.16" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6232"/></proof>
   </goal>
-  <goal name="VC fulcrum.17" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="3841"/></proof>
+  <goal name="fulcrum&#39;vc.17" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="3842"/></proof>
   </goal>
-  <goal name="VC fulcrum.18" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="3437"/></proof>
+  <goal name="fulcrum&#39;vc.18" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3438"/></proof>
   </goal>
-  <goal name="VC fulcrum.19" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.37" steps="34816"/></proof>
+  <goal name="fulcrum&#39;vc.19" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.37" steps="34817"/></proof>
   </goal>
-  <goal name="VC fulcrum.20" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="3639"/></proof>
+  <goal name="fulcrum&#39;vc.20" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="3640"/></proof>
   </goal>
-  <goal name="VC fulcrum.21" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="4021"/></proof>
+  <goal name="fulcrum&#39;vc.21" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="4022"/></proof>
   </goal>
-  <goal name="VC fulcrum.22" expl="out of loop bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="3577"/></proof>
+  <goal name="fulcrum&#39;vc.22" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="3578"/></proof>
   </goal>
-  <goal name="VC fulcrum.23" expl="out of loop bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="8166"/></proof>
+  <goal name="fulcrum&#39;vc.23" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="8167"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="FulcrumNoOverflow" proved="true">
- <goal name="VC big" expl="VC for big" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="4797"/></proof>
+ <goal name="big&#39;vc" expl="VC for big" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="4798"/></proof>
  </goal>
- <goal name="VC big_zero" expl="VC for big_zero" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="4963"/></proof>
+ <goal name="big_zero&#39;vc" expl="VC for big_zero" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="4964"/></proof>
  </goal>
- <goal name="VC add_big" expl="VC for add_big" proved="true">
+ <goal name="add_big&#39;vc" expl="VC for add_big" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="VC add_big.0" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6086"/></proof>
+  <goal name="add_big&#39;vc.0" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6087"/></proof>
   </goal>
-  <goal name="VC add_big.1" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6284"/></proof>
+  <goal name="add_big&#39;vc.1" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6285"/></proof>
   </goal>
-  <goal name="VC add_big.2" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6371"/></proof>
+  <goal name="add_big&#39;vc.2" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6372"/></proof>
   </goal>
-  <goal name="VC add_big.3" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6512"/></proof>
+  <goal name="add_big&#39;vc.3" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6513"/></proof>
   </goal>
-  <goal name="VC add_big.4" expl="type invariant" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6770"/></proof>
+  <goal name="add_big&#39;vc.4" expl="type invariant" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6771"/></proof>
   </goal>
-  <goal name="VC add_big.5" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="5295"/></proof>
+  <goal name="add_big&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="5296"/></proof>
   </goal>
-  <goal name="VC add_big.6" expl="type invariant" proved="true">
+  <goal name="add_big&#39;vc.6" expl="type invariant" proved="true">
   <transf name="split_vc" proved="true" >
-   <goal name="VC add_big.6.0" expl="type invariant" proved="true">
-   <proof prover="0"><result status="valid" time="0.04" steps="6164"/></proof>
+   <goal name="add_big&#39;vc.6.0" expl="type invariant" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="6165"/></proof>
    </goal>
-   <goal name="VC add_big.6.1" expl="type invariant" proved="true">
-   <proof prover="0"><result status="valid" time="0.03" steps="6161"/></proof>
+   <goal name="add_big&#39;vc.6.1" expl="type invariant" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="6162"/></proof>
    </goal>
-   <goal name="VC add_big.6.2" expl="type invariant" proved="true">
-   <proof prover="0"><result status="valid" time="0.03" steps="5133"/></proof>
+   <goal name="add_big&#39;vc.6.2" expl="type invariant" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="5134"/></proof>
    </goal>
-   <goal name="VC add_big.6.3" expl="type invariant" proved="true">
-   <proof prover="0"><result status="valid" time="0.02" steps="6098"/></proof>
+   <goal name="add_big&#39;vc.6.3" expl="type invariant" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="6099"/></proof>
    </goal>
-   <goal name="VC add_big.6.4" expl="type invariant" proved="true">
-   <proof prover="0"><result status="valid" time="0.04" steps="6588"/></proof>
+   <goal name="add_big&#39;vc.6.4" expl="type invariant" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="6589"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC add_big.7" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="5226"/></proof>
+  <goal name="add_big&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="5227"/></proof>
   </goal>
-  <goal name="VC add_big.8" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6021"/></proof>
+  <goal name="add_big&#39;vc.8" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6022"/></proof>
   </goal>
-  <goal name="VC add_big.9" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6193"/></proof>
+  <goal name="add_big&#39;vc.9" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6194"/></proof>
   </goal>
-  <goal name="VC add_big.10" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6306"/></proof>
+  <goal name="add_big&#39;vc.10" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6307"/></proof>
   </goal>
-  <goal name="VC add_big.11" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6421"/></proof>
+  <goal name="add_big&#39;vc.11" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6422"/></proof>
   </goal>
-  <goal name="VC add_big.12" expl="type invariant" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6822"/></proof>
+  <goal name="add_big&#39;vc.12" expl="type invariant" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6823"/></proof>
   </goal>
-  <goal name="VC add_big.13" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="5295"/></proof>
+  <goal name="add_big&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="5296"/></proof>
   </goal>
-  <goal name="VC add_big.14" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="6386"/></proof>
+  <goal name="add_big&#39;vc.14" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6387"/></proof>
   </goal>
-  <goal name="VC add_big.15" expl="type invariant" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="7020"/></proof>
-  </goal>
-  <goal name="VC add_big.16" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="5280"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="VC sub_big" expl="VC for sub_big" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="9468"/></proof>
- </goal>
- <goal name="VC delta" expl="VC for delta" proved="true">
- <transf name="split_vc" proved="true" >
-  <goal name="VC delta.0" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6272"/></proof>
-  </goal>
-  <goal name="VC delta.1" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6539"/></proof>
-  </goal>
-  <goal name="VC delta.2" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6665"/></proof>
-  </goal>
-  <goal name="VC delta.3" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6750"/></proof>
-  </goal>
-  <goal name="VC delta.4" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="6868"/></proof>
-  </goal>
-  <goal name="VC delta.5" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="7076"/></proof>
-  </goal>
-  <goal name="VC delta.6" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="7982"/></proof>
-  </goal>
-  <goal name="VC delta.7" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6564"/></proof>
-  </goal>
-  <goal name="VC delta.8" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6707"/></proof>
-  </goal>
-  <goal name="VC delta.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="7453"/></proof>
-  </goal>
-  <goal name="VC delta.10" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6520"/></proof>
-  </goal>
-  <goal name="VC delta.11" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="7181"/></proof>
-  </goal>
-  <goal name="VC delta.12" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="6644"/></proof>
-  </goal>
-  <goal name="VC delta.13" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="6602"/></proof>
-  </goal>
-  <goal name="VC delta.14" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6744"/></proof>
-  </goal>
-  <goal name="VC delta.15" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="6809"/></proof>
-  </goal>
-  <goal name="VC delta.16" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6998"/></proof>
-  </goal>
-  <goal name="VC delta.17" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="7859"/></proof>
-  </goal>
-  <goal name="VC delta.18" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6637"/></proof>
-  </goal>
-  <goal name="VC delta.19" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="7498"/></proof>
-  </goal>
-  <goal name="VC delta.20" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6598"/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="VC big_lt" expl="VC for big_lt" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="7069"/></proof>
- </goal>
- <goal name="VC sum_bounds" expl="VC for sum_bounds" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="10963"/></proof>
- </goal>
- <goal name="VC fulcrum" expl="VC for fulcrum" proved="true">
- <transf name="split_vc" proved="true" >
-  <goal name="VC fulcrum.0" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6787"/></proof>
-  </goal>
-  <goal name="VC fulcrum.1" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="5833"/></proof>
-  </goal>
-  <goal name="VC fulcrum.2" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="7218"/></proof>
-  </goal>
-  <goal name="VC fulcrum.3" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6425"/></proof>
-  </goal>
-  <goal name="VC fulcrum.4" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="7787"/></proof>
-  </goal>
-  <goal name="VC fulcrum.5" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="6029"/></proof>
-  </goal>
-  <goal name="VC fulcrum.6" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="9837"/></proof>
-  </goal>
-  <goal name="VC fulcrum.7" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="7752"/></proof>
-  </goal>
-  <goal name="VC fulcrum.8" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="7749"/></proof>
-  </goal>
-  <goal name="VC fulcrum.9" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="6034"/></proof>
-  </goal>
-  <goal name="VC fulcrum.10" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="9422"/></proof>
-  </goal>
-  <goal name="VC fulcrum.11" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="6546"/></proof>
-  </goal>
-  <goal name="VC fulcrum.12" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="6087"/></proof>
-  </goal>
-  <goal name="VC fulcrum.13" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.08" steps="9761"/></proof>
-  </goal>
-  <goal name="VC fulcrum.14" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6652"/></proof>
-  </goal>
-  <goal name="VC fulcrum.15" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="7022"/></proof>
-  </goal>
-  <goal name="VC fulcrum.16" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="9418"/></proof>
-  </goal>
-  <goal name="VC fulcrum.17" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="7137"/></proof>
-  </goal>
-  <goal name="VC fulcrum.18" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="13012"/></proof>
-  </goal>
-  <goal name="VC fulcrum.19" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.17" steps="19993"/></proof>
-  </goal>
-  <goal name="VC fulcrum.20" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.10" steps="13073"/></proof>
-  </goal>
-  <goal name="VC fulcrum.21" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="9882"/></proof>
-  </goal>
-  <goal name="VC fulcrum.22" expl="type invariant" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="9950"/></proof>
-  </goal>
-  <goal name="VC fulcrum.23" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="6785"/></proof>
-  </goal>
-  <goal name="VC fulcrum.24" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.20" steps="22013"/></proof>
-  </goal>
-  <goal name="VC fulcrum.25" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.05" steps="120634"/></proof>
-  </goal>
-  <goal name="VC fulcrum.26" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="7515"/></proof>
-  </goal>
-  <goal name="VC fulcrum.27" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.02" steps="28526"/></proof>
-  </goal>
-  <goal name="VC fulcrum.28" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="58"/></proof>
-  </goal>
-  <goal name="VC fulcrum.29" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="6716"/></proof>
-  </goal>
-  <goal name="VC fulcrum.30" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.18" steps="19388"/></proof>
-  </goal>
-  <goal name="VC fulcrum.31" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.17" steps="529495"/></proof>
-  </goal>
-  <goal name="VC fulcrum.32" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="7346"/></proof>
-  </goal>
-  <goal name="VC fulcrum.33" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="48"/></proof>
-  </goal>
-  <goal name="VC fulcrum.34" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="52"/></proof>
-  </goal>
-  <goal name="VC fulcrum.35" expl="postcondition" proved="true">
+  <goal name="add_big&#39;vc.15" expl="type invariant" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="7021"/></proof>
   </goal>
-  <goal name="VC fulcrum.36" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06" steps="9314"/></proof>
+  <goal name="add_big&#39;vc.16" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="5281"/></proof>
   </goal>
-  <goal name="VC fulcrum.37" expl="out of loop bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.04" steps="6690"/></proof>
+ </transf>
+ </goal>
+ <goal name="sub_big&#39;vc" expl="VC for sub_big" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="9469"/></proof>
+ </goal>
+ <goal name="delta&#39;vc" expl="VC for delta" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="delta&#39;vc.0" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6273"/></proof>
   </goal>
-  <goal name="VC fulcrum.38" expl="out of loop bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.03" steps="20585"/></proof>
+  <goal name="delta&#39;vc.1" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6540"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.2" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6666"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.3" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6751"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.4" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="6869"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.5" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="7077"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="7983"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.7" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6565"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.8" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6708"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="7454"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.10" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6521"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="7182"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="6645"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.13" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6603"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.14" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6745"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.15" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6810"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.16" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6999"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="7860"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.18" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6638"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.19" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="7499"/></proof>
+  </goal>
+  <goal name="delta&#39;vc.20" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6599"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="big_lt&#39;vc" expl="VC for big_lt" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="7070"/></proof>
+ </goal>
+ <goal name="sum_bounds&#39;vc" expl="VC for sum_bounds" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="10964"/></proof>
+ </goal>
+ <goal name="fulcrum&#39;vc" expl="VC for fulcrum" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="fulcrum&#39;vc.0" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6788"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="5834"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="7219"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.3" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6426"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="7788"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.5" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6030"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="9838"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="7753"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.8" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7750"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.9" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6035"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.10" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="9423"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.11" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="6547"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.12" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6088"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.13" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="9762"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.14" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6653"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.15" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7023"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.16" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="9419"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.17" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7138"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.18" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="13013"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.19" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.17" steps="19994"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.20" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="13074"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.21" expl="integer overflow" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="9883"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.22" expl="type invariant" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="9951"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.23" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6786"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.24" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.20" steps="22014"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.25" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="120586"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.26" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="7516"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.27" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="28526"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.28" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="58"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.29" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6717"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.30" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.18" steps="19389"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.31" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.17" steps="529496"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.32" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="7347"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.33" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="48"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.34" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="52"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.35" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="7022"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.36" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="9315"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.37" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="6691"/></proof>
+  </goal>
+  <goal name="fulcrum&#39;vc.38" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="20586"/></proof>
   </goal>
  </transf>
  </goal>

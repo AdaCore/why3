@@ -31,9 +31,12 @@ type t =
       mutable premise_color : string;
       mutable neg_premise_color : string;
       mutable goal_color : string;
-      mutable error_color : string;
+      mutable error_color_fg : string;
       mutable error_color_bg : string;
+      mutable error_color_msg_zone_fg : string;
+      mutable error_color_msg_zone_bg : string;
       mutable error_line_color : string;
+      mutable search_color : string;
       mutable iconset : string;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;

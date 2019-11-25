@@ -60,8 +60,21 @@
   showstringspaces=false,
 }
 
+% Language used for printing transformations with arguments (no syntax coloring)
+\lstdefinelanguage{transwhy3}
+{
+basicstyle=\ttfamily,%
+string=[b]",%
+commentstyle=\itshape,%
+columns=[l]fullflexible,%
+sensitive=true,%
+morecomment=[s]{(*}{*)},%
+keepspaces=true,%
+}
+
 \lstnewenvironment{whycode}{\lstset{language=why3}}{}
 \lstnewenvironment{ocamlcode}{\lstset{language={[Objective]Caml}}}{}
+\lstnewenvironment{transwhy3}{\lstset{language=transwhy3}}{}
 
 %%% Local Variables:
 %%% mode: latex

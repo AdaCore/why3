@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="380_doc_trans.mlw"/>
+<theory name="Apply">
+ <goal name="G">
+ <transf name="apply" arg1="zero_is_even">
+  <goal name="G.0" expl="apply premises">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Transitivity">
+ <goal name="G">
+ <transf name="apply" arg1="transitivity" arg2="with" arg3="c">
+  <goal name="G.0" expl="apply premises">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="G.1" expl="apply premises">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Transitivity2">
+ <goal name="G">
+ <transf name="apply" arg1="t" arg2="with" arg3="c,0">
+  <goal name="G.0" expl="apply premises">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="G.1" expl="apply premises">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+  <goal name="G.2" expl="apply premises">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.00" steps="4"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Assert">
+ <goal name="G">
+ <transf name="assert" arg1="(n = 0)" arg2="as" arg3="n0">
+  <goal name="G.0" expl="asserted formula">
+  <transf name="assert" arg1="(n = 0)">
+   <goal name="G.0.0" expl="asserted formula">
+   </goal>
+   <goal name="G.0.1" expl="asserted formula">
+   <transf name="case" arg1="(n = 0)">
+    <goal name="G.0.1.0" expl="true case (asserted formula)">
+    </goal>
+    <goal name="G.0.1.1" expl="false case (asserted formula)">
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="G.1">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Case">
+ <goal name="G">
+ <transf name="case" arg1="(x = 0)">
+  <goal name="G.0" expl="true case">
+  </goal>
+  <goal name="G.1" expl="false case">
+  <transf name="clear_but" arg1="G">
+   <goal name="G.1.0" expl="false case">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Destruct">
+ <goal name="G">
+ <transf name="destruct" arg1="h">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Destruct_rec">
+ <goal name="G">
+ <transf name="destruct_rec" arg1="H">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Destruct_term">
+ <goal name="G">
+ <transf name="destruct_term" arg1="a">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Exists">
+ <goal name="G">
+ <transf name="exists" arg1="0">
+  <goal name="G.0">
+  <proof prover="1" obsolete="true"><result status="valid" time="0.03" steps="22"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Hide">
+ <goal name="G">
+ <transf name="hide" arg1="t" arg2="(1 + 1)">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ <transf name="hide_and_clear" arg1="t" arg2="(1 + 1)">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Induction">
+ <goal name="G">
+ <transf name="induction" arg1="n">
+  <goal name="G.0" expl="base case">
+  </goal>
+  <goal name="G.1" expl="recursive case">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Instantiate">
+ <goal name="G">
+ <transf name="instantiate" arg1="h" arg2="0, 1">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Intros">
+ <goal name="G">
+ <transf name="intros" arg1="n,m">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ <transf name="intros_n" arg1="2">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Left">
+ <goal name="G">
+ <transf name="left" >
+  <goal name="G.0" expl="left case">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Pose">
+ <goal name="G">
+ <transf name="pose" arg1="t" arg2="(x + 2)">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Remove">
+ <goal name="G">
+ <transf name="remove" arg1="h">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Replace">
+ <goal name="G">
+ <transf name="replace" arg1="(y + 1)" arg2="(x + 2)" arg3="in" arg4="h">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1" expl="equality hypothesis">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Revert">
+ <goal name="G">
+ <transf name="revert" arg1="x">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Rewrite">
+ <goal name="G">
+ <transf name="rewrite" arg1="eq">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1" expl="rewrite premises">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Rewrite2">
+ <goal name="G">
+ <transf name="rewrite" arg1="eq" arg2="with" arg3="0">
+  <goal name="G.0">
+  </goal>
+  <goal name="G.1" expl="rewrite premises">
+  </goal>
+  <goal name="G.2" expl="rewrite premises">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Right">
+ <goal name="G">
+ <transf name="right" >
+  <goal name="G.0" expl="right case">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Subst">
+ <goal name="G">
+ <transf name="subst" arg1="x">
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Subst_all">
+ <goal name="G">
+ <transf name="subst_all" >
+  <goal name="G.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Unfold">
+ <goal name="G">
+ <transf name="unfold" arg1="p">
+  <goal name="G.0">
+  <transf name="unfold" arg1="p" arg2="in" arg3="h">
+   <goal name="G.0.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Use_th">
+ <goal name="G">
+ <transf name="use_th" arg1="int.Int">
+  <goal name="G.0">
+  <transf name="replace" arg1="5" arg2="(2 + 3)">
+   <goal name="G.0.0">
+   </goal>
+   <goal name="G.0.1" expl="equality hypothesis">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

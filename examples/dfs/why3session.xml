@@ -4,13 +4,13 @@
 <why3session shape_version="8">
 <prover id="1" name="Z3" version="4.6.0" timelimit="15" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="dfs.mlw"/>
 <theory name="DFS" proved="true">
- <goal name="VC set" expl="VC for set" proved="true">
+ <goal name="set&#39;vc" expl="VC for set" proved="true">
  <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
- <goal name="VC dfs" expl="VC for dfs" proved="true">
+ <goal name="dfs&#39;vc" expl="VC for dfs" proved="true">
  <proof prover="2"><result status="valid" time="0.12" steps="584"/></proof>
  </goal>
  <goal name="reformulation" proved="true">
@@ -32,7 +32,7 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC traverse" expl="VC for traverse" proved="true">
+ <goal name="traverse&#39;vc" expl="VC for traverse" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="50"/></proof>
  </goal>
 </theory>

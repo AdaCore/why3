@@ -300,6 +300,11 @@ Existing Instance set_WhyType.
 
 Parameter to_fset: set -> set.Fset.fset Numbers.BinNums.Z.
 
+Parameter mk: set.Fset.fset Numbers.BinNums.Z -> set.
+
+Axiom mk'spec :
+  forall (s:set.Fset.fset Numbers.BinNums.Z), ((to_fset (mk s)) = s).
+
 Parameter choose: set -> Numbers.BinNums.Z.
 
 Axiom choose'spec :
@@ -348,7 +353,7 @@ Fixpoint stmt_writes (i:stmt)
   end.
 
 (* Why3 goal *)
-Theorem compute_writes'VC :
+Theorem compute_writes'vc :
   forall (s:stmt), forall (result:set),
   (exists x:term, exists x1:fmla, exists x2:stmt,
    (s = (Swhile x x1 x2)) /\
@@ -362,6 +367,7 @@ Theorem compute_writes'VC :
     (n:Numbers.BinNums.Z),
   many_steps sigma pi s sigma' pi' Sskip n ->
   assigns sigma (to_fset result) sigma'.
+(* Why3 intros s result (x,(x1,(x2,(h1,h2)))) sigma pi sigma' pi' n h3. *)
 Proof.
 intros s result (x,(x1,(x2,(h1,h2)))); rewrite h1 in *. intros.
 generalize sigma pi sigma' pi' H.
@@ -387,3 +393,4 @@ inversion H0; subst; clear H0.
 apply assigns_refl.
 inversion H.
 Qed.
+

@@ -1,144 +1,389 @@
-(** {1 Characters and Strings} *)
+(** {1 Theory of strings}
 
-(** {2 Characters} *)
+This file provides a theory over strings. It contains all the
+predicates and functions currently supported by the smt-solvers CVC4
+and Z3.
 
-module Char
+*)
 
-  use int.Int
-
-  type char = private { code : int }
-    invariant { 0 <= code <= 255 }
-
-  val function uppercase char : char
-  val function lowercase char : char
-
-  axiom uppercase_alpha:
-    forall c:char. 97 <= c.code <= 122 ->
-      (uppercase c).code = c.code - 32
-
-  axiom uppercase_other:
-    forall c:char. 0 <= c.code < 97 \/ 122 < c.code <= 127 ->
-      (uppercase c).code = c.code
-
-  axiom lowercase_alpha:
-    forall c:char. 65 <= c.code <= 90 ->
-      (lowercase c).code = c.code + 32
-
-  axiom lowercase_other:
-    forall c:char. 0 <= c.code < 65 \/ 90 < c.code <= 127 ->
-      (lowercase c).code = c.code
-
-  val chr (x:int) : char
-    requires { 0 <= x <= 255 }
-    ensures  { result.code = x }
-
-  (*** TODO
-     - compare ?
-   *)
-
-end
-
-(** {2 Strings} *)
+(** {2 String operations} *)
 
 module String
 
   use int.Int
-  use Char
-  use map.Map as M
 
-  type string = private {
-    mutable ghost chars: M.map int char;
-                 length: int
-  } invariant { length >= 0 }
+  (** indexes for strings start at `0` *)
 
-  val create (len:int) : string
-    requires { len >= 0 } ensures { length result = len }
+  (** type string is built-in *)
 
-  function ([]) (s: string) (i: int) : char = M.([]) s.chars i
-  function get  (s: string) (i: int) : char = M.([]) s.chars i
+  constant empty : string = ""
+  (** the empty string. *)
 
-  val make (len:int) (c:char) : string
-    requires { len >= 0 }
-    ensures  { length result = len }
-    ensures  { forall i:int. 0 <= i < len -> result[i] = c }
+  function concat string string : string
+  (** `concat s1 s2` is the concatenation of `s1` and `s2`.  *)
 
-  val get (s:string) (i:int) : char
-    requires { 0 <= i < length s } ensures { result = s[i] }
+  axiom concat_assoc: forall s1 s2 s3.
+    concat (concat s1 s2) s3 = concat s1 (concat s2 s3)
 
-  val unsafe_get (s:string) (i:int) : char
-    ensures { result = s[i] }
+  axiom concat_empty: forall s.
+    concat s empty = concat empty s = s
 
-  val set (s:string) (i:int) (v:char) : unit writes {s}
-    requires { 0 <= i < length s }
-    ensures  { s.chars = old M.(s.chars[i <- v]) }
+  function length string : int
+  (** `length s` is the length of the string `s`. *)
 
-  val unsafe_set (s:string) (i:int) (v:char) : unit writes {s}
-    ensures { s.chars = old M.(s.chars[i <- v]) }
+  axiom length_empty: length "" = 0
 
-  val copy (s:string) : string
-    ensures { length result = length s }
-    ensures { forall i:int. 0 <= i < length result -> result[i] = s[i] }
+  axiom length_concat: forall s1 s2.
+    length (concat s1 s2) = length s1 + length s2
 
-  val uppercase (s:string) : string
-    ensures { length result = length s }
-    ensures { forall i:int.
-      0 <= i < length result -> result[i] = Char.uppercase s[i] }
+  predicate lt string string
+  (** `lt s1 s2` returns `True` iff `s1` is lexicographically smaller
+  than `s2`. *)
 
-  val lowercase (s:string) : string
-    ensures { length result = length s }
-    ensures { forall i:int.
-      0 <= i < length result -> result[i] = Char.lowercase s[i] }
+  axiom lt_empty: forall s.
+    s <> empty -> lt empty s
 
-  (*** TODO
-     - copy
-     - sub
-     - fill
-     - blit
-     - concat
-     - index / rindex / index_from / rindex_from
-     - contains / contains_from / rcontains_from
-     - capitalize / uncapitalize
-  *)
+  axiom lt_not_com: forall s1 s2.
+    lt s1 s2 -> not (lt s2 s1)
+
+  axiom lt_ref: forall s1. not (lt s1 s1)
+
+  axiom lt_trans: forall s1 s2 s3.
+    lt s1 s2 && lt s2 s3 -> lt s1 s3
+
+  predicate le string string
+  (** `le s1 s2` returns `True` iff `s1` is lexicographically smaller
+  or equal than `s2`. *)
+
+  axiom le_empty: forall s.
+    le empty s
+
+  axiom le_ref: forall s1.
+    le s1 s1
+
+  axiom lt_le: forall s1 s2.
+    lt s1 s2 -> le s1 s2
+
+  axiom lt_le_eq: forall s1 s2.
+    le s1 s2 -> lt s1 s2 || s1 = s2
+
+  axiom le_trans: forall s1 s2 s3.
+    le s1 s2 && le s2 s3 -> le s1 s3
+
+  function ([]) string int : string
+  (** `s[i]` is:
+
+       (1) `empty`, if either `i < 0` or `i >= length s`;
+
+       (2) the string of length `1` containing the character of
+           position `i` in string `s`, if `0 <= i < length s`. *)
+
+  axiom at_out_of_range: forall s i.
+    i < 0 || i >= length s -> s[i] = empty
+
+  axiom at_empty: forall i.
+    empty[i] = empty
+
+  axiom at_length: forall s i.
+    let j = s[i] in
+    if 0 <= i < length s then length j = 1 else length j = 0
+
+  function substring string int int : string
+  (** `substring s i x` is:
+
+      (1) the `empty` string if `i < 0`, `i >= length s`, or `x <= 0`;
+
+      (2) the substring of `s` starting at `i` and of length
+          `min x (length s - i)`. *)
+
+  axiom substring_out_of_range: forall s i x.
+    i < 0 || i >= length s -> substring s i x = empty
+
+  axiom substring_of_length_zero_or_less: forall s i x.
+    x <= 0 -> substring s i x = ""
+
+  axiom substring_of_empty: forall i x.
+    substring "" i x = ""
+
+  axiom substring_smaller: forall s i x.
+    length (substring s i x) <= length s
+
+  axiom substring_smaller_x: forall s i x.
+    x > 0 -> length (substring s i x) <= x
+
+  axiom substring_length: forall s i x.
+    x > 0 && 0 <= i < length s ->
+      if i + x > length s then
+        length (substring s i x) = length s - i
+      else length (substring s i x) = x
+
+  axiom substring_at: forall s i.
+    s[i] = substring s i 1
+
+  predicate prefixof string string
+  (** `prefixof s1 s2` is `True` iff `s1` is a prefix of `s2`. *)
+
+  axiom prefixof_substring: forall s1 s2.
+    prefixof s1 s2 <-> s1 = substring s2 0 (length s1)
+
+  axiom prefixof_concat: forall s1 s2.
+    prefixof s1 (concat s1 s2)
+
+  axiom prefixof_empty: forall s2.
+    prefixof "" s2
+
+  axiom prefixof_empty2: forall s1.
+    s1 <> empty -> not (prefixof s1 "")
+
+  predicate suffixof string string
+  (** `suffixof s1 s2` is `True` iff `s1` is a suffix of `s2`. *)
+
+  axiom suffixof_substring: forall s1 s2.
+    suffixof s1 s2 <-> s1 = substring s2 (length s2 - length s1) (length s1)
+
+  axiom suffixof_concat: forall s1 s2.
+    suffixof s2 (concat s1 s2)
+
+  axiom suffixof_empty: forall s2.
+    suffixof "" s2
+
+  axiom suffiof_empty2: forall s1.
+    s1 <> empty -> not (suffixof s1 "")
+
+  predicate contains string string
+  (** `contains s1 s2` is `True` iff `s1` contains `s2`. *)
+
+  axiom contains_prefixof: forall s1 s2.
+    prefixof s1 s2 -> contains s2 s1
+
+  axiom contains_suffixof: forall s1 s2.
+    suffixof s1 s2 -> contains s2 s1
+
+  axiom contains_empty: forall s2.
+    contains "" s2 <-> s2 = empty
+
+  axiom contains_empty2: forall s1.
+    contains s1 ""
+
+  axiom contains_substring: forall s1 s2 i.
+    substring s1 i (length s2) = s2 -> contains s1 s2
+
+  (*** The following should hold, but are not proved by SMT provers *)
+  (*** axiom substring_contains: forall s1 s2.
+    contains s1 s2 -> exists i. substring s1 i (length s2) = s2 *)
+
+  axiom contains_concat: forall s1 s2.
+    contains (concat s1 s2) s1 && contains (concat s1 s2) s2
+
+  axiom contains_at: forall s1 s2 i.
+    s1[i] = s2 -> contains s1 s2
+
+  (*** The following should hold, but are not proved by SMT provers *)
+  (*** axiom at_contains: forall s1 s2.
+    contains s1 s2 && length s2 = 1 -> exists i. s1[i] = s2 *)
+
+  function indexof string string int : int
+  (** `indexof s1 s2 i` is:
+
+      (1) the first occurence of `s2` in `s1` after `i`, if `0 <= i <=
+          length s1` (note: the result is `i`, if `s2 = empty` and `0
+          <= i <= length s1`);
+
+      (2) `-1`, if `i < 0`, `i > length s1`, or `0 <= i <= length s1`
+          and `s2` does not occur in `s1` after `i`.  *)
+
+  axiom indexof_empty: forall s i.
+    0 <= i <= length s -> indexof s "" i = i
+
+  axiom indexof_empty1: forall s i.
+    let j = indexof "" s i in
+    j = -1 || (s = "" && i = j = 0)
+
+  axiom indexof_contains: forall s1 s2.
+    let j = indexof s1 s2 0 in
+    contains s1 s2 ->
+      0 <= j <= length s1 && substring s1 j (length s2) = s2
+
+  axiom contains_indexof: forall s1 s2 i.
+    indexof s1 s2 i >= 0 -> contains s1 s2
+
+  axiom not_contains_indexof: forall s1 s2 i.
+    not (contains s1 s2)  -> indexof s1 s2 i = -1
+
+  axiom substring_indexof: forall s1 s2 i.
+    let j = indexof s1 s2 i in
+    j >= 0 -> substring s1 j (length s2) = s2
+
+  axiom indexof_out_of_range: forall i s1 s2.
+    not (0 <= i <= length s1) -> indexof s1 s2 i = -1
+
+  axiom indexof_in_range: forall s1 s2 i.
+    let j = indexof s1 s2 i in
+    0 <= i <= length s1 -> j = -1 || i <= j <= length s1
+
+  axiom indexof_contains_substring: forall s1 s2 i.
+    0 <= i <= length s1 && contains (substring s1 i (length s1 - i)) s2 ->
+      i <= indexof s1 s2 i <= length s1
+
+  function replace string string string : string
+  (** `replace s1 s2 s3` is:
+
+      (1) `concat s3 s1`, if `s2 = empty`;
+
+      (2) the string obtained by replacing the first occurrence of `s2`
+          (if any) by `s3` in `s1`. *)
+
+  axiom replace_empty: forall s1 s3.
+    replace s1 "" s3 = concat s3 s1
+
+  axiom replace_not_contains: forall s1 s2 s3.
+    not (contains s1 s2) -> replace s1 s2 s3 = s1
+
+  axiom replace_empty2: forall s2 s3.
+    let s4 = replace empty s2 s3 in
+    if s2 = empty then s4 = s3 else s4 = empty
+
+  axiom replace_substring_indexof: forall s1 s2 s3.
+    let j = indexof s1 s2 0 in
+    replace s1 s2 s3 =
+      if j < 0 then s1 else
+        concat (concat (substring s1 0 j) s3)
+               (substring s1 (j + length s2) (length s1 - j - length s2))
+
+  (*** Not in SMT-LIB standard, but in CVC4 *)
+  function replaceall string string string : string
+  (** `replaceall s1 s2 s3` is:
+
+      (1) `s1`, if `s2 = empty`;
+
+      (2) the string obtained by replacing all occurences of `s2` by
+          `s3` in `s1`. *)
+
+  axiom replaceall_empty1: forall s1 s3.
+    replaceall s1 "" s3 = s1
+
+  axiom not_contains_replaceall: forall s1 s2 s3.
+    not (contains s1 s2) -> replaceall s1 s2 s3 = s1
+
+  function to_int string : int
+  (** `to_int s` is:
+
+      (1) an `int` consisting on the digits of `s`, if `s` contains
+          exclusively ascii characters in the range 0x30 ... 0x39;
+
+      (2) `-1`, if `s` contains a character that is not in the range
+          0x30 ... 0x39. *)
+
+  axiom to_int_gt_minus_1: forall s. to_int s >= -1
+
+  axiom to_int_empty: to_int "" = -1
+
+  (*** The following lemmas should hold, but CVC4 is not able to prove them *)
+  (*** axiom to_int_only_digits: forall s.
+        s <> empty &&
+          (forall i. 0 <= i < length s -> le "0" s[i] && le s[i] "9")
+            -> to_int s >= 0 *)
+
+  (*** axiom to_int_lt_0: forall s i.
+         0 <= i < length s && lt s[i] "0"
+             -> to_int s = -1 *)
+
+  (*** In SMT-Lib, but NOT in z3/cvc4 *)
+  predicate is_digit (s:string) = 0 <= to_int s <= 9 && length s = 1
+  (** `is_digit s` returns `True` iff `s` is of length `1` and
+      corresponds to a decimal digit, that is, to a code point in the
+      range 0x30 ... 0x39 *)
+
+  function from_int int : string
+  (** `from_int i` is:
+
+      (1) the corresponding string in the decimal notation if `i >= 0`;
+
+      (2) `empty`, if `i < 0`. *)
+
+  axiom from_int_negative: forall i.
+    i < 0 <-> from_int i = empty
+
+  axiom from_int_to_int: forall i.
+    if i >= 0 then to_int (from_int i) = i else to_int (from_int i) = -1
 
 end
 
-(** {2 Buffers} *)
+(** {2 String realization}
 
-module Buffer
+This module is inteded for string realization. It clones the `String`
+module replacing axioms by goals.
 
-  use int.Int
-  use Char
-  use import String as S
-  use import map.Map as M
+*)
 
-  type t = private {
-    ghost mutable  chars: map int char;
-          mutable length: int
-  } invariant { length >= 0 }
+module StringRealization
 
-  val create (size:int) : t
-    requires { size >= 0 } ensures { result.length = 0 }
-    (** `size` is only given as a hint for the initial size *)
+  clone export String
+    with goal .
+  (** trick to remove axioms from the String theory. See file
+     examples/stdlib/stringCheck.mlw *)
 
-  val contents (b:t) : string
-    ensures { S.length result = length b }
+end
 
-  val add_char (b:t) (c:char) : unit writes {b}
-    ensures { length b = old (length b) + 1 }
-    ensures { forall i: int.
-      0 <= i < length b -> b.chars[i] = old b.chars[i] }
-    ensures { b.chars[length b - 1] = c }
+(** {2 Regular expressions} *)
 
-  val add_string (b:t) (s:string) : unit writes {b}
-    ensures { length b = old (length b) + S.length s }
-    ensures { forall i: int.
-      0 <= i < old (length b) -> b.chars[i] = old b.chars[i] }
-    ensures { forall i: int.
-      0 <= i < S.length s -> b.chars[old (length b) + i] = S.get s i }
+module RegExpr
 
-  (*** TODO
-     - add_substring
-     - add_buffer
-  *)
+  use String as S
+
+  type re
+  (** type for regular expressions *)
+
+  function to_re string : re
+  (** string to regular expression injection *)
+
+  predicate in_re string re
+  (** regular expression membership *)
+
+  function concat re re : re
+  (** regular expressions concatenation, left associativity *)
+
+  function union re re : re
+  (** regular expressions union, left associativity *)
+
+  function inter re re : re
+  (** regular expressions intersection, left associativity *)
+
+  function star re : re
+  (** Kleene closure *)
+
+  function plus re : re
+  (** Kleene cross *)
+  (*** forall re. plus re = concat re (star re) *)
+
+  constant none : re
+  (** the empty set of strings *)
+
+  constant allchar : re
+  (** the set of all strings of length 1 *)
+
+  constant all : re = star allchar
+  (** the set of all strings *)
+
+  function opt re : re
+  (** regular expression option *)
+  (*** forall re. opt re = union re (to_re "") *)
+
+  function range string string : re
+  (** `range s1 s2` is the set of singleton strings such that all
+  element `s` of `range s1 s2` satisfies the condition `Str.<= s1 s`
+  and `Str.<= s s2`. *)
+
+  function power int re : re
+  (** `power n r` is the `n`th power of `r`; `n` must be an
+      integer literal. *)
+  (*** power 0 e = to_re ""
+     power n e = concat e (power (n-1) e) *)
+
+  function loop int int re : re
+  (** loop n1 n2 r = if n1 > ne then none else
+                    if n1 = n2 then power n1 r else
+                    union (power n1 e) (loop (n1+1) n2 e) *)
+  (*** `n1` and `n2` must be literals. *)
 
 end

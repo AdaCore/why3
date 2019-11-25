@@ -64,7 +64,9 @@ let do_input f =
     | "-" ->
         Env.read_channel Pmodule.mlw_language ?format env "stdin" stdin
     | file ->
-        Env.read_file Pmodule.mlw_language ?format env file
+        let (mlw_files, _) =
+          Env.read_file Pmodule.mlw_language ?format env file in
+        mlw_files
   in
   let do_exec (mid,name) =
     let m = try Mstr.find mid mm with Not_found ->

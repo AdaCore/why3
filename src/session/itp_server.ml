@@ -16,6 +16,7 @@ open Controller_itp
 open Server_utils
 open Itp_communication
 
+
 (**********************************)
 (* list unproven goal and related *)
 (**********************************)
@@ -73,16 +74,55 @@ let unproven_goals_below_id cont id =
   | ATh th     ->
      List.rev (unproven_goals_below_th cont [] th)
 
+
+module type Protocol = sig
+  val get_requests : unit -> ide_request list
+  val notify : notification -> unit
+
+end
+
+let registered_lang = Hashtbl.create 63
+
+exception Task_language_error
+
+let add_registered_lang lang print_ext_any =
+  if Hashtbl.mem registered_lang lang then
+    raise Task_language_error
+  else
+    Hashtbl.add registered_lang lang print_ext_any
+
+(* Printing of task *)
+let print_ext_any task (lang:string) print_any =
+  match Hashtbl.find registered_lang lang with
+  | print_ext_any -> print_ext_any task print_any
+  | exception Not_found -> print_any
+
+module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
+
+module C = Controller_itp.Make(S)
+
+let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
+
+let debug_attrs = Debug.register_info_flag "print_model_attrs"
+  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
+
+(* Return the source language associated to the following goals. *)
+let lang ses any =
+  let file = Session_itp.get_encapsulating_file ses any in
+  Session_itp.file_format file
+
 (****** Exception handling *********)
 
 let p s id =
-  let _,tables = Session_itp.get_task_name_table s id in
+  let lang = lang s (APn id) in
+  let task,tables = Session_itp.get_task_name_table s id in
   (* We use snapshots of printers to avoid registering new values inside it
      only for exception messages.
   *)
   let pr = Ident.duplicate_ident_printer tables.Trans.printer in
   let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
-  (Pretty.create pr apr pr pr false)
+  (* Use the external printer for exception reporting (default is identity) *)
+  (Pretty.create ~print_ext_any:(print_ext_any task lang) pr apr pr pr false)
 
 let print_opt_type ~print_type fmt t =
   match t with
@@ -93,6 +133,7 @@ let print_opt_type ~print_type fmt t =
 
 (* TODO remove references to id.id_string in this function *)
 let bypass_pretty s id =
+  (* For task errors, we use the external printer if one is given *)
   let module P = (val (p s id)) in
   begin fun fmt exn -> match exn with
   | Ty.TypeMismatch (t1,t2) ->
@@ -210,7 +251,7 @@ let get_exception_message ses id e =
   | Session_itp.NoProgress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans s ->
-      Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
+      Pp.sprintf "Error in transformation function:\n%s \n" s, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_decl (s, ld) ->
       Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
         (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") P.print_tdecl) ld,
@@ -237,8 +278,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Error in transformation %s during unification of the following types:\n %a \n %a"
         s P.print_ty ty1 P.print_ty ty2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_missing (s, svs) ->
-      Pp.sprintf "Error in transformation function: %s %a\n" s
-        (Pp.print_list Pp.space P.print_vs) (Term.Svs.elements svs),
+      Pp.sprintf "Error in transformation function:\n%s %a\n" s
+        (* The arguments should appear on one line (no @) *)
+        (Pp.print_list (fun fmt () -> fprintf fmt ", ") P.print_vs)
+        (Term.Svs.elements svs),
       Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
       Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
@@ -269,21 +312,6 @@ let get_exception_message ses id e =
       Pp.sprintf "An argument was expected of type %s, none were given" s, Loc.dummy_position, ""
   | e ->
       (Pp.sprintf "%a" (bypass_pretty ses id) e), Loc.dummy_position, ""
-
-
-module type Protocol = sig
-  val get_requests : unit -> ide_request list
-  val notify : notification -> unit
-end
-
-module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
-
-module C = Controller_itp.Make(S)
-
-let debug = Debug.register_flag "itp_server" ~desc:"ITP server"
-
-let debug_attrs = Debug.register_info_flag "print_model_attrs"
-  ~desc:"Print@ attrs@ of@ identifiers@ and@ expressions@ in prover@ results."
 
 (****************)
 (* Command list *)
@@ -519,9 +547,10 @@ let get_modified_node n =
   | Saved | Saving_needed _ -> None
   | Message _ -> None
   | Dead _ -> None
-  | Task (nid, _, _, _) -> Some nid
+  | Task (nid, _, _, _, _) -> Some nid
   | File_contents _ -> None
   | Source_and_ce _ -> None
+  | Ident_notif_loc _ -> None
 
 
 type focus =
@@ -577,7 +606,7 @@ end
   (* File input/output *)
   (*********************)
 
-  let read_and_send f =
+  let read_and_send ~read_only f file_format =
     try
       let d = get_server_data() in
       if d.send_source then
@@ -586,7 +615,7 @@ end
             (Session_itp.get_dir d.cont.controller_session) f in
  *)
         let s = Sysutil.file_contents f in
-        P.notify (File_contents (f, s))
+        P.notify (File_contents (f, s, file_format, read_only))
     with Invalid_argument s ->
       P.notify (Message (Error s))
 
@@ -694,13 +723,16 @@ end
     | APa pa ->
       let pa = get_proof_attempt_node s pa in
       let obs = pa.proof_obsolete in
+      let detached = get_node_detached node in
+      let appear_obs = obs || detached in
       let limit = pa.limit in
       let res =
         match pa.Session_itp.proof_state with
         | Some pa -> Done pa
         | _ -> Undone
       in
-      P.notify (Node_change (new_id, Proof_status_change(res, obs, limit)))
+      P.notify (Node_change (new_id,
+                             Proof_status_change(res, appear_obs, limit)))
 
 
 (*
@@ -855,7 +887,8 @@ end
     let d = get_server_data () in
     let ses = d.cont.controller_session in
     let on_file f =
-      read_and_send (Session_itp.system_path ses f)
+      read_and_send ~read_only:false (Session_itp.system_path ses f)
+        (Session_itp.file_format f)
     in
     iter_on_files ~on_file ~on_subtree:create_node
 
@@ -866,13 +899,17 @@ end
   (* -- send the task -- *)
   let task_of_id d id show_full_context loc =
     let task,tables = get_task_name_table d.cont.controller_session id in
+    let lang = lang d.cont.controller_session (APn id) in
     (* This function also send source locations associated to the task *)
     let goal_loc, loc_color_list =
       if loc then get_locations task else (None, []) in
     let task_text =
       let pr = tables.Trans.printer in
       let apr = tables.Trans.aprinter in
-      let module P = (val Pretty.create pr apr pr pr false) in
+      (* For task printing we use the external printer (the default one is
+         identity). *)
+      let module P = (val Pretty.create ~print_ext_any:(print_ext_any task lang) pr apr
+                         pr pr false) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in
     task_text, loc_color_list, goal_loc
@@ -883,6 +920,7 @@ end
 
   let create_ce_tab ~print_attrs s res any list_loc goal_loc =
     let f = get_encapsulating_file s any in
+    let file_format = Session_itp.file_format f in
     let filename = Session_itp.system_path s f in
     let source_code = Sysutil.file_contents filename in
     (* Convert the color location and location of the goal at the same time *)
@@ -899,12 +937,12 @@ end
     let goal_loc, list_loc = List.partition (fun (_, y) -> y = Goal_loc) list_loc in
     let goal_loc =
       match goal_loc with
-      | [(x, _)] -> Some x
+      | (x, _) :: _ -> Some x
       | _        -> None in
     let list_loc =
       List.map (fun (x, y) ->
           match y with | Color_loc y -> (x, y) | _ -> assert false) list_loc in
-    (source_result, list_loc, goal_loc)
+    (source_result, list_loc, goal_loc, file_format)
 
   let send_task nid show_full_context loc =
     let d = get_server_data () in
@@ -917,34 +955,35 @@ end
       match any with
       | APn _id ->
         let s = "Goal is detached and cannot be printed" in
-        P.notify (Task (nid, s, [], None))
+        P.notify (Task (nid, s, [], None, ""))
       | ATh t ->
           let th_id   = theory_name t in
           let th_name = th_id.Ident.id_string in
           let th_loc  = th_id.Ident.id_loc in
-          P.notify (Task (nid, "Detached theory " ^ th_name, [], th_loc))
+          P.notify (Task (nid, "Detached theory " ^ th_name, [], th_loc, ""))
       | APa pid ->
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
           let prover_text = "Detached prover\n====================> Prover: " ^ name ^ "\n" in
-          P.notify (Task (nid, prover_text, [], None))
+          P.notify (Task (nid, prover_text, [], None, ""))
       | AFile f ->
-          P.notify (Task (nid, "Detached file " ^ (Sysutil.basename (file_path f)), [], None))
+          P.notify (Task (nid, "Detached file " ^ (Sysutil.basename (file_path f)), [], None, ""))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
           P.notify (Task (nid, "Detached transformation\n====================> Transformation: " ^
-                          String.concat " " (name :: args) ^ "\n", [], None))
+                          String.concat " " (name :: args) ^ "\n", [], None, ""))
     else
+      let lang = lang d.cont.controller_session any in
       match any with
       | APn id ->
           let s, list_loc, goal_loc = task_of_id d id show_full_context loc in
-          P.notify (Task (nid, s, list_loc, goal_loc))
+          P.notify (Task (nid, s, list_loc, goal_loc, lang))
       | ATh t ->
           let th_id   = theory_name t in
           let th_name = th_id.Ident.id_string in
           let th_loc  = th_id.Ident.id_loc in
-          P.notify (Task (nid, "Theory " ^ th_name, [], th_loc))
+          P.notify (Task (nid, "Theory " ^ th_name, [], th_loc, lang))
       | APa pid ->
           let print_attrs = Debug.test_flag debug_attrs in
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
@@ -969,22 +1008,22 @@ end
                   let result_pr =
                     result ^ "\n\n" ^ "The prover did not return counterexamples."
                   in
-                  P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc))
+                  P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc, lang))
                 else
                   begin
                     let result_pr =
                       result ^ "\n\n" ^ "Counterexample suggested by the prover:\n\n" ^ ce_result
                     in
-                    let (source_result, list_loc, goal_loc) =
+                    let (source_result, list_loc, goal_loc, file_format) =
                       create_ce_tab d.cont.controller_session ~print_attrs res any old_list_loc old_goal_loc
                     in
-                    P.notify (Source_and_ce (source_result, list_loc, goal_loc));
-                    P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc))
+                    P.notify (Source_and_ce (source_result, list_loc, goal_loc, file_format));
+                    P.notify (Task (nid, prover_text ^ result_pr, old_list_loc, old_goal_loc, lang))
                   end
-            | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc))
+            | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc, lang))
           end
       | AFile f ->
-          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], None))
+          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], None, lang))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
@@ -992,7 +1031,7 @@ end
           let s, list_loc, goal_loc = task_of_id d parid show_full_context loc in
           P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
                           String.concat " " (name :: args) ^ "\n",
-                          list_loc, goal_loc))
+                          list_loc, goal_loc, lang))
 
   (* -------------------- *)
 
@@ -1013,7 +1052,9 @@ end
         let l = add_file cont f in
         let file = find_file_from_path cont.controller_session fn in
         send_new_subtree_from_file file;
-        read_and_send (Session_itp.system_path cont.controller_session file);
+        read_and_send ~read_only:false
+          (Session_itp.system_path cont.controller_session file)
+          (Session_itp.file_format file);
         begin
           match l with
           | [] ->
@@ -1348,7 +1389,10 @@ end
 
   let read_and_send_files s =
     let fs = Session_itp.get_files s in
-    Hfile.iter (fun _ f -> read_and_send (Session_itp.system_path s f)) fs
+    Hfile.iter (fun _ f ->
+        read_and_send ~read_only:false (Session_itp.system_path s f)
+          (Session_itp.file_format f))
+      fs
 
   let notify_parsing_errors l =
     List.iter
@@ -1473,7 +1517,7 @@ end
      | Get_file_contents _ | Save_file_req _
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
      | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
-     | Reset_proofs_req -> true
+     | Reset_proofs_req | Find_ident_req _ -> true
      | Get_first_unproven_node ni ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
@@ -1487,6 +1531,51 @@ end
            Hint.mem model_any nid
          else
            true
+
+   (* Sends a notification of a location together with the file in which this
+      location appear. (TODO: TBI only send the file if it is not in the
+      session) *)
+   let notify_loc loc =
+     let (f, _, _, _) = Loc.get loc in
+     let s = Sysutil.file_contents f in
+     let format = Env.get_format f in
+     P.notify (File_contents (f, s, format, true));
+     P.notify (Ident_notif_loc loc)
+
+   let find_ident (loc: Loc.position) =
+     try
+       let (id, _, _) = Glob.find loc in
+       begin match id.Ident.id_loc with
+         | None -> ()
+         | Some loc -> notify_loc loc
+       end
+     with Not_found ->
+       P.notify (Message (Error "Ident not found: try saving the file."))
+
+   (* Locate a string in the task *)
+   let locate_id d (id: string) nid =
+     let any = any_from_node_ID nid in
+     let ses = d.cont.Controller_itp.controller_session in
+     let locate_in_goal nid =
+       let _,table = Session_itp.get_task_name_table ses nid in
+         begin match locate_id d.cont table [id] with
+           | None -> P.notify (Message (Error "No location found"))
+           | exception Server_utils.Undefined_id _ ->
+               P.notify (Message (Error "No location found"))
+           | Some loc -> notify_loc loc
+         end in
+     match any with
+     | None -> P.notify (Message (Error "Please select a node id"));
+     | Some (APn nid) ->
+         locate_in_goal nid
+     | Some (APa nid) ->
+         let nid = Session_itp.get_proof_attempt_parent ses nid in
+         locate_in_goal nid
+     | Some (ATn nid) ->
+         let nid = Session_itp.get_trans_parent ses nid in
+         locate_in_goal nid
+     | Some (AFile _) | Some (ATh _) ->
+         P.notify (Message (Error "Please select a goal id"))
 
   (* ----------------- treat_request -------------------- *)
 
@@ -1502,7 +1591,9 @@ end
        reload_session ();
        session_needs_saving := true
     | Get_first_unproven_node ni   ->
-      notify_first_unproven_node d ni
+        notify_first_unproven_node d ni
+    | Find_ident_req loc ->
+        find_ident loc
     | Remove_subtree nid           ->
        remove_node nid;
        session_needs_saving := true
@@ -1527,7 +1618,12 @@ end
           end
        end
     | Get_file_contents f          ->
-       read_and_send f
+        (* TODO warning this request is not tested *)
+        let ses = d.cont.controller_session in
+        let file = Session_itp.find_file_from_path ses
+            (Sysutil.system_independent_path_of_file f) in
+        let file_format = Session_itp.file_format file in
+        read_and_send ~read_only:false f file_format
     | Save_file_req (name, text)   ->
        save_file name text
     | Check_need_saving_req ->
@@ -1554,6 +1650,8 @@ end
          | Strategies st           ->
              run_strategy_on_task nid st;
              session_needs_saving := true
+         | Locate id               ->
+             locate_id d id nid
          | Edit p                  ->
              schedule_edition nid p;
              session_needs_saving := true

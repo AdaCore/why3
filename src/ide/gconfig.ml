@@ -49,9 +49,12 @@ type t =
       mutable premise_color : string;
       mutable neg_premise_color : string;
       mutable goal_color : string;
-      mutable error_color : string;
+      mutable error_color_fg : string;
       mutable error_color_bg : string;
+      mutable error_color_msg_zone_fg : string;
+      mutable error_color_msg_zone_bg : string;
       mutable error_line_color : string;
+      mutable search_color : string;
       mutable iconset : string;
       (** colors *)
       mutable config : Whyconf.config;
@@ -85,9 +88,12 @@ type ide = {
   ide_premise_color : string;
   ide_neg_premise_color : string;
   ide_goal_color : string;
-  ide_error_color : string;
+  ide_error_color_fg : string;
   ide_error_color_bg : string;
+  ide_error_color_msg_zone_fg : string;
+  ide_error_color_msg_zone_bg : string;
   ide_error_line_color : string;
+  ide_search_color : string;
   ide_iconset : string;
   (* ide_replace_prover : conf_replace_prover; *)
   ide_hidden_provers : string list;
@@ -113,9 +119,12 @@ let default_ide =
     ide_premise_color = "chartreuse";
     ide_neg_premise_color = "pink";
     ide_goal_color = "gold";
-    ide_error_color_bg = "yellow";
-    ide_error_color = "red";
+    ide_error_color_bg = "white";
+    ide_error_color_fg = "red";
+    ide_error_color_msg_zone_bg = "yellow";
+    ide_error_color_msg_zone_fg = "red";
     ide_error_line_color = "yellow";
+    ide_search_color = "lightblue"; (* TODO color TBD *)
     ide_iconset = "fatcow";
     ide_hidden_provers = [];
   }
@@ -165,15 +174,24 @@ let load_ide section =
     ide_goal_color =
       get_string section ~default:default_ide.ide_goal_color
         "goal_color";
-    ide_error_color =
-      get_string section ~default:default_ide.ide_error_color
-        "error_color";
+    ide_error_color_fg =
+      get_string section ~default:default_ide.ide_error_color_fg
+        "error_color_fg";
     ide_error_color_bg =
       get_string section ~default:default_ide.ide_error_color_bg
         "error_color_bg";
+    ide_error_color_msg_zone_bg =
+      get_string section ~default:default_ide.ide_error_color_msg_zone_bg
+        "error_color_msg_zone_bg";
+    ide_error_color_msg_zone_fg =
+      get_string section ~default:default_ide.ide_error_color_msg_zone_fg
+        "error_color_msg_zone_fg";
     ide_error_line_color =
       get_string section ~default:default_ide.ide_error_line_color
         "error_line_color";
+    ide_search_color =
+      get_string section ~default:default_ide.ide_search_color
+        "search_color";
     ide_iconset =
       get_string section ~default:default_ide.ide_iconset
         "iconset";
@@ -224,9 +242,12 @@ let load_config config original_config =
     premise_color = ide.ide_premise_color;
     neg_premise_color = ide.ide_neg_premise_color;
     goal_color = ide.ide_goal_color;
-    error_color = ide.ide_error_color;
+    error_color_fg = ide.ide_error_color_fg;
     error_color_bg = ide.ide_error_color_bg;
     error_line_color = ide.ide_error_line_color;
+    error_color_msg_zone_fg = ide.ide_error_color_msg_zone_fg;
+    error_color_msg_zone_bg = ide.ide_error_color_msg_zone_bg;
+    search_color = ide.ide_search_color;
     iconset = ide.ide_iconset;
     config         = config;
     original_config = original_config;
@@ -274,9 +295,12 @@ let save_config t =
   let ide = set_string ide "premise_color" t.premise_color in
   let ide = set_string ide "neg_premise_color" t.neg_premise_color in
   let ide = set_string ide "goal_color" t.goal_color in
-  let ide = set_string ide "error_color" t.error_color in
+  let ide = set_string ide "error_color_fg" t.error_color_fg in
   let ide = set_string ide "error_color_bg" t.error_color_bg in
   let ide = set_string ide "error_line_color" t.error_line_color in
+  let ide = set_string ide "error_color_msg_zone_fg" t.error_color_msg_zone_fg in
+  let ide = set_string ide "error_color_msg_zone_bg" t.error_color_msg_zone_bg in
+  let ide = set_string ide "search_color" t.search_color in
   let ide = set_string ide "iconset" t.iconset in
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
   let config = Whyconf.set_section config "ide" ide in
@@ -1077,6 +1101,53 @@ let alternatives_frame c (notebook:GPack.notebook) =
   let _fillbox = GPack.vbox ~packing:page_pack () in
   ()
 
+let colors_frame c (notebook:GPack.notebook) =
+  let editable_colors =
+    [("error_color_bg", "#FFFFFF", fun x -> c.error_color_bg <- x);
+     ("error_color_fg", "#FF0000", fun x -> c.error_color_fg <- x);
+     ("error_color_msg_zone_fg", "#FF0000", fun x -> c.error_color_msg_zone_fg <- x);
+     ("error_color_msg_zone_bg", "#FFFF00", fun x -> c.error_color_msg_zone_bg <- x);
+     ("error_line_color", "#FFFF00", fun x -> c.error_line_color <- x);
+    ] in
+  let label = GMisc.label ~text:"Colors" () in
+  let page = GPack.vbox ~homogeneous:false ~packing:
+      (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) () in
+  let page_pack = page#pack ?fill:None ~expand:true ?from:None ?padding:None in
+  let frame = GBin.frame ~label:"Choosing colors" ~packing:page_pack () in
+  let box = GPack.vbox ~border_width:5 ~packing:frame#add () in
+  let box_pack = box#pack ?fill:None ?expand:None ?from:None ?padding:None in
+  let add_choice (desc, default, set) =
+    (* Check the color is of the form #FFFFFF *)
+    let check_color s =
+      String.length s = 7 && s.[0] = '#' &&
+      match int_of_string ("0x" ^ (String.sub s 1 6)) with
+      | _ -> true
+      | exception Failure _ -> false in
+    let text = "Color for " ^ desc in
+    let hb = GPack.hbox ~homogeneous:false ~packing:box_pack () in
+    let hb_pack_fill_expand =
+      hb#pack ~fill:true ~expand:true ?from:None ?padding:None in
+    let hb_pack = hb#pack ?fill:None ?expand:None ?from:None ?padding:None in
+    let (_: GMisc.label) = GMisc.label ~width:150 ~xalign:0.0 ~text
+      ~packing:hb_pack_fill_expand () in
+    let entry = GEdit.entry ~text:default ~packing:hb_pack () in
+    let (_: GtkSignal.id) = entry#event#connect#key_press
+        ~callback:(fun (ev: 'a Gdk.event) ->
+            match GdkEvent.Key.keyval ev with
+            | k when k = GdkKeysyms._Return ->
+                let data = entry#text in
+                if check_color data then begin
+                    set data;
+                    entry#set_text "";
+                  end;
+                false
+            | _ -> false
+          ) in
+    () in
+  List.iter add_choice editable_colors;
+  let _ = GPack.vbox ~packing:page_pack () in
+  ()
+
 let editors_page c (notebook:GPack.notebook) =
   let label = GMisc.label ~text:"Editors" () in
   let page =
@@ -1179,6 +1250,8 @@ let preferences ~parent (c : t) =
   (* page "uninstalled provers" *)
   alternatives_frame c notebook;
   (* page "Colors" **)
+  colors_frame c notebook;
+
 (*
   let label2 = GMisc.label ~text:"Colors" () in
   let _color_sel = GMisc.color_selection (* ~title:"Goal color" *)

@@ -1,0 +1,15 @@
+use map.Map
+use array.Array
+use mach.c.C
+use int.Int
+use mach.int.UInt64
+
+let double_free (p1 p2:ptr uint64)
+  requires { offset p1 = 0 }
+  requires { offset p2 = 0 }
+  alias { p1.data with p2.data }
+  requires { valid p1 0 }
+  requires { valid p2 0 }
+=
+  free p1; (* resets p2 *)
+  free p2

@@ -267,22 +267,56 @@ rule token = parse
   let debug = Debug.register_info_flag "print_modules"
     ~desc:"Print@ program@ modules@ after@ typechecking."
 
-  let build_parsing_function entry lb = Loc.with_location (entry token) lb
+  exception Error of string option
 
-  let parse_term = build_parsing_function Parser.term_eof
+  let () = Exn_printer.register (fun fmt exn -> match exn with
+  (* This ad hoc switch allows to not edit the automatically generated
+     handcrafted.messages in ad hoc ways. *)
+  | Error None -> Format.fprintf fmt "syntax error"
+  | Error (Some s) -> Format.fprintf fmt "syntax error:\n %s" s
+  | _ -> raise exn)
 
-  let parse_term_list = build_parsing_function Parser.term_comma_list_eof
-
-  let parse_qualid = build_parsing_function Parser.qualid_eof
-
-  let parse_list_ident = build_parsing_function Parser.ident_comma_list_eof
-
-  let parse_list_qualid = build_parsing_function Parser.qualid_comma_list_eof
+  let build_parsing_function (parser_entry: Lexing.position -> 'a) lb =
+    (* This records the last token which was read (for error messages) *)
+    let last = ref EOF in
+    let module I = Parser.MenhirInterpreter in
+    let checkpoint = parser_entry lb.Lexing.lex_curr_p
+    and supplier =
+      I.lexer_lexbuf_to_supplier (fun x -> let t = token x in last := t; t) lb
+    and succeed t = t
+    and fail checkpoint =
+      let text = Lexing.lexeme lb in
+      let fname = lb.Lexing.lex_curr_p.Lexing.pos_fname in
+      (* TODO/FIXME: ad-hoc fix for TryWhy3/Str incompatibility *)
+      let s = if Strings.has_prefix "/trywhy3_input." fname
+        then None
+        else Report.report text !last checkpoint in
+      (* Typing.close_file is supposedly done at the end of the file in
+         parsing.mly. If there is a syntax error, we still need to close it (to
+         be able to reload). *)
+      Loc.with_location (fun _x -> raise (Error s)) lb
+    in
+    I.loop_handle succeed fail supplier checkpoint
 
   open Wstdlib
   open Ident
   open Theory
   open Pmodule
+
+  let parse_term lb =
+    build_parsing_function Parser.Incremental.term_eof lb
+
+  let parse_decl lb = build_parsing_function Parser.Incremental.decl_eof lb
+
+  let parse_term_list lb = build_parsing_function Parser.Incremental.term_comma_list_eof lb
+
+  let parse_qualid lb = build_parsing_function Parser.Incremental.qualid_eof lb
+
+  let parse_list_ident lb = build_parsing_function Parser.Incremental.ident_comma_list_eof lb
+
+  let parse_list_qualid lb = build_parsing_function Parser.Incremental.qualid_comma_list_eof lb
+
+  let parse_mlw_file lb = build_parsing_function Parser.Incremental.mlw_file_parsing_only lb
 
   let read_channel env path file c =
     let lb = Lexing.from_channel c in
@@ -290,7 +324,7 @@ rule token = parse
     Typing.open_file env path;
     let mm =
       try
-        build_parsing_function Parser.mlw_file lb
+        build_parsing_function Parser.Incremental.mlw_file lb
       with
         e -> ignore (Typing.discard_file ()); raise e
     in
@@ -301,7 +335,9 @@ rule token = parse
     end;
     mm
 
-  let () = Env.register_format mlw_language "whyml" ["mlw";"why"] read_channel
-    ~desc:"WhyML@ programming@ and@ specification@ language"
+  let whyml_format = "whyml"
+
+  let () = Env.register_format mlw_language whyml_format ["mlw";"why"]
+      read_channel ~desc:"WhyML@ programming@ and@ specification@ language"
 
 }

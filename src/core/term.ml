@@ -224,7 +224,7 @@ type term = {
 
 and term_node =
   | Tvar of vsymbol
-  | Tconst of Number.constant
+  | Tconst of Constant.constant
   | Tapp of lsymbol * term list
   | Tif of term * term * term
   | Tlet of term * term_bound
@@ -331,7 +331,7 @@ let t_compare trigger attr loc t1 t2 =
           | Tvar v1, Tvar v2 ->
               comp_raise (vs_compare v1 v2)
           | Tconst c1, Tconst c2 ->
-              comp_raise (Number.compare_const c1 c2)
+              comp_raise (Constant.compare_const c1 c2)
           | Tapp (s1,l1), Tapp (s2,l2) ->
               comp_raise (ls_compare s1 s2);
               List.iter2 (t_compare bnd vml1 vml2) l1 l2
@@ -400,7 +400,7 @@ let t_similar t1 t2 =
   oty_equal t1.t_ty t2.t_ty &&
   match t1.t_node, t2.t_node with
     | Tvar v1, Tvar v2 -> vs_equal v1 v2
-    | Tconst c1, Tconst c2 -> Number.compare_const c1 c2 = 0
+    | Tconst c1, Tconst c2 -> Constant.compare_const c1 c2 = 0
     | Tapp (s1,l1), Tapp (s2,l2) -> ls_equal s1 s2 && Lists.equal (==) l1 l2
     | Tif (f1,t1,e1), Tif (f2,t2,e2) -> f1 == f2 && t1 == t2 && e1 == e2
     | Tlet (t1,bv1), Tlet (t2,bv2) -> t1 == t2 && bv1 == bv2
@@ -851,30 +851,37 @@ let ps_app ps tl    = t_app ps tl None
 
 let t_nat_const n =
   assert (n >= 0);
-  t_const (Number.int_const_of_int n) ty_int
+  t_const (Constant.int_const_of_int n) ty_int
 
 let t_int_const n =
-  t_const (Number.int_const n) Ty.ty_int
+  t_const (Constant.int_const n) Ty.ty_int
 
 let t_real_const ?pow2 ?pow5 s =
-  t_const (Number.real_const ?pow2 ?pow5 s) Ty.ty_real
+  t_const (Constant.real_const ?pow2 ?pow5 s) Ty.ty_real
+
+let t_string_const s =
+  t_const (Constant.string_const s) Ty.ty_str
 
 exception InvalidIntegerLiteralType of ty
 exception InvalidRealLiteralType of ty
+exception InvalidStringLiteralType of ty
 
 let check_literal c ty =
-  let open Number in
+  let open Constant in
   let ts = match ty.ty_node, c with
     | Tyapp (ts,[]), _ -> ts
     | _, ConstInt _ -> raise (InvalidIntegerLiteralType ty)
-    | _, ConstReal _ -> raise (InvalidRealLiteralType ty) in
+    | _, ConstReal _ -> raise (InvalidRealLiteralType ty)
+    | _, ConstStr _ -> raise (InvalidStringLiteralType ty) in
   match c, ts.ts_def with
   | ConstInt _, _ when ts_equal ts ts_int -> ()
-  | ConstInt n, Range ir -> check_range n ir
+  | ConstInt n, Range ir -> Number.check_range n ir
   | ConstInt _, _ -> raise (InvalidIntegerLiteralType ty)
   | ConstReal _, _ when ts_equal ts ts_real -> ()
-  | ConstReal x, Float fp -> check_float x fp
+  | ConstReal x, Float fp -> Number.check_float x fp
   | ConstReal _, _ -> raise (InvalidRealLiteralType ty)
+  | ConstStr _, _ when ts_equal ts ts_str -> ()
+  | ConstStr _, _ -> raise (InvalidStringLiteralType ty)
 
 let t_const c ty = check_literal c ty; t_const c ty
 

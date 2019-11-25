@@ -18,14 +18,18 @@ let () = Debug.unset_flag flag (* make sure it is unset by default *)
 
 type def_use = Def | Use
 
-let glob = Hashtbl.create 5003
-  (* could be improved with nested hash tables *)
+let glob = Hashtbl.create 16
+(* Hash [file -> Hash [(line, column) -> ident]] *)
 
-let key loc = let f, l, c, _ = Loc.get loc in f, l, c
+let key loc = let f, l, c, _ = Loc.get loc in f, (l, c)
 
 let add loc idk =
-  let k = key loc in
-  if not (Hashtbl.mem glob k) then Hashtbl.add glob k idk
+  let kf, k = key loc in
+  match (Hashtbl.find glob kf) with
+  | hash_f -> if not (Hashtbl.mem hash_f k) then Hashtbl.add hash_f k idk
+  | exception Not_found ->
+      let hash_f = Hashtbl.create 255 in
+      Hashtbl.add glob kf hash_f
 
 let def ~kind id =
   Opt.iter (fun loc -> add loc (id, Def, kind)) id.id_loc
@@ -33,8 +37,15 @@ let def ~kind id =
 let use ~kind loc id =
   add loc (id, Use, kind)
 
+let clear f =
+  match Hashtbl.find glob f with
+  | exception Not_found -> ()
+  | hash_f -> Hashtbl.clear hash_f
+
 let find loc =
-  Hashtbl.find glob (key loc)
+  let (kf, k) = key loc in
+  let hash_f = Hashtbl.find glob kf in
+  Hashtbl.find hash_f k
 
 (* FIXME allow several entries for the same loc, find returns all of them,
          and why3doc inserts several anchors *)

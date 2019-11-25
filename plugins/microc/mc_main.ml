@@ -43,9 +43,10 @@ let mk_ref ~loc e =
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (set_op ~loc, [a; i; v]))
 let constant ~loc i =
-  mk_expr ~loc (Econst (Number.int_const_of_int i))
+  mk_expr ~loc (Econst (Constant.int_const_of_int i))
 let constant_s ~loc s =
-  mk_expr ~loc (Econst (Number.(ConstInt (int_literal ILitDec ~neg:false s))))
+  let int_lit = Number.(int_literal ILitDec ~neg:false s) in
+  mk_expr ~loc (Econst (Constant.ConstInt int_lit))
 let break ~loc =
   Qident (mk_id ~loc "Break")
 let break_handler ~loc =
@@ -288,10 +289,12 @@ let decl = function
     let body = List.fold_left local body idl in
     let param (_ty, id) = id.id_loc, Some id, false, None in
     let params = if idl = [] then no_params ~loc else List.map param idl in
+    let p = mk_pat ~loc Pwild in
     let d = if stmt_has_call id bl then
-      Drec ([id, false, Expr.RKnone, params, None, Ity.MaskVisible, sp, body])
+      Drec ([id, false, Expr.RKnone, params, None,
+             p, Ity.MaskVisible, sp, body])
     else
-      let e = Efun (params, None, Ity.MaskVisible, sp, body) in
+      let e = Efun (params, None, p, Ity.MaskVisible, sp, body) in
       Dlet (id, false, Expr.RKnone, mk_expr ~loc e) in
     Typing.add_decl loc d
   | Mc_ast.Dlogic (ty, id, idl, def) ->

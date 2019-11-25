@@ -1,24 +1,51 @@
-FROM bench-image-system-stable
+FROM debian:buster
 
 USER root
 
+# install dependencies
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -yq && \
+    apt-get upgrade -yq --with-new-pkgs --auto-remove && \
+    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module unzip build-essential autoconf automake ocaml-nox ca-certificates && \
+    apt-get clean
+
+RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.5/opam-2.0.5-x86_64-linux -O /usr/local/bin/opam && \
+    chmod a+x /usr/local/bin/opam
+
+# install provers
+## CVC4 1.7
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.7-x86_64-linux-opt -O /usr/local/bin/cvc4-1.7 && \
+    chmod a+x /usr/local/bin/cvc4-1.7
+## Z3 4.8.4
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.8.4/z3-4.8.4.d6df51951f4c-x64-debian-8.11.zip && \
+    unzip z3-4.8.4.d6df51951f4c-x64-debian-8.11.zip && \
+    mv z3-4.8.4.d6df51951f4c-x64-debian-8.11/bin/z3 /usr/local/bin/z3-4.8.4 && \
+    rm -r z3-4.8.4.d6df51951f4c-x64-debian-8.11.zip z3-4.8.4.d6df51951f4c-x64-debian-8.11
+
+# create user
 RUN adduser --disabled-password --gecos '' guest
+USER guest
+ENV HOME /home/guest
 
-USER why3
+RUN opam init -y --auto-setup -j1 --compiler=ocaml-system --disable-sandboxing && \
+    opam install -y re menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo && \
+    opam clean -a
 
-COPY --chown=why3:why3 . why3
-WORKDIR /home/why3/why3
-
-RUN eval `opam config env` && \
+COPY --chown=guest:guest . /home/guest/why3
+WORKDIR /home/guest/why3
+RUN eval `opam env` && \
+    ./autogen.sh && \
     ./configure && \
     make
 
 USER root
 
-RUN make install
+RUN make install && \
+    cp /home/guest/.opam/ocaml-system/bin/alt-ergo /usr/local/bin/
 
 USER guest
-ENV HOME /home/guest
 WORKDIR /home/guest
 
 RUN why3 config --detect
+
+ENTRYPOINT [ "why3" ]

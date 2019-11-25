@@ -151,7 +151,7 @@ type ident = {
   id_attrs  : Sattr.t;              (* identifier attributes *)
   id_loc    : Loc.position option;  (* optional location *)
   id_tag    : Weakhtbl.tag;         (* unique magical tag *)
-}
+  }
 
 module Id = MakeMSHW (struct
   type t = ident
@@ -341,6 +341,8 @@ let sanitizer head rest n = sanitizer' head rest rest n
 
 let proxy_attr = create_attribute "mlw:proxy_symbol"
 
+let useraxiom_attr = create_attribute "useraxiom"
+
 let model_projected_attr = create_attribute "model_projected"
 let model_vc_post_attr = create_attribute "model_vc_post"
 
@@ -473,11 +475,18 @@ let get_element_name ~attrs =
   | None -> None
   | Some name_attr ->
     let splitted1 = Strings.bounded_split ':' name_attr.attr_string 2 in
-    let correct_word = Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_']*\\)$" in
+    let correct_word = Re.Str.regexp "^\\([A-Za-z]+\\)\\([A-Za-z0-9_']*\\)$" in
     match splitted1 with
-    | ["name"; content] when Str.string_match correct_word content 0 ->
+    | ["name"; content] when Re.Str.string_match correct_word content 0 ->
         Some content
     | _ -> None
+
+let suffix_attr_name ~attrs suffix =
+  Sattr.fold (fun x acc ->
+      if is_name_attr x then
+          Sattr.add (create_attribute (x.attr_string ^ suffix)) acc
+      else
+        Sattr.add x acc) attrs Sattr.empty
 
 let id_unique_attr printer ?(sanitizer = same) id =
   try

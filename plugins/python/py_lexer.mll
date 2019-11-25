@@ -154,7 +154,14 @@ and string = parse
     stack := [0];  (* reinitialise indentation stack *)
     Why3.Loc.with_location (Py_parser.file next_token) lb
 
+  (* Entries for transformations: similar to lexer.mll *)
+  let build_parsing_function entry lb = Why3.Loc.with_location (entry next_token) lb
+
+  let parse_term = build_parsing_function Py_parser.term_eof
+
+  let parse_term_list = build_parsing_function Py_parser.term_comma_list_eof
+
+  let parse_list_ident = build_parsing_function Py_parser.ident_comma_list_eof
+
+
 }
-
-
-

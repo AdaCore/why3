@@ -5,30 +5,30 @@
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="logic.mlw"/>
 <theory name="Compiler_logic" proved="true">
- <goal name="VC hl" expl="VC for hl" proved="true">
+ <goal name="hl&#39;vc" expl="VC for hl" proved="true">
  <proof prover="3"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="VC wp" expl="VC for wp" proved="true">
+ <goal name="wp&#39;vc" expl="VC for wp" proved="true">
  <proof prover="3"><result status="valid" time="0.02" steps="6"/></proof>
  </goal>
  <goal name="seq_wp_lemma" proved="true">
  <proof prover="3"><result status="valid" time="0.02" steps="5"/></proof>
  </goal>
- <goal name="VC infix --" expl="VC for infix --" proved="true">
+ <goal name="infix --&#39;vc" expl="VC for infix --" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC infix --.0" expl="precondition" proved="true">
+  <goal name="infix --&#39;vc.0" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
-  <goal name="VC infix --.1" expl="assertion" proved="true">
+  <goal name="infix --&#39;vc.1" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.05" steps="15"/></proof>
   </goal>
-  <goal name="VC infix --.2" expl="postcondition" proved="true">
+  <goal name="infix --&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
   </goal>
-  <goal name="VC infix --.3" expl="postcondition" proved="true">
+  <goal name="infix --&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.03" steps="8"/></proof>
   </goal>
  </transf>
@@ -36,16 +36,16 @@
  <goal name="fork_wp_lemma" proved="true">
  <proof prover="3"><result status="valid" time="0.03" steps="14"/></proof>
  </goal>
- <goal name="VC infix %" expl="VC for infix %" proved="true">
+ <goal name="infix %&#39;vc" expl="VC for infix %" proved="true">
  <proof prover="0"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="towp_wp_lemma" proved="true">
  <proof prover="3"><result status="valid" time="0.04" steps="13"/></proof>
  </goal>
- <goal name="VC prefix $" expl="VC for prefix $" proved="true">
+ <goal name="prefix $&#39;vc" expl="VC for prefix $" proved="true">
  <proof prover="3"><result status="valid" time="0.05" steps="17"/></proof>
  </goal>
- <goal name="VC hoare" expl="VC for hoare" proved="true">
+ <goal name="hoare&#39;vc" expl="VC for hoare" proved="true">
  <proof prover="0"><result status="valid" time="0.07"/></proof>
  </goal>
  <goal name="pconj_lemma" proved="true">
@@ -54,22 +54,22 @@
  <goal name="loop_wp_lemma" proved="true">
  <proof prover="3"><result status="valid" time="0.04" steps="50"/></proof>
  </goal>
- <goal name="VC make_loop" expl="VC for make_loop" proved="true">
+ <goal name="make_loop&#39;vc" expl="VC for make_loop" proved="true">
  <transf name="split_goal_right" proved="true" >
-  <goal name="VC make_loop.0" expl="assertion" proved="true">
+  <goal name="make_loop&#39;vc.0" expl="assertion" proved="true">
   <transf name="induction_pr" proved="true" >
-   <goal name="VC make_loop.0.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.26" steps="59915"/></proof>
+   <goal name="make_loop&#39;vc.0.0" expl="assertion" proved="true">
+   <proof prover="2"><result status="valid" time="0.26" steps="59916"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC make_loop.1" expl="precondition" proved="true">
+  <goal name="make_loop&#39;vc.1" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
-  <goal name="VC make_loop.2" expl="postcondition" proved="true">
+  <goal name="make_loop&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.05" steps="7"/></proof>
   </goal>
-  <goal name="VC make_loop.3" expl="postcondition" proved="true">
+  <goal name="make_loop&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
  </transf>

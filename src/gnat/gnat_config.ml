@@ -366,7 +366,7 @@ let actual_cmd ?main filename cmd =
     | None -> get_main config
     | Some m -> m in
   let replace_func s =
-    match (Str.matched_string s).[1] with
+    match (Re.Str.matched_string s).[1] with
     | '%' -> "%"
     | 'f' -> Sys.getcwd () ^ Filename.dir_sep ^ filename
     (* Can %t and %T be on an editor command line and have a meaning?
@@ -378,7 +378,7 @@ let actual_cmd ?main filename cmd =
     | 'd' -> datadir m
     | 'o' -> libobjdir m
     | a ->  Char.escaped a in
-  Str.global_substitute (Str.regexp "%.") replace_func cmd
+  Re.Str.global_substitute (Re.Str.regexp "%.") replace_func cmd
 
 (* function to build manual elements *)
 (* pass proof dir and prover as args *)

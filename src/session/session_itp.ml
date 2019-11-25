@@ -77,7 +77,7 @@ type transformation_node = {
 type file = {
   file_id                : int;
   mutable file_path      : Sysutil.file_path;
-  file_format            : string option;
+  file_format            : Env.fformat;
   file_is_detached       : bool;
   mutable file_theories  : theory list;
 }
@@ -1205,8 +1205,8 @@ let load_theory ~version session parent_name old_provers (path,acc) th =
 let load_file ~version session old_provers f =
   match f.Xml.name with
   | "file" ->
+    (* This "name" attribute only exists in old sessions *)
     let fn = string_attribute_opt "name" f in
-    let fmt = load_option "format" f in
     let fid = gen_fileID session in
     let path,ft =
       List.fold_left
@@ -1222,6 +1222,12 @@ let load_file ~version session old_provers f =
         | None -> assert false
       else path
     in
+    let fmt =
+      (* If the session is ill-formed and the format is absent, we use the
+         extension to decide the format *)
+      let def_fmt =
+        Env.get_format (Format.asprintf "%a" Sysutil.print_file_path path) in
+      string_attribute_def "format" f def_fmt in
     let mf = { file_id = fid;
                file_path = path;
                file_format = fmt;
@@ -1427,7 +1433,7 @@ let load_session (dir : string) =
       None
   in
   let session = empty_session ~shape_version dir in
-  (* This shape can be switched to None if the shape file is not found *)
+  (* This shape is switched to None when the shape file is not found *)
   let shape_version =
     if Sys.file_exists file then
       try
@@ -1456,9 +1462,13 @@ let load_session (dir : string) =
 
 module Goal_Shape = struct
   type 'a t = proofNodeID * session
-  let checksum (id,s) = Some (Hpn.find s.shapes.session_sum_table id)
+  let checksum (id,s) =
+    try Some (Hpn.find s.shapes.session_sum_table id) with
+    | Not_found -> None
   let shape (id,s)    =
-    (Hpn.find s.shapes.session_shape_table id, Termcode.Gshape.empty_bshape)
+    try
+      (Hpn.find s.shapes.session_shape_table id, Termcode.Gshape.empty_bshape)
+    with Not_found -> (Termcode.empty_shape, Termcode.Gshape.empty_bshape)
   let name (id,s)     = (get_proofNode s id).proofn_name
 end
 
@@ -1468,10 +1478,14 @@ module Goal_Bound_Shape = struct
 
   type 'a t = proofNodeID * session
 
-  let checksum (id,s) = Some (Hpn.find s.shapes.session_sum_table id)
+  let checksum (id,s) =
+    try Some (Hpn.find s.shapes.session_sum_table id) with
+    | Not_found -> None
   let shape (id,s) =
-    let li = Hpn.find s.shapes.session_bound_shape_table id in
-    (Termcode.Gshape.goal_and_expl_shapes s.shapes.session_global_shapes li, li)
+    try
+      let li = Hpn.find s.shapes.session_bound_shape_table id in
+      (Termcode.Gshape.goal_and_expl_shapes s.shapes.session_global_shapes li, li)
+    with Not_found -> (Termcode.empty_shape, Termcode.Gshape.empty_bshape)
   let name (id,s) = (get_proofNode s id).proofn_name
 
 end
@@ -1566,7 +1580,8 @@ let () = Exn_printer.register
 
 let apply_trans_to_goal ~allow_no_effect s env name args id =
   let task,table = get_task_name_table s id in
-  let subtasks = Trans.apply_transform_args name env args table task in
+  let lang = (get_encapsulating_file s (APn id)).file_format in
+  let subtasks = Trans.apply_transform_args name env args table lang task in
   (* If any generated task is equal to the former task, then we made no
      progress because we need to prove more lemmas than before *)
   match subtasks with
@@ -1837,7 +1852,7 @@ let merge_file_section ~shape_version ~old_ses ~old_theories ~file_is_detached ~
   update_file_node (fun _ -> ()) s f
 
 let read_file env ?format fn =
-  let theories = Env.read_file Env.base_language env ?format fn in
+  let theories, format = Env.read_file Env.base_language env ?format fn in
   let ltheories =
     Mstr.fold
       (fun name th acc ->
@@ -1853,7 +1868,7 @@ let read_file env ?format fn =
       (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
       ltheories
   in
-  List.map (fun (_,_,a) -> a) th
+  (List.map (fun (_,_,a) -> a) th), format
 
 let merge_file ~shape_version env (ses : session) (old_ses : session) file =
   let format = file_format file in
@@ -1861,7 +1876,7 @@ let merge_file ~shape_version env (ses : session) (old_ses : session) file =
   let file_name = Sysutil.system_dependent_absolute_path (get_dir old_ses) (file_path file) in
   Debug.dprintf debug "merging file %s@." file_name;
   try
-    let new_theories = read_file env file_name ?format in
+    let new_theories, format = read_file env file_name ~format in
     merge_file_section
       ses ~shape_version ~old_ses ~old_theories ~file_is_detached:false
       ~env file_name new_theories format;
@@ -1995,8 +2010,6 @@ let get_prover_to_save prover_ids p (timelimits,steplimits,memlimits) provers =
 let opt pr lab fmt = function
   | None -> ()
   | Some s -> fprintf fmt "@ %s=\"%a\"" lab pr s
-
-let opt_string = opt save_string
 
 let save_prover fmt id (p,mostfrequent_timelimit,mostfrequent_steplimit,mostfrequent_memlimit) =
   let steplimit =
@@ -2138,7 +2151,7 @@ let save_theory s ctxt fmt t =
 let save_file s ctxt fmt _ f =
   fprintf fmt
     "@\n@[<v 0>@[<h><file%a%a>@]@\n%a"
-    (opt_string "format") f.file_format
+    (save_string_attrib "format") f.file_format
     (save_bool_def "proved" false) (file_proved s f)
     save_file_path f.file_path;
   List.iter (save_theory s ctxt fmt) f.file_theories;

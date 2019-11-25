@@ -77,6 +77,7 @@ type color =
   | Error_color
   | Error_line_color
   | Error_font_color
+  | Search_color
 
 type update_info =
   | Proved of bool
@@ -108,15 +109,21 @@ type notification =
   (** an informative message, can be an error message *)
   | Dead         of string
   (** server exited *)
-  | Task         of node_ID * string * (Loc.position * color) list * Loc.position option
-  (** the node_ID's task together with information that allows to color the
-     source code corresponding to different part of the task (premise, goal,
-     etc). Last parameter is the location of the goal for scrolling  *)
-  | File_contents of string * string
-  (** File_contents (filename, contents) *)
-  | Source_and_ce of string * (Loc.position * color) list * Loc.position option
+  | Task         of node_ID * string * (Loc.position * color) list * Loc.position option * string
+  (** [n, s, list_loc, goal_loc, lang] with
+     - [n] the node_ID's task,
+     - [s] the task to be displayed
+     - [list_loc] a list of location to color the source,
+     - [goal_loc] the location of the goal,
+     - [lang] the language to load in Why3ide for syntax coloring
+  *)
+  | File_contents of string * string * Env.fformat * bool
+  (** File_contents (filename, contents, format, read_only) *)
+  | Source_and_ce of string * (Loc.position * color) list * Loc.position option * Env.fformat
   (** Source interleaved with counterexamples: contents and list color loc,
-      loc of the goal *)
+      loc of the goal, format of the source *)
+  | Ident_notif_loc of Loc.position
+  (** Answer the position where an ident is defined *)
 
 type ide_request =
   | Command_req             of node_ID * string
@@ -124,6 +131,8 @@ type ide_request =
      interpreted by Server_utils.interp. This includes calling
      provers, applying transformations, stategies.  *)
   | Add_file_req            of string
+  (* The file argument should be absolute. Or, at least, contain the session
+     directory path: relative path will be taken from there *)
   | Set_config_param        of string * int
   | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
@@ -137,6 +146,8 @@ type ide_request =
   | Save_file_req           of string * string
   (** [Save_file_req(filename, content_of_file)] saves the file *)
   | Get_first_unproven_node of node_ID
+  | Find_ident_req          of Loc.position
+  (** [Find_ident_req (position)] *)
   | Unfocus_req
   | Save_req
   | Reload_req

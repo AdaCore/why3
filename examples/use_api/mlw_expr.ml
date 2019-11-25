@@ -73,7 +73,7 @@ let d2 =
   let body =
     (* building expression "ref 42" *)
     let e =
-      let c0 = Expr.e_const (Number.int_const_of_int 42) Ity.ity_int in
+      let c0 = Expr.e_const (Constant.int_const_of_int 42) Ity.ity_int in
       let refzero_type = Ity.ity_app ref_type [Ity.ity_int] [] in
       Expr.e_app ref_fun [c0] [] refzero_type
     in

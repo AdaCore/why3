@@ -97,8 +97,8 @@ theory real.FromInt
 end
 
 theory real.Truncate
-  syntax function truncate "(ite (>= %1 0.0)
-                                 (to_int %1)
+  syntax function truncate "(ite (>= %1 0.0) \
+                                 (to_int %1) \
                                  (- (to_int (- %1))))"
   syntax function floor "(to_int %1)"
   syntax function ceil "(- (to_int (- %1)))"

@@ -159,12 +159,12 @@ let read_lib_file ?format lang env path file =
   let ff = get_format ?format file in
   let fp = get_parser lang ff in
   let ch = open_in file in
-  try fp env path file ch; close_in ch
+  try fp env path file ch; close_in ch; ff
   with exn -> close_in ch; raise exn
 
 let read_file ?format lang env file =
-  read_lib_file ?format lang env [] file;
-  Hpath.find (Wenv.find lang.memo env) []
+  let format = read_lib_file ?format lang env [] file in
+  (Hpath.find (Wenv.find lang.memo env) []), format
 
 (** Library file parsing *)
 
@@ -197,7 +197,7 @@ let read_library lang env = function
       List.iter read lang.bins
   | path ->
       let file = locate_library env path in
-      read_lib_file lang env path file
+      let (_: fformat) = read_lib_file lang env path file in ()
 
 let libstack = Hpath.create 17
 

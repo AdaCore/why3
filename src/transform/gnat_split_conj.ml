@@ -61,9 +61,9 @@ let () =
    on the right hand side, and only there."
 
 
-let post_def_axiom_regexp = Str.regexp ".*__\\(post\\|def\\)_axiom"
+let post_def_axiom_regexp = Re.Str.regexp ".*__\\(post\\|def\\)_axiom"
 
-let match_axiom s = Str.string_match post_def_axiom_regexp s 0
+let match_axiom s = Re.Str.string_match post_def_axiom_regexp s 0
 
 let rec merge_univ_quant t acc =
   match t.t_node with

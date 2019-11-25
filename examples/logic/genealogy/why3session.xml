@@ -36,10 +36,12 @@
 <prover id="31" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="32" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="33" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="34" name="Z3" version="4.8.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="35" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="36" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="37" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="4000"/>
-<file proved="true">
+<prover id="38" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
 <path name=".."/><path name="genealogy.why"/>
 <theory name="Genealogy" proved="true">
  <goal name="Child_is_son_or_daughter" proved="true">
@@ -75,10 +77,12 @@
  <proof prover="31"><result status="valid" time="0.00" steps="312"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="33"><result status="valid" time="0.02" steps="1631"/></proof>
- <proof prover="35"><result status="valid" time="0.02" steps="320"/></proof>
+ <proof prover="34"><result status="valid" time="0.02" steps="2071"/></proof>
+ <proof prover="35"><result status="valid" time="0.02" steps="509"/></proof>
  <proof prover="36"><result status="valid" time="0.00" steps="9"/></proof>
  <proof prover="37"><path
                      name="genealogy_Genealogy_Child_is_son_or_daughter_1.v"/><result status="valid" time="0.24"/></proof>
+ <proof prover="38"><result status="valid" time="0.03" steps="2071"/></proof>
  </goal>
  <goal name="Sibling_sym" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="3"/></proof>
@@ -109,8 +113,10 @@
  <proof prover="31"><result status="valid" time="0.00" steps="294"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="4"/></proof>
  <proof prover="33"><result status="valid" time="0.02" steps="1983"/></proof>
- <proof prover="35"><result status="valid" time="0.02" steps="302"/></proof>
+ <proof prover="34"><result status="valid" time="0.01" steps="2527"/></proof>
+ <proof prover="35"><result status="valid" time="0.02" steps="303"/></proof>
  <proof prover="36"><result status="valid" time="0.00" steps="4"/></proof>
+ <proof prover="38"><result status="valid" time="0.03" steps="2634"/></proof>
  </goal>
  <goal name="Sibling_is_brother_or_sister" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="10"/></proof>
@@ -140,8 +146,10 @@
  <proof prover="31"><result status="valid" time="0.00" steps="374"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="5"/></proof>
  <proof prover="33"><result status="valid" time="0.02" steps="2763"/></proof>
- <proof prover="35"><result status="valid" time="0.02" steps="382"/></proof>
+ <proof prover="34"><result status="valid" time="0.01" steps="3475"/></proof>
+ <proof prover="35"><result status="valid" time="0.02" steps="942"/></proof>
  <proof prover="36"><result status="valid" time="0.00" steps="9"/></proof>
+ <proof prover="38"><result status="valid" time="0.01" steps="3577"/></proof>
  </goal>
  <goal name="Grandparent_is_grandfather_or_grandmother" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="28"/></proof>
@@ -172,8 +180,10 @@
  <proof prover="31"><result status="valid" time="0.00" steps="313"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="20"/></proof>
  <proof prover="33"><result status="valid" time="0.01" steps="4234"/></proof>
- <proof prover="35"><result status="valid" time="0.02" steps="321"/></proof>
+ <proof prover="34"><result status="valid" time="0.01" steps="5528"/></proof>
+ <proof prover="35"><result status="valid" time="0.02" steps="372"/></proof>
  <proof prover="36"><result status="valid" time="0.00" steps="21"/></proof>
+ <proof prover="38"><result status="valid" time="0.01" steps="5537"/></proof>
  </goal>
  <goal name="Grandfather_male" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
@@ -203,8 +213,10 @@
  <proof prover="31"><result status="valid" time="0.00" steps="330"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="11"/></proof>
  <proof prover="33"><result status="valid" time="0.02" steps="3608"/></proof>
- <proof prover="35"><result status="valid" time="0.02" steps="391"/></proof>
+ <proof prover="34"><result status="valid" time="0.03" steps="4621"/></proof>
+ <proof prover="35"><result status="valid" time="0.02" steps="419"/></proof>
  <proof prover="36"><result status="valid" time="0.00" steps="11"/></proof>
+ <proof prover="38"><result status="valid" time="0.03" steps="4810"/></proof>
  </goal>
  <goal name="Grandmother_female" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
@@ -234,8 +246,10 @@
  <proof prover="31"><result status="valid" time="0.00" steps="328"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="11"/></proof>
  <proof prover="33"><result status="valid" time="0.01" steps="3614"/></proof>
- <proof prover="35"><result status="valid" time="0.02" steps="398"/></proof>
+ <proof prover="34"><result status="valid" time="0.03" steps="4629"/></proof>
+ <proof prover="35"><result status="valid" time="0.02" steps="419"/></proof>
  <proof prover="36"><result status="valid" time="0.00" steps="11"/></proof>
+ <proof prover="38"><result status="valid" time="0.02" steps="4815"/></proof>
  </goal>
  <goal name="Only_two_grandfathers" proved="true">
  <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
@@ -268,8 +282,10 @@
  <proof prover="31"><result status="valid" time="0.00" steps="474"/></proof>
  <proof prover="32"><result status="valid" time="0.00" steps="18"/></proof>
  <proof prover="33"><result status="valid" time="0.02" steps="3863"/></proof>
- <proof prover="35"><result status="valid" time="0.02" steps="482"/></proof>
+ <proof prover="34"><result status="valid" time="0.04" steps="4935"/></proof>
+ <proof prover="35"><result status="valid" time="0.02" steps="587"/></proof>
  <proof prover="36"><result status="valid" time="0.00" steps="18"/></proof>
+ <proof prover="38"><result status="valid" time="0.02" steps="5145"/></proof>
  </goal>
 </theory>
 </file>

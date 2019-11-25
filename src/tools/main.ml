@@ -60,10 +60,10 @@ let extra_help fmt commands =
 let available_commands () =
   let commands = Sys.readdir command_path in
   Array.sort String.compare commands;
-  let re = Str.regexp "^why3\\([^.]+\\)\\([.].*\\)?" in
+  let re = Re.Str.regexp "^why3\\([^.]+\\)\\([.].*\\)?" in
   let commands = Array.fold_left (fun acc v ->
-    if Str.string_match re v 0 then
-      let w = Str.matched_group 1 v in
+    if Re.Str.string_match re v 0 then
+      let w = Re.Str.matched_group 1 v in
       match acc with
       | (h,_)::_ when h = w -> acc
       | _ -> (w, v) :: acc

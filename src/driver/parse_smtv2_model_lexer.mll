@@ -13,13 +13,25 @@
   open Parse_smtv2_model_parser
   exception SyntaxError
 
+  let char_for_backslash = function
+    | 'a'  -> '\x07'
+    | 'b'  -> '\b'
+    | 'e'  -> '\x1B'
+    | 'f'  -> '\x0C'
+    | 'n'  -> '\n'
+    | 'r'  -> '\r'
+    | 't'  -> '\t'
+    | 'v'  -> '\x0B'
+    | _ as c -> c
+
 }
 
-let atom = [^'('')'' ''\t''\n']
+let atom = [^'('')'' ''\t''\n''"']
 let space = [' ''\t''\n''\r']
 let num = ['0'-'9']+
 let opt_num = ['0'-'9']*
-let hexa_num = ( num | ['a' - 'f'] | ['A' - 'F'])+
+let hex     = ['0'-'9' 'a'-'f' 'A'-'F']
+let hexa_num = hex+
 let dec_num = num"."num
 let name = (['a'-'z']*'_'*['0'-'9']*)*
 let dummy = ('_''_''_')?
@@ -32,6 +44,8 @@ rule token = parse
     { token lexbuf }
   | space+
       { token lexbuf }
+  | "\""
+      { STRING (read_string (Buffer.create 17) lexbuf) }
   | "store" { STORE }
   | "const" { CONST }
   | "model" {MODEL}
@@ -40,8 +54,8 @@ rule token = parse
       { LPAREN }
   | ')'
       { RPAREN }
-  | ';' { read_string (Buffer.create 17) lexbuf }
-  | ";;" { read_string (Buffer.create 17) lexbuf }
+  | ';' { read_comment (Buffer.create 17) lexbuf }
+  | ";;" { read_comment (Buffer.create 17) lexbuf }
   | '=' { EQUAL }
   | '_' { UNDERSCORE }
   | '/' { DIV }
@@ -90,9 +104,26 @@ rule token = parse
   | _
       { raise SyntaxError }
 
-and read_string buf =
+and read_comment buf =
   parse
   | '\n'      { COMMENT (Buffer.contents buf) }
   | '\r'      { COMMENT (Buffer.contents buf) }
   | eof       { COMMENT (Buffer.contents buf) }
-  | _ as a    { Buffer.add_char buf a; read_string buf lexbuf }
+  | _ as a    { Buffer.add_char buf a; read_comment buf lexbuf }
+
+and read_string buf = parse
+  | "\""
+    { Buffer.contents buf }
+  | "\"\""
+    { Buffer.add_char buf '"';
+      read_string buf lexbuf }
+  | "\\x" (hex hex as c)
+    { let c = Scanf.sscanf c "%2x" Char.chr in
+      Buffer.add_char buf c;
+      read_string buf lexbuf }
+  | "\\" (_ as c)
+    { Buffer.add_char buf (char_for_backslash c);
+      read_string buf lexbuf }
+  | _ as c
+    { Buffer.add_char buf c;
+      read_string buf lexbuf }

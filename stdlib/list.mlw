@@ -33,29 +33,6 @@ module Length
 
 end
 
-(** {2 Quantifiers on lists} *)
-
-module Quant
-
-  use List
-
-  let rec function for_all (p: 'a -> bool) (l:list 'a) : bool =
-    match l with
-    | Nil -> true
-    | Cons x r -> p x && for_all p r
-    end
-
-  let rec function for_some (p: 'a -> bool) (l:list 'a) : bool =
-    match l with
-    | Nil -> false
-    | Cons x r -> p x || for_some p r
-    end
-
-  let function mem (eq:'a -> 'a -> bool) (x:'a) (l:list 'a) : bool =
-    for_some (eq x) l
-
-end
-
 (** {2 Membership in a list} *)
 
 module Mem
@@ -67,6 +44,37 @@ module Mem
     end
 
 end
+
+(** {2 Quantifiers on lists} *)
+
+module Quant
+
+  use List
+  use Mem
+
+  let rec function for_all (p: 'a -> bool) (l:list 'a) : bool
+    ensures { result <-> forall x. mem x l -> p x }
+  =
+    match l with
+    | Nil -> true
+    | Cons x r -> p x && for_all p r
+    end
+
+  let rec function for_some (p: 'a -> bool) (l:list 'a) : bool
+    ensures { result <-> exists x. mem x l /\ p x }
+  =
+    match l with
+    | Nil -> false
+    | Cons x r -> p x || for_some p r
+    end
+
+  let function mem (eq:'a -> 'a -> bool) (x:'a) (l:list 'a) : bool
+    ensures  { result <-> exists y. mem y l /\ eq x y }
+  =
+    for_some (eq x) l
+
+end
+
 
 module Elements
 

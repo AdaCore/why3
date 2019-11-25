@@ -23,6 +23,10 @@ external reset_gc : unit -> unit = "ml_reset_gc"
 let debug = Debug.lookup_flag "ide_info"
 let debug_stack_trace = Debug.lookup_flag "stack_trace"
 
+let () =
+  (* Allow global locations to be saved for Find_ident_req *)
+  Debug.set_flag Glob.flag
+
 (***************************)
 (* Debugging Json protocol *)
 (***************************)
@@ -100,6 +104,10 @@ module Protocol_why3ide = struct
     let l = List.rev !notification_list in
     notification_list := [];
     l
+
+  (* print_ext_any just use the pretty function here *)
+  let print_ext_any print_any fmt t =
+    print_any fmt t
 
 end
 
@@ -203,7 +211,7 @@ let env, gconfig = try
 (********************************)
 
 
-let (why_lang, any_lang) =
+let (why_lang, any_lang, why3py_lang) =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
@@ -222,7 +230,14 @@ let (why_lang, any_lang) =
     match languages_manager#guess_language ~filename () with
     | None -> why_lang
     | Some _ as l -> l in
-  (why_lang, any_lang)
+  let why3py_lang =
+    match languages_manager#language "why3py" with
+    | None ->
+        eprintf "language file for 'Why3python' not found in directory %s@."
+          load_path;
+        exit 1
+    | Some _ as l -> l in
+  (why_lang, any_lang, why3py_lang)
 
 (* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
@@ -243,27 +258,44 @@ let try_convert s =
 (* Color handling in source *)
 (****************************)
 
-(* For each view, we have to recreate the tags *)
-let create_colors v =
-  let premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"premise_tag" [`BACKGROUND gconfig.premise_color] in
-  let neg_premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color] in
-  let goal_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
-  let error_line_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
-  let error_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
-  let error_font_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_font_tag" [`BACKGROUND gconfig.error_color] in
-  let _ : GText.tag = premise_tag v in
-  let _ : GText.tag = neg_premise_tag v in
-  let _ : GText.tag = goal_tag v in
-  let _ : GText.tag = error_line_tag v in
-  let _ : GText.tag = error_tag v in
-  let _ : GText.tag = error_font_tag v in
-  ()
+(* Generates the tag list (using the current config) *)
+let color_tags_list config =
+  (* The order of this list influences the priorities of tags *)
+  [("error_line_tag", [`BACKGROUND config.error_line_color]); (* less priority *)
+   ("premise_tag", [`BACKGROUND config.premise_color]);
+   ("neg_premise_tag", [`BACKGROUND config.neg_premise_color]);
+   ("goal_tag", [`BACKGROUND config.goal_color]);
+   ("error_tag", [`BACKGROUND config.error_color_bg]);
+   ("error_tag_msg_zone", [`BACKGROUND gconfig.error_color_msg_zone_bg;
+                           `FOREGROUND gconfig.error_color_msg_zone_fg]);
+   ("error_font_tag", [`FOREGROUND config.error_color_fg]);
+   ("search_tag", [`BACKGROUND config.search_color]);
+  ]
+
+(* For each view, we have to recreate the tags.
+   TODO The type annotatin is necessary for the type inference to know that <name> is optional. *)
+let create_colors config
+    (v: <buffer: < create_tag: ?name:string -> GText.tag_property list -> GText.tag;..>; ..>) =
+  let list_tags = color_tags_list config in
+  List.iter (fun (name, props) ->
+      let (_: GText.tag) = v#buffer#create_tag ~name props in ()) list_tags
+
+let remove_tag v tag_name =
+  let tag = GtkText.TagTable.lookup v#buffer#tag_table tag_name in
+  match tag with
+  | None -> ()
+  | Some tag -> GtkText.TagTable.remove v#buffer#tag_table tag
+
+let remove_all_tags config v =
+  List.iter (fun (s, _) -> remove_tag v s) (color_tags_list config)
+
+(* When colors are changed in the preferences, the tag need to change so we
+   remove and regenerate the tags.
+   This works only on sourceview (not on message_zone where tags are not added
+   by name *)
+let update_tags config v =
+  remove_all_tags config  v;
+  create_colors config v
 
 (* Erase all the source location tags in a source file *)
 let erase_color_loc (v:GSourceView.source_view) =
@@ -297,14 +329,12 @@ let exit_function_unsafe () =
   send_request Exit_req;
   GMain.quit ()
 
-(* Contains quadruples (tab page, source_view, file_has_been_modified, label_of_tab):
+(* Contains triples (tab page, source_view, label_of_tab):
    - tab_page is a unique number for each pages of the notebook
    - source_view is the graphical element inside a tab
-   - has_been_modified is a reference to a boolean stating if the current tab
-     source has been modified
    - label_of_tab is the mutable title of the tab
 *)
-let source_view_table : (int * GSourceView.source_view * bool ref * GMisc.label) Hstr.t =
+let source_view_table : (int * GSourceView.source_view * GMisc.label) Hstr.t =
   Hstr.create 14
 
 (* The corresponding file does not have a source view *)
@@ -315,17 +345,11 @@ let get_source_view_table (file:string) =
   | v -> v
   | exception Not_found -> raise (Nosourceview file)
 
-(* This returns the source_view of a file *)
-let get_source_view (file: string) : GSourceView.source_view =
-  match Hstr.find source_view_table file with
-  | (_, v, _, _) -> v
-  | exception Not_found -> raise (Nosourceview file)
-
 (* Saving function for sources *)
 let save_sources () =
   Hstr.iter
-    (fun k (_n, (s: GSourceView.source_view), b, _l) ->
-      if !b then
+    (fun k (_n, (s: GSourceView.source_view), _l) ->
+      if s#source_buffer#modified then
         let text_to_save = s#source_buffer#get_text () in
         send_request (Save_file_req (k, text_to_save))
     )
@@ -333,19 +357,19 @@ let save_sources () =
 
 (* True if there exist a file which needs saving *)
 let files_need_saving () =
-  Hstr.fold (fun _k (_, _, b, _) acc -> !b || acc) source_view_table false
+  Hstr.fold (fun _k (_, s, _) acc -> acc || s#source_buffer#modified) source_view_table false
 
 (* Ask if the user wants to save session before exit. Exit is then delayed until
    the [Saved] notification is received *)
 let exit_function_safe () =
   send_request Check_need_saving_req
 
-let exit_function_handler b =
+let exit_function_handler main_window b =
   if not b && not (files_need_saving ()) then
     exit_function_unsafe ()
   else
     let answer =
-      GToolbox.question_box
+      GToolbox.question_box ~parent:main_window
         ~title:"Why3 saving session and files"
         ~buttons:["Yes"; "No"; "Cancel"]
         "Do you want to save the session and unsaved files?"
@@ -357,9 +381,14 @@ let exit_function_handler b =
       | _ -> ()
     end
 
+(* Erase colors in all source views *)
+let erase_loc_all_view () =
+  Hstr.iter (fun _ (_, v, _) -> erase_color_loc v) source_view_table
+
 (* Update name of the tab when the label changes so that it has a * as prefix *)
 let update_label_change (label: GMisc.label) =
   let s = label#text in
+  erase_loc_all_view ();
   if not (Strings.has_prefix "*" s) then
     label#set_text ("*" ^ s)
 
@@ -371,7 +400,7 @@ let update_label_saved (label: GMisc.label) =
 
 let make_sources_editable b =
   Hstr.iter
-    (fun _ (_,source_view,_,_) ->
+    (fun _ (_,source_view,_) ->
       source_view#set_editable b;
       source_view#set_auto_indent b)
     source_view_table
@@ -398,7 +427,10 @@ let () =
       Whyconf.Args.exit_with_usage spec usage_str
   in
   Server.init_server gconfig.config env dir;
-  Queue.iter (fun f -> send_request (Add_file_req f)) files;
+  Queue.iter (fun f ->
+      (* Sanitize the command line arguments so that they are always absolute *)
+      let f = Sysutil.concat (Sys.getcwd()) f in
+      send_request (Add_file_req f)) files;
   send_request Get_global_infos;
   Debug.dprintf debug "Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());
@@ -641,113 +673,12 @@ let clear_tree_and_table goals_model =
      2.2.2.2.2 a scrolled window to hold the output of the commands
  *)
 
-(***********************************)
-(*    notebook on the top 2.2.2.1  *)
-(***********************************)
-
-(* notebook is composed of a Task page and several source files pages *)
-let notebook = GPack.notebook ~packing:vpan222#add ()
-
-let (_ : GtkSignal.id) =
-  vpan222#set_position gconfig.task_height;
-  notebook#misc#connect#size_allocate
-    ~callback:
-    (fun {Gtk.width=_w;Gtk.height=h} ->
-       gconfig.task_height <- h)
-
-(********************************)
-(* Task view (part of notebook) *)
-(********************************)
-
-let task_view =
-  let label = GMisc.label ~text:"Task" () in
-  let scrolled_task_view =
-    GBin.scrolled_window
-      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-      ~shadow_type:`ETCHED_OUT
-      ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
-    ()
-  in
-  GSourceView.source_view
-    ~editable:false
-    ~cursor_visible:false
-    ~show_line_numbers:true
-    ~packing:scrolled_task_view#add
-    ()
-
-
-(* Creating a page for source code view *)
-let create_source_view =
-  (* Counter for pages *)
-  let n = ref 1 in
-  (* Create a page with tabname [f] and buffer equal to [content] in the
-     notebook. Also add a corresponding page in source_view_table. *)
-  let create_source_view f content =
-    if not (Hstr.mem source_view_table f) then
-      begin
-        let label = GMisc.label ~text:(Filename.basename f) () in
-        label#misc#set_tooltip_markup f;
-        let source_page (*, scrolled_source_view*) =
-          !n (* , GPack.vbox ~homogeneous:false ~packing:
-            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w)) () *)
-        in
-        let scrolled_source_view =
-          GBin.scrolled_window
-            ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-            ~shadow_type:`ETCHED_OUT
-            (*    ~packing:scrolled_source_view#add*)
-            ~packing:
-            (fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
-            ()
-        in
-        let source_view =
-          GSourceView.source_view
-            ~auto_indent:gconfig.allow_source_editing
-            ~insert_spaces_instead_of_tabs:true ~tab_width:2
-            ~show_line_numbers:true
-            (* ~right_margin_position:80 ~show_right_margin:true *)
-            (* ~smart_home_end:true *)
-            ~editable:gconfig.allow_source_editing
-            ~packing:scrolled_source_view#add
-            () in
-        let has_changed = ref false in
-        Hstr.add source_view_table f (source_page, source_view, has_changed, label);
-        n := !n + 1;
-        source_view#source_buffer#begin_not_undoable_action ();
-        source_view#source_buffer#set_text content;
-        source_view#source_buffer#end_not_undoable_action ();
-        (* At initialization, file has not changed. When it changes, changes the
-           name of the tab and update has_changed boolean. *)
-        let (_: GtkSignal.id) = source_view#source_buffer#connect#changed
-          ~callback:(fun () ->
-            try
-              let _source_page, _source_view, has_changed, label =
-                Hstr.find source_view_table f in
-              update_label_change label;
-              has_changed := true;
-              ()
-            with Not_found -> () ) in
-        Gconfig.add_modifiable_mono_font_view source_view#misc;
-        source_view#source_buffer#set_language why_lang;
-        (* We have to create the tags for background colors for each view.
-           They are not reusable from the other views.  *)
-        create_colors source_view;
-        Gconfig.set_fonts ();
-        (* Focusing on the tabs that was just added *)
-        notebook#goto_page (!n - 1)
-      end in
-  create_source_view
-
-
-
-(* End of notebook *)
-
 (*
   2.2.2.2 a vertical pan which contains [vbox2222]
     2.2.2.2.1 the input field to type commands [hbox22221]
     2.2.2.2.2 a scrolled window to hold the output of the commands [message_zone]
 *)
-let vbox2222 = GPack.vbox ~packing:vpan222#add  ()
+let vbox2222 = GPack.vbox  ()
 
 (* 2.2.2.2.1 Horizontal box [hbox22221]
      [monitor] number of scheduled/running provers
@@ -838,7 +769,7 @@ let counterexample_view =
     ()
 
 (* Allow colors locations on counterexample view *)
-let () = create_colors counterexample_view
+let () = create_colors gconfig counterexample_view
 
 let message_zone =
   let sv = GBin.scrolled_window
@@ -857,8 +788,11 @@ let log_zone =
     ~packing:sv#add ()
 
 (* Create a tag for errors in the message zone. *)
-let message_zone_error_tag = message_zone#buffer#create_tag
-  ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg; `FOREGROUND gconfig.error_color]
+let create_msg_zone_error_tag () =
+  message_zone#buffer#create_tag
+    ~name:"error_tag_msg_zone" [`BACKGROUND gconfig.error_color_msg_zone_bg;
+                                `FOREGROUND gconfig.error_color_msg_zone_fg]
+let message_zone_error_tag = ref (create_msg_zone_error_tag ())
 
 (**** Message-zone printing functions *****)
 
@@ -888,7 +822,7 @@ let add_to_log =
 
 let clear_message_zone () =
   let buf = message_zone#buffer in
-  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_tag_msg_zone" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#delete ~start:buf#start_iter ~stop:buf#end_iter
 
 (* Function used to print stuff on the message_zone *)
@@ -904,7 +838,7 @@ let print_message ~kind ~notif_kind fmt =
                   if Strings.ends_with notif_kind "error" ||
                      Strings.ends_with notif_kind "Error"
                   then
-                    buf#insert ~tags:[message_zone_error_tag] (s ^ "\n")
+                    buf#insert ~tags:[!message_zone_error_tag] (s ^ "\n")
                   else
                     buf#insert (s ^ "\n");
                   messages_notebook#goto_page error_page;
@@ -940,8 +874,152 @@ let display_warnings () =
 let print_message ~kind ~notif_kind fmt =
   display_warnings (); print_message ~kind ~notif_kind fmt
 
+(***********************************)
+(*    notebook on the top 2.2.2.1  *)
+(***********************************)
+
+(* notebook is composed of a Task page and several source files pages *)
+let notebook = GPack.notebook ~packing:(vpan222#pack1 ~resize:true ~shrink:true) ()
+
+(* Pack vbox2222 after packing the notebook (for vertical order) *)
+let () = vpan222#pack2 ~resize:false ~shrink:true vbox2222#coerce
+
+let (_ : GtkSignal.id) =
+  vpan222#set_position gconfig.task_height;
+  notebook#misc#connect#size_allocate
+    ~callback:
+    (fun {Gtk.width=_w;Gtk.height=h} ->
+       gconfig.task_height <- h)
+
+(********************************)
+(* Task view (part of notebook) *)
+(********************************)
+
+let task_view =
+  let label = GMisc.label ~text:"Task" () in
+  let scrolled_task_view =
+    GBin.scrolled_window
+      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+      ~shadow_type:`ETCHED_OUT
+      ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
+    ()
+  in
+  GSourceView.source_view
+    ~editable:false
+    ~cursor_visible:true
+    ~show_line_numbers:true
+    ~packing:scrolled_task_view#add
+    ()
+
+let () = create_colors gconfig task_view
+
+let change_lang view lang =
+  let lang =
+    match lang with
+    | "python" -> why3py_lang
+    | _ -> why_lang in
+  view#source_buffer#set_language lang
+
+(* Create an eventbox for the title label of the notebook tab *)
+let create_eventbox ~read_only file =
+  let eventbox = GBin.event_box () in
+  let right_click_label_menu = GMenu.menu () in
+  (* Create a menu for this eventbox *)
+  let () =
+    let close_item = GMenu.menu_item ~label:"close" () in
+    if read_only then
+      let (_: GtkSignal.id) = close_item#connect#activate
+          ~callback:(fun () ->
+              match Hstr.find source_view_table file with
+              | exception Not_found ->
+                  print_message ~kind:1 ~notif_kind:"ide_error"
+                    "Error of the graphic interface: cannot find %s" file
+              | (page_number, _, _)  ->
+                  notebook#remove_page page_number;
+                  Hstr.remove source_view_table file) in
+      right_click_label_menu#append close_item in
+  (* Connect the menu in the eventbox *)
+  let (_: GtkSignal.id) =
+    eventbox#event#connect#button_press ~callback:(fun v ->
+        let n = GdkEvent.Button.button v in
+        if n = 3 then
+          right_click_label_menu#popup ~button:3 ~time:(GdkEvent.Button.time v);
+        false (* Allow other handlers *)
+      ) in
+  eventbox
+
+(* Create a page with tabname [f] and buffer equal to [content] in the
+   notebook. Also add a corresponding page in source_view_table. *)
+let create_source_view ~read_only f content f_format =
+  let markup_read_only txt =
+    "<span font-style=\"italic\">" ^ txt ^
+    "</span> <span font-weight=\"bold\">(read-only)</span>" in
+
+  if not (Hstr.mem source_view_table f) then
+    begin
+      let fl = Filename.basename f in
+      let markup_fl = if read_only then markup_read_only fl else fl in
+      let eventbox = create_eventbox ~read_only f in
+      let label = GMisc.label ~packing:(fun w -> eventbox#add w)
+          ~markup:markup_fl () in
+      label#misc#set_tooltip_markup f;
+      (* let source_page = !n in*)
+      let scrolled_source_view =
+        GBin.scrolled_window
+          ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+          ~shadow_type:`ETCHED_OUT
+          (*    ~packing:scrolled_source_view#add*)
+          () in
+      let source_page = notebook#append_page ~tab_label:eventbox#coerce
+          scrolled_source_view#coerce in
+      let editable = gconfig.allow_source_editing && (not read_only) in
+      let source_view =
+        GSourceView.source_view
+          ~auto_indent:editable
+          ~insert_spaces_instead_of_tabs:true ~tab_width:2
+          ~show_line_numbers:true
+          (* ~right_margin_position:80 ~show_right_margin:true *)
+          (* ~smart_home_end:true *)
+          ~editable:editable
+          ~packing:scrolled_source_view#add
+          () in
+      Hstr.add source_view_table f (source_page, source_view, label);
+      source_view#source_buffer#begin_not_undoable_action ();
+      source_view#source_buffer#set_text content;
+      source_view#source_buffer#end_not_undoable_action ();
+      source_view#source_buffer#set_modified false;
+      (* At initialization, file has not changed. When it changes, changes the
+         name of the tab and update has_changed boolean. *)
+      let (_: GtkSignal.id) = source_view#source_buffer#connect#modified_changed
+          ~callback:(fun () ->
+              try
+                let _source_page, source_view, label =
+                  Hstr.find source_view_table f in
+                if not read_only then
+                  if source_view#source_buffer#modified then
+                    update_label_change label
+                  else
+                    update_label_saved label
+              with Not_found -> () ) in
+      Gconfig.add_modifiable_mono_font_view source_view#misc;
+      change_lang source_view f_format;
+      (* We have to create the tags for background colors for each view.
+         They are not reusable from the other views.  *)
+      create_colors gconfig source_view;
+      Gconfig.set_fonts ();
+      (* Focusing on the tabs that was just added *)
+      notebook#goto_page source_page
+    end
+
+(* This returns the source_view of a file *)
+let get_source_view (file: string) : GSourceView.source_view =
+  if file = "Task" then task_view else
+  match Hstr.find source_view_table file with
+  | (_, v, _) -> v
+  | exception Not_found -> raise (Nosourceview file)
 
 
+(* End of notebook *)
 
 (**** Monitor *****)
 
@@ -973,22 +1051,29 @@ let update_monitor =
 (* Current position in the source files *)
 let current_cursor_loc = ref None
 
-let move_to_line ~yalign (v : GSourceView.source_view) line =
+let move_to_line ?(character=0) ~yalign (v : GSourceView.source_view) line =
   let line = max 0 (line - 1) in
   let line = min line v#buffer#line_count in
+  (* Warning : Do not use LINECHAR here as it fails when there is not enough
+     char on the line. *)
   let it = v#buffer#get_iter (`LINE line) in
+  let it = it#forward_chars character in
   v#buffer#place_cursor ~where:it;
   let mark = `MARK (v#buffer#create_mark it) in
-  v#scroll_to_mark ~use_align:true ~yalign mark
+  (* Make the left side of the code always visible *)
+  let xalign = 1.0 in
+  v#scroll_to_mark ~use_align:true ~yalign ~xalign mark
 
 (* Scroll to a specific locations *)
 let scroll_to_loc ~force_tab_switch loc_of_goal =
   match loc_of_goal with
   | None -> ()
   | Some loc ->
-    let f, l, _, _ = Loc.get loc in
+    let f, l, e, _ = Loc.get loc in
     try
-      let (n, v, _, _) = get_source_view_table f in
+      let (n, v) = if f = "Task" then (0, task_view) else
+          let (n, v, _) = get_source_view_table f in
+          (n, v) in
       if force_tab_switch then
         begin
           Debug.dprintf debug "tab switch to page %d@." n;
@@ -996,7 +1081,7 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
         end;
       when_idle (fun () ->
           (* 0.5 to focus on the middle of the screen *)
-          move_to_line ~yalign:0.5 v l)
+          move_to_line ~character:e ~yalign:0.5 v l)
     with Nosourceview f ->
       Debug.dprintf debug "scroll_to_loc: no source know for file %s@." f
 
@@ -1012,24 +1097,30 @@ let scroll_to_loc_ce loc_of_goal =
 let reposition_ide_cursor () =
   scroll_to_loc ~force_tab_switch:false !current_cursor_loc
 
-(* Save the current location of the cursor to be reused after reload *)
-let save_cursor_loc () =
+let find_current_file_view () =
   let n = notebook#current_page in
-  let acc = ref None in
-  Hstr.iter (fun k (x, v, _, _) -> if x = n then acc := Some (k, v)) source_view_table;
-  match !acc with
+  if n = 0 then Some ("Task", task_view) else
+    let acc = ref None in
+    Hstr.iter (fun k (x, v, _) -> if x = n then acc := Some (k, v)) source_view_table;
+    !acc
+
+(* Save the current location of the cursor to be reused after reload *)
+let save_cursor_loc cursor_ref =
+  let cur_fv = find_current_file_view () in
+  match cur_fv with
   | None -> ()
   | Some (cur_file, view) ->
     (* Get current line *)
     let line = (view#buffer#get_iter_at_mark `INSERT)#line + 1 in
-    current_cursor_loc := Some (Loc.user_position cur_file line 1 1)
+    cursor_ref := Some (Loc.user_position cur_file line 0 0)
 
 (******************)
 (* Reload actions *)
 (******************)
 
 let reload_unsafe () =
-  save_cursor_loc (); clear_message_zone (); send_request Reload_req
+  save_cursor_loc current_cursor_loc; clear_message_zone ();
+  send_request Reload_req
 
 let save_and_reload () = save_sources (); reload_unsafe ()
 
@@ -1053,7 +1144,7 @@ let add_completion_entry (s,desc) =
 let match_function s iter =
   let candidate = completion_model#get ~row:iter ~column:completion_col in
   try
-    ignore (Str.search_forward (Str.regexp_string_case_fold s) candidate 0);
+    ignore (Re.Str.search_forward (Re.Str.regexp_string_case_fold s) candidate 0);
     true
   with Not_found -> false
 
@@ -1096,11 +1187,12 @@ let () = send_session_config_to_server ()
 let convert_color (color: color): string =
   match color with
   | Neg_premise_color -> "neg_premise_tag"
-  | Premise_color -> "premise_tag"
-  | Goal_color -> "goal_tag"
-  | Error_color -> "error_tag"
-  | Error_line_color -> "error_line_tag"
-  | Error_font_color -> "error_font_tag"
+  | Premise_color     -> "premise_tag"
+  | Goal_color        -> "goal_tag"
+  | Error_color       -> "error_tag"
+  | Error_line_color  -> "error_line_tag"
+  | Error_font_color  -> "error_font_tag"
+  | Search_color      -> "search_tag"
 
 let color_line ~color loc =
   let color_line (v:GSourceView.source_view) ~color l =
@@ -1151,7 +1243,7 @@ let color_loc ?(ce=false) ~color loc =
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
 let apply_loc_on_source (l: (Loc.position * color) list) loc_goal =
-  Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table;
+  erase_loc_all_view ();
   List.iter (fun (loc, color) -> color_loc ~color loc) l;
   scroll_to_loc ~force_tab_switch:false loc_goal
 
@@ -1566,6 +1658,7 @@ let treat_message_notification msg = match msg with
        begin
          scroll_to_loc ~force_tab_switch:true (Some loc);
          color_line ~color:Error_line_color loc;
+         color_loc ~color:Error_color loc;
          color_loc ~color:Error_font_color loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
@@ -1578,9 +1671,8 @@ let treat_message_notification msg = match msg with
   | File_Saved f                 ->
     begin
       try
-        let (_source_page, _source_view, b, l) = Hstr.find source_view_table f in
-        b := false;
-        update_label_saved l;
+        let (_source_page, source_view, _) = Hstr.find source_view_table f in
+        source_view#source_buffer#set_modified false;
         print_message ~kind:1 ~notif_kind:"File_Saved" "%s was saved" f
       with
       | Not_found                ->
@@ -1853,6 +1945,11 @@ let (_: GMenu.menu_item) =
 let (_: GMenu.menu_item) =
   let callback () =
     Gconfig.preferences ~parent:main_window gconfig;
+    (* Source view tags *)
+    Opt.iter (fun (_, v) -> update_tags gconfig v) (find_current_file_view ());
+    (* Update message zone tags *)
+    remove_all_tags gconfig message_zone;
+    message_zone_error_tag := create_msg_zone_error_tag ();
     make_sources_editable gconfig.allow_source_editing;
     send_session_config_to_server ()
   in
@@ -1887,6 +1984,197 @@ let (_: GMenu.menu_item) =
     ~modi:[`CONTROL] ~key:GdkKeysyms._Q
     ~tooltip:"See the Preferences for setting the policy on automatic file saving at exit."
     ~callback:exit_function_safe
+
+(* Remove a specific color at a specific location *)
+let uncolor ~color loc =
+  match loc with
+  | None -> ()
+  | Some loc ->
+      let f, l, b, e = Loc.get loc in
+      try
+        let v = get_source_view f in
+        let color = convert_color color in
+        let buf = v#buffer in
+        let top = buf#start_iter in
+        let start = top#forward_lines (l-1) in
+        let start = start#forward_chars b in
+        let stop = start#forward_chars (e-b) in
+        buf#remove_tag_by_name ~start ~stop color;
+      with
+      | Nosourceview _ -> ()
+
+let search_forward =
+  let last_search = ref "" in
+  let last_colored = ref None in
+  let search_forward ~forward () =
+    let cur_fv = find_current_file_view () in
+    match cur_fv with
+    | None -> print_message ~kind:0 ~notif_kind:"Search"
+                "Cannot search. No current file view exist"
+    | Some (cur_file, view) ->
+        (* Get current line *)
+        let iter = view#buffer#get_iter_at_mark `SEL_BOUND in
+        let search_string =
+          let find = if forward then "Forward search" else "Backward search" in
+          GToolbox.input_string ~title:find ~parent:main_window ~ok:"Search"
+            ~cancel:"Cancel" ~text:!last_search
+            "Type a string to find in the current document"
+        in
+        match search_string with
+        | None -> uncolor ~color:Search_color !last_colored
+        | Some search ->
+            last_search := search;
+            let searched =
+              if forward then
+                GtkText.Iter.forward_search iter#as_iter search None
+              else
+                GtkText.Iter.backward_search iter#as_iter search None
+            in
+            match searched with
+            | None ->
+                uncolor ~color:Search_color !last_colored;
+                print_message ~kind:1 ~notif_kind:"Search"
+                        "Searched string not found in the rest of the document"
+            | Some (iter_begin, iter_end) ->
+                let n1 = GtkText.Iter.get_line iter_begin in
+                let l1 = GtkText.Iter.get_line_index iter_begin in
+                let l2 = GtkText.Iter.get_line_index iter_end in
+                let loc1 = Loc.user_position cur_file (n1 + 1) l1 l2 in
+                color_loc ~color:Search_color loc1;
+                if not (Opt.equal Loc.equal !last_colored (Some loc1)) then
+                  uncolor ~color:Search_color !last_colored;
+                last_colored := Some loc1;
+                (* Get to the line after to be able to call Ctrl+F on the same
+                   string right away *)
+                let loc2 = if forward then
+                    Loc.user_position cur_file (n1 + 1) l2 l2
+                  else
+                    Loc.user_position cur_file (n1 + 1) l1 l1
+                in
+                scroll_to_loc ~force_tab_switch:false (Some loc2);
+  in
+  search_forward
+
+let edit_menu = factory#add_submenu "_Edit"
+let edit_factory = new menu_factory edit_menu ~accel_path:"<Why3-Main>/Edit/" ~accel_group
+
+let (_: GMenu.menu_item) =
+  edit_factory#add_item "Search forward"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._F
+    ~tooltip:"Search in the source file."
+    ~callback:(search_forward ~forward:true)
+
+let (_: GMenu.menu_item) =
+  edit_factory#add_item "Search backward"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._B
+    ~tooltip:"Search backward in the source file."
+    ~callback:(search_forward ~forward:false)
+
+exception SearchLimit
+
+(* Use a specific function to read words under cursor (for Ctrl+L) because GTK
+   functions for forward_word_end/backward_word_start does not skip "_" in
+   particular. *)
+let get_word_around_iter iter =
+
+  let is_letter c =
+    match c with
+    | '0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '_' | '\'' -> true
+    | _ -> false in
+
+  let get_right_words (iter: GText.iter) =
+    let rec get_words n start_iter =
+      if n = 0 then raise SearchLimit; (* Forbid too long search *)
+      let incr_iter = start_iter#forward_char in
+      let s = start_iter#get_text ~stop:incr_iter in
+      if not (is_letter s.[0]) then
+        start_iter
+      else
+        get_words (n-1) incr_iter
+    in
+    get_words 80 iter in
+
+  let get_left_words (iter: GText.iter) =
+    let rec get_words n (end_iter: GText.iter) =
+      if n = 0 then raise SearchLimit; (* Forbid too long search *)
+      let incr_iter = end_iter#backward_char in
+      let s = incr_iter#get_text ~stop:incr_iter#forward_char in
+      if not (is_letter s.[0]) then
+        incr_iter#forward_char
+      else
+        get_words (n-1) incr_iter
+    in
+    get_words 80 iter in
+
+  let start_iter = get_left_words iter in
+  let end_iter = get_right_words iter in
+  let text = start_iter#get_text ~stop:end_iter in
+  (start_iter, text, end_iter)
+
+(* This function check for immediate quantification (not for scope yet) *)
+let rec get_qualif acc start_iter =
+  if start_iter#get_text ~stop:start_iter#forward_char = "." then
+    let (start_iter, text, _) = get_word_around_iter start_iter#backward_char in
+    if Strings.char_is_uppercase
+        (start_iter#get_text ~stop:start_iter#forward_char).[0] then
+      get_qualif (text :: acc) start_iter#backward_char
+    else
+      acc
+  else
+    acc
+
+let get_module (iter: GText.iter) =
+  match iter#backward_search "module" with
+  | None -> print_message ~kind:1 ~notif_kind:"Error"
+              "cannot find encapsulating module"; None
+  | Some (_, end_iter) ->
+      let (_, text, _) = get_word_around_iter end_iter#forward_char in
+      Some text
+
+(* find_cursor_ident: finds the ident under cursor and scroll to its definition
+   get_back_loc: returns to the last position of a searched ident. *)
+let find_cursor_ident, get_back_loc =
+  let last_loc = ref None in
+  (fun () ->
+    save_cursor_loc last_loc;
+    match find_current_file_view () with
+    | None -> print_message ~notif_kind:"Ide_error" ~kind:1
+                "Cannot determine current source file"
+    | Some (file, view) ->
+        try
+          if file = "Task" then
+            let iter = view#buffer#get_iter `SEL_BOUND in
+            let (_, text, _) = get_word_around_iter iter in
+            interp ("locate " ^ text)
+          else
+            let iter = view#buffer#get_iter `SEL_BOUND in
+            let (start_iter, text, end_iter) = get_word_around_iter iter in
+            if text = "" then
+              ()
+            else
+              let l = start_iter#line + 1 in
+              let b = start_iter#line_offset in
+              let e = end_iter#line_offset in
+              let f = file in
+              let loc = Loc.user_position f l b e in
+              send_request (Find_ident_req loc)
+        with SearchLimit ->
+          print_message ~notif_kind:"Ide_error" ~kind:1
+            "Search limit overflow: the word is too long"
+  ),
+  (fun () -> scroll_to_loc ~force_tab_switch:true !last_loc)
+
+let (_: GMenu.menu_item) =
+  edit_factory#add_item "Find cursor ident"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._L
+    ~tooltip:"This finds the definition of the ident under user cursor"
+    ~callback:find_cursor_ident
+
+let (_: GMenu.menu_item) =
+  edit_factory#add_item "Back"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._ampersand (* & *)
+    ~tooltip:"After find cursor ident, return back to cursor"
+    ~callback:get_back_loc
 
 (* "Tools" menu items *)
 
@@ -2433,24 +2721,31 @@ let treat_notification n =
          ignore (new_node id name typ detached)
      end
   | Remove id                     ->
-     (* In the case where id is an ancestor of a selected node, this node will
-        be erased. So we try to select the parent. *)
      let n = get_node_row id in
-     let is_ancestor =
-       List.exists
-         (fun row -> let row_id = get_node_id row#iter in
-           row_id = id || goals_model#is_ancestor ~iter:n#iter ~descendant:row#iter)
-         (get_selected_row_references ())
-     in
-     if is_ancestor then
-       (match goals_model#iter_parent n#iter with
-       | None -> goals_view#selection#unselect_all ()
-       | Some parent ->
-          goals_view#selection#unselect_all ();
-          select_iter parent
-          (* TODO Go to the next unproved goal ?
+     if get_node_detached id then begin
+         let path = goals_model#get_path n#iter in
+         ignore(GtkTree.TreePath.prev path);
+         goals_view#set_cursor path view_name_column
+       end
+     else begin
+         (* In the case where id is an ancestor of a selected node, this node will
+        be erased. So we try to select the parent. *)
+         let is_ancestor =
+           List.exists
+             (fun row -> let row_id = get_node_id row#iter in
+                         row_id = id || goals_model#is_ancestor ~iter:n#iter ~descendant:row#iter)
+             (get_selected_row_references ())
+         in
+         if is_ancestor then
+           (match goals_model#iter_parent n#iter with
+            | None -> goals_view#selection#unselect_all ()
+            | Some parent ->
+               goals_view#selection#unselect_all ();
+               select_iter parent
+           (* TODO Go to the next unproved goal ?
             let parent_id = get_node_id parent in
           send_request (Get_first_unproven_node parent_id)*));
+       end;
      ignore (goals_model#remove(n#iter));
      Hint.remove node_id_to_gtree id;
      Hint.remove node_id_type id;
@@ -2468,11 +2763,12 @@ let treat_notification n =
                         "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
-  | Saving_needed b -> exit_function_handler b
+  | Saving_needed b -> exit_function_handler main_window b
   | Message (msg)                 -> treat_message_notification msg
-  | Task (id, s, list_loc, goal_loc)        ->
+  | Task (id, s, list_loc, goal_loc, lang)        ->
      if is_selected_alone id then
        begin
+         change_lang task_view lang;
          task_view#source_buffer#set_text s;
          (* Avoid erasing colors at startup when selecting the first node. In
             all other cases, it should change nothing. *)
@@ -2485,24 +2781,30 @@ let treat_notification n =
             of the "smooth scrolling". *)
          when_idle (fun () -> task_view#scroll_to_mark `INSERT)
        end
-  | File_contents (file_name, content) ->
+  | File_contents (file_name, content, f_format, read_only) ->
      let content = try_convert content in
-    begin
-      try
-        let (_, sc_view, b, l) = Hstr.find source_view_table file_name in
-        sc_view#source_buffer#begin_not_undoable_action ();
-        sc_view#source_buffer#set_text content;
-        sc_view#source_buffer#end_not_undoable_action ();
-        update_label_saved l;
-        b := false;
-        reposition_ide_cursor ()
-      with
-      | Not_found -> create_source_view file_name content
-    end
-  | Source_and_ce (content, list_loc, goal_loc) ->
+     begin
+       try
+         let (_, sc_view, _) = Hstr.find source_view_table file_name in
+         (* read_only means it was sent by ctrl+l not by reload. So, if the file
+            already exists, we dont want to erase users changes. *)
+         if not read_only then
+           begin
+             sc_view#source_buffer#begin_not_undoable_action ();
+             sc_view#source_buffer#set_text content;
+             sc_view#source_buffer#end_not_undoable_action ();
+             sc_view#source_buffer#set_modified false;
+             reposition_ide_cursor ()
+           end
+       with
+       | Not_found ->
+           create_source_view ~read_only file_name content f_format
+     end
+  | Source_and_ce (content, list_loc, goal_loc, f_format) ->
     begin
       messages_notebook#goto_page counterexample_page;
       counterexample_view#source_buffer#set_text content;
+      change_lang counterexample_view f_format;
       apply_loc_on_ce list_loc;
       scroll_to_loc_ce goal_loc
     end
@@ -2510,6 +2812,8 @@ let treat_notification n =
      print_message ~kind:1 ~notif_kind:"Server Dead ?"
                         "Server sent the notification '%a'. Please report."
         print_notify n
+  | Ident_notif_loc loc ->
+      scroll_to_loc ~force_tab_switch:true (Some loc)
   end;
   ()
 
@@ -2597,7 +2901,7 @@ let batch s =
           let cmd = Strings.join " " cmd in
           let v = Hstr.fold (fun _ x acc ->
               match acc, x with
-              | None, (sp, sv, _, _) when sp = 1 ->
+              | None, (sp, sv, _) when sp = 1 ->
                   Some sv
               | _ -> acc) source_view_table None
           in

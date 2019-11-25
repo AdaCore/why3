@@ -10,13 +10,19 @@ module Sys
 
 end
 
-module Pervasives
+module Exceptions
 
   exception Exit
   exception Not_found
 
+end
+
+module Pervasives
+
   use int.Int
   use mach.int.Int63
+
+  use export Exceptions
 
   val succ (x: int63) : int63
     requires { [@expl:integer overflow] in_bounds (to_int x + 1) }

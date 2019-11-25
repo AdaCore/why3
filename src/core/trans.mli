@@ -237,8 +237,10 @@ type naming_table = {
 
 exception Bad_name_table of string
 
-type trans_with_args = string list -> Env.env -> naming_table -> task trans
-type trans_with_args_l = string list -> Env.env -> naming_table -> task tlist
+type trans_with_args =
+  string list -> Env.env -> naming_table -> Env.fformat -> task trans
+type trans_with_args_l =
+  string list -> Env.env -> naming_table -> Env.fformat -> task tlist
 
 val list_transforms_with_args   : unit -> (string * Pp.formatted) list
 val list_transforms_with_args_l : unit -> (string * Pp.formatted) list
@@ -267,5 +269,6 @@ exception Unnecessary_arguments of string list
 val apply_transform : string -> Env.env -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n, directly.*)
 
-val apply_transform_args : string -> Env.env -> string list -> naming_table -> task -> task list
+val apply_transform_args :
+  string -> Env.env -> string list -> naming_table -> Env.fformat -> task -> task list
 (** apply a registered 1-to-1 or a 1-to-n or a trans with args, directly *)

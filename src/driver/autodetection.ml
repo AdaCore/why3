@@ -49,6 +49,13 @@ let debug = Debug.register_info_flag "autodetect"
   ~desc:"Print@ debugging@ messages@ about@ auto-detection@ \
          of@ external@ provers."
 
+let is_config_command = ref false
+
+let print_info fmt =
+  if !is_config_command
+  then Format.printf fmt
+  else Debug.dprintf debug fmt
+
 (* auto-detection of provers *)
 
 type prover_kind = ATP | ITP
@@ -61,9 +68,9 @@ type prover_autodetection_data =
       execs : string list;
       version_switch : string;
       version_regexp : string;
-      versions_ok : (string * Str.regexp) list;
-      versions_old : (string * Str.regexp) list;
-      versions_bad : (string * Str.regexp) list;
+      versions_ok : (string * Re.Str.regexp) list;
+      versions_old : (string * Re.Str.regexp) list;
+      versions_bad : (string * Re.Str.regexp) list;
       (** If none it's a fake prover (very bad version) *)
       prover_command : string option;
       prover_command_steps : string option;
@@ -141,34 +148,42 @@ let load_prover_shortcut acc (_, section) =
     (fp,shortcut)::acc
   ) acc shortcuts
 
-module Hstr2 = Hashtbl.Make(struct
-  type t = string * string
+module Hstr3 = Hashtbl.Make(struct
+  type t = string * string * string
   let hash = Hashtbl.hash
   let equal = (=)
 end)
 
 type env =
   {
-    (* memoization of (exec_name,version_switch)
+    (* memoization of (exec_name,version_switch,version_regexp)
         -> Some output | None doesn't exists *)
-    prover_output : string option Hstr2.t;
+    prover_output : string option Hstr3.t;
+    (* stored (exec_name -> output) from config file *)
+    prover_output_stored : string option Hstr.t;
     (* existing executable table:
         exec_name -> | Some (priority, id, prover_config)
                                   unknown version (neither good or bad)
                      | None               there is a good version *)
     prover_unknown_version :
       (prover_autodetection_data * int * string * config_prover) option Hstr.t;
+    (* exec commands if not they must all be in prover_output *)
+    exec_commands : bool;
     (* string -> priority * prover  *)
     prover_shortcuts : (int * prover) Hstr.t;
     mutable possible_prover_shortcuts : (filter_prover * string) list;
+    prover_auto_levels : (int * bool) Hprover.t;
   }
 
-let create_env shortcuts =
-{ prover_output = Hstr2.create 10;
+let create_env ~exec_commands () = {
+  prover_output = Hstr3.create 10;
+  prover_output_stored = Hstr.create 10;
   prover_unknown_version = Hstr.create 10;
   prover_shortcuts = Hstr.create 5;
-  possible_prover_shortcuts = shortcuts;
- }
+  possible_prover_shortcuts = [];
+  exec_commands;
+  prover_auto_levels = Hprover.create 5;
+}
 
 let next_priority =
   let r = ref 0 in
@@ -176,14 +191,15 @@ let next_priority =
 
 let highest_priority = 0
 
-let read_auto_detection_data main =
+let read_auto_detection_data env main =
   let filename = Filename.concat (Whyconf.datadir main)
     "provers-detection-data.conf" in
   try
     let rc = Rc.from_file filename in
     let shortcuts =
       List.fold_left load_prover_shortcut [] (get_family rc "shortcut") in
-    List.rev (load rc), create_env shortcuts
+    env.possible_prover_shortcuts <- shortcuts @ env.possible_prover_shortcuts;
+    List.rev (load rc)
   with
     | Failure "lexing" ->
         Loc.errorm "Syntax error in provers-detection-data.conf@."
@@ -205,13 +221,13 @@ let read_editors main =
         Loc.errorm "provers-detection-data.conf not found at %s@." filename
 
 let make_command =
-  let cmd_regexp = Str.regexp "%\\(.\\)" in
+  let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
   fun exec com ->
-    let replace s = match Str.matched_group 1 s with
+    let replace s = match Re.Str.matched_group 1 s with
       | "e" -> exec
       | c -> "%"^c
     in
-    Str.global_substitute cmd_regexp replace com
+    Re.Str.global_substitute cmd_regexp replace com
 
 (* dead code
 let sanitize_exec =
@@ -226,7 +242,7 @@ let sanitize_exec =
   sanitizer first rest
 *)
 
-let ask_prover_version exec_name version_switch =
+let ask_prover_version exec_name version_switch version_regexp =
   let out = Filename.temp_file "out" "" in
   let cmd = sprintf "%s %s" exec_name version_switch in
   let c = sprintf "(%s) > %s 2>&1" cmd out in
@@ -240,20 +256,41 @@ let ask_prover_version exec_name version_switch =
     if ret <> 0 then begin
       Debug.dprintf debug "command '%s' failed. Output:@\n%s@." cmd c;
       None
-    end else Some c
+    end else
+      let re = Re.Str.regexp version_regexp in
+      let ver =
+        try
+          ignore (Re.Str.search_forward re c 0);
+          Re.Str.matched_group 1 c
+        with Not_found ->
+          Debug.dprintf debug "Warning: found prover %s but name/version not \
+                               recognized by regexp `%s'@."
+            exec_name version_regexp;
+          Debug.dprintf debug "Answer was `%s'@." c;
+          ""
+      in
+      Some ver
   with Not_found | End_of_file | Sys_error _ ->
     Debug.dprintf debug "command '%s' failed@." cmd;
     None
 
-let ask_prover_version env exec_name version_switch =
+let ask_prover_version env exec_name version_switch version_regexp =
   try
-    Hstr2.find env.prover_output (exec_name,version_switch)
+    let res = Hstr.find env.prover_output_stored exec_name in
+    Hstr3.add env.prover_output (exec_name,version_switch,version_regexp) res;
+    res
   with Not_found ->
-    let res = ask_prover_version exec_name version_switch in
-    Hstr2.add env.prover_output (exec_name,version_switch) res;
+  try
+    Hstr3.find env.prover_output (exec_name,version_switch,version_regexp)
+  with Not_found ->
+    let res =
+      if env.exec_commands
+      then ask_prover_version exec_name version_switch version_regexp
+      else None in
+    Hstr3.add env.prover_output (exec_name,version_switch,version_regexp) res;
     res
 
-let check_version version (_,schema) = Str.string_match schema version 0
+let check_version version (_,schema) = Re.Str.string_match schema version 0
 
 let known_version env exec_name =
   Hstr.replace env.prover_unknown_version exec_name None
@@ -309,23 +346,21 @@ let add_id_prover_shortcut env id prover priority =
  *)
   | _ -> Hstr.replace env.prover_shortcuts id (priority,prover)
 
-let prover_auto_levels = Hprover.create 5
+let record_prover_for_auto_mode env prover level =
+  Hprover.replace env.prover_auto_levels prover (level,false)
 
-let record_prover_for_auto_mode prover level =
-  Hprover.replace prover_auto_levels prover (level,false)
-
-let check_prover_auto_level prover =
+let check_prover_auto_level env prover =
   try
-    let lev,_ = Hprover.find prover_auto_levels prover in
-    Hprover.replace prover_auto_levels prover (lev,true)
+    let lev,_ = Hprover.find env.prover_auto_levels prover in
+    Hprover.replace env.prover_auto_levels prover (lev,true)
   with Not_found -> ()
 
-let generate_auto_strategies config =
-  eprintf "Generating strategies:@.";
+let generate_auto_strategies env =
+  print_info "Generating strategies:@.";
   Hprover.iter
     (fun p (lev,b) ->
-     if b then eprintf "  Prover %a will be used in Auto level >= %d@."
-                       Whyconf.print_prover p lev) prover_auto_levels;
+     if b then print_info "  Prover %a will be used in Auto level >= %d@."
+                       Whyconf.print_prover p lev) env.prover_auto_levels;
   (* Split VCs *)
   let code = "t split_vc exit" in
   let split = {
@@ -340,7 +375,7 @@ let generate_auto_strategies config =
       (fun p (lev,b) acc ->
        if b && lev = 1 then
          let name = Whyconf.prover_parseable_format p in name :: acc
-       else acc) prover_auto_levels []
+       else acc) env.prover_auto_levels []
   in
   List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level1;
   let code = flush_str_formatter () in
@@ -375,7 +410,7 @@ let generate_auto_strategies config =
       (fun p (lev,b) acc ->
        if b && lev >= 1 && lev <= 2 then
          let name = Whyconf.prover_parseable_format p in name :: acc
-       else acc) prover_auto_levels []
+       else acc) env.prover_auto_levels []
   in
   fprintf str_formatter "start:@\n";
   List.iter (fun s -> fprintf str_formatter "c %s 1 1000@\n" s) provers_level3;
@@ -396,15 +431,15 @@ let generate_auto_strategies config =
       strategy_shortcut = "3";
       strategy_code = code }
   in
-  List.fold_left add_strategy config [split ; auto0 ; auto1 ; auto2 ; auto3]
+  [split ; auto0 ; auto1 ; auto2 ; auto3]
 
 let check_support_library data ver =
-  let cmd_regexp = Str.regexp "%\\(.\\)" in
-  let replace s = match Str.matched_group 1 s with
+  let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
+  let replace s = match Re.Str.matched_group 1 s with
     | "l" -> Config.libdir
     | "d" -> Config.datadir
     | c -> c in
-  let sl = Str.global_substitute cmd_regexp replace data.support_library in
+  let sl = Re.Str.global_substitute cmd_regexp replace data.support_library in
   try
     let f = open_in sl in
     let support_ver = input_line f in
@@ -412,13 +447,13 @@ let check_support_library data ver =
     if support_ver = ver then true
     else if support_ver = "" then raise Not_found
     else begin
-      eprintf
+      print_info
         "Found prover %s version %s, but the compiled Why3 library supports only version %s@."
         data.prover_name ver support_ver;
       false
     end
   with Sys_error _ | Not_found ->
-    eprintf
+    print_info
       "Found prover %s version %s, but no Why3 libraries were compiled for it@."
       data.prover_name ver;
     false
@@ -427,23 +462,11 @@ exception Skip    (* prover is ignored *)
 exception Discard (* prover is recognized, but unusable *)
 
 let detect_exec env data exec_name =
-  let s = ask_prover_version env exec_name data.version_switch in
-  let s =
-    match s with
-    | None -> raise Skip
-    | Some s -> s in
-  let re = Str.regexp data.version_regexp in
+  let ver = ask_prover_version env exec_name data.version_switch data.version_regexp in
   let ver =
-    try
-      ignore (Str.search_forward re s 0);
-      Str.matched_group 1 s
-    with Not_found ->
-      Debug.dprintf debug "Warning: found prover %s but name/version not \
-                       recognized by regexp `%s'@."
-        data.prover_name data.version_regexp;
-      Debug.dprintf debug "Answer was `%s'@." s;
-      ""
-  in
+    match ver with
+    | None -> raise Skip
+    | Some ver -> ver in
   (* bad here means not good, it is not the same thing as a version
      of a prover with known problems *)
   let bad = List.exists (check_version ver) data.versions_bad in
@@ -455,7 +478,7 @@ let detect_exec env data exec_name =
     | None ->
       (* empty prover: a matching version means known problems *)
       if not (good || old) then raise Skip;
-      eprintf "Found prover %s version %s%s@."
+      print_info "Found prover %s version %s%s@."
         data.prover_name ver
         (Opt.get_def
            ". This version of the prover is known to have problems."
@@ -481,9 +504,9 @@ let detect_exec env data exec_name =
       extra_options = [];
       extra_drivers = [];
       configure_build = "";
-      build_commands = []
-    }
-  in
+      build_commands = [];
+      added_at_startup = false;
+    } in
   (* if unknown, temporarily put the prover away *)
   if not (good || old) then begin
     let priority = next_priority () in
@@ -494,21 +517,21 @@ let detect_exec env data exec_name =
   if data.support_library <> "" && not (check_support_library data ver) then
     raise Discard;
   let priority = next_priority () in
-  eprintf "Found prover %s version %s%s@."
+  print_info "Found prover %s version %s%s@."
     data.prover_name ver
     (Opt.get_def
        (if old then
-	   " (old version, please consider upgrading)."
-	else
-	   if data.prover_altern <> "" then
-	     " (alternative: " ^ data.prover_altern ^ ")"
-	   else
-	     ", OK.")
+           " (old version, please consider upgrading)."
+        else
+           if data.prover_altern <> "" then
+             " (alternative: " ^ data.prover_altern ^ ")"
+           else
+             ", OK.")
        data.message);
   add_prover_shortcuts env prover;
   add_id_prover_shortcut env data.prover_id prover priority;
   let level = data.use_at_auto_level in
-  if level > 0 then record_prover_for_auto_mode prover level;
+  if level > 0 then record_prover_for_auto_mode env prover level;
   prover_config
 
 let detect_exec env data acc exec_name =
@@ -535,9 +558,10 @@ let detect_unknown env pc =
   let prover = prover_config.prover in
   let ver = prover.prover_version in
   if data.support_library <> "" && not (check_support_library data ver) then raise Skip;
-  Warning.emit "@[Prover %s version %s is not known to be supported.@\n\
-                Known versions for this prover:@ %a@\n\
-                Known old versions for this prover:@ %a@]@."
+  print_info
+    "@[<v>@[Prover %s version %s is not known to be supported.@]@ \
+     @[Known versions for this prover:@ %a.@]@ \
+     @[Known old versions for this prover:@ %a.@]@]@."
     prover.Wc.prover_name ver
     pp_versions data.versions_ok
     pp_versions data.versions_old;
@@ -552,33 +576,75 @@ let detect_unknown env detected =
 
 let convert_shortcuts env =
   Hstr.fold (fun s (_,p) acc ->
-    check_prover_auto_level p; Mstr.add s p acc
+    check_prover_auto_level env p; Mstr.add s p acc
   ) env.prover_shortcuts Mstr.empty
 
-let run_auto_detection config =
+
+type autodetection_result = env * Whyconf.config_prover Whyconf.Mprover.t
+
+let generate_builtin_config ((env,detected):autodetection_result) config =
   let main = get_main config in
-  let l,env = read_auto_detection_data main in
-  let detected = List.fold_left (detect_prover env) Mprover.empty l in
-  let length_recognized = Mprover.cardinal detected in
-  let detected = detect_unknown env detected in
-  let length_detected = Mprover.cardinal detected in
-  if length_detected > length_recognized then
-    eprintf
-      "%d prover(s) added (including %d prover(s) with an unrecognized version)@."
-      length_detected (length_detected - length_recognized)
-  else
-    eprintf "%d prover(s) added@." length_detected;
   let shortcuts = convert_shortcuts env in
-  let config = generate_auto_strategies config in
+  let config =
+    List.fold_left add_strategy config
+      (generate_auto_strategies env)
+  in
   let config = set_editors config (read_editors main) in
   let config = set_prover_shortcuts config shortcuts in
   let config = set_provers config detected in
   config
 
+let generate_detected_config ((env,_):autodetection_result) =
+  let fold (exec_name,_,_) version acc =
+    match version with
+    | Some version -> { Whyconf.exec_name; version }::acc
+    | None -> acc
+  in
+  Hstr3.fold fold env.prover_output []
+
+let run_auto_detection' env config =
+  let main = get_main config in
+  let l = read_auto_detection_data env main in
+  let provers = get_provers config in
+  let detected = List.fold_left (detect_prover env) provers l in
+  let length_recognized = Mprover.cardinal detected in
+  let detected = detect_unknown env detected in
+  let length_detected = Mprover.cardinal detected in
+  if length_detected > length_recognized then
+    print_info
+      "%d prover(s) added (including %d prover(s) with an unrecognized version)@."
+      length_detected (length_detected - length_recognized)
+  else
+    print_info "%d prover(s) added@." length_detected;
+  detected
+
+let run_auto_detection config =
+  let env = create_env ~exec_commands:true () in
+  env,run_auto_detection' env config
+
+let provers_from_detected_provers config =
+  let env = create_env ~exec_commands:false () in
+  let open Whyconf in
+  List.iter (fun detected ->
+      Hstr.add
+        env.prover_output_stored
+        detected.exec_name
+        (Some detected.version))
+    (get_detected_provers config);
+  let detected = run_auto_detection' env config in
+  let detected =
+    Whyconf.Mprover.map (fun c -> { c with added_at_startup = true }) detected
+  in
+  generate_builtin_config (env,detected) config
+
+let () = Whyconf.provers_from_detected_provers :=
+    provers_from_detected_provers
+
 let list_prover_families () =
   let config = default_config "" in
   let main = get_main config in
-  let l,_ = read_auto_detection_data main in
+  let env = create_env ~exec_commands:false () in
+  let l = read_auto_detection_data env main in
   let s = List.fold_left (fun s p -> Sstr.add p.prover_id s) Sstr.empty l in
   Sstr.elements s
 
@@ -609,11 +675,12 @@ let add_existing_shortcuts env shortcuts =
 
 let add_prover_binary config id shortcut path =
   let main = get_main config in
-  let l,env = read_auto_detection_data main in
   let prover_shortcuts = get_prover_shortcuts config in
   if Mstr.mem shortcut prover_shortcuts then
     Loc.errorm "Shortcut %s already in use" shortcut;
-  add_existing_shortcuts env prover_shortcuts;
+  let env = create_env ~exec_commands:true () in
+  let l = read_auto_detection_data env main in
+  add_existing_shortcuts env (get_prover_shortcuts config);
   let l = List.filter (fun p -> p.prover_id = id) l in
   if l = [] then begin
     let list_of_allowed_id =
@@ -626,7 +693,6 @@ let add_prover_binary config id shortcut path =
   let detected = detect_unknown env detected in
   if Mprover.is_empty detected then
     Loc.errorm "File %s does not correspond to the prover id %s" path id;
-  let provers = get_provers config in
   let fold _ p provers =
     (* find a prover altern not used *)
     (* Is a prover with this name and version already in config? *)
@@ -638,6 +704,7 @@ let add_prover_binary config id shortcut path =
         find_prover_altern provers prover_id in
     let p = {p with prover = prover_id} in
     add_prover_with_uniq_id p provers in
+  let provers = get_provers config in
   let provers = Mprover.fold fold detected provers in
   let prover = fst (Mprover.choose detected) in
   let shortcuts = Mstr.add shortcut prover (convert_shortcuts env) in

@@ -57,9 +57,15 @@ let ns_add merge chk x vn m = Mstr.change (function
   | Some vo -> Some (merge chk x vo vn)
   | None    -> Some vn) x m
 
-let add_ts chk x ts ns = { ns with ns_ts = ns_add merge_ts chk x ts ns.ns_ts }
-let add_ls chk x ps ns = { ns with ns_ls = ns_add merge_ls chk x ps ns.ns_ls }
-let add_pr chk x xs ns = { ns with ns_pr = ns_add merge_pr chk x xs ns.ns_pr }
+let add_ts chk x ts ns =
+  let loc = x.id_loc in
+  { ns with ns_ts = Loc.try5 ?loc ns_add merge_ts chk x.id_string ts ns.ns_ts }
+let add_ls chk x ps ns =
+  let loc = x.id_loc in
+  { ns with ns_ls = Loc.try5 ?loc ns_add merge_ls chk x.id_string ps ns.ns_ls }
+let add_pr chk x xs ns =
+  let loc = x.id_loc in
+  { ns with ns_pr = Loc.try5 ?loc ns_add merge_pr chk x.id_string xs ns.ns_pr }
 let add_ns chk x nn ns = { ns with ns_ns = ns_add merge_ns chk x nn ns.ns_ns }
 
 let merge_ns chk nn no = merge_ns chk "" no nn (* swap arguments *)
@@ -446,8 +452,8 @@ let add_symbol add id v uc =
   store_path uc [] id;
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
-      uc_import = add false id.id_string v i0 :: sti;
-      uc_export = add true  id.id_string v e0 :: ste }
+      uc_import = add false id v i0 :: sti;
+      uc_export = add true  id v e0 :: ste }
   | _ -> assert false
 
 let add_symbol_ts uc ts = add_symbol add_ts ts.ts_name ts uc
@@ -645,40 +651,47 @@ let cl_find_pr cl pr =
   try Mpr.find pr cl.pr_table with Not_found -> raise EmptyDecl
 
 let cl_clone_pr cl pr =
-  let pr' = create_prsymbol (id_clone pr.pr_name) in
+  let attr = Sattr.remove Ident.useraxiom_attr pr.pr_name.id_attrs in
+  let pr' = create_prsymbol (id_attr pr.pr_name attr) in
   cl.pr_table <- Mpr.add pr pr' cl.pr_table;
   pr'
 
 (* initialize the clone structure *)
 
+type badinstance_error =
+  | BadI of ident
+  | BadI_type_proj of ident * string
+  | BadI_ghost_proj of ident * string
+  | BadI_not_found of ident * string
+
 exception NonLocal of ident
-exception BadInstance of ident
+exception BadInstance of badinstance_error
 
 let cl_init_ty cl ({ts_name = id} as ts) ty =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let stv = Stv.of_list ts.ts_args in
-  if not (ty_v_all (Stv.contains stv) ty) then raise (BadInstance id);
+  if not (ty_v_all (Stv.contains stv) ty) then raise (BadInstance (BadI id));
   cl.ty_table <- Mts.add ts ty cl.ty_table
 
 let cl_init_ts cl ({ts_name = id} as ts) ts' =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   if List.length ts.ts_args <> List.length ts'.ts_args then
-    raise (BadInstance id);
+    raise (BadInstance (BadI id));
   cl.ts_table <- Mts.add ts ts' cl.ts_table
 
 let cl_init_ls cl ({ls_name = id} as ls) ls' =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let mtch sb ty ty' =
     try ty_match sb ty' (cl_trans_ty cl ty)
-    with TypeMismatch _ -> raise (BadInstance id)
+    with TypeMismatch _ -> raise (BadInstance (BadI id))
   in
   let sb = match ls.ls_value,ls'.ls_value with
     | Some ty, Some ty' -> mtch Mtv.empty ty ty'
     | None, None -> Mtv.empty
-    | _ -> raise (BadInstance id)
+    | _ -> raise (BadInstance (BadI id))
   in
   ignore (try List.fold_left2 mtch sb ls.ls_args ls'.ls_args
-    with Invalid_argument _ -> raise (BadInstance id));
+    with Invalid_argument _ -> raise (BadInstance (BadI id)));
   cl.ls_table <- Mls.add ls ls' cl.ls_table
 
 let cl_init_pr cl {pr_name = id} _ =
@@ -921,6 +934,7 @@ let builtin_theory =
   let uc = empty_theory (id_fresh "BuiltIn") ["why3";"BuiltIn"] in
   let uc = add_ty_decl uc ts_int in
   let uc = add_ty_decl uc ts_real in
+  let uc = add_ty_decl uc ts_str in
   let uc = add_param_decl uc ps_equ in
   close_theory uc
 
@@ -983,8 +997,21 @@ let () = Exn_printer.register
       Format.fprintf fmt "Non-local symbol: %a" print_id id
   | CannotInstantiate id ->
       Format.fprintf fmt "Cannot instantiate a defined symbol %a" print_id id
-  | BadInstance id ->
+  | BadInstance (BadI id) ->
       Format.fprintf fmt "Illegal instantiation for symbol %a" print_id id
+  | BadInstance (BadI_type_proj (id, pr_name)) ->
+      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
+                          projection types for %s are not compatible"
+        print_id id pr_name
+  | BadInstance (BadI_ghost_proj (id, pr_name)) ->
+      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
+                          projection %s cannot be ghost if the \
+                          cloned projection is not"
+        print_id id pr_name
+  | BadInstance (BadI_not_found (id, pj_str)) ->
+      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
+                          projection %s cannot be found in instance type"
+        print_id id pj_str
   | CloseTheory ->
       Format.fprintf fmt "Cannot close theory: some namespaces are still open"
   | NoOpenedNamespace ->

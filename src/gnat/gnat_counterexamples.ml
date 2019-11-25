@@ -38,7 +38,7 @@ let remove_fields_attrs attrs =
 let rec remove_fields model_value =
   Model_parser.(match model_value with
   | Integer _ | Decimal _ | Fraction _ | Float _ | Boolean _ | Bitvector _
-    | Unparsed _ -> model_value
+    | Unparsed _ | String _ -> model_value
   | Array a ->
       Array (remove_fields_array a)
   | Record l when get_only_first (List.map fst l) ->

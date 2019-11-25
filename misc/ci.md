@@ -2,6 +2,13 @@ Continuous integration slaves are hosted on https://ci.inria.fr/ in the
 `why3` project. They are of type `medium` (1 core at 2GHz and 2GB RAM)
 with 40GB of storage.
 
+Continuous integration is run inside Docker containers. The corresponding
+Docker image is loaded from the Gitlab registry. It is built from the
+`misc/Dockerfile.build` description. Changes to this file do not automatically
+lead to a new Docker image. One should first modify the image name in the
+`BUILD_IMAGE` variable of `.gitlab-ci.yml` and then manually trigger a pipeline
+while setting the `NEW_BUILD_IMAGE` variable.
+
 :warning: Do not write any sensible information in this file, e.g., the CI token!
 
 # To create a new slave
@@ -11,9 +18,9 @@ with 40GB of storage.
 3.  run:
     ```
     hostname > /etc/hostname
-    gitlab-runner register
+    gitlab-runner register --url https://gitlab.inria.fr/ --executor docker --tag-list docker --docker-image alpine:latest
     ```
-4.  use the information from "CI/CD settings", `shell` for the type, and no tags
+4.  use the information from "CI/CD settings" to fill the token, keep the other fields to their default value
 5.  enjoy
 
 # To create the initial slave template (once in a while)
@@ -24,7 +31,7 @@ with 40GB of storage.
     ```
     apt-get update
     apt-get dist-upgrade
-    apt-get install curl autoconf automake
+    apt-get install curl
     curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | bash
     curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
     apt-key fingerprint 0EBFCD88
@@ -74,5 +81,6 @@ with 40GB of storage.
     blkid
     ```
 10. replace the `UUID` of `/dev/sda2` inside `/etc/fstab`
-11. reboot
-12. finish as if creating the initial template (see above)
+11. replace the `UUID` inside `/etc/initramfs-tools/conf.d/resume`
+12. reboot
+13. finish as if creating the initial template (see above)

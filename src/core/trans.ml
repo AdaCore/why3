@@ -419,8 +419,10 @@ type naming_table = {
 
 exception Bad_name_table of string
 
-type trans_with_args = string list -> Env.env -> naming_table -> task trans
-type trans_with_args_l = string list -> Env.env -> naming_table -> task tlist
+type trans_with_args =
+  string list -> Env.env -> naming_table -> Env.fformat -> task trans
+type trans_with_args_l =
+  string list -> Env.env -> naming_table -> Env.fformat -> task tlist
 
 let transforms_with_args = Hstr.create 17
 let transforms_with_args_l = Hstr.create 17
@@ -506,14 +508,14 @@ let apply_transform tr_name env task =
     | Trans_with_args _ (* [apply (t []) task] *)
     | Trans_with_args_l _ -> assert false (* apply (t []) task *)
 
-let apply_transform_args tr_name env args tables task =
+let apply_transform_args tr_name env args tables lang task =
    match lookup_trans env tr_name, args with
     | Trans_one t, [] -> [apply t task]
     | Trans_list t, [] -> apply t task
     | Trans_one _, l | Trans_list _, l ->
         raise (Unnecessary_arguments l)
-    | Trans_with_args t, _ -> [apply (t args) env tables task]
-    | Trans_with_args_l t, _ -> apply (t args) env tables task
+    | Trans_with_args t, _ -> [apply (t args) env tables lang task]
+    | Trans_with_args_l t, _ -> apply (t args) env tables lang task
 
 (** Flag-dependent transformations *)
 

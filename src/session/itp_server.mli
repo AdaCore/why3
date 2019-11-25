@@ -12,14 +12,22 @@
 (** Server for a client/server communication with an external graphical interface *)
 
 open Itp_communication
+open Pretty
 
 (* The server part of the protocol *)
 module type Protocol = sig
 
+  (* Getting request *)
   val get_requests : unit -> ide_request list
+  (* Notify *)
   val notify : notification -> unit
 
 end
+
+(* A specific external way to print task. This registered an external printer
+   for printing tasks. This is combined with the standard printer (see Pretty).
+*)
+val add_registered_lang: string -> (Task.task -> any_pp Pp.pp -> any_pp Pp.pp) -> unit
 
 module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
 

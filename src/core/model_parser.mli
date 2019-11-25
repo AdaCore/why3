@@ -28,6 +28,7 @@ type float_type =
 val interp_float: ?interp:bool -> string -> string -> string -> float_type
 
 type model_value =
+ | String of string
  | Integer of string
  | Decimal of (string * string)
  | Fraction of (string * string)

@@ -38,10 +38,6 @@ type real_constant = {
   rl_real : real_value
 }
 
-type constant =
-  | ConstInt  of int_constant
-  | ConstReal of real_constant
-
 let compare_real { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 } { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } =
   let c = BigInt.compare s1 s2 in
   if c <> 0 then c else
@@ -49,28 +45,17 @@ let compare_real { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 } { rv_sig = s2; rv
   if c <> 0 then c else
   BigInt.compare p51 p52
 
-let compare_const c1 c2 =
-  match c1, c2 with
-  | ConstInt { il_kind = k1; il_int = i1 }, ConstInt { il_kind = k2; il_int = i2 } ->
-      let c = Pervasives.compare k1 k2 in
-      if c <> 0 then c else BigInt.compare i1 i2
-  | ConstReal { rl_kind = k1; rl_real = r1 }, ConstReal { rl_kind = k2; rl_real = r2 } ->
-      let c = Pervasives.compare k1 k2 in
-      if c <> 0 then c else compare_real r1 r2
-  | _, _ ->
-      Pervasives.compare c1 c2
+let neg_int { il_kind; il_int = i } =
+  { il_kind; il_int = BigInt.minus i }
 
-let neg = function
-  | ConstInt { il_kind = k; il_int = i } ->
-      ConstInt { il_kind = k; il_int = BigInt.minus i }
-  | ConstReal { rl_kind = k; rl_real = r } ->
-      ConstReal { rl_kind = k; rl_real = { r with rv_sig = BigInt.minus r.rv_sig } }
+let neg_real { rl_kind = k; rl_real = r } =
+  { rl_kind = k; rl_real = { r with rv_sig = BigInt.minus r.rv_sig } }
 
-let abs = function
-  | ConstInt { il_kind = k; il_int = i } ->
-      ConstInt { il_kind = k; il_int = BigInt.abs i }
-  | ConstReal { rl_kind = k; rl_real = r } ->
-      ConstReal { rl_kind = k; rl_real = { r with rv_sig = BigInt.abs r.rv_sig } }
+let abs_int { il_kind; il_int = i } =
+  { il_kind; il_int = BigInt.abs i }
+
+let abs_real { rl_kind; rl_real = r } =
+  { rl_kind; rl_real = { r with rv_sig = BigInt.abs r.rv_sig } }
 
 exception InvalidConstantLiteral of int * string
 let invalid_constant_literal n s = raise (InvalidConstantLiteral(n,s))
@@ -84,12 +69,6 @@ let check_integer_literal n f s =
 
 let is_hex = function '0'..'9' | 'A'..'F' | 'a'..'f' -> true | _ -> false
 let is_dec = function '0'..'9' -> true | _ -> false
-
-let int_const n =
-  ConstInt { il_kind = ILitUnk; il_int = n }
-
-let int_const_of_int n =
-  int_const (BigInt.of_int n)
 
 let rec normalize v p e =
   let (d,m) = BigInt.computer_div_mod v p in
@@ -109,9 +88,6 @@ let real_value ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) i =
     let (i, p2) = normalize i 2 in
     let (i, p5) = normalize i 5 in
     { rv_sig = i; rv_pow2 = BigInt.add pow2 p2; rv_pow5 = BigInt.add pow5 p5 }
-
-let real_const ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) i =
-  ConstReal { rl_kind = RLitUnk; rl_real = real_value ~pow2 ~pow5 i }
 
 (** Parsing *)
 
@@ -404,10 +380,6 @@ let print_real_constant support fmt r =
   else
     print_real_constant support fmt r
 
-let print support fmt = function
-  | ConstInt i -> print_int_constant support fmt i
-  | ConstReal r -> print_real_constant support fmt r
-
 (** Range checks *)
 
 type int_range = {
@@ -579,4 +551,3 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
               (print_int_constant full_support) c
   | _ -> raise exn)
 
-let print_constant = print full_support

@@ -256,13 +256,15 @@ let ty_match s ty1 ty2 =
 
 (* built-in symbols *)
 
-let ts_int  = create_tysymbol (id_fresh "int")  [] NoDef
-let ts_real = create_tysymbol (id_fresh "real") [] NoDef
-let ts_bool = create_tysymbol (id_fresh "bool") [] NoDef
+let ts_int  = create_tysymbol (id_fresh "int")    [] NoDef
+let ts_real = create_tysymbol (id_fresh "real")   [] NoDef
+let ts_bool = create_tysymbol (id_fresh "bool")   [] NoDef
+let ts_str  = create_tysymbol (id_fresh "string") [] NoDef
 
 let ty_int  = ty_app ts_int  []
 let ty_real = ty_app ts_real []
 let ty_bool = ty_app ts_bool []
+let ty_str  = ty_app ts_str  []
 
 let ts_func =
   let tv_a = create_tvsymbol (id_fresh "a") in

@@ -8,7 +8,7 @@
 <prover id="6" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Z3" version="3.2" timelimit="3" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name="bitvector.why"/>
 <theory name="BitVector" proved="true">
  <goal name="Nth_bw_xor_v1true" proved="true">
@@ -59,18 +59,18 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC to_nat_of_one" expl="VC for to_nat_of_one" proved="true">
+ <goal name="to_nat_of_one&#39;vc" expl="VC for to_nat_of_one" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="VC to_nat_of_one.0" expl="variant decrease" proved="true">
+  <goal name="to_nat_of_one&#39;vc.0" expl="variant decrease" proved="true">
   <proof prover="5"><result status="valid" time="0.02" steps="8110"/></proof>
   </goal>
-  <goal name="VC to_nat_of_one.1" expl="precondition" proved="true">
+  <goal name="to_nat_of_one&#39;vc.1" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.03" steps="8394"/></proof>
   </goal>
-  <goal name="VC to_nat_of_one.2" expl="precondition" proved="true">
+  <goal name="to_nat_of_one&#39;vc.2" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.06" steps="14754"/></proof>
   </goal>
-  <goal name="VC to_nat_of_one.3" expl="postcondition" proved="true">
+  <goal name="to_nat_of_one&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="5"><result status="valid" time="0.16" steps="35782"/></proof>
   </goal>
  </transf>
@@ -182,7 +182,7 @@
  <proof prover="4" timelimit="30"><result status="valid" time="6.45" steps="2706"/></proof>
  </goal>
  <goal name="to_nat_0x00000003" proved="true">
- <proof prover="6" timelimit="120"><result status="valid" time="53.28"/></proof>
+ <proof prover="6" timelimit="120"><result status="valid" time="64.85"/></proof>
  </goal>
  <goal name="to_nat_0x00000007" proved="true">
  <proof prover="4" timelimit="30"><result status="valid" time="9.99" steps="2976"/></proof>

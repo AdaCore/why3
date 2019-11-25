@@ -24,6 +24,7 @@ let usage_msg =
 let conf_file = ref None
 let autoprovers = ref false
 let autoplugins = ref false
+let partial_config = ref true
 let resetloadpath = ref false
 
 (* When no arguments are given, activate the fallback to auto mode on error.
@@ -62,7 +63,9 @@ let option_list = Arg.align [
      [Arg.Set_string id;
       Arg.Set_string shortcut;
       Arg.String (fun name -> Queue.add (!id, !shortcut, name) prover_bins)]),
-  "<id> <shortcut> <file> add a new prover executable";
+  "<id><shortcut><file> add a new prover executable";
+  "--full-config", Arg.Unit (fun () -> partial_config := false; autoprovers := true),
+  " write in .why3.conf the default config for provers, shortcut, strategies and plugins instead of loading it at startup";
   "--list-prover-families", Arg.Set opt_list_prover_families,
   " list known prover families";
   "--install-plugin", Arg.String add_plugin,
@@ -105,25 +108,6 @@ let install_plugin main p =
   if p <> target then Sysutil.copy_file p target;
   Whyconf.add_plugin main (Filename.chop_extension target)
 
-let plugins_auto_detection config =
-  let main = get_main config in
-  let main = set_plugins main [] in
-  let dir = Whyconf.pluginsdir main in
-  let main =
-    if Sys.file_exists dir then
-      let files = Sys.readdir dir in
-      let fold main p =
-        if p.[0] == '.' then main else
-        let p = Filename.concat dir p in
-        try
-            install_plugin main p
-        with Exit -> main
-      in
-      Array.fold_left fold main files
-    else main
-  in
-  set_main config main
-
 (*  Activate the fallback to auto mode on error *)
 let auto_fallback () =
   if auto_fb then begin
@@ -136,6 +120,7 @@ let main () =
   Arg.parse option_list anon_file usage_msg;
 
   let opt_list = ref false in
+  Autodetection.is_config_command := true;
 
   (* Debug flag *)
   Debug.Args.set_flags_selected ();
@@ -176,17 +161,29 @@ let main () =
     auto_fallback ();
   let config =
     if !resetloadpath then
-      set_main config (set_loadpath (get_main config) default_loadpath)
+      (** temporary 13/06/18 after introduction of --no-stdlib *)
+      set_main config (set_loadpath (get_main config) [])
     else config
   in
   let config =
     if !autoprovers
-    then Autodetection.run_auto_detection config
+    then
+      let config = Whyconf.set_provers config Mprover.empty in
+      let config = Whyconf.set_load_default_config !partial_config config in
+      let env = Autodetection.run_auto_detection config in
+      if !partial_config then
+        let detected_provers = Autodetection.generate_detected_config env in
+        Whyconf.set_detected_provers config detected_provers
+      else begin
+        let config = Whyconf.set_detected_provers config [] in
+        Autodetection.generate_builtin_config env config
+      end
     else config
   in
   let config =
-    if !autoplugins
-    then plugins_auto_detection config
+    if !autoplugins then
+      (** To remove after 13/06/21, two years after introduction of partial config *)
+      set_main config (set_plugins (get_main config) [])
     else config
   in
   if !save then begin

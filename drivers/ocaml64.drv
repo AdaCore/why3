@@ -5,6 +5,7 @@ printer "ocaml"
 
 module BuiltIn
   syntax type int "Z.t"
+  syntax type string "string"
 end
 
 module HighOrd
@@ -47,25 +48,25 @@ module list.Length
 end
 
 module list.Append
-  syntax val (++) "List.append %1 %2" prec 4 3 3
+  syntax val (++) "List.append"
 end
 
 module list.Reverse
-  syntax val reverse "List.rev %1" prec 4 3
+  syntax val reverse "List.rev"
 end
 
 module list.RevAppend
-  syntax val rev_append "List.rev_append %1 %2" prec 4 3
+  syntax val rev_append "List.rev_append"
 end
 
 module list.Combine
-  syntax val combine "List.combine %1 %2" prec 4 3 3
+  syntax val combine "List.combine"
 end
 
 module Ref
   syntax type     ref      "%1 ref"
   syntax val contents "Pervasives.contents" prec 1 0
-  syntax val      ref      "ref %1" prec 4 3
+  syntax val      ref      "ref"
 end
 
 module ref.Ref
@@ -74,11 +75,11 @@ module ref.Ref
 end
 
 module ref.Refint
-  syntax val incr "%1 := Z.succ !%1" prec 15 0
-  syntax val decr "%1 := Z.pred !%1" prec 15 0
-  syntax val (+=) "%1 := Z.add !%1 %2" prec 15 0 0
-  syntax val (-=) "%1 := Z.sub !%1 %2" prec 15 0 0
-  syntax val ( *= ) "%1 := Z.mul !%1 %2" prec 15 0 0
+  syntax val incr "(fun r -> r := Z.succ !r) %1" prec 4 3
+  syntax val decr "(fun r -> r := Z.pred !r) %1" prec 4 3
+  syntax val (+=) "(fun r v -> r := Z.add !r v) %1 %2" prec 4 3 3
+  syntax val (-=) "(fun r v -> r := Z.sub !r v) %1 %2" prec 4 3 3
+  syntax val ( *= ) "(fun r v -> r := Z.mul !r v) %1 %2" prec 4 3 3
 end
 
 module null.Null
@@ -95,35 +96,35 @@ module int.Int
   syntax val zero "Z.zero"
   syntax val one  "Z.one"
 
-  syntax val (<)   "Z.lt %1 %2" prec 4 3 3
-  syntax val (<=)  "Z.leq %1 %2" prec 4 3 3
-  syntax val (>)   "Z.gt %1 %2" prec 4 3 3
-  syntax val (>=)  "Z.geq %1 %2" prec 4 3 3
-  syntax val (=)   "Z.equal %1 %2" prec 4 3 3
+  syntax val (<)   "Z.lt"
+  syntax val (<=)  "Z.leq"
+  syntax val (>)   "Z.gt"
+  syntax val (>=)  "Z.geq"
+  syntax val (=)   "Z.equal"
 
-  syntax val  (+)   "Z.add %1 %2" prec 4 3 3
-  syntax val  (-)   "Z.sub %1 %2" prec 4 3 3
-  syntax val  ( * ) "Z.mul %1 %2" prec 4 3 3
-  syntax val  (-_)  "Z.neg %1"    prec 4 3
+  syntax val  (+)   "Z.add"
+  syntax val  (-)   "Z.sub"
+  syntax val  ( * ) "Z.mul"
+  syntax val  (-_)  "Z.neg"
 end
 
 module int.Abs
-  syntax val abs "Z.abs %1" prec 4 3
+  syntax val abs "Z.abs"
 end
 
 module int.MinMax
-  syntax val min "Z.min %1 %2" prec 4 3 3
-  syntax val max "Z.max %1 %2" prec 4 3 3
+  syntax val min "Z.min"
+  syntax val max "Z.max"
 end
 
 module int.EuclideanDivision
-  syntax val div "Z.ediv %1 %2" prec 4 3 3
-  syntax val mod "Z.erem %1 %2" prec 4 3 3
+  syntax val div "Z.ediv"
+  syntax val mod "Z.erem"
 end
 
 module int.ComputerDivision
-  syntax val div "Z.div %1 %2" prec 4 3 3
-  syntax val mod "Z.rem %1 %2" prec 4 3 3
+  syntax val div "Z.div"
+  syntax val mod "Z.rem"
 end
 
 module stack.Stack
@@ -138,7 +139,7 @@ module stack.Stack
   syntax val       clear    "Stack.clear"
   syntax val       copy     "Stack.copy"
   syntax val       is_empty "Stack.is_empty"
-  syntax val       length   "Stack.length %1" prec 4 3
+  syntax val       length   "Z.of_int (Stack.length %1)" prec 4 3
 end
 
 module queue.Queue
@@ -153,8 +154,61 @@ module queue.Queue
   syntax val       clear     "Queue.clear"
   syntax val       copy      "Queue.copy"
   syntax val       is_empty  "Queue.is_empty"
-  syntax val       length    "Queue.length %1" prec 4 3
+  syntax val       length    "Z.of_int (Queue.length %1)" prec 4 3
   syntax val       transfer  "Queue.transfer"
+end
+
+module set.SetAppInt
+  prelude "module SetAppInt = Set.Make(Z)"
+  syntax type set      "SetAppInt.t"
+  syntax val  empty    "%1; SetAppInt.empty" prec 17 16
+  syntax val  is_empty "SetAppInt.is_empty %1" prec 4 3
+  syntax val  add      "SetAppInt.add %1 %2" prec 4 3 3
+  syntax val  mem      "SetAppInt.mem %1 %2" prec 4 3 3
+  syntax val  remove   "SetAppInt.remove %1 %2" prec 4 3 3
+  syntax val  cardinal "Z.of_int (SetAppInt.cardinal %1)" prec 4 3
+  syntax val  min_elt  "SetAppInt.min_elt %1" prec 4 3
+  syntax val  max_elt  "SetAppInt.max_elt %1" prec 4 3
+  (* TODO interval *)
+end
+
+module set.SetImpInt
+  syntax type set      "(Z.t, unit) Hashtbl.t"
+  syntax val  empty    "(fun () -> Hashtbl.create 8) %1" prec 4 3
+  syntax val  is_empty "Hashtbl.length %1 = 0" prec 11 3
+  syntax val  add      "Hashtbl.replace %2 %1 ()" prec 4 3 3
+  syntax val  mem      "Hashtbl.mem %2 %1" prec 4 3 3
+  syntax val  remove   "Hashtbl.remove %2 %1" prec 4 3 3
+  syntax val  cardinal "Z.of_int (Hashtbl.length %1)" prec 4 3
+  syntax val  clear    "Hashtbl.clear"
+  (* TODO: disjoint, choose_and_remove, choose, singleton, subset, == *)
+end
+
+module fmap.MapAppInt
+  prelude "module MapAppInt = Map.Make(Z)"
+  syntax type t        "%1 MapAppInt.t"
+  syntax val  create   "%1; MapAppInt.empty" prec 17 16
+  syntax val  is_empty "MapAppInt.is_empty"
+  syntax val  add      "MapAppInt.add"
+  syntax val  find     "MapAppInt.find"
+  syntax val  find_exn "MapAppInt.find"
+  syntax val  mem      "MapAppInt.mem"
+  syntax val  remove   "MapAppInt.remove"
+  syntax val  size     "Z.of_int (MapAppInt.cardinal %1)" prec 4 3
+end
+
+module fmap.MapImpInt
+  (* prelude "let create () = Hashtbl.create 8" *)
+  syntax type t        "(Z.t, %1) Hashtbl.t"
+  syntax val  create   "(fun () -> Hashtbl.create 8) %1" prec 4 3
+  syntax val  is_empty "Hashtbl.length %1 = 0" prec 11 3
+  syntax val  add      "Hashtbl.replace %3 %1 %2" prec 4 3 3 3
+  syntax val  find     "Hashtbl.find %2 %1" prec 4 3 3
+  syntax val  find_exn "Hashtbl.find %2 %1" prec 4 3 3
+  syntax val  mem      "Hashtbl.mem %2 %1" prec 4 3 3
+  syntax val  remove   "Hashtbl.remove %2 %1" prec 4 3 3
+  syntax val  size     "Z.of_int (Hashtbl.length %1)" prec 4 3
+  syntax val  clear    "Hashtbl.clear"
 end
 
 module array.Array
@@ -169,9 +223,9 @@ module array.Array
   syntax val defensive_set "%1.(Z.to_int %2) <- %3" prec 15 2 1 15
   syntax val empty         "(%1; [||])"
   syntax val make          "Array.make (Z.to_int %1) %2" prec 4 3 3
-  syntax val append        "Array.append %1 %2" prec 4 3 3
+  syntax val append        "Array.append"
   syntax val sub           "Array.sub %1 (Z.to_int %2) (Z.to_int %3)" prec 4 3 3 3
-  syntax val copy          "Array.copy %1" prec 4 3
+  syntax val copy          "Array.copy"
   syntax val fill          "Array.fill %1 (Z.to_int %2) (Z.to_int %3) %4" prec 4 3 3 3
   syntax val blit          "Array.blit %1 (Z.to_int %2) %3 (Z.to_int %4) (Z.to_int %5)" prec 4
 end
@@ -188,7 +242,7 @@ module matrix.Matrix
   syntax val get           "%1.(Z.to_int %2).(Z.to_int %3)" prec 2 1 3 3
   syntax val set           "%1.(Z.to_int %2).(Z.to_int %3) <- %4" prec 15 1 3 3 14
   syntax val rows          "Z.of_int (Array.length %1)" prec 4 3
-  syntax val columns       "Z.of_int (Array.length %1.(0))" prec 4 3
+  syntax val columns       "Z.of_int (Array.length %1.(0))" prec 4 1
   syntax val defensive_get "%1.(Z.to_int %2).(Z.to_int %3)" prec 2 1 3 3
   syntax val defensive_set "%1.(Z.to_int %2).(Z.to_int %3) <- %4" prec 15 1 3 3 14
   syntax val make          "Array.make_matrix (Z.to_int %1) (Z.to_int %2) %3" prec 4 3 3 3
@@ -196,8 +250,8 @@ module matrix.Matrix
 end
 
 module mach.int.Int
-  syntax val ( / ) "Z.div %1 %2" prec 4 3 3
-  syntax val ( % ) "Z.rem %1 %2" prec 4 3 3
+  syntax val ( / ) "Z.div"
+  syntax val ( % ) "Z.rem"
 end
 
 module mach.int.Int32
@@ -205,8 +259,8 @@ module mach.int.Int32
 
   syntax literal   int32    "%1"
 
-  syntax val of_int "Z.to_int %1" prec 4 3
-  syntax val to_int "Z.of_int %1" prec 4 3
+  syntax val of_int "Z.to_int"
+  syntax val to_int "Z.of_int"
 
   syntax val min_int32 "Z.of_int 0x7fff_ffff"
   syntax val max_int32 "Z.of_int (-0x8000_0000)"
@@ -228,11 +282,11 @@ module mach.int.Int63
 
   syntax literal   int63    "%1"
 
-  syntax val of_int "Z.to_int %1"
-  syntax val to_int "Z.of_int %1"
+  syntax val of_int "Z.to_int"
+  syntax val to_int "Z.of_int"
 
-  syntax val min_int63 "Z.of_int min_int"
-  syntax val max_int63 "Z.of_int max_int"
+  syntax val min_int63 "Z.of_int min_int" prec 4
+  syntax val max_int63 "Z.of_int max_int" prec 4
   syntax val min_int   "min_int"
   syntax val max_int   "max_int"
   syntax val zero      "0"
@@ -255,10 +309,10 @@ end
 
 module mach.int.Random63
   syntax val s             "REMOVE"
-  syntax val init          "Random.init %1" prec 4 3
-  syntax val self_init     "Random.self_init %1" prec 4 3
-  syntax val random_bool   "Random.bool %1" prec 4 3
-  syntax val random_int63  "Random.int %1" prec 4 3
+  syntax val init          "Random.init"
+  syntax val self_init     "Random.self_init"
+  syntax val random_bool   "Random.bool"
+  syntax val random_int63  "Random.int"
 end
 
 module mach.int.State63
@@ -274,12 +328,12 @@ end
 
 module mach.peano.Peano
   syntax type t      "int"
-  syntax val  to_int "Z.of_int %1" prec 4 3
-  syntax val  of_int "Z.to_int %1" prec 4 3
+  syntax val  to_int "Z.of_int"
+  syntax val  of_int "Z.to_int"
   syntax val  zero   "0"
   syntax val  one    "1"
-  syntax val  succ   "%1 + 1"   prec 8 8
-  syntax val  pred   "%1 - 1"   prec 8 8
+  syntax val  succ   "%1 + 1"   prec 8 8 7
+  syntax val  pred   "%1 - 1"   prec 8 8 7
   syntax val  lt     "%1 < %2"  prec 11 11 10
   syntax val  le     "%1 <= %2" prec 11 11 10
   syntax val  gt     "%1 > %2"  prec 11 11 10
@@ -287,7 +341,7 @@ module mach.peano.Peano
   syntax val  eq     "%1 = %2"  prec 11 11 10
   syntax val  ne     "%1 <> %2" prec 11 11 10
   syntax val  neg    "- %1"     prec 5 4
-  syntax val  abs    "abs %1"   prec 4 3
+  syntax val  abs    "abs"
   syntax val  add    "%1 + %2"  prec 8 8 7
   syntax val  sub    "%1 - %2"  prec 8 8 7
   syntax val  mul    "%1 * %2"  prec 7 7 6
@@ -299,8 +353,8 @@ module mach.peano.ComputerDivision
 end
 
 module mach.peano.MinMax
-  syntax val  max    "max %1 %2" prec 4 3 3
-  syntax val  min    "min %1 %2" prec 4 3 3
+  syntax val  max    "max"
+  syntax val  min    "min"
 end
 
 module mach.peano.Int63
@@ -311,11 +365,11 @@ end
 
 module mach.onetime.OneTime
   syntax type t      "int"
-  syntax val  to_int "Z.of_int %1" prec 4 3
+  syntax val  to_int "Z.of_int"
   syntax val  zero   "0"
   syntax val  one    "1"
-  syntax val  succ   "%1 + 1"   prec 8 8
-  syntax val  pred   "%1 - 1"   prec 8 8
+  syntax val  succ   "%1 + 1"   prec 8 8 7
+  syntax val  pred   "%1 - 1"   prec 8 8 7
   syntax val  lt     "%1 < %2"  prec 11 11 10
   syntax val  le     "%1 <= %2" prec 11 11 10
   syntax val  gt     "%1 > %2"  prec 11 11 10
@@ -325,24 +379,24 @@ module mach.onetime.OneTime
 
   syntax val transfer "%1"
   syntax val neg      "-%1"     prec 5 4
-  syntax val abs      "abs %1"  prec 4 3
+  syntax val abs      "abs"
   syntax val add      "%1 + %2" prec 8 8 7
   syntax val sub      "%1 - %2" prec 8 8 7
   syntax val split    "(%1-%2, %2)" prec 0 13 13
 end
 
-module string.Char
-  syntax type char "char"
-  syntax val chr "Char.chr (Z.to_int %1)" prec 4 3
-  syntax val code "Z.of_int (Char.code %1)" prec 4 3
-  syntax val uppercase "Char.uppercase %1" prec 4 3
-  syntax val lowercase "Char.lowercase %1" prec 4 3
-end
+(* module string.Char                                    *)
+(*   syntax type char "char"                             *)
+(*   syntax val chr "Char.chr (Z.to_int %1)" prec 4 3    *)
+(*   syntax val code "Z.of_int (Char.code %1)" prec 4 3  *)
+(*   syntax val uppercase "Char.uppercase %1" prec 4 3   *)
+(*   syntax val lowercase "Char.lowercase %1" prec 4 3   *)
+(* end                                                   *)
 
 module io.StdIO
-  syntax val print_char "Pervasives.print_char %1" prec 4 3
+  syntax val print_string "Pervasives.print_string"
   syntax val print_int "Pervasives.print_string (Z.to_string %1)" prec 4 3
-  syntax val print_newline "Pervasives.print_newline %1" prec 4 3
+  syntax val print_newline "Pervasives.print_newline"
 end
 
 module random.Random
@@ -350,61 +404,61 @@ module random.Random
 end
 
 module mach.int.Refint63
-  syntax val incr "incr %1" prec 4 3
-  syntax val decr "decr %1" prec 4 3
-  syntax val (+=) "%1 := !%1 + %2" prec 15 0 7
-  syntax val (-=) "%1 := !%1 - %2" prec 15 0 7
-  syntax val ( *= ) "%1 := !%1 * %2" prec 15 0 7
+  syntax val incr "incr"
+  syntax val decr "decr"
+  syntax val (+=) "(fun r v -> r := !r + v) %1 %2" prec 4 3 3
+  syntax val (-=) "(fun r v -> r := !r - v) %1 %2" prec 4 3 3
+  syntax val ( *= ) "(fun r v -> r := !r * v) %1 %2" prec 4 3 3
 end
 module mach.int.MinMax63
-  syntax val min "Pervasives.min %1 %2" prec 4 3 3
-  syntax val max "Pervasives.max %1 %2" prec 4 3 3
+  syntax val min "Pervasives.min"
+  syntax val max "Pervasives.max"
 end
 
 module mach.array.Array32
   syntax type      array         "(%1 array)"
 
   syntax exception OutOfBounds   "Invalid_argument \"index out of bounds\""
-  syntax val       make          "Array.make %1 %2" prec 4 3 3
+  syntax val       make          "Array.make"
   syntax val       ([])          "%1.(%2)" prec 2 1 18
   syntax val       ([]<-)        "%1.(%2) <- %3" prec 15 1 18 15
   syntax val       defensive_get "%1.(%2)" prec 2 1 18
   syntax val       defensive_set "%1.(%2) <- %3" prec 15 1 18 15
-  syntax val       length        "Array.length %1" prec 4
-  syntax val       append        "Array.append %1 %2" prec 4
-  syntax val       sub           "Array.sub %1 %2 %3" prec 4
-  syntax val       copy          "Array.copy %1" prec 4
-  syntax val       fill          "Array.fill %1 %2 %3 %4" prec 4
-  syntax val       blit          "Array.blit %1 %2 %3 %4 %5" prec 4
-  syntax val       self_blit     "Array.blit %1 %2 %1 %3 %4" prec 4
+  syntax val       length        "Array.length"
+  syntax val       append        "Array.append"
+  syntax val       sub           "Array.sub"
+  syntax val       copy          "Array.copy"
+  syntax val       fill          "Array.fill"
+  syntax val       blit          "Array.blit"
+  syntax val       self_blit     "Array.blit"
 end
 
 module mach.array.Array63
   syntax type      array         "(%1 array)"
 
   syntax exception OutOfBounds   "Invalid_argument \"index out of bounds\""
-  syntax val       make          "Array.make %1 %2" prec 4
+  syntax val       make          "Array.make"
   syntax val       ([])          "%1.(%2)" prec 2 1 18
   syntax val       ([]<-)        "%1.(%2) <- %3" prec 15 1 18 15
   syntax val       defensive_get "%1.(%2)" prec 2 1 18
   syntax val       defensive_set "%1.(%2) <- %3" prec 15 1 18 15
-  syntax val       length        "Array.length %1" prec 4
-  syntax val       append        "Array.append %1 %2" prec 4
-  syntax val       sub           "Array.sub %1 %2 %3" prec 4
-  syntax val       copy          "Array.copy %1" prec 4
-  syntax val       fill          "Array.fill %1 %2 %3 %4" prec 4
-  syntax val       blit          "Array.blit %1 %2 %3 %4 %5" prec 4
-  syntax val       self_blit     "Array.blit %1 %2 %1 %3 %4" prec 4
-  syntax val       init          "Array.init %1 %2" prec 4
+  syntax val       length        "Array.length"
+  syntax val       append        "Array.append"
+  syntax val       sub           "Array.sub"
+  syntax val       copy          "Array.copy"
+  syntax val       fill          "Array.fill"
+  syntax val       blit          "Array.blit"
+  syntax val       self_blit     "Array.blit"
+  syntax val       init          "Array.init"
 end
 
 module mach.array.ArrayInt63
   syntax type array63 "(int array)"
-  syntax val  make   "Array.make %1 %2" prec 4
+  syntax val  make   "Array.make"
   syntax val  ([])   "%1.(%2)" prec 2 1 18
   syntax val  ([]<-) "%1.(%2) <- %3" prec 15 1 18 15
-  syntax val  length "Array.length %1" prec 4
-  syntax val  copy   "Array.copy %1" prec 4
+  syntax val  length "Array.length"
+  syntax val  copy   "Array.copy"
 end
 
 module mach.matrix.Matrix63
@@ -412,28 +466,31 @@ module mach.matrix.Matrix63
 
   (* syntax exception OutOfBounds "(Invalid_argument \"index out of bounds\")" *)
 
-  syntax val rows     "Array.length %1" prec 4
+  syntax val rows     "Array.length"
   syntax val columns  "Array.length %1.(0)" prec 4 1
-  syntax val rows          "Array.length %1" prec 4
+  syntax val rows          "Array.length"
   syntax val columns       "Array.length %1.(0)" prec 4 1
   syntax val get           "%1.(%2).(%3)" prec 2 1 18 18
   syntax val set           "%1.(%2).(%3) <- %4" prec 15 1 18 18 15
   syntax val defensive_get "%1.(%2).(%3)" prec 2 1 18 18
   syntax val defensive_set "%1.(%2).(%3) <- %4" prec 15 1 18 18 15
-  syntax val make          "Array.make_matrix %1 %2 %3" prec 4
-  syntax val copy          "Array.map Array.copy %1" prec 4
+  syntax val make          "Array.make_matrix"
+  syntax val copy          "Array.map Array.copy %1" prec 4 3
 end
 
 module ocaml.Sys
   syntax val max_array_length "Sys.max_array_length"
 end
 
-module ocaml.Pervasives
+module ocaml.Exceptions
   syntax exception Exit             "Pervasives.Exit"
   syntax exception Not_found        "Not_found"
+end
+
+module ocaml.Pervasives
   syntax exception AssertFailure    "REMOVE"
-  syntax val       ocaml_assert     "assert %1" prec 4
+  syntax val       ocaml_assert     "assert"
   syntax exception Invalid_argument "Invalid_argument \"\""
-  syntax val       succ             "succ %1" prec 4
-  syntax val       pred             "pred %1" prec 4
+  syntax val       succ             "succ"
+  syntax val       pred             "pred"
 end

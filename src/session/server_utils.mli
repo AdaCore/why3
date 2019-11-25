@@ -41,6 +41,7 @@ type query =
 (* The first argument is not used: these functions are supposed to be given to a
    Qtask. *)
 val print_id: 'a -> Trans.naming_table -> string list -> string
+val locate_id: 'a -> Trans.naming_table -> string list -> Loc.position option
 val search_id: search_both:bool -> 'a -> Trans.naming_table -> string list -> string
 
 val list_strategies: Controller_itp.controller -> (string * string) list
@@ -67,6 +68,7 @@ type command =
   | Mark_Obsolete
   | Focus_req
   | Unfocus_req
+  | Locate       of string
   | Help_message of string
   | Query        of string
   | QError       of string

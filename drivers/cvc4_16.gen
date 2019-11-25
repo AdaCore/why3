@@ -1,15 +1,6 @@
 (** Why3 driver for CVC4 >= 1.6 (with floating point support) *)
 
 prelude "(set-info :smt-lib-version 2.6)"
-prelude "(set-logic AUFBVFPDTNIRA)"
-(*
-    A    : Array
-    UF   : Uninterpreted Function
-    BV   : BitVectors
-    FP   : FloatingPoint
-    DT   : Datatypes
-    NIRA : NonLinear Integer+Real Arithmetic
-*)
 
 import "smt-libv2.gen"
 printer "smtv2.6"

@@ -136,6 +136,12 @@ let find_prog_symbol_ns ns p =
     | OO ss -> (Srs.choose ss).rs_name in
   find_qualid ~ty:Prog get_id_ps ns_find_prog_symbol ns p
 
+let import_namespace ~loc ns sl =
+  Loc.try2 ~loc import_namespace ns sl
+
+let import_scope ~loc ns sl =
+  Loc.try2 ~loc import_scope ns sl
+
 (** Parsing types *)
 
 let rec ty_of_pty ns = function
@@ -153,7 +159,8 @@ let rec ty_of_pty ns = function
   | PTarrow (ty1, ty2) ->
       ty_func (ty_of_pty ns ty1) (ty_of_pty ns ty2)
   | PTscope (q, ty) ->
-      let ns = import_namespace ns (string_list_of_qualid q) in
+      let loc = qloc q in
+      let ns = import_namespace ~loc ns (string_list_of_qualid q) in
       ty_of_pty ns ty
   | PTpure ty | PTparen ty ->
       ty_of_pty ns ty
@@ -198,7 +205,8 @@ let rec dpattern ns km { pat_desc = desc; pat_loc = loc } =
   match desc with
     | Ptree.Pparen p -> dpattern ns km p
     | Ptree.Pscope (q,p) ->
-        let ns = import_namespace ns (string_list_of_qualid q) in
+        let loc = qloc q in
+        let ns = import_namespace ~loc ns (string_list_of_qualid q) in
         dpattern ns km p
     | _ -> (* creative indentation ahead *)
   Dterm.dpattern ~loc (match desc with
@@ -386,10 +394,12 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dterm ns km crcmap gvars at denv e23) in
       chain loc (dterm ns km crcmap gvars at denv e1) op1 e23
-  | Ptree.Tconst (Number.ConstInt _ as c) ->
+  | Ptree.Tconst (Constant.ConstInt _ as c) ->
       DTconst (c, dty_int)
-  | Ptree.Tconst (Number.ConstReal _ as c) ->
+  | Ptree.Tconst (Constant.ConstReal _ as c) ->
       DTconst (c, dty_real)
+  | Ptree.Tconst (Constant.ConstStr _ as c) ->
+      DTconst (c, dty_str)
   | Ptree.Tlet (x, e1, e2) ->
       let id = create_user_id x in
       let e1 = dterm ns km crcmap gvars at denv e1 in
@@ -474,7 +484,8 @@ let rec dterm ns km crcmap gvars at denv {term_desc = desc; term_loc = loc} =
       Hstr.remove at_uses l;
       DTattr (e1, Sattr.empty)
   | Ptree.Tscope (q, e1) ->
-      let ns = import_namespace ns (string_list_of_qualid q) in
+      let loc = qloc q in
+      let ns = import_namespace ~loc ns (string_list_of_qualid q) in
       DTattr (dterm ns km crcmap gvars at denv e1, Sattr.empty)
   | Ptree.Tasref q ->
       let e1 = { term_desc = Tident q; term_loc = loc } in
@@ -553,8 +564,9 @@ let rec ity_of_pty muc = function
   | PTpure ty ->
       ity_purify (ity_of_pty muc ty)
   | PTscope (q, ty) ->
+      let loc = qloc q in
       let muc = open_scope muc "dummy" in
-      let muc = import_scope muc (string_list_of_qualid q) in
+      let muc = import_scope ~loc muc (string_list_of_qualid q) in
       ity_of_pty muc ty
   | PTparen ty ->
       ity_of_pty muc ty
@@ -617,8 +629,9 @@ let rec dpattern muc gh { pat_desc = desc; pat_loc = loc } =
     | Ptree.Pparen p -> dpattern muc gh p
     | Ptree.Pghost p -> dpattern muc true p
     | Ptree.Pscope (q,p) ->
+        let loc = qloc q in
         let muc = open_scope muc "dummy" in
-        let muc = import_scope muc (string_list_of_qualid q) in
+        let muc = import_scope ~loc muc (string_list_of_qualid q) in
         dpattern muc gh p
     | _ -> (* creative indentation ahead *)
   Dexpr.dpattern ~loc (match desc with
@@ -712,7 +725,23 @@ let dpost muc ql lvm old ity =
     | _ -> mk_case loc pfl in
   List.map dpost ql
 
-let dxpost muc ql lvm xsm old =
+let dpost muc ids ql lvm old ity =
+  let check_id id =
+    if Sstr.mem id.id_str ids then Loc.errorm ~loc:id.id_loc
+      "Result %s has the same name as a formal parameter" id.id_str in
+  let rec check p = match p.pat_desc with
+    | Ptree.Pwild -> ()
+    | Ptree.Pvar id -> check_id id
+    | Ptree.Papp (_, pl) | Ptree.Ptuple pl -> List.iter check pl
+    | Ptree.Prec fl -> List.iter (fun (_, p) -> check p) fl
+    | Ptree.Pas (p, id, _) -> check_id id; check p
+    | Ptree.Por (p, _) | Ptree.Pcast (p, _)
+    | Ptree.Pscope (_, p) | Ptree.Pparen p | Ptree.Pghost p -> check p in
+  let check (p, _) = check p in
+  List.iter (fun (_,pfl) -> List.iter check pfl) ql;
+  dpost muc ql lvm old ity
+
+let dxpost muc ids ql lvm xsm old =
   let add_exn (q,pf) m =
     let xs = match q with
       | Qident i ->
@@ -726,7 +755,7 @@ let dxpost muc ql lvm xsm old =
       | None,    Some _ -> l) xs m in
   let mk_xpost loc xs pfl =
     if pfl = [] then [] else
-    dpost muc [loc,pfl] lvm old xs.xs_ity in
+    dpost muc ids [loc,pfl] lvm old xs.xs_ity in
   let exn_map (loc,xpfl) =
     let m = List.fold_right add_exn xpfl Mxs.empty in
     Mxs.mapi (fun xs pfl -> mk_xpost loc xs pfl) m in
@@ -754,20 +783,29 @@ let dvariant muc varl lvm _xsm old =
   let dvar (t,q) = dvar t, Opt.map (find_variant_ls muc) q in
   List.map dvar varl
 
-let dspec muc sp lvm xsm old ity = {
+let dspec muc ids sp lvm xsm old ity = {
   ds_pre     = dpre muc sp.sp_pre lvm old;
-  ds_post    = dpost muc sp.sp_post lvm old ity;
-  ds_xpost   = dxpost muc sp.sp_xpost lvm xsm old;
+  ds_post    = dpost muc ids sp.sp_post lvm old ity;
+  ds_xpost   = dxpost muc ids sp.sp_xpost lvm xsm old;
   ds_reads   = dreads muc sp.sp_reads lvm;
   ds_writes  = dwrites muc sp.sp_writes lvm;
   ds_checkrw = sp.sp_checkrw;
   ds_diverge = sp.sp_diverge;
   ds_partial = sp.sp_partial; }
 
-let dspec_no_variant muc sp = match sp.sp_variant with
+let dspec muc pl sp =
+  let add_ident acc (a,_,_) = match a with
+    | None -> acc
+    | Some { pre_name = s ; pre_loc = loc } ->
+        if String.equal s "result" then Loc.errorm ?loc
+          "Formal parameters of program functions cannot be named 'result'";
+        Sstr.add s acc in
+  dspec muc (List.fold_left add_ident Sstr.empty pl) sp
+
+let dspec_no_variant muc pl sp = match sp.sp_variant with
   | ({term_loc = loc},_)::_ ->
       Loc.errorm ~loc "unexpected 'variant' clause"
-  | _ -> dspec muc sp
+  | _ -> dspec muc pl sp
 
 let dassert muc f lvm _xsm old = type_fmla muc lvm old f
 
@@ -795,8 +833,8 @@ let mk_let ~loc n de node =
   DElet ((id_user n loc, false, RKnone, de), de1)
 
 let update_any kind e = match e.expr_desc with
-  | Ptree.Eany (pl, _, pty, msk, sp) ->
-      { e with expr_desc = Ptree.Eany (pl, kind, pty, msk, sp) }
+  | Ptree.Eany (pl, _, pty, pat, msk, sp) ->
+      { e with expr_desc = Ptree.Eany (pl, kind, pty, pat, msk, sp) }
   | _ -> e
 
 let local_kind = function
@@ -832,8 +870,9 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
   | Ptree.Tapply (e1, e2) ->
       DEapp (eff_dterm muc denv e1, eff_dterm muc denv e2)
   | Ptree.Tscope (q, e1) ->
+      let loc = qloc q in
       let muc = open_scope muc "dummy" in
-      let muc = import_scope muc (string_list_of_qualid q) in
+      let muc = import_scope ~loc muc (string_list_of_qualid q) in
       DEattr (eff_dterm muc denv e1, Sattr.empty)
   | Ptree.Tasref q ->
       let e1 = { term_desc = Tident q; term_loc = loc } in
@@ -889,6 +928,20 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         -> DEgexn (find_xsymbol muc q))
     | _ -> DEgexn (find_xsymbol muc q)
   in
+  let handle_alias denv alias pat dity =
+    let pp = dpattern muc pat in
+    let denv = denv_add_pat denv pp dity in
+    let res = Some (id_fresh "result"), false, dity in
+    let denv = denv_add_args denv [res] in
+    let add_alias (t1, t2) =
+      let bty = dity_fresh () in
+      let dt1 = eff_dterm muc denv t1 in
+      let dt2 = eff_dterm muc denv t2 in
+      ignore (Dexpr.dexpr ~loc:t1.term_loc (DEcast (dt1, bty)));
+      ignore (Dexpr.dexpr ~loc:t2.term_loc (DEcast (dt2, bty)));
+    in
+    List.iter add_alias alias
+  in
   Dexpr.dexpr ~loc begin match desc with
   | Ptree.Eident q ->
       qualid_app loc q []
@@ -923,14 +976,16 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
         | e23 ->
             apply loc de1 op1 (dexpr muc denv e23) in
       chain "q1 " "q2 " loc (dexpr muc denv e1) op1 e23
-  | Ptree.Econst (Number.ConstInt _ as c) ->
+  | Ptree.Econst (Constant.ConstInt _ as c) ->
       let dty = if Mts.is_empty muc.muc_theory.uc_ranges
                 then dity_int else dity_fresh () in
       DEconst(c, dty)
-  | Ptree.Econst (Number.ConstReal _ as c) ->
+  | Ptree.Econst (Constant.ConstReal _ as c) ->
       let dty = if Mts.is_empty muc.muc_theory.uc_floats
                 then dity_real else dity_fresh () in
       DEconst(c, dty)
+  | Ptree.Econst (Constant.ConstStr _ as c) ->
+      DEconst(c, dity_str)
   | Ptree.Eref ->
       DEsym (RS rs_ref)
   | Ptree.Erecord fl ->
@@ -959,36 +1014,29 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       let ld = create_user_prog_id id, gh, kind, dexpr muc denv e1 in
       DElet (ld, dexpr muc (denv_add_let denv ld) e2)
   | Ptree.Erec (fdl, e1) ->
-      let update_kind (id, gh, k, bl, pty, msk, sp, e) =
-        id, gh, local_kind k, bl, pty, msk, sp, e in
+      let update_kind (id, gh, k, bl, pty, pat, msk, sp, e) =
+        id, gh, local_kind k, bl, pty, pat, msk, sp, e in
       let fdl = List.map update_kind fdl in
       let denv, rd = drec_defn muc denv fdl in
       DErec (rd, dexpr muc denv e1)
-  | Ptree.Efun (bl, pty, msk, sp, e) ->
+  | Ptree.Efun (bl, pty, pat, msk, sp, e) ->
       let bl = List.map (dbinder muc) bl in
-      let ds = dspec_no_variant muc sp in
+      let ds = dspec_no_variant muc bl sp in
       let dity = dity_of_opt muc pty in
       let denv = denv_add_args denv bl in
+      handle_alias denv sp.sp_alias pat dity;
       DEfun (bl, dity, msk, ds, dexpr muc denv e)
-  | Ptree.Eany (pl, kind, pty, msk, sp) ->
+  | Ptree.Eany (pl, kind, pty, pat, msk, sp) ->
       let pl = List.map (dparam muc) pl in
-      let ds = dspec_no_variant muc sp in
+      let ds = dspec_no_variant muc pl sp in
       let ity = match kind, pty with
         | _, Some pty -> ity_of_pty muc pty
         | RKlemma, None -> ity_unit
         | RKpred, None -> ity_bool
         | _ -> Loc.errorm ~loc "cannot determine the type of the result" in
       let dity = dity_of_ity ity in
-      let res = Some (id_fresh "result"), false, dity in
-      let denv = denv_add_args denv (res::pl) in
-      let add_alias (t1, t2) =
-        let bty = dity_fresh () in
-        let dt1 = eff_dterm muc denv t1 in
-        let dt2 = eff_dterm muc denv t2 in
-        ignore (Dexpr.dexpr ~loc:t1.term_loc (DEcast (dt1, bty)));
-        ignore (Dexpr.dexpr ~loc:t2.term_loc (DEcast (dt2, bty)));
-      in
-      List.iter add_alias sp.sp_alias;
+      let denv = denv_add_args denv pl in
+      handle_alias denv sp.sp_alias pat dity;
       DEany (pl, dity, msk, ds)
   | Ptree.Ematch (e1, bl, xl) ->
       let e1 = dexpr muc denv e1 in
@@ -1087,8 +1135,9 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   | Ptree.Elabel (id, e1) ->
       DElabel (create_user_id id, dexpr muc denv e1)
   | Ptree.Escope (q, e1) ->
+      let loc = qloc q in
       let muc = open_scope muc "dummy" in
-      let muc = import_scope muc (string_list_of_qualid q) in
+      let muc = import_scope ~loc muc (string_list_of_qualid q) in
       DEattr (dexpr muc denv e1, Sattr.empty)
   | Ptree.Easref q ->
       let e1 = { expr_desc = Eident q; expr_loc = loc } in
@@ -1106,13 +1155,16 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
   end
 
 and drec_defn muc denv fdl =
-  let prep (id, gh, kind, bl, pty, msk, sp, e) =
+  let prep (id, gh, kind, bl, pty, _pat, msk, sp, e) =
+    if sp.sp_alias <> []
+    then Loc.errorm ~loc:id.id_loc
+           "alias is forbidden in recursive functions";
     let bl = List.map (dbinder muc) bl in
     let dity = dity_of_opt muc pty in
     let pre denv =
       let denv = denv_add_args denv bl in
       let dv = dvariant muc sp.sp_variant in
-      dspec muc sp, dv, dexpr muc denv e in
+      dspec muc bl sp, dv, dexpr muc denv e in
     create_user_prog_id id, gh, kind, bl, dity, msk, pre in
   Dexpr.drec_defn denv (List.map prep fdl)
 
@@ -1564,6 +1616,7 @@ let type_module file env loc path (id,dl) =
   file
 
 let type_mlw_file env path filename mlw_file =
+  if Debug.test_flag Glob.flag then Glob.clear filename;
   let file = Mstr.empty in
   let loc = Loc.user_position filename 0 0 0 in
   let file =

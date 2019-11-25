@@ -475,7 +475,7 @@ let search_labels =
 
 let parse_line_spec s =
    try
-     let args = Str.split (Str.regexp_string ":") s in
+     let args = Re.Str.split (Re.Str.regexp_string ":") s in
      match args with
      | [] ->
         Gnat_util.abort_with_message ~internal:true
@@ -504,7 +504,7 @@ let parse_line_spec s =
 
 let parse_region_spec s =
    try
-     let args = Str.split (Str.regexp_string ":") s in
+     let args = Re.Str.split (Re.Str.regexp_string ":") s in
      match args with
      | [] ->
         Gnat_util.abort_with_message ~internal:true

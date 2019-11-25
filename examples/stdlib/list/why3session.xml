@@ -5,13 +5,13 @@
 <prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Spass" version="3.7" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file proved="true">
+<file format="whyml" proved="true">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="list.mlw"/>
 <theory name="List" proved="true">
- <goal name="VC is_nil" expl="VC for is_nil" proved="true">
+ <goal name="is_nil&#39;vc" expl="VC for is_nil" proved="true">
  <proof prover="7"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
 </theory>
@@ -33,6 +33,17 @@
   <proof prover="7"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
  </transf>
+ </goal>
+</theory>
+<theory name="Quant" proved="true">
+ <goal name="for_all&#39;vc" expl="VC for for_all" proved="true">
+ <proof prover="5"><result status="valid" time="0.04" steps="3669"/></proof>
+ </goal>
+ <goal name="for_some&#39;vc" expl="VC for for_some" proved="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="4840"/></proof>
+ </goal>
+ <goal name="mem&#39;vc" expl="VC for mem" proved="true">
+ <proof prover="5"><result status="valid" time="0.02" steps="4082"/></proof>
  </goal>
 </theory>
 <theory name="Elements" proved="true">
@@ -294,7 +305,7 @@
    <proof prover="7"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
    <goal name="rev_append_sorted_incr.0.4" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.07" steps="22302"/></proof>
+   <proof prover="5"><result status="valid" time="0.07" steps="22303"/></proof>
    </goal>
    <goal name="rev_append_sorted_incr.0.5" proved="true">
    <proof prover="7"><result status="valid" time="0.03" steps="60"/></proof>
@@ -326,7 +337,7 @@
    <proof prover="7"><result status="valid" time="0.01" steps="8"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.0.4" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.05" steps="25375"/></proof>
+   <proof prover="5"><result status="valid" time="0.05" steps="25376"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.0.5" proved="true">
    <proof prover="7"><result status="valid" time="0.03" steps="72"/></proof>
@@ -335,7 +346,7 @@
    <proof prover="7"><result status="valid" time="0.22" steps="1011"/></proof>
    </goal>
    <goal name="rev_append_sorted_decr.0.7" proved="true">
-   <proof prover="5" timelimit="5"><result status="valid" time="0.07" steps="13255"/></proof>
+   <proof prover="5"><result status="valid" time="0.07" steps="13256"/></proof>
    </goal>
   </transf>
   </goal>
@@ -426,7 +437,7 @@
     <proof prover="0"><result status="valid" time="0.02" steps="27861"/></proof>
     </goal>
     <goal name="Permut_length.0.0.1" proved="true">
-    <proof prover="5"><result status="valid" time="0.01" steps="4979"/></proof>
+    <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="4980"/></proof>
     </goal>
    </transf>
    </goal>
@@ -435,19 +446,19 @@
     <goal name="Permut_length.0.1.0" proved="true">
     <transf name="assert" proved="true" arg1="(num_occ x1 l1 &gt;= 1)">
      <goal name="Permut_length.0.1.0.0" expl="asserted formula" proved="true">
-     <proof prover="5"><result status="valid" time="0.02" steps="6415"/></proof>
+     <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="6416"/></proof>
      </goal>
      <goal name="Permut_length.0.1.0.1" proved="true">
      <transf name="assert" proved="true" arg1="(mem x1 l2)">
       <goal name="Permut_length.0.1.0.1.0" expl="asserted formula" proved="true">
-      <proof prover="5"><result status="valid" time="0.02" steps="6344"/></proof>
+      <proof prover="5" timelimit="1"><result status="valid" time="0.02" steps="6345"/></proof>
       </goal>
       <goal name="Permut_length.0.1.0.1.1" proved="true">
       <transf name="instantiate" proved="true" arg1="mem_decomp" arg2="x1,l2">
        <goal name="Permut_length.0.1.0.1.1.0" proved="true">
        <transf name="destruct" proved="true" arg1="Hinst">
         <goal name="Permut_length.0.1.0.1.1.0.0" expl="destruct premise" proved="true">
-        <proof prover="5"><result status="valid" time="0.01" steps="5352"/></proof>
+        <proof prover="5" timelimit="1"><result status="valid" time="0.01" steps="5353"/></proof>
         </goal>
         <goal name="Permut_length.0.1.0.1.1.0.1" proved="true">
         <transf name="destruct" proved="true" arg1="Hinst">
@@ -456,10 +467,10 @@
           <goal name="Permut_length.0.1.0.1.1.0.1.0.0" proved="true">
           <transf name="assert" proved="true" arg1="(permut x (l1 ++ l2))">
            <goal name="Permut_length.0.1.0.1.1.0.1.0.0.0" expl="asserted formula" proved="true">
-           <proof prover="5"><result status="valid" time="0.22" steps="32271"/></proof>
+           <proof prover="5" timelimit="1"><result status="valid" time="0.22" steps="32272"/></proof>
            </goal>
            <goal name="Permut_length.0.1.0.1.1.0.1.0.0.1" proved="true">
-           <proof prover="5"><result status="valid" time="0.19" steps="25534"/></proof>
+           <proof prover="5" timelimit="1"><result status="valid" time="0.19" steps="25535"/></proof>
            </goal>
           </transf>
           </goal>

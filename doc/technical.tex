@@ -57,12 +57,35 @@ case, the relative order of these associations matters.
 \section{Drivers for External Provers}
 \label{sec:drivers}
 
-Drivers for external provers are readable files from directory
-\texttt{drivers}. Experimented users can modify them to change the way
-the external provers are called, in particular which transformations
-are applied to goals.
+Drivers for external provers are readable files located in the
+\texttt{drivers} directory. They describe how \why should interact
+with external provers.
 
-[TO BE COMPLETED LATER]
+% Experienced users can modify them to
+% change the way \why interacts with external provers.
+
+%  namely the need
+% for printer section, any other ?
+
+% , in particular which transformations
+% are applied to goals.
+
+
+Files with \texttt{.drv} extension represent drivers that might be
+associated to a specific solver in the \texttt{why3.conf}
+configuration file (see \ref{sec:whyconffile} for more information);
+files with \texttt{.gen} extension are intended to be imported by
+other drivers; finally, files with \texttt{.aux} extension are
+automatically generated from the main \texttt{Makefile}.
+%
+\input{./generated/drivers_dependency.tex}
+%
+The most important drivers dependencies are shown in
+Figs.~\driversref. Fig.~\ref{fig:drv:smt} shows the drivers files
+related to the \texttt{SMT} solvers, Fig.~\ref{fig:drv:coq} the files
+for \texttt{Coq}, Fig.~\ref{fig:drv:tptp} the files for \texttt{TPTP},
+Fig.~\ref{fig:drv:isabelle} the files for \texttt{Isabelle}, and
+finally Fig.~\ref{fig:drv:pvs} shows the files for \texttt{PVS}.
 
 \section{Transformations}
 \label{sec:transformations}
@@ -545,6 +568,854 @@ and is likely to change in future versions.
 
 \end{description}
 
+\subsection{Transformations with arguments}
+
+Transformations with arguments are transformations that can use symbols and
+expressions found in the task as arguments. This section contains a description
+and examples of usage for every transformations with arguments.
+
+\begin{description}
+
+\item[apply] applies an hypothesis to the goal of the task using a
+  \textit{modus ponens} rule. The hypothesis should be an implication whose
+  conclusion can be matched with the goal.
+  The intuitive behavior of \texttt{apply} can be translated as follows:\\
+  $\Gamma, h: f1 \rightarrow f2 \vdash G: f2$\\
+  \texttt{apply h} generates a new task:\\
+  $\Gamma, h: f1 \rightarrow f2 \vdash G: f1$\\
+
+  In practice, the transformation also manages to instantiate some variables
+  with the appropriate terms. In \why code, an example is:
+\begin{whycode}
+predicate is_even int
+predicate is_zero int
+axiom zero_is_even: forall x: int. is_zero x -> is_even x
+goal G: is_even 0
+\end{whycode}
+Applying the transformation:
+\begin{transwhy3}
+apply zero_is_even
+\end{transwhy3}
+
+A new goal is created:
+\begin{whycode}
+predicate is_even int
+predicate is_zero int
+axiom zero_is_even: forall x:int. is_zero x -> is_even x
+goal G: is_zero 0
+\end{whycode}
+The transformation first matched the goal against the hypothesis and
+instantiated \texttt{x} with \texttt{0}. It then applied the
+\textit{modus ponens} rule to generate the new goal.
+
+This transformation helps automated provers when they don't know which
+hypothesis to use in order to prove a goal.
+
+
+\index{apply@\verb+apply+}
+
+\item[apply ... with ...] is a variant of \texttt{apply} (described above). It
+  is intended to be used in contexts where \texttt{apply} cannot infer what
+  terms to use for variables given in the applied hypothesis.
+  For example, on the following task:
+\begin{whycode}
+axiom ac: a = c
+axiom cb: c = b
+axiom transitivity : forall x y z:int. x = y -> y = z -> x = z
+goal G1 : a = b
+\end{whycode}
+
+\begin{transwhy3}
+apply transitivity
+\end{transwhy3}
+
+Applying transitivity raises the following error:
+
+\begin{transwhy3}
+apply: Unable to infer arguments (try using "with") for: y
+\end{transwhy3}
+
+It means that the tool is not able to infer the right term to
+instantiate symbol \texttt{y}. In our case, the user knows that the term
+\texttt{c} should work.
+So, we can apply a new transformation using the \texttt{with} syntax:
+
+\begin{transwhy3}
+apply transitivity with c
+\end{transwhy3}
+
+This generates two goals which are easily provable with hypotheses \texttt{ac}
+and \texttt{cb}.
+
+When multiple variables are needed, they should be provided as a list in the
+transformation. For the sake of the example, we overcomplexify the
+\texttt{transitivity} hypothesis:
+\begin{whycode}
+axiom t : forall x y z k:int. k = k -> x = y -> y = z -> x = z
+\end{whycode}
+With this new example, we can provide a new value for \texttt{k} as follows:
+
+\begin{transwhy3}
+apply t with c,0
+\end{transwhy3}
+
+\item[assert] allows to make an intermediate proof. This is comparable
+  \texttt{assert}s written in the \whyml code. Here, the intent is only to help
+  provers by specifying one key argument of the reasoning they should use.
+  For example:
+
+\begin{transwhy3}
+assert (n = 0)
+\end{transwhy3}
+
+From a goal of the form $\Gamma \vdash G$, and with $h$ the new name of
+hypothesis $n = 0$. The transformation produces the following two tasks:\\
+$\Gamma \vdash h$\\
+$\Gamma, h \vdash G$
+
+This effectively adds $h$ as an intermediate goal to prove.
+
+  \index{assert@\verb+assert+}
+
+\item[assert ... as ...] is derived from \texttt{assert}: it allows to give
+  a name to the new hypothesis.
+  For example:
+\begin{transwhy3}
+assert (x = 0) as x0
+\end{transwhy3}
+
+\item[case] is the destruction of the \textit{excluded middle} rule on a given
+  formula \texttt{f}. It splits the task in two: the first assumes \texttt{f}
+  and the other one assumes \texttt{not f}.
+  On the task $\Gamma \vdash G$, with $f$ the term provided, \texttt{case}
+  produces the two tasks:\\
+$\Gamma, h : f \vdash G$\\
+$\Gamma, h : \neg f \vdash G$
+
+In \why code, an example is:
+\begin{whycode}
+constant x : int
+constant y : int
+goal G: if x = 0 then y = 2 else y = 3
+\end{whycode}
+
+\begin{transwhy3}
+case (x = 0)
+\end{transwhy3}
+
+The transformation generates the two new following goals:
+
+\begin{whycode}
+constant x : int
+constant y : int
+axiom h : x = 0
+goal G : if x = 0 then y = 2 else y = 3
+\end{whycode}
+and:
+\begin{whycode}
+constant x : int
+constant y : int
+axiom h : not x = 0
+goal G : if x = 0 then y = 2 else y = 3
+\end{whycode}
+
+The intention is again to simplify the job of automated provers by giving them a
+key argument of the reasoning behind the proof of a subgoal.
+
+\index{case@\verb+case+}
+
+\item[case ... as ...] is derived from \texttt{case}: it allows to name the
+  introduced hypotheses.
+
+\item[clear\_but] removes all hypotheses except those specified in
+  the arguments. This is useful when a prover fails to use the relevant
+  hypotheses in a very big context.
+  For example:
+\begin{transwhy3}
+clear_but h23,h55
+\end{transwhy3}
+
+\index{clear_but@\verb+clear_but+}
+
+\item[compute\_hyp] applies the transformation \texttt{compute} on the given
+  hypothesis.
+
+\index{compute_hyp@\verb+compute_hyp+}
+
+\item[compute\_hyp\_specified] applies the transformation
+  \texttt{compute\_specified} on the given hypothesis.
+
+\index{compute_hyp_specified@\verb+compute_hyp_specified+}
+
+\item[cut] is the same as \texttt{assert} with the order of generated subgoals
+  reversed.
+
+\index{cut@\verb+cut+}
+
+\item[destruct] is used to eliminate the head logical symbol of an hypothesis
+  such as $\wedge$, $\vee$, or $\rightarrow$.
+  For example, on the following goal:
+\begin{whycode}
+constant p1 : bool
+predicate p2 int
+axiom h : p1 = True /\ (forall x:int. p2 x)
+goal G : p2 0
+\end{whycode}
+
+\begin{transwhy3}
+destruct h
+\end{transwhy3}
+
+
+The task is transformed into:
+\begin{whycode}
+constant p1 : bool
+predicate p2 int
+axiom h1 : p1 = True
+axiom h : forall x:int. p2 x
+goal G : p2 0
+\end{whycode}
+
+The logical operator $\wedge$ is effectively removed.
+\texttt{destruct} can be applied to a lot of head logical constructions
+producing the expected new tasks:
+\begin{itemize}
+\item \whyf{false}
+\item \whyf{true}
+\item \whyf{/\\}
+\item \whyf{\\/}
+\item \whyf{->}
+\item \whyf{exists}
+\item \whyf{not}
+\item \whyf{if ... then ... else}
+\item \whyf{match ... with ... end}
+\item (in)equality on constructors of the same type
+\end{itemize}
+
+\index{destruct@\verb+destruct+}
+
+\item[destruct\_rec] recursively calls \texttt{destruct} on new generated
+  hypotheses. The recursivity on implication and \texttt{match} stops after the
+  first occurence of a different symbol.
+  For example, on the following goal:
+\begin{whycode}
+predicate a
+predicate b
+predicate c
+axiom H : (a -> b) /\ (b /\ c)
+goal G : false
+\end{whycode}
+
+\begin{transwhy3}
+destruct_rec H
+\end{transwhy3}
+
+The transformation will not destruct the implication symbol because it occurs
+as a subterms of an already destructed symbol. This stop applies only to
+implication and \texttt{match}: the other symbols are destructed recursively.
+In the generated task, we can see that the second \whyf{/\\} is simplified but
+not the \whyf{->}:
+\begin{whycode}
+predicate a
+predicate b
+predicate c
+axiom H2 : a -> b
+axiom H1 : b
+axiom H: c
+goal G : false
+\end{whycode}
+
+\index{destruct-rec@\verb+destruct_rec+}
+
+\item[destruct\_term] destructs an expression according to the type of the
+  expression. The transformation produces all possible outcomes of a
+  destruction of the algebraic type.
+  For example,
+\begin{whycode}
+type t = | A | B int
+constant a : t
+goal G : a = A
+\end{whycode}
+
+\begin{transwhy3}
+destruct_term a
+\end{transwhy3}
+
+returns the two following goals (for constructor \texttt{B}):
+
+\begin{whycode}
+type t = | A | B int
+constant a : t
+constant x : int
+axiom h : a = B x
+goal G : a = A
+\end{whycode}
+
+and (for constructor \texttt{A}):
+\begin{whycode}
+type t = | A | B int
+constant a : t
+axiom h : a = A
+goal G : a = A
+\end{whycode}
+
+The term was destructed according to all the possible outcomes in the
+type. Note that, during destruction, a new constant \texttt{x} has been
+introduced for the argument of constructor \texttt{B}.
+
+\index{destruct-term@\verb+destruct_term+}
+
+\item[destruct\_term ... using ..] is a way to give names to constants that were
+  generated by \texttt{destruct\_term}.
+
+\item[destruct\_term\_subst] has the same behavior as \texttt{destruct\_term}
+  except that it also substitutes the created term.
+
+\index{destruct-term-subst@\verb+destruct_term_subst+}
+
+\item[exists] is a way to give a witness term to a goal that starts with an
+  existential quantification.
+  For example, on the following goal:
+\begin{whycode}
+goal G : exists x:int. x = 0
+\end{whycode}
+We can apply the following transformation:
+
+\begin{transwhy3}
+exists 0
+\end{transwhy3}
+
+This instantiates the symbol \texttt{x} with \texttt{0}. The goal becomes:
+
+\begin{whycode}
+goal G : 0 = 0
+\end{whycode}
+
+\index{exists@\verb+exists+}
+
+\item[hide] is used to hide a complex term: it creates a new constant equal to
+  the term and then replaces all occurences of the term in the context by this
+  constant.
+  For example, on the task:
+\begin{whycode}
+constant y : int
+axiom h : forall x:int. x = (1 + 1)
+goal G : (y - (1 + 1)) = ((1 + 1) - (1 + 1))
+\end{whycode}
+
+\begin{transwhy3}
+hide t (1 + 1)
+\end{transwhy3}
+
+The transformation generates the new following task:
+\begin{whycode}
+constant y : int
+constant t : int
+axiom H : t = (1 + 1)
+axiom h : forall x:int. x = t
+goal G : (y - t) = (t - t)
+\end{whycode}
+
+All occurences of \whyf{(1 + 1)} have been replaced by \whyf{t}.
+
+\index{hide@\verb+hide+}
+
+\item[hide\_and\_clear] first applies \texttt{hide} then removes the
+  equality between the hidden term and the introduced constant. This means that
+  the hidden term completely disappears and cannot be recovered.
+
+\index{hide-and-clear@\verb+hide_and_clear+}
+
+\item[induction] generates a reasoning by induction for the current goal.
+  For example, on the following goal, trying to prove that \texttt{p1} implies
+  \texttt{p} by induction on \texttt{n}:
+\begin{whycode}
+constant n : int
+predicate p int
+predicate p1 int
+axiom h : p1 n
+goal G : p n
+\end{whycode}
+
+\begin{transwhy3}
+induction n
+\end{transwhy3}
+
+This does an induction starting at \texttt{0} generating the two following
+goals. The base case:
+\begin{whycode}
+constant n : int
+predicate p int
+predicate p1 int
+axiom h : p1 n
+axiom Init : n <= 0
+goal G : p n
+\end{whycode}
+
+And, the recursive case:
+
+\begin{whycode}
+constant n : int
+predicate p int
+predicate p1 int
+axiom h : p1 n
+axiom Init : 0 < n
+axiom Hrec : forall n1:int. n1 < n -> p1 n1 -> p n1
+goal G : p n
+\end{whycode}
+
+\index{induction@\verb+induction+}
+
+\item[induction ... from ...] is the same as \texttt{induction} but it starts
+  the induction from a given integer instead of \texttt{0}.
+
+\item[induction\_arg\_pr] does \texttt{induction\_pr} on the given
+  hypothesis/goal symbol.
+
+\index{induction-arg-pr@\verb+induction_arg_pr+}
+
+\item[induction\_arg\_ty\_lex] does \texttt{induction\_ty\_lex} on the given
+  symbol.
+
+\index{induction-arg-ty-lex@\verb+induction_arg_ty_lex+}
+
+\item[instantiate] generates a new hypothesis with quantified variables
+  replaced by the given terms. For example, on the following:
+
+\begin{whycode}
+predicate p int
+axiom h : forall x:int, y:int. x <= y -> p x /\ p y
+goal G : p 0
+\end{whycode}
+
+\begin{transwhy3}
+instantiate h 0, 1
+\end{transwhy3}
+
+generates this new hypothesis:
+\begin{whycode}
+predicate p int
+axiom h : forall x:int, y:int. x <= y -> p x /\ p y
+axiom Hinst : 0 <= 1 -> p 0 /\ p 1
+goal G : p 0
+\end{whycode}
+
+This is used to help automatic provers that are generally better at working on
+instantiated hypothesis.
+
+\index{instantiate@\verb+instantiate+}
+
+\item[inst\_rem] first does \texttt{instantiate} then removes the original
+  instantiated hypothesis.
+
+\index{inst-rem@\verb+inst_rem+}
+
+\item[intros] allows to name introduced elements.
+  For example,
+\begin{whycode}
+predicate p int int int
+goal G : forall x:int, y:int, z:int. p x y z
+\end{whycode}
+
+\begin{transwhy3}
+intros n, m
+\end{transwhy3}
+
+returns:
+\begin{whycode}
+predicate p int int int
+constant n : int
+constant m : int
+goal G : forall z:int. p n m z
+\end{whycode}
+
+\index{intros@\verb+intros+}
+
+\item[intros\_n] introduces the \texttt{n} first quantified variables or
+  premises.
+  For example,
+\begin{whycode}
+predicate p int int int
+goal G : forall x:int, y:int, z:int. p x y z
+\end{whycode}
+
+\begin{transwhy3}
+intros_n 2
+\end{transwhy3}
+
+returns:
+
+\begin{whycode}
+predicate p int int int
+constant x : int
+constant y : int
+goal G : forall z:int. p x y z
+\end{whycode}
+
+\index{intros-n@\verb+intros_n+}
+
+\item[inversion\_arg\_pr] does \texttt{inversion\_pr} on the given
+  hypothesis/goal symbol.
+
+\index{inversion-arg-pr@\verb+inversion_arg_pr+}
+
+\item[left] removes the right part of a goal head disjonction.
+  For example,
+\begin{whycode}
+constant x : int
+goal G : x = 0 \/ x = 1
+\end{whycode}
+
+\begin{transwhy3}
+left
+\end{transwhy3}
+
+returns:
+
+\begin{whycode}
+constant x : int
+goal G : x = 0
+\end{whycode}
+
+\index{left@\verb+left+}
+
+\item[pose] adds a new constant equal to the given term.
+  For example,
+\begin{whycode}
+constant x : int
+goal G : true
+\end{whycode}
+
+\begin{transwhy3}
+pose t (x + 2)
+\end{transwhy3}
+
+returns:
+\begin{whycode}
+constant x : int
+constant t : int
+axiom H : t = (x + 2)
+goal G : true
+\end{whycode}
+
+\index{pose@\verb+pose+}
+
+\item[remove] removes an hypothesis from the context.
+
+\begin{whycode}
+axiom h : true
+goal G : true
+\end{whycode}
+
+\begin{transwhy3}
+remove h
+\end{transwhy3}
+
+
+returns:
+\begin{whycode}
+goal G : true
+\end{whycode}
+
+\index{remove@\verb+remove+}
+
+\item[replace] replaces a term with another one in an hypothesis or in the
+  goal. This generates a new goal which asks for the proof of the equality.
+  For example,
+\begin{whycode}
+constant x : int
+constant y : int
+axiom h : x >= (y + 1)
+goal G : true
+\end{whycode}
+
+\begin{transwhy3}
+replace (y + 1) (x + 2) in h
+\end{transwhy3}
+
+The transformation generates two subgoals:
+\begin{whycode}
+constant x : int
+constant y : int
+axiom h : x >= (x + 2)
+goal G : true
+\end{whycode}
+
+and:
+\begin{whycode}
+constant x : int
+constant y : int
+axiom h : x >= (y + 1)
+goal G : (y + 1) = (x + 2)
+\end{whycode}
+
+It can be seen as the combination of \texttt{assert} and \texttt{rewrite}.
+
+\index{replace@\verb+replace+}
+
+\item[revert] is the opposite of \texttt{intros}. It takes hypotheses/constants
+  and quantifies them in the goal.
+  For example,
+
+\begin{whycode}
+constant x : int
+constant y : int
+axiom h : x = y
+goal G : true
+\end{whycode}
+
+\begin{transwhy3}
+revert x
+\end{transwhy3}
+
+returns:
+
+\begin{whycode}
+constant y : int
+goal G : forall x:int. x = y -> true
+\end{whycode}
+
+\index{revert@\verb+revert+}
+
+\item[rewrite] rewrites using an equality hypothesis.
+  For example,
+\begin{whycode}
+function a int : bool
+function b int : bool
+constant y : int
+axiom eq : forall x:int. not x = 0 -> a x = b x
+goal G : a y = True
+\end{whycode}
+
+\begin{transwhy3}
+rewrite eq
+\end{transwhy3}
+
+The transformation modifies the goal:
+
+\begin{whycode}
+function a int : bool
+function b int : bool
+constant y : int
+axiom eq : forall x:int. not x = 0 -> a x = b x
+goal G : b y = True
+\end{whycode}
+
+and adds new generated premises (as for \texttt{apply}):
+\begin{whycode}
+function a int : bool
+function b int : bool
+constant y : int
+axiom eq : forall x:int. not x = 0 -> a x = b x
+goal G : not y = 0
+\end{whycode}
+
+\index{rewrite@\verb+rewrite+}
+
+\item[rewrite ... with ...] is a variant of \texttt{rewrite}. As for
+  \texttt{apply}, symbols that could not be instantiated can be provided by the
+  user after the \texttt{with}.
+
+  For example:
+\begin{whycode}
+function a int : bool
+function b int : bool
+constant y : int
+axiom eq : forall x:int, z:int. z = 0 -> not x = 0 -> a x = b x
+goal G : a y = True
+\end{whycode}
+
+The following transformation can be applied:
+
+\begin{transwhy3}
+rewrite eq with 0
+\end{transwhy3}
+
+In this case, a value was provided for the symbol \texttt{z} modifying the goal
+and generating two new ones for the premises of the equality hypothesis:
+\begin{whycode}
+function a int : bool
+function b int : bool
+constant y : int
+axiom eq : forall x:int, z:int. z = 0 -> not x = 0 -> a x = b x
+goal G : b y = True
+\end{whycode}
+
+\begin{whycode}
+function a int : bool
+function b int : bool
+constant y : int
+axiom eq : forall x:int, z:int. z = 0 -> not x = 0 -> a x = b x
+goal G : 0 = 0
+\end{whycode}
+
+\begin{whycode}
+function a int : bool
+function b int : bool
+constant y : int
+axiom eq : forall x:int, z:int. z = 0 -> not x = 0 -> a x = b x
+goal G : not y = 0
+\end{whycode}
+
+
+
+\item[rewrite\_list] is a variant of \texttt{rewrite} which allows
+  simultaneous rewriting in a list of hypothesis/goals.
+
+\index{rewrite-list@\verb+rewrite_list+}
+
+\item[right] removes the left part of a goal head disjonction.
+  For example,
+\begin{whycode}
+constant x : int
+goal G : x = 0 \/ x = 1
+\end{whycode}
+
+\begin{transwhy3}
+right
+\end{transwhy3}
+
+The transformation returns:
+
+\begin{whycode}
+constant x : int
+goal G : x = 1
+\end{whycode}
+
+\index{right@\verb+right+}
+
+%TODO not documenting step and steps which are limited version of
+%compute ?
+
+\item[subst] substitutes a constant \whyf{c} with a term \whyf{t} using an
+  equality of the form \whyf{c = t} in the context. The constant is removed.
+  For example,
+\begin{whycode}
+constant x : int
+constant y : int
+constant z : int
+axiom h : x = y + 1
+axiom h1 : z = (x + y)
+goal G : x = z
+\end{whycode}
+
+\begin{transwhy3}
+subst x
+\end{transwhy3}
+
+The transformation first finds the hypothesis \texttt{h} that can be used to
+rewrite \texttt{x}. Then, it replaces every occurences of \texttt{x} with
+\texttt{y + 1} and finally, it removes \texttt{h} and \texttt{x}.
+The result is as follows:
+
+\begin{whycode}
+constant y : int
+constant z : int
+axiom h1 : z = ((y + 1) + y)
+goal G : (y + 1) = z
+\end{whycode}
+
+This transformation is used to make the task more easily readable by a human
+during debugging. This transformation should not help automatic provers at all
+as they generally implement substitution rules in their logic.
+
+\index{subst@\verb+subst+}
+
+
+\item[subst\_all] tries to substitute all variables that can be substituted.
+
+  For example,
+\begin{whycode}
+constant x : int
+constant x1 : int
+constant y : int
+constant z : int
+axiom h : x = (y + 1)
+axiom hx1 : x = x1
+axiom h1 : z = (x + y)
+goal G : x = z
+\end{whycode}
+
+\begin{transwhy3}
+subst_all
+\end{transwhy3}
+
+The returned tasks with \texttt{x}, \texttt{x1}, and \texttt{z} removed is:
+\begin{whycode}
+constant y : int
+goal G : (y + 1) = ((y + 1) + y)
+\end{whycode}
+
+Note that the order in which constants are substituted is not specified.
+
+\index{subst-all@\verb+subst_all+}
+
+\item[unfold ... in ...] unfolds the definition of a logical symbol in the
+  given hypothesis.
+  For example,
+\begin{whycode}
+predicate p (x:int) = x <= 22
+axiom h : forall x:int. p x -> p (x - 1)
+goal G : p 21
+\end{whycode}
+
+\begin{transwhy3}
+unfold p
+\end{transwhy3}
+
+This unfolds \whyf{p} in the goal:
+
+\begin{whycode}
+predicate p (x:int) = x <= 22
+axiom h : forall x:int. p x -> p (x - 1)
+goal G : 21 <= 22
+\end{whycode}
+
+But, we could also unfold in an hypothesis:
+
+\begin{transwhy3}
+unfold p in h
+\end{transwhy3}
+
+\begin{whycode}
+predicate p (x:int) = x <= 22
+axiom h : forall x:int. x <= 22 -> (x - 1) <= 22
+goal G : 21 <= 22
+\end{whycode}
+
+\index{unfold@\verb+unfold+}
+
+
+\item[use\_th] imports a theory inside the current context. This is used, in
+  some rare case, to reduced the size of the context in other goals (it avoids
+  importing a theory in the \whyml code thus making the theory available in all
+  goals whereas the theory is only needed in one specific goal).
+  For example,
+\begin{whycode}
+predicate p int
+goal G : p 5
+\end{whycode}
+
+\begin{transwhy3}
+use_th int.Int
+\end{transwhy3}
+
+This imports the \texttt{Int} theory. So, one is able to use the addition over
+integers for example:
+
+\begin{transwhy3}
+replace 5 (2 + 3)
+\end{transwhy3}
+
+Any lemma appearing in the imported theory can also be used.
+
+Note that axioms are also imported. So, this transformation should be used
+with care. We recommend to use only theories that do not contain any axioms
+because this transformation could easily makes the context incoherent.
+
+\index{use-th@\verb+use_th+}
+
+\end{description}
 
 \section{Proof Strategies}
 \label{sec:strategies}

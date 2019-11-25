@@ -68,7 +68,7 @@ Axiom inversion_mem_star :
   mem (Init.Datatypes.cons c w1) r /\ mem w2 (Star r).
 
 (* Why3 goal *)
-Theorem residual'VC :
+Theorem residual'vc :
   forall (r:regexp) (c:char), forall (result:regexp),
   (exists x:regexp, exists x1:regexp,
    (r = (Concat x x1)) /\

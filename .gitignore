@@ -23,6 +23,7 @@ why3.conf
 .*.aux
 *.elc
 *.summary
+.merlin
 \#*\#
 .depend.gnat
 
@@ -31,6 +32,8 @@ why3.conf
 /config.log
 /autom4te.cache
 /Makefile
+/configure
+/install-sh
 /semantic.cache
 /TAGS
 /output_why3
@@ -39,8 +42,8 @@ why3.conf
 /distrib
 /why3regtests.err
 /why3regtests.out
-/.merlin
 /src/jessie/.merlin
+/_build
 
 # /bench/
 /bench/programs/good/booleans/
@@ -54,6 +57,7 @@ why3.conf
 /bench/programs/good/po/
 /bench/valid/list/
 /bench/ce/*.out
+/bench/parsing/bad/*.out
 
 # /bin/
 /bin/why3.byte
@@ -85,6 +89,9 @@ why3.conf
 /bin/why3replay.byte
 /bin/why3replay.opt
 /bin/why3replay
+/bin/why3pp.opt
+/bin/why3pp.byte
+/bin/why3pp
 /bin/why3session.opt
 /bin/why3session.byte
 /bin/why3session
@@ -99,6 +106,9 @@ why3.conf
 /bin/why3webserver.opt
 /bin/why3webserver.byte
 /bin/why3webserver
+/bin/why3pp.opt
+/bin/why3pp.byte
+/bin/why3pp
 /bin/isabelle_client.opt
 /bin/isabelle_client.byte
 /bin/isabelle_client
@@ -201,6 +211,8 @@ pvsbin/
 /src/parser/parser.ml
 /src/parser/parser.mli
 /src/parser/parser.conflicts
+/src/parser/handcrafted.messages.temp
+/src/parser/parser_messages.ml
 
 # /src/why3doc/
 /src/why3doc/doc_lexer.ml
@@ -213,6 +225,8 @@ pvsbin/
 /src/util/json_parser.mli
 /src/util/json_parser.ml
 /src/util/json_parser.conflicts
+/src/util/mlmpfr_wrapper.ml
+/src/util/ppx_debug_optim
 
 # /src/session
 /src/session/xml.ml

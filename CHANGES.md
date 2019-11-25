@@ -1,35 +1,47 @@
 :x: marks a potential source of incompatibility
 
 Standard library
-  * `pqueue.Pqueue` now modeled using sequences instead of lists :x:
-  * `queue.Queue` now modeled using sequences instead of lists :x:
+  * `pqueue.Pqueue` is now modeled using sequences instead of lists :x:
+  * `queue.Queue` is now modeled using sequences instead of lists :x:
   * the `set` library has been revamped :x:
       - in `set.Fset`, type `set` becomes `fset`; `choose` becomes `pick`
       - module `appset.Appset` becomes `set.SetApp`;
         `impset.Impset` becomes `set.SetImp`
       - in `set.SetApp` and `set.SetImp`, type `t` becomes `set`;
         field `contents` becomes `to_fset`; call to `empty` becomes `empty ()`
+  * new library `fmap` for finite maps
+      - Fmap: polymorphic, logic finite maps to be used in logic
+      - MapApp, MapAppInt, MapImp, MapImpInt: monomorphic finite maps to
+        be used in programs
 
 Language
-  * It is now possible to give a name to requires and assertions.
-    `requires Hyp { a = 3 }` tries to give the name `Hyp` to the corresponding
-    hypothesis after introduction. This uses the attribute [@hyp_name:] which is
-    now reserved.
-  * Ident suffix introduced for specification (resp definition) of a function
-    are renamed from "_spec" (resp. "_def" to "'spec" (resp. "'def" :x:
-  * Ident prefix introduced for goals "VC " and record constructor "mk "
-    becomes suffix "'VC" and "'mk".
+  * it is now possible to give a name to preconditions and assertions;
+    `requires Foo { a = 3 }` sets the attribute `[@hyp_name:Foo]`, which tries
+    to give the name `Foo` to the corresponding hypothesis after introduction
+  * identifiers used for specification (resp. definition) of a function `foo`
+    have been renamed from `foo_spec` (resp. `foo_def`) to `foo'spec` (resp. `foo'def`) :x:
+  * identifiers used for goals `VC foo` have been renamed to `foo'vc`
+  * identifiers used for record constructor `mk foo` have been renamed to `foo'mk` :x:
+  * the `alias` clause can now be used in program functions to force the aliasing
+    of function parameters and/or named returns
 
 Tools
   * counterexamples given by `why3prove` are no longer printed using JSON
     by default; pass option `--json` to restore the previous behavior
+  * new tool `why3pp` to pretty print Why3 source code (inductive definitions to LaTeX,
+    formatting of mlw files)
 
 API
   * `Call_provers.print_prover_result` now takes an additional argument
     `~json_model` to indicate whether counterexamples are printed using JSON :x:
-  * Counterexamples: indices of array are now model_value. :x:
-  * ITP constructor Task now contain the location of the goal :x:
-  * ITP constructor Source_and_ce now has 3 arguments instead of 2 :x:
+  * indices of array are now `model_value` for counterexamples :x:
+  * ITP constructor `Task` now contains the location of the goal :x:
+  * ITP constructor `Source_and_ce` now has 3 arguments instead of 2 :x:
+  * ITP constructors `File_contents` and `Source_and_ce` has a new argument for
+    the file format :x:
+  * ITP constructor `File_contents` has a new boolean argument for
+    interpretation of the file in the IDE as `read_only` :x:
+  * New ITP constructor `Ident_notif_loc`
 
 Transformations
   * `apply`/`rewrite` behaves better in presence of `let`;
@@ -40,34 +52,47 @@ Transformations
   * `induction_arg_ty_lex` is now equivalent to `induction_ty_lex`
   * `induction_arg_pr` now takes an optional argument that indicates what to
     generalize in the induction
-  * `destruct` now destruct `not p` into `p -> false`. `destruct_rec` is
-     allowed to further destruct afterwards.
-    `destruct` can also destruct `true` and `false`.
-  * decision procedures used for reflection now must be declared explicitly using
-    `meta reflection val <function_name>` :x:
-  * `remove` should not raise unnecessary popups anymore. Added `remove_rec`.
-    `bisect` should not raise unnecessary popups too.
+  * `destruct` now destructs `not p` into `p -> false`;
+    `destruct_rec` can further destruct afterwards;
+    `destruct` can also destruct `true` and `false` :x:
+  * decision procedures used for reflection must now be declared explicitly using
+    `meta reflection val foo` :x:
+  * `remove` and `bisect` should not raise unnecessary popups anymore
+  * added `remove_rec`
 
 IDE
   * display of counterexamples in the Task view has been improved
   * auto jumping to next unproved goal can now be disabled in the preferences
-  * add a "reset proofs" command in the Tools menu. It removes all proofs in
-    the session
+  * added a "reset proofs" command in the Tools menu to remove all the proofs
+    from the session
   * default proof strategies "Auto level 1" and "Auto level 2"
-    have been respectively renamed "Auto level 2" and "Auto level 3"
-    and there is a new "Auto level 1" similar to "Auto level 0" but with a longer
-    time limit.
-    More details in the manual, section 9.6 "Proof Strategies". :x:
-  * strategies can now be defined using %t (resp. %m) for using a prover with
+    have been respectively renamed "Auto level 2" and "Auto level 3";
+    "Auto level 1" now behaves similarly to "Auto level 0" but with a longer
+    time limit; more details in the manual, section 9.6 "Proof Strategies" :x:
+  * strategies can now be defined using `%t` (resp. `%m`) to call a prover with
     the default timelimit (resp. memlimit)
+  * added minimal search menu
+  * A merlin-like feature to find the ident located under the cursor has been
+    added in the Edit menu.
+  * Read only file can now be displayed and removed by right clicking on their
+    tab titles
+  * Colors for error can now be edited in the why3.conf more precisely
 
 Realizations
-  * Added experimental realizations for new Set theories in both Isabelle and
-    Coq
+  * added experimental realizations for new Set theories in both Isabelle and Coq
+
+Version 1.2.1, October 28, 2019
+-------------------------------
+
+Bug fixes
+  * fixed compilation with OCaml 4.09
+  * fixed compilation with Lablgtk3
 
 Provers
-  * support for CVC4 1.7 (released April 9, 2019)
-  * support for Alt-Ergo 2.3.0 (released February 11, 2019)
+  * support for Z3 4.8.6 (released Sep 20, 2019)
+  * support for Z3 4.8.5 (released Jun 3, 2019)
+  * support for CVC4 1.7 (released Apr 9, 2019)
+  * support for Alt-Ergo 2.3.0 (released Feb 11, 2019)
   * support for Coq 8.9.1 (released May 20, 2019)
 
 Version 1.2.0, February 11, 2019
@@ -270,8 +295,8 @@ Standard library
     commutative :x:
 
 Miscellaneous
-  * fixed support for `--enable_relocation=yes` (issue #50)
-  * fixed support for Windows (issue #70)
+  * fixed support for `--enable_relocation=yes`
+  * fixed support for Windows
 
 Version 0.88.2, December 7, 2017
 --------------------------------

@@ -1,12 +1,57 @@
+(** Why3 driver for CVC4 1.7 *)
 
 prelude ";; produced by cvc4_17.drv ;;"
 
+prelude "(set-logic AUFBVFPDTSNIRA)"
+(*
+    A    : Array
+    UF   : Uninterpreted Function
+    BV   : BitVectors
+    FP   : FloatingPoint
+    DT   : Datatypes
+    S    : Strings
+    NIRA : NonLinear Integer+Real Arithmetic
+*)
+
 unknown "^(error \"Can't get-info :reason-unknown when the last result wasn't unknown!\")$" "(not unknown!)"
 
+import "smtlib-strings.gen"
 import "cvc4_16.gen"
 
 theory BuiltIn
 
   meta "supports_smt_get_info_unknown_reason" ""
+
+end
+
+theory string.String
+
+  syntax predicate lt        "(str.< %1 %2)"
+  syntax predicate le        "(str.<= %1 %2)"
+
+  syntax function replaceall "(str.replaceall %1 %2 %3)"
+
+end
+
+theory string.RegExpr
+
+  syntax type re             "RegLan"
+
+  syntax function to_re      "(str.to.re %1)"
+  syntax predicate in_re     "(str.in.re %1 %2)"
+
+  syntax function concat     "(re.++ %1 %2)"
+  syntax function union      "(re.union %1 %2)"
+  syntax function inter      "(re.inter %1 %2)"
+  syntax function star       "(re.* %1)"
+  syntax function plus       "(re.+ %1)"
+
+  syntax function none       "re.nostr"
+  syntax function allchar    "re.allchar"
+
+  syntax function opt        "(re.opt %1)"
+  syntax function range      "(re.range %1 %2)"
+  syntax function power      "(re.loop %2 %1 %1)"
+  syntax function loop       "(re.loop %3 %1 %2)"
 
 end
