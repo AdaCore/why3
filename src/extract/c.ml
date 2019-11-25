@@ -438,8 +438,9 @@ module C = struct
     | _ -> false
 
   let left_assoc = function
-    | Band | Bor | Beq | Bne | Blt | Ble | Bgt | Bge -> true
+    | Beq | Bne | Blt | Ble | Bgt | Bge -> true
     | Bassign -> false
+    | Band | Bor -> false (* avoids Wparentheses *)
 
   let right_assoc = function
     | Bassign -> true
@@ -584,9 +585,13 @@ module Print = struct
        (* call to function defined in the prelude *)
        fprintf fmt (protect_on (prec < 1) "%s(%a)")
          s (print_list comma (print_expr ~prec:15)) l
-    | Ecall (e,l) ->
+    | Ecall (Evar id, l) ->
+       fprintf fmt (protect_on (prec < 1) "%a(%a)")
+         print_global_ident id (print_list comma (print_expr ~prec:15)) l
+    | Ecall ((Esyntax _ as e),l) ->
        fprintf fmt (protect_on (prec < 1) "%a(%a)")
          (print_expr ~prec:1) e (print_list comma (print_expr ~prec:15)) l
+    | Ecall _ -> raise (Unsupported "complex function expression")
     | Econst c -> print_const fmt c
     | Evar id -> print_local_ident fmt id
     | Elikely e -> fprintf fmt

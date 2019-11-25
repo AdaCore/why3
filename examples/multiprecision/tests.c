@@ -143,10 +143,10 @@ int main () {
 #endif
 
 #if defined(TEST_GMP) || defined(TEST_MINIGMP)
-            c = mpn_add (refp, ap, an, bp, bn);
+            refc = mpn_add (refp, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
-            refc = wmpn_add (rp, ap, an, bp, bn);
+            c = wmpn_add1 (rp, ap, an, bp, bn);
 #endif
 
 #ifdef BENCH

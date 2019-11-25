@@ -131,7 +131,7 @@ struct __open_sep_result open_sep (uint64_t * r, uint64_t * x, int32_t sx,
 struct __open_rx_result open_rx (uint64_t * x, int32_t sx,
                                  uint64_t * y, int32_t sy)
 {
-  struct __open_sep_result result;
+  struct __open_rx_result result;
   result.__field_0 = x;
   result.__field_1 = x;
   result.__field_2 = y;
@@ -141,7 +141,7 @@ struct __open_rx_result open_rx (uint64_t * x, int32_t sx,
 struct __open_ry_result open_ry (uint64_t * x, int32_t sx,
                                  uint64_t * y, int32_t sy)
 {
-  struct __open_sep_result result;
+  struct __open_ry_result result;
   result.__field_0 = y;
   result.__field_1 = x;
   result.__field_2 = y;
@@ -150,7 +150,7 @@ struct __open_ry_result open_ry (uint64_t * x, int32_t sx,
 
 struct __open_rxy_result open_rxy (uint64_t * x, int32_t sx)
 {
-  struct __open_sep_result result;
+  struct __open_rxy_result result;
   result.__field_0 = x;
   result.__field_1 = x;
   result.__field_2 = x;
@@ -203,5 +203,69 @@ struct __open_rxy_result open_rxy (uint64_t * x, int32_t sx);
   syntax val close_rx "IGNORE3(%1,%2,%4)" prec 1 15 15 15
   syntax val close_ry "IGNORE3(%1,%2,%4)" prec 1 15 15 15
   syntax val close_rxy "IGNORE3(%1,%2,%4)" prec 1 15 15 15
+
+end
+
+module mpz.Z
+
+prelude "
+typedef struct
+{
+  int _alloc;
+  int _size;
+  uint64_t * _ptr;
+} __mpz_struct;
+
+typedef __mpz_struct *mpz_ptr;
+
+#define SIZ(x) ((x)->_size)
+#define ALLOC(x) ((x)->_alloc)
+#define PTR(x) ((x)->_ptr)
+
+void wmpz_init (mpz_ptr x) {
+  ALLOC(x) = 1;
+  SIZ(x) = 0;
+  PTR(x) = malloc(1);
+  PTR(x)[0] = 0;
+}
+
+void wmpz_clear (mpz_ptr x)
+{
+  free (PTR(x));
+}
+"
+
+interface "
+typedef struct
+{
+  int _alloc;
+  int _size;
+  uint64_t * _ptr;
+} __mpz_struct;
+
+typedef __mpz_struct *mpz_ptr;
+
+#define SIZ(x) ((x)->_size)
+#define ALLOC(x) ((x)->_alloc)
+#define PTR(x) ((x)->_ptr)
+
+void wmpz_init (mpz_ptr x);
+void wmpz_clear (mpz_ptr x);
+"
+
+  syntax type mpz_ptr "mpz_ptr"
+  syntax val mpz_eq "%1 == %2" prec 7 15 14
+  syntax val size_of "SIZ(%1)" prec 1 15
+  syntax val set_size "SIZ(%1) = %2" prec 14 15 14
+  syntax val set_size_0 "SIZ(%1) = 0" prec 14 15
+  syntax val wmpz_minus "SIZ(%1) = -SIZ(%1)" prec 14 15 15
+  syntax val set_alloc "ALLOC(%1) = %2" prec 14 15 14
+  syntax val set_ptr "PTR(%1) = %2" prec 14 15 14
+  syntax val get_read_ptr "PTR(%1)" prec 1 15
+  syntax val get_write_ptr "PTR(%1)" prec 1 15
+  syntax val release_reader "(void)(%1)" prec 2 15
+  syntax val release_writer "(void)(%1)" prec 2 15
+  syntax val wmpz_init "wmpz_init(%0)" prec 2 15
+  syntax val wmpz_clear "wmpz_clear"
 
 end

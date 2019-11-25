@@ -192,15 +192,7 @@ val release_writer (x: mpz_ptr) (p:ptr limb) : unit
   ensures  { mpz.readers[x] = 0 }
   ensures  { forall y. y <> x -> mpz.readers[y] = old mpz.readers[y] }
 
-(* in C:
-   mpz_ptr x;
-   mpz_init(x);
-
-   extraction:
-   prelude defining _mpz_init as malloc + set fields
-   syntax val mpz_init "_mpz_init(%0)"
-   *)
-val partial mpz_init () : mpz_ptr
+val partial wmpz_init () : mpz_ptr
   writes  { mpz }
   ensures { forall x. old mpz.alloc[result] > 0 -> result <> x }
           (*result is fresh*)
@@ -212,7 +204,7 @@ val partial mpz_init () : mpz_ptr
   ensures { mpz.alloc[result] = 1 }
   ensures { mpz.zones[result] <> null_zone }
 
-val mpz_clear (x:mpz_ptr) : unit (* scrambles mpz._[x] *)
+val wmpz_clear (x:mpz_ptr) : unit (* scrambles mpz._[x] *)
   writes { mpz }
   requires { mpz.readers[x] = 0 }
   ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
