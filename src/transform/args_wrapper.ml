@@ -275,6 +275,9 @@ let set_argument_parsing_functions lang ~parse_term ~parse_term_list
        parse_list_qualid,
        parse_list_ident)
 
+(*
+(* The parser/printer for regular Why3 is disabled. Instead, we use the one
+   from the plugin for Ada: registered in plugins/ada_terms/ada_main.ml *)
 let () =
   set_argument_parsing_functions Lexer.whyml_format
     ~parse_term:(fun _ -> Lexer.parse_term)
@@ -282,6 +285,7 @@ let () =
     ~parse_qualid:Lexer.parse_qualid
     ~parse_list_qualid:Lexer.parse_list_qualid
     ~parse_list_ident:Lexer.parse_list_ident
+*)
 
 let get_parse_term lang =
   let (p, _, _, _, _) =

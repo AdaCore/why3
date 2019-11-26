@@ -676,16 +676,20 @@ GNATWHY3_FILES := gnat_util gnat_loc gnat_expl gnat_counterexamples gnat_config\
 GNATWHY3MODULES := $(addprefix src/gnat/, $(GNATWHY3_FILES))
 GNATWHY3DEP = $(addsuffix .dep, $(GNATWHY3MODULES))
 GNATWHY3CMO = $(addsuffix .cmo, $(GNATWHY3MODULES))
-GNATWHY3CMX = $(addsuffix .cmx, $(GNATWHY3MODULES))
-$(GNATWHY3CMO) $(GNATWHY3CMX): INCLUDES += -I src/gnat -I src/util
-$(GNATWHY3DEP): DEPFLAGS += -I src/gnat
+# Import external printer parser for Ada
+GNATWHY3CMX = plugins/ada_terms/ada_nametable.cmx plugins/ada_terms/ada_parser.cmx plugins/ada_terms/ada_lexer.cmx plugins/ada_terms/ada_main.cmx
+GNATWHY3CMX += $(addsuffix .cmx, $(GNATWHY3MODULES))
+$(GNATWHY3CMO) $(GNATWHY3CMX): INCLUDES += -I src/gnat -I src/util -I plugins/ada_terms
+$(GNATWHY3DEP): DEPFLAGS += -I src/gnat -I plugins/ada_terms
 
 GNAT_SERVER_MODULES := $(addprefix src/gnat/, $(GNAT_SERVER_FILES))
 GNAT_SERVER_DEP = $(addsuffix .dep, $(GNAT_SERVER_MODULES))
 GNAT_SERVER_CMO = $(addsuffix .cmo, $(GNAT_SERVER_MODULES))
-GNAT_SERVER_CMX = $(addsuffix .cmx, $(GNAT_SERVER_MODULES))
-$(GNAT_SERVER_CMO) $(GNAT_SERVER_CMX): INCLUDES += -I src/gnat -I src/util
-$(GNAT_SERVER_DEP): DEPFLAGS += -I src/gnat
+# Import external printer parser for Ada
+GNAT_SERVER_CMX = plugins/ada_terms/ada_nametable.cmx plugins/ada_terms/ada_parser.cmx plugins/ada_terms/ada_lexer.cmx plugins/ada_terms/ada_main.cmx
+GNAT_SERVER_CMX += $(addsuffix .cmx, $(GNAT_SERVER_MODULES))
+$(GNAT_SERVER_CMO) $(GNAT_SERVER_CMX): INCLUDES += -I src/gnat -I src/util -I plugins/ada_terms
+$(GNAT_SERVER_DEP): DEPFLAGS += -I src/gnat -I plugins/ada_terms
 
 depend: $(GNAT_SERVER_DEP)
 
@@ -708,6 +712,8 @@ ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 -include $(GNATWHY3DEP)
 -include $(GNAT_SERVER_DEP)
 endif
+
+CLEANDIRS += src/gnat
 
 clean::
 	rm -f bin/gnatwhy3.byte bin/gnatwhy3.opt bin/gnatwhy3

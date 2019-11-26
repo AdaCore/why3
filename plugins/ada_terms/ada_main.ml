@@ -199,3 +199,12 @@ let () = Args_wrapper.set_argument_parsing_functions ada_format
     ~parse_list_ident:(fun lb -> Ada_lexer.parse_list_ident lb)
     ~parse_qualid:(fun lb -> Ada_lexer.parse_qualid lb)
     ~parse_list_qualid:(fun lb -> Ada_lexer.parse_list_qualid lb)
+
+let () = Itp_server.add_registered_lang Lexer.whyml_format ada_ext_printer
+
+let () = Args_wrapper.set_argument_parsing_functions Lexer.whyml_format
+    ~parse_term:(fun nt lb -> Ada_lexer.parse_term nt lb)
+    ~parse_term_list:(fun nt lb -> Ada_lexer.parse_term_list nt lb)
+    ~parse_list_ident:(fun lb -> Ada_lexer.parse_list_ident lb)
+    ~parse_qualid:(fun lb -> Ada_lexer.parse_qualid lb)
+    ~parse_list_qualid:(fun lb -> Ada_lexer.parse_list_qualid lb)
