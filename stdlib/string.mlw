@@ -12,9 +12,64 @@ module String
 
   use int.Int
 
-  (** indexes for strings start at `0` *)
+  (** The type `string` is built-in. Indexes for strings start at `0`. *)
 
-  (** type string is built-in *)
+  (** The following functions/predicates are available in this theory:
+  {h
+<style type="text/css">td{padding:0 15px 0 15px;}</style>
+<table cellpadding="5" cellspacing="0" border="1" style="border-collapse:collapse">
+  <tr><th> Description </th> <th> Name </th> <th> Arguments </th> <th> Result </th> </tr>
+  <tr>
+    <td/> Concatenate
+      <td/> <code> concat <code>      <td/> string string       <td/> string
+  </tr><tr>
+    <td/> Length
+      <td/><code> length </code>     <td/> string              <td/> int
+  </tr><tr>
+    <td/> Get string of length 1
+      <td/><code> ([]) </code>       <td/> string int           <td/> string
+  </tr><tr>
+    <td/> Get substring
+      <td/><code> substring </code> <td/> string int int       <td/> string
+  </tr><tr>
+    <td/> Index of substring
+      <td/><code> indexof </code>   <td/> string string int    <td/> int
+  </tr><tr>
+    <td/> Replace first occurrence
+      <td/><code> replace </code>   <td/> string string string <td/> string
+  </tr><tr>
+    <td/> Replace all occurrences
+      <td/><code> replaceall </code><td/> string string string <td/> string
+  </tr><tr>
+    <td/> String to int
+      <td/><code> to_int </code>     <td/> string               <td/> int
+  </tr><tr>
+    <td/> Int to string
+      <td/><code> from_int </code>   <td/> int                  <td/> string
+  </tr><tr>
+    <td/> Comparison less than
+      <td/><code> lt </code>         <td/> string string <td/>
+  </tr><tr>
+    <td/> Comparison less or equal than
+      <td/><code> le </code>         <td/> string string <td/>
+  </tr><tr>
+    <td/> Check if it a prefix
+      <td/><code> prefixof </code>  <td/> string string <td/>
+  </tr><tr>
+    <td/> Check if it is a suffix
+      <td/><code> suffixof </code>  <td/> string string <td/>
+  </tr><tr>
+    <td/> Check if contains
+      <td/><code> contains </code>  <td/> string string <td/>
+  </tr><tr>
+    <td/> Check if it is a digit
+      <td/><code> is_digit </code>   <td/> string <td/>
+  </tr>
+
+
+</table>}
+   *)
+
 
   constant empty : string = ""
   (** the empty string. *)
