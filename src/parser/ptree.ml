@@ -101,75 +101,86 @@ and term_desc =
 
 (** {2 Program expressions} *)
 
+(** Loop invariant or type invariant *)
 type invariant = term list
+
+(** Variant for both loops and recursive functions *)
 type variant = (term * qualid option) list
 
+(** Precondition *)
 type pre = term
+
+(** Normal postcondition *)
 type post = Loc.position * (pattern * term) list
+
+(** Exceptional postcondition *)
 type xpost = Loc.position * (qualid * (pattern * term) option) list
 
+(** Contract *)
 type spec = {
-  sp_pre     : pre list;
-  sp_post    : post list;
-  sp_xpost   : xpost list;
-  sp_reads   : qualid list;
-  sp_writes  : term list;
-  sp_alias   : (term * term) list;
-  sp_variant : variant;
-  sp_checkrw : bool;
-  sp_diverge : bool;
-  sp_partial : bool;
+    sp_pre     : pre list; (** preconditions *)
+    sp_post    : post list; (** normal postconditions *)
+    sp_xpost   : xpost list; (** exceptional postconditions *)
+    sp_reads   : qualid list; (** [reads] clause *)
+    sp_writes  : term list;   (** [writes] clause *)
+    sp_alias   : (term * term) list; (** [alias] clause *)
+    sp_variant : variant; (** variant for recursive functions *)
+    sp_checkrw : bool; (** should the reads and writes clauses be checked against the given body? *)
+    sp_diverge : bool; (** may the function diverge? *)
+    sp_partial : bool; (** is the function partial? *)
 }
 
+(** Expressions, equipped with a source location *)
 type expr = {
     expr_desc : expr_desc;
     expr_loc  : Loc.position;
   }
 
+(** Expression kinds *)
 and expr_desc =
   | Eref
   (** TODO: document *)
   | Etrue
-  (** literal `true` *)
+  (** Boolean literal [True] *)
   | Efalse
-  (** literal `false` *)
+  (** Boolean literal [False] *)
   | Econst of Constant.constant
-  (** constant literals *)
+  (** Constant literals *)
   | Eident of qualid
-  (** variable identifier *)
+  (** Variable identifier *)
   | Easref of qualid
   (** TODO: document *)
   | Eidapp of qualid * expr list
-  (** uncurried application of a function identifier to a list of arguments *)
+  (** Uncurried application of a function identifier to a list of arguments *)
   | Eapply of expr * expr
-  (** curried application *)
+  (** Curried application *)
   | Einfix of expr * ident * expr
-  (** infix operation *)
+  (** Infix operation *)
   | Einnfix of expr * ident * expr
-  (** infix operation (TODO: document the difference with the former) *)
+  (** Infix operation (TODO: document the difference with the former) *)
   | Elet of ident * ghost * Expr.rs_kind * expr * expr
-  (** `let ... in ...` expression *)
+  (** [let ... in ...] expression *)
   | Erec of fundef list * expr
-  (** local definition of function, possibly mutually recursive *)
+  (** Local definition of function, possibly mutually recursive *)
   | Efun of binder list * pty option * pattern * Ity.mask * spec * expr
-  (** anonymous function *)
+  (** Anonymous function *)
   | Eany of param list * Expr.rs_kind * pty option * pattern * Ity.mask * spec
-  (** `any`: abstract expression with a specification,
+  (** [any]: abstract expression with a specification,
        generating of VC for existence *)
   | Etuple of expr list
-  (** tuple of expressions *)
+  (** Tuple of expressions *)
   | Erecord of (qualid * expr) list
-  (** record expressions *)
+  (** Record expressions *)
   | Eupdate of expr * (qualid * expr) list
-  (** TODO: record update ? *)
+  (** Record update [{e with f=e1; ...}] *)
   | Eassign of (expr * qualid option * expr) list
-  (** assignment ? TODO: document *)
+  (** Parallel assignment ? TODO: document *)
   | Esequence of expr * expr
-  (** sequence of two expressions *)
+  (** Sequence of two expressions *)
   | Eif of expr * expr * expr
-  (** `if .. then .. else ..` expression *)
+  (** [if .. then .. else ..] expression *)
   | Ewhile of expr * invariant * variant * expr
-  (** `while` loop *)
+  (** [while] loop *)
   | Eand of expr * expr
   (** lazy conjunction *)
   | Eor of expr * expr
@@ -180,7 +191,7 @@ and expr_desc =
   (** match expression, including both regular patterns and exception
      patterns (those lists cannot be both empty) *)
   | Eabsurd
-  (** `absurd` statement to mark unreachable branches *)
+  (** [absurd] statement to mark unreachable branches *)
   | Epure of term
   (** turns a logical term into a pure expression *)
   | Eidpur of qualid
@@ -192,9 +203,9 @@ and expr_desc =
   | Eoptexn of ident * Ity.mask * expr
   (** TODO: document *)
   | Efor of ident * expr * Expr.for_direction * expr * invariant * expr
-  (** `for` loop *)
+  (** [for] loop *)
   | Eassert of Expr.assertion_kind * term
-  (** `assert` expression *)
+  (** [assert] expression *)
   | Escope of qualid * expr
   (** TODO: document *)
   | Elabel of ident * expr
@@ -206,15 +217,19 @@ and expr_desc =
   | Eattr of attr * expr
   (** attach an attribute to an expression *)
 
+(** A regular match branch *)
 and reg_branch = pattern * expr
 
+(** An exception match branch *)
 and exn_branch = qualid * pattern option * expr
 
+(** Local function definition *)
 and fundef = ident * ghost * Expr.rs_kind *
                binder list * pty option * pattern * Ity.mask * spec * expr
 
 (** {2 Declarations} *)
 
+(** record fields *)
 type field = {
   f_loc     : Loc.position;
   f_ident   : ident;
@@ -223,26 +238,35 @@ type field = {
   f_ghost   : bool
 }
 
+(** Type definition body *)
 type type_def =
   | TDalias     of pty
+  (** alias type *)
   | TDalgebraic of (Loc.position * ident * param list) list
+  (** algebraic type *)
   | TDrecord    of field list
+  (** record type *)
   | TDrange     of BigInt.t * BigInt.t
+  (** integer type in given range  *)
   | TDfloat     of int * int
+  (** floating-point type with given exponent and precision *)
 
+(** The different kinds of visibility *)
 type visibility = Public | Private | Abstract (** = Private + ghost fields *)
 
+(** A type declaration *)
 type type_decl = {
   td_loc    : Loc.position;
   td_ident  : ident;
   td_params : ident list;
-  td_vis    : visibility; (** records only *)
-  td_mut    : bool;       (** records or abstract types *)
-  td_inv    : invariant;  (** records only *)
-  td_wit    : (qualid * expr) list;
+  td_vis    : visibility; (** visibility, for records only *)
+  td_mut    : bool;       (** mutability, for records or abstract types *)
+  td_inv    : invariant;  (** invariant, for records only *)
+  td_wit    : (qualid * expr) list;  (** witness for the invariant *)
   td_def    : type_def;
 }
 
+(** A single declaration of a function or predicate *)
 type logic_decl = {
   ld_loc    : Loc.position;
   ld_ident  : ident;
@@ -251,6 +275,7 @@ type logic_decl = {
   ld_def    : term option;
 }
 
+(** A single declaration of an inductive predicate *)
 type ind_decl = {
   in_loc    : Loc.position;
   in_ident  : ident;
@@ -258,7 +283,7 @@ type ind_decl = {
   in_def    : (Loc.position * ident * term) list;
 }
 
-(** Arguments of `meta` declarations *)
+(** Arguments of [meta] declarations *)
 type metarg =
   | Mty  of pty
   | Mfs  of qualid
@@ -270,7 +295,7 @@ type metarg =
   | Mstr of string
   | Mint of int
 
-(** The possible `clone` substitution elements *)
+(** The possible [clone] substitution elements *)
 type clone_subst =
   | CStsym  of qualid * ident list * pty
   | CSfsym  of qualid * qualid
@@ -287,32 +312,34 @@ type decl =
   | Dtype of type_decl list
   (** Type declaration *)
   | Dlogic of logic_decl list
-  (** `function` and `predicate`, mutually recursively declared *)
+  (** Collection of [function]s and [predicate]s, mutually recursively declared *)
   | Dind of Decl.ind_sign * ind_decl list
-  (** inductive or co-inductive predicate *)
+  (** An inductive or co-inductive predicate *)
   | Dprop of Decl.prop_kind * ident * term
-  (** propositions: `lemma` or `goal` or `axiom` *)
+  (** Propositions: [lemma] or [goal] or [axiom] *)
   | Dlet of ident * ghost * Expr.rs_kind * expr
-  (** global program variable *)
+  (** Global program variable *)
   | Drec of fundef list
-  (** program functions, mutually recursively defined *)
+  (** Program functions, mutually recursively defined *)
   | Dexn of ident * pty * Ity.mask
-  (** declaration of global exceptions *)
+  (** Declaration of global exceptions *)
   | Dmeta of ident * metarg list
-  (** `meta` *)
+  (** Declaration of a [meta] *)
   | Dcloneexport of qualid * clone_subst list
-  (** `clone` *)
+  (** [clone export] *)
   | Duseexport of qualid
-  (** `use` *)
+  (** [use export] *)
   | Dcloneimport of Loc.position * bool * qualid * ident option * clone_subst list
-  (** `clone import ... as ...` *)
+  (** [clone import ... as ...] *)
   | Duseimport of Loc.position * bool * (qualid * ident option) list
-  (** `use import ... as ...` *)
+  (** [use import ... as ...] *)
   | Dimport of qualid
-  (** `import` *)
+  (** [import] *)
   | Dscope of Loc.position * bool * ident * decl list
-  (** `scope` *)
+  (** [scope] *)
 
 type mlw_file =
   | Modules of (ident * decl list) list
+  (** a list of modules containing lists of declarations *)
   | Decls of decl list
+  (** a list of declarations outside any module *)
