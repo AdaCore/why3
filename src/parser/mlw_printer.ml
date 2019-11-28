@@ -395,7 +395,8 @@ and pp_expr fmt e =
       fprintf fmt "@[<v>let rec %a in@ %a@]" pp_fundefs defs pp_expr' e
   | Efun (binders, opt_pty, pat, mask, spec, e) ->
       pp_fun pp_expr fmt (binders, opt_pty, pat, mask, spec, e)
-  | Eany (params, _kind, Some pty, _pat, _mask, spec) ->
+  | Eany (_params, _kind, Some pty, _pat, _mask, spec) ->
+      (* TODO _params *)
       fprintf fmt "@[<hv 2>any %a%a@]" pp_pty pty pp_spec spec
   | Eany _ ->
       todo fmt "Eany _"
