@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,7 +12,7 @@
 open Format
 open Pp
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -24,6 +24,8 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type interface = string list
+type interface_map = interface Mid.t
 type blacklist = string list
 
 type 'a pp = Pp.formatter -> 'a -> unit
@@ -31,7 +33,12 @@ type 'a pp = Pp.formatter -> 'a -> unit
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
-  queried_terms : Term.term Stdlib.Mstr.t;
+  queried_terms : Term.term Mstr.t;
+  list_projections: Ident.ident Mstr.t;
+  list_fields: Ident.ident Mstr.t;
+  list_records: ((string * string) list) Mstr.t;
+  noarg_constructors: string list;
+  set_str: Sattr.t Mstr.t
 }
 
 type printer_args = {
@@ -54,7 +61,12 @@ exception UnknownPrinter of string
 let get_default_printer_mapping = {
   lsymbol_m = (function _ -> raise Not_found);
   vc_term_loc = None;
-  queried_terms = Stdlib.Mstr.empty;
+  queried_terms = Mstr.empty;
+  list_projections = Mstr.empty;
+  list_fields = Mstr.empty;
+  list_records = Mstr.empty;
+  noarg_constructors = [];
+  set_str = Mstr.empty
 }
 
 let register_printer ~desc s p =
@@ -76,7 +88,7 @@ let () = register_printer
 
 (*
 let opt_search_forward re s pos =
-  try Some (Str.search_forward re s pos) with Not_found -> None
+  try Some (Re.Str.search_forward re s pos) with Not_found -> None
 *)
 
 (* specialized version of opt_search_forward, searching for strings
@@ -98,7 +110,8 @@ let opt_search_forward s pos =
         incr i;
         b := !i;
         begin match s.[!i] with
-        | 't' | 'v' -> incr i
+        | '%' -> incr i; raise Exit
+        | 'a'..'z' -> incr i
         | _ -> ()
         end;
         let e = !i in
@@ -120,12 +133,13 @@ let opt_search_forward_literal_format s pos =
         incr i;
         b := !i;
         begin match s.[!i] with
+        | '%' -> incr i; raise Exit
         | 's' | 'e' | 'm' -> incr i; (* float literals *)
         | _ -> ()
         end;
         while !i < l && is_digit s.[!i] do incr i done;
         begin match s.[!i] with
-        | 'b' | 'x' | 'o' | 'd' -> incr i; raise Exit
+        | 'b' | 'x' | 'o' | 'd' | 'c' -> incr i; raise Exit
         | _ -> ()
         end;
       end;
@@ -142,25 +156,25 @@ let global_substitute_fmt search_fun repl_fun text fmt =
       pp_print_string fmt (String.sub text start (len - start))
     | Some(pos,end_pos) ->
       pp_print_string fmt (String.sub text start (pos - start - 1));
-      repl_fun text pos end_pos fmt;
+      if text.[pos] = '%' then pp_print_char fmt '%'
+      else repl_fun text pos end_pos fmt;
       replace end_pos
   in
   replace 0
 
 let iter_group search_fun iter_fun text =
-  let rec iter start last_was_empty =
-    let startpos = if last_was_empty then start + 1 else start in
-    if startpos < String.length text then
-      match search_fun text startpos with
-      | None -> ()
-      | Some (pos,end_pos) ->
-          iter_fun text pos end_pos;
-          iter end_pos (end_pos = pos)
+  let rec iter start =
+    match search_fun text start with
+    | None -> ()
+    | Some (pos, end_pos) ->
+        if text.[pos] <> '%' then iter_fun text pos end_pos;
+        iter end_pos
   in
-  iter 0 false
+  iter 0
 
 exception BadSyntaxIndex of int
 exception BadSyntaxArity of int * int
+exception BadSyntaxKind of char
 
 let int_of_string s =
   try int_of_string s
@@ -168,35 +182,49 @@ let int_of_string s =
     Format.eprintf "bad argument for int_of_string: %s@." s;
     assert false
 
-let check_syntax s len =
+let iter_on_syntax_parameters s f =
   let arg s b e =
     let i = int_of_string (String.sub s b (e-b)) in
+    f i in
+  iter_group opt_search_forward arg s
+
+(** [check_syntax s len] checks that all %i arguments in [s]
+    satisfy [0 < i <= len]. *)
+let check_syntax s len =
+  iter_on_syntax_parameters s (fun i ->
     if i <= 0 then raise (BadSyntaxIndex i);
     if i > len then raise (BadSyntaxArity (len,i));
-    ()
-  in
-  iter_group opt_search_forward arg s
+    ())
+
+let syntax_arity s =
+  let arity = ref 0 in
+  iter_on_syntax_parameters s (fun i ->
+    if i <= 0 then raise (BadSyntaxIndex i);
+    arity := max i !arity);
+  !arity
 
 let check_syntax_logic ls s =
   let len = List.length ls.ls_args in
   let ret = ls.ls_value <> None in
   let nfv = Stv.cardinal (ls_ty_freevars ls) in
   let arg s b e =
-    if s.[b] = 't' then begin
+    match s.[b] with
+    | 't' ->
       let grp = String.sub s (b+1) (e-b-1) in
       let i = int_of_string grp in
       if i < 0 || (not ret && i = 0) then raise (BadSyntaxIndex i);
       if i > len then raise (BadSyntaxArity (len,i))
-    end else if s.[b] = 'v' then begin
+    | 'v' ->
       let grp = String.sub s (b+1) (e-b-1) in
       let i = int_of_string grp in
       if i < 0 || i >= nfv then raise (BadSyntaxIndex i)
-    end else begin
+    | 'a'..'z' as c ->
+      raise (BadSyntaxKind c)
+    | _ ->
       let grp = String.sub s b (e-b) in
       let i = int_of_string grp in
       if i <= 0 then raise (BadSyntaxIndex i);
       if i > len then raise (BadSyntaxArity (len,i));
-    end
   in
   iter_group opt_search_forward arg s
 
@@ -210,13 +238,6 @@ let check_syntax_literal _ts s =
   (* if !count <> 1 then *)
     (* raise (BadSyntaxArity (1,!count)) *)
 
-let syntax_arguments s print fmt l =
-  let args = Array.of_list l in
-  let repl_fun s b e fmt =
-    let i = int_of_string (String.sub s b (e-b)) in
-    print fmt args.(i-1) in
-  global_substitute_fmt opt_search_forward repl_fun s fmt
-
 (* return the type arguments of a symbol application, sorted according
    to their (formal) names *)
 let get_type_arguments t = match t.t_node with
@@ -224,64 +245,94 @@ let get_type_arguments t = match t.t_node with
       let m = oty_match Mtv.empty ls.ls_value t.t_ty in
       let m = List.fold_left2
         (fun m ty t -> oty_match m (Some ty) t.t_ty) m ls.ls_args tl in
-      let name tv = Stdlib.Mstr.add tv.tv_name.id_string in
-      let m = Mtv.fold name m Stdlib.Mstr.empty in
-      Array.of_list (Stdlib.Mstr.values m)
+      let name tv = Mstr.add tv.tv_name.id_string in
+      let m = Mtv.fold name m Mstr.empty in
+      Array.of_list (Mstr.values m)
   | _ ->
       [||]
 
-let gen_syntax_arguments_typed ty_of tys_of s print_arg print_type t fmt l =
-  let args = Array.of_list l in
+let gen_syntax_arguments_prec fmt s print pl =
+  let precs = Array.of_list pl in
+  let lp = Array.length precs in
+  let num = ref 1 in
   let repl_fun s b e fmt =
-    if s.[b] = 't' then
-      let grp = String.sub s (b+1) (e-b-1) in
-      let i = int_of_string grp in
-      if i = 0
-      then print_type fmt (ty_of t)
-      else print_type fmt (ty_of args.(i-1))
-    else if s.[b] = 'v' then
-      let grp = String.sub s (b+1) (e-b-1) in
-      let m = tys_of t in
-      print_type fmt m.(int_of_string grp)
-    else
-      let grp = String.sub s b (e-b) in
-      let i = int_of_string grp in
-      print_arg fmt args.(i-1) in
+    let (c, i) =
+      match s.[b] with
+      | 'a'..'z' as c -> (Some c, String.sub s (b + 1) (e - b - 1))
+      | _ -> (None, String.sub s b (e - b)) in
+    let i = int_of_string i in
+    let p =
+      if !num < lp then precs.(!num)
+      else if lp = 0 then 0
+      else precs.(0) - 1 in
+    incr num;
+    print fmt p c i in
   global_substitute_fmt opt_search_forward repl_fun s fmt
 
-let syntax_arguments_typed =
-  gen_syntax_arguments_typed t_type get_type_arguments
+let syntax_arguments_prec s print pl fmt l =
+  let args = Array.of_list l in
+  let pr fmt p c i =
+    match c with
+    | None -> print p fmt args.(i - 1)
+    | Some c -> raise (BadSyntaxKind c) in
+  gen_syntax_arguments_prec fmt s pr pl
 
-let syntax_range_literal s fmt c =
+let syntax_arguments s print fmt l =
+  syntax_arguments_prec s (fun _ f a -> print f a) [] fmt l
+
+let syntax_arguments_typed_prec s print_arg print_type t pl fmt l =
+  let args = Array.of_list l in
+  let tys = lazy (get_type_arguments t) in
+  let pr fmt p c i =
+    match c with
+    | None -> print_arg p fmt args.(i - 1)
+    | Some 't' ->
+        let v = if i = 0 then t else args.(i - 1) in
+        print_type fmt (t_type v)
+    | Some 'v' ->
+        print_type fmt (Lazy.force tys).(i)
+    | Some c -> raise (BadSyntaxKind c) in
+  gen_syntax_arguments_prec fmt s pr pl
+
+let syntax_arguments_typed s print_arg print_type t fmt l =
+  syntax_arguments_typed_prec s (fun _ f a -> print_arg f a) print_type t [] fmt l
+
+let syntax_range_literal ?(cb=None) s fmt c =
   let f s b e fmt =
-    let v = Number.compute_int_literal c.Number.ic_abs in
-    let base = match s.[e-1] with
-      | 'x' -> 16
-      | 'd' -> 10
-      | 'o' -> 8
-      | 'b' -> 2
-      | _ -> assert false
-    in
-    let digits =
-      if e > b + 1 then
-        Some (int_of_string (String.sub s b (e-b-1)))
-      else
-        None
-    in
-    if base = 10 then begin
-        if c.Number.ic_negative then fprintf fmt "-";
-        Number.print_in_base base digits fmt v
-      end
-    else
-      let v =
-        if c.Number.ic_negative then
-          match digits with
-            | Some d ->
-               BigInt.sub (BigInt.pow_int_pos base d) v
-            | None -> failwith ("number of digits must be given for printing negative literals in base " ^ string_of_int base)
-        else v
+    try
+      let v = c.Number.il_int in
+      let base = match s.[e-1] with
+        | 'x' -> 16
+        | 'd' -> 10
+        | 'o' -> 8
+        | 'b' -> 2
+        | 'c' -> raise Exit
+        | _ -> assert false
       in
-      Number.print_in_base base digits fmt v
+      let digits =
+        if e > b + 1 then
+          Some (int_of_string (String.sub s b (e-b-1)))
+        else
+          None
+      in
+      if base = 10 then begin
+          if BigInt.lt v BigInt.zero then fprintf fmt "-";
+          Number.print_in_base base digits fmt (BigInt.abs v)
+        end
+      else
+        let v =
+          if BigInt.lt v BigInt.zero then
+            match digits with
+            | Some d ->
+               BigInt.add (BigInt.pow_int_pos base d) v
+            | None -> failwith ("number of digits must be given for printing negative literals in base " ^ string_of_int base)
+          else v
+        in
+        Number.print_in_base base digits fmt v
+    with Exit ->
+      match cb with
+      | Some cb -> cb fmt c
+      | None -> failwith ("custom format string with no callback passed")
   in
   global_substitute_fmt opt_search_forward_literal_format f s fmt
 
@@ -300,8 +351,8 @@ let syntax_float_literal s fp fmt c =
       else
         None
     in
-    let e,m = Number.compute_float c.Number.rc_abs fp in
-    let sg = if c.Number.rc_negative then BigInt.one else BigInt.zero in
+    let e,m = Number.compute_float c fp in
+    let m,sg = if BigInt.lt m BigInt.zero then BigInt.abs m, BigInt.one else m, BigInt.zero in
     match s.[b] with
     | 's' -> Number.print_in_base base digits fmt sg
     | 'e' -> Number.print_in_base base digits fmt e
@@ -315,6 +366,8 @@ let syntax_float_literal s fp fmt c =
 let print_prelude fmt pl =
   let println fmt s = fprintf fmt "%s@\n" s in
   print_list nothing println fmt pl
+
+let print_interface = print_prelude
 
 let print_prelude_of_theories th_used fmt pm =
   let ht = Hid.create 5 in
@@ -343,10 +396,8 @@ let print_prelude_for_theory th fmt pm =
 
 exception KnownTypeSyntax of tysymbol
 exception KnownLogicSyntax of lsymbol
-exception KnownConverterSyntax of lsymbol
 exception TooManyTypeOverride of tysymbol
 exception TooManyLogicOverride of lsymbol
-exception TooManyConverterOverride of lsymbol
 
 let meta_syntax_type = register_meta "syntax_type" [MTtysymbol; MTstring; MTint]
   ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ type@ symbol.@ \
@@ -357,11 +408,6 @@ let meta_syntax_logic = register_meta "syntax_logic" [MTlsymbol; MTstring; MTint
          symbol.@ \
          Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax function'@ \
          or@ 'syntax predicate'@ rules."
-
-let meta_syntax_converter = register_meta "syntax_converter" [MTlsymbol; MTstring; MTint]
-  ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ converter@ \ symbol.@ \
-         Can@ be@ specified@ in@ the@ driver@ with@ the@ 'syntax converter'@ \
-         rules."
 
 let meta_syntax_literal = register_meta "syntax_literal" [MTtysymbol; MTstring; MTint]
   ~desc:"Specify@ the@ syntax@ used@ to@ pretty-print@ a@ range@ literal.@ \
@@ -394,10 +440,6 @@ let syntax_logic ls s b =
   check_syntax_logic ls s;
   create_meta meta_syntax_logic [MAls ls; MAstr s; MAint (if b then 1 else 0)]
 
-let syntax_converter ls s b =
-  check_syntax_logic ls s;
-  create_meta meta_syntax_converter [MAls ls; MAstr s; MAint (if b then 1 else 0)]
-
 let syntax_literal ts s b =
   check_syntax_literal ts s;
   create_meta meta_syntax_literal [MAts ts; MAstr s; MAint (if b then 1 else 0)]
@@ -406,7 +448,6 @@ let remove_prop pr =
   create_meta meta_remove_prop [MApr pr]
 
 type syntax_map = (string * int) Mid.t
-type converter_map = (string * int) Mls.t
 
 let change_override e e' rs ov = function
   | None         -> Some (rs,ov)
@@ -443,22 +484,12 @@ let sm_add_pr sm = function
   | [MApr pr] -> Mid.add pr.pr_name ("",0) sm
   | _ -> assert false
 
-let cm_add_ls cm = function
-  | [MAls ls; MAstr rs; MAint ov] ->
-    Mls.change
-      (change_override (KnownConverterSyntax ls) (TooManyConverterOverride ls)
-         rs ov) ls cm
-  | _ -> assert false
-
 let get_syntax_map task =
   let sm = Mid.empty in
   let sm = Task.on_meta meta_syntax_type sm_add_ts sm task in
   let sm = Task.on_meta meta_syntax_logic sm_add_ls sm task in
   let sm = Task.on_meta meta_remove_prop sm_add_pr sm task in
   sm
-
-let get_converter_map task =
-  Task.on_meta meta_syntax_converter cm_add_ls Mls.empty task
 
 let get_rliteral_map task =
   Task.on_meta meta_syntax_literal sm_add_ts Mid.empty task
@@ -472,11 +503,6 @@ let add_syntax_map td sm = match td.td_node with
       sm_add_pr sm args
   | _ -> sm
 
-(*let add_converter_map td cm = match td.td_node with
-  | Meta (m, args) when meta_equal m meta_syntax_converter ->
-    cm_add_ls cm args
-  | _ -> cm*)
-
 let add_rliteral_map td sm = match td.td_node with
   | Meta (m, args) when meta_equal m meta_syntax_literal ->
       sm_add_ts sm args
@@ -484,9 +510,6 @@ let add_rliteral_map td sm = match td.td_node with
 
 let query_syntax sm id =
   try Some (fst (Mid.find id sm)) with Not_found -> None
-
-let query_converter cm ls =
-  try Some (fst (Mls.find ls cm)) with Not_found -> None
 
 let on_syntax_map fn =
   Trans.on_meta meta_syntax_type (fun sts ->
@@ -497,10 +520,6 @@ let on_syntax_map fn =
     let sm = List.fold_left sm_add_ls sm sls in
     let sm = List.fold_left sm_add_pr sm spr in
     fn sm)))
-
-let on_converter_map fn =
-  Trans.on_meta meta_syntax_converter (fun scs ->
-    fn (List.fold_left cm_add_ls Mls.empty scs))
 
 let sprint_tdecl (fn : 'a -> Format.formatter -> tdecl -> 'a * string list) =
   let buf = Buffer.create 2048 in
@@ -560,24 +579,20 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
   | KnownLogicSyntax ls ->
       fprintf fmt "Syntax for logical symbol %a is already defined"
         Pretty.print_ls ls
-  | KnownConverterSyntax ls ->
-      fprintf fmt "Converter syntax for logical symbol %a is already defined"
-        Pretty.print_ls ls
   | TooManyTypeOverride ts ->
       fprintf fmt "Too many syntax overriding for type symbol %a"
         Pretty.print_ts ts
   | TooManyLogicOverride ls ->
       fprintf fmt "Too many syntax overriding for logic symbol %a"
         Pretty.print_ls ls
-  | TooManyConverterOverride ls ->
-      fprintf fmt "Too many syntax converter overriding for logic symbol %a"
-        Pretty.print_ls ls
   | BadSyntaxIndex i ->
       fprintf fmt "Bad argument index %d, must start with 1" i
   | BadSyntaxArity (i1,i2) ->
       fprintf fmt "Bad argument index %d, must end with %d" i2 i1
+  | BadSyntaxKind c ->
+      fprintf fmt "Unrecognized argument kind '%c'" c
   | Unsupported s ->
-      fprintf fmt "@[<hov 3> Uncatched exception 'Unsupported %s'@]" s
+      fprintf fmt "@[<hov 3> Uncaught exception 'Unsupported %s'@]" s
   | UnsupportedType (e,s) ->
       fprintf fmt "@[@[<hov 3> This type isn't supported:@\n%a@]@\n %s@]"
         Pretty.print_ty e s

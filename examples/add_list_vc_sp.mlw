@@ -1,0 +1,95 @@
+theory SumList
+
+use export int.Int
+use export real.RealInfix
+use export list.List
+
+type or_integer_float = Integer int | Real real
+
+
+(* sum integers in a list *)
+function add_int (e: list or_integer_float) : int =
+  match e with
+  | Nil -> 0
+  | Cons (Integer n) t -> n + add_int t
+  | Cons _ t -> add_int t
+  end
+
+(* sum reals in a list *)
+function add_real (e: list or_integer_float) : real =
+  match e with
+  | Nil -> 0.0
+  | Cons (Real x) t -> x +. add_real t
+  | Cons _ t -> add_real t
+  end
+
+end
+
+module AddListRec
+
+use SumList
+
+let rec sum (l: list or_integer_float) : (si: int, sf: real) =
+    variant { l }
+    ensures { si = add_int l /\ sf = add_real l }
+  [@vc:sp]
+  match l with
+  | Nil -> 0, 0.0
+  | Cons h t ->
+      let a,b = sum t in
+      match h with
+      | Integer n -> n + a, b
+      | Real x -> a, x +. b
+      end
+  end
+
+let main () =
+  [@vc:sp]
+  let l =
+    Cons (Integer 5) (Cons (Real 3.3) (Cons (Integer 8)
+      (Cons (Real 1.4) (Cons (Integer 9) Nil))))
+  in
+  let s,f = sum l in
+  assert { s = 22 };
+  assert { f = 4.7 }
+
+end
+
+
+module AddListImp
+
+use SumList
+use ref.Ref
+
+let sum (l: list or_integer_float) : (si: int, sf: real) =
+    ensures { si = add_int l /\ sf = add_real l }
+  [@vc:sp]
+  let si = ref 0 in
+  let sf = ref 0.0 in
+  let ll = ref l in
+  while True do
+    invariant { !si + add_int !ll = add_int l /\
+                !sf +. add_real !ll = add_real l }
+    variant { !ll }
+     match !ll with
+     | Nil -> return !si, !sf
+     | Cons (Integer n) t ->
+         si := !si + n; ll := t
+     | Cons (Real x) t ->
+         sf := !sf +. x; ll := t
+     end
+  done;
+  absurd
+
+
+let main () =
+  [@vc:sp]
+  let l =
+    Cons (Integer 5) (Cons (Real 3.3) (Cons (Integer 8)
+      (Cons (Real 1.4) (Cons (Integer 9) Nil))))
+  in
+  let s,f = sum l in
+  assert { s = 22 };
+  assert { f = 4.7 }
+
+end

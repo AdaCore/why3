@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<file format="whyml">
+<path name=".."/><path name="265_apply.mlw"/>
+<theory name="Test">
+ <goal name="g">
+ <transf name="apply" arg1="H4" arg2="with" arg3="22">
+  <goal name="g.0" expl="apply premises">
+  </goal>
+  <goal name="g.1" expl="apply premises">
+  </goal>
+ </transf>
+ <transf name="apply" arg1="H3" arg2="with" arg3="19">
+  <goal name="g.0" expl="apply premises">
+  </goal>
+  <goal name="g.1" expl="apply premises">
+  </goal>
+ </transf>
+ <transf name="apply" arg1="H1" arg2="with" arg3="18">
+  <goal name="g.0" expl="apply premises">
+  </goal>
+ </transf>
+ <transf name="apply" arg1="H2" arg2="with" arg3="4">
+  <goal name="g.0" expl="apply premises">
+  </goal>
+ </transf>
+ <transf name="apply" arg1="H" arg2="with" arg3="3">
+  <goal name="g.0" expl="apply premises">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Test2">
+ <goal name="g">
+ <transf name="apply" arg1="test_bad" arg2="with" arg3="23">
+  <goal name="g.0" expl="apply premises">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Test3">
+ <goal name="g1">
+ <transf name="apply" arg1="H1" arg2="with" arg3="23">
+  <goal name="g1.0" expl="apply premises">
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g2">
+ <transf name="apply" arg1="H2" arg2="with" arg3="48">
+  <goal name="g2.0" expl="apply premises">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

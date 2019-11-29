@@ -1,5 +1,5 @@
 theory genealogy_Genealogy_Grandparent_is_grandfather_or_grandmother_1
-imports Why3
+imports Why3.Why3
 begin
 
 why3_open "genealogy_Genealogy_Grandparent_is_grandfather_or_grandmother_1.xml"

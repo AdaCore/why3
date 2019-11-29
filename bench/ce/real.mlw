@@ -1,9 +1,9 @@
 theory ModelReal
 
-use import real.Real
+use real.Real
 
-goal test1 : forall x "model":real. not (0.0 < x < 1.0)
+goal test1 : forall x:real. not (0.0 < x < 1.0)
 
-goal test2 : forall x "model":real. x/x=1.0
+goal test2 : forall x:real. x/x=1.0
 
 end

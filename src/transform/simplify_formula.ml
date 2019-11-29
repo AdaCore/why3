@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,11 +13,11 @@ open Ident
 open Term
 open Decl
 
-let labset = Slab.of_list [Term.asym_split]
+let attrset = Sattr.of_list [Term.asym_split]
 
 let rec fmla_simpl f =
-  let f = if Slab.disjoint f.t_label labset then f else
-    t_label ?loc:f.t_loc (Slab.diff f.t_label labset) f in
+  let f = if Sattr.disjoint f.t_attrs attrset then f else
+    t_attr_set ?loc:f.t_loc (Sattr.diff f.t_attrs attrset) f in
   TermTF.t_map_simp t_fmla_simpl fmla_simpl f
 
 and t_fmla_simpl t = TermTF.t_map t_fmla_simpl fmla_simpl t
@@ -94,7 +94,7 @@ let rec fmla_find_subst boundvars var sign f =
     | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
 
 (* Simplify out equalities that could be selected. *)
-let rec equ_simp f = t_label_copy f (match f.t_node with
+let rec equ_simp f = t_attr_copy f (match f.t_node with
   | Tbinop (op, f1, f2) ->
        begin match op, equ_simp f1, equ_simp f2 with
        | Tor, { t_node = Tfalse }, f
@@ -108,10 +108,15 @@ let rec equ_simp f = t_label_copy f (match f.t_node with
        t_equ_simp (equ_simp f1) (equ_simp f2)
   | _ -> t_map equ_simp f)
 
-let rec fmla_quant sign f = function
+let rec fmla_quant ~keep_model_vars sign f = function
   | [] -> [], f
   | vs::l ->
-      let vsl, f = fmla_quant sign f l in
+     let vsl, f = fmla_quant ~keep_model_vars sign f l in
+     if keep_model_vars && has_a_model_attr vs.vs_name then
+      vs::vsl, f
+     else if t_v_occurs vs f = 0 then
+      vsl, f
+     else
       try
         fmla_find_subst (Svs.singleton vs) vs sign f;
         vs::vsl, f
@@ -119,7 +124,7 @@ let rec fmla_quant sign f = function
         let f = t_subst_single vs t f in
         vsl, equ_simp f
 
-let rec fmla_remove_quant f =
+let rec fmla_remove_quant ~keep_model_vars f =
   match f.t_node with
     | Tquant (k,fb) ->
         let vsl,trl,f',close = t_open_quant_cb fb in
@@ -128,10 +133,10 @@ let rec fmla_remove_quant f =
           else
             let sign = match k with
               | Tforall -> false | Texists -> true in
-            let vsl, f' = fmla_quant sign f' vsl in
-            let f' = fmla_remove_quant f' in
-            t_quant k (close vsl [] f')
-    | _ -> Term.t_map fmla_remove_quant f
+            let vsl, f' = fmla_quant ~keep_model_vars sign f' vsl in
+            let f' = fmla_remove_quant ~keep_model_vars f' in
+            t_attr_copy f (t_quant k (close vsl [] f'))
+    | _ -> Term.t_map (fmla_remove_quant ~keep_model_vars) f
 
 (*let fmla_remove_quant f =
   Format.eprintf "@[<hov>%a =>|@\n" Pretty.print_fmla f;
@@ -142,7 +147,10 @@ let rec fmla_remove_quant f =
 *)
 
 let simplify_trivial_quantification =
-  Trans.rewrite fmla_remove_quant None
+  Trans.rewrite (fmla_remove_quant ~keep_model_vars:false) None
+
+let simplify_trivial_wp_quantification =
+  Trans.rewrite (fmla_remove_quant ~keep_model_vars:true) None
 
 let () = Trans.register_transform
   "simplify_trivial_quantification" simplify_trivial_quantification
@@ -152,7 +160,9 @@ let () = Trans.register_transform
      - @[transform \\forall x. x <> y \\/ F@ into F[y/x].@]@]"
 
 let simplify_trivial_quantification_in_goal =
-  Trans.goal (fun pr f -> [create_prop_decl Pgoal pr (fmla_remove_quant f)])
+  Trans.goal
+    (fun pr f ->
+     [create_prop_decl Pgoal pr (fmla_remove_quant ~keep_model_vars:false f)])
 
 let () = Trans.register_transform
   "simplify_trivial_quantification_in_goal"
@@ -179,7 +189,7 @@ let fmla_flatten conj f =
 (** recreate the structure of a given formula with linearized subformulas *)
 let fmla_unflatten conj f formulas =
   let i = ref 0 in
-  let rec aux sign f = t_label_copy f (match f.t_node with
+  let rec aux sign f = t_attr_copy f (match f.t_node with
     | Tnot f -> t_not (aux (not sign) f)
     | Tbinop (Tor, f1, f2) when sign <> conj ->
         let f1' = aux sign f1 in t_or f1' (aux sign f2)

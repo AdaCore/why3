@@ -1,41 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../fact.mlw" expanded="true">
-<theory name="FactRecursive" sum="919362d8ebfa7553f31188fdb9ff9151" expanded="true">
- <goal name="VC fact_rec" expl="VC for fact_rec" expanded="true">
- <proof prover="0"><result status="valid" time="0.02" steps="16"/></proof>
+<why3session shape_version="8">
+<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="fact_vc_sp.mlw"/>
+<theory name="FactRecursive" proved="true">
+ <goal name="fact_rec&#39;vc" expl="VC for fact_rec" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="915"/></proof>
  </goal>
- <goal name="VC test0" expl="VC for test0" expanded="true">
- <proof prover="0"><result status="valid" time="0.01" steps="0"/></proof>
+ <goal name="test0&#39;vc" expl="VC for test0" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="289"/></proof>
  </goal>
- <goal name="VC test1" expl="VC for test1" expanded="true">
- <proof prover="0"><result status="valid" time="0.01" steps="0"/></proof>
+ <goal name="test1&#39;vc" expl="VC for test1" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="289"/></proof>
  </goal>
- <goal name="VC test7" expl="VC for test7" expanded="true">
- <proof prover="0"><result status="valid" time="0.02" steps="0"/></proof>
+ <goal name="test7&#39;vc" expl="VC for test7" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="289"/></proof>
  </goal>
- <goal name="VC test42" expl="VC for test42" expanded="true">
- <proof prover="0"><result status="valid" time="0.01" steps="0"/></proof>
+ <goal name="test42&#39;vc" expl="VC for test42" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="289"/></proof>
  </goal>
 </theory>
-<theory name="FactImperative" sum="f774c4a73a685d4f4ee9f137ea770ccf" expanded="true">
- <goal name="VC fact_imp" expl="VC for fact_imp" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="23"/></proof>
+<theory name="FactImperative" proved="true">
+ <goal name="fact_imp&#39;vc" expl="VC for fact_imp" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="2643"/></proof>
  </goal>
- <goal name="VC test0" expl="VC for test0" expanded="true">
- <proof prover="0"><result status="valid" time="0.01" steps="0"/></proof>
+ <goal name="test0&#39;vc" expl="VC for test0" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="831"/></proof>
  </goal>
- <goal name="VC test1" expl="VC for test1" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
+ <goal name="test1&#39;vc" expl="VC for test1" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="831"/></proof>
  </goal>
- <goal name="VC test7" expl="VC for test7" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="0"/></proof>
+ <goal name="test7&#39;vc" expl="VC for test7" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="831"/></proof>
  </goal>
- <goal name="VC test42" expl="VC for test42" expanded="true">
- <proof prover="0"><result status="valid" time="0.01" steps="0"/></proof>
+ <goal name="test42&#39;vc" expl="VC for test42" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="831"/></proof>
  </goal>
 </theory>
 </file>

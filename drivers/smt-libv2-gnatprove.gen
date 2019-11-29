@@ -1,0 +1,47 @@
+(**********************************************************************
+ ***                       gnat2why theories                        ***
+ **********************************************************************)
+
+theory _gnatprove_standard_th.Integer
+   syntax function bool_eq "(= %1 %2)"
+   syntax function bool_ne "(not (= %1 %2))"
+   syntax function bool_lt "(< %1 %2)"
+   syntax function bool_le "(<= %1 %2)"
+   syntax function bool_gt "(> %1 %2)"
+   syntax function bool_ge "(>= %1 %2)"
+   remove allprops
+end
+
+theory _gnatprove_standard_th.Boolean_Func
+   syntax function bool_eq "(= %1 %2)"
+   syntax function to_int "(ite %1 1 0)"
+   syntax function of_int "(distinct %1 0)"
+   remove allprops
+end
+
+(*************************************************************************)
+
+theory _gnatprove_standard.BVAda
+   syntax function bool_eq "(= %1 %2)"
+   syntax function bool_ne "(not (= %1 %2))"
+   syntax function bool_lt "(bvult %1 %2)"
+   syntax function bool_le "(bvule %1 %2)"
+   syntax function bool_gt "(bvugt %1 %2)"
+   syntax function bool_ge "(bvuge %1 %2)"
+
+   remove allprops
+end
+
+(*************************************************************************)
+
+theory ada__model.Discrete_Base
+   syntax function bool_eq "(= %1 %2)"
+   remove allprops
+end
+
+(*************************************************************************)
+
+theory ada__model_th.Discrete_Base_Theory
+   syntax function bool_eq "(= %1 %2)"
+   remove allprops
+end

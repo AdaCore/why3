@@ -21,7 +21,7 @@ module B
 
   type t = { ghost a : unit }
 
-  clone A with type t = t
+  clone export A with type t = t
 
 (* FIXME !
   let sub (x:t) : unit = A.add x

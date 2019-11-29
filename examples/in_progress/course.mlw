@@ -1,11 +1,11 @@
 module M
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (* preliminaries *)
 
-  clone import appmap.Appmap as M with type key = int
+  clone appmap.Appmap with type key = int
 
   type array 'a = t 'a
 
@@ -13,7 +13,7 @@ module M
     forall i j:int. n <= i <= m -> n <= j <= m ->
        a[i] = a[j] -> i = j
 
-  type string
+  type char_string
 
   (* Capucine memory model *)
 
@@ -30,18 +30,18 @@ module M
 
 val alloc : ref first_free_addr
 
-val new_pointer (tt:unit) : pointer writes { alloc }
+val new_pointer (_tt:unit) : pointer writes { alloc }
   ensures { !alloc = old !alloc + 1 /\ result = old !alloc }
 
 (*
 record Student =
-  name: string;
+  name: char_string;
   mark: int
   inv(this) { 0 <= this.mark <= 100 }
 end
 *)
 
-  type student = (string, int)
+  type student = (char_string, int)
 
   predicate invStudent (this:student) =
      let (_,m) = this in 0 <= m <= 100
@@ -132,7 +132,7 @@ let createCourse (r: (ref (region course))) : pointer
     c
 
 (*
-fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
+fun RegisterStudent(R:[Course], c: [R], name: char_string): [R.Rstud]
   consumes R^c
   produces R^c
 =
@@ -147,7 +147,7 @@ fun RegisterStudent(R:[Course], c: [R], name: string): [R.Rstud]
 *)
 
 let registerStudent
-    (r: (ref (region course))) (c:pointer) (name:string) : pointer
+    (r: (ref (region course))) (c:pointer) (name:char_string) : pointer
 requires { valid !alloc c /\ invCourse !alloc !r[c] }
 ensures  { valid !alloc result }
 = let s = new_pointer () in

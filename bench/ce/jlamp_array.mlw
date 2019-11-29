@@ -1,0 +1,36 @@
+module Array
+
+  use int.Int
+  use array.Array
+
+  type t
+
+  function to_int  t : int
+  meta "model_projection" function to_int
+
+  val function two : t
+  axiom two_def : to_int two = 2
+
+  val function three : t
+  axiom three_def : to_int three = 3
+
+
+  let f (a : array t) : unit
+    requires { a[42] = three }
+    writes { a }
+    ensures { a[42] = three }
+  = a[42] <- two
+
+  let g (a : array t) : unit
+    requires { a.length >= 43 /\ a[17] = three }
+    writes { a }
+    ensures { a[42] = three }
+  = a[42] <- two
+
+  let h (a : array t) : unit
+    requires { a.length >= 43 /\ a[17] = three }
+    writes { a }
+    ensures { a[42] = three }
+  = a[17] <- two
+
+end

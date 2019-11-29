@@ -3,12 +3,12 @@ module VM_instr_spec
 
   meta compute_max_steps 0x10000
 
-  use import int.Int
-  use import list.List
-  use import list.Length
-  use import vm.Vm
-  use import state.State
-  use import logic.Compiler_logic
+  use int.Int
+  use list.List
+  use list.Length
+  use vm.Vm
+  use state.State
+  use logic.Compiler_logic
 
   function ifun_post (f:machine_state -> machine_state) : post 'a =
     fun _ _ ms ms' -> ms' = f ms
@@ -16,7 +16,7 @@ module VM_instr_spec
 
   (* General specification builder for determinstic machine
      instructions. *)
-  let ifunf (ghost pre:pre {'a}) (code_f:code)
+  let ifunf (ghost pre:pre 'a) (code_f:code)
     (ghost f:machine_state -> machine_state) : hl 'a
     requires { forall c p. codeseq_at c p code_f ->
         forall x ms. pre x p ms -> transition c ms (f ms) }

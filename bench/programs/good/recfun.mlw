@@ -1,7 +1,7 @@
 module M
 
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 
   (** Recursive functions *)
 
@@ -15,7 +15,7 @@ module M
 
   val x : ref int
 
-  let rec f2 (u:unit) : unit variant { !x }
+  let rec f2 (_u:unit) : unit variant { !x }
     requires { !x >= 0 } ensures { !x = 0 }
     = if !x > 0 then begin x := !x - 1; f2 () end
 
@@ -42,4 +42,3 @@ module M
     = let b = ref 0 in let f = f5 x in f b
 
 end
-

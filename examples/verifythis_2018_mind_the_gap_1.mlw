@@ -1,0 +1,81 @@
+(**
+
+{1 VerifyThis @ ETAPS 2018 competition
+   Challenge 1: Mind the gap}
+
+Author: Martin Clochard (LRI, Université Paris Sud)
+*)
+
+use int.Int
+use import seq.Seq as S
+use array.Array
+
+type char
+val constant any_char : char
+
+(* gap buffer model: content (buffer content) + l (location in buffer). *)
+type gap_buffer = {
+  mutable a : array char;
+  mutable l : int;
+  mutable r : int;
+  mutable ghost content : seq char;
+} invariant { 0 <= l <= r <= a.length }
+invariant { a.length = content.S.length + r - l }
+invariant { forall i. 0 <= i < l -> S.get content i = a.elts i }
+invariant { forall i. l <= i < content.S.length ->
+                        S.get content i = a.elts (i+r-l) }
+by { a = make 0 any_char; l = 0; r = 0; content = S.empty }
+
+let left (g:gap_buffer) : unit
+  ensures  { g.l = old (if g.l = 0 then g.l else g.l - 1) }
+  ensures  { g.content = old g.content }
+= if g.l <> 0 then begin
+    g.l <- g.l - 1;
+    g.r <- g.r - 1;
+    g.a[g.r]<- g.a[g.l]
+  end
+
+let right (g:gap_buffer) : unit
+  ensures { g.l = old (if g.l = g.content.S.length then g.l else g.l + 1) }
+  ensures { g.content = old g.content }
+= if g.r <> g.a.length then begin
+    g.a[g.l] <- g.a[g.r];
+    g.l <- g.l + 1;
+    g.r <- g.r + 1
+  end
+
+let delete (g:gap_buffer) : unit
+  ensures { if old g.l = 0 then g = old g else
+    g.l = old g.l - 1 /\
+    g.content = old (g.content[.. g.l - 1] ++ g.content[g.l ..]) }
+= if g.l <> 0 then begin
+    ghost (g.content <- g.content[.. g.l - 1] ++ g.content[g.l ..]);
+    g.l <- g.l - 1;
+  end
+
+(* Send back the capacity increment without modifying buffer.
+   Implemented by a constant (K) in the problem statement.
+   This version is more general and account for the standard doubling pattern
+   as well. *)
+val growth (_g:gap_buffer) : int ensures { result > 0 }
+
+(* Since it is an internal primitive, it is fine to refer to r as well. *)
+let grow (g:gap_buffer) : unit
+  ensures { g.l = old g.l /\ g.content = old g.content }
+  ensures { g.l < g.r }
+= let k = growth g in
+  let b = Array.make (g.a.length + k) any_char in
+  Array.blit g.a 0 b 0 g.l;
+  Array.blit g.a g.r b (g.r + k) (g.a.length - g.r);
+  g.r <- g.r + k;
+  g.a <- b
+
+let insert (g:gap_buffer) (x:char) : unit
+  ensures { g.l = old g.l + 1 }
+  ensures { g.content = old (g.content[.. g.l] ++ cons x g.content[g.l ..]) }
+= if g.l = g.r then grow g;
+  ghost (g.content <- g.content[.. g.l] ++ cons x g.content[g.l ..]);
+  g.a[g.l] <- x;
+  g.l <- g.l + 1
+
+

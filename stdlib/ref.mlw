@@ -1,0 +1,40 @@
+
+(** {1 References}
+
+   A mutable variable, or "reference" in ML terminology, is simply a
+   record with a single mutable field [contents].
+*)
+
+(** {2 Generic references}
+
+   Creation, access, and assignment are provided as [ref], prefix [!], and
+   infix [:=], respectively.
+*)
+
+module Ref
+
+  use export why3.Ref.Ref
+
+  let function (!) (r: ref 'a) = r.contents
+
+  let (:=) (ref r:'a) (v:'a) ensures { r = v } = r <- v
+
+end
+
+(** {2 Integer References}
+
+a few operations specific to integer references *)
+
+module Refint
+
+  use int.Int
+  use export Ref
+
+  let incr (ref r: int) ensures { r = old r + 1 } = r <- r + 1
+  let decr (ref r: int) ensures { r = old r - 1 } = r <- r - 1
+
+  let (+=)   (ref r: int) (v: int) ensures { r = old r + v } = r <- r + v
+  let (-=)   (ref r: int) (v: int) ensures { r = old r - v } = r <- r - v
+  let ( *= ) (ref r: int) (v: int) ensures { r = old r * v } = r <- r * v
+
+end

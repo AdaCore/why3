@@ -1,0 +1,10 @@
+module A
+  type a
+  val constant x : a
+end
+
+module B
+  type b
+  val ghost constant y : b
+  clone export A with type a = b, val x = y
+end

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,30 +17,33 @@ Require int.Int.
 Require int.Abs.
 
 (* Why3 goal *)
-Definition div: Z -> Z -> Z.
+Definition div : Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z.
 intros x y.
 case (Z_le_dec 0 (Zmod x y)) ; intros H.
-exact (Zdiv x y).
-exact (Zdiv x y + 1)%Z.
+exact (Z.div x y).
+exact (Z.div x y + 1)%Z.
 Defined.
 
 (* Why3 goal *)
-Definition mod1: Z -> Z -> Z.
+Definition mod1 :
+  Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z.
 intros x y.
 exact (x - y * div x y)%Z.
 Defined.
 
 (* Why3 goal *)
-Lemma Div_mod : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> (x = ((y * (div x
-  y))%Z + (mod1 x y))%Z).
+Lemma Div_mod :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), ~ (y = 0%Z) ->
+  (x = ((y * (div x y))%Z + (mod1 x y))%Z).
 intros x y Zy.
 unfold mod1, div.
 case Z_le_dec ; intros H ; ring.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_bound : forall (x:Z) (y:Z), (~ (y = 0%Z)) -> ((0%Z <= (mod1 x
-  y))%Z /\ ((mod1 x y) < (ZArith.BinInt.Z.abs y))%Z).
+Lemma Mod_bound :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z), ~ (y = 0%Z) ->
+  (0%Z <= (mod1 x y))%Z /\ ((mod1 x y) < (ZArith.BinInt.Z.abs y))%Z.
 intros x y Zy.
 zify.
 assert (H1 := Z_mod_neg x y).
@@ -55,8 +58,10 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_unique : forall (x:Z) (y:Z) (q:Z), (0%Z < y)%Z ->
-  ((((q * y)%Z <= x)%Z /\ (x < ((q * y)%Z + y)%Z)%Z) -> ((div x y) = q)).
+Lemma Div_unique :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (q:Numbers.BinNums.Z),
+  (0%Z < y)%Z -> ((q * y)%Z <= x)%Z /\ (x < ((q * y)%Z + y)%Z)%Z ->
+  ((div x y) = q).
 intros x y q h1 (h2,h3).
 assert (h:(~(y=0))%Z) by omega.
 generalize (Mod_bound x y h); intro h0.
@@ -77,27 +82,28 @@ omega.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_bound : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (0%Z < y)%Z) ->
-  ((0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z).
+Lemma Div_bound :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (0%Z <= x)%Z /\ (0%Z < y)%Z -> (0%Z <= (div x y))%Z /\ ((div x y) <= x)%Z.
 intros x y (Hx,Hy).
 unfold div.
 case Z_le_dec ; intros H.
 split.
 apply Z_div_pos with (2 := Hx).
-now apply Zlt_gt.
-destruct (Z_eq_dec y 1) as [H'|H'].
+now apply Z.lt_gt.
+destruct (Z.eq_dec y 1) as [H'|H'].
 rewrite H', Zdiv_1_r.
-apply Zle_refl.
+apply Z.le_refl.
 rewrite <- (Zdiv_1_r x) at 2.
 apply Zdiv_le_compat_l with (1 := Hx).
 omega.
 elim H.
 apply Z_mod_lt.
-now apply Zlt_gt.
+now apply Z.lt_gt.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_1 : forall (x:Z), ((mod1 x 1%Z) = 0%Z).
+Lemma Mod_1 : forall (x:Numbers.BinNums.Z), ((mod1 x 1%Z) = 0%Z).
 intros x.
 unfold mod1, div.
 rewrite Zmod_1_r, Zdiv_1_r, Zmult_1_l.
@@ -105,15 +111,16 @@ apply Zminus_diag.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_1 : forall (x:Z), ((div x 1%Z) = x).
+Lemma Div_1 : forall (x:Numbers.BinNums.Z), ((div x 1%Z) = x).
 intros x.
 unfold div.
 now rewrite Zmod_1_r, Zdiv_1_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_inf : forall (x:Z) (y:Z), ((0%Z <= x)%Z /\ (x < y)%Z) -> ((div x
-  y) = 0%Z).
+Lemma Div_inf :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (0%Z <= x)%Z /\ (x < y)%Z -> ((div x y) = 0%Z).
 intros x y Hxy.
 unfold div.
 case Z_le_dec ; intros H.
@@ -123,8 +130,9 @@ now rewrite Zmod_small.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_inf_neg : forall (x:Z) (y:Z), ((0%Z < x)%Z /\ (x <= y)%Z) ->
-  ((div (-x)%Z y) = (-1%Z)%Z).
+Lemma Div_inf_neg :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z),
+  (0%Z < x)%Z /\ (x <= y)%Z -> ((div (-x)%Z y) = (-1%Z)%Z).
 intros x y Hxy.
 assert (h: (x < y \/ x = y)%Z) by omega.
 destruct h.
@@ -155,7 +163,8 @@ rewrite Z_div_same_full; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_0 : forall (y:Z), (~ (y = 0%Z)) -> ((mod1 0%Z y) = 0%Z).
+Lemma Mod_0 :
+  forall (y:Numbers.BinNums.Z), ~ (y = 0%Z) -> ((mod1 0%Z y) = 0%Z).
 intros y Hy.
 unfold mod1, div.
 rewrite Zmod_0_l.
@@ -164,14 +173,15 @@ now rewrite Zdiv_0_l, Zmult_0_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_1_left : forall (y:Z), (1%Z < y)%Z -> ((div 1%Z y) = 0%Z).
+Lemma Div_1_left :
+  forall (y:Numbers.BinNums.Z), (1%Z < y)%Z -> ((div 1%Z y) = 0%Z).
 intros y Hy.
 rewrite Div_inf; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Div_minus1_left : forall (y:Z), (1%Z < y)%Z -> ((div (-1%Z)%Z
-  y) = (-1%Z)%Z).
+Lemma Div_minus1_left :
+  forall (y:Numbers.BinNums.Z), (1%Z < y)%Z -> ((div (-1%Z)%Z y) = (-1%Z)%Z).
 intros y Hy.
 unfold div.
 assert (h1: (1 mod y = 1)%Z).
@@ -185,15 +195,17 @@ rewrite Zdiv_small; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_1_left : forall (y:Z), (1%Z < y)%Z -> ((mod1 1%Z y) = 1%Z).
+Lemma Mod_1_left :
+  forall (y:Numbers.BinNums.Z), (1%Z < y)%Z -> ((mod1 1%Z y) = 1%Z).
 intros y Hy.
 unfold mod1.
 rewrite Div_1_left; auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_minus1_left : forall (y:Z), (1%Z < y)%Z -> ((mod1 (-1%Z)%Z
-  y) = (y - 1%Z)%Z).
+Lemma Mod_minus1_left :
+  forall (y:Numbers.BinNums.Z), (1%Z < y)%Z ->
+  ((mod1 (-1%Z)%Z y) = (y - 1%Z)%Z).
 intros y Hy.
 unfold mod1.
 rewrite Div_minus1_left; auto with zarith.
@@ -202,8 +214,9 @@ Qed.
 Open Scope Z_scope.
 
 (* Why3 goal *)
-Lemma Div_mult : forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z ->
-  ((div ((x * y)%Z + z)%Z x) = (y + (div z x))%Z).
+Lemma Div_mult :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (z:Numbers.BinNums.Z),
+  (0%Z < x)%Z -> ((div ((x * y)%Z + z)%Z x) = (y + (div z x))%Z).
 intros x y z h.
 unfold div.
 destruct (Z_le_dec 0 (z mod x)).
@@ -215,8 +228,9 @@ generalize (Z_mod_lt z x); auto with zarith.
 Qed.
 
 (* Why3 goal *)
-Lemma Mod_mult : forall (x:Z) (y:Z) (z:Z), (0%Z < x)%Z ->
-  ((mod1 ((x * y)%Z + z)%Z x) = (mod1 z x)).
+Lemma Mod_mult :
+  forall (x:Numbers.BinNums.Z) (y:Numbers.BinNums.Z) (z:Numbers.BinNums.Z),
+  (0%Z < x)%Z -> ((mod1 ((x * y)%Z + z)%Z x) = (mod1 z x)).
 intros x y z h.
 unfold mod1.
 rewrite Div_mult.

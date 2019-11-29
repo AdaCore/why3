@@ -2,9 +2,9 @@
 (* avl-based random-access lists. *)
 module RAL
   
-  use import int.Int
-  use import list.NthLengthAppend
-  use import avl.SelectionTypes
+  use int.Int
+  use list.NthLengthAppend
+  use avl.SelectionTypes
   
   (* Data is trivial (random-access lists are fully polymorphic). *)
   namespace Data
@@ -19,7 +19,7 @@ module RAL
   (* Tree structure. Store additional information for fast index selection. *)
   namespace Tree
     
-    use import avl.ParamsTypes
+    use avl.ParamsTypes
     
     (* Store cardinal at every node. *)
     type t 'a 'b =

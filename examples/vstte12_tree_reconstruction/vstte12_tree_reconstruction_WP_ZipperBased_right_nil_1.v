@@ -10,9 +10,6 @@ Require list.Append.
 Require list.Reverse.
 
 (* Why3 assumption *)
-Definition unit := unit.
-
-(* Why3 assumption *)
 Inductive tree :=
   | Leaf : tree
   | Node : tree -> tree -> tree.
@@ -23,222 +20,139 @@ Existing Instance tree_WhyType.
 Fixpoint depths (d:Z) (t:tree) {struct t}: (list Z) :=
   match t with
   | Leaf => (Init.Datatypes.cons d Init.Datatypes.nil)
-  | (Node l r) => (Init.Datatypes.app (depths (d + 1%Z)%Z
-      l) (depths (d + 1%Z)%Z r))
+  | Node l r =>
+      (Init.Datatypes.app (depths (d + 1%Z)%Z l) (depths (d + 1%Z)%Z r))
   end.
 
-Axiom depths_head : forall (t:tree) (d:Z), match (depths d
-  t) with
+Axiom depths_head :
+  forall (t:tree) (d:Z),
+  match depths d t with
   | (Init.Datatypes.cons x _) => (d <= x)%Z
   | Init.Datatypes.nil => False
   end.
 
-Axiom depths_unique : forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z))
-  (s2:(list Z)), ((Init.Datatypes.app (depths d
-  t1) s1) = (Init.Datatypes.app (depths d t2) s2)) -> ((t1 = t2) /\
-  (s1 = s2)).
+Axiom depths_unique :
+  forall (t1:tree) (t2:tree) (d:Z) (s1:(list Z)) (s2:(list Z)),
+  ((Init.Datatypes.app (depths d t1) s1) =
+   (Init.Datatypes.app (depths d t2) s2)) ->
+  (t1 = t2) /\ (s1 = s2).
 
-Axiom depths_prefix : forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z))
-  (s2:(list Z)), ((Init.Datatypes.app (depths d1
-  t) s1) = (Init.Datatypes.app (depths d2 t) s2)) -> (d1 = d2).
+Axiom depths_prefix :
+  forall (t:tree) (d1:Z) (d2:Z) (s1:(list Z)) (s2:(list Z)),
+  ((Init.Datatypes.app (depths d1 t) s1) =
+   (Init.Datatypes.app (depths d2 t) s2)) ->
+  (d1 = d2).
 
-Axiom depths_prefix_simple : forall (t:tree) (d1:Z) (d2:Z), ((depths d1
-  t) = (depths d2 t)) -> (d1 = d2).
+Axiom depths_prefix_simple :
+  forall (t:tree) (d1:Z) (d2:Z), ((depths d1 t) = (depths d2 t)) -> (d1 = d2).
 
-Axiom depths_subtree : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z)
-  (s1:(list Z)), ((Init.Datatypes.app (depths d1 t1) s1) = (depths d2 t2)) ->
-  (d2 <= d1)%Z.
+Axiom depths_subtree :
+  forall (t1:tree) (t2:tree) (d1:Z) (d2:Z) (s1:(list Z)),
+  ((Init.Datatypes.app (depths d1 t1) s1) = (depths d2 t2)) -> (d2 <= d1)%Z.
 
-Axiom depths_unique2 : forall (t1:tree) (t2:tree) (d1:Z) (d2:Z), ((depths d1
-  t1) = (depths d2 t2)) -> ((d1 = d2) /\ (t1 = t2)).
+Axiom depths_unique2 :
+  forall (t1:tree) (t2:tree) (d1:Z) (d2:Z),
+  ((depths d1 t1) = (depths d2 t2)) -> (d1 = d2) /\ (t1 = t2).
 
 (* Why3 assumption *)
 Fixpoint forest_depths (f:(list (Z* tree)%type)) {struct f}: (list Z) :=
   match f with
   | Init.Datatypes.nil => Init.Datatypes.nil
-  | (Init.Datatypes.cons (d, t) r) => (Init.Datatypes.app (depths d
-      t) (forest_depths r))
+  | (Init.Datatypes.cons (d, t) r) =>
+      (Init.Datatypes.app (depths d t) (forest_depths r))
   end.
 
-Axiom forest_depths_append : forall (f1:(list (Z* tree)%type)) (f2:(list (Z*
-  tree)%type)),
-  ((forest_depths (Init.Datatypes.app f1 f2)) = (Init.Datatypes.app (forest_depths f1) (forest_depths f2))).
+Axiom forest_depths_append :
+  forall (f1:(list (Z* tree)%type)) (f2:(list (Z* tree)%type)),
+  ((forest_depths (Init.Datatypes.app f1 f2)) =
+   (Init.Datatypes.app (forest_depths f1) (forest_depths f2))).
 
 (* Why3 assumption *)
-Fixpoint greedy (d:Z) (d1:Z) (t1:tree) {struct t1}: Prop := (~ (d = d1)) /\
+Fixpoint greedy (d:Z) (d1:Z) (t1:tree) {struct t1}: Prop :=
+  ~ (d = d1) /\
   match t1 with
   | Leaf => True
-  | (Node l1 _) => (greedy d (d1 + 1%Z)%Z l1)
+  | Node l1 _ => greedy d (d1 + 1%Z)%Z l1
   end.
 
 (* Why3 assumption *)
 Inductive g: (list (Z* tree)%type) -> Prop :=
-  | Gnil : (g Init.Datatypes.nil)
-  | Gone : forall (d:Z) (t:tree), (g (Init.Datatypes.cons (d,
-      t) Init.Datatypes.nil))
-  | Gtwo : forall (d1:Z) (d2:Z) (t1:tree) (t2:tree) (l:(list (Z*
-      tree)%type)), (greedy d1 d2 t2) -> ((g (Init.Datatypes.cons (d1,
-      t1) l)) -> (g (Init.Datatypes.cons (d2, t2) (Init.Datatypes.cons (d1,
-      t1) l)))).
+  | Gnil : g Init.Datatypes.nil
+  | Gone :
+      forall (d:Z) (t:tree),
+      g (Init.Datatypes.cons (d, t) Init.Datatypes.nil)
+  | Gtwo :
+      forall (d1:Z) (d2:Z) (t1:tree) (t2:tree) (l:(list (Z* tree)%type)),
+      (greedy d1 d2 t2) -> (g (Init.Datatypes.cons (d1, t1) l)) ->
+      g (Init.Datatypes.cons (d2, t2) (Init.Datatypes.cons (d1, t1) l)).
 
-Axiom g_append : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*
-  tree)%type)), (g (Init.Datatypes.app l1 l2)) -> (g l1).
+Axiom g_append :
+  forall (l1:(list (Z* tree)%type)) (l2:(list (Z* tree)%type)),
+  (g (Init.Datatypes.app l1 l2)) -> g l1.
 
-Require Import Why3. 
-Ltac z := why3 "Z3,4.4.0," timelimit 5; admit.
-Ltac ae := why3 "Alt-Ergo,0.99.1,"; admit.
+Axiom depths_length :
+  forall (t:tree) (d:Z), (1%Z <= (list.Length.length (depths d t)))%Z.
 
-Lemma depths_length: forall t d, (Length.length (depths d t) >= 1)%Z.
-  induction t; simpl.
-  intro; omega.
-  z.
-Admitted.
+Axiom forest_depths_length :
+  forall (l:(list (Z* tree)%type)),
+  (0%Z <= (list.Length.length (forest_depths l)))%Z.
 
-Lemma forest_depths_length: forall l, (Length.length (forest_depths l) >= 0)%Z.
-  induction l; simpl.
-  omega.
-  destruct a. z.
-Admitted.
+Axiom g_tail :
+  forall (l1:(list (Z* tree)%type)) (l2:(list (Z* tree)%type)),
+  (g (Init.Datatypes.app l1 l2)) -> g l2.
 
-Lemma g_tail : forall (l1:(list (Z* tree)%type)) (l2:(list (Z*
-  tree)%type)), (g (app l1 l2)) -> (g l2).
-induction l1; simpl; auto.
-ae.
-Admitted.
-
-Theorem key_lemma : forall t l d d1 t1 s, (d < d1)%Z ->
-  (1 <= Length.length l)%Z -> g (List.rev (cons (d1, t1) l)) ->
-  ~ (forest_depths (cons (d1, t1) l) = app (depths d t) s).
-induction t; simpl.
-(* t = Leaf *)
-intros.
-generalize (depths_head t1 d1).
-destruct (depths d1 t1); intuition.
-simpl in H3. injection H3.
-intros; omega.
-(* t = Node _ _ *)
-rename t1 into left, IHt1 into IHleft,
-       t2 into right, IHt2 into IHright.
-destruct l.
-(* l = Nil *)
-z.
-(* l = Cons _ *)
-destruct p as (d2, t2).
-intros d d1 t1 s hdd1 hlen hg.
-assert (hg2: g (app (List.rev l) (cons (d2, t2) nil))) by z.
-assert (hg12: g (app (cons (d2, t2) nil) (cons (d1, t1) nil))) by z.
-inversion hg12. subst. clear H5.
-assert (ineq: (d1 <> d2)) by z.
-
-intros eq.
-assert (case: (d2 < d1 \/ d1 < d2)%Z) by omega. destruct case as [case|case].
-(* d2 < d1 *)
-assert (L0: (forall t2 d1 d2, greedy d1 d2 t2 -> d2 < d1 ->
-   match depths d2 t2 with cons x _ => x < d1 | Nil  => False end)%Z).
-  induction t0.
-  ae.
-  simpl.
-  clear IHt0_2.
-  intros d0 d3 (diseq, gr) lt.
-  assert (d0 <> d3+1)%Z by z.
-  assert (d3+1 < d0)%Z by z.
-  generalize (IHt0_1 d0 (d3+1)%Z gr H0).
-  destruct (depths (d3 + 1) t0_1).
-  intuition.
-  simpl; auto.
-assert (L1: forall t d1 t1 l s d, (d < d1)%Z ->
-  app (depths d1 t1) l = app (depths d t) s -> 
-  match l with cons x _ => (x >= d1)%Z | Nil => True end).
-  clear L0 case eq ineq H1 hg12 hg2 hg hlen hdd1.
-  clear s t1 d1 d l t2 d2 IHright IHleft right left.
-  induction t; simpl.
-  intros.
-  generalize (depths_head t1 d1).
-  destruct (depths d1 t1).
-  intuition.
-  destruct l; auto.
-  ae.
-  intros.
-  assert (case2: (d+1 = d1 \/ d+1 < d1)%Z) by omega. destruct case2.
-  rewrite H1 in *.
-  assert (l = app (depths d1 t2) s) by z.
-  generalize (depths_head t2 d1).
-  subst l. destruct (depths d1 t2).
-  intuition. simpl. ae.
-  clear IHt2.
-  apply (IHt1 d1 t0 l (app (depths (d+1) t2) s) (d+1))%Z; auto.
-  z.
-
-generalize eq.
-pose (l0 := (app (depths d2 t2) (forest_depths l))).
-generalize (depths_head t2 d2).
-generalize (L0 t2 d1 d2 H1 case); clear L0.
-generalize (L1 (Node left right) d1 t1 l0 s d hdd1 eq).
-subst l0.
-destruct (depths d2 t2).
-intuition.
-simpl.
-intros; omega.
-
-(* d1 < d2 *)
-assert (case2: (d+1 = d1 \/ d+1 < d1)%Z) by omega. destruct case2.
-(* d+1 = d1 *)
-rewrite H in *.
-assert (t1 = left) by z.
-subst t1.
-assert (forest_depths (cons (d2, t2) l) = app (depths d1 right) s) by z.
-clear eq.
-destruct l.
-(* l = Nil => contradiction *)
-simpl in H0.
-assert (d1 >= d2)%Z by z.
-omega.
-(* l = Cons _ _ *)
-clear IHleft.
-apply (IHright (cons p l) d1 d2 t2 s); auto.
-ae.
-(* d+1 < d1 *)
-clear IHright.
-apply (IHleft (cons (d2, t2) l) (d+1) d1 t1 (app (depths (d+1) right) s))%Z; auto.
-z.
-Admitted.
+Axiom key_lemma :
+  forall (t:tree) (l:(list (Z* tree)%type)) (d:Z) (d1:Z) (t1:tree)
+    (s:(list Z)),
+  (d < d1)%Z -> (1%Z <= (list.Length.length l))%Z ->
+  (g (Lists.List.rev (Init.Datatypes.cons (d1, t1) l))) ->
+  ~ ((forest_depths (Init.Datatypes.cons (d1, t1) l)) =
+     (Init.Datatypes.app (depths d t) s)).
 
 (* Why3 goal *)
-Theorem right_nil : forall (l:(list (Z* tree)%type)),
-  (2%Z <= (list.Length.length l))%Z -> ((g l) -> forall (t:tree) (d:Z),
-  ~ ((forest_depths (Lists.List.rev l)) = (depths d t))).
+Theorem right_nil :
+  forall (l:(list (Z* tree)%type)), (2%Z <= (list.Length.length l))%Z ->
+  (g l) -> forall (t:tree) (d:Z),
+  ~ ((forest_depths (Lists.List.rev l)) = (depths d t)).
 (* Why3 intros l h1 h2 t d. *)
 intros l H hg.
-replace l with (List.rev (List.rev l)) in H, hg by z.
+replace l with (List.rev (List.rev l)) in H, hg. 2:apply Reverse.reverse_reverse.
 generalize H; clear H. generalize hg; clear hg.
 generalize (List.rev l). clear l.
 
 destruct l.
 (* l = Nil => contradiction *)
-intros; ae.
+intros.
+simpl in H. omega.
 (* l = Cons *)
 intros. destruct p as (d1, t1).
 intros eq.
 assert (d < d1)%Z.
   simpl in eq.
-  assert (d <= d1)%Z by z.
+  assert (d <= d1)%Z. apply (depths_subtree _ _ _ _ _ eq).
   assert (d <> d1)%Z. intro.
   subst.
-  assert (depths d1 t = app (depths d1 t) nil) by z.
-  assert (t = t1) by z.
+  assert (depths d1 t = app (depths d1 t) nil). auto with *.
+  assert (t = t1). rewrite H1 in eq. generalize (depths_unique _ _ _ _ _ eq).
+   intuition.
   subst.
-  assert (forest_depths l = nil) by z.
+  assert (forest_depths l = nil). rewrite H1 in eq at 2.
+    generalize (depths_unique _ _ _ _ _ eq). intuition.
   simpl in H.
-  destruct l. ae.
+  destruct l. simpl in H. omega.
   assert (cons p l = nil).
   destruct (cons p l); auto.
-  simpl in H2. destruct p0. z.
+  simpl in H2. destruct p0. 
+    generalize (depths_head t z). destruct (depths z t). intuition.
+    simpl in H2. discriminate H2.
   discriminate H3.
   omega.
 generalize eq; clear eq.
-replace (depths d t) with (app (depths d t) nil) by z.
+replace (depths d t) with (app (depths d t) nil).
+   2:rewrite Append.Append_l_nil; trivial.
 apply key_lemma; auto.
-simpl in H.
-ae.
-Admitted.
-
+simpl in H. 
+rewrite Append.Append_length in H.
+rewrite Reverse.Reverse_length in H. simpl in H.
+omega.
+Qed.

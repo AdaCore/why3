@@ -1,10 +1,10 @@
 (* Symbolic computation on matrix expressions. *)
 module Symb
 
-  use import int.Int
-  use import list.List
-  use import matrices.Matrix
-  use import matrices.MatrixArithmetic
+  use int.Int
+  use list.List
+  use matrices.Matrix
+  use matrices.MatrixArithmetic
 
   scope LOCAL
 
@@ -309,7 +309,7 @@ module Symb
     e_cols : int;
   }
 
-  predicate (-->) (x y:'a) = "rewrite" x = y
+  predicate (-->) (x y:'a) = [@rewrite] x = y
   meta rewrite_def predicate (-->)
 
   predicate e_vld (env:env) (e:expr) =

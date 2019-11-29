@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -47,13 +47,9 @@ module Sexpr = Set.Make(ExprNode)
 
 (** prints the given expression, transforming spaces into _ *)
 let string_of_expr_node node =
-  let print_in_buf printer x =
-    Format.fprintf Format.str_formatter "@[%a@]" printer x;
-    Format.flush_str_formatter()
-  in
-  let white_space = Str.regexp "[ ()]" in
-  let translate x = Str.global_replace white_space "_" x in
-  let repr = print_in_buf Pretty.print_term node in
+  let white_space = Re.Str.regexp "[ ()]" in
+  let translate x = Re.Str.global_replace white_space "_" x in
+  let repr = Format.asprintf "@[%a@]" Pretty.print_term node in
   translate repr
 
 (* for debugging (graph printing) purposes *)

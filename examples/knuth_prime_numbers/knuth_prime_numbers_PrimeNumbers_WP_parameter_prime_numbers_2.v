@@ -7,97 +7,124 @@ Require int.Int.
 Require int.Abs.
 Require int.EuclideanDivision.
 Require int.ComputerDivision.
+Require map.Map.
 Require number.Parity.
 Require number.Divisibility.
 Require number.Prime.
-Require map.Map.
-
-(* Why3 assumption *)
-Definition lt_nat (x:Z) (y:Z): Prop := (0%Z <= y)%Z /\ (x < y)%Z.
-
-(* Why3 assumption *)
-Inductive lex: (Z* Z)%type -> (Z* Z)%type -> Prop :=
-  | Lex_1 : forall (x1:Z) (x2:Z) (y1:Z) (y2:Z), (lt_nat x1 x2) -> (lex (x1,
-      y1) (x2, y2))
-  | Lex_2 : forall (x:Z) (y1:Z) (y2:Z), (lt_nat y1 y2) -> (lex (x, y1) (x,
-      y2)).
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
+  | ref'mk : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Implicit Arguments mk_ref [[a]].
+Arguments ref'mk {a}.
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | (mk_ref x) => x
+  | ref'mk x => x
   end.
 
 (* Why3 assumption *)
-Definition no_prime_in (l:Z) (u:Z): Prop := forall (x:Z), ((l < x)%Z /\
-  (x < u)%Z) -> ~ (number.Prime.prime x).
+Definition no_prime_in (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z) : Prop :=
+  forall (x:Numbers.BinNums.Z), (l < x)%Z /\ (x < u)%Z ->
+  ~ number.Prime.prime x.
 
 (* Why3 assumption *)
-Definition first_primes (p:(Z -> Z)) (u:Z): Prop := ((p 0%Z) = 2%Z) /\
-  ((forall (i:Z) (j:Z), ((0%Z <= i)%Z /\ ((i < j)%Z /\ (j < u)%Z)) -> ((p
-  i) < (p j))%Z) /\ ((forall (i:Z), ((0%Z <= i)%Z /\ (i < u)%Z) ->
-  (number.Prime.prime (p i))) /\ forall (i:Z), ((0%Z <= i)%Z /\
-  (i < (u - 1%Z)%Z)%Z) -> (no_prime_in (p i) (p (i + 1%Z)%Z)))).
+Definition first_primes (p:Numbers.BinNums.Z -> Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z) : Prop :=
+  ((p 0%Z) = 2%Z) /\
+  (forall (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
+   (0%Z <= i)%Z /\ (i < j)%Z /\ (j < u)%Z -> ((p i) < (p j))%Z) /\
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < u)%Z ->
+   number.Prime.prime (p i)) /\
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < (u - 1%Z)%Z)%Z ->
+   no_prime_in (p i) (p (i + 1%Z)%Z)).
 
-Axiom exists_prime : forall (p:(Z -> Z)) (u:Z), (1%Z <= u)%Z ->
-  ((first_primes p u) -> forall (d:Z), ((2%Z <= d)%Z /\ (d <= (p
-  (u - 1%Z)%Z))%Z) -> ((number.Prime.prime d) -> exists i:Z, ((0%Z <= i)%Z /\
-  (i < u)%Z) /\ (d = (p i)))).
+Axiom exists_prime :
+  forall (p:Numbers.BinNums.Z -> Numbers.BinNums.Z) (u:Numbers.BinNums.Z),
+  (1%Z <= u)%Z -> first_primes p u -> forall (d:Numbers.BinNums.Z),
+  (2%Z <= d)%Z /\ (d <= (p (u - 1%Z)%Z))%Z -> number.Prime.prime d ->
+  exists i:Numbers.BinNums.Z, ((0%Z <= i)%Z /\ (i < u)%Z) /\ (d = (p i)).
 
-Axiom Bertrand_postulate : forall (p:Z), (number.Prime.prime p) ->
-  ~ (no_prime_in p (2%Z * p)%Z).
+Axiom Bertrand_postulate :
+  forall (p:Numbers.BinNums.Z), number.Prime.prime p ->
+  ~ no_prime_in p (2%Z * p)%Z.
 
 Axiom array : forall (a:Type), Type.
-Parameter array_WhyType : forall (a:Type) {a_WT:WhyType a},
-  WhyType (array a).
+Parameter array_WhyType :
+  forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 
-Parameter elts: forall {a:Type} {a_WT:WhyType a}, (array a) -> (Z -> a).
+Parameter elts:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a.
 
-Parameter length: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z.
+Parameter length:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z.
 
-Axiom array'invariant : forall {a:Type} {a_WT:WhyType a}, forall (self:(array
-  a)), (0%Z <= (length self))%Z.
+Axiom array'invariant :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (self:array a), (0%Z <= (length self))%Z.
 
 (* Why3 assumption *)
-Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
-  ((elts a1) i).
+Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:array a)
+    (i:Numbers.BinNums.Z) : a :=
+  elts a1 i.
 
-Parameter mixfix_lblsmnrb: forall {a:Type} {a_WT:WhyType a}, (array a) ->
-  Z -> a -> (array a).
+Parameter mixfix_lblsmnrb:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
+  array a.
 
-Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(array a)) (i:Z) (v:a), ((length (mixfix_lblsmnrb a1 i
-  v)) = (length a1)) /\ ((elts (mixfix_lblsmnrb a1 i
-  v)) = (map.Map.set (elts a1) i v)).
+Axiom mixfix_lblsmnrb'spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
+  ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
+
+Parameter make:
+  forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
+
+Axiom make'spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
+   ((mixfix_lbrb (make n v) i) = v)) /\
+  ((length (make n v)) = n).
 
 (* Why3 goal *)
-Theorem VC_prime_numbers : forall (m:Z), (2%Z <= m)%Z -> forall (p:(array
-  Z)), ((forall (i:Z), ((0%Z <= i)%Z /\ (i < m)%Z) -> ((mixfix_lbrb p
-  i) = 0%Z)) /\ ((length p) = m)) -> forall (p1:(array Z)),
-  ((length p1) = (length p)) -> (((elts p1) = (map.Map.set (elts p) 0%Z
-  2%Z)) -> forall (p2:(array Z)), ((length p2) = (length p1)) ->
-  (((elts p2) = (map.Map.set (elts p1) 1%Z 3%Z)) -> let o := (m - 1%Z)%Z in
-  ((2%Z <= (o + 1%Z)%Z)%Z -> forall (n:Z) (p3:(array Z)),
-  ((length p3) = (length p2)) -> forall (j:Z), (((2%Z <= j)%Z /\
-  (j <= o)%Z) /\ ((first_primes (elts p3) j) /\ ((((mixfix_lbrb p3
-  (j - 1%Z)%Z) < n)%Z /\ (n < (2%Z * (mixfix_lbrb p3 (j - 1%Z)%Z))%Z)%Z) /\
-  ((number.Parity.odd n) /\ (no_prime_in (mixfix_lbrb p3 (j - 1%Z)%Z)
-  n))))) -> forall (n1:Z) (p4:(array Z)), ((length p4) = (length p3)) ->
-  forall (k:Z), (((1%Z <= k)%Z /\ (k < j)%Z) /\ ((first_primes (elts p4)
-  j) /\ ((((mixfix_lbrb p4 (j - 1%Z)%Z) < n1)%Z /\
-  (n1 < (2%Z * (mixfix_lbrb p4 (j - 1%Z)%Z))%Z)%Z) /\ ((number.Parity.odd
-  n1) /\ ((no_prime_in (mixfix_lbrb p4 (j - 1%Z)%Z) n1) /\ forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < k)%Z) -> ~ (number.Divisibility.divides
-  (mixfix_lbrb p4 i) n1)))))) -> (((ZArith.BinInt.Z.rem n1 (mixfix_lbrb p4
-  k)) = 0%Z) -> ~ (number.Prime.prime n1))))).
+Theorem prime_numbers'vc :
+  forall (m:Numbers.BinNums.Z), (2%Z <= m)%Z ->
+  let p := make m 0%Z in
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < m)%Z ->
+   ((mixfix_lbrb p i) = 0%Z)) /\
+  ((length p) = m) -> forall (p1:array Numbers.BinNums.Z),
+  ((length p1) = (length p)) ->
+  ((elts p1) = (map.Map.set (elts p) 0%Z 2%Z)) /\
+  (p1 = (mixfix_lblsmnrb p 0%Z 2%Z)) -> forall (p2:array Numbers.BinNums.Z),
+  ((length p2) = (length p1)) ->
+  ((elts p2) = (map.Map.set (elts p1) 1%Z 3%Z)) /\
+  (p2 = (mixfix_lblsmnrb p1 1%Z 3%Z)) ->
+  let o := (m - 1%Z)%Z in
+  (2%Z <= (o + 1%Z)%Z)%Z ->
+  forall (n:Numbers.BinNums.Z) (p3:array Numbers.BinNums.Z),
+  ((length p3) = (length p2)) -> forall (j:Numbers.BinNums.Z),
+  ((2%Z <= j)%Z /\ (j <= o)%Z) /\
+  first_primes (elts p3) j /\
+  (((mixfix_lbrb p3 (j - 1%Z)%Z) < n)%Z /\
+   (n < (2%Z * (mixfix_lbrb p3 (j - 1%Z)%Z))%Z)%Z) /\
+  number.Parity.odd n /\ no_prime_in (mixfix_lbrb p3 (j - 1%Z)%Z) n ->
+  forall (n1:Numbers.BinNums.Z) (p4:array Numbers.BinNums.Z),
+  ((length p4) = (length p3)) -> forall (k:Numbers.BinNums.Z),
+  ((1%Z <= k)%Z /\ (k < j)%Z) /\
+  first_primes (elts p4) j /\
+  (((mixfix_lbrb p4 (j - 1%Z)%Z) < n1)%Z /\
+   (n1 < (2%Z * (mixfix_lbrb p4 (j - 1%Z)%Z))%Z)%Z) /\
+  number.Parity.odd n1 /\
+  no_prime_in (mixfix_lbrb p4 (j - 1%Z)%Z) n1 /\
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < k)%Z ->
+   ~ number.Divisibility.divides (mixfix_lbrb p4 i) n1) ->
+  ((ZArith.BinInt.Z.rem n1 (mixfix_lbrb p4 k)) = 0%Z) ->
+  ~ number.Prime.prime n1.
 Proof.
 intros m h1 p (h2,h3) p1 h4 h5 p2 h6 h7 o h8 n p3 h9 j
 ((h10,h11),(h12,((h13,h14),(h15,h16)))) n1 p4 h17 k
@@ -121,4 +148,3 @@ rewrite <- H1.
 apply H3; omega.
 omega.
 Qed.
-

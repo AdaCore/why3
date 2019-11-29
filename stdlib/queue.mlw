@@ -1,0 +1,73 @@
+
+(** {1 Polymorphic mutable queues}
+
+    The module `Queue` below is mapped to OCaml's standard library
+    module `Queue` by Why3's extraction.
+
+    Independently, a Why3 implementation of this module is also
+    provided in examples/queue_two_lists.mlw.
+*)
+
+module Queue
+
+  use seq.Seq
+  use mach.peano.Peano
+  use int.Int
+
+  type t 'a = abstract {
+    mutable seq: Seq.seq 'a;
+  }
+
+  meta coercion function seq
+
+  val create () : t 'a
+    ensures { result = empty }
+
+  val push (x: 'a) (q: t 'a) : unit
+    writes { q }
+    ensures { q = snoc (old q) x }
+
+  exception Empty
+
+  val pop (q: t 'a) : 'a
+    writes { q }
+    ensures { old q <> empty }
+    ensures { result = (old q)[0] }
+    ensures { q = (old q)[1 ..] }
+    raises  { Empty -> q = old q = empty }
+
+  val peek (q: t 'a) : 'a
+    ensures { q <> empty }
+    ensures { result = q[0] }
+    raises  { Empty -> q = empty }
+
+  val safe_pop (q: t 'a) : 'a
+    requires { q <> empty }
+    writes { q }
+    ensures { result = (old q)[0] }
+    ensures { q = (old q)[1 ..] }
+
+  val safe_peek (q: t 'a) : 'a
+    requires { q <> empty }
+    ensures { result = q[0] }
+
+  val clear (q: t 'a) : unit
+    writes  { q }
+    ensures { q = empty }
+
+  val copy (q: t 'a) : t 'a
+    ensures { result == q }
+
+  val is_empty (q: t 'a) : bool
+    ensures { result <-> (q = empty) }
+
+  val length (q: t 'a) : Peano.t
+    ensures { result = length q }
+
+  val transfer (q1 q2: t 'a) : unit
+    writes  { q1, q2 }
+    ensures { q1 = empty }
+    ensures { q2 = (old q2) ++ (old q1) }
+
+end
+

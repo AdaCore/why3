@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,7 +18,7 @@
     Referred to as "traditional tags" encoding t in Blanchette et al.,
     Encoding monomorphic and polymorphic types, TACAS 2013, LNCS 7795. *)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term

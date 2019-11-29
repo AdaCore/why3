@@ -28,7 +28,7 @@ end
 
 module AddListRec
 
-use import SumList
+use SumList
 
 let rec sum (l: list or_integer_float) : (int, real) =
   { true }
@@ -57,8 +57,8 @@ end
 
 module AddListImp
 
-use import SumList
-use import module ref.Ref
+use SumList
+use module ref.Ref
 
 exception Break
 

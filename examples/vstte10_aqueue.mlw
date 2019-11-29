@@ -8,9 +8,9 @@
 
 module AmortizedQueue
 
-  use import int.Int
-  use import option.Option
-  use import list.ListRich
+  use int.Int
+  use option.Option
+  use list.ListRich
 
   type queue 'a = { front: list 'a; lenf: int;
                     rear : list 'a; lenr: int; }
@@ -24,27 +24,27 @@ module AmortizedQueue
     ensures { sequence result = Nil }
   = { front = Nil; lenf = 0; rear = Nil; lenr = 0 }
 
-  let head (q: queue 'a)
+  let head (q: queue 'a) : 'a
     requires { sequence q <> Nil }
-    ensures { hd (sequence q) = Some result }
+    ensures  { hd (sequence q) = Some result }
   = let Cons x _ = q.front in x
 
-  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int)
+  let create (f: list 'a) (lf: int) (r: list 'a) (lr: int) : queue 'a
     requires { lf = length f /\ lr = length r }
-    ensures { sequence result = f ++ reverse r }
+    ensures  { sequence result = f ++ reverse r }
   = if lf >= lr then
       { front = f; lenf = lf; rear = r; lenr = lr }
     else
       let f = f ++ reverse r in
       { front = f; lenf = lf + lr; rear = Nil; lenr = 0 }
 
-  let tail (q: queue 'a)
+  let tail (q: queue 'a) : queue 'a
     requires { sequence q <> Nil }
-    ensures { tl (sequence q) = Some (sequence result) }
+    ensures  { tl (sequence q) = Some (sequence result) }
   = let Cons _ r = q.front in
     create r (q.lenf - 1) q.rear q.lenr
 
-  let enqueue (x: 'a) (q: queue 'a)
+  let enqueue (x: 'a) (q: queue 'a) : queue 'a
     ensures { sequence result = sequence q ++ Cons x Nil }
   = create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
 

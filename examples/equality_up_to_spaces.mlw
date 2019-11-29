@@ -1,0 +1,68 @@
+
+(** Check that two strings are equal up to space characters.
+
+    This problem was suggested by Rustan Leino (Amazon Web Services).
+    The trick is in finding a loop invariant that makes the proof easy.
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use seq.Seq
+use seq.FreeMonoid
+
+type char
+val constant space: char
+val function eq (x y: char): bool ensures { result <-> x = y }
+type char_string = seq char
+
+(** The specification uses a function `remove_spaces`.
+    It is recursively defined over a string, from left to right. *)
+
+let rec function remove_spaces (s: char_string) : char_string
+  variant { length s }
+=      if length s = 0  then s
+  else if eq s[0] space then remove_spaces s[1..]
+                        else cons s[0] (remove_spaces s[1..])
+
+(** Code and proof.
+
+   It would be natural to have a loop invariant such as
+
+     remove_spaces x[..i] = remove_spaces y[..j]
+
+   Unfortunately, since `remove_spaces` is defined recursively from
+   left to right, we would have hard time proving such an invariant.
+   So instead we use an invariant which refers to the *suffixes* of `x`
+   and `y`. *)
+
+let rec compare_up_to_spaces (x y: char_string) : bool
+  ensures { result <-> remove_spaces x = remove_spaces y }
+= let n = length x in
+  let m = length y in
+  let ref i = 0 in
+  let ref j = 0 in
+  while i < n || j < m do
+    invariant { 0 <= i <= n }
+    invariant { 0 <= j <= m }
+    invariant { remove_spaces x      = remove_spaces y
+            <-> remove_spaces x[i..] = remove_spaces y[j..] }
+    variant   { n - i + m - j }
+    if i < n && eq x[i] space then begin
+      assert { remove_spaces x[i..] == remove_spaces x[i+1..] };
+      i <- i + 1
+    end else if j < m && eq y[j] space then begin
+      assert { remove_spaces y[j..] == remove_spaces y[j+1..] };
+      j <- j + 1
+    end else begin
+      assert { i < n ->
+               remove_spaces x[i..] == cons x[i] (remove_spaces x[i+1..]) };
+      assert { j < m ->
+               remove_spaces y[j..] == cons y[j] (remove_spaces y[j+1..]) };
+      if i = n || j = m then return false;
+      if not (eq x[i] y[j]) then return false;
+      i <- i + 1;
+      j <- j + 1
+    end
+  done;
+  return true

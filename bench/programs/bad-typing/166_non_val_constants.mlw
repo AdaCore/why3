@@ -1,0 +1,5 @@
+type t
+constant a : t
+val function f t : int
+use ref.Ref
+let test (x:ref int) : unit = x := f a

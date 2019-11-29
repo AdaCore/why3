@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -50,8 +50,12 @@ let get loc = loc
 
 let dummy_position = ("",0,0,0)
 
-let join (f1,l1,b1,e1) (f2,_,b2,e2) =
-  assert (f1 = f2); (f1,l1,b1,e1+e2-b2)
+let join (f1,l1,b1,e1) (f2,l2,_b2,e2) =
+  assert (f1 = f2);
+  if l1 = l2 then (f1,l1,b1,e2)
+  else
+    (* There is no way to get an always right join in this case *)
+    (f1, l1, b1, e1 + e2)
 
 let extract (b,e) =
   let f = b.pos_fname in
@@ -110,15 +114,7 @@ let try7 ?loc f x y z t u v w =
 exception Message of string
 
 let errorm ?loc f =
-  let buf = Buffer.create 512 in
-  let fmt = Format.formatter_of_buffer buf in
-  Format.kfprintf
-    (fun _ ->
-       Format.pp_print_flush fmt ();
-       let s = Buffer.contents buf in
-       Buffer.clear buf;
-       error ?loc (Message s))
-    fmt ("@[" ^^ f ^^ "@]")
+  Format.kasprintf (fun s -> error ?loc (Message s)) ("@[" ^^ f ^^ "@]")
 
 let () = Exn_printer.register
   (fun fmt exn -> match exn with

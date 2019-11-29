@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="nistonacci.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="nist&#39;vc" expl="VC for nist" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="4"/></proof>
+ </goal>
+ <goal name="nistonacci&#39;vc" expl="VC for nistonacci" proved="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="98"/></proof>
+ </goal>
+ <goal name="nist_ge_n&#39;vc" expl="VC for nist_ge_n" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="13"/></proof>
+ </goal>
+ <goal name="test" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

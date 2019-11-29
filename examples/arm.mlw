@@ -2,9 +2,9 @@
 
 module M
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
+  use int.Int
+  use ref.Refint
+  use array.Array
 
   val a : array int
 
@@ -48,7 +48,7 @@ module ARM
   (* memory *)
   val mem : ref (map int int)
   val mem_ldr (a:int) : int ensures { result = !mem[a] }
-  val mem_str (a:int) (v:int) : int writes { mem }
+  val mem_str (a:int) (v:int) : (_r: int) writes { mem }
     ensures { !mem = (old !mem)[a <- v] }
 
   (* data segment *)
@@ -98,7 +98,7 @@ main:
 
 module InsertionSortExample
 
-  use import ARM
+  use ARM
 
   (* i = fp-16
      j = fp-20

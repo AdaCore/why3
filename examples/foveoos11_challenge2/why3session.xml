@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../foveoos11_challenge2.mlw" expanded="true">
-<theory name="MaximumTree" sum="252b0d85107c0220027ecae74603020a" expanded="true">
- <goal name="size_nonneg" expl="" expanded="true">
- <proof prover="2" edited="foveoos11_challenge2_WP_MaximumTree_size_nonneg_1.v"><result status="valid" time="0.30"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="foveoos11_challenge2.mlw"/>
+<theory name="MaximumTree" proved="true">
+ <goal name="size_nonneg" proved="true">
+ <proof prover="1"><path
+                    name="foveoos11_challenge2_WP_MaximumTree_size_nonneg_1.v"/><result status="valid" time="0.28"/></proof>
  </goal>
- <goal name="VC maximum" expl="VC for maximum" expanded="true">
- <proof prover="1"><result status="valid" time="0.25" steps="1474"/></proof>
+ <goal name="maximum&#39;vc" expl="VC for maximum" proved="true">
+ <proof prover="2"><result status="valid" time="0.25" steps="1354"/></proof>
  </goal>
 </theory>
 </file>

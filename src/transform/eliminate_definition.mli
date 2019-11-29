@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -25,15 +25,18 @@ val eliminate_mutual_recursion: Task.task Trans.trans
 
 (** bisection *)
 
-val bisect : (Task.task -> bool) ->
-  Task.task -> (Theory.meta * Theory.meta_arg list) list
-  (** [bisect test task] return metas that specify the symbols that
+type rem = { rem_pr : Decl.Spr.t; rem_ls : Term.Sls.t; rem_ts : Ty.Sts.t }
+
+(* unused
+val bisect : (Task.task -> bool) -> Task.task -> rem
+  (** [bisect test task] return the symbols that
       can be removed without making the task invalid for
       the function test. *)
+ *)
 
 type bisect_step =
-| BSdone of (Theory.meta * Theory.meta_arg list) list
-| BSstep of Task.task * (bool -> bisect_step)
+| BSdone of rem
+| BSstep of rem * (bool -> bisect_step)
 
 val bisect_step : Task.task -> bisect_step
 (** Same as before but doing it step by step *)

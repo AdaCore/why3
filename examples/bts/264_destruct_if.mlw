@@ -1,0 +1,87 @@
+use list.List
+use list.Length
+use int.Int
+
+constant x: int
+
+predicate p int
+
+(**********************)
+(* Simple destruction *)
+(**********************)
+
+axiom H: if x = 42 then p 1 else p 2
+
+goal g: p 0
+
+constant l: list int
+
+axiom H1: match l with
+| Nil -> p 4
+| Cons x y -> p (x+length y)
+| Cons _ (Cons y Nil) -> p y
+| Cons x (Cons y z) -> p (x+y+length z)
+| Cons _ (Cons _ (Cons _ _)) -> p 5
+end
+
+goal g1: p 1
+
+(**********************)
+(* As and or patterns *)
+(**********************)
+
+axiom H2: match l with
+| Nil -> p 1
+| Cons x Nil | Cons _ (Cons x Nil) -> p x
+| Cons _ (Cons _ _ as l1) -> p (length l1)
+end
+
+goal g2: p 2
+
+axiom H3: match l with
+| Cons _ (Cons _ _ as l1) as l2 -> p (length l1+length l2)
+| _ -> p 0
+end
+
+goal g3: p 3
+
+(*************************)
+(* Recursive destruction *)
+(*************************)
+
+axiom H4:
+  if p x then
+    (if p (x+1) then
+       p 1
+     else
+       p 2)
+  else p 3
+
+goal g4: p 4
+
+axiom H5: match l with
+| Cons x (Cons y _) ->
+  if x = y then
+    p 1 \/ p 2
+  else
+    p 3 /\ p 4
+| _ -> true
+end
+
+(*********************************************************************************)
+(* Interaction between recursive destruction of conditionals and of implications *)
+(*********************************************************************************)
+
+goal g5: p 5
+
+axiom H6: p 1 -> if p 2 then p 3 else p 4
+
+goal g6: p 6
+
+axiom H7: if p 1 then p 2 -> p 3 else p 4
+
+goal g7: p 7
+
+axiom H8: if p 1 then if p 2 then (p 3 -> p 4) else p 5 else p 6
+
+goal g8: p 8

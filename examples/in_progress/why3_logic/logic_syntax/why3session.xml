@@ -7,9 +7,9 @@
 <prover id="4" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="5" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
 <file name="../logic_syntax.mlw">
-<theory name="Defs" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="Defs">
 </theory>
-<theory name="Maps" sum="631671056649904b9453a27b5e57993e">
+<theory name="Maps">
  <goal name="WP_parameter tyl_map_def" expl="VC for tyl_map_def">
  <proof prover="0"><result status="valid" time="0.04" steps="23"/></proof>
  </goal>
@@ -23,7 +23,7 @@
  <proof prover="0"><result status="valid" time="0.04" steps="24"/></proof>
  </goal>
 </theory>
-<theory name="Substs" sum="41b79333d7461f404a8e6705cd478008">
+<theory name="Substs">
  <goal name="WP_parameter tyl_subst_def" expl="VC for tyl_subst_def">
  <proof prover="0"><result status="valid" time="0.03" steps="23"/></proof>
  </goal>
@@ -37,7 +37,7 @@
  <proof prover="0"><result status="valid" time="0.03" steps="24"/></proof>
  </goal>
 </theory>
-<theory name="VarsIn" sum="a14da3cf2fa65329fa743eadc77d5542">
+<theory name="VarsIn">
  <goal name="WP_parameter tyl_vars_in_def" expl="VC for tyl_vars_in_def">
  <proof prover="0"><result status="valid" time="0.03" steps="46"/></proof>
  </goal>
@@ -51,13 +51,13 @@
  <proof prover="0"><result status="valid" time="0.05" steps="44"/></proof>
  </goal>
 </theory>
-<theory name="FreeVars" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="FreeVars">
 </theory>
-<theory name="MapId" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="MapId">
 </theory>
-<theory name="SubstId" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="SubstId">
 </theory>
-<theory name="IdProofs" sum="f8655673e86d694726a84d476a9ccc52">
+<theory name="IdProofs">
  <goal name="WP_parameter ty_map_id" expl="VC for ty_map_id">
  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="33"/></proof>
  </goal>
@@ -131,9 +131,9 @@
  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="16"/></proof>
  </goal>
  <goal name="WP_parameter t_lift_id" expl="VC for t_lift_id">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_lift_id.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_lift_id.1.1" expl="1. assertion">
    <proof prover="1"><result status="valid" time="0.40"/></proof>
    </goal>
@@ -280,17 +280,17 @@
  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="10"/></proof>
  </goal>
 </theory>
-<theory name="MapThenMap" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="MapThenMap">
 </theory>
-<theory name="MapThenSubst" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="MapThenSubst">
 </theory>
-<theory name="SubstThenMap" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="SubstThenMap">
 </theory>
-<theory name="SubstThenSubst" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="SubstThenSubst">
 </theory>
-<theory name="MapAsSubst" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="MapAsSubst">
 </theory>
-<theory name="CommutationProofs" sum="e8a0af0c64304e4aefd038e637f2fc62">
+<theory name="CommutationProofs">
  <goal name="WP_parameter ty_map_compose" expl="VC for ty_map_compose">
  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="67"/></proof>
  </goal>
@@ -346,9 +346,9 @@
  <proof prover="0" timelimit="1"><result status="valid" time="0.05" steps="18"/></proof>
  </goal>
  <goal name="WP_parameter smap_t_lifting" expl="VC for smap_t_lifting">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter smap_t_lifting.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter smap_t_lifting.1.1" expl="1. assertion">
    <proof prover="5"><result status="valid" time="0.03"/></proof>
    </goal>
@@ -414,9 +414,9 @@
  <proof prover="0" timelimit="1"><result status="valid" time="0.07" steps="17"/></proof>
  </goal>
  <goal name="WP_parameter maps_t_lifting" expl="VC for maps_t_lifting">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter maps_t_lifting.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter maps_t_lifting.1.1" expl="1. VC for maps_t_lifting">
    <proof prover="1"><result status="valid" time="0.74"/></proof>
    </goal>
@@ -485,9 +485,9 @@
  <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="16"/></proof>
  </goal>
  <goal name="WP_parameter subst_t_lifting" expl="VC for subst_t_lifting">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter subst_t_lifting.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter subst_t_lifting.1.1" expl="1. assertion">
    <proof prover="1"><result status="valid" time="0.74"/></proof>
    </goal>
@@ -844,17 +844,17 @@
  <proof prover="0"><result status="valid" time="0.20" steps="10"/></proof>
  </goal>
 </theory>
-<theory name="VarsInFull" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="VarsInFull">
 </theory>
-<theory name="MapVarsIn" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="MapVarsIn">
 </theory>
-<theory name="SubstVarsIn" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="SubstVarsIn">
 </theory>
-<theory name="MapCong" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="MapCong">
 </theory>
-<theory name="SubstCong" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="SubstCong">
 </theory>
-<theory name="VarsInProofs" sum="bf17b06ed9403a5fff830a61cd6563dc">
+<theory name="VarsInProofs">
  <goal name="WP_parameter ty_vars_in_all" expl="VC for ty_vars_in_all">
  <proof prover="0"><result status="valid" time="0.06" steps="30"/></proof>
  </goal>
@@ -868,7 +868,7 @@
  <proof prover="0"><result status="valid" time="0.06" steps="45"/></proof>
  </goal>
  <goal name="WP_parameter t_vars_in_all" expl="VC for t_vars_in_all">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_vars_in_all.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.09" steps="108"/></proof>
   </goal>
@@ -974,7 +974,7 @@
  <proof prover="0"><result status="valid" time="0.07" steps="46"/></proof>
  </goal>
  <goal name="WP_parameter br_vars_in_all" expl="VC for br_vars_in_all">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter br_vars_in_all.1" expl="1. postcondition">
   <proof prover="0"><result status="valid" time="0.06" steps="11"/></proof>
   </goal>
@@ -996,7 +996,7 @@
  <proof prover="0"><result status="valid" time="0.10" steps="176"/></proof>
  </goal>
  <goal name="WP_parameter t_map_vars_in" expl="VC for t_map_vars_in">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_map_vars_in.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.10" steps="111"/></proof>
   </goal>
@@ -1094,7 +1094,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="9"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.33" expl="33. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_map_vars_in.33.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.08" steps="114"/></proof>
    </goal>
@@ -1170,7 +1170,7 @@
   <proof prover="0"><result status="valid" time="0.06" steps="45"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.54" expl="54. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_map_vars_in.54.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.05" steps="99"/></proof>
    </goal>
@@ -1207,7 +1207,7 @@
   <proof prover="0"><result status="valid" time="0.10" steps="105"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.62" expl="62. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_map_vars_in.62.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.07" steps="99"/></proof>
    </goal>
@@ -1244,7 +1244,7 @@
   <proof prover="0"><result status="valid" time="0.13" steps="111"/></proof>
   </goal>
   <goal name="WP_parameter t_map_vars_in.70" expl="70. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_map_vars_in.70.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.07" steps="99"/></proof>
    </goal>
@@ -1466,9 +1466,9 @@
  <proof prover="0"><result status="valid" time="0.14" steps="282"/></proof>
  </goal>
  <goal name="WP_parameter br_map_vars_in" expl="VC for br_map_vars_in">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter br_map_vars_in.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter br_map_vars_in.1.1" expl="1. assertion">
    <proof prover="0"><result status="valid" time="0.06" steps="94"/></proof>
    </goal>
@@ -1543,7 +1543,7 @@
  <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="202"/></proof>
  </goal>
  <goal name="WP_parameter t_subst_vars_in" expl="VC for t_subst_vars_in">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_subst_vars_in.1" expl="1. variant decrease">
   <proof prover="0" timelimit="1"><result status="valid" time="0.12" steps="115"/></proof>
   </goal>
@@ -1641,7 +1641,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.06" steps="11"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.33" expl="33. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_subst_vars_in.33.1" expl="1. assertion">
    <proof prover="1" timelimit="1"><result status="valid" time="1.11"/></proof>
    </goal>
@@ -1720,7 +1720,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.07" steps="50"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.54" expl="54. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_subst_vars_in.54.1" expl="1. assertion">
    <proof prover="1" timelimit="1"><result status="valid" time="0.97"/></proof>
    </goal>
@@ -1760,7 +1760,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.07" steps="85"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.62" expl="62. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_subst_vars_in.62.1" expl="1. assertion">
    <proof prover="1" timelimit="1"><result status="valid" time="0.84"/></proof>
    </goal>
@@ -1800,7 +1800,7 @@
   <proof prover="0" timelimit="1"><result status="valid" time="0.10" steps="86"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_vars_in.70" expl="70. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_subst_vars_in.70.1" expl="1. assertion">
    <proof prover="1" timelimit="1"><result status="valid" time="0.93"/></proof>
    </goal>
@@ -2025,9 +2025,9 @@
  <proof prover="0" timelimit="1"><result status="valid" time="0.13" steps="219"/></proof>
  </goal>
  <goal name="WP_parameter br_subst_vars_in" expl="VC for br_subst_vars_in">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter br_subst_vars_in.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter br_subst_vars_in.1.1" expl="1. assertion">
    <proof prover="1" timelimit="1"><result status="valid" time="0.91"/></proof>
    </goal>
@@ -2081,7 +2081,7 @@
  <proof prover="0"><result status="valid" time="0.12" steps="118"/></proof>
  </goal>
  <goal name="WP_parameter t_subst_congruence" expl="VC for t_subst_congruence">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter t_subst_congruence.1" expl="1. variant decrease">
   <proof prover="0"><result status="valid" time="0.14" steps="115"/></proof>
   </goal>
@@ -2179,7 +2179,7 @@
   <proof prover="0"><result status="valid" time="0.07" steps="25"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_congruence.33" expl="33. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_subst_congruence.33.1" expl="1. assertion">
    <proof prover="1"><result status="valid" time="0.61"/></proof>
    </goal>
@@ -2261,7 +2261,7 @@
   <proof prover="0"><result status="valid" time="0.09" steps="19"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_congruence.54" expl="54. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_subst_congruence.54.1" expl="1. assertion">
    <proof prover="1"><result status="valid" time="0.65"/></proof>
    </goal>
@@ -2304,7 +2304,7 @@
   <proof prover="0"><result status="valid" time="0.13" steps="58"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_congruence.62" expl="62. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_subst_congruence.62.1" expl="1. assertion">
    <proof prover="1"><result status="valid" time="0.58"/></proof>
    </goal>
@@ -2347,7 +2347,7 @@
   <proof prover="0"><result status="valid" time="0.14" steps="60"/></proof>
   </goal>
   <goal name="WP_parameter t_subst_congruence.70" expl="70. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter t_subst_congruence.70.1" expl="1. assertion">
    <proof prover="1"><result status="valid" time="0.52"/></proof>
    </goal>
@@ -2575,9 +2575,9 @@
  <proof prover="0"><result status="valid" time="0.12" steps="118"/></proof>
  </goal>
  <goal name="WP_parameter br_subst_congruence" expl="VC for br_subst_congruence">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter br_subst_congruence.1" expl="1. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter br_subst_congruence.1.1" expl="1. assertion">
    <proof prover="1"><result status="valid" time="0.59"/></proof>
    </goal>
@@ -2766,9 +2766,9 @@
  <proof prover="0"><result status="valid" time="0.07" steps="16"/></proof>
  </goal>
 </theory>
-<theory name="FreeVarsIn" sum="d41d8cd98f00b204e9800998ecf8427e">
+<theory name="FreeVarsIn">
 </theory>
-<theory name="FreeVarsInProof" sum="bc3ab3a6761eae4d72a00aad331a6abb">
+<theory name="FreeVarsInProof">
  <goal name="WP_parameter pat_pv_free_var_minimal" expl="VC for pat_pv_free_var_minimal">
  <proof prover="0"><result status="valid" time="0.25" steps="615"/></proof>
  </goal>

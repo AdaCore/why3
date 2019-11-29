@@ -1,7 +1,7 @@
 module Rmbt
-  use import int.Int
-  use import ref.Ref
-  use import bv.BV64
+  use int.Int
+  use ref.Ref
+  use bv.BV64
 
   let ghost rightmost_position_set (a : t) : t
     requires { a <> zeros }

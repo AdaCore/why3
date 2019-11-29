@@ -1,0 +1,56 @@
+module Ref
+
+  type ref1 = { mutable contents : int }
+
+  function (!) (x: ref1) : int = x.contents
+
+  let ref1 (v: int) ensures { result = { contents = v } } = { contents = v }
+
+  let (!) (r:ref1) ensures { result = !r } = r.contents
+
+  let (:=) (r:ref1) (v:int) ensures { !r = v } = r.contents <- v
+
+end
+
+module M
+  use list.List
+  use int.Int
+  use Ref
+
+  let test_post (x: int) (y: ref1): unit
+    ensures { old !y >= x }
+      =
+      y := x - 1 + !y
+
+  let test_post2 (x: int) (y: ref1): unit
+    requires { x > 42 }
+    ensures { old !y > !y + x }
+      =
+      y := x - 1 + !y
+
+
+  (**********************************************************
+   ** Getting counterexamples for terms of primitive types **
+   **********************************************************)
+  val y :ref1
+
+  let incr (x23: ref1): unit
+  ensures { !x23 = old !x23 + 2 + !y }
+  =
+  y := !y + 1;
+  x23 := !x23 + 1;
+  x23 := !x23 + 1
+
+  let test_loop (x: ref1): unit
+  ensures { !x < old !x }
+  =
+  label L in
+  incr x;
+  label M in
+  while !x > 0 do
+  invariant { !x > !x at L + !x at M }
+  variant { !x }
+    x := !x - 1
+  done
+
+end

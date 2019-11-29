@@ -1,14 +1,14 @@
 
 module Implementation
 
-use import int.Int
-use import int.ComputerDivision
-(*use import map.Map*)
+use int.Int
+use int.ComputerDivision
+(*use map.Map*)
 
-use import heap_model.Model
-use import bag_of_integers.Bag_integers
-use import elements.Elements
-use import heap.Heap
+use heap_model.Model
+use bag_of_integers.Bag_integers
+use elements.Elements
+use heap.Heap
 
 let rec lemma is_heap_min (a:map) (n :int)
   requires { n > 0 }
@@ -17,7 +17,7 @@ let rec lemma is_heap_min (a:map) (n :int)
   ensures { A.([]) a 0 = min_bag (model (a, n)) }
 = if n > 1 then is_heap_min a (n-1)
 
-use import ref.Ref
+use ref.Ref
 
 (* implementation of heaps *)
 let create () : ref logic_heap

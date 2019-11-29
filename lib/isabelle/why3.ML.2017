@@ -31,6 +31,11 @@ fun get_name'' atts =
 
 fun get_name' atts = (get_name atts, get_name'' atts);
 
+fun get_opt_name atts =
+  case get_opt_att "name" atts of
+    NONE => NONE
+  | SOME name => SOME (name, get_name'' atts);
+
 fun variant fs (XML.Elem ((s, atts), ts)) =
       (case AList.lookup (op =) fs s of
          SOME f => (f atts ts handle General.Match =>
@@ -137,7 +142,7 @@ datatype decl =
   | Typedecl of name * string list * typ option
   | Param of name * typ
   | Definition of name' * term
-  | Datatype of (name * string list * (name * typ list) list) list
+  | Datatype of (name * string list * (name * (name option * typ) list) list) list
   | Inductive of bool * (name * typ * (name * term) list) list
   | Function of (name' * term list) list
 
@@ -182,7 +187,7 @@ structure Why3_Data = Theory_Data
     {theories: tables Symtab.table,
      env:
        {thyname: string,
-        decls: decl list,
+        decls: (decl * Timing.timing) list,
         vcs: (thm list option * term list * term list) Symtab.table} option}
   val empty : T = {theories = Symtab.empty, env = NONE}
   val extend = I
@@ -337,7 +342,7 @@ fun prep_datatypes ctxt dts =
     Typedecl.basic_typedecl {final = true} (Binding.name s, length args, NoSyn) #>
     snd #> Local_Theory.background_theory (add_type s)) dts ctxt
   in map (fn (b, args, constrs) =>
-    (b, args, map (apsnd (map (read_type ctxt'))) constrs)) dts
+    (b, args, map (apsnd (map (apsnd (read_type ctxt')))) constrs)) dts
   end;
 
 fun read_statement ctxt f atts [prems, concls] = f
@@ -352,9 +357,6 @@ val gen_head_of_eqn =
 
 val head_of_eqn = gen_head_of_eqn #> dest_Free;
 val head_of_eqn' = gen_head_of_eqn #> dest_Const;
-
-fun globalize f thy =
-  Local_Theory.exit_global (f (Named_Target.theory_init thy));
 
 (* split up term containing case combinators into several terms *)
 fun expand_cases ctxt t =
@@ -414,7 +416,9 @@ fun read_decl ctxt = variant
           read_ty_params params,
           elem "constrs"
             (K (map (elem "constr" (fn atts => fn ys =>
-               (get_name' atts, ys))))) constrs))) xs))),
+               (get_name' atts,
+                map (elem "carg" (fn atts => fn [z] =>
+                  (get_opt_name atts, z))) ys))))) constrs))) xs))),
    ("inductive", fn atts => fn xs => Inductive
       (get_bool "coind" atts,
        map (elem "pred" (fn atts => fn ty :: rls =>
@@ -492,10 +496,12 @@ fun pretty_decl (p, f) ctxt (Lemma ((s, _), prems, concls)) =
          [pretty_typ s args,
           Pretty.str " =", Pretty.brk 1] @
           Pretty.separate " |"
-            (map (fn ((s', _), Ts) => Pretty.block
-                 (separate (Pretty.brk 1) (Pretty.str s' ::
-                    (map (Pretty.quote o
-                       Syntax.pretty_typ ctxt) Ts))))
+            (map (fn ((s', _), cargs) => Pretty.block
+                 (separate (Pretty.brk 1) (Pretty.str s' :: (map
+                    (fn (NONE, T) => Pretty.quote (Syntax.pretty_typ ctxt T)
+                      | (SOME (sel, _), T) => Pretty.enclose "(" ")"
+                          [Pretty.str sel, Pretty.str " :", Pretty.brk 1,
+                           Pretty.quote (Syntax.pretty_typ ctxt T)]) cargs))))
                constrs))))
   | pretty_decl _ ctxt (Inductive (coind, preds)) =
       let val ctxt' = fold (fold (Variable.auto_fixes o snd) o #3) preds ctxt
@@ -535,18 +541,79 @@ fun path_of_decl (Lemma ((_, SOME (s, _)), _, _)) = s
   | path_of_decl (Function ((SOME (s, _), _) :: _)) = s
   | path_of_decl _ = "local";
 
-fun show_status thy sel =
+val why3_timing = Attrib.setup_config_bool @{binding "why3_timing"} (K false);
+
+fun pretty_decl_timing sel ctxt (d, (tm, tm')) =
+  case pretty_decl sel ctxt d of
+    NONE => NONE
+  | SOME pr => SOME
+      (if Config.get ctxt why3_timing then
+         Pretty.chunks2
+           [pr, Pretty.enclose "(" ")"
+              [Pretty.str (Timing.message tm),
+               Pretty.str ",", Pretty.brk 1, Pretty.str "total: ",
+               Pretty.str (Timing.message tm')]]
+       else pr);
+
+fun sum_timing
+  {elapsed = elapsed1, cpu = cpu1, gc = gc1}
+  {elapsed = elapsed2, cpu = cpu2, gc = gc2} =
+  {elapsed = elapsed1 + elapsed2, cpu = cpu1 + cpu2, gc = gc1 + gc2};
+
+val zero_timing = {elapsed = Time.zeroTime, cpu = Time.zeroTime, gc = Time.zeroTime};
+
+fun pretty_decls thy sel decls =
+  let
+    val ctxt = Proof_Context.init_global thy;
+    val decls' = AList.coalesce (op =)
+      (fst (fold_map (fn (d, tm) => fn tm' =>
+         let val tm'' = sum_timing tm tm'
+         in ((path_of_decl d, (d, (tm, tm''))), tm'') end)
+         decls zero_timing))
+  in
+    Pretty.chunks2 (maps (fn (s, ds) =>
+      Pretty.str ("(**** " ^ s ^ " ****)") ::
+      map_filter (pretty_decl_timing sel ctxt) ds) decls')
+  end;
+
+fun add_type_names (Type (s, Ts)) = insert (op =) (Long_Name.base_name s) #> fold add_type_names Ts
+  | add_type_names _ = I;
+
+val add_term_names = fold_term_types
+  (fn (Const (s, _)) =>
+        apfst (insert (op =) (Long_Name.base_name s)) oo apsnd o add_type_names
+    | _ => apsnd o add_type_names);
+
+fun add_decl_names (Lemma (_, prems, concls)) =
+      fold add_term_names prems #> fold add_term_names concls
+  | add_decl_names (Axiom (_, ts)) = fold add_term_names ts
+  | add_decl_names (Typedecl ((s, _), _, opT)) =
+      apsnd (insert (op =) s #> (case opT of SOME T => add_type_names T | _ => I))
+  | add_decl_names (Param ((s, _), T)) =
+      apfst (insert (op =) s) #> apsnd (add_type_names T)
+  | add_decl_names (Definition (_, eqn)) =
+      apfst (insert (op =) (fst (head_of_eqn eqn))) #> add_term_names eqn
+  | add_decl_names (Datatype dts) = fold (fn ((tyname, _), _, constrs) =>
+      apsnd (insert (op =) tyname) #> fold (fn ((cname, _), cargs) =>
+        apfst (insert (op =) cname) #> fold
+          (fn (NONE, T) => apsnd (add_type_names T)
+            | (SOME (sel, _), T) => apfst (insert (op =) sel) #> apsnd (add_type_names T))
+          cargs) constrs) dts
+  | add_decl_names (Inductive (_, preds)) = fold (fn ((s, _), _, intrs) =>
+      apfst (insert (op =) s) #> fold (add_term_names o snd) intrs) preds
+  | add_decl_names (Function eqnss) = fold (fn (_, eqns) =>
+      apfst (insert (op =) (fst (head_of_eqn (hd eqns)))) #>
+      fold add_term_names eqns) eqnss;
+
+fun mk_decl_filter (p, s) = filter (fn (decl, _) => p s (add_decl_names decl ([], [])));
+
+fun has_cname s (cnames, _) = exists (String.isSubstring s) cnames;
+fun has_tyname s (_, tynames) = exists (String.isSubstring s) tynames;
+fun has_name s names = has_cname s names orelse has_tyname s names;
+
+fun show_status thy (flt, sel) =
   (case Why3_Data.get thy of
-     {env = SOME {decls, ...}, ...} =>
-       let
-         val ctxt = Proof_Context.init_global thy;
-         val decls' = AList.coalesce (op =)
-           (map (fn d => (path_of_decl d, d)) decls)
-       in
-         Pretty.writeln (Pretty.chunks2 (maps (fn (s, ds) =>
-           Pretty.str ("(**** " ^ s ^ " ****)") ::
-           map_filter (pretty_decl sel ctxt) ds) decls'))
-       end
+     {env = SOME {decls, ...}, ...} => Pretty.writeln (pretty_decls thy sel (flt decls))
    | _ => ());
 
 
@@ -578,6 +645,68 @@ fun err_decl thy s decl =
     [Pretty.str s, Pretty.fbrk, Pretty.fbrk,
      the (pretty_decl (K true, K "") (Proof_Context.init_global thy) decl)])));
 
+fun make_record_aux rname cname
+      ({fields as (fname, _) :: _, extension = (ext_name, _),
+        args, select_convs, ...} : Record.info) thy =
+      let
+        val fields' = map fst fields @ [Long_Name.map_base_name (K "more") fname];
+        val [a, b] = Name.variant_list (map fst args) ["'a", "'b"];
+        val aT = TFree (a, @{sort type});
+        val bT = TFree (b, @{sort type});
+        val argsT = map TFree args;
+        val rT = Type (ext_name, argsT @ [aT]);
+        val rT' = Type (ext_name, argsT @ [HOLogic.unitT]);
+        val fld_names = map (Long_Name.base_name o fst) fields;
+        val Us = map snd fields;
+        val Ts = Us @ [aT];
+        val fT = Ts ---> bT;
+        val fN = singleton (Name.variant_list fld_names) "f";
+        val f = Free (fN, fT);
+        val x = Free ("x", rT);
+        val xs' = map Free (fld_names ~~ Us);
+        val xs = xs' @ [Free ("more", aT)];
+
+        val ((_, (_, case_def)), lthy1) = thy |> Named_Target.theory_init |>
+          Specification.definition NONE [] []
+            (Binding.empty_atts,
+             HOLogic.mk_Trueprop (HOLogic.mk_eq
+               (Free (rname ^ "_case", fT --> rT --> bT) $ f $ x,
+                list_comb (f, map2 (fn s => fn T => Const (s, rT --> T) $ x) fields' Ts))));
+
+        val case_eq = Goal.prove_sorry lthy1 (fN :: "more" :: fld_names) []
+          (HOLogic.mk_Trueprop (HOLogic.mk_eq
+             (Free (rname ^ "_case", fT --> rT --> bT) $ f $
+                list_comb (Const (ext_name, Ts ---> rT), xs),
+              list_comb (f, xs))))
+          (fn {context, ...} =>
+             simp_tac (put_simpset HOL_basic_ss context addsimps (case_def :: select_convs)) 1);
+
+        val case_name = Sign.intern_const (Proof_Context.theory_of lthy1) (rname ^ "_case")
+      in
+        lthy1 |>
+        Local_Theory.note
+          ((Binding.name (rname ^ "_case_eq"),
+           [Attrib.internal (K Simplifier.simp_add)]), [case_eq]) |> snd |>
+        Specification.abbreviation Syntax.mode_input NONE []
+          (Logic.mk_equals
+             (list_comb (Free (cname, Us ---> rT'), xs'),
+              list_comb (Const (ext_name, Us ---> HOLogic.unitT --> rT'),
+                xs' @ [HOLogic.unit]))) false |>
+        Local_Theory.exit_global |>
+        Context.theory_map (Case_Translation.register
+          (Const (case_name, fT --> rT --> bT)) [Const (ext_name, Ts ---> rT)])
+      end
+  | make_record_aux _ _ _ _ = error "make_record_aux: internal error";
+
+fun make_record rname args cname flds thy =
+  let val thy' = Record.add_record {overloaded = false}
+    (args, Binding.name rname) NONE
+    (map (fn (fname, T) => (Binding.name fname, T, NoSyn)) flds) thy;
+  in
+    make_record_aux rname cname
+      (Record.the_info thy' (Sign.full_name thy' (Binding.name rname))) thy'
+  end;
+
 fun add_axioms s [t] =
       Specification.axiom ((fact_binding s, []), t) #> snd
   | add_axioms s ts =
@@ -586,6 +715,36 @@ fun add_axioms s [t] =
            ((fact_binding (s ^ "_" ^ string_of_int (i + 1)), []), t)) ts) #>
       apfst (pair (fact_binding s)) #>
       uncurry Global_Theory.store_thms #> snd;
+
+fun dest_record thy [((s, _), args, [((cname, _), cargs)])] =
+      let val tyname = Sign.full_name thy (Binding.name s)
+      in
+        if forall (fn (sel, T) => is_some sel andalso not (exists_subtype
+          (fn Type (tyname', _) => tyname = tyname' | _ => false) T)) cargs
+        then SOME (s, args, cname, map (apfst (fst o the)) cargs)
+        else NONE
+      end
+  | dest_record _ _ = NONE;
+
+fun get_dt_spec thy err s =
+  case Ctr_Sugar.ctr_sugar_of_global thy s of
+    SOME {T, ctrs, selss, ...} =>
+      let
+        val ctrs' = map (apsnd binder_types o dest_Const) ctrs;
+        val selss' = (case selss of
+            [] => map (map (K NONE) o snd) ctrs'
+          | _ => map (map (SOME o fst o dest_Const)) selss)
+      in
+        (snd (dest_Type T),
+         map2 (fn (cname, cargs) => fn sels => (cname, sels ~~ cargs)) ctrs' selss',
+         NONE)
+      end
+  | NONE => (case Record.get_info thy s of
+      SOME (info as {args, fields, ...}) =>
+        (map TFree args, [("", map (apfst SOME) fields)], SOME info)
+    | NONE => err ());
+
+val why3_records = Attrib.setup_config_bool @{binding "why3_records"} (K true);
 
 fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
       (case lookup_thm thy id of
@@ -602,13 +761,13 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
            if realize then (thy, false) else
            (case lookup_type' thy id of
               NONE =>
-                (thy |> globalize (Typedecl.typedecl {final = true}
+                (thy |> Named_Target.theory_map (Typedecl.typedecl {final = true}
                    (Binding.name s, map (rpair dummyS) args, NoSyn) #> snd) |>
                  add_type s,
                  true)
             | SOME s' => (add_type_raw NONE (s, s') thy, false))
        | SOME T =>
-           (thy |> globalize (Typedecl.abbrev
+           (thy |> Named_Target.theory_map (Typedecl.abbrev
               (Binding.name s, args, NoSyn) T #> snd) |>
             add_type s,
             true))
@@ -626,7 +785,7 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
       in
         case lookup_def thy id of
           NONE =>
-            (thy |> globalize (Specification.definition
+            (thy |> Named_Target.theory_map (Specification.definition
                NONE [] [] (Binding.empty_atts, eqn) #> snd) |>
              add_const s,
              true)
@@ -645,40 +804,83 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
   | mk_decl _ (decl as Datatype dts) thy =
       (case lookup_list (snd o #1) (lookup_type' thy) dts of
          NONE =>
-           (thy |> BNF_LFP_Compat.add_datatype [BNF_LFP_Compat.Keep_Nesting]
-              (map (fn ((s, _), args, constrs) =>
-                 ((Binding.name s, map (rpair dummyS) args, NoSyn),
-                  map (fn ((s', _), Ts) =>
-                    (Binding.name s', Ts, NoSyn)) constrs)) dts) |> snd |>
-            fold (fn ((s, _), _, constrs) => add_type s #>
-              fold (add_const o fst o fst) constrs) dts,
-            true)
+           (case (Config.get_global thy why3_records, dest_record thy dts) of
+              (true, SOME (s, args, s', cargs)) =>
+                (thy |> make_record s (map (rpair @{sort type}) args) s' cargs |>
+                 add_type s |>
+                 add_const s' |>
+                 fold (add_const o fst) cargs,
+                 true)
+            | _ =>
+                (thy |> Named_Target.theory_map
+                   (BNF_FP_Def_Sugar.co_datatypes BNF_Util.Least_FP BNF_LFP.construct_lfp
+                      (Ctr_Sugar.default_ctr_options,
+                       map (fn ((s, _), args, constrs) =>
+                         (((((map (fn arg => (SOME Binding.empty, (TFree (arg, @{sort type}),
+                              @{sort type}))) args, Binding.name s), NoSyn),
+                            map (fn ((s', _), cargs) =>
+                              (((Binding.empty, Binding.name s'),
+                                map (fn (NONE, T) => (Binding.empty, T)
+                                      | (SOME (sel, _), T) => (Binding.name sel, T)) cargs),
+                               NoSyn)) constrs),
+                           (Binding.empty, Binding.empty, Binding.empty)),
+                          [])) dts)) |>
+                 fold (fn ((s, _), _, constrs) => add_type s #>
+                   fold (add_const o fst o fst) constrs #>
+                   fold add_const (map_filter (Option.map fst o fst) (snd (hd constrs)))) dts,
+                 true))
        | SOME dts' =>
            let val tcmap = map (fn (((s, _), _, _), s') =>
              (Sign.full_name thy (Binding.name s), s')) dts'
            in
-             (fold (fn (((s, id), args, constrs), s') =>
+             (fold (fn (((tyname, id), args, constrs), tyname') =>
                 let
-                  val (args', constrs') = BNF_LFP_Compat.the_spec thy s';
+                  val (args', constrs', opt_info) = get_dt_spec thy
+                    (fn () => err_decl thy (string_of_id id ^
+                       "must be mapped to a datatype or record type") decl) tyname';
                   fun err () = err_decl thy
                     ("Failed to match type " ^ string_of_id id) decl;
                   val _ =
                     length args = length args' andalso
                     length constrs = length constrs' orelse err ();
-                  val tvmap = args ~~ map fst args';
+                  val tvmap = args ~~ args';
 
                   fun rename (Type (tc, Ts)) = Type
                         (the_default tc (AList.lookup (op =) tcmap tc),
                          map rename Ts)
-                    | rename (TFree (a, S)) = TFree
-                        (the_default a (AList.lookup (op =) tvmap a), S)
+                    | rename (T as TFree (a, _)) =
+                        (the_default T (AList.lookup (op =) tvmap a))
                     | rename T = T
                 in
-                  add_type_raw NONE (s, s') #>
-                  fold2 (fn ((s, _), Ts) => fn (s', Us) =>
-                    if map rename Ts = Us
-                    then add_const_raw NONE (s, s')
-                    else err ()) constrs constrs'
+                  add_type_raw NONE (tyname, tyname') #>
+                  rpair [] #>
+                  fold2 (fn ((cname, _), cargs) => fn (cname', cargs') =>
+                    if map (rename o snd) cargs = map snd cargs'
+                    then
+                      apfst (case opt_info of
+                          NONE => add_const_raw NONE (cname, cname')
+                        | SOME info =>
+                            make_record_aux tyname cname info #>
+                            add_const cname) #>
+                      fold2
+                        (fn (NONE, _) => K I
+                          | (SOME (sel, _), _) =>
+                               (fn (NONE, _) => err_decl thy
+                                     ("Missing selector " ^ sel ^
+                                      " for type " ^ string_of_id id) decl
+                                 | (SOME sel', _) => (fn p as (thy', sel_map) =>
+                                     (case AList.lookup (op =) sel_map sel of
+                                        NONE =>
+                                          (add_const_raw NONE (sel, sel') thy',
+                                           (sel, sel') :: sel_map)
+                                      | SOME sel'' =>
+                                          if sel' = sel'' then p
+                                          else err_decl thy
+                                            ("Inconsistent selector " ^ sel ^
+                                             " for type " ^ string_of_id id) decl))))
+                        cargs cargs'
+                    else err ()) constrs constrs' #>
+                  fst
                 end) dts' thy,
               false)
            end)
@@ -715,10 +917,10 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
       in
         case lookup_list fst (lookup_def thy) eqnss of
           NONE =>
-            (thy |> globalize (fn lthy => Function_Fun.add_fun
+            (thy |> Named_Target.theory_map (Function_Fun.add_fun
                (map (fn (s, T) => (Binding.name s, SOME T, NoSyn)) eqnss')
                (map (fn t => ((Binding.empty_atts, t), [], [])) (maps snd eqnss))
-               Function_Fun.fun_config lthy) |>
+               Function_Fun.fun_config) |>
              fold (add_const o fst) eqnss',
              true)
         | SOME eqnss'' =>
@@ -763,7 +965,7 @@ fun put_decls decls = Why3_Data.map
            {thyname = thyname,
             decls = decls,
             vcs = print_open_vcs I (fold
-              (fn Lemma ((s, _), ps, cs) => Symtab.update_new (s, (NONE, ps, cs))
+              (fn (Lemma ((s, _), ps, cs), _) => Symtab.update_new (s, (NONE, ps, cs))
                 | _ => I) decls Symtab.empty
               handle Symtab.DUP k => error ("Verification condition " ^ k ^
                 " has already been declared."))}}
@@ -786,6 +988,16 @@ fun close incomplete thy =
     | _ => err_no_env ()) |>
   Sign.parent_path;
 
+val why3_warn_axioms = Attrib.setup_config_bool @{binding "why3_warn_axioms"} (K true);
+
+fun unrealized_axioms thy decls =
+  if Config.get_global thy why3_warn_axioms then
+    (case filter (fn (Axiom _, _) => true | _ => false) decls of
+       [] => ()
+     | decls' => warning (Pretty.string_of (Pretty.chunks2
+         [Pretty.str "Unrealized axioms", pretty_decls thy (K true, K "") decls'])))
+  else ();
+
 fun process_decls consts types x path = elem "theory" (fn atts =>
   (fn imports :: xs => elem "realized" (fn _ => fn rs => fn thy =>
         let
@@ -807,9 +1019,11 @@ fun process_decls consts types x path = elem "theory" (fn atts =>
             fold (fn x => fn (ds, thy) =>
               let
                 val d = read_decl (Named_Target.theory_init thy) x;
-                val (thy', b) = mk_decl realize d thy
-              in ((b ? cons d) ds, thy') end) xs
-        in put_decls (rev ds) thy' end) imports
+                val (tm, (thy', b)) = Timing.timing (mk_decl realize d) thy
+              in ((b ? cons (d, tm)) ds, thy') end) xs |>
+            apfst rev;
+          val _ = unrealized_axioms thy' ds
+        in put_decls ds thy' end) imports
     | _ => error "Bad theory specification")) x
 
 
@@ -854,6 +1068,11 @@ val _ =
   Outer_Syntax.command @{command_keyword "why3_status"}
     "show the name and state of all loaded verification conditions"
     (Scan.optional
+       ((   Args.$$$ "cname" >> K has_cname
+         || Args.$$$ "tyname" >> K has_tyname
+         || Args.$$$ "name" >> K has_name) --|
+        Args.colon -- Args.name >> mk_decl_filter) I --
+     Scan.optional
        (Args.parens
           (   Args.$$$ "proved" >> K (is_some, K "")
            || Args.$$$ "unproved" >> K (is_none, K "")))

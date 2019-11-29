@@ -1,6 +1,6 @@
 theory Test_simplify_array
-  use import int.Int
-  use import map.Map
+  use int.Int
+  use map.Map
   goal G1 : forall x y:int. forall m: map int int.
     get (set m y x) y = x
   goal G2 : forall x y z t:int. forall m: map int int.

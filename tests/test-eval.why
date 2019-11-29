@@ -2,7 +2,7 @@
 
 theory T
 
-  use import int.Int
+  use int.Int
 
   constant i1 : int = 42
 
@@ -26,11 +26,11 @@ theory T
 
   constant c6 : int = if 2 < 3 /\ 5 >= 6 /\ 7 > 8 \/ 9 <= 10 then 1 else 0
 
-  use import int.Abs
+  use int.Abs
 
   constant c7 : int = abs 42 + abs (-12)
 
-  use import list.List
+  use list.List
 
 (* test of the 'match' *)
 
@@ -46,7 +46,7 @@ theory T
     | Cons x (Cons y l) -> Cons y (Cons x l)
     end
 
-  use import list.Append
+  use list.Append
 
   constant l5 : list 'a = Nil ++ Nil
 
@@ -86,7 +86,7 @@ theory T
 
   constant l11 : int = puiss l10 (Cons 12 (Cons 34 (Cons 56 Nil)))
 
-  use import map.Map
+  use map.Map
 
   constant t0 : map int int = (const 42)
 
@@ -115,7 +115,7 @@ end
 
 theory Records 
 
-  use import int.Int
+  use int.Int
 
   type pt = { x : int ; y : int }
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -37,9 +37,11 @@ val ns_find_prog_symbol : namespace -> string list -> prog_symbol
 
 val ns_find_its : namespace -> string list -> itysymbol
 val ns_find_pv  : namespace -> string list -> pvsymbol
-val ns_find_rs  : namespace -> string list -> rsymbol
 val ns_find_xs  : namespace -> string list -> xsymbol
 val ns_find_ns  : namespace -> string list -> namespace
+
+(* use this only on an export namespace, which cannot have overloaded symbols *)
+val ns_find_rs  : namespace -> string list -> rsymbol
 
 type overload =
   | FixedRes of ity (* t -> t -> ... -> T *)
@@ -47,6 +49,8 @@ type overload =
   | NoOver          (* neither *)
 
 val overload_of_rs : rsymbol -> overload
+
+val ref_attr : Ident.attribute
 
 exception IncompatibleNotation of string
 
@@ -78,6 +82,7 @@ and mod_inst = {
   mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
   mi_xs  : xsymbol Mxs.t;
+  mi_df  : prop_kind;
 }
 
 val empty_mod_inst: pmodule -> mod_inst
@@ -110,6 +115,10 @@ val restore_path : ident -> string list * string * string list
    If [id] is a module name, the third component is an empty list.
    Raises Not_found if the ident was never declared in/as a module. *)
 
+val restore_module_id : ident -> pmodule
+(** retrieves a module from a program symbol defined in it
+    Raises Not_found if the ident was never declared in/as a module. *)
+
 val restore_module : theory -> pmodule
 (** retrieves a module from its underlying theory
     raises [Not_found] if no such module exists *)
@@ -139,6 +148,15 @@ val bool_module : pmodule
 val unit_module : pmodule
 val highord_module : pmodule
 val tuple_module : int -> pmodule
+val ref_module : pmodule
+
+val its_ref     : itysymbol
+val ts_ref      : tysymbol
+val rs_ref      : rsymbol
+val rs_ref_cons : rsymbol
+val rs_ref_proj : rsymbol
+val ls_ref_cons : lsymbol
+val ls_ref_proj : lsymbol
 
 (** {2 WhyML language} *)
 

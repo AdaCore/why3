@@ -1,4 +1,20 @@
-(* Driver for Alt-Ergo versions >= 0.95.2 *)
+(* Driver for Alt-Ergo versions >= 2.3.0 *)
+
+prelude "(* this is the prelude for Alt-Ergo, version >= 2.3.0 *)"
+
+
+transformation "inline_trivial"
+
+transformation "eliminate_builtin"
+transformation "eliminate_recursion"
+transformation "eliminate_inductive"
+transformation "eliminate_algebraic"
+transformation "eliminate_literal"
+transformation "eliminate_epsilon"
+transformation "eliminate_let_term"
+transformation "split_premise_right"
+transformation "simplify_formula"
+
 
 import "alt_ergo_common.drv"
 import "no-bv.gen"

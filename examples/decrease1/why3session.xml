@@ -1,82 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="Z3" version="4.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="9" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../decrease1.mlw" expanded="true">
-<theory name="Decrease1" sum="26b3c9eafcf691a57c8cf349f0349c38" expanded="true">
- <goal name="VC decrease1_induction" expl="VC for decrease1_induction" expanded="true">
- <proof prover="9"><result status="valid" time="0.02" steps="35"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="decrease1.mlw"/>
+<theory name="Decrease1" proved="true">
+ <goal name="decrease1_induction&#39;vc" expl="VC for decrease1_induction" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="35"/></proof>
  </goal>
- <goal name="VC search" expl="VC for search" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC search.1" expl="loop invariant init">
-  <proof prover="9"><result status="valid" time="0.00" steps="2"/></proof>
+ <goal name="search&#39;vc" expl="VC for search" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="search&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="VC search.2" expl="loop invariant init">
-  <proof prover="9"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="search&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC search.3" expl="index in array bounds">
-  <proof prover="9"><result status="valid" time="0.00" steps="4"/></proof>
+  <goal name="search&#39;vc.2" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC search.4" expl="postcondition">
-  <proof prover="9"><result status="valid" time="0.00" steps="12"/></proof>
+  <goal name="search&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC search.5" expl="index in array bounds">
-  <proof prover="9"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="search&#39;vc.4" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC search.6" expl="index in array bounds">
-  <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="search&#39;vc.5" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search.7" expl="loop variant decrease">
-  <proof prover="9"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="search&#39;vc.6" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC search.8" expl="loop invariant preservation">
-  <proof prover="9"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="search&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC search.9" expl="loop invariant preservation" expanded="true">
-  <proof prover="0"><result status="valid" time="0.02"/></proof>
+  <goal name="search&#39;vc.8" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="11716"/></proof>
   </goal>
-  <goal name="VC search.10" expl="loop variant decrease">
-  <proof prover="9"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="search&#39;vc.9" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC search.11" expl="loop invariant preservation">
-  <proof prover="9"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="search&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC search.12" expl="loop invariant preservation">
-  <proof prover="9"><result status="valid" time="0.00" steps="13"/></proof>
+  <goal name="search&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC search.13" expl="postcondition">
-  <proof prover="9"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="search&#39;vc.12" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC search_rec" expl="VC for search_rec" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC search_rec.1" expl="index in array bounds">
-  <proof prover="9"><result status="valid" time="0.00" steps="4"/></proof>
+ <goal name="search_rec&#39;vc" expl="VC for search_rec" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="search_rec&#39;vc.0" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
   </goal>
-  <goal name="VC search_rec.2" expl="index in array bounds">
-  <proof prover="9"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="search_rec&#39;vc.1" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC search_rec.3" expl="index in array bounds">
-  <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="search_rec&#39;vc.2" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.4" expl="variant decrease">
-  <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="search_rec&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.5" expl="precondition">
-  <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="search_rec&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.6" expl="variant decrease">
-  <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="search_rec&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.7" expl="precondition">
-  <proof prover="9"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="search_rec&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC search_rec.8" expl="postcondition" expanded="true">
-  <proof prover="0"><result status="valid" time="0.01"/></proof>
+  <goal name="search_rec&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="22635"/></proof>
   </goal>
  </transf>
  </goal>

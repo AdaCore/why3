@@ -1,0 +1,134 @@
+
+(** Support library for the Micro-C format. *)
+
+module MicroC
+
+  use int.Int
+  use ref.Ref
+  use array.Array
+
+  function length (a: array 'a) : int =
+    Array.length a
+
+  function ([]) (a: array 'a) (i: int) : 'a =
+    Array.([]) a i
+
+  function ([<-]) (a: array 'a) (i: int) (v: 'a) : array 'a =
+    Array.([<-]) a i v
+
+  let ([]) (a: array 'a) (i: int) : 'a
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    ensures  { result = a[i] }
+  = Array.([]) a i
+
+  let ([]<-) (a: array 'a) (i: int) (v: 'a) : unit
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    ensures  { a = Array.([<-]) (old a) i v }
+  = Array.([]<-) a i v
+
+  use map.Occ
+
+  function occurrence (v: 'a) (a: array 'a) : int =
+    Occ.occ v a.Array.elts 0 a.Array.length
+
+  use export int.ComputerDivision
+
+  val (/) (x y: int) : int
+    requires { [@expl:check division by zero] y <> 0 }
+    ensures  { result = div x y }
+
+  val (/=) (ref x: int) (y: int) : unit
+    requires { [@expl:check division by zero] y <> 0 }
+    ensures  { x = div (old x) y }
+
+  val (%) (x y: int) : int
+    requires { y <> 0 }
+    ensures  { result = mod x y }
+
+  (* operators ++ -- on integers *)
+  let __postinc (ref r: int) : int
+    ensures { r = old r + 1 }
+    ensures { result = old r }
+  = let v = r in r <- r + 1; v
+
+  let __postdec (ref r: int) : int
+    ensures { r = old r - 1 }
+    ensures { result = old r }
+  = let v = r in r <- r - 1; v
+
+  let __preinc (ref r: int) : int
+    ensures { result = r = old r + 1 }
+  = r <- r + 1; r
+
+  let __predec (ref r: int) : int
+    ensures { result = r = old r - 1 }
+  = r <- r - 1; r
+
+  (* operators ++ -- on array elements *)
+  let __arrpostinc (a: array int) (i: int) : int
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    ensures  { a = (old a)[i <- (old a)[i] + 1] }
+    ensures  { result = old a[i] }
+  = let v = a[i] in a[i] <- v + 1; v
+
+  let __arrpostdec (a: array int) (i: int) : int
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    ensures  { a = (old a)[i <- (old a)[i] - 1] }
+    ensures  { result = old a[i] }
+  = let v = a[i] in a[i] <- v - 1; v
+
+  let __arrpreinc (a: array int) (i: int) : int
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    ensures  { a = (old a)[i <- (old a)[i] + 1] }
+    ensures  { result = a[i] }
+  = a[i] <- a[i] + 1; a[i]
+
+  let __arrpredec (a: array int) (i: int) : int
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    ensures  { a = (old a)[i <- (old a)[i] - 1] }
+    ensures  { result = a[i] }
+  = a[i] <- a[i] - 1; a[i]
+
+  (* operators += -= on array elements *)
+  let __array_add (a: array int) (i: int) (x: int) : unit
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    ensures  { a = (old a)[i <- (old a)[i] + x] }
+  = a[i] <- a[i] + x
+
+  let __array_sub (a: array int) (i: int) (x: int) : unit
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    ensures  { a = (old a)[i <- (old a)[i] - x] }
+  = a[i] <- a[i] - x
+
+  let __array_mul (a: array int) (i: int) (x: int) : unit
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    ensures  { a = (old a)[i <- (old a)[i] * x] }
+  = a[i] <- a[i] * x
+
+  let __array_div (a: array int) (i: int) (x: int) : unit
+    requires { [@expl:index in array bounds] 0 <= i < Array.length a }
+    requires { [@expl:check division by zero] x <> 0 }
+    ensures  { a = (old a)[i <- div (old a)[i] x] }
+  = a[i] <- a[i] / x
+
+  (* to initialize stack-allocated variables *)
+
+  val any_int () : int
+
+  val alloc_array (n: int) : array int
+    requires { n >= 0 }
+    ensures  { length result = n }
+
+  (* C library *)
+
+  val rand () : int
+    ensures  { 0 <= result }
+
+  val scanf (ref r: int) : unit
+    writes { r }
+
+  exception Break
+
+  exception Return int
+
+end

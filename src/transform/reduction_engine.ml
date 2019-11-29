@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -14,36 +14,50 @@ open Term
 (* {2 Values} *)
 
 type value =
-| Term of term    (* invariant: is in normal form *)
-| Int of BigInt.t
+  | Term of term    (* invariant: is in normal form *)
+  | Int of BigInt.t
+  | Real of Number.real_value
 
-let v_label_copy orig v =
+let v_attr_copy orig v =
   match v with
   | Int _ -> v
-  | Term t -> Term (t_label_copy orig t)
-
-let ls_minus = ref ps_equ (* temporary *)
+  | Real _ -> v
+  | Term t -> Term (t_attr_copy orig t)
 
 let term_of_value v =
+  let open Number in
   match v with
   | Term t -> t
-  | Int n -> t_bigint_const n
+  | Int n -> t_int_const n
+  | Real { rv_sig = s; rv_pow2 = pow2; rv_pow5 = pow5 } -> t_real_const ~pow2 ~pow5 s
 
 exception NotNum
 
 let big_int_of_const c =
   match c with
-    | Number.ConstInt i -> Number.compute_int_constant i
-    | _ -> raise NotNum
+  | Constant.ConstInt i -> i.Number.il_int
+  | Constant.ConstReal _ -> assert false
+  | Constant.ConstStr _ -> assert false
 
 let big_int_of_value v =
   match v with
   | Int n -> n
+  | Real _ -> assert false
   | Term { t_node = Tconst c } -> big_int_of_const c
-  | Term { t_node = Tapp (ls,[{ t_node = Tconst c }]) }
-    when ls_compare ls !ls_minus = 0 -> BigInt.minus (big_int_of_const c)
-  | _ -> raise NotNum
+  | Term _ -> raise NotNum
 
+let real_of_const c =
+  match c with
+  | Constant.ConstReal r -> r.Number.rl_real
+  | Constant.ConstInt _ -> assert false
+  | Constant.ConstStr _ -> assert false
+
+let real_of_value v =
+  match v with
+  | Real r -> r
+  | Int _ -> assert false
+  | Term { t_node = Tconst c } -> real_of_const c
+  | Term _ -> raise NotNum
 
 (* {2 Builtin symbols} *)
 
@@ -77,27 +91,16 @@ let eval_int_op op simpl ls l ty =
       with NotNum | Division_by_zero ->
         simpl ls t1 t2 ty
     end
-  | _ -> assert false (* t_app_value ls l ty *)
-
-(* unused anymore, for the moment
-let simpl_none ls t1 t2 ty =
-  t_app_value ls [t1;t2] ty
-*)
+  | _ -> assert false
 
 let simpl_add _ls t1 t2 _ty =
   if is_zero t1 then t2 else
   if is_zero t2 then t1 else
   raise Undetermined
-(*
-  t_app_value ls [t1;t2] ty
-*)
 
 let simpl_sub _ls t1 t2 _ty =
   if is_zero t2 then t1 else
   raise Undetermined
-(*
-  t_app_value ls [t1;t2] ty
-*)
 
 let simpl_mul _ls t1 t2 _ty =
   if is_zero t1 then t1 else
@@ -105,31 +108,19 @@ let simpl_mul _ls t1 t2 _ty =
   if is_one t1 then t2 else
   if is_one t2 then t1 else
   raise Undetermined
-(*
-  t_app_value ls [t1;t2] ty
-*)
 
 let simpl_divmod _ls t1 t2 _ty =
   if is_zero t1 then t1 else
   if is_one t2 then t1 else
   raise Undetermined
-(*
-  t_app_value ls [t1;t2] ty
-*)
 
 let simpl_minmax _ls v1 v2 _ty =
   match v1,v2 with
   | Term t1, Term t2 ->
     if t_equal t1 t2 then v1 else
       raise Undetermined
-  (*
-    t_app_value ls [v1;v2] ty
-  *)
   | _ ->
     raise Undetermined
-(*
-  t_app_value ls [v1;v2] ty
-*)
 
 let eval_int_rel op _ls l _ty =
   match l with
@@ -144,7 +135,6 @@ let eval_int_rel op _ls l _ty =
     (*        t_app_value ls l ty *)
     end
   | _ -> assert false
-    (* t_app_value ls l ty *)
 
 let eval_int_uop op _ls l _ty =
   match l with
@@ -158,6 +148,159 @@ let eval_int_uop op _ls l _ty =
     end
   | _ -> assert false
 
+let real_align ~pow2 ~pow5 r =
+  let open Number in
+  let { rv_sig = s; rv_pow2 = p2; rv_pow5 = p5 } = r in
+  let s = BigInt.mul s (BigInt.pow_int_pos_bigint 2 (BigInt.sub p2 pow2)) in
+  let s = BigInt.mul s (BigInt.pow_int_pos_bigint 5 (BigInt.sub p5 pow5)) in
+  s
+
+let eval_real_op op simpl ls l ty =
+  match l with
+  | [t1; t2] ->
+    begin
+      try
+        let n1 = real_of_value t1 in
+        let n2 = real_of_value t2 in
+        Real (op n1 n2)
+      with NotNum ->
+        simpl ls t1 t2 ty
+    end
+  | _ -> assert false
+
+let eval_real_uop op _ls l _ty =
+  match l with
+  | [t1] ->
+    begin
+      try
+        let n1 = real_of_value t1 in
+        Real (op n1)
+      with NotNum ->
+        raise Undetermined
+    end
+  | _ -> assert false
+
+let eval_real_rel op _ls l _ty =
+  let open Number in
+  match l with
+  | [t1 ; t2] ->
+    begin
+      try
+        let n1 = real_of_value t1 in
+        let n2 = real_of_value t2 in
+        let s1, s2 =
+          let { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 } = n1 in
+          let { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } = n2 in
+          if BigInt.sign s1 <> BigInt.sign s2 then s1,s2
+          else
+            let pow2 = BigInt.min p21 p22 in
+            let pow5 = BigInt.min p51 p52 in
+            let s1 = real_align ~pow2 ~pow5 n1 in
+            let s2 = real_align ~pow2 ~pow5 n2 in
+            s1, s2 in
+        Term (to_bool (op s1 s2))
+      with NotNum ->
+        raise Undetermined
+    (*        t_app_value ls l ty *)
+    end
+  | _ -> assert false
+
+let real_0 = Number.real_value BigInt.zero
+let real_1 = Number.real_value BigInt.one
+
+let is_real t r =
+  try Number.compare_real (real_of_value t) r = 0
+  with NotNum -> false
+
+let real_opp r =
+  let open Number in
+  let { rv_sig = s; rv_pow2 = pow2; rv_pow5 = pow5 } = r in
+  real_value ~pow2 ~pow5 (BigInt.minus s)
+
+let real_add r1 r2 =
+  let open Number in
+  let { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 } = r1 in
+  let { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } = r2 in
+  if BigInt.eq s1 BigInt.zero then r2 else
+  if BigInt.eq s2 BigInt.zero then r1 else
+  let pow2 = BigInt.min p21 p22 in
+  let pow5 = BigInt.min p51 p52 in
+  let s1 = real_align ~pow2 ~pow5 r1 in
+  let s2 = real_align ~pow2 ~pow5 r2 in
+  real_value ~pow2 ~pow5 (BigInt.add s1 s2)
+
+let real_sub r1 r2 =
+  let open Number in
+  let { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 } = r1 in
+  let { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } = r2 in
+  if BigInt.eq s2 BigInt.zero then r1 else
+  if BigInt.eq s1 BigInt.zero then real_value ~pow2:p22 ~pow5:p52 (BigInt.minus s2) else
+  let pow2 = BigInt.min p21 p22 in
+  let pow5 = BigInt.min p51 p52 in
+  let s1 = real_align ~pow2 ~pow5 r1 in
+  let s2 = real_align ~pow2 ~pow5 r2 in
+  real_value ~pow2 ~pow5 (BigInt.sub s1 s2)
+
+let real_mul r1 r2 =
+  let open Number in
+  let { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 } = r1 in
+  let { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } = r2 in
+  let s = BigInt.mul s1 s2 in
+  let pow2 = BigInt.add p21 p22 in
+  let pow5 = BigInt.add p51 p52 in
+  real_value ~pow2 ~pow5 s
+
+let simpl_real_add _ls t1 t2 _ty =
+  if is_real t1 real_0 then t2 else
+  if is_real t2 real_0 then t1 else
+  raise Undetermined
+
+let simpl_real_sub _ls t1 t2 _ty =
+  if is_real t2 real_0 then t1 else
+  raise Undetermined
+
+let simpl_real_mul _ls t1 t2 _ty =
+  if is_real t1 real_0 then t1 else
+  if is_real t2 real_0 then t2 else
+  if is_real t1 real_1 then t2 else
+  if is_real t2 real_1 then t1 else
+  raise Undetermined
+
+let real_pow r1 r2 =
+  let open Number in
+  let { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 } = r1 in
+  let { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } = r2 in
+  if BigInt.le s1 BigInt.zero then
+    raise Undetermined
+  else if BigInt.lt p22 BigInt.zero || BigInt.lt p52 BigInt.zero then
+    raise NotNum
+  else
+    let s1 = try BigInt.to_int s1 with Failure _ -> raise NotNum in
+    let s2 = BigInt.mul s2 (BigInt.pow_int_pos_bigint 2 p22) in
+    let s2 = BigInt.mul s2 (BigInt.pow_int_pos_bigint 5 p52) in
+    let s =
+      if s1 = 1 then BigInt.one
+      else if BigInt.lt s2 BigInt.zero then raise NotNum
+      else BigInt.pow_int_pos_bigint s1 s2 in
+    let pow2 = BigInt.mul p21 s2 in
+    let pow5 = BigInt.mul p51 s2 in
+    Number.real_value ~pow2 ~pow5 s
+
+let simpl_real_pow _ls t1 _t2 _ty =
+  if is_real t1 real_1 then t1 else
+  raise Undetermined
+
+let real_from_int _ls l _ty =
+  match l with
+  | [t] ->
+    begin
+      try
+        let n = big_int_of_value t in
+        Real (Number.real_value n)
+      with NotNum ->
+        raise Undetermined
+    end
+  | _ -> assert false
 
 let built_in_theories =
   [
@@ -168,14 +311,14 @@ let built_in_theories =
     ] ;
 *)
     ["int"],"Int", [],
-    [ "infix +", None, eval_int_op BigInt.add simpl_add;
-      "infix -", None, eval_int_op BigInt.sub simpl_sub;
-      "infix *", None, eval_int_op BigInt.mul simpl_mul;
-      "prefix -", Some ls_minus, eval_int_uop BigInt.minus;
-      "infix <", None, eval_int_rel BigInt.lt;
-      "infix <=", None, eval_int_rel BigInt.le;
-      "infix >", None, eval_int_rel BigInt.gt;
-      "infix >=", None, eval_int_rel BigInt.ge;
+    [ Ident.op_infix "+", None, eval_int_op BigInt.add simpl_add;
+      Ident.op_infix "-", None, eval_int_op BigInt.sub simpl_sub;
+      Ident.op_infix "*", None, eval_int_op BigInt.mul simpl_mul;
+      Ident.op_prefix "-", None, eval_int_uop BigInt.minus;
+      Ident.op_infix "<", None, eval_int_rel BigInt.lt;
+      Ident.op_infix "<=", None, eval_int_rel BigInt.le;
+      Ident.op_infix ">", None, eval_int_rel BigInt.gt;
+      Ident.op_infix ">=", None, eval_int_rel BigInt.ge;
     ] ;
     ["int"],"MinMax", [],
     [ "min", None, eval_int_op BigInt.min simpl_minmax;
@@ -189,6 +332,19 @@ let built_in_theories =
     [ "div", None, eval_int_op BigInt.euclidean_div simpl_divmod;
       "mod", None, eval_int_op BigInt.euclidean_mod simpl_divmod;
     ] ;
+    ["real"], "Real", [],
+    [ Ident.op_prefix "-", None, eval_real_uop real_opp;
+      Ident.op_infix "+", None, eval_real_op real_add simpl_real_add;
+      Ident.op_infix "-", None, eval_real_op real_sub simpl_real_sub;
+      Ident.op_infix "*", None, eval_real_op real_mul simpl_real_mul;
+      Ident.op_infix "<", None, eval_real_rel BigInt.lt;
+      Ident.op_infix "<=", None, eval_real_rel BigInt.le;
+      Ident.op_infix ">", None, eval_real_rel BigInt.gt;
+      Ident.op_infix ">=", None, eval_real_rel BigInt.ge ] ;
+    ["real"], "FromInt", [],
+    [ "from_int", None, real_from_int ] ;
+    ["real"], "PowerReal", [],
+    [ "pow", None, eval_real_op real_pow simpl_real_pow ] ;
 (*
     ["map"],"Map", ["map", builtin_map_type],
     [ "const", Some ls_map_const, eval_map_const;
@@ -249,13 +405,13 @@ type engine =
     model([t],[]) = t
 
     model(t1::..::tn::t,f::s) = model(f(t1,..,tn)::t,s)
-      where f as arity n
+      where f is of arity n
 
   A given term can be "exploded" into a configuration by reversing the
   rules above
 
   During reduction, the terms in the first stack are kept in normal
-  form. The normalization process can be defined as the repeated
+  form (value). The normalization process can be defined as the repeated
   application of the following rules.
 
   ([t],[]) --> t  // t is in normal form
@@ -287,15 +443,53 @@ type cont =
 type config = {
   value_stack : value list;
   cont_stack : (cont * term) list;
-  (* second term is the original term, for label and loc copy *)
+  (* second term is the original term, for attribute and loc copy *)
 }
 
 
-exception NoMatch
+(* This global variable is used to approximate a count of the elementary
+   simplifications that are done during normalization. This is used for
+   transformation step. *)
+let rec_step_limit = ref 0
+
+exception NoMatch of (term * term * term option) option
+exception NoMatchpat of (pattern * pattern) option
+
+let rec pattern_renaming (bound_vars, mt) p1 p2 =
+  match p1.pat_node, p2.pat_node with
+  | Pwild, Pwild ->
+      (bound_vars, mt)
+  | Pvar v1, Pvar v2 ->
+      begin
+        try
+          let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
+          let bound_vars = Mvs.add v2 v1 bound_vars in
+          (bound_vars, mt)
+        with
+        | Ty.TypeMismatch _ ->
+          raise (NoMatchpat (Some (p1, p2)))
+      end
+  | Papp (ls1, tl1), Papp (ls2, tl2) when ls_equal ls1 ls2 ->
+      List.fold_left2 pattern_renaming (bound_vars, mt) tl1 tl2
+  | Por (p1a, p1b), Por (p2a, p2b) ->
+      let (bound_vars, mt) =
+        pattern_renaming (bound_vars, mt) p1a p2a in
+      pattern_renaming (bound_vars, mt) p1b p2b
+  | Pas (p1, v1), Pas (p2, v2) ->
+      begin
+        try
+          let mt = Ty.ty_match mt v1.vs_ty v2.vs_ty in
+          let bound_vars = Mvs.add v2 v1 bound_vars in
+          pattern_renaming (bound_vars, mt) p1 p2
+        with
+        | Ty.TypeMismatch _ ->
+          raise (NoMatchpat (Some (p1, p2)))
+      end
+  | _ -> raise (NoMatchpat (Some (p1, p2)))
 
 let first_order_matching (vars : Svs.t) (largs : term list)
     (args : term list) : Ty.ty Ty.Mtv.t * substitution =
-  let rec loop ((mt,mv) as sigma) largs args =
+  let rec loop bound_vars ((mt,mv) as sigma) largs args =
     match largs,args with
       | [],[] -> sigma
       | t1::r1, t2::r2 ->
@@ -309,34 +503,139 @@ let first_order_matching (vars : Svs.t) (largs : term list)
               begin
                 try let t = Mvs.find vs mv in
                     if t_equal t t2 then
-                      loop sigma r1 r2
+                      loop bound_vars sigma r1 r2
                     else
-                      raise NoMatch
+                      raise (NoMatch (Some (t1, t2, Some t)))
                 with Not_found ->
                   try
                     let ts = Ty.ty_match mt vs.vs_ty (t_type t2) in
-                    loop (ts,Mvs.add vs t2 mv) r1 r2
-                  with Ty.TypeMismatch _ -> raise NoMatch
+                    let fv2 = t_vars t2 in
+                    if Mvs.is_empty (Mvs.set_inter bound_vars fv2) then
+                      loop bound_vars (ts,Mvs.add vs t2 mv) r1 r2
+                    else
+                      raise (NoMatch (Some (t1, t2, None)))
+                  with Ty.TypeMismatch _ ->
+                    raise (NoMatch (Some (t1, t2, None)))
               end
             | Tapp(ls1,args1) ->
               begin
                 match t2.t_node with
                   | Tapp(ls2,args2) when ls_equal ls1 ls2 ->
-                    let mt, mv = loop sigma (List.rev_append args1 r1)
-                      (List.rev_append args2 r2) in
+                    let mt, mv = loop bound_vars sigma
+                        (List.rev_append args1 r1)
+                        (List.rev_append args2 r2) in
                     begin
                       try Ty.oty_match mt t1.t_ty t2.t_ty, mv
-                      with Ty.TypeMismatch _ -> raise NoMatch
+                      with Ty.TypeMismatch _ ->
+                        raise (NoMatch (Some (t1, t2, None)))
                     end
-                  | _ -> raise NoMatch
+                  | _ -> raise (NoMatch (Some (t1, t2, None)))
               end
+            | Tquant (q1, bv1) ->
+              begin
+                match t2.t_node with
+                | Tquant (q2, bv2) when q1 = q2 ->
+                  let (vl1, _tl1, term1) = t_open_quant bv1 in
+                  let (vl2, _tl2, term2) = t_open_quant bv2 in
+                  let (bound_vars, term1, mt) =
+                    try List.fold_left2 (fun (bound_vars, term1, mt) e1 e2 ->
+                      let mt = Ty.ty_match mt e1.vs_ty e2.vs_ty in
+                      let bound_vars = Mvs.add e2 e1 bound_vars in
+                      (bound_vars,term1, mt)) (bound_vars,term1, mt) vl1 vl2
+                    with Invalid_argument _ | Ty.TypeMismatch _ ->
+                      raise (NoMatch (Some (t1,t2,None)))
+                  in
+                  loop bound_vars (mt, mv) (term1 :: r1) (term2 :: r2)
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
+              end
+            | Tbinop (b1, t1_l, t1_r) ->
+              begin
+                match t2.t_node with
+                | Tbinop (b2, t2_l, t2_r) when b1 = b2 ->
+                  loop bound_vars (mt, mv) (t1_l :: t1_r :: r1) (t2_l :: t2_r :: r2)
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
+              end
+            | Tif (t11, t12, t13) ->
+              begin
+                match t2.t_node with
+                | Tif (t21, t22, t23) ->
+                  loop bound_vars (mt, mv) (t11 :: t12 :: t13 :: r1)
+                      (t21 :: t22 :: t23 :: r2)
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
+              end
+            | Tlet (td1, tb1) ->
+              begin
+                match t2.t_node with
+                | Tlet (td2, tb2) ->
+                  let (v1, tl1) = t_open_bound tb1 in
+                  let (v2, tl2) = t_open_bound tb2 in
+                  let mt = try Ty.ty_match mt v1.vs_ty v2.vs_ty
+                    with Ty.TypeMismatch _ ->
+                      raise (NoMatch (Some (t1,t2, None))) in
+                  let bound_vars = Mvs.add v2 v1 bound_vars in
+                  loop bound_vars (mt, mv) (td1 :: tl1 :: r1) (td2 :: tl2 :: r2)
+                | _ ->
+                  raise (NoMatch (Some (t1, t2, None)))
+              end
+            | Tcase (ts1, tbl1) ->
+              begin
+                match t2.t_node with
+                | Tcase (ts2, tbl2) ->
+                    begin try
+                      let (bound_vars, mt, l1, l2) =
+                        List.fold_left2 (fun (bound_vars, mt, l1, l2) tb1 tb2 ->
+                          let (p1, tb1) = t_open_branch tb1 in
+                          let (p2, tb2) = t_open_branch tb2 in
+                          let bound_vars, mt = pattern_renaming (bound_vars, mt) p1 p2 in
+                          (bound_vars,mt, tb1 :: l1, tb2 :: l2)
+                        ) (bound_vars,mt, ts1 :: r1, ts2 :: r2) tbl1 tbl2 in
+                      loop bound_vars (mt,mv) l1 l2
+                    with Invalid_argument _ ->
+                      raise (NoMatch (Some (t1, t2, None)))
+                    end
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
+              end
+            | Teps tb1 ->
+              begin
+                match t2.t_node with
+                | Teps tb2 ->
+                  let (v1, td1) = t_open_bound tb1 in
+                  let (v2, td2) = t_open_bound tb2 in
+                  let mt = try Ty.ty_match mt v1.vs_ty v2.vs_ty
+                    with Ty.TypeMismatch _ ->
+                      raise (NoMatch (Some (t1,t2,None))) in
+                  let bound_vars = Mvs.add v2 v1 bound_vars in
+                  loop bound_vars (mt, mv) (td1 :: r1) (td2 :: r2)
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
+              end
+
+            | Tnot t1 ->
+              begin
+                match t2.t_node with
+                | Tnot t2 ->
+                  loop bound_vars sigma (t1 :: r1) (t2 :: r2)
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
+              end
+            | Tvar v1 ->
+                begin match t2.t_node with
+                | Tvar v2 ->
+                    begin try
+                      if vs_equal v1 (Mvs.find v2 bound_vars) then
+                        loop bound_vars sigma r1 r2
+                      else
+                        raise (NoMatch (Some (t1, t2, None)))
+                    with
+                      Not_found -> assert false
+                    end
+                | _ -> raise (NoMatch (Some (t1, t2, None)))
+                end
             | (Tconst _ | Ttrue | Tfalse) when t_equal t1 t2 ->
-                loop sigma r1 r2
-            | _ -> raise NoMatch
+                loop bound_vars sigma r1 r2
+            | Tconst _ | Ttrue | Tfalse -> raise (NoMatch (Some (t1, t2, None)))
         end
-      | _ -> raise NoMatch
+      | _ -> raise (NoMatch None)
   in
-  loop (Ty.Mtv.empty, Mvs.empty) largs args
+  loop Mvs.empty (Ty.Mtv.empty, Mvs.empty) largs args
 
 exception Irreducible
 
@@ -351,7 +650,7 @@ let one_step_reduce engine ls args =
             try
               let sigma = first_order_matching vars largs args in
               sigma,rhs
-            with NoMatch ->
+            with NoMatch _ ->
               loop rem
           end
     in loop rules
@@ -365,7 +664,7 @@ let rec matching ((mt,mv) as sigma) t p =
   | Por(p1,p2) ->
     begin
       try matching sigma t p1
-      with NoMatch -> matching sigma t p2
+      with NoMatch _ -> matching sigma t p2
     end
   | Pas(p,v) -> matching (mt,Mvs.add v t mv) t p
   | Papp(ls1,pl) ->
@@ -374,7 +673,7 @@ let rec matching ((mt,mv) as sigma) t p =
         if ls_equal ls1 ls2 then
           List.fold_left2 matching sigma tl pl
         else
-          if ls2.ls_constr > 0 then raise NoMatch
+          if ls2.ls_constr > 0 then raise (NoMatch None)
           else raise Undetermined
       | _ -> raise Undetermined
 
@@ -396,63 +695,69 @@ let rec reduce engine c =
     begin
       match v with
       | Term { t_node = Ttrue } ->
+        incr(rec_step_limit);
         { value_stack = st ;
-          cont_stack = (Keval(t2,sigma),t_label_copy orig t2)  :: rem }
+          cont_stack = (Keval(t2,sigma),t_attr_copy orig t2)  :: rem }
       | Term { t_node = Tfalse } ->
+        incr(rec_step_limit);
         { value_stack = st ;
-          cont_stack = (Keval(t3,sigma),t_label_copy orig t3) :: rem }
+          cont_stack = (Keval(t3,sigma),t_attr_copy orig t3) :: rem }
       | Term t1 -> begin
           match t1.t_node , t2.t_node , t3.t_node with
           | Tapp (ls,[b0;{ t_node = Tapp (ls1,_) }]) , Tapp(ls2,_) , Tapp(ls3,_)
             when ls_equal ls ps_equ && ls_equal ls1 fs_bool_true &&
               ls_equal ls2 fs_bool_true && ls_equal ls3 fs_bool_false ->
-            { value_stack = Term (t_label_copy orig b0) :: st;
+            incr(rec_step_limit);
+            { value_stack = Term (t_attr_copy orig b0) :: st;
               cont_stack = rem }
           | _ ->
             { value_stack =
                 Term
-                  (t_label_copy orig
+                  (t_attr_copy orig
                      (t_if t1 (t_subst sigma t2) (t_subst sigma t3))) :: st;
               cont_stack = rem;
             }
         end
-      | Int _ -> assert false (* would be ill-typed *)
+      | (Int _ | Real _) -> assert false (* would be ill-typed *)
     end
   | [], (Klet _, _) :: _ -> assert false
   | t1 :: st, (Klet(v,t2,sigma), orig) :: rem ->
+    incr(rec_step_limit);
     let t1 = term_of_value t1 in
     { value_stack = st;
       cont_stack =
-        (Keval(t2, Mvs.add v t1 sigma), t_label_copy orig t2) :: rem;
+        (Keval(t2, Mvs.add v t1 sigma), t_attr_copy orig t2) :: rem;
     }
   | [], (Kcase _, _) :: _ -> assert false
-  | Int _ :: _, (Kcase _, _) :: _ -> assert false
+  | (Int _ | Real _) :: _, (Kcase _, _) :: _ -> assert false
   | (Term t1) :: st, (Kcase(tbl,sigma), orig) :: rem ->
     reduce_match st t1 ~orig tbl sigma rem
-  | ([] | [_] | Int _ :: _ | Term _ :: Int _ :: _),
+  | ([] | [_] | (Int _ | Real _) :: _ | Term _ :: (Int _ | Real _) :: _),
     (Kbinop _, _) :: _ -> assert false
   | (Term t1) :: (Term t2) :: st, (Kbinop op, orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_binary_simp op t2 t1)) :: st;
+    incr(rec_step_limit);
+    { value_stack = Term (t_attr_copy orig (t_binary_simp op t2 t1)) :: st;
       cont_stack = rem;
     }
   | [], (Knot,_) :: _ -> assert false
-  | Int _ :: _ , (Knot,_) :: _ -> assert false
+  | (Int _ | Real _) :: _ , (Knot,_) :: _ -> assert false
   | (Term t) :: st, (Knot, orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_not_simp t)) :: st;
+    incr(rec_step_limit);
+    { value_stack = Term (t_attr_copy orig (t_not_simp t)) :: st;
       cont_stack = rem;
     }
   | st, (Kapp(ls,ty), orig) :: rem ->
     reduce_app engine st ~orig ls ty rem
   | [], (Keps _, _) :: _ -> assert false
-  | Int _ :: _ , (Keps _, _) :: _ -> assert false
+  | (Int _ | Real _) :: _ , (Keps _, _) :: _ -> assert false
   | Term t :: st, (Keps v, orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_eps_close v t)) :: st;
+    { value_stack = Term (t_attr_copy orig (t_eps_close v t)) :: st;
       cont_stack = rem;
     }
   | [], (Kquant _, _) :: _ -> assert false
-  | Int _ :: _, (Kquant _, _) :: _ -> assert false
+  | (Int _ | Real _) :: _, (Kquant _, _) :: _ -> assert false
   | Term t :: st, (Kquant(q,vl,tr), orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_quant_close_simp q vl tr t)) :: st;
+    { value_stack = Term (t_attr_copy orig (t_quant_close_simp q vl tr t)) :: st;
       cont_stack = rem;
     }
 
@@ -489,10 +794,11 @@ and reduce_match st u ~orig tbl sigma cont =
           mv'';
         Format.eprintf "@]@.";
 *)
+        incr(rec_step_limit);
         { value_stack = st;
-          cont_stack = (Keval(t,mv''), t_label_copy orig t) :: cont;
+          cont_stack = (Keval(t,mv''), t_attr_copy orig t) :: cont;
         }
-      with NoMatch -> iter rem
+      with NoMatch _ -> iter rem
   in
   try iter tbl with Undetermined ->
     let dmy = t_var (create_vsymbol (Ident.id_fresh "__dmy") (t_type u)) in
@@ -501,19 +807,20 @@ and reduce_match st u ~orig tbl sigma cont =
       | _ -> assert false
     in
     { value_stack =
-        Term (t_label_copy orig (t_case u tbls)) :: st;
+        Term (t_attr_copy orig (t_case u tbls)) :: st;
       cont_stack = cont;
     }
 
 
 and reduce_eval st t ~orig sigma rem =
-  let orig = t_label_copy orig t in
+  let orig = t_attr_copy orig t in
   match t.t_node with
   | Tvar v ->
     begin
       try
         let t = Mvs.find v sigma in
-        { value_stack = Term (t_label_copy orig t) :: st ;
+        incr(rec_step_limit);
+        { value_stack = Term (t_attr_copy orig t) :: st ;
           cont_stack = rem;
         }
       with Not_found ->
@@ -612,12 +919,12 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
               | rvh::rvt , _ ->
                 let lhs1 , fc2 = remove_var lhs1 rvh rvt in
                 let lhs2 = t_app ls2 [lhs1;arg] lhs.t_ty in
-                t_label_copy lhs lhs2 , fc2
+                t_attr_copy lhs lhs2 , fc2
               | [] , { t_node = Tvar fc1 } when vs_equal fc1 fc ->
                 let fcn = fc.vs_name in
                 let fc2 = Ident.id_derive fcn.Ident.id_string fcn in
                 let fc2 = create_vsymbol fc2 (t_type lhs) in
-                t_label_copy lhs (t_var fc2) , fc2
+                t_attr_copy lhs (t_var fc2) , fc2
               | _ -> raise Undetermined
               end
             | _ -> raise Undetermined
@@ -636,11 +943,11 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
             | _ ->
               let eq = equ lhs body in
               let tq = t_quant Tforall (t_close_quant vl trig eq) in
-              let body = t_label_copy t (t_eps_close fc2 tq) in
+              let body = t_attr_copy t (t_eps_close fc2 tq) in
               { value_stack = rem_st;
                 cont_stack =
                   (Keval(body,Mvs.add vh t2 Mvs.empty),
-                   t_label_copy orig body) :: rem_cont;
+                   t_attr_copy orig body) :: rem_cont;
               }
             end
           | _ -> raise Undetermined
@@ -649,12 +956,12 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
         begin
         match t.t_node with
           | Tapp (ls1,[lhs;body]) when ls_equal ls1 ps_equ ->
-            let equ lhs body = t_label_copy t (t_app ps_equ [lhs;body] None) in
+            let equ lhs body = t_attr_copy t (t_app ps_equ [lhs;body] None) in
             let elim body vh t2 = {
               value_stack = rem_st;
               cont_stack =
                 (Keval(body,Mvs.add vh t2 Mvs.empty),
-                 t_label_copy orig body) :: rem_cont;
+                 t_attr_copy orig body) :: rem_cont;
             } in
             process lhs body equ elim
           | Tbinop (Tiff,
@@ -662,14 +969,14 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
             body)
             when ls_equal ls1 ps_equ && t_equal tr t_bool_true ->
             let equ lhs body =
-              let lhs = t_label_copy teq (t_app ps_equ [lhs;tr] None) in
-              t_label_copy t (t_binary Tiff lhs body) in
+              let lhs = t_attr_copy teq (t_app ps_equ [lhs;tr] None) in
+              t_attr_copy t (t_binary Tiff lhs body) in
             let elim body vh t2 =
               let body = t_if body t_bool_true t_bool_false in
               { value_stack = rem_st;
                 cont_stack =
                 (Keval(body,Mvs.add vh t2 Mvs.empty),
-                t_label_copy orig body) :: rem_cont } in
+                t_attr_copy orig body) :: rem_cont } in
             process lhs body equ elim
           | _ -> raise Undetermined
         end
@@ -683,7 +990,7 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
   try
     let f = Hls.find builtins ls in
     let v = f ls args ty in
-    { value_stack = (v_label_copy orig v) :: rem_st;
+    { value_stack = (v_attr_copy orig v) :: rem_st;
       cont_stack = rem_cont;
     }
   with Not_found | Undetermined ->
@@ -731,12 +1038,13 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
             Format.eprintf "@.";
 *)
             let mv,rhs = t_subst_types mt mv rhs in
+            incr(rec_step_limit);
             { value_stack = rem_st;
               cont_stack = (Keval(rhs,mv),orig) :: rem_cont;
             }
           with Irreducible ->
             { value_stack =
-                Term (t_label_copy orig (t_app ls args ty)) :: rem_st;
+                Term (t_attr_copy orig (t_app ls args ty)) :: rem_st;
               cont_stack = rem_cont; }
         end in
       match d.Decl.d_node with
@@ -783,7 +1091,7 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
                         if ls_equal ls pr
                         then (* projection found! *)
                           { value_stack =
-                              (Term (t_label_copy orig t)) :: rem_st;
+                              (Term (t_attr_copy orig t)) :: rem_st;
                             cont_stack = rem_cont;
                           }
                         else
@@ -806,7 +1114,14 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
     match v1,v2 with
     | Int n1, Int n2 ->
       let b = to_bool (BigInt.eq n1 n2) in
-      { value_stack = Term (t_label_copy orig b) :: st;
+      incr(rec_step_limit);
+      { value_stack = Term (t_attr_copy orig b) :: st;
+        cont_stack = cont;
+      }
+    | Real r1, Real r2 ->
+      let b = to_bool (Number.compare_real r1 r2 = 0) in
+      incr rec_step_limit;
+      { value_stack = Term (t_attr_copy orig b) :: st;
         cont_stack = cont;
       }
     | Int n, Term {t_node = Tconst c} | Term {t_node = Tconst c}, Int n ->
@@ -814,12 +1129,26 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
         try
           let n' = big_int_of_const c in
           let b = to_bool (BigInt.eq n n') in
-          { value_stack = Term (t_label_copy orig b) :: st;
+          incr(rec_step_limit);
+          { value_stack = Term (t_attr_copy orig b) :: st;
             cont_stack = cont;
           }
         with NotNum -> raise Undetermined
       end
+    | Real r, Term {t_node = Tconst c} | Term {t_node = Tconst c}, Real r ->
+      begin
+        try
+          let r' = real_of_const c in
+          let b = to_bool (Number.compare_real r r' = 0) in
+          incr rec_step_limit;
+          { value_stack = Term (t_attr_copy orig b) :: st;
+            cont_stack = cont;
+          }
+        with NotNum -> raise Undetermined
+      end
+    | Real _, Term _ | Term _, Real _ -> raise Undetermined
     | Int _,  Term _ | Term _,  Int _ -> raise Undetermined
+    | Int _, Real _ | Real _, Int _ -> assert false
     | Term t1, Term t2 -> reduce_term_equ ~orig st t1 t2 cont
 (*
   with Undetermined ->
@@ -830,7 +1159,8 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
 
 and reduce_term_equ ~orig st t1 t2 cont =
   if t_equal t1 t2 then
-    { value_stack = Term (t_label_copy orig t_true) :: st;
+    let () = incr(rec_step_limit) in
+    { value_stack = Term (t_attr_copy orig t_true) :: st;
       cont_stack = cont;
     }
   else
@@ -838,12 +1168,12 @@ and reduce_term_equ ~orig st t1 t2 cont =
   | Tconst c1, Tconst c2 ->
     begin
       match c1,c2 with
-      | Number.ConstInt i1, Number.ConstInt i2 ->
+      | Constant.ConstInt i1, Constant.ConstInt i2 ->
         let b =
-          BigInt.eq (Number.compute_int_constant i1)
-                    (Number.compute_int_constant i2)
+          BigInt.eq i1.Number.il_int i2.Number.il_int
         in
-        { value_stack = Term (t_label_copy orig (to_bool b)) :: st;
+        incr(rec_step_limit);
+        { value_stack = Term (t_attr_copy orig (to_bool b)) :: st;
           cont_stack = cont;
         }
       | _ -> raise Undetermined
@@ -865,17 +1195,19 @@ and reduce_term_equ ~orig st t1 t2 cont =
       let sigma,t =
         aux Mvs.empty t_true ls1.ls_args tl1 tl2
       in
+      let () = incr(rec_step_limit) in
       { value_stack = st;
         cont_stack = (Keval(t,sigma),orig) :: cont;
       }
     else
-      { value_stack = Term (t_label_copy orig t_false) :: st;
+      { value_stack = Term (t_attr_copy orig t_false) :: st;
         cont_stack = cont;
       }
   | Tif (b,{ t_node = Tapp(ls1,_) },{ t_node = Tapp(ls2,_) }) , Tapp(ls3,_)
     when ls_equal ls3 fs_bool_true && ls_equal ls1 fs_bool_true &&
          ls_equal ls2 fs_bool_false ->
-    { value_stack = Term (t_label_copy orig b) :: st;
+    incr(rec_step_limit);
+    { value_stack = Term (t_attr_copy orig b) :: st;
       cont_stack = cont }
   | _ -> raise Undetermined
 
@@ -914,14 +1246,15 @@ let rec reconstruct c =
         (t_quant_close_simp q vl tr (term_of_value t)), st
     in
     reconstruct {
-      value_stack = (Term (t_label_copy orig t)) :: st;
+      value_stack = (Term (t_attr_copy orig t)) :: st;
       cont_stack = rem;
     }
 
 
 (** iterated reductions *)
 
-let normalize ~limit engine t0 =
+let normalize ?step_limit ~limit engine t0 =
+  rec_step_limit := 0;
   let rec many_steps c n =
     match c.value_stack, c.cont_stack with
     | [Term t], [] -> t
@@ -929,24 +1262,29 @@ let normalize ~limit engine t0 =
     | _ ->
       if n = limit then
         begin
-          Warning.emit "reduction of term %a takes more than %d steps, aborted.@."
-            Pretty.print_term t0 limit;
-          reconstruct c
+          let t1 = reconstruct c in
+          Warning.emit "reduction of term %a takes more than %d steps, aborted at %a.@."
+            Pretty.print_term t0 limit Pretty.print_term t1;
+          t1
         end
-      else
-        let c = reduce engine c in
-        many_steps c (n+1)
+      else begin
+        match step_limit with
+        | None ->
+            let c = reduce engine c in
+            many_steps c (n+1)
+        | Some step_limit ->
+            if !rec_step_limit >= step_limit then
+              reconstruct c
+            else
+              let c = reduce engine c in
+              many_steps c (n+1)
+      end
   in
   let c = { value_stack = [];
             cont_stack = [Keval(t0,Mvs.empty),t0] ;
           }
   in
   many_steps c 0
-
-
-
-
-
 
 (* the rewrite engine *)
 
@@ -979,7 +1317,9 @@ let extract_rule _km t =
 *)
 
   let check_vars acc t1 t2 =
-    (* check that quantified variables all appear in the lefthand side *)
+    (* check that quantified variables all appear in the lefthand side
+       (quantified variables not appearing could be removed and those appearing
+       on right hand side cannot be guessed during rewriting). *)
     let vars_lhs = t_vars t1 in
     if Svs.exists (fun vs -> not (Mvs.mem vs vars_lhs)) acc
     then raise (NotARewriteRule "lhs should contain all variables");
@@ -990,7 +1330,6 @@ let extract_rule _km t =
     then raise (NotARewriteRule "lhs should contain all type variables")
 
   in
-
   let rec aux acc t =
     match t.t_node with
       | Tquant(Tforall,q) ->

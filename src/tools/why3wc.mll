@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -91,7 +91,7 @@ let code =
   "let" | "val" | "exception"
 let annotation =
   "requires" | "ensures" | "returns" | "raises" | "reads" | "writes" |
-  "variant" | "invariant" | "assert" | "assume" | "check"
+  "variant" | "invariant" | "assert" | "assume" | "check" | "alias"
 
 let digit = ['0'-'9']
 let hexadigit = ['0'-'9' 'a'-'f' 'A'-'F']
@@ -132,6 +132,8 @@ let token =
 rule scan = parse
   | space+
       { scan lexbuf }
+  | "(*)"
+      { add_token (); scan lexbuf }
   | "(*" space* '\n'?
       { add_comment (comment 0 lexbuf); scan lexbuf }
   | '"'
@@ -173,6 +175,8 @@ rule scan = parse
 and start_annotation = parse
   | space+
       { start_annotation lexbuf }
+  | "(*)"
+      { add_token (); scan lexbuf }
   | "(*"
       { add_comment (comment 0 lexbuf); start_annotation lexbuf }
   | "{"
@@ -193,6 +197,8 @@ and scan_annotation = parse
       { add_token (); scan_annotation lexbuf; scan_annotation lexbuf }
   | "}"
       { add_token () }
+  | "(*)"
+      { add_token (); scan lexbuf }
   | "(*" space* '\n'?
       { add_comment (comment 0 lexbuf); scan_annotation lexbuf }
   | '"'
@@ -224,6 +230,7 @@ and string n = parse
 and comment n = parse
   | ('\n' | space)* "*)"
           { n }
+  | "(*)" { comment n lexbuf }
   | "(*"  { comment (comment n lexbuf) lexbuf }
   | '"'   { comment (string n lexbuf) lexbuf }
   | '\n'+ { comment (n + 1) lexbuf }

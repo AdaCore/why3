@@ -5,13 +5,13 @@
 
 module Quicksort
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import array.IntArraySorted
-  use import array.ArraySwap
-  use import array.ArrayPermut
-  use import array.ArrayEq
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.IntArraySorted
+  use array.ArraySwap
+  use array.ArrayPermut
+  use array.ArrayEq
 
   predicate qs_partition (a1 a2: array int) (l m r: int) (v: int) =
     permut_sub a1 a2 l r /\
@@ -66,14 +66,16 @@ module Quicksort
 
 end
 
+(** {2 Knuth' shuffle} *)
+
 (* a realistic quicksort first shuffles the array *)
 
-module Shuffle "Knuth shuffle"
+module Shuffle
 
-  use import int.Int
-  use import array.Array
-  use import array.ArraySwap
-  use import array.ArrayPermut
+  use int.Int
+  use array.Array
+  use array.ArraySwap
+  use array.ArrayPermut
   use random.Random
 
   let shuffle (a: array int) : unit
@@ -89,11 +91,11 @@ end
 
 module QuicksortWithShuffle
 
-  use import array.Array
-  use import array.IntArraySorted
-  use import array.ArrayPermut
-  use import Shuffle
-  use import Quicksort
+  use array.Array
+  use array.IntArraySorted
+  use array.ArrayPermut
+  use Shuffle
+  use Quicksort
 
   let qs (a: array int) : unit =
     ensures { sorted a }
@@ -107,13 +109,13 @@ end
 
 module Quicksort3way
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
-  use import array.IntArraySorted
-  use import array.ArraySwap
-  use import array.ArrayPermut
-  use import array.ArrayEq
+  use int.Int
+  use ref.Refint
+  use array.Array
+  use array.IntArraySorted
+  use array.ArraySwap
+  use array.ArrayPermut
+  use array.ArrayEq
 
   predicate qs_partition (a1 a2: array int) (l ml mr r: int) (v: int) =
     permut_sub a1 a2 l r /\
@@ -174,7 +176,7 @@ module Quicksort3way
     ensures { permut_all (old a) a }
     quick_rec a 0 (length a)
 
-  use import Shuffle
+  use Shuffle
 
   let qs (a: array int) : unit =
     ensures { sorted a }
@@ -186,9 +188,9 @@ end
 
 module Test
 
-  use import int.Int
-  use import array.Array
-  use import Quicksort
+  use int.Int
+  use array.Array
+  use Quicksort
 
   let test1 () =
     let a = make 3 0 in

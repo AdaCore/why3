@@ -13,6 +13,7 @@ time "why3cpulimit time : %s s"
 transformation "inline_trivial"
 transformation "eliminate_non_struct_recursion"
 transformation "eliminate_if"
+transformation "eliminate_literal"
 transformation "eliminate_non_lambda_set_epsilon"
 transformation "eliminate_projections"
 transformation "simplify_formula"
@@ -20,12 +21,12 @@ transformation "simplify_formula"
 
 theory BuiltIn
 
-  prelude "
-Require Import ssreflect ssrbool ssrfun ssrnat seq eqtype ssrint.
-Require Import ssrint ssrwhy3.
-Set Implicit Arguments.
-Unset Strict Implicit.
-Unset Printing Implicit Defensive.
+  prelude "\n\
+Require Import ssreflect ssrbool ssrfun ssrnat seq eqtype ssrint.\n\
+Require Import ssrint ssrwhy3.\n\
+Set Implicit Arguments.\n\
+Unset Strict Implicit.\n\
+Unset Printing Implicit Defensive.\n\
 "
 
   syntax type int "int"
@@ -64,9 +65,9 @@ end
 
 theory int.Int
 
-  prelude "
-Require Import ssralg ssrnum.
-Import GRing.Theory Num.Theory.
+  prelude "\n\
+Require Import ssralg ssrnum.\n\
+Import GRing.Theory Num.Theory.\n\
 Local Open Scope ring_scope."
 
   syntax function zero "0%:Z"

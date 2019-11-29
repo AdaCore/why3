@@ -1,27 +1,38 @@
 \begin{syntax}
-  digit ::= "0" - "9" ; 
+  digit ::= "0" - "9"
   \
-  hex-digit ::= digit | "a" - "f" | "A" - "F" ;
-  \ 
-  oct-digit ::= "0" - "7" 
-  \ 
-  bin-digit ::= "0" | "1" 
-  \ 
-  integer ::= digit (digit | "_")*               ; decimal
-    | ("0x" | "0X") hex-digit (hex-digit | "_")* ; hexadecimal
-    | ("0o" | "0O") oct-digit (oct-digit | "_")* ; octal
-    | ("0b" | "0B") bin-digit (bin-digit | "_")* ; binary
+  hex-digit ::= "0" - "9" | "a" - "f" | "A" - "F"
   \
-  real ::= digit+ exponent        ; decimal
-    | digit+ "." digit* exponent? ;
-    | digit* "." digit+ exponent? ;
-    | ("0x" | "0X") hex-real h-exponent ; hexadecimal
+  oct-digit ::= "0" - "7"
   \
-  hex-real ::= hex-digit+ ;
-    | hex-digit+ "." hex-digit* ;
-    | hex-digit* "." hex-digit+ ;
-    \
-  exponent ::= ("e" | "E") ("-" | "+")? digit+ ;
+  bin-digit ::= "0" | "1"
   \
-  h-exponent ::= ("p" | "P") ("-" | "+")? digit+ ; %
+  integer ::= digit (digit | "_")*               ;
+    | ("0x" | "0X") hex-digit (hex-digit | "_")* ;
+    | ("0o" | "0O") oct-digit (oct-digit | "_")* ;
+    | ("0b" | "0B") bin-digit (bin-digit | "_")* ;
+  \
+  real ::= digit+ exponent                      ;
+    | digit+ "." digit* exponent?               ;
+    | digit* "." digit+ exponent?               ;
+    | ("0x" | "0X") hex-digit+ h-exponent                 ;
+    | ("0x" | "0X") hex-digit+ "." hex-digit* h-exponent? ;
+    | ("0x" | "0X") hex-digit* "." hex-digit+ h-exponent? ;
+  \
+  exponent ::= ("e" | "E") ("-" | "+")? digit+
+  \
+  h-exponent ::= ("p" | "P") ("-" | "+")? digit+
+  \
+  char ::= "a" - "z" | "A" - "Z" | "0" - "9"              ;
+    | " " | "!" | "#" | "$" | "%" | "&" | "'" | "("
+    | ")" | "*" | "+" | "," | "-" | "." | "/" | ":"       ;
+    | ";" | "<" | "=" | ">" | "?" | "@" | "[" | "]"
+    | "^" | "_" | "`" | "\\" | "\n" | "\r" | "\t" | "\"""        ;
+    | "\" ("0" | "1") digit digit
+    | "\" "2" ("0" - "4") digit
+    | "\" "2" "5" ("0" - "5")                             ;
+    | "\x" hex-digit hex-digit                            ;
+    | "\o" ("0" - "3" ) oct-digit oct-digit
+  \
+  string ::= ""char*"" %
 \end{syntax}

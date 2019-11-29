@@ -1,0 +1,140 @@
+
+(* The 2nd Verified Software Competition (VSTTE 2012)
+   https://sites.google.com/site/vstte2012/compet
+
+   Problem 5:
+   Shortest path in a graph using breadth-first search *)
+
+theory Graph
+
+  use int.Int
+  use export set.Fset
+
+  type vertex
+
+  val predicate eq (x y: vertex)
+    ensures { result <-> x = y }
+
+  function succ vertex : fset vertex
+
+  (* there is a path of length n from v1 to v2 *)
+  inductive path (v1 v2: vertex) (n: int) =
+    | path_empty:
+        forall v: vertex. path v v 0
+    | path_succ:
+        forall v1 v2 v3: vertex, n: int.
+        path v1 v2 n -> mem v3 (succ v2) -> path v1 v3 (n+1)
+
+  (* path length is non-negative *)
+  lemma path_nonneg:
+    forall v1 v2: vertex, n: int. path v1 v2 n -> n >= 0
+
+  (* a non-empty path has a last but one node *)
+  lemma path_inversion:
+    forall v1 v3: vertex, n: int. n >= 0 ->
+    path v1 v3 (n+1) ->
+    exists v2: vertex. path v1 v2 n /\ mem v3 (succ v2)
+
+  (* a path starting in a set S that is closed under succ ends up in S *)
+  lemma path_closure:
+    forall s: fset vertex.
+    (forall x: vertex. mem x s ->
+       forall y: vertex. mem y (succ x) -> mem y s) ->
+    forall v1 v2: vertex, n: int. path v1 v2 n ->
+    mem v1 s -> mem v2 s
+
+  predicate shortest_path (v1 v2: vertex) (n: int) =
+    path v1 v2 n /\
+    forall m: int. m < n -> not (path v1 v2 m)
+
+end
+
+module BFS
+
+  use int.Int
+  use Graph
+  clone set.SetImp as B with type elt = vertex, val eq = eq
+  use ref.Refint
+
+  exception Found int
+
+  (* global invariant *)
+  predicate inv (s t: vertex) (visited current next: fset vertex) (d: int) =
+    (* current *)
+    subset current visited /\
+    (forall x: vertex. mem x current -> shortest_path s x d) /\
+    (* next *)
+    subset next visited /\
+    (forall x: vertex. mem x next -> shortest_path s x (d + 1)) /\
+    (* visited *)
+    (forall x: vertex, m: int. path s x m -> m <= d -> mem x visited) /\
+    (forall x: vertex. mem x visited ->
+       exists m: int. path s x m /\ m <= d+1) /\
+    (* nodes at distance d+1 are either in next or not yet visited *)
+    (forall x: vertex. shortest_path s x (d + 1) ->
+       mem x next \/ not (mem x visited)) /\
+    (* target t *)
+    (mem t visited -> mem t current \/ mem t next)
+
+  (* visited\current\next is closed under succ *)
+  predicate closure (visited current next: fset vertex) (x: vertex) =
+    mem x visited -> not (mem x current) -> not (mem x next) ->
+    forall y: vertex. mem y (succ x) -> mem y visited
+
+  function (!!) (s: B.set) : fset vertex = B.to_fset s
+
+  val pick_succ (v: vertex) : B.set
+    ensures { !!result = succ v }
+
+  (* function fill_next fills set next with the unvisited successors of v *)
+  let fill_next (s t v: vertex) (visited current next: B.set) (d:ref int)
+    requires { inv s t !!visited !!current !!next !d /\
+      shortest_path s v !d /\
+      (forall x: vertex. x<> v -> closure !!visited !!current !!next x) }
+    ensures { inv s t !!visited !!current !!next !d /\
+      subset (succ v) !!visited  /\
+      (forall x: vertex. closure !!visited !!current !!next x) }
+  = let acc = pick_succ v in
+    while not (B.is_empty acc) do
+      invariant {
+        inv s t !!visited !!current !!next !d /\
+        subset !!acc (succ v) /\
+        subset (diff (succ v) !!acc) !!visited /\
+        (forall x: vertex. x <> v -> closure !!visited !!current !!next x)
+      }
+      variant { cardinal !!acc }
+      let w = B.choose_and_remove acc in
+      if not (B.mem w visited) then begin
+        B.add w visited;
+        B.add w next
+      end
+    done
+
+  let bfs (s: vertex) (t: vertex)
+    ensures { forall d: int. not (path s t d) }
+    raises { Found r -> shortest_path s t r }
+    diverges (* the set of reachable nodes may be infinite *)
+  = let visited = B.empty () in
+    let current = ref (B.empty ()) in
+    let next    = ref (B.empty ()) in
+    B.add s visited;
+    B.add s !current;
+    let d = ref 0 in
+    while not (B.is_empty !current) do
+      invariant {
+        inv s t !!visited !! !current !! !next !d /\
+        (is_empty !! !current -> is_empty !! !next) /\
+        (forall x: vertex. closure !!visited !! !current !! !next x) /\
+        0 <= !d
+      }
+      let v = B.choose_and_remove !current in
+      if eq v t then raise (Found !d);
+      fill_next s t v visited !current !next d;
+      if B.is_empty !current then begin
+        (current.contents, next.contents) <- (!next, B.empty ());
+        incr d
+      end
+    done;
+    assert { not (mem t !!visited) }
+
+end

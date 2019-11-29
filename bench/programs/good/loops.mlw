@@ -1,13 +1,13 @@
 module M
 
-use import int.Int
-use import ref.Ref
+use int.Int
+use ref.Ref
 
 (** 1. A loop increasing [i] up to 10. *)
 
 val i : ref int
 
-let loop1 (u:unit) requires { !i <= 10 } ensures { !i = 10 }
+let loop1 (_u:unit) requires { !i <= 10 } ensures { !i = 10 }
 = while !i < 10 do
     invariant { !i <= 10 } variant { 10 - !i }
     i := !i + 1
@@ -18,9 +18,9 @@ let loop1 (u:unit) requires { !i <= 10 } ensures { !i = 10 }
 
 val x: ref int
 
-let negate (u:unit) ensures { !x = - (old !x) } = x := - !x
+let negate (_u:unit) ensures { !x = - (old !x) } = x := - !x
 
-let loop2 (u:unit) requires { !x <= 10 }
+let loop2 (_u:unit) requires { !x <= 10 }
 = begin
     while !x < 10 do invariant { !x <= 10 } variant { 10 - !x }
       x := !x + 1
@@ -31,4 +31,3 @@ let loop2 (u:unit) requires { !x <= 10 }
   end
 
 end
-

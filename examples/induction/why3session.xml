@@ -1,51 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="36" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="36" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.5.0" timelimit="36" steplimit="0" memlimit="1000"/>
-<file name="../induction.mlw" expanded="true">
-<theory name="Hyps" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
-</theory>
-<theory name="Induction1" sum="c75c825baeab11bcef9d145235d9eda3" expanded="true">
- <goal name="SimpleInduction.base" expl="" expanded="true">
- <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+<why3session shape_version="8">
+<prover id="2" name="Z3" version="4.6.0" timelimit="36" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="36" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.5" timelimit="36" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="induction.mlw"/>
+<theory name="Induction1" proved="true">
+ <goal name="SimpleInduction.base" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
- <goal name="SimpleInduction.induction_step" expl="" expanded="true">
- <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
+ <goal name="SimpleInduction.induction_step" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="16"/></proof>
  </goal>
- <goal name="G" expl="" expanded="true">
- <proof prover="0"><result status="valid" time="0.00"/></proof>
- </goal>
-</theory>
-<theory name="Induction2" sum="982bec2e073762a155dbd5b65703a996" expanded="true">
- <goal name="G" expl="" expanded="true">
- <proof prover="4"><result status="valid" time="0.02"/></proof>
+ <goal name="G" proved="true">
+ <proof prover="5"><result status="valid" time="0.00" steps="821"/></proof>
  </goal>
 </theory>
-<theory name="LemmaFunction1" sum="7bb6a0f888c8962e7268a6cd6bf4231c" expanded="true">
- <goal name="VC ind" expl="VC for ind" expanded="true">
- <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
- </goal>
- <goal name="G" expl="" expanded="true">
- <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+<theory name="Induction2" proved="true">
+ <goal name="G" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="39247"/></proof>
  </goal>
 </theory>
-<theory name="LemmaFunction2" sum="0c4af2d993fa6f577db75f942eee968b" expanded="true">
- <goal name="VC ind" expl="VC for ind" expanded="true">
- <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
+<theory name="LemmaFunction1" proved="true">
+ <goal name="ind&#39;vc" expl="VC for ind" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
  </goal>
- <goal name="G" expl="" expanded="true">
- <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+ <goal name="G" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
-<theory name="LemmaFunction3" sum="fee6cd2a8d05340bd4e49feef58e1cff" expanded="true">
- <goal name="VC ind" expl="VC for ind" expanded="true">
- <proof prover="1"><result status="valid" time="0.01" steps="51"/></proof>
+<theory name="LemmaFunction2" proved="true">
+ <goal name="ind&#39;vc" expl="VC for ind" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
- <goal name="G" expl="" expanded="true">
- <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+ <goal name="G" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+ </goal>
+</theory>
+<theory name="LemmaFunction3" proved="true">
+ <goal name="ind&#39;vc" expl="VC for ind" proved="true">
+ <proof prover="3"><result status="valid" time="0.01" steps="55"/></proof>
+ </goal>
+ <goal name="G" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
  </goal>
 </theory>
 </file>

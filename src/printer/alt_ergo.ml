@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,6 +13,7 @@
 
 open Format
 open Pp
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -34,7 +35,7 @@ let meta_invalid_trigger =
 type info = {
   info_syn : syntax_map;
   info_ac  : Sls.t;
-  info_show_labels : bool;
+  info_show_attrs : bool;
   info_type_casts : bool;
   info_csm : lsymbol list Mls.t;
   info_pjs : Sls.t;
@@ -44,13 +45,18 @@ type info = {
   mutable info_model: S.t;
   info_vc_term: vc_term_info;
   mutable info_in_goal: bool;
+  mutable list_projs: Ident.ident Mstr.t;
+  mutable list_field_def: Ident.ident Mstr.t;
+  meta_model_projection: Sls.t;
+  meta_record_def : Sls.t;
+  info_cntexample: bool
   }
 
 let ident_printer () =
   let bls = [
     "abs_int"; "abs_real"; "ac"; "and"; "array"; "as"; "axiom";
-    "bitv"; "bool";
-    "check"; "cut"; "distinct"; "else"; "exists";
+    "bitv"; "bool"; "case_split"; "check"; "cut"; "distinct";
+    "else"; "end"; "exists"; "extends";
     "false"; "float"; "float32"; "float32d"; "float64"; "float64d";
     "forall"; "fpa_rounding_mode"; "function";
     "goal";
@@ -63,7 +69,7 @@ let ident_printer () =
     "prop";
     "real"; "real_of_int"; "rewriting";
     "select"; "sqrt_real"; "sqrt_real_default"; "sqrt_real_excess"; "store";
-    "then"; "true"; "type"; "unit"; "void"; "with";
+    "then"; "theory"; "true"; "type"; "unit"; "void"; "with";
     "Aw"; "Down"; "Od";
     "NearestTiesToAway"; "NearestTiesToEven"; "Nd"; "No"; "Nu"; "Nz";
     "ToZero"; "Up";
@@ -75,22 +81,27 @@ let ident_printer () =
 let print_ident info fmt id =
   fprintf fmt "%s" (id_unique info.info_printer id)
 
-let print_ident_label info fmt id =
-  if info.info_show_labels then
+let print_attr fmt l = fprintf fmt "\"%s\"" l.attr_string
+
+let print_ident_attr info fmt id =
+  if info.info_show_attrs then
     fprintf fmt "%s %a"
       (id_unique info.info_printer id)
-      (print_list space print_label) (Slab.elements id.id_label)
+      (print_list space print_attr) (Sattr.elements id.id_attrs)
   else
     print_ident info fmt id
 
 let forget_var info v = forget_id info.info_printer v.vs_name
 
 let collect_model_ls info ls =
-  if ls.ls_args = [] && Slab.mem model_label ls.ls_name.id_label then
+  if Sls.mem ls info.meta_model_projection then
+    info.list_projs <- Mstr.add (sprintf "%a" (print_ident info) ls.ls_name)
+        ls.ls_name info.list_projs;
+  if ls.ls_args = [] && relevant_for_counterexample ls.ls_name then
     let t = t_app ls [] ls.ls_value in
     info.info_model <-
       add_model_element
-      (t_label ?loc:ls.ls_name.id_loc ls.ls_name.id_label t) info.info_model
+      (t_attr_set ?loc:ls.ls_name.id_loc ls.ls_name.id_attrs t) info.info_model
 
 (*
 let tv_printer =
@@ -140,36 +151,35 @@ let unambig_fs fs =
   in
   inspect (Opt.get fs.ls_value)
 
+let number_format = {
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Default;
+    Number.dec_int_support = `Default;
+    Number.hex_int_support = `Unsupported;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Default;
+    Number.dec_real_support = `Default;
+    Number.hex_real_support = `Default;
+    Number.frac_real_support = `Unsupported (fun _ _ -> assert false);
+  }
+
 let rec print_term info fmt t =
-  if Slab.mem model_label t.t_label then
+  if check_for_counterexample t then
     info.info_model <- add_model_element t info.info_model;
 
   check_enter_vc_term t info.info_in_goal info.info_vc_term;
 
   let () = match t.t_node with
   | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = true;
-          Number.negative_int_support = Number.Number_default;
-          Number.dec_int_support = Number.Number_default;
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.negative_real_support = Number.Number_default;
-          Number.dec_real_support = Number.Number_default;
-          Number.hex_real_support = Number.Number_default;
-          Number.frac_real_support = Number.Number_unsupported;
-          Number.def_real_support = Number.Number_unsupported;
-        } in
-      Number.print number_format fmt c
+      Constant.(print number_format unsupported_escape) fmt c
   | Tvar { vs_name = id } ->
       print_ident info fmt id
-  | Tapp (ls, tl) -> begin
-      (match query_syntax info.info_syn ls.ls_name with
-      | Some s -> syntax_arguments s (print_term info) fmt tl
-      | None ->
+  | Tapp (ls, tl) ->
+     begin
+       match query_syntax info.info_syn ls.ls_name with
+       | Some s -> syntax_arguments s (print_term info) fmt tl
+       | None ->
 	  begin
 	    if (tl = []) then
 	      begin
@@ -178,12 +188,14 @@ let rec print_term info fmt t =
 		  match vc_term_info.vc_loc with
 		  | None -> ()
 		  | Some loc ->
-		      let labels = match vc_term_info.vc_func_name with
-		      | None ->
-			  ls.ls_name.id_label
-		      | Some _ ->
-			  model_trace_for_postcondition ~labels:ls.ls_name.id_label info.info_vc_term in
-		      let _t_check_pos = t_label ~loc labels t in
+                    let attrs = (*match vc_term_info.vc_func_name with
+                      | None ->*)
+                          ls.ls_name.id_attrs
+                      (*| Some _ ->
+                          model_trace_for_postcondition ~attrs:ls.ls_name.id_attrs info.info_vc_term
+                       *)
+                    in
+                    let _t_check_pos = t_attr_set ~loc attrs t in
 		      (* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		      (*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		      ()
@@ -210,11 +222,12 @@ let rec print_term info fmt t =
 	      fprintf fmt "(%a%a : %a)" (print_ident info) ls.ls_name
 		(print_tapp info) tl (print_type info) (t_type t)
 	    end
-      ) end
+     end
   | Tlet _ -> unsupportedTerm t
       "alt-ergo: you must eliminate let in term"
-  | Tif _ -> unsupportedTerm t
-      "alt-ergo: you must eliminate if_then_else"
+  | Tif(t1,t2,t3) ->
+     fprintf fmt "(if %a then %a else %a)"
+       (print_fmla info) t1 (print_term info) t2 (print_term info) t3
   | Tcase _ -> unsupportedTerm t
       "alt-ergo: you must eliminate match"
   | Teps _ -> unsupportedTerm t
@@ -228,18 +241,18 @@ and print_tapp info fmt = function
   | [] -> ()
   | tl -> fprintf fmt "(%a)" (print_list comma (print_term info)) tl
 
-let rec print_fmla info fmt f =
-  if Slab.mem model_label f.t_label then
+and print_fmla info fmt f =
+  if check_for_counterexample f then
     info.info_model <- add_model_element f info.info_model;
 
   check_enter_vc_term f info.info_in_goal info.info_vc_term;
 
-  let () = if info.info_show_labels then
-    match Slab.elements f.t_label with
+  let () = if info.info_show_attrs then
+    match Sattr.elements f.t_attrs with
       | [] -> print_fmla_node info fmt f
       | l ->
         fprintf fmt "(%a : %a)"
-          (print_list colon print_label) l
+          (print_list colon print_attr) l
           (print_fmla_node info) f
   else
     print_fmla_node info fmt f
@@ -261,7 +274,7 @@ and print_fmla_node info fmt f = match f.t_node with
         | Texists -> "exists", [] (* Alt-ergo has no triggers for exists *)
       in
       let forall fmt v =
-        fprintf fmt "%s %a:%a" q (print_ident_label info) v.vs_name
+        fprintf fmt "%s %a:%a" q (print_ident_attr info) v.vs_name
           (print_type info) v.vs_ty
       in
       fprintf fmt "@[(%a%a.@ %a)@]" (print_list dot forall) vl
@@ -281,12 +294,18 @@ and print_fmla_node info fmt f = match f.t_node with
       fprintf fmt "true"
   | Tfalse ->
       fprintf fmt "false"
-  | Tif (f1, f2, f3) ->
-      fprintf fmt "((%a and@ %a)@ or@ (not@ %a and@ %a))"
-        (print_fmla info) f1 (print_fmla info) f2 (print_fmla info)
-        f1 (print_fmla info) f3
-  | Tlet _ -> unsupportedTerm f
-      "alt-ergo: you must eliminate let in formula"
+  | Tif(t1,t2,t3) ->
+     fprintf fmt "(if %a then %a else %a)"
+       (print_fmla info) t1 (print_fmla info) t2 (print_fmla info) t3
+  | Tlet (t1, tb) ->
+      let v, f2 = t_open_bound tb in
+      fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
+        (print_ident info) v.vs_name
+        (print_term info) t1
+         (** some version of alt-ergo have an inefficient typing of let *)
+        (print_type info) v.vs_ty
+        (print_fmla info) f2;
+      forget_var info v
   | Tcase _ -> unsupportedTerm f
       "alt-ergo: you must eliminate match"
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f)
@@ -379,18 +398,17 @@ let print_logic_decl info fmt (ls,ld) =
   if Mid.mem ls.ls_name info.info_syn || Sls.mem ls info.info_pjs
     then () else (print_logic_decl info fmt ls ld; forget_tvs info)
 
-let print_info_model cntexample info =
+let print_info_model info =
   (* Prints the content of info.info_model *)
   let info_model = info.info_model in
-  if not (S.is_empty info_model) && cntexample then
+  if not (S.is_empty info_model) && info.info_cntexample then
     begin
       let model_map =
 	S.fold (fun f acc ->
-          fprintf str_formatter "%a" (print_fmla info) f;
-	  let s = flush_str_formatter () in
-	  Stdlib.Mstr.add s f acc)
+          let s = asprintf "%a" (print_fmla info) f in
+	  Mstr.add s f acc)
 	info_model
-	Stdlib.Mstr.empty in ();
+	Mstr.empty in ();
 
       (* Printing model has modification of info.info_model as undesirable
 	 side-effect. Revert it back. *)
@@ -398,27 +416,32 @@ let print_info_model cntexample info =
       model_map
     end
   else
-    Stdlib.Mstr.empty
+    Mstr.empty
 
-let print_prop_decl vc_loc cntexample args info fmt k pr f =
+let print_prop_decl vc_loc args info fmt k pr f =
   match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Pgoal ->
-      let model_list = print_info_model cntexample info in
+      let model_list = print_info_model info in
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
 				vc_term_loc = vc_loc;
-				queried_terms = model_list; };
+				queried_terms = model_list;
+                                list_projections = info.list_projs;
+                                list_fields = info.list_field_def;
+                                list_records = Mstr.empty;
+                                noarg_constructors = [];
+                                set_str = Mstr.empty};
       fprintf fmt "@[<hov 2>goal %a :@ %a@]@\n"
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma -> assert false
 
-let print_prop_decl vc_loc cntexample args info fmt k pr f =
+let print_prop_decl vc_loc args info fmt k pr f =
   if Mid.mem pr.pr_name info.info_syn || Spr.mem pr info.info_axs
-    then () else (print_prop_decl vc_loc cntexample args info fmt k pr f; forget_tvs info)
+    then () else (print_prop_decl vc_loc args info fmt k pr f; forget_tvs info)
 
-let print_decl vc_loc cntexample args info fmt d = match d.d_node with
+let print_decl vc_loc args info fmt d = match d.d_node with
   | Dtype ts ->
       print_ty_decl info fmt ts
   | Ddata dl ->
@@ -430,7 +453,7 @@ let print_decl vc_loc cntexample args info fmt d = match d.d_node with
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "alt-ergo: inductive definitions are not supported"
-  | Dprop (k,pr,f) -> print_prop_decl vc_loc cntexample args info fmt k pr f
+  | Dprop (k,pr,f) -> print_prop_decl vc_loc args info fmt k pr f
 
 let add_projection (csm,pjs,axs) = function
   | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
@@ -441,7 +464,7 @@ let add_projection (csm,pjs,axs) = function
   | _ -> assert false
 
 let check_options ((show,cast) as acc) = function
-  | [Theory.MAstr "show_labels"] -> true, cast
+  | [Theory.MAstr "show_attrs"] -> true, cast
   | [Theory.MAstr "no_type_cast"] -> show, false
   | [Theory.MAstr _] -> acc
   | _ -> assert false
@@ -452,13 +475,13 @@ let print_task args ?old:_ fmt task =
   let inv_trig = Task.on_tagged_ls meta_invalid_trigger task in
   let show,cast = Task.on_meta meta_printer_option
     check_options (false,true) task in
-  let cntexample = Prepare_for_counterexmp.get_counterexmp task in
+  let cntexample = Inlining.get_counterexmp task in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {
     info_syn = Discriminate.get_syntax_map task;
     info_ac  = Task.on_tagged_ls meta_ac task;
-    info_show_labels = show;
+    info_show_attrs = show;
     info_type_casts = cast;
     info_csm = Mls.map Array.to_list csm;
     info_pjs = pjs;
@@ -467,7 +490,13 @@ let print_task args ?old:_ fmt task =
     info_printer = ident_printer ();
     info_model = S.empty;
     info_vc_term = vc_info;
-    info_in_goal = false;} in
+    info_in_goal = false;
+    list_projs = Mstr.empty;
+    list_field_def = Mstr.empty;
+    meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
+    meta_record_def = Task.on_tagged_ls Theory.meta_record task;
+    info_cntexample = cntexample;
+  } in
   print_prelude fmt args.prelude;
   print_th_prelude task fmt args.th_prelude;
   let rec print_decls = function
@@ -475,7 +504,7 @@ let print_task args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc cntexample args info fmt d
+            begin try print_decl vc_loc args info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

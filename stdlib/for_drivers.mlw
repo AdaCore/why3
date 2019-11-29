@@ -1,0 +1,19 @@
+theory ComputerOfEuclideanDivision
+
+  use int.Int
+  use int.EuclideanDivision as ED
+  use int.ComputerDivision as CD
+
+  lemma cdiv_cases : forall n d:int [CD.div n d].
+    ((n >= 0) -> (d > 0) -> CD.div n d = ED.div n d) /\
+    ((n <= 0) -> (d > 0) -> CD.div n d = -(ED.div (-n) d)) /\
+    ((n >= 0) -> (d < 0) -> CD.div n d = -(ED.div n (-d))) /\
+    ((n <= 0) -> (d < 0) -> CD.div n d = ED.div (-n) (-d))
+
+  lemma cmod_cases : forall n d:int [CD.mod n d].
+    ((n >= 0) -> (d > 0) -> CD.mod n d = ED.mod n d) /\
+    ((n <= 0) -> (d > 0) -> CD.mod n d = -(ED.mod (-n) d)) /\
+    ((n >= 0) -> (d < 0) -> CD.mod n d = (ED.mod n (-d))) /\
+    ((n <= 0) -> (d < 0) -> CD.mod n d = -(ED.mod (-n) (-d)))
+
+end

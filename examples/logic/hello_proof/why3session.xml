@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Coq" version="8.6.1" timelimit="4" steplimit="0" memlimit="0"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../hello_proof.why" expanded="true">
-<theory name="HelloProof" sum="8ee14372c90511294fc78a9e191cf86a" expanded="true">
- <goal name="G1" expl="" expanded="true">
- <proof prover="2"><result status="valid" time="0.00" steps="0"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Coq" version="8.9.1" timelimit="4" steplimit="0" memlimit="0"/>
+<file format="whyml">
+<path name=".."/><path name="hello_proof.why"/>
+<theory name="HelloProof">
+ <goal name="G1" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
- <goal name="G2" expl="" expanded="true">
- <proof prover="2" timelimit="4" memlimit="0"><result status="unknown" time="0.00"/></proof>
- <transf name="split_goal_wp" expanded="true">
-  <goal name="G2.1" expl="" expanded="true">
-  <proof prover="1" edited="hello_proof_HelloProof_G2_1.v"><result status="unknown" time="0.29"/></proof>
-  <proof prover="2"><result status="unknown" time="0.00"/></proof>
+ <goal name="G2">
+ <proof prover="1" timelimit="4" memlimit="0"><result status="unknown" time="0.00"/></proof>
+ <transf name="split_goal_right" >
+  <goal name="G2.0">
+  <proof prover="1"><result status="unknown" time="0.00"/></proof>
+  <proof prover="2"><path name="hello_proof_HelloProof_G2_1.v"/><result status="unknown" time="0.27"/></proof>
   </goal>
-  <goal name="G2.2" expl="" expanded="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="0"/></proof>
+  <goal name="G2.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="G3" expl="" expanded="true">
- <proof prover="2" timelimit="4" memlimit="0"><result status="valid" time="0.00" steps="0"/></proof>
+ <goal name="G3" proved="true">
+ <proof prover="1" timelimit="4" memlimit="0"><result status="valid" time="0.00" steps="1"/></proof>
  </goal>
 </theory>
 </file>

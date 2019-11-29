@@ -64,7 +64,7 @@ To compile it, we create a file \texttt{main.ml}
 containing a call to \texttt{max\_sum}, \emph{e.g.},
 \begin{whycode}
 let a = Array.map Z.of_int [| 9; 5; 0; 2; 7; 3; 2; 1; 10; 6 |]
-let m, s = Max_sum.max_sum a (Z.of_int 10)
+let s, m = Max_sum.max_sum a (Z.of_int 10)
 let () = Format.printf "sum=%s, max=%s@." (Z.to_string s) (Z.to_string m)
 \end{whycode}
 It is convenient to use \texttt{ocamlbuild} to compile and link both
@@ -80,7 +80,7 @@ uses OCaml's native integers instead, one has to use \why's types for
 63-bit integers from libraries \texttt{mach.int.Int63} and
 \texttt{mach.array.Array63}.
 
-\paragraph{Extraction starting point} The \texttt{extract} command accepts three
+\paragraph{Extraction Starting Point.} The \texttt{extract} command accepts three
 different targets for extraction: a \whyml file, a module, or a symbol
 (function, type, exception). To extract all the symbols from every module of a
 file named \texttt{f.mlw}, one should write
@@ -100,7 +100,8 @@ module \texttt{M} of file \texttt{f.mlw}, one should write
 Note the use of~\texttt{-L <dir>}, for both extraction of a module and a symbol,
 in order to state the location of file \texttt{f.mlw}.
 
-\paragraph{Options}
+\paragraph{Options.} The following options can be added to the
+extraction command line:
 \begin{description}
 \item[\texttt{-{}-flat}] performs a flat extraction, \emph{i.e.}, everything is
   extracted into a single file. This is the default behavior. The \texttt{-o}
@@ -115,11 +116,17 @@ in order to state the location of file \texttt{f.mlw}.
   \texttt{flat} options.
 \end{description}
 
-\paragraph{Examples}
-We illustrate different ways of using the \texttt{extract} command though some
-examples. Consider the program in Figure~\ref{fig:AQueue} on
-page~\pageref{fig:AQueue}. If we are only interested in extracting function
-\texttt{aenqueue}, we can proceed as follows:
+\paragraph{Examples.}
+We illustrate different ways of using the \texttt{extract} command through some
+examples.
+\begin{latexonly}
+Consider the program in Figure~\ref{fig:AQueue} on page~\pageref{fig:AQueue}.
+\end{latexonly}
+\begin{htmlonly}
+Consider the program of Section~\ref{sec:AQueue}.
+\end{htmlonly}
+If we are only interested in extracting function
+\texttt{enqueue}, we can proceed as follows:
 \begin{verbatim}
 > why3 extract -D ocaml64 -L . aqueue.AmortizedQueue.enqueue -o aqueue.ml
 \end{verbatim}
@@ -138,7 +145,7 @@ and on type \texttt{'a queue}, whose definitions are not given. In order to
 obtain a \emph{complete} OCaml implementation, we can perform a recursive
 extraction:
 \begin{verbatim}
-> why3 extraction --recursive -D ocaml64 -L . \
+> why3 extract --recursive -D ocaml64 -L . \
     aqueue.AmortizedQueue.enqueue -o aqueue.ml
 \end{verbatim}
 This updates the contents of file \texttt{aqueue.ml} as follows:
@@ -163,12 +170,45 @@ let enqueue (x: 'a) (q: 'a queue) : 'a queue =
   create (q.front) (q.lenf) (x :: (q.rear))
     (Z.add (q.lenr) (Z.of_string "1"))
 \end{whycode}
-This new version of the code is now accepted by the OCaml compiler.
+This new version of the code is now accepted by the OCaml compiler
+(provided the \texttt{ZArith} library is available, as above).
 
-Let us now consider the
-% \label{fig:extract-queens}
-% \caption{Recursive extraction of \texttt{queens} function.}
-% \end{figure}
+\paragraph{Custom Extraction Drivers.}
+Several OCaml drivers can be specified on the command line, using
+option \texttt{-D} several times. In particular, one can provide
+a custom driver to map some symbols of a Why3 development to existing
+OCaml code. Suppose for instance we have a file \texttt{file.mlw}
+containing a proof parameterized with some type \texttt{elt} and some
+binary function \texttt{f}:
+\begin{whycode}
+module M
+  type elt
+  val f (x y: elt) : elt
+  let double (x: elt) : elt = f x x
+  ...
+\end{whycode}
+When it comes to extract this module to OCaml, we may want to
+instantiate type \texttt{elt} with OCaml's type \texttt{int} and
+function \texttt{f} with OCaml's addition. For this purpose, we
+provide the following in a file \texttt{mydriver.drv}:
+\begin{whycode}
+module file.M
+  syntax type elt "int"
+  syntax val  f   "%1 + %2"
+end
+\end{whycode}
+OCaml fragments to be substituted for Why3 symbols are given as
+arbitrary strings, where \verb+%1+, \verb+%2+, etc., will be replaced
+with actual arguments.
+Here is the extraction command line and its output:
+\begin{verbatim}
+> why3 extract -D ocaml64 -D mydriver.drv -L . file.M
+let double (x: int) : int = x + x
+...
+\end{verbatim}
+When using such custom drivers, it is not possible to pass Why3 file
+names on the command line; one has to specify module names to be
+extracted, as done above.
 
 %%% Local Variables:
 %%% mode: latex

@@ -3,49 +3,59 @@
 Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
-Require option.Option.
 Require list.List.
 Require list.Length.
 Require list.Nth.
+Require option.Option.
 Require list.HdTl.
 
 (* Why3 assumption *)
-Definition zero_at (l:(list Z)) (i:Z): Prop := ((list.Nth.nth i
-  l) = (Init.Datatypes.Some 0%Z)) /\ forall (j:Z), ((0%Z <= j)%Z /\
-  (j < i)%Z) -> ~ ((list.Nth.nth j l) = (Init.Datatypes.Some 0%Z)).
+Definition zero_at (l:Init.Datatypes.list Numbers.BinNums.Z)
+    (i:Numbers.BinNums.Z) : Prop :=
+  ((list.Nth.nth i l) = (Init.Datatypes.Some 0%Z)) /\
+  (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < i)%Z ->
+   ~ ((list.Nth.nth j l) = (Init.Datatypes.Some 0%Z))).
 
 (* Why3 assumption *)
-Definition no_zero (l:(list Z)): Prop := forall (j:Z), ((0%Z <= j)%Z /\
-  (j < (list.Length.length l))%Z) -> ~ ((list.Nth.nth j
-  l) = (Init.Datatypes.Some 0%Z)).
+Definition no_zero (l:Init.Datatypes.list Numbers.BinNums.Z) : Prop :=
+  forall (j:Numbers.BinNums.Z),
+  (0%Z <= j)%Z /\ (j < (list.Length.length l))%Z ->
+  ~ ((list.Nth.nth j l) = (Init.Datatypes.Some 0%Z)).
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
+  | ref'mk : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Implicit Arguments mk_ref [[a]].
+Arguments ref'mk {a}.
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | (mk_ref x) => x
+  | ref'mk x => x
   end.
 
 (* Why3 goal *)
-Theorem VC_search_loop : forall (l:(list Z)), forall (s:(list Z)) (i:Z),
-  ((0%Z <= i)%Z /\
-  (((i + (list.Length.length s))%Z = (list.Length.length l)) /\
-  ((forall (j:Z), (0%Z <= j)%Z -> ((list.Nth.nth j
-  s) = (list.Nth.nth (i + j)%Z l))) /\ forall (j:Z), ((0%Z <= j)%Z /\
-  (j < i)%Z) -> ~ ((list.Nth.nth j l) = (Init.Datatypes.Some 0%Z))))) ->
-  (((list.List.is_nil s) <-> (s = Init.Datatypes.nil)) -> forall (o:bool),
-  (((~ (list.List.is_nil s)) /\ exists o1:Z,
-  ((list.HdTl.hd s) = (Init.Datatypes.Some o1)) /\ (((o1 = 0%Z) /\
-  (o = false)) \/ ((~ (o1 = 0%Z)) /\ (o = true)))) \/ ((list.List.is_nil
-  s) /\ (o = false))) -> ((~ (o = true)) -> ((((0%Z <= i)%Z /\
-  (i < (list.Length.length l))%Z) /\ (zero_at l i)) \/
-  ((i = (list.Length.length l)) /\ (no_zero l))))).
+Theorem search_loop'vc :
+  forall (l:Init.Datatypes.list Numbers.BinNums.Z),
+  forall (s:Init.Datatypes.list Numbers.BinNums.Z) (i:Numbers.BinNums.Z),
+  (0%Z <= i)%Z /\
+  ((i + (list.Length.length s))%Z = (list.Length.length l)) /\
+  (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z ->
+   ((list.Nth.nth j s) = (list.Nth.nth (i + j)%Z l))) /\
+  (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < i)%Z ->
+   ~ ((list.Nth.nth j l) = (Init.Datatypes.Some 0%Z))) ->
+  list.List.is_nil s <-> (s = Init.Datatypes.nil) ->
+  forall (o:Init.Datatypes.bool),
+  ~ list.List.is_nil s /\
+  (exists o1:Numbers.BinNums.Z,
+   ((list.HdTl.hd s) = (Init.Datatypes.Some o1)) /\
+   ((o1 = 0%Z) /\ (o = Init.Datatypes.false) \/
+    ~ (o1 = 0%Z) /\ (o = Init.Datatypes.true))) \/
+  list.List.is_nil s /\ (o = Init.Datatypes.false) ->
+  ~ (o = Init.Datatypes.true) ->
+  ((0%Z <= i)%Z /\ (i < (list.Length.length l))%Z) /\ zero_at l i \/
+  (i = (list.Length.length l)) /\ no_zero l.
 Proof.
 intros l s i (h1,(h2,(h3,h4))) _ o h6 h7.
 destruct s.
@@ -74,4 +84,3 @@ simpl.
 now destruct H1 ; intuition ; subst.
 easy.
 Qed.
-

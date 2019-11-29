@@ -81,7 +81,7 @@ syn keyword  whyImport contained import
 
 syn region   whyNone matchgroup=whyKeyword start="\<import\>" matchgroup=whyModSpec end="\<\(\u\(\w\|'\)*\.\)*\u\(\w\|'\)*\>" contains=@whyAllErrs,whyComment
 
-syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\)\>" matchgroup=whyNone end="\<\w\(\w\|'\)*\>" contains=@whyAllErrs,whyComment
+syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\)\>" matchgroup=whyNone end="\<\w\(\w\|'\)\>\|" contains=@whyAllErrs,whyComment
 
 syn keyword  whyKeyword  as by constant
 syn keyword  whyKeyword  else epsilon exists
@@ -93,7 +93,7 @@ syn keyword  whyKeyword  then type with
 
 syn keyword  whyKeyword  abstract any break continue
 syn keyword  whyKeyword  exception fun ghost label
-syn keyword  whyKeyword  model mutable private
+syn keyword  whyKeyword  model mutable partial private
 syn keyword  whyKeyword  raise rec return val while
 
 syn keyword  whyBoolean  true false
@@ -101,7 +101,7 @@ syn keyword  whyBoolean  true false
 syn keyword  whyType     bool int list map option real
 syn keyword  whyType     array ref unit
 
-syn keyword  whySpec     absurd assert assume check diverges ensures invariant
+syn keyword  whySpec     absurd alias assert assume check diverges ensures invariant
 syn keyword  whySpec     pure raises reads requires returns variant writes at old
 
 syn match    whyConstructor  "(\s*)"

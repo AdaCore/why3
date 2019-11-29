@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -23,6 +23,7 @@ let opt_list_printers = ref false
 let opt_list_provers = ref false
 let opt_list_formats = ref false
 let opt_list_metas = ref false
+let opt_list_attrs = ref false
 
 let option_list = [
   "--list-transforms", Arg.Set opt_list_transforms,
@@ -35,6 +36,7 @@ let option_list = [
       " list known input formats";
   "--list-metas", Arg.Set opt_list_metas,
       " list known metas";
+  "--list-attributes", Arg.Set opt_list_attrs, "list used attributes";
   "--print-libdir",
       Arg.Unit (fun _ -> printf "%s@." Config.libdir; exit 0),
       " print location of binary components (plugins, etc)";
@@ -58,22 +60,37 @@ let extra_help fmt commands =
 let available_commands () =
   let commands = Sys.readdir command_path in
   Array.sort String.compare commands;
-  let re = Str.regexp "^why3\\([^.]+\\)\\([.].*\\)?" in
+  let re = Re.Str.regexp "^why3\\([^.]+\\)\\([.].*\\)?" in
   let commands = Array.fold_left (fun acc v ->
-    if Str.string_match re v 0 then
-      let w = Str.matched_group 1 v in
+    if Re.Str.string_match re v 0 then
+      let w = Re.Str.matched_group 1 v in
       match acc with
-      | _ when w = "contraption" -> acc
       | (h,_)::_ when h = w -> acc
       | _ -> (w, v) :: acc
     else acc) [] commands in
   List.rev commands
 
 let command sscmd =
+  let sscmd,args =
+    let cur = !Arg.current in
+    if sscmd = "help" then begin
+      if cur + 1 >= Array.length Sys.argv then begin
+        let extra_help fmt () = extra_help fmt (available_commands ()) in
+        Args.exit_with_usage ~exit_code:0 ~extra_help option_list usage_msg
+      end;
+      let sscmd = Sys.argv.(cur + 1) in
+      sscmd, ["--help"]
+    end else begin
+      let args = ref [] in
+      for i = 1 to Array.length Sys.argv - 1 do
+        if i <> cur then args := Sys.argv.(i) :: !args;
+      done;
+      sscmd, List.rev !args
+    end in
   let cmd =
     let scmd = "why3" ^ sscmd in
     let cmd = Filename.concat command_path scmd in
-    if cmd <> "" && cmd <> "contraption" && Sys.file_exists cmd
+    if cmd <> "" && Sys.file_exists cmd
     then cmd
     else begin
       let commands = available_commands () in
@@ -85,12 +102,8 @@ let command sscmd =
           exit 1 in
       Filename.concat command_path scmd
     end in
-  let args = ref [] in
-  for i = 1 to Array.length Sys.argv - 1 do
-    if i <> !Arg.current then args := Sys.argv.(i) :: !args;
-  done;
   let scmd = "why3 " ^ sscmd in
-  Unix.execv cmd (Array.of_list (scmd :: List.rev !args))
+  Unix.execv cmd (Array.of_list (scmd :: args))
 
 let () = try
   let extra_help fmt () = extra_help fmt (available_commands ()) in
@@ -109,7 +122,13 @@ let () = try
       (List.sort sort_pair (Trans.list_transforms ()));
     printf "@[<hov 2>Known splitting transformations:@\n%a@]@\n@."
       (Pp.print_list Pp.newline2 print_trans_desc)
-      (List.sort sort_pair (Trans.list_transforms_l ()))
+      (List.sort sort_pair (Trans.list_transforms_l ()));
+    let list_transform_with_arg =
+      Trans.list_transforms_with_args () @
+      Trans.list_transforms_with_args_l () in
+    printf "@[<hov 2>Known transformations with arguments:@\n%a@]@\n@."
+      (Pp.print_list Pp.newline2 print_trans_desc)
+      (List.sort sort_pair list_transform_with_arg)
   end;
   if !opt_list_printers then begin
     opt_list := true;
@@ -151,6 +170,11 @@ let () = try
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline2 print) (List.sort cmp (Theory.list_metas ()))
   end;
+  if !opt_list_attrs then begin
+    opt_list := true;
+    let l = List.sort String.compare (Ident.list_attributes ()) in
+    List.iter (fun x -> Format.eprintf "%s@." x) l
+  end;
   if !opt_list then exit 0;
 
   printf "@[%s%a@]" usage_msg extra_help ()
@@ -158,9 +182,3 @@ let () = try
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)

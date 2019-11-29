@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,7 +12,8 @@
 open Format
 open Worker_proto
 
-module SAT = (val (Sat_solvers.get_current ()) : Sat_solvers.S)
+module Worker = Js_of_ocaml.Worker
+module SAT = (val (Sat_solver.get_current ()) : Sat_solver_sig.S)
 module FE = Frontend.Make (SAT)
 
 let print_status fmt _d status steps =
@@ -34,10 +35,10 @@ let report_status report _d status _steps =
 let run_alt_ergo_on_task text =
   let lb = Lexing.from_string text in
 (* from Alt-Ergo, src/main/frontend.ml *)
-  let a = Why_parser.file Why_lexer.token lb in
+  let a = Why_parser.file_parser Why_lexer.parse_token lb in
   Parsing.clear_parser ();
-  let ltd, _typ_env = Why_typing.file false Why_typing.empty_env a in
-  match Why_typing.split_goals ltd with
+  let ltd, _typ_env = Typechecker.file false Typechecker.empty_env a in
+  match Typechecker.split_goals ltd with
   | [d] ->
     let d = Cnf.make (List.map (fun (f, _env) -> f, true) d) in
     SAT.reset_refs ();
@@ -49,7 +50,7 @@ let run_alt_ergo_on_task text =
           (SAT.empty (), true, Explanation.empty) d
         in
         !stat
-      with Sat_solvers.StepsLimitReached -> Unknown "steps limit reached"
+      with Fun_sat.StepsLimitReached -> Unknown "steps limit reached"
     end
   | _ -> Invalid "zero or more than 1 goal to solve"
 
@@ -58,6 +59,7 @@ let run_alt_ergo_on_task text =
 
 let () =
   Options.set_steps_bound 100;
+  Options.set_is_gui false;
   Worker.set_onmessage (fun msg ->
 			match unmarshal msg with
 			  Goal (id, text, steps) ->

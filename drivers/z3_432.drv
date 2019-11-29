@@ -4,10 +4,13 @@
    prelude "(set-logic AUFNIRA)"
 *)
 
+prelude ";; produced by z3_432.drv ;;"
+
 (* Counterexamples: set model parser *)
 model_parser "smtv2"
 
-import "smt-libv2.drv"
+import "smt-libv2.gen"
+printer "smtv2"
 import "no-bv.gen"
 import "discrimination.gen"
 
@@ -40,6 +43,7 @@ transformation "encoding_smt_if_poly"
 (** Error messages specific to Z3 *)
 
 outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
+steplimitexceeded "Maximal allocation counts .* have been exceeded\\|(error \".*number of configured allocations exceeded\")"
 timeout "interrupted by timeout"
 
 (** Extra theories supported by Z3 *)
@@ -74,31 +78,4 @@ theory real.Trigonometry
   syntax function atan "(atan %1)"
 
 end
-*)
-
-
-(* REMOVED: we do not use BV theory from Z3 in 4.3.2 but starting from 4.4.0
-
-(* bitvector modules, is not in smt-libv2.drv since cvc4 and z3 don't
-   have the same name for the function to_uint *)
-theory bv.BV64
-  syntax converter of_int "((_ int2bv 64) %1)"
-  syntax function to_uint "(bv2int %1)"
-end
-
-theory bv.BV32
-  syntax converter of_int "((_ int2bv 32) %1)"
-  syntax function to_uint "(bv2int %1)"
-end
-
-theory bv.BV16
-  syntax converter of_int "((_ int2bv 16) %1)"
-  syntax function to_uint "(bv2int %1)"
-end
-
-theory bv.BV8
-  syntax converter of_int "((_ int2bv 8) %1)"
-  syntax function to_uint "(bv2int %1)"
-end
-
 *)

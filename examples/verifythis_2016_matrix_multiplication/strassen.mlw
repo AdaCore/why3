@@ -1,14 +1,14 @@
 module MatrixMultiplication
 
-  use import int.Int
-  use import int.Sum
-  use import ref.Ref
-  use import map.Map
+  use int.Int
+  use int.Sum
+  use ref.Ref
+  use map.Map
   use import matrices.Matrix as F
-  use import matrices.MatrixArithmetic
-  use import matrices.BlockMul
-  use import matrices_ring_simp.Symb
-  use import matrix.Matrix
+  use matrices.MatrixArithmetic
+  use matrices.BlockMul
+  use matrices_ring_simp.Symb
+  use matrix.Matrix
 
   let blit (src tar: matrix 'a) (src_r tar_r dr src_c tar_c dc: int) : unit
     requires { 0 <= src_r <= src_r + dr <= src.rows }
@@ -255,8 +255,8 @@ module MatrixMultiplication
     res
 
 
-  use import int.EuclideanDivision
-  use import number.Parity
+  use int.EuclideanDivision
+  use number.Parity
 
   let rec strassen (a b: matrix int) (ghost flag:int) : matrix int
     requires { a.mdl.F.cols = b.mdl.F.rows }

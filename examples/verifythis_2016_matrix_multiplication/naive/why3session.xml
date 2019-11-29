@@ -1,77 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../naive.mlw">
-<theory name="MatrixMultiplication" sum="911c4e0a5b3fe8cc6dacaa3acb684928">
- <goal name="VC mult_naive" expl="VC for mult_naive">
- <transf name="split_goal_wp">
-  <goal name="VC mult_naive.1" expl="1. precondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="naive.mlw"/>
+<theory name="MatrixMultiplication" proved="true">
+ <goal name="mult_naive&#39;vc" expl="VC for mult_naive" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="mult_naive&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC mult_naive.2" expl="2. loop bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="mult_naive&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC mult_naive.3" expl="3. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="mult_naive&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC mult_naive.4" expl="4. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  <goal name="mult_naive&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="VC mult_naive.5" expl="5. loop bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="mult_naive&#39;vc.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC mult_naive.6" expl="6. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+  <goal name="mult_naive&#39;vc.5" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="VC mult_naive.7" expl="7. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
+  <goal name="mult_naive&#39;vc.6" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC mult_naive.8" expl="8. loop bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="mult_naive&#39;vc.7" expl="index in matrix bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC mult_naive.9" expl="9. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
+  <goal name="mult_naive&#39;vc.8" expl="index in matrix bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC mult_naive.10" expl="10. loop invariant init">
-  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="mult_naive&#39;vc.9" expl="index in matrix bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC mult_naive.11" expl="11. index in matrix bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="mult_naive&#39;vc.10" expl="index in matrix bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC mult_naive.12" expl="12. index in matrix bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="mult_naive&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="36"/></proof>
   </goal>
-  <goal name="VC mult_naive.13" expl="13. index in matrix bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="mult_naive&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="92"/></proof>
   </goal>
-  <goal name="VC mult_naive.14" expl="14. index in matrix bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="mult_naive&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="VC mult_naive.15" expl="15. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03" steps="31"/></proof>
+  <goal name="mult_naive&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="VC mult_naive.16" expl="16. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.09" steps="77"/></proof>
+  <goal name="mult_naive&#39;vc.15" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC mult_naive.17" expl="17. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="mult_naive&#39;vc.16" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="32"/></proof>
   </goal>
-  <goal name="VC mult_naive.18" expl="18. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="mult_naive&#39;vc.17" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="59"/></proof>
   </goal>
-  <goal name="VC mult_naive.19" expl="19. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>
+  <goal name="mult_naive&#39;vc.18" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC mult_naive.20" expl="20. loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="52"/></proof>
+  <goal name="mult_naive&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
   </goal>
-  <goal name="VC mult_naive.21" expl="21. postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="mult_naive&#39;vc.20" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="VC mult_naive.22" expl="22. postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
+  <goal name="mult_naive&#39;vc.21" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
  </transf>
  </goal>

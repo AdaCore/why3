@@ -1,73 +1,235 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../pairing_heap.mlw" expanded="true">
-<theory name="Heap" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="HeapType" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="Size" sum="d1f04a99b56a83b7ac16cdbff4e4d751">
- <goal name="VC size_nonneg" expl="VC for size_nonneg">
- <proof prover="2"><result status="valid" time="0.00" steps="26"/></proof>
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="pairing_heap.mlw"/>
+<theory name="Size" proved="true">
+ <goal name="size_nonneg&#39;vc" expl="VC for size_nonneg" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="28"/></proof>
  </goal>
- <goal name="VC size_list_nonneg" expl="VC for size_list_nonneg">
- <proof prover="2"><result status="valid" time="0.00" steps="38"/></proof>
+ <goal name="size_tree_nonneg&#39;vc" expl="VC for size_tree_nonneg" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
  </goal>
- <goal name="VC size_empty" expl="VC for size_empty">
- <proof prover="2"><result status="valid" time="0.00" steps="15"/></proof>
+ <goal name="size_list_nonneg&#39;vc" expl="VC for size_list_nonneg" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="67"/></proof>
  </goal>
-</theory>
-<theory name="Occ" sum="136b365b3e776a8da3526fad7cf08cb4">
- <goal name="VC occ_nonneg" expl="VC for occ_nonneg">
- <proof prover="2"><result status="valid" time="0.00" steps="26"/></proof>
- </goal>
- <goal name="VC occ_list_nonneg" expl="VC for occ_list_nonneg">
- <proof prover="2"><result status="valid" time="0.00" steps="33"/></proof>
+ <goal name="size_empty&#39;vc" expl="VC for size_empty" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="46"/></proof>
  </goal>
 </theory>
-<theory name="PairingHeap" sum="90f5c2d494967d4ac7c91bc8ae4a4dae" expanded="true">
- <goal name="le_root_trans" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="19"/></proof>
+<theory name="Occ" proved="true">
+ <goal name="occ_nonneg&#39;vc" expl="VC for occ_nonneg" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="29"/></proof>
  </goal>
- <goal name="le_roots_trans" expl="">
- <transf name="induction_ty_lex">
-  <goal name="le_roots_trans.1" expl="">
-  <proof prover="2"><result status="valid" time="0.01" steps="52"/></proof>
+ <goal name="occ_tree_nonneg&#39;vc" expl="VC for occ_tree_nonneg" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="26"/></proof>
+ </goal>
+ <goal name="occ_list_nonneg&#39;vc" expl="VC for occ_list_nonneg" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="92"/></proof>
+ </goal>
+</theory>
+<theory name="PairingHeap" proved="true">
+ <goal name="le_root_trans" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="63"/></proof>
+ </goal>
+ <goal name="le_roots_trans" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="le_roots_trans.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="124"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC heap_mem" expl="VC for heap_mem">
- <proof prover="2"><result status="valid" time="0.03" steps="141"/></proof>
+ <goal name="heap&#39;vc" expl="VC for heap" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
- <goal name="VC heap_mem_list" expl="VC for heap_mem_list">
- <proof prover="2"><result status="valid" time="0.03" steps="243"/></proof>
+ <goal name="heap_mem&#39;vc" expl="VC for heap_mem" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="205"/></proof>
  </goal>
- <goal name="VC root_is_minimum" expl="VC for root_is_minimum">
- <proof prover="0"><result status="valid" time="0.07"/></proof>
+ <goal name="heap_mem_tree&#39;vc" expl="VC for heap_mem_tree" proved="true">
+ <proof prover="0"><result status="valid" time="0.06" steps="310"/></proof>
  </goal>
- <goal name="VC empty" expl="VC for empty">
- <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
+ <goal name="heap_mem_list&#39;vc" expl="VC for heap_mem_list" proved="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="492"/></proof>
  </goal>
- <goal name="VC is_empty" expl="VC for is_empty">
- <proof prover="2"><result status="valid" time="0.00" steps="18"/></proof>
+ <goal name="root_is_minimum&#39;vc" expl="VC for root_is_minimum" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="root_is_minimum&#39;vc.0" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="root_is_minimum&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1"><result status="valid" time="0.77" steps="3495"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="VC merge" expl="VC for merge">
- <proof prover="2"><result status="valid" time="0.15" steps="937"/></proof>
+ <goal name="empty&#39;vc" expl="VC for empty" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="40"/></proof>
  </goal>
- <goal name="VC insert" expl="VC for insert">
- <proof prover="2"><result status="valid" time="0.02" steps="89"/></proof>
+ <goal name="is_empty&#39;vc" expl="VC for is_empty" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="45"/></proof>
  </goal>
- <goal name="VC find_min" expl="VC for find_min">
- <proof prover="2"><result status="valid" time="0.00" steps="20"/></proof>
+ <goal name="merge&#39;vc" expl="VC for merge" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="merge&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  </goal>
+  <goal name="merge&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+  </goal>
+  <goal name="merge&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="merge&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="211"/></proof>
+  </goal>
+  <goal name="merge&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="213"/></proof>
+  </goal>
+  <goal name="merge&#39;vc.5" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="merge&#39;vc.5.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+   </goal>
+   <goal name="merge&#39;vc.5.1" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+   </goal>
+   <goal name="merge&#39;vc.5.2" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+   </goal>
+   <goal name="merge&#39;vc.5.3" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+   </goal>
+   <goal name="merge&#39;vc.5.4" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="merge&#39;vc.6" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="merge&#39;vc.6.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+   </goal>
+   <goal name="merge&#39;vc.6.1" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+   </goal>
+   <goal name="merge&#39;vc.6.2" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+   </goal>
+   <goal name="merge&#39;vc.6.3" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="234"/></proof>
+   </goal>
+   <goal name="merge&#39;vc.6.4" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="236"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
- <goal name="VC merge_pairs" expl="VC for merge_pairs">
- <proof prover="2"><result status="valid" time="0.05" steps="462"/></proof>
+ <goal name="insert&#39;vc" expl="VC for insert" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="220"/></proof>
  </goal>
- <goal name="VC delete_min" expl="VC for delete_min">
- <proof prover="2"><result status="valid" time="0.02" steps="151"/></proof>
+ <goal name="find_min&#39;vc" expl="VC for find_min" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="51"/></proof>
+ </goal>
+ <goal name="merge_pairs&#39;vc" expl="VC for merge_pairs" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="merge_pairs&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
+  </goal>
+  <goal name="merge_pairs&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="merge_pairs&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  </goal>
+  <goal name="merge_pairs&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
+  </goal>
+  <goal name="merge_pairs&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="21"/></proof>
+  </goal>
+  <goal name="merge_pairs&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+  </goal>
+  <goal name="merge_pairs&#39;vc.6" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="merge_pairs&#39;vc.6.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+   </goal>
+   <goal name="merge_pairs&#39;vc.6.1" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
+   </goal>
+   <goal name="merge_pairs&#39;vc.6.2" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="26"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="merge_pairs&#39;vc.7" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="merge_pairs&#39;vc.7.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="19"/></proof>
+   </goal>
+   <goal name="merge_pairs&#39;vc.7.1" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.01" steps="68"/></proof>
+   </goal>
+   <goal name="merge_pairs&#39;vc.7.2" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="223"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="delete_min&#39;vc" expl="VC for delete_min" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="delete_min&#39;vc.0" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="delete_min&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="46"/></proof>
+  </goal>
+  <goal name="delete_min&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="1.28" steps="5521"/></proof>
+  </goal>
+  <goal name="delete_min&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="1.28" steps="6034"/></proof>
+  </goal>
+  <goal name="delete_min&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.21" steps="1690"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Correct" proved="true">
+ <goal name="Heap.TotalPreOrder.Refl" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+ </goal>
+ <goal name="Heap.TotalPreOrder.Trans" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+ </goal>
+ <goal name="Heap.TotalPreOrder.Total" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+ </goal>
+ <goal name="Heap.min_def" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="77"/></proof>
+ </goal>
+ <goal name="Heap.empty&#39;vc" expl="VC for empty" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="36"/></proof>
+ </goal>
+ <goal name="Heap.is_empty&#39;vc" expl="VC for is_empty" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+ </goal>
+ <goal name="Heap.merge&#39;vc" expl="VC for merge" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="71"/></proof>
+ </goal>
+ <goal name="Heap.insert&#39;vc" expl="VC for insert" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="58"/></proof>
+ </goal>
+ <goal name="Heap.find_min&#39;vc" expl="VC for find_min" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="15"/></proof>
+ </goal>
+ <goal name="Heap.delete_min&#39;vc" expl="VC for delete_min" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="101"/></proof>
  </goal>
 </theory>
 </file>

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,10 +13,7 @@
 
 (** {2 Wrappers for deprecated string functions of OCaml stdlib} *)
 
-val create : int -> string
-val copy : string -> string
-val set : string -> int -> char -> unit
-
+val lowercase : string -> string
 val capitalize : string -> string
 val uncapitalize : string -> string
 
@@ -57,3 +54,6 @@ val has_suffix : string -> string -> bool
 val remove_suffix : string -> string -> string
 (** [remove_suffix suff s] removes the suffix [suff] from [s].
     Raises [Not_found] if [s] does not end with [suff] *)
+
+val ends_with : string -> string -> bool
+(** test if a string ends with another *)

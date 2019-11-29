@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -61,7 +61,7 @@ let overload_of_rs {rs_cty = cty} =
   | a::al when not a.pv_ghost && List.for_all (same_type a.pv_ity) al ->
       let res = cty.cty_result in
       if ity_equal res a.pv_ity then SameType else
-      if ity_closed res && ity_immutable res then FixedRes res else NoOver
+      if ity_closed res && res.ity_pure then FixedRes res else NoOver
   | _ -> NoOver
 
 let same_overload r1 r2 =
@@ -70,6 +70,12 @@ let same_overload r1 r2 =
   | SameType, SameType -> true
   | FixedRes t1, FixedRes t2 -> ity_equal t1 t2
   | _ -> false (* two NoOver's are not the same *)
+
+let ref_attr = Ident.create_attribute "mlw:reference_var"
+
+let has_ref s =
+  let has v = Sattr.mem ref_attr v.pv_vs.vs_name.id_attrs in
+  List.exists has s.rs_cty.cty_args
 
 exception IncompatibleNotation of string
 
@@ -85,14 +91,19 @@ let merge_ps chk x vo vn =
     (* once again, no way to export notation *)
     | _, OO _ -> assert false
     (* but we can merge two compatible symbols *)
-    | RS r1, RS r2 when not (rs_equal r1 r2) ->
+    | RS r1, RS r2 ->
+        if rs_equal r1 r2 then vo else
+        if has_ref r1 || has_ref r2 then vn else
         if not (same_overload r1 r2) then vn else
         if ity_equal (fsty r1) (fsty r2) then vn else
         OO (Srs.add r2 (Srs.singleton r1))
     (* or add a compatible symbol to notation *)
     | OO s1, RS r2 ->
-        let r1 = Srs.choose s1 and ty = fsty r2 in
+        if Srs.mem r2 s1 then vo else
+        if has_ref r2 then vn else
+        let r1 = Srs.choose s1 in
         if not (same_overload r1 r2) then vn else
+        let ty = fsty r2 in
         let confl r = not (ity_equal (fsty r) ty) in
         let s1 = Srs.filter confl s1 in
         if Srs.is_empty s1 then vn else
@@ -172,6 +183,7 @@ and mod_inst = {
   mi_pv  : pvsymbol Mvs.t;
   mi_rs  : rsymbol Mrs.t;
   mi_xs  : xsymbol Mxs.t;
+  mi_df  : prop_kind;
 }
 
 let empty_mod_inst m = {
@@ -184,6 +196,7 @@ let empty_mod_inst m = {
   mi_pv  = Mvs.empty;
   mi_rs  = Mrs.empty;
   mi_xs  = Mxs.empty;
+  mi_df  = Plemma;
 }
 
 (** {2 Module under construction} *)
@@ -274,19 +287,27 @@ let add_meta uc m al = { uc with
   muc_theory = Theory.add_meta uc.muc_theory m al;
   muc_units  = Umeta (m,al) :: uc.muc_units; }
 
-let store_path, store_module, restore_path =
+let store_path, store_module, restore_path, restore_module_id =
   let id_to_path = Wid.create 17 in
+  let id_to_pmod = Wid.create 17 in
   let store_path {muc_theory = uc} path id =
     (* this symbol already belongs to some theory *)
     if Wid.mem id_to_path id then () else
     let prefix = List.rev (id.id_string :: path @ uc.uc_prefix) in
     Wid.set id_to_path id (uc.uc_path, uc.uc_name.id_string, prefix) in
-  let store_module {mod_theory = {th_name = id} as th} =
+  let store_module pmod  =
+    let th = pmod.mod_theory in
+    let id = th.th_name in
     (* this symbol is already a module *)
-    if Wid.mem id_to_path id then () else
-    Wid.set id_to_path id (th.th_path, id.id_string, []) in
+    if Wid.mem id_to_path id then () else begin
+        Wid.set id_to_path id (th.th_path, id.id_string, []);
+        Sid.iter (fun id -> Wid.set id_to_pmod id pmod) pmod.mod_local;
+        Wid.set id_to_pmod id pmod;
+      end
+  in
   let restore_path id = Wid.find id_to_path id in
-  store_path, store_module, restore_path
+  let restore_module_id id = Wid.find id_to_pmod id in
+  store_path, store_module, restore_path, restore_module_id
 
 let close_module uc =
   let m = close_module uc in
@@ -362,6 +383,7 @@ let builtin_module =
   let uc = empty_module dummy_env (id_fresh "BuiltIn") ["why3";"BuiltIn"] in
   let uc = add_pdecl_no_logic uc pd_int in
   let uc = add_pdecl_no_logic uc pd_real in
+  let uc = add_pdecl_no_logic uc pd_str in
   let uc = add_pdecl_no_logic uc pd_equ in
   let m = close_module uc in
   { m with mod_theory = builtin_theory }
@@ -393,6 +415,32 @@ let unit_module =
   let td = create_alias_decl (id_fresh "unit") [] ity_unit in
   close_module (List.fold_left add uc (create_type_decl [td]))
 
+let itd_ref =
+  let tv = create_tvsymbol (id_fresh "a") in
+  let pj = create_pvsymbol (id_fresh "contents") (ity_var tv) in
+  create_plain_record_decl ~priv:false ~mut:true (id_fresh "ref")
+                                            [tv] [true, pj] [] []
+
+let its_ref = itd_ref.itd_its
+let rs_ref_cons = List.hd itd_ref.itd_constructors
+let rs_ref_proj = List.hd itd_ref.itd_fields
+
+let ts_ref = its_ref.its_ts
+let ls_ref_cons = ls_of_rs rs_ref_cons
+let ls_ref_proj = ls_of_rs rs_ref_proj
+
+let rs_ref_ld, rs_ref =
+  let cty = rs_ref_cons.rs_cty in
+  let ityl = List.map (fun v -> v.pv_ity) cty.cty_args in
+  let_sym (id_fresh "ref") (c_app rs_ref_cons [] ityl cty.cty_result)
+
+let ref_module =
+  let add uc d = add_pdecl_raw ~warn:false uc d in
+  let uc = empty_module dummy_env (id_fresh "Ref") ["why3";"Ref"] in
+  let uc = List.fold_left add uc (create_type_decl [itd_ref]) in
+  let uc = use_export uc builtin_module (* needed for "=" *) in
+  close_module (add uc (create_let_decl rs_ref_ld))
+
 let create_module env ?(path=[]) n =
   let m = empty_module env n path in
   let m = use_export m builtin_module in
@@ -403,6 +451,8 @@ let create_module env ?(path=[]) n =
 let add_use uc d = Sid.fold (fun id uc ->
   if id_equal id ts_func.ts_name then
     use_export uc highord_module
+  else if id_equal id ts_ref.ts_name then
+    use_export uc ref_module
   else match is_ts_tuple_id id with
   | Some n -> use_export uc (tuple_module n)
   | None -> uc) (Mid.set_diff d.pd_syms uc.muc_known) uc
@@ -445,6 +495,8 @@ let empty_clones m = {
   rs_table = Mrs.empty;
   xs_table = Mxs.empty;
 }
+
+exception CloneDivergence of ident * ident
 
 (* populate the clone structure *)
 
@@ -544,13 +596,13 @@ let cl_init m inst =
   Mts.iter (fun ts _ -> non_local ts.ts_name) inst.mi_ty;
   let check_ls ls _ =
     non_local ls.ls_name;
-    try  ignore (restore_rs ls); raise (BadInstance ls.ls_name)
+    try  ignore (restore_rs ls); raise (BadInstance (BadI ls.ls_name))
     with Not_found -> () in
   Mls.iter check_ls inst.mi_ls;
   let check_rs rs _ =
     non_local rs.rs_name;
     match (Mid.find rs.rs_name m.mod_known).pd_node with
-    | PDtype _ -> raise (BadInstance rs.rs_name)
+    | PDtype _ -> raise (BadInstance (BadI rs.rs_name))
     | PDlet  _ | PDexn  _ | PDpure -> () in
   Mrs.iter check_rs inst.mi_rs;
   Mvs.iter (fun vs _ -> non_local vs.vs_name) inst.mi_pv;
@@ -558,10 +610,10 @@ let cl_init m inst =
   let check_pk pr _ =
     non_local pr.pr_name;
     match (Mid.find pr.pr_name m.mod_known).pd_node with
-    | PDtype _ | PDlet  _ | PDexn  _ -> raise (BadInstance pr.pr_name)
+    | PDtype _ | PDlet  _ | PDexn  _ -> raise (BadInstance (BadI pr.pr_name))
     | PDpure -> () in
   Mpr.iter check_pk inst.mi_pk;
-  Mpr.iter (fun pr _ -> raise (BadInstance pr.pr_name)) inst.mi_pr;
+  Mpr.iter (fun pr _ -> raise (BadInstance (BadI pr.pr_name))) inst.mi_pr;
   cl
 
 (* clone declarations *)
@@ -580,13 +632,13 @@ let clone_decl inst cl uc d = match d.d_node with
   | Dparam ({ls_name = id} as ls) when Mls.mem ls inst.mi_ls ->
       let ls' = Mls.find ls inst.mi_ls in
       let mtch sb ty ty' = try ty_match sb ty' (clone_ty cl ty)
-        with TypeMismatch _ -> raise (BadInstance id) in
+        with TypeMismatch _ -> raise (BadInstance (BadI id)) in
       let sbs = match ls.ls_value,ls'.ls_value with
         | Some ty, Some ty' -> mtch Mtv.empty ty ty'
         | None, None -> Mtv.empty
-        | _ -> raise (BadInstance id) in
+        | _ -> raise (BadInstance (BadI id)) in
       ignore (try List.fold_left2 mtch sbs ls.ls_args ls'.ls_args
-        with Invalid_argument _ -> raise (BadInstance id));
+        with Invalid_argument _ -> raise (BadInstance (BadI id)));
       cl.ls_table <- Mls.add ls ls' cl.ls_table;
       uc
   | Dparam ls ->
@@ -618,9 +670,10 @@ let clone_decl inst cl uc d = match d.d_node with
         | Plemma, Some Pgoal -> true, Pgoal
         | Plemma, _ -> false, Plemma
         | Paxiom, Some k -> false, k
-        | Paxiom, None -> false, Paxiom (* TODO: Plemma *) in
+        | Paxiom, None -> false, inst.mi_df in
       if skip then uc else
-      let pr' = create_prsymbol (id_clone pr.pr_name) in
+      let attr = Sattr.remove Ident.useraxiom_attr pr.pr_name.id_attrs in
+      let pr' = create_prsymbol (id_attr pr.pr_name attr) in
       cl.pr_table <- Mpr.add pr pr' cl.pr_table;
       let d = create_prop_decl k' pr' (clone_fmla cl f) in
       add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
@@ -725,7 +778,8 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let eff = eff_reset (eff_write reads writes) resets in
   let add_raise xs eff = eff_raise eff (sm_find_xs sm xs) in
   let eff = Sxs.fold add_raise cty.cty_effect.eff_raises eff in
-  let eff = if cty.cty_effect.eff_oneway then eff_diverge eff else eff in
+  let eff = if partial cty.cty_effect.eff_oneway then eff_partial eff else eff in
+  let eff = if diverges cty.cty_effect.eff_oneway then eff_diverge eff else eff in
   let cty = create_cty ~mask:cty.cty_mask args pre post xpost olds eff res in
   cty_ghostify (cty_ghost cty) cty
 
@@ -751,9 +805,9 @@ let clone_ppat cl sm pp mask =
   let save v sm = sm_save_vs sm v (Mstr.find v.vs_name.id_string vm) in
   Svs.fold save pp.pp_pat.pat_vars sm, pp'
 
-let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
+let rec clone_expr cl sm e = e_attr_copy e (match e.e_node with
   | Evar v -> e_var (sm_find_pv sm v)
-  | Econst c -> e_const c e.e_ity
+  | Econst c -> e_const c (clone_ity cl e.e_ity)
   | Eexec (c,_) -> e_exec (clone_cexp cl sm c)
   | Eassign asl ->
       let conv (r,f,v) =
@@ -764,12 +818,16 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
       e_let ld (clone_expr cl sm e)
   | Eif (e1, e2, e3) ->
       e_if (clone_expr cl sm e1) (clone_expr cl sm e2) (clone_expr cl sm e3)
-  | Ecase (d, bl) ->
+  | Ematch (d, bl, xl) ->
       let d = clone_expr cl sm d in
-      let conv_br (pp, e) =
+      let conv_rbr (pp, e) =
         let sm, pp = clone_ppat cl sm pp d.e_mask in
         pp, clone_expr cl sm e in
-      e_case d (List.map conv_br bl)
+      let conv_xbr xs (vl, e) m =
+        let vl' = List.map (clone_pv cl) vl in
+        let sm = List.fold_left2 sm_save_pv sm vl vl' in
+        Mxs.add (sm_find_xs sm xs) (vl', clone_expr cl sm e) m in
+      e_match d (List.map conv_rbr bl) (Mxs.fold conv_xbr xl Mxs.empty)
   | Ewhile (c,invl,varl,e) ->
       e_while (clone_expr cl sm c) (clone_invl cl sm invl)
               (clone_varl cl sm varl) (clone_expr cl sm e)
@@ -781,14 +839,8 @@ let rec clone_expr cl sm e = e_label_copy e (match e.e_node with
       e_for v'
         (e_var (sm_find_pv sm f)) dir (e_var (sm_find_pv sm t))
         i' (clone_invl cl ism invl) (clone_expr cl ism e)
-  | Etry (d, case, xl) ->
-      let conv_br xs (vl, e) m =
-        let vl' = List.map (clone_pv cl) vl in
-        let sm = List.fold_left2 sm_save_pv sm vl vl' in
-        Mxs.add (sm_find_xs sm xs) (vl', clone_expr cl sm e) m in
-      e_try (clone_expr cl sm d) ~case (Mxs.fold conv_br xl Mxs.empty)
-  | Eraise (xs, e) ->
-      e_raise (sm_find_xs sm xs) (clone_expr cl sm e) (clone_ity cl e.e_ity)
+  | Eraise (xs, e1) ->
+      e_raise (sm_find_xs sm xs) (clone_expr cl sm e1) (clone_ity cl e.e_ity)
   | Eexn ({xs_name = id; xs_mask = mask; xs_ity = ity} as xs, e) ->
       let xs' = create_xsymbol (id_clone id) ~mask (clone_ity cl ity) in
       e_exn xs' (clone_expr cl (sm_save_xs sm xs xs') e)
@@ -832,8 +884,8 @@ and clone_let_defn cl sm ld = match ld with
         ~ghost:(rs_ghost s) ~kind:(rs_kind s) c' in
       sm_save_rs cl sm s s', ld
   | LDrec rdl ->
-      let conv_rs mrs {rec_rsym = {rs_name = id} as rs; rec_varl = varl} =
-        let cty = clone_cty cl sm ~drop_decr:(varl <> []) rs.rs_cty in
+      let conv_rs mrs {rec_rsym = {rs_name = id} as rs} =
+        let cty = clone_cty cl sm ~drop_decr:true rs.rs_cty in
         let rs' = create_rsymbol (id_clone id) ~ghost:(rs_ghost rs) cty in
         Mrs.add rs rs' mrs, rs' in
       let mrs, rsyml = Lists.map_fold_left conv_rs sm.sm_rs rdl in
@@ -865,12 +917,15 @@ let clone_type_record cl s d s' d' =
     let pj_ity = clone_ity cl pj.pv_ity in
     let pj_ght = pj.pv_ghost in
     let rs' = try Hstr.find fields' pj_str with Not_found ->
-      raise (BadInstance id) in
+        raise (BadInstance (BadI_not_found (id, pj_str))) in
     let pj' = fd_of_rs rs' in
     let pj'_ity = pj'.pv_ity in
     let pj'_ght = pj'.pv_ghost in
-    if not (ity_equal pj_ity pj'_ity && (pj_ght || not pj'_ght)) then
-      raise (BadInstance id);
+    let equal_pjs = ity_equal pj_ity pj'_ity in
+    if not equal_pjs then
+      raise (BadInstance (BadI_type_proj (id, pj.pv_vs.vs_name.id_string)));
+    if not (pj_ght || not pj'_ght) then
+      raise (BadInstance (BadI_ghost_proj (id, pj.pv_vs.vs_name.id_string)));
     let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     cl.rs_table <- Mrs.add rs rs' cl.rs_table;
@@ -910,13 +965,13 @@ let clone_type_decl inst cl tdl kn =
       begin match Mts.find_opt ts inst.mi_ts with
       | Some s' ->
           if not (List.length ts.ts_args = List.length s'.its_ts.ts_args) then
-            raise (BadInstance id);
+            raise (BadInstance (BadI id));
           let pd' = Mid.find s'.its_ts.ts_name kn in
           let d' = match pd'.pd_node with
             | PDtype [d'] -> d'
             (* FIXME: we could refine with mutual types *)
-            | PDtype _ -> raise (BadInstance id)
-            | PDlet _ | PDexn _ | PDpure -> raise (BadInstance id) in
+            | PDtype _ -> raise (BadInstance (BadI id))
+            | PDlet _ | PDexn _ | PDpure -> raise (BadInstance (BadI id)) in
           clone_type_record cl s d s' d'; (* clone record fields *)
           (* generate and add VC for type invariant implication *)
           if d.itd_invariant <> [] then begin
@@ -931,7 +986,7 @@ let clone_type_decl inst cl tdl kn =
              private types with no fields and no invariant? *)
           let stv = Stv.of_list ts.ts_args in
           if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
-                  its_pure s && ity_immutable ity) then raise (BadInstance id);
+                  its_pure s && ity.ity_pure) then raise (BadInstance (BadI id));
           cl.ty_table <- Mts.add ts ity cl.ty_table
       | None -> assert false end end;
       Hits.add htd s None;
@@ -997,8 +1052,8 @@ let clone_type_decl inst cl tdl kn =
 
 let add_vc uc (its, f) =
   let {id_string = nm; id_loc = loc} = its.its_ts.ts_name in
-  let label = Slab.singleton (Ident.create_label ("expl:VC for " ^ nm)) in
-  let pr = create_prsymbol (id_fresh ~label ?loc ("VC " ^ nm)) in
+  let attrs = Sattr.singleton (Ident.create_attribute ("expl:VC for " ^ nm)) in
+  let pr = create_prsymbol (id_fresh ~attrs ?loc (nm ^ "'vc")) in
   let d = create_pure_decl (create_prop_decl Pgoal pr f) in
   add_pdecl ~warn:false ~vc:false uc d
 
@@ -1015,19 +1070,29 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let add_e spv e = Spv.union spv e.e_effect.eff_reads in
       let add_d spv d = List.fold_left add_e spv d.itd_witness in
       freeze_foreign cl (List.fold_left add_d Spv.empty tdl);
-      let tdl, vcl = clone_type_decl inst cl tdl uc.muc_known in
-      if tdl = [] then List.fold_left add_vc uc vcl else
-        let add uc d = add_pdecl ~warn:false ~vc:false uc d in
-        List.fold_left add uc (create_type_decl tdl)
+      let ndl, vcl = clone_type_decl inst cl tdl uc.muc_known in
+      let uc = List.fold_left add_vc uc vcl in
+      let dl = if ndl <> [] then create_type_decl ndl else [] in
+      let save_special_ls d d' = match d.d_node, d'.d_node with
+        | Dparam ls, Dparam ls' | Dlogic [ls,_], Dlogic [ls',_] ->
+            cl.ls_table <- Mls.add ls ls' cl.ls_table;
+        | Dtype _, Dtype _ -> ()
+        | _ -> assert false in
+      begin match tdl, dl with
+      | [{itd_its = {its_def = (Range _|Float _)}}], [d'] ->
+          List.iter2 save_special_ls d.pd_pure d'.pd_pure
+      | _ -> () end;
+      let add uc d = add_pdecl ~warn:false ~vc:false uc d in
+      List.fold_left add uc dl
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
       (* refine only [val] symbols *)
       let cty = match c.c_node with (* cty for [val constant] is not c.c_cty *)
         | Cany -> c.c_cty
         | Cfun {e_node = Eexec ({c_node = Cany}, cty)} -> cty
-        | _ -> raise (BadInstance rs.rs_name) in
+        | _ -> raise (BadInstance (BadI rs.rs_name)) in
       let kind = match rs.rs_logic with
         | RLnone -> RKnone
-        | RLpv _ -> raise (BadInstance rs.rs_name)
+        | RLpv _ -> raise (BadInstance (BadI rs.rs_name))
         | RLls ls when ls.ls_value = None -> RKpred
         | RLls _ -> RKfunc
         | RLlemma -> RKlemma in
@@ -1037,7 +1102,12 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       begin match rs.rs_logic, rs'.rs_logic with
       | RLnone, (RLnone | RLls _ | RLlemma) | RLlemma, RLlemma -> ()
       | RLls ls, RLls ls' -> cl.ls_table <- Mls.add ls ls' cl.ls_table
-      | _ -> raise (BadInstance rs.rs_name)
+      | _ -> raise (BadInstance (BadI rs.rs_name))
+      end;
+      begin
+        match cty.cty_effect.eff_oneway, rs'.rs_cty.cty_effect.eff_oneway with
+        | _, Total | Diverges, _ | Partial, Partial -> ()
+        | _ -> raise (CloneDivergence (rs.rs_name, rs'.rs_name))
       end;
       cl.rs_table <- Mrs.add rs rs' cl.rs_table;
       let e = e_exec (c_app rs' cty.cty_args [] cty.cty_result) in
@@ -1053,10 +1123,10 @@ let clone_pdecl inst cl uc d = match d.pd_node with
   | PDlet ld ->
       begin match ld with
         | LDvar ({pv_vs=vs}, _) when Mvs.mem vs inst.mi_pv ->
-            raise (BadInstance vs.vs_name)
+            raise (BadInstance (BadI vs.vs_name))
         | LDrec rdl ->
             let no_inst { rec_sym = rs } =
-              if Mrs.mem rs inst.mi_rs then raise (BadInstance rs.rs_name) in
+              if Mrs.mem rs inst.mi_rs then raise (BadInstance (BadI rs.rs_name)) in
             List.iter no_inst rdl
         | _ -> () end;
       let reads = match ld with
@@ -1072,8 +1142,8 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let xs' = Mxs.find xs inst.mi_xs in
       begin try let ity = clone_ity cl xs.xs_ity in
                 ignore (ity_match isb_empty xs'.xs_ity ity)
-        with TypeMismatch _ -> raise (BadInstance id) end;
-      if mask_spill xs'.xs_mask xs.xs_mask then raise (BadInstance id);
+        with TypeMismatch _ -> raise (BadInstance (BadI id)) end;
+      if mask_spill xs'.xs_mask xs.xs_mask then raise (BadInstance (BadI id));
       cl.xs_table <- Mxs.add xs xs' cl.xs_table;
       uc
   | PDexn xs ->
@@ -1113,7 +1183,8 @@ let clone_export uc m inst =
           mi_pk = mi.mi_pk;
           mi_pv = Mvs.map (cl_find_pv cl) mi.mi_pv;
           mi_rs = Mrs.map (cl_find_rs cl) mi.mi_rs;
-          mi_xs = Mxs.map (cl_find_xs cl) mi.mi_xs}
+          mi_xs = Mxs.map (cl_find_xs cl) mi.mi_xs;
+          mi_df = mi.mi_df}
         with Not_found -> uc end
     | Umeta (m,al) ->
         begin try add_meta uc m (List.map (function
@@ -1137,7 +1208,8 @@ let clone_export uc m inst =
     mi_pk  = inst.mi_pk;
     mi_pv  = cl.pv_table;
     mi_rs  = cl.rs_table;
-    mi_xs  = cl.xs_table} in
+    mi_xs  = cl.xs_table;
+    mi_df  = inst.mi_df} in
   add_clone uc mi
 
 (** {2 WhyML language} *)
@@ -1164,6 +1236,7 @@ end)
 let mlw_language_builtin =
   let builtin s =
     if s = unit_module.mod_theory.th_name.id_string then unit_module else
+    if s = ref_module.mod_theory.th_name.id_string then ref_module else
     if s = builtin_theory.th_name.id_string then builtin_module else
     if s = highord_theory.th_name.id_string then highord_module else
     if s = bool_theory.th_name.id_string then bool_module else
@@ -1213,20 +1286,15 @@ let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string
   (Pp.print_list Pp.newline2 print_unit) m.mod_units
 
-let get_rs_name nm =
-  if nm = "mixfix []" then "([])" else
-  if nm = "mixfix []<-" then "([]<-)" else
-  if nm = "mixfix [<-]" then "([<-])" else
-  if nm = "mixfix [_..]" then "([_..])" else
-  if nm = "mixfix [.._]" then "([.._])" else
-  if nm = "mixfix [_.._]" then "([_.._])" else
-  try "(" ^ Strings.remove_prefix "infix " nm ^ ")" with Not_found ->
-  try "(" ^ Strings.remove_prefix "prefix " nm ^ "_)" with Not_found ->
-  nm
+let print_id fmt id = Ident.print_decoded fmt id.id_string
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | IncompatibleNotation nm -> Format.fprintf fmt
-      "Incombatible type signatures for notation '%s'" (get_rs_name nm)
+      "Incombatible type signatures for notation '%a'" Ident.print_decoded nm
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
+  | CloneDivergence (iv, il) -> Format.fprintf fmt
+      "Cannot instantiate symbol %a with symbol %a \
+       that has worse termination status"
+      print_id iv print_id il
   | _ -> raise e)

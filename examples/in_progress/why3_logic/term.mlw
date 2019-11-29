@@ -1,19 +1,19 @@
 
 module Vs
-  
-  use import support.HO
-  use import ident.String
-  use import ident.Ident
-  use import ident.Label
-  use import list.List
-  use import option.Option
-  use import ty.Tv
-  use import ty.Ty
-  
+
+  use support.HO
+  use ident.String
+  use ident.Ident
+  use ident.Label
+  use list.List
+  use option.Option
+  use ty.Tv
+  use ty.Ty
+
   (* TODO (long-term, see ident): add a table to recover variable types
      from name (would actually be necessary to define one of the context
      invariant about program variable). *)
-  
+
   (* Toplevel declaration: ident class of term variables. *)
   constant vs_id_class_name : ident_name
   axiom vs_id_class_name_distinct :
@@ -21,7 +21,7 @@ module Vs
     vs_id_class_name <> ts_id_class_name
   val ghost vs_id_class () : id_class
     ensures { result.id_class_name = vs_id_class_name }
-  
+
   (* Type variable symbols. *)
   type vsymbol
   function vs_name vsymbol : ident
@@ -29,17 +29,17 @@ module Vs
   function vs_idn (vs:vsymbol) : ident_name = vs.vs_name.id_name
   axiom vs_inv : forall x. exists y z.
     x.vs_name.id_class = Cons y z /\ y.id_class_name = vs_id_class_name
-  
+
   val vs_name (vs:vsymbol) : ident
     ensures { result = vs.vs_name }
-  
+
   val vs_ty (vs:vsymbol) : ty
     ensures { result = vs.vs_ty }
-  
+
   val vs_equal (vs1 vs2:vsymbol) : bool
     ensures { vs1.vs_idn = vs2.vs_idn -> result }
     ensures { result -> vs1 = vs2 }
-  
+
   val create_vs_symbol (ghost idc:list id_class) (p:preid) : vsymbol
     writes { ids }
     ensures { result.vs_name.id_string = p.pre_name }
@@ -50,34 +50,34 @@ module Vs
     ensures { not (old ids).ids result.vs_idn }
     ensures { subset (old ids).ids ids.ids }
     ensures { ids.ids result.vs_idn }
-  
+
   clone extmap.FMap as Mvs with
     type key = tvsymbol,
     type key_l = ident_name,
     function k_m = tv_idn
-  
+
 end
 
 module Ls
-  
-  use import int.Int
-  use import list.List
-  use import option.Option
-  use import ident.Ident
+
+  use int.Int
+  use list.List
+  use option.Option
+  use ident.Ident
   use import logic_syntax.Defs as D
-  use import logic_syntax.FreeVars
+  use logic_syntax.FreeVars
   use logic_typing.Sig as E
-  use import context.Ctx
-  use import support.HO
-  use import support.HOList
-  use import signature.Sig
-  use import ty.Tv
-  use import ty.Ty
-  
+  use context.Ctx
+  use support.HO
+  use support.HOList
+  use signature.Sig
+  use ty.Tv
+  use ty.Ty
+
   (* Split the logical view of logic symbols in two parts:
      constant and non-constant symbols. *)
   predicate ls_constant D.lsymbol
-  
+
   (* Global growing correspondance between logic symbols and
      their identifiers names. *)
   type ls_ctx model {
@@ -91,7 +91,7 @@ module Ls
     ensures { result.ctls_s = ls_ctx.ctls }
   val ghost ls_ctx_growth (s:ls_ctx_snapshot) : unit
     ensures { sub_context s.ctls_s ls_ctx.ctls }
-  
+
   type lsymbol
   function ls_name lsymbol : ident
   function ls_m lsymbol : D.lsymbol
@@ -107,27 +107,27 @@ module Ls
        This enforces subsitution unicity for application. *)
     forall n. 0 <= n < ls.ls_ty_arity ->
       ty_tyv_free_var ls.ls_ret n \/ tyl_tyv_free_var ls.ls_args n
-  
+
   function ls_idn (ls:lsymbol) : ident_name = ls.ls_name.id_name
-  
+
   (* TODO (long-term): add type arguments/return projections to constants. *)
   type const
   function cst_m const : D.lsymbol
   axiom const_inv : forall c. c.cst_m.ls_constant
-  
+
   val ls_name (ls:lsymbol) : ident
     ensures { result = ls.ls_name }
-  
+
   val ghost ls_cty (sym_c:sym_ctx) (ls:lsymbol) : ty_ctx
     requires { sym_c.d_ls ls.ls_m }
     ensures { result.cty_sym = sym_c }
     ensures { result.cty_tv = ls.ls_ctv }
-  
+
   val ls_args (ghost cty:ty_ctx) (ls:lsymbol) : list ty
     requires { cty.cty_sym.d_ls ls.ls_m }
     requires { cty.cty_tv = ls.ls_ctv }
     ensures { map (cty.cty_m) result = ls.ls_args }
-  
+
   val ls_value (ghost cty:ty_ctx) (ls:lsymbol) : option ty
     requires { cty.cty_sym.d_ls ls.ls_m }
     requires { cty.cty_tv = ls.ls_ctv }
@@ -135,7 +135,7 @@ module Ls
       | None -> ls.ls_ret = E.ty_prop
       | Some u -> ls.ls_ret = cty.cty_m u
       end }
-  
+
   val ls_constr (ls:lsymbol) : int
     ensures { result >= 0 }
     ensures { result = ls.ls_constr }
@@ -145,7 +145,7 @@ module Ls
         | D.TyApp tys _ -> tys <> E.tys_prop /\
           result = global_sig.tsc_n tys
         end }
-  
+
   val ghost ls_inv (ls:lsymbol) : unit
     ensures { not ls_constant ls.ls_m /\ let sig = global_sig.sig_m in
       sig.E.ls_belong ls.ls_m /\ ls.ls_ty_arity = sig.E.ls_ty_arity ls.ls_m /\
@@ -162,17 +162,17 @@ module Ls
       let ctls = ls_ctx.ctls in
       ctls.c_ldom ls.ls_m /\ ctls.c_pdom ls.ls_idn /\
       ctls.c_ltp ls.ls_m = ls.ls_idn /\ ctls.c_ptl ls.ls_idn = ls.ls_m }
-  
+
   val ghost const_inv (cst:const) : unit
     ensures { ls_constant cst.cst_m /\ let sig = global_sig.sig_m in
       sig.E.ls_belong cst.cst_m /\ sig.E.ls_ty_arity cst.cst_m = 0 /\
       sig.E.ls_args cst.cst_m = Nil /\ not sig.E.ls_constr cst.cst_m }
-  
+
   val ls_equal (a b:lsymbol) : bool
     ensures { result -> a = b }
     ensures { a.ls_m = b.ls_m -> result }
     ensures { a.ls_idn = b.ls_idn -> result }
-  
+
   val create_lsymbol (ghost cty:ty_ctx) (ghost ty_ar:int)
     (constr:int) (p:preid) (tyl:list ty) (vl:option ty) : lsymbol
     writes { global_sig , ids , ls_ctx }
@@ -211,35 +211,35 @@ module Ls
       global_sig.sig_m.E.ls_constr = (old global_sig).sig_m.E.ls_constr }
     ensures { constr > 0 -> global_sig.sig_m.E.ls_constr =
       update (old global_sig).sig_m.E.ls_constr result.ls_m true }
-  
+
   val ls_ty_freevars (ls:lsymbol) : Mtv.s
     ensures { result.Mtv.domain = ls.ls_ctv.c_pdom }
-  
+
 end
 
 module Term
-  
-  use import list.List
-  use import list.Length
-  use import list.Nth
-  use import option.Option
-  use import support.HO
-  use import support.Bind
-  use import support.HOList
-  use import logic_syntax.Defs
-  use import logic_syntax.Maps
-  use import logic_syntax.VarsIn
-  use import logic_syntax.FreeVars
-  use import logic_typing.Pattern
-  use import logic_typing.Term
-  use import logic_semantic.Sem
-  use import ident.Ident
-  use import signature.Sig
-  use import context.Ctx
-  use import ty.Ty
-  use import Vs
-  use import Ls
-  
+
+  use list.List
+  use list.Length
+  use list.Nth
+  use option.Option
+  use support.HO
+  use support.Bind
+  use support.HOList
+  use logic_syntax.Defs
+  use logic_syntax.Maps
+  use logic_syntax.VarsIn
+  use logic_syntax.FreeVars
+  use logic_typing.Pattern
+  use logic_typing.Term
+  use logic_semantic.Sem
+  use ident.Ident
+  use signature.Sig
+  use context.Ctx
+  use ty.Ty
+  use Vs
+  use Ls
+
   (* Patterns and terms. Interpretation depends on environment. *)
   type pattern
   function pat_ty pattern : ty
@@ -254,7 +254,7 @@ module Term
   type term_branch
   function tbr_ty term_branch : ty
   function tbr_bty term_branch : ty
-  
+
   (* Polymorphic environment for terms (the type to which variables are
      interpreted may change). *)
   type t_ctx 'vs
@@ -264,11 +264,11 @@ module Term
   function ct_d (t_ctx 'vs) : term -> bool
   function ct_m (t_ctx 'vs) : term -> D.term 'vs
   axiom t_ctx_inv : forall c,x:'vs. c.ct_vs.c_ldom x ->
-    ty_vars_in c.ct_ty.cty_tv.c_ldom c.ct_ty.cty_sym.d_tys (c.ct_vty x)  
-  
+    ty_vars_in c.ct_ty.cty_tv.c_ldom c.ct_ty.cty_sym.d_tys (c.ct_vty x)
+
   function ct_tv (ct:t_ctx 'vs) : context ident_name int = ct.ct_ty.cty_tv
   function ct_sym (ct:t_ctx 'vs) : sym_ctx = ct.ct_ty.cty_sym
-  
+
   (* Environment for terms are also environments for bounds terms. *)
   function ctb_d (t_ctx 'vs) : term_bound -> bool
   function ctb_m (t_ctx 'vs) : term_bound -> D.term (bind 'vs unit)
@@ -276,17 +276,17 @@ module Term
   function ctq_m (t_ctx 'vs) : term_quant -> D.term (bind 'vs int)
   function ctbr_d (t_ctx 'vs) : term_branch -> bool
   function ctbr_m (t_ctx 'vs) : term_branch -> D.branch 'vs
-  
+
   (* Environment for patterns: special case of term environment. *)
   type pat_ctx = t_ctx pat_var
   function ctp_d pat_ctx : pattern -> bool
   function ctp_m pat_ctx : pattern -> D.pattern
-  
+
   (* Useful alias in practice *)
   function ct_mty (ct:t_ctx 'vs) : term -> D.ty = \t. ct.ct_ty.cty_m t.t_ty
   function ctp_mty (ctp:pat_ctx) : pattern -> D.ty =
     \p. ctp.ct_ty.cty_m p.pat_ty
-  
+
   (* Type of variable symbols in contexts. *)
   val ghost ct_vs_tys (ct:t_ctx 'vs) (vs:vsymbol) : unit
     requires { ct.ct_vs.c_pdom vs.vs_idn }
@@ -379,7 +379,7 @@ module Term
     ensures { forall p. ct1.ctp_d p ->
       ct2.ctp_d p /\ ct2.ctp_m p = ct1.ctp_m p }
   (* TODO (see ty.mlw): context shrinking as well... *)
-  
+
   (* Binding predicate: notion of fusion between environments. *)
   predicate fused (ct1:t_ctx 'old) (ct2:t_ctx 'new)
                   (ct3:t_ctx (bind 'old 'new)) =
@@ -387,17 +387,17 @@ module Term
     ct3.ct_vs.c_ldom = bfold ct1.ct_vs.c_ldom ct2.ct_vs.c_ldom /\
     ct3.ct_vs.c_ltp = bfold ct1.ct_vs.c_ltp ct2.ct_vs.c_ltp /\
     ct3.ct_vty = bfold ct1.ct_vty ct2.ct_vty
-  
+
   (* Consequences of fused on the program variable side. *)
   predicate fused_alt (ct1:t_ctx 'old) (ct2:t_ctx 'new)
                       (ct3:t_ctx (bind 'old 'new)) =
-    (forall x. ct3.ct_vs.c_pdom x <-> 
+    (forall x. ct3.ct_vs.c_pdom x <->
                (ct1.ct_vs.c_pdom x \/ ct2.ct_vs.c_pdom x)) /\
     (forall x. ct1.ct_vs.c_pdom x ->
                ct3.ct_vs.c_ptl x = Old (ct1.ct_vs.c_ptl x)) /\
     (forall x. ct2.ct_vs.c_pdom x ->
                ct3.ct_vs.c_ptl x = Fresh (ct2.ct_vs.c_ptl x))
-  
+
   let lemma fused_alt (ct1:t_ctx 'old) (ct2:t_ctx 'new)
                           (ct3:t_ctx (bind 'old 'new)) : unit
     ensures { fused ct1 ct2 ct3 -> fused_alt ct1 ct2 ct3 }
@@ -420,7 +420,7 @@ module Term
       (forall x. v2.c_pdom x -> let u = v2.c_ptl x in v3.c_ptl x <> Fresh u ->
         v3.c_ldom (Fresh u) && v3.c_ltp (Fresh u) = x && false)
     }
-  
+
   let lemma fused_inj (ct1:t_ctx 'old) (ct2:t_ctx 'new)
                       (ct3:t_ctx (bind 'old 'new)) : unit
     ensures { fused ct1 ct2 ct3 ->
@@ -428,16 +428,16 @@ module Term
       sub_context ct1.ct_tv ct2.ct_tv /\
       sub_sym_ctx ct1.ct_sym ct2.ct_sym }
   = ()
-  
+
   (* Pattern operations. *)
-  
+
   type pattern_node =
     | Pwild
     | Pvar vsymbol
     | Papp lsymbol (ghost list D.ty) (list pattern)
     | Por pattern pattern
     | Pas pattern vsymbol
-  
+
   val ghost pat_typing (ctp:pat_ctx) (p:pattern) : unit
     requires { ctp.ctp_d p }
     ensures { pat_wf global_sig.sig_m (ctp.ctp_m p) (ctp.ctp_mty p) }
@@ -446,19 +446,19 @@ module Term
       | None -> true
       | Some u -> ctp.ct_vs.c_ldom x /\ ctp.ct_vty x = u
       end }
-  
+
   val pat_ty (ghost ctp:pat_ctx) (p:pattern) : ty
     requires { ctp.ctp_d p }
     ensures { ctp.ct_ty.cty_d result }
     ensures { ctp.ctp_mty p = ctp.ct_ty.cty_m result }
     ensures { ctp.ctp_mty p <> ty_prop }
-  
+
   val pat_wild (ghost ctp:pat_ctx) (ty:ty) : pattern
     requires { ctp.ct_ty.cty_d ty }
     ensures { ctp.ctp_d result }
     ensures { ctp.ctp_m result = D.PWild }
     ensures { ctp.ctp_mty result = ctp.ct_ty.cty_m ty }
-  
+
   val pat_var (ghost ctp:pat_ctx) (vs:vsymbol) : pattern
     requires { ctp.ct_vs.c_pdom vs.vs_idn }
     ensures { ctp.ctp_d result }
@@ -467,7 +467,7 @@ module Term
     (* Guaranteed by context invariant. *)
     ensures { ctp.ct_ty.cty_d vs.vs_ty /\
       ctp.ct_ty.cty_m vs.vs_ty = ctp.ct_vty (ctp.ct_vs.c_ptl vs.vs_idn) }
-  
+
   val pat_app (ghost ctp:pat_ctx) (ls:lsymbol) (ghost tyl:list D.ty)
               (pl:list pattern) (ty:ty) : pattern
     requires { for_all ctp.ctp_d pl /\ ctp.ct_sym.d_constr ls.ls_m }
@@ -479,7 +479,7 @@ module Term
     ensures { ctp.ctp_d result }
     ensures { ctp.ctp_m result = D.PApp ls.ls_m tyl (map ctp.ctp_m pl) }
     ensures { ctp.ctp_mty result = ctp.ct_ty.cty_m ty }
-  
+
   val pat_or (ghost ctp:pat_ctx) (p1 p2:pattern) : pattern
     requires { ctp.ctp_d p1 /\ ctp.ctp_d p2 }
     requires { ctp.ctp_mty p1 = ctp.ctp_mty p2 }
@@ -488,7 +488,7 @@ module Term
     ensures { ctp.ctp_d result }
     ensures { ctp.ctp_m result = D.POr (ctp.ctp_m p1) (ctp.ctp_m p2) }
     ensures { ctp.ctp_mty result = ctp.ctp_mty p1 }
-  
+
   val pat_as (ghost ctp:pat_ctx) (p:pattern) (vs:vsymbol) : pattern
     requires { ctp.ctp_d p /\ ctp.ct_vs.c_pdom vs.vs_idn }
     requires { ctp.ctp_mty p = ctp.ct_ty.cty_m vs.vs_ty }
@@ -499,7 +499,7 @@ module Term
     ensures { ctp.ctp_mty result = ctp.ctp_mty p }
     ensures { ctp.ct_ty.cty_d vs.vs_ty /\
       ctp.ct_ty.cty_m vs.vs_ty = ctp.ct_vty (ctp.ct_vs.c_ptl vs.vs_idn) }
-  
+
   val pat_node (ghost ctp:pat_ctx) (p:pattern) : pattern_node
     requires { ctp.ctp_d p }
     returns {
@@ -526,19 +526,19 @@ module Term
         ctp.ctp_mty p = ctp.ctp_mty p0 =
           ctp.ct_ty.cty_m vs.vs_ty = ctp.ct_vty (ctp.ct_vs.c_ptl vs.vs_idn)
     }
-  
+
   val pat_vars (ghost ctp:pat_ctx) (p:pattern) : Mvs.s
     requires { ctp.ctp_d p }
     ensures { forall x. result.Mvs.domain x <->
                         (ctp.ct_vs.c_pdom x /\
                         pat_pv_free_var (ctp.ctp_m p) (ctp.ct_vs.c_ptl x)) }
-  
+
   (* Term operations. *)
-  
+
   type quant = Tforall | Texists
-  
+
   type binop = Tand | Tor | Timplies | Tiff
-  
+
   type term_node =
     | Tvar vsymbol
     | Tconst const
@@ -552,32 +552,32 @@ module Term
     | Tnot term
     | Ttrue
     | Tfalse
-  
-  
+
+
   type trigger = list (list term)
-  
+
   predicate br_ty_are (ct:t_ctx 'vs) (bty:D.ty) (oty:D.ty) (tbr:term_branch) =
     ct.ct_ty.cty_m tbr.tbr_bty = bty /\
     ct.ct_ty.cty_m tbr.tbr_ty = oty
-  
+
   (* Binding predicates. *)
   predicate bound_env (x:vsymbol) (c:t_ctx unit) =
     c.ct_vs.c_ldom = all /\
     (forall y. c.ct_vs.c_pdom y <-> y = x.vs_idn) /\
     c.ct_vs.c_ltp () = x.vs_idn /\ c.ct_vs.c_ptl x.vs_idn = () /\
     c.ct_vty () = c.ct_ty.cty_m x.vs_ty
-  
+
   predicate branch_env (pat:pattern) (c:t_ctx pat_var) =
     c.ctp_d pat /\
     c.ct_vs.c_ldom = pat_pv_free_var (c.ctp_m pat)
-  
+
   predicate quant_env (vsl:list vsymbol) (c:t_ctx int) =
     c.ct_vs.c_ldom = range 0 (length vsl) /\
     forall n. match nth n vsl with
       | None -> true
       | Some u -> u.vs_idn = c.ct_vs.c_ltp n
       end
-  
+
   (* Encode triggers inside the term structure as a semantically
      irrelevant formula *)
   function trigg (ct:t_ctx 'vs) (tl:list term) : D.term 'vs =
@@ -585,32 +585,32 @@ module Term
     | Nil -> TFalse
     | Cons x q -> TAnd (TLet (ct.ct_m x) TTrue) (trigg ct q)
     end
-  
+
   function trigger (ct:t_ctx 'vs) (trig:trigger) : D.term 'vs =
     match trig with
     | Nil -> TTrue
     | Cons x q -> TOr (trigg ct x) (trigger ct q)
     end
-  
+
   let rec lemma trigger_irrelevant (m:model 'u) (tyv:ty_val 'u)
                                    (tv:valuation 'vs 'u)
                                    (ct:t_ctx 'vs) (trig:trigger) : unit
     ensures { f_sem m tyv tv (trigger ct trig) }
     variant { trig }
   = match trig with Cons _ q -> trigger_irrelevant m tyv tv ct q | _ -> () end
-  
+
   val ghost t_typing (ct:t_ctx 'vs) (t:term) : unit
     requires { ct.ct_d t }
     ensures { let e0 = { tv_belong = ct.ct_vs.c_ldom ; tv_ty = ct.ct_vty } in
       t_wf global_sig.sig_m e0 (ct.ct_m t) (ct.ct_mty t) }
-  
+
   val t_ty (ghost ct:t_ctx 'vs) (t:term) : option ty
     requires { ct.ct_d t }
     returns { None -> ct.ct_mty t = ty_prop
       | Some u -> ct.ct_ty.cty_d u
                /\ ct.ct_mty t = ct.ct_ty.cty_m u
                /\ ct.ct_mty t <> ty_prop }
-  
+
   val t_close_bound (ghost ct:t_ctx (bind 'vs unit))
                     (ghost co:t_ctx 'vs) (ghost cb:t_ctx unit)
                     (vs:vsymbol) (t:term) : term_bound
@@ -623,7 +623,7 @@ module Term
     ensures { ct.ct_ty.cty_d vs.vs_ty }
     ensures { co.ct_ty.cty_m result.tb_bty = ct.ct_ty.cty_m vs.vs_ty
                                        = ct.ct_vty (ct.ct_vs.c_ptl vs.vs_idn) }
-  
+
   val t_close_branch (ghost ct:t_ctx (bind 'vs pat_var))
                      (ghost co:t_ctx 'vs) (ghost cb:t_ctx pat_var)
                      (pat:pattern) (t:term) : term_branch
@@ -634,7 +634,7 @@ module Term
     ensures { co.ctbr_m result = (cb.ctp_m pat, ct.ct_m t) }
     ensures { co.ct_ty.cty_m result.tbr_ty = ct.ct_mty t }
     ensures { co.ct_ty.cty_m result.tbr_bty = co.ct_ty.cty_m pat.pat_ty }
-  
+
   val t_close_quant (ghost ct:t_ctx (bind 'vs int))
                     (ghost co:t_ctx 'vs) (ghost cb:t_ctx int)
                     (vsl:list vsymbol) (tr:trigger) (t:term) : term_quant
@@ -646,14 +646,14 @@ module Term
     ensures { co.ctq_d result }
     ensures { co.ctq_m result = D.TImplies (trigger ct tr) (ct.ct_m t) }
     ensures { result.tq_qty = map vs_ty vsl }
-  
+
   type term_bound_open 'vs = {
     ghost tbo_cn : t_ctx (bind 'vs unit);
     ghost tbo_cb : t_ctx unit;
     tbo_vs : vsymbol;
     tbo_t : term;
   }
-  
+
   val t_open_bound (ghost ct:t_ctx 'vs) (tb:term_bound) : term_bound_open 'vs
     requires { ct.ctb_d tb }
     returns { r -> let cn = r.tbo_cn in let t = r.tbo_t in
@@ -663,14 +663,14 @@ module Term
       cn.ct_ty.cty_d vs.vs_ty /\
       cn.ct_ty.cty_m vs.vs_ty = cn.ct_vty (cn.ct_vs.c_ptl vs.vs_idn)
                               = ct.ct_ty.cty_m tb.tb_bty }
-  
+
   type term_branch_open 'vs = {
     ghost tbro_cn : t_ctx (bind 'vs pat_var);
     ghost tbro_cb : t_ctx pat_var;
     tbro_pat : pattern;
     tbro_t : term;
   }
-  
+
   val term_open_branch (ghost ct:t_ctx 'vs)
                        (tbr:term_branch) : term_branch_open 'vs
     requires { ct.ctbr_d tbr }
@@ -681,7 +681,7 @@ module Term
       ct.ctbr_m tbr = (cb.ctp_m pat,cn.ct_m t) /\
       ct.ct_ty.cty_m tbr.tbr_ty = cn.ct_mty t /\
       ct.ct_ty.cty_m tbr.tbr_bty = cn.ct_ty.cty_m pat.pat_ty }
-  
+
   type term_quant_open 'vs = {
     ghost tqo_cn : t_ctx (bind 'vs int);
     ghost tqo_cb : t_ctx int;
@@ -689,7 +689,7 @@ module Term
     tqo_trig : trigger;
     tqo_t : term;
   }
-  
+
   val t_open_quant (ghost ct:t_ctx 'vs) (tq:term_quant) : term_quant_open 'vs
     requires { ct.ctq_d tq }
     returns { r -> let cn = r.tqo_cn in let t = r.tqo_t in
@@ -699,7 +699,7 @@ module Term
       ct.ctq_m tq = D.TImplies (trigger cn tr) (cn.ct_m t) /\
       tq.tq_qty = map vs_ty vsl /\
       vsl <> Nil /\ cn.ct_ty.cty_m t.t_ty = ty_prop }
-  
+
   val t_node (ghost ct:t_ctx 'vs) (t:term) : term_node
     requires { ct.ct_d t }
     returns { Tvar vs -> ct.ct_m t = D.TVar (ct.ct_vs.c_ptl vs.vs_idn) /\
@@ -746,7 +746,7 @@ module Term
       | Ttrue -> ct.ct_m t = D.TTrue /\ ct.ct_mty t = ty_prop
       | Tfalse -> ct.ct_m t = D.TFalse /\ ct.ct_mty t = ty_prop
     }
-  
+
   val t_var (ghost ct:t_ctx 'vs) (vs:vsymbol) : term
     requires { ct.ct_vs.c_pdom vs.vs_idn }
     ensures { ct.ct_d result }
@@ -754,11 +754,11 @@ module Term
     ensures { ct.ct_ty.cty_d vs.vs_ty }
     ensures { ct.ct_mty result = ct.ct_ty.cty_m vs.vs_ty
                                = ct.ct_vty (ct.ct_vs.c_ptl vs.vs_idn) }
-  
+
   val t_const (ghost ct:t_ctx 'vs) (cst:const) : term
     ensures { ct.ct_d result /\ ct.ct_m result = D.TApp cst.cst_m Nil Nil }
     ensures { ct.ct_mty result = ty_ret global_sig.sig_m cst.cst_m Nil }
-  
+
   val t_app (ghost ct:t_ctx 'vs) (ls:lsymbol) (ghost tyl:list D.ty)
             (tl:list term) (tyo:option ty) : term
     requires { for_all ct.ct_d tl /\ ct.ct_sym.d_ls ls.ls_m }
@@ -770,21 +770,21 @@ module Term
     ensures { ct.ct_d result }
     ensures { ct.ct_m result = D.TApp ls.ls_m tyl (map ct.ct_m tl) }
     ensures { ct.ct_mty result = ty_subst_ret tyl ls.ls_ret }
-  
+
   val t_if (ghost ct:t_ctx 'vs) (b:term) (th:term) (el:term) : term
     requires { ct.ct_d b /\ ct.ct_d th /\ ct.ct_d el }
     requires { ct.ct_mty th = ct.ct_mty el /\ ct.ct_mty b = ty_prop }
     ensures { ct.ct_d result }
     ensures { ct.ct_m result = D.TIf (ct.ct_m b) (ct.ct_m th) (ct.ct_m el) }
     ensures { ct.ct_mty result = ct.ct_mty th }
-  
+
   val t_let (ghost ct:t_ctx 'vs) (u:term) (v:term_bound) : term
     requires { ct.ct_d u /\ ct.ctb_d v }
     requires { ct.ct_ty.cty_m v.tb_bty = ct.ct_mty u }
     ensures { ct.ct_d result }
     ensures { ct.ct_m result = D.TLet (ct.ct_m u) (ct.ctb_m v) }
     ensures { ct.ct_mty result = ct.ct_ty.cty_m v.tb_ty }
-  
+
   val t_case (ghost ct:t_ctx 'vs) (ghost oty:D.ty)
              (u:term) (brl:list term_branch) : term
     requires { ct.ct_d u /\ for_all ct.ctbr_d brl }
@@ -792,13 +792,13 @@ module Term
     ensures { ct.ct_d result }
     ensures { ct.ct_m result = D.TCase (ct.ct_m u) (map ct.ctbr_m brl) }
     ensures { ct.ct_mty result = oty }
-  
+
   val t_eps (ghost ct:t_ctx 'vs) (u:term_bound) : term
     requires { ct.ctb_d u /\ ct.ct_ty.cty_m u.tb_ty = ty_prop }
     ensures { ct.ct_d result }
     ensures { ct.ct_m result = D.TEps (ct.ct_mty result) (ct.ctb_m u) }
     ensures { ct.ct_mty result = ct.ct_ty.cty_m u.tb_bty }
-  
+
   val t_quant (ghost ct:t_ctx 'vs) (q:quant) (tq:term_quant) : term
     requires { ct.ctq_d tq }
     ensures { ct.ct_d result }
@@ -808,21 +808,21 @@ module Term
       | Texists -> ct.ct_m result = D.TExists tyl (ct.ctq_m tq)
       end }
     ensures { ct.ct_mty result = ty_prop }
-  
+
   val t_forall (ghost ct:t_ctx 'vs) (tq:term_quant) : term
     requires { ct.ctq_d tq }
     ensures { ct.ct_d result }
     ensures { let tyl = map ct.ct_ty.cty_m tq.tq_qty in
       ct.ct_m result = D.TForall tyl (ct.ctq_m tq) }
     ensures { ct.ct_mty result = ty_prop }
-  
+
   val t_exists (ghost ct:t_ctx 'vs) (tq:term_quant) : term
     requires { ct.ctq_d tq }
     ensures { ct.ct_d result }
     ensures { let tyl = map ct.ct_ty.cty_m tq.tq_qty in
       ct.ct_m result = D.TExists tyl (ct.ctq_m tq) }
     ensures { ct.ct_mty result = ty_prop }
-  
+
   val t_binary (ghost ct:t_ctx 'vs) (bp:binop) (a b:term) : term
     requires { ct.ct_d a /\ ct.ct_d b }
     requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
@@ -835,43 +835,43 @@ module Term
       | Timplies -> rm = D.TImplies am bm
       | Tiff -> rm = D.TIff am bm
       end }
-  
+
   val t_and (ghost ct:t_ctx 'vs) (a b:term) : term
     requires { ct.ct_d a /\ ct.ct_d b }
     requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
     ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
     ensures { ct.ct_m result = D.TAnd (ct.ct_m a) (ct.ct_m b) }
-  
+
   val t_or (ghost ct:t_ctx 'vs) (a b:term) : term
     requires { ct.ct_d a /\ ct.ct_d b }
     requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
     ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
     ensures { ct.ct_m result = D.TOr (ct.ct_m a) (ct.ct_m b) }
-  
+
   val t_implies (ghost ct:t_ctx 'vs) (a b:term) : term
     requires { ct.ct_d a /\ ct.ct_d b }
     requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
     ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
     ensures { ct.ct_m result = D.TImplies (ct.ct_m a) (ct.ct_m b) }
-  
+
   val t_iff (ghost ct:t_ctx 'vs) (a b:term) : term
     requires { ct.ct_d a /\ ct.ct_d b }
     requires { ct.ct_mty a = ty_prop = ct.ct_mty b }
     ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
     ensures { ct.ct_m result = D.TIff (ct.ct_m a) (ct.ct_m b) }
-  
+
   val t_not (ghost ct:t_ctx 'vs) (a:term) : term
     requires { ct.ct_d a /\ ct.ct_mty a = ty_prop }
     ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
     ensures { ct.ct_m result = D.TNot (ct.ct_m a) }
-  
+
   val t_true (ghost ct:t_ctx 'vs) : term
     ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
     ensures { ct.ct_m result = D.TTrue }
-  
+
   val t_false (ghost ct:t_ctx 'vs) : term
     ensures { ct.ct_d result /\ ct.ct_mty result = ty_prop }
     ensures { ct.ct_m result = D.TFalse }
-  
+
 end
 

@@ -1,0 +1,54 @@
+Weakest Precondition
+bench/ce/jlamp_array.mlw Array f'vc: Timeout or Unknown
+Counter-example model:
+File jlamp_array.mlw:
+  Line 11:
+    two, [] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "2" } }
+  Line 14:
+    three, [] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "3" } }
+  Line 22:
+    the check fails with all inputs
+
+bench/ce/jlamp_array.mlw Array f'vc: Timeout or Unknown
+Counter-example model:
+File jlamp_array.mlw:
+  Line 11:
+    two, [] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "2" } }
+  Line 14:
+    three, [] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "3" } }
+  Line 21:
+    three, [[@model_trace:three]] = {"proj_name" : "to_int" ,
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "3" } }
+
+bench/ce/jlamp_array.mlw Array g'vc: Valid
+bench/ce/jlamp_array.mlw Array g'vc: Timeout or Unknown
+Counter-example model:
+File jlamp_array.mlw:
+  Line 11:
+    two, [] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "2" } }
+  Line 14:
+    three, [] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "3" } }
+  Line 27:
+    three, [[@model_trace:three]] = {"proj_name" : "to_int" ,
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "3" } }
+
+bench/ce/jlamp_array.mlw Array h'vc: Valid
+bench/ce/jlamp_array.mlw Array h'vc: Timeout or Unknown
+Counter-example model:
+File jlamp_array.mlw:
+  Line 11:
+    two, [] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "2" } }
+  Line 14:
+    three, [] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "3" } }
+  Line 33:
+    three, [[@model_trace:three]] = {"proj_name" : "to_int" ,
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "3" } }
+

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -45,7 +45,7 @@ open Why3
 
 open Theory
 open Term
-open Stdlib
+open Wstdlib
 
 open Ident
 
@@ -62,10 +62,10 @@ let scanf s =
 let read_channel env path filename cin =
   (* Find the int theory and the needed operation *)
   let th_int = Env.read_theory env ["int"] "Int" in
-  let leq = ns_find_ls th_int.th_export ["infix <"] in
-  let plus_symbol = Theory.ns_find_ls th_int.Theory.th_export ["infix +"] in
-  let neg_symbol = Theory.ns_find_ls th_int.Theory.th_export ["prefix -"] in
-  let mult_symbol = Theory.ns_find_ls th_int.Theory.th_export ["infix *"] in
+  let leq = ns_find_ls th_int.th_export [op_infix "<"] in
+  let plus_symbol = ns_find_ls th_int.th_export [op_infix "+"] in
+  let neg_symbol = ns_find_ls th_int.th_export [op_prefix "-"] in
+  let mult_symbol = ns_find_ls th_int.th_export [op_infix "*"] in
 
   let zero = t_nat_const 0 in
   let t_int_const n =

@@ -1,0 +1,11 @@
+\begin{syntax}
+  alpha  ::= "a" - "z" | "A" - "Z"
+  \
+  suffix ::= alpha | digit | "'" | "_"
+  \
+  lident ::= ("a" - "z") suffix* | "_" suffix+
+  \
+  uident ::= ("A" - "Z") suffix*
+  \
+  qident ::= "'" ("a" - "z") suffix* %
+\end{syntax}

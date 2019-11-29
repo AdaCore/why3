@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -94,6 +94,7 @@ let comma fmt () = fprintf fmt ",@ "
 let star fmt () = fprintf fmt "*@ "
 let simple_comma fmt () = fprintf fmt ", "
 let underscore fmt () = fprintf fmt "_"
+let slash fmt () = fprintf fmt "/"
 let semi fmt () = fprintf fmt ";@ "
 let colon fmt () = fprintf fmt ":@ "
 let space fmt () = fprintf fmt "@ "
@@ -202,10 +203,7 @@ let string_of_wnl p x =
   fprintf fmt "%a@?" p x;
   Buffer.contents b
 
-let sprintf p =
-  let b = Buffer.create 100 in
-  let fmt = formatter_of_buffer b in
-  kfprintf (fun fmt -> Format.pp_print_flush fmt (); Buffer.contents b) fmt p
+let sprintf = asprintf
 
 let sprintf_wnl p =
   let b = Buffer.create 100 in
@@ -216,7 +214,7 @@ let sprintf_wnl p =
 let html_char fmt c =
   match c with
   | '\"' -> pp_print_string fmt "&quot;"
-  | '\'' -> pp_print_string fmt "&apos;"
+  | '\'' -> pp_print_string fmt "&#39;"
   | '<' -> pp_print_string fmt "&lt;"
   | '>' -> pp_print_string fmt "&gt;"
   | '&' -> pp_print_string fmt "&amp;"

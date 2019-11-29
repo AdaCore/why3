@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -142,10 +142,12 @@ val ty_equal_check : ty -> ty -> unit
 val ts_int  : tysymbol
 val ts_real : tysymbol
 val ts_bool : tysymbol
+val ts_str  : tysymbol
 
 val ty_int  : ty
 val ty_real : ty
 val ty_bool : ty
+val ty_str  : ty
 
 val ts_func : tysymbol
 

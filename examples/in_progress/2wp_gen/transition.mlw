@@ -1,0 +1,533 @@
+(* Encodings of transition systems into games. *)
+
+(* Axiomatic definition of (potentially infinite)
+    evolution traces within a transition ystem. In order to avoid
+   bringing in the context the full invariant that enforces
+   extensionality, the actual type of trace is defined in
+   another module. *)
+module Trace "W:non_conservative_extension:N" (* => TraceDef *)
+
+  use int.Int
+  use ho_set.Set
+  use ho_rel.Rel
+  use order.Ordered
+  use order.Chain
+
+  (* FIXME: weird that witness obligation is generated here
+     (cause abstract type anyway),
+     and not possible to use 'by' witness introduction because
+     there is no way to generate a polymorphic
+     computable witness of (int -> 'a) (only (int -> {'a}) is possible,
+     but that type is rejected). Since we must move the lemma out,
+     this also force a very inelegant context disposal. *)
+  lemma existence : exists rel:erel 'a,finite length nth.
+    length >= 0 /\
+    (forall n. 0 < n /\ (finite -> n <= length) ->
+     rel (nth (n-1)) (nth n))
+    by finite = true /\ length = 0
+
+  type trace 'a = private {
+    rel : erel 'a;
+    finite : bool;
+    length : int;
+    nth : int -> 'a;
+  } invariant { length >= 0 }
+  invariant { forall n. 0 < n /\ (finite -> n <= length) ->
+              rel (nth (n-1)) (nth n) }
+
+  meta remove_prop lemma existence
+
+  (* Prefix comparisons for traces. *)
+  predicate subtrace (t1 t2:trace 'a) =
+    t1.rel = t2.rel &&
+    (t2.finite -> t1.finite && t1.length <= t2.length) &&
+    forall n. 0 <= n /\ (t1.finite -> n <= t1.length) -> t1.nth n = t2.nth n
+
+  axiom subtrace_order : order (subtrace:erel (trace 'a))
+
+  (* Minimal trace constructor: comprehension. *)
+  val ghost create_trace (r:erel {'a}) (fn:bool)
+                            (len:int) (f:int -> {'a}) : trace {'a}
+    requires { fn -> 0 <= len }
+    requires { forall n. 0 < n /\ (fn -> n <= len) -> r (f (n-1)) (f n) }
+    ensures  { result.rel = r }
+    ensures  { result.finite = fn }
+    ensures  { fn -> result.length = len }
+    ensures  { forall n. 0 <= n /\ (fn -> n <= len) -> result.nth n = f n }
+
+
+  (*(* Minimal trace constructors: singleton (base case),
+     addition (successor case), and supremum (limit case). *)
+  val ghost function singleton_trace (r:erel {'a}) (x:{'a}) : trace {'a}
+    ensures { result.finite /\ result.length = 0 }
+    ensures { result.rel = r /\ result.nth 0 = x }
+
+  val ghost function add_to_trace (t:trace {'a}) (x:{'a}) : trace {'a}
+    requires { t.finite /\ t.rel (t.nth t.length) x }
+    ensures  { result.finite /\ result.length = t.length + 1 }
+    ensures  { result.nth result.length = x }
+    ensures  { subtrace t result }
+
+  val ghost function sup_chain_trace (h:set (trace {'a})) : trace {'a}
+    requires { chain subtrace h /\ inhabited h }
+    ensures  { supremum subtrace h result }
+    ensures  { forall x. h x -> result.rel = x.rel }
+    ensures  { result.finite -> maximum subtrace h result }
+    ensures  { not maximum subtrace h result -> forall x. h x -> x.finite }
+    ensures  { not maximum subtrace h result -> forall n. 0 <= n ->
+      exists x. h x /\ n <= x.length }*)
+
+end
+
+(* Additional constructors for evolution traces, defined on
+   top of comprehension: singleton trace, addition of an element to any end,
+   catenation, pre/suffix extraction and chain supremum. *)
+module TraceConstructors
+
+  use int.Int
+  use option.Option
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use order.Ordered
+  use order.Chain
+  use choice.Choice
+  use export Trace
+
+  let ghost function singleton_trace (r:erel {'a}) (x:{'a}) : trace {'a}
+    ensures { result.finite /\ result.length = 0 }
+    ensures { result.rel = r /\ result.nth 0 = x }
+  = create_trace r true 0 (fun _ -> x)
+
+  let ghost function add_suffix_trace (t:trace {'a}) (x:{'a}) : trace {'a}
+    requires { t.finite -> t.rel (t.nth t.length) x }
+    ensures  { result.finite = t.finite }
+    ensures  { t.finite -> result.length = t.length + 1 }
+    ensures  { not t.finite -> result = t }
+    ensures  { t.finite -> result.nth result.length = x }
+    ensures  { subtrace t result }
+  = if not t.finite then t else
+    let function nt n = if n = t.length + 1 then x else t.nth n in
+    create_trace t.rel true (t.length + 1) nt
+
+  let ghost function add_prefix_trace (x:{'a}) (t:trace {'a}) : trace {'a}
+    requires { t.rel x (t.nth 0) }
+    ensures  { result.finite = t.finite }
+    ensures  { t.finite -> result.length = t.length + 1 }
+    ensures  { forall n. 0 <= n /\ (result.finite -> n <= result.length) ->
+      result.nth n = if n = 0 then x else t.nth (n-1) }
+  = let function nt n = if n = 0 then x else t.nth (n-1) in
+    create_trace t.rel t.finite (t.length + 1) nt
+
+  let ghost function cat_trace (t1 t2:trace {'a}) : trace {'a}
+    requires { t1.rel = t2.rel }
+    requires { t1.finite -> t1.nth t1.length = t2.nth 0 }
+    ensures  { subtrace t1 result /\ (not t1.finite -> result = t1) }
+    ensures  { result.finite <-> t1.finite /\ t2.finite }
+    ensures  { result.finite -> result.length = t1.length + t2.length }
+    ensures  { forall n. 0 <= n /\ (t1.finite -> n <= t1.length) ->
+      result.nth n = t1.nth n }
+    ensures  { t1.finite -> forall n.
+      t1.length <= n /\ (result.finite -> n <= result.length) ->
+      result.nth n = t2.nth (n - t1.length) }
+  = let fn = pure { t1.finite /\ t2.finite } in
+    let ln = t1.length + t2.length in
+    let function nt (n:int) = if pure { t1.finite -> n <= t1.length }
+      then t1.nth n else t2.nth (n - t1.length) in
+    assert { forall n. 0 < n /\ (fn -> n <= ln) ->
+      t1.rel (nt (n-1)) (nt n)
+      by if (t1.finite -> n <= t1.length) then
+      t1.rel (t1.nth (n-1)) (t1.nth n)
+      else let m = n - t1.length in
+      (t2.nth (m-1) = nt (n-1)
+       by n > t1.length + 1 -> t2.nth (m-1) = nt (n-1))
+      so t2.rel (t2.nth (m-1)) (t2.nth m)
+      };
+    let res = create_trace t1.rel fn ln nt in
+    assert { subtrace t1 res
+      && (not t1.finite -> res = t1 by subtrace res t1) };
+    res
+
+  let ghost function prefix_trace (l:int) (t:trace {'a}) : trace {'a}
+    requires { 0 <= l /\ (t.finite -> l <= t.length) }
+    ensures  { subtrace result t }
+    ensures  { result.finite /\ result.length = l }
+  = create_trace t.rel true l t.nth
+
+  let ghost function suffix_trace (l:int) (t:trace {'a}) : trace {'a}
+    requires { 0 <= l /\ (t.finite -> l <= t.length) }
+    ensures  { cat_trace (prefix_trace l t) result = t }
+  = let function nt n = t.nth (n+l) in
+    assert { forall n. 0 < n /\ (t.finite -> n <= t.length - l) ->
+      t.rel (nt (n-1)) (nt n) by 0 < n+l /\ (t.finite -> n + l <= t.length) };
+    let sf = create_trace t.rel t.finite (t.length - l) (fun n -> t.nth (n+l)) in
+    let pr = prefix_trace l t in
+    let t0 = cat_trace pr sf in
+    assert { subtrace t0 t };
+    assert { subtrace t t0 };
+    sf
+
+  let ghost function sup_chain_trace (h:set (trace {'a})) : trace {'a}
+    requires { chain subtrace h /\ inhabited h }
+    ensures  { supremum subtrace h result }
+    ensures  { forall x. h x -> result.rel = x.rel }
+    ensures  { result.finite -> maximum subtrace h result }
+    ensures  { not h result -> forall x. h x -> x.finite }
+    ensures  { not h result -> forall n. 0 <= n ->
+      exists x. h x /\ n <= x.length }
+  = let res = match choose_if (maximum subtrace h) with
+    | Some u -> u
+    | None ->
+      assert { forall x. h x -> if x.finite then true else false
+        by maximum subtrace h x
+      };
+      let s = pure { image length h } in
+      assert { forall x. h x -> not (upper_bound (<=) s x.length
+        so maximum subtrace h x
+        by forall u. h u -> if subtrace u x then true else false
+        by subtrace x u so u.length > x.length /\ s u.length
+      )};
+      let w = choose h in
+      assert { forall x. h x -> x.rel = w.rel
+        by subtrace x w \/ subtrace w x };
+      let function nth0 (n:int)
+        ensures { n >= 0 -> forall x. h x /\ n <= x.length -> x.nth n = result }
+        ensures { n >= 0 -> exists x. h x /\ n <= x.length }
+      = if n < 0 then witness else
+        let t = pure { fun x -> h x /\ n <= x.length } in
+        match choose_if t with
+        | None ->
+          let rec aux (m:int) : 'a
+            requires { upper_bound (<=) s m }
+            ensures  { false }
+            variant  { m }
+          = if s m then absurd else aux (m-1) in
+          assert { forall l. s l -> l <= n
+            by exists x. h x /\ x.length = l so not t x };
+          aux n
+        | Some u -> assert { forall x. h x /\ n <= x.length ->
+          x.nth n = u.nth n by subtrace x u \/ subtrace u x };
+          u.nth n
+        end
+      in
+      assert { forall n. 0 < n -> w.rel (nth0 (n-1)) (nth0 n)
+        by exists x. h x /\ n < x.length so (n-1) <= x.length
+        so x.rel (x.nth (n-1)) (x.nth n)
+      };
+      let res = create_trace w.rel false 42 nth0 in
+      assert { upper_bound subtrace h res };
+      assert { forall u. upper_bound subtrace h u -> subtrace res u
+        by not (u.finite so exists x. h x /\ u.length + 1 <= x.length
+          so subtrace x u)
+        so (u.rel = res.rel by subtrace w u)
+        so forall n. n >= 0 -> res.nth n = u.nth n
+        by exists x. h x /\ n <= x.length so subtrace x u
+        so res.nth n = x.nth n = u.nth n
+      };
+      res
+    end in
+    assert { forall x. h x -> res.rel = x.rel by subtrace x res };
+    res
+
+end
+
+module TraceDef
+
+  use int.Int
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use order.Ordered
+  use order.Chain
+  use option.Option
+  use choice.Choice
+
+  (* FIXME: not possible to use 'by' witness introduction because
+     [witness] is purely logical, and cannot be used in code. *)
+  lemma existence : exists rel:erel 'a,finite length nth.
+    length >= 0 /\ (not finite -> length = 0)
+    /\ (forall n. 0 < n /\ (finite -> n <= length) ->
+        rel (nth (n-1)) (nth n))
+    /\ (forall x. x < 0 \/ (finite /\ x > length) -> nth x = witness)
+    by length = 0 /\ finite = true /\ nth = (fun _ -> witness)
+
+  type t 'a = {
+    rel : erel 'a;
+    finite : bool;
+    length : int;
+    nth : int -> 'a;
+  } invariant { length >= 0 }
+  invariant { not finite -> length = 0 }
+  invariant { forall n. 0 < n /\ (finite -> n <= length) ->
+    rel (nth (n-1)) (nth n) }
+  invariant { forall x. x < 0 \/ (finite /\ x > length) -> nth x = witness }
+
+  (* FIXME: no way to recover extensionality from a 'subtype',
+     so we make it axiomatic.... *)
+  axiom extensionality : forall t1 t2:t 'a.
+    t1.rel = t2.rel /\ t1.finite = t2.finite
+    /\ t1.length = t2.length /\ t1.nth = t2.nth -> t1 = t2
+
+  predicate subtrace (t1 t2:t 'a) =
+    t1.rel = t2.rel &&
+    (t2.finite -> t1.finite && t1.length <= t2.length) &&
+    forall n. 0 <= n /\ (t1.finite -> n <= t1.length) -> t1.nth n = t2.nth n
+
+  lemma sorder : order (subtrace:erel (t 'a))
+    by forall x y:t 'a. subtrace x y /\ subtrace y x -> x = y
+
+  let ghost create_trace (r:erel {'a}) (fn:bool)
+                            (len:int) (f:int -> {'a}) : t {'a}
+    requires { fn -> 0 <= len }
+    requires { forall n. 0 < n /\ (fn -> n <= len) -> r (f (n-1)) (f n) }
+    ensures  { result.rel = r }
+    ensures  { result.finite = fn }
+    ensures  { fn -> result.length = len }
+    ensures  { forall n. 0 <= n /\ (fn -> n <= len) -> result.nth n = f n }
+  = { rel = r; finite = fn; length = if fn then len else 0;
+      nth = fun n -> pure { if 0 <= n /\ (fn -> n <= len)
+                            then f n else witness }
+    }
+
+  meta compute_max_steps 0x1000000
+
+  (* FIXME: no way to collapse both defined symbols subtrace !
+     Although they can be fully unrolled with compute, this is
+     quite ugly. *)
+  clone Trace with type trace 'a = t 'a,
+    goal subtrace_order,
+    val create_trace = create_trace
+
+end
+
+(* Trace conversion from transition systems to games. *)
+module TraceGameCommon
+
+  use int.Int
+  use fn.Image
+  use ho_set.Set
+  use ho_rel.Rel
+  use game.Game
+  use Trace
+
+  predicate next_trace (t1 t2:trace 'a) =
+    subtrace t1 t2 /\ t2.finite /\ t2.length = t1.length + 1
+  predicate maximal_trace (t:trace 'a) =
+    not inhabited (next_trace t)
+  predicate has_midpoint_in (a b:trace 'a) (q:set (trace 'a)) =
+    exists c. subtrace a c /\ subtrace c b /\ q c
+  predicate will_reach_trace_in (t:trace 'a) (q:set (trace 'a)) =
+    forall t2. subtrace t t2 /\ maximal_trace t2 -> has_midpoint_in t t2 q
+
+  let ghost constant game_ex_trace : game (trace {'a})
+  = { progress = subtrace;
+      transition = fun t1 s -> pure { image (=) (next_trace t1) s } }
+
+  let ghost constant game_unv_trace : game (trace {'a})
+  = { progress = subtrace;
+      transition = fun t1 s -> pure { inhabited s /\ s = next_trace t1 } }
+
+end
+
+module TraceGame "W:non_conservative_extension:N" (* => TraceGameProof *)
+
+  use Trace
+  use game.Game
+  use export TraceGameCommon
+
+  axiom trace_enforce_ex : forall t:trace 'a,q.
+    have_winning_strat game_ex_trace t q
+    <-> exists tex. q tex /\ subtrace t tex
+
+  axiom trace_enforce_unv : forall t:trace 'a,q.
+    have_winning_strat game_unv_trace t q
+    <-> will_reach_trace_in t q
+
+end
+
+module TraceGameProof
+
+  use int.Int
+  use TraceConstructors
+  use TraceGameCommon
+  use fn.Fun
+  use fn.Image
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use game.Game
+  use game.BasicStrats
+  use game_no_strat.WinAlt
+  use choice.Choice
+  use transfinite.Extension
+  use order.LimUniq
+  use order.Chain
+  use order.SubChain
+
+  constant gex : game (trace 'a) = game_ex_trace
+  constant gun : game (trace 'a) = game_unv_trace
+
+  lemma trace_enforce_ex_1 : forall t:trace 'a,q.
+    have_winning_strat gex t q ->
+    (exists tex. q tex /\ subtrace t tex)
+    by exists ang. winning_strat gex t q ang
+    so let dmn = choice in
+      win_against gex t q ang dmn
+    so exists h. tr_ext subtrace (step gex ang dmn) ((=) t) h /\
+      win_at gex q ang dmn h
+    so chain subtrace h /\ (inhabited h by h t)
+    so let tex = sup_chain_trace h in
+      tex = sup subtrace h
+    so if q tex then subtrace t tex else false
+    by let a = ang h in gex.transition tex a /\ not a (dmn a)
+    so exists t2. next_trace tex t2 /\ a = (=) t2 so a t2
+
+  lemma trace_enforce_ex_2 : forall t:trace 'a,q tex.
+    q tex /\ subtrace t tex -> have_winning_strat gex t q
+    by have_uniform_winning_strat game_ex_trace ((=) t) q
+    by let inv = fun h -> forall x. h x -> subtrace x tex in
+      victory_invariant gex ((=) t) q inv
+    by forall h t. inv h /\ not inhabited (inter h q) /\ maximum subtrace h t ->
+      exists a. gex.transition t a /\ not a t /\ subset a (next_hist inv h)
+      by let t2 = prefix_trace (t.length + 1) tex in a = (=) t2
+      so not (q t so inter h q t)
+      so (if t.finite /\ (tex.finite -> t.length < tex.length)
+        then true else false by tex = t by subtrace tex t)
+      so next_trace t t2
+
+  let rec ghost function uacc_prefix (t1 t2:trace {'a})
+    (ang:angel (trace {'a})) (q:set {trace 'a}) (l:int) : set (trace {'a})
+    requires { t1.finite /\ winning_strat gun t1 q ang }
+    requires { not has_midpoint_in t1 t2 q }
+    requires { subtrace t1 t2 }
+    requires { t1.length <= l /\ (t2.finite -> l <= t2.length) }
+    ensures  { strong_u_acc gun ang t1 result }
+    ensures  { maximum subtrace result (prefix_trace l t2) }
+    ensures  { forall t3. subtrace t1 t3 ->
+       subtrace t3 (prefix_trace l t2) -> result t3 }
+    variant  { l }
+  = let p2 = prefix_trace l t2 in
+    if l = t1.length
+    then begin
+      assert { t1 = p2 by subtrace t1 p2 so subtrace p2 t1 };
+      pure { (=) t1 }
+    end else
+      let h0 = uacc_prefix t1 t2 ang q (l-1) in
+      let p1 = prefix_trace (l-1) t2 in
+      let a = pure { ang h0 } in
+      assert { u_acc_step gun ang h0 p2
+        by (if gun.transition p1 a then true else false
+          by lose_at gun ang q h0
+          by forall u. h0 u -> not (q u
+           so subtrace t1 u by subchain subtrace ((=) t1) h0))
+        so a p2 by next_trace p1 p2
+      };
+      assert { subtrace p1 p2 };
+      assert { forall t3. subtrace t1 t3 /\ subtrace t3 p2 /\ t3 <> p2 ->
+        h0 t3 by not subtrace p2 t3 so subtrace t3 p1 };
+      add h0 p2
+
+  lemma trace_enforce_unv_1 : forall t t2:trace 'a,q.
+    let gun = game_unv_trace in
+    have_winning_strat gun t q /\ subtrace t t2 /\ maximal_trace t2 ->
+    not has_midpoint_in t t2 q -> false
+    by exists ang. winning_strat gun t q ang
+    so exists h. (strong_u_acc gun ang t h /\ maximum subtrace h t2
+        so not lose_at gun ang q h
+        so (forall u. h u -> not (q u so subtrace t u /\ subtrace u t2))
+        so let a = ang h in gun.transition t2 (ang h) /\ not ang h t2
+        so exists t3. a t3 so t3 = t2 by subtrace t3 t2
+      )
+      by if not t.finite
+        then h = (=) t so t = t2 by subtrace t2 t
+        else let lens = fun l ->
+            t.length <= l /\ (t2.finite -> l <= t2.length) in
+          let fn = uacc_prefix t t2 ang q in
+          let ch = image fn lens in
+          let hl = bigunion ch in
+          let sp = sup_chain_trace hl in
+          let hr = add hl sp in
+          h = hr
+          so (ch (fn t.length) by lens t.length) so inhabited ch
+          so (inhabited hl by hl (prefix_trace t.length t2))
+          so (forall h. ch h -> chain subtrace h /\ minimum subtrace h t
+            by strong_u_acc gun ang t h /\ chain subtrace ((=) t)
+            so subchain subtrace ((=) t) h)
+          so ("stop_split" chain (subchain subtrace) ch
+            by monotone_on lens (<=) fn (subchain subtrace)
+            by forall i j. lens i /\ lens j /\ i <= j ->
+              let hi = fn i in let hj = fn j in
+              subchain subtrace hi hj
+              by ch hi /\ ch hj
+              so let pi = prefix_trace i t2 in let pj = prefix_trace j t2 in
+                subtrace pi pj
+              so maximum subtrace hi pi /\ maximum subtrace hj pj
+              so (forall a. hi a -> hj a
+                by subtrace t a so subtrace a pj by subtrace a pi)
+              so forall a b. hi a /\ hj b /\ not hi b -> subtrace a b
+                by chain subtrace hj so subtrace t b
+                so not (subtrace b a so subtrace b pi)
+          )
+          so chain subtrace hl
+          so supremum subtrace hl sp
+          so (upper_bound subtrace hl t2 by forall u. hl u -> subtrace u t2
+            by exists h. h u /\ ch h so exists l. lens l /\ fn l = h
+            so maximum subtrace h (prefix_trace l t2)
+          )
+          so ("stop_split" sp = t2 by subtrace sp t2
+            so subtrace t2 sp
+            by if t2.finite then hl t2
+              by ch (fn t2.length) /\ fn t2.length t2
+              by let p2 = prefix_trace t2.length t2 in
+                p2 = t2 by subtrace p2 t2 so subtrace t2 p2
+            else
+              not (sp.finite so let c = sp.length + t.length + 1 in
+                let pc = prefix_trace c t2 in
+                subtrace pc sp by hl pc by ch (fn c) /\ fn c pc)
+          )
+          so (forall h. ch h -> strong_u_acc gun ang t h)
+          so strong_u_acc gun ang t hl
+          so (hl sp so hl = hr) \/ u_acc_step gun ang hl sp
+
+
+  lemma trace_enforce_unv_2 : forall t:trace 'a,q.
+    will_reach_trace_in t q ->
+    have_winning_strat gun t q
+    by have_uniform_winning_strat gun ((=) t) q
+    by let inv = fun h -> minimum subtrace h t /\
+      (forall u v. h v /\ subtrace t u /\ subtrace u v -> h u) in
+      victory_invariant gun ((=) t) q inv
+    by (forall ch.
+      subset ch inv /\ chain (subchain subtrace) ch /\ inhabited ch ->
+      let hl = bigunion ch in
+      inv hl by supremum (subchain subtrace) ch hl
+      so (minimum subtrace hl t by
+        exists h0. ch h0 so subchain subtrace ((=) t) hl
+        by subchain subtrace ((=) t) h0 /\ subchain subtrace h0 hl
+      ) so (forall u v. hl v /\ subtrace t u /\ subtrace u v -> hl u
+        by exists h. ch h /\ h v so h u)
+    ) /\ (forall h tl. inv h /\ supremum subtrace h tl ->
+      let ht = add h tl in inv ht
+      by (forall u v. ht v /\ subtrace t u /\ subtrace u v -> ht u
+          by if v <> tl then h u by h v else u <> tl ->
+            not upper_bound subtrace h u
+          so exists w. h w /\ not subtrace w u
+          so subtrace w tl so subtrace u w so h u
+        )
+    ) /\ (forall h tm. inv h /\ not inhabited (inter h q) ->
+      maximum subtrace h tm ->
+      exists a. gun.transition tm a /\ not a tm /\ subset a (next_hist inv h)
+      by a = next_trace tm
+      so not (has_midpoint_in t tm q so exists t0. subtrace t t0 /\ subtrace t0 tm /\ q t0 so inter h q t0)
+      so inhabited a
+      so forall t2. next_trace tm t2 -> let ht = add h t2 in inv ht
+       by (forall u v. ht v /\ subtrace t u /\ subtrace u v -> ht u
+         by if v <> t2 then h u by h v else u <> t2 ->
+           h u by subtrace u tm by not subtrace t2 u
+       )
+    )
+
+
+  clone TraceGame with goal trace_enforce_ex, goal trace_enforce_unv
+
+end

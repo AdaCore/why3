@@ -1,0 +1,56 @@
+
+(** {1 Pancake sorting}
+
+   See {h <a href="https://en.wikipedia.org/wiki/Pancake_sorting">Pancake
+   sorting</a>}.
+
+   Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use mach.int.Int
+use ref.Ref
+use array.Array
+use array.ArraySwap
+use array.ArrayPermut
+
+(** We choose to have the bottom of the stack of pancakes at `a[0]`.
+    So it means we sort the array in reverse order. *)
+
+predicate sorted (a: array int) (hi: int) =
+  forall j1 j2. 0 <= j1 <= j2 < hi -> a[j1] >= a[j2]
+
+(** Insert the spatula at index `i` and flip the pancakes *)
+let flip (a: array int) (i: int)
+  requires { 0 <= i < length a }
+  ensures  { forall j. 0 <= j < i        -> a[j] = (old a)[j] }
+  ensures  { forall j. i <= j < length a -> a[j] = (old a)[length a -1-(j-i)] }
+  ensures  { permut_all (old a) a }
+= let n = length a in
+  for k = 0 to (n - i) / 2 - 1 do
+    invariant { forall j. 0   <= j < i   -> a[j] = (old a)[j]     }
+    invariant { forall j. i   <= j < i+k -> a[j] = (old a)[n-1-(j-i)] }
+    invariant { forall j. i+k <= j < n-k -> a[j] = (old a)[j]     }
+    invariant { forall j. n-k <= j < n   -> a[j] = (old a)[n-1-(j-i)] }
+    invariant { permut_all (old a) a }
+    swap a (i + k) (n - 1 - k)
+  done
+
+let pancake_sort (a: array int)
+  ensures { sorted a (length a) }
+  ensures { permut_all (old a) a }
+= for i = 0 to length a - 2 do
+    invariant { sorted a i }
+    invariant { forall j1 j2. 0 <= j1 < i <= j2 < length a -> a[j1] >= a[j2] }
+    invariant { permut_all (old a) a }
+    (* 1. look for the maximum of a[i..] *)
+    let m = ref i in
+    for k = i + 1 to length a - 1 do
+      invariant { i <= !m < length a }
+      invariant { forall j. i <= j < k -> a[j] <= a[!m] }
+      if a[k] > a[!m] then m := k
+    done;
+    (* 2. then flip the pancakes to put it at index i *)
+    if !m = i then continue;
+    if !m < length a - 1 then flip a !m;
+    flip a i
+  done

@@ -21,7 +21,7 @@ why3.conf
 .*.aux
 *.elc
 *.summary
-.*.sw*
+.merlin
 \#*\#
 
 # /
@@ -30,7 +30,6 @@ why3.conf
 /autom4te.cache
 /Makefile
 /configure
-/install-sh
 /semantic.cache
 /TAGS
 /output_why3
@@ -39,7 +38,8 @@ why3.conf
 /distrib
 /why3regtests.err
 /why3regtests.out
-/.merlin
+/src/jessie/.merlin
+/_build
 
 # /bench/
 /bench/programs/good/booleans/
@@ -53,6 +53,7 @@ why3.conf
 /bench/programs/good/po/
 /bench/valid/list/
 /bench/ce/*.out
+/bench/parsing/bad/*.out
 
 # /bin/
 /bin/why3
@@ -65,11 +66,27 @@ why3.conf
 /bin/why3prove
 /bin/why3realize
 /bin/why3replay
+n/bin/why3pp.opt
+/bin/why3pp.byte
+/bin/why3pp
+/bin/why3session.opt
+/bin/why3session.byte
 /bin/why3session
+/bin/why3shell.opt
+/bin/why3shell.byte
+/bin/why3shell
+/bin/why3wc.opt
+/bin/why3wc.byte
 /bin/why3wc
-/bin/*.byte
-/bin/*.opt
-
+/bin/why3webserver.opt
+/bin/why3webserver.byte
+/bin/why3webserver
+/bin/why3pp.opt
+/bin/why3pp.byte
+/bin/why3pp
+/bin/isabelle_client.opt
+/bin/isabelle_client.byte
+/bin/isabelle_client
 
 # /doc/
 /doc/version.tex
@@ -96,16 +113,19 @@ why3.conf
 /doc/manual.synctex.gz
 /doc/*.haux
 /doc/*.pdf
+/doc/generated/
 /doc/html/
 /doc/*.hind
 /doc/*.htoc
 /doc/bnf
 /doc/bnf.ml
-/doc/*_bnf.tex
 /doc/apidoc.tex
 /doc/apidoc/
 /doc/stdlibdoc/
 /doc/texput.log
+/doc/extract_ocaml_code
+/doc/*__*.ml
+/doc/*_bnf.tex
 
 # /lib
 /lib/why3-cpulimit
@@ -118,28 +138,22 @@ why3.conf
 # /lib/why3/
 /lib/why3/META
 
-# /lib/ocaml/
-/lib/ocaml/why3__BigInt_compat.ml
-
 # /share/
 /share/emacs/semantic.cache
 /share/Makefile.config
 /share/drivers
-/share/modules
-/share/theories
+/share/stdlib
 
 # /src/
 /src/config.sh
 
-# Coq tactic
-/src/coq-tactic/why3tac.ml
-/src/coq-tactic/.why3-vo-*
-
 # Coq
+/lib/coq/version
 
 # PVS
 .pvscontext
 orphaned-proofs.prf
+/lib/pvs/version
 /lib/pvs/*/*.summary
 pvsbin/
 
@@ -151,11 +165,8 @@ pvsbin/
 /lib/isabelle/map/
 /lib/isabelle/real/
 /lib/isabelle/set/
-/lib/isabelle/ROOT
-/lib/isabelle/Why3_BV.thy
 /lib/isabelle/Why3_Number.thy
 /lib/isabelle/Why3_Real.thy
-/lib/isabelle/Why3_Set.thy
 /lib/isabelle/why3.ML
 /lib/isabelle/last_build
 /lib/isabelle/bv
@@ -168,12 +179,15 @@ pvsbin/
 /src/driver/parse_smtv2_model_lexer.ml
 /src/driver/parse_smtv2_model_parser.ml
 /src/driver/parse_smtv2_model_parser.mli
+/src/driver/parse_smtv2_model_parser.conflicts
 
 # /src/parser/
 /src/parser/lexer.ml
 /src/parser/parser.ml
 /src/parser/parser.mli
 /src/parser/parser.conflicts
+/src/parser/handcrafted.messages.temp
+/src/parser/parser_messages.ml
 
 # /src/why3doc/
 /src/why3doc/doc_lexer.ml
@@ -182,8 +196,12 @@ pvsbin/
 /src/util/config.ml
 /src/util/lexlib.ml
 /src/util/rc.ml
+/src/util/json_lexer.ml
 /src/util/json_parser.mli
 /src/util/json_parser.ml
+/src/util/json_parser.conflicts
+/src/util/mlmpfr_wrapper.ml
+/src/util/ppx_debug_optim
 
 # /src/session
 /src/session/xml.ml
@@ -192,6 +210,11 @@ pvsbin/
 
 # /src/tools
 /src/tools/why3wc.ml
+
+# /src/ide
+/src/ide/gtkcompat.ml
+/src/ide/why3_js.byte
+/src/ide/why3_js.js
 
 # /plugins/tptp/
 /plugins/tptp/tptp_lexer.ml
@@ -207,6 +230,19 @@ pvsbin/
 /plugins/python/test/
 /plugins/python/py_parser.conflicts
 
+# /plugins/microc/
+/plugins/microc/mc_lexer.ml
+/plugins/microc/mc_parser.ml
+/plugins/microc/mc_parser.mli
+/plugins/microc/test/
+/plugins/microc/mc_parser.conflicts
+
+# /plugins/ada_terms/
+/plugins/ada_terms/ada_lexer.ml
+/plugins/ada_terms/ada_parser.conflicts
+/plugins/ada_terms/ada_parser.ml
+/plugins/ada_terms/ada_parser.mli
+
 # /drivers
 /drivers/coq-realizations.aux
 /drivers/pvs-realizations.aux
@@ -221,6 +257,8 @@ pvsbin/
 !/tests/test-extraction/main.ml
 /tests/python/*/why3session.xml
 /tests/python/*/why3shapes.gz
+/tests/microc/*/why3session.xml
+/tests/microc/*/why3shapes.gz
 
 # /examples/
 /examples/in_progress/course/
@@ -228,10 +266,6 @@ pvsbin/
 /examples/in_progress/binary_search2/
 /examples/in_progress/binary_search_c/
 /examples/in_progress/vacid_0_red_black_trees_harness/
-/examples/in_progress/prover/bench/*/*.out
-/examples/in_progress/prover/bench/*/*.txt
-/examples/in_progress/prover/bench1
-/examples/in_progress/prover/bench2
 /examples/why3bench.html
 /examples/why3regtests.err
 /examples/why3regtests.out
@@ -270,18 +304,15 @@ pvsbin/
 /examples/in_progress/bigInt/*__*.ml
 /examples/in_progress/mp/jsmain.js
 /examples/in_progress/mp/*__*.ml
-/examples/in_progress/prover/build/*__*.ml
-/examples/in_progress/prover/.depend
-/examples/in_progress/prover/build/prover
-
-# modules
-/modules/string/
-/modules/stack/
-/modules/queue/
-/modules/pqueue/
-/modules/mach/array/
-/modules/mach/int/
-/modules/python/
+/examples/prover/.depend
+/examples/prover/prover
+/examples/prover/prover.ml
+/examples/prover/bench/*/*.out
+/examples/prover/bench/*/*.txt
+/examples/prover/bench1
+/examples/prover/bench2
+/examples/prover/macro_generator/depend
+/examples/prover/macro_generator/build
 
 # Try Why3
 /src/trywhy3/trywhy3.byte

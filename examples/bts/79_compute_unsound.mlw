@@ -1,0 +1,18 @@
+module Soundness
+  use int.Int
+
+  function f0 (x y z:int) : int = x * y + z
+  predicate p (f:int -> int) =
+    f (-1) = 0 && forall n:int. f n = f 0 + (f 1 - f 0) * n
+
+  lemma A : forall y z:int. p (fun x -> f0 x y z) <-> y = z
+  meta rewrite lemma A
+
+  (* compute_specified should not solve this goal.
+     0 = 0 was added so that compute_specified progress on this goal even when
+     not unsound.
+  *)
+  lemma Fail : 0 = 0 /\ p (fun x -> f0 x x x)
+
+  lemma Absurd : false
+end

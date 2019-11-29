@@ -93,6 +93,10 @@ on linking described in file LICENSE.
 	<context id="floating-point-number" style-ref="floating-point">
 	  <match>[-]?[0-9][0-9_]*(\.[0-9_]*)?([Ee][+-]?[0-9][0-9_]*)?</match>
 	</context>
+        <context id="attributes" style-ref="string">
+          <start>\[\@</start>
+          <end>\]</end>
+        </context>
 <!--
 	<context id="label" style-ref="label">
 	  <match>[~?]\%{low-ident}</match>
@@ -216,6 +220,7 @@ on linking described in file LICENSE.
 	</context>
 	<context id="spec" style-ref="spec-keyword">
           <keyword>absurd</keyword>
+          <keyword>alias</keyword>
           <keyword>assert</keyword>
           <keyword>assume</keyword>
           <keyword>at</keyword>

@@ -1,46 +1,13 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
 (*  on linking described in file LICENSE.                           *)
 (*                                                                  *)
 (********************************************************************)
-
-module ProdConsume :
-sig
-  type 'a t
-  val create : unit -> 'a t
-  val add : 'a -> 'a t -> unit
-  val iter_remove : ('a -> unit) -> 'a t -> unit
-end
-= struct
-  (* One thing can produce, one thing can consume concurrently *)
-
-  type 'a cell =
-    | Empty
-    | Cons of 'a * 'a list
-  and 'a list = 'a cell ref
-
-  let rec iter f = function
-    | Empty -> ()
-    | Cons (x,l) -> f x; iter f !l
-
-  (* a reference on a mutable singly linked list *)
-  type 'a t = 'a list ref
-
-  let create () = ref (ref (Empty))
-  let add x t = t := ref (Cons(x,!t))
-  let iter_remove f t =
-    if !(!t) = Empty then () else
-    let r = !t in (* atomic one cell of the list *)
-    let l = !r in (* the content of the cell *)
-    r := Empty; (* Work even if there are some production,
-                   just not anymore the head *)
-    iter f l
-end
 
 module type S = sig
 
@@ -89,27 +56,15 @@ module type S = sig
 
 end
 
-let new_tbl_tag = let c = ref (-1) in
-  fun () -> (incr c; !c)
+type tag = int
 
-type tag = {
-  tag_map : ((int,Obj.t) Hashtbl.t) Lazy.t;
-  tag_tag : int;
-}
+let create_tag tag = tag
 
-let create_tag tag = {
-  tag_map = lazy (Hashtbl.create 3);
-  tag_tag = tag;
-}
-
-let dummy_tag = {
-  tag_map = lazy (failwith "dummy tag");
-  tag_tag = -1;
-}
+let dummy_tag = -1
 
 let tag_equal : tag -> tag -> bool = (==)
 
-let tag_hash k = assert (k != dummy_tag); k.tag_tag
+let tag_hash k = assert (k != dummy_tag); k
 
 module type Weakey =
 sig
@@ -117,93 +72,40 @@ sig
   val tag : t -> tag
 end
 
-module Make (S : Weakey) = struct
+module Make (S : Weakey) : S with type key = S.t = struct
 
   type key = S.t
 
-  module H = Weak.Make (struct
+  module H = Ephemeron.K1.Make (struct
     type t = S.t
-    let hash k = (S.tag k).tag_tag
+    let hash k = (S.tag k)
     let equal k1 k2 = S.tag k1 == S.tag k2
   end)
 
-  type 'a t = {
-    tbl_set : H.t;
-    tbl_tag : int;
-  }
+  type 'a t = 'a H.t
 
-  let tag_map k = Lazy.force (S.tag k).tag_map
+  let create = H.create
 
-  let find (t : 'a t) k : 'a =
-    Obj.obj (Hashtbl.find (tag_map k) t.tbl_tag)
 
-  let mem t k = Hashtbl.mem (tag_map k) t.tbl_tag
+  let find = H.find
 
-  let set (t : 'a t) k (v : 'a) =
-    Hashtbl.replace (tag_map k) t.tbl_tag (Obj.repr v);
-    ignore (H.merge t.tbl_set k)
+  let mem = H.mem
 
-  let remove t k =
-    Hashtbl.remove (tag_map k) t.tbl_tag;
-    H.remove t.tbl_set k
+  let set = H.replace
 
-  let iterk fn t = H.iter fn t.tbl_set
-  let foldk fn t = H.fold fn t.tbl_set
+  let remove = H.remove
 
-  let iter  fn t = H.iter (fun k -> fn k (find t k)) t.tbl_set
-  let fold  fn t = H.fold (fun k -> fn k (find t k)) t.tbl_set
+  let iter = H.iter
+  let fold = H.fold
 
-  (** This table is just a hack to keep alive the weak hashset :
-      Indeed that circunvent a strange behavior/bug of weak hashset,
-      when a weak hashset is garbage collected it will not anymore
-      remove the dead elements from it. So during finalize or if the
-      hashset is keep alive, we can acces invalid pointer...
+  let iterk fn t = H.iter (fun k _ -> fn k) t
+  let foldk fn t = H.fold (fun k _ -> fn k) t
 
-      So to summarize we keep alive the weak hashset until we don't need them
-      anymore.
-  *)
-  let gen_table = Hashtbl.create 5
+  let clear = H.clear
 
-  let tbl_final_aux t =
-    iterk (fun k -> Hashtbl.remove (tag_map k) t.tbl_tag) t
+  let length = H.length
 
-  let tbl_final t =
-    tbl_final_aux t;
-    (* We don't need anymore the weak hashset, we can release it *)
-    Hashtbl.remove gen_table t.tbl_tag
-
-  (** All the hashweak that can be collected. When a hashweak is
-      garbage collected we need to remove its tag from the key
-      hashtable. Since finalisation can be triggered at anytime even
-      when the key hashtable are in an inconsistent state, we need to
-      delay the actual removing until it can be done safely.
-      t_collected contains the delayed hashweak *)
-  let t_collected = ProdConsume.create ()
-
-  (** Do really the removing *)
-  let collect () = ProdConsume.iter_remove tbl_final t_collected
-
-  let create n =
-    let t = {
-      tbl_set = H.create n;
-      tbl_tag = new_tbl_tag () }
-    in
-    Hashtbl.add gen_table t.tbl_tag t.tbl_set;
-    Gc.finalise (fun t -> ProdConsume.add t t_collected) t;
-    t
-
-  let find x y = collect (); find x y
-  let set x y z = collect (); set x y z
-
-  let clear t = collect (); tbl_final_aux t; H.clear t.tbl_set
-
-  let length t = H.count t.tbl_set
-
-  let copy t =
-    collect ();
-    let t' = create (length t) in
-    iter (set t') t;
-    t'
+  let copy = H.copy
 
   let memoize n fn =
     let h = create n in fun e ->
@@ -233,4 +135,3 @@ module Make (S : Weakey) = struct
       | None -> Lazy.force v
 
 end
-

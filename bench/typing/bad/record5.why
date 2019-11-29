@@ -1,6 +1,6 @@
 theory T
-  use import list.List
-  use import bool.Bool
+  use list.List
+  use bool.Bool
   type t 'a = { a : list 'a; b : list 'a; }
   goal g1 : let t = { a = Cons 1 Nil; b = Cons True Nil } in true
 end

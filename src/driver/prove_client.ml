@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -14,6 +14,7 @@ let socket : Unix.file_descr option ref = ref None
 exception NotConnected
 exception AlreadyConnected
 exception InvalidAnswer of string
+exception ConnectionError of string
 
 let is_connected () = !socket <> None
 
@@ -32,12 +33,13 @@ let client_connect ~fail socket_name =
     socket := Some sock
   with
   | Unix.Unix_error(err, func, arg) when fail ->
-     Format.eprintf "client_connect: connection failed: %s (%s,%s) (socket_name=%s)@." (Unix.error_message err) func arg socket_name;
-     exit 2
+     let s = Format.sprintf "client_connect: connection failed: %s (%s,%s) (socket_name=%s)@."
+             (Unix.error_message err) func arg socket_name in
+     raise (ConnectionError s)
   | e when fail ->
-     Format.eprintf "client_connect failed for some unexpected reason: %s@\nAborting.@."
-                    (Printexc.to_string e);
-     exit 2
+     let s = Format.sprintf "client_connect failed for some unexpected reason: %s@\nAborting.@."
+                    (Printexc.to_string e) in
+     raise (ConnectionError s)
 
 let client_disconnect () =
   match !socket with
@@ -55,12 +57,12 @@ let send_request_string msg =
       let to_write = String.length msg in
       let rec write pointer =
         if pointer < to_write then
-          let written = Unix.write sock msg pointer (to_write - pointer) in
+          let written = Unix.write_substring sock msg pointer (to_write - pointer) in
           write (pointer + written)
       in write 0
 
 let read_from_client =
-  let buf = String.make 1024 ' ' in
+  let buf = Bytes.make 1024 ' ' in
   fun blocking ->
     match !socket with
     | None -> raise NotConnected
@@ -73,7 +75,7 @@ let read_from_client =
         in
         if do_read then
           let read = Unix.read sock buf 0 1024 in
-          String.sub buf 0 read
+          Bytes.sub_string buf 0 read
         else ""
 
 (* TODO/FIXME: should we be able to change this setting when
@@ -109,11 +111,20 @@ let connect_internal () =
     Filename.temp_file "why3server" "sock"
   in
   let exec = Filename.concat Config.libdir "why3server" in
-  let pid = Unix.create_process exec
+  let pid =
+    (* use this version for debugging the C code
+    Unix.create_process "valgrind"
+    [|"/usr/bin/valgrind";exec; "--socket"; socket_name;
+      "--single-client";
+      "-j"; string_of_int !max_running_provers|]
+    Unix.stdin Unix.stdout Unix.stderr
+     *)
+    Unix.create_process exec
     [|exec; "--socket"; socket_name;
       "--single-client";
       "-j"; string_of_int !max_running_provers|]
-    Unix.stdin Unix.stdout Unix.stderr in
+    Unix.stdin Unix.stdout Unix.stderr
+  in
   Unix.chdir cwd;
   (* sleep before connecting, or the server will not be ready yet *)
   let rec try_connect n d =
@@ -152,6 +163,15 @@ let send_request ~id ~timelimit ~memlimit ~use_stdin ~cmd =
       Buffer.add_char send_buf ';';
       Buffer.add_string send_buf s
   end;
+  Buffer.add_char send_buf '\n';
+  let s = Buffer.contents send_buf in
+  send_request_string s
+
+let send_interrupt ~id =
+  if not (is_connected ()) then connect_internal ();
+  Buffer.clear send_buf;
+  Buffer.add_string send_buf "interrupt;";
+  Buffer.add_string send_buf (string_of_int id);
   Buffer.add_char send_buf '\n';
   let s = Buffer.contents send_buf in
   send_request_string s
@@ -220,4 +240,6 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       Format.fprintf fmt "Already connected to the proof server"
   | InvalidAnswer s ->
       Format.fprintf fmt "Invalid server answer: %s" s
+  | ConnectionError s ->
+      Format.fprintf fmt "Connection error: %s" s
   | _ -> raise exn)

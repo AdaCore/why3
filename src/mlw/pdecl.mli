@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -113,6 +113,7 @@ val pd_int : pdecl
 val pd_real : pdecl
 val pd_equ : pdecl
 val pd_bool : pdecl
+val pd_str : pdecl
 val pd_tuple : int -> pdecl
 val pd_func : pdecl
 val pd_func_app : pdecl
@@ -127,6 +128,6 @@ val merge_known : known_map -> known_map -> known_map
 
 val find_its_defn : known_map -> itysymbol -> its_defn
 
-(** {2 Pretty-printing *)
+(** {2 Pretty-printing} *)
 
 val print_pdecl : Format.formatter -> pdecl -> unit

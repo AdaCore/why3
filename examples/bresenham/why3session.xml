@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../bresenham.mlw" expanded="true">
-<theory name="M" sum="7f17c0a603b1cea677dd6eb91a67437a" expanded="true">
- <goal name="closest" expl="" expanded="true">
- <proof prover="1" edited="bresenham_M_closest_1.v"><result status="valid" time="0.54"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="bresenham.mlw"/>
+<theory name="M" proved="true">
+ <goal name="closest" proved="true">
+ <proof prover="2"><path name="bresenham_M_closest_1.v"/><result status="valid" time="0.38"/></proof>
  </goal>
- <goal name="VC bresenham" expl="VC for bresenham" expanded="true">
- <proof prover="2"><result status="valid" time="0.12" steps="70"/></proof>
+ <goal name="bresenham&#39;vc" expl="VC for bresenham" proved="true">
+ <proof prover="1"><result status="valid" time="0.12" steps="70"/></proof>
  </goal>
 </theory>
 </file>

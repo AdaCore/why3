@@ -152,9 +152,9 @@ v ::= (\x.t, e)
 *)
 
 
-use import Lambda
+use Lambda
 
-use import list.List
+use list.List
 
 type environment = list (identifier, value)
 with value = Closure identifier term environment

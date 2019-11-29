@@ -1,20 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../conjugate.mlw" expanded="true">
-<theory name="Conjugate" sum="18382f4f171724c051985bfdff9a47b7" expanded="true">
- <goal name="VC conjugate" expl="VC for conjugate" expanded="true">
- <proof prover="0"><result status="valid" time="0.13" steps="316"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="conjugate.mlw"/>
+<theory name="Conjugate" proved="true">
+ <goal name="conjugate&#39;vc" expl="VC for conjugate" proved="true">
+ <proof prover="1"><result status="valid" time="0.13" steps="277"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="143b95196fccc06b9d4eab84a6f33f73" expanded="true">
- <goal name="VC test" expl="VC for test" expanded="true">
- <proof prover="0"><result status="valid" time="0.11" steps="181"/></proof>
+<theory name="Conjugate32" proved="true">
+ <goal name="conjugate&#39;vc" expl="VC for conjugate" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="conjugate&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="5535"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="7919"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.2" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="4308"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.3" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="4372"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.4" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="5947"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.5" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="8062"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.6" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="5354"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.7" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="5160"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.8" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="6332"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.9" expl="loop variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="5187"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="10981"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="6763"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.12" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="9876"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.13" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="5307"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.14" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="4675"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.15" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="4810"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.16" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="14929"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.17" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="403"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.18" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.13" steps="459"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.19" expl="loop variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="5644"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.20" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="5605"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.21" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.26" steps="39960"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.22" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="7318"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.23" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="4938"/></proof>
+  </goal>
+  <goal name="conjugate&#39;vc.24" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="5772"/></proof>
+  </goal>
+ </transf>
  </goal>
- <goal name="VC bench" expl="VC for bench" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
+</theory>
+<theory name="Test" proved="true">
+ <goal name="test&#39;vc" expl="VC for test" proved="true">
+ <proof prover="1"><result status="valid" time="0.11" steps="99"/></proof>
+ </goal>
+ <goal name="bench&#39;vc" expl="VC for bench" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
 </theory>
 </file>

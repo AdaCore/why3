@@ -3,8 +3,8 @@
 
 module SetZeros
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   let set_zeros (a : array int) =
     ensures { forall j: int. 0 <= j < a.length -> a[j] = 0 }
@@ -25,9 +25,9 @@ end
 
 module AllZeros
 
-  use import int.Int
-  use import array.Array
-  use import ref.Refint
+  use int.Int
+  use array.Array
+  use ref.Refint
 
   predicate all_zeros (a: array int) (hi: int) =
     forall i: int. 0 <= i < hi -> a[i] = 0
@@ -93,7 +93,7 @@ module AllZeros
   predicate zero_interval (a: array int) (lo hi: int) =
     forall i: int. lo <= i < hi -> a[i] = 0
 
-  use import int.ComputerDivision
+  use int.ComputerDivision
 
   let all_zeros5 (a: array int) : bool
     ensures { result <-> all_zeros a a.length }

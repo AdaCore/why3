@@ -1,7 +1,7 @@
 /********************************************************************/
 /*                                                                  */
 /*  The Why3 Verification Platform   /   The Why3 Development Team  */
-/*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  */
+/*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  */
 /*                                                                  */
 /*  This software is distributed under the terms of the GNU Lesser  */
 /*  General Public License version 2.1, with the special exception  */
@@ -23,10 +23,10 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <poll.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/wait.h>
@@ -40,6 +40,7 @@
 #include "writebuf.h"
 #include "options.h"
 #include "logging.h"
+#include "proc.h"
 
 #define READ_ONCE 1024
 
@@ -52,35 +53,26 @@ typedef struct {
 
 int server_sock = -1;
 
-typedef struct {
-  pid_t id;
-  int client_fd;
-  char* task_id;
-  char* outfile;
-} t_proc, *pproc;
-
 // the poll list is the list of file descriptors for which we monitor certain
 // events.
 struct pollfd* poll_list;
 int poll_num = 0;
 int poll_len = 0;
 
-plist processes;
+// global pointers are initialized with NULL by C semantics
 plist clients;
 char *current_dir;
-pqueue queue;
 
 static int cpipe[2];
 
 void shutdown_with_msg(char* msg);
 
 void shutdown_with_msg(char* msg) {
-  int i;
   if (server_sock != -1) {
     close(server_sock);
   }
   if (clients != NULL) {
-     for (i = 0; i < list_length(clients); i++) {
+     for (int i = 0; i < list_length(clients); i++) {
        close(((pclient) clients->data[i])->fd);
      }
   }
@@ -98,12 +90,12 @@ void add_to_poll_list(int sock, short events) {
   }
   poll_list[poll_num].fd = sock;
   poll_list[poll_num].events = events;
+  poll_list[poll_num].revents = 0;
   poll_num++;
 }
 
 struct pollfd* poll_list_lookup(int fd) {
-  int i;
-  for (i = 0; i < poll_num; i++) {
+  for (int i = 0; i < poll_num; i++) {
     if (poll_list[i].fd == fd) {
       return poll_list+i;
     }
@@ -111,19 +103,24 @@ struct pollfd* poll_list_lookup(int fd) {
   return NULL;
 }
 
+void poll_list_clean() {
+  int i = 0;
+  while (i < poll_num) {
+    if (poll_list[i].fd == -1) {
+      poll_list[i] = poll_list[poll_num - 1];
+      --poll_num;
+    } else ++i;
+  }
+}
+
 void poll_list_remove(int fd) {
-  int i;
-  assert (poll_num > 0);
-  for (i = 0; i < poll_num; i++) {
+  for (int i = 0; i < poll_num; ++i) {
     if (poll_list[i].fd == fd) {
+      poll_list[i].fd = -1;
+      poll_list[i].revents = 0;
       break;
     }
   }
-  if (i == poll_num) {
-    return;
-  }
-  poll_list[i] = poll_list[poll_num - 1];
-  poll_num--;
 }
 
 int open_temp_file(char* dir, char** outfile) {
@@ -206,23 +203,47 @@ size_t unix_path_max() {
   return sizeof(struct sockaddr_un) - offsetof(struct sockaddr_un, sun_path);
 }
 
-void server_init_listening(char* basename, int parallel) {
+void server_init_listening(char* socketname, int parallel) {
   struct sockaddr_un addr;
   int res;
-  init_logging();
+  int cur_dir;
+  char *socketname_copy1, *socketname_copy2, *dirn, *filen;
+
+  // Initialize current_dir pointer. Do that here because we switch the
+  // directory temporarily below.
   current_dir = get_cur_dir();
-  queue = init_queue(100);
+
+  // Before opening the socket, we switch to the dir of the socket. This
+  // workaround is needed because Unix sockets only support relatively short
+  // paths (~100 chars depending on the system). We also open a file
+  // descriptor to the current dir so that we can switch back afterwards.
+
+  socketname_copy1 = strdup(socketname);
+  socketname_copy2 = strdup(socketname);
+  dirn = dirname(socketname_copy1);
+  filen = basename(socketname_copy2);
+  cur_dir = open(".", O_RDONLY);
+  if (cur_dir == -1) {
+    shutdown_with_msg("error when opening current directory");
+  }
+  res = chdir(dirn);
+  if (res == -1) {
+    shutdown_with_msg("error when switching to socket directory");
+  }
+
+  init_logging();
+  init_request_queue();
   clients = init_list(parallel);
   addr.sun_family = AF_UNIX;
   poll_len = 2 + parallel;
   poll_list = (struct pollfd*) malloc(sizeof(struct pollfd) * poll_len);
   poll_num = 0;
-  if (strlen(basename) + 1 > unix_path_max()) {
-    shutdown_with_msg("basename too long");
+  if (strlen(filen) + 1 > unix_path_max()) {
+    shutdown_with_msg("basename of filename too long");
   }
-  memcpy(addr.sun_path, basename, strlen(basename) + 1);
+  memcpy(addr.sun_path, filen, strlen(filen) + 1);
   server_sock = socket(AF_UNIX, SOCK_STREAM, 0);
-  res = unlink(basename);
+  res = unlink(filen);
   // we delete the file if present
   if (res == -1 && errno != ENOENT) {
     shutdown_with_msg("error deleting socket");
@@ -235,8 +256,18 @@ void server_init_listening(char* basename, int parallel) {
   if (res == -1) {
     shutdown_with_msg("error listening on socket");
   }
+  res = fchdir(cur_dir);
+  if (res == -1) {
+    shutdown_with_msg("error when switching back to current directory");
+  }
+  res = close(cur_dir);
+  if (res == -1) {
+    shutdown_with_msg("error closing descriptor to current dir");
+  }
+  free(socketname_copy1);
+  free(socketname_copy2);
   add_to_poll_list(server_sock, POLLIN);
-  processes = init_list(parallel);
+  init_process_list();
   setup_child_pipe();
 }
 
@@ -255,9 +286,8 @@ pid_t create_process(char* cmd,
                      bool usestdin,
                      int outfile,
                      int timelimit,
-                     int memlimit) {
+                     unsigned int memlimit) {
   struct rlimit res;
-  int i;
   char** unix_argv;
   int count = argc;
   // in the case of usestdin, the last argument is in fact not passed to
@@ -268,7 +298,7 @@ pid_t create_process(char* cmd,
   unix_argv = (char**)malloc(sizeof(char*) * (count + 2));
   unix_argv[0] = cmd;
   unix_argv[count + 1] = NULL;
-  for (i = 0; i < count; i++) {
+  for (int i = 0; i < count; i++) {
     unix_argv[i + 1] = argv[i];
   }
 
@@ -297,8 +327,8 @@ pid_t create_process(char* cmd,
   if (memlimit > 0) {
     /* set the CPU memory limit */
     getrlimit(RLIMIT_AS,&res);
-    res.rlim_cur = memlimit * 1024 * 1024;
-    res.rlim_max = memlimit * 1024 * 1024;
+    res.rlim_cur = (rlim_t)memlimit * 1024 * 1024;
+    res.rlim_max = (rlim_t)memlimit * 1024 * 1024;
     setrlimit(RLIMIT_AS,&res);
   }
 
@@ -389,12 +419,6 @@ void send_msg_to_client(pclient client,
    queue_write(client, msgbuf);
 }
 
-void free_process(pproc proc) {
-   free(proc->outfile);
-   free(proc->task_id);
-   free(proc);
-}
-
 void handle_child_events() {
   pproc child;
   pclient client;
@@ -417,13 +441,13 @@ void handle_child_events() {
     is_timeout = false;
     if (WIFSIGNALED(status)) {
       is_timeout = true;
-    }
-    if (WIFEXITED(status)) {
+      exit_code = WTERMSIG(status);
+    } else if (WIFEXITED(status)) {
       exit_code = WEXITSTATUS(status);
     }
     child = (pproc) list_lookup(processes, pid);
     list_remove(processes, pid);
-    client = (pclient) list_lookup(clients, child->client_fd);
+    client = (pclient) list_lookup(clients, child->client_key);
     if (client != NULL) {
       send_msg_to_client(client,
                          child->task_id,
@@ -436,6 +460,8 @@ void handle_child_events() {
   }
 }
 
+/*@ requires r != NULL && r->req_type == REQ_RUN;
+  @*/
 void run_request (prequest r) {
   char* outfile;
   int out_descr;
@@ -460,7 +486,7 @@ void run_request (prequest r) {
 
   proc = (pproc) malloc(sizeof(t_proc));
   proc->task_id = r->id;
-  proc->client_fd = r->key;
+  proc->client_key = r->key;
   proc->id = id;
   proc->outfile = outfile;
   list_append(processes, id, (void*) proc);
@@ -486,11 +512,22 @@ void handle_msg(pclient client, int key) {
       break;
     r = parse_request(buf + old, cur - old, key);
     if (r) {
-      if (list_length(processes) < parallel) {
-        run_request(r);
+      switch (r->req_type) {
+      case REQ_RUN:
+        if (list_length(processes) < parallel) {
+          run_request(r);
+          free_request(r);
+        } else {
+          queue_push(queue, (void*) r);
+        }
+        break;
+      case REQ_INTERRUPT:
+        // removes all occurrences of r->id from the queue
+        log_msg("Why3 server: removing id '%s' from queue",r->id);
+        remove_from_queue(r->id);
+        kill_processes(r->id);
         free_request(r);
-      } else {
-        queue_push(queue, (void*) r);
+        break;
       }
     }
     //skip newline
@@ -503,7 +540,7 @@ void handle_msg(pclient client, int key) {
 }
 
 void shutdown_server() {
-  unlink(basename);
+  unlink(socketname);
   shutdown_with_msg("last client disconnected");
 }
 
@@ -544,21 +581,21 @@ void schedule_new_jobs() {
 }
 
 int main(int argc, char **argv) {
-  int i;
   char ch;
   int res;
   struct pollfd* cur;
   pclient client;
   parse_options(argc, argv);
-  server_init_listening(basename, parallel);
+  server_init_listening(socketname, parallel);
   while (1) {
     schedule_new_jobs();
+    poll_list_clean();
     while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR)
       continue;
     if (res == -1) {
       shutdown_with_msg("call to poll failed");
     }
-    for (i = 0; i < poll_num; i++) {
+    for (int i = 0; i < poll_num; i++) {
       cur = (struct pollfd*) poll_list + i;
       if (cur->revents == 0) {
         continue;
@@ -577,9 +614,7 @@ int main(int argc, char **argv) {
       if (cur->fd == server_sock) {
         assert (cur->revents == POLLIN);
         server_accept_client();
-        //we should stop looking at other sockets now, because we have altered
-        //the poll list
-        break;
+        continue;
       }
 
       // a client
@@ -588,8 +623,7 @@ int main(int argc, char **argv) {
         continue;
       if (cur->revents & POLLERR) {
         close_client(client);
-      }
-      if (cur->revents & POLLOUT) {
+      } else if (cur->revents & POLLOUT) {
         write_to_client(client, cur);
       } else if (cur->revents & POLLIN) {
         read_on_client(client);

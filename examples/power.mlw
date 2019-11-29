@@ -3,9 +3,9 @@
 
 module FastExponentiation
 
-  use import int.Int
-  use import int.Power
-  use import int.ComputerDivision
+  use int.Int
+  use int.Power
+  use int.ComputerDivision
 
   (* recursive implementation *)
 
@@ -21,7 +21,7 @@ module FastExponentiation
 
   (* non-recursive implementation using a while loop *)
 
-  use import ref.Ref
+  use ref.Ref
 
   let fast_exp_imperative x n
     requires { 0 <= n }

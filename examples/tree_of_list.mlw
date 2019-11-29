@@ -7,17 +7,17 @@
 
 module TreeOfList
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import int.Power
-  use import list.List
-  use import list.Append
-  use import list.Length
-  use import bintree.Tree
-  use import bintree.Size
-  use import bintree.Inorder
-  use import bintree.InorderLength
-  use import bintree.Height
+  use int.Int
+  use int.ComputerDivision
+  use int.Power
+  use list.List
+  use list.Append
+  use list.Length
+  use bintree.Tree
+  use bintree.Size
+  use bintree.Inorder
+  use bintree.InorderLength
+  use bintree.Height
 
   type elt
 
@@ -26,7 +26,7 @@ module TreeOfList
     variant  { n }
     ensures  { let t, l' = result in
                inorder t ++ l' = l && size t = n &&
-               (n> 0 -> let h = height t in power 2 (h-1) <= n < power 2 h) }
+               (n > 0 -> let h = height t in power 2 (h-1) <= n < power 2 h) }
   =
     if n = 0 then
       Empty, l
@@ -43,7 +43,7 @@ module TreeOfList
   let tree_of_list (l: list elt) : tree elt
     ensures { inorder result = l }
     ensures { size result > 0 -> let h = height result in
--                power 2 (h-1) <= size result < power 2 h }
+                power 2 (h-1) <= size result < power 2 h }
   =
     let t, l = tree_of_list_aux (length l) l in
     assert { l = Nil };

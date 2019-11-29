@@ -1,3 +1,504 @@
-
-
 printer "c"
+
+prelude "#include <stdlib.h>"
+prelude "#include <stdint.h>"
+prelude "#include <stdio.h>"
+prelude "#include <assert.h>"
+prelude "#include <alloca.h>"
+
+module ref.Ref
+  syntax val (!_) "%d1"           prec 2 2
+  syntax val (:=) "%d1 = %2"      prec 14 2 14
+end
+
+module mach.int.Bounded_int
+  syntax val of_int "%1"         prec 0
+end
+
+module mach.int.Int32
+
+  syntax type int32  "int32_t"
+  syntax literal int32 "%c"
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+end
+
+module mach.int.UInt32Gen
+
+  syntax type uint32 "uint32_t"
+
+  syntax val max_uint32 "0xffffffff" prec 0
+  syntax val length "32"             prec 0
+
+end
+
+module mach.int.UInt32
+
+  syntax literal uint32 "%cU"
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+end
+
+module mach.int.UInt32GMP
+
+  prelude "\n\
+#define LOW_MASK 0x00000000FFFFFFFFUL\n\
+\n\
+struct __add32_with_carry_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c)\n\
+{\n\
+  struct __add32_with_carry_result result;\n\
+  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) c;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 32);\n\
+  return result;\n\
+}\n\
+\n\
+struct __sub32_with_borrow_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b)\n\
+{\n\
+  struct __sub32_with_borrow_result result;\n\
+  uint64_t r = (uint64_t)x - (uint64_t)y - (uint64_t) b;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 63);\n\
+  return result;\n\
+}\n\
+\n\
+struct __mul32_double_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __mul32_double_result mul32_double(uint32_t x, uint32_t y)\n\
+{\n\
+  struct __mul32_double_result result;\n\
+  uint64_t r = (uint64_t)x * (uint64_t)y;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 32);\n\
+  return result;\n\
+}\n\
+\n\
+struct __add32_3_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z)\n\
+{\n\
+  struct __add32_3_result result;\n\
+  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) z;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 32);\n\
+  return result;\n\
+}\n\
+\n\
+struct __lsld32_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)\n\
+{\n\
+  struct __lsld32_result result;\n\
+  uint64_t r = (uint64_t)x << cnt;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 32);\n\
+  return result;\n\
+}\n\
+"
+
+  interface "\n\
+struct __add32_with_carry_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c);\n\
+\n\
+struct __sub32_with_borrow_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b);\n\
+\n\
+struct __mul32_double_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __mul32_double_result mul32_double(uint32_t x, uint32_t y);\n\
+\n\
+struct __add32_3_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z);\n\
+\n\
+struct __lsld32_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);\n\
+"
+
+  syntax literal uint32 "%cU"
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  syntax val add_with_carry "add32_with_carry"
+  syntax val sub_with_borrow "sub32_with_borrow"
+  syntax val mul_double "mul32_double"
+  syntax val add3 "add32_3"
+  syntax val lsld "lsld32"
+
+  syntax val add_mod "%1 + %2" prec 4 4 3
+  syntax val sub_mod "%1 - %2" prec 4 4 3
+  syntax val minus_mod "-%1"   prec 2 1
+  syntax val mul_mod "%1 * %2" prec 3 3 2
+
+  syntax val div2by1
+         "(uint32_t)((((uint64_t)%1) | (((uint64_t)%2) << 32))/(uint64_t)(%3))"
+         prec 2
+
+  syntax val lsl "%1 << %2" prec 5 5 2
+  syntax val lsr "%1 >> %2" prec 5 5 2
+
+  syntax val is_msb_set "%1 & 0x80000000U" prec 8 8
+
+  syntax val count_leading_zeros "__builtin_clz(%1)" prec 1 15
+  syntax val count_trailing_zeros "__builtin_ctz(%1)" prec 1 15
+
+  syntax val of_int32 "(uint32_t)%1" prec 2 2
+
+
+end
+
+module mach.int.Int64
+  syntax type int64  "int64_t"
+  syntax literal int64 "INT64_C(%c)"
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+end
+
+module mach.int.UInt64Gen
+
+  syntax type uint64 "uint64_t"
+
+  syntax val max_uint64 "0xffffffffffffffff" prec 0
+  syntax val length "64" prec 0
+
+end
+
+module mach.int.UInt64
+
+  syntax literal uint64 "UINT64_C(%c)"
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+end
+
+module mach.int.UInt64GMP
+
+  prelude "\n\
+struct __add64_with_carry_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+struct __add64_with_carry_result\n\
+add64_with_carry(uint64_t x, uint64_t y, uint64_t c)\n\
+{\n\
+  struct __add64_with_carry_result result;\n\
+  uint64_t r = x + y + c;\n\
+  result.__field_0 = r;\n\
+  if (r == x) result.__field_1 = c;\n\
+  else result.__field_1 = (r < x);\n\
+  return result;\n\
+}\n\
+\n\
+struct __sub64_with_borrow_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+struct __sub64_with_borrow_result\n\
+sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)\n\
+{\n\
+  struct __sub64_with_borrow_result result;\n\
+  uint64_t r = x - y - b;\n\
+  result.__field_0 = r;\n\
+  if (r > x) result.__field_1 = 1;\n\
+  else if (r == x) result.__field_1 = b;\n\
+  else result.__field_1 = 0;\n\
+  return result;\n\
+}\n\
+\n\
+struct __add64_3_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)\n\
+{\n\
+  struct __add64_3_result result;\n\
+  uint64_t r, c1, c2;\n\
+  r = x + y;\n\
+  c1 = r < y;\n\
+  r += z;\n\
+  c2 = r < z;\n\
+  result.__field_1 = c1 + c2;\n\
+  result.__field_0 = r;\n\
+  return result;\n\
+}\n\
+\n\
+struct __lsld64_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\n\
+{\n\
+  struct __lsld64_result result;\n\
+  result.__field_1 = x >> (64 - cnt);\n\
+  result.__field_0 = x << cnt;\n\
+  return result;\n\
+}\n\
+"
+
+  interface "\n\
+struct __add64_with_carry_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+static inline struct __add64_with_carry_result\n\
+add64_with_carry(uint64_t x, uint64_t y, uint64_t c)\n\
+{\n\
+  struct __add64_with_carry_result result;\n\
+  uint64_t r = x + y + c;\n\
+  result.__field_0 = r;\n\
+  if (r == x) result.__field_1 = c;\n\
+  else result.__field_1 = (r < x);\n\
+  return result;\n\
+}\n\
+\n\
+struct __sub64_with_borrow_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+static inline struct __sub64_with_borrow_result\n\
+sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)\n\
+{\n\
+  struct __sub64_with_borrow_result result;\n\
+  uint64_t r = x - y - b;\n\
+  result.__field_0 = r;\n\
+  if (r > x) result.__field_1 = 1;\n\
+  else if (r == x) result.__field_1 = b;\n\
+  else result.__field_1 = 0;\n\
+  return result;\n\
+}\n\
+\n\
+struct __add64_3_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+static inline struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)\n\
+{\n\
+  struct __add64_3_result result;\n\
+  uint64_t r, c1, c2;\n\
+  r = x + y;\n\
+  c1 = r < y;\n\
+  r += z;\n\
+  c2 = r < z;\n\
+  result.__field_1 = c1 + c2;\n\
+  result.__field_0 = r;\n\
+  return result;\n\
+}\n\
+\n\
+struct __lsld64_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\n\
+{\n\
+  struct __lsld64_result result;\n\
+  result.__field_1 = x >> (64 - cnt);\n\
+  result.__field_0 = x << cnt;\n\
+  return result;\n\
+}\n\
+"
+  syntax literal uint64 "UINT64_C(%c)"
+
+  syntax val uint64_max "0xffffffffffffffffUL" prec 0
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  syntax val add_with_carry "add64_with_carry"
+  syntax val sub_with_borrow "sub64_with_borrow"
+  syntax val add3 "add64_3"
+  syntax val lsld "lsld64"
+
+  syntax val add_mod "%1 + %2" prec 4 4 3
+  syntax val sub_mod "%1 - %2" prec 4 4 3
+  syntax val minus_mod "-%1"   prec 2 1
+  syntax val mul_mod "%1 * %2" prec 3 3 2
+
+  syntax val lsl "%1 << %2" prec 5 5 2
+  syntax val lsr "%1 >> %2" prec 5 5 2
+  syntax val lsl_mod "%1 << %2" prec 5 5 2
+  syntax val lsr_mod "%1 >> %2" prec 5 5 2
+
+  syntax val is_msb_set "%1 & 0x8000000000000000UL" prec 8 7
+
+  syntax val count_leading_zeros "__builtin_clzll(%1)" prec 1 15
+  syntax val count_trailing_zeros "__builtin_ctzll(%1)" prec 1 15
+
+  syntax val to_int32 "(int32_t)%1" prec 2 2
+  syntax val of_int32 "(uint64_t)%1" prec 2 2
+  syntax val to_int64 "(int64_t)%1" prec 2 2
+  syntax val of_int64 "(uint64_t)%1" prec 2 2
+
+  syntax val of_int "%1" prec 0
+
+end
+
+module mach.array.Array32
+
+  syntax val ([]) "%1[%2]"
+  syntax val ([]<-) "%1[%2] = %3"
+
+end
+
+module mach.c.C
+
+  prelude
+  "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
+  prelude
+  "#define IGNORE3(x,y,z) do { (void(x); (void)(y); (void)(z); } while (0)"
+  interface
+  "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
+  interface
+  "#define IGNORE3(x,y,z) do { (void(x); (void)(y); (void)(z); } while (0)"
+
+  syntax type ptr "%1 *"
+  syntax type bool "int" (* ? *)
+
+  syntax val malloc "malloc(%1 * sizeof(%v0))" prec 1 3
+  syntax val free   "free(%1)" prec 1 15
+  syntax val realloc "realloc(%1, %2 * sizeof(%v0))" prec 1 15 3
+
+  syntax val salloc "alloca(%1 * sizeof(%v0))" prec 1 3
+  syntax val sfree  "(void)%1" prec 2 2
+
+  (* syntax val is_null "(%1) == NULL" *)
+  syntax val is_not_null "%1" prec 0
+  syntax val null "NULL" prec 0
+
+  syntax val incr "%1 + %2" prec 4 4 3
+
+  syntax val get "*%1"        prec 2 2
+  syntax val get_ofs "%1[%2]" prec 1 1 15
+
+  syntax val set "*%1 = %2"  prec 14 2 14
+  syntax val set_ofs "%1[%2] = %3" prec 14 14 15 14
+
+  syntax val incr_split "%1 + %2" prec 4 4 3
+  syntax val decr_split "%1 - %2" prec 4 4 3
+  syntax val join "IGNORE2"
+  syntax val join_r "IGNORE2"
+
+  syntax val c_assert "assert (%1)" prec 1 15
+
+  syntax val print_space "printf(\" \")" prec 1
+  syntax val print_newline "printf(\"\\n\")" prec 1
+  syntax val print_uint32 "printf(\"%#010x\",%1)" prec 1 15
+
+end
+
+module mach.fxp.Fxp
+
+  syntax val fxp_add "%1 + %2" prec 4 4 3
+  syntax val fxp_sub "%1 - %2" prec 4 4 3
+  syntax val fxp_mul "%1 * %2" prec 3 3 2
+  syntax val fxp_lsl "%1 << %2" prec 5 5 2
+  syntax val fxp_lsr "%1 >> %2" prec 5 5 2
+  syntax val fxp_asr "(uint64_t)((int64_t)%1 >> %2)" prec 2 1 2
+  syntax val fxp_asr' "(uint64_t)((int64_t)%1 >> %2)" prec 2 1 2
+
+end

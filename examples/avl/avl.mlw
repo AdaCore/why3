@@ -5,18 +5,18 @@
 (** {2 Preliminary definitions} *)
 theory SelectionTypes
 
-  use import seq.Seq
-  use import option.Option
+  use seq.Seq
+  use option.Option
 
-  (** Describe a position in the sequence [left ++ middle ++ right]
-      (see [rebuild]) *)
+  (** Describe a position in the sequence `left ++ middle ++ right`
+      (see `rebuild`) *)
   type split 'a = {
     left : seq 'a;
     middle : option 'a;
     right : seq 'a;
   }
 
-  (** Describe reduced problem for selection (see [selected_part]) *)
+  (** Describe reduced problem for selection (see `selected_part`) *)
   type part_base 'a = Left 'a
     | Right 'a
     | Here
@@ -55,28 +55,29 @@ module AVL
        routine (monoid operations, element measure,...) is assumed to
        take constant time) *)
 
-  use import int.Int
-  use import bool.Bool
+  use int.Int
+  use bool.Bool
   use import seq.Seq as S
-  use import seq.FreeMonoid
-  use import option.Option
-  use import ref.Ref
+  use seq.FreeMonoid
+  use option.Option
+  use ref.Ref
   use mach.peano.Peano as I
 
   (** The implementation is parameterized by an abstract monoid.
       The elements of the monoid will be used as summaries of
       sequence of elements, obtained by aggregation of the elements of
-      the sequence. In other words, [M.sum f [a_1;...;a_n]] is the
-      monoidal summary of sequence [[a_1;...;a_n]] with respect to
-      measure [f]. *)
-  clone monoid.ComputableMonoid as M
+      the sequence. In other words, `M.sum f [a_1;...;a_n]` is the
+      monoidal summary of sequence `[a_1;...;a_n]` with respect to
+      measure `f`. *)
+  clone monoid.ComputableMonoid as M with axiom .
   clone monoid.MonoidSum as M with
     (* scope M = M *)
     type M.t = M.t,
     constant M.zero = M.zero,
     function M.op = M.op,
     goal M.assoc,
-    goal M.neutral
+    goal M.neutral,
+    axiom .
 
   (** Abstract description of the data stored in the tree:
       measurable elements. *)
@@ -148,7 +149,7 @@ module AVL
       2) The monoidal value corresponds to the summary of the sequence of
          elements associated with the subtree associated with the node
 
-      3) Left and right subtrees are [balancing]-height-balanced *)
+      3) Left and right subtrees are `balancing`-height-balanced *)
   predicate balanced (t:tree 'a) = match t with
     | Empty -> true
     | Node l _ r h m ->  h = real_height t /\
@@ -258,12 +259,12 @@ module AVL
             s
     end
 
-  (** First re-balancing constructor: [balance l d r]
-      build the same sequence as [node l d r], but permit slightly
+  (** First re-balancing constructor: `balance l d r`
+      build the same sequence as `node l d r`, but permit slightly
       unbalanced input, and might decrement the expected height by one.
       Also, if the expected input node was already balanced, it is
       specified to return a value indistinguishable from a value
-      returned by [node l d r].
+      returned by `node l d r`.
       This constructor is constant-time. *)
   let balance (l:t 'a) (d:D.t 'a) (r:t 'a) : t 'a
     requires { -balancing-1 <= l.hgt - r.hgt <= balancing+1 }
@@ -303,7 +304,7 @@ module AVL
       end
     else node l d r
 
-  (** Internal routine. Decompose [l ++ [d] ++ r] as [[head]++tail],
+  (** Internal routine. Decompose `l ++ [d] ++ r` as `[head]++tail`,
       with sequences represented by AVL trees. *)
   let rec decompose_front_node (l:t 'a) (d:D.t 'a) (r:t 'a) : (D.t 'a,t 'a)
     requires { -balancing <= l.hgt - r.hgt <= balancing }
@@ -328,7 +329,7 @@ module AVL
     end
 
 
-  (** Internal routine, mirror of [decompose_front_node]. *)
+  (** Internal routine, mirror of `decompose_front_node`. *)
   let rec decompose_back_node (l:t 'a) (d:D.t 'a) (r:t 'a) : (t 'a,D.t 'a)
     requires { -balancing <= l.hgt - r.hgt <= balancing }
     returns { (res:t 'a,d2) -> node_model l d r = snoc res d2 /\
@@ -404,7 +405,7 @@ module AVL
       end
     end
 
-  (** List cons: build the sequence [cons d t]. logarithmic-time. *)
+  (** List cons: build the sequence `cons d t`. logarithmic-time. *)
   let rec cons (d:D.t 'a) (t:t 'a) : t 'a
     ensures { result = cons d t }
     ensures { 1 >= result.hgt - t.hgt >= 0 }
@@ -414,7 +415,7 @@ module AVL
     | ANode l d2 r _ _ -> balance (cons d l) d2 r
     end
 
-  (** Reverse cons: build [snoc t d]. logarithmic-time. *)
+  (** Reverse cons: build `snoc t d`. logarithmic-time. *)
   let rec snoc (t:t 'a) (d:D.t 'a) : t 'a
     ensures { result = snoc t d }
     ensures { 1 >= result.hgt - t.hgt >= 0 }
@@ -426,23 +427,23 @@ module AVL
 
   (** Variant of the node constructor without any height hypothesis.
      The time complexity is proportional to the height
-     difference between [l] and [r] (O(|l.m.hgt-r.m.hgt|)) (in particular,
+     difference between `l` and `r` (O(|l.m.hgt-r.m.hgt|)) (in particular,
      it is logarithmic) *)
   let rec join (l:t 'a) (d:D.t 'a) (r:t 'a) : t 'a
     ensures { result = node_model l d r }
     ensures { let hl = l.hgt in let hr = r.hgt in
       let he = 1 + if hl < hr then hr else hl in let hres = result.hgt in
       0 <= he - hres <= 1 }
-    variant { l.hgt + r.hgt }
+    variant { if l.hgt > r.hgt then l.hgt - r.hgt else r.hgt - l.hgt }
   = match view l with
     | AEmpty -> cons d r
     | ANode ll ld lr lh _ -> match view r with
       | AEmpty -> snoc l d
       | ANode rl rd rr rh _ ->
         let df = I.sub lh rh (I.neg rh) lh in
-        if I.ge df balancing
+        if I.gt df balancing
         then balance ll ld (join lr d r)
-        else if I.le df (I.neg balancing)
+        else if I.lt df (I.neg balancing)
         then balance (join l d rl) rd rr
         else node l d r
       end
@@ -488,13 +489,13 @@ module AVL
       random access.
 
       The positions found in step 1) corresponds readily to splits of
-      the sequence, as defined in the [SelectionTypes] module. We consider
+      the sequence, as defined in the `SelectionTypes` module. We consider
       that the objective of the search is to find a split with particular
       properties.
 
       *)
 
-  use import SelectionTypes
+  use SelectionTypes
 
   (** Parameter: selector type. The elements of that type
       are intended to describe the class of splits we wish to find. *)
@@ -523,7 +524,7 @@ module AVL
       3) Taking the split induced by the node *)
   type part = part_base selector
 
-  (** Parameter: [selected_part llis rlis s l d r] effectively compute
+  (** Parameter: `selected_part llis rlis s l d r` effectively compute
       the reduction of the selection to one of the three part of a node.
       It uses the monoidal summaries to get informations about the
       left and right subtrees. *)
@@ -541,7 +542,7 @@ module AVL
         forall e. selected sr e /\ rebuild e = rseq ->
           selected s (left_extend lseq d e) }
 
-  use import ref.Ref
+  use ref.Ref
 
   (** Create a reference over a dummy split. All the binary-search-based
       routines take a ghost reference to explicitly return the existential
@@ -551,10 +552,10 @@ module AVL
     ref { left = S.empty; middle = None; right = S.empty }
 
   (** Insertion of an element into the sequence.
-     [insert r s d t] split the sequence [t] using [s] as [lf ++ o ++ rg],
-     and rebuild it with [d] in the middle, potentially erasing whatever
-     was there before, as [lf ++ [d] ++ rg].
-     The reference [r] is assigned to the selected position.
+     `insert r s d t` split the sequence `t` using `s` as `lf ++ o ++ rg`,
+     and rebuild it with `d` in the middle, potentially erasing whatever
+     was there before, as `lf ++ [d] ++ rg`.
+     The reference `r` is assigned to the selected position.
      It is logarithmic-time.
      Note: the procedure described above match only the specification,
      not what the actual code does. *)
@@ -583,9 +584,9 @@ module AVL
     end
 
   (** Remove an element from the sequence.
-     [remove r s t] Split the sequence [t] using [s] into [lf ++ o ++ rg],
+     `remove r s t` Split the sequence `t` using `s` into `lf ++ o ++ rg`,
      and erase whatever may be in the middle,
-     as [lf++rg]. logarithmic-time. *)
+     as `lf++rg`. logarithmic-time. *)
   let rec remove (ghost r:ref (split (D.t 'a))) (s:selector) (t:t 'a) : t 'a
     requires { selection_possible s t }
     ensures { result = !r.left ++ !r.right }
@@ -609,8 +610,8 @@ module AVL
     end
 
   (** Attempt to find an element in the sequence.
-      [find r s t] return the middle value obtained by splitting the
-      sequence [t] with respect to the [s]. logarithmic-time. *)
+      `find r s t` return the middle value obtained by splitting the
+      sequence `t` with respect to the `s`. logarithmic-time. *)
   let rec get (ghost r:ref (split (D.t 'a))) (s:selector)
     (t:t 'a) : option (D.t 'a)
     requires { selection_possible s t }
@@ -634,7 +635,7 @@ module AVL
       end
     end
 
-  (** Combine [get] and [remove] *)
+  (** Combine `get` and `remove` *)
   let rec extract (ghost r:ref (split (D.t 'a))) (s:selector)
     (t:t 'a) : (option (D.t 'a),t 'a)
     requires { selection_possible s t }
@@ -663,8 +664,8 @@ module AVL
     end
 
   (** Split a sequence.
-      [split r s t] return a program version of a split found
-      by [s], using AVL trees for the sequence. It is logarithmic-time.
+      `split r s t` return a program version of a split found
+      by `s`, using AVL trees for the sequence. It is logarithmic-time.
       Note: As their specification suggest, all the binary-search-based
       routines can be directly implemented in term of a split followed
       by catenations. Although a constant time factor, the rebalancing work

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -34,5 +34,4 @@ val intros :
 
 val introduce_premises : Task.task Trans.trans
 
-val split_intro : Task.task Trans.tlist
-(** [split_intro] is [split_goal_wp] followed by [introduce_premises] *)
+val simplify_intros: Task.task Trans.trans

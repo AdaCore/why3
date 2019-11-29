@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,17 +22,6 @@ let meta_vc_location =
   Theory.register_meta_excl "vc_location" [Theory.MTstring]
   ~desc:"Location@ of@ the@ term@ that@ triggers@ vc@ in@ the@ form@ file:line:col."
 
-let model_label = Ident.create_label "model"
-  (* Identifies terms that should be in counterexample and should not be projected. *)
-let model_projected_label = Ident.create_label "model_projected"
-  (* Identifies terms that should be in counterexample and should be projected. *)
-let model_vc_label = Ident.create_label "model_vc"
-  (* Identifies the term that triggers the VC. *)
-let model_vc_post_label = Ident.create_label "model_vc_post"
-(* Identifies the postcondition that triggers the VC. *)
-let model_trace_prefix = "model_trace:"
-  (* The term labeled with "model_trace:name" will be in counterexample with name "name" *)
-
 (* Information about the term that triggers VC.  *)
 type vc_term_info = {
   vc_inside : bool;
@@ -43,12 +32,8 @@ type vc_term_info = {
   (* true if VC was generated for precondition or postcondition *)
 }
 
-let get_label labels prefix =
-  let check l = Strings.has_prefix prefix l.lab_string in
-  Slab.choose (Slab.filter check labels)
-
-let is_model_vc_label l =
-  lab_equal l model_vc_label || lab_equal l model_vc_post_label
+let is_model_vc_attr l =
+  attr_equal l Ity.annot_attr || attr_equal l model_vc_post_attr
 
 let check_enter_vc_term t info vc_loc =
   (* Check whether the term that triggers VC is entered.
@@ -56,66 +41,56 @@ let check_enter_vc_term t info vc_loc =
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if Slab.exists is_model_vc_label t.t_label then
+  if Sattr.exists is_model_vc_attr t.t_attrs then
     begin
       vc_loc := t.t_loc;
       { vc_inside = true;
-      vc_loc = t.t_loc;
-      vc_pre_or_post = Slab.mem model_vc_post_label t.t_label}
+        vc_loc = t.t_loc;
+        vc_pre_or_post = Sattr.mem model_vc_post_attr t.t_attrs }
     end
   else
     info
 
-(* TODO: add "remove_suffix" to Strings and use it here instead of regexps *)
-let add_old lab_str =
-  try
-    let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
-    let after = String.sub lab_str pos ((String.length lab_str)-pos) in
-    if after = "@init" then
-      (String.sub lab_str 0 pos) ^ "@old"
-    else lab_str
-  with Not_found -> lab_str ^ "@old"
-
-let model_trace_for_postcondition ~labels =
-  (* Modifies the  model_trace label of a term in the postcondition:
-     - if term corresponds to the initial value of a function
-     parameter, model_trace label will have postfix @old
-
-     Returns labels with model_trace label modified if there
-     exist model_trace label in labels, labels otherwise.
-  *)
-  try
-    let trace_label = get_label labels model_trace_prefix in
-    let lab_str = add_old trace_label.lab_string in
-    if lab_str = trace_label.lab_string then
-      labels
-    else
-      let other_labels = Slab.remove trace_label labels in
-      Slab.add
-	(Ident.create_label lab_str)
-	other_labels
-  with Not_found ->
-    labels
-
-let is_counterexample_label l =
-  lab_equal l model_label || lab_equal l model_projected_label
-
-
 (* Preid table necessary to avoid duplication of *_vc_constant *)
 module Hprid = Exthtbl.Make (struct
   type t = preid
-  let equal x y = x.pre_name = y.pre_name && Slab.equal x.pre_label y.pre_label
+  let equal x y = x.pre_name = y.pre_name && Sattr.equal x.pre_attrs y.pre_attrs
   let hash p = Exthtbl.hash p
 end)
 
+let same_line_loc loc1 loc2 =
+  match loc1, loc2 with
+  | Some loc1, Some loc2 ->
+      let (f1, l1, _, _) = Loc.get loc1 in
+      let (f2, l2, _, _) = Loc.get loc2 in
+      f1 = f2 && l1 = l2
+  | _ -> false
+
+let same_line_locs loc1 ls =
+  let is_same =
+    match ls.id_loc with
+    | Some loc when same_line_loc (Some loc) loc1 -> true
+    | _ -> false
+  in
+  is_same ||
+  Sattr.exists (fun x ->
+      let loc = extract_written_loc x in
+      same_line_loc loc loc1) ls.id_attrs
+
+let add_model_trace_attr name attrs =
+  if Sattr.exists is_model_trace_attr attrs then
+    attrs
+  else
+    let mt_attr = create_attribute ("model_trace:" ^ name) in
+    Sattr.add mt_attr attrs
 
 (*  Used to generate duplicate vc_constant and axioms for counterex generation.
     This function is always called when the term is in negative position or
     under a positive term that is not introducible. This means it never change the
     goal.
 
-    @param info used to know if the current term is under a vc_label
-    @param vc_loc is the location of the vc_label (returned value)
+    @param info used to know if the current term is under a vc_attr
+    @param vc_loc is the location of the vc_attr (returned value)
     @param vc_map is a container for generated vc_constant id (used to avoid duplication)
     @param vc_var contains the variables we can safely use as CE (ie: we introduced these)
     @param t: current subterm of the goal
@@ -131,39 +106,46 @@ let rec do_intro info vc_loc vc_map vc_var t =
     if info.vc_inside then begin
       match info.vc_loc with
       | None -> []
-      | Some loc ->
-
-	  (* variable inside the term T that triggers VC. If the variable
-	     should be in counterexample, introduce new constant in location
-	     loc with all labels necessary for collecting it for counterexample
-	     and make it equal to the variable *)
-          if Slab.exists is_counterexample_label ls.id_label then
-	    let const_label = if info.vc_pre_or_post then
-	      model_trace_for_postcondition ~labels:ls.id_label
-	    else
-	      ls.id_label in
-	    let const_name = ls.id_string^"_vc_constant" in
-	    let axiom_name = ls.id_string^"_vc_axiom" in
-	    (* Create a new id here to check the couple name, location. *)
-	    let id_new = Ident.id_user ~label:const_label const_name loc in
-	    (* The following check is used to avoid duplication of
-	       *_vc_constant_n.  We keep track of the preids that have already
-	       been duplicated in vc_map.  Note that we need to do it before
-	       these preid are casted to lsymbol (by Term.create_lsymbol)
-	       because those integrates a unique hash that would make identical
-	       preid different lsymbol *)
-	    if (Hprid.mem vc_map id_new) then
-	      []
-	    else
-	      begin
-		Hprid.add vc_map id_new true;
-		intro_const_equal_to_term
-		  ~term:t ~id_new:id_new ~axiom_name
-	      end
-	  else
-	    []
+      | Some loc when not (same_line_locs info.vc_loc ls) ->
+          (* variable inside the term T that triggers VC. If the variable
+             should be in counterexample, introduce new constant in location
+             loc with all attributes necessary for collecting it for
+             counterexample and make it equal to the variable *)
+          if relevant_for_counterexample ls then
+            begin
+              let const_attr = ls.id_attrs in
+              let const_name = ls.id_string^"_vc_constant" in
+              let axiom_name = ls.id_string^"_vc_axiom" in
+              let labels_attr =
+                Sattr.filter (fun x ->
+                    Strings.has_prefix "at:" x.attr_string)
+                  t.t_attrs
+              in
+              let const_attr = Sattr.union const_attr labels_attr in
+              let const_attr = add_model_trace_attr ls.id_string const_attr in
+              (* Create a new id here to check the couple name, location. *)
+              let id_new = Ident.id_user ~attrs:const_attr const_name loc in
+              (* The following check is used to avoid duplication of
+                 *_vc_constant_n.  We keep track of the preids that have already
+                 been duplicated in vc_map.  Note that we need to do it before
+                 these preid are casted to lsymbol (by Term.create_lsymbol)
+                 because those integrates a unique hash that would make
+                 identical preid different lsymbol *)
+              if (Hprid.mem vc_map id_new) then
+                []
+              else
+                begin
+                  Hprid.add vc_map id_new true;
+                  intro_const_equal_to_term
+                    ~term:t ~id_new:id_new ~axiom_name
+                end
+            end
+          else
+            []
+      | _ -> []
     end
     else [] in
+
   match t.t_node with
   | Tapp (ls, tl) ->
     begin
@@ -172,10 +154,10 @@ let rec do_intro info vc_loc vc_map vc_var t =
         new_counter_example_variable ls.ls_name info
       | _ ->
         List.fold_left
-	    (fun defs term ->
-	      List.append defs (do_intro term))
-	    []
-	    tl
+            (fun defs term ->
+              List.append defs (do_intro term))
+            []
+            tl
     end
   | Tvar v ->
     if (Hvs.mem vc_var v) then
@@ -195,7 +177,7 @@ let rec do_intro info vc_loc vc_map vc_var t =
   | Tif (f1, f2, f3) ->
     List.append
       (List.append (do_intro f1) (do_intro f2))
-	(do_intro f3)
+        (do_intro f3)
   | Tcase (t, _) ->
     do_intro t
     (* todo: handle the second argument of Tcase *)
@@ -223,19 +205,19 @@ let rec remove_positive_foralls vc_var f =
       let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
-	Hvs.add vc_var vs true;
-	Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
+        Hvs.add vc_var vs true;
+        Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
       let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
-      let f = t_label_copy f (t_subst subst f_t) in
+      let f = t_attr_copy f (t_subst subst f_t) in
       let decl, goal = remove_positive_foralls vc_var f in
       (dl @ decl, goal)
   | _ -> ([], f)
 
 
 (*  Introduces foralls, lets, and implications at the head of the goal.  When
-    under a vc_label, it can make calls to do_intros which creates new
+    under a vc_attr, it can make calls to do_intros which creates new
     declarations for counterexample generation.  When no more intros are
     possible, it calls remove_positive_foralls which do an experimental
     introduction of foralls even under another constructs (example: H /\ forall
@@ -245,8 +227,8 @@ let rec remove_positive_foralls vc_var f =
     It is adapted from transform/introduce.ml. (we mainly added do_intros calls
     and removed split optimizations.
 
-    @param info used to know if the current term is under a vc_label
-    @param vc_loc is the location of the vc_label (returned value)
+    @param info used to know if the current term is under a vc_attr
+    @param vc_loc is the location of the vc_attr (returned value)
     @param vc_map is a container for generated vc_constant id
     (used to avoid duplication)
     @param vc_var current set of variables we introduced
@@ -257,7 +239,7 @@ let rec intros info vc_loc vc_map vc_var f =
   let intros = intros info vc_loc vc_map vc_var in
   match f.t_node with
   | Tbinop (Timplies,f1,f2) ->
-      let f2 = t_label_copy f f2 in
+      let f2 = t_attr_copy f f2 in
       let l = if info.vc_inside then do_intro info vc_loc vc_map vc_var f1 else [] in
       let id = create_prsymbol (id_fresh "H") in
       let d = create_prop_decl Paxiom id f1 in
@@ -267,16 +249,16 @@ let rec intros info vc_loc vc_map vc_var f =
       let vsl,_trl,f_t = t_open_quant fq in
       let intro_var subst vs =
         let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
-	Hvs.add vc_var vs true;
-	Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
+        Hvs.add vc_var vs true;
+        Mvs.add vs (fs_app ls [] vs.vs_ty) subst,
         create_param_decl ls
       in
       let subst, dl = Lists.map_fold_left intro_var Mvs.empty vsl in
       (* if vs is a symbol that is tagged with a model or model_projected
-	 label, we have to allow it to be printed but it wont be available
-	 after its substitution *)
-      (* preserve labels and location of f *)
-      let f = t_label_copy f (t_subst subst f_t) in
+         attribute, we have to allow it to be printed but it won't be
+         available after its substitution *)
+      (* preserve attributes and location of f *)
+      let f = t_attr_copy f (t_subst subst f_t) in
       let decl, goal = intros f in
       (dl @ decl, goal)
   | Tlet (t,fb) ->
@@ -284,12 +266,12 @@ let rec intros info vc_loc vc_map vc_var f =
       let ls = create_lsymbol (id_clone vs.vs_name) [] (Some vs.vs_ty) in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
-      (* If we are not inside a vc we don't want left side of let otherwise we
-	 might want it *)
+      (* If we are not inside a vc we don't want left side of let
+         otherwise we might want it *)
       let decl, goal = intros f in
       if info.vc_inside then
         let l = do_intro info vc_loc vc_map vc_var t in
-	(d :: l @ decl, goal)
+        (d :: l @ decl, goal)
       else
         (d :: decl, goal)
   | _ ->
@@ -332,7 +314,7 @@ let intro_vc_vars_counterexmp2 task =
     | None -> ""
     | Some loc ->
       let (file, line, col1, col2) = Loc.get loc in
-      file ^ ":" ^ (string_of_int line) ^ ":" ^ (string_of_int col1) ^ ":" ^ (string_of_int col2)
+      Printf.sprintf "%s:%d:%d:%d" file line col1 col2
   in
   let task = Task.add_meta task vc_loc_meta [Theory.MAstr pos_str] in
   Task.add_tdecl task g
@@ -354,10 +336,10 @@ let get_location_of_vc task =
     let split = Strings.rev_split ':' loc_str in
     let loc =  match split with
       | col2 :: col1 :: line :: ((_ :: _) as rest) ->
-	let line = int_of_string line in
-	let col1 = int_of_string col1 in
-	let col2 = int_of_string col2 in
-	let filename = Strings.join ":" (List.rev rest) in
+        let line = int_of_string line in
+        let col1 = int_of_string col1 in
+        let col2 = int_of_string col2 in
+        let filename = Strings.join ":" (List.rev rest) in
         Some (Loc.user_position filename line col1 col2)
       | _ -> None in
     loc

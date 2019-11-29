@@ -27,9 +27,9 @@
     and arbitrary-sized memory blocks. *)
 module Memory
 
-  use import int.Int
-  use import option.Option
-  use import map.Map
+  use int.Int
+  use option.Option
+  use map.Map
   (** Memory locations *)
   type loc
   (** Null pointer *)
@@ -101,10 +101,10 @@ end
 (** Define notions about the memory graph *)
 module GraphShape
 
-  use import int.Int
-  use import set.Fset
-  use import map.Map
-  use import Memory
+  use int.Int
+  use set.Fset
+  use map.Map
+  use Memory
 
   predicate black (c:color) = c <> White
 
@@ -118,7 +118,7 @@ module GraphShape
   (** DFS invariant. For technical reason, it must refer to different parts
      of the memory at different time. The graph structure is given
      via the initial memory, but the coloring is given via the current one. *)
-  predicate well_colored_on (graph gray:set loc) (m:memory) (cl:map loc color) =
+  predicate well_colored_on (graph gray:fset loc) (m:memory) (cl:map loc color) =
     subset gray graph /\
     (forall x y. mem x graph /\ edge m x y /\ y <> null /\ black cl[x] ->
       mem x gray \/ black cl[y]) /\
@@ -133,14 +133,14 @@ end
 (** Proof of Schorr-Waite algorithm *)
 module SchorrWaite
 
-  use import int.Int
-  use import option.Option
-  use import set.Fset
-  use import map.Map
-  use import map.Const
-  use import ref.Ref
-  use import Memory
-  use import GraphShape
+  use int.Int
+  use option.Option
+  use set.Fset
+  use map.Map
+  use map.Const
+  use ref.Ref
+  use Memory
+  use GraphShape
 
   let black (l: loc) : bool
     requires { l <> null }
@@ -150,7 +150,7 @@ module SchorrWaite
 
   exception Stop
 
-  let schorr_waite (root: loc) (ghost graph: set loc) : unit
+  let schorr_waite (root: loc) (ghost graph: fset loc) : unit
     (** Root belong to graph (note: for simplicity, the graph set
         may (and likely does) contain the null pointer. *)
     requires { mem root graph }
@@ -245,7 +245,7 @@ module SchorrWaite
           set_color !p (Black (Some 0))
         end
     in
-    let rec aux (ghost gray:set loc) : unit
+    let rec aux (ghost gray:fset loc) : unit
       (* DFS invariant *)
       requires { well_colored_on graph gray (memo at I) memo.colors }
       requires { mem !t graph }
@@ -315,7 +315,7 @@ module SchorrWaite
       (* Need induction to recover path-based specification. *)
       assert { forall x y m. m = memo at I /\ x <> null /\ y <> null /\
         mem x graph /\ black memo.colors[x] ->
-        ("induction" path m x y) -> black memo.colors[y] }
+        ([@induction] path m x y) -> black memo.colors[y] }
     end
 
 end

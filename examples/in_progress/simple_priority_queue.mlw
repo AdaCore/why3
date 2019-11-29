@@ -4,15 +4,15 @@
 
 module SimplePrioriyQueue
 
-  use import int.Int
-  use import ref.Ref
-  use import array.Array
-  use import bag.Bag
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use bag.Bag
 
   type elt
   val function priority elt : int
 
-  use import array.NumOfEq
+  use array.NumOfEq
 
   type t = {
     elems: array elt;

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*i $Id: pp.mli,v 1.22 2009-10-19 11:55:33 bobot Exp $ i*)
+(** Helpers for formatted pretty-printing *)
 
 open Format
 
@@ -28,6 +28,7 @@ val print_list_delim :
 
 val print_pair_delim :
   unit pp -> unit pp -> unit pp -> 'a pp -> 'b pp -> ('a * 'b) pp
+(** [print_pair_delim left_delim middle_delim right_delim] *)
 val print_pair : 'a pp -> 'b pp -> ('a * 'b) pp
 
 val print_iter1 :
@@ -68,6 +69,7 @@ val simple_comma : unit pp
 val semi : unit pp
 val colon : unit pp
 val underscore : unit pp
+val slash : unit pp
 val equal : unit pp
 val arrow : unit pp
 val lbrace : unit pp

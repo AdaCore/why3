@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,7 +12,15 @@
 (* simple helpers *)
 open Worker_proto
 
-module JSU = Js.Unsafe
+module Js = Js_of_ocaml.Js
+module JSU = Js_of_ocaml.Js.Unsafe
+module Dom = Js_of_ocaml.Dom
+module File = Js_of_ocaml.File
+module Sys_js = Js_of_ocaml.Sys_js
+module Worker = Js_of_ocaml.Worker
+module Dom_html = Js_of_ocaml.Dom_html
+module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
+
 let get_opt o = Js.Opt.get o (fun () -> assert false)
 
 let check_def s o =
@@ -25,15 +33,9 @@ let get_global ident =
 let int_of_js_string s = int_of_string (Js.to_string s)
 
 let blob_url_of_string s =
-  let s = JSU.inject (Js.string (Sys_js.file_content s)) in
-  let _Blob  = get_global "Blob" in
-  let blob =
-    jsnew _Blob (Js.array [| s |])
-  in
-  let _URL = JSU.(get (get_global "window") (Js.string "URL")) in
-  let url : Js.js_string Js.t =
-    JSU.(meth_call _URL "createObjectURL" [| JSU.inject blob |])
-  in
+  let s = Sys_js.read_file ~name:s in
+  let blob = File.blob_from_string s in
+  let url = Dom_html.window ##. _URL ## createObjectURL blob in
   Js.to_string url
 
 
@@ -43,7 +45,7 @@ module XHR =
 
     let load_embedded_files =
       Js.to_bool (get_global "load_embedded_files") ||
-	Js.to_string (Dom_html.window ## location ## protocol) = "file:"
+	Js.to_string (Dom_html.window ##. location ##. protocol) = "file:"
 
     let make_url =
       if load_embedded_files then
@@ -53,11 +55,11 @@ module XHR =
 
     let update_file ?(date=0.) cb url =
       let xhr = create () in
-      xhr ## onreadystatechange <-
+      xhr ##. onreadystatechange :=
         Js.wrap_callback
           (fun () ->
-           if xhr ## readyState == DONE then
-	     if xhr ## status = 200 || (xhr ## status = 0 && load_embedded_files) then
+           if xhr ##. readyState == DONE then
+	     if xhr ##. status = 200 || (xhr ##. status = 0 && load_embedded_files) then
                let date_str = Js.Opt.get (xhr ## getResponseHeader (Js.string "Last-Modified"))
                                          (fun () -> Js.string "01/01/2100") (* far into the future *)
                in
@@ -66,21 +68,21 @@ module XHR =
                if document_date < date then
                  cb `UpToDate
                else
-                 let () = xhr ## onreadystatechange <-
+                 let () = xhr ##. onreadystatechange :=
                             Js.wrap_callback
                               (fun () ->
-                               if xhr ## readyState == DONE then
-	                         if xhr ## status = 200 then
-                                   cb (`New xhr ## responseText)
+                               if xhr ##. readyState == DONE then
+	                         if xhr ##. status = 200 then
+                                   cb (`New xhr ##. responseText)
                                  else
                                    cb `NotFound)
                  in
-                 let () = xhr ## _open (Js.string "GET", (make_url url), Js._true) in
+                 let () = xhr ## _open (Js.string "GET") (make_url url) Js._true in
                  xhr ## send (Js.null)
              else
                cb `NotFound
           );
-      xhr ## _open (Js.string "HEAD", (make_url url), Js._true);
+      xhr ## _open (Js.string "HEAD") (make_url url) Js._true;
       xhr ## send (Js.null)
 
   end
@@ -106,13 +108,10 @@ let getElement cast id =
     log ("Element " ^ id ^ " does not exist or has invalid type");
     assert false
 
-let appendChild o c =
-  ignore (o ## appendChild ( (c :> Dom.node Js.t)))
-
 let addMouseEventListener prevent o e f =
   let cb = Js.wrap_callback
 	     (fun (e : Dom_html.mouseEvent Js.t) ->
-	      if prevent then ignore (JSU.(meth_call e "preventDefault" [| |]));
+	      if prevent then Dom.preventDefault e;
 	      f e;
 	      Js._false)
   in
@@ -122,102 +121,146 @@ let addMouseEventListener prevent o e f =
 			   inject Js._false |])
 
 
-
-
-module Editor =
+module Ace =
   struct
-    type range
-    type marker
-    let name = ref (Js.string "")
-    let saved = ref false
-    let ace = get_global "ace"
+    open Js
 
-    let _Range : (int -> int -> int -> int -> range Js.t) Js.constr =
+    type marker
+
+    class type annotation =
+      object
+        method row : int readonly_prop
+        method column : int readonly_prop
+        method text : js_string t readonly_prop
+        method _type : js_string t readonly_prop
+      end
+
+    class type range =
+      object
+      end
+
+    class type selection =
+      object
+        method setSelectionRange : range t -> bool t -> unit meth
+      end
+
+    class type editSession =
+      object
+        method addMarker : range t -> js_string t -> js_string t -> bool t -> marker meth
+        method clearAnnotations : unit meth
+        method getLength : int meth
+        method removeMarker : marker -> unit meth
+        method setAnnotations : annotation t js_array t -> unit meth
+        method setMode : js_string t -> unit meth
+      end
+
+    class type editor =
+      object
+        method focus : unit meth
+        method getSelection : selection t meth
+        method getSession : editSession t meth
+        method getValue : js_string t meth
+        method gotoLine : int -> int -> bool t -> unit meth
+        method redo : unit meth
+        method setReadOnly : bool t -> unit meth
+        method setTheme : js_string t -> unit meth
+        method setValue : js_string t -> int -> unit meth
+        method undo : unit meth
+      end
+
+    class type ace =
+      object
+        method edit : js_string t -> editor t optdef meth
+      end
+
+    let ace : ace Js.t = get_global "ace"
+    let edit s = ace ## edit s
+
+    let range : (int -> int -> int -> int -> range Js.t) Js.constr =
       let r =
 	JSU.(get (meth_call ace "require" [| inject (Js.string "ace/range") |])
 		 (Js.string "Range"))
       in
       check_def "Range" r
 
+    let annotation row col text kind : annotation t =
+      object%js
+        val row = row
+        val column = col
+        val text = text
+        val _type = kind
+      end
+  end
+
+module Editor =
+  struct
+    let name = ref (Js.string "")
+    let saved = ref false
+
     let editor =
-      let e =
-	JSU.(meth_call ace "edit" [| inject (Js.string "why3-editor") |])
-      in
+      let e = Ace.edit (Js.string "why3-editor") in
       check_def "why3-editor" e
 
     let task_viewer =
-      let e =
-	JSU.(meth_call ace "edit" [| inject (Js.string "why3-task-viewer") |])
-      in
+      let e = Ace.edit (Js.string "why3-task-viewer") in
       check_def "why3-task-viewer" e
-
-    let get_session ed =
-      JSU.(meth_call ed "getSession" [| |])
-
-
-    let mk_annotation row col text kind =
-      JSU.(obj [| "row", inject row; "column", inject col;
-		  "text", inject text; "type", inject kind |])
 
     let set_annotations l =
       let a =
-	Array.map (fun (r,c,t,k) -> mk_annotation r c t k) (Array.of_list l)
+	Array.map (fun (r,c,t,k) -> Ace.annotation r c t k) (Array.of_list l)
       in
       let a = Js.array a in
-      JSU.(meth_call (get_session editor) "setAnnotations" [| inject a |])
+      editor ## getSession ## setAnnotations a
 
     let clear_annotations () =
-      ignore (JSU.(meth_call (get_session editor) "clearAnnotations" [| |]))
+      editor ## getSession ## clearAnnotations
 
-    let _Infinity = get_global "Infinity"
+    let _Infinity : int = get_global "Infinity"
 
     let scroll_to_end e =
-      let len : int  = JSU.(meth_call (get_session e) "getLength" [| |]) in
+      let len = e ## getSession ## getLength in
       let last_line = len - 1 in
-      ignore JSU.(meth_call e "gotoLine" [| inject last_line; inject _Infinity; inject Js._false |])
+      e ## gotoLine last_line _Infinity Js._false
 
     let () =
       let editor_theme : Js.js_string Js.t = get_global "editor_theme" in
       let editor_mode : Js.js_string Js.t = get_global "editor_mode" in
       let task_viewer_mode : Js.js_string Js.t = get_global "task_viewer_mode" in
 
-      ignore (JSU.(meth_call editor "setTheme" [| inject editor_theme |]));
-      ignore (JSU.(meth_call (get_session editor) "setMode" [| inject editor_mode |]));
+      editor ## setTheme editor_theme;
+      editor ## getSession ## setMode editor_mode;
       JSU.(set editor (Js.string "$blockScrolling") _Infinity);
 
-      ignore (JSU.(meth_call task_viewer "setTheme" [| inject editor_theme |]));
-      ignore (JSU.(meth_call (get_session task_viewer) "setMode" [| inject task_viewer_mode |]));
+      task_viewer ## setTheme editor_theme;
+      task_viewer ## getSession ## setMode task_viewer_mode;
       JSU.(set task_viewer (Js.string "$blockScrolling") _Infinity);
 
-      JSU.(meth_call task_viewer "setReadOnly" [| inject Js._true|])
+      task_viewer ## setReadOnly Js._true
 
     let undo () =
-      ignore JSU.(meth_call editor "undo" [| |])
+      editor ## undo
 
     let redo () =
-      ignore JSU.(meth_call editor "redo" [| |])
+      editor ## redo
 
-    let get_value ?(editor=editor) () : Js.js_string Js.t =
-      JSU.meth_call editor "getValue" [| |]
+    let get_value ?(editor=editor) () =
+      editor ## getValue
 
-    let set_value ?(editor=editor) (str : Js.js_string Js.t) =
-      ignore JSU.(meth_call editor "setValue" [| inject (str); inject ~-1 |])
+    let set_value ?(editor=editor) str =
+      editor ## setValue str ~-1
 
     let mk_range l1 c1 l2 c2 =
-      jsnew _Range (l1, c1, l2, c2)
+      new%js Ace.range l1 c1 l2 c2
 
     let set_selection_range r =
-      let selection = JSU.meth_call editor "getSelection" [| |] in
-      ignore JSU.(meth_call selection "setSelectionRange" [| inject r |])
+      let selection = editor ## getSelection in
+      selection ## setSelectionRange r Js._false
 
-    let add_marker cls r : marker =
-      JSU.(meth_call (get_session editor) "addMarker"
-                     [| inject r;
-			inject (Js.string cls);
-			inject (Js.string "text") |])
+    let add_marker cls r =
+      editor ## getSession ## addMarker r (Js.string cls) (Js.string "text") Js._false
 
     let remove_marker m =
-      ignore JSU.(meth_call  (get_session editor) "removeMarker" [| inject  m|])
+      editor ## getSession ## removeMarker m
 
     let get_char buffer i = int_of_float (buffer ## charCodeAt(i))
     let why3_loc_to_range buffer loc =
@@ -242,9 +285,6 @@ module Editor =
       let l2, c2 = convert_range l1 b (i+b) (e-b) in
       mk_range (l1-1) c1 (l2-1) c2
 
-    let focus e =
-      ignore JSU.(meth_call e "focus" [| |])
-
       let set_on_event e f =
 	ignore JSU.(meth_call editor "on" [| inject (Js.string e);
 					   inject f|])
@@ -253,13 +293,13 @@ module Editor =
       let editor_bg = getElement AsHtml.div "why3-editor-bg"
 
       let disable () =
-        ignore JSU.(meth_call editor "setReadOnly" [| inject Js._true|]);
-        editor_bg ## style ## display <- Js.string "block"
+        editor ## setReadOnly Js._true;
+        editor_bg ##. style ##. display := Js.string "block"
 
 
       let enable () =
-        ignore JSU.(meth_call editor "setReadOnly" [| inject Js._false|]);
-        editor_bg ## style ## display <- Js.string "none"
+        editor ## setReadOnly Js._false;
+        editor_bg ##. style ##. display := Js.string "none"
 
 
       let confirm_unsaved () =
@@ -281,21 +321,21 @@ module Tabs =
 	 let labels = select tab_group ".why3-tab-label" in
 	 List.iter
 	     (fun tab ->
-	      tab ## onclick <-
+	      tab ##. onclick :=
 		Dom.handler
                     (fun _ev ->
                    let () = if Js.to_bool
-                       (tab ## classList ## contains (Js.string "why3-inactive")) then
+                       (tab ##. classList ## contains (Js.string "why3-inactive")) then
 		       List.iter
 	                  (fun t ->
-                            ignore (t ## classList ## toggle (Js.string "why3-inactive")))
+                            ignore (t ##. classList ## toggle (Js.string "why3-inactive")))
 		            labels
                    in
 		   Js._false)
       ) labels)
       tab_groups
     let focus id =
-      (Dom_html.getElementById id) ## click ()
+      (Dom_html.getElementById id) ## click
   end
 
 module ContextMenu =
@@ -314,19 +354,19 @@ module ContextMenu =
 
     let show_at x y =
       if !enabled then begin
-          task_menu ## style ## display <- Js.string "block";
-          task_menu ## style ## left <- Js.string ((string_of_int x) ^ "px");
-          task_menu ## style ## top <- Js.string ((string_of_int y) ^ "px")
+          task_menu ##. style ##. display := Js.string "block";
+          task_menu ##. style ##. left := Js.string ((string_of_int x) ^ "px");
+          task_menu ##. style ##. top := Js.string ((string_of_int y) ^ "px")
         end
     let hide () =
       if !enabled then
-        task_menu ## style ## display <- Js.string "none"
+        task_menu ##. style ##. display := Js.string "none"
 
     let add_action b f =
-      b ## onclick <- Dom.handler (fun _ ->
+      b ##. onclick := Dom.handler (fun _ ->
 				   hide ();
 				   f ();
-				   Editor.(focus editor);
+				   Editor.editor ## focus;
 				   Js._false)
     let () = addMouseEventListener false task_menu "mouseleave"
 	(fun _ -> hide())
@@ -339,61 +379,60 @@ module ExampleList =
     let select_example = getElement AsHtml.select "why3-select-example"
     let example_label = getElement AsHtml.span "why3-example-label"
     let set_loading_label b =
-      select_example ## disabled <- (Js.bool b);
+      select_example ##. disabled := Js.bool b;
       if b then
-	example_label ## className <- Js.string "fa fa-spin fa-refresh why3-icon"
+	example_label ##. className := Js.string "fas fa-spin fa-refresh why3-icon"
       else
-	example_label ## className <- Js.string "fa-book why3-icon"
+	example_label ##. className := Js.string "fas fa-book why3-icon"
 
     let selected_index = ref 0
     let unselect () =
       selected_index := 0;
-      select_example ## selectedIndex <- 0
+      select_example ##. selectedIndex := 0
 
     let () =
-      let sessionStorage : Dom_html.storage Js.t =
-	get_global "sessionStorage"
-      in
+      let sessionStorage =
+        check_def "sessionStorage" (Dom_html.window ##. sessionStorage) in
       let filename url =
 	let arr = url ## split (Js.string "/") in
 	let arr = Js.to_array (Js.str_array arr) in
 	arr.(Array.length arr - 1)
       in
-      select_example ## onchange <-
+      select_example ##. onchange :=
 	Dom.handler (fun _ ->
                      if Editor.confirm_unsaved () then begin
-                         selected_index := select_example ## selectedIndex;
-		         let url = select_example ## value in
+                         selected_index := select_example ##. selectedIndex;
+		         let url = select_example ##. value in
 		         let name = filename url in
 		         begin
 		           match Js.Opt.to_option (sessionStorage ## getItem (url)) with
 			     Some s -> Editor.set_value s; Editor.name := name
 		           | None ->
-                              XHR.update_file
-                                (function `New mlw ->
-				          sessionStorage ## setItem (url, mlw);
-				          Editor.name := name;
-				          Editor.set_value mlw;
-				          set_loading_label false
-                                        | _ -> ()
-			        ) url
-                         end
+                  let upd mlw =
+                    sessionStorage ## setItem url mlw;
+                    Editor.name := name;
+                    Editor.set_value mlw;
+                    set_loading_label false
+                  in
+                  XHR.update_file (function `New mlw -> Js.Opt.iter mlw upd
+                                          | _ -> ()) url
+             end
                        end
                      else
-                       select_example ## selectedIndex <- !selected_index;
+                       select_example ##. selectedIndex := !selected_index;
 		     Js._false
 		    )
     let add_example text url =
       let option = Dom_html.createOption Dom_html.document in
-      option ## value <- url;
-      option ## innerHTML <- text;
-      appendChild select_example option
+      option ##. value := url;
+      option ##. innerHTML := text;
+      Dom.appendChild select_example option
 
     let enable () =
-      select_example ## disabled <- Js._false
+      select_example ##. disabled := Js._false
 
     let disable () =
-      select_example ## disabled <- Js._true
+      select_example ##. disabled := Js._true
   end
 
 module TaskList =
@@ -403,7 +442,7 @@ module TaskList =
     let task_list = getElement AsHtml.div "why3-task-list"
 
     let print cls msg =
-      task_list ## innerHTML <-
+      task_list ##. innerHTML :=
         (Js.string ("<p class='" ^ cls ^ "'>" ^
                       msg ^ "</p>"))
 
@@ -414,9 +453,9 @@ module TaskList =
     let print_alt_ergo_output id res =
       let span_msg = getElement AsHtml.span (id ^ "_msg") in
       match res with
-        Valid -> span_msg ## innerHTML <- Js.string ""
-      | Unknown msg -> span_msg ## innerHTML <- (Js.string (" (" ^ msg ^ ")"))
-      | Invalid msg -> span_msg ## innerHTML <- (Js.string (" (" ^ msg ^ ")"))
+        Valid -> span_msg ##. innerHTML := Js.string ""
+      | Unknown msg -> span_msg ##. innerHTML := Js.string (" (" ^ msg ^ ")")
+      | Invalid msg -> span_msg ##. innerHTML := Js.string (" (" ^ msg ^ ")")
 
     let mk_li_content id expl =
       Js.string (Format.sprintf
@@ -426,7 +465,7 @@ module TaskList =
     let clean_task id =
       try
 	let ul = getElement_exn AsHtml.ul (id ^ "_ul") in
-	ul ## innerHTML <- Js.string ""
+	ul ##. innerHTML := Js.string ""
       with
 	Not_found -> ()
 
@@ -438,20 +477,20 @@ module TaskList =
         with
           Not_found ->
           let ul = Dom_html.createUl doc in
-          ul ## id <- Js.string parent_id;
-          appendChild task_list ul;
+          ul ##. id := Js.string parent_id;
+          Dom.appendChild task_list ul;
           ul
       in
       let li = Dom_html.createLi doc in
-      li ## id <- Js.string id;
-      appendChild ul li;
-      li ## innerHTML <- mk_li_content id expl
+      li ##. id := Js.string id;
+      Dom.appendChild ul li;
+      li ##. innerHTML := mk_li_content id expl
 
 
     let task_selection = Hashtbl.create 17
     let is_selected id = Hashtbl.mem task_selection id
     let select_task id span loc pretty =
-      (span ## classList) ## add (Js.string "why3-task-selected");
+      span ##. classList ## add (Js.string "why3-task-selected");
       let markers = List.map (fun (cls, range) -> Editor.add_marker cls range) loc in
       Hashtbl.add task_selection id (span, loc, markers);
       Editor.set_value ~editor:Editor.task_viewer (Js.string pretty);
@@ -460,7 +499,7 @@ module TaskList =
     let deselect_task id =
       try
         let span, _loc, markers = Hashtbl.find task_selection id in
-        (span ## classList) ## remove (Js.string "why3-task-selected");
+        span ##. classList ## remove (Js.string "why3-task-selected");
         List.iter Editor.remove_marker markers;
         Hashtbl.remove task_selection id
       with
@@ -473,7 +512,7 @@ module TaskList =
 
     let clear () =
       clear_task_selection ();
-      task_list ## innerHTML <- Js.string "";
+      task_list ##. innerHTML := Js.string "";
       Editor.set_value ~editor:Editor.task_viewer (Js.string "")
 
     let error_marker = ref None
@@ -523,11 +562,11 @@ module TaskList =
       | Result sl ->
          clear ();
          let ul = Dom_html.createUl doc in
-         appendChild task_list ul;
+         Dom.appendChild task_list ul;
          List.iter (fun (s : string) ->
                     let li = Dom_html.createLi doc in
-                    li ## innerHTML <- (Js.string s);
-                    appendChild ul li;) sl
+                    li ##. innerHTML := (Js.string s);
+                    Dom.appendChild ul li;) sl
 
       | Theory (th_id, th_name) ->
 	 attach_to_parent th_id "why3-theory-list" th_name []
@@ -543,10 +582,10 @@ module TaskList =
                 let locs =
 		  List.map (fun (k, loc) -> k, Editor.why3_loc_to_range buffer loc) locs
 		in
-		span ## onclick <-
+		span ##. onclick :=
 		  Dom.handler
 		    (fun ev ->
-		     let ctrl = Js.to_bool (ev ## ctrlKey) in
+		     let ctrl = Js.to_bool (ev ##. ctrlKey) in
 		     if is_selected id then
                        if ctrl then deselect_task id else
 			 clear_task_selection ()
@@ -560,8 +599,8 @@ module TaskList =
 		  (fun e ->
 		   clear_task_selection ();
                    select_task id span locs pretty;
-		   let x = max 0 ((e ##clientX) - 2) in
-		   let y = max 0 ((e ##clientY) - 2) in
+		   let x = max 0 (e ##. clientX - 2) in
+		   let y = max 0 (e ##. clientY - 2) in
 		   ContextMenu.show_at x y)
 	 end
 
@@ -573,12 +612,12 @@ module TaskList =
 	   let span_msg = getElement AsHtml.span (id ^ "_msg") in
            let cls =
              match st with
-               `New -> "fa fa-fw fa-cog fa-spin fa-fw why3-task-pending"
-             | `Valid -> span_msg ## innerHTML <- Js.string "";
-			 "fa-check-circle why3-task-valid"
-             | `Unknown -> "fa-question-circle why3-task-unknown"
+               `New -> "fas fa-fw fa-cog fa-spin fa-fw why3-task-pending"
+             | `Valid -> span_msg ##. innerHTML := Js.string "";
+			 "fas fa-check-circle why3-task-valid"
+             | `Unknown -> "fas fa-question-circle why3-task-unknown"
            in
-           span_icon ## className <- Js.string cls
+           span_icon ##. className := Js.string cls
          with
            Not_found -> ()
 
@@ -603,25 +642,25 @@ module ToolBar =
     let button_about = getElement AsHtml.button "why3-button-about"
 
     let disable b  =
-      b ## disabled <- Js._true;
-      b ## classList ## add (Js.string "why3-inactive")
+      b ##. disabled := Js._true;
+      b ##. classList ## add (Js.string "why3-inactive")
 
     let enable b =
-      b ## disabled <- Js._false;
-      b ## classList ## remove (Js.string "why3-inactive")
+      b ##. disabled := Js._false;
+      b ##. classList ## remove (Js.string "why3-inactive")
 
 
     let toggle (b : <disabled : bool Js.t Js.prop; ..> Js.t) =
-      if Js.to_bool (b##disabled) then enable b else disable b
+      if Js.to_bool (b ##. disabled) then enable b else disable b
 
 
     let add_action b f =
       let cb = fun _ ->
 	f ();
-	Editor.(focus editor);
+	Editor.editor ## focus;
 	Js._false
       in
-      b ## onclick <- Dom.handler cb
+      b ##. onclick := Dom.handler cb
 
 
     let disable_compile () =
@@ -647,59 +686,57 @@ module ToolBar =
 
 
 
-    let mk_save =
-      let _Blob  = get_global "Blob" in
-      fun () ->
+    let mk_save () =
       let blob =
-        jsnew _Blob (Js.array [| (Editor.get_value ()) |],
-                     JSU.(obj [| "type", inject (Js.string "application/octet-stream") |]))
+        let code = Js.to_string (Editor.get_value ()) in
+        File.blob_from_string ~contentType:"text/plain" ~endings:`Native code
       in
       let name =
-	if !Editor.name ## length == 0 then Js.string "test.mlw" else !Editor.name
+	if !Editor.name ##. length == 0 then Js.string "test.mlw" else !Editor.name
       in
       blob, name
 
-    let save_default  =
-      let _URL = JSU.(get Dom_html.window (Js.string "URL")) in
-      fun () ->
+    let save_default () =
       let blob, name = mk_save () in
-      let url = JSU.(meth_call _URL "createObjectURL" [| inject blob |]) in
-      real_save ## href <- url;
+      let url = Dom_html.window ##. _URL ## createObjectURL blob in
+      real_save ##. href := url;
       JSU.(set real_save (Js.string "download") name);
-      ignore JSU.(meth_call real_save "click" [| |])
+      real_save ## click
     (* does not work with firefox *)
     (*ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |]) *)
 
 
     let save =
-      match Js.Optdef.to_option JSU.(get (Dom_html.window ## navigator) (Js.string "msSaveBlob"))
+      match Js.Optdef.to_option JSU.(get (Dom_html.window ##. navigator) (Js.string "msSaveBlob"))
       with
         None -> save_default
       | Some _f ->
          fun () ->
          let blob, name = mk_save () in
-         ignore JSU.(meth_call (Dom_html.window ## navigator) "msSaveBlob" [| inject blob; inject name |])
+         ignore JSU.(meth_call (Dom_html.window ##. navigator) "msSaveBlob" [| inject blob; inject name |])
 
     let open_ = getElement AsHtml.input "why3-open"
     let () =
-      open_ ## onchange <-
-	Dom.handler
-	  (fun _e ->
-           ExampleList.unselect ();
-	   match Js.Optdef.to_option (open_ ## files) with
-	     None -> Js._false
-	   | Some (f) -> match Js.Opt.to_option (f ## item (0)) with
-			  None -> Js._false
-			| Some f ->
-			   ignore (
-			       Lwt.bind (File.readAsText f)
-					(fun str ->
-					 Editor.name := File.filename f;
-					 Editor.set_value str;
-					 Lwt.return_unit));
-			       Js._true
+      open_ ##. onchange := Dom.handler (fun _e ->
+        ExampleList.unselect ();
+	match Js.Optdef.to_option (open_ ##. files) with
+	| None -> Js._false
+	| Some (f) ->
+          match Js.Opt.to_option (f ## item (0)) with
+	  | None -> Js._false
+	  | Some f ->
+            let reader = new%js File.fileReader in
+            reader ##. onloadend := Dom.handler (fun _ ->
+              match Js.Opt.to_option (File.CoerceTo.string (reader ##. result)) with
+              | None -> Js._true
+              | Some content ->
+                Editor.name := File.filename f;
+                Editor.set_value content;
+                Js._true);
+            reader##readAsText ((f :> File.blob Js.t));
+	    Js._true
           )
-    let open_ () = if Editor.confirm_unsaved () then open_ ## click ()
+    let open_ () = if Editor.confirm_unsaved () then open_ ## click
 
   end
 
@@ -709,37 +746,37 @@ module Panel =
     let editor_container = getElement AsHtml.div "why3-editor-container"
     let resize_bar = getElement AsHtml.div "why3-resize-bar"
     let reset () =
-      let edit_style = editor_container ## style in
+      let edit_style = editor_container ##. style in
       JSU.(set edit_style (Js.string "flexGrow") (Js.string "2"));
       JSU.(set edit_style (Js.string "flexBasis") (Js.string ""))
 
     let set_wide b =
       reset ();
-      main_panel ## classList ## remove (Js.string "why3-wide-view");
-      main_panel ## classList ## remove (Js.string "why3-column-view");
+      main_panel ##. classList ## remove (Js.string "why3-wide-view");
+      main_panel ##. classList ## remove (Js.string "why3-column-view");
       if b then
-	main_panel ## classList ## add (Js.string "why3-wide-view")
+	main_panel ##. classList ## add (Js.string "why3-wide-view")
       else
-	main_panel ## classList ## add (Js.string "why3-column-view")
+	main_panel ##. classList ## add (Js.string "why3-column-view")
 
     let is_wide () =
-      Js.to_bool (main_panel ## classList ## contains (Js.string "why3-wide-view"))
+      Js.to_bool (main_panel ##. classList ## contains (Js.string "why3-wide-view"))
 
     let () =
       let mouse_down = ref false in
-      resize_bar ## onmousedown <- Dom.handler (fun _ -> mouse_down := true; Js._false);
-      resize_bar ## ondblclick <- Dom.handler (fun _ -> reset (); Js._false);
-      main_panel ## onmouseup <- Dom.handler (fun _ -> mouse_down := false; Js._false);
-      main_panel ## onmousemove <-
+      resize_bar ##. onmousedown := Dom.handler (fun _ -> mouse_down := true; Js._false);
+      resize_bar ##. ondblclick := Dom.handler (fun _ -> reset (); Js._false);
+      main_panel ##. onmouseup := Dom.handler (fun _ -> mouse_down := false; Js._false);
+      main_panel ##. onmousemove :=
 	Dom.handler (fun e ->
 		     if !mouse_down then begin
 			 let offset =
 			   if is_wide ()
-			   then (e ## clientX) - (main_panel ## offsetLeft)
-			   else (e ## clientY) - (main_panel ## offsetTop)
+			   then (e ##. clientX) - (main_panel ##. offsetLeft)
+			   else (e ##. clientY) - (main_panel ##. offsetTop)
 			 in
 			 let offset = Js.string ((string_of_int offset) ^ "px") in
-			 let edit_style = editor_container ## style in
+			 let edit_style = editor_container ##. style in
 			 JSU.(set edit_style (Js.string "flexGrow") (Js.string "0"));
 			     JSU.(set edit_style (Js.string "flexBasis") offset);
 			     Js._false
@@ -760,16 +797,16 @@ module Dialogs =
 
     let all_dialogs = [ setting_dialog; about_dialog ]
     let show diag () =
-      dialog_panel ## style ## display <- Js.string "flex";
-      diag ## style ## display <- Js.string "inline-block";
-      ignore JSU.(meth_call diag "focus" [| |])
+      dialog_panel ##. style ##. display := Js.string "flex";
+      diag ##. style ##. display := Js.string "inline-block";
+      diag ## focus
 
     let close () =
-      List.iter (fun d -> d ## style ## display <- Js.string "none") all_dialogs;
-      dialog_panel ## style ## display <- Js.string "none"
+      List.iter (fun d -> d ##. style ##. display := Js.string "none") all_dialogs;
+      dialog_panel ##. style ##. display := Js.string "none"
 
     let set_onchange o f =
-      o ## onchange <- Dom.handler (fun _ -> f o; Js._false)
+      o ##. onchange := Dom.handler (fun _ -> f o; Js._false)
   end
 
 module KeyBinding =
@@ -785,15 +822,15 @@ module KeyBinding =
             (bool_to_int d)
 
     let () =
-      Dom_html.document ## onkeydown <-
+      Dom_html.document ##. onkeydown :=
         Dom.handler
           (fun ev ->
-           let i = min (Array.length callbacks) (max 0 ev ## keyCode) in
+           let i = min (Array.length callbacks) (max 0 ev ##. keyCode) in
            let t = callbacks.(i) in
-           match t.(pack (ev ## ctrlKey) (ev ## shiftKey) (ev ## metaKey) (ev ## altKey)) with
+           match t.(pack (ev ##. ctrlKey) (ev ##. shiftKey) (ev ##. metaKey) (ev ##. altKey)) with
              None -> Js._true
            | Some f ->
-              ignore JSU.(meth_call ev "preventDefault" [| |]);
+              Dom.preventDefault ev;
               f ();
               Js._false)
 
@@ -808,22 +845,22 @@ module KeyBinding =
 module Session =
   struct
 
-    let localStorage : Dom_html.storage Js.t =
-      get_global "localStorage"
+    let localStorage =
+      check_def "localStorage" (Dom_html.window ##. localStorage)
 
     let save_num_threads i =
-      localStorage ## setItem (Js.string "why3-num-threads", Js.string (string_of_int i))
+      localStorage ## setItem (Js.string "why3-num-threads") (Js.string (string_of_int i))
 
     let save_num_steps i =
-      localStorage ## setItem (Js.string "why3-num-steps", Js.string (string_of_int i))
+      localStorage ## setItem (Js.string "why3-num-steps") (Js.string (string_of_int i))
 
 
     let save_view_mode m =
-      localStorage ## setItem (Js.string "why3-view-mode", m)
+      localStorage ## setItem (Js.string "why3-view-mode") m
 
     let save_buffer name content =
-      localStorage ## setItem (Js.string "why3-buffer-name", name);
-      localStorage ## setItem (Js.string "why3-buffer-content", content)
+      localStorage ## setItem (Js.string "why3-buffer-name") name;
+      localStorage ## setItem (Js.string "why3-buffer-content") content
 
     let load_num_threads () =
       int_of_js_string (Js.Opt.get (localStorage ## getItem (Js.string "why3-num-threads"))
@@ -886,9 +923,9 @@ module Controller =
 
     let rec init_alt_ergo_worker i =
       let worker = Worker.create (blob_url_of_string "/alt_ergo_worker.js") in
-      worker ## onmessage <-
+      worker ##. onmessage :=
 	(Dom.handler (fun ev ->
-                      let (id, result) as res = unmarshal (ev ## data) in
+                      let (id, result) as res = unmarshal (ev ##. data) in
                       TaskList.print_alt_ergo_output id result;
 		      let status_update = status_of_result res in
 		      let () = match status_update with
@@ -924,7 +961,7 @@ module Controller =
 	(fun i w ->
 	 match w with
 	   Busy (w)  ->
-           w ## terminate ();
+           w ## terminate;
            !alt_ergo_workers.(i) <- init_alt_ergo_worker i
 	 | Absent -> !alt_ergo_workers.(i) <- init_alt_ergo_worker i
 	 | Free _ -> ()
@@ -936,9 +973,9 @@ module Controller =
 
     let init_why3_worker () =
       let worker = Worker.create (blob_url_of_string "/why3_worker.js") in
-      worker ## onmessage <-
+      worker ##. onmessage :=
 	(Dom.handler (fun ev ->
-                      let msg = unmarshal (ev ## data) in
+                      let msg = unmarshal (ev ##. data) in
                       if !first_task then begin
 			  first_task := false;
 			  TaskList.clear ()
@@ -960,7 +997,7 @@ module Controller =
       ToolBar.disable_compile ();
       why3_busy := true;
       TaskList.clear ();
-      TaskList.print_msg "<span class='fa fa-cog fa-spin'></span> Generating tasks … ";
+      TaskList.print_msg "<span class='fas fa-cog fa-spin'></span> Generating tasks … ";
       reset_workers ();
       first_task := true;
       let code = Js.to_string (Editor.get_value ()) in
@@ -972,7 +1009,7 @@ module Controller =
       ToolBar.disable_compile ();
       why3_busy := true;
       TaskList.clear ();
-      TaskList.print_msg "<span class='fa fa-cog fa-spin'></span> Compiling buffer … ";
+      TaskList.print_msg "<span class='fas fa-cog fa-spin'></span> Compiling buffer … ";
       reset_workers ();
       let code = Js.to_string (Editor.get_value ()) in
       (get_why3_worker()) ## postMessage (marshal (ExecuteBuffer code))
@@ -1000,7 +1037,7 @@ module Controller =
 
     let force_stop () =
       log ("Called force_stop");
-      (get_why3_worker()) ## terminate ();
+      (get_why3_worker()) ## terminate;
       why3_worker := Some (init_why3_worker ());
       reset_workers ();
       TaskList.clear ();
@@ -1032,9 +1069,9 @@ let () =
   ToolBar.(add_action button_stop Controller.stop);
   ToolBar.(add_action button_settings Dialogs.(show setting_dialog));
   ToolBar.(add_action button_help (fun () ->
-                                   Dom_html.window ## open_ (Js.string "trywhy3_help.html",
-                                                             Js.string "_blank",
-                                                             Js.null)));
+                                   Dom_html.window ## open_ (Js.string "trywhy3_help.html")
+                                                            (Js.string "_blank")
+                                                            Js.null));
   ToolBar.(add_action button_about Dialogs.(show about_dialog));
   ContextMenu.(add_action split_menu_entry
 			  Controller.(why3_transform `Split ignore));
@@ -1051,58 +1088,55 @@ let () =
   Dialogs.(set_onchange input_num_threads
 			 (fun o ->
 			  let open Controller in
-			  let len = int_of_js_string (o ## value) in
+			  let len = int_of_js_string (o ##. value) in
                           force_stop ();
 			  alt_ergo_workers := Array.make len Absent));
 
   Dialogs.(set_onchange input_num_steps
 			 (fun o ->
-			  let steps = int_of_js_string (o ## value) in
+			  let steps = int_of_js_string (o ##. value) in
                           Controller.alt_ergo_steps := steps;
 			  Controller.force_stop ()
 	                 ));
 
   ToolBar.add_action Dialogs.button_close Dialogs.close;
-  KeyBinding.add_global Keycode.esc  Dialogs.close;
+  (*KeyBinding.add_global Keycode.esc  Dialogs.close;*)
 
   Dialogs.(set_onchange radio_wide (fun _ -> Panel.set_wide true));
   Dialogs.(set_onchange radio_column (fun _ -> Panel.set_wide false))
 
 
 let () =
-  XHR.update_file (function `New content ->
-	                    let examples = content ## split (Js.string "\n") in
-	                    let examples = Js.to_array (Js.str_array examples) in
-	                    for i = 0 to ((Array.length examples) / 2) - 1 do
-	                      ExampleList.add_example
-	                        examples.(2*i)
-	                        ((Js.string "examples/") ## concat (examples.(2*i+1)))
-	                    done;
-	                    ExampleList.set_loading_label false
-                          | _ ->
-	                     ExampleList.set_loading_label false
-                  ) (Js.string "examples/index.txt");
+  let upd content =
+	  let examples = content ## split (Js.string "\n") in
+	  let examples = Js.to_array (Js.str_array examples) in
+	  for i = 0 to ((Array.length examples) / 2) - 1 do
+	    ExampleList.add_example
+	      examples.(2*i)
+	      ((Js.string "examples/") ## concat (examples.(2*i+1)))
+	  done;
+	  ExampleList.set_loading_label false in
+  XHR.update_file (function `New content -> Js.Opt.iter content upd
+                          | _ -> ExampleList.set_loading_label false
+    ) (Js.string "examples/index.txt");
   ExampleList.set_loading_label true
 
 
 let () =
-  Dom_html.window ## onunload <- Dom.handler (fun _ -> Js._false);
   (* restore the session *)
   let name, buffer = Session.load_buffer () in
   Editor.name := name;
   Editor.set_value buffer;
   Panel.set_wide (Session.load_view_mode () = (Js.string "wide"));
   ExampleList.unselect();
-  Dom_html.window ## onbeforeunload <-
-    Dom.handler (Obj.magic (fun _ ->
+  Dom_html.window ##. onunload :=
+    Dom.handler (fun _ ->
                    Session.save_buffer !Editor.name (Editor.get_value ());
                    Session.save_num_threads (Array.length !Controller.alt_ergo_workers);
                    Session.save_num_steps !Controller.alt_ergo_steps;
                    Session.save_view_mode (if Panel.is_wide () then Js.string "wide"
                                            else Js.string "column");
-
-                   (Js.string "Do you wish to quit TryWhy3 (your current session will be saved to your browser local storage) ?"))
-                )
+                   Js._true)
 
 (*
 Local Variables:

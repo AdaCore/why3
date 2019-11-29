@@ -1,0 +1,180 @@
+(**
+
+{1 VerifyThis @ ETAPS 2018 competition
+   Challenge 2: Le rouge et le noir}
+
+Author: Martin Clochard (LRI, Université Paris Sud)
+*)
+
+use int.Int
+use import set.Fset as F
+
+(* The part about bijections, preservation of finiteness and cardinality,
+   should be moved somewhere in stdlib. *)
+predicate bijection (p:fset 'a) (q:'b -> bool) (f:'a -> 'b) (g:'b -> 'a) =
+  (forall x. mem x p -> q (f x) /\ g (f x) = x)
+  /\ (forall x. q x -> mem (g x) p /\ f (g x) = x)
+
+let rec ghost bij_preserve (p:fset 'a) (q:'b -> bool)
+                           (f:'a -> 'b) (g:'b -> 'a) : fset 'b
+  requires { bijection p q f g }
+  ensures  { forall x. q x <-> mem x result }
+  ensures  { cardinal p = cardinal result }
+  variant  { cardinal p }
+= if cardinal p = 0 then empty else
+  let x = pick p in
+  add (f x) (bij_preserve (remove x p) (fun y -> pure { q y /\ y <> f x}) f g)
+
+let rec ghost disjoint_union (p q:fset 'a) : unit
+  requires { forall x. not (mem x p /\ mem x q) }
+  ensures  { cardinal (union p q) = cardinal p + cardinal q }
+  variant  { cardinal p }
+= if cardinal p = 0 then assert { union p q == q } else
+  let x = pick p in
+  assert { union (remove x p) q == remove x (union p q) };
+  disjoint_union (remove x p) q
+
+(* Abstraction layer over the integers. Reduce to standard integers
+   after ghost code erasure (=ghost wrapping of integers operation for
+   proof purposes). *)
+type cardinal 'a = {
+  card : int;
+  ghost cset : fset 'a;
+} invariant { card = cardinal cset }
+by { card = 0; cset = empty }
+
+let czero () : cardinal 'a
+  ensures { result.cset = empty }
+  ensures { result.card = 0 }
+= { card = 0; cset = empty }
+let cone (ghost x:'a) : cardinal 'a
+  ensures { result.cset = singleton x }
+  ensures { result.card = 1 }
+= { card = 1; cset = singleton x }
+
+(* reduce to identity after ghost code erasure. *)
+let cmap (ghost q:'b -> bool)
+         (ghost f:'a -> 'b)
+         (ghost g:'b -> 'a) (i:cardinal 'a) : cardinal 'b
+  requires { bijection i.cset q f g }
+  ensures { forall x. mem x result.cset <-> q x }
+  ensures { result.card = i.card }
+= { card = i.card; cset = bij_preserve i.cset q f g }
+
+(* reduce to integer addition after ghost code erasure. *)
+let cadd (i1 i2:cardinal 'a) : cardinal 'a
+  requires { forall x. not (mem x i1.cset /\ mem x i2.cset) }
+  ensures  { result.cset = union i1.cset i2.cset }
+  ensures  { result.card = i1.card + i2.card }
+= ghost disjoint_union i1.cset i2.cset;
+  { card = i1.card + i2.card; cset = union i1.cset i2.cset }
+
+(* Specification of colorings:
+   sequence of tiles that can be obtained by catenating unit black tiles
+   or large (>=3 units) red tiles, with red tiles being non-consecutive. *)
+type color = Red | Black
+use import seq.Seq as S
+constant black : seq color = singleton Black
+function red (n:int) : seq color = create n (fun _ -> Red)
+(* color is color of first square. Default to black for empty sequence,
+   as a black tile does not give any constraints. *)
+inductive valid_coloring_f color (seq color) =
+  | ValidEmpty : valid_coloring_f Black empty
+  | ValidBlack : forall c s.
+    valid_coloring_f c s -> valid_coloring_f Black (black++s)
+  | ValidRed : forall n s. n >= 3 /\ valid_coloring_f Black s ->
+    valid_coloring_f Red (red n ++ s)
+
+predicate valid_coloring (s:seq color) =
+  valid_coloring_f Red s \/ valid_coloring_f Black s
+
+predicate valid_coloring_l (n:int) (s:seq color) =
+  valid_coloring s /\ s.length = n
+
+predicate valid_coloring_inter (n:int) (m:int) (s:seq color) =
+  valid_coloring_l n s /\ exists i. 0 <= i < m /\ s[i] = Black
+
+predicate valid_coloring_at (n:int) (m:int) (s:seq color) =
+  valid_coloring_l n s /\ s[m] = Black /\ forall i. 0 <= i < m -> s[i] = Red
+
+use array.Array
+
+
+let main () : unit
+= let count = Array.make 51 (czero ()) in
+  count[0] <- cone S.empty;
+  assert { forall s. mem s count[0].cset <-> valid_coloring_l 0 s };
+  count[1] <- cone (black ++ S.empty);
+  assert { forall s. mem s count[1].cset <-> valid_coloring_l 1 s };
+  count[2] <- cone (black ++ (black ++ S.empty));
+  assert { forall s. mem s count[2].cset <-> valid_coloring_l 2 s };
+  count[3] <- { card = 2;
+                cset = F.add (red 3 ++ S.empty)
+                             (F.singleton (black ++ (black ++
+                                                    (black ++ S.empty)))); };
+  assert { forall s. mem s count[3].cset <-> valid_coloring_l 3 s };
+  for n = 4 to 50 do
+    invariant { forall i s. 0 <= i < n ->
+      valid_coloring_l i s <-> mem s count[i].cset }
+    label L in
+    let ghost q = pure { valid_coloring_inter n 3 } in
+    let ghost f = pure { fun (s:seq color) -> black ++ s } in
+    let ghost g = pure { fun (s:seq color) -> s[1 ..] } in
+    assert { bijection count[n-1].cset q f g
+      by (forall s. valid_coloring_l (n-1) s ->
+        (valid_coloring_inter n 3 (black ++ s)
+         by 0 <= 0 < (black ++ s).S.length /\ S.get (black++s) 0 = Black)
+        /\ g (f s) == s)
+      /\ (forall s. valid_coloring_inter n 3 s ->
+        (valid_coloring_l (n-1) s[1 ..]
+         /\ f (g s) == s)
+        by (exists c s'. s = black ++ s' /\ valid_coloring_f c s'
+          so s' == s[1 ..])
+        \/ (false by exists i s'. 3 <= i /\ s = red i ++ s')
+      ) };
+    count[n] <- cmap q f g count[n-1];
+    for k = 3 to n - 1 do
+      invariant { forall i. 0 <= i < n -> count[i] = (count[i] at L) }
+      invariant { forall s.
+        valid_coloring_inter n k s <-> mem s count[n].cset
+      }
+      let ghost q = pure { valid_coloring_at n k } in
+      let ghost f = pure { fun (s:seq color) -> red k ++ (black ++ s) } in
+      let ghost g = pure { fun (s:seq color) -> s[k+1 ..] } in
+      assert { bijection count[n-k-1].cset q f g
+        by (forall s. g (f s) == s
+          by forall i. 0 <= i < s.S.length ->
+            S.get (g (f s)) i = S.get (f s) (i+k+1) = S.get s i)
+        so (forall s. valid_coloring_l (n-k-1) s ->
+          valid_coloring_at n k (f s) /\ g (f s) = s
+        ) /\ (forall s. valid_coloring_at n k s ->
+          valid_coloring_l (n-k-1) (g s) /\ f (g s) = s
+          by (false by exists s'. s = black ++ s'
+            so 0 <= 0 < k /\ S.get s 0 = Black)
+          \/ (exists i s'.
+            3 <= i /\ s = red i ++ s' /\ valid_coloring_f Black s'
+            so s' <> empty so exists c s''.
+              s' = black ++ s'' /\ valid_coloring_f c s''
+            so (i = k by not (i < k so S.get s i = Black)
+                      /\ not (i > k so S.get s k = Red))
+            so s'' = g s by s = f s'')
+        ) };
+      count[n] <- cadd count[n] (cmap q f g count[n-k-1])
+    done;
+    count[n] <- cadd count[n] (cone (red n));
+    assert { forall s. valid_coloring_l n s ->
+      s = red n \/ valid_coloring_inter n n s
+      by (exists s'. s = black ++ s'
+        so 0 <= 0 < n /\ S.get s 0 = Black so valid_coloring_inter n n s)
+      \/ (exists i s'. 3 <= i /\ s = red i ++ s' /\ valid_coloring_f Black s'
+        so if i = n then s == red n else
+        (s' <> empty by s'.S.length > 0)
+        so exists s''. s' = black ++ s'' so 0 <= i < n /\ S.get s i = Black
+        so valid_coloring_inter n n s
+      )
+    };
+    assert { valid_coloring_l n (red n) by red n == red n ++ empty }
+  done;
+  (* Property asked by the problem. *)
+  assert { forall s. valid_coloring_l 50 s <-> mem s count[50].cset };
+  assert { count[50].card = cardinal count[50].cset }

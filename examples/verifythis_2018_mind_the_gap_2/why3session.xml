@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="verifythis_2018_mind_the_gap_2.mlw"/>
+<theory name="GapBuffer" proved="true">
+ <goal name="buffer&#39;vc" expl="VC for buffer" proved="true">
+ <proof prover="2"><result status="valid" time="0.01" steps="6918"/></proof>
+ </goal>
+ <goal name="left&#39;vc" expl="VC for left" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="left&#39;vc.0" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="29578"/></proof>
+  </goal>
+  <goal name="left&#39;vc.1" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="29560"/></proof>
+  </goal>
+  <goal name="left&#39;vc.2" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="31426"/></proof>
+  </goal>
+  <goal name="left&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="28453"/></proof>
+  </goal>
+  <goal name="left&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="61"/></proof>
+  </goal>
+  <goal name="left&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="1442"/></proof>
+  </goal>
+  <goal name="left&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="right&#39;vc" expl="VC for right" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="right&#39;vc.0" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="29497"/></proof>
+  </goal>
+  <goal name="right&#39;vc.1" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="29615"/></proof>
+  </goal>
+  <goal name="right&#39;vc.2" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="31399"/></proof>
+  </goal>
+  <goal name="right&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="29876"/></proof>
+  </goal>
+  <goal name="right&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="0" memlimit="2000"><result status="valid" time="0.02" steps="61"/></proof>
+  </goal>
+  <goal name="right&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="1518"/></proof>
+  </goal>
+  <goal name="right&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="grow&#39;vc" expl="VC for grow" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="grow&#39;vc.0" expl="array creation size" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="29292"/></proof>
+  </goal>
+  <goal name="grow&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="30500"/></proof>
+  </goal>
+  <goal name="grow&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="29912"/></proof>
+  </goal>
+  <goal name="grow&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="31666"/></proof>
+  </goal>
+  <goal name="grow&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="31217"/></proof>
+  </goal>
+  <goal name="grow&#39;vc.5" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="33430"/></proof>
+  </goal>
+  <goal name="grow&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="8498"/></proof>
+  </goal>
+  <goal name="grow&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="8518"/></proof>
+  </goal>
+  <goal name="grow&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="117793"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="insert&#39;vc" expl="VC for insert" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="insert&#39;vc.0" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="33596"/></proof>
+  </goal>
+  <goal name="insert&#39;vc.1" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="35301"/></proof>
+  </goal>
+  <goal name="insert&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="8178"/></proof>
+  </goal>
+  <goal name="insert&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="188"/></proof>
+  </goal>
+  <goal name="insert&#39;vc.4" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="32918"/></proof>
+  </goal>
+  <goal name="insert&#39;vc.5" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="34089"/></proof>
+  </goal>
+  <goal name="insert&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="8072"/></proof>
+  </goal>
+  <goal name="insert&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="115"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="delete&#39;vc" expl="VC for delete" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="delete&#39;vc.0" expl="type invariant" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="35982"/></proof>
+  </goal>
+  <goal name="delete&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.19" steps="409046"/></proof>
+  </goal>
+  <goal name="delete&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="1676"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

@@ -4,12 +4,12 @@
    defines u-accessibility and victory invariants. *)
 module StratLessDef
 
-  use import game.Game
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import order.LimUniq
-  use import order.Chain
-  use import transfinite.ExtensionDef
+  use game.Game
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.LimUniq
+  use order.Chain
+  use transfinite.ExtensionDef
 
   (* u-accessibility of an history: can be reached by some demon. *)
   predicate u_acc (g:game 'a) (ang:angel 'a) (x:'a) (h:set 'a) =
@@ -69,12 +69,12 @@ end
  (* Properties about u-accessibilities *)
 module Uacc "W:non_conservative_extension:N" (* => UaccProof *)
 
-  use import game.Game
+  use game.Game
   use export StratLessDef
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import order.Chain
-  use import transfinite.ExtensionDef
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.Chain
+  use transfinite.ExtensionDef
 
   (* Propagation rules. *)
   axiom u_acc_base : forall g ang,x:'a. u_acc g ang x ((=) x)
@@ -108,9 +108,9 @@ end
 (* Alternative criterions for winning strategies (and win-strat existence) *)
 module WinAlt "W:non_conservative_extension:N" (* => WinAltProof *)
 
-  use import game.Game
+  use game.Game
   use export StratLessDef
-  use import transfinite.ExtensionDef
+  use transfinite.ExtensionDef
 
   (* a strategy is winning iff there are no losing history
      among (strong) u-accessible. *)
@@ -147,11 +147,11 @@ end
 (* Basic manipulation on victory invariant. *)
 module InvExtraDef
 
-  use import game.Game
-  use import order.Ordered
-  use import ho_set.Set
-  use import ho_rel.RelSet
-  use import StratLessDef
+  use game.Game
+  use order.Ordered
+  use ho_set.Set
+  use ho_rel.RelSet
+  use StratLessDef
 
   (* Cropping: enforce the absence of history past the winning set. *)
   predicate cropped (o:erel 'a) (win:set 'a) (inv:set (set 'a)) =
@@ -181,8 +181,8 @@ end
 
 module InvExtra "W:non_conservative_extension:N" (* => InvExtraProof *)
 
-  use import game.Game
-  use import ho_set.Set
+  use game.Game
+  use ho_set.Set
   use export InvExtraDef
   use export StratLessDef
 
@@ -201,16 +201,16 @@ end
 
 module UaccProof
 
-  use import game.Game
-  use import StratLessDef
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import order.LimUniq
-  use import order.SubChain
-  use import fn.Fun
-  use import choice.Choice
-  use import transfinite.ExtensionDet
-  use import transfinite.Transport
+  use game.Game
+  use StratLessDef
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.LimUniq
+  use order.SubChain
+  use fn.Fun
+  use choice.Choice
+  use transfinite.ExtensionDet
+  use transfinite.Transport
 
   lemma u_acc_base : forall g ang,x:'a. u_acc g ang x ((=) x)
     by exists dmn. true so tr_ext g.progress (step g ang dmn) ((=) x) ((=) x)
@@ -357,15 +357,15 @@ end
 
 module WinAltProof
 
-  use import game.Game
-  use import fn.Fun
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import order.LimUniq
-  use import order.SubChain
-  use import transfinite.ExtensionDet
-  use import transfinite.Transport
-  use import Uacc
+  use game.Game
+  use fn.Fun
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use order.LimUniq
+  use order.SubChain
+  use transfinite.ExtensionDet
+  use transfinite.Transport
+  use Uacc
 
   (* Winning -> no losing u-acc: by contradiction, suppose there is one.
      1) Consider a demon that get to the losing history,
@@ -503,7 +503,7 @@ module WinAltProof
       )
     )
 
-  use import choice.Choice
+  use choice.Choice
 
   lemma victory_invariant_ok_1 : forall g:game 'a,inv start win.
     victory_invariant g start win inv ->
@@ -536,16 +536,16 @@ end
 
 module InvExtraProof
 
-  use import game.Game
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import ho_rel.RelSet
-  use import order.Ordered
-  use import order.Chain
-  use import InvExtraDef
-  use import Uacc
-  use import WinAlt
-  use import transfinite.ExtensionDef
+  use game.Game
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.RelSet
+  use order.Ordered
+  use order.Chain
+  use InvExtraDef
+  use Uacc
+  use WinAlt
+  use transfinite.ExtensionDef
 
   lemma victory_inv_span : forall g:game 'a,start win inv.
     let sg = span_game g in

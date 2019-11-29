@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Term
 open Ity
@@ -118,27 +118,30 @@ type expr = private {
   e_ity    : ity;
   e_mask   : mask;
   e_effect : effect;
-  e_label  : Slab.t;
+  e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
 }
 
 and expr_node =
   | Evar    of pvsymbol
-  | Econst  of Number.constant
+  | Econst  of Constant.constant
   | Eexec   of cexp * cty
   | Eassign of assign list
   | Elet    of let_defn * expr
   | Eif     of expr * expr * expr
-  | Ecase   of expr * (prog_pattern * expr) list
+  | Ematch  of expr * reg_branch list * exn_branch Mxs.t
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * pvsymbol * invariant list * expr
-  | Etry    of expr * bool * (pvsymbol list * expr) Mxs.t
   | Eraise  of xsymbol * expr
   | Eexn    of xsymbol * expr
   | Eassert of assertion_kind * term
   | Eghost  of expr
   | Epure   of term
   | Eabsurd
+
+and reg_branch = prog_pattern * expr
+
+and exn_branch = pvsymbol list * expr
 
 and cexp = private {
   c_node : cexp_node;
@@ -165,10 +168,10 @@ and rec_defn = private {
 
 (** {2 Expressions} *)
 
-val e_label : ?loc:Loc.position -> Slab.t -> expr -> expr
-val e_label_push : ?loc:Loc.position -> Slab.t -> expr -> expr
-val e_label_add : label -> expr -> expr
-val e_label_copy : expr -> expr -> expr
+val e_attr_set : ?loc:Loc.position -> Sattr.t -> expr -> expr
+val e_attr_push : ?loc:Loc.position -> Sattr.t -> expr -> expr
+val e_attr_add : attribute -> expr -> expr
+val e_attr_copy : expr -> expr -> expr
 
 (** {2 Definitions} *)
 
@@ -203,7 +206,7 @@ val c_any : cty -> cexp
 
 val e_var : pvsymbol -> expr
 
-val e_const : Number.constant -> ity -> expr
+val e_const : Constant.constant -> ity -> expr
 val e_nat_const : int -> expr
 
 val e_exec : cexp -> expr
@@ -235,9 +238,7 @@ val e_exn : xsymbol -> expr -> expr
 
 val e_raise : xsymbol -> expr -> ity -> expr
 
-val e_try : expr -> case:bool -> (pvsymbol list * expr) Mxs.t -> expr
-
-val e_case : expr -> (prog_pattern * expr) list -> expr
+val e_match : expr -> reg_branch list -> exn_branch Mxs.t -> expr
 
 val e_while : expr -> invariant list -> variant list -> expr -> expr
 
@@ -260,8 +261,6 @@ val e_fold : ('a -> expr -> 'a) -> 'a -> expr -> 'a
 val e_locate_effect : (effect -> bool) -> expr -> Loc.position option
 (** [e_locate_effect pr e] looks for a minimal sub-expression of
     [e] whose effect satisfies [pr] and returns its location *)
-
-val proxy_label : label
 
 val e_rs_subst : rsymbol Mrs.t -> expr -> expr
 val c_rs_subst : rsymbol Mrs.t -> cexp -> cexp

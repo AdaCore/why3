@@ -1,0 +1,77 @@
+
+module Pred
+
+  use Functions.Func
+  use bool.Bool
+
+  predicate predExtensionalEqual (p q:'a -> bool) =
+    forall x:'a. p x <-> q x
+
+  (* Assume extensionality of predicate. *)
+
+  axiom predicateExtensionality [@W:non_conservative_extension:N] :
+    forall p q:'a -> bool. predExtensionalEqual p q -> p = q
+
+  (* Mainly for use in whyml *)
+
+  predicate evalp (p:'a -> bool) (x:'a) = p x
+
+
+  (* Abstraction definition axiom :
+       pupdate (p:'a -> bool) (x:'a) (y:bool) : 'a -> bool =
+         (\ z:'a. if x = z then y = True else p z) *)
+  function pupdate (p:'a -> bool) (x:'a) (y:bool) : 'a -> bool
+  axiom pupdate_def : forall p:'a -> bool,x:'a,y:bool,z:'a.
+    pupdate p x y z <-> if x = z then y = True else p z
+
+  lemma pupdate_eq : forall p:'a -> bool,x:'a,y:bool.
+    pupdate p x y x <-> y = True
+  lemma pupdate_neq : forall p:'a -> bool,x:'a,y:bool,z:'a.
+    x <> z -> pupdate p x y z <-> p z
+
+  (* Abstraction definition axiom :
+       function pcompose (p:'b -> bool) (f:'a -> bool 'b) : 'b -> bool =
+         (\ x:'a. p (f x)) *)
+  function pcompose (p:'b -> bool) (f:'a -> 'b) : 'a -> bool
+  axiom pcompose_def : forall p:'b -> bool,f:'a -> 'b,x:'a.
+    pcompose p f x <-> p (f x)
+
+  let lemma pcompose_associative (p:'c -> bool) (g:'b -> 'c) (f:'a -> 'b) : unit
+    ensures { pcompose (pcompose p g) f = pcompose p (compose g f) }
+  =
+    assert { predExtensionalEqual (pcompose (pcompose p g) f) (pcompose p (compose g f)) }
+
+  let lemma identity_neutral (p:'a -> bool) : unit
+    ensures { pcompose p identity = p }
+  =
+    assert { predExtensionalEqual (pcompose p identity) p }
+
+  (* Abstraction definition axiom :
+     constant pfalse : 'a -> bool = (\z:'a. false) *)
+
+  constant pfalse : 'a -> bool
+  axiom pfalse_def : forall x:'a. not(pfalse x)
+
+  (* Abstraction definition axiom :
+     constant ptrue : 'a -> bool = (\z:'a. true) *)
+  constant ptrue : 'a -> bool
+  axiom ptrue_def : forall x:'a. ptrue x
+
+
+  (*(* Abstraction definition axiom :
+       function const (x:'b) : 'a -> 'b =
+         (\ z:'a.x) *)
+  function const (x: 'b) : 'a -> 'b
+  axiom const_def : forall x:'b,z:'a. const x z = x
+
+  let lemma const_compose_left (f:'a -> 'b) (x:'c) : unit
+    ensures { compose (const x) f = const x }
+  =
+    assert { extensionalEqual (const x) (compose (const x) f) }
+
+  let lemma const_compose_right (f: 'a -> 'b) (x:'a) : unit
+    ensures { compose f (const x) = (const (f x) : 'c -> 'b) }
+  =
+    assert { extensionalEqual (const (f x) : func 'c 'b) (compose f (const x)) }*)
+
+end

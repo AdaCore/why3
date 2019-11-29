@@ -7,10 +7,13 @@ type value =
 let v_label_copy orig v =
   match v with
   | Int _ -> v
-  | Term t -> Term (t_label_copy orig t)
+  | Term t -> Term (t_attr_copy orig t)
 
 let const_of_positive n =
-  t_const (Number.ConstInt Number.{ ic_negative = false; ic_abs = Number.int_const_dec (BigInt.to_string n)}) Ty.ty_int
+  let const = Number.{
+        il_kind = ILitUnk; (* TODO check this *)
+        il_int = n} in
+  t_const (Constant.ConstInt const) Ty.ty_int
 
 let ls_minus = ref ps_equ (* temporary *)
 
@@ -28,7 +31,7 @@ exception NotNum
 
 let big_int_of_const c =
   match c with
-    | Number.ConstInt i -> Number.compute_int_constant i
+    | Constant.ConstInt i -> i.il_int
     | _ -> raise NotNum
 
 let big_int_of_value v =
@@ -392,21 +395,21 @@ let rec reduce engine c =
       match v with
       | Term { t_node = Ttrue } ->
         { value_stack = st ;
-          cont_stack = (Keval(t2,sigma),t_label_copy orig t2)  :: rem }
+          cont_stack = (Keval(t2,sigma),t_attr_copy orig t2)  :: rem }
       | Term { t_node = Tfalse } ->
         { value_stack = st ;
-          cont_stack = (Keval(t3,sigma),t_label_copy orig t3) :: rem }
+          cont_stack = (Keval(t3,sigma),t_attr_copy orig t3) :: rem }
       | Term t1 -> begin
           match t1.t_node , t2.t_node , t3.t_node with
           | Tapp (ls,[b0;{ t_node = Tapp (ls1,_) }]) , Tapp(ls2,_) , Tapp(ls3,_)
             when ls_equal ls ps_equ && ls_equal ls1 fs_bool_true &&
               ls_equal ls2 fs_bool_true && ls_equal ls3 fs_bool_false ->
-            { value_stack = Term (t_label_copy orig b0) :: st;
+            { value_stack = Term (t_attr_copy orig b0) :: st;
               cont_stack = rem }
           | _ ->
             { value_stack =
                 Term
-                  (t_label_copy orig
+                  (t_attr_copy orig
                      (t_if t1 (t_subst sigma t2) (t_subst sigma t3))) :: st;
               cont_stack = rem;
             }
@@ -418,7 +421,7 @@ let rec reduce engine c =
     let t1 = term_of_value t1 in
     { value_stack = st;
       cont_stack =
-        (Keval(t2, Mvs.add v t1 sigma), t_label_copy orig t2) :: rem;
+        (Keval(t2, Mvs.add v t1 sigma), t_attr_copy orig t2) :: rem;
     }
   | [], (Kcase _, _) :: _ -> assert false
   | Int _ :: _, (Kcase _, _) :: _ -> assert false
@@ -427,13 +430,13 @@ let rec reduce engine c =
   | ([] | [_] | Int _ :: _ | Term _ :: Int _ :: _),
     (Kbinop _, _) :: _ -> assert false
   | (Term t1) :: (Term t2) :: st, (Kbinop op, orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_binary_simp op t2 t1)) :: st;
+    { value_stack = Term (t_attr_copy orig (t_binary_simp op t2 t1)) :: st;
       cont_stack = rem;
     }
   | [], (Knot,_) :: _ -> assert false
   | Int _ :: _ , (Knot,_) :: _ -> assert false
   | (Term t) :: st, (Knot, orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_not_simp t)) :: st;
+    { value_stack = Term (t_attr_copy orig (t_not_simp t)) :: st;
       cont_stack = rem;
     }
   | st, (Kapp(ls,ty), orig) :: rem ->
@@ -441,13 +444,13 @@ let rec reduce engine c =
   | [], (Keps _, _) :: _ -> assert false
   | Int _ :: _ , (Keps _, _) :: _ -> assert false
   | Term t :: st, (Keps v, orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_eps_close v t)) :: st;
+    { value_stack = Term (t_attr_copy orig (t_eps_close v t)) :: st;
       cont_stack = rem;
     }
   | [], (Kquant _, _) :: _ -> assert false
   | Int _ :: _, (Kquant _, _) :: _ -> assert false
   | Term t :: st, (Kquant(q,vl,tr), orig) :: rem ->
-    { value_stack = Term (t_label_copy orig (t_quant_close_simp q vl tr t)) :: st;
+    { value_stack = Term (t_attr_copy orig (t_quant_close_simp q vl tr t)) :: st;
       cont_stack = rem;
     }
 
@@ -485,7 +488,7 @@ and reduce_match st u ~orig tbl sigma cont =
         Format.eprintf "@]@.";
 *)
         { value_stack = st;
-          cont_stack = (Keval(t,mv''), t_label_copy orig t) :: cont;
+          cont_stack = (Keval(t,mv''), t_attr_copy orig t) :: cont;
         }
       with NoMatch -> iter rem
   in
@@ -496,19 +499,19 @@ and reduce_match st u ~orig tbl sigma cont =
       | _ -> assert false
     in
     { value_stack =
-        Term (t_label_copy orig (t_case u tbls)) :: st;
+        Term (t_attr_copy orig (t_case u tbls)) :: st;
       cont_stack = cont;
     }
 
 
 and reduce_eval st t ~orig sigma rem =
-  let orig = t_label_copy orig t in
+  let orig = t_attr_copy orig t in
   match t.t_node with
   | Tvar v ->
     begin
       try
         let t = Mvs.find v sigma in
-        { value_stack = Term (t_label_copy orig t) :: st ;
+        { value_stack = Term (t_attr_copy orig t) :: st ;
           cont_stack = rem;
         }
       with Not_found ->
@@ -607,12 +610,12 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
               | rvh::rvt , _ ->
                 let lhs1 , fc2 = remove_var lhs1 rvh rvt in
                 let lhs2 = t_app ls2 [lhs1;arg] lhs.t_ty in
-                t_label_copy lhs lhs2 , fc2
+                t_attr_copy lhs lhs2 , fc2
               | [] , { t_node = Tvar fc1 } when vs_equal fc1 fc ->
                 let fcn = fc.vs_name in
                 let fc2 = Ident.id_derive fcn.Ident.id_string fcn in
                 let fc2 = create_vsymbol fc2 (t_type lhs) in
-                t_label_copy lhs (t_var fc2) , fc2
+                t_attr_copy lhs (t_var fc2) , fc2
               | _ -> raise Undetermined
               end
             | _ -> raise Undetermined
@@ -631,11 +634,11 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
             | _ ->
               let eq = equ lhs body in
               let tq = t_quant Tforall (t_close_quant vl trig eq) in
-              let body = t_label_copy t (t_eps_close fc2 tq) in
+              let body = t_attr_copy t (t_eps_close fc2 tq) in
               { value_stack = rem_st;
                 cont_stack =
                   (Keval(body,Mvs.add vh t2 Mvs.empty),
-                   t_label_copy orig body) :: rem_cont;
+                   t_attr_copy orig body) :: rem_cont;
               }
             end
           | _ -> raise Undetermined
@@ -644,12 +647,12 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
         begin
         match t.t_node with
           | Tapp (ls1,[lhs;body]) when ls_equal ls1 ps_equ ->
-            let equ lhs body = t_label_copy t (t_app ps_equ [lhs;body] None) in
+            let equ lhs body = t_attr_copy t (t_app ps_equ [lhs;body] None) in
             let elim body vh t2 = {
               value_stack = rem_st;
               cont_stack =
                 (Keval(body,Mvs.add vh t2 Mvs.empty),
-                 t_label_copy orig body) :: rem_cont;
+                 t_attr_copy orig body) :: rem_cont;
             } in
             process lhs body equ elim
           | Tbinop (Tiff,
@@ -657,14 +660,14 @@ and reduce_func_app ~orig _ty rem_st t1 t2 rem_cont =
             body)
             when ls_equal ls1 ps_equ && t_equal tr t_bool_true ->
             let equ lhs body =
-              let lhs = t_label_copy teq (t_app ps_equ [lhs;tr] None) in
-              t_label_copy t (t_binary Tiff lhs body) in
+              let lhs = t_attr_copy teq (t_app ps_equ [lhs;tr] None) in
+              t_attr_copy t (t_binary Tiff lhs body) in
             let elim body vh t2 =
               let body = t_if body t_bool_true t_bool_false in
               { value_stack = rem_st;
                 cont_stack =
                 (Keval(body,Mvs.add vh t2 Mvs.empty),
-                t_label_copy orig body) :: rem_cont } in
+                t_attr_copy orig body) :: rem_cont } in
             process lhs body equ elim
           | _ -> raise Undetermined
         end
@@ -731,7 +734,7 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
             }
           with Irreducible ->
             { value_stack =
-                Term (t_label_copy orig (t_app ls args ty)) :: rem_st;
+                Term (t_attr_copy orig (t_app ls args ty)) :: rem_st;
               cont_stack = rem_cont; }
         end in
       match d.Decl.d_node with
@@ -778,7 +781,7 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
                         if ls_equal ls pr
                         then (* projection found! *)
                           { value_stack =
-                              (Term (t_label_copy orig t)) :: rem_st;
+                              (Term (t_attr_copy orig t)) :: rem_st;
                             cont_stack = rem_cont;
                           }
                         else
@@ -801,7 +804,7 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
     match v1,v2 with
     | Int n1, Int n2 ->
       let b = to_bool (BigInt.eq n1 n2) in
-      { value_stack = Term (t_label_copy orig b) :: st;
+      { value_stack = Term (t_attr_copy orig b) :: st;
         cont_stack = cont;
       }
     | Int n, Term {t_node = Tconst c} | Term {t_node = Tconst c}, Int n ->
@@ -809,7 +812,7 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
         try
           let n' = big_int_of_const c in
           let b = to_bool (BigInt.eq n n') in
-          { value_stack = Term (t_label_copy orig b) :: st;
+          { value_stack = Term (t_attr_copy orig b) :: st;
             cont_stack = cont;
           }
         with NotNum -> raise Undetermined
@@ -825,7 +828,7 @@ and reduce_equ (* engine *) ~orig st v1 v2 cont =
 
 and reduce_term_equ ~orig st t1 t2 cont =
   if t_equal t1 t2 then
-    { value_stack = Term (t_label_copy orig t_true) :: st;
+    { value_stack = Term (t_attr_copy orig t_true) :: st;
       cont_stack = cont;
     }
   else
@@ -833,9 +836,9 @@ and reduce_term_equ ~orig st t1 t2 cont =
   | Tconst c1, Tconst c2 ->
     begin
       match c1,c2 with
-      | Number.ConstInt i1, Number.ConstInt i2 ->
-        let b = BigInt.eq (Number.compute_int_constant i1) (Number.compute_int_constant i2) in
-        { value_stack = Term (t_label_copy orig (to_bool b)) :: st;
+      | Constant.ConstInt i1, Constant.ConstInt i2 ->
+        let b = BigInt.eq i1.il_int i2.il_int in
+        { value_stack = Term (t_attr_copy orig (to_bool b)) :: st;
           cont_stack = cont;
         }
       | _ -> raise Undetermined
@@ -861,13 +864,13 @@ and reduce_term_equ ~orig st t1 t2 cont =
         cont_stack = (Keval(t,sigma),orig) :: cont;
       }
     else
-      { value_stack = Term (t_label_copy orig t_false) :: st;
+      { value_stack = Term (t_attr_copy orig t_false) :: st;
         cont_stack = cont;
       }
   | Tif (b,{ t_node = Tapp(ls1,_) },{ t_node = Tapp(ls2,_) }) , Tapp(ls3,_)
     when ls_equal ls3 fs_bool_true && ls_equal ls1 fs_bool_true &&
          ls_equal ls2 fs_bool_false ->
-    { value_stack = Term (t_label_copy orig b) :: st;
+    { value_stack = Term (t_attr_copy orig b) :: st;
       cont_stack = cont }
   | _ -> raise Undetermined
 
@@ -906,7 +909,7 @@ let rec reconstruct c =
         (t_quant_close_simp q vl tr (term_of_value t)), st
     in
     reconstruct {
-      value_stack = (Term (t_label_copy orig t)) :: st;
+      value_stack = (Term (t_attr_copy orig t)) :: st;
       cont_stack = rem;
     }
 

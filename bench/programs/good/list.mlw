@@ -1,8 +1,8 @@
 module M
 
-  use import int.Int
-  use import list.List
-  use import list.Length
+  use int.Int
+  use list.List
+  use list.Length
 
   let rec append (l1 : list 'a) (l2 : list 'a) variant { length l1 }
     ensures { length result = length l1 + length l2 }

@@ -1,99 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../remove_duplicate_hash.mlw" expanded="true">
-<theory name="Spec" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="MutableSet" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="RemoveDuplicate" sum="ac43052c2d1d8df3b56593f4e8f09c8d" expanded="true">
- <goal name="VC remove_duplicate" expl="VC for remove_duplicate" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC remove_duplicate.1" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="remove_duplicate_hash.mlw"/>
+<theory name="RemoveDuplicate" proved="true">
+ <goal name="remove_duplicate&#39;vc" expl="VC for remove_duplicate" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="remove_duplicate&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="11958"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.2" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="remove_duplicate&#39;vc.1" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="7992"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.3" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="56"/></proof>
+  <goal name="remove_duplicate&#39;vc.2" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="350"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.4" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
+  <goal name="remove_duplicate&#39;vc.3" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="7968"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.5" expl="array creation size">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="remove_duplicate&#39;vc.4" expl="array creation size" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="10380"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.6" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="18"/></proof>
+  <goal name="remove_duplicate&#39;vc.5" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="12574"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.7" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
+  <goal name="remove_duplicate&#39;vc.6" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="14079"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.8" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="remove_duplicate&#39;vc.7" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="11681"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.9" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="20"/></proof>
+  <goal name="remove_duplicate&#39;vc.8" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="12017"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.10" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="24"/></proof>
+  <goal name="remove_duplicate&#39;vc.9" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="10344"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.11" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
+  <goal name="remove_duplicate&#39;vc.10" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="8358"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.12" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+  <goal name="remove_duplicate&#39;vc.11" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="8386"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.13" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="remove_duplicate&#39;vc.12" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="8462"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.14" expl="index in array bounds">
-  <proof prover="1"><result status="valid" time="0.01" steps="74"/></proof>
+  <goal name="remove_duplicate&#39;vc.13" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="129"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.15" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="140"/></proof>
+  <goal name="remove_duplicate&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="438"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.16" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.04" steps="222"/></proof>
+  <goal name="remove_duplicate&#39;vc.15" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.12" steps="1221"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.17" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03" steps="100"/></proof>
+  <goal name="remove_duplicate&#39;vc.16" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.12" steps="886"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.18" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="130"/></proof>
+  <goal name="remove_duplicate&#39;vc.17" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="161"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.19" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.02" steps="169"/></proof>
+  <goal name="remove_duplicate&#39;vc.18" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.30" steps="58795"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.20" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="67"/></proof>
+  <goal name="remove_duplicate&#39;vc.19" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.41" steps="91201"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.21" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+  <goal name="remove_duplicate&#39;vc.20" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="11613"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.22" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+  <goal name="remove_duplicate&#39;vc.21" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="8047"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.23" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="remove_duplicate&#39;vc.22" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="9892"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.24" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.00" steps="15"/></proof>
+  <goal name="remove_duplicate&#39;vc.23" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="8764"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.25" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.01" steps="92"/></proof>
+  <goal name="remove_duplicate&#39;vc.24" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.69"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.26" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.02" steps="123"/></proof>
+  <goal name="remove_duplicate&#39;vc.25" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="2.27"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.27" expl="out of loop bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="remove_duplicate&#39;vc.26" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.02" steps="9885"/></proof>
   </goal>
-  <goal name="VC remove_duplicate.28" expl="out of loop bounds">
-  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="remove_duplicate&#39;vc.27" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="16842"/></proof>
   </goal>
  </transf>
  </goal>

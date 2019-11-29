@@ -1,20 +1,20 @@
 
 (* Define a (bare) Hoare-type intuitionnistic logic on games....
    TODO/FIXME: in practice, there does not seem to be a real role
-   for the arrow... *)
+   for the arrow... could simply remove it. *)
 module Fmla
 
-  use import ho_set.Set
-  use import ho_set.SetBigOps
-  use import ho_rel.Rel
-  use import ho_rel.RelSet
-  use import order.Ordered
-  use import order.Chain
-  use import fn.Fun
-  use import fn.Image
-  use import game.Game
-  use import game_simulation.SimDef
-  use import subgame.SubGame
+  use ho_set.Set
+  use ho_set.SetBigOps
+  use ho_rel.Rel
+  use ho_rel.RelSet
+  use order.Ordered
+  use order.Chain
+  use fn.Fun
+  use fn.Image
+  use game.Game
+  use game_simulation.SimDef
+  use subgame.SubGame
 
   (* Game formula: monotonic predicates over games. *)
   type fmla 'a = { interp : set (game 'a) }
@@ -78,9 +78,9 @@ end
 
 module FmlaRules "W:non_conservative_extension:N" (* => FmlaProof *)
 
-  use import ho_set.Set
-  use import ho_rel.Rel
-  use import game.Game
+  use ho_set.Set
+  use ho_rel.Rel
+  use game.Game
   use export Fmla
 
   (* Usual core rules of intuitionnistic logic. *)
@@ -150,14 +150,14 @@ end
 
 module FmlaProof
 
-  use import Fmla
-  use import game.Game
-  use import subgame.SubGame
-  use import game.BasicStrats
-  use import game_no_strat.WinAlt
-  use import ho_set.Set
-  use import order.Ordered
-  use import transfinite.Extension
+  use Fmla
+  use game.Game
+  use subgame.SubGame
+  use game.BasicStrats
+  use game_no_strat.WinAlt
+  use ho_set.Set
+  use order.Ordered
+  use transfinite.Extension
 
   (* Mostly proved in BasicStrats. *)
   lemma enforce_monotonic : forall c,p1 p2 q1 q2:set 'a.
@@ -220,19 +220,19 @@ module FmlaProof
     by forall g. c.interp g -> have_uniform_winning_strat g p q
     by forall y. p y -> have_winning_strat g y q
 
-  use import ho_rel.Prod
-  use import ho_rel.RelSet
-  use import order.Product
-  use import order.Chain
-  use import order.ProductChain
-  use import choice.Choice
-  use import fn.Fun
-  use import fn.Image
-  use import pfn.Pfun
-  use import pfn.SubFunOrder
-  use import order.SubChain
-  use import order.SubFunLimit
-  use import game_simulation.Sim
+  use ho_rel.Prod
+  use ho_rel.RelSet
+  use order.Product
+  use order.Chain
+  use order.ProductChain
+  use choice.Choice
+  use fn.Fun
+  use fn.Image
+  use pfn.Pfun
+  use pfn.SubFunOrder
+  use order.SubChain
+  use order.SubFunLimit
+  use game_simulation.Sim
 
   (* Loop rule: direct consequence of the simulation theorem.
      Source game:
@@ -409,7 +409,7 @@ module FmlaProof
      {P -> Q}, {Q -> R} |- {P -> R}
      Qed.
    *)
-  use import int.Int
+  use int.Int
 
   lemma sequence : forall c,p q r:set 'a.
     holds c (enforce p q) /\ holds c (enforce q r) ->
@@ -434,7 +434,7 @@ module FmlaProof
     so if h 2 then maximum o h 2 else if h 1 then maximum o h 1
       else maximum o h 0
 
-  use import ho_set.SetBigOps
+  use ho_set.SetBigOps
 
   (* Proof of transfinite loop rule: generic derecursification.
      Note that if:

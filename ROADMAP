@@ -109,102 +109,6 @@
 ** preuve sur l'assembleur
 ** support de Yices 2 ? interesserait Cesar
 
-============ Making a release ============
-
-* check the BTS
-* do "make update-coq" and "make", fix Coq realizations if needed
-* check that nightly bench is OK
-* check that "make xml-validate-local" is OK
-  (see below : copy the dtd on the web)
-
-* put 0.86 in file Version, and then run ./config.status
-* check/update the content of the About dialog in src/ide/gconfig.ml
-  around lines 550-600
-* check headers
-* check the file CHANGES, add the release date
-
-* generate documentation
- - update the date in doc/manual.tex (near \whyversion{})
- - check that macro \todo is commented out in doc/macros.tex
- - do "make doc"
-   (check that manual in HTML is also generated, doc/html/index.html)
- - do "make stdlibdoc"
- - do "make apidoc"
-
-* make a last commit:
- - git commit -am "Version 0.86"
- - git tag 0.86
-* do "make dist"
-* test distrib/why3-0.86.tar.gz
-* push the commit:
- - git push
- - git push --tags
-* upload distrib/why3-0.86.tar.gz to https://gforge.inria.fr/frs/?group_id=2990
-
-* upload the documentation on the web page
- - cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-0.86.pdf
- - cp -r doc/html /users/www-perso/projets/why3/doc-0.86
- - cp share/why3session.dtd /users/www-perso/projets/why3/
- - cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-0.86
-   ln -s -n -f stdlib-0.86 /users/www-perso/projets/why3/stdlib
- - cp -r doc/apidoc /users/www-perso/projets/why3/api-0.86
-   ln -s -n -f api-0.86 /users/www-perso/projets/why3/api
-
-* update the main HTML page (sources are in repository why3-www)
- - edit index.html, change at least all occurrences of 0.85 by 0.86, and
-   update the url for download
- - make (to check validity)
- - make export
-
-* add a new version to the bugtracker:
-  https://gforge.inria.fr/tracker/admin/?group_id=2990&atid=10293&add_extrafield=1
-
-* The next commit : add +git to the version in file Version
-
-* prepare the OPAM package
- - update opam/why3-base/url: url and checksum of why-0.86.tar.gz
-   (use "md5sum distrib/why3-0.86.tar.gz")
- - update opam/why3-base/descr and opam/why3/descr if necessary
- - update opam/why3-base/opam with correct dependencies
- - update opam/why3/opam with the dependency on why3-base
- - test with "opam pin add why3 --kind=git .../why3/.git"
-   (it runs "opam install why3")
-
-* upload the OPAM package
- - clone https://github.com/ocaml/opam-repository
-   git clone git@github.com:.../opam-repository.git
-   cd opam-repository/
-   git remote add opam https://github.com/ocaml/opam-repository.git
- - reinitialize the repository if not fresh:
-   git fetch opam
-   git reset --hard opam/master
-   git push
- - cd packages/why3-base; cp -r .../opam/why3-base why3-base.0.86
- - cd packages/why3; cp -r .../opam/why3 why3.0.86
- - commit and push
- - make a pull request on github
-
-* inform Jerry James <loganjerry@gmail.com> so that he can produce the
-  Fedora package
-
-* produce the Why3 part of Toccata gallery
-  - have GALLERYDIR set to the sub-directory gallery/ of the git sources
-    of the Toccata web site, e.g.
-    export GALLERYDIR=/users/vals/filliatr/toccata/web/gallery
-  - in Why3 sources, do "make gallery"; it exports to GALLERYDIR all
-    Why3 programs for which there is a session
-  - now move to the Toccata web site sources, and
-    - update web/gallery/examples.rc to include new examples
-    - "git add" the files for these new examples (those currently untracked
-      in git) or simply remove them if they should not go on-line
-    - do "make" in web/gallery/
-    - do "make install-gallery" in web/
-
-* Once the OPAM package is pulled in the main OPAM repository:
-  announce the distrib
-  What to put in the announcement: see New Features above
-
-
 ==================== Roadmap for next releases ========================
 
 HighOrd: Coq output and OCaml extraction should produce lambda's from lambda's
@@ -216,9 +120,6 @@ and no epsilon
 ** quand une definition logique recursive ne peut pas etre verifiee
    bien-fondee statiquement, generer une obligation de preuve
    (feature wish de F Besson)
-
-* Coq tactic
-** ajout de bases de hint
 
 * replayer
 ** deplacer option -bench dans une commande de why3session

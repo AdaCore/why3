@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Term
 open Ity
@@ -26,17 +26,19 @@ val dity_of_ity : ity -> dity
 
 val dity_int  : dity
 val dity_real : dity
+val dity_str  : dity
 val dity_bool : dity
 val dity_unit : dity
 
 type dvty = dity list * dity (* A -> B -> C == ([A;B],C) *)
+type dref = bool list * bool
 
 (** Patterns *)
 
 type dpattern = private {
   dp_pat  : pre_pattern;
   dp_dity : dity;
-  dp_vars : dity Mstr.t;
+  dp_vars : (dity * bool) Mstr.t;
   dp_loc  : Loc.position option;
 }
 
@@ -54,13 +56,17 @@ type ghost = bool
 
 type dbinder = preid option * ghost * dity
 
+val dummy_var_attr : Ident.attribute
+(* pvsymbols created from dbinders with a None ident are dummy variables,
+   they are decorated with this attribute. *)
+
 (** Specifications *)
 
 exception UnboundLabel of string
 
-val old_mark : string
+val old_label : string
 
-type register_old = pvsymbol -> string -> pvsymbol
+type register_old = string -> pvsymbol -> pvsymbol
   (** Program variables occurring under [old] or [at] are passed to
       a registrar function. The label string must be ["'Old"] for [old]. *)
 
@@ -76,6 +82,7 @@ type dspec_final = {
   ds_reads   : pvsymbol list;
   ds_writes  : term list;
   ds_diverge : bool;
+  ds_partial : bool;
   ds_checkrw : bool;
 }
 
@@ -100,9 +107,9 @@ type dexpr = private {
 }
 
 and dexpr_node =
-  | DEvar of string * dvty
+  | DEvar of string * dvty * dref
   | DEsym of prog_symbol
-  | DEconst of Number.constant * dity
+  | DEconst of Constant.constant * dity
   | DEapp of dexpr * dexpr
   | DEfun of dbinder list * dity * mask * dspec later * dexpr
   | DEany of dbinder list * dity * mask * dspec later
@@ -112,27 +119,30 @@ and dexpr_node =
   | DEand of dexpr * dexpr
   | DEor of dexpr * dexpr
   | DEif of dexpr * dexpr * dexpr
-  | DEcase of dexpr * (dpattern * dexpr) list
+  | DEmatch of dexpr * dreg_branch list * dexn_branch list
   | DEassign of (dexpr * rsymbol * dexpr) list
   | DEwhile of dexpr * dinvariant later * variant list later * dexpr
   | DEfor of preid * dexpr * for_direction * dexpr * dinvariant later * dexpr
-  | DEtry of dexpr * bool * (dxsymbol * dpattern * dexpr) list
   | DEraise of dxsymbol * dexpr
   | DEghost of dexpr
   | DEexn of preid * dity * mask * dexpr
   | DEoptexn of preid * dity * mask * dexpr
   | DEassert of assertion_kind * term later
   | DEpure of term later * dity
-  | DEvar_pure of string * dvty
+  | DEvar_pure of string * dvty * dref
   | DEls_pure of lsymbol * bool
   | DEpv_pure of pvsymbol
   | DEabsurd
   | DEtrue
   | DEfalse
+  | DElabel of preid * dexpr
   | DEcast of dexpr * dity
-  | DEmark of preid * dexpr
   | DEuloc of dexpr * Loc.position
-  | DElabel of dexpr * Slab.t
+  | DEattr of dexpr * Sattr.t
+
+and dreg_branch = dpattern * dexpr
+
+and dexn_branch = dxsymbol * dpattern * dexpr
 
 and dlet_defn = preid * ghost * rs_kind * dexpr
 
@@ -153,7 +163,9 @@ val denv_add_let : denv -> dlet_defn -> denv
 
 val denv_add_args : denv -> dbinder list -> denv
 
-val denv_add_pat : denv -> dpattern -> denv
+val denv_add_pat : denv -> dpattern -> dity -> denv
+val denv_add_expr_pat : denv -> dpattern -> dexpr -> denv
+val denv_add_exn_pat : denv -> dpattern -> dxsymbol -> denv
 
 val denv_add_for_index : denv -> preid -> dvty -> denv
 
@@ -183,9 +195,12 @@ type pre_fun_defn = preid * ghost * rs_kind * dbinder list *
 
 val drec_defn : denv -> pre_fun_defn list -> denv * drec_defn
 
+val undereference : dexpr -> dexpr
+  (* raises Not_found if the argument is not auto-dereferenced *)
+
 (** Final stage *)
 
-val expr : ?keep_loc:bool -> dexpr -> expr
+val expr : ?keep_loc:bool -> ?ughost:bool -> dexpr -> expr
 
 val let_defn : ?keep_loc:bool -> dlet_defn -> let_defn
 val rec_defn : ?keep_loc:bool -> drec_defn -> let_defn

@@ -1,0 +1,39 @@
+
+module Test
+
+use int.Int
+use ref.Ref
+
+val x : ref int
+
+let f (_a : int) : int
+  ensures { result  = 0}
+=
+  x := 42;
+  !x
+
+let f2 (_a : int) : int
+  ensures { result  = 0}
+=
+  x := 42;
+  !x
+
+let f3 (a : int) : int
+  ensures { result  = 0}
+=
+  (if a = 0 then
+    x.contents <- 42
+  else
+    x := 18);
+  !x
+
+let f4 (a : int) : int
+  ensures { result  = 0}
+=
+  (if a = 0 then
+    (x.contents <- 42; assert{ !x = 13})
+  else
+    (x := 18; assert { !x = 18}) );
+  17
+
+end

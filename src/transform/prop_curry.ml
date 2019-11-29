@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,7 +18,7 @@ let rec curry t = match t.t_node with
 
 and expand orig l r = match l.t_node with
   | Tbinop (Tand, a, b) -> expand orig a (expand orig b r)
-  | _  -> t_label_copy orig (t_implies (curry l) r)
+  | _  -> t_attr_copy orig (t_implies (curry l) r)
 
 let curry = Trans.goal (fun pr t -> [create_prop_decl Pgoal pr (curry t)])
 

@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../fib_memo.mlw" expanded="true">
-<theory name="FibMemo" sum="220b87f46388c193b9cb37190ebd604c" expanded="true">
- <goal name="VC fibo" expl="VC for fibo" expanded="true">
- <proof prover="1"><result status="valid" time="0.01" steps="30"/></proof>
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="fib_memo.mlw"/>
+<theory name="FibMemo" proved="true">
+ <goal name="fibo&#39;vc" expl="VC for fibo" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="30"/></proof>
  </goal>
- <goal name="VC memo_fibo" expl="VC for memo_fibo" expanded="true">
- <proof prover="1"><result status="valid" time="0.01" steps="29"/></proof>
+ <goal name="memo_fibo&#39;vc" expl="VC for memo_fibo" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="29"/></proof>
  </goal>
 </theory>
 </file>

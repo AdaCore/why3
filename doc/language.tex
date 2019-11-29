@@ -178,7 +178,7 @@ In the following, strings are referred to with the non-terminal
 uppercase identifiers and, similarly, lowercase and uppercase
 qualified identifiers.
 
-\begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/qualid_bnf.tex}}\end{center}
 
 \paragraph{Constants.}
 The syntax for constants is given in Figure~\ref{fig:bnf:constant}.
@@ -187,7 +187,7 @@ Integer constants may be given in base 16, 10, 8 or 2.
 Real constants may be given in base 16 or 10.
 
 \begin{figure}
-\begin{center}\framebox{\input{./constant_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/constant_bnf.tex}}\end{center}
   \caption{Syntax for constants.}
 \label{fig:bnf:constant}
 \end{figure}
@@ -195,7 +195,7 @@ Real constants may be given in base 16 or 10.
 \paragraph{Operators.}
 Prefix and infix operators are built from characters organized in four
 categories (\textsl{op-char-1} to \textsl{op-char-4}).
-\begin{center}\framebox{\input{./operator_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/operator_bnf.tex}}\end{center}
 Infix operators are classified into 4 categories, according to the
 characters they are built from:
 \begin{itemize}
@@ -211,7 +211,7 @@ characters they are built from:
 
 \paragraph{Labels.} Identifiers, terms, formulas, program expressions
 can all be labeled, either with a string, or with a location tag.
-\begin{center}\framebox{\input{./label_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/label_bnf.tex}}\end{center}
 A location tag consists of a file name, a line number, and starting
 and ending characters.
 

@@ -9,7 +9,7 @@
 <prover id="4" name="Z3" version="4.3.2" timelimit="60" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
 <file name="../sudoku_reloaded.mlw">
-<theory name="Grid" sum="328980bca6907861757055864cfa29a1">
+<theory name="Grid">
  <goal name="grid_eq_sub">
  <proof prover="5"><result status="valid" time="0.03" steps="14"/></proof>
  </goal>
@@ -20,9 +20,9 @@
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>
 </theory>
-<theory name="TheClassicalSudokuGrid" sum="5b3bced86a36ca4a1d9a35b676b3eb00">
+<theory name="TheClassicalSudokuGrid">
  <goal name="WP_parameter classical_sudoku" expl="VC for classical_sudoku">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter classical_sudoku.1" expl="1. integer overflow">
   <proof prover="2"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -1130,7 +1130,7 @@
   <goal name="WP_parameter classical_sudoku.369" expl="369. postcondition">
   <transf name="inline_goal">
    <goal name="WP_parameter classical_sudoku.369.1" expl="1. postcondition">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter classical_sudoku.369.1.1" expl="1.">
     <proof prover="2" timelimit="20"><result status="valid" time="2.77"/></proof>
     </goal>
@@ -1156,9 +1156,9 @@
  </transf>
  </goal>
 </theory>
-<theory name="Solver" sum="90a5cba0dfc2acb64daf0916e73db25b">
+<theory name="Solver">
  <goal name="WP_parameter check_valid_chunk" expl="VC for check_valid_chunk">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter check_valid_chunk.1" expl="1. integer overflow">
   <proof prover="5"><result status="valid" time="0.03" steps="13"/></proof>
   </goal>
@@ -1277,7 +1277,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter check_valid" expl="VC for check_valid">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter check_valid.1" expl="1. integer overflow">
   <proof prover="5"><result status="valid" time="0.05" steps="14"/></proof>
   </goal>
@@ -1371,7 +1371,7 @@
  <proof prover="1"><result status="valid" time="8.38"/></proof>
  </goal>
  <goal name="WP_parameter valid_chunk_eq" expl="VC for valid_chunk_eq">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter valid_chunk_eq.1" expl="1. postcondition">
   <transf name="inline_goal">
    <goal name="WP_parameter valid_chunk_eq.1.1" expl="1. postcondition">
@@ -1387,9 +1387,9 @@
  <goal name="WP_parameter valid_up_to_eq" expl="VC for valid_up_to_eq">
  <transf name="inline_goal">
   <goal name="WP_parameter valid_up_to_eq.1" expl="1.">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter valid_up_to_eq.1.1" expl="1. postcondition">
-   <transf name="split_goal_wp">
+   <transf name="split_goal_right">
     <goal name="WP_parameter valid_up_to_eq.1.1.1" expl="1. postcondition">
     <proof prover="2" timelimit="20"><result status="valid" time="0.33"/></proof>
     </goal>
@@ -1406,7 +1406,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter solve_aux" expl="VC for solve_aux">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter solve_aux.1" expl="1. integer overflow">
   <proof prover="5"><result status="valid" time="0.04" steps="18"/></proof>
   </goal>
@@ -1567,7 +1567,7 @@
   <proof prover="5"><result status="valid" time="0.05" steps="56"/></proof>
   </goal>
   <goal name="WP_parameter solve_aux.54" expl="54. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="WP_parameter solve_aux.54.1" expl="1. assertion">
    <proof prover="1" timelimit="5"><result status="valid" time="0.19"/></proof>
    <proof prover="2"><result status="valid" time="0.07"/></proof>
@@ -1754,7 +1754,7 @@
  <proof prover="5"><result status="valid" time="0.13" steps="92"/></proof>
  </goal>
 </theory>
-<theory name="Test" sum="7db7aec6ae7938923728c6990a431933">
+<theory name="Test">
  <goal name="WP_parameter test0" expl="VC for test0">
  <proof prover="2"><result status="valid" time="0.08"/></proof>
  </goal>

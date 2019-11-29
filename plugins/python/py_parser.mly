@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -19,7 +19,7 @@
     | _ -> raise exn)
 
   let floc s e = Loc.extract (s,e)
-  let mk_id id s e = { id_str = id; id_lab = []; id_loc = floc s e }
+  let mk_id id s e = { id_str = id; id_ats = []; id_loc = floc s e }
   let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
   let mk_term d s e = { term_desc = d; term_loc = floc s e }
   let mk_expr loc d = { expr_desc = d; expr_loc = loc }
@@ -31,17 +31,14 @@
     | _, ({term_loc = loc},_)::_ -> Loc.errorm ~loc
         "multiple `variant' clauses are not allowed"
 
-  let infix  s = "infix "  ^ s
-  let prefix s = "prefix " ^ s
-  let mixfix s = "mixfix " ^ s
-
-  let get_op s e = Qident (mk_id (mixfix "[]") s e)
-  let set_op s e = Qident (mk_id (mixfix "[<-]") s e)
+  let get_op s e = Qident (mk_id (Ident.op_get "") s e)
+  let upd_op s e = Qident (mk_id (Ident.op_update "") s e)
 
   let empty_spec = {
-    sp_pre     = [];    sp_post    = [];  sp_xpost   = [];
-    sp_reads   = [];    sp_writes  = [];  sp_variant = [];
-    sp_checkrw = false; sp_diverge = false;
+    sp_pre     = [];    sp_post    = [];  sp_xpost  = [];
+    sp_reads   = [];    sp_writes  = [];  sp_alias  = [];
+    sp_variant = [];
+    sp_checkrw = false; sp_diverge = false; sp_partial = false;
   }
 
   let spec_union s1 s2 = {
@@ -50,9 +47,11 @@
     sp_xpost   = s1.sp_xpost @ s2.sp_xpost;
     sp_reads   = s1.sp_reads @ s2.sp_reads;
     sp_writes  = s1.sp_writes @ s2.sp_writes;
+    sp_alias   = s1.sp_alias @ s2.sp_alias;
     sp_variant = variant_union s1.sp_variant s2.sp_variant;
     sp_checkrw = s1.sp_checkrw || s2.sp_checkrw;
     sp_diverge = s1.sp_diverge || s2.sp_diverge;
+    sp_partial = s1.sp_partial || s2.sp_partial;
   }
 
 %}
@@ -69,7 +68,7 @@
 (* annotations *)
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
 %token FUNCTION PREDICATE
-%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET
+%token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET OLD AT
 
 (* precedences *)
 
@@ -86,6 +85,10 @@
 %nonassoc LEFTSQ
 
 %start file
+(* Transformations entries *)
+%start <Why3.Ptree.term> term_eof
+%start <Why3.Ptree.term list> term_comma_list_eof
+%start <Why3.Ptree.ident list> ident_comma_list_eof
 
 %type <Py_ast.file> file
 %type <Py_ast.decl> stmt
@@ -136,7 +139,7 @@ single_spec:
 ensures:
 | term
     { let id = mk_id "result" $startpos $endpos in
-      [mk_pat (Pvar (id, false)) $startpos $endpos, $1] }
+      [mk_pat (Pvar id) $startpos $endpos, $1] }
 
 expr:
 | d = expr_desc
@@ -281,6 +284,10 @@ term_:
       | d -> d }
 | NOT term
     { Tnot $2 }
+| OLD LEFTPAR t=term RIGHTPAR
+    { Tat (t, mk_id Dexpr.old_label $startpos($1) $endpos($1)) }
+| AT LEFTPAR t=term COMMA l=ident RIGHTPAR
+    { Tat (t, l) }
 | o = prefix_op ; t = term %prec prec_prefix_op
     { Tidapp (Qident o, [t]) }
 | l = term ; o = bin_op ; r = term
@@ -307,7 +314,7 @@ term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
 | ident       { Tident (Qident $1) }
-| INTEGER     { Tconst (Number.(ConstInt { ic_negative = false ; ic_abs = int_const_dec $1})) }
+| INTEGER     { Tconst (Constant.ConstInt Number.(int_literal ILitDec ~neg:false $1)) }
 | NONE        { Ttuple [] }
 | TRUE        { Ttrue }
 | FALSE       { Tfalse }
@@ -318,7 +325,7 @@ term_sub_:
 | term_arg LEFTSQ term RIGHTSQ
     { Tidapp (get_op $startpos($2) $endpos($2), [$1;$3]) }
 | term_arg LEFTSQ term LARROW term RIGHTSQ
-    { Tidapp (set_op $startpos($2) $endpos($2), [$1;$3;$5]) }
+    { Tidapp (upd_op $startpos($2) $endpos($2), [$1;$3;$5]) }
 
 %inline bin_op:
 | ARROW   { Dterm.DTimplies }
@@ -335,17 +342,32 @@ term_sub_:
           | Bgt  -> ">"
           | Bge  -> ">="
           | Badd|Bsub|Bmul|Bdiv|Bmod|Band|Bor -> assert false in
-           mk_id (infix op) $startpos $endpos }
+           mk_id (Ident.op_infix op) $startpos $endpos }
 
 %inline prefix_op:
-| MINUS { mk_id (prefix "-")  $startpos $endpos }
+| MINUS { mk_id (Ident.op_prefix "-")  $startpos $endpos }
 
 %inline infix_op_234:
-| DIV    { mk_id "div" $startpos $endpos }
-| MOD    { mk_id "mod" $startpos $endpos }
-| PLUS   { mk_id (infix "+") $startpos $endpos }
-| MINUS  { mk_id (infix "-") $startpos $endpos }
-| TIMES  { mk_id (infix "*") $startpos $endpos }
+| DIV    { mk_id (Ident.op_infix "//") $startpos $endpos }
+| MOD    { mk_id (Ident.op_infix "%") $startpos $endpos }
+| PLUS   { mk_id (Ident.op_infix "+") $startpos $endpos }
+| MINUS  { mk_id (Ident.op_infix "-") $startpos $endpos }
+| TIMES  { mk_id (Ident.op_infix "*") $startpos $endpos }
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }
+
+(* Parsing of a list of qualified identifiers for the ITP *)
+
+(* parsing of a single term *)
+
+term_eof:
+| term EOF { $1 }
+
+ident_comma_list_eof:
+| comma_list1(ident) EOF { $1 }
+
+term_comma_list_eof:
+| comma_list1(term) EOF { $1 }
+(* we use single_term to avoid conflict with tuples, that
+   do not need parentheses *)

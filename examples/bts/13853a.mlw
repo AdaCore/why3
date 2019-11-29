@@ -13,7 +13,7 @@ module T
 
  exception MyExc
 
- let rec f (a:t) : t raises { MyExc } = raise MyExc
+ let rec f (_a:t) : t raises { MyExc } = raise MyExc
  with g (a:t) : t = try (f a) with MyExc -> a end
 
 end

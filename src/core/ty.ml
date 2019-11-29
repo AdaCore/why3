@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 
 (** Types *)
@@ -18,7 +18,7 @@ type tvsymbol = {
   tv_name : ident;
 }
 
-module Tvar = Stdlib.MakeMSHW (struct
+module Tvar = MakeMSHW (struct
   type t = tvsymbol
   let tag tv = tv.tv_name.id_tag
 end)
@@ -63,7 +63,7 @@ and ty_node =
   | Tyvar of tvsymbol
   | Tyapp of tysymbol * ty list
 
-module Tsym = Stdlib.MakeMSHW (struct
+module Tsym = MakeMSHW (struct
   type t = tysymbol
   let tag ts = ts.ts_name.id_tag
 end)
@@ -191,7 +191,7 @@ let create_tysymbol name args def =
         ignore (ty_v_all check def)
     | Range ir ->
         if args <> [] then raise IllegalTypeParameters;
-        if BigInt.lt ir.Number.ir_upper_val ir.Number.ir_lower_val
+        if BigInt.lt ir.Number.ir_upper ir.Number.ir_lower
         then raise EmptyRange
     | Float fp ->
         if args <> [] then raise IllegalTypeParameters;
@@ -256,18 +256,21 @@ let ty_match s ty1 ty2 =
 
 (* built-in symbols *)
 
-let ts_int  = create_tysymbol (id_fresh "int")  [] NoDef
-let ts_real = create_tysymbol (id_fresh "real") [] NoDef
-let ts_bool = create_tysymbol (id_fresh "bool") [] NoDef
+let ts_int  = create_tysymbol (id_fresh "int")    [] NoDef
+let ts_real = create_tysymbol (id_fresh "real")   [] NoDef
+let ts_bool = create_tysymbol (id_fresh "bool")   [] NoDef
+let ts_str  = create_tysymbol (id_fresh "string") [] NoDef
 
 let ty_int  = ty_app ts_int  []
 let ty_real = ty_app ts_real []
 let ty_bool = ty_app ts_bool []
+let ty_str  = ty_app ts_str  []
 
 let ts_func =
   let tv_a = create_tvsymbol (id_fresh "a") in
   let tv_b = create_tvsymbol (id_fresh "b") in
-  create_tysymbol (id_fresh "infix ->") [tv_a;tv_b] NoDef
+  let id = id_fresh (op_infix "->") in
+  create_tysymbol id [tv_a;tv_b] NoDef
 
 let ty_func ty_a ty_b = ty_app ts_func [ty_a;ty_b]
 

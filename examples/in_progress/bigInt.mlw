@@ -4,13 +4,13 @@
 
 module N
 
-  use import map.Map
-  use import mach.int.Int31
-  use import mach.array.Array31
-  use import ref.Ref
+  use map.Map
+  use mach.int.Int31
+  use mach.array.Array31
+  use ref.Ref
 
-  use import int.Int
-  use import int.Power
+  use int.Int
+  use int.Power
 
 (** {2 data type for unbound integers and invariants} *)
 
@@ -136,7 +136,7 @@ module N
     ensures { value result = to_int n }
   = let zero = of_int 0 in
     let a =
-      if Int31.eq n zero then
+      if n = zero then
         Array31.make zero zero
       else
         Array31.make (of_int 1) n
@@ -231,7 +231,7 @@ module N
   let eq (x y:t) : bool
     requires { ok x /\ ok y }
     ensures  { if result then value x = value y else value x <> value y }
-  = Int31.eq (compare_array x.digits y.digits) (of_int 0)
+  = compare_array x.digits y.digits = of_int 0
 
 (** {2 arithmetic operations} *)
 
@@ -277,7 +277,7 @@ module N
       if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
-      if Int31.ne arr[!i] zero then non_null_idx := !i;
+      if arr[!i] <> zero then non_null_idx := !i;
       assert {
         MapEq.map_eq_sub arr.elts (arr at L).elts 0 (to_int !i) };
       assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
@@ -305,7 +305,7 @@ module N
       if Int31.(>=) sum base31
         then begin arr[!i] <- Int31.(-) sum base31; carry := one end
         else begin arr[!i] <- sum; carry := zero end;
-      if Int31.ne arr[!i] zero then non_null_idx := !i;
+      if arr[!i] <> zero then non_null_idx := !i;
       assert {
         MapEq.map_eq_sub arr.elts (arr at L).elts 0 (to_int !i) };
       assert { value_sub arr.elts 0 (to_int !i) (to_int h + 1) =
@@ -324,7 +324,7 @@ module N
      ensures { to_int !non_null_idx >= 0 -> to_int arr[to_int !non_null_idx] <> 0 }
      ensures {
         forall j. to_int !non_null_idx < j <= to_int !i -> to_int arr[j] = 0 }
-     (if Int31.ne arr[!i] zero then non_null_idx := !i)
+     (if arr[!i] <> zero then non_null_idx := !i)
     end;
     let len = Int31.(+) !non_null_idx one in
     assert { value_sub arr.elts 0 (to_int !i + 1) (to_int h + 1) =
@@ -445,13 +445,13 @@ end
 
 module Z
 
-  use import map.Map
-  use import mach.int.Int31
-  use import mach.array.Array31
-  use import ref.Ref
+  use map.Map
+  use mach.int.Int31
+  use mach.array.Array31
+  use ref.Ref
 
-  use import int.Int
-  use import int.Power
+  use int.Int
+  use int.Power
   let constant base : int = 32768
   let constant max_digit : int = 16384
   let constant min_digit : int = -16384

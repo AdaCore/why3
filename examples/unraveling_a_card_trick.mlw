@@ -11,12 +11,12 @@
 theory GilbreathCardTrickPure
 
   use export int.Int
-  use import option.Option
+  use option.Option
   use export list.List
   use export list.Length
   use export list.Append
   use export list.Reverse
-  use import list.Nth
+  use list.Nth
 
   constant m: int
   axiom m_positive: 0 < m
@@ -67,8 +67,8 @@ end
 (* a program implementing the card trick using stacks *)
 module GilbreathCardTrick
 
-  use import GilbreathCardTrickPure
-  use import stack.Stack
+  use GilbreathCardTrickPure
+  use stack.Stack
 
   let shuffle (a b: t int)
     ensures { a.elts = Nil /\ b.elts = Nil /\

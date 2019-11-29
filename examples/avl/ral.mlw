@@ -7,13 +7,13 @@ module RAL
 
   (** {2 Instantiation of the AVL tree module} *)
 
-  use import int.Int
+  use int.Int
   use import mach.peano.Peano as I
-  use import seq.Seq
-  use import seq.FreeMonoid
-  use import option.Option
-  use import avl.SelectionTypes
-  use import ref.Ref
+  use seq.Seq
+  use seq.FreeMonoid
+  use option.Option
+  use avl.SelectionTypes
+  use ref.Ref
 
   (** Remaining parameters. A fully concrete implementation would
       have to provide an explicit positive integer. *)
@@ -61,7 +61,7 @@ module RAL
   predicate selection_possible (s:selector) (l:seq 'a) =
     0 <= s.index && (if s.hole then s.index <= length l else s.index < length l)
 
-  (** Selection predicate: We are exactly at the [index]-th position of the
+  (** Selection predicate: We are exactly at the `index`-th position of the
      rebuild sequence, and there is an element in the middle iff we are
      not trying to select a hole. *)
   predicate selected (s:selector) (e:split 'a) =
@@ -75,11 +75,11 @@ module RAL
     returns { Here -> let e2 = { left = lseq;
         middle = Some d;
         right = rseq } in selected s e2
-      | Left sl -> selection_possible sl lseq /\
-        forall e. selected sl e /\ rebuild e = lseq ->
+      | Left rsl -> selection_possible rsl lseq /\
+        forall e. selected rsl e /\ rebuild e = lseq ->
           selected s (right_extend e d rseq)
-      | Right sr -> selection_possible sr rseq /\
-        forall e. selected sr e /\ rebuild e = rseq ->
+      | Right rsr -> selection_possible rsr rseq /\
+        forall e. selected rsr e /\ rebuild e = rseq ->
           selected s (left_extend lseq d e) }
   = let ind = s.index in
     if ind > sl
@@ -276,4 +276,3 @@ module RAL
     check { a[1] = 2 }
 
 end
-

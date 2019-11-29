@@ -25,7 +25,7 @@
  <proof prover="5"><result status="valid" time="0.90"/></proof>
  </goal>
  <goal name="VC f" expl="VC for f">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC f.1" expl="1. assertion">
   <proof prover="1"><result status="valid" time="0.02"/></proof>
   <proof prover="2"><result status="valid" time="0.00" steps="5"/></proof>
@@ -66,7 +66,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="10"/></proof>
   </goal>
   <goal name="VC f.10" expl="10. assertion">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC f.10.1" expl="1. VC for f">
    <proof prover="1"><result status="valid" time="0.04"/></proof>
    <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,11 +17,6 @@
   open Lexing
   open Why3
 
-  let newline lexbuf =
-    let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <-
-      { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
-
   let backtrack lexbuf =
     lexbuf.lex_curr_pos <- lexbuf.lex_start_pos;
     lexbuf.lex_curr_p <- lexbuf.lex_start_p
@@ -31,50 +26,54 @@
     List.iter (fun s -> Hashtbl.add ht s ()) l;
     Hashtbl.mem ht
 
-  let is_keyword1 = make_table [ "as"; "axiom"; "clone"; "coinductive";
-    "constant"; "else"; "end"; "epsilon"; "exists"; "export"; "false";
-    "forall"; "function"; "goal"; "if"; "import"; "in"; "inductive";
-    "lemma"; "let"; "match"; "meta"; "not"; "predicate"; "prop";
-    "scope"; "then"; "theory"; "true"; "type"; "use"; "with";
-    (* programs *) "abstract"; "any";
-    "begin"; "do"; "done"; "downto"; "exception";
-    "for"; "fun"; "ghost"; "loop"; "model"; "module";
-    "mutable"; "private"; "raise"; "rec";
+  (* keep synchronized with src/trywhy3/mode-why3.js *)
+  let is_keyword1 = make_table [ "as"; "axiom"; "by";
+    "clone"; "coinductive"; "constant";
+    "else"; "end"; "epsilon"; "exists"; "export";
+    "false"; "float"; "forall"; "function";
+    "goal"; "if"; "import"; "in"; "inductive";
+    "lemma"; "let"; "match"; "meta"; "not"; "predicate";
+    "range"; "scope"; "so"; "then"; "theory"; "true"; "type"; "use"; "with";
+    (* programs *) "abstract"; "any"; "at";
+    "begin"; "break"; "continue"; "do"; "done"; "downto"; "exception";
+    "for"; "fun"; "ghost"; "label"; "module"; "mutable";
+    "old"; "private"; "pure"; "raise"; "rec"; "ref"; "return";
     "to"; "try"; "val"; "while"; ]
 
-  let is_keyword2 = make_table [ "absurd"; "assert"; "assume";
-    "ensures"; "check"; "invariant"; "raises"; "reads"; "requires";
-    "returns"; "variant"; "writes"; "diverges"; ]
+  let is_keyword2 = make_table [ "absurd"; "alias"; "assert"; "assume";
+    "check"; "diverges"; "ensures"; "invariant";
+    "raises"; "reads"; "requires"; "returns"; "variant"; "writes"; ]
 
   let get_loc lb =
     Loc.extract (Lexing.lexeme_start_p lb, Lexing.lexeme_end_p lb)
 
-  let current_file = ref ""
-
-  let print_ident fmt lexbuf s =
+  let print_ident ?(parentheses=false) fmt lexbuf s =
     if is_keyword1 s then
       fprintf fmt "<span class=\"keyword1\">%s</span>" s
     else if is_keyword2 s then
       fprintf fmt "<span class=\"keyword2\">%s</span>" s
     else begin
-      let (* f,l,c as *) loc = get_loc lexbuf in
-      (* Format.eprintf "  IDENT %s/%d/%d@." f l c; *)
-      (* is this a def point? *)
+      let loc =
+        let loc = get_loc lexbuf in
+        if parentheses then
+          let (f,l,s,e) = Loc.get loc in
+          Loc.user_position f l (s + 1) (e - 1)
+        else loc in
       try
-        let id, def = Glob.find loc in
+        let id, def, kind = Glob.find loc in
         match id.Ident.id_loc with
         | None -> raise Not_found
         | Some _ ->
           match def with
           | Glob.Def ->
             fprintf fmt "<a name=\"%a\">%a</a>"
-              Doc_def.pp_anchor id Pp.html_string s
+              (Doc_def.pp_anchor ~kind) id Pp.html_string s
           | Glob.Use ->
             fprintf fmt "<a href=\"%a\">%a</a>"
-              Doc_def.pp_locate id Pp.html_string s
+              (Doc_def.pp_locate ~kind) id Pp.html_string s
       with Not_found ->
         (* otherwise, just print it *)
-        pp_print_string fmt s
+        Pp.html_string fmt s
     end
 
 }
@@ -105,8 +104,9 @@ let ident = ['A'-'Z' 'a'-'z' '_'] ['A'-'Z' 'a'-'z' '0'-'9' '_']* | operator
 let special = ['\'' '"' '<' '>' '&']
 
 rule scan fmt empty delayed = parse
-  | "(*)" as s
-          { pp_print_string fmt s;
+  | "(*)" { pp_print_char fmt '(';
+            print_ident ~parentheses:true fmt lexbuf "*";
+            pp_print_char fmt ')';
             scan fmt false delayed lexbuf }
   | space* "(***"
           { comment fmt false lexbuf;
@@ -125,13 +125,14 @@ rule scan fmt empty delayed = parse
             comment fmt true lexbuf;
             pp_print_string fmt "</span>";
             scan fmt false delayed lexbuf }
-  | eof   { if delayed <> "" then
-              fprintf fmt "</pre>\n<div class=\"info\">%s</div>" delayed }
+  | eof   { pp_print_string fmt "</pre>\n";
+            if delayed <> "" then
+              fprintf fmt "<div class=\"info\">%s</div>" delayed }
   | ident as s
           { print_ident fmt lexbuf s;
             scan fmt false delayed lexbuf }
   | space* '\n'
-          { newline lexbuf;
+          { new_line lexbuf;
             match empty, delayed with
             | false, d ->
               pp_print_char fmt '\n';
@@ -155,13 +156,12 @@ and scan_isolated fmt empty in_pre delayed = parse
           { comment fmt false lexbuf;
             scan_isolated fmt empty in_pre delayed lexbuf }
   | space* "(**"
-          { doc str_formatter false [] lexbuf;
-            let d = delayed ^ flush_str_formatter () in
+          { let d = asprintf "%s%a" delayed (fun fmt -> doc fmt false []) lexbuf in
             scan_isolated fmt false in_pre d lexbuf }
   | eof   { if in_pre then pp_print_string fmt "</pre>\n";
             if delayed <> "" then pp_print_string fmt delayed }
   | space* '\n'
-          { newline lexbuf;
+          { new_line lexbuf;
             match empty, delayed with
             | false, d | true, ("" as d) ->
               scan_isolated fmt true in_pre d lexbuf
@@ -172,27 +172,27 @@ and scan_isolated fmt empty in_pre delayed = parse
   | ""    { if not in_pre then pp_print_string fmt "<pre>";
             scan fmt empty delayed lexbuf }
 
-and scan_embedded fmt depth = parse
-  | '['   { pp_print_char fmt '[';
-            scan_embedded fmt (depth + 1) lexbuf }
-  | ']'   { if depth > 0 then begin
-              pp_print_char fmt ']';
-              scan_embedded fmt (depth - 1) lexbuf
+and scan_embedded fmt ldelim = parse
+  | ' '* ('`' '`'* as delim) as s
+          { if String.length delim <> ldelim then begin
+              pp_print_string fmt s;
+              scan_embedded fmt ldelim lexbuf
             end }
   | "*)"  { backtrack lexbuf }
   | eof   { () }
   | ident as s
           { print_ident fmt lexbuf s;
-            scan_embedded fmt depth lexbuf }
-  | "\n"   { newline lexbuf;
-             pp_print_char fmt '\n';
-             scan_embedded fmt depth lexbuf }
-  | '"'    { pp_print_string fmt "&quot;";
-             string fmt true lexbuf;
-             scan_embedded fmt depth lexbuf }
+            scan_embedded fmt ldelim lexbuf }
+  | "\n"  { new_line lexbuf;
+            pp_print_char fmt '\n';
+            scan_embedded fmt ldelim lexbuf }
+  | '"'   { pp_print_string fmt "&quot;";
+            string fmt true lexbuf;
+            scan_embedded fmt ldelim lexbuf }
   | "'\"'"
-  | _ as s { pp_print_string fmt s;
-             scan_embedded fmt depth lexbuf }
+  | _ as s
+          { pp_print_string fmt s;
+            scan_embedded fmt ldelim lexbuf }
 
 and comment fmt do_output = parse
   | "(*"   { if do_output then pp_print_string fmt "(*";
@@ -200,7 +200,7 @@ and comment fmt do_output = parse
              comment fmt do_output lexbuf }
   | "*)"   { if do_output then pp_print_string fmt "*)" }
   | eof    { () }
-  | "\n"   { newline lexbuf;
+  | "\n"   { new_line lexbuf;
              if do_output then pp_print_char fmt '\n';
              comment fmt do_output lexbuf }
   | '"'    { if do_output then pp_print_string fmt "&quot;";
@@ -214,7 +214,7 @@ and comment fmt do_output = parse
              comment fmt do_output lexbuf }
 
 and string fmt do_output = parse
-  | "\n"   { newline lexbuf;
+  | "\n"   { new_line lexbuf;
              if do_output then pp_print_char fmt '\n';
              string fmt do_output lexbuf }
   | '"'    { if do_output then pp_print_string fmt "&quot;" }
@@ -229,12 +229,12 @@ and doc fmt block headings = parse
   | ' '* "*)"
            { if block then pp_print_string fmt "</p>\n" }
   | eof    { () }
-  | "\n" space* "\n" { newline lexbuf;
-             newline lexbuf;
+  | "\n" space* "\n" { new_line lexbuf;
+             new_line lexbuf;
              if block then pp_print_string fmt "</p>";
              pp_print_char fmt '\n';
              doc fmt false headings lexbuf }
-  | "\n"   { newline lexbuf;
+  | "\n"   { new_line lexbuf;
              pp_print_char fmt '\n';
              doc fmt block headings lexbuf }
   | '{' (['1'-'6'] as c) ' '*
@@ -260,9 +260,12 @@ and doc fmt block headings = parse
                   doc fmt (r <> []) r lexbuf
                 end else brace r
            }
-  | '['    { if not block then pp_print_string fmt "<p>";
+  | "\\`"  { pp_print_char fmt '`';
+             doc fmt true headings lexbuf }
+  | ('`' '`'* as delim) ' '*
+           { if not block then pp_print_string fmt "<p>";
              pp_print_string fmt "<code>";
-             scan_embedded fmt 0 lexbuf;
+             scan_embedded fmt (String.length delim) lexbuf;
              pp_print_string fmt "</code>";
              doc fmt true headings lexbuf }
   | ' '    { if block then pp_print_char fmt ' ';
@@ -279,7 +282,7 @@ and doc fmt block headings = parse
 and raw_html fmt depth = parse
   | "*)"  { backtrack lexbuf }
   | eof    { () }
-  | "\n"   { newline lexbuf;
+  | "\n"   { new_line lexbuf;
              pp_print_char fmt '\n';
              raw_html fmt depth lexbuf }
   | '{'    { pp_print_char fmt '{'; raw_html fmt (succ depth) lexbuf }
@@ -310,7 +313,6 @@ and skip_comment = parse
 {
 
   let do_file fmt fname =
-    current_file := fname;
     (* input *)
     let cin = open_in fname in
     let lb = Lexing.from_channel cin in

@@ -12,6 +12,7 @@
 open Format
 open Why3
 open Stdlib
+open Wstdlib
 
 
 exception File_too_small
@@ -21,15 +22,15 @@ let unwrap = function
   | Some s -> s
   | None -> raise Unwraaap
 
-let assert_ n b = 
-  if b then 
+let assert_ n b =
+  if b then
     Format.printf "%s \027[32m passed\027[0m.@." n
   else
     Format.printf "%s \027[31m failed\027[0m.@." n
 
 
 (* can't be used because why3 does not seem to keep a good character count (?) *)
-let insert_at filename filename_2 offset to_add = 
+let insert_at filename filename_2 offset to_add =
   let buf = Bytes.create offset in
   let fin = open_in filename in
   let fout = open_out filename_2 in
@@ -52,7 +53,7 @@ let insert_at filename filename_2 offset to_add =
       close_in fin; close_out fout
   end
 
-let insert_at_lines filename filename_2 offset to_add = 
+let insert_at_lines filename filename_2 offset to_add =
   let fin = open_in filename in
   let fout = open_out filename_2 in
   begin
@@ -108,7 +109,7 @@ let do_input way f =
     | "-" ->
         Env.read_channel Pmodule.mlw_language ?format env "stdin" stdin
     | file ->
-        Env.read_file Pmodule.mlw_language ?format env file
+        fst (Env.read_file Pmodule.mlw_language ?format env file)
   in
   let open Pdecl in
   let open Expr in
@@ -119,7 +120,7 @@ let do_input way f =
         | RS(rsym) ->
           let function_name = Ident.(rsym.rs_name.id_string) in
           let decl = Ident.Mid.find Expr.(rsym.rs_name) m.mod_known in
-          match decl.pd_node with
+          begin match decl.pd_node with
           | PDlet(let_expr) ->
             begin match let_expr with
               | LDvar(_) -> Format.eprintf "ldvar not handled@."
@@ -149,13 +150,12 @@ let do_input way f =
                         -> []
                       | Eif(e1, e2, e3) ->
                         r e1 @ r e2 @ r e3
-                      | Ecase(e,  pats) ->
-                        r e
+                      | Ematch (e, pats, exns) ->
+                        r e @
+                        Ity.Mxs.fold_left (fun l _ (pvs, e) ->
+                            r e @ l) (r e) exns
                       | Eraise(x, e_) ->
                         r e_
-                      | Etry(e, _, pv) ->
-                        Ity.Mxs.fold_left (fun l _ (pvs, e) ->
-                            r e @ l) (r e) pv
                       | Eghost(e) ->
                         r e
                       | Ewhile(e_cond, invs, _, e_loop) ->
@@ -170,6 +170,7 @@ let do_input way f =
                         r e_loop
                       | Efor(pv, (f, d, to_), inv, _, e_loop) ->
                         r e_loop;
+                      | _ -> assert false
                     in
                     List.iter (Abstract_interpreter.add_variable cfg context)
                       Ity.(cexp.c_cty.cty_args);
@@ -189,7 +190,7 @@ let do_input way f =
                           assert_ (f ^ ":" ^ function_name) (b <> way);
                           if b = way then
                             begin
-                              let s = 
+                              let s =
                                 Abstract_interpreter.domain_to_term cfg context d
                                 |> Pretty.print_term Format.str_formatter
                                 |> Format.flush_str_formatter
@@ -201,7 +202,7 @@ let do_input way f =
                               Format.printf "@.";
                               Format.printf "%s@." s;
                               Format.printf "vs.@.";
-                              let s = 
+                              let s =
                                 Abstract_interpreter.domain_to_term cfg context expected_d
                                 |> Pretty.print_term Format.str_formatter
                                 |> Format.flush_str_formatter
@@ -230,8 +231,8 @@ let do_input way f =
                 end;
               | LDrec(_) -> Format.eprintf "LDrec not handled@."
             end
-          | _ -> () 
-
+          | _ -> () end
+        | _ -> assert false
       ) m.mod_export.ns_ps
   in
   Mstr.iter do_infer mm;
@@ -261,4 +262,3 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-

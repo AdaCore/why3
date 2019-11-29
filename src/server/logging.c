@@ -1,7 +1,7 @@
 /********************************************************************/
 /*                                                                  */
 /*  The Why3 Verification Platform   /   The Why3 Development Team  */
-/*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  */
+/*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  */
 /*                                                                  */
 /*  This software is distributed under the terms of the GNU Lesser  */
 /*  General Public License version 2.1, with the special exception  */
@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include "logging.h"
 #include "options.h"
 
@@ -22,24 +23,21 @@ void init_logging() {
   }
 }
 
-void log_msg(char* s) {
+void log_msg(char* fmt, ...) {
   if (logging) {
-   fprintf (logfile, "%s\n", s);
-   fflush (logfile);
-  }
-}
-
-void log_msg_len(char* s, int len) {
-  if (logging) {
-   fprintf (logfile, "%.*s\n", len, s);
-   fflush (logfile);
+    va_list va;
+    va_start(va, fmt);
+    vfprintf(logfile, fmt, va);
+    fprintf(logfile, "\n");
+    fflush (logfile);
+    va_end(va);
   }
 }
 
 void logging_shutdown(char* s) {
   if (logging) {
-   log_msg(s);
-   fclose(logfile);
+    log_msg("%s",s);
+    fclose(logfile);
   }
   exit(1);
 }

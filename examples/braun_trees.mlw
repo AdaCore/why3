@@ -17,8 +17,8 @@
 
 module BraunHeaps
 
-  use import int.Int
-  use import bintree.Tree
+  use int.Int
+  use bintree.Tree
   use export bintree.Size
   use export bintree.Occ
 
@@ -26,7 +26,7 @@ module BraunHeaps
 
   val predicate le elt elt
 
-  clone relations.TotalPreOrder with type t = elt, predicate rel = le
+  clone relations.TotalPreOrder with type t = elt, predicate rel = le, axiom .
 
   (* [e] is no greater than the root of [t], if any *)
   let predicate le_root (e: elt) (t: tree elt) = match t with
@@ -190,7 +190,7 @@ module BraunHeaps
         Chris Okasaki
         J. Functional Programming 7 (6) 661–666, November 1997 *)
 
-  use import int.ComputerDivision
+  use int.ComputerDivision
 
   let rec diff (m: int) (t: tree elt)
     requires { inv t }
@@ -223,8 +223,8 @@ module BraunHeaps
 
   (** A Braun tree has a logarithmic height *)
 
-  use import bintree.Height
-  use import int.Power
+  use bintree.Height
+  use int.Power
 
   let rec lemma size_height (t1 t2: tree elt)
     requires { inv t1 && inv t2 }

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -48,7 +48,7 @@ let check_field stv f =
   let ftv = ity_freevars Stv.empty f.pv_ity in
   if not (Stv.subset ftv stv) then Loc.error ?loc
     (UnboundTypeVar (Stv.choose (Stv.diff ftv stv)));
-  if not f.pv_ity.ity_imm then Loc.errorm ?loc
+  if not f.pv_ity.ity_pure then Loc.errorm ?loc
     "This field has non-pure type, it cannot be used \
      in a recursive type definition"
 
@@ -77,7 +77,7 @@ let create_semi_constructor id s fdl pjl invl =
 
 let create_plain_record_decl ~priv ~mut id args fdl invl witn =
   let exn = Invalid_argument "Pdecl.create_plain_record_decl" in
-  let cid = id_fresh ?loc:id.pre_loc ("mk " ^ id.pre_name) in
+  let cid = id_fresh ?loc:id.pre_loc (id.pre_name ^ "'mk") in
   let add_fd fds (mut, fd) = Mpv.add_new exn fd mut fds in
   let fds = List.fold_left add_fd Mpv.empty fdl in
   let fdl = List.map snd fdl in
@@ -88,8 +88,10 @@ let create_plain_record_decl ~priv ~mut id args fdl invl witn =
     [create_constructor ~constr:1 cid s fdl] in
   if witn <> [] then begin
     List.iter2 (fun fd ({e_loc = loc} as e) ->
-      if e.e_effect.eff_oneway then Loc.errorm ?loc
+      if diverges e.e_effect.eff_oneway then Loc.errorm ?loc
         "This expression may not terminate, it cannot be a witness";
+      if partial e.e_effect.eff_oneway then Loc.errorm ?loc
+        "This expression may fail, it cannot be a witness";
       if not (eff_pure e.e_effect) then Loc.errorm ?loc
         "This expression has side effects, it cannot be a witness";
       let ety = ty_of_ity e.e_ity and fty = fd.pv_vs.vs_ty in
@@ -101,7 +103,7 @@ let create_rec_record_decl s fdl =
   let exn = Invalid_argument "Pdecl.create_rec_record_decl" in
   if not (its_recursive s) then raise exn;
   let id = s.its_ts.ts_name in
-  let cid = id_fresh ?loc:id.id_loc ("mk " ^ id.id_string) in
+  let cid = id_fresh ?loc:id.id_loc (id.id_string ^ "'mk") in
   List.iter (check_field (Stv.of_list s.its_ts.ts_args)) fdl;
   let cs = create_constructor ~constr:1 cid s fdl in
   let pjl = List.map (create_projection s) fdl in
@@ -236,19 +238,20 @@ let get_syms node pure =
         syms_tl (syms_eity syms d) invl
     | Eif (c,d,e) ->
         syms_expr (syms_expr (syms_eity syms c) d) e
-    | Ecase (d,bl) ->
+    | Ematch (d,bl,xl) ->
         (* Dexpr handles this, but not Expr, so we set a failsafe *)
-        let v = create_vsymbol (id_fresh "x") (ty_of_ity d.e_ity) in
-        let pl = List.map (fun (p,_) -> [p.pp_pat]) bl in
-        if not (Pattern.is_exhaustive [t_var v] pl) then
+        let exhaustive = bl = [] ||
+          let v = create_vsymbol (id_fresh "x") (ty_of_ity d.e_ity) in
+          let pl = List.map (fun (p,_) -> [p.pp_pat]) bl in
+          Pattern.is_exhaustive [t_var v] pl in
+        if not exhaustive then
           Loc.errorm ?loc:e.e_loc "Non-exhaustive pattern matching";
-        let add_branch syms (p,e) =
+        let add_rbranch syms (p,e) =
           syms_pat (syms_expr syms e) p.pp_pat in
-        List.fold_left add_branch (syms_eity syms d) bl
-    | Etry (d,_,xl) ->
-        let add_branch xs (vl,e) syms =
+        let add_xbranch xs (vl,e) syms =
           syms_xs xs (syms_pvl (syms_expr syms e) vl) in
-        Mxs.fold add_branch xl (syms_expr syms d)
+        Mxs.fold add_xbranch xl
+          (List.fold_left add_rbranch (syms_eity syms d) bl)
     | Eraise (xs,e) ->
         syms_xs xs (syms_eity syms e)
   and syms_eity syms e =
@@ -340,46 +343,68 @@ let create_type_decl dl =
     | _, _, Alias _ ->
         mk_decl (PDtype [itd]) [create_ty_decl ts]
     | _, _, Range ir ->
-        let pj_id = id_derive (nm ^ "'int") id in
+        let pj_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'int" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'int") in
         let pj_ls = create_fsymbol pj_id [ty_app ts []] ty_int in
         let pj_decl = create_param_decl pj_ls in
+        (* Create the projection meta for pj_decl *)
+        let meta_proj_pj = (Theory.meta_projection, [Theory.MAls pj_ls]) in
         (* create max attribute *)
-        let max_id = id_derive (nm ^ "'maxInt") id in
+        let max_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'maxInt" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'maxInt") in
         let max_ls = create_fsymbol max_id [] ty_int  in
-        let max_defn = t_const Number.(ConstInt ir.ir_upper) ty_int in
+        let const = Constant.int_const ir.Number.ir_upper in
+        let max_defn = t_const const ty_int in
         let max_decl = create_logic_decl [make_ls_defn max_ls [] max_defn] in
         (* create min attribute *)
-        let min_id = id_derive (nm ^ "'minInt") id in
+        let min_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'minInt" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'minInt") in
         let min_ls = create_fsymbol min_id [] ty_int  in
-        let min_defn = t_const Number.(ConstInt ir.ir_lower) ty_int in
+        let const = Constant.int_const ir.Number.ir_lower in
+        let min_defn = t_const const ty_int in
         let min_decl = create_logic_decl [make_ls_defn min_ls [] min_defn] in
         let pure = [create_ty_decl ts; pj_decl; max_decl; min_decl] in
         let meta = Theory.(meta_range, [MAts ts; MAls pj_ls]) in
-        mk_decl_meta [meta] (PDtype [itd]) pure
+        mk_decl_meta [meta; meta_proj_pj] (PDtype [itd]) pure
     | _, _, Float ff ->
-        let pj_id = id_derive (nm ^ "'real") id in
+        let pj_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'real" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'real") in
         let pj_ls = create_fsymbol pj_id [ty_app ts []] ty_real in
         let pj_decl = create_param_decl pj_ls in
+        (* Create the projection meta for pj_decl *)
+        let meta_proj_pj = (Theory.meta_projection, [Theory.MAls pj_ls]) in
         (* create finiteness predicate *)
-        let iF_id = id_derive (nm ^ "'isFinite") id in
+        let iF_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'isFinite" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'isFinite") in
         let iF_ls = create_psymbol iF_id [ty_app ts []] in
         let iF_decl = create_param_decl iF_ls in
         (* create exponent digits attribute *)
-        let eb_id = id_derive (nm ^ "'eb") id in
+        let eb_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'eb" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'eb") in
         let eb_ls = create_fsymbol eb_id [] ty_int in
         let eb_defn = t_nat_const ff.Number.fp_exponent_digits in
         let eb_decl = create_logic_decl [make_ls_defn eb_ls [] eb_defn] in
         (* create significand digits attribute *)
-        let sb_id = id_derive (nm ^ "'sb") id in
+        let sb_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'sb" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'sb") in
         let sb_ls = create_fsymbol sb_id [] ty_int  in
         let sb_defn = t_nat_const ff.Number.fp_significand_digits in
         let sb_decl = create_logic_decl [make_ls_defn sb_ls [] sb_defn] in
         let pure = [create_ty_decl ts; pj_decl; iF_decl; eb_decl; sb_decl] in
         let meta = Theory.(meta_float, [MAts ts; MAls pj_ls; MAls iF_ls]) in
-        mk_decl_meta [meta] (PDtype [itd]) pure
+        mk_decl_meta [meta; meta_proj_pj] (PDtype [itd]) pure
     | fl, _, NoDef when itd.itd_invariant <> [] ->
         let inv = axiom_of_invariant itd in
-        let pr = create_prsymbol (id_derive (nm ^ "'invariant") id) in
+        let pr =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'invariant" in
+          create_prsymbol (id_fresh ~attrs ?loc:id.id_loc (nm ^ "'invariant")) in
         let ax = create_prop_decl Paxiom pr inv in
         let add_fd s dl = create_param_decl (ls_of_rs s) :: dl in
         let pure = create_ty_decl ts :: List.fold_right add_fd fl [ax] in
@@ -444,14 +469,14 @@ let rec t_insert hd t = match t.t_node with
   | _ when hd.t_ty = None -> t_iff_simp hd t
   | _ -> t_equ_simp hd t
 
-let rec t_subst_fmla v t f = t_label_copy f (match f.t_node with
+let rec t_subst_fmla v t f = t_attr_copy f (match f.t_node with
   | Tapp (ps, [{t_node = Tvar u}; t1])
     when ls_equal ps ps_equ && vs_equal v u && t_v_occurs v t1 = 0 ->
       t_iff_simp t (t_equ_simp t1 t_bool_true)
   | Tvar u when vs_equal u v -> t_if t t_bool_true t_bool_false
   | _ -> t_map (t_subst_fmla v t) f)
 
-let lab_w_nce_no = Slab.singleton Theory.lab_w_non_conservative_extension_no
+let sattr_w_nce_no = Sattr.singleton Theory.attr_w_non_conservative_extension_no
 
 let create_let_decl ld =
   let conv_post t ql =
@@ -460,7 +485,7 @@ let create_let_decl ld =
       | None -> let v,f = open_post q in
                 t_subst_fmla v t f in
     List.map conv ql in
-  let label = lab_w_nce_no in
+  let attrs = sattr_w_nce_no in
   let cty_axiom id cty f axms =
     if t_equal f t_true then axms else
     (* we do not care about aliases for pure symbols *)
@@ -468,7 +493,7 @@ let create_let_decl ld =
     let sbs = Mpv.fold add_old cty.cty_oldies Mvs.empty in
     let f = List.fold_right t_implies cty.cty_pre (t_subst sbs f) in
     let args = List.map (fun v -> v.pv_vs) cty.cty_args in
-    let f = t_forall_close args [] f in
+    let f = t_forall_close_simp args [] f in
     let f = t_forall_close (Mvs.keys (t_vars f)) [] f in
     create_prop_decl Paxiom (create_prsymbol id) f :: axms in
   let add_rs sm s ({c_cty = cty} as c) (abst,defn,axms) =
@@ -484,18 +509,18 @@ let create_let_decl ld =
               let fl = f :: conv_post (t_var v) ql in
               t_exists_close [v] [] (t_and_simp_l fl)
           | [] -> t_true in
-        abst, defn, cty_axiom (id_clone ~label s.rs_name) cty f axms
+        abst, defn, cty_axiom (id_clone ~attrs s.rs_name) cty f axms
     | RLls ({ls_name = id} as ls) ->
         let vl = List.map (fun v -> v.pv_vs) cty.cty_args in
         let hd = t_app ls (List.map t_var vl) ls.ls_value in
         let f = t_and_simp_l (conv_post hd cty.cty_post) in
-        let nm = id.id_string ^ "_spec" in
-        let axms = cty_axiom (id_derive ~label nm id) cty f axms in
+        let nm = id.id_string ^ "'spec" in
+        let axms = cty_axiom (id_derive ~attrs nm id) cty f axms in
         let c = if Mrs.is_empty sm then c else c_rs_subst sm c in
         begin match c.c_node with
         | Cany | Capp _ | Cpur _ ->
             (* the full spec of c is inherited by the rsymbol and
-               so appears in the "_spec" axiom above. Even if this
+               so appears in the "'spec" axiom above. Even if this
                spec contains "result = ...", we do not try to extract
                a definition from it. We only produce definitions via
                term_of_expr from a Cfun, and the user must eta-expand
@@ -506,14 +531,14 @@ let create_let_decl ld =
             | Some f when cty.cty_pre = [] ->
                 abst, (ls, vl, f) :: defn, axms
             | Some f ->
-                let f = t_insert hd f and nm = id.id_string ^ "_def" in
-                let axms = cty_axiom (id_derive ~label nm id) cty f axms in
+                let f = t_insert hd f and nm = id.id_string ^ "'def" in
+                let axms = cty_axiom (id_derive ~attrs nm id) cty f axms in
                 create_param_decl ls :: abst, defn, axms
             | None when cty.cty_post = [] ->
                 let axms = match post_of_expr hd e with
                   | Some f ->
-                      let nm = id.id_string ^ "_def" in
-                      cty_axiom (id_derive ~label nm id) cty f axms
+                      let nm = id.id_string ^ "'def" in
+                      cty_axiom (id_derive ~attrs nm id) cty f axms
                   | None -> axms in
                 create_param_decl ls :: abst, defn, axms
             | None ->
@@ -524,8 +549,6 @@ let create_let_decl ld =
     | LDvar ({pv_vs = {vs_name = {id_loc = loc}}},e) ->
         if not (ity_closed e.e_ity) then
           Loc.errorm ?loc "Top-level variables must have monomorphic type";
-        if match e.e_node with Eexec _ -> false | _ -> true then
-          Loc.errorm ?loc "Top-level computations must carry a specification";
         [], [], []
     | LDrec rdl ->
         let add_rd sm d = Mrs.add d.rec_rsym d.rec_sym sm in
@@ -534,20 +557,13 @@ let create_let_decl ld =
         List.fold_right add_rd rdl ([],[],[])
     | LDsym (s,c) ->
         add_rs Mrs.empty s c ([],[],[]) in
-  let fail_trusted_rec ls =
-    Loc.error ?loc:ls.ls_name.id_loc (Decl.NoTerminationProof ls) in
-  let is_trusted_rec = match ld with
-    | LDrec ({rec_sym = {rs_logic = RLls ls; rs_cty = c}; rec_varl = []}::_)
-      when not c.cty_effect.eff_oneway -> abst = [] || fail_trusted_rec ls
-    | _ -> false in
   let defn = if defn = [] then [] else
     let dl = List.map (fun (s,vl,t) -> make_ls_defn s vl t) defn in
-    try [create_logic_decl dl] with Decl.NoTerminationProof ls ->
-    if is_trusted_rec then fail_trusted_rec ls;
+    try [create_logic_decl dl] with Decl.NoTerminationProof _ ->
     let abst = List.map (fun (s,_) -> create_param_decl s) dl in
     let mk_ax ({ls_name = id} as s, vl, t) =
-      let nm = id.id_string ^ "_def" in
-      let pr = create_prsymbol (id_derive ~label nm id) in
+      let nm = id.id_string ^ "'def" in
+      let pr = create_prsymbol (id_derive ~attrs nm id) in
       let hd = t_app s (List.map t_var vl) t.t_ty in
       let ax = t_forall_close vl [] (t_insert hd t) in
       create_prop_decl Paxiom pr ax in
@@ -557,7 +573,7 @@ let create_let_decl ld =
 let create_exn_decl xs =
   if not (ity_closed xs.xs_ity) then Loc.errorm ?loc:xs.xs_name.id_loc
     "Top-level exception %a has a polymorphic type" print_xs xs;
-  if not (ity_immutable xs.xs_ity) then Loc.errorm ?loc:xs.xs_name.id_loc
+  if not xs.xs_ity.ity_pure then Loc.errorm ?loc:xs.xs_name.id_loc
     "The type of top-level exception %a has mutable components" print_xs xs;
   mk_decl (PDexn xs) []
 
@@ -573,10 +589,12 @@ open Theory
    Therefore we match the exact contents of th_decls, and crash if it
    is not what we expect. *)
 
-let pd_int, pd_real, pd_equ = match builtin_theory.th_decls with
-  | [{td_node = Decl di}; {td_node = Decl dr}; {td_node = Decl de}] ->
+let pd_int, pd_real, pd_str, pd_equ = match builtin_theory.th_decls with
+  | [{td_node = Decl di}; {td_node = Decl dr};
+     {td_node = Decl ds}; {td_node = Decl de}] ->
       mk_decl (PDtype [mk_itd its_int  [] [] [] []]) [di],
       mk_decl (PDtype [mk_itd its_real [] [] [] []]) [dr],
+      mk_decl (PDtype [mk_itd its_str  [] [] [] []]) [ds],
       mk_decl PDpure [de]
   | _ -> assert false
 
@@ -591,7 +609,7 @@ let pd_bool = match bool_theory.th_decls with
       mk_decl (PDtype [mk_itd its_bool [] [rs_true; rs_false] [] []]) [db]
   | _ -> assert false
 
-let pd_tuple = Stdlib.Hint.memo 17 (fun n ->
+let pd_tuple = Wstdlib.Hint.memo 17 (fun n ->
   match (tuple_theory n).th_decls with
   | [{td_node = Decl dt}] ->
       mk_decl (PDtype [mk_itd (its_tuple n) [] [rs_tuple n] [] []]) [dt]
@@ -646,7 +664,7 @@ let print_its_defn fst fmt itd =
   let print_field fmt f = fprintf fmt "%s%s%a%a : %a"
     (if List.exists (pv_equal (fd_of_rs f)) s.its_mfields
       then "mutable " else "") (if rs_ghost f then "ghost " else "")
-    print_rs f Pretty.print_id_labels f.rs_name
+    print_rs f Pretty.print_id_attrs f.rs_name
     print_ity f.rs_cty.cty_result in
   let is_big ity = match ity.ity_node with
     | Ityreg {reg_args = []; reg_regs = []}
@@ -659,7 +677,7 @@ let print_its_defn fst fmt itd =
     | _ when is_big f.pv_ity -> fprintf fmt "@ (%a)" print_ity f.pv_ity
     | _ -> fprintf fmt "@ %a" print_ity f.pv_ity in
   let print_constr mf fmt c = fprintf fmt "@\n@[<hov 4>| %a%a%a@]"
-    print_rs c Pretty.print_id_labels c.rs_name
+    print_rs c Pretty.print_id_attrs c.rs_name
     (Pp.print_list Pp.nothing (print_proj mf)) c.rs_cty.cty_args in
   let print_defn fmt () =
     match s.its_def, itd.itd_fields, itd.itd_constructors with
@@ -671,7 +689,7 @@ let print_its_defn fst fmt itd =
         (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
     | NoDef, fl, [{rs_name = {id_string = n}}]
-      when n = "mk " ^ s.its_ts.ts_name.id_string -> fprintf fmt " =%s { %a }"
+      when n = s.its_ts.ts_name.id_string ^ "'mk" -> fprintf fmt " =%s { %a }"
         (if s.its_mutable && s.its_mfields = [] then " mutable" else "")
         (Pp.print_list Pp.semi print_field) fl
     | NoDef, fl, cl ->
@@ -684,7 +702,7 @@ let print_its_defn fst fmt itd =
   fprintf fmt "@[<hov 2>%s %a%a%a%a%a%a@]"
     (if fst then "type" else "with")
     print_its s
-    Pretty.print_id_labels s.its_ts.ts_name
+    Pretty.print_id_attrs s.its_ts.ts_name
     (print_args Pretty.print_tv) s.its_ts.ts_args
     (print_regs print_reg) s.its_regions
     print_defn ()
@@ -695,5 +713,5 @@ let print_pdecl fmt d = match d.pd_node with
   | PDlet ld -> print_let_defn fmt ld
   | PDexn xs -> fprintf fmt
       "@[<hov 2>exception %a%a of@ %a@]"
-        print_xs xs Pretty.print_id_labels xs.xs_name print_ity xs.xs_ity
+        print_xs xs Pretty.print_id_attrs xs.xs_name print_ity xs.xs_ity
   | PDpure -> Pp.print_list Pp.newline2 Pretty.print_decl fmt d.pd_pure

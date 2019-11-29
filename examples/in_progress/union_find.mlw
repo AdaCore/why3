@@ -1,6 +1,6 @@
 module Intf
 
-  use import int.Int
+  use int.Int
 
   type t = private {
                   size: int;        (* elements are 0,1,...,size-1 *)
@@ -38,9 +38,8 @@ end
 
 module Impl
 
-  use import int.Int
-  use map.Map
-  use import array.Array
+  use int.Int
+  use array.Array
 
   (* there is a path from x to y of length at most d *)
   inductive path (size: int) (link: array int) (x d y: int) =
@@ -92,7 +91,7 @@ module Impl
     (forall i. 0 <= i < size -> path size link i (dist i) (repr i))
   } by {
     size = 0; link = Array.make 0 0; rank = Array.make 0 0;
-    repr = (fun i -> i); dist = (fun i -> 0)
+    repr = (fun i -> i); dist = (fun _i -> 0)
   }
 
   let create (n: int) : t
@@ -106,7 +105,7 @@ module Impl
     done;
     let rank = Array.make n 0 in
     { size = n; link = link; rank = rank;
-      repr = (fun i -> i); dist = (fun i -> 0) }
+      repr = (fun i -> i); dist = (fun _i -> 0) }
 
   let rec lemma path_dist (size: int) (link: array int) (dist: int -> int)
                           (x d y: int)

@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# This checks specifically error messages
+
+dir=`dirname $0`
+
+updateoracle=false
+files=""
+
+while test $# != 0; do
+case "$1" in
+  "-update-oracle")
+      updateoracle=true;;
+  "-"*)
+      printf "unknown option: %s\n" "$1"
+      printf "usage: parsing-bench [-update-oracle] <files>\n"
+      printf "  <files> must be given without the '.mlw' suffix\n"
+      printf "  if <files> empty, use all files from directory 'parsing/bad'\n"
+      exit 2;;
+  *)
+       files="$files $1"
+esac
+shift
+done
+
+if test "$files" = "" ; then
+    files="$dir/parsing/bad/*.mlw"
+fi
+
+run () {
+    printf " $1 "
+    f="$1"
+    $dir/../bin/why3prove.opt --parse-only "$1.mlw" 2> "$f.out"
+    if cmp "$f.oracle" "$f.out" > /dev/null 2>&1 ; then
+     echo "ok"
+  else
+     if $updateoracle; then
+        echo "Updating oracle for $1"
+        mv "$f.out" "$f.oracle"
+     else
+       echo "FAILED!"
+       echo "diff is the following:"
+       touch "$f.oracle"
+       diff -u "$f.oracle" "$f.out"
+     fi
+  fi
+}
+
+for file in $files; do
+    filedir=`dirname $file`
+    filebase=`basename $file .mlw`
+    printf "Parsing files\n";
+    run $filedir/$filebase
+done

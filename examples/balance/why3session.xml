@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../balance.mlw" expanded="true">
-<theory name="Roberval" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="Puzzle8" sum="cd15b414a487f5dee1d992c22c5e3264">
- <goal name="VC solve3" expl="VC for solve3">
- <proof prover="0"><result status="valid" time="0.02" steps="47"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="balance.mlw"/>
+<theory name="Puzzle8" proved="true">
+ <goal name="solve3&#39;vc" expl="VC for solve3" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="52"/></proof>
  </goal>
- <goal name="VC solve8" expl="VC for solve8">
- <proof prover="0"><result status="valid" time="0.13" steps="291"/></proof>
+ <goal name="solve8&#39;vc" expl="VC for solve8" proved="true">
+ <proof prover="1"><result status="valid" time="0.13" steps="267"/></proof>
  </goal>
 </theory>
-<theory name="Puzzle12" sum="6ea315cb4493db13a7fa4541d6a0e474" expanded="true">
- <goal name="VC solve12" expl="VC for solve12" expanded="true">
- <proof prover="0"><result status="valid" time="0.53" steps="1379"/></proof>
+<theory name="Puzzle12" proved="true">
+ <goal name="solve12&#39;vc" expl="VC for solve12" proved="true">
+ <proof prover="1"><result status="valid" time="0.53" steps="1204"/></proof>
  </goal>
 </theory>
 </file>

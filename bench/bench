@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # auto bench for why
@@ -8,19 +7,27 @@
 # export WHY3DATA=.
 # export WHY3LOADPATH=theories
 
+has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
+
+shopt -s nullglob
+
 suffix=$1
 
+# TODO: remove the hack about int.mlw once it has become builtin
 goods () {
     pgm="bin/why3prove$suffix"
     ERROR=
-    echo "bench aborted due to the following errors:" > bench_errors
+    test -d $1 || exit 1
+    rm -f bench_errors
     for f in $1/*.[wm][hl][yw] ; do
-	echo -n "  $f... "
+	printf "  $f... "
+        opts="$2"
+        if test $f = stdlib/int.mlw; then opts="$2 --type-only"; fi
 	# running Why
-	if ! $pgm $2 $f > /dev/null 2> bench_error; then
+	if ! $pgm $opts $f > /dev/null 2> bench_error; then
 	    echo "FAILED!"
 #            echo "env: WHY3DATA='$WHY3DATA'"
-            echo "invocation: $pgm $2 $f" | tee -a bench_errors
+            echo "invocation: $pgm $opts $f" | tee -a bench_errors
             cat bench_error | tee -a bench_errors
             ERROR=yes
 	elif test -s bench_error; then
@@ -30,18 +37,34 @@ goods () {
 	    echo "ok"
         fi
     done
-    rm bench_error
+    rm -f bench_error
     if test -n "$ERROR"; then
+        echo "bench aborted due to the following errors:"
         cat bench_errors
         rm bench_errors
         exit 1
     fi
 }
 
+plugins () {
+    pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
+    for f in $1/*.$3 ; do
+	printf "  $f... "
+	if ! $pgm $2 $f > /dev/null 2>&1; then
+	    echo "FAILED!"
+            echo "invocation: $pgm $2 $f"
+	    exit 1
+	fi
+	echo "ok"
+    done
+}
+
 bads () {
     pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
     for f in $1/*.[wm][hl][yw] ; do
-	echo -n "  $f... "
+	printf "  $f... "
 	if $pgm $2 $f > /dev/null 2>&1; then
 	    echo "SHOULD FAIL!"
 #            echo "env: WHY3DATA='$WHY3DATA'"
@@ -52,12 +75,34 @@ bads () {
     done
 }
 
+warns () {
+    pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
+    rm -f bench_errors
+    for f in $1/*.[wm][hl][yw] ; do
+	printf "  $f... "
+	if ! $pgm $2 $f > /dev/null 2>bench_errors; then
+            echo "FAILED!"
+            echo "invocation: $pgm $2 $f"
+            exit 1
+        fi
+        if ! test -s bench_errors; then
+            echo "SHOULD HAVE A WARNING !"
+            echo "invocation: $pgm $2 $f"
+            exit 1
+        fi
+	echo "ok"
+    done
+}
+
 drivers () {
     pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
     for f in $1/*.drv; do
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
         if [[ $f == drivers/c.drv ]]; then continue; fi
-	echo -n "  $f... "
+        if [[ $f == drivers/cakeml.drv ]]; then continue; fi
+	printf "  $f... "
 	# running Why
 	if ! echo "theory Test goal G : 1=2 end" | $pgm -F whyml --driver $f - > /dev/null; then
 	    echo "why FAILED"
@@ -69,24 +114,27 @@ drivers () {
 }
 
 valid_goals () {
+    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
     pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
     for f in $1/*.mlw; do
-	echo -n "  "$f"... "
-	if $pgm -t 10 -P alt-ergo $f | grep -q -v Valid; then
-	    echo "valid test $f failed!"
-	    echo "$pgm -P alt-ergo $f"
-	    $pgm -t 10 -P alt-ergo $f
+	printf "  $f... "
+        if ! $pgm -t 15 -P alt-ergo $2 $f > /dev/null 2>&1; then
+            echo "FAILED!"
+            echo "$pgm -t 15 -P alt-ergo $2 $f"
+            $pgm -t 15 -P alt-ergo $2 $f
 	    exit 1
-       else
-	    echo "ok"
        fi
+       echo "ok"
     done
 }
 
 invalid_goals () {
+    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
     pgm="bin/why3prove$suffix"
+    test -d $1 || exit 1
     for f in $1/*.mlw; do
-	echo -n "  "$f"... "
+	printf "  $f... "
 	if $pgm -t 3 -P alt-ergo $f | grep -q Valid; then
 	    echo "invalid test $f failed!"
 	    echo "$pgm -P alt-ergo $f"
@@ -98,9 +146,25 @@ invalid_goals () {
     done
 }
 
+replay () {
+    pgm="bin/why3replay$suffix"
+    test -d $1 || exit 1
+    for f in $1/*/; do
+        printf "  $f... "
+        if $pgm $2 $f > /dev/null 2> /dev/null; then
+            echo "ok"
+        else
+            echo "replay test failed!"
+            echo $pgm $2 $f
+            $pgm $2 $f
+            exit 1
+        fi
+    done
+}
+
 execute () {
     pgm="bin/why3execute$suffix"
-    echo -n "$1 $2... "
+    printf "  $1 $2... "
     if $pgm $1 $2 > /dev/null; then
         echo "ok"
     else
@@ -111,22 +175,42 @@ execute () {
     fi
 }
 
+extract () {
+    pgm="bin/why3extract$suffix"
+    dir=$1
+    shift
+    for f in $dir/*.mlw; do
+        printf "  $f... "
+        if ($pgm $@ $f -o bench_test.ml && ocaml -noinit bench_test.ml) > /dev/null 2> /dev/null; then
+            echo "ok"
+        else
+            echo "extract test failed!"
+            echo $pgm $@ $f
+            $pgm $@ $f -o bench_test.ml
+            ocaml -noinit bench_test.ml
+            rm -f bench_test.ml
+            exit 1
+        fi
+    done
+    rm -f bench_test.ml
+}
+
 extract_and_run () {
     dir=$1
     shift
     prg=$1
     shift
-    echo -n "$dir... "
+    printf "  $dir... "
     rm -f $dir/$prg
-    echo -n "clean... "
+    printf "clean... "
     if BENCH=yes make -C $dir clean > /dev/null; then
-        echo -n "extract... "
+        printf "extract... "
         if BENCH=yes make -C $dir extract > /dev/null; then
-            echo -n "compile... "
+            printf "compile... "
             if BENCH=yes make -C $dir > /dev/null; then
-                echo -n "execute... "
+                printf "execute... "
                 if $dir/main.opt "$@" > /dev/null; then
-                    echo -n "doc... "
+                    printf "doc... "
                     if BENCH=yes make -C $dir doc > /dev/null; then
                         echo "ok"
                     else
@@ -161,9 +245,48 @@ extract_and_run () {
     fi
 }
 
+extract_and_test_wmp () {
+    dir=$1
+    shift
+    printf "  $dir... "
+    printf "clean... "
+    if BENCH=yes make -C $dir clean > /dev/null; then
+        printf "extract... "
+        if BENCH=yes make -C $dir extract > /dev/null; then
+            printf "compile... "
+            if BENCH=yes make -C $dir build/tests > /dev/null; then
+                printf "execute... "
+                if $dir/build/tests > /dev/null; then
+                    echo "ok"
+                else
+                    echo "execution failed!"
+                    echo $dir/build/tests
+                    $dir/build/tests
+                    exit 1
+                fi
+            else
+                echo "compilation failed!"
+                echo BENCH=yes make -C $dir
+                BENCH=yes make -C $dir
+                exit 1
+            fi
+        else
+            echo "extract failed!"
+            echo BENCH=yes make -C $dir extract
+            BENCH=yes make -C $dir extract
+            exit 1
+        fi
+    else
+        echo "clean failed!"
+        echo BENCH=yes make -C $dir clean
+        BENCH=yes make -C $dir clean
+        exit 1
+    fi
+}
+
 list_stuff () {
     pgm="bin/why3$suffix"
-    echo -n "$1 "
+    printf '  %s ' "$1"
     if $pgm $1 > /dev/null; then
         echo "ok"
     else
@@ -173,13 +296,9 @@ list_stuff () {
     fi
 }
 
-echo "=== Checking theories ==="
-goods theories --type-only # FIXME remove --type-only
-echo ""
-
-echo "=== Checking modules ==="
-goods modules
-goods modules/mach
+echo "=== Checking stdlib ==="
+goods stdlib
+goods stdlib/mach
 echo ""
 
 echo "=== Checking drivers ==="
@@ -189,20 +308,26 @@ echo ""
 echo "=== Checking bad files ==="
 goods bench/typing/bad --parse-only
 goods bench/programs/bad-typing --parse-only
+goods bench/programs/warn-typing --parse-only
 bads bench/typing/bad --type-only
 bads bench/programs/bad-typing --type-only
+warns bench/programs/warn-typing --type-only
+goods bench/typing/x-bad --type-only
 echo ""
 
 echo "=== Checking good files ==="
 goods bench/typing/good
+goods bench/typing/x-good --parse-only
+bads bench/typing/x-good --type-only
 goods bench/programs/good
+goods bench/ce
+goods src/trywhy3/examples "--debug ignore_missing_diverges"
 goods examples/bts
 goods examples/tests
 goods examples/tests-provers
 goods examples/check-builtin
 goods examples/logic
 goods examples
-goods examples/to_port
 goods examples/foveoos11-cm
 goods examples/WP_revisited
 goods examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps"
@@ -210,11 +335,20 @@ goods examples/bitvectors "-L examples/bitvectors"
 goods examples/avl "-L examples/avl"
 goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication"
 goods examples/double_wp "-L examples/double_wp"
+goods examples/in_progress/ring_decision "-L examples/in_progress/ring_decision"
+goods examples/multiprecision "-L examples/multiprecision"
+goods examples/prover "-L examples/prover --debug ignore_unused_vars"
 goods examples/in_progress
+plugins tests/python --type-only py
+plugins tests/microc --type-only c
 echo ""
 
 echo "=== Checking valid goals ==="
 valid_goals bench/valid
+echo ""
+
+echo "=== Checking splitted valid goals ==="
+valid_goals bench/valid/split_vc "-a split_vc"
 echo ""
 
 echo "=== Checking invalid goals ==="
@@ -244,23 +378,83 @@ execute examples/verifythis_fm2012_LRS.mlw LCP_test.bench
 execute examples/verifythis_fm2012_LRS.mlw SuffixSort_test.bench
 execute examples/verifythis_fm2012_LRS.mlw SuffixArray_test.bench
 execute examples/verifythis_fm2012_LRS.mlw LRS_test.bench
-execute examples/to_port/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
+execute examples/verifythis_PrefixSumRec.mlw PrefixSumRec.bench
 execute examples/vstte10_queens.mlw NQueens.test8
 # fails: "Cannot decide condition of if: (not ((~)((<<)((~)(0), 8)) = 0))"
 # examples/queens.mlw NQueensBits.test8
 # fails: cannot find definition of routine eq
 # examples/residual.mlw Test.test_astar
+# test of execution on real numbers; only if mpfr installed
+if test -n "$has_mpfr"; then
+    # Reals
+    execute bench/interp/real.mlw R.test0
+    execute bench/interp/real.mlw R.test1
+    execute bench/interp/real.mlw R.test2
+    execute bench/interp/real.mlw R.test3
+    execute bench/interp/real.mlw R.test_exp
+    execute bench/interp/real.mlw R.test_log
+    execute bench/interp/real.mlw R.test_exp_log
+    execute bench/interp/real.mlw R.bench1
+    execute bench/interp/real.mlw R.bench2
+    execute bench/interp/real.mlw R.bench3
+    # Float32
+    execute bench/interp/float32.mlw N.bench1
+    execute bench/interp/float32.mlw N.bench2
+    execute bench/interp/float32.mlw N.bench3
+    execute bench/interp/float32.mlw N.bench4
+    execute bench/interp/float32.mlw N.bench5
+    execute bench/interp/float32.mlw N.bench6
+    execute bench/interp/float32.mlw N.bench7
+    execute bench/interp/float32.mlw N.bench8
+    # Float64
+    execute bench/interp/float64.mlw N.bench1
+    execute bench/interp/float64.mlw N.bench2
+    execute bench/interp/float64.mlw N.bench3
+    execute bench/interp/float64.mlw N.bench4
+    execute bench/interp/float64.mlw N.bench5
+    execute bench/interp/float64.mlw N.bench6
+    execute bench/interp/float64.mlw N.bench7
+    execute bench/interp/float64.mlw N.bench8
+else
+    echo "MPFR not installed, skipping tests"
+fi
 echo ""
 
-
 echo "=== Checking extraction to OCaml ==="
+extract bench/extraction -D ocaml64
 extract_and_run examples/euler001 euler001.ml 1000000
 extract_and_run examples/gcd gcd.ml 6 15
 extract_and_run examples/vstte10_max_sum vstte10_max_sum.ml
-# needs to port
-# extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
+extract_and_run examples/vstte12_combinators vstte12_combinators.ml "((((K K) K) K) K)"
 extract_and_run examples/defunctionalization defunctionalization.ml
 extract_and_run examples/sudoku sudoku.ml 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
+echo ""
+
+echo "=== Checking extraction to C ==="
+extract_and_test_wmp examples/multiprecision
+echo ""
+
+echo "=== Checking replay (no prover) ==="
+replay bench/replay
+replay tests/ada_terms # TODO ada plugin only
+replay examples/stdlib --merging-only
+replay examples/bts --merging-only
+replay examples/tests --merging-only
+replay examples/tests-provers --merging-only
+replay examples/check-builtin --merging-only
+replay examples/logic --merging-only
+replay examples --merging-only
+replay examples/foveoos11-cm --merging-only
+replay examples/WP_revisited --merging-only
+replay examples/vacid_0_binary_heaps "-L examples/vacid_0_binary_heaps --merging-only"
+replay examples/bitvectors "-L examples/bitvectors --merging-only"
+replay examples/avl "-L examples/avl --merging-only"
+replay examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_2016_matrix_multiplication --merging-only"
+replay examples/double_wp "-L examples/double_wp --merging-only"
+replay examples/in_progress/ring_decision "-L examples/in_progress/ring_decision --merging-only"
+replay examples/multiprecision "-L examples/multiprecision --merging-only"
+replay examples/prover "-L examples/prover --merging-only --debug ignore_unused_vars"
+#replay examples/in_progress --merging-only
 echo ""
 
 echo "=== Checking --list-* ==="
@@ -271,3 +465,6 @@ list_stuff --list-formats
 list_stuff --list-metas
 list_stuff --list-debug-flags
 echo ""
+
+echo "=== Checking realizations ==="
+exec bench/check_realizations.sh

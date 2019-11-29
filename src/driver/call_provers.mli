@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,13 +15,6 @@ open Model_parser
 
 (** {2 data types for prover answers} *)
 
-(** The reason why unknown was reported *)
-type reason_unknown =
-  | Resourceout
-  (** Out of resources  *)
-  | Other
-  (** Other reason *)
-
 type prover_answer =
   | Valid
       (** The task is valid according to the prover *)
@@ -33,7 +26,7 @@ type prover_answer =
       (** the task runs out of memory *)
   | StepLimitExceeded
       (** the task required more steps than the limit provided *)
-  | Unknown of (string * reason_unknown option)
+  | Unknown of string
       (** The prover can't determine if the task is valid *)
   | Failure of string
       (** The prover reports a failure *)
@@ -59,7 +52,8 @@ type prover_result = {
 val print_prover_answer : Format.formatter -> prover_answer -> unit
 (** Pretty-print a {! prover_answer} *)
 
-val print_prover_result : Format.formatter -> prover_result -> unit
+val print_prover_result :
+  json_model:bool -> Format.formatter -> prover_result -> unit
 (** Pretty-print a prover_result. The answer and the time are output.
     The output of the prover is printed if and only if the answer is
     a [HighFailure] *)
@@ -84,7 +78,7 @@ val stepregexp : string -> int -> stepregexp
     [s] is a regular expression, [n] is the group number with steps number. *)
 
 type prover_result_parser = {
-  prp_regexps     : (Str.regexp * prover_answer) list;
+  prp_regexps     : (string * prover_answer) list;
   prp_timeregexps : timeregexp list;
   prp_stepregexps : stepregexp list;
   prp_exitcodes   : (int * prover_answer) list;
@@ -132,6 +126,7 @@ val limit_max : resource_limit -> resource_limit -> resource_limit
 
 val call_editor : command : string -> string -> prover_call
 
+(* internal use only
 val call_on_file :
   command         : string ->
   limit           : resource_limit ->
@@ -139,6 +134,7 @@ val call_on_file :
   printer_mapping : Printer.printer_mapping ->
   ?inplace        : bool ->
   string -> prover_call
+ *)
 
 val call_on_buffer :
   command         : string ->
@@ -146,9 +142,10 @@ val call_on_buffer :
   res_parser      : prover_result_parser ->
   filename        : string ->
   printer_mapping : Printer.printer_mapping ->
+  gen_new_file    : bool ->
   ?inplace        : bool ->
   Buffer.t -> prover_call
-(** Call a prover on the task printed in the {!type: Buffer.t} given.
+(** Build a prover call on the task already printed in the {!type: Buffer.t} given.
 
     @param limit : set the available time limit (def. 0 : unlimited), memory
     limit (def. 0 : unlimited) and step limit (def. -1 : unlimited)
@@ -156,16 +153,33 @@ val call_on_buffer :
     @param res_parser : prover result parser
 
     @param filename : the suffix of the proof task's file, if the prover
-    doesn't accept stdin. *)
+    doesn't accept stdin.
+
+    @param inplace : it is used to make a save of the file on which the
+    prover was called. It is renamed as %f.save if inplace=true and the command
+    [actualcommand] fails
+
+    @param gen_new_file: When set, this generates a new temp file to run the
+    prover on. Otherwise it reuses the filename already given.
+
+*)
 
 type prover_update =
   | NoUpdates
+  | ProverInterrupted
+  | InternalFailure of exn
   | ProverStarted
   | ProverFinished of prover_result
+
+val get_new_results: blocking:bool -> (prover_call * prover_update) list
+(** returns new results from why3server, in an unordered fashion. *)
 
 val query_call : prover_call -> prover_update
 (** non-blocking function that reports any new updates
     from the server related to a given prover call. *)
+
+val interrupt_call : prover_call -> unit
+(** non-blocking function that asks for prover interruption *)
 
 val wait_on_call : prover_call -> prover_result
 (** blocking function that waits until the prover finishes. *)

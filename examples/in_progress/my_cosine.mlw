@@ -3,27 +3,27 @@
 
 module M
 
-  use import real.RealInfix
-  use import real.Abs
-  use import real.Trigonometry
-  use import floating_point.Rounding
-  use import floating_point.Single
+  use real.RealInfix
+  use real.Abs
+  use real.Trigonometry
+  use floating_point.Rounding
+  use floating_point.Single
 
   val single_of_real_exact (x: real) : single
     ensures { value result = x }
 
   val add (x y: single) : single
-    requires { "expl:floating-point overflow"
+    requires { [@expl:floating-point overflow]
                no_overflow NearestTiesToEven ((value x) +. (value y)) }
     ensures  { value result = round NearestTiesToEven ((value x) +. (value y))}
 
   val sub (x y: single) : single
-    requires { "expl:floating-point overflow"
+    requires { [@expl:floating-point overflow]
                no_overflow NearestTiesToEven ((value x) -. (value y)) }
     ensures  { value result = round NearestTiesToEven ((value x) -. (value y))}
 
   val mul (x y: single) : single
-    requires { "expl:floating-point overflow"
+    requires { [@expl:floating-point overflow]
                no_overflow NearestTiesToEven ((value x) *. (value y)) }
     ensures  { value result = round NearestTiesToEven ((value x) *. (value y))}
 
@@ -41,21 +41,21 @@ end
 
 module IEEEfloat
 
-  use import real.RealInfix
-  use import real.Abs
-  use import real.Trigonometry
-  use import ieee_float.Float32
+  use real.RealInfix
+  use real.Abs
+  use real.Trigonometry
+  use ieee_float.Float32
 
   val add (x y: t) : t
-    requires { "expl:floating-point overflow" t'isFinite (x .+ y) }
+    requires { [@expl:floating-point overflow] t'isFinite (x .+ y) }
     ensures  { result = x .+ y }
 
   val sub (x y: t) : t
-    requires { "expl:floating-point overflow" t'isFinite (x .- y)}
+    requires { [@expl:floating-point overflow] t'isFinite (x .- y)}
     ensures  { result = x .- y }
 
   val mul (x y: t) : t
-    requires { "expl:floating-point overflow" t'isFinite (x .* y)}
+    requires { [@expl:floating-point overflow] t'isFinite (x .* y)}
     ensures  { result = x .* y }
 
   let my_cosine (x:t) : t
@@ -72,10 +72,10 @@ end
 
 module Combined
 
-  use import real.RealInfix
-  use import real.Abs
-  use import real.Trigonometry
-  use import mach.float.Single
+  use real.RealInfix
+  use real.Abs
+  use real.Trigonometry
+  use mach.float.Single
 
   let my_cosine (x:t) : t
     requires { abs x .<= (0x1p-5:t) }
@@ -84,6 +84,6 @@ module Combined
     assert {
       Abs.abs (1.0 -. (t'real x) *. (t'real x) *. 0.5 -. cos (t'real x)) <=. 0x1p-24
     };
-    sub (1.0:t) (mul (mul x x) (0.5:t))
+    safe_sub (1.0:t) (safe_mul (safe_mul x x) (0.5:t))
 
 end

@@ -1,0 +1,1136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="Firstorder_formula_spec.mlw"/>
+<theory name="Spec" proved="true">
+ <goal name="size_positive_lemma_fo_formula&#39;vc" expl="VC for size_positive_lemma_fo_formula" proved="true">
+ <proof prover="0"><result status="valid" time="0.84" steps="3169"/></proof>
+ </goal>
+ <goal name="renaming_composition_lemma_fo_formula&#39;vc" expl="VC for renaming_composition_lemma_fo_formula" proved="true">
+ <proof prover="0"><result status="valid" time="0.52" steps="2968"/></proof>
+ </goal>
+ <goal name="renaming_identity_lemma_fo_formula&#39;vc" expl="VC for renaming_identity_lemma_fo_formula" proved="true">
+ <proof prover="0"><result status="valid" time="0.22" steps="966"/></proof>
+ </goal>
+ <goal name="rename_then_subst_composition_lemma_fo_formula&#39;vc" expl="VC for rename_then_subst_composition_lemma_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="rename_then_subst_composition_lemma_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="rename_then_subst_composition_lemma_fo_formula&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="11"/></proof>
+  </goal>
+  <goal name="rename_then_subst_composition_lemma_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="28"/></proof>
+  </goal>
+  <goal name="rename_then_subst_composition_lemma_fo_formula&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="36"/></proof>
+  </goal>
+  <goal name="rename_then_subst_composition_lemma_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="28"/></proof>
+  </goal>
+  <goal name="rename_then_subst_composition_lemma_fo_formula&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="36"/></proof>
+  </goal>
+  <goal name="rename_then_subst_composition_lemma_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="9"/></proof>
+  </goal>
+  <goal name="rename_then_subst_composition_lemma_fo_formula&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="644"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc" expl="VC for subst_then_rename_composition_lemma_fo_formula" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.20" steps="38327"/></proof>
+  </goal>
+  <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="38327"/></proof>
+  </goal>
+  <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.21" steps="41664"/></proof>
+  </goal>
+  <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.24" steps="43996"/></proof>
+  </goal>
+  <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="41664"/></proof>
+  </goal>
+  <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.16" steps="43996"/></proof>
+  </goal>
+  <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="36823"/></proof>
+  </goal>
+  <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7" expl="postcondition" proved="true">
+  <transf name="destruct_term_subst" proved="true" arg1="t">
+   <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+   </goal>
+   <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.1" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.59" steps="208361"/></proof>
+   <transf name="steps" proved="true" arg1="10">
+   </transf>
+   </goal>
+   <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.2" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.57" steps="208361"/></proof>
+   <transf name="steps" proved="true" arg1="10">
+   </transf>
+   </goal>
+   <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.3" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.82" steps="217010"/></proof>
+   </goal>
+   <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.4" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.82" steps="220091"/></proof>
+   </goal>
+   <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.5" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.05" steps="13"/></proof>
+   </goal>
+   <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.6" expl="postcondition" proved="true">
+   <transf name="unfold" proved="true" arg1="subst_fo_formula">
+    <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.6.0" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.03" steps="21"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.7" expl="postcondition" proved="true">
+   <transf name="unfold" proved="true" arg1="subst_fo_formula">
+    <goal name="subst_then_rename_composition_lemma_fo_formula&#39;vc.7.7.0" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.03" steps="21"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="subst_composition_lemma_fo_formula&#39;vc" expl="VC for subst_composition_lemma_fo_formula" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="subst_composition_lemma_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.18" steps="38620"/></proof>
+  </goal>
+  <goal name="subst_composition_lemma_fo_formula&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="38620"/></proof>
+  </goal>
+  <goal name="subst_composition_lemma_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.17" steps="42962"/></proof>
+  </goal>
+  <goal name="subst_composition_lemma_fo_formula&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.20" steps="46552"/></proof>
+  </goal>
+  <goal name="subst_composition_lemma_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.20" steps="42962"/></proof>
+  </goal>
+  <goal name="subst_composition_lemma_fo_formula&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.17" steps="46552"/></proof>
+  </goal>
+  <goal name="subst_composition_lemma_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="37116"/></proof>
+  </goal>
+  <goal name="subst_composition_lemma_fo_formula&#39;vc.7" expl="postcondition" proved="true">
+  <transf name="destruct_term_subst" proved="true" arg1="t">
+   <goal name="subst_composition_lemma_fo_formula&#39;vc.7.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.78" steps="205851"/></proof>
+   </goal>
+   <goal name="subst_composition_lemma_fo_formula&#39;vc.7.1" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.61" steps="218644"/></proof>
+   </goal>
+   <goal name="subst_composition_lemma_fo_formula&#39;vc.7.2" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.64" steps="218644"/></proof>
+   </goal>
+   <goal name="subst_composition_lemma_fo_formula&#39;vc.7.3" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.79" steps="223154"/></proof>
+   </goal>
+   <goal name="subst_composition_lemma_fo_formula&#39;vc.7.4" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.83" steps="223957"/></proof>
+   </goal>
+   <goal name="subst_composition_lemma_fo_formula&#39;vc.7.5" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+   </goal>
+   <goal name="subst_composition_lemma_fo_formula&#39;vc.7.6" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.07" steps="127"/></proof>
+   </goal>
+   <goal name="subst_composition_lemma_fo_formula&#39;vc.7.7" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.08" steps="127"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="subst_identity_lemma_fo_formula&#39;vc" expl="VC for subst_identity_lemma_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="subst_identity_lemma_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="subst_identity_lemma_fo_formula&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="subst_identity_lemma_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="28"/></proof>
+  </goal>
+  <goal name="subst_identity_lemma_fo_formula&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="32"/></proof>
+  </goal>
+  <goal name="subst_identity_lemma_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="28"/></proof>
+  </goal>
+  <goal name="subst_identity_lemma_fo_formula&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="32"/></proof>
+  </goal>
+  <goal name="subst_identity_lemma_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="subst_identity_lemma_fo_formula&#39;vc.7" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="subst_identity_lemma_fo_formula&#39;vc.7.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.28" steps="79342"/></proof>
+   </goal>
+   <goal name="subst_identity_lemma_fo_formula&#39;vc.7.1" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.24" steps="79342"/></proof>
+   </goal>
+   <goal name="subst_identity_lemma_fo_formula&#39;vc.7.2" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.26" steps="73210"/></proof>
+   </goal>
+   <goal name="subst_identity_lemma_fo_formula&#39;vc.7.3" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.23" steps="73210"/></proof>
+   </goal>
+   <goal name="subst_identity_lemma_fo_formula&#39;vc.7.4" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.21" steps="72987"/></proof>
+   </goal>
+   <goal name="subst_identity_lemma_fo_formula&#39;vc.7.5" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.25" steps="71040"/></proof>
+   </goal>
+   <goal name="subst_identity_lemma_fo_formula&#39;vc.7.6" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.24" steps="71040"/></proof>
+   </goal>
+   <goal name="subst_identity_lemma_fo_formula&#39;vc.7.7" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.20" steps="73286"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="renaming_preserve_size_fo_formula&#39;vc" expl="VC for renaming_preserve_size_fo_formula" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="renaming_preserve_size_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.18" steps="38249"/></proof>
+  </goal>
+  <goal name="renaming_preserve_size_fo_formula&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.15" steps="38249"/></proof>
+  </goal>
+  <goal name="renaming_preserve_size_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.14" steps="39511"/></proof>
+  </goal>
+  <goal name="renaming_preserve_size_fo_formula&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.21" steps="37227"/></proof>
+  </goal>
+  <goal name="renaming_preserve_size_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.15" steps="39511"/></proof>
+  </goal>
+  <goal name="renaming_preserve_size_fo_formula&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.17" steps="37227"/></proof>
+  </goal>
+  <goal name="renaming_preserve_size_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.14" steps="36745"/></proof>
+  </goal>
+  <goal name="renaming_preserve_size_fo_formula&#39;vc.7" expl="postcondition" proved="true">
+  <transf name="destruct_term_subst" proved="true" arg1="t">
+   <goal name="renaming_preserve_size_fo_formula&#39;vc.7.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
+   </goal>
+   <goal name="renaming_preserve_size_fo_formula&#39;vc.7.1" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.27" steps="80833"/></proof>
+   </goal>
+   <goal name="renaming_preserve_size_fo_formula&#39;vc.7.2" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.28" steps="80833"/></proof>
+   </goal>
+   <goal name="renaming_preserve_size_fo_formula&#39;vc.7.3" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.37" steps="84168"/></proof>
+   </goal>
+   <goal name="renaming_preserve_size_fo_formula&#39;vc.7.4" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.29" steps="86252"/></proof>
+   </goal>
+   <goal name="renaming_preserve_size_fo_formula&#39;vc.7.5" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.39" steps="86252"/></proof>
+   </goal>
+   <goal name="renaming_preserve_size_fo_formula&#39;vc.7.6" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.03" steps="13"/></proof>
+   </goal>
+   <goal name="renaming_preserve_size_fo_formula&#39;vc.7.7" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="13"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="rename_free_var_constructive_inversion_symbol_fo_formula&#39;vc" expl="VC for rename_free_var_constructive_inversion_symbol_fo_formula" proved="true">
+ <proof prover="0"><result status="valid" time="0.29" steps="1921"/></proof>
+ </goal>
+ <goal name="rename_free_var_inversion_symbol_fo_formula&#39;vc" expl="VC for rename_free_var_inversion_symbol_fo_formula" proved="true">
+ <proof prover="0"><result status="valid" time="0.10" steps="11"/></proof>
+ </goal>
+ <goal name="rename_free_var_constructive_inversion_fo_term_fo_formula&#39;vc" expl="VC for rename_free_var_constructive_inversion_fo_term_fo_formula" proved="true">
+ <proof prover="0"><result status="valid" time="0.25" steps="2163"/></proof>
+ </goal>
+ <goal name="rename_free_var_inversion_fo_term_fo_formula&#39;vc" expl="VC for rename_free_var_inversion_fo_term_fo_formula" proved="true">
+ <proof prover="3"><result status="valid" time="0.20" steps="66776"/></proof>
+ </goal>
+ <goal name="rename_free_var_propagation_symbol_fo_formula&#39;vc" expl="VC for rename_free_var_propagation_symbol_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="rename_free_var_propagation_symbol_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_symbol_fo_formula&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_symbol_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="28"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_symbol_fo_formula&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="30"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_symbol_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="28"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_symbol_fo_formula&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="30"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_symbol_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="9"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_symbol_fo_formula&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="1195"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="rename_free_var_propagation_fo_term_fo_formula&#39;vc" expl="VC for rename_free_var_propagation_fo_term_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="rename_free_var_propagation_fo_term_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_fo_term_fo_formula&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_fo_term_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="28"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_fo_term_fo_formula&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="30"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_fo_term_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="28"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_fo_term_fo_formula&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="30"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_fo_term_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="9"/></proof>
+  </goal>
+  <goal name="rename_free_var_propagation_fo_term_fo_formula&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="1254"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc" expl="VC for subst_free_var_constructive_inversion_symbol_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="13"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="71"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="14"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.4" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="122"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="102"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.6" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="15"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.7" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="16"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.8" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="13"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="71"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="14"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.12" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="122"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="102"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.14" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="15"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.15" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="16"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.16" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="39"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.18" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="70"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.19" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="14"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.20" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="46"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.21" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="14"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.22" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="43"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.23" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.24" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="74"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.25" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="15"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.26" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="50"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.27" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="15"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.28" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="97"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.29" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="39"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.30" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.31" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="70"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.32" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="14"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.33" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="46"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.34" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="14"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.35" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="43"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.36" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.37" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="74"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.38" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="15"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.39" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="50"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.40" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="15"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.41" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="97"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.42" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.43" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.44" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="66"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.45" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="14"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.46" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="42"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.47" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="14"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.48" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="13"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.49" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="19"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.50" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="19"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.51" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.52" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="14"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.53" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.54" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.55" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="78"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.56" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="19"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.57" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="54"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.58" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="19"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.59" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="105"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_symbol_fo_formula&#39;vc.60" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.37" steps="3628"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="subst_free_var_inversion_symbol_fo_formula&#39;vc" expl="VC for subst_free_var_inversion_symbol_fo_formula" proved="true">
+ <proof prover="0"><result status="valid" time="0.12" steps="32"/></proof>
+ </goal>
+ <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc" expl="VC for subst_free_var_constructive_inversion_fo_term_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="13"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.2" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="212"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="58"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.4" expl="assertion" proved="true">
+  <proof prover="8"><result status="valid" time="1.06"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.5" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="13"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.8" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="212"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="58"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.10" expl="assertion" proved="true">
+  <proof prover="8"><result status="valid" time="1.13"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.11" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.12" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="39"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.14" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="10"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.15" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.16" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="43"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.18" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.19" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="13"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.20" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="97"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.21" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="39"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.22" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.23" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="10"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.24" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.25" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="43"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.26" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.27" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.28" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="13"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.29" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="97"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.30" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.31" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.32" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="10"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.33" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.34" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="13"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.35" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="19"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.36" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="19"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.37" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="4"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.38" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="10"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.39" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.40" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="116"/></proof>
+  </goal>
+  <goal name="subst_free_var_constructive_inversion_fo_term_fo_formula&#39;vc.41" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="484"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="subst_free_var_inversion_fo_term_fo_formula&#39;vc" expl="VC for subst_free_var_inversion_fo_term_fo_formula" proved="true">
+ <proof prover="0"><result status="valid" time="0.11" steps="11"/></proof>
+ </goal>
+ <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc" expl="VC for subst_free_var_propagation_symbol_symbol_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="28"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="36"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.8" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="28"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.10" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="36"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.12" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="9"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.13" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.14" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.15" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_symbol_symbol_fo_formula&#39;vc.16" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.17" steps="1590"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc" expl="VC for subst_free_var_propagation_fo_term_symbol_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="15"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="15"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="28"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="31"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.8" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="28"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.10" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="31"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.12" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.13" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.14" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_symbol_fo_formula&#39;vc.15" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="1362"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc" expl="VC for subst_free_var_propagation_fo_term_fo_term_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="18"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="11"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="18"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="28"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="31"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.8" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="28"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.10" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="31"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.12" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="9"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.13" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.14" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="subst_free_var_propagation_fo_term_fo_term_fo_formula&#39;vc.15" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="1383"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc" expl="VC for free_var_equivalence_of_subst_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="18"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="8"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="33"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="135"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="18"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.6" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="8"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.7" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="11"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="33"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="135"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.10" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="7"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="7"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.12" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="28"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="35"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.14" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="37"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.15" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="10"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.16" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="10"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.17" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="39"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.18" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="36"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.19" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="34"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.20" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.21" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="7"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.22" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="28"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.23" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="35"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.24" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="37"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.25" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="10"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.26" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="10"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.27" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="39"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.28" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="36"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.29" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="34"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.30" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="18"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.31" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="18"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.32" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="9"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.33" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="33"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.34" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="35"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.35" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="7"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.36" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="35"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.37" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="17"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.38" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="8"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.39" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="33"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.40" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.08" steps="41"/></proof>
+  </goal>
+  <goal name="free_var_equivalence_of_subst_fo_formula&#39;vc.41" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="191"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="free_var_equivalence_of_rename_fo_formula&#39;vc" expl="VC for free_var_equivalence_of_rename_fo_formula" proved="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="128"/></proof>
+ </goal>
+ <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.09" steps="12"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.09" steps="25"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.2" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="96"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.3" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.3.0" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="19"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.3.1" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="16"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.3.2" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="19"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.3.3" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.07" steps="65"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.3.4" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="10"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.3.5" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.07" steps="65"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.3.6" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="13"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.3.7" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="2"><result status="valid" time="1.21"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="12"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.10" steps="25"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.6" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.14" steps="96"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.7" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.7.0" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="19"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.7.1" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="16"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.7.2" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="19"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.7.3" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="65"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.7.4" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="10"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.7.5" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="65"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.7.6" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="0" timelimit="5"><result status="valid" time="0.07" steps="13"/></proof>
+   </goal>
+   <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.7.7" expl="VC for free_var_derive_equivalence_of_subst_fo_formula" proved="true">
+   <proof prover="2"><result status="valid" time="1.20"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.8" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="33"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="76"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.10" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="108"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="118"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.12" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="33"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.11" steps="77"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.14" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="109"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.15" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="119"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.16" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="33"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.07" steps="76"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.18" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="108"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.19" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="118"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.20" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="33"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.21" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="77"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.22" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="109"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.23" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="119"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.24" expl="variant decrease" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="10"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.25" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.09" steps="19"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.26" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.04" steps="92"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.27" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.14" steps="102"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.28" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.14" steps="55"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.29" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.11" steps="106"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.30" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.10" steps="62"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.31" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="107"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.32" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.03" steps="116"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.33" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.09" steps="226"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_subst_fo_formula&#39;vc.34" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.07" steps="271"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="free_var_derive_equivalence_of_rename_fo_formula&#39;vc" expl="VC for free_var_derive_equivalence_of_rename_fo_formula" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="free_var_derive_equivalence_of_rename_fo_formula&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.05" steps="6"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_rename_fo_formula&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.08" steps="22"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_rename_fo_formula&#39;vc.2" expl="assertion" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.10" steps="35"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_rename_fo_formula&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.53"/></proof>
+  </goal>
+  <goal name="free_var_derive_equivalence_of_rename_fo_formula&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.58"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

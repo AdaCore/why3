@@ -13,7 +13,7 @@ module Make(S: sig
 
   let known_logical_ident = Pmodule.(Theory.(S.pmod.mod_theory.th_known))
   let known_pdecl = Pmodule.(Theory.(S.pmod.mod_known))
-  
+
   let th_int = Env.read_theory env ["int"] "Int"
   let le_int = Theory.(ns_find_ls th_int.th_export ["infix <="])
   let ge_int = Theory.(ns_find_ls th_int.th_export ["infix >="])
@@ -23,8 +23,8 @@ module Make(S: sig
   let min_int = Theory.(ns_find_ls th_int.th_export ["infix -"])
   let min_u_int = Theory.(ns_find_ls th_int.th_export ["prefix -"])
   let mult_int = Theory.(ns_find_ls th_int.th_export ["infix *"])
-  let zero_int = t_const Number.(ConstInt ({ic_negative = false; ic_abs = int_const_dec "0"})) Ty.ty_int
-  let one_int = t_const Number.(ConstInt ({ic_negative = false; ic_abs = int_const_dec "1"})) Ty.ty_int
+  let zero_int = Term.t_nat_const 0
+  let one_int = Term.t_nat_const 1
   let int_add =  begin fun a ->
     match a with
     | [a; b] ->
@@ -33,7 +33,7 @@ module Make(S: sig
       else fs_app Theory.(ns_find_ls th_int.th_export ["infix +"]) [a; b] Ty.ty_int
     | _ -> assert false
   end
-  let int_minus_u = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["prefix -"]) a Ty.ty_int 
+  let int_minus_u = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["prefix -"]) a Ty.ty_int
   let int_minus = begin fun a ->
     match a with
     | [a; b] ->
@@ -44,9 +44,9 @@ module Make(S: sig
   end
   let int_mult = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix *"]) a Ty.ty_int
 
-    
+
   exception Cannot_be_expressed
-  
+
   type coeff =
     | CNone
     | CPos of Term.term
@@ -57,10 +57,7 @@ module Make(S: sig
   let coeff_to_term = function
     | Coeff.Scalar(s) ->
       let i = int_of_string (Scalar.to_string s) in
-      let s = string_of_int (abs i) in
-      let n = Number.int_const_dec s in
-      let n = Number.{ic_negative = false; ic_abs = n } in
-      let n = Number.ConstInt n in
+      let n = Constant.int_const_of_int (abs i) in
 
       if i = 1 then
         COne
@@ -106,7 +103,7 @@ module Make(S: sig
         int_minus [!term; one_int]
     in
     term
-  
+
   (** Descend nots in the tree *)
   (* if way is true, then we must return the negation of t *)
   let rec t_descend_nots ?way:(way=false) t =
@@ -210,7 +207,7 @@ module Make(S: sig
     let t = t_map t_replace_all t in
     match t.t_node with
     | Tapp (fs,tl) ->
-      t_label_copy t (t_unfold t.t_loc fs tl t.t_ty)
+      t_attr_copy t (t_unfold t.t_loc fs tl t.t_ty)
     | _ -> t
 end
 
@@ -254,7 +251,3 @@ let rec descend_quantifier q t =
         | _ -> assert false
       in
       t_quant Tforall (t_close_quant [var] [] t)
-
-
-
-

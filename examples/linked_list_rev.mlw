@@ -1,0 +1,405 @@
+
+
+(**
+
+{1 In-place linked list reversal }
+
+Version designed for the {h <a href="http://www.lri.fr/~marche/MPRI-2-36-1/">MPRI lecture ``Proof of Programs''</a>}
+
+This is an improved version of {h <a href="linked_list_rev.html">this
+one</a>}: it does not use any Coq proofs, but lemma functions instead.
+
+*)
+
+
+
+module InPlaceRev
+
+  use map.Map
+  use ref.Ref
+  use int.Int
+  use list.List
+  use list.Quant as Q
+  use list.Append
+  use list.Mem
+  use list.Length
+  use export list.Reverse
+
+  type loc
+
+  val function eq_loc (l1 l2:loc) : bool
+    ensures { result <-> l1 = l2 }
+
+  val constant null : loc
+
+  predicate disjoint (l1:list loc) (l2:list loc) =
+    forall x:loc. not (mem x l1 /\ mem x l2)
+
+  predicate no_repet (l:list loc) =
+    match l with
+    | Nil -> true
+    | Cons x r -> not (mem x r) /\ no_repet r
+    end
+
+  let rec ghost mem_decomp (x: loc) (l: list loc)
+    : (l1: list loc, l2: list loc)
+    requires { mem x l }
+    variant  { l }
+    ensures  { l = l1 ++ Cons x l2 }
+  = match l with
+    | Nil -> absurd
+    | Cons h t -> if eq_loc h x then (Nil,t) else
+       let (r1,r2) = mem_decomp x t in (Cons h r1,r2)
+    end
+
+  val acc (field: ref (map loc 'a)) (l:loc) : 'a
+    requires { l <> null }
+    reads { field }
+    ensures { result = get !field l }
+
+  val upd (field: ref (map loc 'a)) (l:loc) (v:'a):unit
+    requires { l <> null }
+    writes { field }
+    ensures { !field = set (old !field) l v }
+
+
+  inductive list_seg loc (map loc loc) (list loc) loc =
+  | list_seg_nil: forall p:loc, next:map loc loc. list_seg p next Nil p
+  | list_seg_cons: forall p q:loc, next:map loc loc, l:list loc.
+      p <> null /\ list_seg (get next p) next l q ->
+         list_seg p next (Cons p l) q
+
+  let rec lemma list_seg_frame_ext (next1 next2:map loc loc)
+    (p q r v: loc) (pM:list loc)
+    requires { list_seg p next1 pM r }
+    requires { next2 = set next1 q v }
+    requires { not (mem q pM) }
+    variant  { pM }
+    ensures  { list_seg p next2 pM r }
+  = match pM with
+    | Nil -> ()
+    | Cons h t ->
+       assert { p = h };
+       list_seg_frame_ext next1 next2 (get next1 p) q r v t
+    end
+
+  let rec lemma list_seg_functional (next:map loc loc) (l1 l2:list loc) (p: loc)
+    requires { list_seg p next l1 null }
+    requires { list_seg p next l2 null }
+    variant  { l1 }
+    ensures  { l1 = l2 }
+  = match l1,l2 with
+    | Nil, Nil -> ()
+    | Cons _ r1, Cons _ r2 -> list_seg_functional next r1 r2 (get next p)
+    | _ -> absurd
+    end
+
+  let rec lemma list_seg_sublistl (next:map loc loc) (l1 l2:list loc) (p q: loc)
+    requires { list_seg p next (l1 ++ Cons q l2) null }
+    variant { l1 }
+    ensures { list_seg q next (Cons q l2) null }
+  = match l1 with
+    | Nil -> ()
+    | Cons _ r -> list_seg_sublistl next r l2 (get next p) q
+    end
+
+  let rec lemma list_seg_no_repet (next:map loc loc) (p: loc) (pM:list loc)
+    requires { list_seg p next pM null }
+    variant  { pM }
+    ensures  { no_repet pM }
+  = match pM with
+    | Nil -> ()
+    | Cons h t ->
+      if mem h t then
+         (* absurd case *)
+         let (l1,l2) = mem_decomp h t in
+         list_seg_sublistl next (Cons h l1) l2 p h;
+         list_seg_functional next pM (Cons h l2) p;
+         assert { length pM > length (Cons h l2) }
+      else
+        list_seg_no_repet next (get next p) t
+    end
+
+  let rec lemma list_seg_append (next:map loc loc) (p q r: loc) (pM qM:list loc)
+    requires { list_seg p next pM q }
+    requires { list_seg q next qM r }
+    variant  { pM }
+    ensures  { list_seg p next (pM ++ qM) r }
+  = match pM with
+    | Nil -> ()
+    | Cons _ t ->
+      list_seg_append next (get next p) q r t qM
+    end
+
+  val next : ref (map loc loc)
+
+  let app (l1 l2:loc) (ghost l1M l2M:list loc) : loc
+    requires { list_seg l1 !next l1M null }
+    requires { list_seg l2 !next l2M null }
+    requires { disjoint l1M l2M }
+    ensures { list_seg result !next (l1M ++ l2M) null }
+  =
+    if eq_loc l1 null then l2 else
+    let p = ref l1 in
+    let ghost pM = ref l1M in
+    let ghost l1pM = ref (Nil : list loc) in
+    while not (eq_loc (acc next !p) null) do
+      invariant { !p <> null }
+      invariant { list_seg l1 !next !l1pM !p }
+      invariant { list_seg !p !next !pM null }
+      invariant { !l1pM ++ !pM = l1M }
+      invariant { disjoint !l1pM !pM }
+      variant   { !pM }
+        match !pM with
+        | Nil -> absurd
+        | Cons h t ->
+          pM := t;
+          assert { disjoint !l1pM !pM };
+          assert { not (mem h !pM) };
+          l1pM := !l1pM ++ Cons h Nil;
+        end;
+        p := acc next !p
+    done;
+    upd next !p l2;
+    assert { list_seg l1 !next !l1pM !p };
+    assert { list_seg !p !next (Cons !p Nil) l2 };
+    assert { list_seg l2 !next l2M null };
+    l1
+
+
+
+  let in_place_reverse (l:loc) (ghost lM:list loc) : loc
+    requires { list_seg l !next lM null }
+    ensures  { list_seg result !next (reverse lM) null }
+  = let p = ref l in
+    let ghost pM = ref lM in
+    let r = ref null in
+    let ghost rM = ref (Nil : list loc) in
+    while not (eq_loc !p null) do
+      invariant { list_seg !p !next !pM null }
+      invariant { list_seg !r !next !rM null }
+      invariant { disjoint !pM !rM }
+      invariant { (reverse !pM) ++ !rM = reverse lM }
+      variant   { !pM }
+      let n = get !next !p in
+      upd next !p !r;
+      assert { list_seg !r !next !rM null };
+      r := !p;
+      p := n;
+      match !pM with
+      | Nil -> absurd
+      | Cons h t -> rM := Cons h !rM; pM := t
+      end
+      done;
+    !r
+
+end
+
+(** Using sequences instead of lists *)
+
+module InPlaceRevSeq
+
+  use int.Int
+  use map.Map as Map
+  use seq.Seq
+  use seq.Mem
+  use seq.Reverse
+
+  type loc
+
+  val function null: loc
+
+  val function eq_loc (l1 l2:loc) : bool
+    ensures { result <-> l1 = l2 }
+
+  predicate disjoint (s1: seq 'a) (s2: seq 'a) =
+    (* forall x:'a. not (mem x s1 /\ mem x s2) *)
+    forall i1. 0 <= i1 < length s1 ->
+    forall i2. 0 <= i2 < length s2 ->
+    s1[i1] <> s2[i2]
+
+  predicate no_repet (s: seq loc) =
+    forall i. 0 <= i < length s -> not (mem s[i] s[i+1..])
+
+  lemma non_empty_seq:
+    forall s: seq 'a. length s > 0 ->
+    s == cons s[0] s[1..]
+
+  let rec ghost mem_decomp (x: loc) (s: seq loc) : (s1: seq loc, s2: seq loc)
+    requires { mem x s }
+    variant  { length s }
+    ensures  { s == s1 ++ cons x s2 }
+  =
+    if eq_loc s[0] x then (empty, s[1..])
+    else begin
+      assert { s == cons s[0] s[1..] };
+      let (s1, s2) = mem_decomp x s[1..] in (cons s[0] s1, s2)
+    end
+
+  use ref.Ref
+
+  type memory 'a = ref (Map.map loc 'a)
+
+  val acc (field: memory 'a) (l:loc) : 'a
+    requires { l <> null }
+    reads    { field }
+    ensures  { result = Map.get !field l }
+
+  val upd (field: memory 'a) (l: loc) (v: 'a) : unit
+    requires { l <> null }
+    writes   { field }
+    ensures  { !field = Map.set (old !field) l v }
+
+  type next = Map.map loc loc
+
+  predicate list_seg (next: next) (p: loc) (s: seq loc) (q: loc) =
+    let n = length s in
+    (forall i. 0 <= i < n -> s[i] <> null) /\
+    (   (p = q /\ n = 0)
+     \/ (1 <= n /\ s[0] = p /\ Map.get next s[n-1] = q /\
+         forall i. 0 <= i < n-1 -> Map.get next s[i] = s[i+1]))
+
+  lemma list_seg_frame_ext:
+    forall next1 next2: next, p q r v: loc, pM: seq loc.
+    list_seg next1 p pM r ->
+    next2 = Map.set next1 q v ->
+    not (mem q pM) ->
+    list_seg next2 p pM r
+
+  let rec lemma list_seg_functional (next: next) (l1 l2: seq loc) (p: loc)
+    requires { list_seg next p l1 null }
+    requires { list_seg next p l2 null }
+    variant  { length l1 }
+    ensures  { l1 == l2 }
+  = if length l1 > 0 && length l2 > 0 then begin
+      assert { l1[0] = l2[0] = p };
+      list_seg_functional next l1[1..] l2[1..] (Map.get next p)
+    end
+
+  let rec lemma list_seg_tail (next: next) (l1: seq loc) (p q: loc)
+    requires { list_seg next p l1 q }
+    requires { length l1 > 0 }
+    variant  { length l1 }
+    ensures  { list_seg next (Map.get next p)l1[1..] q }
+  = if length l1 > 1 then
+      list_seg_tail next l1[1..] (Map.get next p) q
+
+  let rec lemma list_seg_append (next: next) (p q r: loc) (pM qM: seq loc)
+    requires { list_seg next p pM q }
+    requires { list_seg next q qM r }
+    variant  { length pM }
+    ensures  { list_seg next p (pM ++ qM) r }
+  =  if length pM > 0 then
+      list_seg_append next (Map.get next p) q r pM[1..] qM
+
+  lemma seq_tail_append:
+    forall l1 l2: seq 'a.
+    length l1 > 0 -> (l1 ++ l2)[1..] == l1[1..] ++ l2
+
+  let rec lemma list_seg_prefix (next: next) (l1 l2: seq loc) (p q: loc)
+    requires { list_seg next p (l1 ++ cons q l2) null }
+    variant  { length l1 }
+    ensures  { list_seg next p l1 q }
+  = if length l1 > 0 then begin
+      list_seg_tail next (l1 ++ cons q l2) p null;
+      list_seg_prefix next l1[1..] l2 (Map.get next p) q
+    end
+
+  let rec lemma list_seg_sublistl (next: next) (l1 l2: seq loc) (p q: loc)
+    requires { list_seg next p (l1 ++ cons q l2) null }
+    variant  { length l1 }
+    ensures  { list_seg next q (cons q l2) null }
+  = assert { list_seg next p l1 q };
+    if length l1 > 0 then begin
+      list_seg_tail next l1 p q;
+      list_seg_sublistl next l1[1..] l2 (Map.get next p) q
+    end
+
+  lemma get_tail:
+    forall i: int, s: seq 'a. 0 <= i < length s - 1 -> s[1..][i] = s[i+1]
+  lemma tail_suffix:
+    forall i: int, s: seq 'a. 0 <= i < length s -> s[1..][i..] == s[i+1..]
+
+  let rec lemma list_seg_no_repet (next: next) (p: loc) (pM: seq loc)
+    requires { list_seg next p pM null }
+    variant  { length pM }
+    ensures  { no_repet pM }
+  = if length pM > 0 then begin
+      let h = pM[0] in
+      let t = pM[1..] in
+      if mem h t then
+         (* absurd case *)
+         let (l1,l2) = mem_decomp h t in
+         list_seg_sublistl next (cons h l1) l2 p h;
+         list_seg_functional next pM (cons h l2) p;
+         assert { length pM > length (cons h l2) }
+      else begin
+        assert { not (mem pM[0] pM[0+1..]) };
+        list_seg_no_repet next (Map.get next p) t;
+        assert { forall i. 1 <= i < length pM -> not (mem pM[i] pM[i+1..]) }
+      end
+    end
+
+  val next : ref next
+
+  let app (l1 l2: loc) (ghost l1M l2M: seq loc) : loc
+    requires { list_seg !next l1 l1M null }
+    requires { list_seg !next l2 l2M null }
+    requires { disjoint l1M l2M }
+    ensures  { list_seg !next result (l1M ++ l2M) null }
+  =
+    if eq_loc l1 null then l2 else
+    let p = ref l1 in
+    let ghost pM = ref l1M in
+    let ghost l1pM = ref (empty : seq loc) in
+    ghost list_seg_no_repet !next l1 l1M;
+    while not (eq_loc (acc next !p) null) do
+      invariant { !p <> null }
+      invariant { list_seg !next l1 !l1pM !p }
+      invariant { list_seg !next !p !pM null }
+      invariant { !l1pM ++ !pM == l1M }
+      invariant { disjoint !l1pM !pM }
+      variant   { length !pM }
+      assert { length !pM > 0 };
+      assert { not (mem !p !l1pM) };
+      let ghost t = !pM[1..] in
+      ghost l1pM := !l1pM ++ cons !p empty;
+      ghost pM := t;
+      p := acc next !p
+    done;
+    upd next !p l2;
+    assert { list_seg !next l1 !l1pM !p };
+    assert { list_seg !next !p (cons !p empty) l2 };
+    assert { list_seg !next l2 l2M null };
+    l1
+
+  let in_place_reverse (l:loc) (ghost lM: seq loc) : loc
+    requires { list_seg !next l lM null }
+    ensures  { list_seg !next result (reverse lM) null }
+  = let p = ref l in
+    let ghost pM = ref lM in
+    let r = ref null in
+    let ghost rM = ref (empty: seq loc) in
+    while not (eq_loc !p null) do
+      invariant { list_seg !next !p !pM null }
+      invariant { list_seg !next !r !rM null }
+      invariant { disjoint !pM !rM }
+      invariant { (reverse !pM) ++ !rM == reverse lM }
+      variant   { length !pM }
+      let n = acc next !p in
+      upd next !p !r;
+      assert { list_seg !next !r !rM null };
+      r := !p;
+      p := n;
+      rM := cons !pM[0] !rM;
+      pM := !pM[1..]
+    done;
+    !r
+
+end
+
+(*
+Local Variables:
+compile-command: "why3 ide linked_list_rev.mlw"
+End:
+*)

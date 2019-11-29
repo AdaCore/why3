@@ -1,284 +1,330 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../maximum_subarray.mlw" expanded="true">
-<theory name="Spec" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="Algo1" sum="e8f82ef65f2d5f6a1fdcf96390b86b5f">
- <goal name="VC maximum_subarray" expl="VC for maximum_subarray">
- <proof prover="4"><result status="valid" time="0.45" steps="784"/></proof>
+<why3session shape_version="8">
+<prover id="2" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="maximum_subarray.mlw"/>
+<theory name="Algo1" proved="true">
+ <goal name="maximum_subarray&#39;vc" expl="VC for maximum_subarray" proved="true">
+ <proof prover="5"><result status="valid" time="0.26" steps="501"/></proof>
  </goal>
 </theory>
-<theory name="Algo2" sum="a46491523ecb74085758aaca5a9bda43">
- <goal name="VC maximum_subarray" expl="VC for maximum_subarray">
- <proof prover="4"><result status="valid" time="0.25" steps="555"/></proof>
+<theory name="Algo2" proved="true">
+ <goal name="maximum_subarray&#39;vc" expl="VC for maximum_subarray" proved="true">
+ <proof prover="5"><result status="valid" time="0.25" steps="450"/></proof>
  </goal>
 </theory>
-<theory name="Algo3" sum="ade5da6f1affffd2d62e05276bddb4d1">
- <goal name="VC maximum_subarray_rec" expl="VC for maximum_subarray_rec">
- <transf name="split_goal_wp">
-  <goal name="VC maximum_subarray_rec.1" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
+<theory name="Algo3" proved="true">
+ <goal name="maximum_subarray_rec&#39;vc" expl="VC for maximum_subarray_rec" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="maximum_subarray_rec&#39;vc.0" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="12"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.2" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="14"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.3" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="5"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.4" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.5" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="13"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.4" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="13"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.6" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="11"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.5" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.7" expl="index in array bounds">
-  <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.6" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="27"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.8" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.9" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.8" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.10" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.9" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.11" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.00" steps="22"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.12" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.00" steps="17"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.13" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.00" steps="21"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="21"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.14" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.00" steps="17"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.15" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.00" steps="17"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.14" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="17"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.16" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.15" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.17" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="22"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.16" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="22"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.18" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="16"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.17" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.19" expl="index in array bounds">
-  <proof prover="4"><result status="valid" time="0.00" steps="20"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.18" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="20"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.20" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.01" steps="29"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.19" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.21" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.02" steps="38"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.20" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="38"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.22" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="26"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.21" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.23" expl="loop invariant preservation">
-  <transf name="inline_all">
-   <goal name="VC maximum_subarray_rec.23.1" expl="loop invariant preservation">
-   <proof prover="1"><result status="valid" time="5.70"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.22" expl="loop invariant preservation" proved="true">
+  <transf name="inline_all" proved="true" >
+   <goal name="maximum_subarray_rec&#39;vc.22.0" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="1.10" steps="141239"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC maximum_subarray_rec.24" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.00" steps="29"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.23" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="29"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.25" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.00" steps="24"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.24" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="24"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.26" expl="loop invariant preservation">
-  <transf name="inline_all">
-   <goal name="VC maximum_subarray_rec.26.1" expl="loop invariant preservation">
-   <proof prover="1"><result status="valid" time="4.94"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.25" expl="loop invariant preservation" proved="true">
+  <transf name="inline_all" proved="true" >
+   <goal name="maximum_subarray_rec&#39;vc.25.0" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.31" steps="51348"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC maximum_subarray_rec.27" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.26" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.28" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.02" steps="31"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.27" expl="variant decrease" proved="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.29" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="18"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.28" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="18"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.30" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.00" steps="26"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.29" expl="variant decrease" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="26"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.31" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.02" steps="42"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.30" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.32" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="35"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.31" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.33" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="45"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.32" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="45"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.34" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="31"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.33" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.35" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="42"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.34" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="42"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.36" expl="variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.35" expl="variant decrease" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.37" expl="precondition">
-  <proof prover="4"><result status="valid" time="0.02" steps="37"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.36" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.38" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.37" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.39" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.00" steps="42"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.38" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="42"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.40" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="28"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.39" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.41" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="36"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.40" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.42" expl="out of loop bounds">
-  <proof prover="4"><result status="valid" time="0.00" steps="19"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.41" expl="out of loop bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="26"/></proof>
   </goal>
-  <goal name="VC maximum_subarray_rec.43" expl="out of loop bounds">
-  <proof prover="4"><result status="valid" time="0.00" steps="20"/></proof>
+  <goal name="maximum_subarray_rec&#39;vc.42" expl="out of loop bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="28"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC maximum_subarray" expl="VC for maximum_subarray">
- <proof prover="4"><result status="valid" time="0.00" steps="13"/></proof>
+ <goal name="maximum_subarray&#39;vc" expl="VC for maximum_subarray" proved="true">
+ <proof prover="5"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
 </theory>
-<theory name="Algo4" sum="ac48132fdab07e9d05db1d3cf27734f6">
- <goal name="VC maximum_subarray" expl="VC for maximum_subarray">
- <proof prover="4"><result status="valid" time="2.52" steps="2097"/></proof>
+<theory name="Algo4" proved="true">
+ <goal name="maximum_subarray&#39;vc" expl="VC for maximum_subarray" proved="true">
+ <proof prover="5"><result status="valid" time="2.08" steps="1977"/></proof>
  </goal>
 </theory>
-<theory name="Algo5" sum="e9381f1b6f864e196dfc4e81fd72f831">
- <goal name="VC maximum_subarray" expl="VC for maximum_subarray">
- <proof prover="4"><result status="valid" time="0.98" steps="849"/></proof>
+<theory name="Algo5" proved="true">
+ <goal name="maximum_subarray&#39;vc" expl="VC for maximum_subarray" proved="true">
+ <proof prover="5"><result status="valid" time="0.75" steps="831"/></proof>
  </goal>
 </theory>
-<theory name="BoundedIntegers" sum="1171406c4c3e936a4c1bf0d10639c889">
- <goal name="VC maximum_subarray" expl="VC for maximum_subarray">
- <transf name="split_goal_wp">
-  <goal name="VC maximum_subarray.1" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="30"/></proof>
+<theory name="BoundedIntegers" proved="true">
+ <goal name="maximum_subarray&#39;vc" expl="VC for maximum_subarray" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="maximum_subarray&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="33"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.2" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="maximum_subarray&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.3" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.00" steps="13"/></proof>
+  <goal name="maximum_subarray&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.4" expl="loop invariant init">
-  <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="maximum_subarray&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.5" expl="index in array bounds">
-  <proof prover="4"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="maximum_subarray&#39;vc.4" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.6" expl="integer overflow">
-  <proof prover="4"><result status="valid" time="0.02" steps="71"/></proof>
+  <goal name="maximum_subarray&#39;vc.5" expl="integer overflow" proved="true">
+  <proof prover="5"><result status="valid" time="0.04" steps="23"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.7" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="25"/></proof>
+  <goal name="maximum_subarray&#39;vc.6" expl="loop variant decrease" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.8" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.06" steps="130"/></proof>
+  <goal name="maximum_subarray&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.05" steps="129"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.9" expl="loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.34"/></proof>
+  <goal name="maximum_subarray&#39;vc.8" expl="loop invariant preservation" proved="true">
+  <proof prover="5" timelimit="60"><result status="valid" time="7.02" steps="3911"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.10" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="31"/></proof>
+  <goal name="maximum_subarray&#39;vc.9" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.00" steps="29"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.11" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.02" steps="38"/></proof>
+  <goal name="maximum_subarray&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="36"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.12" expl="integer overflow">
-  <proof prover="4"><result status="valid" time="0.02" steps="68"/></proof>
+  <goal name="maximum_subarray&#39;vc.11" expl="integer overflow" proved="true">
+  <proof prover="5"><result status="valid" time="0.05" steps="20"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.13" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="maximum_subarray&#39;vc.12" expl="loop variant decrease" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.14" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.00" steps="22"/></proof>
+  <goal name="maximum_subarray&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.15" expl="loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.53"/></proof>
+  <goal name="maximum_subarray&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <proof prover="5" timelimit="120"><result status="valid" time="17.06" steps="11448"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.16" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.05" steps="129"/></proof>
+  <goal name="maximum_subarray&#39;vc.15" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.05" steps="118"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.17" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.38"/></proof>
+  <goal name="maximum_subarray&#39;vc.16" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.20" steps="54020"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.18" expl="assertion">
-  <proof prover="4" timelimit="15"><result status="valid" time="0.01" steps="20"/></proof>
-  <proof prover="5" timelimit="15"><result status="valid" time="0.01"/></proof>
+  <goal name="maximum_subarray&#39;vc.17" expl="assertion" proved="true">
+  <proof prover="2" timelimit="15"><result status="valid" time="0.01" steps="39994"/></proof>
+  <proof prover="5" timelimit="15"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.19" expl="index in array bounds">
-  <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
+  <goal name="maximum_subarray&#39;vc.18" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.20" expl="integer overflow">
-  <proof prover="4" timelimit="15"><result status="valid" time="0.04" steps="100"/></proof>
+  <goal name="maximum_subarray&#39;vc.19" expl="integer overflow" proved="true">
+  <proof prover="5" timelimit="15"><result status="valid" time="0.05" steps="111"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.21" expl="integer overflow">
-  <proof prover="4"><result status="valid" time="0.04" steps="83"/></proof>
+  <goal name="maximum_subarray&#39;vc.20" expl="integer overflow" proved="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.22" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="25"/></proof>
+  <goal name="maximum_subarray&#39;vc.21" expl="loop variant decrease" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="23"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.23" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.03" steps="76"/></proof>
+  <goal name="maximum_subarray&#39;vc.22" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.04" steps="203"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.24" expl="loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.61"/></proof>
+  <goal name="maximum_subarray&#39;vc.23" expl="loop invariant preservation" proved="true">
+  <transf name="simplify_trivial_quantification" proved="true" >
+   <goal name="maximum_subarray&#39;vc.23.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="maximum_subarray&#39;vc.23.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="maximum_subarray&#39;vc.23.0.0.0" expl="loop invariant preservation" proved="true">
+     <transf name="case" proved="true" arg1="(h&#39; &lt; i)">
+      <goal name="maximum_subarray&#39;vc.23.0.0.0.0" expl="true case (loop invariant preservation)" proved="true">
+      <proof prover="4" timelimit="1"><result status="valid" time="0.04" steps="13539"/></proof>
+      </goal>
+      <goal name="maximum_subarray&#39;vc.23.0.0.0.1" expl="false case (loop invariant preservation)" proved="true">
+      <proof prover="2"><result status="valid" time="0.12" steps="81887"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  <transf name="split_all_full" proved="true" >
+   <goal name="maximum_subarray&#39;vc.23.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="maximum_subarray&#39;vc.23.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="maximum_subarray&#39;vc.23.0.0.0" expl="loop invariant preservation" proved="true">
+     <proof prover="4" timelimit="30" memlimit="4000"><result status="valid" time="1.14" steps="110695"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="VC maximum_subarray.25" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="31"/></proof>
+  <goal name="maximum_subarray&#39;vc.24" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.06" steps="29"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.26" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="37"/></proof>
+  <goal name="maximum_subarray&#39;vc.25" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="35"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.27" expl="integer overflow">
-  <proof prover="4"><result status="valid" time="0.05" steps="80"/></proof>
+  <goal name="maximum_subarray&#39;vc.26" expl="integer overflow" proved="true">
+  <proof prover="5"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.28" expl="loop variant decrease">
-  <proof prover="4"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="maximum_subarray&#39;vc.27" expl="loop variant decrease" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.29" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="maximum_subarray&#39;vc.28" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.05" steps="20"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.30" expl="loop invariant preservation">
-  <proof prover="5"><result status="valid" time="0.45"/></proof>
+  <goal name="maximum_subarray&#39;vc.29" expl="loop invariant preservation" proved="true">
+  <transf name="simplify_trivial_quantification" proved="true" >
+   <goal name="maximum_subarray&#39;vc.29.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="maximum_subarray&#39;vc.29.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="case" proved="true" arg1="(h&#39; &lt; i)">
+     <goal name="maximum_subarray&#39;vc.29.0.0.0" expl="true case (loop invariant preservation)" proved="true">
+     <proof prover="4" timelimit="1"><result status="valid" time="0.04" steps="13459"/></proof>
+     </goal>
+     <goal name="maximum_subarray&#39;vc.29.0.0.1" expl="false case (loop invariant preservation)" proved="true">
+     <proof prover="2"><result status="valid" time="0.08" steps="79408"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
-  <goal name="VC maximum_subarray.31" expl="loop invariant preservation">
-  <proof prover="4"><result status="valid" time="0.02" steps="65"/></proof>
+  <goal name="maximum_subarray&#39;vc.30" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.03" steps="96"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.32" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.47"/></proof>
+  <goal name="maximum_subarray&#39;vc.31" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="36829"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.33" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="maximum_subarray&#39;vc.32" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC maximum_subarray.34" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="maximum_subarray&#39;vc.33" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
  </transf>
  </goal>

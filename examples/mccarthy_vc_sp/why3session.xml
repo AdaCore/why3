@@ -1,47 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../mccarthy.mlw" expanded="true">
-<theory name="McCarthy91" sum="b68a98895b244f16dcb90a4b51e9d55e" expanded="true">
- <goal name="VC f91" expl="VC for f91" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC f91.1" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
-  </goal>
-  <goal name="VC f91.2" expl="variant decrease">
-  <proof prover="1"><result status="valid" time="0.00" steps="5"/></proof>
-  </goal>
-  <goal name="VC f91.3" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
-  </goal>
- </transf>
+<why3session shape_version="8">
+<prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="mccarthy_vc_sp.mlw"/>
+<theory name="McCarthy91" proved="true">
+ <goal name="f91&#39;vc" expl="VC for f91" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="938"/></proof>
  </goal>
- <goal name="VC f91_nonrec" expl="VC for f91_nonrec" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC f91_nonrec.1" expl="loop invariant init">
-  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
-  </goal>
-  <goal name="VC f91_nonrec.2" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
-  </goal>
-  <goal name="VC f91_nonrec.3" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.01" steps="31"/></proof>
-  </goal>
-  <goal name="VC f91_nonrec.4" expl="loop variant decrease">
-  <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
-  </goal>
-  <goal name="VC f91_nonrec.5" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.14" steps="294"/></proof>
-  </goal>
-  <goal name="VC f91_nonrec.6" expl="postcondition">
-  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
-  </goal>
- </transf>
+ <goal name="f91_nonrec&#39;vc" expl="VC for f91_nonrec" proved="true">
+ <proof prover="4"><result status="valid" time="0.27" steps="532"/></proof>
  </goal>
- <goal name="VC f91_pseudorec" expl="VC for f91_pseudorec" expanded="true">
- <proof prover="1"><result status="valid" time="0.00" steps="49"/></proof>
+ <goal name="f91_pseudorec&#39;vc" expl="VC for f91_pseudorec" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="4682"/></proof>
+ </goal>
+</theory>
+<theory name="McCarthy91Mach" proved="true">
+ <goal name="f91&#39;vc" expl="VC for f91" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="4712"/></proof>
+ </goal>
+ <goal name="f91_nonrec&#39;vc" expl="VC for f91_nonrec" proved="true">
+ <proof prover="3"><result status="valid" time="0.02" steps="24562"/></proof>
+ </goal>
+ <goal name="f91_pseudorec&#39;vc" expl="VC for f91_pseudorec" proved="true">
+ <proof prover="1"><result status="valid" time="0.07" steps="10975"/></proof>
  </goal>
 </theory>
 </file>

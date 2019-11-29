@@ -1,722 +1,614 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Coq" version="8.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="1.01" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../heapsort.mlw">
-<theory name="HeapSort" sum="79f2390a23b665ab5ee9460a8e6f736f">
- <goal name="VC min_of_sorted" expl="VC for min_of_sorted">
- <transf name="split_goal_wp">
-  <goal name="VC min_of_sorted.1" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+<why3session shape_version="8">
+<prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.9.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="heapsort.mlw"/>
+<theory name="HeapSort" proved="true">
+ <goal name="min_of_sorted&#39;vc" expl="VC for min_of_sorted" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="min_of_sorted&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="10250"/></proof>
   </goal>
-  <goal name="VC min_of_sorted.2" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="min_of_sorted&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="10227"/></proof>
   </goal>
-  <goal name="VC min_of_sorted.3" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+  <goal name="min_of_sorted&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="11106"/></proof>
   </goal>
-  <goal name="VC min_of_sorted.4" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="67"/></proof>
+  <goal name="min_of_sorted&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="23156"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC heapSort" expl="VC for heapSort">
- <transf name="split_goal_wp">
-  <goal name="VC heapSort.1" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
+ <goal name="heapSort&#39;vc" expl="VC for heapSort" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="heapSort&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="8029"/></proof>
   </goal>
-  <goal name="VC heapSort.2" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="heapSort&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="11944"/></proof>
   </goal>
-  <goal name="VC heapSort.3" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="heapSort&#39;vc.2" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="11607"/></proof>
   </goal>
-  <goal name="VC heapSort.4" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="VC heapSort.4.1" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
-   <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="heapSort&#39;vc.3" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="heapSort&#39;vc.3.0" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="12107"/></proof>
    </goal>
-   <goal name="VC heapSort.4.2" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.00" steps="10"/></proof>
-   <proof prover="3"><result status="valid" time="0.00" steps="9"/></proof>
+   <goal name="heapSort&#39;vc.3.1" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="11245"/></proof>
    </goal>
-   <goal name="VC heapSort.4.3" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
-   <proof prover="3"><result status="valid" time="0.00" steps="10"/></proof>
+   <goal name="heapSort&#39;vc.3.2" expl="VC for heapSort" proved="true">
+   <proof prover="1" timelimit="1"><result status="valid" time="0.01" steps="13"/></proof>
    </goal>
-   <goal name="VC heapSort.4.4" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.01" steps="36"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="44"/></proof>
+   <goal name="heapSort&#39;vc.3.3" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.06" steps="13293"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC heapSort.5" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.02" steps="96"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="42"/></proof>
+  <goal name="heapSort&#39;vc.4" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="14874"/></proof>
   </goal>
-  <goal name="VC heapSort.6" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="16"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="15"/></proof>
+  <goal name="heapSort&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="12616"/></proof>
   </goal>
-  <goal name="VC heapSort.7" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00" steps="16"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="15"/></proof>
+  <goal name="heapSort&#39;vc.6" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="13213"/></proof>
   </goal>
-  <goal name="VC heapSort.8" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.03" steps="112"/></proof>
-  <proof prover="3"><result status="valid" time="0.03" steps="116"/></proof>
+  <goal name="heapSort&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="111"/></proof>
   </goal>
-  <goal name="VC heapSort.9" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="VC heapSort.9.1" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="heapSort&#39;vc.8" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="heapSort&#39;vc.8.0" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="13729"/></proof>
    </goal>
-   <goal name="VC heapSort.9.2" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
+   <goal name="heapSort&#39;vc.8.1" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="12035"/></proof>
    </goal>
-   <goal name="VC heapSort.9.3" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.00" steps="19"/></proof>
-   <proof prover="3"><result status="valid" time="0.00" steps="18"/></proof>
+   <goal name="heapSort&#39;vc.8.2" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.02" steps="12467"/></proof>
    </goal>
-   <goal name="VC heapSort.9.4" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.08" steps="206"/></proof>
-   <proof prover="3"><result status="valid" time="0.16" steps="147"/></proof>
+   <goal name="heapSort&#39;vc.8.3" expl="VC for heapSort" proved="true">
+   <proof prover="0"><result status="valid" time="0.11" steps="22655"/></proof>
    </goal>
-   <goal name="VC heapSort.9.5" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.04" steps="107"/></proof>
-   <proof prover="3"><result status="valid" time="0.06" steps="214"/></proof>
+   <goal name="heapSort&#39;vc.8.4" expl="VC for heapSort" proved="true">
+   <proof prover="1" timelimit="1"><result status="valid" time="0.04" steps="78"/></proof>
    </goal>
-   <goal name="VC heapSort.9.6" expl="VC for heapSort">
-   <proof prover="2"><result status="valid" time="0.03" steps="93"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="92"/></proof>
+   <goal name="heapSort&#39;vc.8.5" expl="VC for heapSort" proved="true">
+   <proof prover="1" timelimit="1"><result status="valid" time="0.03" steps="93"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC heapSort.10" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="43"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="38"/></proof>
+  <goal name="heapSort&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="13555"/></proof>
   </goal>
-  <goal name="VC heapSort.11" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="7"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="heapSort&#39;vc.10" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="10822"/></proof>
   </goal>
-  <goal name="VC heapSort.12" expl="out of loop bounds">
-  <proof prover="2"><result status="valid" time="0.01" steps="3"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="2"/></proof>
+  <goal name="heapSort&#39;vc.11" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.02" steps="14454"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 </file>
-<file name="../heap.why">
-<theory name="Heap" sum="ac7411ced7d244b5bf5d1f3500b7d77d">
- <goal name="Parent_inf" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+<file format="whyml" proved="true">
+<path name=".."/><path name="heap.why"/>
+<theory name="Heap" proved="true">
+ <goal name="Parent_inf" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
- <goal name="Left_sup" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+ <goal name="Left_sup" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="Right_sup" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+ <goal name="Right_sup" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
  </goal>
- <goal name="Parent_right" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+ <goal name="Parent_right" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
  </goal>
- <goal name="Parent_left" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+ <goal name="Parent_left" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
  </goal>
- <goal name="Inf_parent" expl="">
- <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+ <goal name="Inf_parent" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
  </goal>
- <goal name="Child_parent" expl="">
- <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
+ <goal name="Child_parent" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
  </goal>
- <goal name="Parent_pos" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+ <goal name="Parent_pos" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
  </goal>
- <goal name="Is_heap_when_no_element" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
+ <goal name="Is_heap_when_no_element" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="4"/></proof>
  </goal>
- <goal name="Is_heap_sub" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="14"/></proof>
+ <goal name="Is_heap_sub" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="21"/></proof>
  </goal>
- <goal name="Is_heap_sub2" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
+ <goal name="Is_heap_sub2" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="19"/></proof>
  </goal>
- <goal name="Is_heap_when_node_modified" expl="">
- <proof prover="2"><result status="valid" time="0.15" steps="227"/></proof>
+ <goal name="Is_heap_when_node_modified" proved="true">
+ <proof prover="1"><result status="valid" time="0.15" steps="360"/></proof>
  </goal>
- <goal name="Is_heap_add_last" expl="">
- <proof prover="2"><result status="valid" time="0.05" steps="94"/></proof>
+ <goal name="Is_heap_add_last" proved="true">
+ <proof prover="1"><result status="valid" time="0.05" steps="180"/></proof>
  </goal>
- <goal name="Parent_inf_el" expl="">
- <proof prover="5" timelimit="1"><result status="valid" time="0.14"/></proof>
+ <goal name="Parent_inf_el" proved="true">
+ <proof prover="2"><result status="valid" time="0.12"/></proof>
  </goal>
- <goal name="Left_sup_el" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="11"/></proof>
+ <goal name="Left_sup_el" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
- <goal name="Right_sup_el" expl="">
- <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
+ <goal name="Right_sup_el" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
  </goal>
- <goal name="VC is_heap_relation" expl="VC for is_heap_relation">
- <transf name="split_goal_wp">
-  <goal name="VC is_heap_relation.1" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
+ <goal name="is_heap_relation&#39;vc" expl="VC for is_heap_relation" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="is_heap_relation&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC is_heap_relation.2" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="is_heap_relation&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC is_heap_relation.3" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="is_heap_relation&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC is_heap_relation.4" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
+  <goal name="is_heap_relation&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="9"/></proof>
   </goal>
-  <goal name="VC is_heap_relation.5" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="is_heap_relation&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 </file>
-<file name="../bag_of_integers.why">
-<theory name="Bag_integers" sum="11f798688fe35fe2155a1e298c24360f">
- <goal name="Min_bag_union1" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
+<file format="whyml" proved="true">
+<path name=".."/><path name="bag_of_integers.why"/>
+<theory name="Bag_integers" proved="true">
+ <goal name="Min_bag_union1" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
  </goal>
- <goal name="Min_bag_union2" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="16"/></proof>
+ <goal name="Min_bag_union2" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="16"/></proof>
  </goal>
 </theory>
 </file>
-<file name="../test_harness.mlw">
-<theory name="TestHarness" sum="399d6c7af7202a79830962e15d126417">
- <goal name="VC testHarness" expl="VC for testHarness">
- <transf name="split_goal_wp">
-  <goal name="VC testHarness.1" expl="array creation size">
-  <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="0"/></proof>
+<file format="whyml" proved="true">
+<path name=".."/><path name="test_harness.mlw"/>
+<theory name="TestHarness" proved="true">
+ <goal name="testHarness&#39;vc" expl="VC for testHarness" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="testHarness&#39;vc.0" expl="array creation size" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
   </goal>
-  <goal name="VC testHarness.2" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00" steps="2"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="1"/></proof>
+  <goal name="testHarness&#39;vc.1" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="VC testHarness.3" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00" steps="4"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="testHarness&#39;vc.2" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="10501"/></proof>
   </goal>
-  <goal name="VC testHarness.4" expl="index in array bounds">
-  <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="testHarness&#39;vc.3" expl="index in array bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="10710"/></proof>
   </goal>
-  <goal name="VC testHarness.5" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="8"/></proof>
-  <proof prover="3"><result status="valid" time="0.00" steps="7"/></proof>
+  <goal name="testHarness&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="10940"/></proof>
   </goal>
-  <goal name="VC testHarness.6" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="68"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="145"/></proof>
+  <goal name="testHarness&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.01" steps="81"/></proof>
   </goal>
-  <goal name="VC testHarness.7" expl="assertion">
-  <proof prover="5"><result status="valid" time="5.64"/></proof>
+  <goal name="testHarness&#39;vc.6" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.03" steps="38943"/></proof>
   </goal>
-  <goal name="VC testHarness.8" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="63"/></proof>
-  <proof prover="5"><result status="valid" time="0.14"/></proof>
+  <goal name="testHarness&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="14679"/></proof>
   </goal>
-  <goal name="VC testHarness.9" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.04" steps="114"/></proof>
-  <proof prover="5"><result status="valid" time="0.15"/></proof>
+  <goal name="testHarness&#39;vc.8" expl="assertion" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.04" steps="104"/></proof>
   </goal>
-  <goal name="VC testHarness.10" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="testHarness&#39;vc.9" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.05" steps="15034"/></proof>
   </goal>
-  <goal name="VC testHarness.11" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="testHarness&#39;vc.10" expl="assertion" proved="true">
+  <proof prover="0" timelimit="1"><result status="valid" time="0.09" steps="22008"/></proof>
   </goal>
-  <goal name="VC testHarness.12" expl="assertion">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="testHarness&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="0" timelimit="1"><result status="valid" time="0.18" steps="22008"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 </file>
-<file name="../elements.why">
-<theory name="Elements" sum="ccfa65d825afad905d7bab87ce1ac82d">
- <goal name="Elements_singleton" expl="">
- <proof prover="5"><result status="valid" time="0.03"/></proof>
+<file format="whyml" proved="true">
+<path name=".."/><path name="elements.why"/>
+<theory name="Elements" proved="true">
+ <goal name="Elements_singleton" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="6992"/></proof>
  </goal>
- <goal name="Elements_union" expl="">
- <proof prover="1" edited="elements_Elements_Elements_union_1.v"><result status="valid" time="0.40"/></proof>
+ <goal name="Elements_union" proved="true">
+ <proof prover="3"><path name="elements_Elements_Elements_union_1.v"/><result status="valid" time="0.40"/></proof>
  </goal>
- <goal name="Elements_add1" expl="">
- <proof prover="1" edited="elements_Elements_Elements_add1_1.v"><result status="valid" time="0.37"/></proof>
+ <goal name="Elements_add1" proved="true">
+ <proof prover="3"><path name="elements_Elements_Elements_add1_1.v"/><result status="valid" time="0.33"/></proof>
  </goal>
- <goal name="Elements_remove_last" expl="">
- <proof prover="2"><result status="valid" time="0.00" steps="9"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
+ <goal name="Elements_remove_last" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
  </goal>
- <goal name="Occ_elements" expl="">
- <proof prover="1" edited="elements_Elements_Occ_elements_1.v"><result status="valid" time="0.38"/></proof>
+ <goal name="Occ_elements" proved="true">
+ <proof prover="3"><path name="elements_Elements_Occ_elements_1.v"/><result status="valid" time="0.34"/></proof>
  </goal>
- <goal name="VC elements_set_outside" expl="VC for elements_set_outside">
- <transf name="split_goal_wp">
-  <goal name="VC elements_set_outside.1" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+ <goal name="elements_set_outside&#39;vc" expl="VC for elements_set_outside" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="elements_set_outside&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC elements_set_outside.2" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.00" steps="3"/></proof>
+  <goal name="elements_set_outside&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="3"/></proof>
   </goal>
-  <goal name="VC elements_set_outside.3" expl="postcondition">
-  <proof prover="4"><result status="valid" time="0.02"/></proof>
+  <goal name="elements_set_outside&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02" steps="14549"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="Elements_set_inside" expl="">
- <proof prover="1" edited="elements_Elements_Elements_set_inside_1.v"><result status="valid" time="0.41"/></proof>
+ <goal name="Elements_set_inside" proved="true">
+ <proof prover="3"><path name="elements_Elements_Elements_set_inside_1.v"/><result status="valid" time="0.38"/></proof>
  </goal>
- <goal name="Elements_set_inside2" expl="">
- <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="33"/></proof>
+ <goal name="Elements_set_inside2" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="44"/></proof>
  </goal>
 </theory>
 </file>
-<file name="../heap_implem.mlw">
-<theory name="Implementation" sum="09313e861bc974038bd7b2b59ccb436e">
- <goal name="VC is_heap_min" expl="VC for is_heap_min">
- <transf name="split_goal_wp">
-  <goal name="VC is_heap_min.1" expl="variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+<file format="whyml" proved="true">
+<path name=".."/><path name="heap_implem.mlw"/>
+<theory name="Implementation" proved="true">
+ <goal name="is_heap_min&#39;vc" expl="VC for is_heap_min" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="is_heap_min&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC is_heap_min.2" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="4"/></proof>
+  <goal name="is_heap_min&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
-  <goal name="VC is_heap_min.3" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="is_heap_min&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="20"/></proof>
   </goal>
-  <goal name="VC is_heap_min.4" expl="postcondition">
-  <proof prover="2"><result status="valid" time="2.00" steps="1761"/></proof>
+  <goal name="is_heap_min&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.96" steps="699"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC create" expl="VC for create">
- <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
+ <goal name="create&#39;vc" expl="VC for create" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
  </goal>
- <goal name="VC insert" expl="VC for insert">
- <transf name="split_goal_wp">
-  <goal name="VC insert.1" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01" steps="21"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
+ <goal name="insert&#39;vc" expl="VC for insert" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="insert&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC insert.2" expl="precondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
+  <goal name="insert&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
   </goal>
-  <goal name="VC insert.3" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.26" steps="358"/></proof>
-  <proof prover="3"><result status="valid" time="0.36" steps="254"/></proof>
+  <goal name="insert&#39;vc.2" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.11" steps="183"/></proof>
   </goal>
-  <goal name="VC insert.4" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.04" steps="75"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="79"/></proof>
+  <goal name="insert&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="78"/></proof>
   </goal>
-  <goal name="VC insert.5" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC insert.5.1" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.02" steps="32"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="31"/></proof>
+  <goal name="insert&#39;vc.4" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="insert&#39;vc.4.0" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="46"/></proof>
    </goal>
-   <goal name="VC insert.5.2" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.16" steps="229"/></proof>
-   <proof prover="3"><result status="valid" time="0.82" steps="189"/></proof>
+   <goal name="insert&#39;vc.4.1" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.14" steps="190"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC insert.6" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="24"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="43"/></proof>
+  <goal name="insert&#39;vc.5" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="24"/></proof>
   </goal>
-  <goal name="VC insert.7" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="VC insert.7.1" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.02" steps="30"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
+  <goal name="insert&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="insert&#39;vc.6.0" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="30"/></proof>
    </goal>
-   <goal name="VC insert.7.2" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="29"/></proof>
+   <goal name="insert&#39;vc.6.1" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="30"/></proof>
    </goal>
-   <goal name="VC insert.7.3" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.03" steps="48"/></proof>
-   <proof prover="3"><result status="valid" time="0.07" steps="90"/></proof>
+   <goal name="insert&#39;vc.6.2" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.07" steps="62"/></proof>
    </goal>
-   <goal name="VC insert.7.4" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.04" steps="58"/></proof>
-   <proof prover="5"><result status="valid" time="0.04"/></proof>
+   <goal name="insert&#39;vc.6.3" expl="VC for insert" proved="true">
+   <proof prover="0"><result status="valid" time="0.04" steps="20015"/></proof>
+   <proof prover="1"><result status="valid" time="0.04" steps="58"/></proof>
    </goal>
-   <goal name="VC insert.7.5" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="1.33" steps="693"/></proof>
-   <proof prover="3"><result status="valid" time="0.60" steps="262"/></proof>
+   <goal name="insert&#39;vc.6.4" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.77" steps="608"/></proof>
    </goal>
-   <goal name="VC insert.7.6" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.01" steps="13"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
+   <goal name="insert&#39;vc.6.5" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="13"/></proof>
    </goal>
-   <goal name="VC insert.7.7" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.32" steps="481"/></proof>
-   <proof prover="3"><result status="valid" time="0.64" steps="261"/></proof>
+   <goal name="insert&#39;vc.6.6" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.42" steps="496"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC insert.8" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="9"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="8"/></proof>
+  <goal name="insert&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="9"/></proof>
   </goal>
-  <goal name="VC insert.9" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="64"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="116"/></proof>
+  <goal name="insert&#39;vc.8" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="65"/></proof>
   </goal>
-  <goal name="VC insert.10" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC insert.10.1" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.05" steps="175"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="118"/></proof>
+  <goal name="insert&#39;vc.9" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="insert&#39;vc.9.0" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.13" steps="228"/></proof>
    </goal>
-   <goal name="VC insert.10.2" expl="VC for insert">
-   <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="27"/></proof>
+   <goal name="insert&#39;vc.9.1" expl="VC for insert" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="28"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="VC extractMin" expl="VC for extractMin">
- <transf name="split_goal_wp">
-  <goal name="VC extractMin.1" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="8"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="7"/></proof>
+ <goal name="extractMin&#39;vc" expl="VC for extractMin" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="extractMin&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="8"/></proof>
   </goal>
-  <goal name="VC extractMin.2" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.17" steps="418"/></proof>
-  <proof prover="3"><result status="valid" time="0.16" steps="286"/></proof>
+  <goal name="extractMin&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.33" steps="646"/></proof>
   </goal>
-  <goal name="VC extractMin.3" expl="loop invariant init">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.3.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.00" steps="6"/></proof>
-   <proof prover="3"><result status="valid" time="0.00" steps="5"/></proof>
+  <goal name="extractMin&#39;vc.2" expl="loop invariant init" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.2.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
    </goal>
-   <goal name="VC extractMin.3.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="1"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="0"/></proof>
+   <goal name="extractMin&#39;vc.2.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
    </goal>
-   <goal name="VC extractMin.3.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.03" steps="60"/></proof>
-   <proof prover="3"><result status="valid" time="0.04" steps="94"/></proof>
+   <goal name="extractMin&#39;vc.2.2" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.04" steps="101"/></proof>
    </goal>
-   <goal name="VC extractMin.3.4" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.15" steps="315"/></proof>
-   <proof prover="3"><result status="valid" time="0.12" steps="219"/></proof>
+   <goal name="extractMin&#39;vc.2.3" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.12" steps="378"/></proof>
    </goal>
-   <goal name="VC extractMin.3.5" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
+   <goal name="extractMin&#39;vc.2.4" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.4" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.03" steps="64"/></proof>
-  <proof prover="3"><result status="valid" time="0.03" steps="32"/></proof>
+  <goal name="extractMin&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="146"/></proof>
   </goal>
-  <goal name="VC extractMin.5" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.00" steps="17"/></proof>
-  <proof prover="3"><result status="valid" time="0.04" steps="16"/></proof>
+  <goal name="extractMin&#39;vc.4" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="17"/></proof>
   </goal>
-  <goal name="VC extractMin.6" expl="assertion">
-  <proof prover="2"><result status="valid" time="1.16" steps="1039"/></proof>
-  <proof prover="3"><result status="valid" time="1.64" steps="717"/></proof>
+  <goal name="extractMin&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="1.14" steps="806"/></proof>
   </goal>
-  <goal name="VC extractMin.7" expl="postcondition">
-  <proof prover="2"><result status="valid" time="1.02" steps="1083"/></proof>
-  <proof prover="3"><result status="valid" time="0.48" steps="359"/></proof>
+  <goal name="extractMin&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.95" steps="782"/></proof>
   </goal>
-  <goal name="VC extractMin.8" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.8.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="11"/></proof>
+  <goal name="extractMin&#39;vc.7" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.7.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="12"/></proof>
    </goal>
-   <goal name="VC extractMin.8.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="11"/></proof>
+   <goal name="extractMin&#39;vc.7.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
    </goal>
-   <goal name="VC extractMin.8.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
-   <proof prover="3"><result status="valid" time="0.07" steps="11"/></proof>
+   <goal name="extractMin&#39;vc.7.2" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.07" steps="12"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.9" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.04" steps="74"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="39"/></proof>
+  <goal name="extractMin&#39;vc.8" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="162"/></proof>
   </goal>
-  <goal name="VC extractMin.10" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.05" steps="76"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="38"/></proof>
+  <goal name="extractMin&#39;vc.9" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="129"/></proof>
   </goal>
-  <goal name="VC extractMin.11" expl="assertion">
-  <proof prover="2"><result status="valid" time="2.48" steps="1513"/></proof>
-  <proof prover="3"><result status="valid" time="3.26" steps="766"/></proof>
+  <goal name="extractMin&#39;vc.10" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="2.08" steps="1095"/></proof>
   </goal>
-  <goal name="VC extractMin.12" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.12.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.02" steps="27"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="26"/></proof>
+  <goal name="extractMin&#39;vc.11" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.11.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="27"/></proof>
    </goal>
-   <goal name="VC extractMin.12.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.03" steps="57"/></proof>
-   <proof prover="3"><result status="valid" time="0.03" steps="34"/></proof>
+   <goal name="extractMin&#39;vc.11.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.03" steps="59"/></proof>
    </goal>
-   <goal name="VC extractMin.12.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="1.54" steps="1029"/></proof>
-   <proof prover="3"><result status="valid" time="0.98" steps="378"/></proof>
+   <goal name="extractMin&#39;vc.11.2" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.59" steps="568"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.13" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.13.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
+  <goal name="extractMin&#39;vc.12" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.12.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
-   <goal name="VC extractMin.13.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="18"/></proof>
+   <goal name="extractMin&#39;vc.12.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="19"/></proof>
    </goal>
-   <goal name="VC extractMin.13.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
+   <goal name="extractMin&#39;vc.12.2" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.14" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
+  <goal name="extractMin&#39;vc.13" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
-  <goal name="VC extractMin.15" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.15.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.02" steps="22"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="21"/></proof>
+  <goal name="extractMin&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.14.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="22"/></proof>
    </goal>
-   <goal name="VC extractMin.15.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
+   <goal name="extractMin&#39;vc.14.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
    </goal>
-   <goal name="VC extractMin.15.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="4.16" steps="2411"/></proof>
-   <proof prover="5"><result status="valid" time="0.08"/></proof>
+   <goal name="extractMin&#39;vc.14.2" expl="VC for extractMin" proved="true">
+   <proof prover="0"><result status="valid" time="0.60" steps="89203"/></proof>
+   <proof prover="1"><result status="valid" time="5.48" steps="1435"/></proof>
    </goal>
-   <goal name="VC extractMin.15.4" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="21"/></proof>
+   <goal name="extractMin&#39;vc.14.3" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="22"/></proof>
    </goal>
-   <goal name="VC extractMin.15.5" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.03" steps="76"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="37"/></proof>
+   <goal name="extractMin&#39;vc.14.4" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="76"/></proof>
    </goal>
-   <goal name="VC extractMin.15.6" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.05" steps="64"/></proof>
-   <proof prover="3"><result status="valid" time="0.04" steps="97"/></proof>
+   <goal name="extractMin&#39;vc.14.5" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.04" steps="66"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.16" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="71"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="37"/></proof>
+  <goal name="extractMin&#39;vc.15" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="157"/></proof>
   </goal>
-  <goal name="VC extractMin.17" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.04" steps="72"/></proof>
-  <proof prover="3"><result status="valid" time="0.03" steps="36"/></proof>
+  <goal name="extractMin&#39;vc.16" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="123"/></proof>
   </goal>
-  <goal name="VC extractMin.18" expl="assertion">
-  <proof prover="2"><result status="valid" time="2.28" steps="1504"/></proof>
-  <proof prover="3"><result status="valid" time="2.77" steps="761"/></proof>
+  <goal name="extractMin&#39;vc.17" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="1.89" steps="1087"/></proof>
   </goal>
-  <goal name="VC extractMin.19" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.19.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.02" steps="25"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="24"/></proof>
+  <goal name="extractMin&#39;vc.18" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.18.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="25"/></proof>
    </goal>
-   <goal name="VC extractMin.19.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.02" steps="54"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="32"/></proof>
+   <goal name="extractMin&#39;vc.18.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="56"/></proof>
    </goal>
-   <goal name="VC extractMin.19.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="1.46" steps="1025"/></proof>
-   <proof prover="3"><result status="valid" time="0.96" steps="373"/></proof>
+   <goal name="extractMin&#39;vc.18.2" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.72" steps="565"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.20" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="extractMin&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="17"/></proof>
   </goal>
-  <goal name="VC extractMin.21" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
+  <goal name="extractMin&#39;vc.20" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
-  <goal name="VC extractMin.22" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.22.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.02" steps="20"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
+  <goal name="extractMin&#39;vc.21" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.21.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
-   <goal name="VC extractMin.22.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.02" steps="21"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="20"/></proof>
+   <goal name="extractMin&#39;vc.21.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="21"/></proof>
    </goal>
-   <goal name="VC extractMin.22.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="4.41" steps="2760"/></proof>
-   <proof prover="5"><result status="valid" time="0.10"/></proof>
+   <goal name="extractMin&#39;vc.21.2" expl="VC for extractMin" proved="true">
+   <proof prover="0"><result status="valid" time="0.55" steps="88013"/></proof>
    </goal>
-   <goal name="VC extractMin.22.4" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="19"/></proof>
+   <goal name="extractMin&#39;vc.21.3" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="20"/></proof>
    </goal>
-   <goal name="VC extractMin.22.5" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.03" steps="74"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="36"/></proof>
+   <goal name="extractMin&#39;vc.21.4" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="74"/></proof>
    </goal>
-   <goal name="VC extractMin.22.6" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.04" steps="59"/></proof>
-   <proof prover="3"><result status="valid" time="0.04" steps="58"/></proof>
+   <goal name="extractMin&#39;vc.21.5" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.04" steps="61"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.23" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.03" steps="68"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="35"/></proof>
+  <goal name="extractMin&#39;vc.22" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="152"/></proof>
   </goal>
-  <goal name="VC extractMin.24" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.02" steps="26"/></proof>
-  <proof prover="3"><result status="valid" time="0.03" steps="25"/></proof>
+  <goal name="extractMin&#39;vc.23" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="32"/></proof>
   </goal>
-  <goal name="VC extractMin.25" expl="assertion">
-  <proof prover="2"><result status="valid" time="1.63" steps="1299"/></proof>
-  <proof prover="3"><result status="valid" time="2.42" steps="801"/></proof>
+  <goal name="extractMin&#39;vc.24" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="2.31" steps="1188"/></proof>
   </goal>
-  <goal name="VC extractMin.26" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.26.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="22"/></proof>
+  <goal name="extractMin&#39;vc.25" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.25.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="23"/></proof>
    </goal>
-   <goal name="VC extractMin.26.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.03" steps="51"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="30"/></proof>
+   <goal name="extractMin&#39;vc.25.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="53"/></proof>
    </goal>
-   <goal name="VC extractMin.26.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="1.60" steps="1001"/></proof>
-   <proof prover="3"><result status="valid" time="0.91" steps="366"/></proof>
+   <goal name="extractMin&#39;vc.25.2" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.84" steps="551"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.27" expl="postcondition">
-  <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="extractMin&#39;vc.26" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
-  <goal name="VC extractMin.28" expl="loop variant decrease">
-  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
+  <goal name="extractMin&#39;vc.27" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC extractMin.29" expl="loop invariant preservation">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.29.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="17"/></proof>
+  <goal name="extractMin&#39;vc.28" expl="loop invariant preservation" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.28.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="18"/></proof>
    </goal>
-   <goal name="VC extractMin.29.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="19"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="18"/></proof>
+   <goal name="extractMin&#39;vc.28.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="19"/></proof>
    </goal>
-   <goal name="VC extractMin.29.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="3.69" steps="2469"/></proof>
-   <proof prover="5"><result status="valid" time="0.09"/></proof>
+   <goal name="extractMin&#39;vc.28.2" expl="VC for extractMin" proved="true">
+   <proof prover="0"><result status="valid" time="0.38" steps="67330"/></proof>
+   <proof prover="1"><result status="valid" time="2.49" steps="930"/></proof>
    </goal>
-   <goal name="VC extractMin.29.4" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="17"/></proof>
+   <goal name="extractMin&#39;vc.28.3" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="18"/></proof>
    </goal>
-   <goal name="VC extractMin.29.5" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.03" steps="70"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="33"/></proof>
+   <goal name="extractMin&#39;vc.28.4" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="70"/></proof>
    </goal>
-   <goal name="VC extractMin.29.6" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.04" steps="56"/></proof>
-   <proof prover="3"><result status="valid" time="0.06" steps="55"/></proof>
+   <goal name="extractMin&#39;vc.28.5" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.06" steps="58"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.30" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="9"/></proof>
+  <goal name="extractMin&#39;vc.29" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="10"/></proof>
   </goal>
-  <goal name="VC extractMin.31" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
-  <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
+  <goal name="extractMin&#39;vc.30" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
   </goal>
-  <goal name="VC extractMin.32" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
-  <proof prover="3"><result status="valid" time="0.03" steps="10"/></proof>
+  <goal name="extractMin&#39;vc.31" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="11"/></proof>
   </goal>
-  <goal name="VC extractMin.33" expl="assertion">
-  <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
-  <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="extractMin&#39;vc.32" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
   </goal>
-  <goal name="VC extractMin.34" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.34.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
+  <goal name="extractMin&#39;vc.33" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.33.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
    </goal>
-   <goal name="VC extractMin.34.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="10"/></proof>
+   <goal name="extractMin&#39;vc.33.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="11"/></proof>
    </goal>
-   <goal name="VC extractMin.34.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="11"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="10"/></proof>
+   <goal name="extractMin&#39;vc.33.2" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="11"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC extractMin.35" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC extractMin.35.1" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="15"/></proof>
-   <proof prover="3"><result status="valid" time="0.02" steps="14"/></proof>
+  <goal name="extractMin&#39;vc.34" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="extractMin&#39;vc.34.0" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="15"/></proof>
    </goal>
-   <goal name="VC extractMin.35.2" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
-   <proof prover="3"><result status="valid" time="0.01" steps="16"/></proof>
+   <goal name="extractMin&#39;vc.34.1" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.01" steps="26"/></proof>
    </goal>
-   <goal name="VC extractMin.35.3" expl="VC for extractMin">
-   <proof prover="2"><result status="valid" time="0.01" steps="23"/></proof>
-   <proof prover="3"><result status="valid" time="0.10" steps="22"/></proof>
+   <goal name="extractMin&#39;vc.34.2" expl="VC for extractMin" proved="true">
+   <proof prover="1"><result status="valid" time="0.10" steps="23"/></proof>
    </goal>
   </transf>
   </goal>
@@ -724,26 +616,23 @@
  </goal>
 </theory>
 </file>
-<file name="../abstract_heap.mlw">
-<theory name="AbstractHeap" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
+<file format="whyml" proved="true">
+<path name=".."/><path name="abstract_heap.mlw"/>
 </file>
-<file name="../heap_model.why">
-<theory name="Model" sum="4e26e6b01738e8834e2a10ad47b287a9">
- <goal name="Model_empty" expl="">
- <proof prover="2"><result status="valid" time="0.01" steps="5"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
+<file format="whyml" proved="true">
+<path name=".."/><path name="heap_model.why"/>
+<theory name="Model" proved="true">
+ <goal name="Model_empty" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="5"/></proof>
  </goal>
- <goal name="Model_singleton" expl="">
- <proof prover="2"><result status="valid" time="0.01" steps="6"/></proof>
- <proof prover="3"><result status="valid" time="0.01" steps="5"/></proof>
+ <goal name="Model_singleton" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="6"/></proof>
  </goal>
- <goal name="Model_set" expl="">
- <proof prover="2"><result status="valid" time="0.15" steps="306"/></proof>
- <proof prover="3"><result status="valid" time="0.30" steps="304"/></proof>
+ <goal name="Model_set" proved="true">
+ <proof prover="1"><result status="valid" time="0.30" steps="336"/></proof>
  </goal>
- <goal name="Model_add_last" expl="">
- <proof prover="5"><result status="valid" time="0.04"/></proof>
+ <goal name="Model_add_last" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="17399"/></proof>
  </goal>
 </theory>
 </file>

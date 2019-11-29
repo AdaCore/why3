@@ -3,9 +3,8 @@ exception Exception
 
 val f0 (tt:unit) : unit
 
-val f1 (tt:unit) : unit raises { Exception }
+val f1 (_tt:unit) : unit raises { Exception }
 
 let f ()
   raises { Exception -> true }
   = f0 (f1 ())
-

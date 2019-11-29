@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -27,58 +27,68 @@ Require BuiltIn.
 (* infix_ls is replaced with (x < x1)%R by the coq driver *)
 
 (* Why3 goal *)
-Lemma infix_lseq_def : forall (x:R) (y:R), (x <= y)%R <-> ((x < y)%R \/
-  (x = y)).
+Lemma infix_lseq'def :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  (x <= y)%R <-> (x < y)%R \/ (x = y).
 Proof.
+intros x y.
 reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma Assoc : forall (x:R) (y:R) (z:R),
+Lemma Assoc :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
   (((x + y)%R + z)%R = (x + (y + z)%R)%R).
 Proof.
 exact Rplus_assoc.
 Qed.
 
 (* Why3 goal *)
-Lemma Unit_def_l : forall (x:R), ((0%R + x)%R = x).
+Lemma Unit_def_l : forall (x:Reals.Rdefinitions.R), ((0%R + x)%R = x).
 Proof.
 exact Rplus_0_l.
 Qed.
 
 (* Why3 goal *)
-Lemma Unit_def_r : forall (x:R), ((x + 0%R)%R = x).
+Lemma Unit_def_r : forall (x:Reals.Rdefinitions.R), ((x + 0%R)%R = x).
 Proof.
 exact Rplus_0_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Inv_def_l : forall (x:R), (((-x)%R + x)%R = 0%R).
+Lemma Inv_def_l : forall (x:Reals.Rdefinitions.R), (((-x)%R + x)%R = 0%R).
 Proof.
 exact Rplus_opp_l.
 Qed.
 
 (* Why3 goal *)
-Lemma Inv_def_r : forall (x:R), ((x + (-x)%R)%R = 0%R).
+Lemma Inv_def_r : forall (x:Reals.Rdefinitions.R), ((x + (-x)%R)%R = 0%R).
 Proof.
 exact Rplus_opp_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Comm : forall (x:R) (y:R), ((x + y)%R = (y + x)%R).
+Lemma Comm :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  ((x + y)%R = (y + x)%R).
 Proof.
 exact Rplus_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Assoc1 : forall (x:R) (y:R) (z:R),
+Lemma Assoc1 :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
   (((x * y)%R * z)%R = (x * (y * z)%R)%R).
 Proof.
 exact Rmult_assoc.
 Qed.
 
 (* Why3 goal *)
-Lemma Mul_distr_l : forall (x:R) (y:R) (z:R),
+Lemma Mul_distr_l :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
   ((x * (y + z)%R)%R = ((x * y)%R + (x * z)%R)%R).
 Proof.
 intros x y z.
@@ -86,7 +96,9 @@ apply Rmult_plus_distr_l.
 Qed.
 
 (* Why3 goal *)
-Lemma Mul_distr_r : forall (x:R) (y:R) (z:R),
+Lemma Mul_distr_r :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
   (((y + z)%R * x)%R = ((y * x)%R + (z * x)%R)%R).
 Proof.
 intros x y z.
@@ -94,13 +106,15 @@ apply Rmult_plus_distr_r.
 Qed.
 
 (* Why3 goal *)
-Lemma Comm1 : forall (x:R) (y:R), ((x * y)%R = (y * x)%R).
+Lemma Comm1 :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  ((x * y)%R = (y * x)%R).
 Proof.
 exact Rmult_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Unitary : forall (x:R), ((1%R * x)%R = x).
+Lemma Unitary : forall (x:Reals.Rdefinitions.R), ((1%R * x)%R = x).
 Proof.
 exact Rmult_1_l.
 Qed.
@@ -113,31 +127,38 @@ exact R1_neq_R0.
 Qed.
 
 (* Why3 comment *)
-(* inv is replaced with (Reals.Rdefinitions.Rinv x) by the coq driver *)
+(* inv is replaced with (/ x)%R by the coq driver *)
 
 (* Why3 goal *)
-Lemma Inverse : forall (x:R), (~ (x = 0%R)) ->
-  ((x * (Reals.Rdefinitions.Rinv x))%R = 1%R).
+Lemma Inverse :
+  forall (x:Reals.Rdefinitions.R), ~ (x = 0%R) -> ((x * (/ x)%R)%R = 1%R).
 Proof.
 exact Rinv_r.
 Qed.
 
 (* Why3 goal *)
-Lemma infix_mn_def : forall (x:R) (y:R), ((x - y)%R = (x + (-y)%R)%R).
+Lemma infix_mn'def :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  ((x - y)%R = (x + (-y)%R)%R).
 Proof.
+intros x y.
 reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma infix_sl_def : forall (x:R) (y:R),
-  ((x / y)%R = (x * (Reals.Rdefinitions.Rinv y))%R).
+Lemma infix_sl'def :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  ((x / y)%R = (x * (/ y)%R)%R).
 Proof.
+intros x y.
 reflexivity.
 Qed.
 
 (* Why3 goal *)
-Lemma add_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
-  (((x + y)%R / z)%R = ((x / z)%R + (y / z)%R)%R).
+Lemma add_div :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  ~ (z = 0%R) -> (((x + y)%R / z)%R = ((x / z)%R + (y / z)%R)%R).
 Proof.
 intros.
 field.
@@ -145,8 +166,10 @@ assumption.
 Qed.
 
 (* Why3 goal *)
-Lemma sub_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
-  (((x - y)%R / z)%R = ((x / z)%R - (y / z)%R)%R).
+Lemma sub_div :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  ~ (z = 0%R) -> (((x - y)%R / z)%R = ((x / z)%R - (y / z)%R)%R).
 Proof.
 intros.
 field.
@@ -154,7 +177,8 @@ assumption.
 Qed.
 
 (* Why3 goal *)
-Lemma neg_div : forall (x:R) (y:R), (~ (y = 0%R)) ->
+Lemma neg_div :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), ~ (y = 0%R) ->
   (((-x)%R / y)%R = (-(x / y)%R)%R).
 Proof.
 intros.
@@ -163,16 +187,20 @@ assumption.
 Qed.
 
 (* Why3 goal *)
-Lemma assoc_mul_div : forall (x:R) (y:R) (z:R), (~ (z = 0%R)) ->
-  (((x * y)%R / z)%R = (x * (y / z)%R)%R).
+Lemma assoc_mul_div :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  ~ (z = 0%R) -> (((x * y)%R / z)%R = (x * (y / z)%R)%R).
 Proof.
 intros x y z _.
 apply Rmult_assoc.
 Qed.
 
 (* Why3 goal *)
-Lemma assoc_div_mul : forall (x:R) (y:R) (z:R), ((~ (y = 0%R)) /\
-  ~ (z = 0%R)) -> (((x / y)%R / z)%R = (x / (y * z)%R)%R).
+Lemma assoc_div_mul :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  ~ (y = 0%R) /\ ~ (z = 0%R) -> (((x / y)%R / z)%R = (x / (y * z)%R)%R).
 Proof.
 intros x y z (Zy, Zz).
 unfold Rdiv.
@@ -181,8 +209,10 @@ now rewrite Rinv_mult_distr.
 Qed.
 
 (* Why3 goal *)
-Lemma assoc_div_div : forall (x:R) (y:R) (z:R), ((~ (y = 0%R)) /\
-  ~ (z = 0%R)) -> ((x / (y / z)%R)%R = ((x * z)%R / y)%R).
+Lemma assoc_div_div :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  ~ (y = 0%R) /\ ~ (z = 0%R) -> ((x / (y / z)%R)%R = ((x * z)%R / y)%R).
 Proof.
 intros x y z (Zy, Zz).
 field.
@@ -190,26 +220,32 @@ now split.
 Qed.
 
 (* Why3 goal *)
-Lemma Refl : forall (x:R), (x <= x)%R.
+Lemma Refl : forall (x:Reals.Rdefinitions.R), (x <= x)%R.
 Proof.
 exact Rle_refl.
 Qed.
 
 (* Why3 goal *)
-Lemma Trans : forall (x:R) (y:R) (z:R), (x <= y)%R -> ((y <= z)%R ->
-  (x <= z)%R).
+Lemma Trans :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  (x <= y)%R -> (y <= z)%R -> (x <= z)%R.
 Proof.
 exact Rle_trans.
 Qed.
 
 (* Why3 goal *)
-Lemma Antisymm : forall (x:R) (y:R), (x <= y)%R -> ((y <= x)%R -> (x = y)).
+Lemma Antisymm :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (x <= y)%R ->
+  (y <= x)%R -> (x = y).
 Proof.
 exact Rle_antisym.
 Qed.
 
 (* Why3 goal *)
-Lemma Total : forall (x:R) (y:R), (x <= y)%R \/ (y <= x)%R.
+Lemma Total :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  (x <= y)%R \/ (y <= x)%R.
 Proof.
 intros x y.
 destruct (Rle_or_lt x y) as [H|H].
@@ -225,16 +261,20 @@ exact Rle_0_1.
 Qed.
 
 (* Why3 goal *)
-Lemma CompatOrderAdd : forall (x:R) (y:R) (z:R), (x <= y)%R ->
-  ((x + z)%R <= (y + z)%R)%R.
+Lemma CompatOrderAdd :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  (x <= y)%R -> ((x + z)%R <= (y + z)%R)%R.
 Proof.
 intros x y z.
 exact (Rplus_le_compat_r z x y).
 Qed.
 
 (* Why3 goal *)
-Lemma CompatOrderMult : forall (x:R) (y:R) (z:R), (x <= y)%R ->
-  ((0%R <= z)%R -> ((x * z)%R <= (y * z)%R)%R).
+Lemma CompatOrderMult :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  (x <= y)%R -> (0%R <= z)%R -> ((x * z)%R <= (y * z)%R)%R.
 Proof.
 intros x y z H Zz.
 now apply Rmult_le_compat_r.

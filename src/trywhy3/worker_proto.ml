@@ -1,13 +1,15 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
 (*  on linking described in file LICENSE.                           *)
 (*                                                                  *)
 (********************************************************************)
+
+open Js_of_ocaml
 
 type id = string
 type loc = int * int * int * int
@@ -45,6 +47,6 @@ let status_of_result = function
 
 let log s = ignore (Firebug.console ## log (Js.string s))
 let log_time s =
-  let date = jsnew Js.date_now () in
-  let date_str = string_of_float ((date ## getTime ()) /. 1000.) in
+  let date = new%js Js.date_now in
+  let date_str = string_of_float (date ## getTime /. 1000.) in
   log (date_str ^ " : " ^ s)

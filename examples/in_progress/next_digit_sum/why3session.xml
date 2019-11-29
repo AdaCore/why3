@@ -5,8 +5,8 @@
 <prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="10" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="10" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.3.2" timelimit="10" memlimit="1000"/>
-<file name="../next_digit_sum.mlw" expanded="true">
-<theory name="M" sum="c34577c36db634d514063f7841bcae83" expanded="true">
+<file name="../next_digit_sum.mlw">
+<theory name="M">
  <goal name="WP_parameter interp_eq" expl="VC for interp_eq">
  <proof prover="0"><result status="valid" time="0.04" steps="31"/></proof>
  </goal>
@@ -30,7 +30,7 @@
  <proof prover="0" obsolete="true"><result status="timeout" time="9.92"/></proof>
  <proof prover="1" obsolete="true"><result status="timeout" time="10.07"/></proof>
  <proof prover="2" obsolete="true"><result status="timeout" time="9.99"/></proof>
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter search.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="0.03" steps="12"/></proof>
   </goal>
@@ -234,7 +234,7 @@
   </goal>
  </transf>
  </goal>
- <goal name="Gt_digit_interp" expanded="true">
+ <goal name="Gt_digit_interp">
  <proof prover="0" obsolete="true"><result status="timeout" time="9.98"/></proof>
  <proof prover="1" obsolete="true"><result status="timeout" time="10.03"/></proof>
  <proof prover="2" obsolete="true"><result status="timeout" time="9.98"/></proof>
@@ -243,7 +243,7 @@
  <proof prover="1"><result status="valid" time="0.13"/></proof>
  <proof prover="2"><result status="valid" time="0.02"/></proof>
  </goal>
- <goal name="Smallest_shape_1" expanded="true">
+ <goal name="Smallest_shape_1">
  <proof prover="0" obsolete="true"><result status="timeout" time="9.99"/></proof>
  <proof prover="1" obsolete="true"><result status="timeout" time="10.02"/></proof>
  <proof prover="2" obsolete="true"><result status="timeout" time="9.98"/></proof>
@@ -252,7 +252,7 @@
  <proof prover="0" obsolete="true"><result status="timeout" time="10.00"/></proof>
  <proof prover="1" obsolete="true"><result status="timeout" time="10.02"/></proof>
  <proof prover="2" obsolete="true"><result status="timeout" time="9.96"/></proof>
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="Smallest_shape_2.1" expl="1.">
   <proof prover="0" obsolete="true"><result status="timeout" time="9.98"/></proof>
   </goal>
@@ -261,12 +261,12 @@
   </goal>
  </transf>
  </goal>
- <goal name="Smallest_nb_digits" expanded="true">
+ <goal name="Smallest_nb_digits">
  <proof prover="0" obsolete="true"><result status="timeout" time="9.99"/></proof>
  <proof prover="1" obsolete="true"><result status="timeout" time="10.01"/></proof>
  <proof prover="2" obsolete="true"><result status="timeout" time="9.99"/></proof>
  </goal>
- <goal name="Any_nb_digits_above_smallest_size" expanded="true">
+ <goal name="Any_nb_digits_above_smallest_size">
  <proof prover="0" obsolete="true"><result status="timeout" time="10.00"/></proof>
  <proof prover="1" obsolete="true"><result status="timeout" time="10.03"/></proof>
  <proof prover="2" obsolete="true"><result status="timeout" time="9.98"/></proof>
@@ -275,7 +275,7 @@
  <proof prover="0" obsolete="true"><result status="timeout" time="9.96"/></proof>
  <proof prover="1" obsolete="true"><result status="timeout" time="10.03"/></proof>
  <proof prover="2" obsolete="true"><result status="timeout" time="9.99"/></proof>
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="Completeness.1" expl="1.">
   <proof prover="0"><result status="valid" time="0.05" steps="20"/></proof>
   </goal>
@@ -288,7 +288,7 @@
  <proof prover="0" obsolete="true"><result status="timeout" time="9.99"/></proof>
  <proof prover="1" obsolete="true"><result status="timeout" time="10.14"/></proof>
  <proof prover="2" obsolete="true"><result status="timeout" time="9.99"/></proof>
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter search_smallest.1" expl="1. assertion">
   <proof prover="0"><result status="valid" time="0.03" steps="16"/></proof>
   </goal>

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2016   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -20,13 +20,21 @@ let debug = Debug.register_info_flag "trace_exec"
 
 open Ity
 open Expr
-
+open Big_real
+open Mlmpfr_wrapper
 
 (* module Nummap = Map.Make(BigInt) *)
+
+type float_mode = mpfr_rnd_t
+type big_float = mpfr_float
 
 type value =
   | Vconstr of rsymbol * field list
   | Vnum of BigInt.t
+  | Vreal of real
+  | Vfloat_mode of float_mode
+  | Vfloat of big_float
+  | Vstring of string
   | Vbool of bool
   | Vvoid
   | Varray of value array
@@ -40,6 +48,15 @@ let field_get f =
 let constr rs vl =
   Vconstr(rs,List.map (fun v -> Fimmutable v) vl)
 
+let mode_to_string m =
+  match m with
+  | To_Nearest            -> "RNE"
+  | Away_From_Zero        -> "RNA"
+  | Toward_Plus_Infinity  -> "RTP"
+  | Toward_Minus_Infinity -> "RTN"
+  | Toward_Zero           -> "RTZ"
+  | Faithful              -> assert false
+
 let rec print_value fmt v =
   match v with
   | Vnum n ->
@@ -49,6 +66,18 @@ let rec print_value fmt v =
       fprintf fmt "(%s)" (BigInt.to_string n)
   | Vbool b ->
     fprintf fmt "%b" b
+  | Vreal r ->
+    print_real fmt r
+  | Vfloat f ->
+      (* Getting "@" is intentional in mlmpfr library for bases higher than 10.
+         So, we keep this notation. *)
+      let hexadecimal = get_formatted_str ~base:16 f in
+      let decimal = get_formatted_str ~base:10 f in
+      fprintf fmt "%s (%s)" decimal hexadecimal
+  | Vfloat_mode m ->
+      fprintf fmt "%s" (mode_to_string m)
+  | Vstring s ->
+      Constant.print_string_def fmt s
   | Vvoid ->
     fprintf fmt "()"
   | Varray a ->
@@ -134,10 +163,8 @@ let rec matching env (v:value) p =
 
 exception NotNum
 
-let big_int_of_const c =
-  match c with
-    | Number.ConstInt i -> Number.compute_int_constant i
-    | _ -> raise NotNum
+let big_int_of_const i =
+  i.Number.il_int
 
 let big_int_of_value v =
   match v with
@@ -178,6 +205,83 @@ let eval_int_rel op ls l =
     end
   | _ -> constr ls l
 
+(* This initialize Mpfr for float32 behavior *)
+let initialize_float32 () =
+  set_default_prec 24;
+  set_emin (-148);
+  set_emax 128
+
+(* This initialize Mpfr for float64 behavior *)
+let initialize_float64 () =
+  set_default_prec 53;
+  set_emin (-1073);
+  set_emax 1024
+
+type 'a float_arity =
+  | Mode1: (float_mode -> big_float -> big_float) float_arity (* Unary op *)
+  | Mode2: (float_mode -> big_float -> big_float -> big_float) float_arity (* binary op *)
+  | Mode3: (float_mode -> big_float -> big_float -> big_float -> big_float) float_arity (* ternary op *)
+  | Mode_rel: (big_float -> big_float -> bool) float_arity (* binary predicates *)
+  | Mode_rel1: (big_float -> bool) float_arity (* Unary predicate *)
+
+let use_float_format (float_format: int) =
+  match float_format with
+  | 32 -> initialize_float32 ()
+  | 64 -> initialize_float64 ()
+  | _ -> raise CannotCompute
+
+let eval_float:
+  type a. int -> a float_arity -> a -> Expr.rsymbol -> value list -> value =
+  (fun float_format ty op ls l ->
+     (* Set the exponent depending on Float type that are used: 32 or 64 *)
+     use_float_format float_format;
+     try
+       begin match ty, l with
+         | Mode1, [Vfloat_mode mode; Vfloat f] ->
+             (* Subnormalize used to simulate IEEE behavior *)
+             Vfloat (subnormalize ~rnd:mode (op mode f))
+         | Mode2, [Vfloat_mode mode; Vfloat f1; Vfloat f2] ->
+             Vfloat (subnormalize ~rnd:mode (op mode f1 f2))
+         | Mode3, [Vfloat_mode mode; Vfloat f1; Vfloat f2; Vfloat f3] ->
+             Vfloat (subnormalize ~rnd:mode (op mode f1 f2 f3))
+         | Mode_rel, [Vfloat f1; Vfloat f2] ->
+             Vbool (op f1 f2)
+         | Mode_rel1, [Vfloat f] ->
+             Vbool (op f)
+         | _ -> constr ls l
+       end
+     with
+     | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
+     | _ -> assert false
+  )
+
+type 'a real_arity =
+  | Modeconst: real real_arity
+  | Mode1r: (real -> real) real_arity
+  | Mode2r: (real -> real -> real) real_arity
+  | Mode_relr: (real -> real -> bool) real_arity
+
+let eval_real : type a. a real_arity -> a -> Expr.rsymbol -> value list -> value =
+  (fun ty op ls l ->
+     try
+       begin match ty, l with
+         | Mode1r, [Vreal r] ->
+             Vreal (op r)
+         | Mode2r, [Vreal r1; Vreal r2] ->
+             Vreal (op r1 r2)
+         | Mode_relr, [Vreal r1; Vreal r2] ->
+             Vbool (op r1 r2)
+         | Modeconst, [] ->
+             Vreal op
+         | _ -> constr ls l
+       end
+     with
+     | Big_real.Undetermined -> (* Cannot decide interval comparison *)
+         constr ls l
+     | Mlmpfr_wrapper.Not_Implemented ->
+         raise CannotCompute
+     | _ -> assert false
+  )
 
 let rec default_value_of_type env ity =
   match ity.ity_node with
@@ -239,9 +343,12 @@ let exec_array_make _ args =
     | _ ->
       raise CannotCompute
 
-let exec_array_copy _ args =
+let exec_array_empty _ args =
   match args with
-    | [Varray a] -> Varray(Array.copy a)
+    | [Vconstr(_, [])] ->
+        (* we know by typing that the constructor
+           will be the Tuple0 constructor *)
+        Varray([||])
     | _ ->
       raise CannotCompute
 
@@ -271,46 +378,134 @@ let exec_array_set _ args =
       end
     | _ -> assert false
 
+let builtin_mode _kn _its = ()
 
-let built_in_modules =
-  [
+let builtin_float_type _kn _its = ()
+
+(** Description of modules *)
+(* Described as a function so that this code is not executed outside of
+   why3execute. *)
+let built_in_modules () =
+  let bool_module =
     ["bool"],"Bool", [],
     [ "True", eval_true ;
       "False", eval_false ;
-    ] ;
-    ["int"],"Int", [],
-    [ "infix +", eval_int_op BigInt.add;
-      (* defined as x+(-y)
-         "infix -", eval_int_op BigInt.sub; *)
-      "infix *", eval_int_op BigInt.mul;
-      "prefix -", eval_int_uop BigInt.minus;
-      "infix =", eval_int_rel BigInt.eq;
-      "infix <", eval_int_rel BigInt.lt;
-      "infix <=", eval_int_rel BigInt.le;
-      "infix >", eval_int_rel BigInt.gt;
-      "infix >=", eval_int_rel BigInt.ge;
-    ] ;
-    ["int"],"MinMax", [],
-    [ "min", eval_int_op BigInt.min;
-      "max", eval_int_op BigInt.max;
-    ] ;
-    ["int"],"ComputerDivision", [],
-    [ "div", eval_int_op BigInt.computer_div;
-      "mod", eval_int_op BigInt.computer_mod;
-    ] ;
-    ["int"],"EuclideanDivision", [],
-    [ "div", eval_int_op BigInt.euclidean_div;
-      "mod", eval_int_op BigInt.euclidean_mod;
-    ] ;
-   ["array"],"Array",
+    ]
+  in
+  let int_modules =
+    [
+      ["int"],"Int", [],
+      [ Ident.op_infix "+", eval_int_op BigInt.add;
+        (* defined as x+(-y)
+           Ident.op_infix "-", eval_int_op BigInt.sub; *)
+        Ident.op_infix "*", eval_int_op BigInt.mul;
+        Ident.op_prefix "-", eval_int_uop BigInt.minus;
+        Ident.op_infix "=", eval_int_rel BigInt.eq;
+        Ident.op_infix "<", eval_int_rel BigInt.lt;
+        Ident.op_infix "<=", eval_int_rel BigInt.le;
+        Ident.op_infix ">", eval_int_rel BigInt.gt;
+        Ident.op_infix ">=", eval_int_rel BigInt.ge;
+      ] ;
+      ["int"],"MinMax", [],
+      [ "min", eval_int_op BigInt.min;
+        "max", eval_int_op BigInt.max;
+      ] ;
+      ["int"],"ComputerDivision", [],
+      [ "div", eval_int_op BigInt.computer_div;
+        "mod", eval_int_op BigInt.computer_mod;
+      ] ;
+      ["int"],"EuclideanDivision", [],
+      [ "div", eval_int_op BigInt.euclidean_div;
+        "mod", eval_int_op BigInt.euclidean_mod;
+      ]
+    ]
+  in
+  let array_module =
+    ["array"],"Array",
     ["array", builtin_array_type],
     ["make", exec_array_make ;
-     "mixfix []", exec_array_get ;
+     "empty", exec_array_empty ;
+     Ident.op_get "", exec_array_get ;
      "length", exec_array_length ;
-     "mixfix []<-", exec_array_set ;
-     "copy", exec_array_copy ;
-    ] ;
-  ]
+     Ident.op_set "", exec_array_set ;
+    ]
+  in
+
+  let mode_module =
+    ["ieee_float"], "RoundingMode",
+    ["mode", builtin_mode],
+    ["RNE", (fun _ _ -> Vfloat_mode To_Nearest);
+     "RNA", (fun _ _ -> Vfloat_mode Away_From_Zero);
+     "RTP", (fun _ _ -> Vfloat_mode Toward_Plus_Infinity);
+     "RTN", (fun _ _ -> Vfloat_mode Toward_Minus_Infinity);
+     "RTZ", (fun _ _ -> Vfloat_mode Toward_Zero);
+    ]
+  in
+  let float_modules tyb ~prec m =
+    ["ieee_float"], m,
+    ["t", builtin_float_type],
+    ["zeroF", (fun _rs _l ->
+         Vfloat (make_zero ~prec Positive));
+     "add", eval_float tyb Mode2 (fun rnd -> add ~rnd ~prec);
+     "sub", eval_float tyb Mode2 (fun rnd -> sub ~rnd ~prec);
+     "mul", eval_float tyb Mode2 (fun rnd -> mul ~rnd ~prec);
+     "div", eval_float tyb Mode2 (fun rnd -> div ~rnd ~prec);
+     "abs", eval_float tyb Mode1 (fun rnd -> abs ~rnd ~prec);
+     "neg", eval_float tyb Mode1 (fun rnd -> neg ~rnd ~prec);
+     "fma", eval_float tyb Mode3 (fun rnd -> fma ~rnd ~prec);
+     "sqrt", eval_float tyb Mode1 (fun rnd -> sqrt ~rnd ~prec);
+     "roundToIntegral", eval_float tyb Mode1 (fun rnd -> rint ~rnd ~prec);
+(* Intentionnally removed from programs
+     "min", eval_float_minmax min;
+     "max", eval_float_minmax max;
+*)
+     "le", eval_float tyb Mode_rel lessequal_p;
+     "lt", eval_float tyb Mode_rel less_p;
+     "eq", eval_float tyb Mode_rel equal_p;
+     "is_zero", eval_float tyb Mode_rel1 zero_p;
+     "is_infinite", eval_float tyb Mode_rel1 inf_p;
+     "is_nan", eval_float tyb Mode_rel1 nan_p;
+     "is_positive", eval_float tyb Mode_rel1 (fun s -> signbit s = Positive);
+     "is_negative", eval_float tyb Mode_rel1 (fun s -> signbit s = Negative);
+    ]
+  in
+
+  let real_module =
+    ["real"], "Real", [],
+    [Ident.op_infix "=", eval_real Mode_relr Big_real.eq;
+     Ident.op_infix "<", eval_real Mode_relr Big_real.lt;
+     Ident.op_infix "<=", eval_real Mode_relr Big_real.le;
+     Ident.op_prefix "-", eval_real Mode1r Big_real.neg;
+     Ident.op_infix "+", eval_real Mode2r Big_real.add;
+     Ident.op_infix "*", eval_real Mode2r Big_real.mul;
+     Ident.op_infix "/", eval_real Mode2r Big_real.div;
+    ]
+  in
+  let real_square_module =
+    ["real"], "Square", [],
+    ["sqrt", eval_real Mode1r Big_real.sqrt;
+    ]
+  in
+  let real_trigo_module =
+    ["real"], "Trigonometry", [],
+    ["pi", eval_real Modeconst (Big_real.pi());
+    ]
+  in
+  let real_exp_log =
+    ["real"], "ExpLog", [],
+    ["exp", eval_real Mode1r Big_real.exp;
+     "log", eval_real Mode1r Big_real.log]
+  in
+  bool_module :: (int_modules @ [array_module;
+                                 real_module;
+                                 real_square_module;
+                                 real_trigo_module;
+                                 real_exp_log;
+                                 mode_module;
+                                 float_modules 32 ~prec:24 "Float32";
+                                 float_modules 64 ~prec:53 "Float64";])
+
+exception CannotFind of (Env.pathname * string * string)
 
 let add_builtin_mo env (l,n,t,d) =
   let mo = Pmodule.read_module env l n in
@@ -318,18 +513,23 @@ let add_builtin_mo env (l,n,t,d) =
   let kn = mo.Pmodule.mod_known in
   List.iter
     (fun (id,r) ->
-      let its = Pmodule.ns_find_its exp [id] in
-      r kn its)
+       let its =
+         try Pmodule.ns_find_its exp [id] with
+         | Not_found -> raise (CannotFind (l, n, id))
+       in
+       r kn its)
     t;
   List.iter
     (fun (id,f) ->
-      let ps = Pmodule.ns_find_rs exp [id] in
-      Hrs.add builtin_progs ps f)
+       let ps =
+         try Pmodule.ns_find_rs exp [id] with
+         | Not_found -> raise (CannotFind (l, n, id))
+       in
+       Hrs.add builtin_progs ps f)
     d
 
 let get_builtin_progs lib =
-  List.iter (add_builtin_mo lib) built_in_modules
-
+  List.iter (add_builtin_mo lib) (built_in_modules ())
 
 let get_pvs env pvs =
   let t =
@@ -383,7 +583,7 @@ and p_expr fmt e =
       fprintf fmt "@[Elet(%a,@ %a)@]" p_let ldefn p_expr e1
     | Erec (_, _) -> fprintf fmt "@[Erec(_,@ _,@ _)@]"
     | Eif (_, _, _) -> fprintf fmt "@[Eif(_,@ _,@ _)@]"
-    | Ecase (_, _) -> fprintf fmt "@[Ecase(_,@ _)@]"
+    | Ematch (_, _) -> fprintf fmt "@[Ematch(_,@ _)@]"
     | Eassign (pls, e1, reg, pvs) ->
       fprintf fmt "@[Eassign(%a,@ %a,@ %a,@ %a)@]"
         p_pls pls p_expr e1 Ppretty.print_reg reg p_pvs pvs
@@ -392,7 +592,6 @@ and p_expr fmt e =
     | Eloop (_, _, _) -> fprintf fmt "@[Eloop(_,@ _,@ _)@]"
     | Efor (_, _, _, _) -> fprintf fmt "@[Efor(_,@ _,@ _,@ _)@]"
     | Eraise (_, _) -> fprintf fmt "@[Eraise(_,@ _)@]"
-    | Etry (_, _) -> fprintf fmt "@[Etry(_,@ _)@]"
     | Eabstr (_, _) -> fprintf fmt "@[Eabstr(_,@ _)@]"
     | Eassert (_, _) -> fprintf fmt "@[Eassert(_,@ _)@]"
     | Eabsurd -> fprintf fmt "@[Eabsurd@]"
@@ -475,6 +674,22 @@ let find_definition env rs =
       (* else look for a global function *)
       find_global_definition env.known rs
 
+(* Assuming the real is given in pow2 and pow5 *)
+let compute_fraction { Number.rv_sig = i; Number.rv_pow2 = p2; Number.rv_pow5 = p5 } =
+  let p2_val = BigInt.pow_int_pos_bigint 2 (BigInt.abs p2) in
+  let p5_val = BigInt.pow_int_pos_bigint 5 (BigInt.abs p5) in
+  let num = ref BigInt.one in
+  let den = ref BigInt.one in
+  num := BigInt.mul i !num;
+  if BigInt.ge p2 BigInt.zero then
+    num := BigInt.mul p2_val !num
+  else
+    den := BigInt.mul p2_val !den;
+  if BigInt.ge p5 BigInt.zero then
+    num := BigInt.mul p5_val !num
+  else
+    den := BigInt.mul p5_val !den;
+  (!num, !den)
 
 (* evaluate expressions *)
 let rec eval_expr env (e : expr) : result =
@@ -490,7 +705,21 @@ let rec eval_expr env (e : expr) : result =
         Normal v
       with Not_found -> assert false (* Irred e ? *)
     end
-  | Econst c -> Normal (Vnum (big_int_of_const c))
+  | Econst (Constant.ConstInt c) ->
+      Normal (Vnum (big_int_of_const c))
+  | Econst (Constant.ConstReal r) ->
+      (* ConstReal can be float or real *)
+      let is_real ity = ity_equal ity ity_real in
+      if is_real e.e_ity then
+        let (p, q) = compute_fraction r.Number.rl_real in
+        let (sp, sq) = BigInt.to_string p, BigInt.to_string q in
+        try Normal (Vreal (real_from_fraction sp sq)) with
+        | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
+      else
+        let c = Constant.ConstReal r in
+        let s = Format.asprintf "%a" Constant.print_def c in
+        Normal (Vfloat (make_from_str s))
+  | Econst (Constant.ConstStr s) -> Normal (Vstring s)
   | Eexec (ce,cty) ->
     assert (cty.cty_args = []);
     assert (ce.c_cty.cty_args = []);
@@ -561,15 +790,6 @@ let rec eval_expr env (e : expr) : result =
           end
         | r -> r
     end
-  | Ecase(e1,ebl) ->
-    begin
-      match eval_expr env e1 with
-        | Normal t ->
-          begin try exec_match env t ebl
-            with Undetermined -> Irred e
-          end
-        | r -> r
-    end
   | Ewhile(cond,_inv,_var,e1) ->
     begin
       match eval_expr env cond with
@@ -617,19 +837,14 @@ let rec eval_expr env (e : expr) : result =
       with
           NotNum -> Irred e
     end
-  | Etry(e1,case,el) ->
+  | Ematch(e0,ebl,el) ->
     begin
-      let e0,ebl =
-        if not case then e1,[]
-        else match e1.e_node with
-        | Ecase(e0,ebl) -> e0,ebl
-        | _ -> assert false
-      in
       let r = eval_expr env e0 in
       match r with
-        | Normal t when case ->
+        | Normal t ->
+          if ebl = [] then r else
           begin try exec_match env t ebl
-            with Undetermined -> Irred e1
+            with Undetermined -> Irred e
           end
         | Excep(ex,t) ->
           begin
@@ -701,7 +916,8 @@ and exec_call env rs args ity_result =
       let env = add_local_funs locals env in
       begin
         match d.c_node with
-        | Capp _ -> assert false (* TODO ? *)
+        | Capp (rs',pvl) ->
+          exec_call env rs' (pvl @ args) ity_result
         | Cpur _ -> assert false (* TODO ? *)
         | Cany -> raise CannotCompute
         | Cfun body ->
@@ -752,9 +968,6 @@ and exec_call env rs args ity_result =
       rs.rs_name.Ident.id_string;
     raise CannotCompute
 
-
-
-
 let eval_global_expr env km locals e =
   get_builtin_progs env;
   let env = {
@@ -788,9 +1001,16 @@ let eval_global_expr env km locals e =
   let res = eval_expr env e in
   res, global_env
 
+let init_real real_param =
+  match real_param with
+  | None -> ()
+  | Some (emin, emax, prec) ->
+      Big_real.init emin emax prec
 
-
-let eval_global_symbol env m fmt rs =
+(* real_param is used in case of real computation for the user to give the
+   precision she wants to use *)
+let eval_global_symbol ?real_param env m fmt rs =
+  init_real real_param;
   try
     match find_global_definition m.Pmodule.mod_known rs with
     | Function(locals,d) ->
@@ -824,6 +1044,9 @@ let eval_global_symbol env m fmt rs =
           end
       end
     | _ -> assert false
-  with Not_found ->
+  with
+  | Not_found ->
     eprintf "Symbol '%s' has no definition.@." rs.rs_name.Ident.id_string;
     exit 1
+  | CannotFind (l, n, s) ->
+    eprintf "Cannot find builtin symbol %s %s %s@." (List.fold_left (fun x y -> x^y) "" l) n s

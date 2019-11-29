@@ -1,0 +1,40 @@
+module M
+
+  use list.List
+  use list.Length
+
+  goal g: forall l: list int. length l = 0
+
+
+(*
+  (*********************************
+   ** Non-terminating projections **
+   *********************************)
+   (* Warning: if definition of the following projections are present,
+      the proof of everything below will not terminate. *)
+  function projfl "model_trace:.projfl" (l : list int_type) : int
+  =
+  match l with
+  | Nil -> 0
+  | Cons (Integer n) _ -> n
+  | _ -> 0
+  end
+  meta "inline : no" function projfl
+  meta "model_projection" function projfl
+
+  (* list int_type will be projected using projfl to int,
+     int will be projected using projfi, projf1, and projf2
+     Warning: does not terminate. *)
+  let proj_test ( l "model_projected" : list int_type) : int
+  ensures { result > 0  }
+  =
+  match l with
+  | Nil -> 1
+  | Cons (Integer n) _ -> n
+  | _ -> 1
+  end
+
+
+*)
+
+end

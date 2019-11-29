@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -43,10 +43,7 @@ let cmdline_split s =
     | '\\' -> cstate := Escape
     | c when is_blank c ->
         let n = Queue.length cur_arg in
-        let s = Strings.create n in
-        for i = 0 to pred n do
-          Strings.set s i (Queue.take cur_arg)
-        done;
+        let s = String.init n (fun _ -> Queue.take cur_arg) in
         argv := s :: !argv;
         cstate := Blank
     | c -> Queue.add c cur_arg

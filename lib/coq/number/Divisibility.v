@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,145 +22,164 @@ Require number.Parity.
 (* Hack so that Why3 does not override the notation below.
 
 (* Why3 assumption *)
-Definition divides (d:Z) (n:Z): Prop := ((d = 0%Z) -> (n = 0%Z)) /\
-  ((~ (d = 0%Z)) -> ((ZArith.BinInt.Z.rem n d) = 0%Z)).
+Definition divides (d:Numbers.BinNums.Z) (n:Numbers.BinNums.Z) : Prop :=
+  ((d = 0%Z) -> (n = 0%Z)) /\
+  (~ (d = 0%Z) -> ((ZArith.BinInt.Z.rem n d) = 0%Z)).
+
+(* Why3 goal *)
+Lemma divides'spec :
+  forall (d:Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
+  divides d n <-> (exists q:Numbers.BinNums.Z, (n = (q * d)%Z)).
+Proof.
+intros d n.
+
+Qed.
 
 *)
 
 Require Import Znumtheory.
-Notation divides := Zdivide (only parsing).
+Notation divides := Z.divide (only parsing).
 
 (* Why3 goal *)
-Lemma divides_spec : forall (d:Z) (n:Z), (divides d n) <-> exists q:Z,
-  (n = (q * d)%Z).
+Lemma divides_refl : forall (n:Numbers.BinNums.Z), divides n n.
 Proof.
-intros d n.
-easy.
+exact Z.divide_refl.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_refl : forall (n:Z), (divides n n).
-Proof.
-exact Zdivide_refl.
-Qed.
-
-(* Why3 goal *)
-Lemma divides_1_n : forall (n:Z), (divides 1%Z n).
+Lemma divides_1_n : forall (n:Numbers.BinNums.Z), divides 1%Z n.
 Proof.
 exact Zone_divide.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_0 : forall (n:Z), (divides n 0%Z).
+Lemma divides_0 : forall (n:Numbers.BinNums.Z), divides n 0%Z.
 Proof.
 exact Zdivide_0.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_left : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides
-  (c * a)%Z (c * b)%Z).
+Lemma divides_left :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  divides a b -> divides (c * a)%Z (c * b)%Z.
 Proof.
 exact Zmult_divide_compat_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_right : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides
-  (a * c)%Z (b * c)%Z).
+Lemma divides_right :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  divides a b -> divides (a * c)%Z (b * c)%Z.
 Proof.
 exact Zmult_divide_compat_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_oppr : forall (a:Z) (b:Z), (divides a b) -> (divides a (-b)%Z).
+Lemma divides_oppr :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), divides a b ->
+  divides a (-b)%Z.
 Proof.
 exact Zdivide_opp_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_oppl : forall (a:Z) (b:Z), (divides a b) -> (divides (-a)%Z b).
+Lemma divides_oppl :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), divides a b ->
+  divides (-a)%Z b.
 Proof.
 exact Zdivide_opp_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_oppr_rev : forall (a:Z) (b:Z), (divides (-a)%Z b) -> (divides a
-  b).
+Lemma divides_oppr_rev :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), divides (-a)%Z b ->
+  divides a b.
 Proof.
 exact Zdivide_opp_l_rev.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_oppl_rev : forall (a:Z) (b:Z), (divides a (-b)%Z) -> (divides a
-  b).
+Lemma divides_oppl_rev :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), divides a (-b)%Z ->
+  divides a b.
 Proof.
 exact Zdivide_opp_r_rev.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_plusr : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides a
-  c) -> (divides a (b + c)%Z)).
+Lemma divides_plusr :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  divides a b -> divides a c -> divides a (b + c)%Z.
 Proof.
 exact Zdivide_plus_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_minusr : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides a
-  c) -> (divides a (b - c)%Z)).
+Lemma divides_minusr :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  divides a b -> divides a c -> divides a (b - c)%Z.
 Proof.
 exact Zdivide_minus_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_multl : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a
-  (c * b)%Z).
+Lemma divides_multl :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  divides a b -> divides a (c * b)%Z.
 Proof.
 intros a b c.
 apply Zdivide_mult_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_multr : forall (a:Z) (b:Z) (c:Z), (divides a b) -> (divides a
-  (b * c)%Z).
+Lemma divides_multr :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  divides a b -> divides a (b * c)%Z.
 Proof.
 exact Zdivide_mult_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_factorl : forall (a:Z) (b:Z), (divides a (b * a)%Z).
+Lemma divides_factorl :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), divides a (b * a)%Z.
 Proof.
 exact Zdivide_factor_l.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_factorr : forall (a:Z) (b:Z), (divides a (a * b)%Z).
+Lemma divides_factorr :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), divides a (a * b)%Z.
 Proof.
 exact Zdivide_factor_r.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_n_1 : forall (n:Z), (divides n 1%Z) -> ((n = 1%Z) \/
-  (n = (-1%Z)%Z)).
+Lemma divides_n_1 :
+  forall (n:Numbers.BinNums.Z), divides n 1%Z -> (n = 1%Z) \/ (n = (-1%Z)%Z).
 Proof.
 exact Zdivide_1.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_antisym : forall (a:Z) (b:Z), (divides a b) -> ((divides b
-  a) -> ((a = b) \/ (a = (-b)%Z))).
+Lemma divides_antisym :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), divides a b ->
+  divides b a -> (a = b) \/ (a = (-b)%Z).
 Proof.
-exact Zdivide_antisym.
+exact Z.divide_antisym.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_trans : forall (a:Z) (b:Z) (c:Z), (divides a b) -> ((divides b
-  c) -> (divides a c)).
+Lemma divides_trans :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z) (c:Numbers.BinNums.Z),
+  divides a b -> divides b c -> divides a c.
 Proof.
-exact Zdivide_trans.
+exact Z.divide_trans.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_bounds : forall (a:Z) (b:Z), (divides a b) -> ((~ (b = 0%Z)) ->
-  ((ZArith.BinInt.Z.abs a) <= (ZArith.BinInt.Z.abs b))%Z).
+Lemma divides_bounds :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), divides a b ->
+  ~ (b = 0%Z) -> ((ZArith.BinInt.Z.abs a) <= (ZArith.BinInt.Z.abs b))%Z.
 Proof.
 exact Zdivide_bounds.
 Qed.
@@ -168,8 +187,9 @@ Qed.
 Import EuclideanDivision.
 
 (* Why3 goal *)
-Lemma mod_divides_euclidean : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
-  (((int.EuclideanDivision.mod1 a b) = 0%Z) -> (divides b a)).
+Lemma mod_divides_euclidean :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), ~ (b = 0%Z) ->
+  ((int.EuclideanDivision.mod1 a b) = 0%Z) -> divides b a.
 Proof.
 intros a b Zb H.
 exists (div a b).
@@ -179,8 +199,9 @@ ring.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_mod_euclidean : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((divides
-  b a) -> ((int.EuclideanDivision.mod1 a b) = 0%Z)).
+Lemma divides_mod_euclidean :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), ~ (b = 0%Z) ->
+  divides b a -> ((int.EuclideanDivision.mod1 a b) = 0%Z).
 Proof.
 intros a b Zb H.
 assert (Zmod a b = Z0).
@@ -194,8 +215,9 @@ now elim H1.
 Qed.
 
 (* Why3 goal *)
-Lemma mod_divides_computer : forall (a:Z) (b:Z), (~ (b = 0%Z)) ->
-  (((ZArith.BinInt.Z.rem a b) = 0%Z) -> (divides b a)).
+Lemma mod_divides_computer :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), ~ (b = 0%Z) ->
+  ((ZArith.BinInt.Z.rem a b) = 0%Z) -> divides b a.
 Proof.
 intros a b Zb H.
 exists (Z.quot a b).
@@ -204,8 +226,9 @@ now apply Zquot.Z_quot_exact_full.
 Qed.
 
 (* Why3 goal *)
-Lemma divides_mod_computer : forall (a:Z) (b:Z), (~ (b = 0%Z)) -> ((divides b
-  a) -> ((ZArith.BinInt.Z.rem a b) = 0%Z)).
+Lemma divides_mod_computer :
+  forall (a:Numbers.BinNums.Z) (b:Numbers.BinNums.Z), ~ (b = 0%Z) ->
+  divides b a -> ((ZArith.BinInt.Z.rem a b) = 0%Z).
 Proof.
 intros a b Zb (q,H).
 rewrite H.
@@ -213,16 +236,16 @@ apply Zquot.Z_rem_mult.
 Qed.
 
 (* Why3 goal *)
-Lemma even_divides : forall (a:Z), (number.Parity.even a) <-> (divides 2%Z
-  a).
+Lemma even_divides :
+  forall (a:Numbers.BinNums.Z), number.Parity.even a <-> divides 2%Z a.
 Proof.
 split ;
   intros (q,H) ; exists q ; now rewrite Zmult_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma odd_divides : forall (a:Z), (number.Parity.odd a) <-> ~ (divides 2%Z
-  a).
+Lemma odd_divides :
+  forall (a:Numbers.BinNums.Z), number.Parity.odd a <-> ~ divides 2%Z a.
 Proof.
 split.
 intros H.

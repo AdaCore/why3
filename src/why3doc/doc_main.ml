@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,7 +26,7 @@ let opt_title = ref None
 let opt_body = ref false
 let opt_queue = Queue.create ()
 
-let option_list = Arg.align [
+let option_list = [
   "-o", Arg.String (fun s -> opt_output := Some s),
       "<dir> print files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),

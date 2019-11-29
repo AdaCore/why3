@@ -1,0 +1,114 @@
+(**
+
+{1 VerifyThis @ ETAPS 2018 competition
+   Challenge 1: Mind the gap}
+
+Author: Raphaël Rieu-Helft (LRI, Université Paris Sud)
+*)
+
+module GapBuffer
+
+  use int.Int
+  use seq.Seq
+  use map.Map
+  use array.Array
+
+  type char
+  val constant dummy_char : char
+
+  type buffer =  {
+    mutable data : array char;
+    mutable l : int;
+    mutable r : int
+  } invariant { 0 <= l <= r <= data.length }
+  by { data = make 1 dummy_char; l = 0; r = 0 }
+
+  function len_contents (b:buffer) : int
+    = b.data.length - b.r + b.l
+
+  function contents (b:buffer) : int -> char
+    = fun i -> if 0 <= i < b.l then b.data.elts i
+               else if b.l <= i <= len_contents b
+                    then b.data.elts (i+b.r-b.l)
+                    else dummy_char
+
+  function cursor_pos (b:buffer) : int = b.l
+
+  predicate same_contents (b1 b2:buffer)
+  = len_contents b1 = len_contents b2
+      /\ forall i. 0 <= i < len_contents b1 ->
+                   contents b1 i = contents b2 i
+
+  val b: buffer
+
+  let left ()
+    ensures { if old b.l = 0
+              then b = old b
+              else cursor_pos b = cursor_pos (old b) - 1 }
+    ensures { same_contents b (old b) }
+  = if b.l <> 0
+    then begin
+      b.l <- b.l - 1;
+      b.r <- b.r - 1;
+      b.data[b.r] <- b.data[b.l]
+    end
+
+  let right ()
+    ensures { if old b.r = old b.data.length
+              then b = old b
+              else cursor_pos b = cursor_pos (old b) + 1 }
+    ensures { same_contents b (old b) }
+  = if b.r <> b.data.length
+    then begin
+      b.data[b.l] <- b.data[b.r];
+      b.l <- b.l + 1;
+      b.r <- b.r + 1
+    end
+
+  let constant k = 42
+
+  let grow ()
+    ensures { b.l = old b.l }
+    ensures { b.r = old b.r + k }
+    ensures { same_contents b (old b) }
+  = let ndata = Array.make (b.data.length + k) dummy_char in
+    Array.blit b.data 0 ndata 0 b.l;
+    Array.blit b.data b.r ndata (b.r + k) (b.data.length - b.r);
+    b.r <- b.r + k;
+    b.data <- ndata
+
+
+  predicate contents_inserted (newb oldb: buffer) (x:char) (pos:int)
+  = len_contents newb = len_contents oldb + 1
+    /\ 0 <= pos <= len_contents oldb
+    /\ (forall i. 0 <= i < pos -> contents newb i = contents oldb i)
+    /\ contents newb pos = x
+    /\ (forall i. pos < i < len_contents newb ->
+                  contents newb i = contents oldb (i-1))
+
+  let insert (x:char)
+    ensures  { cursor_pos b = old cursor_pos b + 1 }
+    ensures  { contents_inserted b (old b) x (old b.l) }
+  =
+    if b.l = b.r then grow ();
+    b.data[b.l] <- x;
+    b.l <- b.l + 1
+
+
+  predicate contents_deleted (newb oldb: buffer) (pos:int)
+  = len_contents newb = len_contents oldb - 1
+    /\ 0 <= pos < len_contents oldb
+    /\ (forall i. 0 <= i < pos -> contents newb i = contents oldb i)
+    /\ (forall i. pos <= i < len_contents newb ->
+                  contents newb i = contents oldb (i+1))
+  let delete ()
+    ensures { if cursor_pos (old b) = 0
+              then b = old b
+              else cursor_pos b = old cursor_pos b - 1
+                   /\ contents_deleted b (old b) (old b.l - 1) }
+  = if b.l <> 0
+    then b.l <- b.l - 1
+    else ()
+
+
+end

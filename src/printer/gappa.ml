@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -28,6 +28,14 @@ let syntactic_transform transf =
       | _ -> assert false) Sls.empty metas in
     transf (fun ls -> Sls.mem ls symbols))
 
+let syntactic_transform_env transf env =
+  Trans.on_meta meta_syntax_logic (fun metas ->
+    let symbols = List.fold_left (fun acc meta_arg ->
+      match meta_arg with
+      | [MAls ls; MAstr _; MAint _] -> Sls.add ls acc
+      | _ -> assert false) Sls.empty metas in
+    transf (fun ls -> Sls.mem ls symbols) env)
+
 let () =
   Trans.register_transform "abstract_unknown_lsymbols"
     (syntactic_transform Abstraction.abstraction)
@@ -48,7 +56,11 @@ let () =
       ])))
     ~desc:"Same@ as@ simplify_trivial_quantification_in_goal,@ but@ instead@ \
       of@ substituting@ quantified@ variables,@ substitute@ applications@ \
-      of@ non-built-in@ symbols.@ Used@ by@ the@ Gappa@ pretty-printer."
+      of@ non-built-in@ symbols.@ Used@ by@ the@ Gappa@ pretty-printer.";
+  Trans.register_env_transform "simplify_computations"
+    (syntactic_transform_env (fun check_ls -> Compute.simplify (fun ls -> check_ls ls)))
+    ~desc:"Perform computations and simplify non-builtin symbols.@ \
+           Used by the Gappa pretty-printer.";
 
 (* patterns (TODO: add a parser and generalize it out of Gappa) *)
 
@@ -108,8 +120,8 @@ let find_th env file th =
 
 let get_info env task =
   (* unary minus for constants *)
-  int_minus := find_th env "int" "Int" "prefix -";
-  real_minus := find_th env "real" "Real" "prefix -";
+  int_minus := find_th env "int" "Int" (op_prefix "-");
+  real_minus := find_th env "real" "Real" (op_prefix "-");
   (* handling of inequalities *)
   let ops = on_meta arith_meta (fun acc meta_arg ->
     match meta_arg with
@@ -144,19 +156,16 @@ let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
 let number_format = {
-    Number.long_int_support = true;
-    Number.extra_leading_zeros_support = true;
-    Number.negative_int_support = Number.Number_custom "-%a";
-    Number.dec_int_support = Number.Number_default;
-    Number.hex_int_support = Number.Number_default;
-    Number.oct_int_support = Number.Number_unsupported;
-    Number.bin_int_support = Number.Number_unsupported;
-    Number.def_int_support = Number.Number_unsupported;
-    Number.negative_real_support = Number.Number_custom "-%a";
-    Number.dec_real_support = Number.Number_default;
-    Number.hex_real_support = Number.Number_default;
-    Number.frac_real_support = Number.Number_unsupported;
-    Number.def_real_support = Number.Number_unsupported;
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Custom (fun fmt f -> fprintf fmt "-%t" f);
+    Number.dec_int_support = `Default;
+    Number.hex_int_support = `Default;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Custom (fun fmt f -> fprintf fmt "-%t" f);
+    Number.dec_real_support = `Default;
+    Number.hex_real_support = `Default;
+    Number.frac_real_support = `Unsupported (fun _ _ -> assert false);
   }
 
 type constant = Enum of term * int | Value of term | Varying
@@ -164,12 +173,10 @@ type constant = Enum of term * int | Value of term | Varying
 let rec constant_value defs t =
   match t.t_node with
   | Tconst c ->
-      fprintf str_formatter "%a" (Number.print number_format) c;
-      flush_str_formatter ()
+      asprintf "%a" Constant.(print number_format unsupported_escape) c
   | Tapp (ls, [{ t_node = Tconst c}])
       when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-      fprintf str_formatter "-%a" (Number.print number_format) c;
-      flush_str_formatter ()
+      asprintf "-%a" Constant.(print number_format unsupported_escape) c
   | Tapp (ls, []) ->
     begin
       match Hid.find defs ls.ls_name with
@@ -219,12 +226,12 @@ let rec print_term info defs fmt t =
 (* predicates *)
 
 let rel_error_pat =
-  PatApp (["real"], "Real", ["infix <="], [
+  PatApp (["real"], "Real", [op_infix "<="], [
     PatApp (["real"], "Abs", ["abs"], [
-      PatApp (["real"], "Real", ["infix -"], [
+      PatApp (["real"], "Real", [op_infix "-"], [
         PatHole 0;
         PatHole 1])]);
-    PatApp (["real"], "Real", ["infix *"], [
+    PatApp (["real"], "Real", [op_infix "*"], [
       PatHole 2;
         PatApp (["real"], "Abs", ["abs"], [
           PatHole 1])])])
@@ -250,7 +257,7 @@ let rec print_fmla info defs fmt f =
           let c2 = constant_value defs t2 in
           fprintf fmt "%a in [%s,%s]" term t1 c2 c2
         with Not_found ->
-          fprintf fmt "%a - %a in [0,0]" term t1 term t2
+          fprintf fmt "%a = %a" term t1 term t2
       end
   | Tapp (ls, [t1;t2]) when Mls.mem ls info.info_ops_of_rel ->
       let s,op,rev_op = try Mls.find ls info.info_ops_of_rel

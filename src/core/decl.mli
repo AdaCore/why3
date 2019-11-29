@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -50,6 +50,20 @@ val ls_defn_decrease : ls_defn -> int list
     NOTE: This is only meaningful if the [ls_defn] comes
     from a declaration; on the result of [make_ls_defn],
     [ls_defn_decrease] will always return an empty list. *)
+
+(** {2 Structural descent checking} *)
+
+type call_set
+type vs_graph
+
+val create_call_set : unit -> call_set
+val create_vs_graph : vsymbol list -> vs_graph
+val register_call   : call_set -> ident ->
+                      vs_graph -> ident -> term list -> unit
+val vs_graph_drop   : vs_graph -> vsymbol -> vs_graph
+val vs_graph_let    : vs_graph -> term -> vsymbol -> vs_graph
+val vs_graph_pat    : vs_graph -> term -> pattern -> vs_graph
+val find_variant    : exn -> call_set -> ident -> int list
 
 (** {2 Proposition names} *)
 

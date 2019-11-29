@@ -1,0 +1,17 @@
+module Test
+
+  use array.Array
+  use mach.array.Array63
+
+  constant d: Array.array int
+  val e: Array63.array int
+
+  goal a: d[1] = 5
+
+  let f i =
+    e[i] <- 5;
+    e[i]
+
+  goal c: d[3] = 5
+
+end

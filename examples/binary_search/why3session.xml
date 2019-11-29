@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="3" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../binary_search.mlw" expanded="true">
-<theory name="BinarySearch" sum="a87eac5cc232a78b8d8da4a5e55ee897" expanded="true">
- <goal name="VC binary_search" expl="VC for binary_search" expanded="true">
- <proof prover="3"><result status="valid" time="0.05" steps="88"/></proof>
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="binary_search.mlw"/>
+<theory name="BinarySearch" proved="true">
+ <goal name="binary_search&#39;vc" expl="VC for binary_search" proved="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="132"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchAnyMidPoint" sum="6461e35169c0e5653c907b27049a389f" expanded="true">
- <goal name="VC binary_search" expl="VC for binary_search" expanded="true">
- <proof prover="3"><result status="valid" time="0.01" steps="63"/></proof>
+<theory name="BinarySearchAnyMidPoint" proved="true">
+ <goal name="binary_search&#39;vc" expl="VC for binary_search" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="63"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchInt32" sum="c6414dcfd473a940357d90533f815b58" expanded="true">
- <goal name="VC binary_search" expl="VC for binary_search" expanded="true">
- <proof prover="3"><result status="valid" time="2.53" steps="3682"/></proof>
+<theory name="BinarySearchBranchless" proved="true">
+ <goal name="binary_search&#39;vc" expl="VC for binary_search" proved="true">
+ <proof prover="0" timelimit="5"><result status="valid" time="0.06" steps="218"/></proof>
  </goal>
 </theory>
-<theory name="BinarySearchBoolean" sum="0022604a394766cd083f25712d0f873a" expanded="true">
- <goal name="VC binary_search" expl="VC for binary_search" expanded="true">
- <proof prover="3"><result status="valid" time="0.08" steps="194"/></proof>
+<theory name="BinarySearchInt32" proved="true">
+ <goal name="binary_search&#39;vc" expl="VC for binary_search" proved="true">
+ <proof prover="0"><result status="valid" time="0.50" steps="1797"/></proof>
+ </goal>
+</theory>
+<theory name="BinarySearchBoolean" proved="true">
+ <goal name="binary_search&#39;vc" expl="VC for binary_search" proved="true">
+ <proof prover="0"><result status="valid" time="0.08" steps="245"/></proof>
  </goal>
 </theory>
 </file>

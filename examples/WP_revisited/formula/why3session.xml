@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="2" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="3" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="0"/>
-<file name="../formula.why" expanded="true">
-<theory name="Formula" sum="d41d8cd98f00b204e9800998ecf8427e">
-</theory>
-<theory name="PropositionalCalculus" sum="7f2804c705a099e7f5ba415139b5ad50" expanded="true">
- <goal name="Test1" expl="" expanded="true">
+<file format="whyml" proved="true">
+<path name=".."/><path name="formula.why"/>
+<theory name="PropositionalCalculus" proved="true">
+ <goal name="Test1" proved="true">
+ <proof prover="0"><result status="valid" time="0.05" steps="38"/></proof>
  <proof prover="1"><result status="valid" time="0.01"/></proof>
  <proof prover="2"><result status="valid" time="0.19"/></proof>
- <proof prover="3"><result status="valid" time="0.05" steps="46"/></proof>
  </goal>
 </theory>
 </file>

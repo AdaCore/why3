@@ -8,7 +8,7 @@
 
 theory Utils
 
-  use import bv.BV32
+  use bv.BV32
 
   let constant one : t = (1:t)
   let constant two : t = (2:t)
@@ -43,10 +43,10 @@ end
 *)
 
 module Utils_Spec
-  use import int.Int
-  use import int.NumOf
-  use import bv.BV32
-  use import Utils
+  use int.Int
+  use int.NumOf
+  use bv.BV32
+  use Utils
 
   (** {6 count correctness } *)
 
@@ -75,7 +75,7 @@ module Utils_Spec
     numof_shift p q a (b-1) k
 
   let rec lemma countSpec_Aux (bv : t) : unit
-  variant {bv with ult}
+  variant {t'int bv}
   ensures {t'int (count bv) = NumOf.numof (nth bv) 0 32}
   =
     if pure { bv <> zeros } then
@@ -138,11 +138,11 @@ module Utils_Spec
 end
 
 module Hackers_delight
-  use import int.Int
-  use import int.NumOf
-  use import bool.Bool
-  use import bv.BV32
-  use import Utils
+  use int.Int
+  use int.NumOf
+  use bool.Bool
+  use bv.BV32
+  use Utils
 
   (** {2 ASCII checksum }
     In the beginning the encoding of an ascii character was done on 8

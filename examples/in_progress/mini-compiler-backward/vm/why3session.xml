@@ -7,8 +7,8 @@
 <prover id="2" name="Z3" version="4.3.1" timelimit="5" memlimit="1000"/>
 <prover id="3" name="Eprover" version="1.8-001" timelimit="5" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="0.95.2" timelimit="5" memlimit="1000"/>
-<file name="../vm.mlw" expanded="true">
-<theory name="ReflTransClosure" sum="41f42e2f3926adcb698b8698151507f0">
+<file name="../vm.mlw">
+<theory name="ReflTransClosure">
  <goal name="transition_star_one">
  <proof prover="2"><result status="valid" time="0.00"/></proof>
  </goal>
@@ -23,7 +23,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="Vm" sum="acfc57c1ffaddaef327e3669c590c3a0">
+<theory name="Vm">
  <goal name="codeseq_at_app_right">
  <proof prover="4"><result status="valid" time="0.02"/></proof>
  </goal>
@@ -31,9 +31,9 @@
  <proof prover="4"><result status="valid" time="0.10"/></proof>
  </goal>
 </theory>
-<theory name="VMClock" sum="8e19e54308c1351d0cdf53199e5bc630" expanded="true">
+<theory name="VMClock">
  <goal name="transition_star_endpoints">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="transition_star_endpoints.1" expl="1.">
   <proof prover="4"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -49,18 +49,18 @@
   </goal>
  </transf>
  </goal>
- <goal name="transition_star_weakening" expanded="true">
- <transf name="induction_pr" expanded="true">
-  <goal name="transition_star_weakening.1" expl="1." expanded="true">
-  <transf name="simplify_trivial_quantification_in_goal" expanded="true">
-   <goal name="transition_star_weakening.1.1" expl="1." expanded="true">
+ <goal name="transition_star_weakening">
+ <transf name="induction_pr">
+  <goal name="transition_star_weakening.1" expl="1.">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="transition_star_weakening.1.1" expl="1.">
    <proof prover="4"><result status="valid" time="0.02"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="transition_star_weakening.2" expl="2." expanded="true">
-  <transf name="simplify_trivial_quantification_in_goal" expanded="true">
-   <goal name="transition_star_weakening.2.1" expl="1." expanded="true">
+  <goal name="transition_star_weakening.2" expl="2.">
+  <transf name="simplify_trivial_quantification_in_goal">
+   <goal name="transition_star_weakening.2.1" expl="1.">
    <proof prover="0" edited="vm_VMClock_transition_star_weakening_2.v"><result status="valid" time="1.73"/></proof>
    </goal>
   </transf>
@@ -68,7 +68,7 @@
  </transf>
  </goal>
  <goal name="WP_parameter transition_deterministic" expl="VC for transition_deterministic">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="WP_parameter transition_deterministic.1" expl="1. assertion">
   <transf name="inversion_pr">
    <goal name="WP_parameter transition_deterministic.1.1" expl="1.">
@@ -540,12 +540,12 @@
  <goal name="transition_out_deterministic">
  <proof prover="0" edited="vm_VMClock_transition_out_deterministic_1.v"><result status="valid" time="0.95"/></proof>
  </goal>
- <goal name="WP_parameter halt_stuck" expl="VC for halt_stuck" expanded="true">
- <transf name="split_goal_wp" expanded="true">
+ <goal name="WP_parameter halt_stuck" expl="VC for halt_stuck">
+ <transf name="split_goal_right">
   <goal name="WP_parameter halt_stuck.1" expl="1. assertion">
   <proof prover="4"><result status="valid" time="0.86"/></proof>
   </goal>
-  <goal name="WP_parameter halt_stuck.2" expl="2. postcondition" expanded="true">
+  <goal name="WP_parameter halt_stuck.2" expl="2. postcondition">
   <proof prover="0" edited="vm_VMClock_WP_parameter_halt_stuck_1.v"><result status="valid" time="5.01"/></proof>
   </goal>
  </transf>

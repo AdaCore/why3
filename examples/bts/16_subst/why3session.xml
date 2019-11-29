@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<file format="whyml">
+<path name=".."/><path name="16_subst.mlw"/>
+<theory name="Issue16">
+ <goal name="g2">
+ <transf name="introduce_premises" >
+  <goal name="g2.0">
+  <transf name="subst" arg1="x">
+   <goal name="g2.0.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ <transf name="simplify_trivial_quantification_in_goal" >
+  <goal name="g2.0">
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g1">
+ <transf name="introduce_premises" >
+  <goal name="g1.0">
+  <transf name="subst_all" >
+   <goal name="g1.0.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="More">
+ <goal name="g3">
+ <transf name="introduce_premises" >
+  <goal name="g3.0">
+  <transf name="subst" arg1="z,x">
+   <goal name="g3.0.0">
+   </goal>
+  </transf>
+  <transf name="subst" arg1="z">
+   <goal name="g3.0.0">
+   </goal>
+  </transf>
+  <transf name="subst" arg1="x">
+   <goal name="g3.0.0">
+   </goal>
+  </transf>
+  <transf name="subst_all" >
+   <goal name="g3.0.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="g2">
+ <transf name="introduce_premises" >
+  <goal name="g2.0">
+  <transf name="subst" arg1="x">
+   <goal name="g2.0.0">
+   </goal>
+  </transf>
+  <transf name="subst_all" >
+   <goal name="g2.0.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Other">
+ <goal name="g">
+ <transf name="subst" arg1="x">
+  <goal name="g.0">
+  </goal>
+ </transf>
+ <transf name="subst" arg1="y">
+  <goal name="g.0">
+  </goal>
+ </transf>
+ <transf name="subst_all" >
+  <goal name="g.0">
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

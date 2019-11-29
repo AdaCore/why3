@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -56,18 +56,18 @@ let check_ls ign_ls ls =
     (Ty.oty_cons ls.Term.ls_args ls.Term.ls_value)
 
 let detect_polymorphism_in_decl ign_ts ign_ls ign_pr d =
-  Debug.dprintf debug "[detect_polymorphism] |sts|=%d |sls|=%d |spr|=%d@."
+  Debug.dprintf debug "|sts|=%d |sls|=%d |spr|=%d@."
                 (Ty.Sts.cardinal ign_ts)
                 (Term.Sls.cardinal ign_ls)
                 (Spr.cardinal ign_pr);
-  Debug.dprintf debug "[detect_polymorphism] decl %a@."
+  Debug.dprintf debug "decl %a@."
                 Pretty.print_decl d;
   match d.d_node with
   | Dtype ts -> check_ts ign_ts ts
   | Ddata dl ->
      List.fold_left (fun acc (ts,_) -> acc || check_ts ign_ts ts) false dl
   | Dparam ls ->
-     Debug.dprintf debug "[detect_polymorphism] param %a@."
+     Debug.dprintf debug "param %a@."
                 Pretty.print_ls ls;
      check_ls ign_ls ls
   | Dlogic dl ->
@@ -79,7 +79,10 @@ let detect_polymorphism_in_decl ign_ts ign_ls ign_pr d =
         monomorphic, since it is checked by typing *)
      List.fold_left (fun acc (ls,_) -> acc || check_ls ign_ls ls) false indl
   | Dprop (_,pr,t) ->
-     (* todo: NE PAS TESTER le goal *)
+     (* todo: DO NOT TEST the goal. This requires skolemizing
+        type variables in the goal _before_ eliminate_epsilon
+        in the transformation chain, to avoid producing
+        polymorphic identities in monomorphic tasks *)
      not (Spr.mem pr ign_pr) &&
        let s = Term.t_ty_freevars Ty.Stv.empty t in
        not (Ty.Stv.is_empty s)

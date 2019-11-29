@@ -2,83 +2,453 @@
 \label{chap:syntaxref}
 %HEVEA\cutname{syntaxref.html}
 
-This chapter gives the grammar and semantics for \why and \whyml input files.
+In this chapter, we describe the syntax and semantics of \whyml.
+
+%This chapter is not yet fully updated to the new syntax of
+%\why 1.00, so it not distributed for the moment.
+%
+%\endinput
 
 \section{Lexical Conventions}
+\label{sec:lexer}
 
-Lexical conventions are common to \why and \whyml.
-
-% TODO: blanks
-
-\subsection{Comments}
-
+%Lexical conventions of \whyml are similar to those of OCaml.
+%
+Blank characters are space, horizontal tab, carriage return,
+and line feed. Blanks separate lexemes but are otherwise ignored.
+%
 Comments are enclosed by \texttt{(*} and \texttt{*)} and can be nested.
+Note that \texttt{(*)} does not start a comment.
 
-\subsection{Strings}
-
-Strings are enclosed in double quotes (\verb!"!). Double quotes can be
-escaped in strings using the backslash character (\verb!\!).
-The other special sequences are \verb!\n! for line feed and \verb!\t!
-for horizontal tab.
-In the following, strings are referred to with the non-terminal
-\nonterm{string}{}.
-
-\subsection{Identifiers}
-
-Identifiers are non-empty sequences of characters among letters,
-digits, the underscore character and the quote character. They cannot
-start with a digit or a quote.
-
-\begin{center}\framebox{\input{./qualid_bnf.tex}}\end{center}
-
-The syntax distinguishes identifiers that start with a lowercase or an
-uppercase letter (resp. \nonterm{lident}{} and \nonterm{uident}{}), and
-similarly, lowercase and uppercase qualified identifiers.
-
-The restricted classes of identifiers denoted by \nonterm{lident-nq}{}
-and \nonterm{uident-nq}{} correspond to identifiers where the quote
-character cannot be followed by a letter. Identifiers where a quote is
-followed by a letter are reserved and cannot be used as identifier for
-declarations introduced by the user (see Section~\ref{sec:rangetypes}).
-
-
-\subsection{Constants}
-The syntax for constants is given in Figure~\ref{fig:bnf:constant}.
-Integer and real constants have arbitrary precision.
-Integer constants may be given in base 16, 10, 8 or 2.
-Real constants may be given in base 16 or 10.
-
-\begin{figure}
-\begin{center}\framebox{\input{./constant_bnf.tex}}\end{center}
-  \caption{Syntax for constants.}
-\label{fig:bnf:constant}
-\end{figure}
-
-\subsection{Operators}
-
-Prefix and infix operators are built from characters organized in four
-categories (\textsl{op-char-1} to \textsl{op-char-4}).
-\begin{center}\framebox{\input{./operator_bnf.tex}}\end{center}
-Infix operators are classified into 4 categories, according to the
-characters they are built from:
+Strings are enclosed in double quotes \texttt{"\ldots"}. The backslash character
+\texttt{\textbackslash}, is used for escaping purposes. The following
+escape sequences are allowed:
 \begin{itemize}
-\item level 4: operators containing only characters from
-\textit{op-char-4};
-\item level 3: those containing
- characters from \textit{op-char-3} or \textit{op-char-4};
-\item level 2: those containing
- characters from \textit{op-char-2}, \textit{op-char-3} or
- \textit{op-char-4};
-\item level 1: all other operators (non-terminal \textit{infix-op-1}).
+\item \texttt{\textbackslash} followed by a \emph{new line} allows for
+  multi-line strings. The leading spaces immediately after the new
+  line are ignored.
+\item \texttt{\textbackslash\textbackslash} and \texttt{\textbackslash
+    \textquotedbl} for the backslash and double quote respectively.
+\item \texttt{\textbackslash n}, \texttt{\textbackslash r}, and
+  \texttt{\textbackslash t} for the new line feed, carriage return,
+  and horizontal tab character.
+\item \texttt{\textbackslash DDD}, \texttt{\textbackslash oOOO}, and
+  \texttt{\textbackslash xXX}, where \texttt{DDD} is a decimal value
+  in the interval \texttt{0-255}, \texttt{OOO} an octal value in the
+  interval \texttt{0-377}, and \texttt{XX} and hexadecimal value.
+  Sequences of this form can be used to encode Unicode characters, in
+  particular non printable \texttt{ASCII} characters.
+\item any other escape sequence results in a parsing error.
 \end{itemize}
 
-\subsection{Labels}
+%\subsection{Constants}
+The syntax for numerical constants is given by the following rules:
+%\begin{figure}[ht]
+\begin{center}\input{./generated/constant_bnf.tex}\end{center}
+%\caption{Syntax for numerical constants.}
+%\label{fig:bnf:constant}
+%\end{figure}
+%in Figure~\ref{fig:bnf:constant}.
+Integer and real constants have arbitrary precision.
+Integer constants can be given in base 10, 16, 8 or 2.
+Real constants can be given in base 10 or 16.
+Notice that the exponent in hexadecimal real constants is written in base 10.
 
-Identifiers, terms, formulas, program expressions
-can all be labeled, either with a string, or with a location tag.
-\begin{center}\framebox{\input{./label_bnf.tex}}\end{center}
-A location tag consists of a file name, a line number, and starting
-and ending characters.
+%\subsection{Identifiers}
+Identifiers are composed of letters, digits, underscores,
+and primes. %, as shown in Figure~\ref{fig:bnf:ident}.
+The syntax distinguishes identifiers that start with a lowercase letter
+or an underscore (\nonterm{lident}{}\spacefalse), identifiers that
+start with an uppercase letter (\nonterm{uident}{}\spacefalse),
+and identifiers that start with a prime
+(\nonterm{qident}{}\spacefalse, used exclusively for type variables):
+%\begin{figure}[ht]
+\begin{center}\input{./generated/ident_bnf.tex}\end{center}
+%\caption{Syntax for identifiers.}
+%\label{fig:bnf:ident}
+%\end{figure}
+Identifiers that contain a prime followed by a letter,
+such as \texttt{int32'max}, are reserved for symbols
+introduced by \why and cannot be used for user-defined symbols.
+
+In order to refer to symbols introduced in different namespaces
+(\textit{scopes}), we can put a dot-separated ``qualifier prefix''
+in front of an identifier (e.g.~\texttt{Map.S.get}).
+This allows us to use the symbol \texttt{get}
+from the scope \texttt{Map.S} without importing
+it in the current namespace:
+%\begin{figure}[ht]
+\begin{center}\input{./generated/qualid_bnf.tex}\end{center}
+%\caption{Syntax for qualified identifiers.}
+%\label{fig:bnf:qualid}
+%\end{figure}
+All parenthesised expressions in \whyml (types,
+patterns, logical terms, program expressions)
+admit a qualifier before the opening parenthesis,
+e.g.~\texttt{Map.S.(get m i)}. This imports
+the indicated scope into the current namespace during
+the parsing of the expression under the qualifier.
+For the sake of convenience, the parentheses can be omitted
+when the expression itself is enclosed in parentheses,
+square brackets or curly braces.
+
+%\subsection{Operators}
+Prefix and infix operators are built from characters organized in four
+precedence groups (\textsl{op-char-1} to \textsl{op-char-4}), with
+optional primes at the end:
+%as shown in Figure~\ref{fig:bnf:operator}.
+%\begin{figure}[ht]
+\begin{center}\input{./generated/operator_bnf.tex}\end{center}
+%\caption{Syntax for operators.}
+%\label{fig:bnf:operator}
+%\end{figure}
+Infix operators from a high-numbered group bind stronger
+than the infix operators from a low-numbered group.
+For example, infix operator \texttt{.*.} from group 3
+would have a higher precedence than infix operator
+\texttt{->-} from group 1.
+Prefix operators always bind stronger than infix operators.
+The so-called ``tight operators'' are prefix operators that have even
+higher precedence than the juxtaposition (application) operator,
+allowing us to write expressions like \texttt{inv !x}
+without parentheses.
+%An operator from \textsl{infix-op-4} or \textsl{prefix-op}
+%cannot start with \texttt{!} or \texttt{?}: such operators
+%are always recognized as tight operators.
+%Infix operators from groups 2-4 are left-associative.
+%Infix operators from group 1 are non-associative and
+%may instead be chained, as explained in Section~\ref{sec:terms}.
+
+%An operator inside parenthesis can act as a lowercase identifier.
+%\begin{figure}[ht]
+%\begin{center}\input{./generated/ident_op_bnf.tex}\end{center}
+%\caption{Syntax for qualified identifiers.}
+%\label{fig:bnf:qualid}
+%\end{figure}
+
+Finally, any identifier, term, formula, or expression
+in a \whyml source can be tagged either with a string
+\textit{attribute} or a location:
+\begin{center}\input{./generated/attribute_bnf.tex}\end{center}
+An attribute cannot contain newlines or closing square brackets;
+leading and trailing spaces are ignored.
+A location consists of a file name in double quotes,
+a line number, and starting and ending character positions.
+
+\section{Type expressions}
+\label{sec:types}
+
+\whyml features an ML-style type system with polymorphic types,
+variants (sum types), and records that can have mutable fields.
+The syntax for type expressions is the following:
+\begin{center}\input{./generated/type_bnf.tex}\end{center}
+Built-in types are \texttt{int} (arbitrary precision integers),
+\texttt{real} (real numbers), \texttt{bool}, the arrow type
+(also called the \textit{mapping type}),
+and the tuple types.
+The empty tuple type is also called the \textit{unit type}
+and can be written as \texttt{unit}.
+
+Note that the syntax for type expressions notably differs from
+the usual ML syntax. In particular, the type of polymorphic lists
+is written \texttt{list 'a}, and not \texttt{'a list}.
+
+\textit{Snapshot types} are specific to \whyml, they denote
+the types of ghost values produced by pure logical functions in
+\whyml programs. A snapshot of an immutable type is the type
+itself: thus, \texttt{\{int\}} is the same as \texttt{int} and
+\texttt{\{list 'a\}} is the same as \texttt{list 'a}.
+A snapshot of a mutable type, however, represents a snapshot
+value which cannot be modified anymore. Thus, a snapshot array
+\texttt{a} of type \texttt{\{array int\}} can be read from
+(\texttt{a[42]} is accepted) but not written into
+(\texttt{a[42] <- 0} is rejected). Generally speaking,
+a program function that expects an argument of a mutable type
+will accept an argument of the corresponding snapshot type
+as long as it is not modified by the function.
+
+\section{Logical expressions: terms and formulas}
+\label{sec:terms}
+
+\begin{figure}[p!]
+\begin{center}\input{./generated/term1_bnf.tex}\end{center}
+\caption{\whyml terms (part I).}
+\label{fig:bnf:term1}
+\end{figure}
+
+\begin{figure}[ht]
+\begin{center}\input{./generated/term2_bnf.tex}\end{center}
+\caption{\whyml terms (part II).}
+\label{fig:bnf:term2}
+\end{figure}
+
+A significant part of a typical \whyml source file is occupied
+by non-executable logical content intended for specification
+and proof: function contracts, assertions, definitions of
+logical functions and predicates, axioms, lemmas, etc.
+
+Logical expressions are called \textit{terms}. Boolean
+terms are called \textit{formulas}. Internally, \why distinguishes
+the proper formulas (produced by predicate symbols, propositional
+connectives and quantifiers) and the terms of type \texttt{bool}
+(produced by Boolean variables and logical functions that return
+\texttt{bool}). However, this distinction is not enforced on the
+syntactical level, and \why will perform the necessary conversions
+behind the scenes.
+
+The syntax of \whyml terms is given in
+Figures~\ref{fig:bnf:term1}-\ref{fig:bnf:term3}.
+The constructions are listed in the order of
+decreasing precedence.
+For example, as was mentioned above,
+tight operators have the highest precedence of all operators,
+so that \texttt{-p.x} denotes the negation of the
+record field \texttt{p.x}, whereas \texttt{!p.x}
+denotes the field \texttt{x} of a record stored
+in the reference \texttt{p}.
+
+An operator in parentheses acts as an identifier
+referring to that operator, for example, in a definition.
+To distinguish between prefix and infix operators, an
+underscore symbol is appended at the end: for example,
+\texttt{(-)} refers to the binary subtraction and
+\texttt{(-\_)} to the unary negation.
+Tight operators cannot be used as infix operators,
+and thus do not require disambiguation.
+
+In addition to prefix and infix operators, \whyml
+supports several mixfix bracket operators to
+manipulate various collection types: dictionaries,
+arrays, sequences, etc. Bracket operators do not have
+any predefined meaning and may be used to denote access
+and update operations for various user-defined collection types.
+We can introduce multiple bracket operations in the same scope
+by disambiguating them with primes after the closing
+bracket: for example, \texttt{a[i]} may denote array access
+and \texttt{s[i]'} sequence access.
+Notice that the in-place update operator \texttt{a[i] <- v}
+cannot be used inside logical terms: all effectful operations
+are restricted to program expressions. To represent the result
+of a collection update, we should use a pure logical update
+operator \texttt{a[i <- v]} instead.
+%Overloading of bracket operations, which would allow to use
+%the same bracket operator for different collections,
+%is currently not supported in \whyml.
+
+\whyml supports ``associated'' names for operators, obtained
+by adding a suffix after the parenthesised operator name.
+For example, an axiom that represents the specification of the
+infix operator \texttt{(+)} may be called \texttt{(+)'spec}
+or \texttt{(+)\_spec}. As with normal identifiers, names
+with a letter after a prime, such as \texttt{(+)'spec},
+can only be introduced by \why, and not by the user in a \whyml
+source.
+
+The \texttt{at} and \texttt{old} operators are used inside
+postconditions and assertions to refer to the value of
+a mutable program variable at some past moment of execution
+(see the next section for details).
+These operators have higher precedence than the infix
+operators from group 1 (\textsl{infix-op-1}): \texttt{old i > j}
+is parsed as \texttt{(old i) > j} and not as \texttt{old (i > j)}.
+
+Infix operators from groups 2-4 are left-associative.
+Infix operators from group 1 are non-associative and
+can be chained. For example, the term \texttt{0 <= i < j < length a}
+is parsed as the conjunction of three inequalities \texttt{0 <= i},
+\texttt{i < j}, and \texttt{j < length a}.
+
+As with normal identifiers,
+we can put a qualifier over a parenthesised operator,
+e.g.~\texttt{Map.S.([]) m i}. Also, as noted above,
+a qualifier can be put over a parenthesised term,
+%e.g.~\texttt{Map.S.(m[i])},
+and the parentheses
+can be omitted if the term is a record or a record update.
+
+The propositional connectives in \whyml formulas are listed in
+Figure~\ref{fig:bnf:term2}. The non-standard connectives ---
+asymmetric conjunction (\texttt{\&\&}), asymmetric disjunction
+(\texttt{||}), proof indication (\texttt{by}), and consequence
+indication (\texttt{so}) --- are used to control the goal-splitting
+transformations of \why and provide integrated proofs for
+\whyml assertions, postconditions, lemmas, etc.
+The semantics of these connectives
+follows the rules below:
+\begin{itemize}\setlength{\itemsep}{0ex}
+\item A proof task for \texttt{A \&\& B} is split into
+separate tasks for \texttt{A} and \texttt{A -> B}.
+If \texttt{A \&\& B} occurs as a premise, it behaves
+as a normal conjunction.
+\item A case analysis over \texttt{A || B} is split into
+disjoint cases \texttt{A} and \texttt{not A {/\char92} B}.
+If \texttt{A || B} occurs as a goal, it behaves
+as a normal disjunction.
+\item An occurrence of \texttt{A by B} generates a side condition
+\texttt{B -> A} (the proof justifies the affirmation).
+When \texttt{A by B} occurs as a premise,
+it is reduced to \texttt{A} (the proof is discarded).
+When \texttt{A by B} occurs as a goal,
+it is reduced to \texttt{B} (the proof is verified).
+\item An occurrence of \texttt{A so B} generates a side condition
+\texttt{A -> B} (the premise justifies the conclusion).
+When \texttt{A so B} occurs as a premise,
+it is reduced to the conjunction \mbox{\texttt{A {/\char92} B}}
+(we use both the premise and the conclusion).
+When \texttt{A so B} occurs as a goal,
+it is reduced to \texttt{A} (the premise is verified).
+\end{itemize}
+For example, full splitting of the goal
+\texttt{(A by (exists x. B so C)) \&\& D}
+produces four subgoals:
+\texttt{exists x. B} (the premise is verified),
+\texttt{forall x. B -> C} (the premise justifies the conclusion),
+\texttt{(exists x. B {/\char92} C) -> A} (the proof justifies the affirmation),
+and finally, \texttt{A -> D} (the proof of \texttt{A} is discarded
+and \texttt{A} is used to prove \texttt{D}).
+
+%Figure~\ref{fig:byso} contains more examples of usage of
+%\texttt{\&\&}, \texttt{||}, \texttt{by}, and \texttt{so}.
+%\begin{figure}[ht]
+%\begin{center}
+%\begin{tabular}{c|c}
+%\multicolumn{1}{c|}{Initial goal} &
+%\multicolumn{1}{c}{Goals after full splitting} \\
+%\hline
+%\texttt{A -> (B {/\char92} C)} & \texttt{A -> B}, \:\: \texttt{A -> C} \\
+%\texttt{(A {\char92/} B) -> C} & \texttt{A -> C}, \:\: \texttt{B -> C} \\[1ex]
+%\texttt{A -> (B {\&\&} C)} & \texttt{A -> B}, \:\: \texttt{A -> (B -> C)} \\
+%\texttt{(A || B) -> C} & \texttt{A -> C}, \:\: \texttt{(not A {/\char92} B) -> C} \\[1ex]
+%\texttt{A -> (B by C)} & \texttt{A -> C}, \:\: \texttt{A -> (C -> B)} \\
+%\texttt{(A so B) -> C} & \texttt{A -> B}, \:\: \texttt{(A {/\char92} B) -> C} \\[1ex]
+%\texttt{A by (B by C)} & \texttt{C}, \:\:
+%  \texttt{C -> B}, \:\: \texttt{B -> A} \\
+%\texttt{A by (B so C)} & \texttt{B}, \:\:
+%  \texttt{B -> C}, \:\: \texttt{(B {/\char92} C) -> A} \\
+%\end{tabular}
+%\end{center}
+%\caption{Non-standard propositional connectives.}
+%\label{fig:byso}
+%\end{figure}
+
+The behaviour of the splitting transformations is further
+controlled by attributes \texttt{[@stop\_split]} and
+\texttt{[@case\_split]}. Consult Section~\ref{tech:trans:split}
+for details.
+
+Among the propositional connectives,
+\texttt{not} has the highest precedence,
+\texttt{\&\&} has the same precedence as \texttt{/\char92}
+(weaker than negation),
+\texttt{||} has the same precedence as \texttt{\char92/}
+(weaker than conjunction),
+\texttt{by}, \texttt{so}, \texttt{->}, and \texttt{<->}
+all have the same precedence (weaker than disjunction).
+All binary connectives except equivalence are right-associative.
+Equivalence is non-associative and is chained instead:
+\texttt{A <-> B <-> C} is transformed into a conjunction
+of \texttt{A <-> B} and \texttt{B <-> C}.
+To reduce ambiguity, \whyml forbids to place
+a non-parenthesised implication at the right-hand side
+of an equivalence: \texttt{A <-> B -> C} is rejected.
+
+\begin{figure}[ht]
+\begin{center}\input{./generated/term3_bnf.tex}\end{center}
+\caption{\whyml terms (part III).}
+\label{fig:bnf:term3}
+\end{figure}
+
+In Figure~\ref{fig:bnf:term3}, we find the more advanced
+term constructions: conditionals, let-bindings, pattern
+matching, and local function definitions,
+either via the \texttt{let-in} construction or the
+\texttt{fun} keyword. The pure logical functions
+defined in this way are called \emph{mappings};
+they are first-class values of ``arrow'' type
+\texttt{$\tau_1$ -> $\tau_2$}.
+
+The patterns are similar to those of OCaml, though the \texttt{when}
+clauses and numerical constants are not supported. Unlike in OCaml,
+\texttt{as} binds stronger than the comma: in the pattern
+\texttt{($p_1$,$p_2$ as x)}, variable \texttt{x} is bound to
+the value matched by pattern $p_2$. Also notice the closing
+\texttt{end} after the \texttt{match-with} term.
+A \texttt{let-in} construction with a non-trivial pattern is
+translated as a \texttt{match-with} term with a single branch.
+
+Inside logical terms, pattern matching must be exhaustive:
+\whyml rejects a term like \texttt{let Some x = o in $\dots$},
+where \texttt{o} is a variable of an option type.
+In program expressions, non-exhaustive pattern matching
+is accepted and a proof obligation is generated to show
+that the values not covered cannot occur in execution.
+
+The syntax of parameters %(non-terminal
+%\nonterm{param}{} in Figure~\ref{fig:bnf:term3})
+in user-defined operations---%
+first-class mappings,
+top-level logical functions and predicates,
+and program functions---%
+is rather flexible in \whyml.
+Like in OCaml, the user can specify the name of a parameter
+without its type and let the type be inferred from the
+definition. Unlike in OCaml, the user can also specify
+the type of the parameter without giving its name.
+This is convenient when the symbol declaration does not
+provide the actual definition or specification of
+the symbol, and thus only the type signature is of
+relevance.
+For example, one can declare an abstract binary function
+that adds an element to a set simply by writing
+\texttt{function add 'a (set 'a) : set 'a}.
+A standalone non-qualified lowercase identifier without
+attributes is treated as a type name when the definition
+is not provided, and as a parameter name otherwise.
+
+Ghost patterns, ghost variables after \texttt{as},
+and ghost parameters in function definitions are only used
+in program code, and not allowed in logical terms.
+
+\section{Program expressions}
+\label{sec:exprs}
+
+The syntax of program expressions is given in
+Figures~\ref{fig:bnf:expr1}-\ref{fig:bnf:expr2}.
+As before, the constructions are listed in the order of decreasing
+precedence. The rules for tight, prefix, infix, and bracket operators
+are the same as for logical terms. In particular, the infix operators
+from group~1 can be chained. Notice that binary operators \texttt{\&\&}
+and \texttt{||} denote here the usual lazy conjunction and disjunction,
+respectively.
+
+\begin{figure}[ht]
+\begin{center}\input{./generated/expr1_bnf.tex}\end{center}
+\caption{\whyml program expressions (part I).}
+\label{fig:bnf:expr1}
+\end{figure}
+
+%Two new operators make appearance in Figure~\ref{fig:bnf:expr1}.
+Keyword \texttt{ghost} marks the expression as
+ghost code added for verification purposes. Ghost code is
+removed from the final code intended for execution, and thus
+cannot affect the computation of the program results nor the
+content of the observable memory.
+
+Assignment updates in place
+a mutable record field or an element of a collection.
+The former can be done simultaneously
+on a tuple of values: \texttt{x.f, y.g <- a, b}. The latter
+form, \texttt{a[i] <- v}, amounts to a call of the ternary
+bracket operator \texttt{([]<-)} and cannot be used in a
+multiple assignment.
+
+\newpage
+\begin{figure}[ht]
+\begin{center}\input{./generated/expr2_bnf.tex}\end{center}
+\caption{\whyml program expressions (part II).}
+\label{fig:bnf:expr2}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -86,7 +456,7 @@ and ending characters.
 
 \subsection{Terms}
 
-The syntax for terms is given in Figure~\ref{fig:bnf:term}.
+The syntax for terms is given in Figure~\ref{fig:bnf:term1}.
 The various constructs have the following priorities and
 associativities, from lowest to greatest priority:
 \begin{center}
@@ -111,22 +481,6 @@ associativities, from lowest to greatest priority:
 
 Note the curryfied syntax for function application, though partial
 application is not allowed (rejected at typing).
-
-\begin{figure}
-  \begin{center}\framebox{\input{./term_bnf.tex}}\end{center}
-  \caption{Syntax for terms.}
-\label{fig:bnf:term}
-\end{figure}
-
-\subsection{Type Expressions}
-
-The syntax for type expressions is the following:
-\begin{center}\framebox{\input{./type_bnf.tex}}\end{center}
-Built-in types are \texttt{int}, \texttt{real}, and tuple types.
-Note that the syntax for type
-expressions notably differs from the usual ML syntax (\eg the
-type of polymorphic lists is written \texttt{list 'a}, not \texttt{'a list}).
-
 
 \subsection{Formulas}
 
@@ -157,7 +511,7 @@ Note that infix symbols of level 1 include equality (\texttt{=}) and
 disequality (\texttt{<>}).
 
 \begin{figure}
-  \begin{center}\framebox{\input{./formula_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/formula_bnf.tex}}\end{center}
   \caption{Syntax for formulas.}
 \label{fig:bnf:formula}
 \end{figure}
@@ -181,13 +535,13 @@ transformations interpret those connectives as introduction of logical cuts
 The syntax for theories is given on Figure~\ref{fig:bnf:theorya} and~\ref{fig:bnf:theoryb}.
 
 \begin{figure}
-  \begin{center}\framebox{\input{./theory_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/theory_bnf.tex}}\end{center}
   \caption{Syntax for theories (part 1).}
 \label{fig:bnf:theorya}
 \end{figure}
 
 \begin{figure}
-  \begin{center}\framebox{\input{./theory2_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/theory2_bnf.tex}}\end{center}
   \caption{Syntax for theories (part 2).}
 \label{fig:bnf:theoryb}
 \end{figure}
@@ -242,7 +596,7 @@ This type is used in the standard library in the theories
 
 A declaration of the form \texttt{type f = < float \textit{eb sb} >}
 defines a type of floating-point numbers as specified by the IEEE-754
-standard~\cite{ieee754}. Here the literal \texttt{\textit{eb}}
+standard~\cite{ieee754-2008}. Here the literal \texttt{\textit{eb}}
 represents the number of bits in the exponent and the literal
 \texttt{\textit{sb}} the number of bits in the significand (including
 the hidden bit). Note that in order to make such a declaration the
@@ -290,7 +644,7 @@ This type is used in the standard library in the theories
 \subsection{Files}
 
 A \why input file is a (possibly empty) list of theories.
-\begin{center}\framebox{\input{./why_file_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/why_file_bnf.tex}}\end{center}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -302,13 +656,13 @@ A \why input file is a (possibly empty) list of theories.
 The syntax for specification clauses in programs
 is given in Figure~\ref{fig:bnf:spec}.
 \begin{figure}
-  \begin{center}\framebox{\input{./spec_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/spec_bnf.tex}}\end{center}
   \caption{Specification clauses in programs.}
 \label{fig:bnf:spec}
 \end{figure}
 Within specifications, terms are extended with new constructs
 \verb|old| and \verb|at|:
-\begin{center}\framebox{\input{./term_old_at_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/term_old_at_bnf.tex}}\end{center}
 Within a postcondition, $\verb|old|~t$ refers to the value of term $t$
 in the prestate. Within the scope of a code mark $L$,
 the term $\verb|at|~t~\verb|'|L$ refers to the value of term $t$ at the program
@@ -319,13 +673,13 @@ point corresponding to $L$.
 The syntax for program expressions is given in
 Figure~\ref{fig:bnf:expra} and~Figure~\ref{fig:bnf:exprb}.
 \begin{figure}
-  \begin{center}\framebox{\input{./expr_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/expr_bnf.tex}}\end{center}
   \caption{Syntax for program expressions (part 1).}
 \label{fig:bnf:expra}
 \end{figure}
 
 \begin{figure}
-  \begin{center}\framebox{\input{./expr2_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/expr2_bnf.tex}}\end{center}
   \caption{Syntax for program expressions (part 2).}
 \label{fig:bnf:exprb}
 \end{figure}
@@ -477,7 +831,7 @@ right, lazily.
 
 The syntax for modules is given in Figure~\ref{fig:bnf:module}.
 \begin{figure}
-  \begin{center}\framebox{\input{./module_bnf.tex}}\end{center}
+  \begin{center}\framebox{\input{./generated/module_bnf.tex}}\end{center}
   \caption{Syntax for modules.}
 \label{fig:bnf:module}
 \end{figure}
@@ -489,7 +843,7 @@ variables, functions, exceptions).
 \subsection{Files}
 
 A \whyml input file is a (possibly empty) list of theories and modules.
-\begin{center}\framebox{\input{./whyml_file_bnf.tex}}\end{center}
+\begin{center}\framebox{\input{./generated/whyml_file_bnf.tex}}\end{center}
 A theory defined in a \whyml file can only be used within that
 file. If a theory is supposed to be reused from other files, be they
 \why or \whyml files, it should be defined in a \why file.
@@ -498,20 +852,29 @@ file. If a theory is supposed to be reused from other files, be they
 \section{The \why Standard Library}
 \label{sec:library}\index{standard library}\index{library}
 
-The \why standard library provides general-purpose theories and
+The \why standard library provides general-purpose
 modules, to be used in logic and/or programs.
 It can be browsed on-line at \url{http://why3.lri.fr/stdlib/}.
-Each file contains one or several theories and/or modules.
-To \texttt{use} or \texttt{clone} a theory/module \texttt{T} from file
-\texttt{file}, use the syntax \texttt{file.T}, since \texttt{file} is
-available in \why's default load path. For instance, the theory of
+Each file contains one or several modules.
+To \texttt{use} or \texttt{clone} a module \texttt{M} from file
+\texttt{file}, use the syntax \texttt{file.M}, since \texttt{file} is
+available in \why's default load path. For instance, the module of
 integers and the module of references are imported as follows:
-
 \begin{whycode}
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
 \end{whycode}
-
+A sub-directory \texttt{mach/} provides various modules to model
+machine arithmetic.
+For instance, the module of 63-bit integers and the module of arrays
+indexed by 63-bit integers are imported as follows:
+\begin{whycode}
+  use mach.int.Int63
+  use mach.array.Array63
+\end{whycode}
+In particular, the types and operations from these modules are mapped
+to native OCaml's types and operations when \why code is extracted to
+OCaml (see Section~\ref{sec:extract}).
 
 %%% Local Variables:
 %%% mode: latex

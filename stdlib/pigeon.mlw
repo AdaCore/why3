@@ -1,0 +1,79 @@
+
+(** {1 Pigeon hole principle} *)
+
+module Pigeonhole
+
+  use int.Int
+  use map.Map
+
+  let rec lemma pigeonhole (n m: int) (f: int -> int)
+    requires { 0 <= m < n }
+    requires { forall i. 0 <= i < n -> 0 <= f i < m }
+    ensures  { exists i1, i2. 0 <= i1 < i2 < n /\ f i1 = f i2 }
+    variant  { m }
+  = for i = 0 to n - 1 do
+      invariant { forall k. 0 <= k < i -> f k < m - 1 }
+      if f i = m - 1 then begin
+        for j = i + 1 to n - 1 do
+          invariant { forall k. i < k < j -> f k < m - 1 }
+          if f j = m - 1 then return
+        done;
+        let function g k = if k < i then f k else f (k + 1) in
+        pigeonhole (n - 1) (m - 1) g;
+        return end
+    done;
+    pigeonhole n (m - 1) f
+
+end
+
+(* An instance where a list is included into a set with fewer elements.
+
+   Contributed by Yuto Takei (University of Tokyo) *)
+
+module ListAndSet
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Mem as Mem
+  use set.Fset
+
+  type t
+
+  predicate pigeon_set (s: fset t) =
+    forall l: list t.
+    (forall e: t. Mem.mem e l -> mem e s) ->
+    (length l > cardinal s) ->
+    exists e: t, l1 l2 l3: list t.
+    l = l1 ++ (Cons e (l2 ++ (Cons e l3)))
+
+  clone set.FsetInduction as FSI with
+    type t = t, predicate p = pigeon_set
+
+  lemma corner:
+    forall s: fset t, l: list t.
+    (length l = cardinal s) ->
+    (forall e: t. Mem.mem e l -> mem e s) ->
+    (exists e: t, l1 l2 l3: list t.
+    l = l1 ++ (Cons e (l2 ++ (Cons e l3)))) \/
+    (forall e: t. mem e s -> Mem.mem e l)
+
+  lemma pigeon_0:
+    pigeon_set empty
+
+  lemma pigeon_1:
+    forall s: fset t. pigeon_set s ->
+    forall t: t. pigeon_set (add t s)
+
+  lemma pigeon_2:
+    forall s: fset t. pigeon_set s
+
+  lemma pigeonhole:
+    forall s: fset t, l: list t.
+    (forall e: t. Mem.mem e l -> mem e s) ->
+    (length l > cardinal s) ->
+    exists e: t, l1 l2 l3: list t.
+    l = l1 ++ (Cons e (l2 ++ (Cons e l3)))
+
+end

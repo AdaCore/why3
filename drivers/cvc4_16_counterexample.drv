@@ -1,0 +1,12 @@
+
+import "cvc4_16.drv"
+
+(* Counterexamples: set model parser *)
+model_parser "smtv2"
+
+theory BuiltIn
+
+  meta "get_counterexmp" ""
+  meta "meta_incremental" ""
+
+end

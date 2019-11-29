@@ -1,7 +1,5 @@
 (* Why drivers for Alt-Ergo: common part *)
 
-prelude "(* this is the prelude for Alt-Ergo, version >= 0.95.2 *)"
-
 printer "alt-ergo"
 filename "%f-%t-%g.why"
 
@@ -19,21 +17,6 @@ time "Valid (%s)"
 steps "Valid (\\([0-9]+.?[0-9]*\\)) (\\([0-9]+.?[0-9]*\\))" 2
 steps "Valid (\\([0-9]+.?[0-9]*\\)) (\\([0-9]+.?[0-9]*\\) steps)" 2
 time "why3cpulimit time : %s s"
-
-transformation "inline_trivial"
-
-transformation "eliminate_builtin"
-transformation "eliminate_recursion"
-transformation "eliminate_inductive"
-transformation "eliminate_algebraic"
-transformation "eliminate_literal"
-transformation "eliminate_epsilon"
-transformation "eliminate_if"
-transformation "eliminate_let"
-
-transformation "split_premise_right"
-transformation "simplify_formula"
-(*transformation "simplify_trivial_quantification_in_goal"*)
 
 theory BuiltIn
   syntax type int   "int"
@@ -98,14 +81,7 @@ end
 
 theory int.ComputerDivision
 
-  prelude "logic comp_div: int, int -> int"
-  prelude "axiom comp_div_def: forall x, y:int. x >= 0 and y > 0 -> comp_div(x,y) = x / y"
-
-  prelude "logic comp_mod: int, int -> int"
-  prelude "axiom comp_mod_def: forall x, y:int. x >= 0 and y > 0 -> comp_mod(x,y) = x % y"
-
-  syntax function div "comp_div(%1,%2)"
-  syntax function mod "comp_mod(%1,%2)"
+  use for_drivers.ComputerOfEuclideanDivision
 
 end
 

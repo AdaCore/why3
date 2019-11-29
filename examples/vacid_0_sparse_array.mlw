@@ -20,8 +20,8 @@ back   +-+-+-+-------------------+
 
 *)
 
-  use import int.Int
-  use import array.Array as A
+  use int.Int
+  use array.Array
 
   constant maxlen : int = 1000
 
@@ -31,15 +31,15 @@ back   +-+-+-+-------------------+
                    mutable card   : int;
                            def    : 'a; }
   invariant {
-    0 <= card <= A.length values <= maxlen /\
-    A.length values = A.length index = A.length back /\
+    0 <= card <= length values <= maxlen /\
+    length values = length index = length back /\
     forall i : int.
       0 <= i < card ->
-      0 <= back[i] < A.length values /\ index[back[i]] = i
+      0 <= back[i] < length values /\ index[back[i]] = i
   } by {
-    values = A.make 0 (any 'a);
-    index  = A.make 0 0;
-    back   = A.make 0 0;
+    values = make 0 (any 'a);
+    index  = make 0 0;
+    back   = make 0 0;
     card   = 0;
     def    = any 'a
   }
@@ -53,11 +53,11 @@ back   +-+-+-+-------------------+
     else
       a.def
 
-  function length (a: sparse_array 'a) : int = A.length a.values
+  function length (a: sparse_array 'a) : int = Array.length a.values
 
   (* creation *)
 
-  val malloc (n:int) : array 'a ensures { A.length result = n }
+  val malloc (n:int) : array 'a ensures { Array.length result = n }
 
   let create (sz: int) (d: 'a)
     requires { 0 <= sz <= maxlen }
@@ -90,11 +90,11 @@ back   +-+-+-+-------------------+
   lemma permutation :
     forall a: sparse_array 'a.
     (* sparse_array invariant *)
-      (0 <= a.card <= A.length a.values <= maxlen /\
-      A.length a.values = A.length a.index = A.length a.back /\
+      Array.(0 <= a.card <= Array.length a.values <= maxlen /\
+      length a.values = length a.index = length a.back /\
       forall i : int.
         0 <= i < a.card ->
-        0 <= a.back[i] < A.length a.values /\ a.index[a.back[i]] = i) ->
+        0 <= a.back[i] < length a.values /\ a.index[a.back[i]] = i) ->
     (* sparse_array invariant *)
     a.card = a.length ->
     forall i: int. 0 <= i < a.length -> is_elt a i
@@ -118,7 +118,7 @@ end
 
 module Harness
 
-  use import SparseArray
+  use SparseArray
 
   type elt
   val constant default : elt

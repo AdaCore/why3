@@ -1,0 +1,252 @@
+
+(** {1 The VerifyThis competition at FM2012: Problem 3}
+
+   See {h <a href="http://fm2012.verifythis.org/challenges">this web page</a>}
+
+   Author: Jean-Christophe Filliâtre *)
+
+(*
+Iterative deletion in a binary search tree - 90 minutes
+
+
+VERIFICATION TASK
+-----------------
+
+Given: a pointer t to the root of a non-empty binary search tree (not
+necessarily balanced). Verify that the following procedure removes the
+node with the minimal key from the tree. After removal, the data
+structure should again be a binary search tree.
+
+
+(Tree, int) search_tree_delete_min (Tree t) {
+   Tree tt, pp, p;
+   int m;
+   p = t->left;
+   if (p == NULL) {
+       m = t->data; tt = t->right; dispose (t); t = tt;
+   } else {
+       pp = t; tt = p->left;
+       while (tt != NULL) {
+           pp = p; p = tt; tt = p->left;
+       }
+       m = p->data; tt = p->right; dispose(p); pp->left= tt;
+   }
+   return (t,m);
+}
+
+Note: When implementing in a garbage-collected language, the call to
+dispose() is superfluous.
+*)
+
+(* Why3 has no pointer data structures, so we model the heap *)
+module Memory
+
+  use export map.Map
+  use export ref.Ref
+
+  type loc
+  val constant null: loc
+  val predicate eq_loc (x y:loc)
+    ensures { result <-> x = y }
+
+  type node = { left: loc; right: loc; data: int; }
+  type memory = map loc node
+
+  (* the global variable mem contains the current state of the memory *)
+  val mem: ref memory
+
+  (* accessor functions to ensure safety i.e. no null loc dereference *)
+  let get_left (p: loc) : loc =
+    requires { p <> null }
+    ensures  { result = !mem[p].left }
+    !mem[p].left
+  let get_right (p: loc) : loc =
+    requires { p <> null }
+    ensures  { result = !mem[p].right }
+    !mem[p].right
+  let get_data (p: loc) : int =
+    requires { p <> null }
+    ensures  { result = !mem[p].data }
+    !mem[p].data
+
+  val set_left (p: loc) (v:loc) : unit
+    requires { p <> null }
+    writes { mem }
+    ensures  { !mem[p] = { (old !mem)[p] with left = v } }
+    ensures  { forall q. q <> p -> !mem[q] = (old !mem)[q] }
+(* FIXME: This expression makes a ghost modification in the non-ghost variable mem
+
+  = mem := set !mem p { !mem[p] with left = v }
+*)
+
+end
+
+module Treedel
+
+  use Memory
+  use bintree.Tree
+  use bintree.Inorder
+  use list.List
+  use list.Mem
+  use list.Append
+  use list.Distinct
+
+  function root (t: tree loc) : loc =
+    match t with
+    | Empty -> null
+    | Node _ p _ -> p
+    end
+
+  (* there is a binary tree t in memory m *)
+  predicate istree (m: memory) (t: tree loc) =
+    match t with
+    | Empty -> true
+    | Node l p r -> p <> null
+      /\ istree m l /\ istree m r
+      /\ root l = m[p].left /\ root r = m[p].right
+    end
+
+  let rec lemma extensionality (m m': memory) (t: tree loc) : unit
+    requires { istree m t }
+    requires { forall p. Mem.mem p (inorder t) ->
+      m[p].left = m'[p].left /\ m[p].right = m'[p].right }
+    ensures  { istree m' t }
+    variant { t }
+  = let rc = extensionality m m' in
+    match t with Empty -> () | Node l _ r -> rc l; rc r end
+
+  (* degenerated zipper for a left descent (= list of pairs) *)
+  type zipper 'a =
+    | Top
+    | Left (zipper 'a) 'a (tree 'a)
+
+  let rec function zip (t: tree 'a) (z: zipper 'a) : tree 'a
+  = match z with
+    | Top -> t
+    | Left z x r -> zip (Node t x r) z
+    end
+
+  function inorderz (z: zipper 'a) : list 'a =
+    match z with
+    | Top -> Nil
+    | Left z x r -> Cons x (inorder r) ++ inorderz z
+    end
+
+  lemma inorder_zip:
+     forall z [@induction]: zipper 'a, t: tree 'a.
+       inorder (zip t z) = inorder t ++ inorderz z
+
+  let ghost tree_left (t: tree loc) : tree loc
+    requires { t <> Empty }
+    ensures  { match t with Empty -> false | Node l _ _ -> result = l end }
+  = match t with Empty -> absurd | Node l _ _ -> l end
+
+  let ghost tree_right (t: tree loc) : tree loc
+    requires { t <> Empty }
+    ensures  { match t with Empty -> false | Node _ _ r -> result = r end }
+  = match t with Empty -> absurd | Node _ _ r -> r end
+
+  lemma distinct_break_append :
+    forall l1 [@induction] l2:list 'a.
+    distinct (l1 ++ l2) ->
+    distinct l1 /\ distinct l2 /\ forall x. Mem.mem x l1 -> not Mem.mem x l2
+
+  let rec ghost in_zip_tree (m: memory) (t: tree loc) (z: zipper loc) : unit
+    requires { istree m (zip t z) }
+    ensures  { istree m t }
+    variant  { z }
+  = match z with Top -> () | Left z p r -> in_zip_tree m (Node t p r) z end
+
+  let rec ghost subst_zip_tree (m m': memory)
+                               (t1 t2: tree loc) (z: zipper loc) : unit
+    requires { istree m (zip t1 z) /\ istree m' t2 }
+    requires { root t1 = root t2 }
+    requires { distinct (inorder (zip t1 z)) }
+    requires { forall x. m[x] <> m'[x] -> Mem.mem x (inorder t1) }
+    ensures  { istree m' (zip t2 z) /\ root (zip t1 z) = root (zip t2 z) }
+    variant  { z }
+  = match z with
+    | Top -> ()
+    | Left z p r ->
+      let t3 = Node t1 p r in
+      in_zip_tree m t3 z;
+      assert { forall q. Mem.mem q (inorder r) \/ q = p ->
+        m[q] = m'[q] by Mem.mem q (Cons p (inorder r)) /\ distinct (inorder t3)
+      };
+      extensionality m m' r;
+      subst_zip_tree m m' t3 (Node t2 p r) z
+    end
+
+  let lemma main_lemma (m: memory) (pp p: loc)
+                       (ppr pr: tree loc) (z: zipper loc) : unit
+    requires { let it = zip (Node (Node Empty p pr) pp ppr) z in
+      istree m it /\ distinct (inorder it) }
+    ensures { let m' = m[pp <- { m[pp] with left = m[p].right }] in
+      let t1 = Node (Node Empty p pr) pp ppr in
+      let t2 = Node pr pp ppr in
+      istree m' (zip t2 z) /\ root (zip t1 z) = root (zip t2 z)
+    }
+  = let m' = m[pp <- { m[pp] with left = m[p].right }] in
+    let t1 = Node (Node Empty p pr) pp ppr in
+    in_zip_tree m t1 z;
+    assert { let l = inorder pr ++ Cons pp (inorder ppr) in
+      distinct l by distinct (inorder t1) so inorder t1 = Cons p l };
+    extensionality m m' pr;
+    extensionality m m' ppr;
+    subst_zip_tree m m' t1 (Node pr pp ppr) z
+
+  (* specification is as follows: if t is a tree and its list of locs
+     is x::l then, at the end of execution, its list is l and m = x.data *)
+  let search_tree_delete_min
+    (t: loc) (ghost it: tree loc) (ghost ot: ref (tree loc))
+    : (loc, int)
+    requires { t <> null }
+    requires { istree !mem it /\ t = root it }
+    requires { distinct (inorder it) }
+    ensures  { forall p. !mem[p].data = old !mem[p].data }
+    ensures  { let (t', m) = result in istree !mem !ot /\ root !ot = t' /\
+               match inorder it with
+               | Nil -> false
+               | Cons p l -> m = !mem[p].data /\ inorder !ot = l end }
+    =
+    label I in
+    let p = ref (get_left t) in
+    if eq_loc !p null then begin
+      let m = get_data t in
+      let tt = get_right t in
+      ghost match it with Empty -> absurd
+        | Node l _ r -> assert { l = Empty }; ot := r end;
+      (tt, m)
+    end else begin
+      let pp = ref t in
+      let tt = ref (get_left !p) in
+      let ghost zipper = ref Top in
+      let ghost ppr = ref (tree_right it) in
+      let ghost subtree = ref (tree_left it) in
+      while not (eq_loc !tt null) do
+        invariant { !pp <> null /\ !mem[!pp].left = !p }
+        invariant { !p <> null /\ !mem[!p].left = !tt }
+        invariant { let pt = Node !subtree !pp !ppr in
+                    istree !mem pt /\ zip pt !zipper = it }
+        invariant { forall p. !mem[p].data = (!mem[p].data at I) }
+        variant { !subtree }
+        assert { istree !mem !subtree /\ root !subtree = !p };
+        ghost zipper := Left !zipper !pp !ppr;
+        ghost ppr := tree_right !subtree;
+        ghost subtree := tree_left !subtree;
+        pp := !p;
+        p := !tt;
+        tt := get_left !p
+      done;
+      assert { istree !mem !subtree /\ root !subtree = !p };
+      assert { !pp <> !p };
+      let m = get_data !p in
+      tt := get_right !p;
+      set_left !pp !tt;
+      let ghost pl = tree_left !subtree in assert { pl = Empty };
+      let ghost z = Left !zipper !pp !ppr in
+      ghost ot := zip (tree_right !subtree) z;
+      (t, m)
+    end
+
+end

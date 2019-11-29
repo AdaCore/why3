@@ -1,0 +1,19 @@
+module Nested
+  use int.Int
+  use ref.Ref
+
+  type ref_one = { mutable cont_one [@model_trace:cont_one_attr] : int }
+
+  type ref_two = { mutable cont_two : ref_one }
+
+  type ref_three = ref ref_two
+
+  type ref_four = { mutable cont_four [@model_trace:cont_four_attr]: ref_three }
+
+  let test_post (x : int) (y : ref_four): unit
+    ensures { !(y.cont_four).cont_two.cont_one >= x }
+  =
+    y.cont_four.contents.cont_two.cont_one <- x - 1 +
+      !(y.cont_four).cont_two.cont_one
+
+end

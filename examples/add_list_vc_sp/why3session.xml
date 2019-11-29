@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="Z3" version="4.3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../add_list.mlw" expanded="true">
-<theory name="SumList" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
+<why3session shape_version="8">
+<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="add_list_vc_sp.mlw"/>
+<theory name="AddListRec" proved="true">
+ <goal name="sum&#39;vc" expl="VC for sum" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="7648"/></proof>
+ </goal>
+ <goal name="main&#39;vc" expl="VC for main" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="5898"/></proof>
+ </goal>
 </theory>
-<theory name="AddListRec" sum="191e311078f6223c9af44eece1bb2a47" expanded="true">
- <goal name="VC sum" expl="VC for sum" expanded="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
+<theory name="AddListImp" proved="true">
+ <goal name="sum&#39;vc" expl="VC for sum" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="8179"/></proof>
  </goal>
- <goal name="VC main" expl="VC for main" expanded="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- </goal>
-</theory>
-<theory name="AddListImp" sum="25869898cb7ed98962558d9845b87089" expanded="true">
- <goal name="VC sum" expl="VC for sum" expanded="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
- </goal>
- <goal name="VC main" expl="VC for main" expanded="true">
- <proof prover="0"><result status="valid" time="0.01"/></proof>
+ <goal name="main&#39;vc" expl="VC for main" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="6121"/></proof>
  </goal>
 </theory>
 </file>

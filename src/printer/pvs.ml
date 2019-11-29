@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -276,9 +276,26 @@ let print_binop fmt = function
 
 (* TODO: labels are lost, but we could print them as "% label \n",
    it would result in an ugly output, though *)
-let print_label _fmt (_l,_) = () (*fprintf fmt "(*%s*)" l*)
+let print_attr _fmt (_l,_) = () (*fprintf fmt "(*%s*)" l*)
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
+let number_format = {
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Default;
+    Number.dec_int_support = `Default;
+    Number.hex_int_support = `Unsupported;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Default;
+    Number.dec_real_support = `Unsupported;
+    Number.hex_real_support = `Unsupported;
+    Number.frac_real_support =
+      `Custom
+        ((fun fmt i -> pp_print_string fmt i),
+         (fun fmt i n -> fprintf fmt "(%s * %s)" i n),
+         (fun fmt i n -> fprintf fmt "(%s / %s)" i n));
+  }
 
 let rec print_term info fmt t = print_lrterm false false info fmt t
 and     print_fmla info fmt f = print_lrfmla false false info fmt f
@@ -287,35 +304,17 @@ and print_opl_fmla info fmt f = print_lrfmla true  false info fmt f
 and print_opr_term info fmt t = print_lrterm false true  info fmt t
 and print_opr_fmla info fmt f = print_lrfmla false true  info fmt f
 
-and print_lrterm opl opr info fmt t = match t.t_label with
+and print_lrterm opl opr info fmt t = match t.t_attrs with
   | _ -> print_tnode opl opr info fmt t
 
-and print_lrfmla opl opr info fmt f = match f.t_label with
+and print_lrfmla opl opr info fmt f = match f.t_attrs with
   | _ -> print_fnode opl opr info fmt f
 
 and print_tnode opl opr info fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      let number_format = {
-          Number.long_int_support = true;
-          Number.extra_leading_zeros_support = true;
-          Number.negative_int_support = Number.Number_default;
-          Number.dec_int_support = Number.Number_custom "%s";
-          Number.hex_int_support = Number.Number_unsupported;
-          Number.oct_int_support = Number.Number_unsupported;
-          Number.bin_int_support = Number.Number_unsupported;
-          Number.def_int_support = Number.Number_unsupported;
-          Number.negative_real_support = Number.Number_default;
-          Number.dec_real_support = Number.Number_unsupported;
-          Number.hex_real_support = Number.Number_unsupported;
-          Number.frac_real_support = Number.Number_custom
-            (Number.PrintFracReal
-               ("%s", "(%s * %s)", "(%s / %s)"));
-          Number.def_real_support = Number.Number_unsupported;
-        }
-      in
-      Number.print number_format fmt c
+      Constant.(print number_format unsupported_escape) fmt c
   | Tif (f, t1, t2) ->
       fprintf fmt "IF %a@ THEN %a@ ELSE %a ENDIF"
         (print_fmla info) f (print_term info) t1 (print_opl_term info) t2
@@ -509,8 +508,8 @@ type chunk =
   | Edition of string * contents (* name contents *)
   | Other of contents            (* contents *)
 
-let re_blank = Str.regexp "[ ]*$"
-let re_why3 = Str.regexp "% Why3 \\([^ ]+\\)"
+let re_blank = Re.Str.regexp "[ ]*$"
+let re_why3 = Re.Str.regexp "% Why3 \\([^ ]+\\)"
 
 (* Reads an old version of the file, as a list of chunks.
    Each chunk is either identified as a Why3 symbol (Edition)
@@ -525,16 +524,16 @@ let read_old_script ch =
   in
   (* skip first lines, until we find a blank line *)
   begin try while true do
-    let s = read_line () in if Str.string_match re_blank s 0 then raise Exit
+    let s = read_line () in if Re.Str.string_match re_blank s 0 then raise Exit
   done with End_of_file | Exit -> () end;
   (* then read chunks *)
   let rec read ?name () =
     let s = read_line () in
     if s = "" then begin
       new_chunk ?name (); read ()
-    end else if Str.string_match re_why3 s 0 then begin
+    end else if Re.Str.string_match re_why3 s 0 then begin
       new_chunk ?name ();
-      let name = Str.matched_group 1 s in
+      let name = Re.Str.matched_group 1 s in
       read ~name ()
     end else begin
       contents := s :: !contents;
@@ -669,9 +668,9 @@ let print_arguments info fmt = function
   | [] -> ()
   | vl -> fprintf fmt "(%a)" (print_comma_list (print_vsty_nopar info)) vl
 
-let re_macro = Str.regexp "\\bMACRO\\b"
+let re_macro = Re.Str.regexp "\\bMACRO\\b"
 let has_macro s =
-  try let _ = Str.search_forward re_macro s 0 in true with Not_found -> false
+  try let _ = Re.Str.search_forward re_macro s 0 in true with Not_found -> false
 let is_macro info fmt = function
   | Some (Edition (_, c)) when info.realization && List.exists has_macro c ->
       fprintf fmt "MACRO "
@@ -752,11 +751,11 @@ let print_ind_decl info fmt d =
     forget_tvs ()
   end
 
-let re_lemma = Str.regexp "\\(\\bLEMMA\\b\\|\\bTHEOREM\\b\\)"
+let re_lemma = Re.Str.regexp "\\(\\bLEMMA\\b\\|\\bTHEOREM\\b\\)"
 let rec find_lemma = function
   | [] -> "AXIOM"
   | s :: sl ->
-      (try let _ = Str.search_forward re_lemma s 0 in Str.matched_group 1 s
+      (try let _ = Re.Str.search_forward re_lemma s 0 in Re.Str.matched_group 1 s
        with Not_found -> find_lemma sl)
 let axiom_or_lemma = function
   | Some (Edition (_, c)) -> find_lemma c

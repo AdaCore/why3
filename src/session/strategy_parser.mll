@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -10,7 +10,6 @@
 (********************************************************************)
 
 {
-  open Session
   open Strategy
 
   exception SyntaxError of string
@@ -28,17 +27,19 @@
   }
 
   type 'a code = {
-    env: 'a Session.env_session;
+    env: Env.env;
+    whyconf: Whyconf.config;
     mutable instr: instruction array;
     mutable next: int;
     labels: (string, label) Hashtbl.t; (* label name -> label *)
     mutable temp: int;
   }
 
-  let create_code env =
+  let create_code env conf =
     let h = Hashtbl.create 17 in
     Hashtbl.add h "exit" { defined = Some (-1); temporary = 0 };
     { env = env;
+      whyconf = conf;
       instr = Array.make 10 (Igoto 0);
       next = 0;
       temp = 1;
@@ -80,7 +81,7 @@
   let prover code p =
     try
       let fp = Whyconf.parse_filter_prover p in
-      Whyconf.filter_one_prover code.env.whyconf fp
+      Whyconf.filter_one_prover code.whyconf fp
     with
       | Whyconf.ProverNotFound _ ->
           error "Prover %S not installed or not configured" p
@@ -88,15 +89,20 @@
           error "Prover description %s is ambiguous" p
 
   let integer msg s =
-    try int_of_string s
-    with Failure _ -> error "unable to parse %s argument '%s'" msg s
+    try Some (int_of_string s)
+    with Failure _ ->
+      match s with
+      | "%t" -> None
+      | "%m" -> None
+      | _ ->
+          error "unable to parse %s argument '%s'" msg s
 
   let transform code t =
     try
-      ignore (Trans.lookup_transform t code.env.Session.env)
+      ignore (Trans.lookup_transform t code.env)
     with Trans.UnknownTrans _ ->
     try
-      ignore (Trans.lookup_transform_l t code.env.Session.env)
+      ignore (Trans.lookup_transform_l t code.env)
     with Trans.UnknownTrans _->
       error "transformation %S is unknown" t
 
@@ -108,6 +114,8 @@ let integer = ['0'-'9']+
 let goto = 'g' | "goto"
 let call = 'c' | "call"
 let transform = 't' | "transform"
+let timelimit = integer | "%t"
+let memlimit = integer | "%m"
 
 rule scan code = parse
   | space+
@@ -120,12 +128,14 @@ rule scan code = parse
   | goto space+ (ident as id)
       { add_instr code (Igoto (find_label code id));
         scan code lexbuf }
-  | call space+ (ident as p) space+ (integer as t) space+ (integer as m)
+  | call space+ (ident as p) space+ (timelimit as t) space+ (memlimit as m)
       { let p = prover code p in
         let t = integer "timelimit" t in
-        if t <= 0 then error "timelimit %d is invalid" t;
+        if t <> None && Opt.get t <= 0 then
+          error "timelimit %d is invalid" (Opt.get t);
         let m = integer "memlimit" m in
-        if m <= 0 then error "memlimit %d is invalid" m;
+        if m <> None && Opt.get m <= 0 then
+          error "memlimit %d is invalid" (Opt.get m);
         add_instr code (Icall_prover (p.Whyconf.prover, t, m));
         scan code lexbuf }
   | transform space+ (ident as t) space+ (ident as l)
@@ -140,8 +150,8 @@ rule scan code = parse
 
 {
 
-  let parse env s =
-    let code = create_code env in
+  let parse env conf s =
+    let code = create_code env conf in
     scan code (Lexing.from_string s);
     let label = Array.make code.temp 0 in
     let fill name lab = match lab.defined with

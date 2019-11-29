@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -46,14 +46,22 @@ let make_pont = Wty.memoize 3 (fun ty ->
     create_prop_decl Paxiom pr ax in
   t2tb, tb2t, [t2tb_def; tb2t_def; bridge_l; bridge_r])
 
-let seen = Hty.create 7
+let seen_h = Hty.create 7
+let seen_q = Queue.create ()
+
+let check_in ty =
+  if not (Hty.mem seen_h ty) then begin
+    Hty.add seen_h ty ();
+    Queue.add ty seen_q
+  end
 
 let add_decls tenv decls =
-  let add ty () decls =
+  let add decls ty =
     let _,_,defs = Mty.find ty tenv in
     List.append defs decls in
-  let decls = Hty.fold add seen decls in
-  Hty.clear seen;
+  let decls = Queue.fold add decls seen_q in
+  Queue.clear seen_q;
+  Hty.clear seen_h;
   decls
 
 let conv_arg tenv t aty =
@@ -61,7 +69,7 @@ let conv_arg tenv t aty =
   if ty_equal tty aty then t else
   try
     let t2tb,tb2t,_ = Mty.find tty tenv in
-    Hty.replace seen tty ();
+    check_in tty;
     match t.t_node with
       | Tapp (fs,[t]) when ls_equal fs tb2t -> t
       | _ -> fs_app t2tb [t] tty
@@ -73,7 +81,7 @@ let conv_app tenv fs tl tty =
   if ty_equal tty vty then t else
   try
     let _,tb2t,_ = Mty.find tty tenv in
-    Hty.replace seen tty ();
+    check_in tty;
     fs_app tb2t [t] tty
   with Not_found -> t
 
@@ -81,12 +89,12 @@ let conv_app tenv fs tl tty =
    with unnecessary bridge functions over them *)
 let rec rewrite tenv t = match t.t_node with
   | Tapp (ls,[t1;t2]) when ls_equal ls ps_equ ->
-      t_label_copy t (t_equ (rewrite tenv t1) (rewrite tenv t2))
+      t_attr_copy t (t_equ (rewrite tenv t1) (rewrite tenv t2))
   | Tapp (ls,tl) ->
       let tl = List.map (rewrite tenv) tl in
       let tl = List.map2 (conv_arg tenv) tl ls.ls_args in
-      if t.t_ty = None then t_label_copy t (ps_app ls tl)
-      else t_label_copy t (conv_app tenv ls tl (t_type t))
+      if t.t_ty = None then t_attr_copy t (ps_app ls tl)
+      else t_attr_copy t (conv_app tenv ls tl (t_type t))
   | _ -> t_map (rewrite tenv) t
 
 let decl tenv d = match d.d_node with

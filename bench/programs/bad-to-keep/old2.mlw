@@ -1,6 +1,6 @@
 module M
-  use import int.Int
-  use import ref.Ref
+  use int.Int
+  use ref.Ref
   let test1 (x: ref int)
     ensures  { !x >= old !x }
     requires { !x >= 0}

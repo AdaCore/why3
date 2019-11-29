@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,7 +17,7 @@ type rc_value =
   | RCint of int
   | RCbool of bool
   | RCfloat of float
-  | RCstring of string
+  | RCstring of string * bool (** escape eol *)
   | RCident of string
 
 (* exception SyntaxError *)
@@ -154,10 +154,11 @@ val get_stringl : ?default:string list -> section -> string -> string list
 
 val get_stringo : section -> string -> string option
 
-val set_string : ?default:string -> section -> string -> string -> section
-(** Same as {!set_int} but on string *)
+val set_string : ?escape_eol:bool -> ?default:string -> section -> string -> string -> section
+(** Same as {!set_int} but on string. [escape_eol] indicates if special
+   character should be escaped *)
 
-val set_stringl : ?default:string list ->
+val set_stringl : ?escape_eol:bool -> ?default:string list ->
   section -> string -> string list -> section
 (** Same as {!set_intl} but on string *)
 
@@ -181,7 +182,7 @@ val set_stringl : ?default:string list ->
 (*       raise Bad_value_type *)
 (*   *\) *)
 
-val check_exhaustive : section -> Stdlib.Sstr.t -> unit
+val check_exhaustive : section -> Wstdlib.Sstr.t -> unit
 (** [check_exhaustive section keys] check that only the keys in [keys]
     appear inside the section [section]
 

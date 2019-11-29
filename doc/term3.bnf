@@ -1,0 +1,30 @@
+\begin{syntax}
+  term ::= ...  ; see Fig.~\ref{fig:bnf:term1} and \ref{fig:bnf:term2}
+    | "if" term "then" term "else" term     ; conditional
+    | "match" term "with" term-case+ "end"  ; pattern matching
+    | "let" pattern "=" term "in" term      ; let-binding
+    | "let" symbol param+ "=" term "in" term  ; mapping definition
+    | "fun" param+ "->" term                ; unnamed mapping
+  \
+  term-case ::= "|" pattern "->" term
+  \
+  pattern ::=
+      binder                            ; variable or `\texttt{\_}'
+    | "()"                              ; empty tuple
+    | "{" (lqualid "=" pattern ";")+ "}"  ; record pattern
+    | uqualid pattern*                  ; constructor
+    | "ghost" pattern                   ; ghost sub-pattern
+    | pattern "as" "ghost"? bound-var   ; named sub-pattern
+    | pattern "," pattern               ; tuple pattern
+    | pattern "|" pattern               ; ``or'' pattern
+    | qualifier? "(" pattern ")"        ; pattern in a scope
+  \
+  symbol ::= lident-ext attribute*      ; user-defined symbol
+  \
+  param ::=
+      type-arg                          ; unnamed typed
+    | binder                            ; (un)named untyped
+    | "(" "ghost"? type ")"             ; unnamed typed
+    | "(" "ghost"? binder ")"           ; (un)named untyped
+    | "(" "ghost"? binder+ ":" type ")" ; multi-variable typed %
+\end{syntax}

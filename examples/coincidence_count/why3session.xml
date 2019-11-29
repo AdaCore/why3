@@ -1,26 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="1" name="Alt-Ergo" version="0.95.2" timelimit="6" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="0.99.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="1.30" timelimit="10" steplimit="0" memlimit="1000"/>
-<file name="../coincidence_count.mlw" expanded="true">
-<theory name="CoincidenceCount" sum="b1548bbf632a991ba0139bb7832a9b2e" expanded="true">
- <goal name="drop_left" expl="">
- <proof prover="2"><result status="valid" time="0.15" steps="337"/></proof>
- <proof prover="3"><result status="valid" time="0.06" steps="344"/></proof>
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="10" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="coincidence_count.mlw"/>
+<theory name="CoincidenceCount" proved="true">
+ <goal name="drop_left" proved="true">
+ <proof prover="0" timelimit="5"><result status="valid" time="0.15" steps="207"/></proof>
  </goal>
- <goal name="not_mem_inter_r" expl="">
- <proof prover="1"><result status="valid" time="0.27" steps="391"/></proof>
- <proof prover="3"><result status="valid" time="0.03" steps="161"/></proof>
+ <goal name="not_mem_inter_r" proved="true">
+ <proof prover="0"><result status="valid" time="0.14" steps="688"/></proof>
  </goal>
- <goal name="not_mem_inter_l" expl="">
- <proof prover="1"><result status="valid" time="0.27" steps="391"/></proof>
- <proof prover="3"><result status="valid" time="0.03" steps="161"/></proof>
+ <goal name="not_mem_inter_l" proved="true">
+ <proof prover="0"><result status="valid" time="0.14" steps="678"/></proof>
  </goal>
- <goal name="VC coincidence_count" expl="VC for coincidence_count" expanded="true">
- <proof prover="3"><result status="valid" time="0.62" steps="2573"/></proof>
+ <goal name="coincidence_count&#39;vc" expl="VC for coincidence_count" proved="true">
+ <proof prover="0"><result status="valid" time="7.84" steps="11544"/></proof>
  </goal>
 </theory>
 </file>

@@ -5,11 +5,9 @@
 
 module Pigeonhole
 
-  use import int.Int
-  use import set.Fset
-  use import ref.Ref
+  use int.Int, set.Fset, ref.Ref
 
-  let rec below (n: int) : set int
+  let rec ghost below (n: int) : fset int
     requires { 0 <= n }
     ensures  { forall i. mem i result <-> 0 <= i < n }
     ensures  { cardinal result = n }

@@ -1,6 +1,6 @@
 theory CheckBV64
-  use import bv.BV64
-  use int.Int
+  use bv.BV64
+  use int.Int as Int
 
   constant one   : t                                         = 1
   constant two   : t                                         = 2
@@ -142,8 +142,8 @@ theory CheckBV64
 end
 
 theory CheckBV32
-  use import bv.BV32
-  use int.Int
+  use bv.BV32
+  use int.Int as Int
 
   constant one   : t                                         = 1
   constant two   : t                                         = 2
@@ -200,8 +200,8 @@ theory CheckBV32
 end
 
 theory CheckBV16
-  use import bv.BV16
-  use int.Int
+  use bv.BV16
+  use int.Int as Int
 
   constant one   : t                                         = 1
   constant two   : t                                         = 2
@@ -258,8 +258,8 @@ theory CheckBV16
 end
 
 theory CheckBV8
-  use import bv.BV8
-  use int.Int
+  use bv.BV8
+  use int.Int as Int
 
   constant one   : t                                         = 1
   constant two   : t                                         = 2
@@ -313,4 +313,24 @@ theory CheckBV8
   goal smoke6    : ule (asr_bv lastb one) lastb
   goal smoke7    : rotate_right_bv one one                   = zeros
   goal smoke8    : rotate_left_bv lastb one                  = zeros
+end
+
+
+
+
+
+theory Extras
+
+  use bv.BV64
+
+  lemma mod_mult: forall x [@model] a [@model] b [@model].
+      ule zeros x ->
+      ult zeros a ->
+      ult zeros b ->
+      ule a (0xffff_ffff:t) ->
+      ule b (0xffff_ffff:t) ->
+      urem (urem x (mul a b)) a = urem x a
+
+
+
 end

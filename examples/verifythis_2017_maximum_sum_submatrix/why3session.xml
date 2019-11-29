@@ -1,160 +1,161 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../verifythis_2017_maximum_sum_submatrix.mlw">
-<theory name="Kadane2D" sum="609a4871b7ce9d876aee8d69853a60c0">
- <goal name="VC maximum_submatrix" expl="VC for maximum_submatrix">
- <transf name="split_goal_wp">
-  <goal name="VC maximum_submatrix.1" expl="array creation size">
-  <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
+<why3session shape_version="8">
+<prover id="3" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="verifythis_2017_maximum_sum_submatrix.mlw"/>
+<theory name="Kadane2D" proved="true">
+ <goal name="maximum_submatrix&#39;vc" expl="VC for maximum_submatrix" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="maximum_submatrix&#39;vc.0" expl="array creation size" proved="true">
+  <proof prover="4"><result status="valid" time="0.00" steps="2"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.2" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="3"/></proof>
+  <goal name="maximum_submatrix&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="3"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.3" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="maximum_submatrix&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.4" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
+  <goal name="maximum_submatrix&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.5" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="maximum_submatrix&#39;vc.4" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.6" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="maximum_submatrix&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="14"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.7" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="maximum_submatrix&#39;vc.6" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.8" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
+  <goal name="maximum_submatrix&#39;vc.7" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.9" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00" steps="16"/></proof>
+  <goal name="maximum_submatrix&#39;vc.8" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.10" expl="loop invariant init">
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
+  <goal name="maximum_submatrix&#39;vc.9" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="44934"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.11" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="24"/></proof>
+  <goal name="maximum_submatrix&#39;vc.10" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="24"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.12" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
+  <goal name="maximum_submatrix&#39;vc.11" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="28"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.13" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.01" steps="34"/></proof>
+  <goal name="maximum_submatrix&#39;vc.12" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.14" expl="index in matrix bounds">
-  <proof prover="0"><result status="valid" time="0.01" steps="32"/></proof>
+  <goal name="maximum_submatrix&#39;vc.13" expl="index in matrix bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.15" expl="index in array bounds">
-  <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
+  <goal name="maximum_submatrix&#39;vc.14" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.16" expl="index in array bounds">
-  <proof prover="0"><result status="valid" time="0.00" steps="31"/></proof>
+  <goal name="maximum_submatrix&#39;vc.15" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.00" steps="31"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.17" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="127"/></proof>
+  <goal name="maximum_submatrix&#39;vc.16" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.04" steps="138"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.18" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.04" steps="131"/></proof>
+  <goal name="maximum_submatrix&#39;vc.17" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="98"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.19" expl="assertion">
-  <proof prover="0"><result status="valid" time="1.76" steps="852"/></proof>
+  <goal name="maximum_submatrix&#39;vc.18" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="1.76" steps="865"/></proof>
   </goal>
-  <goal name="VC maximum_submatrix.20" expl="assertion">
-  <transf name="split_goal_wp">
-   <goal name="VC maximum_submatrix.20.1" expl="assertion">
-   <proof prover="0"><result status="valid" time="0.34" steps="314"/></proof>
+  <goal name="maximum_submatrix&#39;vc.19" expl="assertion" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="maximum_submatrix&#39;vc.19.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.34" steps="314"/></proof>
    </goal>
-   <goal name="VC maximum_submatrix.20.2" expl="VC for maximum_submatrix">
-   <proof prover="0"><result status="valid" time="0.01" steps="52"/></proof>
-   </goal>
-  </transf>
-  </goal>
-  <goal name="VC maximum_submatrix.21" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="40"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.22" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="43"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.23" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="46"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.24" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.25" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="57"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.26" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.27" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.00" steps="35"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.28" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="35"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.29" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.05"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.30" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="44"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.31" expl="out of loop bounds">
-  <proof prover="0"><result status="valid" time="0.01" steps="27"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.32" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.33" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.34" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="25"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.35" expl="loop invariant preservation">
-  <proof prover="1"><result status="valid" time="0.03"/></proof>
-  <proof prover="2"><result status="valid" time="0.01"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.36" expl="out of loop bounds">
-  <proof prover="0"><result status="valid" time="0.00" steps="15"/></proof>
-  </goal>
-  <goal name="VC maximum_submatrix.37" expl="postcondition">
-  <transf name="split_goal_wp">
-   <goal name="VC maximum_submatrix.37.1" expl="VC for maximum_submatrix">
-   <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
-   </goal>
-   <goal name="VC maximum_submatrix.37.2" expl="VC for maximum_submatrix">
-   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
-   </goal>
-   <goal name="VC maximum_submatrix.37.3" expl="VC for maximum_submatrix">
-   <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
-   </goal>
-   <goal name="VC maximum_submatrix.37.4" expl="VC for maximum_submatrix">
-   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
-   </goal>
-   <goal name="VC maximum_submatrix.37.5" expl="VC for maximum_submatrix">
-   <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
-   </goal>
-   <goal name="VC maximum_submatrix.37.6" expl="VC for maximum_submatrix">
-   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
-   </goal>
-   <goal name="VC maximum_submatrix.37.7" expl="VC for maximum_submatrix">
-   <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
-   </goal>
-   <goal name="VC maximum_submatrix.37.8" expl="VC for maximum_submatrix">
-   <proof prover="2"><result status="valid" time="0.02"/></proof>
+   <goal name="maximum_submatrix&#39;vc.19.1" expl="VC for maximum_submatrix" proved="true">
+   <proof prover="4"><result status="valid" time="0.01" steps="52"/></proof>
    </goal>
   </transf>
   </goal>
-  <goal name="VC maximum_submatrix.38" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="4"/></proof>
+  <goal name="maximum_submatrix&#39;vc.20" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="40"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.21" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="43"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.22" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.02" steps="46"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.23" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.05" steps="23613"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.24" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="57"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.25" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="35"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.26" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.00" steps="35"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.27" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="35"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.28" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.05" steps="21846"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.29" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="44"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.30" expl="out of loop bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="27"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.31" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.32" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.33" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="25"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.34" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.01" steps="33966"/></proof>
+  <proof prover="5"><result status="valid" time="0.03" steps="14896"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.35" expl="out of loop bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.00" steps="15"/></proof>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.36" expl="postcondition" proved="true">
+  <transf name="split_goal_right" proved="true" >
+   <goal name="maximum_submatrix&#39;vc.36.0" expl="VC for maximum_submatrix" proved="true">
+   <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
+   </goal>
+   <goal name="maximum_submatrix&#39;vc.36.1" expl="VC for maximum_submatrix" proved="true">
+   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+   <goal name="maximum_submatrix&#39;vc.36.2" expl="VC for maximum_submatrix" proved="true">
+   <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
+   </goal>
+   <goal name="maximum_submatrix&#39;vc.36.3" expl="VC for maximum_submatrix" proved="true">
+   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+   <goal name="maximum_submatrix&#39;vc.36.4" expl="VC for maximum_submatrix" proved="true">
+   <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
+   </goal>
+   <goal name="maximum_submatrix&#39;vc.36.5" expl="VC for maximum_submatrix" proved="true">
+   <proof prover="4"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+   <goal name="maximum_submatrix&#39;vc.36.6" expl="VC for maximum_submatrix" proved="true">
+   <proof prover="4"><result status="valid" time="0.00" steps="12"/></proof>
+   </goal>
+   <goal name="maximum_submatrix&#39;vc.36.7" expl="VC for maximum_submatrix" proved="true">
+   <proof prover="3"><result status="valid" time="0.02" steps="122137"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="maximum_submatrix&#39;vc.37" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="4"/></proof>
   </goal>
  </transf>
  </goal>

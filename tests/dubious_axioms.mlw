@@ -1,7 +1,7 @@
 
 theory Tests
 
-  use import int.Int
+  use int.Int
 
   axiom a : 1 = 2
 
@@ -21,9 +21,9 @@ end
 
 theory BadExtension
 
-  use import int.Int
+  use int.Int
 
-  use import T
+  use T
 
   axiom a : forall x:t. f x >= 0
 
@@ -33,7 +33,7 @@ module ProblemWithLemmaFunction
 
 (* this case should not issue a warning *)
 
-use import int.Int
+use int.Int
 
 let lemma plus_comm (x y : int) : unit
   ensures { x + y = y + x }

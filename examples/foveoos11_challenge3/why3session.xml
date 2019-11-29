@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<prover id="0" name="Z3" version="4.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="foveoos11_challenge3.mlw"/>
+<theory name="TwoEqualElements" proved="true">
+ <goal name="two_equal_elements&#39;vc" expl="VC for two_equal_elements" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="two_equal_elements&#39;vc.0" expl="array creation size" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="3628"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="2146"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="2146"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="2146"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.4" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="5744"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.5" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="5881"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.6" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="6131"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.7" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="6965"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.8" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="7763"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.9" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="5525"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="12958"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="5737"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="11996"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="9268"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <transf name="unfold" proved="true" arg1="appear_twice">
+   <goal name="two_equal_elements&#39;vc.14.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="two_equal_elements&#39;vc.14.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="assert" proved="true" arg1="(forall i1 j:int. 0 &lt;= i1 /\ i1 &lt; (i + 1) /\ 0 &lt;= j /\ j &lt; (i + 1) /\ i1 &lt;&gt; j -&gt; a[i1] &lt;&gt; v \/ a[j] &lt;&gt; v)">
+     <goal name="two_equal_elements&#39;vc.14.0.0.0" expl="asserted formula" proved="true">
+     <proof prover="1"><result status="valid" time="0.08" steps="19704"/></proof>
+     </goal>
+     <goal name="two_equal_elements&#39;vc.14.0.0.1" expl="loop invariant preservation" proved="true">
+     <proof prover="1"><result status="valid" time="0.03" steps="10083"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.15" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="5151"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.16" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="10570"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.17" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.08" steps="16729"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.18" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="16044"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.19" expl="loop invariant preservation" proved="true">
+  <transf name="inline_all" proved="true" >
+   <goal name="two_equal_elements&#39;vc.19.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="10453"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.20" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.03" steps="9857"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.21" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="5071"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.22" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="12917"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.23" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="5341"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.24" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.05" steps="13004"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.25" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="5676"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.26" expl="loop invariant preservation" proved="true">
+  <transf name="unfold" proved="true" arg1="appear_twice">
+   <goal name="two_equal_elements&#39;vc.26.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="two_equal_elements&#39;vc.26.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="assert" proved="true" arg1="(forall i1 j:int. 0 &lt;= i1 /\ i1 &lt; (i + 1) /\ 0 &lt;= j /\ j &lt; (i + 1) /\ i1 &lt;&gt; j -&gt; a[i1] &lt;&gt; v \/ a[j] &lt;&gt; v)">
+     <goal name="two_equal_elements&#39;vc.26.0.0.0" expl="asserted formula" proved="true">
+     <proof prover="1"><result status="valid" time="0.05" steps="13525"/></proof>
+     </goal>
+     <goal name="two_equal_elements&#39;vc.26.0.0.1" expl="loop invariant preservation" proved="true">
+     <proof prover="1"><result status="valid" time="0.03" steps="10162"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.27" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="7952"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.28" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="5137"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.29" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="11293"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.30" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.06" steps="12284"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.31" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.07" steps="15904"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.32" expl="loop invariant preservation" proved="true">
+  <transf name="unfold" proved="true" arg1="appear_twice">
+   <goal name="two_equal_elements&#39;vc.32.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="two_equal_elements&#39;vc.32.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="assert" proved="true" arg1="(forall i1 j:int. 0 &lt;= i1 /\ i1 &lt; (i + 1) /\ 0 &lt;= j /\ j &lt; (i + 1) /\ i1 &lt;&gt; j -&gt; a[i1] &lt;&gt; v \/ a[j] &lt;&gt; v)">
+     <goal name="two_equal_elements&#39;vc.32.0.0.0" expl="asserted formula" proved="true">
+     <proof prover="1"><result status="valid" time="0.12" steps="22588"/></proof>
+     </goal>
+     <goal name="two_equal_elements&#39;vc.32.0.0.1" expl="loop invariant preservation" proved="true">
+     <proof prover="1"><result status="valid" time="0.02" steps="9696"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.33" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.50" steps="1959673"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.34" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="8489"/></proof>
+  </goal>
+  <goal name="two_equal_elements&#39;vc.35" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="4900"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

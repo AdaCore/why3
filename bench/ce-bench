@@ -2,42 +2,173 @@
 
 dir=`dirname $0`
 
+updateoracle=false
+files=""
+success=true
+
+while test $# != 0; do
 case "$1" in
   "-update-oracle")
-        updateoracle=true;;
-  "")
-        updateoracle=false;;
+      updateoracle=true;;
+  "-"*)
+      printf "unknown option: %s\n" "$1"
+      printf "usage: ce-bench [-update-oracle] <files>\n"
+      printf "  <files> must be given without the '.mlw' suffix\n"
+      printf "  if <files> empty, use all files from directory 'ce'\n"
+      exit 2;;
   *)
-        echo "$0: Unknown option '$1'"
-        exit 2
+       files="$files $1"
 esac
+shift
+done
 
-cd $dir
+if test "$files" = "" ; then
+    files="$dir/ce/*.mlw"
+fi
 
-run_cvc4_15 () {
-  echo -n "  $1... "
-  ../bin/why3prove.opt -P "CVC4,1.5" --timelimit 1 --get-ce $1 | \
-  # This ad hoc sed removes any timing information from counterexamples output.
-  # Counterexamples in JSON format cannot match this regexp.
-  sed 's/ ([0-9]\+\.[0-9]\+s)/ (time hidden)/' > $1.out
-  if cmp $1.oracle $1.out > /dev/null 2>&1 ; then
-     echo "ok"
-  else
-     if $updateoracle; then
-        echo "Updating oracle for $1"
-        mv $1.out $1.oracle
-     else
-       echo "FAILED!"
-       echo "diff is the following:"
-       diff $1.oracle $1.out
-     fi
-  fi
+is_xfail=none
+
+# TODO this function should disappear as counterexamples should eventually get
+# more reproducible.
+decide_fail () {
+    case "$1" in
+        # Inconsistent integer values between two runs
+        "bench/ce/algebraic_types_mono_Z3,4.8.4_SP")
+           is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/algebraic_types_mono_Z3,4.8.4_WP")
+           is_xfail=integer_values;;
+        # Inconsistent result values between two runs
+        "bench/ce/algebraic_types_mono_CVC4,1.7_SP")
+           is_xfail=full;;
+        # Inconsistent results between two runs
+        "bench/ce/algebraic_types_mono_CVC4,1.7_WP")
+           is_xfail=full;;
+        # Inconsistent results between two runs
+        "bench/ce/list_CVC4,1.7_WP")
+           is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/list_CVC4,1.7_SP")
+           is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/ref_mono_Z3,4.8.4_WP")
+            is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/ref_mono_Z3,4.8.4_SP")
+            is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/floats_Z3,4.8.4_WP")
+            is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/floats_Z3,4.8.4_SP")
+            is_xfail=integer_values;;
+        # Inconsistent results between two runs
+        "bench/ce/strings_CVC4,1.7_SP")
+           is_xfail=string_values;;
+        # Inconsistent results between two runs
+        "bench/ce/strings_CVC4,1.7_WP")
+           is_xfail=string_values;;
+        # Inconsistent results between two runs
+        "bench/ce/strings_Z3,4.8.4_SP")
+           is_xfail=full;;
+        # Inconsistent results between two runs
+        "bench/ce/strings_Z3,4.8.4_WP")
+           is_xfail=full;;
+        # Inconsistent results in CI
+        "bench/ce/records_CVC4,1.7_WP")
+           is_xfail=integer_values;;
+        # Inconsistent results in CI
+        "bench/ce/records_CVC4,1.7_SP")
+           is_xfail=integer_values;;
+        *) is_xfail=none;;
+    esac
 }
 
+# $1 = prover, $2 = dir, $3 = filename, $4 = true for WP; false for SP
+run () {
+    printf "  $2 ($1)... "
+    file_path="$2/$3"
+    if $4; then
+        f="${file_path}_$1_WP"
+        oracle_file="$2/oracles/$3_$1_WP.oracle"
+        wp_sp=""
+        echo "Weakest Precondition" > "$f.out"
+        printf "Weakest Precondition  ${file_path} ($1)... "
+    else
+        f="${file_path}_$1_SP"
+        oracle_file="$2/oracles/$3_$1_SP.oracle"
+        wp_sp=" --debug vc_sp"
+        echo "Strongest Postcondition" > "$f.out"
+        printf "Strongest Postcondition  ${file_path} ($1)... "
+    fi
+    $dir/../bin/why3prove.opt --json --debug print_model_attrs${wp_sp} -P "$1,counterexamples" --timelimit 1 -a split_vc "${file_path}.mlw" | \
+        # This ad hoc sed removes any timing information from counterexamples output.
+        # Counterexamples in JSON format cannot match this regexp.
+        sed 's/ ([0-9]\+\.[0-9]\+s)//' | \
+        # This ad hoc sed removes diff between Timeout and Unknown (unknown)
+        # when running from platform with different speed.
+        sed -r 's/(Timeout.*$|Unknown \(unknown\).*$|Unknown \(incomplete\).*$|\Unknown \(unknown \+ incomplete\).*$|\Unknown \(unknown \+ interrupted\).*$)/Timeout or Unknown/' | \
+        # ad hoc sed to remove the directory of the stdlib that can be found
+        # inside labels attribute [@at:'Old:loc:/home/.../stdlib/array.mlw
+        # TODO temporary as this comes from incorrect locations generated in
+        # a[i] <- x like terms.
+        sed -r 's/\:loc\:.*\]/\:loc\:location\]/' | \
+        # Remove steps informations
+        sed -r 's/Unknown \(sat\).*$/Unknown \(sat\)/' | \
+        sed -r 's/Valid \(.*$/Valid/' >> "$f.out"
+    str_oracle=$(tr -d ' \n' < "${oracle_file}")
+    str_out=$(tr -d ' \n' < "$f.out")
+    decide_fail $f
+    case $is_xfail in
+        "full") is_xfail=true;;
+        "none") is_xfail=false;;
+	"string_values")
+	    is_xfail=false
+            str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"\([^"]\|\\"\)\+"/"val":"ANYSTRING"/g')
+            str_out=$(echo ${str_out} | sed -e 's/"val":"\([^"]\|\\"\)\+"/"val":"ANYSTRING"/g')
+            ;;
+        "integer_values")
+            is_xfail=false
+            str_oracle=$(echo ${str_oracle} | sed -e 's/"val":"-\?[0-9]\+"/"val":"ANYINT"/g')
+            str_out=$(echo ${str_out} | sed -e 's/"val":"-\?[0-9]\+"/"val":"ANYINT"/g')
+            ;;
+        *)
+            echo "High failure: unknown xfail value $is_xfail";
+            exit 2;;
+    esac
+    if [ "$str_oracle" = "$str_out" ] ; then
+        echo "ok"
+    else
+        if $updateoracle; then
+            echo "Updating oracle for ${file_path}, prover $1"
+            mv "$f.out" "${oracle_file}"
+        else
+            echo "FAILED!"
+            # echo "Oracle is ${str_oracle}"
+            # echo "Output is ${str_out}"
+            echo "diff is the following:"
+            echo "$f"
+            diff "${oracle_file}" "$f.out"
+            if $is_xfail; then
+                echo "Failed but bench is ok because asserted as an XFAIL."
+            else
+                success=false
+            fi
+        fi
+    fi
+}
 
-
-
-
-for f in ce/*.mlw; do
-    run_cvc4_15 $f
+for file in $files; do
+    filedir=`dirname $file`
+    filebase=`basename $file .mlw`
+    printf "Running provers on $filedir/$filebase.mlw\n";
+    run CVC4,1.7 $filedir $filebase true
+    run CVC4,1.7 $filedir $filebase false
+    run Z3,4.8.4 $filedir $filebase true
+    run Z3,4.8.4 $filedir $filebase false
 done
+if $success; then
+    exit 0
+else
+    exit 1
+fi

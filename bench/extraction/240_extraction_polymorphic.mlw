@@ -1,0 +1,11 @@
+
+
+let rec f x =
+  let rec aux y = () in
+  aux x
+
+
+
+let rec g x diverges =
+  let rec aux y diverges = g () in
+  aux x

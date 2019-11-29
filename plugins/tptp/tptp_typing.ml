@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,7 +13,7 @@ open Format
 open Tptp_ast
 
 open Why3
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -158,11 +158,11 @@ let defined_arith ~loc denv env impl dw tl =
   in
   add_theory env impl th;
   let ls = match dw with
-    | DF DFumin -> ns_find_ls th.th_export ["prefix -"]
-    | DF DFsum -> ns_find_ls th.th_export ["infix +"]
-    | DF DFdiff -> ns_find_ls th.th_export ["infix -"]
-    | DF DFprod -> ns_find_ls th.th_export ["infix *"]
-    | DF DFquot -> ns_find_ls th.th_export ["infix /"]
+    | DF DFumin -> ns_find_ls th.th_export [op_prefix "-"]
+    | DF DFsum -> ns_find_ls th.th_export [op_infix "+"]
+    | DF DFdiff -> ns_find_ls th.th_export [op_infix "-"]
+    | DF DFprod -> ns_find_ls th.th_export [op_infix "*"]
+    | DF DFquot -> ns_find_ls th.th_export [op_infix "/"]
     | DF DFquot_e -> ns_find_ls th.th_export ["div"]
     | DF DFquot_t -> ns_find_ls th.th_export ["div_t"]
     | DF DFquot_f -> ns_find_ls th.th_export ["div_f"]
@@ -176,10 +176,10 @@ let defined_arith ~loc denv env impl dw tl =
     | DF DFtoint -> ns_find_ls th.th_export ["to_int"]
     | DF DFtorat -> ns_find_ls th.th_export ["to_rat"]
     | DF DFtoreal -> ns_find_ls th.th_export ["to_real"]
-    | DP DPless -> ns_find_ls th.th_export ["infix <"]
-    | DP DPlesseq -> ns_find_ls th.th_export ["infix <="]
-    | DP DPgreater -> ns_find_ls th.th_export ["infix >"]
-    | DP DPgreatereq -> ns_find_ls th.th_export ["infix >="]
+    | DP DPless -> ns_find_ls th.th_export [op_infix "<"]
+    | DP DPlesseq -> ns_find_ls th.th_export [op_infix "<="]
+    | DP DPgreater -> ns_find_ls th.th_export [op_infix ">"]
+    | DP DPgreatereq -> ns_find_ls th.th_export [op_infix ">="]
     | DP DPisint -> ns_find_ls th.th_export ["is_int"]
     | DP DPisrat -> ns_find_ls th.th_export ["is_rat"]
     | DP (DPtrue|DPfalse|DPdistinct) | DT _ -> assert false
@@ -285,7 +285,8 @@ let rec ty denv env impl { e_loc = loc; e_node = n } = match n with
   | Enot _ | Eequ _ | Edob _ | Enum _ -> error ~loc TypeExpected
 
 let t_int_const s =
-  t_const (Number.(ConstInt { ic_negative = false; ic_abs = int_const_dec s})) ty_int
+  let int_lit = Number.(int_literal ILitDec ~neg:false s) in
+  t_const (Constant.ConstInt int_lit) ty_int
 
 (* unused
 let t_real_const r = t_const (Number.ConstReal r)
@@ -308,8 +309,9 @@ let rec term denv env impl { e_loc = loc; e_node = n } = match n with
       find_dobj ~loc denv env impl s
   | Enum (Nint s) -> t_int_const s
   | Enum (Nreal (i,f,e)) ->
-      t_const (Number.(ConstReal { rc_negative = false ;
-                                   rc_abs = real_const_dec i (Opt.get_def "0" f) e})) ty_real
+      let real_lit = Number.(real_literal ~radix:10 ~neg:false ~int:i
+                               ~frac:(Opt.get_def "0" f) ~exp:e) in
+      t_const (Constant.ConstReal real_lit) ty_real
   | Enum (Nrat (n,d)) ->
       let n = t_int_const n and d = t_int_const d in
       let frac = ns_find_ls denv.th_rat.th_export ["frac"] in
@@ -599,7 +601,7 @@ let flush_impl ~strict env uc impl =
           | _ -> f in
         let f = Mstr.fold add env t_true in
         let uc = if t_equal f t_true then uc else
-          let id = ls.ls_name.id_string ^ "_def" in
+          let id = ls.ls_name.id_string ^ "'def" in
           let pr = create_prsymbol (id_fresh id) in
           add_prop_decl uc Paxiom pr f in
         Mstr.add s e env, uc

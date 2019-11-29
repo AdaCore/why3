@@ -9,49 +9,72 @@ Require map.Occ.
 Require map.MapInjection.
 
 Axiom array : forall (a:Type), Type.
-Parameter array_WhyType : forall (a:Type) {a_WT:WhyType a},
-  WhyType (array a).
+Parameter array_WhyType :
+  forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 
-Parameter elts: forall {a:Type} {a_WT:WhyType a}, (array a) -> (Z -> a).
+Parameter elts:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a.
 
-Parameter length: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z.
+Parameter length:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z.
 
-Axiom array'invariant : forall {a:Type} {a_WT:WhyType a}, forall (self:(array
-  a)), (0%Z <= (length self))%Z.
-
-(* Why3 assumption *)
-Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
-  ((elts a1) i).
-
-Parameter mixfix_lblsmnrb: forall {a:Type} {a_WT:WhyType a}, (array a) ->
-  Z -> a -> (array a).
-
-Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(array a)) (i:Z) (v:a), ((length (mixfix_lblsmnrb a1 i
-  v)) = (length a1)) /\ ((elts (mixfix_lblsmnrb a1 i
-  v)) = (map.Map.set (elts a1) i v)).
+Axiom array'invariant :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (self:array a), (0%Z <= (length self))%Z.
 
 (* Why3 assumption *)
-Definition injective (a:(array Z)) (n:Z): Prop := (map.MapInjection.injective
-  (elts a) n).
+Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:array a)
+    (i:Numbers.BinNums.Z) : a :=
+  elts a1 i.
+
+Parameter mixfix_lblsmnrb:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
+  array a.
+
+Axiom mixfix_lblsmnrb'spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
+  ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
+
+Parameter make:
+  forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
+
+Axiom make'spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
+   ((mixfix_lbrb (make n v) i) = v)) /\
+  ((length (make n v)) = n).
 
 (* Why3 assumption *)
-Definition surjective (a:(array Z)) (n:Z): Prop :=
-  (map.MapInjection.surjective (elts a) n).
+Definition injective (a:array Numbers.BinNums.Z) (n:Numbers.BinNums.Z) : Prop :=
+  map.MapInjection.injective (elts a) n.
 
 (* Why3 assumption *)
-Definition range (a:(array Z)) (n:Z): Prop := (map.MapInjection.range
-  (elts a) n).
+Definition surjective (a:array Numbers.BinNums.Z) (n:Numbers.BinNums.Z) :
+    Prop :=
+  map.MapInjection.surjective (elts a) n.
+
+(* Why3 assumption *)
+Definition range (a:array Numbers.BinNums.Z) (n:Numbers.BinNums.Z) : Prop :=
+  map.MapInjection.range (elts a) n.
 
 (* Why3 goal *)
-Theorem VC_inverting2 : forall (a:(array Z)) (n:Z), ((n = (length a)) /\
-  ((injective a n) /\ (range a n))) -> forall (b:(array Z)), ((forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((mixfix_lbrb b i) = 0%Z)) /\
-  ((length b) = n)) -> let o := (n - 1%Z)%Z in ((0%Z <= (o + 1%Z)%Z)%Z ->
-  forall (b1:(array Z)), ((length b1) = (length b)) -> ((forall (j:Z),
-  ((0%Z <= j)%Z /\ (j < (o + 1%Z)%Z)%Z) -> ((mixfix_lbrb b1 (mixfix_lbrb a
-  j)) = j)) -> (injective b1 n))).
+Theorem inverting2'vc :
+  forall (a:array Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
+  (n = (length a)) /\ injective a n /\ range a n ->
+  let b := make n 0%Z in
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
+   ((mixfix_lbrb b i) = 0%Z)) /\
+  ((length b) = n) ->
+  let o := (n - 1%Z)%Z in
+  (0%Z <= (o + 1%Z)%Z)%Z -> forall (b1:array Numbers.BinNums.Z),
+  ((length b1) = (length b)) ->
+  (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < (o + 1%Z)%Z)%Z ->
+   ((mixfix_lbrb b1 (mixfix_lbrb a j)) = j)) ->
+  injective b1 n.
 Proof.
 intros a n (h1,(h2,h3)) b (h4,h5) o h6 b1 h7 h8.
 assert (MapInjection.surjective (elts a) n).
@@ -66,4 +89,3 @@ intros H2.
 contradict H2.
 now rewrite H2.
 Qed.
-

@@ -9,11 +9,11 @@
 
 module RingBuffer
 
-  use import int.Int
-  use import option.Option
-  use import list.List
+  use int.Int
+  use option.Option
+  use list.List
   use import list.NthLengthAppend as L
-  use import array.Array
+  use import array.Array as A
 
   type buffer 'a = {
     mutable first: int;
@@ -22,7 +22,7 @@ module RingBuffer
     ghost mutable sequence: list 'a;
   }
   invariant {
-    let size = Array.length data in
+    let size = A.length data in
     0 <= first <  size /\
     0 <= len   <= size /\
     len = L.length sequence /\
@@ -35,7 +35,7 @@ module RingBuffer
   by { first = 0; len = 0; data = make 1 (any 'a); sequence = Nil }
 
   (* total capacity of the buffer *)
-  function size (b: buffer 'a) : int = Array.length b.data
+  function size (b: buffer 'a) : int = A.length b.data
 
   (* length = number of elements *)
   function length (b: buffer 'a) : int = b.len
@@ -66,7 +66,7 @@ module RingBuffer
     ensures  { b.sequence = (old b.sequence) ++ Cons x Nil }
   = ghost (b.sequence <- b.sequence ++ Cons x Nil);
     let i = b.first + b.len in
-    let n = Array.length b.data in
+    let n = A.length b.data in
     b.data[if i >= n then i - n else i] <- x;
     b.len <- b.len + 1
 
@@ -85,7 +85,7 @@ module RingBuffer
   = ghost match b.sequence with Nil -> absurd | Cons _ s -> b.sequence <- s end;
     let r = b.data[b.first] in
     b.len <- b.len - 1;
-    let n = Array.length b.data in
+    let n = A.length b.data in
     b.first <- b.first + 1;
     if b.first = n then b.first <- 0;
     r
@@ -93,8 +93,8 @@ end
 
 module Harness
 
-  use import RingBuffer
-  use import list.List
+  use RingBuffer
+  use list.List
 
   let harness () =
     let b = create 10 0 in
@@ -125,7 +125,7 @@ module Harness
     let x = pop b in assert { x = 4 };
     ()
 
-  use import int.Int
+  use int.Int
 
   let test (x: int) (y: int) (z: int) =
     let b = create 2 0 in
@@ -145,9 +145,9 @@ end
 
 module RingBufferSeq
 
-  use import int.Int
+  use int.Int
   use import seq.Seq as S
-  use import array.Array
+  use import array.Array as A
 
   type buffer 'a = {
     mutable first: int;
@@ -156,7 +156,7 @@ module RingBufferSeq
     ghost mutable sequence: S.seq 'a;
   }
   invariant {
-    let size = Array.length data in
+    let size = A.length data in
     0 <= first <  size /\
     0 <= len   <= size /\
     len = S.length sequence /\
@@ -169,7 +169,7 @@ module RingBufferSeq
   by { first = 0; len = 0; data = make 1 (any 'a); sequence = S.empty }
 
   (* total capacity of the buffer *)
-  function size (b: buffer 'a) : int = Array.length b.data
+  function size (b: buffer 'a) : int = A.length b.data
 
   (* length = number of elements *)
   function length (b: buffer 'a) : int = b.len
@@ -200,7 +200,7 @@ module RingBufferSeq
     ensures  { b.sequence = S.snoc (old b.sequence) x }
   = ghost (b.sequence <- S.snoc b.sequence x);
     let i = b.first + b.len in
-    let n = Array.length b.data in
+    let n = A.length b.data in
     b.data[if i >= n then i - n else i] <- x;
     b.len <- b.len + 1
 
@@ -214,11 +214,11 @@ module RingBufferSeq
     writes   { b.first, b.len, b.sequence }
     ensures  { length b = (old (length b)) - 1 }
     ensures  { result = S.get (old b.sequence) 0 }
-    ensures  { b.sequence = (old b.sequence)[1 ..] }
-  = ghost (b.sequence <- b.sequence[1 ..]);
+    ensures  { b.sequence = (old b.sequence)[1..] }
+  = ghost (b.sequence <- b.sequence[1..]);
     let r = b.data[b.first] in
     b.len <- b.len - 1;
-    let n = Array.length b.data in
+    let n = A.length b.data in
     b.first <- b.first + 1;
     if b.first = n then b.first <- 0;
     r
@@ -226,8 +226,8 @@ end
 
 module HarnessSeq
 
-  use import seq.Seq
-  use import RingBufferSeq
+  use seq.Seq
+  use RingBufferSeq
 
   let harness () =
     let b = create 10 0 in
@@ -258,7 +258,7 @@ module HarnessSeq
     let x = pop b in assert { x = 4 };
     ()
 
-  use import int.Int
+  use int.Int
 
   let test (x: int) (y: int) (z: int) =
     let b = create 2 0 in

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,24 +12,40 @@
 {
   open Parse_smtv2_model_parser
   exception SyntaxError
+
+  let char_for_backslash = function
+    | 'a'  -> '\x07'
+    | 'b'  -> '\b'
+    | 'e'  -> '\x1B'
+    | 'f'  -> '\x0C'
+    | 'n'  -> '\n'
+    | 'r'  -> '\r'
+    | 't'  -> '\t'
+    | 'v'  -> '\x0B'
+    | _ as c -> c
+
 }
 
-let atom = [^'('')'' ''\t''\n']
+let atom = [^'('')'' ''\t''\n''"']
 let space = [' ''\t''\n''\r']
 let num = ['0'-'9']+
 let opt_num = ['0'-'9']*
-let hexa_num = ( num | ['a' - 'f'] | ['A' - 'F'])+
+let hex     = ['0'-'9' 'a'-'f' 'A'-'F']
+let hexa_num = hex+
 let dec_num = num"."num
 let name = (['a'-'z']*'_'*['0'-'9']*)*
 let dummy = ('_''_''_')?
 let float_num = '#'('b' | 'x') hexa_num
-
+let bv_num = '#'('b' | 'x') hexa_num
+let variable = [^'|']* (* cvc4 variables can now be arbitrary strings *)
 
 rule token = parse
   | '\n'
     { token lexbuf }
-  | space+ as space_str
-      { SPACE (space_str) }
+  | space+
+      { token lexbuf }
+  | "\""
+      { STRING (read_string (Buffer.create 17) lexbuf) }
   | "store" { STORE }
   | "const" { CONST }
   | "model" {MODEL}
@@ -38,10 +54,11 @@ rule token = parse
       { LPAREN }
   | ')'
       { RPAREN }
-  | ';' { read_string (Buffer.create 17) lexbuf }
-  | ";;" { read_string (Buffer.create 17) lexbuf }
+  | ';' { read_comment (Buffer.create 17) lexbuf }
+  | ";;" { read_comment (Buffer.create 17) lexbuf }
   | '=' { EQUAL }
   | '_' { UNDERSCORE }
+  | '/' { DIV }
   | "as-array" { AS_ARRAY }
   | "ite" { ITE }
   | "define-fun" { DEFINE_FUN }
@@ -57,34 +74,21 @@ rule token = parse
   | "true" { TRUE }
   | "false" { FALSE }
   | "LAMBDA" { LAMBDA }
+  | "lambda" { LAMBDA }
   | "ARRAY_LAMBDA" { ARRAY_LAMBDA }
-  | "mk___split_fields"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_SPLIT_FIELD ("mk___split_fields",0)
-    | n -> MK_SPLIT_FIELD ("mk___split_fields"^n, int_of_string n) }
-  | "mk___rep"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_REP ("mk___rep", 0)
-    | n -> MK_REP ("mk___rep"^n, int_of_string n) }
-  | "mk___t"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_T ("mk___t", 0)
-    | n -> MK_T ("mk___t"^n, int_of_string n) }
-  | "mk___split_discrs"(opt_num as n) dummy {
-    match n with
-    | "" -> MK_SPLIT_DISCRS ("mk___split_discrs",0)
-    | n -> MK_SPLIT_DISCRS ("mk___split_discrs"^n, int_of_string n) }
-  | "mk" name dummy { MK_ANYTHING } (* encapsulate mk_int_ref etc (other refs) *)
-  | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE bv_value }
+  | "(_" space+ "bv"(num as bv_value) space+ num")" { BITVECTOR_VALUE_INT bv_value }
   | "(_" space+ "BitVec" space+ num")" { BITVECTOR_TYPE }
-
-  | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Plus_zero }
-  | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Minus_zero }
-  | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Plus_infinity }
-  | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Minus_infinity }
-  | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Smt2_model_defs.Not_a_number }
+  | "(_" space+ "extract" space+ num space+ num ")" as s { BITVECTOR_EXTRACT s }
+  | "(_" space+ "int2bv" space+ num ")" as s { INT_TO_BV s}
+  | "(_" space+ "FloatingPoint" space+ (num as exp) space+ (num as mantissa)")" { FLOAT_TYPE (exp, mantissa) }
+  | "(_" space+ "+zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_zero }
+  | "(_" space+ "-zero" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_zero }
+  | "(_"  space+ "+oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Plus_infinity }
+  | "(_" space+ "-oo" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Minus_infinity }
+  | "(_" space+ "NaN" space+ num space+ num ")" { FLOAT_VALUE Model_parser.Not_a_number }
   | "(fp" space+ (float_num as b) space+ (float_num as eb) space+ (float_num as sb) ")"
-      { FLOAT_VALUE (Smt2_model_defs.Float_value (b, eb, sb)) }
+      { FLOAT_VALUE (Model_parser.interp_float b eb sb) }
+  | bv_num as bv_value { BITVECTOR_VALUE_SHARP bv_value }
 
   | num as integer
       { INT_STR (integer) }
@@ -93,15 +97,33 @@ rule token = parse
       { DEC_STR (int_part, fract_part)  }
   | '-'space*(num as int_part)"."(num as fract_part)
       {MINUS_DEC_STR (("-"^int_part), fract_part)}
+  | '|' (variable as at) '|' { ATOM (at) }
   | atom+ as at { ATOM (at) }
   | eof
       { EOF }
   | _
-	{ raise SyntaxError }
+      { raise SyntaxError }
 
-and read_string buf =
+and read_comment buf =
   parse
   | '\n'      { COMMENT (Buffer.contents buf) }
   | '\r'      { COMMENT (Buffer.contents buf) }
   | eof       { COMMENT (Buffer.contents buf) }
-  | _ as a    { Buffer.add_char buf a; read_string buf lexbuf }
+  | _ as a    { Buffer.add_char buf a; read_comment buf lexbuf }
+
+and read_string buf = parse
+  | "\""
+    { Buffer.contents buf }
+  | "\"\""
+    { Buffer.add_char buf '"';
+      read_string buf lexbuf }
+  | "\\x" (hex hex as c)
+    { let c = Scanf.sscanf c "%2x" Char.chr in
+      Buffer.add_char buf c;
+      read_string buf lexbuf }
+  | "\\" (_ as c)
+    { Buffer.add_char buf (char_for_backslash c);
+      read_string buf lexbuf }
+  | _ as c
+    { Buffer.add_char buf c;
+      read_string buf lexbuf }

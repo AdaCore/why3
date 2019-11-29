@@ -1,0 +1,65 @@
+(** {1 Matrices} *)
+
+module Matrix
+
+  use int.Int
+  use map.Map
+
+  type matrix 'a = private {
+    ghost mutable elts: int -> int -> 'a;
+                  rows: int;
+               columns: int
+  } invariant { 0 <= rows /\ 0 <= columns }
+
+  predicate valid_index (a: matrix 'a) (r c: int) =
+    0 <= r < a.rows /\ 0 <= c < a.columns
+
+  function get (a: matrix 'a) (r c: int) : 'a =
+    a.elts r c
+
+  val get (a: matrix 'a) (r c: int) : 'a
+    requires { [@expl:index in matrix bounds] valid_index a r c }
+    ensures  { result = a.elts r c }
+
+  val ghost function update (a: matrix 'a) (r c: int) (v: 'a) : matrix 'a
+    ensures  { result.rows = a.rows }
+    ensures  { result.columns = a.columns }
+    ensures  { result.elts = a.elts[r <- (a.elts r)[c <- v]] }
+
+  val set (a: matrix 'a) (r c: int) (v: 'a) : unit
+    requires { [@expl:index in matrix bounds] valid_index a r c }
+    writes   { a }
+    ensures  { a.elts = (old a.elts)[r <- (old a.elts r)[c <- v]] }
+
+  (** unsafe get/set operations with no precondition *)
+
+  exception OutOfBounds
+
+  let defensive_get (a: matrix 'a) (r c: int) : 'a
+    ensures { [@expl:index in matrix bounds] valid_index a r c }
+    ensures { result = a.elts r c }
+    raises  { OutOfBounds -> not (valid_index a r c) }
+  = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
+    get a r c
+
+  let defensive_set (a: matrix 'a) (r c: int) (v: 'a) : unit
+    ensures { [@expl:index in matrix bounds] valid_index a r c }
+    ensures { a.elts = (old a.elts)[r <- (old a.elts r)[c <- v]] }
+    raises  { OutOfBounds -> not (valid_index a r c) /\ a = old a }
+  = if r < 0 || r >= a.rows || c < 0 || c >= a.columns then raise OutOfBounds;
+    set a r c v
+
+  val make (r c: int) (v: 'a) : matrix 'a
+    requires { r >= 0 /\ c >= 0 }
+    ensures  { result.rows = r }
+    ensures  { result.columns = c }
+    ensures  {
+      forall i j. 0 <= i < r /\ 0 <= j < c -> result.elts i j = v }
+
+  val copy (a: matrix 'a) : matrix 'a
+    ensures  { result.rows = a.rows /\ result.columns = a.columns }
+    ensures  { forall r:int. 0 <= r < result.rows ->
+               forall c:int. 0 <= c < result.columns ->
+               result.elts r c = a.elts r c }
+
+end

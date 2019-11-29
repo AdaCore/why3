@@ -54,12 +54,12 @@ and syntax = parse
   | ";" ([^ '\n']* as s) '\n' [' ''\t']* '|' {
       print_string "& \\textrm{";
       print_string s;
-      print_string "} \\alt{}";
+      print_string "} \\alt";
       syntax lexbuf }
   | ";" ([^ '\n']* as s) '\n' [' ''\t']* '\\' [' ''\t']* '\n' {
       print_string "& \\textrm{";
       print_string s;
-      print_string "} \\sep{}";
+      print_string "} \\sep";
       syntax lexbuf }
   | ";" ([^ '\n']* as s) "%\n" {
       print_string "& \\textrm{";
@@ -69,7 +69,7 @@ and syntax = parse
   | ";" ([^ '\n']* as s) '\n' {
       print_string "& \\textrm{";
       print_string s;
-      print_string "} \\newl{}";
+      print_string "} \\newl";
       syntax lexbuf }
   | "@" {
       print_string "}";
@@ -78,13 +78,16 @@ and syntax = parse
       Buffer.clear idx;
       Buffer.clear full_kw;
       inquote lexbuf }
+  | '"' '"' {
+      print_char '"';
+      syntax lexbuf }
   | '"' {
       Buffer.clear idx;
       Buffer.clear full_kw;
       indoublequote lexbuf }
   | "below" { print_string "\\below"; syntax lexbuf }
   | "epsilon" { print_string "\\emptystring"; syntax lexbuf }
-  | ['A'-'Z''a'-'z''-'] + {
+  | ['A'-'Z''a'-'z'] ['A'-'Z''a'-'z''-']* {
       print_string "\\nonterm{";
       print_string (lexeme lexbuf);
       print_string"}";
@@ -95,16 +98,18 @@ and syntax = parse
   | ['_' '^'] _ {
       print_string (lexeme lexbuf);
       syntax lexbuf }
-  | "*" { print_string "\\repetstar{}"; syntax lexbuf }
-  | "+" { print_string "\\repetplus{}"; syntax lexbuf }
-  | "?" { print_string "\\repetone{}"; syntax lexbuf }
-  | "(" { print_string "\\lparen{}"; syntax lexbuf }
-  | ")" { print_string "\\rparen{}"; syntax lexbuf }
-  | "::=" { print_string "\\is{}"; syntax lexbuf }
-  | "|" { print_string "\\orelse{}"; syntax lexbuf }
-  | "\\" { print_string "\\sep{}"; syntax lexbuf }
+  | '-' { print_string "\\interval"; syntax lexbuf }
+  | "*" { print_string "\\repetstar"; syntax lexbuf }
+  | "+" { print_string "\\repetplus"; syntax lexbuf }
+  | "?" { print_string "\\repetone"; syntax lexbuf }
+  | "(" { print_string "\\lparen"; syntax lexbuf }
+  | ")" { print_string "\\rparen"; syntax lexbuf }
+  | "::=" { print_string "\\is"; syntax lexbuf }
+  | "|" { print_string "\\orelse"; syntax lexbuf }
+  | "\\" { print_string "\\sep"; syntax lexbuf }
   | "{" { print_string "\\begin{notimplementedenv}"; check_implementation_note lexbuf }
   | "}" { print_string "\\end{notimplementedenv}"; syntax lexbuf }
+  | [' ''\t'] { syntax lexbuf }
   | _ {
       print_char (lexeme_char lexbuf 0);
       syntax lexbuf }

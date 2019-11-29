@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -38,7 +38,7 @@ and its_flag = private {
 
 and ity = private {
   ity_node : ity_node;
-  ity_imm  : bool;
+  ity_pure : bool;
   ity_tag  : Weakhtbl.tag;
 }
 
@@ -47,8 +47,8 @@ and ity_node = private
     (** record with mutable fields and shareable components *)
   | Ityapp of itysymbol * ity list * ity list
     (** immutable type with shareable components *)
-  | Ityvar of tvsymbol * bool
-    (** type variable and its purity status *)
+  | Ityvar of tvsymbol
+    (** type variable *)
 
 and region = private {
   reg_name : ident;
@@ -140,17 +140,8 @@ val restore_its : tysymbol -> itysymbol
 
 (* {2 Basic properties} *)
 
-val its_immutable : itysymbol -> bool
-(** an immutable type symbol is not a mutable record nor an alias for one *)
-
 val its_pure : itysymbol -> bool
 (** a pure type symbol is immutable and has no mutable components *)
-
-val ity_immutable : ity -> bool
-(** an immutable type contains no regions (returns the [ity_imm] field) *)
-
-val ity_pure : ity -> bool
-(** a pure type is immutable and all type variables in it are pure *)
 
 val ity_closed : ity -> bool
 (** a closed type contains no type variables *)
@@ -182,17 +173,15 @@ val ity_reg : region -> ity
 
 val ity_var : tvsymbol -> ity
 
-val ity_var_pure : tvsymbol -> ity
-
 val ity_purify : ity -> ity
-(** replaces regions with pure snapshots and variables with pure variables. *)
+(** replaces regions with pure snapshots *)
 
 val ity_of_ty : ty -> ity
-(** fresh regions are created when needed and all variables are impure.
+(** fresh regions are created when needed.
     Raises [Invalid_argument] for any non-its tysymbol. *)
 
 val ity_of_ty_pure : ty -> ity
-(** pure snapshots are substituted when needed and all variables are pure.
+(** pure snapshots are substituted when needed.
     Raises [Invalid_argument] for any non-its tysymbol. *)
 
 val ty_of_ity : ity -> ty
@@ -251,12 +240,14 @@ val ty_unit : ty
 val its_int  : itysymbol
 val its_real : itysymbol
 val its_bool : itysymbol
+val its_str  : itysymbol
 val its_unit : itysymbol
 val its_func : itysymbol
 
 val ity_int  : ity
 val ity_real : ity
 val ity_bool : ity
+val ity_str  : ity
 val ity_unit : ity
 val ity_func : ity -> ity -> ity
 val ity_pred : ity -> ity (* ity_pred 'a == ity_func 'a ity_bool *)
@@ -268,12 +259,10 @@ val ity_tuple : ity list -> ity
 
 type ity_subst = private {
   isb_var : ity Mtv.t;
-  isb_pur : ity Mtv.t;
   isb_reg : ity Mreg.t;
 }
 
 exception TypeMismatch of ity * ity * ity_subst
-exception ImpureType of tvsymbol * ity
 
 val isb_empty : ity_subst
 
@@ -342,12 +331,25 @@ val create_xsymbol : preid -> ?mask:mask -> ity -> xsymbol
 exception IllegalSnapshot of ity
 exception IllegalAlias of region
 exception AssignPrivate of region
+exception AssignSnapshot of ity
+exception WriteImmutable of region * pvsymbol
 exception IllegalUpdate of pvsymbol * region
 exception StaleVariable of pvsymbol * region
 exception BadGhostWrite of pvsymbol * region
 exception DuplicateField of region * pvsymbol
 exception IllegalAssign of region * region * region
+exception ImpureVariable of tvsymbol * ity
 exception GhostDivergence
+
+(* termination status *)
+type oneway =
+  | Total
+  | Partial
+  | Diverges
+
+val total : oneway -> bool
+val partial : oneway -> bool
+val diverges : oneway -> bool
 
 type effect = private {
   eff_reads  : Spv.t;         (* known variables *)
@@ -356,11 +358,14 @@ type effect = private {
   eff_covers : Sreg.t;        (* surviving writes *)
   eff_resets : Sreg.t;        (* locked by covers *)
   eff_raises : Sxs.t;         (* raised exceptions *)
-  eff_oneway : bool;          (* non-termination *)
+  eff_spoils : Stv.t;         (* immutable tyvars *)
+  eff_oneway : oneway;        (* non-termination *)
   eff_ghost  : bool;          (* ghost status *)
 }
 
 val eff_empty : effect
+(** Effect of a non-ghost total function without any observational effect of any
+    kinds *)
 
 val eff_equal : effect -> effect -> bool
 val eff_pure : effect -> bool
@@ -384,14 +389,31 @@ val eff_reset_overwritten : effect -> effect  (* confine regions under writes *)
 val eff_raise : effect -> xsymbol -> effect
 val eff_catch : effect -> xsymbol -> effect
 
-val eff_diverge : effect -> effect                (* forbidden if ghost *)
-val eff_ghostify : bool -> effect -> effect       (* forbidden if diverges *)
-val eff_ghostify_weak : bool -> effect -> effect  (* only if has no effect *)
+val eff_spoil : effect -> ity -> effect
+
+val eff_partial : effect -> effect                      (* forbidden if ghost *)
+val eff_diverge : effect -> effect                      (* forbidden if ghost *)
+val eff_ghostify : bool -> effect -> effect (* forbidden if fails or diverges *)
+val eff_ghostify_weak : bool -> effect -> effect     (* only if has no effect *)
 
 val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
 val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
 
 val mask_adjust : effect -> ity -> mask -> mask
+
+val eff_escape : effect -> ity -> Sity.t
+
+val ity_affected : 'a Mreg.t -> ity -> bool
+(** [ity_affected wr ity] returns [true] if the regions of [ity] are contained
+    in the effect described by [wr]. *)
+
+val pv_affected  : 'a Mreg.t -> pvsymbol -> bool
+(** [pv_affected wr pv] returns [true] if the regions of [pv] are contained in
+    the effect described by [wr]. *)
+
+val pvs_affected : 'a Mreg.t -> Spv.t -> Spv.t
+(** [pvs_affected wr pvs] returns the set of pvsymbols from [pvs] whose regions
+    are contained in the effect described by [wr]. *)
 
 (** {2 Computation types (higher-order types with effects)} *)
 
@@ -404,7 +426,8 @@ val clone_post_result : post -> preid
 
 val create_post : vsymbol -> term -> post
 
-val annot_label : label
+val annot_attr : attribute
+val break_attr : attribute
 
 type cty = private {
   cty_args   : pvsymbol list;
@@ -421,8 +444,8 @@ type cty = private {
 val create_cty : ?mask:mask -> pvsymbol list ->
   pre list -> post list -> post list Mxs.t ->
   pvsymbol Mpv.t -> effect -> ity -> cty
-(** [create_cty ?mask args pre post xpost oldies effect result] creates
-    a computation type. [post] and [mask] must be consistent with [result].
+(** [create_cty ?mask ?defensive args pre post xpost oldies effect result]
+    creates a new cty. [post] and [mask] must be consistent with [result].
     The [cty_xpost] field does not have to cover all raised exceptions.
     [cty_effect.eff_reads] is completed wrt the specification and [args].
     [cty_freeze] freezes every unbound pvsymbol in [cty_effect.eff_reads].
@@ -432,6 +455,13 @@ val create_cty : ?mask:mask -> pvsymbol list ->
     [oldies] maps ghost pure snapshots of the parameters and external
     reads to the original pvsymbols: these snapshots are removed from
     [cty_effect.eff_reads] and replaced with the originals. *)
+
+val create_cty_defensive : ?mask:mask -> pvsymbol list ->
+  pre list -> post list -> post list Mxs.t ->
+  pvsymbol Mpv.t -> effect -> ity -> cty
+(** same as [create_cty], except that type variables in the result
+    and exceptional results are spoiled and fresh regions in the
+    result and exceptional results are reset. *)
 
 val cty_apply : cty -> pvsymbol list -> ity list -> ity -> cty
 (** [cty_apply cty pvl rest res] instantiates [cty] up to the types in

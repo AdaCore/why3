@@ -2,20 +2,20 @@
 
 module M
 
-  use import int.Int
+  use int.Int
 
   let x0 () : int = 13 * 3 + 7 - 4
 
   let x1 () : bool = 2 + 2 = 4
 
-  use import ref.Ref
+  use ref.Ref
 
   let x2 () : int =
     let x = ref 13 in
     if !x <> 3 then 7 else 4
 
-  use import list.List
-  use import list.Append
+  use list.List
+  use list.Append
 
   let y () : list int =
     Cons 12 (Cons 34 (Cons 56 Nil)) ++ Cons 78 (Cons 90 Nil)
@@ -24,9 +24,9 @@ end
 
 module Map
 
-  use import int.Int
-  use import map.Map
-  use import map.Const
+  use int.Int
+  use map.Map
+  use map.Const
 
   exception Found int
 
@@ -50,7 +50,7 @@ end
 
 module Mut
 
-  use import int.Int
+  use int.Int
 
   type t = { mutable a : int; c: int ; mutable b : int }
 
@@ -132,14 +132,14 @@ end
 
 module Ref
 
-  use import ref.Ref
+  use ref.Ref
 
   let y () : ref int = { contents = 0 }
 
   let z () : int =
     let r = ref 0 in r := 42; !r
 
-  use import int.Int
+  use int.Int
 
   let f m : int
   = let x = ref 2 in
@@ -188,7 +188,7 @@ end
 
 module Pair
 
-  use import ref.Ref
+  use ref.Ref
 
   type t = { left : ref int ; middle : int; right : ref int }
 
@@ -213,8 +213,8 @@ end
 
 module Array
 
-  use import int.Int
-  use import array.Array
+  use int.Int
+  use array.Array
 
   exception Found int
 
@@ -269,7 +269,7 @@ module Array
   let test7 () = search (t ()) 7
 
 
-  use import array.ArraySwap
+  use array.ArraySwap
 
   let test_swap () =
      let t = Array.make 3 0 in

@@ -1,0 +1,65 @@
+
+(** {1 Nistonacci numbers}
+
+    The simple "Nistonacci numbers" example, originally designed by
+    K. Rustan M. Leino for the SSAS workshop (Sound Static Analysis
+    for Security, NIST, Gaithersburg, MD, USA, June 27-28, 2018) *)
+
+use int.Int
+
+
+(** {2 Specification}
+
+    new in Why3 1.0: (pure) program function that goes into the logic
+    (no need for axioms anymore to define such a function)
+ *)
+
+let rec ghost function nist(n:int) : int
+  requires { n >= 0 }
+  variant { n }
+= if n < 2 then n else nist (n-2) + 2 * nist (n-1)
+
+(** {2 Implementation} *)
+
+use ref.Ref
+
+let rec nistonacci (n:int) : int
+  requires { n >= 0 }
+  variant { n }
+  ensures { result = nist n }
+= let x = ref 0 in
+  let y = ref 1 in
+  for i=0 to n-1 do
+    invariant { !x = nist i }
+    invariant { !y = nist (i+1) }
+     let tmp = !x in
+     x := !y;
+     y := tmp + 2 * !y
+  done;
+  !x
+
+(** {2 A general lemma on Nistonacci numbers}
+
+  That lemma function is used to prove the lemma `forall n. nist(n) >=
+    n` by induction on `n`
+
+*)
+
+(***  (new in Why3 1.0: markdown in comments !) *)
+
+let rec lemma nist_ge_n (n:int)
+   requires { n >= 0 }
+   variant { n }
+   ensures { nist(n) >= n }
+= if n >= 2 then begin
+  (** recursive call on `n-1`, acts as using the induction
+      hypothesis on `n-1` *)
+  nist_ge_n (n-1);
+  (** let's also use induction hypothesis on `n-2` *)
+  nist_ge_n (n-2)
+  end
+
+
+(** test: this can be proved by instantiating the previous lemma *)
+
+goal test : nist 42 >= 17

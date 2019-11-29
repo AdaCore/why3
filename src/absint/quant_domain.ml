@@ -6,21 +6,21 @@ module Make(S:sig
     val pmod: Pmodule.pmodule
   end) = struct
   module A = S.A
-  
+
   open Ai_logic
   module Ai_logic = Ai_logic.Make(struct
       let env = S.env
       let pmod = S.pmod
     end)
   open Ai_logic
-  
+
   include A
 
   let quant_var, pv =
     let open Term in
-    let ident_ret = Ident.{pre_name = "w"; pre_label = Ident.Slab.empty; pre_loc = None; } in
+    let ident_ret = Ident.{pre_name = "w"; pre_attrs = Ident.Sattr.empty; pre_loc = None; } in
     let v  = Ity.create_pvsymbol ident_ret Ity.ity_int in
-    t_var Ity.(v.pv_vs), v 
+    t_var Ity.(v.pv_vs), v
 
   let create_manager () =
     let man = A.create_manager () in
@@ -50,4 +50,3 @@ module Make(S:sig
       end
     | _ -> A.meet_term man term elt
 end
-  

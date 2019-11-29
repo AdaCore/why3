@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,7 +11,7 @@
 
 (** Managing the configuration of Why3 *)
 
-open Stdlib
+open Wstdlib
 
 (** {2 General configuration} *)
 
@@ -40,7 +40,9 @@ val read_config : string option -> config
       Windows) is checked for existence:
       - if present, the content is parsed and returned,
       - otherwise, we return the built-in default_config with a
-        default configuration filename. *)
+        default configuration filename.
+
+ *)
 
 val merge_config : config -> string -> config
 (** [merge_config config filename] merge the content of [filename]
@@ -69,15 +71,27 @@ val get_main : config -> main
 val set_main : config -> main -> config
 (** [set_main config main] replace the main section by the given one *)
 
+val set_stdlib: bool -> config -> config
+(** Set if the standard library should be added to loadpath *)
+
+val set_load_default_plugins: bool -> config -> config
+(** Set if the plugins in the default path should be loaded *)
+
+val set_load_default_config: bool -> config -> config
+(** Set if the default strategies should be automatically generated *)
+
 val libdir: main -> string
 val datadir: main -> string
 val loadpath: main -> string list
+val set_loadpath : main -> string list -> main
 val timelimit: main -> int
 val memlimit: main -> int
 val running_provers_max: main -> int
-val cntexample: main -> bool
 val set_limits: main -> int -> int -> int -> main
-val set_cntexample: main -> bool -> main
+
+val default_editor: main -> string
+(** editor name used when no specific editor known for a prover *)
+val set_default_editor: main -> string -> main
 
 val plugins : main -> string list
 val pluginsdir : main -> string
@@ -118,6 +132,7 @@ type config_prover = {
   interactive  : bool; (* Interactive theorem prover *)
   extra_options: string list;
   extra_drivers: string list;
+  added_at_startup : bool; (* added at startup or present in the user configuration *)
 }
 
 val get_complete_command : config_prover -> with_steps:bool -> string
@@ -126,6 +141,10 @@ val get_complete_command : config_prover -> with_steps:bool -> string
 val get_provers : config -> config_prover Mprover.t
 (** [get_provers config] get the prover family stored in the Rc file. The
     keys are the unique ids of the prover (argument of the family) *)
+
+val get_prover_config: config -> prover -> config_prover
+(** [get_prover_config config prover] get the prover config as stored in
+ the config. Raise Not_found if the prover does not exists in the config. *)
 
 val set_provers : config ->
   ?shortcuts:prover Mstr.t -> config_prover Mprover.t -> config
@@ -165,6 +184,9 @@ type prover_upgrade_policy =
   | CPU_keep
   | CPU_upgrade of prover
   | CPU_duplicate of prover
+  | CPU_remove
+
+val print_prover_upgrade_policy : Format.formatter -> prover_upgrade_policy -> unit
 
 val set_prover_upgrade_policy :
   config -> prover -> prover_upgrade_policy -> config
@@ -192,6 +214,15 @@ type config_strategy = {
 val get_strategies : config -> config_strategy Mstr.t
 
 val add_strategy : config -> config_strategy -> config
+
+(** detected provers *)
+type detected_prover = {
+  exec_name  : string;
+  version : string;
+}
+
+val set_detected_provers: config -> detected_prover list -> config
+val get_detected_provers: config -> detected_prover list
 
 (** filter prover *)
 type filter_prover
@@ -229,7 +260,7 @@ val filter_one_prover : config -> filter_prover -> config_prover
 (** find the uniq prover that verify the filter. If it doesn't exists
     raise ProverNotFound or raise ProverAmbiguity *)
 
-val why3_regexp_of_string : string -> Str.regexp
+val why3_regexp_of_string : string -> Re.Str.regexp
 
 (** {2 For accesing other parts of the configuration } *)
 
@@ -250,13 +281,18 @@ val set_family  : config -> string -> Rc.family  -> config
 (** Common command line options *)
 
 module Args : sig
+
   val initialize :
     ?extra_help : (Format.formatter -> unit -> unit) ->
     (string * Arg.spec * string) list ->
     (string -> unit) -> string ->
     config * config * Env.env
 
-  val exit_with_usage : (string * Arg.spec * string) list -> string -> 'a
+  val exit_with_usage :
+    ?exit_code : int ->
+    ?extra_help : (Format.formatter -> unit -> unit) ->
+    (string * Arg.spec * string) list -> string -> 'a
+
 end
 
 
@@ -266,3 +302,16 @@ val load_driver : main -> Env.env -> string -> string list -> Driver.driver
 (** wrapper for loading a driver from a file that may be relative to the datadir.
     See [Driver.load_driver_absolute]
 *)
+
+val unknown_to_known_provers  :
+  config_prover Mprover.t -> prover ->
+  prover list * prover list * prover list
+(** return others, same name, same version *)
+
+(** */ *)
+
+(** Internal, recursive functionality with Autodetection  *)
+
+val provers_from_detected_provers: (config -> config) ref
+
+(** */ *)

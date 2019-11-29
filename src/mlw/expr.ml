@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -74,8 +74,10 @@ let rs_kind s = match s.rs_logic with
 let rs_ghost s = s.rs_cty.cty_effect.eff_ghost
 
 let check_effects ?loc c =
-  if c.cty_effect.eff_oneway then Loc.errorm ?loc
+  if diverges c.cty_effect.eff_oneway then Loc.errorm ?loc
     "This function may not terminate, it cannot be used as pure";
+  if partial c.cty_effect.eff_oneway then Loc.errorm ?loc
+    "This function may fail, it cannot be used as pure";
   if not (cty_pure c) then Loc.errorm ?loc
     "This function has side effects, it cannot be used as pure"
 
@@ -212,8 +214,9 @@ let rs_of_ls ls =
     create_pvsymbol (id_fresh "u") (ity_of_ty ty)) ls.ls_args in
   let t_args = List.map (fun v -> t_var v.pv_vs) v_args in
   let q = make_post (t_app ls t_args ls.ls_value) in
-  let ity = ity_of_ty (t_type q) in
-  let c = create_cty v_args [] [q] Mxs.empty Mpv.empty eff_empty ity in
+  let ity = ity_of_ty (t_type q) and eff = eff_empty in
+  let eff = if ls.ls_constr = 0 then eff_spoil eff ity else eff in
+  let c = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
   mk_rs ls.ls_name c (RLls ls) None
 
 let ls_of_rs rs = match rs.rs_logic with
@@ -310,27 +313,30 @@ type expr = {
   e_ity    : ity;
   e_mask   : mask;
   e_effect : effect;
-  e_label  : Slab.t;
+  e_attrs  : Sattr.t;
   e_loc    : Loc.position option;
 }
 
 and expr_node =
   | Evar    of pvsymbol
-  | Econst  of Number.constant
+  | Econst  of Constant.constant
   | Eexec   of cexp * cty
   | Eassign of assign list
   | Elet    of let_defn * expr
   | Eif     of expr * expr * expr
-  | Ecase   of expr * (prog_pattern * expr) list
+  | Ematch  of expr * reg_branch list * exn_branch Mxs.t
   | Ewhile  of expr * invariant list * variant list * expr
   | Efor    of pvsymbol * for_bounds * pvsymbol * invariant list * expr
-  | Etry    of expr * bool * (pvsymbol list * expr) Mxs.t
   | Eraise  of xsymbol * expr
   | Eexn    of xsymbol * expr
   | Eassert of assertion_kind * term
   | Eghost  of expr
   | Epure   of term
   | Eabsurd
+
+and reg_branch = prog_pattern * expr
+
+and exn_branch = pvsymbol list * expr
 
 and cexp = {
   c_node : cexp_node;
@@ -357,26 +363,26 @@ and rec_defn = {
 
 (* basic tools *)
 
-let e_label ?loc l e = { e with e_label = l; e_loc = loc }
+let e_attr_set ?loc l e = { e with e_attrs = l; e_loc = loc }
 
-let e_label_add l e = { e with e_label = Slab.add l e.e_label }
+let e_attr_add l e = { e with e_attrs = Sattr.add l e.e_attrs }
 
-let e_label_copy { e_label = lab; e_loc = loc } e =
-  let lab = Slab.union lab e.e_label in
+let e_attr_copy { e_attrs = attrs; e_loc = loc } e =
+  let attrs = Sattr.union attrs e.e_attrs in
   let loc = if e.e_loc = None then loc else e.e_loc in
-  { e with e_label = lab; e_loc = loc }
+  { e with e_attrs = attrs; e_loc = loc }
 
-let proxy_label = create_label "whyml_proxy_symbol"
-let proxy_labels = Slab.singleton proxy_label
+let proxy_attrs = Sattr.singleton proxy_attr
 
-let rec e_label_push ?loc l e = match e.e_node with
+let rec e_attr_push ?loc l e = match e.e_node with
   | (Elet (LDvar ({pv_vs = {vs_name = id}},_) as ld, e1)
   |  Elet (LDsym ({rs_name = id},_) as ld, e1))
-    when Slab.mem proxy_label id.id_label ->
-      let e1 = e_label_push ?loc l e1 in
+    when Sattr.mem proxy_attr id.id_attrs ->
+      let e1 = e_attr_push ?loc l e1 in
       { e with e_node = Elet (ld, e1); e_loc = loc }
   | _ ->
-      { e with e_label = l; e_loc = loc }
+      let l = Sattr.union l e.e_attrs in
+      { e with e_attrs = l; e_loc = loc }
 
 let e_ghost e = e.e_effect.eff_ghost
 let c_ghost c = c.c_cty.cty_effect.eff_ghost
@@ -389,8 +395,8 @@ let e_fold fn acc e = match e.e_node with
   | Elet ((LDsym _|LDrec _), e) | Eexn (_,e) -> fn acc e
   | Elet (LDvar (_,d), e) | Ewhile (d,_,_,e) -> fn (fn acc d) e
   | Eif (c,d,e) -> fn (fn (fn acc c) d) e
-  | Ecase (d,bl) -> List.fold_left (fun acc (_,e) -> fn acc e) (fn acc d) bl
-  | Etry (d,_,xl) -> Mxs.fold (fun _ (_,e) acc -> fn acc e) xl (fn acc d)
+  | Ematch (d,bl,xl) -> Mxs.fold (fun _ (_,e) acc -> fn acc e) xl
+      (List.fold_left (fun acc (_,e) -> fn acc e) (fn acc d) bl)
 
 exception FoundExpr of Loc.position option * expr
 
@@ -446,13 +452,15 @@ let localize_reset_stale v r el =
 
 (* localize a divergence *)
 let localize_divergence el =
-  let diverges eff = eff.eff_oneway in
+  let diverges eff = diverges eff.eff_oneway in
   List.iter (fun e -> if diverges e.e_effect then
     let loc = e_locate_effect diverges e in
     Loc.error ?loc GhostDivergence) el;
   raise GhostDivergence
 
-let try_effect el fn x y = try fn x y with
+let try_effect el fn x y =
+  if Debug.test_flag Debug.stack_trace then fn x y else
+  try fn x y with
   | BadGhostWrite (v,r) -> localize_ghost_write v r el
   | IllegalUpdate (v,r) -> localize_immut_write v r el
   | StaleVariable (v,r) -> localize_reset_stale v r el
@@ -465,7 +473,7 @@ let mk_expr node ity mask eff = {
   e_ity    = ity;
   e_mask   = mask_adjust eff ity mask;
   e_effect = eff;
-  e_label  = Slab.empty;
+  e_attrs  = Sattr.empty;
   e_loc    = None;
 }
 
@@ -484,10 +492,7 @@ let e_const c ity =
 
 let e_nat_const n =
   assert (n >= 0);
-  let a =
-    Number.{ ic_negative = false ; ic_abs = int_const_dec (string_of_int n)}
-  in
-  e_const (Number.ConstInt a) ity_int
+  e_const (Constant.int_const_of_int n) ity_int
 
 let e_ghostify gh ({e_effect = eff} as e) =
   if not gh then e else
@@ -517,24 +522,25 @@ let t_void = t_tuple []
 let is_rlpv s = match s.rs_logic with
   | RLpv _ -> true | _ -> false
 
-let copy_labels e t =
-  if e.e_loc = None && Slab.is_empty e.e_label then t else
+let copy_attrs e t =
+  if e.e_loc = None && Sattr.is_empty e.e_attrs then t else
   let loc = if t.t_loc = None then e.e_loc else t.t_loc in
-  t_label ?loc (Slab.union e.e_label t.t_label) t
+  t_attr_set ?loc (Sattr.union e.e_attrs t.t_attrs) t
 
 let term_of_fmla f = match f.t_node with
   | _ when f.t_ty <> None -> f
   | Tapp (ps, [t; {t_node = Tapp (fs,[])}])
     when ls_equal ps ps_equ && ls_equal fs fs_bool_true -> t
-  | _ -> t_label ?loc:f.t_loc Slab.empty (t_if_simp f t_bool_true t_bool_false)
+  | _ -> t_attr_set ?loc:f.t_loc Sattr.empty
+      (t_if_simp f t_bool_true t_bool_false)
 
 let fmla_of_term t = match t.t_node with
   | _ when t.t_ty = None -> t
   | Tif (f, {t_node = Tapp (fs1,[])}, {t_node = Tapp (fs2,[])})
     when ls_equal fs1 fs_bool_true && ls_equal fs2 fs_bool_false -> f
-  | Tapp (fs,[]) when ls_equal fs fs_bool_true -> t_label_copy t t_true
-  | Tapp (fs,[]) when ls_equal fs fs_bool_false -> t_label_copy t t_false
-  | _ -> t_label ?loc:t.t_loc Slab.empty (t_equ_simp t t_bool_true)
+  | Tapp (fs,[]) when ls_equal fs fs_bool_true -> t_attr_copy t t_true
+  | Tapp (fs,[]) when ls_equal fs fs_bool_false -> t_attr_copy t t_false
+  | _ -> t_attr_set ?loc:t.t_loc Sattr.empty (t_equ_simp t t_bool_true)
 
 let rec pure_of_post prop v h = match h.t_node with
   | Tapp (ps, [{t_node = Tvar u}; t])
@@ -547,12 +553,12 @@ let rec pure_of_post prop v h = match h.t_node with
       (if prop then f else term_of_fmla f), t_true
   | Tbinop (Tand, f, g) ->
       let t, f = pure_of_post prop v f in
-      t, t_label_copy h (t_and_simp f g)
+      t, t_attr_copy h (t_and_simp f g)
   | _ -> raise Exit
 
 let pure_of_post prop v h = match v.vs_ty.ty_node, h.t_node with
   | Tyapp (ts,_), Tquant (Tforall,_) when ts_equal ts ts_func ->
-      let t = t_label_copy h (t_eps_close v h) in
+      let t = t_attr_copy h (t_eps_close v h) in
       if not (t_is_lambda t) then raise Exit else
       (if prop then fmla_of_term t else t), t_true
   | _ -> pure_of_post prop v h
@@ -563,8 +569,8 @@ let term_of_post ~prop v h =
 let rec raw_of_expr prop e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_void
     (* we do not check e.e_effect here, since we check the
-        effects later for the overall expression. The only
-        effect-hiding construction, Etry, is forbidden. *)
+       effects later for the overall expression. The only
+       effect-hiding construction, Ematch(_,_,xl), is forbidden. *)
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Evar v -> t_var v.pv_vs
   | Econst c -> t_const c (ty_of_ity e.e_ity)
@@ -595,12 +601,13 @@ let rec raw_of_expr prop e = match e.e_node with
       t_or (pure_of_expr true e0) (pure_of_expr true e2)
   | Eif (e0,e1,e2) ->
       t_if (pure_of_expr true e0) (pure_of_expr prop e1) (pure_of_expr prop e2)
-  | Ecase (d,bl) ->
+  | Ematch (d,bl,xl) when Mxs.is_empty xl ->
+      if bl = [] then pure_of_expr prop d else
       let conv (p,e) = t_close_branch p.pp_pat (pure_of_expr prop e) in
       t_case (pure_of_expr false d) (List.map conv bl)
-  | Etry _ | Eraise _ | Eabsurd -> raise Exit
+  | Ematch _ | Eraise _ | Eabsurd -> raise Exit
 
-and pure_of_expr prop e = match copy_labels e (raw_of_expr prop e) with
+and pure_of_expr prop e = match copy_attrs e (raw_of_expr prop e) with
   | {t_ty = Some _} as t when prop -> fmla_of_term t
   | {t_ty = None} as f when not prop -> term_of_fmla f
   | t -> t
@@ -610,7 +617,7 @@ let term_of_expr ~prop e =
   try Some (pure_of_expr prop e) with Exit -> None
 
 let post_of_term res t =
-  let loca f = t_label ?loc:t.t_loc Slab.empty f in
+  let loca f = t_attr_set ?loc:t.t_loc Sattr.empty f in
   let f_of_t t = loca (t_equ_simp t t_bool_true) in
   match res.t_ty, t.t_ty with
   | Some _, Some _ -> loca (t_equ_simp res t)
@@ -626,36 +633,39 @@ let rec post_of_expr res e = match e.e_node with
   | _ when ity_equal e.e_ity ity_unit -> t_true
   | Eassign _ | Ewhile _ | Efor _ | Eassert _ -> assert false
   | Evar v -> post_of_term res (t_var v.pv_vs)
-  | Econst (Number.ConstInt _ as c)->
+  | Econst (Constant.ConstInt _ as c)->
       post_of_term res (t_const c ty_int)
-  | Econst (Number.ConstReal _ as c)->
+  | Econst (Constant.ConstReal _ as c)->
       post_of_term res (t_const c ty_real)
+  | Econst (Constant.ConstStr _ as c) ->
+      post_of_term res (t_const c ty_str)
   | Epure t -> post_of_term res t
   | Eghost e | Eexn (_,e) -> post_of_expr res e
   | Eexec (_,c) ->
       let conv q = open_post_with res q in
-      copy_labels e (t_and_l (List.map conv c.cty_post))
+      copy_attrs e (t_and_l (List.map conv c.cty_post))
   | Elet (LDvar (v,_d),e) when ity_equal v.pv_ity ity_unit ->
-      copy_labels e (t_subst_single v.pv_vs t_void (post_of_expr res e))
+      copy_attrs e (t_subst_single v.pv_vs t_void (post_of_expr res e))
   | Elet (LDvar (v,d),e) ->
-      copy_labels e (t_let_close_simp v.pv_vs
+      copy_attrs e (t_let_close_simp v.pv_vs
         (pure_of_expr false d) (post_of_expr res e))
   | Elet (LDsym (s,_),e) ->
       if is_rlpv s then raise Exit;
-      copy_labels e (post_of_expr res e)
+      copy_attrs e (post_of_expr res e)
   | Elet (LDrec rdl,e) ->
       if List.exists (fun rd -> is_rlpv rd.rec_sym) rdl then raise Exit;
-      copy_labels e (post_of_expr res e)
+      copy_attrs e (post_of_expr res e)
   | Eif (_,e1,e2) when is_e_true e1 || is_e_false e2 ||
                       (is_e_false e1 && is_e_true e2) ->
       post_of_term res (pure_of_expr true e)
   | Eif (e0,e1,e2) ->
       t_if (pure_of_expr true e0) (post_of_expr res e1) (post_of_expr res e2)
-  | Ecase (d,bl) ->
+  | Ematch (d,bl,xl) when Mxs.is_empty xl ->
+      if bl = [] then post_of_expr res d else
       let conv (p,e) = t_close_branch p.pp_pat (post_of_expr res e) in
       t_case (pure_of_expr false d) (List.map conv bl)
-  | Etry _ | Eraise _ -> raise Exit
-  | Eabsurd -> copy_labels e t_false
+  | Ematch _ | Eraise _ -> raise Exit
+  | Eabsurd -> copy_attrs e t_false
 
 let local_post_of_expr e =
   if ity_equal e.e_ity ity_unit || not (eff_pure e.e_effect) then [] else
@@ -764,6 +774,7 @@ let e_exec c =
           eff_catch eff xs) x_lost e.e_effect in
         let eff = if cty.cty_effect.eff_ghost then
           try_effect [e] eff_ghostify true eff else eff in
+        let eff = eff_bind (Mpv.domain cty.cty_oldies) eff in
         eff_union_par cty.cty_effect eff
     | _ -> cty.cty_effect in
   mk_expr (Eexec (c, cty)) cty.cty_result cty.cty_mask eff
@@ -779,27 +790,29 @@ let c_fun ?(mask=MaskVisible) args p q xq old e =
     | StaleVariable (v,r) -> localize_reset_stale v r [e] in
   mk_cexp (Cfun e) c
 
+let is_rs_tuple s = match s.rs_logic with
+  | RLls ls -> is_fs_tuple ls
+  | _ -> false
+
 let c_app s vl ityl ity =
   let cty = cty_apply s.rs_cty vl ityl ity in
-  let cty = match s.rs_logic with
-    | RLls ls when ityl = [] && is_fs_tuple ls -> cty_tuple vl
-    | _ -> cty in
+  let cty = if ityl = [] && is_rs_tuple s then cty_tuple vl else cty in
   mk_cexp (Capp (s,vl)) cty
 
 let c_pur s vl ityl ity =
-  if not (ity_pure ity) then Loc.errorm "This expression must have pure type";
+  if not ity.ity_pure then Loc.errorm "This expression must have pure type";
   let v_args = List.map (create_pvsymbol ~ghost:false (id_fresh "u")) ityl in
   let t_args = List.map (fun v -> t_var v.pv_vs) (vl @ v_args) in
   let res = Opt.map (fun _ -> ty_of_ity ity) s.ls_value in
   let q = make_post (t_app s t_args res) in
-  let eff = eff_ghostify true eff_empty in
+  let eff = eff_ghostify true (eff_spoil eff_empty ity) in
   let cty = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
   mk_cexp (Cpur (s,vl)) cty
 
 let mk_proxy ghost e hd = match e.e_node with
-  | Evar v when Slab.is_empty e.e_label -> hd, v
+  | Evar v when Sattr.is_empty e.e_attrs -> hd, v
   | _ ->
-      let id = id_fresh ?loc:e.e_loc ~label:proxy_labels "o" in
+      let id = id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o" in
       let ld, v = let_var ~ghost id e in ld::hd, v
 
 let add_proxy ghost e (hd,vl) =
@@ -809,12 +822,14 @@ let let_head hd e = List.fold_left (fun e ld -> e_let ld e) e hd
 
 let e_app s el ityl ity =
   let trues l = List.map Util.ttrue l in
+  let falses l = List.map Util.ffalse l in
   let rec down al el = match al, el with
     | {pv_ghost = gh}::al, {e_mask = m}::el ->
         if not gh && mask_ghost m then raise Exit;
         gh :: down al el
     | _, el -> trues el in
   let ghl = if rs_ghost s then trues el else
+    if ityl = [] && is_rs_tuple s then falses el else
     try down s.rs_cty.cty_args el with Exit -> trues el in
   let hd, vl = List.fold_right2 add_proxy ghl el ([],[]) in
   let_head hd (e_exec (c_app s vl ityl ity))
@@ -846,8 +861,6 @@ let e_false = e_app rs_false [] [] ity_bool
 
 let rs_tuple = Hint.memo 17 (fun n ->
   ignore (its_tuple n); rs_of_ls (fs_tuple n))
-
-let is_rs_tuple rs = rs_equal rs (rs_tuple (List.length rs.rs_cty.cty_args))
 
 let e_tuple el =
   let ity = ity_tuple (List.map (fun e -> e.e_ity) el) in
@@ -943,16 +956,26 @@ let e_while d inv vl e =
 
 (* match-with, try-with, raise *)
 
-let e_case e bl =
+let e_match e bl xl =
+  (* return type *)
   let ity = match bl with
     | (_,d)::_ -> d.e_ity
-    | [] -> invalid_arg "Expr.e_case" in
-  List.iter (fun (p,d) ->
-    if not (ity_equal e.e_ity ity_unit) &&
-        mask_spill e.e_mask p.pp_mask then
+    | [] -> e.e_ity in
+  (* check types and masks *)
+  let check rity rmask pity pmask d =
+    ity_equal_check rity pity;
+    if not (ity_equal rity ity_unit) && mask_spill rmask pmask then
       Loc.errorm "Non-ghost pattern in a ghost position";
-    ity_equal_check d.e_ity ity;
-    ity_equal_check e.e_ity p.pp_ity) bl;
+    ity_equal_check d.e_ity ity in
+  List.iter (fun (p,d) ->
+    check e.e_ity e.e_mask p.pp_ity p.pp_mask d) bl;
+  Mxs.iter (fun xs (vl,d) ->
+    let vl_ity, vl_mask = match vl with
+      | [] -> ity_unit, MaskVisible
+      | [v] -> v.pv_ity, mask_of_pv v
+      | vl -> ity_tuple (List.map (fun v -> v.pv_ity) vl),
+              MaskTuple (List.map mask_of_pv vl) in
+    check xs.xs_ity xs.xs_mask vl_ity vl_mask d) xl;
   (* absurd branches can be eliminated, any pattern with
      a refutable ghost subpattern makes the whole match
      ghost, unless it is the last branch, in which case
@@ -963,49 +986,29 @@ let e_case e bl =
     | ({pp_fail = PGlast},_)::bl -> last || scan true bl
     | ({pp_fail = PGfail},_)::_  -> true
     | [] -> false in
-  let ghost = scan false bl and dl = List.map snd bl in
-  let add_mask mask d = mask_union mask d.e_mask in
-  let mask = List.fold_left add_mask MaskVisible dl in
-  let eff = List.fold_left (fun eff (p,d) ->
+  let ghost = scan false bl ||
+    (e.e_effect.eff_ghost && not (Mxs.is_empty xl)) in
+  (* return mask *)
+  let mask = if bl = [] then e.e_mask else MaskVisible in
+  let mask = List.fold_left (fun mask (_,d) ->
+    mask_union mask d.e_mask) mask bl in
+  let mask = Mxs.fold (fun _ (_,d) mask ->
+    mask_union mask d.e_mask) xl mask in
+  (* branch effect *)
+  let xeff = eff_empty, [] in
+  let xeff = List.fold_left (fun (eff,dl) (p,d) ->
     let pvs = pvs_of_vss Spv.empty p.pp_pat.pat_vars in
     let deff = eff_bind pvs d.e_effect in
-    try_effect dl eff_union_par eff deff) eff_empty bl in
-  let eff = try_effect (e::dl) eff_union_seq e.e_effect eff in
-  let eff = try_effect (e::dl) eff_ghostify ghost eff in
-  mk_expr (Ecase (e,bl)) ity mask eff
-
-let e_try e ~case xl =
-  let get_mask = function
-    | [] -> ity_unit, MaskVisible
-    | [v] -> v.pv_ity, mask_of_pv v
-    | vl -> ity_tuple (List.map (fun v -> v.pv_ity) vl),
-            MaskTuple (List.map mask_of_pv vl) in
-  Mxs.iter (fun xs (vl,d) ->
-    let ity, mask = get_mask vl in
-    if mask_spill xs.xs_mask mask then
-      Loc.errorm "Non-ghost pattern in a ghost position";
-    ity_equal_check ity xs.xs_ity;
-    ity_equal_check d.e_ity e.e_ity) xl;
-  let ghost = e.e_effect.eff_ghost in
-  let e0, bl = if not case then e, [] else
-    match e.e_node with Ecase (e,bl) -> e,bl
-    | _ -> invalid_arg "Expr.e_try" in
-  let eeff = Mxs.fold (fun xs _ eff ->
-    eff_catch eff xs) xl e0.e_effect in
-  let dl = Mxs.fold (fun _ (_,d) l -> d::l) xl [] in
-  let add_mask mask d = mask_union mask d.e_mask in
-  let mask = List.fold_left add_mask e.e_mask dl in
-  let bldl = List.map snd bl @ dl in
-  let xeff = List.fold_left (fun eff (p,d) ->
-    let pvs = pvs_of_vss Spv.empty p.pp_pat.pat_vars in
-    eff_union_par eff (eff_bind pvs d.e_effect)) eff_empty bl in
-  let xeff = Mxs.fold (fun _ (vl,d) eff ->
+    try_effect (d::dl) eff_union_par eff deff, d::dl) xeff bl in
+  let eff, dl = Mxs.fold (fun _ (vl,d) (eff,dl) ->
     let add s v = Spv.add_new (Invalid_argument "Expr.e_try") v s in
     let deff = eff_bind (List.fold_left add Spv.empty vl) d.e_effect in
-    try_effect bldl eff_union_par eff deff) xl xeff in
-  let eff = try_effect (e0::bldl) eff_union_seq eeff xeff in
-  let eff = try_effect (e0::bldl) eff_ghostify ghost eff in
-  mk_expr (Etry (e,case,xl)) e.e_ity mask eff
+    try_effect (d::dl) eff_union_par eff deff, d::dl) xl xeff in
+  (* total effect *)
+  let eeff = Mxs.fold (fun xs _ eff -> eff_catch eff xs) xl e.e_effect in
+  let eff = try_effect (e::dl) eff_union_seq eeff eff in
+  let eff = try_effect (e::dl) eff_ghostify ghost eff in
+  mk_expr (Ematch (e,bl,xl)) ity mask eff
 
 let e_raise xs e ity =
   ity_equal_check e.e_ity xs.xs_ity;
@@ -1026,6 +1029,9 @@ let e_exn xs e =
 let e_pure t =
   let ity = Opt.fold (Util.const ity_of_ty_pure) ity_bool t.t_ty in
   let eff = eff_ghostify true (eff_read (t_freepvs Spv.empty t)) in
+  let eff = match t.t_node with
+    | Tvar _ -> eff (* no magic *)
+    | _ -> eff_spoil eff ity in
   mk_expr (Epure t) ity MaskGhost eff
 
 let e_assert ak f =
@@ -1034,12 +1040,78 @@ let e_assert ak f =
 
 let e_absurd ity = mk_expr Eabsurd ity MaskVisible eff_empty
 
+(* structural descent *)
+
+exception NoVariantFound of rsymbol
+
+let term_check rdl =
+  let cgr = Decl.create_call_set () in
+  let add acc rd = Mrs.add rd.rec_rsym rd acc in
+  let syms = List.fold_left add Mrs.empty rdl in
+  let term_of e =
+    try pure_of_expr false e with Exit -> t_void in
+  let rec expr rs vm e = match e.e_node with
+    | Evar _ | Econst _ | Epure _ | Eassert _ -> ()
+    | Eghost e | Eexn (_,e) -> expr rs vm e
+    | Eexec (c, _) ->
+        cexp rs vm c
+    | Elet (LDvar (v,d),e) ->
+        expr rs vm d;
+        let t = term_of d in
+        expr rs (Decl.vs_graph_let vm t v.pv_vs) e
+    | Elet (LDsym (_, c),e) ->
+        cexp rs vm c; expr rs vm e
+    | Elet (LDrec rdl,e) ->
+        List.iter (fun rd -> cexp rs vm rd.rec_fun) rdl;
+        expr rs vm e;
+    | Eif (e0,e1,e2) ->
+        expr rs vm e0; expr rs vm e1; expr rs vm e2
+    | Ematch (d,bl,xl) when Mxs.is_empty xl ->
+        expr rs vm d;
+        let t = term_of d in
+        let check (p,e) =
+          expr rs (Decl.vs_graph_pat vm t p.pp_pat) e in
+        List.iter check bl
+    | Eassign _ | Ewhile _ | Efor _
+    | Ematch _ | Eraise _ | Eabsurd ->
+        raise Exit
+  and cexp rs vm c = match c.c_node with
+    | Cfun d ->
+        if not (eff_pure d.e_effect) then raise Exit;
+        let drop vm v = Decl.vs_graph_drop vm v.pv_vs in
+        expr rs (List.fold_left drop vm c.c_cty.cty_args) d
+    | Capp (s,vl) when Mrs.mem s syms ->
+        if c.c_cty.cty_args <> [] then raise Exit;
+        let tl = List.map (fun v -> t_var v.pv_vs) vl in
+        Decl.register_call cgr rs.rs_name vm s.rs_name tl
+    | Cany | Cpur _ | Capp _ -> ()
+  in
+  let build_call_graph rs rd =
+    let vl = List.map (fun v -> v.pv_vs) rs.rs_cty.cty_args in
+    let e = match rd.rec_fun.c_node with
+      Cfun e -> e | _ -> assert false in
+    if not (eff_pure e.e_effect) then
+      raise (NoVariantFound rs);
+    try expr rs (Decl.create_vs_graph vl) e
+    with Exit -> raise (NoVariantFound rs)
+  in
+  Mrs.iter build_call_graph syms;
+  let check rs _ =
+    Decl.find_variant (NoVariantFound rs) cgr rs.rs_name in
+  ignore (Mrs.mapi check syms)
+
+let term_check rdl = match rdl with
+  | {rec_varl = []}::_
+    when List.for_all (fun rd -> rd.rec_sym.rs_logic <> RLnone) rdl ->
+      term_check rdl
+  | _ -> ()
+
 (* recursive definitions *)
 
 let cty_add_variant d varl = let add s (t,_) = t_freepvs s t in
   cty_read_pre (List.fold_left add Spv.empty varl) d.c_cty
 
-let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
+let rec e_rs_subst sm e = e_attr_copy e (match e.e_node with
   | Evar _ | Econst _ | Eassign _ | Eassert _ | Epure _ | Eabsurd -> e
   | Eexn (xs,e) -> e_exn xs (e_rs_subst sm e)
   | Eghost e -> e_ghostify true (e_rs_subst sm e)
@@ -1071,10 +1143,9 @@ let rec e_rs_subst sm e = e_label_copy e (match e.e_node with
   | Efor (v,b,i,inv,e) -> e_for_raw v b i inv (e_rs_subst sm e)
   | Ewhile (d,inv,vl,e) -> e_while (e_rs_subst sm d) inv vl (e_rs_subst sm e)
   | Eraise (xs,d) -> e_raise xs (e_rs_subst sm d) e.e_ity
-  | Ecase (d,bl) -> e_case (e_rs_subst sm d)
+  | Ematch (d,bl,xl) -> e_match (e_rs_subst sm d)
       (List.map (fun (pp,e) -> pp, e_rs_subst sm e) bl)
-  | Etry (d,case,xl) -> e_try (e_rs_subst sm d) ~case
-      (Mxs.map (fun (v,e) -> v, e_rs_subst sm e) xl))
+      (Mxs.map (fun (vl,e) -> vl, e_rs_subst sm e) xl))
 
 and c_rs_subst sm ({c_node = n; c_cty = c} as d) = match n with
   | Cany | Cpur _ -> d
@@ -1090,8 +1161,7 @@ and rec_fixp dl =
     if cty_ghost d.c_cty && not (rs_ghost s) then Loc.errorm
       "Expr.let_rec: ghost status mismatch";
     let c = c_cty_ghostify (rs_ghost s) d in
-    let c = if List.length c.cty_pre < List.length s.rs_cty.cty_pre
-            then cty_add_pre [List.hd s.rs_cty.cty_pre] c else c in
+    let c = cty_add_pre [List.hd s.rs_cty.cty_pre] c in
     if eff_equal c.cty_effect s.rs_cty.cty_effect &&
        mask_equal c.cty_mask s.rs_cty.cty_mask then sm, (s,d)
     else let n = rs_dup s c in Mrs.add s n sm, (n,d) in
@@ -1117,13 +1187,9 @@ let let_rec fdl =
         "All functions in a recursive definition must use the same \
         well-founded order for the first component of the variant" in
   List.iter check_variant (List.tl fdl);
-  (* if we have a top-level total let-function definition and
-     no variants are supplied, then we expect the definition
-     to be terminating with respect to Decl.check_termination *)
-  let impure (_,d,_,k) =
-    (k <> RKfunc && k <> RKpred) || d.c_cty.cty_pre <> [] in
-  let start_eff = if varl1 = [] && List.exists impure fdl then
-    eff_diverge eff_empty else eff_empty in
+  let start_eff = (* pure functions cannot diverge *)
+    if varl1 = [] && List.exists (fun (_,_,_,k) -> k = RKnone) fdl
+    then eff_diverge eff_empty else eff_empty in
   (* create the first substitution *)
   let update sm (s,({c_cty = c} as d),varl,_) =
     (* check that the type signatures are consistent *)
@@ -1138,13 +1204,10 @@ let let_rec fdl =
        c.cty_args = []
     then invalid_arg "Expr.let_rec";
     (* prepare the extra "decrease" precondition *)
-    let pre = match varl with
-      | [] -> c.cty_pre
-      | _::_ ->
-          let tl = List.map fst varl in
-          let id = id_fresh ("DECR " ^ s.rs_name.id_string) in
-          let ps = create_psymbol id (List.map t_type tl) in
-          ps_app ps tl :: c.cty_pre in
+    let decr_tl = List.map fst varl in
+    let decr_id = id_fresh ("DECR " ^ s.rs_name.id_string) in
+    let decr_ps = create_psymbol decr_id (List.map t_type decr_tl) in
+    let pre = ps_app decr_ps decr_tl :: c.cty_pre in
     (* create the clean rsymbol *)
     let id = id_clone s.rs_name in
     let c = create_cty ~mask:c.cty_mask c.cty_args pre
@@ -1161,20 +1224,18 @@ let let_rec fdl =
     let s = create_rsymbol id ~kind ~ghost:(rs_ghost rs) c in
     { rec_sym = s; rec_rsym = rs; rec_fun = d; rec_varl = varl } in
   let rdl = List.map2 merge fdl (rec_fixp (List.map conv dl)) in
+  (* try to infer the missing variant if termination is assumed *)
+  term_check rdl;
   LDrec rdl, rdl
 
 let ls_decr_of_rec_defn = function
-  | { rec_rsym = {rs_cty = {cty_pre = {t_node = Tapp (ls,_)}::_}};
-      rec_varl = _::_ } -> Some ls
+  | { rec_rsym = {rs_cty = {cty_pre = {t_node = Tapp (ls,_)}::_}} } -> Some ls
   | _ -> None
 
-(* pretty-pringting *)
+(* pretty-printing *)
 
 open Format
 open Pretty
-
-let sprinter = create_ident_printer []
-  ~sanitizer:(sanitizer char_to_alpha char_to_alnumus)
 
 let id_of_rs s = match s.rs_logic with
   | RLnone | RLlemma -> s.rs_name
@@ -1183,50 +1244,27 @@ let id_of_rs s = match s.rs_logic with
 
 let forget_rs s = match s.rs_logic with
   | RLnone | RLlemma -> forget_id sprinter s.rs_name
-  | RLpv v -> forget_pv v
-  | RLls _ -> () (* we don't forget top-level symbols *)
+  | RLpv v -> forget_id sprinter v.pv_vs.vs_name
+  | RLls _ -> () (* never forget top-level symbols *)
 
 let forget_let_defn = function
   | LDvar (v,_) -> forget_pv v
   | LDsym (s,_) -> forget_rs s
   | LDrec rdl -> List.iter (fun fd -> forget_rs fd.rec_sym) rdl
 
-let extract_op {id_string = s} =
-  try Some (Strings.remove_prefix "infix " s) with Not_found ->
-  try Some (Strings.remove_prefix "prefix " s) with Not_found ->
-  None
+let print_rs fmt s =
+  Ident.print_decoded fmt (id_unique sprinter (id_of_rs s))
 
-let tight_op s =
-  s <> "" && (let c = String.get s 0 in c = '!' || c = '?')
-
-let print_rs fmt ({rs_name = {id_string = nm}} as s) =
-  if nm = "mixfix []" then pp_print_string fmt "([])" else
-  if nm = "mixfix []<-" then pp_print_string fmt "([]<-)" else
-  if nm = "mixfix [<-]" then pp_print_string fmt "([<-])" else
-  if nm = "mixfix [_..]" then pp_print_string fmt "([_..])" else
-  if nm = "mixfix [.._]" then pp_print_string fmt "([.._])" else
-  if nm = "mixfix [_.._]" then pp_print_string fmt "([_.._])" else
-  match extract_op s.rs_name, s.rs_logic with
-  | Some x, _ ->
-      fprintf fmt "(%s%s%s)"
-        (if Strings.has_prefix "*" x then " " else "")
-        x
-        (if List.length s.rs_cty.cty_args = 1 then "_" else
-         if Strings.has_suffix "*" x then " " else "")
-  | _, RLnone | _, RLlemma ->
-      pp_print_string fmt (id_unique sprinter s.rs_name)
-  | _, RLpv v -> print_pv fmt v
-  | _, RLls s -> print_ls fmt s
-
-let print_rs_head fmt s = fprintf fmt "%s%s%a%a"
+let print_rs_head fmt s = fprintf fmt "%s%s%s%a%a"
   (if s.rs_cty.cty_effect.eff_ghost then "ghost " else "")
+  (if partial s.rs_cty.cty_effect.eff_oneway then "partial " else "")
   (match s.rs_logic with
     | RLnone -> ""
     | RLpv _ -> "function "
     | RLls {ls_value = None} -> "predicate "
     | RLls _ -> "function "
     | RLlemma -> "lemma ")
-  print_rs s print_id_labels (id_of_rs s)
+  print_rs s print_id_attrs (id_of_rs s)
 
 let print_invariant fmt fl =
   let print_inv fmt f = fprintf fmt "@\ninvariant@ { %a }" print_term f in
@@ -1245,8 +1283,8 @@ let print_variant fmt varl =
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
-let debug_print_labels = Debug.register_info_flag "print_labels"
-  ~desc:"Print@ labels@ of@ identifiers@ and@ expressions."
+let debug_print_attrs = Debug.register_info_flag "print_attributes"
+  ~desc:"Print@ attributes@ of@ identifiers@ and@ expressions."
 
 let debug_print_locs = Debug.register_info_flag "print_locs"
   ~desc:"Print@ locations@ of@ identifiers@ and@ expressions."
@@ -1256,9 +1294,7 @@ let ambig_cty c =
   let sarg = List.fold_right freeze_pv c.cty_args isb_empty in
   let sarg = Spv.fold freeze_pv c.cty_effect.eff_reads sarg in
   let sres = ity_freeze isb_empty c.cty_result in
-  not (Mtv.set_submap sres.isb_var sarg.isb_var) ||
-  not (Mtv.set_submap sres.isb_pur
-       (Mtv.set_union sarg.isb_var sarg.isb_pur))
+  not (Mtv.set_submap sres.isb_var sarg.isb_var)
 
 let ambig_ls s =
   let sarg = List.fold_left ty_freevars Stv.empty s.ls_args in
@@ -1267,72 +1303,58 @@ let ambig_ls s =
 
 let ht_rs = Hrs.create 7 (* rec_rsym -> rec_sym *)
 
-let print_capp pri ({rs_name = id} as s) fmt vl =
-  match extract_op id, vl with
-  | _, [] ->
-      print_rs fmt s
-  | Some o, [t1] when tight_op o ->
+let print_capp pri s fmt vl =
+  if vl = [] then print_rs fmt s else
+  let p = id_unique sprinter (id_of_rs s) in
+  match Ident.sn_decode p, vl with
+  | Ident.SNtight o, [t1] ->
       fprintf fmt (protect_on (pri > 7) "%s%a") o print_pv t1
-  | Some o, [t1] when String.get id.id_string 0 = 'p' ->
+  | Ident.SNprefix o, [t1] ->
       fprintf fmt (protect_on (pri > 4) "%s %a") o print_pv t1
-  | Some o, [t1;t2] ->
+  | Ident.SNinfix o, [t1;t2] ->
       fprintf fmt (protect_on (pri > 4) "@[<hov 1>%a %s@ %a@]")
         print_pv t1 o print_pv t2
-  | _, [t1;t2] when id.id_string = "mixfix []" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a]") print_pv t1 print_pv t2
-  | _, [t1;t2;t3] when id.id_string = "mixfix [<-]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]")
-        print_pv t1 print_pv t2 print_pv t3
-  | _, [t1;t2;t3] when id.id_string = "mixfix []<-" ->
-      fprintf fmt (protect_on (pri > 0) "%a[%a] <- %a")
-        print_pv t1 print_pv t2 print_pv t3
-  | _, [t1;t2] when id.id_string = "mixfix [_..]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a..]") print_pv t1 print_pv t2
-  | _, [t1;t2] when id.id_string = "mixfix [.._]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[..%a]") print_pv t1 print_pv t2
-  | _, [t1;t2;t3] when id.id_string = "mixfix [_.._]" ->
-      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]")
-        print_pv t1 print_pv t2 print_pv t3
-  | _, tl ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%a@ %a@]")
-        print_rs s (Pp.print_list Pp.space print_pv) tl
+  | Ident.SNget p, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a]%s") print_pv t1 print_pv t2 p
+  | Ident.SNupdate p, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a <- %a]%s")
+        print_pv t1 print_pv t2 print_pv t3 p
+  | Ident.SNset p, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 0) "%a[%a]%s <- %a")
+        print_pv t1 print_pv t2 p print_pv t3
+  | Ident.SNcut p, [t1;t2;t3] ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..%a]%s")
+        print_pv t1 print_pv t2 print_pv t3 p
+  | Ident.SNrcut p, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 6) "%a[%a..]%s") print_pv t1 print_pv t2 p
+  | Ident.SNlcut p, [t1;t2] ->
+      fprintf fmt (protect_on (pri > 6) "%a[..%a]%s") print_pv t1 print_pv t2 p
+  | Ident.SNword p, vl ->
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%s@ %a@]")
+        p (Pp.print_list Pp.space print_pv) vl
+  | _, vl -> (* do not fail, just print the string *)
+      fprintf fmt (protect_on (pri > 5) "@[<hov 1>%s@ %a@]")
+        p (Pp.print_list Pp.space print_pv) vl
 
-let print_cpur pri ({ls_name = id} as s) fmt vl =
-  let op = match extract_op id, vl with
-    | Some o, [_] when tight_op o -> Some o
-    | Some o, [_] when String.get id.id_string 0 = 'p' -> Some (o ^ "_")
-    | Some o, [_;_] -> Some o
-    | _, [_;_] when id.id_string = "mixfix []" -> Some "[]"
-    | _, [_;_;_] when id.id_string = "mixfix [<-]" -> Some "[<-]"
-    | _, [_;_;_] when id.id_string = "mixfix []<-" -> Some "[]<-"
-    | _, [_;_] when id.id_string = "mixfix [_..]" -> Some "[_..]"
-    | _, [_;_] when id.id_string = "mixfix [.._]" -> Some "[.._]"
-    | _, [_;_;_] when id.id_string = "mixfix [_.._]" -> Some "[_.._]"
-    | _ -> None in
-  match op, vl with
-  | None, [] ->
-      fprintf fmt "{%a}" print_ls s
-  | None, tl ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>{%a}@ %a@]")
-        print_ls s (Pp.print_list Pp.space print_pv) tl
-  | Some o, tl ->
-      fprintf fmt (protect_on (pri > 5) "@[<hov 1>{(%s)}@ %a@]")
-        o (Pp.print_list Pp.space print_pv) tl
+let print_cpur pri s fmt vl =
+  if vl = [] then fprintf fmt "{%a}" print_ls s else
+  fprintf fmt (protect_on (pri > 5) "@[<hov 1>{%a}@ %a@]")
+    print_ls s (Pp.print_list Pp.space print_pv) vl
 
 let rec print_expr fmt e = print_lexpr 0 fmt e
 
 and print_lexpr pri fmt e =
-  let print_elab pri fmt e =
-    if Debug.test_flag debug_print_labels && not (Slab.is_empty e.e_label)
+  let print_eattr pri fmt e =
+    if Debug.test_flag debug_print_attrs && not (Sattr.is_empty e.e_attrs)
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (Pp.print_iter1 Slab.iter Pp.space print_label) e.e_label
+      (Pp.print_iter1 Sattr.iter Pp.space print_attr) e.e_attrs
       (print_enode 0) e
     else print_enode pri fmt e in
   let print_eloc pri fmt e =
     if Debug.test_flag debug_print_locs && e.e_loc <> None
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (Pp.print_option print_loc) e.e_loc (print_elab 0) e
-    else print_elab pri fmt e in
+      (Pp.print_option print_loc) e.e_loc (print_eattr 0) e
+    else print_eattr pri fmt e in
   print_eloc pri fmt e
 
 and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
@@ -1374,7 +1396,7 @@ and print_cexp exec pri fmt {c_node = n; c_cty = c} = match n with
 
 and print_enode pri fmt e = match e.e_node with
   | Evar v -> print_pv fmt v
-  | Econst c -> Number.print_constant fmt c
+  | Econst c -> Constant.print_def fmt c
   | Eexec (c,_) -> print_cexp true pri fmt c
   | Elet (LDvar (v,e1), e2)
     when v.pv_vs.vs_name.id_string = "_" && ity_equal v.pv_ity ity_unit ->
@@ -1405,10 +1427,17 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt (protect_on (pri > 0) "%a <- %a")
         (Pp.print_list Pp.comma print_left) al
         (Pp.print_list Pp.comma print_right) al
-  | Ecase (e0,bl) ->
-      (* Elet and Ecase are ghost-containers *)
+  | Ematch (e,[],xl) ->
+      fprintf fmt "try %a with@\n@[<hov>%a@]@\nend" print_expr e
+        (Pp.print_list Pp.newline (print_xbranch false)) (Mxs.bindings xl)
+  | Ematch (e0,bl,xl) when Mxs.is_empty xl ->
+      (* Elet and Ematch are ghost-containers *)
       fprintf fmt "match %a with@\n@[<hov>%a@]@\nend"
         print_expr e0 (Pp.print_list Pp.newline print_branch) bl
+  | Ematch (e,bl,xl) ->
+      fprintf fmt "match %a with@\n@[<hov>%a@\n%a@]@\nend"
+        print_expr e (Pp.print_list Pp.newline print_branch) bl
+        (Pp.print_list Pp.newline (print_xbranch true)) (Mxs.bindings xl)
   | Ewhile (d,inv,varl,e) ->
       fprintf fmt "@[<hov 2>while %a do%a%a@\n%a@]@\ndone"
         print_expr d print_invariant inv print_variant varl print_expr e
@@ -1427,15 +1456,6 @@ and print_enode pri fmt e = match e.e_node with
       fprintf fmt "raise %a" print_xs xs
   | Eraise (xs,e) ->
       fprintf fmt "raise (%a %a)" print_xs xs print_expr e
-  | Etry ({e_node = Ecase (e,bl)},true,xl) ->
-      let xl = Mxs.bindings xl in
-      fprintf fmt "match %a with@\n@[<hov>%a@\n%a@]@\nend"
-        print_expr e (Pp.print_list Pp.newline print_branch) bl
-        (Pp.print_list Pp.newline (print_xbranch true)) xl
-  | Etry (e,_,xl) ->
-      let xl = Mxs.bindings xl in
-      fprintf fmt "try %a with@\n@[<hov>%a@]@\nend" print_expr e
-        (Pp.print_list Pp.newline (print_xbranch false)) xl
   | Eabsurd ->
       fprintf fmt "absurd"
   | Eassert (Assert,f) ->
@@ -1467,7 +1487,7 @@ and print_let_defn fmt = function
   | LDvar (v,e) ->
       fprintf fmt "@[<hov 2>let %s%a%a =@ %a@]"
         (if v.pv_ghost then "ghost " else "")
-        print_pv v print_id_labels v.pv_vs.vs_name
+        print_pv v print_id_attrs v.pv_vs.vs_name
         (print_lexpr 0 (*4*)) e
   | LDsym (s,{c_node = Cfun e; c_cty = ({cty_args = _::_} as c)}) ->
       fprintf fmt "@[<hov 2>let %a%a =@\n%a@]"
@@ -1506,5 +1526,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | FieldExpected s -> fprintf fmt
       "Function %a is not a mutable field" print_rs s
   | ExceptionLeak xs -> fprintf fmt
-      "Uncatched local exception %a" print_xs xs
+      "Uncaught local exception %a" print_xs xs
+  | NoVariantFound rs -> fprintf fmt
+      "Cannot prove termination for %a" print_rs rs
   | _ -> raise e)

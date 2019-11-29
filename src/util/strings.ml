@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,17 +9,11 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* Replace with Char.uppercase_ascii as soon as we can assume
-  OCaml version at least 4.03.0  *)
-let char_is_uppercase c = c = Char.uppercase c
+let char_is_uppercase c = c = Char.uppercase_ascii c
 
-let create = String.create
-let copy = String.copy
-let set = String.set
-
-
-let capitalize = String.capitalize
-let uncapitalize = String.uncapitalize
+let lowercase = String.lowercase_ascii
+let capitalize = String.capitalize_ascii
+let uncapitalize = String.uncapitalize_ascii
 
 
 let rev_split c s =
@@ -55,10 +49,10 @@ let rec join sep l =
 let pad_right c s i =
   let sl = String.length s in
   if sl < i then
-    let p = create i in
-    String.blit s 0 p 0 sl;
-    String.fill p sl (i-sl) c;
-    p
+    let p = Bytes.create i in
+    Bytes.blit_string s 0 p 0 sl;
+    Bytes.fill p sl (i-sl) c;
+    Bytes.unsafe_to_string p
   else if sl > i
   then String.sub s 0 i
   else s
@@ -94,3 +88,11 @@ let remove_suffix suff s =
     if s.[sl - l + i] <> suff.[i] then raise Not_found
   done;
   String.sub s 0 (sl - l)
+
+let ends_with s suf =
+  let rec aux s suf suflen offset i =
+    i >= suflen || (s.[i + offset] = suf.[i]
+                   && aux s suf suflen offset (i+1)) in
+  let slen = String.length s in
+  let suflen = String.length suf in
+  slen >= suflen && aux s suf suflen (slen - suflen) 0

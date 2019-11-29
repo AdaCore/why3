@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -31,6 +31,7 @@ val dty_unify : dty -> dty -> unit (* raises Exit on failure *)
 val dty_int  : dty
 val dty_real : dty
 val dty_bool : dty
+val dty_str  : dty
 
 val dty_fold : (tysymbol -> 'a list -> 'a) ->
                (tvsymbol -> 'a) -> (int -> 'a) -> dty -> 'a
@@ -69,7 +70,7 @@ type dterm = private {
 and dterm_node =
   | DTvar of string * dty
   | DTgvar of vsymbol
-  | DTconst of Number.constant * dty
+  | DTconst of Constant.constant * dty
   | DTapp of lsymbol * dterm list
   | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm
@@ -83,7 +84,7 @@ and dterm_node =
   | DTfalse
   | DTcast of dterm * dty
   | DTuloc of dterm * Loc.position
-  | DTlabel of dterm * Slab.t
+  | DTattr of dterm * Sattr.t
 
 (** Environment *)
 
@@ -102,7 +103,8 @@ val denv_add_let : denv -> dterm -> preid -> denv
 
 val denv_add_quant : denv -> dbinder list -> denv
 
-val denv_add_pat : denv -> dpattern -> denv
+val denv_add_pat : denv -> dpattern -> dty -> denv
+val denv_add_term_pat : denv -> dpattern -> dterm -> denv
 
 val denv_get : denv -> string -> dterm_node (** raises UnboundVar *)
 
@@ -112,11 +114,16 @@ val denv_get_opt : denv -> string -> dterm_node option
 
 val dpattern : ?loc:Loc.position -> dpattern_node -> dpattern
 
-val dterm : Theory.theory_uc -> ?loc:Loc.position -> dterm_node -> dterm
+val dterm : Coercion.t -> ?loc:Loc.position -> dterm_node -> dterm
+
+(** Unused variables *)
+val debug_ignore_unused_var : Debug.flag
+val attr_w_unused_var_no : attribute
+
+(* Emit a warning if the variable is unused *)
+val check_used_var: term -> vsymbol -> unit
 
 (** Final stage *)
-
-val debug_ignore_unused_var : Debug.flag
 
 val term : ?strict:bool -> ?keep_loc:bool -> dterm -> term
 

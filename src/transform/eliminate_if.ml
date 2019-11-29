@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -20,7 +20,7 @@ let rec has_if t = match t.t_node with
   | _ -> TermTF.t_any has_if Util.ffalse t
 
 let rec elim_t contT t =
-  let contTl e = contT (t_label_copy t e) in
+  let contTl e = contT (t_attr_copy t e) in
   match t.t_node with
   | Tlet (t1,tb) ->
       let u,t2,close = t_open_bound_cb tb in
@@ -43,10 +43,24 @@ let rec elim_t contT t =
   | _ ->
       TermTF.t_map_cont elim_t elim_f contT t
 
+and elim_t_eps t = match t.t_node with
+  | Tif (f,t1,t2) when t.t_ty <> None ->
+      let z = create_vsymbol (id_fresh "if_term") (t_type t) in
+      let tz = t_var z in
+      let f = elim_f (fun f -> f) f in
+      let f1 = t_equ tz (elim_t_eps t1) in
+      let f2 = t_equ tz (elim_t_eps t2) in
+      t_attr_copy t (t_eps_close z (t_if f f1 f2))
+  | _ ->
+      TermTF.t_map elim_t_eps (elim_f (fun f -> f)) t
+
 and elim_f contF f = match f.t_node with
-  | Tapp _ | Tlet _ | Tcase _ ->
+  | Tapp _ ->
       contF (TermTF.t_map_cont elim_t elim_f (fun f -> f) f)
-  | _ -> TermTF.t_map_cont elim_tr elim_f contF f
+  | Tlet _ | Tcase _ ->
+      contF (TermTF.t_map elim_t_eps (elim_f (fun f -> f)) f)
+  | _ ->
+      TermTF.t_map_cont elim_tr elim_f contF f
 
 (* the only terms we still can meet are the terms in triggers *)
 and elim_tr contT t = match t.t_node with
@@ -63,7 +77,7 @@ let add_ld (ls,ld) (abst,defn,axl) =
   let vl,e,close = open_ls_defn_cb ld in
   match e.t_ty with
     | Some _ when has_if e ->
-        let nm = ls.ls_name.id_string ^ "_def" in
+        let nm = ls.ls_name.id_string ^ "'def" in
         let pr = create_prsymbol (id_derive nm ls.ls_name) in
         let hd = t_app ls (List.map t_var vl) e.t_ty in
         let ax = t_forall_close vl [] (elim_f (t_equ hd e)) in
@@ -127,7 +141,7 @@ let eliminate_if = Trans.compose eliminate_if_term eliminate_if_fmla
 
 let () =
   Trans.register_transform "eliminate_if_term" eliminate_if_term
-    ~desc:"Replaces@ terms@ of@ the@ form@ [if f1 then t2 else t3]@ by@ \
+    ~desc:"Replace@ terms@ of@ the@ form@ [if f1 then t2 else t3]@ by@ \
            lifting@ them@ at@ the@ level@ of@ formulas.";
   Trans.register_transform "eliminate_if_fmla" eliminate_if_fmla
     ~desc:"Eliminate@ formulas@ of@ the@ form@ [if f1 then f2 else f3].";

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -10,5 +10,5 @@
 (********************************************************************)
 
 val typecheck : Why3.Env.env -> Why3.Env.pathname ->
-  Tptp_ast.tptp_file -> Why3.Theory.theory Why3.Stdlib.Mstr.t
+  Tptp_ast.tptp_file -> Why3.Theory.theory Why3.Wstdlib.Mstr.t
 

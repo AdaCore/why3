@@ -22,7 +22,7 @@ end
 
 theory TestInt
 
-   use import int.Int
+   use int.Int
 
    goal Test1: 2+2 = 4
 
@@ -60,7 +60,7 @@ theory TestSplit
 
   goal G4 : forall x:int. ("stop_split" aa x && bb 1) && ("stop_split" aa 1 && bb 2)
 
-  use import int.Int
+  use int.Int
 
   goal Glet : (let x = 1 in x+1 = 2) /\ (let y = 3 in y+2 = 4)
 
@@ -68,8 +68,8 @@ end
 
 theory TestMinMax
 
-  use import int.Int
-  use import int.MinMax
+  use int.Int
+  use int.MinMax
 
   goal G1: min 1 2 = 1
 
@@ -77,7 +77,7 @@ end
 
 theory TestDiv
 
-   use import int.Int
+   use int.Int
    use int.EuclideanDivision
 
    goal EDiv1: EuclideanDivision.div 1 2 = 0
@@ -94,8 +94,8 @@ end
 
 theory TestList
 
-  use import int.Int
-  use import list.List
+  use int.Int
+  use list.List
 
   function x : list int
 
@@ -111,11 +111,11 @@ end
 
 theory TestReal
 
-   use import real.Real
+   use real.Real
 
    goal Real1: forall x:real. x <> 0.0 -> x*x <> 0.0
 
-   use import real.Abs
+   use real.Abs
 
    goal RealAbs1: forall x:real. 100.0 >= abs x >= 1.0 -> x*x >= 1.0
 
@@ -125,7 +125,7 @@ end
 
 theory TestFloat
 
-   use import floating_point.Rounding
+   use floating_point.Rounding
    use floating_point.Single
 
    lemma Round_single_01: Single.round NearestTiesToEven 0.1 = 0x0.199999Ap0
@@ -134,7 +134,7 @@ end
 
 theory TestIntros
 
-  use import int.Int
+  use int.Int
 
   goal G :
     forall x y : int. x > 0 /\ y > 0 ->
@@ -178,7 +178,7 @@ end
 
 theory TestRealizeUse
 
-  use import TestRealize
+  use TestRealize
 
   function q t : t
 
@@ -188,7 +188,7 @@ end
 
 theory TestRealizeUseInt
 
-  use import int.Int
+  use int.Int
 
   function q int : int
 
@@ -198,7 +198,7 @@ end
 
 theory TestInline
 
-  use import int.Int
+  use int.Int
 
   goal T : 1 = 2
 
@@ -210,7 +210,7 @@ end
 
 theory TestInductive
 
-use import int.Int
+use int.Int
 
 inductive p (x:int) =
 
@@ -234,8 +234,8 @@ end
 
 theory TestPVSRealAbs
 
-  use import int.Abs
-  use import real.RealInfix
+  use int.Abs
+  use real.RealInfix
   use import real.Abs as A
 
   lemma l: A.abs (-. 1.0) = 1.0

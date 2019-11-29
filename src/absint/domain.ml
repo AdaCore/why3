@@ -70,7 +70,7 @@ module Make_from_apron(M:sig
   let assign_linexpr = A.assign_linexpr
   let hash = A.hash
   let is_eq = A.is_eq
-                         
+
   exception Cannot_be_expressed
 
   type coeff =
@@ -80,13 +80,13 @@ module Make_from_apron(M:sig
     | CMinusOne
     | COne
 
-  let to_term env pmod = 
+  let to_term env pmod =
     let open Term in
     let th_int = Env.read_theory env ["int"] "Int" in
     let int_tys = Theory.(ns_find_ts th_int.th_export ["int"]) in
     let ty_int = (Ty.ty_app int_tys []) in
-    let int_zero = t_const Number.(ConstInt ({ic_negative = false; ic_abs= int_const_dec "0"})) Ty.ty_int in
-    let int_one = t_const Number.(ConstInt ({ic_negative = false; ic_abs = int_const_dec "1"})) Ty.ty_int in
+    let int_zero = t_nat_const 0 in
+    let int_one = t_nat_const 1 in
     let int_le = Theory.(ns_find_ls th_int.th_export ["infix <="]) in
     let int_lt = Theory.(ns_find_ls th_int.th_export ["infix <"]) in
     let int_add =  begin fun a ->
@@ -112,7 +112,7 @@ module Make_from_apron(M:sig
     let rec int_of_s s =
       let open Scalar in
       match s with
-      | Float f -> 
+      | Float f ->
         let i = int_of_float f in
         assert (float_of_int i = f);
         i
@@ -125,10 +125,7 @@ module Make_from_apron(M:sig
     let coeff_to_term = function
       | Coeff.Scalar(s) ->
         let i = int_of_s s in
-        let s = string_of_int (abs i) in
-        let n = Number.int_const_dec s in
-        let n = Number.{ic_negative = false; ic_abs = n } in
-        let n = Number.ConstInt n in
+        let n = Constant.int_const_of_int (abs i) in
 
         if i = 1 then
           COne
@@ -184,6 +181,7 @@ module Make_from_apron(M:sig
         else
           ps_app int_le [terml; termr;]
       | Lincons1.DISEQ ->  t_not (ps_app ps_equ [terml; termr])
+      | Lincons1.EQMOD _ -> assert false
     in
 
     let lincons_array_to_term l variable_mapping =
@@ -238,11 +236,11 @@ module Make_from_apron(M:sig
         end
     done;
     !vars
-  
+
   let rec int_of_s s =
       let open Apron.Scalar in
       match s with
-      | Float f -> 
+      | Float f ->
         let i = int_of_float f in
         assert (float_of_int i = f);
         i
@@ -251,7 +249,7 @@ module Make_from_apron(M:sig
       | Mpfrf t ->
         int_of_s (Float (Mpfr.to_float t))
 
-  
+
   let round_integers man env a =
     let open Apron in
     let l = A.to_lincons_array man a in
@@ -279,7 +277,7 @@ module Make_from_apron(M:sig
                     | _ -> assert false
                   in
                   Lincons1.set_coeff l' v (Coeff.s_of_int (if myi < 0 then -1 else 1));
-                  let c = 
+                  let c =
                     if i mod myi = 0 then
                       i/(abs myi)
                     else if i > 0 then i/(abs myi)

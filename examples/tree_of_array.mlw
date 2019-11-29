@@ -7,15 +7,15 @@
 
 module TreeOfArray
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import int.Power
-  use import array.Array
-  use import array.ToList
-  use import bintree.Tree
-  use import bintree.Size
-  use import bintree.Inorder
-  use import bintree.Height
+  use int.Int
+  use int.ComputerDivision
+  use int.Power
+  use array.Array
+  use array.ToList
+  use bintree.Tree
+  use bintree.Size
+  use bintree.Inorder
+  use bintree.Height
 
   let rec tree_of_array_aux (a: array 'a) (lo hi: int) : tree 'a
     requires { 0 <= lo <= hi <= length a }
@@ -30,7 +30,7 @@ module TreeOfArray
     else
       let mid = lo + div (hi - lo) 2 in
       let left = tree_of_array_aux a lo mid in
-      let right = tree_of_array_aux a (mid + 1) hi in
+      let right = tree_of_array_aux a (mid+1) hi in
       Node left a[mid] right
 
   let tree_of_array (a: array 'a) : tree 'a

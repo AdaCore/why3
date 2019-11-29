@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,11 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*
-***************************************************************
-**  Counter-example model values
-****************************************************************
-*)
+(** {1 Counter-example model values} *)
 
 type float_type =
   | Plus_infinity
@@ -22,28 +18,36 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
+    (** [Float_value (sign, exponent, mantissa)] *)
+  | Float_hexa of string * float
+
+val interp_float: ?interp:bool -> string -> string -> string -> float_type
 
 type model_value =
+ | String of string
  | Integer of string
  | Decimal of (string * string)
+ | Fraction of (string * string)
  | Float of float_type
  | Boolean of bool
  | Array of model_array
  | Record of model_record
+ | Proj of model_proj
  | Bitvector of string
+ | Apply of string * model_value list
  | Unparsed of string
 and  arr_index = {
-  arr_index_key : string;
+  arr_index_key : model_value;
   arr_index_value : model_value;
 }
 and model_array = {
   arr_others  : model_value;
   arr_indices : arr_index list;
 }
-and model_record ={
-  discrs : model_value list;
-  fields : model_value list;
-}
+and model_proj = (proj_name * model_value)
+and proj_name = string
+and model_record = (field_name * model_value) list
+and field_name = string
 
 val array_create_constant :
   value : model_value ->
@@ -52,14 +56,13 @@ val array_create_constant :
 
 val array_add_element :
   array : model_array ->
-  index : string      ->
+  index : model_value ->
   value : model_value ->
   model_array
 (** Adds an element to the array.
     @param array : the array to that the element will be added
 
     @param index : the index on which the element will be added.
-    Note that the index must be of value model_value.Integer
 
     @param value : the value of the element to be added
 *)
@@ -89,24 +92,26 @@ type model_element_name = {
     (** The name of the source-code element.  *)
   men_kind   : model_element_kind;
     (** The kind of model element. *)
+  men_attrs : Ident.Sattr.t;
 }
 
 (** Counter-example model elements. Each element represents
     a counter-example for a single source-code element.*)
 type model_element = {
-  me_name     : model_element_name;
+  me_name       : model_element_name;
     (** Information about the name of the model element  *)
-  me_value    : model_value;
+  me_value      : model_value;
     (** Counter-example value for the element. *)
-  me_location : Loc.position option;
+  me_location   : Loc.position option;
     (** Source-code location of the element. *)
-  me_term     : Term.term option;
+  me_term       : Term.term option;
     (** Why term corresponding to the element.  *)
 }
 
 val create_model_element :
-  name     : string ->
-  value    : model_value ->
+  name      : string ->
+  value     : model_value ->
+  attrs     : Ident.Sattr.t ->
   ?location : Loc.position ->
   ?term     : Term.term ->
   unit ->
@@ -118,26 +123,21 @@ val create_model_element :
 
     @param location : source-code location of the element
 
-    @param term : why term corresponding to the element *)
-
-(*
-***************************************************************
-**  Model definitions
-***************************************************************
+    @param term : why term corresponding to the element
 *)
+
+  (** {2 Model definitions} *)
+
 type model
 
 val is_model_empty : model -> bool
 val default_model : model
 
-(*
-***************************************************************
-**  Quering the model
-***************************************************************
-*)
+(** {2 Querying the model} *)
 
 val print_model :
   ?me_name_trans:(model_element_name -> string) ->
+  print_attrs:bool ->
   Format.formatter ->
   model ->
   unit
@@ -147,36 +147,18 @@ val print_model :
       names. The input is information about model element name. The
       output is the name of the model element that should be displayed.
     @param model the counter-example model to print
+    @param print_attrs: when set to true, the name is printed together with the
+    attrs associated to the specific ident.
 *)
 
-val model_to_string :
+val print_model_human :
   ?me_name_trans:(model_element_name -> string) ->
-  model ->
-  string
-(** See print_model  *)
-
-val print_model_vc_term :
-  ?me_name_trans: (model_element_name -> string) ->
-  ?sep: string ->
   Format.formatter ->
   model ->
+  print_attrs:bool ->
   unit
-(** Prints counter-example model elements related to term that
-    triggers VC.
+(** Same as print_model but is intended to be human readable.
 
-    @param sep separator of counter-example model elements
-    @param me_name_trans see print_model
-    @model the counter-example model.
-*)
-
-val model_vc_term_to_string :
-  ?me_name_trans: (model_element_name -> string) ->
-  ?sep: string ->
-  model ->
-  string
-(** Gets string with counter-example model elements related to term that
-    triggers VC.
-    See print_model_vc_term
 *)
 
 val print_model_json :
@@ -192,13 +174,12 @@ val print_model_json :
       to the term that triggers VC before splitting VC to the name of JSON field
       storing counterexample information related to this term. By default, this
       information is stored in JSON field corresponding to this line, i.e.,
-      the transformation is string_of_int.
+      the transformation is [string_of_int].
       Note that the exact line of the construct that triggers VC may not be
       known. This can happen if the term that triggers VC spans multiple lines
       and it is splitted.
       This transformation can be used to store the counterexample information
-      related to this term in dedicated JSON field.
-    @model the counter-example model to print.
+      related to this term in dedicated JSON field
 
     The format is the following:
     - counterexample is JSON object with fields indexed by names of files
@@ -218,7 +199,7 @@ val print_model_json :
         - "other"
 
     Example:
-    {
+    [
       "records.adb": {
           "84": [
             {
@@ -233,24 +214,19 @@ val print_model_json :
             }
           ]
       }
-    }
+    ]
 *)
 
-val model_to_string_json :
-  ?me_name_trans:(model_element_name -> string) ->
-  ?vc_line_trans:(int -> string) ->
-  model ->
-  string
-(** See print_model_json *)
-
 val interleave_with_source :
+  print_attrs:bool ->
   ?start_comment:string ->
   ?end_comment:string ->
   ?me_name_trans:(model_element_name -> string) ->
   model ->
-  filename:string ->
+  rel_filename:string ->
   source_code:string ->
-  string
+  locations:(Loc.position * 'a) list ->
+  string * (Loc.position * 'a) list
 (** Given a source code and a counter-example model interleaves
     the source code with information in about the counter-example.
     That is, for each location in counter-example trace creates
@@ -261,11 +237,14 @@ val interleave_with_source :
     @param end_comment the string that ends a comment
     @param me_name_trans see print_model
     @param model counter-example model
-    @param filename the file name of the source
+    @param rel_filename the file name of the source relative to the session
     @param source_code the input source code
+    @param locations the source locations that are found in the code
 
     @return the source code with added comments with information
-    about counter-example model
+    about counter-example model. The second part of the pair are
+    locations modified so that it takes into account that counterexamples
+    were added.
 *)
 
 (*
@@ -298,8 +277,23 @@ type model_parser =  string -> Printer.printer_mapping -> model
     and builds model data structure.
 *)
 
-type raw_model_parser =  string -> model_element list
-(** Parses the input string into model elements. *)
+type raw_model_parser =
+  Ident.ident Wstdlib.Mstr.t -> Ident.ident Wstdlib.Mstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
+    string list -> Ident.Sattr.t Wstdlib.Mstr.t -> string -> model_element list
+(** Parses the input string into model elements.
+    [raw_model_parser: proj->record_map->noarg_cons->s->mel]
+    [proj]: is the list of projections
+    [list_field]: is the list of field function definition
+    [record_map]: is a map associating the name of printed projections to the
+      fields (couple of printed field and model_trace name).
+    [noarg_cons]: List of constructors with no arguments (collected to avoid
+      confusion between variable and constructors)
+    [s]: model
+    [mel]: collected model
+ *)
+
+val register_remove_field:
+  (Ident.Sattr.t * model_value -> Ident.Sattr.t * model_value) -> unit
 
 val register_model_parser : desc:Pp.formatted -> string -> raw_model_parser -> unit
 

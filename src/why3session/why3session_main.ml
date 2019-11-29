@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,8 +16,10 @@ open Why3session_lib
 let cmds =
   [|
     Why3session_info.cmd;
-    Why3session_latex.cmd;
     Why3session_html.cmd;
+    Why3session_latex.cmd;
+    Why3session_update.cmd_update;
+(*
     Why3session_csv.cmd;
     Why3session_copy.cmd_mod;
     Why3session_copy.cmd_copy;
@@ -25,6 +27,7 @@ let cmds =
     Why3session_rm.cmd;
     Why3session_output.cmd;
     Why3session_run.cmd;
+*)
   |]
 
 let exec_name = Filename.basename Sys.argv.(0)

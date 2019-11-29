@@ -7,7 +7,7 @@
 
 module Spec
 
-  use import int.Int
+  use int.Int
 
   type addr
 
@@ -39,7 +39,7 @@ module Spec
   function update (reg: registers) (r: register) (v: int) : registers =
     fun r' -> if r' = r then v else reg r'
 
-  use import list.List
+  use list.List
 
   type stack = list int
 
@@ -70,7 +70,7 @@ module Spec
     | Cons i l -> exec_list l (exec i s)
     end
 
-  use import list.Append
+  use list.Append
 
   let rec lemma exec_append (c1 c2: code) (s: state) : unit
     ensures { exec_list (c1 ++ c2) s = exec_list c2 (exec_list c1 s) }
@@ -101,13 +101,13 @@ end
 
 module DWP
 
-  use import list.List
-  use import list.Append
-  use import Spec
+  use list.List
+  use list.Append
+  use Spec
 
   meta compute_max_steps 0x10000
 
-  predicate (-->) (x y: 'a) = "rewrite" x = y
+  predicate (-->) (x y: 'a) = [@rewrite] x = y
   meta rewrite_def predicate (-->)
 
   type post = state -> state -> bool
@@ -169,14 +169,14 @@ end
 
 module InfinityOfRegisters
 
-  use import int.Int
-  use import list.List
-  use import list.Append
-  use import Spec
-  use import DWP
+  use int.Int
+  use list.List
+  use list.Append
+  use Spec
+  use DWP
 
-  (** [compile e r] returns a list of instructions that stores the value
-      of [e] in register [r], without modifying any register [r' < r]. *)
+  (** `compile e r` returns a list of instructions that stores the value
+      of `e` in register `r`, without modifying any register `r' < r`. *)
 
   let rec compile (e: expr) (r: register) : hcode
     variant { e }
@@ -204,19 +204,19 @@ end
 
 module FiniteNumberOfRegisters
 
-  use import int.Int
-  use import list.List
-  use import list.Append
-  use import Spec
-  use import DWP
+  use int.Int
+  use list.List
+  use list.Append
+  use Spec
+  use DWP
 
   (** we have k registers, namely 0,1,...,k-1,
       and there are at least two of them, otherwise we can't add *)
   val constant k: int
     ensures { 2 <= result }
 
-  (** [compile e r] returns a list of instructions that stores the value
-      of [e] in register [r], without modifying any register [r' < r]. *)
+  (** `compile e r` returns a list of instructions that stores the value
+      of `e` in register `r`, without modifying any register `r' < r`. *)
 
   let rec compile (e: expr) (r: register) : hcode
     requires { 0 <= r < k }
@@ -242,14 +242,14 @@ end
 
 module OptimalNumberOfRegisters
 
-  use import int.Int
-  use import int.MinMax
-  use import list.List
-  use import list.Append
-  use import Spec
-  use import DWP
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Append
+  use Spec
+  use DWP
 
-  (** we have k registers, namely 0,1,...,k-1,
+  (** we have `k` registers, namely `0,1,...,k-1`,
       and there are at least two of them, otherwise we can't add *)
   val constant k: int
     ensures { 2 <= result }
@@ -264,10 +264,10 @@ module OptimalNumberOfRegisters
                     if n1 = n2 then 1 + n1 else max n1 n2
     end
 
-  (** Note: This is of course inefficient to recompute function [n] many
-      times. A realistic implementation would compute [n e] once for
-      each sub-expression [e], either with a first pass of tree decoration,
-      or with function [compile] returning the value of [n e] as well,
+  (** Note: This is of course inefficient to recompute function `n` many
+      times. A realistic implementation would compute `n e` once for
+      each sub-expression `e`, either with a first pass of tree decoration,
+      or with function `compile` returning the value of `n e` as well,
       in a bottom-up way *)
 
   function measure (e: expr) : int =
@@ -280,8 +280,8 @@ module OptimalNumberOfRegisters
 
   lemma measure_nonneg: forall e. measure e >= 0
 
-  (** [compile e r] returns a list of instructions that stores the value
-      of [e] in register [r], without modifying any register [r' < r]. *)
+  (** `compile e r` returns a list of instructions that stores the value
+      of `e` in register `r`, without modifying any register `r' < r`. *)
 
   let rec compile (e: expr) (r: register) : hcode
     requires { 0 <= r < k }

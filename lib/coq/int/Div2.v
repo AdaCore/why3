@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,8 +18,10 @@ Require int.Int.
 Require Import int.EuclideanDivision.
 
 (* Why3 goal *)
-Lemma div2 : forall (x:Z), exists y:Z, (x = (2%Z * y)%Z) \/
-  (x = ((2%Z * y)%Z + 1%Z)%Z).
+Lemma div2 :
+  forall (x:Numbers.BinNums.Z),
+  exists y:Numbers.BinNums.Z,
+  (x = (2%Z * y)%Z) \/ (x = ((2%Z * y)%Z + 1%Z)%Z).
 Proof.
 intros x.
 exists (div x 2).

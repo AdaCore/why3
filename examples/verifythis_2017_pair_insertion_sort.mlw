@@ -10,10 +10,10 @@ Author: Jean-Christophe Filliâtre (CNRS)
 
 module Challenge1
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
-  use import array.ArrayPermut
+  use int.Int
+  use ref.Refint
+  use array.Array
+  use array.ArrayPermut
 
   let pair_insertion_sort (a: array int)
     ensures { forall k l. 0 <= k <= l < length a -> a[k] <= a[l] }

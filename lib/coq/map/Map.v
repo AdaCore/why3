@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,7 +18,7 @@ Require HighOrd.
 Require Import ClassicalEpsilon.
 
 (* Why3 assumption *)
-Definition map (a:Type) (b:Type) := (a -> b).
+Definition map (a:Type) (b:Type) := a -> b.
 
 Global Instance map_WhyType : forall (a:Type) {a_WT:WhyType a} (b:Type) {b_WT:WhyType b}, WhyType (map a b).
 Proof.
@@ -30,10 +30,10 @@ apply excluded_middle_informative.
 Qed.
 
 (* Why3 goal *)
-Definition set: forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  (a -> b) -> a -> b -> (a -> b).
+Definition set {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  (a -> b) -> a -> b -> a -> b.
 Proof.
-intros a a_WT b b_WT m x y.
+intros m x y.
 intros x'.
 destruct (why_decidable_eq x x') as [H|H].
 exact y.
@@ -41,15 +41,15 @@ exact (m x').
 Defined.
 
 (* Why3 goal *)
-Lemma set_def : forall {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b},
-  forall (f:(a -> b)) (x:a) (v:b) (y:a), ((y = x) -> (((set f x v)
-  y) = v)) /\ ((~ (y = x)) -> (((set f x v) y) = (f y))).
+Lemma set'def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  forall (f:a -> b) (x:a) (v:b) (y:a),
+  ((y = x) -> ((set f x v y) = v)) /\ (~ (y = x) -> ((set f x v y) = (f y))).
 Proof.
-intros a a_WT b b_WT f x v y.
+intros f x v y.
 unfold set.
 case why_decidable_eq.
 intros <-.
-easy.
+split ; try easy ; intros H ; now elim H. (* TODO: replace by easy after 8.4 *)
 intros H.
 split ; intros H'.
 now elim H.

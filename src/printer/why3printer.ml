@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -146,19 +146,19 @@ let prio_binop = function
   | Timplies -> 1
   | Tiff -> 1
 
-let print_label = Pretty.print_label
-let print_labels = print_iter1 Slab.iter space print_label
+let print_attr = Pretty.print_attr
+let print_attrs = print_iter1 Sattr.iter space print_attr
 
-let print_ident_labels fmt id =
-  if not (Slab.is_empty id.id_label) then
-    fprintf fmt "@ %a" print_labels id.id_label
+let print_ident_attrs fmt id =
+  if not (Sattr.is_empty id.id_attrs) then
+    fprintf fmt "@ %a" print_attrs id.id_attrs
 
 let rec print_term fmt t = print_lterm 0 fmt t
 
 and print_lterm pri fmt t =
-  if Slab.is_empty t.t_label then print_tnode pri fmt t
+  if Sattr.is_empty t.t_attrs then print_tnode pri fmt t
   else fprintf fmt (protect_on (pri > 0) "%a %a")
-      print_labels t.t_label (print_tnode 0) t
+      print_attrs t.t_attrs (print_tnode 0) t
 
 and print_app pri fs fmt tl =
   match query_syntax fs.ls_name with
@@ -173,7 +173,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tvar v ->
       print_vs fmt v
   | Tconst c ->
-      Number.print_constant fmt c
+      Constant.print_def fmt c
   | Tapp (fs, tl) when unambig_fs fs ->
       print_app pri fs fmt tl
   | Tapp (fs, tl) ->
@@ -212,7 +212,7 @@ and print_tnode pri fmt t = match t.t_node with
   | Tfalse ->
       fprintf fmt "false"
   | Tbinop (b,f1,f2) ->
-      let asym = Slab.mem Term.asym_split f1.t_label in
+      let asym = Sattr.mem Term.asym_split f1.t_attrs in
       let p = prio_binop b in
       fprintf fmt (protect_on (pri > p) "%a %a@ %a")
         (print_lterm (p + 1)) f1 (print_binop ~asym) b (print_lterm p) f2
@@ -241,26 +241,26 @@ let print_constr fmt (cs,pjl) =
     | None -> print_ty_arg fmt ty
   in
   fprintf fmt "@[<hov 4>| %a%a%a@]" print_cs cs
-    print_ident_labels cs.ls_name
+    print_ident_attrs cs.ls_name
     (print_list nothing print_pj)
     (List.fold_right2 add_pj pjl cs.ls_args [])
 
 let print_type_decl fmt ts = match ts.ts_def with
   | NoDef ->
       fprintf fmt "@[<hov 2>type %a%a%a@]@\n@\n"
-        print_ts ts print_ident_labels ts.ts_name
+        print_ts ts print_ident_attrs ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
   | Alias ty ->
       fprintf fmt "@[<hov 2>type %a%a%a =@ %a@]@\n@\n"
-        print_ts ts print_ident_labels ts.ts_name
+        print_ts ts print_ident_attrs ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args print_ty ty
   | Range _ir -> (* TODO *)
       fprintf fmt "@[<hov 2>type %a%a%a =@ <range ...>@]@\n@\n"
-        print_ts ts print_ident_labels ts.ts_name
+        print_ts ts print_ident_attrs ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
   | Float _fp -> (* TODO *)
       fprintf fmt "@[<hov 2>type %a%a%a =@ <float ...>@]@\n@\n"
-        print_ts ts print_ident_labels ts.ts_name
+        print_ts ts print_ident_attrs ts.ts_name
         (print_list nothing print_tv_arg) ts.ts_args
 
 let print_type_decl fmt ts =
@@ -270,7 +270,7 @@ let print_type_decl fmt ts =
 let print_data_decl fst fmt (ts,csl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]@\n@\n"
     (if fst then "type" else "with") print_ts ts
-    print_ident_labels ts.ts_name
+    print_ident_attrs ts.ts_name
     (print_list nothing print_tv_arg) ts.ts_args
     (print_list newline print_constr) csl
 
@@ -285,7 +285,7 @@ let ls_kind ls = if ls.ls_value = None then "predicate" else "function"
 let print_param_decl fmt ls =
   fprintf fmt "@[<hov 2>%s %a%a%a%a@]@\n@\n"
     (ls_kind ls) print_ls ls
-    print_ident_labels ls.ls_name
+    print_ident_attrs ls.ls_name
     (print_list nothing print_ty_arg) ls.ls_args
     (print_option print_ls_type) ls.ls_value
 
@@ -297,7 +297,7 @@ let print_logic_decl fst fmt (ls,ld) =
   let vl,e = open_ls_defn ld in
   fprintf fmt "@[<hov 2>%s %a%a%a%a =@ %a@]@\n@\n"
     (if fst then ls_kind ls else "with") print_ls ls
-    print_ident_labels ls.ls_name
+    print_ident_attrs ls.ls_name
     (print_list nothing print_vs_arg) vl
     (print_option print_ls_type) ls.ls_value print_term e;
   List.iter forget_var vl
@@ -308,7 +308,7 @@ let print_logic_decl first fmt d =
 
 let print_ind fmt (pr,f) =
   fprintf fmt "@[<hov 4>| %a%a :@ %a@]"
-    print_pr pr print_ident_labels pr.pr_name print_term f
+    print_pr pr print_ident_attrs pr.pr_name print_term f
 
 let ind_sign = function
   | Ind   -> "inductive"
@@ -317,7 +317,7 @@ let ind_sign = function
 let print_ind_decl s fst fmt (ps,bl) =
   fprintf fmt "@[<hov 2>%s %a%a%a =@ @[<hov>%a@]@]@\n@\n"
     (if fst then ind_sign s else "with") print_ls ps
-    print_ident_labels ps.ls_name
+    print_ident_attrs ps.ls_name
     (print_list nothing print_ty_arg) ps.ls_args
     (print_list newline print_ind) bl
 
@@ -329,7 +329,7 @@ let print_pkind = Pretty.print_pkind
 
 let print_prop_decl fmt (k,pr,f) =
   fprintf fmt "@[<hov 2>%a %a%a : %a@]@\n@\n" print_pkind k
-    print_pr pr print_ident_labels pr.pr_name print_term f
+    print_pr pr print_ident_attrs pr.pr_name print_term f
 
 let print_prop_decl fmt (k,pr,f) = match k with
   | Paxiom when query_remove pr.pr_name -> ()
@@ -370,6 +370,7 @@ let print_meta_arg fmt = function
   | MApr pr -> fprintf fmt "prop %a" print_pr pr
   | MAstr s -> fprintf fmt "\"%s\"" s
   | MAint i -> fprintf fmt "%d" i
+  | MAid id -> fprintf fmt "%s" (id_unique iprinter id)
 
 let print_qt fmt th =
   if th.th_path = [] then print_th fmt th else

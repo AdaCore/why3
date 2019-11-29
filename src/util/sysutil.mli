@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -33,6 +33,9 @@ val file_contents_buf : string -> Buffer.t
 (* put the content of a file in a formatter *)
 val file_contents_fmt : string -> Format.formatter -> unit
 
+(* [write_file f c] writes the content [c] into the file [f] *)
+val write_file : string -> string -> unit
+
 val open_temp_file :
   ?debug:bool -> (* don't remove the file *)
   string -> (string -> out_channel -> 'a) -> 'a
@@ -49,27 +52,41 @@ val copy_dir : string -> string -> unit
     currently the directory must contains only directories and common files
 *)
 
-val path_of_file : string -> string list
-(** [path_of_file filename] return the absolute path of [filename] *)
+val concat : string -> string -> string
+(** like [Filename.concat] but returns only second string when it is already absolute *)
 
-(* unused ?
-val normalize_filename : string -> string
+type file_path
+val empty_path : file_path
+val add_to_path : file_path -> string -> file_path
+val is_empty_path : file_path -> bool
+val decompose_path : file_path -> string list
+val basename : file_path -> string
+
+val print_file_path : Format.formatter -> file_path -> unit
+
+val system_independent_path_of_file : string -> file_path
+(** [system_independent_path_of_file filename] return the access path
+    of [filename], in a system-independent way *)
+
+val system_dependent_absolute_path : string -> file_path -> string
+(** [system_dependent_absolute_path d p] returns the
+    system-dependent absolute path for the abstract path [p] relative
+    to directory [d] *)
+
+val relativize_filename : string -> string -> file_path
+(** [relativize_filename base filename] returns an access path for
+    filename [filename] relatively to [base]. The [filename] is split
+    into path components using the system-dependent calls to
+    [Filename.dirname] and [Filename.basename].
+
+    OBSOLETE COMMENT? [base] should not contain occurrences of "." and "..",
+    which can be removed by calling first [normalize_filename].
+
+    FIXME: this function does not handle symbolic links properly
  *)
-(** [normalize_filename filename] removes from [filename] occurrences of
-    "." and ".." that denote respectively the current directory and
-    parent directory, whenever possible *)
 
-val relativize_filename : string -> string -> string
-(** [relativize_filename base filename] relativize the filename
-    [filename] according to [base]. [base] should not contain occurrences of
-    "." and "..", which can be removed by calling first [normalize_filename].
-*)
-
-val absolutize_filename : string -> string -> string
-(** [absolutize_filename base filename] absolutize the filename
-    [filename] according to [base] *)
 
 val uniquify : string -> string
-(** find filename that doesn't exists based on the given filename.
+(** find filename that doesn't exist based on the given filename.
     Be careful the file can be taken after the return of this function.
 *)

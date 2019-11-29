@@ -28,11 +28,11 @@ why3_vc Mul_distr_l by (simp add: ring_distribs)
 
 why3_vc Mul_distr_r by (simp add: ring_distribs)
 
-why3_vc infix_mn_def by simp
+why3_vc infix_mnqtdef by simp
 
 why3_vc NonTrivialRing by simp
 
-why3_vc infix_lseq_def by auto
+why3_vc infix_lseqqtdef by auto
 
 why3_vc Refl by simp
 
@@ -55,7 +55,7 @@ section {* Absolute Value *}
 
 why3_open "int/Abs.xml"
 
-why3_vc abs_def by simp
+why3_vc absqtdef by simp
 
 why3_vc Abs_le by auto
 
@@ -80,9 +80,9 @@ why3_vc Min_comm by simp
 
 why3_vc Min_assoc by simp
 
-why3_vc max_def by auto
+why3_vc maxqtdef by auto
 
-why3_vc min_def by auto
+why3_vc minqtdef by auto
 
 why3_end
 
@@ -154,7 +154,7 @@ why3_vc Mod_mult using assms by (simp add: emod_def add.commute)
 why3_vc Mod_bound using assms by (simp_all add: emod_def)
 
 why3_vc Div_unique using assms
- proof - 
+ proof -
   have h0: "y \<noteq> 0" using assms by auto
   have h1: "x = y * (x ediv y) + (x emod y)" using h0 Div_mod by blast
   have h2: "0 \<le> x emod y \<and> x emod y < y" using assms H1 h0 Mod_bound zabs_def
@@ -166,16 +166,16 @@ why3_vc Div_unique using assms
    assume a:"q < x ediv y"
    have h5: "x ediv y \<ge> q + 1" using a by linarith
    have h6: "y * (x ediv y) >= y * (q + 1)" by (metis H1 h5 le_less mult_left_mono)
-   have h7: "y * (x ediv y) >= q * y + y" by (metis Comm1 Mul_distr_l h6 monoid_mult_class.mult.right_neutral) 
+   have h7: "y * (x ediv y) >= q * y + y" by (metis Comm1 Mul_distr_l h6 monoid_mult_class.mult.right_neutral)
    thus "x ediv y = q" using H3 h1 h2 h7 by linarith
    next
    assume a:"\<not> q < x ediv y"
-   show "x ediv y = q"    
+   show "x ediv y = q"
    proof (cases "x ediv y < q")
     assume b:"x ediv y < q"
     have h5: "x ediv y \<le> q - 1" using b by linarith
     have h6: "y * (x ediv y) <= y * (q - 1)" by (metis H1 h5 le_less mult_left_mono)
-    have h7: "y * (x ediv y) <= q * y - y" by (metis Comm1 h6 int_distrib(4) monoid_mult_class.mult.right_neutral) 
+    have h7: "y * (x ediv y) <= q * y - y" by (metis Comm1 h6 int_distrib(4) monoid_mult_class.mult.right_neutral)
     thus "x ediv y = q" using H2 h3 h7 by linarith
     next
     assume b:"\<not> x ediv y < q"
@@ -320,13 +320,16 @@ why3_vc Power_sum using assms by (simp add: nat_add_distrib power_add)
 
 why3_vc Power_mult using assms by (simp add: nat_mult_distrib power_mult)
 
-why3_vc Power_mult2 by (simp add: power_mult_distrib)
+why3_vc Power_comm1 by (simp add: power_mult_distrib)
+
+why3_vc Power_comm2 by (simp add: power_mult_distrib)
 
 why3_vc Power_non_neg using assms by simp
+
+why3_vc Power_pos using assms by simp
 
 why3_vc Power_monotonic using assms by (simp add: power_increasing)
 
 why3_end
 
 end
-

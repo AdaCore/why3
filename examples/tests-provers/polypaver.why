@@ -7,14 +7,14 @@ theory TestReal
 
 *)
 
-  use import real.Real
+  use real.Real
 
   goal add1 : 1.0 + 2.0 = 3.0
 
   goal add2 : 1.2 + 3.4 = 5.6
 
-  use import real.Square
-  use import real.ExpLog
+  use real.Square
+  use real.ExpLog
 
   goal exp_hyp:
     forall x:real. 0.01 < x < 5.1785 ->

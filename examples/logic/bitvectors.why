@@ -1,20 +1,20 @@
 theory TestBV
 
-  use import int.Int
-  use import bv.BV32
+  use int.Int
+  use bv.BV32
 
-  constant b0000  : t = of_int 0b0000
-  constant b0001  : t = of_int 0b0001
-  constant b0010  : t = of_int 0b0010
-  constant b0011  : t = of_int 0b0011
-  constant b0110  : t = of_int 0b0110
-  constant b0101  : t = of_int 0b0101
-  constant b0111  : t = of_int 0b0111
-  constant b1100  : t = of_int 0b1100
-  constant b11100 : t = of_int 0b11100
+  constant b0000  : t = (0b0000:t)
+  constant b0001  : t = (0b0001:t)
+  constant b0010  : t = (0b0010:t)
+  constant b0011  : t = (0b0011:t)
+  constant b0110  : t = (0b0110:t)
+  constant b0101  : t = (0b0101:t)
+  constant b0111  : t = (0b0111:t)
+  constant b1100  : t = (0b1100:t)
+  constant b11100 : t = (0b11100:t)
 
-  constant bv2    : t = of_int 2
-  constant bv31   : t = of_int 31
+  constant bv2    : t = (2:t)
+  constant bv31   : t = (31:t)
 
   goal g1 : bw_and b0011 b0110 = b0010
   goal f1 : bw_and b0011 b0110 = b0011
@@ -23,21 +23,21 @@ theory TestBV
   goal f2 :  bw_or b0011 b0110 = b0110
 
   goal g3 :  bw_xor b0011 b0110 = b0101
-  goal g4 :  bw_not b0011 = (of_int 0xFFFFFFFC)
+  goal g4 :  bw_not b0011 = (0xFFFFFFFC:t)
 
   goal g3a : lsr_bv b0111 bv2 = b0001
   goal g3b : lsr_bv ones bv31 = b0001
-  goal f3c : lsr_bv ones (of_int 0x10000001) = (of_int 0x7FFFFFFF) (* should be false: we don't take the modulo of the second argument. *)
+  goal f3c : lsr_bv ones (0x10000001:t) = (0x7FFFFFFF:t) (* should be false: we don't take the modulo of the second argument. *)
 
   goal g3aa : lsr b0111 2 = b0001
   goal g3bb : lsr ones 31 = b0001
-  goal f3cc : lsr ones 0x10000001 = (of_int 0x7FFFFFFF) (* should be false: we don't take the modulo of the second argument. *)
+  goal f3cc : lsr ones 0x10000001 = (0x7FFFFFFF:t) (* should be false: we don't take the modulo of the second argument. *)
 
   goal g4a : lsl_bv b0111 bv2 = b11100
-  goal g4b : lsl_bv b0001 bv31 = (of_int 0x80000000)
+  goal g4b : lsl_bv b0001 bv31 = (0x80000000:t)
 
   goal g4aa : lsl b0111 2 = b11100
-  goal g4bb : lsl b0001 31 = (of_int 0x80000000)
+  goal g4bb : lsl b0001 31 = (0x80000000:t)
 
   goal g5a : asr_bv b0111 bv2 = b0001
   goal g5b : asr_bv ones bv31 = ones
@@ -52,13 +52,13 @@ theory TestBV
   goal g7b : to_int ones = -1
 
   goal g8a : nth_bv b0110 bv2 = True
-  goal g8b : nth_bv b0110 (of_int 3) = False
+  goal g8b : nth_bv b0110 (3:t) = False
 
   goal g8aa : nth b0110 2 = True
   goal g8bb : nth b0110 3 = False
 
-  goal gtt : t'int (lsl_bv (of_int 3) (of_int 30)) > 0 (* = 0xC0000000 *)
-  goal gttt : t'int (lsl (of_int 3) 30) > 0 (* = 0xC0000000 *)
+  goal gtt : t'int (lsl_bv (3:t) (30:t)) > 0 (* = 0xC0000000 *)
+  goal gttt : t'int (lsl (3:t) 30) > 0 (* = 0xC0000000 *)
 
   goal not_not : forall v:t. bw_not (bw_not v) = v
 

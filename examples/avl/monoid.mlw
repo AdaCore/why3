@@ -23,8 +23,8 @@ end
 (** {2 Abstract monoid with aggregation} *)
 module MonoidSum
 
-  use import seq.Seq
-  clone import Monoid as M
+  use seq.Seq
+  clone import Monoid as M with axiom .
 
   function agg (f:'a -> t) (s:seq 'a) : t
   axiom agg_empty : forall f:'a -> t. agg f empty = zero
@@ -38,11 +38,11 @@ end
 (** {2 Definition of aggregation (refinement of MonoidSum} *)
 module MonoidSumDef
 
-  use import seq.Seq
-  use import seq.FreeMonoid
+  use seq.Seq
+  use seq.FreeMonoid
 
   (* TODO: do that refinement correctly ! *)
-  clone import Monoid as M
+  clone import Monoid as M with axiom .
 
   let rec ghost function agg (f:'a -> t) (s:seq 'a) : M.t
     variant { length s }
@@ -70,7 +70,7 @@ end
 (** {2 Computable monoid} *)
 module ComputableMonoid
 
-  clone export Monoid
+  clone export Monoid with axiom .
 
   (** Abstract routines computing operations in the monoid. *)
   val zero () : t ensures { result = zero }

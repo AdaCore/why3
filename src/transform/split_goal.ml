@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,16 +26,16 @@ type split = {
   comp_match : known_map option;
 }
 
-let stop f = Slab.mem Term.stop_split f.t_label
-let asym f = Slab.mem Term.asym_split f.t_label
+let stop f = Sattr.mem Term.stop_split f.t_attrs
+let asym f = Sattr.mem Term.asym_split f.t_attrs
 
-let case_split = Ident.create_label "case_split"
-let case f = Slab.mem case_split f.t_label
+let case_split = Ident.create_attribute "case_split"
+let case f = Sattr.mem case_split f.t_attrs
 
-let compiled = Ident.create_label "split_goal: compiled match"
+let compiled = Ident.create_attribute "split_goal: compiled match"
 
 let unstop f =
-  t_label ?loc:f.t_loc (Slab.remove stop_split f.t_label) f
+  t_attr_set ?loc:f.t_loc (Sattr.remove stop_split f.t_attrs) f
 
 (* Represent monoid of formula interpretation for conjonction and disjunction *)
 module M = struct
@@ -175,7 +175,7 @@ let fold_cond = function
   | x -> x
 
 let rec split_core sp f =
-  let (~-) = t_label_copy f in
+  let (~-) = t_attr_copy f in
   let ro = sp.right_only in
   let alias fo1 unop f1 =
     if fo1 == f1 then f else - unop f1 in
@@ -203,7 +203,7 @@ let rec split_core sp f =
   let bimap = bimap (fun _ t -> Zero t) cpy in
   let iclose = bimap ngt t_implies in
   let aclose = bimap cpy t_and in
-  let nclose ps = map (fun t -> Zero (t_label_copy t t_true)) t_not ps in
+  let nclose ps = map (fun t -> Zero (t_attr_copy t t_true)) t_not ps in
   let ret pos neg bwd fwd side cpos cneg =
       { pos; neg; bwd; fwd; side; cpos; cneg } in
   let r = match f.t_node with
@@ -328,7 +328,7 @@ let rec split_core sp f =
   | Tnot f1 ->
       let sf = split_core (in_csp sp) f1 in
       let (!) = alias f1 t_not in
-      let (|>) zero = map (fun t -> !+(t_label_copy t zero)) (!) in
+      let (|>) zero = map (fun t -> !+(t_attr_copy t zero)) (!) in
       let pos = t_false |> sf.neg and neg = t_true |> sf.pos in
       ret pos neg !(sf.fwd) !(sf.bwd) sf.side sf.cneg sf.cpos
   | Tlet (t,fb) ->
@@ -378,18 +378,18 @@ let rec split_core sp f =
           in
           k join
       | Some kn ->
-          if Slab.mem compiled f.t_label
+          if Sattr.mem compiled f.t_attrs
           then
-            (* keep the labels for single-case match *)
-            let lab = match bl with
-              | [_] -> Slab.remove case_split
-                    (Slab.remove compiled f.t_label)
-              | _ -> Slab.empty in
+            (* keep the attributes for single-case match *)
+            let attrs = match bl with
+              | [_] -> Sattr.remove case_split
+                    (Sattr.remove compiled f.t_attrs)
+              | _ -> Sattr.empty in
             let join sbl =
               let vs = create_vsymbol (id_fresh "q") (t_type t) in
               let tv = t_var vs in
               let (~-) fb =
-                t_label ?loc:f.t_loc lab (t_let_close_simp vs t fb) in
+                t_attr_set ?loc:f.t_loc attrs (t_let_close_simp vs t fb) in
               let _, pos, neg, side =
                 List.fold_left (fun (cseen, pos, neg, side) (p, _, sf) ->
                   let cseen, vl, cond = pat_condition kn tv cseen p in
@@ -410,7 +410,7 @@ let rec split_core sp f =
             k join
           else
             let mk_let = t_let_close_simp in
-            let mk_case t bl = t_label_add compiled (t_case_close t bl) in
+            let mk_case t bl = t_attr_add compiled (t_case_close t bl) in
             let mk_b b = let p, f = t_open_branch b in [p], f in
             let bl = List.map mk_b bl in
             rc (- Pattern.compile_bare ~mk_case ~mk_let [t] bl)
@@ -526,15 +526,12 @@ let prep_premise split = Trans.store (fun t ->
 
 let split_goal_full  = prep_goal full_proof
 let split_goal_right = prep_goal right_proof
-let split_goal_wp    = split_goal_right
 
 let split_all_full  = prep_all full_proof
 let split_all_right = prep_all right_proof
-let split_all_wp    = split_all_right
 
 let split_premise_full  = prep_premise full_proof
 let split_premise_right = prep_premise right_proof
-let split_premise_wp    = split_premise_right
 
 let () = Trans.register_transform_l "split_goal_full" split_goal_full
   ~desc:"Put@ the@ goal@ in@ a@ conjunctive@ form,@ \
@@ -553,10 +550,3 @@ let () = Trans.register_transform_l "split_all_right" split_all_right
   ~desc:"Same@ as@ split_goal_right,@ but@ also@ split@ premises."
 let () = Trans.register_transform "split_premise_right" split_premise_right
   ~desc:"Same@ as@ split_all_right,@ but@ split@ only@ premises."
-
-let () = Trans.register_transform_l "split_goal_wp" split_goal_wp
-  ~desc:"Same@ as@ split_goal_right."
-let () = Trans.register_transform_l "split_all_wp" split_all_wp
-  ~desc:"Same@ as@ split_goal_wp,@ but@ also@ split@ premises."
-let () = Trans.register_transform "split_premise_wp" split_premise_wp
-  ~desc:"Same@ as@ split_all_wp,@ but@ split@ only@ premises."

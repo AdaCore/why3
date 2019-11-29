@@ -11,7 +11,7 @@
  *)
 
 module Spec
-  use import int.Int
+  use int.Int
   use export array.Array
 
   use export array.ArraySum
@@ -33,9 +33,9 @@ end
 (* Naive solution, in O(N^3) *)
 module Algo1
 
-  use import int.Int
-  use import ref.Refint
-  use import Spec
+  use int.Int
+  use ref.Refint
+  use Spec
 
   let maximum_subarray (a: array int) (ghost lo hi: ref int): int
     ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
@@ -71,9 +71,9 @@ end
 
 module Algo2
 
-  use import int.Int
-  use import ref.Refint
-  use import Spec
+  use int.Int
+  use ref.Refint
+  use Spec
 
   let maximum_subarray (a: array int) (ghost lo hi: ref int): int
     ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
@@ -105,10 +105,10 @@ end
 
 module Algo3
 
-  use import int.Int
-  use import ref.Refint
-  use import int.ComputerDivision
-  use import Spec
+  use int.Int
+  use ref.Refint
+  use int.ComputerDivision
+  use Spec
 
   let rec maximum_subarray_rec (a: array int) (l h: int) (ghost lo hi: ref int)
     : int
@@ -175,9 +175,9 @@ end
 
 module Algo4
 
-  use import int.Int
-  use import ref.Refint
-  use import Spec
+  use int.Int
+  use ref.Refint
+  use Spec
 
   let maximum_subarray (a: array int) (ghost lo hi: ref int): int
     ensures { 0 <= !lo <= !hi <= length a && result = sum a !lo !hi }
@@ -204,8 +204,8 @@ end
 
 module Algo5
 
-  use import int.Int
-  use import ref.Refint
+  use int.Int
+  use ref.Refint
   use export array.Array
   use export array.ArraySum
 
@@ -246,17 +246,18 @@ end
 
 module BoundedIntegers
 
-  use import int.Int
-  use import mach.int.Int63
-  use import mach.int.Refint63
-  use import mach.array.Array63
+  use int.Int
+  use mach.int.Int63
+  use mach.int.Refint63
+  use seq.Seq
+  use mach.array.Array63
   use int.Sum
 
   function sum (a: array int63) (lo hi: int) : int =
     Sum.sum (fun i -> (a[i] : int)) lo hi
 
   let maximum_subarray (a: array int63) (ghost lo hi: ref int): int63
-    requires { "no overflow" forall l h. 0 <= l <= h <= length a ->
+    requires { [@no overflow] forall l h. 0 <= l <= h <= length a ->
                sum a l h <= max_int }
     ensures { 0 <= !lo <= !hi <= length a && result  = sum a !lo !hi }
     ensures { forall l h. 0 <= l <= h <= length a -> result >= sum a !lo !hi }

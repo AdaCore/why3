@@ -1,0 +1,29 @@
+module M
+  use int.Int
+
+  type int_type = Integer int
+
+  goal G : forall x : int_type. match x with Integer y -> y > 0 end
+
+  type t = A | B int
+
+  goal g2: forall x. x = A
+
+  goal g4: forall x. x = B 0
+
+  type u = Au int int
+
+  goal g5: forall x. x = Au 0 0
+
+  type mylist = | Nil | Cons int mylist
+
+  let rec function len l = match l with
+  | Nil -> 0
+  | Cons _ l' -> 1 + len l'
+  end
+
+  goal g1: forall l: mylist. len l = 0
+
+  goal g7: forall l: mylist. l = Nil
+
+end

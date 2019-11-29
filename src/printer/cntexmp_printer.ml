@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Format
+open Wstdlib
 open Ident
 open Term
 
@@ -46,7 +46,7 @@ module TermCmp = struct
 	    else false
 
   let compare a b =
-    if (a.t_loc = b.t_loc) && (a.t_label = b.t_label)
+    if (a.t_loc = b.t_loc) && (a.t_attrs = b.t_attrs)
     then 0 else
       (* Order the terms accoridng to their source code locations  *)
       if before a.t_loc b.t_loc then 1
@@ -56,29 +56,9 @@ end
 
 module S = Set.Make(TermCmp)
 
-let model_trace_regexp = Str.regexp "model_trace:"
-  (* The term labeled with "model_trace:name" will be in counter-example with name "name" *)
-
-let label_starts_with regexp l =
-  try
-    ignore(Str.search_forward regexp l.lab_string 0);
-    true
-  with Not_found -> false
-
-let get_label labels regexp =
-  Slab.choose (Slab.filter (label_starts_with regexp) labels)
-
-let print_label fmt l =
-  fprintf fmt "\"%s\"" l.lab_string
-
-let model_label = Ident.create_label "model"
-  (* This label identifies terms that should be in counter-example. *)
-let model_vc_term_label = Ident.create_label "model_vc"
-  (* This label identifies the term that triggers the VC. *)
-
 let add_model_element (el: term) info_model =
  (* Add element el (term) to info_model.
-    If an element with the same hash (the same set of labels + the same
+    If an element with the same hash (the same set of attributes + the same
     location) as the element el already exists in info_model, replace it with el.
 
     The reason is that  we do not want to display two model elements with the same
@@ -98,68 +78,61 @@ let add_model_element (el: term) info_model =
   let info_model = S.remove el info_model in
   S.add el info_model
 
-let add_old lab_str =
-  try
-    let pos = Str.search_forward (Str.regexp "@") lab_str 0 in
-    let after = String.sub lab_str pos ((String.length lab_str)-pos) in
-    if after = "@init" then
-      (String.sub lab_str 0 pos) ^ "@old"
-    else lab_str
-  with Not_found -> lab_str ^ "@old"
-
-let model_trace_for_postcondition ~labels (info: vc_term_info)  =
-  (* Modifies the  model_trace label of a term in the postcondition:
-     - if term corresponds to the initial value of a function
-     parameter, model_trace label will have postfix @old
-     - if term corresponds to the return value of a function, add
-     model_trace label in a form function_name@result
-  *)
-  try
-    let trace_label = get_label labels model_trace_regexp in
-    let lab_str = add_old trace_label.lab_string in
-    if lab_str = trace_label.lab_string then
-      labels
-    else
-      let other_labels = Slab.remove trace_label labels in
-      Slab.add
-	(Ident.create_label lab_str)
-	other_labels
-  with Not_found ->
-    (* no model_trace label => the term represents the return value *)
-    Slab.add
-      (Ident.create_label
-	 ("model_trace:" ^ (Opt.get_def "" info.vc_func_name)  ^ "@result"))
-      labels
-
-let get_fun_name name =
-  let splitted = Strings.bounded_split ':' name 2 in
-  match splitted with
-  | _::[second] ->
-    second
-  | _ ->
-    ""
-
 let check_enter_vc_term t in_goal vc_term_info =
   (* Check whether the term that triggers VC is entered.
      If it is entered, extract the location of the term and if the VC is
      postcondition or precondition of a function, extract the name of
      the corresponding function.
   *)
-  if in_goal && Slab.mem model_vc_term_label t.t_label then begin
+  if in_goal && Sattr.mem Ity.annot_attr t.t_attrs then begin
     vc_term_info.vc_inside <- true;
-    vc_term_info.vc_loc <- t.t_loc;
-    try
-      (* Label "model_func" => the VC is postcondition or precondition *)
-      (* Extract the function name from "model_func" label *)
-      let fun_label = get_label t.t_label (Str.regexp "model_func") in
-      vc_term_info.vc_func_name <- Some (get_fun_name fun_label.lab_string);
-    with Not_found ->
-      (* No label "model_func" => the VC is not postcondition or precondition *)
-      ()
+    vc_term_info.vc_loc <- t.t_loc
   end
 
 let check_exit_vc_term t in_goal info =
   (* Check whether the term triggering VC is exited. *)
-  if in_goal && Slab.mem model_vc_term_label t.t_label then begin
+  if in_goal && Sattr.mem Ity.annot_attr t.t_attrs then begin
     info.vc_inside <- false;
   end
+
+(* This is used to update info_labels of info in the printer. This takes the
+   label informations present in the term and add a location to help pretty
+   printing the counterexamples.
+   This also takes the information for if_branching "branch_id=" used by API
+   users.
+*)
+let update_info_labels lsname cur_attrs t ls =
+  let cur_l =
+    match Mstr.find lsname cur_attrs with
+    | exception Not_found -> Sattr.empty
+    | s -> s
+  in
+  let updated_attr_labels =
+    (* Change attributes labels with "at:" to located
+       "at:[label]:loc:filename:line" *)
+    Sattr.fold (fun attr acc ->
+        if Strings.has_prefix "at:" attr.attr_string then
+          let (f, l, _, _) =
+            match t.t_loc with
+            | None -> Loc.get (Opt.get_def Loc.dummy_position ls.ls_name.id_loc)
+            | Some loc -> Loc.get loc
+          in
+          let attr = create_attribute (attr.attr_string ^ ":loc:" ^ f ^ ":" ^ (string_of_int l)) in
+          Sattr.add attr acc
+        else
+          if Strings.has_prefix "branch_id=" attr.attr_string then
+            Sattr.add attr acc
+          else
+            acc
+      ) (Sattr.union t.t_attrs ls.ls_name.id_attrs) cur_l
+  in
+  Mstr.add lsname updated_attr_labels cur_attrs
+
+let check_for_counterexample t =
+  let is_app t =
+    match t.t_node with
+    | Tapp (ls, []) -> not (Sattr.mem proxy_attr ls.ls_name.id_attrs)
+    | _ -> false
+  in
+  not (Sattr.mem proxy_attr t.t_attrs) &&
+  t.t_loc <> None && (is_app t)

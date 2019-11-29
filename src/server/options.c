@@ -1,7 +1,7 @@
 /********************************************************************/
 /*                                                                  */
 /*  The Why3 Verification Platform   /   The Why3 Development Team  */
-/*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  */
+/*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  */
 /*                                                                  */
 /*  This software is distributed under the terms of the GNU Lesser  */
 /*  General Public License version 2.1, with the special exception  */
@@ -16,7 +16,8 @@
 #include "options.h"
 
 int parallel = 1;
-char* basename = NULL;
+/* global data doesn't need null initialization, so none provided here */
+char* socketname;
 bool logging = false;
 bool single_client = false;
 
@@ -30,7 +31,7 @@ void parse_options(int argc, char **argv) {
   };
   while (1) {
      int option_index = 0;
-     char c = 0;
+     int c = 0;
      c = getopt_long (argc, argv, "j:s:",
                       long_options, &option_index);
      /* Detect the end of the options. */
@@ -65,7 +66,7 @@ void parse_options(int argc, char **argv) {
          break;
 
        case 's':
-         basename = optarg;
+         socketname = optarg;
          break;
 
        case '?':
@@ -77,12 +78,11 @@ void parse_options(int argc, char **argv) {
      }
   }
   if (optind < argc) {
-    printf("extra arguments, stopping\n");
+    printf("extra arguments, stopping [opt_index=%d,argc=%d]\n",optind,argc);
     exit(1);
   }
-  if (basename == NULL) {
+  if (socketname == NULL) {
     printf("need to specify a socket name using --socket\n");
     exit(1);
   }
 }
-

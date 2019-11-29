@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -68,7 +68,7 @@ rule xml_prolog fixattrs = parse
 | "<?xml" space+ "version=\"1.0\"" space+ "encoding=\"UTF-8\"" space+ "?>"
     { xml_doctype fixattrs "1.0" "" lexbuf }
 | "<?xml" ([^'?']|'?'[^'>'])* "?>"
-    { Debug.dprintf debug "[Xml warning] prolog ignored@.";
+    { Debug.dprintf debug "prolog ignored@.";
       xml_doctype fixattrs "1.0" "" lexbuf }
 | _
     { parse_error "wrong prolog" }
@@ -99,25 +99,25 @@ and elements fixattrs group_stack element_stack = parse
       { match group_stack with
          | [] ->
              Debug.dprintf debug
-               "[Xml warning] unexpected closing Xml element `%s'@."
+               "unexpected closing Xml element `%s'@."
                celem;
              elements fixattrs group_stack element_stack lexbuf
          | (elem,att,stack)::g ->
              if celem <> elem then
                Debug.dprintf debug
-                 "[Xml warning] Xml element `%s' closed by `%s'@."
+                 "Xml element `%s' closed by `%s'@."
                  elem celem;
              let e = mk_element elem att element_stack in
              elements fixattrs g (e::stack) lexbuf
        }
   | '<'
-      { Debug.dprintf debug "[Xml warning] unexpected '<'@.";
+      { Debug.dprintf debug "unexpected '<'@.";
         elements fixattrs group_stack element_stack lexbuf }
   | eof
       { match group_stack with
          | [] -> element_stack
          | (elem,_,_)::_ ->
-             Debug.dprintf debug "[Xml warning] unclosed Xml element `%s'@." elem;
+             Debug.dprintf debug "unclosed Xml element `%s'@." elem;
              pop_all group_stack element_stack
       }
   | _ as c
@@ -170,6 +170,13 @@ and string_val = parse
   | "&amp;"
       { Buffer.add_char buf '&';
         string_val lexbuf }
+  | "&#" (digit+ as n) ';'
+      { let n = try int_of_string n with _ -> 256 in
+        if n >= 128 then parse_error "unrecognized entity";
+        Buffer.add_char buf (Char.chr n);
+        string_val lexbuf }
+  | '&'
+      { parse_error "unrecognized entity" }
   | [^ '"'] as c
       { Buffer.add_char buf c;
         string_val lexbuf }

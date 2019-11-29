@@ -1,0 +1,209 @@
+
+(** {1 Basic Algebra Theories} *)
+
+(** {2 Associativity} *)
+
+module Assoc
+
+  type t
+  function op t t : t
+  axiom Assoc : forall x y z : t. op (op x y) z = op x (op y z)
+
+end
+
+(** {2 Commutativity} *)
+
+module Comm
+
+  type t
+  function op t t : t
+  axiom Comm : forall x y : t. op x y = op y x
+
+end
+
+(** {2 Associativity and Commutativity} *)
+
+module AC
+
+  clone export Assoc with axiom Assoc
+  clone export Comm with type t = t, function op = op, axiom Comm
+  meta AC function op
+
+end
+
+(** {2 Monoids} *)
+
+module Monoid
+
+  clone export Assoc with axiom Assoc
+  constant unit : t
+  axiom Unit_def_l : forall x:t. op unit x = x
+  axiom Unit_def_r : forall x:t. op x unit = x
+
+end
+
+(** {2 Commutative Monoids} *)
+
+module CommutativeMonoid
+
+  clone export Monoid with axiom Assoc, axiom Unit_def_l, axiom Unit_def_r
+  clone export Comm with type t = t, function op = op, axiom Comm
+  meta AC function op
+
+end
+
+(** {2 Groups} *)
+
+module Group
+
+  clone export Monoid with axiom Assoc, axiom Unit_def_l, axiom Unit_def_r
+  function inv t : t
+  axiom Inv_def_l : forall x:t. op (inv x) x = unit
+  axiom Inv_def_r : forall x:t. op x (inv x) = unit
+
+(***
+  lemma Inv_unit : forall x y:t. op x (inv y) = unit -> x = y
+*)
+
+end
+
+(** {2 Commutative Groups} *)
+
+module CommutativeGroup
+
+  clone export Group with axiom .
+  clone export Comm with type t = t, function op = op, axiom Comm
+  meta AC function op
+
+end
+
+(** {2 Rings} *)
+
+module Ring
+
+  type t
+  constant zero : t
+  function (+) t t : t
+  function (-_) t : t
+  function (*) t t : t
+
+  clone export CommutativeGroup with type t = t,
+                                constant unit = zero,
+                                function op = (+),
+                                function inv = (-_),
+                                axiom .
+
+  clone Assoc as MulAssoc with type t = t, function op = (*), axiom Assoc
+
+  axiom Mul_distr_l : forall x y z : t. x * (y + z) = x * y + x * z
+  axiom Mul_distr_r : forall x y z : t. (y + z) * x = y * x + z * x
+
+end
+
+(** {2 Commutative Rings} *)
+
+module CommutativeRing
+
+  clone export Ring with axiom .
+  clone Comm as MulComm with type t = t, function op = (*), axiom Comm
+  meta AC function (*)
+
+end
+
+(** {2 Commutative Rings with Unit} *)
+
+module UnitaryCommutativeRing
+
+  clone export CommutativeRing with axiom .
+  constant one : t
+  axiom Unitary : forall x:t. one * x = x
+  axiom NonTrivialRing : zero <> one
+
+end
+
+(** {2 Ordered Commutative Rings} *)
+
+module OrderedUnitaryCommutativeRing
+
+  clone export UnitaryCommutativeRing with axiom .
+
+  predicate (<=) t t
+
+  clone export relations.TotalOrder with
+    type t = t, predicate rel = (<=), axiom .
+
+  axiom ZeroLessOne : zero <= one
+
+  axiom CompatOrderAdd  :
+    forall x y z : t. x <= y -> x + z <= y + z
+
+  axiom CompatOrderMult :
+    forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
+
+end
+
+(** {2 Field theory} *)
+
+module Field
+
+  clone export UnitaryCommutativeRing with axiom .
+
+  function inv t : t
+
+  axiom Inverse : forall x:t. x <> zero -> x * inv x = one
+
+  function (-) (x y : t) : t = x + -y
+  function (/) (x y : t) : t = x * inv y
+
+  lemma add_div :
+    forall x y z : t. z <> zero -> (x+y)/z = x/z + y/z
+
+  lemma sub_div :
+    forall x y z : t. z <> zero -> (x-y)/z = x/z - y/z
+
+  lemma neg_div :
+    forall x y : t. y <> zero -> (-x)/y = -(x/y)
+
+  lemma assoc_mul_div: forall x y z:t.
+    (* todo: discard the hypothesis ? *)
+     z <> zero -> (x*y)/z = x*(y/z)
+
+  lemma assoc_div_mul: forall x y z:t.
+    (* todo: discard the hypothesis ? *)
+     y <> zero /\ z <> zero -> (x/y)/z = x/(y*z)
+
+  lemma assoc_div_div: forall x y z:t.
+    (* todo: discard the hypothesis ? *)
+     y <> zero /\ z <> zero -> x/(y/z) = (x*z)/y
+
+end
+
+(** {2 Ordered Fields} *)
+
+module OrderedField
+
+  clone export Field with axiom .
+
+  predicate (<=) t t
+
+  clone export relations.TotalOrder with
+    type t = t, predicate rel = (<=), axiom .
+
+  axiom ZeroLessOne : zero <= one
+
+  axiom CompatOrderAdd  : forall x y z : t. x <= y -> x + z <= y + z
+
+  axiom CompatOrderMult :
+    forall x y z : t. x <= y -> zero <= z -> x * z <= y * z
+
+end
+
+(***
+ to be discussed: should we add the following lemmas, and where
+
+  lemma InvMult : forall x y : t. (-x) * y = - (x * y) = x * (-y)
+  lemma InvSquare : forall x : t. x * x = (-x) * (-x)
+  lemma ZeroMult : forall x : t. x * zero = zero = zero * x
+  lemma SquareNonNeg1 : forall x : t. x <= zero -> zero <= x * x
+  lemma SquareNonNeg : forall x : t. zero <= x * x
+*)

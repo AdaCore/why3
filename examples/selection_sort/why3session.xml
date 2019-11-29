@@ -1,64 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../selection_sort.mlw" expanded="true">
-<theory name="SelectionSort" sum="987357ae5f3f4a61771fb6ae2b009a21" expanded="true">
- <goal name="VC selection_sort" expl="VC for selection_sort" expanded="true">
- <transf name="split_goal_wp" expanded="true">
-  <goal name="VC selection_sort.1" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00" steps="14"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="selection_sort.mlw"/>
+<theory name="SelectionSort" proved="true">
+ <goal name="selection_sort&#39;vc" expl="VC for selection_sort" proved="true">
+ <transf name="split_goal_right" proved="true" >
+  <goal name="selection_sort&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
-  <goal name="VC selection_sort.2" expl="loop invariant init">
-  <proof prover="0"><result status="valid" time="0.00" steps="12"/></proof>
+  <goal name="selection_sort&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
-  <goal name="VC selection_sort.3" expl="index in array bounds">
-  <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
+  <goal name="selection_sort&#39;vc.2" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC selection_sort.4" expl="index in array bounds">
-  <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
+  <goal name="selection_sort&#39;vc.3" expl="index in array bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
-  <goal name="VC selection_sort.5" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.01" steps="33"/></proof>
+  <goal name="selection_sort&#39;vc.4" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="35"/></proof>
   </goal>
-  <goal name="VC selection_sort.6" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.00" steps="25"/></proof>
+  <goal name="selection_sort&#39;vc.5" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="27"/></proof>
   </goal>
-  <goal name="VC selection_sort.7" expl="precondition">
-  <proof prover="0"><result status="valid" time="0.01" steps="14"/></proof>
+  <goal name="selection_sort&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC selection_sort.8" expl="assertion">
-  <proof prover="0"><result status="valid" time="0.01" steps="33"/></proof>
+  <goal name="selection_sort&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.01" steps="73"/></proof>
   </goal>
-  <goal name="VC selection_sort.9" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.59" steps="667"/></proof>
+  <goal name="selection_sort&#39;vc.8" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.34" steps="573"/></proof>
   </goal>
-  <goal name="VC selection_sort.10" expl="assertion">
-  <proof prover="0"><result status="valid" time="0.00" steps="17"/></proof>
+  <goal name="selection_sort&#39;vc.9" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="16"/></proof>
   </goal>
-  <goal name="VC selection_sort.11" expl="loop invariant preservation">
-  <proof prover="0"><result status="valid" time="0.02" steps="95"/></proof>
+  <goal name="selection_sort&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.02" steps="97"/></proof>
   </goal>
-  <goal name="VC selection_sort.12" expl="out of loop bounds">
-  <proof prover="0"><result status="valid" time="0.00" steps="8"/></proof>
+  <goal name="selection_sort&#39;vc.11" expl="out of loop bounds" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
-  <goal name="VC selection_sort.13" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+  <goal name="selection_sort&#39;vc.12" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
-  <goal name="VC selection_sort.14" expl="postcondition">
-  <proof prover="0"><result status="valid" time="0.00" steps="13"/></proof>
+  <goal name="selection_sort&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="VC test1" expl="VC for test1">
- <proof prover="0"><result status="valid" time="0.00" steps="9"/></proof>
+ <goal name="test1&#39;vc" expl="VC for test1" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="13"/></proof>
  </goal>
- <goal name="VC test2" expl="VC for test2">
- <proof prover="0"><result status="valid" time="0.01" steps="31"/></proof>
+ <goal name="test2&#39;vc" expl="VC for test2" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="40"/></proof>
  </goal>
- <goal name="VC bench" expl="VC for bench">
- <proof prover="0"><result status="valid" time="0.01" steps="28"/></proof>
+ <goal name="bench&#39;vc" expl="VC for bench" proved="true">
+ <proof prover="1"><result status="valid" time="0.01" steps="28"/></proof>
  </goal>
 </theory>
 </file>

@@ -11,7 +11,7 @@
  <proof prover="0"><result status="valid" time="0.03" steps="91"/></proof>
  </goal>
  <goal name="VC aux" expl="VC for aux">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC aux.1" expl="1. precondition">
   <proof prover="0"><result status="valid" time="0.02" steps="86"/></proof>
   </goal>
@@ -40,7 +40,7 @@
   <proof prover="1"><result status="valid" time="0.09"/></proof>
   </goal>
   <goal name="VC aux.10" expl="10. variant decrease">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC aux.10.1" expl="1. VC for aux">
    <proof prover="0"><result status="valid" time="0.03" steps="92"/></proof>
    </goal>
@@ -53,7 +53,7 @@
   <proof prover="1"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC aux.12" expl="12. precondition">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC aux.12.1" expl="1. precondition">
    <proof prover="0"><result status="valid" time="0.02" steps="87"/></proof>
    </goal>
@@ -87,7 +87,7 @@
   <proof prover="1"><result status="valid" time="0.10"/></proof>
   </goal>
   <goal name="VC aux.21" expl="21. variant decrease">
-  <transf name="split_goal_wp">
+  <transf name="split_goal_right">
    <goal name="VC aux.21.1" expl="1. VC for aux">
    <proof prover="0"><result status="valid" time="0.02" steps="93"/></proof>
    <proof prover="1"><result status="valid" time="0.20"/></proof>
@@ -131,7 +131,7 @@
  </transf>
  </goal>
  <goal name="VC bit_rev" expl="VC for bit_rev">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC bit_rev.1" expl="1. precondition">
   <proof prover="1"><result status="valid" time="0.03"/></proof>
   </goal>
@@ -165,7 +165,7 @@
  </transf>
  </goal>
  <goal name="VC main" expl="VC for main">
- <transf name="split_goal_wp">
+ <transf name="split_goal_right">
   <goal name="VC main.1" expl="1. array creation size">
   <proof prover="0"><result status="valid" time="0.02" steps="68"/></proof>
   <proof prover="1"><result status="valid" time="0.02"/></proof>

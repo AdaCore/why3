@@ -1,0 +1,361 @@
+(** {1 VerifyThis @ ETAPS 2019 competition Challenge 1: Monotonic Segments and GHC sort }
+
+Author: Quentin Garchery (LRI, Université Paris-Sud)
+*)
+
+
+use int.Int
+use seq.Seq
+use seq.OfList
+use seq.FreeMonoid
+use array.Array
+use map.Occ
+use list.ListRich
+use bool.Bool
+use exn.Exn
+
+
+(** {2 PART A : Monotonic Segments} *)
+
+
+clone list.Sorted as StrictIncr with type t = int, predicate le = (<)
+clone list.RevSorted with type t = int, predicate le = (<=)
+
+use list.FoldRight
+
+let function eqb (b1 b2 : bool) : bool
+  ensures { result <-> b1 = b2 }
+=
+  andb (implb b1 b2) (implb b2 b1)
+
+(** Use a type invariant that ensures that the sequence represents the list.
+  It is useful to get a nice specification when dealing with first and last
+  elements of the list (begin-to-end property) *)
+type list_seq = {
+  list : list int;
+  ghost seq : seq int
+} invariant {
+  seq = of_list (reverse list)
+} by {
+  list = Nil;
+  seq = Seq.empty
+}
+
+let constant nil : list_seq
+= { list = Nil;
+    seq = Seq.empty }
+
+let extend a lseq
+  ensures { result.list = Cons a lseq.list }
+=
+  { list = Cons a lseq.list;
+    seq = snoc lseq.seq a }
+
+(** Compute the monotonic cutpoints of a sequence *)
+
+let cutpoints (s : array int)
+  requires { Array.length s > 0 }
+  (* Begin-to-end property *)
+  ensures { get result.seq 0 = 0 }
+  ensures { get result.seq (Seq.length result.seq - 1) = Array.length s }
+  (* Non-empty property *)
+  ensures { length result.list >= 2 }
+  (* Within bounds property *)
+  ensures { forall z. mem z result.list -> 0 <= z <= Array.length s }
+  (* Monotonic property *)
+  ensures { forall k. 0 <= k < Seq.length result.seq - 1 ->
+                      let ck = get result.seq k in
+                      let ck1 = get result.seq (k+1) in
+                      (forall z1 z2. ck <= z1 < z2 < ck1 -> s[z1] < s[z2]) \/
+                      (forall z1 z2. ck <= z1 < z2 < ck1 -> s[z1] >= s[z2]) }
+  (* For the next part, we also need the cutpoints list to be decreasing *)
+  ensures { forall i j. 0 <= i < j < Seq.length result.seq ->
+            get result.seq i <= get result.seq j }
+=
+  let n = s.length in
+  let ref cut = extend 0 nil in
+  let ref x = 0 in
+  let ref y = 1 in
+  let ref increasing = True in
+  while y < n do
+        variant { n - y }
+        invariant { y = x + 1 }
+        invariant { 0 < y <= n+1 }
+        invariant { Seq.length cut.seq > 0 }
+        invariant { get cut.seq 0 = 0 }
+        invariant { get cut.seq (Seq.length cut.seq - 1) = x }
+        invariant { forall z. mem z cut.list -> 0 <= z <= n }
+        invariant { forall k. 0 <= k < Seq.length cut.seq - 1 ->
+                    let ck = get cut.seq k in
+                    let ck1 = get cut.seq (k+1) in
+                    (forall z1 z2. ck <= z1 < z2 < ck1 -> s[z1] < s[z2]) \/
+                    (forall z1 z2. ck <= z1 < z2 < ck1 -> s[z1] >= s[z2])}
+        invariant { forall i j. 0 <= i < j < Seq.length cut.seq ->
+                    get cut.seq i <= get cut.seq j }
+        label StartLoop in
+        increasing <- (s[x] < s[y]);
+        while y < n && eqb (s[y-1] < s[y]) increasing do
+              variant { n - y }
+              invariant { y at StartLoop <= y <= n }
+              invariant { (forall z1 z2. x <= z1 < z2 < y -> s[z1] < s[z2]) \/
+                          (forall z1 z2. x <= z1 < z2 < y -> s[z1] >= s[z2]) }
+              y <- y + 1
+        done;
+        cut <- extend y cut;
+        assert { get (cut.seq at StartLoop) (Seq.length cut.seq - 2) = x };
+        assert { forall k. 0 <= k < Seq.length cut.seq - 2 ->
+                 get cut.seq k at StartLoop = get cut.seq k /\
+                 get cut.seq (k+1) at StartLoop = get cut.seq (k+1) };
+        x <- y;
+        y <- x+1;
+  done;
+  label AfterLoop in
+  if x < n then cut <- extend n cut;
+  assert { get cut.seq (Seq.length cut.seq - 1) = n };
+  assert { forall k. 0 <= k < Seq.length cut.seq - 2 ->
+           get cut.seq k at AfterLoop = get cut.seq k /\
+           get cut.seq (k+1) at AfterLoop = get cut.seq (k+1) };
+  cut
+
+
+(** {2 PART B : GHC Sort} *)
+
+
+lemma reverse_sorted_incr :
+  forall l. Decr.sorted l -> Incr.sorted (reverse l)
+  by Decr.sorted l /\ Incr.sorted Nil /\ compat l Nil
+
+let rec lemma lt_le_sorted (l : list int)
+  variant { l }
+  requires { StrictIncr.sorted l}
+  ensures { Incr.sorted l }
+=
+  match l with
+  | Cons _ (Cons h2 t) -> lt_le_sorted (Cons h2 t)
+  | _ -> ()
+  end
+
+(** Get an ordered list from a monotonic list *)
+let function order l
+  requires { StrictIncr.sorted l \/ Decr.sorted l }
+  ensures { Incr.sorted result }
+  ensures { permut l result }
+=
+  match l with
+  | Nil -> l
+  | Cons _ Nil -> l
+  | Cons h1 (Cons h2 _) ->
+      if h1 < h2
+      then (assert { Incr.sorted l by StrictIncr.sorted l }; l)
+      else (assert { Decr.sorted l }; reverse l)
+  end
+
+(** Get a monotonic list from two cutpoints in the array *)
+let rec list_from (a : array int) s e
+  variant { e - s }
+  requires { 0 <= s <= Array.length a }
+  requires { 0 <= e <= Array.length a }
+  requires { (forall z1 z2. s <= z1 < z2 < e -> a[z1] < a[z2]) \/
+             (forall z1 z2. s <= z1 < z2 < e -> a[z1] >= a[z2]) }
+  ensures { forall x. num_occ x result = occ x a.elts s e }
+  ensures { forall x. mem x result -> exists z. s <= z < e /\ a[z] = x }
+  ensures { (forall z1 z2. s <= z1 < z2 < e -> a[z1] < a[z2]) -> StrictIncr.sorted result }
+  ensures { (forall z1 z2. s <= z1 < z2 < e -> a[z1] >= a[z2]) -> Decr.sorted result }
+  ensures { StrictIncr.sorted result \/ Decr.sorted result }
+=
+  if s >= e then Nil
+  else Cons a[s] (list_from a (s+1) e)
+
+let rec lemma occ_slice (a : array 'a) (c1 c2 c3 : int)
+  variant { c3 - c2 }
+  requires { 0 <= c1 <= c2 <= c3 <= Array.length a }
+  ensures { forall x. occ x a.elts c1 c3 = occ x a.elts c1 c2 + occ x a.elts c2 c3 }
+= if c3 <> c2 then occ_slice a c1 c2 (c3-1)
+
+(** Get sorted lists from the cutpoints *)
+let rec sorted_lists (s: array int) (cutp : list_seq)
+  requires { length cutp.list > 0 }
+  (* This is where we need cutpoints to be sorted *)
+  requires { forall x y. 0 <= x < y < Seq.length cutp.seq -> get cutp.seq x <= get cutp.seq y }
+  requires { forall z. mem z cutp.list -> 0 <= z <= Array.length s }
+  requires { forall k. 0 <= k < Seq.length cutp.seq - 1 ->
+                      let ck = get cutp.seq k in
+                      let ck1 = get cutp.seq (k+1) in
+                      (forall z1 z2. ck <= z1 < z2 < ck1 -> s[z1] < s[z2]) \/
+                      (forall z1 z2. ck <= z1 < z2 < ck1 -> s[z1] >= s[z2]) }
+  variant { cutp.list }
+  ensures { forall l. mem l result -> Incr.sorted l }
+  ensures { forall x. let first = get cutp.seq 0 in
+                      let last  = get cutp.seq (Seq.length cutp.seq - 1) in
+                      num_occ x (fold_right (++) result Nil) = occ x s.elts first last }
+=
+  let ls = cutp.list in
+  let seq = cutp.seq in
+  match ls with
+  | Nil | Cons _ Nil -> Nil
+  | Cons h1 (Cons h2 t) ->
+      assert { let k = Seq.length cutp.seq - 2 in
+               h2 = get cutp.seq k /\ h1 = get cutp.seq (k+1) };
+      let seqi = list_from s h2 h1 in
+      let lseq = { list = Cons h2 t; seq = seq[0..(length seq - 1)] } in
+      (* occ_slice s.elts (get seq 0) (get lseq.seq (Seq.length lseq.seq - 1)) *)
+      (*               (get seq (Seq.length seq - 1)); *)
+      assert { Incr.sorted (order seqi) };
+      Cons (order seqi) (sorted_lists s lseq)
+  end
+
+(** The merge of mergesort ! *)
+let rec merge l1 l2
+  variant { length l1 + length l2 }
+  requires { Incr.sorted l1 }
+  requires { Incr.sorted l2 }
+  ensures { Incr.sorted result }
+  ensures { permut result (l1 ++ l2) }
+=
+  match l1, l2 with
+  | Nil, l | l, Nil -> l
+  | Cons h1 t1, Cons h2 t2 ->
+    if h1 < h2
+    then (assert { forall x. mem x (t1 ++ l2) -> h1 <= x };
+         Cons h1 (merge t1 l2))
+    else (assert { forall x. mem x (l1 ++ t2) -> h2 <= x };
+         Cons h2 (merge l1 t2))
+  end
+
+(** Merge pair by pair for efficiency *)
+let rec merge_pair ls
+  variant { length ls }
+  requires { forall l. mem l ls -> Incr.sorted l }
+  ensures { length result <= length ls }
+  ensures { length ls > 1 -> 0 < length result < length ls }
+  ensures { forall l. mem l result -> Incr.sorted l }
+  ensures { permut (fold_right (++) result Nil) (fold_right (++) ls Nil) }
+=
+  match ls with
+  | Nil | Cons _ Nil -> ls
+  | Cons l1 (Cons l2 r) -> Cons (merge l1 l2) (merge_pair r)
+  end
+
+(** Repeat previous merge *)
+let rec mergerec ls
+  requires { forall l. mem l ls -> Incr.sorted l }
+  variant { length ls }
+  ensures { Incr.sorted result }
+  ensures { permut result (fold_right (++) ls Nil) }
+=
+  match ls with
+  | Nil -> Nil
+  | Cons l Nil -> l
+  | Cons _ (Cons _ _) -> mergerec (merge_pair ls)
+  end
+
+use seq.Occ as SO
+use seq.OfList
+(** Show that the result of <mergerec> has the same length has the initial array *)
+(** By induction, when increasing the size of the sub-array by one, we remove the new
+ element in the corresponding array (use <find> to find the index to remove) *)
+let rec find (seq : seq int) (v : int) (s e : int)
+  variant { e - s }
+  requires { 0 <= s < e <= Seq.length seq }
+  requires { SO.occ v seq s e >= 1 }
+  ensures { s <= result < e /\ get seq result = v }
+=
+  if get seq s = v then s
+  else find seq v (s+1) e
+
+let rec lemma same_occs_same_lengths (a : array int) (seq : seq int) (s : int)
+  variant { Array.length a - s }
+  requires { 0 <= s <= Array.length a }
+  requires { forall x. occ x a.elts s (Array.length a) = SO.occ x seq 0 (Seq.length seq) }
+  ensures { Seq.length seq = Array.length a - s }
+=
+  let na = Array.length a in
+  let ns = Seq.length seq in
+  if s = na
+  then (assert { ns > 0 -> SO.occ (get seq 0) seq 0 ns > 0 }; ())
+  else (assert { ns = 0 -> false by SO.occ a[s] seq 0 ns = 0 };
+       let i = find seq a[s] 0 ns in
+       let rem_as = seq[0..i] ++ seq[i+1..ns] in (* seq where a[s] is removed *)
+       assert { forall x. (if x = a[s]
+                then SO.occ x seq 0 ns = SO.occ x rem_as 0 (ns-1) + 1
+                else SO.occ x seq 0 ns = SO.occ x rem_as 0 (ns-1))
+                by seq == Seq.(++) seq[0..i] (Seq.(++) seq[i..i+1] seq[i+1..ns])
+                so SO.occ x seq 0 ns = SO.occ x seq[0..i] 0 i +
+                                       SO.occ x seq[i..i+1] 0 1 +
+                                       SO.occ x seq[i+1..ns] 0 (ns-i-1)
+                so SO.occ x rem_as 0 (ns-1) = SO.occ x seq[0..i] 0 i +
+                                              SO.occ x seq[i+1..ns] 0 (ns-i-1) };
+       same_occs_same_lengths a rem_as (s+1))
+
+let rec lemma num_occ_seq_occ (l : list 'a) (x : 'a)
+  variant { l }
+  ensures { num_occ x l = SO.occ x (of_list l) 0 (length l) }
+=
+  match l with
+  | Nil -> ()
+  | Cons h t -> assert { of_list l = Seq.(++) (singleton h) (of_list t) /\
+                         if x = h
+                         then SO.occ x (singleton h) 0 1 = 1
+                         else SO.occ x (singleton h) 0 1 = 0 };
+                num_occ_seq_occ t x
+  end
+
+let sort_to_list a =
+  requires { Array.length a > 0 }
+  ensures { Incr.sorted result }
+  ensures { forall x. occ x a.elts 0 (Array.length a) = num_occ x result }
+  ensures { length result = Array.length a }
+  let res = mergerec (sorted_lists a (cutpoints a)) in
+  same_occs_same_lengths a (of_list res) 0;
+  res
+
+use array.IntArraySorted
+use array.ArrayPermut
+use option.Option
+use list.NthNoOpt
+
+(** Copy a list in an array, element by element, starting at a given index *)
+let rec copy_list (l : list int) (a : array int) (s : int) : unit
+  variant { l }
+  requires { s >= 0 }
+  requires { length l = Array.length a - s }
+  ensures { forall x. s <= x < Array.length a -> a[x] = nth (x - s) l }
+  ensures { forall x. 0 <= x < s -> a[x] = (old a)[x] }
+  ensures { forall x. occ x a.elts s (Array.length a) = num_occ x l }
+=
+  match l with
+  | Nil -> ()
+  | Cons h t -> a[s] <- h; copy_list t a (s+1)
+  end
+
+let rec lemma mem_nth_in_bounds (l : list 'a) (j : int)
+  requires { 0 <= j < length l }
+  ensures { mem (nth j l) l }
+=
+  match l with
+  | Nil -> ()
+  | Cons _ t -> if j > 0 then mem_nth_in_bounds t (j-1)
+  end
+
+(** Useful to deduce sorted on arrays from sorted on lists *)
+let rec lemma sorted_list_nth (l : list int) (i j : int)
+  variant { l }
+  requires { Incr.sorted l }
+  requires { 0 <= i <= j < length l }
+  ensures { nth i l <= nth j l }
+=
+  match l with
+  | Nil -> ()
+  | Cons _ t -> if i > 0 then sorted_list_nth t (i-1) (j-1)
+  end
+
+let ghc_sort a
+  ensures { sorted a }
+  ensures { permut_all a (old a) }
+=
+  if Array.length a = 0 then ()
+  else let l = sort_to_list a in
+       assert { length l = Array.length a };
+       copy_list l a 0
+
+

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,22 +17,22 @@ let backup_file f =
   end
 
 let channel_contents_fmt cin fmt =
-  let buff = String.make 1024 ' ' in
+  let buff = Bytes.create 1024 in
   let n = ref 0 in
   while n := input cin buff 0 1024; !n <> 0 do
     Format.pp_print_string fmt
       (if !n = 1024 then
-         buff
+         Bytes.unsafe_to_string buff
        else
-         String.sub buff 0 !n)
+         Bytes.sub_string buff 0 !n)
   done
 
 let channel_contents_buf cin =
-  let buf = Buffer.create 1024
-  and buff = String.make 1024 ' ' in
+  let buf = Buffer.create 1024 in
+  let buff = Bytes.create 1024 in
   let n = ref 0 in
   while n := input cin buff 0 1024; !n <> 0 do
-    Buffer.add_substring buf buff 0 !n
+    Buffer.add_subbytes buf buff 0 !n
   done;
   buf
 
@@ -62,6 +62,11 @@ let file_contents_buf f =
 
 let file_contents f = Buffer.contents (file_contents_buf f)
 
+let write_file f c =
+  let oc = open_out f in
+  output_string oc c;
+  close_out oc
+
 let open_temp_file ?(debug=false) filesuffix usefile =
   let file,cout = Filename.open_temp_file "why" filesuffix in
   try
@@ -78,7 +83,7 @@ let open_temp_file ?(debug=false) filesuffix usefile =
 let copy_file from to_ =
   let cin = open_in from in
   let cout = open_out to_ in
-  let buff = String.make 1024 ' ' in
+  let buff = Bytes.create 1024 in
   let n = ref 0 in
   while n := input cin buff 0 1024; !n <> 0 do
     output cout buff 0 !n
@@ -97,37 +102,40 @@ let rec copy_dir from to_ =
     else copy_file src dst in
   Array.iter copy files
 
+let concat f1 f2 =
+  if Filename.is_relative f2 then Filename.concat f1 f2 else f2
 
-(* return the absolute path of a given file name.
-   this code has been designed to be architecture-independant so
-   be very careful if you modify this *)
-let path_of_file f =
+type file_path = string list
+let empty_path = []
+let add_to_path p fn = p @ [fn]
+let is_empty_path p = match p with [] -> true | _ -> false
+let decompose_path p = p
+
+let rec basename p =
+  match p with
+  | [] -> raise Not_found
+  | [f] -> f
+  | _ :: tl -> basename tl
+
+(* deprecated: let string_of_file_path p = String.concat "/" p *)
+let print_file_path fmt p = Format.fprintf fmt "%a" (Pp.print_list Pp.slash Pp.string) p
+
+
+let system_independent_path_of_file f =
   let rec aux acc f =
-(*
-    Format.printf "aux %s@." f;
-    let _ = read_line () in
-*)
     let d = Filename.dirname f in
     if d = Filename.current_dir_name then
       (* f is relative to the current dir *)
       let b = Filename.basename f in
-      aux (b::acc) (Sys.getcwd ())
+      b::acc
     else if f=d then
       (* we are at the root *)
       acc
     else
       let b = Filename.basename f in
-        if f=b then b::acc else
-          aux (b::acc) d
+      aux (b::acc) d
   in
   aux [] f
-
-(* return the file name of an absolute path *)
-let rec file_of_path l =
-  match l with
-    | [] -> ""
-    | [x] -> x
-    | x::l -> Filename.concat x (file_of_path l)
 
 (*
 let test x = (Filename.dirname x, Filename.basename x)
@@ -143,51 +151,38 @@ let p1 = path_of_file "/bin/bash"
 let p1 = path_of_file "../src/f.why"
   *)
 
-                              (*
-let normalize_filename f =
-  let rec aux af acc =
-    match af, acc with
-      | x::rf, _ ->
-        if x = Filename.current_dir_name then
-          aux rf acc
-        else if x = Filename.parent_dir_name then
-          (match acc with
-             | _::racc -> aux rf racc
-             | [] ->
-               (* do not treat currently cases like "../../../a/b/c/d",
-                  that cannot occur if [f] is a full path *)
-                failwith "cannot normalize filename")
-        else
-          aux rf (x::acc)
-      | [], _ -> acc
+let system_dependent_absolute_path dir p =
+  let rec file_of_path l =
+    match l with
+    | [] -> ""
+    | [x] -> x
+    | x::l -> Filename.concat x (file_of_path l)
   in
-  file_of_path (List.rev (aux (path_of_file f) []))
-                               *)
+  let f = file_of_path p in
+  Filename.concat dir f
 
 let relativize_filename base f =
-  let rec aux ab af =
+  let rec aux abs ab af =
     match ab,af with
-      | x::rb, y::rf when x=y -> aux rb rf
+      | x::rb, y::rf when x=y -> aux (x::abs) rb rf
       | _ ->
-          let rec aux2 acc p =
+          let rec aux2 abs rel p =
             match p with
-              | [] -> acc
+              | [] -> rel
               | x::rb ->
                 (if x = Filename.current_dir_name then
-                   aux2 acc rb
+                   aux2 abs rel rb
                  else if x = Filename.parent_dir_name then
-                   failwith "cannot relativize filename"
+                   match abs with
+                   | x::rem -> aux2 rem (x::rel) rb
+                   | [] -> aux2 [] rel rb
                  else
-                   aux2 (Filename.parent_dir_name::acc) rb)
-          in aux2 af ab
+                   aux2 (x::abs) (Filename.parent_dir_name::rel) rb)
+          in aux2 abs af ab
   in
-  file_of_path (aux (path_of_file base) (path_of_file f))
+  aux [] (system_independent_path_of_file base) (system_independent_path_of_file f)
 
-let absolutize_filename dirname f =
-  if Filename.is_relative f then
-    Filename.concat dirname f
-  else
-    f
+
 
 (*
 let p1 = relativize_filename "/bin/bash" "src/f.why"

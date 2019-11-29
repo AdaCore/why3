@@ -1,13 +1,13 @@
-/**************************************************************************/
-/*                                                                        */
-/*  The Why3 Verification Platform   /   The Why3 Development Team        */
-/*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University        */
-/*                                                                        */
-/*  This software is distributed under the terms of the GNU Lesser        */
-/*  General Public License version 2.1, with the special exception        */
-/*  on linking described in file LICENSE.                                 */
-/*                                                                        */
-/**************************************************************************/
+/********************************************************************/
+/*                                                                  */
+/*  The Why3 Verification Platform   /   The Why3 Development Team  */
+/*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  */
+/*                                                                  */
+/*  This software is distributed under the terms of the GNU Lesser  */
+/*  General Public License version 2.1, with the special exception  */
+/*  on linking described in file LICENSE.                           */
+/*                                                                  */
+/********************************************************************/
 
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
@@ -24,7 +24,7 @@ typedef struct {
   int capacity; // the capacity of the arrays key and data
 } t_list, *plist;
 // The idea is that each element in the list is a tuple (key, data), but it is
-// simpler to hahve two separate arrays for that
+// simpler to have two separate arrays for that
 
 // return a list of initial capacity <capacity>
 plist init_list(int capacity);
@@ -40,7 +40,8 @@ bool list_is_empty(plist l);
 int list_length(plist l);
 
 // remove the element in the list whose key is equal to <key>. If no such data
-// exists, do nothing.
+// exists, do nothing. Note that removing an element may alter the order of
+// the remaining elements of the list.
 void list_remove(plist l, int key);
 
 // Return the data whose key is equal to <key>. Return NULL if no such data

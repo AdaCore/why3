@@ -1,8 +1,8 @@
 
 module ResizableArraySpec
 
-  use import int.Int
-  use import map.Map
+  use int.Int
+  use map.Map
   use map.Const
 
   type rarray 'a = private {
@@ -43,8 +43,8 @@ end
 
 module ResizableArrayImplem (* : ResizableArraySpec *)
 
-  use import int.Int
-  use import int.MinMax
+  use int.Int
+  use int.MinMax
   use array.Array as A
 
   type rarray 'a =
@@ -76,7 +76,7 @@ function make (len: int) (dummy: 'a) : rarray 'a =
 
   let ([]<-) (r: rarray 'a) (i: int) (v: 'a) : unit
     requires { 0 <= i < r.length }
-    ensures { r.data.A.elts = A.M.([<-]) (old r).data.A.elts i v }
+    ensures { r.data.A.elts = A.Map.([<-]) (old r).data.A.elts i v }
     =
     A.([]<-) r.data i v
 
@@ -134,8 +134,8 @@ end
 
 module Test
 
-  use import int.Int
-  use import ResizableArrayImplem
+  use int.Int
+  use ResizableArrayImplem
 
   let test1 () =
     let r = make 10 0 in

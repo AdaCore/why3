@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Stdlib
+open Wstdlib
 open Ident
 open Term
 open Decl
@@ -21,6 +21,10 @@ open Trans
 open Driver_ast
 open Call_provers
 
+let driver_debug =
+  Debug.register_flag "interm_task"
+    ~desc:"Print intermediate task generated during processing of a driver"
+
 (** drivers *)
 
 type driver = {
@@ -30,6 +34,7 @@ type driver = {
   drv_transform   : string list;
   drv_prelude     : prelude;
   drv_thprelude   : prelude_map;
+  drv_thuse       : (theory * theory) Mid.t;
   drv_blacklist   : string list;
   drv_meta        : (theory * Stdecl.t) Mid.t;
   drv_res_parser  : prover_result_parser;
@@ -86,24 +91,23 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
   let add_to_list r v = (r := v :: !r) in
   let add_global (loc, g) = match g with
     | Prelude s -> add_to_list prelude s
-    | RegexpValid s -> add_to_list regexps (Str.regexp s, Valid)
-    | RegexpInvalid s -> add_to_list regexps (Str.regexp s, Invalid)
-    | RegexpTimeout s -> add_to_list regexps (Str.regexp s, Timeout)
-    | RegexpOutOfMemory s -> add_to_list regexps (Str.regexp s, OutOfMemory)
+    | RegexpValid s -> add_to_list regexps (s, Valid)
+    | RegexpInvalid s -> add_to_list regexps (s, Invalid)
+    | RegexpTimeout s -> add_to_list regexps (s, Timeout)
+    | RegexpOutOfMemory s -> add_to_list regexps (s, OutOfMemory)
     | RegexpStepLimitExceeded s ->
-      add_to_list regexps (Str.regexp s, StepLimitExceeded)
-    | RegexpUnknown (s,t) -> add_to_list regexps (Str.regexp s, Unknown (t, None))
-    | RegexpFailure (s,t) -> add_to_list regexps (Str.regexp s, Failure t)
+      add_to_list regexps (s, StepLimitExceeded)
+    | RegexpUnknown (s,t) -> add_to_list regexps (s, Unknown t)
+    | RegexpFailure (s,t) -> add_to_list regexps (s, Failure t)
     | TimeRegexp r -> add_to_list timeregexps (Call_provers.timeregexp r)
     | StepRegexp (r,ns) ->
       add_to_list stepregexps (Call_provers.stepregexp r ns)
     | ExitCodeValid s -> add_to_list exitcodes (s, Valid)
     | ExitCodeInvalid s -> add_to_list exitcodes (s, Invalid)
     | ExitCodeTimeout s -> add_to_list exitcodes (s, Timeout)
-    | ExitCodeOutOfMemory s -> add_to_list exitcodes (s, OutOfMemory)
     | ExitCodeStepLimitExceeded s ->
       add_to_list exitcodes (s, StepLimitExceeded)
-    | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown (t, None))
+    | ExitCodeUnknown (s,t) -> add_to_list exitcodes (s, Unknown t)
     | ExitCodeFailure (s,t) -> add_to_list exitcodes (s, Failure t)
     | Filename s -> set_or_raise loc filename s "filename"
     | Printer s -> set_or_raise loc printer s "printer"
@@ -118,6 +122,7 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
   let thprelude     = ref Mid.empty in
   let meta          = ref Mid.empty in
   let qualid        = ref [] in
+  let thuse         = ref Mid.empty in
 
   let find_pr th (loc,q) = try ns_find_pr th.th_export q
     with Not_found -> raise (Loc.Located (loc, UnknownProp (!qualid,q)))
@@ -138,34 +143,39 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
     let s = try snd (Mid.find th.th_name !m) with Not_found -> Stdecl.empty in
     m := Mid.add th.th_name (th, Stdecl.add td s) !m
   in
-  let add_local th = function
+  (* th_uc is the theory built with the uses forced by the driver *)
+  let add_local th th_uc = function
     | Rprelude s ->
         let l = Mid.find_def [] th.th_name !thprelude in
-        thprelude := Mid.add th.th_name (s::l) !thprelude
+        thprelude := Mid.add th.th_name (s::l) !thprelude;
+        th_uc
     | Rsyntaxts (q,s,b) ->
         let td = syntax_type (find_ts th q) s b in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
     | Rsyntaxfs (q,s,b) ->
         let td = syntax_logic (find_fs th q) s b in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
     | Rsyntaxps (q,s,b) ->
         let td = syntax_logic (find_ps th q) s b in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
     | Rremovepr (q) ->
         let td = remove_prop (find_pr th q) in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
     | Rremoveall ->
       let it key _ = match (Mid.find key th.th_known).d_node with
         | Dprop (_,symb,_) -> add_meta th (remove_prop symb) meta
         | _ -> ()
       in
-      Mid.iter it th.th_local
-    | Rconverter (q,s,b) ->
-        let cs = syntax_converter (find_ls th q) s b in
-        add_meta th cs meta
+      Mid.iter it th.th_local;
+      th_uc
     | Rliteral (q,s,b) ->
         let cs = syntax_literal (find_ts th q) s b in
-        add_meta th cs meta
+        add_meta th cs meta;
+        th_uc
     | Rmeta (s,al) ->
         let rec ty_of_pty = function
           | PTyvar x ->
@@ -190,14 +200,22 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
         in
         let m = lookup_meta s in
         let td = create_meta m (List.map convert al) in
-        add_meta th td meta
+        add_meta th td meta;
+        th_uc
+    | Ruse (loc,q) ->
+      let file, th = Lists.chop_last q in
+      let th = Loc.try3 ~loc Env.read_theory env file th in
+      Theory.use_export th_uc th
   in
-  let add_local th (loc,rule) = Loc.try2 ~loc add_local th rule in
+  let add_local th th_uc (loc,rule) = Loc.try2 ~loc add_local th th_uc rule in
   let add_theory { thr_name = (loc,q); thr_rules = trl } =
-    let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
+    let f,id = Lists.chop_last q in
     let th = Loc.try3 ~loc Env.read_theory env f id in
+    let th_uc = Theory.create_theory (Ident.id_fresh ~loc ("driver export for "^th.th_name.id_string)) in
     qualid := q;
-    List.iter (add_local th) trl
+    let th_uc' = List.fold_left (add_local th) th_uc trl in
+    if th_uc != th_uc' then
+      thuse := Mid.add th.th_name (th, Theory.close_theory th_uc') !thuse
   in
   List.iter add_theory f.f_rules;
   List.iter (fun f -> List.iter add_theory (load_file f).f_rules) extra_files;
@@ -220,6 +238,7 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
       prp_model_parser = Model_parser.lookup_model_parser !model_parser
     };
     drv_tag         = !driver_tag;
+    drv_thuse       = !thuse;
   }
 
 let syntax_map drv =
@@ -230,7 +249,7 @@ let syntax_map drv =
 
 exception UnknownSpec of string
 
-let filename_regexp = Str.regexp "%\\(.\\)"
+let filename_regexp = Re.Str.regexp "%\\(.\\)"
 
 let get_filename drv input_file theory_name goal_name =
   let sanitize = Ident.sanitizer
@@ -239,14 +258,14 @@ let get_filename drv input_file theory_name goal_name =
     | Some f -> f
     | None -> "%f-%t-%g.dump"
   in
-  let replace s = match Str.matched_group 1 s with
+  let replace s = match Re.Str.matched_group 1 s with
     | "%" -> "%"
     | "f" -> sanitize input_file
     | "t" -> sanitize theory_name
     | "g" -> sanitize goal_name
     | s   -> raise (UnknownSpec s)
   in
-  Str.global_substitute filename_regexp replace file
+  Re.Str.global_substitute filename_regexp replace file
 
 let file_of_task drv input_file theory_name task =
   get_filename drv input_file theory_name (task_goal task).pr_name.id_string
@@ -254,10 +273,10 @@ let file_of_task drv input_file theory_name task =
 let file_of_theory drv input_file th =
   get_filename drv input_file th.th_name.Ident.id_string "null"
 
-let call_on_buffer ~command ~limit
-                   ?inplace ~filename ~printer_mapping drv buffer =
+let call_on_buffer ~command ~limit ~gen_new_file ?inplace ~filename
+    ~printer_mapping drv buffer =
   Call_provers.call_on_buffer
-    ~command ~limit ~res_parser:drv.drv_res_parser
+    ~command ~limit ~gen_new_file ~res_parser:drv.drv_res_parser
     ~filename ~printer_mapping ?inplace buffer
 
 (** print'n'prove *)
@@ -265,20 +284,35 @@ let call_on_buffer ~command ~limit
 exception NoPrinter
 
 let update_task = let ht = Hint.create 5 in fun drv ->
-  let update task0 =
-    Mid.fold (fun _ (th,tdms) task ->
-      let tdcs = (Task.find_clone_tds task0 th).tds_set in
-      Stdecl.fold (fun tdc task ->
-        Stdecl.fold (fun tdm task -> match tdc.td_node with
-          | Use _ -> add_tdecl task tdm
-          | Clone (_,sm) ->
-              let tdm = Theory.clone_meta tdm th sm in
-              Opt.fold add_tdecl task tdm
-          | _ -> assert false
-        ) tdms task
-      ) tdcs task
-    ) drv.drv_meta task0
-  in
+    let update task0 =
+      (** add requested theorie *)
+      let task0 = Mid.fold (fun _ (th,th') task ->
+          let tdcs = (Task.find_clone_tds task0 th).tds_set in
+          Stdecl.fold (fun tdc task -> match tdc.td_node with
+              | Use _ -> Task.use_export task th'
+              | Clone (_,_) ->
+                  (** We do nothing in case of clone *)
+                  task
+              | _ -> assert false
+            ) tdcs task
+        ) drv.drv_thuse task0
+      in
+      (** apply metas *)
+      let task0 = Mid.fold (fun _ (th,tdms) task ->
+          let tdcs = (Task.find_clone_tds task0 th).tds_set in
+          Stdecl.fold (fun tdc task ->
+              Stdecl.fold (fun tdm task -> match tdc.td_node with
+                  | Use _ -> add_tdecl task tdm
+                  | Clone (_,sm) ->
+                      let tdm = Theory.clone_meta tdm th sm in
+                      Opt.fold add_tdecl task tdm
+                  | _ -> assert false
+                ) tdms task
+            ) tdcs task
+        ) drv.drv_meta task0
+      in
+      task0
+    in
   function
   | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}} as goal;
           task_prev = task} ->
@@ -288,22 +322,23 @@ let update_task = let ht = Hint.create 5 in fun drv ->
         Hint.add ht drv.drv_tag upd; upd in
       let task = Trans.apply update task in
       add_tdecl task goal
-  | task -> update task
+    | task -> update task
 
-let add_cntexample_meta task cntexample =
-  if not (cntexample) then task
-  else
-    let cnt_meta = lookup_meta "get_counterexmp" in
-    let g,task = Task.task_separate_goal task in
-    let task = Task.add_meta task cnt_meta [] in
-    Task.add_tdecl task g
-
-let prepare_task ~cntexample drv task =
-  let task = add_cntexample_meta task cntexample in
-  let lookup_transform t = lookup_transform t drv.drv_env in
+(* Apply driver's transformations to the task *)
+let prepare_task drv task =
+  let lookup_transform t = lookup_transform t drv.drv_env, t in
   let transl = List.map lookup_transform drv.drv_transform in
-  let apply task tr = Trans.apply tr task in
+  let apply task (tr,name) =
+    let task = Trans.apply tr task in
+    Debug.dprintf driver_debug "Task after transformation: %s\n%a@."
+      name Pretty.print_task task;
+    task
+  in
+  Debug.dprintf driver_debug "Task before driver's transformation\n%a@."
+    Pretty.print_task task;
   let task = update_task drv task in
+  Debug.dprintf driver_debug "Task after update\n%a@."
+    Pretty.print_task task;
   List.fold_left apply task transl
 
 let print_task_prepared ?old drv fmt task =
@@ -321,8 +356,8 @@ let print_task_prepared ?old drv fmt task =
   fprintf fmt "@[%a@]@?" (printer ?old) task;
   printer_args.printer_mapping
 
-let print_task ?old ?(cntexample=false) drv fmt task =
-  let task = prepare_task ~cntexample drv task in
+let print_task ?old drv fmt task =
+  let task = prepare_task drv task in
   let _ = print_task_prepared ?old drv fmt task in
   ()
 
@@ -330,35 +365,59 @@ let print_theory ?old drv fmt th =
   let task = Task.use_export None th in
   print_task ?old drv fmt task
 
-let file_name_of_task ?old ?inplace drv task =
+let file_name_of_task ?old ?inplace ?interactive drv task =
   match old, inplace with
-    | Some fn, Some true -> fn
-    | _ ->
+    | Some fn, Some true ->
+        (* Example: Isabelle. No file should be generated, it should be done
+           in_place and we keep the same file. *)
+        false, fn
+    | Some fn, _ when interactive <> Some true ->
+        (* Example: cvc4. If a file is provided, it means it was passed to
+           schedule_proof_attempt via its save_to argument. So we ask to erase
+           and regenerate the file (the advantage is that we decide the location
+           of the file).
+        *)
+        false, fn
+    | Some _, _ ->
+        (* Example: Coq.
+           For Coq, the interactively edited file should be kept (not erased)
+           and a new temp file is generated using the old one.
+        *)
         let pr = Task.task_goal task in
         let fn = match pr.pr_name.id_loc with
           | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
           | None -> "" in
         let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
-        get_filename drv fn "T" pr.pr_name.id_string
+        true, get_filename drv fn "T" pr.pr_name.id_string
+    | _ ->
+        (* Example: cvc4 without ?save_to argument
+           No file were provided. We have to generate a new one.
+        *)
+        let pr = Task.task_goal task in
+        let fn = match pr.pr_name.id_loc with
+          | Some loc -> let fn,_,_,_ = Loc.get loc in Filename.basename fn
+          | None -> "" in
+        let fn = try Filename.chop_extension fn with Invalid_argument _ -> fn in
+        true, get_filename drv fn "T" pr.pr_name.id_string
 
-let prove_task_prepared ~command ~limit ?old ?inplace drv task =
+let prove_task_prepared ~command ~limit ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
+  let gen_new_file, filename =
+    file_name_of_task ?old ?inplace ?interactive drv task in
   let old_channel = Opt.map open_in old in
-  let filename = file_name_of_task ?old ?inplace drv task in
   let printer_mapping = print_task_prepared ?old:old_channel drv fmt task in
   pp_print_flush fmt ();
   Opt.iter close_in old_channel;
   let res =
-    call_on_buffer ~command ~limit
+    call_on_buffer ~command ~limit ~gen_new_file
                    ?inplace ~filename ~printer_mapping drv buf in
   Buffer.reset buf;
   res
 
-let prove_task ~command ~limit ?(cntexample=false) ?old
-               ?inplace drv task =
-  let task = prepare_task ~cntexample drv task in
-  prove_task_prepared ~command ~limit ?old ?inplace drv task
+let prove_task ~command ~limit ?old ?inplace ?interactive drv task =
+  let task = prepare_task drv task in
+  prove_task_prepared ~command ~limit ?interactive ?old ?inplace drv task
 
 (* exception report *)
 

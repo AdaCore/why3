@@ -1,0 +1,27 @@
+Strongest Postcondition
+bench/ce/if_decision_branch.mlw Other f'vc: Valid
+bench/ce/if_decision_branch.mlw Other f'vc: Unknown (sat)
+Counter-example model:
+File int.mlw:
+  Line 16:
+    a, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
+File if_decision_branch.mlw:
+  Line 18:
+    a, [[@introduced]] = {"type" : "Integer" , "val" : "0" }
+  Line 19:
+    result, [[@introduced]] = {"type" : "Integer" , "val" : "22" }
+  Line 22:
+    TEMP_NAME, [[@introduced], [@model_trace:TEMP_NAME], [@branch_id=5454],
+               [@field:0:sel_path]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "sel_path" ,
+    "value" : {"type" : "Boolean" , "val" : false } }] } }
+  Line 25:
+    TEMP_NAME, [[@introduced], [@model_trace:TEMP_NAME], [@field:0:sel_path]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "sel_path" ,
+    "value" : {"type" : "Boolean" , "val" : true } }] } }
+  Line 27:
+    TEMP_NAME, [[@introduced], [@model_trace:TEMP_NAME], [@branch_id=121],
+               [@field:0:sel_path]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "sel_path" ,
+    "value" : {"type" : "Boolean" , "val" : false } }] } }
+

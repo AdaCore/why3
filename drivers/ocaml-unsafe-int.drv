@@ -12,7 +12,7 @@ theory BuiltIn
   syntax predicate  (=)   "(%1 = %2)"
 end
 
-import "ocaml-no-arith.drv"
+(* import "ocaml-no-arith.drv" *)
 
 (* int *)
 
@@ -39,12 +39,12 @@ end
 (* FIXME: avoid Pervasives using a black list of reserved OCaml names *)
 
 theory int.Abs
-  syntax function abs "(Pervasives.abs %1)"
+  syntax function abs "Pervasives.abs"
 end
 
 theory int.MinMax
-  syntax function min "(Pervasives.min %1 %2)"
-  syntax function max "(Pervasives.max %1 %2)"
+  syntax function min "Pervasives.min"
+  syntax function max "Pervasives.max"
 end
 
 (* TODO
@@ -54,12 +54,12 @@ end
 
 theory int.Power
   prelude "let rec power x n = if n = 0 then 1 else x * power x (n-1)"
-  syntax function power "(power %1 %2)"
+  syntax function power "power"
 end
 
 theory int.Fact
   prelude "let rec fact n = if n <= 1 then 1 else n * fact (n-1)"
-  syntax function fact "(fact %1)"
+  syntax function fact "fact"
 end
 
 theory int.Fibonacci
@@ -68,6 +68,17 @@ theory int.Fibonacci
 end
 
 (* WhyML *)
+
+module Ref
+  syntax type     ref      "%1 ref"
+  syntax function contents "!%1"
+  syntax val      ref      "ref"
+end
+
+module ref.Ref
+  syntax val      (!_)     "!%1"
+  syntax val      (:=)     "%1 := %2"
+end
 
 module stack.Stack
   syntax type      t        "(%1 Stack.t)"
@@ -113,6 +124,7 @@ module array.Array
   syntax val defensive_get "Array.get"
   syntax val defensive_set "Array.set"
   syntax val make          "Array.make"
+  syntax val empty         "(%1; [||])"
   syntax val append        "Array.append"
   syntax val sub           "Array.sub"
   syntax val copy          "Array.copy"
@@ -125,7 +137,7 @@ module matrix.Matrix
 
   syntax exception OutOfBounds "(Invalid_argument \"index out of bounds\")"
 
-  syntax function rows     "(Array.length %1)"
+  syntax function rows     "Array.length"
   syntax function columns  "(Array.length %1.(0))"
   syntax val rows          "Array.length"
   syntax val columns       "(fun m -> Array.length m.(0))"
@@ -138,8 +150,7 @@ module matrix.Matrix
 end
 
 module mach.int.Int31
-  syntax val       of_int   "(fun x -> x)"
-  syntax converter of_int   "%1"
+  syntax val of_int   "%1"
 
   syntax function to_int "(%1)"
 
@@ -150,16 +161,14 @@ module mach.int.Int31
   syntax val      ( * )     "( * )"
   syntax val      ( / )     "( / )"
   syntax val      ( % )     "(mod)"
-  syntax val      eq        "(=)"
-  syntax val      ne        "(<>)"
+  syntax val      (=)       "(=)"
   syntax val      (<=)      "(<=)"
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
   syntax val      (>)       "(>)"
 end
 module mach.int.Int63
-  syntax val       of_int   "(fun x -> x)"
-  syntax converter of_int   "%1"
+  syntax val      of_int   "%1"
 
   syntax function to_int "(%1)"
 
@@ -170,8 +179,7 @@ module mach.int.Int63
   syntax val      ( * )     "( * )"
   syntax val      ( / )     "( / )"
   syntax val      ( % )     "(mod)"
-  syntax val      eq        "(=)"
-  syntax val      ne        "(<>)"
+  syntax val      (=)       "(=)"
   syntax val      (<=)      "(<=)"
   syntax val      (<)       "(<)"
   syntax val      (>=)      "(>=)"
@@ -207,7 +215,7 @@ module mach.array.Array31
   syntax val  self_blit "Array.blit"
 end
 module mach.array.Array63
-  syntax type array63 "(%1 array)"
+  syntax type array   "(%1 array)"
 
   syntax val  make   "Array.make"
   syntax val  ([])   "Array.get"
@@ -225,7 +233,7 @@ module mach.matrix.Matrix63
 
   syntax exception OutOfBounds "(Invalid_argument \"index out of bounds\")"
 
-  syntax function rows     "(Array.length %1)"
+  syntax function rows     "Array.length"
   syntax function columns  "(Array.length %1.(0))"
   syntax val rows          "Array.length"
   syntax val columns       "(fun m -> Array.length m.(0))"
@@ -236,4 +244,3 @@ module mach.matrix.Matrix63
   syntax val make          "Array.make_matrix"
   syntax val copy          "(Array.map Array.copy)"
 end
-

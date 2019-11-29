@@ -1,0 +1,9 @@
+module Debug
+
+type t = { mutable foo: unit }
+
+val t: t
+
+val print (x:'a) : unit writes { t }
+
+end

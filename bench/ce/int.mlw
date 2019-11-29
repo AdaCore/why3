@@ -1,0 +1,24 @@
+theory T
+
+  use int.Int
+
+  goal g_lab : forall x [@model] :int. x >= 42 -> x + 3 <= 50
+
+  goal g_no_lab : forall x:int. x >= 42 -> x + 3 <= 50
+
+  constant g : int
+
+  goal g2_lab : forall x:int. (g >= x)
+
+  goal newgoal : forall x1 [@model] [@model_trace:X] x2 x3 x4 x5 x6 x7 x8.
+  (x1 + 1 = 2) ->
+  (x2 + 1 = 2) ->
+  (x3 + 1 = 2) ->
+  (x4 + 1 = 2) ->
+  (x5 + 1 = 2) ->
+  (x6 + 1 = 2) ->
+  (x7 + 1 = 2) ->
+  (x8 + 1 = 2) ->
+  (x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 = 2)
+
+end

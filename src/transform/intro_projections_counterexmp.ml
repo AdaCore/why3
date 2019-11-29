@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,33 +15,10 @@ open Decl
 open Theory
 open Ty
 
-let model_trace_regexp = Str.regexp "model_trace:"
-  (* The term labeled with "model_trace:name" will be in counterexample with name "name" *)
-
-
-let label_starts_with regexp l =
-  try
-    ignore(Str.search_forward regexp l.lab_string 0);
-    true
-  with Not_found -> false
-
-let string_starts_with regexp l =
-  try
-    ignore(Str.search_forward regexp l 0);
-    true
-  with Not_found -> false
-
-let get_label labels regexp =
-  Slab.choose (Slab.filter (label_starts_with regexp) labels)
-
 let is_proj_for_array_attr proj_name =
-  let b =
-    try
-      string_starts_with (Str.regexp "'First\\|'Last\\|\\.") proj_name
-    with Not_found -> false in
-  b
-
-
+  match Re.Str.search_forward (Re.Str.regexp "'First\\|'Last") proj_name 0 with
+  | _ -> true
+  | exception Not_found -> false
 
 (*
 (* Debugging functions *)
@@ -62,15 +39,6 @@ let debug_decl decl =
   Debug.dprintf debug "Declaration %s @." s
 *)
 
-(* Label for terms that should be in counterexample *)
-let model_label = Ident.create_label "model"
-(* Label for terms that should be projected in counterexample *)
-let model_proj_label = Ident.create_label "model_projected"
-
-(* Meta to tag projection functions *)
-let meta_projection = Theory.register_meta "model_projection" [Theory.MTlsymbol]
-  ~desc:"Declares@ the@ projection."
-
 let intro_const_equal_to_term
     ~term
     ~id_new
@@ -79,14 +47,18 @@ let intro_const_equal_to_term
   (* See documentation of the function in file intro_projections_counterexmp.mli. *)
 
   (* Create declaration of new constant *)
-  (*let lab_new = Slab.add model_label labels in*)
   let ls_new_constant =  Term.create_lsymbol id_new [] term.t_ty in
   let decl_new_constant = Decl.create_param_decl ls_new_constant in
   let t_new_constant = Term.t_app ls_new_constant [] term.t_ty in
 
   (* Create declaration of the axiom about the constant: t_new_constant = t_rhs *)
   let id_axiom = Decl.create_prsymbol (Ident.id_fresh axiom_name) in
-  let fla_axiom = Term.t_equ t_new_constant term in
+  let fla_axiom =
+    (* Handle the case of predicates *)
+    if term.t_ty = None then
+      Term.t_iff t_new_constant term
+    else
+      Term.t_equ t_new_constant term in
   let decl_axiom = Decl.create_prop_decl Decl.Paxiom id_axiom fla_axiom in
 
   (* Return the declaration of new constant and the axiom *)
@@ -98,19 +70,20 @@ let introduce_constant ls t_rhs proj_name =
      array attributes like First and Last *)
   if is_proj_for_array_attr proj_name then
     (* introduce new constant c and axiom stating c = t_rhs  *)
-    let const_label = Slab.add model_label ls.ls_name.id_label in
-    let const_label = append_to_model_element_name ~labels:const_label ~to_append:proj_name in
-    let const_loc = Opt.get ls.ls_name.id_loc in
+    let const_attr = ls.ls_name.id_attrs in
+    let const_attr = append_to_model_element_name ~attrs:const_attr ~to_append:proj_name in
+    (* Note that this location can now be None *)
+    let const_loc = ls.ls_name.id_loc in
     let const_name = ls.ls_name.id_string^"_proj_constant_"^proj_name in
     let axiom_name = ls.ls_name.id_string^"_proj_axiom_"^proj_name in
-    let id_new = Ident.id_user ~label:const_label const_name const_loc in
+    let id_new = Ident.id_fresh ~attrs:const_attr ?loc:const_loc const_name in
     intro_const_equal_to_term ~term:t_rhs ~id_new:id_new ~axiom_name:axiom_name
   else
     []
 
 let get_record_field_suffix projection =
   try
-    get_model_element_name ~labels:projection.ls_name.id_label
+    get_model_element_name ~attrs:projection.ls_name.id_attrs
   with Not_found -> ""
 
 (* Find the projections corresponding to some type if it exists *)
@@ -178,12 +151,13 @@ let rec projections_for_term ls term proj_name applied_projs env map_projs =
 
 let intro_proj_for_ls env map_projs ls_projected =
   (* Returns list of declarations for projection of ls_projected
-     if it has a  label "model_projected", otherwise returns [].
+     if it has an attribute "model_projected", otherwise returns [].
 
      There can be more projections for ls_projected. For each projection
      f the declarations include:
-     - declaration of new constant with labels of ls_projected, label "model",
-       and label "model_trace:proj_name" where proj_name is the name of the projection
+     - declaration of new constant with attributes of ls_projected,
+       attribute "model" a nd attribute "model_trace:proj_name" where
+       proj_name is the name of the projection
      - declaration of axiom saying that the new constant is equal to
        ls_projected projected by its projection
 
@@ -191,11 +165,11 @@ let intro_proj_for_ls env map_projs ls_projected =
      map_projs.
 
      @param map_projs maps types to projection function for these types
-     @param ls_projected the label symbol that should be projected
+     @param ls_projected the attribute symbol that should be projected
   *)
-  if not (Slab.mem model_proj_label ls_projected.ls_name.id_label)
+  if not (Sattr.mem Ident.model_projected_attr ls_projected.ls_name.id_attrs)
   then
-    (* ls_projected has not a label "model_projected" *)
+    (* ls_projected has not an attribute "model_projected" *)
     []
   else
     match ls_projected.ls_value with
@@ -239,15 +213,8 @@ let build_projections_map projs =
   in
   Sls.fold build_map projs Ty.Mty.empty
 
-(* TODO we want to be able to write this. It seems not possible with Trans and
-   more efficient than the version we have below.
-let meta_transform2 f : Task.task -> Task.task = fun task ->
-  Trans.apply (Trans.fold (fun d t ->
-    Trans.apply (Trans.add_decls (f d)) t) task) task
-*)
-
-(* [meta_transform2 f t] Generate new declarations by applying f to each declaration of t
-   and then append these declarations to t *)
+(* [meta_transform2 f t] Generate new declarations by applying f to each
+   declaration of t and then append these declarations to t *)
 let meta_transform2 f : Task.task Trans.trans =
   let list_decl = Trans.fold (fun d l -> l @ (f d)) [] in
   Trans.bind list_decl (fun x -> Trans.add_decls x)
@@ -257,16 +224,12 @@ let encapsulate env projs : Task.task Trans.trans =
   meta_transform2 (fun d -> introduce_projs env map_projs d.Task.task_decl.td_node)
 
 let intro_projections_counterexmp env =
-  Trans.on_tagged_ls meta_projection (encapsulate env)
+  Trans.on_tagged_ls Theory.meta_projection (encapsulate env)
 
 
-let () = Trans.register_env_transform "intro_projections_counterexmp" intro_projections_counterexmp
-  ~desc:"For@ each@ declared@ abstract@ function@ and@ predicate@ p@ with@ label@ model_projected@ \
-and@ projectin@ f@ for@ p@ creates@ declaration@ of@ new@ constant@ c@ with@ label@ model@ and@ an@ axiom@ \
-c = f p."
-
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
+let () = Trans.register_env_transform "intro_projections_counterexmp"
+  intro_projections_counterexmp
+  ~desc:"For@ each@ declared@ abstract@ function@ and@ predicate@ p@ \
+         with@ attribute@ [%@model_projected]@ and@ projecting@ f@ \
+         for@ p,@ create@ declaration@ of@ new@ constant@ c@ with@ \
+         attribute@ [%@model]@ and@ an@ axiom@ c = f p."

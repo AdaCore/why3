@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,24 +15,29 @@ type t =
     { mutable window_width : int;
       mutable window_height : int;
       mutable tree_width : int;
+      mutable task_height : int;
       mutable font_size : int;
       mutable current_tab : int;
       mutable verbose : int;
-      mutable default_prover : string;
-      mutable default_editor : string;
-      mutable intro_premises : bool;
-      mutable show_labels : bool;
+      mutable show_full_context : bool;
+      mutable show_attributes : bool;
       mutable show_coercions : bool;
       mutable show_locs : bool;
       mutable show_time_limit : bool;
       mutable max_boxes : int;
+      mutable allow_source_editing : bool;
       mutable saving_policy : int;
+      mutable auto_next : bool;
       mutable premise_color : string;
       mutable neg_premise_color : string;
       mutable goal_color : string;
-      mutable error_color : string;
+      mutable error_color_fg : string;
+      mutable error_color_bg : string;
+      mutable error_color_msg_zone_fg : string;
+      mutable error_color_msg_zone_bg : string;
+      mutable error_line_color : string;
+      mutable search_color : string;
       mutable iconset : string;
-      mutable env : Why3.Env.env;
       mutable config : Whyconf.config;
       original_config : Whyconf.config;
       (* mutable altern_provers : prover option Mprover.t; *)
@@ -41,11 +46,10 @@ type t =
       mutable session_time_limit : int;
       mutable session_mem_limit : int;
       mutable session_nb_processes : int;
-      mutable session_cntexample : bool;
     }
 
-val load_config : Whyconf.config -> Whyconf.config -> Why3.Env.env -> unit
-(** [load_config config original_config env] creates and saves IDE config *)
+val load_config : Whyconf.config -> Whyconf.config -> unit
+(** [load_config config original_config] creates and saves IDE config *)
 
 val init : unit -> unit
 
@@ -57,9 +61,15 @@ val config : unit -> t
 
 val get_main : unit -> Whyconf.main
 
-val incr_font_size : int -> int
-(** [incr_font_size n] increments current font size by [n] (can be negative)
-    and returns the new size *)
+(*******************)
+(*   font size     *)
+(*******************)
+
+val add_modifiable_sans_font_view : GObj.misc_ops -> unit
+val add_modifiable_mono_font_view : GObj.misc_ops -> unit
+val enlarge_fonts : unit -> unit
+val reduce_fonts : unit -> unit
+val set_fonts : unit -> unit
 
 (*****************)
 (* images, icons *)
@@ -106,12 +116,15 @@ val image_failure_obs : GdkPixbuf.pixbuf ref
 (* miscellaneous dialogs *)
 (*************************)
 
-val show_legend_window : unit -> unit
-val show_about_window : unit -> unit
-val preferences : t -> unit
+val show_legend_window : parent:#GWindow.window_skel -> unit -> unit
+val show_about_window : parent:#GWindow.window_skel -> unit -> unit
+val preferences : parent:#GWindow.window_skel -> t -> unit
 
-val uninstalled_prover :
-  t -> 'key Session.env_session -> Whyconf.prover -> Whyconf.prover_upgrade_policy
+val uninstalled_prover_dialog :
+  parent:#GWindow.window_skel ->
+  callback: (Whyconf.prover -> Whyconf.prover_upgrade_policy -> unit) ->
+  t -> Whyconf.prover -> unit
+
 
 (*
 val unknown_prover :

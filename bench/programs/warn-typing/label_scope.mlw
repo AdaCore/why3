@@ -1,0 +1,11 @@
+
+module T
+
+  use ref.Ref
+
+  let f () =
+    label Foo in
+    let x = ref 0 in
+    assert { 42 = !x at Foo } (* variable x does not exist at Foo *)
+
+end

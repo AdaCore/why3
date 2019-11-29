@@ -1,0 +1,326 @@
+
+(** {1 A proof of Bellman-Ford algorithm}
+
+   By Yuto Takei (University of Tokyo, Japan)
+   and Jean-Christophe Filliâtre (CNRS, France). *)
+
+theory Graph
+
+  use export list.List
+  use export list.Append
+  use export list.Length
+  use export int.Int
+  use export set.Fset
+
+  (* the graph is defined by a set of vertices and a set of edges *)
+  type vertex
+  constant vertices: fset vertex
+  constant edges: fset (vertex, vertex)
+
+  predicate edge (x y: vertex) = mem (x,y) edges
+
+  (* edges are well-formed *)
+  axiom edges_def:
+    forall x y: vertex.
+    mem (x, y) edges -> mem x vertices /\ mem y vertices
+
+  (* a single source vertex s is given *)
+  val constant s: vertex
+    ensures { mem result vertices }
+
+  (* hence vertices is non empty *)
+  lemma vertices_cardinal_pos: cardinal vertices > 0
+
+  val constant nb_vertices: int
+    ensures { result = cardinal vertices }
+
+  (* paths *)
+  clone export graph.IntPathWeight
+     with type vertex = vertex, predicate edge = edge
+
+  lemma path_in_vertices:
+    forall v1 v2: vertex, l: list vertex.
+    mem v1 vertices -> path v1 l v2 -> mem v2 vertices
+
+  (* A key idea behind Bellman-Ford's correctness is that of simple path:
+     if there is a path from s to v, there is a path with less than
+     |V| edges. We formulate this in a slightly more precise way: if there
+     a path from s to v with at least |V| edges, then there must be a duplicate
+     vertex along this path. There is a subtlety here: since the last vertex
+     of a path is not part of the vertex list, we distinguish the case where
+     the duplicate vertex is the final vertex v.
+
+     Proof: Assume [path s l v] with length l >= |V|.
+       Consider the function f mapping i in {0..|V|} to the i-th element
+       of the list l ++ [v]. Since all elements of the
+       path (those in l and v) belong to V, then by the pigeon hole principle,
+       f cannot be injective from 0..|V| to V. Thus there exist two distinct
+       i and j in 0..|V| such that f(i)=f(j), which means that
+              l ++ [v] = l1 ++ [u] ++ l2 ++ [u] ++ l3
+       Two cases depending on l3=[] (and thus u=v) conclude the proof. Qed.
+  *)
+
+  clone pigeon.ListAndSet with type t = vertex
+
+  predicate cyc_decomp (v: vertex) (l: list vertex)
+                       (vi: vertex) (l1 l2 l3: list vertex) =
+    l = l1 ++ l2 ++ l3 /\ length l2 > 0 /\
+    path s l1 vi /\ path vi l2 vi /\ path vi l3 v
+
+  lemma long_path_decomposition:
+    forall l v. path s l v /\ length l >= cardinal vertices ->
+      (exists vi l1 l2 l3. cyc_decomp v l vi l1 l2 l3)
+      by exists n l1 l2 l3. Cons v l = l1 ++ Cons n (l2 ++ Cons n l3)
+      so match l1 with
+        | Nil -> cyc_decomp v l v l2 (Cons n l3) Nil
+        | Cons v l1 -> cyc_decomp v l n l1 (Cons n l2) (Cons n l3)
+        end
+
+  lemma long_path_reduction:
+    forall l v. path s l v /\ length l >= cardinal vertices ->
+      exists l'. path s l' v /\ length l' < length l
+      by exists vi l1 l2 l3. cyc_decomp v l vi l1 l2 l3 /\ l' = l1 ++ l3
+
+  let lemma simple_path (v: vertex) (l: list vertex) : unit
+    requires { path s l v }
+    ensures  { exists l'. path s l' v /\ length l' < cardinal vertices }
+  = let rec aux (n: int) : unit
+      ensures { forall l. length l <= n /\ path s l v ->
+          exists l'. path s l' v /\ length l' < cardinal vertices }
+      variant { n }
+    = if n > 0 then aux (n-1)
+    in
+    aux (length l)
+
+  (* negative cycle [v] -> [v] reachable from [s] *)
+  predicate negative_cycle (v: vertex) =
+    mem v vertices /\
+    (exists l1: list vertex. path s l1 v) /\
+    (exists l2: list vertex. path v l2 v /\ path_weight l2 v < 0)
+
+  (* key lemma for existence of a negative cycle
+
+     Proof: by induction on the (list) length of the shorter path l
+       If length l < cardinal vertices, then it contradicts hypothesis 1
+       thus length l >= cardinal vertices and thus the path contains a cycle
+             s ----> n ----> n ----> v
+       If the weight of the cycle n--->n is negative, we are done.
+       Otherwise, we can remove this cycle from the path and we get
+       an even shorter path, with a stricltly shorter (list) length,
+       thus we can apply the induction hypothesis.                     Qed.
+   *)
+  predicate all_path_gt (v: vertex) (n: int) =
+    forall l. path s l v /\ length l < cardinal vertices -> path_weight l v >= n
+
+  let lemma key_lemma_1 (v: vertex) (l: list vertex) (n: int) : unit
+    (* if any simple path has weight at least n *)
+    requires { all_path_gt v n }
+    (* and if there exists a shorter path *)
+    requires { path s l v /\ path_weight l v < n }
+    (* then there exists a negative cycle. *)
+    ensures  { exists u. negative_cycle u }
+  = let rec aux (m: int) : (_a: 'a)
+      requires { forall u. not negative_cycle u }
+      requires { exists l. path s l v /\ path_weight l v < n /\ length l <= m }
+      ensures  { false }
+      variant  { m }
+    = assert { (exists l'. path s l' v /\ path_weight l' v < n /\ length l' < m)
+        by exists l. path s l v /\ path_weight l v < n /\ length l <= m
+        so exists vi l1 l2 l3. cyc_decomp v l vi l1 l2 l3
+        so let res = l1 ++ l3 in
+          path s res v /\ length res < length l /\ path_weight res v < n
+          by path_weight l v =
+            path_weight l1 vi + path_weight l2 vi + path_weight l3 v
+          so path_weight l2 vi >= 0 by not negative_cycle vi
+      };
+      aux (m-1)
+    in
+    if pure { forall u. not negative_cycle u } then aux (length l)
+
+end
+
+module BellmanFord
+
+  use Graph
+  use int.IntInf as D
+  use ref.Ref
+  clone set.SetImp as S with type elt = (vertex, vertex)
+  clone impmap.ImpmapNoDom with type key = vertex
+
+  type distmap = ImpmapNoDom.t D.t
+
+  let initialize_single_source (s: vertex): distmap
+    ensures { result = (create D.Infinite)[s <- D.Finite 0] }
+  =
+    let m = create D.Infinite in
+    m[s] <- D.Finite 0;
+    m
+
+  (* [inv1 m pass via] means that we already performed [pass-1] steps
+     of the main loop, and, in step [pass], we already processed edges
+     in [via] *)
+  predicate inv1 (m: distmap) (pass: int) (via: fset (vertex, vertex)) =
+    forall v: vertex. mem v vertices ->
+    match m[v] with
+      | D.Finite n ->
+        (* there exists a path of weight [n] *)
+        (exists l: list vertex. path s l v /\ path_weight l v = n) /\
+        (* there is no shorter path in less than [pass] steps *)
+        (forall l: list vertex.
+           path s l v -> length l < pass -> path_weight l v >= n) /\
+        (* and no shorter path in i steps with last edge in [via] *)
+        (forall u: vertex, l: list vertex.
+           path s l u -> length l < pass -> mem (u,v) via ->
+           path_weight l u + weight u v >= n)
+      | D.Infinite ->
+        (* any path has at least [pass] steps *)
+        (forall l: list vertex. path s l v -> length l >= pass) /\
+        (* [v] cannot be reached by [(u,v)] in [via] *)
+        (forall u: vertex. mem (u,v) via -> (*m[u] = D.Infinite*)
+          forall lu: list vertex. path s lu u -> length lu >= pass)
+    end
+
+  predicate inv2 (m: distmap) (via: fset (vertex, vertex)) =
+    forall u v: vertex. mem (u, v) via ->
+    D.le m[v] (D.add m[u] (D.Finite (weight u v)))
+
+
+  let rec lemma inv2_path (m: distmap) (y z: vertex) (l:list vertex) : unit
+    requires { inv2 m edges }
+    requires { path y l z }
+    ensures  { D.le m[z] (D.add m[y] (D.Finite (path_weight l z))) }
+    variant  { length l }
+  = match l with
+    | Nil -> ()
+    | Cons _ q ->
+      let hd = match q with
+        | Nil -> z
+        | Cons h _ ->
+          assert { path_weight l z = weight y h + path_weight q z };
+          assert { D.le m[h] (D.add m[y] (D.Finite (weight y h))) };
+          h
+        end in
+      inv2_path m hd z q
+    end
+
+  (* key lemma for non-existence of a negative cycle
+
+     Proof: let us assume a negative cycle reachable from s, that is
+         s --...--> x0 --w1--> x1 --w2--> x2 ... xn-1 --wn--> x0
+       with w1+w2+...+wn < 0.
+       Let di be the distance from s to xi as given by map m.
+       By [inv2 m edges] we have di-1 + wi >= di for all i.
+       Summing all such inequalities over the cycle, we get
+            w1+w2+...+wn >= 0
+       hence a contradiction.                                  Qed. *)
+  lemma key_lemma_2:
+     forall m: distmap. inv1 m (cardinal vertices) empty -> inv2 m edges ->
+     forall v: vertex. not (negative_cycle v
+       so exists l1. path s l1 v
+       so exists l2. path v l2 v /\ path_weight l2 v < 0
+       so D.le m[v] (D.add m[v] (D.Finite (path_weight l2 v)))
+     )
+
+  let relax (m: distmap) (u v: vertex) (pass: int)
+            (ghost via: fset (vertex, vertex))
+    requires { 1 <= pass /\ mem (u, v) edges /\ not (mem (u, v) via) }
+    requires { inv1 m pass via }
+    ensures  { inv1 m pass (add (u, v) via) }
+  = label I in
+    let n = D.add m[u] (D.Finite (weight u v)) in
+    if D.lt n m[v]
+    then begin
+      m[v] <- n;
+      assert { match (m at I)[u] with
+        | D.Infinite -> false
+        | D.Finite w0 ->
+          let w1 = w0 + weight u v in
+          n = D.Finite w1
+          && (exists l. path s l v /\ path_weight l v = w1
+            by exists l2.
+              path s l2 u /\ path_weight l2 u = w0 /\ l = l2 ++ Cons u Nil
+          ) && (forall l. path s l v /\ length l < pass -> path_weight l v >= w1
+            by match (m at I)[v] with
+            | D.Infinite -> false
+            | D.Finite w2 -> path_weight l v >= w2
+            end
+          ) && (forall z l. path s l z /\ length l < pass ->
+            mem (z,v) (add (u,v) via) ->
+            path_weight l z + weight z v >= w1
+            by if z = u then path_weight l z >= w0
+            else match (m at I)[v] with
+              | D.Infinite -> false
+              | D.Finite w2 -> path_weight l z + weight z v >= w2
+              end
+          )
+        end
+      }
+    end else begin
+      assert { forall l w1. path s l u /\ length l < pass /\ m[v] = D.Finite w1 ->
+        path_weight l u + weight u v >= w1
+        by match m[u] with
+        | D.Infinite -> false
+        | D.Finite w0 -> path_weight l u >= w0
+        end
+      }
+    end
+
+  val get_edges (): S.set
+    ensures { result = edges }
+
+  exception NegativeCycle
+
+  let bellman_ford ()
+    ensures { forall v: vertex. mem v vertices ->
+      match result[v] with
+        | D.Finite n ->
+            (exists l: list vertex. path s l v /\ path_weight l v = n) /\
+            (forall l: list vertex. path s l v -> path_weight l v >= n
+             by all_path_gt v n)
+        | D.Infinite ->
+            (forall l: list vertex. not (path s l v))
+      end }
+    raises { NegativeCycle -> exists v: vertex. negative_cycle v }
+  = let m = initialize_single_source s in
+    for i = 1 to nb_vertices - 1 do
+      invariant { inv1 m i empty }
+      let es = get_edges () in
+      while not (S.is_empty es) do
+        invariant { subset es.S.to_fset edges /\ inv1 m i (diff edges es.S.to_fset) }
+        variant   { S.cardinal es }
+        let ghost via = diff edges es.S.to_fset in
+        let (u, v) = S.choose_and_remove es in
+        relax m u v i via
+      done;
+      assert { inv1 m i edges }
+    done;
+    assert { inv1 m (cardinal vertices) empty };
+    let es = get_edges () in
+    while not (S.is_empty es) do
+      invariant { subset es.S.to_fset edges /\ inv2 m (diff edges es.S.to_fset) }
+      variant { S.cardinal es }
+      let (u, v) = S.choose_and_remove es in
+      if D.lt (D.add m[u] (D.Finite (weight u v))) m[v] then begin
+        assert { match m[u], m[v] with
+          | D.Infinite, _ -> false
+          | D.Finite _, D.Infinite -> false
+            by exists l2. path s l2 u
+            so let l = l2 ++ Cons u Nil in path s l v
+            so exists l. path s l v /\ length l < cardinal vertices
+          | D.Finite wu, D.Finite wv ->
+            (exists w. negative_cycle w)
+            by
+            all_path_gt v wv
+            so exists l2. path s l2 u /\ path_weight l2 u = wu
+            so let l = l2 ++ Cons u Nil in
+              path s l v /\ path_weight l v < wv
+          end
+        };
+        raise NegativeCycle
+      end
+    done;
+    assert { inv2 m edges };
+    assert { forall u. not (negative_cycle u) };
+    m
+
+end

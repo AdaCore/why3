@@ -1,0 +1,50 @@
+
+(** {1 Booleans} *)
+
+(** {2 Basic theory of Booleans} *)
+
+module Bool
+
+  let function andb (x y : bool) : bool =
+    match x with
+    | True -> y
+    | False -> False
+    end
+
+  let function orb (x y : bool) : bool =
+    match x with
+    | False -> y
+    | True -> True
+    end
+
+  let function notb (x : bool) : bool =
+    match x with
+    | False -> True
+    | True  -> False
+    end
+
+  let function xorb (x y : bool) : bool =
+    match x with
+    | False -> y
+    | True -> notb y
+    end
+
+  let function implb (x y : bool) : bool =
+    match x with
+    | False -> True
+    | True -> y
+    end
+
+end
+
+(** {2 Operator if-then-else} *)
+
+module Ite
+
+  let function ite (b:bool) (x y : 'a) : 'a =
+    match b with
+    | True  -> x
+    | False -> y
+    end
+
+end

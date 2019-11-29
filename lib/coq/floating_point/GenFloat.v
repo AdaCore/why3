@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -21,8 +21,8 @@ Require real.Abs.
 Require real.FromInt.
 Require floating_point.Rounding.
 
-Require Import Flocq.Core.Fcore.
-Require Import Flocq.Appli.Fappli_IEEE.
+Require Import Flocq.Core.Core.
+Require Import Flocq.IEEE754.Binary.
 Require Import int.Abs.
 
 Section GenFloat.
@@ -65,7 +65,7 @@ match goal with
 end.
 split.
 split.
-apply Fappli_IEEE.B754_zero.
+apply B754_zero.
 exact false.
 exact R0.
 exact R0.
@@ -93,16 +93,11 @@ intros H _ _.
 now injection H.
 clear.
 destruct (Bool.bool_dec xs ys) as [->|Hs].
-destruct (Z_eq_dec (Zpos (proj1_sig xm')) (Zpos (proj1_sig ym'))) as [Hm'|Hm'].
+destruct (Pos.eq_dec xm' ym') as [Hm'|Hm'].
 left.
 apply f_equal3 ; try easy.
-apply f_equal2 ; try easy.
-destruct xm' as [xm' pxm'].
-destruct ym' as [ym' pym'].
-simpl in Hm'.
-injection Hm'.
-intros ->.
-now rewrite (eqbool_irrelevance _ pxm' pym').
+revert e; rewrite Hm'; intros e.
+now rewrite (eqbool_irrelevance _ e0 e).
 right.
 apply t_inv.
 intros H _ _.
@@ -142,7 +137,7 @@ Definition rnd_of_mode (m:mode) :=
 Definition r_to_fp rnd x : binary_float prec emax :=
   let r := round radix2 fexp (round_mode rnd) x in
   let m := Ztrunc (scaled_mantissa radix2 fexp r) in
-  let e := canonic_exp radix2 fexp r in
+  let e := cexp radix2 fexp r in
   binary_normalize prec emax Hprec' Hemax' rnd m e false.
 
 Lemma is_finite_FF2B :
@@ -166,7 +161,7 @@ Theorem r_to_fp_correct :
 Proof with auto with typeclass_instances.
 intros rnd x r Bx.
 unfold r_to_fp. fold r.
-generalize (binary_normalize_correct prec emax Hprec' Hemax' rnd (Ztrunc (scaled_mantissa radix2 fexp r)) (canonic_exp radix2 fexp r) false).
+generalize (binary_normalize_correct prec emax Hprec' Hemax' rnd (Ztrunc (scaled_mantissa radix2 fexp r)) (cexp radix2 fexp r) false).
 unfold r.
 elim generic_format_round...
 fold emin r.
@@ -223,36 +218,36 @@ apply Rabs_le.
 assert (generic_format radix2 fexp max).
 apply generic_format_F2R.
 intros H.
-unfold canonic_exp.
-rewrite ln_beta_F2R with (1 := H).
-rewrite (ln_beta_unique _ _ prec).
+unfold cexp.
+rewrite mag_F2R with (1 := H).
+rewrite (mag_unique _ _ prec).
 ring_simplify (prec + (emax - prec))%Z.
 unfold FLT_exp.
-rewrite Zmax_l.
-apply Zle_refl.
+rewrite Z.max_l.
+apply Z.le_refl.
 unfold emin.
 generalize Hprec' Hemax' ; clear ; omega.
-rewrite <- Z2R_abs, Zabs_eq, <- 2!Z2R_Zpower.
+rewrite <- abs_IZR, Z.abs_eq, <- 2!IZR_Zpower.
 split.
-apply Z2R_le.
+apply IZR_le.
 apply Zlt_succ_le.
-change (2 ^ prec - 1)%Z with (Zpred (2^prec))%Z.
+change (2 ^ prec - 1)%Z with (Z.pred (2^prec))%Z.
 rewrite <- Zsucc_pred.
-apply lt_Z2R.
+apply lt_IZR.
 change 2%Z with (radix_val radix2).
-rewrite 2!Z2R_Zpower.
+rewrite 2!IZR_Zpower.
 apply bpow_lt.
 apply Zlt_pred.
 apply Zlt_le_weak.
 exact Hprec'.
 generalize Hprec' ; clear ; omega.
-apply Z2R_lt.
+apply IZR_lt.
 apply Zlt_pred.
 apply Zlt_le_weak.
 exact Hprec'.
 generalize Hprec' ; clear ; omega.
 apply Zlt_succ_le.
-change (2 ^ prec - 1)%Z with (Zpred (2^prec))%Z.
+change (2 ^ prec - 1)%Z with (Z.pred (2^prec))%Z.
 rewrite <- Zsucc_pred.
 change 2%Z with (radix_val radix2).
 apply Zpower_gt_0.
@@ -299,7 +294,7 @@ Lemma Bounded_value : forall (x:t), ((Rabs (value x)) <= max)%R.
 Proof with auto with typeclass_instances.
 intros x.
 replace max with (pred radix2 fexp (bpow radix2 emax)).
-apply le_pred_lt...
+apply pred_ge_gt...
 apply generic_format_abs.
 apply generic_format_B2R.
 apply generic_format_bpow.
@@ -308,16 +303,16 @@ zify ; generalize Hprec' Hemax' ; omega.
 apply abs_B2R_lt_emax.
 rewrite pred_eq_pos.
 unfold pred_pos.
-rewrite ln_beta_bpow.
+rewrite mag_bpow.
 ring_simplify (emax+1-1)%Z.
 rewrite Req_bool_true by easy.
 unfold FLT_exp, emin.
-rewrite Zmax_l.
+rewrite Z.max_l.
 unfold max, F2R; simpl.
 pattern emax at 1; replace emax with (prec+(emax-prec))%Z by ring.
 rewrite bpow_plus.
 change 2%Z with (radix_val radix2).
-rewrite Z2R_minus, Z2R_Zpower.
+rewrite minus_IZR, IZR_Zpower.
 simpl; ring.
 apply Zlt_le_weak.
 exact Hprec'.
@@ -337,21 +332,19 @@ Lemma Exact_rounding_for_integers : forall (m:floating_point.Rounding.mode)
 Proof with auto with typeclass_instances.
 intros m z Hz.
 apply round_generic...
-assert (Zabs z <= max_representable_integer)%Z.
+assert (Z.abs z <= max_representable_integer)%Z.
 apply Abs_le with (1:=Hz).
 destruct (Zle_lt_or_eq _ _ H) as [Bz|Bz] ; clear H Hz.
 apply generic_format_FLT.
 exists (Float radix2 z 0).
 unfold F2R ; simpl.
-split.
-rewrite Z2R_IZR.
 now rewrite Rmult_1_r.
-split. easy.
-unfold emin; generalize Hprec' Hemax'; omega.
+easy.
+simpl; unfold emin; generalize Hprec' Hemax'; omega.
 unfold max_representable_integer in Bz.
 change 2%Z with (radix_val radix2) in Bz.
 apply generic_format_abs_inv.
-rewrite  <- Z2R_IZR, <- Z2R_abs, Bz, Z2R_Zpower.
+rewrite <- abs_IZR, Bz, IZR_Zpower.
 apply generic_format_bpow.
 unfold FLT_exp, emin.
 clear Bz; generalize Hprec' Hemax'; zify.
@@ -413,8 +406,8 @@ rewrite bpow_plus.
 apply Rmult_lt_compat_r.
 apply bpow_gt_0.
 simpl.
-rewrite <- Z2R_Zpower.
-apply Z2R_lt.
+rewrite <- IZR_Zpower.
+apply IZR_lt.
 apply Zlt_pred.
 apply Zlt_le_weak.
 exact Hprec'.

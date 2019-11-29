@@ -12,6 +12,7 @@
 open Format
 open Why3
 open Stdlib
+open Wstdlib
 
 
 exception File_too_small
@@ -22,7 +23,7 @@ let unwrap = function
   | None -> raise Unwraaap
 
 (* can't be used because why3 does not seem to keep a good character count (?) *)
-let insert_at filename filename_2 offset to_add = 
+let insert_at filename filename_2 offset to_add =
   let buf = Bytes.create offset in
   let fin = open_in filename in
   let fout = open_out filename_2 in
@@ -45,7 +46,7 @@ let insert_at filename filename_2 offset to_add =
       close_in fin; close_out fout
   end
 
-let insert_at_lines filename filename_2 offset to_add = 
+let insert_at_lines filename filename_2 offset to_add =
   let fin = open_in filename in
   let fout = open_out filename_2 in
   begin
@@ -104,7 +105,7 @@ let do_input f =
     | "-" ->
         Env.read_channel Pmodule.mlw_language ?format env "stdin" stdin
     | file ->
-        Env.read_file Pmodule.mlw_language ?format env file
+        fst (Env.read_file Pmodule.mlw_language ?format env file)
   in
   let all_while = ref [] in
   let open Pdecl in
@@ -113,7 +114,7 @@ let do_input f =
     let open Pmodule in
     Mstr.iter (fun k ps -> match ps with
         | PV a -> (* this is a val - nothing to do *) ()
-        | RS(rsym) ->
+        | RS(rsym) -> begin
           let decl = Ident.Mid.find Expr.(rsym.rs_name) m.mod_known in
           match decl.pd_node with
           | PDlet(let_expr) ->
@@ -167,8 +168,9 @@ let do_input f =
                 end
               | LDrec(_) -> Format.eprintf "LDrec not handled@."
             end
-          | _ -> () 
-
+          | _ -> ()
+          end
+        | _ -> assert false
       ) m.mod_export.ns_ps
   in
   (*let open Pmodule in
@@ -184,7 +186,7 @@ let do_input f =
   let copying_informations = Hashtbl.create 100 in
   !all_while
   |> List.concat
-  |> List.sort (fun (e1, _) (e2, _) -> 
+  |> List.sort (fun (e1, _) (e2, _) ->
                         let e1 = match e1.e_node with
                           | Ewhile(_, _, _, e1) | Efor(_, _, _, _, e1)
                             -> e1
@@ -237,4 +239,3 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
-

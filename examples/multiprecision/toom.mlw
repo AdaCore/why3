@@ -1,0 +1,2134 @@
+module Toom
+
+  use array.Array
+  use map.Map
+  use mach.c.C
+  use ref.Ref
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Int
+  use int.Power
+  use valuation.Valuation
+  use int.ComputerDivision
+  use types.Types
+  use lemmas.Lemmas
+  use compare.Compare
+  use util.Util
+  use add.Add
+  use sub.Sub
+  use mul.Mul
+  use logical.Logical
+
+let constant toom22_threshold : int32 = 29
+
+let lemma no_borrow (x y r b m:int)
+  requires { 0 <= y <= x }
+  requires { 0 <= r < m }
+  requires { r - m * b = x - y }
+  requires { 0 <= b }
+  ensures  { b = 0 }
+= assert { b <= 0 by m * b < m * 1 }
+
+let lemma no_borrow_ptr (x y r: ptr limb) (nx ny:int) (b:limb)
+  requires { 0 < ny <= nx }
+  requires { value y ny <= value x nx }
+  requires { value r nx - (power radix nx) * b = value x nx - value y ny }
+  requires { 0 <= b }
+  ensures  { b = 0 }
+= no_borrow (value x nx) (value y ny) (value r nx) (l2i b) (power radix nx)
+
+let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+                        (scratch: ptr limb) (ghost k: int) : unit
+  requires { valid x sx }
+  requires { valid y sy }
+  requires { valid r (sx + sy) }
+  requires { toom22_threshold < sy }
+  requires { 0 < k <= 64 }
+  requires { sx <= toom22_threshold * power 2 k }
+  requires { valid scratch (2 * (sx + k)) } (*TODO faire en fonction de sy *)
+  requires { 8 * sx < max_int32 }
+  requires { 2 < sy <= sx < sy + sy - 1 }
+  requires { 4 * sx < 5 * sy }
+  ensures  { min r = old min r }
+  ensures  { max r = old max r }
+  ensures  { plength r = old plength r }
+  ensures  { min scratch = old min scratch }
+  ensures  { max scratch = old max scratch }
+  ensures  { plength scratch = old plength scratch }
+  ensures  { value r (sx + sy) = value x sx * value y sy }
+  ensures  { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
+                       -> (pelts r)[j] = old (pelts r)[j] }
+  ensures  { forall j. min scratch <= j < offset scratch
+                       -> (pelts scratch)[j] = old (pelts scratch)[j] }
+  variant { k + k }
+=
+  let s = sx / 2 in (* TODO sx >> 1 *)
+  let n = sx - s in
+  let t = sy - n in
+  assert { 0 < s };
+  assert { n-1 <= s <= n };
+  assert { 0 < t <= s };
+  let x0 = x in
+  let x1 = C.incr x n in
+  let y0 = y in
+  let y1 = C.incr y n in
+  let ghost a0 = value x0 (int32'int n) in
+  let ghost a1 = value x1 (int32'int s) in
+  let ghost b0 = value y0 (int32'int n) in
+  let ghost b1 = value y1 (int32'int t) in
+  let ghost m = power radix (int32'int n) in
+  value_concat x n sx;
+  value_concat y n sy;
+  assert { value x sx = a0 + m * a1 };
+  assert { value y sy = b0 + m * b1 };
+  let r' = decr_split r 0 in
+  let ro = C.incr_split r (sx + sy) in
+  let scratch' = decr_split scratch 0 in
+  assert { min r = offset r /\ max r = offset r + sx + sy };
+  let s_out = C.incr_split scratch (n + n) in
+  let vinf = C.incr_split r (n + n) in
+  label ASM1 in
+  let xsm1 = r in
+  let ysm1 = C.incr_split r n in
+  let vm1_neg = ref false in
+  begin ensures { (!vm1_neg /\ value xsm1 n = a1 - a0)
+                  \/ (not !vm1_neg /\ value xsm1 n = a0 - a1) }
+        ensures { min scratch = old min scratch }
+        ensures { max scratch = old max scratch }
+        ensures { plength scratch = old plength scratch }
+    if (s = n)
+    then
+      if begin ensures { result <->  value x0 n < value x1 n }
+           (wmpn_cmp x0 x1 n) < 0
+         end
+      then begin
+        let ghost b = wmpn_sub_n xsm1 x1 x0 n in
+        no_borrow_ptr x1 x0 xsm1 (p2i n) (p2i n) b;
+        vm1_neg := true end
+      else let ghost b = wmpn_sub_n xsm1 x0 x1 n in
+           no_borrow_ptr x0 x1 xsm1 (p2i n) (p2i n) b
+    else
+      (* n-s=1*)
+      if ((get_ofs x0 s) = 0) &&
+         ((wmpn_cmp x0 x1 s) < 0)
+      then begin
+        assert { value x0 s < value x1 s };
+        value_tail x0 s;
+        assert { value x0 n = value x0 s };
+        let ghost b = wmpn_sub_n xsm1 x1 x0 s in
+        no_borrow_ptr x1 x0 xsm1 (p2i s) (p2i s) b;
+        value_sub_shift_no_change (pelts xsm1) (xsm1.offset) (p2i s) (p2i s) 0;
+        set_ofs xsm1 s 0;
+        vm1_neg := true;
+        value_tail xsm1 s
+        end
+      else begin
+        let b = wmpn_sub_n xsm1 x0 x1 s in
+        label Borrow in
+        value_sub_shift_no_change (pelts xsm1) (xsm1.offset) (p2i s) (p2i s) b;
+        let lx = get_ofs x0 s in
+        set_ofs xsm1 s (lx - b);
+        assert { value xsm1 s = value (xsm1 at Borrow) s };
+        value_tail x0 s;
+        value_tail xsm1 s;
+        end
+  end;
+  label BSM1 in
+  begin ensures { (!vm1_neg = (!vm1_neg at BSM1) /\ value ysm1 n = b0 - b1)
+                  \/ (!vm1_neg = not (!vm1_neg at BSM1) /\ value ysm1 n = b1 - b0) }
+        ensures { value xsm1 n = (value xsm1 n at BSM1) }
+        ensures { min scratch = old min scratch }
+        ensures { max scratch = old max scratch }
+        ensures { plength scratch = old plength scratch }
+    if (t = n)
+    then
+      if begin ensures { result <-> value y0 n < value y1 n }
+           (wmpn_cmp y0 y1 n) < 0
+         end
+      then begin
+        let ghost b = wmpn_sub_n ysm1 y1 y0 n in
+        no_borrow_ptr y1 y0 ysm1 (p2i n) (p2i n) b;
+        vm1_neg := not !vm1_neg end
+      else
+        let ghost b = wmpn_sub_n ysm1 y0 y1 n in
+        no_borrow_ptr y0 y1 ysm1 (p2i n) (p2i n) b;
+    else
+      let y0t = C.incr y0 t in
+      let c0 = ((wmpn_zero_p y0t (n - t)) = 1) in
+      let c1 = ((wmpn_cmp y0 y1 t) < 0) in
+      if c0 && c1
+      then begin
+        assert { value y0 t < value y1 t };
+        value_concat y0 t n;
+        assert { value y0 n = value y0 t };
+        let ghost b = wmpn_sub_n ysm1 y1 y0 t in
+        no_borrow_ptr y1 y0 ysm1 (p2i t) (p2i t) b;
+        assert { forall j. (j < offset r \/ offset r + sx + sy <= j)
+                             -> (pelts r)[j] = (pelts r)[j] at BSM1 };
+        label Zero in
+        let ghost ysm1z = { ysm1 } in
+        let ysm1t = C.incr ysm1 t in
+        wmpn_zero ysm1t (n - t);
+        value_sub_frame_shift (pelts ysm1) (pelts ysm1z)
+                              (offset ysm1) (offset ysm1z) (p2i t);
+        assert { value ysm1 t = value ysm1 t at Zero };
+        assert { value xsm1 n = value xsm1 n at Zero };
+        value_concat ysm1 t n;
+        assert { value ysm1 n = value ysm1 t };
+        vm1_neg := not !vm1_neg end
+      else begin
+        value_concat y0 t n;
+        assert { value y0 n = value y0 t + power radix t * value y0t (n-t) };
+        assert { value y1 t <= value y0 n
+                 by (not c0
+                     so 1 <= value y0t (n - t)
+                     so power radix t * 1 <= power radix t * value y0t (n-t)
+                     so power radix t <= value y0 n
+                     so value y1 t < power radix t)
+                  \/ (not c1
+                      so value y1 t <= value y0 t
+                      so value y0 t <= value y0 n) };
+        let ghost b = wmpn_sub ysm1 y0 n y1 t in
+        no_borrow_ptr y0 y1 ysm1 (p2i n) (p2i t) b;
+        end
+  end;
+  let ghost asm1_abs = value xsm1 (int32'int n) in
+  let ghost bsm1_abs = value ysm1 (int32'int n) in
+  label RecM1 in
+  wmpn_toom22_mul_n_rec scratch xsm1 ysm1 s_out n (k-1);
+  assert { value scratch (n+n) = asm1_abs * bsm1_abs };
+  join r ysm1;
+  assert { min scratch = offset scratch };
+  assert { max scratch = max scratch at ASM1 };
+  assert { plength scratch = old plength scratch };
+  assert { min r = offset r };
+  assert { max r = max r at ASM1 };
+  assert { plength r = old plength r };
+  assert { forall j. min scratch <= j < offset scratch -> (pelts scratch)[j]
+            = old (pelts scratch)[j] };
+  let v0 = r in
+  label Rec in
+  begin ensures { value scratch (n+n) = asm1_abs * bsm1_abs }
+        ensures { value v0 (n+n) = a0 * b0 }
+        ensures { value vinf (s+t) = a1 * b1 }
+        ensures { min scratch = old min scratch }
+        ensures { max scratch = old max scratch }
+        ensures { plength scratch = old plength scratch }
+        ensures { min s_out = old min s_out }
+        ensures { max s_out = old max s_out }
+        ensures { min vinf = old min vinf }
+        ensures { max vinf = old max vinf }
+        ensures { plength vinf = old plength vinf }
+        ensures { min r = old min r }
+        ensures { max r = old max r }
+        ensures { plength r = old plength r }
+    let lemma valid_monotonous (s n:int32)
+      requires { valid s_out (2*(n+(k-1))) }
+      requires { 0 <= s <= n }
+      ensures  { valid s_out (2*(s+(k-1))) }
+    = assert { 0 <= 2*(s+(k-1)) <= 2*(n+(k-1)) };
+      assert { forall p: ptr limb, n1 n2. 0 <= n1 <= n2 -> valid p n2 -> valid p n1 } in
+    valid_monotonous s n;
+    valid_monotonous t n;
+    (if s > t
+     then wmpn_toom22_mul_rec vinf x1 s y1 t s_out (k-1)
+     else wmpn_toom22_mul_n_rec vinf x1 y1 s_out s (k-1));
+    wmpn_toom22_mul_n_rec v0 x0 y0 s_out n (k-1);
+  end;
+  label Adds in
+  value_concat v0 n (n + n);
+  value_concat vinf n (s + t);
+  let v0n = incr_split v0 n in
+  let vinfn = incr_split vinf n in
+  let ghost lv0 = value v0 (int32'int n) in
+  let ghost hv0 = value v0n (int32'int n) in
+  let ghost lvinf = value vinf (int32'int n) in
+  let ghost hvinf = value vinfn (int32'int s + int32'int t- int32'int n) in
+  assert { lv0 + m * hv0 = a0 * b0 };
+  assert { lvinf + m * hvinf = a1 * b1 };
+  let cy = ref (wmpn_add_in_place vinf n v0n n) in (*TODO wmpn_add_n_in_place*)
+  assert { value vinf n = lvinf + hv0 - m * !cy };
+  let c = wmpn_add_n v0n vinf v0 n in
+  let cy2 = c + !cy in
+  assert { value v0n n = lvinf + hv0 + lv0 - m * cy2
+           by value v0n n = lv0 + value vinf n - m * c
+                          = lvinf + hv0 + lv0 - m * !cy - m * c
+                          = lvinf + hv0 + lv0 - m * cy2 };
+  label Add3 in
+  let c' = wmpn_add_in_place vinf n vinfn ((s+t) - n) in
+  cy := !cy + c';
+  assert { value vinf n = hvinf + lvinf + hv0 - m * !cy
+           by m * (!cy at Add3) + m * c' = m * !cy
+           so value vinf n = value vinf n at Add3 + hvinf - m * c'
+              = lvinf + hv0 - m * (!cy at Add3) + hvinf - m * c'
+              = hvinf + lvinf + hv0 - m * !cy };
+  assert { !cy <= 2 };
+  label JoinMid in
+  let ghost v0nj = { v0n } in
+  let ghost vinfj = { vinf } in
+  join v0n vinf;
+  value_sub_frame (pelts v0n) (pelts v0nj) (offset v0n) (offset v0n + p2i n);
+  assert { value v0n n = value v0nj n };
+  value_sub_frame (pelts v0n) (pelts vinfj) (offset vinf) (offset vinf + p2i n);
+  assert { value_sub (pelts v0n) (offset v0n + n) (offset v0n + n + n)
+           = value vinfj n };
+  value_concat v0n n (n + n);
+  assert { value v0n (n+n) = a1 * b1 + a0 * b0 + hv0 + m * lvinf
+             - m * cy2 - m * m * !cy
+           by value v0n (n+n)
+           = value v0n n at JoinMid + m * value vinf n at JoinMid
+           = lvinf + hv0 + lv0 - m * cy2
+             + m * (hvinf + lvinf + hv0 - m * !cy)
+           = lvinf + hv0 + lv0 - m * cy2 + m * hvinf + m * lvinf
+             + m * hv0 - m * m * !cy
+           = a1 * b1 + a0 * b0 + hv0 + m * lvinf
+             - m * cy2 - m * m * !cy };
+  label AddSub in
+  begin ensures { !cy <= 3 (*2?*)
+                   /\ value v0n (n+n) = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                                      + hv0 + m * lvinf - m * cy2 - m * m * !cy
+                  \/ !cy = radix - 1
+                      /\ value v0n (n+n) = a1 * b1 + a0 * b0  - (a0 - a1)*(b0 - b1)
+                         + hv0 + m * lvinf - m * cy2 + m * m
+                      /\ !cy at AddSub = 0 }
+    assert { !vm1_neg /\ value scratch (n+n) = - (a0-a1)*(b0-b1)
+             \/ not !vm1_neg /\ value scratch (n+n) = (a0-a1)*(b0-b1)
+             by value scratch (n+n) = asm1_abs * bsm1_abs
+             so [@case_split]
+                 (!vm1_neg at BSM1 /\ !vm1_neg
+               \/ !vm1_neg at BSM1 /\ not !vm1_neg
+               \/ not !vm1_neg at BSM1 /\ !vm1_neg
+               \/ not !vm1_neg at BSM1 /\ not !vm1_neg) };
+    assert { power radix (n+n) = m * m };
+    if !vm1_neg
+    then
+      let c'' = wmpn_add_in_place v0n (n+n) scratch (n+n) in
+      assert { value v0n (n+n)
+               = value v0n (n+n) at AddSub + value scratch (n+n)
+                 - power radix (n+n) * c'' };
+      cy := !cy + c'';
+      assert { value v0n (n+n) = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                 + hv0 + m * lvinf - m * cy2 - m * m * !cy
+               by - m * m * c'' - m * m * !cy at AddSub = - m * m * !cy
+               so value scratch (n+n) = -(a0-a1)*(b0-b1)
+               so value v0n (n+n)
+                  = value v0n (n+n) at AddSub + value scratch (n+n)
+                    - power radix (n+n) * c''
+                  = value v0n (n+n) at AddSub - (a0 - a1)*(b0-b1) - m * m * c''
+                  = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                    + hv0 + m * lvinf - m * cy2 - m * m * !cy }
+    else
+      let b = wmpn_sub_in_place v0n (n+n) scratch (n+n) in
+      assert { value v0n (n+n)
+               = value v0n (n+n) at AddSub - value scratch (n+n)
+                 + power radix (n+n) * b };
+      cy := sub_mod !cy b;
+      assert { !cy <= 2 /\ !cy = !cy at AddSub - b
+               \/ !cy = radix - 1 /\ !cy at AddSub = 0 /\ b = 1
+               by [@case_split]
+                  ((!cy at AddSub = 0 /\ b = 1
+                   so !cy = EuclideanDivision.mod (-1) radix = radix - 1)
+                   \/
+                   (1 <= !cy at AddSub \/ b = 0
+                   so 0 <= !cy at AddSub - b < radix
+                   so !cy = !cy at AddSub - b)) };
+      assert { !cy <= 2 ->
+               (value v0n (n+n) = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                                  + hv0 + m * lvinf - m * cy2 - m * m * !cy
+               by !cy = !cy at AddSub - b
+               so m * m * b - m * m * !cy at AddSub = - m * m * !cy
+               so value scratch (n+n) = (a0-a1)*(b0-b1)
+               so value v0n (n+n)
+                  = value v0n (n+n) at AddSub - value scratch (n+n)
+                    + power radix (n+n) * b
+                  = value v0n (n+n) at AddSub - (a0 - a1)*(b0-b1) + m * m * b
+                  = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                    + hv0 + m * lvinf - m * cy2 - m * m * !cy) };
+      assert { !cy = radix - 1 ->
+               (value v0n (n+n) = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                                  - m * cy2 + hv0 + m * lvinf + m * m
+                by b = 1 so power radix (n+n) * b = m * m
+                so m * m * !cy at AddSub = 0
+                so value scratch (n+n) = (a0-a1)*(b0-b1)
+                so value v0n (n+n)
+                   = value v0n (n+n) at AddSub - value scratch (n+n)
+                     + power radix (n+n) * b
+                   = value v0n (n+n) at AddSub - (a0 - a1)*(b0-b1) + m*m
+                   = a1 * b1 + a0 * b0 + hv0 + m * lvinf
+                     - m * cy2 - m * m * (!cy at AddSub) - (a0 - a1)*(b0-b1) + m*m
+                   = a1 * b1 + a0 * b0 + hv0 - (a0 - a1)*(b0 - b1)
+                     + m * lvinf - m * cy2 + m * m) }
+  end;
+  label Join in
+  let ghost rj = { r } in
+  let ghost v0nj = { v0n } in
+  let ghost vinfnj = { vinfn } in
+  join r v0n;
+  value_sub_frame (pelts r) (pelts rj) (offset r) (offset r + p2i n);
+  assert { value r n = value rj n = lv0 };
+  value_concat r n (3 * n);
+  value_sub_frame (pelts r) (pelts v0nj) (offset r + p2i n)
+                                         (offset r + 3 * p2i n);
+  assert { value r (3*n) = value r n + m * value (v0n at Join) (n+n)
+           by offset v0nj = offset r + n
+           so offset v0nj + (n + n) = offset r + 3 * n
+           so value_sub (pelts r) (offset r + n) (offset r + 3*n)
+              = value v0nj (n+n) };
+  label JoinH in
+  let ghost rh = { r } in
+  join r vinfn;
+  value_sub_frame (pelts r) (pelts rh) (offset r) (offset r + 3 * p2i n);
+  assert { value r (3*n) = value r (3*n) at JoinH };
+  value_sub_frame (pelts r) (pelts rh) (offset r) (offset r + p2i n);
+  assert { value r n = value r n at JoinH };
+  value_concat r (3*n) ((3 * n) + ((s + t) - n));
+  assert { forall i. offset r + 3 * n <= i < offset r + 3 * n + s + t - n ->
+           min vinfnj <= i < max vinfnj
+           by max vinfnj >= offset r + sx + sy
+              = offset r + n + s + n + t
+              = offset r + 3 * n + s + t - n };
+  value_sub_frame (pelts r) (pelts vinfnj) (offset r + 3 * p2i n)
+                            (offset r + 3 * p2i n + p2i s + p2i t - p2i n);
+  assert { value r (sx + sy)
+           = value r (3*n + s + t - n)
+           = value r (3*n) + m*m*m* value (vinfn at Join) (s+t-n)
+           by offset vinfnj = offset r + 3*n
+           so offset vinfnj + s + t - n = offset r + 3*n + s + t - n
+           so m * m * m = power radix n * power radix n * power radix n
+              = power radix (n+n+n) = power radix (3 * n)
+           so value_sub (pelts r) (offset r + 3*n) (offset r + 3*n + s + t - n)
+              = value vinfnj (s+t-n) };
+  join scratch s_out;
+  assert { a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1) = a0 * b1 + a1 * b0 };
+  assert { value x sx * value y sy
+           = (a0 +  m * a1)*(b0 + m * b1)
+           = a0 * b0 + m * (a0 * b1 + a1 * b0) + m * m * (a1 * b1) };
+  assert { !cy <= 3 /\ value r (sx + sy) = value x sx * value y sy
+                                            - m * m * cy2 - m * m * m * !cy
+           \/ !cy = radix - 1 /\ value r (sx + sy) = value x sx * value y sy
+                                  - m * m * cy2 + m * m * m
+            by value r n = lv0
+               so value vinfnj (s+t-n) = hvinf
+               so value r (sx + sy)
+               = value r (3 * n) + m * m * m * value vinfnj (s+t-n)
+               = value r n + m * value v0nj (n+n)
+                 + m*m*m * value vinfnj (s+t-n)
+               = lv0 + m * value v0nj (n+n) + m * m * m * hvinf
+            so (lv0 + m * (a1*b1 + a0*b0 - (a0 - a1)*(b0 - b1) + hv0 + m*lvinf)
+                + m * m * m * hvinf = value x sx * value y sy
+               by lv0 + m * (a0 * b1 + a1 * b0 + hv0 + m * lvinf)
+                      + m * m * m * hvinf
+                  = lv0 + m * hv0 + m * (a0 * b1 + a1 * b0)
+                     + m * m * lvinf + m * m * m * hvinf
+                  = lv0 + m * hv0 + m * (a0 * b1 + a1 * b0)
+                    + m * m * (lvinf + m * hvinf)
+                  = a0 * b0 + m * (a0 * b1 + a1 * b0)
+                    + m * m * a1 * b1
+                  = value x sx * value y sy)
+            so [@case_split] (* TODO *)
+               ((!cy <= 3
+                so value v0nj (n+n) = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                                     + hv0 + m * lvinf - m * cy2 - m * m * !cy
+                   = a0 * b1 + a1 * b0 + hv0 + m * lvinf - m * cy2 - m * m * !cy
+                so value r (sx + sy)
+                   = lv0 + m * value v0nj (n+n) + m * m * m * hvinf
+                   = lv0 + m * (a0 * b1 + a1 * b0 + hv0 + m * lvinf
+                               - m * cy2 - m * m * !cy)
+                               + m * m * m * hvinf
+                   = lv0 + m * (a0 * b1 + a1 * b0 + hv0 + m * lvinf)
+                      + m * m * m * hvinf
+                      - m * m * cy2 - m * m * m * !cy
+                   = value x sx * value y sy
+                     - m * m * cy2 - m * m * m * !cy)
+                 \/
+                 (!cy = radix - 1
+                  so value v0nj (n+n) = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                                     + hv0 + m * lvinf - m * cy2 + m * m
+                   = a0 * b1 + a1 * b0 + hv0 + m * lvinf - m * cy2 + m * m
+                  so value r (sx + sy)
+                   = lv0 + m * value v0nj (n+n) + m * m * m * hvinf
+                   = lv0 + m * (a0 * b1 + a1 * b0 + hv0 + m * lvinf
+                               - m * cy2 + m * m)
+                               + m * m * m * hvinf
+                   = lv0 + m * (a0 * b1 + a1 * b0 + hv0 + m * lvinf)
+                      + m * m * m * hvinf
+                      - m * m * cy2 + m * m * m
+                   = value x sx * value y sy
+                     - m * m * cy2 + m * m * m)) };
+  let vinf0 = C.incr r (n+n) in
+  value_sub_upper_bound (pelts x1) (offset x1) (offset x1 + int32'int s);
+  value_sub_upper_bound (pelts y1) (offset y1) (offset y1 + int32'int t);
+  assert { s + t - n > 0
+           by s >= n-1
+           so 4 * sx < 5 * sy
+           so 4 * n + 4 * s < 5 * n + 5 * t
+           so 5 * t > 4 * s - n >= 4 * n - 4 - n = 3 * n - 4
+           so 5 * t > 3 * n - 4
+           so n > 3
+           so t > 1 };
+  let ghost m' = power radix (p2i s + p2i t - p2i n) in
+  begin ensures { value r (sx + sy) + m * m * cy2  < m * m * m * m' }
+        ensures { value x sx * value y sy < m * m * m * m' }
+  assert { power radix (s+t) = m * m' };
+  value_sub_upper_bound (pelts r) (offset r) (offset r + int32'int n);
+  value_sub_upper_bound (pelts v0nj) (offset v0nj)
+                        (offset v0nj + int32'int n + int32'int n);
+  value_sub_upper_bound (pelts x) (offset x) (offset x + int32'int sx);
+  value_sub_upper_bound (pelts y) (offset y) (offset y + int32'int sy);
+  assert { !cy = radix - 1 -> hvinf <= m' - 2
+           by value v0nj (n+n) < power radix (n+n) = m * m
+           so value v0nj (n+n) = a1 * b1 + a0 * b0 - (a0 - a1)*(b0 - b1)
+                                     + hv0 + m * lvinf - m * cy2 + m * m
+                   = a0 * b1 + a1 * b0 + hv0 + m * lvinf - m * cy2 + m * m
+                              so (0 <= a0 * b1 by 0 <= a0 /\ 0 <= b1)
+           so (0 <= a1 * b0 by 0 <= a1 /\ 0 <= b0)
+           so hv0 >= 0
+           so value v0nj (n+n) >= m * lvinf - m * cy2 + m * m
+           so m * lvinf - m * cy2 + m * m < m * m
+           so m * (lvinf - cy2) = m * lvinf - m * cy2 < 0
+           so lvinf - cy2 < 0
+           so (cy2 <= 1 by !cy at AddSub = 0 so !cy at Add3 = 0)
+           so (lvinf = 0 by 0 <= lvinf)
+           so a1 * b1 = m * hvinf
+           so if a1*b1 <= 0
+           then (hvinf <= m' - 2
+                 by m*hvinf=0 so 0 <> m so hvinf = 0
+                 so 1 <= s+t-n
+                 so radix = power radix 1 <= power radix (s+t-n)
+                 so m' > 2
+                 so hvinf <= m' - 2)
+           else hvinf <= m'-2 by
+                (forall s. 0 <= s -> power radix s = power 2 (64*s)
+                by radix = power 2 64)
+           so (m = power 2 (64 * n)
+               by m = power radix n)
+           so m >= 1
+           so (hvinf >= 1 by m*hvinf > 0)
+           so valuation m 2 = 64*n
+           so 64*n <= valuation (a1*b1) 2 = valuation a1 2 + valuation b1 2
+           so if 64*n < valuation (a1*b1) 2
+           then hvinf <= m'-2
+                 by valuation (m*hvinf) 2 > 64*n
+                 so valuation m 2 = 64*n
+                 so if valuation hvinf 2 = 0
+                    then false by valuation (m*hvinf) 2 = valuation m 2
+                    else hvinf <= m'-2
+                    by even hvinf
+                    so (odd (m'-1)
+                       by m' = power radix (s+t-n)
+                             = power 2 (64*(s+t-n))
+                             = 2 * power 2 (64*(s+t-n) - 1)
+                          so even m')
+                    so hvinf <> m'-1
+                    so (hvinf < m'
+                        by hvinf = value vinfnj (s+t-n)
+                                 < power radix ((offset vinfnj +(s+t-n))
+                                                 - offset vinfnj)
+                                 = power radix (s+t-n))
+                    so hvinf < m'-1
+           else hvinf <= m'-2
+           by power radix s = power 2 (64*s)
+           so power radix t = power 2 (64*t)
+           so m' = power radix (s+t-n) = power 2 (64*(s+t-n))
+           so let k = valuation a1 2 in
+              let l = valuation b1 2 in
+              let a1' = div a1 (power 2 k) in
+              let b1' = div b1 (power 2 l) in
+              a1 = (power 2 k) * a1'
+           so b1 = (power 2 l) * b1'
+           so 64*n = k + l
+           so 1 <= a1 /\ 1 <= b1
+           so 0 <= k /\ 0 <= l
+           so 1 <= a1' /\ 1 <= b1'
+           so (k <= 64*s by power 2 k <= a1 < power 2 (64*s)
+                         so power 2 k < power 2 (64*s)
+                         so not 64*s < k)
+           so (l <= 64*t by power 2 l <= b1 < power 2 (64*t)
+                         so power 2 l < power 2 (64*t)
+                         so not 64*t < l)
+           so (forall a b c m:int. 0 <= a -> 0 <= b -> 0 < c -> 0 < m
+              -> a * c < m -> b * c >= m -> a < b)
+           so a1' < power 2 (64*s - k)
+              (*(by a1' * (power 2 k) = a1 < power radix s = power 2 (64*s)
+              so a1' * power 2 k < power 2 (64*s)
+              so power 2 (64*s-k) * power 2 k = power 2 (64*s))*)
+           so a1' <= power 2 (64*s - k) - 1
+           so b1' < power 2 (64*t - l)
+           so b1' <= power 2 (64*t - l) - 1
+           so a1' * b1'
+              <= (power 2 (64*s - k) - 1) * b1'
+              <= (power 2 (64*s - k) - 1) * (power 2 (64*t - l) - 1)
+              = (power 2 (64*s-k))*(power 2 (64*t -l))
+                - power 2 (64*s-k)
+                - power 2 (64*t-l)
+                + 1
+              <= (power 2 (64*s-k))*(power 2 (64*t -l)) - 2
+              = power 2 (64*(s+t) - (k+l)) - 2
+              = power 2 (64*(s+t) - 64*n) - 2
+              = power 2 (64*(s+t-n)) - 2
+              = power radix (s+t-n) - 2
+              = m' - 2
+           so a1 * b1 = (power 2 k) * a1' * (power 2 l) * b1'
+              = power 2 k * power 2 l * a1' * b1'
+              = (power 2 (k+l)) * a1' * b1'
+              = power 2 (64*n) * a1' * b1'
+              = power radix n * a1' * b1'
+              = m * (a1' * b1')
+           so a1 * b1 = m * hvinf = m * (a1' * b1')
+           so hvinf = a1' * b1' <= m' - 2 };
+  assert { value x sx * value y sy < m * m * m * m'
+           by (m * m * m * m' = power radix (n+n+s+t)
+              by m * m * m * m'
+                 = power radix n * power radix n * power radix n
+                   * power radix (s+t-n)
+                 = power radix n * power radix n * power radix (s+t)
+                 = power radix n * power radix (n+s+t)
+                 = power radix (n+n+s+t))
+           so value x sx < power radix sx = power radix (n+s)
+           so value y sy < power radix sy = power radix (n+t)
+           so (forall a b c d. 0 <= a < b -> 0 <= c < d -> a * c < b * d
+               by [@case_split]
+                  (((a=0\/c=0) so a*c=0 so b*d>0 so a*c < b*d)
+                  \/
+                  ((0<a /\ 0<c) so a * c < a * d = d*a < d * b = b * d)))
+           so value x sx * value y sy < power radix (n+s) * power radix (n+t)
+              = power radix (n+n+s+t) };
+  assert { value r (sx + sy) + m * m * cy2  < m * m * m * m'
+           by [@case_split]
+           ((!cy <= 3
+           so 0 <= m * m * m * !cy
+           so value r (sx + sy) + m * m * cy2
+           = value x sx * value y sy - m * m * cy2 - m * m * m * !cy
+               + m * m * cy2
+           = value x sx * value y sy - m * m * m * !cy
+           <= value x sx * value y sy)
+           \/
+           (!cy = radix - 1
+           so hvinf <= m' - 2
+           so value r (sx + sy) = value r n + m * (value v0nj (n+n))
+                                   + m*m*m * value vinfnj (s+t-n)
+              = value r n + m * (value v0nj (n+n)) + m*m*m * hvinf
+           so value r n < power radix n
+           so value r n < m
+           so value v0nj (n+n) < power radix (n+n) = m * m
+           so value v0nj (n+n) <= m * m - 1
+           so m * value v0nj (n+n) <= m * (m * m - 1)
+           so value r n + m * (value v0nj (n+n))
+              < m + m * (m * m -1) = m * m * m
+           so m * m * m * hvinf <= m * m * m * (m'-2)
+           so value r (sx + sy) < m * m * m + m * m * m * (m'-2)
+              = m * m * m * m' - m * m * m
+           so m * m * cy2 < m * m * m)) };
+  end;
+  value_concat r (n + n) (sx + sy);
+  assert { value_sub (pelts r) (offset r + n + n) (offset r + sx + sy)
+           = value vinf0 (s+t) };
+  assert { value r (sx + sy) = value r (n+n) + m * m * value vinf0 (s+t) };
+  assert { value vinf0 (s+t) + cy2 < m * m'
+           by value r (n+n) >= 0
+           so m * m * m * m' > value r (sx + sy) + m * m * cy2
+              = value r (n+n) + m * m * value vinf0 (s+t) + m * m * cy2
+              >= m * m * value vinf0 (s+t) + m * m * cy2
+              = m * m * (value vinf0 (s+t) + cy2)
+              so (m * m) * (value vinf0 (s+t) + cy2) < (m * m) * (m * m') };
+  let ghost ri = { r } in
+  label IncrM in
+  wmpn_incr vinf0 (s + t) cy2;
+  value_concat r (n + n) (sx + sy);
+  assert { value_sub (pelts r) (offset r + n + n) (offset r + sx + sy)
+           = value vinf0 (s+t) };
+  assert { value r (sx + sy) = value r (n+n) + m * m * value vinf0 (s+t) };
+  assert { forall j. offset r <= j < offset r + (n+n)
+           -> (pelts r)[j] = (pelts r)[j] at IncrM };
+  value_sub_frame (pelts r) (pelts ri) (offset r)
+                  (offset r + (int32'int n + int32'int n));
+  assert { value r (sx + sy) = value r (sx+sy) at IncrM + m * m * cy2
+           by value vinf0 (s+t) = value vinf0 (s+t) at IncrM + cy2
+           so value r (n+n) = value r (n+n) at IncrM
+           so value r (sx + sy) = value r (n+n) + m * m * value vinf0 (s+t)
+              = (value r (n+n) at IncrM)
+                + m * m * (value vinf0 (s+t) at IncrM + cy2)
+              = (value r (n+n) + m * m * value vinf0 (s+t) at IncrM)
+                + m * m * cy2
+              = value r (sx+sy) at IncrM + m * m * cy2 };
+  assert { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
+             -> (pelts r)[j] = (pelts r)[j] at IncrM
+                by (pelts r)[j] = (pelts vinf0)[j]
+                   = (pelts vinf0)[j] at IncrM };
+  assert { !cy <= 3 /\ value r (sx + sy)
+                       = value x sx * value y sy - m * m * m * !cy
+           \/ value r (sx + sy) = value x sx * value y sy + m * m * m };
+  let rh = { r } in
+  let vinfn = C.incr r (3 * n) in
+  label IncrH in
+  assert { valid vinfn (s+t-n) };
+  value_concat r (3 * n) (sx + sy);
+  assert { value_sub (pelts r) (offset r + 3*n) (offset r + sx + sy)
+           = value vinfn (s+t-n)
+           by pelts r = pelts vinfn
+           so offset r + 3*n = offset vinfn
+           so offset r + sx + sy = offset vinfn + s + t - n };
+  assert { value r (sx + sy) = value r (3*n)
+                               + power radix (3*n) * value vinfn (s+t-n)};
+  assert { power radix (3*n) = m * m * m
+           by power radix (3*n) = power radix (n+n+n)
+              = power radix (n+n) * power radix n
+              = power radix n * power radix n * power radix n };
+  if ([@likely] !cy <= 3)
+  then begin
+    assert { value r (sx+sy) = value x sx * value y sy
+                               - power radix (3*n) * !cy
+              by value r (sx+sy) = value x sx * value y sy - m * m * m * !cy };
+    assert { value r (sx+sy) + power radix (3*n)* !cy < power radix (3*n) * m'
+             by value r (sx+sy) + power radix (3*n) * !cy
+                = value x sx * value y sy
+                < m*m*m*m' = power radix (3*n) * m' };
+    assert { value vinfn (s+t-n) + !cy < m'
+             by power radix (3*n) * m'
+                > value r (sx+sy) + power radix (3*n) * !cy
+                = value r (3*n) + power radix (3*n) * value vinfn (s+t-n)
+                                + power radix (3*n) * !cy
+                = value r (3*n) + power radix (3*n) * (value vinfn (s+t-n) + !cy)
+                >= power radix (3*n) * (value vinfn (s+t-n) + !cy)
+                so power radix (3*n) * (value vinfn (s+t-n) + !cy)
+                   < power radix (3*n) * m'};
+    wmpn_incr vinfn ((s + t) - n) !cy;
+    value_concat r (3 * n) (sx + sy);
+    assert { value_sub (pelts r) (offset r + 3*n) (offset r + sx + sy)
+             = value vinfn (s+t-n)
+             by pelts r = pelts vinfn
+             so offset r + 3*n = offset vinfn
+             so offset r + sx + sy = offset vinfn + s + t - n };
+    assert { value r (sx + sy) = value r (3*n)
+                                + power radix (3*n) * value vinfn (s+t-n)};
+    assert { forall j. offset r <= j < offset r + (3*n)
+             -> (pelts r)[j] = (pelts r)[j] at IncrH };
+    value_sub_frame (pelts r) (pelts rh) (offset r)
+                    (offset r + (3 * int32'int n));
+    assert { value r (sx + sy) = value x sx * value y sy
+             by value vinfn (s+t-n) = (value vinfn (s+t-n) at IncrH) + !cy
+             so value r (3*n) = value r (3*n) at IncrH
+             so value r (sx + sy)
+                = value r (3*n) + power radix (3*n) * value vinfn (s+t-n)
+                = value r (3*n) at IncrH
+                  + power radix (3*n) * (value vinfn (s+t-n) at IncrH + !cy)
+                = (value r (3*n) + power radix (3*n) * value vinfn (s+t-n)
+                         at IncrH)
+                  + power radix (3*n) * !cy
+                = value r (sx+sy) at IncrH + power radix (3*n) * !cy
+                = value x sx * value y sy - power radix (3*n) * !cy
+                                          + power radix (3*n) * !cy };
+  end
+  else begin
+    assert { !cy = radix - 1 };
+    assert { value r (sx+sy) = value x sx * value y sy
+                               + power radix (3*n)
+              by value r (sx+sy) = value x sx * value y sy + m * m * m };
+    value_sub_upper_bound (pelts r) (offset r) (offset r + 3 * int32'int n);
+    assert { 0 <= value vinfn (s+t-n) - 1
+             by 0 <= value x sx so 0 <= value y sy
+             so 0 <= value x sx * value y sy
+             so value r (sx + sy) >= power radix (3*n)
+             so value r (sx + sy)
+                = value r (3*n) + power radix (3*n) * value vinfn (s+t-n)
+             so value r (3*n) < power radix (3*n)
+             so power radix (3*n) * value vinfn (s+t-n) > 0
+             so value vinfn (s+t-n) > 0 };
+    wmpn_decr_1 vinfn ((s + t) - n);
+    value_concat r (3 * n) (sx + sy);
+    assert { value_sub (pelts r) (offset r + 3*n) (offset r + sx + sy)
+             = value vinfn (s+t-n)
+             by pelts r = pelts vinfn
+             so offset r + 3*n = offset vinfn
+             so offset r + sx + sy = offset vinfn + s + t - n };
+    assert { value r (sx + sy) = value r (3*n)
+                                + power radix (3*n) * value vinfn (s+t-n)};
+    assert { forall j. offset r <= j < offset r + (3*n)
+             -> (pelts r)[j] = (pelts r)[j] at IncrH };
+    value_sub_frame (pelts r) (pelts rh) (offset r)
+                    (offset r + (3 * int32'int n));
+    assert { value r (sx + sy) = value x sx * value y sy
+             by value vinfn (s+t-n) = (value vinfn (s+t-n) at IncrH) - 1
+             so value r (3*n) = value r (3*n) at IncrH
+             so value r (sx + sy)
+                = value r (3*n) + power radix (3*n) * value vinfn (s+t-n)
+                = value r (3*n) at IncrH
+                  + power radix (3*n) * (value vinfn (s+t-n) at IncrH - 1)
+                = (value r (3*n) + power radix (3*n) * value vinfn (s+t-n)
+                         at IncrH)
+                  - power radix (3*n)
+                = value r (sx+sy) at IncrH - power radix (3*n)
+                = value x sx * value y sy };
+  end;
+  label JoinRight in
+  let rf = { r } in
+  C.join r ro;
+  label JoinLeft in
+  C.join_r r' r;
+  assert { forall j. offset r <= j < offset r + sx + sy ->
+           (pelts r)[j] = (pelts rf)[j]
+           by (pelts r)[j] = (pelts r)[j] at JoinLeft
+              = (pelts rf)[j] };
+  value_sub_frame (pelts r) (pelts rf) (offset r) (offset r + p2i sx + p2i sy);
+  assert { value r (sx + sy) = value r (sx + sy) at JoinRight };
+  C.join_r scratch' scratch
+
+
+  (* Choose which multiplication algorithm is called recursively.
+     Equivalent to the macros WMPN_TOOM22_MUL_REC and WMPN_TOOM22_MUL_N_REC
+     respectively, in wmpn_toom22_mul.c *)
+with wmpn_toom22_mul_rec (r x: ptr limb) (sx:int32) (y:ptr limb) (sy: int32)
+                         (scratch:ptr limb) (ghost k: int)
+     : unit
+  requires { valid x sx }
+  requires { valid y sy }
+  requires { valid r (sx + sy) }
+  requires { 0 < sy <= sx <= sy + sy }
+  requires { 8 * sx < max_int32 }
+  requires { 0 <= k <= 64 }
+  requires { sx <= toom22_threshold * power 2 k }
+  requires { valid scratch (2 * (sx + k)) }
+  ensures  { value r (sx + sy) = value x sx * value y sy }
+  ensures  { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
+                       -> (pelts r)[j] = old (pelts r)[j] }
+  ensures  { forall j. min scratch <= j < offset scratch
+             -> (pelts scratch)[j] = old (pelts scratch)[j] }
+  ensures  { min r = old min r }
+  ensures  { max r = old max r }
+  ensures  { plength r = old plength r }
+  ensures  { min scratch = old min scratch }
+  ensures  { max scratch = old max scratch }
+  ensures  { plength scratch = old plength scratch }
+  variant  { k + k + 1 }
+=
+  if sy <= toom22_threshold
+  then wmpn_mul_basecase r x sx y sy
+  else
+    if (4 * sx < 5 * sy) (* ? *)
+    then wmpn_toom22_mul r x sx y sy scratch k
+    else wmpn_toom32_mul r x sx y sy scratch k
+
+with wmpn_toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) : unit
+  requires { valid x sz }
+  requires { valid y sz }
+  requires { valid r (sz + sz) }
+  requires { 0 < sz }
+  requires { 8 * sz < max_int32 }
+  requires { 0 <= k <= 64 }
+  requires { sz <= toom22_threshold * power 2 k }
+  requires { valid scratch (2 * (sz + k)) }
+  ensures  { value r (sz + sz) = value x sz * value y sz }
+  ensures  { forall j. min r <= j < offset r \/ offset r + sz + sz <= j < max r
+                       -> (pelts r)[j] = old (pelts r)[j] }
+  ensures  { forall j. min scratch <= j < offset scratch
+             -> (pelts scratch)[j] = old (pelts scratch)[j] }
+  ensures  { min r = old min r }
+  ensures  { max r = old max r }
+  ensures  { plength r = old plength r }
+  ensures  { min scratch = old min scratch }
+  ensures  { max scratch = old max scratch }
+  ensures  { plength scratch = old plength scratch }
+  variant  { k + k + 1 }
+=
+  if sz <= toom22_threshold
+  then wmpn_mul_basecase r x sz y sz
+  else wmpn_toom22_mul r x sz y sz scratch k
+
+with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+                     (scratch: ptr limb) (ghost k: int) : unit
+  requires { valid x sx }
+  requires { valid y sy }
+  requires { valid r (sx + sy) }
+  requires { toom22_threshold < sy }
+  requires { 0 < k <= 64 }
+  requires { sx <= toom22_threshold * power 2 k }
+  requires { valid scratch (2 * (sx + k)) }
+  requires { 8 * sx < max_int32 }
+  requires { 4 < sy + 2 <= sx }
+  requires { sx + 6 <= 3 * sy }
+  ensures  { min r = old min r }
+  ensures  { max r = old max r }
+  ensures  { plength r = old plength r }
+  ensures  { min scratch = old min scratch }
+  ensures  { max scratch = old max scratch }
+  ensures  { plength scratch = old plength scratch }
+  ensures  { value r (sx + sy) = value x sx * value y sy }
+  ensures  { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
+                       -> (pelts r)[j] = old (pelts r)[j] }
+  ensures  { forall j. min scratch <= j < offset scratch
+                       -> (pelts scratch)[j] = old (pelts scratch)[j] }
+  variant { k + k }
+=
+  let n = 1 + (if 2 * sx >= 3 * sy
+               then (sx - 1) / 3
+               else (sy - 1) / 2) in
+  let s = sx - 2 * n in
+  let t = sy - n in
+  assert { 0 < s <= n };
+  assert { 0 < t <= n };
+  assert { s + t >= n };
+  let x0 = x in
+  let x1 = C.incr x n in
+  let x2 = C.incr x1 n in
+  let y0 = y in
+  let y1 = C.incr y n in
+  let ghost a0 = value x0 (int32'int n) in
+  let ghost a1 = value x1 (int32'int n) in
+  let ghost a2 = value x2 (int32'int s) in
+  let ghost b0 = value y0 (int32'int n) in
+  let ghost b1 = value y1 (int32'int t) in
+  let ghost m  = power radix (int32'int n) in
+  value_concat x1 n (sx - n);
+  value_concat x n sx;
+  value_concat y n sy;
+  assert { value y sy = b0 + m * b1 };
+  assert { value x sx = a0 + m * a1 + m * m * a2 };
+  let rol = decr_split r 0 in
+  let ror = incr_split r (sx + sy) in
+  let sol = decr_split scratch 0 in
+  let sor = incr_split scratch ((n + n) + 1) in
+  (* xp1 | yp1 | xm1 | ym1 *)
+  let xp1 = r in                  (* x(1) = a0 + a1 + a2  *)
+  let yp1 = incr_split r n in     (* y(1) = b0 + b1       *)
+  let xm1 = incr_split yp1 n in   (* x(-1) = a0 - a1 + a2 *)
+  let ym1 = incr_split xm1 n in   (* y(-1) = b0 - b1      *)
+  let v1  = scratch in            (* x(1)*y(1)            *)
+  let vm1 = r in                  (* x(-1)*y(-1)          *)
+  let xp1_hi = ref 0 in           (* high limb of xp1     *)
+  let yp1_hi = ref 0 in           (* high bit of yp1      *)
+  let hi = ref 0 in               (* high bit of xm1      *)
+  let vm1_neg = ref false in      (* negate vm1 ?         *)
+  begin ensures { value xp1 n + m * !xp1_hi = a0 + a1 + a2 }
+        ensures { (!vm1_neg /\ value xm1 n + m * !hi = a1 - (a0 + a2))
+                  \/ (not !vm1_neg /\ value xm1 n + m * !hi = a0 - a1 + a2) }
+        ensures { 0 <= !xp1_hi <= 2 }
+        ensures { 0 <= !hi <= 1 }
+    xp1_hi := wmpn_add xp1 x0 n x2 s;
+    begin
+      let cmp = wmpn_cmp xp1 x1 n in
+      if (*begin ensures { result <-> a0 + a2 < a1 }*)
+           !xp1_hi = 0
+           && (cmp < 0)
+         (*end*)
+      then begin
+        assert { value xp1 n < value x1 n };
+        assert { value xp1 n = a0 + a2 };
+        let ghost b = wmpn_sub_n xm1 x1 xp1 n in
+        assert { b = 0 };
+        hi := 0;
+        vm1_neg := true end
+      else begin
+        let b = wmpn_sub_n xm1 xp1 x1 n in
+        assert { !xp1_hi = 0 -> b = 0 };
+        hi := !xp1_hi - b;
+        assert { value xm1 n + m * !hi = a0 - a1 + a2
+                 by value xm1 n + m * !hi
+                  = value xm1 n - m * b + m * !xp1_hi
+                  = value xp1 n - a1 + m * !xp1_hi
+                  = a0 - a1 + a2 };
+        end
+    end;
+    label Addx1 in
+    assert { value xp1 n + m * !xp1_hi = a0 + a2 };
+    let c = wmpn_add_in_place xp1 n x1 n in
+    xp1_hi := !xp1_hi + c;
+    assert { value xp1 n + m * !xp1_hi = a0 + a2 + a1
+             by value xp1 n + m * !xp1_hi
+                = value xp1 n + m * c + m * (!xp1_hi at Addx1)
+                = (value xp1 n at Addx1) + value x1 n + m * (!xp1_hi at Addx1)
+                = a0 + a2 + value x1 n = a0 + a2 + a1 };
+  end;
+  label B1 in
+  begin ensures { value yp1 n + m * !yp1_hi = b0 + b1 }
+        ensures { (!vm1_neg = (!vm1_neg at B1) /\ value ym1 n = b0 - b1)
+                  \/ (!vm1_neg = not (!vm1_neg at B1) /\ value ym1 n = b1 - b0) }
+        ensures { 0 <= !yp1_hi <= 1 }
+    if (t = n)
+    then begin
+      yp1_hi := wmpn_add_n yp1 y0 y1 n;
+      let cmp = wmpn_cmp y0 y1 n in
+      if (cmp < 0)
+      then begin
+        let ghost b = wmpn_sub_n ym1 y1 y0 n in
+        assert { b = 0 };
+        vm1_neg := not !vm1_neg end
+      else begin
+        let ghost b = wmpn_sub_n ym1 y0 y1 n in
+        assert { b = 0 }
+        end
+      end
+    else begin
+      yp1_hi := wmpn_add yp1 y0 n y1 t;
+      let y0t = C.incr y0 t in
+      let c0 = ((wmpn_zero_p y0t (n - t)) = 1) in
+      let cmp = wmpn_cmp y0 y1 t in
+      let c1 = (cmp < 0) in
+      if c0 && c1
+      then begin
+        value_concat y0 t n;
+        assert { value y0 t = value y0 n };
+        assert { value y0 t < value y1 t };
+        let ghost b = wmpn_sub_n ym1 y1 y0 t in
+        assert { b = 0 };
+        let ghost ym1z = { ym1 } in
+        let ym1t = C.incr ym1 t in
+        label Zero in
+        wmpn_zero ym1t (n - t);
+        assert { forall i. 0 <= i < t ->
+                 (pelts ym1)[offset ym1 + i] = (pelts ym1z)[offset ym1z + i]
+                 by offset ym1 + i < offset ym1t
+                 so (pelts ym1)[offset ym1 + i]
+                     = (pelts ym1t)[offset ym1 + i]
+                     = (pelts ym1t at Zero)[offset ym1 + i]
+                     = (pelts ym1 at Zero)[offset ym1 + i] };
+        value_sub_frame_shift (pelts ym1) (pelts ym1z)
+                              (offset ym1) (offset ym1z) (p2i t);
+        assert { value ym1 t = value ym1 t at Zero };
+        value_concat ym1 t n;
+        assert { value ym1 n = value ym1 t
+                 by value_sub (pelts ym1) (offset ym1 + t) (offset ym1 + n)
+                    = value ym1t (n-t) = 0 };
+        vm1_neg := not !vm1_neg end
+      else begin
+        value_concat y0 t n;
+        assert { value y0 n = value y0 t + power radix t * value y0t (n-t) };
+        assert { value y1 t <= value y0 n
+                 by (not c0
+                     so 1 <= value y0t (n - t)
+                     so power radix t * 1 <= power radix t * value y0t (n-t)
+                     so power radix t <= value y0 n
+                     so value y1 t < power radix t)
+                  \/ (not c1
+                      so value y1 t <= value y0 t
+                      so value y0 t <= value y0 n) };
+        let ghost b = wmpn_sub ym1 y0 n y1 t in
+        assert { b = 0 }
+        end;
+      end
+  end;
+  let ghost am1_abs = value xm1 (int32'int n) + m * (uint64'int !hi) in
+  let ghost bm1_abs = value ym1 (int32'int n) in
+  label RecP1 in
+  wmpn_toom22_mul_n_rec v1 xp1 yp1 sor n (k-1);
+  let cy = ref 0 in
+  begin ensures { value scratch (2 * n) + power radix (n + n) * !cy
+                  = (a0 + a1 + a2) * (b0 + b1) }
+    assert { value scratch (n+n) = value xp1 n * value yp1 n };
+    begin ensures { value scratch (n + n) + power radix (n + n) * !cy
+                    = (a0 + a1 + a2) * (value yp1 n) }
+          ensures { 0 <= !cy <= 3 }
+          (* actually 2, but this is enough to prove there is no overflow *)
+    if (!xp1_hi = 1)
+    then begin
+      let sa = { scratch } in
+      let sn = C.incr scratch n in
+      label Adjust1 in
+      value_concat scratch n (n+n);
+      assert { pelts scratch = pelts sn };
+      let c = wmpn_add_in_place sn n yp1 n in
+      assert { pelts scratch = pelts sn };
+      value_concat scratch n (n+n);
+      value_sub_frame_shift (pelts scratch) (pelts sa)
+                            (offset scratch) (offset sa) (p2i n);
+      assert { value scratch n = value (scratch at Adjust1) n };
+      assert { m * m = power radix (n+n) };
+      assert { value scratch (n+n) + m * m * c = (a0 + a1 + a2) * value yp1 n
+               by value sn n = value_sub (pelts scratch) (offset scratch + n)
+                                         (offset scratch + (n+n))
+               so value scratch (n+n) = value scratch n + m * value sn n
+               so value (sn at Adjust1) n
+                   = value_sub (pelts sa) (offset scratch + n)
+                                          (offset scratch + (n+n))
+               so value (scratch at Adjust1) (n+n)
+                   = value scratch n + m * value (sn at Adjust1) n
+               so value sn n + m * c = value (sn at Adjust1) n + value yp1 n
+               so value scratch (n+n) + m * m * c
+                  = value scratch n + m * (value sn n + m * c)
+                  = value scratch n + m * value (sn at Adjust1) n + m * value yp1 n
+                  = value (scratch at Adjust1) (n+n) + m * value yp1 n
+                  = value xp1 n * value yp1 n + m * value yp1 n
+                  = (value xp1 n + m * !xp1_hi) * value yp1 n
+                  = (a0 + a1 + a2) * value yp1 n };
+      cy := c end
+    else begin
+      if (!xp1_hi = 2)
+      then begin
+      let sa = { scratch } in
+      let sn = C.incr scratch n in
+      label Adjust2 in
+      value_concat scratch n (n+n);
+      assert { pelts scratch = pelts sn };
+      let c = wmpn_addmul_1 sn yp1 n 2 in
+      assert { pelts scratch = pelts sn };
+      value_concat scratch n (n+n);
+      value_sub_frame_shift (pelts scratch) (pelts sa)
+                            (offset scratch) (offset sa) (p2i n);
+      assert { value scratch n = value (scratch at Adjust2) n };
+      assert { m * m = power radix (n+n) };
+      assert { value scratch (n+n) + m * m * c = (a0 + a1 + a2) * value yp1 n
+               by value sn n = value_sub (pelts scratch) (offset scratch + n)
+                                         (offset scratch + (n+n))
+               so value scratch (n+n) = value scratch n + m * value sn n
+               so value (sn at Adjust2) n
+                   = value_sub (pelts sa) (offset scratch + n)
+                                          (offset scratch + (n+n))
+               so value (scratch at Adjust2) (n+n)
+                   = value scratch n + m * value (sn at Adjust2) n
+               so value sn n + m * c = value (sn at Adjust2) n + !xp1_hi * value yp1 n
+               so value scratch (n+n) + m * m * c
+                  = value scratch n + m * (value sn n + m * c)
+                  = value scratch n + m * value (sn at Adjust2) n
+                                    + m * !xp1_hi * value yp1 n
+                  = value (scratch at Adjust2) (n+n) + m * !xp1_hi * value yp1 n
+                  = value xp1 n * value yp1 n + m * !xp1_hi * value yp1 n
+                  = (value xp1 n + m * !xp1_hi) * value yp1 n
+                  = (a0 + a1 + a2) * value yp1 n };
+      assert { c <= 3
+               by value sn n + m * c = value (sn at Adjust2) n + (value yp1 n) * 2
+               so 0 <= value sn n
+               so value (sn at Adjust2) n < m
+               so value yp1 n < m
+               so m * c < m * 3
+               so c <= 3 };
+      cy := c end
+    else assert { !xp1_hi = 0 }  end
+    end;
+    begin ensures { value scratch (n + n) + power radix (n + n) * !cy
+                    = (a0 + a1 + a2) * (b0 + b1) }
+    if not (!yp1_hi = 0)
+    then begin
+      let sa = { scratch } in
+      let sn = C.incr scratch n in
+      label Adjust3 in
+      value_concat scratch n (n+n);
+      assert { pelts scratch = pelts sn };
+      let c = wmpn_add_in_place sn n xp1 n in
+      value_concat scratch n (n+n);
+      assert { pelts scratch = pelts sn };
+      value_sub_frame_shift (pelts scratch) (pelts sa)
+                            (offset scratch) (offset sa) (p2i n);
+      assert { value scratch n = value (scratch at Adjust3) n };
+      cy := !xp1_hi * !yp1_hi + c + !cy;
+      assert { m * m = power radix (n+n) };
+      assert { value scratch (n + n) + power radix (n + n) * !cy
+                    = (a0 + a1 + a2) * (b0 + b1)
+               by value sn n = value_sub (pelts scratch) (offset scratch + n)
+                                         (offset scratch + (n+n))
+               so value scratch (n+n) = value scratch n + m * value sn n
+               so value (sn at Adjust3) n
+                   = value_sub (pelts sa) (offset scratch + n)
+                                          (offset scratch + (n+n))
+               so value (scratch at Adjust3) (n+n)
+                   = value scratch n + m * value (sn at Adjust3) n
+               so !yp1_hi = 1
+               so value sn n + m * c
+                  = value (sn at Adjust3) n + !yp1_hi * value xp1 n
+               so !yp1_hi * value xp1 n + m * !xp1_hi * !yp1_hi
+                  = (a0 + a1 + a2) * !yp1_hi
+               so value scratch (n+n) + m * m * !cy
+                  = value scratch (n+n) + m * m * c
+                       + m * m * !xp1_hi * !yp1_hi + m * m * (!cy at Adjust3)
+                  = value scratch n + m * (value sn n + m * c)
+                       + m * m * !xp1_hi * !yp1_hi + m * m * (!cy at Adjust3)
+                  = value scratch n
+                       + m * (value (sn at Adjust3) n + !yp1_hi * value xp1 n)
+                       + m * m * !xp1_hi * !yp1_hi + m * m * (!cy at Adjust3)
+                  = value scratch n + m * value (sn at Adjust3) n
+                       + m * !yp1_hi * value xp1 n
+                       + m * m * !xp1_hi * !yp1_hi + m * m * (!cy at Adjust3)
+                  = value (scratch at Adjust3) (n+n)
+                       + m * !yp1_hi * value xp1 n
+                       + m * m * !xp1_hi * !yp1_hi + m * m * (!cy at Adjust3)
+                  = (a0 + a1 + a2) * value yp1 n
+                       + m * !yp1_hi * value xp1 n
+                       + m * m * !xp1_hi * !yp1_hi
+                  = (a0 + a1 + a2) * value yp1 n + m * (a0 + a1 + a2) * !yp1_hi
+                  = (a0 + a1 + a2) * (value yp1 n + m * !yp1_hi)
+                  = (a0 + a1 + a2) * (b0 + b1) } end
+      else assert { b0 + b1 = value yp1 n }
+    end;
+  end;
+  label RecM1 in
+  join vm1 yp1;
+  wmpn_toom22_mul_n_rec vm1 xm1 ym1 sor n (k-1);
+  begin ensures { value vm1 (2*n) + m * m * !hi = am1_abs * bm1_abs }
+        ensures { min r = old min r }
+        ensures { max r = old max r }
+        ensures { plength r = old plength r }
+        ensures { 0 <= !hi <= 1 }
+  if (not (!hi = 0))
+  then begin
+    assert { !hi = 1 };
+    value_concat vm1 n (2*n);
+    label HiSplit in
+    let vm1n = incr_split vm1 n in
+    let vm1l = { vm1 } in
+    assert { value vm1 (2*n) at HiSplit = value vm1l n + m * value vm1n n
+             by value vm1n n = value_sub (pelts vm1 at HiSplit)
+                               (offset vm1 + n) (offset vm1 + 2*n) };
+    label HiAdd in
+    let c = wmpn_add_in_place vm1n n ym1 n in
+    label HiJoin in
+    let vm1nj = { vm1n } in
+    join vm1 vm1n;
+    value_concat vm1 n (2*n);
+    value_sub_frame (pelts vm1) (pelts vm1l) (offset vm1) (offset vm1 + p2i n);
+    value_sub_frame (pelts vm1) (pelts vm1nj) (offset vm1 + p2i n)
+                                              (offset vm1 + 2 * p2i n);
+    assert { value vm1 n = value vm1l n };
+    assert { value vm1 (2*n) = value vm1l n + m * value vm1nj n
+             by value vm1nj n = value_sub (pelts vm1) (offset vm1 + p2i n)
+                                                  (offset vm1 + 2 * p2i n) };
+    assert { value vm1 (2*n) + m * m * c = am1_abs * bm1_abs
+             by value vm1 (2 * n) + m * m * c
+                = value vm1l n + m * (value (vm1n at HiJoin) n + m * c)
+                = value vm1l n + m * (value (vm1n at HiAdd) n + value ym1 n)
+                = value vm1 (2*n) at HiSplit + m * value ym1 n
+                = value xm1 n * value ym1 n + m * value ym1 n
+                = (value xm1 n + m * !hi) * value ym1 n
+                = am1_abs * bm1_abs };
+    hi := c;
+    end
+  end;
+  let ghost vx0 = a0 * b0 in
+  let ghost vx1 = a1 * b0 + a0 * b1 in
+  let ghost vx2 = a2 * b0 + a1 * b1 in
+  let ghost vx3 = a2 * b1 in
+  assert { 0 <= vx0 /\ 0 <= vx1 /\ 0 <= vx2 /\ 0 <= vx3
+           by 0 <= a0 /\ 0 <= a1 /\ 0 <= a2 /\ 0 <= b0 /\ 0 <= b1 };
+  assert { (a0 + m * a1 + m * m * a2) * (b0 + m * b1)
+           = vx0 + m * vx1 + m * m * vx2 + m * m * m * vx3 };
+  assert { (a0 + a1 + a2) * (b0 + b1) = vx0 + vx1 + vx2 + vx3 };
+  assert { vx0 + vx2 < 3 * m * m
+            by (0 <= a0 < m /\ 0 <= a1 < m /\ 0 <= a2 < m
+                /\ 0 <= b0 < m /\ 0 <= b1 < m
+                by a2 < power radix s <= m
+                so b1 < power radix t <= m)
+            so (vx0 < m * m
+                by vx0 = a0 * b0 <= a0 * m = m * a0 < m * m)
+            so (vx2 < 2 * m * m
+                by vx2 = a2 * b0 + a1 * b1
+                so a2 * b0 <= a2 * m = m * a2 < m * m
+                so a1 * b1 <= a1 * m = m * a1 < m * m) };
+  begin ensures { value scratch (2*n + 1) = vx0 + vx2 }
+        ensures { if !vm1_neg
+                  then am1_abs*bm1_abs = (a0 - a1 + a2) * (b1 - b0)
+                  else am1_abs*bm1_abs = (a0 - a1 + a2) * (b0 - b1) }
+    begin ensures { value scratch (2*n + 1) = 2 * (vx0 + vx2) }
+          ensures { if !vm1_neg
+                    then am1_abs*bm1_abs = (a0 - a1 + a2) * (b1 - b0)
+                    else am1_abs*bm1_abs = (a0 - a1 + a2) * (b0 - b1) }
+    if !vm1_neg
+    then begin
+      assert { am1_abs * bm1_abs = (a0 - a1 + a2) * (b1 - b0)
+               by if !vm1_neg at B1
+               then am1_abs * bm1_abs = (a0 - a1 + a2) * (b1 - b0)
+                    by am1_abs = a1 - (a0 + a2) /\ bm1_abs = b0 - b1
+               else am1_abs * bm1_abs = (a0 - a1 + a2) * (b1 - b0)
+                    by am1_abs = a0 - a1 + a2 /\ bm1_abs = b1 - b0 };
+      assert { (a0 - a1 + a2) * (b1 - b0) = vx1 -vx0 + vx3 - vx2 };
+      label Sub in
+      let b = wmpn_sub_in_place scratch (2*n) vm1 (2*n) in
+      let r, ghost b' = sub_with_borrow !cy !hi b in
+      assert { (b' = 0 /\ value scratch (2*n) + m * m * r = 2 * (vx0 + vx2))
+               by r - radix * b' = !cy - !hi - b
+               so m * m * r - m * m * radix * b'
+                  = m * m * !cy - m * m * !hi - m * m * b
+               so (m * m * b
+                    = value scratch (2*n) - value (scratch at Sub) (2*n)
+                      + value vm1 (2*n)
+                   by value scratch (2*n) - (m * m) * b
+                      = value (scratch at Sub) (2*n) - value vm1 (2*n))
+               so m * m * r - m * m * radix * b' + value scratch (2 * n)
+                  = m * m * !cy - m * m * !hi + value (scratch at Sub) (2*n)
+                    - value vm1 (2*n)
+                  = (value (scratch at Sub) (2*n) + m * m * !cy)
+                    - (value vm1 (2*n) + m * m * !hi)
+                  = (vx0 + vx1 + vx2 + vx3) - (vx1 - vx0 + vx3 - vx2)
+                  = 2 * (vx0 + vx2)
+                  >= 0
+               so m * m * r - m * m * radix * b' + value scratch (2 * n) >= 0
+               so value scratch (2 * n) < m * m
+               so (m * m) * r <= (m * m) * (radix - 1)
+               so value scratch (2 * n) + m * m * r < m * m * radix
+               so m * m * radix * (1 - b') > 0
+               so b' < 1
+               so b' = 0
+               };
+      label Set in
+      value_sub_shift_no_change (pelts scratch) (offset scratch)
+                                (2 * p2i n)
+                                (2 * p2i n) !cy;
+      set_ofs scratch (2*n) r;
+      assert { value scratch (2 * n) = value (scratch at Set) (2 * n) };
+      value_tail scratch (2*n);
+      assert { value scratch (2*n + 1) = 2 * (vx0 + vx2)
+               by value scratch (2*n + 1) = value scratch (2*n) + (m*m) * r };
+      end
+    else begin
+      assert { am1_abs * bm1_abs = (a0 - a1 + a2) * (b0 - b1)
+               by if !vm1_neg at B1
+               then am1_abs * bm1_abs = (a0 - a1 + a2) * (b0 - b1)
+                    by am1_abs = a1 - (a0 + a2) /\ bm1_abs = b1 - b0
+               else am1_abs * bm1_abs = (a0 - a1 + a2) * (b0 - b1)
+                    by am1_abs = a0 - a1 + a2 /\ bm1_abs = b0 - b1 };
+      assert { (a0 - a1 + a2) * (b0 - b1) = vx0 - vx1 + vx2 - vx3 };
+      label Add in
+      let c = wmpn_add_in_place scratch (2*n) vm1 (2*n) in
+      let r, ghost c' = add_with_carry !cy !hi c in
+      assert { (c' = 0 /\ value scratch (2*n) + (m*m) * r = 2 * (vx0 + vx2))
+                by r + radix * c' = !cy + !hi + c
+                so m * m * r + m * m * radix * c'
+                   = m * m * !cy + m * m * !hi + m * m * c
+                so (m * m * c
+                    = value (scratch at Add) (2*n) - value scratch (2*n)
+                      + value vm1 (2*n)
+                    by value scratch (2*n) + (m*m)*c
+                       = value (scratch at Add) (2*n) + value vm1 (2*n))
+                so m * m * r + m * m * radix * c' + value scratch (2*n)
+                   = m * m * !cy + m * m * !hi + value (scratch at Add) (2*n)
+                     + value vm1 (2*n)
+                   = (value (scratch at Add) (2*n) + m * m * !cy)
+                     + (value vm1 (2*n) + m * m * !hi)
+                   = (vx0 + vx1 + vx2 + vx3) + (am1_abs * bm1_abs)
+                   = (vx0 + vx1 + vx2 + vx3) + (vx0 - vx1 + vx2 - vx3)
+                   = 2 * (vx0 + vx2)
+                so 2 * (vx0 + vx2) < 6 * m * m < m * m * radix
+                so (m * m * radix * c' < m * m * radix
+                    by 0 <= r so 0 <= m * m * r
+                    so 0 <= value scratch (2*n)
+                    so m * m * radix * c'
+                       <= m * m * r + m * m * radix * c' + value scratch (2*n)
+                       < m * m * radix)
+                so c' < 1
+                so c' = 0
+      };
+      label Set in
+      value_sub_shift_no_change (pelts scratch) (offset scratch)
+                                (2 * p2i n)
+                                (2 * p2i n) !cy;
+      set_ofs scratch (2*n) r;
+      assert { value scratch (2 * n) = value (scratch at Set) (2 * n) };
+      value_tail scratch (2*n);
+      assert { value scratch (2*n + 1) = 2 * (vx0 + vx2)
+               by value scratch (2*n + 1) = value scratch (2*n) + (m*m) * r };
+    end
+    end;
+    label Shift in
+    let s = (2 * n) + 1 in
+    let ghost low = wmpn_rshift_in_place scratch s 1 in
+    assert { low = 0 /\ value scratch s = vx0 + vx2
+             by (low + radix * value scratch s)
+                = value (scratch at Shift) s * power 2 (Limb.length - 1)
+                = 2 * (vx0 + vx2) * power 2 (Limb.length - 1)
+                = (vx0 + vx2) * power 2 Limb.length
+                = (vx0 + vx2) * radix
+             so divides radix ((vx0 + vx2) * radix)
+             so divides radix (low + radix * value scratch s)
+             so divides radix low }
+  end;
+  let ghost vy = vx1 + vx3 + (vx0 + vx2) * m in
+  assert { vy = (vx0 + vx2) * m + vx0 + vx2 - (vx0 - vx1 + vx2 - vx3) };
+  join xm1 ym1;
+  (* (    r    |    xm1  ) *)
+  let ghost ss = (2 * n) + 1 in
+  assert { value scratch ss = vx0 + vx2 };
+  let vy0 = scratch in
+  let ghost l02 = value scratch (int32'int n) in
+  let vy1 = xm1 in
+  let vy2 = incr_split scratch n in
+  let ghost h02 = value vy2 (int32'int n) in
+  let t02 = get_ofs vy2 n in
+  begin ensures { value vy0 n + m * value vy1 n + m * m * value vy2 (n+1) = vy }
+        ensures { value vy2 (n+1) < (power radix n) * 6 }
+  label Vy in
+  let os = { vy0 } in
+  value_tail vy2 n;
+  value_concat scratch n ss;
+  assert { l02 + m * h02 + m * m * t02 = vx0 + vx2
+           by vx0 + vx2 = value scratch ss
+              = value scratch n + m * value_sub (pelts scratch)
+                                      (offset scratch + n) (offset scratch + ss)
+              = value scratch n + m * value vy2 (n+1)
+              = l02 + m * (h02 + m * t02) };
+  assert { t02 < 3
+           by l02 + m * h02 + m * m * t02 < m * m * 3
+           so 0 <= l02 /\ 0 <= h02 /\ 0 <= m
+           so 0 <= l02 + m * h02
+           so m * m * t02 < m * m * 3 };
+  let c = wmpn_add_n vy1 vy0 vy2 n in
+  assert { value vy2 (n+1) < (power radix n) * 4
+           by value vy2 (n+1) = value vy2 n + (power radix n) * t02
+              < power radix n + (power radix n) * t02
+              <= (power radix n) * 4 };
+  assert { value vy2 (n+1) + (c + t02) < (power radix n) * 5
+           by c + t02 <= power radix n
+           so value vy2 (n+1) + (c+t02) <= (power radix n) * 5 };
+  wmpn_incr vy2 (n+1) (c + t02);
+  assert { value vy2 (n+1) < (power radix n) * 5 };
+  value_sub_frame (pelts vy0) (pelts os) (offset scratch) (offset scratch + int32'int n);
+  assert { value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)
+           = l02 + m * (l02 + h02) + m * m * (h02 + t02 + m * t02)
+           = (vx0 + vx2) * m + vx0 + vx2
+           by value vy0 n = l02
+           so value vy1 n + m * c = l02 + h02
+           so value vy2 (n+1) = value vy2 (n+1) at Vy + c + t02
+              = h02 + t02 + m * t02 + c
+           so value vy0 n + m * value vy1 n + m * m * value vy2 (n+1) + m * c
+              = l02 + m * (l02 + h02) + m * m * (h02 + t02 + m * t02) + m * c };
+  let vm1n = incr vm1 n in
+  value_concat vm1 n (2*n);
+  assert { value vm1 n + m * value vm1n n + m * m * !hi = am1_abs * bm1_abs
+           by value vm1 n + m * value vm1n n = value vm1 (2*n) };
+  begin ensures { value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)
+                  = old (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1))
+                    - (vx0 - vx1 + vx2 - vx3) }
+        ensures { value vy2 (n+1) < (power radix n) * 6 }
+  label Vm1 in
+  let ovy2 = { vy2 } in
+  if !vm1_neg
+  then begin
+    assert { am1_abs*bm1_abs = (a0 - a1 + a2) * (b1 - b0)
+             = - (vx0 - vx1 + vx2 - vx3) };
+    let c1 = wmpn_add_in_place scratch n vm1 n in
+    assert { value scratch n = value scratch n at Vm1 + value vm1 n - m * c1 };
+    let c2 = wmpn_add_in_place vy1 n vm1n n in
+    assert { value vy1 n = value vy1 n at Vm1 + value vm1n n - m * c2};
+    hi := !hi + c2;
+    let c3 = wmpn_add_1_in_place vy1 n c1 in
+    assert { value vy1 n
+             = value vy1 n at Vm1 + value vm1n n + c1 - m * (c2 + c3) };
+    hi := !hi + c3;
+    wmpn_incr vy2 (n+1) !hi;
+    assert { value vy2 (n+1) = value ovy2 (n+1) + c2 + c3 + !hi at Vm1 };
+    assert { value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)
+             = (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)) at Vm1
+               - (vx0 - vx1 + vx2 - vx3)
+             by value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)
+             = value vy0 n at Vm1 + value vm1 n - m * c1
+               + m * (value vy1 n at Vm1 + value vm1n n + c1 -  m * (c2 + c3))
+               + m * m * (value ovy2 (n+1) + c2 + c3 + !hi at Vm1)
+             = (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)) at Vm1
+               + (value vm1 n + m * value vm1n n + m * m * !hi at Vm1)
+             = (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)) at Vm1
+               + am1_abs * bm1_abs
+             = (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)) at Vm1
+                - (vx0 - vx1 + vx2 - vx3) };
+    end
+  else begin
+    assert { am1_abs*bm1_abs = (a0 - a1 + a2) * (b0 - b1)
+             = vx0 - vx1 + vx2 - vx3 };
+    let b1 = wmpn_sub_in_place scratch n vm1 n in
+    assert { value scratch n = value scratch n at Vm1 - value vm1 n + m * b1 };
+    let b2 = wmpn_sub_in_place vy1 n vm1n n in
+    assert { value vy1 n = value vy1 n at Vm1 - value vm1n n + m * b2 };
+    hi := !hi + b2;
+    let b3 = wmpn_sub_1_in_place vy1 n b1 in
+    assert { value vy1 n
+             = value vy1 n at Vm1 - value vm1n n - b1 + m * (b2 + b3) };
+    hi := !hi + b3;
+    assert { value vy0 n + m * value vy1 n + m * m * (value vy2 (n+1) - !hi)
+             = (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)) at Vm1
+               - (vx0 - vx1 + vx2 - vx3)
+             by value vy0 n + m * value vy1 n + m * m * (value vy2 (n+1) - !hi)
+             = value vy0 n + m * value vy1 n
+               + m * m * (value ovy2 (n+1) - b2 - b3 - !hi at Vm1)
+             = value vy0 n at Vm1 - value vm1 n + m * b1
+               + m * (value vy1 n at Vm1 - value vm1n n - b1 +  m * (b2 + b3))
+               + m * m * (value ovy2 (n+1) - b2 - b3 - !hi at Vm1)
+             = (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)) at Vm1
+               - (value vm1 n + m * value vm1n n + m * m * !hi at Vm1)
+             = (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)) at Vm1
+               - am1_abs * bm1_abs
+             = (value vy0 n + m * value vy1 n + m * m * value vy2 (n+1)) at Vm1
+               - (vx0 - vx1 + vx2 - vx3) };
+    assert { value vy2 (n+1) - !hi >= 0
+             by value vy0 n + m * value vy1 n + m * m * (value vy2 (n+1) - !hi)
+                = vy
+             so (vy >= 0 by 0 <= vx1 /\ 0 <= vx1 /\ 0 <= vx2 /\ 0 <= vx3)
+             so value vy0 n < m
+             so value vy1 n <= m - 1
+             so m * value vy1 n <= m * (m-1)
+             so value vy0 n + m * value vy1 n <= value vy0 n + m * (m-1)
+                < m + m * (m-1) = m * m
+             so 0 <= value vy0 n + m * value vy1 n + m * m * (value vy2 (n+1) - !hi)
+                < m * m * (1 + value vy2 (n+1) - !hi)
+             so 0 < (m * m) * (1 + value vy2 (n+1) - !hi)
+             so 0 < (1 + value vy2 (n+1) - !hi) };
+    wmpn_decr vy2 (n+1) !hi;
+    assert { value vy2 (n+1) = value ovy2 (n+1) - b2 - b3 - !hi at Vm1 };
+    end;
+  end
+  end;
+  label Split3 in
+  let ghost ovy1 = { vy1 } in
+  wmpn_toom22_mul_n_rec r x y sor n (k-1);
+  let r3n = incr_split xm1 n in
+  value_sub_frame (pelts vy1) (pelts ovy1) (offset vy1)
+                              (offset vy1 + int32'int n);
+  assert { value vy1 n = value ovy1 n };
+  assert { value r (n+n) = vx0
+           by value x n = a0 so value y n = b0 };
+  begin
+    ensures { value r3n (s+t) = vx3 }
+    ensures { min r3n = old min r3n /\ max r3n = old max r3n }
+    ensures { plength r3n = old plength r3n }
+    if (s > t)
+    then wmpn_mul r3n x2 s y1 t (k-1)
+    else wmpn_mul r3n y1 t x2 s (k-1)
+  end;
+  assert { (a0 + m * a1 + m * m * a2) * (b0 + m * b1)
+           = m * vy + vx0 + m * m * m * vx3 - m * m * vx0 - m * vx3 };
+  assert { 0 <= vx0 < m * m /\ 0 <= vx3 < m * m
+           by a0 * b0 <= a0 * m = m * a0 < m * m
+           so a2 < power radix s <= m
+           so b1 < power radix t <= m
+           so a2 * b1 <= a2 * m = m * a2 < m * m };
+  let ghost or = { r } in
+  let r1n = incr_split r n in
+  value_sub_frame (pelts r) (pelts or) (offset r) (offset r + int32'int n);
+  value_sub_frame (pelts r1n) (pelts or) (offset r1n) (offset r1n + int32'int n);
+  let ghost lvx0 = value r (int32'int n) in
+  let ghost hvx0 = value r1n (int32'int n) in
+  value_concat or n (n + n);
+  assert { vx0 = lvx0 + m * hvx0 };
+  let ghost or3n = { r3n } in
+  let r4n = incr_split r3n n in
+  let r2n = xm1 in
+  value_sub_frame (pelts r3n) (pelts or3n) (offset r3n)
+                                           (offset r3n + int32'int n);
+  value_sub_frame (pelts r4n) (pelts or3n) (offset r4n)
+                  (offset r4n + int32'int s + int32'int t - int32'int n);
+  let ghost lvx3 = value r3n (int32'int n) in
+  let ghost hvx3 = value r4n (int32'int s + int32'int t- int32'int n) in
+  value_concat or3n n (s + t);
+  assert { vx3 = lvx3 + m * hvx3 };
+  let ghost vvy0 = value vy0 (int32'int n) in
+  let ghost vvy1 = value vy1 (int32'int n) in
+  let ghost vvy2 = value vy2 (int32'int n+1) in
+  assert { vy = vvy0 + m * vvy1 + m * m * vvy2 };
+  assert { m * vy + vx0 + m * m * m * vx3 - m * m * vx0 - m * vx3
+           = lvx0 + m * (vvy0 + hvx0 - lvx3) + m * m * (vvy1 - lvx0 - hvx3)
+             + m * m * m * (vvy2 - (hvx0 - lvx3)) + m * m * m * m * hvx3 };
+  label R1 in
+  let bo1 = wmpn_sub_in_place r1n n r3n n in
+  let bo = ref bo1 in
+  assert { value r1n n - m * bo1 = hvx0 - lvx3 };
+  let ly2 = get_ofs vy2 n in
+  value_tail vy2 n;
+  assert { 0 <= ly2 < 6
+           by 0 <= value vy2 n
+           so value vy2 n + (power radix n) * ly2 = value vy2 (n+1)
+           so (power radix n) * ly2 <= value vy2 (n+1) < (power radix n) * 6 };
+  let h = ref (Limb.to_int64 (ly2 + bo1)) in
+  label R2 in
+  let bo2 = wmpn_sub_in_place r2n n r n in
+  let bo2' = wmpn_sub_1_in_place r2n n !bo in
+  bo := bo2 + bo2';
+  assert { value r2n n - m * !bo = vvy1 - lvx0 - (!bo at R2) };
+  assert { value r1n n + m * value r2n n - m * m * !bo
+           = hvx0 - lvx3 + m * (vvy1 - lvx0) };
+  label R3 in
+  let bo3 = wmpn_sub_n r3n vy2 r1n n in
+  let bo3' = wmpn_sub_1_in_place r3n n !bo in
+  bo := bo3 + bo3';
+  assert { value r3n n - m * !bo = value vy2 n - value r1n n - (!bo at R3) };
+  assert { value r1n n + m * value r2n n + m * m * value r3n n - m * m *m * !bo
+           = hvx0 - lvx3 + m * (vvy1 - lvx0) + m * m * value vy2 n
+             - m * m * (hvx0 - lvx3 + m * bo1) };
+  h := Int64.(-) !h (Limb.to_int64 !bo);
+  label Join3 in
+  let ghost or1n = { r1n } in
+  let ghost or2n = { r2n } in
+  let ghost or3n = { r3n } in
+  join r2n r3n;
+  value_concat r2n n (n + n);
+  join r1n r2n;
+  value_sub_frame (pelts r1n) (pelts or1n)
+                  (offset r1n) (offset r1n + int32'int n);
+  value_sub_frame (pelts r1n) (pelts or2n)
+                  (offset r1n + int32'int n) (offset r1n + 2 * int32'int n);
+  value_sub_frame (pelts r1n) (pelts or3n)
+                  (offset r1n + 2 * int32'int n) (offset r1n + 3 * int32'int n);
+  value_concat r1n n (3 * n);
+  value_sub_concat (pelts r1n) (offset r1n + int32'int n)
+                   (offset r1n + int32'int (2 * n))
+                   (offset r1n + int32'int (3 * n));
+  assert { value r1n (3*n)
+           = value r1n n + m * value r2n n + m * m * value r3n n at Join3
+           by offset r2n at Join3 = offset r1n + n
+           so offset r3n at Join3 = offset r1n + 2 * n
+           so value r1n n = value r1n n at Join3
+           so value_sub (pelts r1n) (offset r1n + n) (offset r1n + 2*n)
+              = value r2n n at Join3
+           so value_sub (pelts r1n) (offset r1n + 2*n) (offset r1n + 3*n)
+              = value_sub (pelts or3n) (offset r1n + 2*n) (offset r1n + 3*n)
+              = value r3n n at Join3
+           so value r1n (3*n)
+              = value r1n n
+                + m * value_sub (pelts r1n) (offset r1n + n) (offset r1n + 3*n)
+              = value r1n n
+                + m *
+                (value_sub (pelts r1n) (offset r1n + n) (offset r1n + 2*n)
+                 + m * value_sub (pelts r1n) (offset r1n + 2*n)
+                                             (offset r1n + 3*n))
+              = value r1n n
+                + m * value_sub (pelts r1n) (offset r1n + n) (offset r1n + 2*n)
+                + m * m * value_sub (pelts r1n) (offset r1n + 2*n)
+                                                (offset r1n + 3*n) };
+  assert { value r1n (3*n) + m * m * m * !h
+           = hvx0 - lvx3 + m * (vvy1 - lvx0) + m * m * vvy2
+             - m * m * (hvx0 - lvx3)
+           by value r1n (3*n) - m * m * m * !bo
+              = hvx0 - lvx3 + m * (vvy1 - lvx0) + m * m * value vy2 n
+               - m * m * (hvx0 - lvx3 + m * bo1)
+           so !h = ly2 + bo1 - !bo
+           so value r1n (3*n) + m * m * m * !h
+              = value r1n (3*n) - m * m * m * !bo
+                + m * m * m * ly2 + m * m * m * bo1
+           so m * m * value vy2 n + m * m * m * ly2 = m * m * vvy2 };
+  label Addy0 in
+  let c = wmpn_add_in_place r1n (3 * n) scratch n in
+  h := Int64.(+) !h (Limb.to_int64 c);
+  assert { power radix (3*n) = m * m * m };
+  assert { value r1n (3*n) + m * m * m * !h
+           = vy + hvx0 - lvx3 - m * lvx0 - m * m * (hvx0 - lvx3)
+           = vy + hvx0 - lvx3 - m * vx0 + m * m * lvx3
+           by value r1n (3*n) + m * m * m * !h
+              = value r1n (3*n) + (m * m * m * !h at Addy0) + m * m * m * c
+              = (value r1n (3*n) + m * m * m * !h at Addy0)
+                 + vvy0
+              = vvy0 + hvx0 - lvx3 + m * (vvy1 - lvx0) + m * m * vvy2
+                - m * m * (hvx0 - lvx3) };
+  label Join1 in
+  let ghost or = { r } in
+  let ghost or1n = { r1n } in
+  join r r1n;
+  value_sub_frame (pelts r) (pelts or) (offset r) (offset r + int32'int n);
+  value_sub_frame (pelts r) (pelts or1n)
+                  (offset r + int32'int n)
+                  (offset r + 4 * int32'int n);
+  value_concat r n (4*n);
+  assert { value r (4*n)
+           = lvx0 + m * value r1n (3*n) at Join1
+           by offset or1n = offset r + n
+           so value r n = lvx0
+           so value r1n (3*n) at Join1
+              = value_sub (pelts r) (offset r + n) (offset r + 4*n) };
+  assert { m * m * m * m = power radix (4*n)
+           by m * m = power radix (2*n) };
+  assert { value r (4*n) + m * m * m * m * !h
+           = vx0 + m * vy - m * lvx3 - m * m * vx0 + m * m * m * lvx3 };
+  let rs = s + t - n in
+  begin ensures { value r (4*n) + m * m * m * m * value r4n rs
+                  = (value x sx) * (value y sy) }
+  if [@extraction:likely] (s + t > n)
+  then begin
+    let r2n = incr r (2 * n) in
+    label Sub2 in
+    value_concat r (2 * n) (4 * n);
+    assert { value r (4*n) = value r (2*n) + m*m * value r2n (2*n)
+             by m * m = power radix (2*n)
+             so value_sub (pelts r) (offset r + 2*n) (offset r + 4*n)
+                = value r2n (2*n) };
+    assert { value r4n rs = hvx3 };
+    let ghost or = { r } in
+    let b = wmpn_sub_in_place r2n (2 * n) r4n rs in
+    value_sub_frame (pelts r) (pelts or) (offset r) (offset r + 2 * int32'int n);
+    assert { value r (2*n) = value or (2*n) };
+    value_concat r (2 * n) (4 * n);
+    assert { value r (4*n) = value r (2*n) + m*m * value r2n (2*n)
+             by m * m = power radix (2*n)
+             so pelts r2n = pelts r
+             so offset r2n = offset r + 2*n
+             so offset r2n + 2*n = offset r + 4*n
+             so value_sub (pelts r) (offset r + 2*n) (offset r + 4*n)
+                = value r2n (2*n) };
+    h := Int64.(-) !h (Limb.to_int64 b);
+    assert { value r2n (2*n) - m * m * b = (value r2n (2*n) at Sub2) - hvx3
+             by m * m = power radix (2*n) };
+    assert { value r (4*n) - m * m * m * m * b
+             = value r (4*n) at Sub2 - m * m * hvx3 };
+    assert { value r (4*n) + m * m * m * m * !h + m * m * m * m * value r4n rs
+             = value x sx * value y sy
+             by value r (4*n) + m * m * m * m * !h
+             = value r (4*n) + m * m * m * m * (!h at Sub2) - m * m * m * m * b
+             = value r (4*n) at Sub2 + m * m * m * m * !h at Sub2 - m * m * hvx3
+             = vx0 + m * vy - m * lvx3 - m * m * vx0 + m * m * m * lvx3
+               - m * m * hvx3
+             = vx0 + m * vy - m * vx3 - m * m * vx0 + m * m * m * lvx3
+             so value r (4*n) + m * m * m * m * !h
+                + m * m * m * m * value r4n rs
+             = vx0 + m * vy - m * vx3 - m * m * vx0 + m * m * m * lvx3
+                + m * m * m * m * value r4n rs
+             = vx0 + m * vy - m * vx3 - m * m * vx0 + m * m * m * vx3
+             = (a0 + m * a1 + m * m * a2) * (b0 + m * b1)
+             = value x sx * value y sy };
+    (if Int64.(<) !h 0
+    then begin
+      assert { 0 <= value r4n rs + !h
+               by 0 <= value x sx so 0 <= value y sy
+               so 0 <= value x sx * value y sy
+               so value r (4*n) < power radix (4*n) = m * m * m * m
+               so 0 <= value r (4*n) + m * m * m * m * (value r4n rs + !h)
+                    < (m * m * m * m) * (1 + value r4n rs + !h)
+               so 0 < (m * m * m * m) * (1 + value r4n rs + !h)
+               so 0 < (m * m * m * m)
+               so 0 < 1 + value r4n rs + !h };
+      wmpn_decr r4n rs (Limb.of_int64 (Int64.(-_) !h))
+      end
+    else begin
+      assert { value r4n rs + !h < power radix rs
+               by value x sx < power radix sx
+               so value y sy < power radix sy
+               so value x sx * value y sy
+                  <= value x sx * power radix sy
+                  < power radix sx * power radix sy
+                  = power radix (sx + sy)
+                  = power radix (3*n+s+t)
+               so 0 <= value r (4*n)
+               so power radix (4*n) * (value r4n rs + !h)
+                  = m * m * m * m * (value r4n rs + !h)
+                  <= value r (4*n) + m * m * m * m * (value r4n rs + !h)
+                  < power radix (3*n + s + t) = power radix (4*n + rs)
+                  = power radix (4*n) * power radix rs
+               so power radix (4*n) * (value r4n rs + !h)
+                  < power radix (4*n) * power radix rs
+               so 0 < power radix (4*n) };
+      wmpn_incr r4n rs (Limb.of_int64 !h)
+      end)
+  end
+  else begin
+    assert { !h = 0
+             by rs = 0
+             so sx + sy = 4 * n
+             so hvx3 = 0
+             so vx3 = lvx3
+             so value r (4*n) + power radix (4*n) * !h = value x sx * value y sy
+             so 0 <= value x sx < power radix sx
+             so 0 <= value y sy < power radix sy
+             so 0 <= value x sx * value y sy
+             so value x sx * value y sy
+                <= value x sx * power radix sy
+                < power radix sx * power radix sy
+                = power radix (sx + sy)
+                = power radix (4*n)
+             so 0 <= value r (4*n) < power radix (4*n)
+             so 0 <= value x sx * value y sy
+                < power radix (4*n) + power radix (4*n) * !h
+                = power radix (4*n) * (1 + !h)
+             so 0 < power radix (4*n) * (1 + !h)
+             so 0 < 1 + !h
+             so power radix (4*n) * 1 > value x sx * value y sy
+                >= power radix (4*n) * !h
+             so power radix (4*n) * !h < power radix (4*n) * 1
+             so !h < 1 };
+  end
+  end;
+  label Join4 in
+  let ghost or = { r } in
+  let ghost or4n = { r4n } in
+  join r r4n;
+  value_sub_frame (pelts r) (pelts or) (offset r) (offset r + 4 * int32'int n);
+  value_sub_frame (pelts r) (pelts or4n) (offset r + 4 * int32'int n)
+                  (offset r + 3 * int32'int n + int32'int s + int32'int t);
+  value_concat r (4*n) (3*n + s + t);
+  assert { value r (3*n + s + t) = value x sx * value y sy
+           by offset or4n = offset r + 4*n
+           so offset r4n + rs = offset r + 3*n + s + t
+           so value_sub (pelts r) (offset r + 4*n) (offset r + 3*n + s + t)
+              = value_sub (pelts or4n) (offset r + 4*n) (offset r + 3*n + s + t)
+              = value or4n rs
+           so value r (3*n + s + t)
+              = value or (4*n) + m * m * m * m * value or4n rs };
+  join scratch vy2;
+  join scratch sor;
+  join_r sol scratch;
+  label JoinR in
+  let ghost or = { r } in
+  join r ror;
+  value_sub_frame (pelts r) (pelts or) (offset r)
+                  (offset r + int32'int sx + int32'int sy);
+  label JoinL in
+  join_r rol r;
+  value_sub_frame (pelts r) (pelts or) (offset r)
+                  (offset r + int32'int sx + int32'int sy);
+  assert { value r (sx + sy) = value x sx * value y sy
+           by value r (sx + sy) = value r (sx + sy) at JoinL
+              = value r (sx + sy) at JoinR }
+
+  with wmpn_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) (ghost k: int) : unit
+    requires { valid x sx }
+    requires { valid y sy }
+    requires { valid r (sx + sy) }
+    requires { 0 < sy <= sx }
+    requires { 8 * sx < max_int32 }
+    requires { sx <= toom22_threshold * power 2 k }
+    requires { 0 <= k <= 64 }
+    ensures  { min r = old min r }
+    ensures  { max r = old max r }
+    ensures  { plength r = old plength r }
+    ensures  { value r (sx + sy) = value x sx * value y sy }
+    ensures  { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
+                         -> (pelts r)[j] = old (pelts r)[j] }
+    variant  { k+k+1 }
+  =
+    if sy <= toom22_threshold
+    then
+    (* TODO block product if sx large, for memory locality according to GMP *)
+     wmpn_mul_basecase r x sx y sy
+    else begin
+      (* this would be faster with salloc *)
+      (*let ghost k = 64 in*) (* is always enough *)
+      let scratch = salloc (UInt32.of_int32 ((5 * sy) + 128)) in
+      (* c_assert (is_not_null scratch); *)
+      let rol = decr_split r 0 in
+      let ror = incr_split r (sx + sy) in
+      if ((2 * sx) >= (5 * sy))
+      then begin
+        let un = ref sx in
+        let su = (3 * sy) / 2 in
+        assert { 0 < su };
+        let ghost sr = su + sy in
+        let ws = salloc (UInt32.of_int32 (4 * sy)) in
+        (* c_assert (is_not_null ws); *)
+        wmpn_toom32_mul r x su y sy scratch k;
+        un := !un - su;
+        let up = ref (C.incr x su) in
+        let rp = ref (C.incr r su) in
+        let ghost ou = ref su in
+        let ghost or = ref sr in
+        while (!un >= (2 * sy)) do (* 5/2?*)
+          invariant { min_int32 <= 2 * !un <= max_int32 }
+          invariant { !ou + !un = sx }
+          invariant { !or = !ou + sy }
+          invariant { su <= !ou < sx }
+          invariant { !un < sx }
+          invariant { 2 * sy - su <= !un }
+          invariant { value r !or = value x !ou * value y sy }
+          invariant { offset !rp = offset r + !ou }
+          invariant { offset !up = offset x + !ou }
+          invariant { min !up = min x /\ max !up = max x }
+          invariant { plength !up = plength x }
+          invariant { min !rp = min r /\ max !rp = max r }
+          invariant { plength !rp = plength r }
+          invariant { min ws = 0 /\ max ws = plength ws = 4 * sy }
+          invariant { min scratch = 0 /\ max scratch = plength scratch }
+          invariant { plength scratch = 5 * sy + 128 }
+          invariant { pelts !rp = pelts r }
+          invariant { pelts !up = pelts x }
+          variant { p2i !un }
+          (*wmpn_copyi ws !rp sy;
+          let rr = rp.contents in
+          wmpn_toom32_mul rr !up y scratch su sy k;
+          let cy = wmpn_add_in_place rr ws sy sy in
+          let rpn = C.incr rr sy in
+          wmpn_incr rpn cy su;
+          un := !un - su;
+          up.contents <- C.incr !up su;
+          ou := !ou + su;
+          or := !or + su;
+          rp.contents <- C.incr !rp su;*)
+          label StartLoop in
+          let ghost o_r = { r } in
+          let ghost rrp = !rp in
+          let ghost o_rp = { rrp } in (* TODO why not { !rp } ? *)
+          value_concat r !ou !or;
+          assert { value r !or = value r !ou + power radix !ou * value !rp sy };
+          wmpn_toom32_mul ws !up su y sy scratch k;
+          let cy = wmpn_add_in_place !rp sy ws sy in
+          value_sub_frame (pelts r) (pelts o_r) (offset r) (offset r + p2i !ou);
+          assert { value r !ou = value o_r !ou };
+          assert { value !rp sy + (power radix sy) * cy
+                   = value o_rp sy + value ws sy };
+          let rpn = C.incr !rp sy in
+          let wsy = C.incr ws sy in
+          let orp = { rpn } in
+          label Copy in
+          wmpn_copyi rpn wsy su;
+          value_sub_frame_shift (pelts rpn) (pelts wsy)
+                                (offset rpn) (offset wsy) (int32'int su);
+          value_sub_frame (pelts r) (pelts orp) (offset r) (offset r + p2i !ou);
+          value_sub_frame (pelts rpn) (pelts orp)
+                          (offset !rp) (offset !rp + p2i sy);
+          assert { value rpn su = value wsy su };
+          assert { value !rp sy = value (!rp at Copy) sy };
+          assert { value r !ou = value o_r !ou };
+          value_concat ws sy sr;
+          assert { value ws sr
+                   = value ws (sy + su)
+                   = value ws sy + power radix sy * value wsy su };
+          value_concat r !ou (!ou + sr);
+          assert { value r (!or + su) = value r (!ou + sr)
+                   = value r !ou + power radix !ou * value !rp sr };
+          value_concat !rp sy sr;
+          assert { value !rp sr = value !rp sy + power radix sy * value rpn su };
+          value_concat x !ou (!ou + su);
+          assert { value x (!ou + su)
+                   = value x !ou + power radix !ou * value !up su };
+          assert { value r (!ou + sr) + (power radix !or) * cy
+                   = value x (!ou + su) * value y sy
+                   by value r (!ou + sr) + (power radix !or) * cy
+                      = value r !ou + power radix !ou * value !rp sr
+                        + power radix !ou * (power radix sy) * cy
+                      = value r !ou + power radix !ou * value !rp sy
+                        + power radix !ou * power radix sy * value wsy su
+                        + power radix !ou * power radix sy * cy
+                      = value r !ou
+                        + power radix !ou * (value !rp sy + power radix sy * cy)
+                        + power radix !ou * power radix sy * value wsy su
+                      = value r !ou
+                        + power radix !ou * (value o_rp sy + value ws sy)
+                        + power radix !ou * power radix sy * value wsy su
+                      = value r !ou + power radix !ou * value o_rp sy
+                        + power radix !ou
+                          * (value ws sy + power radix sy * value wsy su)
+                      = value o_r !or
+                        + power radix !ou * value ws sr
+                      = value x !ou * value y sy
+                        + power radix !ou * value !up su * value y sy
+                      = (value x !ou + power radix !ou * value !up su)
+                        * value y sy
+                      = value x (!ou + su) * value y sy };
+          value_concat r !or (!ou + sr);
+          assert { value r (!ou + sr)
+                      = value r !or + power radix !or * value rpn su };
+          assert { value rpn su + cy < power radix su
+                   by value x (!ou + su) < power radix (!ou + su)
+                   so value y sy < power radix sy
+                   so value x (!ou + su) * value y sy
+                      < power radix (!ou + su) * power radix sy
+                      = power radix (!ou + su + sy)
+                      = power radix (!or + su)
+                   so value r (!ou + sr) + power radix !or * cy
+                      = value r !or + power radix !or * (value rpn su)
+                        + power radix !or * cy
+                      = value r !or + power radix !or * (value rpn su + cy)
+                   so value r !or + power radix !or * (value rpn su + cy)
+                      < power radix (!or + su)
+                   so 0 <= value r !or
+                   so power radix !or * (value rpn su + cy)
+                      < power radix (!or + su)
+                      = power radix !or * power radix su };
+          label Incr in
+          let orp = { rpn } in
+          wmpn_incr rpn su cy;
+          value_sub_frame (pelts r) (pelts orp) (offset r) (offset r + p2i !or);
+          assert { value r !or = value r !or at Incr };
+          value_concat r !or (!ou + sr);
+          assert { value r (!ou + sr) = value x (!ou + su) * value y sy
+                   by value r (!ou + sr)
+                   = value r !or + power radix !or * value rpn su
+                   = value r !or at Incr + power radix !or * value rpn su
+                   = value r !or at Incr
+                     + power radix !or * (value rpn su at Incr + cy)
+                   = value r !or at Incr
+                     + power radix !or * value rpn su at Incr
+                     + power radix !or * cy
+                   = value r (!ou + sr) at Incr + power radix !or * cy };
+          un := !un - su;
+          up.contents <- C.incr !up su;
+          ou := !ou + su;
+          or := !or + su;
+          rp.contents <- C.incr !rp su;
+        done;
+ (*       wmpn_copyi ws !rp sy;*)
+        (* sy <= !un <= 2.5 * sy *)
+        value_concat r !ou !or;
+        assert { value r !or = value r !ou + power radix !ou * value !rp sy };
+        let ghost o_r = { r } in
+        let ghost rrp = !rp in
+        let ghost o_rp = { rrp } in (* TODO why not { !rp } ? *)
+        begin
+          ensures { value ws (!un + sy) = value !up !un * value y sy }
+          ensures { min ws = old min ws /\ max ws = old max ws
+                    /\ plength ws = old plength ws }
+          ensures { min scratch = old min scratch
+                    /\ max scratch = old max scratch
+                    /\ plength scratch = old plength scratch }
+          if sy <= !un
+          then begin
+            if ((4 * !un) < (5 * sy))
+            then wmpn_toom22_mul ws !up !un y sy scratch k
+            else wmpn_toom32_mul ws !up !un y sy scratch k
+          end
+          else wmpn_mul ws y sy !up !un (k-1)
+        end;
+        let cy = wmpn_add_in_place !rp sy ws sy in
+        value_sub_frame (pelts r) (pelts o_r) (offset r) (offset r + p2i !ou);
+        assert { value r !ou = value o_r !ou };
+        assert { value !rp sy + (power radix sy) * cy
+                 = value o_rp sy + value ws sy };
+        let rpn = C.incr !rp sy in
+        let wsy = C.incr ws sy in
+        let orp = { rpn } in
+        label Copy in
+        wmpn_copyi rpn wsy !un;
+        value_sub_frame_shift (pelts rpn) (pelts wsy)
+                              (offset rpn) (offset wsy) (int32'int !un);
+        value_sub_frame (pelts r) (pelts orp) (offset r) (offset r + p2i !ou);
+        value_sub_frame (pelts rpn) (pelts orp)
+                        (offset !rp) (offset !rp + p2i sy);
+        assert { value rpn !un = value wsy !un };
+        assert { value !rp sy = value (!rp at Copy) sy };
+        assert { value r !ou = value o_r !ou };
+        let ghost sr = sy + !un in
+        value_concat ws sy sr;
+        assert { value ws sr
+                 = value ws sy + power radix sy * value wsy !un };
+        value_concat r !ou (!ou + sr);
+        assert { value r (!or + !un) = value r (!ou + sr)
+                 = value r !ou + power radix !ou * value !rp sr };
+        value_concat !rp sy sr;
+        assert { value !rp sr = value !rp sy + power radix sy * value rpn !un };
+        value_concat x !ou (!ou + !un);
+        assert { value x (!ou + !un)
+                 = value x !ou + power radix !ou * value !up !un };
+        assert { value r (!ou + sr) + (power radix !or) * cy
+                 = value x (!ou + !un) * value y sy
+                 by value r (!ou + sr) + (power radix !or) * cy
+                    = value r !ou + power radix !ou * value !rp sr
+                      + power radix !ou * (power radix sy) * cy
+                    = value r !ou + power radix !ou * value !rp sy
+                      + power radix !ou * power radix sy * value wsy !un
+                      + power radix !ou * power radix sy * cy
+                    = value r !ou
+                      + power radix !ou * (value !rp sy + power radix sy * cy)
+                      + power radix !ou * power radix sy * value wsy !un
+                    = value r !ou
+                      + power radix !ou * (value o_rp sy + value ws sy)
+                      + power radix !ou * power radix sy * value wsy !un
+                    = value r !ou + power radix !ou * value o_rp sy
+                      + power radix !ou
+                        * (value ws sy + power radix sy * value wsy !un)
+                    = value o_r !or
+                      + power radix !ou * value ws sr
+                    = value x !ou * value y sy
+                      + power radix !ou * value !up !un * value y sy
+                    = (value x !ou + power radix !ou * value !up !un)
+                      * value y sy
+                    = value x (!ou + !un) * value y sy };
+        value_concat r !or (!ou + sr);
+        assert { value r (!ou + sr)
+                    = value r !or + power radix !or * value rpn !un };
+        assert { value rpn !un + cy < power radix !un
+                 by value x (!ou + !un) < power radix (!ou + !un)
+                 so value y sy < power radix sy
+                 so value x (!ou + !un) * value y sy
+                    < power radix (!ou + !un) * power radix sy
+                    = power radix (!ou + !un + sy)
+                    = power radix (!or + !un)
+                 so value r (!ou + sr) + power radix !or * cy
+                    = value r !or + power radix !or * (value rpn !un)
+                      + power radix !or * cy
+                    = value r !or + power radix !or * (value rpn !un + cy)
+                 so value r !or + power radix !or * (value rpn !un + cy)
+                    < power radix (!or + !un)
+                 so 0 <= value r !or
+                 so power radix !or * (value rpn !un + cy)
+                    < power radix (!or + !un)
+                    = power radix !or * power radix !un };
+        let orp = { rpn } in
+        label Incr in
+        wmpn_incr rpn !un cy;
+        value_sub_frame (pelts r) (pelts orp) (offset r) (offset r + p2i !or);
+        assert { value r !or = value r !or at Incr };
+        value_concat r !or (!ou + sr);
+        assert { value r (!ou + sr) = value x (!ou + !un) * value y sy
+                 by value r (!ou + sr)
+                 = value r !or + power radix !or * value rpn !un
+                 = value r !or at Incr + power radix !or * value rpn !un
+                 = value r !or at Incr
+                   + power radix !or * (value rpn !un at Incr + cy)
+                 = value r !or at Incr
+                   + power radix !or * value rpn !un at Incr
+                   + power radix !or * cy
+                 = value r (!ou + sr) at Incr + power radix !or * cy };
+        assert { value r (sx + sy) = value x sx * value y sy
+                 by !ou + sr = sx + sy /\ !ou + !un = sx };
+        sfree ws;
+      end
+      else begin
+        if ((4 * sx) < (5 * sy))
+        then wmpn_toom22_mul r x sx y sy scratch k
+        else wmpn_toom32_mul r x sx y sy scratch k
+      end;
+      sfree scratch;
+      label JoinR in
+      let ghost or = { r } in
+      join r ror;
+      value_sub_frame (pelts r) (pelts or) (offset r)
+                      (offset r + int32'int sx + int32'int sy);
+      label JoinL in
+      join_r rol r;
+      value_sub_frame (pelts r) (pelts or) (offset r)
+                      (offset r + int32'int sx + int32'int sy);
+      assert { value r (sx + sy) = value x sx * value y sy
+               by value r (sx + sy) = value r (sx + sy) at JoinL
+                = value r (sx + sy) at JoinR }
+    end
+        (* sy <= !un <= 2.5 * sy *)
+       (* if sy <= !un
+        then begin
+           if ((4 * !un) < (5 * sy))
+           then wmpn_toom22_mul ws !up y scratch !un sy k
+           else wmpn_toom32_mul ws !up y scratch !un sy k
+        end
+        else wmpn_mul ws y !up sy !un (k-1);
+        let cy = wmpn_add_in_place !rp ws sy sy in
+        let rpn = C.incr !rp sy in
+        wmpn_copyi rpn (C.incr ws sy) !un;
+        wmpn_incr rpn cy !un;
+        sfree ws;
+      end
+      else begin
+        if ((4 * sx) < (5 * sy))
+        then wmpn_toom22_mul r x y scratch sx sy k
+        else wmpn_toom32_mul r x y scratch sx sy k
+      end;
+      sfree scratch
+    end*)
+
+  (** `wmpn_mul_n r x y sz` multiplies `(x, sz)` and `(y, sz)` and
+  writes the result to `(r, 2*sz)`. `r` must not overlap with either
+  `x` or `y`. Corresponds to `mpn_mul_n`.  *)
+  let wmpn_mul_n (r x y:t) (sz:int32) (ghost k: int) : unit
+    requires { sz > 0 }
+    requires { valid x sz }
+    requires { valid y sz }
+    requires { valid r (sz + sz) }
+    requires { 8 * sz < max_int32 }
+    requires { sz <= toom22_threshold * power 2 k }
+    requires { 0 <= k <= 64 }
+    ensures { value r (sz + sz) = value x sz * value y sz }
+    ensures  { min r = old min r }
+    ensures  { max r = old max r }
+    ensures  { plength r = old plength r }
+    ensures  { forall j. min r <= j < offset r \/ offset r + sz + sz <= j < max r
+                         -> (pelts r)[j] = old (pelts r)[j] }
+  =
+    if sz <= toom22_threshold
+    then wmpn_mul_basecase r x sz y sz
+    else
+      let ws = salloc (UInt32.of_int32 (2 * (sz + 64))) in
+      wmpn_toom22_mul r x sz y sz ws 64
+
+  meta remove_prop axiom no_borrow
+  meta remove_prop axiom no_borrow_ptr
+  meta remove_prop lemma power_ge_1
+  meta remove_prop axiom valuation'def
+  meta remove_prop axiom valuation'spec
+  meta remove_prop lemma valuation_mul
+  meta remove_prop axiom valuation_times_pow
+  meta remove_prop axiom valuation_lower_bound
+  meta remove_prop axiom valuation_monotonous
+  meta remove_prop lemma valuation_nondiv
+  meta remove_prop lemma valuation_zero_prod
+  meta remove_prop axiom valuation_times_nondiv
+  meta remove_prop lemma valuation_split
+  meta remove_prop lemma valuation_prod
+  meta remove_prop lemma valuation_mod
+  meta remove_prop lemma valuation_decomp
+  meta remove_prop lemma valuation_pow
+
+end

@@ -1,12 +1,12 @@
 
 module TestCursor
 
-  use import int.Int
-  use import int.Sum
-  use import seq.Seq
-  use import ref.Refint
+  use int.Int
+  use int.Sum
+  use seq.Seq
+  use ref.Refint
 
-  use import cursor.Cursor
+  use cursor.Cursor
 
   (** sums all the remaining elements in the cursor *)
   let sum (c: cursor int) : int
@@ -31,10 +31,10 @@ end
 
 module ListCursorImpl (* : ListCursor *)
 
-  use import int.Int
-  use import list.List
-  use import seq.Seq
-  use import seq.OfList
+  use int.Int
+  use list.List
+  use seq.Seq
+  use seq.OfList
 
   type cursor 'a = {
     mutable ghost visited    : seq 'a;
@@ -95,16 +95,16 @@ end
 
 module TestListCursor
 
-  use import int.Int
-  use import int.Sum as S
-  use import list.List
-  use import list.Length
-  use import list.Sum
-  use import ref.Refint
-  use import seq.Seq
-  use import seq.OfList
+  use int.Int
+  use int.Sum as S
+  use list.List
+  use list.Length
+  use list.Sum
+  use ref.Refint
+  use seq.Seq
+  use seq.OfList
 
-  clone import cursor.ListCursor
+  clone cursor.ListCursor
 
   lemma sum_of_list: forall l: list int.
     sum l = S.sum (get (of_list l)) 0 (length l)
@@ -126,9 +126,9 @@ end
 
 module TestListCursorLink
 
-  use import ListCursorImpl
+  use ListCursorImpl
 
-  clone import TestListCursor with
+  clone TestListCursor with
     type ListCursor.cursor     = cursor,
     val  ListCursor.C.next     = next,
     val  ListCursor.C.has_next = has_next,
@@ -142,13 +142,13 @@ end
 
 module ArrayCursorImpl (* : ArrayCursor *)
 
-  use import int.Int
-  use import array.Array
-  use import array.ToSeq
-  use import list.List
-  use import list.Reverse
-  use import array.ToList
-  use import seq.Seq
+  use int.Int
+  use array.Array
+  use array.ToSeq
+  use list.List
+  use list.Reverse
+  use array.ToList
+  use seq.Seq
 
   type cursor 'a = {
     mutable ghost visited    : seq 'a;
@@ -197,14 +197,14 @@ end
 
 module TestArrayCursor
 
-  use import int.Int
-  use import array.Array
-  use import array.ToSeq
-  use import seq.Seq
-  use import int.Sum
-  use import ref.Refint
+  use int.Int
+  use array.Array
+  use array.ToSeq
+  use seq.Seq
+  use int.Sum
+  use ref.Refint
 
-  clone import cursor.ArrayCursor
+  clone cursor.ArrayCursor
 
   let array_sum (a: array int) : int
     ensures { result = sum (Array.([]) a) 0 (length a) }
@@ -238,9 +238,9 @@ end
 
 module TestArrayCursorLink
 
-  use import ArrayCursorImpl
+  use ArrayCursorImpl
 
-  clone import TestArrayCursor with
+  clone TestArrayCursor with
     type ArrayCursor.cursor     = cursor,
     val  ArrayCursor.C.next     = next,
     val  ArrayCursor.C.has_next = has_next,

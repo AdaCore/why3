@@ -1,0 +1,287 @@
+
+(** proof of Schorr-Waite algorithm using a ghost monitor
+
+The C code for Schorr-Waite is the following:
+
+typedef struct struct_node {
+  unsigned int m :1, c :1;
+  struct struct_node *l, *r;
+} * node;
+
+void schorr_waite(node root) {
+  node t = root;
+  node p = NULL;
+  while (p != NULL || (t != NULL && ! t->m)) {
+    if (t == NULL || t->m) {
+      if (p->c) { /* pop */
+	node q = t; t = p; p = p->r; t->r = q;
+      }
+      else { /* swing */
+	node q = t; t = p->r; p->r = p->l; p->l = q; p->c = 1;
+      }
+    }
+    else { /* push */
+      node q = p; p = t; t = t->l; p->l = q; p->m = 1; p->c = 0;
+    }
+  }
+}
+
+The informal specification is
+
+- the graph structure induced by pointer `l` and `r` is restored into its original shape
+- assuming that initially all the nodes reachable from `root` are unmarked (m is 0) then
+  at exit all those nodes are marked.
+- the nodes initially unreachable from `root` have their mark unchanged
+
+*)
+
+(** Component-as-array memory model, with null pointers *)
+module Memory
+
+  use int.Int
+  use option.Option
+
+  (** Memory locations *)
+  type loc
+
+  (** null pointer *)
+  val constant null : loc
+
+  (** pointer equality *)
+  val (=) (l1 l2:loc) : bool
+    ensures { result <-> l1 = l2 }
+
+  type memory = abstract {
+    mutable left  : loc -> loc;
+    mutable right : loc -> loc;
+    mutable mark  : loc -> bool;
+    mutable color : loc -> bool;
+  }
+
+  predicate update (m1 m2:loc -> 'a) (l:loc) (v:'a) =
+    m1 l = v /\ forall x. x<>l -> m1 x = m2 x
+
+  (** Global instance for memory *)
+  val heap : memory
+
+  (** Getters/setters for pointers *)
+  val get_l (l:loc) : loc
+    requires { l <> null }
+    reads { heap }
+    ensures { result = heap.left l }
+  val get_r (l:loc) : loc
+    requires { l <> null }
+    reads { heap }
+    ensures { result = heap.right l }
+  val get_m (l:loc) : bool
+    requires { l <> null }
+    reads { heap }
+    ensures { result = heap.mark l }
+  val get_c (l:loc) : bool
+    requires { l <> null }
+    reads { heap }
+    ensures { result = heap.color l  }
+  val set_l (l:loc) (d:loc) : unit
+    requires { l <> null }
+    writes { heap.left }
+    ensures { update heap.left (old heap.left) l d }
+  val set_r (l:loc) (d:loc) : unit
+    requires { l <> null }
+    writes { heap.right }
+    ensures { update heap.right (old heap.right) l d }
+  val set_m (l:loc) (m:bool) : unit
+    requires { l <> null }
+    writes { heap.mark }
+    ensures { update heap.mark (old heap.mark) l m }
+  val set_c (l:loc) (c:bool) : unit
+    requires { l <> null }
+    writes { heap.color }
+    ensures { update heap.color (old heap.color) l c }
+
+end
+
+
+
+(** Define notions about the memory graph *)
+module GraphShape
+
+  use int.Int
+  use set.Fset
+  use Memory
+
+  (** Edges *)
+  predicate edge (m:memory) (x y:loc) =
+    x <> null /\ (m.left x = y \/ m.right x = y)
+
+  (** Paths *)
+  inductive path memory (x y:loc) =
+    | path_nil : forall m x. path m x x
+    | path_cons : forall m x y z. edge m x y /\ path m y z -> path m x z
+
+  (** DFS invariant. For technical reason, it must refer to different parts
+     of the memory at different time. The graph structure is given
+     via the initial memory `m`, but the coloring is given via the current one `mark`. *)
+  predicate well_colored_on (graph gray:fset loc) (m:memory) (mark:loc -> bool) =
+    subset gray graph /\
+    (forall x. mem x gray -> mark x) /\
+    (forall x y. mem x graph /\ edge m x y /\ y <> null /\ mark x ->
+      mem x gray \/ mark y)
+
+  (** Unchanged_structure only concerns the graph shape, not the marks *)
+  predicate unchanged_structure (m1 m2:memory) =
+    forall x. x <> null ->
+      m2.left x = m1.left x /\ m2.right x = m1.right x
+
+end
+
+
+
+
+module SchorrWaite
+
+  use int.Int
+  use set.Fset
+  use ref.Ref
+  use Memory
+  use GraphShape
+
+  let schorr_waite (root : loc) (ghost graph : fset loc) : unit
+    requires { (** Root belong to graph *)
+      mem root graph }
+    requires { (** Graph is closed by following edges *)
+      forall l. mem l graph /\ l <> null ->
+        mem (heap.left l) graph /\ mem (heap.right l) graph }
+    writes { heap }
+    requires { (** The graph starts fully unmarked. *)
+      forall x. mem x graph -> not heap.mark x }
+    ensures  { (** The graph structure is left unchanged. *)
+      unchanged_structure (old heap) heap }
+    ensures  { (** Every non-null location reachable from the root is marked. *)
+      forall x. path (old heap) root x /\ x <> null ->
+        heap.mark x }
+    ensures { (** Every other location is left with its previous marking. *)
+      forall x. not path (old heap) root x /\ x <> null ->
+        heap.mark x = (old heap.mark) x }
+
+=
+  (* Non-memory internal state *)
+  let pc = ref 0 in
+  let t = ref null in
+  let p = ref null in
+
+  (** step function for low-level Schorr-Waite algorithm
+  L0:
+  node t = root;
+  node p = NULL;
+  while L1: (p != NULL || (t != NULL && ! t->m)) {
+    if (t == NULL || t->m) {
+      if (p->c) { /* Pop */
+        node q = t; t = p; p = p->r; t->r = q;
+      }
+      else { /* Swing */
+        node q = t; t = p->r; p->r = p->l; p->l = q; p->c = 1;
+      }
+    }
+    else { /* Push */
+      node q = p; p = t; t = t->l; p->l = q; p->m = 1; p->c = 0;
+    }
+  }
+  L2:
+  *)
+  let step () : unit
+    requires { 0 <= !pc < 2 }
+    writes   { pc,t,p,heap }
+    ensures  { old (!pc = 0) -> !pc = 1 /\ !t = root /\ !p = null /\ heap = old heap }
+    ensures  { old (!pc = 1 /\ not(!p <> null \/ (!t <> null /\ not heap.mark !t))) ->
+      !pc = 2 /\ !t = old !t /\ !p = old !p /\ heap = old heap }
+    ensures  { old (!pc = 1 /\ (!p <> null \/ (!t <> null /\ not heap.mark !t))) ->
+      !pc = 1 /\
+      ( old ((!t = null \/ heap.mark !t) /\ heap.color !p) -> (* Pop *)
+         (* q = t *) let q = old !t in
+         (* t = p *) !t = old !p /\
+         (* p = p->r *) !p = old (heap.right !p) /\
+         (* t->r = q (t is old p here!) *) update heap.right (old heap.right) (old !p) q /\
+         heap.left = old (heap.left) /\
+         heap.mark = old (heap.mark) /\
+         heap.color = old (heap.color) )
+       /\
+       ( old ((!t = null \/ heap.mark !t) /\ not heap.color !p) -> (* Swing *)
+         (* q = t *) let q = old !t in
+         (* p unchanged *) !p = old !p /\
+         (* t = p->r *) !t = old (heap.right !p) /\
+         (* p->r = p->l *) update heap.right (old heap.right) !p (old (heap.left !p)) /\
+         (* p->l = q *) update heap.left (old heap.left) !p q /\
+         (* p->c = 1 *) update heap.color (old heap.color) !p true /\
+         heap.mark = old (heap.mark) )
+       /\
+       ( old (not (!t = null \/ heap.mark !t)) -> (* Push *)
+         (* q = p *) let q = old !p in
+         (* p = t *) !p = old !t /\
+         (* t = t -> l *) !t = old (heap.left !t) /\
+         (* p->l = q (p is old t here!) *) update heap.left (old heap.left) (old !t) q /\
+         (* p->m = 1 *) update heap.mark (old heap.mark) !p true /\
+         (* p->c = 0 *) update heap.color (old heap.color) !p false /\
+         heap.right = old (heap.right) )
+      }
+  =
+    if !pc = 0 then (t := root; p := null; pc := 1)
+    else if !pc = 1 then
+      if !p <> null || (!t <> null && not(get_m(!t)))
+      then begin
+        if !t = null || get_m(!t) then
+        if get_c !p then (* Pop *)
+          let q = !t in t := !p;  p := get_r !p; set_r !t q; pc := 1
+        else (* Swing *)
+          let q = !t in t := get_r !p; set_r !p (get_l !p); set_l !p q; set_c !p true; pc := 1
+        else (* Push *)
+          let q = !p in p := !t; t := get_l !t; set_l !p q; set_m !p true; set_c !p false; pc := 1
+       end
+      else pc := 2
+    else absurd
+  in
+  let ghost initial_heap = pure {heap} in (* Copy of initial memory *)
+  let rec recursive_monitor (ghost gray_nodes: fset loc) : unit
+      requires { !pc = 1 }
+      requires { mem !t graph }
+      requires { (* assume DFS invariant *)
+        well_colored_on graph gray_nodes initial_heap heap.mark }
+      requires { (* Non-marked nodes have unchanged structure with respect
+                    to the initial one *)
+        forall x. x <> null /\ not heap.mark x ->
+          heap.left x = initial_heap.left x /\ heap.right x = initial_heap.right x }
+
+      ensures { !pc = 1 }
+      ensures { !t = old !t /\ !p = old !p }
+      ensures { (* Pointer buffer is overall left unchanged *)
+        unchanged_structure (old heap) heap }
+      ensures { (* Maintain DFS invariant *)
+        well_colored_on graph gray_nodes initial_heap heap.mark }
+      ensures { (* The top node get marked *)
+        !t <> null -> heap.mark !t }
+      ensures { (* May not mark unreachable nodes,
+                   neither change marked nodes. *)
+        forall x. x <> null ->
+          not path initial_heap !t x \/ old heap.mark x ->
+          heap.mark x = (old heap.mark) x /\
+          heap.color x = (old heap.color) x
+      }
+      (* Terminates because there is a finite number of 'grayable' nodes. *)
+      variant { cardinal graph - cardinal gray_nodes }
+    = if !t = null || get_m !t then () else
+      let ghost new_gray = add !t gray_nodes in
+      step (); (* Push *)
+      recursive_monitor new_gray; (* Traverse the left child *)
+      step (); (* Swing *)
+      recursive_monitor new_gray; (* Traverse the right child *)
+      step () (* Pop *)
+    in
+    step (); (* Initialize *)
+    recursive_monitor empty;
+    step (); (* Exit. *)
+    assert { !pc = 2 };
+    (* Need induction to recover path-based specification. *)
+    assert { forall x y. ([@induction] path initial_heap x y) ->
+        x <> null /\ y <> null /\ mem x graph /\ heap.mark x ->
+        heap.mark y }
+
+end

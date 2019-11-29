@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -34,18 +34,19 @@ val file_of_theory : driver -> string -> Theory.theory -> string
 (** [file_of_theory d f th] produces a filename
     for the prover of driver [d], for a theory [th] from filename [f] *)
 
+(* unused outside ?
 val call_on_buffer :
   command      : string ->
   limit        : Call_provers.resource_limit ->
+  gen_new_file : bool ->
   ?inplace     : bool ->
   filename     : string ->
   printer_mapping : Printer.printer_mapping ->
   driver -> Buffer.t -> Call_provers.prover_call
-
+ *)
 
 val print_task :
   ?old       : in_channel ->
-  ?cntexample : bool ->
   driver -> Format.formatter -> Task.task -> unit
 
 val print_theory :
@@ -56,13 +57,15 @@ val print_theory :
 val prove_task :
   command      : string ->
   limit        : Call_provers.resource_limit ->
-  ?cntexample  : bool ->
   ?old         : string ->
   ?inplace     : bool ->
+  ?interactive : bool ->
   driver -> Task.task -> Call_provers.prover_call
 
 (** Split the previous function in two simpler functions *)
-val prepare_task : cntexample:bool -> driver -> Task.task -> Task.task
+
+(* Apply driver's transformations to the task *)
+val prepare_task : driver -> Task.task -> Task.task
 
 val print_task_prepared :
   ?old       : in_channel ->
@@ -73,6 +76,7 @@ val prove_task_prepared :
   limit        : Call_provers.resource_limit ->
   ?old         : string ->
   ?inplace     : bool ->
+  ?interactive : bool ->
   driver -> Task.task -> Call_provers.prover_call
 
 

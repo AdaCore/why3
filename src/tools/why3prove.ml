@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,7 +11,7 @@
 
 open Format
 open Why3
-open Stdlib
+open Wstdlib
 open Whyconf
 open Theory
 open Task
@@ -26,6 +26,8 @@ let opt_input = ref None
 let opt_theory = ref None
 let opt_trans = ref []
 let opt_metas = ref []
+(* Option for printing counterexamples with JSON formatting *)
+let opt_json = ref false
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -94,8 +96,6 @@ let opt_task = ref None
 let opt_print_theory = ref false
 let opt_print_namespace = ref false
 
-let opt_cntexmp = ref false
-
 let option_list = [
   "-", Arg.Unit (fun () -> add_opt_file "-"),
       " read the input file from stdin";
@@ -139,6 +139,8 @@ let option_list = [
       "<dir> print the selected goals to separate files in <dir>";
   "--output", Arg.String (fun s -> opt_output := Some s),
       " same as -o";
+  "--json", Arg.Set opt_json,
+      " print counterexamples in JSON format";
   "--print-theory", Arg.Set opt_print_theory,
       " print selected theories";
   "--print-namespace", Arg.Set opt_print_namespace,
@@ -147,9 +149,7 @@ let option_list = [
     "parse_only" "--parse-only" " stop after parsing";
   Debug.Args.desc_shortcut
     "type_only" "--type-only" " stop after type checking";
-  Termcode.arg_extra_expl_prefix;
-  "--get-ce", Arg.Set opt_cntexmp,
-      " gets the counter-example model" ]
+  Termcode.arg_extra_expl_prefix ]
 
 let config, _, env =
   Whyconf.Args.initialize option_list add_opt_file usage_msg
@@ -244,6 +244,8 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
+let unproved = ref false
+
 let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   let limit =
     { Call_provers.empty_limit with
@@ -252,13 +254,14 @@ let do_task drv fname tname (th : Theory.theory) (task : Task.task) =
   match !opt_output, !opt_command with
     | None, Some command ->
         let call =
-          Driver.prove_task ~command ~limit ~cntexample:!opt_cntexmp drv task in
+          Driver.prove_task ~command ~limit drv task in
         let res = Call_provers.wait_on_call call in
         printf "%s %s %s: %a@." fname tname
           (task_goal task).Decl.pr_name.Ident.id_string
-          Call_provers.print_prover_result res
+          (Call_provers.print_prover_result ~json_model:!opt_json) res;
+        if res.Call_provers.pr_answer <> Call_provers.Valid then unproved := true
     | None, None ->
-        Driver.print_task ~cntexample:!opt_cntexmp drv std_formatter task
+        Driver.print_task drv std_formatter task
     | Some dir, _ -> output_task drv fname tname th task dir
 
 let do_tasks env drv fname tname th task =
@@ -337,8 +340,10 @@ let do_input env drv = function
       let fname, m = match f with
         | "-" -> "stdin",
             Env.read_channel Env.base_language ?format env "stdin" stdin
-        | fname -> fname,
-            Env.read_file Env.base_language ?format env fname
+        | fname ->
+            let (mlw_files, _) =
+              Env.read_file Env.base_language ?format env fname in
+            (fname, mlw_files)
       in
       if Debug.test_flag Typing.debug_type_only then ()
       else
@@ -357,7 +362,8 @@ let () =
   try
     let load (f,ef) = load_driver (Whyconf.get_main config) env f ef in
     let drv = Opt.map load !opt_driver in
-    Queue.iter (do_input env drv) opt_queue
+    Queue.iter (do_input env drv) opt_queue;
+    if !unproved then exit 2
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

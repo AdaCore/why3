@@ -61,8 +61,8 @@ who entered the competition.
 (** Component-as-array memory model with null pointers. *)
 module Memory
 
-  use import map.Map
-  (** [loc] is the type of memory locations (e.g pointers) *)
+  use map.Map
+  (** `loc` is the type of memory locations (e.g pointers) *)
   type loc
   val predicate eq (x y:loc) ensures { result <-> x = y }
   (** Kinds of pointer fields. *)
@@ -73,9 +73,9 @@ module Memory
     mutable accessor : pmem;
     mutable mark : map loc bool;
   }
-  (** [memo] represent memory. *)
+  (** `memo` represent memory. *)
   val memo : memory
-  (** the memory model has a [null] pointer. *)
+  (** the memory model has a `null` pointer. *)
   constant null : loc
   val null () : loc ensures { result = null }
   val is_null (l:loc) : bool ensures { result <-> l = null }
@@ -116,24 +116,24 @@ module Memory
 
 end
 
-(** In module [TreeShape] we describe the correlation between
+(** In module `TreeShape` we describe the correlation between
     the memory and the binary tree model. We also gives
     elements of the algorithm specification, and prove
     some frame/separation properties. *)
 module TreeShape
 
-  use import int.Int
-  use import set.Set
-  use import map.Map
-  use import bintree.Tree
-  use import bintree.Size
-  use import Memory
+  use int.Int
+  use set.Set
+  use map.Map
+  use bintree.Tree
+  use bintree.Size
+  use Memory
 
   (** The described structure can be modeled as a tree of locations *)
   type treel = tree loc
 
-  (** [is_tree memo t c p] describe the fact that [c] points to
-      a well-formed tree modeled by [t], whose root parent node is [p].  *)
+  (** `is_tree memo t c p` describe the fact that `c` points to
+      a well-formed tree modeled by `t`, whose root parent node is `p`.  *)
   predicate is_tree (memo:pmem) (t:treel) (c p:loc) = match t with
     | Empty -> c = null
     | Node l m r -> c <> null /\ c = m /\ memo[Parent][c] = p /\
@@ -143,23 +143,23 @@ module TreeShape
       is_tree memo l cl c /\ is_tree memo r cr c
     end
 
-  (** [footprint t] is the memory footprint of [t], e.g the set of
+  (** `footprint t` is the memory footprint of `t`, e.g the set of
       locations occuring in the tree. *)
   function footprint (t:treel) : set loc = match t with
     | Empty -> empty
     | Node l m r -> add m (union (footprint l) (footprint r))
     end
 
-  (** [ext s memo1 memo2] mean that the pointer fields associated to
-      locations in set [s] are identical in memo1 and memo2. *)
+  (** `ext s memo1 memo2` mean that the pointer fields associated to
+      locations in set `s` are identical in memo1 and memo2. *)
   predicate ext (s:set loc) (memo1 memo2:pmem) =
     forall k x. mem x s -> memo1[k][x] = memo2[k][x]
-  (** [unchanged memo1 memo2] mean that all pointer fields in
-      [memo1] and [memo2] are identical. *)
+  (** `unchanged memo1 memo2` mean that all pointer fields in
+      `memo1` and `memo2` are identical. *)
   predicate unchanged (memo1 memo2:pmem) =
     forall k x. memo1[k][x] = memo2[k][x]
-  (** [was_marked t memo1 memo2] mean that [memo2] is the update
-      of [memo1] obtained by marking all elements in [t]. *)
+  (** `was_marked t memo1 memo2` mean that `memo2` is the update
+      of `memo1` obtained by marking all elements in `t`. *)
   predicate was_marked (t:treel) (memo1 memo2:map loc bool) =
     (forall l. mem l (footprint t) -> memo2[l]) /\
     (forall l. not mem l (footprint t) -> memo2[l] = memo1[l])
@@ -221,11 +221,11 @@ module TreeShape
     aux lf (memo[Left][c]) c; aux rg (memo[Right][c]) c
 
   (** Algorithm phases.
-      [GoLeft] mean that the algorithm will try to explore the left
+      `GoLeft` mean that the algorithm will try to explore the left
         subtree
-      [GoRight] mean that the algorithm will explore the right subtree
-      [GoBack] mean that the algorithm will go back to the parent node
-      [Finish] mean that the alogrithm will exit *)
+      `GoRight` mean that the algorithm will explore the right subtree
+      `GoBack` mean that the algorithm will go back to the parent node
+      `Finish` mean that the alogrithm will exit *)
   type phase =
     | GoLeft
     | GoRight
@@ -239,9 +239,9 @@ module TreeShape
     | GoBack -> GoLeft
     | Finish -> Finish
     end
-  (** [rotated memo1 memo2 ph c] describe how [c] is rotated in
-      [memo2] with respect to its initial position in [memo1] for
-      current phase [ph]. In final phase, it is not rotated but
+  (** `rotated memo1 memo2 ph c` describe how `c` is rotated in
+      `memo2` with respect to its initial position in `memo1` for
+      current phase `ph`. In final phase, it is not rotated but
       null instead. *)
   predicate rotated (memo1 memo2:pmem) (ph:phase) (c:loc) =
     (forall k x. x <> c -> memo1[k][x] = memo2[k][x]) /\
@@ -265,11 +265,11 @@ end
     to the one proposed in the challenge. *)
 module Recursive
 
-  use import map.Map
-  use import bintree.Tree
-  use import ref.Ref
-  use import Memory
-  use import TreeShape
+  use map.Map
+  use bintree.Tree
+  use ref.Ref
+  use Memory
+  use TreeShape
 
   (** Recursion-based proof of the algorithm.
       The principal idea is the following: in its recursive
@@ -279,25 +279,25 @@ module Recursive
       to link it with its recursive version. However,
       the obtained algorithm does not really need the call stack
       to run. Here is how we achieve this:
-      - We create a non-recursive sub-routine [bloc] corresponding to
+      - We create a non-recursive sub-routine `bloc` corresponding to
         one turn of the while loop in the challenge's code.
         It uses an exception to simulate exit.
         Also, this sub-routine does not have any non-ghost argument,
-        so calling [bloc] really amounts to advancing in the loop execution.
+        so calling `bloc` really amounts to advancing in the loop execution.
       - We forbids use of any side-effect in the recursive procedure
-        except those obtained by calling [bloc]. Hence calling
+        except those obtained by calling `bloc`. Hence calling
         the recursive procedure is equivalent to run a certain
         amounts of turns in the loop execution.
         Note that since we will prove that the recursive procedure
         terminates, it might not run a finite amount of turns and diverges
         afterward.
       - After the topmost call to the recursive procedure,
-        we add an infinite loop who only calls [bloc] at every turns.
+        we add an infinite loop who only calls `bloc` at every turns.
         This call and the loop are enclosed in an exception catching
         construction to detect loop termination.
       Hence it is justifiable that the algorithm with
       the recursive procedure is equivalent (in the sense that
-      they have the same side-effects) as an infinite loop of [bloc] calls,
+      they have the same side-effects) as an infinite loop of `bloc` calls,
       encapsulated in an exception catching expression. And this
       algorithm is evidently equivalent to the original challenge code.
     *)
@@ -320,17 +320,17 @@ module Recursive
     (* ^ Used to encode the do { .. } while() loop as a while() {..}.
        Iterations will set the flag. *)
     let ghost z = ref (null ()) in (* Store previously explored node. *)
-    (* Loop body. [mem0] is memory state at start of recursive call,
-       [ph] is phase. *)
+    (* Loop body. `mem0` is memory state at start of recursive call,
+       `ph` is phase. *)
     let bloc (ghost mem0:pmem) (ghost ph:phase) : unit
-      (* current node [!x] is rotated correctly with
+      (* current node `!x` is rotated correctly with
          respect to the phase. *)
       requires { rotated mem0 memo.accessor ph !x }
       requires { ph = Finish -> !entered }
       writes { memo, x, y, z, entered }
-      (* Caracterise [x] and [z] reference updates. *)
+      (* Caracterise `x` and `z` reference updates. *)
       ensures { !z = !(old x) /\ !x = memo.accessor[Parent][!z] }
-      (* [Finish] phase never ends normally *)
+      (* `Finish` phase never ends normally *)
       ensures { ph <> Finish /\ !entered }
       (* Node is marked, and other nodes do not change. *)
       ensures { memo.mark[!z] }
@@ -341,7 +341,7 @@ module Recursive
            = (old memo).accessor[Right][!z]
         then memo.accessor = (old memo).accessor
         else rotated mem0 memo.accessor (next_phase ph) !z }
-      (* In [Finish] phase, the code throws [Stop] without changing
+      (* In `Finish` phase, the code throws `Stop` without changing
          anything. *)
       raises { Stop -> ph = Finish /\ memo = old memo }
     = if !entered && is_null !x then raise Stop; (* ==> do { BODY         *)
@@ -410,15 +410,15 @@ end
     derecursiving the previous one *)
 module Iterative
 
-  use import int.Int
-  use import map.Map
-  use import map.Const
-  use import bintree.Tree
-  use import bintree.Size
-  use import option.Option
-  use import ref.Ref
-  use import Memory
-  use import TreeShape
+  use int.Int
+  use map.Map
+  use map.Const
+  use bintree.Tree
+  use bintree.Size
+  use option.Option
+  use ref.Ref
+  use Memory
+  use TreeShape
 
   (** Snapshot of all relevant memory values in the program *)
   type snap = {
@@ -457,7 +457,7 @@ module Iterative
     else if pc <= 3 then f.memo3
     else f.memo4
 
-  (** Postcondition relation for [bloc] calls. *)
+  (** Postcondition relation for `bloc` calls. *)
   predicate bloc_rel (mem0:pmem) (ph:phase) (s1 s2:snap) =
     s2.parent = s1.cursor /\ s2.cursor = s2.pointers[Parent][s2.parent] /\
     s2.marks[s2.parent] /\
@@ -466,7 +466,7 @@ module Iterative
     then s2.pointers = s1.pointers
     else rotated mem0 s2.pointers (next_phase ph) s2.parent
 
-  (** postcondition relation for recursive ([aux]) calls. *)
+  (** postcondition relation for recursive (`aux`) calls. *)
   predicate rec_rel (t:treel) (s1 s2:snap) =
     unchanged s1.pointers s2.pointers /\
     s2.cursor = s1.parent /\ s2.parent = s1.cursor /\

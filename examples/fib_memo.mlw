@@ -2,14 +2,13 @@
 
 module FibMemo
 
-  use import option.Option
-  use import int.Int
-  use import int.Fibonacci
-  use import ref.Ref
+  use option.Option
+  use int.Int
+  use int.Fibonacci
+  use ref.Ref
+  use map.Map
 
-  use import map.Map as M
-
-  type table = M.map int (option int)
+  type table = map int (option int)
 
   predicate inv (t : table) =
     forall x y : int. t[x] = Some y -> y = fib x

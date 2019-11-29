@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Stdlib
+open Wstdlib
 
 (** Theories and Namespaces *)
 
@@ -32,6 +32,8 @@ val ns_find_ls : namespace -> string list -> lsymbol
 val ns_find_pr : namespace -> string list -> prsymbol
 val ns_find_ns : namespace -> string list -> namespace
 
+val import_namespace : namespace -> string list -> namespace
+
 (** {2 Meta properties} *)
 
 type meta_arg_type =
@@ -41,6 +43,7 @@ type meta_arg_type =
   | MTprsymbol
   | MTstring
   | MTint
+  | MTid
 
 type meta_arg =
   | MAty  of ty
@@ -49,6 +52,7 @@ type meta_arg =
   | MApr  of prsymbol
   | MAstr of string
   | MAint of int
+  | MAid of ident
 
 type meta = private {
   meta_name : string;
@@ -80,6 +84,9 @@ val list_metas  : unit -> meta list
 
 val meta_range : meta
 val meta_float : meta
+val meta_projection: meta
+val meta_record: meta
+
 
 (** {2 Theories} *)
 
@@ -87,7 +94,8 @@ type theory = private {
   th_name   : ident;          (* theory name *)
   th_path   : string list;    (* environment qualifiers *)
   th_decls  : tdecl list;     (* theory declarations *)
-  th_ranges : lsymbol Mts.t;  (* range type projections *)
+  th_ranges : tdecl Mts.t;    (* range type projections *)
+  th_floats : tdecl Mts.t;    (* float type projections *)
   th_crcmap : Coercion.t;     (* implicit coercions *)
   th_export : namespace;      (* exported namespace *)
   th_known  : known_map;      (* known identifiers *)
@@ -126,7 +134,8 @@ type theory_uc = private {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
-  uc_ranges : lsymbol Mts.t;
+  uc_ranges : tdecl Mts.t;
+  uc_floats : tdecl Mts.t;
   uc_crcmap : Coercion.t;
   uc_prefix : string list;
   uc_import : namespace list;
@@ -153,6 +162,8 @@ val restore_path : ident -> string list * string * string list
    If [id] is a theory name, the third component is an empty list.
    Raises [Not_found] if the ident was never declared in/as a theory. *)
 
+val restore_theory : ident -> theory
+
 (** {2 Declaration constructors} *)
 
 val create_decl : decl -> tdecl
@@ -166,7 +177,7 @@ val add_logic_decl : theory_uc -> logic_decl list -> theory_uc
 val add_ind_decl : theory_uc -> ind_sign -> ind_decl list -> theory_uc
 val add_prop_decl : ?warn:bool -> theory_uc -> prop_kind -> prsymbol -> term -> theory_uc
 
-val lab_w_non_conservative_extension_no : Ident.label
+val attr_w_non_conservative_extension_no : Ident.attribute
 
 (** {2 Use} *)
 
@@ -180,6 +191,7 @@ type th_inst = {
   inst_ts : tysymbol Mts.t;
   inst_ls : lsymbol Mls.t;
   inst_pr : prop_kind Mpr.t;
+  inst_df : prop_kind;
 }
 
 val empty_inst : th_inst
@@ -193,6 +205,9 @@ val clone_export : theory_uc -> theory -> th_inst -> theory_uc
 val add_clone_internal : unit -> theory_uc -> theory -> symbol_map -> theory_uc
 
 (** {2 Meta} *)
+
+(* Adding registered meta for coercion *)
+val meta_coercion: meta
 
 val create_meta : meta -> meta_arg list -> tdecl
 
@@ -221,8 +236,14 @@ val add_decl_with_tuples : theory_uc -> decl -> theory_uc
 
 (* {2 Exceptions} *)
 
+type badinstance_error =
+  | BadI of ident
+  | BadI_type_proj of ident * string (* Incompatible proj type *)
+  | BadI_ghost_proj of ident * string (* Incompatible ghost *)
+  | BadI_not_found of ident * string (* Field not found in implem *)
+
 exception NonLocal of ident
-exception BadInstance of ident
+exception BadInstance of badinstance_error
 exception CannotInstantiate of ident
 
 exception CloseTheory
@@ -235,3 +256,4 @@ exception BadMetaArity of meta * int
 exception MetaTypeMismatch of meta * meta_arg_type * meta_arg_type
 
 exception RangeConflict of tysymbol
+exception FloatConflict of tysymbol

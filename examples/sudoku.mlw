@@ -9,8 +9,8 @@
 
 module Grid
 
-  use import int.Int
-  use import map.Map
+  use int.Int
+  use map.Map
 
   (** A grid is a map from integers to integers *)
   type grid = map int int
@@ -46,7 +46,7 @@ module Grid
 
   *)
 
-  use import array.Array
+  use array.Array
 
   type sudoku_chunks =
     { column_start : array int;
@@ -84,8 +84,8 @@ module Grid
 
   (** {3 Valid Sudoku Solutions} *)
 
-  (** [valid_chunk g i start offsets] is true whenever the chunk
-  denoted by [start,offsets] from cell [i] is "valid" in grid [g], in
+  (** `valid_chunk g i start offsets` is true whenever the chunk
+  denoted by `start,offsets` from cell `i` is "valid" in grid `g`, in
   the sense that it contains at most one occurence of each number
   between 1 and 9 *)
 
@@ -107,16 +107,16 @@ module Grid
   predicate valid_square (s:sudoku_chunks) (g:grid) (i:int) =
     valid_chunk g i s.square_start s.square_offsets
 
-  (** [valid g] is true when all chunks are valid *)
+  (** `valid g` is true when all chunks are valid *)
   predicate valid (s:sudoku_chunks) (g : grid) =
     forall i : int. is_index i ->
       valid_column s g i /\ valid_row s g i /\ valid_square s g i
 
-  (** [full g] is true when all cells are filled *)
+  (** `full g` is true when all cells are filled *)
   predicate full (g : grid) =
     forall i : int. is_index i -> 1 <= Map.get g i <= 9
 
-  (** [included g1 g2] *)
+  (** `included g1 g2` *)
   predicate included (g1 g2 : grid) =
     forall i : int. is_index i /\ 1 <= Map.get g1 i <= 9 ->
       Map.get g2 i = Map.get g1 i
@@ -132,8 +132,8 @@ module Grid
     forall s g h.
       well_formed_sudoku s /\ included g h /\ valid s h -> valid s g
 
-  (** A solution of a grid [data] is a full grid [sol]
-     that is valid and includes [data] *)
+  (** A solution of a grid `data` is a full grid `sol`
+     that is valid and includes `data` *)
   predicate is_solution_for (s:sudoku_chunks) (sol:grid) (data:grid) =
     included data sol /\ full sol /\ valid s sol
 
@@ -144,11 +144,11 @@ end
 (** {2 Concrete Values of Chunks for the Classical Sudoku Grid} *)
 module TheClassicalSudokuGrid
 
-  use import Grid
-  use import map.Map
-  use import int.Int
+  use Grid
+  use map.Map
+  use int.Int
 
-  use import array.Array
+  use array.Array
 
   let classical_sudoku () : sudoku_chunks
     ensures { well_formed_sudoku result }
@@ -229,9 +229,9 @@ end
 
 module Solver
 
-  use import Grid
-  use import array.Array
-  use import int.Int
+  use Grid
+  use array.Array
+  use int.Int
 
   (** predicate for the loop invariant of next function *)
   predicate valid_chunk_up_to (g:grid) (i:int)
@@ -246,10 +246,10 @@ module Solver
 
   exception Invalid
 
-  use import array.Array
+  use array.Array
 
-  (** [check_valid_chunk g i start offsets] checks the validity
-      of the chunk that includes [i] *)
+  (** `check_valid_chunk g i start offsets` checks the validity
+      of the chunk that includes `i` *)
   let check_valid_chunk (g:array int) (i:int)
     (start:array int) (offsets:array int) : unit
     requires { g.length = 81 }
@@ -283,8 +283,8 @@ module Solver
     forall j : int. 0 <= j < i ->
       valid_column s g j /\ valid_row s g j /\ valid_square s g j
 
-  (** [check_valid s g] checks if the (possibly partially filled) grid
-      [g] is valid. (This function is not needed by the solver) *)
+  (** `check_valid s g` checks if the (possibly partially filled) grid
+      `g` is valid. (This function is not needed by the solver) *)
   let check_valid (s:sudoku_chunks) (g : array int) : bool
     requires { well_formed_sudoku s }
     requires { g.length = 81 }
@@ -302,7 +302,7 @@ module Solver
     with Invalid -> False
     end
 
-  (** [full_up_to g i] is true when all cells [0..i-1] in grid [g] are
+  (** `full_up_to g i` is true when all cells `0..i-1` in grid `g` are
       non empty *)
   predicate full_up_to (g : grid) (i : int) = forall j :
   int. 0 <= j < i -> 1 <= Map.get g j <= 9
@@ -358,31 +358,31 @@ module Solver
 
 (** how to prove the "hard" property : if
 
-   [valid_up_to s g i]
+   `valid_up_to s g i`
 
 and
 
-  [h = g[i <- k]    (with 1 <= k <= 9)]
+  `h = g[i <- k`    (with 1 <= k <= 9)]
 
 and
 
-  [valid_column s h i /\ valid_row s h i /\ valid_square s h i]
+  `valid_column s h i /\ valid_row s h i /\ valid_square s h i`
 
 then
 
-  [valid_up_to s h (i+1)]
+  `valid_up_to s h (i+1)`
 
-then the problem is that one should prove that for each [j] in [0..i-1] :
+then the problem is that one should prove that for each `j` in `0..i-1` :
 
-  [valid_column s h j /\ valid_row s h j /\ valid_square s h j]
+  `valid_column s h j /\ valid_row s h j /\ valid_square s h j`
 
 this is true but with 2 different possible reasons:
 
-  if [column_start j = column_start i] then
-    [valid_column s h j] is true because [valid_column s h i] is true
+  if `column_start j = column_start i` then
+    `valid_column s h j` is true because `valid_column s h i` is true
   else
-    [valid_column s h j] is true because [valid_column s g j] is true
-    because [valid_column s h j] does not depend on [h[i]]
+    `valid_column s h j` is true because `valid_column s g j` is true
+    because `valid_column s h j` does not depend on `h[i]`
 
 *)
 
@@ -523,12 +523,12 @@ module RandomSolver
 
   (* a variant: solve using a random order of cells *)
 
-  use import Grid
-  use import array.Array
-  use import int.Int
+  use Grid
+  use array.Array
+  use int.Int
   use random.Random
 
-  use import Solver
+  use Solver
 
   let rec solve_aux (s:sudoku_chunks) (randoffset:int) (g : array int) (i : int)
     requires { well_formed_sudoku s }
@@ -637,12 +637,12 @@ end
 
 module Test
 
-  use import Grid
-  use import TheClassicalSudokuGrid
+  use Grid
+  use TheClassicalSudokuGrid
 
-  use import Solver
-  use import map.Map
-  use import array.Array
+  use Solver
+  use map.Map
+  use array.Array
 
   (** Solving the empty grid: easy, yet not trivial *)
   let test0 ()

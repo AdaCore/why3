@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -53,10 +53,9 @@ let provers =
     provers
     []
 
-let dummy_keygen ?parent () = ()
-
-(* a dummy keygen function for sessions *)
 (* create an empty session in the current directory *)
+let session = Session_itp.empty_session ~shape_version:None "."
+(*
 let env_session,_,_ =
   let dummy_session : unit Session.session = Session.create_session "." in
   let ctxt = Session.mk_update_context
@@ -64,43 +63,49 @@ let env_session,_,_ =
     dummy_keygen
   in
   Session.update_session ~ctxt dummy_session env config
+ *)
+
+(* creates a controller on top of this session *)
+let controller = Controller_itp.create_controller config env session
 
 (* adds a file in the new session *)
-let file : unit Session.file =
+let file : Session_itp.file =
   let file_name = "examples/logic/hello_proof.why" in
   try
-    Session.add_file ~keygen:dummy_keygen env_session file_name
-  with e ->
-    eprintf "@[Error while reading file@ '%s':@ %a@.@]" file_name
-      Exn_printer.exn_printer e;
-    exit 1
+    Controller_itp.add_file controller file_name;
+    let path = Sysutil.relativize_filename (Session_itp.get_dir session) file_name in
+    Session_itp.find_file_from_path session path
+  with
+  | Controller_itp.Errors_list le ->
+      eprintf "@[Error while reading file@ '%s':@ %a@.@]" file_name
+              (Pp.print_list Pp.space Exn_printer.exn_printer) le;
+      exit 1
 
 (* explore the theories in that file *)
-let theories = file.Session.file_theories
+let theories = Session_itp.file_theories file
 let () = eprintf "%d theories found@." (List.length theories)
 
-(* add proof attempts for each goals in the theories *)
+(* save the session on disk. *)
+let () = Session_itp.save_session session
 
+
+(* add proof attempts for each goals in the theories *)
 let add_proofs_attempts g =
   List.iter
     (fun (p,d) ->
-      let _pa : unit Session.proof_attempt =
-        Session.add_external_proof
-          ~keygen:dummy_keygen
-          ~obsolete:true
-          ~archived:false
+      let _pa : Session_itp.proofAttemptID =
+        Session_itp.graft_proof_attempt
           ~limit:{Call_provers.empty_limit with
                   Call_provers.limit_time = 5;
                                limit_mem = 1000 }
-          ~edit:None
-          g p.Whyconf.prover Session.Scheduled
+          session g p.Whyconf.prover
       in ())
     provers
 
 let () =
   List.iter
-    (fun th -> List.iter add_proofs_attempts th.Session.theory_goals)
+    (fun th -> List.iter add_proofs_attempts (Session_itp.theory_goals th))
     theories
 
-(* save the session on disk *)
-let () = Session.save_session config env_session.Session.session
+(* save the session on disk. note: the prover have not been run yet ! *)
+let () = Session_itp.save_session session

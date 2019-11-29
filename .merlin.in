@@ -1,6 +1,7 @@
 S src/util
 S src/core
 S src/driver
+S src/extract
 S src/mlw
 S src/parser
 S src/transform
@@ -9,7 +10,6 @@ S src/whyml
 S src/session
 S src/tools
 S src/ide
-S src/coq-tactic
 S src/why3session
 S src/why3doc
 S src/jessie
@@ -23,6 +23,7 @@ S plugins/python
 B src/util
 B src/core
 B src/driver
+B src/extract
 B src/mlw
 B src/parser
 B src/transform
@@ -31,7 +32,6 @@ B src/whyml
 B src/session
 B src/tools
 B src/ide
-B src/coq-tactic
 B src/why3session
 B src/why3doc
 B src/jessie
@@ -43,4 +43,4 @@ B plugins/tptp
 B plugins/python
 B lib/why3
 
-PKG str unix num dynlink @ZIPLIB@ @LABLGTK2PKG@ @META_OCAMLGRAPH@ @INFERLIB@
+PKG @SEQLIB@ re unix num dynlink @ZIPLIB@ @LABLGTKPKG@ @META_OCAMLGRAPH@ @JSOFOCAMLPKG@ @MLMPFR@ @INFERLIB@

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -158,7 +158,9 @@ let fold tenv taskpre task =
           | MAls ls -> MAls (conv_ls tenv ud ls)
           | MApr _ -> raise Exit
           | MAstr _ as s -> s
-          | MAint _ as i -> i in
+          | MAint _ as i -> i
+          | MAid _ as i -> i
+        in
         let arg = List.map map ml in
         add_meta (decl_ud ud task) meta arg
       with

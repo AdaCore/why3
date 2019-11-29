@@ -1,0 +1,119 @@
+
+(** CakeML driver *)
+
+printer "cakeml"
+
+theory BuiltIn
+  syntax type int "int"
+  syntax predicate  (=)   "%1 = %2"
+end
+
+module HighOrd
+  syntax type (->) "%1 -> %2"
+  syntax val  ( @ )  "%1 %2"
+end
+
+theory option.Option
+  syntax type     option "%1 option"
+  syntax function None   "NONE"
+  syntax function Some   "SOME %1"
+end
+
+theory Bool
+  syntax type     bool  "bool"
+  syntax function True  "true"
+  syntax function False "false"
+end
+
+theory bool.Ite
+  syntax function ite "(if %1 then %2 else %3)"
+end
+
+theory bool.Bool
+  syntax function andb  "%1 andalso %2"
+  syntax function orb   "%1 orelse %2"
+  syntax function xorb  "%1 <> %2"
+  syntax function notb  "not %1"
+  syntax function implb "not %1 orelse %2"
+end
+
+theory list.List
+  syntax type     list "%1 list"
+  syntax function Nil  "[]"
+  syntax function Cons "%1 :: %2"
+  syntax predicate is_nil "%1 = []"
+end
+
+theory list.Length
+  syntax function length "List.length %1"
+end
+
+module Ref
+  syntax type     ref      "%1 ref"
+  syntax function contents "!%1"
+  syntax val      ref      "ref %1"
+end
+
+module ref.Ref
+  syntax val      (!_)     "!%1"
+  syntax val      (:=)     "%1 := %2"
+end
+
+module ref.Refint
+  syntax val incr "%1 := !%1 + 1"
+  syntax val decr "%1 := !%1 - 1"
+  syntax val (+=) "%1 := !%1 + %2"
+  syntax val (-=) "%1 := !%1 - %2"
+  syntax val ( *= ) "%1 := !%1 * %2"
+end
+
+module int.Int
+  syntax constant zero "0"
+  syntax constant one  "1"
+
+  syntax predicate (<)   "%1 < %2"
+  syntax predicate (<=)  "%1 <= %2"
+  syntax predicate (>)   "%1 > %2"
+  syntax predicate (>=)  "%1 >= %2"
+  syntax val       (=)   "%1 = %2"
+
+  syntax function  (+)   "%1 + %2"
+  syntax function  (-)   "%1 - %2"
+  syntax function  ( * ) "%1 * %2"
+  syntax function  (-_)  "~%1"
+end
+
+module int.EuclideanDivision
+  syntax val div "%1 div %2"
+  syntax val mod "%1 mod %2"
+end
+
+(* not implemented in CakeML *)
+(* module int.ComputerDivision *)
+(*   syntax val div "quot (%1, %2)" *)
+(*   syntax val mod "%1 rem %2" *)
+(* end *)
+
+module array.Array
+  syntax type array "%1 array"
+
+  (* syntax exception OutOfBounds "Why3__Array.OutOfBounds" *) (* FIXME *)
+
+  syntax val ([])          "Array.sub %1 %2"
+  syntax val ([]<-)        "Array.update %1 %2 %3"
+  syntax val length        "Array.length %1"
+  syntax val defensive_get "Array.sub %1 %2"
+  syntax val defensive_set "Array.update %1 %2 %3"
+  syntax val make          "Array.array %1 %2"
+  syntax val empty         "Array.arrayEmpty %1"
+  (* syntax val append        "Array.append %1 %2" *)
+  (* syntax val sub           "Array.sub %1 (Z.to_int %2) (Z.to_int %3)" *)
+  (* syntax val copy          "Array.copy %1" *)
+  (* syntax val fill          "Array.fill %1 (Z.to_int %2) (Z.to_int %3) %4" *)
+  (* syntax val blit          "Array.blit %1 (Z.to_int %2) %3 (Z.to_int %4) (Z.to_int %5)" *)
+end
+
+(* module mach.int.Int *)
+(*   syntax val ( / ) "Z.div %1 %2" *)
+(*   syntax val ( % ) "Z.rem %1 %2" *)
+(* end *)

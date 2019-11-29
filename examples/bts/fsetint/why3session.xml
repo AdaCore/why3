@@ -1,48 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
+<why3session shape_version="8">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="3.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="0.99.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.3.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<file name="../fsetint.why" expanded="true">
-<theory name="Th1" sum="e1f443d7f0a8aab451344228c2ef17ef" expanded="true">
- <goal name="l_false" expl="" expanded="true">
+<file format="whyml">
+<path name=".."/><path name="fsetint.why"/>
+<theory name="Th1">
+ <goal name="l_false">
  <proof prover="0"><result status="timeout" time="1.00"/></proof>
- <proof prover="1"><result status="unknown" time="0.01"/></proof>
+ <proof prover="2"><result status="unknown" time="0.01"/></proof>
  <proof prover="4"><result status="timeout" time="1.00"/></proof>
- <proof prover="5"><result status="unknown" time="0.01"/></proof>
  <proof prover="6"><result status="unknown" time="0.01"/></proof>
  <proof prover="7"><result status="timeout" time="1.00"/></proof>
  </goal>
 </theory>
-<theory name="Th2" sum="93cbaa930c6e2bd7320e513ae1a52bfe" expanded="true">
- <goal name="mem_integer" expl="" expanded="true">
+<theory name="Th2">
+ <goal name="mem_integer">
  <proof prover="0"><result status="timeout" time="1.00"/></proof>
- <proof prover="1"><result status="unknown" time="0.01"/></proof>
+ <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="4"><result status="timeout" time="1.00"/></proof>
- <proof prover="5"><result status="unknown" time="0.00"/></proof>
- <proof prover="6"><result status="unknown" time="1.94"/></proof>
+ <proof prover="6"><result status="timeout" time="1.00"/></proof>
  <proof prover="7"><result status="timeout" time="1.00"/></proof>
  </goal>
- <goal name="foo" expl="" expanded="true">
+ <goal name="foo">
  <proof prover="0"><result status="timeout" time="1.00"/></proof>
- <proof prover="1"><result status="unknown" time="0.01"/></proof>
+ <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="4"><result status="timeout" time="1.00"/></proof>
- <proof prover="5"><result status="unknown" time="0.00"/></proof>
  <proof prover="6"><result status="unknown" time="0.02"/></proof>
  <proof prover="7"><result status="timeout" time="1.00"/></proof>
  </goal>
 </theory>
-<theory name="Th3" sum="c0c9f1d85a3b2d68e03259c6b27adbff" expanded="true">
- <goal name="foo" expl="" expanded="true">
+<theory name="Th3">
+ <goal name="foo">
  <proof prover="0"><result status="unknown" time="0.00"/></proof>
- <proof prover="1"><result status="unknown" time="0.01"/></proof>
+ <proof prover="2"><result status="unknown" time="0.00"/></proof>
  <proof prover="4"><result status="timeout" time="1.00"/></proof>
- <proof prover="5"><result status="unknown" time="0.00"/></proof>
  <proof prover="6"><result status="unknown" time="0.00"/></proof>
  <proof prover="7"><result status="timeout" time="1.00"/></proof>
  </goal>

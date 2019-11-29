@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -31,21 +31,22 @@ type th_rule =
   | Rsyntaxts  of qualid * string * bool
   | Rsyntaxfs  of qualid * string * bool
   | Rsyntaxps  of qualid * string * bool
-  | Rconverter of qualid * string * bool
   | Rliteral   of qualid * string * bool
   | Rremovepr  of qualid
   | Rremoveall
   | Rmeta      of string * metarg list
+  | Ruse       of qualid
 
 type theory_rules = {
   thr_name  : qualid;
   thr_rules : (loc * th_rule) list;
 }
-
+                      
 type mo_rule =
   | MRtheory    of th_rule
+  | MRinterface of string
   | MRexception of qualid * string
-  | MRval       of qualid * string
+  | MRval       of qualid * string * int list
 
 type module_rules = {
   mor_name  : qualid;
@@ -68,7 +69,6 @@ type global =
   | ExitCodeValid of int
   | ExitCodeInvalid of int
   | ExitCodeTimeout of int
-  | ExitCodeOutOfMemory of int
   | ExitCodeStepLimitExceeded of int
   | ExitCodeUnknown of int * string
   | ExitCodeFailure of int * string

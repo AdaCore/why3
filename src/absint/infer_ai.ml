@@ -32,16 +32,13 @@ module Make(S:sig
         -> e
       | Eif(e1, e2, e3) ->
         e_if (r e1) (r e2) (r e3)
-      | Ecase(e,  pats) ->
-        List.map (fun (p, e) ->
-            p, r e) pats
-        |> e_case (r e)
+      | Ematch (e,  pats, exns) ->
+        let pats = List.map (fun (p, e) -> p, r e) pats in
+        let exns = Mxs.map (fun (pvs, e) -> pvs, r e) exns in
+        e_match (r e) pats exns
+      | Ematch (e,  pats, m) -> assert false
       | Eraise(x, e_) ->
         e_raise x e_ e.e_ity
-      | Etry(e, case, pv) ->
-        Mxs.map (fun (pvs, e) ->
-            pvs, r e) pv 
-        |> e_try ~case (r e)
       | Eghost(e) ->
         e_ghostify true (r e)
       | Ewhile(e_cond, inv, vari, e_loop) ->
@@ -57,7 +54,7 @@ module Make(S:sig
               raise Not_found
           in
           let t = AI.domain_to_term cfg context new_inv in
-          let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
+          let t = Term.t_attr_add (Ident.create_attribute "expl:loop invariant via abstract interpretation") t in
           Pretty.print_term Format.err_formatter t;
           let inv = t :: inv in
           let e_cond = r e_cond in
@@ -68,9 +65,10 @@ module Make(S:sig
       | Efor(pv, (f, d, to_), pv2, inv, e_loop) ->
         let _, new_inv = List.find (fun (e_, _) -> e == e_) fixp in
         let t = AI.domain_to_term cfg context new_inv in
-        let t = Term.t_label_add (Ident.create_label "expl:loop invariant via abstract interpretation") t in
+        let t = Term.t_attr_add (Ident.create_attribute "expl:loop invariant via abstract interpretation") t in
         let inv = t :: inv in
         e_for pv (e_var f) d (e_var to_) pv2 inv (r e_loop)
+      | _ -> assert false
     in
 
     let clone_infer_pdecl pdecl =
@@ -81,9 +79,8 @@ module Make(S:sig
         | [a] -> Some a
         | _ -> assert false
           end
-      | PDpure ->
-        let [t] = pdecl.pd_pure in
-        begin
+      | PDpure -> begin
+          let t = match pdecl.pd_pure with [t] -> t | _ -> assert false in
           let open Decl in
           match t.d_node with
           | Dprop(Pgoal, _, _) -> None

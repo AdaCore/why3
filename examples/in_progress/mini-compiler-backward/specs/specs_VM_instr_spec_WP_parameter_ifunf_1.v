@@ -537,9 +537,9 @@ Theorem WP_parameter_ifunf : forall {a:Type} {a_WT:WhyType a},
   (x2:(list Z)) (x3:(map id Z)) (x4:Z), (mc' = (VMC x1 x2 x3 x4)) ->
   ((mc = mc') -> (transition c_glob (VMS x1 x2 x3) (infix_at f (VMS x1 x2
   x3)))))).
-(* Why3 intros a a_WT pre2 code_f f h1 x c_glob p mc mc' h2 h3 post2 (h4,h5)
+(* Why3 intros pre2 code_f f h1 x c_glob p mc mc' h2 h3 post2 (h4,h5)
         x1 x2 x3 x4 h6 h7. *)
-intros a a_WT pre2 code_f f h1 x c_glob p mc mc' h2 h3 post2 (h4,h5) x1 x2 x3
+intros pre2 code_f f h1 x c_glob p mc mc' h2 h3 post2 (h4,h5) x1 x2 x3
 x4 h6 h7.
 unfold post2 in *;clear post2.
 subst.

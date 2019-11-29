@@ -3,7 +3,7 @@
 
 module Square
 
-  use import int.Int
+  use int.Int
 
   function sqr (x:int) : int = x * x
 
@@ -23,24 +23,24 @@ end
 
 module Simple
 
-  use import int.Int
-  use import ref.Ref
-  use import Square
+  use int.Int
+  use ref.Refint
+  use Square
 
   let isqrt (x:int) : int
     requires { x >= 0 }
-    ensures { isqrt_spec x result }
-  = let count = ref 0 in
-    let sum = ref 1 in
-    while !sum <= x do
-      invariant { !count >= 0 }
-      invariant { x >= sqr !count }
-      invariant { !sum = sqr (!count+1) }
-      variant   { x - !count }
-      count := !count + 1;
-      sum := !sum + 2 * !count + 1
+    ensures  { isqrt_spec x result }
+  = let ref count = 0 in
+    let ref sum = 1 in
+    while sum <= x do
+      invariant { count >= 0 }
+      invariant { x >= sqr count }
+      invariant { sum = sqr (count+1) }
+      variant   { x - count }
+      count += 1;
+      sum += 2 * count + 1
     done;
-    !count
+    count
 
   let main ()
     ensures { result = 4 }
@@ -52,42 +52,42 @@ end
 
 module NewtonMethod
 
-  use import int.Int
-  use import mach.int.Int
-  use import ref.Ref
-  use import Square
+  use int.Int
+  use mach.int.Int
+  use ref.Ref
+  use Square
 
   let sqrt (x : int) : int
     requires { x >= 0 }
     ensures  { isqrt_spec x result }
   = if x = 0 then 0 else
     if x <= 3 then 1 else
-    let y = ref x in
-    let z = ref ((1 + x) / 2) in
-    while !z < !y do
-      variant { !y }
-      invariant { !z > 0 }
-      invariant { !y > 0 }
-      invariant { !z = div (div x !y + !y) 2 }
-      invariant { x < sqr (!y + 1) }
-      invariant { x < sqr (!z + 1) }
-      y := !z;
-      z := (x / !z + !z) / 2;
+    let ref y = x in
+    let ref z = (1 + x) / 2 in
+    while z < y do
+      variant { y }
+      invariant { z > 0 }
+      invariant { y > 0 }
+      invariant { z = div (div x y + y) 2 }
+      invariant { x < sqr (y + 1) }
+      invariant { x < sqr (z + 1) }
+      y <- z;
+      z <- (x / z + z) / 2;
       (* A few hints to prove preservation of the last invariant *)
-      assert { x < sqr (!z + 1)
-        by let a = div x !y in
-              x < a * !y + !y
-           so a + !y <= 2 * !z + 1
-           so sqr (a + !y + 1) <= sqr (2 * !z + 2)
-           so 4 * (sqr (!z + 1) - x)
-             = sqr (2 * !z + 2) - 4 * x
-             >= sqr (a + !y + 1) - 4 * x
-             > sqr (a + !y + 1) - 4 * (a * !y + !y)
-             = sqr (a + 1 - !y)
+      assert { x < sqr (z + 1)
+        by let a = div x y in
+              x < a * y + y
+           so a + y <= 2 * z + 1
+           so sqr (a + y + 1) <= sqr (2 * z + 2)
+           so 4 * (sqr (z + 1) - x)
+             = sqr (2 * z + 2) - 4 * x
+             >= sqr (a + y + 1) - 4 * x
+             > sqr (a + y + 1) - 4 * (a * y + y)
+             = sqr (a + 1 - y)
              >= 0 }
     done;
-    assert { !y * !y <= div x !y * !y
-             by !y <= div x !y };
-    !y
+    assert { y * y <= div x y * y
+             by y <= div x y };
+    y
 
 end

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -81,8 +81,8 @@ let find_th env file th =
 
 let get_info env task =
   (* unary minus for constants *)
-  int_minus := find_th env "int" "Int" "prefix -";
-  real_minus := find_th env "real" "Real" "prefix -";
+  int_minus := find_th env "int" "Int" (op_prefix "-");
+  real_minus := find_th env "real" "Real" (op_prefix "-");
   (* handling of inequalities *)
   let ops = on_meta arith_meta (fun acc meta_arg ->
     match meta_arg with
@@ -112,44 +112,43 @@ let ident_printer =
 let print_ident fmt id =
   fprintf fmt "%s" (id_unique ident_printer id)
 
-let print_const fmt c =
-  let number_format = {
-    Number.long_int_support = true;
-    Number.extra_leading_zeros_support = true;
-    Number.negative_int_support = Number.Number_default;
-    Number.dec_int_support = Number.Number_default;
-    Number.hex_int_support = Number.Number_default;
-    Number.oct_int_support = Number.Number_unsupported;
-    Number.bin_int_support = Number.Number_unsupported;
-    Number.def_int_support = Number.Number_unsupported;
-    Number.negative_real_support = Number.Number_default;
-    Number.dec_real_support = Number.Number_unsupported;
-    Number.hex_real_support = Number.Number_unsupported;
+let number_format = {
+    Number.long_int_support = `Default;
+    Number.negative_int_support = `Default;
+    Number.dec_int_support = `Default;
+    Number.hex_int_support = `Default;
+    Number.oct_int_support = `Unsupported;
+    Number.bin_int_support = `Unsupported;
+    Number.negative_real_support = `Default;
+    Number.dec_real_support = `Unsupported;
+    Number.hex_real_support = `Unsupported;
     Number.frac_real_support =
-      Number.Number_custom (Number.PrintFracReal ("%s", "(%s/%s)", "(%s/%s)"));
-    Number.def_real_support = Number.Number_unsupported;
-  } in
-    (Number.print number_format) fmt c
+      `Custom
+        ((fun fmt i -> pp_print_string fmt i),
+         (fun fmt i n -> fprintf fmt "(%s*%s)" i n),
+         (fun fmt i n -> fprintf fmt "(%s/%s)" i n));
+  }
+
+let print_const fmt c =
+  Constant.(print number_format unsupported_escape) fmt c
 
 let constant_value =
   fun t -> match t.t_node with
     | Tconst c ->
-        fprintf str_formatter "%a" print_const c;
-        flush_str_formatter ()
+        asprintf "%a" print_const c
     | Tapp(ls, [{ t_node = Tconst c}])
         when ls_equal ls !int_minus || ls_equal ls !real_minus ->
-        fprintf str_formatter "-%a" print_const c;
-        flush_str_formatter ()
+        asprintf "-%a" print_const c
     | _ -> raise Not_found
 
 
 let rel_error_pat =
-  PatApp (["real"], "Real", ["infix <="], [
+  PatApp (["real"], "Real", [op_infix "<="], [
     PatApp (["real"], "Abs", ["abs"], [
-      PatApp (["real"], "Real", ["infix -"], [
+      PatApp (["real"], "Real", [op_infix "-"], [
         PatHole 0;
         PatHole 1])]);
-    PatApp (["real"], "Real", ["infix *"], [
+    PatApp (["real"], "Real", [op_infix "*"], [
       PatHole 2;
         PatApp (["real"], "Abs", ["abs"], [
           PatHole 1])])])

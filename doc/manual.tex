@@ -4,6 +4,7 @@
 
 %BEGIN LATEX
 \usepackage{comment}
+\usepackage{todonotes}
 \newcommand{\ahref}[2]{{#2}}
 \excludecomment{htmlonly}
 \newenvironment{latexonly}{}{}
@@ -30,6 +31,7 @@
 %END LATEX
 %HEVEA \newcommand{\includegraphics}[2][2]{\imgsrc{#2}}
 
+\usepackage{alltt}
 \usepackage{listings}
 \usepackage{xspace}
 
@@ -63,9 +65,18 @@
 %\let\bf\bfseries
 
 \usepackage{ifthen}
+
+% avoid double spacing after '.' and ':' in texttt
+%BEGIN LATEX
+\makeatletter
+\let\ttfamily\relax
+\DeclareRobustCommand\ttfamily
+   {\not@math@alphabet\ttfamily\mathtt\fontfamily\ttdefault\selectfont\frenchspacing}
+\makeatother
+%END LATEX
+
 \input{./macros.tex}
 \input{./replayer_macros.tex}
-
 \input{./version.tex}
 
 \makeindex
@@ -103,12 +114,12 @@
 
 \vfill
 
-% \todo{NE PAS DISTRIBUER TANT QU'IL RESTE DES TODOS}
+%\todo{NE PAS DISTRIBUER TANT QU'IL RESTE DES TODOS}
 
 %BEGIN LATEX
 \begin{LARGE}
 %END LATEX
-  Version \whyversion{}, January 2017
+  Version \whyversion{}, October 2019
 %BEGIN LATEX
 \end{LARGE}
 %END LATEX
@@ -141,20 +152,25 @@ $^2$ Inria Saclay -- \^Ile-de-France, Palaiseau, F-91120
 \bigskip
 %END LATEX
 
-\textcopyright 2010--2016 University Paris-Sud, CNRS, Inria
+\textcopyright 2010--2019 University Paris-Sud, CNRS, Inria
 
 \urldef{\urlutcat}{\url}{http://frama-c.com/u3cat/}
 \urldef{\urlhilite}{\url}{http://www.open-do.org/projects/hi-lite/}
 \urldef{\urlbware}{\url}{http://bware.lri.fr/}
 \urldef{\urlproofinuse}{\url}{http://www.spark-2014.org/proofinuse}
+\urldef{\urlcolis}{\url}{http://colis.irif.univ-paris-diderot.fr/}
+\urldef{\urlvocal}{\url}{https://vocal.lri.fr/}
 
 This work has been partly supported by the `\ahref{\urlutcat}{U3CAT}'
 national ANR project (ANR-08-SEGI-021-08\begin{latexonly},
-  \urlutcat\end{latexonly}) ; the `\ahref{\urlhilite}{Hi-Lite}'
+  \urlutcat\end{latexonly}), the `\ahref{\urlhilite}{Hi-Lite}'
 \begin{latexonly}(\urlhilite)\end{latexonly} FUI project of the
-System@tic competitivity cluster ; the `\ahref{\urlbware}{BWare}'
+System@tic competitivity cluster, the `\ahref{\urlbware}{BWare}'
 ANR project (ANR-12-INSE-0010\begin{latexonly},
-  \urlbware\end{latexonly}) ; and the \ahref{\urlproofinuse}{Joint Laboratory ProofInUse} (ANR-13-LAB3-0007\begin{latexonly}, \urlproofinuse\end{latexonly})
+  \urlbware\end{latexonly}), the \ahref{\urlproofinuse}{Joint Laboratory ProofInUse} (ANR-13-LAB3-0007\begin{latexonly}, \urlproofinuse\end{latexonly});
+the `\ahref{\urlcolis}{CoLiS}' ANR project (ANR-15-CE25-0001\begin{latexonly},
+  \urlcolis\end{latexonly}), and the `\ahref{\urlvocal}{VOCaL}' ANR project (ANR-15-CE25-008\begin{latexonly},
+  \urlvocal\end{latexonly}).
 \end{flushleft}
 \end{center}
 
@@ -190,6 +206,9 @@ formalizations or to add support for a new external prover if wanted.
 is available there, in source format, together with this documentation
 and several examples.
 
+\why is also distributed under the form of an OPAM package and a
+Debian package.
+
 \why is distributed as open source and freely available under the
 terms of the GNU LGPL 2.1. See the file \texttt{LICENSE}.
 
@@ -203,17 +222,34 @@ There is a public mailing list for users' discussions:
 \url{http://lists.gforge.inria.fr/mailman/listinfo/why3-club}.
 
 Report any bug to the \why Bug Tracking System:
-\url{https://gforge.inria.fr/tracker/?atid=10293&group_id=2990&func=browse}.
+\url{https://gitlab.inria.fr/why3/why3/issues}.
 
 
 \subsection*{Acknowledgements}
 
 We gratefully thank the people who contributed to \why, directly or
-indirectly: Romain Bardou, Stefan Berghofer, Sylvie Boldo, Martin
-Clochard, Simon Cruanes, L\'eon Gondelman, Johannes Kanig, St\'ephane
-Lescuyer, David Mentr\'e, Sim\~ao Melo de Sousa, Benjamin Monate,
-Thi-Minh-Tuyen Nguyen, M\'ario Pereira, Asma Tafat, Piotr Trojanek.
-
+indirectly:
+Stefan Berghofer,
+Sylvie Boldo,
+Martin Clochard,
+Simon Cruanes,
+Sylvain Dailler,
+Cl\'ement Fumex,
+L\'eon Gondelman,
+David Hauzar,
+Daisuke Ishii,
+Johannes Kanig,
+Mikhail Mandrykin,
+David Mentr\'e,
+Benjamin Monate,
+Kim Nguyen,
+Thi-Minh-Tuyen Nguyen,
+M\'ario Pereira,
+Rapha\"el Rieu-Helft,
+Sim\=ao Melo de Sousa,
+Asma Tafat,
+Piotr Trojanek,
+Makarius Wenzel.
 
 \cleardoublepage
 
@@ -227,7 +263,7 @@ Thi-Minh-Tuyen Nguyen, M\'ario Pereira, Asma Tafat, Piotr Trojanek.
 
 \input{starting.tex}
 
-\input{syntax.tex}
+% \input{syntax.tex}
 
 % \input{ide.tex}
 
@@ -265,56 +301,213 @@ Thi-Minh-Tuyen Nguyen, M\'ario Pereira, Asma Tafat, Piotr Trojanek.
 \chapter{Release Notes}
 %HEVEA\cutname{changes.html}
 
-\section{Release Notes for version 0.90}
+\section{Release Note for version 1.2: new syntax for ``auto-dereference''}
 
-TO DISCUSS:
-
-comment mettre a jour l'example bag ? Parametrer par une egalit'e sur
-les elements ?
-
-
-Attention, ne pas introduire 1 variable par champ complique le boulot des prouveurs
-
-``inline'' ne doit pas inliner Map.set
-
-egalite sur les type algebriques ? engendrees automatiquement ?
-
-\subsection{Syntax Changes}
+Version 1.2 introduces a simplified syntax for reference variables, to
+avoid the somehow heavy OCaml syntax using bang character. In short,
+this is syntactic sugar summarized in the following table.  An example
+using this new syntax is in \url{examples/isqrt.mlw}
 
 \begin{center}
-  \begin{tabular}{|c|c|}
+  \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
 \hline
-    0.87 & 0.90 \\
+\textbf{auto-dereference syntax} & \textbf{desugared to} \\
 \hline
-\texttt{'L:} & \texttt{label L in} \\
-\texttt{at x 'L} & \texttt{x at L} \\
-\texttt{assert \{ ... (old x) ... \}} & \texttt{ assert \{... (x at Init) .. \}} \\
-\verb|\|\texttt{ x. e} & \texttt{fun x -> e} \\
-\texttt{use HighOrd} & nothing, not needed anymore \\
-\texttt{HighOrd.pred ty} & \texttt{ty -> bool} \\
-\texttt{type t model ...} & \texttt{type t = abstract ... } \\
-\texttt{abstract e ensures \{ Q \}} & \texttt{begin ensures \{ Q \} e end} \\
+\texttt{let \&x = ... in} & \texttt{let (x: ref ...) = ... in} \\
 \hline
-  \end{tabular}
+\texttt{f x;} & \texttt{f x.contents;} \\
+\hline
+\texttt{x <- ...} & \texttt{x.contents <- ...} \\
+\hline
+\texttt{let ref x = ...} & \texttt{let \&x = ref ...} \\
+\hline
+\end{tabular}
+\end{center}
+Notice that:
+\begin{itemize}
+\item The \verb|&| marker adds the typing constraint \verb|(x: ref ...)|
+\item Top-level \verb|let/val ref| and \verb|let/val &| are allowed
+\item Auto-dereferencing works in logic, but such variables
+  cannot be introduced inside logical terms.
+\end{itemize}
+
+That syntactic sugar is further extended to pattern matching, function
+parameters and reference passing as follows.
+\begin{center}
+  \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+\hline
+\textbf{auto-dereference syntax} & \textbf{desugared to} \\
+\hline
+\texttt{match e with (x,\&y) -> y end} & \texttt{match e with
+ (x,(y: ref ...)) -> y.contents end} \\
+  \hline
+  \texttt{\begin{tabular}{l}
+            let incr (\&x: ref int) = \\
+            ~ x <- x + 1 \\
+            ~ \\
+            let f () = \\
+            ~ let ref x = 0 in \\
+            ~ incr x; \\
+            ~ x
+          \end{tabular}}
+  &
+    \texttt{\begin{tabular}{l}
+              let incr (x: ref int) = \\
+              ~ x.contents <- x.contents + 1 \\
+              ~ \\
+              let f () = \\
+              ~ let x = ref 0 in \\
+              ~ incr x; \\
+              ~ x.contents
+            \end{tabular}}
+  \\
+  \hline
+  \texttt{let incr (ref x: int)  ...} & \texttt{let incr (\&x: ref int) ...}
+                                        \\\hline
+\end{tabular}
 \end{center}
 
-\subsection{Model types, abstract types}
+The type annotation is not required. Let-functions with such formal
+parameters also prevent the actual argument from auto-dereferencing
+when used in logic. Pure logical symbols cannot be declared with such
+parameters.
 
-explain \texttt{private} and ghost fields, \texttt{abstract mutable},
-\texttt{private mutable}
+Auto-dereference suppression does not work in the middle of a relation
+chain: in \verb|0 < x :< 17|, \verb|x| will be dereferenced even if \verb|(:<)| expects a
+ref-parameter on the left.
 
-\subsection{Polymorphic Equality}
+Finally, that syntactic sugar applies to the caller side:
+\begin{center}
+  \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+\hline
+\textbf{auto-dereference syntax} & \textbf{desugared to} \\
+\hline
+ \texttt{\begin{tabular}{l}
+    let f () = \\
+    ~ let ref x = 0 in \\
+    ~ g \&x
+         \end{tabular}}
+  &
+ \texttt{\begin{tabular}{l}
+          let f () = \\
+          ~ let x = ref 0 in \\
+          ~ g x
+         \end{tabular}
+  }
+  \\\hline
+\end{tabular}
+\end{center}
+The \verb|&| marker can only be attached to a variable. Works in logic.
 
-No polymorphic equality in programs. Consequence : no List.mem in
-programs, need for List.mem, List.filter, parameterized with a
-predicate.
+Ref-binders and \verb|&|-binders in variable declarations, patterns,
+and function parameters do not require importing \verb|ref.Ref|.
+Any example that does not use references inside data structures
+can be rewritten by using ref-binders, without importing \verb|ref.Ref|.
 
-No default equality on algebraic datatypes
+Explicit use of type symbol "ref", program function "ref",
+or field "contents" require importing \verb|ref.Ref| or \verb|why3.Ref.Ref|.
+Operations \verb|(:=)| and \verb|(!)| require importing \verb|ref.Ref|.
 
+Operation \verb|(:=)| is fully subsumed by direct assignment \verb|(<-)|.
+
+\section{Release Notes for version 1.0: syntax changes w.r.t. 0.88}
+
+The syntax of \whyml programs changed in release 1.0.
+The table in Figure~\ref{fig:syntax-1.0} summarizes the changes.
+
+Note also that logical symbols can no longer be used in non-ghost code;
+in particular, there is no polymorphic equality in programs anymore,
+so equality functions must be declared/defined on a per-type basis
+(already done for type \texttt{int} in the standard library). The \texttt{CHANGES.md}
+file describes other potential sources of incompatibility.
+
+\begin{figure}[thbp]
+\centering
+\begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+\hline
+\textbf{version 0.88} & \textbf{version 1.0} \\
+\hline
+\texttt{function f ...} & \texttt{let function f ...} if called in
+                          programs \\
+\hline
+\texttt{'L:} & \texttt{label L in} \\
+\hline
+\texttt{at x 'L} & \texttt{x at L} \\
+\hline
+\texttt{\char`\\ x. e} & \texttt{fun x -> e} \\
+\hline
+\texttt{use HighOrd} & nothing, not needed anymore \\
+\hline
+\texttt{HighOrd.pred ty} & \texttt{ty -> bool} \\
+\hline
+\texttt{type t model ...} & \texttt{type t = abstract ...} \\
+\hline
+\texttt{abstract e ensures \{ Q \}} & \texttt{begin ensures \{ Q \} e end} \\
+\hline
+\texttt{namespace N} & \texttt{scope N} \\
+\hline
+\texttt{use import M} & \texttt{use M} \\
+\hline
+\texttt{"attribute"} & \texttt{[@attribute]} \\
+\hline
+\texttt{meta M prop P} & \texttt{meta M lemma P} or \texttt{meta M axiom P} or \texttt{meta M goal P} \\
+\hline
+\texttt{loop ... end} & \texttt{while true do ... done} \\
+\hline
+\texttt{type ... invariant \{ ... self.foo ... \}} & \texttt{type ... invariant \{ ... foo ... \}}\\
+\hline
+\end{tabular}
+\caption{Syntax changes from version 0.88 to version 1.0}
+\label{fig:syntax-1.0}
+\end{figure}
+
+Here are a few more semantic changes
+\begin{description}
+\item[Proving only partial correctness] In versions 0.xx of Why3, when
+  a program function is recursive but not given a variant, or contains
+  a while loop not given a variant, then it was assumed that the user
+  wants to prove partial correctness only. A warning was issued,
+  recommending to add an extra \verb|diverges| clause to that
+  function's contract. It was also possible to disable that warning by
+  adding the label \verb|"W:diverges:N"| to the function's
+  name. Version 1.00 of Why3 is more aggressively requiring the user
+  to prove the termination of functions which are not given the
+  \verb|diverges| clause, and the previous warning is now an
+  error. The possibility of proving only partial correctness is now
+  given on a more fine-grain basis: any expression for which one wants
+  to prove partial correctness only, must by annotated with the
+  attribute \verb|[@vc:divergent]|.
+
+  In other words, if one was using the following structure in Why3 0.xx:
+  \begin{lstlisting}
+    let f "W:diverges:N" <parameters> <contract> = <body>
+  \end{lstlisting}
+  then in 1.00 it should be written as
+  \begin{lstlisting}
+    let f <parameters> <contract> = [@vc:divergent] <body>
+  \end{lstlisting}
+\item[Semantics of the \texttt{any} construct] The \verb|any| construct
+  in Why3 0.xx was introducing an arbitrary value satisfying the
+  associated post-condition. In some sense, this construct was
+  introducing some form of an axiom stating that such a value
+  exists. In Why3 1.00, it is now mandatory to prove the existence of
+  such a value, and a VC is generated for that purpose.
+
+  To obtain the effect of the former semantics of the \verb|any| construct, one should use instead a local \verb|val| function. In other words, if one was using the following structure in Why3 0.xx:
+  \begin{lstlisting}
+    any t ensures { P }
+  \end{lstlisting}
+  then in 1.00 it should be written as
+  \begin{lstlisting}
+    val x:t ensures { P } in x
+  \end{lstlisting}
+
+
+\end{description}
 \section{Release Notes for version 0.80: syntax changes w.r.t. 0.73}
 
 The syntax of \whyml programs changed in release 0.80.
-The table in Figure~\ref{fig:syntax080} summarizes the changes.
+The table in Figure~\ref{fig:syntax-0.80} summarizes the changes.
 
 \begin{figure}[thbp]
   \centering
@@ -407,7 +600,7 @@ abstract e ensures \{ Q \}
 \hline
 \end{tabular}
 \caption{Syntax changes from version 0.73 to version 0.80}
-\label{fig:syntax080}
+\label{fig:syntax-0.80}
 \end{figure}
 
 \section{Summary of Changes w.r.t. Why 2}
@@ -468,9 +661,9 @@ are the following.
 % %   the future. Examples are available in \texttt{examples/programs}. *)
 % \end{itemize}
 
-\bibliographystyle{abbrv}
+\bibliographystyle{plain}
 \bibliography{manual}
-%\input{biblio-demons}
+%\bibliography{abbrevs,demons,demons2,demons3,team,crossrefs}
 
 
 % \cleardoublepage

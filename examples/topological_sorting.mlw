@@ -1,0 +1,210 @@
+
+(** Topological sorting
+
+    Author: François Bobot (CEA)
+*)
+
+theory Graph
+
+  use export int.Int
+  use set.Fset as S
+  use map.Map as M
+
+  (* the graph is defined by a set of vertices and a set of edges *)
+  type vertex
+  type graph
+
+  function vertices graph: S.fset vertex
+
+  function edges graph: S.fset (vertex , vertex)
+
+  axiom edges_use_vertices:
+  forall g:graph. forall x y:vertex.
+    S.mem (x,y) (edges g) -> (S.mem x (vertices g) /\ S.mem y (vertices g))
+
+  (** direct predecessors *)
+  function preds graph vertex: S.fset vertex
+
+  axiom preds_def:  forall g:graph. forall v:vertex. forall u:vertex.
+   S.mem (u,v) (edges g) <-> S.mem u (preds g v)
+
+  (** direct successors *)
+  function succs graph vertex: S.fset vertex
+  axiom succs_def:  forall g:graph. forall v:vertex. forall u:vertex.
+   S.mem (u,v) (edges g) <-> S.mem v (succs g u)
+
+  type msort = M.map vertex int
+
+  predicate sort (g: graph) (m:msort) =
+    forall v:vertex. forall u:vertex.
+    S.mem (u,v) (edges g) ->
+    (M.get m u) < (M.get m v)
+
+end
+
+(** static topological sorting by depth-first search *)
+module Static
+
+  use ref.Ref
+  use Graph
+  use set.Fset as Fset
+
+  clone set.SetImp as S with type elt = vertex
+  clone set.SetApp as SA with type elt = vertex
+  clone impmap.ImpmapNoDom with type key = vertex
+
+  val ghost function defined_sort (m: t int): Fset.fset vertex
+    ensures { forall v: vertex [Fset.mem v result].
+              Fset.mem v result <-> 0 <= m[v] }
+
+  val get_preds (g: graph) (v: vertex): S.set
+    ensures { result.S.to_fset = preds g v }
+
+  val get_vertices (g: graph): S.set
+    ensures { result.S.to_fset = vertices g }
+
+  predicate partial_sort (g: graph) (m: t int) =
+    forall v:vertex. forall u:vertex.
+    Fset.mem (u,v) (edges g) -> 0 <= m[v] -> 0 <= m[u] < m[v]
+
+  exception Cycle_found
+
+  predicate inv (g: graph) (m: t int) (next: int) =
+    Fset.subset (defined_sort m) (vertices g) &&
+    0 <= next &&
+    partial_sort g m &&
+    forall v:vertex. Fset.mem v (defined_sort m) -> m[v] < next
+
+  let rec dfs (g: graph) (v: vertex) (seen: SA.set) (values: t int) (next: ref int): unit
+    requires { inv g values !next }
+    requires { Fset.mem v (vertices g) }
+    requires { Fset.subset seen.SA.to_fset (vertices g) }
+    variant { Fset.cardinal (vertices g) - SA.cardinal seen }
+    ensures { Fset.subset (defined_sort (old values)) (defined_sort values) }
+    ensures { 0 <= values[v] <= !next}
+    ensures { inv g values !next }
+    ensures { forall x:vertex. SA.mem x seen -> old values[x] = values[x] }
+    raises  { Cycle_found -> true }
+  =
+    if SA.mem v seen then raise Cycle_found;
+    if values[v] < 0 then begin
+      let p = get_preds g v in
+      let seen = SA.add v seen in
+      while not (S.is_empty p) do
+        invariant { inv g values !next }
+        invariant { Fset.subset (Fset.diff (preds g v) p.S.to_fset) (defined_sort values) }
+        invariant { Fset.subset (defined_sort (old values)) (defined_sort values) }
+        invariant { Fset.subset p.S.to_fset (preds g v) }
+        invariant { forall x:vertex. SA.mem x seen -> values[x] = old values[x] }
+        variant { S.cardinal p }
+        let u = S.choose_and_remove p in
+        dfs g u seen values next
+      done;
+      values[v] <- !next;
+      next := !next + 1
+    end
+
+  let topo_order (g:graph): t int
+    raises  { Cycle_found -> true }
+    ensures { sort g result.contents }
+  =
+    let next = ref 0 in
+    let values = create (-1) in
+    let p = get_vertices g in
+    while not (S.is_empty p) do
+      invariant { inv g values !next }
+      invariant { Fset.subset p.S.to_fset (vertices g) }
+      invariant { Fset.subset (Fset.diff (vertices g) p.S.to_fset) (defined_sort values) }
+      variant { S.cardinal p }
+      let u = S.choose_and_remove p in
+      dfs g u (SA.empty ()) values next
+    done;
+    values
+
+end
+
+module Online_graph
+  use export Graph
+
+  val function add_edge (g: graph) (u v: vertex): graph
+    ensures { forall x.
+      preds result x = if x = v then S.add u (preds g v) else preds g x }
+    ensures { forall x.
+      succs result x = if x = u then S.add v (succs g u) else succs g x }
+
+end
+
+(**
+A New Approach to Incremental Topological Ordering
+   Michael A. Bender, Jeremy T. Fineman, Seth Gilbert
+*)
+module Online_Basic
+
+  use ref.Ref
+  use Online_graph
+  use set.Fset
+
+  clone set.SetImp as S with type elt = vertex
+  clone set.SetApp as SA with type elt = vertex
+  clone import impmap.ImpmapNoDom as M with type key = vertex
+
+  val get_succs (g: graph) (v: vertex): S.set
+    ensures { result.S.to_fset = succs g v }
+
+  exception Cycle_found
+
+  type t = {
+    mutable graph : graph;
+    mutable values: M.t int;
+  }
+
+  predicate inv (g:t) = sort g.graph g.values.contents
+
+  let create (g: graph): t
+     requires { forall x: vertex. Fset.is_empty (preds g x) }
+     ensures  { result.graph = g }
+     ensures  { inv result }
+  = { graph = g; values = create 0 }
+
+  let rec dfs (g: t) (v: vertex) (seen: SA.set) (min_depth: int): unit
+    requires { inv g }
+    requires { Fset.mem v (vertices g.graph) }
+    requires { Fset.subset seen.SA.to_fset (vertices g.graph) }
+    raises  { Cycle_found -> true }
+    variant { Fset.cardinal (vertices g.graph) - SA.cardinal seen }
+    ensures { min_depth <= g.values[v] }
+    ensures { inv g }
+    ensures { forall x:vertex. SA.mem x seen -> g.values[x] = old g.values[x] }
+    ensures { forall x:vertex. old g.values[x] <= g.values[x] }
+  =
+    if SA.mem v seen then raise Cycle_found;
+    if g.values[v] < min_depth then begin
+      let p = get_succs g.graph v in
+      let seen = SA.add v seen in
+      while not (S.is_empty p) do
+        invariant { inv g }
+        invariant { forall s:vertex. Fset.mem s (succs g.graph v) -> not (S.mem s p) -> min_depth < g.values[s] }
+        invariant { S.subset p.S.to_fset (succs g.graph v) }
+        invariant { forall x:vertex. SA.mem x seen -> g.values[x] = old g.values[x] }
+        invariant { forall x:vertex. old g.values[x] <= g.values[x] }
+        variant { S.cardinal p }
+        let u = S.choose_and_remove p in
+        dfs g u seen (min_depth + 1)
+      done;
+      g.values[v] <- min_depth;
+    end
+
+  let add_edge (g: t) (x y: vertex): unit
+    requires { inv g }
+    requires { Fset.mem x (vertices g.graph) }
+    requires { Fset.mem y (vertices g.graph) }
+    ensures  { inv g }
+    ensures  { g.graph = add_edge (old g.graph) x y }
+    raises   { Cycle_found -> true }
+  =
+    let seen = SA.empty () in
+    let seen = SA.add x seen in
+    dfs g y seen (g.values[x] + 1);
+    g.graph <- add_edge g.graph x y
+
+end

@@ -1,0 +1,65 @@
+
+(** {1 Pseudo-random generators}
+
+   This easiest way to get random numbers (of random values of any type)
+   is to take advantage of the non-determinism of Hoare triples.
+   Simply declaring a function
+
+      [val random_int: unit -> {} int {}]
+
+   is typically enough. Two calls to [random_int] return values that can not
+   be proved equal, which is exactly what we need.
+
+   The following modules provide slightly more: pseudo-random generators
+   which are deterministic according to a state. The state is either
+   explicit (module [State]) or global (module [Random]). Functions [init] allow
+   to reset the generators according to a given seed.
+
+ *)
+
+(** {2 Mutable states of pseudo-random generators}
+
+  Basically a reference containing a pure generator. *)
+
+module State
+
+  use int.Int
+
+  type state = private mutable { }
+
+  val create (seed: int) : state
+
+  val init (s: state) (seed: int) : unit writes {s}
+
+  val self_init (s: state) : unit writes {s}
+
+  val random_bool (s: state) : bool writes {s}
+
+  val random_int (s: state) (n: int) : int writes {s}
+    requires { 0 < n }
+    ensures  { 0 <= result < n }
+
+end
+
+(** {2 A global pseudo-random generator} *)
+
+module Random
+
+  use int.Int
+  use State
+
+  val s: state
+
+  let init (seed: int) = init s seed
+
+  let self_init () = self_init s
+
+  let random_bool ()
+  = random_bool s
+
+  let random_int (n: int)
+    requires { 0 < n }
+    ensures  { 0 <= result < n }
+  = random_int s n
+
+end

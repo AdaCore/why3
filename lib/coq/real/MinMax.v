@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -21,9 +21,10 @@ Require Import Rbasic_fun.
 (* min is replaced with (Reals.Rbasic_fun.Rmin x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma min_def : forall (x:R) (y:R), ((x <= y)%R ->
-  ((Reals.Rbasic_fun.Rmin x y) = x)) /\ ((~ (x <= y)%R) ->
-  ((Reals.Rbasic_fun.Rmin x y) = y)).
+Lemma min'def :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  ((x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = x)) /\
+  (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmin x y) = y)).
 Proof.
 intros x y.
 split ; intros H.
@@ -36,9 +37,10 @@ Qed.
 (* max is replaced with (Reals.Rbasic_fun.Rmax x x1) by the coq driver *)
 
 (* Why3 goal *)
-Lemma max_def : forall (x:R) (y:R), ((x <= y)%R ->
-  ((Reals.Rbasic_fun.Rmax x y) = y)) /\ ((~ (x <= y)%R) ->
-  ((Reals.Rbasic_fun.Rmax x y) = x)).
+Lemma max'def :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  ((x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = y)) /\
+  (~ (x <= y)%R -> ((Reals.Rbasic_fun.Rmax x y) = x)).
 Proof.
 intros x y.
 split ; intros H.
@@ -48,32 +50,39 @@ now apply Rlt_le, Rnot_le_lt.
 Qed.
 
 (* Why3 goal *)
-Lemma Min_r : forall (x:R) (y:R), (y <= x)%R ->
+Lemma Min_r :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (y <= x)%R ->
   ((Reals.Rbasic_fun.Rmin x y) = y).
 exact Rmin_right.
 Qed.
 
 (* Why3 goal *)
-Lemma Max_l : forall (x:R) (y:R), (y <= x)%R ->
+Lemma Max_l :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (y <= x)%R ->
   ((Reals.Rbasic_fun.Rmax x y) = x).
 exact Rmax_left.
 Qed.
 
 (* Why3 goal *)
-Lemma Min_comm : forall (x:R) (y:R),
+Lemma Min_comm :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((Reals.Rbasic_fun.Rmin x y) = (Reals.Rbasic_fun.Rmin y x)).
 exact Rmin_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Max_comm : forall (x:R) (y:R),
+Lemma Max_comm :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   ((Reals.Rbasic_fun.Rmax x y) = (Reals.Rbasic_fun.Rmax y x)).
 exact Rmax_comm.
 Qed.
 
 (* Why3 goal *)
-Lemma Min_assoc : forall (x:R) (y:R) (z:R),
-  ((Reals.Rbasic_fun.Rmin (Reals.Rbasic_fun.Rmin x y) z) = (Reals.Rbasic_fun.Rmin x (Reals.Rbasic_fun.Rmin y z))).
+Lemma Min_assoc :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  ((Reals.Rbasic_fun.Rmin (Reals.Rbasic_fun.Rmin x y) z) =
+   (Reals.Rbasic_fun.Rmin x (Reals.Rbasic_fun.Rmin y z))).
 Proof.
 intros x y z.
 destruct (Rle_or_lt x y) as [Hxy|Hxy].
@@ -94,8 +103,11 @@ apply Rmin_l.
 Qed.
 
 (* Why3 goal *)
-Lemma Max_assoc : forall (x:R) (y:R) (z:R),
-  ((Reals.Rbasic_fun.Rmax (Reals.Rbasic_fun.Rmax x y) z) = (Reals.Rbasic_fun.Rmax x (Reals.Rbasic_fun.Rmax y z))).
+Lemma Max_assoc :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R)
+    (z:Reals.Rdefinitions.R),
+  ((Reals.Rbasic_fun.Rmax (Reals.Rbasic_fun.Rmax x y) z) =
+   (Reals.Rbasic_fun.Rmax x (Reals.Rbasic_fun.Rmax y z))).
 Proof.
 intros x y z.
 destruct (Rle_or_lt x y) as [Hxy|Hxy].

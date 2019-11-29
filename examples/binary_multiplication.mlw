@@ -1,5 +1,5 @@
 
-(* Ancient Egyptian Multiplication
+(** {1 Russian peasant multiplication}
 
    Multiply two integers a and b using only addition, multiplication by 2,
    and division by 2.
@@ -10,10 +10,10 @@
 
 module BinaryMultiplication
 
-  use import mach.int.Int
-  use import ref.Ref
+  use mach.int.Int
+  use ref.Ref
 
-  let binary_mult (a b: int)
+  let binary_mult (a b: int) : int
     requires { b >= 0 }
     ensures  { result = a * b }
   = let x = ref a in
@@ -26,6 +26,43 @@ module BinaryMultiplication
       if !y % 2 = 1 then z := !z + !x;
       x := 2 * !x;
       y := !y / 2
+    done;
+    !z
+
+end
+
+(** Now using machine integers.
+
+    Assuming that the product fits in machine integers, we can still
+    verify the code. The only exception is when `a*b = min_int`.
+
+    The code below makes no assumption on the sign of `b`.
+    Instead, it uses the fact that `!y % 2` has the sign of `!y`
+    so that `!x` is either added to or subtracted from the result.
+*)
+
+module BinaryMultiplication63
+
+  use int.Int
+  use int.Abs
+  use mach.int.Int63
+  use ref.Ref
+
+  let binary_mult (a b: int63) : int63
+    requires { min_int < a * b <= max_int }
+    ensures  { result = a * b }
+  = let x = ref a in
+    let y = ref b in
+    let z = ref 0 in
+    while !y <> 0 do
+      invariant { if a*b >= 0 then !x * !y >= 0 && !z >= 0
+                              else !x * !y <= 0 && !z <= 0 }
+      invariant { !z + !x * !y = a * b }
+      variant   { abs !y }
+      z := !z + !x * (!y % 2);
+      y := !y / 2;
+      (* be careful not to make the very last multiplication *)
+      if !y <> 0 then x := 2 * !x
     done;
     !z
 

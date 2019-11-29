@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -10,7 +10,7 @@
 (********************************************************************)
 
 open Format
-open Stdlib
+open Wstdlib
 open Ident
 open Ty
 open Term
@@ -57,9 +57,15 @@ let ns_add merge chk x vn m = Mstr.change (function
   | Some vo -> Some (merge chk x vo vn)
   | None    -> Some vn) x m
 
-let add_ts chk x ts ns = { ns with ns_ts = ns_add merge_ts chk x ts ns.ns_ts }
-let add_ls chk x ps ns = { ns with ns_ls = ns_add merge_ls chk x ps ns.ns_ls }
-let add_pr chk x xs ns = { ns with ns_pr = ns_add merge_pr chk x xs ns.ns_pr }
+let add_ts chk x ts ns =
+  let loc = x.id_loc in
+  { ns with ns_ts = Loc.try5 ?loc ns_add merge_ts chk x.id_string ts ns.ns_ts }
+let add_ls chk x ps ns =
+  let loc = x.id_loc in
+  { ns with ns_ls = Loc.try5 ?loc ns_add merge_ls chk x.id_string ps ns.ns_ls }
+let add_pr chk x xs ns =
+  let loc = x.id_loc in
+  { ns with ns_pr = Loc.try5 ?loc ns_add merge_pr chk x.id_string xs ns.ns_pr }
 let add_ns chk x nn ns = { ns with ns_ns = ns_add merge_ns chk x nn ns.ns_ns }
 
 let merge_ns chk nn no = merge_ns chk "" no nn (* swap arguments *)
@@ -83,6 +89,7 @@ type meta_arg_type =
   | MTprsymbol
   | MTstring
   | MTint
+  | MTid
 
 type meta_arg =
   | MAty  of ty
@@ -91,6 +98,7 @@ type meta_arg =
   | MApr  of prsymbol
   | MAstr of string
   | MAint of int
+  | MAid of ident
 
 type meta = {
   meta_name : string;
@@ -154,13 +162,20 @@ let meta_range = register_meta "range_type" [MTtysymbol; MTlsymbol]
 let meta_float = register_meta "float_type" [MTtysymbol; MTlsymbol; MTlsymbol]
     ~desc:"Projection@ and@ finiteness@ of@ a@ floating-point@ type."
 
+let meta_projection = register_meta "model_projection" [MTlsymbol]
+  ~desc:"Declares@ the@ projection."
+
+let meta_record = register_meta "model_record" [MTlsymbol]
+  ~desc:"Declares@ the@ record field."
+
 (** Theory *)
 
 type theory = {
   th_name   : ident;          (* theory name *)
   th_path   : string list;    (* environment qualifiers *)
   th_decls  : tdecl list;     (* theory declarations *)
-  th_ranges : lsymbol Mts.t;  (* range type projections *)
+  th_ranges : tdecl Mts.t;    (* range type projections *)
+  th_floats : tdecl Mts.t;    (* float type projections *)
   th_crcmap : Coercion.t;     (* implicit coercions *)
   th_export : namespace;      (* exported namespace *)
   th_known  : known_map;      (* known identifiers *)
@@ -228,6 +243,7 @@ module Hstdecl = Hashcons.Make (struct
     | MApr pr -> pr_hash pr
     | MAstr s -> Hashtbl.hash s
     | MAint i -> Hashtbl.hash i
+    | MAid i -> Ident.id_hash i
 
   let hs_smap sm h =
     Mts.fold hs_cl_ty sm.sm_ty
@@ -265,7 +281,8 @@ type theory_uc = {
   uc_name   : ident;
   uc_path   : string list;
   uc_decls  : tdecl list;
-  uc_ranges : lsymbol Mts.t;
+  uc_ranges : tdecl Mts.t;
+  uc_floats : tdecl Mts.t;
   uc_crcmap : Coercion.t;
   uc_prefix : string list;
   uc_import : namespace list;
@@ -283,6 +300,7 @@ let empty_theory n p = {
   uc_path   = p;
   uc_decls  = [];
   uc_ranges = Mts.empty;
+  uc_floats = Mts.empty;
   uc_crcmap = Coercion.empty;
   uc_prefix = [];
   uc_import = [empty_ns];
@@ -298,6 +316,7 @@ let close_theory uc = match uc.uc_export with
       th_path   = uc.uc_path;
       th_decls  = List.rev uc.uc_decls;
       th_ranges = uc.uc_ranges;
+      th_floats = uc.uc_floats;
       th_crcmap = uc.uc_crcmap;
       th_export = e;
       th_known  = uc.uc_known;
@@ -324,11 +343,17 @@ let close_scope uc ~import =
   | [], [_], [_] -> raise NoOpenedNamespace
   | _ -> assert false
 
-let import_scope uc ql = match uc.uc_import with
+let import_namespace ns ql =
+  match ns_find_ns ns ql with
+  | e0 -> merge_ns false e0 ns
+  | exception Not_found ->
+      Loc.errorm "unknown scope %s" (String.concat "." ql)
+
+let import_scope uc ql =
+  match uc.uc_import with
   | i1 :: sti ->
-      let e0 = ns_find_ns i1 ql in
-      let i1 = merge_ns false e0 i1 in
-      { uc with uc_import = i1::sti }
+     let i1 = import_namespace i1 ql in
+     { uc with uc_import = i1::sti }
   | _ -> assert false
 
 (* Base constructors *)
@@ -356,6 +381,7 @@ let known_meta kn al =
 let meta_coercion = register_meta ~desc:"coercion" "coercion" [MTlsymbol]
 
 exception RangeConflict of tysymbol
+exception FloatConflict of tysymbol
 
 let add_tdecl uc td = match td.td_node with
   | Decl d -> { uc with
@@ -369,13 +395,21 @@ let add_tdecl uc td = match td.td_node with
       uc_used  = Sid.union uc.uc_used (Sid.add th.th_name th.th_used) }
   | Clone (_,sm) -> known_clone uc.uc_known sm;
       { uc with uc_decls = td :: uc.uc_decls }
-  | Meta (m,([MAts ts; MAls ls] as al)) when meta_equal m meta_range ->
+  | Meta (m,((MAts ts :: _) as al)) when meta_equal m meta_range ->
       known_meta uc.uc_known al;
       let add b = match b with
-        | None -> Some ls
-        | Some s when ls_equal s ls -> b
+        | None -> Some td
+        | Some d when td_equal d td -> b
         | _ -> raise (RangeConflict ts) in
       { uc with uc_ranges = Mts.change add ts uc.uc_ranges;
+                uc_decls = td :: uc.uc_decls }
+  | Meta (m,((MAts ts :: _) as al)) when meta_equal m meta_float ->
+      known_meta uc.uc_known al;
+      let add b = match b with
+        | None -> Some td
+        | Some d when td_equal d td -> b
+        | _ -> raise (FloatConflict ts) in
+      { uc with uc_floats = Mts.change add ts uc.uc_floats;
                 uc_decls = td :: uc.uc_decls }
   | Meta (m,([MAls ls] as al)) when meta_equal m meta_coercion ->
       known_meta uc.uc_known al;
@@ -387,8 +421,9 @@ let add_tdecl uc td = match td.td_node with
 
 (** Declarations *)
 
-let store_path, store_theory, restore_path =
+let store_path, store_theory, restore_path, restore_theory =
   let id_to_path = Wid.create 17 in
+  let id_to_th = Wid.create 17 in
   let store_path uc path id =
     (* this symbol already belongs to some theory *)
     if Wid.mem id_to_path id then () else
@@ -398,10 +433,15 @@ let store_path, store_theory, restore_path =
   let store_theory th =
     let id = th.th_name in
     (* this symbol is already a theory *)
-    if Wid.mem id_to_path id then () else
-    Wid.set id_to_path id (th.th_path, id.id_string, []) in
+    if Wid.mem id_to_path id then () else begin
+        Wid.set id_to_path id (th.th_path, id.id_string, []);
+        Sid.iter (fun id -> Wid.set id_to_th id th) th.th_local;
+        Wid.set id_to_th id th;
+      end
+  in
   let restore_path id = Wid.find id_to_path id in
-  store_path, store_theory, restore_path
+  let restore_theory id = Wid.find id_to_th id in
+  store_path, store_theory, restore_path, restore_theory
 
 let close_theory uc =
   let th = close_theory uc in
@@ -412,15 +452,15 @@ let add_symbol add id v uc =
   store_path uc [] id;
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
-      uc_import = add false id.id_string v i0 :: sti;
-      uc_export = add true  id.id_string v e0 :: ste }
+      uc_import = add false id v i0 :: sti;
+      uc_export = add true  id v e0 :: ste }
   | _ -> assert false
 
 let add_symbol_ts uc ts = add_symbol add_ts ts.ts_name ts uc
 
 let add_symbol_ls uc ({ls_name = id} as ls) =
   let {id_string = nm; id_loc = loc} = id in
-  if (nm = "infix =" || nm = "infix <>") &&
+  if (nm = Ident.op_equ || nm = Ident.op_neq) &&
       uc.uc_path <> ["why3";"BuiltIn"] then
     Loc.errorm ?loc "Logical equality cannot be redefined";
   add_symbol add_ls id ls uc
@@ -429,7 +469,7 @@ let add_symbol_pr uc pr = add_symbol add_pr pr.pr_name pr uc
 
 let create_decl d = mk_tdecl (Decl d)
 
-let print_id fmt id = Format.fprintf fmt "%s" id.id_string
+let print_id fmt id = Ident.print_decoded fmt id.id_string
 
 let warn_dubious_axiom uc k p syms =
   match k with
@@ -449,11 +489,11 @@ let warn_dubious_axiom uc k p syms =
         (Pp.print_list Pp.comma print_id) (Sid.elements syms)
     with Exit -> ()
 
-let lab_w_non_conservative_extension_no =
-  Ident.create_label "W:non_conservative_extension:N"
+let attr_w_non_conservative_extension_no =
+  Ident.create_attribute "W:non_conservative_extension:N"
 
 let should_be_conservative id =
-  not (Slab.mem lab_w_non_conservative_extension_no id.id_label)
+  not (Sattr.mem attr_w_non_conservative_extension_no id.id_attrs)
 
 let add_decl ?(warn=true) uc d =
   let uc = add_tdecl uc (create_decl d) in
@@ -503,13 +543,16 @@ let create_use th = mk_tdecl (Use th)
 
 let use_export uc th =
   let uc = add_tdecl uc (create_use th) in
-  let comb ts s1 s2 = if ls_equal s1 s2 then Some s1
+  let urng ts d1 d2 = if td_equal d1 d2 then Some d1
                       else raise (RangeConflict ts) in
+  let uflt ts d1 d2 = if td_equal d1 d2 then Some d1
+                      else raise (FloatConflict ts) in
   match uc.uc_import, uc.uc_export with
   | i0 :: sti, e0 :: ste -> { uc with
       uc_import = merge_ns false th.th_export i0 :: sti;
       uc_export = merge_ns true  th.th_export e0 :: ste;
-      uc_ranges = Mts.union comb uc.uc_ranges th.th_ranges;
+      uc_ranges = Mts.union urng uc.uc_ranges th.th_ranges;
+      uc_floats = Mts.union uflt uc.uc_floats th.th_floats;
       uc_crcmap = Coercion.union uc.uc_crcmap th.th_crcmap }
   | _ -> assert false
 
@@ -520,6 +563,7 @@ type th_inst = {
   inst_ts : tysymbol Mts.t;
   inst_ls : lsymbol Mls.t;
   inst_pr : prop_kind Mpr.t;
+  inst_df : prop_kind;
 }
 
 let empty_inst = {
@@ -527,6 +571,7 @@ let empty_inst = {
   inst_ts = Mts.empty;
   inst_ls = Mls.empty;
   inst_pr = Mpr.empty;
+  inst_df = Plemma;
 }
 
 exception CannotInstantiate of ident
@@ -580,8 +625,8 @@ let cl_clone_ts cl ts =
     match ts.ts_def with
     | Alias t -> Alias (cl_trans_ty cl t)
     | NoDef -> NoDef
-    | Range _ -> assert false (* TODO *)
-    | Float _ -> assert false (* TODO *) in
+    | Range ir -> Range ir
+    | Float irf -> Float irf in
   let ts' = create_tysymbol (id_clone ts.ts_name) ts.ts_args td' in
   cl.ts_table <- Mts.add ts ts' cl.ts_table;
   ts'
@@ -604,40 +649,47 @@ let cl_find_pr cl pr =
   try Mpr.find pr cl.pr_table with Not_found -> raise EmptyDecl
 
 let cl_clone_pr cl pr =
-  let pr' = create_prsymbol (id_clone pr.pr_name) in
+  let attr = Sattr.remove Ident.useraxiom_attr pr.pr_name.id_attrs in
+  let pr' = create_prsymbol (id_attr pr.pr_name attr) in
   cl.pr_table <- Mpr.add pr pr' cl.pr_table;
   pr'
 
 (* initialize the clone structure *)
 
+type badinstance_error =
+  | BadI of ident
+  | BadI_type_proj of ident * string
+  | BadI_ghost_proj of ident * string
+  | BadI_not_found of ident * string
+
 exception NonLocal of ident
-exception BadInstance of ident
+exception BadInstance of badinstance_error
 
 let cl_init_ty cl ({ts_name = id} as ts) ty =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let stv = Stv.of_list ts.ts_args in
-  if not (ty_v_all (Stv.contains stv) ty) then raise (BadInstance id);
+  if not (ty_v_all (Stv.contains stv) ty) then raise (BadInstance (BadI id));
   cl.ty_table <- Mts.add ts ty cl.ty_table
 
 let cl_init_ts cl ({ts_name = id} as ts) ts' =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   if List.length ts.ts_args <> List.length ts'.ts_args then
-    raise (BadInstance id);
+    raise (BadInstance (BadI id));
   cl.ts_table <- Mts.add ts ts' cl.ts_table
 
 let cl_init_ls cl ({ls_name = id} as ls) ls' =
   if not (Sid.mem id cl.cl_local) then raise (NonLocal id);
   let mtch sb ty ty' =
     try ty_match sb ty' (cl_trans_ty cl ty)
-    with TypeMismatch _ -> raise (BadInstance id)
+    with TypeMismatch _ -> raise (BadInstance (BadI id))
   in
   let sb = match ls.ls_value,ls'.ls_value with
     | Some ty, Some ty' -> mtch Mtv.empty ty ty'
     | None, None -> Mtv.empty
-    | _ -> raise (BadInstance id)
+    | _ -> raise (BadInstance (BadI id))
   in
   ignore (try List.fold_left2 mtch sb ls.ls_args ls'.ls_args
-    with Invalid_argument _ -> raise (BadInstance id));
+    with Invalid_argument _ -> raise (BadInstance (BadI id)));
   cl.ls_table <- Mls.add ls ls' cl.ls_table
 
 let cl_init_pr cl {pr_name = id} _ =
@@ -709,7 +761,7 @@ let cl_prop cl inst (k,pr,f) =
     | Plemma, Some Pgoal -> raise EmptyDecl
     | Plemma, _ -> Plemma
     | Paxiom, Some k -> k
-    | Paxiom, None -> Paxiom (* TODO: Plemma *) in
+    | Paxiom, None -> inst.inst_df in
   let pr' = cl_clone_pr cl pr in
   let f' = cl_trans_fmla cl f in
   create_prop_decl k' pr' f'
@@ -835,6 +887,7 @@ let get_meta_arg_type = function
   | MApr  _ -> MTprsymbol
   | MAstr _ -> MTstring
   | MAint _ -> MTint
+  | MAid _ -> MTid
 
 let create_meta m al =
   let get_meta_arg at a =
@@ -879,6 +932,7 @@ let builtin_theory =
   let uc = empty_theory (id_fresh "BuiltIn") ["why3";"BuiltIn"] in
   let uc = add_ty_decl uc ts_int in
   let uc = add_ty_decl uc ts_real in
+  let uc = add_ty_decl uc ts_str in
   let uc = add_param_decl uc ps_equ in
   close_theory uc
 
@@ -933,15 +987,29 @@ let print_meta_arg_type fmt = function
   | MTprsymbol -> fprintf fmt "proposition"
   | MTstring -> fprintf fmt "string"
   | MTint -> fprintf fmt "int"
+  | MTid -> fprintf fmt "identifier"
 
 let () = Exn_printer.register
   begin fun fmt exn -> match exn with
   | NonLocal id ->
-      Format.fprintf fmt "Non-local symbol: %s" id.id_string
+      Format.fprintf fmt "Non-local symbol: %a" print_id id
   | CannotInstantiate id ->
-      Format.fprintf fmt "Cannot instantiate a defined symbol %s" id.id_string
-  | BadInstance id ->
-      Format.fprintf fmt "Illegal instantiation for symbol %s" id.id_string
+      Format.fprintf fmt "Cannot instantiate a defined symbol %a" print_id id
+  | BadInstance (BadI id) ->
+      Format.fprintf fmt "Illegal instantiation for symbol %a" print_id id
+  | BadInstance (BadI_type_proj (id, pr_name)) ->
+      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
+                          projection types for %s are not compatible"
+        print_id id pr_name
+  | BadInstance (BadI_ghost_proj (id, pr_name)) ->
+      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
+                          projection %s cannot be ghost if the \
+                          cloned projection is not"
+        print_id id pr_name
+  | BadInstance (BadI_not_found (id, pj_str)) ->
+      Format.fprintf fmt "Illegal instantiation for type symbol %a:\n\
+                          projection %s cannot be found in instance type"
+        print_id id pj_str
   | CloseTheory ->
       Format.fprintf fmt "Cannot close theory: some namespaces are still open"
   | NoOpenedNamespace ->
@@ -963,6 +1031,9 @@ let () = Exn_printer.register
         m.meta_name print_meta_arg_type t1 print_meta_arg_type t2
   | RangeConflict ts ->
       Format.fprintf fmt "Conflicting definitions for range type %s"
+        ts.ts_name.id_string
+  | FloatConflict ts ->
+      Format.fprintf fmt "Conflicting definitions for float type %s"
         ts.ts_name.id_string
   | _ -> raise exn
   end

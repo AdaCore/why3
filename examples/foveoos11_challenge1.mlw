@@ -7,24 +7,23 @@
 
 module Max
 
-  use import int.Int
-  use import ref.Refint
-  use import array.Array
+  use int.Int
+  use ref.Refint
+  use array.Array
 
-  let max (a: array int)
+  let max (a: array int) : int
     requires { length a > 0 }
-    ensures { 0 <= result < length a }
-    ensures { forall i: int. 0 <= i < length a -> a[i] <= a[result] }
-  = let x = ref 0 in
-    let y = ref (length a - 1) in
-    while !x <> !y do
-      invariant { 0 <= !x <= !y < length a }
-      invariant {
-        forall i: int. (0 <= i < !x \/ !y < i < length a) ->
-                       (a[i] <= a[!y] \/ a[i] <= a[!x]) }
-      variant { !y - !x }
-      if a[!x] <= a[!y] then incr x else decr y
+    ensures  { 0 <= result < length a }
+    ensures  { forall i. 0 <= i < length a -> a[i] <= a[result] }
+  = let ref x = 0 in
+    let ref y = (length a - 1) in
+    while x <> y do
+      invariant { 0 <= x <= y < length a }
+      invariant { forall i. (0 <= i < x \/ y < i < length a) ->
+                            (a[i] <= a[y] \/ a[i] <= a[x]) }
+      variant   { y - x }
+      if a[x] <= a[y] then incr x else decr y
     done;
-    !x
+    x
 
 end

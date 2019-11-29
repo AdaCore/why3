@@ -6,25 +6,24 @@ section {* Generic Maps *}
 
 why3_open "map/Map.xml"
 
-why3_vc Select_eq
-  using assms
-  by simp
-
-why3_vc Select_neq
-  using assms
-  by simp
+why3_vc setqtdef by auto
 
 why3_end
 
 
 section {* Constant Maps *}
 
-why3_open "map/Const.xml"
+definition abs_const :: "'a \<Rightarrow> ('b \<Rightarrow> 'a)" where
+  "abs_const v y = v"
 
-why3_vc Const by simp
+why3_open "map/Const.xml"
+  constants
+    const=abs_const
+
+why3_vc constqtdef
+  by (simp add: abs_const_def)
 
 why3_end
-
 
 section {* Number of occurrences *}
 
@@ -92,8 +91,28 @@ proof -
   then show ?thesis by (simp add: occ_def)
 qed
 
-why3_end
+lemma vimage_update:
+  "m(i := x) -` {z} = (if x = z then m -` {z} \<union> {i} else m -` {z} - {i})"
+  by auto
 
+why3_vc occ_exchange
+  using assms
+  by (simp add: occ_def vimage_update insert_Diff_if card_insert)
+    (auto simp add: Diff_Int_distrib2 card_Diff_subset_Int)
+
+why3_vc occ_left_add
+proof -
+  from assms have "{l..<u} = {l} \<union> {l + 1..<u}" by auto
+  with assms show ?thesis by (simp add: occ_def)
+qed
+
+why3_vc occ_left_no_add
+proof -
+  from assms have "{l..<u} = {l} \<union> {l + 1..<u}" by auto
+  with assms show ?thesis by (simp add: occ_def)
+qed
+
+why3_end
 
 why3_open "map/MapPermut.xml"
 

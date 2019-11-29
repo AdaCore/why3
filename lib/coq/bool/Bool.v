@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,55 +15,65 @@ Require Import BuiltIn.
 Require BuiltIn.
 
 (* Why3 goal *)
-Lemma andb_def : forall (x:bool) (y:bool),
-  ((Init.Datatypes.andb x y) = match x with
-  | true => y
-  | false => false
-  end).
+Lemma andb'def :
+  forall (x:Init.Datatypes.bool) (y:Init.Datatypes.bool),
+  ((Init.Datatypes.andb x y) =
+   match x with
+   | Init.Datatypes.true => y
+   | Init.Datatypes.false => Init.Datatypes.false
+   end).
 Proof.
 intros x y.
 apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma orb_def : forall (x:bool) (y:bool),
-  ((Init.Datatypes.orb x y) = match x with
-  | false => y
-  | true => true
-  end).
+Lemma orb'def :
+  forall (x:Init.Datatypes.bool) (y:Init.Datatypes.bool),
+  ((Init.Datatypes.orb x y) =
+   match x with
+   | Init.Datatypes.false => y
+   | Init.Datatypes.true => Init.Datatypes.true
+   end).
 Proof.
 intros x y.
 apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma notb_def : forall (x:bool),
-  ((Init.Datatypes.negb x) = match x with
-  | false => true
-  | true => false
-  end).
+Lemma notb'def :
+  forall (x:Init.Datatypes.bool),
+  ((Init.Datatypes.negb x) =
+   match x with
+   | Init.Datatypes.false => Init.Datatypes.true
+   | Init.Datatypes.true => Init.Datatypes.false
+   end).
 Proof.
 intros x.
 apply refl_equal.
 Qed.
 
 (* Why3 goal *)
-Lemma xorb_def : forall (x:bool) (y:bool),
-  ((Init.Datatypes.xorb x y) = match x with
-  | false => y
-  | true => (Init.Datatypes.negb y)
-  end).
+Lemma xorb'def :
+  forall (x:Init.Datatypes.bool) (y:Init.Datatypes.bool),
+  ((Init.Datatypes.xorb x y) =
+   match x with
+   | Init.Datatypes.false => y
+   | Init.Datatypes.true => Init.Datatypes.negb y
+   end).
 Proof.
 intros x y.
 destruct x; destruct y; auto.
 Qed.
 
 (* Why3 goal *)
-Lemma implb_def : forall (x:bool) (y:bool),
-  ((Init.Datatypes.implb x y) = match x with
-  | false => true
-  | true => y
-  end).
+Lemma implb'def :
+  forall (x:Init.Datatypes.bool) (y:Init.Datatypes.bool),
+  ((Init.Datatypes.implb x y) =
+   match x with
+   | Init.Datatypes.false => Init.Datatypes.true
+   | Init.Datatypes.true => y
+   end).
 Proof.
 now intros [|] [|].
 Qed.

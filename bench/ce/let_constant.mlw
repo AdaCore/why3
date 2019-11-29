@@ -1,0 +1,11 @@
+module Let_constant
+
+  use int.Int
+
+  let dummy ()
+  = [@vc:sp] 
+    let a [@model_trace:T] = 25 in
+    let b = 65 in
+    assert { a + b > 150 };
+
+end

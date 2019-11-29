@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -40,7 +40,9 @@ let inv acc (ps,al) =
   let tl = List.map t_var vl in
   let hd = ps_app ps tl in
   let dj = Lists.map_join_left (exi tl) t_or al in
-  let hsdj = Simplify_formula.fmla_remove_quant (t_implies hd dj) in
+  let hsdj =
+    Simplify_formula.fmla_remove_quant ~keep_model_vars:false (t_implies hd dj)
+  in
   let ax = t_forall_close vl [] hsdj in
   let nm = id_derive (ps.ls_name.id_string ^ "_inversion") ps.ls_name in
   create_prop_decl Paxiom (create_prsymbol nm) ax :: acc

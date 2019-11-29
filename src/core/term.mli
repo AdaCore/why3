@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -13,6 +13,8 @@
 
 open Ident
 open Ty
+
+(** {1 Terms and Formulas} *)
 
 (** {2 Variable symbols} *)
 
@@ -53,6 +55,8 @@ val ls_hash : lsymbol -> int
 val create_lsymbol : ?constr:int -> preid -> ty list -> ty option -> lsymbol
 
 val create_fsymbol : ?constr:int -> preid -> ty list -> ty -> lsymbol
+(** ~constr is the number of constructors of the type in which the
+   symbol is a constructor otherwise it must be the default 0. *)
 
 val create_psymbol : preid -> ty list -> lsymbol
 
@@ -67,7 +71,9 @@ exception BadArity of lsymbol * int
 exception FunctionSymbolExpected of lsymbol
 exception PredicateSymbolExpected of lsymbol
 exception ConstructorExpected of lsymbol
-exception InvalidLiteralType of ty
+exception InvalidIntegerLiteralType of ty
+exception InvalidRealLiteralType of ty
+exception InvalidStringLiteralType of ty
 
 (** {2 Patterns} *)
 
@@ -114,13 +120,13 @@ type binop =
 type term = private {
   t_node  : term_node;
   t_ty    : ty option;
-  t_label : Slab.t;
+  t_attrs : Sattr.t;
   t_loc   : Loc.position option;
 }
 
 and term_node =
   | Tvar of vsymbol
-  | Tconst of Number.constant
+  | Tconst of Constant.constant
   | Tapp of lsymbol * term list
   | Tif of term * term * term
   | Tlet of term * term_bound
@@ -138,15 +144,25 @@ and term_quant
 
 and trigger = term list list
 
+(** {2 Term equality modulo alpha-equivalence} *)
+
+val t_equal_strict : term -> term -> bool
+val t_compare_strict : term -> term -> int
+val t_hash_strict : term -> int
+
+module Mterm_strict : Extmap.S with type key = term
+module Sterm_strict : Extset.S with module M = Mterm_strict
+module Hterm_strict : Exthtbl.S with type key = term
+
+(** {2 Term equality modulo alpha-equivalence, attributes, triggers, and locations} *)
+
+val t_equal : term -> term -> bool
+val t_compare : term -> term -> int
+val t_hash : term -> int
+
 module Mterm : Extmap.S with type key = term
 module Sterm : Extset.S with module M = Mterm
 module Hterm : Exthtbl.S with type key = term
-
-(** {2 Term equality modulo alpha-equivalence and location} *)
-
-val t_compare : term -> term -> int
-val t_equal : term -> term -> bool
-val t_hash : term -> int
 
 (** {2 Bindings} *)
 
@@ -163,6 +179,9 @@ val t_open_branch : term_branch -> pattern * term
 val t_open_quant : term_quant -> vsymbol list * trigger * term
 
 val t_open_bound_with : term -> term_bound -> term
+(** [t_open_bound_with t tb] opens the binding [tb] and immediately
+    replaces the corresponding bound variable with [t] *)
+
 val t_clone_bound_id : term_bound -> preid
 
 (** open bindings with optimized closing callbacks *)
@@ -201,10 +220,10 @@ val t_app_infer : lsymbol -> term list -> term
 val ls_arg_inst : lsymbol -> term list -> ty Mtv.t
 val ls_app_inst : lsymbol -> term list -> ty option -> ty Mtv.t
 
-val check_literal : Number.constant -> ty -> unit
+val check_literal : Constant.constant -> ty -> unit
 
 val t_var : vsymbol -> term
-val t_const : Number.constant -> ty -> term
+val t_const : Constant.constant -> ty -> term
 val t_if : term -> term -> term -> term
 val t_let : term -> term_bound -> term
 val t_case : term -> term_branch list -> term
@@ -224,10 +243,12 @@ val t_false : term
 val t_nat_const : int -> term
 (** [t_nat_const n] builds the constant integer term [n],
     n must be non-negative *)
-val t_bigint_const : BigInt.t -> term
+val t_int_const : BigInt.t -> term
+val t_real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> term
+val t_string_const : string -> term
 
-val stop_split : label
-val asym_split : label
+val stop_split : attribute
+val asym_split : attribute
 
 val t_and_l : term list -> term
 val t_or_l : term list -> term
@@ -245,10 +266,10 @@ val t_quant_close : quant -> vsymbol list -> trigger -> term -> term
 val t_forall_close : vsymbol list -> trigger -> term -> term
 val t_exists_close : vsymbol list -> trigger -> term -> term
 
-val t_label : ?loc:Loc.position -> Slab.t -> term -> term
-val t_label_add : label -> term -> term
-val t_label_remove : label -> term -> term
-val t_label_copy : term -> term -> term
+val t_attr_set : ?loc:Loc.position -> Sattr.t -> term -> term
+val t_attr_add : attribute -> term -> term
+val t_attr_remove : attribute -> term -> term
+val t_attr_copy : term -> term -> term
 
 (** Constructors with propositional simplification *)
 
@@ -376,6 +397,7 @@ val t_pred_app_beta_l : term -> term list -> term
 
 val t_map : (term -> term) -> term -> term
 val t_fold : ('a -> term -> 'a) -> 'a -> term -> 'a
+val t_iter : (term -> unit) -> term -> unit
 val t_map_fold : ('a -> term -> 'a * term) -> 'a -> term -> 'a * term
 
 val t_all : (term -> bool) -> term -> bool
@@ -463,9 +485,12 @@ val t_ty_subst : ty Mtv.t -> term Mvs.t -> term -> term
     mapping [mt] and term variables by mapping [mv] in term [t] *)
 
 val t_subst_types : ty Mtv.t -> term Mvs.t -> term -> term Mvs.t * term
-(** [t_subst_types mt mv t] substitutes type variables by
-    mapping [mt] simultaneously in substitution [mv] and in term [t].
-    This operation may rename the variables in [t]. *)
+(** [t_subst_types mt mv t] substitutes type variables of term [t] by
+    mapping [mt]. This operation may rename the variables in [t], and
+    the same renaming is simultaneously applied to the variables of
+    the substitution [mv] (both domain and codomain).
+    Example: [t_subst_types {'a -> int} {x:'a -> t:'a} (f x)]
+       returns ({z:int -> t:int},(f z))   *)
 
 (** {2 Find free variables and type variables} *)
 

@@ -1,9 +1,9 @@
 
 module Defs
-  
-  use import list.List
-  use import support.Bind
-  
+
+  use list.List
+  use support.Bind
+
   (* type variables = integers. Variable n is the n-th variable
      bound by the currently defined logical symbol (no need for
      a type parameter as there is only a single level of binding).
@@ -15,42 +15,42 @@ module Defs
      to lift this substitution in the semantic interpretation as well.
      Integers allows to consider type variables as if they where regular
      parameters. *)
-  
+
   type ty_var = int
-  
+
   (* Abstract infinite type for type symbols. *)
   type ty_symbol
   function ty_symbol_from_index (n:int) : ty_symbol
   axiom ty_symbol_from_index_injective : forall n m.
     ty_symbol_from_index n = ty_symbol_from_index m -> n = m
   meta infinite_type type ty_symbol
-  
+
   (* Abstract infinite type for logic symbols. *)
   type lsymbol
   function lsymbol_from_index (n:int) : lsymbol
   axiom lsymbol_from_index_injective : forall n m.
     lsymbol_from_index n = lsymbol_from_index m -> n = m
   meta infinite_type type lsymbol
-  
+
   (* Abstract infinite type for pattern variables. *)
   type pat_var
   function pat_var_from_index (n:int) : pat_var
   axiom pat_var_from_index_injective : forall n m.
     pat_var_from_index n = pat_var_from_index m -> n = m
   meta infinite_type type pat_var
-  
+
   (* Arbitrary type for variables of closed terms.
      Nothing is known about this type, so it is the closest thing
      to an empty type one can achieve in Why3. *)
   type closed
-  
+
   (* Type definitions. *)
-  
+
   (* Types *)
   type ty =
     | TyVar ty_var
     | TyApp ty_symbol (list ty)
-  
+
   (* Patterns *)
   type pattern =
     | PWild
@@ -58,7 +58,7 @@ module Defs
     | PApp lsymbol (list ty) (list pattern)
     | POr pattern pattern
     | PAs pattern pat_var
-  
+
   (* Terms. *)
   type term 'tv =
       (* Term variable. *)
@@ -85,39 +85,39 @@ module Defs
     | TNot (term 'tv)
     | TTrue
     | TFalse
-  
+
   (* Case branches. *)
   with branch 'tv = (pattern,term (bind 'tv pat_var))
-  
+
 end
 
 (* Definition of renamings. *)
 module Maps
-  
+
   use export Defs
-  use import list.List
-  use import support.Bind
-  use import support.HO
-  use import support.HOList
-  
+  use list.List
+  use support.Bind
+  use support.HO
+  use support.HOList
+
   function ty_map (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol) (ty:ty) : ty =
     match ty with
     | TyVar x -> TyVar (f x)
     | TyApp u l -> TyApp (g u) (tyl_map f g l)
     end
-  
+
   with tyl_map (f:ty_var -> ty_var)
     (g:ty_symbol -> ty_symbol) (tyl:list ty) : list ty = match tyl with
     | Nil -> Nil
     | Cons x q -> Cons (ty_map f g x) (tyl_map f g q)
     end
-  
+
   let rec lemma tyl_map_def (f:ty_var -> ty_var)
     (g:ty_symbol -> ty_symbol) (tyl:list ty) : unit
     ensures { tyl_map f g tyl = map (ty_map f g) tyl }
     variant { tyl }
   = match tyl with Cons _ q -> tyl_map_def f g q | _ -> () end
-  
+
   function pat_map (f:pat_var -> pat_var) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (p:pattern) : pattern =
     match p with
@@ -127,7 +127,7 @@ module Maps
     | POr p1 p2 -> POr (pat_map f g h i p1) (pat_map f g h i p2)
     | PAs p x -> PAs (pat_map f g h i p) (f x)
     end
-  
+
   with patl_map (f:pat_var -> pat_var) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (pl:list pattern) : list pattern =
@@ -135,14 +135,14 @@ module Maps
     | Nil -> Nil
     | Cons x q -> Cons (pat_map f g h i x) (patl_map f g h i q)
     end
-  
+
   let rec lemma patl_map_def (f:pat_var -> pat_var) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (pl:list pattern) : unit
     ensures { patl_map f g h i pl = map (pat_map f g h i) pl }
     variant { pl }
   = match pl with Cons _ q -> patl_map_def f g h i q | _ -> () end
-  
+
   function t_map (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (t:term 'tv1) : term 'tv2 =
@@ -168,7 +168,7 @@ module Maps
     | TTrue -> TTrue
     | TFalse -> TFalse
     end
-  
+
   with tl_map (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (tl:list (term 'tv1)) : list (term 'tv2) =
@@ -176,7 +176,7 @@ module Maps
     | Nil -> Nil
     | Cons x q -> Cons (t_map f g h i x) (tl_map f g h i q)
     end
-  
+
   with brl_map (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (brl:list (branch 'tv1)) : list (branch 'tv2) =
@@ -184,57 +184,57 @@ module Maps
     | Nil -> Nil
     | Cons x q -> Cons (br_map f g h i x) (brl_map f g h i q)
     end
-  
+
   with br_map (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (br:branch 'tv1) : branch 'tv2 =
     match br with
     | (pat,right) -> (pat_map id g h i pat,t_map (bmap f) g h i right)
     end
-  
+
   let rec lemma tl_map_def (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (tl:list (term 'tv1)) : unit
     ensures { tl_map f g h i tl = map (t_map f g h i) tl }
     variant { tl }
   = match tl with Cons _ q -> tl_map_def f g h i q | _ -> () end
-  
+
   let rec lemma brl_map_def (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (brl:list (branch 'tv1)) : unit
     ensures { brl_map f g h i brl = map (br_map f g h i) brl }
     variant { brl }
   = match brl with Cons _ q -> brl_map_def f g h i q | _ -> () end
-  
+
 end
 
 (* Definition of substitutions. *)
 module Substs
 
   use export Maps
-  use import list.List
-  use import support.Bind
-  use import support.HO
-  use import support.HOList
-  
+  use list.List
+  use support.Bind
+  use support.HO
+  use support.HOList
+
   function ty_subst (f:ty_var -> ty) (g:ty_symbol -> ty_symbol) (ty:ty) : ty =
     match ty with
     | TyVar x -> f x
     | TyApp u l -> TyApp (g u) (tyl_subst f g l)
     end
-  
+
   with tyl_subst (f:ty_var -> ty) (g:ty_symbol -> ty_symbol)
     (tyl:list ty) : list ty = match tyl with
     | Nil -> Nil
     | Cons x q -> Cons (ty_subst f g x) (tyl_subst f g q)
     end
-  
+
   let rec lemma tyl_subst_def (f:ty_var -> ty) (g:ty_symbol -> ty_symbol)
     (tyl:list ty) : unit
     ensures { tyl_subst f g tyl = map (ty_subst f g) tyl }
     variant { tyl }
   = match tyl with Cons _ q -> tyl_subst_def f g q | _ -> () end
-  
+
   function pat_subst (f:pat_var -> pat_var) (g:ty_var -> ty)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (p:pattern) : pattern =
@@ -246,7 +246,7 @@ module Substs
     | POr p1 p2 -> POr (pat_subst f g h i p1) (pat_subst f g h i p2)
     | PAs p x -> PAs (pat_subst f g h i p) (f x)
     end
-  
+
   with patl_subst (f:pat_var -> pat_var) (g:ty_var -> ty)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (pl:list pattern) : list pattern =
@@ -254,17 +254,17 @@ module Substs
     | Nil -> Nil
     | Cons x q -> Cons (pat_subst f g h i x) (patl_subst f g h i q)
     end
-  
+
   let rec lemma patl_subst_def (f:pat_var -> pat_var) (g:ty_var -> ty)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (pl:list pattern) : unit
     ensures { patl_subst f g h i pl = map (pat_subst f g h i) pl }
     variant { pl }
   = match pl with Cons _ q -> patl_subst_def f g h i q | _ -> () end
-  
+
   function t_lift (f:'tv1 -> term 'tv2) : bind 'tv1 'l -> term (bind 'tv2 'l) =
     bfold (compose (t_map Old id id id) f) (compose TVar Fresh)
-  
+
   function t_subst (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (t:term 'tv1) : term 'tv2 =
@@ -291,7 +291,7 @@ module Substs
     | TTrue -> TTrue
     | TFalse -> TFalse
     end
-  
+
   with tl_subst (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (tl:list (term 'tv1)) : list (term 'tv2) =
@@ -299,7 +299,7 @@ module Substs
     | Nil -> Nil
     | Cons x q -> Cons (t_subst f g h i x) (tl_subst f g h i q)
     end
-  
+
   with brl_subst (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (brl:list (branch 'tv1)) : list (branch 'tv2) =
@@ -307,28 +307,28 @@ module Substs
     | Nil -> Nil
     | Cons x q -> Cons (br_subst f g h i x) (brl_subst f g h i q)
     end
-  
+
   with br_subst (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (br:branch 'tv1) : branch 'tv2 =
     match br with
     | (pat,right) -> (pat_subst id g h i pat,t_subst (t_lift f) g h i right)
     end
-  
+
   let rec lemma tl_subst_def (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (tl:list (term 'tv1)) : unit
     ensures { tl_subst f g h i tl = map (t_subst f g h i) tl }
     variant { tl }
   = match tl with Cons _ q -> tl_subst_def f g h i q | _ -> () end
-  
+
   let rec lemma brl_subst_def (f:'tv1 -> term 'tv2) (g:ty_var -> ty)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     (brl:list (branch 'tv1)) : unit
     ensures { brl_subst f g h i brl = map (br_subst f g h i) brl }
     variant { brl }
   = match brl with Cons _ q -> brl_subst_def f g h i q | _ -> () end
-  
+
 end
 
 (* Inclusion of free variables in sets.
@@ -338,30 +338,30 @@ end
 module VarsIn
 
   use export Defs
-  use import list.List
-  use import support.HOList
-  use import support.HO
-  use import support.Bind
-  
+  use list.List
+  use support.HOList
+  use support.HO
+  use support.Bind
+
   predicate ty_vars_in (tyv_set:ty_var -> bool)
     (tys_set:ty_symbol -> bool) (ty:ty) = match ty with
     | TyVar x -> tyv_set x
     | TyApp f l -> tys_set f /\ tyl_vars_in tyv_set tys_set l
     end
-  
+
   with tyl_vars_in (tyv_set:ty_var -> bool)
     (tys_set:ty_symbol -> bool) (tyl:list ty) = match tyl with
     | Nil -> true
     | Cons x q -> ty_vars_in tyv_set tys_set x /\
       tyl_vars_in tyv_set tys_set q
     end
-  
+
   let rec lemma tyl_vars_in_def (a:ty_var -> bool)
     (b:ty_symbol -> bool) (tyl:list ty) : unit
     ensures { tyl_vars_in a b tyl <-> for_all (ty_vars_in a b) tyl }
     variant { tyl }
   = match tyl with Cons _ q -> tyl_vars_in_def a b q | _ -> () end
-  
+
   predicate pat_vars_in (pv_set:pat_var -> bool) (tyv_set:ty_var -> bool)
     (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
     (pat:pattern) = match pat with
@@ -373,7 +373,7 @@ module VarsIn
       pat_vars_in pv_set tyv_set tys_set ls_set p2
     | PAs p x -> pat_vars_in pv_set tyv_set tys_set ls_set p /\ pv_set x
     end
-  
+
   with patl_vars_in (pv_set:pat_var -> bool) (tyv_set:ty_var -> bool)
     (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
     (patl:list pattern) = match patl with
@@ -381,13 +381,13 @@ module VarsIn
     | Cons x q -> pat_vars_in pv_set tyv_set tys_set ls_set x /\
       patl_vars_in pv_set tyv_set tys_set ls_set q
     end
-  
+
   let rec lemma patl_vars_in_def (a:pat_var -> bool) (b:ty_var -> bool)
     (c:ty_symbol -> bool) (d:lsymbol -> bool) (patl:list pattern) : unit
     ensures { patl_vars_in a b c d patl <-> for_all (pat_vars_in a b c d) patl }
     variant { patl }
   = match patl with Cons _ q -> patl_vars_in_def a b c d q | _ -> () end
-  
+
   predicate t_vars_in (tv_set:'tv -> bool) (tyv_set:ty_var -> bool)
     (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
     (t:term 'tv) = match t with
@@ -419,7 +419,7 @@ module VarsIn
     | TTrue -> true
     | TFalse -> true
     end
-  
+
   with tl_vars_in (tv_set:'tv -> bool) (tyv_set:ty_var -> bool)
     (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
     (tl:list (term 'tv)) = match tl with
@@ -427,14 +427,14 @@ module VarsIn
     | Cons x q -> t_vars_in tv_set tyv_set tys_set ls_set x /\
       tl_vars_in tv_set tyv_set tys_set ls_set q
     end
-  
+
   with br_vars_in (tv_set:'tv -> bool) (tyv_set:ty_var -> bool)
     (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
     (br:branch 'tv) = match br with
     | (pat,right) -> pat_vars_in all tyv_set tys_set ls_set pat /\
       t_vars_in (bfold tv_set all) tyv_set tys_set ls_set right
     end
-  
+
   with brl_vars_in (tv_set:'tv -> bool) (tyv_set:ty_var -> bool)
     (tys_set:ty_symbol -> bool) (ls_set:lsymbol -> bool)
     (brl:list (branch 'tv)) = match brl with
@@ -442,29 +442,29 @@ module VarsIn
     | Cons x q -> br_vars_in tv_set tyv_set tys_set ls_set x /\
       brl_vars_in tv_set tyv_set tys_set ls_set q
     end
-  
+
   let rec lemma tl_vars_in_def (a:'tv -> bool) (b:ty_var -> bool)
     (c:ty_symbol -> bool) (d:lsymbol -> bool) (tl:list (term 'tv)) : unit
     ensures { tl_vars_in a b c d tl <-> for_all (t_vars_in a b c d) tl }
     variant { tl }
   = match tl with Cons _ q -> tl_vars_in_def a b c d q | _ -> () end
-  
+
   let rec lemma brl_vars_in_def (a:'tv -> bool) (b:ty_var -> bool)
     (c:ty_symbol -> bool) (d:lsymbol -> bool) (brl:list (branch 'tv)) : unit
     ensures { brl_vars_in a b c d brl <-> for_all (br_vars_in a b c d) brl }
     variant { brl }
   = match brl with Cons _ q -> brl_vars_in_def a b c d q | _ -> () end
-  
+
 end
 
 (* Free variable predicates. *)
 module FreeVars
-  
+
   use export Defs
-  use import list.List
-  use import support.HO
-  use import support.Bind
-  
+  use list.List
+  use support.HO
+  use support.Bind
+
   predicate pat_pv_free_var (pat:pattern) (x:pat_var) =
     match pat with
     | PWild -> false
@@ -473,176 +473,176 @@ module FreeVars
     | POr p1 p2 -> pat_pv_free_var p1 x \/ pat_pv_free_var p2 x
     | PApp _ _ pl -> patl_pv_free_var pl x
     end
-  
+
   with patl_pv_free_var (patl:list pattern) (x:pat_var) =
     match patl with
     | Nil -> false
     | Cons p q -> pat_pv_free_var p x \/ patl_pv_free_var q x
     end
-  
+
   predicate ty_tyv_free_var (ty:ty) (x:ty_var) =
     match ty with
     | TyVar y -> y = x
     | TyApp _ l -> tyl_tyv_free_var l x
     end
-  
+
   with tyl_tyv_free_var (tyl:list ty) (x:ty_var) =
     match tyl with
     | Nil -> false
     | Cons h q -> ty_tyv_free_var h x \/ tyl_tyv_free_var q x
     end
-  
+
 end
 
 (* Identity renaming is identity.
    Proofs delayed to IdProofs. *)
 module MapId
-  
+
   clone import support.Dummy as DMapId
   use export Maps
-  use import list.List
-  use import support.Bind
-  use import support.HO
-  
+  use list.List
+  use support.Bind
+  use support.HO
+
   axiom ty_map_id : forall ty. ty_map id id ty = ty
     /\ forall _:d. true
-  
+
   axiom ty_map_id_ho : ty_map id id = id
     /\ forall _:d. true
-  
+
   axiom tyl_map_id : forall tyl. tyl_map id id tyl = tyl
     /\ forall _:d. true
-  
+
   axiom tyl_map_id_ho : tyl_map id id = id
     /\ forall _:d. true
-  
+
   axiom pat_map_id : forall pat. pat_map id id id id pat = pat
     /\ forall _:d. true
-  
+
   axiom pat_map_id_ho : pat_map id id id id = id
     /\ forall _:d. true
-  
+
   axiom patl_map_id : forall patl. patl_map id id id id patl = patl
     /\ forall _:d. true
-  
+
   axiom patl_map_id_ho : patl_map id id id id = id
     /\ forall _:d. true
-  
+
   axiom t_map_id : forall t. t_map (id:'a -> 'a) id id id t = t
     /\ forall _:d. true
-  
+
   axiom t_map_id_ho : t_map (id:'a -> 'a) id id id = id
     /\ forall _:d. true
-  
+
   axiom tl_map_id : forall tl. tl_map (id:'a -> 'a) id id id tl = tl
     /\ forall _:d. true
-  
+
   axiom tl_map_id_ho : tl_map (id:'a -> 'a) id id id = id
     /\ forall _:d. true
-  
+
   axiom br_map_id : forall br. br_map (id:'a -> 'a) id id id br = br
     /\ forall _:d. true
-  
+
   axiom br_map_id_ho : br_map (id:'a -> 'a) id id id = id
     /\ forall _:d. true
-  
+
   axiom brl_map_id : forall brl. brl_map (id:'a -> 'a) id id id brl = brl
     /\ forall _:d. true
-  
+
   axiom brl_map_id_ho : brl_map (id:'a -> 'a) id id id = id
     /\ forall _:d. true
-  
+
 end
 
 (* Identity substitution is indeed identity.
    Proofs delayed to IdProofs. *)
 module SubstId
-  
+
   clone import support.Dummy as DSubstId
   use export Substs
-  use import list.List
-  use import support.Bind
-  use import support.HO
-  
+  use list.List
+  use support.Bind
+  use support.HO
+
   axiom ty_subst_id : forall ty. ty_subst TyVar id ty = ty
     /\ forall _:d. true
-  
+
   axiom ty_subst_id_ho : ty_subst TyVar id = id
     /\ forall _:d. true
-  
+
   axiom tyl_subst_id : forall tyl. tyl_subst TyVar id tyl = tyl
     /\ forall _:d. true
-  
+
   axiom tyl_subst_id_ho : tyl_subst TyVar id = id
     /\ forall _:d. true
-  
+
   axiom pat_subst_id : forall pat. pat_subst id TyVar id id pat = pat
     /\ forall _:d. true
-  
+
   axiom pat_subst_id_ho : pat_subst id TyVar id id = id
     /\ forall _:d. true
-  
+
   axiom patl_subst_id : forall patl. patl_subst id TyVar id id patl = patl
     /\ forall _:d. true
-  
+
   axiom patl_subst_id_ho : patl_subst id TyVar id id = id
     /\ forall _:d. true
-  
+
   axiom t_subst_id : forall t. t_subst (TVar:'a -> term 'a) TyVar id id t = t
     /\ forall _:d. true
-  
+
   axiom t_subst_id_ho : t_subst (TVar:'a -> term 'a) TyVar id id = id
     /\ forall _:d. true
-  
+
   axiom tl_subst_id : forall tl. tl_subst (TVar:'a -> term 'a) TyVar id id tl = tl
     /\ forall _:d. true
-  
+
   axiom tl_subst_id_ho : tl_subst (TVar:'a -> term 'a) TyVar id id = id
     /\ forall _:d. true
-  
+
   axiom br_subst_id : forall br. br_subst (TVar:'a -> term 'a) TyVar id id br = br
     /\ forall _:d. true
-  
+
   axiom br_subst_id_ho : br_subst (TVar:'a -> term 'a) TyVar id id = id
     /\ forall _:d. true
-  
+
   axiom brl_subst_id :
     forall brl. brl_subst (TVar:'a -> term 'a) TyVar id id brl = brl
     /\ forall _:d. true
-  
+
   axiom brl_subst_id_ho : brl_subst (TVar:'a -> term 'a) TyVar id id = id
     /\ forall _:d. true
-  
+
 end
 
 (* Proofs for MapId and SubstId modules. *)
 module IdProofs
-  
-  use import Maps
-  use import Substs
-  use import list.List
-  use import support.BindFull
-  use import support.HOFull
-  use import support.NoDiscriminate
-  
+
+  use Maps
+  use Substs
+  use list.List
+  use support.BindFull
+  use support.HOFull
+  use support.NoDiscriminate
+
   let rec lemma ty_map_id (ty:ty) : unit
     ensures { ty_map id id ty = ty }
     variant { ty }
   = match ty with TyApp _ l -> tyl_map_id l | _ -> () end
-  
+
   with lemma tyl_map_id (tyl:list ty) : unit
     ensures { tyl_map id id tyl = tyl }
     variant { tyl }
   = match tyl with Cons x q -> ty_map_id x ; tyl_map_id q | _ -> () end
-  
+
   let lemma ty_map_id_ho () : unit
     ensures { ty_map id id = id }
   = assert { extensional_equal (ty_map id id) id }
-  
+
   let lemma tyl_map_id_ho () : unit
     ensures { tyl_map id id = id }
   = assert { extensional_equal (tyl_map id id) id }
-  
+
   let rec lemma pat_map_id (p:pattern) : unit
     ensures { pat_map id id id id p = p }
     variant { p }
@@ -651,22 +651,22 @@ module IdProofs
     | PApp _ _ l -> patl_map_id l
     | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
     end
-  
+
   with lemma patl_map_id (pl:list pattern) : unit
     ensures { patl_map id id id id pl = pl }
     variant { pl }
   = match pl with
     | Cons x q -> pat_map_id x; patl_map_id q | _ -> ()
     end
-  
+
   let lemma pat_map_id_ho () : unit
     ensures { pat_map id id id id = id }
   = assert { extensional_equal (pat_map id id id id) id }
-  
+
   let lemma patl_map_id_ho () : unit
     ensures { patl_map id id id id = id }
   = assert { extensional_equal (patl_map id id id id) id }
-  
+
   let rec lemma t_map_id (t:term 'a) : unit
     ensures { t_map id id id id t = t }
     variant { t }
@@ -682,60 +682,60 @@ module IdProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma tl_map_id (tl:list (term 'a)) : unit
     ensures { tl_map id id id id tl = tl }
     variant { tl }
   = match tl with Cons x q -> t_map_id x; tl_map_id q | _ -> () end
-  
+
   with lemma brl_map_id (brl:list (branch 'a)) : unit
     ensures { brl_map id id id id brl = brl }
     variant { brl }
   = match brl with
     | Cons x q -> br_map_id x; brl_map_id q | _ -> ()
     end
-  
+
   with lemma br_map_id (br:branch 'a) : unit
     ensures { br_map id id id id br = br }
     variant { br }
   = match br with
     | (pat,right) -> pat_map_id pat; t_map_id right
     end
-  
+
   let lemma t_map_id_ho () : unit
     ensures { t_map (id:'a -> 'a) id id id = id }
   = assert { extensional_equal (t_map (id:'a -> 'a) id id id) id }
-  
+
   let lemma tl_map_id_ho () : unit
     ensures { tl_map (id:'a -> 'a) id id id = id }
   = assert { extensional_equal (tl_map (id:'a -> 'a) id id id) id }
-  
+
   let lemma br_map_id_ho () : unit
     ensures { br_map (id:'a -> 'a) id id id = id }
   = assert { extensional_equal (br_map (id:'a -> 'a) id id id) id }
-  
+
   let lemma brl_map_id_ho () : unit
     ensures { brl_map (id:'a -> 'a) id id id = id }
   = assert { extensional_equal (brl_map (id:'a -> 'a) id id id) id }
-  
+
   let rec lemma ty_subst_id (ty:ty) : unit
     ensures { ty_subst TyVar id ty = ty }
     variant { ty }
   = match ty with TyApp _ l -> tyl_subst_id l | _ -> () end
-  
+
   with lemma tyl_subst_id (tyl:list ty) : unit
     ensures { tyl_subst TyVar id tyl = tyl }
     variant { tyl }
   = match tyl with Cons x q -> ty_subst_id x ; tyl_subst_id q | _ -> () end
-  
+
   let lemma ty_subst_id_ho () : unit
     ensures { ty_subst TyVar id = id }
   = assert { extensional_equal (ty_subst TyVar id) id }
-  
+
   let lemma tyl_subst_id_ho () : unit
     ensures { tyl_subst TyVar id = id }
   = assert { extensional_equal (tyl_subst TyVar id) id }
-  
+
   let rec lemma pat_subst_id (p:pattern) : unit
     ensures { pat_subst id TyVar id id p = p }
     variant { p }
@@ -744,22 +744,22 @@ module IdProofs
     | PApp _ _ l -> patl_subst_id l
     | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
     end
-  
+
   with lemma patl_subst_id (pl:list pattern) : unit
     ensures { patl_subst id TyVar id id pl = pl }
     variant { pl }
   = match pl with
     | Cons x q -> pat_subst_id x; patl_subst_id q | _ -> ()
     end
-  
+
   let lemma pat_subst_id_ho () : unit
     ensures { pat_subst id TyVar id id = id }
   = assert { extensional_equal (pat_subst id TyVar id id) id }
-  
+
   let lemma patl_subst_id_ho () : unit
     ensures { patl_subst id TyVar id id = id }
   = assert { extensional_equal (patl_subst id TyVar id id) id }
-  
+
   let lemma t_lift_id () : unit
     ensures { t_lift TVar = (TVar:bind 'a 'b -> term (bind 'a 'b)) }
   = assert { let u = (TVar:bind 'a 'b -> term (bind 'a 'b)) in
@@ -767,7 +767,7 @@ module IdProofs
       (forall x. t_lift TVar x <> u x -> match x with
         | Old y -> t_lift TVar x = t_map Old id id id (TVar y) = TVar x && false
         | _ -> false end && false) && false }
-  
+
   let rec lemma t_subst_id (t:term 'a) : unit
     ensures { t_subst TVar TyVar id id t = t }
     variant { t }
@@ -783,42 +783,42 @@ module IdProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma tl_subst_id (tl:list (term 'a)) : unit
     ensures { tl_subst TVar TyVar id id tl = tl }
     variant { tl }
   = match tl with Cons x q -> t_subst_id x; tl_subst_id q | _ -> () end
-  
+
   with lemma brl_subst_id (brl:list (branch 'a)) : unit
     ensures { brl_subst TVar TyVar id id brl = brl }
     variant { brl }
   = match brl with
     | Cons x q -> br_subst_id x; brl_subst_id q | _ -> ()
     end
-  
+
   with lemma br_subst_id (br:branch 'a) : unit
     ensures { br_subst TVar TyVar id id br = br }
     variant { br }
   = match br with
     | (pat,right) -> pat_subst_id pat; t_subst_id right
     end
-  
+
   let lemma t_subst_id_ho () : unit
     ensures { t_subst (TVar:'a -> term 'a) TyVar id id = id }
   = assert { extensional_equal (t_subst (TVar:'a -> term 'a) TyVar id id) id }
-  
+
   let lemma tl_subst_id_ho () : unit
     ensures { tl_subst (TVar:'a -> term 'a) TyVar id id = id }
   = assert { extensional_equal (tl_subst (TVar:'a -> term 'a) TyVar id id) id }
-  
+
   let lemma br_subst_id_ho () : unit
     ensures { br_subst (TVar:'a -> term 'a) TyVar id id = id }
   = assert { extensional_equal (br_subst (TVar:'a -> term 'a) TyVar id id) id }
-  
+
   let lemma brl_subst_id_ho () : unit
     ensures { brl_subst (TVar:'a -> term 'a) TyVar id id = id }
   = assert { extensional_equal (brl_subst (TVar:'a -> term 'a) TyVar id id) id }
-  
+
   clone MapId with type DMapId.d = unit,
     goal ty_map_id,
     goal ty_map_id_ho,
@@ -836,7 +836,7 @@ module IdProofs
     goal br_map_id_ho,
     goal brl_map_id,
     goal brl_map_id_ho
-  
+
   clone SubstId with type DSubstId.d = unit,
     goal ty_subst_id,
     goal ty_subst_id_ho,
@@ -854,493 +854,493 @@ module IdProofs
     goal br_subst_id_ho,
     goal brl_subst_id,
     goal brl_subst_id_ho
-  
+
 end
 
 (* Commutation lemmas for expression with shape "map f (map g t)".
    Proofs delayed to CommutationProofs. *)
 
 module MapThenMap
-  
+
   clone import support.Dummy as DMapThenMap
   use export Maps
-  use import support.HO
-  
+  use support.HO
+
   axiom ty_mm : forall fa fb ga gb ty.
     ty_map fa fb (ty_map ga gb ty) = ty_map (compose fa ga) (compose fb gb) ty
     /\ forall _:d.true
-  
+
   axiom ty_mm_ho : forall fa fb ga gb.
     compose (ty_map fa fb) (ty_map ga gb) =
     ty_map (compose fa ga) (compose fb gb)
     /\ forall _:d.true
-  
+
   axiom tyl_mm : forall fa fb ga gb tyl.
     tyl_map fa fb (tyl_map ga gb tyl) =
     tyl_map (compose fa ga) (compose fb gb) tyl
     /\ forall _:d.true
-  
+
   axiom tyl_mm_ho : forall fa fb ga gb.
     compose (tyl_map fa fb) (tyl_map ga gb) =
     tyl_map (compose fa ga) (compose fb gb)
     /\ forall _:d.true
-  
+
   axiom pat_mm : forall fa fb fc fd ga gb gc gd pat.
     pat_map fa fb fc fd (pat_map ga gb gc gd pat) =
     pat_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd) pat
     /\ forall _:d.true
-  
+
   axiom pat_mm_ho : forall fa fb fc fd ga gb gc gd.
     compose (pat_map fa fb fc fd) (pat_map ga gb gc gd) =
     pat_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom patl_mm : forall fa fb fc fd ga gb gc gd patl.
     patl_map fa fb fc fd (patl_map ga gb gc gd patl) =
     patl_map (compose fa ga) (compose fb gb)
              (compose fc gc) (compose fd gd) patl
     /\ forall _:d.true
-  
+
   axiom patl_mm_ho : forall fa fb fc fd ga gb gc gd.
     compose (patl_map fa fb fc fd) (patl_map ga gb gc gd) =
     patl_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom t_mm : forall fa:'b -> 'c,fb fc fd,ga:'a -> 'b,gb gc gd t.
     t_map fa fb fc fd (t_map ga gb gc gd t) =
     t_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd) t
     /\ forall _:d.true
-  
+
   axiom t_mm_ho : forall fa:'b -> 'c,fb fc fd,ga:'a -> 'b,gb gc gd.
     compose (t_map fa fb fc fd) (t_map ga gb gc gd) =
     t_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom tl_mm : forall fa:'b -> 'c,fb fc fd,ga:'a -> 'b,gb gc gd tl.
     tl_map fa fb fc fd (tl_map ga gb gc gd tl) =
     tl_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd) tl
     /\ forall _:d.true
-  
+
   axiom tl_mm_ho : forall fa:'b -> 'c,fb fc fd,ga:'a -> 'b,gb gc gd.
     compose (tl_map fa fb fc fd) (tl_map ga gb gc gd) =
     tl_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom br_mm : forall fa:'b -> 'c,fb fc fd,ga:'a -> 'b,gb gc gd br.
     br_map fa fb fc fd (br_map ga gb gc gd br) =
     br_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd) br
     /\ forall _:d.true
-  
+
   axiom br_mm_ho : forall fa:'b -> 'c,fb fc fd,ga:'a -> 'b,gb gc gd.
     compose (br_map fa fb fc fd) (br_map ga gb gc gd) =
     br_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom brl_mm : forall fa:'b -> 'c,fb fc fd,ga:'a -> 'b,gb gc gd brl.
     brl_map fa fb fc fd (brl_map ga gb gc gd brl) =
     brl_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd) brl
     /\ forall _:d.true
-  
+
   axiom brl_mm_ho : forall fa:'b -> 'c,fb fc fd,ga:'a -> 'b,gb gc gd.
     compose (brl_map fa fb fc fd) (brl_map ga gb gc gd) =
     brl_map (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
 end
 
 (* Commutation lemmas for expression with shape "subst f (map g t)".
    Proofs delayed to CommutationProofs. *)
 module MapThenSubst
-  
+
   clone import support.Dummy as DMapThenSubst
   use export Maps
   use export Substs
-  use import support.HO
-  
+  use support.HO
+
   axiom ty_ms : forall fa fb ga gb ty.
     ty_subst fa fb (ty_map ga gb ty) =
     ty_subst (compose fa ga) (compose fb gb) ty
     /\ forall _:d.true
-  
+
   axiom ty_ms_ho : forall fa fb ga gb.
     compose (ty_subst fa fb) (ty_map ga gb) =
     ty_subst (compose fa ga) (compose fb gb)
     /\ forall _:d.true
-  
+
   axiom tyl_ms : forall fa fb ga gb tyl.
     tyl_subst fa fb (tyl_map ga gb tyl) =
     tyl_subst (compose fa ga) (compose fb gb) tyl
     /\ forall _:d.true
-  
+
   axiom tyl_ms_ho : forall fa fb ga gb.
     compose (tyl_subst fa fb) (tyl_map ga gb) =
     tyl_subst (compose fa ga) (compose fb gb)
     /\ forall _:d.true
-  
+
   axiom pat_ms : forall fa fb fc fd ga gb gc gd pat.
     pat_subst fa fb fc fd (pat_map ga gb gc gd pat) =
     pat_subst (compose fa ga) (compose fb gb)
               (compose fc gc) (compose fd gd) pat
     /\ forall _:d.true
-  
+
   axiom pat_ms_ho : forall fa fb fc fd ga gb gc gd.
     compose (pat_subst fa fb fc fd) (pat_map ga gb gc gd) =
     pat_subst (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom patl_ms : forall fa fb fc fd ga gb gc gd patl.
     patl_subst fa fb fc fd (patl_map ga gb gc gd patl) =
     patl_subst (compose fa ga) (compose fb gb)
                (compose fc gc) (compose fd gd) patl
     /\ forall _:d.true
-  
+
   axiom patl_ms_ho : forall fa fb fc fd ga gb gc gd.
     compose (patl_subst fa fb fc fd) (patl_map ga gb gc gd) =
     patl_subst (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom t_ms : forall fa:'b -> term 'c,fb fc fd,ga:'a -> 'b,gb gc gd t.
     t_subst fa fb fc fd (t_map ga gb gc gd t) =
     t_subst (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd) t
     /\ forall _:d.true
-  
+
   axiom t_ms_ho : forall fa:'b -> term 'c,fb fc fd,ga:'a -> 'b,gb gc gd.
     compose (t_subst fa fb fc fd) (t_map ga gb gc gd) =
     t_subst (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom tl_ms : forall fa:'b -> term 'c,fb fc fd,ga:'a -> 'b,gb gc gd tl.
     tl_subst fa fb fc fd (tl_map ga gb gc gd tl) =
     tl_subst (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd) tl
     /\ forall _:d.true
-  
+
   axiom tl_ms_ho : forall fa:'b -> term 'c,fb fc fd,ga:'a -> 'b,gb gc gd.
     compose (tl_subst fa fb fc fd) (tl_map ga gb gc gd) =
     tl_subst (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom br_ms : forall fa:'b -> term 'c,fb fc fd,ga:'a -> 'b,gb gc gd br.
     br_subst fa fb fc fd (br_map ga gb gc gd br) =
     br_subst (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd) br
     /\ forall _:d.true
-  
+
   axiom br_ms_ho : forall fa:'b -> term 'c,fb fc fd,ga:'a -> 'b,gb gc gd.
     compose (br_subst fa fb fc fd) (br_map ga gb gc gd) =
     br_subst (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom brl_ms : forall fa:'b -> term 'c,fb fc fd,ga:'a -> 'b,gb gc gd brl.
     brl_subst fa fb fc fd (brl_map ga gb gc gd brl) =
     brl_subst (compose fa ga) (compose fb gb)
               (compose fc gc) (compose fd gd) brl
     /\ forall _:d.true
-  
+
   axiom brl_ms_ho : forall fa:'b -> term 'c,fb fc fd,ga:'a -> 'b,gb gc gd.
     compose (brl_subst fa fb fc fd) (brl_map ga gb gc gd) =
     brl_subst (compose fa ga) (compose fb gb) (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
 end
 
 (* Commutation lemmas for expression with shape "map f (subst g t)".
    Proofs delayed to CommutationProofs. *)
 module SubstThenMap
-  
+
   clone import support.Dummy as DSubstThenMap
   use export Maps
   use export Substs
-  use import support.HO
-  
+  use support.HO
+
   axiom ty_sm : forall fa fb ga gb ty.
     ty_map fa fb (ty_subst ga gb ty) =
     ty_subst (compose (ty_map fa fb) ga) (compose fb gb) ty
     /\ forall _:d.true
-  
+
   axiom ty_sm_ho : forall fa fb ga gb.
     compose (ty_map fa fb) (ty_subst ga gb) =
     ty_subst (compose (ty_map fa fb) ga) (compose fb gb)
     /\ forall _:d.true
-  
+
   axiom tyl_sm : forall fa fb ga gb tyl.
     tyl_map fa fb (tyl_subst ga gb tyl) =
     tyl_subst (compose (ty_map fa fb) ga) (compose fb gb) tyl
     /\ forall _:d.true
-  
+
   axiom tyl_sm_ho : forall fa fb ga gb.
     compose (tyl_map fa fb) (tyl_subst ga gb) =
     tyl_subst (compose (ty_map fa fb) ga) (compose fb gb)
     /\ forall _:d.true
-  
+
   axiom pat_sm : forall fa fb fc fd ga gb gc gd pat.
     pat_map fa fb fc fd (pat_subst ga gb gc gd pat) =
     pat_subst (compose fa ga) (compose (ty_map fb fc) gb)
               (compose fc gc) (compose fd gd) pat
     /\ forall _:d.true
-  
+
   axiom pat_sm_ho : forall fa fb fc fd ga gb gc gd.
     compose (pat_map fa fb fc fd) (pat_subst ga gb gc gd) =
     pat_subst (compose fa ga) (compose (ty_map fb fc) gb)
               (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom patl_sm : forall fa fb fc fd ga gb gc gd patl.
     patl_map fa fb fc fd (patl_subst ga gb gc gd patl) =
     patl_subst (compose fa ga) (compose (ty_map fb fc) gb)
                (compose fc gc) (compose fd gd) patl
     /\ forall _:d.true
-  
+
   axiom patl_sm_ho : forall fa fb fc fd ga gb gc gd.
     compose (patl_map fa fb fc fd) (patl_subst ga gb gc gd) =
     patl_subst (compose fa ga) (compose (ty_map fb fc) gb)
                (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom t_sm : forall fa:'b -> 'c,fb fc fd,ga:'a -> term 'b,gb gc gd t.
     t_map fa fb fc fd (t_subst ga gb gc gd t) =
     t_subst (compose (t_map fa fb fc fd) ga) (compose (ty_map fb fc) gb)
             (compose fc gc) (compose fd gd) t
     /\ forall _:d.true
-  
+
   axiom t_sm_ho : forall fa:'b -> 'c,fb fc fd,ga:'a -> term 'b,gb gc gd.
     compose (t_map fa fb fc fd) (t_subst ga gb gc gd) =
     t_subst (compose (t_map fa fb fc fd) ga) (compose (ty_map fb fc) gb)
             (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom tl_sm : forall fa:'b -> 'c,fb fc fd,ga:'a -> term 'b,gb gc gd tl.
     tl_map fa fb fc fd (tl_subst ga gb gc gd tl) =
     tl_subst (compose (t_map fa fb fc fd) ga) (compose (ty_map fb fc) gb)
              (compose fc gc) (compose fd gd) tl
     /\ forall _:d.true
-  
+
   axiom tl_sm_ho : forall fa:'b -> 'c,fb fc fd,ga:'a -> term 'b,gb gc gd.
     compose (tl_map fa fb fc fd) (tl_subst ga gb gc gd) =
     tl_subst (compose (t_map fa fb fc fd) ga) (compose (ty_map fb fc) gb)
              (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom br_sm : forall fa:'b -> 'c,fb fc fd,ga:'a -> term 'b,gb gc gd br.
     br_map fa fb fc fd (br_subst ga gb gc gd br) =
     br_subst (compose (t_map fa fb fc fd) ga) (compose (ty_map fb fc) gb)
              (compose fc gc) (compose fd gd) br
     /\ forall _:d.true
-  
+
   axiom br_sm_ho : forall fa:'b -> 'c,fb fc fd,ga:'a -> term 'b,gb gc gd.
     compose (br_map fa fb fc fd) (br_subst ga gb gc gd) =
     br_subst (compose (t_map fa fb fc fd) ga) (compose (ty_map fb fc) gb)
              (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom brl_sm : forall fa:'b -> 'c,fb fc fd,ga:'a -> term 'b,gb gc gd brl.
     brl_map fa fb fc fd (brl_subst ga gb gc gd brl) =
     brl_subst (compose (t_map fa fb fc fd) ga) (compose (ty_map fb fc) gb)
               (compose fc gc) (compose fd gd) brl
     /\ forall _:d.true
-  
+
   axiom brl_sm_ho : forall fa:'b -> 'c,fb fc fd,ga:'a -> term 'b,gb gc gd.
     compose (brl_map fa fb fc fd) (brl_subst ga gb gc gd) =
     brl_subst (compose (t_map fa fb fc fd) ga) (compose (ty_map fb fc) gb)
               (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
 end
 
 (* Commutation lemmas for expression with shape "subst f (subst g t)".
    Proofs delayed to CommutationProofs. *)
 module SubstThenSubst
-  
+
   clone import support.Dummy as DSubstThenSubst
   use export Maps
   use export Substs
-  use import support.HO
-  
+  use support.HO
+
   axiom ty_ss : forall fa fb ga gb ty.
     ty_subst fa fb (ty_subst ga gb ty) =
     ty_subst (compose (ty_subst fa fb) ga) (compose fb gb) ty
     /\ forall _:d.true
-  
+
   axiom ty_ss_ho : forall fa fb ga gb.
     compose (ty_subst fa fb) (ty_subst ga gb) =
     ty_subst (compose (ty_subst fa fb) ga) (compose fb gb)
     /\ forall _:d.true
-  
+
   axiom tyl_ss : forall fa fb ga gb tyl.
     tyl_subst fa fb (tyl_subst ga gb tyl) =
     tyl_subst (compose (ty_subst fa fb) ga) (compose fb gb) tyl
     /\ forall _:d.true
-  
+
   axiom tyl_ss_ho : forall fa fb ga gb.
     compose (tyl_subst fa fb) (tyl_subst ga gb) =
     tyl_subst (compose (ty_subst fa fb) ga) (compose fb gb)
     /\ forall _:d.true
-  
+
   axiom pat_ss : forall fa fb fc fd ga gb gc gd pat.
     pat_subst fa fb fc fd (pat_subst ga gb gc gd pat) =
     pat_subst (compose fa ga) (compose (ty_subst fb fc) gb)
               (compose fc gc) (compose fd gd) pat
     /\ forall _:d.true
-  
+
   axiom pat_ss_ho : forall fa fb fc fd ga gb gc gd.
     compose (pat_subst fa fb fc fd) (pat_subst ga gb gc gd) =
     pat_subst (compose fa ga) (compose (ty_subst fb fc) gb)
               (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom patl_ss : forall fa fb fc fd ga gb gc gd patl.
     patl_subst fa fb fc fd (patl_subst ga gb gc gd patl) =
     patl_subst (compose fa ga) (compose (ty_subst fb fc) gb)
                (compose fc gc) (compose fd gd) patl
     /\ forall _:d.true
-  
+
   axiom patl_ss_ho : forall fa fb fc fd ga gb gc gd.
     compose (patl_subst fa fb fc fd) (patl_subst ga gb gc gd) =
     patl_subst (compose fa ga) (compose (ty_subst fb fc) gb)
                (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom t_ss : forall fa:'b -> term 'c,fb fc fd,ga:'a -> term 'b,gb gc gd t.
     t_subst fa fb fc fd (t_subst ga gb gc gd t) =
     t_subst (compose (t_subst fa fb fc fd) ga) (compose (ty_subst fb fc) gb)
             (compose fc gc) (compose fd gd) t
     /\ forall _:d.true
-  
+
   axiom t_ss_ho : forall fa:'b -> term 'c,fb fc fd,ga:'a -> term 'b,gb gc gd.
     compose (t_subst fa fb fc fd) (t_subst ga gb gc gd) =
     t_subst (compose (t_subst fa fb fc fd) ga) (compose (ty_subst fb fc) gb)
             (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom tl_ss : forall fa:'b -> term 'c,fb fc fd,ga:'a -> term 'b,gb gc gd tl.
     tl_subst fa fb fc fd (tl_subst ga gb gc gd tl) =
     tl_subst (compose (t_subst fa fb fc fd) ga) (compose (ty_subst fb fc) gb)
              (compose fc gc) (compose fd gd) tl
     /\ forall _:d.true
-  
+
   axiom tl_ss_ho : forall fa:'b -> term 'c,fb fc fd,ga:'a -> term 'b,gb gc gd.
     compose (tl_subst fa fb fc fd) (tl_subst ga gb gc gd) =
     tl_subst (compose (t_subst fa fb fc fd) ga) (compose (ty_subst fb fc) gb)
              (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom br_ss : forall fa:'b -> term 'c,fb fc fd,ga:'a -> term 'b,gb gc gd br.
     br_subst fa fb fc fd (br_subst ga gb gc gd br) =
     br_subst (compose (t_subst fa fb fc fd) ga) (compose (ty_subst fb fc) gb)
              (compose fc gc) (compose fd gd) br
     /\ forall _:d.true
-  
+
   axiom br_ss_ho : forall fa:'b -> term 'c,fb fc fd,ga:'a -> term 'b,gb gc gd.
     compose (br_subst fa fb fc fd) (br_subst ga gb gc gd) =
     br_subst (compose (t_subst fa fb fc fd) ga) (compose (ty_subst fb fc) gb)
              (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
   axiom brl_ss : forall fa:'b -> term 'c,fb fc fd,ga:'a -> term 'b,gb gc gd brl.
     brl_subst fa fb fc fd (brl_subst ga gb gc gd brl) =
     brl_subst (compose (t_subst fa fb fc fd) ga) (compose (ty_subst fb fc) gb)
               (compose fc gc) (compose fd gd) brl
     /\ forall _:d.true
-  
+
   axiom brl_ss_ho : forall fa:'b -> term 'c,fb fc fd,ga:'a -> term 'b,gb gc gd.
     compose (brl_subst fa fb fc fd) (brl_subst ga gb gc gd) =
     brl_subst (compose (t_subst fa fb fc fd) ga) (compose (ty_subst fb fc) gb)
               (compose fc gc) (compose fd gd)
     /\ forall _:d.true
-  
+
 end
 
 (* Renaming definitions in term of substitutions. *)
 module MapAsSubst
-  
+
   clone import support.Dummy as DMapAsSubst
   use export Maps
   use export Substs
-  use import support.HO
-  
+  use support.HO
+
   axiom ty_mas : forall f g ty.
     ty_map f g ty = ty_subst (compose TyVar f) g ty
     /\ forall _:d.true
-  
+
   axiom ty_mas_ho : forall f g. ty_map f g = ty_subst (compose TyVar f) g
     /\ forall _:d.true
-  
+
   axiom tyl_mas : forall f g tyl.
     tyl_map f g tyl = tyl_subst (compose TyVar f) g tyl
     /\ forall _:d.true
-  
+
   axiom tyl_mas_ho : forall f g. tyl_map f g = tyl_subst (compose TyVar f) g
     /\ forall _:d.true
-  
+
   axiom pat_mas : forall f g h i pat.
     pat_map f g h i pat = pat_subst f (compose TyVar g) h i pat
     /\ forall _:d.true
-  
+
   axiom pat_mas_ho : forall f g h i.
     pat_map f g h i = pat_subst f (compose TyVar g) h i
     /\ forall _:d.true
-  
+
   axiom patl_mas : forall f g h i patl.
     patl_map f g h i patl = patl_subst f (compose TyVar g) h i patl
     /\ forall _:d.true
-  
+
   axiom patl_mas_ho : forall f g h i.
     patl_map f g h i = patl_subst f (compose TyVar g) h i
     /\ forall _:d.true
-  
+
   axiom t_mas : forall f:'a -> 'b,g h i t.
     t_map f g h i t = t_subst (compose TVar f) (compose TyVar g) h i t
     /\ forall _:d.true
-  
+
   axiom t_mas_ho : forall f:'a -> 'b,g h i.
     t_map f g h i = t_subst (compose TVar f) (compose TyVar g) h i
     /\ forall _:d.true
-  
+
   axiom tl_mas : forall f:'a -> 'b,g h i tl.
     tl_map f g h i tl = tl_subst (compose TVar f) (compose TyVar g) h i tl
     /\ forall _:d.true
-  
+
   axiom tl_mas_ho : forall f:'a -> 'b,g h i.
     tl_map f g h i = tl_subst (compose TVar f) (compose TyVar g) h i
     /\ forall _:d.true
-  
+
   axiom br_mas : forall f:'a -> 'b,g h i br.
     br_map f g h i br = br_subst (compose TVar f) (compose TyVar g) h i br
     /\ forall _:d.true
-  
+
   axiom br_mas_ho : forall f:'a -> 'b,g h i.
     br_map f g h i = br_subst (compose TVar f) (compose TyVar g) h i
     /\ forall _:d.true
-  
+
   axiom brl_mas : forall f:'a -> 'b,g h i brl.
     brl_map f g h i brl = brl_subst (compose TVar f) (compose TyVar g) h i brl
     /\ forall _:d.true
-  
+
   axiom brl_mas_ho : forall f:'a -> 'b,g h i.
     brl_map f g h i = brl_subst (compose TVar f) (compose TyVar g) h i
     /\ forall _:d.true
-  
+
 end
 
 (* Proof for modules MapThenMap, MapThenSubst, SubstThenMap, SubstThenSubst,
    and MapAsSubst. *)
 module CommutationProofs
-  
-  use import support.HOFull
-  use import support.BindFull
-  use import Substs
-  use import Maps
-  use import MapId
-  use import list.List
-  use import support.NoDiscriminate
-  
+
+  use support.HOFull
+  use support.BindFull
+  use Substs
+  use Maps
+  use MapId
+  use list.List
+  use support.NoDiscriminate
+
   (* First, successive renamings. *)
-  
+
   let rec lemma ty_map_compose (f1 f2:ty_var -> ty_var)
     (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
     ensures { ty_map (compose f2 f1) (compose g2 g1) ty =
       ty_map f2 g2 (ty_map f1 g1 ty) }
     variant { ty }
   = match ty with TyApp _ l -> tyl_map_compose f1 f2 g1 g2 l | _ -> () end
-  
+
   with lemma tyl_map_compose (f1 f2:ty_var -> ty_var)
     (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
     ensures { tyl_map (compose f2 f1) (compose g2 g1) tyl =
@@ -1350,21 +1350,21 @@ module CommutationProofs
     | Cons x q -> ty_map_compose f1 f2 g1 g2 x;
       tyl_map_compose f1 f2 g1 g2 q
     | _ -> () end
-  
+
   let lemma ty_map_ho_compose (f1 f2:ty_var -> ty_var)
     (g1 g2:ty_symbol -> ty_symbol) : unit
     ensures { ty_map (compose f2 f1) (compose g2 g1) =
       compose (ty_map f2 g2) (ty_map f1 g1) }
   = assert { extensional_equal (ty_map (compose f2 f1) (compose g2 g1))
     (compose (ty_map f2 g2) (ty_map f1 g1)) }
-  
+
   let lemma tyl_map_ho_compose (f1 f2:ty_var -> ty_var)
     (g1 g2:ty_symbol -> ty_symbol) : unit
     ensures { tyl_map (compose f2 f1) (compose g2 g1) =
       compose (tyl_map f2 g2) (tyl_map f1 g1) }
   = assert { extensional_equal (tyl_map (compose f2 f1) (compose g2 g1))
     (compose (tyl_map f2 g2) (tyl_map f1 g1)) }
-  
+
   let rec lemma pat_map_compose (f1 f2:pat_var -> pat_var)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (p:pattern) : unit
@@ -1377,7 +1377,7 @@ module CommutationProofs
     | PApp _ _ l -> patl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 l
     | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
     end
-  
+
   with lemma patl_map_compose (f1 f2:pat_var -> pat_var)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (pl:list pattern) : unit
@@ -1390,7 +1390,7 @@ module CommutationProofs
       patl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   let lemma pat_map_ho_compose (f1 f2:pat_var -> pat_var)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1400,7 +1400,7 @@ module CommutationProofs
   = assert { extensional_equal (pat_map (compose f2 f1) (compose g2 g1)
                                         (compose h2 h1) (compose i2 i1))
     (compose (pat_map f2 g2 h2 i2) (pat_map f1 g1 h1 i1)) }
-  
+
   let lemma patl_map_ho_compose (f1 f2:pat_var -> pat_var)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1410,7 +1410,7 @@ module CommutationProofs
   = assert { extensional_equal (patl_map (compose f2 f1) (compose g2 g1)
                                              (compose h2 h1) (compose i2 i1))
     (compose (patl_map f2 g2 h2 i2) (patl_map f1 g1 h1 i1)) }
-  
+
   let rec lemma t_map_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (t:term 'tv1) : unit
@@ -1432,7 +1432,7 @@ module CommutationProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma tl_map_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (tl:list (term 'tv1)) : unit
@@ -1445,7 +1445,7 @@ module CommutationProofs
       tl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   with lemma brl_map_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (brl:list (branch 'tv1)) : unit
@@ -1458,7 +1458,7 @@ module CommutationProofs
       brl_map_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   with lemma br_map_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (br:branch 'tv1) : unit
@@ -1470,7 +1470,7 @@ module CommutationProofs
     | (_,right) ->
       t_map_compose (bmap f1) (bmap f2) g1 g2 h1 h2 i1 i2 right
     end
-  
+
   let lemma t_map_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1480,7 +1480,7 @@ module CommutationProofs
   = assert { extensional_equal
     (t_map (compose f2 f1) (compose g2 g1) (compose h2 h1) (compose i2 i1))
     (compose (t_map f2 g2 h2 i2) (t_map f1 g1 h1 i1)) }
-  
+
   let lemma tl_map_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1491,7 +1491,7 @@ module CommutationProofs
       (tl_map (compose f2 f1) (compose g2 g1)
                      (compose h2 h1) (compose i2 i1))
       (compose (tl_map f2 g2 h2 i2) (tl_map f1 g1 h1 i1)) }
-  
+
   let lemma brl_map_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1502,7 +1502,7 @@ module CommutationProofs
     (brl_map (compose f2 f1) (compose g2 g1)
                      (compose h2 h1) (compose i2 i1))
     (compose (brl_map f2 g2 h2 i2) (brl_map f1 g1 h1 i1)) }
-  
+
   let lemma br_map_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> 'tv3)
     (g1 g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1513,21 +1513,21 @@ module CommutationProofs
     (br_map (compose f2 f1) (compose g2 g1)
                 (compose h2 h1) (compose i2 i1))
     (compose (br_map f2 g2 h2 i2) (br_map f1 g1 h1 i1)) }
-  
+
   (* Second, subst-then-rename. *)
-  
+
   (* Need a small additional commutation lemma *)
-  
+
   let lemma map_ty_var (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol) : unit
     ensures { compose (ty_map f g) TyVar = compose TyVar f }
   = assert { extensional_equal (compose (ty_map f g) TyVar) (compose TyVar f) }
-  
+
   let lemma map_term_var (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
     ensures { compose (t_map f g h i) TVar = compose TVar f }
   = assert {
     extensional_equal (compose (t_map f g h i) TVar) (compose TVar f) }
-  
+
   let lemma smap_t_lifting (s:'a -> term 'tv1)
     (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
@@ -1543,7 +1543,7 @@ module CommutationProofs
       compose rn' (t_lift s) =
         bfold (compose rn' (compose u2 s)) (compose rn' v2)
     }
-  
+
   let rec lemma ty_smap_compose (f1:ty_var -> ty) (f2:ty_var -> ty_var)
     (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
     ensures { let s2 = ty_map f2 g2 in
@@ -1551,7 +1551,7 @@ module CommutationProofs
       ty_map f2 g2 (ty_subst f1 g1 ty) }
     variant { ty }
   = match ty with TyApp _ l -> ty_list_smap_compose f1 f2 g1 g2 l | _ -> () end
-  
+
   with lemma ty_list_smap_compose (f1:ty_var -> ty) (f2:ty_var -> ty_var)
     (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
     ensures { let s2 = ty_map f2 g2 in
@@ -1562,7 +1562,7 @@ module CommutationProofs
     | Cons x q -> ty_smap_compose f1 f2 g1 g2 x;
       ty_list_smap_compose f1 f2 g1 g2 q
     | _ -> () end
-  
+
   let lemma ty_smap_ho_compose (f1:ty_var -> ty) (f2:ty_var -> ty_var)
     (g1 g2:ty_symbol -> ty_symbol) : unit
     ensures { let s2 = ty_map f2 g2 in
@@ -1570,7 +1570,7 @@ module CommutationProofs
   = assert { let s2 = ty_map f2 g2 in
       extensional_equal (ty_subst (compose s2 f1) (compose g2 g1))
       (compose s2 (ty_subst f1 g1)) }
-  
+
   let lemma ty_list_smap_ho_compose (f1:ty_var -> ty) (f2:ty_var -> ty_var)
     (g1 g2:ty_symbol -> ty_symbol) : unit
     ensures { let s2 = ty_map f2 g2 in
@@ -1579,7 +1579,7 @@ module CommutationProofs
   = assert { let s2 = ty_map f2 g2 in
       extensional_equal (tyl_subst (compose s2 f1) (compose g2 g1))
       (compose (tyl_map f2 g2) (tyl_subst f1 g1)) }
-  
+
   let rec lemma pat_smap_compose (f1 f2:pat_var -> pat_var)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (p:pattern) : unit
@@ -1593,7 +1593,7 @@ module CommutationProofs
     | PApp _ _ l -> pat_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 l
     | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
     end
-  
+
   with lemma pat_list_smap_compose (f1 f2:pat_var -> pat_var)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (pl:list pattern) : unit
@@ -1607,7 +1607,7 @@ module CommutationProofs
       pat_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   let lemma pat_smap_ho_compose (f1 f2:pat_var -> pat_var)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1619,7 +1619,7 @@ module CommutationProofs
       extensional_equal (pat_subst (compose f2 f1) (compose s2 g1)
                                    (compose h2 h1) (compose i2 i1))
         (compose (pat_map f2 g2 h2 i2) (pat_subst f1 g1 h1 i1)) }
-  
+
   let lemma pat_list_smap_ho_compose (f1 f2:pat_var -> pat_var)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1631,7 +1631,7 @@ module CommutationProofs
       extensional_equal (patl_subst (compose f2 f1) (compose s2 g1)
                                         (compose h2 h1) (compose i2 i1))
         (compose (patl_map f2 g2 h2 i2) (patl_subst f1 g1 h1 i1)) }
-  
+
   let rec lemma term_smap_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (t:term 'tv1) : unit
@@ -1656,7 +1656,7 @@ module CommutationProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma term_list_smap_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (tl:list (term 'tv1)) : unit
@@ -1671,7 +1671,7 @@ module CommutationProofs
       term_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   with lemma branch_list_smap_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (brl:list (branch 'tv1)) : unit
@@ -1686,7 +1686,7 @@ module CommutationProofs
       branch_list_smap_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   with lemma branch_smap_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (br:branch 'tv1) : unit
@@ -1700,7 +1700,7 @@ module CommutationProofs
     | (_,right) ->
       term_smap_compose (t_lift f1) (bmap f2) g1 g2 h1 h2 i1 i2 right
     end
-  
+
   let lemma term_smap_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1714,7 +1714,7 @@ module CommutationProofs
       extensional_equal
   (t_subst (compose s2 f1) (compose s'2 g1) (compose h2 h1) (compose i2 i1))
   (compose (t_map f2 g2 h2 i2) (t_subst f1 g1 h1 i1)) }
-  
+
   let lemma term_list_smap_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1729,7 +1729,7 @@ module CommutationProofs
       (tl_subst (compose s2 f1) (compose s'2 g1)
                        (compose h2 h1) (compose i2 i1))
       (compose (tl_map f2 g2 h2 i2) (tl_subst f1 g1 h1 i1)) }
-  
+
   let lemma branch_list_smap_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1744,7 +1744,7 @@ module CommutationProofs
     (brl_subst (compose s2 f1) (compose s'2 g1)
                      (compose h2 h1) (compose i2 i1))
     (compose (brl_map f2 g2 h2 i2) (brl_subst f1 g1 h1 i1)) }
-  
+
   let lemma branch_smap_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> 'tv3)
     (g1:ty_var -> ty) (g2:ty_var -> ty_var) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1759,25 +1759,25 @@ module CommutationProofs
     (br_subst (compose s2 f1) (compose s'2 g1)
                   (compose h2 h1) (compose i2 i1))
     (compose (br_map f2 g2 h2 i2) (br_subst f1 g1 h1 i1)) }
-  
+
   (* Third: rename-then-subst *)
-  
+
   (* Need a small additional commutation lemma *)
-  
+
   let lemma maps_t_lifting (r:'a -> 'b) (s:'b -> term 'c) : unit
     ensures { t_lift (compose s r) =
       compose (t_lift s) (bmap r:bind 'a 'bnd -> bind 'b 'bnd) }
   = assert { compose (t_lift s) (compose (Old:'b -> bind 'b 'bnd) r) =
         compose (compose (t_map Old id id id) s) r &&
       compose (t_lift s) Fresh = compose TVar (Fresh:'bnd -> bind 'c 'bnd) }
-  
+
   let rec lemma ty_maps_compose (f1:ty_var -> ty_var) (f2:ty_var -> ty)
     (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
     ensures { ty_subst (compose f2 f1) (compose g2 g1) ty =
       ty_subst f2 g2 (ty_map f1 g1 ty) }
     variant { ty }
   = match ty with TyApp _ l -> tyl_maps_compose f1 f2 g1 g2 l | _ -> () end
-  
+
   with lemma tyl_maps_compose (f1:ty_var -> ty_var) (f2:ty_var -> ty)
     (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
     ensures { tyl_subst (compose f2 f1) (compose g2 g1) tyl =
@@ -1787,21 +1787,21 @@ module CommutationProofs
     | Cons x q -> ty_maps_compose f1 f2 g1 g2 x;
       tyl_maps_compose f1 f2 g1 g2 q
     | _ -> () end
-  
+
   let lemma ty_maps_ho_compose (f1:ty_var -> ty_var) (f2:ty_var -> ty)
     (g1 g2:ty_symbol -> ty_symbol) : unit
     ensures { ty_subst (compose f2 f1) (compose g2 g1) =
       compose (ty_subst f2 g2) (ty_map f1 g1) }
   = assert { extensional_equal (ty_subst (compose f2 f1) (compose g2 g1))
     (compose (ty_subst f2 g2) (ty_map f1 g1)) }
-  
+
   let lemma tyl_maps_ho_compose (f1:ty_var -> ty_var) (f2:ty_var -> ty)
     (g1 g2:ty_symbol -> ty_symbol) : unit
     ensures { tyl_subst (compose f2 f1) (compose g2 g1) =
       compose (tyl_subst f2 g2) (tyl_map f1 g1) }
   = assert { extensional_equal (tyl_subst (compose f2 f1) (compose g2 g1))
     (compose (tyl_subst f2 g2) (tyl_map f1 g1)) }
-  
+
   let rec lemma pat_maps_compose (f1 f2:pat_var -> pat_var)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (p:pattern) : unit
@@ -1814,7 +1814,7 @@ module CommutationProofs
     | PApp _ _ l -> patl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 l
     | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
     end
-  
+
   with lemma patl_maps_compose (f1 f2:pat_var -> pat_var)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (pl:list pattern) : unit
@@ -1827,7 +1827,7 @@ module CommutationProofs
       pat_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 x
     | _ -> ()
     end
-  
+
   let lemma pat_maps_ho_compose (f1 f2:pat_var -> pat_var)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1837,7 +1837,7 @@ module CommutationProofs
   = assert { extensional_equal
     (pat_subst (compose f2 f1) (compose g2 g1) (compose h2 h1) (compose i2 i1))
     (compose (pat_subst f2 g2 h2 i2) (pat_map f1 g1 h1 i1)) }
-  
+
   let lemma patl_maps_ho_compose (f1 f2:pat_var -> pat_var)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1848,7 +1848,7 @@ module CommutationProofs
       (patl_subst (compose f2 f1) (compose g2 g1)
                   (compose h2 h1) (compose i2 i1))
       (compose (patl_subst f2 g2 h2 i2) (patl_map f1 g1 h1 i1)) }
-  
+
   let rec lemma t_maps_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (t:term 'tv1) : unit
@@ -1870,7 +1870,7 @@ module CommutationProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma tl_maps_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (tl:list (term 'tv1)) : unit
@@ -1883,7 +1883,7 @@ module CommutationProofs
       tl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   with lemma brl_maps_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (brl:list (branch 'tv1)) : unit
@@ -1896,7 +1896,7 @@ module CommutationProofs
       brl_maps_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   with lemma br_maps_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (br:branch 'tv1) : unit
@@ -1908,7 +1908,7 @@ module CommutationProofs
     | (_,right) ->
       t_maps_compose (bmap f1) (t_lift f2) g1 g2 h1 h2 i1 i2 right
     end
-  
+
   let lemma t_maps_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1918,7 +1918,7 @@ module CommutationProofs
   = assert { extensional_equal
     (t_subst (compose f2 f1) (compose g2 g1) (compose h2 h1) (compose i2 i1))
     (compose (t_subst f2 g2 h2 i2) (t_map f1 g1 h1 i1)) }
-  
+
   let lemma tl_maps_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1929,7 +1929,7 @@ module CommutationProofs
       (tl_subst (compose f2 f1) (compose g2 g1)
                        (compose h2 h1) (compose i2 i1))
       (compose (tl_subst f2 g2 h2 i2) (tl_map f1 g1 h1 i1)) }
-  
+
   let lemma brl_maps_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1940,7 +1940,7 @@ module CommutationProofs
     (brl_subst (compose f2 f1) (compose g2 g1)
                        (compose h2 h1) (compose i2 i1))
     (compose (brl_subst f2 g2 h2 i2) (brl_map f1 g1 h1 i1)) }
-  
+
   let lemma br_maps_ho_compose (f1:'tv1 -> 'tv2) (f2:'tv2 -> term 'tv3)
     (g1:ty_var -> ty_var) (g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -1951,20 +1951,20 @@ module CommutationProofs
     (br_subst (compose f2 f1) (compose g2 g1)
                   (compose h2 h1) (compose i2 i1))
     (compose (br_subst f2 g2 h2 i2) (br_map f1 g1 h1 i1)) }
-  
+
   (* Last part: subst-subst composition. *)
-  
+
   (* Need a small additional commutation lemma *)
-  
+
   let lemma subst_ty_var (f:ty_var -> ty) (g:ty_symbol -> ty_symbol) : unit
     ensures { compose (ty_subst f g) TyVar = f }
   = assert { extensional_equal (compose (ty_subst f g) TyVar) f }
-  
+
   let lemma subst_term_var (f:'tv1 -> term 'tv2)
     (g:ty_var -> ty) (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
     ensures { compose (t_subst f g h i) TVar = f }
   = assert { extensional_equal (compose (t_subst f g h i) TVar) f }
-  
+
   let lemma subst_t_lifting (s:'a -> term 'tv1) (f:'tv1 -> term 'tv2)
     (g:ty_var -> ty) (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
     ensures { let sn = t_subst f g h i in
@@ -1982,7 +1982,7 @@ module CommutationProofs
       compose sn' (t_lift s) =
         bfold (compose sn' (compose u2 s)) (compose sn' v2)
     }
-  
+
   let rec lemma ty_subst_compose (f1 f2:ty_var -> ty)
     (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
     ensures { let s2 = ty_subst f2 g2 in
@@ -1990,7 +1990,7 @@ module CommutationProofs
       ty_subst f2 g2 (ty_subst f1 g1 ty) }
     variant { ty }
   = match ty with TyApp _ l -> tyl_subst_compose f1 f2 g1 g2 l | _ -> () end
-  
+
   with lemma tyl_subst_compose (f1 f2:ty_var -> ty)
     (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
     ensures { let s2 = ty_subst f2 g2 in
@@ -2001,7 +2001,7 @@ module CommutationProofs
     | Cons x q -> ty_subst_compose f1 f2 g1 g2 x;
       tyl_subst_compose f1 f2 g1 g2 q
     | _ -> () end
-  
+
   let lemma ty_subst_ho_compose (f1 f2:ty_var -> ty)
     (g1 g2:ty_symbol -> ty_symbol) : unit
     ensures { let s2 = ty_subst f2 g2 in
@@ -2009,7 +2009,7 @@ module CommutationProofs
   = assert { let s2 = ty_subst f2 g2 in
       extensional_equal (ty_subst (compose s2 f1) (compose g2 g1))
       (compose s2 (ty_subst f1 g1)) }
-  
+
   let lemma tyl_subst_ho_compose (f1 f2:ty_var -> ty)
     (g1 g2:ty_symbol -> ty_symbol) : unit
     ensures { let s2 = ty_subst f2 g2 in
@@ -2018,7 +2018,7 @@ module CommutationProofs
   = assert { let s2 = ty_subst f2 g2 in
       extensional_equal (tyl_subst (compose s2 f1) (compose g2 g1))
       (compose (tyl_subst f2 g2) (tyl_subst f1 g1)) }
-  
+
   let rec lemma pat_subst_compose (f1 f2:pat_var -> pat_var)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (p:pattern) : unit
@@ -2032,7 +2032,7 @@ module CommutationProofs
     | PApp _ _ l -> patl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 l
     | POr p1 p2 -> rc p1; rc p2 | PAs p _ -> rc p | _ -> ()
     end
-  
+
   with lemma patl_subst_compose (f1 f2:pat_var -> pat_var)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (pl:list pattern) : unit
@@ -2046,7 +2046,7 @@ module CommutationProofs
       patl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   let lemma pat_subst_ho_compose (f1 f2:pat_var -> pat_var)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -2058,7 +2058,7 @@ module CommutationProofs
       extensional_equal
   (pat_subst (compose f2 f1) (compose s2 g1) (compose h2 h1) (compose i2 i1))
   (compose (pat_subst f2 g2 h2 i2) (pat_subst f1 g1 h1 i1)) }
-  
+
   let lemma patl_subst_ho_compose (f1 f2:pat_var -> pat_var)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -2071,7 +2071,7 @@ module CommutationProofs
       (patl_subst (compose f2 f1) (compose s2 g1)
                       (compose h2 h1) (compose i2 i1))
       (compose (patl_subst f2 g2 h2 i2) (patl_subst f1 g1 h1 i1)) }
-  
+
   let rec lemma t_subst_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (t:term 'tv1) : unit
@@ -2096,7 +2096,7 @@ module CommutationProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma tl_subst_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (tl:list (term 'tv1)) : unit
@@ -2111,7 +2111,7 @@ module CommutationProofs
       tl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   with lemma brl_subst_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (brl:list (branch 'tv1)) : unit
@@ -2126,7 +2126,7 @@ module CommutationProofs
       brl_subst_compose f1 f2 g1 g2 h1 h2 i1 i2 q
     | _ -> ()
     end
-  
+
   with lemma br_subst_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) (br:branch 'tv1) : unit
@@ -2140,7 +2140,7 @@ module CommutationProofs
     | (_,right) ->
       t_subst_compose (t_lift f1) (t_lift f2) g1 g2 h1 h2 i1 i2 right
     end
-  
+
   let lemma t_subst_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -2154,7 +2154,7 @@ module CommutationProofs
       extensional_equal
   (t_subst (compose s2 f1) (compose s'2 g1) (compose h2 h1) (compose i2 i1))
   (compose (t_subst f2 g2 h2 i2) (t_subst f1 g1 h1 i1)) }
-  
+
   let lemma tl_subst_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -2169,7 +2169,7 @@ module CommutationProofs
       (tl_subst (compose s2 f1) (compose s'2 g1)
                        (compose h2 h1) (compose i2 i1))
       (compose (tl_subst f2 g2 h2 i2) (tl_subst f1 g1 h1 i1)) }
-  
+
   let lemma brl_subst_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -2184,7 +2184,7 @@ module CommutationProofs
     (brl_subst (compose s2 f1) (compose s'2 g1)
                      (compose h2 h1) (compose i2 i1))
     (compose (brl_subst f2 g2 h2 i2) (brl_subst f1 g1 h1 i1)) }
-  
+
   let lemma br_subst_ho_compose (f1:'tv1 -> term 'tv2) (f2:'tv2 -> term 'tv3)
     (g1 g2:ty_var -> ty) (h1 h2:ty_symbol -> ty_symbol)
     (i1 i2:lsymbol -> lsymbol) : unit
@@ -2199,109 +2199,109 @@ module CommutationProofs
     (br_subst (compose s2 f1) (compose s'2 g1)
                   (compose h2 h1) (compose i2 i1))
     (compose (br_subst f2 g2 h2 i2) (br_subst f1 g1 h1 i1)) }
-  
+
   (* Renamings as substitutions. *)
-  
-  use import SubstId
-  
+
+  use SubstId
+
   let lemma ty_map_as_subst (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol)
     (ty:ty)
     ensures { ty_map f g ty = ty_subst (compose TyVar f) g ty }
   = ()
-  
+
   let lemma ty_map_as_subst_ho (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol)
     ensures { ty_map f g = ty_subst (compose TyVar f) g }
   = ()
-  
+
   let lemma tyl_map_as_subst (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol)
     (tyl:list ty)
     ensures { tyl_map f g tyl = tyl_subst (compose TyVar f) g tyl }
   = ()
-  
+
   let lemma tyl_map_as_subst_ho (f:ty_var -> ty_var) (g:ty_symbol -> ty_symbol)
     ensures { tyl_map f g = tyl_subst (compose TyVar f) g }
   = assert { extensional_equal (tyl_map f g) (tyl_subst (compose TyVar f) g) }
-  
+
   let lemma pat_map_as_subst (f:pat_var -> pat_var) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (p:pattern)
     ensures { pat_map f g h i p = pat_subst f (compose TyVar g) h i p }
   = assert { pat_subst f (compose TyVar g) h i p =
       pat_subst id TyVar id id (pat_map f g h i p) }
-  
+
   let lemma pat_map_as_subst_ho (f:pat_var -> pat_var) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     ensures { pat_map f g h i = pat_subst f (compose TyVar g) h i }
   = assert { extensional_equal (pat_map f g h i)
       (pat_subst f (compose TyVar g) h i) }
-  
+
   let lemma patl_map_as_subst (f:pat_var -> pat_var) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (pl:list pattern)
     ensures { patl_map f g h i pl = patl_subst f (compose TyVar g) h i pl }
   = assert { patl_subst f (compose TyVar g) h i pl =
       patl_subst id TyVar id id (patl_map f g h i pl) }
-  
+
   let lemma patl_map_as_subst_ho (f:pat_var -> pat_var) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) : unit
     ensures { patl_map f g h i = patl_subst f (compose TyVar g) h i }
   = assert { extensional_equal (patl_map f g h i)
       (patl_subst f (compose TyVar g) h i) }
-  
+
   let lemma t_map_as_subst (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (t:term 'tv1)
     ensures { t_map f g h i t =
       t_subst (compose TVar f) (compose TyVar g) h i t }
   = assert { t_subst (compose TVar f) (compose TyVar g) h i t =
       t_subst TVar TyVar id id (t_map f g h i t) }
-  
+
   let lemma t_map_as_subst_ho (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     ensures { t_map f g h i =
       t_subst (compose TVar f) (compose TyVar g) h i }
   = assert { extensional_equal (t_map f g h i)
       (t_subst (compose TVar f) (compose TyVar g) h i) }
-  
+
   let lemma tl_map_as_subst (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (tl:list (term 'tv1))
     ensures { tl_map f g h i tl =
       tl_subst (compose TVar f) (compose TyVar g) h i tl }
   = assert { tl_subst (compose TVar f) (compose TyVar g) h i tl =
       tl_subst TVar TyVar id id (tl_map f g h i tl) }
-  
+
   let lemma tl_map_as_subst_ho (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     ensures { tl_map f g h i =
       tl_subst (compose TVar f) (compose TyVar g) h i }
   = assert { extensional_equal (tl_map f g h i)
       (tl_subst (compose TVar f) (compose TyVar g) h i) }
-  
+
   let lemma brl_map_as_subst (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (brl:list (branch 'tv1))
     ensures { brl_map f g h i brl =
       brl_subst (compose TVar f) (compose TyVar g) h i brl }
   = assert { brl_subst (compose TVar f) (compose TyVar g) h i brl =
       brl_subst TVar TyVar id id (brl_map f g h i brl) }
-  
+
   let lemma brl_map_as_subst_ho (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     ensures { brl_map f g h i =
       brl_subst (compose TVar f) (compose TyVar g) h i }
   = assert { extensional_equal (brl_map f g h i)
       (brl_subst (compose TVar f) (compose TyVar g) h i) }
-  
+
   let lemma br_map_as_subst (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol) (br:branch 'tv1)
     ensures { br_map f g h i br =
       br_subst (compose TVar f) (compose TyVar g) h i br }
   = assert { br_subst (compose TVar f) (compose TyVar g) h i br =
       br_subst TVar TyVar id id (br_map f g h i br) }
-  
+
   let lemma br_map_as_subst_ho (f:'tv1 -> 'tv2) (g:ty_var -> ty_var)
     (h:ty_symbol -> ty_symbol) (i:lsymbol -> lsymbol)
     ensures { br_map f g h i =
       br_subst (compose TVar f) (compose TyVar g) h i }
   = assert { extensional_equal (br_map f g h i)
       (br_subst (compose TVar f) (compose TyVar g) h i) }
-  
+
   clone MapThenMap with type DMapThenMap.d = unit,
     goal ty_mm,
     goal tyl_mm,
@@ -2319,7 +2319,7 @@ module CommutationProofs
     goal tl_mm_ho,
     goal br_mm_ho,
     goal brl_mm_ho
-  
+
   clone MapThenSubst with type DMapThenSubst.d = unit,
     goal ty_ms,
     goal tyl_ms,
@@ -2337,7 +2337,7 @@ module CommutationProofs
     goal tl_ms_ho,
     goal br_ms_ho,
     goal brl_ms_ho
-  
+
   clone SubstThenMap with type DSubstThenMap.d = unit,
     goal ty_sm,
     goal tyl_sm,
@@ -2355,7 +2355,7 @@ module CommutationProofs
     goal tl_sm_ho,
     goal br_sm_ho,
     goal brl_sm_ho
-  
+
   clone SubstThenSubst with type DSubstThenSubst.d = unit,
     goal ty_ss,
     goal tyl_ss,
@@ -2373,7 +2373,7 @@ module CommutationProofs
     goal tl_ss_ho,
     goal br_ss_ho,
     goal brl_ss_ho
-  
+
   clone MapAsSubst with type DMapAsSubst.d = unit,
     goal ty_mas,
     goal tyl_mas,
@@ -2391,349 +2391,349 @@ module CommutationProofs
     goal tl_mas_ho,
     goal br_mas_ho,
     goal brl_mas_ho
-  
+
 end
 
 (* Structural lemmas about variable inclusion sets.
    Proof delayed to VarsInProofs. *)
 module VarsInFull
-  
+
   clone import support.Dummy as DVarsInFull
   use export VarsIn
-  use import list.List
-  use import support.HOList
-  use import support.HO
-  use import support.Bind
-  
+  use list.List
+  use support.HOList
+  use support.HO
+  use support.Bind
+
   axiom ty_vars_in_all : forall ty. ty_vars_in all all ty
     /\ forall _:d. true
-  
+
   axiom tyl_vars_in_all : forall tyl. tyl_vars_in all all tyl
     /\ forall _:d. true
-  
+
   axiom pat_vars_in_all : forall pat. pat_vars_in all all all all pat
     /\ forall _:d. true
-  
+
   axiom patl_vars_in_all : forall patl. patl_vars_in all all all all patl
     /\ forall _:d. true
-  
+
   axiom t_vars_in_all : forall t:term 'v. t_vars_in all all all all t
     /\ forall _:d. true
-  
+
   axiom tl_vars_in_all : forall tl:list (term 'v). tl_vars_in all all all all tl
     /\ forall _:d. true
-  
+
   axiom br_vars_in_all : forall br:branch 'v. br_vars_in all all all all br
     /\ forall _:d. true
-  
+
   axiom brl_vars_in_all : forall brl:list (branch 'v).
     brl_vars_in all all all all brl
     /\ forall _:d. true
-  
+
   axiom ty_vars_subset : forall a b c d ty.
     subset a b /\ subset c d /\ ty_vars_in a c ty -> ty_vars_in b d ty
     /\ forall _:d. true
-  
+
   axiom tyl_vars_subset : forall a b c d tyl.
     subset a b /\ subset c d /\ tyl_vars_in a c tyl -> tyl_vars_in b d tyl
     /\ forall _:d. true
-  
+
   axiom pat_vars_subset : forall a b c d e f g h pat.
     subset a b /\ subset c d /\ subset e f /\ subset g h /\
     pat_vars_in a c e g pat -> pat_vars_in b d f h pat
     /\ forall _:d. true
-  
+
   axiom patl_vars_subset : forall a b c d e f g h patl.
     subset a b /\ subset c d /\ subset e f /\ subset g h /\
     patl_vars_in a c e g patl -> patl_vars_in b d f h patl
     /\ forall _:d. true
-  
+
   axiom t_vars_subset : forall a b:'v -> bool,c d e f g h t.
     subset a b /\ subset c d /\ subset e f /\ subset g h /\
     t_vars_in a c e g t -> t_vars_in b d f h t
     /\ forall _:d. true
-  
+
   axiom tl_vars_subset : forall a b:'v -> bool,c d e f g h tl.
     subset a b /\ subset c d /\ subset e f /\ subset g h /\
     tl_vars_in a c e g tl -> tl_vars_in b d f h tl
     /\ forall _:d. true
-  
+
   axiom br_vars_subset : forall a b:'v -> bool,c d e f g h br.
     subset a b /\ subset c d /\ subset e f /\ subset g h /\
     br_vars_in a c e g br -> br_vars_in b d f h br
     /\ forall _:d. true
-  
+
   axiom brl_vars_subset : forall a b:'v -> bool,c d e f g h brl.
     subset a b /\ subset c d /\ subset e f /\ subset g h /\
     brl_vars_in a c e g brl -> brl_vars_in b d f h brl
     /\ forall _:d. true
-  
+
 end
 
 (* Relational lemmas between sets of free variables of a term and its
    renaming. Proof delayed to VarsInProofs as well. *)
 module MapVarsIn
-  
+
   clone import support.Dummy as DMapVarsIn
   use export VarsIn
   use export Maps
-  use import list.List
-  use import support.HOList
-  use import support.HO
-  use import support.Bind
-  
+  use list.List
+  use support.HOList
+  use support.HO
+  use support.Bind
+
   axiom ty_map_vars_in : forall a ab b c cd d ty.
     maps_to a ab b /\ maps_to c cd d /\ ty_vars_in a c ty ->
     ty_vars_in b d (ty_map ab cd ty)
     /\ forall _:d. true
-  
+
   axiom tyl_map_vars_in : forall a ab b c cd d tyl.
     maps_to a ab b /\ maps_to c cd d /\
     tyl_vars_in a c tyl -> tyl_vars_in b d (tyl_map ab cd tyl)
     /\ forall _:d. true
-  
+
   axiom pat_map_vars_in : forall a ab b c cd d e ef f g gh h pat.
     maps_to a ab b /\ maps_to c cd d /\ maps_to e ef f /\ maps_to g gh h /\
     pat_vars_in a c e g pat -> pat_vars_in b d f h (pat_map ab cd ef gh pat)
     /\ forall _:d. true
-  
+
   axiom patl_map_vars_in : forall a ab b c cd d e ef f g gh h patl.
     maps_to a ab b /\ maps_to c cd d /\ maps_to e ef f /\ maps_to g gh h /\
     patl_vars_in a c e g patl ->
     patl_vars_in b d f h (patl_map ab cd ef gh patl)
     /\ forall _:d. true
-  
+
   axiom t_map_vars_in : forall a,ab:'a -> 'b,b c cd d e ef f g gh h t.
     maps_to a ab b /\ maps_to c cd d /\ maps_to e ef f /\ maps_to g gh h /\
     t_vars_in a c e g t -> t_vars_in b d f h (t_map ab cd ef gh t)
     /\ forall _:d. true
-  
+
   axiom tl_map_vars_in : forall a,ab:'a -> 'b,b c cd d e ef f g gh h tl.
     maps_to a ab b /\ maps_to c cd d /\ maps_to e ef f /\ maps_to g gh h /\
     tl_vars_in a c e g tl -> tl_vars_in b d f h (tl_map ab cd ef gh tl)
     /\ forall _:d. true
-  
+
   axiom br_map_vars_in : forall a,ab:'a -> 'b,b c cd d e ef f g gh h br.
     maps_to a ab b /\ maps_to c cd d /\ maps_to e ef f /\ maps_to g gh h /\
     br_vars_in a c e g br -> br_vars_in b d f h (br_map ab cd ef gh br)
     /\ forall _:d. true
-  
+
   axiom brl_map_vars_in : forall a,ab:'a -> 'b,b c cd d e ef f g gh h brl.
     maps_to a ab b /\ maps_to c cd d /\ maps_to e ef f /\ maps_to g gh h /\
     brl_vars_in a c e g brl -> brl_vars_in b d f h (brl_map ab cd ef gh brl)
     /\ forall _:d. true
-  
+
 end
 
 (* Relational lemmas between sets of free variables of a term and after
    a substitution. Proof delayed to VarsInProofs as well. *)
 module SubstVarsIn
-  
+
   clone import support.Dummy as DSubstVarsIn
   use export VarsIn
   use export Substs
-  use import list.List
-  use import support.HOList
-  use import support.HO
-  use import support.Bind
-  
+  use list.List
+  use support.HOList
+  use support.HO
+  use support.Bind
+
   axiom ty_subst_vars_in : forall a ab b c cd d ty.
     maps_to a ab (ty_vars_in b d) /\ maps_to c cd d /\ ty_vars_in a c ty ->
     ty_vars_in b d (ty_subst ab cd ty)
     /\ forall _:d. true
-  
+
   axiom tyl_subst_vars_in : forall a ab b c cd d tyl.
     maps_to a ab (ty_vars_in b d) /\ maps_to c cd d /\
     tyl_vars_in a c tyl -> tyl_vars_in b d (tyl_subst ab cd tyl)
     /\ forall _:d. true
-  
+
   axiom pat_subst_vars_in : forall a ab b c cd d e ef f g gh h pat.
     maps_to a ab b /\ maps_to c cd (ty_vars_in d f) /\
     maps_to e ef f /\ maps_to g gh h /\
     pat_vars_in a c e g pat -> pat_vars_in b d f h (pat_subst ab cd ef gh pat)
     /\ forall _:d. true
-  
+
   axiom patl_subst_vars_in : forall a ab b c cd d e ef f g gh h patl.
     maps_to a ab b /\ maps_to c cd (ty_vars_in d f) /\
     maps_to e ef f /\ maps_to g gh h /\
     patl_vars_in a c e g patl ->
     patl_vars_in b d f h (patl_subst ab cd ef gh patl)
     /\ forall _:d. true
-  
+
   axiom t_subst_vars_in : forall a,ab:'a -> term 'b,b c cd d e ef f g gh h t.
     maps_to a ab (t_vars_in b d f h) /\ maps_to c cd (ty_vars_in d f) /\
     maps_to e ef f /\ maps_to g gh h /\
     t_vars_in a c e g t -> t_vars_in b d f h (t_subst ab cd ef gh t)
     /\ forall _:d. true
-  
+
   axiom tl_subst_vars_in : forall a,ab:'a -> term 'b,b c cd d e ef f g gh h tl.
     maps_to a ab (t_vars_in b d f h) /\ maps_to c cd (ty_vars_in d f) /\
     maps_to e ef f /\ maps_to g gh h /\
     tl_vars_in a c e g tl -> tl_vars_in b d f h (tl_subst ab cd ef gh tl)
     /\ forall _:d. true
-  
+
   axiom br_subst_vars_in : forall a,ab:'a -> term 'b,b c cd d e ef f g gh h br.
     maps_to a ab (t_vars_in b d f h) /\ maps_to c cd (ty_vars_in d f) /\
     maps_to e ef f /\ maps_to g gh h /\
     br_vars_in a c e g br -> br_vars_in b d f h (br_subst ab cd ef gh br)
     /\ forall _:d. true
-  
+
   axiom brl_subst_vars_in :
     forall a,ab:'a -> term 'b,b c cd d e ef f g gh h brl.
       maps_to a ab (t_vars_in b d f h) /\ maps_to c cd (ty_vars_in d f) /\
       maps_to e ef f /\ maps_to g gh h /\
       brl_vars_in a c e g brl -> brl_vars_in b d f h (brl_subst ab cd ef gh brl)
       /\ forall _:d. true
-  
+
 end
 
 (* Congruence lemmas for maps. Proofs delayed to VarsInProofs as well. *)
 module MapCong
-  
+
   clone import support.Dummy as DMapCong
   use export VarsIn
   use export Maps
-  use import list.List
-  use import support.HOList
-  use import support.HO
-  use import support.Bind
-  
+  use list.List
+  use support.HOList
+  use support.HO
+  use support.Bind
+
   axiom ty_map_congruence : forall a fa ga b fb gb ty.
     equalizer a fa ga /\ equalizer b fb gb /\ ty_vars_in a b ty ->
     ty_map fa fb ty = ty_map ga gb ty
     /\ forall _:d. true
-  
+
   axiom tyl_map_congruence : forall a fa ga b fb gb tyl.
     equalizer a fa ga /\ equalizer b fb gb /\ tyl_vars_in a b tyl ->
     tyl_map fa fb tyl = tyl_map ga gb tyl
     /\ forall _:d. true
-  
+
   axiom pat_map_congruence : forall a fa ga b fb gb c fc gc d fd gd pat.
     equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
     equalizer d fd gd /\ pat_vars_in a b c d pat ->
     pat_map fa fb fc fd pat = pat_map ga gb gc gd pat
     /\ forall _:d. true
-  
+
   axiom patl_map_congruence : forall a fa ga b fb gb c fc gc d fd gd patl.
     equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
     equalizer d fd gd /\ patl_vars_in a b c d patl ->
     patl_map fa fb fc fd patl = patl_map ga gb gc gd patl
     /\ forall _:d. true
-  
+
   axiom t_map_congruence : forall a,fa ga:'a -> 'b,b fb gb c fc gc d fd gd t.
     equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
     equalizer d fd gd /\ t_vars_in a b c d t ->
     t_map fa fb fc fd t = t_map ga gb gc gd t
     /\ forall _:d. true
-  
+
   axiom tl_map_congruence : forall a,fa ga:'a -> 'b,b fb gb c fc gc d fd gd tl.
     equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
     equalizer d fd gd /\ tl_vars_in a b c d tl ->
     tl_map fa fb fc fd tl = tl_map ga gb gc gd tl
     /\ forall _:d. true
-  
+
   axiom br_map_congruence : forall a,fa ga:'a -> 'b,b fb gb c fc gc d fd gd br.
     equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
     equalizer d fd gd /\ br_vars_in a b c d br ->
     br_map fa fb fc fd br = br_map ga gb gc gd br
     /\ forall _:d. true
-  
+
   axiom brl_map_congruence :
     forall a,fa ga:'a -> 'b,b fb gb c fc gc d fd gd brl.
       equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
       equalizer d fd gd /\ brl_vars_in a b c d brl ->
       brl_map fa fb fc fd brl = brl_map ga gb gc gd brl
     /\ forall _:d. true
-  
+
 end
 
 (* Congruence lemmas for substitutions.
    Proofs delayed to VarsInProofs as well. *)
 module SubstCong
-  
+
   clone import support.Dummy as DSubstCong
   use export VarsIn
   use export Substs
-  use import list.List
-  use import support.HOList
-  use import support.HO
-  use import support.Bind
-  
+  use list.List
+  use support.HOList
+  use support.HO
+  use support.Bind
+
   axiom ty_subst_congruence : forall a fa ga b fb gb ty.
     equalizer a fa ga /\ equalizer b fb gb /\ ty_vars_in a b ty ->
     ty_subst fa fb ty = ty_subst ga gb ty
     /\ forall _:d. true
-  
+
   axiom tyl_subst_congruence : forall a fa ga b fb gb tyl.
     equalizer a fa ga /\ equalizer b fb gb /\ tyl_vars_in a b tyl ->
     tyl_subst fa fb tyl = tyl_subst ga gb tyl
     /\ forall _:d. true
-  
+
   axiom pat_subst_congruence : forall a fa ga b fb gb c fc gc d fd gd pat.
     equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
     equalizer d fd gd /\ pat_vars_in a b c d pat ->
     pat_subst fa fb fc fd pat = pat_subst ga gb gc gd pat
     /\ forall _:d. true
-  
+
   axiom patl_subst_congruence : forall a fa ga b fb gb c fc gc d fd gd patl.
     equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
     equalizer d fd gd /\ patl_vars_in a b c d patl ->
     patl_subst fa fb fc fd patl = patl_subst ga gb gc gd patl
     /\ forall _:d. true
-  
+
   axiom t_subst_congruence :
     forall a,fa ga:'a -> term 'b,b fb gb c fc gc d fd gd t.
       equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
       equalizer d fd gd /\ t_vars_in a b c d t ->
       t_subst fa fb fc fd t = t_subst ga gb gc gd t
     /\ forall _:d. true
-  
-  axiom tl_subst_congruence : 
+
+  axiom tl_subst_congruence :
     forall a,fa ga:'a -> term 'b,b fb gb c fc gc d fd gd tl.
       equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
       equalizer d fd gd /\ tl_vars_in a b c d tl ->
       tl_subst fa fb fc fd tl = tl_subst ga gb gc gd tl
     /\ forall _:d. true
-  
-  axiom br_subst_congruence : 
+
+  axiom br_subst_congruence :
     forall a,fa ga:'a -> term 'b,b fb gb c fc gc d fd gd br.
       equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
       equalizer d fd gd /\ br_vars_in a b c d br ->
       br_subst fa fb fc fd br = br_subst ga gb gc gd br
     /\ forall _:d. true
-  
+
   axiom brl_subst_congruence :
     forall a,fa ga:'a -> term 'b,b fb gb c fc gc d fd gd brl.
       equalizer a fa ga /\ equalizer b fb gb /\ equalizer c fc gc /\
       equalizer d fd gd /\ brl_vars_in a b c d brl ->
       brl_subst fa fb fc fd brl = brl_subst ga gb gc gd brl
     /\ forall _:d. true
-  
+
 end
 
 (* Proofs for: VarsInFull,MapVarsIn,SubstVarsIn,MapExt,and SubstExt *)
 module VarsInProofs
-  
-  use import VarsIn
-  use import Maps
-  use import Substs
-  use import list.List
-  use import MapId
-  use import support.HOListFull
-  use import support.HOFull
-  use import support.BindFull
-  use import support.NoDiscriminate
-  
+
+  use VarsIn
+  use Maps
+  use Substs
+  use list.List
+  use MapId
+  use support.HOListFull
+  use support.HOFull
+  use support.BindFull
+  use support.NoDiscriminate
+
   let rec lemma ty_vars_in_all (ty:ty) : unit
     ensures { ty_vars_in all all ty }
     variant { ty }
   = match ty with TyApp _ l -> tyl_vars_in_all l | _ -> () end
-  
+
   with lemma tyl_vars_in_all (tyl:list ty) : unit
     ensures { tyl_vars_in all all tyl }
     variant { tyl }
   = match tyl with Cons x q -> ty_vars_in_all x; tyl_vars_in_all q | _ -> () end
-  
+
   let rec lemma pat_vars_in_all (pat:pattern) : unit
     ensures { pat_vars_in all all all all pat }
     variant { pat }
@@ -2743,12 +2743,12 @@ module VarsInProofs
     | PApp _ _ pl -> patl_vars_in_all pl
     | _ -> ()
     end
-  
+
   with lemma patl_vars_in_all (pl:list (pattern)) : unit
     ensures { patl_vars_in all all all all pl }
     variant { pl }
   = match pl with Cons x q -> pat_vars_in_all x;patl_vars_in_all q | _ -> () end
-  
+
   let rec lemma t_vars_in_all (t:term 'tv) : unit
     ensures { t_vars_in all all all all t }
     variant { t }
@@ -2763,24 +2763,24 @@ module VarsInProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma tl_vars_in_all (tl:list (term 'tv)) : unit
     ensures { tl_vars_in all all all all tl }
     variant { tl }
   = match tl with Cons x q -> t_vars_in_all x;tl_vars_in_all q | _ -> () end
-  
+
   with lemma br_vars_in_all (br:branch 'tv) : unit
     ensures { br_vars_in all all all all br }
     variant { br }
   = match br with
     | (_,r) -> t_vars_in_all r
     end
-  
+
   with lemma brl_vars_in_all (brl:list (branch 'tv)) : unit
     ensures { brl_vars_in all all all all brl }
     variant { brl }
   = match brl with Cons x q -> br_vars_in_all x;brl_vars_in_all q | _ -> () end
-  
+
   let rec lemma ty_map_vars_in
     (pf:ty_var -> bool) (f:ty_var -> ty_var) (qf:ty_var -> bool)
     (pg:ty_symbol -> bool) (g:ty_symbol -> ty_symbol) (qg:ty_symbol -> bool)
@@ -2794,7 +2794,7 @@ module VarsInProofs
     | TyApp _ l -> tyl_map_vars_in pf f qf pg g qg l
     | _ -> ()
     end
-  
+
   with lemma tyl_map_vars_in
     (pf:ty_var -> bool) (f:ty_var -> ty_var) (qf:ty_var -> bool)
     (pg:ty_symbol -> bool) (g:ty_symbol -> ty_symbol) (qg:ty_symbol -> bool)
@@ -2809,7 +2809,7 @@ module VarsInProofs
       tyl_map_vars_in pf f qf pg g qg q
     | _ -> ()
     end
-  
+
   let rec lemma pat_map_vars_in
     (pf:pat_var -> bool) (f:pat_var -> pat_var) (qf:pat_var -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
@@ -2830,7 +2830,7 @@ module VarsInProofs
     | PAs p _ -> rc p
     | _ -> ()
     end
-  
+
   with lemma patl_map_vars_in
     (pf:pat_var -> bool) (f:pat_var -> pat_var) (qf:pat_var -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
@@ -2849,7 +2849,7 @@ module VarsInProofs
       patl_map_vars_in pf f qf pg g qg ph h qh pi i qi q
     | _ -> ()
     end
-  
+
   let rec lemma t_map_vars_in
     (pf:'tv1 -> bool) (f:'tv1 -> 'tv2) (qf:'tv2 -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
@@ -2887,7 +2887,7 @@ module VarsInProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma tl_map_vars_in
     (pf:'tv1 -> bool) (f:'tv1 -> 'tv2) (qf:'tv2 -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
@@ -2906,7 +2906,7 @@ module VarsInProofs
       tl_map_vars_in pf f qf pg g qg ph h qh pi i qi q
     | _ -> ()
     end
-  
+
   with lemma br_map_vars_in
     (pf:'tv1 -> bool) (f:'tv1 -> 'tv2) (qf:'tv2 -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
@@ -2927,7 +2927,7 @@ module VarsInProofs
         && false };
       t_map_vars_in bf (bmap f) (bfold qf all) pg g qg ph h qh pi i qi right
     end
-  
+
   with lemma brl_map_vars_in
     (pf:'tv1 -> bool) (f:'tv1 -> 'tv2) (qf:'tv2 -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty_var) (qg:ty_var -> bool)
@@ -2946,7 +2946,7 @@ module VarsInProofs
       brl_map_vars_in pf f qf pg g qg ph h qh pi i qi q
     | _ -> ()
     end
-  
+
   let lemma ty_map_subset (a b:ty_var -> bool) (c d:ty_symbol -> bool)
     (ty:ty) : unit
     requires { subset a b }
@@ -2954,7 +2954,7 @@ module VarsInProofs
     requires { ty_vars_in a c ty }
     ensures { ty_vars_in b d ty }
   = ty_map_vars_in a id b c id d ty
-  
+
   let lemma tyl_map_subset (a b:ty_var -> bool) (c d:ty_symbol -> bool)
     (tyl:list ty) : unit
     requires { subset a b }
@@ -2962,7 +2962,7 @@ module VarsInProofs
     requires { tyl_vars_in a c tyl }
     ensures { tyl_vars_in b d tyl }
   = tyl_map_vars_in a id b c id d tyl
-  
+
   let lemma pat_map_subset (a b:pat_var -> bool)
     (c d:ty_var -> bool) (e f:ty_symbol -> bool) (g h:lsymbol -> bool)
     (pat:pattern) : unit
@@ -2973,7 +2973,7 @@ module VarsInProofs
     requires { pat_vars_in a c e g pat }
     ensures { pat_vars_in b d f h pat }
   = pat_map_vars_in a id b c id d e id f g id h pat
-  
+
   let lemma patl_map_subset (a b:pat_var -> bool)
     (c d:ty_var -> bool) (e f:ty_symbol -> bool) (g h:lsymbol -> bool)
     (patl:list pattern) : unit
@@ -2984,8 +2984,8 @@ module VarsInProofs
     requires { patl_vars_in a c e g patl }
     ensures { patl_vars_in b d f h patl }
   = patl_map_vars_in a id b c id d e id f g id h patl
-  
-  
+
+
   let lemma t_map_subset (a b:'v -> bool)
     (c d:ty_var -> bool) (e f:ty_symbol -> bool) (g h:lsymbol -> bool)
     (t:term 'v) : unit
@@ -2996,7 +2996,7 @@ module VarsInProofs
     requires { t_vars_in a c e g t }
     ensures { t_vars_in b d f h t }
   = t_map_vars_in a id b c id d e id f g id h t
-  
+
   let lemma tl_map_subset (a b:'v -> bool)
     (c d:ty_var -> bool) (e f:ty_symbol -> bool) (g h:lsymbol -> bool)
     (tl:list (term 'v)) : unit
@@ -3007,7 +3007,7 @@ module VarsInProofs
     requires { tl_vars_in a c e g tl }
     ensures { tl_vars_in b d f h tl }
   = tl_map_vars_in a id b c id d e id f g id h tl
-  
+
   let lemma br_map_subset (a b:'v -> bool)
     (c d:ty_var -> bool) (e f:ty_symbol -> bool) (g h:lsymbol -> bool)
     (br:branch 'v) : unit
@@ -3018,7 +3018,7 @@ module VarsInProofs
     requires { br_vars_in a c e g br }
     ensures { br_vars_in b d f h br }
   = br_map_vars_in a id b c id d e id f g id h br
-  
+
   let lemma brl_map_subset (a b:'v -> bool)
     (c d:ty_var -> bool) (e f:ty_symbol -> bool) (g h:lsymbol -> bool)
     (brl:list (branch 'v)) : unit
@@ -3029,7 +3029,7 @@ module VarsInProofs
     requires { brl_vars_in a c e g brl }
     ensures { brl_vars_in b d f h brl }
   = brl_map_vars_in a id b c id d e id f g id h brl
-  
+
   let rec lemma ty_subst_vars_in
     (pf:ty_var -> bool) (f:ty_var -> ty) (qf:ty_var -> bool)
     (pg:ty_symbol -> bool) (g:ty_symbol -> ty_symbol) (qg:ty_symbol -> bool)
@@ -3043,7 +3043,7 @@ module VarsInProofs
     | TyApp _ l -> tyl_subst_vars_in pf f qf pg g qg l
     | _ -> ()
     end
-  
+
   with lemma tyl_subst_vars_in
     (pf:ty_var -> bool) (f:ty_var -> ty) (qf:ty_var -> bool)
     (pg:ty_symbol -> bool) (g:ty_symbol -> ty_symbol) (qg:ty_symbol -> bool)
@@ -3058,7 +3058,7 @@ module VarsInProofs
       tyl_subst_vars_in pf f qf pg g qg q
     | _ -> ()
     end
-  
+
   let rec lemma pat_subst_vars_in
     (pf:pat_var -> bool) (f:pat_var -> pat_var) (qf:pat_var -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
@@ -3079,7 +3079,7 @@ module VarsInProofs
     | PAs p _ -> rc p
     | _ -> ()
     end
-  
+
   with lemma patl_subst_vars_in
     (pf:pat_var -> bool) (f:pat_var -> pat_var) (qf:pat_var -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
@@ -3098,7 +3098,7 @@ module VarsInProofs
       patl_subst_vars_in pf f qf pg g qg ph h qh pi i qi q
     | _ -> ()
     end
-  
+
   let rec lemma t_subst_vars_in
     (pf:'tv1 -> bool) (f:'tv1 -> term 'tv2) (qf:'tv2 -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
@@ -3142,7 +3142,7 @@ module VarsInProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma tl_subst_vars_in
     (pf:'tv1 -> bool) (f:'tv1 -> term 'tv2) (qf:'tv2 -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
@@ -3161,7 +3161,7 @@ module VarsInProofs
       tl_subst_vars_in pf f qf pg g qg ph h qh pi i qi q
     | _ -> ()
     end
-  
+
   with lemma br_subst_vars_in
     (pf:'tv1 -> bool) (f:'tv1 -> term 'tv2) (qf:'tv2 -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
@@ -3185,7 +3185,7 @@ module VarsInProofs
       t_subst_vars_in bf (t_lift f) (bfold qf all)
         pg g qg ph h qh pi i qi right
     end
-  
+
   with lemma brl_subst_vars_in
     (pf:'tv1 -> bool) (f:'tv1 -> term 'tv2) (qf:'tv2 -> bool)
     (pg:ty_var -> bool) (g:ty_var -> ty) (qg:ty_var -> bool)
@@ -3204,7 +3204,7 @@ module VarsInProofs
       brl_subst_vars_in pf f qf pg g qg ph h qh pi i qi q
     | _ -> ()
     end
-  
+
   let rec lemma ty_subst_congruence (sf:ty_var -> bool) (f1 f2:ty_var -> ty)
     (sg:ty_symbol -> bool) (g1 g2:ty_symbol -> ty_symbol) (ty:ty) : unit
     requires { equalizer sf f1 f2 }
@@ -3216,7 +3216,7 @@ module VarsInProofs
     | TyApp _ l -> tyl_subst_congruence sf f1 f2 sg g1 g2 l
     | _ -> ()
     end
-  
+
   with lemma tyl_subst_congruence (sf:ty_var -> bool) (f1 f2:ty_var -> ty)
     (sg:ty_symbol -> bool) (g1 g2:ty_symbol -> ty_symbol) (tyl:list ty) : unit
     requires { equalizer sf f1 f2 }
@@ -3229,7 +3229,7 @@ module VarsInProofs
       tyl_subst_congruence sf f1 f2 sg g1 g2 q
     | _ -> ()
     end
-  
+
   let rec lemma pat_subst_congruence
     (sf:pat_var -> bool) (f1 f2:pat_var -> pat_var)
     (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
@@ -3249,7 +3249,7 @@ module VarsInProofs
     | PAs p _ -> rc p
     | _ -> ()
     end
-  
+
   with lemma patl_subst_congruence
     (sf:pat_var -> bool) (f1 f2:pat_var -> pat_var)
     (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
@@ -3267,7 +3267,7 @@ module VarsInProofs
       patl_subst_congruence sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 q
     | _ -> ()
     end
-  
+
   let rec lemma t_subst_congruence
     (sf:'tv1 -> bool) (f1 f2:'tv1 -> term 'tv2)
     (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
@@ -3323,7 +3323,7 @@ module VarsInProofs
     | TNot t -> rc t
     | _ -> ()
     end
-  
+
   with lemma tl_subst_congruence
     (sf:'tv1 -> bool) (f1 f2:'tv1 -> term 'tv2)
     (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
@@ -3341,7 +3341,7 @@ module VarsInProofs
       tl_subst_congruence sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 q
     | _ -> ()
     end
-  
+
   with lemma br_subst_congruence
     (sf:'tv1 -> bool) (f1 f2:'tv1 -> term 'tv2)
     (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
@@ -3367,7 +3367,7 @@ module VarsInProofs
         end && false };
       t_subst_congruence bf tf1 tf2 sg g1 g2 sh h1 h2 si i1 i2 right
     end
-  
+
   with lemma brl_subst_congruence
     (sf:'tv1 -> bool) (f1 f2:'tv1 -> term 'tv2)
     (sg:ty_var -> bool) (g1 g2:ty_var -> ty)
@@ -3386,9 +3386,9 @@ module VarsInProofs
       brl_subst_congruence sf f1 f2 sg g1 g2 sh h1 h2 si i1 i2 q
     | _ -> ()
     end
-  
-  use import MapAsSubst
-  
+
+  use MapAsSubst
+
   clone VarsInFull with type DVarsInFull.d = unit,
     goal ty_vars_in_all,
     goal tyl_vars_in_all,
@@ -3406,7 +3406,7 @@ module VarsInProofs
     goal tl_vars_subset,
     goal br_vars_subset,
     goal brl_vars_subset
-  
+
   clone MapVarsIn with type DMapVarsIn.d = unit,
     goal ty_map_vars_in,
     goal tyl_map_vars_in,
@@ -3416,7 +3416,7 @@ module VarsInProofs
     goal tl_map_vars_in,
     goal br_map_vars_in,
     goal brl_map_vars_in
-  
+
   clone SubstVarsIn with type DSubstVarsIn.d = unit,
     goal ty_subst_vars_in,
     goal tyl_subst_vars_in,
@@ -3426,7 +3426,7 @@ module VarsInProofs
     goal tl_subst_vars_in,
     goal br_subst_vars_in,
     goal brl_subst_vars_in
-  
+
   clone MapCong with type DMapCong.d = unit,
     goal ty_map_congruence,
     goal tyl_map_congruence,
@@ -3436,7 +3436,7 @@ module VarsInProofs
     goal tl_map_congruence,
     goal br_map_congruence,
     goal brl_map_congruence
-  
+
   clone SubstCong with type DSubstCong.d = unit,
     goal ty_subst_congruence,
     goal tyl_subst_congruence,
@@ -3446,54 +3446,54 @@ module VarsInProofs
     goal tl_subst_congruence,
     goal br_subst_congruence,
     goal brl_subst_congruence
-  
+
 end
 
 (* Free variables sets are minimal inclusion sets. Proofs in FreeVarsInProof.*)
 module FreeVarsIn
-  
+
   clone import support.Dummy as DFreeVarsIn
   use export FreeVars
   use export VarsIn
-  use import list.List
-  use import support.HO
-  use import support.Bind
-  
+  use list.List
+  use support.HO
+  use support.Bind
+
   axiom pat_pv_free_var_minimal : forall s1 s2 s3 s4 pat.
     pat_vars_in s1 s2 s3 s4 pat ->
     pat_vars_in (pat_pv_free_var pat) s2 s3 s4 pat /\
     subset (pat_pv_free_var pat) s1
     /\ forall _:d.true
-  
+
   axiom patl_pv_free_var_minimal : forall s1 s2 s3 s4 patl.
     patl_vars_in s1 s2 s3 s4 patl ->
     patl_vars_in (patl_pv_free_var patl) s2 s3 s4 patl /\
     subset (patl_pv_free_var patl) s1
     /\ forall _:d.true
-  
+
   axiom ty_tyv_free_var_minimal : forall s1 s2 ty.
     ty_vars_in s1 s2 ty ->
     ty_vars_in (ty_tyv_free_var ty) s2 ty /\
     subset (ty_tyv_free_var ty) s1
     /\ forall _:d.true
-  
+
   axiom tyl_tyv_free_var_minimal : forall s1 s2 tyl.
     tyl_vars_in s1 s2 tyl ->
     tyl_vars_in (tyl_tyv_free_var tyl) s2 tyl /\
     subset (tyl_tyv_free_var tyl) s1
     /\ forall _:d.true
-  
+
 end
 
 module FreeVarsInProof
-  
-  use import FreeVars
-  use import VarsInFull
-  use import list.List
-  use import support.HOFull
-  use import support.BindFull
-  use import support.NoDiscriminate
-  
+
+  use FreeVars
+  use VarsInFull
+  use list.List
+  use support.HOFull
+  use support.BindFull
+  use support.NoDiscriminate
+
   let rec lemma pat_pv_free_var_minimal (s1:pat_var -> bool)
     (s2:ty_var -> bool) (s3:ty_symbol -> bool) (s4:lsymbol -> bool)
     (pat:pattern) : unit
@@ -3508,7 +3508,7 @@ module FreeVarsInProof
     | PApp _ _ pl -> patl_pv_free_var_minimal s1 s2 s3 s4 pl
     | _ -> ()
     end
-  
+
   with lemma patl_pv_free_var_minimal (s1:pat_var -> bool)
     (s2:ty_var -> bool) (s3:ty_symbol -> bool) (s4:lsymbol -> bool)
     (patl:list pattern) : unit
@@ -3521,7 +3521,7 @@ module FreeVarsInProof
       patl_pv_free_var_minimal s1 s2 s3 s4 q
     | _ -> ()
     end
-  
+
   let rec lemma ty_tyv_free_var_minimal (s1:ty_var -> bool)
     (s2:ty_symbol -> bool) (ty:ty) : unit
     requires { ty_vars_in s1 s2 ty }
@@ -3532,7 +3532,7 @@ module FreeVarsInProof
     | TyVar _ -> ()
     | TyApp _ l -> tyl_tyv_free_var_minimal s1 s2 l
     end
-  
+
   with lemma tyl_tyv_free_var_minimal (s1:ty_var -> bool)
     (s2:ty_symbol -> bool) (tyl:list ty) : unit
     requires { tyl_vars_in s1 s2 tyl }
@@ -3544,13 +3544,13 @@ module FreeVarsInProof
     | Cons x q -> ty_tyv_free_var_minimal s1 s2 x;
       tyl_tyv_free_var_minimal s1 s2 q
     end
-  
+
   clone FreeVarsIn with type DFreeVarsIn.d = unit,
     goal pat_pv_free_var_minimal,
     goal patl_pv_free_var_minimal,
     goal ty_tyv_free_var_minimal,
     goal tyl_tyv_free_var_minimal
-  
+
 end
 
 

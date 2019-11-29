@@ -10,41 +10,33 @@
 <!ATTLIST prover memlimit CDATA #IMPLIED>
 <!ATTLIST prover steplimit CDATA #IMPLIED>
 
-<!ELEMENT file (theory*)>
-<!ATTLIST file name CDATA #REQUIRED>
-<!ATTLIST file expanded CDATA #IMPLIED>
+<!ELEMENT file (path*, theory*)>
+<!ATTLIST file name CDATA #IMPLIED>
 <!ATTLIST file verified CDATA #IMPLIED>
+<!ATTLIST file proved CDATA #IMPLIED>
+
+<!ELEMENT path EMPTY>
+<!ATTLIST path name CDATA #REQUIRED>
 
 <!ELEMENT theory (label*,goal*)>
 <!ATTLIST theory name CDATA #REQUIRED>
-<!ATTLIST theory expanded CDATA #IMPLIED>
 <!ATTLIST theory verified CDATA #IMPLIED>
-<!ATTLIST theory sum CDATA #IMPLIED>
-<!ATTLIST theory locfile CDATA #IMPLIED>
-<!ATTLIST theory loclnum CDATA #IMPLIED>
-<!ATTLIST theory loccnumb CDATA #IMPLIED>
-<!ATTLIST theory loccnume CDATA #IMPLIED>
+<!ATTLIST theory proved CDATA #IMPLIED>
 
-<!ELEMENT goal (label*, proof*, transf*, metas*)>
+<!ELEMENT goal (label*, proof*, transf*)>
 <!ATTLIST goal name CDATA #REQUIRED>
 <!ATTLIST goal expl CDATA #IMPLIED>
 <!ATTLIST goal sum CDATA #IMPLIED>
 <!ATTLIST goal shape CDATA #IMPLIED>
 <!ATTLIST goal proved CDATA #IMPLIED>
-<!ATTLIST goal expanded CDATA #IMPLIED>
-<!ATTLIST goal locfile CDATA #IMPLIED>
-<!ATTLIST goal loclnum CDATA #IMPLIED>
-<!ATTLIST goal loccnumb CDATA #IMPLIED>
-<!ATTLIST goal loccnume CDATA #IMPLIED>
 
-<!ELEMENT proof (result|undone|internalfailure|unedited)>
+<!ELEMENT proof (path*, (result|undone|internalfailure|unedited))>
 <!ATTLIST proof prover CDATA #REQUIRED>
 <!ATTLIST proof timelimit CDATA #IMPLIED>
 <!ATTLIST proof memlimit CDATA #IMPLIED>
 <!ATTLIST proof steplimit CDATA #IMPLIED>
 <!ATTLIST proof edited CDATA #IMPLIED>
 <!ATTLIST proof obsolete CDATA #IMPLIED>
-<!ATTLIST proof archived CDATA #IMPLIED>
 
 <!ELEMENT result EMPTY>
 <!ATTLIST result status (valid|invalid|unknown|timeout|outofmemory|steplimitexceeded|failure|highfailure) #REQUIRED>
@@ -59,61 +51,11 @@
 
 <!ELEMENT transf (goal*)>
 <!ATTLIST transf name CDATA #REQUIRED>
-<!ATTLIST transf expanded CDATA #IMPLIED>
 <!ATTLIST transf proved CDATA #IMPLIED>
+<!ATTLIST transf arg1 CDATA #IMPLIED>
+<!ATTLIST transf arg2 CDATA #IMPLIED>
+<!ATTLIST transf arg3 CDATA #IMPLIED>
+<!ATTLIST transf arg4 CDATA #IMPLIED>
 
 <!ELEMENT label EMPTY>
 <!ATTLIST label name CDATA #REQUIRED>
-
-<!ELEMENT metas (ts_pos*,ls_pos*,pr_pos*,meta*,goal)>
-<!ATTLIST metas expanded CDATA #IMPLIED>
-<!ATTLIST metas proved CDATA #IMPLIED>
-
-<!ELEMENT ts_pos (ip_library*,ip_qualid+)>
-<!ATTLIST ts_pos name CDATA #REQUIRED>
-<!ATTLIST ts_pos arity CDATA #REQUIRED>
-<!ATTLIST ts_pos id CDATA #REQUIRED>
-<!ATTLIST ts_pos ip_theory CDATA #REQUIRED>
-
-<!ELEMENT ls_pos (ip_library*,ip_qualid+)>
-<!ATTLIST ls_pos name CDATA #REQUIRED>
-<!ATTLIST ls_pos id CDATA #REQUIRED>
-<!ATTLIST ls_pos ip_theory CDATA #REQUIRED>
-
-<!ELEMENT pr_pos (ip_library*,ip_qualid+)>
-<!ATTLIST pr_pos name CDATA #REQUIRED>
-<!ATTLIST pr_pos id CDATA #REQUIRED>
-<!ATTLIST pr_pos ip_theory CDATA #REQUIRED>
-
-<!ELEMENT ip_library EMPTY>
-<!ATTLIST ip_library name CDATA #REQUIRED>
-
-<!ELEMENT ip_qualid EMPTY>
-<!ATTLIST ip_qualid name CDATA #REQUIRED>
-
-<!ELEMENT meta (meta_arg_ty*, meta_arg_ts*, meta_arg_ls*,
-          meta_arg_pr*, meta_arg_str*, meta_arg_int*)>
-<!ATTLIST meta name CDATA #REQUIRED>
-
-<!ELEMENT meta_args_ty (ty_var|ty_app)>
-
-<!ELEMENT ty_var EMPTY>
-<!ATTLIST ty_var id CDATA #REQUIRED>
-
-<!ELEMENT ty_app (ty_var*,ty_app*)>
-<!ATTLIST ty_app id CDATA #REQUIRED>
-
-<!ELEMENT meta_arg_ts EMPTY>
-<!ATTLIST meta_arg_ts id CDATA #REQUIRED>
-
-<!ELEMENT meta_arg_ls EMPTY>
-<!ATTLIST meta_arg_ls id CDATA #REQUIRED>
-
-<!ELEMENT meta_arg_pr EMPTY>
-<!ATTLIST meta_arg_pr id CDATA #REQUIRED>
-
-<!ELEMENT meta_arg_str EMPTY>
-<!ATTLIST meta_arg_str val CDATA #REQUIRED>
-
-<!ELEMENT meta_arg_int EMPTY>
-<!ATTLIST meta_arg_int val CDATA #REQUIRED>

@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../lcp.mlw" expanded="true">
-<theory name="LCP" sum="04989728636fec25ecb04a20cb3ceab2" expanded="true">
- <goal name="not_eqseq" expl="" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="11"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="lcp.mlw"/>
+<theory name="LCP" proved="true">
+ <goal name="not_eqseq" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="14"/></proof>
  </goal>
- <goal name="VC lcp" expl="VC for lcp" expanded="true">
- <proof prover="0"><result status="valid" time="0.02" steps="79"/></proof>
+ <goal name="lcp&#39;vc" expl="VC for lcp" proved="true">
+ <proof prover="1"><result status="valid" time="0.02" steps="79"/></proof>
  </goal>
 </theory>
 </file>

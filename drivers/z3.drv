@@ -1,12 +1,14 @@
 (** Why3 driver for Z3 <= 4.3.1 *)
 
+prelude ";; produced by z3.drv ;;"
 prelude "(set-logic AUFNIRA)"
 (* A  : Array
    UF : Uninterpreted Function
    NIRA : NonLinear Integer Reals Arithmetic
 *)
 
-import "smt-libv2.drv"
+import "smt-libv2.gen"
+printer "smtv2"
 import "discrimination.gen"
 
 transformation "inline_trivial"
@@ -26,6 +28,7 @@ transformation "encoding_smt"
 (** Error messages specific to Z3 *)
 
 outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
+steplimitexceeded "Maximal allocation counts .* have been exceeded\\|(error \".*number of configured allocations exceeded\")"
 timeout "interrupted by timeout"
 (* stop reporting Z3 2.19 warnings as errors *)
 fail "^(error \"\\(\\(W\\(A\\(R\\(N\\(I\\(N[^G]\\|[^N]\\)\\|[^I]\\)\\|[^N]\\)\\|[^R]\\)\\|[^A]\\)\\|[^W]\\).*\\)\")" "Error: \\1"

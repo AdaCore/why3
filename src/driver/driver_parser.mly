@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,28 +11,28 @@
 
 %{
   open Driver_ast
-
-  let infix s  = "infix " ^ s
-  let prefix s = "prefix " ^ s
-  let mixfix s = "mixfix " ^ s
 %}
 
 %token <int> INTEGER
 %token <string> IDENT
 %token <string> STRING
 %token <string> OPERATOR
+%token <string> RIGHTSQ_QUOTE
+%token <string> RIGHTPAR_QUOTE
 %token <string> INPUT (* never reaches the parser *)
-%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING
+%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING USE
+%token INTERFACE
 %token VALID INVALID UNKNOWN FAIL
 %token TIMEOUT OUTOFMEMORY STEPLIMITEXCEEDED TIME STEPS
-%token UNDERSCORE LEFTPAR RIGHTPAR DOT QUOTE EOF
+%token UNDERSCORE LEFTPAR RIGHTPAR DOT DOTDOT QUOTE EOF
 %token BLACKLIST
-%token MODULE EXCEPTION VAL CONVERTER LITERAL
+%token MODULE EXCEPTION VAL LITERAL
 %token FUNCTION PREDICATE TYPE PROP ALL FILENAME TRANSFORM PLUGIN
-%token LEFTPAR_STAR_RIGHTPAR COMMA CONSTANT
+%token COMMA CONSTANT
 %token LEFTSQ RIGHTSQ LARROW
+%token PREC
 
-%nonassoc SYNTAX REMOVE PRELUDE
+%nonassoc SYNTAX REMOVE PRELUDE INTERFACE
 %nonassoc prec_pty
 
 %start <Driver_ast.file> file
@@ -88,12 +88,12 @@ trule:
 | syntax CONSTANT  qualid STRING { Rsyntaxfs  ($3, $4, $1) }
 | syntax FUNCTION  qualid STRING { Rsyntaxfs  ($3, $4, $1) }
 | syntax PREDICATE qualid STRING { Rsyntaxps  ($3, $4, $1) }
-| syntax CONVERTER qualid STRING { Rconverter ($3, $4, $1) }
 | syntax LITERAL   qualid STRING { Rliteral   ($3, $4, $1) }
 | REMOVE PROP qualid             { Rremovepr  ($3) }
 | REMOVE ALL                     { Rremoveall }
 | META ident meta_args           { Rmeta      ($2, $3) }
 | META STRING meta_args          { Rmeta      ($2, $3) }
+| USE qualid                     { Ruse       ($2)     }
 
 meta_args: separated_nonempty_list(COMMA,meta_arg) { $1 }
 
@@ -121,6 +121,7 @@ ident:
 | SYNTAX       { "syntax" }
 | REMOVE       { "remove" }
 | PRELUDE      { "prelude" }
+| INTERFACE    { "interface" }
 | BLACKLIST    { "blacklist" }
 | PRINTER      { "printer" }
 | STEPS        { "steps" }
@@ -135,16 +136,24 @@ ident:
 | PLUGIN       { "plugin" }
 
 ident_rich:
-| ident                     { $1 }
-| LEFTPAR_STAR_RIGHTPAR     { infix "*" }
-| LEFTPAR operator RIGHTPAR { $2 }
+| ident                             { $1 }
+| LEFTPAR operator RIGHTPAR         { $2 }
+| LEFTPAR operator RIGHTPAR_QUOTE   { $2 ^ $3 }
 
 operator:
-| OPERATOR              { infix $1 }
-| OPERATOR UNDERSCORE   { prefix $1 }
-| LEFTSQ RIGHTSQ        { mixfix "[]" }
-| LEFTSQ LARROW RIGHTSQ { mixfix "[<-]" }
-| LEFTSQ RIGHTSQ LARROW { mixfix "[]<-" }
+| o = OPERATOR                      { if o.[0] <> '!' && o.[0] <> '?' then
+                                      Ident.op_infix o else Ident.op_prefix o }
+| OPERATOR UNDERSCORE               { Ident.op_prefix $1 }
+| LEFTSQ rightsq                    { Ident.op_get $2 }
+| LEFTSQ rightsq LARROW             { Ident.op_set $2 }
+| LEFTSQ LARROW rightsq             { Ident.op_update $3 }
+| LEFTSQ DOTDOT rightsq             { Ident.op_cut $3 }
+| LEFTSQ UNDERSCORE DOTDOT rightsq  { Ident.op_rcut $4 }
+| LEFTSQ DOTDOT UNDERSCORE rightsq  { Ident.op_lcut $4 }
+
+rightsq:
+| RIGHTSQ         { "" }
+| RIGHTSQ_QUOTE   { $1 }
 
 (* Types *)
 
@@ -200,7 +209,13 @@ module_:
 
 mrule:
 | trule                          { MRtheory $1 }
+| INTERFACE STRING               { MRinterface ($2) }
 | SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
-| SYNTAX VAL qualid STRING       { MRval ($3, $4) }
+| SYNTAX VAL qualid STRING       { MRval ($3, $4, []) }
+| SYNTAX VAL qualid STRING precedence
+                                 { MRval ($3, $4, $5) }
+
+precedence:
+| PREC list(INTEGER) { $2 }
 
 loc(X): X { Loc.extract ($startpos,$endpos), $1 }

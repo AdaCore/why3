@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="4">
-<prover id="0" name="Alt-Ergo" version="1.30" timelimit="5" steplimit="0" memlimit="1000"/>
-<file name="../arm.mlw" expanded="true">
-<theory name="M" sum="3f4a7332fb862e7e78830642919cdaaf" expanded="true">
- <goal name="VC insertion_sort" expl="VC for insertion_sort" expanded="true">
- <proof prover="0"><result status="valid" time="0.11" steps="156"/></proof>
+<why3session shape_version="8">
+<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="arm.mlw"/>
+<theory name="M" proved="true">
+ <goal name="insertion_sort&#39;vc" expl="VC for insertion_sort" proved="true">
+ <proof prover="1"><result status="valid" time="0.11" steps="137"/></proof>
  </goal>
 </theory>
-<theory name="ARM" sum="d41d8cd98f00b204e9800998ecf8427e" expanded="true">
-</theory>
-<theory name="InsertionSortExample" sum="b0bf33c0b21cb5adba7e72e6f7e3acfd" expanded="true">
- <goal name="VC path_init_l2" expl="VC for path_init_l2" expanded="true">
- <proof prover="0"><result status="valid" time="0.03" steps="22"/></proof>
+<theory name="InsertionSortExample" proved="true">
+ <goal name="path_init_l2&#39;vc" expl="VC for path_init_l2" proved="true">
+ <proof prover="1"><result status="valid" time="0.03" steps="24"/></proof>
  </goal>
- <goal name="VC path_l2_exit" expl="VC for path_l2_exit" expanded="true">
- <proof prover="0"><result status="valid" time="0.00" steps="7"/></proof>
+ <goal name="path_l2_exit&#39;vc" expl="VC for path_l2_exit" proved="true">
+ <proof prover="1"><result status="valid" time="0.00" steps="7"/></proof>
  </goal>
 </theory>
 </file>

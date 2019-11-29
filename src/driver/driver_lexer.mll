@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2017   --   INRIA - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -10,15 +10,8 @@
 (********************************************************************)
 
 {
-  open Format
   open Lexing
   open Driver_parser
-
-  exception IllegalCharacter of char
-
-  let () = Exn_printer.register (fun fmt e -> match e with
-    | IllegalCharacter c -> fprintf fmt "illegal character %c" c
-    | _ -> raise e)
 
   let keywords = Hashtbl.create 97
   let () =
@@ -31,6 +24,7 @@
         "remove", REMOVE;
         "meta", META;
         "prelude", PRELUDE;
+        "interface", INTERFACE;
         "printer", PRINTER;
 	"steps", STEPS;
 	"model_parser", MODEL_PARSER;
@@ -52,31 +46,32 @@
         "transformation", TRANSFORM;
         "plugin", PLUGIN;
         "blacklist", BLACKLIST;
+        "prec", PREC;
         (* WhyML *)
         "module", MODULE;
         "exception", EXCEPTION;
         "val", VAL;
-        "converter", CONVERTER;
         "literal", LITERAL;
+        "use", USE;
       ]
-
 }
 
 let space = [' ' '\t' '\r']
 let alpha = ['a'-'z' 'A'-'Z' '_']
 let digit = ['0'-'9']
-let ident = alpha (alpha | digit | '\'')*
+let idsuf = alpha | digit | '\''
+let ident = alpha idsuf*
 
-let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%'
+let op_char = ['=' '<' '>' '~' '+' '-' '*' '/' '%' '\\'
                '!' '$' '&' '?' '@' '^' '.' ':' '|' '#']
 
 rule token = parse
   | '\n'
-      { Lexlib.newline lexbuf; token lexbuf }
+      { Lexing.new_line lexbuf; token lexbuf }
   | space+
       { token lexbuf }
   | "(*)"
-      { LEFTPAR_STAR_RIGHTPAR }
+      { Lexlib.backjump lexbuf 2; LEFTPAR }
   | "(*"
       { Lexlib.comment lexbuf; token lexbuf }
   | '_'
@@ -97,20 +92,26 @@ rule token = parse
       { RIGHTPAR }
   | "."
       { DOT }
+  | ".."
+      { DOTDOT }
   | ","
       { COMMA }
   | "'"
       { QUOTE }
-  | op_char+ as op
+  | "]" ("'"+ as s)
+      { RIGHTSQ_QUOTE s }
+  | ")" (['\'' '_'] ['a'-'z' 'A'-'Z'] idsuf* as s)
+      { RIGHTPAR_QUOTE s }
+  | op_char+ "'"* as op
       { OPERATOR op }
-  | "\""
+  | '"'
       { STRING (Lexlib.string lexbuf) }
-  | "import" space*  "\""
+  | "import" space* '"'
       { INPUT (Lexlib.string lexbuf) }
   | eof
       { EOF }
   | _ as c
-      { raise (IllegalCharacter c) }
+      { Lexlib.illegal_character c lexbuf }
 
 {
   let parse_file_gen parse input_lexbuf lexbuf =
@@ -123,7 +124,7 @@ rule token = parse
       match tok with
         | INPUT filename ->
           let dirname = Filename.dirname lexbuf.lex_curr_p.pos_fname in
-          let filename = Sysutil.absolutize_filename dirname filename in
+          let filename = Sysutil.concat dirname filename in
           Stack.push (input_lexbuf filename) s;
           multifile lex_dumb
         | EOF -> ignore (Stack.pop s);
