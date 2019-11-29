@@ -151,15 +151,18 @@ let p1 = path_of_file "/bin/bash"
 let p1 = path_of_file "../src/f.why"
   *)
 
+let is_regular_dir fn =
+  let s = Unix.lstat fn in
+  s.Unix.st_kind = Unix.S_DIR
+
 let system_dependent_absolute_path dir p =
-  let rec file_of_path l =
+  let rec aux dir l =
     match l with
-    | [] -> ""
-    | [x] -> x
-    | x::l -> Filename.concat x (file_of_path l)
+    | [] -> dir
+    | ".." :: xs when is_regular_dir dir -> aux (Filename.dirname dir) xs
+    | x :: xs -> aux (Filename.concat dir x) xs
   in
-  let f = file_of_path p in
-  Filename.concat dir f
+  aux dir p
 
 let relativize_filename base f =
   let rec aux abs ab af =
