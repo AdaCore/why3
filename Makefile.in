@@ -208,6 +208,7 @@ LIB_UTIL = config bigInt mlmpfr_wrapper util opt lists strings \
 	   cmdline warning sysutil rc plugin bigInt number constant vector pqueue
 
 ifeq (@enable_re@,no)
+LIBGENERATED += src/util/re.ml
 LIB_UTIL += re
 endif
 
@@ -337,6 +338,13 @@ src/extract/mlinterp.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
 
 clean::
 	rm -f src/util/ppx_debug_optim
+endif
+
+# Re
+
+ifeq (@enable_re@,no)
+src/util/re.ml: src/util/recompat.ml config.status
+	cp $< $@
 endif
 
 # build targets
