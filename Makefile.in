@@ -127,7 +127,7 @@ CMIHACK = -intf-suffix .cmi
 # external libraries common to all binaries
 
 EXTOBJS = menhirLib
-EXTLIBS = @SEQLIB@ re unix nums dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@
+EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -205,6 +205,10 @@ LIB_UTIL = config bigInt mlmpfr_wrapper util opt lists strings \
 	   json_base json_parser json_lexer \
 	   debug loc lexlib print_tree \
 	   cmdline warning sysutil rc plugin bigInt number constant vector pqueue
+
+ifeq (@enable_re@,no)
+LIB_UTIL += re
+endif
 
 LIB_CORE = ident ty term pattern decl coercion theory \
 	   task pretty dterm env trans printer model_parser
