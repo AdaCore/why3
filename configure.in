@@ -76,6 +76,12 @@ AC_ARG_ENABLE(js_of_ocaml,
     AS_HELP_STRING([--disable-js-of-ocaml], [do not use js-of-ocaml]),,
     enable_js_of_ocaml=yes)
 
+# re
+
+AC_ARG_ENABLE(re,
+    AS_HELP_STRING([--disable-re], [use Str instead of Re for regular expressions]),,
+    enable_re=yes)
+
 # IDE
 
 AC_ARG_ENABLE(ide,
@@ -525,27 +531,41 @@ if test "$found_seq" = no; then
    AC_CHECK_FILE($DIR/stdlib__seq.cmi,,found_seq=no)
 fi
 if test "$found_seq" = no; then
-   AC_MSG_ERROR([Library seq not found.])
+   AC_MSG_WARN([Library seq not found.])
+   if test "$enable_re" = yes; then
+      enable_re=no
+      reason_re=" (seq not found)"
+   fi
 fi
 
 # checking for re
-found_re=yes
-DIR=
-if test "$USEOCAMLFIND" = yes; then
-   DIR=$(ocamlfind query re)
-   if test -n "$DIR"; then
-      echo "ocamlfind found re in $DIR"
-      REINCLUDE="-I $DIR"
+if test "$enable_re" = yes; then
+   found_re=yes
+   DIR=
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query re)
+      if test -n "$DIR"; then
+         echo "ocamlfind found re in $DIR"
+         REINCLUDE="-I $DIR"
+      fi
+   fi
+   if test -z "$DIR"; then
+      REINCLUDE="-I +re"
+      DIR="$OCAMLLIB/re"
+      AC_CHECK_FILE($DIR/re.cmx,,found_re=no)
+   fi
+   AC_CHECK_FILE($DIR/re.cmi,,found_re=no)
+   if test "$found_re" = no; then
+      AC_MSG_WARN([Library re not found.])
+      enable_re=no
    fi
 fi
-if test -z "$DIR"; then
-   REINCLUDE="-I +re"
-   DIR="$OCAMLLIB/re"
-   AC_CHECK_FILE($DIR/re.cmx,,found_re=no)
-fi
-AC_CHECK_FILE($DIR/re.cmi,,found_re=no)
-if test "$found_re" = no; then
-   AC_MSG_ERROR([Library re not found.])
+
+if test "$enable_re" = no; then
+   REINCLUDE=""
+   RELIB="str"
+else
+   RELIB="re"
 fi
 
 # checking for lablgtk3
@@ -1029,7 +1049,9 @@ AC_SUBST(MENHIRINCLUDE)
 AC_SUBST(SEQINCLUDE)
 AC_SUBST(SEQLIB)
 
+AC_SUBST(enable_re)
 AC_SUBST(REINCLUDE)
+AC_SUBST(RELIB)
 
 AC_SUBST(enable_coq_libs)
 AC_SUBST(enable_coq_fp_libs)
@@ -1115,6 +1137,7 @@ echo "    Profiling               : $enable_profiling"
 echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
+echo "    Re support              : $enable_re$reason_re"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"
