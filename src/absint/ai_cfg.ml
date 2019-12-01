@@ -405,55 +405,6 @@ module Make(E: sig
         );
       (* FIXME: exceptions while inside the condition *)
       before_loop_cp, after_loop_cp, loop_exn
-    (* | Etry(e, _, exc) -> (\* FIXME what is that second arg? *\) assert false *)
-      (* let additional_exn = ref [] in
-       * let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg ~ret cfg manpk e in
-       * let i = new_node_cfg cfg expr in
-       * let exc = Ity.Mxs.map (fun (l, e) ->
-       *     List.iter (fun p ->
-       *         D.add_variable_to_env manpk p) l;
-       * 
-       *     let before_assign_cp = new_node_cfg cfg e in
-       * 
-       *     let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg ~ret cfg manpk e in
-       * 
-       *     additional_exn := e_exn @ !additional_exn;
-       * 
-       *     begin
-       *       match l with
-       *       | [p] ->
-       *         let constraints, forget_ret = create_postcondition cfg manpk p in
-       *         new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs ->
-       *             constraints abs |> forget_ret
-       *           );
-       * 
-       *         let to_forget = D.forget_var manpk Ity.(p.pv_vs) in
-       *         new_hedge_cfg cfg (e_end_cp, i) (fun _ abs ->
-       *             to_forget abs
-       *           );
-       *       | _ -> Format.eprintf "Multiple constructors exception, not handled by AI.";
-       *         new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs -> abs);
-       *         new_hedge_cfg cfg (e_end_cp, i) (fun _ abs -> abs);
-       *     end;
-       *     l, before_assign_cp, e_end_cp
-       *     ) exc in
-       * 
-       * let e_exn = Ity.Mxs.fold (fun exc_sym (_, cp_begin, _) e_exn ->
-       *     List.filter (fun (cp, exc_sym_) ->
-       *         if Ity.xs_equal exc_sym exc_sym_ then
-       *           begin
-       *             new_hedge_cfg cfg (cp, cp_begin) (fun _ abs ->
-       *                  abs
-       *               );
-       *             false
-       *           end
-       *         else
-       *           true
-       *       ) e_exn) exc e_exn in
-       * new_hedge_cfg cfg (e_end_cp, i) (fun _ abs ->
-       *     abs
-       *   );
-       * e_begin_cp, i, !additional_exn @ e_exn *)
     | Eraise(s, e) ->
       let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg manpk e in
       let j = new_node_cfg cfg expr in
@@ -489,51 +440,100 @@ module Make(E: sig
       new_hedge_cfg cfg (b_end_cp, end_cp) (fun _ abs ->
           abs);
       start_cp, end_cp, b_exn @ c_exn
-    | Ematch (case_e, l, _) -> assert false
-      (* let case_e_begin_cp, case_e_end_cp, case_e_exn = put_expr_in_cfg cfg manpk case_e in
-       * let e_exns = ref [case_e_exn] in
-       * let case_end_cp = new_node_cfg cfg expr in
-       * List.iter (fun (p, e) ->
-       *     let open Term in
-       *     let open Expr in
-       *     let constraints, to_forget_before, to_forget_end = match p.pp_pat.pat_node with
-       *       | Pwild -> (fun abs -> abs), (fun abs -> abs), (fun x -> x)
-       *       | Pvar(_) -> failwith "pattern"
-       *       | Papp(l, p) ->
-       *         let args = List.map (fun p -> match p.pat_node with
-       *             | Pvar(vsym) ->
-       *               let pv = Ity.restore_pv vsym in
-       *               D.add_variable_to_env manpk pv;
-       *               vsym
-       *             | Pwild ->
-       *               create_vreturn manpk p.pat_ty
-       *             | _ -> failwith "nested pattern or worse"
-       *           ) p in
-       *         let matched_term = t_app l (List.map t_var args) (Some (Ity.ty_of_ity (case_e.e_ity))) in
-       *         let vreturn = match ret with
-       *           | None -> create_vreturn manpk (t_type matched_term)
-       *           | Some v -> v
-       *         in
-       *         let postcondition =
-       *             t_app ps_equ [matched_term; t_var vreturn] None in
-       *         let constr = D.meet_term manpk postcondition
-       *         in
-       *         constr, D.forget_var manpk vreturn, (List.fold_left (fun c arg ->
-       *             fun x -> c x |> D.forget_var manpk arg) (fun x -> x) args)
-       * 
-       *       | Por(_) -> failwith "pattern or"
-       *       | Pas(_) -> failwith "pattern as"
-       *     in
-       *     let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
-       *     new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun man abs ->
-       *         constraints abs |> to_forget_before
-       *       );
-       *     new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun man abs ->
-       *         to_forget_end abs
-       *       );
-       *     e_exns := e_exn :: !e_exns;
-       *   ) l;
-       * case_e_begin_cp, case_end_cp, (List.concat !e_exns) *)
+    | Ematch (case_e, l, mxs) when Ity.Mxs.is_empty mxs ->
+      let case_e_begin_cp, case_e_end_cp, case_e_exn = put_expr_in_cfg cfg manpk case_e in
+      let e_exns = ref [case_e_exn] in
+      let case_end_cp = new_node_cfg cfg expr in
+      List.iter (fun (p, e) ->
+          let open Term in
+          let open Expr in
+          let constraints, to_forget_before, to_forget_end = match p.pp_pat.pat_node with
+            | Pwild -> (fun abs -> abs), (fun abs -> abs), (fun x -> x)
+            | Pvar(_) -> failwith "pattern"
+            | Papp(l, p) ->
+              let args = List.map (fun p -> match p.pat_node with
+                  | Pvar(vsym) ->
+                    let pv = Ity.restore_pv vsym in
+                    D.add_variable_to_env manpk pv;
+                    vsym
+                  | Pwild ->
+                    create_vreturn manpk p.pat_ty
+                  | _ -> failwith "nested pattern or worse"
+                ) p in
+              let matched_term = t_app l (List.map t_var args) (Some (Ity.ty_of_ity (case_e.e_ity))) in
+              let vreturn = match ret with
+                | None -> create_vreturn manpk (t_type matched_term)
+                | Some v -> v
+              in
+              let postcondition =
+                  t_app ps_equ [matched_term; t_var vreturn] None in
+              let constr = D.meet_term manpk postcondition
+              in
+              constr, D.forget_var manpk vreturn, (List.fold_left (fun c arg ->
+                  fun x -> c x |> D.forget_var manpk arg) (fun x -> x) args)
+
+            | Por(_) -> failwith "pattern or"
+            | Pas(_) -> failwith "pattern as"
+          in
+          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
+          new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun man abs ->
+              constraints abs |> to_forget_before
+            );
+          new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun man abs ->
+              to_forget_end abs
+            );
+          e_exns := e_exn :: !e_exns;
+        ) l;
+      case_e_begin_cp, case_end_cp, (List.concat !e_exns)
+    | Ematch (e, [], exc) ->
+      let additional_exn = ref [] in
+      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg ~ret cfg manpk e in
+      let i = new_node_cfg cfg expr in
+      let exc = Ity.Mxs.map (fun (l, e) ->
+          List.iter (fun p ->
+              D.add_variable_to_env manpk p) l;
+
+          let before_assign_cp = new_node_cfg cfg e in
+
+          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg ~ret cfg manpk e in
+
+          additional_exn := e_exn @ !additional_exn;
+
+          begin
+            match l with
+            | [p] ->
+              let constraints, forget_ret = create_postcondition cfg manpk p in
+              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs ->
+                  constraints abs |> forget_ret
+                );
+
+              let to_forget = D.forget_var manpk Ity.(p.pv_vs) in
+              new_hedge_cfg cfg (e_end_cp, i) (fun _ abs ->
+                  to_forget abs
+                );
+            | _ -> Format.eprintf "Multiple constructors exception, not handled by AI.";
+              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs -> abs);
+              new_hedge_cfg cfg (e_end_cp, i) (fun _ abs -> abs);
+          end;
+          l, before_assign_cp, e_end_cp
+          ) exc in
+
+      let e_exn = Ity.Mxs.fold (fun exc_sym (_, cp_begin, _) e_exn ->
+          List.filter (fun (cp, exc_sym_) ->
+              if Ity.xs_equal exc_sym exc_sym_ then
+                begin
+                  new_hedge_cfg cfg (cp, cp_begin) (fun _ abs ->
+                       abs
+                    );
+                  false
+                end
+              else
+                true
+            ) e_exn) exc e_exn in
+      new_hedge_cfg cfg (e_end_cp, i) (fun _ abs ->
+          abs
+        );
+      e_begin_cp, i, !additional_exn @ e_exn
     | Eassert(_) | Eabsurd -> (* FIXME: maybe they could be taken into account *)
       let i = new_node_cfg cfg expr in
 
