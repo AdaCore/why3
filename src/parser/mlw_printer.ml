@@ -753,7 +753,20 @@ and pp_decl fmt = function
       todo fmt "Dscope _"
 
 let pp_decls =
-  pp_print_list ~pp_sep:(pp_sep "@,@,") pp_decl
+  let previous_was_use_import_export =
+    ref false in
+  let pp_decl' fmt decl =
+    let this_is_use_import_export = match decl with
+      | Duseimport _ | Duseexport _
+      | Dcloneimport _ | Dcloneexport _
+      | Dimport _ ->
+          true
+      | _ -> false in
+    if not (!previous_was_use_import_export && this_is_use_import_export) then
+      fprintf fmt "@,";
+    previous_was_use_import_export := this_is_use_import_export;
+    pp_decl fmt decl in
+  pp_print_list ~pp_sep:(pp_sep "@,") pp_decl'
 
 let pp_mlw_file fmt = function
   | Decls decls ->
