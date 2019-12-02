@@ -1,0 +1,33 @@
+
+\chapter{Inference of Loop Invariants}
+
+\section{Availability}
+
+Extension available if Why3 is configured with --enable-infer (?) need apron, camllib and fixpoint
+
+Check all of the following !
+
+- install apron and camllib with opam
+
+- get the sources of fixpoint at
+
+svn://scm.gforge.inria.fr/svnroot/bjeannet/pkg/fixpoint
+
+compile and install with
+
+cp Makefile.config.model Makefile.config
+make all
+make install
+
+
+Why3 compilation should generate a new why3 subcommand 'infer'
+
+\section{Running it}
+
+
+run it with
+\begin{verbatim}
+why3 infer <file>.mlw
+\end{verbatim}
+
+it produces a file \verb|<file>.mlw_inferred.mlw| where the invariants found are inserted
