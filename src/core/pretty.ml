@@ -837,17 +837,17 @@ let () = Exn_printer.register
       fprintf fmt "Not a record field: %a" print_ls ls
   | Decl.BadRecordCons (ls, ty) ->
       fprintf fmt "Type %a contains several constructors and cannot be \
-                   (de)constructed in logic using curly braces.\n\
+                   (de)constructed using curly braces.\n\
                    Function %a is presumably a field of type %a."
         print_ts ty print_ls ls print_ts ty
   | Decl.BadRecordType (ls, ty) ->
       fprintf fmt "Type %a is not a record type or contains an invariant, \
-                   it cannot be (de)constructed in logic using curly braces.\n\
+                   it cannot be (de)constructed using curly braces.\n\
                    Function %a is presumably a field of type %a."
         print_ts ty print_ls ls print_ts ty
   | Decl.BadRecordUnnamed (ls, ty) ->
       fprintf fmt "Type %a contains unnamed fields and cannot be \
-                   (de)constructed in logic using curly braces.\n\
+                   (de)constructed using curly braces.\n\
                    Function %a is presumably a field of type %a."
         print_ts ty print_ls ls print_ts ty
   | Decl.RecordFieldMissing ls ->
