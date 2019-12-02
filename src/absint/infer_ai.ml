@@ -25,7 +25,6 @@ module Make(S:sig
       match e.e_node with
       | Elet(LDvar(pv, e), e2) ->
         (let_var_raw pv (r e)
-        |> fst
         |> e_let) (r e2)
       | Evar(_) | Econst(_) | Eassign(_)
       | Eabsurd | Epure (_) | Eassert(_) | Eexec(_) | Elet(_)
@@ -108,7 +107,7 @@ module Make(S:sig
             let ce = c_fun cexp.c_cty.cty_args cexp.c_cty.cty_pre cexp.c_cty.cty_post cexp.c_cty.cty_xpost
               cexp.c_cty.cty_oldies new_e
             in
-            let let_expr = let_sym_raw rs ce |> fst in
+            let let_expr = let_sym_raw rs ce in
             Some (create_let_decl let_expr)
           | _ ->
             Some (create_let_decl l)
