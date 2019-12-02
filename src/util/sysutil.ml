@@ -152,8 +152,9 @@ let p1 = path_of_file "../src/f.why"
   *)
 
 let is_regular_dir fn =
-  let s = Unix.lstat fn in
-  s.Unix.st_kind = Unix.S_DIR
+  match Unix.lstat fn with
+  | s -> s.Unix.st_kind = Unix.S_DIR
+  | exception _ -> false
 
 let system_dependent_absolute_path dir p =
   let rec aux dir l =
