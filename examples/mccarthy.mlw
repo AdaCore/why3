@@ -39,30 +39,16 @@ module McCarthy91
   use ref.Ref
   use int.Iter
 
-  let f91_nonrec (n0: int) requires { n0 > 100 } ensures { result = spec n0 }
-  = let e = ref 1 in
-    let n = ref n0 in
-    while !e > 0 do
-      variant   { 101 - !n + 10 * !e, !e }
-      if !n > 100 then begin
-        n := !n - 10;
-        e := !e - 1
-      end else begin
-        n := !n + 11;
-        e := !e + 1
-      end
-    done;
-    !n
-
-  let f91_nonrec2 (n0: int) requires { n0 <= 100 } ensures { result = spec n0 }
-  = let e = ref 1 in
-    let n = ref n0 in
-    while !e > 0 do
-      variant   { 101 - !n + 10 * !e, !e }
-	  invariant { !e = 0 -> !n > 90 }
-      if !n > 100 then begin
-        n := !n - 10;
-        e := !e - 1
+  let f91_nonrec (n0: int): int
+    ensures { result = spec n0 }
+  = let ref e = 1 in
+    let ref n = n0 in
+    while e > 0 do
+      invariant { e >= 0 /\ iter spec e n = spec n0 }
+      variant   { 101 - n + 10 * e, e }
+      if n > 100 then begin
+        n <- n - 10;
+        e <- e - 1
       end else begin
         n <- n + 11;
         e <- e + 1

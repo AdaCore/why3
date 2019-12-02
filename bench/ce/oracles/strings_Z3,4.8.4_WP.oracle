@@ -3,14 +3,13 @@ bench/ce/strings.mlw TestCounterexample T1: Timeout or Unknown
 Counter-example model:
 File strings.mlw:
   Line 6:
-    s, [[@introduced]] = {"type" : "String" , "val" : "\u0000" }
+    s, [[@introduced]] = {"type" : "String" , "val" : "8" }
 
 bench/ce/strings.mlw TestCounterexample T2: Timeout or Unknown
 Counter-example model:
 File strings.mlw:
   Line 7:
-    s, [[@introduced]] = {"type" : "String" ,
-    "val" : "\u0000\u0000\u0000\u0000" }
+    s, [[@introduced]] = {"type" : "String" , "val" : "28444" }
 
 bench/ce/strings.mlw TestCounterexample T3: Timeout or Unknown
 Counter-example model:
@@ -30,18 +29,10 @@ bench/ce/strings.mlw TestCounterexample T5: Timeout or Unknown
 Counter-example model:
 File strings.mlw:
   Line 10:
-    s, [[@introduced]] = {"type" : "String" ,
-    "val" : "\u0000\u0000\u0000\u0000\u0000\u0000\u0000" }
+    s, [[@introduced]] = {"type" : "String" , "val" : "2828118" }
     x, [[@introduced]] = {"type" : "String" , "val" : "b{uoh\ti" }
 
-bench/ce/strings.mlw TestCounterexample T6: Timeout or Unknown
-Counter-example model:
-File strings.mlw:
-  Line 11:
-    s, [[@introduced]] = {"type" : "String" ,
-    "val" : "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000" }
-    x, [[@introduced]] = {"type" : "String" , "val" : "b{uoh\ti" }
-
+bench/ce/strings.mlw TestCounterexample T6: Valid
 bench/ce/strings.mlw TestCounterexample T7: Timeout or Unknown
 Counter-example model:
 File strings.mlw:
@@ -64,14 +55,7 @@ File strings.mlw:
     "val" : "\u0000\u0000\u0000\u0000\u0000\u0000\u0000" }
     x, [[@introduced]] = {"type" : "String" , "val" : "b{uoh\ti" }
 
-bench/ce/strings.mlw TestCounterexample T10: Timeout or Unknown
-Counter-example model:
-File strings.mlw:
-  Line 15:
-    s, [[@introduced]] = {"type" : "String" ,
-    "val" : "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000" }
-    x, [[@introduced]] = {"type" : "String" , "val" : "b{uoh\ti" }
-
+bench/ce/strings.mlw TestCounterexample T10: Valid
 bench/ce/strings.mlw TestCounterexample T11: Timeout or Unknown
 Counter-example model:
 File strings.mlw:
@@ -102,8 +86,8 @@ bench/ce/strings.mlw TestCounterexample T15: Timeout or Unknown
 Counter-example model:
 File strings.mlw:
   Line 20:
-    i, [[@introduced]] = {"type" : "Integer" , "val" : "-401" }
-    s, [[@introduced]] = {"type" : "String" , "val" : "\u0000" }
+    i, [[@introduced]] = {"type" : "Integer" , "val" : "-1" }
+    s, [[@introduced]] = {"type" : "String" , "val" : "" }
 
 bench/ce/strings.mlw TestCounterexample T16: Timeout or Unknown
 Counter-example model:
