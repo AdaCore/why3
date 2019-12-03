@@ -59,6 +59,8 @@ Transformations
     `meta reflection val foo` :x:
   * `remove` and `bisect` should not raise unnecessary popups anymore
   * added `remove_rec`
+  * the attribute `ìnline:trivial` can be added on definitions to force its
+    inlining by the transformation `inline_trivial`
 
 IDE
   * display of counterexamples in the Task view has been improved
