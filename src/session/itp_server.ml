@@ -657,6 +657,9 @@ end
      be incorrect and end up in a correct state. *)
   let reload_files cont ~shape_version =
     let hard_reload = true in
+    (* On reload, we empty the legacy printer (which is used to print
+       parsing/typing errors. This avoids odd numbering of ident. *)
+    Pretty.forget_all ();
     capture_parse_or_type_errors
       (fun c ->
         try let (_,_) = reload_files ~hard_reload ~shape_version c in [] with
