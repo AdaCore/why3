@@ -1,8 +1,8 @@
 module Uf10
-	use import array.Array
-	use import ref.Ref
-	use import ref.Refint
-	use import int.Int
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
 
 	let b(x:int): int
 	ensures { result = 18 } =
@@ -12,7 +12,7 @@ module Uf10
 		(*a[!k+1] <- 18;*)
 		incr k;
 		while (!k <= 3)
-		do 
+		do
 		variant { 12 - !k }
 		a[!k+1] <- 0;
 		incr k;

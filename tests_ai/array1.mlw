@@ -1,11 +1,11 @@
 
 module Test
-	use import array.Array
-	use import ref.Ref
-	use import ref.Refint
-	use import int.Int
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
 
-	
+
 	let init1(x:int): array int
 	requires { x >= 3 }
 	ensures { forall i: int. 0 <= i < x -> result[i] = 8 }
@@ -17,7 +17,7 @@ module Test
 		a[!k] <- 8;
 		incr k;
 		done; a
-	
+
 	let init2(x:int): array int
 	requires { x >= 0 }
 	ensures { forall i: int. 0 <= i < x -> result[i] = i }
@@ -29,7 +29,7 @@ module Test
 		a[!k] <- !k;
 		incr k;
 		done; a
-	
+
 	let init3(x:int): array int
 	requires { x >= 10 }
 	ensures { forall i: int. 0 <= i < 3 -> result[i] = 8 }
@@ -41,7 +41,7 @@ module Test
 		a[!k] <- 8;
 		incr k;
 		done; a
-	
+
 	(*let init4(x:int): array int
 	requires { x >= 0 }
 	ensures { forall i: int. 0 <= i < x -> result[i] = i * i }
@@ -53,8 +53,8 @@ module Test
 		a[!k] <- !k * !k;
 		incr k;
 		done; a*)
-	
-	
+
+
 	let init5 (x:int) (y:int) (d:int) (b:int) (c:int) : array int
 	requires { x > y >= 0 }
 	ensures { forall i: int. (0 <= i < y -> result[i] = d) /\ (y <= i < x -> result[i] = b) }
@@ -71,7 +71,7 @@ module Test
 			a[!k] <- d;
 		incr k;
 		done; a
-	
+
 	let init6 (x:int) (y:int) (d:int) (b:int) (c:int) : array int
 	requires { x > y >= 0 }
 	ensures { forall i: int. (0 <= i < y -> result[i] = 0) /\ (y <= i < x -> result[i] = 1) }

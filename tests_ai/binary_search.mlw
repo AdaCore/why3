@@ -4,17 +4,17 @@
 
 module BinarySearch
 
-  use import int.Int
-  use import int.ComputerDivision
-  use import ref.Ref
-  use import array.Array
+  use int.Int
+  use int.ComputerDivision
+  use ref.Ref
+  use array.Array
 
   (* the code and its specification *)
 
   exception Break int (* raised to exit the loop *)
   exception Not_found (* raised to signal a search failure *)
 
-  val mydiv(x:int):int 
+  val mydiv(x:int):int
   ensures { 2*result = x }
 
   let binary_search (a : array int) (v : int)

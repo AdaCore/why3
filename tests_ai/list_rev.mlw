@@ -1,8 +1,8 @@
 module ListRev
-	use import list.List
-	use import list.Length
-	use import int.Int
-	use import ref.Ref
+	use list.List
+	use list.Length
+	use int.Int
+	use ref.Ref
 
 	val function length (l: list 'a) : int
 	ensures { result >= 0 }
@@ -75,14 +75,14 @@ module ListRev
 
 
 
-	let seq (i: int) : list int 
+	let seq (i: int) : list int
 		ensures { i <= 0 \/ length result = i } =
 		let l = ref (nil ()) in
 		let k = ref i in
 		while !k > 0 do
 		variant { !k }
 			k := !k - 1;
-			l := cons !k !l; 
+			l := cons !k !l;
 		done;
 		!l
 
