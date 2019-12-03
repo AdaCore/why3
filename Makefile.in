@@ -273,10 +273,10 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
 	      $(addprefix src/session/, $(LIB_SESSION))
 
-ifeq (@enable_infer@,yes)
-LIBDIRS = util core driver mlw extract parser transform printer session absint
-else
 LIBDIRS = util core driver mlw extract parser transform printer session
+
+ifeq (@enable_infer@,yes)
+LIBDIRS += absint
 endif
 
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
@@ -460,7 +460,6 @@ PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
 		plugins/python/py_lexer.ml \
 		plugins/python/py_parser.ml plugins/python/py_parser.mli \
-		plugins/absint/absint.ml \
 		plugins/microc/mc_lexer.ml \
 		plugins/microc/mc_parser.ml plugins/microc/mc_parser.mli \
 		plugins/parser/dimacs.ml \
@@ -472,26 +471,21 @@ PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_ast py_parser py_lexer py_main
-PLUG_ABSINT = absint
 PLUG_MICROC = mc_ast mc_parser mc_lexer mc_main
 PLUG_ADA = ada_nametable ada_parser ada_lexer ada_main
 
-PLUGINS = genequlin dimacs tptp python microc ada absint
+PLUGINS = genequlin dimacs tptp python microc ada
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
 MICROCMODULES = $(addprefix plugins/microc/, $(PLUG_MICROC))
 ADAMODULES = $(addprefix plugins/ada_terms/, $(PLUG_ADA))
-ABSINTMODULES = $(addprefix plugins/absint/, $(PLUG_ABSINT))
 
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
 
 PYTHONCMO = $(addsuffix .cmo, $(PYTHONMODULES))
 PYTHONCMX = $(addsuffix .cmx, $(PYTHONMODULES))
-
-ABSINTCMO = $(addsuffix .cmo, $(ABSINTMODULES))
-ABSINTCMX = $(addsuffix .cmx, $(ABSINTMODULES))
 
 MICROCCMO = $(addsuffix .cmo, $(MICROCMODULES))
 MICROCCMX = $(addsuffix .cmx, $(MICROCMODULES))
@@ -512,14 +506,14 @@ endif
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
-	      $(TPTPMODULES) $(PYTHONMODULES) $(ABSINTMODULES) \
-				 $(MICROCMODULES) $(ADAMODULES)
+	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
+	      $(ADAMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 
-PLUGDIRS = parser printer transform tptp python absint microc ada_terms
+PLUGDIRS = parser printer transform tptp python microc ada_terms
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 $(PLUGDEP): DEPFLAGS += $(PLUGINCLUDES)
@@ -550,26 +544,14 @@ lib/plugins/%.cmxs: plugins/printer/%.cmx
 lib/plugins/%.cmo: plugins/printer/%.cmo
 lib/plugins/%.cmxs: plugins/transform/%.cmx
 lib/plugins/%.cmo: plugins/transform/%.cmo
-lib/plugins/%.cmxs: plugins/absint/%.cmx
-lib/plugins/%.cmo: plugins/absint/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
 lib/plugins/tptp.cmo: $(TPTPCMO)
 lib/plugins/python.cmxs: $(PYTHONCMX)
 lib/plugins/python.cmo: $(PYTHONCMO)
-lib/plugins/absint.cmxs: $(ABSINTCMX)
-lib/plugins/absint.cmo: $(ABSINTCMO)
 lib/plugins/microc.cmxs: $(MICROCCMX)
 lib/plugins/microc.cmo: $(MICROCCMO)
 lib/plugins/ada.cmxs: $(ADACMX)
 lib/plugins/ada.cmo: $(ADACMO)
-
-# lib/plugins/absint.cmxs: $(ABSINTCMX)
-# 	$(SHOW) 'Linking  $@'
-# 	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
-
-# lib/plugins/absint.cmo: $(ABSINTCMO)
-# 	$(SHOW) 'Linking  $@'
-# 	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
 # depend and clean targets
 
@@ -596,13 +578,12 @@ install-bin::
 
 TOOLSGENERATED = src/tools/why3wc.ml
 
+TOOLS_BIN = why3config why3execute why3extract why3prove \
+	    why3realize why3replay why3wc
+
 ifeq (@enable_infer@,yes)
-TOOLS_BIN = why3config why3execute why3extract why3prove \
-	    why3realize why3replay why3wc \
-		why3infer test_disjunction test_infer
+TOOLS_BIN += why3infer test_disjunction test_infer
 else
-TOOLS_BIN = why3config why3execute why3extract why3prove \
-		why3realize why3replay why3wc
 endif
 
 TOOLS_FILES = main $(TOOLS_BIN)
@@ -632,14 +613,6 @@ bin/why3execute.opt: $(WHY3CMXA) src/tools/why3execute.cmx
 bin/why3execute.byte: $(WHY3CMA) src/tools/why3execute.cmo
 bin/why3extract.opt: $(WHY3CMXA) src/tools/why3extract.cmx
 bin/why3extract.byte: $(WHY3CMA) src/tools/why3extract.cmo
-ifeq (@enable_infer@,yes)
-bin/why3infer.opt: $(WHY3CMXA) src/tools/why3infer.cmx
-bin/why3infer.byte: $(WHY3CMA) src/tools/why3infer.cmo
-bin/test_disjunction.opt: $(WHY3CMXA) src/tools/test_disjunction.cmx
-bin/test_disjunction.byte: $(WHY3CMA) src/tools/test_disjunction.cmo
-bin/test_infer.opt: $(WHY3CMXA) src/tools/test_infer.cmx
-bin/test_infer.byte: $(WHY3CMA) src/tools/test_infer.cmo
-endif
 bin/why3prove.opt: $(WHY3CMXA) src/tools/why3prove.cmx
 bin/why3prove.byte: $(WHY3CMA) src/tools/why3prove.cmo
 bin/why3realize.opt: $(WHY3CMXA) src/tools/why3realize.cmx
@@ -648,36 +621,34 @@ bin/why3replay.opt: $(WHY3CMXA) src/tools/unix_scheduler.cmx src/tools/why3repla
 bin/why3replay.byte: $(WHY3CMA) src/tools/unix_scheduler.cmo src/tools/why3replay.cmo
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
+ifeq (@enable_infer@,yes)
+bin/why3infer.opt: $(WHY3CMXA) src/tools/why3infer.cmx
+bin/why3infer.byte: $(WHY3CMA) src/tools/why3infer.cmo
+bin/test_disjunction.opt: $(WHY3CMXA) src/tools/test_disjunction.cmx
+bin/test_disjunction.byte: $(WHY3CMA) src/tools/test_disjunction.cmo
+bin/test_infer.opt: $(WHY3CMXA) src/tools/test_infer.cmx
+bin/test_infer.byte: $(WHY3CMA) src/tools/test_infer.cmo
+endif
 
 uninstall-bin::
 	rm -f $(BINDIR)/why3$(EXE)
 	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%$(EXE))
 
+install-bin::
+	$(MKDIR_P) $(BINDIR)
+	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
+	$(MKDIR_P) $(TOOLDIR)
+	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
+	$(INSTALL) bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
+	$(INSTALL) bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
+	$(INSTALL) bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
+	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
+	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
+	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
+
 ifeq (@enable_infer@,yes)
 install-bin::
-	$(MKDIR_P) $(BINDIR)
-	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
-	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
-	$(INSTALL) bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
-	$(INSTALL) bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
 	$(INSTALL) bin/why3infer.@OCAMLBEST@   $(TOOLDIR)/why3infer$(EXE)
-	$(INSTALL) bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
-	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
-	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
-	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
-else
-install-bin::
-	$(MKDIR_P) $(BINDIR)
-	$(INSTALL) bin/why3.@OCAMLBEST@ $(BINDIR)/why3$(EXE)
-	$(MKDIR_P) $(TOOLDIR)
-	$(INSTALL) bin/why3config.@OCAMLBEST@  $(TOOLDIR)/why3config$(EXE)
-	$(INSTALL) bin/why3execute.@OCAMLBEST@ $(TOOLDIR)/why3execute$(EXE)
-	$(INSTALL) bin/why3extract.@OCAMLBEST@ $(TOOLDIR)/why3extract$(EXE)
-	$(INSTALL) bin/why3prove.@OCAMLBEST@   $(TOOLDIR)/why3prove$(EXE)
-	$(INSTALL) bin/why3realize.@OCAMLBEST@ $(TOOLDIR)/why3realize$(EXE)
-	$(INSTALL) bin/why3replay.@OCAMLBEST@  $(TOOLDIR)/why3replay$(EXE)
-	$(INSTALL) bin/why3wc.@OCAMLBEST@      $(TOOLDIR)/why3wc$(EXE)
 endif
 
 install_local:: bin/why3 $(addprefix bin/,$(TOOLS_BIN))
@@ -2013,6 +1984,10 @@ test-ce.opt: examples/use_api/counterexample.ml lib/why3/why3.cmxa
 	|| (rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz; \
 	printf "Test of Why3 API calls for counterexamples failed. Please fix it"; exit 2)
 	@rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz
+
+test-absint.opt: examples/use_api/absint.ml lib/why3/why3.cmxs
+	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)$(OCAMLOPT) -o examples/use_api/$@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa  $<
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
