@@ -321,7 +321,7 @@ clean::
 
 # debug optimisation ppx
 
-ifeq (@enable_ppx@,yes)
+ifeq (no,yes)
 src/util/ppx_debug_optim: src/util/debug_optim.ml
 	$(SHOW) 'Linking $@'
 	$(HIDE) $(OCAMLFIND) opt -package compiler-libs.common -linkpkg src/util/debug_optim.ml -o $@
