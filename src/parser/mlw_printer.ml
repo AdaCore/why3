@@ -687,18 +687,19 @@ and pp_ind_decl fmt d =
   fprintf fmt "%a%a = %a" pp_id d.in_ident (pp_print_opt_list ~prefix:" " pp_param) d.in_params pp_ind_decl_def d.in_def
 
 and pp_logic_decl fmt d =
-  pp_id fmt d.ld_ident;
-  pp_print_opt_list ~prefix:" " ~sep:" " pp_param fmt d.ld_params;
-  pp_opt ~prefix:" : " pp_pty fmt d.ld_type;
-  pp_opt ~prefix:" =@ " pp_term fmt d.ld_def
+  fprintf fmt "%a%a%a%a"
+    pp_id d.ld_ident
+    (pp_print_opt_list ~prefix:" " ~sep:" " pp_param) d.ld_params
+    (pp_opt ~prefix:" : " pp_pty) d.ld_type
+    (pp_opt ~prefix:" =@ " pp_term) d.ld_def
 
 and pp_decl fmt = function
   | Dtype decls ->
       let pp_type_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_type_decl in
       fprintf fmt "@[<v>type %a@]" pp_type_decls decls
   | Dlogic decls when List.for_all (fun d -> d.ld_type = None) decls ->
-      let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_logic_decl in
-      fprintf fmt "@[<v>predicate %a@]" pp_logic_decls decls
+      let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@]@,@[<hv 2>with ") pp_logic_decl in
+      fprintf fmt "@[<v>@[<hv 2>predicate %a@]@]" pp_logic_decls decls
   | Dlogic decls when List.for_all (fun d -> d.ld_type <> None) decls ->
       let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_logic_decl in
       fprintf fmt "@[<v>function %a@]" pp_logic_decls decls
