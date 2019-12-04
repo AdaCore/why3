@@ -168,7 +168,7 @@ let main () =
   let config =
     if !autoprovers
     then
-      let config = Whyconf.set_provers config Mprover.empty in
+      let config = Whyconf.set_provers config (Whyconf.get_provers config) in
       let config = Whyconf.set_load_default_config !partial_config config in
       let env = Autodetection.run_auto_detection config in
       if !partial_config then
