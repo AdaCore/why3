@@ -6,11 +6,11 @@ module Make(A:DOMAIN) = struct
 
   type t = A.t a
   type env = A.env
-  
+
   let hash man t =
     List.map (A.hash (fst man)) t.t |>
     List.fold_left (+) 0
-  
+
   let is_eq _ _ _ = assert false
 
   module Hashdom = Hashtbl.Make(struct
@@ -20,7 +20,7 @@ module Make(A:DOMAIN) = struct
         (A.is_eq man t t2 && A.is_eq man t' t2') ||
         (A.is_eq man t' t2 && A.is_eq man t t2')
     end)
-  
+
   module Hashdoml = Hashtbl.Make(struct
       type t = (A.t * Apron.Lincons1.earray * A.man)
       let hash (t, t', man) = A.hash man t + Hashtbl.hash t'
@@ -28,8 +28,8 @@ module Make(A:DOMAIN) = struct
         A.is_eq man t t2 && (
           t' = t2')
     end)
-  
-  
+
+
   type disj_man = { join_tbl: bool Hashdom.t; real_join_tbl: A.t Hashdom.t; meet_lincons: A.t Hashdoml.t }
   type man = A.man * disj_man
 
@@ -40,7 +40,7 @@ module Make(A:DOMAIN) = struct
   let top man e = { i = 0; t = [A.top (fst man) e]; c = true; }
 
   let canonicalize m a = List.iter (A.canonicalize (fst m)) a.t
-  
+
   let print fmt e = List.iter (fun b ->
       A.print fmt b;
       Format.fprintf fmt "@.";) e.t
@@ -49,7 +49,7 @@ module Make(A:DOMAIN) = struct
     let man = fst man in
     List.map (A.is_bottom man) t.t
     |> List.fold_left ( && ) true
-  
+
   let a_meet_lincons_array man a l =
     (*try
       Hashdoml.find (snd man).meet_lincons (a, l, fst man)
@@ -61,7 +61,7 @@ module Make(A:DOMAIN) = struct
 
   let a_is_leq man a b =
     A.is_leq (fst man) a b
-  
+
   let a_join man a b =
     (*try
       Hashdom.find (snd man).real_join_tbl (a, b, fst man)
@@ -159,9 +159,9 @@ module Make(A:DOMAIN) = struct
     | [t] -> t
     | t::q ->
       List.fold_left (join man) t q
-  
+
   let is_join_precise man a b = Some (join man a b)
-  
+
 
   (* used once by loop, so it can be costly *)
   let widening man a b =

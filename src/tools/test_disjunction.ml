@@ -15,8 +15,8 @@ let add_opt x =
 let config, _, env =
   Whyconf.Args.initialize [] add_opt usage_msg
 
-let assert_ n b = 
-  if b then 
+let assert_ n b =
+  if b then
     Format.eprintf "%s \027[32m passed\027[0m.@." n
   else
     Format.eprintf "%s \027[31m failed\027[0m.@." n
@@ -75,7 +75,7 @@ let test2 =
   dom_eq man ([Base.join_list man (List.concat [d1; d2])]) d
   |> assert_ "test2"
 
-let test3 = 
+let test3 =
   let man, env, assign, constr, _ = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 4; "y", [], 3] in
   let d2 = constr ["x", [], 3; "y", [], 2] in
@@ -145,7 +145,7 @@ let test6 =
   let d1 = Dom.top man env in
   let d1 = lineq d1 [1, "x"; -1, "y"] 0 Lincons1.EQ in
   let d1 = lineq d1 [1, "i"] (-8) Lincons1.EQ in
-  
+
   let d2 = Dom.top man env in
   let d2 = lineq d2 [1, "x"] 0 Lincons1.EQ in
   let d4 = Dom.top man env in
@@ -212,7 +212,7 @@ let test_w1 =
   let d1 = Domw.top man env in
   let a1 = lineq d1 [-2, "x"] (3) Lincons1.SUPEQ in
   let a2 = lineq d1 [1, "x"] (-1) Lincons1.SUPEQ in
-  
+
   Domw.print Format.err_formatter a1;
   assert_ "testcleanup" (dom_eq man a1 a2);
   Format.eprintf "@.";
@@ -224,11 +224,11 @@ let test_w1 =
   let a1 = lineq d1 [1, "z"] 0 Lincons1.EQ in
   let a1 = lineq a1 [1, "y"] 0 Lincons1.EQ in
   let a1 = lineq a1 [1, "x"] (-2) Lincons1.SUPEQ in
-  
+
   let a2 = lineq d1 [1, "z"] (-4) Lincons1.EQ in
   let a2 = lineq a2 [1, "y"] (-2) Lincons1.EQ in
   let a2 = lineq a2 [1, "x"] (-2) Lincons1.SUPEQ in
-  
+
   let a3 = lineq d1 [1, "z"] (-2) Lincons1.EQ in
   let a3 = lineq a3 [1, "y"] (-1) Lincons1.EQ in
   let a3 = lineq a3 [1, "x"] (-2) Lincons1.SUPEQ in
@@ -240,4 +240,3 @@ let test_w1 =
   Domw.print Format.err_formatter d3;
   Format.eprintf "@.";
   assert_ "testw1" true
-

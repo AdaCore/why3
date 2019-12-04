@@ -9,7 +9,7 @@ module Make(S:sig
     val pmod: Pmodule.pmodule
   end) = struct
   module A = S.A
-  
+
   open Ai_logic
   module Ai_logic = Ai_logic.Make(struct
       let env = S.env
@@ -19,20 +19,20 @@ module Make(S:sig
 
   type t = A.t a
   type env = A.env
-  
+
   let is_eq _ _ _ = assert false
 
   type disj_man = ()
   type man = A.man * disj_man
 
-  let (create_manager:unit -> man) = fun () -> A.create_manager (), () 
+  let (create_manager:unit -> man) = fun () -> A.create_manager (), ()
 
   let bottom m e = { i = 0; t = []; c = true; }
 
   let top man e = { i = 0; t = [A.top (fst man) e]; c = true; }
 
   let canonicalize m a = List.iter (A.canonicalize (fst m)) a.t
-  
+
   let print fmt e = List.iter (fun b ->
       A.print fmt b;
       Format.fprintf fmt "@.";) e.t
@@ -41,7 +41,7 @@ module Make(S:sig
     let man = fst man in
     List.map (A.is_bottom man) t.t
     |> List.fold_left ( && ) true
-  
+
   let is_leq (man, _) a b =
     let rec aux = function
       | [] -> true
@@ -130,9 +130,9 @@ module Make(S:sig
     | [t] -> t
     | t::q ->
       List.fold_left (join man) t q
-  
+
   let is_join_precise man a b = Some (join man a b)
-  
+
 
   (* used once by loop, so it can be costly *)
   let widening man a b =
@@ -159,7 +159,7 @@ module Make(S:sig
     let c = {t = List.map (fun (k, v) ->
          A.widening (fst man) v k) b_leq; c = false; i = 0; } |> cleanup man in
     c
-  
+
   let to_term man t =
     let f = A.to_term (fst man) in
     let t = cleanup_hard man t in
@@ -197,7 +197,7 @@ module Make(S:sig
 
   let forget_term (man, _) v d =
     { d with t = List.map (A.forget_term man v) d.t }
-  
+
   let rec meet_term man term elt =
     let open Term in
     match term.t_node with

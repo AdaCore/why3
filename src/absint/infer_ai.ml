@@ -1,8 +1,14 @@
-module Make(S:sig
-    val env: Env.env
-    val widening: int
-    module D: Domain.DOMAIN
-  end) = struct
+module type Abs_int_options = sig
+    val env       : Env.env
+    val widening  : int
+    module Domain : Domain.DOMAIN
+end
+
+module type Inv_gen = sig
+  val infer_loop_invariants: Pmodule.pmodule -> Pmodule.pmodule
+end
+
+module Make (S: Abs_int_options) = struct
 
   let env = S.env
 
@@ -12,11 +18,11 @@ module Make(S:sig
   open Ity
 
   let infer_loop_invariants pmod =
-    let module AI = Ai_cfg.Make(struct
+    let module AI = Ai_cfg.Make (struct
         let env = env
         let pmod = pmod
         let widening = S.widening
-        module D = S.D
+        module D = S.Domain
       end)
     in
 
