@@ -1,28 +1,22 @@
-module type Abs_int_options = sig
-    val env       : Env.env
-    val widening  : int
-    module Domain : Domain.DOMAIN
-end
 
 module type Inv_gen = sig
-  val infer_loop_invariants: Pmodule.pmodule -> Pmodule.pmodule
+  val infer_loop_invariants:
+    ?widening:int -> Env.env -> Pmodule.pmodule -> Pmodule.pmodule
 end
 
-module Make (S: Abs_int_options) = struct
-
-  let env = S.env
+module Make (D: Domain.DOMAIN) = struct
 
   open Pmodule
   open Pdecl
   open Expr
   open Ity
 
-  let infer_loop_invariants pmod =
+  let infer_loop_invariants ?(widening=3) env pmod =
     let module AI = Ai_cfg.Make (struct
         let env = env
         let pmod = pmod
-        let widening = S.widening
-        module D = S.Domain
+        let widening = widening
+        module D = D
       end)
     in
 
@@ -148,3 +142,8 @@ module Make (S: Abs_int_options) = struct
     close_module pmod_uc
 
 end
+
+
+module InvGenPolyhedra : Inv_gen = Make (Domain.Polyhedra)
+module InvGenBox       : Inv_gen = Make (Domain.Box)
+module InvGenOct       : Inv_gen = Make (Domain.Oct)

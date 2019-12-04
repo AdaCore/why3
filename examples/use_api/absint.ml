@@ -36,26 +36,12 @@ let parse_file file env =
      printf "unlocated error: %s@." (Printexc.to_string e);
      exit 1
 
-module Domain_dft = Domain.Polyhedra
-
-module MkAbsIntOpt (D: Domain.DOMAIN) : Abs_int_options = struct
-  let env = env
-  let widening = Opt.get_def 3 !widening
-  module Domain = D
-end
-
-module MkInvGen (D: Domain.DOMAIN) : Inv_gen = Make(MkAbsIntOpt(D))
-
-let generate_inv m = match !domain with
-  | Some "box" ->
-     let module InvGen = MkInvGen(Domain.Box) in
-     InvGen.infer_loop_invariants m
-  | Some "oct" ->
-     let module InvGen = MkInvGen(Domain.Oct) in
-     InvGen.infer_loop_invariants m
-  | _ ->
-     let module InvGen = MkInvGen(Domain.Polyhedra) in
-     InvGen.infer_loop_invariants m
+(* Select the adequated function to the chosen abstract interpretation domain *)
+let generate_inv domain =
+  match domain with
+  | Some "box" -> InvGenBox.infer_loop_invariants
+  | Some "oct" -> InvGenOct.infer_loop_invariants
+  | _          -> InvGenPolyhedra.infer_loop_invariants
 
 let run_on_file file =
   (* parse mlw file *)
@@ -63,7 +49,10 @@ let run_on_file file =
   printf "Syntax OK@.";
 
   (* generate invariants *)
-  let mlw_with_inv = Wstdlib.Mstr.map generate_inv mlw in
+  let widening = Opt.get_def 3 !widening in
+  let infer = (generate_inv !domain) ~widening env in
+  let mlw_with_inv = Wstdlib.Mstr.map infer mlw in
+  printf "Invariants generated successfully@.";
 
   (* print modules to standard output after generating loop invariants *)
   Wstdlib.Mstr.iter (fun s pm ->
@@ -72,6 +61,6 @@ let run_on_file file =
 
 let () =
   if !files = [] then
-    eprintf "no file provided"
+    eprintf "No file provided@\n"
   else
     List.iter run_on_file !files
