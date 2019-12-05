@@ -257,7 +257,7 @@ let load_config config original_config =
     session_nb_processes = Whyconf.running_provers_max main;
 }
 
-let save_config t =
+let get_config t =
   Debug.dprintf debug "[config] saving IDE config file@.";
   (* taking original config, without the extra_config *)
   let config = t.original_config in
@@ -275,6 +275,8 @@ let save_config t =
   let config = set_provers config (get_provers t.config) in
   (* copy also the possibly changed policies *)
   let config = set_policies config (get_policies t.config) in
+  (* Set editors *)
+  let config = set_editors config (get_editors t.config) in
   let ide = empty_section in
   let ide = set_int ide "window_height" t.window_height in
   let ide = set_int ide "window_width" t.window_width in
@@ -303,8 +305,10 @@ let save_config t =
   let ide = set_string ide "search_color" t.search_color in
   let ide = set_string ide "iconset" t.iconset in
   let ide = set_stringl ide "hidden_prover" t.hidden_provers in
-  let config = Whyconf.set_section config "ide" ide in
-  Whyconf.save_config config
+  Whyconf.set_section config "ide" ide
+
+let save_config t =
+  Whyconf.save_config (get_config t)
 
 let config,load_config =
   let config = ref None in
@@ -1275,8 +1279,10 @@ let preferences ~parent (c : t) =
       c.config <- Whyconf.set_main c.config
         (Whyconf.set_limits (Whyconf.get_main c.config)
            c.session_time_limit c.session_mem_limit c.session_nb_processes);
-      save_config ()
-    | `CLOSE | `DELETE_EVENT -> ()
+      save_config ();
+      Itp_server.set_partial_config (get_config (config ()))
+    | `CLOSE | `DELETE_EVENT ->
+        Itp_server.set_partial_config (get_config (config ()))
   end;
   dialog#destroy ()
 

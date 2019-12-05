@@ -29,6 +29,11 @@ end
 *)
 val add_registered_lang: string -> (Task.task -> any_pp Pp.pp -> any_pp Pp.pp) -> unit
 
+(* Used to update the config after preferences are changed in the ide.
+   This is not usable by other IDEs (webide): in the long term a
+   request/notification could be added for this kind of interaction. *)
+val set_partial_config: Whyconf.config -> unit
+
 module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
 
   (* This function is used to change the registered function for
