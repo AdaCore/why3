@@ -430,7 +430,7 @@ module mach.array.Array32
   syntax val       copy          "Array.copy"
   syntax val       fill          "Array.fill"
   syntax val       blit          "Array.blit"
-  syntax val       self_blit     "Array.blit"
+  syntax val       self_blit     "Array.blit %1 %2 %1 %3 %4" prec 4 3 3 3 3 3
 end
 
 module mach.array.Array63
@@ -448,7 +448,7 @@ module mach.array.Array63
   syntax val       copy          "Array.copy"
   syntax val       fill          "Array.fill"
   syntax val       blit          "Array.blit"
-  syntax val       self_blit     "Array.blit"
+  syntax val       self_blit     "Array.blit %1 %2 %1 %3 %4" prec 4 3 3 3 3 3
   syntax val       init          "Array.init"
 end
 
