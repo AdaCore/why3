@@ -24,7 +24,6 @@ let () =
 
 (* Some configurations for parsing and typing WhyML *)
 open Why3
-open Infer_ai
 
 let config : Whyconf.config = Whyconf.read_config None
 let main   : Whyconf.main   = Whyconf.get_main config
@@ -32,7 +31,7 @@ let env    : Env.env        = Env.create_env (Whyconf.loadpath main)
 
 (* Parses and types a file *)
 let parse_file file env =
-  try Env.read_file Pmodule.mlw_language env file with
+  try fst (Env.read_file Pmodule.mlw_language env file) with
   | Loc.Located(loc, e) ->
      printf "%a: %a@." Loc.gen_report_position loc Exn_printer.exn_printer e;
      exit 1
@@ -41,20 +40,20 @@ let parse_file file env =
      exit 1
 
 (* Logic to use loop invariant inference *)
+(* open Infer_ai *)
 
 (* Select the adequate function according to the chosen abstract interpretation domain *)
 let generate_inv domain =
   match domain with
-  | Some "box"    -> InvGenBox.infer_loop_invariants
-  | Some "oct"    -> InvGenOct.infer_loop_invariants
-  | _ (*default*) -> InvGenPolyhedra.infer_loop_invariants
+  | Some "box"    -> Infer_ai.InvGenBox.infer_loop_invariants
+  | Some "oct"    -> Infer_ai.InvGenOct.infer_loop_invariants
+  | _ (*default*) -> Infer_ai.InvGenPolyhedra.infer_loop_invariants
 
 (* Main function: parses and types a file, generates the invariants
    for each module, and prints them to the standard output *)
 let run_on_file file =
   (* parse mlw file *)
-  let mlw, _ = parse_file file env in
-  printf "Syntax OK@.";
+  let mlw = parse_file file env in
 
   (* generate invariants *)
   let widening = Opt.get_def 3 !widening in
@@ -62,7 +61,7 @@ let run_on_file file =
   let mlw_with_inv = Wstdlib.Mstr.map infer mlw in
   printf "Invariants generated successfully@.";
 
-  (* print modules to standard output after generating loop invariants *)
+  (* print modules to std output with the inferred loop invariants *)
   Wstdlib.Mstr.iter (fun s pm ->
       printf "%a@\n" Pmodule.print_module pm) mlw_with_inv;
   exit 0

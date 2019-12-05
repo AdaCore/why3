@@ -477,6 +477,96 @@ as follows:
 
 % TODO Details on the way the JSON is printed can be found in the code.
 
+\section{Infering loop invariants}
+\label{sec:infer-loop-api}
+
+For information about the inference of loop invariants in \why refer
+to Chapter~\ref{chp:infer-loop}. This section describes how to use the
+API to infer loop invariants. The complete example used in this
+section is in \verb|examples/use_api/infer.ml|. For the matter of
+simplification, in this section we omit some details, such as the
+parsing of command line arguments.
+
+Let us start by defining a \why environment required to parse and type
+check a \whyml program. This was already discussed in the previous
+sections.
+
+\begin{verbatim}
+open Why3
+
+let config : Whyconf.config = Whyconf.read_config None
+let main   : Whyconf.main   = Whyconf.get_main config
+let env    : Env.env        = Env.create_env (Whyconf.loadpath main)
+\end{verbatim}
+
+Now, we define a function that given a path for a file and an \why
+environment, returns a collection of typed modules corresponding to
+the top level modules declared in the file.
+
+\begin{verbatim}
+let parse_file file env =
+  try fst (Env.read_file Pmodule.mlw_language env file) with
+  | Loc.Located(loc, e) ->
+     printf "%a: %a@." Loc.gen_report_position loc Exn_printer.exn_printer e;
+     exit 1
+  | e ->
+     printf "unlocated error: %s@." (Printexc.to_string e);
+     exit 1
+\end{verbatim}
+
+Up to this point we just defined what is required for our tool to
+parse and type check a \whyml file. It is now possible to infer loop
+invariants. For that we can use the \ocaml module \verb|Infer_ai| that
+provides the following interface.
+
+\begin{verbatim}
+module type Inv_gen = sig
+  val infer_loop_invariants:
+    ?widening:int -> Env.env -> Pmodule.pmodule -> Pmodule.pmodule
+end
+
+module Make (D: Domain.DOMAIN) : Inv_gen
+
+module InvGenPolyhedra : Inv_gen
+module InvGenBox       : Inv_gen
+module InvGenOct       : Inv_gen
+\end{verbatim}
+
+The interface provides a module type \verb|Inv_gen| containing only a
+function that receives a \emph{widening} value (the default value is
+3), a \why environment, and a typed \why module. It returns the same
+module with the inferred invariants. Three modules of these type are
+also provided: \verb|InvGenPolyhedra|, \verb|InvGenBox|, and
+\verb|InvGenOct|. Each one of these modules imposes the obvious
+abstract interpretation domain, respectively \emph{Polyhedra},
+\emph{Box}, and \emph{Oct}. Other modules, using other domains can be
+created using the \verb|Make| functor.
+
+Putting these pieces together, it is now possible to create a function
+that receives a path for a \whyml file, parses and types it, infers
+loop invariants, and outputs the result to the standard output.
+
+\begin{verbatim}
+let run_on_file file =
+  (* parse mlw file *)
+  let mlw = parse_file file env in
+
+  (* generate invariants *)
+  let infer =
+    Infer_ai.InvGenPolyhedra.infer_loop_invariants ~widening:3 env in
+  let mlw_with_inv = Wstdlib.Mstr.map infer mlw in
+  printf "Invariants generated successfully@.";
+
+  (* print modules to std output with the inferred loop invariants *)
+  Wstdlib.Mstr.iter (fun s pm ->
+      printf "%a@\n" Pmodule.print_module pm) mlw_with_inv;
+  exit 0
+\end{verbatim}
+
+In the code above, the \emph{widening} and the \emph{abstract
+  interpretation domain} are hard coded, but they can be selected by
+the user. For more information see \verb|examples/use_api/infer.ml|.
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-PDF-mode: t
