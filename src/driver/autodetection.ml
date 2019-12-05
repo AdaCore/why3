@@ -535,8 +535,13 @@ let detect_exec env data exec_name =
 let detect_exec env data acc exec_name =
   try
     let prover_config = detect_exec env data exec_name in
-    known_version env exec_name;
-    add_prover_with_uniq_id prover_config acc
+    if Mprover.mem prover_config.prover acc then
+      (* Avoid adding manually added provers twice *)
+      acc
+    else begin
+        known_version env exec_name;
+        add_prover_with_uniq_id prover_config acc
+      end
   with
   | Skip -> acc
   | Discard -> known_version env exec_name; acc
@@ -631,7 +636,7 @@ let provers_from_detected_provers config =
     (get_detected_provers config);
   let detected = run_auto_detection' env config in
   let detected =
-    Whyconf.Mprover.map (fun c -> { c with added_at_startup = true }) detected
+    Mprover.map (fun c -> { c with added_at_startup = true }) detected
   in
   generate_builtin_config (env,detected) config
 
