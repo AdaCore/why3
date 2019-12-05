@@ -368,8 +368,6 @@ open Term
 open Format
 open Pretty
 
-let protect_on x s = if x then "(" ^^ s ^^ ")" else s
-
 (* python print_binop *)
 let print_binop ~asym fmt = function
   | Tand when asym -> fprintf fmt "&&"
