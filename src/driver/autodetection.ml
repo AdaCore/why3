@@ -503,7 +503,7 @@ let detect_exec env data exec_name =
       interactive = (match data.kind with ITP -> true | ATP -> false);
       extra_options = [];
       extra_drivers = [];
-      added_at_startup = false;
+      detected_at_startup = false;
     } in
   (* if unknown, temporarily put the prover away *)
   if not (good || old) then begin
@@ -635,8 +635,11 @@ let provers_from_detected_provers config =
         (Some detected.version))
     (get_detected_provers config);
   let detected = run_auto_detection' env config in
+  let manually_added = get_provers config in
   let detected =
-    Mprover.map (fun c -> { c with added_at_startup = true }) detected
+    Mprover.map (fun c -> if Mprover.mem c.prover manually_added
+                    then c else
+                    {  c with detected_at_startup = true }) detected
   in
   generate_builtin_config (env,detected) config
 

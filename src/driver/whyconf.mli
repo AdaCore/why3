@@ -132,7 +132,7 @@ type config_prover = {
   interactive  : bool; (* Interactive theorem prover *)
   extra_options: string list;
   extra_drivers: string list;
-  added_at_startup : bool; (* added at startup or present in the user configuration *)
+  detected_at_startup : bool; (* detected at startup *)
 }
 
 val get_complete_command : config_prover -> with_steps:bool -> string

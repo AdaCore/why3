@@ -138,7 +138,7 @@ type config_prover = {
   interactive : bool;
   extra_options : string list;
   extra_drivers : string list;
-  added_at_startup : bool;
+  detected_at_startup : bool;
 }
 
 type config_editor = {
@@ -477,7 +477,7 @@ let load_prover (provers,shortcuts) section =
         interactive = get_bool ~default:false section "interactive";
         extra_options = [];
         extra_drivers = [];
-        added_at_startup = false;
+        detected_at_startup = false;
       } provers in
     let lshort = get_stringl section ~default:[] "shortcut" in
     let shortcuts = add_prover_shortcuts shortcuts prover lshort in
@@ -836,7 +836,7 @@ let set_main config main =
 let set_provers config ?shortcuts provers =
   let shortcuts = Opt.get_def config.prover_shortcuts shortcuts in
   let rc_config =
-    let provers = Mprover.filter (fun _ c -> not c.added_at_startup) provers in
+    let provers = Mprover.filter (fun _ c -> not c.detected_at_startup) provers in
     set_provers_shortcuts config.config shortcuts provers;
   in
   {config with

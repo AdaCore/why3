@@ -79,6 +79,7 @@ IDE
   * Read only file can now be displayed and removed by right clicking on their
     tab titles
   * Colors for error can now be edited in the why3.conf more precisely
+  * Most of the preferences can now be changed for the current session
 
 Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq
