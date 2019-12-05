@@ -1985,7 +1985,7 @@ test-ce.opt: examples/use_api/counterexample.ml lib/why3/why3.cmxa
 	printf "Test of Why3 API calls for counterexamples failed. Please fix it"; exit 2)
 	@rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz
 
-test-absint.opt: examples/use_api/absint.ml lib/why3/why3.cmxs
+test-infer.opt: examples/use_api/infer.ml lib/why3/why3.cmxs
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)$(OCAMLOPT) -o examples/use_api/$@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa  $<
 

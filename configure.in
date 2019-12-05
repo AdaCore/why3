@@ -74,7 +74,7 @@ AC_ARG_ENABLE(zip,
 
 AC_ARG_ENABLE(infer,
     AS_HELP_STRING([--enable-infer], [use apron and fixpoint to infer loop invariants]),,
-    enable_infer=yes)
+    enable_infer=no)
 # js_of_ocaml
 
 AC_ARG_ENABLE(js_of_ocaml,
@@ -488,9 +488,11 @@ if test "$enable_infer" = yes; then
 	  fi
    else
      enable_infer=no
-	 reason_infer=" (apron or apron.polkaMPQ or apron.boxMPQ or apron.octMPQ or camllib not found)"
-	 AC_MSG_WARN([Lib apron or apron.polkaMPQ  not found or apron.boxMPQ or apron.octMPQ or camllib, infer will not be built.])
+	   reason_infer=" (apron or apron.polkaMPQ or apron.boxMPQ or apron.octMPQ or camllib not found)"
+	   AC_MSG_WARN([Lib apron or apron.polkaMPQ  not found or apron.boxMPQ or apron.octMPQ or camllib, infer will not be built.])
    fi
+else
+  reason_infer=" (disabled by default)"
 fi
 
 
@@ -1160,13 +1162,13 @@ echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
 echo "Components"
-echo "    Invariant inference     : $enable_infer$reason_infer"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"
 echo "    Web IDE                 : $enable_web_ide$reason_web_ide"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
+echo "    Invariant inference     : $enable_infer$reason_infer"
 echo "    Frama-C support         : $enable_frama_c$reason_frama_c"
 if test "$enable_frama_c" = yes ; then
    echo "        Version             : $FRAMAC_VERSION"
