@@ -1919,6 +1919,69 @@ object (self)
     m
 end
 
+(*****************************************************************)
+(* "Tools" submenus for strategies, provers, and transformations *)
+(*****************************************************************)
+
+let string_of_desc desc =
+  let print_trans_desc fmt (x,r) =
+    fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
+  in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
+
+let parse_shortcut_as_key s =
+  let (key,modi) as r = GtkData.AccelGroup.parse s in
+  begin if key = 0 then
+    Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s
+  else
+    let name = GtkData.AccelGroup.name ~key ~modi in
+    Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name
+  end;
+  r
+
+let add_submenu_strategy (str_fac: menu_factory) (con_fac: menu_factory) (shortcut,strategy) =
+  let callback () =
+    Debug.dprintf debug "interp command '%s'@." strategy;
+    interp strategy
+  in
+  let name = String.map (function '_' -> ' ' | c -> c) strategy in
+  let tooltip = "run strategy " ^ strategy ^ " on selected goal" in
+  let accel_path = "<Why3-Main>/Tools/Strategies/" ^ name in
+  let (key, modi) = parse_shortcut_as_key shortcut in
+  let (_ : GMenu.menu_item) = str_fac#add_item name
+    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
+  let (_ : GMenu.menu_item) = con_fac#add_item name
+    ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
+  ()
+
+let hide_context_provers, add_submenu_prover =
+  (* Set of context provers menu items *)
+  let context_provers = Hstr.create 16 in
+  (* After preferences for hidden provers are set, actualize provers allowed in
+   the context_factory *)
+  let hide_context_provers () =
+    Hstr.iter (fun k i ->
+      if List.mem k gconfig.hidden_provers then
+        i#misc#hide ()
+      else
+        i#misc#show ()) context_provers in
+  let add_submenu_prover (pro_fac: menu_factory) (con_fac: menu_factory)
+    (shortcut,prover_name,prover_parseable_name) =
+    let callback () =
+      Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
+      interp prover_parseable_name
+    in
+    let tooltip = "run prover " ^ prover_name ^ " on selected goal" in
+    let accel_path = "<Why3-Main>/Tools/Provers/" ^ prover_name in
+    let (key,modi) = parse_shortcut_as_key shortcut in
+    let (_ : GMenu.menu_item) = pro_fac#add_item prover_name
+        ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
+    let (i : GMenu.menu_item) = con_fac#add_item prover_name
+        ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
+    Hstr.add context_provers prover_parseable_name i;
+    if List.mem prover_parseable_name gconfig.hidden_provers then
+      i#misc#hide() in
+  hide_context_provers, add_submenu_prover
+
 (*************)
 (* Main menu *)
 (*************)
@@ -1945,6 +2008,8 @@ let (_: GMenu.menu_item) =
 let (_: GMenu.menu_item) =
   let callback () =
     Gconfig.preferences ~parent:main_window gconfig;
+    (* hide/show provers in contextual menu *)
+    hide_context_provers ();
     (* Source view tags *)
     Opt.iter (fun (_, v) -> update_tags gconfig v) (find_current_file_view ());
     (* Update message zone tags *)
@@ -2260,55 +2325,6 @@ let (_ : GMenu.menu_item) =
     "About"
     ~callback:(show_about_window ~parent:main_window)
 
-(*****************************************************************)
-(* "Tools" submenus for strategies, provers, and transformations *)
-(*****************************************************************)
-
-let string_of_desc desc =
-  let print_trans_desc fmt (x,r) =
-    fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
-  in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
-
-let parse_shortcut_as_key s =
-  let (key,modi) as r = GtkData.AccelGroup.parse s in
-  begin if key = 0 then
-    Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s
-  else
-    let name = GtkData.AccelGroup.name ~key ~modi in
-    Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name
-  end;
-  r
-
-let add_submenu_strategy (shortcut,strategy) =
-  let callback () =
-    Debug.dprintf debug "interp command '%s'@." strategy;
-    interp strategy
-  in
-  let name = String.map (function '_' -> ' ' | c -> c) strategy in
-  let tooltip = "run strategy " ^ strategy ^ " on selected goal" in
-  let accel_path = "<Why3-Main>/Tools/Strategies/" ^ name in
-  let (key, modi) = parse_shortcut_as_key shortcut in
-  let (_ : GMenu.menu_item) = strategies_factory#add_item name
-    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
-  let (_ : GMenu.menu_item) = context_factory#add_item name
-    ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
-  ()
-
-let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
-  let callback () =
-    Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
-    interp prover_parseable_name
-  in
-  let tooltip = "run prover " ^ prover_name ^ " on selected goal" in
-  let accel_path = "<Why3-Main>/Tools/Provers/" ^ prover_name in
-  let (key,modi) = parse_shortcut_as_key shortcut in
-  let (_ : GMenu.menu_item) = provers_factory#add_item prover_name
-    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
-  if not (List.mem prover_parseable_name gconfig.hidden_provers) then
-    let (_ : GMenu.menu_item) = context_factory#add_item prover_name
-      ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
-    ()
-
 let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
   List.iter add_completion_entry transformations;
@@ -2334,7 +2350,7 @@ let init_completion provers transformations strategies commands =
   let menu_provers =
     List.filter (fun (_, _, s) -> not (Strings.ends_with s "counterexamples"))
       provers_sorted in
-  List.iter add_submenu_prover menu_provers;
+  List.iter (add_submenu_prover provers_factory context_factory) menu_provers;
   context_factory#add_separator ();
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
@@ -2345,7 +2361,7 @@ let init_completion provers transformations strategies commands =
                    [] strategies
   in
   List.iter add_completion_entry all_strings;
-  List.iter add_submenu_strategy strategies;
+  List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
 
   command_entry_completion#set_text_column completion_col;
   (* Adding a column which contains the description of the
