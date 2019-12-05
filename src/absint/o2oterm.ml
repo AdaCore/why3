@@ -48,7 +48,7 @@ module Make(S:sig type t end) = struct
         in
         add a te t) a b.to_t
 
-  let card a = 
+  let card a =
     Term.Mterm.cardinal a.to_t
 
   let choose a =

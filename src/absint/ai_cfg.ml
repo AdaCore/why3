@@ -1,7 +1,9 @@
 open Domain
 
-let ai_print_domains = Debug.register_flag "ai_print_domains" ~desc:"Print domains to debug"
-let ai_cfg_debug = Debug.register_flag "ai_cfg_debug" ~desc:"CFG debug"
+let ai_print_domains =
+  Debug.register_flag "ai_print_domains" ~desc:"Print domains to debug"
+let ai_cfg_debug =
+  Debug.register_flag "ai_cfg_debug" ~desc:"CFG debug"
 
 open Format
 open Apron

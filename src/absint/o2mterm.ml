@@ -47,7 +47,7 @@ module Make(S:sig type t end) = struct
     { to_term = TMap.add (Term.Mterm.find te oto.to_t) all  oto.to_term;
       to_t = Term.Mterm.remove te oto.to_t }
 
-  let card a = 
+  let card a =
     Term.Mterm.cardinal a.to_t
 
   let card2 a =

@@ -9,13 +9,13 @@ module Make(A:DOMAIN) = struct
 
   let hash _ _ = assert false
   let is_eq _ _ _ = assert false
-  
+
   let bottom m e = []
 
   let top m e = [A.top m e]
 
   let canonicalize m _ = () (*List.iter (A.canonicalize m)*)
-  
+
   let print fmt = List.iter (fun b ->
       A.print fmt b;
       Format.fprintf fmt "@.";)
@@ -113,7 +113,7 @@ module Make(A:DOMAIN) = struct
     | [t] -> t
     | t::q ->
       List.fold_left (join man) t q
-  
+
 
   (* used once by loop, so it can be costly *)
   let widening man a b =

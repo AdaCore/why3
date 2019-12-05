@@ -51,7 +51,7 @@ module Make(A:DOMAIN) = struct
     | _ -> false
 
   exception LNone_found
-  
+
   let sum_list f a =
     let a = List.sort (fun (_, i) (_, j) ->
         compare i j) a in
@@ -118,7 +118,7 @@ module Make(A:DOMAIN) = struct
     | [t] -> t
     | t::q ->
       List.fold_left (join man) t q
-  
+
   let print fmt = List.iter (fun (a,_) -> A.print fmt a)
 
   let widening man a b =
@@ -148,7 +148,7 @@ module Make(A:DOMAIN) = struct
 
   let push_label man env i t =
     List.map (fun (d, p) -> A.push_label man env i d,  path_add i p) t |> sum_list (A.join man)
-  
+
   let to_lincons_array man t =
     match join_one man t with
     | None -> assert false

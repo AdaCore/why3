@@ -9,7 +9,7 @@ module Make(S:sig
   end) = struct
   module A = S.A
   module D = A
-  
+
   module Ai_logic = Ai_logic.Make(struct
       let env = S.env
       let pmod = S.pmod
@@ -84,7 +84,7 @@ module Make(S:sig
                            class_to_term = TermToClass.empty;
                            var_to_term = TermToVar.empty;
                            apron_var;
-                           quant_var; 
+                           quant_var;
                          }
 
   let empty_uf_domain = {
@@ -105,7 +105,7 @@ module Make(S:sig
     A.is_bottom man a
 
   let p = Pretty.print_term Format.err_formatter
-  
+
   let get_class_for_term uf_man t =
     try
       TermToClass.to_t uf_man.class_to_term t
@@ -114,8 +114,8 @@ module Make(S:sig
       let c = Union_find.new_class () in
       uf_man.class_to_term <- TermToClass.add uf_man.class_to_term t c;
       c
-  
-  
+
+
   let get_equivs uf_man uf t =
     let tcl = TermToClass.to_t uf_man.class_to_term t in
     match t.t_node with
@@ -219,7 +219,7 @@ module Make(S:sig
         let lincons = Lincons1.make expr Lincons1.EQ in
         let lincons_array = Lincons1.array_make uf_man.env 1 in
         Lincons1.array_set lincons_array 0 lincons;
-        d := D.meet_lincons_array man !d lincons_array; 
+        d := D.meet_lincons_array man !d lincons_array;
         d := D.forget_array man !d [|v2|] false;
       ) (fun te ->
         (*let eqs' =
@@ -273,7 +273,7 @@ module Make(S:sig
 
   let push_label (man, uf_man) env i (a, b) =
     A.push_label man uf_man.env i a, b
-  
+
   let warning_t s t =
     Format.eprintf "-- warning: %s -- triggered by " s;
     Pretty.print_term Format.err_formatter t;
@@ -300,7 +300,7 @@ module Make(S:sig
         | Some s ->
           t_app s [a] (Some t)
 
-  
+
   let get_subvalues a ity =
     let open Ty in
     let myty = t_type a in
@@ -310,7 +310,7 @@ module Make(S:sig
         []
       | _ when ty_equal myty ty_int ->
         [a, None]
-      | Tyapp(tys, vars) -> 
+      | Tyapp(tys, vars) ->
         begin
           let vars = Ty.ts_match_args tys vars in
           match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
@@ -409,7 +409,7 @@ module Make(S:sig
       TermToVar.to_t uf_man.var_to_term t
     with
     | Not_found ->
-      let v = 
+      let v =
         ignore (Format.flush_str_formatter ());
         Pretty.print_term Format.str_formatter t
         |> Format.flush_str_formatter
@@ -419,7 +419,7 @@ module Make(S:sig
       uf_man.env <- Environment.add uf_man.env [|v|] [||];
       uf_man.var_to_term <- TermToVar.add uf_man.var_to_term t v;
       v
-  
+
   exception Bad_domain of D.t
 
   let rec extract_term (man, uf_man) is_in (dom, b) v =
@@ -433,7 +433,7 @@ module Make(S:sig
             raise Not_found
           else
             candidate
-        with 
+        with
         | Not_found ->
           try
             let t = TermToVar.to_terms b.uf_to_var a in
@@ -456,7 +456,7 @@ module Make(S:sig
       end
     | None -> None
 
-  
+
   let to_term (man, uf_man) (a, b) =
     let find_var = fun a ->
       if a = uf_man.apron_var then
@@ -464,7 +464,7 @@ module Make(S:sig
       else
         try
           Hashtbl.find uf_man.variable_mapping a
-        with 
+        with
         | Not_found ->
           try
             let t = TermToVar.to_term b.uf_to_var a in
@@ -475,7 +475,7 @@ module Make(S:sig
             Format.eprintf "Couldn't find variable %s@." (Var.to_string a);
             raise Not_found
     in
-    let t = 
+    let t =
       D.to_term S.env S.pmod man a find_var    in
     let t = Union_find.fold_class (fun t a b ->
         let a = TermToClass.to_term uf_man.class_to_term a in
@@ -488,7 +488,7 @@ module Make(S:sig
     in
     t_quant Tforall (t_close_quant [var] [] t)
 
-  
+
   let get_class_for_term_ro uf_man t =
     TermToClass.to_t uf_man.class_to_term t
 
@@ -594,7 +594,7 @@ module Make(S:sig
                   in
                   let equivs = get_equivs uf_man u.classes t in
                   let classes, uf_to_var, d = List.fold_left (fun (classes, uf_to_var, d) u ->
-                      let uf_to_var, d = 
+                      let uf_to_var, d =
                         try
                           let v = (TermToVar.to_t uf_to_var u) in
                           let expr = Linexpr1.make uf_man.env in
@@ -640,7 +640,7 @@ module Make(S:sig
             )
 
           | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int (* || Ty.ty_equal (t_type a) Ty.ty_bool*))
-                                    && 
+                                    &&
                                     (ls_equal ps_equ func ||
                                      ls_equal lt_int func ||
                                      ls_equal gt_int func ||
@@ -678,7 +678,7 @@ module Make(S:sig
             let arr = Lincons1.array_make uf_man.env 1 in
             Lincons1.array_set arr 0 cons;
             let f = !f in
-            let f = 
+            let f =
               if ls_equal ps_equ func then
                 let g = do_eq (man, uf_man) a b in
                 (fun (d, ud) ->
@@ -701,7 +701,7 @@ module Make(S:sig
             let f_uf = do_eq (man, uf_man) a b in
             let subv_a = get_subvalues a None in
             let subv_b = get_subvalues b None in
-            List.combine subv_a subv_b 
+            List.combine subv_a subv_b
             |> List.fold_left (fun f ((a, _), (b, _)) ->
                 let g = aux (t_app ps_equ [a; b] None) in
                 (fun abs ->
@@ -759,7 +759,7 @@ module Make(S:sig
         Hashtbl.add uf_man.variable_mapping v t;
         uf_man.env <- Environment.add uf_man.env [|v|] [||]
       end
-  
+
   let add_lvariable_to_env (man, uf_man) vsym =
     incr var_id;
     let open Expr in
@@ -811,7 +811,7 @@ module Make(S:sig
               uf_man.apron_mapping <- Term.Mterm.add t v uf_man.apron_mapping) subv
         end
 
-  
+
   let cached_vreturn = ref (Ty.Mty.empty)
   let ident_ret = Ident.{pre_name = "$reg"; pre_label = Ident.Slab.empty; pre_loc = None; }
   let create_vreturn man ty =
@@ -824,7 +824,7 @@ module Make(S:sig
       add_lvariable_to_env man v;
       cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
       v
-  
+
   let add_variable_to_env (man, uf_man) psym =
     incr var_id;
     let open Expr in
@@ -858,9 +858,9 @@ module Make(S:sig
       uf_man.apron_mapping <- Term.Mterm.add logical_term v uf_man.apron_mapping;
     | _ when Ity.ity_equal variable_type Ity.ity_unit
       -> ()
-    | Ity.Ityreg(reg), Tyapp(_, _) -> 
+    | Ity.Ityreg(reg), Tyapp(_, _) ->
       begin
-        let reg_name = 
+        let reg_name =
           Ity.print_reg_name Format.str_formatter reg
           |> Format.flush_str_formatter
         in
@@ -920,7 +920,7 @@ module Make(S:sig
       Ity.print_ity Format.err_formatter variable_type;
       Format.eprintf "@.";
       ()
-            
+
   let is_in t myt =
     let found = ref false in
     let rec is_in myt =
@@ -1021,7 +1021,7 @@ module Make(S:sig
                     let alt = replaceby v in
                     let altcl = get_class_for_term uf_man alt in
                     let b = { b with classes = Union_find.union altcl altcl b.classes } in
-                    let uf_to_var = 
+                    let uf_to_var =
                       try
                         let myv = TermToVar.to_t b.uf_to_var v in
                         try
@@ -1095,7 +1095,7 @@ module Make(S:sig
 
   let update_possible_substitutions (man, uf_man) =
     ()
-  
+
   let widening (man, uf_man) (a, b) (c, d) =
     let a = A.widening man a c in
     let a, e = join_uf (man, uf_man) a b d in

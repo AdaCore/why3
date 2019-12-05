@@ -1,6 +1,6 @@
 type t = int
 
-type set = int list list 
+type set = int list list
 
 let empty = []
 
@@ -88,7 +88,7 @@ let print s =
 
 let is_leq a b =
   let b = List.fold_left (fun t cb ->
-      t && 
+      t &&
         List.fold_left (fun t ca ->
             t || begin
               let na = List.length ca in
