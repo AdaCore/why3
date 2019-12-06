@@ -340,3 +340,16 @@ let read_channel env path file c =
 let () =
   Env.register_format mlw_language "micro-C" ["c"] read_channel
     ~desc:"micro-C format"
+
+(* Add an extension of task printing *)
+let () = Itp_server.add_registered_lang "micro-C"
+    (fun _ -> Mc_printer.microc_ext_printer)
+
+(* Add transformation arguments parsing *)
+let () = Args_wrapper.set_argument_parsing_functions "micro-C"
+    ~parse_term:(fun _ lb -> Mc_lexer.parse_term lb)
+    ~parse_term_list:(fun _ lb -> Mc_lexer.parse_term_list lb)
+    ~parse_list_ident:(fun lb -> Mc_lexer.parse_list_ident lb)
+    (* TODO for qualids, add a similar funciton *)
+    ~parse_qualid:(fun lb -> Lexer.parse_qualid lb)
+    ~parse_list_qualid:(fun lb -> Lexer.parse_list_qualid lb)

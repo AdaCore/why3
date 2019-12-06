@@ -34,6 +34,8 @@ let prio_binop = function
   | Timplies -> 1
   | Tiff -> 1
 
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
 type any_pp =
   | Pp_term of (Term.term * int) (* term and priority *)
   | Pp_ty of (Ty.ty * int * bool) (* ty * prio * q *)
@@ -240,8 +242,6 @@ let print_pr_qualified fmt pr =
   try print_qualified true fmt pr.pr_name with Not_found -> print_pr fmt pr
 
 (** Types *)
-
-let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
 let rec print_ty_node ?(ext_printer=true) q pri fmt ty =
   if ext_printer then

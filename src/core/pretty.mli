@@ -25,6 +25,9 @@ open Task
 
 val prio_binop: binop -> int
 
+val protect_on: bool -> ('a, 'b, 'c, 'd, 'e, 'f) format6 ->
+  ('a, 'b, 'c, 'd, 'e, 'f) format6
+
 type syntax =
 | Is_array of string
 | Is_getter of string

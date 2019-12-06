@@ -211,7 +211,7 @@ let env, gconfig = try
 (********************************)
 
 
-let (why_lang, any_lang, why3py_lang) =
+let (why_lang, any_lang, why3py_lang, why3c_lang) =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
@@ -237,7 +237,14 @@ let (why_lang, any_lang, why3py_lang) =
           load_path;
         exit 1
     | Some _ as l -> l in
-  (why_lang, any_lang, why3py_lang)
+  let why3c_lang =
+    match languages_manager#language "why3c" with
+    | None ->
+        eprintf "language file for 'Why3c' not found in directory %s@."
+          load_path;
+        exit 1
+    | Some _ as l -> l in
+  (why_lang, any_lang, why3py_lang, why3c_lang)
 
 (* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
@@ -917,6 +924,7 @@ let change_lang view lang =
   let lang =
     match lang with
     | "python" -> why3py_lang
+    | "micro-C" -> why3c_lang
     | _ -> why_lang in
   view#source_buffer#set_language lang
 
