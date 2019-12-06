@@ -374,15 +374,20 @@ module OCaml
   use mach.int.Int63
   use export String
 
+  (** to be mapped into the OCaml char type. *)
+  type char = private {
+                content: string;
+              } invariant { length content = 1 }
+
+  val ([]) (s: string) (i: int63) : char
+    requires { 0 <= i < length s }
+    ensures  { result.content = s[i] }
+
   val (=) (x y: string) : bool
     ensures { result <-> x = y }
 
   val length (s: string) : int63
     ensures { result = length s }
-
-  val ([]) (s: string) (i: int63) : string
-    requires { 0 <= i < length s }
-    ensures  { result = s[i] }
 
   val sub (s: string) (start: int63) (len: int63) : string
     requires { 0 <= start <= length s }
