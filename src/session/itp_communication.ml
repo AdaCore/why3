@@ -215,8 +215,9 @@ let print_notify fmt n =
   | Dead s                            -> fprintf fmt "dead :%s" s
   | File_contents (f, _s, _, _)       -> fprintf fmt "file contents %s" f
   | Source_and_ce (_, _list_loc, _gl, _) -> fprintf fmt "source and ce"
-  | Task (ni, _s, list_loc, _g_loc, _lang) ->
-      fprintf fmt "task for node_ID %d which contains a list of %d locations"
-              ni (List.length list_loc) (* print_list_loc list_loc *)
+  | Task (ni, _s, list_loc, g_loc, _lang) ->
+      fprintf fmt "task for node_ID %d which contains a list of %d locations. Goal_location = %a"
+        ni (List.length list_loc)
+        (Pp.print_option print_loc) g_loc (* print_list_loc list_loc *)
   | Ident_notif_loc loc               ->
       fprintf fmt "ident notification %a" Pretty.print_loc loc

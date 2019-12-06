@@ -2799,8 +2799,11 @@ let treat_notification n =
          if list_loc != [] then
            apply_loc_on_source list_loc goal_loc
          else
-           (* Still scroll to the ident (for example for modules) *)
-           scroll_to_loc ~force_tab_switch:false goal_loc;
+           begin
+             erase_loc_all_view ();
+             (* Still scroll to the ident (for example for modules) *)
+             scroll_to_loc ~force_tab_switch:true goal_loc
+           end;
          (* scroll to end of text. Since Gtk3 we must do it in idle() because
             of the "smooth scrolling". *)
          when_idle (fun () -> task_view#scroll_to_mark `INSERT)
