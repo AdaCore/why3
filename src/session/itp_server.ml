@@ -1026,7 +1026,10 @@ end
             | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc, lang))
           end
       | AFile f ->
-          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], None, lang))
+          let file_loc =
+            let fp = Session_itp.system_path d.cont.controller_session f in
+            Loc.user_position fp 1 1 1 in
+          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], Some file_loc, lang))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
