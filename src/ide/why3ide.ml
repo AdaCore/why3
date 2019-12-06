@@ -2306,7 +2306,7 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   view_factory#add_item "Go to parent node"
-    ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Left
     ~callback:move_current_row_selection_to_parent
 
 let (_: GMenu.menu_item) =
@@ -2315,7 +2315,7 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   view_factory#add_item "Select next unproven goal"
-    ~modi:[`CONTROL] ~key:GdkKeysyms._Down
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Right
     ~callback:move_to_next_unproven_node_id
 
 (* "Help" menu items *)
