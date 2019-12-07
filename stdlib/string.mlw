@@ -202,7 +202,7 @@ module String
   axiom suffixof_empty: forall s2.
     suffixof "" s2
 
-  axiom suffiof_empty2: forall s1.
+  axiom suffixof_empty2: forall s1.
     s1 <> empty -> not (suffixof s1 "")
 
   predicate contains string string

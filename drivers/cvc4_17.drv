@@ -26,6 +26,19 @@ end
 
 theory string.String
 
+  remove prop lt_empty
+  remove prop lt_not_com
+  remove prop lt_ref
+  remove prop lt_ref
+  remove prop lt_trans
+  remove prop le_empty
+  remove prop le_ref
+  remove prop lt_le
+  remove prop lt_le_eq
+  remove prop le_trans
+  remove prop replaceall_empty1
+  remove prop not_contains_replaceall
+
   syntax predicate lt        "(str.< %1 %2)"
   syntax predicate le        "(str.<= %1 %2)"
 
