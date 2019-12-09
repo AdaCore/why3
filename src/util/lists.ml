@@ -139,6 +139,13 @@ let rec chop_last = function
   | [r] -> [], r
   | x :: s -> let s, r = chop_last s in x :: s, r
 
+let rec split n l =
+  if n = 0 then [], l
+  else if n < 0 || l = [] then invalid_arg "Util.split"
+  else
+    let prefix, suffix = split (n - 1) (List.tl l) in
+    (List.hd l :: prefix, suffix)
+
 let init n f =
   let rec loop acc i =
     if i >= n then List.rev acc
