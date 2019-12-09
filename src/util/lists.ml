@@ -11,6 +11,14 @@
 
 (* useful list combinators *)
 
+let rev_filter f l =
+  let rec rev_filter acc l =
+    match l with
+    | [] -> acc
+    | hd :: tl when f hd -> rev_filter (hd :: acc) tl
+    | hd :: tl -> rev_filter acc tl in
+  rev_filter [] l
+
 let rev_map_fold_left f acc l =
   let acc, rev =
     List.fold_left

@@ -197,6 +197,19 @@ let convert_policy u =
   | CPU_duplicate p ->
      ["policy", String "duplicate"] @ convert_prover "target_" p
 
+let convert_strat str =
+  String (match str with
+      | Next -> "Next"
+      | Prev -> "Prev"
+      | Clever -> "Clever")
+
+let parse_strat j =
+  match j with
+  | String "Next" -> Next
+  | String "Prev" -> Prev
+  | String "Clever" -> Clever
+  | _ -> assert false
+
 let print_request_to_json (r: ide_request): Json_base.json =
   let cc = convert_request_constructor in
   Record (
@@ -233,9 +246,10 @@ let print_request_to_json (r: ide_request): Json_base.json =
       convert_record ["ide_request", cc r;
            "node_ID1", Int from_id;
            "node_ID2", Int to_id]
-  | Get_first_unproven_node id ->
+  | Get_first_unproven_node (str, id) ->
       convert_record ["ide_request", cc r;
-                      "node_ID", Int id]
+                      "node_ID", Int id;
+                      "strat", convert_strat str]
   | Check_need_saving_req
   | Unfocus_req
   | Save_req
@@ -495,7 +509,8 @@ let parse_request (constr: string) j =
 
   | "Get_first_unproven_node" ->
     let nid = get_int (get_field j "node_ID") in
-    Get_first_unproven_node nid
+    let str = parse_strat (get_field j "strat") in
+    Get_first_unproven_node (str, nid)
 
   | "Add_file_req" ->
     let f = get_string (get_field j "file") in

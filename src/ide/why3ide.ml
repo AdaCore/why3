@@ -1385,13 +1385,13 @@ let move_current_row_selection_to_next () =
       goals_view#set_cursor path view_name_column
   | _ -> ()
 
-let move_to_next_unproven_node_id () =
+let move_to_next_unproven_node_id strat =
   let rows = get_selected_row_references () in
   match rows with
   | [row] ->
       let row_id = get_node_id row#iter in
       manual_next := Some row_id;
-      send_request (Get_first_unproven_node row_id)
+      send_request (Get_first_unproven_node (strat, row_id))
   | _ -> ()
 
 (* unused
@@ -1423,7 +1423,7 @@ let interp_ide cmd =
   | "down" ->
       move_current_row_selection_to_first_child ()
   | "next" ->
-      move_to_next_unproven_node_id ()
+      move_to_next_unproven_node_id Clever
   | "expand" ->
       expand_row ()
   | "collapse" ->
@@ -2306,7 +2306,7 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   view_factory#add_item "Go to parent node"
-    ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Left
     ~callback:move_current_row_selection_to_parent
 
 let (_: GMenu.menu_item) =
@@ -2315,8 +2315,18 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   view_factory#add_item "Select next unproven goal"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Right
+    ~callback:(fun () -> move_to_next_unproven_node_id Clever)
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Go down (skipping proved goals)"
     ~modi:[`CONTROL] ~key:GdkKeysyms._Down
-    ~callback:move_to_next_unproven_node_id
+    ~callback:(fun () -> move_to_next_unproven_node_id Next)
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Go up (skipping proved goals)"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~callback:(fun () -> move_to_next_unproven_node_id Prev)
 
 (* "Help" menu items *)
 
@@ -2690,7 +2700,7 @@ let treat_notification n =
                   (* if the node newly proved is selected, then force
                    moving the selection the next unproved goal *)
                   if is_selected_alone id then
-                    send_request (Get_first_unproven_node id)
+                    send_request (Get_first_unproven_node (Clever, id))
                 end
               else
                 begin
@@ -2739,7 +2749,7 @@ let treat_notification n =
             (* if this new node is a transformation, and its parent
                goal is selected, then ask for the next goal to prove. *)
             if is_selected_alone parent_id then
-              send_request (Get_first_unproven_node parent_id)
+              send_request (Get_first_unproven_node (Clever, parent_id))
          | _ -> ()
        with Not_found ->
          ignore (new_node id name typ detached)
