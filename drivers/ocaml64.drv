@@ -388,7 +388,7 @@ end
 module string.OCaml
   syntax val (=)    "%1 = %2" prec 11 11 10
   syntax val length "String.length %1" prec 4 3
-  syntax val ([]) "String.Get %1 %2" prec 4 3 3
+  syntax val ([]) "String.get %1 %2" prec 4 3 3
   syntax val sub "String.sub %1 %2 %3" prec 4 3 3 3
   syntax val concat "%1 ^ %2" prec 4 3 4
 end

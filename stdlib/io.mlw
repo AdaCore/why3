@@ -4,8 +4,8 @@ module StdIO
   use string.OCaml
   use int.Int
 
-  (** small trick so printinv vals are extracted to OCaml *)
-  type t = private {mutable foo:int}
+  (** small trick so printing vals are extracted to OCaml *)
+  type t = private {ghost mutable foo:int}
   val ghost bar:t
 
   (** prints a string to the standard output *)
