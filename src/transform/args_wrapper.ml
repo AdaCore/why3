@@ -225,6 +225,7 @@ type (_, _) trans_typ =
   | Tlist       : ('a, 'b) trans_typ -> ((symbol list -> 'a), 'b) trans_typ
   | Tidentlist  : ('a, 'b) trans_typ -> ((string list -> 'a), 'b) trans_typ
   | Ttermlist   : ('a, 'b) trans_typ -> ((term list -> 'a), 'b) trans_typ
+  | Ttermlist_same : int * ('a, 'b) trans_typ -> ((term list -> 'a), 'b) trans_typ
   | Tterm       : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Tformula    : ('a, 'b) trans_typ -> ((term -> 'a), 'b) trans_typ
   | Ttheory     : ('a, 'b) trans_typ -> ((Theory.theory -> 'a), 'b) trans_typ
@@ -337,6 +338,54 @@ let parse_and_type_list ~lang ~as_fmla s naming_table =
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
+(* This parses and types a list of terms that should have the same type
+   (example of replace). Because of coercions, this is not trivial to do in
+   this file. To force unification we use a trick that takes the list
+   [t1; t2; t3;....tn] and try to type the term
+   (t1 = t2 /\ t1 = t3 /\ ... t1 = tn) instead. This enforces the correct
+   use of coercions during typing. We then recover the separated terms. *)
+let parse_list_same ~lang ~as_fmla ls naming_table =
+  (* Deconstruct the term built for typing into the list of typed terms *)
+  let rec collect acc t =
+    match t.t_node with
+    | Tbinop (Tand, t1, {t_node = Tapp (eq, [_; t3]); _}) when ls_equal eq ps_equ ->
+        collect (t3 :: acc) t1
+    | Tapp (_, [t2; t3]) -> t2 :: t3 :: acc
+    | _ -> t :: acc in
+  try
+    let llb = List.map (fun s -> Lexing.from_string s) ls in
+    let t_list = List.map (get_parse_term lang naming_table) llb in
+    (* Type them somehow so that they have the same type *)
+    let id_equal = Ptree.{id_str = Ident.op_infix "=";
+                          id_ats = [];
+                          id_loc = Loc.dummy_position } in
+    if List.length t_list < 2 then
+      (* This case should not happen, fallback to normal typing *)
+      List.map (fun t -> type_ptree ~as_fmla t naming_table) t_list
+    else
+      let hds, t_list = Lists.split 2 t_list in
+      let open Ptree in
+      match hds with
+      | hd1 :: hd2 :: [] ->
+          let tfst_eq = {term_desc = Tidapp (Qident id_equal, [hd1; hd2]);
+                         term_loc = Loc.dummy_position} in
+          let term_to_type = List.fold_left
+              (fun acc t ->
+                 let teq = {term_desc = Tidapp (Qident id_equal, [hd1; t]);
+                            term_loc = Loc.dummy_position} in
+                 {term_desc = Tbinnop (acc, Dterm.DTand, teq);
+                  term_loc = Loc.dummy_position })
+              tfst_eq t_list in
+          let typed_term = type_ptree ~as_fmla:true term_to_type naming_table in
+          (* Recollect the (now) typed terms from the conjunction *)
+          collect [] typed_term
+      | _ -> assert false (* Lists.split should give a list of 2 elements *)
+  with
+  | Loc.Located (loc, e) ->
+      let arg = List.fold_left (fun acc x ->
+          if acc = "" then x else acc ^ " " ^ x) "" ls in
+      raise (Arg_parse_type_error (loc, arg, e))
+
 let parse_qualid ~lang s =
   try
     let lb = Lexing.from_string s in
@@ -421,6 +470,7 @@ let rec is_trans_typ_l: type a b. (a, b) trans_typ -> b trans_typ_is_l =
     | Tterm t        -> is_trans_typ_l t
     | Tidentlist t   -> is_trans_typ_l t
     | Ttermlist t    -> is_trans_typ_l t
+    | Ttermlist_same (_, t) -> is_trans_typ_l t
     | Tformula t     -> is_trans_typ_l t
     | Ttheory t      -> is_trans_typ_l t
     | Topt (_,t)     -> is_trans_typ_l t
@@ -446,6 +496,7 @@ let rec string_of_trans_typ : type a b. (a, b) trans_typ -> string =
     | Tformula _     -> "formula"
     | Tidentlist _   -> "list ident"
     | Ttermlist _    -> "list term"
+    | Ttermlist_same _ -> "list term with same type"
     | Ttheory _      -> "theory"
     | Topt (s,t)     -> "?" ^ s ^ (string_of_trans_typ t)
     | Toptbool (s,_) -> "?" ^ s ^ ":bool"
@@ -470,6 +521,7 @@ let rec print_type : type a b. Format.formatter -> (a, b) trans_typ -> unit =
     | Tformula t     -> Format.fprintf fmt "formula -> %a" print_type t
     | Tidentlist t   -> Format.fprintf fmt "list ident -> %a" print_type t
     | Ttermlist t    -> Format.fprintf fmt "list term -> %a" print_type t
+    | Ttermlist_same (n, t) -> Format.fprintf fmt "list term (same type arity: %d) -> %a" n print_type t
     | Ttheory t      -> Format.fprintf fmt "theory -> %a" print_type t
     | Topt (s,t)     -> Format.fprintf fmt "?%s -> %a" s print_type t
     | Toptbool (s,t) -> Format.fprintf fmt "?%s:bool -> %a" s print_type t
@@ -537,6 +589,17 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
     | Ttermlist t', s :: tail ->
        let term_list = parse_and_type_list ~lang ~as_fmla:false s tables in
        wrap_to_store t' (f term_list) tail env tables lang task
+    | Ttermlist_same (arity, t'), s :: tail ->
+        let n_firsts, lasts =
+          try Lists.split arity (s :: tail) with
+          | _ ->
+              let msg = "list of " ^ string_of_int arity ^ " elements of same type" in
+              let args = List.fold_left (fun acc x ->
+                  if acc = "" then x else acc ^ " " ^ x) "" (s::tail) in
+              raise (Arg_expected (msg, args))
+        in
+        let term_list = parse_list_same ~lang ~as_fmla:false n_firsts tables in
+        wrap_to_store t' (f term_list) lasts env tables lang task
     | Topt (optname, t'), s :: s' :: tail when s = optname ->
        begin match t' with
         | Tint t' ->

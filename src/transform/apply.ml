@@ -481,6 +481,12 @@ let replace t1 t2 hl =
       | _ -> [d]) None in
     Trans.par [g; ng]
 
+let replace tl hl =
+  match tl with
+  | t1 :: t2 :: [] -> replace t1 t2 hl
+  | _ ->
+      (* Should not happen, an error should be raised in args_wrapper *)
+      assert false
 
 let t_replace_app unf ls_defn t =
   let (vl, tls) = ls_defn in
@@ -537,7 +543,7 @@ let () = wrap_and_register
             the@ given@ list@ of@ premises.@ If@ no@ list@ is@ given,@ \
             replace@ in@ the@ goal."
           "replace"
-          (Tterm (Tterm (Topt ("in", Tprlist Ttrans_l))))
+          (Ttermlist_same (2, (Topt ("in", Tprlist Ttrans_l))))
           replace
 
 let _ = wrap_and_register
