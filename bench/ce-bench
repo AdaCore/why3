@@ -146,12 +146,12 @@ run () {
             echo "FAILED!"
             # echo "Oracle is ${str_oracle}"
             # echo "Output is ${str_out}"
-            echo "diff is the following:"
-            echo "$f"
-            diff "${oracle_file}" "$f.out"
             if $is_xfail; then
                 echo "Failed but bench is ok because asserted as an XFAIL."
             else
+                echo "diff is the following:"
+                echo "$f"
+                diff "${oracle_file}" "$f.out"
                 success=false
             fi
         fi
