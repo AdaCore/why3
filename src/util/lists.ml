@@ -134,7 +134,7 @@ let fold_lefti f acc l =
 
 let rec prefix n l =
   if n = 0 then []
-  else if n < 0 || l = [] then invalid_arg "Util.chop"
+  else if n < 0 || l = [] then invalid_arg "Util.prefix"
   else List.hd l :: prefix (n - 1) (List.tl l)
 
 let rec chop n l =
@@ -146,6 +146,13 @@ let rec chop_last = function
   | [] -> invalid_arg "Util.chop_last"
   | [r] -> [], r
   | x :: s -> let s, r = chop_last s in x :: s, r
+
+let rec split n l =
+  if n = 0 then [], l
+  else if n < 0 || l = [] then invalid_arg "Util.split"
+  else
+    let prefix, suffix = split (n - 1) (List.tl l) in
+    (List.hd l :: prefix, suffix)
 
 let init n f =
   let rec loop acc i =
