@@ -125,6 +125,11 @@ type notification =
   | Ident_notif_loc of Loc.position
   (** Answer the position where an ident is defined *)
 
+type next_unproved_node_strat =
+  | Prev
+  | Next
+  | Clever
+
 type ide_request =
   | Command_req             of node_ID * string
   (* executes the given command on the given node. command is
@@ -145,7 +150,7 @@ type ide_request =
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string
   (** [Save_file_req(filename, content_of_file)] saves the file *)
-  | Get_first_unproven_node of node_ID
+  | Get_first_unproven_node of next_unproved_node_strat * node_ID
   | Find_ident_req          of Loc.position
   (** [Find_ident_req (position)] *)
   | Unfocus_req

@@ -115,6 +115,11 @@ type notification =
   | Ident_notif_loc of Loc.position
   (* Answer the position where an ident is defined *)
 
+type next_unproved_node_strat =
+  | Prev
+  | Next
+  | Clever
+
 type ide_request =
   | Command_req             of node_ID * string
   | Add_file_req            of string
@@ -125,7 +130,7 @@ type ide_request =
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string
-  | Get_first_unproven_node of node_ID
+  | Get_first_unproven_node of next_unproved_node_strat * node_ID
   | Find_ident_req          of Loc.position
   | Unfocus_req
   | Save_req
@@ -150,7 +155,7 @@ let print_request fmt r =
      fprintf fmt "set prover policy %a -> %a" Whyconf.print_prover p1
              Whyconf.print_prover_upgrade_policy p2
   | Get_file_contents _f            -> fprintf fmt "get file contents"
-  | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
+  | Get_first_unproven_node (_,_nid)-> fprintf fmt "get first unproven node"
   | Find_ident_req _                -> fprintf fmt "find ident"
   | Get_task(nid,b,loc)             -> fprintf fmt "get task(%d,%b,%b)" nid b loc
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"

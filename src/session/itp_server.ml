@@ -1498,14 +1498,14 @@ end
 
   (* ----------------- locate next unproven node -------------------- *)
 
-  let notify_first_unproven_node d ni =
+  let notify_first_unproven_node ~st d ni =
     let s = d.cont.controller_session in
     let any = any_from_node_ID ni in
     match any with
     | None -> P.notify (Message (Error "Please select a node id"))
     | Some any ->
       let unproven_any =
-        get_first_unproven_goal_around
+        get_next_with_strategy ~st
           ~always_send:false
           ~proved:(Session_itp.any_proved s)
           ~children:(get_undetached_children_no_pa s)
@@ -1528,7 +1528,7 @@ end
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
      | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
      | Reset_proofs_req | Find_ident_req _ -> true
-     | Get_first_unproven_node ni ->
+     | Get_first_unproven_node (_st, ni) ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
          Hint.mem model_any nid
@@ -1600,8 +1600,8 @@ end
     | Reload_req                   ->
        reload_session ();
        session_needs_saving := true
-    | Get_first_unproven_node ni   ->
-        notify_first_unproven_node d ni
+    | Get_first_unproven_node (st, ni)   ->
+        notify_first_unproven_node ~st d ni
     | Find_ident_req loc ->
         find_ident loc
     | Remove_subtree nid           ->

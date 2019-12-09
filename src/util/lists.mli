@@ -11,6 +11,8 @@
 
 (** Useful list combinators *)
 
+val rev_filter: ('a -> bool) -> 'a list -> 'a list
+
 val rev_map_fold_left :
   ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
 
