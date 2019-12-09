@@ -126,7 +126,7 @@ let fold_lefti f acc l =
 
 let rec prefix n l =
   if n = 0 then []
-  else if n < 0 || l = [] then invalid_arg "Util.chop"
+  else if n < 0 || l = [] then invalid_arg "Util.prefix"
   else List.hd l :: prefix (n - 1) (List.tl l)
 
 let rec chop n l =
