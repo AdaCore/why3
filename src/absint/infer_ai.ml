@@ -7,7 +7,7 @@ let infer_debug  = Debug.register_flag "infer_debug"
 
 module type Inv_gen = sig
   val infer_loop_invariants:
-    ?widening:int -> Env.env -> Pmodule.pmodule -> Pmodule.pmodule
+    widening:int -> Env.env -> Pmodule.pmodule -> Pmodule.pmodule
 end
 
 module Make (D: Domain.DOMAIN) = struct
@@ -17,7 +17,7 @@ module Make (D: Domain.DOMAIN) = struct
   open Expr
   open Ity
 
-  let infer_loop_invariants ?(widening=3) env pmod =
+  let infer_loop_invariants ~widening env pmod =
     let module AI = Ai_cfg.Make (struct
         let env = env
         let pmod = pmod

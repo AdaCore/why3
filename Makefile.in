@@ -2059,6 +2059,9 @@ doc/generated/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_c
 doc/generated/counterexample__%.ml: examples/use_api/counterexample.ml doc/extract_ocaml_code
 	doc/extract_ocaml_code $* < $< > $@
 
+doc/generated/infer__%.ml: examples/use_api/infer.ml doc/extract_ocaml_code
+	doc/extract_ocaml_code $* < $< > $@
+
 OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
 	buildtask printtask buildtask2 \
 	getconf getanyaltergo getaltergo200 \
@@ -2081,6 +2084,8 @@ OCAMLCODE_MLWEXPR = buildenv source2 code2_import code2 createmodule checkingvcs
 OCAMLCODE_COUNTEREXAMPLES =  ce_declarepropvars ce_adaptgoals \
 	ce_get_cvc4ce ce_callprover ce_nobuiltin
 
+OCAMLCODE_INFER = buildenv parsefile main
+
 OCAMLCODE = \
 	$(addprefix doc/generated/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
 	$(addprefix doc/generated/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
@@ -2088,6 +2093,7 @@ OCAMLCODE = \
 	$(addprefix doc/generated/mlw_tree__, $(addsuffix .ml, $(OCAMLCODE_MLWTREE))) \
 	$(addprefix doc/generated/mlw_expr__, $(addsuffix .ml, $(OCAMLCODE_MLWEXPR))) \
 	$(addprefix doc/generated/counterexample__, $(addsuffix .ml, $(OCAMLCODE_COUNTEREXAMPLES))) \
+	$(addprefix doc/generated/infer__, $(addsuffix .ml, $(OCAMLCODE_INFER))) \
 	doc/generated/whyconf__provertype.ml
 
 DOC = api glossary ide intro exec macros manpages install \
