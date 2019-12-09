@@ -324,26 +324,16 @@ let get_parse_list_ident lang =
 let parse_and_type ~lang ~as_fmla s naming_table =
   try
     let lb = Lexing.from_string s in
-    let t =
-      get_parse_term lang naming_table lb
-    in
-    let t =
-      type_ptree ~as_fmla:as_fmla t naming_table
-    in
-    t
+    let t = get_parse_term lang naming_table lb in
+    type_ptree ~as_fmla:as_fmla t naming_table
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
 let parse_and_type_list ~lang ~as_fmla s naming_table =
   try
     let lb = Lexing.from_string s in
-    let t_list =
-      get_parse_term_list lang naming_table lb
-    in
-    let t_list =
-      List.map (fun t -> type_ptree ~as_fmla:as_fmla t naming_table) t_list
-    in
-    t_list
+    let t_list = get_parse_term_list lang naming_table lb in
+    List.map (fun t -> type_ptree ~as_fmla:as_fmla t naming_table) t_list
   with
   | Loc.Located (loc, e) -> raise (Arg_parse_type_error (loc, s, e))
 
