@@ -38,7 +38,9 @@ module Make(S:sig
       join man (meet_term man a elt) (meet_term man b elt)
     | Tbinop(Tand, a, b) ->
       meet_term man a elt |> meet_term man b
-    | Tbinop(_) -> assert false
+    | Tbinop (Timplies, a, b) -> meet_term man (t_or (t_not a) b) elt
+    | Tbinop (Tiff, a, b) ->
+       meet_term man (t_and (t_implies a b) (t_implies b a)) elt
     | Tquant(Tforall, tq) ->
       begin
         match t_open_quant tq with

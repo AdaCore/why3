@@ -1,0 +1,19 @@
+
+
+module Example1
+  use ref.Ref
+  use int.Int
+  use bool.Bool
+
+  let f (x: int) : bool =
+    requires {x <= 0}
+    ensures  { result = true }
+    let x = ref x in
+    let y = ref true in
+    while !x < 0 do
+      variant {0 - !x}
+      y := andb !y (!x < 0);
+      x := !x + 1
+    done;
+    !y
+end
