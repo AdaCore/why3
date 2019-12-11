@@ -715,16 +715,6 @@ let let_var id ?(ghost=false) e =
   let v = create_pvsymbol id ~ghost e.e_ity in
   LDvar (v,e), v
 
-let let_sym_raw s c =
-  (* we do not compute implicit post-conditions for let-functions,
-     as this would be equivalent to auto-inlining of the generated
-     logical function definition. FIXME: Should we make exception
-     for local let-functions? We do have a mapping definition in
-     the antecedents of WP, but provers must perform beta-reduction
-     to apply it: auto-inlining might be really helpful here. *)
-  LDsym (s,c)
-
-
 let let_sym id ?(ghost=false) ?(kind=RKnone) c =
   let cty = c_cty_enrich ghost kind c in
   let s = create_rsymbol id ~kind cty in
