@@ -102,6 +102,7 @@ deploy:
     - docker build --force-rm --cache-from "$IMAGE" -t "$IMAGE" -f misc/Dockerfile.deploy .
     - docker push "$IMAGE"
     - docker rmi "$IMAGE"
+    - docker image prune -f
   only:
     - master
     - /^bugfix[/]v[0-9.]*$/
