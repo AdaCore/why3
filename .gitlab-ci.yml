@@ -6,7 +6,7 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2019-11-14"
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2019-12-11"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
 build-image:
@@ -36,7 +36,7 @@ build-image:
 
 build-system:
   variables:
-    COMPILER: ocaml-system
+    COMPILER: system
   <<: *build_definition
 
 build-4.05.0:
@@ -77,7 +77,12 @@ build-4.09.0:
     - schedules
 
 bench-system:
-  <<: *bench_definition_always
+  variables:
+    COMPILER: system
+  stage: test
+  script:
+    - misc/ci-local.sh bench ide doc
+  <<: *docker_definition
 
 bench-4.05.0:
   variables:
@@ -131,8 +136,10 @@ ce-bench:
 opam:
   stage: build
   script:
+    - opam switch full
     - opam pin -v -y add why3 .
     - opam pin -v -y add why3-ide .
+    - opam pin -v -y add why3-coq .
   <<: *docker_definition
 
 deploy:

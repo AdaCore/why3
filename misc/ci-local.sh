@@ -1,8 +1,10 @@
 #!/bin/bash
 
 set -e
-opam switch $COMPILER
-eval `opam env`
+if test "$COMPILER" != "system"; then
+    opam switch $COMPILER
+    eval `opam env`
+fi
 
 export OCAMLRUNPARAM=o=20,O=200
 ./autogen.sh
