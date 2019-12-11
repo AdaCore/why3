@@ -34,6 +34,8 @@ let env    : Env.env        = Env.create_env (Whyconf.loadpath main)
 (* Parses and types a file *)
 (* BEGIN{parsefile} *)
 let parse_file file env =
+  (* Ideally VCs should not be generated when parsing and type
+     checking, however I'm not sure how to do it. *)
   try fst (Env.read_file Pmodule.mlw_language env file) with
   | Loc.Located(loc, e) ->
      printf "%a: %a@." Loc.gen_report_position loc Exn_printer.exn_printer e;
@@ -65,7 +67,7 @@ let run_on_file (widening:int) (domain: string option) (file: string) =
 
   (* print modules to std output with the inferred loop invariants *)
   Wstdlib.Mstr.iter (fun s pm ->
-      printf "%a@\n" Pmodule.print_module pm) mlw_with_inv;
+      printf "%a@." Pmodule.print_module pm) mlw_with_inv;
   exit 0
 (* END{main} *)
 
