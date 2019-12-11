@@ -29,7 +29,7 @@ ENV HOME /home/guest
 
 RUN opam init -y --auto-setup -j1 --compiler=ocaml-system --disable-sandboxing && \
     opam install -y re menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo && \
-    opam clean -a
+    opam clean -a -c -r -s --logs
 
 COPY --chown=guest:guest . /home/guest/why3
 WORKDIR /home/guest/why3
