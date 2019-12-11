@@ -667,7 +667,9 @@ COQLIB
 coq_compat_version
 enable_coq_fp_libs
 enable_coq_libs
+RELIB
 REINCLUDE
+enable_re
 SEQLIB
 SEQINCLUDE
 MENHIRINCLUDE
@@ -756,7 +758,6 @@ infodir
 docdir
 oldincludedir
 includedir
-runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -787,6 +788,7 @@ enable_why3_lib
 enable_zarith
 enable_zip
 enable_js_of_ocaml
+enable_re
 enable_ide
 enable_web_ide
 enable_coq_libs
@@ -845,7 +847,6 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
-runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1098,15 +1099,6 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
-  -runstatedir | --runstatedir | --runstatedi | --runstated \
-  | --runstate | --runstat | --runsta | --runst | --runs \
-  | --run | --ru | --r)
-    ac_prev=runstatedir ;;
-  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
-  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
-  | --run=* | --ru=* | --r=*)
-    runstatedir=$ac_optarg ;;
-
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1244,7 +1236,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir runstatedir
+		libdir localedir mandir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1397,7 +1389,6 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
-  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1435,6 +1426,7 @@ Optional Features:
   --disable-zarith        use Nums instead of Zarith for computations
   --disable-zip           do not use LZ compression to store session files
   --disable-js-of-ocaml   do not use js-of-ocaml
+  --disable-re            use Str instead of Re for regular expressions
   --disable-ide           do not build Why3 IDE
   --disable-web-ide       do not build Why3 Web IDE
   --disable-coq-libs      do not build Coq realizations
@@ -2006,6 +1998,16 @@ if test "${enable_js_of_ocaml+set}" = set; then :
   enableval=$enable_js_of_ocaml;
 else
   enable_js_of_ocaml=yes
+fi
+
+
+# re
+
+# Check whether --enable-re was given.
+if test "${enable_re+set}" = set; then :
+  enableval=$enable_re;
+else
+  enable_re=yes
 fi
 
 
@@ -4730,23 +4732,29 @@ fi
 
 fi
 if test "$found_seq" = no; then
-   as_fn_error $? "Library seq not found." "$LINENO" 5
+   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Library seq not found." >&5
+$as_echo "$as_me: WARNING: Library seq not found." >&2;}
+   if test "$enable_re" = yes; then
+      enable_re=no
+      reason_re=" (seq not found)"
+   fi
 fi
 
 # checking for re
-found_re=yes
-DIR=
-if test "$USEOCAMLFIND" = yes; then
-   DIR=$(ocamlfind query re)
-   if test -n "$DIR"; then
-      echo "ocamlfind found re in $DIR"
-      REINCLUDE="-I $DIR"
+if test "$enable_re" = yes; then
+   found_re=yes
+   DIR=
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query re)
+      if test -n "$DIR"; then
+         echo "ocamlfind found re in $DIR"
+         REINCLUDE="-I $DIR"
+      fi
    fi
-fi
-if test -z "$DIR"; then
-   REINCLUDE="-I +re"
-   DIR="$OCAMLLIB/re"
-   as_ac_File=`$as_echo "ac_cv_file_$DIR/re.cmx" | $as_tr_sh`
+   if test -z "$DIR"; then
+      REINCLUDE="-I +re"
+      DIR="$OCAMLLIB/re"
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/re.cmx" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/re.cmx" >&5
 $as_echo_n "checking for $DIR/re.cmx... " >&6; }
 if eval \${$as_ac_File+:} false; then :
@@ -4769,8 +4777,8 @@ else
   found_re=no
 fi
 
-fi
-as_ac_File=`$as_echo "ac_cv_file_$DIR/re.cmi" | $as_tr_sh`
+   fi
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/re.cmi" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/re.cmi" >&5
 $as_echo_n "checking for $DIR/re.cmi... " >&6; }
 if eval \${$as_ac_File+:} false; then :
@@ -4793,8 +4801,18 @@ else
   found_re=no
 fi
 
-if test "$found_re" = no; then
-   as_fn_error $? "Library re not found." "$LINENO" 5
+   if test "$found_re" = no; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Library re not found." >&5
+$as_echo "$as_me: WARNING: Library re not found." >&2;}
+      enable_re=no
+   fi
+fi
+
+if test "$enable_re" = no; then
+   REINCLUDE=""
+   RELIB="str"
+else
+   RELIB="re"
 fi
 
 # checking for lablgtk3
@@ -5628,6 +5646,8 @@ fi
 VERSION=$PACKAGE_VERSION
 
 # substitutions to perform
+
+
 
 
 
@@ -6964,6 +6984,7 @@ echo "    Profiling               : $enable_profiling"
 echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
+echo "    Re support              : $enable_re$reason_re"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"
