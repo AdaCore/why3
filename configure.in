@@ -589,6 +589,8 @@ else
    AC_CHECK_FILE($DIR/gtkButton.cmi,,LABLGTKLIB="")
    if test -n "$LABLGTKLIB"; then
       GTKVERSION=3
+      LIB_SOURCEVIEW=lablgtk3_sourceview3
+      PKG_SOURCEVIEW=lablgtk3-sourceview3
       reason_ide=" (gtk3)"
    else
       AC_MSG_WARN([Lib lablgtk3 not found, trying lablgtk2.])
@@ -616,6 +618,8 @@ if test "$enable_ide" = retry; then
    if test "$enable_ide" = yes; then
       GTKVERSION=2
       LABLGTKLIB=lablgtk
+      LIB_SOURCEVIEW=lablgtksourceview2
+      PKG_SOURCEVIEW=lablgtk2.sourceview2
       reason_ide=" (gtk2)"
    else
       AC_MSG_WARN([Lib lablgtk2 not found, IDE disabled.])
@@ -627,32 +631,32 @@ fi
 if test "$enable_ide" = yes ; then
    DIR=
    if test "$USEOCAMLFIND" = yes; then
-      case $GTKVERSION in
-        2)
-           LIB_SOURCEVIEW=lablgtksourceview2
-           PKG_SOURCEVIEW=lablgtk2.sourceview2
-           DIR=$(ocamlfind query $PKG_SOURCEVIEW)
-           if test -z "$DIR"; then
-              PKG_SOURCEVIEW=lablgtksourceview2
-              DIR=$(ocamlfind query $PKG_SOURCEVIEW)
-           fi
-           ;;
-        3)
-           LIB_SOURCEVIEW=lablgtk3_sourceview3
-           PKG_SOURCEVIEW=lablgtk3-sourceview3
-           DIR=$(ocamlfind query $PKG_SOURCEVIEW)
-           ;;
-        *)
-           AC_MSG_ERROR(Unknown gtk version $GTKVERSION)
-           ;;
-      esac
+      DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+      if test -z "$DIR"; then
+         case $GTKVERSION in
+            2)
+                PKG_SOURCEVIEW=lablgtksourceview2
+                DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+                ;;
+            3)
+                PKG_SOURCEVIEW=lablgtksourceview3
+                DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+                ;;
+         esac
+      fi
       if test -n "$DIR";then
          echo "ocamlfind found $PKG_SOURCEVIEW in $DIR"
       fi
    fi
    if test -z "$DIR"; then
       DIR="$OCAMLLIB/lablgtk$GTKVERSION"
-      AC_CHECK_FILE($DIR/lablgtksourceview$GTKVERSION.cma,,enable_ide=no)
+      LIB_SOURCEVIEW="lablgtksourceview$GTKVERSION"
+      AC_CHECK_FILE($DIR/$LIB_SOURCEVIEW.cma,,DIR="")
+   fi
+   if test -z "$DIR"; then
+      DIR="$OCAMLLIB/lablgtk$GTKVERSION-sourceview$GTKVERSION"
+      LIB_SOURCEVIEW="lablgtk${GTKVERSION}_sourceview$GTKVERSION"
+      AC_CHECK_FILE($DIR/$LIB_SOURCEVIEW.cma,,enable_ide=no)
    fi
    AC_CHECK_FILE($DIR/gSourceView$GTKVERSION.cmi,,enable_ide=no)
    if test "$enable_ide" = no; then
