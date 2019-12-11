@@ -1977,10 +1977,12 @@ test-ocaml-extraction: bin/why3.opt bin/why3extract.opt
 	@echo "driver ocaml64"
 	@bin/why3extract.opt -D ocaml64 -L tests \
 	  test_extraction.TestExtraction -o tests/test-extraction/test.ml
-	@ocamlfind ocamlopt -package zarith -linkpkg -I tests/test-extraction/ \
+ifeq (@enable_zarith@,yes)
+	@$(OCAMLOPT) @BIGINTINCLUDE@ -I tests/test-extraction/ zarith.cmxa \
 	  tests/test-extraction/test.ml tests/test-extraction/main.ml \
           -o tests/test-extraction/a.out
 	@tests/test-extraction/a.out
+endif
 
 ################
 # documentation
