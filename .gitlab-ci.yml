@@ -39,42 +39,10 @@ build-system:
     COMPILER: system
   <<: *build_definition
 
-build-4.05.0:
-  variables:
-    COMPILER: 4.05.0
-  <<: *build_definition
-
-build-4.06.1:
-  variables:
-    COMPILER: 4.06.1
-  <<: *build_definition
-
-build-4.07.1:
-  variables:
-    COMPILER: 4.07.1
-  <<: *build_definition
-
-build-4.08.1:
-  variables:
-    COMPILER: 4.08.1
-  <<: *build_definition
-
 build-4.09.0:
   variables:
     COMPILER: 4.09.0
   <<: *build_definition
-
-.bench_template1: &bench_definition_always
-  stage: test
-  script:
-    - misc/ci-local.sh bench ide
-  <<: *docker_definition
-
-.bench_template2: &bench_definition
-  <<: *bench_definition_always
-  only:
-    - tags
-    - schedules
 
 bench-system:
   variables:
@@ -84,30 +52,13 @@ bench-system:
     - misc/ci-local.sh bench ide doc
   <<: *docker_definition
 
-bench-4.05.0:
-  variables:
-    COMPILER: 4.05.0
-  <<: *bench_definition
-
-bench-4.06.1:
-  variables:
-    COMPILER: 4.06.1
-  <<: *bench_definition
-
-bench-4.07.1:
-  variables:
-    COMPILER: 4.07.1
-  <<: *bench_definition_always
-
-bench-4.08.1:
-  variables:
-    COMPILER: 4.08.1
-  <<: *bench_definition
-
 bench-4.09.0:
   variables:
     COMPILER: 4.09.0
-  <<: *bench_definition
+  stage: test
+  script:
+    - misc/ci-local.sh ide bench
+  <<: *docker_definition
 
 full:
   stage: test
