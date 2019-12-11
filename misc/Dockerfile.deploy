@@ -6,11 +6,8 @@ USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev gnome-themes-standard libcanberra-gtk-module unzip build-essential autoconf automake ocaml-nox ca-certificates && \
+    apt-get install -yq --no-install-recommends wget libcanberra-gtk3-module unzip build-essential autoconf automake ocaml-nox ca-certificates menhir libmenhir-ocaml-dev libzip-ocaml-dev liblablgtksourceview3-ocaml-dev alt-ergo && \
     apt-get clean
-
-RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.5/opam-2.0.5-x86_64-linux -O /usr/local/bin/opam && \
-    chmod a+x /usr/local/bin/opam
 
 # install provers
 ## CVC4 1.7
@@ -27,21 +24,15 @@ RUN adduser --disabled-password --gecos '' guest
 USER guest
 ENV HOME /home/guest
 
-RUN opam init -y --auto-setup -j1 --compiler=ocaml-system --disable-sandboxing && \
-    opam install -y re menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo && \
-    opam clean -a -c -r -s --logs
-
 COPY --chown=guest:guest . /home/guest/why3
 WORKDIR /home/guest/why3
-RUN eval `opam env` && \
-    ./autogen.sh && \
+RUN ./autogen.sh && \
     ./configure && \
     make
 
 USER root
 
-RUN make install && \
-    cp /home/guest/.opam/ocaml-system/bin/alt-ergo /usr/local/bin/
+RUN make install
 
 USER guest
 WORKDIR /home/guest
