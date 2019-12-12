@@ -1,15 +1,17 @@
-FROM debian:buster
+# Stage 1: build setup and prover download; to be cached
+
+FROM debian:buster as builder
 
 USER root
 
-# install dependencies
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
     apt-get install -yq --no-install-recommends wget libcanberra-gtk3-module unzip build-essential autoconf automake ocaml-nox ca-certificates menhir libmenhir-ocaml-dev libzip-ocaml-dev liblablgtksourceview3-ocaml-dev alt-ergo && \
     apt-get clean
 
-# install provers
+RUN adduser --disabled-password --gecos '' guest
+
 ## CVC4 1.7
 RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.7-x86_64-linux-opt -O /usr/local/bin/cvc4-1.7 && \
     chmod a+x /usr/local/bin/cvc4-1.7
@@ -19,22 +21,48 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.8.4/z3-4.
     mv z3-4.8.4.d6df51951f4c-x64-debian-8.11/bin/z3 /usr/local/bin/z3-4.8.4 && \
     rm -r z3-4.8.4.d6df51951f4c-x64-debian-8.11.zip z3-4.8.4.d6df51951f4c-x64-debian-8.11
 
-# create user
-RUN adduser --disabled-password --gecos '' guest
+
+# Stage 2: compilation and installation; to be pruned
+
+FROM builder as artifact
+
 USER guest
 ENV HOME /home/guest
-
 COPY --chown=guest:guest . /home/guest/why3
 WORKDIR /home/guest/why3
+
 RUN ./autogen.sh && \
     ./configure && \
     make
 
 USER root
-
 RUN make install
 
+
+# Stage 3: deployed image; to be cached (for its first layers)
+
+FROM debian:buster
+
+USER root
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -yq && \
+    apt-get upgrade -yq --with-new-pkgs --auto-remove && \
+    apt-get install -yq --no-install-recommends libcanberra-gtk3-module libgtksourceview-3.0-1 libgomp1 zlib1g && \
+    apt-get clean
+
+RUN adduser --disabled-password --gecos '' guest
+
+COPY --from=builder /usr/bin/alt-ergo /usr/local/bin/
+COPY --from=builder /usr/local/bin/cvc4-1.7 /usr/local/bin/
+COPY --from=builder /usr/local/bin/z3-4.8.4 /usr/local/bin/
+
+COPY --from=artifact /usr/local/bin/why3 /usr/local/bin/
+COPY --from=artifact /usr/local/lib/why3 /usr/local/lib/why3
+COPY --from=artifact /usr/local/share/why3 /usr/local/share/why3
+
 USER guest
+ENV HOME /home/guest
 WORKDIR /home/guest
 
 RUN why3 config --detect

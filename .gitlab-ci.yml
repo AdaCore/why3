@@ -96,11 +96,17 @@ opam:
 deploy:
   stage: deploy
   script:
-    - IMAGE=$CI_REGISTRY_IMAGE:$(echo $CI_COMMIT_REF_NAME | tr -cs "[:alnum:].\n" "-")
+    - BRANCH=$(echo $CI_COMMIT_REF_NAME | tr -cs "[:alnum:].\n" "-")
+    - CACHE=$CI_REGISTRY_IMAGE:cache-$BRANCH
+    - IMAGE=$CI_REGISTRY_IMAGE:$BRANCH
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
+    - docker pull "$CACHE" || true
     - docker pull "$IMAGE" || true
-    - docker build --force-rm --cache-from "$IMAGE" -t "$IMAGE" -f misc/Dockerfile.deploy .
+    - docker build --force-rm --cache-from="$CACHE" --target=builder -t "$CACHE" -f misc/Dockerfile.deploy .
+    - docker build --force-rm --cache-from="$CACHE" --cache-from="$IMAGE" -t "$IMAGE" -f misc/Dockerfile.deploy .
+    - docker push "$CACHE"
     - docker push "$IMAGE"
+    - docker rmi "$CACHE"
     - docker rmi "$IMAGE"
     - docker image prune -f
   only:
