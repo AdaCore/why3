@@ -2,6 +2,11 @@ open Domain
 open Apron
 open Term
 
+(* TODO move it deeper in the abstract interpretation mechanism (as needed) *)
+let infer_debug  = Debug.register_flag "infer_debug"
+                     ~desc:"Debug messages about loop inference using \
+                            abstract interpretation."
+
 module Make(S:sig
     module A:DOMAIN
     val env: Env.env
@@ -325,7 +330,8 @@ module Make(S:sig
     try
       while true do
         let t, v = TermToVar.choose !k in
-        p t; Format.eprintf " ---> %s@." (Var.to_string v);
+        if Debug.test_flag infer_debug then
+          (p t; Format.eprintf " ---> %s@." (Var.to_string v));
         k := TermToVar.remove_t !k v;
       done;
     with
@@ -724,8 +730,8 @@ module Make(S:sig
             let subv_b = get_subvalues b None in
             List.combine subv_a subv_b
             |> List.fold_left (fun f ((a, _), (b, _)) ->
-                p a;
-                p b;
+                if Debug.test_flag infer_debug then
+                  (p a; p b);
                 let g = aux (t_app ps_equ [a; b] None) in
                 (fun abs ->
                    g abs |> f
