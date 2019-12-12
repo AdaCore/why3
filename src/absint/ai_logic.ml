@@ -12,7 +12,7 @@ module Make(S: sig
   let env = S.env
 
   let known_logical_ident = Pmodule.(Theory.(S.pmod.mod_theory.th_known))
-  let known_pdecl = Pmodule.(Theory.(S.pmod.mod_known))
+  let known_pdecl = Pmodule.(S.pmod.mod_known)
 
   let th_int = Env.read_theory env ["int"] "Int"
   let le_int = Theory.(ns_find_ls th_int.th_export ["infix <="])
@@ -55,7 +55,7 @@ module Make(S: sig
     | COne
 
   let coeff_to_term = function
-    | Coeff.Scalar(s) ->
+    | Coeff.Scalar s ->
       let i = int_of_string (Scalar.to_string s) in
       let n = Constant.int_const_of_int (abs i) in
 
@@ -69,10 +69,9 @@ module Make(S: sig
         CMinus (t_const n Ty.ty_int)
       else
         CNone
-    | Coeff.Interval(_) -> raise Cannot_be_expressed
+    | Coeff.Interval _ -> raise Cannot_be_expressed
 
   let varlist_to_term variable_mapping (l, cst) =
-    let open Ty in
     let term = ref zero_int in
     List.iter (fun (c, v) ->
         match coeff_to_term c with
@@ -108,37 +107,37 @@ module Make(S: sig
   (* if way is true, then we must return the negation of t *)
   let rec t_descend_nots ?way:(way=false) t =
     match t.t_node with
-    | Tbinop(Tand, t1, t2) ->
+    | Tbinop (Tand, t1, t2) ->
       if way then
         t_or_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
       else
         t_and_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
-    | Tbinop(Tor, t1, t2) ->
+    | Tbinop (Tor, t1, t2) ->
       if way then
         t_and_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
       else
         t_or_simp (t_descend_nots ~way t1) (t_descend_nots ~way t2)
-    | Tbinop(Timplies, t1, t2) ->
+    | Tbinop (Timplies, t1, t2) ->
       t_descend_nots ~way (t_or (t_not t1) t2)
-    | Tnot(t) ->
+    | Tnot t ->
       t_descend_nots ~way:(not way) t
-    | Tapp(l, args) when ls_equal l lt_int && way ->
+    | Tapp (l, args) when ls_equal l lt_int && way ->
       t_app ge_int args None
-    | Tapp(l, args) when ls_equal l gt_int && way ->
+    | Tapp (l, args) when ls_equal l gt_int && way ->
       t_app le_int args None
-    | Tapp(l, args) when ls_equal l le_int && way ->
+    | Tapp (l, args) when ls_equal l le_int && way ->
       t_app gt_int args None
-    | Tapp(l, args) when ls_equal l ge_int && way ->
+    | Tapp (l, args) when ls_equal l ge_int && way ->
       t_app lt_int args None
-    | Tapp(l, args) when ls_equal l ps_equ && way && Ty.ty_equal (t_type (List.hd args)) Ty.ty_int ->
+    | Tapp (l, args) when ls_equal l ps_equ && way && Ty.ty_equal (t_type (List.hd args)) Ty.ty_int ->
       t_or (t_app lt_int args None) (t_app gt_int args None)
-    | Tapp(l, [a;b]) when ls_equal l ps_equ && way && t_equal t_bool_true a ->
+    | Tapp (l, [a;b]) when ls_equal l ps_equ && way && t_equal t_bool_true a ->
       t_app ps_equ [b;t_bool_false] None
-    | Tapp(l, [b;a]) when ls_equal l ps_equ && way && t_equal t_bool_true a ->
+    | Tapp (l, [b;a]) when ls_equal l ps_equ && way && t_equal t_bool_true a ->
       t_app ps_equ [b;t_bool_false] None
-    | Tapp(l, [a;b]) when ls_equal l ps_equ && way && t_equal t_bool_false a ->
+    | Tapp (l, [a;b]) when ls_equal l ps_equ && way && t_equal t_bool_false a ->
       t_app ps_equ [b;t_bool_true] None
-    | Tapp(l, [b;a]) when ls_equal l ps_equ && way && t_equal t_bool_false a ->
+    | Tapp (l, [b;a]) when ls_equal l ps_equ && way && t_equal t_bool_false a ->
       t_app ps_equ [b;t_bool_true] None
     | _ ->
       if way then
@@ -158,11 +157,11 @@ module Make(S: sig
   let find_global_definition kn rs =
     let open Term in
     match (Ident.Mid.find rs.ls_name kn).Decl.d_node with
-    | Decl.Dlogic(decls) ->
+    | Decl.Dlogic decls ->
       if List.length decls <> 1 then
         raise Recursive_logical_definition;
       Some (List.hd decls)
-    | Decl.Dparam(_) -> None
+    | Decl.Dparam _ -> None
     | _ -> None
 
   let find_definition env rs =
@@ -184,7 +183,7 @@ module Make(S: sig
 
   (** Inline every symbol *)
 
-  let t_unfold loc fs tl ty =
+  let t_unfold _ fs tl ty =
     let open Ty in
     if Term.ls_equal fs Term.ps_equ then
       t_app fs tl ty
@@ -201,7 +200,7 @@ module Make(S: sig
           let mt = oty_match mt (Some (t_type new_term)) ty in
           t_ty_subst mt mv new_term
         with
-        | Term.TermExpected(_) -> t_app fs tl ty
+        | Term.TermExpected _ -> t_app fs tl ty
 
   let rec t_replace_all t =
     let t = t_map t_replace_all t in
@@ -213,7 +212,7 @@ end
 
 let rec extract_atom_from_conjuction l t =
   match t.t_node with
-  | Tbinop(Tand, a, b) ->
+  | Tbinop (Tand, a, b) ->
     extract_atom_from_conjuction
       (extract_atom_from_conjuction l a) b
   | _ -> t::l
@@ -230,12 +229,12 @@ let is_in t myt =
 
 let rec descend_quantifier q t =
   match t.t_node with
-  | Tbinop(Tand, a, b) ->
+  | Tbinop (Tand, a, b) ->
     let ia = is_in q a
     and ib = is_in q b in
     if ia && ib then
       let var = match q.t_node with
-        | Tvar(v) -> v
+        | Tvar v  -> v
         | _ -> assert false
       in
       t_quant Tforall (t_close_quant [var] [] t)
@@ -247,7 +246,7 @@ let rec descend_quantifier q t =
       t_and_simp a b
   | _ ->
       let var = match q.t_node with
-        | Tvar(v) -> v
+        | Tvar v -> v
         | _ -> assert false
       in
       t_quant Tforall (t_close_quant [var] [] t)

@@ -15,14 +15,14 @@ module Make(S:sig
   module A = S.A
   module D = A
 
-  open Ai_logic
+  (* open Ai_logic *)
   module Ai_logic = Ai_logic.Make(struct
       let env = S.env
       let pmod = S.pmod
     end)
   open Ai_logic
 
-  type domain = A.t
+  (* type domain = A.t *)
 
   exception Not_handled of Term.term
 
@@ -106,16 +106,16 @@ module Make(S:sig
     var_pool = build_var_pool npool;
   }
 
-  let bottom (man, uf_man) env =
+  let bottom (man, uf_man) _ =
     A.bottom man uf_man.env, empty_uf_domain
 
-  let top (man, uf_man) env =
+  let top (man, uf_man) _ =
     A.top man uf_man.env, empty_uf_domain
 
-  let canonicalize (man, _) (a, b) =
+  let canonicalize (man, _) (a, _) =
     A.canonicalize man a
 
-  let is_bottom (man, _) (a, b) =
+  let is_bottom (man, _) (a, _) =
     A.is_bottom man a
 
   let p = Pretty.print_term Format.err_formatter
@@ -128,7 +128,6 @@ module Make(S:sig
       let c = Union_find.new_class () in
       uf_man.class_to_term <- TermToClass.add uf_man.class_to_term t c;
       c
-
 
   let get_equivs uf_man uf t =
     let tcl = TermToClass.to_t uf_man.class_to_term t in
@@ -169,11 +168,12 @@ module Make(S:sig
     let t = t (* Reduction_engine0.normalize ~limit:50 engine  t*) in
     if Ty.ty_equal (t_type t) Ty.ty_int then
       let rec eval_num t =
+        let open Number in
         match t.t_node with
-        | Tvar(vs) -> Some t, 0
-        | Tconst(Constant.ConstInt n) ->
+        | Tvar _ -> Some t, 0
+        | Tconst (Constant.ConstInt n) ->
           (None, BigInt.to_int n.il_int)
-        | Tapp(func, args) when Term.ls_equal func ad_int ->
+        | Tapp (func, args) when Term.ls_equal func ad_int ->
           List.fold_left (fun (a, b) c ->
               let tc, cc = eval_num c in
               match tc, a with
@@ -181,7 +181,7 @@ module Make(S:sig
               | Some t, Some v -> Some (t_app ad_int [v; t] (Some Ty.ty_int)), b + cc
               | Some t, None | None, Some t -> Some t, b + cc
             ) (None, 0) args
-        | Tapp(func, [a;b]) when Term.ls_equal func min_int ->
+        | Tapp (func, [a;b]) when Term.ls_equal func min_int ->
           let ta, ca = eval_num a in
           let tb, cb = eval_num b in
           begin
@@ -191,14 +191,14 @@ module Make(S:sig
             | Some t, None -> Some t, ca - cb
             | None, Some t -> Some (t_app_infer min_u_int [t]), ca - cb
           end
-        | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
+        | Tapp (func, [a]) when Term.ls_equal func min_u_int ->
           let ta, ca = eval_num a in
           begin
             match ta with
             | None -> None, - ca
             | Some a -> Some (t_app min_u_int [a] (Some Ty.ty_int)), - ca
           end
-        | Tapp(func, args) ->
+        | Tapp (func, args) ->
           let t = t_app func (List.map eval_term args) (Some (t_type t)) in
           Some t, 0
         | _ -> Some t, 0
@@ -206,7 +206,7 @@ module Make(S:sig
       match eval_num t with
       | Some t, 0 -> t
       | Some t, a -> t_app ad_int [t; t_z_const a] (Some Ty.ty_int)
-      | None, a -> raise Constant
+      | None, _ -> raise Constant
     else
       t_map eval_term t
 
@@ -284,9 +284,9 @@ module Make(S:sig
       fun x -> x
 
   (* probably not clever enough, will not work with a complex CFG with exceptions etc *)
-  let print fmt (a, b) = A.print fmt a
+  let print fmt (a, _) = A.print fmt a
 
-  let get_var_for_term uf_man ref_dom term =
+  let get_var_for_term _ ref_dom term =
     let uf_to_var = !ref_dom.uf_to_var in
     try
       TermToVar.to_t uf_to_var term
@@ -350,7 +350,7 @@ module Make(S:sig
     let uf_to_var = TermToVar.union
         d.uf_to_var
         b.uf_to_var
-        (fun v1 v2 t ->
+        (fun v1 _ t ->
         let var_tmp = List.hd !tmp_pool in
         tmp_pool := List.tl !tmp_pool;
         rc := eq_var (man, uf_man) !rc v1 var_tmp;
@@ -362,7 +362,7 @@ module Make(S:sig
                 with
                 | Not_found -> true);
             )
-        (fun t t' v ->
+        (fun t _ v ->
            vars_to_replace := (t, v) :: !vars_to_replace;
 )
     in
@@ -403,7 +403,7 @@ module Make(S:sig
     | [] -> assert false
     | t::q -> List.fold_left (join man) t q
 
-  let push_label (man, uf_man) env i (a, b) =
+  let push_label (man, uf_man) _ i (a, b) =
     A.push_label man uf_man.env i a, b
 
   let warning_t s t =
@@ -417,9 +417,9 @@ module Make(S:sig
 
   let access_field constr constr_args a i (proj, t) =
       match a.t_node with
-      | Tapp(func, args) when func.ls_constr = 1 ->
+      | Tapp (func, args) when func.ls_constr = 1 ->
         List.nth args i
-      | Tvar(_) | _ ->
+      | Tvar _ | _ ->
         match proj with
         | None ->
           let return = create_vsymbol ident_ret t in
@@ -437,17 +437,17 @@ module Make(S:sig
   let get_subvalues a ity =
     let open Ty in
     let myty = t_type a in
-    let rec aux ity =
+    let aux ity =
       match myty.ty_node with
       | _ when ty_equal myty ty_bool ->
         []
       | _ when ty_equal myty ty_int ->
         [a, None]
-      | Tyapp(tys, vars) ->
+      | Tyapp (tys, vars) ->
         begin
           let vars = Ty.ts_match_args tys vars in
           match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
-          | Decl.Ddata([_, [ls, ls_projs]]) ->
+          | Decl.Ddata ([_, [ls, ls_projs]]) ->
             let l =
               let my_ls_args = List.map (fun i -> Ty.ty_inst vars i) ls.ls_args in
               List.combine my_ls_args ls_projs
@@ -471,15 +471,15 @@ module Make(S:sig
                 List.map (fun a -> Some a) pdecl
                 |> List.combine l
             end
-          (*| Decl.Dtype({ts_def = _; ts_args = _; _ }) ->
+          (*| Decl.Dtype ({ts_def = _; ts_args = _; _ }) ->
             (* untested code*)
             let () = assert false in
             aux ity*)
-          | Decl.Ddata([_; _]) ->
+          | Decl.Ddata [_; _] ->
             warning_t "Multiple constructors is not supported in abstract interpretation." a; []
-          | Decl.Ddata(_) ->
+          | Decl.Ddata _ ->
             warning_t "Recursive types is not supported in abstract interpretation." a; []
-          | Decl.Dtype(_) -> (* This happens when a type is private or has an invariant: it can't be accesed
+          | Decl.Dtype _  -> (* This happens when a type is private or has an invariant: it can't be accesed
                               * by the logic, so we give up and only look for projections by looking
                               * at program projections. *)
             begin
@@ -490,31 +490,31 @@ module Make(S:sig
                  | Some s -> assert (Ity.its_equal its s));
                 let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
                 List.map (fun b ->
-                    let l = match Expr.(b.rs_logic) with | Expr.RLls(l) -> l | _ -> assert false in
+                    let l = match Expr.(b.rs_logic) with | Expr.RLls l -> l | _ -> assert false in
                     let this_ty = Expr.(Ity.(ty_of_ity b.rs_cty.cty_result)) in
                     let ty = Ty.ty_inst vars this_ty in
                     t_app l [a] (Some ty), if ity = None then None else Some b) pdecl
               with
               | Not_found -> failwith "could not restore its"
             end
-          | Decl.Dind(_) ->
+          | Decl.Dind _ ->
             warning_t "Could not find type declaration (got inductive predicate)."
               a;
             []
-          | Decl.Dlogic(_) ->
+          | Decl.Dlogic _ ->
             warning_t "Could not find type declaration (got logic declaration)."
               a;
             []
-          | Decl.Dprop(_) ->
+          | Decl.Dprop _ ->
             warning_t "Could not find type declaration (got propsition) for: "
               a;
             []
-          | Decl.Dparam(_) ->
+          | Decl.Dparam _ ->
             warning_t "Could not find type declaration (got param)."
               a;
             []
         end
-      | Tyvar(_) ->
+      | Tyvar _ ->
         warning_t "Comparison of values with an abstract type, the interpretation will not be precise" a;
         []
     in
@@ -547,7 +547,7 @@ module Make(S:sig
           assert (Ty.ty_equal (t_type t) Ty.ty_int);
           Some t
         with
-        | Bad_domain(a) -> extract_term (man, uf_man) is_in (a, b) v
+        | Bad_domain a -> extract_term (man, uf_man) is_in (a, b) v
       end
     | None -> None
 
@@ -612,27 +612,28 @@ module Make(S:sig
        * *)
       let rec term_to_var_list rud coeff t =
         let re = term_to_var_list rud in
+        let open Number in
         match t.t_node with
-        | Tvar(_) ->
+        | Tvar _ ->
           begin
             match var_of_term t with
             | Some var -> ([(var, coeff)], 0)
             | None -> Format.eprintf "Variable undefined: "; Pretty.print_term Format.err_formatter t; Format.eprintf "@."; failwith "undefined var"
           end
-        | Tconst(Constant.ConstInt n) ->
+        | Tconst (Constant.ConstInt n) ->
           ([], coeff * (BigInt.to_int n.il_int))
-        | Tapp(func, args) when Term.ls_equal func ad_int ->
+        | Tapp (func, args) when Term.ls_equal func ad_int ->
           List.fold_left (fun (a, b) c ->
               let c, d = re coeff c in
               (a @ c, b + d)) ([], 0)args
-        | Tapp(func, [a;b]) when Term.ls_equal func min_int ->
+        | Tapp (func, [a;b]) when Term.ls_equal func min_int ->
           let c, d = re coeff a in
           let e, f = re (-coeff) b in
           (c @ e, d + f)
-        | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
+        | Tapp (func, [a]) when Term.ls_equal func min_u_int ->
           re (-coeff)  a;
-        | Tapp(func, [{t_node = Tconst(Constant.ConstInt n); _}; a])
-        | Tapp(func, [a; {t_node = Tconst(Constant.ConstInt n); _};]) when Term.ls_equal func mult_int ->
+        | Tapp (func, [{t_node = Tconst (Constant.ConstInt n); _}; a])
+        | Tapp (func, [a; {t_node = Tconst (Constant.ConstInt n); _};]) when Term.ls_equal func mult_int ->
           re ((BigInt.to_int n.il_int) * coeff) a
         | _ -> (* maybe a record access *)
           begin
@@ -659,12 +660,12 @@ module Make(S:sig
       let rec aux t =
         try
           match t.t_node with
-          | Tbinop(Tand, a, b) ->
+          | Tbinop (Tand, a, b) ->
             let fa = aux a in
             let fb = aux b in
             (fun (d, a) ->
                fb (fa (d, a)))
-          | Tbinop(Tor, a, b) ->
+          | Tbinop (Tor, a, b) ->
             let fa = aux a in
             let fb = aux b in
             (fun (d, a) ->
@@ -673,7 +674,7 @@ module Make(S:sig
                join (man, uf_man) a1 a2
             )
 
-          | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int (* || Ty.ty_equal (t_type a) Ty.ty_bool*))
+          | Tapp (func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int (* || Ty.ty_equal (t_type a) Ty.ty_bool*))
                                     &&
                                     (ls_equal ps_equ func ||
                                      ls_equal lt_int func ||
@@ -724,7 +725,7 @@ module Make(S:sig
                let arr = Lincons1.array_make uf_man.env 1 in
                Lincons1.array_set arr 0 cons;
                D.meet_lincons_array man d arr, d')
-          | Tapp(func, [a;b]) when ls_equal ps_equ func ->
+          | Tapp (func, [a;b]) when ls_equal ps_equ func ->
             let f_uf = do_eq (man, uf_man) a b in
             let subv_a = get_subvalues a None in
             let subv_b = get_subvalues b None in
@@ -736,7 +737,7 @@ module Make(S:sig
                 (fun abs ->
                    g abs |> f
                    )) f_uf
-          | Tif(a, b, c) ->
+          | Tif (a, b, c) ->
             let fa = aux a in
             let fa_not = aux (t_descend_nots a) in
             let fb = aux b in
@@ -752,7 +753,7 @@ module Make(S:sig
           | _ ->
             raise (Not_handled t)
         with
-        | Not_handled(t) ->
+        | Not_handled t ->
           Format.eprintf "Couldn't understand entirely the post condition: ";
           Pretty.print_term Format.err_formatter t;
           Format.eprintf "@.";
@@ -778,10 +779,8 @@ module Make(S:sig
         uf_man.env <- Environment.add uf_man.env [|v|] [||]
       end
 
-  let add_lvariable_to_env (man, uf_man) vsym =
+  let add_lvariable_to_env (_, uf_man) vsym =
     incr var_id;
-    let open Expr in
-    let open Ity in
     let open Ty in
     let logical_term = t_var vsym in
     try
@@ -876,7 +875,7 @@ module Make(S:sig
       uf_man.apron_mapping <- Term.Mterm.add logical_term v uf_man.apron_mapping;
     | _ when Ity.ity_equal variable_type Ity.ity_unit
       -> ()
-    | Ity.Ityreg(reg), Tyapp(_, _) ->
+    | Ity.Ityreg reg, Tyapp (_, _) ->
       begin
         let reg_name =
           Ity.print_reg_name Format.str_formatter reg
@@ -917,7 +916,7 @@ module Make(S:sig
         uf_man.region_mapping <- Ity.Mreg.add reg (proj_list @ old_projs) uf_man.region_mapping;
         uf_man.region_var <- Ity.Mreg.add reg (Ity.(psym.pv_vs) :: old_vars) uf_man.region_var
       end
-    | Ity.Ityapp(_), _ ->
+    | Ity.Ityapp _, _ ->
       let reg_name = Ity.print_pv Format.str_formatter psym
                      |> Format.flush_str_formatter in
       let subv = get_subvalues logical_term None in
@@ -1002,7 +1001,7 @@ module Make(S:sig
       let int_values, other_values =
         List.partition (fun (_, t) ->
             Ty.ty_equal (t_type t) Ty.ty_int) all_values in
-      let b = List.fold_left (fun b (cl, t) ->
+      let b = List.fold_left (fun b (cl, _) ->
           { b with classes = Union_find.forget cl b.classes |> snd }) b other_values in
       let forgot_var = t in
       let a, b = List.fold_left (fun (a, b) (cl, t) ->
@@ -1060,7 +1059,7 @@ module Make(S:sig
 
   let forget_var m v = forget_term m (t_var v)
 
-  let forget_region (man, uf_man) v b =
+  let forget_region (man, uf_man) v _ =
     let members = Ity.Mreg.find v uf_man.region_mapping |> List.map snd in
     let vars = Ity.Mreg.find v uf_man.region_var in
     let f = List.fold_left (fun f t ->

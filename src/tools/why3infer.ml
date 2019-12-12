@@ -58,10 +58,10 @@ let do_input f =
   let all_while = ref [] in
   let open Pdecl in
   let open Expr in
-  let do_infer mid m =
+  let do_infer _ m =
     let open Pmodule in
-    Mstr.iter (fun k ps -> match ps with
-        | PV a -> (* this is a val - nothing to do *) ()
+    Mstr.iter (fun _ ps -> match ps with
+        | PV _ -> (* this is a val - nothing to do *) ()
         | RS(rsym) -> begin
           let decl = Ident.Mid.find Expr.(rsym.rs_name) m.mod_known in
           match decl.pd_node with
@@ -166,14 +166,14 @@ let do_input f =
       in
       let number_of_lines_to_read = line_number - (o + 1) in (* the file was copied up to o *)
       assert (number_of_lines_to_read >= -1);
-      for i = 0 to number_of_lines_to_read do
+      for _ = 0 to number_of_lines_to_read do
         input_line fin |> Format.sprintf "%s\n" |> output_string fout;
       done;
       output_string fout inv;
       Hashtbl.replace copying_informations file (line_number, fin, fout);
     | _ -> assert false
   end;
-  Hashtbl.iter (fun _ (o, fin, fout) ->
+  Hashtbl.iter (fun _ (_, fin, fout) ->
       try
         while true do
           input_line fin |> Format.sprintf "%s\n" |> output_string fout;

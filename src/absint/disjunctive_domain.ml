@@ -10,11 +10,11 @@ module Make(A:DOMAIN) = struct
   let hash _ _ = assert false
   let is_eq _ _ _ = assert false
 
-  let bottom m e = []
+  let bottom _ _ = []
 
   let top m e = [A.top m e]
 
-  let canonicalize m _ = () (*List.iter (A.canonicalize m)*)
+  let canonicalize _ _ = () (*List.iter (A.canonicalize m)*)
 
   let print fmt = List.iter (fun b ->
       A.print fmt b;

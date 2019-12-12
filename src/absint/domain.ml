@@ -80,7 +80,7 @@ module Make_from_apron(M:sig
     | CMinusOne
     | COne
 
-  let to_term env pmod =
+  let to_term env _ =
     let open Term in
     let th_int = Env.read_theory env ["int"] "Int" in
     let int_tys = Theory.(ns_find_ts th_int.th_export ["int"]) in
@@ -98,7 +98,7 @@ module Make_from_apron(M:sig
       | _ -> assert false
     end in
     let int_minus_u = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["prefix -"]) a ty_int in
-    let int_minus = begin fun a ->
+    let _ (* int_minus *) = begin fun a ->
       match a with
       | [a; b] ->
         if t_equal a int_zero then int_minus_u [b]
@@ -123,7 +123,7 @@ module Make_from_apron(M:sig
     in
 
     let coeff_to_term = function
-      | Coeff.Scalar(s) ->
+      | Coeff.Scalar s ->
         let i = int_of_s s in
         let n = Constant.int_const_of_int (abs i) in
 
@@ -137,11 +137,10 @@ module Make_from_apron(M:sig
           CMinus (t_const n Ty.ty_int)
         else
           CNone
-      | Coeff.Interval(_) -> raise Cannot_be_expressed
+      | Coeff.Interval _ -> raise Cannot_be_expressed
     in
 
     let lincons_to_term l variable_mapping =
-      let open Ty in
       let termr = ref int_zero in
       let terml = ref int_zero in
       Lincons1.iter (fun c v ->
@@ -218,7 +217,7 @@ module Make_from_apron(M:sig
               if v <> v' then
                 var_list := (c, v') :: !var_list
               else match c with
-                | Coeff.Scalar(s) ->
+                | Coeff.Scalar s ->
                   neg := Scalar.equal_int s 1;
                   if Scalar.equal_int s 1 || Scalar.equal_int s (-1) then
                     found := true;
@@ -261,7 +260,7 @@ module Make_from_apron(M:sig
       if not (Coeff.equal_int (Lincons1.get_cst l) 0) then
         begin
           let i = Lincons1.get_cst l |> function
-            | Coeff.Scalar(s) ->
+            | Coeff.Scalar s ->
               int_of_s s
             | _ -> assert false
           in
@@ -271,7 +270,7 @@ module Make_from_apron(M:sig
                 begin
 
                   let myi = match c with
-                    | Coeff.Scalar(s) ->
+                    | Coeff.Scalar s ->
                       let s = Scalar.to_string s in
                       int_of_string s
                     | _ -> assert false
@@ -303,7 +302,7 @@ module Make_from_apron(M:sig
     let open Apron in
     let linexpr_a = A.to_lincons_array man a in
     let linexpr_b = A.to_lincons_array man b in
-    let a, b, linexpr_a, linexpr_b =
+    let a, b, linexpr_a, _ (* linexpr_b *) =
       if Lincons1.array_length linexpr_a > Lincons1.array_length linexpr_b then
         b, a, linexpr_b, linexpr_a
       else

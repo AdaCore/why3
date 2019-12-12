@@ -31,7 +31,7 @@ exception NotNum
 
 let big_int_of_const c =
   match c with
-    | Constant.ConstInt i -> i.il_int
+    | Constant.ConstInt i -> Number.(i.il_int)
     | _ -> raise NotNum
 
 let big_int_of_value v =
@@ -837,10 +837,11 @@ and reduce_term_equ ~orig st t1 t2 cont =
     begin
       match c1,c2 with
       | Constant.ConstInt i1, Constant.ConstInt i2 ->
-        let b = BigInt.eq i1.il_int i2.il_int in
-        { value_stack = Term (t_attr_copy orig (to_bool b)) :: st;
-          cont_stack = cont;
-        }
+         let open Number in
+         let b = BigInt.eq i1.il_int i2.il_int in
+         { value_stack = Term (t_attr_copy orig (to_bool b)) :: st;
+           cont_stack = cont;
+         }
       | _ -> raise Undetermined
     end
   | Tapp(ls1,tl1), Tapp(ls2,tl2) when ls1.ls_constr > 0 && ls2.ls_constr > 0 ->

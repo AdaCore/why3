@@ -119,9 +119,9 @@ module Make(S:sig
   let get_equivs uf_man uf t =
     let tcl = TermToClass.to_t uf_man.class_to_term t in
     match t.t_node with
-    | Tvar(_) | Tconst(_) when not( Ty.ty_equal (t_type t) Ty.ty_int) ->
+    | Tvar _ | Tconst _ when not ( Ty.ty_equal (t_type t) Ty.ty_int) ->
       List.map (TermToClass.to_term uf_man.class_to_term) (Union_find.get_class tcl uf)
-    | Tapp(lsym, args) ->
+    | Tapp (lsym, args) ->
       let l = List.fold_left (fun args argi ->
           let tclarg = get_class_for_term uf_man argi in
           let argsi =
@@ -284,9 +284,9 @@ module Make(S:sig
   let ident_ret = Ident.{pre_name = "$pat"; pre_label = Ident.Slab.empty; pre_loc = None; }
   let access_field constr constr_args a i (proj, t) =
       match a.t_node with
-      | Tapp(func, args) when func.ls_constr = 1 ->
+      | Tapp (func, args) when func.ls_constr = 1 ->
         List.nth args i
-      | Tvar(_) | _ ->
+      | Tvar _ | _ ->
         match proj with
         | None ->
           let return = create_vsymbol ident_ret t in
@@ -310,11 +310,11 @@ module Make(S:sig
         []
       | _ when ty_equal myty ty_int ->
         [a, None]
-      | Tyapp(tys, vars) ->
+      | Tyapp (tys, vars) ->
         begin
           let vars = Ty.ts_match_args tys vars in
           match (Ident.Mid.find tys.ts_name known_logical_ident).Decl.d_node with
-          | Decl.Ddata([_, [ls, ls_projs]]) ->
+          | Decl.Ddata ([_, [ls, ls_projs]]) ->
             let l =
               let my_ls_args = List.map (fun i -> Ty.ty_inst vars i) ls.ls_args in
               List.combine my_ls_args ls_projs
@@ -338,15 +338,15 @@ module Make(S:sig
                 List.map (fun a -> Some a) pdecl
                 |> List.combine l
             end
-          | Decl.Dtype({ts_def = Some _; ts_args = _; _ }) ->
+          | Decl.Dtype ({ts_def = Some _; ts_args = _; _ }) ->
             (* untested code*)
             let () = assert false in
             aux ity
-          | Decl.Ddata([_; _]) ->
+          | Decl.Ddata ([_; _]) ->
             warning_t "Multiple constructors is not supported in abstract interpretation." a; []
-          | Decl.Ddata(_) ->
+          | Decl.Ddata _ ->
             warning_t "Recursive types is not supported in abstract interpretation." a; []
-          | Decl.Dtype(_) -> (* This happens when a type is private or has an invariant: it can't be accesed
+          | Decl.Dtype _ -> (* This happens when a type is private or has an invariant: it can't be accesed
                               * by the logic, so we give up and only look for projections by looking
                               * at program projections. *)
             begin
@@ -357,31 +357,31 @@ module Make(S:sig
                  | Some s -> assert (Ity.its_equal its s));
                 let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
                 List.map (fun b ->
-                    let l = match Expr.(b.rs_logic) with | Expr.RLls(l) -> l | _ -> assert false in
+                    let l = match Expr.(b.rs_logic) with | Expr.RLls l -> l | _ -> assert false in
                     let this_ty = Expr.(Ity.(ty_of_ity b.rs_cty.cty_result)) in
                     let ty = Ty.ty_inst vars this_ty in
                     t_app l [a] (Some ty), if ity = None then None else Some b) pdecl
               with
               | Not_found -> failwith "could not restore its"
             end
-          | Decl.Dind(_) ->
+          | Decl.Dind _ ->
             warning_t "Could not find type declaration (got inductive predicate)."
               a;
             []
-          | Decl.Dlogic(_) ->
+          | Decl.Dlogic _ ->
             warning_t "Could not find type declaration (got logic declaration)."
               a;
             []
-          | Decl.Dprop(_) ->
+          | Decl.Dprop _ ->
             warning_t "Could not find type declaration (got propsition) for: "
               a;
             []
-          | Decl.Dparam(_) ->
+          | Decl.Dparam _ ->
             warning_t "Could not find type declaration (got param)."
               a;
             []
         end
-      | Tyvar(_) ->
+      | Tyvar _ ->
         warning_t "Comparison of values with an abstract type, the interpretation will not be precise" a;
         []
     in
@@ -394,11 +394,11 @@ module Make(S:sig
 
   let rec get_depend s t =
     match t.t_node with
-    | Tvar(_) ->
+    | Tvar _ ->
       if t_equal s t then
         Mterm.empty
       else Mterm.add t () Mterm.empty
-    | Tapp(_, args) ->
+    | Tapp (_, args) ->
       List.map (get_depend s) args
       |> List.fold_left (Mterm.union (fun _ _ _ -> Some ())) Mterm.empty
     | _ -> Mterm.empty
@@ -452,7 +452,7 @@ module Make(S:sig
           assert (Ty.ty_equal (t_type t) Ty.ty_int);
           Some t
         with
-        | Bad_domain(a) -> extract_term (man, uf_man) is_in (a, b) v
+        | Bad_domain a -> extract_term (man, uf_man) is_in (a, b) v
       end
     | None -> None
 
@@ -483,7 +483,7 @@ module Make(S:sig
         t_and t (t_equ a b)) t b.classes
     in
     let var = match uf_man.quant_var.t_node with
-      | Tvar(v) -> v
+      | Tvar v -> v
       | _ -> assert false
     in
     t_quant Tforall (t_close_quant [var] [] t)
@@ -527,27 +527,27 @@ module Make(S:sig
       let rec term_to_var_list f coeff t =
         let re = term_to_var_list f in
         match t.t_node with
-        | Tvar(_) ->
+        | Tvar _ ->
           begin
             match var_of_term t with
             | Some var -> ([(var, coeff)], 0)
             | None -> Format.eprintf "Variable undefined: "; Pretty.print_term Format.err_formatter t; Format.eprintf "@."; failwith "undefined var"
           end
-        | Tconst(Number.ConstInt(n)) ->
+        | Tconst (Number.ConstInt n) ->
           let n = Number.compute_int n in
           ([], coeff * (BigInt.to_int n))
-        | Tapp(func, args) when Term.ls_equal func ad_int ->
+        | Tapp (func, args) when Term.ls_equal func ad_int ->
           List.fold_left (fun (a, b) c ->
               let c, d = re coeff c in
               (a @ c, b + d)) ([], 0)args
-        | Tapp(func, [a;b]) when Term.ls_equal func min_int ->
+        | Tapp (func, [a;b]) when Term.ls_equal func min_int ->
           let c, d = re coeff a in
           let e, f = re (-coeff) b in
           (c @ e, d + f)
-        | Tapp(func, [a]) when Term.ls_equal func min_u_int ->
+        | Tapp (func, [a]) when Term.ls_equal func min_u_int ->
           re (-coeff)  a;
-        | Tapp(func, [{t_node = Tconst(Number.ConstInt(n)); _}; a])
-        | Tapp(func, [a; {t_node = Tconst(Number.ConstInt(n)); _};]) when Term.ls_equal func mult_int ->
+        | Tapp (func, [{t_node = Tconst (Number.ConstInt n); _}; a])
+        | Tapp (func, [a; {t_node = Tconst (Number.ConstInt n); _};]) when Term.ls_equal func mult_int ->
           let n = Number.compute_int n in
           re ((BigInt.to_int n) * coeff) a
         (* FIXME: need a nice domain for algebraic types *)
@@ -625,12 +625,12 @@ module Make(S:sig
       let rec aux t =
         try
           match t.t_node with
-          | Tbinop(Tand, a, b) ->
+          | Tbinop (Tand, a, b) ->
             let fa = aux a in
             let fb = aux b in
             (fun (d, a) ->
                fb (fa (d, a)))
-          | Tbinop(Tor, a, b) ->
+          | Tbinop (Tor, a, b) ->
             let fa = aux a in
             let fb = aux b in
             (fun (d, a) ->
@@ -639,7 +639,7 @@ module Make(S:sig
                join (man, uf_man) a1 a2
             )
 
-          | Tapp(func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int (* || Ty.ty_equal (t_type a) Ty.ty_bool*))
+          | Tapp (func, [a; b]) when (Ty.ty_equal (t_type a) Ty.ty_int (* || Ty.ty_equal (t_type a) Ty.ty_bool*))
                                     &&
                                     (ls_equal ps_equ func ||
                                      ls_equal lt_int func ||
@@ -697,7 +697,7 @@ module Make(S:sig
             (fun (d, a) ->
                let d, a = f (d, a) in
                D.meet_lincons_array man d arr, a)
-          | Tapp(func, [a;b]) when ls_equal ps_equ func ->
+          | Tapp (func, [a;b]) when ls_equal ps_equ func ->
             let f_uf = do_eq (man, uf_man) a b in
             let subv_a = get_subvalues a None in
             let subv_b = get_subvalues b None in
@@ -707,7 +707,7 @@ module Make(S:sig
                 (fun abs ->
                    g abs |> f
                    )) f_uf
-          | Tif(a, b, c) ->
+          | Tif (a, b, c) ->
             let fa = aux a in
             let fa_not = aux (t_descend_nots a) in
             let fb = aux b in
@@ -720,7 +720,7 @@ module Make(S:sig
           | _ when t_equal t t_bool_true || t_equal t t_true -> (fun d -> d)
           | Tfalse -> (fun _ -> D.bottom man uf_man.env, empty_uf_domain)
           | _ when t_equal t t_bool_false || t_equal t t_false -> (fun _ -> D.bottom man uf_man.env, empty_uf_domain)
-          | Tquant(Tforall, tq) ->
+          | Tquant (Tforall, tq) ->
             begin
               match t_open_quant tq with
               | [a], _, t when (Ty.ty_equal a.vs_ty Ty.ty_int) ->
@@ -733,7 +733,7 @@ module Make(S:sig
           | _ ->
             raise (Not_handled t)
         with
-        | Not_handled(t) ->
+        | Not_handled t ->
           Format.eprintf "Couldn't understand entirely the post condition: ";
           Pretty.print_term Format.err_formatter t;
           Format.eprintf "@.";
@@ -858,7 +858,7 @@ module Make(S:sig
       uf_man.apron_mapping <- Term.Mterm.add logical_term v uf_man.apron_mapping;
     | _ when Ity.ity_equal variable_type Ity.ity_unit
       -> ()
-    | Ity.Ityreg(reg), Tyapp(_, _) ->
+    | Ity.Ityreg reg, Tyapp (_, _) ->
       begin
         let reg_name =
           Ity.print_reg_name Format.str_formatter reg
@@ -899,7 +899,7 @@ module Make(S:sig
         uf_man.region_mapping <- Ity.Mreg.add reg (proj_list @ old_projs) uf_man.region_mapping;
         uf_man.region_var <- Ity.Mreg.add reg (Ity.(psym.pv_vs) :: old_vars) uf_man.region_var
       end
-    | Ity.Ityapp(_), _ ->
+    | Ity.Ityapp _, _ ->
       let reg_name = Ity.print_pv Format.str_formatter psym
                      |> Format.flush_str_formatter in
       let subv = get_subvalues logical_term None in

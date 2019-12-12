@@ -58,7 +58,7 @@ let insert_at_lines filename filename_2 offset to_add =
   let fout = open_out filename_2 in
   begin
     try
-      for i = 0 to offset-1 do
+      for _ = 0 to offset-1 do
         input_line fin
         |> Format.sprintf "%s\n"
         |> output_string fout;
@@ -113,18 +113,18 @@ let do_input way f =
   in
   let open Pdecl in
   let open Expr in
-  let do_infer mid m =
+  let do_infer _ m =
     let open Pmodule in
-    Mstr.iter (fun k ps -> match ps with
-        | PV a -> (* this is a val - nothing to do *) ()
+    Mstr.iter (fun _ ps -> match ps with
+        | PV _ -> (* this is a val - nothing to do *) ()
         | RS(rsym) ->
           let function_name = Ident.(rsym.rs_name.id_string) in
           let decl = Ident.Mid.find Expr.(rsym.rs_name) m.mod_known in
           begin match decl.pd_node with
           | PDlet(let_expr) ->
             begin match let_expr with
-              | LDvar(_) -> Format.eprintf "ldvar not handled@."
-              | LDsym(rsym_, cexp) ->
+              | LDvar _ -> Format.eprintf "ldvar not handled@."
+              | LDsym (_, cexp) ->
                 if Some (f ^ ":" ^ function_name) = !opt_file || Some f = !opt_file || !opt_file = None then
                 begin
                   match cexp.c_node with
@@ -143,22 +143,22 @@ let do_input way f =
                     let rec while_invariants context e =
                       let r = while_invariants context in
                       match e.e_node with
-                      | Elet(LDvar(pv, e), e2) ->
+                      | Elet (LDvar(_, e), e2) ->
                         r e @ r e2
-                      | Evar(_) | Econst(_) | Eassign(_)
-                      | Eabsurd | Epure (_) | Eassert(_) | Eexec(_) | Elet(_)
+                      | Evar _ | Econst _ | Eassign _
+                      | Eabsurd | Epure _ | Eassert _ | Eexec _ | Elet _
                         -> []
-                      | Eif(e1, e2, e3) ->
+                      | Eif (e1, e2, e3) ->
                         r e1 @ r e2 @ r e3
-                      | Ematch (e, pats, exns) ->
+                      | Ematch (e, _, exns) ->
                         r e @
-                        Ity.Mxs.fold_left (fun l _ (pvs, e) ->
+                        Ity.Mxs.fold_left (fun l _ (_, e) ->
                             r e @ l) (r e) exns
-                      | Eraise(x, e_) ->
+                      | Eraise (_, e_) ->
                         r e_
-                      | Eghost(e) ->
+                      | Eghost e ->
                         r e
-                      | Ewhile(e_cond, invs, _, e_loop) ->
+                      | Ewhile (e_cond, invs, _, e_loop) ->
                         begin
                           match invs with
                           | inv::_ ->
@@ -168,7 +168,7 @@ let do_input way f =
                         end ::
                         r e_cond @
                         r e_loop
-                      | Efor(pv, (f, d, to_), inv, _, e_loop) ->
+                      | Efor (_, (_, _, _), _, _, e_loop) ->
                         r e_loop;
                       | _ -> assert false
                     in
@@ -183,7 +183,7 @@ let do_input way f =
                     in
                     List.iter (fun (meet_term, (e, d)) ->
                         match e.e_node with
-                        | Ewhile(_, inv::_, _, _) ->
+                        | Ewhile (_, _::_, _, _) ->
                           let man = Abstract_interpreter.domain_manager context in
                           let expected_d = Abstract_interpreter.Domain.top man () |> meet_term in
                           let b = Abstract_interpreter.Domain.is_leq man d expected_d in
@@ -220,16 +220,16 @@ let do_input way f =
                     Format.eprintf "rs:";
                     Expr.print_rs Format.err_formatter rsym;
                     Format.eprintf " -> not a fun: any@."
-                  | Cpur(_) ->
+                  | Cpur _ ->
                     Format.eprintf "rs:";
                     Expr.print_rs Format.err_formatter rsym;
                     Format.eprintf " -> not a fun: pur@."
-                  | Capp(_) ->
+                  | Capp _ ->
                     Format.eprintf "rs:";
                     Expr.print_rs Format.err_formatter rsym;
                     Format.eprintf " -> not a fun: app@."
                 end;
-              | LDrec(_) -> Format.eprintf "LDrec not handled@."
+              | LDrec _ -> Format.eprintf "LDrec not handled@."
             end
           | _ -> () end
         | _ -> assert false

@@ -3,7 +3,6 @@ open Term
 
 module Apron_to_term(E: sig
     val env: Env.env
-    val pmod: Pmodule.pmodule
   end) = struct
 
   exception Cannot_be_expressed
@@ -49,7 +48,7 @@ module Apron_to_term(E: sig
     i
 
   let coeff_to_term = function
-    | Coeff.Scalar(s) ->
+    | Coeff.Scalar s ->
       let i = int_of_string (Scalar.to_string s) in
       let n = Constant.int_const_of_int (abs i) in
 
@@ -63,10 +62,9 @@ module Apron_to_term(E: sig
         CMinus (t_const n Ty.ty_int)
       else
         CNone
-    | Coeff.Interval(_) -> raise Cannot_be_expressed
+    | Coeff.Interval _ -> raise Cannot_be_expressed
 
   let lincons_to_term l variable_mapping =
-    let open Ty in
     let term = ref int_zero in
     Lincons1.iter (fun c v ->
         match coeff_to_term c with

@@ -93,7 +93,7 @@ let is_leq a b =
             t || begin
               let na = List.length ca in
               (ca @ cb |> List.sort_uniq compare |> List.length) = na
-            end) (match cb with [t] -> true | _ -> false) a) true b
+            end) (match cb with [_] -> true | _ -> false) a) true b
   in
   b
 
@@ -112,7 +112,7 @@ let forget t s =
     match nl with
     | [] ->
       None, List.filter (fun k -> not (k == l)) s
-    | t::q ->
+    | t::_ ->
       Some t, List.map (fun k ->
           if k == l then
             nl

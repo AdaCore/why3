@@ -15,7 +15,6 @@ module Make(S:sig
       let env = S.env
       let pmod = S.pmod
     end)
-  open Ai_logic
 
   type t = A.t a
   type env = A.env
@@ -27,7 +26,7 @@ module Make(S:sig
 
   let (create_manager:unit -> man) = fun () -> A.create_manager (), ()
 
-  let bottom m e = { i = 0; t = []; c = true; }
+  let bottom _ _ = { i = 0; t = []; c = true; }
 
   let top man e = { i = 0; t = [A.top (fst man) e]; c = true; }
 
@@ -182,7 +181,7 @@ module Make(S:sig
     |> Term.t_or_simp_l in
     List.fold_left Term.t_and_simp t globals
 
-  let push_label man env i t = t
+  let push_label _ _ _ t = t
 
   let make_consistent _ = failwith "not implemented"
 
@@ -201,11 +200,11 @@ module Make(S:sig
   let rec meet_term man term elt =
     let open Term in
     match term.t_node with
-    | Tbinop(Tor, a, b) ->
+    | Tbinop (Tor, a, b) ->
       join man (meet_term man a elt) (meet_term man b elt)
-    | Tbinop(Tand, a, b) ->
+    | Tbinop (Tand, a, b) ->
       meet_term man a elt |> meet_term man b
-    | Tbinop(_) -> assert false
+    | Tbinop _ -> assert false
     | _ -> {elt with t = List.map (A.meet_term (fst man) term) elt.t }
 
 end

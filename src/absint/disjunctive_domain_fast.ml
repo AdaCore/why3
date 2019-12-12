@@ -35,7 +35,7 @@ module Make(A:DOMAIN) = struct
 
   let create_manager () = A.create_manager (), { join_tbl = Hashdom.create 1024; real_join_tbl = Hashdom.create 1024; meet_lincons = Hashdoml.create 1024; }
 
-  let bottom m e = { i = 0; t = []; c = true; }
+  let bottom _ _ = { i = 0; t = []; c = true; }
 
   let top man e = { i = 0; t = [A.top (fst man) e]; c = true; }
 
@@ -222,7 +222,7 @@ module Make(A:DOMAIN) = struct
     |> Term.t_or_simp_l in
     List.fold_left Term.t_and_simp t globals
 
-  let push_label man env i t = t
+  let push_label _ _ _ t = t
 
   let to_lincons_array man t =
     match (join_one man t).t with

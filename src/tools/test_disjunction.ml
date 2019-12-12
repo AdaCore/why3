@@ -9,8 +9,7 @@ let usage_msg = Format.sprintf
   "Usage: %s"
   (Filename.basename Sys.argv.(0))
 
-let add_opt x =
-  ()
+let add_opt _ = ()
 
 let config, _, env =
   Whyconf.Args.initialize [] add_opt usage_msg
@@ -54,7 +53,7 @@ let dom_eq man d d_ =
 
 
 let test1 =
-  let man, env, assign, constr, _ = init ["x"; "y"; "i"; "j"] in
+  let man, _, _, constr, _ = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 4] in
   let d2 = constr ["y", [], 5] in
   let d1_ = match d1 with
@@ -68,7 +67,7 @@ let test1 =
   |> assert_ "test1"
 
 let test2 =
-  let man, env, assign, constr, _ = init ["x"; "y"; "i"; "j"] in
+  let man, _, _, constr, _ = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 4] in
   let d2 = constr ["x", [], 3] in
   let d = Dom.join man d1 d2 in
@@ -76,7 +75,7 @@ let test2 =
   |> assert_ "test2"
 
 let test3 =
-  let man, env, assign, constr, _ = init ["x"; "y"; "i"; "j"] in
+  let man, _, _, constr, _ = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 4; "y", [], 3] in
   let d2 = constr ["x", [], 3; "y", [], 2] in
   let d = Dom.join man d1 d2 in
@@ -84,7 +83,7 @@ let test3 =
   |> assert_ "test3"
 
 let test4 =
-  let man, env, assign, constr,_  = init ["x"; "y"; "i"; "j"] in
+  let man, _, _, constr,_  = init ["x"; "y"; "i"; "j"] in
   let d1 = constr ["x", [], 0; "y", [], 1] in
   let d2 = constr ["x", [], 1; "y", [], 0] in
   let d3 = constr ["x", [], 0; "y", [], 0] in
@@ -112,7 +111,7 @@ let test4 =
   ()
 
 let test5 =
-  let man, env, assign, constr, lineq = init ["x"; "y"; "i"; "k"; "j"; "w"] in
+  let man, env, _, _, lineq = init ["x"; "y"; "i"; "k"; "j"; "w"] in
   let d = Dom.top man env in
   let d = lineq d [1, "x"; -1, "y"] 0 Lincons1.EQ in
   let d = lineq d [1, "i"] (-8) Lincons1.EQ in
@@ -136,7 +135,7 @@ let test5 =
   assert_ "test5" (List.length d = 1)
 
 let test6 =
-  let man, env, assign, constr, lineq = init ["x"; "y"; "i"; "k"; "j"; "w"] in
+  let man, env, _, _, lineq = init ["x"; "y"; "i"; "k"; "j"; "w"] in
   let d = Dom.top man env in
   let d = lineq d [1, "x"; -1, "y"] 0 Lincons1.EQ in
   let d = lineq d [1, "i"] (-8) Lincons1.SUPEQ in
@@ -208,7 +207,7 @@ let dom_eq man d d_ =
   Domw.is_leq man d d_ && Domw.is_leq man d_ d
 
 let test_w1 =
-  let man, env, assign, constr, lineq = init ["x"; "y"; "z"] in
+  let man, env, _, _, lineq = init ["x"; "y"; "z"] in
   let d1 = Domw.top man env in
   let a1 = lineq d1 [-2, "x"] (3) Lincons1.SUPEQ in
   let a2 = lineq d1 [1, "x"] (-1) Lincons1.SUPEQ in
@@ -219,7 +218,7 @@ let test_w1 =
   assert_ "testcleanup" true
 
 let test_w1 =
-  let man, env, assign, constr, lineq = init ["x"; "y"; "z"] in
+  let man, env, _, _, lineq = init ["x"; "y"; "z"] in
   let d1 = Domw.top man env in
   let a1 = lineq d1 [1, "z"] 0 Lincons1.EQ in
   let a1 = lineq a1 [1, "y"] 0 Lincons1.EQ in

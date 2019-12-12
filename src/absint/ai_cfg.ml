@@ -6,7 +6,6 @@ let ai_cfg_debug =
   Debug.register_flag "ai_cfg_debug" ~desc:"CFG debug"
 
 open Format
-open Apron
 
 module Make(E: sig
     val env: Env.env
@@ -170,8 +169,6 @@ module Make(E: sig
       Format.fprintf debug_fmt "%d -> %d@." a b
     | None -> ()
 
-  exception Not_handled of Term.term
-
   let warning_t s t =
     Format.eprintf "-- warning: %s -- triggered by " s;
     Pretty.print_term Format.err_formatter t;
@@ -179,7 +176,7 @@ module Make(E: sig
     Pretty.print_ty Format.err_formatter (Term.t_type t);
     Format.eprintf "@."
 
-  let create_postcondition_equality cfg manpk psym vreturn =
+  let create_postcondition_equality _ manpk psym vreturn =
     if not Ity.(ity_equal  psym.pv_ity ity_unit) then
       begin
         let postcondition =
@@ -209,7 +206,7 @@ module Make(E: sig
 
   let remove_eps ?ret:(ret=None) manpk t =
     match t.t_node with
-    | Teps(tb) ->
+    | Teps (tb) ->
       let return, t = Term.t_open_bound tb in
       (* Always use the same variable when returning a value,
        * otherwise variables keep being created and the previous ones (with the
@@ -252,7 +249,7 @@ module Make(E: sig
           constraints abs);
       i, j, []
 
-    | Elet(LDvar(psym, let_expr), b) ->
+    | Elet (LDvar (psym, let_expr), b) ->
           (*
            * let a = b in c
            *
@@ -278,19 +275,19 @@ module Make(E: sig
 
 
       (* Save the effect of the let *)
-      new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun man abs ->
+      new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun _ abs ->
           abs
         );
 
       let end_cp = new_node_cfg cfg expr in
       (* erase a *)
       let forget_fun = D.forget_var manpk Ity.(psym.pv_vs) in
-      new_hedge_cfg cfg (b_end_cp, end_cp) (fun man abs ->
+      new_hedge_cfg cfg (b_end_cp, end_cp) (fun _ abs ->
           forget_fun abs
         );
       let_begin_cp, end_cp, let_exn @ b_exn
 
-    | Evar(psym) ->
+    | Evar (psym) ->
       let constraints =
         if not Ity.(ity_equal  psym.pv_ity ity_unit) then
           begin
@@ -321,7 +318,7 @@ module Make(E: sig
           constraints abs
         );
       begin_cp, end_cp, []
-    | Econst(n) ->
+    | Econst n ->
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg ~label:"constant returned" cfg expr in
 
@@ -336,7 +333,7 @@ module Make(E: sig
           constraints abs
         );
       begin_cp, end_cp, []
-    | Eexec({c_node = Capp(rsym, _); _}, { Ity.cty_post = post; Ity.cty_effect = effect;  Ity.cty_oldies = oldies; _ }) ->
+    | Eexec ({c_node = Capp (rsym, _); _}, { Ity.cty_post = post; Ity.cty_effect = effect;  Ity.cty_oldies = oldies; _ }) ->
       let eff_write = Ity.(effect.eff_writes) in
       let vars_to_forget, constraint_copy_ghost = Ity.Mpv.fold_left (
           fun (vars_to_forget, constraints) k b ->
@@ -374,20 +371,20 @@ module Make(E: sig
              constr x |> forget)
         ) (fun x -> x) eff_write in
 
-      new_hedge_cfg cfg (begin_cp, end_cp) (fun man abs ->
+      new_hedge_cfg cfg (begin_cp, end_cp) (fun _ abs ->
           constraint_copy_ghost abs  |> forget_writes |> constraints |> vars_to_forget
         );
       (* FIXME: handle exceptions *)
       begin_cp, end_cp, []
-    | Ewhile(cond, _, _, content) ->
+    | Ewhile (cond, _, _, content) ->
       (* Condition expression *)
-      let cond_term, cond_term_not =
+      let cond_term =
         match Expr.term_of_expr ~prop:true cond with
         | Some s ->
-          s, t_not s
+          s
         | None ->
           Format.eprintf "warning, condition in while could not be translated to term, an imprecise invariant will be generated";
-          Term.t_true, Term.t_true
+          Term.t_true
       in
       let constraints = D.meet_term manpk cond_term in
 
@@ -407,7 +404,7 @@ module Make(E: sig
         );
       (* FIXME: exceptions while inside the condition *)
       before_loop_cp, after_loop_cp, loop_exn
-    | Eraise(s, e) ->
+    | Eraise (s, e) ->
       let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg manpk e in
       let j = new_node_cfg cfg expr in
       let k = new_node_cfg cfg expr in
@@ -415,7 +412,7 @@ module Make(E: sig
           D.bottom man ());
       arg_begin, k, ((arg_end_cp, s)::arg_exn)
 
-    | Eif(cond, b, c) ->
+    | Eif (cond, b, c) ->
       (* Condition expression *)
       let cond_term, not_cond_term =
         match Expr.term_of_expr ~prop:true cond with
@@ -451,10 +448,10 @@ module Make(E: sig
           let open Expr in
           let constraints, to_forget_before, to_forget_end = match p.pp_pat.pat_node with
             | Pwild -> (fun abs -> abs), (fun abs -> abs), (fun x -> x)
-            | Pvar(_) -> failwith "pattern"
-            | Papp(l, p) ->
+            | Pvar _ -> failwith "pattern"
+            | Papp (l, p) ->
               let args = List.map (fun p -> match p.pat_node with
-                  | Pvar(vsym) ->
+                  | Pvar (vsym) ->
                     let pv = Ity.restore_pv vsym in
                     D.add_variable_to_env manpk pv;
                     vsym
@@ -474,14 +471,14 @@ module Make(E: sig
               constr, D.forget_var manpk vreturn, (List.fold_left (fun c arg ->
                   fun x -> c x |> D.forget_var manpk arg) (fun x -> x) args)
 
-            | Por(_) -> failwith "pattern or"
-            | Pas(_) -> failwith "pattern as"
+            | Por _ -> failwith "pattern or"
+            | Pas _ -> failwith "pattern as"
           in
           let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
-          new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun man abs ->
+          new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun _ abs ->
               constraints abs |> to_forget_before
             );
-          new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun man abs ->
+          new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun _ abs ->
               to_forget_end abs
             );
           e_exns := e_exn :: !e_exns;
@@ -536,14 +533,14 @@ module Make(E: sig
           abs
         );
       e_begin_cp, i, !additional_exn @ e_exn
-    | Eassert(_) | Eabsurd -> (* FIXME: maybe they could be taken into account *)
+    | Eassert _ | Eabsurd -> (* FIXME: maybe they could be taken into account *)
       let i = new_node_cfg cfg expr in
 
       i, i, []
 
-    | Eghost(e) -> put_expr_in_cfg ~ret cfg manpk e
+    | Eghost e -> put_expr_in_cfg ~ret cfg manpk e
 
-    | Efor(k, (lo, dir, up), _, _, e) ->
+    | Efor (k, (lo, dir, up), _, _, e) ->
       (* . before_loop
        * | k = 0      k = n -> forget_k
        * . start_loop ------------------> end_loop
@@ -588,11 +585,11 @@ module Make(E: sig
       let res = t_app ad_int [k_term; Term.t_nat_const 1] (Some Ty.ty_int) in
       let next_assignation = t_app ps_equ [t_var vret_k; res] None |> D.meet_term manpk in
       let vret_equal = t_app ps_equ [t_var vret_k; k_term] None |> D.meet_term manpk in
-      new_hedge_cfg cfg (e_end_cp, start_loop_cp) (fun man abs ->
+      new_hedge_cfg cfg (e_end_cp, start_loop_cp) (fun _ abs ->
           (* vret = k + 1, forget k, k = vret, forget vret *)
           next_assignation abs |> forget_k |> vret_equal |> forget_vret
         );
-      new_hedge_cfg cfg (start_loop_cp, end_loop_cp) (fun man abs ->
+      new_hedge_cfg cfg (start_loop_cp, end_loop_cp) (fun _ abs ->
           constraints_post abs |> forget_k
         );
       before_loop_cp, end_loop_cp, e_exn
@@ -615,8 +612,7 @@ module Make(E: sig
     new_hedge_cfg cfg (i, e_start_cp) (fun _ -> constraints);
     i, e_end_cp, e_exn
 
-  module Apron_to_term = Apron_to_term.Apron_to_term (E)
-  let domain_to_term cfg manpk domain =
+  let domain_to_term _ manpk domain =
     D.to_term manpk domain
 
   let vertex_dummy = -1
@@ -751,7 +747,7 @@ module Make(E: sig
         ) cfg.loop_invariants
     end
 
-  let add_variable cfg a pvs =
+  let add_variable _ a pvs =
     D.add_variable_to_env a pvs
 
 end

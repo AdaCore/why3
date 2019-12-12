@@ -67,7 +67,7 @@ module Make(S:sig type t end) = struct
           add c te t) c b.to_t
 
   let get_inconsistent a b =
-    TMap.merge (fun v a b ->
+    TMap.merge (fun _ a b ->
         match a, b with
         | Some t, Some t' ->
           let d = Term.Mterm.diff (fun _ _ _ -> None) t' t in

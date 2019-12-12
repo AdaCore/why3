@@ -7,14 +7,14 @@ module Make(A:DOMAIN) = struct
   let hash _ _ = assert false
   let is_eq _ _ _ = assert false
 
-  let rec path_height = List.length
+  let path_height = List.length
 
   let print_path = List.iter (function
       | Node i -> Format.eprintf "%d@." i;
       | Star i -> Format.eprintf "%d*@." i;
     )
 
-  let rec path_add l p =
+  let path_add l p =
     let a = List.find_all (function
         | Node i | Star i when l = i -> true
         | _ -> false) p in
@@ -72,7 +72,7 @@ module Make(A:DOMAIN) = struct
 
   let create_manager = A.create_manager
 
-  let bottom m e = []
+  let bottom _ _ = []
 
   let top m e = [A.top m e, []]
 
@@ -83,8 +83,8 @@ module Make(A:DOMAIN) = struct
     |> List.fold_left (&&) true
 
   let is_leq man a b =
-    let one_in_many (t, path) =
-      List.map (fun (t_, path_) ->
+    let one_in_many (t, _) =
+      List.map (fun (t_, _) ->
           A.is_leq man t t_) b
       |> List.fold_left (||) false
     in
@@ -98,8 +98,8 @@ module Make(A:DOMAIN) = struct
 
   let join_one man = function
     | [] -> None
-    | (a, b)::q ->
-      let qa, qb = List.split q in
+    | (a, _)::q ->
+      let qa, _ = List.split q in
       Some (List.fold_left (A.join man) a qa, [])
 
   let unwrap_domain = function
