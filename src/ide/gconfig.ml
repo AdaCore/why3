@@ -351,10 +351,8 @@ let change_font size =
 *)
   let sff = sans_font_family ^ " " ^ string_of_int size in
   let mff = mono_font_family ^ " " ^ string_of_int size in
-  let sf = Gtkcompat.gpango_font_description_from_string sff in
-  let mf = Gtkcompat.gpango_font_description_from_string mff in
-  List.iter (fun v -> v#modify_font sf) !modifiable_sans_font_views;
-  List.iter (fun v -> v#modify_font mf) !modifiable_mono_font_views
+  List.iter (fun v -> v#modify_font_by_name sff) !modifiable_sans_font_views;
+  List.iter (fun v -> v#modify_font_by_name mff) !modifiable_mono_font_views
 
 let incr_font_size n =
   let c = config () in
