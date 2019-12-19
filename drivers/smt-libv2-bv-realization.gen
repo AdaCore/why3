@@ -103,6 +103,18 @@ theory bv.BV_Gen
 
 end
 
+theory bv.BV128
+  syntax type t "(_ BitVec 128)"
+
+  syntax function zeros "#x00000000000000000000000000000000"
+  syntax function ones "#xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+
+  syntax function nth_bv
+    "(not (= (bvand (bvlshr %1 %2) (_ bv1 128)) (_ bv0 128)))"
+
+  syntax function rotate_left_bv "(bvor (bvshl %1 (bvurem %2 (_ bv128 128))) (bvlshr %1 (bvsub (_ bv128 128) (bvurem %2 (_ bv128 128)))))"
+  syntax function rotate_right_bv "(bvor (bvlshr %1 (bvurem %2 (_ bv128 128))) (bvshl %1 (bvsub (_ bv128 128) (bvurem %2 (_ bv128 128)))))"
+end
 
 theory bv.BV64
   syntax type t "(_ BitVec 64)"
@@ -161,6 +173,11 @@ end
 
 theory bv.BVConverter_Gen
   remove allprops
+end
+
+theory bv.BVConverter_64_128
+  syntax function toBig "((_ zero_extend 64) %1)"
+  syntax function toSmall "((_ extract 63 0) %1)"
 end
 
 theory bv.BVConverter_32_64

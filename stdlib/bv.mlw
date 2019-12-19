@@ -407,7 +407,28 @@ module BV_Gen
 
 end
 
-(** {2 Bit Vectors of common sizes, 8/16/32/64} *)
+(** {2 Bit Vectors of common sizes, 8/16/32/64/128} *)
+
+module BV128
+  constant size           : int = 128
+  constant two_power_size : int = 0x1_0000_0000_0000_0000_0000_0000_0000_0000
+
+  use int.Int as Int (* needed to use range types *)
+
+  type t = < range 0 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF >
+
+  clone export BV_Gen with
+    type t = t,
+    function to_uint = t'int,
+    constant size = size,
+    constant two_power_size = two_power_size,
+    constant max_int = t'maxInt,
+    goal size_pos,
+    goal two_power_size_val,
+    goal max_int_val,
+    axiom . (* should this be "lemma"? "goal"? *)
+
+end
 
 module BV64
   constant size           : int = 64
@@ -518,7 +539,24 @@ module BVConverter_Gen
 
 end
 
-(** {2 Converters of common size_bvs} *)
+(** {3 Converters of common size_bvs} *)
+
+module BVConverter_64_128
+  use BV64 as BV64
+  use BV128 as BV128
+
+  predicate in_range (b : BV128.t) = BV128.ule b (0xFFFF_FFFF_FFFF_FFFF:BV128.t)
+
+  clone export BVConverter_Gen with
+    type bigBV = BV128.t,
+    type smallBV = BV64.t,
+    predicate in_small_range = in_range,
+    function to_uint_small = BV64.t'int,
+    function to_uint_big = BV128.t'int,
+    axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
+    axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
+
+end
 
 module BVConverter_32_64
   use BV32 as BV32

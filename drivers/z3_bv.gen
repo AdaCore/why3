@@ -6,16 +6,21 @@ theory bv.BV_Gen
   remove allprops
 end
 
+theory bv.BV128
+  syntax function of_int "((_ int2bv 128) %1)"
+  syntax function t'int "(bv2int %1)"
+
+  remove allprops
+end
+
 theory bv.BV64
   syntax function of_int "((_ int2bv 64) %1)"
   syntax function t'int "(bv2int %1)"
 
   remove allprops
-
 end
 
 theory bv.BV32
-
   syntax function of_int "((_ int2bv 32) %1)"
   syntax function t'int "(bv2int %1)"
 
