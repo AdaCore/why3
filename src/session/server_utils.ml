@@ -589,7 +589,7 @@ let find_next_unproved_goal ~proved ~children ~get_parent ~is_pa node =
     | Some parent ->
         let brothers_node = children parent in
         let _before_nodes, after_nodes = split_list brothers_node node in
-        let after_nodes = Lists.rev_filter
+        let after_nodes = List.filter
             (fun x -> not (proved x) && not (is_pa x)) after_nodes in
         if after_nodes = [] then
           find_next_in_above parent
