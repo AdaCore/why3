@@ -39,12 +39,12 @@ end
 (* FIXME: avoid Pervasives using a black list of reserved OCaml names *)
 
 theory int.Abs
-  syntax function abs "(Pervasives.abs %1)"
+  syntax function abs "Pervasives.abs"
 end
 
 theory int.MinMax
-  syntax function min "(Pervasives.min %1 %2)"
-  syntax function max "(Pervasives.max %1 %2)"
+  syntax function min "Pervasives.min"
+  syntax function max "Pervasives.max"
 end
 
 (* TODO
@@ -54,12 +54,12 @@ end
 
 theory int.Power
   prelude "let rec power x n = if n = 0 then 1 else x * power x (n-1)"
-  syntax function power "(power %1 %2)"
+  syntax function power "power"
 end
 
 theory int.Fact
   prelude "let rec fact n = if n <= 1 then 1 else n * fact (n-1)"
-  syntax function fact "(fact %1)"
+  syntax function fact "fact"
 end
 
 theory int.Fibonacci
@@ -72,7 +72,7 @@ end
 module Ref
   syntax type     ref      "%1 ref"
   syntax function contents "!%1"
-  syntax val      ref      "ref %1"
+  syntax val      ref      "ref"
 end
 
 module ref.Ref
@@ -137,7 +137,7 @@ module matrix.Matrix
 
   syntax exception OutOfBounds "(Invalid_argument \"index out of bounds\")"
 
-  syntax function rows     "(Array.length %1)"
+  syntax function rows     "Array.length"
   syntax function columns  "(Array.length %1.(0))"
   syntax val rows          "Array.length"
   syntax val columns       "(fun m -> Array.length m.(0))"
@@ -233,7 +233,7 @@ module mach.matrix.Matrix63
 
   syntax exception OutOfBounds "(Invalid_argument \"index out of bounds\")"
 
-  syntax function rows     "(Array.length %1)"
+  syntax function rows     "Array.length"
   syntax function columns  "(Array.length %1.(0))"
   syntax val rows          "Array.length"
   syntax val columns       "(fun m -> Array.length m.(0))"

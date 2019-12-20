@@ -286,7 +286,7 @@ pid_t create_process(char* cmd,
                      bool usestdin,
                      int outfile,
                      int timelimit,
-                     int memlimit) {
+                     unsigned int memlimit) {
   struct rlimit res;
   char** unix_argv;
   int count = argc;
@@ -327,8 +327,8 @@ pid_t create_process(char* cmd,
   if (memlimit > 0) {
     /* set the CPU memory limit */
     getrlimit(RLIMIT_AS,&res);
-    res.rlim_cur = memlimit * 1024 * 1024;
-    res.rlim_max = memlimit * 1024 * 1024;
+    res.rlim_cur = (rlim_t)memlimit * 1024 * 1024;
+    res.rlim_max = (rlim_t)memlimit * 1024 * 1024;
     setrlimit(RLIMIT_AS,&res);
   }
 

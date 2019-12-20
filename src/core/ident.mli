@@ -166,6 +166,7 @@ val id_unique_attr :
     the "name:" attribute to generate the name instead of id.id_string *)
 
 val proxy_attr: attribute
+val useraxiom_attr: attribute
 
 (** {2 Attributes for handling counterexamples} *)
 
@@ -221,6 +222,11 @@ val get_model_trace_string : name:string -> attrs:Sattr.t -> string
 (** If attrs contain an attribute of the form ["model_trace:mt_string"],
     return ["mt_string"]. Raises [Not_found] if there is no attribute of
     the form ["model_trace:*"]. *)
+
+val get_element_name: attrs:Sattr.t -> string option
+
+val suffix_attr_name: attrs:Sattr.t -> string -> Sattr.t
+(** Add a suffix to all "name" attributes of [attrs] *)
 
 val compute_model_trace_field: ident option -> int -> Sattr.t
 (** Take an optional projection name and the depths of its occurence and return

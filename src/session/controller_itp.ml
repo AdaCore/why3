@@ -84,6 +84,12 @@ type controller =
     controller_running_proof_attempts : unit Hpan.t;
   }
 
+let set_partial_config cont c =
+  let open Whyconf in
+  let config = set_editors cont.controller_config (get_editors c) in
+  let config = set_provers config (get_provers c) in
+  cont.controller_config <- config
+
 let session_max_tasks = ref 1
 
 let set_session_max_tasks n =

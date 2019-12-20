@@ -21,60 +21,60 @@ module String
   type char
   constant dummy_char: char
 
-  type string
+  type char_string
 
   (* axiomatized function length *)
-  val function length string: int
+  val function length char_string: int
     ensures { 0 <= result }
 
   (* string access routine *)
-  val function ([]) (s: string) (i:int) : char
+  val function ([]) (s: char_string) (i:int) : char
     requires { 0 <= i < s.length }
 
-  val constant empty: string
+  val constant empty: char_string
     ensures { length result = 0 }
 
   (* extensional equality for strings *)
-  predicate (==) (s1 s2: string) =
+  predicate (==) (s1 s2: char_string) =
     length s1 = length s2 /\
     forall i:int. 0 <= i < length s1 -> s1[i] = s2[i]
 
   axiom extensionality:
-     forall s1 s2: string. s1 == s2 -> s1 = s2
+     forall s1 s2: char_string. s1 == s2 -> s1 = s2
 
   (* axiomatized concatenation *)
-  function app string string: string
+  function app char_string char_string: char_string
 
   axiom app_def1:
-    forall s1 s2: string. length (app s1 s2) = length s1 + length s2
+    forall s1 s2: char_string. length (app s1 s2) = length s1 + length s2
 
   axiom app_def2:
-    forall s1 s2: string, i: int.
+    forall s1 s2: char_string, i: int.
     0 <= i < length s1 -> (app s1 s2)[i] = s1[i]
 
   axiom app_def3:
-    forall s1 s2: string, i: int.
+    forall s1 s2: char_string, i: int.
     length s1 <= i < length s1 + length s2 ->
     (app s1 s2)[i] = s2[i - length s1]
 
   lemma app_assoc:
-    forall s1 s2 s3: string. app s1 (app s2 s3) == app (app s1 s2) s3
+    forall s1 s2 s3: char_string. app s1 (app s2 s3) == app (app s1 s2) s3
 
   (* axiomatized substring *)
-  function sub string int int: string
+  function sub char_string int int: char_string
 
   axiom sub_def1:
-    forall s: string, ofs len: int.
+    forall s: char_string, ofs len: int.
     0 <= len -> 0 <= ofs <= length s -> ofs + len <= length s ->
     length (sub s ofs len) = len
 
   axiom sub_def2:
-    forall s: string, ofs len: int.
+    forall s: char_string, ofs len: int.
     0 <= len -> 0 <= ofs <= length s -> ofs + len <= length s ->
     forall i: int. 0 <= i < len -> (sub s ofs len)[i] = s[ofs + i]
 
   (* substring routine *)
-  val sub (s: string) (ofs len: int) : string
+  val sub (s: char_string) (ofs len: int) : char_string
     requires { 0 <= len /\ 0 <= ofs <= length s /\ ofs + len <= length s }
     ensures  { result = sub s ofs len }
 
@@ -89,7 +89,7 @@ module Sig
 
   type rope
 
-  function string rope: string
+  function string rope: char_string
     (** a rope is a string *)
 
   function length rope: int
@@ -100,7 +100,7 @@ module Sig
   val is_empty (r: rope) : bool
     ensures  { result <-> string r == empty }
 
-  val of_string (s: string) : rope
+  val of_string (s: char_string) : rope
     requires { 0 <= S.length s }
     ensures  { string result == s}
 
@@ -132,7 +132,7 @@ module Rope (* : Sig *)
   (* ***** Logical description of rope type **** *)
   type rope =
     | Emp
-    | Str string int  int  (* Str s ofs len is s[ofs..ofs+len[ *)
+    | Str char_string int  int  (* Str s ofs len is s[ofs..ofs+len[ *)
     | App rope   rope int  (* concatenation and total length   *)
 
   let function length (r: rope) : int =
@@ -156,7 +156,7 @@ module Rope (* : Sig *)
   end
 
   (* the string model of a rope *)
-  function string (r: rope) : string = match r with
+  function string (r: rope) : char_string = match r with
     | Emp           -> S.empty
     | Str s ofs len -> S.sub s ofs len
     | App l r _     -> S.app (string l) (string r)
@@ -181,7 +181,7 @@ module Rope (* : Sig *)
   = match r with Emp -> true | _ -> false end
 
   (* string conversion into a rope *)
-  let of_string (s: string) : rope
+  let of_string (s: char_string) : rope
     requires { 0 <= S.length s }
     ensures  { string result == s}
     ensures  { inv result }
@@ -248,7 +248,7 @@ module Balance
   val constant max : int (* e.g. = 100 *)
     ensures { 2 <= result }
 
-  function string_of_array (q: array rope) (l u: int) : string
+  function string_of_array (q: array rope) (l u: int) : char_string
     (** `q[u-1] + q[u-2] + ... + q[l]` *)
 
   axiom string_of_array_empty:
@@ -304,7 +304,7 @@ module Balance
     ensures  { string_of_array q l u == S.empty }
     = variant { u - l } if l < u then string_of_array_concat_empty q (l+1) u
 
-  function string_of_queue (q: array rope) : string =
+  function string_of_queue (q: array rope) : char_string =
     string_of_array q 2 (Array.length q)
 
   let rec insert (q: array rope) (i: int) (r: rope) : unit

@@ -40,7 +40,9 @@ val read_config : string option -> config
       Windows) is checked for existence:
       - if present, the content is parsed and returned,
       - otherwise, we return the built-in default_config with a
-        default configuration filename. *)
+        default configuration filename.
+
+ *)
 
 val merge_config : config -> string -> config
 (** [merge_config config filename] merge the content of [filename]
@@ -69,11 +71,19 @@ val get_main : config -> main
 val set_main : config -> main -> config
 (** [set_main config main] replace the main section by the given one *)
 
+val set_stdlib: bool -> config -> config
+(** Set if the standard library should be added to loadpath *)
+
+val set_load_default_plugins: bool -> config -> config
+(** Set if the plugins in the default path should be loaded *)
+
+val set_load_default_config: bool -> config -> config
+(** Set if the default strategies should be automatically generated *)
+
 val libdir: main -> string
 val datadir: main -> string
 val loadpath: main -> string list
 val set_loadpath : main -> string list -> main
-val default_loadpath : string list
 val timelimit: main -> int
 val memlimit: main -> int
 val running_provers_max: main -> int
@@ -122,6 +132,7 @@ type config_prover = {
   interactive  : bool; (* Interactive theorem prover *)
   extra_options: string list;
   extra_drivers: string list;
+  detected_at_startup : bool; (* detected at startup *)
 }
 
 val get_complete_command : config_prover -> with_steps:bool -> string
@@ -204,6 +215,15 @@ val get_strategies : config -> config_strategy Mstr.t
 
 val add_strategy : config -> config_strategy -> config
 
+(** detected provers *)
+type detected_prover = {
+  exec_name  : string;
+  version : string;
+}
+
+val set_detected_provers: config -> detected_prover list -> config
+val get_detected_provers: config -> detected_prover list
+
 (** filter prover *)
 type filter_prover
 
@@ -240,7 +260,7 @@ val filter_one_prover : config -> filter_prover -> config_prover
 (** find the uniq prover that verify the filter. If it doesn't exists
     raise ProverNotFound or raise ProverAmbiguity *)
 
-val why3_regexp_of_string : string -> Str.regexp
+val why3_regexp_of_string : string -> Re.Str.regexp
 
 (** {2 For accesing other parts of the configuration } *)
 
@@ -287,3 +307,11 @@ val unknown_to_known_provers  :
   config_prover Mprover.t -> prover ->
   prover list * prover list * prover list
 (** return others, same name, same version *)
+
+(** */ *)
+
+(** Internal, recursive functionality with Autodetection  *)
+
+val provers_from_detected_provers: (config -> config) ref
+
+(** */ *)

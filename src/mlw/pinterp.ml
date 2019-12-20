@@ -34,6 +34,7 @@ type value =
   | Vreal of real
   | Vfloat_mode of float_mode
   | Vfloat of big_float
+  | Vstring of string
   | Vbool of bool
   | Vvoid
   | Varray of value array
@@ -75,6 +76,8 @@ let rec print_value fmt v =
       fprintf fmt "%s (%s)" decimal hexadecimal
   | Vfloat_mode m ->
       fprintf fmt "%s" (mode_to_string m)
+  | Vstring s ->
+      Constant.print_string_def fmt s
   | Vvoid ->
     fprintf fmt "()"
   | Varray a ->
@@ -380,7 +383,9 @@ let builtin_mode _kn _its = ()
 let builtin_float_type _kn _its = ()
 
 (** Description of modules *)
-let built_in_modules =
+(* Described as a function so that this code is not executed outside of
+   why3execute. *)
+let built_in_modules () =
   let bool_module =
     ["bool"],"Bool", [],
     [ "True", eval_true ;
@@ -524,7 +529,7 @@ let add_builtin_mo env (l,n,t,d) =
     d
 
 let get_builtin_progs lib =
-  List.iter (add_builtin_mo lib) built_in_modules
+  List.iter (add_builtin_mo lib) (built_in_modules ())
 
 let get_pvs env pvs =
   let t =
@@ -700,9 +705,9 @@ let rec eval_expr env (e : expr) : result =
         Normal v
       with Not_found -> assert false (* Irred e ? *)
     end
-  | Econst (Number.ConstInt c) ->
+  | Econst (Constant.ConstInt c) ->
       Normal (Vnum (big_int_of_const c))
-  | Econst (Number.ConstReal r) ->
+  | Econst (Constant.ConstReal r) ->
       (* ConstReal can be float or real *)
       let is_real ity = ity_equal ity ity_real in
       if is_real e.e_ity then
@@ -711,8 +716,10 @@ let rec eval_expr env (e : expr) : result =
         try Normal (Vreal (real_from_fraction sp sq)) with
         | Mlmpfr_wrapper.Not_Implemented -> raise CannotCompute
       else
-        let s = Format.asprintf "%a" Number.print_constant (Number.ConstReal r) in
+        let c = Constant.ConstReal r in
+        let s = Format.asprintf "%a" Constant.print_def c in
         Normal (Vfloat (make_from_str s))
+  | Econst (Constant.ConstStr s) -> Normal (Vstring s)
   | Eexec (ce,cty) ->
     assert (cty.cty_args = []);
     assert (ce.c_cty.cty_args = []);

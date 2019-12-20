@@ -343,41 +343,57 @@ let create_type_decl dl =
     | _, _, Alias _ ->
         mk_decl (PDtype [itd]) [create_ty_decl ts]
     | _, _, Range ir ->
-        let pj_id = id_derive (nm ^ "'int") id in
+        let pj_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'int" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'int") in
         let pj_ls = create_fsymbol pj_id [ty_app ts []] ty_int in
         let pj_decl = create_param_decl pj_ls in
         (* Create the projection meta for pj_decl *)
         let meta_proj_pj = (Theory.meta_projection, [Theory.MAls pj_ls]) in
         (* create max attribute *)
-        let max_id = id_derive (nm ^ "'maxInt") id in
+        let max_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'maxInt" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'maxInt") in
         let max_ls = create_fsymbol max_id [] ty_int  in
-        let max_defn = t_const Number.(int_const ir.ir_upper) ty_int in
+        let const = Constant.int_const ir.Number.ir_upper in
+        let max_defn = t_const const ty_int in
         let max_decl = create_logic_decl [make_ls_defn max_ls [] max_defn] in
         (* create min attribute *)
-        let min_id = id_derive (nm ^ "'minInt") id in
+        let min_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'minInt" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'minInt") in
         let min_ls = create_fsymbol min_id [] ty_int  in
-        let min_defn = t_const Number.(int_const ir.ir_lower) ty_int in
+        let const = Constant.int_const ir.Number.ir_lower in
+        let min_defn = t_const const ty_int in
         let min_decl = create_logic_decl [make_ls_defn min_ls [] min_defn] in
         let pure = [create_ty_decl ts; pj_decl; max_decl; min_decl] in
         let meta = Theory.(meta_range, [MAts ts; MAls pj_ls]) in
         mk_decl_meta [meta; meta_proj_pj] (PDtype [itd]) pure
     | _, _, Float ff ->
-        let pj_id = id_derive (nm ^ "'real") id in
+        let pj_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'real" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'real") in
         let pj_ls = create_fsymbol pj_id [ty_app ts []] ty_real in
         let pj_decl = create_param_decl pj_ls in
         (* Create the projection meta for pj_decl *)
         let meta_proj_pj = (Theory.meta_projection, [Theory.MAls pj_ls]) in
         (* create finiteness predicate *)
-        let iF_id = id_derive (nm ^ "'isFinite") id in
+        let iF_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'isFinite" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'isFinite") in
         let iF_ls = create_psymbol iF_id [ty_app ts []] in
         let iF_decl = create_param_decl iF_ls in
         (* create exponent digits attribute *)
-        let eb_id = id_derive (nm ^ "'eb") id in
+        let eb_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'eb" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'eb") in
         let eb_ls = create_fsymbol eb_id [] ty_int in
         let eb_defn = t_nat_const ff.Number.fp_exponent_digits in
         let eb_decl = create_logic_decl [make_ls_defn eb_ls [] eb_defn] in
         (* create significand digits attribute *)
-        let sb_id = id_derive (nm ^ "'sb") id in
+        let sb_id =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'sb" in
+          id_fresh ~attrs ?loc:id.id_loc (nm ^ "'sb") in
         let sb_ls = create_fsymbol sb_id [] ty_int  in
         let sb_defn = t_nat_const ff.Number.fp_significand_digits in
         let sb_decl = create_logic_decl [make_ls_defn sb_ls [] sb_defn] in
@@ -386,7 +402,9 @@ let create_type_decl dl =
         mk_decl_meta [meta; meta_proj_pj] (PDtype [itd]) pure
     | fl, _, NoDef when itd.itd_invariant <> [] ->
         let inv = axiom_of_invariant itd in
-        let pr = create_prsymbol (id_derive (nm ^ "'invariant") id) in
+        let pr =
+          let attrs = suffix_attr_name ~attrs:id.id_attrs "'invariant" in
+          create_prsymbol (id_fresh ~attrs ?loc:id.id_loc (nm ^ "'invariant")) in
         let ax = create_prop_decl Paxiom pr inv in
         let add_fd s dl = create_param_decl (ls_of_rs s) :: dl in
         let pure = create_ty_decl ts :: List.fold_right add_fd fl [ax] in
@@ -571,10 +589,12 @@ open Theory
    Therefore we match the exact contents of th_decls, and crash if it
    is not what we expect. *)
 
-let pd_int, pd_real, pd_equ = match builtin_theory.th_decls with
-  | [{td_node = Decl di}; {td_node = Decl dr}; {td_node = Decl de}] ->
+let pd_int, pd_real, pd_str, pd_equ = match builtin_theory.th_decls with
+  | [{td_node = Decl di}; {td_node = Decl dr};
+     {td_node = Decl ds}; {td_node = Decl de}] ->
       mk_decl (PDtype [mk_itd its_int  [] [] [] []]) [di],
       mk_decl (PDtype [mk_itd its_real [] [] [] []]) [dr],
+      mk_decl (PDtype [mk_itd its_str  [] [] [] []]) [ds],
       mk_decl PDpure [de]
   | _ -> assert false
 

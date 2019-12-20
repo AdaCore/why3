@@ -49,9 +49,10 @@ let mk_ref ~loc e =
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (set_op ~loc, [a; i; v]))
 let constant ~loc i =
-  mk_expr ~loc (Econst (Number.int_const_of_int i))
+  mk_expr ~loc (Econst (Constant.int_const_of_int i))
 let constant_s ~loc s =
-  mk_expr ~loc (Econst (Number.(ConstInt (int_literal ILitDec ~neg:false s))))
+  let int_lit = Number.(int_literal ILitDec ~neg:false s) in
+  mk_expr ~loc (Econst (Constant.ConstInt int_lit))
 let len ~loc =
   Qident (mk_id ~loc "len")
 let break ~loc =
@@ -367,8 +368,6 @@ open Term
 open Format
 open Pretty
 
-let protect_on x s = if x then "(" ^^ s ^^ ")" else s
-
 (* python print_binop *)
 let print_binop ~asym fmt = function
   | Tand when asym -> fprintf fmt "&&"
@@ -405,7 +404,7 @@ let rec python_ext_printer print_any fmt a =
       end
   | _ -> print_any fmt a
 
-let () = Itp_server.add_registered_lang "python" python_ext_printer
+let () = Itp_server.add_registered_lang "python" (fun _ -> python_ext_printer)
 
 let () = Args_wrapper.set_argument_parsing_functions "python"
     ~parse_term:(fun _ lb -> Py_lexer.parse_term lb)

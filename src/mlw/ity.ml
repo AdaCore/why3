@@ -765,11 +765,13 @@ let t_freepvs pvs t = pvs_of_vss pvs (t_vars t)
 let its_int  = its_of_ts ts_int  true
 let its_real = its_of_ts ts_real true
 let its_bool = its_of_ts ts_bool true
+let its_str  = its_of_ts ts_str  true
 let its_func = its_of_ts ts_func true
 
 let ity_int  = ity_app its_int  [] []
 let ity_real = ity_app its_real [] []
 let ity_bool = ity_app its_bool [] []
+let ity_str  = ity_app its_str  [] []
 
 let ity_func a b = ity_app its_func [a;b] []
 let ity_pred a   = ity_app its_func [a;ity_bool] []

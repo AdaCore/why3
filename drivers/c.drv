@@ -6,15 +6,9 @@ prelude "#include <stdio.h>"
 prelude "#include <assert.h>"
 prelude "#include <alloca.h>"
 
-module Ref
-  syntax type ref "%1"
-  syntax val ref "%1"            prec 0
-  syntax val contents "%1"       prec 0
-end
-
 module ref.Ref
-  syntax val (!_) "%1"           prec 0
-  syntax val (:=) "%1 = %2"      prec 14 13 14
+  syntax val (!_) "%d1"           prec 2 2
+  syntax val (:=) "%d1 = %2"      prec 14 2 14
 end
 
 module mach.int.Bounded_int
@@ -73,115 +67,115 @@ end
 
 module mach.int.UInt32GMP
 
-  prelude "
-#define LOW_MASK 0x00000000FFFFFFFFUL
-
-struct __add32_with_carry_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c)
-{
-  struct __add32_with_carry_result result;
-  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) c;
-  result.__field_0 = (uint32_t)(r & LOW_MASK);
-  result.__field_1 = (uint32_t)(r >> 32);
-  return result;
-}
-
-struct __sub32_with_borrow_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b)
-{
-  struct __sub32_with_borrow_result result;
-  uint64_t r = (uint64_t)x - (uint64_t)y - (uint64_t) b;
-  result.__field_0 = (uint32_t)(r & LOW_MASK);
-  result.__field_1 = (uint32_t)(r >> 63);
-  return result;
-}
-
-struct __mul32_double_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __mul32_double_result mul32_double(uint32_t x, uint32_t y)
-{
-  struct __mul32_double_result result;
-  uint64_t r = (uint64_t)x * (uint64_t)y;
-  result.__field_0 = (uint32_t)(r & LOW_MASK);
-  result.__field_1 = (uint32_t)(r >> 32);
-  return result;
-}
-
-struct __add32_3_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z)
-{
-  struct __add32_3_result result;
-  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) z;
-  result.__field_0 = (uint32_t)(r & LOW_MASK);
-  result.__field_1 = (uint32_t)(r >> 32);
-  return result;
-}
-
-struct __lsld32_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)
-{
-  struct __lsld32_result result;
-  uint64_t r = (uint64_t)x << cnt;
-  result.__field_0 = (uint32_t)(r & LOW_MASK);
-  result.__field_1 = (uint32_t)(r >> 32);
-  return result;
-}
+  prelude "\n\
+#define LOW_MASK 0x00000000FFFFFFFFUL\n\
+\n\
+struct __add32_with_carry_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c)\n\
+{\n\
+  struct __add32_with_carry_result result;\n\
+  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) c;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 32);\n\
+  return result;\n\
+}\n\
+\n\
+struct __sub32_with_borrow_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b)\n\
+{\n\
+  struct __sub32_with_borrow_result result;\n\
+  uint64_t r = (uint64_t)x - (uint64_t)y - (uint64_t) b;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 63);\n\
+  return result;\n\
+}\n\
+\n\
+struct __mul32_double_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __mul32_double_result mul32_double(uint32_t x, uint32_t y)\n\
+{\n\
+  struct __mul32_double_result result;\n\
+  uint64_t r = (uint64_t)x * (uint64_t)y;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 32);\n\
+  return result;\n\
+}\n\
+\n\
+struct __add32_3_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z)\n\
+{\n\
+  struct __add32_3_result result;\n\
+  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) z;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 32);\n\
+  return result;\n\
+}\n\
+\n\
+struct __lsld32_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)\n\
+{\n\
+  struct __lsld32_result result;\n\
+  uint64_t r = (uint64_t)x << cnt;\n\
+  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
+  result.__field_1 = (uint32_t)(r >> 32);\n\
+  return result;\n\
+}\n\
 "
 
-  interface "
-struct __add32_with_carry_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c);
-
-struct __sub32_with_borrow_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b);
-
-struct __mul32_double_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __mul32_double_result mul32_double(uint32_t x, uint32_t y);
-
-struct __add32_3_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z);
-
-struct __lsld32_result
-{ uint32_t __field_0;
-  uint32_t __field_1;
-};
-
-struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);
+  interface "\n\
+struct __add32_with_carry_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c);\n\
+\n\
+struct __sub32_with_borrow_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b);\n\
+\n\
+struct __mul32_double_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __mul32_double_result mul32_double(uint32_t x, uint32_t y);\n\
+\n\
+struct __add32_3_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z);\n\
+\n\
+struct __lsld32_result\n\
+{ uint32_t __field_0;\n\
+  uint32_t __field_1;\n\
+};\n\
+\n\
+struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);\n\
 "
 
   syntax literal uint32 "%cU"
@@ -273,136 +267,136 @@ end
 
 module mach.int.UInt64GMP
 
-  prelude "
-struct __add64_with_carry_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-struct __add64_with_carry_result
-add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
-{
-  struct __add64_with_carry_result result;
-  uint64_t r = x + y + c;
-  result.__field_0 = r;
-  if (r == x) result.__field_1 = c;
-  else result.__field_1 = (r < x);
-  return result;
-}
-
-struct __sub64_with_borrow_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-struct __sub64_with_borrow_result
-sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
-{
-  struct __sub64_with_borrow_result result;
-  uint64_t r = x - y - b;
-  result.__field_0 = r;
-  if (r > x) result.__field_1 = 1;
-  else if (r == x) result.__field_1 = b;
-  else result.__field_1 = 0;
-  return result;
-}
-
-struct __add64_3_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)
-{
-  struct __add64_3_result result;
-  uint64_t r, c1, c2;
-  r = x + y;
-  c1 = r < y;
-  r += z;
-  c2 = r < z;
-  result.__field_1 = c1 + c2;
-  result.__field_0 = r;
-  return result;
-}
-
-struct __lsld64_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
-{
-  struct __lsld64_result result;
-  result.__field_1 = x >> (64 - cnt);
-  result.__field_0 = x << cnt;
-  return result;
-}
+  prelude "\n\
+struct __add64_with_carry_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+struct __add64_with_carry_result\n\
+add64_with_carry(uint64_t x, uint64_t y, uint64_t c)\n\
+{\n\
+  struct __add64_with_carry_result result;\n\
+  uint64_t r = x + y + c;\n\
+  result.__field_0 = r;\n\
+  if (r == x) result.__field_1 = c;\n\
+  else result.__field_1 = (r < x);\n\
+  return result;\n\
+}\n\
+\n\
+struct __sub64_with_borrow_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+struct __sub64_with_borrow_result\n\
+sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)\n\
+{\n\
+  struct __sub64_with_borrow_result result;\n\
+  uint64_t r = x - y - b;\n\
+  result.__field_0 = r;\n\
+  if (r > x) result.__field_1 = 1;\n\
+  else if (r == x) result.__field_1 = b;\n\
+  else result.__field_1 = 0;\n\
+  return result;\n\
+}\n\
+\n\
+struct __add64_3_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)\n\
+{\n\
+  struct __add64_3_result result;\n\
+  uint64_t r, c1, c2;\n\
+  r = x + y;\n\
+  c1 = r < y;\n\
+  r += z;\n\
+  c2 = r < z;\n\
+  result.__field_1 = c1 + c2;\n\
+  result.__field_0 = r;\n\
+  return result;\n\
+}\n\
+\n\
+struct __lsld64_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\n\
+{\n\
+  struct __lsld64_result result;\n\
+  result.__field_1 = x >> (64 - cnt);\n\
+  result.__field_0 = x << cnt;\n\
+  return result;\n\
+}\n\
 "
 
-  interface "
-struct __add64_with_carry_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-static inline struct __add64_with_carry_result
-add64_with_carry(uint64_t x, uint64_t y, uint64_t c)
-{
-  struct __add64_with_carry_result result;
-  uint64_t r = x + y + c;
-  result.__field_0 = r;
-  if (r == x) result.__field_1 = c;
-  else result.__field_1 = (r < x);
-  return result;
-}
-
-struct __sub64_with_borrow_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-static inline struct __sub64_with_borrow_result
-sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)
-{
-  struct __sub64_with_borrow_result result;
-  uint64_t r = x - y - b;
-  result.__field_0 = r;
-  if (r > x) result.__field_1 = 1;
-  else if (r == x) result.__field_1 = b;
-  else result.__field_1 = 0;
-  return result;
-}
-
-struct __add64_3_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-static inline struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)
-{
-  struct __add64_3_result result;
-  uint64_t r, c1, c2;
-  r = x + y;
-  c1 = r < y;
-  r += z;
-  c2 = r < z;
-  result.__field_1 = c1 + c2;
-  result.__field_0 = r;
-  return result;
-}
-
-struct __lsld64_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)
-{
-  struct __lsld64_result result;
-  result.__field_1 = x >> (64 - cnt);
-  result.__field_0 = x << cnt;
-  return result;
-}
+  interface "\n\
+struct __add64_with_carry_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+static inline struct __add64_with_carry_result\n\
+add64_with_carry(uint64_t x, uint64_t y, uint64_t c)\n\
+{\n\
+  struct __add64_with_carry_result result;\n\
+  uint64_t r = x + y + c;\n\
+  result.__field_0 = r;\n\
+  if (r == x) result.__field_1 = c;\n\
+  else result.__field_1 = (r < x);\n\
+  return result;\n\
+}\n\
+\n\
+struct __sub64_with_borrow_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+static inline struct __sub64_with_borrow_result\n\
+sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)\n\
+{\n\
+  struct __sub64_with_borrow_result result;\n\
+  uint64_t r = x - y - b;\n\
+  result.__field_0 = r;\n\
+  if (r > x) result.__field_1 = 1;\n\
+  else if (r == x) result.__field_1 = b;\n\
+  else result.__field_1 = 0;\n\
+  return result;\n\
+}\n\
+\n\
+struct __add64_3_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+static inline struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)\n\
+{\n\
+  struct __add64_3_result result;\n\
+  uint64_t r, c1, c2;\n\
+  r = x + y;\n\
+  c1 = r < y;\n\
+  r += z;\n\
+  c2 = r < z;\n\
+  result.__field_1 = c1 + c2;\n\
+  result.__field_0 = r;\n\
+  return result;\n\
+}\n\
+\n\
+struct __lsld64_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\n\
+{\n\
+  struct __lsld64_result result;\n\
+  result.__field_1 = x >> (64 - cnt);\n\
+  result.__field_0 = x << cnt;\n\
+  return result;\n\
+}\n\
 "
   syntax literal uint64 "UINT64_C(%c)"
 

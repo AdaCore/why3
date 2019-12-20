@@ -88,7 +88,7 @@ let () = register_printer
 
 (*
 let opt_search_forward re s pos =
-  try Some (Str.search_forward re s pos) with Not_found -> None
+  try Some (Re.Str.search_forward re s pos) with Not_found -> None
 *)
 
 (* specialized version of opt_search_forward, searching for strings
@@ -110,7 +110,8 @@ let opt_search_forward s pos =
         incr i;
         b := !i;
         begin match s.[!i] with
-        | 't' | 'v' -> incr i
+        | '%' -> incr i; raise Exit
+        | 'a'..'z' -> incr i
         | _ -> ()
         end;
         let e = !i in
@@ -132,6 +133,7 @@ let opt_search_forward_literal_format s pos =
         incr i;
         b := !i;
         begin match s.[!i] with
+        | '%' -> incr i; raise Exit
         | 's' | 'e' | 'm' -> incr i; (* float literals *)
         | _ -> ()
         end;
@@ -154,25 +156,25 @@ let global_substitute_fmt search_fun repl_fun text fmt =
       pp_print_string fmt (String.sub text start (len - start))
     | Some(pos,end_pos) ->
       pp_print_string fmt (String.sub text start (pos - start - 1));
-      repl_fun text pos end_pos fmt;
+      if text.[pos] = '%' then pp_print_char fmt '%'
+      else repl_fun text pos end_pos fmt;
       replace end_pos
   in
   replace 0
 
 let iter_group search_fun iter_fun text =
-  let rec iter start last_was_empty =
-    let startpos = if last_was_empty then start + 1 else start in
-    if startpos < String.length text then
-      match search_fun text startpos with
-      | None -> ()
-      | Some (pos,end_pos) ->
-          iter_fun text pos end_pos;
-          iter end_pos (end_pos = pos)
+  let rec iter start =
+    match search_fun text start with
+    | None -> ()
+    | Some (pos, end_pos) ->
+        if text.[pos] <> '%' then iter_fun text pos end_pos;
+        iter end_pos
   in
-  iter 0 false
+  iter 0
 
 exception BadSyntaxIndex of int
 exception BadSyntaxArity of int * int
+exception BadSyntaxKind of char
 
 let int_of_string s =
   try int_of_string s
@@ -206,21 +208,23 @@ let check_syntax_logic ls s =
   let ret = ls.ls_value <> None in
   let nfv = Stv.cardinal (ls_ty_freevars ls) in
   let arg s b e =
-    if s.[b] = 't' then begin
+    match s.[b] with
+    | 't' ->
       let grp = String.sub s (b+1) (e-b-1) in
       let i = int_of_string grp in
       if i < 0 || (not ret && i = 0) then raise (BadSyntaxIndex i);
       if i > len then raise (BadSyntaxArity (len,i))
-    end else if s.[b] = 'v' then begin
+    | 'v' ->
       let grp = String.sub s (b+1) (e-b-1) in
       let i = int_of_string grp in
       if i < 0 || i >= nfv then raise (BadSyntaxIndex i)
-    end else begin
+    | 'a'..'z' as c ->
+      raise (BadSyntaxKind c)
+    | _ ->
       let grp = String.sub s b (e-b) in
       let i = int_of_string grp in
       if i <= 0 then raise (BadSyntaxIndex i);
       if i > len then raise (BadSyntaxArity (len,i));
-    end
   in
   iter_group opt_search_forward arg s
 
@@ -233,22 +237,6 @@ let check_syntax_literal _ts s =
   iter_group opt_search_forward_literal_format arg s
   (* if !count <> 1 then *)
     (* raise (BadSyntaxArity (1,!count)) *)
-
-let syntax_arguments_prec s print pl fmt l =
-  let args = Array.of_list l in
-  let precs = Array.of_list pl in
-  let lp = Array.length precs in
-  let repl_fun s b e fmt =
-    let i = int_of_string (String.sub s b (e-b)) in
-    let p =
-      if i < lp then precs.(i)
-      else if lp = 0 then 0
-      else precs.(0) - 1 in
-    print p fmt args.(i-1) in
-  global_substitute_fmt opt_search_forward repl_fun s fmt
-
-let syntax_arguments s print fmt l =
-  syntax_arguments_prec s (fun _ f a -> print f a) [] fmt l
 
 (* return the type arguments of a symbol application, sorted according
    to their (formal) names *)
@@ -263,34 +251,48 @@ let get_type_arguments t = match t.t_node with
   | _ ->
       [||]
 
-let gen_syntax_arguments_typed_prec
-      ty_of tys_of s print_arg print_type t pl fmt l =
-  let args = Array.of_list l in
+let gen_syntax_arguments_prec fmt s print pl =
   let precs = Array.of_list pl in
   let lp = Array.length precs in
+  let num = ref 1 in
   let repl_fun s b e fmt =
-    if s.[b] = 't' then
-      let grp = String.sub s (b+1) (e-b-1) in
-      let i = int_of_string grp in
-      if i = 0
-      then print_type fmt (ty_of t)
-      else print_type fmt (ty_of args.(i-1))
-    else if s.[b] = 'v' then
-      let grp = String.sub s (b+1) (e-b-1) in
-      let m = tys_of t in
-      print_type fmt m.(int_of_string grp)
-    else
-      let grp = String.sub s b (e-b) in
-      let i = int_of_string grp in
-      let p =
-        if i < lp then precs.(i)
-        else if lp = 0 then 0
-        else precs.(0) - 1 in
-      print_arg p fmt args.(i-1) in
+    let (c, i) =
+      match s.[b] with
+      | 'a'..'z' as c -> (Some c, String.sub s (b + 1) (e - b - 1))
+      | _ -> (None, String.sub s b (e - b)) in
+    let i = int_of_string i in
+    let p =
+      if !num < lp then precs.(!num)
+      else if lp = 0 then 0
+      else precs.(0) - 1 in
+    incr num;
+    print fmt p c i in
   global_substitute_fmt opt_search_forward repl_fun s fmt
 
-let syntax_arguments_typed_prec =
-  gen_syntax_arguments_typed_prec t_type get_type_arguments
+let syntax_arguments_prec s print pl fmt l =
+  let args = Array.of_list l in
+  let pr fmt p c i =
+    match c with
+    | None -> print p fmt args.(i - 1)
+    | Some c -> raise (BadSyntaxKind c) in
+  gen_syntax_arguments_prec fmt s pr pl
+
+let syntax_arguments s print fmt l =
+  syntax_arguments_prec s (fun _ f a -> print f a) [] fmt l
+
+let syntax_arguments_typed_prec s print_arg print_type t pl fmt l =
+  let args = Array.of_list l in
+  let tys = lazy (get_type_arguments t) in
+  let pr fmt p c i =
+    match c with
+    | None -> print_arg p fmt args.(i - 1)
+    | Some 't' ->
+        let v = if i = 0 then t else args.(i - 1) in
+        print_type fmt (t_type v)
+    | Some 'v' ->
+        print_type fmt (Lazy.force tys).(i)
+    | Some c -> raise (BadSyntaxKind c) in
+  gen_syntax_arguments_prec fmt s pr pl
 
 let syntax_arguments_typed s print_arg print_type t fmt l =
   syntax_arguments_typed_prec s (fun _ f a -> print_arg f a) print_type t [] fmt l
@@ -587,6 +589,8 @@ let () = Exn_printer.register (fun fmt exn -> match exn with
       fprintf fmt "Bad argument index %d, must start with 1" i
   | BadSyntaxArity (i1,i2) ->
       fprintf fmt "Bad argument index %d, must end with %d" i2 i1
+  | BadSyntaxKind c ->
+      fprintf fmt "Unrecognized argument kind '%c'" c
   | Unsupported s ->
       fprintf fmt "@[<hov 3> Uncaught exception 'Unsupported %s'@]" s
   | UnsupportedType (e,s) ->

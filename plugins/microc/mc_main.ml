@@ -43,9 +43,10 @@ let mk_ref ~loc e =
 let array_set ~loc a i v =
   mk_expr ~loc (Eidapp (set_op ~loc, [a; i; v]))
 let constant ~loc i =
-  mk_expr ~loc (Econst (Number.int_const_of_int i))
+  mk_expr ~loc (Econst (Constant.int_const_of_int i))
 let constant_s ~loc s =
-  mk_expr ~loc (Econst (Number.(ConstInt (int_literal ILitDec ~neg:false s))))
+  let int_lit = Number.(int_literal ILitDec ~neg:false s) in
+  mk_expr ~loc (Econst (Constant.ConstInt int_lit))
 let break ~loc =
   Qident (mk_id ~loc "Break")
 let break_handler ~loc =
@@ -339,3 +340,16 @@ let read_channel env path file c =
 let () =
   Env.register_format mlw_language "micro-C" ["c"] read_channel
     ~desc:"micro-C format"
+
+(* Add an extension of task printing *)
+let () = Itp_server.add_registered_lang "micro-C"
+    (fun _ -> Mc_printer.microc_ext_printer)
+
+(* Add transformation arguments parsing *)
+let () = Args_wrapper.set_argument_parsing_functions "micro-C"
+    ~parse_term:(fun _ lb -> Mc_lexer.parse_term lb)
+    ~parse_term_list:(fun _ lb -> Mc_lexer.parse_term_list lb)
+    ~parse_list_ident:(fun lb -> Mc_lexer.parse_list_ident lb)
+    (* TODO for qualids, add a similar funciton *)
+    ~parse_qualid:(fun lb -> Lexer.parse_qualid lb)
+    ~parse_list_qualid:(fun lb -> Lexer.parse_list_qualid lb)

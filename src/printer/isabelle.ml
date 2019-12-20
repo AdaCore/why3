@@ -181,8 +181,16 @@ let rec print_pat info fmt p = match p.pat_node with
       elems' "prod" (print_pat info) fmt pl
   | Papp (cs, pl) ->
       begin match query_syntax info.info_syn cs.ls_name with
-        | Some s -> gen_syntax_arguments_typed_prec p_type (fun _ -> [||])
-            s (fun _ fmt p -> print_pat info fmt p) (print_ty info) p [] fmt pl
+      | Some s ->
+          let pl = Array.of_list pl in
+          let pr fmt _ c i =
+            match c with
+            | None -> print_pat info fmt pl.(i - 1)
+            | Some 't' ->
+                let v = if i = 0 then p else pl.(i - 1) in
+                print_ty info fmt (p_type v)
+            | Some c -> raise (BadSyntaxKind c) in
+          gen_syntax_arguments_prec fmt s pr []
         | _ -> print_app (print_ls_real info Sls.empty) (print_pat info)
             fmt ((cs, (List.map p_type pl, Some (p.pat_ty))), pl)
       end
@@ -225,15 +233,18 @@ let rec print_term info defs fmt t = match t.t_node with
       print_var info fmt v
   | Tconst c ->
       begin match c with
-        | Number.ConstInt _ ->
-            fprintf fmt "<num val=\"%a\">%a</num>"
-              (Number.print number_format) c (print_ty info) (t_type t)
-        | Number.ConstReal _ ->
+        | Constant.ConstInt _ ->
+           let pp = Constant.(print number_format unsupported_escape) in
+           fprintf fmt "<num val=\"%a\">%a</num>"
+             pp c (print_ty info) (t_type t)
+        | Constant.ConstStr _ ->
+           Constant.(print number_format unsupported_escape) fmt c
+        | Constant.ConstReal _ ->
            match t.t_ty with
            | None -> assert false (* impossible *)
            | Some ty ->
               if ty_equal ty ty_real then
-                Number.print number_format fmt c
+                Constant.(print number_format unsupported_escape) fmt c
               else raise (UnsupportedTerm (t, "floating-point literal"))
       end
   | Tif (f, t1, t2) ->

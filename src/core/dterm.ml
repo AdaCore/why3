@@ -106,6 +106,7 @@ let rec dty_unify dty1 dty2 = match dty1,dty2 with
 let dty_int  = Duty ty_int
 let dty_real = Duty ty_real
 let dty_bool = Duty ty_bool
+let dty_str  = Duty ty_str
 
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
@@ -206,7 +207,7 @@ type dterm = {
 and dterm_node =
   | DTvar of string * dty
   | DTgvar of vsymbol
-  | DTconst of Number.constant * dty
+  | DTconst of Constant.constant * dty
   | DTapp of lsymbol * dterm list
   | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm

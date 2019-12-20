@@ -1,6 +1,15 @@
-
 (** Why3 driver for CVC4 1.6 *)
 
 prelude ";; produced by cvc4_16.drv ;;"
+
+prelude "(set-logic AUFBVFPDTNIRA)"
+(*
+    A    : Array
+    UF   : Uninterpreted Function
+    BV   : BitVectors
+    FP   : FloatingPoint
+    DT   : Datatypes
+    NIRA : NonLinear Integer+Real Arithmetic
+*)
 
 import "cvc4_16.gen"

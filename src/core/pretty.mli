@@ -25,6 +25,16 @@ open Task
 
 val prio_binop: binop -> int
 
+val protect_on: bool -> ('a, 'b, 'c, 'd, 'e, 'f) format6 ->
+  ('a, 'b, 'c, 'd, 'e, 'f) format6
+
+type syntax =
+| Is_array of string
+| Is_getter of string
+| Is_none
+
+val get_element_syntax: attrs:Sattr.t -> syntax
+
 module type Printer = sig
 
     val tprinter : ident_printer  (* type symbols *)
@@ -95,6 +105,18 @@ include Printer
 type any_pp =
   | Pp_term of (Term.term * int) (* Term and priority *)
   | Pp_ty of (Ty.ty * int * bool) (* ty * prio * q *)
+  | Pp_decl of (bool * Ty.tysymbol * (Term.lsymbol * Term.lsymbol option list) list)
+    (* [Pp_decl (fst, ts, csl)]: Declaration of type [ts] with constructors
+       [csl] as [fst] *)
+  | Pp_ts of Ty.tysymbol (* Print tysymbol *)
+  | Pp_ls of Term.lsymbol (* Print lsymbol *)
+  | Pp_id of Ident.ident (* Print ident *)
+  | Pp_cs of Term.lsymbol (* Print constructors *)
+  | Pp_vs of Term.vsymbol (* Print vsymbol *)
+  | Pp_trigger of Term.trigger (* Print triggers *)
+  | Pp_forget of Term.vsymbol list (* Forget all the vsymbols listed *)
+  | Pp_forget_tvs (* execute forget_tvs *)
+
 
 val create :
   ?print_ext_any:(any_pp Pp.pp -> any_pp Pp.pp) ->

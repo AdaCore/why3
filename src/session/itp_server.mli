@@ -27,7 +27,12 @@ end
 (* A specific external way to print task. This registered an external printer
    for printing tasks. This is combined with the standard printer (see Pretty).
 *)
-val add_registered_lang: string -> (any_pp Pp.pp -> any_pp Pp.pp) -> unit
+val add_registered_lang: string -> (Task.task -> any_pp Pp.pp -> any_pp Pp.pp) -> unit
+
+(* Used to update the config after preferences are changed in the ide.
+   This is not usable by other IDEs (webide): in the long term a
+   request/notification could be added for this kind of interaction. *)
+val set_partial_config: Whyconf.config -> unit
 
 module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
 

@@ -34,9 +34,22 @@ let prio_binop = function
   | Timplies -> 1
   | Tiff -> 1
 
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
 type any_pp =
   | Pp_term of (Term.term * int) (* term and priority *)
   | Pp_ty of (Ty.ty * int * bool) (* ty * prio * q *)
+  | Pp_decl of (bool * Ty.tysymbol * (Term.lsymbol * Term.lsymbol option list) list)
+    (* [Pp_decl (fst, ts, csl)]: Declaration of type [ts] with constructors
+       [csl] as [fst] *)
+  | Pp_ts of Ty.tysymbol (* Print tysymbol *)
+  | Pp_ls of Term.lsymbol (* Print lsymbol *)
+  | Pp_id of Ident.ident (* Print ident *)
+  | Pp_cs of Term.lsymbol (* Print constructor *)
+  | Pp_vs of Term.vsymbol (* Print vsymbol *)
+  | Pp_trigger of Term.trigger (* Print triggers *)
+  | Pp_forget of Term.vsymbol list (* Forget all the vsymbols listed *)
+  | Pp_forget_tvs (* execute forget_tvs *)
 
 
 module type Printer = sig
@@ -230,8 +243,6 @@ let print_pr_qualified fmt pr =
 
 (** Types *)
 
-let protect_on x s = if x then "(" ^^ s ^^ ")" else s
-
 let rec print_ty_node ?(ext_printer=true) q pri fmt ty =
   if ext_printer then
     let print_any = get_print_any () in
@@ -380,8 +391,8 @@ and print_tnode ?(ext_printer=true) pri fmt t =
           match t.t_ty with
           | Some {ty_node = Tyapp (ts,[])}
             when ts_equal ts ts_int || ts_equal ts ts_real ->
-              Number.print_constant fmt c
-          | Some ty -> fprintf fmt "(%a:%a)" Number.print_constant c
+              Constant.print_def fmt c
+          | Some ty -> fprintf fmt "(%a:%a)" Constant.print_def c
                          print_ty ty
           | None -> assert false
         end
@@ -486,12 +497,17 @@ let print_ty_decl fmt ts =
     print_def ts.ts_def;
   forget_tvs ()
 
-let print_data_decl fst fmt (ts,csl) =
-  fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
-    (if fst then "type" else "with") print_ts ts
-    print_id_attrs ts.ts_name
-    (print_list nothing print_tv_arg) ts.ts_args
-    (print_list newline print_constr) csl;
+let print_data_decl_aux ?(ext_printer=true) fst fmt (ts,csl) =
+  if ext_printer then
+    let print_any = get_print_any () in
+    print_ext_any print_any fmt (Pp_decl (fst, ts, csl))
+  else begin
+    fprintf fmt "@[<hov 2>%s %a%a%a =@\n@[<hov>%a@]@]"
+      (if fst then "type" else "with") print_ts ts
+      print_id_attrs ts.ts_name
+      (print_list nothing print_tv_arg) ts.ts_args
+      (print_list newline print_constr) csl;
+  end;
   forget_tvs ()
 
 let print_ls_type fmt = fprintf fmt " :@ %a" print_ty
@@ -541,10 +557,18 @@ let sprint_pkind = function
 
 let print_pkind fmt k = pp_print_string fmt (sprint_pkind k)
 
+let print_axiom fmt (pr, f) =
+  (fprintf fmt "@[<hov 2>%a%a :@ %a@]"
+       print_pr pr print_id_attrs pr.pr_name print_term f;
+     forget_tvs ())
+
 let print_prop_decl fmt (k,pr,f) =
-  fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
-    print_pr pr print_id_attrs pr.pr_name print_term f;
-  forget_tvs ()
+  if k == Paxiom && not (Sattr.exists (Ident.attr_equal Ident.useraxiom_attr) pr.pr_name.id_attrs) then
+    print_axiom fmt (pr, f)
+  else
+    (fprintf fmt "@[<hov 2>%a %a%a :@ %a@]" print_pkind k
+       print_pr pr print_id_attrs pr.pr_name print_term f;
+     forget_tvs ())
 
 let print_list_next sep print fmt = function
   | [] -> ()
@@ -554,14 +578,15 @@ let print_list_next sep print fmt = function
 
 let print_decl fmt d = match d.d_node with
   | Dtype ts  -> print_ty_decl fmt ts
-  | Ddata tl  -> print_list_next newline print_data_decl fmt tl
+  | Ddata tl  ->
+      print_list_next newline (print_data_decl_aux ~ext_printer:true) fmt tl
   | Dparam ls -> print_param_decl fmt ls
   | Dlogic ll -> print_list_next newline print_logic_decl fmt ll
   | Dind (s, il) -> print_list_next newline (print_ind_decl s) fmt il
   | Dprop p   -> print_prop_decl fmt p
 
-let print_next_data_decl  = print_data_decl false
-let print_data_decl       = print_data_decl true
+let print_next_data_decl  = print_data_decl_aux false
+let print_data_decl       = print_data_decl_aux true
 let print_next_logic_decl = print_logic_decl false
 let print_logic_decl      = print_logic_decl true
 let print_next_ind_decl   = print_ind_decl Ind false
@@ -707,6 +732,17 @@ let print_any fmt t =
   match t with
   | Pp_term (t, pri) -> print_tnode ~ext_printer:false pri fmt t
   | Pp_ty (ty, pri, q) -> print_ty_node ~ext_printer:false q pri fmt ty
+  | Pp_decl (fst, ts, csl) ->
+      print_data_decl_aux ~ext_printer:false fst fmt (ts, csl)
+  | Pp_ts ts -> print_ts fmt ts
+  | Pp_ls ls -> print_ls fmt ls
+  | Pp_id id -> print_id_attrs fmt id
+  | Pp_cs cs -> print_cs fmt cs
+  | Pp_vs vs -> print_vsty fmt vs
+  | Pp_trigger tl -> print_tl fmt tl
+  | Pp_forget vl -> List.iter forget_var vl
+  | Pp_forget_tvs -> forget_tvs ()
+
 
 (* When this module is loaded, the function is always set in the reference *)
 let () = set_print_any print_any
@@ -786,6 +822,8 @@ let () = Exn_printer.register
       fprintf fmt "Cannot cast an integer literal to type %a" print_ty ty
   | Term.InvalidRealLiteralType ty ->
       fprintf fmt "Cannot cast a real literal to type %a" print_ty ty
+  | Term.InvalidStringLiteralType ty ->
+      fprintf fmt "Cannot cast a string literal to type %a" print_ty ty
   | Pattern.ConstructorExpected (ls,ty) ->
       fprintf fmt "%s %a is not a constructor of type %a"
         (if ls.ls_value = None then "Predicate" else "Function") print_ls ls
@@ -797,6 +835,21 @@ let () = Exn_printer.register
       fprintf fmt "Bad constructor: %a" print_ls ls
   | Decl.BadRecordField ls ->
       fprintf fmt "Not a record field: %a" print_ls ls
+  | Decl.BadRecordCons (ls, ty) ->
+      fprintf fmt "Type %a contains several constructors and cannot be \
+                   (de)constructed using curly braces.\n\
+                   Function %a is presumably a field of type %a."
+        print_ts ty print_ls ls print_ts ty
+  | Decl.BadRecordType (ls, ty) ->
+      fprintf fmt "Type %a is not a record type or contains an invariant, \
+                   it cannot be (de)constructed using curly braces.\n\
+                   Function %a is presumably a field of type %a."
+        print_ts ty print_ls ls print_ts ty
+  | Decl.BadRecordUnnamed (ls, ty) ->
+      fprintf fmt "Type %a contains unnamed fields and cannot be \
+                   (de)constructed using curly braces.\n\
+                   Function %a is presumably a field of type %a."
+        print_ts ty print_ls ls print_ts ty
   | Decl.RecordFieldMissing ls ->
       fprintf fmt "Field %a is missing" print_ls ls
   | Decl.DuplicateRecordField ls ->
@@ -842,3 +895,30 @@ let () = Exn_printer.register
       fprintf fmt "Cannot prove termination for %a" print_ls ls
   | _ -> raise exn
   end
+
+
+(* New attribute for plugins (parsing of arguments of transformation when
+   printing Ada, python or C *)
+let is_syntax_attr a =
+  Strings.has_prefix "syntax:" a.attr_string
+
+let get_syntax_attr ~attrs =
+  try Some (Sattr.choose (Sattr.filter is_syntax_attr attrs))
+  with Not_found -> None
+
+type syntax =
+| Is_array of string
+| Is_getter of string
+| Is_none
+
+let get_element_syntax ~attrs =
+  match get_syntax_attr ~attrs with
+  | None -> Is_none
+  | Some syntax_attr ->
+    let splitted1 = Strings.bounded_split ':' syntax_attr.attr_string 3 in
+    match splitted1 with
+    | ["syntax"; "getter"; name] ->
+        Is_getter name
+    | ["syntax"; "array"; name] ->
+        Is_array name
+    | _ -> Is_none

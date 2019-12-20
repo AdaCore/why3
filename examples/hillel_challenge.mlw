@@ -29,9 +29,9 @@ module Leftpad
   use array.Array
 
   type char (* whatever it is *)
-  type string = array char
+  type char_string = array char
 
-  let leftpad (pad: char) (n: int) (s: string) : string
+  let leftpad (pad: char) (n: int) (s: char_string) : char_string
     ensures { length result = max n (length s) }
     ensures { forall i. 0 <= i < length result - length s -> result[i] = pad }
     ensures { forall i. 0 <= i < length s ->
@@ -55,29 +55,26 @@ module Unique
 
   use int.Int
   use ref.Refint
-  clone hashtbl.Hashtbl as H with type key = int
+  use fmap.MapImpInt as H
   use array.Array
 
   predicate mem (x: int) (a: array int) (i: int) =
     exists j. 0 <= j < i /\ a[j] = x
 
-  predicate hmem (x: int) (h: H.t unit) =
-    H.contents h x <> H.List.Nil
-
   let unique (a: array int) : array int
     ensures { forall x. mem x result (length result) <-> mem x a (length a) }
     ensures { forall i j. 0 <= i < j < length result -> result[i] <> result[j] }
   = let n = length a in
-    let h = H.create n in
+    let h = H.create () in
     let res = Array.make n 0 in
     let len = ref 0 in
     for i = 0 to n - 1 do
       invariant { 0 <= !len <= i }
-      invariant { forall x. mem x a i <-> hmem x h }
+      invariant { forall x. mem x a i <-> H.mem x h }
       invariant { forall x. mem x a i <-> mem x res !len }
       invariant { forall i j. 0 <= i < j < !len -> res[i]<>res[j] }
-      if not (H.mem h a[i]) then begin
-        H.add h a[i] ();
+      if not (H.mem a[i] h) then begin
+        H.add a[i] () h;
         res[!len] <- a[i];
         incr len
       end

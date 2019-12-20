@@ -9,7 +9,7 @@ authors: [
 ]
 
 homepage: "http://why3.lri.fr/"
-license: "GNU Lesser General Public License version 2.1"
+license: "LGPL-2.1-only"
 doc: "http://why3.lri.fr/doc/"
 bug-reports: "https://gitlab.inria.fr/why3/why3/issues"
 dev-repo: "git+https://gitlab.inria.fr/why3/why3.git"
@@ -40,7 +40,7 @@ install: [
 ]
 
 depends: [
-  "ocaml" {>= "4.02.3"}
+  "ocaml" {>= "4.05.0"}
   "ocamlfind" {build}
   "menhir" {>= "20151112"}
   "num"
@@ -50,6 +50,7 @@ depopts: [
   "zarith"
   "camlzip"
   "ocamlgraph"
+  "re"
 ]
 
 conflicts: [

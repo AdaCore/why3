@@ -203,11 +203,7 @@ let string_of_wnl p x =
   fprintf fmt "%a@?" p x;
   Buffer.contents b
 
-let sprintf p =
-  (* useless: this is the same as Format.asprintf *)
-  let b = Buffer.create 100 in
-  let fmt = formatter_of_buffer b in
-  kfprintf (fun fmt -> Format.pp_print_flush fmt (); Buffer.contents b) fmt p
+let sprintf = asprintf
 
 let sprintf_wnl p =
   let b = Buffer.create 100 in

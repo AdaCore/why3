@@ -49,7 +49,7 @@ let number_format = {
 
 let rec print_term info fmt t = match t.t_node with
   | Tconst c ->
-      Number.print number_format fmt c
+      Constant.(print number_format unsupported_escape) fmt c
   | Tvar v ->
       print_var fmt v
   | Tapp (ls, tl) -> begin match query_syntax info.info_syn ls.ls_name with

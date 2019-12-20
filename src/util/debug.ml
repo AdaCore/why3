@@ -181,10 +181,13 @@ module Stats = struct
     print ();
     Format.pp_print_flush !formatter ())
 
+(* top-level code disabled because issue #383 and nobody knows why this code was for
+
   (** SIGXCPU cpu time limit reached *)
   let _ =
     (* TODO? have a possible callback for printing different message*)
     Sys.signal Sys.sigint (Sys.Signal_handle (fun _ -> exit 2))
+*)
 
   let register ~print ~name ~init =
     let s = {name = name; printer = print; value = init} in

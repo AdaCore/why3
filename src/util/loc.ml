@@ -114,15 +114,7 @@ let try7 ?loc f x y z t u v w =
 exception Message of string
 
 let errorm ?loc f =
-  let buf = Buffer.create 512 in
-  let fmt = Format.formatter_of_buffer buf in
-  Format.kfprintf
-    (fun _ ->
-       Format.pp_print_flush fmt ();
-       let s = Buffer.contents buf in
-       Buffer.clear buf;
-       error ?loc (Message s))
-    fmt ("@[" ^^ f ^^ "@]")
+  Format.kasprintf (fun s -> error ?loc (Message s)) ("@[" ^^ f ^^ "@]")
 
 let () = Exn_printer.register
   (fun fmt exn -> match exn with

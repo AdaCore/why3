@@ -37,16 +37,16 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
       underscore *)
   let split_base_suffixes str =
     try
-      let re = Str.regexp "_?_?\\([0-9]*\\)\\('*\\)$" in
-      let n = Str.search_forward re str 0 in
+      let re = Re.Str.regexp "_?_?\\([0-9]*\\)\\('*\\)$" in
+      let n = Re.Str.search_forward re str 0 in
       let base = String.sub str 0 n in
       let numbers =
-        match Str.matched_group 1 str with
+        match Re.Str.matched_group 1 str with
         | "" -> None
         | s -> Some s
       in
       let quotes =
-        match Str.matched_group 2 str with
+        match Re.Str.matched_group 2 str with
         | "" -> None
         | s -> Some s
       in
@@ -212,7 +212,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Tfalse ->
         fprintf fmt "\\bot"
     | Tconst n ->
-        Number.print_constant fmt n
+        Constant.print_def fmt n
     | Tident qid ->
         let id = id_of_qualid qid in
         (match sn_decode id.id_str with

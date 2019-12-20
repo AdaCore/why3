@@ -27,6 +27,7 @@ module C = struct
     | Tstruct of struct_def
     | Tunion of ident * (ident * ty) list
     | Tnamed of ident (* alias from typedef *)
+    | Tmutable of ty (* struct with a single mutable field *)
     | Tnosyntax (* types that do not have a syntax, can't be printed *)
     (* enum, const could be added *)
 
@@ -269,6 +270,7 @@ module C = struct
       | Tstruct (n1, _), Tstruct (n2, _) -> n1 = n2
       | Tunion (id1, _), Tunion (id2, _) -> id_equal id1 id2
       | Tnamed id1, Tnamed id2 -> id_equal id1 id2
+      | Tmutable t, Tmutable t' -> group_types t t'
       | _,_ -> false
     in
     match l with
@@ -419,12 +421,14 @@ module C = struct
 
   let rec has_unboxed_struct = function
     | Tstruct _ -> true
+    | Tmutable _ -> true
     | Tunion (_, lidty)  -> List.exists has_unboxed_struct (List.map snd lidty)
     | Tsyntax (_, lty) -> List.exists has_unboxed_struct lty
     | _ -> false
 
   let rec has_array = function
     | Tarray _ -> true
+    | Tmutable t -> has_array t
     | Tsyntax (_,lty) -> List.exists has_array lty
     | Tstruct (_, lsty) -> List.exists has_array (List.map snd lsty)
     | Tunion (_,lidty) -> List.exists has_array (List.map snd lidty)
@@ -433,6 +437,7 @@ module C = struct
   let rec should_not_escape = function
     | Tstruct _ -> true
     | Tarray _ -> true
+    | Tmutable _ -> true
     | Tunion (_, lidty)  -> List.exists should_not_escape (List.map snd lidty)
     | Tsyntax (_, lty) -> List.exists should_not_escape lty
     | _ -> false
@@ -533,6 +538,7 @@ module Print = struct
     | Tstruct (s,_) -> fprintf fmt "struct %s" s
     | Tunion _ -> raise (Unprinted "unions")
     | Tnamed id -> print_global_ident fmt id
+    | Tmutable ty -> print_ty ~paren fmt ty
     | Tnosyntax -> raise (Unprinted "type without syntax")
 
   and print_unop fmt = function
@@ -615,20 +621,29 @@ module Print = struct
     | Earrow (e,s) ->
        fprintf fmt (protect_on (prec <= 1) "%a->%s")
          (print_expr ~prec:1) e s
+    | Esyntax ("%1", _, _, [e,_], _) ->
+        print_expr ~prec fmt e
     | Esyntax (s, t, args, lte, pl) ->
-       if s = "%1" (*identity*)
-       then begin
-         assert (List.length lte = 1);
-         print_expr ~prec fmt (fst (List.hd lte)) end
-       else
-         let s =
-           if pl = [] || prec < List.hd pl
-           then Format.sprintf "(%s)" s
-           else s in
-         gen_syntax_arguments_typed_prec snd (fun _ -> args)
-           s
-           (fun p fmt (e,_t) -> print_expr ~prec:p fmt e)
-           (print_ty ~paren:false) (C.Enothing,t) pl fmt lte
+        let s =
+          if pl = [] || prec < List.hd pl
+          then Format.sprintf "(%s)" s
+          else s in
+        let lte = Array.of_list lte in
+        let pr fmt p c i =
+          match c with
+          | None -> print_expr ~prec:p fmt (fst lte.(i - 1))
+          | Some 't' ->
+              let v = if i = 0 then t else snd lte.(i - 1) in
+              print_ty ~paren:false fmt v
+          | Some 'v' ->
+              print_ty ~paren:false fmt args.(i)
+          | Some 'd' -> (* dereference the value *)
+              begin match fst lte.(i - 1) with
+              | Eunop (Uaddr, e) -> print_expr ~prec:p fmt e
+              | e -> print_expr ~prec:p fmt (Eunop (Ustar, e))
+              end
+          | Some c -> raise (BadSyntaxKind c) in
+        gen_syntax_arguments_prec fmt s pr pl
 
   and print_const  fmt = function
     | Cint s | Cfloat s | Cchar s | Cstring s -> fprintf fmt "%s" s
@@ -799,6 +814,8 @@ module MLToC = struct
       end
     | Tyapp (ts, [t]) when Sattr.mem array ts.ts_name.id_attrs ->
        Tarray (ty_of_ty info t, Enothing)
+    | Tyapp (id, [t]) when ts_equal id Pmodule.ts_ref ->
+        Tmutable (ty_of_ty info t)
     | Tyapp (ts, tl) ->
        begin match query_syntax info.syntax ts.ts_name
         with
@@ -824,6 +841,8 @@ module MLToC = struct
       end
     | Tapp (id, [t]) when Sattr.mem array id.id_attrs ->
        Tarray (ty_of_mlty info t, Enothing)
+    | Tapp (id, [t]) when id_equal id Pmodule.ts_ref.ts_name ->
+        Tmutable (ty_of_mlty info t)
     | Tapp (id, tl) ->
        begin match query_syntax info.syntax id
         with
@@ -936,12 +955,12 @@ module MLToC = struct
       | Tyapp ({ ts_def = Range { ir_lower = lb; ir_upper = ub }},_) ->
          let init_test_ok, end_test_ok =
            match se, ee with
-           | _, Some { e_node = Mltree.Econst ec } ->
+           | _, Some { e_node = Mltree.Econst (Constant.ConstInt ec) } ->
               true,
               if dir = To
               then BigInt.lt ec.il_int ub
               else BigInt.lt lb ec.il_int
-           | Some { e_node = Mltree.Econst sc }, _ ->
+           | Some { e_node = Mltree.Econst (Constant.ConstInt sc) }, _ ->
               (if dir = To
                then BigInt.eq sc.il_int lb
                else BigInt.eq sc.il_int ub),
@@ -1029,7 +1048,8 @@ module MLToC = struct
        let id = pv_name pv in
        let e = C.Evar id in
        ([], expr_or_return env e)
-    | Mltree.Econst ic ->
+    | Mltree.Econst (Constant.ConstStr _ | Constant.ConstReal _) -> assert false (* TODO *)
+    | Mltree.Econst (Constant.ConstInt ic) ->
        let open Number in
        let print fmt ic =
         let n = ic.il_int in
@@ -1059,6 +1079,11 @@ module MLToC = struct
         | _ -> assert false in
         let e = C.(Econst (Cint s)) in
         ([], expr_or_return env e)
+    | Eapp (rs, [e]) when rs_equal rs Pmodule.rs_ref ->
+        Debug.dprintf debug_c_extraction "ref constructor@.";
+        let env_f = { env with computes_return_value = false } in
+        let arg = simplify_expr (expr info env_f e) in
+        ([], expr_or_return env arg)
     | Eapp (rs, el)
          when is_struct_constructor info rs
               && query_syntax info.syntax rs.rs_name = None ->
@@ -1135,6 +1160,9 @@ module MLToC = struct
                  | (ce, Tstruct s), { e_ity = I { ity_node = Ityreg r }}
                       when not (Hreg.mem env.boxed r) ->
                     C.(Eunop(Uaddr, ce), Tptr (Tstruct s))
+                 | (ce, Tmutable t), { e_ity = I { ity_node = Ityreg r }}
+                       when not (Hreg.mem env.boxed r) ->
+                     (Eunop(Uaddr, ce), Tptr t)
                  | p, _ -> p)
                unboxed_params args in
            prelude,
@@ -1174,6 +1202,8 @@ module MLToC = struct
                     if Hreg.mem env.boxed r
                     then C.Earrow (ce, (pv_name pv).id_string)
                     else C.Edot (ce, (pv_name pv).id_string)
+                 | [(ce, Tmutable _)], [{ e_ity = I { ity_node = Ityreg r }}] ->
+                     if Hreg.mem env.boxed r then C.Eunop (C.Ustar, ce) else ce
                  | _ -> C.Edot (fst (List.hd params), (pv_name pv).id_string) end
          in
          let s =
@@ -1325,8 +1355,8 @@ module MLToC = struct
          | Some s ->
             let _ =
               try
-                Str.search_forward
-                  (Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0
+                Re.Str.search_forward
+                  (Re.Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0
               with Not_found -> raise (Unsupported "assign field format")  in
             let st = if boxed
                      then C.(Eunop(Ustar, Evar id))
@@ -1340,9 +1370,15 @@ module MLToC = struct
             in
             let p = Mid.find rs.rs_name info.prec in
             C.Esyntax(s,ty_of_ty info rty, rtyargs, params,p)
-         | None -> if boxed
-                   then C.(Earrow(Evar id, rs.rs_name.id_string))
-                   else C.(Edot(Evar id, rs.rs_name.id_string)) in
+         | None ->
+             let ty = ty_of_ty info (ty_of_ity pv.pv_ity) in
+             match ty with
+             | Tmutable _ ->
+                 if boxed then Eunop (Ustar, Evar id) else Evar id
+             | _ ->
+                 if boxed
+                 then Earrow (Evar id, rs.rs_name.id_string)
+                 else Edot (Evar id, rs.rs_name.id_string) in
        let d,v = expr info { env with computes_return_value = false } e2 in
        d, C.(Sexpr(Ebinop(Bassign, t, simplify_expr ([],v))))
     | Eassign _ -> raise (Unsupported "assign")

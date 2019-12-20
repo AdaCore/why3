@@ -110,6 +110,10 @@
 %nonassoc unary_minus prec_prefix_op
 
 %start file
+(* Transformations entries *)
+%start <Why3.Ptree.term> term_eof
+%start <Why3.Ptree.term list> term_comma_list_eof
+%start <Why3.Ptree.ident list> ident_comma_list_eof
 
 %type <Mc_ast.file> file
 %type <Mc_ast.stmt> stmt
@@ -423,7 +427,7 @@ term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
 | ident       { Tident (Qident $1) }
-| INTEGER     { Tconst Number.(ConstInt (int_literal ILitDec ~neg:false $1)) }
+| INTEGER     { Tconst (Constant.ConstInt Number.(int_literal ILitDec ~neg:false $1)) }
 | TRUE        { Ttrue }
 | FALSE       { Tfalse }
 | term_sub_                 { $1 }
@@ -464,3 +468,13 @@ term_sub_:
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }
+
+(* parsing of a single term *)
+term_eof:
+| term EOF { $1 }
+
+ident_comma_list_eof:
+| comma_list1(ident) EOF { $1 }
+
+term_comma_list_eof:
+| comma_list1(term) EOF { $1 }

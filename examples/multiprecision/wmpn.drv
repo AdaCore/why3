@@ -1,71 +1,71 @@
 module sqrt.Sqrt1
 
-  prelude "
-#include \"sqrtinit.h\"
-
-uint64_t rsa_estimate (uint64_t a) {
-  uint64_t abits, x0;
-  abits = a >> 55;
-  x0 = 0x100 | invsqrttab[abits - 0x80];
-  return x0;
-}
+  prelude "\n\
+#include \"sqrtinit.h\"\n\
+\n\
+uint64_t rsa_estimate (uint64_t a) {\n\
+  uint64_t abits, x0;\n\
+  abits = a >> 55;\n\
+  x0 = 0x100 | invsqrttab[abits - 0x80];\n\
+  return x0;\n\
+}\n\
 "
 
 end
 
 module powm.Powm
 
-prelude "#include \"binverttab.h\"
-
-uint64_t binvert_limb_table (uint64_t n) {
-  return (uint64_t)binverttab[n];
-}
+prelude "#include \"binverttab.h\"\n\
+\n\
+uint64_t binvert_limb_table (uint64_t n) {\n\
+  return (uint64_t)binverttab[n];\n\
+}\n\
 "
 
 end
 
 module mach.int.UInt64GMP
 
-  prelude "
-typedef unsigned __int128 uint128_t;
-
-struct __mul64_double_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
-{
-  uint128_t z = (uint128_t)x * (uint128_t)y;
-  struct __mul64_double_result result = { z, z >> 64 };
-  return result;
-}
-
-uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
-{
-  return (((uint128_t)uh << 64) | ul) / d;
-}
+  prelude "\n\
+typedef unsigned __int128 uint128_t;\n\
+\n\
+struct __mul64_double_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)\n\
+{\n\
+  uint128_t z = (uint128_t)x * (uint128_t)y;\n\
+  struct __mul64_double_result result = { z, z >> 64 };\n\
+  return result;\n\
+}\n\
+\n\
+uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)\n\
+{\n\
+  return (((uint128_t)uh << 64) | ul) / d;\n\
+}\n\
 "
 
-  interface "
-typedef unsigned __int128 uint128_t;
-
-struct __mul64_double_result
-{ uint64_t __field_0;
-  uint64_t __field_1;
-};
-
-static inline struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)
-{
-  uint128_t z = (uint128_t)x * (uint128_t)y;
-  struct __mul64_double_result result = { z, z >> 64 };
-  return result;
-}
-
-static inline uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
-{
-  return (((uint128_t)uh << 64) | ul) / d;
-}
+  interface "\n\
+typedef unsigned __int128 uint128_t;\n\
+\n\
+struct __mul64_double_result\n\
+{ uint64_t __field_0;\n\
+  uint64_t __field_1;\n\
+};\n\
+\n\
+static inline struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)\n\
+{\n\
+  uint128_t z = (uint128_t)x * (uint128_t)y;\n\
+  struct __mul64_double_result result = { z, z >> 64 };\n\
+  return result;\n\
+}\n\
+\n\
+static inline uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)\n\
+{\n\
+  return (((uint128_t)uh << 64) | ul) / d;\n\
+}\n\
 "
 
 (* "

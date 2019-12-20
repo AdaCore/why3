@@ -23,6 +23,10 @@ external reset_gc : unit -> unit = "ml_reset_gc"
 let debug = Debug.lookup_flag "ide_info"
 let debug_stack_trace = Debug.lookup_flag "stack_trace"
 
+let () =
+  (* Allow global locations to be saved for Find_ident_req *)
+  Debug.set_flag Glob.flag
+
 (***************************)
 (* Debugging Json protocol *)
 (***************************)
@@ -207,7 +211,7 @@ let env, gconfig = try
 (********************************)
 
 
-let (why_lang, any_lang, why3py_lang) =
+let (why_lang, any_lang, why3py_lang, why3c_lang) =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
@@ -233,7 +237,14 @@ let (why_lang, any_lang, why3py_lang) =
           load_path;
         exit 1
     | Some _ as l -> l in
-  (why_lang, any_lang, why3py_lang)
+  let why3c_lang =
+    match languages_manager#language "why3c" with
+    | None ->
+        eprintf "language file for 'Why3c' not found in directory %s@."
+          load_path;
+        exit 1
+    | Some _ as l -> l in
+  (why_lang, any_lang, why3py_lang, why3c_lang)
 
 (* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
@@ -254,30 +265,44 @@ let try_convert s =
 (* Color handling in source *)
 (****************************)
 
-(* For each view, we have to recreate the tags *)
-let create_colors v =
-  let premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"premise_tag" [`BACKGROUND gconfig.premise_color] in
-  let neg_premise_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"neg_premise_tag" [`BACKGROUND gconfig.neg_premise_color] in
-  let goal_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"goal_tag" [`BACKGROUND gconfig.goal_color] in
-  let error_line_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_line_tag" [`BACKGROUND gconfig.error_line_color] in
-  let error_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg] in
-  let error_font_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"error_font_tag" [`BACKGROUND gconfig.error_color] in
-  let search_tag (v: GSourceView.source_view) = v#buffer#create_tag
-      ~name:"search_tag" [`BACKGROUND gconfig.search_color] in
-  let _ : GText.tag = premise_tag v in
-  let _ : GText.tag = neg_premise_tag v in
-  let _ : GText.tag = goal_tag v in
-  let _ : GText.tag = error_line_tag v in
-  let _ : GText.tag = error_tag v in
-  let _ : GText.tag = error_font_tag v in
-  let _ : GText.tag = search_tag v in
-  ()
+(* Generates the tag list (using the current config) *)
+let color_tags_list config =
+  (* The order of this list influences the priorities of tags *)
+  [("error_line_tag", [`BACKGROUND config.error_line_color]); (* less priority *)
+   ("premise_tag", [`BACKGROUND config.premise_color]);
+   ("neg_premise_tag", [`BACKGROUND config.neg_premise_color]);
+   ("goal_tag", [`BACKGROUND config.goal_color]);
+   ("error_tag", [`BACKGROUND config.error_color_bg]);
+   ("error_tag_msg_zone", [`BACKGROUND gconfig.error_color_msg_zone_bg;
+                           `FOREGROUND gconfig.error_color_msg_zone_fg]);
+   ("error_font_tag", [`FOREGROUND config.error_color_fg]);
+   ("search_tag", [`BACKGROUND config.search_color]);
+  ]
+
+(* For each view, we have to recreate the tags.
+   TODO The type annotatin is necessary for the type inference to know that <name> is optional. *)
+let create_colors config
+    (v: <buffer: < create_tag: ?name:string -> GText.tag_property list -> GText.tag;..>; ..>) =
+  let list_tags = color_tags_list config in
+  List.iter (fun (name, props) ->
+      let (_: GText.tag) = v#buffer#create_tag ~name props in ()) list_tags
+
+let remove_tag v tag_name =
+  let tag = GtkText.TagTable.lookup v#buffer#tag_table tag_name in
+  match tag with
+  | None -> ()
+  | Some tag -> GtkText.TagTable.remove v#buffer#tag_table tag
+
+let remove_all_tags config v =
+  List.iter (fun (s, _) -> remove_tag v s) (color_tags_list config)
+
+(* When colors are changed in the preferences, the tag need to change so we
+   remove and regenerate the tags.
+   This works only on sourceview (not on message_zone where tags are not added
+   by name *)
+let update_tags config v =
+  remove_all_tags config  v;
+  create_colors config v
 
 (* Erase all the source location tags in a source file *)
 let erase_color_loc (v:GSourceView.source_view) =
@@ -311,14 +336,12 @@ let exit_function_unsafe () =
   send_request Exit_req;
   GMain.quit ()
 
-(* Contains quadruples (tab page, source_view, file_has_been_modified, label_of_tab):
+(* Contains triples (tab page, source_view, label_of_tab):
    - tab_page is a unique number for each pages of the notebook
    - source_view is the graphical element inside a tab
-   - has_been_modified is a reference to a boolean stating if the current tab
-     source has been modified
    - label_of_tab is the mutable title of the tab
 *)
-let source_view_table : (int * GSourceView.source_view * bool ref * GMisc.label) Hstr.t =
+let source_view_table : (int * GSourceView.source_view * GMisc.label) Hstr.t =
   Hstr.create 14
 
 (* The corresponding file does not have a source view *)
@@ -332,8 +355,8 @@ let get_source_view_table (file:string) =
 (* Saving function for sources *)
 let save_sources () =
   Hstr.iter
-    (fun k (_n, (s: GSourceView.source_view), b, _l) ->
-      if !b then
+    (fun k (_n, (s: GSourceView.source_view), _l) ->
+      if s#source_buffer#modified then
         let text_to_save = s#source_buffer#get_text () in
         send_request (Save_file_req (k, text_to_save))
     )
@@ -341,19 +364,19 @@ let save_sources () =
 
 (* True if there exist a file which needs saving *)
 let files_need_saving () =
-  Hstr.fold (fun _k (_, _, b, _) acc -> !b || acc) source_view_table false
+  Hstr.fold (fun _k (_, s, _) acc -> acc || s#source_buffer#modified) source_view_table false
 
 (* Ask if the user wants to save session before exit. Exit is then delayed until
    the [Saved] notification is received *)
 let exit_function_safe () =
   send_request Check_need_saving_req
 
-let exit_function_handler b =
+let exit_function_handler main_window b =
   if not b && not (files_need_saving ()) then
     exit_function_unsafe ()
   else
     let answer =
-      GToolbox.question_box
+      GToolbox.question_box ~parent:main_window
         ~title:"Why3 saving session and files"
         ~buttons:["Yes"; "No"; "Cancel"]
         "Do you want to save the session and unsaved files?"
@@ -365,9 +388,14 @@ let exit_function_handler b =
       | _ -> ()
     end
 
+(* Erase colors in all source views *)
+let erase_loc_all_view () =
+  Hstr.iter (fun _ (_, v, _) -> erase_color_loc v) source_view_table
+
 (* Update name of the tab when the label changes so that it has a * as prefix *)
 let update_label_change (label: GMisc.label) =
   let s = label#text in
+  erase_loc_all_view ();
   if not (Strings.has_prefix "*" s) then
     label#set_text ("*" ^ s)
 
@@ -379,7 +407,7 @@ let update_label_saved (label: GMisc.label) =
 
 let make_sources_editable b =
   Hstr.iter
-    (fun _ (_,source_view,_,_) ->
+    (fun _ (_,source_view,_) ->
       source_view#set_editable b;
       source_view#set_auto_indent b)
     source_view_table
@@ -406,7 +434,10 @@ let () =
       Whyconf.Args.exit_with_usage spec usage_str
   in
   Server.init_server gconfig.config env dir;
-  Queue.iter (fun f -> send_request (Add_file_req f)) files;
+  Queue.iter (fun f ->
+      (* Sanitize the command line arguments so that they are always absolute *)
+      let f = Sysutil.concat (Sys.getcwd()) f in
+      send_request (Add_file_req f)) files;
   send_request Get_global_infos;
   Debug.dprintf debug "Init the GTK interface...@?";
   ignore (GtkMain.Main.init ());
@@ -745,7 +776,7 @@ let counterexample_view =
     ()
 
 (* Allow colors locations on counterexample view *)
-let () = create_colors counterexample_view
+let () = create_colors gconfig counterexample_view
 
 let message_zone =
   let sv = GBin.scrolled_window
@@ -764,8 +795,11 @@ let log_zone =
     ~packing:sv#add ()
 
 (* Create a tag for errors in the message zone. *)
-let message_zone_error_tag = message_zone#buffer#create_tag
-  ~name:"error_tag" [`BACKGROUND gconfig.error_color_bg; `FOREGROUND gconfig.error_color]
+let create_msg_zone_error_tag () =
+  message_zone#buffer#create_tag
+    ~name:"error_tag_msg_zone" [`BACKGROUND gconfig.error_color_msg_zone_bg;
+                                `FOREGROUND gconfig.error_color_msg_zone_fg]
+let message_zone_error_tag = ref (create_msg_zone_error_tag ())
 
 (**** Message-zone printing functions *****)
 
@@ -795,7 +829,7 @@ let add_to_log =
 
 let clear_message_zone () =
   let buf = message_zone#buffer in
-  buf#remove_tag_by_name "error_tag" ~start:buf#start_iter ~stop:buf#end_iter;
+  buf#remove_tag_by_name "error_tag_msg_zone" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#delete ~start:buf#start_iter ~stop:buf#end_iter
 
 (* Function used to print stuff on the message_zone *)
@@ -811,7 +845,7 @@ let print_message ~kind ~notif_kind fmt =
                   if Strings.ends_with notif_kind "error" ||
                      Strings.ends_with notif_kind "Error"
                   then
-                    buf#insert ~tags:[message_zone_error_tag] (s ^ "\n")
+                    buf#insert ~tags:[!message_zone_error_tag] (s ^ "\n")
                   else
                     buf#insert (s ^ "\n");
                   messages_notebook#goto_page error_page;
@@ -852,10 +886,10 @@ let print_message ~kind ~notif_kind fmt =
 (***********************************)
 
 (* notebook is composed of a Task page and several source files pages *)
-let notebook = GPack.notebook ~packing:vpan222#add ()
+let notebook = GPack.notebook ~packing:(vpan222#pack1 ~resize:true ~shrink:true) ()
 
 (* Pack vbox2222 after packing the notebook (for vertical order) *)
-let () = vpan222#add vbox2222#coerce
+let () = vpan222#pack2 ~resize:false ~shrink:true vbox2222#coerce
 
 let (_ : GtkSignal.id) =
   vpan222#set_position gconfig.task_height;
@@ -884,12 +918,13 @@ let task_view =
     ~packing:scrolled_task_view#add
     ()
 
-let () = create_colors task_view
+let () = create_colors gconfig task_view
 
 let change_lang view lang =
   let lang =
     match lang with
     | "python" -> why3py_lang
+    | "micro-C" -> why3c_lang
     | _ -> why_lang in
   view#source_buffer#set_language lang
 
@@ -907,7 +942,7 @@ let create_eventbox ~read_only file =
               | exception Not_found ->
                   print_message ~kind:1 ~notif_kind:"ide_error"
                     "Error of the graphic interface: cannot find %s" file
-              | (page_number, _, _, _)  ->
+              | (page_number, _, _)  ->
                   notebook#remove_page page_number;
                   Hstr.remove source_view_table file) in
       right_click_label_menu#append close_item in
@@ -956,29 +991,29 @@ let create_source_view ~read_only f content f_format =
           ~editable:editable
           ~packing:scrolled_source_view#add
           () in
-      let has_changed = ref false in
-      Hstr.add source_view_table f (source_page, source_view, has_changed, label);
+      Hstr.add source_view_table f (source_page, source_view, label);
       source_view#source_buffer#begin_not_undoable_action ();
       source_view#source_buffer#set_text content;
       source_view#source_buffer#end_not_undoable_action ();
+      source_view#source_buffer#set_modified false;
       (* At initialization, file has not changed. When it changes, changes the
          name of the tab and update has_changed boolean. *)
-      let (_: GtkSignal.id) = source_view#source_buffer#connect#changed
+      let (_: GtkSignal.id) = source_view#source_buffer#connect#modified_changed
           ~callback:(fun () ->
               try
-                let _source_page, _source_view, has_changed, label =
+                let _source_page, source_view, label =
                   Hstr.find source_view_table f in
                 if not read_only then
-                  begin
-                    update_label_change label;
-                    has_changed := true;
-                  end
+                  if source_view#source_buffer#modified then
+                    update_label_change label
+                  else
+                    update_label_saved label
               with Not_found -> () ) in
       Gconfig.add_modifiable_mono_font_view source_view#misc;
       change_lang source_view f_format;
       (* We have to create the tags for background colors for each view.
          They are not reusable from the other views.  *)
-      create_colors source_view;
+      create_colors gconfig source_view;
       Gconfig.set_fonts ();
       (* Focusing on the tabs that was just added *)
       notebook#goto_page source_page
@@ -988,7 +1023,7 @@ let create_source_view ~read_only f content f_format =
 let get_source_view (file: string) : GSourceView.source_view =
   if file = "Task" then task_view else
   match Hstr.find source_view_table file with
-  | (_, v, _, _) -> v
+  | (_, v, _) -> v
   | exception Not_found -> raise (Nosourceview file)
 
 
@@ -1045,7 +1080,7 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
     let f, l, e, _ = Loc.get loc in
     try
       let (n, v) = if f = "Task" then (0, task_view) else
-          let (n, v, _, _) = get_source_view_table f in
+          let (n, v, _) = get_source_view_table f in
           (n, v) in
       if force_tab_switch then
         begin
@@ -1074,7 +1109,7 @@ let find_current_file_view () =
   let n = notebook#current_page in
   if n = 0 then Some ("Task", task_view) else
     let acc = ref None in
-    Hstr.iter (fun k (x, v, _, _) -> if x = n then acc := Some (k, v)) source_view_table;
+    Hstr.iter (fun k (x, v, _) -> if x = n then acc := Some (k, v)) source_view_table;
     !acc
 
 (* Save the current location of the cursor to be reused after reload *)
@@ -1117,7 +1152,7 @@ let add_completion_entry (s,desc) =
 let match_function s iter =
   let candidate = completion_model#get ~row:iter ~column:completion_col in
   try
-    ignore (Str.search_forward (Str.regexp_string_case_fold s) candidate 0);
+    ignore (Re.Str.search_forward (Re.Str.regexp_string_case_fold s) candidate 0);
     true
   with Not_found -> false
 
@@ -1216,7 +1251,7 @@ let color_loc ?(ce=false) ~color loc =
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
 let apply_loc_on_source (l: (Loc.position * color) list) loc_goal =
-  Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table;
+  erase_loc_all_view ();
   List.iter (fun (loc, color) -> color_loc ~color loc) l;
   scroll_to_loc ~force_tab_switch:false loc_goal
 
@@ -1350,13 +1385,13 @@ let move_current_row_selection_to_next () =
       goals_view#set_cursor path view_name_column
   | _ -> ()
 
-let move_to_next_unproven_node_id () =
+let move_to_next_unproven_node_id strat =
   let rows = get_selected_row_references () in
   match rows with
   | [row] ->
       let row_id = get_node_id row#iter in
       manual_next := Some row_id;
-      send_request (Get_first_unproven_node row_id)
+      send_request (Get_first_unproven_node (strat, row_id))
   | _ -> ()
 
 (* unused
@@ -1388,7 +1423,7 @@ let interp_ide cmd =
   | "down" ->
       move_current_row_selection_to_first_child ()
   | "next" ->
-      move_to_next_unproven_node_id ()
+      move_to_next_unproven_node_id Clever
   | "expand" ->
       expand_row ()
   | "collapse" ->
@@ -1631,6 +1666,7 @@ let treat_message_notification msg = match msg with
        begin
          scroll_to_loc ~force_tab_switch:true (Some loc);
          color_line ~color:Error_line_color loc;
+         color_loc ~color:Error_color loc;
          color_loc ~color:Error_font_color loc;
          print_message ~kind:1 ~notif_kind:"Parse_Or_Type_Error" "%s" s
        end
@@ -1643,9 +1679,8 @@ let treat_message_notification msg = match msg with
   | File_Saved f                 ->
     begin
       try
-        let (_source_page, _source_view, b, l) = Hstr.find source_view_table f in
-        b := false;
-        update_label_saved l;
+        let (_source_page, source_view, _) = Hstr.find source_view_table f in
+        source_view#source_buffer#set_modified false;
         print_message ~kind:1 ~notif_kind:"File_Saved" "%s was saved" f
       with
       | Not_found                ->
@@ -1892,6 +1927,69 @@ object (self)
     m
 end
 
+(*****************************************************************)
+(* "Tools" submenus for strategies, provers, and transformations *)
+(*****************************************************************)
+
+let string_of_desc desc =
+  let print_trans_desc fmt (x,r) =
+    fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
+  in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
+
+let parse_shortcut_as_key s =
+  let (key,modi) as r = GtkData.AccelGroup.parse s in
+  begin if key = 0 then
+    Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s
+  else
+    let name = GtkData.AccelGroup.name ~key ~modi in
+    Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name
+  end;
+  r
+
+let add_submenu_strategy (str_fac: menu_factory) (con_fac: menu_factory) (shortcut,strategy) =
+  let callback () =
+    Debug.dprintf debug "interp command '%s'@." strategy;
+    interp strategy
+  in
+  let name = String.map (function '_' -> ' ' | c -> c) strategy in
+  let tooltip = "run strategy " ^ strategy ^ " on selected goal" in
+  let accel_path = "<Why3-Main>/Tools/Strategies/" ^ name in
+  let (key, modi) = parse_shortcut_as_key shortcut in
+  let (_ : GMenu.menu_item) = str_fac#add_item name
+    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
+  let (_ : GMenu.menu_item) = con_fac#add_item name
+    ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
+  ()
+
+let hide_context_provers, add_submenu_prover =
+  (* Set of context provers menu items *)
+  let context_provers = Hstr.create 16 in
+  (* After preferences for hidden provers are set, actualize provers allowed in
+   the context_factory *)
+  let hide_context_provers () =
+    Hstr.iter (fun k i ->
+      if List.mem k gconfig.hidden_provers then
+        i#misc#hide ()
+      else
+        i#misc#show ()) context_provers in
+  let add_submenu_prover (pro_fac: menu_factory) (con_fac: menu_factory)
+    (shortcut,prover_name,prover_parseable_name) =
+    let callback () =
+      Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
+      interp prover_parseable_name
+    in
+    let tooltip = "run prover " ^ prover_name ^ " on selected goal" in
+    let accel_path = "<Why3-Main>/Tools/Provers/" ^ prover_name in
+    let (key,modi) = parse_shortcut_as_key shortcut in
+    let (_ : GMenu.menu_item) = pro_fac#add_item prover_name
+        ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
+    let (i : GMenu.menu_item) = con_fac#add_item prover_name
+        ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
+    Hstr.add context_provers prover_parseable_name i;
+    if List.mem prover_parseable_name gconfig.hidden_provers then
+      i#misc#hide() in
+  hide_context_provers, add_submenu_prover
+
 (*************)
 (* Main menu *)
 (*************)
@@ -1918,6 +2016,13 @@ let (_: GMenu.menu_item) =
 let (_: GMenu.menu_item) =
   let callback () =
     Gconfig.preferences ~parent:main_window gconfig;
+    (* hide/show provers in contextual menu *)
+    hide_context_provers ();
+    (* Source view tags *)
+    Opt.iter (fun (_, v) -> update_tags gconfig v) (find_current_file_view ());
+    (* Update message zone tags *)
+    remove_all_tags gconfig message_zone;
+    message_zone_error_tag := create_msg_zone_error_tag ();
     make_sources_editable gconfig.allow_source_editing;
     send_session_config_to_server ()
   in
@@ -1984,7 +2089,7 @@ let search_forward =
         let iter = view#buffer#get_iter_at_mark `SEL_BOUND in
         let search_string =
           let find = if forward then "Forward search" else "Backward search" in
-          GToolbox.input_string ~title:find ~ok:"Search"
+          GToolbox.input_string ~title:find ~parent:main_window ~ok:"Search"
             ~cancel:"Cancel" ~text:!last_search
             "Type a string to find in the current document"
         in
@@ -2077,12 +2182,12 @@ let get_word_around_iter iter =
   let start_iter = get_left_words iter in
   let end_iter = get_right_words iter in
   let text = start_iter#get_text ~stop:end_iter in
-  (start_iter, text)
+  (start_iter, text, end_iter)
 
 (* This function check for immediate quantification (not for scope yet) *)
 let rec get_qualif acc start_iter =
   if start_iter#get_text ~stop:start_iter#forward_char = "." then
-    let (start_iter, text) = get_word_around_iter start_iter#backward_char in
+    let (start_iter, text, _) = get_word_around_iter start_iter#backward_char in
     if Strings.char_is_uppercase
         (start_iter#get_text ~stop:start_iter#forward_char).[0] then
       get_qualif (text :: acc) start_iter#backward_char
@@ -2096,7 +2201,7 @@ let get_module (iter: GText.iter) =
   | None -> print_message ~kind:1 ~notif_kind:"Error"
               "cannot find encapsulating module"; None
   | Some (_, end_iter) ->
-      let (_, text) = get_word_around_iter end_iter#forward_char in
+      let (_, text, _) = get_word_around_iter end_iter#forward_char in
       Some text
 
 (* find_cursor_ident: finds the ident under cursor and scroll to its definition
@@ -2112,19 +2217,20 @@ let find_cursor_ident, get_back_loc =
         try
           if file = "Task" then
             let iter = view#buffer#get_iter `SEL_BOUND in
-            let (_, text) = get_word_around_iter iter in
+            let (_, text, _) = get_word_around_iter iter in
             interp ("locate " ^ text)
           else
             let iter = view#buffer#get_iter `SEL_BOUND in
-            let (start_iter, text) = get_word_around_iter iter in
+            let (start_iter, text, end_iter) = get_word_around_iter iter in
             if text = "" then
               ()
             else
-              let qualif = get_qualif [] start_iter#backward_char in
-              match get_module start_iter with
-              | Some enc_module ->
-                  send_request (Find_ident_req (file, qualif, enc_module, text))
-              | None -> ()
+              let l = start_iter#line + 1 in
+              let b = start_iter#line_offset in
+              let e = end_iter#line_offset in
+              let f = file in
+              let loc = Loc.user_position f l b e in
+              send_request (Find_ident_req loc)
         with SearchLimit ->
           print_message ~notif_kind:"Ide_error" ~kind:1
             "Search limit overflow: the word is too long"
@@ -2200,7 +2306,7 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   view_factory#add_item "Go to parent node"
-    ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Left
     ~callback:move_current_row_selection_to_parent
 
 let (_: GMenu.menu_item) =
@@ -2209,8 +2315,18 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   view_factory#add_item "Select next unproven goal"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Right
+    ~callback:(fun () -> move_to_next_unproven_node_id Clever)
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Go down (skipping proved goals)"
     ~modi:[`CONTROL] ~key:GdkKeysyms._Down
-    ~callback:move_to_next_unproven_node_id
+    ~callback:(fun () -> move_to_next_unproven_node_id Next)
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Go up (skipping proved goals)"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~callback:(fun () -> move_to_next_unproven_node_id Prev)
 
 (* "Help" menu items *)
 
@@ -2226,55 +2342,6 @@ let (_ : GMenu.menu_item) =
   help_factory#add_item
     "About"
     ~callback:(show_about_window ~parent:main_window)
-
-(*****************************************************************)
-(* "Tools" submenus for strategies, provers, and transformations *)
-(*****************************************************************)
-
-let string_of_desc desc =
-  let print_trans_desc fmt (x,r) =
-    fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
-  in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
-
-let parse_shortcut_as_key s =
-  let (key,modi) as r = GtkData.AccelGroup.parse s in
-  begin if key = 0 then
-    Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s
-  else
-    let name = GtkData.AccelGroup.name ~key ~modi in
-    Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name
-  end;
-  r
-
-let add_submenu_strategy (shortcut,strategy) =
-  let callback () =
-    Debug.dprintf debug "interp command '%s'@." strategy;
-    interp strategy
-  in
-  let name = String.map (function '_' -> ' ' | c -> c) strategy in
-  let tooltip = "run strategy " ^ strategy ^ " on selected goal" in
-  let accel_path = "<Why3-Main>/Tools/Strategies/" ^ name in
-  let (key, modi) = parse_shortcut_as_key shortcut in
-  let (_ : GMenu.menu_item) = strategies_factory#add_item name
-    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
-  let (_ : GMenu.menu_item) = context_factory#add_item name
-    ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
-  ()
-
-let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
-  let callback () =
-    Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
-    interp prover_parseable_name
-  in
-  let tooltip = "run prover " ^ prover_name ^ " on selected goal" in
-  let accel_path = "<Why3-Main>/Tools/Provers/" ^ prover_name in
-  let (key,modi) = parse_shortcut_as_key shortcut in
-  let (_ : GMenu.menu_item) = provers_factory#add_item prover_name
-    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
-  if not (List.mem prover_parseable_name gconfig.hidden_provers) then
-    let (_ : GMenu.menu_item) = context_factory#add_item prover_name
-      ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
-    ()
 
 let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
@@ -2301,7 +2368,7 @@ let init_completion provers transformations strategies commands =
   let menu_provers =
     List.filter (fun (_, _, s) -> not (Strings.ends_with s "counterexamples"))
       provers_sorted in
-  List.iter add_submenu_prover menu_provers;
+  List.iter (add_submenu_prover provers_factory context_factory) menu_provers;
   context_factory#add_separator ();
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
@@ -2312,7 +2379,7 @@ let init_completion provers transformations strategies commands =
                    [] strategies
   in
   List.iter add_completion_entry all_strings;
-  List.iter add_submenu_strategy strategies;
+  List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
 
   command_entry_completion#set_text_column completion_col;
   (* Adding a column which contains the description of the
@@ -2633,7 +2700,7 @@ let treat_notification n =
                   (* if the node newly proved is selected, then force
                    moving the selection the next unproved goal *)
                   if is_selected_alone id then
-                    send_request (Get_first_unproven_node id)
+                    send_request (Get_first_unproven_node (Clever, id))
                 end
               else
                 begin
@@ -2682,30 +2749,37 @@ let treat_notification n =
             (* if this new node is a transformation, and its parent
                goal is selected, then ask for the next goal to prove. *)
             if is_selected_alone parent_id then
-              send_request (Get_first_unproven_node parent_id)
+              send_request (Get_first_unproven_node (Clever, parent_id))
          | _ -> ()
        with Not_found ->
          ignore (new_node id name typ detached)
      end
   | Remove id                     ->
-     (* In the case where id is an ancestor of a selected node, this node will
-        be erased. So we try to select the parent. *)
      let n = get_node_row id in
-     let is_ancestor =
-       List.exists
-         (fun row -> let row_id = get_node_id row#iter in
-           row_id = id || goals_model#is_ancestor ~iter:n#iter ~descendant:row#iter)
-         (get_selected_row_references ())
-     in
-     if is_ancestor then
-       (match goals_model#iter_parent n#iter with
-       | None -> goals_view#selection#unselect_all ()
-       | Some parent ->
-          goals_view#selection#unselect_all ();
-          select_iter parent
-          (* TODO Go to the next unproved goal ?
+     if get_node_detached id then begin
+         let path = goals_model#get_path n#iter in
+         ignore(GtkTree.TreePath.prev path);
+         goals_view#set_cursor path view_name_column
+       end
+     else begin
+         (* In the case where id is an ancestor of a selected node, this node will
+        be erased. So we try to select the parent. *)
+         let is_ancestor =
+           List.exists
+             (fun row -> let row_id = get_node_id row#iter in
+                         row_id = id || goals_model#is_ancestor ~iter:n#iter ~descendant:row#iter)
+             (get_selected_row_references ())
+         in
+         if is_ancestor then
+           (match goals_model#iter_parent n#iter with
+            | None -> goals_view#selection#unselect_all ()
+            | Some parent ->
+               goals_view#selection#unselect_all ();
+               select_iter parent
+           (* TODO Go to the next unproved goal ?
             let parent_id = get_node_id parent in
           send_request (Get_first_unproven_node parent_id)*));
+       end;
      ignore (goals_model#remove(n#iter));
      Hint.remove node_id_to_gtree id;
      Hint.remove node_id_type id;
@@ -2723,7 +2797,7 @@ let treat_notification n =
                         "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
-  | Saving_needed b -> exit_function_handler b
+  | Saving_needed b -> exit_function_handler main_window b
   | Message (msg)                 -> treat_message_notification msg
   | Task (id, s, list_loc, goal_loc, lang)        ->
      if is_selected_alone id then
@@ -2735,8 +2809,11 @@ let treat_notification n =
          if list_loc != [] then
            apply_loc_on_source list_loc goal_loc
          else
-           (* Still scroll to the ident (for example for modules) *)
-           scroll_to_loc ~force_tab_switch:false goal_loc;
+           begin
+             erase_loc_all_view ();
+             (* Still scroll to the ident (for example for modules) *)
+             scroll_to_loc ~force_tab_switch:true goal_loc
+           end;
          (* scroll to end of text. Since Gtk3 we must do it in idle() because
             of the "smooth scrolling". *)
          when_idle (fun () -> task_view#scroll_to_mark `INSERT)
@@ -2745,7 +2822,7 @@ let treat_notification n =
      let content = try_convert content in
      begin
        try
-         let (_, sc_view, b, l) = Hstr.find source_view_table file_name in
+         let (_, sc_view, _) = Hstr.find source_view_table file_name in
          (* read_only means it was sent by ctrl+l not by reload. So, if the file
             already exists, we dont want to erase users changes. *)
          if not read_only then
@@ -2753,8 +2830,7 @@ let treat_notification n =
              sc_view#source_buffer#begin_not_undoable_action ();
              sc_view#source_buffer#set_text content;
              sc_view#source_buffer#end_not_undoable_action ();
-             update_label_saved l;
-             b := false;
+             sc_view#source_buffer#set_modified false;
              reposition_ide_cursor ()
            end
        with
@@ -2862,7 +2938,7 @@ let batch s =
           let cmd = Strings.join " " cmd in
           let v = Hstr.fold (fun _ x acc ->
               match acc, x with
-              | None, (sp, sv, _, _) when sp = 1 ->
+              | None, (sp, sv, _) when sp = 1 ->
                   Some sv
               | _ -> acc) source_view_table None
           in

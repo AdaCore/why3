@@ -9,11 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(*
-***************************************************************
-**  Counter-example model values
-****************************************************************
-*)
+(** {1 Counter-example model values} *)
 
 type float_type =
   | Plus_infinity
@@ -22,12 +18,13 @@ type float_type =
   | Minus_zero
   | Not_a_number
   | Float_value of string * string * string
-    (* Float_value (sign, exponent, mantissa) *)
+    (** [Float_value (sign, exponent, mantissa)] *)
   | Float_hexa of string * float
 
 val interp_float: ?interp:bool -> string -> string -> string -> float_type
 
 type model_value =
+ | String of string
  | Integer of string
  | Decimal of (string * string)
  | Fraction of (string * string)
@@ -129,21 +126,14 @@ val create_model_element :
     @param term : why term corresponding to the element
 *)
 
-(*
-***************************************************************
-**  Model definitions
-***************************************************************
-*)
+  (** {2 Model definitions} *)
+
 type model
 
 val is_model_empty : model -> bool
 val default_model : model
 
-(*
-***************************************************************
-**  Quering the model
-***************************************************************
-*)
+(** {2 Querying the model} *)
 
 val print_model :
   ?me_name_trans:(model_element_name -> string) ->
@@ -184,15 +174,12 @@ val print_model_json :
       to the term that triggers VC before splitting VC to the name of JSON field
       storing counterexample information related to this term. By default, this
       information is stored in JSON field corresponding to this line, i.e.,
-      the transformation is string_of_int.
+      the transformation is [string_of_int].
       Note that the exact line of the construct that triggers VC may not be
       known. This can happen if the term that triggers VC spans multiple lines
       and it is splitted.
       This transformation can be used to store the counterexample information
-      related to this term in dedicated JSON field.
-    @param model the counter-example model to print.
-    @param print_attrs if set to true, add attrs associated to the name id to
-      the counterexample output
+      related to this term in dedicated JSON field
 
     The format is the following:
     - counterexample is JSON object with fields indexed by names of files
@@ -212,7 +199,7 @@ val print_model_json :
         - "other"
 
     Example:
-    {
+    [
       "records.adb": {
           "84": [
             {
@@ -227,7 +214,7 @@ val print_model_json :
             }
           ]
       }
-    }
+    ]
 *)
 
 val interleave_with_source :

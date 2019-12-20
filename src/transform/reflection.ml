@@ -176,7 +176,7 @@ let rec reify_term renv t rt =
                            assert (v = []);
                            check_nonvar f t
             else ()
-         | Tconst (Number.ConstInt c1), Tconst (Number.ConstInt c2) ->
+         | Tconst (Constant.ConstInt c1), Tconst (Constant.ConstInt c2) ->
             let open Number in
             if not (BigInt.eq c1.il_int c2.il_int)
             then raise NoReification
@@ -293,7 +293,7 @@ let rec reify_term renv t rt =
                let fr = renv.fr in
                let store = Mterm.add t (vy, fr) renv.store in
                { renv with store = store; fr = fr + 1 }, fr in
-           let const = Number.int_const_of_int i in
+           let const = Constant.int_const_of_int i in
            (renv, app_pat (t_const const Ty.ty_int))
          end
     | _ -> raise NoReification
@@ -641,8 +641,8 @@ let reflection_by_function do_trans s env = Trans.store (fun task ->
   let g, prev = Task.task_separate_goal task in
   let g = Apply.term_decl g in
   let ths = Task.used_theories task in
-  let re_dot = Str.regexp_string "." in
-  let qs = Str.split re_dot s in
+  let re_dot = Re.Str.regexp_string "." in
+  let qs = Re.Str.split re_dot s in
   let fname = List.hd (List.rev qs) in
   let es = "Symbol "^fname^" not found in reflection metas" in
   let fid = Mstr.find_exn (Arg_error es) s nt.Trans.meta_id_args in

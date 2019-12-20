@@ -383,11 +383,13 @@ module Print = struct
     | _ -> false
 
   let print_constant fmt e = begin match e.e_node with
-    | Econst c ->
+    | Econst (Constant.ConstInt c) ->
         let v = c.Number.il_int in
         let s = BigInt.to_string v in
         if BigInt.lt v BigInt.zero then fprintf fmt "(%s)" s
         else fprintf fmt "%s" s
+    | Econst (Constant.ConstStr s) ->
+       Constant.print_string_def fmt s
     | _ -> assert false end
 
   let print_for_direction fmt = function
@@ -413,7 +415,7 @@ module Print = struct
         print_apply_args info fmt (exprl, [])
     | [], _ -> ()
 
-  and print_apply info rs fmt pvl =
+  and print_apply info prec rs fmt pvl =
     let isconstructor () =
       match Mid.find_opt rs.rs_name info.info_mo_known_map with
       | Some {pd_node = PDtype its} ->
@@ -428,28 +430,33 @@ module Print = struct
       | _ -> assert false
     else
       match query_syntax info.info_syn rs.rs_name, pvl with
-      | Some s, _ when complex_syntax s || pvl = [] ->
+      | Some s, _ when complex_syntax s ->
           let arity = syntax_arity s in
-          if List.length pvl >= arity then begin
+          if List.length pvl = arity then begin
             let p = Mid.find rs.rs_name info.info_prec in
+            let s =
+              if p = [] || prec < List.hd p
+              then Format.sprintf "(%s)" s
+              else s in
             syntax_arguments_prec s (print_expr info) p fmt pvl
           end else begin
             let ids =
               let id i = id_register (id_fresh ("x" ^ string_of_int i)) in
               Lists.init arity id in
-            fprintf fmt "@[<hov 2>@[(fun %a -> %a)@]%t%a@]"
+            fprintf fmt (protect_on (prec < 4) "@[(fun %a -> %a)@]%t%a")
               (print_list space (print_lident info)) ids
               (syntax_arguments s (print_lident info)) ids
               (fun fmt -> if pvl = [] then () else fprintf fmt "@;<1 2>")
               (print_apply_args info) (pvl, [])
           end
       | _, [t1] when is_field rs ->
-         fprintf fmt "%a.%a" (print_expr info 2) t1 (print_record_proj info) rs
+          fprintf fmt (protect_on (prec < 2) "%a.%a")
+            (print_expr info 2) t1 (print_record_proj info) rs
       | Some s, _ ->
-         fprintf fmt "@[<hov 2>%s %a@]" s
+         fprintf fmt (protect_on (prec < 4) "%s %a") s
            (print_apply_args info) (pvl, rs.rs_cty.cty_args)
       | None, [t] when is_rs_tuple rs ->
-         fprintf fmt "@[%a@]" (print_expr info 1) t
+          print_expr info prec fmt t
       | None, tl when is_rs_tuple rs ->
          fprintf fmt "@[(%a)@]" (print_list comma (print_expr info 14)) tl
       | None, tl when isconstructor () ->
@@ -458,11 +465,11 @@ module Print = struct
          | [], [] ->
             (print_uident info) fmt rs.rs_name
          | [], [t] ->
-            fprintf fmt "@[<hov 2>%a %a@]" (print_uident info) rs.rs_name
-              (print_expr info 2) t
+             fprintf fmt (protect_on (prec < 4) "%a %a") (print_uident info) rs.rs_name
+               (print_expr info 2) t
          | [], tl ->
-            fprintf fmt "@[<hov 2>%a (%a)@]" (print_uident info) rs.rs_name
-              (print_list comma (print_expr info 14)) tl
+             fprintf fmt (protect_on (prec < 4) "%a (%a)") (print_uident info) rs.rs_name
+               (print_list comma (print_expr info 14)) tl
          | pjl, tl -> let equal fmt () = fprintf fmt " =@ " in
                       fprintf fmt "@[<hov 2>{ %a }@]"
                         (print_list2 semi equal (print_record_proj info)
@@ -470,7 +477,7 @@ module Print = struct
       | None, [] ->
          (print_lident info) fmt rs.rs_name
       | _, tl ->
-         fprintf fmt "@[<hov 2>%a %a@]"
+         fprintf fmt (protect_on (prec < 4) "%a %a")
            (print_lident info) rs.rs_name
            (print_apply_args info) (tl, rs.rs_cty.cty_args)
 
@@ -533,7 +540,7 @@ module Print = struct
     let protect_on_be ?(boxed=false) b s = protect_on ~boxed ~be:true b s in
     let protect_on ?(boxed=false) b s = protect_on ~boxed ~be b s in
     match e.e_node with
-    | Econst c ->
+    | Econst (Constant.ConstInt c) ->
         let n = c.Number.il_int in
         let n = BigInt.to_string n in
         let id = match e.e_ity with
@@ -544,6 +551,9 @@ module Print = struct
          | None when n = "0" -> fprintf fmt "Z.zero"
          | None when n = "1" -> fprintf fmt "Z.one"
          | None   -> fprintf fmt (protect_on (prec < 4) "Z.of_string \"%s\"") n)
+    | Econst (Constant.ConstStr s) ->
+        Constant.print_string_def fmt s
+    | Econst (Constant.ConstReal _) -> assert false (* TODO *)
     | Evar pvs ->
         (print_lident info) fmt (pv_name pvs)
     | Elet (let_def, e) ->
@@ -557,9 +567,11 @@ module Print = struct
     | Eapp (rs, []) when rs_equal rs rs_false ->
         fprintf fmt "false"
     | Eapp (rs, [])  -> (* avoids parenthesis around values *)
-        fprintf fmt "%a" (print_apply info rs) []
+        print_apply info prec rs fmt []
+    | Eapp (rs, [e]) when query_syntax info.info_syn rs.rs_name = Some "%1" ->
+        print_expr ~boxed ~opr ~be info prec fmt e
     | Eapp (rs, pvl) ->
-       fprintf fmt (protect_on (prec < 4) "%a") (print_apply info rs) pvl
+        print_apply info prec rs fmt pvl
     | Ematch (e1, [p, e2], []) ->
         fprintf fmt (protect_on (opr && prec < 18) "let %a =@ %a in@ %a")
           (print_pat info 6) p (print_expr ~opr:false info 18) e1

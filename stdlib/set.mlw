@@ -264,7 +264,7 @@ module Fset
   constant empty: fset 'a
   (* axiom empty_def: (empty: fset 'a).to_map = const false *)
 
-  lemma is_empty_empty: is_empty (empty: fset 'a)
+  axiom is_empty_empty: is_empty (empty: fset 'a)
 
   lemma empty_is_empty:
     forall s: fset 'a. is_empty s -> s = empty
@@ -514,7 +514,7 @@ module SetApp
   }
   meta coercion function to_fset
 
-  val ghost function mk (s:fset elt) : set
+  val ghost function mk (s: fset elt) : set
     ensures { result.to_fset = s }
 
   val mem (x: elt) (s: set) : bool
@@ -667,7 +667,10 @@ module SetImp
 
 end
 
-(** {3 Imperative sets of integers} *)
+(** {3 Imperative sets of integers}
+
+    This module is mapped to OCaml's Hashtbl in the OCaml driver.
+*)
 
 module SetImpInt
 
@@ -675,17 +678,5 @@ module SetImpInt
   use export FsetInt
 
   clone export SetImp with type elt = int, val eq = Int.(=), axiom .
-
-  val min_elt (s: set) : int
-    requires { not (is_empty s) }
-    ensures  { result = min_elt s }
-
-  val max_elt (s: set) : int
-    requires { not (is_empty s) }
-    ensures  { result = max_elt s }
-
-  val interval (l r: int) : set
-    ensures  { result = interval l r }
-    ensures  { cardinal result = if l <= r then r - l else 0 }
 
 end

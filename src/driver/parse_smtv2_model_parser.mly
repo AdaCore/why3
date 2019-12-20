@@ -36,6 +36,7 @@ open Smt2_model_defs
 %token DIV
 %token <Model_parser.float_type> FLOAT_VALUE
 %token <string> COMMENT
+%token <string> STRING
 %token <string> BITVECTOR_VALUE_SHARP
 %token <string> BITVECTOR_VALUE_INT
 %token <string> BITVECTOR_EXTRACT
@@ -80,6 +81,7 @@ decl:
 
 smt_term:
 | name      { Variable $1         }
+| STRING    { Sval (String $1)    }
 | integer   { Sval (Integer $1)   }
 | decimal   { Sval (Decimal $1)   }
 | fraction  { Sval (Fraction $1)  }

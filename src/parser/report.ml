@@ -40,7 +40,7 @@ let state checkpoint : int =
 
  let fragment text message =
    try
-     let i = int_of_string (Str.matched_group 1 message) in
+     let i = int_of_string (Re.Str.matched_group 1 message) in
      match i with
      | 0 -> text
      | _ -> text
@@ -56,8 +56,8 @@ let state checkpoint : int =
 
 
  let fragments text (message : string) : string =
-   Str.global_substitute
-     (Str.regexp "\\$\\([0-9]+\\)")
+   Re.Str.global_substitute
+     (Re.Str.regexp "\\$\\([0-9]+\\)")
      (fragment text)
      message
 

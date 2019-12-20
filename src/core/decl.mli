@@ -152,6 +152,9 @@ exception EmptyIndDecl of lsymbol
 
 exception BadConstructor of lsymbol
 exception BadRecordField of lsymbol
+exception BadRecordCons of lsymbol * tysymbol
+exception BadRecordType of lsymbol * tysymbol
+exception BadRecordUnnamed of lsymbol * tysymbol
 exception RecordFieldMissing of lsymbol
 exception DuplicateRecordField of lsymbol
 

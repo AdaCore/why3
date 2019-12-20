@@ -31,6 +31,7 @@ val dty_unify : dty -> dty -> unit (* raises Exit on failure *)
 val dty_int  : dty
 val dty_real : dty
 val dty_bool : dty
+val dty_str  : dty
 
 val dty_fold : (tysymbol -> 'a list -> 'a) ->
                (tvsymbol -> 'a) -> (int -> 'a) -> dty -> 'a
@@ -69,7 +70,7 @@ type dterm = private {
 and dterm_node =
   | DTvar of string * dty
   | DTgvar of vsymbol
-  | DTconst of Number.constant * dty
+  | DTconst of Constant.constant * dty
   | DTapp of lsymbol * dterm list
   | DTfapp of dterm * dterm
   | DTif of dterm * dterm * dterm

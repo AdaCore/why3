@@ -77,6 +77,8 @@ let print_float fmt f =
 
 let print_value fmt v =
   match v with
+  | String s ->
+     Format.fprintf fmt "String: %a" Constant.print_string_def s
   | Integer s -> Format.fprintf fmt "Integer: %s" s
   | Decimal (s1, s2) -> Format.fprintf fmt "Decimal: %s . %s" s1 s2
   | Fraction (s1, s2) -> Format.fprintf fmt "Fraction: %s / %s" s1 s2
@@ -309,8 +311,8 @@ let add_vars_to_table (table: correspondence_table) key value : correspondence_t
             Mstr.fold (fun key_val l_elt acc ->
               let match_str_z3 = type_value ^ "!" in
               let match_str_cvc4 = "_" ^ type_value ^ "_" in
-              let match_str = Str.regexp ("\\(" ^ match_str_z3 ^ "\\|" ^ match_str_cvc4 ^ "\\)") in
-              match Str.search_forward match_str (remove_end_num key_val) 0 with
+              let match_str = Re.Str.regexp ("\\(" ^ match_str_z3 ^ "\\|" ^ match_str_cvc4 ^ "\\)") in
+              match Re.Str.search_forward match_str (remove_end_num key_val) 0 with
               | exception Not_found -> acc
               | _ ->
                   if l_elt = Leaf TNoelement then
@@ -433,6 +435,7 @@ let refine_variable_value table key t =
 
 let convert_simple_to_model_value (v: simple_value) =
   match v with
+  | String s -> Model_parser.String s
   | Integer i -> Model_parser.Integer i
   | Decimal (d1, d2) -> Model_parser.Decimal (d1, d2)
   | Fraction (s1, s2) -> Model_parser.Fraction (s1, s2)

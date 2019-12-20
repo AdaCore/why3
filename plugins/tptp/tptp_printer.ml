@@ -117,8 +117,11 @@ let number_format_metitarski = {
          (fun fmt i n -> fprintf fmt "(%s / %s)" i n));
   }
 
-let print_number info fmt c = Number.print (match info.info_num with
-  | TPTP -> number_format | MetiTarski -> number_format_metitarski) fmt c
+let print_const info fmt c =
+  let supported = match info.info_num with
+    | TPTP -> number_format
+    | MetiTarski -> number_format_metitarski in
+  Constant.(print supported unsupported_escape) fmt c
 
 let rec print_app info fmt ls tl oty =
   match query_syntax info.info_syn ls.ls_name with
@@ -142,7 +145,7 @@ and print_term info fmt t = match t.t_node with
   | Tapp (ls, tl) ->
       print_app info fmt ls tl t.t_ty
   | Tconst c ->
-      print_number info fmt c
+      print_const info fmt c
   | Tlet (t1,tb) ->
       let v,t2 = t_open_bound tb in
       fprintf fmt "$let_tt(%a@ =@ %a,@ %a)"
@@ -384,7 +387,7 @@ and print_term info fmt t = match t.t_node with
   | Tapp (ls, tl) ->
       print_app info fmt ls tl t.t_ty
   | Tconst c ->
-      Number.print number_format fmt c
+      Constant.(print number_format unsupported_escape) fmt c
   | Tlet _ -> unsupportedTerm t
       "DFG does not support let, use eliminate_let"
   | Tif _ -> unsupportedTerm t

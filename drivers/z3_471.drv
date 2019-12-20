@@ -1,0 +1,27 @@
+(** Why3 driver for Z3 >= 4.7.1 *)
+
+import "z3_440.drv"
+import "smtlib-strings.gen"
+
+theory string.RegExpr
+
+  syntax type re             "(RegEx String)"
+
+  syntax function to_re      "(str.to.re %1)"
+  syntax predicate in_re     "(str.in.re %1 %2)"
+
+  syntax function concat     "(re.++ %1 %2)"
+  syntax function union      "(re.union %1 %2)"
+  syntax function inter      "(re.inter %1 %2)"
+  syntax function star       "(re.* %1)"
+  syntax function plus       "(re.+ %1)"
+
+  syntax function none       "re.nostr"
+  syntax function allchar    "re.allchar"
+
+  syntax function opt        "(re.opt %1)"
+  syntax function range      "(re.range %1 %2)"
+  syntax function power      "(re.loop %2 %1 %1)"
+  syntax function loop       "(re.loop %3 %1 %2)"
+
+end

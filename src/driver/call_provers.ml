@@ -66,22 +66,22 @@ type timeunit =
   | Msec
 
 type timeregexp = {
-  re    : Str.regexp;
+  re    : Re.Str.regexp;
   group : timeunit array; (* i-th corresponds to the group i+1 *)
 }
 
 type stepregexp = {
-  steps_re        : Str.regexp;
+  steps_re        : Re.Str.regexp;
   steps_group_num : int;
   (* the number of matched group which corresponds to the number of steps *)
 }
 
 let timeregexp s =
-  let cmd_regexp = Str.regexp "%\\(.\\)" in
+  let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
   let nb = ref 0 in
   let l = ref [] in
   let add_unit x = l := (!nb,x) :: !l; incr nb; "\\([0-9]+.?[0-9]*\\)" in
-  let replace s = match Str.matched_group 1 s with
+  let replace s = match Re.Str.matched_group 1 s with
     | "%" -> "%"
     | "h" -> add_unit Hour
     | "m" -> add_unit Min
@@ -90,19 +90,19 @@ let timeregexp s =
     | x -> failwith ("unknown time format specifier: %%" ^
             x ^ " (should be either %%h, %%m, %%s or %%i")
   in
-  let s = Str.global_substitute cmd_regexp replace s in
+  let s = Re.Str.global_substitute cmd_regexp replace s in
   let group = Array.make !nb Hour in
   List.iter (fun (i,u) -> group.(i) <- u) !l;
-  { re = Str.regexp s; group = group }
+  { re = Re.Str.regexp s; group = group }
 
 let rec grep_time out = function
   | [] -> None
   | re :: l ->
       begin try
-        ignore (Str.search_forward re.re out 0);
+        ignore (Re.Str.search_forward re.re out 0);
         let t = ref 0. in
         Array.iteri (fun i u ->
-          let v = Str.matched_group (succ i) out in
+          let v = Re.Str.matched_group (succ i) out in
           match u with
           | Hour -> t := !t +. float_of_string v *. 3600.
           | Min  -> t := !t +. float_of_string v *. 60.
@@ -112,14 +112,14 @@ let rec grep_time out = function
       with _ -> grep_time out l end
 
 let stepregexp s_re s_group_num =
-  {steps_re = (Str.regexp s_re); steps_group_num = s_group_num}
+  {steps_re = (Re.Str.regexp s_re); steps_group_num = s_group_num}
 
 let rec grep_steps out = function
   | [] -> None
   | re :: l ->
       begin try
-        ignore (Str.search_forward re.steps_re out 0);
-        let v = Str.matched_group (re.steps_group_num) out in
+        ignore (Re.Str.search_forward re.steps_re out 0);
+        let v = Re.Str.matched_group (re.steps_group_num) out in
         Some(int_of_string v)
       with _ -> grep_steps out l end
 
@@ -127,9 +127,9 @@ let rec grep_steps out = function
 let grep_reason_unknown out =
   try
     (* TODO: this is SMTLIB specific, should be done in drivers instead *)
-    let re = Str.regexp "^(:reason-unknown \\([^)]*\\)" in
-    ignore (Str.search_forward re out 0);
-    match (Str.matched_group 1 out) with
+    let re = Re.Str.regexp "^(:reason-unknown \\([^)]*\\)" in
+    ignore (Re.Str.search_forward re out 0);
+    match (Re.Str.matched_group 1 out) with
     | "resourceout" -> Resourceout
     | _ -> Other
   with Not_found ->
@@ -183,11 +183,11 @@ let rec grep out l = match l with
       HighFailure
   | (re,pa) :: l ->
       begin try
-        ignore (Str.search_forward re out 0);
+        ignore (Re.Str.search_forward re out 0);
         match pa with
         | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
-        | Unknown s -> Unknown (Str.replace_matched s out)
-        | Failure s -> Failure (Str.replace_matched s out)
+        | Unknown s -> Unknown (Re.Str.replace_matched s out)
+        | Failure s -> Failure (Re.Str.replace_matched s out)
         | HighFailure -> assert false
       with Not_found -> grep out l end
 
@@ -200,7 +200,7 @@ let craft_efficient_re l =
        ~sep:(fun fmt () -> Format.fprintf fmt "\\|")
        (fun fmt (a, _b) -> Format.fprintf fmt "%s" a)) l
   in
-  Str.regexp s
+  Re.Str.regexp s
 
 let debug_print_model ~print_attrs model =
   Debug.dprintf debug "Call_provers: %a@."
@@ -208,20 +208,20 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-let analyse_result res_parser printer_mapping out =
+let analyse_result exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
-  let list_re = List.map (fun (a, b) -> Str.regexp a, b) list_re in
-  let result_list = Str.full_split re out in
+  let list_re = List.map (fun (a, b) -> Re.Str.regexp a, b) list_re in
+  let result_list = Re.Str.full_split re out in
   let result_list =
     List.fold_right
       (fun s acc ->
         match s with
-        | Str.Delim r -> Answer (grep r list_re) :: acc
-        | Str.Text "\n" -> acc
-        | Str.Text t -> Model t :: acc)
+        | Re.Str.Delim r -> Answer (grep r list_re) :: acc
+        | Re.Str.Text "\n" -> acc
+        | Re.Str.Text t -> Model t :: acc)
       result_list
-      []
+      exit_result
   in
 
   let rec analyse saved_model saved_res l =
@@ -293,11 +293,11 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
   let ans, model =
-    if signaled then HighFailure, None else
-    try List.assoc int_exitcode res_parser.prp_exitcodes, None
-    with Not_found -> analyse_result res_parser printer_mapping out
-      (* TODO let (n, m, t) = greps out res_parser.prp_regexps in
-      t, None *)
+    let exit_result =
+      if signaled then [Answer HighFailure] else
+      try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
+      with Not_found -> []
+    in analyse_result exit_result res_parser printer_mapping out
   in
   let model = match model with Some s -> s | None -> default_model in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;
@@ -329,8 +329,8 @@ let actualcommand command limit file =
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
   let on_timelimit = ref false in
-  let cmd_regexp = Str.regexp "%\\(.\\)" in
-  let replace s = match Str.matched_group 1 s with
+  let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
+  let replace s = match Re.Str.matched_group 1 s with
     | "%" -> "%"
     | "f" -> use_stdin := false; file
     | "t" -> on_timelimit := true; stime
@@ -344,7 +344,7 @@ let actualcommand command limit file =
     | _ -> failwith "unknown specifier, use %%, %f, %t, %m, %l, %d or %S"
   in
   let args =
-    List.map (Str.global_substitute cmd_regexp replace) arglist
+    List.map (Re.Str.global_substitute cmd_regexp replace) arglist
   in
   args, !use_stdin, !on_timelimit
 

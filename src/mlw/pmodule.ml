@@ -383,6 +383,7 @@ let builtin_module =
   let uc = empty_module dummy_env (id_fresh "BuiltIn") ["why3";"BuiltIn"] in
   let uc = add_pdecl_no_logic uc pd_int in
   let uc = add_pdecl_no_logic uc pd_real in
+  let uc = add_pdecl_no_logic uc pd_str in
   let uc = add_pdecl_no_logic uc pd_equ in
   let m = close_module uc in
   { m with mod_theory = builtin_theory }
@@ -595,13 +596,13 @@ let cl_init m inst =
   Mts.iter (fun ts _ -> non_local ts.ts_name) inst.mi_ty;
   let check_ls ls _ =
     non_local ls.ls_name;
-    try  ignore (restore_rs ls); raise (BadInstance ls.ls_name)
+    try  ignore (restore_rs ls); raise (BadInstance (BadI ls.ls_name))
     with Not_found -> () in
   Mls.iter check_ls inst.mi_ls;
   let check_rs rs _ =
     non_local rs.rs_name;
     match (Mid.find rs.rs_name m.mod_known).pd_node with
-    | PDtype _ -> raise (BadInstance rs.rs_name)
+    | PDtype _ -> raise (BadInstance (BadI rs.rs_name))
     | PDlet  _ | PDexn  _ | PDpure -> () in
   Mrs.iter check_rs inst.mi_rs;
   Mvs.iter (fun vs _ -> non_local vs.vs_name) inst.mi_pv;
@@ -609,10 +610,10 @@ let cl_init m inst =
   let check_pk pr _ =
     non_local pr.pr_name;
     match (Mid.find pr.pr_name m.mod_known).pd_node with
-    | PDtype _ | PDlet  _ | PDexn  _ -> raise (BadInstance pr.pr_name)
+    | PDtype _ | PDlet  _ | PDexn  _ -> raise (BadInstance (BadI pr.pr_name))
     | PDpure -> () in
   Mpr.iter check_pk inst.mi_pk;
-  Mpr.iter (fun pr _ -> raise (BadInstance pr.pr_name)) inst.mi_pr;
+  Mpr.iter (fun pr _ -> raise (BadInstance (BadI pr.pr_name))) inst.mi_pr;
   cl
 
 (* clone declarations *)
@@ -631,13 +632,13 @@ let clone_decl inst cl uc d = match d.d_node with
   | Dparam ({ls_name = id} as ls) when Mls.mem ls inst.mi_ls ->
       let ls' = Mls.find ls inst.mi_ls in
       let mtch sb ty ty' = try ty_match sb ty' (clone_ty cl ty)
-        with TypeMismatch _ -> raise (BadInstance id) in
+        with TypeMismatch _ -> raise (BadInstance (BadI id)) in
       let sbs = match ls.ls_value,ls'.ls_value with
         | Some ty, Some ty' -> mtch Mtv.empty ty ty'
         | None, None -> Mtv.empty
-        | _ -> raise (BadInstance id) in
+        | _ -> raise (BadInstance (BadI id)) in
       ignore (try List.fold_left2 mtch sbs ls.ls_args ls'.ls_args
-        with Invalid_argument _ -> raise (BadInstance id));
+        with Invalid_argument _ -> raise (BadInstance (BadI id)));
       cl.ls_table <- Mls.add ls ls' cl.ls_table;
       uc
   | Dparam ls ->
@@ -671,7 +672,8 @@ let clone_decl inst cl uc d = match d.d_node with
         | Paxiom, Some k -> false, k
         | Paxiom, None -> false, inst.mi_df in
       if skip then uc else
-      let pr' = create_prsymbol (id_clone pr.pr_name) in
+      let attr = Sattr.remove Ident.useraxiom_attr pr.pr_name.id_attrs in
+      let pr' = create_prsymbol (id_attr pr.pr_name attr) in
       cl.pr_table <- Mpr.add pr pr' cl.pr_table;
       let d = create_prop_decl k' pr' (clone_fmla cl f) in
       add_pdecl ~warn:false ~vc:false uc (create_pure_decl d)
@@ -915,12 +917,15 @@ let clone_type_record cl s d s' d' =
     let pj_ity = clone_ity cl pj.pv_ity in
     let pj_ght = pj.pv_ghost in
     let rs' = try Hstr.find fields' pj_str with Not_found ->
-      raise (BadInstance id) in
+        raise (BadInstance (BadI_not_found (id, pj_str))) in
     let pj' = fd_of_rs rs' in
     let pj'_ity = pj'.pv_ity in
     let pj'_ght = pj'.pv_ghost in
-    if not (ity_equal pj_ity pj'_ity && (pj_ght || not pj'_ght)) then
-      raise (BadInstance id);
+    let equal_pjs = ity_equal pj_ity pj'_ity in
+    if not equal_pjs then
+      raise (BadInstance (BadI_type_proj (id, pj.pv_vs.vs_name.id_string)));
+    if not (pj_ght || not pj'_ght) then
+      raise (BadInstance (BadI_ghost_proj (id, pj.pv_vs.vs_name.id_string)));
     let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     cl.rs_table <- Mrs.add rs rs' cl.rs_table;
@@ -960,13 +965,13 @@ let clone_type_decl inst cl tdl kn =
       begin match Mts.find_opt ts inst.mi_ts with
       | Some s' ->
           if not (List.length ts.ts_args = List.length s'.its_ts.ts_args) then
-            raise (BadInstance id);
+            raise (BadInstance (BadI id));
           let pd' = Mid.find s'.its_ts.ts_name kn in
           let d' = match pd'.pd_node with
             | PDtype [d'] -> d'
             (* FIXME: we could refine with mutual types *)
-            | PDtype _ -> raise (BadInstance id)
-            | PDlet _ | PDexn _ | PDpure -> raise (BadInstance id) in
+            | PDtype _ -> raise (BadInstance (BadI id))
+            | PDlet _ | PDexn _ | PDpure -> raise (BadInstance (BadI id)) in
           clone_type_record cl s d s' d'; (* clone record fields *)
           (* generate and add VC for type invariant implication *)
           if d.itd_invariant <> [] then begin
@@ -981,7 +986,7 @@ let clone_type_decl inst cl tdl kn =
              private types with no fields and no invariant? *)
           let stv = Stv.of_list ts.ts_args in
           if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
-                  its_pure s && ity.ity_pure) then raise (BadInstance id);
+                  its_pure s && ity.ity_pure) then raise (BadInstance (BadI id));
           cl.ty_table <- Mts.add ts ity cl.ty_table
       | None -> assert false end end;
       Hits.add htd s None;
@@ -1084,10 +1089,10 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let cty = match c.c_node with (* cty for [val constant] is not c.c_cty *)
         | Cany -> c.c_cty
         | Cfun {e_node = Eexec ({c_node = Cany}, cty)} -> cty
-        | _ -> raise (BadInstance rs.rs_name) in
+        | _ -> raise (BadInstance (BadI rs.rs_name)) in
       let kind = match rs.rs_logic with
         | RLnone -> RKnone
-        | RLpv _ -> raise (BadInstance rs.rs_name)
+        | RLpv _ -> raise (BadInstance (BadI rs.rs_name))
         | RLls ls when ls.ls_value = None -> RKpred
         | RLls _ -> RKfunc
         | RLlemma -> RKlemma in
@@ -1097,7 +1102,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       begin match rs.rs_logic, rs'.rs_logic with
       | RLnone, (RLnone | RLls _ | RLlemma) | RLlemma, RLlemma -> ()
       | RLls ls, RLls ls' -> cl.ls_table <- Mls.add ls ls' cl.ls_table
-      | _ -> raise (BadInstance rs.rs_name)
+      | _ -> raise (BadInstance (BadI rs.rs_name))
       end;
       begin
         match cty.cty_effect.eff_oneway, rs'.rs_cty.cty_effect.eff_oneway with
@@ -1118,10 +1123,10 @@ let clone_pdecl inst cl uc d = match d.pd_node with
   | PDlet ld ->
       begin match ld with
         | LDvar ({pv_vs=vs}, _) when Mvs.mem vs inst.mi_pv ->
-            raise (BadInstance vs.vs_name)
+            raise (BadInstance (BadI vs.vs_name))
         | LDrec rdl ->
             let no_inst { rec_sym = rs } =
-              if Mrs.mem rs inst.mi_rs then raise (BadInstance rs.rs_name) in
+              if Mrs.mem rs inst.mi_rs then raise (BadInstance (BadI rs.rs_name)) in
             List.iter no_inst rdl
         | _ -> () end;
       let reads = match ld with
@@ -1137,8 +1142,8 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let xs' = Mxs.find xs inst.mi_xs in
       begin try let ity = clone_ity cl xs.xs_ity in
                 ignore (ity_match isb_empty xs'.xs_ity ity)
-        with TypeMismatch _ -> raise (BadInstance id) end;
-      if mask_spill xs'.xs_mask xs.xs_mask then raise (BadInstance id);
+        with TypeMismatch _ -> raise (BadInstance (BadI id)) end;
+      if mask_spill xs'.xs_mask xs.xs_mask then raise (BadInstance (BadI id));
       cl.xs_table <- Mxs.add xs xs' cl.xs_table;
       uc
   | PDexn xs ->

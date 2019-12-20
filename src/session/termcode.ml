@@ -11,6 +11,7 @@
 
 open Term
 open Number
+open Constant
 
 (*******************************)
 (*          explanations       *)
@@ -197,6 +198,8 @@ let const_v1 fmt c =
           Format.fprintf fmt "%a.0p%se%s"
             (Number.print_in_base 16 None) i (BigInt.to_string p2) (BigInt.to_string p5)
       end
+  | ConstStr c ->
+      print_string_def fmt c
 
 let const_v2 fmt c =
   match c with
@@ -205,6 +208,8 @@ let const_v2 fmt c =
   | ConstReal { rl_kind=_; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
       Format.fprintf fmt "%s.p%se%s"
         (BigInt.to_string i) (BigInt.to_string p2) (BigInt.to_string p5)
+  | ConstStr c ->
+      print_string_def fmt c
 
 end
 
@@ -224,12 +229,35 @@ let string_of_shape sv =
   | Bound_shape l ->
       Format.asprintf "%a" (Pp.print_list (Pp.constant_string "H") Pp.int) l
 
-let shape_of_string ~version s =
+let shape_of_string =
+  let cache = ref [] in
+  fun ~version s ->
   if version >= 8 then
-    Bound_shape (List.fold_right (fun x acc ->
+    let s = Strings.rev_split 'H' s in
+    (* most consecutive shapes have very long common suffixes,
+       so we look for some sharing with the previously computed shape
+       in order to reduce the memory footprint of large sessions *)
+    let c, lc =
+      let lc = List.length !cache in
+      let ls = List.length s in
+      (* this avoids reverting a uselessly long list below *)
+      if lc > ls then Lists.chop (lc - ls) !cache, ls
+      else !cache, lc in
+    let rec aux c s n =
+      match c, s with
+      | hc :: tc, hs :: ts ->
+          begin match int_of_string hs with
+          | x -> if x = hc then aux tc ts (n + 1) else (n, s)
+          | exception _ -> aux c ts n
+          end
+      | _, _ -> (n, s) in
+    let (common, remaining) = aux (List.rev c) s 0 in
+    let common = Lists.chop (lc - common) c in
+    let s = List.fold_left (fun acc x ->
         try int_of_string x :: acc with
-        | _ -> acc)
-        (Strings.split 'H' s) [])
+        | _ -> acc) common remaining in
+    cache := s;
+    Bound_shape s
   else
     Old_shape s
 

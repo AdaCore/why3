@@ -21,6 +21,7 @@ why3.conf
 .*.aux
 *.elc
 *.summary
+.merlin
 \#*\#
 
 # /
@@ -29,7 +30,6 @@ why3.conf
 /autom4te.cache
 /Makefile
 /configure
-/install-sh
 /semantic.cache
 /TAGS
 /output_why3
@@ -38,8 +38,8 @@ why3.conf
 /distrib
 /why3regtests.err
 /why3regtests.out
-/.merlin
 /src/jessie/.merlin
+/_build
 
 # /bench/
 /bench/programs/good/booleans/
@@ -83,6 +83,9 @@ why3.conf
 /bin/why3replay.byte
 /bin/why3replay.opt
 /bin/why3replay
+/bin/why3pp.opt
+/bin/why3pp.byte
+/bin/why3pp
 /bin/why3session.opt
 /bin/why3session.byte
 /bin/why3session
@@ -95,6 +98,9 @@ why3.conf
 /bin/why3webserver.opt
 /bin/why3webserver.byte
 /bin/why3webserver
+/bin/why3pp.opt
+/bin/why3pp.byte
+/bin/why3pp
 /bin/isabelle_client.opt
 /bin/isabelle_client.byte
 /bin/isabelle_client
@@ -207,6 +213,7 @@ pvsbin/
 /src/util/config.ml
 /src/util/lexlib.ml
 /src/util/rc.ml
+/src/util/re.ml
 /src/util/json_lexer.ml
 /src/util/json_parser.mli
 /src/util/json_parser.ml
@@ -247,6 +254,12 @@ pvsbin/
 /plugins/microc/mc_parser.mli
 /plugins/microc/test/
 /plugins/microc/mc_parser.conflicts
+
+# /plugins/ada_terms/
+/plugins/ada_terms/ada_lexer.ml
+/plugins/ada_terms/ada_parser.conflicts
+/plugins/ada_terms/ada_parser.ml
+/plugins/ada_terms/ada_parser.mli
 
 # /drivers
 /drivers/coq-realizations.aux

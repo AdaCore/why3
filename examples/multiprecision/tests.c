@@ -2,6 +2,7 @@
 #define BENCH
 #else
 #define COMPARE
+#define TEST_WHY3
 #ifdef COMPARE_MINI
 #define TEST_MINIGMP
 #else
@@ -27,10 +28,6 @@ extern void __gmpn_powm (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t,
 #ifdef TEST_LIB
 #include "wmp.h"
 extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
-#endif
-
-#ifndef TEST_WHY3
-#define TEST_WHY3
 #endif
 
 #if defined(TEST_WHY3) && !defined(TEST_LIB)

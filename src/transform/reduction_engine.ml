@@ -35,8 +35,9 @@ exception NotNum
 
 let big_int_of_const c =
   match c with
-  | Number.ConstInt i -> i.Number.il_int
-  | Number.ConstReal _ -> assert false
+  | Constant.ConstInt i -> i.Number.il_int
+  | Constant.ConstReal _ -> assert false
+  | Constant.ConstStr _ -> assert false
 
 let big_int_of_value v =
   match v with
@@ -47,8 +48,9 @@ let big_int_of_value v =
 
 let real_of_const c =
   match c with
-  | Number.ConstReal r -> r.Number.rl_real
-  | Number.ConstInt _ -> assert false
+  | Constant.ConstReal r -> r.Number.rl_real
+  | Constant.ConstInt _ -> assert false
+  | Constant.ConstStr _ -> assert false
 
 let real_of_value v =
   match v with
@@ -1166,7 +1168,7 @@ and reduce_term_equ ~orig st t1 t2 cont =
   | Tconst c1, Tconst c2 ->
     begin
       match c1,c2 with
-      | Number.ConstInt i1, Number.ConstInt i2 ->
+      | Constant.ConstInt i1, Constant.ConstInt i2 ->
         let b =
           BigInt.eq i1.Number.il_int i2.Number.il_int
         in

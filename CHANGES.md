@@ -9,6 +9,10 @@ Standard library
         `impset.Impset` becomes `set.SetImp`
       - in `set.SetApp` and `set.SetImp`, type `t` becomes `set`;
         field `contents` becomes `to_fset`; call to `empty` becomes `empty ()`
+  * new library `fmap` for finite maps
+      - Fmap: polymorphic, logic finite maps to be used in logic
+      - MapApp, MapAppInt, MapImp, MapImpInt: monomorphic finite maps to
+        be used in programs
 
 Language
   * it is now possible to give a name to preconditions and assertions;
@@ -38,6 +42,8 @@ API
   * ITP constructor `File_contents` has a new boolean argument for
     interpretation of the file in the IDE as `read_only` :x:
   * New ITP constructor `Ident_notif_loc`
+  * ITP constructor `Get_first_unproven_node` now takes a heuristic name
+    argument :x:
 
 Transformations
   * `apply`/`rewrite` behaves better in presence of `let`;
@@ -55,6 +61,8 @@ Transformations
     `meta reflection val foo` :x:
   * `remove` and `bisect` should not raise unnecessary popups anymore
   * added `remove_rec`
+  * the attribute `ìnline:trivial` can be added on definitions to force its
+    inlining by the transformation `inline_trivial`
 
 IDE
   * display of counterexamples in the Task view has been improved
@@ -72,13 +80,26 @@ IDE
     added in the Edit menu.
   * Read only file can now be displayed and removed by right clicking on their
     tab titles
+  * Colors for error can now be edited in the why3.conf more precisely
+  * Most of the preferences can now be changed for the current session
+  * Ctrl-Down/Ctrl-Up are mapped to more straightforward moves. The former
+    movement can be triggered with Ctrl-Left/Ctrl-Right
 
 Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq
 
+Version 1.2.1, October 28, 2019
+-------------------------------
+
+Bug fixes
+  * fixed compilation with OCaml 4.09
+  * fixed compilation with Lablgtk3
+
 Provers
-  * support for CVC4 1.7 (released April 9, 2019)
-  * support for Alt-Ergo 2.3.0 (released February 11, 2019)
+  * support for Z3 4.8.6 (released Sep 20, 2019)
+  * support for Z3 4.8.5 (released Jun 3, 2019)
+  * support for CVC4 1.7 (released Apr 9, 2019)
+  * support for Alt-Ergo 2.3.0 (released Feb 11, 2019)
   * support for Coq 8.9.1 (released May 20, 2019)
 
 Version 1.2.0, February 11, 2019
@@ -281,8 +302,8 @@ Standard library
     commutative :x:
 
 Miscellaneous
-  * fixed support for `--enable_relocation=yes` (issue #50)
-  * fixed support for Windows (issue #70)
+  * fixed support for `--enable_relocation=yes`
+  * fixed support for Windows
 
 Version 0.88.2, December 7, 2017
 --------------------------------

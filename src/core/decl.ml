@@ -418,6 +418,9 @@ exception BadLogicDecl of lsymbol * lsymbol
 exception BadConstructor of lsymbol
 
 exception BadRecordField of lsymbol
+exception BadRecordType of lsymbol * tysymbol
+exception BadRecordUnnamed of lsymbol * tysymbol
+exception BadRecordCons of lsymbol * tysymbol
 exception RecordFieldMissing of lsymbol
 exception DuplicateRecordField of lsymbol
 
@@ -797,8 +800,9 @@ let parse_record kn fll =
     | [{ ty_node = Tyapp (ts,_) }] -> ts
     | _ -> raise (BadRecordField fs) in
   let cs, pjl = match find_constructors kn ts with
-    | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordField fs)) pjl
-    | _ -> raise (BadRecordField fs) in
+    | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordUnnamed (fs, ts))) pjl
+    | _hd1 :: _hd2 :: _ -> raise (BadRecordCons (fs, ts))
+    | _ -> raise (BadRecordType (fs, ts)) in
   let pjs = Sls.of_list pjl in
   let flm = List.fold_left (fun m (pj,v) ->
     if not (Sls.mem pj pjs) then raise (BadRecordField pj) else

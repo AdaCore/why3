@@ -21,6 +21,9 @@ let has_extension f =
 let get_session_dir ~allow_mkdir files =
   if Queue.is_empty files then invalid_arg "no files given";
   let first = Queue.pop files in
+  (* The session should always return an absolute path. It will be used for
+     relative calculus of every other paths *)
+  let first = Sysutil.concat (Sys.getcwd ()) first in
   let dir =
     if Sys.file_exists first then
       if Sys.is_directory first then
@@ -53,7 +56,6 @@ let get_session_dir ~allow_mkdir files =
         invalid_arg ("session directory '" ^ dir ^ "' not found")
     end;
   dir
-
 
 (******************)
 (* Simple queries *)
@@ -329,17 +331,25 @@ let split_args s =
   in
   let push_char c = Buffer.add_char b c in
   let state = ref 0 in
+  (* state 0 : normal mode (no '"' and no ",")
+     state 1 : encountered one '"' waiting for another one to go back to 0
+     state 2 : encountered one ',': immediately followed whitespace are not
+               argument separations
+     par_depth : number of nested opened parenthesis *)
   for i = 0 to String.length s - 1 do
     let c = s.[i] in
     match !state, c with
     | 0,' ' -> if !par_depth > 0 then push_char c else push_arg ()
+    | 0,',' -> push_char c; if !par_depth > 0 then () else state := 2
     | 0,'(' -> incr par_depth; push_char c
     | 0,')' -> decr par_depth; push_char c
     | 0,'"' -> state := 1; if !par_depth > 0 then push_char c
-    | 0,_ -> push_char c
+    | 0,_   -> push_char c
     | 1,'"' -> state := 0; if !par_depth > 0 then push_char c
-    | 1,_ -> push_char c
-    | _ -> assert false
+    | 1,_   -> push_char c
+    | 2,' ' -> push_char c
+    | 2,_   -> push_char c; state := 0
+    | _     -> assert false
   done;
   push_arg ();
   match List.rev !args with
@@ -569,3 +579,56 @@ let get_first_unproven_goal_around
       | hd :: _tl -> Some hd
     end
   | hd :: _tl  -> Some hd
+
+let find_next_unproved_goal ~proved ~children ~get_parent ~is_pa node =
+  let rec find_next_in_above node =
+    match get_parent node with
+    | None -> None
+    | Some parent when proved parent ->
+        find_next_in_above parent
+    | Some parent ->
+        let brothers_node = children parent in
+        let _before_nodes, after_nodes = split_list brothers_node node in
+        let after_nodes = Lists.rev_filter
+            (fun x -> not (proved x) && not (is_pa x)) after_nodes in
+        if after_nodes = [] then
+          find_next_in_above parent
+        else
+          Some (List.hd after_nodes)
+  in
+  let childrens = children node in
+  let l = List.filter (fun x -> not (proved x) && not (is_pa x)) childrens in
+  if l <> [] then
+    Some (List.hd l)
+  else
+    find_next_in_above node
+
+let find_previous_unproved_goal ~proved ~children ~get_parent node =
+  let original_node = node in
+  let rec find_previous_in_above node =
+    match get_parent node with
+    | None -> if node = original_node then None else Some node
+    | Some parent when proved parent ->
+        find_previous_in_above parent
+    | Some parent ->
+        if not (proved node) && node <> original_node then
+          Some node
+        else
+          let brothers_node = children parent in
+          let before_nodes, _after_nodes = split_list brothers_node node in
+          let before_nodes =
+            Lists.rev_filter (fun x -> not (proved x)) before_nodes in
+          begin match before_nodes with
+            | [] -> find_previous_in_above parent
+            | t :: _ -> Some t
+          end
+  in
+  find_previous_in_above node
+
+let get_next_with_strategy ~st
+    ~always_send ~proved ~children ~get_parent ~is_goal ~is_pa node =
+  let open Itp_communication in
+  match st with
+  | Next -> find_next_unproved_goal ~proved ~children ~get_parent ~is_pa node
+  | Prev -> find_previous_unproved_goal ~proved ~children ~get_parent node
+  | Clever -> get_first_unproven_goal_around ~always_send ~proved ~children ~get_parent ~is_goal ~is_pa node

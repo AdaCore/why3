@@ -125,12 +125,19 @@ type notification =
   | Ident_notif_loc of Loc.position
   (** Answer the position where an ident is defined *)
 
+type next_unproved_node_strat =
+  | Prev
+  | Next
+  | Clever
+
 type ide_request =
   | Command_req             of node_ID * string
   (* executes the given command on the given node. command is
      interpreted by Server_utils.interp. This includes calling
      provers, applying transformations, stategies.  *)
   | Add_file_req            of string
+  (* The file argument should be absolute. Or, at least, contain the session
+     directory path: relative path will be taken from there *)
   | Set_config_param        of string * int
   | Set_prover_policy       of Whyconf.prover * Whyconf.prover_upgrade_policy
   | Get_file_contents       of string
@@ -143,9 +150,9 @@ type ide_request =
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string
   (** [Save_file_req(filename, content_of_file)] saves the file *)
-  | Get_first_unproven_node of node_ID
-  | Find_ident_req          of string * string list * string * string
-  (** [Find_ident_req (filename, qualification, encapsulating_module, ident] *)
+  | Get_first_unproven_node of next_unproved_node_strat * node_ID
+  | Find_ident_req          of Loc.position
+  (** [Find_ident_req (position)] *)
   | Unfocus_req
   | Save_req
   | Reload_req

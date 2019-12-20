@@ -8,10 +8,10 @@ USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev xvfb unzip build-essential autoconf automake ocaml-nox ca-certificates git xauth hevea texlive-latex-extra lmodern texlive-plain-generic texlive-fonts-recommended && \
+    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev xvfb unzip build-essential autoconf automake ocaml-nox ca-certificates git xauth hevea texlive-latex-extra lmodern texlive-plain-generic texlive-fonts-recommended graphviz menhir libmenhir-ocaml-dev libzip-ocaml-dev liblablgtksourceview3-ocaml-dev libzarith-ocaml-dev && \
     apt-get clean
 
-RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.0/opam-2.0.0-x86_64-linux -O /usr/local/bin/opam && \
+RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.5/opam-2.0.5-x86_64-linux -O /usr/local/bin/opam && \
     chmod a+x /usr/local/bin/opam
 
 # install provers
@@ -45,19 +45,17 @@ ENV HOME /home/why3
 WORKDIR /home/why3
 
 # install opam
-ENV OPAM_PACKAGES="menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip alt-ergo.2.3.0"
-RUN opam init -y --no-setup -j1 --compiler=ocaml-system --disable-sandboxing && \
-    opam install -y $OPAM_PACKAGES && \
-    opam switch create 4.05.0 ocaml-base-compiler.4.05.0 && opam install -y $OPAM_PACKAGES && \
-    opam switch create 4.06.1 ocaml-base-compiler.4.06.1 && opam install -y $OPAM_PACKAGES && \
-    opam switch create 4.07.1 ocaml-base-compiler.4.07.1 && opam install -y $OPAM_PACKAGES && \
-    opam switch create 4.08.1 ocaml-base-compiler.4.08.1 && opam install -y $OPAM_PACKAGES && \
+ENV OPAM_PACKAGES="num menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip"
+RUN opam init -y --no-setup -j1 --bare --disable-sandboxing && \
     opam switch create 4.09.0 ocaml-base-compiler.4.09.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create bench  ocaml-base-compiler.4.05.0 && opam install -y $OPAM_PACKAGES && \
-    opam switch create full   ocaml-base-compiler.4.07.1 && opam install -y $OPAM_PACKAGES && \
+    opam switch create full   ocaml-base-compiler.4.08.1 && opam install -y $OPAM_PACKAGES && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
     opam install -y --switch=bench zenon.0.8.0 coq.8.7.2 coq-flocq.3.1.0 && \
-    opam install -y --switch=full coq-flocq.3.1.0 js_of_ocaml-ppx && \
-    opam clean -a
+    opam install -y --switch=full re coq-flocq.3.1.0 js_of_ocaml-ppx alt-ergo.2.3.0 && \
+    opam clean -a -c -r -s --logs
 
-RUN opam switch ocaml-system
+USER root
+RUN cp /home/why3/.opam/full/bin/alt-ergo /usr/local/bin/alt-ergo-2.3.0
+
+USER why3

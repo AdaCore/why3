@@ -91,10 +91,32 @@ let add_registered_lang lang print_ext_any =
     Hashtbl.add registered_lang lang print_ext_any
 
 (* Printing of task *)
-let print_ext_any (lang:string) print_any =
+let print_ext_any task (lang:string) print_any =
   match Hashtbl.find registered_lang lang with
-  | print_ext_any -> print_ext_any print_any
+  | print_ext_any -> print_ext_any task print_any
   | exception Not_found -> print_any
+
+type server_data =
+  { (* task_driver : Driver.driver; *)
+    cont : Controller_itp.controller;
+    send_source: bool;
+    (* If true the server is parametered to send source mlw files as
+         notifications *)
+    global_infos : Itp_communication.global_information;
+  }
+
+let server_data = ref None
+
+let get_server_data () =
+  match !server_data with
+  | None ->
+      Format.eprintf "get_server_data(): fatal error, server not yet initialized@.";
+      exit 1
+  | Some x -> x
+
+let set_partial_config c =
+  let d = get_server_data () in
+  Controller_itp.set_partial_config d.cont c
 
 module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
 
@@ -114,14 +136,14 @@ let lang ses any =
 
 let p s id =
   let lang = lang s (APn id) in
-  let _,tables = Session_itp.get_task_name_table s id in
+  let task,tables = Session_itp.get_task_name_table s id in
   (* We use snapshots of printers to avoid registering new values inside it
      only for exception messages.
   *)
   let pr = Ident.duplicate_ident_printer tables.Trans.printer in
   let apr = Ident.duplicate_ident_printer tables.Trans.aprinter in
   (* Use the external printer for exception reporting (default is identity) *)
-  (Pretty.create ~print_ext_any:(print_ext_any lang) pr apr pr pr false)
+  (Pretty.create ~print_ext_any:(print_ext_any task lang) pr apr pr pr false)
 
 let print_opt_type ~print_type fmt t =
   match t with
@@ -250,7 +272,7 @@ let get_exception_message ses id e =
   | Session_itp.NoProgress ->
       Pp.sprintf "Transformation made no progress\n", Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans s ->
-      Pp.sprintf "Error in transformation function: %s \n" s, Loc.dummy_position, ""
+      Pp.sprintf "Error in transformation function:\n%s \n" s, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_decl (s, ld) ->
       Pp.sprintf "Error in transformation %s during inclusion of following declarations:\n%a" s
         (Pp.print_list (fun fmt () -> Format.fprintf fmt "\n") P.print_tdecl) ld,
@@ -277,8 +299,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Error in transformation %s during unification of the following types:\n %a \n %a"
         s P.print_ty ty1 P.print_ty ty2, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_trans_missing (s, svs) ->
-      Pp.sprintf "Error in transformation function: %s %a\n" s
-        (Pp.print_list Pp.space P.print_vs) (Term.Svs.elements svs),
+      Pp.sprintf "Error in transformation function:\n%s %a\n" s
+        (* The arguments should appear on one line (no @) *)
+        (Pp.print_list (fun fmt () -> fprintf fmt ", ") P.print_vs)
+        (Term.Svs.elements svs),
       Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
       Pp.sprintf "Not a rewrite hypothesis", Loc.dummy_position, ""
@@ -356,24 +380,6 @@ let () =
     "gl", "go to the goal left",  then_print (move_to_goal_ret_p zipper_left)
  *)
   ]
-
-  type server_data =
-    { (* task_driver : Driver.driver; *)
-      cont : Controller_itp.controller;
-      send_source: bool;
-      (* If true the server is parametered to send source mlw files as
-         notifications *)
-      global_infos : Itp_communication.global_information;
-    }
-
-  let server_data = ref None
-
-  let get_server_data () =
-    match !server_data with
-    | None ->
-       Format.eprintf "get_server_data(): fatal error, server not yet initialized@.";
-       exit 1
-    | Some x -> x
 
 (* fresh gives new fresh "names" for node_ID using a counter.
    reset resets the counter so that we can regenerate node_IDs as if session
@@ -599,6 +605,7 @@ module P = struct
 
 end
 
+
   (*********************)
   (* File input/output *)
   (*********************)
@@ -654,6 +661,9 @@ end
      be incorrect and end up in a correct state. *)
   let reload_files cont ~shape_version =
     let hard_reload = true in
+    (* On reload, we empty the legacy printer (which is used to print
+       parsing/typing errors. This avoids odd numbering of ident. *)
+    Pretty.forget_all ();
     capture_parse_or_type_errors
       (fun c ->
         try let (_,_) = reload_files ~hard_reload ~shape_version c in [] with
@@ -720,13 +730,16 @@ end
     | APa pa ->
       let pa = get_proof_attempt_node s pa in
       let obs = pa.proof_obsolete in
+      let detached = get_node_detached node in
+      let appear_obs = obs || detached in
       let limit = pa.limit in
       let res =
         match pa.Session_itp.proof_state with
         | Some pa -> Done pa
         | _ -> Undone
       in
-      P.notify (Node_change (new_id, Proof_status_change(res, obs, limit)))
+      P.notify (Node_change (new_id,
+                             Proof_status_change(res, appear_obs, limit)))
 
 
 (*
@@ -902,7 +915,7 @@ end
       let apr = tables.Trans.aprinter in
       (* For task printing we use the external printer (the default one is
          identity). *)
-      let module P = (val Pretty.create ~print_ext_any:(print_ext_any lang) pr apr
+      let module P = (val Pretty.create ~print_ext_any:(print_ext_any task lang) pr apr
                          pr pr false) in
       Pp.string_of (if show_full_context then P.print_task else P.print_sequent) task
     in
@@ -931,7 +944,7 @@ end
     let goal_loc, list_loc = List.partition (fun (_, y) -> y = Goal_loc) list_loc in
     let goal_loc =
       match goal_loc with
-      | [(x, _)] -> Some x
+      | (x, _) :: _ -> Some x
       | _        -> None in
     let list_loc =
       List.map (fun (x, y) ->
@@ -1017,7 +1030,10 @@ end
             | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc, lang))
           end
       | AFile f ->
-          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], None, lang))
+          let file_loc =
+            let fp = Session_itp.system_path d.cont.controller_session f in
+            Loc.user_position fp 1 1 1 in
+          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], Some file_loc, lang))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
@@ -1340,7 +1356,6 @@ end
       Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
 
-
   (* ----------------- Clean session -------------------- *)
   let clean nid =
     let d = get_server_data () in
@@ -1483,14 +1498,14 @@ end
 
   (* ----------------- locate next unproven node -------------------- *)
 
-  let notify_first_unproven_node d ni =
+  let notify_first_unproven_node ~st d ni =
     let s = d.cont.controller_session in
     let any = any_from_node_ID ni in
     match any with
     | None -> P.notify (Message (Error "Please select a node id"))
     | Some any ->
       let unproven_any =
-        get_first_unproven_goal_around
+        get_next_with_strategy ~st
           ~always_send:false
           ~proved:(Session_itp.any_proved s)
           ~children:(get_undetached_children_no_pa s)
@@ -1513,7 +1528,7 @@ end
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
      | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
      | Reset_proofs_req | Find_ident_req _ -> true
-     | Get_first_unproven_node ni ->
+     | Get_first_unproven_node (_st, ni) ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
          Hint.mem model_any nid
@@ -1537,50 +1552,15 @@ end
      P.notify (File_contents (f, s, format, true));
      P.notify (Ident_notif_loc loc)
 
-   let find_id_ns (ns_logic: Theory.namespace) (ns_prog: Pmodule.namespace) qs =
-     Pmodule.(Theory.(
-     begin match ns_find_ls ns_logic qs with
-     | ls -> ls.Term.ls_name
-     | exception Not_found ->
-         begin match ns_find_pr ns_logic qs with
-         | pr -> pr.Decl.pr_name
-         | exception Not_found ->
-             begin match ns_find_ts ns_logic qs with
-             | ty -> ty.Ty.ts_name
-             | exception Not_found ->
-                 begin match ns_find_pv ns_prog qs with
-                 | pv -> pv.Ity.pv_vs.Term.vs_name
-                 | exception Not_found ->
-                     begin match ns_find_its ns_prog qs with
-                     | ity -> ity.Ity.its_ts.Ty.ts_name
-                     | exception Not_found ->
-                         begin match ns_find_xs ns_prog qs with
-                         | xs -> xs.Ity.xs_name
-                         | exception Not_found ->
-                             begin match ns_find_rs ns_prog qs with
-                               | rs -> rs.Expr.rs_name
-                             end
-                         end
-                     end
-                 end
-             end
-         end
-     end))
-
-   let find_ident d qualif (encaps_module: string) (f:string) (id: string) =
+   let find_ident (loc: Loc.position) =
      try
-       let (r, _) = Env.read_file Pmodule.mlw_language d.controller_env f in
-       let pmod = Mstr.find encaps_module r in
-       let ns_prog = pmod.Pmodule.mod_export in
-       let ns_logic = pmod.Pmodule.mod_theory.Theory.th_export in
-       let found_id = find_id_ns ns_logic ns_prog (qualif @ [id]) in
-       let treat_ident found_id =
-         match found_id.Ident.id_loc with
-         | None -> P.notify (Message (Error "No location found on ident"))
-         | Some loc ->
-             notify_loc loc in
-       treat_ident found_id
-     with Not_found -> P.notify (Message (Error "Ident not found"))
+       let (id, _, _) = Glob.find loc in
+       begin match id.Ident.id_loc with
+         | None -> ()
+         | Some loc -> notify_loc loc
+       end
+     with Not_found ->
+       P.notify (Message (Error "Ident not found: try saving the file."))
 
    (* Locate a string in the task *)
    let locate_id d (id: string) nid =
@@ -1620,10 +1600,10 @@ end
     | Reload_req                   ->
        reload_session ();
        session_needs_saving := true
-    | Get_first_unproven_node ni   ->
-        notify_first_unproven_node d ni
-    | Find_ident_req (f, qualif, encaps_module, s) ->
-        find_ident d.cont qualif encaps_module f s
+    | Get_first_unproven_node (st, ni)   ->
+        notify_first_unproven_node ~st d ni
+    | Find_ident_req loc ->
+        find_ident loc
     | Remove_subtree nid           ->
        remove_node nid;
        session_needs_saving := true

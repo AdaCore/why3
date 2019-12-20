@@ -1,0 +1,23 @@
+module StringCheck
+
+  use string.StringRealization as SR
+
+  clone string.String
+    with
+      function concat = SR.concat,
+      function length = SR.length,
+      predicate lt = SR.lt,
+      predicate le = SR.le,
+      function ([]) = SR.([]),
+      function substring = SR.substring,
+      predicate prefixof = SR.prefixof,
+      predicate suffixof = SR.suffixof,
+      predicate contains = SR.contains,
+      function indexof = SR.indexof,
+      function replace = SR.replace,
+      function replaceall = SR.replaceall,
+      (*predicate is_digit = SR.is_digit,*)
+      function to_int = SR.to_int,
+      function from_int = SR.from_int
+
+end

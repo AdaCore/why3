@@ -76,6 +76,12 @@ AC_ARG_ENABLE(js_of_ocaml,
     AS_HELP_STRING([--disable-js-of-ocaml], [do not use js-of-ocaml]),,
     enable_js_of_ocaml=yes)
 
+# re
+
+AC_ARG_ENABLE(re,
+    AS_HELP_STRING([--disable-re], [use Str instead of Re for regular expressions]),,
+    enable_re=yes)
+
 # IDE
 
 AC_ARG_ENABLE(ide,
@@ -185,8 +191,8 @@ fi
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 echo "ocaml version is $OCAMLVERSION"
 
-AX_VERSION_GE([$OCAMLVERSION], 4.02.3, [],
-  [AC_MSG_ERROR(You need Objective Caml 4.02.3 or higher.)])
+AX_VERSION_GE([$OCAMLVERSION], 4.05.0, [],
+  [AC_MSG_ERROR(You need Objective Caml 4.05.0 or higher.)])
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
@@ -503,6 +509,65 @@ if test "$found_menhirlib" = no; then
    AC_MSG_ERROR([Library menhirLib not found.])
 fi
 
+# checking for seq
+# (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
+found_seq=no
+if test "$USEOCAMLFIND" = yes; then
+   DIR=$(ocamlfind query seq)
+   if test -n "$DIR"; then
+      echo "ocamlfind found seq in $DIR"
+      SEQINCLUDE="-I $DIR"
+      SEQLIB=seq
+      found_seq=yes
+      AC_CHECK_FILE($DIR/seq.cma,,found_seq=no)
+      AC_CHECK_FILE($DIR/seq.cmi,,found_seq=no)
+   fi
+fi
+if test "$found_seq" = no; then
+   DIR="$OCAMLLIB"
+   SEQINCLUDE=
+   SEQLIB=
+   found_seq=yes
+   AC_CHECK_FILE($DIR/stdlib__seq.cmi,,found_seq=no)
+fi
+if test "$found_seq" = no; then
+   AC_MSG_WARN([Library seq not found.])
+   if test "$enable_re" = yes; then
+      enable_re=no
+      reason_re=" (seq not found)"
+   fi
+fi
+
+# checking for re
+if test "$enable_re" = yes; then
+   found_re=yes
+   DIR=
+   if test "$USEOCAMLFIND" = yes; then
+      DIR=$(ocamlfind query re)
+      if test -n "$DIR"; then
+         echo "ocamlfind found re in $DIR"
+         REINCLUDE="-I $DIR"
+      fi
+   fi
+   if test -z "$DIR"; then
+      REINCLUDE="-I +re"
+      DIR="$OCAMLLIB/re"
+      AC_CHECK_FILE($DIR/re.cmx,,found_re=no)
+   fi
+   AC_CHECK_FILE($DIR/re.cmi,,found_re=no)
+   if test "$found_re" = no; then
+      AC_MSG_WARN([Library re not found.])
+      enable_re=no
+   fi
+fi
+
+if test "$enable_re" = no; then
+   REINCLUDE=""
+   RELIB="str"
+else
+   RELIB="re"
+fi
+
 # checking for lablgtk3
 if test "$enable_ide" != yes ; then
    reason_ide=" (disabled by user)"
@@ -518,11 +583,14 @@ else
    if test -z "$DIR"; then
       LABLGTKINCLUDE="-I +lablgtk3 -I +threads"
       DIR="$OCAMLLIB/lablgtk3"
-      AC_CHECK_FILE($DIR/lablgtk.cma,,enable_ide=no)
    fi
-   AC_CHECK_FILE($DIR/gtkButton.cmi,,enable_ide=no)
-   if test "$enable_ide" = yes; then
+   AC_CHECK_FILE($DIR/lablgtk.cma,LABLGTKLIB="threads lablgtk",)
+   AC_CHECK_FILE($DIR/lablgtk3.cma,LABLGTKLIB="threads lablgtk3",)
+   AC_CHECK_FILE($DIR/gtkButton.cmi,,LABLGTKLIB="")
+   if test -n "$LABLGTKLIB"; then
       GTKVERSION=3
+      LIB_SOURCEVIEW=lablgtk3_sourceview3
+      PKG_SOURCEVIEW=lablgtk3-sourceview3
       reason_ide=" (gtk3)"
    else
       AC_MSG_WARN([Lib lablgtk3 not found, trying lablgtk2.])
@@ -549,6 +617,9 @@ if test "$enable_ide" = retry; then
    AC_CHECK_FILE($DIR/gtkButton.cmi,,enable_ide=no)
    if test "$enable_ide" = yes; then
       GTKVERSION=2
+      LABLGTKLIB=lablgtk
+      LIB_SOURCEVIEW=lablgtksourceview2
+      PKG_SOURCEVIEW=lablgtk2.sourceview2
       reason_ide=" (gtk2)"
    else
       AC_MSG_WARN([Lib lablgtk2 not found, IDE disabled.])
@@ -560,32 +631,32 @@ fi
 if test "$enable_ide" = yes ; then
    DIR=
    if test "$USEOCAMLFIND" = yes; then
-      case $GTKVERSION in
-        2)
-           LIB_SOURCEVIEW=lablgtksourceview2
-           PKG_SOURCEVIEW=lablgtk2.sourceview2
-           DIR=$(ocamlfind query $PKG_SOURCEVIEW)
-           if test -z "$DIR"; then
-              PKG_SOURCEVIEW=lablgtksourceview2
-              DIR=$(ocamlfind query $PKG_SOURCEVIEW)
-           fi
-           ;;
-        3)
-           LIB_SOURCEVIEW=lablgtk3_sourceview3
-           PKG_SOURCEVIEW=lablgtk3-sourceview3
-           DIR=$(ocamlfind query $PKG_SOURCEVIEW)
-           ;;
-        *)
-           AC_MSG_ERROR(Unknown gtk version $GTKVERSION)
-           ;;
-      esac
+      DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+      if test -z "$DIR"; then
+         case $GTKVERSION in
+            2)
+                PKG_SOURCEVIEW=lablgtksourceview2
+                DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+                ;;
+            3)
+                PKG_SOURCEVIEW=lablgtksourceview3
+                DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+                ;;
+         esac
+      fi
       if test -n "$DIR";then
          echo "ocamlfind found $PKG_SOURCEVIEW in $DIR"
       fi
    fi
    if test -z "$DIR"; then
       DIR="$OCAMLLIB/lablgtk$GTKVERSION"
-      AC_CHECK_FILE($DIR/lablgtksourceview$GTKVERSION.cma,,enable_ide=no)
+      LIB_SOURCEVIEW="lablgtksourceview$GTKVERSION"
+      AC_CHECK_FILE($DIR/$LIB_SOURCEVIEW.cma,,DIR="")
+   fi
+   if test -z "$DIR"; then
+      DIR="$OCAMLLIB/lablgtk$GTKVERSION-sourceview$GTKVERSION"
+      LIB_SOURCEVIEW="lablgtk${GTKVERSION}_sourceview$GTKVERSION"
+      AC_CHECK_FILE($DIR/$LIB_SOURCEVIEW.cma,,enable_ide=no)
    fi
    AC_CHECK_FILE($DIR/gSourceView$GTKVERSION.cmi,,enable_ide=no)
    if test "$enable_ide" = no; then
@@ -597,17 +668,6 @@ if test "$enable_ide" = yes ; then
 fi
 
 if test "$enable_ide" = yes ; then
-   case $GTKVERSION in
-        2)
-           LABLGTKLIB="lablgtk"
-           ;;
-        3)
-           LABLGTKLIB="threads lablgtk3"
-           ;;
-        *)
-           AC_MSG_ERROR(Unknown gtk version $GTKVERSION)
-           ;;
-      esac
    LABLGTKLIB="$LABLGTKLIB $LIB_SOURCEVIEW"
    LABLGTKPKG="lablgtk$GTKVERSION lablgtk$GTKVERSION.init $PKG_SOURCEVIEW"
 else
@@ -981,6 +1041,13 @@ AC_SUBST(ZIPLIB)
 
 AC_SUBST(MENHIRINCLUDE)
 
+AC_SUBST(SEQINCLUDE)
+AC_SUBST(SEQLIB)
+
+AC_SUBST(enable_re)
+AC_SUBST(REINCLUDE)
+AC_SUBST(RELIB)
+
 AC_SUBST(enable_coq_libs)
 AC_SUBST(enable_coq_fp_libs)
 AC_SUBST(coq_compat_version)
@@ -1065,6 +1132,7 @@ echo "    Profiling               : $enable_profiling"
 echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
+echo "    Re support              : $enable_re$reason_re"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"

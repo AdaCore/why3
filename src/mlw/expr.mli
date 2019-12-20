@@ -124,7 +124,7 @@ type expr = private {
 
 and expr_node =
   | Evar    of pvsymbol
-  | Econst  of Number.constant
+  | Econst  of Constant.constant
   | Eexec   of cexp * cty
   | Eassign of assign list
   | Elet    of let_defn * expr
@@ -202,7 +202,7 @@ val c_any : cty -> cexp
 
 val e_var : pvsymbol -> expr
 
-val e_const : Number.constant -> ity -> expr
+val e_const : Constant.constant -> ity -> expr
 val e_nat_const : int -> expr
 
 val e_exec : cexp -> expr
