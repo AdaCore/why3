@@ -18,7 +18,7 @@ let wmpz_set_ui (dst: mpz_ptr) (src: uint64): unit
   ensures  { forall x. x <> dst -> mpz_unchanged x mpz (old mpz) }
   ensures  { mpz.readers[dst] = 0 }
 =
-  let dstp = mpz_realloc dst 1 in
+  let dstp = wmpz_realloc dst 1 in
   set dstp src;
   assert { value dstp 1 = src };
   let size = if src <> 0 then 1 else 0 in
@@ -38,7 +38,7 @@ let wmpz_set_si (dst: mpz_ptr) (src: int64): unit
   ensures  { forall x. x <> dst -> mpz_unchanged x mpz (old mpz) }
   ensures  { mpz.readers[dst] = 0 }
 =
-  let dstp = mpz_realloc dst 1 in
+  let dstp = wmpz_realloc dst 1 in
   let abs_src = abs_cast src in
   set dstp abs_src;
   assert { value dstp 1 = abs src };

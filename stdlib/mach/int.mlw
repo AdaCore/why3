@@ -274,6 +274,20 @@ module Int32BV
 
 end
 
+module Int32GMP
+
+  use int.Int
+  use export Int32
+
+  (* bitwise xor *)
+  val bxor (x y:int32) : int32
+    ensures { x = 0 -> result = y }
+    ensures { y = 0 -> result = x }
+    ensures { (x >= 0 /\ y >= 0) \/ (x < 0 /\ y < 0) -> result >= 0 }
+    ensures { (x < 0 /\ y >= 0) \/ (x >= 0 /\ y < 0) -> result < 0 }
+
+end
+
 module UInt32Gen
 
   use int.Int

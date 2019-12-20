@@ -1480,8 +1480,8 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
     ensures { min r3n = old min r3n /\ max r3n = old max r3n }
     ensures { plength r3n = old plength r3n }
     if (s > t)
-    then wmpn_mul r3n x2 s y1 t (k-1)
-    else wmpn_mul r3n y1 t x2 s (k-1)
+    then let ghost _ = wmpn_mul r3n x2 s y1 t (k-1) in ()
+    else let ghost _ = wmpn_mul r3n y1 t x2 s (k-1) in ()
   end;
   assert { (a0 + m * a1 + m * m * a2) * (b0 + m * b1)
            = m * vy + vx0 + m * m * m * vx3 - m * m * vx0 - m * vx3 };
@@ -1763,7 +1763,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
            by value r (sx + sy) = value r (sx + sy) at JoinL
               = value r (sx + sy) at JoinR }
 
-  with wmpn_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) (ghost k: int) : unit
+  with wmpn_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) (ghost k: int) : limb
     requires { valid x sx }
     requires { valid y sy }
     requires { valid r (sx + sy) }
@@ -1776,6 +1776,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
     ensures  { max r = old max r }
     ensures  { plength r = old plength r }
     ensures  { value r (sx + sy) = value x sx * value y sy }
+    ensures  { result = (pelts r)[offset r + sx + sy - 1] }
     ensures  { forall j. min r <= j < offset r \/ offset r + sx + sy <= j < max r
                          -> (pelts r)[j] = old (pelts r)[j] }
     variant  { k+k+1 }
@@ -1960,7 +1961,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
             then wmpn_toom22_mul ws !up !un y sy scratch k
             else wmpn_toom32_mul ws !up !un y sy scratch k
           end
-          else wmpn_mul ws y sy !up !un (k-1)
+          else let _ = wmpn_mul ws y sy !up !un (k-1) in ()
         end;
         let cy = wmpn_add_n_in_place !rp ws sy in
         value_sub_frame (pelts r) (pelts o_r) (offset r) (offset r + p2i !ou);
@@ -2075,7 +2076,8 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
       assert { value r (sx + sy) = value x sx * value y sy
                by value r (sx + sy) = value r (sx + sy) at JoinL
                 = value r (sx + sy) at JoinR }
-    end
+    end;
+  C.get_ofs r (sx + sy - 1)
         (* sy <= !un <= 2.5 * sy *)
        (* if sy <= !un
         then begin

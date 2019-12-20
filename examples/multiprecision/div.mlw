@@ -29,19 +29,18 @@ module Div
     requires { y > 0 }
     ensures { div (x + y * z) y = (div x y) + z }
   =
-    assert { x + y * z = y * (div (x + y * z) y) + mod (x + y * z) y
+    assert { div (x + y * z) y = (div x y) + z
+             by x + y * z = y * (div (x + y * z) y) + mod (x + y * z) y
              so mod (x + y * z) y = mod (y * z + x) y = mod x y
              so x + y * z = y * (div (x + y * z) y) + mod x y
-             so
-             x = y * div x y + mod x y
+             so x = y * div x y + mod x y
              so x + y * z = y * div x y + mod x y + y * z
              so y * (div (x + y * z) y) + mod x y
                 = y * div x y + mod x y + y * z
              so y * (div (x + y * z) y) = y * div x y + y * z
                                         = y * ((div x y) + z)
              so y <> 0
-             so div (x + y * z) y = div x y + z
-           }
+             so div (x + y * z) y = div x y + z }
 
   let invert_limb (d:limb) : limb
     requires { d >= div radix 2 }

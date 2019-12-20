@@ -509,7 +509,7 @@ module Sqrt
                   = n0 + power radix l * value onpl h
                     + power radix l * (power radix h * c) };
       let npn = C.incr_split np n in
-      wmpn_mul npn sp l sp l 64;
+      let ghost _ = wmpn_mul npn sp l sp l 64 in
       let ll = 2 * l in
       assert { value npn ll + power radix ll * q = dq * dq
                by 0 <= q <= 1 so q * q = q

@@ -39,6 +39,11 @@ module mach.int.Int32
   syntax val (>)     "%1 > %2"   prec 6 6 5
 end
 
+module mach.int.Int32GMP
+
+  syntax val bxor    "%1 ^ %2"   prec 9 9 8
+
+end
 module mach.int.UInt32Gen
 
   syntax type uint32 "uint32_t"

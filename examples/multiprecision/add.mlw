@@ -333,7 +333,7 @@ module Add
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_ry (*[@extraction:inline]*) (x:ptr limb) (sx:int32)
+  let add_ry [@extraction:inline] (x:ptr limb) (sx:int32)
                                   (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sx }

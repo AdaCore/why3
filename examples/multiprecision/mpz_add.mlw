@@ -3,11 +3,12 @@ module Zadd
 use int.Int
 use int.Power
 use map.Map
-use mach.int.Int32
+use mach.int.Int32GMP
 use ref.Ref
 use mach.c.C
 use lemmas.Lemmas
 use util.Util
+use ptralias.Alias
 use compare.Compare
 use import mach.int.UInt64GMP as Limb
 use add.Add
@@ -16,7 +17,7 @@ use int.Abs
 use mpz.Z
 
 let wmpz_add (w u v: mpz_ptr) : unit
-  requires { mpz.alloc[w] >= 1 }
+  requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 /\ mpz.alloc[v] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
   requires { mpz.abs_size[u] < max_int32 /\ mpz.abs_size[v] < max_int32 }
   ensures  { value_of w mpz = old (value_of u mpz + value_of v mpz) }
@@ -35,6 +36,7 @@ let wmpz_add (w u v: mpz_ptr) : unit
     ensures { abs_vsize <= abs_usize < max_int32 }
     ensures { 0 <= abs_vsize <= mpz.alloc[v] }
     ensures { 0 <= abs_usize <= mpz.alloc[u] }
+    ensures { mpz.alloc[u] > 0 /\ mpz.alloc[v] > 0 }
     ensures { mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
     ensures { abs_usize * mpz.sgn[u] = usize /\
               abs_vsize * mpz.sgn[v] = vsize }
@@ -58,14 +60,12 @@ let wmpz_add (w u v: mpz_ptr) : unit
   let vw = mpz_eq v w in
   label Realloc in
   let ompz = pure { mpz } in
-  let wp = mpz_realloc w wsize in
+  let wp = wmpz_realloc w wsize in
   assert { uw \/ mpz_unchanged u mpz ompz };
   assert { vw \/ mpz_unchanged v mpz ompz };
   assert { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) };
-  (* TODO remplacer par usize ^ vsize < 0 *)
   label Op in
-  if ((Int32.(>) usize 0 && Int32.(<) vsize 0)
-     || (Int32.(>) vsize 0 && Int32.(<) usize 0))
+  if (bxor usize vsize < 0)
   then begin
       ensures { sgn_value wp wsize
                 = (value_of u mpz + value_of v mpz) at Op }
@@ -76,14 +76,18 @@ let wmpz_add (w u v: mpz_ptr) : unit
       ensures { abs wsize <= plength wp }
       ensures { wsize <> 0 ->
                 value wp (abs wsize) >= power radix (abs wsize - 1) }
+      ensures { mpz.alloc[u] > 0 /\ mpz.alloc[v] > 0 }
       ensures { min wp = old min wp /\ max wp = old max wp
                 /\ plength wp = old plength wp }
+    assert { (usize >= 0 /\ vsize < 0)
+             \/ (usize < 0 /\ vsize >= 0) };
     if abs_usize <> abs_vsize
     then begin
       begin ensures { value wp abs_usize
                       = old (mpz.abs_value_of[u] - mpz.abs_value_of[v]) }
             ensures { uw \/ mpz.readers[u] = 0 }
             ensures { vw \/ mpz.readers[v] = 0 }
+            ensures { mpz.alloc[u] > 0 /\ mpz.alloc[v] > 0 }
             ensures { mpz.readers[w] = -1 }
             ensures { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) }
             ensures { min wp = old min wp /\ max wp = old max wp
@@ -112,7 +116,17 @@ let wmpz_add (w u v: mpz_ptr) : unit
       end;
       wsize <- abs_usize;
       normalize wp wsize;
-      if usize < 0 then wsize <- -wsize
+      if usize < 0 then wsize <- -wsize;
+      assert { sgn_value wp wsize = old (value_of u mpz + value_of v mpz)
+               by if usize < 0
+               then sgn_value wp wsize = - value wp (-wsize)
+                    = - old (mpz.abs_value_of[u] - mpz.abs_value_of[v])
+                    = old (value_of u mpz + value_of v mpz)
+                    by vsize >= 0
+               else sgn_value wp wsize = value wp wsize
+                    = old (mpz.abs_value_of[u] - mpz.abs_value_of[v])
+                    = old (value_of u mpz + value_of v mpz)
+                    by vsize < 0 }
     end
     else begin
       wsize <- abs_usize;
@@ -171,6 +185,8 @@ let wmpz_add (w u v: mpz_ptr) : unit
     end
   end
   else begin
+    assert { (usize >= 0 /\ vsize >= 0)
+             \/ (usize < 0 /\ vsize < 0) };
     let ref cy = 0 in
     begin ensures { value wp wsize = old abs (value_of u mpz + value_of v mpz) }
           ensures { uw \/ mpz.readers[u] = 0 }
@@ -288,7 +304,7 @@ use add_1.Add_1
 use sub_1.Sub_1
 
 let wmpz_add_ui (w u: mpz_ptr) (v: uint64) : unit
-  requires { mpz.alloc[w] >= 1 }
+  requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 }
   requires { mpz.abs_size[u] < max_int32 }
   ensures  { value_of w mpz = old (value_of u mpz + v) }
@@ -312,7 +328,7 @@ let wmpz_add_ui (w u: mpz_ptr) (v: uint64) : unit
   let uw = mpz_eq u w in
   let ref wsize = abs_usize + 1 in
   let ghost ompz = pure { mpz } in
-  let wp = mpz_realloc w wsize in
+  let wp = wmpz_realloc w wsize in
   assert { uw \/ mpz_unchanged u mpz ompz };
   assert { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) };
   let ref cy = 0 in

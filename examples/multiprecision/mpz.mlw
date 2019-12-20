@@ -50,12 +50,24 @@ function sgn_value (p:ptr limb) (sz:int32) : int
   = if sz >= 0 then value p sz else - value p (- sz)
 
 predicate mpz_unchanged (x: mpz_ptr) (memo1 memo2: mpz_memo)
-  = memo1.abs_value_of[x] = memo2.abs_value_of[x]
+  = memo2.alloc[x] > 0 ->
+    (memo1.abs_value_of[x] = memo2.abs_value_of[x]
     /\ memo1.alloc[x] = memo2.alloc[x]
     /\ memo1.abs_size[x] = memo2.abs_size[x]
     /\ memo1.sgn[x] = memo2.sgn[x]
     /\ memo1.readers[x] = memo2.readers[x]
-    /\ memo1.zones[x] = memo2.zones[x]
+    /\ memo1.zones[x] = memo2.zones[x])
+
+let ghost unchanged (x:mpz_ptr) (memo1 memo2: mpz_memo) : unit
+  requires { mpz_unchanged x memo1 memo2 }
+  requires { memo2.alloc[x] > 0 }
+  ensures  { memo1.abs_value_of[x] = memo2.abs_value_of[x]
+    /\ memo1.alloc[x] = memo2.alloc[x]
+    /\ memo1.abs_size[x] = memo2.abs_size[x]
+    /\ memo1.sgn[x] = memo2.sgn[x]
+    /\ memo1.readers[x] = memo2.readers[x]
+    /\ memo1.zones[x] = memo2.zones[x] }
+= ()
 
 lemma unchanged_transitive:
   forall x m1 m2 m3. mpz_unchanged x m1 m2 -> mpz_unchanged x m2 m3
@@ -64,6 +76,9 @@ lemma unchanged_transitive:
 (* SIZ mpz macro *)
 val size_of (x: mpz_ptr) : int32
   ensures { result = mpz.sgn[x] * mpz.abs_size[x] }
+
+val alloc_of (x: mpz_ptr) : int32
+  ensures { result = mpz.alloc[x] }
 
 let abs [@extraction:inline] (x:int32) : int32
   requires { x > min_int32 }
@@ -128,20 +143,17 @@ val set_ptr (x:mpz_ptr) (p:ptr limb) : unit
   requires { min p = 0 }
   requires { max p = plength p }
   requires { plength p = mpz.alloc[x] }
-  writes   { p }
-  writes   { p.data }    (* FIXME resets p *)
   writes   { mpz.abs_value_of }
   writes   { mpz.zones }
+  writes   { mpz.readers }
   ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
   ensures  { mpz.abs_value_of[x] = value p (mpz.abs_size[x]) }
+  ensures  { mpz.readers[x] = -1 }
   ensures  { mpz.zones[x] = zone p }
   ensures  { min p = 0 }
   ensures  { max p = plength p }
   ensures  { plength p = old plength p }
   ensures  { pelts p = old pelts p }
-
-val ghost alloc_of (x: mpz_ptr) : int
-  ensures { result = mpz.alloc[x] }
 
 val ghost value_of (x: mpz_ptr) : int
   ensures { result = mpz.sgn[x] * mpz.abs_value_of[x] }
@@ -194,9 +206,10 @@ val release_writer (x: mpz_ptr) (p:ptr limb) : unit
 
 val partial wmpz_init () : mpz_ptr
   writes  { mpz }
-  ensures { forall x. old mpz.alloc[result] > 0 -> result <> x }
+  ensures { forall x. old mpz.alloc[x] > 0 -> result <> x }
           (*result is fresh*)
-  ensures { forall x. x <> result -> mpz_unchanged x mpz (old mpz) }
+  ensures { forall x. old mpz.alloc[x] > 0 ->
+                      mpz_unchanged x mpz (old mpz) } (* FIXME *)
   ensures { mpz.readers[result] = 0 }
   ensures { mpz.abs_value_of[result] = 0 }
   ensures { mpz.abs_size[result] = 0 }
@@ -209,7 +222,7 @@ val wmpz_clear (x:mpz_ptr) : unit (* scrambles mpz._[x] *)
   requires { mpz.readers[x] = 0 }
   ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
 
-let partial mpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
+let partial wmpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
   requires { 1 <= sz } (* GMP does sz = max (sz,1) instead, do that if needed *)
   requires { mpz.readers[x] = 0 }
   requires { 1 <= mpz.alloc[x] }

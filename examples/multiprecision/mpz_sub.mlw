@@ -3,7 +3,7 @@ module Zsub
 use int.Int
 use int.Power
 use map.Map
-use mach.int.Int32
+use mach.int.Int32GMP
 use ref.Ref
 use mach.c.C
 use lemmas.Lemmas
@@ -16,7 +16,7 @@ use int.Abs
 use mpz.Z
 
 let wmpz_sub (w u v: mpz_ptr) : unit
-  requires { mpz.alloc[w] >= 1 }
+  requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 /\ mpz.alloc[v] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
   requires { mpz.abs_size[u] < max_int32 /\ mpz.abs_size[v] < max_int32 }
   ensures  { value_of w mpz = old (value_of u mpz - value_of v mpz) }
@@ -31,6 +31,7 @@ let wmpz_sub (w u v: mpz_ptr) : unit
   if (mpz_eq u v) then begin set_size_0 w; return end;
   let ref usize = size_of u in
   let ref vsize = - (size_of v) in
+  assert { vsize >= 0 <-> value_of v mpz <= 0 };
   let ref abs_usize = abs usize in
   let ref abs_vsize = abs vsize in
   let ghost ref swapped = false in
@@ -39,14 +40,15 @@ let wmpz_sub (w u v: mpz_ptr) : unit
     ensures { abs_vsize <= abs_usize < max_int32 }
     ensures { 0 <= abs_vsize <= mpz.alloc[v] }
     ensures { 0 <= abs_usize <= mpz.alloc[u] }
+    ensures { mpz.alloc[u] > 0 /\ mpz.alloc[v] > 0 }
     ensures { mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
     ensures { swapped <-> old abs_usize < old abs_vsize }
     ensures { swapped ->
-                abs_usize * mpz.sgn[u] = - usize /\
-                abs_vsize * mpz.sgn[v] = vsize }
+                abs_usize * (old mpz).sgn[u] = - usize /\
+                abs_vsize * (old mpz).sgn[v] = vsize }
     ensures { not swapped ->
-                abs_usize * mpz.sgn[u] = usize /\
-                abs_vsize * mpz.sgn[v] = - vsize }
+                abs_usize * (old mpz).sgn[u] = usize /\
+                abs_vsize * (old mpz).sgn[v] = - vsize }
     ensures { swapped -> - value_of u mpz + value_of v mpz
               = old (value_of u mpz - value_of v mpz) }
     ensures { not swapped -> value_of u mpz - value_of v mpz
@@ -73,14 +75,12 @@ let wmpz_sub (w u v: mpz_ptr) : unit
   let vw = mpz_eq v w in
   label Realloc in
   let ompz = pure { mpz } in
-  let wp = mpz_realloc w wsize in
+  let wp = wmpz_realloc w wsize in
   assert { uw \/ mpz_unchanged u mpz ompz };
   assert { vw \/ mpz_unchanged v mpz ompz };
   assert { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) };
-  (* TODO remplacer par usize ^ vsize < 0 *)
   label Op in
-  if ((Int32.(>) usize 0 && Int32.(<) vsize 0)
-     || (Int32.(>) vsize 0 && Int32.(<) usize 0))
+  if (bxor usize vsize < 0)
   then begin
      ensures { value wp (abs wsize)
                = old (abs(mpz.abs_value_of[u] - mpz.abs_value_of[v])) }
@@ -95,6 +95,8 @@ let wmpz_sub (w u v: mpz_ptr) : unit
                value wp (abs wsize) >= power radix (abs wsize - 1) }
      ensures { min wp = old min wp /\ max wp = old max wp
                /\ plength wp = old plength wp }
+    assert { (usize >= 0 /\ vsize < 0)
+             \/ (usize < 0 /\ vsize >= 0) };
     if abs_usize <> abs_vsize
     then begin
       begin ensures { value wp abs_usize
@@ -130,6 +132,31 @@ let wmpz_sub (w u v: mpz_ptr) : unit
       wsize <- abs_usize;
       normalize wp wsize;
       if usize < 0 then wsize <- -wsize;
+      assert { sgn_value wp wsize =
+               (value_of ou mpz - value_of ov mpz) at Start
+               by if swapped
+               then (value_of ou mpz - value_of ov mpz) at Start
+                    = (- value_of u mpz + value_of v mpz) at Start
+                 so if usize < 0
+                    then vsize >= 0
+                         so sgn_value wp wsize
+                         = - value wp abs_usize
+                         = - value_of u mpz + value_of v mpz at Start
+                    else vsize < 0
+                         so sgn_value wp wsize
+                         = value wp abs_usize
+                         = - value_of u mpz + value_of v mpz at Start
+               else (value_of ou mpz - value_of ov mpz) at Start
+                    = (value_of u mpz - value_of v mpz) at Start
+                 so if usize < 0
+                    then vsize >= 0
+                         so sgn_value wp wsize
+                         = - value wp abs_usize
+                         = value_of u mpz - value_of v mpz at Start
+                    else vsize < 0
+                         so sgn_value wp wsize
+                         = value wp abs_usize
+                         = value_of u mpz - value_of v mpz at Start };
     end
     else begin
       wsize <- abs_usize;
@@ -194,6 +221,8 @@ let wmpz_sub (w u v: mpz_ptr) : unit
     end
   end
   else begin
+    assert { (usize >= 0 /\ vsize >= 0)
+             \/ (usize < 0 /\ vsize < 0) };
     let ref cy = 0 in
     begin
           ensures { value wp (abs wsize)
@@ -267,7 +296,18 @@ let wmpz_sub (w u v: mpz_ptr) : unit
       assert { sgn_value wp wsize = value wp wsize
                = abs (value_of ou mpz - value_of ov mpz) at Start
                = (value_of ou mpz - value_of ov mpz) at Start
-               by usize >= 0 so vsize >= 0 }
+               by usize >= 0 so vsize >= 0
+               so if swapped
+                  then value_of u mpz at Start <= 0
+                       /\ value_of v mpz at Start >= 0
+                  so (value_of ou mpz - value_of ov mpz) at Start
+                     = - (value_of u mpz - value_of v mpz) at Start
+                     >= 0
+                  else value_of u mpz at Start >= 0
+                       /\ value_of v mpz at Start <= 0
+                  so (value_of ou mpz - value_of ov mpz) at Start
+                     = (value_of u mpz - value_of v mpz) at Start
+                     >= 0 };
     end;
     assert { sgn_value wp wsize = (value_of ou mpz - value_of ov mpz) at Start }
   end;
@@ -280,7 +320,7 @@ use add_1.Add_1
 use sub_1.Sub_1
 
 let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
-  requires { mpz.alloc[w] >= 1 }
+  requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 }
   requires { mpz.abs_size[u] < max_int32 }
   ensures  { value_of w mpz = old (value_of u mpz - v) }
@@ -304,7 +344,7 @@ let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
   let uw = mpz_eq u w in
   let ref wsize = abs_usize + 1 in
   let ghost ompz = pure { mpz } in
-  let wp = mpz_realloc w wsize in
+  let wp = wmpz_realloc w wsize in
   assert { uw \/ mpz_unchanged u mpz ompz };
   assert { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) };
   let ref cy = 0 in
@@ -458,7 +498,7 @@ let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
 
 
 let wmpz_ui_sub (w: mpz_ptr) (uval: uint64) (v:mpz_ptr) : unit
-  requires { mpz.alloc[w] >= 1 }
+  requires { mpz.alloc[w] >= 1 /\ mpz.alloc[v] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[v] = 0 }
   requires { mpz.abs_size[v] < max_int32 }
   ensures  { value_of w mpz = old (uval - value_of v mpz) }
@@ -469,14 +509,16 @@ let wmpz_ui_sub (w: mpz_ptr) (uval: uint64) (v:mpz_ptr) : unit
   let ref vsize = size_of v in
   let ref wsize = 0 in
   let vw = mpz_eq v w in
+  let ompz = pure { mpz } in
   if vsize > 1
   then begin
-    let wp = mpz_realloc w vsize in
+    let wp = wmpz_realloc w vsize in
     if vw
     then begin
       let ghost _b = wmpn_sub_1_in_place wp vsize uval in
       assert { _b = 0 };
     end else begin
+      unchanged v mpz ompz;
       let vp = get_read_ptr v in
       assert { mpz.abs_size[v] = vsize };
       let ghost _b = wmpn_sub_1 wp vp vsize uval in
@@ -576,7 +618,7 @@ let wmpz_ui_sub (w: mpz_ptr) (uval: uint64) (v:mpz_ptr) : unit
     assert { vsize < 0 };
     label Opp in
     vsize <- -vsize;
-    let wp = mpz_realloc w (vsize+1) in
+    let wp = wmpz_realloc w (vsize+1) in
     if vw
     then begin
       let cy = wmpn_add_1_in_place wp vsize uval in
@@ -604,6 +646,7 @@ let wmpz_ui_sub (w: mpz_ptr) (uval: uint64) (v:mpz_ptr) : unit
                        so value wp (abs wsize) = uval + mpz.abs_value_of[v]
                           >= power radix (vsize - 1) };
     end else begin
+      unchanged v mpz ompz;
       let vp = get_read_ptr v in
       assert { vsize = mpz.abs_size[v] };
       let cy = wmpn_add_1 wp vp vsize uval in
