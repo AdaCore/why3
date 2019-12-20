@@ -92,71 +92,70 @@ end
 
 module ptralias.Alias
 
-  interface "
-struct __open_sep_result
-{ uint64_t *__field_0;
-  uint64_t *__field_1;
-  uint64_t *__field_2;
-};
-
-struct __open_rx_result
-{ uint64_t *__field_0;
-  uint64_t *__field_1;
-  uint64_t *__field_2;
-};
-
-struct __open_ry_result
-{ uint64_t *__field_0;
-  uint64_t *__field_1;
-  uint64_t *__field_2;
-};
-
-struct __open_rxy_result
-{ uint64_t *__field_0;
-  uint64_t *__field_1;
-  uint64_t *__field_2;
-};
-
-static inline struct __open_sep_result
-open_sep (uint64_t * r, uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)
-{
-  struct __open_sep_result result;
-  result.__field_0 = r;
-  result.__field_1 = x;
-  result.__field_2 = y;
-  return result;
-}
-
-
-static inline struct __open_rx_result
-open_rx (uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)
-{
-  struct __open_rx_result result;
-  result.__field_0 = x;
-  result.__field_1 = x;
-  result.__field_2 = y;
-  return result;
-}
-
-static inline struct __open_ry_result
-open_ry (uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)
-{
-  struct __open_ry_result result;
-  result.__field_0 = y;
-  result.__field_1 = x;
-  result.__field_2 = y;
-  return result;
-}
-
-static inline struct __open_rxy_result
-open_rxy (uint64_t * x, int32_t sx)
-{
-  struct __open_rxy_result result;
-  result.__field_0 = x;
-  result.__field_1 = x;
-  result.__field_2 = x;
-  return result;
-}
+  interface "\n\
+struct __open_sep_result\n\
+{ uint64_t *__field_0;\n\
+  uint64_t *__field_1;\n\
+  uint64_t *__field_2;\n\
+};\n\
+\n\
+struct __open_rx_result\n\
+{ uint64_t *__field_0;\n\
+  uint64_t *__field_1;\n\
+  uint64_t *__field_2;\n\
+};\n\
+\n\
+struct __open_ry_result\n\
+{ uint64_t *__field_0;\n\
+  uint64_t *__field_1;\n\
+  uint64_t *__field_2;\n\
+};\n\
+\n\
+struct __open_rxy_result\n\
+{ uint64_t *__field_0;\n\
+  uint64_t *__field_1;\n\
+  uint64_t *__field_2;\n\
+};\n\
+\n\
+static inline struct __open_sep_result\n\
+open_sep (uint64_t * r, uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)\n\
+{\n\
+  struct __open_sep_result result;\n\
+  result.__field_0 = r;\n\
+  result.__field_1 = x;\n\
+  result.__field_2 = y;\n\
+  return result;\n\
+}\n\
+\n\
+static inline struct __open_rx_result\n\
+open_rx (uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)\n\
+{\n\
+  struct __open_rx_result result;\n\
+  result.__field_0 = x;\n\
+  result.__field_1 = x;\n\
+  result.__field_2 = y;\n\
+  return result;\n\
+}\n\
+\n\
+static inline struct __open_ry_result\n\
+open_ry (uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)\n\
+{\n\
+  struct __open_ry_result result;\n\
+  result.__field_0 = y;\n\
+  result.__field_1 = x;\n\
+  result.__field_2 = y;\n\
+  return result;\n\
+}\n\
+\n\
+static inline struct __open_rxy_result\n\
+open_rxy (uint64_t * x, int32_t sx)\n\
+{\n\
+  struct __open_rxy_result result;\n\
+  result.__field_0 = x;\n\
+  result.__field_1 = x;\n\
+  result.__field_2 = x;\n\
+  return result;\n\
+}\n\
 "
 
   syntax val open_sep "open_sep"
@@ -172,51 +171,50 @@ end
 
 module mpz.Z
 
-prelude "
-typedef struct
-{
-  int _alloc;
-  int _size;
-  uint64_t * _ptr;
-} __mpz_struct;
+prelude "\n\
+typedef struct\n\
+{\n\
+  int _alloc;\n\
+  int _size;\n\
+  uint64_t * _ptr;\n\
+} __mpz_struct;\n\
+\n\
+typedef __mpz_struct *mpz_ptr;\n\
+\n\
+#define SIZ(x) ((x)->_size)\n\
+#define ALLOC(x) ((x)->_alloc)\n\
+#define PTR(x) ((x)->_ptr)\n\
+\n\
+mpz_ptr wmpz_init () {\n\
+  mpz_ptr x = malloc(sizeof(__mpz_struct));\n\
+  ALLOC(x) = 1;\n\
+  SIZ(x) = 0;\n\
+  PTR(x) = malloc(1);\n\
+  PTR(x)[0] = 0;\n\
+  return x;\n\
+}\n\
+\n\
+void wmpz_clear (mpz_ptr x)\n\
+{\n\
+  free (PTR(x));\n\
+}"
 
-typedef __mpz_struct *mpz_ptr;
-
-#define SIZ(x) ((x)->_size)
-#define ALLOC(x) ((x)->_alloc)
-#define PTR(x) ((x)->_ptr)
-
-mpz_ptr wmpz_init () {
-  mpz_ptr x;
-  ALLOC(x) = 1;
-  SIZ(x) = 0;
-  PTR(x) = malloc(1);
-  PTR(x)[0] = 0;
-  return x;
-}
-
-void wmpz_clear (mpz_ptr x)
-{
-  free (PTR(x));
-}
-"
-
-interface "
-typedef struct
-{
-  int _alloc;
-  int _size;
-  uint64_t * _ptr;
-} __mpz_struct;
-
-typedef __mpz_struct *mpz_ptr;
-
-#define SIZ(x) ((x)->_size)
-#define ALLOC(x) ((x)->_alloc)
-#define PTR(x) ((x)->_ptr)
-
-mpz_ptr wmpz_init ();
-void wmpz_clear (mpz_ptr x);
+interface "\n\
+typedef struct\n\
+{\n\
+  int _alloc;\n\
+  int _size;\n\
+  uint64_t * _ptr;\n\
+} __mpz_struct;\n\
+\n\
+typedef __mpz_struct *mpz_ptr;\n\
+\n\
+#define SIZ(x) ((x)->_size)\n\
+#define ALLOC(x) ((x)->_alloc)\n\
+#define PTR(x) ((x)->_ptr)\n\
+\n\
+mpz_ptr wmpz_init ();\n\
+void wmpz_clear (mpz_ptr x);\n\
 "
 
   syntax type mpz_ptr "mpz_ptr"

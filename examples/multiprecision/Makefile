@@ -48,7 +48,7 @@ build/binverttab.h: binverttab.ml
 
 extract: build/extracted build/sqrtinit.h build/binverttab.h
 
-CFILES = build/uint64gmp.c build/z.c build/zadd.c build/zsub.c build/set.c build/powm.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/mul.c build/subold.c build/sub.c build/sub_1.c build/addold.c build/add.c build/add_1.c build/compare.c build/util.c build/int32.c
+CFILES = build/uint64gmp.c build/z.c build/zadd.c build/zsub.c build/zmul.c build/set.c build/powm.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/mul.c build/subold.c build/sub.c build/sub_1.c build/addold.c build/add.c build/add_1.c build/compare.c build/util.c build/int32.c
 
 build/tests: tests.c extract
 	gcc $(CFLAGS) tests.c $(CFILES) -Irandom -lgmp -o build/tests
