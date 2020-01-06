@@ -288,4 +288,114 @@ let wmpz_mul (w u v: mpz_ptr) : unit
   assert { mpz.readers[u] = 0 /\ mpz.readers[v] = 0 };
   return ()
 
+use mach.int.Int64
+use mpz_getset.Set
+use bool.Bool
+
+let wmpz_mul_si (prod mult: mpz_ptr) (small_mult:int64)
+  requires { mpz.alloc[prod] >= 1 /\ mpz.alloc[mult] >= 1 }
+  requires { mpz.readers[prod] = 0 /\ mpz.readers[mult] = 0 }
+  requires { mpz.abs_size[mult] + 1 <= max_int32 }
+  ensures  { value_of prod mpz = old (value_of mult mpz * small_mult) }
+  ensures  { forall x. x <> prod -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[prod] = 0 /\ mpz.readers[mult] = 0 }
+=
+  label Start in
+  let sign_product = size_of mult in
+  if (sign_product = 0 || small_mult = 0)
+  then begin
+    set_size_0 prod;
+    return
+  end;
+  let ref size = abs sign_product in
+  let sml = abs_cast small_mult in
+  let ghost mpz' = pure { mpz } in
+  let pp = wmpz_realloc prod (size+1) in
+  label Mult in
+  let cy = if (mpz_eq prod mult)
+           then
+              wmpn_mul_1_in_place pp size sml
+           else begin
+              unchanged mult mpz mpz';
+              let mp = get_read_ptr mult in
+              let cy = wmpn_mul_1 pp mp size sml in
+              release_reader mult mp; cy end in
+  value_sub_update_no_change (pelts pp) (int32'int size)
+                                        0 (int32'int size) cy;
+  C.set_ofs pp size cy;
+  value_tail pp size;
+  assert { value pp (size + 1) = mpz.abs_value_of[mult] * sml at Start };
+  size <- size + (if cy <> 0 then 1 else 0);
+  assert { value pp size = mpz.abs_value_of[mult] * sml at Start };
+  assert { value pp size >= power radix (size - 1)
+           by if cy <> 0
+              then
+                value pp size
+                >= power radix (size at Mult) * cy
+                >= power radix (size at Mult)
+                so size at Mult = size - 1
+              else
+                value pp size
+                = mpz.abs_value_of[mult] * sml at Start
+                >= mpz.abs_value_of[mult]
+                >= power radix (abs sign_product - 1)
+                so abs sign_product = size };
+  size <- if (xorb (sign_product < 0) (small_mult < 0)) then -size else size;;
+  assert { sgn_value pp size = value_of mult mpz * small_mult at Start };
+  set_size prod size pp;
+  release_writer prod pp
+
+
+let wmpz_mul_ui (prod mult: mpz_ptr) (small_mult:uint64)
+  requires { mpz.alloc[prod] >= 1 /\ mpz.alloc[mult] >= 1 }
+  requires { mpz.readers[prod] = 0 /\ mpz.readers[mult] = 0 }
+  requires { mpz.abs_size[mult] + 1 <= max_int32 }
+  ensures  { value_of prod mpz = old (value_of mult mpz * small_mult) }
+  ensures  { forall x. x <> prod -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[prod] = 0 /\ mpz.readers[mult] = 0 }
+=
+  label Start in
+  let sign_product = size_of mult in
+  if (sign_product = 0 || small_mult = 0)
+  then begin
+    set_size_0 prod;
+    return
+  end;
+  let ref size = abs sign_product in
+  let ghost mpz' = pure { mpz } in
+  let pp = wmpz_realloc prod (size+1) in
+  label Mult in
+  let cy = if (mpz_eq prod mult)
+           then
+              wmpn_mul_1_in_place pp size small_mult
+           else begin
+              unchanged mult mpz mpz';
+              let mp = get_read_ptr mult in
+              let cy = wmpn_mul_1 pp mp size small_mult in
+              release_reader mult mp; cy end in
+  value_sub_update_no_change (pelts pp) (int32'int size)
+                                        0 (int32'int size) cy;
+  C.set_ofs pp size cy;
+  value_tail pp size;
+  assert { value pp (size + 1) = mpz.abs_value_of[mult] * small_mult at Start };
+  size <- size + (if cy <> 0 then 1 else 0);
+  assert { value pp size = mpz.abs_value_of[mult] * small_mult at Start };
+  assert { value pp size >= power radix (size - 1)
+           by if cy <> 0
+              then
+                value pp size
+                >= power radix (size at Mult) * cy
+                >= power radix (size at Mult)
+                so size at Mult = size - 1
+              else
+                value pp size
+                = mpz.abs_value_of[mult] * small_mult at Start
+                >= mpz.abs_value_of[mult]
+                >= power radix (abs sign_product - 1)
+                so abs sign_product = size };
+  size <- if (sign_product < 0) then -size else size;;
+  assert { sgn_value pp size = value_of mult mpz * small_mult at Start };
+  set_size prod size pp;
+  release_writer prod pp
+  
 end

@@ -450,6 +450,16 @@ module mach.array.Array32
 
 end
 
+module bool.Bool
+
+  (* FIXME: use bitwise operators instead ? *)
+  syntax val orb  "%1 || %2" prec 12 12 11
+  syntax val andb "%1 && %2" prec 11 11 10
+  syntax val xorb "%1 ^ %2" prec 9 9 8 (* ? *)
+  syntax val notb "!%1" prec 2 2 1
+
+end
+
 module mach.c.C
 
   prelude
@@ -462,7 +472,7 @@ module mach.c.C
   "#define IGNORE3(x,y,z) do { (void)(x); (void)(y); (void)(z); } while (0)"
 
   syntax type ptr "%1 *"
-  syntax type bool "int" (* ? *)
+  syntax type bool "int"
 
   syntax val malloc "malloc(%1 * sizeof(%v0))" prec 1 3
   syntax val free   "free(%1)" prec 1 15
