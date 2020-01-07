@@ -453,9 +453,11 @@ end
 module bool.Bool
 
   (* FIXME: use bitwise operators instead ? *)
-  syntax val orb  "%1 || %2" prec 12 12 11
-  syntax val andb "%1 && %2" prec 11 11 10
-  syntax val xorb "%1 ^ %2" prec 9 9 8 (* ? *)
+  (* requiring higher-than-needed precedence for arguments
+     avoids Wparentheses *)
+  syntax val orb  "%1 || %2" prec 12 5 5
+  syntax val andb "%1 && %2" prec 11 5 5
+  syntax val xorb "%1 ^ %2" prec 9 5 5
   syntax val notb "!%1" prec 2 2 1
 
 end

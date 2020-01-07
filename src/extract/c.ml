@@ -1270,11 +1270,13 @@ module MLToC = struct
         (fun (bs,rs) (xs, pvsl, r) ->
           let id = xs.xs_name in
           match pvsl, r.e_node with
-          | [pv], Mltree.Evar pv'
-            when pv_equal pv pv' && env.computes_return_value ->
-            (bs, Sid.add id rs)
           | [], (Eblock []) when is_unit r.e_ity && is_while ->
-            (Sid.add id bs, rs)
+             (Sid.add id bs, rs)
+          | [pv], Mltree.Evar pv'
+             when pv_equal pv pv' && env.computes_return_value ->
+             (bs, Sid.add id rs)
+          | [], Mltree.Eblock [] when env.computes_return_value ->
+             (bs, Sid.add id rs)
           |_ -> raise (Unsupported "non break/return exception in try"))
         (Sid.empty, env.returns) xl
       in
@@ -1291,6 +1293,10 @@ module MLToC = struct
     | Eraise (xs, Some r) when Sid.mem xs.xs_name env.returns ->
       Debug.dprintf debug_c_extraction "RETURN@.";
       expr info {env with computes_return_value = true} r
+    | Eraise (xs, None)
+         when Sid.mem xs.xs_name env.returns &&
+                ity_equal Ity.ity_unit env.current_function.rs_cty.cty_result
+      -> ([], C.Sreturn Enothing)
     | Eraise (xs, None) when Sid.mem xs.xs_name env.returns ->
        assert false (* nothing to pass to return *)
     | Eraise _ -> raise (Unsupported "non break/return exception raised")

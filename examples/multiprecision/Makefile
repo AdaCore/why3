@@ -29,7 +29,7 @@ clean:
 why3:
 	make -C ../..
 
-MLWFILES = $(addsuffix .mlw, powm sqrtrem sqrt toom logical div mul sub add compare util)
+MLWFILES = $(addsuffix .mlw, mpz_mul mpz_sub mpz_add mpz_getset mpz powm sqrtrem sqrt toom logical div mul sub add compare util)
 
 build/extracted:
 	mkdir -p build

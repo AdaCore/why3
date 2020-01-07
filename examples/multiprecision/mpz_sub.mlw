@@ -8,6 +8,7 @@ use ref.Ref
 use mach.c.C
 use lemmas.Lemmas
 use util.Util
+use ptralias.Alias
 use compare.Compare
 use import mach.int.UInt64GMP as Limb
 use add.Add
@@ -28,7 +29,7 @@ let wmpz_sub (w u v: mpz_ptr) : unit
   let ghost ov = pure { v } in
   let ref u = u in
   let ref v = v in
-  if (mpz_eq u v) then begin set_size_0 w; return end;
+  if (mpz_eq u v) then begin set_size_0 w; return (); end;
   let ref usize = size_of u in
   let ref vsize = - (size_of v) in
   assert { vsize >= 0 <-> value_of v mpz <= 0 };
@@ -337,7 +338,7 @@ let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
     set_size w (-(if v <> 0 then 1 else 0)) wp;
     assert { value_of w mpz = - v };
     release_writer w wp;
-    return;
+    return ();
   end;
   let abs_usize = abs usize in
   assert { 0 <= abs_usize <= mpz.alloc[u] };
@@ -493,8 +494,7 @@ let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
     end;
   end;
   set_size w wsize wp;
-  release_writer w wp;
-  return
+  release_writer w wp
 
 
 let wmpz_ui_sub (w: mpz_ptr) (uval: uint64) (v:mpz_ptr) : unit

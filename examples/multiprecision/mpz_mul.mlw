@@ -8,6 +8,7 @@ use ref.Ref
 use mach.c.C
 use lemmas.Lemmas
 use util.Util
+use ptralias.Alias
 use compare.Compare
 use import mach.int.UInt64GMP as Limb
 use add.Add
@@ -397,5 +398,5 @@ let wmpz_mul_ui (prod mult: mpz_ptr) (small_mult:uint64)
   assert { sgn_value pp size = value_of mult mpz * small_mult at Start };
   set_size prod size pp;
   release_writer prod pp
-  
+
 end

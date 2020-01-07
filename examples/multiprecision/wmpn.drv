@@ -230,7 +230,7 @@ void wmpz_clear (mpz_ptr x);\n\
   syntax val get_write_ptr "PTR(%1)" prec 1 15
   syntax val release_reader "(void)(%1)" prec 2 15
   syntax val release_writer "(void)(%1)" prec 2 15
-  syntax val wmpz_init "wmpz_init"
-  syntax val wmpz_clear "wmpz_clear"
+  syntax val wmpz_init "wmpz_init()" prec 2
+  syntax val wmpz_clear "wmpz_clear" prec 2
 
 end

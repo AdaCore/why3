@@ -15,12 +15,19 @@
 #define TEST_SQRT1
 #define TEST_SQRTREM
 #define TEST_POWM
+#define TEST_ZADD
+#define TEST_ZSUB
+#define TEST_ZMUL
 #endif
 
 #ifdef TEST_MINIGMP
 #include "mini-gmp.c"
 #else
 #include <gmp.h>
+#define SIZ(x) ((x)->_mp_size)
+#define ABSIZ(x) ABS (SIZ (x))
+#define PTR(x) ((x)->_mp_d)
+#define ALLOC(x) ((x)->_mp_alloc)
 extern void __gmpn_powm (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t,
                       mp_srcptr, mp_size_t, mp_ptr);
 #endif
@@ -38,6 +45,9 @@ extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
 #include "build/sqrt1.h"
 #include "build/sqrt.h"
 #include "build/powm.h"
+#include "build/zadd.h"
+#include "build/zsub.h"
+#include "build/zmul.h"
 #endif
 
 #include "mt19937-64.c"
@@ -65,6 +75,16 @@ void init_valid (mp_ptr ap, mp_ptr bp, mp_size_t an, mp_size_t bn) {
   return;
 }
 
+void init_mpz_1 (mpz_ptr a, mp_size_t an) {
+  mp_ptr ap = mpz_realloc(a, an);
+  for (int i = 0; i < an; i++)
+    ap[i] = genrand64_int64();
+  while (ap[an-1]<1)
+    ap[an-1] = genrand64_int64();
+  SIZ(a) = an;
+  return;
+}
+
 void init_valid_1(mp_ptr ap, mp_size_t an) {
   for (int i = 0; i < an; i++)
     ap[i] = genrand64_int64();
@@ -73,12 +93,30 @@ void init_valid_1(mp_ptr ap, mp_size_t an) {
   return;
 }
 
+void compare_mpz (mpz_ptr u, mpz_ptr v, mpz_ptr w, mpz_ptr refw,
+                  mp_size_t an, mp_size_t bn) {
+  if (SIZ(w) != SIZ(refw) || (mpn_cmp (PTR(w), PTR(refw), SIZ(w))))
+    {
+      printf ("ERROR, an = %d, bn = %d", (int) an, (int) bn);
+      printf ("a: "); mpn_dump (PTR(u), an);
+      printf ("b: "); mpn_dump (PTR(v), bn);
+      printf ("r:   "); mpn_dump (PTR(w), SIZ(w));
+      printf ("ref: "); mpn_dump (PTR(refw), SIZ(refw));
+      abort();
+    }
+}
+
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr, ep, rep, mp, tp;
   mp_size_t max_n, max_add, max_mul, max_toom, max_div, max_sqrt, max_powm,
     an, bn, rn, cn;
+  mpz_t u, v, w, refw;
   int nb, nb_iter;
   double elapsed;
+  mpz_init(u);
+  mpz_init(v);
+  mpz_init(w);
+  mpz_init(refw);
 #ifdef BENCH
   struct timeval begin, end;
 #endif
@@ -127,7 +165,7 @@ int main () {
   for (an = 2; an <= max_add; an += 1)
     {
       for (bn = 1; bn <= an; bn += 1)
-	{
+        {
           elapsed = 0;
           nb_iter = 1000;
           for (int iter = 0; iter != nb_iter; ++iter) {
@@ -161,27 +199,27 @@ int main () {
             printf ("\n"); //for gnuplot
 #endif
 #ifdef COMPARE
-	  rn = an;
-	  if (mpn_cmp (refp, rp, rn))
-	    {
-	      printf ("ERROR, an = %d, bn = %d, rn = %d\n",
-		      (int) an, (int) bn, (int) rn);
-	      printf ("a: "); mpn_dump (ap, an);
-	      printf ("b: "); mpn_dump (bp, bn);
-	      printf ("r:   "); mpn_dump (rp, rn);
-	      printf ("ref: "); mpn_dump (refp, rn);
-	      abort();
-	    }
+          rn = an;
+          if (mpn_cmp (refp, rp, rn))
+            {
+              printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+                      (int) an, (int) bn, (int) rn);
+              printf ("a: "); mpn_dump (ap, an);
+              printf ("b: "); mpn_dump (bp, bn);
+              printf ("r:   "); mpn_dump (rp, rn);
+              printf ("ref: "); mpn_dump (refp, rn);
+              abort();
+            }
           if (c != refc)
-	    {
-	      printf ("ERROR, an = %d, bn = %d, rn = %d\n",
-		      (int) an, (int) bn, (int) rn);
-	      printf ("a: "); mpn_dump (ap, an);
-	      printf ("b: "); mpn_dump (bp, bn);
-	      printf ("c:    %016lx\n", c);
-	      printf ("refc: %016lx\n", refc);
-	      abort();
-	    }
+            {
+              printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+                      (int) an, (int) bn, (int) rn);
+              printf ("a: "); mpn_dump (ap, an);
+              printf ("b: "); mpn_dump (bp, bn);
+              printf ("c:    %016lx\n", c);
+              printf ("refc: %016lx\n", refc);
+              abort();
+            }
 #endif
         }
     }
@@ -196,7 +234,7 @@ int main () {
   for (an = 2; an <= max_mul; an += 1)
     {
       for (bn = 1; bn <= an; bn += 1)
-	{
+        {
           elapsed = 0;
           nb_iter = 500;
           for (int iter = 0; iter != nb_iter; ++iter) {
@@ -229,17 +267,17 @@ int main () {
             printf ("\n"); //for gnuplot
 #endif
 #ifdef COMPARE
-	  rn = an + bn;
-	  if (mpn_cmp (refp, rp, rn))
-	    {
-	      printf ("ERROR, an = %d, bn = %d, rn = %d\n",
-		      (int) an, (int) bn, (int) rn);
-	      printf ("a: "); mpn_dump (ap, an);
-	      printf ("b: "); mpn_dump (bp, bn);
-	      printf ("r:   "); mpn_dump (rp, rn);
-	      printf ("ref: "); mpn_dump (refp, rn);
-	      abort();
-	    }
+          rn = an + bn;
+          if (mpn_cmp (refp, rp, rn))
+            {
+              printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+                      (int) an, (int) bn, (int) rn);
+              printf ("a: "); mpn_dump (ap, an);
+              printf ("b: "); mpn_dump (bp, bn);
+              printf ("r:   "); mpn_dump (rp, rn);
+              printf ("ref: "); mpn_dump (refp, rn);
+              abort();
+            }
 #endif
         }
     }
@@ -316,7 +354,7 @@ int main () {
   for (an = 2; an <= max_div; an += 1)
     {
       for (bn = 1; bn <= an; bn += 1)
-	{
+        {
           elapsed = 0;
           nb_iter = 1000;
           for (int iter = 0; iter != nb_iter; ++iter) {
@@ -357,7 +395,7 @@ int main () {
 #ifdef COMPARE
             rn = bn;
           if (mpn_cmp (refr, rr, rn))
-	    {
+            {
           printf ("ERROR, an = %d, bn = %d, rn = %d\n",
             (int) an, (int) bn, (int) rn);
           printf ("a: "); mpn_dump (ap, an);
@@ -370,7 +408,7 @@ int main () {
         }
           rn = an - bn + 1;
           if (mpn_cmp (refq, rq, rn))
-	    {
+            {
           printf ("ERROR, an = %d, bn = %d, qn = %d\n",
             (int) an, (int) bn, (int) rn);
           printf ("a: "); mpn_dump (ap, an);
@@ -380,7 +418,7 @@ int main () {
           abort();
         }
 #endif
-	}
+        }
         }
 #ifdef COMPARE
   printf ("division ok\n");
@@ -530,7 +568,7 @@ int main () {
   for (an = 2; an <= max_powm; an += 5)
     {
       for (rn = 1; rn <= max_powm; rn += 5)
-	{
+        {
           elapsed = 0;
           nb_iter = 1;
           for (int iter = 0; iter != nb_iter; ++iter) {
@@ -568,7 +606,7 @@ int main () {
 #endif
 #ifdef COMPARE
           if (mpn_cmp (refr, rr, rn))
-	    {
+            {
           printf ("ERROR, an = %d, rn = %d\n",
             (int) an, (int) rn);
           printf ("b: "); mpn_dump (ap, an);
@@ -579,7 +617,7 @@ int main () {
           abort();
         }
 #endif
-	}
+        }
         }
 #ifdef COMPARE
   printf ("powm ok\n");
@@ -587,6 +625,205 @@ int main () {
  skip:
 #endif
 
+#ifdef TEST_ZADD
+#ifdef BENCH
+  printf ("#an bn t(µs)\n");
+#endif
+  for (an = 2; an <= max_add; an += 1)
+    {
+      for (bn = 1; bn <= an; bn += 1)
+        {
+          elapsed = 0;
+          nb_iter = 1000;
+          for (int iter = 0; iter != nb_iter; ++iter) {
+            init_mpz_1 (u, an);
+            init_mpz_1 (v, bn);
+            mpz_realloc (w, an+1);
+            mpz_realloc (refw, an+1);
+            nb = 10000 / an;
+#ifdef BENCH
+            gettimeofday(&begin, NULL);
+            for (int i = 0; i != nb; ++i)
+              {
+#endif
+
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpz_add (refw, u, v);
+#endif
+#ifdef TEST_WHY3
+            wmpz_add (w, u, v);
+#endif
+
+#ifdef BENCH
+              }
+            gettimeofday(&end, NULL);
+            elapsed +=
+            (end.tv_sec - begin.tv_sec) * 1000000.0
+            + (end.tv_usec - begin.tv_usec);
+#endif
+          }
+          elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+          printf ("%ld %ld %g\n", an, bn, elapsed);
+          if (an==bn)
+            printf ("\n"); //for gnuplot
+#endif
+#ifdef COMPARE
+          compare_mpz (u, v, w, refw, an, bn);
+          mpz_add (refw, u, u);
+          wmpz_add (w, u, u);
+          compare_mpz (u, u, w, refw, an, bn);
+          mpz_set(w,u);
+          mpz_set (refw, u);
+          mpz_add (refw, refw, v);
+          wmpz_add (w, w, v);
+          compare_mpz (w,v,w,refw,an,bn);
+          mpz_set(w,v);
+          mpz_set (refw, v);
+          mpz_add (refw, u, refw);
+          wmpz_add (w, u, w);
+          compare_mpz (u,w,w,refw,an,bn);
+#endif
+        }
+    }
+#ifdef COMPARE
+  printf ("mpz addition ok\n");
+#endif
+#endif
+
+
+#ifdef TEST_ZSUB
+#ifdef BENCH
+  printf ("#an bn t(µs)\n");
+#endif
+  for (an = 2; an <= max_add; an += 1)
+    {
+      for (bn = 1; bn <= an; bn += 1)
+        {
+          elapsed = 0;
+          nb_iter = 1000;
+          for (int iter = 0; iter != nb_iter; ++iter) {
+            init_mpz_1 (u, an);
+            init_mpz_1 (v, bn);
+            mpz_realloc (w, an+1);
+            mpz_realloc (refw, an+1);
+            nb = 10000 / an;
+#ifdef BENCH
+            gettimeofday(&begin, NULL);
+            for (int i = 0; i != nb; ++i)
+              {
+#endif
+
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpz_sub (refw, u, v);
+#endif
+#ifdef TEST_WHY3
+            wmpz_sub (w, u, v);
+#endif
+
+#ifdef BENCH
+              }
+            gettimeofday(&end, NULL);
+            elapsed +=
+            (end.tv_sec - begin.tv_sec) * 1000000.0
+            + (end.tv_usec - begin.tv_usec);
+#endif
+          }
+          elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+          printf ("%ld %ld %g\n", an, bn, elapsed);
+          if (an==bn)
+            printf ("\n"); //for gnuplot
+#endif
+#ifdef COMPARE
+          compare_mpz (u, v, w, refw, an, bn);
+          mpz_sub (refw, u, u);
+          wmpz_sub (w, u, u);
+          compare_mpz (u, u, w, refw, an, bn);
+          mpz_set(w,u);
+          mpz_set (refw, u);
+          mpz_sub (refw, refw, v);
+          wmpz_sub (w, w, v);
+          compare_mpz (w,v,w,refw,an,bn);
+          mpz_set(w,v);
+          mpz_set (refw, v);
+          mpz_sub (refw, u, refw);
+          wmpz_sub (w, u, w);
+          compare_mpz (u,w,w,refw,an,bn);
+#endif
+        }
+    }
+#ifdef COMPARE
+  printf ("mpz subtraction ok\n");
+#endif
+#endif
+
+
+#ifdef TEST_ZMUL
+#ifdef BENCH
+  printf ("#an bn t(µs)\n");
+#endif
+  for (an = 2; an <= max_mul; an += 1)
+    {
+      for (bn = 1; bn <= an; bn += 1)
+        {
+          elapsed = 0;
+          nb_iter = 1000;
+          for (int iter = 0; iter != nb_iter; ++iter) {
+            init_mpz_1 (u, an);
+            init_mpz_1 (v, bn);
+            mpz_realloc (w, an+1);
+            mpz_realloc (refw, an+1);
+            nb = 10000 / an;
+#ifdef BENCH
+            gettimeofday(&begin, NULL);
+            for (int i = 0; i != nb; ++i)
+              {
+#endif
+
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpz_mul (refw, u, v);
+#endif
+#ifdef TEST_WHY3
+            wmpz_mul (w, u, v);
+#endif
+
+#ifdef BENCH
+              }
+            gettimeofday(&end, NULL);
+            elapsed +=
+            (end.tv_sec - begin.tv_sec) * 1000000.0
+            + (end.tv_usec - begin.tv_usec);
+#endif
+          }
+          elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+          printf ("%ld %ld %g\n", an, bn, elapsed);
+          if (an==bn)
+            printf ("\n"); //for gnuplot
+#endif
+#ifdef COMPARE
+          compare_mpz (u, v, w, refw, an, bn);
+          mpz_mul (refw, u, u);
+          wmpz_mul (w, u, u);
+          compare_mpz (u, u, w, refw, an, bn);
+          mpz_set(w,u);
+          mpz_set (refw, u);
+          mpz_mul (refw, refw, v);
+          wmpz_mul (w, w, v);
+          compare_mpz (w,v,w,refw,an,bn);
+          mpz_set(w,v);
+          mpz_set (refw, v);
+          mpz_mul (refw, u, refw);
+          wmpz_mul (w, u, w);
+          compare_mpz (u,w,w,refw,an,bn);
+#endif
+        }
+    }
+#ifdef COMPARE
+  printf ("mpz multiplication ok\n");
+#endif
+#endif  
   //TMP_FREE;
   //tests_end ();
   return 0;
