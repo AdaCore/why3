@@ -24,13 +24,14 @@
 #include "mini-gmp.c"
 #else
 #include <gmp.h>
+extern void __gmpn_powm (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t,
+                      mp_srcptr, mp_size_t, mp_ptr);
+#endif
+
 #define SIZ(x) ((x)->_mp_size)
 #define ABSIZ(x) ABS (SIZ (x))
 #define PTR(x) ((x)->_mp_d)
 #define ALLOC(x) ((x)->_mp_alloc)
-extern void __gmpn_powm (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t,
-                      mp_srcptr, mp_size_t, mp_ptr);
-#endif
 
 #ifdef TEST_LIB
 #include "wmp.h"
@@ -823,7 +824,7 @@ int main () {
 #ifdef COMPARE
   printf ("mpz multiplication ok\n");
 #endif
-#endif  
+#endif
   //TMP_FREE;
   //tests_end ();
   return 0;
