@@ -57,6 +57,11 @@ let generate_inv domain =
   | _ (*default*) -> Infer_ai.InvGenPolyhedra.infer_loop_invariants
 
 let run_on_file (widening:int) (domain: string option) (file: string) =
+
+  (* set debug_type_only flag to true, so VCs are not generated before
+     invariants are inferred *)
+  Debug.set_flag Typing.debug_type_only;
+
   (* parse mlw file *)
   let mlw = parse_file file env in
 
