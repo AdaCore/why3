@@ -20,18 +20,23 @@ module Make (D: Domain.DOMAIN) = struct
       end)
     in
 
-    let rec reconstruct_expr cfg context fixp e =
+  type smap = {
+      sm_vs : vsymbol Mvs.t;
+      sm_pv : pvsymbol Mvs.t;
+      (* sm_xs : xsymbol Mxs.t; not needed*)
+      sm_rs : rsymbol Mrs.t;
+    }
+
+
+    let rec reconstruct_expr cfg context fixp sm e =
       let reconstruct = reconstruct_expr cfg context fixp in
       let expl = "expl:loop invariant via abstract interpretation" in
       match e.e_node with
-      | Elet (LDvar (_, e) as ld, e2) ->
-        e_let (let_replace_expr ld (reconstruct e)) (reconstruct e2)
-      | Elet (LDsym _,_) ->
-         Warning.emit "invariants are not yet generated for inner let functions";
-         e
-      | Elet (LDrec _, _) ->
-         Warning.emit "invariants are not yet generated for inner let rec";
-         e
+      | Elet (ld,e2) ->
+         let sm',ld' = reconstruct_let_defn sm ld in
+         let e' = reconstruct sm' e2 in
+         e_let ld' e'
+
       | Evar _ | Econst _ | Eassign _ | Eabsurd | Epure _
       | Eassert _ | Eexec _ -> e
       | Eif (e1, e2, e3) ->
@@ -55,6 +60,21 @@ module Make (D: Domain.DOMAIN) = struct
          let t = Term.t_attr_add (Ident.create_attribute expl) t in
          e_for pv (e_var f) d (e_var to_) pv2 (t :: inv) (reconstruct e_loop)
       | Eexn (xs,e) -> e_exn xs (reconstruct e)
+
+    and reconstruct_let_defn sm ld =
+      match ld with
+      | LDvar (v, e)->
+         let e' = reconstruct_expr sm e in
+         let id = id_clone v.pv_vs.vs_name in
+         let ld, v' = let_var id ~ghost:v.pv_ghost e' in
+         sm_save_pv sm v v', ld
+      | LDsym _ ->
+         Warning.emit "invariants are not yet generated for inner let functions";
+         assert false
+      | LDrec _ ->
+         Warning.emit "invariants are not yet generated for inner let rec";
+         assert false
+
     in
 
 
@@ -74,6 +94,7 @@ module Make (D: Domain.DOMAIN) = struct
            let_sym id ~ghost:(rs_ghost rs1) ~kind:(rs_kind rs1) cexp in
          create_let_decl let_defn, Mrs.add rs1 new_rs rssm
       | PDlet (LDsym (rs, ({c_node = Cfun e} as cexp))) ->
+         (* TODO: check that rs is not a "function" *)
          let open Ity in
          let preconditions = cexp.c_cty.cty_pre in
          let cfg = AI.start_cfg rs in
@@ -82,7 +103,7 @@ module Make (D: Domain.DOMAIN) = struct
          if Debug.test_flag Uf_domain.infer_debug then
            Format.printf "%a@." Expr.print_expr e;
          ignore (AI.put_expr_with_pre cfg context e preconditions);
-         (* will hold the diffrent file offsets (useful when writing
+         (* will hold the different file offsets (useful when writing
                multiple invariants) *)
          let fixp = AI.eval_fixpoints cfg context in
          let new_e = reconstruct_expr cfg context fixp e in
@@ -134,6 +155,7 @@ module Make (D: Domain.DOMAIN) = struct
     if Debug.test_flag Uf_domain.infer_debug then
       Format.eprintf "Invariants inferred.@.";
     close_module pmuc
+
 end
 
 

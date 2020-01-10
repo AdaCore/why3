@@ -296,10 +296,16 @@ val pvs_of_vss : Spv.t -> 'a Mvs.t -> Spv.t
 
 (** {2 Exception symbols} *)
 
+(** A mask is a generalized ghost information allowing to handle
+   tuples where some components can be ghost and others are not.
+
+   They are used for expressions, including results of programs, and
+   for exceptions *)
+
 type mask =
-  | MaskVisible
-  | MaskTuple of mask list
-  | MaskGhost
+  | MaskVisible            (** fully non-ghost *)
+  | MaskTuple of mask list (** decomposed ghst status for tuples *)
+  | MaskGhost              (** fully ghost *)
 
 val mask_ghost : mask -> bool
 
