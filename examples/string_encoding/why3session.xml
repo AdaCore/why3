@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<prover id="0" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="string_encoding.mlw"/>
+<theory name="Hex" proved="true">
+ <goal name="encode&#39;vc" expl="VC for encode" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="encode&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.24" steps="620"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="15"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="18"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.3" expl="division by zero" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="24"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.4" expl="integer overflow" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="89"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="79"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.6" expl="division by zero" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.7" expl="integer overflow" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="132"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="140"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.9" expl="integer overflow" proved="true">
+  <proof prover="2"><result status="valid" time="0.03" steps="34"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.10" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="34"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="38"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="encode&#39;vc.13.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.13" steps="449896"/></proof>
+   </goal>
+   <goal name="encode&#39;vc.13.1" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.93" steps="5389325"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="encode&#39;vc.14" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.01" steps="22"/></proof>
+  </goal>
+  <goal name="encode&#39;vc.15" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="28"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="Test">
+ <goal name="G1">
+ </goal>
+</theory>
+</file>
+</why3session>
