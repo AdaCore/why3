@@ -195,7 +195,7 @@ let map metas_rewrite_pr env d =
       let lls = Mtyl.values (Mls.find_def Mtyl.empty ls env) in
       let lds = List.map create_param_decl lls in
       ts_of_ls env ls (d::lds),[]
-    | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+    | Dlogic [ls,ld] when not (Sid.mem ls.ls_name (get_decl_syms d)) ->
       let f = ls_defn_axiom ld in
       let substs = ty_quant env f in
       let conv_f tvar (defns,axioms) =

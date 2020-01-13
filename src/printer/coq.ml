@@ -940,7 +940,7 @@ let print_decl ~old info fmt d =
   | Ddata tl -> print_data_decls info fmt tl
   | Dparam ls ->
       print_param_decl ~prev info fmt ls
-  | Dlogic [s,_ as ld] when not (Sid.mem s.ls_name d.d_syms) ->
+  | Dlogic [s,_ as ld] when not (Sid.mem s.ls_name (get_decl_syms d)) ->
       print_logic_decl ~old info fmt ld
   | Dlogic ll ->
       print_recursive_decl ~old info fmt ll

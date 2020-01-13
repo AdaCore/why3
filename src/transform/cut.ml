@@ -58,7 +58,7 @@ let remove_list ~is_rec (name_list: symbol list) =
       | Theory.Use _ | Theory.Clone _ | Theory.Meta _ ->
           (removed_ids, Task.add_tdecl task_uc td.Task.task_decl)
       | Theory.Decl d ->
-          let removed_in_decls = Ident.Sid.inter removed_ids d.d_syms in
+          let removed_in_decls = Ident.Sid.inter removed_ids (get_decl_syms d) in
           begin match d.d_node with
             | Dprop (Pgoal, _, _) ->
                begin try
