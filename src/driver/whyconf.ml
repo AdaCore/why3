@@ -1034,7 +1034,7 @@ let load_driver main env file extras =
   let file = absolute_driver_file main file in
   try
     Driver.load_driver_absolute env file extras
-  with e ->
+  with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "Fatal error while loading driver file '%s': %a@."
             file Exn_printer.exn_printer e;
     exit 1
