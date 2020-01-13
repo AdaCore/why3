@@ -361,17 +361,24 @@ module Add
                /\ plength y = old plength y }
   =
     let ghost ox = pure { x } in
-    let nr, nx, ny, m = open_ry x sx y sy in
+    let ghost oy = pure { y } in
+    let nr, ny, nx, m = open_rx y sx x sx in
     label Add in
+    value_sub_frame_shift (pelts ny) (pelts oy)
+                          (offset ny) (offset y) (int32'int sy);
+    assert { value ny sy = old (value y sy) };
+    assert { value nx sx = old (value x sx) };
     let res = wmpn_add nr nx sx ny sy in
     let ghost onx = pure { nx } in
-    close_ry x sx y sy nr nx ny m;
+    close_rx y sx x sx nr ny nx m;
     assert { forall j. 0 <= j < sx
                        -> (pelts x)[offset x + j] = (pelts ox)[offset x + j]
              by (pelts x)[offset x + j]
                 = (pelts onx)[offset onx + j]
                 = (pelts nx at Add)[offset onx + j]
                 = (pelts ox)[offset x + j] };
+    value_sub_frame_shift (pelts x) (pelts ox)
+                          (offset x) (offset x) (int32'int sx);
     res
 
   let add_n_rxy (*[@extraction:inline]*) (x:ptr limb) (sx:int32) : limb

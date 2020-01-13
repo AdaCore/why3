@@ -275,17 +275,19 @@ module Sub
     ensures  { min y = old min y /\ max y = old max y
                /\ plength y = old plength y }
   = let ghost ox = pure { x } in
-    let nr, nx, ny, m = open_ry x sz y sz in
+    let nr, ny, nx, m = open_rx y sz x sz in
     label Sub in
     let res = wmpn_sub_n nr nx ny sz in
     let ghost onx = pure { nx } in
-    close_ry x sz y sz nr nx ny m;
+    close_rx y sz x sz nr ny nx m;
     assert { forall j. 0 <= j < sz
                        -> (pelts x)[offset x + j] = (pelts ox)[offset x + j]
              by (pelts x)[offset x + j]
                 = (pelts onx)[offset onx + j]
                 = (pelts nx at Sub)[offset onx + j]
                 = (pelts ox)[offset x + j] };
+    value_sub_frame_shift (pelts x) (pelts ox)
+                          (offset x) (offset x) (int32'int sz);
     res
 
   let sub (*[@extraction:inline]*) (r x:ptr limb) (sx:int32)
@@ -380,17 +382,24 @@ module Sub
                /\ plength y = old plength y }
   =
     let ghost ox = pure { x } in
-    let nr, nx, ny, m = open_ry x sx y sy in
+    let ghost oy = pure { y } in
+    let nr, ny, nx, m = open_rx y sx x sx in
     label Sub in
+    value_sub_frame_shift (pelts ny) (pelts oy)
+                          (offset ny) (offset y) (int32'int sy);
+    assert { value ny sy = old (value y sy) };
+    assert { value nx sx = old (value x sx) };
     let res = wmpn_sub nr nx sx ny sy in
     let ghost onx = pure { nx } in
-    close_ry x sx y sy nr nx ny m;
+    close_rx y sx x sx nr ny nx m;
     assert { forall j. 0 <= j < sx
                        -> (pelts x)[offset x + j] = (pelts ox)[offset x + j]
              by (pelts x)[offset x + j]
                 = (pelts onx)[offset onx + j]
                 = (pelts nx at Sub)[offset onx + j]
                 = (pelts ox)[offset x + j] };
+    value_sub_frame_shift (pelts x) (pelts ox)
+                          (offset x) (offset x) (int32'int sx);
     res
 
 
