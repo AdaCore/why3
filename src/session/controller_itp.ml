@@ -117,16 +117,10 @@ let load_drivers c =
   let env = c.controller_env in
   let config = c.controller_config in
   let provers = Whyconf.get_provers config in
-  Whyconf.Mprover.iter
-    (fun _ p ->
-     try
-       let d = Whyconf.load_driver (Whyconf.get_main config) env p.Whyconf.driver [] in
-       Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
-     with e ->
-       Debug.dprintf debug_call_prover
-         "[Controller_itp] error while loading driver for prover %a: %a@."
-         Whyconf.print_prover p.Whyconf.prover
-         Exn_printer.exn_printer e)
+  let main = Whyconf.get_main config in
+  Whyconf.Mprover.iter (fun _ p ->
+      let d = Whyconf.load_driver main env p.Whyconf.driver [] in
+      Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d))
     provers
 
 let create_controller config env ses =
