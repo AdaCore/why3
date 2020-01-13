@@ -18,8 +18,10 @@ module Sub
   let wmpn_sub_n (r x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid r sz /\ valid x sz /\ valid y sz }
-    requires { offset r = offset x \/ offset r + sz <= offset x }
-    requires { offset r = offset y \/ offset r + sz <= offset y }
+    requires { offset r = offset x \/ offset r + sz <= offset x
+               \/ offset x + sz <= offset r }
+    requires { offset r = offset y \/ offset r + sz <= offset y
+               \/ offset y + sz <= offset r }
     requires { r.data = x.data = y.data }
     requires { writable r }
     alias    { r.data with x.data, r.data with y.data }
@@ -80,8 +82,10 @@ module Sub
   let wmpn_sub (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid r sx /\ valid x sx /\ valid y sy }
-    requires { offset r = offset x \/ offset r + sx <= offset x }
-    requires { offset r = offset y \/ offset r + sx <= offset y }
+    requires { offset r = offset x \/ offset r + sx <= offset x
+               \/ offset x + sx <= offset r }
+    requires { offset r = offset y \/ offset r + sx <= offset y
+               \/ offset y + sy <= offset r }
     requires { r.data = x.data = y.data }
     requires { writable r }
     alias    { r.data with x.data }
@@ -106,7 +110,7 @@ module Sub
     assert { offset r <> offset x ->
              forall j. offset x <= j < offset x + sx ->
                        (pelts x)[j] = (pelts ox)[j]
-             by offset r + sy <= j };
+             by offset r + sy <= j \/ j < offset r };
     if (b <> 0)
     then begin
       while i < sx do
@@ -251,6 +255,8 @@ module Sub
                 = (pelts ony)[offset ony + j]
                 = (pelts ny at Sub)[offset ony + j]
                 = (pelts oy)[offset y + j] };
+    value_sub_frame_shift (pelts y) (pelts oy) (offset y) (offset y)
+                          (int32'int sz);
     res
 
   let sub_n_ry (*[@extraction:inline]*) (x y:ptr limb) (sz:int32) : limb

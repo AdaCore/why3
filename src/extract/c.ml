@@ -1270,14 +1270,16 @@ module MLToC = struct
         (fun (bs,rs) (xs, pvsl, r) ->
           let id = xs.xs_name in
           match pvsl, r.e_node with
-          | [], (Eblock []) when is_unit r.e_ity && is_while ->
+          | [], (Eblock []) when is_while ->
+             assert (is_unit r.e_ity);
              (Sid.add id bs, rs)
           | [pv], Mltree.Evar pv'
              when pv_equal pv pv' && env.computes_return_value ->
              (bs, Sid.add id rs)
           | [], Mltree.Eblock [] when env.computes_return_value ->
+             assert (is_unit r.e_ity);
              (bs, Sid.add id rs)
-          |_ -> raise (Unsupported "non break/return exception in try"))
+          | _ -> raise (Unsupported "non break/return exception in try"))
         (Sid.empty, env.returns) xl
       in
       let env' = { env with

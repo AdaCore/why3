@@ -18,8 +18,12 @@ module Add
   let wmpn_add_n (r x y:ptr limb) (sz:int32) : limb
     requires { 0 <= sz }
     requires { valid r sz /\ valid x sz /\ valid y sz }
-    requires { offset r = offset x \/ offset r + sz <= offset x }
-    requires { offset r = offset y \/ offset r + sz <= offset y }
+    requires { offset r = offset x
+               \/ offset r + sz <= offset x
+               \/ offset x + sz <= offset r }
+    requires { offset r = offset y
+               \/ offset r + sz <= offset y
+               \/ offset y + sz <= offset r }
     requires { r.data = x.data = y.data }
     requires { writable r }
     alias    { r.data with x.data }
@@ -85,8 +89,12 @@ module Add
   let wmpn_add (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid r sx /\ valid x sx /\ valid y sy }
-    requires { offset r = offset x \/ offset r + sx <= offset x }
-    requires { offset r = offset y \/ offset r + sx <= offset y }
+    requires { offset r = offset x
+               \/ offset r + sx <= offset x
+               \/ offset x + sx <= offset r }
+    requires { offset r = offset y
+               \/ offset r + sx <= offset y
+               \/ offset y + sy <= offset r }
     requires { r.data = x.data = y.data }
     requires { writable r }
     alias    { r.data with x.data }
@@ -112,7 +120,7 @@ module Add
     assert { offset r <> offset x ->
              forall j. offset x <= j < offset x + sx ->
                        (pelts x)[j] = (pelts ox)[j]
-             by offset r + sy <= j };
+             by offset r + sy <= j \/ j < offset r };
     if (c <> 0)
     then begin
       while i < sx do
@@ -257,6 +265,8 @@ module Add
                 = (pelts ony)[offset ony + j]
                 = (pelts ny at Add)[offset ony + j]
                 = (pelts oy)[offset y + j] };
+    value_sub_frame_shift (pelts y) (pelts oy) (offset y) (offset y)
+                          (int32'int sz);
     res
 
   let add (*[@extraction:inline]*) (r x:ptr limb) (sx:int32)
@@ -333,7 +343,7 @@ module Add
                 = (pelts oy)[offset y + j] };
     res
 
-  let add_ry [@extraction:inline] (x:ptr limb) (sx:int32)
+  let add_ry (*[@extraction:inline]*) (x:ptr limb) (sx:int32)
                                   (y:ptr limb) (sy:int32) : limb
     requires { 0 <= sy <= sx }
     requires { valid x sx /\ valid y sx }
@@ -376,10 +386,7 @@ module Add
     ensures  { min x = old min x /\ max x = old max x
                /\ plength x = old plength x }
   =
-    let nr, nx, ny, m = open_rxy x sx in
-    let res = wmpn_add_n nr nx ny sx in
-    close_rxy x sx nr nx ny m;
-    res
+    wmpn_add_n x x x sx
 
 
 end

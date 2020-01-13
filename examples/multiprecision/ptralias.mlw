@@ -87,7 +87,8 @@ module Alias
     ensures { value nx sx = old value x sx /\ value ny sy = old value y sy }
     ensures { valid nx sx /\ valid ny sy }
     ensures { identical nr nx }
-    ensures { 0 <= offset nx /\ offset nx + sx <= offset ny }
+    ensures { 0 <= offset nx /\ offset nx + sx <= offset ny
+              \/ 0 <= offset ny /\ offset ny + sy <= offset nx }
     ensures { m.zx = x.zone /\ m.zy = y.zone }
     ensures { m.mx = old x.max /\ m.my = old y.max }
     ensures { m.lx = sx /\ m.ly = sy }
@@ -161,7 +162,8 @@ module Alias
     requires { m.ok }
     requires { 0 <= sy <= sx }
     requires { identical nr nx }
-    requires { 0 <= offset nx /\ offset nx + sx <= offset ny }
+    requires { 0 <= offset nx /\ offset nx + sx <= offset ny
+               \/ 0 <= offset ny /\ offset ny + sy <= offset nx  }
     requires { m.zx = x.zone /\ m.zy = y.zone }
     requires { m.lx = sx /\ m.ly = sy }
     ensures { x.max = m.mx /\ y.max = m.my }
@@ -224,6 +226,98 @@ module Alias
     writes   { nr, nx, ny, nr.data, nx.data, ny.data,
                x.data, x.max, m.ok }
 
+  val open_shift_sep (r x:ptr limb) (sz:int32) :
+                     (nr:ptr limb, nx:ptr limb, ghost m:mem)
+    requires { valid r sz /\ valid x sz }
+    requires { 0 <= sz }
+    requires { writable r }
+    ensures  { writable nr }
+    ensures  { value nx sz = old value x sz }
+    ensures  { valid nr sz /\ valid nx sz }
+    ensures  { 0 <= offset nx /\ offset nx + sz <= offset nr }
+    ensures  { m.zr = zone r /\ m.zx = zone x }
+    ensures  { m.mr = old r.max /\ m.mx = old x.max }
+    ensures  { m.lr = m.lx = sz }
+    ensures  { m.ok }
+    ensures  { map_eq_sub_shift (pelts nx) (pelts x) (offset nx) (offset x) sz }
+    ensures  { map_eq_sub_shift (pelts nr) (pelts r) (offset nr) (offset r) sz }
+    ensures  { pelts r = old pelts r /\ pelts x = old pelts x }
+    ensures  { plength r = old plength r /\ plength x = old plength x }
+    ensures  { min r = old min r /\ min x = old min x }
+    ensures  { data nr = data nx }
+    writes   { r, x }
+    alias    { nr.data with nx.data }
+
+  val open_shift_alias (r x:ptr limb) (sz:int32) (ghost ofs:int32) :
+                 (nr:ptr limb, nx:ptr limb, ghost m:mem)
+    requires { valid r sz /\ valid x sz }
+    requires { 0 <= sz }
+    requires { writable r /\ writable x }
+    requires { zone r = zone x }
+    alias    { r.data with x.data }
+    requires { offset r = offset x + ofs }
+    ensures  { writable nr }
+    ensures  { value nx sz = old value x sz }
+    ensures  { valid nr sz /\ valid nx sz }
+    ensures  { 0 <= offset nx }
+    ensures  { offset nr = offset nx + ofs }
+    ensures  { m.zr = zone r /\ m.zx = zone x }
+    ensures  { m.mr = old r.max /\ m.mx = old x.max }
+    ensures  { m.lr = m.lx = sz }
+    ensures  { m.ok }
+    ensures  { map_eq_sub_shift (pelts nx) (pelts x) (offset nx) (offset x) sz }
+    ensures  { map_eq_sub_shift (pelts nr) (pelts r) (offset nr) (offset r) sz }
+    ensures  { pelts r = old pelts r /\ pelts x = old pelts x }
+    ensures  { plength r = old plength r /\ plength x = old plength x }
+    ensures  { min r = old min r /\ min x = old min x }
+    ensures  { data nr = data nx }
+    writes   { r, x }
+    alias    { nr.data with nx.data }
+
+  val close_shift_sep (r x:ptr limb) (sz:int32) (nr nx:ptr limb) (ghost m:mem)
+                      : unit
+    alias    { nr.data with nx.data }
+    requires { writable r /\ writable nr }
+    requires { m.ok }
+    requires { 0 <= sz }
+    requires { 0 <= offset nx /\ offset nx + sz <= offset nr }
+    requires { m.zx = x.zone /\ m.zr = r.zone }
+    requires { m.lx = m.lr = sz }
+    ensures  { x.max = m.mx /\ r.max = m.mr }
+    ensures  { map_eq_sub_shift (old pelts nx) (pelts x)
+                                (offset nx) (offset x) sz }
+    ensures  { map_eq_sub_shift (old pelts nr) (pelts r)
+                                (offset nr) (offset r) sz }
+    ensures  { forall j. j < offset x \/ offset x + sz <= j
+                -> (pelts x)[j] = old (pelts x)[j] }
+    ensures  { forall j. j < offset r \/ offset r + sz <= j
+                -> (pelts r)[j] = old (pelts r)[j] }
+    ensures  { plength x = old plength x /\ plength r = old plength r }
+    ensures  { min r = old min r /\ min x = old min x }
+    writes   { nr, nx, nr.data, nx.data, x.data, x.max, r.data, r.max, m.ok }
+
+  val close_shift_alias (r x:ptr limb) (sz:int32) (nr nx:ptr limb) (ghost m:mem)
+                        : unit
+    alias    { nr.data with nx.data }
+    alias    { r.data with x.data }
+    requires { writable r /\ writable x /\ writable nr /\ writable nx }
+    requires { m.ok }
+    requires { 0 <= sz }
+    requires { x.zone = r.zone }
+    requires { m.zx = x.zone /\ m.zr = r.zone }
+    requires { m.lx = m.lr = sz }
+    ensures  { x.max = m.mx /\ r.max = m.mr }
+    ensures  { map_eq_sub_shift (old pelts nx) (pelts x)
+                                (offset nx) (offset x) sz }
+    ensures  { map_eq_sub_shift (old pelts nr) (pelts r)
+                                (offset nr) (offset r) sz }
+    ensures  { forall j. j < offset x \/ offset x + sz <= j
+                -> (pelts x)[j] = old (pelts x)[j] }
+    ensures  { forall j. j < offset r \/ offset r + sz <= j
+                -> (pelts r)[j] = old (pelts r)[j] }
+    ensures  { plength x = old plength x /\ plength r = old plength r }
+    ensures  { min r = old min r /\ min x = old min x }
+    writes   { nr, nx, nr.data, nx.data, x.data, x.max, r.data, r.max, m.ok }
 
 (*
   let double_open (r x y: ptr limb)

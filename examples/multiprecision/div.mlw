@@ -317,7 +317,7 @@ module Div
 
 (** `wmpn_divrem_1 q x sz y` divides `(x, sz)` by `y`, writes the quotient
     in `(q, sz)` and returns the remainder. Corresponds to
-    `mpn_wmpn_divrem_1`. *)
+    `mpn_divrem_1`. *)
 (* TODO develop further decimal points (qxn) *)
 let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
     requires { valid x sz }
