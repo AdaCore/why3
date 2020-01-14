@@ -27,7 +27,7 @@ module String
       <td/><code> length </code>     <td/> string              <td/> int
   </tr><tr>
     <td/> Get string of length 1
-      <td/><code> ([]) </code>       <td/> string int           <td/> string
+      <td/><code> s_at </code>       <td/> string int           <td/> string
   </tr><tr>
     <td/> Get substring
       <td/><code> substring </code> <td/> string int int       <td/> string
@@ -125,8 +125,8 @@ module String
   axiom le_trans: forall s1 s2 s3.
     le s1 s2 && le s2 s3 -> le s1 s3
 
-  function ([]) string int : string
-  (** `s[i]` is:
+  function s_at string int : string
+  (** `s_at s i` is:
 
        (1) `empty`, if either `i < 0` or `i >= length s`;
 
@@ -134,19 +134,19 @@ module String
            position `i` in string `s`, if `0 <= i < length s`. *)
 
   axiom at_out_of_range: forall s i.
-    i < 0 || i >= length s -> s[i] = empty
+    i < 0 || i >= length s -> s_at s i = empty
 
   axiom at_empty: forall i.
-    empty[i] = empty
+    s_at empty i = empty
 
   axiom at_length: forall s i.
-    let j = s[i] in
+    let j = s_at s i in
     if 0 <= i < length s then length j = 1 else length j = 0
 
   axiom concat_at: forall s1 s2.
     let s = concat s1 s2 in
-    forall i. (0 <= i < length s1 -> s[i] = s1[i]) &&
-              (length s1 <= i < length s -> s[i] = s2[i - length s1])
+    forall i. (0 <= i < length s1 -> s_at s i = s_at s1 i) &&
+              (length s1 <= i < length s -> s_at s i = s_at s2 (i - length s1))
 
   function substring string int int : string
   (** `substring s i x` is:
@@ -178,7 +178,7 @@ module String
       else length (substring s i x) = x
 
   axiom substring_at: forall s i.
-    s[i] = substring s i 1
+    s_at s i = substring s i 1
 
   predicate prefixof string string
   (** `prefixof s1 s2` is `True` iff `s1` is a prefix of `s2`. *)
@@ -236,11 +236,11 @@ module String
     contains (concat s1 s2) s1 && contains (concat s1 s2) s2
 
   axiom contains_at: forall s1 s2 i.
-    s1[i] = s2 -> contains s1 s2
+    s_at s1 i = s2 -> contains s1 s2
 
   (*** The following should hold, but are not proved by SMT provers *)
   (*** axiom at_contains: forall s1 s2.
-    contains s1 s2 && length s2 = 1 -> exists i. s1[i] = s2 *)
+    contains s1 s2 && length s2 = 1 -> exists i. s_at s1 i = s2 *)
 
   function indexof string string int : int
   (** `indexof s1 s2 i` is:
@@ -341,11 +341,11 @@ module String
   (*** The following lemmas should hold, but CVC4 is not able to prove them *)
   (*** axiom to_int_only_digits: forall s.
         s <> empty &&
-          (forall i. 0 <= i < length s -> le "0" s[i] && le s[i] "9")
+          (forall i. 0 <= i < length s -> le "0" (s_at s i) && le (s_at s i) "9")
             -> to_int s >= 0 *)
 
   (*** axiom to_int_lt_0: forall s i.
-         0 <= i < length s && lt s[i] "0"
+         0 <= i < length s && lt (s_at s i) "0"
              -> to_int s = -1 *)
 
   (*** In SMT-Lib, but NOT in z3/cvc4 *)
@@ -399,7 +399,7 @@ module Char
   function get (s: string) (i: int) : char
 
   axiom get: forall s i.
-    0 <= i < length s -> (get s i).content = s[i]
+    0 <= i < length s -> (get s i).content = s_at s i
 
   function ([]) (s: string) (i: int) : char = get s i
 
@@ -410,7 +410,7 @@ module OCaml
   use int.Int
   use mach.int.Int63
   use export String
-  use Char
+  use export Char
 
   val get (s: string) (i: int63) : char
     requires { 0 <= i < length s }
