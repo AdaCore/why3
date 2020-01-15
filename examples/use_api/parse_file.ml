@@ -28,7 +28,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
 let () =
   try
-    let _ = Env.read_file Env.base_language env file_name in
+    let _ = Env.read_file Env.mlw_language env file_name in
     printf "Syntax OK@.";
     exit 0
   with
