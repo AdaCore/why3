@@ -40,13 +40,22 @@ CC        = @CC@
 MKDIR_P   = @MKDIR_P@
 INSTALL   = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
+
+ifeq (@enable_ocamlfind@,yes)
+OCAMLC    = @OCAMLFIND@ ocamlc
+OCAMLOPT  = @OCAMLFIND@ ocamlopt
+OCAMLDEP  = @OCAMLFIND@ ocamldep
+OCAMLDOC  = @OCAMLFIND@ ocamldoc
+else
 OCAMLC    = @OCAMLC@
 OCAMLOPT  = @OCAMLOPT@
 OCAMLDEP  = @OCAMLDEP@
+OCAMLDOC  = @OCAMLDOC@
+endif
+
 OCAMLFIND = @OCAMLFIND@
 OCAMLLEX  = @OCAMLLEX@
 OCAMLYACC = @OCAMLYACC@
-OCAMLDOC  = @OCAMLDOC@
 OCAMLLIB  = @OCAMLLIB@
 OCAMLINSTALLLIB  = $(DESTDIR)@OCAMLINSTALLLIB@
 OCAMLBEST = @OCAMLBEST@
@@ -111,13 +120,19 @@ EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE
 
 WARNINGS = A-4-9-41-44-45-50-52@5@8@48
 
-OFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
-BFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
+FLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
+OFLAGS = $(FLAGS)
+BFLAGS = $(FLAGS)
 
-OFLAGS += $(EXTINCLUDES)
-BFLAGS += $(EXTINCLUDES)
+ifeq (@enable_ocamlfind@,yes)
+FLAGS += $(addprefix -package ,$(EXTPKGS))
+OLINKFLAGS += -linkpkg
+BLINKFLAGS += -linkpkg
+else
+FLAGS += $(EXTINCLUDES)
 OLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMXA)
 BLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMA)
+endif
 
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
@@ -130,6 +145,7 @@ CMIHACK = -intf-suffix .cmi
 
 EXTOBJS = menhirLib
 EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@
+EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @WHY3LIB@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -498,6 +514,8 @@ lib/plugins/hypothesis_selection.cmxs: EXTINCLUDES += -I @OCAMLGRAPHLIB@
 lib/plugins/hypothesis_selection.cmo:  EXTINCLUDES += -I @OCAMLGRAPHLIB@
 lib/plugins/hypothesis_selection.cmxs: EXTLIBS += graph.cmxa
 lib/plugins/hypothesis_selection.cmo:  EXTOBJS += graph.cmo
+lib/plugins/hypothesis_selection.cmxs: EXTPKGS += ocamlgraph
+lib/plugins/hypothesis_selection.cmo:  EXTPKGS += ocamlgraph
 endif
 
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
@@ -814,7 +832,12 @@ opt:  bin/why3ide.opt
 
 bin/why3ide.opt bin/why3ide.byte: EXTINCLUDES += @LABLGTKINCLUDE@
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += @LABLGTKLIB@
+bin/why3ide.opt bin/why3ide.byte: EXTPKGS += @LABLGTKPKG@
 bin/why3ide.byte: BLINKFLAGS += -custom
+
+ifeq (@enable_ocamlfind@,yes)
+bin/why3ide.opt bin/why3ide.byte: FLAGS += -thread
+endif
 
 bin/why3ide.opt: $(WHY3CMXA) src/ide/resetgc.o $(IDECMX)
 bin/why3ide.byte: $(WHY3CMA) src/ide/resetgc.o $(IDECMO)
@@ -1649,7 +1672,7 @@ endif
 
 ALTERGODIR=src/trywhy3/alt-ergo
 
-JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.ppx \
+JSOCAMLC=$(OCAMLFIND) ocamlc -package js_of_ocaml -g -package js_of_ocaml.ppx \
         -package ocplib-simplex -I src/trywhy3 \
 	-I $(ALTERGODIR)/lib/util \
 	-I $(ALTERGODIR)/lib/structures \
@@ -1788,7 +1811,7 @@ CLEANDIRS += src/trywhy3
 
 ifeq (@enable_web_ide@,yes)
 
-JSOCAMLCW=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
+JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
         -I src/ide
 
 src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma
