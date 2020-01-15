@@ -1,125 +1,192 @@
-
-module AssocList
-
-  use list.List
-  use option.Option
-
-  type assoc 'a 'b = list ('a,'b)
-
-  function add (x: 'a) (y: 'b) (l: assoc 'a 'b) : assoc 'a 'b =
-    Cons (x,y) l
-
-  function get_fst (x: 'a) (l: assoc 'a 'b) : option 'b =
-    match l with
-    | Cons (x',y) l' -> if x = x' then Some y else get_fst x l'
-    | Nil -> None
-    end
-
-  function get_snd (y: 'b) (l: assoc 'a 'b) : option 'a =
-    match l with
-    | Cons (x,y') l' -> if y = y' then Some x else get_snd y l'
-    | Nil -> None
-    end
-
-end
-
-module Hex
-
-  (* constant h0 : string = "0" *)
-  (* constant h1 : string = "1" *)
-  (* constant h2 : string = "2" *)
-  (* constant h3 : string = "3" *)
-  (* constant h4 : string = "4" *)
-  (* constant h5 : string = "5" *)
-  (* constant h6 : string = "6" *)
-  (* constant h7 : string = "7" *)
-  (* constant h8 : string = "8" *)
-  (* constant h9 : string = "9" *)
-  (* constant hA : string = "A" *)
-  (* constant hB : string = "B" *)
-  (* constant hC : string = "C" *)
-  (* constant hD : string = "D" *)
-  (* constant hE : string = "E" *)
-  (* constant hF : string = "F" *)
-
-  (* let to_hex (n : int) : Char.char = *)
-  (*   requires { n >= 0 && n < 16 } *)
-  (*   if n < 10 then chr (n + code (get "0" 0)) else chr (n + 55) *)
-
-  (* let encode (n: int) : string = *)
-  (*   requires { n >= 0 } *)
-  (*   let h = ref "" in *)
-  (*   let x = ref n in *)
-  (*   while !x > 15 do *)
-  (*     let r = mod !x 16 in *)
-  (*     h := h  *)
+module Hex1
 
   use mach.int.Int
   use mach.int.Int63
   use string.OCaml
-  use string.Char
-  use ref.Ref
-
-  (* lemma get_content: forall s. *)
-  (*   length s = 1 -> s[0].content = s *)
-
-  (* lemma concat_char_length: forall s c. *)
-  (*   length (concat s c.content) = length s + 1 *)
-
-  (* lemma get_content3: forall c1 c2. c1 = c2 <-> c1.content = c2.content *)
-
-  (* lemma get_content2: forall s c. *)
-  (*   let r = concat s c.content in *)
-  (*   length r = length s + 1 && r[length s] = c *)
 
   let function encode (s: string) : string
-    requires { length s < max_int } (* maybe div max_ind 2 *)
     ensures { length result = 2 * length s }
     ensures { forall i. 0 <= i < length s ->
-                result[2 * i] = Char.chr (div (code s[i]) 16) &&
-                result[2 * i + 1] = Char.chr (mod (code s[i]) 16) }
-  = let i = ref 0 in
-    let r = ref "" in
-    while !i < OCaml.length s do
-      variant { length s - !i }
-      invariant { 0 <= !i <= OCaml.length s }
-      invariant { length !r = 2 * !i }
-      invariant { forall j. 0 <= j < !i  ->
-                    !r[2 * j] = Char.chr (div (code s[j]) 16) &&
-                    !r[2 * j + 1] = Char.chr (mod (code s[j]) 16) }
-      let v = code s[!i] in
-      r := concat !r (chr (v / 16)).content;
-      (* assert { !r[!i] = chr (div v 16) }; *)
-      r := concat !r (chr (v % 16)).content;
-      i := !i + 1
+                result[2 * i] = chr (div (code s[i]) 16) &&
+                result[2 * i + 1] = chr (mod (code s[i]) 16) }
+  = let ref i = 0 in
+    let ref r = "" in
+    while i < OCaml.length s do
+      variant { length s - i }
+      invariant { 0 <= i <= OCaml.length s }
+      invariant { length r = 2 * i }
+      invariant { forall j. 0 <= j < i  ->
+                    r[2 * j] = chr (div (code s[j]) 16) &&
+                    r[2 * j + 1] = chr (mod (code s[j]) 16) }
+      let v = code s[i] in
+      r <- concat r (chr (v / 16)).content;
+      r <- concat r (chr (v % 16)).content;
+      i <- i + 1
     done;
-    !r
+    r
 
-  (* val function decode (s: string) : string *)
-  (*   requires { mod (length s) 2 = 0 } *)
-  (*   ensures  { length result = div (length s) 2 } *)
-  (*   ensures  { forall i. 0 <= i < div (length s) 2 -> *)
-  (*                get result i = Char.chr (code (get s (2 * i)) * 16 + *)
-  (*                                    code (get s (2 * i + 1))) } *)
+  let function decode (s: string) : string
+    requires { mod (length s) 2 = 0 }
+    requires { forall i. 0 <= i < length s -> 0 <= code s[i] < 16 }
+    ensures  { length result = div (length s) 2 }
+    ensures  { forall i. 0 <= i < div (length s) 2 ->
+                 result[i] = chr (code s[2 * i] * 16 + code s[2 * i + 1]) }
+  = let ref i = 0 in
+    let ref r = "" in
+    while i < length s do
+      variant {length s - i}
+      invariant { mod i 2 = 0 }
+      invariant { 0 <= i <= length s }
+      invariant { length r = div i 2 }
+      invariant { forall j. 0 <= j < div i 2 ->
+                    r[j] = chr (code s[2 * j] * 16 + code s[2 * j + 1]) }
+      let v_i = code s[i] in
+      let v_ii = code s[i + 1] in
+      r <- concat r (chr (v_i * 16 + v_ii)).content;
+      i <- i + 2
+    done;
+    r
 
-  (* lemma decode_encode: forall s. decode (encode s) = s *)
+  let test1 = let s = ""  in let r = encode s in assert {r = s}
+  let test2 = let s = "a" in let r = encode s in assert {length r = 2 && decode r = s}
+  let test3 = let s = "b" in let r = encode s in assert {length r = 2 && decode r = s}
 
-  (* let id (s: string): string *)
-  (*   ensures { result = s } *)
-  (* = decode (encode s) *)
+  let test4 = let s = "\006\001" in let r = decode s in assert { length r = 1 && r = "a" }
+  let test5 = let s = "\006\002"    in let r = decode s in assert { length r = 1 && r = "b" }
 
-  (* let test1 () = let x = rev "" in assert {x = ""} *)
-  (* let test2 () = let x = rev "a" in assert {x = "a"} *)
-  (* let test3 () = let x = rev "ab" in assert {x = "ba"} *)
-  (* let test4 () = let x = rev "abc" in assert {x = "cba"} *)
-  (* let test5 () = let x = rev "abcd" in assert {x = "dcba"} *)
+  lemma decode_encode: forall s. decode (encode s) = s
 
 end
 
-module Test
+module Hex2
 
-  use string.Char
+  use mach.int.Int
+  use mach.int.Int63
+  use string.OCaml
 
-  goal G1: forall c:char. chr (code c) = c
+  function hex (i: int) : char =
+    if 0 <= i < 10 then chr (i + 48)
+    else if 10 <= i < 16 then chr (i + 55)
+    else "\000"[0]
+
+  (* lemma hex_bounds: forall i. 0 <= i < 16 -> *)
+  (*   48 <= code (hex i) < 58 || 65 <= code (hex i) < 71 *)
+
+  let hex (i: int63) : char
+    requires { 0 <= i < 16 }
+    ensures  { result = hex i }
+  = if i < 10 then chr (i + 48) else chr (i + 55)
+
+  function xeh (i: int) : int =
+    if 48 <= i < 58 then i - 48
+    else if 65 <= i < 71 then i - 55
+    else -1
+
+  (* lemma xeh_bounds: forall i. 48 <= i < 58 || 65 <= i < 71 -> *)
+  (*   0 <= xeh i < 16 *)
+
+  (* lemma hex_xeh: forall i. 48 <= i < 58 || 65 <= i < 71 -> code (hex (xeh i)) = i *)
+
+  (* lemma xeh_hex: forall i. 0 <= i < 16 -> xeh (code (hex i)) = i *)
+
+  let xeh (i: int63) : int63
+    requires { 48 <= i < 58 || 65 <= i < 71 }
+    ensures  { result = xeh i }
+  = if 48 <= i < 58 then i - 48
+    else i - 55
+
+  let function encode (s: string) : string
+    ensures { length result = 2 * length s }
+    ensures { forall i. 0 <= i < length s ->
+                result[2 * i] = hex (div (code s[i]) 16) &&
+                result[2 * i + 1] = hex (mod (code s[i]) 16) &&
+                (48 <= code result[2*i] < 58 || 65 <= code result[2*i] < 71) && 
+                (48 <= code result[2*i+1] < 58 || 65 <= code result[2*i+1] < 71) }
+  = let ref i = 0 in
+    let ref r = "" in
+    while i < OCaml.length s do
+      variant { length s - i }
+      invariant { 0 <= i <= OCaml.length s }
+      invariant { length r = 2 * i }
+      invariant { forall j. 0 <= j < i  ->
+                    r[2 * j] = hex (div (code s[j]) 16) &&
+                    r[2 * j + 1] = hex (mod (code s[j]) 16)
+      }
+      let v = code s[i] in
+      r <- concat r (hex (v / 16)).content;
+      r <- concat r (hex (v % 16)).content;
+      assert { let h = code r[length r - 1] in 48 <= h < 58 || 65 <= h < 71 };
+      assert { let h = code r[length r - 2] in 48 <= h < 58 || 65 <= h < 71 };
+      i <- i + 1
+    done;
+    r
+
+  let function decode (s: string) : string
+    requires { mod (length s) 2 = 0 }
+    requires { forall i. 0 <= i < length s ->
+                 48 <= code s[i] < 58 || 65 <= code s[i] < 71 }
+    requires { forall i. 0 <= i < length s -> 0 <= xeh (code s[i]) < 16 }
+    ensures  { length result = div (length s) 2 }
+    ensures  { forall i. 0 <= i < div (length s) 2 ->
+                 result[i] = chr (xeh (code s[2 * i]) * 16 + xeh (code s[2 * i + 1])) }
+  = let ref i = 0 in
+    let ref r = "" in
+    while i < length s do
+      variant {length s - i}
+      invariant { mod i 2 = 0 }
+      invariant { 0 <= i <= length s }
+      invariant { length r = div i 2 }
+      invariant { forall j. 0 <= j < div i 2 ->
+                    r[j] = chr (xeh (code s[2 * j]) * 16 + xeh (code s[2 * j + 1])) }
+      let v_i = xeh (code s[i]) in
+      let v_ii = xeh (code s[i + 1]) in
+      r <- concat r (chr (v_i * 16 + v_ii)).content;
+      i <- i + 2
+    done;
+    r
+
+  let lemma decode_encode (s: string) : unit
+    ensures { decode (encode s) = s }
+  = let s1 = encode s in
+    assert { forall i. 0 <= i < length s1 ->
+               48 <= code s1[i] < 58 || 65 <= code s1[i] < 71 };
+    let s2 = decode s1 in
+    assert { length s2 = length s }
+    (* assert { forall i. 0 <= i < length s -> *)
+    (*           } *)
+
+  let test1 = let s = "" in let r = encode s in assert {r = s}
+  let test2 = let s = "a" in let r = encode s in assert {decode r = s}
+  let test3 = let s = "h" in let r = encode s in assert {decode r = s}
+  let test4 = let s = "abc" in let r = encode s in assert {decode r = s}
+  let test5 = let s = "1s1" in let r = encode s in assert {decode r = s}
+  let test6 = let s = "141fh" in let r = encode s in assert {decode r = s}
+  let test7 = let s = "\123as" in let r = encode s in assert {decode r = s}
 
 end
+
+(* module Base64 *)
+
+(*   use mach.int.Int *)
+(*   use mach.int.Int63 *)
+(*   use string.OCaml *)
+(*   use ref.Ref *)
+
+(*   val function encode (s: string) : string *)
+(*     ensures { length result <= (length s + 2) * 4 / 3 } *)
+(*     ensures { mod (length result) 4 = 0 } *)
+(*     ensures { forall i. 0 <= i < length result / 4 -> *)
+(*                 let a1 = s[i*3] in *)
+(*                 let a2 = s[i*3+1] in *)
+(*                 let a3 = s[i*3+2] in *)
+(*                 let b1 = result[i*4] in *)
+(*                 let b2 = result[i*4+1] in *)
+(*                 let b3 = result[i*4+2] in *)
+(*                 let b5 = result[i*4+3] in *)
+(*                 b1 = div (code c1)  4 && *)
+(*                 b2 = mod (code a1) 4 * 16 + div (code a2) 16 && *)
+(*                 b3 = mod (code c2) 16 * 4 + div (code a3 64) && *)
+(*                 b4 = mod (code c3) 64 *)
+(*    } *)
+
+(* end *)

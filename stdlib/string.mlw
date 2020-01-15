@@ -384,7 +384,8 @@ module Char
                 content: string;
               } invariant { length content = 1 }
 
-  axiom char_eq: forall c1 c2. c1 = c2 <-> c1.content = c2.content
+  axiom char_eq: forall c1 c2.
+    c1 = c2 <-> c1.content = c2.content
 
   function code char : int
 
