@@ -59,7 +59,7 @@ MENHIR	  = @MENHIR@
 DEPFLAGS = -slash
 
 ifeq (@enable_why3_lib@,yes)
-DEPFLAGS += -I lib/why3
+INCLUDES += -I lib/why3
 endif
 ifeq (@OCAMLBEST@,opt)
 # the semantics of the -native flag changed in ocaml 4.03.0
@@ -88,7 +88,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@
+EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -114,6 +114,8 @@ WARNINGS = A-4-9-41-44-45-50-52@5@8@48
 OFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
 BFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
 
+OFLAGS += $(EXTINCLUDES)
+BFLAGS += $(EXTINCLUDES)
 OLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMXA)
 BLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMA)
 
@@ -273,8 +275,7 @@ LIBDEP = $(addsuffix .dep, $(LIBMODULES))
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
-$(LIBDEP): DEPFLAGS += $(LIBINCLUDES)
-$(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
+$(LIBDEP) $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
@@ -493,10 +494,10 @@ ifeq (@enable_hypothesis_selection@,yes)
 PLUG_TRANSFORM += hypothesis_selection
 PLUGINS += hypothesis_selection
 
-lib/plugins/hypothesis_selection.cmxs: INCLUDES += -I @OCAMLGRAPHLIB@
-lib/plugins/hypothesis_selection.cmo:  INCLUDES += -I @OCAMLGRAPHLIB@
-lib/plugins/hypothesis_selection.cmxs: OFLAGS += graph.cmxa
-lib/plugins/hypothesis_selection.cmo:  BFLAGS += graph.cmo
+lib/plugins/hypothesis_selection.cmxs: EXTINCLUDES += -I @OCAMLGRAPHLIB@
+lib/plugins/hypothesis_selection.cmo:  EXTINCLUDES += -I @OCAMLGRAPHLIB@
+lib/plugins/hypothesis_selection.cmxs: EXTLIBS += graph.cmxa
+lib/plugins/hypothesis_selection.cmo:  EXTOBJS += graph.cmo
 endif
 
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
@@ -512,8 +513,7 @@ PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 PLUGDIRS = parser printer transform tptp python microc ada_terms
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
-$(PLUGDEP): DEPFLAGS += $(PLUGINCLUDES)
-$(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
+$(PLUGDEP) $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
 
 $(PLUGDEP): $(PLUGGENERATED)
 
@@ -585,8 +585,7 @@ TOOLSDEP = $(addsuffix .dep, $(TOOLSMODULES))
 TOOLSCMO = $(addsuffix .cmo, $(TOOLSMODULES))
 TOOLSCMX = $(addsuffix .cmx, $(TOOLSMODULES))
 
-$(TOOLSDEP): DEPFLAGS += -I src/tools
-$(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
+$(TOOLSDEP) $(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
 
 $(TOOLSDEP): $(TOOLSGENERATED)
 
@@ -804,8 +803,7 @@ IDEDEP = $(addsuffix .dep, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
-$(IDEDEP): DEPFLAGS += -I src/ide
-$(IDECMO) $(IDECMX): INCLUDES += -I src/ide
+$(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
 $(IDEDEP): $(IDEGENERATED)
 
@@ -814,7 +812,7 @@ $(IDEDEP): $(IDEGENERATED)
 byte: bin/why3ide.byte
 opt:  bin/why3ide.opt
 
-bin/why3ide.opt bin/why3ide.byte: INCLUDES += @LABLGTKINCLUDE@
+bin/why3ide.opt bin/why3ide.byte: EXTINCLUDES += @LABLGTKINCLUDE@
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += @LABLGTKLIB@
 bin/why3ide.byte: BLINKFLAGS += -custom
 
@@ -883,8 +881,7 @@ WEBSERVDEP = $(addsuffix .dep, $(WEBSERVMODULES))
 WEBSERVCMO = $(addsuffix .cmo, $(WEBSERVMODULES))
 WEBSERVCMX = $(addsuffix .cmx, $(WEBSERVMODULES))
 
-$(WEBSERVDEP): DEPFLAGS += -I src/ide
-$(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
+$(WEBSERVDEP) $(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
 
 # build targets
 
@@ -935,8 +932,7 @@ SESSIONDEP = $(addsuffix .dep, $(SESSIONMODULES))
 SESSIONCMO = $(addsuffix .cmo, $(SESSIONMODULES))
 SESSIONCMX = $(addsuffix .cmx, $(SESSIONMODULES))
 
-$(SESSIONDEP): DEPFLAGS += -I src/why3session
-$(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
+$(SESSIONDEP) $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
 
 # build targets
 
@@ -977,8 +973,7 @@ SHELLDEP = $(addsuffix .dep, $(SHELLMODULES))
 SHELLCMO = $(addsuffix .cmo, $(SHELLMODULES))
 SHELLCMX = $(addsuffix .cmx, $(SHELLMODULES))
 
-$(SHELLDEP): DEPFLAGS += -I src/tools
-$(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
+$(SHELLDEP) $(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
 
 # build targets
 
@@ -1493,8 +1488,8 @@ ISABELLECMODULES := $(addprefix src/isabelle-client/, $(ISABELLEC_FILES))
 ISABELLECDEP = $(addsuffix .dep, $(ISABELLECMODULES))
 ISABELLECCMO = $(addsuffix .cmo, $(ISABELLECMODULES))
 ISABELLECCMX = $(addsuffix .cmx, $(ISABELLECMODULES))
-$(ISABELLECCMO) $(ISABELLECCMX): INCLUDES += -I src/isabelle-client -I src/util
-$(ISABELLECDEP): DEPFLAGS += -I src/isabelle-client
+
+$(ISABELLECDEP) $(ISABELLECCMO) $(ISABELLECCMX): INCLUDES += -I src/isabelle-client -I src/util
 
 depend: $(ISABELLECDEP)
 CLEANDIRS += src/isabelle-client
@@ -1562,8 +1557,7 @@ PRETTYPRINTDEP = $(addsuffix .dep, $(PRETTYPRINTMODULES))
 PRETTYPRINTCMO = $(addsuffix .cmo, $(PRETTYPRINTMODULES))
 PRETTYPRINTCMX = $(addsuffix .cmx, $(PRETTYPRINTMODULES))
 
-$(PRETTYPRINTDEP): DEPFLAGS += -I src/tools
-$(PRETTYPRINTCMO) $(PRETTYPRINTCMX): INCLUDES += -I src/tools
+$(PRETTYPRINTDEP) $(PRETTYPRINTCMO) $(PRETTYPRINTCMX): INCLUDES += -I src/tools
 
 # build targets
 
@@ -1609,8 +1603,7 @@ WHY3DOCDEP = $(addsuffix .dep, $(WHY3DOCMODULES))
 WHY3DOCCMO = $(addsuffix .cmo, $(WHY3DOCMODULES))
 WHY3DOCCMX = $(addsuffix .cmx, $(WHY3DOCMODULES))
 
-$(WHY3DOCDEP): DEPFLAGS += -I src/why3doc
-$(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
+$(WHY3DOCDEP) $(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
 
 $(WHY3DOCDEP): $(WHY3DOCGENERATED)
 
@@ -2151,7 +2144,7 @@ doc/apidoc:
 
 apidoc: doc/apidoc $(FILESTODOC)
 	$(OCAMLDOC) -d doc/apidoc -html -t "Why3 API documentation" \
-		-keep-code $(INCLUDES) $(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
+		-keep-code $(INCLUDES) $(LIBINCLUDES) $(EXTINCLUDES) $(FILESTODOC)
 
 # could we include also the dependency graph ? -- someone
 # At least we can give a way to create it -- francois
@@ -2174,7 +2167,7 @@ doc/apidoc/dg.png: doc/apidoc/dg.dot
 
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
-		$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
+		$(LIBINCLUDES) $(EXTINCLUDES) $(FILESTODOC)
 
 clean::
 	rm -f doc/apidoc/*
@@ -2307,11 +2300,11 @@ clean::
 
 %.dep: %.ml %.mli
 	$(SHOW) 'Ocamldep $<'
-	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $< $<i $(TOTARGET)
+	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $(INCLUDES) $< $<i $(TOTARGET)
 
 %.dep: %.ml
 	$(SHOW) 'Ocamldep $<'
-	$(HIDE)($(OCAMLDEP) $(DEPFLAGS) $<; \
+	$(HIDE)($(OCAMLDEP) $(DEPFLAGS) $(INCLUDES) $<; \
 	        echo '$*.cmx : $*.cmi'; \
 	        echo '$*.cmi : $*.cmo') $(TOTARGET)
 
