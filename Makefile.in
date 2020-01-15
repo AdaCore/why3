@@ -813,7 +813,15 @@ ifeq (@enable_ide@,yes)
 
 IDEGENERATED = src/ide/gtkcompat.ml
 
-IDE_FILES = gtkcompat gconfig ide_utils why3ide
+IDE_FILES = gtkcompat
+
+ifeq (@enable_statmemprof@,yes)
+IDE_FILES += statmemprof
+
+bin/why3ide.opt bin/why3ide.byte: EXTPKGS += @STATMEMPROFPKG@
+endif
+
+IDE_FILES += gconfig ide_utils why3ide
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
