@@ -1,0 +1,308 @@
+module Zdiv2exp
+
+use int.Int
+use int.ComputerDivision
+use int.Power
+use map.Map
+use mach.int.Int32GMP
+use ref.Ref
+use mach.c.C
+use lemmas.Lemmas
+use util.Util
+use ptralias.Alias
+use compare.Compare
+use import mach.int.UInt64GMP as Limb
+use types.Types
+use logical.Logical
+use logical.AliasLogical
+use int.Abs
+use mpz.Z
+
+let lemma div_unique (x y q:int)
+  requires { y > 0 }
+  requires { x >= 0 }
+  requires { q * y <= x < q * y + y }
+  ensures  { div x y = q }
+=
+  let q' = div x y in
+  let r' = mod x y in
+  let r = x - q * y in
+  assert { q = q'
+           by q' * y + r' = x = q * y + r
+           so q' * y <= x < q' * y + y
+           so -y < q' * y - q * y < y
+           so -1 < q' - q < 1 }
+
+let lemma div_minus (x y:int)
+  requires { y > 0 }
+  requires { x >= 0 }
+  ensures  { div (-x) y = - div x y }
+= ()
+
+let wmpz_tdiv_q_2exp (r u:mpz_ptr) (cnt:limb) : unit
+  requires { mpz.alloc[r] >= 1 /\ mpz.alloc[u] >= 1 }
+  requires { mpz.readers[r] = 0 /\ mpz.readers[u] = 0 }
+  requires { mpz.abs_size[u] + div cnt 64 + 1 <= max_int32 }
+  ensures  { value_of r mpz = div (old (value_of u mpz)) (power 2 cnt) }
+  ensures  { forall x. x <> r -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[r] = 0 /\ mpz.readers[u] = 0 }
+=
+  let ghost ompz = pure { mpz } in
+  let ghost ovu = value_of u in
+  let un = size_of u in
+  let limb_cnt = Limb.to_int32 (cnt / 64) in
+  let ref rn = abs un - limb_cnt in
+  if rn <= 0
+  then begin
+    set_size_0 r;
+    assert { abs ovu < power 2 cnt
+             by cnt >= 64 * limb_cnt
+             so abs ovu < power radix (abs un) <= power radix limb_cnt
+                = power 2 (64 * limb_cnt)
+                <= power 2 cnt };
+    assert { div ovu (power 2 cnt) = 0 };
+  end else begin
+    let rp = wmpz_realloc r rn in
+    let c = cnt % 64 in
+    assert { cnt = 64 * limb_cnt + c };
+    assert { power 2 cnt = power 2 c * power radix limb_cnt
+             by power 2 cnt
+                = power 2 (64 * limb_cnt) * power 2 c
+                = power (power 2 64) limb_cnt * power 2 c
+                = power radix limb_cnt * power 2 c };
+    if mpz_eq u r
+    then begin
+      assert { mpz.alloc[r] >= un };
+      let up = C.incr rp limb_cnt in
+      value_concat rp limb_cnt (abs un);
+      assert { abs ovu = value rp (abs un)
+               = value rp limb_cnt + power radix limb_cnt * value up rn };
+      let ghost orp = pure { rp } in
+      let ghost oup = pure { up } in
+      if c <> 0 then begin
+        label Shift in
+        let ghost _m = rshift rp up rn c in
+        assert { _m + radix * value rp rn
+                 = value oup rn * power 2 (64 - c) };
+        assert { radix * value oup rn
+                 = power 2 c * _m + power 2 c * radix * value rp rn
+                 by power 2 (64 - c) * power 2 c = radix
+                 so radix * value oup rn
+                    = value oup rn * power 2 (64 - c) * power 2 c };
+        let ghost d = div (power 2 (uint64'int c) * uint64'int _m) radix in
+        assert { power 2 c * _m = radix * d
+                 by power 2 c * _m >= 0
+                 so power 2 c * _m
+                    = radix * (value oup rn - power 2 c * value rp rn) + 0
+                 so value oup rn - power 2 c * value rp rn >= 0
+                 so mod (power 2 c * _m) radix
+                    = mod (radix * (value oup rn - power 2 c * value rp rn) + 0)
+                          radix
+                    = 0 };
+        assert { value oup rn = d + power 2 c * value rp rn };
+        assert { abs ovu
+                 = value orp limb_cnt + power radix limb_cnt * d
+                   + power radix limb_cnt * power 2 c * value rp rn
+                 = value orp limb_cnt + power radix limb_cnt * d
+                   + power 2 cnt * value rp rn };
+        assert { value orp limb_cnt + power radix limb_cnt * d < power 2 cnt
+                 by _m < radix
+                 so d * radix = power 2 c * _m < power 2 c * radix
+                 so d < power 2 c
+                 so d <= power 2 c - 1
+                 so value orp limb_cnt < power radix limb_cnt
+                 so value orp limb_cnt + power radix limb_cnt * d
+                    < power radix limb_cnt + power radix limb_cnt * d
+                    = power radix limb_cnt * (d+1)
+                    <= power radix limb_cnt * power 2 c = power 2 cnt };
+        assert { value rp rn = div (abs ovu) (power 2 cnt)
+                 by let cq = value rp rn in
+                    let cr = value orp limb_cnt + power radix limb_cnt * d in
+                    abs ovu = power 2 cnt * cq + cr
+                    so 0 <= value orp limb_cnt
+                    so 0 <= d
+                    so 0 <= power radix limb_cnt * d
+                    so 0 <= cr < power 2 cnt
+                    so div (abs ovu) (power 2 cnt) = cq };
+        value_tail rp (rn - 1);
+        label Size in
+        rn <- rn - (if C.get_ofs rp (rn - 1) = 0 then 1 else 0);
+        assert { value rp rn = div (abs ovu) (power 2 cnt) };
+        assert { rn >= 1 -> value rp rn >= power radix (rn - 1)
+                 by if (pelts rp)[rn - 1 at Size] <> 0
+                    then value rp rn
+                         >= (pelts rp)[rn - 1] * power radix (rn - 1)
+                         >= power radix (rn - 1)
+                 else rn = abs un - limb_cnt - 1
+                 so abs ovu >= power radix (abs un - 1)
+                 so mod (abs ovu) (power 2 c) < power 2 cnt
+                 so value rp rn * power 2 cnt + power 2 cnt > ovu
+                 so (value rp rn + 1) * power radix limb_cnt * power 2 c
+                    = (value rp rn + 1) * power 2 cnt > abs ovu
+                    >= power radix (abs un - 1)
+                    = power radix (rn + limb_cnt)
+                    = power radix rn * power radix limb_cnt
+                 so power radix limb_cnt * power radix rn
+                    < power radix limb_cnt * ((value rp rn + 1) * power 2 c)
+                 so power radix rn < (value rp rn + 1) * power 2 c
+                 so power radix rn = power radix (rn - 1) * power radix 1
+                    = power radix (rn - 1) * radix
+                    = power radix (rn - 1) * (power 2 (64 - c) * power 2 c)
+                    >= power radix (rn - 1) * power 2 c
+                 so power 2 c * power radix (rn - 1)
+                    < power 2 c * (value rp rn + 1)
+                 so power radix (rn - 1) < value rp rn + 1
+                 so value rp rn >= power radix (rn - 1) };
+      end else begin
+        assert { power 2 cnt = power radix limb_cnt };
+        wmpn_copyai rp up rn;
+        value_sub_frame_shift (pelts rp) (pelts oup)
+                              (offset rp) (offset oup)
+                              (int32'int rn);
+        assert { value rp rn = value oup rn };
+        assert { value rp rn = div (abs ovu) (power 2 cnt) };
+        value_concat oup limb_cnt (abs un);
+        assert { value rp rn >= power radix (rn - 1)
+                 by abs ovu >= power radix (abs un - 1)
+                 so abs ovu = value orp limb_cnt
+                          + power radix limb_cnt * value rp rn
+                        < power radix limb_cnt
+                          + power radix limb_cnt * value rp rn
+                        = power radix limb_cnt * (value rp rn + 1)
+                 so power radix (abs un - 1)
+                    = power radix (limb_cnt + rn - 1)
+                    = power radix limb_cnt * power radix (rn - 1)
+                 so value rp rn + 1 > power radix (rn - 1) };
+      end end
+    else begin
+      unchanged u mpz ompz;
+      assert { mpz.alloc[u] >= abs un > limb_cnt};
+      let up0 = get_read_ptr u in
+      let up = C.incr up0 limb_cnt in
+      value_concat up0 limb_cnt (abs un);
+      assert { abs ovu = value up0 (abs un)
+               = value up0 limb_cnt + power radix limb_cnt * value up rn };
+      let ghost oup0 = pure { up0 } in
+      let ghost oup = pure { up } in
+      if c <> 0 then begin
+        label Shift in
+        let ghost _m = wmpn_rshift rp up rn c in
+        assert { _m + radix * value rp rn
+                 = value oup rn * power 2 (64 - c) };
+        assert { radix * value oup rn
+                 = power 2 c * _m + power 2 c * radix * value rp rn
+                 by power 2 (64 - c) * power 2 c = radix
+                 so radix * value oup rn
+                    = value oup rn * power 2 (64 - c) * power 2 c };
+        let ghost d = div (power 2 (uint64'int c) * uint64'int _m) radix in
+        assert { power 2 c * _m = radix * d
+                 by power 2 c * _m >= 0
+                 so power 2 c * _m
+                    = radix * (value oup rn - power 2 c * value rp rn) + 0
+                 so value oup rn - power 2 c * value rp rn >= 0
+                 so mod (power 2 c * _m) radix
+                    = mod (radix * (value oup rn - power 2 c * value rp rn) + 0)
+                          radix
+                    = 0 };
+        assert { value oup rn = d + power 2 c * value rp rn };
+        assert { abs ovu
+                 = value oup0 limb_cnt + power radix limb_cnt * d
+                   + power radix limb_cnt * power 2 c * value rp rn
+                 = value oup0 limb_cnt + power radix limb_cnt * d
+                   + power 2 cnt * value rp rn };
+        assert { value oup0 limb_cnt + power radix limb_cnt * d < power 2 cnt
+                 by _m < radix
+                 so d * radix = power 2 c * _m < power 2 c * radix
+                 so d < power 2 c
+                 so d <= power 2 c - 1
+                 so value oup0 limb_cnt < power radix limb_cnt
+                 so value oup0 limb_cnt + power radix limb_cnt * d
+                    < power radix limb_cnt + power radix limb_cnt * d
+                    = power radix limb_cnt * (d+1)
+                    <= power radix limb_cnt * power 2 c = power 2 cnt };
+        assert { value rp rn = div (abs ovu) (power 2 cnt)
+                 by let cq = value rp rn in
+                    let cr = value oup0 limb_cnt + power radix limb_cnt * d in
+                    abs ovu = power 2 cnt * cq + cr
+                    so 0 <= value oup0 limb_cnt
+                    so 0 <= d
+                    so 0 <= power radix limb_cnt * d
+                    so 0 <= cr < power 2 cnt
+                    so div (abs ovu) (power 2 cnt) = cq };
+        value_tail rp (rn - 1);
+        label Size in
+        rn <- rn - (if C.get_ofs rp (rn - 1) = 0 then 1 else 0);
+        assert { value rp rn = div (abs ovu) (power 2 cnt) };
+        assert { rn >= 1 -> value rp rn >= power radix (rn - 1)
+                 by if (pelts rp)[rn - 1 at Size] <> 0
+                    then value rp rn
+                         >= (pelts rp)[rn - 1] * power radix (rn - 1)
+                         >= power radix (rn - 1)
+                 else rn = abs un - limb_cnt - 1
+                 so abs ovu >= power radix (abs un - 1)
+                 so mod (abs ovu) (power 2 c) < power 2 cnt
+                 so value rp rn * power 2 cnt + power 2 cnt > ovu
+                 so (value rp rn + 1) * power radix limb_cnt * power 2 c
+                    = (value rp rn + 1) * power 2 cnt > abs ovu
+                    >= power radix (abs un - 1)
+                    = power radix (rn + limb_cnt)
+                    = power radix rn * power radix limb_cnt
+                 so power radix limb_cnt * power radix rn
+                    < power radix limb_cnt * ((value rp rn + 1) * power 2 c)
+                 so power radix rn < (value rp rn + 1) * power 2 c
+                 so power radix rn = power radix (rn - 1) * power radix 1
+                    = power radix (rn - 1) * radix
+                    = power radix (rn - 1) * (power 2 (64 - c) * power 2 c)
+                    >= power radix (rn - 1) * power 2 c
+                 so power 2 c * power radix (rn - 1)
+                    < power 2 c * (value rp rn + 1)
+                 so power radix (rn - 1) < value rp rn + 1
+                 so value rp rn >= power radix (rn - 1) };
+      end else begin
+        assert { power 2 cnt = power radix limb_cnt };
+        wmpn_copyi rp up rn;
+        value_sub_frame_shift (pelts rp) (pelts oup)
+                              (offset rp) (offset oup)
+                              (int32'int rn);
+        assert { value rp rn = value oup rn };
+        assert { value rp rn = div (abs ovu) (power 2 cnt) };
+        value_concat oup limb_cnt (abs un);
+        assert { value rp rn >= power radix (rn - 1)
+                 by abs ovu >= power radix (abs un - 1)
+                 so abs ovu = value oup0 limb_cnt
+                          + power radix limb_cnt * value rp rn
+                        < power radix limb_cnt
+                          + power radix limb_cnt * value rp rn
+                        = power radix limb_cnt * (value rp rn + 1)
+                 so power radix (abs un - 1)
+                    = power radix (limb_cnt + rn - 1)
+                    = power radix limb_cnt * power radix (rn - 1)
+                 so power radix limb_cnt * power radix (rn - 1)
+                    < power radix limb_cnt * (value rp rn + 1)
+                 so power radix (rn - 1) < value rp rn + 1 };
+      end;
+      release_reader u up0;
+    end;
+    let ghost nrn = if size_of u >= 0 then rn else -rn in
+    assert { abs nrn >= 1 -> value rp (abs nrn) >= power radix ((abs nrn) - 1)
+             by abs nrn = rn };
+    assert { sgn_value rp nrn = div ovu (power 2 cnt)
+             by if mpz.sgn[u] >= 0
+             then nrn = rn
+                  so value_of u mpz = mpz.abs_value_of[u]
+                  so sgn_value rp nrn = value rp rn
+                  so abs ovu = ovu
+             else nrn = -rn
+                  so value_of u mpz = - mpz.abs_value_of[u]
+                  so abs ovu = - ovu
+                  so sgn_value rp nrn = - value rp rn
+                     = - div (-ovu) (power 2 cnt)
+                  so div (- (- ovu)) (power 2 cnt)
+                     = - div (-ovu) (power 2 cnt) };
+    label Size in
+    set_size r (if size_of u >= 0 then rn else -rn) rp;
+    release_writer r rp;
+    assert { value_of r mpz = sgn_value (rp at Size) nrn }
+  end
+
+end
