@@ -151,9 +151,9 @@ module Hex2
     assert { forall i. 0 <= i < length s1 ->
                48 <= code s1[i] < 58 || 65 <= code s1[i] < 71 };
     let s2 = decode s1 in
-    assert { length s2 = length s }
-    (* assert { forall i. 0 <= i < length s -> *)
-    (*           } *)
+    assert { length s2 = length s };
+    assert { forall i. 0 <= i < length s ->
+             s[i] = s2[i] }
 
   let test1 = let s = "" in let r = encode s in assert {r = s}
   let test2 = let s = "a" in let r = encode s in assert {decode r = s}
@@ -165,28 +165,57 @@ module Hex2
 
 end
 
-(* module Base64 *)
+module Base64
 
-(*   use mach.int.Int *)
-(*   use mach.int.Int63 *)
-(*   use string.OCaml *)
-(*   use ref.Ref *)
+  use mach.int.Int
+  use mach.int.Int63
+  use string.OCaml
 
-(*   val function encode (s: string) : string *)
-(*     ensures { length result <= (length s + 2) * 4 / 3 } *)
-(*     ensures { mod (length result) 4 = 0 } *)
-(*     ensures { forall i. 0 <= i < length result / 4 -> *)
-(*                 let a1 = s[i*3] in *)
-(*                 let a2 = s[i*3+1] in *)
-(*                 let a3 = s[i*3+2] in *)
-(*                 let b1 = result[i*4] in *)
-(*                 let b2 = result[i*4+1] in *)
-(*                 let b3 = result[i*4+2] in *)
-(*                 let b5 = result[i*4+3] in *)
-(*                 b1 = div (code c1)  4 && *)
-(*                 b2 = mod (code a1) 4 * 16 + div (code a2) 16 && *)
-(*                 b3 = mod (code c2) 16 * 4 + div (code a3 64) && *)
-(*                 b4 = mod (code c3) 64 *)
-(*    } *)
+  let function encode (s: string) : string
+    ensures { length result <= div ((length s + 2) * 4) 3 }
+    ensures { mod (length result) 4 = 0 }
+    ensures { forall i. 0 <= i < div (length result) 4 ->
+                let a1, a2, a3 = s[i*3], s[i*3+1], s[i*3+2] in
+                let b1, b2 = result[i*4], result[i*4+1] in
+                let b3, b4 = result[i*4+2], result[i*4+3] in
+                b1 = chr (div (code a1)  4) &&
+                b2 = chr (mod (code a1) 4 * 16 + div (code a2) 16) &&
+                b3 = chr (mod (code a2) 16 * 4 + div (code a3) 64) &&
+                b4 = chr (mod (code a3) 64)
+    }
+  = let len_m = (length s) % 3 in
+    let sp = if len_m = 1 then concat s "\000\000" else
+             if len_m = 2 then concat s "\000" else s in
+    assert { length sp <= length s + 2 };
+    let ref i = 0 in
+    let ref r = "" in
+    while i < length sp do
+      variant {length sp - i}
+      invariant { 0 <= i <= length sp }
+      invariant { mod i 3 = 0 }
+      invariant { length r = div (i * 4) 3 }
+      invariant { forall j. 0 <= j < i - 2 ->
+        let a1, a2, a3 = sp[j*3], sp[j*3+1], sp[j*3+2] in
+        let b1, b2, b3, b4 = r[j*4], r[j*4+1], r[j*4+2], r[j*4+3] in
+        b1 = chr (div (code a1)  4) &&
+        b2 = chr (mod (code a1) 4 * 16 + div (code a2) 16) &&
+        b3 = chr (mod (code a2) 16 * 4 + div (code a3) 64) &&
+        b4 = chr (mod (code a3) 64) }
+      let c1,c2,c3 = sp[i], sp[i+1], sp[i+2] in
+      let b1 = code c1 / 4 in
+      let b2 = (code c1 % 4) * 16 + code c2 / 16 in
+      let b3 = (code c2 % 16) * 4 + code c3 / 64 in
+      let b4 = code c3 % 64 in
+      r <- concat r (chr b1).content;
+      assert { r[length r - 1] = chr (div (code c1) 4) };
+      r <- concat r (chr b2).content;
+      assert { r[length r - 1] = chr (mod (code c1) 4 * 16 + div (code c2) 16) };
+      r <- concat r (chr b3).content;
+      assert { r[length r - 1] = chr (mod (code c2) 16 * 4 + div (code c3) 64) };
+      r <- concat r (chr b4).content;
+      assert { r[length r - 1] = chr (mod (code c3) 64) };
+      i <- i + 3
+    done;
+    r (* TODO padding *)
 
-(* end *)
+end
