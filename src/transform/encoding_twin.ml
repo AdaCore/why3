@@ -102,7 +102,7 @@ let decl tenv d = match d.d_node with
   | Ddata _ -> Printer.unsupportedDecl d
       "Algebraic and recursively-defined types are \
             not supported, run eliminate_algebraic"
-  | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+  | Dlogic [ls,ld] when not (Sid.mem ls.ls_name (get_decl_syms d)) ->
       let f = rewrite tenv (ls_defn_axiom ld) in
       Libencoding.defn_or_axiom ls f
   | Dlogic _ -> Printer.unsupportedDecl d

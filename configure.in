@@ -63,6 +63,11 @@ AC_ARG_ENABLE(zarith,
     AS_HELP_STRING([--disable-zarith], [use Nums instead of Zarith for computations]),,
     enable_zarith=yes)
 
+# ocamlfind
+
+AC_ARG_ENABLE(ocamlfind,
+    AS_HELP_STRING([--disable-ocamlfind], [do not use Ocamlfind]),,
+    enable_ocamlfind=yes)
 
 # camlzip
 
@@ -138,6 +143,11 @@ AC_ARG_ENABLE(frama-c,
 AC_ARG_ENABLE(profiling,
     AS_HELP_STRING([--enable-profiling], [enable profiling]),,
     enable_profiling=no)
+
+AC_ARG_ENABLE(statmemprof,
+    AS_HELP_STRING([--enable-statmemprof], [enable statistical memory profiling]),,
+    [enable_statmemprof=no
+     reason_statmemprof=" (disabled by default)"])
 
 # Emacs compilation
 
@@ -298,35 +308,45 @@ MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
 AX_VERSION_GE([$MENHIRVERSION], 20151112, [],
   [AC_MSG_ERROR(You need Menhir 20151112 or higher.)])
 
-## Where are the library we need
-# we look for ocamlfind; if not present, we just don't use it to find
-# libraries
-AC_CHECK_PROG(USEOCAMLFIND,ocamlfind,yes,no)
-
-if test "$USEOCAMLFIND" = yes; then
-   OCAMLFINDLIB=$(ocamlfind printconf stdlib)
-   OCAMLFIND=$(which ocamlfind)
-   if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
-   USEOCAMLFIND=no;
-   echo "but your ocamlfind is not compatible with your ocamlc:"
-   echo "ocamlfind : $OCAMLFINDLIB, ocamlc : $OCAMLLIB"
+if test "$enable_ocamlfind" != yes; then
+   OCAMLFIND=no
+else
+   AC_CHECK_PROG(OCAMLFIND,ocamlfind,ocamlfind,no)
+   if test "$OCAMLFIND" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (not found)"
+   else
+      OCAMLFINDLIB=$(ocamlfind printconf stdlib)
+      if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
+         OCAMLFIND=no
+         enable_ocamlfind=no
+         reason_ocamlfind=" (incompatible with OCaml)"
+         echo "but your ocamlfind is not compatible with your ocamlc:"
+         echo "ocamlfind: $OCAMLFINDLIB, ocamlc: $OCAMLLIB"
+      fi
    fi
+fi
+
+#if ocamlfind is used it gives the install path for ocaml library
+if test "$enable_ocamlfind" = yes; then
+   OCAMLINSTALLLIB=$($OCAMLFIND printconf destdir)
+else
+   OCAMLINSTALLLIB=$OCAMLLIB
 fi
 
 if test "$enable_why3_lib" = yes ; then
    WHY3LIB=
-   WHY3INCLUDE="-I lib/why3"
 else
    AC_MSG_CHECKING([For Why3])
-   if test "$USEOCAMLFIND" = no; then
+   if test "$enable_ocamlfind" = no; then
       AC_MSG_RESULT([no])
       AC_MSG_ERROR([Cannot use --disable-why3-lib without ocamlfind.])
    fi
    WHY3LIB=why3
-   WHY3INCLUDE=$(ocamlfind query why3)
-   if test -n "$WHY3INCLUDE"; then
-      AC_MSG_RESULT([$WHY3INCLUDE])
-      WHY3INCLUDE="-I $WHY3INCLUDE"
+   DIR=$($OCAMLFIND query why3)
+   if test -n "$DIR"; then
+      AC_MSG_RESULT([$DIR])
+      WHY3INCLUDE="-I $DIR"
    else
       AC_MSG_RESULT([no])
       AC_MSG_ERROR([Cannot use --disable-why3-lib without an installed Why3.])
@@ -339,19 +359,9 @@ else
    LOCALDIR="${PWD}"
 fi
 
-#if ocamlfind is used it gives the install path for ocaml library
-if test "$USEOCAMLFIND" = yes; then
-   OCAMLINSTALLLIB=$(ocamlfind printconf destdir)
-   OCAMLFIND=ocamlfind
-else
-   OCAMLINSTALLLIB=$OCAMLLIB
-   OCAMLFIND=no
-fi
-
 # ppx
-
-if test "$USEOCAMLFIND" = yes; then
-  COMPILERLIBS=$(ocamlfind query compiler-libs)
+if test "$enable_ocamlfind" = yes; then
+  COMPILERLIBS=$($OCAMLFIND query compiler-libs)
   if test -n "$COMPILERLIBS"; then
     echo "ocamlfind found compiler-libs in $COMPILERLIBS"
     enable_ppx=yes
@@ -408,14 +418,18 @@ fi
 # checking for Num
 # (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
 found_num=no
-if test "$USEOCAMLFIND" = yes; then
-   DIR=$(ocamlfind query num)
+if test "$enable_ocamlfind" = yes; then
+   DIR=$($OCAMLFIND query num)
    if test -n "$DIR"; then
       echo "ocamlfind found num in $DIR"
+      NUMPKG=num
       NUMINCLUDE="-I $DIR"
       found_num=yes
       AC_CHECK_FILE($DIR/nums.cma,,found_num=no)
       AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
+   else
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find num)"
    fi
 fi
 if test "$found_num" = no; then
@@ -432,11 +446,13 @@ fi
 # checking for Zarith
 if test "$enable_zarith" = yes; then
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
+   if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query zarith)
       if test -n "$DIR"; then
          echo "ocamlfind found zarith in $DIR"
          BIGINTINCLUDE="-I $DIR"
+      else
+         ocamlfind_zarith=no
       fi
    fi
    if test -z "$DIR"; then
@@ -448,6 +464,9 @@ if test "$enable_zarith" = yes; then
    if test "$enable_zarith" = no; then
       AC_MSG_WARN([Lib Zarith not found, using Nums instead.])
       reason_zarith=" (zarith not found)"
+   elif test "$ocamlfind_zarith" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find zarith)"
    fi
 fi
 
@@ -463,11 +482,13 @@ fi
 # checking for camlzip
 if test "$enable_zip" = yes; then
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
+   if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query zip)
       if test -n "DIR"; then
          echo "ocamlfind found camlzip in $DIR"
          ZIPINCLUDE="-I $DIR"
+      else
+         ocamlfind_zip=no
       fi
    fi
    if test -z "$DIR"; then
@@ -479,6 +500,9 @@ if test "$enable_zip" = yes; then
    if test "$enable_zip" = no; then
       AC_MSG_WARN([Lib camlzip not found, sessions files will not be compressed.])
       reason_zip=" (camlzip not found)"
+   elif test "$ocamlfind_zip" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find camlzip)"
    fi
 fi
 
@@ -492,11 +516,14 @@ fi
 # checking for menhirlib
 found_menhirlib=yes
 DIR=
-if test "$USEOCAMLFIND" = yes; then
-   DIR=$(ocamlfind query menhirLib)
+if test "$enable_ocamlfind" = yes; then
+   DIR=$($OCAMLFIND query menhirLib)
    if test -n "$DIR"; then
       echo "ocamlfind found menhirLib in $DIR"
       MENHIRINCLUDE="-I $DIR"
+   else
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find menhirLib)"
    fi
 fi
 if test -z "$DIR"; then
@@ -512,8 +539,8 @@ fi
 # checking for seq
 # (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
 found_seq=no
-if test "$USEOCAMLFIND" = yes; then
-   DIR=$(ocamlfind query seq)
+if test "$enable_ocamlfind" = yes; then
+   DIR=$($OCAMLFIND query seq)
    if test -n "$DIR"; then
       echo "ocamlfind found seq in $DIR"
       SEQINCLUDE="-I $DIR"
@@ -542,11 +569,13 @@ fi
 if test "$enable_re" = yes; then
    found_re=yes
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
+   if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query re)
       if test -n "$DIR"; then
          echo "ocamlfind found re in $DIR"
          REINCLUDE="-I $DIR"
+      else
+         ocamlfind_re=no
       fi
    fi
    if test -z "$DIR"; then
@@ -558,14 +587,17 @@ if test "$enable_re" = yes; then
    if test "$found_re" = no; then
       AC_MSG_WARN([Library re not found.])
       enable_re=no
+   elif test "$ocamlfind_re" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find re)"
    fi
 fi
 
 if test "$enable_re" = no; then
-   REINCLUDE=""
-   RELIB="str"
+   REINCLUDE=
+   RELIB=str
 else
-   RELIB="re"
+   RELIB=re
 fi
 
 # checking for lablgtk3
@@ -573,8 +605,8 @@ if test "$enable_ide" != yes ; then
    reason_ide=" (disabled by user)"
 else
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query lablgtk3)
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query lablgtk3)
       if test -n "$DIR"; then
          echo "ocamlfind found lablgtk3 in $DIR"
          LABLGTKINCLUDE="-I $DIR -I +threads"
@@ -602,8 +634,8 @@ fi
 if test "$enable_ide" = retry; then
    enable_ide=yes
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query lablgtk2)
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query lablgtk2)
       if test -n "$DIR"; then
          echo "ocamlfind found lablgtk2 in $DIR"
          LABLGTKINCLUDE="-I $DIR"
@@ -630,8 +662,8 @@ fi
 # checking for lablgtksourceview
 if test "$enable_ide" = yes ; then
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query $PKG_SOURCEVIEW)
       if test -z "$DIR"; then
          case $GTKVERSION in
             2)
@@ -669,7 +701,7 @@ fi
 
 if test "$enable_ide" = yes ; then
    LABLGTKLIB="$LABLGTKLIB $LIB_SOURCEVIEW"
-   LABLGTKPKG="lablgtk$GTKVERSION lablgtk$GTKVERSION.init $PKG_SOURCEVIEW"
+   LABLGTKPKG="lablgtk$GTKVERSION $PKG_SOURCEVIEW"
 else
    LABLGTKLIB=
    LABLGTKPKG=
@@ -683,11 +715,13 @@ dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 # checking for ocamlgraph
 if test "$enable_hypothesis_selection" = yes; then
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query ocamlgraph)
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query ocamlgraph)
       if test -n "$DIR"; then
          echo "ocamlfind found ocamlgraph in $DIR"
          OCAMLGRAPHLIB="$DIR"
+      else
+         ocamlfind_ocamlgraph=no
       fi
    fi
    if test -z "$DIR"; then
@@ -699,6 +733,9 @@ if test "$enable_hypothesis_selection" = yes; then
    if test "$enable_hypothesis_selection" = no; then
       reason_hypothesis_selection=" (ocamlgraph not found)"
       AC_MSG_WARN([Lib ocamlgraph not found, hypothesis selection disabled.])
+   elif test "$ocamlfind_ocamlgraph" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find ocamlgraph)"
    fi
 fi
 
@@ -712,16 +749,16 @@ fi
 # checking for js_of_ocaml
 if test "$enable_js_of_ocaml" != yes; then
    reason_js_of_ocaml=" (disabled by user)"
-elif test "$USEOCAMLFIND" != yes; then
+elif test "$enable_ocamlfind" != yes; then
    enable_js_of_ocaml=no
    reason_js_of_ocaml=" (ocamlfind not available)"
 else
-   JSOFOCAML=$(ocamlfind query js_of_ocaml)
+   JSOFOCAML=$($OCAMLFIND query js_of_ocaml)
    if test -z "$JSOFOCAML"; then
       enable_js_of_ocaml=no
       reason_js_of_ocaml=" (js_of_ocaml not found)"
    else
-      JSOFOCAMLPPX=$(ocamlfind query js_of_ocaml-ppx)
+      JSOFOCAMLPPX=$($OCAMLFIND query js_of_ocaml-ppx)
       if test -z "$JSOFOCAMLPPX"; then
          enable_js_of_ocaml=no
          reason_js_of_ocaml=" (js_of_ocaml-ppx not found)"
@@ -744,8 +781,8 @@ if test "$enable_js_of_ocaml" != no; then
    found_mlmpfr=no
    reason_mlmpfr=" (Cannot allow mlmpfr with js_of_ocaml) "
 else
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query mlmpfr)
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query mlmpfr)
       if test -n "$DIR"; then
          echo "ocamlfind found mlmpfr in $DIR"
          # Test that mpfr version is higher than 4.0.0 (because of
@@ -763,11 +800,11 @@ else
             found_mlmpfr=no
          fi
       else
-         reason_mlmpfr=" (Could not find mlmpfr) "
+         reason_mlmpfr=" (mlmpfr not found)"
          found_mlmpfr=no
       fi
    else
-      reason_mlmpfr=" (Should use ocamlfind to use mlmpfr) "
+      reason_mlmpfr=" (ocamlfind not available) "
       found_mlmpfr=no
    fi
 fi
@@ -776,6 +813,20 @@ if test "$found_mlmpfr" = no; then
    MLMPFR=
 fi
 
+# checking for statmemprof
+if test "$enable_statmemprof" = yes; then
+   if test "$enable_ocamlfind" != yes; then
+      enable_statmemprof=no
+      reason_statmemprof=" (ocamlfind not available)"
+   else
+      DIR=$($OCAMLFIND query statmemprof-emacs)
+      if test -z "$DIR"; then
+         enable_statmemprof=no
+         reason_statmemprof=" (statmemprof-emacs not found)"
+      fi
+      STATMEMPROFPKG=statmemprof-emacs
+   fi
+fi
 
 # Coq
 
@@ -994,7 +1045,6 @@ AC_SUBST(STRIP)
 AC_SUBST(OCAMLC)
 AC_SUBST(OCAMLOPT)
 AC_SUBST(OCAMLDEP)
-AC_SUBST(OCAMLFIND)
 AC_SUBST(OCAMLLEX)
 AC_SUBST(OCAMLYACC)
 AC_SUBST(OCAMLDOC)
@@ -1008,7 +1058,13 @@ AC_SUBST(OCAMLGRAPHLIB)
 dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(MENHIR)
 
+AC_SUBST(enable_ocamlfind)
+AC_SUBST(OCAMLFIND)
+
 AC_SUBST(enable_profiling)
+
+AC_SUBST(enable_statmemprof)
+AC_SUBST(STATMEMPROFPKG)
 
 AC_SUBST(enable_ide)
 AC_SUBST(LABLGTKLIB)
@@ -1127,8 +1183,10 @@ echo "Verbose make                : $enable_verbose_make"
 echo "OCaml compiler              : yes"
 echo "    Version                 : $OCAMLVERSION"
 echo "    Library path            : $OCAMLLIB"
+echo "    Ocamlfind               : $enable_ocamlfind$reason_ocamlfind"
 echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
+echo "    Memory profiling        : $enable_statmemprof$reason_statmemprof"
 echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"

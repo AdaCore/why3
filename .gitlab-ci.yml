@@ -76,7 +76,8 @@ nightly-bench:
     - misc/ci-local.sh nightly-bench-reduced
   <<: *docker_definition
 
-ce-bench:
+# disabled
+.ce-bench:
   stage: nightly
   variables:
     COMPILER: bench
