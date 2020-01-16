@@ -29,7 +29,7 @@ clean:
 why3:
 	make -C ../..
 
-MLWFILES = $(addsuffix .mlw, mpz_mul2exp mpz_mul mpz_sub mpz_add mpz_getset mpz powm sqrtrem sqrt toom logical div mul sub add compare util)
+MLWFILES = $(addsuffix .mlw, mpz_div2exp mpz_mul2exp mpz_mul mpz_sub mpz_add mpz_getset mpz powm sqrtrem sqrt toom logical div mul sub add compare util)
 
 build/extracted:
 	mkdir -p build
@@ -48,7 +48,7 @@ build/binverttab.h: binverttab.ml
 
 extract: build/extracted build/sqrtinit.h build/binverttab.h
 
-CFILES = build/uint64gmp.c build/z.c build/zadd.c build/zsub.c build/zmul.c build/zmul2exp.c build/set.c build/powm.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/aliaslogical.c build/mul.c build/subold.c build/sub.c build/sub_1.c build/addold.c build/add.c build/add_1.c build/compare.c build/util.c build/int32.c
+CFILES = build/uint64gmp.c build/z.c build/zadd.c build/zsub.c build/zmul.c build/zmul2exp.c build/zdiv2exp.c build/set.c build/powm.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/aliaslogical.c build/mul.c build/subold.c build/sub.c build/sub_1.c build/addold.c build/add.c build/add_1.c build/compare.c build/util.c build/int32.c
 
 build/tests: tests.c extract
 	gcc $(CFLAGS) tests.c $(CFILES) -Irandom -lgmp -o build/tests

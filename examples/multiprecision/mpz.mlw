@@ -222,7 +222,7 @@ val wmpz_clear (x:mpz_ptr) : unit (* scrambles mpz._[x] *)
   requires { mpz.readers[x] = 0 }
   ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
 
-let partial wmpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
+let partial wmpz_do_realloc (x:mpz_ptr) (sz:int32) : ptr limb
   requires { 1 <= sz } (* GMP does sz = max (sz,1) instead, do that if needed *)
   requires { mpz.readers[x] = 0 }
   requires { 1 <= mpz.alloc[x] }
@@ -258,6 +258,29 @@ let partial wmpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
   set_alloc x sz;
   set_ptr x q;
   q
+
+let wmpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
+  requires { 1 <= sz } (* GMP does sz = max (sz,1) instead, do that if needed *)
+  requires { mpz.readers[x] = 0 }
+  requires { 1 <= mpz.alloc[x] }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.readers[x] = -1 }
+  ensures  { mpz.abs_value_of[x] = value result (mpz.abs_size[x]) }
+  ensures  { mpz.zones[x] = zone result }
+  ensures  { offset result = 0 }
+  ensures  { plength result = mpz.alloc[x] }
+  ensures  { min result = 0 }
+  ensures  { max result = plength result }
+  ensures  { writable result }
+  ensures  { mpz.abs_size[x] = old mpz.abs_size[x] }
+  ensures  { value result (old mpz.abs_size[x])
+             = old mpz.abs_value_of[x] }
+  ensures  { if sz > old mpz.alloc[x]
+             then mpz.alloc[x] = sz
+             else mpz.alloc[x] = old mpz.alloc[x]  }
+= if sz > alloc_of x
+  then wmpz_do_realloc x sz
+  else get_write_ptr x
 
 let mpz_ptr_swap [@extraction:inline] (ref x y: mpz_ptr)
   requires { mpz.readers[x] = 0 /\ mpz.readers[y] = 0 }

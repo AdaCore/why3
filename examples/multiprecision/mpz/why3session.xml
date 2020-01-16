@@ -11,168 +11,298 @@
  <goal name="mpz_memo&#39;vc" expl="VC for mpz_memo" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="mpz_memo&#39;vc.0" expl="type invariant" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="13647"/></proof>
+  <proof prover="2"><result status="valid" time="0.04" steps="13648"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="unchanged&#39;vc" expl="VC for unchanged" proved="true">
- <proof prover="2"><result status="valid" time="0.07" steps="16052"/></proof>
+ <proof prover="2"><result status="valid" time="0.07" steps="16053"/></proof>
  </goal>
  <goal name="unchanged_transitive" proved="true">
- <proof prover="2"><result status="valid" time="0.08" steps="17285"/></proof>
+ <proof prover="2"><result status="valid" time="0.08" steps="17286"/></proof>
  </goal>
  <goal name="abs&#39;vc" expl="VC for abs" proved="true">
- <proof prover="2"><result status="valid" time="0.08" steps="17324"/></proof>
+ <proof prover="2"><result status="valid" time="0.08" steps="17325"/></proof>
  </goal>
  <goal name="abs_size_of&#39;vc" expl="VC for abs_size_of" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="93"/></proof>
  </goal>
+ <goal name="wmpz_do_realloc&#39;vc" expl="VC for wmpz_do_realloc" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="wmpz_do_realloc&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="13434"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.11" steps="18008"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="15426"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="14546"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="14555"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="14743"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15948"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="14312"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="14310"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.10" steps="15774"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="15326"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="15064"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="15346"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="15531"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.14" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="16405"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.15" expl="postcondition" proved="true">
+  <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
+   <goal name="wmpz_do_realloc&#39;vc.15.0" expl="apply premises" proved="true">
+   <proof prover="2"><result status="valid" time="0.07" steps="16882"/></proof>
+   </goal>
+   <goal name="wmpz_do_realloc&#39;vc.15.1" expl="apply premises" proved="true">
+   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
+    <goal name="wmpz_do_realloc&#39;vc.15.1.0" expl="apply premises" proved="true">
+    <proof prover="2"><result status="valid" time="0.07" steps="16882"/></proof>
+    </goal>
+    <goal name="wmpz_do_realloc&#39;vc.15.1.1" expl="apply premises" proved="true">
+    <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz3">
+     <goal name="wmpz_do_realloc&#39;vc.15.1.1.0" expl="apply premises" proved="true">
+     <proof prover="2"><result status="valid" time="0.08" steps="16882"/></proof>
+     </goal>
+     <goal name="wmpz_do_realloc&#39;vc.15.1.1.1" expl="apply premises" proved="true">
+     <proof prover="2"><result status="valid" time="0.07" steps="16882"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.16" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="14871"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.17" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.11" steps="16450"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="14892"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="15145"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.20" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15669"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.21" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15784"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.22" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15684"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.23" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.11" steps="17163"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.24" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="15424"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.25" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.12" steps="16574"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.26" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.18" steps="23091"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.27" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.10" steps="15695"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.28" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15193"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.29" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04" steps="14931"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.30" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15213"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.31" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15398"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.32" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="16226"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.33" expl="postcondition" proved="true">
+  <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz1">
+   <goal name="wmpz_do_realloc&#39;vc.33.0" expl="apply premises" proved="true">
+   <proof prover="2"><result status="valid" time="0.10" steps="16657"/></proof>
+   </goal>
+   <goal name="wmpz_do_realloc&#39;vc.33.1" expl="apply premises" proved="true">
+   <transf name="apply" proved="true" arg1="unchanged_transitive" arg2="with" arg3="mpz2">
+    <goal name="wmpz_do_realloc&#39;vc.33.1.0" expl="apply premises" proved="true">
+    <proof prover="2"><result status="valid" time="0.10" steps="16657"/></proof>
+    </goal>
+    <goal name="wmpz_do_realloc&#39;vc.33.1.1" expl="apply premises" proved="true">
+    <proof prover="2"><result status="valid" time="0.06" steps="16657"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.34" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="14766"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.35" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.10" steps="16254"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.36" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="14787"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.37" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15012"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.38" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="15536"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.39" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15651"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.40" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="15551"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.41" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="16976"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.42" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="15291"/></proof>
+  </goal>
+  <goal name="wmpz_do_realloc&#39;vc.43" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.04" steps="102"/></proof>
+  </goal>
+ </transf>
+ </goal>
  <goal name="wmpz_realloc&#39;vc" expl="VC for wmpz_realloc" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="wmpz_realloc&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="13433"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="13818"/></proof>
   </goal>
-  <goal name="wmpz_realloc&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.12" steps="18007"/></proof>
+  <goal name="wmpz_realloc&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="13481"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.12" steps="15425"/></proof>
+  <proof prover="2"><result status="valid" time="0.12" steps="13484"/></proof>
   </goal>
-  <goal name="wmpz_realloc&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="14545"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.07" steps="14554"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="14742"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="15947"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.07" steps="14311"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="14309"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="15773"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="15325"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="15063"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="15345"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.07" steps="15530"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.12" steps="16404"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.15" expl="postcondition" proved="true">
+  <goal name="wmpz_realloc&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08"/></proof>
   </goal>
+  <goal name="wmpz_realloc&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.11" steps="13910"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="13913"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="14092"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="14602"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="15511"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.08" steps="14622"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.10" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.06" steps="16094"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.11" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="14367"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.12" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.11" steps="19055"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.09" steps="15271"/></proof>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.14" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="wmpz_realloc&#39;vc.14.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.05" steps="13989"/></proof>
+   </goal>
+   <goal name="wmpz_realloc&#39;vc.14.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.08" steps="15300"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="wmpz_realloc&#39;vc.15" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.05" steps="13482"/></proof>
+  </goal>
   <goal name="wmpz_realloc&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.11" steps="14870"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="18378"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.12" steps="16449"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="13888"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.07" steps="14891"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="13898"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="15144"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="14081"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.20" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="15668"/></proof>
+  <proof prover="2"><result status="valid" time="0.09" steps="14592"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.21" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.13" steps="15783"/></proof>
+  <proof prover="2"><result status="valid" time="0.13" steps="14288"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.22" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="15683"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="14604"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.11" steps="17162"/></proof>
+  <proof prover="2"><result status="valid" time="0.11" steps="14792"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.24" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.07" steps="15423"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="14341"/></proof>
   </goal>
   <goal name="wmpz_realloc&#39;vc.25" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.12" steps="16573"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="15179"/></proof>
   </goal>
-  <goal name="wmpz_realloc&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.15" steps="23090"/></proof>
+  <goal name="wmpz_realloc&#39;vc.26" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.07" steps="15221"/></proof>
   </goal>
-  <goal name="wmpz_realloc&#39;vc.27" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="15694"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.28" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="15192"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.29" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="14930"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.30" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="15212"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.31" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="15397"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.32" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="16225"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.33" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.06"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.34" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="14765"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.35" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.11" steps="16253"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.36" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="14786"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.37" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="15011"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.38" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="15535"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.39" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.12" steps="15650"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.40" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="15550"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.41" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.08" steps="16975"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.42" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="15290"/></proof>
-  </goal>
-  <goal name="wmpz_realloc&#39;vc.43" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.04" steps="102"/></proof>
+  <goal name="wmpz_realloc&#39;vc.27" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.12" steps="15333"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="mpz_ptr_swap&#39;vc" expl="VC for mpz_ptr_swap" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="mpz_ptr_swap&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.06" steps="14523"/></proof>
+  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.06" steps="14524"/></proof>
   </goal>
   <goal name="mpz_ptr_swap&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.04" steps="13845"/></proof>
+  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.04" steps="13846"/></proof>
   </goal>
   <goal name="mpz_ptr_swap&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.05" steps="13848"/></proof>
+  <proof prover="2" timelimit="5" memlimit="2000"><result status="valid" time="0.05" steps="13849"/></proof>
   </goal>
  </transf>
  </goal>

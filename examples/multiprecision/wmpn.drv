@@ -105,18 +105,6 @@ struct __open_rx_result\n\
   uint64_t *__field_2;\n\
 };\n\
 \n\
-struct __open_ry_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-};\n\
-\n\
-struct __open_rxy_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-};\n\
-\n\
 struct __open_shift_sep_result\n\
 { uint64_t *__field_0;\n\
   uint64_t *__field_1;\n\
@@ -142,25 +130,6 @@ open_rx (uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)\n\
   return result;\n\
 }\n\
 \n\
-static inline struct __open_ry_result\n\
-open_ry (uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)\n\
-{\n\
-  struct __open_ry_result result;\n\
-  result.__field_0 = y;\n\
-  result.__field_1 = x;\n\
-  result.__field_2 = y;\n\
-  return result;\n\
-}\n\
-\n\
-static inline struct __open_rxy_result\n\
-open_rxy (uint64_t * x, int32_t sx)\n\
-{\n\
-  struct __open_rxy_result result;\n\
-  result.__field_0 = x;\n\
-  result.__field_1 = x;\n\
-  result.__field_2 = x;\n\
-  return result;\n\
-}\n\
 static inline struct __open_shift_sep_result\n\
 open_shift_sep (uint64_t * r, uint64_t * x, int32_t sz)\n\
 {\n\
@@ -173,13 +142,9 @@ open_shift_sep (uint64_t * r, uint64_t * x, int32_t sz)\n\
 
   syntax val open_sep "open_sep"
   syntax val open_rx "open_rx"
-  syntax val open_ry "open_ry"
-  syntax val open_rxy "open_rxy"
   syntax val open_shift_sep "open_shift_sep"
   syntax val close_sep "IGNORE3(%1,%2,%4)" prec 1 15 15 15
   syntax val close_rx "IGNORE3(%1,%2,%4)" prec 1 15 15 15
-  syntax val close_ry "IGNORE3(%1,%2,%4)" prec 1 15 15 15
-  syntax val close_rxy "IGNORE3(%1,%2,%4)" prec 1 15 15 15
   syntax val close_shift_sep "IGNORE2(%1,%2)" prec 1 15 15
 
 end
