@@ -948,6 +948,9 @@ module Checksum = struct
       Buffer.clear b;
       let mnew = match t.Task.task_decl.Theory.td_node with
         | Theory.Decl { Decl.d_news = s } ->
+            (* as metas might be have been put on some symbols before their
+               declaration, ignore such symbols *)
+            let s = Ident.Mid.set_diff s mo in
             Ident.Mid.mapi (fun id () -> Ident.Mid.find id !m) s
         | _ -> Ident.Mid.set_diff !m mo in
       !c, union_mid mold mnew, dnew
