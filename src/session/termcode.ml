@@ -928,6 +928,9 @@ module Checksum = struct
     x.mid <- Msub (d, y);
     y
 
+  let union_mid x d =
+    if Ident.Mid.is_empty d then x else union_mid x d
+
   (* WARNING: The occurence of [Trans.fold] in [task_v3] needs to be executed
      once at initialization in order for all the applications of this
      transformation to share the same Wtask ([h] created on first line of
