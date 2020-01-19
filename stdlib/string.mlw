@@ -409,6 +409,14 @@ module Char
 
   axiom extensionality: forall s1 s2. eq_string s1 s2 -> s1 = s2
 
+  function make (size: int) (v: char) : string
+
+  axiom make_length: forall size v. size >= 0 ->
+    length (make size v) = size
+
+  axiom make_content: forall size v. size >= 0 ->
+    (forall i. 0 <= i < size -> (make size v)[i] = v)
+
 end
 
 module OCaml
@@ -446,6 +454,10 @@ module OCaml
 
   val concat (s1 s2: string) : string
     ensures  { result = concat s1 s2 }
+
+  val make (size: int63) (v: char) : string
+    requires { 0 <= size }
+    ensures  { result = make size v }
 
 end
 
