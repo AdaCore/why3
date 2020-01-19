@@ -1,64 +1,4 @@
-module Hex1
-
-  use mach.int.Int
-  use mach.int.Int63
-  use string.OCaml
-
-  let function encode (s: string) : string
-    ensures { length result = 2 * length s }
-    ensures { forall i. 0 <= i < length s ->
-                result[2 * i] = chr (div (code s[i]) 16) &&
-                result[2 * i + 1] = chr (mod (code s[i]) 16) }
-  = let ref i = 0 in
-    let ref r = "" in
-    while i < OCaml.length s do
-      variant { length s - i }
-      invariant { 0 <= i <= OCaml.length s }
-      invariant { length r = 2 * i }
-      invariant { forall j. 0 <= j < i  ->
-                    r[2 * j] = chr (div (code s[j]) 16) &&
-                    r[2 * j + 1] = chr (mod (code s[j]) 16) }
-      let v = code s[i] in
-      r <- concat r (chr (v / 16)).content;
-      r <- concat r (chr (v % 16)).content;
-      i <- i + 1
-    done;
-    r
-
-  let function decode (s: string) : string
-    requires { mod (length s) 2 = 0 }
-    requires { forall i. 0 <= i < length s -> 0 <= code s[i] < 16 }
-    ensures  { length result = div (length s) 2 }
-    ensures  { forall i. 0 <= i < div (length s) 2 ->
-                 result[i] = chr (code s[2 * i] * 16 + code s[2 * i + 1]) }
-  = let ref i = 0 in
-    let ref r = "" in
-    while i < length s do
-      variant {length s - i}
-      invariant { mod i 2 = 0 }
-      invariant { 0 <= i <= length s }
-      invariant { length r = div i 2 }
-      invariant { forall j. 0 <= j < div i 2 ->
-                    r[j] = chr (code s[2 * j] * 16 + code s[2 * j + 1]) }
-      let v_i = code s[i] in
-      let v_ii = code s[i + 1] in
-      r <- concat r (chr (v_i * 16 + v_ii)).content;
-      i <- i + 2
-    done;
-    r
-
-  let test1 = let s = ""  in let r = encode s in assert {r = s}
-  let test2 = let s = "a" in let r = encode s in assert {length r = 2 && decode r = s}
-  let test3 = let s = "b" in let r = encode s in assert {length r = 2 && decode r = s}
-
-  let test4 = let s = "\006\001" in let r = decode s in assert { length r = 1 && r = "a" }
-  let test5 = let s = "\006\002"    in let r = decode s in assert { length r = 1 && r = "b" }
-
-  lemma decode_encode: forall s. decode (encode s) = s
-
-end
-
-module Hex2
+module Hex
 
   use mach.int.Int
   use mach.int.Int63
@@ -69,9 +9,6 @@ module Hex2
     else if 10 <= i < 16 then chr (i + 55)
     else "\000"[0]
 
-  (* lemma hex_bounds: forall i. 0 <= i < 16 -> *)
-  (*   48 <= code (hex i) < 58 || 65 <= code (hex i) < 71 *)
-
   let hex (i: int63) : char
     requires { 0 <= i < 16 }
     ensures  { result = hex i }
@@ -81,13 +18,6 @@ module Hex2
     if 48 <= i < 58 then i - 48
     else if 65 <= i < 71 then i - 55
     else -1
-
-  (* lemma xeh_bounds: forall i. 48 <= i < 58 || 65 <= i < 71 -> *)
-  (*   0 <= xeh i < 16 *)
-
-  (* lemma hex_xeh: forall i. 48 <= i < 58 || 65 <= i < 71 -> code (hex (xeh i)) = i *)
-
-  (* lemma xeh_hex: forall i. 0 <= i < 16 -> xeh (code (hex i)) = i *)
 
   let xeh (i: int63) : int63
     requires { 48 <= i < 58 || 65 <= i < 71 }
@@ -200,7 +130,7 @@ module Base64
     let s' = concat (substring s 0 (length s - i)) (make i c) in
     length s' = length s &&
     (forall j. 0 <= j < length s - i -> s'[j] = s[j])
-    
+
   lemma concat_make: forall s i c. 0 <= i ->
     let s' = concat s (make i c) in
     (forall j. length s <= j < length s + i -> s'[j] = c)
@@ -219,21 +149,20 @@ module Base64
                 let i = div (length s) 3 in
                 let a1, a2 = s[i*3], s[i*3+1] in
                 result[i*4]   = int2b64 (div (code a1)  4) &&
-                (if i * 3 + 1 >= length s then
+                if i * 3 + 1 >= length s then
                   result[i*4+1] = int2b64 (mod (code a1) 4 * 16) &&
                   result[i*4+2] = "="[0] &&
                   result[i*4+3] = "="[0]
                 else
                   result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
                   result[i*4+2] = int2b64 (mod (code a2) 16 * 4) &&
-                  result[i*4+3] = "="[0])
+                  result[i*4+3] = "="[0]
     }
   = let len_m = (length s) % 3 in
     let padding:int63 = if len_m = 1 then 2 else if len_m = 2 then 1 else 0 in
     let zero = (chr 0).content in
     let sp = if padding = 2 then concat s (concat zero zero) else
              if padding = 1 then concat s zero else s in
-    (* assert { length sp <= length s + 2 }; *)
     let ref i = 0 in
     let ref r = "" in
     while i < length sp do
@@ -287,20 +216,8 @@ module Base64
       r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
       r[j*4+3] = int2b64 (mod (code a3) 64)
     };
-    assert { length r = div (length sp * 4) 3};
-    assert { length sp = (length s + padding) };
     label L2 in
     r <- concat (sub r 0 (length r - padding)) (make padding "="[0]);
-    assert { length (r at L2) = length r};
-    assert { length r = div (length sp * 4) 3};
-    assert { forall j. 0 <= j < length r - padding -> r[j] = (r at L2)[j] };
-    assert { forall j. length r - padding <= j < length r -> r[j] = "="[0] };
-    assert { forall j. 0 <= j < div (length s) 3 ->
-      let a1, a2, a3 = sp[j*3], sp[j*3+1], sp[j*3+2] in
-      r[j*4]   = int2b64 (div (code a1)  4) &&
-      r[j*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-      r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
-      r[j*4+3] = int2b64 (mod (code a3) 64) };
     assert { forall j. 0 <= j < length s -> s[j] = sp[j]};
     assert { forall j. 0 <= j < div (length s) 3 ->
       let a1, a2, a3 = s[j*3], s[j*3+1], s[j*3+2] in
@@ -310,19 +227,19 @@ module Base64
       r[j*4+3] = int2b64 (mod (code a3) 64)
     };
     assert { length s < next_3 (length s) ->
-                let i = div (length s) 3 in
-                let a1, a2, a3 = sp[i*3], sp[i*3+1], sp[i*3+2] in
-                r[i*4] = int2b64 (div (code a1)  4) &&
-                (if i * 3 + 1 >= length s then
-                  div (code a2) 16 = 0 &&
-                  r[i*4+1] = int2b64 (mod (code a1) 4 * 16) &&
-                  r[i*4+2] = "="[0] &&
-                  r[i*4+3] = "="[0]
-                else
-                  div (code a3) 64 = 0 &&
-                  r[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-                  r[i*4+2] = int2b64 (mod (code a2) 16 * 4) &&
-                  r[i*4+3] = "="[0])
+      let i = div (length s) 3 in
+      let a1, a2, a3 = sp[i*3], sp[i*3+1], sp[i*3+2] in
+      r[i*4] = int2b64 (div (code a1)  4) &&
+      if i * 3 + 1 >= length s then
+        div (code a2) 16 = 0 &&
+        r[i*4+1] = int2b64 (mod (code a1) 4 * 16) &&
+        r[i*4+2] = "="[0] &&
+        r[i*4+3] = "="[0]
+      else
+        div (code a3) 64 = 0 &&
+        r[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+        r[i*4+2] = int2b64 (mod (code a2) 16 * 4) &&
+        r[i*4+3] = "="[0]
     };
     r
 
