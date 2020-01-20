@@ -12,6 +12,8 @@ type reason =
    | VC_Predicate_Check_On_Default_Value
    | VC_Null_Pointer_Dereference
    | VC_Null_Exclusion
+   | VC_Memory_Leak
+   | VC_Memory_Leak_At_End_Of_Scope
    | VC_Invariant_Check
    | VC_Invariant_Check_On_Default_Value
    | VC_Length_Check
@@ -66,6 +68,8 @@ let is_warning_reason r =
    | VC_Predicate_Check_On_Default_Value
    | VC_Null_Pointer_Dereference
    | VC_Null_Exclusion
+   | VC_Memory_Leak
+   | VC_Memory_Leak_At_End_Of_Scope
    | VC_Invariant_Check
    | VC_Invariant_Check_On_Default_Value
    | VC_Length_Check
@@ -158,6 +162,8 @@ let reason_from_string s =
       VC_Predicate_Check_On_Default_Value
    | "VC_NULL_POINTER_DEREFERENCE"  -> VC_Null_Pointer_Dereference
    | "VC_NULL_EXCLUSION"            -> VC_Null_Exclusion
+   | "VC_MEMORY_LEAK"               -> VC_Memory_Leak
+   | "VC_MEMORY_LEAK_AT_END_OF_SCOPE" -> VC_Memory_Leak_At_End_Of_Scope
    | "VC_INVARIANT_CHECK"           -> VC_Invariant_Check
    | "VC_INVARIANT_CHECK_ON_DEFAULT_VALUE" ->
       VC_Invariant_Check_On_Default_Value
@@ -217,6 +223,8 @@ let reason_to_ada reason =
      "VC_PREDICATE_CHECK_ON_DEFAULT_VALUE"
    | VC_Null_Pointer_Dereference  -> "VC_NULL_POINTER_DEREFERENCE"
    | VC_Null_Exclusion            -> "VC_NULL_EXCLUSION"
+   | VC_Memory_Leak               -> "VC_MEMORY_LEAK"
+   | VC_Memory_Leak_At_End_Of_Scope -> "VC_MEMORY_LEAK_AT_END_OF_SCOPE"
    | VC_Invariant_Check           -> "VC_INVARIANT_CHECK"
    | VC_Invariant_Check_On_Default_Value ->
      "VC_INVARIANT_CHECK_ON_DEFAULT_VALUE"
@@ -272,6 +280,8 @@ let reason_to_string reason =
    | VC_Predicate_Check_On_Default_Value -> "predicate_check_on_default_value"
    | VC_Null_Pointer_Dereference  -> "null_pointer_dereference"
    | VC_Null_Exclusion            -> "null_exclusion"
+   | VC_Memory_Leak               -> "memory_leak"
+   | VC_Memory_Leak_At_End_Of_Scope -> "memory_leak_at_end_of_scope"
    | VC_Invariant_Check           -> "invariant_check"
    | VC_Invariant_Check_On_Default_Value -> "invariant_check_on_default_value"
    | VC_Length_Check              -> "length_check"
