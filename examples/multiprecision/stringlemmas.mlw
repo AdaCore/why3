@@ -1,0 +1,135 @@
+module String_lemmas
+
+  use array.Array
+  use map.Map
+  use map.MapEq
+  use map.Const
+  use int.Int
+  use int.Power
+  use lemmas.Lemmas
+  use mach.c.C
+  use mach.c.UChar
+
+  predicate in_base (b:int) (x:map int uchar) (n:int) (m:int) =
+    forall i. n <= i < m -> 0 <= x[i] < b
+
+  let rec ghost function
+      svalue_le_sub (b:int) (x:map int uchar) (n:int) (m:int) : int
+    variant  { m - n }
+  =
+    if n < m
+    then uchar'int x[n] + b * svalue_le_sub b x (n+1) m
+    else 0
+
+  predicate string_in_base (b:int) (p:ptr uchar) =
+    in_base b (pelts p) (min p) (max p)
+
+  let rec lemma svalue_le_sub_tail (b:int) (x:map int uchar) (n m:int)
+    requires { n <= m }
+    requires { in_base b x n m }
+    requires { 2 <= b <= 256 }
+    variant  { m - n }
+    ensures  {
+      svalue_le_sub b x n (m+1) =
+        svalue_le_sub b x n m + (Map.get x m) * power b (m-n) }
+  = [@vc:sp] if n < m then svalue_le_sub_tail b x (n+1) m else ()
+
+  let rec lemma svalue_le_sub_concat (b:int) (x:map int uchar) (n m l:int)
+    requires { n <= m <= l}
+    requires { in_base b x n l }
+    requires { 2 <= b <= 256 }
+    variant  { m - n }
+    ensures  {
+      svalue_le_sub b x n l =
+        svalue_le_sub b x n m + svalue_le_sub b x m l * power b (m-n) }
+  =
+  if n < m then
+     begin
+     assert {n<m};
+     svalue_le_sub_concat b x (n+1) m l
+     end
+  else ()
+
+  let lemma svalue_le_sub_head (b:int) (x:map int uchar) (n m:int)
+    requires { n < m }
+    requires { in_base b x n m }
+    requires { 2 <= b <= 256 }
+    ensures { svalue_le_sub b x n m = x[n] + b * svalue_le_sub b x (n+1) m }
+  = ()
+
+  use mach.int.Int32
+
+  function svalue_le (b:int) (x:ptr uchar) (sz:int) : int
+  =
+    svalue_le_sub b (pelts x) x.offset (x.offset + sz)
+
+   let lemma svalue_le_tail (b:int) (x:ptr uchar) (sz:int32)
+    requires { 0 <= sz }
+    requires { in_base b (pelts x) x.offset (x.offset + sz)  }
+    requires { 2 <= b <= 256 }
+    ensures  { svalue_le b x (sz + 1)
+               = svalue_le b x sz + (pelts x)[x.offset + sz] * power b sz }
+  = svalue_le_sub_tail b (pelts x) x.offset (x.offset + p2i sz)
+
+  meta remove_prop axiom svalue_le_tail
+
+  let lemma value_le_concat (b:int) (x:ptr uchar) (n m:int32)
+    requires { 0 <= n <= m }
+    requires { in_base b (pelts x) x.offset (x.offset + p2i m)  }
+    requires { 2 <= b <= 256 }
+    ensures  { svalue_le b x m
+               = svalue_le b x n
+                 + power b n
+                   * svalue_le_sub b (pelts x) (x.offset + n) (x.offset + m) }
+  = svalue_le_sub_concat b (pelts x) x.offset
+                         (x.offset + p2i n) (x.offset + p2i m)
+
+  (** Big-endian values for strings *)
+
+  let rec ghost function
+                svalue_sub (b:int) (x: map int uchar) (n:int) (m:int) : int
+    variant { m - n }
+  = if n < m
+    then uchar'int x[m-1] + b * svalue_sub b x n (m-1)
+    else 0
+
+  let rec lemma svalue_sub_tail (b:int) (x:map int uchar) (n m:int)
+    requires { n <= m }
+    requires { in_base b x n m }
+    requires { 2 <= b <= 256 }
+    variant  { m - n }
+    ensures  { svalue_sub b x (n-1) m =
+                 svalue_sub b x n m + (Map.get x (n-1)) * power b (m - n) }
+  = if n < m
+    then begin
+      svalue_sub_tail b x n (m-1);
+    end else ()
+
+  let rec lemma svalue_sub_concat (b:int) (x:map int uchar) (n m l:int)
+    requires { n <= m <= l}
+    requires { in_base b x n l }
+    requires { 2 <= b <= 256 }
+    variant  { l - m }
+    ensures  { svalue_sub b x n l
+               = svalue_sub b x m l + power b (l - m) * svalue_sub b x n m }
+  =
+    if m < l then svalue_sub_concat b x n m (l-1) else ()
+
+  let lemma svalue_sub_head (b:int) (x:map int uchar) (n m:int)
+    requires { n < m }
+    requires { in_base b x n m }
+    requires { 2 <= b <= 256 }
+    ensures { svalue_sub b x n m = x[m-1] + b * svalue_sub b x n (m-1) }
+  = ()
+
+  let rec lemma svalue_sub_frame (b:int) (x y:map int uchar) (n m:int)
+    requires { MapEq.map_eq_sub x y n m }
+    variant  { m - n }
+    ensures  { svalue_sub b x n m = svalue_sub b y n m }
+  =
+    if n < m then svalue_sub_frame b x y n (m-1) else ()
+
+  function svalue (b:int) (x:ptr uchar) (sz:int) : int
+  = svalue_sub b (pelts x) x.offset (x.offset + sz)
+
+end

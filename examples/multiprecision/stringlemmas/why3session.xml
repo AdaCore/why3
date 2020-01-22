@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="8">
+<prover id="0" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="stringlemmas.mlw"/>
+<theory name="String_lemmas" proved="true">
+ <goal name="svalue_le_sub&#39;vc" expl="VC for svalue_le_sub" proved="true">
+ <proof prover="3"><result status="valid" time="0.04" steps="14066"/></proof>
+ </goal>
+ <goal name="svalue_le_sub_tail&#39;vc" expl="VC for svalue_le_sub_tail" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="svalue_le_sub_tail&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="13263"/></proof>
+  </goal>
+  <goal name="svalue_le_sub_tail&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="13232"/></proof>
+  </goal>
+  <goal name="svalue_le_sub_tail&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="18116"/></proof>
+  </goal>
+  <goal name="svalue_le_sub_tail&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="13260"/></proof>
+  </goal>
+  <goal name="svalue_le_sub_tail&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="svalue_le_sub_concat&#39;vc" expl="VC for svalue_le_sub_concat" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="svalue_le_sub_concat&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="13538"/></proof>
+  </goal>
+  <goal name="svalue_le_sub_concat&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="13589"/></proof>
+  </goal>
+  <goal name="svalue_le_sub_concat&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="13565"/></proof>
+  </goal>
+  <goal name="svalue_le_sub_concat&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.09" steps="19236"/></proof>
+  </goal>
+  <goal name="svalue_le_sub_concat&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="13593"/></proof>
+  </goal>
+  <goal name="svalue_le_sub_concat&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.36"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="svalue_le_sub_head&#39;vc" expl="VC for svalue_le_sub_head" proved="true">
+ <proof prover="3"><result status="valid" time="0.07" steps="18894"/></proof>
+ </goal>
+ <goal name="svalue_le_tail&#39;vc" expl="VC for svalue_le_tail" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="svalue_le_tail&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="14397"/></proof>
+  </goal>
+  <goal name="svalue_le_tail&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="15242"/></proof>
+  </goal>
+  <goal name="svalue_le_tail&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="14145"/></proof>
+  </goal>
+  <goal name="svalue_le_tail&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="20243"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="value_le_concat&#39;vc" expl="VC for value_le_concat" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="value_le_concat&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="14449"/></proof>
+  </goal>
+  <goal name="value_le_concat&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="15294"/></proof>
+  </goal>
+  <goal name="value_le_concat&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="14197"/></proof>
+  </goal>
+  <goal name="value_le_concat&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="19690"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="svalue_sub&#39;vc" expl="VC for svalue_sub" proved="true">
+ <proof prover="3"><result status="valid" time="0.06" steps="15712"/></proof>
+ </goal>
+ <goal name="svalue_sub_tail&#39;vc" expl="VC for svalue_sub_tail" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="svalue_sub_tail&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="14597"/></proof>
+  </goal>
+  <goal name="svalue_sub_tail&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="14570"/></proof>
+  </goal>
+  <goal name="svalue_sub_tail&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.10" steps="20966"/></proof>
+  </goal>
+  <goal name="svalue_sub_tail&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="14598"/></proof>
+  </goal>
+  <goal name="svalue_sub_tail&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="svalue_sub_concat&#39;vc" expl="VC for svalue_sub_concat" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="svalue_sub_concat&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="14912"/></proof>
+  </goal>
+  <goal name="svalue_sub_concat&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.09" steps="14896"/></proof>
+  </goal>
+  <goal name="svalue_sub_concat&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.11" steps="21773"/></proof>
+  </goal>
+  <goal name="svalue_sub_concat&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="14924"/></proof>
+  </goal>
+  <goal name="svalue_sub_concat&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.40"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="svalue_sub_head&#39;vc" expl="VC for svalue_sub_head" proved="true">
+ <proof prover="3"><result status="valid" time="0.09" steps="20700"/></proof>
+ </goal>
+ <goal name="svalue_sub_frame&#39;vc" expl="VC for svalue_sub_frame" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="svalue_sub_frame&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="16622"/></proof>
+  </goal>
+  <goal name="svalue_sub_frame&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="20231"/></proof>
+  </goal>
+  <goal name="svalue_sub_frame&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="100"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

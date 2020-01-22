@@ -1,0 +1,378 @@
+module Get_str
+
+  use int.Int
+  use int.Power
+  use array.Array
+  use map.Map
+  use mach.int.Int32
+  use mach.int.UInt32
+  use mach.c.UChar
+  use import mach.int.UInt64GMP as Limb
+  use mach.c.C
+  use types.Types
+  use lemmas.Lemmas
+  use powm.Powm
+  use stringlemmas.String_lemmas
+  use logical.Logical
+  use int.ComputerDivision as CD
+  use int.EuclideanDivision
+  use base_info.BaseInfo
+
+  let wmpn_get_str_bits (sp:ptr uchar) (bits:limb) (up:ptr limb) (un:int32)
+      : int32
+    requires { 1 <= un }
+    requires { valid up un }
+    requires { 1 <= bits <= 8 }
+    requires { valid sp (div (64 * un + bits - 1) bits) }
+    requires { (pelts up)[offset up + un - 1] > 0 }
+    requires { 64 * un + 7 <= max_int32 }
+    requires { writable sp }
+    ensures  { svalue (power 2 bits) sp result = value up un }
+    writes   { sp.data.elts }
+  =
+    let um = C.get_ofs up (un - 1) in
+    let sb = wmpn_limb_size_in_base_2 um in
+    let e = 64 * (un-1) + Limb.to_int32 sb + Limb.to_int32 bits - 1 in
+    let sn = e / Limb.to_int32 bits in
+    assert { offset sp + sn <= max sp
+             by e <= 64 * un + bits - 1
+             so let d = div (64 * un + bits - 1) bits in
+                let m = mod (64 * un + bits - 1) bits in
+                let m' = mod e bits in
+                sn * bits + m' = e <= d * bits + m
+             so m' <= bits - 1 so 0 <= m
+             so bits * sn <= bits * d + (m-m')
+             so - bits < m - m' < bits
+             so sn <= d };
+    let b = lsl 1 bits in
+    assert { b = power 2 bits };
+    assert { 2 <= b <= 256
+             by 1 <= bits <= 8
+             so power 2 5 = 32
+             so power 2 6 = 64
+             so power 2 7 = 128
+             so power 2 8 = 256
+            };
+    value_tail up (un-1);
+    assert { power 2 (e-bits) <= value up un < power 2 (e-bits+1)
+             by value up un
+                = value up (un - 1)
+                  + power radix (un - 1) * (pelts up)[offset up + (un - 1)]
+                = value up (un - 1) + power radix (un - 1) * um
+             so power 2 (sb-1) <= um < power 2 sb
+             so power radix (un - 1) = power 2 (64 * (un - 1))
+             so 0 <= value up (un - 1) < power radix (un - 1)
+                                       = power 2 (64 * (un - 1))
+             so power radix (un - 1) * um
+                >= power radix (un - 1) * power 2 (sb - 1)
+                = power 2 (64 * (un - 1)) * power 2 (sb - 1)
+                = power 2 (64 * (un - 1) + sb - 1)
+                = power 2 (e - bits)
+             so power 2 (e - bits) <= value up un
+             so value up un
+                < power radix (un - 1) + power radix (un - 1) * um
+                = power radix (un - 1) * (1 + um)
+                = power 2 (64 * (un - 1)) * (1 + um)
+                <= power 2 (64 * (un - 1)) * power 2 sb
+                = power 2 (64 * (un - 1) + sb) };
+    assert { power b (sn - 1) <= value up un < power b sn
+             by e = bits * sn + CD.mod e bits
+             so 0 <= CD.mod e bits < bits
+             so bits * sn <= e < bits * sn + bits
+             so bits * (sn - 1) <= e - bits
+             so e - bits + 1 <= bits * sn
+             so let d = e - bits - (bits * (sn - 1)) in
+                0 <= d
+             so power b (sn - 1) = power (power 2 bits) (sn - 1)
+                = power 2 (bits * (sn - 1))
+                <= power 2 (bits * (sn - 1)) * power 2 d
+                = power 2 (e - bits)
+             so power b sn = power (power 2 bits) sn
+                = power 2 (bits * sn)
+                >= power 2 (e - bits + 1) };
+    let ref i = 0 in
+    let ref j = sn in
+    let ref shift = 0 in
+    let ghost ref udone : int = 0 in
+    assert { sn = div e bits };
+    assert { sn * bits <= sn * bits + mod e bits = e };
+    while j > 0 do
+      invariant { 0 <= i <= un }
+      invariant { 0 <= j <= sn }
+      invariant { (sn - j) * bits = udone }
+      invariant { j > 0 -> udone = 64 * i + shift }
+      invariant { 0 <= shift < Limb.length \/ i = un }
+      invariant { in_base b (pelts sp) (offset sp + j) (offset sp + sn) }
+      invariant { (svalue_sub b (pelts sp) (offset sp + j) (offset sp + sn)
+                   = valueb up udone /\ udone <= 64 * un)
+                  \/ (j = 0 /\ svalue b sp sn = value up un) }
+      variant   { j }
+      assert { i < un
+               by j > 0
+               so sn = div e bits
+               so sn * bits <= sn * bits + mod e bits = e
+               so 64 * i + shift
+                  = (sn - j) * bits
+                  <= sn * bits - bits
+                  <= e - bits
+                  <= 64 * un
+               so i < un };
+      j <- j - 1;
+      let lu = C.get_ofs up i in
+      let ref digit = lsr_mod lu shift in
+      let ghost low = mod (uint64'int lu) (power 2 (uint64'int shift)) in
+      assert { lu = digit * power 2 shift + low
+               by lu = power 2 shift * div lu (power 2 shift)
+                       + mod lu (power 2 shift)
+                     = power 2 shift * digit + low };
+      assert { div udone 64 = i /\ udone - 64 * i = shift };
+      let ghost oshift = shift in
+      assert { power radix i * power 2 oshift = power b (sn - j - 1)
+               by power radix i * power 2 oshift
+                  = power (power 2 64) i * power 2 oshift
+                  = power 2 (64 * i) * power 2 oshift
+                  = power 2 (64 * i + oshift)
+                  = power 2 ((sn - j - 1) * bits)
+                  = power (power 2 bits) (sn - j - 1)
+                  = power b (sn - j - 1) };
+      shift <- shift + bits;
+      if shift >= 64
+      then begin
+        value_tail up i;
+        i <- i+1;
+        assert { digit < power 2 (64 - oshift)
+                 by digit * power 2 oshift + low < radix
+                 so digit * power 2 oshift < radix
+                    = power 2 (64 - oshift) * power 2 oshift };
+        if i < un
+        then begin
+          shift <- shift - 64;
+          let lu' = get_ofs up i in
+          let ghost odigit = digit in
+          let high = lsl_mod lu' (bits - shift) in
+          assert { high = power 2 (bits - shift)
+                          * mod lu' (power 2 (64 - (bits - shift)))
+                        = power 2 (bits - shift) * mod lu' (power 2 oshift)
+                   by high = mod (lu' * power 2 (bits - shift)) radix
+                   so let d = div lu' (power 2 (64 - (bits - shift))) in
+                      let m = mod lu' (power 2 (64 - (bits - shift))) in
+                      lu' * power 2 (bits - shift)
+                      = d * (power 2 (64 - (bits - shift))
+                            * power 2 (bits - shift))
+                        + m * power 2 (bits - shift)
+                      = d * radix + m * power 2 (bits - shift)
+                   so power 2 (bits - shift) * m
+                      < power 2 (bits - shift) * power 2 (64 - (bits - shift))
+                      = power 2 64 = radix
+                   so 0 <= m so 0 <= power 2 (bits - shift)
+                   so 0 <= m * power 2 (bits - shift) < radix
+                   so high = mod (radix * d + m * power 2 (bits - shift)) radix
+                           = mod (m * power 2 (bits - shift)) radix
+                           = m * power 2 (bits - shift) };
+          assert { digit + high < radix
+                   by digit < power 2 (64 - oshift)
+                   so shift = oshift + bits - 64
+                   so 64 - oshift = bits - shift
+                   so digit + high < power 2 (bits - shift) + high
+                      = power 2 (bits - shift) * (1 + mod lu' (power 2 oshift))
+                      <= power 2 (bits - shift) * power 2 oshift
+                      = power 2 (bits - shift + oshift)
+                      = power 2 64 = radix };
+          digit <- digit + high; (* TODO logical or *)
+          assert { valueb up (udone + bits)
+                   = valueb up udone + mod digit b * power b (sn - j - 1)
+                   by valueb up udone = value up (i-1) + power radix (i-1) * low
+                   so oshift + bits >= 64
+                   so div (udone + bits) 64 = i
+                   so udone = 64 * (i-1) + oshift
+                   so udone + bits - (64 * i)
+                      = 64 * (i-1) + oshift + bits - 64 * i
+                      = oshift + bits - 64 = shift
+                   so valueb up (udone + bits)
+                      = value up i + power radix i * mod lu' (power 2 shift)
+                   so value up i = value up (i-1) + power radix (i-1) * lu
+                   so lu = low + power 2 oshift * odigit
+                   so valueb up (udone + bits) - valueb up udone
+                      = power radix (i-1) * power 2 oshift * odigit
+                        + power radix i * mod lu' (power 2 shift)
+                      = power radix (i-1) * power 2 oshift * odigit
+                        + power radix (i-1) * radix * mod lu' (power 2 shift)
+                      = power radix (i-1)
+                        * (power 2 oshift * odigit
+                          + radix * mod lu' (power 2 shift))
+                      = power radix (i-1)
+                        * (power 2 oshift * odigit
+                          + power 2 oshift * power 2 (64 - oshift) *
+                          mod lu' (power 2 shift))
+                      = power radix (i-1) * power 2 oshift
+                        * (odigit
+                           + power 2 (64 - oshift) * mod lu' (power 2 shift))
+                      = power b (sn - j - 1)
+                        * (odigit
+                           + power 2 (64 - oshift) * mod lu' (power 2 shift))
+                   so power 2 (64 - oshift) * mod lu' (power 2 shift)
+                      = power 2 (bits - shift) * mod lu' (power 2 shift)
+                      = mod (lu' * power 2 (bits - shift))
+                            (power 2 shift * power 2 (bits - shift))
+                      = mod (lu' * power 2 (bits - shift))
+                            (power 2 bits)
+                   so high = mod (lu' * power 2 (bits - shift)) radix
+                   so let d = div (lu' * power 2 (bits - shift)) radix in
+                      lu' * power 2 (bits - shift)
+                      = d * radix + high
+                   so radix = power 2 bits * power 2 (64 - bits)
+                   so mod (lu' * power 2 (bits - shift)) (power 2 bits)
+                      = mod (power 2 bits * (power 2 (64 - bits) * d) + high)
+                            (power 2 bits)
+                      = mod high (power 2 bits) = mod high b
+                   so odigit < power 2 (64 - oshift) = power 2 (bits - shift)
+                   so high = power 2 (bits - shift)
+                             * mod lu' (power 2 (64 - (bits - shift)))
+                   so mod high (power 2 (bits - shift)) = 0
+                   so let d = div high (power 2 (bits - shift)) in
+                      high = d * power 2 (bits - shift)
+                   so let d' = div d (power 2 shift) in
+                      let m = mod d (power 2 shift) in
+                      high = (d' * power 2 shift +  m) * power 2 (bits - shift)
+                           = d' * (power 2 shift * power 2 (bits - shift))
+                             + m * power 2 (bits - shift)
+                           = d' * power 2 bits + power 2 (bits - shift) * m
+                   so shift < bits
+                   so 0 <= power 2 (bits - shift) so 0 <= m
+                   so 0 <= power 2 (bits - shift) * m
+                        < power 2 (bits - shift) * power 2 shift = b
+                   so div high b = d'
+                   so mod high b = m * power 2 (bits - shift)
+                   so 0 <= mod odigit b + mod high b
+                        = mod odigit b + m * power 2 (bits - shift)
+                        < power 2 (bits - shift) + m * power 2 (bits - shift)
+                        = power 2 (bits - shift) * (1 + m)
+                        <= power 2 (bits - shift) * power 2 shift
+                        = power 2 bits = b
+                   so odigit + mod high b
+                      = mod odigit b + mod high b
+                      = mod (mod odigit b + mod high b) b
+                      = mod (odigit + high) b
+                      = mod digit b
+                   so valueb up (udone + bits) - valueb up udone
+                      = power b (sn - j - 1)
+                        * (odigit
+                           + power 2 (64 - oshift) * mod lu' (power 2 shift))
+                      = power b (sn - j - 1) * mod digit b };
+        end
+        else begin
+          assert { valueb up udone + mod digit b * power b (sn - j - 1)
+                   = value up un
+                   by i = un
+                   so div udone 64 = i - 1
+                   so valueb up udone = value up (i-1) + power radix (i-1) * low
+                   so value up un = value up (i-1) + power radix (i-1) * lu
+                   so lu = low + digit * power 2 oshift
+                   so value up un
+                      = value up (i-1)
+                        + power radix (i-1) * (low + digit * power 2 oshift)
+                      = valueb up udone
+                        + power radix (i-1) * power 2 oshift * digit
+                      = valueb up udone + power b (sn - j - 1) * digit
+                   so digit < power 2 (64 - oshift) <= power 2 bits = b
+                   so mod digit b = digit };
+          assert { j = 0
+                   by 64 * un <= udone + bits <= bits * (sn - j)
+                   so e < 64 * un + bits
+                   so sn = div e bits
+                   so sn * bits = e - mod e bits <= e < 64 * un + bits
+                   so bits * j <= sn * bits - 64 * un < bits
+                   so bits * j < bits * 1 so 0 < bits
+                   so j < 1 };
+        end
+      end
+      else begin
+        assert { valueb up (udone + bits)
+                 = valueb up udone + mod digit b * power b (sn - j - 1)
+                 by valueb up udone = value up i + power radix i * low
+                 so oshift + bits = shift < 64
+                 so div (udone + bits) 64 = i
+                 so valueb up (udone + bits)
+                    = value up i
+                      + power radix i * mod lu (power 2 (oshift + bits))
+                 so let d = div digit (power 2 bits) in
+                    let m = mod digit (power 2 bits) in
+                    lu = digit * power 2 oshift + low
+                       = ((d * power 2 bits) + m) * power 2 oshift + low
+                       = d * power 2 (oshift + bits) + m * power 2 oshift + low
+                 so 0 <= low < power 2 oshift
+                 so 0 <= m < power 2 bits
+                 so 0 <= m * power 2 oshift
+                 so 0 <= m * power 2 oshift + low
+                      < m * power 2 oshift + power 2 oshift
+                      = power 2 oshift * (m+1)
+                      <= power 2 oshift * power 2 bits
+                      = power 2 (oshift + bits)
+                 so mod lu (power 2 (oshift + bits))
+                    = mod (power 2 (oshift + bits) * d
+                             + (m * power 2 oshift + low))
+                          (power 2 (oshift + bits))
+                    = mod (m * power 2 oshift + low) (power 2 (oshift + bits))
+                    = m * power 2 oshift + low
+                 so valueb up (udone + bits)
+                    = value up i + power radix i * (m * power 2 oshift + low)
+                    = value up i + power radix i * low
+                      + power radix i * (m * power 2 oshift)
+                    = valueb up udone + power radix i * m * power 2 oshift
+                 so 64 * i + oshift = (sn - j - 1) * bits
+                 so power radix i * power 2 oshift = power b (sn - j - 1)
+                 so valueb up (udone + bits)
+                    = valueb up udone + power b (sn - j - 1) * m };
+      end;
+      (* TODO mask + logical and *)
+      let sj = digit % b in
+      assert { sj = mod digit b
+               by div digit b = CD.div digit b
+               so mod digit b = CD.mod digit b = sj };
+      label Set in
+      C.set_ofs sp j (UChar.of_uint64 sj);
+      assert { forall i. offset sp + j < i ->
+                         (pelts sp)[i] = (pelts sp at Set)[i] };
+      assert { svalue_sub b (pelts sp) (offset sp + (j+1)) (offset sp + sn)
+               = svalue_sub b (pelts sp at Set)
+                              (offset sp + (j+1)) (offset sp + sn) };
+      svalue_sub_tail (uint64'int b) (pelts sp) (offset sp + (int32'int j+1))
+                                   (offset sp + int32'int sn);
+      assert { svalue_sub b (pelts sp) (offset sp + j) (offset sp + sn)
+               = svalue_sub b (pelts sp) (offset sp + j + 1) (offset sp + sn)
+                 + power b (sn - (j + 1)) * sj
+               = valueb up udone + mod digit b * power b (sn - j - 1) };
+(*               = valueb up (udone + bits) };*)
+      udone <- udone + uint64'int bits;
+    done;
+    assert { udone <= 64 * un -> value up un = valueb up udone
+             by udone = sn * bits = e - mod e bits
+                = 64 * (un - 1) + sb + (bits - 1) - mod e bits
+                >= 64 * (un - 1) + sb
+             so un - 1 <= div udone 64 <= un
+             so if div udone 64 = un - 1
+                then
+                  valueb up udone
+                  = value up (un-1)
+                    + power radix (un-1)
+                      * mod um (power 2 (udone - 64 * (un - 1)))
+                  so udone - 64 * (un - 1) >= sb
+                  so um < power 2 sb <= power 2 (udone - 64 * (un - 1))
+                  so mod um (power 2 (udone - (64 * (un - 1))))
+                     = um
+                  so valueb up udone
+                     = value up (un - 1) + power radix (un-1) * um
+                     = value up un
+                else
+                  div udone 64 = un
+                  so udone = 64 * un
+                  so valueb up udone
+                     = value up un
+                       + power radix un
+                         * mod (pelts up)[offset up + un] (power 2 0)
+                     = value up un
+                       + power radix un * mod (pelts up)[offset up + un] 1
+                     = value up un };
+    sn
+
+end
