@@ -897,39 +897,7 @@ module Checksum = struct
       let _,_,dnew = Trans.apply tr t in
       Digest.to_hex dnew
 
-  type 'a mid_modif =
-    | Madd of 'a Ident.Mid.t * 'a mid_proxy
-    | Msub of 'a Ident.Mid.t * 'a mid_proxy
-    | Mmap of 'a Ident.Mid.t
-  and 'a mid_proxy = { mutable mid : 'a mid_modif }
-
-  let empty_mid () = { mid = Mmap Ident.Mid.empty }
-
-  let rec get_mid x =
-    match x.mid with
-    | Madd (d,y) ->
-        let my = get_mid y in
-        let mx = Ident.Mid.union (fun _ _ _ -> assert false) my d in
-        y.mid <- Msub (d, x);
-        x.mid <- Mmap mx;
-        mx
-    | Msub (d,y) ->
-        let my = get_mid y in
-        let mx = Ident.Mid.set_diff my d in
-        y.mid <- Madd (d, x);
-        x.mid <- Mmap mx;
-        mx
-    | Mmap mx -> mx
-
-  let union_mid x d =
-    let mx = get_mid x in
-    let my = Ident.Mid.union (fun _ _ _ -> assert false) mx d in
-    let y = { mid = Mmap my } in
-    x.mid <- Msub (d, y);
-    y
-
-  let union_mid x d =
-    if Ident.Mid.is_empty d then x else union_mid x d
+  module DMid = Diffmap.MakeOfMap (Ident.Mid)
 
   (* WARNING: The occurence of [Trans.fold] in [task_v3] needs to be executed
      once at initialization in order for all the applications of this
@@ -943,7 +911,7 @@ module Checksum = struct
     let b = Buffer.create 8192 in
     let task_hd t (cold,mold,dold) =
       c := cold;
-      let mo = get_mid mold in
+      let mo = DMid.get mold in
       m := mo;
       tdecl (CV3,c,m,b) t.Task.task_decl;
       Buffer.add_string b (Digest.to_hex dold);
@@ -956,9 +924,9 @@ module Checksum = struct
             let s = Ident.Mid.set_diff s mo in
             Ident.Mid.mapi (fun id () -> Ident.Mid.find id !m) s
         | _ -> Ident.Mid.set_diff !m mo in
-      !c, union_mid mold mnew, dnew
+      !c, DMid.union mold mnew, dnew
     in
-    let tr = Trans.fold task_hd (0, empty_mid (), Digest.string "") in
+    let tr = Trans.fold task_hd (0, DMid.empty (), Digest.string "") in
     fun t ->
       let _,_,dnew = Trans.apply tr t in
       Digest.to_hex dnew
