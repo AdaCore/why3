@@ -897,6 +897,8 @@ module Checksum = struct
       let _,_,dnew = Trans.apply tr t in
       Digest.to_hex dnew
 
+  module DMid = Diffmap.MakeOfMap (Ident.Mid)
+
   (* WARNING: The occurence of [Trans.fold] in [task_v3] needs to be executed
      once at initialization in order for all the applications of this
      transformation to share the same Wtask ([h] created on first line of
@@ -909,19 +911,22 @@ module Checksum = struct
     let b = Buffer.create 8192 in
     let task_hd t (cold,mold,dold) =
       c := cold;
-      m := mold;
+      let mo = DMid.get mold in
+      m := mo;
       tdecl (CV3,c,m,b) t.Task.task_decl;
       Buffer.add_string b (Digest.to_hex dold);
       let dnew = Digest.string (Buffer.contents b) in
       Buffer.clear b;
       let mnew = match t.Task.task_decl.Theory.td_node with
         | Theory.Decl { Decl.d_news = s } ->
-            Ident.Sid.fold (fun id a ->
-              Ident.Mid.add id (Ident.Mid.find id !m) a) s mold
-        | _ -> !m in
-      !c, mnew, dnew
+            (* as metas might be have been put on some symbols before their
+               declaration, ignore such symbols *)
+            let s = Ident.Mid.set_diff s mo in
+            Ident.Mid.mapi (fun id () -> Ident.Mid.find id !m) s
+        | _ -> Ident.Mid.set_diff !m mo in
+      !c, DMid.union mold mnew, dnew
     in
-    let tr = Trans.fold task_hd (0, Ident.Mid.empty, Digest.string "") in
+    let tr = Trans.fold task_hd (0, DMid.empty (), Digest.string "") in
     fun t ->
       let _,_,dnew = Trans.apply tr t in
       Digest.to_hex dnew
