@@ -1,0 +1,32 @@
+use int.Int
+
+scope S42
+  val create: unit -> unit
+  exception Done
+  val next () : (r:int)
+    ensures { r = 42 }
+end
+
+scope S
+  type t = private { mutable state: int }
+  val create (n: int) : t
+  exception Done
+  val next (t: t) : (int, int)
+    writes  { t }
+    ensures { t.state = old t.state + 1 }
+    ensures { result = (old t.state, t.state) }
+end
+
+let f ()
+= for x, y in 10 with S do
+    invariant { it.S.state >= 0 }
+    variant { 1 }
+    assert { x = 41 }
+  done
+  (*
+  let it = S.create 10 in
+  try while true do
+    let x = S.next it in
+    assert { x = 41 }
+  done with S.Done -> () end
+  *)

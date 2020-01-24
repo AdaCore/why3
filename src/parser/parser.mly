@@ -196,6 +196,21 @@
     let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
     { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
 
+  let re_pat pat d = { pat with pat_desc = d }
+
+  let rec simplify_let_pattern ?loc kind d pat e =
+    let cast e ty = { e with expr_desc = Ecast (e,ty) } in
+    let rec unfold gh d p = match p.pat_desc with
+      | Pparen p | Pscope (_,p) -> unfold gh d p
+      | Pghost p -> unfold true d p
+      | Pcast (p,ty) -> unfold gh (cast d ty) p
+      | Ptuple [] -> unfold gh (cast d (PTtuple [])) (re_pat p Pwild)
+      | Pvar id -> Elet (id, gh, kind, d, e)
+      | Pwild -> Elet (id_anonymous p.pat_loc, gh, kind, d, e)
+      | _ when kind = Expr.RKnone -> Ematch (d, [pat, e], [])
+      | _ -> Loc.errorm ?loc "illegal kind qualifier" in
+    unfold false d pat
+
 %}
 
 (* Tokens *)
@@ -777,8 +792,7 @@ single_term_:
 | IF term THEN term ELSE term
     { Tif ($2, $4, $6) }
 | LET pattern EQUAL term IN term
-    { let re_pat pat d = { pat with pat_desc = d } in
-      let cast t ty = { t with term_desc = Tcast (t,ty) } in
+    { let cast t ty = { t with term_desc = Tcast (t,ty) } in
       let rec unfold d p = match p.pat_desc with
         | Pparen p | Pscope (_,p) -> unfold d p
         | Pcast (p,ty) -> unfold (cast d ty) p
@@ -1051,26 +1065,15 @@ single_expr_:
 | IF seq_expr THEN contract_expr %prec prec_no_else
     { Eif ($2, $4, mk_expr (Etuple []) $startpos $endpos) }
 | LET ghost kind let_pattern EQUAL seq_expr IN seq_expr
-    { let re_pat pat d = { pat with pat_desc = d } in
-      let cast e ty = { e with expr_desc = Ecast (e,ty) } in
-      let rec push pat = re_pat pat (match pat.pat_desc with
+    { let rec push pat = re_pat pat (match pat.pat_desc with
         | Ptuple (p::pl) -> Ptuple (push p :: pl)
         | Pcast (p,ty) -> Pcast (push p, ty)
         | Pas (p,v,g) -> Pas (push p, v, g)
         | Por (p,q) -> Por (push p, q)
         | _ -> Pghost pat) in
       let pat = if ghost $2 then push $4 else $4 in
-      let rec unfold gh d p = match p.pat_desc with
-        | Pparen p | Pscope (_,p) -> unfold gh d p
-        | Pghost p -> unfold true d p
-        | Pcast (p,ty) -> unfold gh (cast d ty) p
-        | Ptuple [] -> unfold gh (cast d (PTtuple [])) (re_pat p Pwild)
-        | Pvar id -> Elet (id, gh, $3, d, $8)
-        | Pwild -> Elet (id_anonymous p.pat_loc, gh, $3, d, $8)
-        | _ when $3 = Expr.RKnone -> Ematch (d, [pat, $8], [])
-        | _ -> Loc.errorm ~loc:(floc $startpos($3) $endpos($3))
-            "illegal kind qualifier" in
-      unfold false (apply_partial $2 $6) pat }
+      let loc = floc $startpos($3) $endpos($3) in
+      simplify_let_pattern ~loc $3 (apply_partial $2 $6) pat $8 }
 | LET ghost kind attrs(lident_op_nq) const_defn IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
@@ -1152,12 +1155,12 @@ single_expr_:
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
       let e = mk_expr (Efor ($2, $4, $5, $6, $8, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
-| FOR lident IN seq_expr WITH uident iterator
+| FOR pattern IN seq_expr WITH uident iterator
   DO loop_annotation loop_body DONE
     { let mk d = mk_expr d $startpos $endpos in
       let q s = Qdot (Qident $6, mk_id s $startpos($6) $endpos($6)) in
       let next = mk (Eidapp (q "next", [mk (Eident (Qident $7))])) in
-      let e = mk (Elet ($2, false, Expr.RKnone, next, $10)) in
+      let e = mk (simplify_let_pattern Expr.RKnone next $2 $10) in
       let e = mk (Ewhile (mk Etrue, fst $9, snd $9, e)) in
       let unit = mk_expr (Etuple []) $startpos($10) $endpos($10) in
       let e = mk (Ematch (e, [], [q "Done", None, unit])) in
