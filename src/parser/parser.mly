@@ -1152,6 +1152,17 @@ single_expr_:
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
       let e = mk_expr (Efor ($2, $4, $5, $6, $8, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
+| FOR lident IN seq_expr WITH uident iterator
+  DO loop_annotation loop_body DONE
+    { let mk d = mk_expr d $startpos $endpos in
+      let q s = Qdot (Qident $6, mk_id s $startpos($6) $endpos($6)) in
+      let next = mk (Eidapp (q "next", [mk (Eident (Qident $7))])) in
+      let e = mk (Elet ($2, false, Expr.RKnone, next, $10)) in
+      let e = mk (Ewhile (mk Etrue, fst $9, snd $9, e)) in
+      let unit = mk_expr (Etuple []) $startpos($10) $endpos($10) in
+      let e = mk (Ematch (e, [], [q "Done", None, unit])) in
+      let create = mk (Eidapp (q "create", [$4])) in
+      Elet ($7, false, Expr.RKnone, create, e) }
 | ABSURD
     { Eabsurd }
 | RAISE uqualid expr_arg?
@@ -1248,6 +1259,10 @@ loop_annotation:
     { let inv, var = $2 in $1 :: inv, var }
 | variant loop_annotation
     { let inv, var = $2 in inv, variant_union $1 var }
+
+iterator:
+| (* epsilon *) { mk_id "it" $startpos $endpos}
+| AS lident     { $2 }
 
 ext_match_cases:
 | ioption(BAR) ext_match_cases1  { $2 }
