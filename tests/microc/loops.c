@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 
-int loop1(int b)
+void loop1(int b)
 //@ requires b > 0;
 {
   while (--b) {
@@ -12,7 +12,7 @@ int loop1(int b)
   //@ assert b == 0;
 }
 
-int loop2(int b)
+void loop2(int b)
 //@ requires b >= 0;
 {
   while (b) {
