@@ -53,6 +53,7 @@ int main() {
     printf("valeur absente\n");
   else
     printf("valeur présente à la position %d\n,", r);
+  return 0;
 }
 
 
