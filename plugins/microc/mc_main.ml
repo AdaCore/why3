@@ -279,8 +279,10 @@ let decl = function
     let rty = type_ loc ty in
     let env' = List.fold_left add_var empty_env idl in
     let body = stmt env' bl in
-    let body = if not (has_return bl) then body else
-      let loc = id.id_loc in
+    let body =
+      if not (has_return bl) then begin
+        if ty <> Tvoid then Loc.errorm ~loc "missing return";
+        body end else
       mk_expr ~loc (Ematch (body, [], return_handler ~loc)) in
     let local bl = function
       | Tint, id ->
