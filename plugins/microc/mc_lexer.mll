@@ -38,6 +38,7 @@
        "at", AT; "old", OLD;
        "invariant", INVARIANT; "variant", VARIANT;
        "assert", ASSERT; "assume", ASSUME; "check", CHECK;
+       "lemma", LEMMA; "axiom", AXIOM; "goal", GOAL;
        "requires", REQUIRES; "ensures", ENSURES;
        "label", LABEL; "function", FUNCTION; "predicate", PREDICATE;
       ];
@@ -101,6 +102,7 @@ rule next_token = parse
   | '{'     { LBRC }
   | '}'     { RBRC }
   | ','     { COMMA }
+  | ':'     { COLON }
   | ';'     { SEMICOLON }
   | "&&"    { AND }
   | "||"    { OR }

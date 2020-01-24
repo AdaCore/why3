@@ -42,10 +42,6 @@
       | s -> raise (Unsupported ("no such operator " ^ s)) in
     { id_str = s; id_ats = []; id_loc = loc }
 
-  let new_axiom =
-    let r = ref 0 in
-    fun s e -> incr r; mk_id ("Axiom_" ^ string_of_int !r) s e
-
   let variant_union v1 v2 = match v1, v2 with
     | _, [] -> v1
     | [], _ -> v2
@@ -75,6 +71,8 @@
     sp_partial = s1.sp_partial || s2.sp_partial;
   }
 
+  let type_int s e = PTtyapp (Qident (mk_id "int" s e), [])
+
 %}
 
 %token <string> INCLUDE
@@ -91,6 +89,7 @@
 %token PLUSPLUS MINUSMINUS PLUSEQUAL MINUSEQUAL TIMESEQUAL DIVEQUAL
 %token AMPERSAND SCANF
 (* annotations *)
+%token LEMMA AXIOM GOAL COLON
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
 %token FUNCTION PREDICATE TRUE FALSE
 %token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET IN OLD AT
@@ -129,7 +128,7 @@ decl:
 | include_ { $1 }
 | def      { $1 }
 | func     { $1 }
-| axiom    { $1 }
+| prop     { $1 }
 
 include_:
 | f=INCLUDE
@@ -149,9 +148,13 @@ func:
   EQUAL t=term SEMICOLON
  { Dlogic (None, id, l, Some t) }
 
-axiom:
-| ASSUME t=term SEMICOLON
-  { Daxiom (new_axiom $startpos $endpos, t) }
+prop:
+| LEMMA id=ident COLON t=term SEMICOLON
+  { Dprop (Decl.Plemma, id, t) }
+| AXIOM id=ident COLON t=term SEMICOLON
+  { Dprop (Decl.Paxiom, id, t) }
+| GOAL id=ident COLON t=term SEMICOLON
+  { Dprop (Decl.Pgoal, id, t) }
 
 def:
 | ty=return_type f=ident LEFTPAR x=separated_list(COMMA, param) RIGHTPAR
@@ -414,7 +417,8 @@ term_:
 | LET id=ident EQUAL t1=term IN t2=term
     { Tlet (id, t1, t2) }
 | q=quant l=comma_list1(ident) DOT t=term
-    { let var id = id.id_loc, Some id, false, None in
+    { let ty = Some (type_int $startpos $endpos) in
+      let var id = id.id_loc, Some id, false, ty in
       Tquant (q, List.map var l, [], t) }
 | id=ident LEFTPAR l=separated_list(COMMA, term) RIGHTPAR
     { Tidapp (Qident id, l) }

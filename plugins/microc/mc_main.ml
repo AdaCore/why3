@@ -56,8 +56,9 @@ let return ~loc =
 let return_handler ~loc =
   let x = mk_id ~loc "x" in
   [return ~loc, Some (mk_pat ~loc (Pvar x)), mk_var ~loc x]
+let array_id ~loc id = Qdot (Qident (mk_id ~loc "Array"), id)
 let array_make ~loc n v =
-  mk_expr ~loc (Eidapp (Qdot (Qident (mk_id ~loc "Array"), mk_id ~loc "make"),
+  mk_expr ~loc (Eidapp (array_id ~loc (mk_id ~loc "make"),
                         [n; v]))
 let set_ref id =
   { id with id_ats = ATstr Pmodule.ref_attr :: id.id_ats }
@@ -254,11 +255,12 @@ let fresh_type_var =
   fun loc -> incr r;
     PTtyvar { id_str = "a" ^ string_of_int !r; id_loc = loc; id_ats = [] }
 
+let type_unit loc = PTtyapp (Qident (mk_id ~loc "unit"), [])
 let type_int loc = PTtyapp (Qident (mk_id ~loc "int"), [])
-let type_array loc ty = PTtyapp (Qident (mk_id ~loc "array"), [ty])
+let type_array loc ty = PTtyapp (array_id ~loc (mk_id ~loc "array"), [ty])
 
 let type_ loc = function
-  | Tvoid -> assert false
+  | Tvoid -> type_unit loc
   | Tint -> type_int loc
   | Tarray -> type_array loc (type_int loc)
 
@@ -268,12 +270,13 @@ let logic_param (ty, id) =
 let decl = function
   | Mc_ast.Dinclude _ ->
      ()
-  | Mc_ast.Dfun (_ty, id, idl, sp, bl) ->
+  | Mc_ast.Dfun (ty, id, idl, sp, bl) ->
     (* f(x1,...,xn): body ==>
       let f x1 ... xn =
         let x1 = ref x1 in ... let xn = ref xn in
         try body with Return x -> x *)
     let loc = id.id_loc in
+    let rty = type_ loc ty in
     let env' = List.fold_left add_var empty_env idl in
     let body = stmt env' bl in
     let body = if not (has_return bl) then body else
@@ -287,14 +290,15 @@ let decl = function
       | Tarray, _ -> bl
       | Tvoid, _ -> assert false in
     let body = List.fold_left local body idl in
-    let param (_ty, id) = id.id_loc, Some id, false, None in
+    let param (ty, id) =
+      id.id_loc, Some id, false, Some (type_ id.id_loc ty) in
     let params = if idl = [] then no_params ~loc else List.map param idl in
     let p = mk_pat ~loc Pwild in
     let d = if stmt_has_call id bl then
-      Drec ([id, false, Expr.RKnone, params, None,
+      Drec ([id, false, Expr.RKnone, params, Some rty,
              p, Ity.MaskVisible, sp, body])
     else
-      let e = Efun (params, None, p, Ity.MaskVisible, sp, body) in
+      let e = Efun (params, Some rty, p, Ity.MaskVisible, sp, body) in
       Dlet (id, false, Expr.RKnone, mk_expr ~loc e) in
     Typing.add_decl loc d
   | Mc_ast.Dlogic (ty, id, idl, def) ->
@@ -304,8 +308,8 @@ let decl = function
               ld_type = Opt.map (type_ id.id_loc) ty;
               ld_def = def } in
     Typing.add_decl id.id_loc (Dlogic [d])
-  | Mc_ast.Daxiom (id, t) ->
-     Typing.add_decl id.id_loc (Dprop (Decl.Paxiom, id, t))
+  | Mc_ast.Dprop (pk, id, t) ->
+     Typing.add_decl id.id_loc (Dprop (pk, id, t))
 
 let translate dl =
   List.iter decl dl

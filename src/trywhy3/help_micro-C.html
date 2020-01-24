@@ -22,7 +22,7 @@
   <body>
 
     <h1>Online version of Why3, with micro-C input format</h1>
-    
+
     This version of Why3 is intended for teaching purposes.
     Its input format is a tiny subset of C, called "micro-C",
     described below.
@@ -38,7 +38,7 @@
     Logical annotations are inserted in special comments starting
     with <tt>//@</tt> or <tt>/*@</tt>. In the following grammar, we
     only use the former kind, for simplicity, but both kinds are allowed.
-    
+
 <pre>
       file ::= decl*
       decl ::= c-function | logic-declaration
@@ -50,15 +50,15 @@
  c-function ::= return_type identifier "(" [ params ] ")" { spec } block
 return_type ::= "void" | "int"
      params ::= param { "," param }
-      param ::= "int" identifier | "int" identifier "[]"	
+      param ::= "int" identifier | "int" identifier "[]"
 </pre>
-    
+
 <h4>Function specification</h4>
 
 <pre>
    spec ::= "requires" term ";"
-          | "ensures"  term ";" 
-          | "variant"  term { "," term } ";" 
+          | "ensures"  term ";"
+          | "variant"  term { "," term } ";"
 </pre>
 
 <h4>C expression</h4>
@@ -113,12 +113,13 @@ placed either before the block or right at the beginning of the block.
 <h4>Logic declarations</h4>
 
 <pre>
-  logic-declaration ::= "//@" "assume" term ";"
-		      | "//@" "function" "int" identifier "(" params ")" ";"
+  logic-declaration ::= "//@" "function" "int" identifier "(" params ")" ";"
 		      | "//@" "function" "int" identifier "(" params ")" "=" term ";"
 		      | "//@" "predicate" identifier "(" params ")" ";"
 		      | "//@" "predicate" identifier "(" params ")" "=" term ";"
-		      | "//@" assume term ";"
+		      | "//@" axiom identifier ":" term ";"
+		      | "//@" lemma identifier ":" term ";"
+		      | "//@" goal  identifier ":" term ";"
 </pre>
 
 <h4>Logical term</h4>
@@ -141,7 +142,7 @@ placed either before the block or right at the beginning of the block.
 	 | "if" term "then" term "else term
 	 | "let" identifier "=" term "in" term
 	 | ( "forall" | "exists" ) identifier { "," identifier } "." term
-	 | identifer "(" [ term { "," term } ] ")"
+	 | identifier "(" [ term { "," term } ] ")"
 </pre>
 
     <h2>Built-in functions and predicates</h2>
@@ -165,7 +166,7 @@ placed either before the block or right at the beginning of the block.
 	occurrences of the value <tt>v</tt> in array <tt>a</tt>
     </ul>
 
-    <h2>Verifiying a program</h2>
+    <h2>Verifying a program</h2>
 
     <p>
     Click on the gears button to launch the verification.
