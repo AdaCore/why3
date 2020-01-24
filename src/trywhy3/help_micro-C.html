@@ -41,8 +41,15 @@
 
 <pre>
       file ::= decl*
-      decl ::= c-function | logic-declaration
+      decl ::= c-include | c-function | logic-declaration
+ c-include ::= "#include" "<" file-name ">"
 </pre>
+
+Directives <tt>#include</tt> are ignored during the translation to
+Why3. They are allowed anyway, such that a C source code using
+functions such as <tt>printf</tt> (see below) is accepted by a C compiler.
+
+
 
 <h4>Function definition</h4>
 
@@ -117,9 +124,9 @@ placed either before the block or right at the beginning of the block.
 		      | "//@" "function" "int" identifier "(" params ")" "=" term ";"
 		      | "//@" "predicate" identifier "(" params ")" ";"
 		      | "//@" "predicate" identifier "(" params ")" "=" term ";"
-		      | "//@" axiom identifier ":" term ";"
-		      | "//@" lemma identifier ":" term ";"
-		      | "//@" goal  identifier ":" term ";"
+		      | "//@" "axiom" identifier ":" term ";"
+		      | "//@" "lemma" identifier ":" term ";"
+		      | "//@" "goal"  identifier ":" term ";"
 </pre>
 
 <h4>Logical term</h4>
@@ -144,6 +151,7 @@ placed either before the block or right at the beginning of the block.
 	 | ( "forall" | "exists" ) identifier { "," identifier } "." term
 	 | identifier "(" [ term { "," term } ] ")"
 </pre>
+  Quantifiers are limited to integer variables.
 
     <h2>Built-in functions and predicates</h2>
 
