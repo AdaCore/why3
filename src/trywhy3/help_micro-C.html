@@ -148,10 +148,11 @@ placed either before the block or right at the beginning of the block.
 	 | term ( "+" | "-" | "*" | "/" | "% ) term
 	 | "if" term "then" term "else term
 	 | "let" identifier "=" term "in" term
-	 | ( "forall" | "exists" ) identifier { "," identifier } "." term
+	 | ( "forall" | "exists" ) binder { "," binder } "." term
 	 | identifier "(" [ term { "," term } ] ")"
+binder ::= identifier
+	 | identifier "[]"
 </pre>
-  Quantifiers are limited to integer variables.
 
     <h2>Built-in functions and predicates</h2>
 
