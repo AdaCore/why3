@@ -1,4 +1,18 @@
 Weakest Precondition
+bench/ce/jlamp_projections.mlw AbstractAlone p3'vc: Valid
+bench/ce/jlamp_projections.mlw AbstractAlone p3'vc: Unknown (sat)
+Counter-example model:
+File jlamp_projections.mlw:
+  Line 18:
+    a, [[@introduced]] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "127" } }
+  Line 28:
+    a, [[@introduced]] = {"proj_name" : "to_int" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "127" } }
+  Line 29:
+    a, [[@introduced], [@model_trace:a]] = {"proj_name" : "to_int" ,
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "127" } }
+
 bench/ce/jlamp_projections.mlw AbstractWithRef p3'vc: Valid
 bench/ce/jlamp_projections.mlw AbstractWithRef p3'vc: Timeout or Unknown
 Counter-example model:
@@ -7,31 +21,31 @@ File ref.mlw:
     a, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"proj_name" : "to_int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } } }] } }
+    "value" : {"type" : "Integer" , "val" : "127" } } }] } }
 File jlamp_projections.mlw:
-  Line 29:
+  Line 41:
     a, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"proj_name" : "to_int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } } }] } }
-  Line 30:
+    "value" : {"type" : "Integer" , "val" : "127" } } }] } }
+  Line 42:
     a, [[@introduced], [@field:0:contents], [@model_trace:a]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"proj_name" : "to_int" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } } }] } }
+    "value" : {"type" : "Integer" , "val" : "127" } } }] } }
 
 bench/ce/jlamp_projections.mlw Record p4'vc: Valid
 bench/ce/jlamp_projections.mlw Record p4'vc: Unknown (sat)
 Counter-example model:
 File jlamp_projections.mlw:
-  Line 41:
+  Line 53:
     b, [[@introduced]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "f" , "value" : {"proj_name" : "to_int" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "0" } } },
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "127" } } },
     {"field" : "g" , "value" : {"type" : "Boolean" , "val" : true } }] } }
-  Line 42:
+  Line 54:
     b, [[@introduced], [@model_trace:b]] = {"type" : "Record" ,
     "val" : {"Field" : [{"field" : "f" , "value" : {"proj_name" : "to_int" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "0" } } },
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "127" } } },
     {"field" : "g" , "value" : {"type" : "Boolean" , "val" : true } }] } }
 

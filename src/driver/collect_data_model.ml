@@ -133,6 +133,33 @@ let rec print_tree fmt t =
 and print_mpt fmt t =
   Mpr.iter (fun key e -> Format.fprintf fmt "P: %s; T: %a" key print_tree e) t
 
+let subst_local_var var value t =
+  let rec aux t =
+    match t with
+    | TFunction_Local_Variable var' when var' = var ->
+        value
+    | TFunction_Local_Variable _ | TVariable _ | TCvc4_Variable _ | TSval _ ->
+        t
+    | TApply (s, args) ->
+        TApply (s, List.map aux args)
+    | TIte (t1, t2, t3, t4) ->
+        TIte (aux t1, aux t2, aux t3, aux t4)
+    | TArray tarray ->
+        TArray (aux_array tarray)
+    | TRecord (s, fields) ->
+        let aux_field (s, t) = (s, aux t) in
+        TRecord (s, List.map aux_field fields)
+    | TTo_array t ->
+        TTo_array (aux t)
+  and aux_array a =
+    match a with
+    | TArray_var _ ->
+        a
+    | TConst t ->
+        TConst (aux t)
+    | TStore (a, t1, t2) ->
+        TStore (aux_array a, aux t1, aux t2) in
+  aux t
 
 (* Printing function for debugging *)
 let print_table (t: correspondence_table) =
@@ -212,8 +239,18 @@ exception Incorrect_table
 
 (* Simplify if-then-else in value so that it can be read by
    add_vars_to_table. *)
-let rec simplify_value v =
+let rec simplify_value table v =
   match v with
+  | TApply (s, args') ->
+      let vars, body = (* Function binding for s *)
+        match Mstr.find s table with
+        | Leaf (TFunction (vars, body)) -> vars, body
+        | _ -> raise Incorrect_table
+        | exception Not_found -> raise Incorrect_table in
+      let vars = List.map fst vars in
+      let args = List.map (simplify_value table) args' in
+      List.fold_right2 subst_local_var vars args body |>
+      simplify_value table
   | TIte (
       TIte (TFunction_Local_Variable x,
             TCvc4_Variable cvc,
@@ -225,7 +262,7 @@ let rec simplify_value v =
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
       let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc, tth, tel) in
-      simplify_value t
+      simplify_value table t
   | TIte (
       TIte (TCvc4_Variable cvc,
             TFunction_Local_Variable x,
@@ -237,7 +274,7 @@ let rec simplify_value v =
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
       let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc, tth, tel) in
-      simplify_value t
+      simplify_value table t
   | TIte (
       TIte (TFunction_Local_Variable x,
             TCvc4_Variable cvc,
@@ -249,7 +286,7 @@ let rec simplify_value v =
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
       let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc3, tth, tel) in
-      simplify_value t
+      simplify_value table t
   | TIte (
       TIte (TCvc4_Variable cvc,
             TFunction_Local_Variable x,
@@ -261,9 +298,9 @@ let rec simplify_value v =
       (* Here we chose what we keep from the model. This case is not complete
          but good enough. *)
       let t = TIte (TFunction_Local_Variable x, TCvc4_Variable cvc3, tth, tel) in
-      simplify_value t
+      simplify_value table t
   | TIte (eq1, eq2, tthen, telse) ->
-      TIte (eq1, eq2, simplify_value tthen, simplify_value telse)
+      TIte (eq1, eq2, simplify_value table tthen, simplify_value table telse)
   | _ -> v
 
 (* Add the variables that can be deduced from ITE to the table of variables *)
@@ -288,7 +325,7 @@ let add_vars_to_table (table: correspondence_table) key value : correspondence_t
           Mstr.add cvc (Node (Mpr.add key t1 Mpr.empty)) table
     in
 
-    let value = simplify_value value in
+    let value = simplify_value table value in
     match value with
     | TIte (TCvc4_Variable (Var cvc), TFunction_Local_Variable _x, t1, t2) ->
         let table = add_var_ite cvc t1 table in

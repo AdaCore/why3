@@ -573,3 +573,56 @@ let get_first_unproven_goal_around
       | hd :: _tl -> Some hd
     end
   | hd :: _tl  -> Some hd
+
+let find_next_unproved_goal ~proved ~children ~get_parent ~is_pa node =
+  let rec find_next_in_above node =
+    match get_parent node with
+    | None -> None
+    | Some parent when proved parent ->
+        find_next_in_above parent
+    | Some parent ->
+        let brothers_node = children parent in
+        let _before_nodes, after_nodes = split_list brothers_node node in
+        let after_nodes = List.filter
+            (fun x -> not (proved x) && not (is_pa x)) after_nodes in
+        if after_nodes = [] then
+          find_next_in_above parent
+        else
+          Some (List.hd after_nodes)
+  in
+  let childrens = children node in
+  let l = List.filter (fun x -> not (proved x) && not (is_pa x)) childrens in
+  if l <> [] then
+    Some (List.hd l)
+  else
+    find_next_in_above node
+
+let find_previous_unproved_goal ~proved ~children ~get_parent node =
+  let original_node = node in
+  let rec find_previous_in_above node =
+    match get_parent node with
+    | None -> if node = original_node then None else Some node
+    | Some parent when proved parent ->
+        find_previous_in_above parent
+    | Some parent ->
+        if not (proved node) && node <> original_node then
+          Some node
+        else
+          let brothers_node = children parent in
+          let before_nodes, _after_nodes = split_list brothers_node node in
+          let before_nodes =
+            Lists.rev_filter (fun x -> not (proved x)) before_nodes in
+          begin match before_nodes with
+            | [] -> find_previous_in_above parent
+            | t :: _ -> Some t
+          end
+  in
+  find_previous_in_above node
+
+let get_next_with_strategy ~st
+    ~always_send ~proved ~children ~get_parent ~is_goal ~is_pa node =
+  let open Itp_communication in
+  match st with
+  | Next -> find_next_unproved_goal ~proved ~children ~get_parent ~is_pa node
+  | Prev -> find_previous_unproved_goal ~proved ~children ~get_parent node
+  | Clever -> get_first_unproven_goal_around ~always_send ~proved ~children ~get_parent ~is_goal ~is_pa node

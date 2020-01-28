@@ -600,10 +600,11 @@ let parse_record muc fll =
   let itd = find_its_defn muc.muc_known its in
   let check v s = match s.rs_field with
     | Some u -> pv_equal v u
-    | _ -> false in
+    | _ -> raise (BadRecordUnnamed (ls_of_rs rs, its.its_ts)) in
   let cs = match itd.itd_constructors with
     | [cs] when Lists.equal check cs.rs_cty.cty_args itd.itd_fields -> cs
-    | _ -> raise (BadRecordField (ls_of_rs rs)) in
+    | _ :: _ :: _ -> raise (BadRecordCons (ls_of_rs rs, its.its_ts))
+    | _ -> raise (BadRecordType (ls_of_rs rs, its.its_ts)) in
   let pjs = Srs.of_list itd.itd_fields in
   let flm = List.fold_left (fun m (pj,v) -> if Srs.mem pj pjs then
     Mrs.add_new (DuplicateRecordField (ls_of_rs pj)) pj v m

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Verify C Code using Why3</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="trywhy3_help.css" />
+
+
+    <script defer="defer" src="ace-builds/src-min-noconflict/ace.js"
+            type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript">
+      var load_embedded_files = false;
+      var editor_theme = "ace/theme/chrome";
+      var editor_mode = "ace/mode/python";
+      var task_viewer_mode = "ace/mode/why3";
+      var library_index = "examples/index.txt";
+    </script>
+    <script defer="defer" type="text/javascript"
+            src="trywhy3.js"></script>
+  </head>
+  <body>
+
+    <h1>Online version of Why3, with micro-C input format</h1>
+
+    This version of Why3 is intended for teaching purposes.
+    Its input format is a tiny subset of C, called "micro-C",
+    described below.
+
+    <h2>Syntax of micro-C</h2>
+
+    Notation: The grammar of micro-C is given below in extended
+    Backus-Naur Form, using | for alternation, () for grouping,
+    [] for option, and {} for repetition.
+
+    <p>
+
+    Logical annotations are inserted in special comments starting
+    with <tt>//@</tt> or <tt>/*@</tt>. In the following grammar, we
+    only use the former kind, for simplicity, but both kinds are allowed.
+
+<pre>
+      file ::= decl*
+      decl ::= c-include | c-function | logic-declaration
+ c-include ::= "#include" "<" file-name ">"
+</pre>
+
+Directives <tt>#include</tt> are ignored during the translation to
+Why3. They are allowed anyway, such that a C source code using
+functions such as <tt>printf</tt> (see below) is accepted by a C compiler.
+
+
+
+<h4>Function definition</h4>
+
+<pre>
+ c-function ::= return_type identifier "(" [ params ] ")" { spec } block
+return_type ::= "void" | "int"
+     params ::= param { "," param }
+      param ::= "int" identifier | "int" identifier "[]"
+</pre>
+
+<h4>Function specification</h4>
+
+<pre>
+   spec ::= "requires" term ";"
+          | "ensures"  term ";"
+          | "variant"  term { "," term } ";"
+</pre>
+
+<h4>C expression</h4>
+
+<pre>
+  expr ::= integer-literal | string-literal
+	 | identifier | identifier ( "++" | "--" ) | ( "++" | "--" ) identifier
+	 | identifier "[" expr "]"
+	 | identifier "[" expr "]" ( "++" | "--")
+	 | ( "++" | "--") identifier "[" expr "]"
+	 | "-" expr | "!" expr
+	 | expr ( "+" | "-" | "*" | "/" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" ) expr
+	 | identifier "(" [ expr { "," expr } ] ")"
+	 | "scanf" "(" "\"%d\"" "," "&" identifier ")"
+	 | "(" expr ")"
+</pre>
+
+<h4>C statement</h4>
+
+<pre>
+       stmt ::= ";"
+	      | "return" expr ";"
+	      | "int" identifier ";"
+	      | "int" identifier "[" expr "]" ";"
+	      | "break" ";"
+	      | "if" "(" expr ")" stmt
+	      | "if" "(" expr ")" stmt "else" stmt
+	      | "while" "(" expr ")" loop_body
+	      | "for" "(" expr_stmt ";" expr ";" expr_stmt ")" loop_body
+	      | expr_stmt ";"
+	      | block
+	      | "//@" "label" identifier ";"
+	      | "//@" ( "assert" | "assume" | "check" ) term ";"
+      block ::= "{" { stmt } "}"
+  expr_stmt ::= "int" identifier "=" expr
+	      | identifier assignop exor
+	      | identifier "[" expr "]" assignop expr
+	      | expr
+   assignop ::= "=" | "+=" | "-=" | "*=" | "/="
+  loop_body ::= { loop_annot } stmt
+              | "{" { loop_annot } { stmt } "}"
+ loop_annot ::= "//@" "invariant" term ";"
+              | "//@" "variant" term { "," term } ";"
+</pre>
+
+Note that the syntax for loop bodies allows the loop annotations to be
+placed either before the block or right at the beginning of the block.
+
+<!-- Note: In ANSI C, the variables must be declared at the beginning of -->
+<!-- the block. Here, they can be declared anywhere. -->
+
+<h4>Logic declarations</h4>
+
+<pre>
+  logic-declaration ::= "//@" "function" "int" identifier "(" params ")" ";"
+		      | "//@" "function" "int" identifier "(" params ")" "=" term ";"
+		      | "//@" "predicate" identifier "(" params ")" ";"
+		      | "//@" "predicate" identifier "(" params ")" "=" term ";"
+		      | "//@" "axiom" identifier ":" term ";"
+		      | "//@" "lemma" identifier ":" term ";"
+		      | "//@" "goal"  identifier ":" term ";"
+</pre>
+
+<h4>Logical term</h4>
+
+<pre>
+  term ::= identifier
+	 | integer-literal
+	 | "true"
+	 | "false"
+	 | "(" term ")"
+	 | term "[" term "]"
+	 | term "[" term "<-" term "]"
+	 | "!" term
+	 | "old" "(" term ")"
+	 | "at" "(" term "," identifier ")"
+	 | "-" term
+	 | term ( "->" | "<->" | "||" | "&&" ) term
+	 | term ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) term
+	 | term ( "+" | "-" | "*" | "/" | "% ) term
+	 | "if" term "then" term "else term
+	 | "let" identifier "=" term "in" term
+	 | ( "forall" | "exists" ) binder { "," binder } "." term
+	 | identifier "(" [ term { "," term } ] ")"
+binder ::= identifier
+	 | identifier "[]"
+</pre>
+
+    <h2>Built-in functions and predicates</h2>
+
+    <h4>C code</h4>
+
+    <ul>
+      <li> <tt>scanf</tt>, with a syntax limited to <tt>scanf("%d", &x)</tt>
+      <li> <tt>printf</tt>, limited to <tt>printf(string-literal,
+	  expr1, ..., exprn)</tt> and assuming that the string literal
+	contains exactly n occurrences of <tt>%d</tt> (not checked by Why3).
+      <li> <tt>rand()</tt>, returns a pseudo-random integer in the range 0 to
+	<tt>RAND_MAX</tt> inclusive.
+    </ul>
+
+    <h4>Logic</h4>
+
+    <ul>
+      <li> <tt>int length(int[] a)</tt>, the length of array <tt>a</tt>
+      <li> <tt>int occurrence(int v, int[] a)</tt>, the number of
+	occurrences of the value <tt>v</tt> in array <tt>a</tt>
+    </ul>
+
+    <h2>Verifying a program</h2>
+
+    <p>
+    Click on the gears button to launch the verification.
+    Verification conditions (VCs) then appear in the right panel, in
+    the Task List tab, and
+    Alt-Ergo is run on each of them with a default time limit (that
+    can be set in the Settings menu).
+    </p>
+
+    <p>
+    When a VC is not proved, there are several options:
+    <ul>
+      <li> use the contextual menu to rerun Alt-Ergo with a larger
+      time limit (e.g. 1000 or 5000 steps instead of 100);
+      <li> use the contextual menu to split the VC and rerun Alt-Ergo
+      on each sub-VC (split and prove);
+      <li> use the Task View tab to investigate the problematic VC,
+      for wrong or missing elements of specification (precondition,
+      postcondition, invariant);
+      <li> add intermediate assertions in the code, using <tt>//@
+      assert ...;</tt>.
+    </ul>
+    </p>
+
+    <br>
+
+  </body>
+
+</html>

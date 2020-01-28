@@ -694,7 +694,7 @@ module Print = struct
           (print_expr info 18) e
     | Eignore e ->
         fprintf fmt (protect_on (prec < 4)"ignore %a")
-          (print_expr info 4) e
+          (print_expr info 3) e
 
   and print_branch info fmt (p, e) =
     fprintf fmt "@[<hv 2>| %a ->@ @[%a@]@]"

@@ -120,7 +120,7 @@ let decl info d = match d.d_node with
       "Algebraic types are not supported, run eliminate_algebraic"
   | Dparam ls ->
       [create_param_decl (ls_extend ls)] @ ls_desc info ls
-  | Dlogic [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+  | Dlogic [ls,ld] when not (Sid.mem ls.ls_name (get_decl_syms d)) ->
       let f = t_type_close (expl_term info true) (ls_defn_axiom ld) in
       defn_or_axiom (ls_extend ls) f @ ls_desc info ls
   | Dlogic _ -> Printer.unsupportedDecl d

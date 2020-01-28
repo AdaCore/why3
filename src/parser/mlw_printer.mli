@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Pretty printing of Why3 parse trees ([Ptree]) as Why3 source code *)
+(** {1 Pretty printing of Why3 parse trees as Why3 source code} *)
 
 val pp_pattern : Format.formatter -> Ptree.pattern -> unit
 
@@ -22,3 +22,4 @@ val pp_pty : Format.formatter -> Ptree.pty -> unit
 val pp_decl : Format.formatter -> Ptree.decl -> unit
 
 val pp_mlw_file : Format.formatter -> Ptree.mlw_file -> unit
+(** [pp_mlw_file fmt t] outputs the parse tree [t] in formatter [fmt] *)

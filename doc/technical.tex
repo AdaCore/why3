@@ -118,6 +118,12 @@ predicate p x_1 ... x_n = (q e_1 ... e_k)
 \end{whycode}
 when each $e_i$ is either a ground term or one of the $x_j$, and
 each $x_1 \dots x_n$ occurs at most once in all the $e_i$.
+
+The attribute \texttt{[@inline:trivial]} is used to tag functions that
+the transformation will force expand (not using the conditions above). This can
+be used to ensure that some specific functions are inlined for automatic
+provers (inline\_trivial is used in many drivers).
+
 \index{inline-trivial@\verb+inline_trivial+}
 
 \item[inline\_goal] expands all outermost symbols of the goal that

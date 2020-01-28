@@ -6,7 +6,7 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2019-11-14"
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2019-12-11"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
 build-image:
@@ -36,27 +36,7 @@ build-image:
 
 build-system:
   variables:
-    COMPILER: ocaml-system
-  <<: *build_definition
-
-build-4.05.0:
-  variables:
-    COMPILER: 4.05.0
-  <<: *build_definition
-
-build-4.06.1:
-  variables:
-    COMPILER: 4.06.1
-  <<: *build_definition
-
-build-4.07.1:
-  variables:
-    COMPILER: 4.07.1
-  <<: *build_definition
-
-build-4.08.1:
-  variables:
-    COMPILER: 4.08.1
+    COMPILER: system
   <<: *build_definition
 
 build-4.09.0:
@@ -64,45 +44,21 @@ build-4.09.0:
     COMPILER: 4.09.0
   <<: *build_definition
 
-.bench_template1: &bench_definition_always
+bench-system:
+  variables:
+    COMPILER: system
   stage: test
   script:
-    - misc/ci-local.sh bench ide
+    - misc/ci-local.sh bench ide doc
   <<: *docker_definition
-
-.bench_template2: &bench_definition
-  <<: *bench_definition_always
-  only:
-    - tags
-    - schedules
-
-bench-system:
-  <<: *bench_definition_always
-
-bench-4.05.0:
-  variables:
-    COMPILER: 4.05.0
-  <<: *bench_definition
-
-bench-4.06.1:
-  variables:
-    COMPILER: 4.06.1
-  <<: *bench_definition
-
-bench-4.07.1:
-  variables:
-    COMPILER: 4.07.1
-  <<: *bench_definition_always
-
-bench-4.08.1:
-  variables:
-    COMPILER: 4.08.1
-  <<: *bench_definition
 
 bench-4.09.0:
   variables:
     COMPILER: 4.09.0
-  <<: *bench_definition
+  stage: test
+  script:
+    - misc/ci-local.sh ide bench
+  <<: *docker_definition
 
 full:
   stage: test
@@ -131,19 +87,28 @@ ce-bench:
 opam:
   stage: build
   script:
+    - opam switch full
     - opam pin -v -y add why3 .
     - opam pin -v -y add why3-ide .
+    - opam pin -v -y add why3-coq .
   <<: *docker_definition
 
 deploy:
   stage: deploy
   script:
-    - IMAGE=$CI_REGISTRY_IMAGE:$(echo $CI_COMMIT_REF_NAME | tr -cs "[:alnum:].\n" "-")
+    - BRANCH=$(echo $CI_COMMIT_REF_NAME | tr -cs "[:alnum:].\n" "-")
+    - CACHE=$CI_REGISTRY_IMAGE:cache-$BRANCH
+    - IMAGE=$CI_REGISTRY_IMAGE:$BRANCH
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
+    - docker pull "$CACHE" || true
     - docker pull "$IMAGE" || true
-    - docker build --force-rm --cache-from "$IMAGE" -t "$IMAGE" -f misc/Dockerfile.deploy .
+    - docker build --force-rm --cache-from="$CACHE" --target=builder -t "$CACHE" -f misc/Dockerfile.deploy .
+    - docker build --force-rm --cache-from="$CACHE" --cache-from="$IMAGE" -t "$IMAGE" -f misc/Dockerfile.deploy .
+    - docker push "$CACHE"
     - docker push "$IMAGE"
+    - docker rmi "$CACHE"
     - docker rmi "$IMAGE"
+    - docker image prune -f
   only:
     - master
     - /^bugfix[/]v[0-9.]*$/

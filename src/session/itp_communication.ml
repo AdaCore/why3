@@ -115,6 +115,11 @@ type notification =
   | Ident_notif_loc of Loc.position
   (* Answer the position where an ident is defined *)
 
+type next_unproved_node_strat =
+  | Prev
+  | Next
+  | Clever
+
 type ide_request =
   | Command_req             of node_ID * string
   | Add_file_req            of string
@@ -125,7 +130,7 @@ type ide_request =
   | Remove_subtree          of node_ID
   | Copy_paste              of node_ID * node_ID
   | Save_file_req           of string * string
-  | Get_first_unproven_node of node_ID
+  | Get_first_unproven_node of next_unproved_node_strat * node_ID
   | Find_ident_req          of Loc.position
   | Unfocus_req
   | Save_req
@@ -150,7 +155,7 @@ let print_request fmt r =
      fprintf fmt "set prover policy %a -> %a" Whyconf.print_prover p1
              Whyconf.print_prover_upgrade_policy p2
   | Get_file_contents _f            -> fprintf fmt "get file contents"
-  | Get_first_unproven_node _nid    -> fprintf fmt "get first unproven node"
+  | Get_first_unproven_node (_,_nid)-> fprintf fmt "get first unproven node"
   | Find_ident_req _                -> fprintf fmt "find ident"
   | Get_task(nid,b,loc)             -> fprintf fmt "get task(%d,%b,%b)" nid b loc
   | Remove_subtree _nid             -> fprintf fmt "remove subtree"
@@ -215,8 +220,9 @@ let print_notify fmt n =
   | Dead s                            -> fprintf fmt "dead :%s" s
   | File_contents (f, _s, _, _)       -> fprintf fmt "file contents %s" f
   | Source_and_ce (_, _list_loc, _gl, _) -> fprintf fmt "source and ce"
-  | Task (ni, _s, list_loc, _g_loc, _lang) ->
-      fprintf fmt "task for node_ID %d which contains a list of %d locations"
-              ni (List.length list_loc) (* print_list_loc list_loc *)
+  | Task (ni, _s, list_loc, g_loc, _lang) ->
+      fprintf fmt "task for node_ID %d which contains a list of %d locations. Goal_location = %a"
+        ni (List.length list_loc)
+        (Pp.print_option print_loc) g_loc (* print_list_loc list_loc *)
   | Ident_notif_loc loc               ->
       fprintf fmt "ident notification %a" Pretty.print_loc loc

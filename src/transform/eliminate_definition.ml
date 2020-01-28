@@ -125,7 +125,7 @@ let elim which meta_rewrite_def d = match d.d_node with
 
 let elim_recursion d = match d.d_node with
   | Dlogic ([s,_] as l)
-    when Sid.mem s.ls_name d.d_syms -> elim_decl Util.ttrue Sls.empty l
+    when Sid.mem s.ls_name (get_decl_syms d) -> elim_decl Util.ttrue Sls.empty l
   | Dlogic l when List.length l > 1 -> elim_decl Util.ttrue Sls.empty l
   | _ -> [Theory.create_decl d]
 
@@ -135,7 +135,7 @@ let is_struct dl = (* FIXME? Shouldn't 0 be allowed too? *)
 (* FIXME? We can have non-recursive functions in a group *)
 let elim_non_struct_recursion d = match d.d_node with
   | Dlogic ((s,_) :: _ as dl)
-    when Sid.mem s.ls_name d.d_syms && not (is_struct dl) ->
+    when Sid.mem s.ls_name (get_decl_syms d) && not (is_struct dl) ->
       elim_decl Util.ttrue Sls.empty dl
   | _ ->
       [Theory.create_decl d]

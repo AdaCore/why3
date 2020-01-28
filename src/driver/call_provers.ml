@@ -208,7 +208,7 @@ let debug_print_model ~print_attrs model =
 
 type answer_or_model = Answer of prover_answer | Model of string
 
-let analyse_result res_parser printer_mapping out =
+let analyse_result exit_result res_parser printer_mapping out =
   let list_re = res_parser.prp_regexps in
   let re = craft_efficient_re list_re in
   let list_re = List.map (fun (a, b) -> Re.Str.regexp a, b) list_re in
@@ -221,7 +221,7 @@ let analyse_result res_parser printer_mapping out =
         | Re.Str.Text "\n" -> acc
         | Re.Str.Text t -> Model t :: acc)
       result_list
-      []
+      exit_result
   in
 
   let rec analyse saved_model saved_res l =
@@ -293,11 +293,11 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
   let ans, model =
-    if signaled then HighFailure, None else
-    try List.assoc int_exitcode res_parser.prp_exitcodes, None
-    with Not_found -> analyse_result res_parser printer_mapping out
-      (* TODO let (n, m, t) = greps out res_parser.prp_regexps in
-      t, None *)
+    let exit_result =
+      if signaled then [Answer HighFailure] else
+      try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
+      with Not_found -> []
+    in analyse_result exit_result res_parser printer_mapping out
   in
   let model = match model with Some s -> s | None -> default_model in
   Debug.dprintf debug "Call_provers: prover output:@\n%s@." out;

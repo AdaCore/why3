@@ -16,7 +16,6 @@ open Controller_itp
 open Server_utils
 open Itp_communication
 
-
 (**********************************)
 (* list unproven goal and related *)
 (**********************************)
@@ -96,6 +95,28 @@ let print_ext_any task (lang:string) print_any =
   match Hashtbl.find registered_lang lang with
   | print_ext_any -> print_ext_any task print_any
   | exception Not_found -> print_any
+
+type server_data =
+  { (* task_driver : Driver.driver; *)
+    cont : Controller_itp.controller;
+    send_source: bool;
+    (* If true the server is parametered to send source mlw files as
+         notifications *)
+    global_infos : Itp_communication.global_information;
+  }
+
+let server_data = ref None
+
+let get_server_data () =
+  match !server_data with
+  | None ->
+      Format.eprintf "get_server_data(): fatal error, server not yet initialized@.";
+      exit 1
+  | Some x -> x
+
+let set_partial_config c =
+  let d = get_server_data () in
+  Controller_itp.set_partial_config d.cont c
 
 module Make (S:Controller_itp.Scheduler) (Pr:Protocol) = struct
 
@@ -360,24 +381,6 @@ let () =
  *)
   ]
 
-  type server_data =
-    { (* task_driver : Driver.driver; *)
-      cont : Controller_itp.controller;
-      send_source: bool;
-      (* If true the server is parametered to send source mlw files as
-         notifications *)
-      global_infos : Itp_communication.global_information;
-    }
-
-  let server_data = ref None
-
-  let get_server_data () =
-    match !server_data with
-    | None ->
-       Format.eprintf "get_server_data(): fatal error, server not yet initialized@.";
-       exit 1
-    | Some x -> x
-
 (* fresh gives new fresh "names" for node_ID using a counter.
    reset resets the counter so that we can regenerate node_IDs as if session
    was fresh *)
@@ -602,6 +605,7 @@ module P = struct
 
 end
 
+
   (*********************)
   (* File input/output *)
   (*********************)
@@ -657,6 +661,9 @@ end
      be incorrect and end up in a correct state. *)
   let reload_files cont ~shape_version =
     let hard_reload = true in
+    (* On reload, we empty the legacy printer (which is used to print
+       parsing/typing errors. This avoids odd numbering of ident. *)
+    Pretty.forget_all ();
     capture_parse_or_type_errors
       (fun c ->
         try let (_,_) = reload_files ~hard_reload ~shape_version c in [] with
@@ -1023,7 +1030,10 @@ end
             | None -> P.notify (Task (nid, "Result of the prover not available.\n", old_list_loc, old_goal_loc, lang))
           end
       | AFile f ->
-          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], None, lang))
+          let file_loc =
+            let fp = Session_itp.system_path d.cont.controller_session f in
+            Loc.user_position fp 1 1 1 in
+          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], Some file_loc, lang))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
@@ -1345,7 +1355,6 @@ end
       Debug.dprintf debug_strat "[strategy_exec] strategy '%s' not found@." s
 
 
-
   (* ----------------- Clean session -------------------- *)
   let clean nid =
     let d = get_server_data () in
@@ -1488,14 +1497,14 @@ end
 
   (* ----------------- locate next unproven node -------------------- *)
 
-  let notify_first_unproven_node d ni =
+  let notify_first_unproven_node ~st d ni =
     let s = d.cont.controller_session in
     let any = any_from_node_ID ni in
     match any with
     | None -> P.notify (Message (Error "Please select a node id"))
     | Some any ->
       let unproven_any =
-        get_first_unproven_goal_around
+        get_next_with_strategy ~st
           ~always_send:true
           ~proved:(Session_itp.any_proved s)
           ~children:(get_undetached_children_no_pa s)
@@ -1518,7 +1527,7 @@ end
      | Interrupt_req | Add_file_req _ | Set_config_param _ | Set_prover_policy _
      | Exit_req | Get_global_infos | Itp_communication.Unfocus_req
      | Reset_proofs_req | Find_ident_req _ -> true
-     | Get_first_unproven_node ni ->
+     | Get_first_unproven_node (_st, ni) ->
          Hint.mem model_any ni
      | Remove_subtree nid ->
          Hint.mem model_any nid
@@ -1590,8 +1599,8 @@ end
     | Reload_req                   ->
        reload_session ();
        session_needs_saving := true
-    | Get_first_unproven_node ni   ->
-        notify_first_unproven_node d ni
+    | Get_first_unproven_node (st, ni)   ->
+        notify_first_unproven_node ~st d ni
     | Find_ident_req loc ->
         find_ident loc
     | Remove_subtree nid           ->

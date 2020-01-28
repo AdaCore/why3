@@ -267,9 +267,9 @@ module mach.int.Int32
   syntax val      ( + )     "%1 + %2"   prec 8 8 7
   syntax val      ( - )     "%1 - %2"   prec 8 8 7
   syntax val      (-_)      "- %1"      prec 5 4
-  syntax val      ( * )     "%1 * %2"   prec 8 8 7
-  syntax val      ( / )     "%1 / %2"   prec 8 8 7
-  syntax val      ( % )     "%1 mod %2" prec 8 8 7
+  syntax val      ( * )     "%1 * %2"   prec 7 7 6
+  syntax val      ( / )     "%1 / %2"   prec 7 7 6
+  syntax val      ( % )     "%1 mod %2" prec 7 7 6
   syntax val      (=)       "%1 = %2"   prec 11 11 10
   syntax val      (<=)      "%1 <= %2"  prec 11 11 10
   syntax val      (<)       "%1 < %2"   prec 11 11 10
@@ -294,9 +294,9 @@ module mach.int.Int63
   syntax val      ( + )     "%1 + %2"   prec 8 8 7
   syntax val      ( - )     "%1 - %2"   prec 8 8 7
   syntax val      (-_)      "- %1"      prec 5 4
-  syntax val      ( * )     "%1 * %2"   prec 8 8 7
-  syntax val      ( / )     "%1 / %2"   prec 8 8 7
-  syntax val      ( % )     "%1 mod %2" prec 8 8 7
+  syntax val      ( * )     "%1 * %2"   prec 7 7 6
+  syntax val      ( / )     "%1 / %2"   prec 7 7 6
+  syntax val      ( % )     "%1 mod %2" prec 7 7 6
   syntax val      (=)       "%1 = %2"   prec 11 11 10
   syntax val      (<=)      "%1 <= %2"  prec 11 11 10
   syntax val      (<)       "%1 < %2"   prec 11 11 10
@@ -385,16 +385,17 @@ module mach.onetime.OneTime
   syntax val split    "(%1-%2, %2)" prec 0 13 13
 end
 
-(* module string.Char                                    *)
-(*   syntax type char "char"                             *)
-(*   syntax val chr "Char.chr (Z.to_int %1)" prec 4 3    *)
-(*   syntax val code "Z.of_int (Char.code %1)" prec 4 3  *)
-(*   syntax val uppercase "Char.uppercase %1" prec 4 3   *)
-(*   syntax val lowercase "Char.lowercase %1" prec 4 3   *)
-(* end                                                   *)
+module string.OCaml
+  syntax val (=)    "%1 = %2" prec 11 11 10
+  syntax val length "String.length %1" prec 4 3
+  syntax val ([]) "String.get %1 %2" prec 4 3 3
+  syntax val sub "String.sub %1 %2 %3" prec 4 3 3 3
+  syntax val concat "%1 ^ %2" prec 4 3 4
+end
 
 module io.StdIO
   syntax val print_string "Pervasives.print_string"
+  syntax val print_char "Pervasives.print_char"
   syntax val print_int "Pervasives.print_string (Z.to_string %1)" prec 4 3
   syntax val print_newline "Pervasives.print_newline"
 end
@@ -430,7 +431,7 @@ module mach.array.Array32
   syntax val       copy          "Array.copy"
   syntax val       fill          "Array.fill"
   syntax val       blit          "Array.blit"
-  syntax val       self_blit     "Array.blit"
+  syntax val       self_blit     "Array.blit %1 %2 %1 %3 %4" prec 4 3 3 3 3 3
 end
 
 module mach.array.Array63
@@ -442,13 +443,13 @@ module mach.array.Array63
   syntax val       ([]<-)        "%1.(%2) <- %3" prec 15 1 18 15
   syntax val       defensive_get "%1.(%2)" prec 2 1 18
   syntax val       defensive_set "%1.(%2) <- %3" prec 15 1 18 15
-  syntax val       length        "Array.length"
+  syntax val       length        "Array.length %1" prec 4 3
   syntax val       append        "Array.append"
   syntax val       sub           "Array.sub"
   syntax val       copy          "Array.copy"
   syntax val       fill          "Array.fill"
   syntax val       blit          "Array.blit"
-  syntax val       self_blit     "Array.blit"
+  syntax val       self_blit     "Array.blit %1 %2 %1 %3 %4" prec 4 3 3 3 3 3
   syntax val       init          "Array.init"
 end
 
@@ -457,7 +458,7 @@ module mach.array.ArrayInt63
   syntax val  make   "Array.make"
   syntax val  ([])   "%1.(%2)" prec 2 1 18
   syntax val  ([]<-) "%1.(%2) <- %3" prec 15 1 18 15
-  syntax val  length "Array.length"
+  syntax val  length "Array.length %1" prec 4 3
   syntax val  copy   "Array.copy"
 end
 
@@ -490,7 +491,7 @@ end
 module ocaml.Pervasives
   syntax exception AssertFailure    "REMOVE"
   syntax val       ocaml_assert     "assert"
-  syntax exception Invalid_argument "Invalid_argument \"\""
+  syntax exception Invalid_argument "Invalid_argument"
   syntax val       succ             "succ"
   syntax val       pred             "pred"
 end

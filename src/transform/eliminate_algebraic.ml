@@ -411,7 +411,7 @@ let comp t (state,task) = match t.task_decl.td_node with
       let state = match dl with
         | _ when state.keep_t -> state
         | [ts, [_]]
-          when state.keep_r && not (Sid.mem ts.ts_name d.d_syms) ->
+          when state.keep_r && not (Sid.mem ts.ts_name (get_decl_syms d)) ->
             { state with keep_t = true }
         | [{ ts_args = [] }, csl]
           when state.keep_e && List.for_all (fun (_,l) -> l = []) csl ->
@@ -439,7 +439,7 @@ let comp t (state,task) = match t.task_decl.td_node with
         let task = add_tdecl task (create_use th) in
         rstate := state ; rtask := task ; None
       in
-      let tp_map = Mid.diff add state.tp_map d.d_syms in
+      let tp_map = Mid.diff add state.tp_map (get_decl_syms d) in
       comp t ({ !rstate with tp_map = tp_map }, !rtask)
   | _ ->
       comp t (state,task)

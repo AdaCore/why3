@@ -40,13 +40,22 @@ CC        = @CC@
 MKDIR_P   = @MKDIR_P@
 INSTALL   = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
+
+ifeq (@enable_ocamlfind@,yes)
+OCAMLC    = @OCAMLFIND@ ocamlc
+OCAMLOPT  = @OCAMLFIND@ ocamlopt
+OCAMLDEP  = @OCAMLFIND@ ocamldep
+OCAMLDOC  = @OCAMLFIND@ ocamldoc
+else
 OCAMLC    = @OCAMLC@
 OCAMLOPT  = @OCAMLOPT@
 OCAMLDEP  = @OCAMLDEP@
+OCAMLDOC  = @OCAMLDOC@
+endif
+
 OCAMLFIND = @OCAMLFIND@
 OCAMLLEX  = @OCAMLLEX@
 OCAMLYACC = @OCAMLYACC@
-OCAMLDOC  = @OCAMLDOC@
 OCAMLLIB  = @OCAMLLIB@
 OCAMLINSTALLLIB  = $(DESTDIR)@OCAMLINSTALLLIB@
 OCAMLBEST = @OCAMLBEST@
@@ -60,7 +69,7 @@ MENHIR	  = @MENHIR@
 DEPFLAGS = -slash
 
 ifeq (@enable_why3_lib@,yes)
-DEPFLAGS += -I lib/why3
+INCLUDES += -I lib/why3
 endif
 ifeq (@OCAMLBEST@,opt)
 # the semantics of the -native flag changed in ocaml 4.03.0
@@ -89,7 +98,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-INCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@
+EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -112,11 +121,19 @@ INCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @
 
 WARNINGS = A-4-9-41-44-45-50-52@5@8@48
 
-OFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
-BFLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
+FLAGS = -w $(WARNINGS) -safe-string -keep-locs -bin-annot -dtypes -g $(INCLUDES)
+OFLAGS = $(FLAGS)
+BFLAGS = $(FLAGS)
 
+ifeq (@enable_ocamlfind@,yes)
+FLAGS += $(addprefix -package ,$(EXTPKGS))
+OLINKFLAGS += -linkpkg -linkall
+BLINKFLAGS += -linkpkg -linkall
+else
+FLAGS += $(EXTINCLUDES)
 OLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMXA)
 BLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMA)
+endif
 
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
@@ -129,6 +146,7 @@ CMIHACK = -intf-suffix .cmi
 
 EXTOBJS = menhirLib
 EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@
+EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @WHY3LIB@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -201,7 +219,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/session/strategy_parser.ml
 
 LIB_UTIL = config bigInt mlmpfr_wrapper util opt lists strings \
-	   pp extmap extset exthtbl weakhtbl \
+	   pp extmap extset exthtbl weakhtbl diffmap \
 	   hashcons wstdlib exn_printer \
 	   json_base json_parser json_lexer \
 	   debug loc lexlib print_tree \
@@ -277,8 +295,7 @@ LIBDEP = $(addsuffix .dep, $(LIBMODULES))
 LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
 LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 
-$(LIBDEP): DEPFLAGS += $(LIBINCLUDES)
-$(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
+$(LIBDEP) $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
@@ -402,6 +419,7 @@ install-data::
 	$(INSTALL_DATA) share/vim/ftdetect/why3.vim $(DATADIR)/why3/vim/ftdetect/why3.vim
 	$(INSTALL_DATA) share/vim/syntax/why3.vim $(DATADIR)/why3/vim/syntax/why3.vim
 	$(INSTALL_DATA) share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
+	$(INSTALL_DATA) share/lang/why3c.lang $(DATADIR)/why3/lang/why3c.lang
 	$(INSTALL_DATA) share/lang/why3py.lang $(DATADIR)/why3/lang/why3py.lang
 
 ifeq (@enable_local@,yes)
@@ -470,7 +488,7 @@ PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_ast py_parser py_lexer py_main
-PLUG_MICROC = mc_ast mc_parser mc_lexer mc_main
+PLUG_MICROC = mc_ast mc_parser mc_lexer mc_printer mc_main
 PLUG_ADA = ada_nametable ada_parser ada_lexer ada_main
 
 PLUGINS = genequlin dimacs tptp python microc ada
@@ -496,10 +514,12 @@ ifeq (@enable_hypothesis_selection@,yes)
 PLUG_TRANSFORM += hypothesis_selection
 PLUGINS += hypothesis_selection
 
-lib/plugins/hypothesis_selection.cmxs: INCLUDES += -I @OCAMLGRAPHLIB@
-lib/plugins/hypothesis_selection.cmo:  INCLUDES += -I @OCAMLGRAPHLIB@
-lib/plugins/hypothesis_selection.cmxs: OFLAGS += graph.cmxa
-lib/plugins/hypothesis_selection.cmo:  BFLAGS += graph.cmo
+lib/plugins/hypothesis_selection.cmxs: EXTINCLUDES += -I @OCAMLGRAPHLIB@
+lib/plugins/hypothesis_selection.cmo:  EXTINCLUDES += -I @OCAMLGRAPHLIB@
+lib/plugins/hypothesis_selection.cmxs: EXTLIBS += graph.cmxa
+lib/plugins/hypothesis_selection.cmo:  EXTOBJS += graph.cmo
+lib/plugins/hypothesis_selection.cmxs: EXTPKGS += ocamlgraph
+lib/plugins/hypothesis_selection.cmo:  EXTPKGS += ocamlgraph
 endif
 
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
@@ -515,8 +535,7 @@ PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 PLUGDIRS = parser printer transform tptp python microc ada_terms
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
-$(PLUGDEP): DEPFLAGS += $(PLUGINCLUDES)
-$(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
+$(PLUGDEP) $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
 
 $(PLUGDEP): $(PLUGGENERATED)
 
@@ -588,8 +607,7 @@ TOOLSDEP = $(addsuffix .dep, $(TOOLSMODULES))
 TOOLSCMO = $(addsuffix .cmo, $(TOOLSMODULES))
 TOOLSCMX = $(addsuffix .cmx, $(TOOLSMODULES))
 
-$(TOOLSDEP): DEPFLAGS += -I src/tools
-$(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
+$(TOOLSDEP) $(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
 
 $(TOOLSDEP): $(TOOLSGENERATED)
 
@@ -893,7 +911,15 @@ ifeq (@enable_ide@,yes)
 
 IDEGENERATED = src/ide/gtkcompat.ml
 
-IDE_FILES = gtkcompat gconfig ide_utils why3ide
+IDE_FILES = gtkcompat
+
+ifeq (@enable_statmemprof@,yes)
+IDE_FILES += statmemprof
+
+bin/why3ide.opt bin/why3ide.byte: EXTPKGS += @STATMEMPROFPKG@
+endif
+
+IDE_FILES += gconfig ide_utils why3ide
 
 IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
 
@@ -901,8 +927,7 @@ IDEDEP = $(addsuffix .dep, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
-$(IDEDEP): DEPFLAGS += -I src/ide
-$(IDECMO) $(IDECMX): INCLUDES += -I src/ide
+$(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
 $(IDEDEP): $(IDEGENERATED)
 
@@ -911,9 +936,14 @@ $(IDEDEP): $(IDEGENERATED)
 byte: bin/why3ide.byte
 opt:  bin/why3ide.opt
 
-bin/why3ide.opt bin/why3ide.byte: INCLUDES += @LABLGTKINCLUDE@
+bin/why3ide.opt bin/why3ide.byte: EXTINCLUDES += @LABLGTKINCLUDE@
 bin/why3ide.opt bin/why3ide.byte: EXTLIBS += @LABLGTKLIB@
+bin/why3ide.opt bin/why3ide.byte: EXTPKGS += @LABLGTKPKG@
 bin/why3ide.byte: BLINKFLAGS += -custom
+
+ifeq (@enable_ocamlfind@,yes)
+bin/why3ide.opt bin/why3ide.byte: FLAGS += -thread
+endif
 
 bin/why3ide.opt: $(WHY3CMXA) src/ide/resetgc.o $(IDECMX)
 bin/why3ide.byte: $(WHY3CMA) src/ide/resetgc.o $(IDECMO)
@@ -980,8 +1010,7 @@ WEBSERVDEP = $(addsuffix .dep, $(WEBSERVMODULES))
 WEBSERVCMO = $(addsuffix .cmo, $(WEBSERVMODULES))
 WEBSERVCMX = $(addsuffix .cmx, $(WEBSERVMODULES))
 
-$(WEBSERVDEP): DEPFLAGS += -I src/ide
-$(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
+$(WEBSERVDEP) $(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
 
 # build targets
 
@@ -1032,8 +1061,7 @@ SESSIONDEP = $(addsuffix .dep, $(SESSIONMODULES))
 SESSIONCMO = $(addsuffix .cmo, $(SESSIONMODULES))
 SESSIONCMX = $(addsuffix .cmx, $(SESSIONMODULES))
 
-$(SESSIONDEP): DEPFLAGS += -I src/why3session
-$(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
+$(SESSIONDEP) $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
 
 # build targets
 
@@ -1074,8 +1102,7 @@ SHELLDEP = $(addsuffix .dep, $(SHELLMODULES))
 SHELLCMO = $(addsuffix .cmo, $(SHELLMODULES))
 SHELLCMX = $(addsuffix .cmx, $(SHELLMODULES))
 
-$(SHELLDEP): DEPFLAGS += -I src/tools
-$(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
+$(SHELLDEP) $(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
 
 # build targets
 
@@ -1593,8 +1620,8 @@ ISABELLECMODULES := $(addprefix src/isabelle-client/, $(ISABELLEC_FILES))
 ISABELLECDEP = $(addsuffix .dep, $(ISABELLECMODULES))
 ISABELLECCMO = $(addsuffix .cmo, $(ISABELLECMODULES))
 ISABELLECCMX = $(addsuffix .cmx, $(ISABELLECMODULES))
-$(ISABELLECCMO) $(ISABELLECCMX): INCLUDES += -I src/isabelle-client -I src/util
-$(ISABELLECDEP): DEPFLAGS += -I src/isabelle-client
+
+$(ISABELLECDEP) $(ISABELLECCMO) $(ISABELLECCMX): INCLUDES += -I src/isabelle-client -I src/util
 
 depend: $(ISABELLECDEP)
 CLEANDIRS += src/isabelle-client
@@ -1662,8 +1689,7 @@ PRETTYPRINTDEP = $(addsuffix .dep, $(PRETTYPRINTMODULES))
 PRETTYPRINTCMO = $(addsuffix .cmo, $(PRETTYPRINTMODULES))
 PRETTYPRINTCMX = $(addsuffix .cmx, $(PRETTYPRINTMODULES))
 
-$(PRETTYPRINTDEP): DEPFLAGS += -I src/tools
-$(PRETTYPRINTCMO) $(PRETTYPRINTCMX): INCLUDES += -I src/tools
+$(PRETTYPRINTDEP) $(PRETTYPRINTCMO) $(PRETTYPRINTCMX): INCLUDES += -I src/tools
 
 # build targets
 
@@ -1709,8 +1735,7 @@ WHY3DOCDEP = $(addsuffix .dep, $(WHY3DOCMODULES))
 WHY3DOCCMO = $(addsuffix .cmo, $(WHY3DOCMODULES))
 WHY3DOCCMX = $(addsuffix .cmx, $(WHY3DOCMODULES))
 
-$(WHY3DOCDEP): DEPFLAGS += -I src/why3doc
-$(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
+$(WHY3DOCDEP) $(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
 
 $(WHY3DOCDEP): $(WHY3DOCGENERATED)
 
@@ -1756,7 +1781,7 @@ endif
 
 ALTERGODIR=src/trywhy3/alt-ergo
 
-JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -g -package js_of_ocaml.ppx \
+JSOCAMLC=$(OCAMLFIND) ocamlc -package js_of_ocaml -g -package js_of_ocaml.ppx \
         -package ocplib-simplex -I src/trywhy3 \
 	-I $(ALTERGODIR)/lib/util \
 	-I $(ALTERGODIR)/lib/structures \
@@ -1848,25 +1873,25 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/
 		--file=alt_ergo_worker.js:/ \
 	        --file=examples/index.txt:/examples/index.txt \
 		`find src/trywhy3/examples \( -name "*.mlw" -o -name "*.why" \) -printf " --file=examples/%P:/examples/%P"` \
-	+nat.js $<
+	$<
 
 src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
-	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+	$(JSOCAMLC) -o $@ -linkpkg $^
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/try_alt_ergo.drv
 	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
 		`find stdlib \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/%p"` \
-	+nat.js $<
+	+dynlink.js +toplevel.js $<
 
 src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
-	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+	$(JSOCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
-	js_of_ocaml $(JSOO_DEBUG) +nat.js +dynlink.js +toplevel.js $<
+	js_of_ocaml $(JSOO_DEBUG) +dynlink.js +toplevel.js $<
 
 src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
-	$(JSOCAMLC) $(BFLAGS) -o $@ -linkpkg $(BLINKFLAGS) $^
+	$(JSOCAMLC) -o $@ -package num -package dynlink -package str -package unix -package camlzip -linkpkg $^
 
 src/trywhy3/alt_ergo_worker.cmo: src/trywhy3/worker_proto.cmo
 src/trywhy3/why3_worker.cmo: src/trywhy3/worker_proto.cmo
@@ -1895,7 +1920,7 @@ CLEANDIRS += src/trywhy3
 
 ifeq (@enable_web_ide@,yes)
 
-JSOCAMLCW=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
+JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml.ppx \
         -I src/ide
 
 src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma
@@ -1953,79 +1978,84 @@ test-itp.opt: src/printer/itp.ml lib/why3/why3.cmxa
 
 test-api-logic.byte: examples/use_api/logic.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
-	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< > /dev/null \
+	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
+	&& ./test-api-logic.byte > /dev/null) \
 	|| (rm -f test-api-logic.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-logic.byte;
 
 test-api-logic.opt: examples/use_api/logic.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
 	&& ./test-api-logic.opt > /dev/null) \
 	|| (rm -f test-api-logic.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-logic.opt
 
 test-api-transform.byte: examples/use_api/transform.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
-	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< > /dev/null \
+	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
+	&& ./test-api-transform.byte > /dev/null) \
 	|| (rm -f test-api-transform.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-transform.byte;
 
 test-api-transform.opt: examples/use_api/transform.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
 	&& ./test-api-transform.opt > /dev/null) \
 	|| (rm -f test-api-transform.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-transform.opt
 
 test-api-clone.opt: examples/use_api/clone.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
-	($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
 	&& ./test-api-clone.opt > /dev/null) \
 	|| (rm -f test-api-clone.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-clone.opt
 
 test-api-clone.byte: examples/use_api/clone.ml lib/why3/why3.cma
 	$(SHOW) 'Ocamlc $<'
-	($(OCAMLC) -o $@ -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< \
+	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
 	&& ./test-api-clone.byte > /dev/null) \
 	|| (rm -f test-api-clone.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-clone.byte
 
 test-api-mlw-tree.byte: examples/use_api/mlw_tree.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
-	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< > /dev/null\
+	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
+	&& ./test-api-mlw-tree.byte) > /dev/null\
 	|| (rm -f test-api-mlw-tree.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw-tree.byte;
 
 test-api-mlw-tree.opt: examples/use_api/mlw_tree.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
 	&& ./test-api-mlw-tree.opt > /dev/null) \
 	|| (rm -f test-api-mlw-tree.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw-tree.opt
 
 test-api-mlw-expr.byte: examples/use_api/mlw_expr.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
-	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< > /dev/null\
+	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
+	&& ./test-api-mlw-expr.byte > /dev/null) \
 	|| (rm -f test-api-mlw-expr.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw-expr.byte;
 
 test-api-mlw-expr.opt: examples/use_api/mlw_expr.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
 	&& ./test-api-mlw-expr.opt > /dev/null) \
 	|| (rm -f test-api-mlw-expr.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw-expr.opt
 
 test-api-mlw.byte: examples/use_api/mlw.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
-	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< \
+	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
+	&& ./test-api-mlw.byte > /dev/null) \
 	|| (rm -f test-api-mlw.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw.byte;
 
 test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
 	&& ./test-api-mlw.opt > /dev/null) \
 	|| (rm -f test-api-mlw.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw.opt
@@ -2035,14 +2065,15 @@ test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
 
 test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
-	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< > /dev/null\
+	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
+	&& ./test-session.byte > /dev/null) \
 	|| (rm -f why3session.xml why3shapes why3shapes.gz;  \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
 	@rm -f why3session.xml why3shapes why3shapes.gz
 
 test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa  $< \
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa  $< \
 	&& ./test-session.opt > /dev/null) \
 	|| (rm -f test-session.opt why3session.xml why3shapes why3shapes.gz; \
 	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
@@ -2050,7 +2081,8 @@ test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
 
 test-ce.byte: examples/use_api/counterexample.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
-	$(HIDE)ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< > /dev/null\
+	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< \
+	&& ./test-ce.byte > /dev/null) \
 	|| (rm -f why3session.xml why3shapes why3shapes.gz;  \
 	printf "Test of Why3 API calls for counterexamples failed. Please fix it"; exit 2)
 	@rm -f why3session.xml why3shapes why3shapes.gz
@@ -2078,10 +2110,12 @@ test-ocaml-extraction: bin/why3.opt bin/why3extract.opt
 	@echo "driver ocaml64"
 	@bin/why3extract.opt -D ocaml64 -L tests \
 	  test_extraction.TestExtraction -o tests/test-extraction/test.ml
-	@ocamlfind ocamlopt -package zarith -linkpkg -I tests/test-extraction/ \
+ifeq (@enable_zarith@,yes)
+	@$(OCAMLOPT) @BIGINTINCLUDE@ -I tests/test-extraction/ zarith.cmxa \
 	  tests/test-extraction/test.ml tests/test-extraction/main.ml \
           -o tests/test-extraction/a.out
 	@tests/test-extraction/a.out
+endif
 
 ################
 # documentation
@@ -2232,7 +2266,8 @@ MODULESTODOC = \
 	util/mlmpfr_wrapper \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task core/trans core/pretty core/printer \
-	parser/typing \
+	core/model_parser \
+	parser/typing parser/mlw_printer \
 	driver/whyconf driver/call_provers driver/driver \
 	transform/args_wrapper \
 	session/session_itp session/controller_itp \
@@ -2248,7 +2283,7 @@ doc/apidoc:
 
 apidoc: doc/apidoc $(FILESTODOC)
 	$(OCAMLDOC) -d doc/apidoc -html -t "Why3 API documentation" \
-		-keep-code $(INCLUDES) $(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
+		-keep-code $(INCLUDES) $(LIBINCLUDES) $(EXTINCLUDES) $(FILESTODOC)
 
 # could we include also the dependency graph ? -- someone
 # At least we can give a way to create it -- francois
@@ -2271,7 +2306,7 @@ doc/apidoc/dg.png: doc/apidoc/dg.dot
 
 doc/apidoc.tex: $(FILESTODOC)
 	$(OCAMLDOC) -o doc/apidoc.tex -latex -noheader -notrailer $(INCLUDES) \
-		$(LIBINCLUDES) -I lib/why3 $(FILESTODOC)
+		$(LIBINCLUDES) $(EXTINCLUDES) $(FILESTODOC)
 
 clean::
 	rm -f doc/apidoc/*
@@ -2404,11 +2439,11 @@ clean::
 
 %.dep: %.ml %.mli
 	$(SHOW) 'Ocamldep $<'
-	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $< $<i $(TOTARGET)
+	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $(INCLUDES) $< $<i $(TOTARGET)
 
 %.dep: %.ml
 	$(SHOW) 'Ocamldep $<'
-	$(HIDE)($(OCAMLDEP) $(DEPFLAGS) $<; \
+	$(HIDE)($(OCAMLDEP) $(DEPFLAGS) $(INCLUDES) $<; \
 	        echo '$*.cmx : $*.cmi'; \
 	        echo '$*.cmi : $*.cmo') $(TOTARGET)
 

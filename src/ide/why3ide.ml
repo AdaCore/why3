@@ -211,7 +211,7 @@ let env, gconfig = try
 (********************************)
 
 
-let (why_lang, any_lang, why3py_lang) =
+let (why_lang, any_lang, why3py_lang, why3c_lang) =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
   let languages_manager =
@@ -237,7 +237,14 @@ let (why_lang, any_lang, why3py_lang) =
           load_path;
         exit 1
     | Some _ as l -> l in
-  (why_lang, any_lang, why3py_lang)
+  let why3c_lang =
+    match languages_manager#language "why3c" with
+    | None ->
+        eprintf "language file for 'Why3c' not found in directory %s@."
+          load_path;
+        exit 1
+    | Some _ as l -> l in
+  (why_lang, any_lang, why3py_lang, why3c_lang)
 
 (* Borrowed from Frama-C src/gui/source_manager.ml:
 Try to convert a source file either as UTF-8 or as locale. *)
@@ -364,12 +371,12 @@ let files_need_saving () =
 let exit_function_safe () =
   send_request Check_need_saving_req
 
-let exit_function_handler main_window b =
+let exit_function_handler b =
   if not b && not (files_need_saving ()) then
     exit_function_unsafe ()
   else
     let answer =
-      GToolbox.question_box ~parent:main_window
+      GToolbox.question_box
         ~title:"Why3 saving session and files"
         ~buttons:["Yes"; "No"; "Cancel"]
         "Do you want to save the session and unsaved files?"
@@ -917,6 +924,7 @@ let change_lang view lang =
   let lang =
     match lang with
     | "python" -> why3py_lang
+    | "micro-C" -> why3c_lang
     | _ -> why_lang in
   view#source_buffer#set_language lang
 
@@ -1377,13 +1385,13 @@ let move_current_row_selection_to_next () =
       goals_view#set_cursor path view_name_column
   | _ -> ()
 
-let move_to_next_unproven_node_id () =
+let move_to_next_unproven_node_id strat =
   let rows = get_selected_row_references () in
   match rows with
   | [row] ->
       let row_id = get_node_id row#iter in
       manual_next := Some row_id;
-      send_request (Get_first_unproven_node row_id)
+      send_request (Get_first_unproven_node (strat, row_id))
   | _ -> ()
 
 (* unused
@@ -1415,7 +1423,7 @@ let interp_ide cmd =
   | "down" ->
       move_current_row_selection_to_first_child ()
   | "next" ->
-      move_to_next_unproven_node_id ()
+      move_to_next_unproven_node_id Clever
   | "expand" ->
       expand_row ()
   | "collapse" ->
@@ -1919,6 +1927,69 @@ object (self)
     m
 end
 
+(*****************************************************************)
+(* "Tools" submenus for strategies, provers, and transformations *)
+(*****************************************************************)
+
+let string_of_desc desc =
+  let print_trans_desc fmt (x,r) =
+    fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
+  in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
+
+let parse_shortcut_as_key s =
+  let (key,modi) as r = GtkData.AccelGroup.parse s in
+  begin if key = 0 then
+    Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s
+  else
+    let name = GtkData.AccelGroup.name ~key ~modi in
+    Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name
+  end;
+  r
+
+let add_submenu_strategy (str_fac: menu_factory) (con_fac: menu_factory) (shortcut,strategy) =
+  let callback () =
+    Debug.dprintf debug "interp command '%s'@." strategy;
+    interp strategy
+  in
+  let name = String.map (function '_' -> ' ' | c -> c) strategy in
+  let tooltip = "run strategy " ^ strategy ^ " on selected goal" in
+  let accel_path = "<Why3-Main>/Tools/Strategies/" ^ name in
+  let (key, modi) = parse_shortcut_as_key shortcut in
+  let (_ : GMenu.menu_item) = str_fac#add_item name
+    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
+  let (_ : GMenu.menu_item) = con_fac#add_item name
+    ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
+  ()
+
+let hide_context_provers, add_submenu_prover =
+  (* Set of context provers menu items *)
+  let context_provers = Hstr.create 16 in
+  (* After preferences for hidden provers are set, actualize provers allowed in
+   the context_factory *)
+  let hide_context_provers () =
+    Hstr.iter (fun k i ->
+      if List.mem k gconfig.hidden_provers then
+        i#misc#hide ()
+      else
+        i#misc#show ()) context_provers in
+  let add_submenu_prover (pro_fac: menu_factory) (con_fac: menu_factory)
+    (shortcut,prover_name,prover_parseable_name) =
+    let callback () =
+      Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
+      interp prover_parseable_name
+    in
+    let tooltip = "run prover " ^ prover_name ^ " on selected goal" in
+    let accel_path = "<Why3-Main>/Tools/Provers/" ^ prover_name in
+    let (key,modi) = parse_shortcut_as_key shortcut in
+    let (_ : GMenu.menu_item) = pro_fac#add_item prover_name
+        ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
+    let (i : GMenu.menu_item) = con_fac#add_item prover_name
+        ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
+    Hstr.add context_provers prover_parseable_name i;
+    if List.mem prover_parseable_name gconfig.hidden_provers then
+      i#misc#hide() in
+  hide_context_provers, add_submenu_prover
+
 (*************)
 (* Main menu *)
 (*************)
@@ -1945,6 +2016,8 @@ let (_: GMenu.menu_item) =
 let (_: GMenu.menu_item) =
   let callback () =
     Gconfig.preferences ~parent:main_window gconfig;
+    (* hide/show provers in contextual menu *)
+    hide_context_provers ();
     (* Source view tags *)
     Opt.iter (fun (_, v) -> update_tags gconfig v) (find_current_file_view ());
     (* Update message zone tags *)
@@ -2016,7 +2089,7 @@ let search_forward =
         let iter = view#buffer#get_iter_at_mark `SEL_BOUND in
         let search_string =
           let find = if forward then "Forward search" else "Backward search" in
-          GToolbox.input_string ~title:find ~parent:main_window ~ok:"Search"
+          GToolbox.input_string ~title:find ~ok:"Search"
             ~cancel:"Cancel" ~text:!last_search
             "Type a string to find in the current document"
         in
@@ -2233,7 +2306,7 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   view_factory#add_item "Go to parent node"
-    ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Left
     ~callback:move_current_row_selection_to_parent
 
 let (_: GMenu.menu_item) =
@@ -2242,8 +2315,18 @@ let (_: GMenu.menu_item) =
 
 let (_: GMenu.menu_item) =
   view_factory#add_item "Select next unproven goal"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Right
+    ~callback:(fun () -> move_to_next_unproven_node_id Clever)
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Go down (skipping proved goals)"
     ~modi:[`CONTROL] ~key:GdkKeysyms._Down
-    ~callback:move_to_next_unproven_node_id
+    ~callback:(fun () -> move_to_next_unproven_node_id Next)
+
+let (_: GMenu.menu_item) =
+  view_factory#add_item "Go up (skipping proved goals)"
+    ~modi:[`CONTROL] ~key:GdkKeysyms._Up
+    ~callback:(fun () -> move_to_next_unproven_node_id Prev)
 
 (* "Help" menu items *)
 
@@ -2259,55 +2342,6 @@ let (_ : GMenu.menu_item) =
   help_factory#add_item
     "About"
     ~callback:(show_about_window ~parent:main_window)
-
-(*****************************************************************)
-(* "Tools" submenus for strategies, provers, and transformations *)
-(*****************************************************************)
-
-let string_of_desc desc =
-  let print_trans_desc fmt (x,r) =
-    fprintf fmt "@[<hov 2>%s@\n%a@]" x Pp.formatted r
-  in Glib.Markup.escape_text (Pp.string_of print_trans_desc desc)
-
-let parse_shortcut_as_key s =
-  let (key,modi) as r = GtkData.AccelGroup.parse s in
-  begin if key = 0 then
-    Debug.dprintf debug "Shortcut '%s' cannot be parsed as a key@." s
-  else
-    let name = GtkData.AccelGroup.name ~key ~modi in
-    Debug.dprintf debug "Shortcut '%s' parsed as key '%s'@." s name
-  end;
-  r
-
-let add_submenu_strategy (shortcut,strategy) =
-  let callback () =
-    Debug.dprintf debug "interp command '%s'@." strategy;
-    interp strategy
-  in
-  let name = String.map (function '_' -> ' ' | c -> c) strategy in
-  let tooltip = "run strategy " ^ strategy ^ " on selected goal" in
-  let accel_path = "<Why3-Main>/Tools/Strategies/" ^ name in
-  let (key, modi) = parse_shortcut_as_key shortcut in
-  let (_ : GMenu.menu_item) = strategies_factory#add_item name
-    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
-  let (_ : GMenu.menu_item) = context_factory#add_item name
-    ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
-  ()
-
-let add_submenu_prover (shortcut,prover_name,prover_parseable_name) =
-  let callback () =
-    Debug.dprintf debug "interp command '%s'@." prover_parseable_name;
-    interp prover_parseable_name
-  in
-  let tooltip = "run prover " ^ prover_name ^ " on selected goal" in
-  let accel_path = "<Why3-Main>/Tools/Provers/" ^ prover_name in
-  let (key,modi) = parse_shortcut_as_key shortcut in
-  let (_ : GMenu.menu_item) = provers_factory#add_item prover_name
-    ~use_mnemonic:false ~accel_path ~key ~modi ~tooltip ~callback in
-  if not (List.mem prover_parseable_name gconfig.hidden_provers) then
-    let (_ : GMenu.menu_item) = context_factory#add_item prover_name
-      ~use_mnemonic:false ~accel_path ~add_accel:false ~tooltip ~callback in
-    ()
 
 let init_completion provers transformations strategies commands =
   (* add the names of all the the transformations *)
@@ -2334,7 +2368,7 @@ let init_completion provers transformations strategies commands =
   let menu_provers =
     List.filter (fun (_, _, s) -> not (Strings.ends_with s "counterexamples"))
       provers_sorted in
-  List.iter add_submenu_prover menu_provers;
+  List.iter (add_submenu_prover provers_factory context_factory) menu_provers;
   context_factory#add_separator ();
   let all_strings =
     List.fold_left (fun acc (shortcut,strategy) ->
@@ -2345,7 +2379,7 @@ let init_completion provers transformations strategies commands =
                    [] strategies
   in
   List.iter add_completion_entry all_strings;
-  List.iter add_submenu_strategy strategies;
+  List.iter (add_submenu_strategy strategies_factory context_factory) strategies;
 
   command_entry_completion#set_text_column completion_col;
   (* Adding a column which contains the description of the
@@ -2666,7 +2700,7 @@ let treat_notification n =
                   (* if the node newly proved is selected, then force
                    moving the selection the next unproved goal *)
                   if is_selected_alone id then
-                    send_request (Get_first_unproven_node id)
+                    send_request (Get_first_unproven_node (Clever, id))
                 end
               else
                 begin
@@ -2715,7 +2749,7 @@ let treat_notification n =
             (* if this new node is a transformation, and its parent
                goal is selected, then ask for the next goal to prove. *)
             if is_selected_alone parent_id then
-              send_request (Get_first_unproven_node parent_id)
+              send_request (Get_first_unproven_node (Clever, parent_id))
          | _ -> ()
        with Not_found ->
          ignore (new_node id name typ detached)
@@ -2763,7 +2797,7 @@ let treat_notification n =
                         "Session saved.";
       if !quit_on_saved = true then
         exit_function_safe ()
-  | Saving_needed b -> exit_function_handler main_window b
+  | Saving_needed b -> exit_function_handler b
   | Message (msg)                 -> treat_message_notification msg
   | Task (id, s, list_loc, goal_loc, lang)        ->
      if is_selected_alone id then
@@ -2775,8 +2809,11 @@ let treat_notification n =
          if list_loc != [] then
            apply_loc_on_source list_loc goal_loc
          else
-           (* Still scroll to the ident (for example for modules) *)
-           scroll_to_loc ~force_tab_switch:false goal_loc;
+           begin
+             erase_loc_all_view ();
+             (* Still scroll to the ident (for example for modules) *)
+             scroll_to_loc ~force_tab_switch:true goal_loc
+           end;
          (* scroll to end of text. Since Gtk3 we must do it in idle() because
             of the "smooth scrolling". *)
          when_idle (fun () -> task_view#scroll_to_mark `INSERT)

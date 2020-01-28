@@ -259,7 +259,7 @@ let lift_d el d = match d.d_node with
       let d = create_logic_decl (List.rev dl) in
       let add_ax (axml1, axml2) (id, f) =
         let ax = create_prop_decl Paxiom id f in
-        if Sid.disjoint ax.d_syms d.d_news
+        if Sid.disjoint (get_decl_syms ax) d.d_news
         then ax :: axml1, axml2 else axml1, ax :: axml2 in
       let axml1, axml2 = List.fold_left add_ax ([],[]) axml in
       List.rev_append abst (axml1 @ d :: axml2)

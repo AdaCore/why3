@@ -527,7 +527,7 @@ let add_decl ?(warn=true) uc d =
   | Dprop (k,pr,_) ->
       if warn && should_be_conservative uc.uc_name &&
          should_be_conservative pr.pr_name
-      then warn_dubious_axiom uc k pr.pr_name d.d_syms;
+      then warn_dubious_axiom uc k pr.pr_name (get_decl_syms d);
       add_symbol_pr uc pr
 
 (** Declaration constructors + add_decl *)
@@ -972,7 +972,7 @@ let tuple_theory_name s =
   Some i
 
 let add_decl_with_tuples uc d =
-  let ids = Mid.set_diff d.d_syms uc.uc_known in
+  let ids = Mid.set_diff (get_decl_syms d) uc.uc_known in
   let add id s = match is_ts_tuple_id id with
     | Some n -> Sint.add n s
     | None -> s in

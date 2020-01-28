@@ -247,7 +247,7 @@ module Transform = struct
     Decl.create_param_decl (findL ls) :: logic_guard kept [] ls
 
   let logic_transform kept d = function
-    | [ls,ld] when not (Sid.mem ls.ls_name d.d_syms) ->
+    | [ls,ld] when not (Sid.mem ls.ls_name (get_decl_syms d)) ->
         let f = f_type_close_select kept (ls_defn_axiom ld) in
         Libencoding.defn_or_axiom (findL ls) f @ logic_guard kept [] ls
     | _ -> Printer.unsupportedDecl d

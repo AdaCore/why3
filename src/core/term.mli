@@ -196,6 +196,12 @@ val t_open_quant_cb :
   term_quant -> vsymbol list * trigger * term *
               (vsymbol list -> trigger -> term -> term_quant)
 
+(** retrieve bound identifiers (useful to detect sharing) *)
+
+val t_peek_bound : term_bound -> ident
+val t_peek_branch : term_branch -> Sid.t
+val t_peek_quant : term_quant -> ident list
+
 (** {2 Type checking} *)
 
 exception TermExpected of term

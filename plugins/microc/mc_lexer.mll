@@ -38,6 +38,7 @@
        "at", AT; "old", OLD;
        "invariant", INVARIANT; "variant", VARIANT;
        "assert", ASSERT; "assume", ASSUME; "check", CHECK;
+       "lemma", LEMMA; "axiom", AXIOM; "goal", GOAL;
        "requires", REQUIRES; "ensures", ENSURES;
        "label", LABEL; "function", FUNCTION; "predicate", PREDICATE;
       ];
@@ -101,6 +102,7 @@ rule next_token = parse
   | '{'     { LBRC }
   | '}'     { RBRC }
   | ','     { COMMA }
+  | ':'     { COLON }
   | ';'     { SEMICOLON }
   | "&&"    { AND }
   | "||"    { OR }
@@ -150,7 +152,13 @@ and string = parse
     Why3.Loc.set_file file lb;
     Why3.Loc.with_location (Mc_parser.file next_token) lb
 
+  (* Entries for transformations: similar to lexer.mll *)
+  let build_parsing_function entry lb = Why3.Loc.with_location (entry next_token) lb
+
+  let parse_term = build_parsing_function Mc_parser.term_eof
+
+  let parse_term_list = build_parsing_function Mc_parser.term_comma_list_eof
+
+  let parse_list_ident = build_parsing_function Mc_parser.ident_comma_list_eof
+
 }
-
-
-

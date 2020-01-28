@@ -42,6 +42,8 @@ API
   * ITP constructor `File_contents` has a new boolean argument for
     interpretation of the file in the IDE as `read_only` :x:
   * New ITP constructor `Ident_notif_loc`
+  * ITP constructor `Get_first_unproven_node` now takes a heuristic name
+    argument :x:
 
 Transformations
   * `apply`/`rewrite` behaves better in presence of `let`;
@@ -59,6 +61,8 @@ Transformations
     `meta reflection val foo` :x:
   * `remove` and `bisect` should not raise unnecessary popups anymore
   * added `remove_rec`
+  * the attribute `ìnline:trivial` can be added on definitions to force its
+    inlining by the transformation `inline_trivial`
 
 IDE
   * display of counterexamples in the Task view has been improved
@@ -77,6 +81,9 @@ IDE
   * Read only file can now be displayed and removed by right clicking on their
     tab titles
   * Colors for error can now be edited in the why3.conf more precisely
+  * Most of the preferences can now be changed for the current session
+  * Ctrl-Down/Ctrl-Up are mapped to more straightforward moves. The former
+    movement can be triggered with Ctrl-Left/Ctrl-Right
 
 Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq

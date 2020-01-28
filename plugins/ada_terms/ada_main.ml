@@ -20,8 +20,6 @@ open Pp
 let get_name ls =
   Ident.(get_element_name ~attrs:ls.ls_name.id_attrs)
 
-let protect_on x s = if x then "(" ^^ s ^^ ")" else s
-
 (* ada print_binop *)
 let print_binop ~asym fmt = function
   | Tand when asym -> fprintf fmt "and then"
