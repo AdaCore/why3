@@ -13,6 +13,12 @@ module String_lemmas
   predicate in_base (b:int) (x:map int uchar) (n:int) (m:int) =
     forall i. n <= i < m -> 0 <= x[i] < b
 
+  let lemma in_base_concat (b:int) (x:map int uchar) (n m l:int)
+    requires { in_base b x n m }
+    requires { in_base b x m l }
+    ensures  { in_base b x n l }
+  = ()
+
   let rec ghost function
       svalue_le_sub (b:int) (x:map int uchar) (n:int) (m:int) : int
     variant  { m - n }
@@ -26,7 +32,7 @@ module String_lemmas
 
   let rec lemma svalue_le_sub_tail (b:int) (x:map int uchar) (n m:int)
     requires { n <= m }
-    requires { in_base b x n m }
+    requires { in_base b x n (m+1) }
     requires { 2 <= b <= 256 }
     variant  { m - n }
     ensures  {
@@ -57,6 +63,13 @@ module String_lemmas
     ensures { svalue_le_sub b x n m = x[n] + b * svalue_le_sub b x (n+1) m }
   = ()
 
+  let rec lemma svalue_le_sub_frame (b:int) (x y:map int uchar) (n m:int)
+    requires { MapEq.map_eq_sub x y n m }
+    variant  { m - n }
+    ensures  { svalue_le_sub b x n m = svalue_le_sub b y n m }
+  =
+    if n < m then svalue_le_sub_frame b x y (n+1) m else ()
+
   use mach.int.Int32
 
   function svalue_le (b:int) (x:ptr uchar) (sz:int) : int
@@ -65,7 +78,7 @@ module String_lemmas
 
    let lemma svalue_le_tail (b:int) (x:ptr uchar) (sz:int32)
     requires { 0 <= sz }
-    requires { in_base b (pelts x) x.offset (x.offset + sz)  }
+    requires { in_base b (pelts x) x.offset (x.offset + sz + 1)  }
     requires { 2 <= b <= 256 }
     ensures  { svalue_le b x (sz + 1)
                = svalue_le b x sz + (pelts x)[x.offset + sz] * power b sz }
@@ -73,7 +86,7 @@ module String_lemmas
 
   meta remove_prop axiom svalue_le_tail
 
-  let lemma value_le_concat (b:int) (x:ptr uchar) (n m:int32)
+  let lemma svalue_le_concat (b:int) (x:ptr uchar) (n m:int32)
     requires { 0 <= n <= m }
     requires { in_base b (pelts x) x.offset (x.offset + p2i m)  }
     requires { 2 <= b <= 256 }
@@ -95,7 +108,7 @@ module String_lemmas
 
   let rec lemma svalue_sub_tail (b:int) (x:map int uchar) (n m:int)
     requires { n <= m }
-    requires { in_base b x n m }
+    requires { in_base b x (n-1) m }
     requires { 2 <= b <= 256 }
     variant  { m - n }
     ensures  { svalue_sub b x (n-1) m =
@@ -132,4 +145,45 @@ module String_lemmas
   function svalue (b:int) (x:ptr uchar) (sz:int) : int
   = svalue_sub b (pelts x) x.offset (x.offset + sz)
 
+  let rec lemma svalue_le_sub_lower_bound (b:int) (x:map int uchar) (n m:int)
+    variant { m - n }
+    requires { 2 <= b <= 256 }
+    ensures { 0 <= svalue_le_sub b x n m }
+  = if m <= n then ()
+    else svalue_le_sub_lower_bound b x (n+1) m
+
+  let rec lemma svalue_sub_lower_bound (b:int) (x:map int uchar) (n m:int)
+    variant { m - n }
+    requires { 2 <= b <= 256 }
+    ensures { 0 <= svalue_sub b x n m }
+  = if m <= n then ()
+    else svalue_sub_lower_bound b x n (m-1)
+
+  let rec lemma svalue_le_sub_upper_bound (b:int) (x:map int uchar) (n m:int)
+    variant { m - n }
+    requires { 2 <= b <= 256 }
+    requires { n <= m }
+    requires { in_base b x n m }
+    ensures  { svalue_le_sub b x n m < power b (m - n) }
+    = if n = m then ()
+      else begin
+        svalue_le_sub_tail b x n (m-1);
+        svalue_le_sub_upper_bound b x n (m-1);
+        assert { svalue_le_sub b x n m
+                 <= svalue_le_sub b x n (m-1) + power b (m - n - 1) * (b-1) };
+      end
+
+  let rec lemma svalue_sub_upper_bound (b:int) (x:map int uchar) (n m:int)
+    variant { m - n }
+    requires { 2 <= b <= 256 }
+    requires { n <= m }
+    requires { in_base b x n m }
+    ensures  { svalue_sub b x n m < power b (m - n) }
+    = if n = m then ()
+      else begin
+        svalue_sub_tail b x (n+1) m;
+        svalue_sub_upper_bound b x (n+1) m;
+        assert { svalue_sub b x n m
+                 <= svalue_sub b x (n+1) m + power b (m - n - 1) * (b-1) };
+      end
 end

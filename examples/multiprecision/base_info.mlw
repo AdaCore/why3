@@ -35,7 +35,8 @@ module BaseInfo
       bb : limb;
     }
   invariant { 2 <= b <= 256 }
-  invariant { bb <= Limb.radix <= bb * b }
+  invariant { bb < Limb.radix <= bb * b }
+  invariant { 1 <= exp <= 63 }
   invariant { bb = power b exp }
   by { b = 2; exp = 63; bb = 0x8000_0000_0000_0000 }
 
