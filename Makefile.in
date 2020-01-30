@@ -272,7 +272,7 @@ LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 LIB_SESSION = compress xml termcode session_itp \
               strategy strategy_parser controller_itp \
 	      server_utils itp_communication \
-	      itp_server json_util
+	      itp_server json_util unix_scheduler
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
@@ -625,8 +625,8 @@ bin/why3prove.opt: $(WHY3CMXA) src/tools/why3prove.cmx
 bin/why3prove.byte: $(WHY3CMA) src/tools/why3prove.cmo
 bin/why3realize.opt: $(WHY3CMXA) src/tools/why3realize.cmx
 bin/why3realize.byte: $(WHY3CMA) src/tools/why3realize.cmo
-bin/why3replay.opt: $(WHY3CMXA) src/tools/unix_scheduler.cmx src/tools/why3replay.cmx
-bin/why3replay.byte: $(WHY3CMA) src/tools/unix_scheduler.cmo src/tools/why3replay.cmo
+bin/why3replay.opt: $(WHY3CMXA) src/tools/why3replay.cmx
+bin/why3replay.byte: $(WHY3CMA) src/tools/why3replay.cmo
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
 
@@ -996,7 +996,7 @@ install_local:: bin/why3session
 # Why3 Shell
 ###############
 
-SHELL_FILES = unix_scheduler why3shell
+SHELL_FILES = why3shell
 
 SHELLMODULES = $(addprefix src/tools/, $(SHELL_FILES))
 
