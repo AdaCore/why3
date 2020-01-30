@@ -916,8 +916,8 @@ module Get_str
       wmpn_get_str_bits sp bits up un
     end
     else begin
-      let info = wmpn_get_base_info (Limb.of_int32 base) in
-      wmpn_get_str_other sp sz base info up un
+     let info = wmpn_get_base_info (Limb.of_int32 base) in
+     wmpn_get_str_other sp sz base info up un
     end
 
 end

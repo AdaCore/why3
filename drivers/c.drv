@@ -216,7 +216,7 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);\n\
   syntax val count_trailing_zeros "__builtin_ctz(%1)" prec 1 15
 
   syntax val of_int32 "(uint32_t)%1" prec 2 2
-
+  syntax val to_int32 "(int32_t)%1" prec 2 2
 
 end
 
@@ -436,6 +436,8 @@ static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\n\
 
   syntax val to_int32 "(int32_t)%1" prec 2 2
   syntax val of_int32 "(uint64_t)%1" prec 2 2
+  syntax val to_uint32 "(uint32_t)%1" prec 2 2
+  syntax val of_uint32 "(uint64_t)%1" prec 2 2
   syntax val to_int64 "(int64_t)%1" prec 2 2
   syntax val of_int64 "(uint64_t)%1" prec 2 2
 
@@ -505,6 +507,21 @@ module mach.c.C
   syntax val print_space "printf(\" \")" prec 1
   syntax val print_newline "printf(\"\\n\")" prec 1
   syntax val print_uint32 "printf(\"%#010x\",%1)" prec 1 15
+
+end
+
+module mach.c.UChar
+
+  syntax literal uchar "%c"
+  syntax type uchar "unsigned char"
+  syntax val of_uint64 "(unsigned char)%1" prec 2 2
+
+end
+
+module mach.c.Char
+
+  syntax literal char "%c"
+  syntax type char "char"
 
 end
 
