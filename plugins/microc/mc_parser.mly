@@ -72,7 +72,10 @@
   }
 
   let type_int s e = PTtyapp (Qident (mk_id "int" s e), [])
-
+  let type_array s e =
+    let array = Qdot (Qident (mk_id "Array" s e), mk_id "array" s e) in
+    PTtyapp (array, [type_int s e])
+                   
 %}
 
 %token <string> INCLUDE
@@ -416,9 +419,8 @@ term_:
     { Tif ($2, $4, $6) }
 | LET id=ident EQUAL t1=term IN t2=term
     { Tlet (id, t1, t2) }
-| q=quant l=comma_list1(ident) DOT t=term
-    { let ty = Some (type_int $startpos $endpos) in
-      let var id = id.id_loc, Some id, false, ty in
+| q=quant l=comma_list1(binder) DOT t=term
+    { let var (id, ty) = id.id_loc, Some id, false, Some ty in
       Tquant (q, List.map var l, [], t) }
 | id=ident LEFTPAR l=separated_list(COMMA, term) RIGHTPAR
     { Tidapp (Qident id, l) }
@@ -427,6 +429,10 @@ quant:
 | FORALL  { Dterm.DTforall }
 | EXISTS  { Dterm.DTexists }
 
+binder:
+| id=ident                { id, type_int   $startpos $endpos }
+| id=ident LEFTSQ RIGHTSQ { id, type_array $startpos $endpos }
+    
 term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
