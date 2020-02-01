@@ -1157,11 +1157,15 @@ single_expr_:
       Eoptexn (id_b, Ity.MaskVisible, e) }
 | FOR pattern IN seq_expr WITH uident iterator
   DO loop_annotation loop_body DONE
-    { let mk d = mk_expr d $startpos $endpos in
+    { let id_b = mk_id break_id $startpos($8) $endpos($8) in
+      let id_c = mk_id continue_id $startpos($8) $endpos($8) in
+      let mk d = mk_expr d $startpos $endpos in
       let q s = Qdot (Qident $6, mk_id s $startpos($6) $endpos($6)) in
       let next = mk (Eidapp (q "next", [mk (Eident (Qident $7))])) in
       let e = mk (simplify_let_pattern Expr.RKnone next $2 $10) in
+      let e = { e with expr_desc = Eoptexn (id_c, Ity.MaskVisible, e) } in
       let e = mk (Ewhile (mk Etrue, fst $9, snd $9, e)) in
+      let e = mk (Eoptexn (id_b, Ity.MaskVisible, e)) in
       let unit = mk_expr (Etuple []) $startpos($10) $endpos($10) in
       let e = mk (Ematch (e, [], [q "Done", None, unit])) in
       let create = mk (Eidapp (q "create", [$4])) in
