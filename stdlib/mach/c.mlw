@@ -273,4 +273,7 @@ module UChar
     requires { 0 <= x <= 255 }
     ensures  { result = to_int x }
 
+  val to_uint64 (x:uchar) : uint64
+    ensures  { to_int result = x }
+
 end
