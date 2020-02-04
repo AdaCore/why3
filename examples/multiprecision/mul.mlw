@@ -403,6 +403,56 @@ module Mul
     done;
     cl
 
+ let wmpn_addmul_2 (r x:t) (sz:int32) (y:t) : limb
+    requires { sz > 0 }
+    requires { valid x sz }
+    requires { valid y 2 }
+    requires { valid r (sz + 2) }
+    requires { writable r }
+    writes   { r.data.elts }
+    ensures  { value r (sz + 1)
+                 + power radix (sz + 1) * result
+               = value (old r) sz
+                 + value x sz * value y 2 }
+    ensures  { forall j. (j < r.offset \/ r.offset + sz + 1 <= j) ->
+               (pelts r)[j] = (pelts (old r))[j] }
+  =
+    let ghost or = pure { r } in
+    let y0 = C.get y in
+    let rn = wmpn_addmul_1 r x sz y0 in
+    value_sub_update_no_change (pelts r) (offset r + int32'int sz) (offset r)
+                               (offset r + int32'int sz) rn;
+    C.set_ofs r sz rn;
+    value_tail r sz;
+    assert { value r (sz + 1) = value or sz + value x sz * y0 };
+    value_concat r 1 (sz + 1);
+    let r1 = C.incr r 1 in
+    assert { value r (sz + 1) = value r 1 + radix * value r1 sz };
+    let y1 = C.get_ofs y 1 in
+    assert { value y 2 = y0 + radix * y1 };
+    label A2 in
+    let c = wmpn_addmul_1 r1 x sz y1 in
+    value_concat r 1 (sz + 1);
+    value_sub_frame (pelts r) (pure { pelts r at A2 })
+                    (offset r) (offset r + 1);
+    assert { value r1 sz + power radix sz * c
+             = value r1 sz at A2 + value x sz * y1 };
+    assert { value r (sz + 1) + power radix (sz + 1) * c
+             = value or sz + value x sz * value y 2
+             by value r (sz + 1) + power radix (sz + 1) * c
+                = value r 1 + radix * value r1 sz + power radix (sz + 1) * c
+                = value r 1 + radix * (value r1 sz + power radix sz * c)
+                = value r 1 + radix * (value r1 sz at A2 + value x sz * y1)
+                = value r 1 at A2 + radix * value r1 sz at A2
+                  + radix * (value x sz * y1)
+                = value r (sz + 1) at A2 + radix * (value x sz * y1)
+                = value or sz + value x sz * y0 + radix * value x sz * y1
+                = value or sz + value x sz * (y0 + radix * y1)
+                = value or sz + value x sz * value y 2 };
+    assert { forall j. (j < r.offset \/ r.offset + sz + 1 <= j) ->
+             (pelts r)[j] = (pelts (old r))[j]
+             by (pelts r)[j] = (pelts r)[j] at A2 = (pelts (old r))[j] };
+    c
 
 end
 
@@ -449,6 +499,86 @@ module Mul_basecase
     let ref vp = C.incr y 1 in
     let ghost ref i = 1 in
     let ref vn = sy - 1 in
+    while vn >= 2 do
+      invariant { 1 <= i <= sy }
+      invariant { i = sy - vn }
+      invariant { value r (i + sx) = value x sx * value y i }
+      invariant { rp.offset = r.offset + i }
+      invariant { plength rp = plength r }
+      invariant { rp.min = r.min }
+      invariant { rp.max = r.max }
+      invariant { pelts rp = pelts r }
+      invariant { writable rp }
+      invariant { vp.offset = y.offset + i }
+      invariant { plength vp = plength y }
+      invariant { vp.min = y.min }
+      invariant { vp.max = y.max }
+      invariant { pelts vp = pelts y }
+      invariant { forall j. (j < offset r \/ offset r + (sy + sx) <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      variant { vn }
+      label StartLoop in
+      value_concat r i (i + sx);
+      assert { value rp sx =
+               value_sub (pelts r) (r.offset + i) (r.offset + (i + sx)) };
+      let res =  wmpn_addmul_2 rp x sx vp in
+      assert { value rp (sx+1) + power radix (sx+1) * res
+              = value (rp at StartLoop) sx + value x sx * value vp 2 };
+      assert { MapEq.map_eq_sub (pelts r) (pelts r at StartLoop)
+                r.offset rp.offset
+                by rp.offset = r.offset + i
+                so forall j. r.offset <= j < rp.offset
+                   ->
+                   (j < rp.offset
+                    so (pelts rp)[j] = (pelts rp at StartLoop)[j]
+                         = (pelts r at StartLoop)[j]) };
+      label BeforeCarry in
+      value_sub_update_no_change (pelts r) (rp.offset + p2i sx + 1)
+                        r.offset  (r.offset + p2i i) res;
+      set_ofs rp (sx+1) res;
+      assert { value rp (sx+1) = value (rp at BeforeCarry) (sx+1) };
+      assert { value r i = value (r at BeforeCarry) i
+             = value (r at StartLoop) i };
+      value_tail r (i + sx + 1);
+      value_tail rp (sx + 1);
+      value_concat y i (i+2);
+      assert { value vp 2
+               = value_sub (pelts y) (y.offset + i) (y.offset + (i+2)) };
+      value_concat r i (i + sx + 2);
+(*      assert { value_sub (pelts r) (r.offset + i) (r.offset + (i + sx + 1))
+               = value rp (sx + 1) };
+      assert { (pelts r)[r.offset + (i + sx + 1)] = res };*)
+      assert { value rp (sx + 2) = value (rp at StartLoop) sx
+               + value x sx * value vp 2 };
+      assert { value x sx * value y (i+2)
+               = value x sx * value y i
+                 + power radix i * (value x sx * value vp 2) };
+      assert { value r (i + sx + 2) = value x sx * value y (i+2)
+               by value r (i + sx + 2)
+                  = value r i
+                    + power radix i * (value_sub (pelts r) (offset r + i)
+                                                 (offset r + i + sx + 2))
+                  = value r i + power radix i * value rp (sx + 2)
+                  = value r i
+                    + power radix i
+                      * (value (rp at StartLoop) sx + value x sx * value vp 2)
+                  = value (r at StartLoop) i
+                    + power radix i
+                      * (value (rp at StartLoop) sx + value x sx * value vp 2)
+                  = value (r at StartLoop) i
+                    + power radix i * value (rp at StartLoop) sx
+                    + power radix i * (value x sx * value vp 2)
+                  = value (r at StartLoop) (sx + i)
+                    + power radix i * (value x sx * value vp 2)
+                  = value x sx * value y i
+                    + power radix i * value x sx * value vp 2
+                  = value x sx * (value y i + power radix i * value vp 2)
+                  = value x sx * value y (i+2) };
+      i <- i + 2;
+      rp <- C.incr rp 2;
+      vp <- C.incr vp 2;
+      vn <- vn - 2;
+    done;
     while vn >= 1 do
       invariant { 1 <= i <= sy }
       invariant { i = sy - vn }
