@@ -10,6 +10,7 @@ use mach.int.Int32
 use mach.int.Int64
 use mach.int.UInt64GMP
 use mpz.Z
+use mpz.Zutil
 
 let wmpz_set_ui (dst: mpz_ptr) (src: uint64): unit
   requires { mpz.alloc[dst] >= 1 }

@@ -15,6 +15,7 @@ use add.Add
 use sub.Sub
 use int.Abs
 use mpz.Z
+use mpz.Zutil
 
 let wmpz_sub (w u v: mpz_ptr) : unit
   requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 /\ mpz.alloc[v] >= 1 }
