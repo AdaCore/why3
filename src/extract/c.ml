@@ -1611,8 +1611,12 @@ let name_gen suffix ?fname m =
     | Some f -> f ^ "__" ^ n ^ suffix in
   Strings.lowercase r
 
-let file_gen = name_gen ".c"
-let header_gen = name_gen ".h"
+let header_border_printer header _args ?old:_ ?fname ~flat:_ fmt m =
+  let n = Strings.uppercase (name_gen "_H_INCLUDED" ?fname m) in
+  if header then
+    Format.fprintf fmt "#ifndef %s@\n@." n
+  else
+    Format.fprintf fmt "#define %s@\n#endif // %s@." n n
 
 let print_header_decl args fmt d =
   let cds = MLToC.translate_decl args d ~header:true in
@@ -1675,12 +1679,22 @@ let print_decl =
     print_decl info fmt d end
 
 let c_printer = Pdriver.{
-      desc            = "printer for C code";
-      file_gen        = file_gen;
-      decl_printer    = print_decl;
-      interf_gen      = Some header_gen;
-      interf_printer  = Some print_header_decl;
-      prelude_printer = print_prelude }
+    desc = "printer for C code";
+    implem_printer = {
+        filename_generator = name_gen ".c";
+        decl_printer = print_decl;
+        prelude_printer = print_prelude;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
+      };
+    interf_printer = Some {
+        filename_generator = name_gen ".h";
+        decl_printer = print_header_decl;
+        prelude_printer = print_prelude;
+        header_printer = header_border_printer true;
+        footer_printer = header_border_printer false;
+      };
+  }
 
 let () =
   Pdriver.register_printer "c" c_printer

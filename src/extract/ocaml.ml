@@ -861,17 +861,16 @@ let ng suffix ?fname m =
   let path     = m.mod_theory.th_path in
   (module_name ?fname path mod_name) ^ suffix
 
-let file_gen = ng ".ml"
-let mli_gen = ng ".mli"
-
-open Pdriver
-
-let ocaml_printer =
-  { desc            = "printer for Ocaml code";
-    file_gen        = file_gen;
-    decl_printer    = print_decl;
-    interf_gen      = Some mli_gen;
-    interf_printer  = None;
-    prelude_printer = print_empty_prelude }
+let ocaml_printer = Pdriver.{
+    desc = "printer for Ocaml code";
+    implem_printer = {
+        filename_generator = ng ".ml";
+        decl_printer = print_decl;
+        prelude_printer = dummy_prelude_printer;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
+      };
+    interf_printer = None
+  }
 
 let () = Pdriver.register_printer "ocaml" ocaml_printer

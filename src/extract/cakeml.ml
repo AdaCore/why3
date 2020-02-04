@@ -481,15 +481,17 @@ let fg_cml ?fname m =
   let path     = m.mod_theory.th_path in
   (module_name ?fname path mod_name) ^ ".cml"
 
-open Pdriver
-
-let cml_printer =
-  { desc = "printer for CakeML code";
-    file_gen = fg_cml;
-    decl_printer = print_decl;
-    interf_gen = None;
-    interf_printer = None;
-    prelude_printer = print_empty_prelude }
+let cml_printer = Pdriver.{
+    desc = "printer for CakeML code";
+    implem_printer = {
+        filename_generator = fg_cml;
+        decl_printer = print_decl;
+        prelude_printer = dummy_prelude_printer;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
+      };
+    interf_printer = None
+  }
 
 let () = Pdriver.register_printer "cakeml" cml_printer
 
@@ -498,12 +500,16 @@ let fg_sml ?fname m =
   let path     = m.mod_theory.th_path in
   (module_name ?fname path mod_name) ^ ".sml"
 
-let sml_printer =
-  { desc = "printer for SML code";
-    file_gen = fg_sml;
-    decl_printer = print_decl;
-    interf_gen = None;
-    interf_printer = None;
-    prelude_printer = print_empty_prelude }
+let sml_printer = Pdriver.{
+    desc = "printer for SML code";
+    implem_printer = {
+        filename_generator = fg_sml;
+        decl_printer = print_decl;
+        prelude_printer = dummy_prelude_printer;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
+      };
+    interf_printer = None
+  }
 
 let () = Pdriver.register_printer "sml" sml_printer
