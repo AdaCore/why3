@@ -1,5 +1,8 @@
 #if defined(TEST_GMP) || defined(TEST_WHY3) || defined(TEST_MINIGMP)
 #define BENCH
+#if !(defined(TEST_ADD) || defined(TEST_MUL) || defined(TEST_TOOM) || defined(TEST_DIV) || defined(TEST_SQRT1) || defined(TEST_SQRTREM) || defined(TEST_POWM) || defined(TEST_ZADD) || defined(TEST_ZSUB) || defined(TEST_ZMUL))
+#error "missing TEST_foo macro definition"
+#endif
 #else
 #define COMPARE
 #define TEST_WHY3
@@ -195,7 +198,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%ld %ld %g\n", an, bn, elapsed);
+          printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -263,7 +266,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%ld %ld %g\n", an, bn, elapsed);
+          printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -296,7 +299,7 @@ int main () {
     {
       //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
       //an = (bn * 3) / 2;
-      an = bn * 6;
+      an = bn;
       elapsed = 0;
       nb_iter = 500;
       for (int iter = 0; iter != nb_iter; ++iter) {
@@ -324,9 +327,7 @@ int main () {
       }
       elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-      printf ("%ld %ld %g\n", an, bn, elapsed);
-      if (an==bn)
-        printf ("\n"); //for gnuplot
+      printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
 #endif
 #ifdef COMPARE
       rn = an + bn;
@@ -389,7 +390,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%ld %ld %g\n", an, bn, elapsed);
+          printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -455,8 +456,7 @@ int main () {
         elapsed +=
           (end.tv_sec - begin.tv_sec)
           + ((end.tv_usec - begin.tv_usec)/1000000.0)
-        printf ("%f\n", elapsed);
-        printf ("\n"); //for gnuplot
+        printf ("%g\n", elapsed);
 #endif
 #ifdef COMPARE
       if (mpn_cmp (refp, rp, rn) || c != refc)
@@ -514,8 +514,7 @@ int main () {
       }
       elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-      printf ("%d %f\n", an, elapsed);
-      printf ("\n"); //for gnuplot
+      printf ("%d %g\n", (int)an, elapsed);
 #endif
 #ifdef COMPARE
       if (cn != rn)
@@ -601,7 +600,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%ld %ld %g\n", an, rn, elapsed);
+          printf ("%d %d %g\n", (int)an, (int)rn, elapsed);
           if (an==rn)
             printf ("\n"); //for gnuplot
 #endif
@@ -665,7 +664,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%ld %ld %g\n", an, bn, elapsed);
+          printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -732,7 +731,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%ld %ld %g\n", an, bn, elapsed);
+          printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif
@@ -799,7 +798,7 @@ int main () {
           }
           elapsed = elapsed / (nb * nb_iter);
 #ifdef BENCH
-          printf ("%ld %ld %g\n", an, bn, elapsed);
+          printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
           if (an==bn)
             printf ("\n"); //for gnuplot
 #endif

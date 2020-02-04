@@ -11,18 +11,18 @@ else
 endif
 
 ifdef GMP_DIR
-  GMPFLAGS = -I$(GMP_DIR) $(shell sed -n -e 's/^CFLAGS = \(.*\)/\1/p' $(GMP_DIR)/Makefile)
+  CFLAGS = $(shell sed -n -e 's/^CFLAGS = \(.*\)/\1/p' $(GMP_DIR)/Makefile)
 else
-  GMPFLAGS = -march=native -O2 -fomit-frame-pointer
+  CFLAGS = -march=native -O2 -fomit-frame-pointer
 endif
 
 ifdef GMP_LIB
-  GMPFLAGS += -L$(GMP_LIB)
+  GMPFLAGS = -I$(GMP_DIR) -L$(GMP_LIB)
 endif
 
-CFLAGS = $(GMPFLAGS) -Wall -Wno-unused -g -std=c11 -Wno-pedantic
+CFLAGS += -Wall -Wno-unused -g -std=c11 -Wno-pedantic
 
-.PHONY: all clean extract plots
+.PHONY: all clean extract plots benchs dist tests-dist
 
 all: extract
 
@@ -35,12 +35,12 @@ why3:
 
 MLWFILES = $(addsuffix .mlw, mpz_div2exp mpz_mul2exp mpz_mul mpz_sub mpz_add mpz_getset mpz get_str base_info powm sqrtrem sqrt toom logical div mul sub add compare util)
 
-build/extracted:
+build/extracted: $(MLWFILES)
 	mkdir -p build
-	rm -f build/extracted
+	rm -f $@
 	$(WHY3) extract -D wmpn.drv -D c -L . --recursive --modular --interface -o build/ \
 	  --debug c_no_error_msgs wmpn.mlw #$(MLWFILES)
-	touch build/extracted
+	touch $@
 
 build/sqrtinit.h: sqrtinit.ml
 	mkdir -p build
@@ -50,29 +50,35 @@ build/binverttab.h: binverttab.ml
 	mkdir -p build
 	ocaml binverttab.ml > build/binverttab.h
 
-extract: build/extracted build/sqrtinit.h build/binverttab.h
+EXTRACTED = build/extracted build/sqrtinit.h build/binverttab.h
 
-CFILES = build/uint64gmp.c build/z.c build/zadd.c build/zsub.c build/zmul.c build/zmul2exp.c build/zdiv2exp.c build/set.c build/get_str.c build/baseinfo.c build/powm.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/aliaslogical.c build/mul_basecase.c build/mul.c build/subold.c build/sub.c build/sub_1.c build/addold.c build/add.c build/add_1.c build/compare.c build/util.c build/int32.c
+extract: $(EXTRACTED)
 
-build/tests: tests.c extract
-	gcc $(CFLAGS) tests.c $(CFILES) -Irandom -lgmp -o build/tests
+CFILES = z.c zadd.c zsub.c zmul.c zmul2exp.c zdiv2exp.c set.c get_str.c baseinfo.c powm.c fxp.c sqrt.c sqrt1.c toom.c div.c logical.c aliaslogical.c mul_basecase.c mul.c subold.c sub.c sub_1.c addold.c add.c add_1.c compare.c util.c int32.c
 
-build/minitests: tests.c extract
-	gcc $(CFLAGS) -DCOMPARE_MINI tests.c $(CFILES) -Irandom -Imini-gmp -o build/minitests
+build/libwmp.a: $(EXTRACTED)
+	cd build; gcc $(CFLAGS) -c $(CFILES)
+	ar rcs $@ $(addprefix build/,$(CFILES:.c=.o))
+
+build/tests: tests.c build/libwmp.a
+	gcc $(CFLAGS) tests.c -Irandom -Lbuild -lwmp -lgmp -o $@
+
+build/minitests: tests.c build/libwmp.a
+	gcc $(CFLAGS) -DCOMPARE_MINI tests.c -Irandom -Imini-gmp -Lbuild -lwmp -o $@
 
 UPPER = $(shell echo $* | tr [:lower:] [:upper:])
 
-build/why3%bench: tests.c extract
-	gcc $(CFLAGS) -DTEST_WHY3 -DTEST_$(UPPER) tests.c $(CFILES) -Iinclude -Irandom -lgmp -o $@
+build/why3%bench: tests.c build/libwmp.a
+	gcc $(CFLAGS) -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Iinclude -Irandom -Lbuild -lwmp -lgmp -o $@
 
 build/lib%bench: tests.c distrib/libwmp.a
 	gcc $(CFLAGS) -DTEST_LIB -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Irandom -Idistrib -Ldistrib -lwmp -lgmp -o $@
 
-build/gmp%bench: tests.c extract
-	gcc $(CFLAGS) -DTEST_GMP -DTEST_$(UPPER) tests.c $(CFILES) -Iinclude -Irandom -lgmp -o $@
+build/gmp%bench: tests.c
+	gcc $(CFLAGS) $(GMPFLAGS) -DTEST_GMP -DTEST_$(UPPER) tests.c -Iinclude -Irandom -lgmp -o $@
 
-build/minigmp%bench: tests.c extract
-	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c $(CFILES) -Iinclude -Imini-gmp -Irandom -o $@
+build/minigmp%bench: tests.c
+	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -o $@
 
 BENCHS = why3add why3mul why3toom why3div why3sqrtrem  why3powm gmpadd gmpmul gmptoom gmpdiv gmpsqrtrem gmppowm minigmpadd minigmpmul minigmpdiv minigmptoom
 
@@ -82,10 +88,12 @@ $(BENCHFILES): bench/%: build/%bench
 	mkdir -p bench
 	$< > $@
 
+benchs: $(BENCHFILES)
+
 plots: $(BENCHFILES)
 	make all -C plots
 
-dist: extract
+dist: $(EXTRACTED)
 	mkdir -p distrib/lib
 	touch distrib/ChangeLog
 	cp build/*.c build/*.h distrib/lib/
