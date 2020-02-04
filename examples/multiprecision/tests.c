@@ -182,7 +182,7 @@ int main () {
             refc = mpn_add (refp, ap, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
-            c = wmpn_add1 (rp, ap, an, bp, bn);
+            c = wmpn_add (rp, ap, an, bp, bn);
 #endif
 
 #ifdef BENCH

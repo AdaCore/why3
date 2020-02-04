@@ -11,12 +11,16 @@ else
 endif
 
 ifdef GMP_DIR
-  GMPFLAGS = $(shell sed -n -e 's/^CFLAGS = \(.*\)/\1/p' $(GMP_DIR)/Makefile)
+  GMPFLAGS = -I$(GMP_DIR) $(shell sed -n -e 's/^CFLAGS = \(.*\)/\1/p' $(GMP_DIR)/Makefile)
 else
   GMPFLAGS = -march=native -O2 -fomit-frame-pointer
 endif
 
-CFLAGS = $(GMPFLAGS) -Wall -Wno-unused -g -std=c11
+ifdef GMP_LIB
+  GMPFLAGS += -L$(GMP_LIB)
+endif
+
+CFLAGS = $(GMPFLAGS) -Wall -Wno-unused -g -std=c11 -Wno-pedantic
 
 .PHONY: all clean extract plots
 
@@ -48,7 +52,7 @@ build/binverttab.h: binverttab.ml
 
 extract: build/extracted build/sqrtinit.h build/binverttab.h
 
-CFILES = build/uint64gmp.c build/z.c build/zadd.c build/zsub.c build/zmul.c build/zmul2exp.c build/zdiv2exp.c build/set.c build/get_str.c build/baseinfo.c build/powm.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/aliaslogical.c build/mul.c build/subold.c build/sub.c build/sub_1.c build/addold.c build/add.c build/add_1.c build/compare.c build/util.c build/int32.c
+CFILES = build/uint64gmp.c build/z.c build/zadd.c build/zsub.c build/zmul.c build/zmul2exp.c build/zdiv2exp.c build/set.c build/get_str.c build/baseinfo.c build/powm.c build/fxp.c build/sqrt.c build/sqrt1.c build/toom.c build/div.c build/logical.c build/aliaslogical.c build/mul_basecase.c build/mul.c build/subold.c build/sub.c build/sub_1.c build/addold.c build/add.c build/add_1.c build/compare.c build/util.c build/int32.c
 
 build/tests: tests.c extract
 	gcc $(CFLAGS) tests.c $(CFILES) -Irandom -lgmp -o build/tests
@@ -70,7 +74,7 @@ build/gmp%bench: tests.c extract
 build/minigmp%bench: tests.c extract
 	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c $(CFILES) -Iinclude -Imini-gmp -Irandom -o $@
 
-BENCHS = why3add why3mul why3toom why3div gmpadd gmpmul gmptoom gmpdiv minigmpadd minigmpmul minigmpdiv minigmptoom gmppowm why3powm
+BENCHS = why3add why3mul why3toom why3div why3sqrtrem  why3powm gmpadd gmpmul gmptoom gmpdiv gmpsqrtrem gmppowm minigmpadd minigmpmul minigmpdiv minigmptoom
 
 BENCHFILES = $(addprefix bench/, $(BENCHS))
 

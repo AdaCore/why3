@@ -13,7 +13,6 @@ module Mul
   use util.Util
   use add.Add
 
-
   (** `wmpn_mul_1 r x sz y` multiplies `x[0..sz-1]` by the limb `y` and
        writes the n least significant limbs in `r`, and returns the most
        significant limb. It corresponds to `mpn_mul_1`. *)
@@ -264,6 +263,165 @@ module Mul
     done;
     c
 
+  (** In-place variant of wmpn_mul_1 *)
+  let wmpn_mul_1_in_place (x:t) (sz:int32) (y:limb) : limb
+    requires { valid x sz }
+    requires { writable x }
+    ensures  { value x sz + (power radix sz) * result
+               = old value x sz * y }
+    ensures  { forall j. (j < offset x \/ offset x + sz <= j)
+              -> (pelts x)[j] = old (pelts x)[j] }
+    writes   { x.data.elts }
+  =
+    let ghost ox = pure { x } in
+    let ref cl = 0 in
+    let ref ul = 0 in
+    let ref n = sz in
+    let ref up = C.incr x 0 in
+    let ghost ref i : int32 = 0 in
+    while n <> 0 do
+      invariant { 0 <= n <= sz }
+      invariant { i = sz - n }
+      invariant { value x i + (power radix i) * cl =
+                  value ox i * y }
+      invariant { up.offset = x.offset + i }
+      invariant { plength up = plength x }
+      invariant { up.min = x.min }
+      invariant { up.max = x.max }
+      invariant { pelts up = pelts x }
+      invariant { writable up }
+      invariant { forall j. (j < offset x \/ offset x + i <= j)
+                -> (pelts x)[j] = (pelts ox)[j] }
+      variant { n }
+      label StartLoop in
+      ul <- C.get up;
+      let l, h = mul_double ul y in
+      assert { h < radix - 1
+               by ul * y <= (radix - 1) * (radix - 1)
+               so radix * h <= ul * y };
+      let lpl = add_mod l cl in
+      begin ensures { lpl + radix * cl = ul * y + (cl at StartLoop) }
+        cl <- (if lpl < cl then 1 else 0) + h;
+      end;
+      value_sub_update_no_change (pelts x) (x.offset + int32'int i)
+                                 x.offset (x.offset + int32'int i) lpl;
+      C.set up lpl;
+      assert { value x i = value x i at StartLoop };
+      assert { (pelts x)[offset x + i] = lpl };
+      value_tail x i;
+      value_tail ox i;
+      assert { value ox (i+1) = value ox i + power radix i * ul };
+      assert { value ox (i+1) * y = value ox i * y + power radix i * (ul * y) };
+      assert { value x (i+1) + power radix (i+1) * cl = value ox (i+1) * y };
+      up <- C.incr up 1;
+      n <- n-1;
+      i <- i+1;
+    done;
+    cl
+
+  (** `wmpn_submul_1 r x sz y` multiplies `(x, sz)` by `y`, subtracts the `sz`
+      least significant limbs from `(r, sz)` and writes the result in `(r, sz)`.
+      Returns the most significant limb of the product plus the borrow
+      of the subtraction. Corresponds to `mpn_submul_1`.*)
+  let wmpn_submul_1 (r x:t) (sz:int32) (y:limb):limb
+    requires { valid x sz }
+    requires { valid r sz }
+    requires { writable r }
+    ensures { value r sz - (power radix sz) * result
+            = value (old r) sz
+              - value x sz * y }
+    writes { r.data.elts }
+    ensures { forall j. j < r.offset \/ r.offset + sz <= j ->
+              (pelts r)[j] = (pelts (old r))[j] }
+  =
+    let ref ul = 0 in
+    let ref rl = 0 in
+    let ref cl = 0 in
+    let ref n = sz in
+    let ghost ref i = 0 in
+    let ref rp = C.incr r 0 in
+    let ref up = C.incr x 0 in
+    while n <> 0 do
+      invariant { 0 <= n <= sz }
+      invariant { i = sz - n }
+      invariant { value r i - (power radix i) * cl
+                  = value (old r) i
+                    - value x i * y }
+      invariant { (rp).offset = r.offset + i }
+      invariant { rp.min = r.min }
+      invariant { rp.max = r.max }
+      invariant { writable rp }
+      invariant { pelts rp = pelts r }
+      invariant { up.offset = x.offset + i }
+      invariant { plength up = plength x }
+      invariant { up.min = x.min }
+      invariant { up.max = x.max }
+      invariant { pelts up = pelts x }
+      invariant { forall j. r.offset + i <= j < r.offset + sz ->
+                 (pelts (old r)) [j] = (pelts r)[j]  }
+      invariant { forall j. j < r.offset \/ r.offset + sz <= j ->
+                 (pelts r)[j] = (pelts (old r))[j] }
+      variant { sz - i }
+      label StartLoop in
+      ul <- C.get up;
+      up <- C.incr up 1;
+      let l, h = mul_double ul y in
+      let ref lpl = add_mod l cl in
+      assert { h < radix - 1
+               by ul * y <= (radix - 1) * (radix - 1)
+               so radix * h <= ul * y };
+      begin ensures { lpl + radix * cl = ul * y + (cl at StartLoop) }
+        cl <- (if lpl < cl then 1 else 0) + h;
+      end;
+      assert { cl = radix - 1 -> lpl = 0
+               by ul * y <= (radix - 1) * (radix - 1)
+               so cl at StartLoop <= radix - 1
+               so lpl + radix * cl
+                  = ul * y + (cl at StartLoop) = radix * (radix - 1) };
+      rl <- C.get rp;
+      assert { rl = (pelts (old r))[r.offset + i] };
+      lpl <- sub_mod rl lpl;
+      begin ensures { lpl - radix * cl = rl - ul * y - (cl at StartLoop) }
+        cl <- (if lpl > rl then 1 else 0) + cl;
+      end;
+      value_sub_update_no_change (pelts r) (r.offset + int32'int i)
+                                 r.offset (r.offset + int32'int i) lpl;
+      C.set rp lpl;
+      assert { value r i = value r i at StartLoop };
+      value_tail r i;
+      value_tail x i;
+      assert { value (old r) (i+1)
+               = value (old r) i + power radix i * rl };
+      assert { value x (i+1) = value x i + power radix i * ul };
+      assert { value r (i+1) = value r i + power radix i * lpl };
+      assert { value x (i+1) * y = value x i * y + power radix i * (ul * y) };
+      assert { value r (i+1) - power radix (i+1) * cl =
+               value (old r) (i+1) - value x (i+1) * y };
+      rp <- C.incr rp 1;
+      n <- n-1;
+      i <- i+1;
+    done;
+    cl
+
+
+end
+
+module Mul_basecase
+
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+  use util.Util
+  use add.Add
+  use Mul
+
   (** `wmpn_mul_basecase r x sx y sy` multiplies `(x, sx)` and `(y,sy)` and writes
   the result in `(r, sx+sy)`. `sx` must be greater than or equal to
   `sy`. Corresponds to `mpn_mul`. *)
@@ -348,62 +506,6 @@ module Mul
       vp <- C.incr vp 1;
       vn <- vn - 1;
     done
-
-  (** In-place variant of wmpn_mul_1 *)
-  let wmpn_mul_1_in_place (x:t) (sz:int32) (y:limb) : limb
-    requires { valid x sz }
-    requires { writable x }
-    ensures  { value x sz + (power radix sz) * result
-               = old value x sz * y }
-    ensures  { forall j. (j < offset x \/ offset x + sz <= j)
-              -> (pelts x)[j] = old (pelts x)[j] }
-    writes   { x.data.elts }
-  =
-    let ghost ox = pure { x } in
-    let ref cl = 0 in
-    let ref ul = 0 in
-    let ref n = sz in
-    let ref up = C.incr x 0 in
-    let ghost ref i : int32 = 0 in
-    while n <> 0 do
-      invariant { 0 <= n <= sz }
-      invariant { i = sz - n }
-      invariant { value x i + (power radix i) * cl =
-                  value ox i * y }
-      invariant { up.offset = x.offset + i }
-      invariant { plength up = plength x }
-      invariant { up.min = x.min }
-      invariant { up.max = x.max }
-      invariant { pelts up = pelts x }
-      invariant { writable up }
-      invariant { forall j. (j < offset x \/ offset x + i <= j)
-                -> (pelts x)[j] = (pelts ox)[j] }
-      variant { n }
-      label StartLoop in
-      ul <- C.get up;
-      let l, h = mul_double ul y in
-      assert { h < radix - 1
-               by ul * y <= (radix - 1) * (radix - 1)
-               so radix * h <= ul * y };
-      let lpl = add_mod l cl in
-      begin ensures { lpl + radix * cl = ul * y + (cl at StartLoop) }
-        cl <- (if lpl < cl then 1 else 0) + h;
-      end;
-      value_sub_update_no_change (pelts x) (x.offset + int32'int i)
-                                 x.offset (x.offset + int32'int i) lpl;
-      C.set up lpl;
-      assert { value x i = value x i at StartLoop };
-      assert { (pelts x)[offset x + i] = lpl };
-      value_tail x i;
-      value_tail ox i;
-      assert { value ox (i+1) = value ox i + power radix i * ul };
-      assert { value ox (i+1) * y = value ox i * y + power radix i * (ul * y) };
-      assert { value x (i+1) + power radix (i+1) * cl = value ox (i+1) * y };
-      up <- C.incr up 1;
-      n <- n-1;
-      i <- i+1;
-    done;
-    cl
 
 
 end
