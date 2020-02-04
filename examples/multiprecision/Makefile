@@ -54,10 +54,16 @@ EXTRACTED = build/extracted build/sqrtinit.h build/binverttab.h
 
 extract: $(EXTRACTED)
 
-CFILES = z.c zadd.c zsub.c zmul.c zmul2exp.c zdiv2exp.c set.c get_str.c baseinfo.c powm.c fxp.c sqrt.c sqrt1.c toom.c div.c logical.c aliaslogical.c mul_basecase.c mul.c subold.c sub.c sub_1.c addold.c add.c add_1.c compare.c util.c int32.c
+CFILES = z.c zadd.c zsub.c zmul.c zmul2exp.c zdiv2exp.c set.c get_str.c baseinfo.c powm.c fxp.c sqrt.c sqrt1.c toom.c div.c logical.c aliaslogical.c mul_basecase.c sub.c sub_1.c add.c add_1.c compare.c util.c int32.c
+
+ifdef OVERLAY
+OVERLAYS = mul.h add.h sub.h
+else
+CFILES += mul.c addold.c subold.c
+endif
 
 build/libwmp.a: $(EXTRACTED)
-	cd build; gcc $(CFLAGS) -c $(CFILES)
+	cd build; gcc $(CFLAGS) $(OVERLAYS:%=-include ../overlays/%) -c $(CFILES)
 	ar rcs $@ $(addprefix build/,$(CFILES:.c=.o))
 
 build/tests: tests.c build/libwmp.a
