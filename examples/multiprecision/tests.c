@@ -153,7 +153,7 @@ void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
       if (bn >= n)
         {
           mp_ptr qp = alloca ((bn - n + 1) * sizeof(uint64_t));
-          wmpn_tdiv_qr (qp, rp, bp, bn, mp, n);
+          wmpn_tdiv_qr (qp, rp, 0L, bp, bn, mp, n);
           rn = n;
           normalize (rp, &rn);
         }
@@ -182,12 +182,14 @@ void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
 #define wmpz_powm mpz_powm
 #define wmpn_mul_n mpn_mul_n
 #ifdef TEST_GMP
-#define wmpn_tdiv_qr(q, r, x, sx, y, sy) mpn_tdiv_qr(q, r, 0, x, sx, y, sy)
+#define wmpn_tdiv_qr(q, r, qxn, x, sx, y, sy) \
+  mpn_tdiv_qr(q, r, qxn, x, sx, y, sy)
 #else
-#define wmpn_tdiv_qr(q, r, x, sx, y, sy) \
-do {                                     \
-  mpn_div_qr(q, x, sx, y, sy);           \
-  mpn_copyi(r,x,sy);                      \
+//FIXME can we avoid a copy?
+#define wmpn_tdiv_qr(q, r, qxn, x, sx, y, sy)    \
+do {                                             \
+  mpn_div_qr(q, x, sx, y, sy);                   \
+  mpn_copyi(r,x,sy);                             \
  } while (0)
 #endif
 #define wmpz_set_ui mpz_set_ui
@@ -216,7 +218,7 @@ void sqrmod (mp_ptr qp, mp_ptr tp, mpz_ptr y, mpz_ptr n)
   yp = PTR(y);
   np = PTR(n);
   wmpn_mul_n(tp, yp, yp, yn);
-  wmpn_tdiv_qr(qp, yp, tp, 2 * yn, np, nn);
+  wmpn_tdiv_qr(qp, yp, 0, tp, 2 * yn, np, nn);
   yn = nn;
   normalize(yp, &yn);
   wmpz_realloc(y, yn);
@@ -599,7 +601,7 @@ int main () {
                 mpn_div_qr (refq, refr, an, bp, bn);
 #endif
 #ifdef TEST_WHY3
-                wmpn_tdiv_qr(rq, rr, ap, an, bp, bn);
+                wmpn_tdiv_qr(rq, rr, 0, ap, an, bp, bn);
 #endif
 
 #ifdef BENCH

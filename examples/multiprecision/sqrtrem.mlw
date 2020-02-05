@@ -360,7 +360,7 @@ module Sqrt
       value_concat npl l n;
       assert { value npl n = n1 + power radix l * value onp' h };
       label DivS in
-      wmpn_tdiv_qr_in_place scratch npl n spl h;
+      wmpn_tdiv_qr_in_place scratch 0 npl n spl h;
       assert { n1 + power radix l * (r' - q * value spl h)
                = value scratch (l+1) * value spl h + value npl h };
       value_tail scratch l;

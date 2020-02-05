@@ -3848,13 +3848,14 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
         end
         end
 
-  let wmpn_tdiv_qr (q r x:t) (sx:int32) (y:t) (sy:int32) : unit
+  let wmpn_tdiv_qr (q r:t) (qxn:int32) (x:t) (sx:int32) (y:t) (sy:int32) : unit
     requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
     requires { valid x sx }
     requires { valid y sy }
     requires { valid q (sx - sy + 1) }
     requires { valid r sy }
     requires { writable q /\ writable r }
+    requires { qxn = 0 }
     requires { (pelts y)[y.offset + sy - 1] > 0 }
     ensures { value x sx
               = value q (sx - sy + 1) * value y sy
@@ -4498,12 +4499,14 @@ let wmpn_divrem_1 (q x:t) (sz:int32) (y:limb) : limb
         end
         end
 
-  let wmpn_tdiv_qr_in_place (q x:t) (sx:int32) (y:t) (sy:int32) : unit
+  let wmpn_tdiv_qr_in_place (q:t) (qxn:int32) (x:t) (sx:int32) (y:t) (sy:int32)
+      : unit
     requires { 1 <= sy <= sx <= (Int32.max_int32 - 1) }
     requires { valid x sx }
     requires { valid y sy }
     requires { valid q (sx - sy + 1) }
     requires { writable x /\ writable q }
+    requires { qxn = 0 }
     requires { (pelts y)[y.offset + sy - 1] > 0 }
     ensures { value (old x) sx
               = value q (sx - sy + 1) * value y sy
