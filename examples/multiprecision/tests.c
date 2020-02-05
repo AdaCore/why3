@@ -1028,6 +1028,7 @@ int main () {
   printf ("%g\n", elapsed);
 #endif
 #ifdef COMPARE
+  refc = mpz_millerrabin(prime,REPS);
   if (c != refc || c == 0)
     abort ();
   printf ("Miller-Rabin ok\n");
