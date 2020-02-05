@@ -117,6 +117,7 @@ void compare_mpz (mpz_ptr u, mpz_ptr v, mpz_ptr w, mpz_ptr refw,
     }
 }
 
+#ifdef TEST_MILLERRABIN
 #ifdef TEST_WHY3
 void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
   mp_ptr rp, tp;
@@ -288,6 +289,7 @@ static int wmpz_millerrabin (mpz_ptr n, int reps)
   gmp_randclear (rstate);
   return is_prime;
 }
+#endif //TEST_MILLERRABIN
 
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr, ep, rep, mp, tp;
@@ -307,7 +309,9 @@ int main () {
   struct timeval begin, end;
 #endif
   uint64_t a, c, refc;
+#ifdef TEST_MILLERRABIN
   gmp_randstate_t rands;
+#endif
   //TMP_DECL;
   //TMP_MARK;
 
