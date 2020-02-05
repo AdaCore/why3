@@ -1,6 +1,13 @@
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <time.h>
+#include <alloca.h>
+
 #if defined(TEST_GMP) || defined(TEST_WHY3) || defined(TEST_MINIGMP)
 #define BENCH
-#if !(defined(TEST_ADD) || defined(TEST_MUL) || defined(TEST_TOOM) || defined(TEST_DIV) || defined(TEST_SQRT1) || defined(TEST_SQRTREM) || defined(TEST_POWM) || defined(TEST_ZADD) || defined(TEST_ZSUB) || defined(TEST_ZMUL))
+#if !(defined(TEST_ADD) || defined(TEST_MUL) || defined(TEST_TOOM) || defined(TEST_DIV) || defined(TEST_SQRT1) || defined(TEST_SQRTREM) || defined(TEST_POWM) || defined(TEST_ZADD) || defined(TEST_ZSUB) || defined(TEST_ZMUL) || defined(TEST_MILLERRABIN))
 #error "missing TEST_foo macro definition"
 #endif
 #else
@@ -60,11 +67,6 @@ extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
 #endif
 
 #include "mt19937-64.c"
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <time.h>
 
 #define TMP_ALLOC_LIMBS(n) (mp_ptr)malloc((n) * 8)
 
@@ -115,7 +117,7 @@ void compare_mpz (mpz_ptr u, mpz_ptr v, mpz_ptr w, mpz_ptr refw,
     }
 }
 
-
+#ifdef TEST_WHY3
 void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
   mp_ptr rp, tp;
   mp_ptr bp, ep, mp;
@@ -177,6 +179,26 @@ void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
   wmpn_copyi (PTR(r), rp, rn);
   //  printf ("%d\n", rn);
 }
+#else
+#define wmpz_powm mpz_powm
+#define wmpn_mul_n mpn_mul_n
+#define wmpn_tdiv_qr(q, r, x, sx, y, sy) mpn_tdiv_qr(q, r, 0, x, sx, y, sy)
+#define wmpz_set_ui mpz_set_ui
+#define wmpz_tdiv_q_2exp mpz_tdiv_q_2exp
+#define wmpz_add_ui mpz_add_ui
+#define wmpz_sub_ui mpz_sub_ui
+#define wmpz_realloc mpz_realloc
+#define normalize(DST, NLIMBS) \
+  do {                                                                  \
+    while (*(NLIMBS) > 0)                                               \
+      {                                                                 \
+        if ((DST)[*(NLIMBS) - 1] != 0)                                  \
+          break;                                                        \
+        (*(NLIMBS))--;                                                  \
+      }                                                                 \
+  } while (0)
+
+#endif
 
 void wmpz_sqrmod (mp_ptr qp, mp_ptr tp, mpz_ptr y, mpz_ptr n)
 {
@@ -994,7 +1016,6 @@ int main () {
 #endif
 
 //TODO make sure we use same randstate
-#ifdef TEST_WHY3
 #ifdef BENCH
   elapsed = 0;
   gettimeofday(&begin, NULL);
@@ -1005,22 +1026,7 @@ int main () {
   elapsed =
     (end.tv_sec - begin.tv_sec) * 1000000.0
     + (end.tv_usec - begin.tv_usec);
-  printf ("WHY3: %g\n", elapsed);
-#endif
-#endif
-#ifdef TEST_GMP
-#ifdef BENCH
-  elapsed = 0;
-  gettimeofday(&begin, NULL);
-#endif
-  refc = mpz_millerrabin(prime,REPS);
-#ifdef BENCH
-  gettimeofday(&end, NULL);
-  elapsed =
-    (end.tv_sec - begin.tv_sec) * 1000000.0
-    + (end.tv_usec - begin.tv_usec);
-  printf ("WHY3: %g\n", elapsed);
-#endif
+  printf ("%g\n", elapsed);
 #endif
 #ifdef COMPARE
   if (c != refc || c == 0)

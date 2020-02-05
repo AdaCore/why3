@@ -86,9 +86,9 @@ build/gmp%bench: tests.c
 build/minigmp%bench: tests.c
 	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -o $@
 
-BENCHS = why3add why3mul why3toom why3div why3sqrtrem  why3powm gmpadd gmpmul gmptoom gmpdiv gmpsqrtrem gmppowm minigmpadd minigmpmul minigmpdiv minigmptoom
+BENCHS = add mul toom div sqrtrem powm millerrabin
 
-BENCHFILES = $(addprefix bench/, $(BENCHS))
+BENCHFILES = $(addprefix bench/why3, $(BENCHS)) $(addprefix bench/gmp, $(BENCHS)) $(addprefix bench/minigmp, $(BENCHS))
 
 $(BENCHFILES): bench/%: build/%bench
 	mkdir -p bench
