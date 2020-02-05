@@ -90,6 +90,22 @@ let abs_size_of [@extraction:inline] (x: mpz_ptr) : int32
   ensures { result = mpz.abs_size[x] }
 = abs (size_of x)
 
+end
+
+
+module Zutil
+
+use int.Int
+use int.Abs
+use mach.int.Int32
+use mach.c.C
+use map.Map
+use types.Types
+use lemmas.Lemmas
+use import mach.int.UInt64GMP as Limb
+use int.Power
+use Z
+
 (* Sets the size of an mpz_ptr, leaving other fields unchanged. *)
 val set_size (x:mpz_ptr) (sz:int32) (ghost p: ptr limb) : unit
   requires { mpz.zones[x] = zone p }

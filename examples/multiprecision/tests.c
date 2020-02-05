@@ -21,6 +21,7 @@
 #define TEST_ZADD
 #define TEST_ZSUB
 #define TEST_ZMUL
+#define TEST_MILLERRABIN
 #endif
 
 #ifdef TEST_MINIGMP
@@ -48,10 +49,14 @@ extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
 #include "build/toom.h"
 #include "build/sqrt1.h"
 #include "build/sqrt.h"
+#include "build/util.h"
 #include "build/powm.h"
+#include "build/zutil.h"
 #include "build/zadd.h"
 #include "build/zsub.h"
 #include "build/zmul.h"
+#include "build/set.h"
+#include "build/zdiv2exp.h"
 #endif
 
 #include "mt19937-64.c"
@@ -110,13 +115,169 @@ void compare_mpz (mpz_ptr u, mpz_ptr v, mpz_ptr w, mpz_ptr refw,
     }
 }
 
+
+void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
+  mp_ptr rp, tp;
+  mp_ptr bp, ep, mp;
+  int32_t es = SIZ(e);
+  int32_t n = SIZ(m);
+  int cnt;
+  int32_t rn, bn, en, itch;
+  mpz_t new_b;
+  mp = PTR(m);
+  //ASSUME: e > 0
+  //ASSUME: m odd
+  //ASSUME: m > 0
+  //ASSUME: b >= 0
+  if (es == 0)
+    {
+      SIZ(r) = n != 1 || mp[0] != 1;
+      PTR(r)[0] = 1;
+      return;
+    }
+  bn = SIZ(b);
+  if (bn == 0)
+    {
+      SIZ(r) = 0;
+      return;
+    }
+  ep = PTR(e);
+  en = es;
+  if (en == 1 && ep[0] == 1)
+    {
+      rp = alloca (n * sizeof(uint64_t));
+      bp = PTR(b);
+      if (bn >= n)
+        {
+          mp_ptr qp = alloca ((bn - n + 1) * sizeof(uint64_t));
+          wmpn_tdiv_qr (qp, rp, bp, bn, mp, n);
+          rn = n;
+          normalize (rp, &rn);
+        }
+      else
+        {
+          wmpn_copyi (rp, bp, bn);
+          rn = bn;
+        }
+      goto ret;
+    }
+  tp = alloca (3*n * sizeof(uint64_t));
+  rp = tp;
+  tp += n;
+  bp = PTR (b);
+  //  printf ("bn %d en %d n %d\n", bn, en, n);
+  if ((mp[0] & 1) == 0)
+    abort();
+  wmpn_powm (rp, bp, bn, ep, en, mp, n, tp);
+  rn = n;
+  normalize (rp, &rn);
+ ret:
+  wmpz_realloc(r, rn);
+  SIZ(r) = rn;
+  wmpn_copyi (PTR(r), rp, rn);
+  //  printf ("%d\n", rn);
+}
+
+void wmpz_sqrmod (mp_ptr qp, mp_ptr tp, mpz_ptr y, mpz_ptr n)
+{
+  int32_t yn, nn;
+  mp_ptr yp, np;
+  yn = SIZ(y);
+  nn = SIZ(n);
+  yp = PTR(y);
+  np = PTR(n);
+  wmpn_mul_n(tp, yp, yp, yn);
+  wmpn_tdiv_qr(qp, yp, tp, 2 * yn, np, nn);
+  yn = nn;
+  normalize(yp, &yn);
+  wmpz_realloc(y, yn);
+  SIZ(y) = yn;
+}
+
+static int do_millerrabin (mpz_ptr n, mpz_ptr nm1, mpz_ptr x, mpz_ptr y,
+                           mpz_ptr q, unsigned long int k,
+                           mp_ptr qp, mp_ptr tp)
+{
+  wmpz_powm (y,x,q,n);
+  if (mpz_cmp_ui (y, 1L) == 0 || mpz_cmp (y, nm1) == 0)
+    return 1;
+  for (unsigned long int i = 1; i < k; i++)
+    {
+      wmpz_sqrmod (qp, tp, y, n);
+      if (mpz_cmp (y, nm1) == 0)
+        return 1;
+      if (mpz_cmp_ui (y, 1L) <= 0)
+        return 0;
+    }
+  return 0;
+}
+
+#define MPZ_TMP_INIT(X, NLIMBS)						\
+  do {									\
+    mpz_ptr __x = (X);							\
+    __x->_mp_alloc = (NLIMBS);						\
+    __x->_mp_d = TMP_ALLOC_LIMBS (NLIMBS);				\
+  } while (0)
+
+static int wmpz_millerrabin (mpz_ptr n, int reps)
+{
+  int r;
+  mpz_t nm1, nm3, x, y, q;
+  mp_ptr qp, tp;
+  unsigned long int k;
+  gmp_randstate_t rstate;
+  int is_prime;
+  //  printf ("%d\n", SIZ(n));
+  MPZ_TMP_INIT(nm1,SIZ(n)+1);
+  wmpz_sub_ui (nm1, n, 1L);
+
+  MPZ_TMP_INIT(x, SIZ(n)+1);
+  MPZ_TMP_INIT(y, SIZ(n)+1); //TODO check
+
+  //ASSUME n > 0
+  //ASSUME n odd
+
+  wmpz_set_ui (x, 210L);
+  wmpz_powm (y, x, nm1, n);
+
+  if (mpz_cmp_ui (y, 1L) != 0)
+    {
+      return 0;
+    }
+
+  MPZ_TMP_INIT(q, SIZ(n));
+  k = mpz_scan1 (nm1, 0L);
+  wmpz_tdiv_q_2exp (q, nm1, k);
+
+  MPZ_TMP_INIT (nm3, SIZ(n) + 1);
+  wmpz_sub_ui (nm3, n, 3L);
+
+  gmp_randinit_default (rstate);
+
+  is_prime = 1;
+  qp = alloca ((SIZ(n) + 1) * sizeof(uint64_t));
+  tp = alloca ((2 * SIZ(n)) * sizeof(uint64_t));
+  for (r = 0; r < reps && is_prime; r++)
+    {
+      /* 2 to n-2 inclusive, don't want 1, 0 or -1 */
+      mpz_urandomm (x, rstate, nm3);
+      wmpz_add_ui (x, x, 2L);
+      is_prime = do_millerrabin(n, nm1, x, y, q, k, qp, tp);
+    }
+  gmp_randclear (rstate);
+  return is_prime;
+}
+
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr, ep, rep, mp, tp;
   mp_size_t max_n, max_add, max_mul, max_toom, max_div, max_sqrt, max_powm,
     an, bn, rn, cn;
-  mpz_t u, v, w, refw;
+  mpz_t u, v, w, refw, prime;
   int nb, nb_iter;
   double elapsed;
+  char sprime[] = "1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005537073003";
+  mpz_init(prime);
+  mpz_set_str(prime, sprime, 10);
   mpz_init(u);
   mpz_init(v);
   mpz_init(w);
@@ -125,14 +286,14 @@ int main () {
   struct timeval begin, end;
 #endif
   uint64_t a, c, refc;
-  //gmp_randstate_t rands;
+  gmp_randstate_t rands;
   //TMP_DECL;
   //TMP_MARK;
 
   //tests_start ();
   //TESTS_REPS (reps, argv, argc);
 
-  //gmp_randinit_default(rands);
+  
   //gmp_randseed_ui(rands, 42);
   /* Re-interpret reps argument as a size argument.  */
 
@@ -823,6 +984,50 @@ int main () {
 #ifdef COMPARE
   printf ("mpz multiplication ok\n");
 #endif
+#endif
+
+#ifdef TEST_MILLERRABIN
+#ifdef BENCH
+#define REPS 250
+#else
+#define REPS 25
+#endif
+
+//TODO make sure we use same randstate
+#ifdef TEST_WHY3
+#ifdef BENCH
+  elapsed = 0;
+  gettimeofday(&begin, NULL);
+#endif
+  c = wmpz_millerrabin(prime,REPS);
+#ifdef BENCH
+  gettimeofday(&end, NULL);
+  elapsed =
+    (end.tv_sec - begin.tv_sec) * 1000000.0
+    + (end.tv_usec - begin.tv_usec);
+  printf ("WHY3: %g\n", elapsed);
+#endif
+#endif
+#ifdef TEST_GMP
+#ifdef BENCH
+  elapsed = 0;
+  gettimeofday(&begin, NULL);
+#endif
+  refc = mpz_millerrabin(prime,REPS);
+#ifdef BENCH
+  gettimeofday(&end, NULL);
+  elapsed =
+    (end.tv_sec - begin.tv_sec) * 1000000.0
+    + (end.tv_usec - begin.tv_usec);
+  printf ("WHY3: %g\n", elapsed);
+#endif
+#endif
+#ifdef COMPARE
+  if (c != refc || c == 0)
+    abort ();
+  printf ("Miller-Rabin ok\n");
+#endif
+
 #endif
   //TMP_FREE;
   //tests_end ();
