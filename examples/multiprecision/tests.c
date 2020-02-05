@@ -184,10 +184,10 @@ void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
 #ifdef TEST_GMP
 #define wmpn_tdiv_qr(q, r, x, sx, y, sy) mpn_tdiv_qr(q, r, 0, x, sx, y, sy)
 #else
-#define wmpn_tdiv_qr(q, r, x, sx, y, sy)
-do {
-  mpn_div_qr(q, x, sx, y, sy);
-  mpn_copy(r,x,sy);
+#define wmpn_tdiv_qr(q, r, x, sx, y, sy) \
+do {                                     \
+  mpn_div_qr(q, x, sx, y, sy);           \
+  mpn_copyi(r,x,sy);                      \
  } while (0)
 #endif
 #define wmpz_set_ui mpz_set_ui
@@ -249,13 +249,40 @@ static int do_millerrabin (mpz_ptr n, mpz_ptr nm1, mpz_ptr x, mpz_ptr y,
     __x->_mp_d = TMP_ALLOC_LIMBS (NLIMBS);				\
   } while (0)
 
+void urandomm (mpz_t a, mpz_t upper)
+{
+  mp_ptr ap, up;
+  mp_size_t un;
+  uint64_t um;
+  int cnt;
+  un = SIZ(upper);
+  wmpz_realloc (a, un);
+  ap = PTR(a);
+  up = PTR(upper);
+  for (int i = 0; i < un; i++) {
+    ap[i] = genrand64_int64();
+  }
+  um = up[un-1];
+  if (um <= 1)
+    {
+      SIZ(a) = un - 1;
+      return;
+    }
+  cnt = __builtin_clz(up[un-1]);
+  ap[un-1] >>= cnt;
+  while (ap[un-1] >= um || ap[un-1] == 0) {
+    ap[un-1] = genrand64_int64();
+    ap[un-1] >>= cnt;
+  }
+  SIZ(a) = un;
+}
+
 static int wmpz_millerrabin (mpz_ptr n, int reps)
 {
   int r = 0;
   mpz_t nm1, nm3, x, y, q;
   mp_ptr qp, tp;
   unsigned long int k;
-  gmp_randstate_t rstate;
   int is_prime;
   //  printf ("%d\n", SIZ(n));
   MPZ_TMP_INIT(nm1,SIZ(n)+1);
@@ -282,26 +309,23 @@ static int wmpz_millerrabin (mpz_ptr n, int reps)
   MPZ_TMP_INIT (nm3, SIZ(n) + 1);
   wmpz_sub_ui (nm3, n, 3L);
 
-  gmp_randinit_default (rstate);
-
   is_prime = 1;
   qp = alloca ((SIZ(n) + 1) * sizeof(uint64_t));
   tp = alloca ((2 * SIZ(n)) * sizeof(uint64_t));
   for (r = 0; r < reps && is_prime; r++)
     {
       /* 2 to n-2 inclusive, don't want 1, 0 or -1 */
-      mpz_urandomm (x, rstate, nm3);
+      urandomm (x, nm3);
       wmpz_add_ui (x, x, 2L);
       is_prime = do_millerrabin(n, nm1, x, y, q, k, qp, tp);
     }
-  gmp_randclear (rstate);
  ret:
-  printf ("%d reps done\n", r);
+  if (r > 0) printf ("%d reps done", r);
   return r;
 }
 
-void mr_candidate (mpz_t c, gmp_randstate_t rands) {
-  mpz_urandomb (c, rands, 2048);
+void mr_candidate (mpz_t c) {
+  init_mpz_1(c, 32);
   mpz_setbit (c, 0);
 }
 
@@ -323,17 +347,14 @@ int main () {
   struct timeval begin, end;
 #endif
   uint64_t a, c, refc;
-#ifdef TEST_MILLERRABIN
-  gmp_randstate_t rands;
-  gmp_randinit_default(rands);
-#endif
+
   //TMP_DECL;
   //TMP_MARK;
 
   //tests_start ();
   //TESTS_REPS (reps, argv, argc);
 
-  
+
   //gmp_randseed_ui(rands, 42);
   /* Re-interpret reps argument as a size argument.  */
 
@@ -1027,18 +1048,21 @@ int main () {
 #endif
 
 #ifdef TEST_MILLERRABIN
-#define REPS 250
-  nb_iter = 20;
+#define REPS 25
+  nb_iter = 1000;
 //TODO make sure we use same randstate
   elapsed = 0;
+  int i = 0;
 #ifdef BENCH
-  for (int i = 0; i < nb_iter; i++) {
+  for (i = 0; i < nb_iter; i++) {
 #endif
-    mr_candidate(cp, rands);
+    mr_candidate(cp);
 #ifdef BENCH
     gettimeofday(&begin, NULL);
 #endif
     c = wmpz_millerrabin(cp,REPS);
+    if (c > 0)
+      printf (" at step %d\n", i);
 #ifdef BENCH
     gettimeofday(&end, NULL);
     elapsed +=
