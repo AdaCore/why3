@@ -196,7 +196,7 @@ mpz_ptr wmpz_init () {\n\
   mpz_ptr x = malloc(sizeof(__mpz_struct));\n\
   ALLOC(x) = 1;\n\
   SIZ(x) = 0;\n\
-  PTR(x) = malloc(1);\n\
+  PTR(x) = malloc(sizeof(uint64_t));\n\
   PTR(x)[0] = 0;\n\
   return x;\n\
 }\n\
