@@ -181,7 +181,15 @@ void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
 #else
 #define wmpz_powm mpz_powm
 #define wmpn_mul_n mpn_mul_n
+#ifdef TEST_GMP
 #define wmpn_tdiv_qr(q, r, x, sx, y, sy) mpn_tdiv_qr(q, r, 0, x, sx, y, sy)
+#else
+#define wmpn_tdiv_qr(q, r, x, sx, y, sy)
+do {
+  mpn_div_qr(q, x, sx, y, sy);
+  mpn_copy(r,x,sy);
+ } while (0)
+#endif
 #define wmpz_set_ui mpz_set_ui
 #define wmpz_tdiv_q_2exp mpz_tdiv_q_2exp
 #define wmpz_add_ui mpz_add_ui
@@ -243,7 +251,7 @@ static int do_millerrabin (mpz_ptr n, mpz_ptr nm1, mpz_ptr x, mpz_ptr y,
 
 static int wmpz_millerrabin (mpz_ptr n, int reps)
 {
-  int r;
+  int r = 0;
   mpz_t nm1, nm3, x, y, q;
   mp_ptr qp, tp;
   unsigned long int k;
@@ -264,7 +272,7 @@ static int wmpz_millerrabin (mpz_ptr n, int reps)
 
   if (mpz_cmp_ui (y, 1L) != 0)
     {
-      return 0;
+      goto ret;
     }
 
   MPZ_TMP_INIT(q, SIZ(n));
@@ -287,20 +295,26 @@ static int wmpz_millerrabin (mpz_ptr n, int reps)
       is_prime = do_millerrabin(n, nm1, x, y, q, k, qp, tp);
     }
   gmp_randclear (rstate);
-  return is_prime;
+ ret:
+  printf ("%d reps done\n", r);
+  return r;
 }
+
+void mr_candidate (mpz_t c, gmp_randstate_t rands) {
+  mpz_urandomb (c, rands, 2048);
+  mpz_setbit (c, 0);
+}
+
 #endif //TEST_MILLERRABIN
 
 int main () {
   mp_ptr ap, bp, rp, refp, rq, rr, refq, refr, ep, rep, mp, tp;
   mp_size_t max_n, max_add, max_mul, max_toom, max_div, max_sqrt, max_powm,
     an, bn, rn, cn;
-  mpz_t u, v, w, refw, prime;
+  mpz_t u, v, w, refw, cp;
   int nb, nb_iter;
   double elapsed;
-  char sprime[] = "1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005537073003";
-  mpz_init(prime);
-  mpz_set_str(prime, sprime, 10);
+  mpz_init(cp);
   mpz_init(u);
   mpz_init(v);
   mpz_init(w);
@@ -311,6 +325,7 @@ int main () {
   uint64_t a, c, refc;
 #ifdef TEST_MILLERRABIN
   gmp_randstate_t rands;
+  gmp_randinit_default(rands);
 #endif
   //TMP_DECL;
   //TMP_MARK;
@@ -1012,28 +1027,29 @@ int main () {
 #endif
 
 #ifdef TEST_MILLERRABIN
-#ifdef BENCH
 #define REPS 250
-#else
-#define REPS 25
-#endif
-
+  nb_iter = 20;
 //TODO make sure we use same randstate
-#ifdef BENCH
   elapsed = 0;
-  gettimeofday(&begin, NULL);
-#endif
-  c = wmpz_millerrabin(prime,REPS);
 #ifdef BENCH
-  gettimeofday(&end, NULL);
-  elapsed =
-    (end.tv_sec - begin.tv_sec) * 1000000.0
-    + (end.tv_usec - begin.tv_usec);
+  for (int i = 0; i < nb_iter; i++) {
+#endif
+    mr_candidate(cp, rands);
+#ifdef BENCH
+    gettimeofday(&begin, NULL);
+#endif
+    c = wmpz_millerrabin(cp,REPS);
+#ifdef BENCH
+    gettimeofday(&end, NULL);
+    elapsed +=
+      (end.tv_sec - begin.tv_sec) * 1000000.0
+      + (end.tv_usec - begin.tv_usec);
+  }
   printf ("%g\n", elapsed);
 #endif
 #ifdef COMPARE
-  refc = mpz_millerrabin(prime,REPS);
-  if (c != refc || c == 0)
+  refc = mpz_millerrabin(cp,REPS);
+  if (c != refc)
     abort ();
   printf ("Miller-Rabin ok\n");
 #endif
