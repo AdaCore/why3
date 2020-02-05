@@ -168,8 +168,6 @@ void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
   tp += n;
   bp = PTR (b);
   //  printf ("bn %d en %d n %d\n", bn, en, n);
-  if ((mp[0] & 1) == 0)
-    abort();
   wmpn_powm (rp, bp, bn, ep, en, mp, n, tp);
   rn = n;
   normalize (rp, &rn);
@@ -200,7 +198,7 @@ void wmpz_powm (mpz_ptr r, mpz_ptr b, mpz_ptr e, mpz_ptr m) {
 
 #endif
 
-void wmpz_sqrmod (mp_ptr qp, mp_ptr tp, mpz_ptr y, mpz_ptr n)
+void sqrmod (mp_ptr qp, mp_ptr tp, mpz_ptr y, mpz_ptr n)
 {
   int32_t yn, nn;
   mp_ptr yp, np;
@@ -225,7 +223,8 @@ static int do_millerrabin (mpz_ptr n, mpz_ptr nm1, mpz_ptr x, mpz_ptr y,
     return 1;
   for (unsigned long int i = 1; i < k; i++)
     {
-      wmpz_sqrmod (qp, tp, y, n);
+      sqrmod (qp, tp, y, n);
+      // mpz_powm_ui(y,2,n);
       if (mpz_cmp (y, nm1) == 0)
         return 1;
       if (mpz_cmp_ui (y, 1L) <= 0)
