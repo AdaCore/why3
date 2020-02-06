@@ -370,7 +370,7 @@ int main () {
 #else
   init_genrand64((unsigned long long)time(NULL));
 #endif
-  max_n = 1000;
+  max_n = 10000;
   max_add = 50;
   max_mul = 20;
   max_toom = 95;
@@ -687,7 +687,7 @@ int main () {
       //an = (bn * 3) / 2;
       an = 6 * bn;
       elapsed = 0;
-      nb_iter = 300;
+      nb_iter = 100;
       for (int iter = 0; iter != nb_iter; ++iter) {
         init_valid (ap, bp, an, bn);
         nb = 5000 / bn;
