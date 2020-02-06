@@ -63,6 +63,7 @@ extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
 #include "build/zsub.h"
 #include "build/zmul.h"
 #include "build/set.h"
+#include "build/zcmp.h"
 #include "build/zdiv2exp.h"
 #endif
 
@@ -192,6 +193,8 @@ do {                                             \
   mpn_copyi(r,x,sy);                             \
  } while (0)
 #endif
+#define wmpz_cmp mpz_cmp
+#define wmpz_cmp_ui mpz_cmp_ui
 #define wmpz_set_ui mpz_set_ui
 #define wmpz_tdiv_q_2exp mpz_tdiv_q_2exp
 #define wmpz_add_ui mpz_add_ui
@@ -230,15 +233,15 @@ static int do_millerrabin (mpz_ptr n, mpz_ptr nm1, mpz_ptr x, mpz_ptr y,
                            mp_ptr qp, mp_ptr tp)
 {
   wmpz_powm (y,x,q,n);
-  if (mpz_cmp_ui (y, 1L) == 0 || mpz_cmp (y, nm1) == 0)
+  if (wmpz_cmp_ui (y, 1L) == 0 || wmpz_cmp (y, nm1) == 0)
     return 1;
   for (unsigned long int i = 1; i < k; i++)
     {
       sqrmod (qp, tp, y, n);
       // mpz_powm_ui(y,2,n);
-      if (mpz_cmp (y, nm1) == 0)
+      if (wmpz_cmp (y, nm1) == 0)
         return 1;
-      if (mpz_cmp_ui (y, 1L) <= 0)
+      if (wmpz_cmp_ui (y, 1L) <= 0)
         return 0;
     }
   return 0;
@@ -299,7 +302,7 @@ static int wmpz_millerrabin (mpz_ptr n, int reps)
   wmpz_set_ui (x, 210L);
   wmpz_powm (y, x, nm1, n);
 
-  if (mpz_cmp_ui (y, 1L) != 0)
+  if (wmpz_cmp_ui (y, 1L) != 0)
     {
       goto ret;
     }
