@@ -325,12 +325,12 @@ static int wmpz_millerrabin (mpz_ptr n, int reps)
       is_prime = do_millerrabin(n, nm1, x, y, q, k, qp, tp);
     }
  ret:
-  if (r > 0) printf ("%d reps done", r);
+  //  if (r > 0) printf ("%d reps done", r);
   return r;
 }
 
-void mr_candidate (mpz_t c) {
-  init_mpz_1(c, 32);
+void mr_candidate (mpz_t c, int len) {
+  init_mpz_1(c, len);
   mpz_setbit (c, 0);
 }
 
@@ -1054,35 +1054,38 @@ int main () {
 
 #ifdef TEST_MILLERRABIN
 #define REPS 25
-  nb_iter = 1000;
-//TODO make sure we use same randstate
+  nb_iter = 100;
   elapsed = 0;
   int i = 0;
+  int len;
+  for (len = 16; len <= 48; len++){
 #ifdef BENCH
-  for (i = 0; i < nb_iter; i++) {
+    for (i = 0; i < nb_iter; i++) {
 #endif
-    mr_candidate(cp);
+      mr_candidate(cp, len);
 #ifdef BENCH
-    gettimeofday(&begin, NULL);
+      gettimeofday(&begin, NULL);
 #endif
-    c = wmpz_millerrabin(cp,REPS);
-    if (c > 0)
-      printf (" at step %d\n", i);
+      c = wmpz_millerrabin(cp,REPS);
+      //   if (c > 0)
+      //printf (" at step %d\n", i);
 #ifdef BENCH
-    gettimeofday(&end, NULL);
-    elapsed +=
-      (end.tv_sec - begin.tv_sec) * 1000000.0
-      + (end.tv_usec - begin.tv_usec);
-  }
-  printf ("%g\n", elapsed);
+      gettimeofday(&end, NULL);
+      elapsed +=
+        (end.tv_sec - begin.tv_sec) * 1000000.0
+        + (end.tv_usec - begin.tv_usec);
+    }
+    printf ("%d   %g\n", len, elapsed);
 #endif
 #ifdef COMPARE
-  refc = mpz_millerrabin(cp,REPS);
-  if (c != refc)
-    abort ();
+    refc = mpz_millerrabin(cp,REPS);
+    if (c != refc)
+      abort ();
+#endif
+  }
+#ifdef COMPARE
   printf ("Miller-Rabin ok\n");
 #endif
-
 #endif
   //TMP_FREE;
   //tests_end ();
