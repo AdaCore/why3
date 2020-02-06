@@ -18,7 +18,7 @@ else
 endif
 
 ifdef GMP_LIB
-  GMPFLAGS = -I$(GMP_DIR) -L$(GMP_LIB)
+  GMPFLAGS = -I$(GMP_LIB)/include -L$(GMP_LIB)/lib
 endif
 
 CFLAGS += -Wall -Wno-unused -g -std=c11 -Wno-pedantic
@@ -84,21 +84,28 @@ build/why3%bench: tests.c build/libwmp.a
 build/lib%bench: tests.c distrib/libwmp.a
 	gcc $(CFLAGS) -DTEST_LIB -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Irandom -Idistrib -Ldistrib -lwmp -lgmp -o $@
 
-build/gmp%bench: tests.c
+build/gmp%bench: tests.c build/libwmp.a
 	gcc $(CFLAGS) $(GMPFLAGS) -DTEST_GMP -DTEST_$(UPPER) tests.c -Iinclude -Irandom -lgmp -o $@
 
-build/minigmp%bench: tests.c
+build/minigmp%bench: tests.c build/libwmp.a
 	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -o $@
 
-BENCHS = add mul toom div sqrtrem powm millerrabin
+BENCHS = toomb toomm toomu #sqrtrem millerrabin #add mul div powm
 
-BENCHFILES = $(addprefix bench/why3, $(BENCHS)) $(addprefix bench/gmp, $(BENCHS)) $(addprefix bench/minigmp, $(BENCHS))
+
+WHY3BENCHFILES = $(addprefix bench/why3, $(BENCHS))
+GMPBENCHFILES = $(addprefix bench/gmp, $(BENCHS))
+MINIGMPBENCHFILES = $(addprefix bench/minigmp, $(BENCHS))
+BENCHFILES = $(WHY3BENCHFILES) $(GMPBENCHFILES) $(MINIGMPBENCHFILES)
 
 $(BENCHFILES): bench/%: build/%bench
 	mkdir -p bench
 	$< > $@
 
-benchs: $(BENCHFILES)
+why3benchs: $(WHY3BENCHFILES)
+gmpbenchs: $(GMPBENCHFILES)
+minigmpbenchs: $(MINIGMPBENCHFILES)
+benchs: why3benchs gmpbenchs minigmpbenchs
 
 plots: $(BENCHFILES)
 	make all -C plots

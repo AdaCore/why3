@@ -7,7 +7,7 @@
 
 #if defined(TEST_GMP) || defined(TEST_WHY3) || defined(TEST_MINIGMP)
 #define BENCH
-#if !(defined(TEST_ADD) || defined(TEST_MUL) || defined(TEST_TOOM) || defined(TEST_DIV) || defined(TEST_SQRT1) || defined(TEST_SQRTREM) || defined(TEST_POWM) || defined(TEST_ZADD) || defined(TEST_ZSUB) || defined(TEST_ZMUL) || defined(TEST_MILLERRABIN))
+#if !(defined(TEST_ADD) || defined(TEST_MUL) || defined(TEST_TOOMB) || defined(TEST_TOOMM) || defined(TEST_TOOMU) || defined(TEST_DIV) || defined(TEST_SQRT1) || defined(TEST_SQRTREM) || defined(TEST_POWM) || defined(TEST_ZADD) || defined(TEST_ZSUB) || defined(TEST_ZMUL) || defined(TEST_MILLERRABIN))
 #error "missing TEST_foo macro definition"
 #endif
 #else
@@ -20,7 +20,9 @@
 #endif
 #define TEST_ADD
 #define TEST_MUL
-#define TEST_TOOM
+#define TEST_TOOMB
+#define TEST_TOOMM
+#define TEST_TOOMU
 #define TEST_DIV
 #define TEST_SQRT1
 #define TEST_SQRTREM
@@ -517,7 +519,7 @@ int main () {
 #endif
 #endif
 
-#ifdef TEST_TOOM
+#ifdef TEST_TOOMB
 #ifdef BENCH
   printf ("#an bn t(µs)\n");
 #endif
@@ -571,10 +573,275 @@ int main () {
 #endif
       //free(ws);
     }
+  for (; bn <= max_toom * 2; bn += 10)
+    {
+      //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
+      //an = (bn * 3) / 2;
+      an = bn;
+      elapsed = 0;
+      nb_iter = 500;
+      for (int iter = 0; iter != nb_iter; ++iter) {
+        init_valid (ap, bp, an, bn);
+        nb = 5000 / bn;
+#ifdef BENCH
+        gettimeofday(&begin, NULL);
+        for (int i = 0, maxi = nb; i != maxi; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpn_mul (refp, ap, an, bp, bn);
+#endif
+#ifdef TEST_WHY3
+            wmpn_mul (rp, ap, an, bp, bn);
+#endif
+
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec) * 1000000.0
+          + (end.tv_usec - begin.tv_usec);
+#endif
+      }
+      elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+      printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
+#endif
 #ifdef COMPARE
-  printf ("toom ok\n");
+      rn = an + bn;
+      if (mpn_cmp (refp, rp, rn))
+        {
+          printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+                  (int) an, (int) bn, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("b: "); mpn_dump (bp, bn);
+          printf ("r:   "); mpn_dump (rp, rn);
+          printf ("ref: "); mpn_dump (refp, rn);
+          abort();
+        }
 #endif
+      //free(ws);
+    }
+#ifdef COMPARE
+  printf ("balanced toom ok\n");
 #endif
+#endif //TOOMB
+
+#ifdef TEST_TOOMM
+#ifdef BENCH
+  printf ("#an bn t(µs)\n");
+#endif
+
+  for (bn = 35; bn <= max_toom; bn += 2)
+    {
+      //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
+      //an = (bn * 3) / 2;
+      an = 6 * bn;
+      elapsed = 0;
+      nb_iter = 300;
+      for (int iter = 0; iter != nb_iter; ++iter) {
+        init_valid (ap, bp, an, bn);
+        nb = 5000 / bn;
+#ifdef BENCH
+        gettimeofday(&begin, NULL);
+        for (int i = 0, maxi = nb; i != maxi; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpn_mul (refp, ap, an, bp, bn);
+#endif
+#ifdef TEST_WHY3
+            wmpn_mul (rp, ap, an, bp, bn);
+#endif
+
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec) * 1000000.0
+          + (end.tv_usec - begin.tv_usec);
+#endif
+      }
+      elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+      printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
+#endif
+#ifdef COMPARE
+      rn = an + bn;
+      if (mpn_cmp (refp, rp, rn))
+        {
+          printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+                  (int) an, (int) bn, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("b: "); mpn_dump (bp, bn);
+          printf ("r:   "); mpn_dump (rp, rn);
+          printf ("ref: "); mpn_dump (refp, rn);
+          abort();
+        }
+#endif
+      //free(ws);
+    }
+  for (; bn <= max_toom * 2; bn += 10)
+    {
+      //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
+      //an = (bn * 3) / 2;
+      an = 6 * bn;
+      elapsed = 0;
+      nb_iter = 300;
+      for (int iter = 0; iter != nb_iter; ++iter) {
+        init_valid (ap, bp, an, bn);
+        nb = 5000 / bn;
+#ifdef BENCH
+        gettimeofday(&begin, NULL);
+        for (int i = 0, maxi = nb; i != maxi; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpn_mul (refp, ap, an, bp, bn);
+#endif
+#ifdef TEST_WHY3
+            wmpn_mul (rp, ap, an, bp, bn);
+#endif
+
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec) * 1000000.0
+          + (end.tv_usec - begin.tv_usec);
+#endif
+      }
+      elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+      printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
+#endif
+#ifdef COMPARE
+      rn = an + bn;
+      if (mpn_cmp (refp, rp, rn))
+        {
+          printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+                  (int) an, (int) bn, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("b: "); mpn_dump (bp, bn);
+          printf ("r:   "); mpn_dump (rp, rn);
+          printf ("ref: "); mpn_dump (refp, rn);
+          abort();
+        }
+#endif
+      //free(ws);
+    }
+#ifdef COMPARE
+  printf ("medium toom ok\n");
+#endif
+#endif //TOOMM
+
+#ifdef TEST_TOOMU
+#ifdef BENCH
+  printf ("#an bn t(µs)\n");
+#endif
+
+  for (bn = 35; bn <= max_toom; bn += 2)
+    {
+      //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
+      //an = (bn * 3) / 2;
+      an = 24 * bn;
+      elapsed = 0;
+      nb_iter = 100;
+      for (int iter = 0; iter != nb_iter; ++iter) {
+        init_valid (ap, bp, an, bn);
+        nb = 5000 / bn;
+#ifdef BENCH
+        gettimeofday(&begin, NULL);
+        for (int i = 0, maxi = nb; i != maxi; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpn_mul (refp, ap, an, bp, bn);
+#endif
+#ifdef TEST_WHY3
+            wmpn_mul (rp, ap, an, bp, bn);
+#endif
+
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec) * 1000000.0
+          + (end.tv_usec - begin.tv_usec);
+#endif
+      }
+      elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+      printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
+#endif
+#ifdef COMPARE
+      rn = an + bn;
+      if (mpn_cmp (refp, rp, rn))
+        {
+          printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+                  (int) an, (int) bn, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("b: "); mpn_dump (bp, bn);
+          printf ("r:   "); mpn_dump (rp, rn);
+          printf ("ref: "); mpn_dump (refp, rn);
+          abort();
+        }
+#endif
+      //free(ws);
+    }
+  for (; bn <= max_toom * 2; bn += 10)
+    {
+      //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
+      //an = (bn * 3) / 2;
+      an = 24 * bn;
+      elapsed = 0;
+      nb_iter = 100;
+      for (int iter = 0; iter != nb_iter; ++iter) {
+        init_valid (ap, bp, an, bn);
+        nb = 5000 / bn;
+#ifdef BENCH
+        gettimeofday(&begin, NULL);
+        for (int i = 0, maxi = nb; i != maxi; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            mpn_mul (refp, ap, an, bp, bn);
+#endif
+#ifdef TEST_WHY3
+            wmpn_mul (rp, ap, an, bp, bn);
+#endif
+
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec) * 1000000.0
+          + (end.tv_usec - begin.tv_usec);
+#endif
+      }
+      elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+      printf ("%d %d %g\n", (int)an, (int)bn, elapsed);
+#endif
+#ifdef COMPARE
+      rn = an + bn;
+      if (mpn_cmp (refp, rp, rn))
+        {
+          printf ("ERROR, an = %d, bn = %d, rn = %d\n",
+                  (int) an, (int) bn, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("b: "); mpn_dump (bp, bn);
+          printf ("r:   "); mpn_dump (rp, rn);
+          printf ("ref: "); mpn_dump (refp, rn);
+          abort();
+        }
+#endif
+      //free(ws);
+    }
+#ifdef COMPARE
+  printf ("unbalanced toom ok\n");
+#endif
+#endif //TOOMU
 
 #ifdef TEST_DIV
 #ifdef BENCH
