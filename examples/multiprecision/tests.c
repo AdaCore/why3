@@ -370,7 +370,7 @@ int main () {
 #else
   init_genrand64((unsigned long long)time(NULL));
 #endif
-  max_n = 10000;
+  max_n = 100000;
   max_add = 50;
   max_mul = 20;
   max_toom = 95;
@@ -573,7 +573,7 @@ int main () {
 #endif
       //free(ws);
     }
-  for (; bn <= max_toom * 2; bn += 10)
+  for (; bn <= max_toom * 5; bn += 50)
     {
       //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
       //an = (bn * 3) / 2;
@@ -681,7 +681,7 @@ int main () {
 #endif
       //free(ws);
     }
-  for (; bn <= max_toom * 2; bn += 10)
+  for (; bn <= max_toom * 5; bn += 50)
     {
       //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
       //an = (bn * 3) / 2;
@@ -789,7 +789,7 @@ int main () {
 #endif
       //free(ws);
     }
-  for (; bn <= max_toom * 2; bn += 10)
+  for (; bn <= max_toom * 5; bn += 50)
     {
       //mp_ptr ws = TMP_ALLOC_LIMBS(9 * bn / 2 + 32);
       //an = (bn * 3) / 2;
@@ -977,6 +977,76 @@ int main () {
 #endif
   bn=1;
   for (an = 1; an <= max_sqrt; an += 1)
+    {
+      elapsed = 0;
+      nb_iter = 1000;
+      for (int iter = 0; iter != nb_iter; ++iter) {
+        init_valid (bp, ap, 1, an);
+#ifdef TEST_MINIGMP
+        mpn_copyi(refr, ap, an);
+#endif
+#ifdef BENCH
+        gettimeofday(&begin, NULL);
+        nb = 1500 / an;
+        for (int i = 0; i != nb; ++i)
+          {
+#endif
+#if defined(TEST_GMP) || defined(TEST_MINIGMP)
+            rn = mpn_sqrtrem(refq, refr, ap, an);
+#endif
+#ifdef TEST_WHY3
+            cn = wmpn_sqrtrem(rq, rr, ap, an);
+#endif
+
+#ifdef BENCH
+          }
+        gettimeofday(&end, NULL);
+        elapsed +=
+          (end.tv_sec - begin.tv_sec) * 1000000.0
+          + (end.tv_usec - begin.tv_usec);
+#endif
+      }
+      elapsed = elapsed / (nb * nb_iter);
+#ifdef BENCH
+      printf ("%d %g\n", (int)an, elapsed);
+#endif
+#ifdef COMPARE
+      if (cn != rn)
+        {
+          printf ("ERROR, an = %d, expected rn = %d, actual rn = %d\n",
+                  (int) an, (int) rn, (int) cn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("s: "); mpn_dump (rq, (an+1)/2);
+          printf ("refs: "); mpn_dump (refq, (an+1)/2);
+          printf ("r: "); mpn_dump (rr, cn);
+          printf ("refr: "); mpn_dump (refr, rn);
+          abort ();
+        }
+      if (mpn_cmp (refr, rr, rn))
+        {
+          printf ("ERROR, an = %d, rn = %d\n",
+                  (int) an, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("s: "); mpn_dump (rq, (an+1)/2);
+          printf ("refs: "); mpn_dump (refq, (an+1)/2);
+          printf ("r: "); mpn_dump (rr, rn);
+          printf ("refr: "); mpn_dump (refr, rn);
+          abort();
+        }
+      if (mpn_cmp (refq, rq, (an+1)/2))
+        {
+          printf ("ERROR, an = %d, rn = %d\n",
+                  (int) an, (int) rn);
+          printf ("a: "); mpn_dump (ap, an);
+          printf ("s: "); mpn_dump (rq, (an+1)/2);
+          printf ("refs: "); mpn_dump (refq, (an+1)/2);
+          printf ("r: "); mpn_dump (rr, rn);
+          printf ("refr: "); mpn_dump (refr, rn);
+          abort();
+        }
+#endif
+    }
+  for (; an <= 10 * max_sqrt; an += 40)
     {
       elapsed = 0;
       nb_iter = 1000;
@@ -1321,11 +1391,37 @@ int main () {
 
 #ifdef TEST_MILLERRABIN
 #define REPS 25
-  nb_iter = 100;
+  nb_iter = 50;
   elapsed = 0;
   int i = 0;
   int len;
   for (len = 16; len <= 48; len++){
+#ifdef BENCH
+    for (i = 0; i < nb_iter; i++) {
+#endif
+      mr_candidate(cp, len);
+#ifdef BENCH
+      gettimeofday(&begin, NULL);
+#endif
+      c = wmpz_millerrabin(cp,REPS);
+      //   if (c > 0)
+      //printf (" at step %d\n", i);
+#ifdef BENCH
+      gettimeofday(&end, NULL);
+      elapsed +=
+        (end.tv_sec - begin.tv_sec) * 1000000.0
+        + (end.tv_usec - begin.tv_usec);
+    }
+    printf ("%d   %g\n", len, elapsed);
+#endif
+#ifdef COMPARE
+    refc = mpz_millerrabin(cp,REPS);
+    if (c != refc)
+      abort ();
+#endif
+  }
+
+  for (len = 60; len <= 240; len += 40){
 #ifdef BENCH
     for (i = 0; i < nb_iter; i++) {
 #endif
