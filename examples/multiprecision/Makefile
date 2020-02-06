@@ -1,4 +1,5 @@
 BENCH ?= no
+OVERLAY ?= no
 
 ifeq ($(BENCH),yes)
   WHY3=../../bin/why3.opt
@@ -56,14 +57,17 @@ extract: $(EXTRACTED)
 
 CFILES = zutil.c z.c zadd.c zsub.c zmul.c zmul2exp.c zdiv2exp.c set.c get_str.c baseinfo.c powm.c fxp.c sqrt.c sqrt1.c toom.c div.c logical.c aliaslogical.c mul_basecase.c sub.c sub_1.c add.c add_1.c compare.c util.c int32.c
 
-ifdef OVERLAY
-OVERLAYS = mul.h add.h sub.h
-else
+ifneq ($(OVERLAY),gmp)
 CFILES += mul.c addold.c subold.c
 endif
 
+gmp_INCLUDES = mul.h add.h sub.h
+mini_INCLUDES = uint64gmp.h
+no_INCLUDES =
+INCLUDES = $($(OVERLAY)_INCLUDES)
+
 build/libwmp.a: $(EXTRACTED)
-	cd build; gcc $(CFLAGS) $(OVERLAYS:%=-include ../overlays/%) -c $(CFILES)
+	cd build; gcc $(CFLAGS) $(INCLUDES:%=-include ../overlays/%) -c $(CFILES)
 	ar rcs $@ $(addprefix build/,$(CFILES:.c=.o))
 
 build/tests: tests.c build/libwmp.a
