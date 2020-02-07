@@ -12,15 +12,17 @@ module Sqrt
   use types.Types
   use lemmas.Lemmas
   use compare.Compare
-  use util.Util
+  use util.UtilOld
   use add_1.Add_1
   use add.AddOld
   use sub_1.Sub_1
   use sub.SubOld
   use mul.Mul
+  use logical.LogicalUtil
   use logical.Logical
   use div.Div
   use sqrt.Sqrt1
+  use ptralias.Alias
 
   use real.ExpLog (* have to use real to be able to remove log2/log10... *)
   meta remove_logic function log10 (* kills CVC3 *)
@@ -404,7 +406,7 @@ module Sqrt
                so sh = c + 2 * q
                so value scratch l = c + 2 * q + radix * st
                   = c + 2 * (q + power 2 (Limb.length - 1) * st) };
-      let ghost r = wmpn_rshift sp scratch l 1 in
+      let ghost r = wmpn_rshift_sep sp scratch l 1 in
       label Div2 in
       assert { 2 * value sp l + c = value scratch l
                by r + radix * value sp l = value scratch l * power 2 (Limb.length - 1)
@@ -453,7 +455,12 @@ module Sqrt
       assert { n1 + power radix l * r'
                = 2 * value spl h * (value sp l + power radix l * q)
                  + value spl h * c
-                 + value npl h };
+                 + value npl h
+               by 2 * value spl h * (value sp l + power radix l * q)
+                  + value spl h * c
+                  = value spl h * (2 * (value sp l + power radix l * q) + c)
+                  = value spl h
+                    * (value scratch l + power radix l * (q at Div2)) };
       assert { value npl h < value spl h };
       begin
         ensures { n1 + power radix l * r'
@@ -866,6 +873,7 @@ module Sqrt
     ensures  { 0 <= result <= n }
     ensures  { value rp result <= 2 * value sp (ceilhalf n) }
     ensures  { result > 0 -> (pelts rp)[offset rp + result - 1] > 0 }
+    ensures  { forall j. (pelts np)[j] = old (pelts np)[j] }
     ensures  { max np = old max np }
     ensures  { min np = old min np }
     ensures  { plength np = old plength np }
@@ -877,6 +885,7 @@ module Sqrt
     ensures  { plength sp = old plength sp }
     variant  { n }
   =
+    label Start in
     let ghost k = ceilhalf (int32'int n) in
     let high = C.get_ofs np (n-1) in
     let ref c = (of_int32 (count_leading_zeros high)) / 2 in
@@ -943,6 +952,9 @@ module Sqrt
             ensures { 4 * value tp (n+adj) >= power radix (n+adj) }
             ensures { max tp = old max tp }
             ensures { plength tp = old plength tp }
+            ensures { min np = old min np /\ max np = old max np
+                      /\ plength np = old plength np }
+            ensures  { forall j. (pelts np)[j] = old (pelts np)[j] }
         assert { value tp adj = 0
                  by value tp 1 = 0
                  so adj = 0 \/ adj = 1 };
@@ -965,7 +977,11 @@ module Sqrt
                       < power 2 (2 * c) * power radix (n-1)
                         + power radix (n-1) * (radix - power 2 (2 * c))
                       = power radix (n-1) * radix = power radix n };
-          let ghost h = wmpn_lshift tpa np n (2 * c) in
+          label Shift in
+          let ghost h = wmpn_lshift_sep tpa np n (2 * c) in
+          value_sub_frame (pelts np) (pure { pelts np at Shift })
+                          (offset np) (offset np + int32'int n);
+          assert { value np n = value np n at Shift };
           assert { h = 0
                    by value np n * power 2 (2 * c) < power radix n
                    so value tpa n + power radix n * h < power radix n
@@ -1021,6 +1037,8 @@ module Sqrt
                so power radix (tn + tn) <= 4 * value tp (n+adj)
                   < power radix (tn + tn - 1) * 4 * (h+1)
                so power radix (tn + tn) = power radix (tn + tn - 1) * radix
+               so power radix (tn + tn - 1) * radix
+                  < power radix (tn + tn - 1) * (4 * (h+1))
                so radix < 4 * (h+1)
                so radix = 4 * power 2 (Limb.length - 2)
                so power 2 (Limb.length - 2) < h+1 };
@@ -1128,7 +1146,7 @@ module Sqrt
                  so rl - cc > - 1 };
         rl <- rl - cc
       end;
-      let ghost r = wmpn_rshift_in_place sp tn c in
+      let ghost r = wmpn_rshift sp sp tn c in
       let ghost vsq = pure { div vs (power 2 c) } in
       assert { vs = vsq * power 2 c + vs0 };
       assert { value sp tn * radix + r = vs * power 2 (Limb.length - c) };
@@ -1170,11 +1188,16 @@ module Sqrt
                so div q (power 2 c) = 0
                so mod q (power 2 c) = q };
       assert { value sp tn * power 2 c = vs - vs0 };
+      assert { value tp tn + power radix tn * rl
+               = vr + 2 * vs0 * vs - vs0 * vs0 };
       value_sub_update_no_change (pelts tp) (offset tp + int32'int tn)
                                  (offset tp) (offset tp + int32'int tn) rl;
+      label Set in
       C.set_ofs tp tn rl;
       value_tail tp tn;
-      assert { value tp (tn + 1) = vr + 2 * vs0 * vs - vs0 * vs0 };
+      assert { value tp (tn + 1) = vr + 2 * vs0 * vs - vs0 * vs0
+               by value tp (tn + 1) = value tp tn + power radix tn * rl
+                  = value (tp at Set) tn + power radix tn * rl };
       assert { vn1 = value tp (tn + 1) + (vs - vs0) * (vs - vs0) };
       assert { power 2 (2 * c) * vn = value tp (tn + 1)
                + power 2 (2 * c) * value sp tn * value sp tn
@@ -1188,7 +1211,10 @@ module Sqrt
                  by vn = value np (n-1)
                        + power radix (n-1) * (pelts np)[offset np + n - 1]
                  so 0 <= value np (n-1)
-                 so 0 < (pelts np)[offset np + n - 1] };
+                 so 0 < (pelts np at Start)[offset np + n - 1]
+                      = (pelts np)[offset np + n - 1]
+                 so 0 < power radix (n-1)
+                 so 0 < power radix (n-1) * (pelts np)[offset np + n - 1] };
       end;
       sqrt_norm vn vn1 (uint64'int c) vsp vs0 vs;
       let ref c2 = lsl c 1 in
@@ -1230,9 +1256,14 @@ module Sqrt
       end;
       begin ensures { value rp rn = vn - vsp * vsp }
             ensures { 0 < rn <= k+1 }
+            ensures { min rp = old min rp /\ max rp = old max rp
+                      /\ plength rp = old plength rp }
         if (not (c2 = 0))
         then begin
-          let ghost b = wmpn_rshift rp tp tn c2 in
+          label Shift in
+          let ghost b = wmpn_rshift_sep rp tp tn c2 in
+          value_sub_frame (pelts tp) (pure { pelts tp at Shift })
+                          (offset tp) (offset tp + int32'int tn);
           assert { value tp tn = power 2 c2 * value rp tn
                    by radix = power 2 c2 * power 2 (64 - c2)
                    so b + radix * value rp tn
@@ -1247,6 +1278,9 @@ module Sqrt
                    so value rp tn * power 2 c2 * power 2 (64 - c2)
                       = radix * value rp tn
                       = value tp tn * power 2 (64 - c2) };
+          assert { value rp tn = vn - vsp * vsp
+                   by value tp tn = power 2 c2 * value rp tn
+                   so value tp tn = power 2 c2 * (vn - vsp * vsp) };
         end
         else wmpn_copyi rp tp tn;
         rn <- tn

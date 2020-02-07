@@ -9,12 +9,14 @@ use ref.Ref
 use mach.c.C
 use lemmas.Lemmas
 use util.Util
+use util.UtilOld as OU
 use ptralias.Alias
 use compare.Compare
 use import mach.int.UInt64GMP as Limb
 use types.Types
+use logical.LogicalUtil
 use logical.Logical
-use logical.AliasLogical
+use logical.LogicalOld as OL
 use int.Abs
 use mpz.Z
 use mpz.Zutil
@@ -82,7 +84,7 @@ let wmpz_tdiv_q_2exp (r u:mpz_ptr) (cnt:limb) : unit
       let ghost oup = pure { up } in
       if c <> 0 then begin
         label Shift in
-        let ghost _m = rshift rp up rn c in
+        let ghost _m = wmpn_rshift rp up rn c in
         assert { _m + radix * value rp rn
                  = value oup rn * power 2 (64 - c) };
         assert { radix * value oup rn
@@ -156,7 +158,7 @@ let wmpz_tdiv_q_2exp (r u:mpz_ptr) (cnt:limb) : unit
                  so value rp rn >= power radix (rn - 1) };
       end else begin
         assert { power 2 cnt = power radix limb_cnt };
-        wmpn_copyai rp up rn;
+        wmpn_copyi rp up rn;
         value_sub_frame_shift (pelts rp) (pelts oup)
                               (offset rp) (offset oup)
                               (int32'int rn);
@@ -187,7 +189,7 @@ let wmpz_tdiv_q_2exp (r u:mpz_ptr) (cnt:limb) : unit
       let ghost oup = pure { up } in
       if c <> 0 then begin
         label Shift in
-        let ghost _m = wmpn_rshift rp up rn c in
+        let ghost _m = OL.wmpn_rshift rp up rn c in
         assert { _m + radix * value rp rn
                  = value oup rn * power 2 (64 - c) };
         assert { radix * value oup rn
@@ -261,7 +263,7 @@ let wmpz_tdiv_q_2exp (r u:mpz_ptr) (cnt:limb) : unit
                  so value rp rn >= power radix (rn - 1) };
       end else begin
         assert { power 2 cnt = power radix limb_cnt };
-        wmpn_copyi rp up rn;
+        OU.wmpn_copyi rp up rn;
         value_sub_frame_shift (pelts rp) (pelts oup)
                               (offset rp) (offset oup)
                               (int32'int rn);

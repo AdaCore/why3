@@ -9,12 +9,14 @@ use ref.Ref
 use mach.c.C
 use lemmas.Lemmas
 use util.Util
+use util.UtilOld
 use ptralias.Alias
 use compare.Compare
 use import mach.int.UInt64GMP as Limb
 use types.Types
+use logical.LogicalUtil
 use logical.Logical
-use logical.AliasLogical
+use logical.LogicalOld as OL
 use int.Abs
 use mpz.Z
 use mpz.Zutil
@@ -48,7 +50,7 @@ let wmpz_mul2exp (r u:mpz_ptr) (cnt: limb) : unit
       then begin
         let rl = C.incr rp limb_cnt in
         label Shift in
-        let rlimb = lshift rl rp un c in
+        let rlimb = wmpn_lshift rl rp un c in
         value_concat rp limb_cnt rn;
         assert { value rp rn
                  = value rp limb_cnt
@@ -119,7 +121,7 @@ let wmpz_mul2exp (r u:mpz_ptr) (cnt: limb) : unit
         assert { power 2 cnt = power radix limb_cnt };
         let ghost ou = pure { rp } in
         assert { value ou un = old (mpz.abs_value_of[u]) };
-        wmpn_copyad (C.incr rp limb_cnt) rp un;
+        wmpn_copyd (C.incr rp limb_cnt) rp un;
         value_sub_frame_shift (pelts rp) (pelts ou)
                               (offset rp + int32'int limb_cnt)
                               (offset ou) (int32'int un);
@@ -141,7 +143,7 @@ let wmpz_mul2exp (r u:mpz_ptr) (cnt: limb) : unit
       then begin
         let rl = C.incr rp limb_cnt in
         label Shift in
-        let rlimb = wmpn_lshift rl up un c in
+        let rlimb = OL.wmpn_lshift rl up un c in
         value_concat rp limb_cnt rn;
         assert { value rp rn
                  = value rp limb_cnt

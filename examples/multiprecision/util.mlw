@@ -11,38 +11,6 @@ module Util
   use types.Types
   use lemmas.Lemmas
 
-  let wmpn_copyi (r x:t) (sz:int32) : unit
-    requires { valid x sz }
-    requires { valid r sz }
-    requires { writable r }
-    ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
-    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
-              (pelts r)[j] = old (pelts r)[j] }
-  =
-    let ref i = 0 in
-    let ref xp = C.incr x 0 in
-    let ref rp = C.incr r 0 in
-    while (Int32.(<) i sz) do
-      variant { p2i sz - p2i i }
-      invariant { 0 <= i <= sz }
-      invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset i }
-      invariant { pelts xp = pelts x }
-      invariant { pelts rp = pelts r }
-      invariant { xp.min = min x }
-      invariant { xp.max = x.max }
-      invariant { rp.min = r.min }
-      invariant { rp.max = r.max }
-      invariant { writable rp }
-      invariant { xp.offset = x.offset + i }
-      invariant { rp.offset = r.offset + i }
-      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
-                  (pelts r)[j] = old (pelts r)[j] }
-      C.set rp (C.get xp);
-      rp <- C.incr rp 1;
-      xp <- C.incr xp 1;
-      i <- i+1;
-    done
-
    (* `wmpn_zero_p` checks if `x[0..sz-1]` is zero. It corresponds to `mpn_zero_p`. *)
    let wmpn_zero_p (x:t) (sz:int32) : int32
      requires { valid x sz }
@@ -121,7 +89,7 @@ module Util
 
   use ptralias.Alias
 
-  let wmpn_copyad (rp up:t) (n:int32) : unit
+  let wmpn_copyd (rp up:t) (n:int32) : unit
     requires { valid up n }
     requires { valid rp n }
     requires { writable rp }
@@ -151,7 +119,6 @@ module Util
     requires { valid up n }
     requires { valid rp n }
     requires { writable rp }
-    requires { offset up <= offset rp \/ offset rp + n <= offset up }
     ensures { map_eq_sub_shift (pelts rp) (old pelts up)
                                rp.offset (old up.offset) n }
     ensures { forall j. (j < offset rp \/ offset rp + n <= j) ->
@@ -161,17 +128,19 @@ module Util
     let ghost ou = pure { up } in
     let nr, nx, m = open_shift_sep rp up n in
     label Copy in
-    wmpn_copyad nr nx n;
+    wmpn_copyd nr nx n;
     let ghost onx = pure { nx } in
     let ghost onr = pure { nr } in
     close_shift_sep rp up n nr nx m;
     assert { forall j. 0 <= j < n ->
                        (pelts up)[offset up + j]
-                       = (pelts onx)[offset onx + j]
-                       = (pelts nx)[offset onx + j] at Copy
                        = (pelts ou)[offset up + j]
                        by offset nx + j at Copy < offset nr
-                       \/ offset nr + n <= offset nx + j at Copy };
+                       \/ offset nr + n <= offset nx + j at Copy
+                       so (pelts up)[offset up + j]
+                       = (pelts onx)[offset onx + j]
+                       = (pelts nx)[offset onx + j] at Copy
+                       = (pelts ou)[offset up + j] };
     assert { forall j. 0 <= j < n ->
                        (pelts rp)[offset rp + j] = (pelts ou)[offset ou + j]
                        by (pelts rp)[offset rp + j]
@@ -179,7 +148,7 @@ module Util
                        = (pelts nx)[offset nx + j] at Copy
                        = (pelts ou)[offset ou + j] }
 
-  let wmpn_copyai (rp up:t) (n:int32) : unit
+  let wmpn_copyi (rp up:t) (n:int32) : unit
     requires { valid up n }
     requires { valid rp n }
     requires { writable rp }
@@ -205,6 +174,52 @@ module Util
       let ghost lou = C.get_ofs ou i in
       assert { lu = lou };
       C.set_ofs rp i lu;
+    done
+
+end
+module UtilOld
+
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+
+  let wmpn_copyi (r x:t) (sz:int32) : unit
+    requires { valid x sz }
+    requires { valid r sz }
+    requires { writable r }
+    ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+  =
+    let ref i = 0 in
+    let ref xp = C.incr x 0 in
+    let ref rp = C.incr r 0 in
+    while (Int32.(<) i sz) do
+      variant { p2i sz - p2i i }
+      invariant { 0 <= i <= sz }
+      invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset i }
+      invariant { pelts xp = pelts x }
+      invariant { pelts rp = pelts r }
+      invariant { xp.min = min x }
+      invariant { xp.max = x.max }
+      invariant { rp.min = r.min }
+      invariant { rp.max = r.max }
+      invariant { writable rp }
+      invariant { xp.offset = x.offset + i }
+      invariant { rp.offset = r.offset + i }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
+                  (pelts r)[j] = old (pelts r)[j] }
+      C.set rp (C.get xp);
+      rp <- C.incr rp 1;
+      xp <- C.incr xp 1;
+      i <- i+1;
     done
 
 end

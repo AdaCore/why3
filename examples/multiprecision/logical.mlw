@@ -1,4 +1,4 @@
-module Logical
+module LogicalUtil
 
   use int.Int
   use mach.int.Int32
@@ -140,6 +140,416 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
              so p * x <= p * (q - 1)
            };
     r
+end
+
+module Logical
+
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+  use int.EuclideanDivision
+  use LogicalUtil
+
+  let wmpn_lshift (r x:t) (sz:int32) (cnt:limb) : limb
+    requires { 0 < cnt < Limb.length }
+    requires { valid r sz }
+    requires { valid x sz }
+    requires { writable r }
+    requires { 0 < sz }
+    requires { offset x <= offset r \/ offset r + sz <= offset x }
+    alias    { r.data with x.data }
+    ensures { value r sz + (power radix sz) * result =
+              old value x sz * (power 2 (cnt)) }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+    ensures { min r = old min r /\ max r = old max r
+               /\ plength r = old plength r }
+    ensures { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
+    writes  { r.data.elts }
+  =
+    let msb = sz - 1 in
+    let xp = ref (C.incr x msb) in
+    let rp = ref (C.incr r msb) in
+    let ghost ox = pure { x } in
+    let ghost oxp = ref (C.incr ox msb) in
+    let high = ref 0 in
+    let low = ref (C.get !xp) in
+    let i = ref msb in
+    let l, retval = lsld_ext !low cnt in
+    high := l;
+    let ghost c = power 2 (uint64'int cnt) in
+    assert { value !oxp (sz - !i) = value !oxp 1 = !low };
+    while (!i > 0) do
+      variant { !i }
+      invariant { 0 <= !i < sz }
+      invariant { radix
+                  * value_sub (pelts r) (r.offset + 1 + !i) (r.offset + sz)
+                  + (power radix (sz - !i)) * retval + !high
+                  = value !oxp (sz - !i) * c }
+      invariant { (!rp).offset = r.offset + !i }
+      invariant { (!xp).offset = x.offset + !i }
+      invariant { (!oxp).offset = !xp.offset }
+      invariant { plength !rp = plength r }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
+      invariant { writable !rp }
+      invariant { pelts !rp = pelts r }
+      invariant { plength !xp = plength x }
+      invariant { !xp.min = ox.min }
+      invariant { !xp.max = ox.max }
+      invariant { !oxp.min = ox.min }
+      invariant { !oxp.max = ox.max }
+      invariant { pelts !xp = pelts x }
+      invariant { pelts !oxp = pelts ox }
+      invariant { !high <= radix - c }
+      invariant unchanged { forall j. 0 <= j <= !i ->
+                  (pelts x)[offset x + j] = (pelts ox)[offset x + j] }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+      label StartLoop in
+      xp.contents <- C.incr !xp (-1);
+      oxp.contents <- C.incr !oxp (-1);
+      low := C.get !xp;
+      let ghost olow = C.get !oxp in
+      assert { !low = olow
+               by offset !oxp = offset x + (!i-1) = offset !xp
+               so !low = (pelts x)[offset !xp]
+                  = (pelts x)[offset x + (!i-1)]
+                  = (pelts ox)[offset x + (!i-1)]
+                  = (pelts ox)[offset !oxp]
+                  = olow };
+      let l,h = lsld_ext !low cnt in
+      assert { !high + h < radix  };
+      let ghost v = !high + h in
+      value_sub_update_no_change (pelts r) (!rp).offset (r.offset + 1 + p2i !i)
+                                 (r.offset + p2i sz) v;
+      value_sub_update_no_change (pelts x) (!rp).offset x.offset
+                                 (x.offset + p2i !i) v;
+      C.set !rp (!high + h);
+      high := l;
+      let ghost k = p2i !i in
+      i := !i - 1;
+      assert { forall j. 0 <= j <= !i ->
+                      (pelts x)[offset x + j] = (pelts ox)[offset x + j]
+                      by ((offset r <= offset !rp <= offset x <= offset x + j)
+                         \/ (offset x <= offset r
+                            so offset x + j <= offset !xp <= offset !rp))
+                      so offset !rp <> offset x + j
+                      so (pelts x)[offset x + j]
+                      = (pelts x)[offset x + j] at StartLoop
+                      = (pelts ox)[offset x + j] };
+      rp.contents <- C.incr !rp (-1);
+      value_sub_head (pelts r) (r.offset + k) (r.offset + p2i sz);
+      value_sub_head (pelts !oxp) (!oxp).offset (ox.offset + p2i sz);
+      assert { radix * (value_sub (pelts r) (r.offset + 1 + k) (r.offset + sz))
+                         + power radix (sz - k) * retval
+                         + (!high at StartLoop)
+               = value (!oxp at StartLoop) (sz - k) * power 2 (cnt) };
+      assert { radix
+               * value_sub (pelts r) (r.offset + k) (r.offset + sz)
+               + (power radix (sz - !i)) * retval + !high
+              = value !oxp (sz - !i)
+                * (power 2 (cnt))
+             by
+               (pelts r)[r.offset + k]
+             = (pelts r)[(!rp.offset at StartLoop)]
+             = (!high at StartLoop) + h
+             so
+                power radix (sz - !i)
+              = power radix (sz - (k - 1))
+              = power radix ((sz - k) +1)
+              = radix * power radix (sz - k)
+             so
+              !low = (pelts ox)[(!oxp).offset]
+             so
+               radix * value_sub (pelts r) (r.offset + k) (r.offset + sz)
+                + (power radix (sz - !i)) * retval + !high
+             = radix * value_sub (pelts r) (r.offset + k) (r.offset + sz)
+                + radix * (power radix (sz - k)) * retval + !high
+             = radix * ( (pelts r)[r.offset + k]
+                          + radix * (value_sub (pelts r)
+                                         (r.offset + 1 + k) (r.offset + sz)))
+               + radix * (power radix (sz - k)) * retval + !high
+             =  radix * ( (!high at StartLoop) + h
+                          + radix * (value_sub (pelts r)
+                                         (r.offset + 1 + k) (r.offset + sz)))
+               + radix * (power radix (sz - k)) * retval + !high
+             = radix * ( (!high at StartLoop)
+                          + radix * (value_sub (pelts r)
+                                         (r.offset + 1 + k) (r.offset + sz)))
+               + radix * h
+               + radix * (power radix (sz - k)) * retval + !high
+             = radix * ( (!high at StartLoop)
+                          + radix * (value_sub (pelts r)
+                                         (r.offset + 1 + k) (r.offset + sz)))
+               + radix * h
+               + radix * (power radix (sz - k)) * retval + l
+             = radix * ( (!high at StartLoop)
+                          + radix * (value_sub (pelts r)
+                                         (r.offset + 1 + k) (r.offset + sz)))
+               + radix * (power radix (sz - k)) * retval + l
+               + radix * h
+             = radix * ( (!high at StartLoop)
+                          + radix * (value_sub (pelts r)
+                                         (r.offset + 1 + k) (r.offset + sz)))
+               + radix * (power radix (sz - k)) * retval
+               + (power 2 (cnt)) * !low
+             = radix * ( (!high at StartLoop)
+                          + radix * (value_sub (pelts r)
+                                         (r.offset + 1 + k) (r.offset + sz)))
+               + radix * (power radix (sz - k)) * retval
+               + (power 2 (cnt)) * (pelts ox)[(!oxp).offset]
+             = radix * ( (!high at StartLoop)
+                          + radix * (value_sub (pelts r)
+                                         (r.offset + 1 + k) (r.offset + sz))
+                          + power radix (sz - k) * retval )
+               + (power 2 (cnt)) * (pelts ox)[(!oxp).offset]
+             = radix * ( radix * (value_sub (pelts r)
+                                         (r.offset + 1 + k) (r.offset + sz))
+                         + power radix (sz - k) * retval
+                         + (!high at StartLoop) )
+               + (power 2 (cnt)) * (pelts ox)[(!oxp).offset]
+             = radix * value (!oxp at StartLoop) (sz - k)
+                     * (power 2 (cnt))
+               + (power 2 (cnt)) * (pelts ox)[(!oxp).offset]
+             = (power 2 (cnt)) *
+                      ((pelts ox)[(!oxp).offset]
+                      + radix * value (!oxp at StartLoop) (sz - k))
+             = (power 2 (cnt)) * value !oxp (sz - !i)
+   };
+   done;
+   assert { !high + radix * value_sub (pelts r) (r.offset + 1) (r.offset + sz)
+                  + (power radix sz) * retval
+                = value !oxp sz
+                  * (power 2 (cnt)) };
+   value_sub_update_no_change (pelts r) r.offset (r.offset+1)
+                              (r.offset + p2i sz) !high;
+   label EndLoop in
+   C.set r !high;
+   assert { value_sub (pelts r) (offset r + 1) (offset r + sz)
+            = value_sub (pelts r at EndLoop) (offset r + 1) (offset r + sz) };
+   value_sub_head (pelts r) r.offset (r.offset + p2i sz);
+   assert { value r sz + power radix sz * retval
+            = value !oxp sz * power 2 cnt
+            by value r sz
+               = !high + radix * value_sub (pelts r at EndLoop)
+                                 (r.offset + 1) (r.offset + sz)};
+   retval
+
+  use ptralias.Alias
+
+  let wmpn_lshift_sep [@extraction:inline] (r x:t) (sz:int32) (cnt:limb) : limb
+    requires { 0 < cnt < Limb.length }
+    requires { valid r sz }
+    requires { valid x sz }
+    requires { writable r }
+    requires { 0 < sz }
+    ensures { value r sz + (power radix sz) * result =
+              old value x sz * (power 2 (cnt)) }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+    ensures { forall j. (pelts x)[j] = old (pelts x)[j] }
+    ensures { min r = old min r /\ max r = old max r
+               /\ plength r = old plength r }
+    ensures { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
+  =
+    let ghost ox = pure { x } in
+    let nr, nx, m = open_shift_sep r x sz in
+    label Shift in
+    let res = wmpn_lshift nr nx sz cnt in
+    let ghost onx = pure { nx } in
+    close_shift_sep r x sz nr nx m;
+    assert { forall j. 0 <= j < sz ->
+                       (pelts x)[offset x + j]
+                       = (pelts onx)[offset onx + j]
+                       = (pelts nx)[offset onx + j] at Shift
+                       = (pelts ox)[offset x + j] at Shift };
+    res
+
+  let wmpn_rshift (r x:t) (sz:int32) (cnt:limb) : limb
+    requires { 0 < cnt < Limb.length }
+    requires { valid x sz }
+    requires { valid r sz }
+    requires { 0 < sz }
+    requires { writable r }
+    requires { offset r <= offset x \/ offset x + sz <= offset r }
+    alias    { r.data with x.data }
+    ensures { result + radix * value r sz
+              = old (value x sz) * (power 2 (Limb.length - cnt)) }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+    ensures { min r = old min r /\ max r = old max r
+               /\ plength r = old plength r }
+    ensures { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
+    writes  { r.data.elts }
+  =
+    let tnc = (64:uint64) - cnt in
+    let msb = sz - 1 in
+    let xp = ref (C.incr x 0) in
+    let ghost ox = pure { x } in
+    let ghost oxp = ref (C.incr ox 0) in
+    let rp = ref (C.incr r 0) in
+    let high = ref (C.get !xp) in
+    assert { value x 1 = !high };
+    let retval, h = lsld_ext !high tnc in
+    let low = ref h in
+    let i = ref 0 in
+    let ghost c = power 2 (uint64'int tnc) in
+    while (!i < msb) do
+      variant { sz - !i }
+      invariant { 0 <= !i <= msb }
+      invariant { retval + radix * (value r !i
+                  + (power radix !i) * !low)
+                  = value ox (!i+1) * c }
+      invariant { (!rp).offset = r.offset + !i }
+      invariant { (!xp).offset = x.offset + !i }
+      invariant { (!oxp).offset = !xp.offset }
+      invariant { plength !rp = plength r }
+      invariant { !rp.min = r.min }
+      invariant { !rp.max = r.max }
+      invariant { writable !rp }
+      invariant { plength !xp = plength x }
+      invariant { !xp.min = x.min }
+      invariant { !xp.max = x.max }
+      invariant { !oxp.min = ox.min }
+      invariant { !oxp.max = ox.max }
+      invariant { pelts !rp = pelts r }
+      invariant { pelts !xp = pelts x }
+      invariant { pelts !oxp = pelts ox }
+      invariant { !low < c }
+      invariant unchanged { forall j. !i <= j < sz ->
+                  (pelts x)[offset x + j] = (pelts ox)[offset x + j] }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+      label StartLoop in
+      xp.contents <- C.incr !xp 1;
+      oxp.contents <- C.incr !oxp 1;
+      high := C.get !xp;
+      let ghost ohigh = C.get !oxp in
+      assert { !high = ohigh
+               by offset !oxp = offset x + (!i+1) = offset !xp
+               so !high = (pelts x)[offset !xp]
+                  = (pelts x)[offset x + (!i+1)]
+                  = (pelts ox)[offset x + (!i+1)]
+                  = (pelts ox)[offset !oxp]
+                  = ohigh };
+      let l,h = lsld_ext !high tnc in
+      assert { !low + l < radix };
+      let ghost v = !low + l in
+      value_sub_update_no_change (pelts r) (!rp.offset) (r.offset)
+                                 (r.offset + p2i !i) v;
+      value_sub_update_no_change (pelts x) (!rp.offset) (x.offset + p2i !i + 1)
+                                 (x.offset + p2i sz) v;
+      C.set !rp (!low + l);
+      assert { value r !i = value (r at StartLoop) !i };
+      value_tail r !i;
+      value_tail ox (!i+1);
+      assert { (pelts r)[r.offset + !i] = !low + l };
+      low := h;
+      assert { value ox (!i+2) * c = value ox (!i+1) * c
+               + power radix (!i+1) * l + power radix (!i+2) * h
+               by (pelts ox)[offset ox + !i + 1] = !high
+               so value ox (!i+2) * c =
+                  (value ox (!i+1) + power radix (!i+1)* !high) * c
+               so !high * c = l + radix * h };
+      (*nonlinear part*)
+      assert { retval + radix * (value r (!i+1)
+                 + (power radix (!i+1)) * !low)
+                 = value ox (!i+2) * c };
+      i := !i + 1;
+      assert { forall j. !i <= j < sz ->
+                      (pelts x)[offset x + j] = (pelts ox)[offset x + j]
+                      by (offset x + j < offset r <= offset !rp
+                         \/ (offset r <= offset x
+                             so offset !rp = offset r + !i - 1 < offset x + j))
+                      so offset !rp <> offset x + j
+                      so (pelts x)[offset x + j]
+                      = (pelts x)[offset x + j] at StartLoop
+                      = (pelts ox)[offset x + j] };
+      rp.contents <- C.incr !rp 1;
+    done;
+    label EndLoop in
+    assert { retval + radix * (value r msb
+                  + (power radix msb) * !low)
+             = value ox sz * c };
+    value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
+    assert { (!rp).offset = r.offset + msb };
+    value_sub_shift_no_change (pelts r) r.offset
+                              (r.offset + p2i msb) (r.offset + p2i msb) !low;
+    C.set !rp !low;
+    assert { pelts r = Map.set (pelts (r at EndLoop)) (r.offset + msb) !low};
+    value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
+    assert { value r sz
+           = value r msb + power radix msb * !low
+           by value r sz
+              = value r msb + power radix msb * (pelts r)[r.offset + msb] };
+    assert { value r sz
+           = value (r at EndLoop) msb
+             + power radix msb * !low
+           by value (r at EndLoop) msb = value r msb };
+    retval
+
+  let wmpn_rshift_sep [@extraction:inline] (r x:t) (sz:int32) (cnt:limb) : limb
+    requires { valid x sz }
+    requires { valid r sz }
+    requires { 0 < cnt < Limb.length }
+    requires { 0 < sz }
+    requires { writable r }
+    ensures { result + radix * value r sz
+              = value x sz * (power 2 (Limb.length - cnt)) }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+    ensures { pelts x =  old pelts x }
+    ensures { min x = old min x /\ max x = old max x
+               /\ plength x = old plength x }
+    ensures { min r = old min r /\ max r = old max r
+               /\ plength r = old plength r }
+=
+    let ghost ox = pure { x } in
+    let nr, nx, m = open_shift_sep r x sz in
+    label Shift in
+    let res = wmpn_rshift nr nx sz cnt in
+    let ghost onx = pure { nx } in
+    let ghost onr = pure { nr } in
+    close_shift_sep r x sz nr nx m;
+    assert { forall j. 0 <= j < sz ->
+                       (pelts x)[offset x + j] = (pelts ox)[offset x + j]
+                       by (pelts x)[offset x + j]
+                       = (pelts onx)[offset onx + j]
+                       = (pelts nx)[offset onx + j] at Shift
+                       = (pelts ox)[offset x + j] };
+    value_sub_frame_shift (pelts x) (pelts ox)
+                          (offset x) (offset x) (int32'int sz);
+    assert { value r sz = value onr sz };
+    assert { value x sz = value onx sz };
+    res
+
+end
+
+module LogicalOld
+
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+  use int.EuclideanDivision
+  use LogicalUtil
 
   (** `wmpn_lshift r x sz cnt` shifts `(x, sz)` `cnt` bits to the left and
       writes the result in `(r, sz)`. Returns the `cnt` most significant
@@ -281,7 +691,6 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
   (** `wmpn_rshift r x sz cnt` shifts `(x, sz)` `cnt` bits to the right and
       writes the result in `(r, sz)`. Returns the `cnt` least significant
       bits of `(x, sz)`. Corresponds to `mpn_rshift`. *)
-  (*TODO overlapping allowed if r <= x*)
   let wmpn_rshift (r x:t) (sz:int32) (cnt:limb) : limb
     requires { valid x sz }
     requires { valid r sz }
@@ -491,6 +900,7 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
     let low = ref h in
     let i = ref 0 in
     let ghost c = power 2 (l2i tnc) in
+    assert { value x 1 = !high };
     while (!i < msb) do
       variant { sz - !i }
       invariant { 0 <= !i <= msb }
@@ -558,374 +968,5 @@ let lsl_mod_ext [@extraction:inline] (x cnt: limb) : limb
     value_tail x msb;
     assert { value x sz = value (x at EndLoop) msb + (power radix msb) * !low };
     retval
-
-end
-
-module AliasLogical
-
-  use int.Int
-  use mach.int.Int32
-  use import mach.int.UInt64GMP as Limb
-  use int.Power
-  use ref.Ref
-  use mach.c.C
-  use array.Array
-  use map.Map
-  use types.Types
-  use lemmas.Lemmas
-  use int.EuclideanDivision
-  use ptralias.Alias
-  use Logical
-
-  let lshift (r x:t) (sz:int32) (cnt:limb) : limb
-    requires { 0 < cnt < Limb.length }
-    requires { valid r sz }
-    requires { valid x sz }
-    requires { writable r }
-    requires { 0 < sz }
-    requires { offset x <= offset r \/ offset r + sz <= offset x }
-    alias    { r.data with x.data }
-    ensures { value r sz + (power radix sz) * result =
-              old value x sz * (power 2 (cnt)) }
-    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
-              (pelts r)[j] = old (pelts r)[j] }
-    writes  { r.data.elts }
-  =
-    let msb = sz - 1 in
-    let xp = ref (C.incr x msb) in
-    let rp = ref (C.incr r msb) in
-    let ghost ox = pure { x } in
-    let ghost oxp = ref (C.incr ox msb) in
-    let high = ref 0 in
-    let low = ref (C.get !xp) in
-    let i = ref msb in
-    let l, retval = lsld_ext !low cnt in
-    high := l;
-    let ghost c = power 2 (uint64'int cnt) in
-    while (!i > 0) do
-      variant { !i }
-      invariant { 0 <= !i < sz }
-      invariant { radix
-                  * value_sub (pelts r) (r.offset + 1 + !i) (r.offset + sz)
-                  + (power radix (sz - !i)) * retval + !high
-                  = value !oxp (sz - !i) * c }
-      invariant { (!rp).offset = r.offset + !i }
-      invariant { (!xp).offset = x.offset + !i }
-      invariant { (!oxp).offset = !xp.offset }
-      invariant { plength !rp = plength r }
-      invariant { !rp.min = r.min }
-      invariant { !rp.max = r.max }
-      invariant { writable !rp }
-      invariant { pelts !rp = pelts r }
-      invariant { plength !xp = plength x }
-      invariant { !xp.min = ox.min }
-      invariant { !xp.max = ox.max }
-      invariant { !oxp.min = ox.min }
-      invariant { !oxp.max = ox.max }
-      invariant { pelts !xp = pelts x }
-      invariant { pelts !oxp = pelts ox }
-      invariant { !high <= radix - c }
-      invariant unchanged { forall j. 0 <= j <= !i ->
-                  (pelts x)[offset x + j] = (pelts ox)[offset x + j] }
-      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
-              (pelts r)[j] = old (pelts r)[j] }
-      label StartLoop in
-      xp.contents <- C.incr !xp (-1);
-      oxp.contents <- C.incr !oxp (-1);
-      low := C.get !xp;
-      let ghost olow = C.get !oxp in
-      assert { !low = olow
-               by offset !oxp = offset x + (!i-1) = offset !xp
-               so !low = (pelts x)[offset !xp]
-                  = (pelts x)[offset x + (!i-1)]
-                  = (pelts ox)[offset x + (!i-1)]
-                  = (pelts ox)[offset !oxp]
-                  = olow };
-      let l,h = lsld_ext !low cnt in
-      assert { !high + h < radix  };
-      let ghost v = !high + h in
-      value_sub_update_no_change (pelts r) (!rp).offset (r.offset + 1 + p2i !i)
-                                 (r.offset + p2i sz) v;
-      value_sub_update_no_change (pelts x) (!rp).offset x.offset
-                                 (x.offset + p2i !i) v;
-      C.set !rp (!high + h);
-      high := l;
-      let ghost k = p2i !i in
-      i := !i - 1;
-      assert { forall j. 0 <= j <= !i ->
-                      (pelts x)[offset x + j] = (pelts ox)[offset x + j]
-                      by ((offset r <= offset !rp <= offset x <= offset x + j)
-                         \/ (offset x <= offset r
-                            so offset x + j <= offset !xp <= offset !rp))
-                      so offset !rp <> offset x + j
-                      so (pelts x)[offset x + j]
-                      = (pelts x)[offset x + j] at StartLoop
-                      = (pelts ox)[offset x + j] };
-      rp.contents <- C.incr !rp (-1);
-      value_sub_head (pelts r) (r.offset + k) (r.offset + p2i sz);
-      value_sub_head (pelts !oxp) (!oxp).offset (ox.offset + p2i sz);
-      assert { radix * (value_sub (pelts r) (r.offset + 1 + k) (r.offset + sz))
-                         + power radix (sz - k) * retval
-                         + (!high at StartLoop)
-               = value (!oxp at StartLoop) (sz - k) * power 2 (cnt) };
-      assert { radix
-               * value_sub (pelts r) (r.offset + k) (r.offset + sz)
-               + (power radix (sz - !i)) * retval + !high
-              = value !oxp (sz - !i)
-                * (power 2 (cnt))
-             by
-               (pelts r)[r.offset + k]
-             = (pelts r)[(!rp.offset at StartLoop)]
-             = (!high at StartLoop) + h
-             so
-                power radix (sz - !i)
-              = power radix (sz - (k - 1))
-              = power radix ((sz - k) +1)
-              = radix * power radix (sz - k)
-             so
-              !low = (pelts ox)[(!oxp).offset]
-             so
-               radix * value_sub (pelts r) (r.offset + k) (r.offset + sz)
-                + (power radix (sz - !i)) * retval + !high
-             = radix * value_sub (pelts r) (r.offset + k) (r.offset + sz)
-                + radix * (power radix (sz - k)) * retval + !high
-             = radix * ( (pelts r)[r.offset + k]
-                          + radix * (value_sub (pelts r)
-                                         (r.offset + 1 + k) (r.offset + sz)))
-               + radix * (power radix (sz - k)) * retval + !high
-             =  radix * ( (!high at StartLoop) + h
-                          + radix * (value_sub (pelts r)
-                                         (r.offset + 1 + k) (r.offset + sz)))
-               + radix * (power radix (sz - k)) * retval + !high
-             = radix * ( (!high at StartLoop)
-                          + radix * (value_sub (pelts r)
-                                         (r.offset + 1 + k) (r.offset + sz)))
-               + radix * h
-               + radix * (power radix (sz - k)) * retval + !high
-             = radix * ( (!high at StartLoop)
-                          + radix * (value_sub (pelts r)
-                                         (r.offset + 1 + k) (r.offset + sz)))
-               + radix * h
-               + radix * (power radix (sz - k)) * retval + l
-             = radix * ( (!high at StartLoop)
-                          + radix * (value_sub (pelts r)
-                                         (r.offset + 1 + k) (r.offset + sz)))
-               + radix * (power radix (sz - k)) * retval + l
-               + radix * h
-             = radix * ( (!high at StartLoop)
-                          + radix * (value_sub (pelts r)
-                                         (r.offset + 1 + k) (r.offset + sz)))
-               + radix * (power radix (sz - k)) * retval
-               + (power 2 (cnt)) * !low
-             = radix * ( (!high at StartLoop)
-                          + radix * (value_sub (pelts r)
-                                         (r.offset + 1 + k) (r.offset + sz)))
-               + radix * (power radix (sz - k)) * retval
-               + (power 2 (cnt)) * (pelts ox)[(!oxp).offset]
-             = radix * ( (!high at StartLoop)
-                          + radix * (value_sub (pelts r)
-                                         (r.offset + 1 + k) (r.offset + sz))
-                          + power radix (sz - k) * retval )
-               + (power 2 (cnt)) * (pelts ox)[(!oxp).offset]
-             = radix * ( radix * (value_sub (pelts r)
-                                         (r.offset + 1 + k) (r.offset + sz))
-                         + power radix (sz - k) * retval
-                         + (!high at StartLoop) )
-               + (power 2 (cnt)) * (pelts ox)[(!oxp).offset]
-             = radix * value (!oxp at StartLoop) (sz - k)
-                     * (power 2 (cnt))
-               + (power 2 (cnt)) * (pelts ox)[(!oxp).offset]
-             = (power 2 (cnt)) *
-                      ((pelts ox)[(!oxp).offset]
-                      + radix * value (!oxp at StartLoop) (sz - k))
-             = (power 2 (cnt)) * value !oxp (sz - !i)
-   };
-   done;
-   assert { !high + radix * value_sub (pelts r) (r.offset + 1) (r.offset + sz)
-                  + (power radix sz) * retval
-                = value !oxp sz
-                  * (power 2 (cnt)) };
-   value_sub_update_no_change (pelts r) r.offset (r.offset+1)
-                              (r.offset + p2i sz) !high;
-   C.set r !high;
-   value_sub_head (pelts r) r.offset (r.offset + p2i sz);
-   assert { value r sz + power radix sz * retval
-            = value !oxp sz * power 2 cnt };
-   retval
-
-  let wmpn_lshift_sep (r x:t) (sz:int32) (cnt:limb) : limb
-    requires { 0 < cnt < Limb.length }
-    requires { valid r sz }
-    requires { valid x sz }
-    requires { writable r }
-    requires { 0 < sz }
-    ensures { value r sz + (power radix sz) * result =
-              old value x sz * (power 2 (cnt)) }
-    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
-              (pelts r)[j] = old (pelts r)[j] }
-    ensures { forall j. (pelts x)[j] = old (pelts x)[j] }
-  =
-    let ghost ox = pure { x } in
-    let nr, nx, m = open_shift_sep r x sz in
-    label Shift in
-    let res = lshift nr nx sz cnt in
-    let ghost onx = pure { nx } in
-    close_shift_sep r x sz nr nx m;
-    assert { forall j. 0 <= j < sz ->
-                       (pelts x)[offset x + j]
-                       = (pelts onx)[offset onx + j]
-                       = (pelts nx)[offset onx + j] at Shift
-                       = (pelts ox)[offset x + j] at Shift };
-    res
-
-  let rshift (r x:t) (sz:int32) (cnt:limb) : limb
-    requires { 0 < cnt < Limb.length }
-    requires { valid x sz }
-    requires { valid r sz }
-    requires { 0 < sz }
-    requires { writable r }
-    requires { offset r <= offset x \/ offset x + sz <= offset r }
-    alias    { r.data with x.data }
-    ensures { result + radix * value r sz
-              = old (value x sz) * (power 2 (Limb.length - cnt)) }
-    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
-              (pelts r)[j] = old (pelts r)[j] }
-    writes  { r.data.elts }
-  =
-    let tnc = (64:uint64) - cnt in
-    let msb = sz - 1 in
-    let xp = ref (C.incr x 0) in
-    let ghost ox = pure { x } in
-    let ghost oxp = ref (C.incr ox 0) in
-    let rp = ref (C.incr r 0) in
-    let high = ref (C.get !xp) in
-    assert { value x 1 = !high };
-    let retval, h = lsld_ext !high tnc in
-    let low = ref h in
-    let i = ref 0 in
-    let ghost c = power 2 (uint64'int tnc) in
-    while (!i < msb) do
-      variant { sz - !i }
-      invariant { 0 <= !i <= msb }
-      invariant { retval + radix * (value r !i
-                  + (power radix !i) * !low)
-                  = value ox (!i+1) * c }
-      invariant { (!rp).offset = r.offset + !i }
-      invariant { (!xp).offset = x.offset + !i }
-      invariant { (!oxp).offset = !xp.offset }
-      invariant { plength !rp = plength r }
-      invariant { !rp.min = r.min }
-      invariant { !rp.max = r.max }
-      invariant { writable !rp }
-      invariant { plength !xp = plength x }
-      invariant { !xp.min = x.min }
-      invariant { !xp.max = x.max }
-      invariant { !oxp.min = ox.min }
-      invariant { !oxp.max = ox.max }
-      invariant { pelts !rp = pelts r }
-      invariant { pelts !xp = pelts x }
-      invariant { pelts !oxp = pelts ox }
-      invariant { !low < c }
-      invariant unchanged { forall j. !i <= j < sz ->
-                  (pelts x)[offset x + j] = (pelts ox)[offset x + j] }
-      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
-              (pelts r)[j] = old (pelts r)[j] }
-      label StartLoop in
-      xp.contents <- C.incr !xp 1;
-      oxp.contents <- C.incr !oxp 1;
-      high := C.get !xp;
-      let ghost ohigh = C.get !oxp in
-      assert { !high = ohigh
-               by offset !oxp = offset x + (!i+1) = offset !xp
-               so !high = (pelts x)[offset !xp]
-                  = (pelts x)[offset x + (!i+1)]
-                  = (pelts ox)[offset x + (!i+1)]
-                  = (pelts ox)[offset !oxp]
-                  = ohigh };
-      let l,h = lsld_ext !high tnc in
-      assert { !low + l < radix };
-      let ghost v = !low + l in
-      value_sub_update_no_change (pelts r) (!rp.offset) (r.offset)
-                                 (r.offset + p2i !i) v;
-      value_sub_update_no_change (pelts x) (!rp.offset) (x.offset + p2i !i + 1)
-                                 (x.offset + p2i sz) v;
-      C.set !rp (!low + l);
-      assert { value r !i = value (r at StartLoop) !i };
-      value_tail r !i;
-      value_tail ox (!i+1);
-      assert { (pelts r)[r.offset + !i] = !low + l };
-      low := h;
-      assert { value ox (!i+2) * c = value ox (!i+1) * c
-               + power radix (!i+1) * l + power radix (!i+2) * h
-               by (pelts ox)[offset ox + !i + 1] = !high
-               so value ox (!i+2) * c =
-                  (value ox (!i+1) + power radix (!i+1)* !high) * c
-               so !high * c = l + radix * h };
-      (*nonlinear part*)
-      assert { retval + radix * (value r (!i+1)
-                 + (power radix (!i+1)) * !low)
-                 = value ox (!i+2) * c };
-      i := !i + 1;
-      assert { forall j. !i <= j < sz ->
-                      (pelts x)[offset x + j] = (pelts ox)[offset x + j]
-                      by (offset x + j < offset r <= offset !rp
-                         \/ (offset r <= offset x
-                             so offset !rp = offset r + !i - 1 < offset x + j))
-                      so offset !rp <> offset x + j
-                      so (pelts x)[offset x + j]
-                      = (pelts x)[offset x + j] at StartLoop
-                      = (pelts ox)[offset x + j] };
-      rp.contents <- C.incr !rp 1;
-    done;
-    label EndLoop in
-    assert { retval + radix * (value r msb
-                  + (power radix msb) * !low)
-             = value ox sz * c };
-    value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
-    assert { (!rp).offset = r.offset + msb };
-    value_sub_shift_no_change (pelts r) r.offset
-                              (r.offset + p2i msb) (r.offset + p2i msb) !low;
-    C.set !rp !low;
-    assert { pelts r = Map.set (pelts (r at EndLoop)) (r.offset + msb) !low};
-    value_sub_tail (pelts r) r.offset (r.offset + p2i msb);
-    assert { value r sz
-           = value r msb + power radix msb * !low
-           by value r sz
-              = value r msb + power radix msb * (pelts r)[r.offset + msb] };
-    assert { value r sz
-           = value (r at EndLoop) msb
-             + power radix msb * !low
-           by value (r at EndLoop) msb = value r msb };
-    retval
-
-  let wmpn_rshift_sep (r x:t) (sz:int32) (cnt:limb) : limb
-    requires { valid x sz }
-    requires { valid r sz }
-    requires { 0 < cnt < Limb.length }
-    requires { 0 < sz }
-    requires { writable r }
-    ensures { result + radix * value r sz
-              = value x sz * (power 2 (Limb.length - cnt)) }
-    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
-              (pelts r)[j] = old (pelts r)[j] }
-  =
-    let ghost ox = pure { x } in
-    let nr, nx, m = open_shift_sep r x sz in
-    label Shift in
-    let res = rshift nr nx sz cnt in
-    let ghost onx = pure { nx } in
-    let ghost onr = pure { nr } in
-    close_shift_sep r x sz nr nx m;
-    assert { forall j. 0 <= j < sz ->
-                       (pelts x)[offset x + j] = (pelts ox)[offset x + j]
-                       by (pelts x)[offset x + j]
-                       = (pelts onx)[offset onx + j]
-                       = (pelts nx)[offset onx + j] at Shift
-                       = (pelts ox)[offset x + j] };
-    value_sub_frame_shift (pelts x) (pelts ox)
-                          (offset x) (offset x) (int32'int sz);
-    assert { value r sz = value onr sz };
-    assert { value x sz = value onx sz };
-    res
 
 end

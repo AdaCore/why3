@@ -14,6 +14,7 @@ module Toom
   use lemmas.Lemmas
   use compare.Compare
   use util.Util
+  use util.UtilOld
   use add_1.Add_1
   use add.AddOld
   use sub_1.Sub_1
@@ -1323,7 +1324,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
     end;
     label Shift in
     let s = (2 * n) + 1 in
-    let ghost low = wmpn_rshift_in_place scratch s 1 in
+    let ghost low = wmpn_rshift scratch scratch s 1 in
     assert { low = 0 /\ value scratch s = vx0 + vx2
              by (low + radix * value scratch s)
                 = value (scratch at Shift) s * power 2 (Limb.length - 1)
