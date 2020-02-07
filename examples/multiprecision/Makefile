@@ -71,26 +71,26 @@ build/libwmp.a: $(EXTRACTED)
 	ar rcs $@ $(addprefix build/,$(CFILES:.c=.o))
 
 build/tests: tests.c build/libwmp.a
-	gcc $(CFLAGS) tests.c -Irandom -Lbuild -lwmp -lgmp -o $@
+	gcc $(CFLAGS) tests.c -Irandom -Lbuild -lm -lwmp -lgmp -o $@
 
 build/minitests: tests.c build/libwmp.a
-	gcc $(CFLAGS) -DCOMPARE_MINI tests.c -Irandom -Imini-gmp -Lbuild -lwmp -o $@
+	gcc $(CFLAGS) -DCOMPARE_MINI tests.c -Irandom -Imini-gmp -Lbuild -lm -lwmp -o $@
 
 UPPER = $(shell echo $* | tr [:lower:] [:upper:])
 
 build/why3%bench: tests.c build/libwmp.a
-	gcc $(CFLAGS) -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Iinclude -Irandom -Lbuild -lwmp -lgmp -o $@
+	gcc $(CFLAGS) -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Iinclude -Irandom -Lbuild -lm -lwmp -lgmp -o $@
 
 build/lib%bench: tests.c distrib/libwmp.a
-	gcc $(CFLAGS) -DTEST_LIB -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Irandom -Idistrib -Ldistrib -lwmp -lgmp -o $@
+	gcc $(CFLAGS) -DTEST_LIB -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Irandom -Idistrib -Ldistrib -lm -lwmp -lgmp -o $@
 
 build/gmp%bench: tests.c build/libwmp.a
-	gcc $(CFLAGS) $(GMPFLAGS) -DTEST_GMP -DTEST_$(UPPER) tests.c -Iinclude -Irandom -lgmp -o $@
+	gcc $(CFLAGS) $(GMPFLAGS) -DTEST_GMP -DTEST_$(UPPER) tests.c -Iinclude -Irandom -lm -lgmp -o $@
 
 build/minigmp%bench: tests.c build/libwmp.a
-	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -o $@
+	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -lm -o $@
 
-BENCHS = toomb sqrtrem millerrabin toomm toomu #add mul div powm
+BENCHS = toomb sqrtrem millerrabin toomu #add mul div powm toomm
 
 
 WHY3BENCHFILES = $(addprefix bench/why3, $(BENCHS))
