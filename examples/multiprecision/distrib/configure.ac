@@ -1,4 +1,4 @@
-AC_INIT([libwmp], [0.1], [Raphaël Rieu-Helft <raphael.rieu-helft@trust-in-soft.com>])
+AC_INIT([libwmp], [0.2], [Raphaël Rieu-Helft <raphael.rieu-helft@trust-in-soft.com>])
 AM_INIT_AUTOMAKE
 
 AC_PROG_CC

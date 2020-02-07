@@ -4,7 +4,7 @@ lib_LIBRARIES = libwmp.a
 
 libwmp_a_SOURCES = \
   lib/int.h lib/int32.h lib/uint32gmp.h lib/int64.h lib/uint64.h lib/uint64gmp.h lib/fxp.h \
-  lib/euclideandivision.h lib/computerdivision.h lib/valuation.h lib/bool.h \
+  lib/euclideandivision.h lib/computerdivision.h lib/bool.h \
   lib/array.h lib/map.h lib/c.h lib/power.h lib/types.h lib/realinfix.h lib/minmax.h \
   lib/explog.h lib/square.h \
   lib/util.c lib/util.h lib/utilold.c lib/utilold.h \
