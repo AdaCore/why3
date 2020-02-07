@@ -1,7 +1,8 @@
 BENCH ?= no
 OVERLAY ?= no
+LOCAL ?= $(BENCH)
 
-ifeq ($(BENCH),yes)
+ifeq ($(LOCAL),yes)
   WHY3=../../bin/why3.opt
 else
   ifeq ($(BINDIR),)
