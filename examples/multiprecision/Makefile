@@ -120,5 +120,5 @@ dist: $(EXTRACTED)
 
 tests-dist:
 	make -C distrib
-	gcc $(CFLAGS) tests.c -DTEST_LIB -Irandom -Idistrib -lgmp -Ldistrib -lwmp -o build/disttests
+	gcc $(CFLAGS) tests.c -DTEST_LIB -Irandom -Idistrib -lgmp -Ldistrib -lwmp -lm -o build/disttests
 	./build/disttests

@@ -157,9 +157,9 @@ typedef struct\n\
   int _alloc;\n\
   int _size;\n\
   uint64_t * _ptr;\n\
-} __mpz_struct;\n\
+} __wmpz_struct;\n\
 \n\
-typedef __mpz_struct *mpz_ptr;\n\
+typedef __wmpz_struct *wmpz_ptr;\n\
 \n\
 #define SIZ(x) ((x)->_size)\n\
 #define ALLOC(x) ((x)->_alloc)\n\
@@ -173,9 +173,9 @@ typedef struct\n\
   int _alloc;\n\
   int _size;\n\
   uint64_t * _ptr;\n\
-} __mpz_struct;\n\
+} __wmpz_struct;\n\
 \n\
-typedef __mpz_struct *mpz_ptr;\n\
+typedef __wmpz_struct *wmpz_ptr;\n\
 \n\
 #define SIZ(x) ((x)->_size)\n\
 #define ALLOC(x) ((x)->_alloc)\n\
@@ -183,7 +183,7 @@ typedef __mpz_struct *mpz_ptr;\n\
 \n\
 "
 
-  syntax type mpz_ptr "mpz_ptr"
+  syntax type mpz_ptr "wmpz_ptr"
   syntax val mpz_eq "%1 == %2" prec 7 15 14
   syntax val size_of "SIZ(%1)" prec 1 15
   syntax val alloc_of "ALLOC(%1)" prec 1 15
@@ -192,8 +192,8 @@ end
 module mpz.Zutil
 
 prelude "\n\
-mpz_ptr wmpz_init () {\n\
-  mpz_ptr x = malloc(sizeof(__mpz_struct));\n\
+wmpz_ptr __wmpz_init () {\n\
+  wmpz_ptr x = malloc(sizeof(__wmpz_struct));\n\
   ALLOC(x) = 1;\n\
   SIZ(x) = 0;\n\
   PTR(x) = malloc(sizeof(uint64_t));\n\
@@ -201,14 +201,14 @@ mpz_ptr wmpz_init () {\n\
   return x;\n\
 }\n\
 \n\
-void wmpz_clear (mpz_ptr x)\n\
+void wmpz_clear (wmpz_ptr x)\n\
 {\n\
   free (PTR(x));\n\
 }\n\
 "
 interface "\n\
-mpz_ptr wmpz_init ();\n\
-void wmpz_clear (mpz_ptr x);\n\
+wmpz_ptr __wmpz_init ();\n\
+void wmpz_clear (wmpz_ptr x);\n\
 "
 
   syntax val set_size "SIZ(%1) = %2" prec 14 15 14
@@ -220,7 +220,7 @@ void wmpz_clear (mpz_ptr x);\n\
   syntax val get_write_ptr "PTR(%1)" prec 1 15
   syntax val release_reader "(void)(%1)" prec 2 15
   syntax val release_writer "(void)(%1)" prec 2 15
-  syntax val wmpz_init "wmpz_init()" prec 2
+  syntax val wmpz_init "__wmpz_init()" prec 2
   syntax val wmpz_clear "wmpz_clear" prec 2
 
 end

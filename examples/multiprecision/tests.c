@@ -10,15 +10,15 @@
 #define BENCH
 #if !(defined(TEST_ADD) || defined(TEST_MUL) || defined(TEST_TOOMB) || defined(TEST_TOOMM) || defined(TEST_TOOMU) || defined(TEST_DIV) || defined(TEST_SQRT1) || defined(TEST_SQRTREM) || defined(TEST_POWM) || defined(TEST_ZADD) || defined(TEST_ZSUB) || defined(TEST_ZMUL) || defined(TEST_MILLERRABIN))
 #error "missing TEST_foo macro definition"
-#endif
-#else
+#endif //no TEST_OP
+#else //no TEST_LIB
 #define COMPARE
 #define TEST_WHY3
 #ifdef COMPARE_MINI
 #define TEST_MINIGMP
-#else
+#else //MINI
 #define TEST_GMP
-#endif
+#endif //MINI
 #define TEST_ADD
 #define TEST_MUL
 #define TEST_TOOMB
@@ -31,7 +31,9 @@
 #define TEST_ZADD
 #define TEST_ZSUB
 #define TEST_ZMUL
+#ifndef COMPARE_MINI
 #define TEST_MILLERRABIN
+#endif
 #endif
 
 #ifdef TEST_MINIGMP
@@ -49,26 +51,14 @@ extern void __gmpn_powm (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t,
 
 #ifdef TEST_LIB
 #include "wmp.h"
-extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
 #endif
 
 #if defined(TEST_WHY3) && !defined(TEST_LIB)
-#include "build/add.h"
-#include "build/mul.h"
-#include "build/div.h"
-#include "build/toom.h"
-#include "build/sqrt1.h"
-#include "build/sqrt.h"
-#include "build/util.h"
-#include "build/powm.h"
-#include "build/zutil.h"
-#include "build/zadd.h"
-#include "build/zsub.h"
-#include "build/zmul.h"
-#include "build/set.h"
-#include "build/zcmp.h"
-#include "build/zdiv2exp.h"
+#include "distrib/wmp.h"
 #endif
+
+extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
+extern void normalize(wmp_ptr, wmp_size_t*);
 
 #include "mt19937-64.c"
 

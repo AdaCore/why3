@@ -8,20 +8,29 @@ typedef uint64_t wmp_limb_t;
 typedef wmp_limb_t *wmp_ptr;
 typedef wmp_limb_t const *wmp_srcptr;
 
+#if defined (__GMP_H__) || defined (__MINI_GMP_H__)
+typedef mpz_ptr wmpz_ptr;
+#else
 typedef struct
 {
-int _alloc;
-int _size;
-uint64_t * _ptr;
+int _mp_alloc;
+int _mp_size;
+uint64_t * _mp_d;
 } __mpz_struct;
 
 typedef __mpz_struct *mpz_ptr;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-mpz_ptr wmpz_init ();
+static inline void wmpz_init (mpz_ptr p)  {
+  p->_mp_alloc = 1;
+  p->_mp_size = 0;
+  p->_mp_d = malloc(sizeof(uint64_t));
+}
+
 void wmpz_clear (mpz_ptr);
 wmp_ptr wmpz_realloc(mpz_ptr, wmp_size_t);
 
