@@ -24,13 +24,12 @@ endif
 
 CFLAGS += -Wall -Wno-unused -g -std=c11 -Wno-pedantic
 
-.PHONY: all clean extract plots benchs dist tests-dist
+.PHONY: all clean extract plots benchs why3benchs gmpbenchs minigmpbenchs
 
 all: extract
 
 clean:
 	rm -rf build bench
-	if test -f distrib/Makefile ; then make -C distrib clean ; fi
 
 why3:
 	make -C ../..
@@ -82,16 +81,13 @@ UPPER = $(shell echo $* | tr [:lower:] [:upper:])
 build/why3%bench: tests.c build/libwmp.a
 	gcc $(CFLAGS) -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Iinclude -Irandom -Lbuild -lm -lwmp -lgmp -o $@
 
-build/lib%bench: tests.c distrib/libwmp.a
-	gcc $(CFLAGS) -DTEST_LIB -DTEST_WHY3 -DTEST_$(UPPER) tests.c -Irandom -Idistrib -Ldistrib -lm -lwmp -lgmp -o $@
-
 build/gmp%bench: tests.c build/libwmp.a
 	gcc $(CFLAGS) $(GMPFLAGS) -DTEST_GMP -DTEST_$(UPPER) tests.c -Iinclude -Irandom -lm -lgmp -o $@
 
 build/minigmp%bench: tests.c build/libwmp.a
 	gcc $(CFLAGS) -DTEST_MINIGMP -DTEST_$(UPPER) tests.c -Iinclude -Imini-gmp -Irandom -lm -o $@
 
-BENCHS = toomb sqrtrem millerrabin toomu #add mul div powm toomm
+BENCHS = toomb sqrtrem millerrabin toomu add mul div powm toomm
 
 
 WHY3BENCHFILES = $(addprefix bench/why3, $(BENCHS))
@@ -110,15 +106,3 @@ benchs: why3benchs gmpbenchs minigmpbenchs
 
 plots: $(BENCHFILES)
 	make all -C plots
-
-dist: $(EXTRACTED)
-	mkdir -p distrib/lib
-	touch distrib/ChangeLog
-	cp build/*.c build/*.h distrib/lib/
-	cd distrib; ./autogen.sh
-	cd distrib; make distcheck
-
-tests-dist:
-	make -C distrib
-	gcc $(CFLAGS) tests.c -DTEST_LIB -Irandom -Idistrib -lgmp -Ldistrib -lwmp -lm -o build/disttests
-	./build/disttests

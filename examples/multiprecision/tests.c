@@ -49,13 +49,7 @@ extern void __gmpn_powm (mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t,
 #define PTR(x) ((x)->_mp_d)
 #define ALLOC(x) ((x)->_mp_alloc)
 
-#ifdef TEST_LIB
 #include "wmp.h"
-#endif
-
-#if defined(TEST_WHY3) && !defined(TEST_LIB)
-#include "distrib/wmp.h"
-#endif
 
 extern wmp_limb_t sqrt1(wmp_ptr, wmp_limb_t);
 extern void normalize(wmp_ptr, wmp_size_t*);
