@@ -41,6 +41,8 @@ uint64_t wmpz_get_ui (wmpz_srcptr);
 
 int32_t wmpz_cmp (wmpz_srcptr, wmpz_ptr);
 int32_t wmpz_cmp_ui (wmpz_srcptr, uint64_t);
+int32_t wmpz_cmpabs (wmpz_srcptr, wmpz_ptr);
+int32_t wmpz_cmpabs_ui (wmpz_srcptr, uint64_t);
 
 void wmpz_add (wmpz_ptr, wmpz_srcptr, wmpz_ptr);
 void wmpz_add_ui (wmpz_ptr, wmpz_srcptr, uint64_t);
