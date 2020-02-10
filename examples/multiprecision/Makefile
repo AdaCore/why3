@@ -34,13 +34,15 @@ clean:
 why3:
 	make -C ../..
 
-MLWFILES = $(addsuffix .mlw, mpz_div2exp mpz_mul2exp mpz_mul mpz_sub mpz_add mpz_getset mpz_cmp mpz get_str base_info powm sqrtrem sqrt toom logical div mul sub add compare util)
+MLWFILES = \
+  mpz_div2exp mpz_mul2exp mpz_mul mpz_sub mpz_add mpz_getset mpz_cmp mpz_cmpabs mpz \
+  get_str base_info powm sqrtrem sqrt toom logical div mul sub add compare util
 
-build/extracted: $(MLWFILES)
+build/extracted: $(addsuffix .mlw, $(MLWFILES))
 	mkdir -p build
 	rm -f $@
 	$(WHY3) extract -D wmpn.drv -D c -L . --recursive --modular --interface -o build/ \
-	  --debug c_no_error_msgs wmpn.mlw #$(MLWFILES)
+	  --debug c_no_error_msgs wmpn.mlw
 	touch $@
 
 build/sqrtinit.h: sqrtinit.ml
@@ -55,7 +57,11 @@ EXTRACTED = build/extracted build/sqrtinit.h build/binverttab.h
 
 extract: $(EXTRACTED)
 
-CFILES = zutil.c z.c zcmp.c zadd.c zsub.c zmul.c zmul2exp.c zdiv2exp.c set.c get_str.c baseinfo.c powm.c fxp.c sqrt.c sqrt1.c toom.c div.c logical.c logicalold.c logicalutil.c mul_basecase.c sub.c sub_1.c add.c add_1.c compare.c util.c utilold.c int32.c
+CFILES = \
+  zutil.c z.c zcmp.c zcmpabs.c zadd.c zsub.c zmul.c zmul2exp.c zdiv2exp.c \
+  set.c get_str.c baseinfo.c powm.c fxp.c sqrt.c sqrt1.c toom.c div.c \
+  logical.c logicalold.c logicalutil.c mul_basecase.c sub.c sub_1.c add.c add_1.c \
+  compare.c util.c utilold.c int32.c
 
 ifneq ($(OVERLAY),gmp)
 CFILES += mul.c addold.c subold.c

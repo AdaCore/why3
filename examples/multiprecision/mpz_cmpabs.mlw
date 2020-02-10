@@ -1,4 +1,4 @@
-module Zcmp
+module Zcmpabs
 
 use int.Int
 use int.Power
@@ -20,7 +20,6 @@ lemma abs_value :
 
 let wmpz_cmpabs (u v:mpz_ptr) : int32
   requires { mpz.readers[u] >= 0 /\ mpz.readers[v] >= 0 }
-  requires { Int32.in_bounds (mpz.abs_size[u] - mpz.abs_size[v]) }
   ensures  { forall w. mpz_unchanged w mpz (old mpz) }
   ensures { result > 0 -> abs (value_of u mpz) > abs (value_of v mpz) }
   ensures { result < 0 -> abs (value_of u mpz) < abs (value_of v mpz) }
