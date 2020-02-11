@@ -3,14 +3,14 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="8">
 <prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<file format="whyml" proved="true">
 <path name=".."/><path name="mpz_cmpabs.mlw"/>
-<theory name="Zcmpabs">
+<theory name="Zcmpabs" proved="true">
  <goal name="abs_value" proved="true">
  <proof prover="0"><result status="valid" time="0.03" steps="115"/></proof>
  </goal>
- <goal name="wmpz_cmpabs&#39;vc" expl="VC for wmpz_cmpabs">
- <transf name="split_vc" >
+ <goal name="wmpz_cmpabs&#39;vc" expl="VC for wmpz_cmpabs" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="wmpz_cmpabs&#39;vc.0" expl="integer overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="93"/></proof>
   </goal>
@@ -62,7 +62,38 @@
   <goal name="wmpz_cmpabs&#39;vc.16" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.03" steps="94"/></proof>
   </goal>
-  <goal name="wmpz_cmpabs&#39;vc.17" expl="postcondition">
+  <goal name="wmpz_cmpabs&#39;vc.17" expl="postcondition" proved="true">
+  <transf name="assert" proved="true" arg1="((readers mpz)[v]&#39; = (readers mpz4)[v]&#39;)">
+   <goal name="wmpz_cmpabs&#39;vc.17.0" expl="asserted formula" proved="true">
+   <proof prover="0"><result status="valid" time="0.15" steps="328"/></proof>
+   </goal>
+   <goal name="wmpz_cmpabs&#39;vc.17.1" expl="postcondition" proved="true">
+   <transf name="unfold" proved="true" arg1="mpz_unchanged">
+    <goal name="wmpz_cmpabs&#39;vc.17.1.0" expl="VC for wmpz_cmpabs" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="wmpz_cmpabs&#39;vc.17.1.0.0" expl="VC for wmpz_cmpabs" proved="true">
+     <proof prover="0"><result status="valid" time="0.05" steps="107"/></proof>
+     </goal>
+     <goal name="wmpz_cmpabs&#39;vc.17.1.0.1" expl="VC for wmpz_cmpabs" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="107"/></proof>
+     </goal>
+     <goal name="wmpz_cmpabs&#39;vc.17.1.0.2" expl="VC for wmpz_cmpabs" proved="true">
+     <proof prover="0"><result status="valid" time="0.03" steps="107"/></proof>
+     </goal>
+     <goal name="wmpz_cmpabs&#39;vc.17.1.0.3" expl="VC for wmpz_cmpabs" proved="true">
+     <proof prover="0"><result status="valid" time="0.02" steps="107"/></proof>
+     </goal>
+     <goal name="wmpz_cmpabs&#39;vc.17.1.0.4" expl="VC for wmpz_cmpabs" proved="true">
+     <proof prover="0"><result status="valid" time="0.84" steps="623"/></proof>
+     </goal>
+     <goal name="wmpz_cmpabs&#39;vc.17.1.0.5" expl="VC for wmpz_cmpabs" proved="true">
+     <proof prover="0"><result status="valid" time="0.03" steps="107"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
   <goal name="wmpz_cmpabs&#39;vc.18" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.08" steps="338"/></proof>
