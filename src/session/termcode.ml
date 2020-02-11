@@ -320,9 +320,10 @@ let pushc c =
   check ()
 
 (* Remove infix and mixfix. (prefix should be rare enough) *)
-let decoded si =
-  Ident.(match sn_decode si with
-  | SNword s | SNinfix s | SNtight s | SNprefix s | SNget s | SNset s
+let decoded pr id =
+  Ident.(match sn_decode id.id_string with
+  | SNword _ -> Ident.id_unique pr id
+  | SNinfix s | SNtight s | SNprefix s | SNget s | SNset s
   | SNupdate s | SNcut s | SNlcut s | SNrcut s -> s)
 
 let ident_v4 h id =
@@ -334,11 +335,11 @@ let ident_v4 h id =
   in
   push x
 
-let ident_v5 h id =
+let ident_v5 pr h id =
   let x =
     try Ident.Mid.find id !h
     with Not_found ->
-      let s = decoded id.Ident.id_string in
+      let s = decoded pr id in
       h := Ident.Mid.add id s !h; s
   in
   push x
@@ -371,31 +372,31 @@ let const_shape v c =
   Format.pp_print_flush fmt ();
   check ()
 
-let ident_shape v m id =
+let ident_shape v pr m id =
   match v with
   | SV1 | SV2 | SV3 | SV4 -> ident_v4 m id
-  | SV5 -> ident_v5 m id
+  | SV5 -> ident_v5 pr m id
 
-let rec pat_shape ~version c m p : 'a =
+let rec pat_shape ~version pr c m p : 'a =
   match p.pat_node with
     | Pwild -> pushc tag_wild
     | Pvar _ -> pushc tag_var
     | Papp (f, l) ->
         pushc tag_app;
-        ident_shape version m f.ls_name;
-        List.iter (pat_shape ~version c m) l
-    | Pas (p, _) -> pat_shape ~version c m p; pushc tag_as
+        ident_shape version pr m f.ls_name;
+        List.iter (pat_shape ~version pr c m) l
+    | Pas (p, _) -> pat_shape ~version pr c m p; pushc tag_as
     | Por (p, q) ->
-       pat_shape ~version c m q; pushc tag_or; pat_shape ~version c m p
+       pat_shape ~version pr c m q; pushc tag_or; pat_shape ~version pr c m p
 
-let rec t_shape ~version c m t =
-  let fn = t_shape ~version c m in
+let rec t_shape ~version pr c m t =
+  let fn = t_shape ~version pr c m in
   match t.t_node with
     | Tconst c -> pushc tag_const; const_shape version c
-    | Tvar v -> pushc tag_var; ident_shape version m v.vs_name
+    | Tvar v -> pushc tag_var; ident_shape version pr m v.vs_name
     | Tapp (s,l) ->
         pushc tag_app;
-        ident_shape version m s.ls_name;
+        ident_shape version pr m s.ls_name;
         List.iter fn l
     | Tif (f,t1,t2) ->
       begin match version with
@@ -407,13 +408,13 @@ let rec t_shape ~version c m t =
           let p,t2 = t_open_branch b in
           match version with
           | SV1 | SV2 ->
-            pat_shape ~version c m p;
+            pat_shape ~version pr c m p;
             pat_rename_alpha c m p;
-            t_shape ~version c m t2
+            fn t2
           | SV3 | SV4 | SV5 ->
             pat_rename_alpha c m p;
-            t_shape ~version c m t2;
-            pat_shape ~version c m p
+            fn t2;
+            pat_shape ~version pr c m p
         in
         begin match version with
         | SV1 | SV2 ->
@@ -429,21 +430,16 @@ let rec t_shape ~version c m t =
         pushc tag_eps;
         let u,f = t_open_bound b in
         vs_rename_alpha c m u;
-        t_shape ~version c m f
+        fn f
     | Tquant (q,b) ->
         let vl,triggers,f1 = t_open_quant b in
         vl_rename_alpha c m vl;
         (* argument first, intentionally, to give more weight on A in
            forall x,A *)
-        t_shape ~version c m f1;
+        fn f1;
         let hq = match q with Tforall -> tag_forall | Texists -> tag_exists in
         pushc hq;
-        List.iter
-          (fun trigger ->
-             List.iter
-               (fun t -> t_shape ~version c m t)
-               trigger)
-          triggers
+        List.iter (fun trigger -> List.iter fn trigger) triggers
     | Tbinop (o,f,g) ->
        (* g first, intentionally, to give more weight on B in A->B *)
        fn g;
@@ -461,10 +457,10 @@ let rec t_shape ~version c m t =
         begin
           match version with
             | SV1 ->
-               pushc tag_let; fn t1; t_shape ~version c m t2
+                pushc tag_let; fn t1; fn t2
             | SV2 | SV3 | SV4 | SV5 ->
-                     (* t2 first, intentionally *)
-                     t_shape ~version c m t2; pushc tag_let; fn t1
+                (* t2 first, intentionally *)
+                fn t2; pushc tag_let; fn t1
         end
     | Tnot f ->
       begin match version with
@@ -476,6 +472,7 @@ let rec t_shape ~version c m t =
 
 let t_shape_task ~version ~expl t =
   Buffer.clear shape_buffer;
+  let pr = Ident.create_ident_printer [] in
   let f = Task.task_goal_fmla t in
   let c = ref (-1) in
   let m = ref Ident.Mid.empty in
@@ -486,7 +483,7 @@ let t_shape_task ~version ~expl t =
       | SV1 | SV2 -> ()
       | SV3 | SV4 | SV5 -> push expl end;
       (* goal shape *)
-      t_shape ~version c m f;
+      t_shape ~version pr c m f;
       (* All declarations shape *)
       begin match version with
       | SV1 | SV2 | SV3 -> ()
@@ -497,7 +494,7 @@ let t_shape_task ~version ~expl t =
               begin match d.d_node with
               | Dparam _ls -> ()
               | Dprop (_, _pr, f) ->
-                 t_shape ~version c m f
+                  t_shape ~version pr c m f
               | _ -> ()
               end
            | _ -> () in
@@ -579,6 +576,7 @@ module Gshape = struct
   let t_shape_task_v5 ~expl gs t =
     let current_shape = ref [] in
     Buffer.clear Shape.shape_buffer;
+    let pr = Ident.create_ident_printer [] in
     let c = ref (-1) in
     let m = ref Ident.Mid.empty in
     (* All declarations shape *)
@@ -591,7 +589,7 @@ module Gshape = struct
       | Dparam _ls -> ()
       | Dprop (_, _pr, f) ->
           let sh =
-            (try Shape.t_shape ~version:SV5 c m f with Shape.ShapeTooLong -> ());
+            (try Shape.t_shape ~version:SV5 pr c m f with Shape.ShapeTooLong -> ());
             Buffer.contents Shape.shape_buffer in
           Buffer.clear Shape.shape_buffer;
           add_and_prepend gs current_shape sh
