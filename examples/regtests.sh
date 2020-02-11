@@ -74,7 +74,7 @@ run_dir () {
         total=`expr $total + 1`
     done
     sessions="$sessions $1/*/why3session.xml"
-    shapes="$shapes $1/*/why3shapes.*"
+    shapes="$shapes $1/*/why3shapes.gz"
 }
 
 echo "=== Programs already ported === MUST REPLAY AND ALL GOALS PROVED ==="

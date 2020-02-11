@@ -202,6 +202,11 @@ let same_result r1 r2 =
     | Call_provers.Failure _, Call_provers.Failure _-> true
     | _ -> false
 
+let save cont =
+  Debug.dprintf debug "Saving session...@?";
+  S.save_session cont.Controller_itp.controller_session;
+  Debug.dprintf debug " done@."
+
 let run_replay some_merge_miss found_obs cont =
   let session = cont.Controller_itp.controller_session in
   let final_callback found_upgraded_prover report =
@@ -229,10 +234,6 @@ let run_replay some_merge_miss found_obs cont =
              | _ -> false)
            report
     in
-    let save () =
-      Debug.dprintf debug "Saving session...@?";
-      S.save_session session;
-      Debug.dprintf debug " done@." in
     printf " %d/%d " n m;
     if report = [] && not some_merge_miss then
       begin
@@ -243,7 +244,7 @@ let run_replay some_merge_miss found_obs cont =
                   (if found_upgraded_prover then ", upgraded prover" else "");
            if !opt_stats && n<m then print_statistics session files;
            Debug.dprintf debug "Everything replayed OK.@.";
-           if !opt_force || found_obs || found_upgraded_prover then save ();
+           if !opt_force || found_obs || found_upgraded_prover then save cont;
            exit 0
         | _ ->
            printf "No smoke detected@.";
@@ -256,7 +257,7 @@ let run_replay some_merge_miss found_obs cont =
           (if some_merge_miss then ", with some merge miss" else "");
         List.iter (print_report session) report;
         eprintf "Replay failed.@.";
-        if !opt_force then save ();
+        if !opt_force then save cont;
         exit 1
       end
   in
@@ -401,6 +402,7 @@ let () =
       begin
         eprintf "Session is not obsolete, hence not replayed@.";
         printf "@.";
+        if !opt_force then save cont;
         exit 0
       end;
     if found_obs then eprintf "[Warning] session is obsolete@.";
