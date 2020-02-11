@@ -1,10 +1,11 @@
 use int.Int
 
 scope Constant
-  val create: unit -> unit
+  let create () : unit = ()
   exception Done
-  val next () : (r:int)
-    ensures { r = 42 }
+  let next () : (r:int)
+    ensures { r = 42 } =
+    42
 end
 
 let test_Constant () =
