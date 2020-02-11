@@ -13,6 +13,7 @@ Standard library
       - Fmap: polymorphic, logic finite maps to be used in logic
       - MapApp, MapAppInt, MapImp, MapImpInt: monomorphic finite maps to
         be used in programs
+  * no more libraries `appmap` and `impmap`
 
 Language
   * it is now possible to give a name to preconditions and assertions;

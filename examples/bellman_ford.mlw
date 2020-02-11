@@ -139,13 +139,37 @@ theory Graph
 
 end
 
+module ImpmapNoDom
+
+  use map.Map
+  use map.Const
+
+  type key
+
+  type t 'a = abstract { mutable contents: map key 'a }
+
+  val function create (x: 'a): t 'a
+    ensures { result.contents = const x }
+
+  val function ([]) (m: t 'a) (k: key): 'a
+    ensures { result = m.contents[k] }
+
+  val ghost function ([<-]) (m: t 'a) (k: key) (v: 'a): t 'a
+    ensures { result.contents = m.contents[k <- v] }
+
+  val ([]<-) (m: t 'a) (k: key) (v: 'a): unit
+    writes { m }
+    ensures { m = (old m)[k <- v] }
+
+end
+
 module BellmanFord
 
   use Graph
   use int.IntInf as D
   use ref.Ref
   clone set.SetImp as S with type elt = (vertex, vertex)
-  clone impmap.ImpmapNoDom with type key = vertex
+  clone ImpmapNoDom with type key = vertex
 
   type distmap = ImpmapNoDom.t D.t
 

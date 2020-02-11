@@ -1,4 +1,28 @@
 
+module ImpmapNoDom
+
+  use map.Map
+  use map.Const
+
+  type key
+
+  type t 'a = abstract { mutable contents: map key 'a }
+
+  val function create (x: 'a): t 'a
+    ensures { result.contents = const x }
+
+  val function ([]) (m: t 'a) (k: key): 'a
+    ensures { result = m.contents[k] }
+
+  val ghost function ([<-]) (m: t 'a) (k: key) (v: 'a): t 'a
+    ensures { result.contents = m.contents[k <- v] }
+
+  val ([]<-) (m: t 'a) (k: key) (v: 'a): unit
+    writes { m }
+    ensures { m = (old m)[k <- v] }
+
+end
+
 module M
 
   use int.Int
@@ -7,7 +31,7 @@ module M
   (** Memory model and definition of is_list *)
   type pointer
 
-  clone impmap.ImpmapNoDom with type key = pointer
+  clone ImpmapNoDom with type key = pointer
 
   val constant null: pointer
   val predicate is_null (x: pointer)
@@ -187,7 +211,7 @@ module M2
   (** Memory model and definition of is_list *)
   type pointer
 
-  clone impmap.ImpmapNoDom with type key = pointer
+  clone ImpmapNoDom with type key = pointer
 
   val constant null: pointer
   val predicate is_null (x: pointer)

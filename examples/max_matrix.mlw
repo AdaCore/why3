@@ -83,6 +83,26 @@ module HashTable
 
 end
 
+module Appmap
+
+  use map.Map
+  use map.Const
+
+  type key
+
+  type t 'a = abstract { contents: map key 'a }
+
+  val function create (x: 'a): t 'a
+    ensures { result.contents = const x }
+
+  val function ([]) (m: t 'a) (k: key): 'a
+    ensures { result = m.contents[k] }
+
+  val function ([<-]) (m: t 'a) (k: key) (v: 'a): t 'a
+    ensures { result.contents = m.contents[k <- v] }
+
+end
+
 module MaxMatrixMemo
 
   use int.Int
@@ -91,7 +111,7 @@ module MaxMatrixMemo
   use Bitset
   use map.Map
 
-  clone appmap.Appmap with type key = int, axiom .
+  clone Appmap with type key = int, axiom .
 
   val constant n : int
     ensures { 0 <= result <= size }
