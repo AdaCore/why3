@@ -89,6 +89,9 @@ IDE
 Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq
 
+Provers
+  * support for Vampire 4.2.2 (released Dec 14, 2017)
+
 Version 1.2.1, October 28, 2019
 -------------------------------
 
