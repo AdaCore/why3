@@ -92,6 +92,8 @@ Realizations
 
 Provers
   * support for Vampire 4.2.2 (released Dec 14, 2017)
+  * support for Coq 8.10 (released Oct 8, 2019)
+  * support for Coq 8.11 (released Jan 30, 2020)
 
 Version 1.2.1, October 28, 2019
 -------------------------------
@@ -168,6 +170,7 @@ Provers
   * support for Z3 4.8.4 (released Dec 20, 2018)
   * support for Coq 8.9.0 (released Jan 17, 2019)
   * upgraded Coq realizations for floating-point arithmetic to Flocq 3.1
+  * dropped support for Coq 8.5
 
 Version 1.1.1, December 17, 2018
 --------------------------------

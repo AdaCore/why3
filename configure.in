@@ -856,9 +856,6 @@ if test "$enable_coq_support" = yes; then
    AC_MSG_RESULT($COQVERSION)
 
    case $COQVERSION in
-      8.5*)
-         coq_compat_version="COQ85"
-         ;;
       8.6*)
          coq_compat_version="COQ86"
          ;;
@@ -879,8 +876,8 @@ if test "$enable_coq_support" = yes; then
          ;;
       *)
          enable_coq_support=no
-         AC_MSG_WARN(You need Coq 8.5 or later; Coq discarded)
-         reason_coq_support=" (version is $COQVERSION but need version 8.5 or later)"
+         AC_MSG_WARN(You need Coq 8.6 or later; Coq discarded)
+         reason_coq_support=" (need version >= 8.6)"
          ;;
    esac
 fi
