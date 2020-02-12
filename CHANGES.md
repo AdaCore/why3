@@ -14,6 +14,7 @@ Standard library
       - MapApp, MapAppInt, MapImp, MapImpInt: monomorphic finite maps to
         be used in programs
   * no more libraries `appmap` and `impmap`
+  * no more library `sum.Sum` (subsumed by `int.Sum`)
 
 Language
   * it is now possible to give a name to preconditions and assertions;
