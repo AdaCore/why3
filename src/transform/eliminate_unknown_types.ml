@@ -23,7 +23,7 @@ let syntactic_transform =
       match meta_arg with
       | [MAts ts; MAstr _; MAint _] -> Sts.add ts acc
       | _ -> assert false) Sts.empty metas in
-      Trans.return (fun ts -> Sts.exists (ts_equal ts) symbols))
+      Trans.return (fun ts -> Sts.mem ts symbols))
 
 let remove_terms keep =
   let keep_ls ls =
@@ -97,3 +97,140 @@ let remove_types =
 let () =
   Trans.register_transform "eliminate_unknown_types" remove_types
     ~desc:"Remove@ types@ unknown@ to@ the@ prover@ and@ terms@ referring@ to@ them."
+
+
+let remove_ty_constr keep =
+  let keep ts =
+    match ts.Ty.ts_args with | [] -> true | _ -> keep ts
+  in
+  let keep_ty ty =
+    Ty.ty_all (fun ty ->
+        match ty.ty_node with
+        | Ty.Tyvar _ -> invalid_arg "remove_ty_constr used with polymorphism"
+        | Ty.Tyapp (ts, _) -> keep ts)
+      ty
+  in
+  let keep_ls ls =
+    List.for_all keep_ty ls.Term.ls_args
+    && Opt.for_all keep_ty ls.Term.ls_value
+  in
+  let keep_term t =
+    Term.t_s_all keep_ty keep_ls t
+  in
+  let convert db ty ts =
+    let (m,new_)  = !db in
+    match Mty.find_opt ty m with
+    | None ->
+        let s = Pp.sprintf_wnl "%a" Pretty.print_ty ty in
+        let ts = Ty.create_tysymbol (Ident.id_derive s ts.Ty.ts_name) [] NoDef in
+        let ty' = Ty.ty_app ts [] in
+        db := (Mty.add ty ty' m,ts::new_);
+        ty'
+    | Some ty -> ty
+  in
+  let rec map' db (ty:Ty.ty) =
+    match ty.ty_node with
+    | Ty.Tyvar _ -> invalid_arg "remove_ty_constr used with polymorphism"
+    | Ty.Tyapp (ts, _) when (keep ts) ->
+        Ty.ty_map (map' db) ty
+    | Ty.Tyapp (ts, _)  ->
+        convert db ty ts
+  in
+  let map (mty,new_)  ty =
+    let db = ref (mty,new_) in
+    let ty = map' db ty in
+    !db, ty
+  in
+  let map_term mty mls mvs new_ t =
+    let db = ref (mty,new_) in
+    let t =
+      Term.t_gen_map
+        (map' db)
+        (fun ls -> Mls.find_def ls ls mls)
+        mvs
+        t
+    in
+    let (mty,new_) = !db in
+    (mty,mls,new_,t)
+  in
+  let create_new_ls mty mls new_ ls =
+    let id = Ident.id_clone ls.ls_name in
+    let db = (mty,new_) in
+    let db,args = Lists.map_fold_left map db ls.Term.ls_args in
+    let (mty,new_),value = Opt.map_fold map db ls.Term.ls_value in
+    let ls' = Term.create_lsymbol id args value in
+    let mls = Mls.add ls ls' mls in
+    (mty,mls,new_,ls')
+  in
+  let add_new mty mls new_ task_uc d =
+    let task_uc =
+      List.fold_left (fun task_uc ts -> Task.add_decl task_uc (create_ty_decl ts))
+        task_uc new_ in
+    ((mty,mls), Task.add_decl task_uc d)
+  in
+  Trans.fold (fun hd ((mty,mls),task_uc) ->
+      match hd.Task.task_decl.td_node with
+      | Decl d ->
+          begin match d.d_node with
+          | Dtype ty when not (keep ty) ->
+              Debug.dprintf debug "remove@ type@ %a@." Pretty.print_ty_decl ty;
+              ((mty,mls), task_uc)
+          | Ddata l  when List.exists (fun (t,_) -> not (keep t)) l ->
+              invalid_arg "remove_ty_constr with datatype with constructor"
+          | Dparam ls when not (keep_ls ls) ->
+              let (mty,mls,new_,ls) = create_new_ls mty mls [] ls in
+              let d = create_param_decl ls in
+              add_new mty mls new_ task_uc d
+          | Dlogic l when not
+                (List.for_all (fun (l,def) ->
+                     (keep_ls l) &&
+                     let (_, t) = open_ls_defn def in
+                     keep_term t) l) ->
+              let ((mty,mls,new_),l) =
+                Lists.map_fold_left
+                  (fun (mty,mls,new_) (ls,def) ->
+                     let (mty,mls,new_,ls) = create_new_ls mty mls new_ ls in
+                     ((mty,mls,new_),(ls,def))
+                  )
+                  (mty,mls,[]) l
+              in
+              let ((mty,mls,new_),l) =
+                Lists.map_fold_left
+                  (fun (mty,mls,new_) (ls,def) ->
+                     let (vs, t) = open_ls_defn def in
+                     let ((mty,new_,vss),vs) =
+                       Lists.map_fold_left
+                         (fun (mty,new_,vss) vs ->
+                            let (mty,new_),ty = map (mty,new_) vs.vs_ty in
+                            let vs' =
+                              Term.create_vsymbol (Ident.id_clone vs.vs_name) ty
+                            in
+                            ((mty,new_,Mvs.add vs vs' vss),vs')
+                         ) (mty,new_,Mvs.empty) vs
+                     in
+                     let (mty,mls,new_,t) = map_term mty mls vss new_ t in
+                     let def = make_ls_defn ls vs t in
+                     ((mty,mls,new_),def)
+                  ) (mty,mls,new_) l
+              in
+              let d = create_logic_decl l in
+              add_new mty mls new_ task_uc d
+          | Dprop (k,pr,t) when not (keep_term t) ->
+              let (mty,mls,new_,t) = map_term mty mls Mvs.empty [] t in
+              let d = create_prop_decl k pr t in
+              add_new mty mls new_ task_uc d
+          | _ ->
+              ((mty,mls), Task.add_decl task_uc d)
+          end
+      | _ -> ((mty,mls),Task.add_tdecl task_uc hd.Task.task_decl)
+    )
+    ((Mty.empty,Mls.empty), None)
+
+let remove_ty_constr =
+  (* TODO fix the pair *)
+  Trans.bind (Trans.bind syntactic_transform remove_ty_constr)
+    (fun (_, task) -> Trans.return task)
+
+let () =
+  Trans.register_transform "eliminate_unknown_ty_constr" remove_types
+    ~desc:"Remove@ type@ unknown@ type@ constructor,@ could@ be@ used@ only@ after@ eliminating@ polymorphism."

@@ -40,3 +40,5 @@ val equal : ('a -> 'b -> bool) -> 'a option -> 'b option -> bool
 val compare : ('a -> 'b -> int) -> 'a option -> 'b option -> int
 
 val map_fold : ('a -> 'b -> 'a * 'b) -> 'a -> 'b option -> 'a * 'b option
+
+val for_all : ('a  -> bool)  -> 'a option  -> bool
