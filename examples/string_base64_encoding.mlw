@@ -1,0 +1,240 @@
+use mach.int.Int
+use mach.int.Int63
+use string.OCaml
+
+function next_3 (i: int) : int
+= if mod i 3 = 0 then i else if mod i 3 = 1 then i + 2 else i + 1
+
+function int2b64 (i: int) : char =
+  if 0 <= i <= 25 then chr (i + 65) else
+  if 26 <= i <= 51 then chr (i - 26 + 97) else
+  if 52 <= i <= 61 then chr (i - 52 + 48) else
+  if i = 62 then chr 43 else if i = 63 then chr 47
+  else chr 64
+
+let int2b64 (i: int63) : char
+  requires { 0 <= i < 64 }
+  ensures  { result = int2b64 i }
+=
+  if 0 <= i <= 25 then chr (i + 65) else
+  if 26 <= i <= 51 then chr (i - 26 + 97) else
+  if 52 <= i <= 61 then chr (i - 52 + 48) else
+  if i = 62 then chr 43 else if i = 63 then chr 47
+  else (assert { false }; chr 60)
+
+lemma substring_eq_char: forall s i. 0 <= i <= length s ->
+  let s' = substring s 0 (length s - i) in
+  (forall j. 0 <= j < length s - i -> s[j] = s'[j])
+
+lemma concat_substring_make: forall s i c. 0 <= i <= length s ->
+  let s' = concat (substring s 0 (length s - i)) (make i c) in
+  length s' = length s &&
+  (forall j. 0 <= j < length s - i -> s'[j] = s[j])
+
+lemma concat_make: forall s i c. 0 <= i ->
+  let s' = concat s (make i c) in
+  (forall j. length s <= j < length s + i -> s'[j] = c)
+
+let function eq_char : char = chr 61
+
+let function encode (s: string) : string
+  ensures { length result = div (next_3 (length s) * 4) 3 }
+  ensures { mod (length result) 4 = 0 }
+  ensures { forall i. 0 <= i < div (length s) 3 ->
+              let a1, a2, a3 = s[i*3], s[i*3+1], s[i*3+2] in
+              result[i*4]   = int2b64 (div (code a1)  4) &&
+              result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+              result[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
+              result[i*4+3] = int2b64 (mod (code a3) 64)
+  }
+  ensures { length s < next_3 (length s) ->
+              let i = div (length s) 3 in
+              let a1, a2 = s[i*3], s[i*3+1] in
+              result[i*4]   = int2b64 (div (code a1)  4) &&
+              if i * 3 + 1 >= length s then
+                result[i*4+1] = int2b64 (mod (code a1) 4 * 16) &&
+                result[i*4+2] = eq_char &&
+                result[i*4+3] = eq_char
+              else
+                result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+                result[i*4+2] = int2b64 (mod (code a2) 16 * 4) &&
+                result[i*4+3] = eq_char
+  }
+= let len_m = (length s) % 3 in
+  let padding:int63 = if len_m = 1 then 2 else if len_m = 2 then 1 else 0 in
+  let zero = (chr 0).content in
+  let sp = if padding = 2 then concat s (concat zero zero) else
+           if padding = 1 then concat s zero else s in
+  let ref i = 0 in
+  let ref r = "" in
+  while i < length sp do
+    variant {length sp - i}
+    invariant { mod i 3 = 0 }
+    invariant { mod (length r) 4 = 0 }
+    invariant { 0 <= i <= length sp }
+    invariant { length r = div (i * 4) 3 }
+    invariant { forall j. 0 <= j < div i 3 ->
+      let a1, a2, a3 = sp[j*3], sp[j*3+1], sp[j*3+2] in
+      r[j*4]   = int2b64 (div (code a1)  4) &&
+      r[j*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+      r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
+      r[j*4+3] = int2b64 (mod (code a3) 64)
+    }
+    let c1,c2,c3 = sp[i], sp[i+1], sp[i+2] in
+    let b1 = code c1 / 4 in
+    let b2 = (code c1 % 4) * 16 + code c2 / 16 in
+    let b3 = (code c2 % 16) * 4 + code c3 / 64 in
+    let b4 = code c3 % 64 in
+    label L in
+    r <- concat r (int2b64 b1).content;
+    assert { forall j. 0 <= j < length r - 1 -> r[j] = (r at L)[j] };
+    assert { r[length r - 1] = int2b64 (div (code c1) 4) };
+    r <- concat r (int2b64 b2).content;
+    assert { forall j. 0 <= j < length r - 2 -> r[j] = (r at L)[j] };
+    assert { r[length r - 1] = int2b64 (mod (code c1) 4 * 16 + div (code c2) 16) };
+    r <- concat r (int2b64 b3).content;
+    assert { forall j. 0 <= j < length r - 3 -> r[j] = (r at L)[j] };
+    assert { r[length r - 1] = int2b64 (mod (code c2) 16 * 4 + div (code c3) 64) };
+    r <- concat r (int2b64 b4).content;
+    assert { forall j. 0 <= j < length r - 4 -> r[j] = (r at L)[j] };
+    assert { r[length r - 4] = int2b64 (div (code c1) 4) &&
+             r[length r - 3] = int2b64 (mod (code c1) 4 * 16 + div (code c2) 16) &&
+             r[length r - 2] = int2b64 (mod (code c2) 16 * 4 + div (code c3) 64) &&
+             r[length r - 1] = int2b64 (mod (code c3) 64) };
+    i <- i + 3;
+    assert { forall j. j = div i 3 - 1 ->
+      let a1, a2, a3 = sp[j*3], sp[j*3+1], sp[j*3+2] in
+      r[j*4]   = int2b64 (div (code a1)  4) &&
+      r[j*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+      r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
+      r[j*4+3] = int2b64 (mod (code a3) 64)
+    };
+    assert { forall j. 0 <= j < length r - 4 -> r[j] = (r at L)[j]}
+  done;
+  assert { forall j. 0 <= j < div (length sp) 3 ->
+    let a1, a2, a3 = sp[j*3], sp[j*3+1], sp[j*3+2] in
+    r[j*4]   = int2b64 (div (code a1)  4) &&
+    r[j*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+    r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
+    r[j*4+3] = int2b64 (mod (code a3) 64)
+  };
+  label L2 in
+  r <- concat (sub r 0 (length r - padding)) (make padding eq_char);
+  assert { forall j. 0 <= j < length s -> s[j] = sp[j]};
+  assert { forall j. 0 <= j < div (length s) 3 ->
+    let a1, a2, a3 = s[j*3], s[j*3+1], s[j*3+2] in
+    r[j*4]   = int2b64 (div (code a1)  4) &&
+    r[j*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+    r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
+    r[j*4+3] = int2b64 (mod (code a3) 64)
+  };
+  assert { length s < next_3 (length s) ->
+    let i = div (length s) 3 in
+    let a1, a2, a3 = sp[i*3], sp[i*3+1], sp[i*3+2] in
+    r[i*4] = int2b64 (div (code a1)  4) &&
+    if i * 3 + 1 >= length s then
+      div (code a2) 16 = 0 &&
+      r[i*4+1] = int2b64 (mod (code a1) 4 * 16) &&
+      r[i*4+2] = eq_char &&
+      r[i*4+3] = eq_char
+    else
+      div (code a3) 64 = 0 &&
+      r[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+      r[i*4+2] = int2b64 (mod (code a2) 16 * 4) &&
+      r[i*4+3] = eq_char
+  };
+  r
+
+predicate valid_64_char (c: char) =
+  65 <= code c <= 90 || 97 <= code c <= 122 || 48 <= code c <= 57 ||
+  code c = 43 || code c = 47 || c = eq_char
+
+function b642int (c: char) : int =
+  if 65 <= code c <= 90 then code c - 65 else
+  if 97 <= code c <= 122 then code c - 97 + 26 else
+  if 48 <= code c <= 57 then code c - 48 + 52 else
+  if code c = 43 then 62 else if code c = 47 then 63
+  else if c = eq_char then 0 else -1
+
+let b642int (c: char) : int63
+  ensures { result = b642int c }
+= if 65 <= code c <= 90 then code c - 65 else
+  if 97 <= code c <= 122 then code c - 97 + 26 else
+  if 48 <= code c <= 57 then code c - 48 + 52 else
+  if code c = 43 then 62 else if code c = 47 then 63
+  else if code eq_char = code c then 0 else -1
+
+function pad (s: string): int =
+  if s = "" then 0 else
+    if s[length s - 1] = eq_char then
+      (if s[length s - 2] = eq_char then 2 else 1)
+    else 0
+
+let pad (s: string): int63
+  ensures { result = pad s }
+= if s = "" then 0 else
+    if code s[length s - 1] = code eq_char then
+      (if code s[length s - 2] = code eq_char then 2 else 1)
+    else 0
+
+let decode (s: string) : string
+  requires { mod (length s) 4 = 0 }
+  requires { forall i. 0 <= i < length s -> valid_64_char s[i] }
+  requires { forall i. s[i] = eq_char ->
+    (i = length s - 2 && s[i-1] = eq_char) || (i = length s - 1) }
+  ensures  { length result = div (length s * 3) 4 - pad s }
+  ensures  { forall i. 0 <= i < div (length s) 4 ->
+    let b1,b2,b3,b4 = s[4*i], s[4*i+1],s[4*i+2], s[4*i+3] in
+    result[i*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+    (pad s < 2 ->
+      result[i*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4)) &&
+    (pad s < 1 ->
+      result[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4))
+  }
+= let ref i = 0 in
+  let ref r = "" in
+  while i < length s do
+    variant { length s - i }
+    invariant { 0 <= i <= length s }
+    invariant { mod i 4 = 0 }
+    invariant { mod (length r) 3 = 0}
+    invariant { length r = div (i * 3) 4 }
+    invariant { forall j. 0 <= j < div i 4 ->
+      let b1,b2,b3,b4 = s[4*j], s[4*j+1], s[4*j+2], s[4*j+3] in
+      r[j*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+      r[j*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
+      r[j*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4)
+    }
+    label L in
+    let b1,b2,b3,b4 = s[i], s[i+1], s[i+2], s[i+3] in
+    (* assert { valid_64_char b1 && valid_64_char b2 &&
+             valid_64_char b3 && valid_64_char b4}; *)
+    let a1 = b642int b1 * 4 + b642int b2 / 16 in
+    let a2 = b642int b2 % 16 * 16 + b642int b3 / 4 in
+    let a3 = b642int b3 % 4 * 64 + b642int b4 in
+    r <- concat r (chr a1).content;
+    assert { length r = length (r at L) + 1};
+    assert { forall j. 0 <= j < length r - 1 -> r[j] =  (r at L)[j]};
+    assert { r[length r - 1] = chr (b642int b1 * 4 + div (b642int b2) 16) };
+    r <- concat r (chr a2).content;
+    assert { length r = length (r at L) + 2};
+    assert { forall j. 0 <= j < length r - 2 -> r[j] =  (r at L)[j]};
+    assert {r[length r - 1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4)};
+    r <- concat r (chr a3).content;
+    assert { forall j. 0 <= j < length r - 3 -> r[j] =  (r at L)[j]};
+    assert {r[length r - 3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+            r[length r - 2] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
+            r[length r - 1] = chr (mod (b642int b3) 4 * 64 + b642int b4)
+    };
+    i <- i + 4
+  done;
+  assert { forall i. 0 <= i < div (length s) 4 ->
+    let b1,b2,b3,b4 = s[4*i], s[4*i+1], s[4*i+2], s[4*i+3] in
+    r[i*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+    r[i*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
+    r[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4)
+  };
+  assert { length s = 0 -> pad s = 0};
+  assert { length r = div (length s * 3) 4 };
+  r <- sub r 0 (length r - pad s);
+  r
