@@ -12,6 +12,7 @@ import "smt-libv2-floats.gen"
 (* import "discrimination.gen" *)
 
 theory BuiltIn
+(* Since quantifiers are all removed we can fully discriminate *)
   meta "select_inst_default" "all"
   meta "select_lskept_default" "all"
   meta "select_lsinst_default" "all"
@@ -41,7 +42,8 @@ transformation "instantiate_predicate"
 transformation "abstract_quantifiers"
 
 transformation "discriminate"
-transformation "encoding_smt"
+transformation "eliminate_poly_unused_or_fail"
+transformation "eliminate_unknown_ty_constr"
 
 transformation "abstract_quantifiers"
 
@@ -99,13 +101,13 @@ theory real.ExpLog
 end
 
 theory real.MinMax
-  syntax function min "(colibri_min %1)"
-  syntax function max "(colibri_max %1)"
+  syntax function min "(colibri_min %1 %2)"
+  syntax function max "(colibri_max %1 %2)"
 end
 
 theory int.MinMax
-  syntax function min "(colibri_min %1)"
-  syntax function max "(colibri_max %1)"
+  syntax function min "(colibri_min %1 %2)"
+  syntax function max "(colibri_max %1 %2)"
 end
 
 

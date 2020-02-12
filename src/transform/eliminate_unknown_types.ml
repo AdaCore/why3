@@ -232,5 +232,38 @@ let remove_ty_constr =
     (fun (_, task) -> Trans.return task)
 
 let () =
-  Trans.register_transform "eliminate_unknown_ty_constr" remove_types
+  Trans.register_transform "eliminate_unknown_ty_constr" remove_ty_constr
     ~desc:"Remove@ type@ unknown@ type@ constructor,@ could@ be@ used@ only@ after@ eliminating@ polymorphism."
+
+
+let syntactic_transform_ls =
+  Trans.on_meta Printer.meta_syntax_logic (fun metas ->
+      let symbols = List.fold_left (fun acc meta_arg ->
+      match meta_arg with
+      | [MAls ls; MAstr _; MAint _] -> Sls.add ls acc
+      | _ -> assert false) Sls.empty metas in
+      Trans.return (fun ls -> Sls.mem ls symbols))
+
+let remove_poly_unused_or_fail keep =
+  let poly_ls ls =
+    not (keep ls ||
+         Stv.is_empty (Term.ls_ty_freevars ls))
+  in
+  Trans.decl (fun d ->
+      begin match d.d_node with
+        | Dparam l when poly_ls l ->
+            []
+        | Dlogic l when
+            List.exists (fun (ls,_) -> poly_ls ls) l ->
+            []
+        | _ -> [d]
+      end
+    ) None
+
+let remove_poly_unused_or_fail =
+  (* TODO fix the pair *)
+  Trans.bind syntactic_transform_ls remove_poly_unused_or_fail
+
+let () =
+  Trans.register_transform "eliminate_poly_unused_or_fail" remove_poly_unused_or_fail
+    ~desc:"After elimination of polymorphism, remove last remnant."
