@@ -407,7 +407,8 @@ module Char
   predicate eq_string (s1 s2: string) = length s1 = length s2 &&
     (forall i. 0 <= i < length s1 -> s1[i] = s2[i])
 
-  axiom extensionality: forall s1 s2. eq_string s1 s2 -> s1 = s2
+  axiom extensionality [@W:non_conservative_extension:N]:
+    forall s1 s2. eq_string s1 s2 -> s1 = s2
 
   function make (size: int) (v: char) : string
 
