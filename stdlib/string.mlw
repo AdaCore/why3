@@ -169,10 +169,10 @@ module String
     length (substring s i x) <= length s
 
   axiom substring_smaller_x: forall s i x.
-    x > 0 -> length (substring s i x) <= x
+    x >= 0 -> length (substring s i x) <= x
 
   axiom substring_length: forall s i x.
-    x > 0 && 0 <= i < length s ->
+    x >= 0 && 0 <= i < length s ->
       if i + x > length s then
         length (substring s i x) = length s - i
       else length (substring s i x) = x
