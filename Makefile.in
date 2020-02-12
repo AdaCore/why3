@@ -358,6 +358,8 @@ endif
 ifeq (@enable_re@,no)
 src/util/re.ml: src/util/recompat.ml config.status
 	cp $< $@
+
+GENERATED += re.ml
 endif
 
 # build targets
