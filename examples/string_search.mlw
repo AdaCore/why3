@@ -14,25 +14,6 @@ module Spec
   predicate matches (pat text: string) (p: int) =
     0 <= p <= length text - length pat /\
     substring text p (length pat) == pat
-
-  (* FIXME to be moved to string.String/Char? *)
-  lemma substring_substring:
-    forall s ofs len ofs' len'.
-    0 <= ofs <= length s -> 0 <= len -> ofs + len <= length s ->
-    0 <= ofs' <= len -> 0 <= len' -> ofs' + len' <= len ->
-    substring (substring s ofs len) ofs' len' = substring s (ofs + ofs') len'
-
-  lemma concat_substring:
-    forall s ofs len len'.
-    0 <= ofs <= length s -> 0 <= len -> ofs + len <= length s ->
-    0 <= len' -> 0 <= ofs + len + len' <= length s ->
-    concat (substring s ofs len) (substring s (ofs+len) len') =
-    substring s ofs (len + len')
-
-  lemma substring_get:
-    forall s ofs len i.
-    0 <= ofs <= length s -> 0 <= len -> ofs + len <= length s -> 0 <= i < len ->
-    (substring s ofs len)[i] = s[ofs + i]
   (* ***** *)
 
 end

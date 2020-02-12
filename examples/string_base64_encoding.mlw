@@ -24,16 +24,21 @@ let int2b64 (i: int63) : char
 
 lemma substring_eq_char: forall s i. 0 <= i <= length s ->
   let s' = substring s 0 (length s - i) in
-  (forall j. 0 <= j < length s - i -> s[j] = s'[j])
+  (forall j. 0 <= j < length s - i -> get s j = get s' j)
 
 lemma concat_substring_make: forall s i c. 0 <= i <= length s ->
   let s' = concat (substring s 0 (length s - i)) (make i c) in
   length s' = length s &&
-  (forall j. 0 <= j < length s - i -> s'[j] = s[j])
+  (forall j. 0 <= j < length s - i -> get s' j = get s j)
+
+lemma concat_first: forall s1 s2.
+  let s3 = concat s1 s2 in
+  forall i. length s1 <= i < length s1 + length s2 ->
+    get s3 i = get s2 (i - length s1)
 
 lemma concat_make: forall s i c. 0 <= i ->
   let s' = concat s (make i c) in
-  (forall j. length s <= j < length s + i -> s'[j] = c)
+  (forall j. length s <= j < length s + i -> get s' j = c)
 
 let function eq_char : char = chr 61
 

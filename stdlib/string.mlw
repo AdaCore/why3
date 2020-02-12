@@ -180,6 +180,19 @@ module String
   axiom substring_at: forall s i.
     s_at s i = substring s i 1
 
+  axiom substring_substring:
+    forall s ofs len ofs' len'.
+    0 <= ofs <= length s -> 0 <= len -> ofs + len <= length s ->
+    0 <= ofs' <= len -> 0 <= len' -> ofs' + len' <= len ->
+    substring (substring s ofs len) ofs' len' = substring s (ofs + ofs') len'
+
+  axiom concat_substring:
+    forall s ofs len len'.
+    0 <= ofs <= length s -> 0 <= len -> ofs + len <= length s ->
+    0 <= len' -> 0 <= ofs + len + len' <= length s ->
+    concat (substring s ofs len) (substring s (ofs+len) len') =
+    substring s ofs (len + len')
+
   predicate prefixof string string
   (** `prefixof s1 s2` is `True` iff `s1` is a prefix of `s2`. *)
 
@@ -402,10 +415,15 @@ module Char
   axiom get: forall s i.
     0 <= i < length s -> (get s i).content = s_at s i
 
+  axiom substring_get:
+    forall s ofs len i.
+    0 <= ofs <= length s -> 0 <= len -> ofs + len <= length s -> 0 <= i < len ->
+    get (substring s ofs len) i = get s (ofs + i)
+
   function ([]) (s: string) (i: int) : char = get s i
 
   predicate eq_string (s1 s2: string) = length s1 = length s2 &&
-    (forall i. 0 <= i < length s1 -> s1[i] = s2[i])
+    (forall i. 0 <= i < length s1 -> get s1 i = get s2 i)
 
   axiom extensionality [@W:non_conservative_extension:N]:
     forall s1 s2. eq_string s1 s2 -> s1 = s2
@@ -416,7 +434,7 @@ module Char
     length (make size v) = size
 
   axiom make_content: forall size v. size >= 0 ->
-    (forall i. 0 <= i < size -> (make size v)[i] = v)
+    (forall i. 0 <= i < size -> get (make size v) i = v)
 
 end
 

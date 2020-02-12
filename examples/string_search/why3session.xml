@@ -7,17 +7,6 @@
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="string_search.mlw"/>
-<theory name="Spec" proved="true">
- <goal name="substring_substring" proved="true">
- <proof prover="1"><result status="valid" time="0.05" steps="8296"/></proof>
- </goal>
- <goal name="concat_substring" proved="true">
- <proof prover="1"><result status="valid" time="0.07" steps="11260"/></proof>
- </goal>
- <goal name="substring_get" proved="true">
- <proof prover="1"><result status="valid" time="0.13" steps="37989"/></proof>
- </goal>
-</theory>
 <theory name="Occurs" proved="true">
  <goal name="occurs&#39;vc" expl="VC for occurs" proved="true">
  <transf name="split_vc" proved="true" >
@@ -25,7 +14,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="16816"/></proof>
   </goal>
   <goal name="occurs&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.05" steps="92"/></proof>
+  <proof prover="2"><result status="valid" time="0.05" steps="93"/></proof>
   </goal>
   <goal name="occurs&#39;vc.2" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="28"/></proof>
@@ -34,12 +23,12 @@
   <proof prover="2"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
   <goal name="occurs&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="180"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="183"/></proof>
   </goal>
   <goal name="occurs&#39;vc.5" expl="loop invariant preservation" proved="true">
   <transf name="rewrite" proved="true" arg1="&lt;-" arg2="concat_substring">
    <goal name="occurs&#39;vc.5.0" expl="loop invariant preservation" proved="true">
-   <proof prover="2"><result status="valid" time="0.93" steps="1517"/></proof>
+   <proof prover="2"><result status="valid" time="1.29" steps="1503"/></proof>
    </goal>
    <goal name="occurs&#39;vc.5.1" expl="rewrite premises" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="34"/></proof>
@@ -59,7 +48,7 @@
   </transf>
   </goal>
   <goal name="occurs&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="279"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="243"/></proof>
   </goal>
   <goal name="occurs&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.03" steps="6436"/></proof>
