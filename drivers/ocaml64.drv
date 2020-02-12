@@ -385,12 +385,20 @@ module mach.onetime.OneTime
   syntax val split    "(%1-%2, %2)" prec 0 13 13
 end
 
+module string.Char
+  syntax type char "char"
+end
+
 module string.OCaml
   syntax val (=)    "%1 = %2" prec 11 11 10
   syntax val length "String.length %1" prec 4 3
-  syntax val ([]) "String.get %1 %2" prec 4 3 3
-  syntax val sub "String.sub %1 %2 %3" prec 4 3 3 3
+  syntax val get    "String.get %1 %2" prec 4 3 3
+  syntax val ([])   "String.get %1 %2" prec 4 3 3
+  syntax val sub    "String.sub %1 %2 %3" prec 4 3 3 3
   syntax val concat "%1 ^ %2" prec 4 3 4
+  syntax val code   "Char.code %1" prec 4 3 3
+  syntax val chr    "Char.chr %1" prec 4 3 3
+  syntax val make   "String.make %1 %2" prec 4 3 3
 end
 
 module io.StdIO
