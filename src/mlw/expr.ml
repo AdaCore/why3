@@ -713,17 +713,6 @@ let let_var id ?(ghost=false) e =
   let v = create_pvsymbol id ~ghost e.e_ity in
   LDvar (v,e), v
 
-let let_replace_expr ld e_new = match ld with
-  | LDvar (pv,e) ->
-     if not (e_new.e_ity = e.e_ity) then
-       Loc.errorm "Types must match when replacing a let expression";
-     if not (e_new.e_mask = e.e_mask) then
-       Loc.errorm "Masks must match when replacing a let expression";
-     if not (e_new.e_effect = e.e_effect) then
-       Loc.errorm "Effects must match when replacing a let expression";
-     LDvar (pv,e_new)
-  | _ -> Loc.errorm "Only possibe to replace expressions in let var"
-
 let let_sym id ?(ghost=false) ?(kind=RKnone) c =
   let cty = c_cty_enrich ghost kind c in
   let s = create_rsymbol id ~kind cty in

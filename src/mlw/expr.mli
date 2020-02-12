@@ -178,12 +178,6 @@ val e_attr_copy : expr -> expr -> expr
 val let_var :
   preid -> ?ghost:bool -> expr -> let_defn * pvsymbol
 
-val let_replace_expr : let_defn -> expr -> let_defn
-(* `let_replace_expr ld new_e`, when `ld` is of the form `Lvar
-   (pv,e)` and `e_new.e_ity = e.e_ity`, `e_new.e_mask = e.e_mask`, and
-   `e_new.e_effect = e.e_effect`, replaces `e` by `e_new`. It fails
-   otherwise *)
-
 val let_sym :
   preid -> ?ghost:bool -> ?kind:rs_kind -> cexp -> let_defn * rsymbol
 
