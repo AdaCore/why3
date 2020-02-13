@@ -1,0 +1,110 @@
+module BaseInfo
+
+  use int.Int
+  use int.Power
+  use mach.int.UInt32
+  use mach.int.UInt64
+  use types.Types
+  use logical.Logical
+  use int.ComputerDivision
+
+  let wmpn_base_power_of_two_p (b:limb) : uint32
+    requires { 2 <= b <= 256 }
+    ensures  { 0 <= result <= 8 }
+    ensures  { result <> 0 -> power 2 result = b }
+    ensures  { result = 0 -> forall n. 0 <= n -> power 2 n <> b }
+  = assert { power 2 5 = 32 };
+    assert { power 2 6 = 64 };
+    assert { power 2 7 = 128 };
+    assert { power 2 8 = 256 };
+    assert { forall n. 9 <= n -> b <= 256 < power 2 n };
+    if b = 2 then 1
+    else if b = 4 then 2
+    else if b = 8 then 3
+    else if b = 16 then 4
+    else if b = 32 then 5
+    else if b = 64 then 6
+    else if b = 128 then 7
+    else if b = 256 then 8
+    else 0
+
+  type wmpn_base_info =
+    {
+      ghost b : int;
+      exp : uint32;
+      bb : limb;
+    }
+  invariant { 2 <= b <= 256 }
+  invariant { bb < Limb.radix <= bb * b }
+  invariant { 7 <= exp <= 63 }
+  invariant { bb = power b exp }
+  by { b = 2; exp = 63; bb = 0x8000_0000_0000_0000 }
+
+  let rec lemma pow_compat (b1 b2 e:int)
+    requires { 1 <= b1 <= b2 }
+    requires { 1 <= e }
+    ensures  { power b1 e <= power b2 e }
+    variant  { e }
+  = if e = 1 then ()
+    else begin
+      pow_compat b1 b2 (e-1);
+      assert { power b1 e <= power b2 e
+               by power b1 (e-1) <= power b2 (e-1)
+               so power b1 e = power b1 (e-1) * b1
+                  <= power b2 (e-1) * b1
+                  <= power b2 (e-1) * b2
+                  = power b2 e }
+    end
+
+  let wmpn_get_base_info (b:limb) : wmpn_base_info
+    requires { 2 <= b <= 256 }
+    ensures  { result.b = b }
+  =
+    let m = 0xffff_ffff_ffff_ffff / b in
+    assert { m * b < radix };
+    assert { m * b + b >= radix
+             by let r = mod 0xffff_ffff_ffff_ffff b in
+             0 <= r < b
+             so 0xffff_ffff_ffff_ffff = m * b + r
+             so radix = m * b + r + 1 <= m * b + b };
+    let ref p = b in
+    let ref exp = 1 in
+    while (p <= m) do
+      variant { m - p }
+      invariant { power b exp = p }
+      invariant { 1 <= exp <= 64 }
+      assert { p * b < radix
+               by p * b <= m * b
+                  <= 0xffff_ffff_ffff_ffff
+                  < radix };
+      p <- p * b;
+      exp <- exp + 1;
+    done;
+    assert { radix <= p * b
+             by m + 1 <= p
+             so radix <= m * b + b = (m+1) * b <= p * b };
+    assert { exp >= 7
+             by 256 = power 2 8
+             so power b 7
+             <= power 256 7
+             = power (power 2 8) 7
+             = power 2 56 < radix };
+    { b = uint64'int b; exp = exp; bb = p }
+
+  let wmpn_limb_size_in_base_2 (u:limb) : limb
+    requires { u > 0 }
+    ensures  { 1 <= result <= 64 }
+    ensures  { power 2 (result - 1) <= u < power 2 result }
+  = let shift = Limb.of_int32 (Limb.count_leading_zeros u) in
+    let r = 64 - shift in
+    assert { power 2 (r-1) <= u < power 2 r
+             by power 2 shift * u <= radix - 1 < 2 * power 2 shift * u
+             so power 2 shift * u < radix <= 2 * power 2 shift * u
+             so power 2 shift * power 2 r = radix
+             so power 2 shift * u < power 2 shift * power 2 r
+             so u < power 2 r
+             so power 2 shift * power 2 r <= power 2 shift * (2 * u)
+             so power 2 r <= 2 * u };
+    r
+
+end

@@ -1,0 +1,62 @@
+module Zcmpabs
+
+use int.Int
+use int.Power
+use map.Map
+use mach.int.Int32GMP
+use ref.Ref
+use mach.c.C
+use lemmas.Lemmas
+use compare.Compare
+use ptralias.Alias
+use compare.Compare
+use import mach.int.UInt64GMP as Limb
+use int.Abs
+use mpz.Z
+use mpz.Zutil
+
+lemma abs_value :
+  forall u mpz. abs (value_of u mpz) = mpz.abs_value_of[u]
+
+let wmpz_cmpabs (u v:mpz_ptr) : int32
+  requires { mpz.readers[u] >= 0 /\ mpz.readers[v] >= 0 }
+  ensures  { forall w. mpz_unchanged w mpz (old mpz) }
+  ensures { result > 0 -> abs (value_of u mpz) > abs (value_of v mpz) }
+  ensures { result < 0 -> abs (value_of u mpz) < abs (value_of v mpz) }
+  ensures { result = 0 -> abs (value_of u mpz) = abs (value_of v mpz) }
+=
+  let usize = abs_size_of u in
+  let vsize = abs_size_of v in
+  let dsize = usize - vsize in
+  if dsize <> 0 then return dsize;
+  let up = get_read_ptr u in
+  let vp = get_read_ptr v in
+  let cmp = wmpn_cmp up vp usize in
+  release_reader u up;
+  release_reader v vp;
+  return cmp
+
+use types.Types
+
+let wmpz_cmpabs_ui (u: mpz_ptr) (v_digit:limb) : int32
+  requires { mpz.readers[u] >= 0 }
+  ensures  { forall w. mpz_unchanged w mpz (old mpz) }
+  ensures { result > 0 -> abs (value_of u mpz) > v_digit }
+  ensures { result < 0 -> abs (value_of u mpz) < v_digit }
+  ensures { result = 0 -> abs (value_of u mpz) = v_digit }
+=
+  let un = size_of u in
+  if un = 0
+  then return (if v_digit <> 0 then -1 else 0);
+  if abs un = 1
+  then begin
+    let up = get_read_ptr u in
+    let ul = C.get up in
+    release_reader u up;
+    if ul > v_digit then return 1;
+    if ul < v_digit then return -1;
+    return 0
+  end;
+  return 1
+
+end

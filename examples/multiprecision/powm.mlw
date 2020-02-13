@@ -14,10 +14,11 @@ module Powm
   use compare.Compare
   use valuation.Valuation
   use util.Util
-  use add.Add
-  use sub.Sub
+  use util.UtilOld
+  use add.AddOld
+  use sub.SubOld
   use mul.Mul
-  use logical.Logical
+  use logical.LogicalUtil
   use div.Div
   use toom.Toom
   use int.EuclideanDivision
@@ -138,6 +139,8 @@ module Powm
     requires { valid mp n /\ valid up (2 * n) /\ valid rp n }
     requires { odd (value mp n) }
     requires { mod ((value mp n) * invm) radix = radix - 1 }
+    requires { writable up }
+    requires { writable rp }
     ensures  { redc (value (old up) (2*n)) (value rp n) n (value mp n) }
     ensures  { forall j. j < offset rp \/ j >= offset rp + n
                          -> (pelts rp)[j] = (pelts (old rp))[j] }
@@ -162,6 +165,7 @@ module Powm
       invariant { u.min = up.min }
       invariant { u.max = up.max }
       invariant { plength u = plength up }
+      invariant { writable u }
       (*invariant { mod (value u n + value up j) (power radix j) = 0 }*)
       invariant { power radix j * value u (n+n-j) + power radix n * value up j
                   = value (old up) (n+n) + vm * added }
@@ -340,7 +344,7 @@ module Powm
     if cy <> 0
     then begin
       assert { cy = 1 };
-      let ghost b = wmpn_sub_in_place rp n mp n in
+      let ghost b = wmpn_sub_n_in_place rp mp n in
       assert { value rp n + power radix n * (cy - b)
                = (value rp n at Sub + power radix n * cy) - vm };
       assert { b = 1
@@ -474,11 +478,13 @@ module Powm
     else if eb <= 28161 then 9
     else 10
 
-  let redcify [@extraction:c_static_inline] (rp up: t) (un: int32) (mp: t) (n: int32)
+  let redcify [@extraction:c_static_inline]
+              (rp up: t) (un: int32) (mp: t) (n: int32)
     requires { valid rp n /\ valid up un /\ valid mp n }
     requires { 1 <= n /\ 1 <= un }
     requires { un + n < max_int32 }
     requires { (pelts mp)[offset mp + n - 1] > 0 }
+    requires { writable rp }
     ensures { value rp n = mod (power radix n * value up un) (value mp n) }
     ensures { redc (value rp n) (value up un) n (value mp n) }
   =
@@ -491,7 +497,7 @@ module Powm
     value_sub_frame (pelts tp) (pure { pelts tp at Copy })
                     (offset tp) (offset tp + int32'int n);
     assert { value tp (un + n) = power radix n * value up un };
-    wmpn_tdiv_qr qp rp tp (un+n) mp n;
+    wmpn_tdiv_qr qp rp 0 tp (un+n) mp n;
     assert { mod (power radix n * value up un) (value mp n)
              = mod (value tp (un + n)) (value mp n)
              = mod (value rp n) (value mp n)
@@ -1087,6 +1093,7 @@ module Powm
                 (n : int32) (tp : t) : unit
     requires { valid rp n /\ valid bp bn /\ valid ep en /\ valid mp n }
     requires { valid tp (2*n) }
+    requires { writable tp /\ writable rp }
     requires { odd (value mp n) }
     requires { value ep en > 1 }
     requires { en >= 1 }
@@ -1220,6 +1227,7 @@ module Powm
       invariant { min this_pp = min pp }
       invariant { max this_pp = max pp }
       invariant { plength this_pp = plength pp }
+      invariant { writable this_pp }
       invariant { plength tp = plength (tp at Window) }
       invariant { min tp = min (tp at Window) }
       invariant { max tp = max (tp at Window) }
@@ -1540,7 +1548,7 @@ module Powm
      if (wmpn_cmp rp mp n >= 0)
       then begin
         label Sub in
-        let ghost _b = wmpn_sub_in_place rp n mp n in
+        let ghost _b = wmpn_sub_n_in_place rp mp n in
         assert { _b = 0
                  by value rp n - power radix n * _b
                     = value rp n at Sub - vm

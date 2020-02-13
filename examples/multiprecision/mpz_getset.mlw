@@ -1,0 +1,69 @@
+module Set
+
+use int.Int
+use int.EuclideanDivision
+use int.Abs
+use map.Map
+use lemmas.Lemmas
+use mach.c.C
+use mach.int.Int32
+use mach.int.Int64
+use mach.int.UInt64GMP
+use mpz.Z
+use mpz.Zutil
+
+let wmpz_set_ui (dst: mpz_ptr) (src: uint64): unit
+  requires { mpz.alloc[dst] >= 1 }
+  requires { mpz.readers[dst] = 0 }
+  ensures  { value_of dst mpz = src }
+  ensures  { forall x. x <> dst -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[dst] = 0 }
+=
+  let dstp = wmpz_realloc dst 1 in
+  set dstp src;
+  assert { value dstp 1 = src };
+  let size = if src <> 0 then 1 else 0 in
+  set_size dst size dstp;
+  assert { mpz.sgn[dst] = 1 };
+  assert { value_of dst mpz = src };
+  release_writer dst dstp
+
+let abs_cast (x: int64): uint64
+  ensures { result = abs x }
+= if x >= 0 then of_int64 x else of_int64 (- (x + 1)) + 1
+
+let wmpz_set_si (dst: mpz_ptr) (src: int64): unit
+  requires { mpz.alloc[dst] >= 1 }
+  requires { mpz.readers[dst] = 0 }
+  ensures  { value_of dst mpz = src }
+  ensures  { forall x. x <> dst -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[dst] = 0 }
+=
+  let dstp = wmpz_realloc dst 1 in
+  let abs_src = abs_cast src in
+  set dstp abs_src;
+  assert { value dstp 1 = abs src };
+  let size = if abs_src <> 0 then 1 else 0 in
+  let size = if src >= 0 then size else - size in
+  set_size dst size dstp;
+  assert { mpz.sgn[dst] = if src >= 0 then 1 else -1 };
+  assert { mpz.abs_value_of[dst] = abs src };
+  assert { value_of dst mpz = src };
+  release_writer dst dstp
+
+let wmpz_get_ui (src: mpz_ptr): uint64
+  requires { mpz.readers[src] = 0 }
+  ensures { result = mod (abs (value_of src mpz)) radix }
+  ensures { forall x. mpz_unchanged x mpz (old mpz) }
+  ensures { mpz.readers[src] = 0 }
+=
+  if size_of src = 0 then return 0;
+  let srcp = get_read_ptr src in
+  let v = get srcp in
+  value_sub_head (pelts srcp) 0 mpz.abs_size[src];
+  assert { abs (value_of src mpz) = (pelts srcp)[0] + radix * value_sub (pelts srcp) 1 mpz.abs_size[src] };
+  release_reader src srcp;
+  assert { forall x y. 0 <= x < radix -> mod (x + radix * y) radix = x };
+  v
+
+end

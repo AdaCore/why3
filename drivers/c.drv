@@ -33,6 +33,11 @@ module mach.int.Int32
   syntax val (>)     "%1 > %2"   prec 6 6 5
 end
 
+module mach.int.Int32GMP
+
+  syntax val bxor    "%1 ^ %2"   prec 9 9 8
+
+end
 module mach.int.UInt32Gen
 
   syntax type uint32 "uint32_t"
@@ -211,7 +216,7 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);\n\
   syntax val count_trailing_zeros "__builtin_ctz(%1)" prec 1 15
 
   syntax val of_int32 "(uint32_t)%1" prec 2 2
-
+  syntax val to_int32 "(int32_t)%1" prec 2 2
 
 end
 
@@ -431,6 +436,8 @@ static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\n\
 
   syntax val to_int32 "(int32_t)%1" prec 2 2
   syntax val of_int32 "(uint64_t)%1" prec 2 2
+  syntax val to_uint32 "(uint32_t)%1" prec 2 2
+  syntax val of_uint32 "(uint64_t)%1" prec 2 2
   syntax val to_int64 "(int64_t)%1" prec 2 2
   syntax val of_int64 "(uint64_t)%1" prec 2 2
 
@@ -445,19 +452,31 @@ module mach.array.Array32
 
 end
 
+module bool.Bool
+
+  (* FIXME: use bitwise operators instead ? *)
+  (* requiring higher-than-needed precedence for arguments
+     avoids Wparentheses *)
+  syntax val orb  "%1 || %2" prec 12 5 5
+  syntax val andb "%1 && %2" prec 11 5 5
+  syntax val xorb "%1 ^ %2" prec 9 5 5
+  syntax val notb "!%1" prec 2 2 1
+
+end
+
 module mach.c.C
 
   prelude
   "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
   prelude
-  "#define IGNORE3(x,y,z) do { (void(x); (void)(y); (void)(z); } while (0)"
+  "#define IGNORE3(x,y,z) do { (void)(x); (void)(y); (void)(z); } while (0)"
   interface
   "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
   interface
-  "#define IGNORE3(x,y,z) do { (void(x); (void)(y); (void)(z); } while (0)"
+  "#define IGNORE3(x,y,z) do { (void)(x); (void)(y); (void)(z); } while (0)"
 
   syntax type ptr "%1 *"
-  syntax type bool "int" (* ? *)
+  syntax type bool "int"
 
   syntax val malloc "malloc(%1 * sizeof(%v0))" prec 1 3
   syntax val free   "free(%1)" prec 1 15
@@ -488,6 +507,22 @@ module mach.c.C
   syntax val print_space "printf(\" \")" prec 1
   syntax val print_newline "printf(\"\\n\")" prec 1
   syntax val print_uint32 "printf(\"%#010x\",%1)" prec 1 15
+
+end
+
+module mach.c.UChar
+
+  syntax literal uchar "%c"
+  syntax type uchar "unsigned char"
+  syntax val of_uint64 "(unsigned char)%1" prec 2 2
+  syntax val to_uint64 "(uint64_t)%1" prec 2 2
+
+end
+
+module mach.c.Char
+
+  syntax literal char "%c"
+  syntax type char "char"
 
 end
 

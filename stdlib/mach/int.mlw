@@ -274,6 +274,20 @@ module Int32BV
 
 end
 
+module Int32GMP
+
+  use int.Int
+  use export Int32
+
+  (* bitwise xor *)
+  val bxor (x y:int32) : int32
+    ensures { x = 0 -> result = y }
+    ensures { y = 0 -> result = x }
+    ensures { (x >= 0 /\ y >= 0) \/ (x < 0 /\ y < 0) -> result >= 0 }
+    ensures { (x < 0 /\ y >= 0) \/ (x >= 0 /\ y < 0) -> result < 0 }
+
+end
+
 module UInt32Gen
 
   use int.Int
@@ -364,9 +378,13 @@ module UInt32GMP
     ensures  { mod x (power 2 result) = 0 }
     ensures  { mod x (power 2 (result + 1)) <> 0 }
 
-  val of_int32(x:int32) : uint32
+  val of_int32 (x:int32) : uint32
     requires { Int32.to_int x >= 0 }
     ensures { to_int result = Int32.to_int x }
+
+  val to_int32 (x:uint32) : int32
+    requires { x <= max_int32 }
+    ensures { Int32.to_int result = to_int x }
 
 (*  use bv.BV32 as BV32
 
@@ -582,6 +600,7 @@ module UInt64GMP
   use int.Power
   use Int32
   use Int64
+  use UInt32
   use export UInt64Gen
 
   clone export UnsignedGMP with
@@ -655,6 +674,13 @@ module UInt64GMP
   val of_int32(x:int32) : uint64
     requires { Int32.to_int x >= 0 }
     ensures { to_int result = Int32.to_int x }
+
+  val to_uint32(x:uint64) : uint32
+    requires { x <= max_uint32 }
+    ensures  { UInt32.to_int result = x }
+
+  val of_uint32(x:uint32) : uint64
+    ensures { to_int result = UInt32.to_int x }
 
   val to_int64(x:uint64) : int64
     requires { x <= max_int64 }

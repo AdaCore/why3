@@ -12,6 +12,7 @@
 let char_is_uppercase c = c = Char.uppercase_ascii c
 
 let lowercase = String.lowercase_ascii
+let uppercase = String.uppercase_ascii
 let capitalize = String.capitalize_ascii
 let uncapitalize = String.uncapitalize_ascii
 
