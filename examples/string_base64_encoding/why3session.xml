@@ -5,34 +5,39 @@
 <prover id="0" name="Z3" version="4.8.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file format="whyml" proved="true">
+<file format="whyml">
 <path name=".."/><path name="string_base64_encoding.mlw"/>
-<theory name="Top" proved="true">
+<theory name="Spec" proved="true">
  <goal name="int2b64&#39;vc" expl="VC for int2b64" proved="true">
  <proof prover="2"><result status="valid" time="0.06" steps="316"/></proof>
  </goal>
- <goal name="substring_eq_char" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="25491"/></proof>
- </goal>
- <goal name="concat_substring_make" proved="true">
- <proof prover="2"><result status="valid" time="0.04" steps="119"/></proof>
- </goal>
  <goal name="concat_first" proved="true">
- <proof prover="2"><result status="valid" time="0.03" steps="84"/></proof>
+ <proof prover="2"><result status="valid" time="0.01" steps="160"/></proof>
  </goal>
- <goal name="concat_make" proved="true">
- <proof prover="2"><result status="valid" time="0.02" steps="53"/></proof>
+ <goal name="concat_second" proved="true">
+ <proof prover="2"><result status="valid" time="0.03" steps="85"/></proof>
  </goal>
- <goal name="eq_char&#39;vc" expl="VC for eq_char" proved="true">
+ <goal name="char_eq&#39;vc" expl="VC for char_eq" proved="true">
  <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
  </goal>
+ <goal name="int2b64_valid_4_char" proved="true">
+ <proof prover="2"><result status="valid" time="0.02" steps="130"/></proof>
+ </goal>
+ <goal name="b642int&#39;vc" expl="VC for b642int" proved="true">
+ <proof prover="2"><result status="valid" time="0.35" steps="1500"/></proof>
+ </goal>
+ <goal name="pad&#39;vc" expl="VC for pad" proved="true">
+ <proof prover="2"><result status="valid" time="0.37" steps="1767"/></proof>
+ </goal>
+</theory>
+<theory name="Base64">
  <goal name="encode&#39;vc" expl="VC for encode" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="encode&#39;vc.0" expl="division by zero" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="encode&#39;vc.1" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="53"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="53"/></proof>
   </goal>
   <goal name="encode&#39;vc.2" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="20"/></proof>
@@ -44,114 +49,114 @@
   <proof prover="2"><result status="valid" time="0.03" steps="33"/></proof>
   </goal>
   <goal name="encode&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.05" steps="9257"/></proof>
+  <proof prover="1"><result status="valid" time="0.05" steps="9102"/></proof>
   </goal>
   <goal name="encode&#39;vc.6" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.03" steps="38"/></proof>
   </goal>
   <goal name="encode&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="31"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="31"/></proof>
   </goal>
   <goal name="encode&#39;vc.8" expl="integer overflow" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="45"/></proof>
   </goal>
   <goal name="encode&#39;vc.9" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="47"/></proof>
+  <proof prover="2"><result status="valid" time="0.03" steps="47"/></proof>
   </goal>
   <goal name="encode&#39;vc.10" expl="division by zero" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="40"/></proof>
   </goal>
   <goal name="encode&#39;vc.11" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.25" steps="458"/></proof>
+  <proof prover="2"><result status="valid" time="0.27" steps="459"/></proof>
   </goal>
   <goal name="encode&#39;vc.12" expl="division by zero" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="44"/></proof>
   </goal>
   <goal name="encode&#39;vc.13" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.45" steps="538"/></proof>
+  <proof prover="2"><result status="valid" time="0.49" steps="542"/></proof>
   </goal>
   <goal name="encode&#39;vc.14" expl="division by zero" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="48"/></proof>
   </goal>
   <goal name="encode&#39;vc.15" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="1.21" steps="911"/></proof>
+  <proof prover="2"><result status="valid" time="1.27" steps="913"/></proof>
   </goal>
   <goal name="encode&#39;vc.16" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.86" steps="818"/></proof>
+  <proof prover="2"><result status="valid" time="0.92" steps="820"/></proof>
   </goal>
   <goal name="encode&#39;vc.17" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="1.14" steps="1423"/></proof>
+  <proof prover="2"><result status="valid" time="1.20" steps="1425"/></proof>
   </goal>
   <goal name="encode&#39;vc.18" expl="division by zero" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="56"/></proof>
   </goal>
   <goal name="encode&#39;vc.19" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.66" steps="539"/></proof>
+  <proof prover="2"><result status="valid" time="0.74" steps="542"/></proof>
   </goal>
   <goal name="encode&#39;vc.20" expl="division by zero" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="60"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="60"/></proof>
   </goal>
   <goal name="encode&#39;vc.21" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="2.36" steps="1927"/></proof>
+  <proof prover="2"><result status="valid" time="2.71" steps="1927"/></proof>
   </goal>
   <goal name="encode&#39;vc.22" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="4.36" steps="1791"/></proof>
+  <proof prover="2"><result status="valid" time="4.68" steps="1805"/></proof>
   </goal>
   <goal name="encode&#39;vc.23" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="3.87" steps="1791"/></proof>
+  <proof prover="2"><result status="valid" time="4.09" steps="1794"/></proof>
   </goal>
   <goal name="encode&#39;vc.24" expl="division by zero" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="68"/></proof>
   </goal>
   <goal name="encode&#39;vc.25" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.05" steps="69161"/></proof>
+  <proof prover="0"><result status="valid" time="0.05" steps="71329"/></proof>
   </goal>
   <goal name="encode&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.22" steps="410"/></proof>
+  <proof prover="2"><result status="valid" time="0.24" steps="413"/></proof>
   </goal>
   <goal name="encode&#39;vc.27" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="2.40" steps="1292"/></proof>
+  <proof prover="2" timelimit="30"><result status="valid" time="0.22" steps="87"/></proof>
   </goal>
   <goal name="encode&#39;vc.28" expl="assertion" proved="true">
-  <proof prover="2" timelimit="10"><result status="valid" time="1.42" steps="640"/></proof>
+  <proof prover="2" timelimit="10"><result status="valid" time="1.53" steps="642"/></proof>
   </goal>
   <goal name="encode&#39;vc.29" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.30" steps="451"/></proof>
+  <proof prover="2"><result status="valid" time="0.34" steps="456"/></proof>
   </goal>
   <goal name="encode&#39;vc.30" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="2.45" steps="1443"/></proof>
+  <proof prover="2"><result status="valid" time="0.80" steps="1387"/></proof>
   </goal>
   <goal name="encode&#39;vc.31" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="1.38" steps="800"/></proof>
+  <proof prover="2"><result status="valid" time="1.75" steps="808"/></proof>
   </goal>
   <goal name="encode&#39;vc.32" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.87" steps="678"/></proof>
+  <proof prover="2"><result status="valid" time="0.88" steps="687"/></proof>
   </goal>
   <goal name="encode&#39;vc.33" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="3.09" steps="2594"/></proof>
+  <proof prover="2" timelimit="15"><result status="valid" time="0.78" steps="1600"/></proof>
   </goal>
   <goal name="encode&#39;vc.34" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="1.31" steps="782"/></proof>
+  <proof prover="2"><result status="valid" time="1.65" steps="935"/></proof>
   </goal>
   <goal name="encode&#39;vc.35" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.17" steps="332"/></proof>
+  <proof prover="2"><result status="valid" time="0.18" steps="332"/></proof>
   </goal>
   <goal name="encode&#39;vc.36" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="5.30" steps="4626"/></proof>
+  <proof prover="2"><result status="valid" time="0.81" steps="1176"/></proof>
   </goal>
   <goal name="encode&#39;vc.37" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="encode&#39;vc.37.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="10"><result status="valid" time="6.53" steps="4769"/></proof>
+   <proof prover="2" timelimit="10"><result status="valid" time="2.08" steps="2172"/></proof>
    </goal>
    <goal name="encode&#39;vc.37.1" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="2.08" steps="2076"/></proof>
+   <proof prover="2"><result status="valid" time="2.27" steps="2218"/></proof>
    </goal>
    <goal name="encode&#39;vc.37.2" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="3.42" steps="2881"/></proof>
+   <proof prover="2"><result status="valid" time="0.51" steps="661"/></proof>
    </goal>
    <goal name="encode&#39;vc.37.3" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.60" steps="883"/></proof>
+   <proof prover="2"><result status="valid" time="1.74" steps="908"/></proof>
    </goal>
   </transf>
   </goal>
@@ -159,49 +164,62 @@
   <proof prover="2"><result status="valid" time="0.15" steps="103"/></proof>
   </goal>
   <goal name="encode&#39;vc.39" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.52" steps="938"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="encode&#39;vc.39.0" expl="assertion" proved="true">
+   <proof prover="2"><result status="valid" time="0.19" steps="107"/></proof>
+   </goal>
+   <goal name="encode&#39;vc.39.1" expl="assertion" proved="true">
+   <proof prover="2"><result status="valid" time="0.21" steps="109"/></proof>
+   </goal>
+   <goal name="encode&#39;vc.39.2" expl="assertion" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="encode&#39;vc.39.2.0" expl="assertion" proved="true">
+    <proof prover="2"><result status="valid" time="0.22" steps="110"/></proof>
+    </goal>
+    <goal name="encode&#39;vc.39.2.1" expl="assertion" proved="true">
+    <proof prover="2"><result status="valid" time="0.22" steps="114"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="encode&#39;vc.39.3" expl="assertion" proved="true">
+   <proof prover="2"><result status="valid" time="0.23" steps="113"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="encode&#39;vc.40" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.19" steps="117"/></proof>
+  <proof prover="2"><result status="valid" time="0.20" steps="117"/></proof>
   </goal>
   <goal name="encode&#39;vc.41" expl="loop variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.03" steps="102"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="102"/></proof>
   </goal>
   <goal name="encode&#39;vc.42" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.22" steps="113"/></proof>
   </goal>
   <goal name="encode&#39;vc.43" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="1.26" steps="868"/></proof>
+  <proof prover="2"><result status="valid" time="1.31" steps="903"/></proof>
   </goal>
   <goal name="encode&#39;vc.44" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="1.55" steps="1354"/></proof>
+  <proof prover="2"><result status="valid" time="2.04" steps="1465"/></proof>
   </goal>
   <goal name="encode&#39;vc.45" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.26" steps="120"/></proof>
   </goal>
   <goal name="encode&#39;vc.46" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.07" steps="192657"/></proof>
+  <proof prover="0"><result status="valid" time="0.18" steps="323747"/></proof>
   </goal>
   <goal name="encode&#39;vc.47" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="encode&#39;vc.47.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.05" steps="49"/></proof>
+   <proof prover="2"><result status="valid" time="0.04" steps="49"/></proof>
    </goal>
    <goal name="encode&#39;vc.47.1" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.06" steps="51"/></proof>
+   <proof prover="2"><result status="valid" time="0.05" steps="51"/></proof>
    </goal>
    <goal name="encode&#39;vc.47.2" expl="assertion" proved="true">
-   <transf name="split_vc" proved="true" >
-    <goal name="encode&#39;vc.47.2.0" expl="assertion" proved="true">
-    <proof prover="2"><result status="valid" time="0.06" steps="52"/></proof>
-    </goal>
-    <goal name="encode&#39;vc.47.2.1" expl="assertion" proved="true">
-    <proof prover="2"><result status="valid" time="0.07" steps="56"/></proof>
-    </goal>
-   </transf>
+   <proof prover="2" timelimit="10"><result status="valid" time="0.07" steps="53"/></proof>
    </goal>
    <goal name="encode&#39;vc.47.3" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.08" steps="55"/></proof>
+   <proof prover="2" timelimit="10"><result status="valid" time="0.08" steps="55"/></proof>
    </goal>
   </transf>
   </goal>
@@ -215,85 +233,79 @@
   <proof prover="2"><result status="valid" time="0.04" steps="49"/></proof>
   </goal>
   <goal name="encode&#39;vc.51" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="347"/></proof>
+  <proof prover="2"><result status="valid" time="0.08" steps="347"/></proof>
   </goal>
   <goal name="encode&#39;vc.52" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.44" steps="655"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="251"/></proof>
   </goal>
   <goal name="encode&#39;vc.53" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="encode&#39;vc.53.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.77" steps="1636"/></proof>
+   <proof prover="2"><result status="valid" time="2.04" steps="1653"/></proof>
    </goal>
    <goal name="encode&#39;vc.53.1" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="3.40" steps="2484"/></proof>
+   <proof prover="2"><result status="valid" time="3.49" steps="3237"/></proof>
    </goal>
    <goal name="encode&#39;vc.53.2" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="4.48" steps="3308"/></proof>
+   <proof prover="2" timelimit="10"><result status="valid" time="4.71" steps="4205"/></proof>
    </goal>
    <goal name="encode&#39;vc.53.3" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="5.63" steps="3426"/></proof>
+   <proof prover="2" timelimit="10"><result status="valid" time="6.31" steps="5342"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="encode&#39;vc.54" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="encode&#39;vc.54.0" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.74" steps="1640"/></proof>
+   <proof prover="2"><result status="valid" time="1.69" steps="2025"/></proof>
    </goal>
    <goal name="encode&#39;vc.54.1" expl="assertion" proved="true">
-   <proof prover="2" timelimit="10"><result status="valid" time="4.68" steps="3981"/></proof>
+   <proof prover="2" timelimit="15"><result status="valid" time="8.00" steps="4150"/></proof>
    </goal>
    <goal name="encode&#39;vc.54.2" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.49" steps="1482"/></proof>
+   <proof prover="2"><result status="valid" time="1.98" steps="2252"/></proof>
    </goal>
    <goal name="encode&#39;vc.54.3" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.08" steps="1300"/></proof>
+   <proof prover="2"><result status="valid" time="1.67" steps="1457"/></proof>
    </goal>
    <goal name="encode&#39;vc.54.4" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.21" steps="1354"/></proof>
+   <proof prover="2"><result status="valid" time="1.04" steps="1304"/></proof>
    </goal>
    <goal name="encode&#39;vc.54.5" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.02" steps="840"/></proof>
+   <proof prover="2"><result status="valid" time="1.43" steps="1197"/></proof>
    </goal>
    <goal name="encode&#39;vc.54.6" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.80" steps="1197"/></proof>
+   <proof prover="2"><result status="valid" time="1.75" steps="1454"/></proof>
    </goal>
    <goal name="encode&#39;vc.54.7" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="2.08" steps="1553"/></proof>
+   <proof prover="2"><result status="valid" time="2.05" steps="1398"/></proof>
    </goal>
    <goal name="encode&#39;vc.54.8" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="1.52" steps="1258"/></proof>
+   <proof prover="2"><result status="valid" time="1.57" steps="1249"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="encode&#39;vc.55" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.59" steps="1395"/></proof>
+  <proof prover="2"><result status="valid" time="0.93" steps="1346"/></proof>
   </goal>
   <goal name="encode&#39;vc.56" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.26" steps="538"/></proof>
+  <proof prover="2"><result status="valid" time="0.11" steps="404"/></proof>
   </goal>
   <goal name="encode&#39;vc.57" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="59"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="59"/></proof>
   </goal>
   <goal name="encode&#39;vc.58" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="2.64" steps="2530"/></proof>
+  <proof prover="2"><result status="valid" time="3.51" steps="4634"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="b642int&#39;vc" expl="VC for b642int" proved="true">
- <proof prover="2"><result status="valid" time="0.42" steps="1901"/></proof>
- </goal>
- <goal name="pad&#39;vc" expl="VC for pad" proved="true">
- <proof prover="2"><result status="valid" time="0.34" steps="1274"/></proof>
  </goal>
  <goal name="decode&#39;vc" expl="VC for decode" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="decode&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.05" steps="10296"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="9322"/></proof>
   </goal>
   <goal name="decode&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="17"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="17"/></proof>
   </goal>
   <goal name="decode&#39;vc.2" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="19"/></proof>
@@ -317,84 +329,84 @@
   <proof prover="2"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="decode&#39;vc.9" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.19" steps="198"/></proof>
+  <proof prover="2"><result status="valid" time="0.25" steps="273"/></proof>
   </goal>
   <goal name="decode&#39;vc.10" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.22" steps="268"/></proof>
+  <proof prover="2"><result status="valid" time="0.19" steps="289"/></proof>
   </goal>
   <goal name="decode&#39;vc.11" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.32" steps="317"/></proof>
+  <proof prover="2"><result status="valid" time="0.25" steps="275"/></proof>
   </goal>
   <goal name="decode&#39;vc.12" expl="division by zero" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="44"/></proof>
   </goal>
   <goal name="decode&#39;vc.13" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.30" steps="367"/></proof>
+  <proof prover="2"><result status="valid" time="0.56" steps="655"/></proof>
   </goal>
   <goal name="decode&#39;vc.14" expl="division by zero" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="48"/></proof>
   </goal>
   <goal name="decode&#39;vc.15" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.61" steps="549"/></proof>
+  <proof prover="2"><result status="valid" time="0.67" steps="574"/></proof>
   </goal>
   <goal name="decode&#39;vc.16" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.48" steps="443"/></proof>
+  <proof prover="2"><result status="valid" time="0.37" steps="549"/></proof>
   </goal>
   <goal name="decode&#39;vc.17" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.47" steps="380"/></proof>
+  <proof prover="2"><result status="valid" time="0.40" steps="374"/></proof>
   </goal>
   <goal name="decode&#39;vc.18" expl="division by zero" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="58"/></proof>
   </goal>
   <goal name="decode&#39;vc.19" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.78" steps="614"/></proof>
+  <proof prover="2"><result status="valid" time="1.13" steps="832"/></proof>
   </goal>
   <goal name="decode&#39;vc.20" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.42" steps="423"/></proof>
+  <proof prover="2"><result status="valid" time="0.51" steps="417"/></proof>
   </goal>
   <goal name="decode&#39;vc.21" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="1.29" steps="895"/></proof>
+  <proof prover="2"><result status="valid" time="1.69" steps="882"/></proof>
   </goal>
   <goal name="decode&#39;vc.22" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="2.60" steps="2175"/></proof>
+  <proof prover="2"><result status="valid" time="1.42" steps="1892"/></proof>
   </goal>
   <goal name="decode&#39;vc.23" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.09" steps="68"/></proof>
   </goal>
   <goal name="decode&#39;vc.24" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.54" steps="446"/></proof>
+  <proof prover="2"><result status="valid" time="0.09" steps="74"/></proof>
   </goal>
   <goal name="decode&#39;vc.25" expl="assertion" proved="true">
-  <proof prover="2" timelimit="20"><result status="valid" time="15.56" steps="9715"/></proof>
+  <proof prover="2" timelimit="15"><result status="valid" time="11.85" steps="10642"/></proof>
   </goal>
   <goal name="decode&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="3.71" steps="2206"/></proof>
+  <proof prover="2"><result status="valid" time="2.50" steps="1832"/></proof>
   </goal>
   <goal name="decode&#39;vc.27" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.10" steps="74"/></proof>
   </goal>
   <goal name="decode&#39;vc.28" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.71" steps="494"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="80"/></proof>
   </goal>
   <goal name="decode&#39;vc.29" expl="assertion" proved="true">
-  <proof prover="2" timelimit="20"><result status="valid" time="11.05" steps="6438"/></proof>
+  <proof prover="2" timelimit="15"><result status="valid" time="8.92" steps="4825"/></proof>
   </goal>
   <goal name="decode&#39;vc.30" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="3.73" steps="2205"/></proof>
+  <proof prover="2"><result status="valid" time="1.86" steps="1130"/></proof>
   </goal>
   <goal name="decode&#39;vc.31" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.93" steps="562"/></proof>
+  <proof prover="2"><result status="valid" time="0.48" steps="659"/></proof>
   </goal>
   <goal name="decode&#39;vc.32" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="decode&#39;vc.32.0" expl="assertion" proved="true">
-   <proof prover="2" timelimit="20"><result status="valid" time="4.36" steps="2302"/></proof>
+   <proof prover="2"><result status="valid" time="2.36" steps="1545"/></proof>
    </goal>
    <goal name="decode&#39;vc.32.1" expl="assertion" proved="true">
-   <proof prover="2" timelimit="10"><result status="valid" time="10.81" steps="6543"/></proof>
+   <proof prover="2" timelimit="10"><result status="valid" time="5.41" steps="6027"/></proof>
    </goal>
    <goal name="decode&#39;vc.32.2" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="2.49" steps="3204"/></proof>
+   <proof prover="2"><result status="valid" time="3.40" steps="2828"/></proof>
    </goal>
   </transf>
   </goal>
@@ -405,13 +417,13 @@
   <proof prover="2"><result status="valid" time="0.02" steps="86"/></proof>
   </goal>
   <goal name="decode&#39;vc.35" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.12" steps="88"/></proof>
+  <proof prover="2"><result status="valid" time="0.14" steps="88"/></proof>
   </goal>
   <goal name="decode&#39;vc.36" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.13" steps="91"/></proof>
   </goal>
   <goal name="decode&#39;vc.37" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.58" steps="612"/></proof>
+  <proof prover="2"><result status="valid" time="0.65" steps="699"/></proof>
   </goal>
   <goal name="decode&#39;vc.38" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.16" steps="95"/></proof>
@@ -419,13 +431,13 @@
   <goal name="decode&#39;vc.39" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="decode&#39;vc.39.0" expl="loop invariant preservation" proved="true">
-   <proof prover="2"><result status="valid" time="1.15" steps="1294"/></proof>
+   <proof prover="2"><result status="valid" time="0.93" steps="1300"/></proof>
    </goal>
    <goal name="decode&#39;vc.39.1" expl="loop invariant preservation" proved="true">
-   <proof prover="2"><result status="valid" time="0.86" steps="1056"/></proof>
+   <proof prover="2"><result status="valid" time="1.22" steps="1713"/></proof>
    </goal>
    <goal name="decode&#39;vc.39.2" expl="loop invariant preservation" proved="true">
-   <proof prover="2"><result status="valid" time="1.36" steps="1251"/></proof>
+   <proof prover="2"><result status="valid" time="1.26" steps="1716"/></proof>
    </goal>
   </transf>
   </goal>
@@ -433,25 +445,101 @@
   <proof prover="2"><result status="valid" time="0.07" steps="31"/></proof>
   </goal>
   <goal name="decode&#39;vc.41" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.06" steps="11636"/></proof>
+  <proof prover="1"><result status="valid" time="0.76" steps="251624"/></proof>
   </goal>
   <goal name="decode&#39;vc.42" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="26"/></proof>
   </goal>
   <goal name="decode&#39;vc.43" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.13" steps="125"/></proof>
+  <proof prover="2"><result status="valid" time="0.12" steps="126"/></proof>
   </goal>
   <goal name="decode&#39;vc.44" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="36"/></proof>
   </goal>
   <goal name="decode&#39;vc.45" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.06" steps="167"/></proof>
+  <proof prover="2"><result status="valid" time="0.06" steps="166"/></proof>
   </goal>
   <goal name="decode&#39;vc.46" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.09" steps="225"/></proof>
+  <proof prover="2"><result status="valid" time="0.09" steps="226"/></proof>
   </goal>
   <goal name="decode&#39;vc.47" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.84" steps="1074"/></proof>
+  <proof prover="2"><result status="valid" time="0.74" steps="1241"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="decode_encode&#39;vc" expl="VC for decode_encode">
+ <transf name="split_vc" >
+  <goal name="decode_encode&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="71713"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.50" steps="670"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.2" expl="assertion">
+  <proof prover="0" timelimit="60" obsolete="true"><result status="timeout" time="60.00" steps="8487688"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.00" steps="1747551"/></proof>
+  <proof prover="2" timelimit="60" obsolete="true"><result status="timeout" time="60.00"/></proof>
+  <transf name="assert" arg1="(length s1 = div (next_m3 (length s)) 3 * 4)">
+   <goal name="decode_encode&#39;vc.2.0" expl="asserted formula" proved="true">
+   <proof prover="2"><result status="valid" time="0.50" steps="765"/></proof>
+   </goal>
+   <goal name="decode_encode&#39;vc.2.1" expl="assertion">
+   <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="3161258"/></proof>
+   <proof prover="1" obsolete="true"><result status="timeout" time="4.33" steps="1712523"/></proof>
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
+   <transf name="rewrite" arg1="h" arg2="in" arg3="H">
+    <goal name="decode_encode&#39;vc.2.1.0" expl="assertion">
+    <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="1762417"/></proof>
+    <proof prover="1" obsolete="true"><result status="timeout" time="5.00" steps="1759527"/></proof>
+    <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="decode_encode&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="2520569"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.00" steps="1743908"/></proof>
+  <proof prover="2"><result status="valid" time="0.07" steps="23"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.5" expl="precondition">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="1672843"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.00" steps="1249539"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.6" expl="assertion" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="4994355"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.00" steps="933983"/></proof>
+  <proof prover="2"><result status="valid" time="0.23" steps="366"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.7" expl="assertion">
+  <proof prover="0"><result status="timeout" time="5.00" steps="2640597"/></proof>
+  <proof prover="1"><result status="timeout" time="5.00" steps="1797969"/></proof>
+  <proof prover="2"><result status="timeout" time="5.00"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.8" expl="assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="2508430"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="4.39" steps="1745116"/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.9" expl="assertion">
+  <proof prover="0" obsolete="true"><undone/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="5.00" steps="1385480"/></proof>
+  <proof prover="2" obsolete="true"><result status="valid" time="0.02" steps="20"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.10" expl="assertion">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.00" steps="3306877"/></proof>
+  <proof prover="1" obsolete="true"><undone/></proof>
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.11" expl="assertion">
+  <proof prover="2" obsolete="true"><result status="timeout" time="5.00"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.12" expl="postcondition">
+  <proof prover="2" obsolete="true"><result status="valid" time="0.03" steps="25"/></proof>
   </goal>
  </transf>
  </goal>
