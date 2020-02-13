@@ -142,16 +142,20 @@ module Sub_1
         xp <- C.incr xp 1;
         if not (lx = 0)
         then begin
-          b <- 0;
           assert { res = lx - 1 };
-          assert { value x i = value ox i - y };
+          assert { value x i = value ox i - y
+                   by power radix (i-1) * res
+                      = power radix (i-1) * lx - power radix (i-1) * b };
+          b <- 0;
           assert { forall j. j < x.offset \/ x.offset + sz <= j ->
                     (pelts x)[j] = (pelts ox)[j] };
           break
         end
         else begin
           assert { res = radix - 1 };
-          assert { value x i - power radix i = value ox i - y };
+          assert { value x i - power radix i = value ox i - y
+                   by power radix (i-1) * res - power radix i
+                      = power radix (i-1) * lx - power radix (i-1) * b};
         end;
         assert { i = sz -> b = 0
                  by value x sz - power radix sz * b = value ox sz - y
@@ -218,11 +222,17 @@ module Sub_1
       assert { forall j. i < j < sz ->
                  (pelts x)[x.offset + j]
                  = (pelts ox)[x.offset + j] };
-      assert { value x i - (power radix i) * (b at StartLoop) = value ox i - 1 };
+      assert { value x i - (power radix i) * (b at StartLoop)
+               = value ox i - 1 };
       value_tail x i;
       value_tail ox i;
       assert { value x (i+1) - power radix (i+1) * b =
-               value ox (i+1) - 1 };
+               value ox (i+1) - 1
+               by power radix i * res - power radix (i+1) * b
+                  = power radix i * (lx - 1)
+                  = power radix i * lx - power radix i * (b at StartLoop)
+               so value x (i+1) - power radix (i+1) * b
+                  = value x i + power radix i * res - power radix (i+1) * b };
       i <- i + 1;
       xp <- C.incr xp 1;
       assert { i = sz -> b = 0

@@ -152,7 +152,9 @@ module Add_1
         end
         else begin
           assert { radix + res = lx + 1 };
-          assert { value x i + power radix i = value ox i + y };
+          assert { value x i + power radix i = value ox i + y
+                   by power radix (i-1) * res + power radix i
+                      = power radix (i-1) * lx + power radix (i-1) * c };
         end;
         assert { i = sz -> c = 0
                  by value x sz + power radix sz * c = value ox sz + y
@@ -219,11 +221,16 @@ module Add_1
       assert { forall j. i < j < sz ->
                  (pelts x)[x.offset + j]
                  = (pelts ox)[x.offset + j] };
-      assert { value x i + (power radix i) * (c at StartLoop) = value ox i + 1 };
+      assert { value x i + (power radix i) * (c at StartLoop)
+               = value ox i + 1 };
       value_tail x i;
       value_tail ox i;
       assert { value x (i+1) + power radix (i+1) * c =
-               value ox (i+1) + 1 };
+               value ox (i+1) + 1
+               by power radix i * res + power radix (i+1) * c
+                  = power radix i * lx + power radix i * (c at StartLoop)
+               so value x (i+1) + power radix (i+1) * c
+                  = value x i + power radix i * res + power radix (i+1) * c };
       i <- i + 1;
       xp <- C.incr xp 1;
       assert { i = sz -> c = 0

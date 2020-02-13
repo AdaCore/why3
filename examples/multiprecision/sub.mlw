@@ -362,6 +362,8 @@ module Sub
                 = (pelts ony)[offset ony + j]
                 = (pelts ny at Sub)[offset ony + j]
                 = (pelts oy)[offset y + j] };
+    value_sub_frame_shift (pelts y) (pelts oy)
+                          (offset y) (offset oy) (int32'int sy);
     res
 
   let sub_ry (*[@extraction:inline]*) (x:ptr limb) (sx:int32)
