@@ -92,8 +92,10 @@ Realizations
 
 Provers
   * support for Vampire 4.2.2 (released Dec 14, 2017)
-  * support for Coq 8.10 (released Oct 8, 2019)
-  * support for Coq 8.11 (released Jan 30, 2020)
+  * support for Coq 8.10.0 (released Oct 8, 2019)
+  * support for Coq 8.10.1 (released Oct 25, 2019)
+  * support for Coq 8.10.2 (released Oct 29, 2019)
+  * support for Coq 8.11.0 (released Jan 30, 2020)
 
 Version 1.2.1, October 28, 2019
 -------------------------------
