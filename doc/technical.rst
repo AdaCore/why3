@@ -5,9 +5,12 @@ Structure of Session Files
 --------------------------
 
 The proof session state is stored in an XML file named
-``<dir>/why3session.xml``, where ``<dir>`` is the directory of the
-project. The XML file follows the DTD given in ``share/why3session.dtd``
+:file:`{dir}/why3session.xml`, where *dir* is the directory of the
+project. The XML file follows the DTD given in :file:`share/why3session.dtd`
 and reproduced below.
+
+.. literalinclude:: ../share/why3session.dtd
+   :language: dtd
 
 .. _sec.proverdetectiondata:
 
@@ -15,8 +18,8 @@ Prover Detection
 ----------------
 
 The data configuration for the automatic detection of installed provers
-is stored in the file ``provers-detection-data.conf`` typically located
-in directory ``/usr/local/share/why3`` after installation. The content
+is stored in the file :file:`provers-detection-data.conf` typically located
+in directory :file:`/usr/local/share/why3` after installation. The content
 of this file is reproduced below.
 
 .. _sec.whyconffile:
@@ -27,12 +30,12 @@ The ``why3.conf`` Configuration File
 One can use a custom configuration file. The Why3 tools look for it in
 the following order:
 
-#. the file specified by the ``-C`` or ``--config`` options,
+#. the file specified by the :option:`-C` or :option:`--config` options,
 
-#. the file specified by the environment variable ``WHY3CONFIG`` if set,
+#. the file specified by the environment variable :envvar:`WHY3CONFIG` if set,
 
-#. the file ``$HOME/.why3.conf`` (``$USERPROFILE/.why3.conf`` under
-   Windows) or, in the case of local installation, ``why3.conf`` in the
+#. the file :file:`$HOME/.why3.conf` (:file:`$USERPROFILE/.why3.conf` under
+   Windows) or, in the case of local installation, :file:`why3.conf` in the
    top directory of Why3 sources.
 
 If none of these files exist, a built-in default configuration is used.

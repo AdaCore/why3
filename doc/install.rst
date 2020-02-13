@@ -70,7 +70,7 @@ the end of the configuration script to check if Coq has been detected
 properly. Similarly, in order to use PVS (:numref:`sec.pvs`) or Isabelle
 (:numref:`sec.isabelle`) to discharge proofs, PVS and Isabelle must be
 installed before Why3. You should check that those proof assistants are
-correctly detected by the configure script.
+correctly detected by the :file:`configure` script.
 
 When configuration is finished, you can compile Why3.
 
@@ -113,8 +113,8 @@ configured and compiled for local use as follows:
     ./configure --enable-local
     make
 
-The Why3 executables are then available in the subdirectory ``bin/``.
-This directory can be added in your ``PATH``.
+The Why3 executables are then available in the subdirectory :file:`bin/`.
+This directory can be added in your :envvar:`PATH`.
 
 .. _sec.installlib:
 
@@ -146,9 +146,9 @@ to run the following command:
 
 ::
 
-    > why3 config --detect
+    why3 config --detect
 
-It scans your ``PATH`` for provers and updates your configuration file
+It scans your :envvar:`PATH` for provers and updates your configuration file
 (see :numref:`sec.why3config`) accordingly.
 
 Multiple Versions of the Same Prover
@@ -156,10 +156,10 @@ Multiple Versions of the Same Prover
 
 Why3 is able to use several versions of the same prover, it can use both
 CVC4 1.4 and CVC4 1.5 at the same time. The automatic detection of
-provers looks for typical names for their executable command, ``cvc4``
+provers looks for typical names for their executable command, :program:`cvc4`
 for CVC3. However, if you install several versions of the same prover it
 is likely that you would use specialized executable names, such as
-``cvc4-1.4`` or ``cvc4-1.5``. If needed, option ``--add-prover`` can be
+:program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, option :option:`--add-prover` can be
 added to the ``config`` command to specify names of prover executables,
 
 ::
@@ -173,9 +173,9 @@ known. The list of these famillies can be obtain using
 
     why3 config --list-prover-families
 
-as they are in fact listed in the file ``provers-detection-data.conf``,
-typically located in ``/usr/local/share/why3`` after installation. See
-Appendix [sec:proverdetecttiondata] for details.
+as they are in fact listed in the file :file:`provers-detection-data.conf`,
+typically located in :file:`/usr/local/share/why3`: after installation. See
+:numref:`sec.proverdetectiondata` for details.
 
 .. _sec.uninstalledprovers:
 
@@ -213,7 +213,7 @@ scripts.
 
 Your choice between the three options above will be recorded, one for
 each prover, in the Why3 configuration file. Within the GUI, you can
-discard these choices via the *Preferences* dialog: just click on one choice to remove
+discard these choices via the :menuselection:`Files --> Preferences` dialog: just click on one choice to remove
 it.
 
 Outside the GUI, the prover upgrades are handled as follows. The

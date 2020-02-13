@@ -115,9 +115,9 @@ be as follows.
 This configuration file can be passed to Why3 thanks to the
 :option:`--extra-config` option.
 
-.. _sec.coq:
-
 .. index:: Coq proof assistant, proof assistant; Coq
+
+.. _sec.coq:
 
 Coq
 ---
@@ -166,9 +166,9 @@ Currently, the parser for Coq scripts is rather naive and does not know
 much about comments. For instance, Why3 can easily be confused by some
 terminating directive like ``Qed`` that would be present in a comment.
 
-.. _sec.isabelle:
-
 .. index:: Isabelle proof assistant, proof assistant; Isabelle
+
+.. _sec.isabelle:
 
 Isabelle/HOL
 ------------
@@ -280,9 +280,9 @@ the following form.
 
 See directory ``lib/isabelle`` for examples.
 
-.. _sec.pvs:
-
 .. index:: PVS proof assistant, proof assistant; PVS
+
+.. _sec.pvs:
 
 PVS
 ---
