@@ -15,8 +15,15 @@ Standard library
         be used in programs
   * no more libraries `appmap` and `impmap`
   * no more library `sum.Sum` (subsumed by `int.Sum`)
+  * new library `string` for character strings
+      - `String`: basic string operations
+      - `OCaml`: additional operations dedicated to extraction to OCaml
+      - `RegExpr`: regular expressions
 
 Language
+  :x: the type `string` is a new built-in type. string literals can be
+    given between double-quotes.  See documentation Section 6.1
+    String operations are defined in the library `string.String`
   * it is now possible to give a name to preconditions and assertions;
     `requires Foo { a = 3 }` sets the attribute `[@hyp_name:Foo]`, which tries
     to give the name `Foo` to the corresponding hypothesis after introduction
@@ -32,6 +39,14 @@ Tools
     by default; pass option `--json` to restore the previous behavior
   * new tool `why3pp` to pretty print Why3 source code (inductive definitions to LaTeX,
     formatting of mlw files)
+
+Documentation
+  * improved Section 9.4 on drivers, including an automatically generated
+    dependency graph of driver files
+  * improved Section 9.5 on transformations, including transformations
+    with arguments
+  :x: lexical conventions are slightly changed regarding strings, see Section 6.1
+  * documentation for tools `why3pp` and `why3latex`
 
 API
   * `Call_provers.print_prover_result` now takes an additional argument
@@ -63,7 +78,7 @@ Transformations
     `meta reflection val foo` :x:
   * `remove` and `bisect` should not raise unnecessary popups anymore
   * added `remove_rec`
-  * the attribute `ìnline:trivial` can be added on definitions to force its
+  * the attribute `inline:trivial` can be added on definitions to force its
     inlining by the transformation `inline_trivial`
 
 IDE
@@ -96,6 +111,7 @@ Provers
   * support for Coq 8.10.1 (released Oct 25, 2019)
   * support for Coq 8.10.2 (released Oct 29, 2019)
   * support for Coq 8.11.0 (released Jan 30, 2020)
+  * make use of built-in support for strings by Z3 (4.8.6), and CVC4 (1.7)
 
 Version 1.2.1, October 28, 2019
 -------------------------------
