@@ -69,9 +69,9 @@ is written in base 10.
 
 Identifiers are composed of letters, digits, underscores, and primes.
 The syntax distinguishes identifiers that start with a lowercase letter
-or an underscore (), identifiers that start with an uppercase letter (),
-and identifiers that start with a prime (, used exclusively for type
-variables):
+or an underscore (:token:`lident`), identifiers that start with an
+uppercase letter (:token:`uident`), and identifiers that start with
+a prime (:token:`qident`, used exclusively for type variables):
 
 .. productionlist::
     alpha: "a" - "z" | "A" - "Z"
@@ -82,12 +82,12 @@ variables):
 
 
 Identifiers that contain a prime followed by a letter, such as
-``int32’max``, are reserved for symbols introduced by Why3 and cannot be
+``int32'max``, are reserved for symbols introduced by Why3 and cannot be
 used for user-defined symbols.
 
 In order to refer to symbols introduced in different namespaces
 (*scopes*), we can put a dot-separated “qualifier prefix” in front of an
-identifier (e.g. ``Map.S.get``). This allows us to use the symbol
+identifier (e.g., ``Map.S.get``). This allows us to use the symbol
 ``get`` from the scope ``Map.S`` without importing it in the current
 namespace:
 
@@ -99,14 +99,14 @@ namespace:
 
 All parenthesised expressions in WhyML (types, patterns, logical terms,
 program expressions) admit a qualifier before the opening parenthesis,
-e.g. \ ``Map.S.(get m i)``. This imports the indicated scope into the
+e.g., ``Map.S.(get m i)``. This imports the indicated scope into the
 current namespace during the parsing of the expression under the
 qualifier. For the sake of convenience, the parentheses can be omitted
 when the expression itself is enclosed in parentheses, square brackets
 or curly braces.
 
 Prefix and infix operators are built from characters organized in four
-precedence groups (*op-char-1* to *op-char-4*), with optional primes at
+precedence groups (:token:`op_char_1` to :token:`op_char_4`), with optional primes at
 the end:
 
 .. productionlist::
@@ -135,7 +135,7 @@ operator, allowing us to write expressions like ``inv !x`` without
 parentheses.
 
 Finally, any identifier, term, formula, or expression in a
-WhyML source can be tagged either with a string *attribute* or a
+WhyML source can be tagged either with a string :token:`attribute` or a
 location:
 
 .. productionlist::
@@ -158,7 +158,7 @@ type expressions is the following:
 .. productionlist::
     type: `lqualid` `type_arg`+            ; polymorphic type symbol
         : | `type` "->" `type`            ; mapping type (right-associative)
-        : | `type-arg`
+        : | `type_arg`
     type_arg: `lqualid`                  ; monomorphic type symbol (sort)
             : | `qident`                    ; type variable
             : | "()"		             ; unit type
@@ -174,12 +174,12 @@ type*), and the tuple types. The empty tuple type is also called the
 
 Note that the syntax for type expressions notably differs from the usual
 ML syntax. In particular, the type of polymorphic lists is written
-``list ’a``, and not ``’a list``.
+``list 'a``, and not ``'a list``.
 
 *Snapshot types* are specific to WhyML, they denote the types of ghost
 values produced by pure logical functions in WhyML programs. A snapshot
-of an immutable type is the type itself: thus, ``{int}`` is the same as
-``int`` and ``{list ’a}`` is the same as ``list ’a``. A snapshot of a
+of an immutable type is the type itself; thus, ``{int}`` is the same as
+``int`` and ``{list 'a}`` is the same as ``list 'a``. A snapshot of a
 mutable type, however, represents a snapshot value which cannot be
 modified anymore. Thus, a snapshot array ``a`` of type ``{array int}``
 can be read from (``a[42]`` is accepted) but not written into
@@ -198,7 +198,7 @@ Logical expressions: terms and formulas
         : | "()"                    ; empty tuple
         : | `qualid`                  ; qualified identifier
         : | `qualifier`? "(" `term` ")"        ; term in a scope
-        : | `qualifier`? "begin" `term` "end"  ; \textit{idem}
+        : | `qualifier`? "begin" `term` "end"  ; idem
         : | `tight_op` `term`           ; tight operator
         : | "{" `term_field`+ "}"     ; record
         : | "{" `term` "with" `term_field`+ "}" ; record update
@@ -225,12 +225,12 @@ Logical expressions: terms and formulas
         : | `term` "so" `term`          ; consequence indication
         : | `term` "->" `term`          ; implication
         : | `term` "<->" `term`         ; equivalence
-        : | `term` ":" `type `          ; type cast
+        : | `term` ":" `type`           ; type cast
         : | `attribute`+ `term`         ; attributes
         : | `term` ("," `term`)+        ; tuple
-        : | `quantifier` `quant-vars` `triggers`? "." `term` ; quantifier
+        : | `quantifier` `quant_vars` `triggers`? "." `term` ; quantifier
         : | ...                     ; (to be continued)
-    term_field: `lqualid` "=" `term` ";" ; field \texttt{=} value
+    term_field: `lqualid` "=" `term` ";" ; field = value
     qualid: `qualifier`? (`lident_ext` | `uident`)  ; qualified identifier
     lident_ext: `lident`                   ; lowercase identifier
               : | "(" `ident_op` ")"         ; operator identifier
@@ -291,23 +291,23 @@ meaning and may be used to denote access and update operations for
 various user-defined collection types. We can introduce multiple bracket
 operations in the same scope by disambiguating them with primes after
 the closing bracket: for example, ``a[i]`` may denote array access and
-``s[i]’`` sequence access. Notice that the in-place update operator
+``s[i]'`` sequence access. Notice that the in-place update operator
 ``a[i] <- v`` cannot be used inside logical terms: all effectful
 operations are restricted to program expressions. To represent the
 result of a collection update, we should use a pure logical update
 operator ``a[i <- v]`` instead. WhyML supports “associated” names for
 operators, obtained by adding a suffix after the parenthesised operator
 name. For example, an axiom that represents the specification of the
-infix operator ``(+)`` may be called ``(+)’spec`` or ``(+)_spec``. As
+infix operator ``(+)`` may be called ``(+)'spec`` or ``(+)_spec``. As
 with normal identifiers, names with a letter after a prime, such as
-``(+)’spec``, can only be introduced by Why3, and not by the user in a
+``(+)'spec``, can only be introduced by Why3, and not by the user in a
 WhyML source.
 
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
 past moment of execution (see the next section for details). These
 operators have higher precedence than the infix operators from group 1
-(*infix-op-1*): ``old i > j`` is parsed as ``(old i) > j`` and not as
+(:token:`infix_op_1`): ``old i > j`` is parsed as ``(old i) > j`` and not as
 ``old (i > j)``.
 
 Infix operators from groups 2-4 are left-associative. Infix operators
@@ -316,7 +316,7 @@ term ``0 <= i < j < length a`` is parsed as the conjunction of three
 inequalities ``0 <= i``, ``i < j``, and ``j < length a``.
 
 As with normal identifiers, we can put a qualifier over a parenthesised
-operator, e.g. \ ``Map.S.([]) m i``. Also, as noted above, a qualifier
+operator, e.g., ``Map.S.([]) m i``. Also, as noted above, a qualifier
 can be put over a parenthesised term, and the parentheses can be omitted
 if the term is a record or a record update.
 
@@ -351,17 +351,17 @@ connectives follows the rules below:
 For example, full splitting of the goal
 ``(A by (exists x. B so C)) && D`` produces four subgoals:
 ``exists x. B`` (the premise is verified), ``forall x. B -> C`` (the
-premise justifies the conclusion), ``(exists x. B /92 C) -> A`` (the
+premise justifies the conclusion), ``(exists x. B /\ C) -> A`` (the
 proof justifies the affirmation), and finally, ``A -> D`` (the proof of
 ``A`` is discarded and ``A`` is used to prove ``D``).
 
-The behaviour of the splitting transformations is further controlled by
+The behavior of the splitting transformations is further controlled by
 attributes ``[@stop_split]`` and ``[@case_split]``. Consult
 :numref:`tech.trans:split` for details.
 
 Among the propositional connectives, ``not`` has the highest precedence,
-``&&`` has the same precedence as ``/92`` (weaker than negation), ``||``
-has the same precedence as ``92/`` (weaker than conjunction), ``by``,
+``&&`` has the same precedence as ``/\`` (weaker than negation), ``||``
+has the same precedence as ``\/`` (weaker than conjunction), ``by``,
 ``so``, ``->``, and ``<->`` all have the same precedence (weaker than
 disjunction). All binary connectives except equivalence are
 right-associative. Equivalence is non-associative and is chained
@@ -377,15 +377,15 @@ equivalence: ``A <-> B -> C`` is rejected.
       : | "let" `pattern` "=" `term` "in" `term`      ; let-binding
       : | "let" `symbol` `param`+ "=" `term` "in" `term`  ; mapping definition
       : | "fun" `param`+ "->" `term`                ; unnamed mapping
-  term_case: "|" pattern "->" `term`
-  pattern: binder                            ; variable or `\texttt{\_}'
+  term_case: "|" `pattern` "->" `term`
+  pattern: `binder`                            ; variable or "_"
          : | "()"                              ; empty tuple
          : | "{" (`lqualid` "=" `pattern` ";")+ "}"  ; record pattern
          : | `uqualid` `pattern`*                  ; constructor
          : | "ghost" `pattern`                   ; ghost sub-pattern
          : | `pattern` "as" "ghost"? `bound_var`   ; named sub-pattern
          : | `pattern` "," `pattern`              ; tuple pattern
-         : | `pattern` "|" `pattern`               ; ``or'' pattern
+         : | `pattern` "|" `pattern`               ; "or" pattern
          : | `qualifier`? "(" `pattern` ")"        ; pattern in a scope
   symbol: `lident_ext` `attribute`*      ; user-defined symbol
   param: `type-arg`                          ; unnamed typed
@@ -399,18 +399,18 @@ conditionals, let-bindings, pattern matching, and local function
 definitions, either via the ``let-in`` construction or the ``fun``
 keyword. The pure logical functions defined in this way are called
 *mappings*; they are first-class values of “arrow” type
-``tau1 -> tau2``.
+:samp:`{t} -> {u}`.
 
 The patterns are similar to those of OCaml, though the ``when`` clauses
 and numerical constants are not supported. Unlike in OCaml, ``as`` binds
-stronger than the comma: in the pattern ``(p_1,p_2 as x)``, variable
-``x`` is bound to the value matched by pattern :math:`p_2`. Also notice
+stronger than the comma: in the pattern :samp:`({p},{q} as {x})`, variable
+*x* is bound to the value matched by pattern *q*. Also notice
 the closing ``end`` after the ``match-with`` term. A ``let-in``
 construction with a non-trivial pattern is translated as a
 ``match-with`` term with a single branch.
 
 Inside logical terms, pattern matching must be exhaustive: WhyML rejects
-a term like ``let Some x = o in \dots``, where ``o`` is a variable of an
+a term like ``let Some x = o in e``, where ``o`` is a variable of an
 option type. In program expressions, non-exhaustive pattern matching is
 accepted and a proof obligation is generated to show that the values not
 covered cannot occur in execution.
@@ -425,7 +425,7 @@ when the symbol declaration does not provide the actual definition or
 specification of the symbol, and thus only the type signature is of
 relevance. For example, one can declare an abstract binary function that
 adds an element to a set simply by writing
-``function add ’a (set ’a) : set ’a``. A standalone non-qualified
+``function add 'a (set 'a): set 'a``. A standalone non-qualified
 lowercase identifier without attributes is treated as a type name when
 the definition is not provided, and as a parameter name otherwise.
 
@@ -637,18 +637,18 @@ Theories
       : | `lident_nq` `label`* `type_param`* ":" `type` "=" `term`
     predicate_decl: `lident_nq` `label`* `type_param`* ;
       : | `lident_nq` `label`* `type_param`* "=" `formula`
-    inductive_decl: `lident_nq` `label`* `type_param`* "=" "|"? ind-case ("|" ind-case)* ;
+    inductive_decl: `lident_nq` `label`* `type_param`* "=" "|"? `ind_case` ("|" `ind_case`)* ;
     ind_case: `ident_nq` `label`* ":" `formula` ;
     imp_exp: ("import" | "export")?
-    subst: "with" ("," subst-elt)+
+    subst: "with" ("," `subst_elt`)+
     subst_elt: "type" `lqualid` "=" `lqualid` ;
       : | "function" `lqualid` "=" `lqualid`          ;
       : | "predicate" `lqualid` "=" `lqualid`         ;
       : | "scope" (`uqualid` | ".") "=" (`uqualid` | ".")  ;
       : | "lemma" `qualid` 	  		   ;
       : | "goal"  `qualid`			   ;
-    tqualid: uident | ident ("." ident)* "." uident ;
-    type_decl: `lident_nq` `label`* ("'" `lident_nq` `label`*)* type-defn; %
+    tqualid: `uident` | `ident` ("." `ident`)* "." `uident` ;
+    type_decl: `lident_nq` `label`* ("'" `lident_nq` `label`*)* `type_defn`; %
     type_defn:                                      ; abstract type
       : | "=" `type `                                      ; alias type
       : | "=" "|"? `type_case` ("|" `type_case`)*            ; algebraic type
@@ -691,12 +691,12 @@ range type :math:`r` automatically introduces the following:
       constant  r'maxInt : int
       constant  r'minInt : int
 
-The function ``r’int`` projects a term of type ``r`` to its integer
+The function ``r'int`` projects a term of type ``r`` to its integer
 value. The two constants represent the high bound and low bound of the
 range respectively.
 
 Unless specified otherwise with the meta ``keep:literal`` on ``r``, the
-transformation *eliminate\_literal* introduces an axiom
+transformation *eliminate_literal* introduces an axiom
 
 ::
 
@@ -713,7 +713,7 @@ axiom as in:
 This type is used in the standard library in the theories ``bv.BV8``,
 ``bv.BV16``, ``bv.BV32``, ``bv.BV64``.
 
-Floating-point Types
+Floating-point types
 ^^^^^^^^^^^^^^^^^^^^
 
 A declaration of the form ``type f = < float eb sb >`` defines a type of
@@ -741,8 +741,8 @@ Defining such a type ``f`` automatically introduces the following:
 As specified by the IEEE standard, float formats includes infinite
 values and also a special NaN value (Not-a-Number) to represent results
 of undefined operations such as :math:`0/0`. The predicate
-``f’isFinite`` indicates whether its argument is neither infinite nor
-NaN. The function ``f’real`` projects a finite term of type ``f`` to its
+``f'isFinite`` indicates whether its argument is neither infinite nor
+NaN. The function ``f'real`` projects a finite term of type ``f`` to its
 real value, its result is not specified for non finite terms.
 
 Unless specified otherwise with the meta ``keep:literal`` on ``f``, the
@@ -785,15 +785,15 @@ The syntax for specification clauses in programs is given in
 Within specifications, terms are extended with new constructs ``old``
 and ``at``:
 
-Within a postcondition, :math:`\verb|old|~t` refers to the value of term
-:math:`t` in the prestate. Within the scope of a code mark :math:`L`,
-the term :math:`\verb|at|~t~\verb|'|L` refers to the value of term
-:math:`t` at the program point corresponding to :math:`L`.
+Within a postcondition, :samp:`old {t}` refers to the value of term
+*t* in the prestate. Within the scope of a code mark *L*,
+the term :samp:`at {t} '{L}` refers to the value of term
+*t* at the program point corresponding to *L*.
 
 Expressions
 ~~~~~~~~~~~
 
-The syntax for program expressions is given in :token:`:expr`.
+The syntax for program expressions is given in :token:`expr`.
 
 In applications, arguments are evaluated from right to left. This
 includes applications of infix operators, with the only exception of
@@ -830,8 +830,8 @@ are imported as follows:
 
 ::
 
-      use import int.Int
-      use import ref.Ref
+      use int.Int
+      use ref.Ref
 
 A sub-directory ``mach/`` provides various modules to model machine
 arithmetic. For instance, the module of 63-bit integers and the module
@@ -839,8 +839,8 @@ of arrays indexed by 63-bit integers are imported as follows:
 
 ::
 
-      use import mach.int.Int63
-      use import mach.array.Array63
+      use mach.int.Int63
+      use mach.array.Array63
 
 In particular, the types and operations from these modules are mapped to
 native OCaml’s types and operations when Why3 code is extracted to OCaml
