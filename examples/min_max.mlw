@@ -50,13 +50,9 @@ let a_better_min_max (a: array int) : (int, int)
     variant   { n - i }
     invariant { mod i 2 = mod n 2 }
     invariant { is_min min a i /\ is_max max a i }
-    if a[i] < a[i+1] then begin
-      if a[i]   < min then min <- a[i];
-      if a[i+1] > max then max <- a[i+1]
-    end else begin
-      if a[i+1] < min then min <- a[i+1];
-      if a[i]   > max then max <- a[i]
-    end;
+    let x, y = if a[i] < a[i+1] then a[i], a[i+1] else a[i+1], a[i] in
+    if x < min then min <- x;
+    if y > max then max <- y;
     i += 2
   done;
   min, max
