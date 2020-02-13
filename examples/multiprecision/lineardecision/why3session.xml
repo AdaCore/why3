@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="8">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -151,10 +151,10 @@
   <proof prover="4" memlimit="2000"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="sprod&#39;vc.3" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="2676"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
   <goal name="sprod&#39;vc.4" expl="exceptional postcondition" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="2676"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1290,7 +1290,7 @@
   </goal>
   <goal name="linear_decision&#39;vc.17" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="48352"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.18" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="70"/></proof>
@@ -1300,24 +1300,24 @@
   </goal>
   <goal name="linear_decision&#39;vc.20" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="48352"/></proof>
-  <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.21" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.22" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.23" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.24" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.25" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.26" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="53556"/></proof>
@@ -1335,10 +1335,10 @@
   <proof prover="4"><result status="valid" time="0.02" steps="84"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.31" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.32" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.33" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="82"/></proof>
@@ -1351,12 +1351,13 @@
   </goal>
   <goal name="linear_decision&#39;vc.36" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.37" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.38" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.39" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="82"/></proof>
@@ -1369,7 +1370,6 @@
   </goal>
   <goal name="linear_decision&#39;vc.42" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.43" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
@@ -1399,10 +1399,10 @@
   <proof prover="4"><result status="valid" time="0.02" steps="80"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.52" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.53" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.54" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="78"/></proof>
@@ -1414,13 +1414,14 @@
   <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.57" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.58" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="32"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.59" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.60" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="78"/></proof>
@@ -1432,8 +1433,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.63" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.64" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
@@ -1485,17 +1485,17 @@
   </goal>
   <goal name="linear_decision&#39;vc.80" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.81" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="3546"/></proof>
-  </goal>
-  <goal name="linear_decision&#39;vc.82" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
+  <goal name="linear_decision&#39;vc.82" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="3546"/></proof>
+  </goal>
   <goal name="linear_decision&#39;vc.83" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.84" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="54617"/></proof>
@@ -1546,16 +1546,16 @@
   <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.99" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.100" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.101" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.102" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
   </goal>
  </transf>
  </goal>
@@ -3088,13 +3088,13 @@
   <proof prover="2"><result status="valid" time="0.23" steps="192550"/></proof>
   </goal>
   <goal name="mp_decision&#39;vc.4" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="9470"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="9470"/></proof>
   </goal>
   <goal name="mp_decision&#39;vc.5" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="9470"/></proof>
   </goal>
   <goal name="mp_decision&#39;vc.6" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="9470"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="9470"/></proof>
   </goal>
  </transf>
  </goal>
