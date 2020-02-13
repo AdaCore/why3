@@ -81,6 +81,9 @@ wmp_limb_t wmpn_rshift (wmp_ptr, wmp_srcptr, wmp_size_t, uint64_t);
 void wmpn_powm (wmp_ptr, wmp_srcptr, wmp_size_t, wmp_srcptr, wmp_size_t,
                 wmp_srcptr, wmp_size_t, wmp_ptr);
 
+size_t wmpn_get_str(unsigned char *, int, wmp_ptr, wmp_size_t);
+wmp_size_t wmpn_set_str(wmp_ptr, unsigned char *, size_t, int);
+
 // not verified when rp and up are aliased.
 wmp_limb_t wmpn_add_1 (wmp_ptr rp, wmp_srcptr up, wmp_size_t, wmp_limb_t);
 wmp_limb_t wmpn_sub_1 (wmp_ptr rp, wmp_srcptr up, wmp_size_t, wmp_limb_t);
