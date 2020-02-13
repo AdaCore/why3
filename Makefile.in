@@ -299,21 +299,21 @@ $(LIBDEP): $(LIBGENERATED)
 # Mlmpfr
 
 ifeq (@found_mlmpfr@,yes)
-src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_real.ml
-	cp src/util/mlmpfr_real.ml $@
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
+	cp $< $@
 else
-src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_dummy.ml
-	cp src/util/mlmpfr_dummy.ml $@
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
+	cp $< $@
 endif
 
 # Ocamlzip
 
 ifeq (@enable_zip@,yes)
-src/session/compress.ml: config.status src/session/compress_z.ml
-	cp src/session/compress_z.ml $@
+src/session/compress.ml: src/session/compress_z.ml Makefile
+	cp $< $@
 else
-src/session/compress.ml: config.status src/session/compress_none.ml
-	cp src/session/compress_none.ml $@
+src/session/compress.ml: src/session/compress_none.ml Makefile
+	cp $< $@
 endif
 
 .PHONY: initialize_messages update-parsing-error-handling
@@ -356,7 +356,7 @@ endif
 # Re
 
 ifeq (@enable_re@,no)
-src/util/re.ml: src/util/recompat.ml config.status
+src/util/re.ml: src/util/recompat.ml Makefile
 	cp $< $@
 
 GENERATED += re.ml
@@ -891,11 +891,11 @@ install:: install-ide
 install_local:: bin/why3ide
 
 ifeq (@GTKVERSION@,2)
-src/ide/gtkcompat.ml: config.status src/ide/gtkcompat2.ml
-	cp src/ide/gtkcompat2.ml $@
+src/ide/gtkcompat.ml: src/ide/gtkcompat2.ml Makefile
+	cp $< $@
 else
-src/ide/gtkcompat.ml: config.status src/ide/gtkcompat3.ml
-	cp src/ide/gtkcompat3.ml $@
+src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
+	cp $< $@
 endif
 
 GENERATED += $(IDEGENERATED)
