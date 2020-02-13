@@ -11,23 +11,61 @@ feed. Blanks separate lexemes but are otherwise ignored. Comments are
 enclosed by ``(*`` and ``*)`` and can be nested. Note that ``(*)`` does
 not start a comment.
 
-Strings are enclosed in double quotes (``"``). Double quotes can be
-escaped inside strings using the backslash character (``\``). The other
-special sequences are ``\n`` for line feed and ``\t`` for horizontal
-tab. In the following, strings are referred to with the non-terminal .
+Strings are enclosed in double quotes (``"``). The backslash character
+``\``, is used for escaping purposes. The following
+escape sequences are allowed:
+
+- ``\`` followed by a *new line* allows for
+  multi-line strings. The leading spaces immediately after the new
+  line are ignored.
+- ``\\`` and ``\"`` for the backslash and double quote respectively.
+- ``\n``, ``\r``, and
+  ``\t`` for the new line feed, carriage return,
+  and horizontal tab character.
+- ``\DDD``, ``\oOOO``, and
+  ``\xXX``, where ``DDD`` is a decimal value
+  in the interval 0-255, ``OOO`` an octal value in the
+  interval 0-377, and ``XX`` an hexadecimal value.
+  Sequences of this form can be used to encode Unicode characters, in
+  particular non printable ASCII characters.
+- any other escape sequence results in a parsing error.
 
 The syntax for numerical constants is given by the following rules:
 
-``0``\ ``9``,\ ``0``\ ``9``\ ``a``\ ``f``\ ``A``\ ``F``,\ ``0``\ ``7``,\ ``0``\ ``1``,\ ``95``\ &
-``0x``\ ``0X``\ ``95``\ & ``0o``\ ``0O``\ ``95``\ &
-``0b``\ ``0B``\ ``95``\ & ,& ``46``\ & ``46``\ & ``0x``\ ``0X``\ &
-``0x``\ ``0X``\ ``46``\ & ``0x``\ ``0X``\ ``46``\ &
-,\ ``e``\ ``E``\ ``45``\ ``43``,\ ``p``\ ``P``\ ``45``\ ``43``
+.. productionlist::
+    digit: "0" - "9"
+    hex_digit: "0" - "9" | "a" - "f" | "A" - "F"
+    oct_digit: "0" - "7"
+    bin_digit: "0" | "1"
+    integer: `digit` (`digit` | "_")*
+      : | ("0x" | "0X") `hex_digit` (`hex_digit` | "_")*
+      : | ("0o" | "0O") `oct_digit` (`oct_digit` | "_")*
+      : | ("0b" | "0B") `bin_digit` (`bin_digit` | "_")*
+    real: `digit`+ `exponent`
+      : | `digit`+ "." `digit`* `exponent`?
+      : | `digit`* "." `digit`+ `exponent`?
+      : | ("0x" | "0X") `hex_digit`+ `h_exponent`
+      : | ("0x" | "0X") `hex_digit`+ "." `hex_digit`* `h_exponent`?
+      : | ("0x" | "0X") `hex_digit`* "." `hex_digit`+ `h_exponent`?
+    exponent: ("e" | "E") ("-" | "+")? `digit`+
+    h_exponent: ("p" | "P") ("-" | "+")? `digit`+
+    char: "a" - "z" | "A" - "Z" | "0" - "9"
+      : | " " | "!" | "#" | "$" | "%" | "&" | "'" | "("
+      : | ")" | "*" | "+" | "," | "-" | "." | "/" | ":"
+      : | ";" | "<" | "=" | ">" | "?" | "@" | "[" | "]"
+      : | "^" | "_" | "`" | "\\" | "\n" | "\r" | "\t" | '\"'
+      : | "\" ("0" | "1") `digit` `digit`
+      : | "\" "2" ("0" - "4") `digit`
+      : | "\" "2" "5" ("0" - "5")
+      : | "\x" `hex_digit` `hex_digit`
+      : | "\o" ("0" - "3" ) `oct_digit` `oct_digit`
+    string: '"' `char`* '"'
+
 
 Integer and real constants have arbitrary precision. Integer constants
-can be given in base 10, 16, 8 or 2. Real constants can be given in base
-10 or 16. Notice that the exponent in hexadecimal real constants is
-written in base 10.
+can be given in base 10, 16, 8 or 2. Real constants can be given in
+base 10 or 16. Notice that the exponent in hexadecimal real constants
+is written in base 10.
 
 Identifiers are composed of letters, digits, underscores, and primes.
 The syntax distinguishes identifiers that start with a lowercase letter
@@ -35,7 +73,13 @@ or an underscore (), identifiers that start with an uppercase letter (),
 and identifiers that start with a prime (, used exclusively for type
 variables):
 
-``a``\ ``z``\ ``A``\ ``Z``,\ ``39``\ ``95``,\ ``a``\ ``z``\ ``95``,\ ``A``\ ``Z``,\ ``39``\ ``a``\ ``z``
+.. productionlist::
+    alpha: "a" - "z" | "A" - "Z"
+    suffix: `alpha` | `digit` | "'" | "_"
+    lident: ("a" - "z") `suffix`* | "_" `suffix`+
+    uident: ("A" - "Z") `suffix`*
+    qident: "'" ("a" - "z") `suffix`*
+
 
 Identifiers that contain a prime followed by a letter, such as
 ``int32’max``, are reserved for symbols introduced by Why3 and cannot be
@@ -47,7 +91,11 @@ identifier (e.g. ``Map.S.get``). This allows us to use the symbol
 ``get`` from the scope ``Map.S`` without importing it in the current
 namespace:
 
-``46``, ,
+.. productionlist::
+    qualifier: (`uident` ".")+
+    lqualid: `qualifier`? `lident`
+    uqualid: `qualifier`? `uident`
+
 
 All parenthesised expressions in WhyML (types, patterns, logical terms,
 program expressions) admit a qualifier before the opening parenthesis,
@@ -61,12 +109,21 @@ Prefix and infix operators are built from characters organized in four
 precedence groups (*op-char-1* to *op-char-4*), with optional primes at
 the end:
 
-1\ ``61``\ ``60``\ ``62``\ ``126``\ & ,2\ ``43``\ ``45``\ &
-,3\ ``42``\ ``47``\ ``92``\ ``37``\ &
-,4\ ``33``\ ``36``\ ``38``\ ``63``\ ``64``\ ``94``\ ``46``\ ``58``\ ``124``\ ``35``\ &
-,12341234& ,234234& ,3434& ,1123411234\ ``39``\ & ,22342234\ ``39``\ &
-,334334\ ``39``\ & ,44\ ``39``\ & ,1234\ ``39``\ &
-,\ ``33``\ ``63``\ 4\ ``39``\ &
+.. productionlist::
+    op_char_1: "=" | "<" | ">" | "~"
+    op_char_2: "+" | "-"
+    op_char_3: "*" | "/" | "\" | "%"
+    op_char_4: "!" | "$" | "&" | "?" | "@" | "^" | "." | ":" | "|" | "#"
+    op_char_1234: `op_char_1` | `op_char_2` | `op_char_3` | `op_char_4`
+    op_char_234: `op_char_2` | `op_char_3` | `op_char_4`
+    op_char_34: `op_char_3` | `op_char_4`
+    infix_op_1: ``op_char_1234`* `op_char_1` `op_char_1234`* "'"*
+    infix_op_2: `op_char_234`* `op_char_2` `op_char_234`* "'"*
+    infix_op_3: `op_char_34`* `op_char_3` `op_char_34`* "'"*
+    infix_op_4: `op_char_4`+ "'"*
+    prefix_op: `op_char_1234`+ "'"*
+    tight_op: ("!" | "?") `op_char_4`* "'"*
+
 
 Infix operators from a high-numbered group bind stronger than the infix
 operators from a low-numbered group. For example, infix operator ``.*.``
@@ -75,11 +132,16 @@ from group 1. Prefix operators always bind stronger than infix
 operators. The so-called “tight operators” are prefix operators that
 have even higher precedence than the juxtaposition (application)
 operator, allowing us to write expressions like ``inv !x`` without
-parentheses. Finally, any identifier, term, formula, or expression in a
+parentheses.
+
+Finally, any identifier, term, formula, or expression in a
 WhyML source can be tagged either with a string *attribute* or a
 location:
 
-``9164`` ...``93``\ & ``9135``\ ``93``\ &
+.. productionlist::
+    attribute: "[@" ... "]"
+             : | "[#" string digit+ digit+ digit+ "]"
+
 
 An attribute cannot contain newlines or closing square brackets; leading
 and trailing spaces are ignored. A location consists of a file name in
@@ -93,8 +155,17 @@ WhyML features an ML-style type system with polymorphic types, variants
 (sum types), and records that can have mutable fields. The syntax for
 type expressions is the following:
 
-& ``4562``\ & ,& & ``4041``\ & ``40``\ ``44``\ ``41``\ &
-``123``\ ``125``\ & ``40``\ ``41``\ &
+.. productionlist::
+    type: `lqualid` `type_arg`+            ; polymorphic type symbol
+        : | `type` "->" `type`            ; mapping type (right-associative)
+        : | `type-arg`
+    type_arg: `lqualid`                  ; monomorphic type symbol (sort)
+            : | `qident`                    ; type variable
+            : | "()"		             ; unit type
+            : | "(" `type` ("," `type`)+ ")"  ; tuple type
+            : | "{" `type` "}"              ; snapshot type
+            : | `qualifier`? "(" `type` ")"   ; type in a scope
+
 
 Built-in types are ``int`` (arbitrary precision integers), ``real``
 (real numbers), ``bool``, the arrow type (also called the *mapping
@@ -120,23 +191,70 @@ function.
 Logical expressions: terms and formulas
 ---------------------------------------
 
-& & ``true``\ ``false``\ & ``4041``\ & & ``40``\ ``41``\ &
-``begin``\ ``end``\ & & ``123``\ ``125``\ &
-``123``\ ``with``\ ``125``\ & ``46``\ & ``91``\ ``93``\ ``39``\ &
-``91``\ ``6045``\ ``93``\ ``39``\ & ``91``\ ``4646``\ ``93``\ ``39``\ &
-``91``\ ``4646``\ ``93``\ ``39``\ & ``91``\ ``4646``\ ``93``\ ``39``\ &
-& & 4& 3& 2& ``at``\ & ``old``\ & 1& ...& ,\ ``61``\ ``59``\ & ,& ,&
-``40``\ ``41``\ & ``40``\ ``41``\ ``95``\ ``39``\ & ,1& 2& 3& 4&
-``95``\ & ``95``\ & ``91``\ ``93``\ ``39``\ &
-``91``\ ``6045``\ ``93``\ ``39``\ & ``91``\ ``93``\ ``39``\ ``6045``\ &
-``91``\ ``4646``\ ``93``\ ``39``\ &
-``91``\ ``95``\ ``4646``\ ``93``\ ``39``\ &
-``91``\ ``4646``\ ``95``\ ``93``\ ``39``\ &
+.. productionlist::
+    term: `integer`            ; integer constant
+        : | `real`                    ; real constant
+        : | "true" | "false"        ; Boolean constant
+        : | "()"                    ; empty tuple
+        : | `qualid`                  ; qualified identifier
+        : | `qualifier`? "(" `term` ")"        ; term in a scope
+        : | `qualifier`? "begin" `term` "end"  ; \textit{idem}
+        : | `tight_op` `term`           ; tight operator
+        : | "{" `term_field`+ "}"     ; record
+        : | "{" `term` "with" `term_field`+ "}" ; record update
+        : | `term` "." `lqualid`        ; record field access
+        : | `term` "[" `term` "]" "'"*  ; collection access
+        : | `term` "[" `term` "<-" `term` "]" "'"*  ; collection update
+        : | `term` "[" `term` ".." `term` "]" "'"*  ; collection slice
+        : | `term` "[" `term` ".." "]" "'"*  ; right-open slice
+        : | `term` "[" ".." `term` "]" "'"*  ; left-open slice
+        : | `term` `term`+              ; application
+        : | `prefix_op` `term`          ; prefix operator
+        : | `term` `infix_op_4` `term`    ; infix operator 4
+        : | `term` `infix_op_3` `term`    ; infix operator 3
+        : | `term` `infix_op_2` `term`    ; infix operator 2
+        : | `term` "at" `uident`        ; past value
+        : | "old" `term`              ; initial value
+        : | `term` `infix_op_1` `term`    ; infix operator 1
+        : | "not" `term`              ; negation
+        : | `term` "/\" `term`          ; conjunction
+        : | `term` "&&" `term`          ; asymmetric conjunction
+        : | `term` "\/" `term`          ; disjunction
+        : | `term` "||" `term`          ; asymmetric disjunction
+        : | `term` "by" `term`          ; proof indication
+        : | `term` "so" `term`          ; consequence indication
+        : | `term` "->" `term`          ; implication
+        : | `term` "<->" `term`         ; equivalence
+        : | `term` ":" `type `          ; type cast
+        : | `attribute`+ `term`         ; attributes
+        : | `term` ("," `term`)+        ; tuple
+        : | `quantifier` `quant-vars` `triggers`? "." `term` ; quantifier
+        : | ...                     ; (to be continued)
+    term_field: `lqualid` "=" `term` ";" ; field \texttt{=} value
+    qualid: `qualifier`? (`lident_ext` | `uident`)  ; qualified identifier
+    lident_ext: `lident`                   ; lowercase identifier
+              : | "(" `ident_op` ")"         ; operator identifier
+              : | "(" `ident_op` ")" ("_" | "'") alpha suffix* ; associated identifier
+    ident_op:  `infix_op_1`              ;   infix operator 1
+            : | `infix_op_2`              ;   infix operator 2
+            : | `infix_op_3`              ;   infix operator 3
+            : | `infix_op_4`              ;   infix operator 4
+            : | `prefix_op` "_"           ;   prefix operator
+            : | `tight_op` "_"?           ;   tight operator
+            : | "[" "]" "'" *           ;   collection access
+            : | "[" "<-" "]" "'"*       ;   collection update
+            : | "[" "]" "'"* "<-"       ;   in-place update
+            : | "[" ".." "]" "'"*       ;   collection slice
+            : | "[" "_" ".." "]" "'"*   ;   right-open slice
+            : | "[" ".." "_" "]" "'"*   ;   left-open slice
+    quantifier: "forall" | "exists"
+    quant_vars: `quant_cast` ("," `quant_cast`)*
+    quant_cast: `binder`+ (":" `type`)?
+    binder: "_" | `bound_var`
+    bound_var: `lident` `attribute`*
+    triggers: "[" `trigger` ("|" `trigger`)* "]"
+    trigger: `term` ("," `term`)*
 
-...& ``not``\ & ``4792``\ & ``3838``\ & ``9247``\ & ``124124``\ &
-``by``\ & ``so``\ & ``4562``\ & ``604562``\ & ``58``\ & & ``44``\ &
-``46``\ & ...& ,\ ``forall``\ ``exists``,\ ``44``,\ ``58``,\ ``95``
-,,\ ``91``\ ``124``\ ``93``\ & ,\ ``44``\ &
 
 A significant part of a typical WhyML source file is occupied by
 non-executable logical content intended for specification and proof:
@@ -203,7 +321,7 @@ can be put over a parenthesised term, and the parentheses can be omitted
 if the term is a record or a record update.
 
 The propositional connectives in WhyML formulas are listed in
-:numref:`fig.bnf:term2`. The non-standard connectives — asymmetric
+:token:`term`. The non-standard connectives — asymmetric
 conjunction (``&&``), asymmetric disjunction (``||``), proof indication
 (``by``), and consequence indication (``so``) — are used to control the
 goal-splitting transformations of Why3 and provide integrated proofs for
@@ -252,20 +370,36 @@ instead: ``A <-> B <-> C`` is transformed into a conjunction of
 a non-parenthesised implication at the right-hand side of an
 equivalence: ``A <-> B -> C`` is rejected.
 
-...& ``if``\ ``then``\ ``else``\ & ``match``\ ``with``\ ``end``\ &
-``let``\ ``61``\ ``in``\ & ``let``\ ``61``\ ``in``\ &
-``fun``\ ``4562``\ & ,\ ``124``\ ``4562`` ,& ``4041``\ &
-``123``\ ``61``\ ``59``\ ``125``\ & & ``ghost``\ & ``as``\ ``ghost``\ &
-``44``\ & ``124``\ & ``40``\ ``41``\ & ,& ,& &
-``40``\ ``ghost``\ ``41``\ & ``40``\ ``ghost``\ ``41``\ &
-``40``\ ``ghost``\ ``58``\ ``41``\ &
+.. productionlist::
+  term: ...
+      : | "if" `term` "then" `term` "else" `term`     ; conditional
+      : | "match" `term` "with" `term_case`+ "end"  ; pattern matching
+      : | "let" `pattern` "=" `term` "in" `term`      ; let-binding
+      : | "let" `symbol` `param`+ "=" `term` "in" `term`  ; mapping definition
+      : | "fun" `param`+ "->" `term`                ; unnamed mapping
+  term_case: "|" pattern "->" `term`
+  pattern: binder                            ; variable or `\texttt{\_}'
+         : | "()"                              ; empty tuple
+         : | "{" (`lqualid` "=" `pattern` ";")+ "}"  ; record pattern
+         : | `uqualid` `pattern`*                  ; constructor
+         : | "ghost" `pattern`                   ; ghost sub-pattern
+         : | `pattern` "as" "ghost"? `bound_var`   ; named sub-pattern
+         : | `pattern` "," `pattern`              ; tuple pattern
+         : | `pattern` "|" `pattern`               ; ``or'' pattern
+         : | `qualifier`? "(" `pattern` ")"        ; pattern in a scope
+  symbol: `lident_ext` `attribute`*      ; user-defined symbol
+  param: `type-arg`                          ; unnamed typed
+       : | `binder`                            ; (un)named untyped
+       : | "(" "ghost"? `type` ")"             ; unnamed typed
+       : | "(" "ghost"? `binder` ")"           ; (un)named untyped
+       : | "(" "ghost"? `binder`+ ":" `type` ")" ; multi-variable typed %
 
-In :numref:`fig.bnf:term3`, we find the more advanced term constructions:
+Above, we find the more advanced term constructions:
 conditionals, let-bindings, pattern matching, and local function
 definitions, either via the ``let-in`` construction or the ``fun``
 keyword. The pure logical functions defined in this way are called
 *mappings*; they are first-class values of “arrow” type
-``\tau_1 -> \tau_2``.
+``tau1 -> tau2``.
 
 The patterns are similar to those of OCaml, though the ``when`` clauses
 and numerical constants are not supported. Unlike in OCaml, ``as`` binds
