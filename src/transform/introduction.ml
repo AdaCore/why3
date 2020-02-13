@@ -35,6 +35,27 @@ let meta_intro_pr = Theory.register_meta
         after@ generalization."
   "introduced_prsymbol" [Theory.MTprsymbol]
 
+module Hsdecl = Hashcons.Make (struct
+  type t = decl
+
+  let equal d1 d2 = match d1.d_node, d2.d_node with
+    | Dprop (k1,pr1,f1), Dprop (k2,pr2,f2) ->
+        let pr_equal {pr_name = id1} {pr_name = id2} =
+          id1.id_string = id2.id_string &&
+          Sattr.equal id1.id_attrs id2.id_attrs &&
+          Opt.equal Loc.equal id1.id_loc id2.id_loc in
+        k1 = k2 && pr_equal pr1 pr2 && t_equal_strict f1 f2
+    | _,_ -> d_equal d1 d2
+
+  let hash d = match d.d_node with
+    | Dprop (k,pr,f) -> Hashcons.combine (Hashcons.combine
+        (Hashtbl.hash pr.pr_name.id_string) (t_hash_strict f))
+        (match k with Plemma -> 11 | Paxiom -> 13 | Pgoal -> 17)
+    | _ -> d_hash d
+
+  let tag _ d = d
+end)
+
 let apply_prev fn hd = match hd.Task.task_prev with
   | Some hd -> fn hd
   | None -> [], None
@@ -43,7 +64,10 @@ let apply_head fn = function
   | Some hd -> snd (fn hd)
   | None -> None
 
-let rec dequant pos f = t_attr_copy f (match f.t_node with
+let rec dequant ht pos f =
+  let dequant = dequant ht (* save the "open-to-bound" map in ht *) in
+  let dequant_if_case pos f = if case f then dequant pos f else f in
+  t_attr_copy f (match f.t_node with
   | _ when stop f -> f
   | Tbinop (Tand,f1,{ t_node = Tbinop (Tor,_,{ t_node = Ttrue }) })
   | Tbinop (Timplies,{ t_node = Tbinop (Tor,_,{ t_node = Ttrue }) },f1) ->
@@ -74,15 +98,15 @@ let rec dequant pos f = t_attr_copy f (match f.t_node with
         t_close_branch pat (dequant pos f1) in
       t_case t (List.map branch bl)
   | Tquant (Tforall,fq) when pos ->
-      let _,_,f1 = t_open_quant fq in
+      let vl,_,f1 = t_open_quant fq in
+      List.iter2 (Hvs.replace ht) vl (t_peek_quant fq);
       dequant true f1
   | Tquant (Texists,fq) when not pos ->
-      let _,_,f1 = t_open_quant fq in
+      let vl,_,f1 = t_open_quant fq in
+      List.iter2 (Hvs.replace ht) vl (t_peek_quant fq);
       dequant false f1
   | Tquant _ | Ttrue | Tfalse | Tapp _ -> f
   | Tvar _ | Tconst _ | Teps _ -> raise (FmlaExpected f))
-
-and dequant_if_case pos f = if case f then dequant pos f else f
 
 let intro_attrs = Sattr.singleton Inlining.intro_attr
 
@@ -90,15 +114,26 @@ let compat ls vs =
   ls.ls_args = [] &&
   Opt.equal ty_equal ls.ls_value (Some vs.vs_ty) &&
   Opt.equal Loc.equal ls.ls_name.id_loc vs.vs_name.id_loc &&
-  Sattr.equal ls.ls_name.id_attrs (Sattr.add Inlining.intro_attr vs.vs_name.id_attrs)
+  Sattr.equal ls.ls_name.id_attrs
+    (Sattr.add Inlining.intro_attr vs.vs_name.id_attrs)
 
-let ls_of_vs mal vs = match mal with
-  | Theory.MAls ls :: mal when compat ls vs -> ls, mal
-  | _ ->  let id = id_clone ~attrs:intro_attrs vs.vs_name in
-          create_fsymbol id [] vs.vs_ty, mal
+(* Memoize the correspondence between bound variables
+   and introduced lsymbols to increase sharing *)
 
-let intro_var (subst, mal) vs =
-  let ls, mal = ls_of_vs mal vs in
+let ls_of_vs = let wt = Wid.create 7 in fun vs id ols ->
+  try Wid.find wt id with Not_found ->
+  let ls = match ols with Some ls -> ls | None ->
+    let id = id_clone ~attrs:intro_attrs vs.vs_name in
+    create_fsymbol id [] vs.vs_ty in
+  Wid.set wt id ls; ls
+
+let ls_of_vs mal vs id = match mal with
+  | Theory.MAls ls :: mal when compat ls vs ->
+         ls_of_vs vs id (Some ls), mal
+  | _ -> ls_of_vs vs id None, mal
+
+let intro_var (subst, mal) (vs, id) =
+  let ls, mal = ls_of_vs mal vs id in
   let subst = Mvs.add vs (fs_app ls [] vs.vs_ty) subst in
   (subst, mal), create_param_decl ls
 
@@ -108,7 +143,23 @@ let get_expls f =
 let get_hyp_names f =
   Sattr.filter (fun a -> Strings.has_prefix "hyp_name:" a.attr_string) f.t_attrs
 
-let rec intros kn pr mal (expl, hyp_name) f =
+(* Check if we already have a proposition with the same content.
+   If we have a hash-consed one, and it is not yet used in the task,
+   then use it. If it is already in the task, then check if we have
+   a similar proposition saved in a weak hash-table, that is not yet
+   used in the task. If none is found, use the newly created decl. *)
+let find_fresh_axiom = let wt = Wdecl.create 7 in fun axs d ->
+  let o = Hsdecl.hashcons d in if not (Sdecl.mem o axs) then o else
+  let spares = try Wdecl.find wt o with Not_found -> Sdecl.empty in
+  try Sdecl.min_elt (Sdecl.diff spares axs) with Not_found ->
+  Wdecl.set wt o (Sdecl.add d spares); d
+
+let pr_of_premise f =
+  let nm = Ident.get_hyp_name ~attrs:f.t_attrs in
+  let nm = Opt.get_def "H" nm in
+  create_prsymbol (id_fresh nm ~attrs:intro_attrs)
+
+let rec intros kn pr axs mal (expl, hyp_name) f =
   let aux_move attrs fattrs = (* attrs may be [expl] or [hyp_name] *)
     let attrs = if Sattr.is_empty fattrs then attrs else fattrs in
     let move f =
@@ -124,43 +175,45 @@ let rec intros kn pr mal (expl, hyp_name) f =
       when Sattr.mem Term.asym_split f2.t_attrs ->
         [create_prop_decl Pgoal pr (move_attrs f)]
   | Tbinop (Timplies,f1,f2) ->
-      (* split f1 *)
       (* f is going to be removed, preserve its attributes and location in f2 *)
       let f2 = t_attr_copy f f2 in
-      let fl = Split_goal.split_intro_right ?known_map:kn (dequant false f1) in
-      let add (subst,dl) f =
-        let idx =
-          let name = Ident.get_hyp_name ~attrs:f.t_attrs in
-          id_fresh (Opt.get_def "H" name) ~attrs:intro_attrs in
+      (* dequantify and split f1, retaining the "open-to-bound" map *)
+      let ht = Hvs.create 7 in
+      let f1 = dequant ht false f1 in
+      let fl = Split_goal.split_intro_right ?known_map:kn f1 in
+      (* construct new premises, reusing lsymbols and propositions *)
+      let add (subst,axs,dl) f =
         let svs = Mvs.set_diff (t_freevars Mvs.empty f) subst in
         let subst, dl = Mvs.fold (fun vs _ (subst,dl) ->
-          let (subst,_), d = intro_var (subst, []) vs in
+          let (subst,_), d = intro_var (subst, []) (vs, Hvs.find ht vs) in
           subst, d::dl) svs (subst, dl) in
         (* only reuse the name when fl is a singleton *)
         let prx = match mal, fl with
           | Theory.MApr pr :: _, [_] -> pr
-          | _, _ -> create_prsymbol idx in
+          | _, _ -> pr_of_premise f in
         let d = create_prop_decl Paxiom prx (t_subst subst f) in
-        subst, d::dl in
+        let d = find_fresh_axiom axs d in
+        subst, Sdecl.add d axs, d::dl in
       (* consume the topmost name *)
       let mal = match mal with
         | Theory.MApr _ :: mal -> mal
         | _ -> mal in
-      let _, fl = List.fold_left add (Mvs.empty, []) fl in
-      List.rev_append fl (intros kn pr mal (expl, hyp_name) f2)
+      let _,axs,dl = List.fold_left add (Mvs.empty,axs,[]) fl in
+      List.rev_append dl (intros kn pr axs mal (expl, hyp_name) f2)
   | Tquant (Tforall,fq) ->
       let vsl,_trl,f_t = t_open_quant fq in
+      let vsl = List.combine vsl (t_peek_quant fq) in
       let (subst, mal), dl =
         Lists.map_fold_left intro_var (Mvs.empty, mal) vsl in
       (* preserve attributes and location of f  *)
       let f = t_attr_copy f (t_subst subst f_t) in
-      dl @ intros kn pr mal (expl, hyp_name) f
+      dl @ intros kn pr axs mal (expl, hyp_name) f
   | Tlet (t,fb) ->
       let vs, f = t_open_bound fb in
-      let ls, mal = ls_of_vs mal vs in
+      let ls, mal = ls_of_vs mal vs (t_peek_bound fb) in
       let f = t_subst_single vs (fs_app ls [] vs.vs_ty) f in
       let d = create_logic_decl [make_ls_defn ls [] t] in
-      d :: intros kn pr mal (expl, hyp_name) f
+      d :: intros kn pr axs mal (expl, hyp_name) f
   | _ -> [create_prop_decl Pgoal pr (move_attrs f)]
 
 let intros kn mal pr f =
@@ -170,7 +223,7 @@ let intros kn mal pr f =
   let decls = Mtv.map create_ty_decl tvm in
   let subst = Mtv.map (fun ts -> ty_app ts []) tvm in
   let f = t_ty_subst subst Mvs.empty f in
-  let dl = intros kn pr mal (Sattr.empty, Sattr.empty) f in
+  let dl = intros kn pr Sdecl.empty mal (Sattr.empty, Sattr.empty) f in
   Mtv.values decls @ dl
 
 let rec introduce hd =
@@ -203,10 +256,14 @@ let () = Trans.register_transform "introduce_premises" introduce_premises
    done in [set_vs]; but in cases where the attribute is directly on the lsymbol
    term application (Tapp), the substitution may not work resulting in an error
    of the transformation. That's why we check for equality modulo attributes and
-   then copy attributes back on the term again.
-*)
+   then copy attributes back on the term again. *)
 let rec t_replace t1 t2 t =
   if t_equal t t1 then t_attr_copy t t2 else t_map (t_replace t1 t2) t
+
+let vs_of_ls = Wls.memoize 7 (fun ({ls_name = id} as ls) ->
+  let attrs = Sattr.remove Inlining.intro_attr id.id_attrs in
+  let id = id_fresh ~attrs ?loc:id.id_loc id.id_string in
+  create_vsymbol id (Opt.get ls.ls_value))
 
 let rec generalize hd =
   match hd.Task.task_decl.Theory.td_node with
@@ -214,19 +271,15 @@ let rec generalize hd =
       let pl, task = apply_prev generalize hd in
       if pl = [] then [], Some hd else
       let expl = get_expls f in
-      let get_vs {ls_name = id; ls_value = oty} =
-        let attrs = Sattr.remove Inlining.intro_attr id.id_attrs in
-        let id = id_fresh ~attrs ?loc:id.id_loc id.id_string in
-        create_vsymbol id (Opt.get oty) in
       let set_vs vs ls f =
         t_replace (t_app ls [] ls.ls_value) (t_var vs) f in
       let rewind (vl,f) d = match d.d_node with
         | Dparam ls ->
-            let v = get_vs ls in
+            let v = vs_of_ls ls in
             v::vl, set_vs v ls f
         | Dlogic [ls,ld] ->
             let f = t_forall_close vl [] f in
-            let v = get_vs ls in
+            let v = vs_of_ls ls in
             let f = set_vs v ls f in
             let _, h = Decl.open_ls_defn ld in
             [], t_let_close v h f

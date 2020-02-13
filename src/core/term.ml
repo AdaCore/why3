@@ -825,6 +825,16 @@ let t_open_quant_cb fq =
   in
   vl, tl, f, close
 
+(* retrieve bound identifiers (useful to detect sharing) *)
+
+let t_peek_bound (v,_,_) = v.vs_name
+
+let t_peek_branch (p,_,_) =
+  Svs.fold (fun v a -> Sid.add v.vs_name a) p.pat_vars Sid.empty
+
+let t_peek_quant (vl,_,_,_) =
+  List.map (fun v -> v.vs_name) vl
+
 (* constructors with type checking *)
 
 let ls_arg_inst ls tl =

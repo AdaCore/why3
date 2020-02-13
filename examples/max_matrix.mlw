@@ -83,6 +83,59 @@ module HashTable
 
 end
 
+module Appmap
+
+  use map.Map
+  use map.Const
+
+  type key
+
+  type t 'a = abstract { contents: map key 'a }
+
+  val function create (x: 'a): t 'a
+    ensures { result.contents = const x }
+
+  val function ([]) (m: t 'a) (k: key): 'a
+    ensures { result = m.contents[k] }
+
+  val function ([<-]) (m: t 'a) (k: key) (v: 'a): t 'a
+    ensures { result.contents = m.contents[k <- v] }
+
+end
+
+module Sum
+
+  use int.Int
+  use map.Map
+
+  type container
+
+  function f container int : int
+  (** `f c i` is the `i`-th element in the container `c` *)
+
+  function sum container int int : int
+  (** `sum c i j` is the sum `\sum_{i <= k < j} f c k` *)
+
+  axiom Sum_def_empty :
+    forall c : container, i j : int. j <= i -> sum c i j = 0
+
+  axiom Sum_def_non_empty :
+    forall c: container, i j : int. i < j -> sum c i j = f c i + sum c (i+1) j
+
+  axiom Sum_right_extension:
+    forall c : container, i j : int.
+    i < j -> sum c i j = sum c i (j-1) + f c (j-1)
+
+  axiom Sum_transitivity :
+    forall c : container, i k j : int. i <= k <= j ->
+    sum c i j = sum c i k + sum c k j
+
+  axiom Sum_eq :
+    forall c1 c2 : container, i j : int.
+    (forall k : int. i <= k < j -> f c1 k = f c2 k) -> sum c1 i j = sum c2 i j
+
+end
+
 module MaxMatrixMemo
 
   use int.Int
@@ -91,7 +144,7 @@ module MaxMatrixMemo
   use Bitset
   use map.Map
 
-  clone appmap.Appmap with type key = int, axiom .
+  clone Appmap with type key = int, axiom .
 
   val constant n : int
     ensures { 0 <= result <= size }
@@ -108,7 +161,7 @@ module MaxMatrixMemo
   predicate permutation (s: mapii) = solution s 0
 
   function f (s: mapii) (i: int) : int = m[i][Map.get s i]
-  clone sum.Sum with type container = mapii, function f = f, axiom .
+  clone Sum with type container = mapii, function f = f, axiom .
 
   lemma sum_ind:
     forall i: int. i < n -> forall j: int.

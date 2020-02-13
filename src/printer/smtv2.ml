@@ -66,7 +66,7 @@ let ident_printer () =
       "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
       "rotate_right"; "bvredor"; "bvredand";
 
-      "sin"; "cos"; "tan"; "asin"; "acos"; "atan"; "pi";
+      "sqrt"; "sin"; "cos"; "tan"; "asin"; "acos"; "atan"; "pi";
 
      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";

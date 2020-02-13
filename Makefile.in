@@ -218,7 +218,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/session/strategy_parser.ml
 
 LIB_UTIL = config bigInt mlmpfr_wrapper util opt lists strings \
-	   pp extmap extset exthtbl weakhtbl \
+	   pp extmap extset exthtbl weakhtbl diffmap \
 	   hashcons wstdlib exn_printer \
 	   json_base json_parser json_lexer \
 	   debug loc lexlib print_tree \
@@ -272,7 +272,7 @@ LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 LIB_SESSION = compress xml termcode session_itp \
               strategy strategy_parser controller_itp \
 	      server_utils itp_communication \
-	      itp_server json_util
+	      itp_server json_util unix_scheduler
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
@@ -299,21 +299,21 @@ $(LIBDEP): $(LIBGENERATED)
 # Mlmpfr
 
 ifeq (@found_mlmpfr@,yes)
-src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_real.ml
-	cp src/util/mlmpfr_real.ml $@
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
+	cp $< $@
 else
-src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_dummy.ml
-	cp src/util/mlmpfr_dummy.ml $@
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
+	cp $< $@
 endif
 
 # Ocamlzip
 
 ifeq (@enable_zip@,yes)
-src/session/compress.ml: config.status src/session/compress_z.ml
-	cp src/session/compress_z.ml $@
+src/session/compress.ml: src/session/compress_z.ml Makefile
+	cp $< $@
 else
-src/session/compress.ml: config.status src/session/compress_none.ml
-	cp src/session/compress_none.ml $@
+src/session/compress.ml: src/session/compress_none.ml Makefile
+	cp $< $@
 endif
 
 .PHONY: initialize_messages update-parsing-error-handling
@@ -356,8 +356,10 @@ endif
 # Re
 
 ifeq (@enable_re@,no)
-src/util/re.ml: src/util/recompat.ml config.status
+src/util/re.ml: src/util/recompat.ml Makefile
 	cp $< $@
+
+GENERATED += re.ml
 endif
 
 # build targets
@@ -625,8 +627,8 @@ bin/why3prove.opt: $(WHY3CMXA) src/tools/why3prove.cmx
 bin/why3prove.byte: $(WHY3CMA) src/tools/why3prove.cmo
 bin/why3realize.opt: $(WHY3CMXA) src/tools/why3realize.cmx
 bin/why3realize.byte: $(WHY3CMA) src/tools/why3realize.cmo
-bin/why3replay.opt: $(WHY3CMXA) src/tools/unix_scheduler.cmx src/tools/why3replay.cmx
-bin/why3replay.byte: $(WHY3CMA) src/tools/unix_scheduler.cmo src/tools/why3replay.cmo
+bin/why3replay.opt: $(WHY3CMXA) src/tools/why3replay.cmx
+bin/why3replay.byte: $(WHY3CMA) src/tools/why3replay.cmo
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
 
@@ -889,11 +891,11 @@ install:: install-ide
 install_local:: bin/why3ide
 
 ifeq (@GTKVERSION@,2)
-src/ide/gtkcompat.ml: config.status src/ide/gtkcompat2.ml
-	cp src/ide/gtkcompat2.ml $@
+src/ide/gtkcompat.ml: src/ide/gtkcompat2.ml Makefile
+	cp $< $@
 else
-src/ide/gtkcompat.ml: config.status src/ide/gtkcompat3.ml
-	cp src/ide/gtkcompat3.ml $@
+src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
+	cp $< $@
 endif
 
 GENERATED += $(IDEGENERATED)
@@ -996,7 +998,7 @@ install_local:: bin/why3session
 # Why3 Shell
 ###############
 
-SHELL_FILES = unix_scheduler why3shell
+SHELL_FILES = why3shell
 
 SHELLMODULES = $(addprefix src/tools/, $(SHELL_FILES))
 
@@ -2238,20 +2240,20 @@ STDMACHLIBS = \
 	array bv c float fxp int matrix onetime peano tagset
 
 STDLIBS = \
-	algebra appmap array \
+	algebra array \
 	bag bintree bool bv \
 	cursor \
 	exn \
-	floating_point function \
+	floating_point fmap function \
 	graph hashtbl \
-	ieee_float impmap int \
+	ieee_float int \
 	list \
 	map matrix \
 	null number option ocaml \
 	pigeon pqueue \
 	queue \
 	random real ref regexp relations \
-	seq set stack string sum \
+	seq set stack string \
 	tree \
 	witness \
 	$(addprefix mach/, $(STDMACHLIBS))

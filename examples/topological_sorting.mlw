@@ -42,6 +42,30 @@ theory Graph
 
 end
 
+module ImpmapNoDom
+
+  use map.Map
+  use map.Const
+
+  type key
+
+  type t 'a = abstract { mutable contents: map key 'a }
+
+  val function create (x: 'a): t 'a
+    ensures { result.contents = const x }
+
+  val function ([]) (m: t 'a) (k: key): 'a
+    ensures { result = m.contents[k] }
+
+  val ghost function ([<-]) (m: t 'a) (k: key) (v: 'a): t 'a
+    ensures { result.contents = m.contents[k <- v] }
+
+  val ([]<-) (m: t 'a) (k: key) (v: 'a): unit
+    writes { m }
+    ensures { m = (old m)[k <- v] }
+
+end
+
 (** static topological sorting by depth-first search *)
 module Static
 
@@ -51,7 +75,7 @@ module Static
 
   clone set.SetImp as S with type elt = vertex
   clone set.SetApp as SA with type elt = vertex
-  clone impmap.ImpmapNoDom with type key = vertex
+  clone ImpmapNoDom with type key = vertex
 
   val ghost function defined_sort (m: t int): Fset.fset vertex
     ensures { forall v: vertex [Fset.mem v result].
@@ -146,7 +170,7 @@ module Online_Basic
 
   clone set.SetImp as S with type elt = vertex
   clone set.SetApp as SA with type elt = vertex
-  clone import impmap.ImpmapNoDom as M with type key = vertex
+  clone import ImpmapNoDom as M with type key = vertex
 
   val get_succs (g: graph) (v: vertex): S.set
     ensures { result.S.to_fset = succs g v }

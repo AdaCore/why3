@@ -179,29 +179,13 @@ File floats.mlw:
     x, [[@introduced]] = {"type" : "Float" ,
     "val" : {"cons" : "Plus_infinity" } }
 
-bench/ce/floats.mlw T64 g9: Timeout or Unknown
-Counter-example model:File ieee_float.mlw:
-                                                                    Line 222:
-                                                                    max_int, 
-                                                                    [] =
-                                                                    {"type" : "Integer" ,
-                                                                    "val" : "0" }
-                                                                  File floats.mlw:
-                                                                    Line 49:
-                                                                    x, 
-                                                                    [[@introduced]] =
-                                                                    {"type" : "Float" ,
-                                                                    "val" : {"cons" : "Float_hexa" ,
-                                                                    "str_hexa" : "0x0.0000000000001p-1023" ,
-                                                                    "value" : 0 } }
-                                                                  
 bench/ce/floats.mlw T64 g10: Unknown (sat)
 Counter-example model:
 File ieee_float.mlw:
   Line 222:
     max_int, [] = {"type" : "Integer" , "val" : "0" }
 File floats.mlw:
-  Line 51:
+  Line 49:
     x, [[@introduced]] = {"type" : "Float" , "val" : {"cons" : "Float_hexa" ,
     "str_hexa" : "0x1.999999999999ap-4" , "value" : 0.1 } }
 

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="8">
-<prover id="0" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<why3session shape_version="6">
+<prover id="0" name="Eprover" version="2.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte10_max_sum.mlw"/>
 <theory name="MaxAndSum" proved="true">
@@ -16,52 +17,62 @@
  <goal name="max_sum&#39;vc" expl="VC for max_sum" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="max_sum&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="4751"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="5984"/></proof>
   </goal>
   <goal name="max_sum&#39;vc.1" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="4488"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="5480"/></proof>
   </goal>
   <goal name="max_sum&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="4583"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="5575"/></proof>
   </goal>
   <goal name="max_sum&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="4631"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="5623"/></proof>
   </goal>
   <goal name="max_sum&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <transf name="split_goal_right" proved="true" >
+  <transf name="split_vc" proved="true" >
    <goal name="max_sum&#39;vc.4.0" expl="VC for max_sum" proved="true">
-   <proof prover="1"><result status="valid" time="0.02" steps="6216"/></proof>
+   <proof prover="3"><result status="valid" time="0.01" steps="36"/></proof>
    </goal>
    <goal name="max_sum&#39;vc.4.1" expl="VC for max_sum" proved="true">
-   <proof prover="1"><result status="valid" time="0.02" steps="7217"/></proof>
+   <proof prover="3"><result status="valid" time="0.03" steps="125"/></proof>
    </goal>
    <goal name="max_sum&#39;vc.4.2" expl="VC for max_sum" proved="true">
-   <transf name="introduce_premises" proved="true" >
-    <goal name="max_sum&#39;vc.4.2.0" expl="VC for max_sum" proved="true">
-    <transf name="assert" proved="true" arg1="(i*m1 &lt;= i * m)">
+   <transf name="assert" proved="true" arg1="(s1 &lt;= i * m)">
+    <goal name="max_sum&#39;vc.4.2.0" expl="asserted formula" proved="true">
+    <transf name="assert" proved="true" arg1="(i * m1 &lt;= i * m)">
      <goal name="max_sum&#39;vc.4.2.0.0" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.02"/></proof>
+     <proof prover="0"><result status="valid" time="2.84"/></proof>
      </goal>
-     <goal name="max_sum&#39;vc.4.2.0.1" expl="VC for max_sum" proved="true">
-     <proof prover="1"><result status="valid" time="0.01" steps="3812"/></proof>
+     <goal name="max_sum&#39;vc.4.2.0.1" expl="asserted formula" proved="true">
+     <proof prover="3"><result status="valid" time="0.00" steps="22"/></proof>
      </goal>
     </transf>
+    </goal>
+    <goal name="max_sum&#39;vc.4.2.1" expl="VC for max_sum" proved="true">
+    <proof prover="3"><result status="valid" time="0.00" steps="22"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="max_sum&#39;vc.5" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="4594"/></proof>
+  <transf name="split_goal_right" proved="true" >
+   <goal name="max_sum&#39;vc.5.0" expl="VC for max_sum" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="4790"/></proof>
+   </goal>
+   <goal name="max_sum&#39;vc.5.1" expl="VC for max_sum" proved="true">
+   <proof prover="1"><result status="valid" time="0.02" steps="5172"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="max_sum&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.04" steps="9834"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="16579"/></proof>
   </goal>
   <goal name="max_sum&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="4439"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="5431"/></proof>
   </goal>
   <goal name="max_sum&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="4659"/></proof>
+  <proof prover="1"><result status="valid" time="0.04" steps="5697"/></proof>
   </goal>
  </transf>
  </goal>
@@ -70,51 +81,51 @@
  <goal name="test&#39;vc" expl="VC for test" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="test&#39;vc.0" expl="array creation size" proved="true">
-  <proof prover="1"><result status="valid" time="0.00" steps="3063"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="4002"/></proof>
   </goal>
   <goal name="test&#39;vc.1" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="3846"/></proof>
+  <proof prover="1"><result status="valid" time="0.00" steps="4838"/></proof>
   </goal>
   <goal name="test&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="3583"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="4447"/></proof>
   </goal>
   <goal name="test&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="3792"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="4656"/></proof>
   </goal>
   <goal name="test&#39;vc.4" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="4041"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="4905"/></proof>
   </goal>
   <goal name="test&#39;vc.5" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="4330"/></proof>
+  <proof prover="1"><result status="valid" time="0.01" steps="5194"/></proof>
   </goal>
   <goal name="test&#39;vc.6" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.01" steps="4659"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="5523"/></proof>
   </goal>
   <goal name="test&#39;vc.7" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="5028"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="5892"/></proof>
   </goal>
   <goal name="test&#39;vc.8" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="5437"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="23"/></proof>
   </goal>
   <goal name="test&#39;vc.9" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="5886"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="6750"/></proof>
   </goal>
   <goal name="test&#39;vc.10" expl="index in array bounds" proved="true">
-  <proof prover="1"><result status="valid" time="0.02" steps="6375"/></proof>
+  <proof prover="2"><result status="valid" time="0.10" steps="29"/></proof>
   </goal>
   <goal name="test&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="36"/></proof>
+  <proof prover="1"><result status="valid" time="0.02" steps="12733"/></proof>
   </goal>
   <goal name="test&#39;vc.12" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.14" steps="27501"/></proof>
+  <proof prover="1"><result status="valid" time="0.63" steps="75332"/></proof>
   </goal>
   <goal name="test&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.10" steps="203"/></proof>
+  <proof prover="3"><result status="valid" time="0.16" steps="319"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="test_case&#39;vc" expl="VC for test_case" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="3054"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="3993"/></proof>
  </goal>
 </theory>
 </file>
