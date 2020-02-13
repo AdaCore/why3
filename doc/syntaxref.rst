@@ -444,14 +444,70 @@ In particular, the infix operators from group 1 can be chained. Notice
 that binary operators ``&&`` and ``||`` denote here the usual lazy
 conjunction and disjunction, respectively.
 
-& & ``true``\ ``false``\ & ``4041``\ & & ``40``\ ``41``\ &
-``begin``\ ``end``\ & & ``123``\ ``61``\ ``59``\ ``125``\ &
-``123``\ ``with``\ ``61``\ ``59``\ ``125``\ & ``46``\ &
-``91``\ ``93``\ ``39``\ & ``91``\ ``6045``\ ``93``\ ``39``\ &
-``91``\ ``4646``\ ``93``\ ``39``\ & ``91``\ ``4646``\ ``93``\ ``39``\ &
-``91``\ ``4646``\ ``93``\ ``39``\ & & & 4& 3& 2& 1& ``not``\ &
-``3838``\ & ``124124``\ & ``58``\ & & ``ghost``\ & ``44``\ & ``6045``\ &
-...&
+.. productionlist::
+    expr: `integer`            ; integer constant
+        : | `real`                    ; real constant
+        : | "true" | "false"        ; Boolean constant
+        : | "()"                    ; empty tuple
+        : | `qualid`                  ; identifier in a scope
+        : | `qualifier`? "(" `expr` ")"        ; expression in a scope
+        : | `qualifier`? "begin" `expr` "end"  ; idem
+        : | `tight_op` `expr`           ; tight operator
+        : | "{" (`lqualid` "=" `expr` ";")+ "}"     ; record
+        : | "{" `expr` "with" (`lqualid` "=" `expr` ";")+ "}" ; record update
+        : | `expr` "." `lqualid`        ; record field access
+        : | `expr` "[" `expr` "]" "'"*  ; collection access
+        : | `expr` "[" `expr` "<-" `expr` "]" "'"*  ; collection update
+        : | `expr` "[" `expr` ".." `expr` "]" "'"*  ; collection slice
+        : | `expr` "[" `expr` ".." "]" "'"*  ; right-open slice
+        : | `expr` "[" ".." `expr` "]" "'"*  ; left-open slice
+        : | `expr` `expr`+              ; application
+        : | `prefix_op` `expr`          ; prefix operator
+        : | `expr` `infix_op_4` `expr`    ; infix operator 4
+        : | `expr` `infix_op_3` `expr`    ; infix operator 3
+        : | `expr` `infix_op_2` `expr`    ; infix operator 2
+        : | `expr` `infix_op_1` `expr`    ; infix operator 1
+        : | "not" `expr`              ; negation
+        : | `expr` "&&" `expr`          ; lazy conjunction
+        : | `expr` "||" `expr`          ; lazy disjunction
+        : | `expr` ":" `type`           ; type cast
+        : | `attribute`+ `expr`         ; attributes
+        : | "ghost" `expr`            ; ghost expression
+        : | `expr` ("," `expr`)+        ; tuple
+        : | `expr` "<-" `expr`          ; assignment
+        : | `expr` spec+                            ; added specification
+        : | "if" `expr` "then" `expr` ("else" `expr`)?  ; conditional
+        : | "match" `expr` "with" ("|" pattern "->" `expr`)+ "end"  ; pattern matching
+        : | qualifier? "begin" spec+ `expr` "end"   ; abstract block
+        : | `expr` ";" `expr`                         ; sequence
+        : | "let" `pattern` "=" `expr` "in" `expr`      ; let-binding
+        : | "let" `fun_defn` "in" `expr`              ; local function
+        : | "let" "rec" `fun_defn` ("with" `fun_defn`)* "in" `expr`   ; recursive function
+        : | "fun" `param`+ `spec`* "->" `spec`* `expr`    ; unnamed function
+        : | "any" result `spec`*                    ; arbitrary value
+    fun_defn: `fun-head` `spec`* "=" `spec`* `expr` ; function definition
+    fun-head: "ghost"? `kind`? `symbol` `param`+ (":" `result`)? ; function header
+    kind: "function" | "predicate" | "lemma" ; function kind
+    result: `ret_type`                      ;
+      : | "(" `ret_type` ("," `ret_type`)* ")"      ;
+      : | "(" `ret-name` ("," `ret-name`)* ")"      ;
+    ret_type: "ghost"? `type`                ; unnamed result
+    ret_name: "ghost"? `binder` ":" `type`     ; named result
+    spec: "requires"  "{" `term` "}"                      ; pre-condition
+      : | "ensures"   "{" `term` "}"                      ; post-condition
+      : | "returns"   "{" ("|" `pattern` "->" `term`)+  "}" ; post-condition
+      : | "raises"    "{" ("|" `pattern` "->" `term`)+  "}" ; exceptional post-c.
+      : | "raises"    "{" `uqualid` ("," `uqualid`)*    "}" ; raised exceptions
+      : | "reads"     "{" `lqualid` ("," `lqualid`)*    "}" ; external reads
+      : | "writes"    "{" `path` ("," `path`)*          "}" ; memory writes
+      : | "alias"     "{" `alias` ("," `alias`)*        "}" ; memory aliases
+      : | "variant"   "{" `variant` ("," `variant`)*    "}" ; termination variant
+      : | "diverges"                                    ; may not terminate
+      : | ("reads" | "writes" | "alias") "{" "}"        ; empty effect
+    path: `lqualid` ("." `lqualid`)*           ; \texttt{v.field1.field2}
+    alias: `path` "with" `path`                ; \texttt{arg1 with result}
+    variant: `term` ("with" `lqualid`)?        ; variant + WF-order %
+
 
 Keyword ``ghost`` marks the expression as ghost code added for
 verification purposes. Ghost code is removed from the final code
@@ -464,24 +520,7 @@ collection. The former can be done simultaneously on a tuple of values:
 of the ternary bracket operator ``([]<-)`` and cannot be used in a
 multiple assignment.
 
-...& & ``if``\ ``then``\ ``else``\ &
-``match``\ ``with``\ ``124``\ ``4562``\ ``end``\ & ``begin``\ ``end``\ &
-``59``\ & ``let``\ ``61``\ ``in``\ & ``let``\ ``in``\ &
-``let``\ ``rec``\ ``with``\ ``in``\ & ``fun``\ ``4562``\ & ``any``\ &
-,\ ``61``\ & ,\ ``ghost``\ ``58``\ &
-,\ ``function``\ ``predicate``\ ``lemma``\ & ,&
-``40``\ ``44``\ ``41``\ & ``40``\ ``44``\ ``41``\ & ,\ ``ghost``\ &
-,\ ``ghost``\ ``58``\ & ,\ ``requires``\ ``123``\ ``125``\ &
-``ensures``\ ``123``\ ``125``\ &
-``returns``\ ``123``\ ``124``\ ``4562``\ ``125``\ &
-``raises``\ ``123``\ ``124``\ ``4562``\ ``125``\ &
-``raises``\ ``123``\ ``44``\ ``125``\ &
-``reads``\ ``123``\ ``44``\ ``125``\ &
-``writes``\ ``123``\ ``44``\ ``125``\ &
-``alias``\ ``123``\ ``44``\ ``125``\ &
-``variant``\ ``123``\ ``44``\ ``125``\ & ``diverges``\ &
-``reads``\ ``writes``\ ``alias``\ ``123``\ ``125``\ & ,\ ``46``\ &
-,\ ``with``\ & ,\ ``with``\ &
+
 
 The Why3 Language
 -----------------
@@ -489,7 +528,7 @@ The Why3 Language
 Terms
 ~~~~~
 
-The syntax for terms is given in :numref:`fig.bnf:term1`. The various
+The syntax for terms is given in :token:`term`. The various
 constructs have the following priorities and associativities, from
 lowest to greatest priority:
 
@@ -525,7 +564,7 @@ application is not allowed (rejected at typing).
 Formulas
 ~~~~~~~~
 
-The syntax for formulas is given :numref:`fig.bnf:formula`. The various
+The syntax for formulas is given :token:`term`. The various
 constructs have the following priorities and associativities, from
 lowest to greatest priority:
 
@@ -575,8 +614,55 @@ as introduction of logical cuts (see [tech:trans:split] for details).
 Theories
 ~~~~~~~~
 
-The syntax for theories is given on :numref:`fig.bnf:theorya`
-and [fig:bnf:theoryb].
+.. productionlist::
+    theory: "theory" `uident_nq` `label`* `decl`* "end"
+    decl: "type" `type_decl` ("with" `type_decl`)* ;
+      : | "constant" `constant_decl` ;
+      : | "function" `function_decl` ("with" `logic_decl`)* ;
+      : | "predicate" `predicate_decl` ("with" `logic_decl`)* ;
+      : | "inductive" `inductive_decl` ("with" `inductive_decl`)* ;
+      : | "coinductive" `inductive_decl` ("with" `inductive_decl`)* ;
+      : | "axiom" `ident_nq` ":" `formula` 	   ;
+      : | "lemma" `ident_nq` ":" `formula` 	   ;
+      : | "goal"  `ident_nq` ":" `formula` 	   ;
+      : | "use" `imp_exp` `tqualid` ("as" `uident`)?     ;
+      : | "clone" `imp_exp` `tqualid` ("as" `uident`)? `subst`? ;
+      : | "scope" "import"? `uident_nq` `decl`* "end" ;
+      : | "import" `uident` ;
+    logic_decl: `function_decl` ;
+      : | `predicate_decl`
+    constant_decl: `lident_nq` `label`* ":" `type` ;
+      : | `lident_nq` `label`* ":" `type` "=" `term`
+    function_decl: `lident_nq` `label`* `type_param`* ":" `type` ;
+      : | `lident_nq` `label`* `type_param`* ":" `type` "=" `term`
+    predicate_decl: `lident_nq` `label`* `type_param`* ;
+      : | `lident_nq` `label`* `type_param`* "=" `formula`
+    inductive_decl: `lident_nq` `label`* `type_param`* "=" "|"? ind-case ("|" ind-case)* ;
+    ind_case: `ident_nq` `label`* ":" `formula` ;
+    imp_exp: ("import" | "export")?
+    subst: "with" ("," subst-elt)+
+    subst_elt: "type" `lqualid` "=" `lqualid` ;
+      : | "function" `lqualid` "=" `lqualid`          ;
+      : | "predicate" `lqualid` "=" `lqualid`         ;
+      : | "scope" (`uqualid` | ".") "=" (`uqualid` | ".")  ;
+      : | "lemma" `qualid` 	  		   ;
+      : | "goal"  `qualid`			   ;
+    tqualid: uident | ident ("." ident)* "." uident ;
+    type_decl: `lident_nq` `label`* ("'" `lident_nq` `label`*)* type-defn; %
+    type_defn:                                      ; abstract type
+      : | "=" `type `                                      ; alias type
+      : | "=" "|"? `type_case` ("|" `type_case`)*            ; algebraic type
+      : | "=" "{" `record_field` (";" `record_field`)* "}"   ; record type
+      : | "<" "range" `integer` `integer` ">"                ; range type
+      : | "<" "float" `integer` `integer` ">"                ; float type
+    type_case: `uident` `label`* `type_param`*
+    record_field: `lident` `label`* ":" `type`
+    type_param: "'" `lident`   ;
+     : | `lqualid`                  ;
+     : | "(" `lident`+ ":" `type` ")" ;
+     : | "(" `type` ("," `type`)* ")" ;
+     : | "()"
+
 
 Algebraic types
 ^^^^^^^^^^^^^^^
@@ -684,6 +770,9 @@ Files
 
 A Why3 input file is a (possibly empty) list of theories.
 
+.. productionlist::
+    file: `theory`*
+
 The WhyML Language
 ------------------
 
@@ -691,7 +780,7 @@ Specification
 ~~~~~~~~~~~~~
 
 The syntax for specification clauses in programs is given in
-:numref:`fig.bnf:spec`.
+:token:`spec`.
 
 Within specifications, terms are extended with new constructs ``old``
 and ``at``:
@@ -704,8 +793,7 @@ the term :math:`\verb|at|~t~\verb|'|L` refers to the value of term
 Expressions
 ~~~~~~~~~~~
 
-The syntax for program expressions is given in :numref:`fig.bnf:expra`
-and :numref:`fig.bnf:exprb`.
+The syntax for program expressions is given in :token:`:expr`.
 
 In applications, arguments are evaluated from right to left. This
 includes applications of infix operators, with the only exception of
@@ -715,7 +803,7 @@ lazily.
 Modules
 ~~~~~~~
 
-The syntax for modules is given in :numref:`fig.bnf:module`.
+The syntax for modules is given in :token:`module`.
 
 Any declaration which is accepted in a theory is also accepted in a
 module. Additionally, modules can introduce record types with mutable
@@ -727,9 +815,7 @@ Files
 
 A WhyML input file is a (possibly empty) list of theories and modules.
 
-A theory defined in a WhyML file can only be used within that file. If a
-theory is supposed to be reused from other files, be they Why3 or WhyML
-files, it should be defined in a Why3 file.
+
 
 The Why3 Standard Library
 -------------------------
