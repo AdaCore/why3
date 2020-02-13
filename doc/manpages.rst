@@ -57,42 +57,49 @@ particular, option ``--help`` displays the usage and options.
 
    add ``<dir>`` in the load path, to search for theories.
 
-``-C <file>``
-    reads the configuration from the given file.
+.. option:: -C <file>, --config <file>
 
-``--config <file>``
-    is the same as ``-C``.
+   read the configuration from the given file.
 
 .. option:: --extra-config <file>
 
    read additional configuration from the given file.
 
-``--list-debug-flags``
-    list known debug flags.
+.. option:: --list-debug-flags
 
-``--list-transforms``
-    list known transformations.
+   list known debug flags.
 
-``--list-printers``
-    list known printers.
+.. option:: --list-transforms
 
-``--list-provers``
-    list known provers
+   list known transformations.
 
-``--list-formats``
-    list known input formats
+.. option:: --list-printers
 
-``--list-metas``
-    list known metas
+   list known printers.
 
-``--debug-all``
-    sets all debug flags (except flags which change the behavior).
+.. option:: --list-provers.
 
-``--debug <flag>``
-    sets a specific debug flag.
+   list known provers.
 
-``--help``
-    displays the usage and the exact list of options for the given tool.
+.. option:: --list-formats
+
+   list known input formats.
+
+.. option:: --list-metas
+
+   list known metas.
+
+.. option:: --debug-all
+
+   set all debug flags (except flags which change the behavior).
+
+.. option:: --debug <flag>
+
+   set a specific debug flag.
+
+.. option:: --help
+
+   display the usage and the exact list of options for the given tool.
 
 .. _sec.why3config:
 
@@ -104,21 +111,21 @@ done by running the ``config`` command. This must be done each time a
 new prover is installed.
 
 The provers that Why3 attempts to detect are described in the readable
-configuration file ``provers-detection-data.conf`` of the Why3 data
-directory (``/usr/local/share/why3``). Advanced users may try to modify
+configuration file :file:`provers-detection-data.conf` of the Why3 data
+directory (:file:`/usr/local/share/why3`). Advanced users may try to modify
 this file to add support for detection of other provers. (In that case,
 please consider submitting a new prover configuration on the bug
 tracking system.)
 
 The result of provers detection is stored in the user’s configuration
-file (``~/.why3.conf`` or, in the case of local installation,
-``why3.conf`` in Why3 sources top directory). This file is also
+file (:file:`~/.why3.conf` or, in the case of local installation,
+:file:`why3.conf` in Why3 sources top directory). This file is also
 human-readable, and advanced users may modify it in order to experiment
 with different ways of calling provers, different versions of the same
 prover, or with different options.
 
 The ``config`` command also detects the plugins installed in the Why3
-plugins directory (``/usr/local/lib/why3/plugins``). A plugin must
+plugins directory (:file:`/usr/local/lib/why3/plugins`). A plugin must
 register itself as a parser, a transformation or a printer, as explained
 in the corresponding section.
 
@@ -130,9 +137,9 @@ configuration file. The option ``--detect-plugins`` will do the same for
 plugins.
 
 If a supported prover is installed under a name that is not
-automatically recognized by ``why3config``, the option ``--add-prover``
+automatically recognized by ``why3 config``, the option :option:`--add-prover`
 will add a specified binary to the configuration. For example, an
-Alt-Ergo executable ``/home/me/bin/alt-ergo-trunk`` can be added as
+Alt-Ergo executable :file:`/home/me/bin/alt-ergo-trunk` can be added as
 follows:
 
 ::
@@ -141,7 +148,7 @@ follows:
 
 As the first argument, one should put a prover family identification
 string. The list of known prover families can be obtained by the option
-``--list-prover-families``.
+:option:`--list-prover-families`.
 
 .. _sec.why3prove:
 
@@ -526,41 +533,41 @@ with arguments.
 Key shortcuts
 ~~~~~~~~~~~~~
 
--  Save session and files : ctrl+s
+-  Save session and files: :kbd:`Control-s`
 
--  Save all and refresh session: ctrl+r
+-  Save all and refresh session: :kbd:`Control-r`
 
--  Quit : ctrl+q
+-  Quit: :kbd:`Control-q`
 
--  Enlarge font : ctrl+plus
+-  Enlarge font: :kbd:`Control-plus`
 
--  Reduce font : ctrl+minus
+-  Reduce font: :kbd:`Control-minus`
 
--  Collapse proven goals : !
+-  Collapse proven goals: :kbd:`!`
 
--  Collapse current node : -
+-  Collapse current node: :kbd:`-`
 
--  Expand current node : +
+-  Expand current node: :kbd:`+`
 
--  Copy : ctrl+c
+-  Copy: :kbd:`Control-c`
 
--  Paste : ctrl+v
+-  Paste: :kbd:`Control-v`
 
--  Select parent node : ctrl+up
+-  Select parent node: :kbd:`Control-up`
 
--  Select next unproven goal : ctrl+down
+-  Select next unproven goal: :kbd:`Control-down`
 
--  Change focus to command line : return
+-  Change focus to command line: :kbd:`Return`
 
--  Edit : e
+-  Edit: :kbd:`e`
 
--  Replay : r
+-  Replay: :kbd:`r`
 
--  Clean : c
+-  Clean: :kbd:`c`
 
--  Remove : del
+-  Remove: :kbd:`Delete`
 
--  Mark obsolete : o
+-  Mark obsolete : :kbd:`o`
 
 Preferences Dialog
 ~~~~~~~~~~~~~~~~~~
@@ -569,12 +576,12 @@ The preferences dialog allows you to customize various settings. They
 are grouped together under several tabs.
 
 Note that there are to different buttons to close that dialog. The
-“Close” button will make modifications of any of these settings
-effective only for the current run of the GUI. The “Save&Close” button
+:guilabel:`Close` button will make modifications of any of these settings
+effective only for the current run of the GUI. The :guilabel:`Save&Close` button
 will save the modified settings in Why3 configuration file, to make them
 permanent.
 
-Tab *General Settings*
+Tab :guilabel:`General`
     allows one to set various general settings.
 
     -  the limits set on resource usages:
@@ -599,14 +606,14 @@ Tab *General Settings*
        -  ask whether to save: on exit, a popup window asks whether you
           want to save or not.
 
-Tab *Appearance settings*
+Tab :guilabel:`Appearance`
     -  show full task context: by default, only the local context of
        formulas is shown, that is only the declarations comming from the
        same module
 
     -  show attributes in formulas
 
-    -  show corecions in formulas
+    -  show coercions in formulas
 
     -  show source locations in formulas
 
@@ -615,7 +622,7 @@ Tab *Appearance settings*
     Finally, it is possible to choose an alternative icon set, provided,
     one is installed first.
 
-Tab *Editors*
+Tab :guilabel:`Editors`
     allows one to customize the use of external editors for proof
     scripts.
 
@@ -628,11 +635,11 @@ Tab *Editors*
        `Proof General <http://proofgeneral.inf.ed.ac.uk/>`_  mode
        instead.
 
-Tab *Provers*
+Tab :guilabel:`Provers`
     allows to select which of the installed provers one wants to see in
     the context menu.
 
-Tab *Uninstalled Provers*
+Tab :guilabel:`Uninstalled provers policies`
     presents all the decision previously taken for missing provers, as
     described in :numref:`sec.uninstalledprovers`. You can remove any
     recorded decision by clicking on it.
@@ -651,17 +658,17 @@ input. Currently, this is supported for CVC4 prover version at least
 
 The generation of counterexamples is fully integrated in Why3 IDE. The
 recommended usage is to first start a prover normally, as shown in
-:numref:`fig.ce\_example0\_p1`) and then click on the status icon for the
+:numref:`fig.ce_example0_p1`) and then click on the status icon for the
 corresponding proof attempt in the tree. Alternatively, one can use the
 key shortcut “G” or type ``get-ce`` in the command entry. The result can
-be seen on :numref:`fig.ce\_example0\_p2`: the same prover but with the
+be seen on :numref:`fig.ce_example0_p2`: the same prover but with the
 alternative *counterexamples* is run. The resulting counterexample is
 displayed in two different ways. First, it is displayed in the *Task* tab of
 the top-right window, at the end of the text of the task, under the form
 of a list of pairs “variable = value”, ordered by the line number of the
 source code in which that variable takes that value. Second, it is
 displayed in the *Counterexample* tab of the bottom right window, this time interleaved
-with the code, as shown in :numref:`fig.ce\_example0\_p2`.
+with the code, as shown in :numref:`fig.ce_example0_p2`.
 
 .. _fig.ce_example0_p1:
 
@@ -761,14 +768,14 @@ The ``replay`` Command
 
 The ``replay`` command is meant to execute the proofs stored in a Why3
 session file, as produced by the IDE. Its main purpose is to play
-non-regression tests. For instance, ``examples/regtests.sh`` is a script
+non-regression tests. For instance, :file:`examples/regtests.sh` is a script
 that runs regression tests on all the examples.
 
 The tool is invoked in a terminal or a script using
 
 why3 replay *[options] <project directory>*
 
-The session file ``why3session.xml`` stored in the given directory is
+The session file :file:`why3session.xml` stored in the given directory is
 loaded and all the proofs it contains are rerun. Then, all the
 differences between the information stored in the session file and the
 new run are shown.
@@ -793,7 +800,7 @@ session file will be updated if both
 -  every goals are proved.
 
 In other cases, you can use the IDE to update the session, or use the
-option ``--force`` described below.
+option :option:`--force` described below.
 
 Exit code and options
 ~~~~~~~~~~~~~~~~~~~~~
@@ -803,25 +810,31 @@ exit codes mean some failure in running the replay.
 
 Options are:
 
-``-s``
-    suppresses the output of the final tree view.
+.. option:: -s
 
-``-q``
-    runs quietly (no progress info).
+   suppress the output of the final tree view.
 
-``--force``
-    enforces saving the session, if all proof attempts replayed
-    correctly, even if some goals are not proved.
+.. option:: -q
 
-``--obsolete-only``
-    replays the proofs only if the session contains obsolete proof
-    attempts.
+   run quietly (no progress info).
 
-``--smoke-detector {none|top|deep}``
-    tries to detect if the context is self-contradicting.
+.. option:: --force
 
-``--prover <prover>``
-    restricts the replay to the selected provers only.
+   enforce saving the session, if all proof attempts replayed
+   correctly, even if some goals are not proved.
+
+.. option:: --obsolete-only
+
+   replay the proofs only if the session contains obsolete proof
+   attempts.
+
+.. option:: --smoke-detector {none|top|deep}
+
+   try to detect if the context is self-contradicting.
+
+.. option:: --prover <prover>
+
+   restrict the replay to the selected provers only.
 
 Smoke detector
 ~~~~~~~~~~~~~~
@@ -915,31 +928,35 @@ Command ``info``
 The command ``why3 session info`` reports various informations about the
 session, depending on the following specific options.
 
-``--provers``
-    prints the provers that appear inside the session, one by line.
+.. option:: --provers
 
-``--edited-files``
-    prints all the files that appear in the session as edited proofs.
+   print the provers that appear inside the session, one by line.
 
-``--stats``
-    prints various proofs statistics, as detailed below.
+.. option:: --edited-files
 
-``--print0``
-    separates the results of the options ``provers`` and
-    ``--edited-files`` by the character number 0 instead of end of line
-    ``\n``. That allows you to safely use (even if the filename contains
-    space or carriage return) the result with other commands. For
-    example you can count the number of proof line in all the coq edited
-    files in a session with:
+   print all the files that appear in the session as edited proofs.
 
-    ::
+.. option:: --stats
+
+   print various proofs statistics, as detailed below.
+
+.. option:: --print0
+
+   separate the results of the options :option:`--provers` and
+   :option:`--edited-files` by the character number 0 instead of end of line
+   ``\n``. That allows you to safely use (even if the filename contains
+   space or carriage return) the result with other commands. For
+   example you can count the number of proof line in all the coq edited
+   files in a session with:
+
+   ::
 
         why3 session info --edited-files vstte12_bfs --print0 | xargs -0 coqwc
 
-    or you can add all the edited files in your favorite repository
-    with:
+   or you can add all the edited files in your favorite repository
+   with:
 
-    ::
+   ::
 
         why3 session info --edited-files --print0 vstte12_bfs.mlw | \
             xargs -0 git add
@@ -947,7 +964,7 @@ session, depending on the following specific options.
 Session Statistics
 ^^^^^^^^^^^^^^^^^^
 
-The proof statistics given by option ``--stats`` are as follows:
+The proof statistics given by option :option:`--stats` are as follows:
 
 -  Number of goals: give both the total number of goals, and the number
    of those that are proved (possibly after a transformation).
@@ -1005,26 +1022,30 @@ tabular environment in LaTeX, one tabular for each theory, one per file.
 
 The specific options are
 
-``-style <n>``
-    sets output style (1 or 2, default 1) Option ``-style 2`` produces
-    an alternate version of LaTeX output, with a different layout of the
-    tables.
+.. option:: -style <n>
 
-``-o <dir>``
-    indicates where to produce LaTeX files (default: the session
-    directory).
+   set output style (1 or 2, default 1) Option ``-style 2`` produces
+   an alternate version of LaTeX output, with a different layout of the
+   tables.
 
-``-longtable``
-    uses the ‘longtable’ environment instead of ‘tabular’.
+.. option:: -o <dir>
 
-``-e <elem>``
-    produces a table for the given element, which is either a file, a
-    theory or a root goal. The element must be specified using its path
-    in dot notation, ``file.theory.goal``. The file produced is named
-    accordingly, ``file.theory.goal.tex``. This option can be given
-    several times to produce several tables in one run. When this option
-    is given at least once, the default behavior that is to produce one
-    table per theory is disabled.
+   indicate where to produce LaTeX files (default: the session
+   directory).
+
+.. option:: -longtable
+
+   use the ‘longtable’ environment instead of ‘tabular’.
+
+.. option :: -e <elem>
+
+   produce a table for the given element, which is either a file, a
+   theory or a root goal. The element must be specified using its path
+   in dot notation, ``file.theory.goal``. The file produced is named
+   accordingly, ``file.theory.goal.tex``. This option can be given
+   several times to produce several tables in one run. When this option
+   is given at least once, the default behavior that is to produce one
+   table per theory is disabled.
 
 Customizing LaTeX output
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1081,8 +1102,8 @@ This command produces a summary of the proof session in HTML syntax.
 There are two styles of output: ‘table’ and ‘simpletree’. The default is
 ‘table’.
 
-The file generated is named ``why3session.html`` and is written in the
-session directory by default (see option ``-o`` to override this
+The file generated is named :file:`why3session.html` and is written in the
+session directory by default (see option :option:`-o` to override this
 default).
 
 <h1>Why3 Proof Results for Project “hello\_proof”</h1> <h2><span
@@ -1123,31 +1144,35 @@ HTML tags such as ``<ul>`` and ``<li>``.
 
 Specific options for this command are as follows.
 
-``--style <style>``
-    sets the style to use, among ``simpletree`` and ``table``; defaults
-    to ``table``.
+.. option:: --style <style>
 
-``-o <dir>``
-    sets the directory where to output the produced files (‘``-``’ for
-    stdout). The default is to output in the same directory as the
-    session itself.
+   set the style to use, among ``simpletree`` and ``table``; defaults
+   to ``table``.
 
-``--context``
-    adds context around the generated code in order to allow direct
-    visualization (header, css, ...). It also adds in the output
-    directory all the needed external files. It can’t be set with stdout
-    output.
+.. option:: -o <dir>
 
-``--add_pp <suffix> <cmd> <out_suffix>``
-    sets a specific pretty-printer for files with the given suffix.
-    Produced files use ``<out_suffix>`` as suffix. ``<cmd>`` must
-    contain ‘``%i``’ which will be replaced by the input file and
-    ‘``%o``’ which will be replaced by the output file.
+   set the directory where to output the produced files (``-`` for
+   stdout). The default is to output in the same directory as the
+   session itself.
 
-``--coqdoc``
-    uses the ``coqdoc`` command to display Coq proof scripts. This is
-    equivalent to
-    ``--add_pp .v coqdoc --no-index --html -o %o %i .html``
+.. option:: --context
+
+   add context around the generated code in order to allow direct
+   visualization (header, css, ...). It also adds in the output
+   directory all the needed external files. It can’t be set with stdout
+   output.
+
+.. option:: --add_pp <suffix> <cmd> <out_suffix>``
+
+   set a specific pretty-printer for files with the given suffix.
+   Produced files use ``<out_suffix>`` as suffix. ``<cmd>`` must
+   contain ‘``%i``’ which will be replaced by the input file and
+   ‘``%o``’ which will be replaced by the output file.
+
+.. option:: --coqdoc
+
+   use the :program:`coqdoc` command to display Coq proof scripts. This is
+   equivalent to ``--add_pp .v coqdoc --no-index --html -o %o %i .html``
 
 Command ``update``
 ~~~~~~~~~~~~~~~~~~
@@ -1155,9 +1180,10 @@ Command ``update``
 The command ``why3 session update`` permits to modify the session
 contents, depending on the following specific options.
 
-``-rename-file <src> <dst>``
-    renames the file *<src>* to *<dst>* in the session. The file *<src>*
-    itself is also renamed to *<dst>* in your filesystem.
+.. option:: -rename-file <src> <dst>
+
+   rename the file *<src>* to *<dst>* in the session. The file *<src>*
+   itself is also renamed to *<dst>* in your filesystem.
 
 .. _sec.why3doc:
 
@@ -1185,25 +1211,27 @@ identifier use to its definition.
 Options
 ~~~~~~~
 
-``-o <dir>``
-    defines the directory where to output the HTML files.
+.. option:: -o <dir>, --output <dir>
 
-``--output <dir>``
-    is the same as ``-o``.
+   define the directory where to output the HTML files.
 
-``--index``
-    generates an index file ``index.html``. This is the default behavior
-    if more than one file is passed on the command line.
+.. option:: --index
 
-``--no-index``
-    prevents the generation of an index file.
+   generate an index file :file:`index.html`. This is the default behavior
+   if more than one file is passed on the command line.
 
-``--title <title>``
-    sets title of the index page.
+.. option:: --no-index
 
-``--stdlib-url <url>``
-    sets a URL for files found in load path, so that links to
-    definitions can be added.
+   prevent the generation of an index file.
+
+.. option:: --title <title>
+
+   set title of the index page.
+
+.. option:: --stdlib-url <url>
+
+   set a URL for files found in load path, so that links to
+   definitions can be added.
 
 Typesetting textual comments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1220,7 +1248,7 @@ Some constructs are interpreted:
 
 -  :literal:`\`code\`` is a code escape: the text *code* is typeset as Why3 code.
 
-A CSS file ``style.css`` suitable for rendering is generated in the same
+A CSS file :file:`style.css` suitable for rendering is generated in the same
 directory as output files. This CSS style can be modified manually,
 since regenerating the HTML documentation will not overwrite an existing
 ``style.css`` file.
