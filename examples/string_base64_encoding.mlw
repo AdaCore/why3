@@ -250,7 +250,7 @@ module Base64
   let lemma decode_encode (s: string) : unit
     ensures { decode (encode s) = s }
   = let s1 = encode s in
-    assert { forall i. 0 <= i < div (length s) 3 ->
+    (*assert { forall i. 0 <= i < div (length s) 3 ->
       valid_64_char s1[i*4] && valid_64_char s1[i*4+1] &&
       valid_64_char s1[i*4+2] && valid_64_char s1[i*4+3] };
     assert { mod (length s) 3 <> 0 ->
@@ -259,18 +259,18 @@ module Base64
       if last * 3 + 1 = length s then
         s1[last*4+2] = char_eq && s1[last*4+3] = char_eq
       else valid_64_char s1[last*4+2] && s1[last*4+3] = char_eq
-    };
+    };*)
 
-    assert { forall i. 0 <= i < length s1 -> valid_64_char s1[i] || s1[i] = char_eq };
+    (* div (length s * 3) 4 *)
+    (*assert { forall i. 0 <= i < length s1 - pad s1 -> valid_64_char s1[i] };
+    assert { pad s1 >= 1 -> (s1[length s1 - 1] = char_eq &&
+                              (pad s1 = 2 -> s1[length s1 - 2] = char_eq))};
+*)
+    let s2 = decode s1 in ()
 
-    let s2 = decode s1 in
+    (* assert { length s2 = length s by length s = div (length s1 * 3) 4 - pad s1 }; *)
 
-    assert { div ((length s1) * 3) 4 = next_m3 (length s) };
-    assert { div ((length s1) * 3) 4 = length s + pad s1 };
-    assert { pad s1 = next_m3 (length s) - length s};
-    assert { length s2 = length s };
+    (* assert { forall i. 0 <= i < length s -> s[i] = s2[i] }; *)
 
-    assert { forall i. 0 <= i < length s -> s[i] = s2[i] };
-
-    assert { eq_string s s2 }
+    (* assert { eq_string s s2 } *)
 end
