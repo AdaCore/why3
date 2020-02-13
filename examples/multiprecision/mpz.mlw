@@ -276,7 +276,6 @@ let partial wmpz_do_realloc (x:mpz_ptr) (sz:int32) : ptr limb
   q
 
 let wmpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
-  requires { 1 <= sz } (* GMP does sz = max (sz,1) instead, do that if needed *)
   requires { mpz.readers[x] = 0 }
   requires { 1 <= mpz.alloc[x] }
   ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
