@@ -53,11 +53,9 @@ needed.
 The commands accept a common subset of command-line options. In
 particular, option ``--help`` displays the usage and options.
 
-``-L <dir>``
-    adds ``<dir>`` in the load path, to search for theories.
+.. option:: -L <dir>, --library <dir>
 
-``--library <dir>``
-    is the same as ``-L``.
+   add ``<dir>`` in the load path, to search for theories.
 
 ``-C <file>``
     reads the configuration from the given file.
@@ -65,8 +63,9 @@ particular, option ``--help`` displays the usage and options.
 ``--config <file>``
     is the same as ``-C``.
 
-``--extra-config <file>``
-    reads additional configuration from the given file.
+.. option:: --extra-config <file>
+
+   read additional configuration from the given file.
 
 ``--list-debug-flags``
     list known debug flags.

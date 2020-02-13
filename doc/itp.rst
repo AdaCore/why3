@@ -13,13 +13,12 @@ that case, the interaction is decomposed into two distinct phases:
 
 -  Replay of an existing proof script.
 
-An example of such an interaction is given in the tutorial
-section [sec:gui].
+An example of such an interaction is given in the :ref:`tutorial section <sec.gui>`.
 
-Some proof assistants offer more than one possible editor, a choice
+Some proof assistants offer more than one possible editor, e.g., a choice
 between the use of a dedicated editor and the use of the Emacs editor
 and the ProofGeneral mode. Selection of the preferred mode can be made
-in ``why3ide`` preferences, under the “Editors” tab.
+in :menuselection:`File --> Preferences`, under the :guilabel:`Editors` tab.
 
 .. _sec.realizations:
 
@@ -36,8 +35,10 @@ proofs.
 Generating a realization
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. index:: realize, tool; realize
+
 Generating the skeleton for a theory is done by passing to the
-``realize`` command a driver suitable for realizations, the names of the
+:program:`why3 realize` command a driver suitable for realizations, the names of the
 theories to realize, and a target directory.
 
 ::
@@ -45,8 +46,8 @@ theories to realize, and a target directory.
     why3 realize -D path/to/drivers/prover-realize.drv
                  -T env_path.theory_name -o path/to/target/dir/
 
-The theory is looked into the files from the environment, the standard
-library. If the theory is stored in a different location, option ``-L``
+The theory is looked into the files from the environment, e.g., the standard
+library. If the theory is stored in a different location, option :option:`-L`
 should be used.
 
 The name of the generated file is inferred from the theory name. If the
@@ -57,10 +58,12 @@ in the generated file.
 Note that Why3 does not track dependencies between realizations and
 theories, so a realization will become outdated if the corresponding
 theory is modified. It is up to the user to handle such dependencies,
-for instance using a ``Makefile``.
+for instance using a :file:`Makefile`.
 
 Using realizations inside proofs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. index:: driver file
 
 If a theory has been realized, the Why3 printer for the corresponding
 prover will no longer output declarations for that theory but instead
@@ -81,6 +84,8 @@ the interactive prover.
 
 Shipping libraries of realizations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. index:: configuration file
 
 While modifying an existing driver file might be sufficient for local
 use, it does not scale well when the realizations are to be shipped to
@@ -108,9 +113,11 @@ be as follows.
       \\\"Logical_directory\\\") coq-load-path))\""
 
 This configuration file can be passed to Why3 thanks to the
-``--extra-config`` option.
+:option:`--extra-config` option.
 
 .. _sec.coq:
+
+.. index:: Coq proof assistant, proof assistant; Coq
 
 Coq
 ---
@@ -161,6 +168,8 @@ terminating directive like ``Qed`` that would be present in a comment.
 
 .. _sec.isabelle:
 
+.. index:: Isabelle proof assistant, proof assistant; Isabelle
+
 Isabelle/HOL
 ------------
 
@@ -168,7 +177,7 @@ When using Isabelle from Why3, files generated from Why3 theories and
 goals are stored in a dedicated XML format. Those files should not be
 edited. Instead, the proofs must be completed in a file with the same
 name and extension ``.thy``. This is the file that is opened when using
-“Edit” action in ``why3 ide``.
+the :menuselection:`Tools --> Edit` action in :program:`why3 ide`.
 
 Installation
 ~~~~~~~~~~~~
@@ -201,33 +210,34 @@ Usage
 
 The most convenient way to call Isabelle for discharging a Why3 goal is
 to start the Isabelle/jedit interface in server mode. In this mode, one
-must start the server once, before launching ``why3 ide``, using
+must start the server once, before launching :program:`why3 ide`, using
 
 ::
 
     isabelle why3_jedit
 
-Then, inside a ``why3 ide`` session, any use of “Edit” will transfer the
-file to the already opened instance of jEdit. When the proof is
-completed, the user must send back the edited proof to ``why3 ide`` by
-closing the opened buffer, typically by hitting ``Ctrl-w``.
+Then, inside a :program:`why3 ide` session, any use
+of :menuselection:`Tools --> Edit` will transfer the file to the already
+opened instance of :program:`jEdit`. When the proof is completed, the
+user must send back the edited proof to :program:`why3 ide` by closing
+the opened buffer, typically by hitting :kbd:`Control-w`.
 
 Using Isabelle 2018 server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Starting from Isabelle version 2018, Why3 is able to exploit the server
 features of Isabelle to speed up the processing of proofs in batch mode,
-e.g. when replaying them from within Why3 IDE. Currently, when replaying
-proofs using the ``isabelle why3`` tool, an Isabelle process including a
+e.g., when replaying them from within Why3 IDE. Currently, when replaying
+proofs using the :program:`isabelle why3` tool, an Isabelle process including a
 rather heavyweight Java/Scala and PolyML runtime environment has to be
 started, and a suitable heap image has to be loaded for each proof
 obligation, which can take several seconds. To avoid this overhead, an
 Isabelle server and a suitable session can be started once, and then
-``isabelle why3`` can just connect to it and request the server to
+:program:`isabelle why3` can just connect to it and request the server to
 process theories. In order to allow a tool such as Why3 IDE to use the
 Isabelle server, it has to be started via the wrapper tool
-``isabelle use_server``. For example, to process the proofs in
-examples/logic/genealogy using Why3 IDE and the Isabelle server, do the
+:program:`isabelle use_server`. For example, to process the proofs in
+:file:`examples/logic/genealogy` using Why3 IDE and the Isabelle server, do the
 following:
 
 #. Start an Isabelle server using
@@ -245,8 +255,8 @@ following:
 Realizations
 ~~~~~~~~~~~~
 
-Realizations must be designed in some ``.thy`` as follows. The
-realization file corresponding to some Why3 file ``f.why`` should have
+Realizations must be designed in some :file:`.thy` as follows. The
+realization file corresponding to some Why3 file :file:`f.why` should have
 the following form.
 
 ::
@@ -272,6 +282,8 @@ See directory ``lib/isabelle`` for examples.
 
 .. _sec.pvs:
 
+.. index:: PVS proof assistant, proof assistant; PVS
+
 PVS
 ---
 
@@ -285,7 +297,7 @@ Usage
 
 When a PVS file is regenerated, the old version is split into chunks,
 according to blank lines. Chunks corresponding to Why3 declarations are
-identified with a comment starting with ``% Why3``,
+identified with a comment starting with ``% Why3``, e.g.,
 
 ::
 
