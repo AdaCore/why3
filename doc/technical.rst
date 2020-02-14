@@ -82,40 +82,44 @@ Inlining definitions
 Those transformations generally amount to replace some applications of
 function or predicate symbols with its definition.
 
-inline\_trivial
-    expands and removes definitions of the form
+.. why3-transform:: inline_trivial
 
-    ::
+    Expand and removes definitions of the form
 
-        function  f x_1 ... x_n = (g e_1 ... e_k)
-        predicate p x_1 ... x_n = (q e_1 ... e_k)
+    .. code-block:: whyml
 
-    when each :math:`e_i` is either a ground term or one of the
-    :math:`x_j`, and each :math:`x_1 \dots x_n` occurs at most once in
-    all the :math:`e_i`.
+        function  f x1 ... xn = g e1 ... ek
+        predicate p x1 ... xn = q e1 ... ek
 
-inline\_goal
-    expands all outermost symbols of the goal that have a non-recursive
-    definition.
+    when each :samp:`e{i}` is either a ground term or one of the
+    :samp:`x{j}`, and each ``x1 ... xn`` occurs at most once in
+    all the :samp:`e{i}`.
 
-inline\_all
-    expands all non-recursive definitions.
+.. why3-transform:: inline_goal
+
+   Expand all outermost symbols of the goal that have a non-recursive
+   definition.
+
+.. why3-transform:: inline_all
+
+   Expand all non-recursive definitions.
 
 Induction Transformations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-induction\_ty\_lex
-    performs structural, lexicographic induction on goals involving
+.. why3-transform:: induction_ty_lex
+
+    Perform structural, lexicographic induction on goals involving
     universally quantified variables of algebraic data types, such as
     lists, trees, etc. For instance, it transforms the following goal
 
-    ::
+    .. code-block:: whyml
 
         goal G: forall l: list 'a. length l >= 0
 
     into this one:
 
-    ::
+    .. code-block:: whyml
 
         goal G :
           forall l:list 'a.
@@ -129,7 +133,7 @@ induction\_ty\_lex
     attribute can be used to force induction over one particular
     variable, with
 
-    ::
+    .. code-block:: whyml
 
         goal G: forall l1 [@induction] l2 l3: list 'a.
                 l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
@@ -145,12 +149,13 @@ These transformations simplify the goal by applying several kinds of
 simplification, described below. The transformations differ only by the
 kind of rules they apply:
 
-compute\_in\_goal
-    aggressively applies all known computation/simplification rules.
+.. why3-transform:: compute_in_goal
 
-compute\_specified
-    performs rewriting using only built-in operators and user-provided
-    rules.
+   Aggressively apply all known computation/simplification rules.
+
+.. why3-transform:: compute_specified
+
+   Perform rewriting using only built-in operators and user-provided rules.
 
 The kinds of simplification are as follows.
 
@@ -164,13 +169,13 @@ The kinds of simplification are as follows.
    transformations thus does not produce any sub-goal. For example, a
    goal like ``6*7=42`` is solved by those transformations.
 
--  Unfolding of definitions, as done by ``inline_goal``. Transformation
-   ``compute_in_goal`` unfolds all definitions, including recursive
-   ones. For ``compute_specified``, the user can enable unfolding of a
+-  Unfolding of definitions, as done by :why3-transform:`inline_goal`. Transformation
+   :why3-transform:`compute_in_goal` unfolds all definitions, including recursive
+   ones. For :why3-transform:`compute_specified`, the user can enable unfolding of a
    specific logic symbol by attaching the meta ``rewrite_def`` to the
    symbol.
 
-   ::
+   .. code-block:: whyml
 
        function sqr (x:int) : int = x * x
        meta "rewrite_def" function sqr
@@ -178,19 +183,19 @@ The kinds of simplification are as follows.
 -  Rewriting using axioms or lemmas declared as rewrite rules. When an
    axiom (or a lemma) has one of the forms
 
-   ::
+   .. code-block:: whyml
 
        axiom a: forall ... t1 = t2
 
    or
 
-   ::
+   .. code-block:: whyml
 
        axiom a: forall ... f1 <-> f2
 
    then the user can declare
 
-   ::
+   .. code-block:: whyml
 
        meta "rewrite" prop a
 
@@ -202,19 +207,19 @@ Instead of using a meta, it is possible to declare an axiom as a rewrite
 rule by adding the ``[@rewrite]`` attribute on the axiom name or on the
 axiom itself, e.g.:
 
-::
+.. code-block:: whyml
 
     axiom a [@rewrite]: forall ... t1 = t2
     lemma b: [@rewrite] forall ... f1 <-> f2
 
 The second form allows some form of local rewriting, e.g.
 
-::
+.. code-block:: whyml
 
     lemma l: forall x y. ([@rewrite] x = y) -> f x = f y
 
-can be proved by ``introduce_premises`` followed by
-``compute_specified``.
+can be proved by :why3-transform:`introduce_premises` followed by
+:why3-transform:`compute_specified`.
 
 Bound on the number of reductions
 '''''''''''''''''''''''''''''''''
@@ -224,7 +229,7 @@ arbitrarily large number of steps, or even not terminate. For this
 reason, the number of steps is bounded by a maximal value, which is set
 by default to 1000. This value can be increased by another meta,
 
-::
+.. code-block:: whyml
 
     meta "compute_max_steps" 1_000_000
 
@@ -234,76 +239,95 @@ partly-reduced goal is returned as the result of the transformation.
 Other Non-Splitting Transformations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-eliminate\_algebraic
-    replaces algebraic data types by first-order
-    definitions :cite:`paskevich09rr`.
+.. why3-transform:: eliminate_algebraic
 
-eliminate\_builtin
-    removes definitions of symbols that are declared as builtin in the
-    driver, with a “syntax” rule.
+   replace algebraic data types by first-order definitions :cite:`paskevich09rr`.
 
-eliminate\_definition\_func
-    replaces all function definitions with axioms.
+.. why3-transform:: eliminate_builtin
 
-eliminate\_definition\_pred
-    replaces all predicate definitions with axioms.
+   remove definitions of symbols that are declared as builtin in the
+   driver, with a “syntax” rule.
 
-eliminate\_definition
-    applies both transformations above.
+.. why3-transform:: eliminate_definition_func
 
-eliminate\_mutual\_recursion
-    replaces mutually recursive definitions with axioms.
+   replace all function definitions with axioms.
 
-eliminate\_recursion
-    replaces all recursive definitions with axioms.
+.. why3-transform:: eliminate_definition_pred
 
-eliminate\_if\_term
-    replaces terms of the form ``if formula then t2 else t3`` by lifting
-    them at the level of formulas. This may introduce ``if then else``
-    in formulas.
+   replace all predicate definitions with axioms.
 
-eliminate\_if\_fmla
-    replaces formulas of the form ``if f1 then f2 else f3`` by an
-    equivalent formula using implications and other connectives.
+.. why3-transform:: eliminate_definition
 
-eliminate\_if
-    applies both transformations above.
+   Apply both :why3-transform:`eliminate_definition_func` and
+   :why3-transform:`eliminate_definition_pred`.
 
-eliminate\_inductive
-    replaces inductive predicates by (incomplete) axiomatic definitions,
-    construction axioms and an inversion axiom.
+.. why3-transform:: eliminate_mutual_recursion
 
-eliminate\_let\_fmla
-    eliminates ``let`` by substitution, at the predicate level.
+   Replace mutually recursive definitions with axioms.
 
-eliminate\_let\_term
-    eliminates ``let`` by substitution, at the term level.
+.. why3-transform:: eliminate_recursion
 
-eliminate\_let
-    applies both transformations above.
+   Replace all recursive definitions with axioms.
 
-encoding\_smt
-    encodes polymorphic types into monomorphic
-    types :cite:`conchon08smt`.
+.. why3-transform:: eliminate_if_term
 
-encoding\_tptp
-    encodes theories into unsorted logic.
+   Replace terms of the form ``if formula then t2 else t3`` by lifting
+   them at the level of formulas. This may introduce ``if then else``
+   in formulas.
 
-introduce\_premises
-    moves antecedents of implications and universal quantifications of
-    the goal into the premises of the task.
+.. why3-transform:: eliminate_if_fmla
 
-simplify\_array
-    automatically rewrites the task using the lemma ``Select_eq`` of
-    theory ``map.Map``.
+   Replace formulas of the form ``if f1 then f2 else f3`` by an
+   equivalent formula using implications and other connectives.
 
-simplify\_formula
-    reduces trivial equalities :math:`t=t` to true and then simplifies
-    propositional structure: removes true, false, simplifies
-    :math:`f \land f` to :math:`f`, etc.
+.. why3-transform:: eliminate_if
 
-simplify\_recursive\_definition
-    reduces mutually recursive definitions if they are not really
+   Apply both :why3-transform:`eliminate_if_term` and :why3-transform:`eliminate_if_fmla`.
+
+.. why3-transform:: eliminate_inductive
+
+   Replace inductive predicates by (incomplete) axiomatic definitions,
+   construction axioms and an inversion axiom.
+
+.. why3-transform:: eliminate_let_fmla
+
+   Eliminate ``let`` by substitution, at the predicate level.
+
+.. why3-transform:: eliminate_let_term
+
+   Eliminate ``let`` by substitution, at the term level.
+
+.. why3-transform:: eliminate_let
+
+   apply both transformations above.
+
+.. why3-transform:: encoding_smt
+
+   Encode polymorphic types into monomorphic types :cite:`conchon08smt`.
+
+.. why3-transform:: encoding_tptp
+
+   Encode theories into unsorted logic.
+
+.. why3-transform:: introduce_premises
+
+   Move antecedents of implications and universal quantifications of
+   the goal into the premises of the task.
+
+.. why3-transform:: simplify_array
+
+   Automatically rewrite the task using the lemma ``Select_eq`` of
+   theory ``map.Map``.
+
+.. why3-transform:: simplify_formula
+
+   Reduce trivial equalities ``t=t`` to true and then simplify
+   propositional structure: removes ``true``, ``false``, simplifies
+   ``f /\ f`` to ``f``, etc.
+
+.. why3-transform:: simplify_recursive_definition
+
+    Reduce mutually recursive definitions if they are not really
     mutually recursive,
 
     ::
@@ -318,10 +342,11 @@ simplify\_recursive\_definition
         function g : ... = e
         function f : ... = ... g ...
 
-    if :math:`f` does not occur in :math:`e`.
+    if ``f`` does not occur in ``e``.
 
-simplify\_trivial\_quantification
-    simplifies quantifications of the form
+.. why3-transform:: simplify_trivial_quantification
+
+    Simplify quantifications of the form
 
     ::
 
@@ -333,33 +358,38 @@ simplify\_trivial\_quantification
 
         P(t)
 
-    when :math:`x` does not occur in :math:`t`. More generally, this
-    simplification is applied whenever :math:`x=t` or :math:`t=x`
+    when ``x`` does not occur in ``t``. More generally, this
+    simplification is applied whenever ``x=t`` or ``t=x``
     appears in negative position.
 
-simplify\_trivial\_quantification\_in\_goal
-    is the same as above but it applies only in the goal.
+.. why3-transform:: simplify_trivial_quantification_in_goal
 
-split\_premise
-    replaces axioms in conjunctive form by an equivalent collection of
-    axioms. In absence of case analysis attributes (see ``split_goal``
+   Apply :why3-transform:`simplify_trivial_quantification`, but only in the goal.
+
+.. why3-transform:: split_premise
+
+    Replace axioms in conjunctive form by an equivalent collection of
+    axioms. In absence of case analysis attributes (see :why3-transform:`split_goal`
     for details), the number of axiom generated per initial axiom is
     linear in the size of that initial axiom.
 
-split\_premise\_full
-    is similar to ``split_premise``, but it also converts the axioms to
+.. why3-transform:: split_premise_full
+
+    Behave similarly to :why3-transform:`split_premise`, but also convert the axioms to
     conjunctive normal form. The number of axioms generated per initial
     axiom may be exponential in the size of the initial axiom.
 
 Other Splitting Transformations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-simplify\_formula\_and\_task
-    is the same as ``simplify_formula`` but it also removes the goal if
-    it is equivalent to true.
+.. why3-transform:: simplify_formula_and_task
 
-split\_goal
-    changes conjunctive goals into the corresponding set of subgoals. In
+   Apply :why3-transform:`simplify_formula` and remove the goal if
+   it is equivalent to true.
+
+.. why3-transform:: split_goal
+
+    Change conjunctive goals into the corresponding set of subgoals. In
     absence of case analysis attributes, the number of subgoals
     generated is linear in the size of the initial goal.
 
@@ -514,7 +544,7 @@ split\_goal
     they were local lemmas.
 
     The ``[@case_split]`` attribute can be used to force case analysis
-    on hypotheses. For instance, applying ``split_goal`` on
+    on hypotheses. For instance, applying :why3-transform:`split_goal` on
 
     ::
 
@@ -534,19 +564,23 @@ split\_goal
     presence of the ``[@case_split]`` attribute is not yet specified and
     is likely to change in future versions.
 
-split\_all
-    performs both ``split_premise`` and ``split_goal``.
+.. why3-transform:: split_all
 
-split\_intro
-    performs both ``split_goal`` and ``introduce_premises``.
+   Perform both :why3-transform:`split_premise` and :why3-transform:`split_goal`.
 
-split\_goal\_full
-    has a behavior similar to ``split_goal``, but also converts the goal
+.. why3-transform:: split_intro
+
+   Perform both :why3-transform:`split_goal` and :why3-transform:`introduce_premises`.
+
+.. why3-transform:: split_goal_full
+
+    Behave similarly to :why3-transform:`split_goal`, but also convert the goal
     to conjunctive normal form. The number of subgoals generated may be
     exponential in the size of the initial goal.
 
-split\_all\_full
-    performs both ``split_premise`` and ``split_goal_full``.
+.. why3-transform:: split_all_full
+
+   Perform both :why3-transform:`split_premise` and :why3-transform:`split_goal_full`.
 
 .. _sec.strategies:
 
