@@ -18,8 +18,42 @@ is as simple as
 
 Then jump to :numref:`provers` to install external provers.
 
-Installation Instructions from Source Distribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installation via Docker
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Instead of compiling Why3, one can also execute a precompiled version
+(for *amd64* architecture) using Docker. The image containing Why3
+as well as a few provers can be recovered using
+
+.. parsed-literal::
+
+   docker pull registry.gitlab.inria.fr/why3/why3:|release|
+   docker tag  registry.gitlab.inria.fr/why3/why3:|release| why3
+
+Let us suppose that there is a file :file:`foo.mlw` in your current
+directory. If you want to verify it using Z3, you can type
+
+.. code-block:: shell
+
+    docker run --rm --volume `pwd`:/data --workdir /data why3 prove foo.mlw -P z3
+
+If you want to verify :file:`foo.mlw` using the graphical user interface,
+the invocation is slightly more complicated as the containerized
+application needs to access your X server:
+
+.. code-block:: shell
+
+    docker run --rm --network host --user `id -u` --volume $HOME/.Xauthority:/home/guest/.Xauthority --env DISPLAY=$DISPLAY --volume `pwd`:/data --workdir /data why3 ide foo.mlw
+
+It certainly makes sense to turn this command line into a shell script for easier use:
+
+.. code-block:: shell
+
+    #!/bin/sh
+    exec docker run --rm --network host --user `id -u` --volume $HOME/.Xauthority:/home/guest/.Xauthority --env DISPLAY=$DISPLAY --volume `pwd`:/data --workdir /data why3 "$@"
+
+Installation from Source Distribution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In short, installation from sources proceeds as follows.
 
@@ -90,7 +124,7 @@ Installation can be tested as follows:
 
 #. run ``why3 config --detect``
 
-#. run some examples from the distribution, you should obtain the
+#. run some examples from the distribution, e.g., you should obtain the
    following (provided the required provers are installed on your
    machine):
 
@@ -128,6 +162,20 @@ By default, the Why3 API is not installed. It can be installed using
     make byte opt
     make install-lib
 
+Beware that if your OCaml installation relies on Opam installed in your
+own user space, then ``make install-lib`` should *not* be run as
+super-user.
+
+Removing Installation
+^^^^^^^^^^^^^^^^^^^^^
+
+Removing installation can be done using
+
+::
+
+    make uninstall
+    make uninstall-lib
+
 .. _provers:
 
 Installing External Provers
@@ -135,7 +183,7 @@ Installing External Provers
 
 Why3 can use a wide range of external theorem provers. These need to be
 installed separately, and then Why3 needs to be configured to use them.
-There is no need to install automatic provers, SMT solvers, before
+There is no need to install automatic provers, e.g., SMT solvers, before
 compiling and installing Why3. For installation of external provers,
 please refer to the specific section about provers from
 http://why3.lri.fr/. (If you have installed Why3 via Opam, note that you can
@@ -154,14 +202,14 @@ It scans your :envvar:`PATH` for provers and updates your configuration file
 Multiple Versions of the Same Prover
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Why3 is able to use several versions of the same prover, it can use both
+Why3 is able to use several versions of the same prover, e.g., it can use both
 CVC4 1.4 and CVC4 1.5 at the same time. The automatic detection of
-provers looks for typical names for their executable command, :program:`cvc4`
+provers looks for typical names for their executable command, e.g., :program:`cvc4`
 for CVC3. However, if you install several versions of the same prover it
 is likely that you would use specialized executable names, such as
 :program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, option
 :option:`why3 config --add-prover` can be
-added to specify names of prover executables,
+added to specify names of prover executables:
 
 ::
 
@@ -172,7 +220,7 @@ known. The list of these famillies can be obtain using
 :option:`why3 config --list-prover-families`.
 
 as they are in fact listed in the file :file:`provers-detection-data.conf`,
-typically located in :file:`/usr/local/share/why3`: after installation. See
+typically located in :file:`/usr/local/share/why3` after installation. See
 :numref:`sec.proverdetectiondata` for details.
 
 .. _sec.uninstalledprovers:
@@ -180,7 +228,7 @@ typically located in :file:`/usr/local/share/why3`: after installation. See
 Session Update after Prover Upgrade
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you happen to upgrade a prover, installing CVC4 1.5 in place of CVC4
+If you happen to upgrade a prover, e.g., installing CVC4 1.5 in place of CVC4
 1.4, then the proof sessions formerly recorded will still refer to the
 old version of the prover. If you open one such a session with the GUI,
 and replay the proofs, a popup window will show up for asking you to
