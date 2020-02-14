@@ -12,7 +12,7 @@ computes the maximum and the sum of an array of integers.
 Let us consider the program of :numref:`sec.maxandsum` that computes the
 maximum and the sum of an array of integers.
 
-Let us assume it is contained in a file ``maxsum.mlw``.
+Let us assume it is contained in a file :file:`maxsum.mlw`.
 
 .. _sec.execute:
 
@@ -22,7 +22,7 @@ Interpreting WhyML Code
 To test function ``max_sum``, we can introduce a WhyML test function in
 module ``MaxAndSum``
 
-::
+.. code-block:: whyml
 
       let test () =
         let n = 10 in
@@ -31,7 +31,7 @@ module ``MaxAndSum``
         a[5] <- 3; a[6] <- 2; a[7] <- 1; a[8] <- 10; a[9] <- 6;
         max_sum a n
 
-and then we use the ``execute`` command to interpret this function, as
+and then we use the :program:`why3 execute` command to interpret this function, as
 follows:
 
 ::
@@ -49,29 +49,31 @@ We get the expected output, namely the pair ``(45, 10)``.
 Compiling WhyML to OCaml
 ------------------------
 
+.. program:: why3 extract
+
 An alternative to interpretation is to compile WhyML to OCaml. We do so
-using the ``extract`` command, as follows:
+using the :program:`why3 extract` command, as follows:
 
 ::
 
     > why3 extract -D ocaml64 maxsum.mlw -o max_sum.ml
 
-The ``extract`` command requires the name of a driver, which indicates
+The :program:`why3 extract` command requires the name of a driver, which indicates
 how theories/modules from the Why3 standard library are translated to
 OCaml. Here we assume a 64-bit architecture and thus we pass
-``ocaml64``. We also specify an output file using option ``-o``, namely
-``max_sum.ml``. After this command, the file ``max_sum.ml`` contains an
+``ocaml64``. We also specify an output file using option :option:`-o`, namely
+:file:`max_sum.ml`. After this command, the file :file:`max_sum.ml` contains an
 OCaml code for function ``max_sum``. To compile it, we create a file
-``main.ml`` containing a call to ``max_sum``, *e.g.*,
+:file:`main.ml` containing a call to ``max_sum``, *e.g.*,
 
-::
+.. code-block:: ocaml
 
     let a = Array.map Z.of_int [| 9; 5; 0; 2; 7; 3; 2; 1; 10; 6 |]
     let s, m = Max_sum.max_sum a (Z.of_int 10)
     let () = Format.printf "sum=%s, max=%s@." (Z.to_string s) (Z.to_string m)
 
-It is convenient to use ``ocamlbuild`` to compile and link both files
-``max_sum.ml`` and ``main.ml``:
+It is convenient to use :program:`ocamlbuild` to compile and link both files
+file:`max_sum.ml` and file:`main.ml`:
 
 ::
 
@@ -79,7 +81,7 @@ It is convenient to use ``ocamlbuild`` to compile and link both files
 
 Since Why3’s type ``int`` is translated to OCaml arbitrary precision
 integers using the ``ZArith`` library, we have to pass option
-``-pkg zarith`` to ``ocamlbuild``. In order to get extracted code that
+``-pkg zarith`` to :program:`ocamlbuild`. In order to get extracted code that
 uses OCaml’s native integers instead, one has to use Why3’s types for
 63-bit integers from libraries ``mach.int.Int63`` and
 ``mach.array.Array63``.
@@ -87,7 +89,7 @@ uses OCaml’s native integers instead, one has to use Why3’s types for
 Extraction Starting Point.
 ''''''''''''''''''''''''''
 
-The ``extract`` command accepts three different targets for extraction:
+The :program:`why3 extract` command accepts three different targets for extraction:
 a WhyML file, a module, or a symbol (function, type, exception). To
 extract all the symbols from every module of a file named ``f.mlw``, one
 should write
@@ -96,7 +98,7 @@ should write
 
     > why3 extract -D <driver> f.mlw
 
-To extract only the symbols from module ``M`` of file ``f.mlw``, one
+To extract only the symbols from module ``M`` of file :file:`f.mlw`, one
 should write
 
 ::
@@ -104,40 +106,43 @@ should write
     > why3 extract -D <driver> -L <dir> f.M
 
 To extract only the symbol ``s`` (a function, a type, or an exception)
-from module ``M`` of file ``f.mlw``, one should write
+from module ``M`` of file :file:`f.mlw`, one should write
 
 ::
 
     > why3 extract -D <driver> -L <dir> f.M.s
 
-Note the use of \ ``-L <dir>``, for both extraction of a module and a
-symbol, in order to state the location of file ``f.mlw``.
+Note the use of :option:`-L`, for both extraction of a module and a
+symbol, in order to state the location of file :file:`f.mlw`.
 
 Options.
 ''''''''
 
 The following options can be added to the extraction command line:
 
-``--flat``
-    performs a flat extraction, *i.e.*, everything is extracted into a
-    single file. This is the default behavior. The ``-o`` option should
-    be given the name of a file or, if omitted, the result of extraction
-    is printed to the standard output.
+.. option:: --flat
 
-``--modular``
-    each module is extracted in its own, separated file. The ``-o``
+   perform a flat extraction, *i.e.*, everything is extracted into a
+   single file. This is the default behavior. The :option:`-o` option should
+   be given the name of a file or, if omitted, the result of extraction
+   is printed to the standard output.
+
+.. option:: --modular
+
+    each module is extracted in its own, separated file. The :option:`-o`
     option cannot be omitted, and it should be given the name of an
     existing directory. This directory will be populated with the
     resulting OCaml files.
 
-``--recursive``
+.. option:: --recursive
+
     recursively extracts all the dependencies of the chosen entry point.
-    This option is valid for both ``modular`` and ``flat`` options.
+    This option is valid for both :option:`--modular` and :option:`--flat` options.
 
 Examples.
 '''''''''
 
-We illustrate different ways of using the ``extract`` command through
+We illustrate different ways of using the :program:`why3 extract` command through
 some examples.
 
 Consider the program in :numref:`fig.aqueue` on page .
@@ -151,11 +156,11 @@ proceed as follows:
 
     > why3 extract -D ocaml64 -L . aqueue.AmortizedQueue.enqueue -o aqueue.ml
 
-Here we assume that file ``aqueue.mlw`` contains this program, and that
+Here we assume that file :file:`aqueue.mlw` contains this program, and that
 we invoke ``extract`` from the directory where this file is stored. File
-``aqueue.ml`` now contains the following OCaml code:
+:file:`aqueue.ml` now contains the following OCaml code:
 
-::
+.. code-block:: ocaml
 
     let enqueue (x: 'a) (q: 'a queue) : 'a queue =
       create (q.front) (q.lenf) (x :: (q.rear))
@@ -164,7 +169,7 @@ we invoke ``extract`` from the directory where this file is stored. File
 Choosing a function symbol as the entry point of extraction allows us to
 focus only on specific parts of the program. However, the generated code
 cannot be type-checked by the OCaml compiler, as it depends on function
-``create`` and on type ``’a queue``, whose definitions are not given. In
+``create`` and on type ``'a queue``, whose definitions are not given. In
 order to obtain a *complete* OCaml implementation, we can perform a
 recursive extraction:
 
@@ -173,9 +178,9 @@ recursive extraction:
     > why3 extract --recursive -D ocaml64 -L . \
         aqueue.AmortizedQueue.enqueue -o aqueue.ml
 
-This updates the contents of file ``aqueue.ml`` as follows:
+This updates the contents of file :file:`aqueue.ml` as follows:
 
-::
+.. code-block:: ocaml
 
     type 'a queue = {
       front: 'a list;
@@ -203,12 +208,12 @@ Custom Extraction Drivers.
 ''''''''''''''''''''''''''
 
 Several OCaml drivers can be specified on the command line, using option
-``-D`` several times. In particular, one can provide a custom driver to
+:option:`-D` several times. In particular, one can provide a custom driver to
 map some symbols of a Why3 development to existing OCaml code. Suppose
-for instance we have a file ``file.mlw`` containing a proof
+for instance we have a file :file:`file.mlw` containing a proof
 parameterized with some type ``elt`` and some binary function ``f``:
 
-::
+.. code-block:: whyml
 
     module M
       type elt
@@ -219,7 +224,7 @@ parameterized with some type ``elt`` and some binary function ``f``:
 When it comes to extract this module to OCaml, we may want to
 instantiate type ``elt`` with OCaml’s type ``int`` and function ``f``
 with OCaml’s addition. For this purpose, we provide the following in a
-file ``mydriver.drv``:
+file :file:`mydriver.drv`:
 
 ::
 

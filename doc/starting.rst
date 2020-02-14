@@ -196,7 +196,7 @@ Cleaning
 You may want to clean some of the proof attempts, removing the
 unsuccessful ones when a project is finally fully proved. A proof or a
 transformation can be removed by selecting it and using menu *Tools/Remove* or the
-``Delete`` key. Menu *Tools/Clean* or shortcut “C” perform an automatic removal of all
+:kbd:`Delete` key. Menu *Tools/Clean* or shortcut :kbd:`C` perform an automatic removal of all
 proofs attempts that are unsuccessful, while there exists a successful
 proof attempt for the same goal. Beware that there is no way to undo
 such a removal.
@@ -206,7 +206,7 @@ such a removal.
 Getting Started with the Why3 Command
 -------------------------------------
 
-The ``prove`` command makes it possible to check the validity of goals
+The :program:`why3 prove` command makes it possible to check the validity of goals
 with external provers, in batch mode. This section presents the basic
 use of this tool. Refer to :numref:`sec.why3prove` for a more complete
 description of this tool and all its command-line options.
@@ -236,9 +236,9 @@ prover. We thus have now the three provers Alt-Ergo :cite:`ergo`,
 CVC4 :cite:`barrett11cade`, and Coq :cite:`CoqArt`.
 
 Let us assume that we want to run Alt-Ergo on the HelloProof example.
-The command to type and its output are as follows, where the ``-P``
+The command to type and its output are as follows, where the :option:`why3 prove -P`
 option is followed by the unique prover identifier (as shown by
-``--list-provers`` option).
+:option:`why3 --list-provers` option).
 
 ::
 
