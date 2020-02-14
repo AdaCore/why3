@@ -56,3 +56,25 @@ let a_better_min_max (a: array int) : (int, int)
     i += 2
   done;
   min, max
+
+(** Divide and conqueer is no better, but let's verify it for the fun of it *)
+
+let rec divide_and_conquer (a: array int) (lo hi: int) : (int, int)
+  requires { 0 <= lo < hi <= length a }
+  returns  { x, y -> is_min x a lo hi /\ is_max y a lo hi }
+  variant  { hi - lo }
+= if hi - lo = 1 then
+    a[lo], a[lo]
+  else if hi - lo = 2 then
+    if a[lo] < a[lo+1] then a[lo], a[lo+1] else a[lo+1], a[lo]
+  else
+    let mid = lo + (hi - lo) / 2 in
+    let x1, y1 = divide_and_conquer a lo mid in
+    let x2, y2 = divide_and_conquer a mid hi in
+    (if x1 < x2 then x1 else x2),
+    (if y1 > y2 then y1 else y2)
+
+let a_similar_min_max (a: array int) : (int, int)
+  requires { 1 <= length a }
+  returns  { x, y -> is_min x a 0 (length a) /\ is_max y a 0 (length a) }
+= divide_and_conquer a 0 (length a)
