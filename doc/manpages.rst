@@ -3,8 +3,10 @@
 Reference Manuals for the Why3 Tools
 ====================================
 
+.. program:: why3
+
 This chapter details the usage of each of the command-line tools
-provided by the Why3 environment. The main command is ``why3``; it acts
+provided by the Why3 environment. The main command is :program:`why3`; it acts
 as an entry-point to all the features of Why3. It is invoked as such
 
 ::
@@ -51,7 +53,7 @@ All these commands are also available as standalone executable files, if
 needed.
 
 The commands accept a common subset of command-line options. In
-particular, option ``--help`` displays the usage and options.
+particular, option :option:`why3 --help` displays the usage and options.
 
 .. option:: -L <dir>, --library <dir>
 
@@ -77,7 +79,7 @@ particular, option ``--help`` displays the usage and options.
 
    list known printers.
 
-.. option:: --list-provers.
+.. option:: --list-provers
 
    list known provers.
 
@@ -106,6 +108,8 @@ particular, option ``--help`` displays the usage and options.
 The ``config`` Command
 ----------------------
 
+.. program:: why3 config
+
 Why3 must be configured to access external provers. Typically, this is
 done by running the ``config`` command. This must be done each time a
 new prover is installed.
@@ -131,13 +135,13 @@ in the corresponding section.
 
 If the user’s configuration file is already present, ``config`` will
 only reset unset variables to default value, but will not try to detect
-provers. The option ``--detect-provers`` should be used to force Why3 to
+provers. The option :option:`--detect-provers` should be used to force Why3 to
 detect again the available provers and to replace them in the
-configuration file. The option ``--detect-plugins`` will do the same for
+configuration file. The option :option:`--detect-plugins` will do the same for
 plugins.
 
 If a supported prover is installed under a name that is not
-automatically recognized by ``why3 config``, the option :option:`--add-prover`
+automatically recognized by :program:`why3 config`, the option :option:`--add-prover`
 will add a specified binary to the configuration. For example, an
 Alt-Ergo executable :file:`/home/me/bin/alt-ergo-trunk` can be added as
 follows:
@@ -155,9 +159,11 @@ string. The list of known prover families can be obtained by the option
 The ``prove`` Command
 ---------------------
 
+.. program:: why3 prove
+
 Why3 is primarily used to call provers on goals contained in an input
 file. By default, such a file must be written in WhyML language
-(extension ``.mlw``). However, a dynamically loaded plugin can register
+(extension :file:`.mlw`). However, a dynamically loaded plugin can register
 a parser for some other format of logical problems, TPTP or SMT-LIB.
 
 The ``prove`` command executes the following steps:
@@ -172,8 +178,8 @@ The ``prove`` command executes the following steps:
 
 #. Parse and typecheck the given files using the correct parser in order
    to obtain a set of Why3 theories for each file. It uses the filename
-   extension or the ``--format`` option to choose among the available
-   parsers. ``why3 --list-formats`` lists the registered parsers. WhyML
+   extension or the :option:`--format` option to choose among the available
+   parsers. :option:`why3 --list-formats` lists the registered parsers. WhyML
    modules are turned into theories containing verification conditions
    as goals.
 
@@ -188,12 +194,12 @@ The ``prove`` command executes the following steps:
 
 #. Apply the transformations requested with ``-a/--apply-transform`` in
    their order of appearance on the command line.
-   ``why3 --list-transforms`` lists the known transformations; plugins
+   :option:`why3 --list-transforms` lists the known transformations; plugins
    can add more of them.
 
 #. Apply the driver selected with the ``-D/--driver`` option, or the
    driver of the prover selected with the ``-P/--prover`` option.
-   ``why3 --list-provers`` lists the known provers, the ones that appear
+   :option:`why3 --list-provers` lists the known provers, the ones that appear
    in the configuration file.
 
 #. If option ``-P/--prover`` is given, call the selected prover on each
@@ -226,10 +232,11 @@ Invalid
 Additional Options
 ~~~~~~~~~~~~~~~~~~
 
-``--extra-expl-prefix <s>``
-    specifies *s* as an additional prefix for labels that denotes VC
-    explanations. The option can be used several times to specify
-    several prefixes.
+.. option:: --extra-expl-prefix <s>
+
+   specify *s* as an additional prefix for labels that denotes VC
+   explanations. The option can be used several times to specify
+   several prefixes.
 
 Getting Potential Counterexamples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,7 +244,7 @@ Getting Potential Counterexamples
 That feature is presented in details in :numref:`sec.idece`, that should
 be read first.
 
-Counterexamples are also displayed by the ``why3 prove`` command when
+Counterexamples are also displayed by the :program:`why3 prove` command when
 one selects a prover with the ``counterexamples`` alternative. The
 output is currently done in a JSON syntax (this may change in the
 future).
@@ -247,13 +254,15 @@ future).
 The ``ide`` Command
 -------------------
 
+.. program:: why3 ide
+
 The basic usage of the GUI is described by the tutorial of
 :numref:`sec.gui`. The command-line options are the common options
 detailed in introduction to this chapter, plus the specific option
-already described for the command ``prove`` in
+already described for the command :program:`why3 prove` in
 :numref:`sec.proveoptions`.
 
-``--extra-expl-prefix <s>``
+.. .. option:: --extra-expl-prefix <s>
 
 At least one anonymous argument must be specified on the command line.
 More precisely, the first anonymous argument must be the directory of
@@ -272,12 +281,12 @@ Session
 ~~~~~~~
 
 Why3 stores in a session the way you achieve to prove goals that come
-from a file (``.why``), from weakest-precondition (``.mlw``) or by other
+from a file (:file:`.why`), from weakest-precondition (:file:`.mlw`) or by other
 means. A session stores which file you prove, by applying which
 transformations, by using which prover. A proof attempt records the
 complete name of a prover (name, version, optional attribute), the time
 limit and memory limit given, and the result of the prover. The result
-of the prover is the same as when you run the ``prove`` command. It
+of the prover is the same as when you run the :program:`why3 prove` command. It
 contains the time taken and the state of the proof:
 
 Valid
@@ -324,9 +333,9 @@ detached
 
 Generally, proof attempts are marked obsolete just after the start of
 the user interface. Indeed, when you load a session in order to modify
-it (not with ``why3session info`` for instance), Why3 rebuilds the goals
+it (not with :program:`why3 session info` for instance), Why3 rebuilds the goals
 to prove by using the information provided in the session. If you modify
-the original file (``.mlw``) or if the transformations have changed (new
+the original file (:file:`.mlw`) or if the transformations have changed (new
 version of Why3), Why3 will detect that. Since the provers might answer
 differently on these new proof obligations, the corresponding proof
 attempts are marked obsolete.
@@ -340,7 +349,7 @@ while cursor is on a given row of the proof session tree.
 
 provers
     The detected provers are listed. Note that you can hide some provers
-    of that list using the preferences, tab *Provers*.
+    of that list using the preferences, tab :guilabel:`Provers`.
 
 strategies
     the set of known strategies is listed
@@ -660,7 +669,7 @@ The generation of counterexamples is fully integrated in Why3 IDE. The
 recommended usage is to first start a prover normally, as shown in
 :numref:`fig.ce_example0_p1`) and then click on the status icon for the
 corresponding proof attempt in the tree. Alternatively, one can use the
-key shortcut “G” or type ``get-ce`` in the command entry. The result can
+key shortcut :kbd:`G` or type ``get-ce`` in the command entry. The result can
 be seen on :numref:`fig.ce_example0_p2`: the same prover but with the
 alternative *counterexamples* is run. The resulting counterexample is
 displayed in two different ways. First, it is displayed in the *Task* tab of
@@ -708,7 +717,7 @@ The counterexamples can contain values of various types.
 To detail the display of map values, consider the following code with a
 trivially false postcondition:
 
-::
+.. code-block:: whyml
 
       use int.Int
       use ref.Ref
@@ -722,7 +731,7 @@ trivially false postcondition:
 Executing CVC4 with the “counterexamples” alternative on goal will
 trigger counterexamples:
 
-::
+.. code-block:: whyml
 
       use int.Int
       use ref.Ref
@@ -759,12 +768,14 @@ non-exhaustive list (which is undergoing active development):
 More information on the implementation of counterexamples in Why3 can be
 found in :cite:`hauzar16sefm` and
 in :cite:`dailler18jlamp`. For the producing counterexamples
-using the Why3 API, see :numref:`sec.ce\_api`.
+using the Why3 API, see :numref:`sec.ce_api`.
 
 .. _sec.why3replay:
 
 The ``replay`` Command
 ----------------------
+
+.. program:: why3 replay
 
 The ``replay`` command is meant to execute the proofs stored in a Why3
 session file, as produced by the IDE. Its main purpose is to play
@@ -773,7 +784,9 @@ that runs regression tests on all the examples.
 
 The tool is invoked in a terminal or a script using
 
-why3 replay *[options] <project directory>*
+::
+
+    why3 replay [options] <project directory>
 
 The session file :file:`why3session.xml` stored in the given directory is
 loaded and all the proofs it contains are rerun. Then, all the
@@ -800,7 +813,7 @@ session file will be updated if both
 -  every goals are proved.
 
 In other cases, you can use the IDE to update the session, or use the
-option :option:`--force` described below.
+option :option:`why3 replay --force` described below.
 
 Exit code and options
 ~~~~~~~~~~~~~~~~~~~~~
@@ -897,7 +910,9 @@ smoke detector has been triggered, or ``No smoke detected`` (exit code
 The ``session`` Command
 -----------------------
 
-The ``session`` command makes it possible to extract information from
+.. program:: why3 session
+
+The :program:`why3 session` command makes it possible to extract information from
 proof sessions on the command line, or even modify them to some extent.
 The invocation of this program is done under the form
 
@@ -925,7 +940,9 @@ modify them.
 Command ``info``
 ~~~~~~~~~~~~~~~~
 
-The command ``why3 session info`` reports various informations about the
+.. program:: why3 session info
+
+The command :program:`why3 session info` reports various informations about the
 session, depending on the following specific options.
 
 .. option:: --provers
@@ -1017,7 +1034,9 @@ proof” example of :numref:`chap.starting`.
 Command ``latex``
 ~~~~~~~~~~~~~~~~~
 
-Command ``latex`` produces a summary of the replay under the form of a
+.. program:: why3 session latex
+
+Command :program:`why3 session latex` produces a summary of the replay under the form of a
 tabular environment in LaTeX, one tabular for each theory, one per file.
 
 The specific options are
@@ -1098,6 +1117,8 @@ with style 1 and 2.
 Command ``html``
 ~~~~~~~~~~~~~~~~
 
+.. program:: why3 session html
+
 This command produces a summary of the proof session in HTML syntax.
 There are two styles of output: ‘table’ and ‘simpletree’. The default is
 ‘table’.
@@ -1177,7 +1198,9 @@ Specific options for this command are as follows.
 Command ``update``
 ~~~~~~~~~~~~~~~~~~
 
-The command ``why3 session update`` permits to modify the session
+.. program:: why3 session update
+
+The command :program:`why3 session update` permits to modify the session
 contents, depending on the following specific options.
 
 .. option:: -rename-file <src> <dst>
@@ -1189,6 +1212,8 @@ contents, depending on the following specific options.
 
 The ``doc`` Command
 -------------------
+
+.. program:: why3 doc
 
 This tool can produce HTML pages from Why3 source code. Why3 code for
 theories or modules is output in preformatted HTML code. Comments are
@@ -1258,21 +1283,27 @@ since regenerating the HTML documentation will not overwrite an existing
 The ``execute`` Command
 -----------------------
 
+.. program:: why3 execute
+
 Why3 can symbolically execute programs written using the WhyML language
-(extension ``.mlw``). See also :numref:`sec.execute`.
+(extension :file:`.mlw`). See also :numref:`sec.execute`.
 
 .. _sec.why3extract:
 
 The ``extract`` Command
 -----------------------
 
+.. program:: why3 extract
+
 Why3 can extract programs written using the WhyML language (extension
-``.mlw``) to OCaml. See also :numref:`sec.extract`.
+:file:`.mlw`) to OCaml. See also :numref:`sec.extract`.
 
 .. _sec.why3realize:
 
 The ``realize`` Command
 -----------------------
+
+.. program:: why3 realize
 
 Why3 can produce skeleton files for proof assistants that, once filled,
 realize the given theories. See also :numref:`sec.realizations`.
@@ -1281,5 +1312,7 @@ realize the given theories. See also :numref:`sec.realizations`.
 
 The ``wc`` Command
 ------------------
+
+.. program:: why3 wc
 
 Why3 can give some token statistics about WhyML source files.

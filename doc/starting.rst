@@ -9,7 +9,7 @@ Hello Proofs
 The first step in using Why3 is to write a suitable input file. When one
 wants to learn a programming language, one starts by writing a basic
 program. Here is our first Why3 file, which is the file
-``examples/logic/hello_proof.why`` of the distribution. It contains a
+:file:`examples/logic/hello_proof.why` of the distribution. It contains a
 small set of goals.
 
 .. literalinclude:: ../examples/logic/hello_proof.why
@@ -25,7 +25,7 @@ library, which is done by the ``use`` declaration above.
 We don’t give more details here about the syntax and refer to
 :numref:`chap.whyml` for detailed explanations. In the following, we
 show how this file is handled in the Why3 GUI (:numref:`sec.gui`) then
-in batch mode using the ``why3`` executable (:numref:`sec.batch`).
+in batch mode using the :program:`why3` executable (:numref:`sec.batch`).
 
 .. _sec.gui:
 
@@ -148,7 +148,7 @@ top-right window of the GUI. Let us assume we change the goal
    goal G2 : (false -> false) /\ (true \/ false)
 
 We can refresh the goals using menu *File/Save all and Refresh session*,
-or the shortcut “Ctrl-R”. We get
+or the shortcut :kbd:`Control-r`. We get
 the tree view shown on :numref:`fig.gui5`.
 
 .. _fig.gui5:
@@ -173,7 +173,7 @@ Replaying obsolete proofs
 Instead of pushing a prover’s button to rerun its proofs, you can
 *replay* the existing but obsolete proof attempts, using menu *Tools/Replay obsolete*. By
 default, *Replay* only replays proofs that were successful before. Notice that
-replaying can be done in batch mode, using the ``replay`` command (see
+replaying can be done in batch mode, using the :program:`why3 replay` command (see
 :numref:`sec.why3replay`) For example, running the replayer on the
 ``hello_proof`` example is as follows (assuming :math:`G_2` still is
 ``(true -> false) /\ (true \/ false)``).
@@ -288,4 +288,4 @@ transformations available.
 
 .. [1]
    If not done yet, you must perform prover autodetection using
-   ``why3 config --detect-provers``
+   :option:`why3 config --detect-provers`
