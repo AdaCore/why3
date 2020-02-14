@@ -176,6 +176,7 @@ Removing installation can be done using
     make uninstall
     make uninstall-lib
 
+.. why3-tool:: config
 .. _provers:
 
 Installing External Provers

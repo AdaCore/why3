@@ -103,6 +103,8 @@ particular, option :option:`why3 --help` displays the usage and options.
 
    display the usage and the exact list of options for the given tool.
 
+
+.. why3-tool:: config
 .. _sec.why3config:
 
 The ``config`` Command
@@ -154,6 +156,8 @@ As the first argument, one should put a prover family identification
 string. The list of known prover families can be obtained by the option
 :option:`--list-prover-families`.
 
+
+.. why3-tool:: prove
 .. _sec.why3prove:
 
 The ``prove`` Command
@@ -249,6 +253,7 @@ one selects a prover with the ``counterexamples`` alternative. The
 output is currently done in a JSON syntax (this may change in the
 future).
 
+.. why3-tool:: ide
 .. _sec.ideref:
 
 The ``ide`` Command
@@ -770,6 +775,7 @@ found in :cite:`hauzar16sefm` and
 in :cite:`dailler18jlamp`. For the producing counterexamples
 using the Why3 API, see :numref:`sec.ce_api`.
 
+.. why3-tool:: replay
 .. _sec.why3replay:
 
 The ``replay`` Command
@@ -905,6 +911,7 @@ Moreover ``Smoke detected`` (exit code 1) is printed at the end if the
 smoke detector has been triggered, or ``No smoke detected`` (exit code
 0) otherwise.
 
+.. why3-tool:: session
 .. _sec.why3session:
 
 The ``session`` Command
@@ -1183,7 +1190,7 @@ Specific options for this command are as follows.
    directory all the needed external files. It can’t be set with stdout
    output.
 
-.. option:: --add_pp <suffix> <cmd> <out_suffix>``
+.. option:: --add_pp <suffix> <cmd> <out_suffix>
 
    set a specific pretty-printer for files with the given suffix.
    Produced files use ``<out_suffix>`` as suffix. ``<cmd>`` must
@@ -1278,6 +1285,7 @@ directory as output files. This CSS style can be modified manually,
 since regenerating the HTML documentation will not overwrite an existing
 ``style.css`` file.
 
+.. why3-tool:: execute
 .. _sec.why3execute:
 
 The ``execute`` Command
@@ -1288,6 +1296,7 @@ The ``execute`` Command
 Why3 can symbolically execute programs written using the WhyML language
 (extension :file:`.mlw`). See also :numref:`sec.execute`.
 
+.. why3-tool:: extract
 .. _sec.why3extract:
 
 The ``extract`` Command
@@ -1298,6 +1307,7 @@ The ``extract`` Command
 Why3 can extract programs written using the WhyML language (extension
 :file:`.mlw`) to OCaml. See also :numref:`sec.extract`.
 
+.. why3-tool:: realize
 .. _sec.why3realize:
 
 The ``realize`` Command
@@ -1308,6 +1318,7 @@ The ``realize`` Command
 Why3 can produce skeleton files for proof assistants that, once filled,
 realize the given theories. See also :numref:`sec.realizations`.
 
+.. why3-tool:: wc
 .. _sec.why3wc:
 
 The ``wc`` Command

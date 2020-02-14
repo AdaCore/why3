@@ -14,6 +14,7 @@ maximum and the sum of an array of integers.
 
 Let us assume it is contained in a file :file:`maxsum.mlw`.
 
+.. why3-tool:: execute
 .. _sec.execute:
 
 Interpreting WhyML Code
@@ -44,6 +45,7 @@ follows:
 
 We get the expected output, namely the pair ``(45, 10)``.
 
+.. why3-tool:: extract
 .. _sec.extract:
 
 Compiling WhyML to OCaml

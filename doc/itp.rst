@@ -32,10 +32,10 @@ one can show the consistency of an axiomatized theory and/or make a
 connection to an existing library (of the proof assistant) to ease some
 proofs.
 
+.. why3-tool:: realize
+
 Generating a realization
 ~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. index:: realize, tool; realize
 
 Generating the skeleton for a theory is done by passing to the
 :program:`why3 realize` command a driver suitable for realizations, the names of the
