@@ -173,7 +173,7 @@ Replaying obsolete proofs
 Instead of pushing a prover’s button to rerun its proofs, you can
 *replay* the existing but obsolete proof attempts, using menu *Tools/Replay obsolete*. By
 default, *Replay* only replays proofs that were successful before. Notice that
-replaying can be done in batch mode, using the :program:`why3 replay` command (see
+replaying can be done in batch mode, using the :why3-tool:`why3 replay` command (see
 :numref:`sec.why3replay`) For example, running the replayer on the
 ``hello_proof`` example is as follows (assuming :math:`G_2` still is
 ``(true -> false) /\ (true \/ false)``).
@@ -206,7 +206,7 @@ such a removal.
 Getting Started with the Why3 Command
 -------------------------------------
 
-The :program:`why3 prove` command makes it possible to check the validity of goals
+The :why3-tool:`why3 prove` command makes it possible to check the validity of goals
 with external provers, in batch mode. This section presents the basic
 use of this tool. Refer to :numref:`sec.why3prove` for a more complete
 description of this tool and all its command-line options.

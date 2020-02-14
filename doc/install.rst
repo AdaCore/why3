@@ -122,7 +122,7 @@ Installation can be tested as follows:
 
 #. install some external provers (see :numref:`provers` below)
 
-#. run ``why3 config --detect``
+#. run :option:`why3 config --detect`
 
 #. run some examples from the distribution, e.g., you should obtain the
    following (provided the required provers are installed on your
@@ -147,7 +147,7 @@ configured and compiled for local use as follows:
     ./configure --enable-local
     make
 
-The Why3 executables are then available in the subdirectory :file:`bin/`.
+The Why3 executable files are then available in the subdirectory :file:`bin/`.
 This directory can be added in your :envvar:`PATH`.
 
 .. _sec.installlib:
@@ -176,7 +176,6 @@ Removing installation can be done using
     make uninstall
     make uninstall-lib
 
-.. why3-tool:: config
 .. _provers:
 
 Installing External Provers
@@ -264,7 +263,7 @@ discard these choices via the :menuselection:`Files --> Preferences` dialog: jus
 it.
 
 Outside the GUI, the prover upgrades are handled as follows. The
-:program:`why3 replay` command will take into account any prover upgrade policy
-stored in the configuration. The :program:`why3 session` command performs move or
+:why3-tool:`replay` command will take into account any prover upgrade policy
+stored in the configuration. The :why3-tool:`session` command performs move or
 copy operations on proof attempts in a fine-grained way, using filters,
 as detailed in :numref:`sec.why3session`.

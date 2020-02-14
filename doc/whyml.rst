@@ -4,7 +4,7 @@ The WhyML Language
 ==================
 
 This chapter describes the WhyML specification and programming language.
-A WhyML source file has suffix ``.mlw``. It contains a list of modules.
+A WhyML source file has suffix :file:`.mlw`. It contains a list of modules.
 Each module contains a list of declarations. These includes
 
 -  Logical declarations:
@@ -48,22 +48,22 @@ containing programs. For instance
     > why3 prove myfile.mlw
 
 displays the verification conditions for programs contained in file
-``myfile.mlw``, and
+:file:`myfile.mlw`, and
 
 ::
 
     > why3 prove -P alt-ergo myfile.mlw
 
 runs the SMT solver Alt-Ergo on these verification conditions. All this
-can be performed within the GUI tool ``why3 ide`` as well. See
+can be performed within the GUI tool :why3-tool:`why3 ide` as well. See
 :numref:`chap.manpages` for more details regarding command lines.
 
 As an introduction to WhyML, we use a small logical puzzle
 (:numref:`sec.einstein`) and then the five problems from the VSTTE 2010
 verification competition :cite:`vstte10comp`. The source
 code for all these examples is contained in Why3’s distribution, in
-sub-directory ``examples/``. Look for files ``logic/einstein.why`` and
-``vstte10_xxx.mlw``.
+sub-directory :file:`examples/`. Look for files :file:`logic/einstein.why` and
+:file:`vstte10_xxx.mlw`.
 
 .. _sec.einstein:
 
@@ -247,7 +247,7 @@ choice.
     einstein.why Goals G: Valid (1.27s, 989 steps)
 
 The source code for this puzzle is available in the source distribution
-of Why3, in file ``examples/logic/einstein.why``.
+of Why3, in file :file:`examples/logic/einstein.why`.
 
 .. _sec.maxandsum:
 
@@ -267,7 +267,7 @@ postcondition:
 
 .. math:: sum \le N \times max.
 
-In a file ``max_sum.mlw``, we start a new module:
+In a file :file:`max_sum.mlw`, we start a new module:
 
 .. code-block:: whyml
 
@@ -291,7 +291,7 @@ library, so we import the corresponding modules:
 Modules ``Ref`` and ``Array`` respectively provide a type ``ref ’a`` for
 references and a type ``array ’a`` for arrays, together with useful
 operations and traditional syntax. They are loaded from the WhyML files
-``ref.mlw`` and ``array.mlw`` in the standard library.
+:file:`ref.mlw` and :file:`array.mlw` in the standard library.
 
 We are now in position to define a program function ``max_sum``. A
 function definition is introduced with the keyword ``let``. In our case,
@@ -392,8 +392,8 @@ shown below.
 
     end
 
-We can now proceed to its verification. Running ``why3``, or better
-``why3 ide``, on file ``max_sum.mlw`` shows a single verification
+We can now proceed to its verification. Running :program:`why3`, or better
+:why3-tool:`why3 ide`, on file :file:`max_sum.mlw` shows a single verification
 condition with name ``WP max_sum``. Discharging this verification
 condition requires a little bit of non-linear arithmetic. Thus some SMT
 solvers may fail at proving it, but other succeed, *e.g.*, CVC4.
@@ -1038,7 +1038,7 @@ queue.
 The postcondition states that the returned queue represents the empty
 sequence. Another postcondition, saying that the returned queue
 satisfies the type invariant, is implicit. Note the cast to type
-``queue ’a``. It is required, for the type checker not to complain about
+``queue 'a``. It is required, for the type checker not to complain about
 an undefined type variable.
 
 The next operation is ``head``, which returns the first element from a

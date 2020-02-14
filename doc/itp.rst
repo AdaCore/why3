@@ -32,13 +32,11 @@ one can show the consistency of an axiomatized theory and/or make a
 connection to an existing library (of the proof assistant) to ease some
 proofs.
 
-.. why3-tool:: realize
-
 Generating a realization
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Generating the skeleton for a theory is done by passing to the
-:program:`why3 realize` command a driver suitable for realizations, the names of the
+:why3-tool:`realize` command a driver suitable for realizations, the names of the
 theories to realize, and a target directory.
 
 ::
@@ -177,7 +175,7 @@ When using Isabelle from Why3, files generated from Why3 theories and
 goals are stored in a dedicated XML format. Those files should not be
 edited. Instead, the proofs must be completed in a file with the same
 name and extension ``.thy``. This is the file that is opened when using
-the :menuselection:`Tools --> Edit` action in :program:`why3 ide`.
+the :menuselection:`Tools --> Edit` action in the Why3 IDE.
 
 Installation
 ~~~~~~~~~~~~
@@ -210,16 +208,16 @@ Usage
 
 The most convenient way to call Isabelle for discharging a Why3 goal is
 to start the Isabelle/jedit interface in server mode. In this mode, one
-must start the server once, before launching :program:`why3 ide`, using
+must start the server once, before launching :why3-tool:`why3 ide`, using
 
 ::
 
     isabelle why3_jedit
 
-Then, inside a :program:`why3 ide` session, any use
+Then, inside a Why3 interactive session, any use
 of :menuselection:`Tools --> Edit` will transfer the file to the already
 opened instance of :program:`jEdit`. When the proof is completed, the
-user must send back the edited proof to :program:`why3 ide` by closing
+user must send back the edited proof to Why3 IDE by closing
 the opened buffer, typically by hitting :kbd:`Control-w`.
 
 Using Isabelle 2018 server
