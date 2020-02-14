@@ -1,8 +1,3 @@
-.. Why3 documentation master file, created by
-   sphinx-quickstart on Fri Mar  1 17:36:15 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to Why3's documentation!
 ================================
 
@@ -34,7 +29,7 @@ project (ANR-15-CE25-0001), and the `VOCaL`_ ANR project
    :maxdepth: 2
    :numbered:
 
-   manual
+   foreword
    starting
    whyml
    api
