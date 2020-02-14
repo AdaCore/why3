@@ -159,8 +159,9 @@ CVC4 1.4 and CVC4 1.5 at the same time. The automatic detection of
 provers looks for typical names for their executable command, :program:`cvc4`
 for CVC3. However, if you install several versions of the same prover it
 is likely that you would use specialized executable names, such as
-:program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, option :option:`--add-prover` can be
-added to the ``config`` command to specify names of prover executables,
+:program:`cvc4-1.4` or :program:`cvc4-1.5`. If needed, option
+:option:`why3 config --add-prover` can be
+added to specify names of prover executables,
 
 ::
 
@@ -168,10 +169,7 @@ added to the ``config`` command to specify names of prover executables,
 
 the first argument (here ``cvc4``) must be one of the family of provers
 known. The list of these famillies can be obtain using
-
-::
-
-    why3 config --list-prover-families
+:option:`why3 config --list-prover-families`.
 
 as they are in fact listed in the file :file:`provers-detection-data.conf`,
 typically located in :file:`/usr/local/share/why3`: after installation. See
@@ -217,7 +215,7 @@ discard these choices via the :menuselection:`Files --> Preferences` dialog: jus
 it.
 
 Outside the GUI, the prover upgrades are handled as follows. The
-``replay`` command will take into account any prover upgrade policy
-stored in the configuration. The ``session`` command performs move or
+:program:`why3 replay` command will take into account any prover upgrade policy
+stored in the configuration. The :program:`why3 session` command performs move or
 copy operations on proof attempts in a fine-grained way, using filters,
 as detailed in :numref:`sec.why3session`.

@@ -30,7 +30,7 @@ The ``why3.conf`` Configuration File
 One can use a custom configuration file. The Why3 tools look for it in
 the following order:
 
-#. the file specified by the :option:`-C` or :option:`--config` options,
+#. the file specified by the :option:`why3 --config` options,
 
 #. the file specified by the environment variable :envvar:`WHY3CONFIG` if set,
 
@@ -74,11 +74,7 @@ the others, first the non-splitting ones, those which produce exactly
 one goal as result, and the others which produce any number of goals.
 
 Notice that the set of available transformations in your own
-installation is given by
-
-::
-
-    why3 --list-transforms
+installation is given by :option:`why3 --list-transforms`.
 
 Inlining definitions
 ~~~~~~~~~~~~~~~~~~~~
@@ -563,23 +559,23 @@ strategies can be defined using a basic assembly-style language, and put
 into the Why3 configuration file. The commands of this basic language
 are:
 
--  ``c p t m`` calls the prover :math:`p` with a time limit :math:`t`
-   and memory limit :math:`m`. On success, the strategy ends, it
-   continues to next line otherwise
+-  :samp:`c {p} {t} {m}` calls the prover *p* with a time limit *t*
+   and memory limit *m*. On success, the strategy ends, it
+   continues to next line otherwise.
 
--  ``t n lab`` applies the transformation :math:`n`. On success, the
-   strategy continues to label :math:`lab`, and is applied to each
+-  :samp:`t {n} {lab}` applies the transformation *n*. On success, the
+   strategy continues to label *lab*, and is applied to each
    generated sub-goals. It continues to next line otherwise.
 
--  ``g lab`` inconditionally jumps to label :math:`lab`
+-  :samp:`g {lab}` unconditionally jumps to label *lab*.
 
--  ``lab:`` declares the label :math:`lab`. The default label ``exit``
-   allows to stop the program.
+-  :samp:`{lab}:` declares the label *lab*. The default label ``exit``
+   stops the program.
 
 To examplify this basic programming language, we give below the default
 strategies that are attached to the default buttons of the IDE, assuming
 that the provers Alt-Ergo 1.30, CVC4 1.5 and Z3 4.5.0 were detected by
-the ``why3 config --detect`` command
+the :option:`why3 config --detect` command
 
 Split
     is bound to the 1-line strategy

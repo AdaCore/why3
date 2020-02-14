@@ -12,7 +12,7 @@ complete documentation for API calls is given at URL |apiurl|.
 We assume the reader has a fair knowledge of the OCaml language. Notice
 that the Why3 library must be installed, see :numref:`sec.installlib`.
 The OCaml code given below is available in the source distribution in
-directory ``examples/use_api/`` together with a few other examples.
+directory :file:`examples/use_api/` together with a few other examples.
 
 .. _sec.prop_form:
 
@@ -492,7 +492,7 @@ syntax trees for such programs, and then call the Why3 typing procedure
 to build typed declarations.
 
 The examples of this section are available in the file
-``examples/use_api/mlw_tree.ml`` of the distribution.
+:file:`examples/use_api/mlw_tree.ml` of the distribution.
 
 The first step is to build an environment as already illustrated in
 :numref:`sec.api.callingprovers`, and open the OCaml module ``Ptree``
@@ -607,7 +607,7 @@ be read first. The counterexamples can also be generated using the API.
 The following explains how to change the source code (mainly adding
 attributes) in order to display counterexamples and how to parse the
 result given by Why3. To illustrate this, we will adapt the examples
-from :numref:`sec.prop\_form` to display counterexamples.
+from :numref:`sec.prop_form` to display counterexamples.
 
 Attributes and locations on identifiers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

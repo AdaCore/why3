@@ -47,7 +47,7 @@ theories to realize, and a target directory.
                  -T env_path.theory_name -o path/to/target/dir/
 
 The theory is looked into the files from the environment, e.g., the standard
-library. If the theory is stored in a different location, option :option:`-L`
+library. If the theory is stored in a different location, option :option:`why3 -L`
 should be used.
 
 The name of the generated file is inferred from the theory name. If the
@@ -113,7 +113,7 @@ be as follows.
       \\\"Logical_directory\\\") coq-load-path))\""
 
 This configuration file can be passed to Why3 thanks to the
-:option:`--extra-config` option.
+:option:`why3 --extra-config` option.
 
 .. index:: Coq proof assistant, proof assistant; Coq
 
