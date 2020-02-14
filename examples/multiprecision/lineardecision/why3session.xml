@@ -151,10 +151,10 @@
   <proof prover="4" memlimit="2000"><result status="valid" time="0.00" steps="11"/></proof>
   </goal>
   <goal name="sprod&#39;vc.3" expl="exceptional postcondition" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="0.00" steps="6"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="2676"/></proof>
   </goal>
   <goal name="sprod&#39;vc.4" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="2676"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="0.00" steps="6"/></proof>
   </goal>
  </transf>
  </goal>
@@ -556,7 +556,7 @@
  <goal name="add_expr&#39;vc" expl="VC for add_expr" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="add_expr&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.22"/></proof>
+  <proof prover="3"><result status="valid" time="0.36"/></proof>
   </goal>
   <goal name="add_expr&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="17"/></proof>
@@ -569,7 +569,7 @@
    <goal name="add_expr&#39;vc.3.0" expl="postcondition" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="add_expr&#39;vc.3.0.0" expl="postcondition" proved="true">
-    <proof prover="3"><result status="valid" time="0.35"/></proof>
+    <proof prover="3"><result status="valid" time="0.51"/></proof>
     </goal>
    </transf>
    </goal>
@@ -584,7 +584,7 @@
    <proof prover="0" timelimit="1"><result status="valid" time="0.19" steps="23713"/></proof>
    </goal>
    <goal name="add_expr&#39;vc.4.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.24"/></proof>
+   <proof prover="3"><result status="valid" time="0.37"/></proof>
    </goal>
   </transf>
   </goal>
@@ -648,7 +648,7 @@
      <proof prover="0" timelimit="1"><result status="valid" time="0.14" steps="23739"/></proof>
      </goal>
      <goal name="add_expr&#39;vc.17.0.0.1" expl="postcondition" proved="true">
-     <proof prover="3"><result status="valid" time="0.24"/></proof>
+     <proof prover="3"><result status="valid" time="0.37"/></proof>
      </goal>
     </transf>
     </goal>
@@ -666,7 +666,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="58"/></proof>
   </goal>
   <goal name="add_expr&#39;vc.21" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="242"/></proof>
+  <proof prover="4"><result status="valid" time="0.32" steps="242"/></proof>
   </goal>
   <goal name="add_expr&#39;vc.22" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="90630"/></proof>
@@ -950,7 +950,7 @@
   <proof prover="4"><result status="valid" time="0.02" steps="8"/></proof>
   </goal>
   <goal name="check_combination&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.23"/></proof>
+  <proof prover="3"><result status="valid" time="1.89"/></proof>
   </goal>
   <goal name="check_combination&#39;vc.19" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="19206"/></proof>
@@ -970,7 +970,7 @@
  <proof prover="2"><result status="valid" time="0.18" steps="183710"/></proof>
  </goal>
  <goal name="swap_rows&#39;vc" expl="VC for swap_rows" proved="true">
- <proof prover="2"><result status="valid" time="0.25" steps="460062"/></proof>
+ <proof prover="2"><result status="valid" time="0.51" steps="460062"/></proof>
  </goal>
  <goal name="mul_row&#39;vc" expl="VC for mul_row" proved="true">
  <proof prover="4"><result status="valid" time="0.12" steps="293"/></proof>
@@ -1102,7 +1102,7 @@
   <proof prover="4"><result status="valid" time="0.01" steps="40"/></proof>
   </goal>
   <goal name="gauss_jordan&#39;vc.29" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.48" steps="713451"/></proof>
+  <proof prover="2"><result status="valid" time="0.67" steps="713451"/></proof>
   </goal>
   <goal name="gauss_jordan&#39;vc.30" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="52"/></proof>
@@ -1151,7 +1151,7 @@
   <proof prover="4" memlimit="2000"><result status="valid" time="0.01" steps="38"/></proof>
   </goal>
   <goal name="gauss_jordan&#39;vc.39" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.61" steps="775836"/></proof>
+  <proof prover="2"><result status="valid" time="0.84" steps="775836"/></proof>
   </goal>
   <goal name="gauss_jordan&#39;vc.40" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.03" steps="50"/></proof>
@@ -1286,38 +1286,38 @@
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.16" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.22" steps="425860"/></proof>
+  <proof prover="2"><result status="valid" time="0.40" steps="425860"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.17" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="48352"/></proof>
-  <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="29"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.18" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.19" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.24" steps="425867"/></proof>
+  <proof prover="2"><result status="valid" time="0.45" steps="425867"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.20" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="48352"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="29"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="29"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.21" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="70"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.22" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.23" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.24" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.25" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.26" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="53556"/></proof>
@@ -1335,10 +1335,10 @@
   <proof prover="4"><result status="valid" time="0.02" steps="84"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.31" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.32" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.33" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="82"/></proof>
@@ -1351,13 +1351,12 @@
   </goal>
   <goal name="linear_decision&#39;vc.36" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.37" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.38" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="34"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.39" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="82"/></proof>
@@ -1370,6 +1369,7 @@
   </goal>
   <goal name="linear_decision&#39;vc.42" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.43" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
@@ -1399,10 +1399,10 @@
   <proof prover="4"><result status="valid" time="0.02" steps="80"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.52" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.03" steps="32"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.53" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.54" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="78"/></proof>
@@ -1414,14 +1414,13 @@
   <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.57" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.58" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.03" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.59" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="32"/></proof>
+  <proof prover="4"><result status="valid" time="0.02" steps="32"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.60" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="78"/></proof>
@@ -1433,7 +1432,8 @@
   <proof prover="4"><result status="valid" time="0.02" steps="34"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.63" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.64" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
@@ -1472,30 +1472,30 @@
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.76" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.30" steps="442664"/></proof>
+  <proof prover="2"><result status="valid" time="0.50" steps="442664"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.77" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="64"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.78" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.25" steps="442670"/></proof>
+  <proof prover="2"><result status="valid" time="0.40" steps="442670"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.79" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="64"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.80" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
-  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.81" expl="exceptional postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.00" steps="3546"/></proof>
+  </goal>
+  <goal name="linear_decision&#39;vc.82" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   <proof prover="4"><result status="valid" time="0.02" steps="7"/></proof>
   </goal>
-  <goal name="linear_decision&#39;vc.82" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.00" steps="3546"/></proof>
-  </goal>
   <goal name="linear_decision&#39;vc.83" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.84" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.02" steps="54617"/></proof>
@@ -1546,16 +1546,16 @@
   <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.99" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.100" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.101" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
   </goal>
   <goal name="linear_decision&#39;vc.102" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="3546"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="3546"/></proof>
   </goal>
  </transf>
  </goal>
@@ -1586,7 +1586,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="4246"/></proof>
   </goal>
   <goal name="simp&#39;vc.7" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.17" steps="322428"/></proof>
+  <proof prover="2"><result status="valid" time="0.32" steps="322428"/></proof>
   </goal>
   <goal name="simp&#39;vc.8" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.18" steps="327276"/></proof>
@@ -1607,7 +1607,7 @@
   <proof prover="2"><result status="valid" time="0.18" steps="322456"/></proof>
   </goal>
   <goal name="simp&#39;vc.14" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.18" steps="327547"/></proof>
+  <proof prover="2"><result status="valid" time="0.32" steps="327547"/></proof>
   </goal>
   <goal name="simp&#39;vc.15" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.02" steps="20"/></proof>
@@ -1672,7 +1672,7 @@
  </transf>
  </goal>
  <goal name="simp_eq&#39;vc" expl="VC for simp_eq" proved="true">
- <proof prover="2"><result status="valid" time="0.32" steps="599027"/></proof>
+ <proof prover="2"><result status="valid" time="0.51" steps="599027"/></proof>
  </goal>
  <goal name="simp_ctx&#39;vc" expl="VC for simp_ctx" proved="true">
  <proof prover="4"><result status="valid" time="0.15" steps="844"/></proof>
@@ -1746,13 +1746,13 @@
   <goal name="cross_ind&#39;vc.2" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="cross_ind&#39;vc.2.0" expl="VC for cross_ind" proved="true">
-   <proof prover="3" timelimit="10"><result status="valid" time="2.12"/></proof>
+   <proof prover="3" timelimit="10"><result status="valid" time="3.26"/></proof>
    </goal>
    <goal name="cross_ind&#39;vc.2.1" expl="VC for cross_ind" proved="true">
    <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
    </goal>
    <goal name="cross_ind&#39;vc.2.2" expl="VC for cross_ind" proved="true">
-   <proof prover="3" timelimit="10"><result status="valid" time="2.17"/></proof>
+   <proof prover="3" timelimit="10"><result status="valid" time="3.03"/></proof>
    </goal>
    <goal name="cross_ind&#39;vc.2.3" expl="VC for cross_ind" proved="true">
    <proof prover="2"><result status="valid" time="0.01" steps="10374"/></proof>
@@ -1888,7 +1888,7 @@
    <goal name="radd&#39;vc.1.3" expl="VC for radd" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="radd&#39;vc.1.3.0" expl="VC for radd" proved="true">
-    <proof prover="3" timelimit="10"><result status="valid" time="0.54"/></proof>
+    <proof prover="3" timelimit="10"><result status="valid" time="0.98"/></proof>
     </goal>
    </transf>
    </goal>
@@ -2207,7 +2207,7 @@
  <proof prover="4"><result status="valid" time="0.16" steps="173"/></proof>
  </goal>
  <goal name="m_expr&#39;vc" expl="VC for m_expr" proved="true">
- <proof prover="4"><result status="valid" time="0.50" steps="2134"/></proof>
+ <proof prover="4"><result status="valid" time="0.72" steps="2134"/></proof>
  </goal>
  <goal name="m_eq&#39;vc" expl="VC for m_eq" proved="true">
  <proof prover="4"><result status="valid" time="0.04" steps="137"/></proof>
@@ -2473,7 +2473,7 @@
   <proof prover="2"><result status="valid" time="0.04" steps="45899"/></proof>
   </goal>
   <goal name="add_sub_exp&#39;vc.56" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.19" steps="2145"/></proof>
+  <proof prover="4"><result status="valid" time="0.34" steps="2145"/></proof>
   </goal>
   <goal name="add_sub_exp&#39;vc.57" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="46113"/></proof>
@@ -2719,7 +2719,7 @@
  <goal name="madd&#39;vc" expl="VC for madd" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="madd&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.40" steps="161"/></proof>
+  <proof prover="4"><result status="valid" time="0.61" steps="161"/></proof>
   </goal>
   <goal name="madd&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="48811"/></proof>
@@ -2812,7 +2812,7 @@
  <goal name="meq&#39;vc" expl="VC for meq" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="meq&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.52" steps="226"/></proof>
+  <proof prover="4"><result status="valid" time="0.86" steps="226"/></proof>
   </goal>
   <goal name="meq&#39;vc.1" expl="postcondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -3071,7 +3071,7 @@
  <proof prover="0"><result status="valid" time="0.29" steps="60223"/></proof>
  </goal>
  <goal name="m_ctx&#39;vc" expl="VC for m_ctx" proved="true">
- <proof prover="4"><result status="valid" time="0.11" steps="655"/></proof>
+ <proof prover="4"><result status="valid" time="0.24" steps="655"/></proof>
  </goal>
  <goal name="mp_decision&#39;vc" expl="VC for mp_decision" proved="true">
  <transf name="split_vc" proved="true" >
@@ -3088,13 +3088,13 @@
   <proof prover="2"><result status="valid" time="0.23" steps="192550"/></proof>
   </goal>
   <goal name="mp_decision&#39;vc.4" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.01" steps="9470"/></proof>
+  <proof prover="2"><result status="valid" time="0.02" steps="9470"/></proof>
   </goal>
   <goal name="mp_decision&#39;vc.5" expl="exceptional postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="9470"/></proof>
   </goal>
   <goal name="mp_decision&#39;vc.6" expl="exceptional postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.02" steps="9470"/></proof>
+  <proof prover="2"><result status="valid" time="0.01" steps="9470"/></proof>
   </goal>
  </transf>
  </goal>
@@ -3214,7 +3214,7 @@
   <proof prover="4"><result status="valid" time="0.06" steps="181"/></proof>
   </goal>
   <goal name="max_var&#39;&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.12" steps="168168"/></proof>
+  <proof prover="2"><result status="valid" time="0.26" steps="168168"/></proof>
   </goal>
   <goal name="max_var&#39;&#39;vc.4" expl="variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.07" steps="179"/></proof>
@@ -3257,7 +3257,7 @@
   <proof prover="2"><result status="valid" time="0.15" steps="170445"/></proof>
   </goal>
   <goal name="max_var_e&#39;&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.15" steps="188221"/></proof>
+  <proof prover="2"><result status="valid" time="0.27" steps="188221"/></proof>
   </goal>
   <goal name="max_var_e&#39;&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.06" steps="94"/></proof>
@@ -3353,7 +3353,7 @@
   <proof prover="4"><result status="valid" time="0.08" steps="46"/></proof>
   </goal>
   <goal name="interp_holds&#39;&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.13" steps="186512"/></proof>
+  <proof prover="2"><result status="valid" time="0.26" steps="186512"/></proof>
   </goal>
  </transf>
  </goal>
@@ -3366,7 +3366,7 @@
   <proof prover="2"><result status="valid" time="0.07" steps="182249"/></proof>
   </goal>
   <goal name="impl_holds&#39;&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.15" steps="208251"/></proof>
+  <proof prover="2"><result status="valid" time="0.28" steps="208251"/></proof>
   </goal>
   <goal name="impl_holds&#39;&#39;vc.3" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.07" steps="47"/></proof>
@@ -3410,7 +3410,7 @@
  <goal name="interp_ctx_impl&#39;&#39;vc" expl="VC for interp_ctx_impl&#39;" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="interp_ctx_impl&#39;&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.16" steps="209022"/></proof>
+  <proof prover="2"><result status="valid" time="0.30" steps="209022"/></proof>
   </goal>
   <goal name="interp_ctx_impl&#39;&#39;vc.1" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.19" steps="186577"/></proof>
@@ -3443,7 +3443,7 @@
  <goal name="impl_self&#39;vc" expl="VC for impl_self" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="impl_self&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.16" steps="202719"/></proof>
+  <proof prover="2"><result status="valid" time="0.30" steps="202719"/></proof>
   </goal>
   <goal name="impl_self&#39;vc.1" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.14" steps="179915"/></proof>
@@ -3477,7 +3477,7 @@
   <proof prover="4"><result status="valid" time="0.14" steps="222"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.17" steps="872"/></proof>
+  <proof prover="4"><result status="valid" time="0.38" steps="872"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.13" steps="165"/></proof>
@@ -3489,7 +3489,7 @@
   <proof prover="4"><result status="valid" time="0.15" steps="245"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.22" steps="538"/></proof>
+  <proof prover="4"><result status="valid" time="0.38" steps="538"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.12" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.14" steps="165"/></proof>
@@ -3501,7 +3501,7 @@
   <proof prover="4"><result status="valid" time="0.18" steps="247"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="1.37" steps="2803"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="2.19" steps="2803"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.16" expl="postcondition" proved="true">
   <proof prover="4" memlimit="2000"><result status="valid" time="0.11" steps="165"/></proof>
@@ -3513,7 +3513,7 @@
   <proof prover="4"><result status="valid" time="0.10" steps="247"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="4" memlimit="2000"><result status="valid" time="1.37" steps="2803"/></proof>
+  <proof prover="4" memlimit="2000"><result status="valid" time="2.14" steps="2803"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.20" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.15" steps="243"/></proof>
@@ -3574,7 +3574,7 @@
   <proof prover="2"><result status="valid" time="0.09" steps="106501"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.37" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.70" steps="598"/></proof>
+  <proof prover="4"><result status="valid" time="1.06" steps="598"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.38" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.21" steps="217022"/></proof>
@@ -3589,7 +3589,7 @@
   <proof prover="2"><result status="valid" time="0.04" steps="105444"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.42" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.38" steps="471"/></proof>
+  <proof prover="4"><result status="valid" time="0.72" steps="471"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.43" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.01" steps="10946"/></proof>
@@ -3616,7 +3616,7 @@
   <proof prover="2"><result status="valid" time="0.04" steps="108594"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.51" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.18" steps="280616"/></proof>
+  <proof prover="2"><result status="valid" time="0.33" steps="280616"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.52" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.04" steps="109844"/></proof>
@@ -3703,7 +3703,7 @@
     <goal name="prop_ctx&#39;vc.75.3.0" expl="VC for prop_ctx" proved="true">
     <transf name="split_all_full" proved="true" >
      <goal name="prop_ctx&#39;vc.75.3.0.0" expl="VC for prop_ctx" proved="true">
-     <proof prover="0" timelimit="15" memlimit="2000"><result status="valid" time="2.35" steps="342336"/></proof>
+     <proof prover="0" timelimit="15" memlimit="2000"><result status="valid" time="4.28" steps="342336"/></proof>
      </goal>
     </transf>
     </goal>
@@ -3734,7 +3734,7 @@
   <proof prover="2"><result status="valid" time="0.23" steps="213983"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.83" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.26" steps="451"/></proof>
+  <proof prover="4"><result status="valid" time="0.40" steps="451"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.84" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.11" steps="52"/></proof>
@@ -3834,7 +3834,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="10946"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.116" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.16" steps="218332"/></proof>
+  <proof prover="2"><result status="valid" time="0.28" steps="218332"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.117" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.16" steps="204013"/></proof>
@@ -3888,16 +3888,16 @@
   <proof prover="4"><result status="valid" time="0.07" steps="69"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.133" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.14" steps="209644"/></proof>
+  <proof prover="2"><result status="valid" time="0.30" steps="209644"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.134" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="37"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.135" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.48" steps="181"/></proof>
+  <proof prover="4"><result status="valid" time="0.76" steps="181"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.136" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.14" steps="211316"/></proof>
+  <proof prover="2"><result status="valid" time="0.31" steps="211316"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.137" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.09" steps="197"/></proof>
@@ -3921,7 +3921,7 @@
   <proof prover="4"><result status="valid" time="0.08" steps="37"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.144" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.44" steps="181"/></proof>
+  <proof prover="4"><result status="valid" time="0.73" steps="181"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.145" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.28" steps="211411"/></proof>
@@ -4012,11 +4012,11 @@
   <proof prover="4"><result status="valid" time="0.10" steps="35"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.174" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.14" steps="214947"/></proof>
+  <proof prover="2"><result status="valid" time="0.28" steps="214947"/></proof>
   <proof prover="4"><result status="valid" time="0.08" steps="40"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.175" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.14" steps="209896"/></proof>
+  <proof prover="2"><result status="valid" time="0.30" steps="209896"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.176" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.10" steps="97"/></proof>
@@ -4032,11 +4032,11 @@
   <proof prover="2"><result status="valid" time="0.23" steps="201549"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.180" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.15" steps="209370"/></proof>
+  <proof prover="2"><result status="valid" time="0.27" steps="209370"/></proof>
   <proof prover="4"><result status="valid" time="0.06" steps="36"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.181" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.14" steps="209534"/></proof>
+  <proof prover="2"><result status="valid" time="0.28" steps="209534"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.182" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.26" steps="210934"/></proof>
@@ -4045,7 +4045,7 @@
   <proof prover="4"><result status="valid" time="0.12" steps="287"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.184" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.15" steps="211496"/></proof>
+  <proof prover="2"><result status="valid" time="0.29" steps="211496"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.185" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.15" steps="217765"/></proof>
@@ -4057,7 +4057,7 @@
   <proof prover="2"><result status="valid" time="0.03" steps="10946"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.188" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.15" steps="200063"/></proof>
+  <proof prover="2"><result status="valid" time="0.29" steps="200063"/></proof>
   <proof prover="4"><result status="valid" time="0.14" steps="35"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.189" expl="postcondition" proved="true">
@@ -4143,7 +4143,7 @@
   <proof prover="2"><result status="valid" time="0.01" steps="10946"/></proof>
   </goal>
   <goal name="prop_ctx&#39;vc.216" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.17" steps="286709"/></proof>
+  <proof prover="2"><result status="valid" time="0.30" steps="286709"/></proof>
   </goal>
  </transf>
  </goal>
@@ -4224,7 +4224,7 @@
     <proof prover="4"><result status="valid" time="0.08" steps="47"/></proof>
     </goal>
     <goal name="g&#39;.0.0.1" proved="true">
-    <proof prover="2"><result status="valid" time="0.14" steps="199477"/></proof>
+    <proof prover="2"><result status="valid" time="0.34" steps="199477"/></proof>
     </goal>
     <goal name="g&#39;.0.0.2" proved="true">
     <proof prover="2"><result status="valid" time="0.15" steps="199476"/></proof>
