@@ -493,6 +493,50 @@
    </goal>
   </transf>
   </goal>
+  <goal name="decode_encode&#39;vc.3" expl="assertion">
+  <transf name="simplify_computations" >
+   <goal name="decode_encode&#39;vc.3.0" expl="assertion">
+   <proof prover="1"><result status="valid" time="0.06" steps="12364"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="decode_encode&#39;vc.1" expl="assertion">
+  <proof prover="2"><result status="valid" time="0.50" steps="670"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.1" expl="assertion">
+  <proof prover="2"><result status="valid" time="0.04" steps="66"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.3" expl="assertion">
+  <transf name="simplify_computations" >
+   <goal name="decode_encode&#39;vc.3.0" expl="assertion">
+   <proof prover="1"><result status="valid" time="0.07" steps="13220"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="decode_encode&#39;vc.0" expl="assertion">
+  <proof prover="0"><result status="valid" time="0.04" steps="71713"/></proof>
+  </goal>
+  <goal name="decode_encode&#39;vc.3" expl="assertion">
+  <transf name="split_vc" >
+   <goal name="decode_encode&#39;vc.3.0" expl="assertion">
+   <transf name="simplify_computations" >
+    <goal name="decode_encode&#39;vc.3.0.0" expl="assertion">
+    <proof prover="1"><result status="valid" time="0.06" steps="12515"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="decode_encode&#39;vc.3.1" expl="VC for decode_encode">
+   <proof prover="2"><result status="valid" time="0.02" steps="18"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="decode_encode&#39;vc.0" expl="assertion">
+  <transf name="simplify_computations" >
+   <goal name="decode_encode&#39;vc.0.0" expl="assertion">
+   <proof prover="1"><result status="valid" time="0.06" steps="11882"/></proof>
+   </goal>
+  </transf>
+  </goal>
  </transf>
  </goal>
 </theory>
