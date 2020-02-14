@@ -207,6 +207,7 @@ class WhyMLLexer(RegexLexer):
             (r'\s+', Text),
             (r'\(\*\)', Operator),
             (r'\(\*', Comment, 'comment'),
+            (r'\[@[^]]*\]', Comment),
             (words(keywords, suffix=r'\b'), Keyword),
             (r'[-~!%^&*+=|?<>/\\]', Operator),
             (r'[][{};:.,()]', Punctuation),
@@ -222,7 +223,6 @@ class WhyMLLexer(RegexLexer):
 
             (r"'", Keyword),
             (r'"', String.Double, 'string'),
-            (r'\[@[^]]*\]', Comment),
         ],
         'comment': [
             (r'[^(*)]+', Comment),
