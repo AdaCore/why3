@@ -6,9 +6,6 @@ Executing WhyML Programs
 This chapter shows how WhyML code can be executed, either by being
 interpreted or compiled to some existing programming language.
 
-Let us consider the program in :numref:`fig.maxandsum` on page  that
-computes the maximum and the sum of an array of integers.
-
 Let us consider the program of :numref:`sec.maxandsum` that computes the
 maximum and the sum of an array of integers.
 
@@ -73,7 +70,7 @@ OCaml code for function ``max_sum``. To compile it, we create a file
     let () = Format.printf "sum=%s, max=%s@." (Z.to_string s) (Z.to_string m)
 
 It is convenient to use :program:`ocamlbuild` to compile and link both files
-file:`max_sum.ml` and file:`main.ml`:
+:file:`max_sum.ml` and :file:`main.ml`:
 
 ::
 
@@ -91,7 +88,7 @@ Extraction Starting Point.
 
 The :why3-tool:`extract` command accepts three different targets for extraction:
 a WhyML file, a module, or a symbol (function, type, exception). To
-extract all the symbols from every module of a file named ``f.mlw``, one
+extract all the symbols from every module of a file named :file:`f.mlw`, one
 should write
 
 ::
@@ -122,21 +119,21 @@ The following options can be added to the extraction command line:
 
 .. option:: --flat
 
-   perform a flat extraction, *i.e.*, everything is extracted into a
+   Perform a flat extraction, *i.e.*, everything is extracted into a
    single file. This is the default behavior. The :option:`-o` option should
    be given the name of a file or, if omitted, the result of extraction
    is printed to the standard output.
 
 .. option:: --modular
 
-    each module is extracted in its own, separated file. The :option:`-o`
+    Each module is extracted in its own, separated file. The :option:`-o`
     option cannot be omitted, and it should be given the name of an
     existing directory. This directory will be populated with the
     resulting OCaml files.
 
 .. option:: --recursive
 
-    recursively extracts all the dependencies of the chosen entry point.
+    Recursively extract all the dependencies of the chosen entry point.
     This option is valid for both :option:`--modular` and :option:`--flat` options.
 
 Examples.
@@ -144,8 +141,6 @@ Examples.
 
 We illustrate different ways of using the :why3-tool:`extract` command through
 some examples.
-
-Consider the program in :numref:`fig.aqueue` on page .
 
 Consider the program of :numref:`sec.aqueue`.
 
