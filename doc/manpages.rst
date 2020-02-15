@@ -32,6 +32,10 @@ The following commands are available:
     provides a graphical interface to display goals and to run provers
     and transformations on them.
 
+:why3-tool:`pp`
+    pretty-prints WhyML definitions (formatting :file:`.mlw` files
+    or printing inductive definitions to LaTeX).
+
 :why3-tool:`prove`
     reads WhyML input files and calls provers, on the command-line.
 
@@ -53,7 +57,7 @@ All these commands are also available as standalone executable files, if
 needed.
 
 The commands accept a common subset of command-line options. In
-particular, option :option:`why3 --help` displays the usage and options.
+particular, option :option:`--help` displays the usage and options.
 
 .. option:: -L <dir>, --library <dir>
 
@@ -104,6 +108,7 @@ particular, option :option:`why3 --help` displays the usage and options.
    display the usage and the exact list of options for the given tool.
 
 
+.. index:: configuration file
 .. why3-tool:: config
 .. _sec.why3config:
 
@@ -118,7 +123,7 @@ new prover is installed.
 
 The provers that Why3 attempts to detect are described in the readable
 configuration file :file:`provers-detection-data.conf` of the Why3 data
-directory (:file:`/usr/local/share/why3`). Advanced users may try to modify
+directory (e.g., :file:`/usr/local/share/why3`). Advanced users may try to modify
 this file to add support for detection of other provers. (In that case,
 please consider submitting a new prover configuration on the bug
 tracking system.)
@@ -127,11 +132,11 @@ The result of provers detection is stored in the user’s configuration
 file (:file:`~/.why3.conf` or, in the case of local installation,
 :file:`why3.conf` in Why3 sources top directory). This file is also
 human-readable, and advanced users may modify it in order to experiment
-with different ways of calling provers, different versions of the same
+with different ways of calling provers, e.g., different versions of the same
 prover, or with different options.
 
-The :why3-tool:`config` command also detects the plugins installed in the Why3
-plugins directory (:file:`/usr/local/lib/why3/plugins`). A plugin must
+The :why3-tool:`config` command also detects the :index:`plugins <plugin>` installed in the Why3
+plugins directory (e.g., :file:`/usr/local/lib/why3/plugins`). A plugin must
 register itself as a parser, a transformation or a printer, as explained
 in the corresponding section.
 
@@ -168,7 +173,7 @@ The ``prove`` Command
 Why3 is primarily used to call provers on goals contained in an input
 file. By default, such a file must be written in WhyML language
 (extension :file:`.mlw`). However, a dynamically loaded plugin can register
-a parser for some other format of logical problems, TPTP or SMT-LIB.
+a parser for some other format of logical problems, e.g., TPTP or SMT-LIB.
 
 The :why3-tool:`prove` command executes the following steps:
 
@@ -238,14 +243,14 @@ Additional Options
 
 .. option:: --extra-expl-prefix <s>
 
-   specify *s* as an additional prefix for labels that denotes VC
+   Specify *s* as an additional prefix for labels that denotes VC
    explanations. The option can be used several times to specify
    several prefixes.
 
 Getting Potential Counterexamples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-That feature is presented in details in :numref:`sec.idece`, that should
+That feature is presented in details in :numref:`sec.idece`, which should
 be read first.
 
 Counterexamples are also displayed by the :why3-tool:`prove` command when
@@ -320,14 +325,14 @@ HighFailure
 
 Additionally, a proof attempt can have the following attributes:
 
-obsolete
+:index:`obsolete`
     The prover associated to that proof attempt has not been run on the
     current task, but on an earlier version of that task. You need to
     replay the proof attempt, run the prover with the current task of
     the proof attempt, in order to update the answer of the prover and
     remove this attribute.
 
-detached
+:index:`detached`
     The proof attempt is not associated to a proof task anymore. The
     reason might be that a proof goal disappeared, or that there is a
     syntax or typing error in the current file, that makes all nodes
@@ -352,81 +357,84 @@ The left toolbar that was present in former versions of Why3 is now
 replaced by a context menu activited by clicking the right mouse button,
 while cursor is on a given row of the proof session tree.
 
-provers
-    The detected provers are listed. Note that you can hide some provers
-    of that list using the preferences, tab :guilabel:`Provers`.
+*Prover list*
+    lists the detected provers. Note that you can hide some provers
+    of that list using :menuselection:`File --> Preferences`, tab :guilabel:`Provers`.
 
-strategies
-    the set of known strategies is listed
+*Strategy list*
+    lists the set of known strategies.
 
-Edit
+:guilabel:`Edit`
     starts an editor on the selected task.
 
-Replay valid obsolete proofs
+:guilabel:`Replay valid obsolete proofs`
     all proof nodes below the selected nodes that are obsolete but whose
     former status was Valid are replayed.
 
-Replay all obsolete proofs
+:guilabel:`Replay all obsolete proofs`
     all proof nodes below the selected nodes that are obsolete are
     replayed.
 
-Remove
+:guilabel:`Clean node`
+    removes any unsuccessful proof attempt for which there is another
+    successful proof attempt for the same goal.
+
+:guilabel:`Remove node`
     removes a proof attempt or a transformation.
 
-Clean
-    removes any unsuccessful proof attempt for which there is another
-    successful proof attempt for the same goal
-
-Interrupt
+:guilabel:`Interrupt`
     cancels all the proof attempts currently scheduled or running.
 
 Global Menus
 ~~~~~~~~~~~~
 
-Menu *File*
-    Add File to session
+Menu :menuselection:`File`
+    :menuselection:`--> Add File to session`
         adds a file in the current proof session.
 
-    Preferences
+    :menuselection:`--> Preferences`
         opens a window for modifying preferred configuration parameters,
         see details below.
 
-    Save session
+    :menuselection:`--> Save session`
         saves current session state on disk. The policy to decide when
         to save the session is configurable, as described in the
         preferences below.
 
-    Save files
+    :menuselection:`--> Save files`
         saves edited soruce files on disk.
 
-    Save session and files
+    :menuselection:`--> Save session and files`
         saves both current session state and edited files on disk.
 
-    Save all and Refresh session
+    :menuselection:`--> Save all and Refresh session`
         save session and edited files, and refresh the current session
         tree.
 
-    Quit
+    :menuselection:`--> Quit`
         exits the GUI.
 
-Menu *Tools*
-    Strategies
-        section provides a set of actions that are performed on the
+Menu :menuselection:`Tools`
+    :menuselection:`--> Strategies`
+        provides a set of actions that are performed on the
         selected goal(s):
 
-        Split VC
+        :menuselection:`--> Split VC`
             splits the current goal into subgoals.
 
-        Auto level 0
+        :menuselection:`--> Auto level 0`
             is a basic proof search strategy that applies a few provers
             on the goal with a short time limit.
 
-        Auto level 1
+        :menuselection:`--> Auto level 1`
+            is the same as level 0 but with a longer time limit.
+
+        :menuselection:`--> Auto level 2`
             is a strategy that first applies a few provers on the goal
             with a short time limit, then splits the goal and tries
-            again on the subgoals
+            again on the subgoals.
 
-        Auto level 2
+        :menuselection:`--> Auto level 3`
             is a strategy more elaborate than level 1, that attempts to
             apply a few transformations that are typically useful. It
             also tries the provers with a larger time limit.
@@ -435,7 +443,7 @@ Menu *Tools*
         :numref:`sec.strategies`, as well as a description on how to
         design strategies of your own.
 
-    Provers
+    :menuselection:`--> Provers`
         provide a menu item for each detected prover. Clicking on such
         an item starts the corresponding prover on the selected goal(s).
         To start a prover with a different time limit, you may either
@@ -443,94 +451,94 @@ Menu *Tools*
         text command field and type the prover name followed by the time
         limit.
 
-    Transformations
+    :menuselection:`--> Transformations`
         gives access to all the known transformations.
 
-    Edit
+    :menuselection:`--> Edit`
         starts an editor on the selected task.
 
-        For automatic provers, this allows to see the file sent to the
+        For automatic provers, this shows the file sent to the
         prover.
 
-        For interactive provers, this also allows to add or modify the
+        For interactive provers, this also makes it possible to add or modify the
         corresponding proof script. The modifications are saved, and can
         be retrieved later even if the goal was modified.
 
-    Replay valid obsolete proofs
+    :menuselection:`--> Replay valid obsolete proofs`
         replays all the obsolete proofs below the current node whose
         former state was Valid.
 
-    Replay all obsolete proofs
+    :menuselection:`--> Replay all obsolete proofs`
         replays all the obsolete proofs below the current node.
 
-    Clean
+    :menuselection:`--> Clean node`
         removes any unsuccessful proof attempt for which there is
-        another successful proof attempt for the same goal
+        another successful proof attempt for the same goal.
 
-    Remove
+    :menuselection:`--> Remove node`
         removes a proof attempt or a transformation.
 
-    Mark obsolete
-        marks all the proof as obsolete. This allows to replay every
+    :menuselection:`--> Mark obsolete`
+        marks all the proof as obsolete. This makes it possible to replay every
         proof.
 
-    Interrupt
+    :menuselection:`--> Interrupt`
         cancels all the proof attempts currently scheduled or running.
 
-    Bisect
+    :menuselection:`--> Bisect`
         performs a reduction of the context for the the current selected
         proof attempt, which must be a Valid one.
 
-    Focus
-        focus the tree session view to the current node
+    :menuselection:`--> Focus`
+        focus the tree session view to the current node.
 
-    Unfocus
-        undoes the Focus action
+    :menuselection:`--> Unfocus`
+        undoes the Focus action.
 
-    Copy
-        Marks of proof sub-tree for copy/past action
+    :menuselection:`--> Copy`
+        marks the proof sub-tree for copy/past action.
 
-    Paste
-        Paste the previously selected sub-tree under the current node
+    :menuselection:`--> Paste`
+        pastes the previously selected sub-tree under the current node.
 
-Menu *View*
-    Enlarge font
-        selects a large font
+Menu :menuselection:`View`
+    :menuselection:`--> Enlarge font`
+        selects a large font.
 
-    Reduce font
-        selects a smaller font
+    :menuselection:`--> Reduce font`
+        selects a smaller font.
 
-    Collapse proved goals
+    :menuselection:`--> Collapse proved goals`
         closes all the rows of the tree view that are proved.
 
-    Expand All
+    :menuselection:`--> Expand All`
         expands all the rows of the tree view.
 
-    Collapse under node
+    :menuselection:`--> Collapse under node`
         closes all the rows of the tree view under the given node that
         are proved.
 
-    Expand below node
-        expands the children below the current node
+    :menuselection:`--> Expand below node`
+        expands the children below the current node.
 
-    Expand all below node
-        expands the whole subtree of the current node
+    :menuselection:`--> Expand all below node`
+        expands the whole subtree of the current node.
 
-    Go to parent node
-        move to the parent of the current node
+    :menuselection:`--> Go to parent node`
+        moves to the parent of the current node.
 
-    Go to first child
-        mode to the first child of the current node
+    :menuselection:`--> Go to first child`
+        moves to the first child of the current node.
 
-    Select next unproven goal
-        go to the next unproven goal after the current node
+    :menuselection:`--> Select next unproven goal`
+        moves to the next unproven goal after the current node.
 
-Menu *Help*
-    Legend
-        Explanations of the meaning of the various icons
+Menu :menuselection:`Help`
+    :menuselection:`--> Legend`
+        explains the meaning of the various icons.
 
-    About
-        some information about this software.
+    :menuselection:`--> About`
+        gives some information about this software.
 
 Command-line interface
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -538,7 +546,7 @@ Command-line interface
 Between the top-right zone containing source files and task, and the
 bottom-right zone containing various messages, a text input field allows
 the user to invoke commands using a textual interface (see
-:numref:`fig.gui1`). The ’help’ command displays a basic list of
+:numref:`fig.gui1`). The ``help`` command displays a basic list of
 available commands. All commands available in the menus are also
 available as a textual command. However the textual interface allows for
 much more possibilities, including the ability to invoke transformations
@@ -615,7 +623,7 @@ Tab :guilabel:`General`
           session is saving on exit
 
        -  never save on exit: the current state of the session is never
-          saved automatically, you must use menu *File/Save session*
+          saved automatically, you must use menu :menuselection:`File --> Save session`
 
        -  ask whether to save: on exit, a popup window asks whether you
           want to save or not.
@@ -677,12 +685,23 @@ corresponding proof attempt in the tree. Alternatively, one can use the
 key shortcut :kbd:`G` or type ``get-ce`` in the command entry. The result can
 be seen on :numref:`fig.ce_example0_p2`: the same prover but with the
 alternative *counterexamples* is run. The resulting counterexample is
-displayed in two different ways. First, it is displayed in the *Task* tab of
+displayed in two different ways. First, it is displayed in the :guilabel:`Task` tab of
 the top-right window, at the end of the text of the task, under the form
 of a list of pairs “variable = value”, ordered by the line number of the
 source code in which that variable takes that value. Second, it is
 displayed in the *Counterexample* tab of the bottom right window, this time interleaved
 with the code, as shown in :numref:`fig.ce_example0_p2`.
+
+
+.. %%Generation of the screenshots:
+.. %%Those commands follow the style of starting.tex. To execute them one needs to
+.. %%do make update-doc-png.
+.. %EXECUTE rm -rf doc/cedoc/
+.. %EXECUTE cp bench/ce/cedoc.mlw doc/
+.. %EXECUTE bin/why3 ide -C doc/why3ide-doc.conf --batch "down;down;type cvc4;wait 2;down;snap -crop 1024x600+0+0 doc/images/ce_example0_p1.png" doc/cedoc.mlw
+.. %EXECUTE bin/why3 ide -C doc/why3ide-doc.conf --batch "down;down;type cvc4;wait 2;down;type get-ce;wait 2;down;faketype get-ce;snap -crop 1024x600+0+0 doc/images/ce_example0_p2.png" doc/cedoc.mlw
+.. %%Cleaning of the environment
+.. %EXECUTE rm -r doc/cedoc.mlw
 
 .. _fig.ce_example0_p1:
 
@@ -755,7 +774,7 @@ arrows and values on the right “(index => value)”. The meaning of the
 keyword ``others`` is the value for all indices that were not mentioned
 yet. This shows that setting the parameter ``x`` to a map that has value
 3 for index 1 and zero for all other indices is a counterexample. We can
-check that this negates the Why3ensures clause.
+check that this negates the ``ensures`` clause.
 
 Known limitations
 ^^^^^^^^^^^^^^^^^
@@ -802,14 +821,14 @@ new run are shown.
 Nothing is shown when there is no change in the results, whether the
 considered goal is proved or not. When all the proof are done, a summary
 of what is proved or not is displayed using a tree-shape pretty print,
-similar to the IDE tree view after doing “Collapse proved goals”. In
+similar to the IDE tree view after doing :menuselection:`View --> Collapse proved goals`. In
 other words, when a goal, a theory, or a file is fully proved, the
 subtree is not shown.
 
 Obsolete proofs
 ~~~~~~~~~~~~~~~
 
-When some proof attempts stored in the session file are obsolete, the
+When some proof attempts stored in the session file are :index:`obsolete`, the
 replay is run anyway, as with the replay button in the IDE. Then, the
 session file will be updated if both
 
@@ -819,7 +838,7 @@ session file will be updated if both
 -  every goals are proved.
 
 In other cases, you can use the IDE to update the session, or use the
-option :option:`why3 replay --force` described below.
+option :option:`--force` described below.
 
 Exit code and options
 ~~~~~~~~~~~~~~~~~~~~~
@@ -831,29 +850,29 @@ Options are:
 
 .. option:: -s
 
-   suppress the output of the final tree view.
+   Suppress the output of the final tree view.
 
 .. option:: -q
 
-   run quietly (no progress info).
+   Run quietly (no progress info).
 
 .. option:: --force
 
-   enforce saving the session, if all proof attempts replayed
+   Enforce saving the session, if all proof attempts replayed
    correctly, even if some goals are not proved.
 
 .. option:: --obsolete-only
 
-   replay the proofs only if the session contains obsolete proof
+   Replay the proofs only if the session contains obsolete proof
    attempts.
 
 .. option:: --smoke-detector {none|top|deep}
 
-   try to detect if the context is self-contradicting.
+   Try to detect if the context is self-contradicting.
 
 .. option:: --prover <prover>
 
-   restrict the replay to the selected provers only.
+   Restrict the replay to the selected provers only.
 
 Smoke detector
 ~~~~~~~~~~~~~~
@@ -956,20 +975,20 @@ session, depending on the following specific options.
 
 .. option:: --provers
 
-   print the provers that appear inside the session, one by line.
+   Print the provers that appear inside the session, one by line.
 
 .. option:: --edited-files
 
-   print all the files that appear in the session as edited proofs.
+   Print all the files that appear in the session as edited proofs.
 
 .. option:: --stats
 
-   print various proofs statistics, as detailed below.
+   Print various proofs statistics, as detailed below.
 
 .. option:: --print0
 
-   separate the results of the options :option:`--provers` and
-   :option:`--edited-files` by the character number 0 instead of end of line
+   Separate the results of the options :option:`--provers` and
+   :option:`--edited-files` by the null character ``\0`` instead of end of line
    ``\n``. That allows you to safely use (even if the filename contains
    space or carriage return) the result with other commands. For
    example you can count the number of proof line in all the coq edited
@@ -1071,8 +1090,8 @@ The specific options are
 
    produce a table for the given element, which is either a file, a
    theory or a root goal. The element must be specified using its path
-   in dot notation, ``file.theory.goal``. The file produced is named
-   accordingly, :file:`file.theory.goal.tex`. This option can be given
+   in dot notation, e.g., ``file.theory.goal``. The file produced is named
+   accordingly, e.g., :file:`file.theory.goal.tex`. This option can be given
    several times to produce several tables in one run. When this option
    is given at least once, the default behavior that is to produce one
    table per theory is disabled.
@@ -1084,46 +1103,48 @@ The generated LaTeX files contain some macros that must be defined
 externally. Various definitions can be given to them to customize the
 output.
 
-``provername``
-    macro with one parameter, a prover name
+``\provername``
+    macro with one parameter, a prover name.
 
-``valid``
+``\valid``
     macro with one parameter, used where the corresponding prover
     answers that the goal is valid. The parameter is the time in
     seconds.
 
-``noresult``
+``\noresult``
     macro without parameter, used where no result exists for the
-    corresponding prover
+    corresponding prover.
 
-``timeout``
+``\timeout``
     macro without parameter, used where the corresponding prover reached
-    the time limit
+    the time limit.
 
-``explanation``
-    macro with one parameter, the goal name or its explanation
+``\explanation``
+    macro with one parameter, the goal name or its explanation.
 
-+----+----+----+----+----+----+
-+----+----+----+----+----+----+
-+----+----+----+----+----+----+
-+----+----+----+----+----+----+
-+----+----+----+----+----+----+
-+----+----+----+----+----+----+
+Here are some examples of macro definitions:
 
-+---------------------+----+----+----+----+----+
-| Proof obligations   |    |    |    |    |    |
-+=====================+====+====+====+====+====+
-+---------------------+----+----+----+----+----+
-+---------------------+----+----+----+----+----+
-+---------------------+----+----+----+----+----+
-+---------------------+----+----+----+----+----+
-+---------------------+----+----+----+----+----+
-+---------------------+----+----+----+----+----+
+.. code-block:: latex
 
-:numref:`fig.custom-latex` suggests some definitions for these macros,
-while Figures [fig:latex] and [fig:latexstyle2] show the tables obtained
-from the HelloProof example of :numref:`chap.starting`, respectively
-with style 1 and 2.
+   \usepackage{xcolor}
+   \usepackage{colortbl}
+   \usepackage{rotating}
+
+   \newcommand{\provername}[1]{\cellcolor{yellow!25}
+   \begin{sideways}\textbf{#1}~~\end{sideways}}
+   \newcommand{\explanation}[1]{\cellcolor{yellow!13}lemma \texttt{#1}}
+   \newcommand{\transformation}[1]{\cellcolor{yellow!13}transformation \texttt{#1}}
+   \newcommand{\subgoal}[2]{\cellcolor{yellow!13}subgoal #2}
+   \newcommand{\valid}[1]{\cellcolor{green!13}#1}
+   \newcommand{\unknown}[1]{\cellcolor{red!20}#1}
+   \newcommand{\invalid}[1]{\cellcolor{red!50}#1}
+   \newcommand{\timeout}[1]{\cellcolor{red!20}(#1)}
+   \newcommand{\outofmemory}[1]{\cellcolor{red!20}(#1)}
+   \newcommand{\noresult}{\multicolumn{1}{>{\columncolor[gray]{0.8}}c|}{~}}
+   \newcommand{\failure}{\cellcolor{red!20}failure}
+   \newcommand{\highfailure}{\cellcolor{red!50}FAILURE}
+
+.. TODO: Restore screenshots of HelloProof.tex (style 1 and style 2)
 
 .. why3-tool:: session html
 
@@ -1140,34 +1161,17 @@ The file generated is named :file:`why3session.html` and is written in the
 session directory by default (see option :option:`-o` to override this
 default).
 
-<h1>Why3 Proof Results for Project “hello\_proof”</h1> <h2><span
-style=“color:#FF0000”>Theory “hello\_proof.HelloProof”: not fully
-verified</span></h2> <table border=“1”
-style=“border-collapse:collapse”><tr><td colspan=“2”>Obligations</td><td
-text-rotation=“90”>Alt-Ergo 0.99.1</td><td text-rotation=“90”>Coq
-8.7.1</td></tr> <tr><td style=“background-color:#C0FFC0”
-colspan=“2”>G1</td><td style=“background-color:#C0FFC0”>0.00</td><td
-style=“background-color:#E0E0E0”>—</td></tr> <tr><td
-style=“background-color:#FF0000” colspan=“2”>G2</td><td
-style=“background-color:#FF8000”>0.00</td><td
-style=“background-color:#E0E0E0”>—</td></tr> <tr><td
-style=“background-color:#FF0000” colspan=“2”>split\_goal\_right</td><td
-style=“background-color:#E0E0E0”></td><td
-style=“background-color:#E0E0E0”></td></tr> <tr><td rowspan=“2”
-style=“width:1ex”></td><td style=“background-color:#FF0000”
-colspan=“1”>G2.0</td><td style=“background-color:#FF8000”>0.00</td><td
-style=“background-color:#FF8000”>0.29</td></tr> <tr><td
-style=“background-color:#C0FFC0” colspan=“1”>G2.1</td><td
-style=“background-color:#C0FFC0”>0.00</td><td
-style=“background-color:#E0E0E0”>—</td></tr> <tr><td
-style=“background-color:#C0FFC0” colspan=“2”>G3</td><td
-style=“background-color:#C0FFC0”>0.00</td><td
-style=“background-color:#E0E0E0”>—</td></tr> </table>
+.. _fig.html:
+
+.. figure:: images/hello_proof.png
+   :alt: HTML table produced for the HelloProof example
+
+   HTML table produced for the HelloProof example
 
 The style ‘table’ outputs the contents of the session as a table,
 similar to the LaTeX output above. :numref:`fig.html` is the HTML table
 produced for the ‘HelloProof’ example, as typically shown in a Web
-browser. The gray cells filled with ``—`` just mean that the prover was
+browser. The gray cells filled with ``---`` just mean that the prover was
 not run on the corresponding goal. Green background means the result was
 “Valid”, other cases are in orange background. The red background for a
 goal means that the goal was not proved.
@@ -1180,28 +1184,28 @@ Specific options for this command are as follows.
 
 .. option:: --style <style>
 
-   set the style to use, among ``simpletree`` and ``table``; defaults
+   Set the style to use, among ``simpletree`` and ``table``; defaults
    to ``table``.
 
 .. option:: -o <dir>
 
-   set the directory where to output the produced files (``-`` for
+   Set the directory where to output the produced files (``-`` for
    stdout). The default is to output in the same directory as the
    session itself.
 
 .. option:: --context
 
-   add context around the generated code in order to allow direct
-   visualization (header, css, ...). It also adds in the output
-   directory all the needed external files. It can’t be set with stdout
+   Add context around the generated code in order to allow direct
+   visualization (header, css, etc.). It also adds in the output
+   directory all the needed external files. It is incompatible with stdout
    output.
 
 .. option:: --add_pp <suffix> <cmd> <out_suffix>
 
-   set a specific pretty-printer for files with the given suffix.
-   Produced files use ``<out_suffix>`` as suffix. ``<cmd>`` must
-   contain ‘``%i``’ which will be replaced by the input file and
-   ‘``%o``’ which will be replaced by the output file.
+   Set a specific pretty-printer for files with the given suffix.
+   Produced files use *<out_suffix>* as suffix. *<cmd>* must
+   contain ``%i`` which will be replaced by the input file and
+   ``%o`` which will be replaced by the output file.
 
 .. option:: --coqdoc
 
@@ -1254,24 +1258,24 @@ Options
 
 .. option:: -o <dir>, --output <dir>
 
-   define the directory where to output the HTML files.
+   Define the directory where to output the HTML files.
 
 .. option:: --index
 
-   generate an index file :file:`index.html`. This is the default behavior
+   Generate an index file :file:`index.html`. This is the default behavior
    if more than one file is passed on the command line.
 
 .. option:: --no-index
 
-   prevent the generation of an index file.
+   Prevent the generation of an index file.
 
 .. option:: --title <title>
 
-   set title of the index page.
+   Set title of the index page.
 
 .. option:: --stdlib-url <url>
 
-   set a URL for files found in load path, so that links to
+   Set a URL for files found in load path, so that links to
    definitions can be added.
 
 Typesetting textual comments
@@ -1281,18 +1285,57 @@ Some constructs are interpreted:
 
 -  ``{c text}`` interprets character *c* as some typesetting command:
 
-   1-6
+   ``1``-``6``
        a heading of level 1 to 6 respectively
 
-   h
+   ``h``
        raw HTML
 
--  :literal:`\`code\`` is a code escape: the text *code* is typeset as Why3 code.
+-  :samp:`\`{code}\`` is a code escape: the text *code* is typeset as Why3 code.
 
 A CSS file :file:`style.css` suitable for rendering is generated in the same
 directory as output files. This CSS style can be modified manually,
 since regenerating the HTML documentation will not overwrite an existing
-``style.css`` file.
+:file:`style.css` file.
+
+.. why3-tool:: pp
+.. _sec.why3pp:
+
+The ``pp`` Command
+------------------
+
+.. program:: why3 pp
+
+This tool pretty-prints Why3 declarations. Currenty it can be used to
+print WhyML inductive definitions to LaTeX (using the ``mathpartir``
+package), and to format WhyML source code.
+
+::
+
+    why3 pp [--output=latex|mlw] [--kind=inductive] [--prefix <prefix>] \
+      <filename> <file>[.<Module>].<ind_type> ...
+
+.. option:: --output=<output>
+
+   Set the output format. Currently, only pretty printing to LaTeX is
+   supported using ``--output=latex``, and formatting of WhyML source
+   code using ``--output=mlw``.
+
+.. option:: --kind=<kind>
+
+   Set the syntactic kind to be pretty printed. Currently, the only
+   supported kind are inductive types (``--kind=inductive``) when using
+   the LaTeX output (``--output=latex``).
+
+.. option:: --prefix=<prefix>
+
+   Set the prefix for LaTeX commands to *<prefix>*. The default is ``WHY``.
+
+For the LaTeX output, the typesetting of variables, record fields, and
+functions can be configured by LaTeX commands. Dummy definitions of these
+commands are printed in comments and have to be defined by the user.
+Trailing digits and quotes are removed from the command names to reduce
+the number of commands.
 
 .. why3-tool:: execute
 .. _sec.why3execute:

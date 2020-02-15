@@ -58,10 +58,10 @@ theories, so a realization will become outdated if the corresponding
 theory is modified. It is up to the user to handle such dependencies,
 for instance using a :file:`Makefile`.
 
+.. index:: driver file
+
 Using realizations inside proofs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. index:: driver file
 
 If a theory has been realized, the Why3 printer for the corresponding
 prover will no longer output declarations for that theory but instead
@@ -80,10 +80,10 @@ if not empty, provides a name to be used inside generated scripts to
 point to the realization, in case the default name is not suitable for
 the interactive prover.
 
+.. index:: configuration file
+
 Shipping libraries of realizations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. index:: configuration file
 
 While modifying an existing driver file might be sufficient for local
 use, it does not scale well when the realizations are to be shipped to
@@ -114,7 +114,6 @@ This configuration file can be passed to Why3 thanks to the
 :option:`why3 --extra-config` option.
 
 .. index:: Coq proof assistant, proof assistant; Coq
-
 .. _sec.coq:
 
 Coq
@@ -165,7 +164,6 @@ much about comments. For instance, Why3 can easily be confused by some
 terminating directive like ``Qed`` that would be present in a comment.
 
 .. index:: Isabelle proof assistant, proof assistant; Isabelle
-
 .. _sec.isabelle:
 
 Isabelle/HOL
@@ -279,7 +277,6 @@ the following form.
 See directory ``lib/isabelle`` for examples.
 
 .. index:: PVS proof assistant, proof assistant; PVS
-
 .. _sec.pvs:
 
 PVS
