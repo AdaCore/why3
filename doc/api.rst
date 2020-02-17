@@ -41,14 +41,14 @@ pretty-printers.
    :start-after: BEGIN{printformula}
    :end-before: END{printformula}
 
-Assuming the lines above are written in a file ``f.ml``, it can be
+Assuming the lines above are written in a file :file:`f.ml`, it can be
 compiled using
 
 ::
 
     ocamlfind ocamlc -package why3 -linkpkg f.ml -o f
 
-Running the generated executable ``f`` results in the following output.
+Running the generated executable :file:`f` results in the following output.
 
 ::
 
@@ -142,7 +142,7 @@ Calling External Provers
 ------------------------
 
 To call an external prover, we need to access the Why3 configuration
-file ``why3.conf``, as it was built using the ``why3config`` command
+file :file:`why3.conf`, as it was built using the :why3:tool:`why3 config` command
 line tool or the *Detect Provers* menu of the graphical IDE. The following API calls
 make it possible to access the content of this configuration file.
 
@@ -238,11 +238,11 @@ corresponding to these kinds of answers:
 
 -  ``OutOfMemory``: the prover exceeds the memory limit.
 
--  ``Unknown`` :math:`msg`: the prover can’t determine if the task is
-   valid; the string parameter :math:`msg` indicates some extra
+-  :samp:`Unknown {msg}`: the prover cannot determine if the task is
+   valid; the string parameter *msg* indicates some extra
    information.
 
--  ``Failure`` :math:`msg`: the prover reports a failure, it was unable
+-  :samp:`Failure {msg}`: the prover reports a failure, it was unable
    to read correctly its input task.
 
 -  ``HighFailure``: an error occurred while trying to call the prover,
