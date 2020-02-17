@@ -313,7 +313,7 @@ static int wmpz_millerrabin (mpz_ptr n, int reps)
     }
  ret:
   //  if (r > 0) printf ("%d reps done", r);
-  return r;
+  return is_prime;
 }
 
 void mr_candidate (mpz_t c, int len) {
