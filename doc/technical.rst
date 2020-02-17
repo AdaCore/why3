@@ -66,8 +66,6 @@ files with :file:`.gen` extension are intended to be imported by
 other drivers; finally, files with :file:`.aux` extension are
 automatically generated from the main :file:`Makefile`.
 
-.. TODO: generated/drivers_dependency.tex
-
 .. graphviz:: generated/drivers-smt.dot
    :caption: Driver dependencies for SMT solvers
    :name: fig.drv.smt
