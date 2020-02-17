@@ -2026,7 +2026,7 @@ endif
 
 ifeq (@enable_doc@,yes)
 
-doc: doc/html/index.html
+doc: doc/html/index.html doc/latex/manual.pdf
 
 doc/generated/drivers-all.dot: drivers/*.drv drivers/*.gen
 	doc/drv_depgraph $^ > $@
@@ -2056,15 +2056,30 @@ update-doc-png:
 doc/html/index.html: $(DOCRST) $(DRVDOT:%=doc/generated/drivers-%.dot)
 	$(SPHINX) -b html doc doc/html
 
+doc/latex/manual.tex: $(DOCRST) $(DRVDOT:%=doc/generated/drivers-%.dot)
+	$(SPHINX) -b latex doc doc/latex
 
 ifeq (@enable_pdf_doc@,yes)
 
+doc/latex/manual.pdf: doc/latex/manual.tex
+	cd doc/latex; $(LATEXCOMP) manual.tex
+ifeq (@LATEX@,pdflatex)
+	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  makeindex manual; pdflatex manual; \
+	fi
+	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  pdflatex manual; \
+	fi
+endif
+
 else
+
+doc/latex/manual.pdf:
 
 endif
 
 clean::
-	rm -rf doc/html; \
+	rm -rf doc/html doc/latex; \
 	rm -rf doc/generated/drivers-*.dot
 
 else
@@ -2328,13 +2343,14 @@ wc:
 
 NAME = why3-@VERSION@
 # see .gitattributes for the list of files that are not distributed
-MORE_DIST = configure doc/manual.pdf
+MORE_DIST = configure
 
-dist: $(MORE_DIST)
+dist: $(MORE_DIST) doc/latex/manual.pdf
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
 	mkdir -p distrib/
 	git archive --format tar --prefix $(NAME)/ HEAD | tar x -C distrib/
 	for f in $(MORE_DIST); do cp $$f distrib/$(NAME)/$$f; done
+	cp doc/latex/manual.pdf distrib/$(NAME)/doc/manual.pdf
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 
 

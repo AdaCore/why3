@@ -147,7 +147,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Why3.tex', 'Why3 Documentation',
+    (master_doc, 'manual.tex', 'Why3 Documentation',
      'The Why3 Development Team', 'manual'),
 ]
 
