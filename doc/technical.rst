@@ -84,12 +84,12 @@ These transformations simplify the goal by applying several kinds of
 simplification, described below. The transformations differ only by the
 kind of rules they apply:
 
-.. why3-transform:: apply
+.. why3:transform:: apply
 
    Apply an hypothesis to the goal of the task using a *modus ponens*
    rule. The hypothesis should be an implication whose conclusion can be
    matched with the goal. The intuitive behavior
-   of :why3-transform:`apply` can be translated as follows.
+   of :why3:transform:`apply` can be translated as follows.
    Given :math:`\Gamma, h: f_1 \rightarrow f_2 \vdash G: f_2`, ``apply h``
    generates a new task :math:`\Gamma, h: f_1 \rightarrow f_2 \vdash G: f_1`.
 
@@ -122,9 +122,9 @@ kind of rules they apply:
    This transformation helps automated provers when they do not know
    which hypothesis to use in order to prove a goal.
 
-.. why3-transform:: apply with
+.. why3:transform:: apply with
 
-   Variant of :why3-transform:`apply` intended to be used in contexts
+   Variant of :why3:transform:`apply` intended to be used in contexts
    where the latter cannot infer what terms to use for variables given in
    the applied hypothesis.
 
@@ -162,7 +162,7 @@ kind of rules they apply:
 
    A value can be provided for ``k`` as follows: ``apply t with c,0``.
 
-.. why3-transform:: assert
+.. why3:transform:: assert
 
    Create an intermediate subgoal. This is comparable to ``assert``
    written in WhyML code. Here, the intent is only to help provers by
@@ -173,12 +173,12 @@ kind of rules they apply:
    tasks: :math:`\Gamma \vdash h: n = 0` and :math:`\Gamma, h: n =
    0 \vdash G`. This effectively adds ``h`` as an intermediate goal to prove.
 
-.. why3-transform:: assert as
+.. why3:transform:: assert as
 
-   Same as :why3-transform:`assert`, except that a name can be given to
+   Same as :why3:transform:`assert`, except that a name can be given to
    the new hypothesis. Example: ``assert (x = 0) as x0``.
 
-.. why3-transform:: case
+.. why3:transform:: case
 
    Split a goal into two subgoal, using the *excluded middle* on a given
    formula. On the task :math:`\Gamma \vdash G`, the transformation
@@ -212,28 +212,28 @@ kind of rules they apply:
    The intent is again to simplify the job of automated provers by giving
    them a key argument of the reasoning behind the proof of a subgoal.
 
-.. why3-transform:: case as
+.. why3:transform:: case as
 
-   Same as :why3-transform:`case`, except that a name can be given to
+   Same as :why3:transform:`case`, except that a name can be given to
    the new hypothesis. Example: ``case (x = 0) as x0``.
 
-.. why3-transform:: clear_but
+.. why3:transform:: clear_but
 
    Remove all the hypotheses except those specified in the arguments.
    This is useful when a prover fails to find relevant hypotheses in
    a very large context. Example: ``clear_but h23,h25``.
 
-.. why3-transform:: compute_hyp
+.. why3:transform:: compute_hyp
 
-   Apply the transformation :why3-transform:`compute_in_goal` on the given
+   Apply the transformation :why3:transform:`compute_in_goal` on the given
    hypothesis.
 
-.. why3-transform:: compute_hyp_specified
+.. why3:transform:: compute_hyp_specified
 
-   Apply the transformation :why3-transform:`compute_specified` on the
+   Apply the transformation :why3:transform:`compute_specified` on the
    given hypothesis.
 
-.. why3-transform:: compute_in_goal
+.. why3:transform:: compute_in_goal
 
    Aggressively apply all known computation/simplification rules.
 
@@ -249,9 +249,9 @@ kind of rules they apply:
       transformations thus does not produce any sub-goal. For example, a
       goal like ``6*7=42`` is solved by those transformations.
 
-   -  Unfolding of definitions, as done by :why3-transform:`inline_goal`. Transformation
-      :why3-transform:`compute_in_goal` unfolds all definitions, including recursive
-      ones. For :why3-transform:`compute_specified`, the user can enable unfolding of a
+   -  Unfolding of definitions, as done by :why3:transform:`inline_goal`. Transformation
+      :why3:transform:`compute_in_goal` unfolds all definitions, including recursive
+      ones. For :why3:transform:`compute_specified`, the user can enable unfolding of a
       specific logic symbol by attaching the meta ``rewrite_def`` to the
       symbol.
 
@@ -298,8 +298,8 @@ kind of rules they apply:
 
        lemma l: forall x y. ([@rewrite] x = y) -> f x = f y
 
-   can be proved by :why3-transform:`introduce_premises` followed by
-   :why3-transform:`compute_specified`.
+   can be proved by :why3:transform:`introduce_premises` followed by
+   :why3:transform:`compute_specified`.
 
    The computations performed by this transformation can take an
    arbitrarily large number of steps, or even not terminate. For this
@@ -313,17 +313,17 @@ kind of rules they apply:
    When this upper limit is reached, a warning is issued, and the
    partly-reduced goal is returned as the result of the transformation.
 
-.. why3-transform:: compute_specified
+.. why3:transform:: compute_specified
 
-   Same as :why3-transform:`compute_in_goal`, but perform rewriting using
+   Same as :why3:transform:`compute_in_goal`, but perform rewriting using
    only built-in operators and user-provided rules.
 
-.. why3-transform:: cut
+.. why3:transform:: cut
 
-   Same as :why3-transform:`assert`, but the order of generated subgoals
+   Same as :why3:transform:`assert`, but the order of generated subgoals
    is reversed.
 
-.. why3-transform:: destruct
+.. why3:transform:: destruct
 
    Eliminate the head symbol of a hypothesis.
 
@@ -346,7 +346,7 @@ kind of rules they apply:
       axiom h : forall x:int. p2 x
       goal G : p2 0
 
-   :why3-transform:`destruct` can be applied on the following constructions:
+   :why3:transform:`destruct` can be applied on the following constructions:
 
    - ``false``, ``true``,
    - ``/\``, ``\/``, ``->``, ``not``,
@@ -355,9 +355,9 @@ kind of rules they apply:
    - ``match ... with ... end``,
    - (in)equality on constructors of the same type.
 
-.. why3-transform:: destruct_rec
+.. why3:transform:: destruct_rec
 
-   Recursively call ::why3-transform:`destruct` on the generated
+   Recursively call ::why3:transform:`destruct` on the generated
    hypotheses. The recursion on implication and ``match`` stops after the
    first occurence of a different symbol.
 
@@ -387,7 +387,7 @@ kind of rules they apply:
       axiom H: c
       goal G : false
 
-.. why3-transform:: destruct_term
+.. why3:transform:: destruct_term
 
    Destruct an expression according to the type of the expression. The
    transformation produces all possible outcomes of a destruction of the
@@ -422,87 +422,87 @@ kind of rules they apply:
    type. Note that, during destruction, a new constant ``x`` has been
    introduced for the argument of constructor ``B``.
 
-.. why3-transform:: destruct_term using
+.. why3:transform:: destruct_term using
 
-   Same as :why3-transform:`destruct_term`, except that names can be given to
+   Same as :why3:transform:`destruct_term`, except that names can be given to
    the constants that were generated.
 
-.. why3-transform:: destruct_term_subst
+.. why3:transform:: destruct_term_subst
 
-   Same as :why3-transform:`destruct_term`, except that it also
+   Same as :why3:transform:`destruct_term`, except that it also
    substitutes the created term.
 
-.. why3-transform:: eliminate_algebraic
+.. why3:transform:: eliminate_algebraic
 
    Replace algebraic data types by first-order definitions :cite:`paskevich09rr`.
 
-.. why3-transform:: eliminate_builtin
+.. why3:transform:: eliminate_builtin
 
    Remove definitions of symbols that are declared as builtin in the
    driver, with a “syntax” rule.
 
-.. why3-transform:: eliminate_definition_func
+.. why3:transform:: eliminate_definition_func
 
    Replace all function definitions with axioms.
 
-.. why3-transform:: eliminate_definition_pred
+.. why3:transform:: eliminate_definition_pred
 
    Replace all predicate definitions with axioms.
 
-.. why3-transform:: eliminate_definition
+.. why3:transform:: eliminate_definition
 
-   Apply both :why3-transform:`eliminate_definition_func` and
-   :why3-transform:`eliminate_definition_pred`.
+   Apply both :why3:transform:`eliminate_definition_func` and
+   :why3:transform:`eliminate_definition_pred`.
 
-.. why3-transform:: eliminate_if
+.. why3:transform:: eliminate_if
 
-   Apply both :why3-transform:`eliminate_if_term` and :why3-transform:`eliminate_if_fmla`.
+   Apply both :why3:transform:`eliminate_if_term` and :why3:transform:`eliminate_if_fmla`.
 
-.. why3-transform:: eliminate_if_fmla
+.. why3:transform:: eliminate_if_fmla
 
    Replace formulas of the form ``if f1 then f2 else f3`` by an
    equivalent formula using implications and other connectives.
 
-.. why3-transform:: eliminate_if_term
+.. why3:transform:: eliminate_if_term
 
    Replace terms of the form ``if formula then t2 else t3`` by lifting
    them at the level of formulas. This may introduce ``if then else``
    in formulas.
 
-.. why3-transform:: eliminate_inductive
+.. why3:transform:: eliminate_inductive
 
    Replace inductive predicates by (incomplete) axiomatic definitions,
    construction axioms and an inversion axiom.
 
-.. why3-transform:: eliminate_let
+.. why3:transform:: eliminate_let
 
-   Apply both :why3-transform:`eliminate_let_fmla` and :why3-transform:`eliminate_let_term`.
+   Apply both :why3:transform:`eliminate_let_fmla` and :why3:transform:`eliminate_let_term`.
 
-.. why3-transform:: eliminate_let_fmla
+.. why3:transform:: eliminate_let_fmla
 
    Eliminate ``let`` by substitution, at the predicate level.
 
-.. why3-transform:: eliminate_let_term
+.. why3:transform:: eliminate_let_term
 
    Eliminate ``let`` by substitution, at the term level.
 
-.. why3-transform:: eliminate_mutual_recursion
+.. why3:transform:: eliminate_mutual_recursion
 
    Replace mutually recursive definitions with axioms.
 
-.. why3-transform:: eliminate_recursion
+.. why3:transform:: eliminate_recursion
 
    Replace all recursive definitions with axioms.
 
-.. why3-transform:: encoding_smt
+.. why3:transform:: encoding_smt
 
    Encode polymorphic types into monomorphic types :cite:`conchon08smt`.
 
-.. why3-transform:: encoding_tptp
+.. why3:transform:: encoding_tptp
 
    Encode theories into unsorted logic.
 
-.. why3-transform:: exists
+.. why3:transform:: exists
 
    Instantiate an existential quantification with a witness.
 
@@ -518,7 +518,7 @@ kind of rules they apply:
 
       goal G : 0 = 0
 
-.. why3-transform:: hide
+.. why3:transform:: hide
 
    Hide a given term, by creating a new constant equal to the term and
    then replacing all occurences of the term in the context by this
@@ -543,13 +543,13 @@ kind of rules they apply:
       axiom h : forall x:int. x = t
       goal G : (y - t) = (t - t)
 
-.. why3-transform:: hide_and_clear
+.. why3:transform:: hide_and_clear
 
-   First apply :why3-transform:`hide` and then remove the equality
+   First apply :why3:transform:`hide` and then remove the equality
    between the hidden term and the introduced constant. This means that
    the hidden term completely disappears and cannot be recovered.
 
-.. why3-transform:: induction
+.. why3:transform:: induction
 
    Perform a reasoning by induction for the current goal.
 
@@ -587,20 +587,20 @@ kind of rules they apply:
       axiom Hrec : forall n1:int. n1 < n -> p1 n1 -> p n1
       goal G : p n
 
-.. why3-transform:: induction from
+.. why3:transform:: induction from
 
-   Same as :why3-transform:`induction`, but it starts the induction from
+   Same as :why3:transform:`induction`, but it starts the induction from
    a given integer instead of ``0``.
 
-.. why3-transform:: induction_arg_pr
+.. why3:transform:: induction_arg_pr
 
-   Apply :why3-transform:`induction_pr` on the given hypothesis/goal symbol.
+   Apply :why3:transform:`induction_pr` on the given hypothesis/goal symbol.
 
-.. why3-transform:: induction_arg_ty_lex
+.. why3:transform:: induction_arg_ty_lex
 
-   Apply :why3-transform:`induction_ty_lex` on the given symbol.
+   Apply :why3:transform:`induction_ty_lex` on the given symbol.
 
-.. why3-transform:: induction_ty_lex
+.. why3:transform:: induction_ty_lex
 
     Perform structural, lexicographic induction on goals involving
     universally quantified variables of algebraic data types, such as
@@ -635,7 +635,7 @@ kind of rules they apply:
     to several variables, a lexicographic induction is performed on
     these variables, from left to right.
 
-.. why3-transform:: inline_trivial
+.. why3:transform:: inline_trivial
 
     Expand and remove definitions of the form
 
@@ -652,18 +652,18 @@ kind of rules they apply:
     that the transformation forcefully expands them (not using the
     conditions above). This can be used to ensure that some specific
     functions are inlined for automatic provers
-    (:why3-transform:`inline_trivial` is used in many drivers).
+    (:why3:transform:`inline_trivial` is used in many drivers).
 
-.. why3-transform:: inline_goal
+.. why3:transform:: inline_goal
 
    Expand all outermost symbols of the goal that have a non-recursive
    definition.
 
-.. why3-transform:: inline_all
+.. why3:transform:: inline_all
 
    Expand all non-recursive definitions.
 
-.. why3-transform:: instantiate
+.. why3:transform:: instantiate
 
    Generate a new hypothesis with quantified variables
    replaced by the given terms.
@@ -688,17 +688,17 @@ kind of rules they apply:
    This is used to help automatic provers that are generally better at
    working on instantiated hypothesis.
 
-.. why3-transform:: inst_rem
+.. why3:transform:: inst_rem
 
-   Apply :why3-transform:`instantiate` then remove the original
+   Apply :why3:transform:`instantiate` then remove the original
    instantiated hypothesis.
 
-.. why3-transform:: introduce_premises
+.. why3:transform:: introduce_premises
 
    Move antecedents of implications and universal quantifications of
    the goal into the premises of the task.
 
-.. why3-transform:: intros
+.. why3:transform:: intros
 
    Introduce universal quantifiers in the context.
 
@@ -718,9 +718,9 @@ kind of rules they apply:
       constant m : int
       goal G : forall z:int. p n m z
 
-.. why3-transform:: intros_n
+.. why3:transform:: intros_n
 
-   Same as :why3-transform:`intros`, but stops after the nth quantified
+   Same as :why3:transform:`intros`, but stops after the nth quantified
    variable or premise.
 
    For example, applying ``intros_n 2`` on the following goal
@@ -739,11 +739,11 @@ kind of rules they apply:
       constant y : int
       goal G : forall z:int. p x y z
 
-.. why3-transform:: inversion_arg_pr
+.. why3:transform:: inversion_arg_pr
 
-   Apply :why3-transform:`inversion_pr` on the given hypothesis/goal symbol.
+   Apply :why3:transform:`inversion_pr` on the given hypothesis/goal symbol.
 
-.. why3-transform:: left
+.. why3:transform:: left
 
    Remove the right part of the head disjunction of the goal.
 
@@ -761,7 +761,7 @@ kind of rules they apply:
       constant x : int
       goal G : x = 0
 
-.. why3-transform:: pose
+.. why3:transform:: pose
 
    Add a new constant equal to the given term.
 
@@ -781,7 +781,7 @@ kind of rules they apply:
       axiom H : t = (x + 2)
       goal G : true
 
-.. why3-transform:: remove
+.. why3:transform:: remove
 
    Remove a hypothesis from the context.
 
@@ -798,7 +798,7 @@ kind of rules they apply:
 
       goal G : true
 
-.. why3-transform:: replace
+.. why3:transform:: replace
 
    Replace a term with another one in a hypothesis or in the goal. This
    generates a new goal which asks for the proof of the equality.
@@ -829,12 +829,12 @@ kind of rules they apply:
       axiom h : x >= (y + 1)
       goal G : (y + 1) = (x + 2)
 
-   It can be seen as the combination of :why3-transform:`assert`
-   and :why3-transform:`rewrite`.
+   It can be seen as the combination of :why3:transform:`assert`
+   and :why3:transform:`rewrite`.
 
-.. why3-transform:: revert
+.. why3:transform:: revert
 
-   Opposite of :why3-transform:`intros`. It takes hypotheses/constants
+   Opposite of :why3:transform:`intros`. It takes hypotheses/constants
    and quantifies them in the goal.
 
    For example, applying ``revert x`` on the following goal
@@ -853,7 +853,7 @@ kind of rules they apply:
       constant y : int
       goal G : forall x:int. x = y -> true
 
-.. why3-transform:: rewrite
+.. why3:transform:: rewrite
 
    Rewrite using the given equality hypothesis.
 
@@ -878,7 +878,7 @@ kind of rules they apply:
       goal G : b y = True
 
    It also produces a goal for the premise of the equality hypothesis (as
-   would :why3-transform:`apply`):
+   would :why3:transform:`apply`):
 
    .. code-block:: whyml
 
@@ -888,11 +888,11 @@ kind of rules they apply:
       axiom eq : forall x:int. not x = 0 -> a x = b x
       goal G : not y = 0
 
-.. why3-transform:: rewrite with
+.. why3:transform:: rewrite with
 
-   Variant of :why3-transform:`rewrite` intended to be used in contexts
+   Variant of :why3:transform:`rewrite` intended to be used in contexts
    where the latter cannot infer what terms to use for the variables of
-   the given hypotheses (see also :why3-transform:`apply with`).
+   the given hypotheses (see also :why3:transform:`apply with`).
 
    For example, the transformation ``rewrite eq with 0`` can be applied
    to the following goal:
@@ -933,12 +933,12 @@ kind of rules they apply:
       axiom eq : forall x:int, z:int. z = 0 -> not x = 0 -> a x = b x
       goal G : not y = 0
 
-.. why3-transform:: rewrite_list
+.. why3:transform:: rewrite_list
 
-   Variant of :why3-transform:`rewrite` that allows simultaneous rewriting in
+   Variant of :why3:transform:`rewrite` that allows simultaneous rewriting in
    a list of hypothesis/goals.
 
-.. why3-transform:: right
+.. why3:transform:: right
 
    Remove the left part of the head disjunction of the goal.
 
@@ -956,23 +956,23 @@ kind of rules they apply:
       constant x : int
       goal G : x = 1
 
-.. why3-transform:: simplify_array
+.. why3:transform:: simplify_array
 
    Automatically rewrite the task using the lemma ``Select_eq`` of
    theory ``map.Map``.
 
-.. why3-transform:: simplify_formula
+.. why3:transform:: simplify_formula
 
    Reduce trivial equalities ``t=t`` to true and then simplify
    propositional structure: removes ``true``, ``false``, simplifies
    ``f /\ f`` to ``f``, etc.
 
-.. why3-transform:: simplify_formula_and_task
+.. why3:transform:: simplify_formula_and_task
 
-   Apply :why3-transform:`simplify_formula` and remove the goal if
+   Apply :why3:transform:`simplify_formula` and remove the goal if
    it is equivalent to true.
 
-.. why3-transform:: simplify_recursive_definition
+.. why3:transform:: simplify_recursive_definition
 
     Reduce mutually recursive definitions if they are not really
     mutually recursive, e.g.,
@@ -991,7 +991,7 @@ kind of rules they apply:
 
     if ``f`` does not occur in ``e``.
 
-.. why3-transform:: simplify_trivial_quantification
+.. why3:transform:: simplify_trivial_quantification
 
     Simplify quantifications of the form
 
@@ -1009,19 +1009,19 @@ kind of rules they apply:
     simplification is applied whenever ``x=t`` or ``t=x``
     appears in negative position.
 
-.. why3-transform:: simplify_trivial_quantification_in_goal
+.. why3:transform:: simplify_trivial_quantification_in_goal
 
-   Apply :why3-transform:`simplify_trivial_quantification`, but only in the goal.
+   Apply :why3:transform:`simplify_trivial_quantification`, but only in the goal.
 
-.. why3-transform:: split_all
+.. why3:transform:: split_all
 
-   Perform both :why3-transform:`split_premise` and :why3-transform:`split_goal`.
+   Perform both :why3:transform:`split_premise` and :why3:transform:`split_goal`.
 
-.. why3-transform:: split_all_full
+.. why3:transform:: split_all_full
 
-   Perform both :why3-transform:`split_premise` and :why3-transform:`split_goal_full`.
+   Perform both :why3:transform:`split_premise` and :why3:transform:`split_goal_full`.
 
-.. why3-transform:: split_goal
+.. why3:transform:: split_goal
 
     Change conjunctive goals into the corresponding set of subgoals. In
     absence of case analysis attributes, the number of subgoals
@@ -1172,7 +1172,7 @@ kind of rules they apply:
     they were local lemmas.
 
     The ``[@case_split]`` attribute can be used to force case analysis
-    on hypotheses. For instance, applying :why3-transform:`split_goal` on
+    on hypotheses. For instance, applying :why3:transform:`split_goal` on
 
     ::
 
@@ -1192,30 +1192,30 @@ kind of rules they apply:
     presence of the ``[@case_split]`` attribute is not yet specified and
     is likely to change in future versions.
 
-.. why3-transform:: split_goal_full
+.. why3:transform:: split_goal_full
 
-    Behave similarly to :why3-transform:`split_goal`, but also convert the goal
+    Behave similarly to :why3:transform:`split_goal`, but also convert the goal
     to conjunctive normal form. The number of subgoals generated may be
     exponential in the size of the initial goal.
 
-.. why3-transform:: split_intro
+.. why3:transform:: split_intro
 
-   Perform both :why3-transform:`split_goal` and :why3-transform:`introduce_premises`.
+   Perform both :why3:transform:`split_goal` and :why3:transform:`introduce_premises`.
 
-.. why3-transform:: split_premise
+.. why3:transform:: split_premise
 
     Replace axioms in conjunctive form by an equivalent collection of
-    axioms. In absence of case analysis attributes (see :why3-transform:`split_goal`
+    axioms. In absence of case analysis attributes (see :why3:transform:`split_goal`
     for details), the number of axiom generated per initial axiom is
     linear in the size of that initial axiom.
 
-.. why3-transform:: split_premise_full
+.. why3:transform:: split_premise_full
 
-    Behave similarly to :why3-transform:`split_premise`, but also convert the axioms to
+    Behave similarly to :why3:transform:`split_premise`, but also convert the axioms to
     conjunctive normal form. The number of axioms generated per initial
     axiom may be exponential in the size of the initial axiom.
 
-.. why3-transform:: subst
+.. why3:transform:: subst
 
    Substitute a given constant using an equality found in the context.
    The constant is removed.
@@ -1247,7 +1247,7 @@ kind of rules they apply:
    automatic provers at all as they generally implement substitution
    rules in their logic.
 
-.. why3-transform: subst_all
+.. why3:transform: subst_all
 
    Substitute all the variables that can be substituted.
 
@@ -1274,7 +1274,7 @@ kind of rules they apply:
 
    The order in which constants are substituted is not specified.
 
-.. why3-transform:: unfold
+.. why3:transform:: unfold
 
    Unfold the definition of a logical symbol in the given hypothesis.
 
@@ -1303,7 +1303,7 @@ kind of rules they apply:
       axiom h : forall x:int. x <= 22 -> (x - 1) <= 22
       goal G : 21 <= 22
 
-.. why3-transform:: use_th
+.. why3:transform:: use_th
 
    Import a theory inside the current context. This is used, in some rare
    case, to reduced the size of the context in other goals, since

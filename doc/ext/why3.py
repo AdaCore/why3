@@ -1,6 +1,7 @@
 import re
 from docutils import nodes
 from sphinx import addnodes
+from sphinx.directives import ObjectDescription
 from sphinx.domains import Domain
 from sphinx.roles import XRefRole
 from sphinx.util.docutils import SphinxDirective
@@ -33,20 +34,42 @@ class Why3ToolDirective(SphinxDirective):
         domain.add_object('tool', fullname, targetname)
         return [inode, node]
 
+class Why3Transform(ObjectDescription):
+    has_content = True
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = True
+    option_spec = {}
+
+    def handle_signature(self, sig, signode):
+        signode += addnodes.desc_name(text = sig)
+        return sig
+
+    def add_target_and_index(self, name, sig, signode):
+        targetname = '%s-%s' % (self.name, name)
+        signode['ids'].append(targetname)
+        indexentry = '%s; transformation' % (name,)
+        self.indexnode['entries'].append(('pair', indexentry, targetname, '', None))
+        domain = self.env.get_domain('why3')
+        domain.add_object('transform', name, targetname)
+
 class Why3Domain(Domain):
     name = 'why3'
     label = 'Why3'
     roles = {
         'tool': Why3ToolRole(),
+        'transform': XRefRole(),
     }
     directives = {
         'tool': Why3ToolDirective,
+        'transform': Why3Transform,
     }
     indices = {
     }
     initial_data = {}
     initial_data['objects'] = {
         'tool': {},
+        'transform': {},
     }
 
     def get_objects(self):
@@ -67,7 +90,6 @@ class Why3Domain(Domain):
 
 
 def setup(app):
-    app.add_object_type('why3-transform', 'why3-transform', 'pair: %s; transformation')
     app.add_domain(Why3Domain)
 
     return {
