@@ -291,7 +291,7 @@ static int wmpz_millerrabin (mpz_ptr n, int reps)
 
   if (wmpz_cmp_ui (y, 1L) != 0)
     {
-      goto ret;
+      return 0;
     }
 
   MPZ_TMP_INIT(q, SIZ(n));
