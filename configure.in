@@ -388,7 +388,7 @@ fi
 
 # checking for rubber or latexmk or pdflatex
 if test "$enable_pdf_doc" = yes; then
-   AC_CHECK_PROGS(LATEX,rubber latexmk pdflatex,no)
+   AC_CHECK_PROGS(LATEX,latexmk rubber pdflatex,no)
    if test "$LATEX" = no; then
       enable_pdf_doc=no
       reason_pdf_doc=" ((rubber|latexmk|pdflatex) not found)"
