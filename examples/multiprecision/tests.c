@@ -1185,8 +1185,10 @@ int main () {
 #endif
 #ifdef COMPARE
     refc = mpz_millerrabin(cp,REPS);
-    if (c != refc)
+    if (c != refc) {
+      printf ("c %ld refc %ld\n", c, refc);
       abort ();
+    }
 #endif
   }
 #ifdef COMPARE
