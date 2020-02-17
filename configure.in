@@ -127,9 +127,9 @@ AC_ARG_ENABLE(doc,
     AS_HELP_STRING([--disable-doc], [do not build documentation]),,
     enable_doc=yes)
 
-AC_ARG_ENABLE(html-doc,
-    AS_HELP_STRING([--disable-html-doc], [do not build HTML documentation]),,
-    enable_html_doc=yes)
+AC_ARG_ENABLE(html-pdf,
+    AS_HELP_STRING([--disable-pdf-doc], [do not build PDF documentation]),,
+    enable_pdf_doc=yes)
 
 # Experimental Jessie3 Frama-C plugin, disabled by default
 
@@ -373,36 +373,26 @@ else
   enable_ppx=no
 fi
 
-# checking for rubber or latexmk or pdflatex
-if test "$enable_doc" = yes ; then
-   AC_CHECK_PROGS(LATEX,rubber latexmk pdflatex,no)
-   if test "$LATEX" = no ; then
+# checking for sphinx
+if test "$enable_doc" = yes; then
+   AC_CHECK_PROG(SPHINX,sphinx-build,sphinx-build,no)
+   if test "$SPHINC" = no; then
       enable_doc=no
-      enable_html_doc=no
-      reason_doc=" ((rubber|latexmk|pdflatex) not found)"
-      AC_MSG_WARN([Cannot find any latex compiler, documentation disabled.])
+      enable_pdf_doc=no
+      reason_doc=" (sphinx-build not found)"
+      AC_MSG_WARN([Cannot find sphinx-build, Documentation disabled.])
    fi
 else
-   enable_html_doc=no
+   enable_pdf_doc=no
 fi
 
-# checking for hevea (note that the pdf documentation DOES NOT use hevea.sty)
-if test "$enable_html_doc" = yes ; then
-   AC_CHECK_PROG(HEVEA,hevea,hevea,no)
-   if test "$HEVEA" = no ; then
-      enable_html_doc=no
-      reason_html_doc=" (hevea not found)"
-      AC_MSG_WARN([Cannot find hevea, HTML documentation disabled.])
-   fi
-fi
-
-# checking for hacha
-if test "$enable_html_doc" = yes ; then
-   AC_CHECK_PROG(HACHA,hacha,hacha,no)
-   if test "$HACHA" = no ; then
-      enable_html_doc=no
-      reason_html_doc=" (hacha not found)"
-      AC_MSG_WARN([Cannot find hacha, HTML documentation disabled.])
+# checking for rubber or latexmk or pdflatex
+if test "$enable_pdf_doc" = yes; then
+   AC_CHECK_PROGS(LATEX,rubber latexmk pdflatex,no)
+   if test "$LATEX" = no; then
+      enable_pdf_doc=no
+      reason_pdf_doc=" ((rubber|latexmk|pdflatex) not found)"
+      AC_MSG_WARN([Cannot find any latex compiler, PDF documentation disabled.])
    fi
 fi
 
@@ -1127,11 +1117,10 @@ AC_SUBST(ISABELLEVERSION)
 AC_SUBST(enable_hypothesis_selection)
 
 AC_SUBST(enable_doc)
-AC_SUBST(enable_html_doc)
+AC_SUBST(enable_pdf_doc)
 
 AC_SUBST(LATEX)
-AC_SUBST(HEVEA)
-AC_SUBST(HACHA)
+AC_SUBST(SPHINX)
 
 AC_SUBST(enable_emacs_compilation)
 AC_SUBST(EMACS)
@@ -1166,7 +1155,7 @@ AC_CONFIG_FILES(src/jessie/.merlin)
 AC_CONFIG_FILES(lib/coq/version lib/pvs/version)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/jessie/Makefile;
-chmod a-w src/config.sh doc/version.tex;
+chmod a-w src/config.sh;
 chmod a-w lib/why3/META;
 chmod a-w .merlin;
 chmod a-w src/jessie/Makefile;
@@ -1209,8 +1198,8 @@ if test "$enable_frama_c" = yes ; then
 fi
 echo "Documentation               : $enable_doc$reason_doc"
 if test "$enable_doc" = yes ; then
-   echo "    PDF                     : with $LATEX"
-   echo "    HTML                    : $enable_html_doc$reason_html_doc"
+   echo "    HTML                    : yes"
+   echo "    PDF                     : $enable_pdf_doc$reason_pdf_doc"
 fi
 echo "Support for interactive proof assistants"
 echo "    Coq                     : $enable_coq_support$reason_coq_support"
