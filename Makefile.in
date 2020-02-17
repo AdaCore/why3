@@ -2051,7 +2051,7 @@ update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
 	export WHY3CONFIG=doc/why3ide-doc.conf; \
 	export WHY3LOADPATH=stdlib; \
-	sed -n -e 's/^%EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
+	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
 
 doc/html/index.html: $(DOCRST) $(DRVDOT:%=doc/generated/drivers-%.dot)
 	$(SPHINX) -b html doc doc/html
