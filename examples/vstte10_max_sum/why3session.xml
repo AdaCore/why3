@@ -6,7 +6,6 @@
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Vampire" version="4.2.2" timelimit="10" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte10_max_sum.mlw"/>
 <theory name="MaxAndSum" proved="true">
@@ -47,7 +46,6 @@
    <transf name="assert" proved="true" arg1="(i * m1 &lt;= i * m)">
     <goal name="max_sum&#39;vc.8.0.0" expl="asserted formula" proved="true">
     <proof prover="0"><result status="valid" time="4.59"/></proof>
-    <proof prover="4"><result status="valid" time="5.01"/></proof>
     </goal>
     <goal name="max_sum&#39;vc.8.0.1" expl="asserted formula" proved="true">
     <proof prover="3"><result status="valid" time="0.01" steps="26"/></proof>
