@@ -36,7 +36,7 @@ Generating a realization
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Generating the skeleton for a theory is done by passing to the
-:why3-tool:`realize` command a driver suitable for realizations, the names of the
+:why3:tool:`realize` command a driver suitable for realizations, the names of the
 theories to realize, and a target directory.
 
 ::
@@ -206,7 +206,7 @@ Usage
 
 The most convenient way to call Isabelle for discharging a Why3 goal is
 to start the Isabelle/jedit interface in server mode. In this mode, one
-must start the server once, before launching :why3-tool:`why3 ide`, using
+must start the server once, before launching :why3:tool:`why3 ide`, using
 
 ::
 

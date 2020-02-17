@@ -263,7 +263,7 @@ discard these choices via the :menuselection:`Files --> Preferences` dialog: jus
 it.
 
 Outside the GUI, the prover upgrades are handled as follows. The
-:why3-tool:`replay` command will take into account any prover upgrade policy
-stored in the configuration. The :why3-tool:`session` command performs move or
+:why3:tool:`replay` command will take into account any prover upgrade policy
+stored in the configuration. The :why3:tool:`session` command performs move or
 copy operations on proof attempts in a fine-grained way, using filters,
 as detailed in :numref:`sec.why3session`.

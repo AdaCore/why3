@@ -28,7 +28,7 @@ module ``MaxAndSum``
         a[5] <- 3; a[6] <- 2; a[7] <- 1; a[8] <- 10; a[9] <- 6;
         max_sum a n
 
-and then we use the :why3-tool:`execute` command to interpret this function, as
+and then we use the :why3:tool:`execute` command to interpret this function, as
 follows:
 
 ::
@@ -49,13 +49,13 @@ Compiling WhyML to OCaml
 .. program:: why3 extract
 
 An alternative to interpretation is to compile WhyML to OCaml. We do so
-using the :why3-tool:`extract` command, as follows:
+using the :why3:tool:`extract` command, as follows:
 
 ::
 
     > why3 extract -D ocaml64 maxsum.mlw -o max_sum.ml
 
-The :why3-tool:`extract` command requires the name of a driver, which indicates
+The :why3:tool:`extract` command requires the name of a driver, which indicates
 how theories/modules from the Why3 standard library are translated to
 OCaml. Here we assume a 64-bit architecture and thus we pass
 ``ocaml64``. We also specify an output file using option :option:`-o`, namely
@@ -86,7 +86,7 @@ uses OCaml’s native integers instead, one has to use Why3’s types for
 Extraction Starting Point.
 ''''''''''''''''''''''''''
 
-The :why3-tool:`extract` command accepts three different targets for extraction:
+The :why3:tool:`extract` command accepts three different targets for extraction:
 a WhyML file, a module, or a symbol (function, type, exception). To
 extract all the symbols from every module of a file named :file:`f.mlw`, one
 should write
@@ -139,7 +139,7 @@ The following options can be added to the extraction command line:
 Examples.
 '''''''''
 
-We illustrate different ways of using the :why3-tool:`extract` command through
+We illustrate different ways of using the :why3:tool:`extract` command through
 some examples.
 
 Consider the program of :numref:`sec.aqueue`.
@@ -152,7 +152,7 @@ proceed as follows:
     > why3 extract -D ocaml64 -L . aqueue.AmortizedQueue.enqueue -o aqueue.ml
 
 Here we assume that file :file:`aqueue.mlw` contains this program, and that
-we invoke the :why3-tool:`extract` command from the directory where this file is stored. File
+we invoke the :why3:tool:`extract` command from the directory where this file is stored. File
 :file:`aqueue.ml` now contains the following OCaml code:
 
 .. code-block:: ocaml

@@ -15,42 +15,42 @@ as an entry-point to all the features of Why3. It is invoked as such
 
 The following commands are available:
 
-:why3-tool:`config`
+:why3:tool:`config`
     manages the user’s configuration, including the detection of
     installed provers.
 
-:why3-tool:`doc`
+:why3:tool:`doc`
     produces HTML versions of Why3 source codes.
 
-:why3-tool:`execute`
+:why3:tool:`execute`
     performs a symbolic execution of WhyML input files.
 
-:why3-tool:`extract`
+:why3:tool:`extract`
     generates an OCaml program corresponding to WhyML input files.
 
-:why3-tool:`ide`
+:why3:tool:`ide`
     provides a graphical interface to display goals and to run provers
     and transformations on them.
 
-:why3-tool:`pp`
+:why3:tool:`pp`
     pretty-prints WhyML definitions (formatting :file:`.mlw` files
     or printing inductive definitions to LaTeX).
 
-:why3-tool:`prove`
+:why3:tool:`prove`
     reads WhyML input files and calls provers, on the command-line.
 
-:why3-tool:`realize`
+:why3:tool:`realize`
     generates interactive proof skeletons for Why3 input files.
 
-:why3-tool:`replay`
+:why3:tool:`replay`
     replays the proofs stored in a session, for regression test
     purposes.
 
-:why3-tool:`session`
+:why3:tool:`session`
     dumps various informations from a proof session, and possibly
     modifies the session.
 
-:why3-tool:`wc`
+:why3:tool:`wc`
     gives some token statistics about WhyML source files.
 
 All these commands are also available as standalone executable files, if
@@ -109,7 +109,7 @@ particular, option :option:`--help` displays the usage and options.
 
 
 .. index:: configuration file
-.. why3-tool:: config
+.. why3:tool:: config
 .. _sec.why3config:
 
 The ``config`` Command
@@ -135,12 +135,12 @@ human-readable, and advanced users may modify it in order to experiment
 with different ways of calling provers, e.g., different versions of the same
 prover, or with different options.
 
-The :why3-tool:`config` command also detects the :index:`plugins <plugin>` installed in the Why3
+The :why3:tool:`config` command also detects the :index:`plugins <plugin>` installed in the Why3
 plugins directory (e.g., :file:`/usr/local/lib/why3/plugins`). A plugin must
 register itself as a parser, a transformation or a printer, as explained
 in the corresponding section.
 
-If the user’s configuration file is already present, :why3-tool:`config` will
+If the user’s configuration file is already present, :why3:tool:`config` will
 only reset unset variables to default value, but will not try to detect
 provers. The option :option:`--detect-provers` should be used to force Why3 to
 detect again the available provers and to replace them in the
@@ -148,7 +148,7 @@ configuration file. The option :option:`--detect-plugins` will do the same for
 plugins.
 
 If a supported prover is installed under a name that is not
-automatically recognized by :why3-tool:`config`, the option :option:`--add-prover`
+automatically recognized by :why3:tool:`config`, the option :option:`--add-prover`
 will add a specified binary to the configuration. For example, an
 Alt-Ergo executable :file:`/home/me/bin/alt-ergo-trunk` can be added as
 follows:
@@ -162,7 +162,7 @@ string. The list of known prover families can be obtained by the option
 :option:`--list-prover-families`.
 
 
-.. why3-tool:: prove
+.. why3:tool:: prove
 .. _sec.why3prove:
 
 The ``prove`` Command
@@ -175,7 +175,7 @@ file. By default, such a file must be written in WhyML language
 (extension :file:`.mlw`). However, a dynamically loaded plugin can register
 a parser for some other format of logical problems, e.g., TPTP or SMT-LIB.
 
-The :why3-tool:`prove` command executes the following steps:
+The :why3:tool:`prove` command executes the following steps:
 
 #. Parse the command line and report errors if needed.
 
@@ -253,12 +253,12 @@ Getting Potential Counterexamples
 That feature is presented in details in :numref:`sec.idece`, which should
 be read first.
 
-Counterexamples are also displayed by the :why3-tool:`prove` command when
+Counterexamples are also displayed by the :why3:tool:`prove` command when
 one selects a prover with the ``counterexamples`` alternative. The
 output is currently done in a JSON syntax (this may change in the
 future).
 
-.. why3-tool:: ide
+.. why3:tool:: ide
 .. _sec.ideref:
 
 The ``ide`` Command
@@ -269,7 +269,7 @@ The ``ide`` Command
 The basic usage of the GUI is described by the tutorial of
 :numref:`sec.gui`. The command-line options are the common options
 detailed in introduction to this chapter, plus the specific option
-already described for the :why3-tool:`prove` command in
+already described for the :why3:tool:`prove` command in
 :numref:`sec.proveoptions`.
 
 .. .. option:: --extra-expl-prefix <s>
@@ -296,7 +296,7 @@ means. A session stores which file you prove, by applying which
 transformations, by using which prover. A proof attempt records the
 complete name of a prover (name, version, optional attribute), the time
 limit and memory limit given, and the result of the prover. The result
-of the prover is the same as when you run the :why3-tool:`prove` command. It
+of the prover is the same as when you run the :why3:tool:`prove` command. It
 contains the time taken and the state of the proof:
 
 Valid
@@ -343,7 +343,7 @@ Additionally, a proof attempt can have the following attributes:
 
 Generally, proof attempts are marked obsolete just after the start of
 the user interface. Indeed, when you load a session in order to modify
-it (not with :why3-tool:`why3 session info` for instance), Why3 rebuilds the goals
+it (not with :why3:tool:`why3 session info` for instance), Why3 rebuilds the goals
 to prove by using the information provided in the session. If you modify
 the original file (:file:`.mlw`) or if the transformations have changed (new
 version of Why3), Why3 will detect that. Since the provers might answer
@@ -794,7 +794,7 @@ found in :cite:`hauzar16sefm` and
 in :cite:`dailler18jlamp`. For the producing counterexamples
 using the Why3 API, see :numref:`sec.ce_api`.
 
-.. why3-tool:: replay
+.. why3:tool:: replay
 .. _sec.why3replay:
 
 The ``replay`` Command
@@ -930,7 +930,7 @@ Moreover ``Smoke detected`` (exit code 1) is printed at the end if the
 smoke detector has been triggered, or ``No smoke detected`` (exit code
 0) otherwise.
 
-.. why3-tool:: session
+.. why3:tool:: session
 .. _sec.why3session:
 
 The ``session`` Command
@@ -948,22 +948,22 @@ The invocation of this program is done under the form
 
 The available subcommands are as follows:
 
-:why3-tool:`session info`
+:why3:tool:`session info`
     prints information and statistics about sessions.
 
-:why3-tool:`session latex`
+:why3:tool:`session latex`
     outputs session contents in LaTeX format.
 
-:why3-tool:`session html`
+:why3:tool:`session html`
     outputs session contents in HTML format.
 
-:why3-tool:`session update`
+:why3:tool:`session update`
     updates session contents.
 
 The first three commands do not modify the sessions, whereas the last
 modify them.
 
-.. why3-tool:: session info
+.. why3:tool:: session info
 
 Command ``info``
 ~~~~~~~~~~~~~~~~
@@ -1059,7 +1059,7 @@ proof” example of :numref:`chap.starting`.
     == Statistics per prover: number of proofs, time (minimum/maximum/average) in seconds ==
       Alt-Ergo 0.99.1     :   3   0.00   0.00   0.00
 
-.. why3-tool:: session latex
+.. why3:tool:: session latex
 
 Command ``latex``
 ~~~~~~~~~~~~~~~~~
@@ -1146,7 +1146,7 @@ Here are some examples of macro definitions:
 
 .. TODO: Restore screenshots of HelloProof.tex (style 1 and style 2)
 
-.. why3-tool:: session html
+.. why3:tool:: session html
 
 Command ``html``
 ~~~~~~~~~~~~~~~~
@@ -1212,7 +1212,7 @@ Specific options for this command are as follows.
    use the :program:`coqdoc` command to display Coq proof scripts. This is
    equivalent to ``--add_pp .v coqdoc --no-index --html -o %o %i .html``
 
-.. why3-tool:: session update
+.. why3:tool:: session update
 
 Command ``update``
 ~~~~~~~~~~~~~~~~~~
@@ -1227,7 +1227,7 @@ contents, depending on the following specific options.
    rename the file *<src>* to *<dst>* in the session. The file *<src>*
    itself is also renamed to *<dst>* in your filesystem.
 
-.. why3-tool:: doc
+.. why3:tool:: doc
 .. _sec.why3doc:
 
 The ``doc`` Command
@@ -1298,7 +1298,7 @@ directory as output files. This CSS style can be modified manually,
 since regenerating the HTML documentation will not overwrite an existing
 :file:`style.css` file.
 
-.. why3-tool:: pp
+.. why3:tool:: pp
 .. _sec.why3pp:
 
 The ``pp`` Command
@@ -1337,7 +1337,7 @@ commands are printed in comments and have to be defined by the user.
 Trailing digits and quotes are removed from the command names to reduce
 the number of commands.
 
-.. why3-tool:: execute
+.. why3:tool:: execute
 .. _sec.why3execute:
 
 The ``execute`` Command
@@ -1348,7 +1348,7 @@ The ``execute`` Command
 Why3 can symbolically execute programs written using the WhyML language
 (extension :file:`.mlw`). See also :numref:`sec.execute`.
 
-.. why3-tool:: extract
+.. why3:tool:: extract
 .. _sec.why3extract:
 
 The ``extract`` Command
@@ -1359,7 +1359,7 @@ The ``extract`` Command
 Why3 can extract programs written using the WhyML language (extension
 :file:`.mlw`) to OCaml. See also :numref:`sec.extract`.
 
-.. why3-tool:: realize
+.. why3:tool:: realize
 .. _sec.why3realize:
 
 The ``realize`` Command
@@ -1370,7 +1370,7 @@ The ``realize`` Command
 Why3 can produce skeleton files for proof assistants that, once filled,
 realize the given theories. See also :numref:`sec.realizations`.
 
-.. why3-tool:: wc
+.. why3:tool:: wc
 .. _sec.why3wc:
 
 The ``wc`` Command

@@ -55,7 +55,7 @@ displays the verification conditions for programs contained in file
     > why3 prove -P alt-ergo myfile.mlw
 
 runs the SMT solver Alt-Ergo on these verification conditions. All this
-can be performed within the GUI tool :why3-tool:`why3 ide` as well. See
+can be performed within the GUI tool :why3:tool:`why3 ide` as well. See
 :numref:`chap.manpages` for more details regarding command lines.
 
 As an introduction to WhyML, we use a small logical puzzle
@@ -393,7 +393,7 @@ shown below.
     end
 
 We can now proceed to its verification. Running :program:`why3`, or better
-:why3-tool:`why3 ide`, on file :file:`max_sum.mlw` shows a single verification
+:why3:tool:`why3 ide`, on file :file:`max_sum.mlw` shows a single verification
 condition with name ``WP max_sum``. Discharging this verification
 condition requires a little bit of non-linear arithmetic. Thus some SMT
 solvers may fail at proving it, but other succeed, *e.g.*, CVC4.
