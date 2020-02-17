@@ -445,6 +445,9 @@ module OCaml
   use export String
   use export Char
 
+  val eq_char (c1 c2: char) : bool
+    ensures { result <-> c1 = c2 }
+
   val get (s: string) (i: int63) : char
     requires { 0 <= i < length s }
     ensures  { result = get s i }
