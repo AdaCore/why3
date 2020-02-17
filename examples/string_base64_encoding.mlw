@@ -211,7 +211,6 @@ module Base64
     (* requires { 0 <= get_pad s < 3 } not needed *)
     requires { forall i. 0 <= i < length s - get_pad s -> valid_64_char s[i] }
     requires { forall i. length s - get_pad s <= i < length s -> s[i] = char_eq }
-    ensures  { length s = 0 }
     ensures  { length result = div (length s * 3) 4 - get_pad s}
     ensures  { forall i. 0 <= i < div (next_m3 (length result)) 3 ->
       let b1,b2,b3,b4 = s[4*i], s[4*i+1],s[4*i+2], s[4*i+3] in
@@ -223,13 +222,13 @@ module Base64
     }
   = let ref i = 0 in
     let ref r = "" in
+    let ghost ref b = 0:int in
     while i < length s do
       variant { length s - i }
       invariant { 0 <= i <= length s }
-      invariant { mod i 4 = 0 }
-      invariant { mod (length r) 3 = 0}
-      invariant { length r = div (i * 3) 4 }
-      invariant { forall j. 0 <= j < div i 4 ->
+      invariant { i = b * 4 }
+      invariant { length r = b * 3 }
+      invariant { forall j. 0 <= j < b ->
         let b1,b2,b3,b4 = s[4*j], s[4*j+1], s[4*j+2], s[4*j+3] in
         r[j*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
         r[j*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
@@ -254,9 +253,10 @@ module Base64
               r[length r - 2] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
               r[length r - 1] = chr (mod (b642int b3) 4 * 64 + b642int b4)
       };
-      i <- i + 4
+      i <- i + 4;
+      ghost (b <- b + 1)
     done;
-    assert { forall i. 0 <= i < div (length s) 4 ->
+    assert { forall i. 0 <= i < b ->
       let b1,b2,b3,b4 = s[4*i], s[4*i+1], s[4*i+2], s[4*i+3] in
       r[i*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
       r[i*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
