@@ -83,8 +83,8 @@ uses OCaml’s native integers instead, one has to use Why3’s types for
 63-bit integers from libraries ``mach.int.Int63`` and
 ``mach.array.Array63``.
 
-Extraction Starting Point.
-''''''''''''''''''''''''''
+Extraction Starting Point
+'''''''''''''''''''''''''
 
 The :why3:tool:`extract` command accepts three different targets for extraction:
 a WhyML file, a module, or a symbol (function, type, exception). To
@@ -112,8 +112,8 @@ from module ``M`` of file :file:`f.mlw`, one should write
 Note the use of :option:`-L`, for both extraction of a module and a
 symbol, in order to state the location of file :file:`f.mlw`.
 
-Options.
-''''''''
+Options
+'''''''
 
 The following options can be added to the extraction command line:
 
@@ -136,8 +136,8 @@ The following options can be added to the extraction command line:
     Recursively extract all the dependencies of the chosen entry point.
     This option is valid for both :option:`--modular` and :option:`--flat` options.
 
-Examples.
-'''''''''
+Examples
+''''''''
 
 We illustrate different ways of using the :why3:tool:`extract` command through
 some examples.
@@ -199,8 +199,8 @@ This updates the contents of file :file:`aqueue.ml` as follows:
 This new version of the code is now accepted by the OCaml compiler
 (provided the ``ZArith`` library is available, as above).
 
-Custom Extraction Drivers.
-''''''''''''''''''''''''''
+Custom Extraction Drivers
+'''''''''''''''''''''''''
 
 Several OCaml drivers can be specified on the command line, using option
 :option:`-D` several times. In particular, one can provide a custom driver to

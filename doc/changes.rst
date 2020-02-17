@@ -91,7 +91,7 @@ The following table summarizes the changes.
 
 +---------------------------------------------+---------------------------------------------------------------+
 | version 0.88                                | version 1.0                                                   |
-+---------------------------------------------+---------------------------------------------------------------+
++=============================================+===============================================================+
 | ``function f ...``                          | ``let function f ...`` if called in programs                  |
 +---------------------------------------------+---------------------------------------------------------------+
 | ``'L:``                                     | ``label L in``                                                |
@@ -137,7 +137,7 @@ Proving only partial correctness:
   A warning was issued, recommending to add an extra ``diverges`` clause
   to that function's contract. It was also possible to disable that
   warning by adding the label ``"W:diverges:N"`` to the function's name.
-  Version 1.00 of Why3 is more aggressively requiring the user to prove
+  Version 1.0 of Why3 is more aggressively requiring the user to prove
   the termination of functions which are not given the ``diverges``
   clause, and the previous warning is now an error. The possibility of
   proving only partial correctness is now given on a more fine-grain
@@ -150,7 +150,7 @@ Proving only partial correctness:
 
      let f "W:diverges:N" <parameters> <contract> = <body>
 
-  then in 1.00 it should be written as
+  then in 1.0 it should be written as
 
   ::
 
@@ -161,7 +161,7 @@ Semantics of the ``any`` construct:
   The ``any`` construct in Why3 0.xx was introducing an arbitrary value
   satisfying the associated post-condition. In some sense, this construct
   was introducing some form of an axiom stating that such a value exists.
-  In Why3 1.00, it is now mandatory to prove the existence of such
+  In Why3 1.0, it is now mandatory to prove the existence of such
   a value, and a VC is generated for that purpose.
 
   To obtain the effect of the former semantics of the ``any`` construct,
@@ -172,7 +172,7 @@ Semantics of the ``any`` construct:
 
      any t ensures { P }
 
-  then in 1.00 it should be written as
+  then in 1.0 it should be written as
 
   ::
 

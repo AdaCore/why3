@@ -381,7 +381,7 @@ kind of rules they apply:
 
 .. why3:transform:: destruct_rec
 
-   Recursively call ::why3:transform:`destruct` on the generated
+   Recursively call :why3:transform:`destruct` on the generated
    hypotheses. The recursion on implication and ``match`` stops after the
    first occurence of a different symbol.
 
