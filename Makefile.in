@@ -2053,14 +2053,13 @@ update-doc-png:
 	export WHY3LOADPATH=stdlib; \
 	sed -n -e 's/^%EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
 
-ifeq (@enable_html_doc@,yes)
-
 doc/html/index.html: $(DOCRST) $(DRVDOT:%=doc/generated/drivers-%.dot)
 	$(SPHINX) -b html doc doc/html
 
-else
 
-doc/html/index.html:
+ifeq (@enable_pdf_doc@,yes)
+
+else
 
 endif
 
