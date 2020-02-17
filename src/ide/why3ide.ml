@@ -2283,7 +2283,7 @@ let (_ : GMenu.menu_item) =
     ~callback:reduce_fonts
 
 let (_: GMenu.menu_item) =
-  view_factory#add_item "Collapse proven goals"
+  view_factory#add_item "Collapse proved goals"
     ~accel_group:tools_accel_group ~key:GdkKeysyms._exclam
     ~tooltip:"Collapse all the proven nodes under the current node"
     ~callback:collapse_proven_goals

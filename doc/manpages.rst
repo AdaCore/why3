@@ -568,7 +568,7 @@ Key shortcuts
 
 -  Reduce font: :kbd:`Control-minus`
 
--  Collapse proven goals: :kbd:`!`
+-  Collapse proved goals: :kbd:`!`
 
 -  Collapse current node: :kbd:`-`
 
