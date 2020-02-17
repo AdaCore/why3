@@ -63,7 +63,7 @@ void wmpz_mul2exp (wmpz_ptr, wmpz_srcptr, uint64_t);
 void wmpz_tdiv_q_2exp (wmpz_ptr, wmpz_srcptr, uint64_t);
 
 void wmpz_tdiv_qr(wmpz_ptr, wmpz_ptr, wmpz_srcptr, wmpz_srcptr);
-
+uint64_t wmpz_tdiv_qr_ui(wmpz_ptr, wmpz_ptr, wmpz_srcptr, uint64_t);
 
 int32_t wmpn_cmp (wmp_srcptr, wmp_srcptr, wmp_size_t);
 

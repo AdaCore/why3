@@ -200,6 +200,106 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
   release_reader d' dp;
   unchanged d' mpz mpz';
   unchanged n' mpz mpz';
-  return;
+  return
+
+let wmpz_tdiv_qr_ui (quot rem dividend: mpz_ptr) (divisor: limb) : limb
+  requires { mpz.alloc[dividend] > 0 }
+  requires { mpz.alloc[quot] > 0 /\ mpz.alloc[rem] > 0 }
+  requires { mpz.readers[dividend] = 0 /\ mpz.readers[quot] = 0
+             /\ mpz.readers[rem] = 0 }
+  requires { quot <> rem }
+  requires { divisor > 0 }
+  ensures  { value_of quot mpz * divisor + value_of rem mpz
+             = old value_of dividend mpz }
+  ensures  { result = mpz.abs_value_of rem }
+  ensures  { 0 <= mpz.abs_value_of rem < divisor }
+  ensures  { forall x. x <> quot -> x <> rem -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[dividend] = 0 /\ mpz.readers[quot] = 0
+             /\ mpz.readers[rem] = 0 }
+=
+  let ghost ompz = pure { mpz } in
+  let ns = size_of dividend in
+  let ghost avn = mpz.abs_value_of dividend in
+  if ns = 0
+  then begin
+    set_size_0 quot;
+    set_size_0 rem;
+    return 0;
+  end;
+  let nn = abs ns in
+  let qp = wmpz_realloc quot nn in
+  ghost (if not mpz_eq quot dividend
+         then unchanged dividend mpz ompz);
+  unchanged rem mpz ompz;
+  let ref qn = nn in
+  let ref rl = 0 in
+  if mpz_eq quot dividend
+  then begin
+    let np = salloc (UInt32.of_int32 nn) in
+    wmpn_copyd_sep np qp nn;
+    rl <- wmpn_divrem_1 qp np nn divisor
+  end else begin
+    let np = get_read_ptr dividend in
+    assert { plength np >= nn };
+    rl <- wmpn_divrem_1 qp np nn divisor;
+    release_reader dividend np;
+    ghost (if not mpz_eq rem dividend
+           then unchanged rem mpz ompz);
+  end;
+  assert { value qp qn * divisor + rl = avn };
+  if rl = 0
+  then set_size_0 rem
+  else begin
+    let rs = if ns >= 0 then 1 else -1 in
+    let rp = get_write_ptr rem in
+    assert { plength rp >= 1 };
+    C.set rp rl;
+    assert { value rp 1 = rl };
+    set_size rem rs rp;
+    release_writer rem rp;
+  end;
+  assert { nn - 2 >= 0 -> value qp qn >= power radix (nn - 2)
+           by 0 <= rl < divisor
+           so value qp qn * divisor + rl
+              < value qp qn * divisor + divisor
+              = (value qp qn + 1) * divisor
+              < (value qp qn + 1) * radix
+           so avn >= power radix (nn - 1)
+           so power radix (nn - 1) < radix * (value qp qn + 1)
+           so power radix (nn - 1) = radix * power radix (nn - 2)
+           so power radix (nn - 2) < value qp qn + 1 };
+  let qh = C.get_ofs qp (nn - 1) in
+  value_tail qp (qn - 1);
+  qn <- qn - (if qh = 0 then 1 else 0);
+  assert { value qp qn = value qp nn };
+  assert { qn >= 1 -> value qp qn >= power radix (qn - 1)
+           by if qh = 0
+           then qn = nn - 1
+                so value qp qn >= power radix (nn - 2)
+           else power radix (qn - 1) * 1 <= power radix (qn - 1) * qh
+                so value qp qn = value qp (qn - 1) + power radix (qn - 1) * qh
+                >= power radix (qn - 1) * qh
+                >= power radix (qn - 1) };
+  let qs = if ns >= 0 then qn else -qn in
+  assert { sgn_value qp qs * divisor
+           + value_of rem mpz = value_of dividend ompz
+           by if ns >= 0
+              then qs = qn so value_of dividend ompz = avn
+                   so value_of rem mpz = rl
+                   so sgn_value qp qs * divisor
+                       + value_of rem mpz = value_of dividend ompz
+              else qs = - qn /\ value_of dividend ompz = - avn
+                   so value_of rem mpz = - rl
+                   so sgn_value qp qs = - value qp qn
+                   so sgn_value qp qs * divisor
+                       + value_of rem mpz
+                       = - (value qp qn * divisor + rl)
+                       = - avn
+                       = value_of dividend ompz };
+  let ghost mpzq = pure { mpz } in
+  set_size quot qs qp;
+  release_writer quot qp;
+  unchanged rem mpz mpzq;
+  return rl
 
 end
