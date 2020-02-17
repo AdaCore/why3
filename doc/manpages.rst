@@ -61,52 +61,56 @@ particular, option :option:`--help` displays the usage and options.
 
 .. option:: -L <dir>, --library <dir>
 
-   add ``<dir>`` in the load path, to search for theories.
+   Add ``<dir>`` in the load path, to search for theories.
 
 .. option:: -C <file>, --config <file>
 
-   read the configuration from the given file.
+   Read the configuration from the given file. See :numref:`sec.whyconffile`.
 
 .. option:: --extra-config <file>
 
-   read additional configuration from the given file.
+   Read additional configuration from the given file.
 
 .. option:: --list-debug-flags
 
-   list known debug flags.
+   List known debug flags.
 
 .. option:: --list-transforms
 
-   list known transformations.
+   List known transformations.
 
 .. option:: --list-printers
 
-   list known printers.
+   List known printers.
 
 .. option:: --list-provers
 
-   list known provers.
+   List known provers.
 
 .. option:: --list-formats
 
-   list known input formats.
+   List known input formats.
 
 .. option:: --list-metas
 
-   list known metas.
+   List known metas.
 
 .. option:: --debug-all
 
-   set all debug flags (except flags which change the behavior).
+   Set all debug flags (except flags that change the behavior).
 
 .. option:: --debug <flag>
 
-   set a specific debug flag.
+   Set a specific debug flag.
 
 .. option:: --help
 
-   display the usage and the exact list of options for the given tool.
+   Display the usage and the exact list of options for the given tool.
 
+.. envvar:: WHY3CONFIG
+
+   Indicate where to find the :file:`why3.conf` file. Can be overwritten using
+   the :option:`--config` option.
 
 .. index:: configuration file
 .. why3:tool:: config
@@ -128,9 +132,8 @@ this file to add support for detection of other provers. (In that case,
 please consider submitting a new prover configuration on the bug
 tracking system.)
 
-The result of provers detection is stored in the user’s configuration
-file (:file:`~/.why3.conf` or, in the case of local installation,
-:file:`why3.conf` in Why3 sources top directory). This file is also
+The result of provers detection is stored in the user's configuration
+file (see :numref:`sec.whyconffile`). This file is also
 human-readable, and advanced users may modify it in order to experiment
 with different ways of calling provers, e.g., different versions of the same
 prover, or with different options.

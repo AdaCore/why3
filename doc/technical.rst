@@ -23,8 +23,8 @@ in directory :file:`/usr/local/share/why3` after installation.
 
 .. _sec.whyconffile:
 
-The ``why3.conf`` Configuration File
-------------------------------------
+The :file:`why3.conf` Configuration File
+----------------------------------------
 
 One can use a custom configuration file. The Why3 tools look for it in
 the following order:
