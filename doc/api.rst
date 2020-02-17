@@ -21,17 +21,16 @@ Building Propositional Formulas
 
 The first step is to know how to build propositional formulas. The
 module ``Term`` gives a few functions for building these. Here is a
-piece of OCaml code for building the formula :math:`\mathit{true} \lor
-\mathit{false}`.
+piece of OCaml code for building the formula ``true \/ false``.
 
 .. literalinclude:: ../examples/use_api/logic.ml
    :language: ocaml
    :start-after: BEGIN{opening}
    :end-before: END{opening}
 
-The library uses the common type ``term`` both for terms (*i.e.*,
+The library uses the common type ``term`` both for terms (i.e.,
 expressions that produce a value of some particular type) and formulas
-(boolean-valued expressions).
+(i.e., boolean-valued expressions).
 
 Such a formula can be printed using the module ``Pretty`` providing
 pretty-printers.
@@ -54,8 +53,8 @@ Running the generated executable :file:`f` results in the following output.
 
     formula 1 is: true \/ false
 
-Let us now build a formula with propositional variables: :math:`A \land
-B \rightarrow A`. Propositional variables must be declared first before
+Let us now build a formula with propositional variables: ``A /\ B -> A``.
+Propositional variables must be declared first before
 using them in formulas. This is done as follows.
 
 .. literalinclude:: ../examples/use_api/logic.ml
@@ -64,8 +63,8 @@ using them in formulas. This is done as follows.
    :end-before: END{declarepropvars}
 
 The type ``lsymbol`` is the type of function and predicate symbols (which
-we call logic symbols for brevity). Then the atoms :math:`A`
-and :math:`B` must be built by the general function for applying
+we call logic symbols for brevity). Then the atoms ``A``
+and ``B`` must be built by the general function for applying
 a predicate symbol to a list of terms. Here we just need the empty list
 of arguments.
 
@@ -91,9 +90,16 @@ Building Tasks
 Let us see how we can call a prover to prove a formula. As said in
 previous chapters, a prover must be given a task, so we need to build
 tasks from our formulas. Task can be build incrementally from an empty
-task by adding declaration to it, using the functions ``add__decl`` of
-module ``Task``. For the formula :math:`\mathit{true} \lor
-\mathit{false}` above, this is done as follows. To make the formula a
+task by adding declaration to it, using the functions ``add_*_decl`` of
+module ``Task``. For the formula ``true \/ false`` above,
+this is done as follows.
+
+.. literalinclude:: ../examples/use_api/logic.ml
+   :language: ocaml
+   :start-after: BEGIN{buildtask}
+   :end-before: END{buildtask}
+
+To make the formula a
 goal, we must give a name to it, here “goal1”. A goal name has type
 ``prsymbol``, for identifiers denoting propositions in a theory or a
 task. Notice again that the concrete syntax of Why3 requires these
@@ -219,7 +225,7 @@ with in particular the fields:
 
 -  ``pr_answer``: the prover answer, explained below;
 
--  ``pr_time`` : the time taken by the prover, in seconds.
+-  ``pr_time``: the time taken by the prover, in seconds.
 
 A ``pr_answer`` is the sum type defined in module ``Call_provers``:
 
@@ -271,9 +277,9 @@ An important feature of the functions for building terms and formulas is
 that they statically guarantee that only well-typed terms can be
 constructed.
 
-Here is the way we build the formula :math:`2+2=4`. The main difficulty
+Here is the way we build the formula ``2+2=4``. The main difficulty
 is to access the internal identifier for addition: it must be retrieved
-from the standard theory ``Int`` of the file ``int.why``.
+from the standard theory ``Int`` of the file :file:`int.why`.
 
 .. literalinclude:: ../examples/use_api/logic.ml
    :language: ocaml
@@ -281,7 +287,7 @@ from the standard theory ``Int`` of the file ``int.why``.
    :end-before: END{buildfmla}
 
 An important point to notice as that when building the application
-of :math:`+` to the arguments, it is checked that the types are correct.
+of ``+`` to the arguments, it is checked that the types are correct.
 Indeed the constructor ``t_app_infer`` infers the type of the resulting
 term. One could also provide the expected type as follows.
 
@@ -302,7 +308,7 @@ Building Quantified Formulas
 ----------------------------
 
 To illustrate how to build quantified formulas, let us consider the
-formula :math:`\forall x:int. x*x \geq 0`. The first step is to obtain
+formula :math:`\forall x:int. x \cdot x \geq 0`. The first step is to obtain
 the symbols from ``Int``.
 
 .. literalinclude:: ../examples/use_api/logic.ml
@@ -310,21 +316,21 @@ the symbols from ``Int``.
    :start-after: BEGIN{quantfmla1}
    :end-before: END{quantfmla1}
 
-The next step is to introduce the variable :math:`x` with the type ``int``.
+The next step is to introduce the variable *x* with the type ``int``.
 
 .. literalinclude:: ../examples/use_api/logic.ml
    :language: ocaml
    :start-after: BEGIN{quantfmla2}
    :end-before: END{quantfmla2}
 
-The formula :math:`x*x \geq 0` is obtained as in the previous example.
+The formula :math:`x \cdot x \geq 0` is obtained as in the previous example.
 
 .. literalinclude:: ../examples/use_api/logic.ml
    :language: ocaml
    :start-after: BEGIN{quantfmla3}
    :end-before: END{quantfmla3}
 
-To quantify on :math:`x`, we use the appropriate smart constructor as
+To quantify on *x*, we use the appropriate smart constructor as
 follows.
 
 .. literalinclude:: ../examples/use_api/logic.ml
@@ -474,28 +480,37 @@ transformation to make it available for example in Why3 IDE.
    :start-after: BEGIN{register}
    :end-before: END{register}
 
-The directory ``src/transform`` contains the code for the many
+The directory :file:`src/transform` contains the code for the many
 transformations that are already available in Why3.
 
 Proof Sessions
 --------------
 
-See the example ``examples/use_api/create_session.ml`` of the
+See the example :file:`examples/use_api/create_session.ml` of the
 distribution for an illustration on how to manipulate proof sessions
 from an OCaml program.
 
 ML Programs
 -----------
 
-The simplest way to build WhyML programs from OCaml is to build untyped
-syntax trees for such programs, and then call the Why3 typing procedure
-to build typed declarations.
+One can build WhyML programs starting at different steps of the WhyML
+pipeline (parsing, typing, VC generation). We present here two choices.
+The first is to build an untyped syntax trees, and then call the Why3
+typing procedure to build typed declarations. The second choice is to
+directly build the typed declaration. The first choice use concepts
+similar to the WhyML language but errors in the generation are harder to
+debug since they are lost inside the typing phase, the second choice use
+more internal notions but it is easier to pinpoint the functions wrongly
+used.
+
+Untyped syntax tree
+~~~~~~~~~~~~~~~~~~~
 
 The examples of this section are available in the file
 :file:`examples/use_api/mlw_tree.ml` of the distribution.
 
 The first step is to build an environment as already illustrated in
-:numref:`sec.api.callingprovers`, and open the OCaml module ``Ptree``
+:numref:`sec.api.callingprovers`, and open the OCaml module ``Ptree`` (“parse tree”)
 which contains most of the OCaml functions we need in this section.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
@@ -503,46 +518,28 @@ which contains most of the OCaml functions we need in this section.
    :start-after: BEGIN{buildenv}
    :end-before: END{buildenv}
 
-To contain all the example programs we are going to build we need a
-module. We start the creation of that module using the following
-declarations, that first introduces a pseudo “file” to hold the module,
-then the module itself called ``Program``.
+Each of our example programs will build a module.
+Let us consider the Why3 code.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
-   :language: ocaml
-   :start-after: BEGIN{openmodule}
-   :end-before: END{openmodule}
-
-Notice the use of a first simple helper function ``mk_ident`` to build an
-identifier without any attributes nor any location.
-
-To write our programs, we need to import some other modules from the
-standard library. The following introduces two helper functions for
-building qualified identifiers and importing modules, and finally
-imports ``int.Int``.
-
-.. literalinclude:: ../examples/use_api/mlw_tree.ml
-   :language: ocaml
-   :start-after: BEGIN{useimport}
-   :end-before: END{useimport}
-
-We want now to build a program equivalent to the following code in
-concrete Why3 syntax.
-
-.. literalinclude:: ../examples/use_api/mlw_tree.ml
-   :language: ocaml
+   :language: whyml
    :start-after: BEGIN{source1}
    :end-before: END{source1}
 
-The OCaml code that programmatically build this Why3 function is as
-follows.
+The Ocaml code that programmatically builds it is as follows.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
    :start-after: BEGIN{code1}
    :end-before: END{code1}
 
-This code makes uses of the following helper functions.
+Most of the code is not using directly the ``Ptree`` constructors but
+instead makes uses of the helper functions that are given below. Notice
+``mk_ident`` which builds an identifier (``Ptree.ident``) without any
+attributes nor any location and ``use_import`` which lets us import some
+other modules and in particular the ones from the standard library. At
+the end, our module is no more than the identifier and a list of two
+declarations (``Ptree.decl list``).
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
@@ -553,31 +550,47 @@ We want now to build a program equivalent to the following code in
 concrete Why3 syntax.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
-   :language: ocaml
+   :language: whyml
    :start-after: BEGIN{source2}
    :end-before: END{source2}
 
-We need to import the ``ref.Ref`` module first. The rest is similar to
-the first example, the code is as follows.
+The OCaml code that programmatically build this Why3 function is as
+follows.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
    :start-after: BEGIN{code2}
    :end-before: END{code2}
 
-The next example makes use of arrays.
+We want now to build a program equivalent to the following code in
+concrete Why3 syntax.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
-   :language: ocaml
+   :language: whyml
    :start-after: BEGIN{source3}
    :end-before: END{source3}
 
-The corresponding OCaml code is as follows.
+We need to import the ``ref.Ref`` module first. The rest is similar to
+the first example, the code is as follows.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
    :start-after: BEGIN{code3}
    :end-before: END{code3}
+
+The next example makes use of arrays.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: whyml
+   :start-after: BEGIN{source4}
+   :end-before: END{source4}
+
+The corresponding OCaml code is as follows.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{code4}
+   :end-before: END{code4}
 
 Having declared all the programs we wanted to write, we can now close
 the module and the file, and get as a result the set of modules of our
@@ -585,8 +598,8 @@ file, under the form of a map of module names to modules.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
-   :start-after: BEGIN{closemodule}
-   :end-before: END{closemodule}
+   :start-after: BEGIN{getmodules}
+   :end-before: END{getmodules}
 
 We can then construct the proofs tasks for our module, and then try to
 call the Alt-Ergo prover. The rest of that code is using OCaml functions
@@ -597,12 +610,70 @@ that were already introduced before.
    :start-after: BEGIN{checkingvcs}
    :end-before: END{checkingvcs}
 
+Typed declaration
+~~~~~~~~~~~~~~~~~
+
+The examples of this section are available in the file
+:file:`examples/use_api/mlw_expr.ml` of the distribution.
+
+The first step to build an environment as already illustrated in
+:numref:`sec.api.callingprovers`.
+
+.. literalinclude:: ../examples/use_api/mlw_expr.ml
+   :language: ocaml
+   :start-after: BEGIN{buildenv}
+   :end-before: END{buildenv}
+
+To write our programs, we need to import some other modules from the
+standard library integers and references. The only subtleties is to get logic
+functions from the logical part of the modules
+``mod_theory.Theory.th_export`` and the program functions from ``mod_export``.
+
+.. literalinclude:: ../examples/use_api/mlw_expr.ml
+   :language: ocaml
+   :start-after: BEGIN{code2_import}
+   :end-before: END{code2_import}
+
+\lstinputlisting{generated/mlw_expr__code2_import.ml}
+
+We want now to build a program equivalent to the following code in
+concrete Why3 syntax.
+
+.. literalinclude:: ../examples/use_api/mlw_expr.ml
+   :language: whyml
+   :start-after: BEGIN{source2}
+   :end-before: END{source2}
+
+The OCaml code that programmatically build this Why3 function is as follows.
+
+.. literalinclude:: ../examples/use_api/mlw_expr.ml
+   :language: ocaml
+   :start-after: BEGIN{code2}
+   :end-before: END{code2}
+
+Having declared all the programs we wanted to write, we can now create the
+module and generate the VCs.
+
+.. literalinclude:: ../examples/use_api/mlw_expr.ml
+   :language: ocaml
+   :start-after: BEGIN{createmodule}
+   :end-before: END{createmodule}
+
+We can then construct the proofs tasks for our module, and then try to
+call the Alt-Ergo prover. The rest of that code is using OCaml
+functions that were already introduced before.
+
+.. literalinclude:: ../examples/use_api/mlw_expr.ml
+   :language: ocaml
+   :start-after: BEGIN{checkingvcs}
+   :end-before: END{checkingvcs}
+
 .. _sec.ce_api:
 
 Generating counterexamples
 --------------------------
 
-That feature is presented in details in :numref:`sec.idece`, that should
+That feature is presented in details in :numref:`sec.idece`, which should
 be read first. The counterexamples can also be generated using the API.
 The following explains how to change the source code (mainly adding
 attributes) in order to display counterexamples and how to parse the
@@ -613,12 +684,12 @@ Attributes and locations on identifiers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For variables to be used for counterexamples they need to contain an
-attribute called ``model_trace`` and a location. The ``model_trace``
+attribute called ``model_trace`` and a location. The ``model_trace`` attribute
 states the name the user wants the variable to be named in the output of
 the counterexamples pass. Usually, people put a reference to their
-program AST node in this attribute: this helps them to parse and display
+program AST node in this attribute; this helps them to parse and display
 the results given by Why3. The locations are also necessary as every
-counterexamples values with no location won’t be displayed. For example,
+counterexamples values with no location will not be displayed. For example,
 an assignment of the source language such as the following will probably
 trigger the creation of an ident (for the left value) in a user
 subsequent tasks:
@@ -648,7 +719,7 @@ formula for counterexamples, we need to tag it with the
 ``vc:annotation`` attribute. This attribute is automatically added when
 using the VC generation of Why3, but on a user-built task, this needs to
 be added. We also need to add a location for this goal. The following is
-obtained for the simple formula linking :math:`A` and :math:`B`:
+obtained for the simple formula linking ``A`` and ``B``:
 
 .. literalinclude:: ../examples/use_api/counterexample.ml
    :language: ocaml
@@ -656,7 +727,7 @@ obtained for the simple formula linking :math:`A` and :math:`B`:
    :end-before: END{ce_adaptgoals}
 
 Note: the transformations used for counterexamples will create new
-variables for each variable occuring inside the formula tagged by
+variables for each variable occurring inside the formula tagged by
 ``vc:annotation``. These variables are duplicates located at the VC
 line. They allow giving all counterexample values located at that VC
 line.
