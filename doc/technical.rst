@@ -68,6 +68,32 @@ automatically generated from the main :file:`Makefile`.
 
 .. TODO: generated/drivers_dependency.tex
 
+.. graphviz:: generated/drivers-smt.dot
+   :caption: Driver dependencies for SMT solvers
+   :name: fig.drv.smt
+
+.. graphviz:: generated/drivers-tptp.dot
+   :caption: Driver dependencies for TPTP solvers
+   :name: fig.drv.tptp
+
+.. graphviz:: generated/drivers-coq.dot
+   :caption: Driver dependencies for Coq
+   :name: fig.drv.coq
+
+.. graphviz:: generated/drivers-isabelle.dot
+   :caption: Driver dependencies for Isabelle/HOL
+   :name: fig.drv.isabelle
+
+.. graphviz:: generated/drivers-pvs.dot
+   :caption: Driver dependencies for PVS
+   :name: fig.drv.pvs
+
+The most important drivers dependencies are shown in the following
+figures: :numref:`fig.drv.smt` shows the drivers files for SMT
+solvers, :numref:`fig.drv.tptp` for TPTP solvers, :numref:`fig.drv.coq`
+for Coq, :numref:`fig.drv.isabelle` for Isabelle/HOL,
+and :numref:`fig.drv.pvs` for PVS.
+
 .. _sec.transformations:
 
 Transformations

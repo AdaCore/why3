@@ -29,6 +29,7 @@ sys.path.append(os.path.abspath('./ext'))
 # ones.
 extensions = [
     'sphinx.ext.mathjax',
+    'sphinx.ext.graphviz',
     'sphinxcontrib.bibtex',
     'why3'
 ]

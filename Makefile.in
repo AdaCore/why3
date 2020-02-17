@@ -2026,26 +2026,26 @@ endif
 
 ifeq (@enable_doc@,yes)
 
-doc: doc/manual.pdf doc/html/index.html
+doc: doc/html/index.html
 
-BNF = ident qualid attribute constant operator type \
-	term1 term2 term3 expr1 expr2 expr3 \
-	formula theory theory2 \
-	why_file spec expr expr2 module whyml_file term_old_at
-BNFTEX = $(BNF:%=doc/generated/%_bnf.tex)
+doc/generated/drivers-all.dot: drivers/*.drv drivers/*.gen
+	doc/drv_depgraph $^ > $@
 
-doc/generated/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
-	doc/bnf$(EXE) $< > $@
+doc/generated/drivers-%.dot: doc/generated/drivers-all.dot
+	ccomps -X $(NODE) $< > $@
 
-doc/bnf$(EXE): doc/bnf.mll
-	$(OCAMLLEX) $<
-	$(OCAMLC) -o $@ doc/bnf.ml
+doc/generated/drivers-smt.dot: NODE = smt-libv2.gen
+doc/generated/drivers-tptp.dot: NODE = tptp.gen
+doc/generated/drivers-coq.dot: NODE = coq-common.gen
+doc/generated/drivers-isabelle.dot: NODE = isabelle-common.gen
+doc/generated/drivers-pvs.dot: NODE = pvs-common.gen
 
-DOC = api glossary ide intro exec macros manpages install \
-      manual starting syntax syntaxref technical version whyml \
-      itp pvs coq isabelle
+DRVDOT = smt tptp coq isabelle pvs
 
-DOCTEX = $(DOC:%=doc/%.tex)
+DOC = index zebibliography genindex \
+  foreword starting whyml api install manpages syntaxref exec itp technical changes
+
+DOCRST = $(DOC:%=doc/%.rst)
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
@@ -2053,19 +2053,10 @@ update-doc-png:
 	export WHY3LOADPATH=stdlib; \
 	sed -n -e 's/^%EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
 
-CLEANDIRS += doc
-GENERATED += doc/bnf.ml
-
 ifeq (@enable_html_doc@,yes)
 
-# the dependency on the pdf ensures the bbl was built
-doc/html/manual.html: doc/manual.pdf doc/fix.hva
-	cd doc; rm -rf html; mkdir -p html
-	cp doc/*.png doc/manual.bbl doc/html/
-	cd doc; $(HEVEA) -o html/manual.html -fix -O fix.hva makeidx.hva manual.tex
-
-doc/html/index.html: doc/html/manual.html
-	cd doc; $(HACHA) -tocbis -o html/index.html html/manual.html
+doc/html/index.html: $(DOCRST) $(DRVDOT:%=doc/generated/drivers-%.dot)
+	sphinx-build -b html doc doc/html
 
 else
 
@@ -2074,9 +2065,8 @@ doc/html/index.html:
 endif
 
 clean::
-	rm -rf doc/bnf$(EXE) $(BNFTEX) doc/html doc/manual.image.out; \
-	cd doc; $(LATEXCLEAN) manual.tex; \
-	rm -rf doc/generated/drivers*
+	rm -rf doc/html; \
+	rm -rf doc/generated/drivers-*.dot
 
 else
 
