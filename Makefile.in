@@ -2028,24 +2028,7 @@ ifeq (@enable_doc@,yes)
 
 doc: doc/html/index.html doc/latex/manual.pdf
 
-doc/generated/drivers-all.dot: drivers/*.drv drivers/*.gen
-	doc/drv_depgraph $^ > $@
-
-doc/generated/drivers-%.dot: doc/generated/drivers-all.dot
-	ccomps -X $(NODE) $< > $@
-
-doc/generated/drivers-smt.dot: NODE = smt-libv2.gen
-doc/generated/drivers-tptp.dot: NODE = tptp.gen
-doc/generated/drivers-coq.dot: NODE = coq-common.gen
-doc/generated/drivers-isabelle.dot: NODE = isabelle-common.gen
-doc/generated/drivers-pvs.dot: NODE = pvs-common.gen
-
-DRVDOT = smt tptp coq isabelle pvs
-
-DOC = index zebibliography genindex \
-  foreword starting whyml api install manpages syntaxref exec itp technical changes
-
-DOCRST = $(DOC:%=doc/%.rst)
+include misc/Makefile.doc
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
@@ -2053,10 +2036,10 @@ update-doc-png:
 	export WHY3LOADPATH=stdlib; \
 	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
 
-doc/html/index.html: $(DOCRST) $(DRVDOT:%=doc/generated/drivers-%.dot)
+doc/html/index.html: $(DOCRST) $(DRVDOT)
 	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
-doc/latex/manual.tex: $(DOCRST) $(DRVDOT:%=doc/generated/drivers-%.dot)
+doc/latex/manual.tex: $(DOCRST) $(DRVDOT)
 	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
 
 ifeq (@enable_pdf_doc@,yes)
