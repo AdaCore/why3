@@ -162,14 +162,14 @@ WhyML features an ML-style type system with polymorphic types, variants
 type expressions is the following:
 
 .. productionlist::
-    type: `lqualid` `type_arg`+            ; polymorphic type symbol
-        : | `type` "->" `type`            ; mapping type (right-associative)
+    type: `lqualid` `type_arg`+   ; polymorphic type symbol
+        : | `type` "->" `type`   ; mapping type (right-associative)
         : | `type_arg`
-    type_arg: `lqualid`                  ; monomorphic type symbol (sort)
-            : | `qident`                    ; type variable
-            : | "()"		             ; unit type
-            : | "(" `type` ("," `type`)+ ")"  ; tuple type
-            : | "{" `type` "}"              ; snapshot type
+    type_arg: `lqualid`   ; monomorphic type symbol (sort)
+            : | `qident`   ; type variable
+            : | "()"   ; unit type
+            : | "(" `type` ("," `type`)+ ")"   ; tuple type
+            : | "{" `type` "}"   ; snapshot type
             : | `qualifier`? "(" `type` ")"   ; type in a scope
 
 
@@ -198,61 +198,62 @@ Logical expressions: terms and formulas
 ---------------------------------------
 
 .. productionlist::
-    term: `integer`            ; integer constant
-        : | `real`                    ; real constant
-        : | "true" | "false"        ; Boolean constant
-        : | "()"                    ; empty tuple
-        : | `qualid`                  ; qualified identifier
-        : | `qualifier`? "(" `term` ")"        ; term in a scope
-        : | `qualifier`? "begin" `term` "end"  ; idem
-        : | `tight_op` `term`           ; tight operator
-        : | "{" `term_field`+ "}"     ; record
-        : | "{" `term` "with" `term_field`+ "}" ; record update
-        : | `term` "." `lqualid`        ; record field access
-        : | `term` "[" `term` "]" "'"*  ; collection access
-        : | `term` "[" `term` "<-" `term` "]" "'"*  ; collection update
-        : | `term` "[" `term` ".." `term` "]" "'"*  ; collection slice
-        : | `term` "[" `term` ".." "]" "'"*  ; right-open slice
-        : | `term` "[" ".." `term` "]" "'"*  ; left-open slice
-        : | `term` `term`+              ; application
-        : | `prefix_op` `term`          ; prefix operator
-        : | `term` `infix_op_4` `term`    ; infix operator 4
-        : | `term` `infix_op_3` `term`    ; infix operator 3
-        : | `term` `infix_op_2` `term`    ; infix operator 2
-        : | `term` "at" `uident`        ; past value
-        : | "old" `term`              ; initial value
-        : | `term` `infix_op_1` `term`    ; infix operator 1
-        : | "not" `term`              ; negation
-        : | `term` "/\" `term`          ; conjunction
-        : | `term` "&&" `term`          ; asymmetric conjunction
-        : | `term` "\/" `term`          ; disjunction
-        : | `term` "||" `term`          ; asymmetric disjunction
-        : | `term` "by" `term`          ; proof indication
-        : | `term` "so" `term`          ; consequence indication
-        : | `term` "->" `term`          ; implication
-        : | `term` "<->" `term`         ; equivalence
-        : | `term` ":" `type`           ; type cast
-        : | `attribute`+ `term`         ; attributes
-        : | `term` ("," `term`)+        ; tuple
-        : | `quantifier` `quant_vars` `triggers`? "." `term` ; quantifier
-        : | ...                     ; (to be continued)
-    term_field: `lqualid` "=" `term` ";" ; field = value
-    qualid: `qualifier`? (`lident_ext` | `uident`)  ; qualified identifier
-    lident_ext: `lident`                   ; lowercase identifier
-              : | "(" `ident_op` ")"         ; operator identifier
-              : | "(" `ident_op` ")" ("_" | "'") alpha suffix* ; associated identifier
-    ident_op:  `infix_op_1`              ;   infix operator 1
-            : | `infix_op_2`              ;   infix operator 2
-            : | `infix_op_3`              ;   infix operator 3
-            : | `infix_op_4`              ;   infix operator 4
-            : | `prefix_op` "_"           ;   prefix operator
-            : | `tight_op` "_"?           ;   tight operator
-            : | "[" "]" "'" *           ;   collection access
-            : | "[" "<-" "]" "'"*       ;   collection update
-            : | "[" "]" "'"* "<-"       ;   in-place update
-            : | "[" ".." "]" "'"*       ;   collection slice
-            : | "[" "_" ".." "]" "'"*   ;   right-open slice
-            : | "[" ".." "_" "]" "'"*   ;   left-open slice
+    term: `integer`   ; integer constant
+        : | `real`   ; real constant
+        : | "true" | "false"   ; Boolean constant
+        : | "()"   ; empty tuple
+        : | `qualid`   ; qualified identifier
+        : | `qualifier`? "(" `term` ")"   ; term in a scope
+        : | `qualifier`? "begin" `term` "end"   ; idem
+        : | `tight_op` `term`   ; tight operator
+        : | "{" `term_field`+ "}"   ; record
+        : | "{" `term` "with" `term_field`+ "}"   ; record update
+        : | `term` "." `lqualid`   ; record field access
+        : | `term` "[" `term` "]" "'"*   ; collection access
+        : | `term` "[" `term` "<-" `term` "]" "'"*   ; collection update
+        : | `term` "[" `term` ".." `term` "]" "'"*   ; collection slice
+        : | `term` "[" `term` ".." "]" "'"*   ; right-open slice
+        : | `term` "[" ".." `term` "]" "'"*   ; left-open slice
+        : | `term` `term`+   ; application
+        : | `prefix_op` `term`   ; prefix operator
+        : | `term` `infix_op_4` `term`   ; infix operator 4
+        : | `term` `infix_op_3` `term`   ; infix operator 3
+        : | `term` `infix_op_2` `term`   ; infix operator 2
+        : | `term` "at" `uident`   ; past value
+        : | "old" `term`   ; initial value
+        : | `term` `infix_op_1` `term`   ; infix operator 1
+        : | "not" `term`   ; negation
+        : | `term` "/\" `term`   ; conjunction
+        : | `term` "&&" `term`   ; asymmetric conjunction
+        : | `term` "\/" `term`   ; disjunction
+        : | `term` "||" `term`   ; asymmetric disjunction
+        : | `term` "by" `term`   ; proof indication
+        : | `term` "so" `term`   ; consequence indication
+        : | `term` "->" `term`   ; implication
+        : | `term` "<->" `term`   ; equivalence
+        : | `term` ":" `type`   ; type cast
+        : | `attribute`+ `term`   ; attributes
+        : | `term` ("," `term`)+   ; tuple
+        : | `quantifier` `quant_vars` `triggers`? "." `term`   ; quantifier
+        : | ...   ; (to be continued)
+    formula: `term`   ; no distinction as far as syntax is concerned
+    term_field: `lqualid` "=" `term` ";"   ; field = value
+    qualid: `qualifier`? (`lident_ext` | `uident`)   ; qualified identifier
+    lident_ext: `lident`   ; lowercase identifier
+              : | "(" `ident_op` ")"   ; operator identifier
+              : | "(" `ident_op` ")" ("_" | "'") alpha suffix*   ; associated identifier
+    ident_op:  `infix_op_1`   ; infix operator 1
+            : | `infix_op_2`   ; infix operator 2
+            : | `infix_op_3`   ; infix operator 3
+            : | `infix_op_4`   ; infix operator 4
+            : | `prefix_op` "_"   ; prefix operator
+            : | `tight_op` "_"?   ; tight operator
+            : | "[" "]" "'" *   ; collection access
+            : | "[" "<-" "]" "'"*   ; collection update
+            : | "[" "]" "'"* "<-"   ; in-place update
+            : | "[" ".." "]" "'"*   ; collection slice
+            : | "[" "_" ".." "]" "'"*   ; right-open slice
+            : | "[" ".." "_" "]" "'"*   ; left-open slice
     quantifier: "forall" | "exists"
     quant_vars: `quant_cast` ("," `quant_cast`)*
     quant_cast: `binder`+ (":" `type`)?
@@ -379,27 +380,27 @@ equivalence: ``A <-> B -> C`` is rejected.
 
 .. productionlist::
   term: ...
-      : | "if" `term` "then" `term` "else" `term`     ; conditional
-      : | "match" `term` "with" `term_case`+ "end"  ; pattern matching
-      : | "let" `pattern` "=" `term` "in" `term`      ; let-binding
-      : | "let" `symbol` `param`+ "=" `term` "in" `term`  ; mapping definition
-      : | "fun" `param`+ "->" `term`                ; unnamed mapping
+      : | "if" `term` "then" `term` "else" `term`   ; conditional
+      : | "match" `term` "with" `term_case`+ "end"   ; pattern matching
+      : | "let" `pattern` "=" `term` "in" `term`   ; let-binding
+      : | "let" `symbol` `param`+ "=" `term` "in" `term`   ; mapping definition
+      : | "fun" `param`+ "->" `term`   ; unnamed mapping
   term_case: "|" `pattern` "->" `term`
-  pattern: `binder`                            ; variable or "_"
-         : | "()"                              ; empty tuple
-         : | "{" (`lqualid` "=" `pattern` ";")+ "}"  ; record pattern
-         : | `uqualid` `pattern`*                  ; constructor
-         : | "ghost" `pattern`                   ; ghost sub-pattern
+  pattern: `binder`   ; variable or "_"
+         : | "()"   ; empty tuple
+         : | "{" (`lqualid` "=" `pattern` ";")+ "}"   ; record pattern
+         : | `uqualid` `pattern`*   ; constructor
+         : | "ghost" `pattern`   ; ghost sub-pattern
          : | `pattern` "as" "ghost"? `bound_var`   ; named sub-pattern
-         : | `pattern` "," `pattern`              ; tuple pattern
-         : | `pattern` "|" `pattern`               ; "or" pattern
-         : | `qualifier`? "(" `pattern` ")"        ; pattern in a scope
-  symbol: `lident_ext` `attribute`*      ; user-defined symbol
-  param: `type-arg`                          ; unnamed typed
-       : | `binder`                            ; (un)named untyped
-       : | "(" "ghost"? `type` ")"             ; unnamed typed
-       : | "(" "ghost"? `binder` ")"           ; (un)named untyped
-       : | "(" "ghost"? `binder`+ ":" `type` ")" ; multi-variable typed %
+         : | `pattern` "," `pattern`   ; tuple pattern
+         : | `pattern` "|" `pattern`   ; "or" pattern
+         : | `qualifier`? "(" `pattern` ")"   ; pattern in a scope
+  symbol: `lident_ext` `attribute`*   ; user-defined symbol
+  param: `type-arg`   ; unnamed typed
+       : | `binder`   ; (un)named untyped
+       : | "(" "ghost"? `type` ")"   ; unnamed typed
+       : | "(" "ghost"? `binder` ")"   ; (un)named untyped
+       : | "(" "ghost"? `binder`+ ":" `type` ")"   ; multi-variable typed
 
 Above, we find the more advanced term constructions:
 conditionals, let-bindings, pattern matching, and local function
@@ -452,68 +453,79 @@ that binary operators ``&&`` and ``||`` denote here the usual lazy
 conjunction and disjunction, respectively.
 
 .. productionlist::
-    expr: `integer`            ; integer constant
-        : | `real`                    ; real constant
-        : | "true" | "false"        ; Boolean constant
-        : | "()"                    ; empty tuple
-        : | `qualid`                  ; identifier in a scope
-        : | `qualifier`? "(" `expr` ")"        ; expression in a scope
-        : | `qualifier`? "begin" `expr` "end"  ; idem
-        : | `tight_op` `expr`           ; tight operator
-        : | "{" (`lqualid` "=" `expr` ";")+ "}"     ; record
-        : | "{" `expr` "with" (`lqualid` "=" `expr` ";")+ "}" ; record update
-        : | `expr` "." `lqualid`        ; record field access
-        : | `expr` "[" `expr` "]" "'"*  ; collection access
-        : | `expr` "[" `expr` "<-" `expr` "]" "'"*  ; collection update
-        : | `expr` "[" `expr` ".." `expr` "]" "'"*  ; collection slice
-        : | `expr` "[" `expr` ".." "]" "'"*  ; right-open slice
-        : | `expr` "[" ".." `expr` "]" "'"*  ; left-open slice
-        : | `expr` `expr`+              ; application
-        : | `prefix_op` `expr`          ; prefix operator
-        : | `expr` `infix_op_4` `expr`    ; infix operator 4
-        : | `expr` `infix_op_3` `expr`    ; infix operator 3
-        : | `expr` `infix_op_2` `expr`    ; infix operator 2
-        : | `expr` `infix_op_1` `expr`    ; infix operator 1
-        : | "not" `expr`              ; negation
-        : | `expr` "&&" `expr`          ; lazy conjunction
-        : | `expr` "||" `expr`          ; lazy disjunction
-        : | `expr` ":" `type`           ; type cast
-        : | `attribute`+ `expr`         ; attributes
-        : | "ghost" `expr`            ; ghost expression
-        : | `expr` ("," `expr`)+        ; tuple
-        : | `expr` "<-" `expr`          ; assignment
-        : | `expr` spec+                            ; added specification
-        : | "if" `expr` "then" `expr` ("else" `expr`)?  ; conditional
-        : | "match" `expr` "with" ("|" pattern "->" `expr`)+ "end"  ; pattern matching
+    expr: `integer`   ; integer constant
+        : | `real`   ; real constant
+        : | "true" | "false"   ; Boolean constant
+        : | "()"   ; empty tuple
+        : | `qualid`   ; identifier in a scope
+        : | `qualifier`? "(" `expr` ")"   ; expression in a scope
+        : | `qualifier`? "begin" `expr` "end"   ; idem
+        : | `tight_op` `expr`   ; tight operator
+        : | "{" (`lqualid` "=" `expr` ";")+ "}"   ; record
+        : | "{" `expr` "with" (`lqualid` "=" `expr` ";")+ "}"   ; record update
+        : | `expr` "." `lqualid`   ; record field access
+        : | `expr` "[" `expr` "]" "'"*   ; collection access
+        : | `expr` "[" `expr` "<-" `expr` "]" "'"*   ; collection update
+        : | `expr` "[" `expr` ".." `expr` "]" "'"*   ; collection slice
+        : | `expr` "[" `expr` ".." "]" "'"*   ; right-open slice
+        : | `expr` "[" ".." `expr` "]" "'"*   ; left-open slice
+        : | `expr` `expr`+   ; application
+        : | `prefix_op` `expr`   ; prefix operator
+        : | `expr` `infix_op_4` `expr`   ; infix operator 4
+        : | `expr` `infix_op_3` `expr`   ; infix operator 3
+        : | `expr` `infix_op_2` `expr`   ; infix operator 2
+        : | `expr` `infix_op_1` `expr`   ; infix operator 1
+        : | "not" `expr`   ; negation
+        : | `expr` "&&" `expr`   ; lazy conjunction
+        : | `expr` "||" `expr`   ; lazy disjunction
+        : | `expr` ":" `type`   ; type cast
+        : | `attribute`+ `expr`   ; attributes
+        : | "ghost" `expr`   ; ghost expression
+        : | `expr` ("," `expr`)+   ; tuple
+        : | `expr` "<-" `expr`   ; assignment
+        : | `expr` spec+   ; added specification
+        : | "if" `expr` "then" `expr` ("else" `expr`)?   ; conditional
+        : | "match" `expr` "with" ("|" pattern "->" `expr`)+ "end"   ; pattern matching
         : | qualifier? "begin" spec+ `expr` "end"   ; abstract block
-        : | `expr` ";" `expr`                         ; sequence
-        : | "let" `pattern` "=" `expr` "in" `expr`      ; let-binding
-        : | "let" `fun_defn` "in" `expr`              ; local function
+        : | `expr` ";" `expr`   ; sequence
+        : | "let" `pattern` "=" `expr` "in" `expr`   ; let-binding
+        : | "let" `fun_defn` "in" `expr`   ; local function
         : | "let" "rec" `fun_defn` ("with" `fun_defn`)* "in" `expr`   ; recursive function
-        : | "fun" `param`+ `spec`* "->" `spec`* `expr`    ; unnamed function
-        : | "any" result `spec`*                    ; arbitrary value
-    fun_defn: `fun-head` `spec`* "=" `spec`* `expr` ; function definition
-    fun-head: "ghost"? `kind`? `symbol` `param`+ (":" `result`)? ; function header
-    kind: "function" | "predicate" | "lemma" ; function kind
-    result: `ret_type`                      ;
-      : | "(" `ret_type` ("," `ret_type`)* ")"      ;
-      : | "(" `ret-name` ("," `ret-name`)* ")"      ;
-    ret_type: "ghost"? `type`                ; unnamed result
-    ret_name: "ghost"? `binder` ":" `type`     ; named result
-    spec: "requires"  "{" `term` "}"                      ; pre-condition
-      : | "ensures"   "{" `term` "}"                      ; post-condition
-      : | "returns"   "{" ("|" `pattern` "->" `term`)+  "}" ; post-condition
-      : | "raises"    "{" ("|" `pattern` "->" `term`)+  "}" ; exceptional post-c.
-      : | "raises"    "{" `uqualid` ("," `uqualid`)*    "}" ; raised exceptions
-      : | "reads"     "{" `lqualid` ("," `lqualid`)*    "}" ; external reads
-      : | "writes"    "{" `path` ("," `path`)*          "}" ; memory writes
-      : | "alias"     "{" `alias` ("," `alias`)*        "}" ; memory aliases
-      : | "variant"   "{" `variant` ("," `variant`)*    "}" ; termination variant
-      : | "diverges"                                    ; may not terminate
-      : | ("reads" | "writes" | "alias") "{" "}"        ; empty effect
-    path: `lqualid` ("." `lqualid`)*           ; \texttt{v.field1.field2}
-    alias: `path` "with" `path`                ; \texttt{arg1 with result}
-    variant: `term` ("with" `lqualid`)?        ; variant + WF-order %
+        : | "fun" `param`+ `spec`* "->" `spec`* `expr`   ; unnamed function
+        : | "any" result `spec`*   ; arbitrary value
+        : | "while" `expr` "do" `invariant`* `variant`? `expr` "done"   ; while loop
+        : | "for" `lident` "=" `expr` ("to" | "downto") `expr` "do" `invariant`* `expr` "done"   ; for loop
+        : | ("assert" | "assume" | "check") "{" `term` "}"   ; assertion
+        : | "raise" `uqualid` `expr`?   ; exception raising
+        : | "raise" "(" `uqualid` `expr`? ")"   ;
+        : | "try" `expr` "with" ("|" `handler`)+ "end"   ; exception catching
+        : | "(" `expr` ")"   ; parentheses
+        : | "label" `uident` "in" `expr`   ; label
+    handler: `uqualid` `pattern`? "->" `expr`   ; exception handler
+    fun_defn: `fun-head` `spec`* "=" `spec`* `expr`   ; function definition
+    fun_head: "ghost"? `kind`? `symbol` `param`+ (":" `result`)?   ; function header
+    kind: "function" | "predicate" | "lemma"   ; function kind
+    result: `ret_type`   ;
+      : | "(" `ret_type` ("," `ret_type`)* ")"   ;
+      : | "(" `ret-name` ("," `ret-name`)* ")"   ;
+    ret_type: "ghost"? `type`   ; unnamed result
+    ret_name: "ghost"? `binder` ":" `type`   ; named result
+    spec: "requires"  "{" `term` "}"   ; pre-condition
+      : | "ensures"   "{" `term` "}"   ; post-condition
+      : | "returns"   "{" ("|" `pattern` "->" `term`)+  "}"   ; post-condition
+      : | "raises"    "{" ("|" `pattern` "->" `term`)+  "}"   ; exceptional post-c.
+      : | "raises"    "{" `uqualid` ("," `uqualid`)*    "}"   ; raised exceptions
+      : | "reads"     "{" `lqualid` ("," `lqualid`)*    "}"   ; external reads
+      : | "writes"    "{" `path` ("," `path`)*          "}"   ; memory writes
+      : | "alias"     "{" `alias` ("," `alias`)*        "}"   ; memory aliases
+      : | `variant`
+      : | "diverges"   ; may not terminate
+      : | ("reads" | "writes" | "alias") "{" "}"   ; empty effect
+    path: `lqualid` ("." `lqualid`)*   ; v.field1.field2
+    alias: `path` "with" `path`   ; arg1 with result
+    invariant: "invariant" "{" `term` "}"   ; loop and type invariant
+    variant: "variant" "{" `variant_term` ("," `variant_term`)* "}"   ; termination variant
+    variant_term: `term` ("with" `lqualid`)?   ; variant term + WF-order
 
 
 Keyword ``ghost`` marks the expression as ghost code added for
@@ -571,7 +583,7 @@ application is not allowed (rejected at typing).
 Formulas
 ~~~~~~~~
 
-The syntax for formulas is given :token:`term`. The various
+The syntax for formulas is given in :token:`formula`. The various
 constructs have the following priorities and associativities, from
 lowest to greatest priority:
 
@@ -622,52 +634,52 @@ Theories
 ~~~~~~~~
 
 .. productionlist::
-    theory: "theory" `uident_nq` `label`* `decl`* "end"
-    decl: "type" `type_decl` ("with" `type_decl`)* ;
-      : | "constant" `constant_decl` ;
-      : | "function" `function_decl` ("with" `logic_decl`)* ;
-      : | "predicate" `predicate_decl` ("with" `logic_decl`)* ;
-      : | "inductive" `inductive_decl` ("with" `inductive_decl`)* ;
-      : | "coinductive" `inductive_decl` ("with" `inductive_decl`)* ;
-      : | "axiom" `ident_nq` ":" `formula` 	   ;
-      : | "lemma" `ident_nq` ":" `formula` 	   ;
-      : | "goal"  `ident_nq` ":" `formula` 	   ;
-      : | "use" `imp_exp` `tqualid` ("as" `uident`)?     ;
-      : | "clone" `imp_exp` `tqualid` ("as" `uident`)? `subst`? ;
-      : | "scope" "import"? `uident_nq` `decl`* "end" ;
-      : | "import" `uident` ;
-    logic_decl: `function_decl` ;
+    theory: "theory" `uident_nq` `attribute`* `decl`* "end"
+    decl: "type" `type_decl` ("with" `type_decl`)*
+      : | "constant" `constant_decl`
+      : | "function" `function_decl` ("with" `logic_decl`)*
+      : | "predicate" `predicate_decl` ("with" `logic_decl`)*
+      : | "inductive" `inductive_decl` ("with" `inductive_decl`)*
+      : | "coinductive" `inductive_decl` ("with" `inductive_decl`)*
+      : | "axiom" `ident_nq` ":" `formula`
+      : | "lemma" `ident_nq` ":" `formula`
+      : | "goal"  `ident_nq` ":" `formula`
+      : | "use" `imp_exp` `tqualid` ("as" `uident`)?
+      : | "clone" `imp_exp` `tqualid` ("as" `uident`)? `subst`?
+      : | "scope" "import"? `uident_nq` `decl`* "end"
+      : | "import" `uident`
+    logic_decl: `function_decl`
       : | `predicate_decl`
-    constant_decl: `lident_nq` `label`* ":" `type` ;
-      : | `lident_nq` `label`* ":" `type` "=" `term`
-    function_decl: `lident_nq` `label`* `type_param`* ":" `type` ;
-      : | `lident_nq` `label`* `type_param`* ":" `type` "=" `term`
-    predicate_decl: `lident_nq` `label`* `type_param`* ;
-      : | `lident_nq` `label`* `type_param`* "=" `formula`
-    inductive_decl: `lident_nq` `label`* `type_param`* "=" "|"? `ind_case` ("|" `ind_case`)* ;
-    ind_case: `ident_nq` `label`* ":" `formula` ;
+    constant_decl: `lident_nq` `attribute`* ":" `type`
+      : | `lident_nq` `attribute`* ":" `type` "=" `term`
+    function_decl: `lident_nq` `attribute`* `type_param`* ":" `type`
+      : | `lident_nq` `attribute`* `type_param`* ":" `type` "=" `term`
+    predicate_decl: `lident_nq` `attribute`* `type_param`*
+      : | `lident_nq` `attribute`* `type_param`* "=" `formula`
+    inductive_decl: `lident_nq` `attribute`* `type_param`* "=" "|"? `ind_case` ("|" `ind_case`)*
+    ind_case: `ident_nq` `attribute`* ":" `formula`
     imp_exp: ("import" | "export")?
     subst: "with" ("," `subst_elt`)+
-    subst_elt: "type" `lqualid` "=" `lqualid` ;
-      : | "function" `lqualid` "=" `lqualid`          ;
-      : | "predicate" `lqualid` "=" `lqualid`         ;
-      : | "scope" (`uqualid` | ".") "=" (`uqualid` | ".")  ;
-      : | "lemma" `qualid` 	  		   ;
-      : | "goal"  `qualid`			   ;
-    tqualid: `uident` | `ident` ("." `ident`)* "." `uident` ;
-    type_decl: `lident_nq` `label`* ("'" `lident_nq` `label`*)* `type_defn`; %
-    type_defn:                                      ; abstract type
-      : | "=" `type `                                      ; alias type
-      : | "=" "|"? `type_case` ("|" `type_case`)*            ; algebraic type
+    subst_elt: "type" `lqualid` "=" `lqualid`
+      : | "function" `lqualid` "=" `lqualid`
+      : | "predicate" `lqualid` "=" `lqualid`
+      : | "scope" (`uqualid` | ".") "=" (`uqualid` | ".")
+      : | "lemma" `qualid`
+      : | "goal"  `qualid`
+    tqualid: `uident` | `ident` ("." `ident`)* "." `uident`
+    type_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `type_defn`
+    type_defn:   ; abstract type
+      : | "=" `type `   ; alias type
+      : | "=" "|"? `type_case` ("|" `type_case`)*   ; algebraic type
       : | "=" "{" `record_field` (";" `record_field`)* "}"   ; record type
-      : | "<" "range" `integer` `integer` ">"                ; range type
-      : | "<" "float" `integer` `integer` ">"                ; float type
-    type_case: `uident` `label`* `type_param`*
-    record_field: `lident` `label`* ":" `type`
-    type_param: "'" `lident`   ;
-     : | `lqualid`                  ;
-     : | "(" `lident`+ ":" `type` ")" ;
-     : | "(" `type` ("," `type`)* ")" ;
+      : | "<" "range" `integer` `integer` ">"   ; range type
+      : | "<" "float" `integer` `integer` ">"   ; float type
+    type_case: `uident` `attribute`* `type_param`*
+    record_field: `lident` `attribute`* ":" `type`
+    type_param: "'" `lident`
+     : | `lqualid`
+     : | "(" `lident`+ ":" `type` ")"
+     : | "(" `type` ("," `type`)* ")"
      : | "()"
 
 
@@ -813,25 +825,23 @@ Modules
 The syntax for modules is as follows:
 
 .. productionlist::
-    module: "module" `uident_nq` `label`* `mdecl`* "end"
-    mdecl: `decl`                                ; theory declaration
-      : | "type" `mtype_decl` ("with" `mtype_decl`)*    ; mutable types
-      : | "type" `lident_nq` ("'" `lident_nq`)* `invariant`+    ; added invariant
-      : | "let" "ghost"? `lident_nq` `label`* `pgm_defn`     ;
-      : | "let" "rec" `rec_defn`                      ;
-      : | "val" "ghost"? `lident_nq` `label`* `pgm_decl`     ;
-      : | "exception" `lident_nq` `label`* `type`?           ;
-      : | "scope" "import"? `uident_nq` `mdecl`* "end" ;
-    mtype_decl: `lident_nq` `label`* ("'" `lident_nq` `label`*)* `mtype_defn`
+    module: "module" `uident_nq` `attribute`* `mdecl`* "end"
+    mdecl: `decl`   ; theory declaration
+      : | "type" `mtype_decl` ("with" `mtype_decl`)*   ; mutable types
+      : | "type" `lident_nq` ("'" `lident_nq`)* `invariant`+   ; added invariant
+      : | "let" "ghost"? `lident_nq` `attribute`* `fun_defn`
+      : | "let" "rec" `fun_defn`
+      : | "val" "ghost"? `lident_nq` `attribute`* `pgm_decl`
+      : | "exception" `lident_nq` `attribute`* `type`?
+      : | "scope" "import"? `uident_nq` `mdecl`* "end"
+    mtype_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `mtype_defn`
     mtype_defn:   ; abstract type
-      : | "=" `type`    ; alias type
-      : | "=" "|"? `type_case` ("|" `type_case`)* `invariant`* ; algebraic type
-      : | "=" "{" `mrecord_field` (";" `mrecord_field`)* "}" `invariant`* ; record type
-    mrecord_field: "ghost"? "mutable"? `lident_nq` `label`* ":" `type`
-    pgm_defn: `fun_body` ;
-      : | "=" "fun" `binder`+ `spec`* "->" `spec`* `expr` ;
-    pgm_decl: ":" `type`    ; global variable
-      : | `param` (`spec`* `param`)+ ":" `type` `spec`*  ; abstract function%
+      : | "=" `type`   ; alias type
+      : | "=" "|"? `type_case` ("|" `type_case`)* `invariant`*   ; algebraic type
+      : | "=" "{" `mrecord_field` (";" `mrecord_field`)* "}" `invariant`*   ; record type
+    mrecord_field: "ghost"? "mutable"? `lident_nq` `attribute`* ":" `type`
+    pgm_decl: ":" `type`   ; global variable
+      : | `param` (`spec`* `param`)+ ":" `type` `spec`*   ; abstract function
 
 
 Any declaration which is accepted in a theory is also accepted in a
