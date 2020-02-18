@@ -3,15 +3,6 @@ module Spec
   use mach.int.Int63
   use string.OCaml
 
-  function next_m3 (i: int) : int
-  = if mod i 3 = 0 then i else if mod i 3 = 1 then i + 2 else i + 1
-
-  function next_m4 (i: int) : int
-  = if mod i 4 = 0 then i else if mod i 4 = 1 then i + 3 else if mod i 4 = 2 then i + 2 else i + 1
-
-  val next_m4 (i: int63): int63
-    ensures { result = next_m4 i }
-
   function int2b64 (i: int) : char =
     if 0 <= i <= 25 then chr (i + 65) else
     if 26 <= i <= 51 then chr (i - 26 + 97) else
@@ -99,7 +90,7 @@ module Base64
   use Spec
 
   let function encode (s: string) : string
-    ensures { length result = div (next_m3 (length s) * 4) 3 }
+    ensures { length result = div (length s + calc_pad s) 3 * 4 }
     ensures { mod (length result) 4 = 0 }
     ensures { forall i. 0 <= i < div (length result) 4 ->
       let a1, a2, a3 = s[i*3], s[i*3+1], s[i*3+2] in
@@ -159,7 +150,7 @@ module Base64
     requires { forall i. 0 <= i < length s - get_pad s -> valid_64_char s[i] }
     requires { forall i. length s - get_pad s <= i < length s -> s[i] = char_eq }
     ensures  { length result = div (length s * 3) 4 - get_pad s}
-    ensures  { forall i. 0 <= i < div (next_m3 (length result)) 3 ->
+    ensures  { forall i. 0 <= i < div (length result + get_pad s) 3 ->
       let b1,b2,b3,b4 = s[4*i], s[4*i+1],s[4*i+2], s[4*i+3] in
       result[i*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
       (i * 3 + 1 < length result ->
@@ -202,7 +193,9 @@ module Base64
     ensures { decode (encode s) = s }
   = let s1 = encode s in
 
-    assert { length s = div (length s1) 4 * 3 - get_pad s1};
+    (* assert { get_pad s1 = calc_pad s }; *)
+    (* assert { length s1 = div (length s + calc_pad s) 3 * 4 }; *)
+    assert { length s = div (length s1) 4 * 3 - get_pad s1 };
 
     assert { forall i. 0 <= i < div (length s) 3 ->
       (valid_64_char s1[i*4] && valid_64_char s1[i*4+1] &&
@@ -225,7 +218,7 @@ module Base64
 
     assert { length s2 = length s by length s = div (length s1 * 3) 4 - get_pad s1 };
 
-    assert { forall i. 0 <= i < div (next_m3 (length s)) 3 ->
+    assert { forall i. 0 <= i < div (length s + calc_pad s) 3 ->
       s[i*3] = s2[i*3] &&
       (i * 3 + 1 < length s -> s[i*3+1] = s2[i*3+1]) &&
       (i * 3 + 2 < length s -> s[i*3+2] = s2[i*3+2]) };
