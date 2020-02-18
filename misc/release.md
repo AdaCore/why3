@@ -7,23 +7,22 @@
     (see below: copy the dtd on the web)
   - `make trywhy3`
 
-* change version number
-  ```
-  VERSION=1.1.0
-  echo "VERSION=$VERSION" > Version
-  ./config.status
-  ```
-  - check/update the content of the About dialog in `src/ide/gconfig.ml`
+* change version number `VERSION=1.3.0`
+  - update the first line of `configure.in`
+  - update the `release` field in `doc/conf.py` around line 60
+  - check `CHANGES.md`, add the release date
+  - update the date in `doc/index.rst`
+
+* check/update authors and copyright
+  - update the content of the About dialog in `src/ide/gconfig.ml`
     around lines 600-650
-  - check headers
-  - check the file `CHANGES.md`, add the release date
+  - update the `copyright` field in `doc/conf.py` around line 50
+  - update `doc/foreword.rst`
+  - check headers, run `make headers` if needed
 
 * generate documentation
-  - update the date in `doc/manual.tex` (near `\whyversion{}`)
-  - check/update the authors in `doc/manual.tex`
-  - check that macro `\todo` is commented out in `doc/macros.tex`
   - `make doc`
-    (check that manual in HTML is also generated, `doc/html/index.html`)
+    (check that the PDF manual is also generated, `doc/latex/manual.pdf`)
   - `make stdlibdoc`
   - `make apidoc`
 
@@ -45,7 +44,7 @@
 * upload the documentation on the web page
   ```
   cp share/why3session.dtd /users/www-perso/projets/why3/
-  cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-$VERSION.pdf
+  cp doc/latex/manual.pdf /users/www-perso/projets/why3/download/manual-$VERSION.pdf
   ln -s -n -f download/manual-$VERSION.pdf /users/www-perso/projets/why3/manual.pdf
   cp -r doc/html /users/www-perso/projets/why3/doc-$VERSION
   ln -s -n -f doc-$VERSION /users/www-perso/projets/why3/doc
@@ -56,7 +55,7 @@
   ```
 
 * update the main HTML page (sources are in repository `why3-www`)
-  - edit `index.html`, change at least all occurrences of `1.0.0` by `1.1.0`, and
+  - edit `index.html`, change at least all occurrences of the version, and
     update the url for download
   - `make` (to check validity)
   - `make export`
@@ -66,8 +65,6 @@
     make trywhy3_package
     tar xzf trywhy3.tar.gz -C /users/www-perso/projets/why3/try/ --strip-components=1
     ```
-
-* next commit: add `+git` to the version in file `Version`
 
 * prepare the OPAM package
   - update `opam/why3{,-ide,-coq}.opam` with correct dependencies on external packages
