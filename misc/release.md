@@ -43,15 +43,17 @@
 
 * upload the documentation on the web page
   ```
-  cp share/why3session.dtd /users/www-perso/projets/why3/
-  cp doc/latex/manual.pdf /users/www-perso/projets/why3/download/manual-$VERSION.pdf
-  ln -s -n -f download/manual-$VERSION.pdf /users/www-perso/projets/why3/manual.pdf
-  cp -r doc/html /users/www-perso/projets/why3/doc-$VERSION
-  ln -s -n -f doc-$VERSION /users/www-perso/projets/why3/doc
-  cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-$VERSION
-  ln -s -n -f stdlib-$VERSION /users/www-perso/projets/why3/stdlib
-  cp -r doc/apidoc /users/www-perso/projets/why3/api-$VERSION
-  ln -s -n -f api-$VERSION /users/www-perso/projets/why3/api
+  DEST=/users/www-perso/projets/why3
+  cp share/why3session.dtd $DEST/
+  cp doc/latex/manual.pdf $DEST/download/manual-$VERSION.pdf
+  ln -s -n -f download/manual-$VERSION.pdf $DEST/manual.pdf
+  rm -rf $DEST/doc-$VERSION $DEST/stdlib-$VERSION $DEST/api-$VERSION
+  cp -r doc/html $DEST/doc-$VERSION
+  ln -s -n -f doc-$VERSION $DEST/doc
+  cp -r doc/stdlibdoc $DEST/stdlib-$VERSION
+  ln -s -n -f stdlib-$VERSION $DEST/stdlib
+  cp -r doc/apidoc $DEST/api-$VERSION
+  ln -s -n -f api-$VERSION $DEST/api
   ```
 
 * update the main HTML page (sources are in repository `why3-www`)
