@@ -440,7 +440,7 @@ equivalence: ``A <-> B -> C`` is rejected.
          : | `pattern` "|" `pattern`   ; "or" pattern
          : | `qualifier`? "(" `pattern` ")"   ; pattern in a scope
   symbol: `lident_ext` `attribute`*   ; user-defined symbol
-  param: `type-arg`   ; unnamed typed
+  param: `type_arg`   ; unnamed typed
        : | `binder`   ; (un)named untyped
        : | "(" "ghost"? `type` ")"   ; unnamed typed
        : | "(" "ghost"? `binder` ")"   ; (un)named untyped
@@ -541,27 +541,27 @@ conjunction and disjunction, respectively.
         : | "for" `lident` "=" `expr` ("to" | "downto") `expr` "do" `invariant`* `expr` "done"   ; for loop
         : | ("assert" | "assume" | "check") "{" `term` "}"   ; assertion
         : | "raise" `uqualid` `expr`?   ; exception raising
-        : | "raise" "(" `uqualid` `expr`? ")"   ;
+        : | "raise" "(" `uqualid` `expr`? ")"
         : | "try" `expr` "with" ("|" `handler`)+ "end"   ; exception catching
         : | "(" `expr` ")"   ; parentheses
         : | "label" `uident` "in" `expr`   ; label
     handler: `uqualid` `pattern`? "->" `expr`   ; exception handler
-    fun_defn: `fun-head` `spec`* "=" `spec`* `expr`   ; function definition
+    fun_defn: `fun_head` `spec`* "=" `spec`* `expr`   ; function definition
     fun_head: "ghost"? `kind`? `symbol` `param`+ (":" `result`)?   ; function header
     kind: "function" | "predicate" | "lemma"   ; function kind
-    result: `ret_type`   ;
-      : | "(" `ret_type` ("," `ret_type`)* ")"   ;
-      : | "(" `ret-name` ("," `ret-name`)* ")"   ;
+    result: `ret_type`
+      : | "(" `ret_type` ("," `ret_type`)* ")"
+      : | "(" `ret_name` ("," `ret_name`)* ")"
     ret_type: "ghost"? `type`   ; unnamed result
     ret_name: "ghost"? `binder` ":" `type`   ; named result
-    spec: "requires"  "{" `term` "}"   ; pre-condition
-      : | "ensures"   "{" `term` "}"   ; post-condition
-      : | "returns"   "{" ("|" `pattern` "->" `term`)+  "}"   ; post-condition
-      : | "raises"    "{" ("|" `pattern` "->" `term`)+  "}"   ; exceptional post-c.
-      : | "raises"    "{" `uqualid` ("," `uqualid`)*    "}"   ; raised exceptions
-      : | "reads"     "{" `lqualid` ("," `lqualid`)*    "}"   ; external reads
-      : | "writes"    "{" `path` ("," `path`)*          "}"   ; memory writes
-      : | "alias"     "{" `alias` ("," `alias`)*        "}"   ; memory aliases
+    spec: "requires" "{" `term` "}"   ; pre-condition
+      : | "ensures" "{" `term` "}"   ; post-condition
+      : | "returns" "{" ("|" `pattern` "->" `term`)+ "}"   ; post-condition
+      : | "raises" "{" ("|" `pattern` "->" `term`)+ "}"   ; exceptional post-c.
+      : | "raises" "{" `uqualid` ("," `uqualid`)* "}"   ; raised exceptions
+      : | "reads" "{" `lqualid` ("," `lqualid`)* "}"   ; external reads
+      : | "writes" "{" `path` ("," `path`)* "}"   ; memory writes
+      : | "alias" "{" `alias` ("," `alias`)* "}"   ; memory aliases
       : | `variant`
       : | "diverges"   ; may not terminate
       : | ("reads" | "writes" | "alias") "{" "}"   ; empty effect
@@ -654,7 +654,7 @@ A WhyML input file is a (possibly empty) list of modules
     tqualid: `uident` | `ident` ("." `ident`)* "." `uident`
     type_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `type_defn`
     type_defn:   ; abstract type
-      : | "=" `type `   ; alias type
+      : | "=" `type`   ; alias type
       : | "=" "|"? `type_case` ("|" `type_case`)*   ; algebraic type
       : | "=" "{" `record_field` (";" `record_field`)* "}"   ; record type
       : | "<" "range" `integer` `integer` ">"   ; range type
