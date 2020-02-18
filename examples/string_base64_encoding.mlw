@@ -230,10 +230,7 @@ module Base64
     ensures { decode (encode s) = s }
   = let s1 = encode s in
 
-    assert { get_pad s1 = calc_pad s };
-
     assert { length s = div (length s1) 4 * 3 - get_pad s1};
-    assert { length s1 = div (next_m3 (length s)) 3 * 4};
 
     assert { forall i. 0 <= i < div (length s) 3 ->
       (valid_64_char s1[i*4] && valid_64_char s1[i*4+1] &&
