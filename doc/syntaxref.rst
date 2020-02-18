@@ -276,13 +276,57 @@ functions that return ``bool``). However, this distinction is not
 enforced on the syntactical level, and Why3 will perform the necessary
 conversions behind the scenes.
 
-The syntax of WhyML terms is given in
-Figures [fig:bnf:term1]-[fig:bnf:term3]. The constructions are listed in
-the order of decreasing precedence. For example, as was mentioned above,
+The syntax of WhyML terms is given in :token:`term`.  The various
+constructs have the following priorities and associativities, from
+lowest to greatest priority:
+
++---------------------------------+-----------------+
+| construct                       | associativity   |
++=================================+=================+
+| ``if then else`` / ``let in``   | –               |
++---------------------------------+-----------------+
+| attribute                       | –               |
++---------------------------------+-----------------+
+| cast                            | –               |
++---------------------------------+-----------------+
+| ``->`` / ``<->``                | right           |
++---------------------------------+-----------------+
+| ``by`` / ``so``                 | right           |
++---------------------------------+-----------------+
+| ``\/`` / ``||``                 | right           |
++---------------------------------+-----------------+
+| ``/\`` / ``&&``                 | right           |
++---------------------------------+-----------------+
+| ``not``                         | –               |
++---------------------------------+-----------------+
+| infix-op level 1                | left            |
++---------------------------------+-----------------+
+| infix-op level 2                | left            |
++---------------------------------+-----------------+
+| infix-op level 3                | left            |
++---------------------------------+-----------------+
+| infix-op level 4                | left            |
++---------------------------------+-----------------+
+| prefix-op                       | –               |
++---------------------------------+-----------------+
+| function application            | left            |
++---------------------------------+-----------------+
+| brackets / ternary brackets     | –               |
++---------------------------------+-----------------+
+| bang-op                         | –               |
++---------------------------------+-----------------+
+
+For example, as was mentioned above,
 tight operators have the highest precedence of all operators, so that
 ``-p.x`` denotes the negation of the record field ``p.x``, whereas
 ``!p.x`` denotes the field ``x`` of a record stored in the reference
 ``p``.
+
+Note that infix symbols of level 1 include equality (``=``) and
+disequality (``<>``).
+
+Note the curryfied syntax for function application, though partial
+application is not allowed (rejected at typing).
 
 An operator in parentheses acts as an identifier referring to that
 operator, for example, in a definition. To distinguish between prefix
@@ -340,7 +384,7 @@ connectives follows the rules below:
    normal conjunction.
 
 -  A case analysis over ``A || B`` is split into disjoint cases ``A``
-   and ``not A /92 B``. If ``A || B`` occurs as a goal, it behaves as a
+   and ``not A /\ B``. If ``A || B`` occurs as a goal, it behaves as a
    normal disjunction.
 
 -  An occurrence of ``A by B`` generates a side condition ``B -> A``
@@ -539,102 +583,29 @@ collection. The former can be done simultaneously on a tuple of values:
 of the ternary bracket operator ``([]<-)`` and cannot be used in a
 multiple assignment.
 
+In applications, arguments are evaluated from right to left. This
+includes applications of infix operators, with the only exception of
+lazy operators ``&&`` and ``||`` that evaluate from left to right,
+lazily.
+
+The syntax for specification clauses in programs is given in
+:token:`spec`.
+Within specifications, terms are extended with new constructs ``old``
+and ``at``.
+Within a postcondition, :samp:`old {t}` refers to the value of term
+*t* in the prestate. Within the scope of a code mark *L*,
+the term :samp:`at {t} '{L}` refers to the value of term
+*t* at the program point corresponding to *L*.
 
 
-The Why3 Language
------------------
+Modules
+-------
 
-Terms
-~~~~~
-
-The syntax for terms is given in :token:`term`. The various
-constructs have the following priorities and associativities, from
-lowest to greatest priority:
-
-+---------------------------------+-----------------+
-| construct                       | associativity   |
-+=================================+=================+
-| ``if then else`` / ``let in``   | –               |
-+---------------------------------+-----------------+
-| label                           | –               |
-+---------------------------------+-----------------+
-| cast                            | –               |
-+---------------------------------+-----------------+
-| infix-op level 1                | left            |
-+---------------------------------+-----------------+
-| infix-op level 2                | left            |
-+---------------------------------+-----------------+
-| infix-op level 3                | left            |
-+---------------------------------+-----------------+
-| infix-op level 4                | left            |
-+---------------------------------+-----------------+
-| prefix-op                       | –               |
-+---------------------------------+-----------------+
-| function application            | left            |
-+---------------------------------+-----------------+
-| brackets / ternary brackets     | –               |
-+---------------------------------+-----------------+
-| bang-op                         | –               |
-+---------------------------------+-----------------+
-
-Note the curryfied syntax for function application, though partial
-application is not allowed (rejected at typing).
-
-Formulas
-~~~~~~~~
-
-The syntax for formulas is given in :token:`formula`. The various
-constructs have the following priorities and associativities, from
-lowest to greatest priority:
-
-+---------------------------------+-----------------+
-| construct                       | associativity   |
-+=================================+=================+
-| ``if then else`` / ``let in``   | –               |
-+---------------------------------+-----------------+
-| label                           | –               |
-+---------------------------------+-----------------+
-| ``->`` / ``<->``                | right           |
-+---------------------------------+-----------------+
-| ``by`` / ``so``                 | right           |
-+---------------------------------+-----------------+
-| ``\/`` / ``||``                 | right           |
-+---------------------------------+-----------------+
-| ``/\`` / ``&&``                 | right           |
-+---------------------------------+-----------------+
-| ``not``                         | –               |
-+---------------------------------+-----------------+
-| infix level 1                   | left            |
-+---------------------------------+-----------------+
-| infix level 2                   | left            |
-+---------------------------------+-----------------+
-| infix level 3                   | left            |
-+---------------------------------+-----------------+
-| infix level 4                   | left            |
-+---------------------------------+-----------------+
-| prefix                          | –               |
-+---------------------------------+-----------------+
-
-Note that infix symbols of level 1 include equality (``=``) and
-disequality (``<>``).
-
-Notice that there are two symbols for the conjunction: ``/\`` and
-``&&``, and similarly for disjunction. They are logically equivalent,
-but may be treated slightly differently by some transformations. For
-instance, ``split`` transforms the goal ``A /\ B`` into subgoals ``A``
-and ``B``, whereas it transforms ``A && B`` into subgoals ``A`` and
-``A -> B``. Similarly, it transforms ``not (A || B)`` into subgoals
-``not A`` and ``not ((not A) /\ B)``. The ``by``/``so`` connectives are
-proof indications. They are logically equivalent to their first
-argument, but may affect the result of some transformations. For
-instance, the ``split_goal`` transformations interpret those connectives
-as introduction of logical cuts (see [tech:trans:split] for details).
-
-Theories
-~~~~~~~~
+A WhyML input file is a (possibly empty) list of modules
 
 .. productionlist::
-    theory: "theory" `uident_nq` `attribute`* `decl`* "end"
+    file: `module`*
+    module: "module" `uident_nq` `attribute`* `decl`* "end"
     decl: "type" `type_decl` ("with" `type_decl`)*
       : | "constant" `constant_decl`
       : | "function" `function_decl` ("with" `logic_decl`)*
@@ -648,6 +619,20 @@ Theories
       : | "clone" `imp_exp` `tqualid` ("as" `uident`)? `subst`?
       : | "scope" "import"? `uident_nq` `decl`* "end"
       : | "import" `uident`
+      : | "type" `mtype_decl` ("with" `mtype_decl`)*   ; mutable types
+      : | "type" `lident_nq` ("'" `lident_nq`)* `invariant`+   ; added invariant
+      : | "let" "ghost"? `lident_nq` `attribute`* `fun_defn`
+      : | "let" "rec" `fun_defn`
+      : | "val" "ghost"? `lident_nq` `attribute`* `pgm_decl`
+      : | "exception" `lident_nq` `attribute`* `type`?
+    mtype_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `mtype_defn`
+    mtype_defn:   ; abstract type
+      : | "=" `type`   ; alias type
+      : | "=" "|"? `type_case` ("|" `type_case`)* `invariant`*   ; algebraic type
+      : | "=" "{" `mrecord_field` (";" `mrecord_field`)* "}" `invariant`*   ; record type
+    mrecord_field: "ghost"? "mutable"? `lident_nq` `attribute`* ":" `type`
+    pgm_decl: ":" `type`   ; global variable
+      : | `param` (`spec`* `param`)+ ":" `type` `spec`*   ; abstract function
     logic_decl: `function_decl`
       : | `predicate_decl`
     constant_decl: `lident_nq` `attribute`* ":" `type`
@@ -784,82 +769,6 @@ specified format. The transformation also replaces all casts of the form
 This type is used in the standard library in the theories
 ``ieee_float.Float32`` and ``ieee_float.Float64``.
 
-Files
-~~~~~
-
-A Why3 input file is a (possibly empty) list of theories.
-
-.. productionlist::
-    file: `theory`*
-
-The WhyML Language
-------------------
-
-Specification
-~~~~~~~~~~~~~
-
-The syntax for specification clauses in programs is given in
-:token:`spec`.
-
-Within specifications, terms are extended with new constructs ``old``
-and ``at``:
-
-Within a postcondition, :samp:`old {t}` refers to the value of term
-*t* in the prestate. Within the scope of a code mark *L*,
-the term :samp:`at {t} '{L}` refers to the value of term
-*t* at the program point corresponding to *L*.
-
-Expressions
-~~~~~~~~~~~
-
-The syntax for program expressions is given in :token:`expr`.
-
-In applications, arguments are evaluated from right to left. This
-includes applications of infix operators, with the only exception of
-lazy operators ``&&`` and ``||`` that evaluate from left to right,
-lazily.
-
-Modules
-~~~~~~~
-
-The syntax for modules is as follows:
-
-.. productionlist::
-    module: "module" `uident_nq` `attribute`* `mdecl`* "end"
-    mdecl: `decl`   ; theory declaration
-      : | "type" `mtype_decl` ("with" `mtype_decl`)*   ; mutable types
-      : | "type" `lident_nq` ("'" `lident_nq`)* `invariant`+   ; added invariant
-      : | "let" "ghost"? `lident_nq` `attribute`* `fun_defn`
-      : | "let" "rec" `fun_defn`
-      : | "val" "ghost"? `lident_nq` `attribute`* `pgm_decl`
-      : | "exception" `lident_nq` `attribute`* `type`?
-      : | "scope" "import"? `uident_nq` `mdecl`* "end"
-    mtype_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `mtype_defn`
-    mtype_defn:   ; abstract type
-      : | "=" `type`   ; alias type
-      : | "=" "|"? `type_case` ("|" `type_case`)* `invariant`*   ; algebraic type
-      : | "=" "{" `mrecord_field` (";" `mrecord_field`)* "}" `invariant`*   ; record type
-    mrecord_field: "ghost"? "mutable"? `lident_nq` `attribute`* ":" `type`
-    pgm_decl: ":" `type`   ; global variable
-      : | `param` (`spec`* `param`)+ ":" `type` `spec`*   ; abstract function
-
-
-Any declaration which is accepted in a theory is also accepted in a
-module. Additionally, modules can introduce record types with mutable
-fields and declarations which are specific to programs (global
-variables, functions, exceptions).
-
-Files
-~~~~~
-
-A WhyML input file is a (possibly empty) list of theories and modules.
-
-.. productionlist::
-    file: (`theory` | `module`)*
-
-A theory defined in a WhyML file can only be used within that
-file. If a theory is supposed to be reused from other files, be they
-Why or WhyML files, it should be defined in a Why file.
 
 
 The Why3 Standard Library
