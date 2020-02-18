@@ -104,19 +104,17 @@ module Base64
     ensures { forall i. 0 <= i < div (length result) 4 ->
       let a1, a2, a3 = s[i*3], s[i*3+1], s[i*3+2] in
       result[i*4] = int2b64 (div (code a1)  4) /\
-      if i * 3 + 1 = length s then
-        result[i*4+1] = int2b64 (mod (code a1) 4 * 16)
-        && result[i*4+2] = char_eq && result[i*4+3] = char_eq
-      else
-        (  result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-           (if i * 3 + 2 = length s then
-              result[i*4+2] = int2b64 (mod (code a2) 16 * 4) &&
-              result[i*4+3] = char_eq
-            else
+      if i * 3 + 1 < length s then
+        ( result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+          ( if i * 3 + 2 < length s then
               result[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
               result[i*4+3] = int2b64 (mod (code a3) 64)
-           )
+            else (result[i*4+2] = int2b64 (mod (code a2) 16 * 4) && result[i*4+3] = char_eq)
+          )
         )
+      else
+        ( result[i*4+1] = int2b64 (mod (code a1) 4 * 16)
+          && result[i*4+2] = char_eq && result[i*4+3] = char_eq)
     }
     ensures { get_pad result = calc_pad s }
   = let padding = calc_pad s in
@@ -258,8 +256,10 @@ module Base64
 
     assert { length s2 = length s by length s = div (length s1 * 3) 4 - get_pad s1 };
 
-    assert { forall i. 0 <= i < div (length s1) 4 -> s[i*3] = s2[i*3] &&
-      s[i*3+1] = s2[i*3+1] && s[i*3+2] = s2[i*3+2] };
+    assert { forall i. 0 <= i < div (next_m3 (length s)) 3 ->
+      s[i*3] = s2[i*3] &&
+      (i * 3 + 1 < length s -> s[i*3+1] = s2[i*3+1]) &&
+      (i * 3 + 2 < length s -> s[i*3+2] = s2[i*3+2]) };
 
     assert { forall i. 0 <= i < length s -> s[i] = s2[i] };
     assert { eq_string s s2 }
