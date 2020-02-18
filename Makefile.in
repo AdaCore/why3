@@ -2054,10 +2054,10 @@ update-doc-png:
 	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
 
 doc/html/index.html: $(DOCRST) $(DRVDOT:%=doc/generated/drivers-%.dot)
-	$(SPHINX) -b html doc doc/html
+	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
 doc/latex/manual.tex: $(DOCRST) $(DRVDOT:%=doc/generated/drivers-%.dot)
-	$(SPHINX) -b latex doc doc/latex
+	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
 
 ifeq (@enable_pdf_doc@,yes)
 
