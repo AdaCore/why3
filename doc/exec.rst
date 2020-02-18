@@ -109,32 +109,8 @@ from module ``M`` of file :file:`f.mlw`, one should write
 
     > why3 extract -D <driver> -L <dir> f.M.s
 
-Note the use of :option:`-L`, for both extraction of a module and a
-symbol, in order to state the location of file :file:`f.mlw`.
-
-Options
-'''''''
-
-The following options can be added to the extraction command line:
-
-.. option:: --flat
-
-   Perform a flat extraction, *i.e.*, everything is extracted into a
-   single file. This is the default behavior. The :option:`-o` option should
-   be given the name of a file or, if omitted, the result of extraction
-   is printed to the standard output.
-
-.. option:: --modular
-
-    Each module is extracted in its own, separated file. The :option:`-o`
-    option cannot be omitted, and it should be given the name of an
-    existing directory. This directory will be populated with the
-    resulting OCaml files.
-
-.. option:: --recursive
-
-    Recursively extract all the dependencies of the chosen entry point.
-    This option is valid for both :option:`--modular` and :option:`--flat` options.
+Note the use of :option:`why3 -L`, when extracting either a module or a
+symbol, in order to state where to look for file :file:`f.mlw`.
 
 Examples
 ''''''''

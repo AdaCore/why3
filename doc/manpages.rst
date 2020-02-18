@@ -1377,6 +1377,32 @@ The ``extract`` Command
 Why3 can extract programs written using the WhyML language (extension
 :file:`.mlw`) to OCaml. See also :numref:`sec.extract`.
 
+.. option:: -o <file|dir>
+
+   Output extracted code to the given file (for :option:`--flat`) or
+   directory (for :option:`--modular`).
+
+.. option:: -D <driver>, --driver <driver>
+
+   Use the given driver.
+
+.. option:: --flat
+
+   Perform a flat extraction, *i.e.*, everything is extracted into
+   a single file. This is the default behavior. If option :option:`-o` is
+   omitted, the result of extraction is printed to the standard output.
+
+.. option:: --modular
+
+   Extract each module in its own, separate file. Option :option:`-o` is
+   mandatory; it should be given the name of an existing directory. This
+   directory will be populated with the resulting OCaml files.
+
+.. option:: --recursive
+
+    Recursively extract all the dependencies of the chosen entry point.
+    This option is valid for both :option:`--modular` and :option:`--flat` options.
+
 .. why3:tool:: realize
 .. _sec.why3realize:
 
