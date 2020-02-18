@@ -131,15 +131,24 @@ deploy:
   tags:
     - shell
 
+.sphinx_template: &sphinx_definition
+  image: "$SPHINX_IMAGE"
+  tags:
+    - docker
+
+doc:
+  stage: test
+  script:
+    - make -f misc/Makefile.doc public/index.html
+  <<: *sphinx_definition
+
 pages:
   stage: deploy
-  image: "$SPHINX_IMAGE"
   script:
     - make -f misc/Makefile.doc public/index.html
   artifacts:
     paths:
     - public
-  tags:
-    - docker
   only:
     - master
+  <<: *sphinx_definition
