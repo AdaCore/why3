@@ -71,7 +71,8 @@ Problem 0: Einstein’s Problem
 -----------------------------
 
 Let us use Why3 to solve a little puzzle known as “Einstein’s logic
-problem”. [1]_ The problem is stated as follows. Five persons, of five
+problem”. (This Why3 example was contributed by Stéphane Lescuyer.)
+The problem is stated as follows. Five persons, of five
 different nationalities, live in five houses in a row, all painted with
 different colors. These five persons own different pets, drink different
 beverages, and smoke different brands of cigars. We are given the
@@ -107,7 +108,7 @@ following information:
 
 -  The man who smokes Blends has a neighbour who drinks water.
 
-The question is: what is the nationality of the fish’s owner?
+The question is: What is the nationality of the fish’s owner?
 
 We start by introducing a general-purpose theory defining the notion of
 *bijection*, as two abstract types together with two functions from one
@@ -207,7 +208,7 @@ theory ``Einstein``.
 .. code-block:: whyml
 
     theory EinsteinHints
-      use import Einstein
+      use Einstein
 
 Then each hypothesis is stated in terms of ``to_`` and ``of`` functions.
 For instance, the hypothesis “The Englishman lives in a red house” is
@@ -232,8 +233,8 @@ Finally, we declare the goal in a fourth theory:
 .. code-block:: whyml
 
     theory Problem
-      use import Einstein
-      use import EinsteinHints
+      use Einstein
+      use EinsteinHints
 
       goal G: Pet.to_ Fish = German
     end
@@ -278,15 +279,15 @@ theory, exactly as we would do within a theory definition:
 
 .. code-block:: whyml
 
-      use import int.Int
+      use int.Int
 
-We are also going to use references and arrays from Why3 standard
+We are also going to use references and arrays from Why3 standard
 library, so we import the corresponding modules:
 
 .. code-block:: whyml
 
-      use import ref.Ref
-      use import array.Array
+      use ref.Ref
+      use array.Array
 
 Modules ``Ref`` and ``Array`` respectively provide a type ``ref ’a`` for
 references and a type ``array ’a`` for arrays, together with useful
@@ -373,9 +374,9 @@ shown below.
 
     module MaxAndSum
 
-      use import int.Int
-      use import ref.Ref
-      use import array.Array
+      use int.Int
+      use ref.Ref
+      use array.Array
 
       let max_sum (a: array int) (n: int) : (int, int)
         requires { n = length a }
@@ -397,6 +398,10 @@ We can now proceed to its verification. Running :program:`why3`, or better
 condition with name ``WP max_sum``. Discharging this verification
 condition requires a little bit of non-linear arithmetic. Thus some SMT
 solvers may fail at proving it, but other succeed, *e.g.*, CVC4.
+
+Note: It is of course possible to *execute* the code to test it,
+before or after you prove it correct. This is detailed in
+:numref:`sec.execute`.
 
 Problem 2: Inverting an Injection
 ---------------------------------
@@ -420,8 +425,8 @@ module and we import arithmetic and arrays:
 .. code-block:: whyml
 
     module InvertingAnInjection
-      use import int.Int
-      use import array.Array
+      use int.Int
+      use array.Array
 
 It is convenient to introduce predicate definitions for the properties
 of being injective and surjective. These are purely logical
@@ -471,16 +476,16 @@ array ``b`` so far:
         done
 
 Here we chose to have array ``b`` as argument; returning a freshly
-allocated array would be equally simple. The whole module is given in
-:numref:`fig.Inverting`. The verification conditions for function
+allocated array would be equally simple. The whole module is given below.
+The verification conditions for function
 ``inverting`` are easily discharged automatically, thanks to the lemma.
 
 .. code-block:: whyml
 
     module InvertingAnInjection
 
-      use import int.Int
-      use import array.Array
+      use int.Int
+      use array.Array
 
       predicate injective (a: array int) (n: int) =
         forall i j. 0 <= i < n -> 0 <= j < n -> i <> j -> a[i] <> a[j]
@@ -516,24 +521,24 @@ The third problem is stated as follows:
 
 More precisely, the specification says
 
-    You have to show that the program returns an index :math:`i` equal
+    You have to show that the program returns an index *i* equal
     to the length of the list if there is no such element. Otherwise,
-    the :math:`i`-th element of the list must be equal to 0, and all the
+    the *i*-th element of the list must be equal to 0, and all the
     preceding elements must be non-zero.
 
 Since the list is not mutated, we can use the algebraic data type of
 polymorphic lists from Why3’s standard library, defined in theory
 ``list.List``. It comes with other handy theories: ``list.Length``,
 which provides a function ``length``, and ``list.Nth``, which provides a
-function ``nth`` for the :math:`n`-th element of a list. The latter
+function ``nth`` for the nth element of a list. The latter
 returns an option type, depending on whether the index is meaningful or
 not.
 
 .. code-block:: whyml
 
     module SearchingALinkedList
-      use import int.Int
-      use import option.Option
+      use int.Int
+      use option.Option
       use export list.List
       use export list.Length
       use export list.Nth
@@ -571,7 +576,7 @@ and ``1 + search ...`` in the second one, avoiding the extra argument
 ``i``.
 
 We first prove the termination of this recursive function. It amounts to
-give it a *variant*, that is a value that strictly decreases at each
+giving it a *variant*, that is a value that strictly decreases at each
 recursive call with respect to some well-founded ordering. Here it is as
 simple as the list ``l`` itself:
 
@@ -601,14 +606,14 @@ plus the length of ``l``:
       result = i + length l /\ no_zero l
 
 Solving the problem is simply a matter of calling ``search`` with 0 as
-first argument. The code is given :numref:`fig.LinkedList`. The
+first argument. The code is given below. The
 verification conditions are all discharged automatically.
 
 .. code-block:: whyml
 
     module SearchingALinkedList
 
-      use import int.Int
+      use int.Int
       use export list.List
       use export list.Length
       use export list.Nth
@@ -641,8 +646,8 @@ lists.
 
 .. code-block:: whyml
 
-      use import ref.Ref
-      use import list.HdTl
+      use ref.Ref
+      use list.HdTl
 
 Being partial functions, ``hd`` and ``tl`` return options. For the
 purpose of our code, though, it is simpler to have functions which do
@@ -696,23 +701,23 @@ Problem 4: N-Queens
 -------------------
 
 The fourth problem is probably the most challenging one. We have to
-verify the implementation of a program which solves the :math:`N`-queens
-puzzle: place :math:`N` queens on an :math:`N \times N` chess board so
+verify the implementation of a program which solves the *N*-queens
+puzzle: place *N* queens on an *N*×*N* chess board so
 that no queen can capture another one with a legal move. The program
 should return a placement if there is a solution and indicates that
-there is no solution otherwise. A placement is a :math:`N`-element array
-which assigns the queen on row :math:`i` to its column. Thus we start
+there is no solution otherwise. A placement is a *N*-element array
+which assigns the queen on row *i* to its column. Thus we start
 our module by importing arithmetic and arrays:
 
 .. code-block:: whyml
 
     module NQueens
-      use import int.Int
-      use import array.Array
+      use int.Int
+      use array.Array
 
 The code is a simple backtracking algorithm, which tries to put a queen
 on each row of the chess board, one by one (there is basically no better
-way to solve the :math:`N`-queens puzzle). A building block is a
+way to solve the *N*-queens puzzle). A building block is a
 function which checks whether the queen on a given row may attack
 another queen on a previous row. To verify this function, we first
 define a more elementary predicate, which expresses that queens on row
@@ -744,7 +749,7 @@ purpose and it carries the row of the attacking queen:
 
 The check is implemented by a function ``check_is_consistent``, which
 takes the board and the row ``pos`` as arguments, and scans rows from 0
-to ``pos-1`` looking for an attacking queen. As soon as one is found,
+to ``pos - 1`` looking for an attacking queen. As soon as one is found,
 the exception is raised. It is caught immediately outside the loop and
 ``False`` is returned. Whenever the end of the loop is reached, ``True``
 is returned.
@@ -772,13 +777,13 @@ is returned.
         end
 
 The assertion in the exception handler is a cut for SMT solvers. This
-first part of the solution is given in :numref:`fig.NQueens1`.
+first part of the solution is given below.
 
 .. code-block:: whyml
 
     module NQueens
-      use import int.Int
-      use import array.Array
+      use int.Int
+      use array.Array
 
       predicate consistent_row (board: array int) (pos: int) (q: int) =
         board[q] <> board[pos] /\
@@ -846,7 +851,7 @@ search:
 
 The backtracking code is a recursive function ``bt_queens`` which takes
 the chess board, its size, and the starting row for the search. The
-termination is ensured by the obvious variant ``n-pos``.
+termination is ensured by the obvious variant ``n - pos``.
 
 .. code-block:: whyml
 
@@ -922,7 +927,7 @@ simpler.
         raises   { Solution -> solution board n }
       = bt_queens board n 0
 
-This second part of the solution is given :numref:`fig.NQueens2`. With
+This second part of the solution is given below. With
 the help of a few auxiliary lemmas — not given here but available from
 Why3’s sources — the verification conditions are all discharged
 automatically, including the verification of the lemmas themselves.
@@ -983,9 +988,8 @@ Structures* :cite:`okasaki98` for more details.)
 We have to implement operations ``empty``, ``head``, ``tail``, and
 ``enqueue`` over this data type, to show that the invariant over lengths
 is maintained, and finally
-
-    to show that a client invoking these operations observes an abstract
-    queue given by a sequence.
+to show that a client invoking these operations observes an abstract
+queue given by a sequence.
 
 In a new module, we import arithmetic and theory ``list.ListRich``, a
 combo theory that imports all list operations we will require: length,
@@ -994,8 +998,8 @@ reversal, and concatenation.
 .. code-block:: whyml
 
     module AmortizedQueue
-      use import int.Int
-      use import option.Option
+      use int.Int
+      use option.Option
       use export list.ListRich
 
 The queue data type is naturally introduced as a polymorphic record
@@ -1102,16 +1106,16 @@ code.
         ensures { sequence result = sequence q ++ Cons x Nil }
       = create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
 
-The code is given :numref:`fig.AQueue`. The verification conditions are
+The code is given below. The verification conditions are
 all discharged automatically.
 
 .. code-block:: whyml
 
     module AmortizedQueue
 
-      use import int.Int
-      use import option.Option
-      use import list.ListRich
+      use int.Int
+      use option.Option
+      use list.ListRich
 
       type queue 'a = { front: list 'a; lenf: int;
                         rear : list 'a; lenr: int; }
@@ -1150,6 +1154,3 @@ all discharged automatically.
       = create q.front q.lenf (Cons x q.rear) (q.lenr + 1)
 
     end
-
-.. [1]
-   This Why3 example was contributed by Stéphane Lescuyer.

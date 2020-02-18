@@ -7,7 +7,7 @@ Release Note for version 1.2: new syntax for “auto-dereference”
 Version 1.2 introduces a simplified syntax for reference variables, to
 avoid the somehow heavy OCaml syntax using bang character. In short, this
 is syntactic sugar summarized in the following table. An example using
-this new syntax is in ``examples/isqrt.mlw``.
+this new syntax is in :file:`examples/isqrt.mlw`.
 
 +-------------------------+-------------------------------+
 | auto-dereference syntax | desugared to                  |
@@ -24,7 +24,7 @@ this new syntax is in ``examples/isqrt.mlw``.
 Notice that
 
 - the ``&`` marker adds the typing constraint ``(x: ref ...)``;
-- top-level `let/val ref` and `let/val &` are allowed;
+- top-level ``let/val ref`` and ``let/val &`` are allowed;
 - auto-dereferencing works in logic, but such variables
   cannot be introduced inside logical terms.
 
@@ -124,7 +124,7 @@ The following table summarizes the changes.
 Note also that logical symbols can no longer be used in non-ghost code;
 in particular, there is no polymorphic equality in programs anymore, so
 equality functions must be declared/defined on a per-type basis (already
-done for type ``int`` in the standard library). The ``CHANGES.md`` file
+done for type ``int`` in the standard library). The :file:`CHANGES.md` file
 describes other potential sources of incompatibility.
 
 Here are a few more semantic changes.
