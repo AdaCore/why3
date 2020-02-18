@@ -156,7 +156,6 @@ module Base64
 
   let function decode (s: string) : string
     requires { mod (length s) 4 = 0 }
-    (* requires { 0 <= get_pad s < 3 } not needed *)
     requires { forall i. 0 <= i < length s - get_pad s -> valid_64_char s[i] }
     requires { forall i. length s - get_pad s <= i < length s -> s[i] = char_eq }
     ensures  { length result = div (length s * 3) 4 - get_pad s}
@@ -178,7 +177,7 @@ module Base64
       invariant { length r = b * 3 }
       invariant { forall j. 0 <= j < b ->
         let b1,b2,b3,b4 = s[4*j], s[4*j+1], s[4*j+2], s[4*j+3] in
-        r[j*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+        r[j*3]   = chr (b642int b1 * 4 + div (b642int b2) 16) &&
         r[j*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
         r[j*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4)
       }
@@ -188,29 +187,15 @@ module Base64
       let a2 = b642int b2 % 16 * 16 + b642int b3 / 4 in
       let a3 = b642int b3 % 4 * 64 + b642int b4 in
       r <- concat r (chr a1).content;
-      assert { length r = length (r at L) + 1};
-      assert { forall j. 0 <= j < length r - 1 -> r[j] =  (r at L)[j]};
-      assert { r[length r - 1] = chr (b642int b1 * 4 + div (b642int b2) 16) };
       r <- concat r (chr a2).content;
-      assert { length r = length (r at L) + 2};
-      assert { forall j. 0 <= j < length r - 2 -> r[j] =  (r at L)[j]};
-      assert {r[length r - 1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4)};
       r <- concat r (chr a3).content;
-      assert { forall j. 0 <= j < length r - 3 -> r[j] =  (r at L)[j]};
-      assert {r[length r - 3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
-              r[length r - 2] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
-              r[length r - 1] = chr (mod (b642int b3) 4 * 64 + b642int b4)
-      };
       i <- i + 4;
-      ghost (b <- b + 1)
+      ghost (b <- b + 1);
+      assert { r[length r - 3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+               r[length r - 2] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
+               r[length r - 1] = chr (mod (b642int b3) 4 * 64 + b642int b4) };
+      assert { forall j. 0 <= j < length r - 3 -> r[j] =  (r at L)[j]}
     done;
-    assert { forall i. 0 <= i < b ->
-      let b1,b2,b3,b4 = s[4*i], s[4*i+1], s[4*i+2], s[4*i+3] in
-      r[i*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
-      r[i*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
-      r[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4)
-    };
-    assert { length r = div (length s * 3) 4 };
     sub r 0 (length r - get_pad s)
 
   let lemma decode_encode (s: string) : unit
