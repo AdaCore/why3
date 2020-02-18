@@ -803,7 +803,29 @@ lazily.
 Modules
 ~~~~~~~
 
-The syntax for modules is given in :token:`module`.
+The syntax for modules is as follows:
+
+.. productionlist::
+    module: "module" `uident_nq` `label`* `mdecl`* "end"
+    mdecl: `decl`                                ; theory declaration
+      : | "type" `mtype_decl` ("with" `mtype_decl`)*    ; mutable types
+      : | "type" `lident_nq` ("'" `lident_nq`)* `invariant`+    ; added invariant
+      : | "let" "ghost"? `lident_nq` `label`* `pgm_defn`     ;
+      : | "let" "rec" `rec_defn`                      ;
+      : | "val" "ghost"? `lident_nq` `label`* `pgm_decl`     ;
+      : | "exception" `lident_nq` `label`* `type`?           ;
+      : | "scope" "import"? `uident_nq` `mdecl`* "end" ;
+    mtype_decl: `lident_nq` `label`* ("'" `lident_nq` `label`*)* `mtype_defn`
+    mtype_defn:   ; abstract type
+      : | "=" `type`    ; alias type
+      : | "=" "|"? `type_case` ("|" `type_case`)* `invariant`* ; algebraic type
+      : | "=" "{" `mrecord_field` (";" `mrecord_field`)* "}" `invariant`* ; record type
+    mrecord_field: "ghost"? "mutable"? `lident_nq` `label`* ":" `type`
+    pgm_defn: `fun_body` ;
+      : | "=" "fun" `binder`+ `spec`* "->" `spec`* `expr` ;
+    pgm_decl: ":" `type`    ; global variable
+      : | `param` (`spec`* `param`)+ ":" `type` `spec`*  ; abstract function%
+
 
 Any declaration which is accepted in a theory is also accepted in a
 module. Additionally, modules can introduce record types with mutable
@@ -815,6 +837,12 @@ Files
 
 A WhyML input file is a (possibly empty) list of theories and modules.
 
+.. productionlist::
+    file: (`theory` | `module`)*
+
+A theory defined in a WhyML file can only be used within that
+file. If a theory is supposed to be reused from other files, be they
+Why or WhyML files, it should be defined in a Why file.
 
 
 The Why3 Standard Library
