@@ -101,27 +101,22 @@ module Base64
   let function encode (s: string) : string
     ensures { length result = div (next_m3 (length s) * 4) 3 }
     ensures { mod (length result) 4 = 0 }
-    ensures { forall i. 0 <= i < div (length s) 3 ->
+    ensures { forall i. 0 <= i < div (length result) 4 ->
       let a1, a2, a3 = s[i*3], s[i*3+1], s[i*3+2] in
-      result[i*4]   = int2b64 (div (code a1)  4) &&
-      result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-      result[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
-      result[i*4+3] = int2b64 (mod (code a3) 64)
-    }
-    ensures { mod (length s) 3 <> 0 ->
-      let i = div (length s) 3 in
-      let a1 = s[i*3] in
-      result[i*4] = int2b64 (div (code a1)  4) &&
+      result[i*4] = int2b64 (div (code a1)  4) /\
       if i * 3 + 1 = length s then
-        result[i*4+1] = int2b64 (mod (code a1) 4 * 16) &&
-        result[i*4+2] = char_eq &&
-        result[i*4+3] = char_eq
+        result[i*4+1] = int2b64 (mod (code a1) 4 * 16)
+        && result[i*4+2] = char_eq && result[i*4+3] = char_eq
       else
-        let a2 = s[i*3+1] in
-        length s = i * 3 + 2 && (* sanity check *)
-        result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-        result[i*4+2] = int2b64 (mod (code a2) 16 * 4) &&
-        result[i*4+3] = char_eq
+        (  result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+           (if i * 3 + 2 = length s then
+              result[i*4+2] = int2b64 (mod (code a2) 16 * 4) &&
+              result[i*4+3] = char_eq
+            else
+              result[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
+              result[i*4+3] = int2b64 (mod (code a3) 64)
+           )
+        )
     }
     ensures { get_pad result = calc_pad s }
   = let padding = calc_pad s in
@@ -158,20 +153,8 @@ module Base64
       assert { r[length r - 1] = int2b64 (mod (code c2) 16 * 4 + div (code c3) 64) };
       r <- concat r (int2b64 b4).content;
       assert { forall j. 0 <= j < length r - 4 -> r[j] = (r at L)[j] };
-      assert { r[length r - 4] = int2b64 (div (code c1) 4) &&
-               r[length r - 3] = int2b64 (mod (code c1) 4 * 16 + div (code c2) 16) &&
-               r[length r - 2] = int2b64 (mod (code c2) 16 * 4 + div (code c3) 64) &&
-               r[length r - 1] = int2b64 (mod (code c3) 64) };
       i <- i + 3;
       ghost (b <- b + 1);
-      assert { forall j. j = b - 1 ->
-        let a1, a2, a3 = sp[j*3], sp[j*3+1], sp[j*3+2] in
-        r[j*4]   = int2b64 (div (code a1)  4) &&
-        r[j*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-        r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
-        r[j*4+3] = int2b64 (mod (code a3) 64)
-      };
-      assert { forall j. 0 <= j < length r - 4 -> r[j] = (r at L)[j] }
     done;
     assert { forall j. 0 <= j < b ->
       let a1, a2, a3 = sp[j*3], sp[j*3+1], sp[j*3+2] in
@@ -180,31 +163,10 @@ module Base64
       r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
       r[j*4+3] = int2b64 (mod (code a3) 64)
     };
-    label L2 in
     r <- concat (sub r 0 (length r - padding)) (make padding char_eq);
     assert { forall j. 0 <= j < length s -> s[j] = sp[j]};
-    assert { forall j. 0 <= j < div (length s) 3 ->
-      let a1, a2, a3 = s[j*3], s[j*3+1], s[j*3+2] in
-      r[j*4]   = int2b64 (div (code a1)  4) &&
-      r[j*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-      r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
-      r[j*4+3] = int2b64 (mod (code a3) 64)
-    };
-    assert { length s < next_m3 (length s) ->
-      let i = div (length s) 3 in
-      let a1, a2, a3 = sp[i*3], sp[i*3+1], sp[i*3+2] in
-      r[i*4] = int2b64 (div (code a1)  4) &&
-      if i * 3 + 1 >= length s then
-        div (code a2) 16 = 0 &&
-        r[i*4+1] = int2b64 (mod (code a1) 4 * 16) &&
-        r[i*4+2] = char_eq &&
-        r[i*4+3] = char_eq
-      else
-        div (code a3) 64 = 0 &&
-        r[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-        r[i*4+2] = int2b64 (mod (code a2) 16 * 4) &&
-        r[i*4+3] = char_eq
-    };
+    assert { padding = get_pad r };
+    (* assert { forall j. length s <= j < length sp -> sp[j] = chr 0 }; *)
     r
 
   let function decode (s: string) : string
@@ -287,9 +249,6 @@ module Base64
         s1[last*4+2] = char_eq && s1[last*4+3] = char_eq
       else valid_64_char s1[last*4+2] && s1[last*4+3] = char_eq
     };
-
-    assert { forall i. 0 <= i < length s1 ->
-      valid_64_char s1[i] || s1[i] = char_eq };
 
     assert { forall i.
       (0 <= i < length s1 - get_pad s1 -> valid_64_char s1[i]) &&

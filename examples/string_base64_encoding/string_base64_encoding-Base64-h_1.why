@@ -1,0 +1,685 @@
+(* this is the prelude for Alt-Ergo, version >= 2.3.0 *)
+(* this is a prelude for Alt-Ergo integer arithmetic *)
+type string
+
+logic match_bool : bool, 'a, 'a -> 'a
+
+axiom match_bool_True :
+  (forall z:'a. forall z1:'a. (match_bool(true, z, z1) = z))
+
+axiom match_bool_False :
+  (forall z:'a. forall z1:'a. (match_bool(false, z, z1) = z1))
+
+axiom CompatOrderMult :
+  (forall x:int. forall y:int. forall z:int. ((x <= y) -> ((0 <= z) ->
+  ((x * z) <= (y * z)))))
+
+function abs(x: int) : int = (if (0 <= x) then x else (-x))
+
+axiom Abs_le : (forall x:int. forall y:int. ((abs(x) <= y) -> ((-y) <= x)))
+
+axiom Abs_le1 : (forall x:int. forall y:int. ((abs(x) <= y) -> (x <= y)))
+
+axiom Abs_le2 :
+  (forall x:int. forall y:int. ((((-y) <= x) and (x <= y)) -> (abs(x) <= y)))
+
+axiom Abs_pos : (forall x:int. (0 <= abs(x)))
+
+logic div : int, int -> int
+
+logic mod : int, int -> int
+
+axiom Div_mod :
+  (forall x:int. forall y:int. ((not (y = 0)) -> (x = ((y * div(x,
+  y)) + mod(x, y)))))
+
+axiom Div_bound :
+  (forall x:int. forall y:int. (((0 <= x) and (0 <  y)) -> (0 <= div(x, y))))
+
+axiom Div_bound1 :
+  (forall x:int. forall y:int. (((0 <= x) and (0 <  y)) -> (div(x, y) <= x)))
+
+axiom Mod_bound :
+  (forall x:int. forall y:int. ((not (y = 0)) -> ((-abs(y)) <  mod(x, y))))
+
+axiom Mod_bound1 :
+  (forall x:int. forall y:int. ((not (y = 0)) -> (mod(x, y) <  abs(y))))
+
+axiom Div_sign_pos :
+  (forall x:int. forall y:int. (((0 <= x) and (0 <  y)) -> (0 <= div(x, y))))
+
+axiom Div_sign_neg :
+  (forall x:int. forall y:int. (((x <= 0) and (0 <  y)) -> (div(x, y) <= 0)))
+
+axiom Mod_sign_pos :
+  (forall x:int. forall y:int. (((0 <= x) and (not (y = 0))) -> (0 <= mod(x,
+  y))))
+
+axiom Mod_sign_neg :
+  (forall x:int. forall y:int. (((x <= 0) and (not (y = 0))) -> (mod(x,
+  y) <= 0)))
+
+axiom Rounds_toward_zero :
+  (forall x:int. forall y:int. ((not (y = 0)) -> (abs((div(x,
+  y) * y)) <= abs(x))))
+
+axiom Div_1 : (forall x:int. (div(x, 1) = x))
+
+axiom Mod_1 : (forall x:int. (mod(x, 1) = 0))
+
+axiom Div_inf :
+  (forall x:int. forall y:int. (((0 <= x) and (x <  y)) -> (div(x, y) = 0)))
+
+axiom Mod_inf :
+  (forall x:int. forall y:int. (((0 <= x) and (x <  y)) -> (mod(x, y) = x)))
+
+axiom Div_mult :
+  (forall x:int. forall y:int. forall z:int [div(((x * y) + z), x)].
+  (((0 <  x) and ((0 <= y) and (0 <= z))) -> (div(((x * y) + z),
+  x) = (y + div(z, x)))))
+
+axiom Mod_mult :
+  (forall x:int. forall y:int. forall z:int [mod(((x * y) + z), x)].
+  (((0 <  x) and ((0 <= y) and (0 <= z))) -> (mod(((x * y) + z), x) = mod(z,
+  x))))
+
+type int63
+
+logic int63qtint : int63 -> int
+
+axiom int63qtaxiom :
+  (forall i:int63. ((- 4611686018427387904) <= int63qtint(i)))
+
+axiom int63qtaxiom1 :
+  (forall i:int63. (int63qtint(i) <= 4611686018427387903))
+
+predicate in_bounds(n: int) = (((- 4611686018427387904) <= n) and
+  (n <= 4611686018427387903))
+
+axiom to_int_in_bounds : (forall n:int63. in_bounds(int63qtint(n)))
+
+axiom extensionality :
+  (forall x:int63. forall y:int63. ((int63qtint(x) = int63qtint(y)) ->
+  (x = y)))
+
+logic max_int1 : int63
+
+axiom max_intqtdef : (int63qtint(max_int1) = 4611686018427387903)
+
+logic min_int1 : int63
+
+axiom min_intqtdef : (int63qtint(min_int1) = (- 4611686018427387904))
+
+logic concat : string, string -> string
+
+axiom concat_assoc :
+  (forall s1:string. forall s2:string. forall s3:string. (concat(concat(s1,
+  s2), s3) = concat(s1, concat(s2, s3))))
+
+logic rliteral : string
+
+axiom concat_empty :
+  (forall s:string. (concat(s, rliteral) = concat(rliteral, s)))
+
+axiom concat_empty1 : (forall s:string. (concat(rliteral, s) = s))
+
+logic length : string -> int
+
+axiom length_empty : (length(rliteral) = 0)
+
+axiom length_concat :
+  (forall s1:string. forall s2:string. (length(concat(s1,
+  s2)) = (length(s1) + length(s2))))
+
+logic lt : string, string -> prop
+
+axiom lt_empty : (forall s:string. ((not (s = rliteral)) -> lt(rliteral, s)))
+
+axiom lt_not_com :
+  (forall s1:string. forall s2:string. (lt(s1, s2) -> (not lt(s2, s1))))
+
+axiom lt_ref : (forall s1:string. (not lt(s1, s1)))
+
+axiom lt_trans :
+  (forall s1:string. forall s2:string. forall s3:string. ((lt(s1, s2) and
+  lt(s2, s3)) -> lt(s1, s3)))
+
+logic le : string, string -> prop
+
+axiom le_empty : (forall s:string. le(rliteral, s))
+
+axiom le_ref : (forall s1:string. le(s1, s1))
+
+axiom lt_le :
+  (forall s1:string. forall s2:string. (lt(s1, s2) -> le(s1, s2)))
+
+axiom lt_le_eq :
+  (forall s1:string. forall s2:string. (le(s1, s2) -> (lt(s1, s2) or
+  (s1 = s2))))
+
+axiom le_trans :
+  (forall s1:string. forall s2:string. forall s3:string. ((le(s1, s2) and
+  le(s2, s3)) -> le(s1, s3)))
+
+logic s_at : string, int -> string
+
+axiom at_out_of_range :
+  (forall s:string. forall i:int. (((i <  0) or (length(s) <= i)) -> (s_at(s,
+  i) = rliteral)))
+
+axiom at_empty : (forall i:int. (s_at(rliteral, i) = rliteral))
+
+axiom at_length :
+  (forall s:string. forall i:int. (((0 <= i) and (i <  length(s))) ->
+  (length(s_at(s, i)) = 1)))
+
+axiom at_length1 :
+  (forall s:string. forall i:int. ((not ((0 <= i) and (i <  length(s)))) ->
+  (length(s_at(s, i)) = 0)))
+
+axiom concat_at :
+  (forall s1:string. forall s2:string.
+  (forall i:int. (((0 <= i) and (i <  length(s1))) -> (s_at(concat(s1, s2),
+  i) = s_at(s1, i)))))
+
+axiom concat_at1 :
+  (forall s1:string. forall s2:string. (let s = concat(s1, s2) : string in
+  (forall i:int. (((length(s1) <= i) and (i <  length(s))) -> (s_at(s,
+  i) = s_at(s2, (i - length(s1))))))))
+
+logic substring : string, int, int -> string
+
+axiom substring_out_of_range :
+  (forall s:string. forall i:int. forall x:int. (((i <  0) or
+  (length(s) <= i)) -> (substring(s, i, x) = rliteral)))
+
+axiom substring_of_length_zero_or_less :
+  (forall s:string. forall i:int. forall x:int. ((x <= 0) -> (substring(s, i,
+  x) = rliteral)))
+
+axiom substring_of_empty :
+  (forall i:int. forall x:int. (substring(rliteral, i, x) = rliteral))
+
+axiom substring_smaller :
+  (forall s:string. forall i:int. forall x:int. (length(substring(s, i,
+  x)) <= length(s)))
+
+axiom substring_smaller_x :
+  (forall s:string. forall i:int. forall x:int. ((0 <= x) ->
+  (length(substring(s, i, x)) <= x)))
+
+axiom substring_length :
+  (forall s:string. forall i:int. forall x:int. (((0 <= x) and ((0 <= i) and
+  (i <  length(s)))) -> ((length(s) <  (i + x)) -> (length(substring(s, i,
+  x)) = (length(s) - i)))))
+
+axiom substring_length1 :
+  (forall s:string. forall i:int. forall x:int. (((0 <= x) and ((0 <= i) and
+  (i <  length(s)))) -> ((not (length(s) <  (i + x))) -> (length(substring(s,
+  i, x)) = x))))
+
+axiom substring_at :
+  (forall s:string. forall i:int. (s_at(s, i) = substring(s, i, 1)))
+
+axiom substring_substring :
+  (forall s:string. forall ofs:int. forall len:int. forall ofsqt:int.
+  forall lenqt:int. (((0 <= ofs) and (ofs <= length(s))) -> ((0 <= len) ->
+  (((ofs + len) <= length(s)) -> (((0 <= ofsqt) and (ofsqt <= len)) ->
+  ((0 <= lenqt) -> (((ofsqt + lenqt) <= len) -> (substring(substring(s, ofs,
+  len), ofsqt, lenqt) = substring(s, (ofs + ofsqt), lenqt)))))))))
+
+axiom concat_substring :
+  (forall s:string. forall ofs:int. forall len:int. forall lenqt:int.
+  (((0 <= ofs) and (ofs <= length(s))) -> ((0 <= len) ->
+  (((ofs + len) <= length(s)) -> ((0 <= lenqt) ->
+  (((0 <= ((ofs + len) + lenqt)) and (((ofs + len) + lenqt) <= length(s))) ->
+  (concat(substring(s, ofs, len), substring(s, (ofs + len),
+  lenqt)) = substring(s, ofs, (len + lenqt)))))))))
+
+logic prefixof : string, string -> prop
+
+axiom prefixof_substring :
+  (forall s1:string. forall s2:string. (prefixof(s1, s2) ->
+  (s1 = substring(s2, 0, length(s1)))))
+
+axiom prefixof_substring1 :
+  (forall s1:string. forall s2:string. ((s1 = substring(s2, 0,
+  length(s1))) -> prefixof(s1, s2)))
+
+axiom prefixof_concat :
+  (forall s1:string. forall s2:string. prefixof(s1, concat(s1, s2)))
+
+axiom prefixof_empty : (forall s2:string. prefixof(rliteral, s2))
+
+axiom prefixof_empty2 :
+  (forall s1:string. ((not (s1 = rliteral)) -> (not prefixof(s1, rliteral))))
+
+logic suffixof : string, string -> prop
+
+axiom suffixof_substring :
+  (forall s1:string. forall s2:string. (suffixof(s1, s2) ->
+  (s1 = substring(s2, (length(s2) - length(s1)), length(s1)))))
+
+axiom suffixof_substring1 :
+  (forall s1:string. forall s2:string. ((s1 = substring(s2,
+  (length(s2) - length(s1)), length(s1))) -> suffixof(s1, s2)))
+
+axiom suffixof_concat :
+  (forall s1:string. forall s2:string. suffixof(s2, concat(s1, s2)))
+
+axiom suffixof_empty : (forall s2:string. suffixof(rliteral, s2))
+
+axiom suffixof_empty2 :
+  (forall s1:string. ((not (s1 = rliteral)) -> (not suffixof(s1, rliteral))))
+
+logic contains : string, string -> prop
+
+axiom contains_prefixof :
+  (forall s1:string. forall s2:string. (prefixof(s1, s2) -> contains(s2,
+  s1)))
+
+axiom contains_suffixof :
+  (forall s1:string. forall s2:string. (suffixof(s1, s2) -> contains(s2,
+  s1)))
+
+axiom contains_empty :
+  (forall s2:string. (contains(rliteral, s2) -> (s2 = rliteral)))
+
+axiom contains_empty1 :
+  (forall s2:string. ((s2 = rliteral) -> contains(rliteral, s2)))
+
+axiom contains_empty2 : (forall s1:string. contains(s1, rliteral))
+
+axiom contains_substring :
+  (forall s1:string. forall s2:string. forall i:int. ((substring(s1, i,
+  length(s2)) = s2) -> contains(s1, s2)))
+
+axiom contains_concat :
+  (forall s1:string. forall s2:string. contains(concat(s1, s2), s1))
+
+axiom contains_concat1 :
+  (forall s1:string. forall s2:string. contains(concat(s1, s2), s2))
+
+axiom contains_at :
+  (forall s1:string. forall s2:string. forall i:int. ((s_at(s1, i) = s2) ->
+  contains(s1, s2)))
+
+logic indexof : string, string, int -> int
+
+axiom indexof_empty :
+  (forall s:string. forall i:int. (((0 <= i) and (i <= length(s))) ->
+  (indexof(s, rliteral, i) = i)))
+
+axiom indexof_empty1 :
+  (forall s:string. forall i:int. (let j = indexof(rliteral, s, i) : int in
+  ((j = (- 1)) or ((s = rliteral) and ((i = j) and (j = 0))))))
+
+axiom indexof_contains :
+  (forall s1:string. forall s2:string. (contains(s1, s2) -> (0 <= indexof(s1,
+  s2, 0))))
+
+axiom indexof_contains1 :
+  (forall s1:string. forall s2:string. (contains(s1, s2) -> (indexof(s1, s2,
+  0) <= length(s1))))
+
+axiom indexof_contains2 :
+  (forall s1:string. forall s2:string. (contains(s1, s2) -> (substring(s1,
+  indexof(s1, s2, 0), length(s2)) = s2)))
+
+axiom contains_indexof :
+  (forall s1:string. forall s2:string. forall i:int. ((0 <= indexof(s1, s2,
+  i)) -> contains(s1, s2)))
+
+axiom not_contains_indexof :
+  (forall s1:string. forall s2:string. forall i:int. ((not contains(s1,
+  s2)) -> (indexof(s1, s2, i) = (- 1))))
+
+axiom substring_indexof :
+  (forall s1:string. forall s2:string. forall i:int. (let j = indexof(s1, s2,
+  i) : int in ((0 <= j) -> (substring(s1, j, length(s2)) = s2))))
+
+axiom indexof_out_of_range :
+  (forall i:int. forall s1:string. forall s2:string. ((not ((0 <= i) and
+  (i <= length(s1)))) -> (indexof(s1, s2, i) = (- 1))))
+
+axiom indexof_in_range :
+  (forall s1:string. forall s2:string. forall i:int. (let j = indexof(s1, s2,
+  i) : int in (((0 <= i) and (i <= length(s1))) -> ((j = (- 1)) or
+  ((i <= j) and (j <= length(s1)))))))
+
+axiom indexof_contains_substring :
+  (forall s1:string. forall s2:string. forall i:int. ((((0 <= i) and
+  (i <= length(s1))) and contains(substring(s1, i, (length(s1) - i)), s2)) ->
+  (i <= indexof(s1, s2, i))))
+
+axiom indexof_contains_substring1 :
+  (forall s1:string. forall s2:string. forall i:int. ((((0 <= i) and
+  (i <= length(s1))) and contains(substring(s1, i, (length(s1) - i)), s2)) ->
+  (indexof(s1, s2, i) <= length(s1))))
+
+logic replace : string, string, string -> string
+
+axiom replace_empty :
+  (forall s1:string. forall s3:string. (replace(s1, rliteral,
+  s3) = concat(s3, s1)))
+
+axiom replace_not_contains :
+  (forall s1:string. forall s2:string. forall s3:string. ((not contains(s1,
+  s2)) -> (replace(s1, s2, s3) = s1)))
+
+axiom replace_empty2 :
+  (forall s2:string. forall s3:string. ((s2 = rliteral) -> (replace(rliteral,
+  s2, s3) = s3)))
+
+axiom replace_empty21 :
+  (forall s2:string. forall s3:string. ((not (s2 = rliteral)) ->
+  (replace(rliteral, s2, s3) = rliteral)))
+
+axiom replace_substring_indexof :
+  (forall s1:string. forall s2:string. forall s3:string. (let j = indexof(s1,
+  s2, 0) : int in (replace(s1, s2,
+  s3) = (if (j <  0) then s1 else concat(concat(substring(s1, 0, j), s3),
+  substring(s1, (j + length(s2)), ((length(s1) - j) - length(s2))))))))
+
+logic replaceall : string, string, string -> string
+
+axiom replaceall_empty1 :
+  (forall s1:string. forall s3:string. (replaceall(s1, rliteral, s3) = s1))
+
+axiom not_contains_replaceall :
+  (forall s1:string. forall s2:string. forall s3:string. ((not contains(s1,
+  s2)) -> (replaceall(s1, s2, s3) = s1)))
+
+logic to_int : string -> int
+
+axiom to_int_gt_minus_1 : (forall s:string. ((- 1) <= to_int(s)))
+
+axiom to_int_empty : (to_int(rliteral) = (- 1))
+
+predicate is_digit(s: string) = (((0 <= to_int(s)) and (to_int(s) <= 9)) and
+  (length(s) = 1))
+
+logic from_int : int -> string
+
+axiom from_int_negative :
+  (forall i:int. ((i <  0) -> (from_int(i) = rliteral)))
+
+axiom from_int_negative1 :
+  (forall i:int. ((from_int(i) = rliteral) -> (i <  0)))
+
+axiom from_int_to_int :
+  (forall i:int. ((0 <= i) -> (to_int(from_int(i)) = i)))
+
+axiom from_int_to_int1 :
+  (forall i:int. ((not (0 <= i)) -> (to_int(from_int(i)) = (- 1))))
+
+type char
+
+logic content : char -> string
+
+axiom charqtinvariant :
+  (forall self:char [content(self)]. (length(content(self)) = 1))
+
+axiom char_eq :
+  (forall c1:char. forall c2:char. ((content(c1) = content(c2)) ->
+  (c1 = c2)))
+
+logic code : char -> int
+
+axiom code1 : (forall c:char. (0 <= code(c)))
+
+axiom code2 : (forall c:char. (code(c) <  256))
+
+logic chr : int -> char
+
+axiom code_chr :
+  (forall n:int. (((0 <= n) and (n <  256)) -> (code(chr(n)) = n)))
+
+axiom chr_code : (forall c:char. (chr(code(c)) = c))
+
+logic get : string, int -> char
+
+axiom get1 :
+  (forall s:string. forall i:int. (((0 <= i) and (i <  length(s))) ->
+  (content(get(s, i)) = s_at(s, i))))
+
+axiom substring_get :
+  (forall s:string. forall ofs:int. forall len:int. forall i:int.
+  (((0 <= ofs) and (ofs <= length(s))) -> ((0 <= len) ->
+  (((ofs + len) <= length(s)) -> (((0 <= i) and (i <  len)) ->
+  (get(substring(s, ofs, len), i) = get(s, (ofs + i))))))))
+
+predicate eq_string(s1: string, s2: string) = ((length(s1) = length(s2)) and
+  (forall i:int. (((0 <= i) and (i <  length(s1))) -> (get(s1, i) = get(s2,
+  i)))))
+
+axiom extensionality1 :
+  (forall s1:string. forall s2:string. (eq_string(s1, s2) -> (s1 = s2)))
+
+logic make : int, char -> string
+
+axiom make_length :
+  (forall size:int. forall v:char. ((0 <= size) -> (length(make(size,
+  v)) = size)))
+
+axiom make_content :
+  (forall size:int. forall v:char. ((0 <= size) ->
+  (forall i:int. (((0 <= i) and (i <  size)) -> (get(make(size, v), i) = v)))))
+
+function next_m3(i: int) : int = (if (mod(i, 3) = 0) then i else (if (mod(i,
+  3) = 1) then (i + 2) else (i + 1)))
+
+function next_m4(i: int) : int = (if (mod(i, 4) = 0) then i else (if (mod(i,
+  4) = 1) then (i + 3) else (if (mod(i, 4) = 2) then (i + 2) else (i + 1))))
+
+function int2b64(i: int) : char = (if ((0 <= i) and
+  (i <= 25)) then chr((i + 65)) else (if ((26 <= i) and
+  (i <= 51)) then chr(((i - 26) + 97)) else (if ((52 <= i) and
+  (i <= 61)) then chr(((i - 52) + 48)) else (if (i = 62) then chr(43) else (if (i = 63) then chr(47) else chr(0))))))
+
+axiom concat_first :
+  (forall s1:string. forall s2:string.
+  (forall i:int. (((0 <= i) and (i <  length(s1))) -> (get(concat(s1, s2),
+  i) = get(s1, i)))))
+
+axiom concat_second :
+  (forall s1:string. forall s2:string.
+  (forall i:int. (((length(s1) <= i) and (i <  (length(s1) + length(s2)))) ->
+  (get(concat(s1, s2), i) = get(s2, (i - length(s1)))))))
+
+predicate valid_64_char(c: char) = (((65 <= code(c)) and (code(c) <= 90)) or
+  (((97 <= code(c)) and (code(c) <= 122)) or (((48 <= code(c)) and
+  (code(c) <= 57)) or ((code(c) = 43) or (code(c) = 47)))))
+
+axiom int2b64_valid_4_char :
+  (forall i:int. (((0 <= i) and (i <  64)) -> valid_64_char(int2b64(i))))
+
+function b642int(c: char) : int = (if ((65 <= code(c)) and
+  (code(c) <= 90)) then (code(c) - 65) else (if ((97 <= code(c)) and
+  (code(c) <= 122)) then ((code(c) - 97) + 26) else (if ((48 <= code(c)) and
+  (code(c) <= 57)) then ((code(c) - 48) + 52) else (if (code(c) = 43) then 62 else (if (code(c) = 47) then 63 else (if (c = chr(61)) then 0 else 64))))))
+
+axiom b642int_int2b64 :
+  (forall i:int. (((0 <= i) and (i <  64)) -> (b642int(int2b64(i)) = i)))
+
+function get_pad(s: string) : int = (if ((1 <= length(s)) and (get(s,
+  (length(s) - 1)) = chr(61))) then (if ((2 <= length(s)) and (get(s,
+  (length(s) - 2)) = chr(61))) then 2 else 1) else 0)
+
+function calc_pad(s: string) : int = (if (mod(length(s),
+  3) = 1) then 2 else (if (mod(length(s), 3) = 2) then 1 else 0))
+
+type 'a ref = { contents : 'a
+}
+
+logic s : string
+
+logic padding : int63
+
+axiom Ensures : (int63qtint(padding) = calc_pad(s))
+
+logic b : int
+
+logic r : string
+
+logic i : int63
+
+axiom LoopInvariant : (int63qtint(i) = (b * 3))
+
+axiom LoopInvariant1 : (length(r) = (b * 4))
+
+axiom H : (0 <= int63qtint(i))
+
+axiom H1 : (int63qtint(i) <= length(concat(s, make(int63qtint(padding),
+  chr(0)))))
+
+axiom LoopInvariant2 :
+  (forall j:int. (((0 <= j) and (j <  b)) -> (get(r,
+  (j * 4)) = int2b64(div(code(get(concat(s, make(int63qtint(padding),
+  chr(0))), (j * 3))), 4)))))
+
+axiom LoopInvariant3 :
+  (forall j:int. (((0 <= j) and (j <  b)) -> (get(r,
+  ((j * 4) + 1)) = int2b64(((mod(code(get(concat(s, make(int63qtint(padding),
+  chr(0))), (j * 3))), 4) * 16) + div(code(get(concat(s,
+  make(int63qtint(padding), chr(0))), ((j * 3) + 1))), 16))))))
+
+axiom LoopInvariant4 :
+  (forall j:int. (((0 <= j) and (j <  b)) -> (get(r,
+  ((j * 4) + 2)) = int2b64(((mod(code(get(concat(s, make(int63qtint(padding),
+  chr(0))), ((j * 3) + 1))), 16) * 4) + div(code(get(concat(s,
+  make(int63qtint(padding), chr(0))), ((j * 3) + 2))), 64))))))
+
+axiom LoopInvariant5 :
+  (forall j:int. (((0 <= j) and (j <  b)) -> (get(r,
+  ((j * 4) + 3)) = int2b64(mod(code(get(concat(s, make(int63qtint(padding),
+  chr(0))), ((j * 3) + 2))), 64)))))
+
+logic o : int63
+
+axiom Ensures1 : (int63qtint(o) = length(concat(s, make(int63qtint(padding),
+  chr(0)))))
+
+axiom H2 : (not (int63qtint(i) <  int63qtint(o)))
+
+axiom Assert :
+  (forall j:int. (((0 <= j) and (j <  b)) -> (get(r,
+  (j * 4)) = int2b64(div(code(get(concat(s, make(int63qtint(padding),
+  chr(0))), (j * 3))), 4)))))
+
+axiom Assert1 :
+  (forall j:int. (((0 <= j) and (j <  b)) -> (get(r,
+  ((j * 4) + 1)) = int2b64(((mod(code(get(concat(s, make(int63qtint(padding),
+  chr(0))), (j * 3))), 4) * 16) + div(code(get(concat(s,
+  make(int63qtint(padding), chr(0))), ((j * 3) + 1))), 16))))))
+
+axiom Assert2 :
+  (forall j:int. (((0 <= j) and (j <  b)) -> (get(r,
+  ((j * 4) + 2)) = int2b64(((mod(code(get(concat(s, make(int63qtint(padding),
+  chr(0))), ((j * 3) + 1))), 16) * 4) + div(code(get(concat(s,
+  make(int63qtint(padding), chr(0))), ((j * 3) + 2))), 64))))))
+
+axiom Assert3 :
+  (forall j:int. (((0 <= j) and (j <  b)) -> (get(r,
+  ((j * 4) + 3)) = int2b64(mod(code(get(concat(s, make(int63qtint(padding),
+  chr(0))), ((j * 3) + 2))), 64)))))
+
+logic o1 : int63
+
+axiom Ensures2 : (int63qtint(o1) = length(r))
+
+logic o2 : int63
+
+axiom Ensures3 : (int63qtint(o2) = (int63qtint(o1) - int63qtint(padding)))
+
+logic r1 : string
+
+axiom H3 : (r1 = concat(substring(r, 0, int63qtint(o2)),
+  make(int63qtint(padding), chr(61))))
+
+axiom Assert4 :
+  (forall j:int. (((0 <= j) and (j <  length(s))) -> (get(s,
+  j) = get(concat(s, make(int63qtint(padding), chr(0))), j))))
+
+axiom Div_mod1 :
+  (forall x:int. forall y:int. ((not (y = 0)) ->
+  (x = ((y * (x / y)) + (x % y)))))
+
+axiom Mod_bound2 :
+  (forall x:int. forall y:int. ((not (y = 0)) -> (0 <= (x % y))))
+
+axiom Mod_bound3 :
+  (forall x:int. forall y:int. ((not (y = 0)) -> ((x % y) <  abs(y))))
+
+axiom Div_unique :
+  (forall x:int. forall y:int. forall q:int. ((0 <  y) ->
+  ((((q * y) <= x) and (x <  ((q * y) + y))) -> ((x / y) = q))))
+
+axiom Div_bound2 :
+  (forall x:int. forall y:int. (((0 <= x) and (0 <  y)) -> (0 <= (x / y))))
+
+axiom Div_bound3 :
+  (forall x:int. forall y:int. (((0 <= x) and (0 <  y)) -> ((x / y) <= x)))
+
+axiom Mod_11 : (forall x:int. ((x % 1) = 0))
+
+axiom Div_11 : (forall x:int. ((x / 1) = x))
+
+axiom Div_inf1 :
+  (forall x:int. forall y:int. (((0 <= x) and (x <  y)) -> ((x / y) = 0)))
+
+axiom Div_inf_neg :
+  (forall x:int. forall y:int. (((0 <  x) and (x <= y)) ->
+  (((-x) / y) = (- 1))))
+
+axiom Mod_0 : (forall y:int. ((not (y = 0)) -> ((0 % y) = 0)))
+
+axiom Div_1_left : (forall y:int. ((1 <  y) -> ((1 / y) = 0)))
+
+axiom Div_minus1_left : (forall y:int. ((1 <  y) -> (((- 1) / y) = (- 1))))
+
+axiom Mod_1_left : (forall y:int. ((1 <  y) -> ((1 % y) = 1)))
+
+axiom Mod_minus1_left : (forall y:int. ((1 <  y) -> (((- 1) % y) = (y - 1))))
+
+axiom Div_mult1 :
+  (forall x:int. forall y:int. forall z:int [(((x * y) + z) / x)].
+  ((0 <  x) -> ((((x * y) + z) / x) = (y + (z / x)))))
+
+axiom Mod_mult1 :
+  (forall x:int. forall y:int. forall z:int [(((x * y) + z) % x)].
+  ((0 <  x) -> ((((x * y) + z) % x) = (z % x))))
+
+axiom cdiv_cases :
+  (forall n:int. forall d:int [div(n, d)]. ((0 <= n) -> ((0 <  d) -> (div(n,
+  d) = (n / d)))))
+
+axiom cdiv_cases1 :
+  (forall n:int. forall d:int [div(n, d)]. ((n <= 0) -> ((0 <  d) -> (div(n,
+  d) = (-((-n) / d))))))
+
+axiom cdiv_cases2 :
+  (forall n:int. forall d:int [div(n, d)]. ((0 <= n) -> ((d <  0) -> (div(n,
+  d) = (-(n / (-d)))))))
+
+axiom cdiv_cases3 :
+  (forall n:int. forall d:int [div(n, d)]. ((n <= 0) -> ((d <  0) -> (div(n,
+  d) = ((-n) / (-d))))))
+
+axiom cmod_cases :
+  (forall n:int. forall d:int [mod(n, d)]. ((0 <= n) -> ((0 <  d) -> (mod(n,
+  d) = (n % d)))))
+
+axiom cmod_cases1 :
+  (forall n:int. forall d:int [mod(n, d)]. ((n <= 0) -> ((0 <  d) -> (mod(n,
+  d) = (-((-n) % d))))))
+
+axiom cmod_cases2 :
+  (forall n:int. forall d:int [mod(n, d)]. ((0 <= n) -> ((d <  0) -> (mod(n,
+  d) = (n % (-d))))))
+
+axiom cmod_cases3 :
+  (forall n:int. forall d:int [mod(n, d)]. ((n <= 0) -> ((d <  0) -> (mod(n,
+  d) = (-((-n) % (-d)))))))
+
+goal h : (forall i1:int. forall c:char. (length(make(i1, c)) = i1))
