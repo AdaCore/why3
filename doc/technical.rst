@@ -101,13 +101,6 @@ This section documents the available transformations. Note that the set
 of available transformations in your own installation is given
 by :option:`why3 --list-transforms`.
 
-Simplification by Computation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-These transformations simplify the goal by applying several kinds of
-simplification, described below. The transformations differ only by the
-kind of rules they apply:
-
 .. why3:transform:: apply
 
    Apply an hypothesis to the goal of the task using a *modus ponens*

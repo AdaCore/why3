@@ -69,21 +69,27 @@ is written in base 10.
 
 Identifiers are composed of letters, digits, underscores, and primes.
 The syntax distinguishes identifiers that start with a lowercase letter
-or an underscore (:token:`lident`), identifiers that start with an
-uppercase letter (:token:`uident`), and identifiers that start with
+or an underscore (:token:`lident_nq`), identifiers that start with an
+uppercase letter (:token:`uident_nq`), and identifiers that start with
 a prime (:token:`qident`, used exclusively for type variables):
 
 .. productionlist::
     alpha: "a" - "z" | "A" - "Z"
-    suffix: `alpha` | `digit` | "'" | "_"
-    lident: ("a" - "z") `suffix`* | "_" `suffix`+
-    uident: ("A" - "Z") `suffix`*
+    suffix: (`alpha` | "'"* ("0" - "9" | "_")*)* "'"*
+    lident_nq: ("a" - "z") `suffix`* | "_" `suffix`+
+    uident_nq: ("A" - "Z") `suffix`*
+    ident_nq: `lident_nq` | `uident_nq`
     qident: "'" ("a" - "z") `suffix`*
 
 
 Identifiers that contain a prime followed by a letter, such as
 ``int32'max``, are reserved for symbols introduced by Why3 and cannot be
 used for user-defined symbols.
+
+.. productionlist::
+    lident: `lident_nq` ("'" `alpha` `suffix`)*
+    uident: `lident_nq` ("'" `alpha` `suffix`)*
+    ident: `lident` | `uident`
 
 In order to refer to symbols introduced in different namespaces
 (*scopes*), we can put a dot-separated “qualifier prefix” in front of an
@@ -356,8 +362,9 @@ proof justifies the affirmation), and finally, ``A -> D`` (the proof of
 ``A`` is discarded and ``A`` is used to prove ``D``).
 
 The behavior of the splitting transformations is further controlled by
-attributes ``[@stop_split]`` and ``[@case_split]``. Consult
-:numref:`tech.trans:split` for details.
+attributes ``[@stop_split]`` and ``[@case_split]``. Consult the documentation
+of transformation :why3:transform:`split_goal` in
+:numref:`sec.transformations` for details.
 
 Among the propositional connectives, ``not`` has the highest precedence,
 ``&&`` has the same precedence as ``/\`` (weaker than negation), ``||``
@@ -696,7 +703,7 @@ value. The two constants represent the high bound and low bound of the
 range respectively.
 
 Unless specified otherwise with the meta ``keep:literal`` on ``r``, the
-transformation *eliminate_literal* introduces an axiom
+transformation :why3:transform:`eliminate_literal` introduces an axiom
 
 ::
 
@@ -746,7 +753,7 @@ NaN. The function ``f'real`` projects a finite term of type ``f`` to its
 real value, its result is not specified for non finite terms.
 
 Unless specified otherwise with the meta ``keep:literal`` on ``f``, the
-transformation *eliminate\_literal* will introduce an axiom
+transformation :why3:transform:`eliminate_literal` will introduce an axiom
 
 ::
 
