@@ -124,6 +124,10 @@ module Util
     ensures { forall j. (j < offset rp \/ offset rp + n <= j) ->
               (pelts rp)[j] = old (pelts rp)[j] }
     ensures { forall j. (pelts up)[j] = old (pelts up)[j] }
+    ensures { min up = old min up /\ max up = old max up
+              /\ plength up = old plength up }
+    ensures { min rp = old min rp /\ max rp = old max rp
+              /\ plength rp = old plength rp }
   =
     let ghost ou = pure { up } in
     let nr, nx, m = open_shift_sep rp up n in

@@ -3,6 +3,7 @@ module Zcmp
 use int.Int
 use int.Power
 use map.Map
+use mach.int.Int64
 use mach.int.Int32GMP
 use ref.Ref
 use mach.c.C
@@ -58,5 +59,41 @@ let wmpz_cmp_ui (u: mpz_ptr) (v_digit:limb) : int32
     return 0
   end;
   return (if un > 0 then 1 else -1)
+
+use mpz_getset.Set
+
+let wmpz_cmp_si (u: mpz_ptr) (v_digit:int64) : int32
+  requires { mpz.readers[u] >= 0 }
+  requires { mpz.abs_size u < max_int32 }
+  ensures  { forall w. mpz_unchanged w mpz (old mpz) }
+  ensures { result > 0 -> value_of u mpz > v_digit }
+  ensures { result < 0 -> value_of u mpz < v_digit }
+  ensures { result = 0 -> value_of u mpz = v_digit }
+=
+  let usize = size_of u in
+  let vsize = (if v_digit > 0 then 1 else 0) - (if v_digit < 0 then 1 else 0) in
+  assert { v_digit > 0 -> vsize = 1 };
+  assert { v_digit < 0 -> vsize = -1 };
+  if (usize = 0) || (usize <> vsize)
+  then return usize - vsize
+  else begin
+    let up = get_read_ptr u in
+    let ul = C.get up in
+    let vl = abs_cast v_digit in
+    release_reader u up;
+    if ul = vl then return 0;
+    if ul > vl then return usize else return (- usize)
+  end
+
+let wmpz_sgn (u:mpz_ptr) : int32
+  requires { mpz.readers[u] >= 0 }
+  ensures  { forall w. mpz_unchanged w mpz (old mpz) }
+  ensures { result > 0 -> value_of u mpz > 0 }
+  ensures { result < 0 -> value_of u mpz < 0 }
+  ensures { result = 0 -> value_of u mpz = 0 }
+=
+  if size_of u < 0 then -1 else if size_of u > 0 then 1 else 0
+
+
 
 end

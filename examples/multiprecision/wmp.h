@@ -41,8 +41,12 @@ uint64_t wmpz_get_ui (wmpz_srcptr);
 
 int32_t wmpz_cmp (wmpz_srcptr, wmpz_ptr);
 int32_t wmpz_cmp_ui (wmpz_srcptr, uint64_t);
+int32_t wmpz_cmp_si (wmpz_srcptr, int64_t);
+int32_t wmpz_sgn (wmpz_srcptr);
 int32_t wmpz_cmpabs (wmpz_srcptr, wmpz_ptr);
 int32_t wmpz_cmpabs_ui (wmpz_srcptr, uint64_t);
+
+void wmpz_abs (wmpz_ptr, wmpz_srcptr);
 
 void wmpz_add (wmpz_ptr, wmpz_srcptr, wmpz_ptr);
 void wmpz_add_ui (wmpz_ptr, wmpz_srcptr, uint64_t);
@@ -58,7 +62,8 @@ void wmpz_mul_ui (wmpz_ptr, wmpz_srcptr, uint64_t);
 void wmpz_mul2exp (wmpz_ptr, wmpz_srcptr, uint64_t);
 void wmpz_tdiv_q_2exp (wmpz_ptr, wmpz_srcptr, uint64_t);
 
-
+void wmpz_tdiv_qr(wmpz_ptr, wmpz_ptr, wmpz_srcptr, wmpz_srcptr);
+uint64_t wmpz_tdiv_qr_ui(wmpz_ptr, wmpz_ptr, wmpz_srcptr, uint64_t);
 
 int32_t wmpn_cmp (wmp_srcptr, wmp_srcptr, wmp_size_t);
 
@@ -81,8 +86,8 @@ wmp_limb_t wmpn_rshift (wmp_ptr, wmp_srcptr, wmp_size_t, uint64_t);
 void wmpn_powm (wmp_ptr, wmp_srcptr, wmp_size_t, wmp_srcptr, wmp_size_t,
                 wmp_srcptr, wmp_size_t, wmp_ptr);
 
-size_t wmpn_get_str(unsigned char *, int, wmp_ptr, wmp_size_t);
-wmp_size_t wmpn_set_str(wmp_ptr, unsigned char *, size_t, int);
+size_t wmpn_get_str(unsigned char *, int, wmp_srcptr, wmp_size_t);
+wmp_size_t wmpn_set_str(wmp_ptr, unsigned const char *, size_t, int);
 
 // not verified when rp and up are aliased.
 wmp_limb_t wmpn_add_1 (wmp_ptr rp, wmp_srcptr up, wmp_size_t, wmp_limb_t);
