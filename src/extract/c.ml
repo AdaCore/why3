@@ -804,6 +804,8 @@ module MLToC = struct
   let likely = create_attribute "extraction:likely"
   let unlikely = create_attribute "extraction:unlikely"
 
+  let decl_attribute = create_attribute "extraction:c_declaration"
+
   let rec ty_of_ty info ty = (*FIXME try to use only ML tys*)
     match ty.ty_node with
     | Tyvar v ->
@@ -944,6 +946,12 @@ module MLToC = struct
     if env.computes_return_value
     then Sreturn e
     else Sexpr e
+
+  let var_escapes_from_expr env v e =
+    let aregs = ity_exp_fold Sreg.add_left Sreg.empty v.pv_ity in
+    let reset_regs = e.e_effect.eff_resets in
+    let locked_regs = Sreg.union env.ret_regs reset_regs in
+    not (Sreg.is_empty (Sreg.inter aregs locked_regs))
 
   let inlined_attr = Compile.InlineFunctionCalls.inlined_call_attr
 
@@ -1392,19 +1400,26 @@ module MLToC = struct
     | Eassign _ -> raise (Unsupported "assign")
     | Eexn (_,_,e) -> expr info env e
     | Eignore e ->
-       [], C.Sseq(C.Sblock(expr info {env with computes_return_value = false} e),
+       [],
+       C.Sseq(C.Sblock(expr info {env with computes_return_value = false} e),
               if env.computes_return_value
               then C.Sreturn(Enothing)
               else C.Snop)
     | Efun _ -> raise (Unsupported "higher order")
+    | Elet (Lvar (v, { e_node = Eapp (rs, _) }), e)
+         when Sattr.mem decl_attribute rs.rs_name.id_attrs ->
+       Debug.dprintf debug_c_extraction "variable declaration call@.";
+       if var_escapes_from_expr env v e
+       then raise (Unsupported "local variable escaping function");
+       let t = ty_of_ty info (ty_of_ity v.pv_ity) in
+       let d = C.Ddecl (t, [pv_name v, Enothing]) in
+       let d', s = expr info env e in
+       d::d', s
     | Elet (Lvar (a, { e_node = Eapp (rs, [n; v]) }), e)
          when Sattr.mem array_mk rs.rs_name.id_attrs ->
        (* let a = Array.make n v in e*)
        Debug.dprintf debug_c_extraction "call to an array constructor@.";
-       let aregs = ity_exp_fold Sreg.add_left Sreg.empty a.pv_ity in
-       let reset_regs = e.e_effect.eff_resets in
-       let locked_regs = Sreg.union env.ret_regs reset_regs in
-       if not (Sreg.is_empty (Sreg.inter aregs locked_regs))
+       if var_escapes_from_expr env a e
        then raise (Unsupported "array escaping function");
        let env_f = { env with computes_return_value = false } in
        let n = expr info env_f n in
@@ -1433,9 +1448,7 @@ module MLToC = struct
        begin match ld with
        | Lvar (pv,le) -> (* not a block *)
           let t = ty_of_ty info (ty_of_ity pv.pv_ity) in
-          let aregs = ity_exp_fold Sreg.add_left Sreg.empty pv.pv_ity in
-          if should_not_escape t
-             && not (Sreg.is_empty (Sreg.inter aregs e.e_effect.eff_resets))
+          if should_not_escape t && var_escapes_from_expr env pv e
           then raise (Unsupported "array or struct escaping function");
           let (d,s) =  expr info {env with computes_return_value = false} le in
           let initblock = d, C.assignify (Evar (pv_name pv)) s in
@@ -1475,30 +1488,30 @@ module MLToC = struct
               let cty = ty_of_mlty info mlty in
               match has_unboxed_struct cty, pv.pv_ity.ity_node with
               | true, Ityreg r ->
-                Debug.dprintf debug_c_extraction "boxing parameter %s@."
-                  id.id_string;
-                Hreg.add boxed r ();
-                C.Tptr cty, id
+                 Debug.dprintf debug_c_extraction "boxing parameter %s@."
+                   id.id_string;
+                 Hreg.add boxed r ();
+                 C.Tptr cty, id
               | _ -> (cty, id)) ngvl ngargs in
         let rity = rs.rs_cty.cty_result in
         let ret_regs = ity_exp_fold Sreg.add_left Sreg.empty rity in
-    let is_simple_tuple ity =
-      let arity_zero = function
-        | Ityapp(_,a,r) -> a = [] && r = []
-        | Ityreg { reg_args = a; reg_regs = r } ->
+        let is_simple_tuple ity =
+          let arity_zero = function
+            | Ityapp(_,a,r) -> a = [] && r = []
+            | Ityreg { reg_args = a; reg_regs = r } ->
                a = [] && r = []
-        | Ityvar _ -> true
-      in
-      (match ity.ity_node with
-       | Ityapp ({its_ts = s},_,_)
+            | Ityvar _ -> true
+          in
+          (match ity.ity_node with
+           | Ityapp ({its_ts = s},_,_)
              | Ityreg { reg_its = {its_ts = s}; }
-         -> is_ts_tuple s
-       | _ -> false)
-      && (ity_fold
+             -> is_ts_tuple s
+           | _ -> false)
+          && (ity_fold
                 (fun acc ity ->
                   acc && arity_zero ity.ity_node) true ity)
-    in
-    (* FIXME is it necessary to have arity 0 in regions ?*)
+        in
+        (* FIXME is it necessary to have arity 0 in regions ?*)
         let rtype = try ty_of_mlty info mlty
                     with Unsupported _ -> (*FIXME*)
                       ty_of_ty info (ty_of_ity rity) in
@@ -1512,21 +1525,21 @@ module MLToC = struct
         if header
         then sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
         else
-      let env = { computes_return_value = true;
-              in_unguarded_loop = false;
+          let env = { computes_return_value = true;
+                      in_unguarded_loop = false;
                       current_function = rs;
                       ret_regs = ret_regs;
-              returns = Sid.empty;
-              breaks = Sid.empty;
+                      returns = Sid.empty;
+                      breaks = Sid.empty;
                       array_sizes = Mid.empty;
                       boxed = boxed;
                     } in
-      let d,s = expr info env e in
-      let d,s = C.flatten_defs d s in
+          let d,s = expr info env e in
+          let d,s = C.flatten_defs d s in
           let d = C.group_defs_by_type d in
-      let s = C.elim_nop s in
-      let s = C.elim_empty_blocks s in
-      sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
+          let s = C.elim_nop s in
+          let s = C.elim_empty_blocks s in
+          sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
     try
       begin match d with
       | Dlet (Lsym(rs, _, mlty, vl, e)) -> translate_fun rs mlty vl e
@@ -1541,8 +1554,8 @@ module MLToC = struct
                 let ty = ty_of_mlty info mlty in
                 Hid.replace aliases id ty;
                 []
-           (*TODO print actual typedef? *)
-           (*[C.Dtypedef (ty_of_mlty info ty, id)]*)
+             (*TODO print actual typedef? *)
+             (*[C.Dtypedef (ty_of_mlty info ty, id)]*)
              | Some (Drecord pjl) ->
                 let pjl =
                   List.filter
