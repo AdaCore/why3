@@ -826,21 +826,24 @@ module InlineProxyVars = struct
        && can_inline e1 e2'
     | _ -> no_effect_conflict eff1.eff_reads eff2
 
-  let rec expr info subst (vars: Spv.t) e =
-    let vars, e = e_map_fold (expr info subst) vars e in
+  let rec expr info subst ((vars: Spv.t), (occ: Spv.t)) e =
+    let (vars, occ), e = e_map_fold (expr info subst) (vars, occ) e in
     let mk e_node = { e with e_node = e_node } in
     match e.e_node with
-    | Evar pv -> begin try Spv.add pv vars, Mpv.find pv subst
-        with Not_found -> vars, e end
+    | Evar pv -> begin try (Spv.add pv vars, Spv.add pv occ), Mpv.find pv subst
+        with Not_found -> (vars, Spv.add pv occ), e end
     | Elet (Lvar (pv, ({e_effect = eff1} as e1)), e2)
       when Sattr.mem proxy_attr pv.pv_vs.vs_name.id_attrs &&
-           eff_pure eff1 && can_inline e1 e2 ->
+             eff_pure eff1 && can_inline e1 e2 ->
         let subst' = Mpv.add pv e1 Mpv.empty in
-        let s_union, e2 = expr info subst' vars e2 in
-        if Spv.mem pv s_union
-        then s_union, e2 (* [pv] was substituted in [e2] *)
+        let (s_union, o_union), e2 = expr info subst' (vars,occ) e2 in
+        if Spv.mem pv s_union (* [pv] was substituted in [e2] *)
+           || not (Spv.mem pv o_union)
+              (* [pv] does not occur in [e2],
+                 e.g e2 was inlined and does not use its argument *)
+        then (s_union, o_union), e2
         else (* [pv] was not substituted in [e2], e.g [e2] is an [Efun] *)
-          s_union, mk (Elet (Lvar (pv, e1), e2))
+          (s_union, o_union), mk (Elet (Lvar (pv, e1), e2))
     | Efun (vl, e) ->
         (* For now, we accept to inline constants and constructors
            with zero arguments inside a [Efun]. *)
@@ -852,12 +855,16 @@ module InlineProxyVars = struct
         (* We begin the inlining of proxy variables in an [Efun] with a
            restricted substitution. This keeps some proxy lets, preventing
            undiserable captures inside the [Efun] expression. *)
-        let spv, e = expr info restrict_subst vars e in
-        spv, mk (Efun (vl, e))
-    | _ -> vars, e
+        let (spv,occ), e = expr info restrict_subst (vars,occ) e in
+        (spv,occ), mk (Efun (vl, e))
+    | Efor (pv1, pv2, _, pv3, _) ->
+       (vars, Spv.add pv1 (Spv.add pv2 (Spv.add pv3 occ))), e
+    | Eassign al ->
+       (vars, List.fold_left (fun occ (pv, _, _) -> Spv.add pv occ) occ al), e
+    | _ -> (vars, occ), e
 
-  and let_def info subst vars ld =
-    ld_map_fold (expr info subst) vars ld
+  and let_def info subst (vars,occ) ld =
+    ld_map_fold (expr info subst) (vars,occ) ld
 
   let rec pdecl info = function
     | Dtype _ | Dexn _ | Dval _ as d -> d
@@ -865,7 +872,7 @@ module InlineProxyVars = struct
         let dl = List.map (pdecl info) dl in Dmodule (id, dl)
     | Dlet def ->
         (* for top-level symbols we can forget the set of inlined variables *)
-        let _, e = let_def info Mpv.empty Spv.empty def in
+        let _, e = let_def info Mpv.empty (Spv.empty, Spv.empty) def in
         Dlet e
 
   let module_ m =
