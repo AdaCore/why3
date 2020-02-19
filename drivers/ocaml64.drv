@@ -387,10 +387,12 @@ end
 
 module string.Char
   syntax type char "char"
+  syntax val content "String.make 1 %1" prec 4 3 3
 end
 
 module string.OCaml
   syntax val (=)    "%1 = %2" prec 11 11 10
+  syntax val eq_char "%1 = %2" prec 11 11 10
   syntax val length "String.length %1" prec 4 3
   syntax val get    "String.get %1 %2" prec 4 3 3
   syntax val ([])   "String.get %1 %2" prec 4 3 3
