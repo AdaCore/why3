@@ -91,8 +91,6 @@ let rec predicate list (mem: loc -> loc) (x: loc) (n :int) (y: loc)
 val get (x: loc) : loc
   requires { x <> null }
   ensures  { result = mem[x] }
-  ensures  { forall n y. list mem x n y -> n > 0 -> list mem result (n-1) y }
-  ensures  { forall n y. list mem y n x -> list mem y (n+1) x }
 
 val set (x y: loc) : unit
   requires { x <> null }
@@ -105,6 +103,13 @@ let rec lemma list_concat
             exists y. y <> null /\ list mem x n1 y /\ list mem mem[y] n2 z }
   variant { n1 }
 = if n1 > 0 then list_concat mem mem[x] (n1-1) y n2 z
+
+lemma path_shorten:
+  forall mem x n y. list mem x n y -> n > 0 -> list mem mem[x] (n-1) y
+
+lemma path_extend:
+  forall mem x n y. n >= 0 -> list mem y n x -> x <> null ->
+  list mem y (n+1) mem[x]
 
 let rec lemma two_paths_means_cycle
   (mem: mem) (h e: loc) (n1 n2: int)
