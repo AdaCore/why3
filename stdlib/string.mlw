@@ -382,11 +382,6 @@ module String
 
 end
 
-(** {2 Programming API}
-
-  The following program functions are mapped to OCaml's functions.
-  See also module `io.StdIO`. *)
-
 module Char
 
   use String
@@ -438,6 +433,11 @@ module Char
 
 end
 
+(** {2 Programming API}
+
+  The following program functions are mapped to OCaml's functions.
+  See also module `io.StdIO`. *)
+
 module OCaml
 
   use int.Int
@@ -480,6 +480,54 @@ module OCaml
   val make (size: int63) (v: char) : string
     requires { 0 <= size }
     ensures  { result = make size v }
+
+end
+
+(** The following module is extracted to OCaml's Buffer *)
+module StringBuffer
+
+  use int.Int
+  use mach.int.Int63
+  use String
+  use Char
+
+  type buffer = abstract {
+    mutable str: string;
+  }
+
+  val create (_: int63) : buffer
+    ensures { result.str = "" }
+
+  val length (b: buffer) : int63
+    ensures { result = length b.str }
+
+  val contents (b: buffer) : string
+    ensures { result = b.str }
+
+  val clear (b: buffer) : unit
+    writes  { b }
+    ensures { b.str = "" }
+
+  val reset (b: buffer) : unit
+    writes  { b }
+    ensures { b.str = "" }
+
+  val sub (b: buffer) (ofs len: int63) : string
+    requires { 0 <= ofs /\ 0 <= len /\ ofs + len <= length b.str }
+    ensures  { result = substring b.str ofs len }
+
+  val add_char (b: buffer) (c: char) : unit
+    writes  { b }
+    ensures { b.str = concat (old b.str) c.content }
+
+  val add_string (b: buffer) (s: string) : unit
+    writes  { b }
+    ensures { b.str = concat (old b.str) s }
+
+  val truncate (b: buffer) (n: int63) : unit
+    requires { 0 <= n <= length b.str }
+    writes   { b }
+    ensures  { b.str = substring (old b.str) 0 n }
 
 end
 
