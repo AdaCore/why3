@@ -503,6 +503,8 @@ by :option:`why3 --list-transforms`.
 
    Eliminate ``let`` by substitution, at the term level.
 
+.. why3:transform:: eliminate_literal
+
 .. why3:transform:: eliminate_mutual_recursion
 
    Replace mutually recursive definitions with axioms.
@@ -616,6 +618,8 @@ by :option:`why3 --list-transforms`.
 .. why3:transform:: induction_arg_ty_lex
 
    Apply :why3:transform:`induction_ty_lex` on the given symbol.
+
+.. why3:transform:: induction_pr
 
 .. why3:transform:: induction_ty_lex
 
@@ -759,6 +763,8 @@ by :option:`why3 --list-transforms`.
 .. why3:transform:: inversion_arg_pr
 
    Apply :why3:transform:`inversion_pr` on the given hypothesis/goal symbol.
+
+.. why3:transform:: inversion_pr
 
 .. why3:transform:: left
 
