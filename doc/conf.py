@@ -92,6 +92,9 @@ html_theme = 'alabaster'
 #html_theme_options = {
 #    'logo': 'logo-why.png',
 #    'logo_name': True,
+#    'page_width': '73em',
+#    'sidebar_width': '18em',
+#    'body_text_align': 'justify',
 #}
 
 # Add any paths that contain custom static files (such as style sheets) here,
