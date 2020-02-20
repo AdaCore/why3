@@ -403,6 +403,19 @@ module string.OCaml
   syntax val make   "String.make %1 %2" prec 4 3 3
 end
 
+module string.StringBuffer
+  syntax type buffer    "Buffer.t"
+  syntax val create     "Buffer.create %1" prec 4 3
+  syntax val length     "Buffer.length %1" prec 4 3
+  syntax val contents   "Buffer.contents %1" prec 4 3
+  syntax val clear      "Buffer.clear %1" prec 4 3
+  syntax val reset      "Buffer.reset %1" prec 4 3
+  syntax val sub        "Buffer.sub %1 %2 %3" prec 4 3 3 3
+  syntax val add_char   "Buffer.add_char %1 %2" prec 4 3 3
+  syntax val add_string "Buffer.add_string %1 %2" prec 4 3 3
+  syntax val truncate   "Buffer.truncate %1 %2" prec 4 3 3
+end
+
 module io.StdIO
   syntax val print_string "Pervasives.print_string"
   syntax val print_char "Pervasives.print_char"
