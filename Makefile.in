@@ -2026,7 +2026,7 @@ endif
 
 ifeq (@enable_doc@,yes)
 
-doc: doc/html/index.html doc/latex/manual.pdf
+doc: doc/html/index.html
 
 include Makefile.doc
 
@@ -2044,6 +2044,8 @@ doc/latex/manual.tex: $(DOCRST) $(DRVDOT)
 
 ifeq (@enable_pdf_doc@,yes)
 
+doc: doc/latex/manual.pdf
+
 doc/latex/manual.pdf: doc/latex/manual.tex
 	cd doc/latex; $(LATEXCOMP) manual.tex
 ifeq (@LATEX@,pdflatex)
@@ -2054,10 +2056,6 @@ ifeq (@LATEX@,pdflatex)
 	  pdflatex manual; \
 	fi
 endif
-
-else
-
-doc/latex/manual.pdf:
 
 endif
 
