@@ -388,12 +388,12 @@ module Char
   use int.Int
 
   (** to be mapped into the OCaml char type. *)
-  type char = private {
-                content: string;
-              } invariant { length content = 1 }
+  type char = abstract {
+                contents: string;
+              } invariant { length contents = 1 }
 
   axiom char_eq: forall c1 c2.
-    c1.content = c2.content -> c1 = c2
+    c1.contents = c2.contents -> c1 = c2
 
   function code char : int
 
@@ -408,7 +408,7 @@ module Char
   function get (s: string) (i: int) : char
 
   axiom get: forall s i.
-    0 <= i < length s -> (get s i).content = s_at s i
+    0 <= i < length s -> (get s i).contents = s_at s i
 
   axiom substring_get:
     forall s ofs len i.
@@ -428,7 +428,7 @@ module Char
   axiom make_length: forall size v. size >= 0 ->
     length (make size v) = size
 
-  axiom make_content: forall size v. size >= 0 ->
+  axiom make_contents: forall size v. size >= 0 ->
     (forall i. 0 <= i < size -> get (make size v) i = v)
 
 end
@@ -444,6 +444,18 @@ module OCaml
   use mach.int.Int63
   use export String
   use export Char
+
+(*
+  let constant max_string_length : int = 144_115_188_075_855_863
+
+  type string = abstract {
+    contents: string;
+  } invariant { length contents <= max_string_length }
+
+  val of_string (s: string) : string
+    requires { length s <= max_string_length }
+    ensures  { result.contents = s }
+*)
 
   val eq_char (c1 c2: char) : bool
     ensures { result <-> c1 = c2 }
@@ -494,6 +506,7 @@ module StringBuffer
   type buffer = abstract {
     mutable str: string;
   }
+  meta coercion function str
 
   val create (_: int63) : buffer
     ensures { result.str = "" }
@@ -518,7 +531,7 @@ module StringBuffer
 
   val add_char (b: buffer) (c: char) : unit
     writes  { b }
-    ensures { b.str = concat (old b.str) c.content }
+    ensures { b.str = concat (old b.str) c.contents }
 
   val add_string (b: buffer) (s: string) : unit
     writes  { b }
