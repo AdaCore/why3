@@ -457,9 +457,9 @@ The patterns are similar to those of OCaml, though the ``when`` clauses
 and numerical constants are not supported. Unlike in OCaml, ``as`` binds
 stronger than the comma: in the pattern :samp:`({p},{q} as {x})`, variable
 *x* is bound to the value matched by pattern *q*. Also notice
-the closing ``end`` after the ``match-with`` term. A ``let-in``
+the closing ``end`` after the ``match with`` term. A ``let in``
 construction with a non-trivial pattern is translated as a
-``match-with`` term with a single branch.
+``match with`` term with a single branch.
 
 Inside logical terms, pattern matching must be exhaustive: WhyML rejects
 a term like ``let Some x = o in e``, where ``o`` is a variable of an
@@ -488,11 +488,10 @@ logical terms.
 Program expressions
 -------------------
 
-The syntax of program expressions is given in
-Figures [fig:bnf:expr1]-[fig:bnf:expr2]. As before, the constructions
+The syntax of program expressions is given below. As before, the constructions
 are listed in the order of decreasing precedence. The rules for tight,
 prefix, infix, and bracket operators are the same as for logical terms.
-In particular, the infix operators from group 1 can be chained. Notice
+In particular, the infix operators from group 1 (:token:`infix_op_1`) can be chained. Notice
 that binary operators ``&&`` and ``||`` denote here the usual lazy
 conjunction and disjunction, respectively.
 
@@ -585,7 +584,7 @@ multiple assignment.
 
 In applications, arguments are evaluated from right to left. This
 includes applications of infix operators, with the only exception of
-lazy operators ``&&`` and ``||`` that evaluate from left to right,
+lazy operators ``&&`` and ``||`` which evaluate from left to right,
 lazily.
 
 The syntax for specification clauses in programs is given in
