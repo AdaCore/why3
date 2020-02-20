@@ -31,7 +31,7 @@ module ``MaxAndSum``
 and then we use the :why3:tool:`execute` command to interpret this function, as
 follows:
 
-::
+.. code-block:: console
 
     > why3 execute maxsum.mlw MaxAndSum.test
     Execution of MaxAndSum.test ():
@@ -53,7 +53,7 @@ using the :why3:tool:`extract` command, as follows:
 
 ::
 
-    > why3 extract -D ocaml64 maxsum.mlw -o max_sum.ml
+    why3 extract -D ocaml64 maxsum.mlw -o max_sum.ml
 
 The :why3:tool:`extract` command requires the name of a driver, which indicates
 how theories/modules from the Why3 standard library are translated to
@@ -74,7 +74,7 @@ It is convenient to use :program:`ocamlbuild` to compile and link both files
 
 ::
 
-    > ocamlbuild -pkg zarith main.native
+    ocamlbuild -pkg zarith main.native
 
 Since Why3’s type ``int`` is translated to OCaml arbitrary precision
 integers using the ``ZArith`` library, we have to pass option
@@ -96,7 +96,7 @@ proceed as follows:
 
 ::
 
-    > why3 extract -D ocaml64 -L . aqueue.AmortizedQueue.enqueue -o aqueue.ml
+    why3 extract -D ocaml64 -L . aqueue.AmortizedQueue.enqueue -o aqueue.ml
 
 Here we assume that file :file:`aqueue.mlw` contains this program, and that
 we invoke the :why3:tool:`extract` command from the directory where this file is stored. File
@@ -117,8 +117,7 @@ recursive extraction:
 
 ::
 
-    > why3 extract --recursive -D ocaml64 -L . \
-        aqueue.AmortizedQueue.enqueue -o aqueue.ml
+    why3 extract --recursive -D ocaml64 -L . aqueue.AmortizedQueue.enqueue -o aqueue.ml
 
 This updates the contents of file :file:`aqueue.ml` as follows:
 
@@ -179,7 +178,7 @@ OCaml fragments to be substituted for Why3 symbols are given as
 arbitrary strings, where ``%1``, ``%2``, etc., will be replaced with
 actual arguments. Here is the extraction command line and its output:
 
-::
+.. code-block:: console
 
     > why3 extract -D ocaml64 -D mydriver.drv -L . file.M
     let double (x: int) : int = x + x

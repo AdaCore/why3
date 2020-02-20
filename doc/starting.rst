@@ -49,12 +49,11 @@ way. This section presents the basic use of this GUI. Please refer to
 
    The GUI when started the very first time.
 
-The GUI is launched on the file above as follows (here “``>``” is the
-prompt):
+The GUI is launched on the file above as follows:
 
 ::
 
-    > why3 ide hello_proof.why
+    why3 ide hello_proof.why
 
 When the GUI is started for the first time, you should get a window that
 looks like the screenshot of :numref:`fig.gui1`. The left part is a tree
@@ -196,7 +195,7 @@ command (see :numref:`sec.why3replay`) For example, running the replayer
 on the ``hello_proof`` example is as follows (assuming ``G2`` still is
 ``(true -> false) /\ (true \/ false)``).
 
-::
+.. code-block:: console
 
     > why3 replay hello_proof
      2/3 (replay OK)
@@ -236,13 +235,13 @@ follows:
 
 ::
 
-    > why3 config --detect
+    why3 config --detect
 
 This prints some information messages on what detections are attempted.
 To know which provers have been successfully detected, you can do as
 follows.
 
-::
+.. code-block:: console
 
     > why3 --list-provers
     Known provers:
@@ -259,7 +258,7 @@ The command to type and its output are as follows, where the :option:`why3 prove
 option is followed by the unique prover identifier (as shown by
 :option:`why3 --list-provers` option).
 
-::
+.. code-block:: console
 
     > why3 prove -P Alt-Ergo hello_proof.why
     hello_proof.why HelloProof G1: Valid (0.00s, 1 steps)
@@ -273,7 +272,7 @@ We can also specify which goal or goals to prove. This is done by giving
 first a theory identifier, then goal identifier(s). Here is the way to
 call Alt-Ergo on goals ``G2`` and ``G3``.
 
-::
+.. code-block:: console
 
     > why3 prove -P Alt-Ergo hello_proof.why -T HelloProof -G G2 -G G3
     hello_proof.why HelloProof G2 : Unknown: Unknown (0.01s)
@@ -283,7 +282,7 @@ Finally, a transformation to apply to goals before proving them can be
 specified. To know the unique identifier associated to a transformation,
 do as follows.
 
-::
+.. code-block:: console
 
     > why3 --list-transforms
     Known non-splitting transformations:
@@ -296,7 +295,7 @@ do as follows.
 Here is how you can split the goal ``G2`` before calling Simplify
 on the resulting subgoals.
 
-::
+.. code-block:: console
 
     > why3 prove -P Alt-Ergo hello_proof.why -a split_goal_right -T HelloProof -G G2
     hello_proof.why HelloProof G2: Unknown (other) (0.01s)

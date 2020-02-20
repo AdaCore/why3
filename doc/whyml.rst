@@ -45,14 +45,14 @@ containing programs. For instance
 
 ::
 
-    > why3 prove myfile.mlw
+    why3 prove myfile.mlw
 
 displays the verification conditions for programs contained in file
 :file:`myfile.mlw`, and
 
 ::
 
-    > why3 prove -P alt-ergo myfile.mlw
+    why3 prove -P alt-ergo myfile.mlw
 
 runs the SMT solver Alt-Ergo on these verification conditions. All this
 can be performed within the GUI tool :why3:tool:`why3 ide` as well. See
@@ -242,7 +242,7 @@ Finally, we declare the goal in a fourth theory:
 and we can use Why3 to discharge this goal with any prover of our
 choice.
 
-::
+.. code-block:: console
 
     > why3 prove -P alt-ergo einstein.why
     einstein.why Goals G: Valid (1.27s, 989 steps)
