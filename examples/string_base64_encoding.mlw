@@ -1,6 +1,8 @@
 module Spec
   use mach.int.Int
   use mach.int.Int63
+  use string.String
+  use string.Char
   use string.OCaml
 
   function int2b64 (i: int) : char =
@@ -67,7 +69,7 @@ module Spec
         (if length s >= 2 && s[length s - 2] = char_eq then 2 else 1)
     else 0
 
-  let get_pad (s: string): int63
+  let get_pad (s: ostring): int63
     ensures { result = get_pad s }
   = if length s >= 1 && eq_char s[length s - 1] char_eq then
         (if length s >= 2 && eq_char s[length s - 2] char_eq then 2 else 1)
@@ -77,7 +79,7 @@ module Spec
     if mod (length s) 3 = 1 then 2 else
       if mod (length s) 3 = 2 then 1 else 0
 
-  let calc_pad (s: string): int63
+  let calc_pad (s: ostring): int63
     ensures { result = calc_pad s }
   = if length s % 3 = 1 then 2 else
       if length s % 3 = 2 then 1 else 0
@@ -86,11 +88,16 @@ end
 module Base64
   use mach.int.Int
   use mach.int.Int63
+  use string.String
+  use string.Char
   use string.OCaml
   use string.StringBuffer
   use Spec
 
-  let function encode (s: string) : string
+  let constant max_base64_length: int = div (3 * max_string_length) 4 - 2
+
+  let function encode (s: ostring) : ostring
+    requires { length s <= max_base64_length }
     ensures { length result = div (length s + calc_pad s) 3 * 4 }
     ensures { mod (length result) 4 = 0 }
     ensures { forall i. 0 <= i < div (length result) 4 ->
@@ -148,7 +155,7 @@ module Base64
     StringBuffer.add_string r (make padding char_eq);
     StringBuffer.contents r
 
-  let function decode (s: string) : string
+  let function decode (s: ostring) : ostring
     requires { mod (length s) 4 = 0 }
     requires { forall i. 0 <= i < length s - get_pad s -> valid_64_char s[i] }
     requires { forall i. length s - get_pad s <= i < length s -> s[i] = char_eq }
@@ -192,7 +199,8 @@ module Base64
     done;
     StringBuffer.sub r 0 (length r - get_pad s)
 
-  let lemma decode_encode (s: string) : unit
+  let lemma decode_encode (s: ostring) : unit
+    requires { length s <= max_base64_length }
     ensures { decode (encode s) = s }
   = let s1 = encode s in
 
