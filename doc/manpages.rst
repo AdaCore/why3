@@ -212,25 +212,25 @@ The :why3:tool:`prove` command executes the following steps:
 
 #. Extract the selected goals inside each of the selected theories into
    tasks. The goals and theories are selected using options
-   ``-G/--goal`` and ``-T/--theory``. Option ``-T/--theory`` applies to
-   the previous file appearing on the command line. Option ``-G/--goal``
+   :option:`--goal` and :option:`--theory`. Option :option:`--theory` applies to
+   the previous file appearing on the command line. Option :option:`--goal`
    applies to the previous theory appearing on the command line. If no
    theories are selected in a file, then every theory is considered as
    selected. If no goals are selected in a theory, then every goal is
    considered as selected.
 
-#. Apply the transformations requested with ``-a/--apply-transform`` in
+#. Apply the transformations requested with :option:`--apply-transform` in
    their order of appearance on the command line.
    :option:`why3 --list-transforms` lists the known transformations; plugins
    can add more of them.
 
-#. Apply the driver selected with the ``-D/--driver`` option, or the
-   driver of the prover selected with the ``-P/--prover`` option.
+#. Apply the driver selected with the :option:`--driver` option, or the
+   driver of the prover selected with the :option:`--prover` option.
    :option:`why3 --list-provers` lists the known provers, the ones that appear
    in the configuration file.
 
-#. If option ``-P/--prover`` is given, call the selected prover on each
-   generated task and print the results. If option ``-D/--driver`` is
+#. If option :option:`--prover` is given, call the selected prover on each
+   generated task and print the results. If option :option:`--driver` is
    given, print each generated task using the format specified in the
    selected driver.
 
@@ -256,8 +256,36 @@ Invalid
 
 .. _sec.proveoptions:
 
-Additional Options
-~~~~~~~~~~~~~~~~~~
+Options
+~~~~~~~
+
+.. option:: -F <format>, --format <format>
+
+   Select the given input format.
+
+.. option:: -T <theory>, --theory <theory>
+
+   Focus on the given theory. If the argument is not qualified, the
+   theory is searched in the input file.
+
+.. option:: -G <goal>, --goal <goal>
+
+   Focus on the given goal. The goal is searched in the theory given
+   by :option:`--theory`, if any. Otherwise, it is searched in the
+   toplevel namespace of the input file.
+
+.. option:: -a <transform>, --apply-transform <transform>
+
+   Apply the given transformation to the goals.
+
+.. option:: -P <prover>, --prover <prover>
+
+   Execute the given prover on the goals.
+
+.. option:: -D <driver>, --driver <driver>
+
+   Output the tasks obtained by applying the given driver to the goals.
+   This option conflicts with :option:`--prover`.
 
 .. option:: --extra-expl-prefix <s>
 
