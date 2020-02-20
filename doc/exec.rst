@@ -83,35 +83,6 @@ uses OCaml’s native integers instead, one has to use Why3’s types for
 63-bit integers from libraries ``mach.int.Int63`` and
 ``mach.array.Array63``.
 
-Extraction Starting Point
-'''''''''''''''''''''''''
-
-The :why3:tool:`extract` command accepts three different targets for extraction:
-a WhyML file, a module, or a symbol (function, type, exception). To
-extract all the symbols from every module of a file named :file:`f.mlw`, one
-should write
-
-::
-
-    > why3 extract -D <driver> f.mlw
-
-To extract only the symbols from module ``M`` of file :file:`f.mlw`, one
-should write
-
-::
-
-    > why3 extract -D <driver> -L <dir> f.M
-
-To extract only the symbol ``s`` (a function, a type, or an exception)
-from module ``M`` of file :file:`f.mlw`, one should write
-
-::
-
-    > why3 extract -D <driver> -L <dir> f.M.s
-
-Note the use of :option:`why3 -L`, when extracting either a module or a
-symbol, in order to state where to look for file :file:`f.mlw`.
-
 Examples
 ''''''''
 

@@ -1402,8 +1402,34 @@ The ``extract`` Command
 
 .. program:: why3 extract
 
-Why3 can extract programs written using the WhyML language (extension
-:file:`.mlw`) to OCaml. See also :numref:`sec.extract`.
+The :program:`why3 extract` command can extract programs written using
+the WhyML language (extension :file:`.mlw`) to some other programming
+language. See also :numref:`sec.extract`.
+
+The command accepts three different targets for extraction: a WhyML file,
+a module, or a symbol (function, type, exception). To extract all the
+symbols from every module of a file named :file:`f.mlw`, one should write
+
+::
+
+    why3 extract -D <driver> f.mlw
+
+To extract only the symbols from module ``M`` of file :file:`f.mlw` in
+directory ``<dir>``, one should write
+
+::
+
+    why3 extract -D <driver> -L <dir> f.M
+
+To extract only the symbol ``s`` (a function, a type, or an exception)
+from module ``M`` of file :file:`f.mlw`, one should write
+
+::
+
+    why3 extract -D <driver> -L <dir> f.M.s
+
+Note the use of :option:`why3 -L`, when extracting either a module or a
+symbol, in order to state where to look for file :file:`f.mlw`.
 
 .. option:: -o <file|dir>
 
