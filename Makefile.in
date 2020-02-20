@@ -2036,10 +2036,10 @@ update-doc-png:
 	export WHY3LOADPATH=stdlib; \
 	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
 
-doc/html/index.html: $(DOCRST) $(DRVDOT)
+doc/html/index.html: $(DOCRST) $(DRVDOT) doc/conf.py
 	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
-doc/latex/manual.tex: $(DOCRST) $(DRVDOT)
+doc/latex/manual.tex: $(DOCRST) $(DRVDOT) doc/conf.py
 	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
 
 ifeq (@enable_pdf_doc@,yes)
