@@ -1,0 +1,222 @@
+
+module Base64
+  use mach.int.Int
+  use mach.int.Int63
+  use string.String
+  use string.Char
+  use string.OCaml
+  use string.StringBuffer
+
+  function int2b64 (i: int) : char =
+    if 0 <= i <= 25 then chr (i + 65) else
+    if 26 <= i <= 51 then chr (i - 26 + 97) else
+    if 52 <= i <= 61 then chr (i - 52 + 48) else
+    if i = 62 then chr 43 else if i = 63 then chr 47
+    else chr 0
+
+  let int2b64 (i: int63) : char
+    requires { 0 <= i < 64 }
+    ensures  { result = int2b64 i }
+  =
+    if 0 <= i <= 25 then chr (i + 65) else
+    if 26 <= i <= 51 then chr (i - 26 + 97) else
+    if 52 <= i <= 61 then chr (i - 52 + 48) else
+    if i = 62 then chr 43 else if i = 63 then chr 47
+    else absurd
+
+  let function char_eq : char = chr 61
+
+  (* **** *)
+
+  predicate valid_64_char (c: char) =
+    65 <= code c <= 90 || 97 <= code c <= 122 || 48 <= code c <= 57 ||
+    code c = 43 || code c = 47
+
+  lemma int2b64_valid_4_char: forall i. 0 <= i < 64 -> valid_64_char (int2b64 i)
+
+  function b642int (c: char) : int =
+    if 65 <= code c <= 90  then code c - 65      else (* 0  - 25 *)
+    if 97 <= code c <= 122 then code c - 97 + 26 else (* 26 - 51 *)
+    if 48 <= code c <= 57  then code c - 48 + 52 else (* 52 - 61 *)
+    if code c = 43         then 62               else (* 62 *)
+    if code c = 47         then 63               else (* 63 *)
+    if c = char_eq         then 0                else (* 0 *)
+    64                                                (* 64 *)
+
+  let b642int (c: char) : int63
+    requires { valid_64_char c || c = char_eq }
+    ensures  { result = b642int c }
+  = if 65 <= code c <= 90  then code c - 65      else
+    if 97 <= code c <= 122 then code c - 97 + 26 else
+    if 48 <= code c <= 57  then code c - 48 + 52 else
+    if code c = 43         then 62               else
+    if code c = 47         then 63               else
+    if eq_char c char_eq   then 0                else
+    absurd
+
+  lemma b642int_int2b64: forall i. 0 <= i < 64 -> b642int (int2b64 i) = i
+
+  function get_pad (s: string): int =
+    if length s >= 1 && s[length s - 1] = char_eq then
+        (if length s >= 2 && s[length s - 2] = char_eq then 2 else 1)
+    else 0
+
+  let get_pad (s: ostring): int63
+    ensures { result = get_pad s }
+  = if length s >= 1 && eq_char s[length s - 1] char_eq then
+        (if length s >= 2 && eq_char s[length s - 2] char_eq then 2 else 1)
+    else 0
+
+  function calc_pad (s: string): int =
+    if mod (length s) 3 = 1 then 2 else
+      if mod (length s) 3 = 2 then 1 else 0
+
+  let calc_pad (s: ostring): int63
+    ensures { result = calc_pad s }
+  = if length s % 3 = 1 then 2 else
+      if length s % 3 = 2 then 1 else 0
+
+  constant max_base64_length: int = div (3 * max_string_length) 4 - 2
+
+  let function encode (s: ostring) : ostring
+    requires { length s <= max_base64_length }
+    ensures { length result = div (length s + calc_pad s) 3 * 4 }
+    ensures { mod (length result) 4 = 0 }
+    ensures { forall i. 0 <= i < div (length result) 4 ->
+      let a1, a2, a3 = s[i*3], s[i*3+1], s[i*3+2] in
+      result[i*4] = int2b64 (div (code a1)  4) /\
+      if i * 3 + 1 < length s then
+        ( result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+          ( if i * 3 + 2 < length s then
+              result[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
+              result[i*4+3] = int2b64 (mod (code a3) 64)
+            else (result[i*4+2] = int2b64 (mod (code a2) 16 * 4) && result[i*4+3] = char_eq)
+          )
+        )
+      else
+        ( result[i*4+1] = int2b64 (mod (code a1) 4 * 16)
+          && result[i*4+2] = char_eq && result[i*4+3] = char_eq)
+    }
+    ensures { get_pad result = calc_pad s }
+  = let padding = calc_pad s in
+    let sp = concat s (make padding (chr 0)) in
+    let ref i = 0 in
+    let r = StringBuffer.create 42 in
+    let ghost ref b = 0 : int in
+    while i < length sp do
+      variant {length sp - i}
+      invariant { i = b * 3 }
+      invariant { length r = b * 4 }
+      invariant { 0 <= i <= length sp }
+      invariant { forall j. 0 <= j < b ->
+        let a1, a2, a3 = sp[j*3], sp[j*3+1], sp[j*3+2] in
+        r[j*4]   = int2b64 (div (code a1)  4) &&
+        r[j*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+        r[j*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
+        r[j*4+3] = int2b64 (mod (code a3) 64)
+      }
+      let c1,c2,c3 = sp[i], sp[i+1], sp[i+2] in
+      let b1 = code c1 / 4 in
+      let b2 = (code c1 % 4) * 16 + code c2 / 16 in
+      let b3 = (code c2 % 16) * 4 + code c3 / 64 in
+      let b4 = code c3 % 64 in
+      label L in
+      StringBuffer.add_char r (int2b64 b1);
+      StringBuffer.add_char r (int2b64 b2);
+      StringBuffer.add_char r (int2b64 b3);
+      StringBuffer.add_char r (int2b64 b4);
+      i <- i + 3;
+      ghost (b <- b + 1);
+      assert { r[length r - 4] = int2b64 (div (code c1) 4)  &&
+               r[length r - 3] = int2b64 (mod (code c1) 4 * 16 + div (code c2) 16) &&
+               r[length r - 2] = int2b64 (mod (code c2) 16 * 4 + div (code c3) 64) &&
+               r[length r - 1] = int2b64 (mod (code c3) 64) };
+      assert { forall j. 0 <= j < length r - 4 -> r[j] = (r at L)[j] };
+    done;
+    StringBuffer.truncate r (length r - padding);
+    StringBuffer.add_string r (make padding char_eq);
+    StringBuffer.contents r
+
+  let function decode (s: ostring) : ostring
+    requires { mod (length s) 4 = 0 }
+    requires { forall i. 0 <= i < length s - get_pad s -> valid_64_char s[i] }
+    requires { forall i. length s - get_pad s <= i < length s -> s[i] = char_eq }
+    ensures  { length result = div (length s * 3) 4 - get_pad s}
+    ensures  { forall i. 0 <= i < div (length result + get_pad s) 3 ->
+      let b1,b2,b3,b4 = s[4*i], s[4*i+1],s[4*i+2], s[4*i+3] in
+      result[i*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+      (i * 3 + 1 < length result ->
+        result[i*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4)) &&
+      (i * 3 + 2 < length result ->
+        result[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4))
+    }
+  = let ref i = 0 in
+    let r = StringBuffer.create 42 in
+    let ghost ref b = 0:int in
+    while i < length s do
+      variant { length s - i }
+      invariant { 0 <= i <= length s }
+      invariant { i = b * 4 }
+      invariant { length r = b * 3 }
+      invariant { forall j. 0 <= j < b ->
+        let b1,b2,b3,b4 = s[4*j], s[4*j+1], s[4*j+2], s[4*j+3] in
+        r[j*3]   = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+        r[j*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
+        r[j*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4)
+      }
+      label L in
+      let b1,b2,b3,b4 = s[i], s[i+1], s[i+2], s[i+3] in
+      let a1 = b642int b1 * 4 + b642int b2 / 16 in
+      let a2 = b642int b2 % 16 * 16 + b642int b3 / 4 in
+      let a3 = b642int b3 % 4 * 64 + b642int b4 in
+      StringBuffer.add_char r (chr a1);
+      StringBuffer.add_char r (chr a2);
+      StringBuffer.add_char r (chr a3);
+      i <- i + 4;
+      ghost (b <- b + 1);
+      assert { r[length r - 3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+               r[length r - 2] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4) &&
+               r[length r - 1] = chr (mod (b642int b3) 4 * 64 + b642int b4) };
+      assert { forall j. 0 <= j < length r - 3 -> r[j] =  (r at L)[j]}
+    done;
+    StringBuffer.sub r 0 (length r - get_pad s)
+
+  let lemma decode_encode (s: ostring) : unit
+    requires { length s <= max_base64_length }
+    ensures { decode (encode s) = s }
+  = let s1 = encode s in
+
+    (* assert { get_pad s1 = calc_pad s }; *)
+    (* assert { length s1 = div (length s + calc_pad s) 3 * 4 }; *)
+    assert { length s = div (length s1) 4 * 3 - get_pad s1 };
+
+    assert { forall i. 0 <= i < div (length s) 3 ->
+      (valid_64_char s1[i*4] && valid_64_char s1[i*4+1] &&
+      valid_64_char s1[i*4+2] && valid_64_char s1[i*4+3])
+    };
+
+    assert { mod (length s) 3 <> 0 ->
+      let last = div (length s) 3 in
+      valid_64_char s1[last*4] && valid_64_char s1[last*4+1] &&
+      if last * 3 + 1 = length s then
+        s1[last*4+2] = char_eq && s1[last*4+3] = char_eq
+      else valid_64_char s1[last*4+2] && s1[last*4+3] = char_eq
+    };
+
+    assert { forall i.
+      (0 <= i < length s1 - get_pad s1 -> valid_64_char s1[i]) &&
+      (length s1 - get_pad s1 <= i < length s1 -> s1[i] = char_eq) };
+
+    let s2 = decode s1 in
+
+    assert { length s2 = length s by length s = div (length s1 * 3) 4 - get_pad s1 };
+
+    assert { forall i. 0 <= i < div (length s + calc_pad s) 3 ->
+      s[i*3] = s2[i*3] &&
+      (i * 3 + 1 < length s -> s[i*3+1] = s2[i*3+1]) &&
+      (i * 3 + 2 < length s -> s[i*3+2] = s2[i*3+2]) };
+
+    assert { forall i. 0 <= i < length s -> s[i] = s2[i] };
+    assert { eq_string s s2 }
+
+end

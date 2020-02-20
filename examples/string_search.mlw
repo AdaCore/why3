@@ -1,0 +1,159 @@
+
+(* Author: Jean-Christophe Filliâtre (CNRS)
+   from a SPARK demo by Claire Dross (Adacore) *)
+
+module Spec
+
+  use int.Int
+  use string.Char
+  use string.String
+
+  (* ***** all this to be moved to String? ***** *)
+  predicate (==) (x y: string) = eq_string x y
+
+  predicate matches (pat text: string) (p: int) =
+    0 <= p <= length text - length pat /\
+    substring text p (length pat) == pat
+  (* ***** *)
+
+end
+
+module Occurs
+
+  use int.Int
+  use mach.int.Int63
+  use string.String
+  use string.Char
+  use string.OCaml
+  use Spec
+
+  val (=) (x y: char) : bool
+    ensures { result <-> x = y }
+
+  let occurs (pat text: ostring) (p: int63) : bool
+    requires { 0 <= p <= length text - length pat }
+    ensures  { result <-> matches pat text p }
+  = let ghost n = length text in
+    let m = length pat in
+    for i = 0 to m - 1 do
+      invariant { substring text p i == substring pat 0 i }
+      assert { p + i <= n };
+      if text[p + i] <> pat[i] then return false
+    done;
+    true
+
+end
+
+module Naive
+
+  use int.Int
+  use mach.int.Int63
+  use string.String
+  use string.Char
+  use string.OCaml
+  use Spec
+  use Occurs
+
+  let search1 (pat text: ostring) : int63
+    requires { length pat <= length text }
+    ensures  { -1 <= result <= length text - length pat }
+    ensures  { if result = -1 then
+                 forall j. not (matches pat text j)
+               else
+                 matches pat text result }
+  =
+    let m = length pat in
+    let n = length text in
+    for i = 0 to n - m do
+      invariant { forall j. 0 <= j < i -> substring text j m <> pat }
+      if occurs pat text i then return i;
+    done;
+    -1
+
+  let search2 (pat text: ostring) : int63
+    requires { length pat <= length text }
+    ensures  { -1 <= result <= length text - length pat }
+    ensures  { if result = -1 then
+                 forall j. not (matches pat text j)
+               else
+                 matches pat text result }
+  =
+    let m = length pat in
+    let n = length text in
+    for i = 0 to n - m do
+      invariant { forall j. 0 <= j < i -> substring text j m <> pat }
+      if sub text i m = pat then return i;
+    done;
+   -1
+
+end
+
+(*
+module BadShiftTable
+
+  use int.Int
+  use mach.int.Int63
+  use string.String
+  use string.Char
+  use string.OCaml
+  use Spec
+  use Occurs
+
+  clone fmap.MapImp as M with type key = char
+
+  (*
+   ------------------------+---+----------------
+                           | C |
+   -----+-----+---+--------+---+----------------
+        | ... | C | ..!C.. |
+        +-----+---+--------+
+          0     i            m
+  *)
+  type bad_shift_table = {
+    pat: string;
+    sht: M.t int63;
+  }
+  invariant { forall j c. 0 <= j < length pat -> c = pat[j] ->
+              M.mem c sht }
+  invariant { forall c. M.mem c sht -> 1 <= sht c <= length pat + 1 }
+  invariant { forall c. M.mem c sht -> forall j. 1 <= j < sht c ->
+              pat[length pat - j] <> c }
+  by { pat = ""; sht = M.create () }
+
+  let make_table (pat: string) : bad_shift_table
+  = let m = length pat in
+    let sht = M.create () in
+    for i = 0 to m - 1 do
+      invariant { forall j c. 0 <= j < i -> c = pat[j] -> M.mem c sht }
+      invariant { forall c. M.mem c sht -> 1 <= sht c <= m + 1 }
+      invariant { forall c. M.mem c sht -> forall j. 1 <= j < sht c + i - m ->
+                  pat[i - j] <> c }
+      M.add pat[i] (m - i) sht;
+    done;
+    { pat = pat; sht = sht }
+
+  let search (bst: bad_shift_table) (text: string) : int63
+    (* requires { length pat < max_int } *)
+    requires { length bst.pat <= length text }
+    ensures  { -1 <= result <= length text - length bst.pat }
+    ensures  { if result = -1 then
+                 forall j. not (matches bst.pat text j)
+               else
+                 matches bst.pat text result }
+  = let pat = bst.pat in
+    let m = length pat in
+    let n = length text in
+    let ref i = 0 in
+    while i <= n - m do
+      invariant { 0 <= i <= n }
+      invariant { forall j. 0 <= j < i -> substring text j m <> pat }
+      variant   { n - m - i }
+      if occurs pat text i then return i;
+      if i = n - m then break;
+      let c = text[i + m] in
+      i <- i + if M.mem c bst.sht then M.find c bst.sht else m + 1
+    done;
+   -1
+
+end
+*)
