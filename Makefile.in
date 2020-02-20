@@ -2328,12 +2328,11 @@ NAME = why3-@VERSION@
 # see .gitattributes for the list of files that are not distributed
 MORE_DIST = configure
 
-dist: $(MORE_DIST) doc/latex/manual.pdf
+dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
 	mkdir -p distrib/
 	git archive --format tar --prefix $(NAME)/ HEAD | tar x -C distrib/
 	for f in $(MORE_DIST); do cp $$f distrib/$(NAME)/$$f; done
-	cp doc/latex/manual.pdf distrib/$(NAME)/doc/manual.pdf
 	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
 
 
