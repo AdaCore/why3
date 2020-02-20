@@ -33,7 +33,7 @@ package.
 Why3 is distributed as open source and freely available under the terms
 of the GNU LGPL 2.1. See the file :file:`LICENSE`.
 
-See the file :file:`INSTALL` for quick installation instructions, and
+See the file :file:`INSTALL.md` for quick installation instructions, and
 :numref:`sec.install` of this document for more detailed instructions.
 
 Contact

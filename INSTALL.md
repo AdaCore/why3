@@ -23,15 +23,14 @@ Installation from the git repository
 First run
 
     autoconf
-    automake --add-missing
 
-to build the `./configure` file and install the helper scripts, then follow
-the instructions from the section above.
+to build the `./configure` file, then follow the instructions from the
+section above.
 
 
 Detailed instructions
 ---------------------
 
 For detailed instructions and required dependencies, please see
-the manual [doc/manual.pdf](http://why3.lri.fr/manual.pdf), Chapter 5
+the manual [doc/latex/manual.pdf](http://why3.lri.fr/manual.pdf), Chapter 5
 [Compilation, Installation](http://why3.lri.fr/doc/install.html).
