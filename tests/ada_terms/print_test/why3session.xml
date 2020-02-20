@@ -6,15 +6,15 @@
 <file format="ada">
 <path name=".."/><path name="print_test.adb"/>
 <theory name="A1">
- <goal name="G">
- <transf name="introduce_premises" >
-  <goal name="G.0">
-  <transf name="case" arg1="(X /= 3 or else X /= 6)">
-   <goal name="G.0.0" expl="true case">
-   <proof prover="0" obsolete="true"><result status="valid" time="0.00" steps="2"/></proof>
+ <goal name="G" proved="true">
+ <transf name="introduce_premises" proved="true" >
+  <goal name="G.0" proved="true">
+  <transf name="case" proved="true" arg1="(X /= 3 or else X /= 6)">
+   <goal name="G.0.0" expl="true case" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
    </goal>
-   <goal name="G.0.1" expl="false case">
-   <proof prover="0" obsolete="true"><result status="valid" time="0.00" steps="2"/></proof>
+   <goal name="G.0.1" expl="false case" proved="true">
+   <proof prover="0"><result status="valid" time="0.00" steps="2"/></proof>
    </goal>
   </transf>
   </goal>

@@ -76,7 +76,7 @@ module Base64
   = if length s % 3 = 1 then 2 else
       if length s % 3 = 2 then 1 else 0
 
-  let constant max_base64_length: int = div (3 * max_string_length) 4 - 2
+  constant max_base64_length: int = div (3 * max_string_length) 4 - 2
 
   let function encode (s: ostring) : ostring
     requires { length s <= max_base64_length }

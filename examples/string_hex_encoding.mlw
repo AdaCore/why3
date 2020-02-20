@@ -1,6 +1,9 @@
 use mach.int.Int
 use mach.int.Int63
+use string.String
+use string.Char
 use string.OCaml
+use string.StringBuffer
 
 function hex (i: int) : char =
   if 0 <= i < 10 then chr (i + 48)
@@ -23,7 +26,8 @@ let xeh (i: int63) : int63
 = if 48 <= i < 58 then i - 48
   else i - 55
 
-let function encode (s: string) : string
+let function encode (s: ostring) : ostring
+  requires { 2 * length s <= max_string_length }
   ensures { length result = 2 * length s }
   ensures { forall i. 0 <= i < length s ->
               result[2 * i] = hex (div (code s[i]) 16) &&
@@ -31,25 +35,25 @@ let function encode (s: string) : string
               (48 <= code result[2*i] < 58 || 65 <= code result[2*i] < 71) &&
               (48 <= code result[2*i+1] < 58 || 65 <= code result[2*i+1] < 71) }
 = let ref i = 0 in
-  let ref r = "" in
+  let r = StringBuffer.create (2 * length s) in
   while i < OCaml.length s do
     variant { length s - i }
-    invariant { 0 <= i <= OCaml.length s }
+    invariant { 0 <= i <= length s }
     invariant { length r = 2 * i }
     invariant { forall j. 0 <= j < i  ->
                   r[2 * j] = hex (div (code s[j]) 16) &&
                   r[2 * j + 1] = hex (mod (code s[j]) 16)
     }
     let v = code s[i] in
-    r <- concat r (hex (v / 16)).content;
-    r <- concat r (hex (v % 16)).content;
+    StringBuffer.add_char r (hex (v / 16));
+    StringBuffer.add_char r (hex (v % 16));
     assert { let h = code r[length r - 1] in 48 <= h < 58 || 65 <= h < 71 };
     assert { let h = code r[length r - 2] in 48 <= h < 58 || 65 <= h < 71 };
     i <- i + 1
   done;
-  r
+  StringBuffer.contents r
 
-let function decode (s: string) : string
+let function decode (s: ostring) : ostring
   requires { mod (length s) 2 = 0 }
   requires { forall i. 0 <= i < length s ->
                48 <= code s[i] < 58 || 65 <= code s[i] < 71 }
@@ -58,7 +62,7 @@ let function decode (s: string) : string
   ensures  { forall i. 0 <= i < div (length s) 2 ->
                result[i] = chr (xeh (code s[2 * i]) * 16 + xeh (code s[2 * i + 1])) }
 = let ref i = 0 in
-  let ref r = "" in
+  let r = StringBuffer.create (length s / 2) in
   while i < length s do
     variant {length s - i}
     invariant { mod i 2 = 0 }
@@ -68,12 +72,13 @@ let function decode (s: string) : string
                   r[j] = chr (xeh (code s[2 * j]) * 16 + xeh (code s[2 * j + 1])) }
     let v_i = xeh (code s[i]) in
     let v_ii = xeh (code s[i + 1]) in
-    r <- concat r (chr (v_i * 16 + v_ii)).content;
+    StringBuffer.add_char r (chr (v_i * 16 + v_ii));
     i <- i + 2
   done;
-  r
+  StringBuffer.contents r
 
-let lemma decode_encode (s: string) : unit
+let lemma decode_encode (s: ostring) : unit
+  requires { 2 * length s <= max_string_length }
   ensures { decode (encode s) = s }
 = let s1 = encode s in
   assert { forall i. 0 <= i < length s1 ->
@@ -84,10 +89,10 @@ let lemma decode_encode (s: string) : unit
            s[i] = s2[i] };
   assert { eq_string s s2 }
 
-let test1 = let s = "" in let r = encode s in assert {r = s}
-let test2 = let s = "a" in let r = encode s in assert {decode r = s}
-let test3 = let s = "h" in let r = encode s in assert {decode r = s}
-let test4 = let s = "abc" in let r = encode s in assert {decode r = s}
-let test5 = let s = "1s1" in let r = encode s in assert {decode r = s}
-let test6 = let s = "141fh" in let r = encode s in assert {decode r = s}
-let test7 = let s = "\123as" in let r = encode s in assert {decode r = s}
+let test1 = let s = of_string "" in let r = encode s in assert {r = s}
+let test2 = let s = of_string "a" in let r = encode s in assert {decode r = s}
+let test3 = let s = of_string "h" in let r = encode s in assert {decode r = s}
+let test4 = let s = of_string "abc" in let r = encode s in assert {decode r = s}
+let test5 = let s = of_string "1s1" in let r = encode s in assert {decode r = s}
+let test6 = let s = of_string "141fh" in let r = encode s in assert {decode r = s}
+let test7 = let s = of_string "\123as" in let r = encode s in assert {decode r = s}

@@ -30,9 +30,6 @@
  <goal name="calc_pad&#39;vc" expl="VC for calc_pad" proved="true">
  <proof prover="1"><result status="valid" time="0.08" steps="15489"/></proof>
  </goal>
- <goal name="max_base64_length&#39;vc" expl="VC for max_base64_length" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="10"/></proof>
- </goal>
  <goal name="encode&#39;vc" expl="VC for encode" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="encode&#39;vc.0" expl="precondition" proved="true">
@@ -93,7 +90,7 @@
   <proof prover="2" timelimit="5"><result status="valid" time="0.02" steps="54"/></proof>
   </goal>
   <goal name="encode&#39;vc.19" expl="integer overflow" proved="true">
-  <proof prover="2" timelimit="5"><result status="valid" time="0.40" steps="382"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.26" steps="382"/></proof>
   </goal>
   <goal name="encode&#39;vc.20" expl="division by zero" proved="true">
   <proof prover="2" timelimit="5"><result status="valid" time="0.02" steps="58"/></proof>
@@ -362,10 +359,10 @@
   <proof prover="2"><result status="valid" time="0.44" steps="564"/></proof>
   </goal>
   <goal name="decode&#39;vc.26" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.82" steps="942"/></proof>
+  <proof prover="2"><result status="valid" time="1.06" steps="942"/></proof>
   </goal>
   <goal name="decode&#39;vc.27" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.83" steps="1320"/></proof>
+  <proof prover="2"><result status="valid" time="1.10" steps="1320"/></proof>
   </goal>
   <goal name="decode&#39;vc.28" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.05" steps="66"/></proof>
@@ -377,7 +374,7 @@
   <proof prover="2"><result status="valid" time="0.06" steps="68"/></proof>
   </goal>
   <goal name="decode&#39;vc.31" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.80" steps="1335"/></proof>
+  <proof prover="2"><result status="valid" time="1.02" steps="1335"/></proof>
   </goal>
   <goal name="decode&#39;vc.32" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.07" steps="70"/></proof>
