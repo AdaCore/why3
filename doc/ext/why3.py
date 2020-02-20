@@ -6,14 +6,15 @@ class WhyMLLexer(RegexLexer):
     aliases = 'whyml'
 
     keywords = (
-        'abstract', 'absurd', 'alias', 'any', 'assert', 'assume', 'as', 'at', 'axiom',
-        'break', 'by', 'check', 'clone', 'coinductive', 'constant', 'continue',
+        'abstract', 'absurd', 'alias', 'any', 'as', 'assert', 'assume', 'at', 'axiom',
+        'begin', 'break', 'by', 'check', 'clone', 'coinductive', 'constant', 'continue',
         'diverges', 'do', 'done', 'downto',
-        'else', 'end', 'ensures', 'exception', 'exists', 'export',
-        'false', 'for', 'forall', 'fun', 'function', 'ghost', 'goal',
-        'if', 'import', 'in', 'inductive', 'invariant', 'label', 'lemma', 'let', 'loop',
-        'match', 'meta', 'module', 'mutable', 'not', 'old', 'predicate', 'private', 'pure',
-        'raise', 'raises', 'reads', 'rec', 'ref', 'requires', 'return', 'returns',
+        'else', 'end', 'ensures', 'epsilon', 'exception', 'exists', 'export',
+        'false', 'float', 'for', 'forall', 'fun', 'function', 'ghost', 'goal',
+        'if', 'import', 'in', 'inductive', 'invariant', 'label', 'lemma', 'let',
+        'match', 'meta', 'module', 'mutable', 'not', 'old',
+        'partial', 'predicate', 'private', 'pure',
+        'raise', 'raises', 'range', 'reads', 'rec', 'ref', 'requires', 'return', 'returns',
         'scope', 'so', 'then', 'theory', 'to', 'true', 'try', 'type', 'use', 'val', 'variant',
         'while', 'with', 'writes',
     )
