@@ -23,4 +23,6 @@ let tests = [
 ]
 
 let () =
-  List.iter test tests
+  List.iter test tests;
+  Format.printf "all tests passed with success!@."
+
