@@ -71,32 +71,69 @@ module Base64
     if mod (length s) 3 = 1 then 2 else
       if mod (length s) 3 = 2 then 1 else 0
 
+  lemma calc_pad_mod3: forall s. mod (length s + calc_pad s) 3 = 0
+
   let calc_pad (s: string): int63
     ensures { result = calc_pad s }
   = if length s % 3 = 1 then 2 else
       if length s % 3 = 2 then 1 else 0
 
-  (* constant max_base64_length: int = div (3 * max_string_length) 4 - 2 *)
+  predicate encoding (s1 s2: string) =
+    (* (length s1 = div (length s2 * 3) 4 - get_pad s2) && *)
+    length s2 = div (length s1 + calc_pad s1) 3 * 4 &&
+    ( forall i. 0 <= i < div (length s2) 4 ->
+      let b1,b2,b3,b4 = s2[4*i], s2[4*i+1],s2[4*i+2], s2[4*i+3] in
+      s1[i*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
+      (i * 3 + 1 < length s1 ->
+        s1[i*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4)) &&
+      (i * 3 + 2 < length s1 ->
+        s1[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4))) &&
+    ( forall i. 0 <= i < length s2 - get_pad s2 -> valid_64_char s2[i] ) &&
+    ( forall i. length s2 - get_pad s2 <= i < length s2 -> s2[i] = char_eq ) &&
+    calc_pad s1 = get_pad s2
 
-  let function encode (s: string) : string
-    ensures { length result = div (length s + calc_pad s) 3 * 4 }
-    ensures { mod (length result) 4 = 0 }
-    ensures { forall i. 0 <= i < div (length result) 4 ->
-      let a1, a2, a3 = s[i*3], s[i*3+1], s[i*3+2] in
-      result[i*4] = int2b64 (div (code a1)  4) /\
-      if i * 3 + 1 < length s then
-        ( result[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-          ( if i * 3 + 2 < length s then
-              result[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
-              result[i*4+3] = int2b64 (mod (code a3) 64)
-            else (result[i*4+2] = int2b64 (mod (code a2) 16 * 4) && result[i*4+3] = char_eq)
-          )
-        )
-      else
-        ( result[i*4+1] = int2b64 (mod (code a1) 4 * 16)
-          && result[i*4+2] = char_eq && result[i*4+3] = char_eq)
-    }
-    ensures { get_pad result = calc_pad s }
+  (* lemma calc_pad_get_pad: forall s1 s2. encoding s1 s2 -> calc_pad s1 = get_pad s2 *)
+
+  predicate valid_b64 (s: string) =
+    (mod (length s) 4 = 0) &&
+    (forall i. 0 <= i < length s - get_pad s -> valid_64_char s[i]) &&
+    (forall i. length s - get_pad s <= i < length s -> s[i] = char_eq)
+
+  let lemma encoding_valid_b64 (s1 s2: string)
+    requires { encoding s1 s2 }
+    ensures  { valid_b64 s2 }
+  =
+    assert { length s1 = div (length s2) 4 * 3 - get_pad s2 };
+    assert { forall i. 0 <= i < div (length s1) 3 ->
+      (valid_64_char s2[i*4] && valid_64_char s2[i*4+1] &&
+      valid_64_char s2[i*4+2] && valid_64_char s2[i*4+3])
+    };
+    assert { mod (length s1) 3 <> 0 ->
+      let last = div (length s1) 3 in
+      valid_64_char s2[last*4] && valid_64_char s2[last*4+1] &&
+      if last * 3 + 1 = length s1 then
+        s2[last*4+2] = char_eq && s2[last*4+3] = char_eq
+      else valid_64_char s2[last*4+2] && s2[last*4+3] = char_eq
+    };
+    assert { forall i.
+      (0 <= i < length s2 - get_pad s2 -> valid_64_char s2[i]) &&
+      (length s2 - get_pad s2 <= i < length s2 -> s2[i] = char_eq) }
+
+  let lemma decode_unique (s1 s2 s3: string)
+    requires { encoding s1 s2 /\ encoding s3 s2 }
+    ensures  { s1 = s3 }
+  = (* assert { length s1 = length s3 }; *)
+    assert { forall i. 0 <= i < div (length s1 + calc_pad s1) 3 ->
+      s1[i*3] = s3[i*3] &&
+      (i * 3 + 1 < length s1 -> s1[i*3+1] = s3[i*3+1]) &&
+      (i * 3 + 2 < length s1 -> s1[i*3+2] = s3[i*3+2]) };
+    assert { forall i. 0 <= i < length s1 -> s1[i] = s3[i] }
+
+  (* lemma encode_unique: forall s1 s2 s3. *)
+  (*   encoding s1 s2 -> encoding s1 s3 -> s2 = s3 *)
+
+  let encode (s: string) : string
+    ensures { encoding s result }
   = let padding = calc_pad s in
     let sp = concat s (make padding (chr 0)) in
     let ref i = 0 in
@@ -136,19 +173,9 @@ module Base64
     StringBuffer.add_string r (make padding char_eq);
     StringBuffer.contents r
 
-  let function decode (s: string) : string
-    requires { mod (length s) 4 = 0 }
-    requires { forall i. 0 <= i < length s - get_pad s -> valid_64_char s[i] }
-    requires { forall i. length s - get_pad s <= i < length s -> s[i] = char_eq }
-    ensures  { length result = div (length s * 3) 4 - get_pad s}
-    ensures  { forall i. 0 <= i < div (length result + get_pad s) 3 ->
-      let b1,b2,b3,b4 = s[4*i], s[4*i+1],s[4*i+2], s[4*i+3] in
-      result[i*3] = chr (b642int b1 * 4 + div (b642int b2) 16) &&
-      (i * 3 + 1 < length result ->
-        result[i*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4)) &&
-      (i * 3 + 2 < length result ->
-        result[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4))
-    }
+  let decode (s: string) : string
+    requires { valid_b64 s }
+    ensures  { encoding result s }
   = let ref i = 0 in
     let r = StringBuffer.create 42 in
     let ghost ref b = 0:int in
@@ -198,41 +225,10 @@ module Base64
     encoding s1 s2 -> encoding s1 s3 -> s2 = s3
 *)
 
-  let lemma decode_encode (s: string) : unit
-    ensures { decode (encode s) = s }
+
+  let decode_encode (s: string) : unit
   = let s1 = encode s in
-
-    (* assert { get_pad s1 = calc_pad s }; *)
-    (* assert { length s1 = div (length s + calc_pad s) 3 * 4 }; *)
-    assert { length s = div (length s1) 4 * 3 - get_pad s1 };
-
-    assert { forall i. 0 <= i < div (length s) 3 ->
-      (valid_64_char s1[i*4] && valid_64_char s1[i*4+1] &&
-      valid_64_char s1[i*4+2] && valid_64_char s1[i*4+3])
-    };
-
-    assert { mod (length s) 3 <> 0 ->
-      let last = div (length s) 3 in
-      valid_64_char s1[last*4] && valid_64_char s1[last*4+1] &&
-      if last * 3 + 1 = length s then
-        s1[last*4+2] = char_eq && s1[last*4+3] = char_eq
-      else valid_64_char s1[last*4+2] && s1[last*4+3] = char_eq
-    };
-
-    assert { forall i.
-      (0 <= i < length s1 - get_pad s1 -> valid_64_char s1[i]) &&
-      (length s1 - get_pad s1 <= i < length s1 -> s1[i] = char_eq) };
-
     let s2 = decode s1 in
-
-    assert { length s2 = length s by length s = div (length s1 * 3) 4 - get_pad s1 };
-
-    assert { forall i. 0 <= i < div (length s + calc_pad s) 3 ->
-      s[i*3] = s2[i*3] &&
-      (i * 3 + 1 < length s -> s[i*3+1] = s2[i*3+1]) &&
-      (i * 3 + 2 < length s -> s[i*3+2] = s2[i*3+2]) };
-
-    assert { forall i. 0 <= i < length s -> s[i] = s2[i] };
-    assert { eq_string s s2 }
+    assert { s = s2 }
 
 end
