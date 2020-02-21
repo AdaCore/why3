@@ -148,6 +148,10 @@ let wmpz_mul (w u v: mpz_ptr) : unit
   let ref v' = v in
   let ref w' = w in
   let ghost ompz = pure { mpz } in
+  let ghost ref should_clear_u = false in
+  let ghost ref should_clear_v = false in
+  let ghost ref clear_mpz_u = any mpz_mem in
+  let ghost ref clear_mpz_v = any mpz_mem in
   assert { mpz.alloc [u] > 0 /\ mpz.alloc[v] > 0 /\ mpz.alloc[w] > 0 };
   begin
     ensures { mpz.alloc[w'] >= wsize }
@@ -169,7 +173,10 @@ let wmpz_mul (w u v: mpz_ptr) : unit
   if alloc_of w < wsize
   then begin
     freew <- true;
-    w' <- wmpz_init ();
+    let nwt = wmpz_tmp_decl () in
+    let nw, ghost memw = wmpz_struct_to_ptr nwt in
+    wmpz_init nw;
+    w' <- nw;
     assert { ompz.alloc[w'] = 0 };
     let wp' = wmpz_realloc w' wsize in
     assert { forall x. x <> w' -> mpz_unchanged x mpz ompz };
@@ -184,7 +191,12 @@ let wmpz_mul (w u v: mpz_ptr) : unit
       let wp = get_read_ptr w in
       let ghost mpz' = pure { mpz } in
       let up = salloc (UInt32.of_int32 usize) in
-      u' <- wmpz_init ();
+      let nu, ghost mu = wmpz_ptr_decl () in
+(*      let nut = wmpz_tmp_decl () in
+      let nu, ghost mu = wmpz_struct_to_ptr nut in *)
+      should_clear_u <- true;
+      clear_mpz_u <- mu;
+      u' <- nu;
       set_alloc u' usize;
       wmpn_copyi up wp usize;
       assert { value up usize = value wp usize = ompz.abs_value_of u };
@@ -200,7 +212,12 @@ let wmpz_mul (w u v: mpz_ptr) : unit
       let wp = get_read_ptr w in
       let ghost mpz' = pure { mpz } in
       let vp = salloc (UInt32.of_int32 vsize) in
-      v' <- wmpz_init ();
+(*      let nv, ghost mv = wmpz_ptr_decl () in*)
+      let nvt = wmpz_tmp_decl () in
+      let nv, ghost mv = wmpz_struct_to_ptr nvt in
+      should_clear_v <- true;
+      clear_mpz_v <- mv;
+      v' <- nv;
       set_alloc v' vsize;
       wmpn_copyi vp wp vsize;
       assert { value vp vsize = value wp vsize = ompz.abs_value_of v };
@@ -285,6 +302,8 @@ let wmpz_mul (w u v: mpz_ptr) : unit
          then unchanged u mpz ompz);
   ghost (if not (mpz_eq v u' || mpz_eq v v' || mpz_eq v w' || mpz_eq v w)
          then unchanged v mpz ompz);
+  ghost (if should_clear_u then wmpz_tmp_clear u' clear_mpz_u);
+  ghost (if should_clear_v then wmpz_tmp_clear v' clear_mpz_v);
   assert { forall x. x <> w -> mpz_unchanged x mpz (mpz at Start) };
   assert { mpz.readers[w] = 0 };
   assert { mpz.readers[u'] = 0 /\ mpz.readers[v'] = 0 };

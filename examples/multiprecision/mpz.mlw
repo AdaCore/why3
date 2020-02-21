@@ -50,17 +50,15 @@ function sgn_value (p:ptr limb) (sz:int32) : int
   = if sz >= 0 then value p sz else - value p (- sz)
 
 predicate mpz_unchanged (x: mpz_ptr) (memo1 memo2: mpz_memo)
-  = memo2.alloc[x] > 0 ->
-    (memo1.abs_value_of[x] = memo2.abs_value_of[x]
+  = memo1.abs_value_of[x] = memo2.abs_value_of[x]
     /\ memo1.alloc[x] = memo2.alloc[x]
     /\ memo1.abs_size[x] = memo2.abs_size[x]
     /\ memo1.sgn[x] = memo2.sgn[x]
     /\ memo1.readers[x] = memo2.readers[x]
-    /\ memo1.zones[x] = memo2.zones[x])
+    /\ memo1.zones[x] = memo2.zones[x]
 
 let ghost unchanged (x:mpz_ptr) (memo1 memo2: mpz_memo) : unit
   requires { mpz_unchanged x memo1 memo2 }
-  requires { memo2.alloc[x] > 0 }
   ensures  { memo1.abs_value_of[x] = memo2.abs_value_of[x]
     /\ memo1.alloc[x] = memo2.alloc[x]
     /\ memo1.abs_size[x] = memo2.abs_size[x]
@@ -90,6 +88,8 @@ let abs_size_of [@extraction:inline] (x: mpz_ptr) : int32
   ensures { result = mpz.abs_size[x] }
 = abs (size_of x)
 
+type mpz_struct = { ghost addr: mpz_ptr }
+
 end
 
 
@@ -104,6 +104,7 @@ use types.Types
 use lemmas.Lemmas
 use import mach.int.UInt64GMP as Limb
 use int.Power
+use ref.Ref
 use Z
 
 (* Sets the size of an mpz_ptr, leaving other fields unchanged. *)
@@ -220,18 +221,47 @@ val release_writer (x: mpz_ptr) (p:ptr limb) : unit
   ensures  { mpz.readers[x] = 0 }
   ensures  { forall y. y <> x -> mpz.readers[y] = old mpz.readers[y] }
 
-val partial wmpz_init () : mpz_ptr
+type mpz_mem = abstract { mem: { mpz_memo }; ptr: mpz_ptr; mutable ok: bool }
+
+val wmpz_struct_to_ptr (x:mpz_struct)
+    : (res:mpz_ptr, ghost memo:mpz_mem)
   writes  { mpz }
-  ensures { forall x. old mpz.alloc[x] > 0 -> result <> x }
-          (*result is fresh*)
+  ensures { res = x.addr }
+  ensures { memo.mem = old mpz }
+  ensures { memo.ptr = res }
+  ensures { forall y. y <> x.addr -> mpz_unchanged y mpz (old mpz) }
+
+val wmpz_tmp_decl [@extraction:c_declaration] () : mpz_struct
+  ensures { forall x. old mpz.alloc[x] > 0 -> result.addr <> x }
+            (*result is fresh*)
+
+val wmpz_tmp_clear (x:mpz_ptr) (memo: mpz_mem) : unit
+  requires { memo.ok }
+  requires { x = memo.ptr }
+  writes   { mpz }
+  ensures  { mpz_unchanged x mpz memo.mem }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+
+let wmpz_ptr_decl [@extraction:inline] () : (ptr: mpz_ptr, ghost memo:mpz_mem)
+  writes  { mpz }
+  ensures { ptr = memo.ptr }
+  ensures { memo.mem = old mpz }
+  ensures { forall x. old mpz.alloc[x] > 0 -> ptr <> x }
+  ensures { forall x. x <> ptr -> mpz_unchanged x mpz (old mpz) }
+=
+  let t = wmpz_tmp_decl () in
+  wmpz_struct_to_ptr t
+
+val partial wmpz_init (p: mpz_ptr) : unit
+  writes  { mpz }
   ensures { forall x. old mpz.alloc[x] > 0 ->
                       mpz_unchanged x mpz (old mpz) } (* FIXME *)
-  ensures { mpz.readers[result] = 0 }
-  ensures { mpz.abs_value_of[result] = 0 }
-  ensures { mpz.abs_size[result] = 0 }
-  ensures { mpz.sgn[result] = 1 }
-  ensures { mpz.alloc[result] = 1 }
-  ensures { mpz.zones[result] <> null_zone }
+  ensures { mpz.readers[p] = 0 }
+  ensures { mpz.abs_value_of[p] = 0 }
+  ensures { mpz.abs_size[p] = 0 }
+  ensures { mpz.sgn[p] = 1 }
+  ensures { mpz.alloc[p] = 1 }
+  ensures { mpz.zones[p] <> null_zone }
 
 val wmpz_clear (x:mpz_ptr) : unit (* scrambles mpz._[x] *)
   writes { mpz }
