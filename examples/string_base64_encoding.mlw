@@ -61,7 +61,7 @@ module Base64
         (if length s >= 2 && s[length s - 2] = char_eq then 2 else 1)
     else 0
 
-  let get_pad (s: ostring): int63
+  let get_pad (s: string): int63
     ensures { result = get_pad s }
   = if length s >= 1 && eq_char s[length s - 1] char_eq then
         (if length s >= 2 && eq_char s[length s - 2] char_eq then 2 else 1)
@@ -71,15 +71,14 @@ module Base64
     if mod (length s) 3 = 1 then 2 else
       if mod (length s) 3 = 2 then 1 else 0
 
-  let calc_pad (s: ostring): int63
+  let calc_pad (s: string): int63
     ensures { result = calc_pad s }
   = if length s % 3 = 1 then 2 else
       if length s % 3 = 2 then 1 else 0
 
-  constant max_base64_length: int = div (3 * max_string_length) 4 - 2
+  (* constant max_base64_length: int = div (3 * max_string_length) 4 - 2 *)
 
-  let function encode (s: ostring) : ostring
-    requires { length s <= max_base64_length }
+  let function encode (s: string) : string
     ensures { length result = div (length s + calc_pad s) 3 * 4 }
     ensures { mod (length result) 4 = 0 }
     ensures { forall i. 0 <= i < div (length result) 4 ->
@@ -137,7 +136,7 @@ module Base64
     StringBuffer.add_string r (make padding char_eq);
     StringBuffer.contents r
 
-  let function decode (s: ostring) : ostring
+  let function decode (s: string) : string
     requires { mod (length s) 4 = 0 }
     requires { forall i. 0 <= i < length s - get_pad s -> valid_64_char s[i] }
     requires { forall i. length s - get_pad s <= i < length s -> s[i] = char_eq }
@@ -181,8 +180,25 @@ module Base64
     done;
     StringBuffer.sub r 0 (length r - get_pad s)
 
-  let lemma decode_encode (s: ostring) : unit
-    requires { length s <= max_base64_length }
+(*
+  predicate valid_base64 string
+
+  predicate encoding string string
+    (encoding s1 s2 -> valid_base64 s2)
+
+  encode s
+    ensures encoding s result
+  decode s
+    requires valid_base64
+    ensures  encoding result s
+
+  lemma decode_unique:
+    encoding s1 s2 -> encoding s3 s2 -> s1 = s3
+  lemma encode_unique:
+    encoding s1 s2 -> encoding s1 s3 -> s2 = s3
+*)
+
+  let lemma decode_encode (s: string) : unit
     ensures { decode (encode s) = s }
   = let s1 = encode s in
 

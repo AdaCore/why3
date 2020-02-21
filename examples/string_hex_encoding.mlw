@@ -26,8 +26,7 @@ let xeh (i: int63) : int63
 = if 48 <= i < 58 then i - 48
   else i - 55
 
-let function encode (s: ostring) : ostring
-  requires { 2 * length s <= max_string_length }
+let function encode (s: string) : string
   ensures { length result = 2 * length s }
   ensures { forall i. 0 <= i < length s ->
               result[2 * i] = hex (div (code s[i]) 16) &&
@@ -53,7 +52,7 @@ let function encode (s: ostring) : ostring
   done;
   StringBuffer.contents r
 
-let function decode (s: ostring) : ostring
+let function decode (s: string) : string
   requires { mod (length s) 2 = 0 }
   requires { forall i. 0 <= i < length s ->
                48 <= code s[i] < 58 || 65 <= code s[i] < 71 }
@@ -77,8 +76,7 @@ let function decode (s: ostring) : ostring
   done;
   StringBuffer.contents r
 
-let lemma decode_encode (s: ostring) : unit
-  requires { 2 * length s <= max_string_length }
+let lemma decode_encode (s: string) : unit
   ensures { decode (encode s) = s }
 = let s1 = encode s in
   assert { forall i. 0 <= i < length s1 ->

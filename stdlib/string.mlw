@@ -457,30 +457,16 @@ module OCaml
   use String
   use Char
 
-  let constant max_string_length: int63 = 144_115_188_075_855_863
-
-  type ostring = abstract {
-    contents: string;
-  } invariant {
-    length contents <= max_string_length
-  }
-  meta coercion function contents
-
-  axiom ostring_eq: forall s1 s2.
-    s1.contents = s2.contents -> s1 = s2
-
-  val of_string (s: string) : ostring
-    requires { length s <= max_string_length }
-    ensures  { result.contents = s }
+  (* In OCaml max_string_length is 144_115_188_075_855_863 *)
 
   val eq_char (c1 c2: char) : bool
     ensures { result <-> c1 = c2 }
 
-  val get (s: ostring) (i: int63) : char
+  val get (s: string) (i: int63) : char
     requires { 0 <= i < length s }
     ensures  { result = get s i }
 
-  let ([]) (s: ostring) (i: int63) : char = get s i
+  let ([]) (s: string) (i: int63) : char = get s i
     requires { 0 <= i < length s }
     ensures  { result = get s i }
 
@@ -491,23 +477,21 @@ module OCaml
     requires { 0 <= n < 256 }
     ensures  { result = chr n }
 
-  val (=) (x y: ostring) : bool
+  val (=) (x y: string) : bool
     ensures { result <-> x = y }
 
-  val length (s: ostring) : int63
+  val partial length (s: string) : int63
     ensures { result = length s }
 
-  val sub (s: ostring) (start: int63) (len: int63) : ostring
+  val sub (s: string) (start: int63) (len: int63) : string
     requires { 0 <= start <= length s }
     requires { 0 <= len <= length s - start }
     ensures  { result = substring s start len }
 
-  val concat (s1 s2: ostring) : ostring
-    requires { length s1 + length s2 <= max_string_length }
+  val concat (s1 s2: string) : string
     ensures  { result = concat s1 s2 }
 
-  val make (size: int63) (v: char) : ostring
-    requires { size <= max_string_length }
+  val make (size: int63) (v: char) : string
     requires { 0 <= size }
     ensures  { result = make size v }
 
@@ -524,8 +508,6 @@ module StringBuffer
 
   type buffer = abstract {
     mutable str: string;
-  } invariant {
-    length str <= max_string_length
   }
   meta coercion function str
 
@@ -535,7 +517,7 @@ module StringBuffer
   val length (b: buffer) : int63
     ensures { result = length b.str }
 
-  val contents (b: buffer) : ostring
+  val contents (b: buffer) : string
     ensures { result = b.str }
 
   val clear (b: buffer) : unit
@@ -546,17 +528,15 @@ module StringBuffer
     writes  { b }
     ensures { b.str = "" }
 
-  val sub (b: buffer) (ofs len: int63) : ostring
+  val sub (b: buffer) (ofs len: int63) : string
     requires { 0 <= ofs /\ 0 <= len /\ ofs + len <= length b.str }
     ensures  { result = substring b.str ofs len }
 
   val add_char (b: buffer) (c: char) : unit
-    requires { length b + 1 <= max_string_length }
     writes   { b }
     ensures  { b.str = concat (old b.str) c.Char.contents }
 
-  val add_string (b: buffer) (s: ostring) : unit
-    requires { length b + length s <= max_string_length }
+  val add_string (b: buffer) (s: string) : unit
     writes   { b }
     ensures  { b.str = concat (old b.str) s }
 

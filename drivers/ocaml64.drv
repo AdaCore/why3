@@ -390,9 +390,6 @@ module string.Char
 end
 
 module string.OCaml
-  syntax type ostring "string"
-  syntax val of_string "%1"
-  syntax val max_string_length "Sys.max_string_length"
   syntax val (=)    "%1 = %2" prec 11 11 10
   syntax val eq_char "%1 = %2" prec 11 11 10
   syntax val length "String.length %1" prec 4 3
