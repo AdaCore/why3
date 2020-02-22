@@ -103,9 +103,10 @@ let command sscmd =
       Filename.concat command_path scmd
     end in
   let scmd = "why3 " ^ sscmd in
+  let args = Array.of_list (scmd :: args) in
   (* add double quotes to avoid splitting issues with execv in Windows *)
-  let quote = if Sys.win32 then Filename.quote else (fun s -> s) in
-  Unix.execv cmd (Array.of_list (List.map quote (scmd :: args)))
+  let args = if Sys.win32 then Array.map Filename.quote args else args in
+  Unix.execv cmd args
 
 let () = try
   let extra_help fmt () = extra_help fmt (available_commands ()) in
