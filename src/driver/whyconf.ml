@@ -106,7 +106,7 @@ module Hprover = Exthtbl.Make(Prover)
 
 module Editor = struct
   type t = string
-  let compare = Pervasives.compare
+  let compare = String.compare
 end
 
 module Meditor = Extmap.Make(Editor)

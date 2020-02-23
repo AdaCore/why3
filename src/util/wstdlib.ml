@@ -64,7 +64,7 @@ struct
   type t = X.t
   let hash = X.tag
   let equal ts1 ts2 = X.tag ts1 == X.tag ts2
-  let compare ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
+  let compare ts1 ts2 = Int.compare (X.tag ts1) (X.tag ts2)
 end
 
 module OrderedHashedList (X : TaggedType) =
@@ -73,7 +73,7 @@ struct
   let hash = Hashcons.combine_list X.tag 3
   let equ_ts ts1 ts2 = X.tag ts1 == X.tag ts2
   let equal = Lists.equal equ_ts
-  let cmp_ts ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
+  let cmp_ts ts1 ts2 = Int.compare (X.tag ts1) (X.tag ts2)
   let compare = Lists.compare cmp_ts
 end
 

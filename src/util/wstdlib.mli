@@ -59,3 +59,5 @@ sig
   module H : Exthtbl.S with type key = X.t
   module W : Weakhtbl.S with type key = X.t
 end
+
+module Int : OrderedHashedType with type t = int

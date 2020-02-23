@@ -110,7 +110,7 @@ module Args = struct
         Format.printf "@[<hov 2>Known debug flags \
             (`*' marks the flags selected by --debug-all):@\n%a@]@."
           (Pp.print_list Pp.newline print)
-          (List.sort Pervasives.compare list);
+          (List.sort (fun (u,_,_) (v,_,_) -> String.compare u v) list);
       end;
       !opt_list_flags in
     desc,list
