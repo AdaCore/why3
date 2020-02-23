@@ -67,4 +67,4 @@ module type S = sig
   val print_ty : ?paren:bool -> info -> ty pp
 end
 
-module MLPrinter (K: sig val keywords : string list end) : S
+module MLPrinter : sig val keywords : string list end -> S

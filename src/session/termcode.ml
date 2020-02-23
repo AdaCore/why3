@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
 open Term
 open Number
 open Constant
@@ -1032,11 +1033,11 @@ module Pairing (Old: S)(New: S) = struct
       | Old g ->
           let (sh, l) = Old.shape table.table_old.(g) in
           (* Sanitazing: sort the lists only once *)
-          (sh, List.sort Pervasives.compare l)
+          (sh, List.sort Int.compare l)
       | New g ->
           let (sh, l) = New.shape table.table_new.(g) in
           (* Sanitazing: sort the lists only once *)
-          (sh, List.sort Pervasives.compare l)
+          (sh, List.sort Int.compare l)
     in
     let rec n = { prev = n; shape = s; elt = g; next = n; valid = true }
     in n
@@ -1115,7 +1116,10 @@ module Pairing (Old: S)(New: S) = struct
       let module E = struct
         let dummy = let n = List.hd allgoals (* safe *) in (0, 0), (n, n)
         type t = (int * int) * (node * node)
-        let compare (v1, _) (v2, _) = Pervasives.compare v2 v1
+        let compare ((u1,u2), _) ((v1,v2), _) =
+          let c = Int.compare v1 u1 in
+          if c <> 0 then c
+          else Int.compare v2 u2
       end in
       let module PQ = Pqueue.Make(E) in
       let pq = PQ.create () in

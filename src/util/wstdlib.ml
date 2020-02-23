@@ -13,7 +13,7 @@
 
 module Int = struct
   type t = int
-  let compare (x : int) y  = Pervasives.compare x y
+  let compare (x : int) y = Pervasives.compare x y [@ocaml.warning "-3"]
   let equal (x : int) y = x = y
   let hash  (x : int) = x
 end
@@ -33,7 +33,7 @@ end)
 
 module Float = struct
   type t = float
-  let compare (x : float) y  = Pervasives.compare x y
+  let compare (x : float) y = Pervasives.compare x y [@ocaml.warning "-3"]
   let equal (x : float) y = x = y
   let hash  (x : float) = Exthtbl.hash x
 end
@@ -64,7 +64,7 @@ struct
   type t = X.t
   let hash = X.tag
   let equal ts1 ts2 = X.tag ts1 == X.tag ts2
-  let compare ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
+  let compare ts1 ts2 = Int.compare (X.tag ts1) (X.tag ts2)
 end
 
 module OrderedHashedList (X : TaggedType) =
@@ -73,7 +73,7 @@ struct
   let hash = Hashcons.combine_list X.tag 3
   let equ_ts ts1 ts2 = X.tag ts1 == X.tag ts2
   let equal = Lists.equal equ_ts
-  let cmp_ts ts1 ts2 = Pervasives.compare (X.tag ts1) (X.tag ts2)
+  let cmp_ts ts1 ts2 = Int.compare (X.tag ts1) (X.tag ts2)
   let compare = Lists.compare cmp_ts
 end
 

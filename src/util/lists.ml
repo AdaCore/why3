@@ -16,7 +16,7 @@ let rev_filter f l =
     match l with
     | [] -> acc
     | hd :: tl when f hd -> rev_filter (hd :: acc) tl
-    | hd :: tl -> rev_filter acc tl in
+    | _ :: tl -> rev_filter acc tl in
   rev_filter [] l
 
 let rev_map_fold_left f acc l =
