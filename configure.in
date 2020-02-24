@@ -376,7 +376,7 @@ fi
 # checking for sphinx
 if test "$enable_doc" = yes; then
    AC_CHECK_PROG(SPHINX,sphinx-build,sphinx-build,no)
-   if test "$SPHINC" = no; then
+   if test "$SPHINX" = no; then
       enable_doc=no
       enable_pdf_doc=no
       reason_doc=" (sphinx-build not found)"
