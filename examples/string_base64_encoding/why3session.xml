@@ -295,19 +295,19 @@
     </transf>
     </goal>
     <goal name="encode&#39;vc.39.0.4" expl="VC for encode" proved="true">
-    <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; b -&gt; valid_64_char r2[i*4] &amp;&amp; valid_64_char r2[i*4+1] &amp;&amp; valid_64_char r2[i*4+2] &amp;&amp; valid_64_char r2[i*4+3])">
+    <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; b -&gt; valid_b64_char r2[i*4] &amp;&amp; valid_b64_char r2[i*4+1] &amp;&amp; valid_b64_char r2[i*4+2] &amp;&amp; valid_b64_char r2[i*4+3])">
      <goal name="encode&#39;vc.39.0.4.0" expl="asserted formula" proved="true">
      <transf name="instantiate" proved="true" arg1="LoopInvariant" arg2="i">
       <goal name="encode&#39;vc.39.0.4.0.0" expl="asserted formula" proved="true">
       <transf name="split_vc" proved="true" >
        <goal name="encode&#39;vc.39.0.4.0.0.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.07" steps="103792"/></proof>
+       <proof prover="0"><result status="valid" time="0.08" steps="103792"/></proof>
        </goal>
        <goal name="encode&#39;vc.39.0.4.0.0.1" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.07" steps="105240"/></proof>
+       <proof prover="0"><result status="valid" time="0.09" steps="105240"/></proof>
        </goal>
        <goal name="encode&#39;vc.39.0.4.0.0.2" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.06" steps="106123"/></proof>
+       <proof prover="0"><result status="valid" time="0.07" steps="106123"/></proof>
        </goal>
        <goal name="encode&#39;vc.39.0.4.0.0.3" expl="asserted formula" proved="true">
        <proof prover="0"><result status="valid" time="0.07" steps="106456"/></proof>
@@ -319,12 +319,12 @@
      <goal name="encode&#39;vc.39.0.4.1" expl="VC for encode" proved="true">
      <transf name="assert" proved="true" arg1="(forall i. 0 &lt;= i &lt; o -&gt; r[i] = r1[i] = r2[i])">
       <goal name="encode&#39;vc.39.0.4.1.0" expl="asserted formula" proved="true">
-      <proof prover="2"><result status="valid" time="0.09" steps="225"/></proof>
+      <proof prover="2"><result status="valid" time="0.10" steps="225"/></proof>
       </goal>
       <goal name="encode&#39;vc.39.0.4.1.1" expl="VC for encode" proved="true">
       <transf name="instantiate" proved="true" arg1="h1" arg2="(div i 4)">
        <goal name="encode&#39;vc.39.0.4.1.1.0" expl="VC for encode" proved="true">
-       <proof prover="2"><result status="valid" time="3.45" steps="5167"/></proof>
+       <proof prover="2"><result status="valid" time="3.40" steps="5167"/></proof>
        </goal>
       </transf>
       </goal>

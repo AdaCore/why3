@@ -5,6 +5,9 @@ use string.Char
 use string.OCaml
 use string.StringBuffer
 
+predicate valid_hex_char (c: char) =
+  48 <= code c < 58 || 65 <= code c < 71
+
 function hex (i: int) : char =
   if 0 <= i < 10 then chr (i + 48)
   else if 10 <= i < 16 then chr (i + 55)
@@ -15,26 +18,34 @@ let hex (i: int63) : char
   ensures  { result = hex i }
 = if i < 10 then chr (i + 48) else chr (i + 55)
 
-function xeh (i: int) : int =
-  if 48 <= i < 58 then i - 48
-  else if 65 <= i < 71 then i - 55
+function xeh (c: char) : int =
+  if 48 <= code c < 58 then code c - 48
+  else if 65 <= code c < 71 then code c - 55
   else -1
 
-let xeh (i: int63) : int63
-  requires { 48 <= i < 58 || 65 <= i < 71 }
-  ensures  { result = xeh i }
-= if 48 <= i < 58 then i - 48
-  else i - 55
+let xeh (c: char) : int63
+  requires { valid_hex_char c }
+  ensures  { result = xeh c }
+= if 48 <= code c < 58 then code c - 48
+  else code c - 55
 
-let function encode (s: string) : string
-  ensures { length result = 2 * length s }
-  ensures { forall i. 0 <= i < length s ->
-              result[2 * i] = hex (div (code s[i]) 16) &&
-              result[2 * i + 1] = hex (mod (code s[i]) 16) &&
-              (48 <= code result[2*i] < 58 || 65 <= code result[2*i] < 71) &&
-              (48 <= code result[2*i+1] < 58 || 65 <= code result[2*i+1] < 71) }
+predicate valid_hex (s : string) =
+  mod (length s) 2 = 0 &&
+  ( forall i. 0 <= i < length s -> valid_hex_char s[i] )
+
+predicate encoding (s1 s2: string) =
+  length s2 = 2 * length s1 &&
+  (forall i. 0 <= i < length s1 ->
+             s1[i] = chr (xeh s2[2 * i] * 16 + xeh s2[2 * i + 1])) &&
+  valid_hex s2
+
+lemma decode_unique: forall s1 s2 s3.
+  encoding s1 s2 /\ encoding s3 s2 -> s1 = s3
+
+let encode (s: string) : string
+  ensures { encoding s result }
 = let ref i = 0 in
-  let r = StringBuffer.create (2 * length s) in
+  let r = StringBuffer.create (length s) in
   while i < OCaml.length s do
     variant { length s - i }
     invariant { 0 <= i <= length s }
@@ -43,23 +54,17 @@ let function encode (s: string) : string
                   r[2 * j] = hex (div (code s[j]) 16) &&
                   r[2 * j + 1] = hex (mod (code s[j]) 16)
     }
+    invariant { forall j. 0 <= j < 2*i -> valid_hex_char r[j]}
     let v = code s[i] in
     StringBuffer.add_char r (hex (v / 16));
     StringBuffer.add_char r (hex (v % 16));
-    assert { let h = code r[length r - 1] in 48 <= h < 58 || 65 <= h < 71 };
-    assert { let h = code r[length r - 2] in 48 <= h < 58 || 65 <= h < 71 };
     i <- i + 1
   done;
   StringBuffer.contents r
 
-let function decode (s: string) : string
-  requires { mod (length s) 2 = 0 }
-  requires { forall i. 0 <= i < length s ->
-               48 <= code s[i] < 58 || 65 <= code s[i] < 71 }
-  requires { forall i. 0 <= i < length s -> 0 <= xeh (code s[i]) < 16 }
-  ensures  { length result = div (length s) 2 }
-  ensures  { forall i. 0 <= i < div (length s) 2 ->
-               result[i] = chr (xeh (code s[2 * i]) * 16 + xeh (code s[2 * i + 1])) }
+let decode (s: string) : string
+  requires { valid_hex s }
+  ensures  { encoding result s }
 = let ref i = 0 in
   let r = StringBuffer.create (length s / 2) in
   while i < length s do
@@ -68,29 +73,15 @@ let function decode (s: string) : string
     invariant { 0 <= i <= length s }
     invariant { length r = div i 2 }
     invariant { forall j. 0 <= j < div i 2 ->
-                  r[j] = chr (xeh (code s[2 * j]) * 16 + xeh (code s[2 * j + 1])) }
-    let v_i = xeh (code s[i]) in
-    let v_ii = xeh (code s[i + 1]) in
+                  r[j] = chr (xeh s[2 * j] * 16 + xeh s[2 * j + 1]) }
+    let v_i = xeh s[i] in
+    let v_ii = xeh s[i + 1] in
     StringBuffer.add_char r (chr (v_i * 16 + v_ii));
     i <- i + 2
   done;
   StringBuffer.contents r
 
-let lemma decode_encode (s: string) : unit
-  ensures { decode (encode s) = s }
+let decode_encode (s: string) : unit
 = let s1 = encode s in
-  assert { forall i. 0 <= i < length s1 ->
-             48 <= code s1[i] < 58 || 65 <= code s1[i] < 71 };
   let s2 = decode s1 in
-  assert { length s2 = length s };
-  assert { forall i. 0 <= i < length s ->
-           s[i] = s2[i] };
-  assert { eq_string s s2 }
-
-let test1 = let s = of_string "" in let r = encode s in assert {r = s}
-let test2 = let s = of_string "a" in let r = encode s in assert {decode r = s}
-let test3 = let s = of_string "h" in let r = encode s in assert {decode r = s}
-let test4 = let s = of_string "abc" in let r = encode s in assert {decode r = s}
-let test5 = let s = of_string "1s1" in let r = encode s in assert {decode r = s}
-let test6 = let s = of_string "141fh" in let r = encode s in assert {decode r = s}
-let test7 = let s = of_string "\123as" in let r = encode s in assert {decode r = s}
+  assert { s = s2 }

@@ -28,11 +28,11 @@ module Base64
 
   (* **** *)
 
-  predicate valid_64_char (c: char) =
+  predicate valid_b64_char (c: char) =
     65 <= code c <= 90 || 97 <= code c <= 122 || 48 <= code c <= 57 ||
     code c = 43 || code c = 47
 
-  lemma int2b64_valid_4_char: forall i. 0 <= i < 64 -> valid_64_char (int2b64 i)
+  lemma int2b64_valid_4_char: forall i. 0 <= i < 64 -> valid_b64_char (int2b64 i)
 
   function b642int (c: char) : int =
     if 65 <= code c <= 90  then code c - 65      else (* 0  - 25 *)
@@ -44,7 +44,7 @@ module Base64
     64                                                (* 64 *)
 
   let b642int (c: char) : int63
-    requires { valid_64_char c || c = char_eq }
+    requires { valid_b64_char c || c = char_eq }
     ensures  { result = b642int c }
   = if 65 <= code c <= 90  then code c - 65      else
     if 97 <= code c <= 122 then code c - 97 + 26 else
@@ -88,7 +88,7 @@ module Base64
         s1[i*3+1] = chr (mod (b642int b2) 16 * 16 + div (b642int b3) 4)) &&
       (i * 3 + 2 < length s1 ->
         s1[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4))) &&
-    ( forall i. 0 <= i < length s2 - get_pad s2 -> valid_64_char s2[i] ) &&
+    ( forall i. 0 <= i < length s2 - get_pad s2 -> valid_b64_char s2[i] ) &&
     ( forall i. length s2 - get_pad s2 <= i < length s2 -> s2[i] = char_eq ) &&
     calc_pad s1 = get_pad s2
 
@@ -96,7 +96,7 @@ module Base64
 
   predicate valid_b64 (s: string) =
     (mod (length s) 4 = 0) &&
-    (forall i. 0 <= i < length s - get_pad s -> valid_64_char s[i]) &&
+    (forall i. 0 <= i < length s - get_pad s -> valid_b64_char s[i]) &&
     (forall i. length s - get_pad s <= i < length s -> s[i] = char_eq)
 
   let lemma encoding_valid_b64 (s1 s2: string)
@@ -105,18 +105,18 @@ module Base64
   =
     assert { length s1 = div (length s2) 4 * 3 - get_pad s2 };
     assert { forall i. 0 <= i < div (length s1) 3 ->
-      (valid_64_char s2[i*4] && valid_64_char s2[i*4+1] &&
-      valid_64_char s2[i*4+2] && valid_64_char s2[i*4+3])
+      (valid_b64_char s2[i*4] && valid_b64_char s2[i*4+1] &&
+      valid_b64_char s2[i*4+2] && valid_b64_char s2[i*4+3])
     };
     assert { mod (length s1) 3 <> 0 ->
       let last = div (length s1) 3 in
-      valid_64_char s2[last*4] && valid_64_char s2[last*4+1] &&
+      valid_b64_char s2[last*4] && valid_b64_char s2[last*4+1] &&
       if last * 3 + 1 = length s1 then
         s2[last*4+2] = char_eq && s2[last*4+3] = char_eq
-      else valid_64_char s2[last*4+2] && s2[last*4+3] = char_eq
+      else valid_b64_char s2[last*4+2] && s2[last*4+3] = char_eq
     };
     assert { forall i.
-      (0 <= i < length s2 - get_pad s2 -> valid_64_char s2[i]) &&
+      (0 <= i < length s2 - get_pad s2 -> valid_b64_char s2[i]) &&
       (length s2 - get_pad s2 <= i < length s2 -> s2[i] = char_eq) }
 
   let lemma decode_unique (s1 s2 s3: string)
