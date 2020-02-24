@@ -129,8 +129,26 @@ module Base64
       (i * 3 + 2 < length s1 -> s1[i*3+2] = s3[i*3+2]) };
     assert { forall i. 0 <= i < length s1 -> s1[i] = s3[i] }
 
-  (* lemma encode_unique: forall s1 s2 s3. *)
-  (*   encoding s1 s2 -> encoding s1 s3 -> s2 = s3 *)
+  (* let lemma encode_unique (s1 s2 s3: string) *)
+  (*   requires { encoding s1 s2 /\ encoding s1 s3 } *)
+  (*   ensures  { s2 = s3 } *)
+  (* = assert { length s2 = length s3 }; *)
+  (*   assert { forall i. 0 <= i < div (length s2) 4 -> *)
+  (*     let a1, a2, a3 = s1[i*3], s1[i*3+1], s1[i*3+2] in *)
+  (*       s2[i*4]   = int2b64 (div (code a1)  4) && *)
+  (*       s2[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) && *)
+  (*       s2[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) && *)
+  (*       s2[i*4+3] = int2b64 (mod (code a3) 64) }; *)
+  (*       assert { forall i. 0 <= i < div (length s2) 4 -> *)
+  (*     let a1, a2, a3 = s1[i*3], s1[i*3+1], s1[i*3+2] in *)
+  (*       s3[i*4]   = int2b64 (div (code a1)  4) && *)
+  (*       s3[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) && *)
+  (*       s3[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) && *)
+  (*       s3[i*4+3] = int2b64 (mod (code a3) 64) }; *)
+  (*   assert { forall i. 0 <= i < div (length s2) 4 -> *)
+  (*     s2[i*4]   = s3[i*4]   && s2[i*4+1] = s3[i*4+1] && *)
+  (*     s2[i*4+2] = s3[i*4+2] && s2[i*4+3] = s3[i*4+3]  }; *)
+  (*   assert { forall i. 0 <= i < length s2 -> s2[i] = s3[i] } *)
 
   let encode (s: string) : string
     ensures { encoding s result }
