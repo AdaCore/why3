@@ -1118,11 +1118,13 @@ module MLToC = struct
        in
        let e = C.(Econst (Cint s)) in
        ([], expr_or_return env e)
+    | Eapp (rs, _) when Sattr.mem decl_attribute rs.rs_name.id_attrs ->
+       raise (Unsupported "local variable declaration call outside let-in")
     | Eapp (rs, [e]) when rs_equal rs Pmodule.rs_ref ->
-        Debug.dprintf debug_c_extraction "ref constructor@.";
-        let env_f = { env with computes_return_value = false } in
-        let arg = simplify_expr (expr info env_f e) in
-        ([], expr_or_return env arg)
+       Debug.dprintf debug_c_extraction "ref constructor@.";
+       let env_f = { env with computes_return_value = false } in
+       let arg = simplify_expr (expr info env_f e) in
+       ([], expr_or_return env arg)
     | Eapp (rs, el)
          when is_struct_constructor info rs
               && query_syntax info.syntax rs.rs_name = None ->
@@ -1160,10 +1162,10 @@ module MLToC = struct
            el
        in (*FIXME still needed with masks? *)
        let env_f = { env with computes_return_value = false } in
-       if is_rs_tuple rs && env.computes_return_value
+       if is_rs_tuple rs
        then begin
          match args with
-         | [] -> C.([], Sreturn Enothing);
+         | [] -> C.([], expr_or_return env Enothing);
          | [e] -> expr info env e
          | _ ->
             let id_struct = id_register (id_fresh "result") in
@@ -1180,7 +1182,7 @@ module MLToC = struct
               | e::t ->
                  let b = expr info env_f e in
                  C.Sseq(assign i b, assigns t (i+1)) in
-            C.([d_struct], Sseq(assigns args 0, Sreturn(e_struct)))
+            C.([d_struct], Sseq(assigns args 0, expr_or_return env e_struct))
          end
        else
          let (prdefs, prstmt), e' =
