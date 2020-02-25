@@ -153,13 +153,13 @@ val set_alloc (x:mpz_ptr) (al:int32) : unit
   ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
   ensures  { mpz.alloc[x] = al }
 
-
 val set_ptr (x:mpz_ptr) (p:ptr limb) : unit
   requires { offset p = 0 }
   requires { writable p }
   requires { min p = 0 }
   requires { max p = plength p }
   requires { plength p = mpz.alloc[x] }
+  requires { mpz.readers[x] <= 0 }
   writes   { mpz.abs_value_of }
   writes   { mpz.zones }
   writes   { mpz.readers }
@@ -229,23 +229,29 @@ val wmpz_struct_to_ptr (x:mpz_struct)
   ensures { res = x.addr }
   ensures { memo.mem = old mpz }
   ensures { memo.ptr = res }
+  ensures { memo.ok }
+  ensures { mpz.readers[res] = old mpz.readers[res] }
   ensures { forall y. y <> x.addr -> mpz_unchanged y mpz (old mpz) }
 
 val wmpz_tmp_decl [@extraction:c_declaration] () : mpz_struct
   ensures { forall x. old mpz.alloc[x] > 0 -> result.addr <> x }
+  ensures { mpz.readers[result.addr] = 0 }
             (*result is fresh*)
 
 val wmpz_tmp_clear (x:mpz_ptr) (memo: mpz_mem) : unit
   requires { memo.ok }
   requires { x = memo.ptr }
   writes   { mpz }
+  writes   { memo }
   ensures  { mpz_unchanged x mpz memo.mem }
   ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
 
 let wmpz_ptr_decl [@extraction:inline] () : (ptr: mpz_ptr, ghost memo:mpz_mem)
   writes  { mpz }
   ensures { ptr = memo.ptr }
+  ensures { memo.ok }
   ensures { memo.mem = old mpz }
+  ensures { mpz.readers[ptr] = 0 }
   ensures { forall x. old mpz.alloc[x] > 0 -> ptr <> x }
   ensures { forall x. x <> ptr -> mpz_unchanged x mpz (old mpz) }
 =
@@ -253,9 +259,9 @@ let wmpz_ptr_decl [@extraction:inline] () : (ptr: mpz_ptr, ghost memo:mpz_mem)
   wmpz_struct_to_ptr t
 
 val partial wmpz_init (p: mpz_ptr) : unit
+  requires { mpz.readers[p] = 0 }
   writes  { mpz }
-  ensures { forall x. old mpz.alloc[x] > 0 ->
-                      mpz_unchanged x mpz (old mpz) } (* FIXME *)
+  ensures { forall x. x <> p -> mpz_unchanged x mpz (old mpz) }
   ensures { mpz.readers[p] = 0 }
   ensures { mpz.abs_value_of[p] = 0 }
   ensures { mpz.abs_size[p] = 0 }
