@@ -220,6 +220,8 @@ module Base64
                r[length r - 1] = int2b64 (mod (code c3) 64) };
       assert { forall j. 0 <= j < length r - 4 -> r[j] = (r at L)[j] };
     done;
+    assert { padding = 1 -> mod (b642int r[length r - 2]) 4  = 0 };
+    assert { padding = 2 -> mod (b642int r[length r - 3]) 16 = 0 };
     StringBuffer.truncate r (length r - padding);
     StringBuffer.add_string r (make padding char_eq);
     StringBuffer.contents r
