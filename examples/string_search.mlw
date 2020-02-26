@@ -30,7 +30,7 @@ module Occurs
   val (=) (x y: char) : bool
     ensures { result <-> x = y }
 
-  let occurs (pat text: ostring) (p: int63) : bool
+  let occurs (pat text: string) (p: int63) : bool
     requires { 0 <= p <= length text - length pat }
     ensures  { result <-> matches pat text p }
   = let ghost n = length text in
@@ -54,7 +54,7 @@ module Naive
   use Spec
   use Occurs
 
-  let search1 (pat text: ostring) : int63
+  let search1 (pat text: string) : int63
     requires { length pat <= length text }
     ensures  { -1 <= result <= length text - length pat }
     ensures  { if result = -1 then
@@ -70,7 +70,7 @@ module Naive
     done;
     -1
 
-  let search2 (pat text: ostring) : int63
+  let search2 (pat text: string) : int63
     requires { length pat <= length text }
     ensures  { -1 <= result <= length text - length pat }
     ensures  { if result = -1 then
