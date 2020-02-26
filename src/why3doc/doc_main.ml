@@ -44,7 +44,7 @@ let option_list =
   ]
 
 let _,_,env =
-  Whyconf.NewArgs.initialize option_list
+  Whyconf.Args.initialize option_list
     (fun x -> Queue.add x opt_queue) usage_msg
 
 let index = match !opt_index with

@@ -958,7 +958,7 @@ let add_builtin_provers config = !provers_from_detected_provers config
 let load_default_config_if_needed config =
   if config.main.load_default_config then add_builtin_provers config else config
 
-module NewArgs = struct
+module Args = struct
   let opt_config = ref None
   let opt_extra = ref []
   let opt_loadpath = ref []

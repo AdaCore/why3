@@ -481,7 +481,7 @@ let deps_file fmt header filename f =
 
 
 let _, _, _ =
-  Whyconf.NewArgs.initialize spec add_filename_then_path usage_msg
+  Whyconf.Args.initialize spec add_filename_then_path usage_msg
 
 let () =
   try

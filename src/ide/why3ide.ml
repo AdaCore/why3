@@ -189,9 +189,9 @@ let usage_str = sprintf
 
 let env, gconfig = try
   let config, base_config, env =
-    Whyconf.NewArgs.initialize spec (fun f -> Queue.add f files) usage_str in
+    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
     if Queue.is_empty files then
-      Whyconf.NewArgs.exit_with_usage spec usage_str;
+      Whyconf.Args.exit_with_usage spec usage_str;
     Gconfig.load_config config base_config;
     env, Gconfig.config ()
 
@@ -426,7 +426,7 @@ let () =
       Server_utils.get_session_dir ~allow_mkdir:true files
     with Invalid_argument s ->
       Format.eprintf "Error: %s@." s;
-      Whyconf.NewArgs.exit_with_usage spec usage_str
+      Whyconf.Args.exit_with_usage spec usage_str
   in
   Server.init_server gconfig.config env dir;
   Queue.iter (fun f ->

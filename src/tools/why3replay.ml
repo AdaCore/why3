@@ -89,7 +89,7 @@ let option_list =
 let add_file f = Queue.push f files
 
 let config, _, env =
-  Whyconf.NewArgs.initialize option_list add_file usage_msg
+  Whyconf.Args.initialize option_list add_file usage_msg
 
 module C = Controller_itp.Make(Unix_scheduler.Unix_scheduler)
 
@@ -361,10 +361,10 @@ let () =
       Server_utils.get_session_dir ~allow_mkdir:false files
     with Invalid_argument s ->
       Format.eprintf "Error: %s@." s;
-      Whyconf.NewArgs.exit_with_usage option_list usage_msg
+      Whyconf.Args.exit_with_usage option_list usage_msg
   in
   if not (Queue.is_empty files) then
-    Whyconf.NewArgs.exit_with_usage option_list usage_msg;
+    Whyconf.Args.exit_with_usage option_list usage_msg;
   try
     Debug.dprintf debug "Opening session '%s'...@?" dir;
     let ses = S.load_session dir in

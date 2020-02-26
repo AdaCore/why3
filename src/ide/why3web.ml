@@ -144,14 +144,14 @@ let usage_str = sprintf
 
 let () =
     let config, _base_config, env =
-      Whyconf.NewArgs.initialize spec (fun f -> Queue.add f files) usage_str
+      Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
     in
     let dir =
       try
         Server_utils.get_session_dir ~allow_mkdir:true files
       with Invalid_argument s ->
         Format.eprintf "Error: %s@." s;
-        Whyconf.NewArgs.exit_with_usage spec usage_str
+        Whyconf.Args.exit_with_usage spec usage_str
     in
     S.init_server config env dir;
     Queue.iter (fun f -> P.push_request (Add_file_req f)) files;

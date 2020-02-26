@@ -23,7 +23,7 @@ let opt_list_attrs = ref false
 
 let option_list =
   let open Getopt in
-  NewArgs.common_options @
+  Args.common_options @
   [ KLong "list-transforms", Hnd0 (fun () -> opt_list_transforms := true),
     " list known transformations";
     KLong "list-printers", Hnd0 (fun () -> opt_list_printers := true),
@@ -124,7 +124,7 @@ let () = try
   while !arg_index < nargs do
     Getopt.parse_one ~mm:false option_list command Sys.argv arg_index;
   done;
-  let config,_,_ = NewArgs.complete_initialization () in
+  let config,_,_ = Args.complete_initialization () in
 
   (* listings *)
 

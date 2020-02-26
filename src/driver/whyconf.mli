@@ -282,7 +282,7 @@ val set_family  : config -> string -> Rc.family  -> config
 
 (** Common command line options *)
 
-module NewArgs : sig
+module Args : sig
 
   val initialize :
     ?extra_help:string ->

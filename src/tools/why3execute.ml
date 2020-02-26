@@ -53,10 +53,10 @@ let option_list =
   ]
 
 let config, _, env =
-  Whyconf.NewArgs.initialize option_list add_opt usage_msg
+  Whyconf.Args.initialize option_list add_opt usage_msg
 
 let () =
-  if !opt_file = None then Whyconf.NewArgs.exit_with_usage option_list usage_msg
+  if !opt_file = None then Whyconf.Args.exit_with_usage option_list usage_msg
 
 let do_input f =
   let format = !opt_parser in

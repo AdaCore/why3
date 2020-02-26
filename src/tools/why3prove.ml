@@ -133,7 +133,7 @@ let option_list =
   ]
 
 let config, _, env =
-  Whyconf.NewArgs.initialize option_list add_opt_file usage_msg
+  Whyconf.Args.initialize option_list add_opt_file usage_msg
 
 let opt_driver = ref (match !opt_driver with
   | f::ef -> Some (f, ef)
@@ -141,7 +141,7 @@ let opt_driver = ref (match !opt_driver with
 
 let () = try
   if Queue.is_empty opt_queue then
-    Whyconf.NewArgs.exit_with_usage option_list usage_msg;
+    Whyconf.Args.exit_with_usage option_list usage_msg;
 
   if !opt_prover <> None && !opt_driver <> None then begin
     eprintf "Options '-P'/'--prover' and \
