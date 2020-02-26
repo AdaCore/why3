@@ -43,12 +43,8 @@ let option_list =
   let open Getopt in
   [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
     "<format> select input format (default: \"why\")";
-    KLong "real", Hnd1 (AString, fun s ->
-      let fail () = raise (GetoptFailure (sprintf "invalid --real argument '%s'" s)) in
-      match List.map int_of_string (Strings.split ',' s) with
-      | [i1;i2;i3] -> real_emin := i1; real_emax := i2; real_prec := i3
-      | _ -> fail ()
-      | exception Failure _ -> fail ()),
+    KLong "real", Hnd1 (APair (',', AInt, APair (',', AInt, AInt)),
+      fun (i1, (i2, i3)) -> real_emin := i1; real_emax := i2; real_prec := i3),
     "<emin>,<emax>,<prec> set format used for real computations (e.g., -148,128,24 for float32)"
   ]
 
