@@ -26,8 +26,6 @@ module Base64
 
   let function char_eq : char = chr 61
 
-  (* **** *)
-
   predicate valid_b64_char (c: char) =
     65 <= code c <= 90 || 97 <= code c <= 122 || 48 <= code c <= 57 ||
     code c = 43 || code c = 47
@@ -79,7 +77,6 @@ module Base64
       if length s % 3 = 2 then 1 else 0
 
   predicate encoding (s1 s2: string) =
-    (* (length s1 = div (length s2 * 3) 4 - get_pad s2) && *)
     length s2 = div (length s1 + calc_pad s1) 3 * 4 &&
     ( forall i. 0 <= i < div (length s2) 4 ->
       let b1,b2,b3,b4 = s2[4*i], s2[4*i+1],s2[4*i+2], s2[4*i+3] in
@@ -89,21 +86,20 @@ module Base64
       (i * 3 + 2 < length s1 ->
         s1[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4))) &&
     ( forall i. 0 <= i < length s2 - get_pad s2 -> valid_b64_char s2[i] ) &&
-    (* ( forall i. length s2 - get_pad s2 <= i < length s2 -> s2[i] = char_eq ) && *)
     ( get_pad s2 = 1 -> mod (b642int s2[length s2 - 2]) 4  = 0 /\
                        s2[length s2 - 1] = char_eq ) &&
     ( get_pad s2 = 2 -> mod (b642int s2[length s2 - 3]) 16 = 0 /\
                        s2[length s2 - 2] = s2[length s2 - 1] = char_eq ) &&
     calc_pad s1 = get_pad s2
 
-  (* lemma calc_pad_get_pad: forall s1 s2. encoding s1 s2 -> calc_pad s1 = get_pad s2 *)
-
   predicate valid_b64 (s: string) =
     (mod (length s) 4 = 0) &&
     (forall i. 0 <= i < length s - get_pad s -> valid_b64_char s[i]) &&
-    (get_pad s = 1 -> mod (b642int s[length s - 2]) 4  = 0) &&
-    (get_pad s = 2 -> mod (b642int s[length s - 3]) 16 = 0) &&
-    (forall i. length s - get_pad s <= i < length s -> s[i] = char_eq)
+    (get_pad s = 1 -> mod (b642int s[length s - 2]) 4  = 0 &&
+                      s[length s - 1] = char_eq) &&
+    (get_pad s = 2 -> mod (b642int s[length s - 3]) 16 = 0 &&
+                      s[length s - 2] = char_eq &&
+                      s[length s - 1] = char_eq)
 
   let lemma encoding_valid_b64 (s1 s2: string)
     requires { encoding s1 s2 }
@@ -128,8 +124,7 @@ module Base64
   let lemma decode_unique (s1 s2 s3: string)
     requires { encoding s1 s2 /\ encoding s3 s2 }
     ensures  { s1 = s3 }
-  = (* assert { length s1 = length s3 }; *)
-    assert { forall i. 0 <= i < div (length s1 + calc_pad s1) 3 ->
+  = assert { forall i. 0 <= i < div (length s1 + calc_pad s1) 3 ->
       s1[i*3] = s3[i*3] &&
       (i * 3 + 1 < length s1 -> s1[i*3+1] = s3[i*3+1]) &&
       (i * 3 + 2 < length s1 -> s1[i*3+2] = s3[i*3+2]) };
@@ -139,13 +134,6 @@ module Base64
     requires { encoding s1 s2 /\ encoding s1 s3 }
     ensures  { s2 = s3 }
   = assert { length s2 = length s3 };
-
-      (*
-                                a1 = chr (b642int s2[4*i] * 4 + div (b642int s2[4*i+1]) 16) &&
-      (i * 3 + 1 < length s1 -> a2 = chr (mod (b642int s2[4*i+1]) 16 * 16 + div (b642int s2[4*i+2]) 4)) &&
-      (i * 3 + 2 < length s1 -> a3 = chr (mod (b642int s2[4*i+2]) 4  * 64 + b642int s2[4*i+3])) *)
-
-
     assert { forall i. 0 <= i < div (length s2) 4 ->
         let a1, a2, a3 = s1[i*3], s1[i*3+1], s1[i*3+2] in
         s2[i*4] = int2b64 (div (code a1)  4) &&
@@ -259,25 +247,6 @@ module Base64
       assert { forall j. 0 <= j < length r - 3 -> r[j] =  (r at L)[j]}
     done;
     StringBuffer.sub r 0 (length r - get_pad s)
-
-(*
-  predicate valid_base64 string
-
-  predicate encoding string string
-    (encoding s1 s2 -> valid_base64 s2)
-
-  encode s
-    ensures encoding s result
-  decode s
-    requires valid_base64
-    ensures  encoding result s
-
-  lemma decode_unique:
-    encoding s1 s2 -> encoding s3 s2 -> s1 = s3
-  lemma encode_unique:
-    encoding s1 s2 -> encoding s1 s3 -> s2 = s3
-*)
-
 
   let decode_encode (s: string) : unit
   = let s1 = encode s in
