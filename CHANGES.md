@@ -21,9 +21,8 @@ Standard library
       - `RegExpr`: regular expressions
 
 Language
-  :x: the type `string` is a new built-in type. string literals can be
-    given between double-quotes.  See documentation Section 6.1
-    String operations are defined in the library `string.String`
+  * the type `string` is a new built-in type; string literals can be
+    given between double-quotes; see documentation Section 6.1 :x:
   * it is now possible to give a name to preconditions and assertions;
     `requires Foo { a = 3 }` sets the attribute `[@hyp_name:Foo]`, which tries
     to give the name `Foo` to the corresponding hypothesis after introduction
@@ -58,7 +57,7 @@ API
     the file format :x:
   * ITP constructor `File_contents` has a new boolean argument for
     interpretation of the file in the IDE as `read_only` :x:
-  * New ITP constructor `Ident_notif_loc`
+  * new ITP constructor `Ident_notif_loc` :x:
   * ITP constructor `Get_first_unproven_node` now takes a heuristic name
     argument :x:
 
@@ -78,7 +77,7 @@ Transformations
     `meta reflection val foo` :x:
   * `remove` and `bisect` should not raise unnecessary popups anymore
   * added `remove_rec`
-  * the attribute `inline:trivial` can be added on definitions to force its
+  * attribute `inline:trivial` can be put on definitions to force their
     inlining by the transformation `inline_trivial`
 
 IDE
@@ -93,14 +92,14 @@ IDE
   * strategies can now be defined using `%t` (resp. `%m`) to call a prover with
     the default timelimit (resp. memlimit)
   * added minimal search menu
-  * A merlin-like feature to find the ident located under the cursor has been
+  * a merlin-like feature to find the identifier located under the cursor has been
     added in the Edit menu.
-  * Read only file can now be displayed and removed by right clicking on their
+  * read-only files can now be displayed and removed by right-clicking on their
     tab titles
-  * Colors for error can now be edited in the why3.conf more precisely
-  * Most of the preferences can now be changed for the current session
-  * Ctrl-Down/Ctrl-Up are mapped to more straightforward moves. The former
-    movement can be triggered with Ctrl-Left/Ctrl-Right
+  * colors for error can now be edited in why3.conf more precisely
+  * most of the preferences can now be changed for the current session
+  * Ctrl-Down/Ctrl-Up are mapped to more straightforward moves; the former
+    movements can be triggered with Ctrl-Left/Ctrl-Right
 
 Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq
