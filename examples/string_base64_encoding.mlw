@@ -89,7 +89,11 @@ module Base64
       (i * 3 + 2 < length s1 ->
         s1[i*3+2] = chr (mod (b642int b3) 4 * 64 + b642int b4))) &&
     ( forall i. 0 <= i < length s2 - get_pad s2 -> valid_b64_char s2[i] ) &&
-    ( forall i. length s2 - get_pad s2 <= i < length s2 -> s2[i] = char_eq ) &&
+    (* ( forall i. length s2 - get_pad s2 <= i < length s2 -> s2[i] = char_eq ) && *)
+    ( get_pad s2 = 1 -> mod (b642int s2[length s2 - 2]) 4  = 0 /\
+                       s2[length s2 - 1] = char_eq ) &&
+    ( get_pad s2 = 2 -> mod (b642int s2[length s2 - 3]) 16 = 0 /\
+                       s2[length s2 - 2] = s2[length s2 - 1] = char_eq ) &&
     calc_pad s1 = get_pad s2
 
   (* lemma calc_pad_get_pad: forall s1 s2. encoding s1 s2 -> calc_pad s1 = get_pad s2 *)
@@ -97,6 +101,8 @@ module Base64
   predicate valid_b64 (s: string) =
     (mod (length s) 4 = 0) &&
     (forall i. 0 <= i < length s - get_pad s -> valid_b64_char s[i]) &&
+    (get_pad s = 1 -> mod (b642int s[length s - 2]) 4  = 0) &&
+    (get_pad s = 2 -> mod (b642int s[length s - 3]) 16 = 0) &&
     (forall i. length s - get_pad s <= i < length s -> s[i] = char_eq)
 
   let lemma encoding_valid_b64 (s1 s2: string)
@@ -157,11 +163,18 @@ module Base64
     };
     assert { forall i. 0 <= i < div (length s3) 4 ->
         let a1, a2, a3 = s1[i*3], s1[i*3+1], s1[i*3+2] in
-        s3[i*4]   = int2b64 (div (code a1)  4) &&
-        s3[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
-        s3[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
-        s3[i*4+3] = int2b64 (mod (code a3) 64)
-
+        s3[i*4] = int2b64 (div (code a1)  4) &&
+        if i * 3 + 1 < length s1 then
+        ( s3[i*4+1] = int2b64 (mod (code a1) 4 * 16 + div (code a2) 16) &&
+          ( if i * 3 + 2 < length s1 then
+              s3[i*4+2] = int2b64 (mod (code a2) 16 * 4 + div (code a3) 64) &&
+              s3[i*4+3] = int2b64 (mod (code a3) 64)
+            else (s3[i*4+2] = int2b64 (mod (code a2) 16 * 4) && s3[i*4+3] = char_eq)
+          )
+        )      else
+        (    s3[i*4+1] = int2b64 (mod (code a1) 4 * 16)
+          && s3[i*4+2] = char_eq
+          && s3[i*4+3] = char_eq)
     };
     assert { forall i. 0 <= i < div (length s2) 4 ->
                 s2[i*4]   = s3[i*4]   /\ s2[i*4+1] = s3[i*4+1]
