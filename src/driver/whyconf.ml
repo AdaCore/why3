@@ -1024,6 +1024,8 @@ module NewArgs = struct
   let opt_config = ref None
   let opt_extra = ref []
   let opt_loadpath = ref []
+  let opt_stdlib = ref true
+  let opt_load_default_plugins = ref true
 
   let common_options =
     let open Getopt in
@@ -1033,6 +1035,10 @@ module NewArgs = struct
       "<file> read additional configuration from <file>";
       Key ('L', "library"), Hnd1 (AString, fun s -> opt_loadpath := s :: !opt_loadpath),
       "<dir> add <dir> to the library search path";
+      KLong "no-stdlib", Hnd0 (fun () -> opt_stdlib := false),
+      " do not add the standard library to the loadpath";
+      KLong "no-load-default-plugins", Hnd0 (fun () -> opt_load_default_plugins := false),
+      " do not load the plugins from the standard path";
     Debug.NewArgs.desc_debug;
     Debug.NewArgs.desc_debug_all;
     Debug.NewArgs.desc_debug_list; ]
@@ -1051,12 +1057,17 @@ module NewArgs = struct
 
   let complete_initialization () =
     let base_config = read_config !opt_config in
-    let config = List.fold_left merge_config base_config !opt_extra in
+    let config = { base_config with conf_file = "" } in
+    let config = List.fold_left merge_config config !opt_extra in
+    let apply_not_default f o b = if !o then b else f !o b in
+    let config = apply_not_default set_stdlib opt_stdlib config in
+    let config = apply_not_default set_load_default_plugins opt_load_default_plugins config in
     let main = get_main config in
     load_plugins main;
     Debug.NewArgs.set_flags_selected ();
     if Debug.NewArgs.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
+    let config = if config.main.load_default_config then add_builtin_provers config else config in
     config, base_config, Env.create_env lp
 
   let initialize ?(extra_help="") options default usage =
