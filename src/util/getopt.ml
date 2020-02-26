@@ -18,6 +18,7 @@ type _ arg =
   | AInt : int arg
   | AString : string arg
   | ASymbol : string list -> string arg
+  | APair : char * 'a arg * 'b arg -> ('a * 'b) arg
 
 type handler =
   | Hnd0 of (unit -> unit)
@@ -81,18 +82,27 @@ let rec find_long opts key =
   | (Key (_, s), h, _) :: _ when s = key -> h
   | _ :: l -> find_long l key
 
-let parse_kind key (type a) (k:a arg) (f:a -> unit) arg i =
+let rec parse_kind : type a. string -> a arg -> (a -> unit) -> string -> int -> unit =
+  fun key k f arg i ->
   let s = String.sub arg i (String.length arg - i) in
+  let fail () = raise (GetoptFailure (sprintf "invalid %s argument '%s'" key s)) in
   match k with
   | AString -> f s
   | ASymbol l ->
       if List.mem s l then f s
-      else raise (GetoptFailure (sprintf "invalid %s argument '%s'" key s))
+      else fail ()
+  | APair (c, k1, k2) ->
+      begin match String.index_from arg i c with
+      | j ->
+          parse_kind key k1
+            (fun a1 -> parse_kind key k2 (fun a2 -> f (a1, a2)) arg (j + 1))
+            (String.sub arg i (j - i)) 0
+      | exception Not_found -> fail ()
+      end
   | AInt ->
     match int_of_string s with
     | i -> f i
-    | exception Failure _ ->
-        raise (GetoptFailure (sprintf "invalid %s argument '%s'" key s))
+    | exception Failure _ -> fail ()
 
 let parse_short opts arg =
   let len = String.length arg in

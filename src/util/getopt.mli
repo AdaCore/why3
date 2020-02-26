@@ -41,6 +41,7 @@ type _ arg =
   | AInt : int arg
   | AString : string arg
   | ASymbol : string list -> string arg
+  | APair : char * 'a arg * 'b arg -> ('a * 'b) arg
 
 type handler =
   | Hnd0 of (unit -> unit)
