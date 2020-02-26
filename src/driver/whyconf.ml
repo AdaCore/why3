@@ -955,70 +955,8 @@ let provers_from_detected_provers =
 
 let add_builtin_provers config = !provers_from_detected_provers config
 
-let load_default_config_if_needed config = if config.main.load_default_config then add_builtin_provers config else config
-
-module Args = struct
-  let opt_config = ref None
-  let opt_extra = ref []
-  let opt_loadpath = ref []
-  let opt_help = ref false
-  let opt_stdlib = ref true
-  let opt_load_default_plugins = ref true
-
-  let common_options_head = [
-    "-C", Arg.String (fun s -> opt_config := Some s),
-        "<file> read configuration from <file>";
-    "--config", Arg.String (fun s -> opt_config := Some s),
-        " same as -C";
-    "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-        "<file> read additional configuration from <file>";
-    "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-        "<dir> add <dir> to the library search path";
-    "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-        " same as -L";
-    "--no-stdlib", Arg.Clear opt_stdlib,
-    " do not add the standard library to the loadpath";
-    "--no-load-default-plugins", Arg.Clear opt_load_default_plugins,
-    " do not load the plugins from the standard path";
-    Debug.Args.desc_debug;
-    Debug.Args.desc_debug_all;
-    Debug.Args.desc_debug_list; ]
-
-  let common_options_tail = [
-    "-h", Arg.Set opt_help, " print this list of options";
-    "-help", Arg.Set opt_help, "";
-    "--help", Arg.Set opt_help, " same as -h"; ]
-
-  let align_options options =
-    Arg.align (common_options_head @ options @ common_options_tail)
-
-  let initialize ?(extra_help=Format.pp_print_newline) options default usage =
-    let options = align_options options in
-    Arg.parse options default usage;
-    if !opt_help then begin
-      Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
-      exit 0
-    end;
-    Debug.Args.set_flags_selected ~silent:true ();
-    let base_config = read_config !opt_config in
-    let config = { base_config with conf_file = "" } in
-    let config = List.fold_left merge_config config !opt_extra in
-    let apply_not_default f o b = if !o then b else f !o b in
-    let config = apply_not_default set_stdlib opt_stdlib config in
-    let config = apply_not_default set_load_default_plugins opt_load_default_plugins config in
-    let main = get_main config in
-    load_plugins main;
-    Debug.Args.set_flags_selected ();
-    if Debug.Args.option_list () then exit 0;
-    let lp = List.rev_append !opt_loadpath (loadpath main) in
-    let config = load_default_config_if_needed config in
-    config, base_config, Env.create_env lp
-
-  let exit_with_usage ?(exit_code=1) ?(extra_help=Format.pp_print_newline) options usage =
-    let options = align_options options in
-    Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
-    exit exit_code
-end
+let load_default_config_if_needed config =
+  if config.main.load_default_config then add_builtin_provers config else config
 
 module NewArgs = struct
   let opt_config = ref None
@@ -1056,6 +994,7 @@ module NewArgs = struct
       options
 
   let complete_initialization () =
+    Debug.Args.set_flags_selected ~silent:true ();
     let base_config = read_config !opt_config in
     let config = { base_config with conf_file = "" } in
     let config = List.fold_left merge_config config !opt_extra in
@@ -1067,7 +1006,7 @@ module NewArgs = struct
     Debug.NewArgs.set_flags_selected ();
     if Debug.NewArgs.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
-    let config = if config.main.load_default_config then add_builtin_provers config else config in
+    let config = load_default_config_if_needed config in
     config, base_config, Env.create_env lp
 
   let initialize ?(extra_help="") options default usage =

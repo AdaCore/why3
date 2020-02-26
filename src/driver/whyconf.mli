@@ -282,21 +282,6 @@ val set_family  : config -> string -> Rc.family  -> config
 
 (** Common command line options *)
 
-module Args : sig
-
-  val initialize :
-    ?extra_help : (Format.formatter -> unit -> unit) ->
-    (string * Arg.spec * string) list ->
-    (string -> unit) -> string ->
-    config * config * Env.env
-
-  val exit_with_usage :
-    ?exit_code : int ->
-    ?extra_help : (Format.formatter -> unit -> unit) ->
-    (string * Arg.spec * string) list -> string -> 'a
-
-end
-
 module NewArgs : sig
 
   val initialize :
