@@ -266,25 +266,21 @@ let pluginsdir m = Filename.concat m.libdir "plugins"
 
 let plugins_auto_detection main =
   let dir = pluginsdir main in
-  let plugins =
-    if Sys.file_exists dir then
-      let files = Sys.readdir dir in
-      let fold acc p =
-        if p.[0] == '.' then acc else
-          let p = Filename.concat dir p in
-          (Filename.chop_extension p)::acc
-      in
-      Array.fold_left fold [] files
+  let ext = if Dynlink.is_native then ".cmxs" else ".cmo" in
+  let files = try Sys.readdir dir with Sys_error _ -> [||] in
+  let fold acc p =
+    let open Filename in
+    if extension p = ext then
+      concat dir (chop_extension p) :: acc
     else
-      []
-  in
-  plugins
+      acc in
+  Array.fold_left fold [] files
 
 let load_plugins main =
   let load x =
     try Plugin.load x
     with exn ->
-      Format.eprintf "%s can't be loaded: %a@." x
+      Format.eprintf "%s cannot be loaded: %a@." x
         Exn_printer.exn_printer exn in
   if main.load_default_plugins then List.iter load (plugins_auto_detection main);
   List.iter load main.plugins
