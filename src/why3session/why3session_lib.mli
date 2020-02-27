@@ -12,9 +12,7 @@
 open Why3
 open Whyconf
 
-val verbose: Debug.flag
-
-type spec_list = (Arg.key * Arg.spec * Arg.doc) list
+type spec_list = Getopt.opt list
 
 type cmd =
     {
@@ -29,20 +27,6 @@ type cmd =
 (** {2 Anonymous argument} *)
 val iter_files : (string -> unit) -> unit
 val anon_fun : Arg.anon_fun
-
-(** {2 Spec for version, debug} *)
-(* val simple_spec : spec_list *)
-
-(*
-val read_simple_spec : unit -> bool
-(** return if we must exit *)
-*)
-
-(** {2 Spec for configuration, loadpath} *)
-val common_options : spec_list
-
-val read_env_spec : unit -> Env.env * Whyconf.config * bool
-(** read_simple_spec also *)
 
 val read_session : string -> Session_itp.session
 (** [read_session s] reads the session file [s] and returns a session structure (without
@@ -62,7 +46,7 @@ val provers_of_filter_prover : config -> filter_prover -> Why3.Whyconf.Sprover.t
 
 type filters
 
-val filter_spec : Getopt.opt list
+val filter_spec : spec_list
 
 val read_filter_spec : Whyconf.config -> filters * bool
 

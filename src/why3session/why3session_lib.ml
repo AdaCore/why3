@@ -14,10 +14,7 @@ open Why3
 module S = Session_itp
 module C = Whyconf
 
-let verbose = Debug.register_info_flag "verbose"
-    ~desc:"Increase verbosity."
-
-type spec_list = (Arg.key * Arg.spec * Arg.doc) list
+type spec_list = Getopt.opt list
 
 type cmd =
     {
@@ -30,46 +27,6 @@ type cmd =
 let files = Queue.create ()
 let iter_files f = Queue.iter f files
 let anon_fun (f:string) = Queue.add f files
-
-let read_simple_spec () =
-  Debug.Args.set_flags_selected ();
-  Debug.Args.option_list ()
-
-let opt_config = ref None
-let opt_loadpath = ref []
-let opt_extra = ref []
-
-let common_options = [
-  "-C", Arg.String (fun s -> opt_config := Some s),
-      "<file> read configuration from <file>";
-  "--config", Arg.String (fun s -> opt_config := Some s),
-      "<file> same as -C";
-  "--extra-config", Arg.String (fun s -> opt_extra := !opt_extra @ [s]),
-      "<file> read additional configuration from <file>";
-  "-L", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> add <dir> to the library search path";
-  "--library", Arg.String (fun s -> opt_loadpath := s :: !opt_loadpath),
-      "<dir> same as -L";
-  Debug.Args.desc_shortcut "verbose" "--verbose" "increase verbosity";
-  Debug.Args.desc_debug_list;
-  Debug.Args.desc_debug_all;
-  Debug.Args.desc_debug;
-]
-
-(* dead code
-let env_spec = common_options
-*)
-
-let read_env_spec () =
-  (* Configuration *)
-  let config = Whyconf.read_config !opt_config in
-  let config = List.fold_left Whyconf.merge_config config !opt_extra in
-  let main = Whyconf.get_main config in
-  Whyconf.load_plugins main;
-  let loadpath = (Whyconf.loadpath (Whyconf.get_main config))
-    @ List.rev !opt_loadpath in
-  let env = Env.create_env loadpath in
-  env,config,read_simple_spec ()
 
 let read_session fname =
   let q = Queue.create () in
@@ -252,8 +209,9 @@ let session_iter_proof_attempt_by_filter s filters f =
 let opt_force_obsolete = ref false
 
 let force_obsolete_spec =
-  ["-F", Arg.Set opt_force_obsolete,
-   " transform obsolete session"]
+  let open Getopt in
+  [ KShort 'F', Hnd0 (fun () -> opt_force_obsolete := true),
+    " transform obsolete session" ]
 
 
 

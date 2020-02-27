@@ -22,31 +22,25 @@ open Session_itp
 open Wstdlib
 
 let opt_print_provers = ref false
-let opt_print_edited = ref false
-let opt_tree_print = ref false
 let opt_stats_print = ref false
 let opt_hist_print = ref false
 let opt_project_dir = ref false
 let opt_print0 = ref false
 
 let spec =
-  ("--provers", Arg.Set opt_print_provers,
-   " provers used in the session" ) ::
-  ("--edited-files", Arg.Set opt_print_edited,
-   " edited proof scripts in the session" ) ::
-  ("--stats", Arg.Set opt_stats_print,
-   " print various proofs statistics" ) ::
-  ("--graph", Arg.Set opt_hist_print,
-   " print a graph of the total time needed for \
-     proving a given number of goals for each provers" ) ::
-  ("--tree", Arg.Set opt_tree_print,
-   " session contents as a tree in textual format" ) ::
-  ("--dir", Arg.Set opt_project_dir,
-   " print the directory of the session" ) ::
-  ("--print0", Arg.Set opt_print0,
-   " use the null character instead of newline" ) ::
-    common_options
-
+  let open Getopt in
+  [ KLong "provers", Hnd0 (fun () -> opt_print_provers := true),
+    " print provers used in the session";
+    KLong "stats", Hnd0 (fun () -> opt_stats_print := true),
+    " print various proofs statistics";
+    KLong "graph", Hnd0 (fun () -> opt_hist_print := true),
+    " print a graph of the total time needed by each prover \
+      depending on the number of goals";
+    KLong "dir", Hnd0 (fun () -> opt_project_dir := true),
+    " print the directory of the session";
+    KLong "print0", Hnd0 (fun () -> opt_print0 := true),
+    " use the null character instead of newline";
+  ]
 
 type proof_stats =
     { mutable nb_root_goals : int;
@@ -354,22 +348,6 @@ let run_one stats r0 r1 fname =
     printf "%a@."
       (Pp.print_iter1 Sprover.iter sep print_prover)
       (get_used_provers ses);
-  if !opt_print_edited then begin
-      failwith "option print_edited non implemented" (* TODO *)
-(*    session_iter_proof_attempt
-      (fun pr ->
-        Opt.iter (fun s -> printf "%s%a" s sep ())
-          (get_edited_as_abs session pr))
-      session;
- *)
-    end;
-  if !opt_tree_print then
-    begin
-      failwith "option print_tree not implemented"
-(*
-      printf "%a@." print_session ses;
- *)
-    end;
   if !opt_stats_print || !opt_hist_print then
     begin
       (* fill_prover_data stats session; *)
@@ -444,8 +422,7 @@ let print_hist stats =
 (****** run on all files  ******)
 
 let run () =
-  let _env,_config,should_exit1 = read_env_spec () in
-  if should_exit1 then exit 1;
+  let _,_,_ = Whyconf.Args.complete_initialization () in
   let stats = new_proof_stats () in
   let r0 = ref [] and r1 = ref [] in
   iter_files (run_one stats r0 r1);

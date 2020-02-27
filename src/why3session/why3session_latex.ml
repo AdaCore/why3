@@ -29,20 +29,16 @@ let add_element s =
   opt_elements := Some l
 
 let spec =
-  ("-style",
-   Arg.Set_int opt_style,
-   "<n> set output style (1 or 2, default 1)") ::
-  ("-o",
-   Arg.Set_string opt_output_dir,
-   "<dir> where to produce LaTeX files (default: session dir)") ::
-  ("-e",
-   Arg.String add_element,
-   "<path> produce a table for the element denoted by <path>") ::
-  ("-longtable",
-   Arg.Set opt_longtable,
-   " use 'longtable' environment instead of 'tabular'") ::
-  common_options
-
+  let open Getopt in
+  [ KLong "style", Hnd1 (AInt, fun i -> opt_style := i),
+    "<n> set output style (1 or 2, default 1)";
+    KShort 'o', Hnd1 (AString, fun s -> opt_output_dir := s),
+    "<dir> set output directory (default: session dir)";
+    KShort 'e', Hnd1 (AString, add_element),
+    "<path> produce a table for the given element";
+    KLong "longtable", Hnd0 (fun () -> opt_longtable := true),
+    " use 'longtable' environment instead of 'tabular'"
+  ]
 
 (* Statistics in LaTeX*)
 
@@ -456,8 +452,7 @@ let run_one fname =
   print_latex_statistics !opt_style (table ()) dir ses
 
 let run () =
-  let _,_,should_exit1 = read_env_spec () in
-  if should_exit1 then exit 1;
+  let _,_,_ = Whyconf.Args.complete_initialization () in
   iter_files run_one
 
 
