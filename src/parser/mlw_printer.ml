@@ -639,16 +639,8 @@ and pp_type_decl fmt d =
   let pp_def fmt = function
     | TDalias pty ->
         pp_pty fmt pty
-    | TDalgebraic variants ->
-        let pp_param fmt (_, id_opt, ghost, pty) =
-          let ghost = if ghost then "ghost " else "" in
-          match id_opt with
-          | None -> fprintf fmt "%s%a" ghost pp_pty pty
-          | Some id -> fprintf fmt "(%s%a : %a)" ghost pp_id id pp_pty pty in
-        let pp_variant fmt (_, id, params) =
-          fprintf fmt "%a%a" pp_id id (pp_print_opt_list ~prefix:" " pp_param) params in
-        let pp_variants = pp_print_list ~pp_sep:(pp_sep "@,| ") pp_variant in
-        fprintf fmt "@,@[<v 2>  | %a@]" pp_variants variants
+    | TDrecord [] when d.td_vis = Abstract && d.td_mut = false ->
+        ()
     | TDrecord fs ->
         let pp_vis fmt vis =
           pp_print_string fmt
@@ -664,16 +656,26 @@ and pp_type_decl fmt d =
           let ghost = if f.f_ghost then "ghost " else "" in
           fprintf fmt "%s%s%a : %a" mutable_ ghost pp_id f.f_ident pp_pty f.f_pty in
         let pp_fields = pp_print_list ~pp_sep:(pp_sep " ;@,") pp_field in
-        fprintf fmt "%a%a{@,@[<v 2>  %a@]@,}%a" pp_vis d.td_vis pp_mut d.td_mut pp_fields fs pp_invariants d.td_inv
+        fprintf fmt " = %a%a{@,@[<v 2>  %a@]@,}%a" pp_vis d.td_vis pp_mut d.td_mut pp_fields fs pp_invariants d.td_inv
+    | TDalgebraic variants ->
+        let pp_param fmt (_, id_opt, ghost, pty) =
+          let ghost = if ghost then "ghost " else "" in
+          match id_opt with
+          | None -> fprintf fmt "%s%a" ghost pp_pty pty
+          | Some id -> fprintf fmt "(%s%a : %a)" ghost pp_id id pp_pty pty in
+        let pp_variant fmt (_, id, params) =
+          fprintf fmt "%a%a" pp_id id (pp_print_opt_list ~prefix:" " pp_param) params in
+        let pp_variants = pp_print_list ~pp_sep:(pp_sep "@,| ") pp_variant in
+        fprintf fmt " = @,@[<v 2>  | %a@]" pp_variants variants
     | TDrange (i1, i2) ->
-        fprintf fmt "< range %s..%s >" (BigInt.to_string i1) (BigInt.to_string i2)
+        fprintf fmt " = < range %s..%s >" (BigInt.to_string i1) (BigInt.to_string i2)
     | TDfloat (i1, i2) ->
-        fprintf fmt "< float %d..%d >" i1 i2 in
+        fprintf fmt " = < float %d..%d >" i1 i2 in
   let pp_wit fmt = function
     | [] -> ()
     | wits ->
         fprintf fmt " by { %a }" (pp_fields pp_expr expr_closed) wits in
-  fprintf fmt "%a%a = %a%a"
+  fprintf fmt "%a%a%a%a"
     pp_id d.td_ident
     (pp_print_opt_list ~prefix:" " pp_id) d.td_params
     pp_def d.td_def
