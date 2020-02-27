@@ -54,7 +54,7 @@ let spec =
     KLong "list-prover-families", Hnd0 (fun () -> opt_list_prover_families := true),
     " list known prover families";
     KLong "install-plugin", Hnd1 (AString, add_plugin),
-    "<file> install a plugin to the actual libdir";
+    "<file> copy a plugin to the current library directory";
     KLong "dont-save", Hnd0 (fun () -> save := false),
     " do not modify the config file";
     Debug.NewArgs.desc_debug_list;
