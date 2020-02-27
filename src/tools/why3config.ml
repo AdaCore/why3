@@ -57,9 +57,9 @@ let spec =
     "<file> copy a plugin to the current library directory";
     KLong "dont-save", Hnd0 (fun () -> save := false),
     " do not modify the config file";
-    Debug.NewArgs.desc_debug_list;
-    Debug.NewArgs.desc_debug_all;
-    Debug.NewArgs.desc_debug;
+    Debug.Args.desc_debug;
+    Debug.Args.desc_debug_all;
+    Debug.Args.desc_debug_list;
   ]
 
 let usage () =
@@ -121,7 +121,7 @@ let main () =
   Autodetection.is_config_command := true;
 
   (* Debug flag *)
-  Debug.NewArgs.set_flags_selected ();
+  Debug.Args.set_flags_selected ();
 
   if !opt_list_prover_families then begin
     opt_list := true;
@@ -130,7 +130,7 @@ let main () =
       (List.sort String.compare (Autodetection.list_prover_families ()))
   end;
 
-  opt_list := Debug.NewArgs.option_list () || !opt_list;
+  opt_list := Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
   (* Main *)

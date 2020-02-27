@@ -125,9 +125,9 @@ let option_list =
     " print selected theories";
     KLong "print-namespace", Hnd0 (fun () -> opt_print_namespace := true),
     " print namespaces of selected theories";
-    Debug.NewArgs.desc_shortcut
+    Debug.Args.desc_shortcut
       "parse_only" (KLong "parse-only") " stop after parsing";
-    Debug.NewArgs.desc_shortcut
+    Debug.Args.desc_shortcut
       "type_only" (KLong "type-only") " stop after type checking";
     Termcode.opt_extra_expl_prefix
   ]

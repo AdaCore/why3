@@ -977,9 +977,10 @@ module Args = struct
       " do not add the standard library to the loadpath";
       KLong "no-load-default-plugins", Hnd0 (fun () -> opt_load_default_plugins := false),
       " do not load the plugins from the standard path";
-    Debug.NewArgs.desc_debug;
-    Debug.NewArgs.desc_debug_all;
-    Debug.NewArgs.desc_debug_list; ]
+      Debug.Args.desc_debug;
+      Debug.Args.desc_debug_all;
+      Debug.Args.desc_debug_list;
+    ]
 
   let do_usage options header footer =
     Printf.printf "%s\n%s" header (Getopt.format options);
@@ -1003,8 +1004,8 @@ module Args = struct
     let config = apply_not_default set_load_default_plugins opt_load_default_plugins config in
     let main = get_main config in
     load_plugins main;
-    Debug.NewArgs.set_flags_selected ();
-    if Debug.NewArgs.option_list () then exit 0;
+    Debug.Args.set_flags_selected ();
+    if Debug.Args.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
     let config = load_default_config_if_needed config in
     config, base_config, Env.create_env lp
