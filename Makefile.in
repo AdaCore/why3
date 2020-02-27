@@ -1809,9 +1809,6 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 	@echo ""
 	@echo "=== Checking extraction ==="
 	$(MAKE) test-ocaml-extraction
-# desactivé car requiert findlib
-# if test -d examples/runstrat ; then \
-#  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
 
 bench-api:
 	@echo ""
@@ -1949,17 +1946,6 @@ test-ce.opt: examples/use_api/counterexample.ml lib/why3/why3.cmxa
 	|| (rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz; \
 	printf "Test of Why3 API calls for counterexamples failed. Please fix it"; exit 2)
 	@rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz
-
-#only test the compilation of runstrat
-test-runstrat.byte: lib/why3/why3.cma lib/why3/META
-	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat clean
-	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat byte
-
-test-runstrat.opt: lib/why3/why3.cmxa lib/why3/META
-	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat clean
-	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat opt
-
-test-runstrat: test-runstrat.@OCAMLBEST@
 
 test-ocaml-extraction: bin/why3.opt bin/why3extract.opt
 	@echo "driver ocaml64"
