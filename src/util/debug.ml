@@ -122,13 +122,12 @@ module Args = struct
   let add_flag s = Queue.add s opt_list_flags
 
   let desc_shortcut flag option desc =
-    let set_flag () = add_flag flag in
     let desc = Printf.sprintf "%s (same as --debug=%s)" desc flag in
-    (option, Hnd0 set_flag, desc)
+    (option, Hnd0 (fun () -> add_flag flag), desc)
 
   let desc_debug =
-    KLong "debug", Hnd1 (AString, add_flag),
-    "<flag> set a debug flag"
+    KLong "debug", Hnd1 (AList (',', AString), fun l -> List.iter add_flag l),
+    "<flag>,... set some debug flags"
 
   let opt_debug_all = ref false
 
