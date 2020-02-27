@@ -53,7 +53,7 @@ let unset_flag s = s.flag_value <- false
 let toggle_flag s = s.flag_value <- not s.flag_value
 
 let () = Exn_printer.register (fun fmt e -> match e with
-  | UnknownFlag s -> Format.fprintf fmt "unknown debug flag `%s'@." s
+  | UnknownFlag s -> Format.fprintf fmt "unknown debug flag '%s'" s
   | _ -> raise e)
 
 let stack_trace = register_info_flag "stack_trace"
