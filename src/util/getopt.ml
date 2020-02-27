@@ -19,6 +19,7 @@ type _ arg =
   | AString : string arg
   | ASymbol : string list -> string arg
   | APair : char * 'a arg * 'b arg -> ('a * 'b) arg
+  | AList : char * 'a arg -> 'a list arg
 
 type handler =
   | Hnd0 of (unit -> unit)
@@ -99,6 +100,19 @@ let rec parse_kind : type a. string -> a arg -> (a -> unit) -> string -> int -> 
             (String.sub arg i (j - i)) 0
       | exception Not_found -> fail ()
       end
+  | AList (c, k) ->
+      let rec aux i acc =
+        match String.index_from arg i c with
+        | j ->
+            parse_kind key k
+              (fun a -> aux (j + 1) (a :: acc))
+              (String.sub arg i (j - i)) 0
+        | exception Not_found ->
+            if i = String.length arg then
+              f (List.rev acc)
+            else
+              parse_kind key k (fun a -> f (List.rev (a :: acc))) arg i in
+      aux i []
   | AInt ->
     match int_of_string s with
     | i -> f i
