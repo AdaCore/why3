@@ -284,6 +284,8 @@ val set_family  : config -> string -> Rc.family  -> config
 
 module Args : sig
 
+  val all_options : Getopt.opt list -> string -> string -> Getopt.opt list
+
   val initialize :
     ?extra_help:string ->
     Getopt.opt list ->
