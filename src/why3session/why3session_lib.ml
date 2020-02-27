@@ -129,54 +129,49 @@ type filter_three = | FT_Yes | FT_No | FT_All
 
 let opt_filter_archived = ref FT_No
 let opt_filter_obsolete = ref FT_All
-let opt_filter_verified_goal = ref FT_All
 let opt_filter_verified = ref FT_All
 
 let add_filter_three r = function
-  | "no" -> r := FT_No
-  | "yes" -> r := FT_Yes
-  | "all" -> r := FT_All
+  | Some "no" -> r := FT_No
+  | Some "yes" | None -> r := FT_Yes
+  | Some "all" -> r := FT_All
   | _ -> assert false
 
-let opt_three r = Arg.Symbol (["yes";"no";"all"], add_filter_three r)
+let opt_three r =
+  let open Getopt in
+  HndOpt (ASymbol ["yes";"no";"all"], add_filter_three r)
 
 let opt_status = ref []
 
+let status_filter x =
+  let open Call_provers in
+  match x with
+  | "valid" -> Valid
+  | "invalid" -> Invalid
+  | "highfailure" -> HighFailure
+  | _ -> assert false
+
 let filter_spec =
-  ["--filter-prover", Arg.String add_filter_prover,
-   " [name,version[,alternative]|id] \
-the proof containing this prover are selected";
-   "--filter-obsolete", opt_three opt_filter_obsolete,
-   " no: only non-obsolete, yes: only obsolete (default all)";
-   "--filter-archived", opt_three opt_filter_archived,
-   " no: only unarchived, yes: only archived (default no)";
-   "--filter-verified-goal", opt_three opt_filter_verified_goal,
-   " no: only parent goal not verified, yes: only verified (default all)";
-   "--filter-verified", opt_three opt_filter_verified,
-   " no: only not verified, yes: only verified (default all)";
-   "--filter-highfailure",
-   Arg.Unit (fun () -> opt_status := Call_provers.HighFailure::!opt_status),
-   " filter the call that fail in an unexpeted way";
-   "--filter-valid",
-   Arg.Unit (fun () -> opt_status := Call_provers.Valid::!opt_status),
-   " filter the valid goals (can be obsolete)";
-   "--filter-invalid",
-   Arg.Unit (fun () -> opt_status := Call_provers.Invalid::!opt_status),
-   " filter the invalid goals";
-   "--filter-unknown",
-   Arg.String (fun s -> opt_status := Call_provers.Unknown s::!opt_status),
-   " filter when the prover reports it can't determine if the task is valid";
-   "--filter-failure",
-   Arg.String (fun s -> opt_status := Call_provers.Failure s::!opt_status),
-   " filter when the prover reports a failure";
-]
+  let open Getopt in
+  [ KLong "filter-prover", Hnd1 (AString, add_filter_prover),
+    "[<name>,<version>[,<alternative>]|<id>] select proof attempts containing this prover";
+    KLong "filter-obsolete", opt_three opt_filter_obsolete,
+    "[yes|no] select only (non-)obsolete goals";
+    KLong "filter-archived", opt_three opt_filter_archived,
+    "[yes|all] select only archived goals";
+    KLong "filter-verified", opt_three opt_filter_verified,
+    "[yes|no] select only (non-)verified goals";
+    KLong "filter-status",
+    Hnd1 (AList (',', ASymbol ["valid"; "invalid"; "highfailure"]),
+          fun l -> opt_status := List.map status_filter l),
+    "[valid|invalid|highfailure] select proofs attempts with the given status";
+  ]
 
 type filters =
     { provers : C.Sprover.t; (* if empty : every provers *)
       obsolete : filter_three;
       archived : filter_three;
       verified : filter_three;
-      verified_goal : filter_three;
       status : Call_provers.prover_answer list; (* if empty : any answer *)
     }
 
@@ -208,7 +203,6 @@ let read_filter_spec whyconf : filters * bool =
    obsolete = !opt_filter_obsolete;
    archived = !opt_filter_archived;
    verified = !opt_filter_verified;
-   verified_goal = !opt_filter_verified_goal;
    status = !opt_status;
   },!should_exit
 
@@ -231,13 +225,9 @@ let iter_proof_attempt_by_filter ses iter filters f =
 (*
   let f = three_value f filters.archived (fun a -> a.S.proof_archived) in
  *)
-  (* verified_goal *)
-  let f = three_value f filters.verified_goal
-    (fun a -> S.pn_proved ses a.S.parent) in
   (* verified *)
   let f = three_value f filters.verified
-    (fun p -> match p.S.proof_state with Some pr when pr.Call_provers.pr_answer = Call_provers.Valid ->
-                                      true | _ -> false) in
+    (fun a -> S.pn_proved ses a.S.parent) in
   (* status *)
   let f = if filters.status = [] then f else
       (fun a -> match a.S.proof_state with
@@ -258,8 +248,6 @@ let session_iter_proof_attempt_by_filter s filters f =
      S.session_iter_proof_attempt (fun _ x -> f x))
     filters f s
 
-
-let set_filter_verified_goal t = opt_filter_verified_goal := t
 
 let opt_force_obsolete = ref false
 

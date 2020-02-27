@@ -62,7 +62,7 @@ val provers_of_filter_prover : config -> filter_prover -> Why3.Whyconf.Sprover.t
 
 type filters
 
-val filter_spec : spec_list
+val filter_spec : Getopt.opt list
 
 val read_filter_spec : Whyconf.config -> filters * bool
 
@@ -79,7 +79,6 @@ val session_iter_proof_attempt_by_filter :
 
 (* quite ad-hoc *)
 type filter_three = | FT_Yes | FT_No | FT_All
-val set_filter_verified_goal : filter_three -> unit
 
 (** force obsolete *)
 val opt_force_obsolete : bool ref
