@@ -54,20 +54,29 @@ type opt = key * handler * doc
 
 exception GetoptFailure of string
 
-val parse_one : ?mm:bool -> opt list -> (string -> unit) -> string array -> int ref -> unit
-(** [parse_one ~mm opts extra args i] parses argument [args.(!i)] using
-    the option list [opts]. If the argument is not an option, it is passed
-    to [extra]. Index [i] is made to point to the next argument to be
-    parsed. When [mm] is true (default), the special argument [--] is
-    recognized and causes all the remaining arguments to be passed to
-    [extra]. The function raises [GetoptFailure] if the argument is either
-    an unrecognized option or its required value is missing. If the option
-    list is static, [parse_all] might be a better choice. *)
+val parse_one : opt list -> string array -> int -> int
+(** [parse_one opts args i] parses argument [args.(i)] using the option
+    list [opts]. If the argument is not an option (or if it is option
+    [--]), [i] is returned. Otherwise, the index of the next unparsed
+    argument is returned. The function raises [GetoptFailure] if the
+    argument is either an unrecognized option or its required value is
+    missing. If the option list does not change depending on parsed
+    options, [parse_many] might be a better choice. *)
 
-val parse_all : opt list -> (string -> unit) -> string array -> unit
-(** [parse_all opts extra args] parses all the arguments, starting from
-    [args.(1)], calling [parse_one] in turn. When [GetoptFailure] is raised,
-    the function calls [handle_exn] to terminate the program. *)
+val parse_many : opt list -> string array -> int -> int
+(** [parse_many opts args i] parses arguments from [args] starting at
+    index [i], calling [parse_one] in turn. It returns the index of the
+    first argument that is not an option. When [GetoptFailure] is raised,
+    the function calls [handle_exn] to terminate the program. If the
+    option list is static, [parse_all] might be a better choice. *)
+
+val parse_all : ?i:int -> opt list -> (string -> unit) -> string array -> unit
+(** [parse_all ~i opts extra args] parses all the arguments from [args],
+    starting from index [i] (1 by default), calling [parse_one] in turn.
+    When [GetoptFailure] is raised, the function calls [handle_exn] to
+    terminate the program. When an argument is not an option, it is passed
+    to [extra]. If an argument is [--], all the remaining arguments are
+    passed to [extra] in turn. *)
 
 val format : ?margin:int -> opt list -> string
 (** [format ~margin opts] turns the option list [opts] into a string that

@@ -82,18 +82,18 @@ let option_list =
    " display this help and exit") ::
   option_list
 
-let arg_index = ref 1
-
-let command sscmd =
-  let sscmd,args =
-    let cur = !arg_index in
+let command cur =
+  let sscmd, args =
+    let nargs = Array.length Sys.argv in
+    let sscmd = Sys.argv.(cur) in
+    let cur = cur + 1 in
     if sscmd = "help" then begin
-      if cur >= Array.length Sys.argv then do_usage ();
+      if cur = nargs then do_usage ();
       let sscmd = Sys.argv.(cur) in
       sscmd, ["--help"]
     end else begin
       let args = ref [] in
-      for i = 1 to Array.length Sys.argv - 1 do
+      for i = 1 to nargs - 1 do
         if i <> cur - 1 then args := Sys.argv.(i) :: !args;
       done;
       sscmd, List.rev !args
@@ -120,10 +120,8 @@ let command sscmd =
   Unix.execv cmd args
 
 let () = try
-  let nargs = Array.length Sys.argv in
-  while !arg_index < nargs do
-    Getopt.parse_one ~mm:false option_list command Sys.argv arg_index;
-  done;
+  let i = Getopt.parse_many option_list Sys.argv 1 in
+  if i < Array.length Sys.argv then command i;
   let config,_,_ = Args.complete_initialization () in
 
   (* listings *)
@@ -198,8 +196,6 @@ let () = try
   do_usage ();
 
   with
-  | Getopt.GetoptFailure _ as exn ->
-      Getopt.handle_exn Sys.argv exn
   | e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1

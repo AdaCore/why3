@@ -125,10 +125,7 @@ let parse_short opts arg =
       None
   | Hnd1 (k, f) ->
       if len = 2 then
-        let f = function
-          | None -> raise (GetoptFailure (sprintf "option -%c requires an argument" arg.[1]))
-          | Some x -> parse_kind arg k f x 0 in
-        Some f
+        Some (fun x -> parse_kind arg k f x 0)
       else
         let () = parse_kind (String.sub arg 0 2) k f arg 2 in
         None
@@ -150,33 +147,27 @@ let parse_long opts arg =
   | Hnd1 _, None ->
       raise (GetoptFailure (sprintf "option --%s requires an argument" key))
 
-let parse_one ?(mm=true) opts extra args i =
+let parse_one opts args i =
   let nargs = Array.length args in
-  assert (0 <= !i && !i < nargs);
-  let arg = args.(!i) in
-  incr i;
+  assert (0 <= i && i < nargs);
+  let arg = args.(i) in
   let len = String.length arg in
   if len < 2 || arg.[0] <> '-' then
-    extra arg
+    i
   else if arg.[1] = '-' then
-    if len = 2 then
-      if mm then
-        begin
-          for j = !i to nargs - 1 do
-            extra args.(j)
-          done;
-          i := nargs;
-        end
-      else
-        raise (GetoptFailure "unrecognized option '--'")
+    if len = 2 then i (* exit on '--' *)
     else
-      parse_long opts arg
+      let () = parse_long opts arg in
+      i + 1
   else
+    let i = i + 1 in
     match parse_short opts arg with
     | Some f ->
-        f (if !i = nargs then None else Some args.(!i));
-        incr i
-    | None -> ()
+        if i = nargs then
+          raise (GetoptFailure (sprintf "option -%c requires an argument" arg.[1]));
+        f (args.(i));
+        i + 1
+    | None -> i
 
 let handle_exn args exn =
   match exn with
@@ -189,13 +180,34 @@ let handle_exn args exn =
       exit 1
   | _ -> assert false
 
-
-let parse_all opts extra args =
-  let i = ref 1 in
+let parse_many opts args i =
   let nargs = Array.length args in
+  let rec aux i =
+    if i = nargs then i
+    else
+      let j = parse_one opts args i in
+      if j <> i then aux j
+      else i in
   try
-    while !i < nargs do
-      parse_one opts extra args i
-    done
+    aux i
+  with GetoptFailure _ as exn ->
+    handle_exn args exn
+
+let parse_all ?(i = 1) opts extra args =
+  let nargs = Array.length args in
+  let rec aux i =
+    if i = nargs then ()
+    else
+      let j = parse_one opts args i in
+      if j <> i then aux j
+      else if args.(i) = "--" then
+        for i = i + 1 to nargs - 1 do
+          extra args.(i)
+        done
+      else
+        let () = extra args.(i) in
+        aux (i + 1) in
+  try
+    aux i
   with GetoptFailure _ as exn ->
     handle_exn args exn
