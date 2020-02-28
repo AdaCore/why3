@@ -16,6 +16,14 @@
   let () =
     List.iter
       (fun (x,y) -> Hashtbl.add keywords x y)
+      (* keep the following files synchronized:
+
+         doc/ext/why3.py
+         src/trywhy3/mode-why3.js
+         src/why3doc/doc_lexer.mll
+         share/emacs/why3.el
+         share/vim/syntax/why3.vim
+       *)
       [
         "abstract", ABSTRACT;
         "absurd", ABSURD;
