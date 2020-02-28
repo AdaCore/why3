@@ -10,11 +10,11 @@ Standard library
       - in `set.SetApp` and `set.SetImp`, type `t` becomes `set`;
         field `contents` becomes `to_fset`; call to `empty` becomes `empty ()`
   * new library `fmap` for finite maps
-      - Fmap: polymorphic, logic finite maps to be used in logic
-      - MapApp, MapAppInt, MapImp, MapImpInt: monomorphic finite maps to
+      - `Fmap`: polymorphic, logic finite maps to be used in logic
+      - `MapApp`, `MapAppInt`, `MapImp`, `MapImpInt`: monomorphic finite maps to
         be used in programs
-  * no more libraries `appmap` and `impmap`
-  * no more library `sum.Sum` (subsumed by `int.Sum`)
+  * no more libraries `appmap` and `impmap` :x:
+  * no more library `sum.Sum` (subsumed by `int.Sum`) :x:
   * new library `string` for character strings
       - `String`: basic string operations
       - `OCaml`: additional operations dedicated to extraction to OCaml
@@ -22,7 +22,7 @@ Standard library
 
 Language
   * the type `string` is a new built-in type; string literals can be
-    given between double-quotes; see documentation Section 6.1 :x:
+    given between double-quotes; see manual, Section 7.1 :x:
   * it is now possible to give a name to preconditions and assertions;
     `requires Foo { a = 3 }` sets the attribute `[@hyp_name:Foo]`, which tries
     to give the name `Foo` to the corresponding hypothesis after introduction
@@ -40,19 +40,17 @@ Tools
     formatting of mlw files)
 
 Documentation
-  * improved Section 9.4 on drivers, including an automatically generated
+  * improved Section 10.4 on drivers, including an automatically generated
     dependency graph of driver files
-  * improved Section 9.5 on transformations, including transformations
+  * improved Section 10.5 on transformations, including transformations
     with arguments
-  :x: lexical conventions are slightly changed regarding strings, see Section 6.1
-  * documentation for tools `why3pp` and `why3latex`
 
 API
   * `Call_provers.print_prover_result` now takes an additional argument
     `~json_model` to indicate whether counterexamples are printed using JSON :x:
   * indices of array are now `model_value` for counterexamples :x:
   * ITP constructor `Task` now contains the location of the goal :x:
-  * ITP constructor `Source_and_ce` now has 3 arguments instead of 2 :x:
+  * ITP constructor `Source_and_ce` has now 3 arguments instead of 2 :x:
   * ITP constructors `File_contents` and `Source_and_ce` has a new argument for
     the file format :x:
   * ITP constructor `File_contents` has a new boolean argument for
@@ -62,7 +60,7 @@ API
     argument :x:
 
 Transformations
-  * `apply`/`rewrite` behaves better in presence of `let`;
+  * `apply` and `rewrite` now behave better in presence of `let`;
     hypotheses with nested let-bindings can now be applied :x:
   * passing arguments to argument-free transformations is now forbidden
     (previously ignored) :x:
@@ -88,7 +86,7 @@ IDE
   * default proof strategies "Auto level 1" and "Auto level 2"
     have been respectively renamed "Auto level 2" and "Auto level 3";
     "Auto level 1" now behaves similarly to "Auto level 0" but with a longer
-    time limit; more details in the manual, section 9.6 "Proof Strategies" :x:
+    time limit; more details in the manual, Section 10.6 "Proof Strategies" :x:
   * strategies can now be defined using `%t` (resp. `%m`) to call a prover with
     the default timelimit (resp. memlimit)
   * added minimal search menu
