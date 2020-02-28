@@ -529,7 +529,7 @@ conjunction and disjunction, respectively.
         : | `expr` spec+   ; added specification
         : | "if" `expr` "then" `expr` ("else" `expr`)?   ; conditional
         : | "match" `expr` "with" ("|" pattern "->" `expr`)+ "end"   ; pattern matching
-        : | qualifier? "begin" spec+ `expr` "end"   ; abstract block
+        : | `qualifier`? "begin" `spec`+ `expr` "end"   ; abstract block
         : | `expr` ";" `expr`   ; sequence
         : | "let" `pattern` "=" `expr` "in" `expr`   ; let-binding
         : | "let" `fun_defn` "in" `expr`   ; local function
