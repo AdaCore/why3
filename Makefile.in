@@ -90,8 +90,8 @@ ifeq (@LATEX@,pdflatex)
    LATEXCLEAN=true
 endif
 
-HEVEA = @HEVEA@
-HACHA = @HACHA@
+SPHINX = @SPHINX@
+
 EMACS = @EMACS@
 
 #PSVIEWER  = @PSVIEWER@
@@ -2001,126 +2001,42 @@ endif
 
 ifeq (@enable_doc@,yes)
 
-doc: doc/manual.pdf doc/html/index.html
+doc: doc/html/index.html
 
-BNF = ident qualid attribute constant operator type \
-	term1 term2 term3 expr1 expr2 expr3 \
-	formula theory theory2 \
-	why_file spec expr expr2 module whyml_file term_old_at
-BNFTEX = $(BNF:%=doc/generated/%_bnf.tex)
-
-doc/generated/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
-	doc/bnf$(EXE) $< > $@
-
-doc/bnf$(EXE): doc/bnf.mll
-	$(OCAMLLEX) $<
-	$(OCAMLC) -o $@ doc/bnf.ml
-
-doc/generated/drivers_dependency.tex: doc/drv_depgraph drivers/*.drv drivers/*.gen
-	doc/drv_depgraph$(EXE) drivers doc/generated
-
-doc/extract_ocaml_code: doc/extract_ocaml_code.ml
-	$(OCAMLC) str.cma -o $@ $<
-
-doc/generated/logic__%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/whyconf__%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/mlw_tree__%.ml: examples/use_api/mlw_tree.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/mlw_expr__%.ml: examples/use_api/mlw_expr.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/counterexample__%.ml: examples/use_api/counterexample.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
-	buildtask printtask buildtask2 \
-	getconf getanyaltergo getaltergo200 \
-	getdriver callprover calltimelimit \
-	buildfmla buildtermalt buildtaskimport \
-	quantfmla1 quantfmla2 quantfmla3 quantfmla4 \
-	buildth1 buildth2 buildth3 buildth4 buildth5 buildth6 buildth7 \
-	printtheory splittheory printalltasks
-
-OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
-
-OCAMLCODE_TRANSFORM = negate register
-
-OCAMLCODE_MLWTREE = buildenv \
-	source1 code1 helper1 source2 code2 source3 code3 source4 code4 \
-	getmodules checkingvcs
-
-OCAMLCODE_MLWEXPR = buildenv source2 code2_import code2 createmodule checkingvcs
-
-OCAMLCODE_COUNTEREXAMPLES =  ce_declarepropvars ce_adaptgoals \
-	ce_get_cvc4ce ce_callprover ce_nobuiltin
-
-OCAMLCODE = \
-	$(addprefix doc/generated/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
-	$(addprefix doc/generated/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
-	$(addprefix doc/generated/transform__, $(addsuffix .ml, $(OCAMLCODE_TRANSFORM))) \
-	$(addprefix doc/generated/mlw_tree__, $(addsuffix .ml, $(OCAMLCODE_MLWTREE))) \
-	$(addprefix doc/generated/mlw_expr__, $(addsuffix .ml, $(OCAMLCODE_MLWEXPR))) \
-	$(addprefix doc/generated/counterexample__, $(addsuffix .ml, $(OCAMLCODE_COUNTEREXAMPLES))) \
-	doc/generated/whyconf__provertype.ml
-
-DOC = api glossary ide intro exec macros manpages install \
-      manual starting syntax syntaxref technical version whyml \
-      itp pvs coq isabelle
-
-DOCTEX = $(DOC:%=doc/%.tex)
-
-doc/manual.pdf: $(BNFTEX) $(OCAMLCODE) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf doc/generated/drivers_dependency.tex
-	cd doc; $(LATEXCOMP) manual.tex
-ifeq (@LATEX@,pdflatex)
-	cd doc; if grep 'may have changed. Rerun to get' manual.log; then \
-		bibtex manual ; makeindex manual; pdflatex manual; \
-	fi
-	cd doc; if grep 'may have changed. Rerun to get' manual.log; then \
-		pdflatex manual; \
-	fi
-endif
+include Makefile.doc
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
 	export WHY3CONFIG=doc/why3ide-doc.conf; \
 	export WHY3LOADPATH=stdlib; \
-	sed -n -e 's/^%EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
+	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
 
-CLEANDIRS += doc
-GENERATED += doc/bnf.ml
+doc/html/index.html: $(DOCRST) $(DRVDOT) doc/conf.py
+	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
-ifeq (@enable_html_doc@,yes)
+doc/latex/manual.tex: $(DOCRST) $(DRVDOT) doc/conf.py
+	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
 
-# the dependency on the pdf ensures the bbl was built
-doc/html/manual.html: doc/manual.pdf doc/fix.hva
-	cd doc; rm -rf html; mkdir -p html
-	cp doc/*.png doc/manual.bbl doc/html/
-	cd doc; $(HEVEA) -o html/manual.html -fix -O fix.hva makeidx.hva manual.tex
+ifeq (@enable_pdf_doc@,yes)
 
-doc/html/index.html: doc/html/manual.html
-	cd doc; $(HACHA) -tocbis -o html/index.html html/manual.html
+doc: doc/latex/manual.pdf
 
-else
-
-doc/html/index.html:
+doc/latex/manual.pdf: doc/latex/manual.tex
+	cd doc/latex; $(LATEXCOMP) manual.tex
+ifeq (@LATEX@,pdflatex)
+	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  makeindex manual; pdflatex manual; \
+	fi
+	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  pdflatex manual; \
+	fi
+endif
 
 endif
 
 clean::
-	rm -rf doc/bnf$(EXE) $(BNFTEX) doc/html doc/manual.image.out; \
-	cd doc; $(LATEXCLEAN) manual.tex; \
-	rm -rf doc/generated/drivers*
+	rm -rf doc/html doc/latex; \
+	rm -rf doc/generated/drivers-*.dot
 
 else
 
@@ -2383,7 +2299,7 @@ wc:
 
 NAME = why3-@VERSION@
 # see .gitattributes for the list of files that are not distributed
-MORE_DIST = configure doc/manual.pdf
+MORE_DIST = configure
 
 dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
@@ -2419,8 +2335,7 @@ AUTOCONF_FILES = \
 	src/jessie/.merlin \
 	lib/why3/META \
 	lib/coq/version \
-	lib/pvs/version \
-	doc/version.tex
+	lib/pvs/version
 
 $(AUTOCONF_FILES): %: %.in config.status
 	./config.status chmod --file $@
@@ -2435,7 +2350,7 @@ clean::
 config.status: configure
 	./config.status --recheck
 
-configure: configure.in Version
+configure: configure.in
 	autoconf -f
 
 ###################

@@ -7,6 +7,7 @@ stages:
 
 variables:
   BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2019-12-11"
+  SPHINX_IMAGE: "$CI_REGISTRY_IMAGE:ci-sphinx"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
 build-image:
@@ -20,6 +21,20 @@ build-image:
   only:
     variables:
       - $NEW_BUILD_IMAGE
+  tags:
+    - shell
+
+sphinx-image:
+  stage: docker
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
+    - if docker pull "$SPHINX_IMAGE"; then echo "Image already exists!"; exit 1; fi
+    - docker build --force-rm -t "$SPHINX_IMAGE" - < misc/Dockerfile.sphinx
+    - docker push "$SPHINX_IMAGE"
+    - docker rmi "$SPHINX_IMAGE"
+  only:
+    variables:
+      - $NEW_SPHINX_IMAGE
   tags:
     - shell
 
@@ -115,3 +130,25 @@ deploy:
     - tags
   tags:
     - shell
+
+.sphinx_template: &sphinx_definition
+  image: "$SPHINX_IMAGE"
+  tags:
+    - docker
+
+doc:
+  stage: test
+  script:
+    - make -f Makefile.doc public/index.html
+  <<: *sphinx_definition
+
+pages:
+  stage: deploy
+  script:
+    - make -f Makefile.doc public/index.html
+  artifacts:
+    paths:
+    - public
+  only:
+    - master
+  <<: *sphinx_definition
