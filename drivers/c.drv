@@ -447,8 +447,8 @@ end
 
 module mach.array.Array32
 
-  syntax val ([]) "%1[%2]"
-  syntax val ([]<-) "%1[%2] = %3"
+  syntax val ([]) "%1[%2]" prec 1 1 15
+  syntax val ([]<-) "%1[%2] = %3" prec 1 1 15 14
 
 end
 
@@ -516,6 +516,7 @@ module mach.c.UChar
   syntax type uchar "unsigned char"
   syntax val of_uint64 "(unsigned char)%1" prec 2 2
   syntax val to_uint64 "(uint64_t)%1" prec 2 2
+  syntax val (=) "%1 == %2"  prec 7 7 6
 
 end
 
