@@ -22,7 +22,7 @@ end
 
 transformation "inline_trivial"
 transformation "simplify_trivial_quantification"
-transformation "simplify_formula_and_task"
+transformation "simplify_formula"
 transformation "eliminate_builtin"
 transformation "eliminate_definition"
 transformation "eliminate_inductive"
@@ -69,8 +69,8 @@ end
 
 theory real.Truncate
   syntax function floor "(to_int %1)"
-  syntax function truncate "(to_int (colibri_truncate %1))"
-  syntax function ceil "(to_int (colibri_ceil %1))"
+  overriding syntax function truncate "(to_int (colibri_truncate %1))"
+  overriding syntax function ceil "(to_int (colibri_ceil %1))"
   remove prop Floor_down
   remove prop Floor_monotonic
 end
@@ -80,7 +80,7 @@ theory real.FromInt
 end
 
 theory real.Abs
-  syntax function abs "(colibri_abs_real %1)"
+  overriding syntax function abs "(colibri_abs_real %1)"
 end
 
 theory int.Abs
