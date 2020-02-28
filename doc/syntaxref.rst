@@ -123,7 +123,7 @@ the end:
     op_char_1234: `op_char_1` | `op_char_2` | `op_char_3` | `op_char_4`
     op_char_234: `op_char_2` | `op_char_3` | `op_char_4`
     op_char_34: `op_char_3` | `op_char_4`
-    infix_op_1: ``op_char_1234`* `op_char_1` `op_char_1234`* "'"*
+    infix_op_1: `op_char_1234`* `op_char_1` `op_char_1234`* "'"*
     infix_op_2: `op_char_234`* `op_char_2` `op_char_234`* "'"*
     infix_op_3: `op_char_34`* `op_char_3` `op_char_34`* "'"*
     infix_op_4: `op_char_4`+ "'"*
@@ -146,7 +146,7 @@ location:
 
 .. productionlist::
     attribute: "[@" ... "]"
-             : | "[#" string digit+ digit+ digit+ "]"
+             : | "[#" `string` `digit`+ `digit`+ `digit`+ "]"
 
 
 An attribute cannot contain newlines or closing square brackets; leading
@@ -526,16 +526,16 @@ conjunction and disjunction, respectively.
         : | "ghost" `expr`   ; ghost expression
         : | `expr` ("," `expr`)+   ; tuple
         : | `expr` "<-" `expr`   ; assignment
-        : | `expr` spec+   ; added specification
+        : | `expr` `spec`+   ; added specification
         : | "if" `expr` "then" `expr` ("else" `expr`)?   ; conditional
-        : | "match" `expr` "with" ("|" pattern "->" `expr`)+ "end"   ; pattern matching
+        : | "match" `expr` "with" ("|" `pattern` "->" `expr`)+ "end"   ; pattern matching
         : | `qualifier`? "begin" `spec`+ `expr` "end"   ; abstract block
         : | `expr` ";" `expr`   ; sequence
         : | "let" `pattern` "=" `expr` "in" `expr`   ; let-binding
         : | "let" `fun_defn` "in" `expr`   ; local function
         : | "let" "rec" `fun_defn` ("with" `fun_defn`)* "in" `expr`   ; recursive function
         : | "fun" `param`+ `spec`* "->" `spec`* `expr`   ; unnamed function
-        : | "any" result `spec`*   ; arbitrary value
+        : | "any" `result` `spec`*   ; arbitrary value
         : | "while" `expr` "do" `invariant`* `variant`? `expr` "done"   ; while loop
         : | "for" `lident` "=" `expr` ("to" | "downto") `expr` "do" `invariant`* `expr` "done"   ; for loop
         : | ("assert" | "assume" | "check") "{" `term` "}"   ; assertion
