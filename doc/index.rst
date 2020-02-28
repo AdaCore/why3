@@ -1,5 +1,5 @@
-Welcome to Why3's documentation!
-================================
+The Why3 Platform
+=================
 
 :Authors:
   François Bobot,
