@@ -59,17 +59,17 @@ Instructions to build TryWhy3
 To compile with a different file format (e.g. Python, Micro-C)
 --------------------------------------------------------------
 
-  * in Makefile.in, change the line
-  
-	TRYWHY3CMO=lib/why3/why3.cma
+  * In `Makefile.in`, change the line
+
+        TRYWHY3CMO=lib/why3/why3.cma
 
     to add the adequate plugin
 
-	TRYWHY3CMO=lib/why3/why3.cma lib/plugins/microc.cmo
+        TRYWHY3CMO=lib/why3/why3.cma lib/plugins/microc.cmo
 
-  * in src/trywhy3/why3_worker.ml, modify line 354 to specify the format
+  * In `src/trywhy3/why3_worker.ml`, modify line 354 to specify the format
 
-      let (theories, _) = Env.read_file ~format:"micro-C" lang ...
+        let (theories, _) = Env.read_file ~format:"micro-C" lang ...
 
 
 Customization
