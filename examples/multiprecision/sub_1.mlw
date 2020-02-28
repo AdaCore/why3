@@ -1,0 +1,321 @@
+module Sub_1
+
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+
+
+  (** `wmpn_sub_1 r x sz y` subtracts `y` from `(x, sz)` and writes
+      the result to `(r, sz)`. Returns borrow, either 0 or
+      1. Corresponds to `mpn_sub_1`. *)
+  let wmpn_sub_1 (r x:t) (sz:int32) (y:limb) : limb
+    requires { valid x sz }
+    requires { valid r sz }
+    requires { 0 < sz }
+    requires { writable r }
+    ensures { value r sz - power radix sz * result
+              = value x sz - y }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j)
+              -> (pelts r)[j] = old (pelts r)[j] }
+    ensures { 0 <= result <= 1 }
+    writes { r.data.elts }
+  =
+    let ref b = 0 in
+    let ref lx = C.get x in
+    let ref i = 1 in
+    let res = sub_mod lx y in
+    C.set r res;
+    if (lx < y)
+    then begin
+      b <- 1;
+      assert { res - radix = lx - y };
+      while (i < sz) do
+        invariant { 1 <= i <= sz }
+        invariant { 0 <= b <= 1 }
+        invariant { i = sz \/ b = 1 }
+        invariant { value r i - (power radix i) * b =
+                    value x i - y }
+        invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                  -> (pelts r)[j] = old (pelts r)[j] }
+        variant { sz - i }
+        assert { b = 1 };
+        lx <- get_ofs x i;
+        let res = sub_mod lx 1 in
+        set_ofs r i res;
+        assert { value r i - (power radix i) * b = value x i - y };
+        value_tail r i;
+        value_tail x i;
+        i <- i + 1;
+        if lx <> 0
+        then begin
+          b <- 0;
+          assert { res = lx - 1 };
+          assert { value r i = value x i - y };
+          break
+        end
+        else begin
+          assert { res = radix - 1 };
+          assert { value r i - power radix i = value x i - y }
+        end
+      done;
+    end;
+    while i < sz do
+      invariant { i = sz \/ b = 0 }
+      invariant { 0 <= i <= sz }
+      invariant { value r i - (power radix i) * b =
+                  value x i - y }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j)
+                -> (pelts r)[j] = old (pelts r)[j] }
+      variant { sz - i }
+      lx <- get_ofs x i;
+      set_ofs r i lx;
+      assert { value r i - (power radix i) * b =
+                  value x i - y };
+      value_tail r i;
+      value_tail x i;
+      i <- i + 1;
+    done;
+    b
+
+  (** `wmpn_decr x sz y` subtracts from `x` the value of the limb `y` in place.
+      `x` has size `sz`. The subtraction must not overflow. This corresponds
+      to `mpn_decr` *)
+  let wmpn_decr (x:t) (ghost sz:int32) (y:limb) : unit
+    requires { valid x sz }
+    requires { sz > 0 }
+    requires { 0 <= value x sz - y }
+    requires { writable x }
+    ensures  { value x sz = value (old x) sz - y }
+    ensures { forall j. j < x.offset \/ x.offset + sz <= j ->
+              (pelts x)[j] = (pelts (old x))[j] }
+    writes   { x.data.elts }
+  =
+    let ghost ox = { x } in
+    let ref b = 0:limb in
+    let ref lx : limb = C.get x in
+    let ref xp = C.incr x 1 in
+    let ghost ref i : int32 = 1 in
+    let res = sub_mod lx y in
+    C.set x res;
+    if (res > lx)
+    then begin
+      b <- 1;
+      assert { res - radix = lx - y };
+      while not (b = 0) do
+        invariant { 1 <= i <= sz }
+        invariant { offset xp = offset x + i }
+        invariant { pelts xp = pelts x }
+        invariant { plength xp = plength x }
+        invariant { min xp = min x /\ max xp = max x }
+        invariant { i = sz -> b = 0 }
+        invariant { 0 <= b <= 1 }
+        invariant { writable xp }
+        invariant { value x i - (power radix i) * b
+                    = value ox i - y }
+        invariant { forall j. i <= j < sz ->
+                    (pelts x)[x.offset + j] = (pelts ox)[x.offset + j] }
+        invariant { forall j. j < x.offset \/ x.offset + sz <= j ->
+                    (pelts x)[j] = (pelts ox)[j] }
+        variant   { sz - i }
+        assert { b = 1 };
+        lx <- C.get xp;
+        assert { lx = (pelts ox)[ox.offset + i] };
+        let res = sub_mod lx 1 in
+        value_sub_update_no_change (pelts x) (x.offset + p2i i)
+                                             (x.offset + p2i i + 1)
+                                             (x.offset + p2i sz) res;
+        C.set xp res;
+        assert { forall j. i < j < sz ->
+                   (pelts x)[x.offset + j]
+                   = (pelts ox)[x.offset + j] };
+        assert { value x i - (power radix i) * b = value ox i - y };
+        value_tail x i;
+        value_tail ox i;
+        i <- i + 1;
+        xp <- C.incr xp 1;
+        if not (lx = 0)
+        then begin
+          assert { res = lx - 1 };
+          assert { value x i = value ox i - y
+                   by power radix (i-1) * res
+                      = power radix (i-1) * lx - power radix (i-1) * b };
+          b <- 0;
+          assert { forall j. j < x.offset \/ x.offset + sz <= j ->
+                    (pelts x)[j] = (pelts ox)[j] };
+          break
+        end
+        else begin
+          assert { res = radix - 1 };
+          assert { value x i - power radix i = value ox i - y
+                   by power radix (i-1) * res - power radix i
+                      = power radix (i-1) * lx - power radix (i-1) * b};
+        end;
+        assert { i = sz -> b = 0
+                 by value x sz - power radix sz * b = value ox sz - y
+                 so 0 <= value ox sz - y
+                 so value x sz < power radix sz
+                 so value x sz - power radix sz * 1 < 0
+                 so (b=0 \/ b=1) };
+        done
+    end;
+    value_concat x i sz;
+    value_concat ox i sz;
+    assert { forall j. x.offset + i <= j < x.offset + sz ->
+             (pelts x)[j] = (pelts ox)[j]
+             by let k = j - x.offset in
+                i <= k < sz
+                so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
+    value_sub_frame (pelts x) (pelts ox) (x.offset + p2i i) (x.offset + p2i sz)
+
+  (** `decr_1 x sz` subtracts 1 from `x` in place.
+      `x` has size `sz`. The subtraction must not overflow.
+      This corresponds to `mpn_decr_1` *)
+  let wmpn_decr_1 (x:t) (ghost sz:int32) : unit
+    requires { valid x sz }
+    requires { sz > 0 }
+    requires { 0 <= value x sz - 1 }
+    requires { writable x }
+    ensures  { value x sz = value (old x) sz - 1 }
+    ensures { forall j. j < x.offset \/ x.offset + sz <= j ->
+              (pelts x)[j] = (pelts (old x))[j] }
+    writes   { x.data.elts }
+  =
+    let ghost ox = { x } in
+    let ghost ref b = 1:limb in
+    let ref lx = 0 in
+    let ghost ref i = 0 in
+    let ref xp = C.incr x 0 in
+    while (lx = 0) do
+      invariant { 0 <= i <= sz }
+      invariant { i = sz -> lx <> 0 }
+      invariant { offset xp = offset x + i }
+      invariant { pelts xp = pelts x }
+      invariant { plength xp = plength x }
+      invariant { min xp = min x /\ max xp = max x }
+      invariant { lx <> 0 <-> b = 0 }
+      invariant { 0 <= b <= 1 }
+      invariant { value x i - (power radix i) * b
+                  = value ox i - 1 }
+      invariant { writable xp }
+      invariant { forall j. i <= j < sz ->
+                  (pelts x)[x.offset + j] = (pelts ox)[x.offset + j] }
+      invariant { forall j. j < x.offset \/ x.offset + sz <= j ->
+                  (pelts x)[j] = (pelts ox)[j] }
+      variant   { sz - i }
+      label StartLoop in
+      lx <- C.get xp;
+      assert { lx = (pelts ox)[ox.offset + i] };
+      let res = sub_mod lx 1 in
+      ghost (if lx = 0 then b <- 1 else b <- 0);
+      assert { res - radix * b = lx - 1 };
+      value_sub_update_no_change (pelts x) (x.offset + p2i i)
+                                           (x.offset + p2i i + 1)
+                                           (x.offset + p2i sz) res;
+      C.set xp res;
+      assert { forall j. i < j < sz ->
+                 (pelts x)[x.offset + j]
+                 = (pelts ox)[x.offset + j] };
+      assert { value x i - (power radix i) * (b at StartLoop)
+               = value ox i - 1 };
+      value_tail x i;
+      value_tail ox i;
+      assert { value x (i+1) - power radix (i+1) * b =
+               value ox (i+1) - 1
+               by power radix i * res - power radix (i+1) * b
+                  = power radix i * (lx - 1)
+                  = power radix i * lx - power radix i * (b at StartLoop)
+               so value x (i+1) - power radix (i+1) * b
+                  = value x i + power radix i * res - power radix (i+1) * b };
+      i <- i + 1;
+      xp <- C.incr xp 1;
+      assert { i = sz -> b = 0
+               by value x sz - power radix sz * b = value ox sz - 1
+                  so 0 <= value ox sz - 1
+                  so value x sz < power radix sz
+                  so value x sz - power radix sz * 1 < 0
+                  so (b=0 \/ b=1) };
+    done;
+    value_concat x i sz;
+    value_concat ox i sz;
+    assert { forall j. x.offset + i <= j < x.offset + sz ->
+             (pelts x)[j] = (pelts ox)[j]
+             by let k = j - x.offset in
+                i <= k < sz
+                so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
+    value_sub_frame (pelts x) (pelts ox) (x.offset + p2i i) (x.offset + p2i sz)
+
+  let wmpn_sub_1_in_place (x:t) (sz:int32) (y:limb) : limb
+    requires { valid x sz }
+    requires { sz > 0 }
+    requires { writable x }
+    ensures  { value x sz - (power radix sz) * result = value (old x) sz - y }
+    ensures  { 0 <= result <= 1 }
+    ensures  { forall j. (j < offset x \/ offset x + sz <= j)
+              -> (pelts x)[j] = old (pelts x)[j] }
+    writes { x.data.elts }
+  =
+    let ghost ox = { x } in
+    let ref b = 0 in
+    let ref lx = C.get x in
+    let ref i = 1 in
+    let res = sub_mod lx y in
+    C.set x res;
+    if lx < y
+    then begin
+      b <- 1;
+      assert { res - radix = lx - y };
+      while i < sz do
+        invariant { 1 <= i <= sz }
+        invariant { 0 <= b <= 1 }
+        invariant { b = 1 \/ i = sz }
+        invariant { value x i - (power radix i) * b =
+                    value ox i - y }
+        invariant { forall j. (j < offset x \/ offset x + i <= j)
+                  -> (pelts x)[j] = old (pelts x)[j] }
+        variant { sz - i }
+        assert { b = 1 };
+        lx <- get_ofs x i;
+        assert { lx = (pelts ox)[offset ox + i] };
+        let res = sub_mod lx 1 in
+        value_sub_update_no_change (pelts x) (x.offset + p2i i)
+                                             (x.offset + p2i i + 1)
+                                             (x.offset + p2i sz) res;
+        set_ofs x i res;
+        assert { forall j. i < j < sz ->
+                   (pelts x)[x.offset + j]
+                   = (pelts ox)[x.offset + j] };
+        assert { value x i - (power radix i) * b = value ox i - y };
+        value_tail x i;
+        value_tail ox i;
+        i <- i + 1;
+        if not (lx = 0)
+        then begin
+          b <- 0;
+          assert { res = lx - 1 };
+          assert { value x i = value ox i - y };
+          break
+        end
+        else begin
+          assert { res = radix - 1 };
+          assert { value x i - power radix i = value ox i - y };
+        end;
+      done;
+    end;
+    value_concat x i sz;
+    value_concat ox i sz;
+    assert { forall j. x.offset + i <= j < x.offset + sz ->
+             (pelts x)[j] = (pelts ox)[j]
+             by let k = j - x.offset in
+                i <= k < sz
+                so (pelts x)[x.offset + k] = (pelts ox)[x.offset + k]};
+    value_sub_frame (pelts x) (pelts ox) (x.offset + p2i i) (x.offset + p2i sz);
+    b
+
+end

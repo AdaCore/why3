@@ -109,9 +109,14 @@ let simpl_mul _ls t1 t2 _ty =
   if is_one t2 then t1 else
   raise Undetermined
 
-let simpl_divmod _ls t1 t2 _ty =
+let simpl_div _ls t1 t2 _ty =
   if is_zero t1 then t1 else
   if is_one t2 then t1 else
+  raise Undetermined
+
+let simpl_mod _ls t1 t2 _ty =
+  if is_zero t1 then t1 else
+  if is_one t2 then Int (BigInt.zero) else
   raise Undetermined
 
 let simpl_minmax _ls v1 v2 _ty =
@@ -325,12 +330,12 @@ let built_in_theories =
       "max", None, eval_int_op BigInt.max simpl_minmax;
     ] ;
     ["int"],"ComputerDivision", [],
-    [ "div", None, eval_int_op BigInt.computer_div simpl_divmod;
-      "mod", None, eval_int_op BigInt.computer_mod simpl_divmod;
+    [ "div", None, eval_int_op BigInt.computer_div simpl_div;
+      "mod", None, eval_int_op BigInt.computer_mod simpl_mod;
     ] ;
     ["int"],"EuclideanDivision", [],
-    [ "div", None, eval_int_op BigInt.euclidean_div simpl_divmod;
-      "mod", None, eval_int_op BigInt.euclidean_mod simpl_divmod;
+    [ "div", None, eval_int_op BigInt.euclidean_div simpl_div;
+      "mod", None, eval_int_op BigInt.euclidean_mod simpl_mod;
     ] ;
     ["real"], "Real", [],
     [ Ident.op_prefix "-", None, eval_real_uop real_opp;

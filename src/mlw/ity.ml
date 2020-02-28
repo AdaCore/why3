@@ -117,7 +117,7 @@ let reg_hash reg = id_hash reg.reg_name
 let pv_hash  pv  = id_hash pv.pv_vs.vs_name
 
 let its_compare its1 its2 = id_compare its1.its_ts.ts_name its2.its_ts.ts_name
-let ity_compare ity1 ity2 = Pervasives.compare (ity_hash ity1) (ity_hash ity2)
+let ity_compare ity1 ity2 = Int.compare (ity_hash ity1) (ity_hash ity2)
 let reg_compare reg1 reg2 = id_compare reg1.reg_name reg2.reg_name
 let pv_compare  pv1  pv2  = id_compare pv1.pv_vs.vs_name pv2.pv_vs.vs_name
 

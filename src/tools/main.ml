@@ -103,7 +103,10 @@ let command sscmd =
       Filename.concat command_path scmd
     end in
   let scmd = "why3 " ^ sscmd in
-  Unix.execv cmd (Array.of_list (scmd :: args))
+  let args = Array.of_list (scmd :: args) in
+  (* add double quotes to avoid splitting issues with execv in Windows *)
+  let args = if Sys.win32 then Array.map Filename.quote args else args in
+  Unix.execv cmd args
 
 let () = try
   let extra_help fmt () = extra_help fmt (available_commands ()) in
@@ -148,7 +151,8 @@ let () = try
     in
     printf "@[Known input formats:@\n  @[%a@]@]@."
       (Pp.print_list Pp.newline2 print)
-      (List.sort Pervasives.compare (Env.list_formats Env.base_language))
+      (List.sort (fun (u,_,_) (v,_,_) -> String.compare u v)
+         (Env.list_formats Env.base_language))
   end;
   if !opt_list_provers then begin
     opt_list := true;
@@ -166,7 +170,7 @@ let () = try
       (Pp.print_list Pp.space Pretty.print_meta_arg_type) m.meta_type
       Pp.formatted m.meta_desc
     in
-    let cmp m1 m2 = Pervasives.compare m1.meta_name m2.meta_name in
+    let cmp m1 m2 = String.compare m1.meta_name m2.meta_name in
     printf "@[<hov 2>Known metas:@\n%a@]@\n@."
       (Pp.print_list Pp.newline2 print) (List.sort cmp (Theory.list_metas ()))
   end;

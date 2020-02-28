@@ -443,8 +443,9 @@ module C = struct
     | _ -> false
 
   let left_assoc = function
-    | Band | Bor | Beq | Bne | Blt | Ble | Bgt | Bge -> true
+    | Beq | Bne | Blt | Ble | Bgt | Bge -> true
     | Bassign -> false
+    | Band | Bor -> false (* avoids Wparentheses *)
 
   let right_assoc = function
     | Bassign -> true
@@ -590,9 +591,13 @@ module Print = struct
        (* call to function defined in the prelude *)
        fprintf fmt (protect_on (prec < 1) "%s(%a)")
          s (print_list comma (print_expr ~prec:15)) l
-    | Ecall (e,l) ->
+    | Ecall (Evar id, l) ->
+       fprintf fmt (protect_on (prec < 1) "%a(%a)")
+         print_global_ident id (print_list comma (print_expr ~prec:15)) l
+    | Ecall ((Esyntax _ as e),l) ->
        fprintf fmt (protect_on (prec < 1) "%a(%a)")
          (print_expr ~prec:1) e (print_list comma (print_expr ~prec:15)) l
+    | Ecall _ -> raise (Unsupported "complex function expression")
     | Econst c -> print_const fmt c
     | Evar id -> print_local_ident fmt id
     | Elikely e -> fprintf fmt
@@ -1265,12 +1270,16 @@ module MLToC = struct
         (fun (bs,rs) (xs, pvsl, r) ->
           let id = xs.xs_name in
           match pvsl, r.e_node with
+          | [], (Eblock []) when is_while ->
+             assert (is_unit r.e_ity);
+             (Sid.add id bs, rs)
           | [pv], Mltree.Evar pv'
-            when pv_equal pv pv' && env.computes_return_value ->
-            (bs, Sid.add id rs)
-          | [], (Eblock []) when is_unit r.e_ity && is_while ->
-            (Sid.add id bs, rs)
-          |_ -> raise (Unsupported "non break/return exception in try"))
+             when pv_equal pv pv' && env.computes_return_value ->
+             (bs, Sid.add id rs)
+          | [], Mltree.Eblock [] when env.computes_return_value ->
+             assert (is_unit r.e_ity);
+             (bs, Sid.add id rs)
+          | _ -> raise (Unsupported "non break/return exception in try"))
         (Sid.empty, env.returns) xl
       in
       let env' = { env with
@@ -1286,6 +1295,10 @@ module MLToC = struct
     | Eraise (xs, Some r) when Sid.mem xs.xs_name env.returns ->
       Debug.dprintf debug_c_extraction "RETURN@.";
       expr info {env with computes_return_value = true} r
+    | Eraise (xs, None)
+         when Sid.mem xs.xs_name env.returns &&
+                ity_equal Ity.ity_unit env.current_function.rs_cty.cty_result
+      -> ([], C.Sreturn Enothing)
     | Eraise (xs, None) when Sid.mem xs.xs_name env.returns ->
        assert false (* nothing to pass to return *)
     | Eraise _ -> raise (Unsupported "non break/return exception raised")
@@ -1598,8 +1611,12 @@ let name_gen suffix ?fname m =
     | Some f -> f ^ "__" ^ n ^ suffix in
   Strings.lowercase r
 
-let file_gen = name_gen ".c"
-let header_gen = name_gen ".h"
+let header_border_printer header _args ?old:_ ?fname ~flat:_ fmt m =
+  let n = Strings.uppercase (name_gen "_H_INCLUDED" ?fname m) in
+  if header then
+    Format.fprintf fmt "#ifndef %s@\n@." n
+  else
+    Format.fprintf fmt "#define %s@\n#endif // %s@." n n
 
 let print_header_decl args fmt d =
   let cds = MLToC.translate_decl args d ~header:true in
@@ -1662,12 +1679,22 @@ let print_decl =
     print_decl info fmt d end
 
 let c_printer = Pdriver.{
-      desc            = "printer for C code";
-      file_gen        = file_gen;
-      decl_printer    = print_decl;
-      interf_gen      = Some header_gen;
-      interf_printer  = Some print_header_decl;
-      prelude_printer = print_prelude }
+    desc = "printer for C code";
+    implem_printer = {
+        filename_generator = name_gen ".c";
+        decl_printer = print_decl;
+        prelude_printer = print_prelude;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
+      };
+    interf_printer = Some {
+        filename_generator = name_gen ".h";
+        decl_printer = print_header_decl;
+        prelude_printer = print_prelude;
+        header_printer = header_border_printer true;
+        footer_printer = header_border_printer false;
+      };
+  }
 
 let () =
   Pdriver.register_printer "c" c_printer

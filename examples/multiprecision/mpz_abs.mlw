@@ -1,0 +1,43 @@
+module Zabs
+
+use int.Int
+use int.Power
+use map.Map
+use mach.int.Int32GMP
+use mach.c.C
+use lemmas.Lemmas
+use util.Util
+use compare.Compare
+use import mach.int.UInt64GMP as Limb
+use int.Abs
+use mpz.Z
+use mpz.Zutil
+
+let wmpz_abs (w u: mpz_ptr) : unit
+  requires { mpz.readers[u] = 0 /\ mpz.readers[w] = 0 }
+  requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 }
+  ensures { mpz.readers[u] = 0 /\ mpz.readers[w] = 0 }
+  ensures { value_of w mpz = abs (old value_of u mpz) }
+  ensures { forall x. x <> w -> mpz_unchanged x mpz (old mpz) }
+=
+  let ghost ompz = pure { mpz } in
+  let size = abs_size_of u in
+  if (not mpz_eq u w)
+  then begin
+    let wp = wmpz_realloc w size in
+    unchanged u mpz ompz;
+    let up = get_read_ptr u in
+    assert { value up size = ompz.abs_value_of u };
+    wmpn_copyd_sep wp up size;
+    assert { sgn_value wp size = ompz.abs_value_of u };
+    release_reader u up;
+    set_size w size wp;
+    release_writer w wp;
+  end
+  else begin
+    let ghost wp = get_write_ptr w in
+    set_size w size wp;
+    release_writer w wp;
+  end
+
+end

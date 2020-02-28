@@ -1,0 +1,309 @@
+module Z
+
+use int.Int
+use int.Abs
+use mach.int.Int32
+use mach.c.C
+use map.Map
+use types.Types
+use lemmas.Lemmas
+use import mach.int.UInt64GMP as Limb
+use int.Power
+
+type mpz_ptr
+
+val predicate mpz_eq (x y: mpz_ptr)
+  ensures { result <-> x = y }
+
+type mpz_memo = abstract {
+  mutable abs_value_of : map mpz_ptr int;
+  mutable alloc : map mpz_ptr int;
+  mutable abs_size : map mpz_ptr int;
+  mutable sgn : map mpz_ptr int;
+  mutable readers : map mpz_ptr int;
+  mutable zones : map mpz_ptr C.zone;
+} invariant { forall p. 0 <= alloc p
+                        /\ (sgn p = 1 \/ sgn p = -1)
+                        /\ abs_size p <= alloc p
+                        /\ 0 <= abs_size p <= max_int32
+                        /\ 0 <= abs_value_of p
+                        /\ (abs_size p >= 1 ->
+                           power radix (abs_size p - 1) <= abs_value_of p)
+                        /\ abs_value_of p < power radix (abs_size p) }
+  by { abs_value_of = (fun _ -> 0);
+       alloc = (fun _ -> 0);
+       abs_size = (fun _ -> 0);
+       sgn = (fun _ -> 1);
+       readers = (fun _ -> 0);
+       zones = (fun _ -> null_zone) }
+
+(* readers : = 0 means there is currently no access
+             = -1 means exactly one read-write access
+             = n > 0 means there are n read-only accesses *)
+
+val ghost mpz : mpz_memo
+
+function value_of (x:mpz_ptr) (memo: mpz_memo) : int
+  = memo.sgn[x] * memo.abs_value_of[x]
+
+function sgn_value (p:ptr limb) (sz:int32) : int
+  = if sz >= 0 then value p sz else - value p (- sz)
+
+predicate mpz_unchanged (x: mpz_ptr) (memo1 memo2: mpz_memo)
+  = memo2.alloc[x] > 0 ->
+    (memo1.abs_value_of[x] = memo2.abs_value_of[x]
+    /\ memo1.alloc[x] = memo2.alloc[x]
+    /\ memo1.abs_size[x] = memo2.abs_size[x]
+    /\ memo1.sgn[x] = memo2.sgn[x]
+    /\ memo1.readers[x] = memo2.readers[x]
+    /\ memo1.zones[x] = memo2.zones[x])
+
+let ghost unchanged (x:mpz_ptr) (memo1 memo2: mpz_memo) : unit
+  requires { mpz_unchanged x memo1 memo2 }
+  requires { memo2.alloc[x] > 0 }
+  ensures  { memo1.abs_value_of[x] = memo2.abs_value_of[x]
+    /\ memo1.alloc[x] = memo2.alloc[x]
+    /\ memo1.abs_size[x] = memo2.abs_size[x]
+    /\ memo1.sgn[x] = memo2.sgn[x]
+    /\ memo1.readers[x] = memo2.readers[x]
+    /\ memo1.zones[x] = memo2.zones[x] }
+= ()
+
+lemma unchanged_transitive:
+  forall x m1 m2 m3. mpz_unchanged x m1 m2 -> mpz_unchanged x m2 m3
+                     -> mpz_unchanged x m1 m3
+
+(* SIZ mpz macro *)
+val size_of (x: mpz_ptr) : int32
+  ensures { result = mpz.sgn[x] * mpz.abs_size[x] }
+
+val alloc_of (x: mpz_ptr) : int32
+  ensures { result = mpz.alloc[x] }
+
+let abs [@extraction:inline] (x:int32) : int32
+  requires { x > min_int32 }
+  ensures { result = abs x }
+= if Int32.(>=) x 0 then x else Int32.(-_) x
+
+(* ABSIZ mpz macro *)
+let abs_size_of [@extraction:inline] (x: mpz_ptr) : int32
+  ensures { result = mpz.abs_size[x] }
+= abs (size_of x)
+
+end
+
+
+module Zutil
+
+use int.Int
+use int.Abs
+use mach.int.Int32
+use mach.c.C
+use map.Map
+use types.Types
+use lemmas.Lemmas
+use import mach.int.UInt64GMP as Limb
+use int.Power
+use Z
+
+(* Sets the size of an mpz_ptr, leaving other fields unchanged. *)
+val set_size (x:mpz_ptr) (sz:int32) (ghost p: ptr limb) : unit
+  requires { mpz.zones[x] = zone p }
+  requires { mpz.readers[x] = -1 }
+  requires { offset p = 0 }
+  requires { min p = 0 }
+  requires { max p = plength p }
+  requires { abs sz <= plength p }
+  requires { plength p = mpz.alloc[x] }
+  requires { sz <> 0 -> value p (abs sz) >= power radix (abs sz - 1) }
+  writes  { mpz.sgn }
+  writes  { mpz.abs_size }
+  writes  { mpz.abs_value_of }
+  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures { mpz.sgn[x] = 1 <-> 0 <= sz }
+  ensures { mpz.sgn[x] = - 1 <-> sz < 0 }
+  ensures { mpz.abs_size[x] = abs sz }
+  ensures { mpz.abs_value_of[x] = value p (abs sz) }
+  (* ensures size_of x = sz *)
+
+(* Sets the size of an mpz_ptr to 0 *)
+val set_size_0 (x:mpz_ptr) : unit
+  requires { mpz.readers[x] = - 1 \/ mpz.readers[x] = 0 }
+  writes   { mpz.abs_size }
+  writes   { mpz.abs_value_of }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.abs_size[x] = 0 }
+  ensures  { mpz.abs_value_of[x] = 0 }
+
+(* Sets the size of an mpz_ptr to minus its former size. *)
+val wmpz_minus (x:mpz_ptr) : unit
+  requires { mpz.readers[x] = -1 }
+  writes   { mpz.abs_size }
+  writes   { mpz.abs_value_of }
+  writes   { mpz.sgn }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.sgn[x] = - old mpz.sgn[x] }
+  ensures  { mpz.abs_size[x] = old mpz.abs_size[x] }
+  ensures  { mpz.abs_value_of[x] = old mpz.abs_value_of[x] }
+
+val set_alloc (x:mpz_ptr) (al:int32) : unit
+  requires { mpz.abs_size[x] <= al }
+  writes   { mpz.alloc }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.alloc[x] = al }
+
+
+val set_ptr (x:mpz_ptr) (p:ptr limb) : unit
+  requires { offset p = 0 }
+  requires { writable p }
+  requires { min p = 0 }
+  requires { max p = plength p }
+  requires { plength p = mpz.alloc[x] }
+  writes   { mpz.abs_value_of }
+  writes   { mpz.zones }
+  writes   { mpz.readers }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.abs_value_of[x] = value p (mpz.abs_size[x]) }
+  ensures  { mpz.readers[x] = -1 }
+  ensures  { mpz.zones[x] = zone p }
+  ensures  { min p = 0 }
+  ensures  { max p = plength p }
+  ensures  { plength p = old plength p }
+  ensures  { pelts p = old pelts p }
+
+val ghost value_of (x: mpz_ptr) : int
+  ensures { result = mpz.sgn[x] * mpz.abs_value_of[x] }
+
+val get_read_ptr (x: mpz_ptr) : ptr limb
+  requires { mpz.readers[x] >= 0 }
+  writes   { mpz.readers }
+  ensures  { mpz.readers[x] = old mpz.readers[x] + 1 }
+  ensures  { forall y. x <> y -> mpz.readers[y] = old mpz.readers[y] }
+  ensures  { value result (mpz.abs_size[x]) = mpz.abs_value_of[x] }
+  ensures  { plength result = mpz.alloc[x] }
+  ensures  { offset result = 0 }
+  ensures  { min result = 0 }
+  ensures  { max result = plength result }
+  ensures  { zone result = mpz.zones[x] }
+
+val get_write_ptr (x: mpz_ptr) : ptr limb
+  requires { mpz.readers[x] = 0 }
+  writes   { mpz.readers }
+  ensures  { mpz.readers[x] = -1 }
+  ensures  { forall y. x <> y -> mpz.readers[y] = old mpz.readers[y] }
+  ensures  { value result (mpz.abs_size[x]) = mpz.abs_value_of[x] }
+  ensures  { plength result = mpz.alloc[x] }
+  ensures  { offset result = 0 }
+  ensures  { min result = 0 }
+  ensures  { max result = plength result }
+  ensures  { writable result }
+  ensures  { zone result = mpz.zones[x] }
+
+val release_reader (x: mpz_ptr) (p:ptr limb) : unit
+  requires { mpz.zones[x] = zone p }
+  requires { mpz.readers[x] >= 1 }
+  requires { min p = 0 }
+  requires { max p = plength p }
+  writes   { mpz.readers }
+  writes   { p } (* invalidates p and its aliases *)
+  ensures  { mpz.readers[x] = old mpz.readers[x] - 1 }
+  ensures  { forall y. y <> x -> mpz.readers[y] = old mpz.readers[y] }
+
+val release_writer (x: mpz_ptr) (p:ptr limb) : unit
+  requires { mpz.zones[x] = zone p }
+  requires { mpz.readers[x] = -1 }
+  requires { min p = 0 }
+  requires { max p = plength p }
+  requires { writable p } (* maybe not needed? *)
+  writes   { mpz.readers }
+  writes   { p } (* invalidates p and its aliases *)
+  ensures  { mpz.readers[x] = 0 }
+  ensures  { forall y. y <> x -> mpz.readers[y] = old mpz.readers[y] }
+
+val partial wmpz_init () : mpz_ptr
+  writes  { mpz }
+  ensures { forall x. old mpz.alloc[x] > 0 -> result <> x }
+          (*result is fresh*)
+  ensures { forall x. old mpz.alloc[x] > 0 ->
+                      mpz_unchanged x mpz (old mpz) } (* FIXME *)
+  ensures { mpz.readers[result] = 0 }
+  ensures { mpz.abs_value_of[result] = 0 }
+  ensures { mpz.abs_size[result] = 0 }
+  ensures { mpz.sgn[result] = 1 }
+  ensures { mpz.alloc[result] = 1 }
+  ensures { mpz.zones[result] <> null_zone }
+
+val wmpz_clear (x:mpz_ptr) : unit (* scrambles mpz._[x] *)
+  writes { mpz }
+  requires { mpz.readers[x] = 0 }
+  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+
+let partial wmpz_do_realloc (x:mpz_ptr) (sz:int32) : ptr limb
+  requires { 1 <= sz } (* GMP does sz = max (sz,1) instead, do that if needed *)
+  requires { mpz.readers[x] = 0 }
+  requires { 1 <= mpz.alloc[x] }
+  ensures { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.readers[x] = -1 }
+  ensures  { mpz.alloc[x] = sz }
+  ensures  { mpz.abs_value_of[x] = value result (mpz.abs_size[x]) }
+  ensures  { mpz.zones[x] = zone result }
+  ensures  { offset result = 0 }
+  ensures  { plength result = sz }
+  ensures  { min result = 0 }
+  ensures  { max result = sz }
+  ensures  { writable result }
+  ensures  { if sz >= old mpz.abs_size[x]
+             then mpz.abs_size[x] = old mpz.abs_size[x]
+                  /\ value result (old mpz.abs_size[x])
+                     = old mpz.abs_value_of[x]
+             else mpz.abs_size[x] = 0 }
+= let p = get_write_ptr x in
+  assert { forall y. y <> x -> mpz_unchanged y mpz (old mpz) };
+  let ghost op = { p } in
+  let ghost os = abs_size_of x in
+  label Realloc in
+  let q = realloc p sz in
+  c_assert (is_not_null q);
+  if Int32.(>) (abs_size_of x) sz
+  then begin
+    set_size_0 x; (* data has shrunk, reset x to 0 *)
+  end
+  else begin
+    value_sub_frame (pelts q) (pelts op) 0 (p2i os);
+  end;
+  set_alloc x sz;
+  set_ptr x q;
+  q
+
+let wmpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
+  requires { mpz.readers[x] = 0 }
+  requires { 1 <= mpz.alloc[x] }
+  ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }
+  ensures  { mpz.readers[x] = -1 }
+  ensures  { mpz.abs_value_of[x] = value result (mpz.abs_size[x]) }
+  ensures  { mpz.zones[x] = zone result }
+  ensures  { offset result = 0 }
+  ensures  { plength result = mpz.alloc[x] }
+  ensures  { min result = 0 }
+  ensures  { max result = plength result }
+  ensures  { writable result }
+  ensures  { mpz.abs_size[x] = old mpz.abs_size[x] }
+  ensures  { value result (old mpz.abs_size[x])
+             = old mpz.abs_value_of[x] }
+  ensures  { if sz > old mpz.alloc[x]
+             then mpz.alloc[x] = sz
+             else mpz.alloc[x] = old mpz.alloc[x]  }
+= if sz > alloc_of x
+  then wmpz_do_realloc x sz
+  else get_write_ptr x
+
+let mpz_ptr_swap [@extraction:inline] (ref x y: mpz_ptr)
+  requires { mpz.readers[x] = 0 /\ mpz.readers[y] = 0 }
+  ensures  { mpz.readers[x] = 0 /\ mpz.readers[y] = 0 }
+  ensures  { x = old y }
+  ensures  { y = old x }
+= let z = x in
+  x <- y;
+  y <- z
+
+end

@@ -43,10 +43,14 @@ val load_driver : Env.env -> string -> string list -> driver
 
 type filename_generator = ?fname:string -> Pmodule.pmodule -> string
 
-type interface_generator = ?fname:string -> Pmodule.pmodule -> string
-type interf_printer =
-  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
-  -> Pmodule.pmodule -> Mltree.decl Pp.pp
+type decl_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->
+  Pmodule.pmodule -> Mltree.decl Pp.pp
+
+(** Things to print as header/footer. *)
+type border_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->
+  Pmodule.pmodule Pp.pp
 
 (** Things to do at the beginning of a module, e.g. open/#include.
     Only used in modular extraction. *)
@@ -54,19 +58,23 @@ type prelude_printer =
   printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
   -> Pmodule.pmodule list -> Pmodule.pmodule Pp.pp
 
-val print_empty_prelude: prelude_printer
+type file_printer = {
+  filename_generator : filename_generator;
+  decl_printer : decl_printer;
+  header_printer : border_printer;
+  prelude_printer : prelude_printer;
+  footer_printer : border_printer;
+}
 
-type decl_printer =
-  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->
-  Pmodule.pmodule -> Mltree.decl Pp.pp
+type printer = {
+  desc           : Pp.formatted;
+  implem_printer : file_printer;
+  interf_printer : file_printer option;
+}
 
-type printer =
-  { desc            : Pp.formatted;
-    file_gen        : filename_generator;
-    decl_printer    : decl_printer;
-    interf_gen      : interface_generator option;
-    interf_printer  : interf_printer option;
-    prelude_printer : prelude_printer; }
+val dummy_prelude_printer : prelude_printer
+
+val dummy_border_printer : border_printer
 
 val register_printer : string -> printer -> unit
 

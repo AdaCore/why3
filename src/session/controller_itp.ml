@@ -17,7 +17,6 @@ let debug_sched = Debug.register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
          and@ transformation@ applications."
 
-let debug_call_prover = Debug.lookup_flag "call_prover"
 let default_delay_ms = 100 (* 0.1 seconds *)
 
 (** State of a proof *)

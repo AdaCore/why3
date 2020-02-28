@@ -13,8 +13,16 @@ Standard library
       - Fmap: polymorphic, logic finite maps to be used in logic
       - MapApp, MapAppInt, MapImp, MapImpInt: monomorphic finite maps to
         be used in programs
+  * no more libraries `appmap` and `impmap`
+  * no more library `sum.Sum` (subsumed by `int.Sum`)
+  * new library `string` for character strings
+      - `String`: basic string operations
+      - `OCaml`: additional operations dedicated to extraction to OCaml
+      - `RegExpr`: regular expressions
 
 Language
+  * the type `string` is a new built-in type; string literals can be
+    given between double-quotes; see documentation Section 6.1 :x:
   * it is now possible to give a name to preconditions and assertions;
     `requires Foo { a = 3 }` sets the attribute `[@hyp_name:Foo]`, which tries
     to give the name `Foo` to the corresponding hypothesis after introduction
@@ -31,6 +39,14 @@ Tools
   * new tool `why3pp` to pretty print Why3 source code (inductive definitions to LaTeX,
     formatting of mlw files)
 
+Documentation
+  * improved Section 9.4 on drivers, including an automatically generated
+    dependency graph of driver files
+  * improved Section 9.5 on transformations, including transformations
+    with arguments
+  :x: lexical conventions are slightly changed regarding strings, see Section 6.1
+  * documentation for tools `why3pp` and `why3latex`
+
 API
   * `Call_provers.print_prover_result` now takes an additional argument
     `~json_model` to indicate whether counterexamples are printed using JSON :x:
@@ -41,7 +57,7 @@ API
     the file format :x:
   * ITP constructor `File_contents` has a new boolean argument for
     interpretation of the file in the IDE as `read_only` :x:
-  * New ITP constructor `Ident_notif_loc`
+  * new ITP constructor `Ident_notif_loc` :x:
   * ITP constructor `Get_first_unproven_node` now takes a heuristic name
     argument :x:
 
@@ -61,7 +77,7 @@ Transformations
     `meta reflection val foo` :x:
   * `remove` and `bisect` should not raise unnecessary popups anymore
   * added `remove_rec`
-  * the attribute `ìnline:trivial` can be added on definitions to force its
+  * attribute `inline:trivial` can be put on definitions to force their
     inlining by the transformation `inline_trivial`
 
 IDE
@@ -76,17 +92,25 @@ IDE
   * strategies can now be defined using `%t` (resp. `%m`) to call a prover with
     the default timelimit (resp. memlimit)
   * added minimal search menu
-  * A merlin-like feature to find the ident located under the cursor has been
+  * a merlin-like feature to find the identifier located under the cursor has been
     added in the Edit menu.
-  * Read only file can now be displayed and removed by right clicking on their
+  * read-only files can now be displayed and removed by right-clicking on their
     tab titles
-  * Colors for error can now be edited in the why3.conf more precisely
-  * Most of the preferences can now be changed for the current session
-  * Ctrl-Down/Ctrl-Up are mapped to more straightforward moves. The former
-    movement can be triggered with Ctrl-Left/Ctrl-Right
+  * colors for error can now be edited in why3.conf more precisely
+  * most of the preferences can now be changed for the current session
+  * Ctrl-Down/Ctrl-Up are mapped to more straightforward moves; the former
+    movements can be triggered with Ctrl-Left/Ctrl-Right
 
 Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq
+
+Provers
+  * support for Vampire 4.2.2 (released Dec 14, 2017)
+  * support for Coq 8.10.0 (released Oct 8, 2019)
+  * support for Coq 8.10.1 (released Oct 25, 2019)
+  * support for Coq 8.10.2 (released Oct 29, 2019)
+  * support for Coq 8.11.0 (released Jan 30, 2020)
+  * make use of built-in support for strings by Z3 (4.8.6), and CVC4 (1.7)
 
 Version 1.2.1, October 28, 2019
 -------------------------------
@@ -163,6 +187,7 @@ Provers
   * support for Z3 4.8.4 (released Dec 20, 2018)
   * support for Coq 8.9.0 (released Jan 17, 2019)
   * upgraded Coq realizations for floating-point arithmetic to Flocq 3.1
+  * dropped support for Coq 8.5
 
 Version 1.1.1, December 17, 2018
 --------------------------------

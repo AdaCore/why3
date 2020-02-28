@@ -328,10 +328,10 @@ end
 module ArraySum
 
   use Array
-  use map.MapSum as M
+  use int.Sum as S
 
   (** `sum a l h` is the sum of `a[i]` for `l <= i < h` *)
-  function sum (a: array int) (l h: int) : int = M.sum a.elts l h
+  function sum (a: array int) (l h: int) : int = S.sum a.elts l h
 
 end
 

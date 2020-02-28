@@ -299,21 +299,21 @@ $(LIBDEP): $(LIBGENERATED)
 # Mlmpfr
 
 ifeq (@found_mlmpfr@,yes)
-src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_real.ml
-	cp src/util/mlmpfr_real.ml $@
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
+	cp $< $@
 else
-src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_dummy.ml
-	cp src/util/mlmpfr_dummy.ml $@
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
+	cp $< $@
 endif
 
 # Ocamlzip
 
 ifeq (@enable_zip@,yes)
-src/session/compress.ml: config.status src/session/compress_z.ml
-	cp src/session/compress_z.ml $@
+src/session/compress.ml: src/session/compress_z.ml Makefile
+	cp $< $@
 else
-src/session/compress.ml: config.status src/session/compress_none.ml
-	cp src/session/compress_none.ml $@
+src/session/compress.ml: src/session/compress_none.ml Makefile
+	cp $< $@
 endif
 
 .PHONY: initialize_messages update-parsing-error-handling
@@ -356,8 +356,10 @@ endif
 # Re
 
 ifeq (@enable_re@,no)
-src/util/re.ml: src/util/recompat.ml config.status
+src/util/re.ml: src/util/recompat.ml Makefile
 	cp $< $@
+
+GENERATED += re.ml
 endif
 
 # build targets
@@ -475,9 +477,7 @@ PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/python/py_parser.ml plugins/python/py_parser.mli \
 		plugins/microc/mc_lexer.ml \
 		plugins/microc/mc_parser.ml plugins/microc/mc_parser.mli \
-		plugins/parser/dimacs.ml \
-		plugins/ada_terms/ada_lexer.ml \
-		plugins/ada_terms/ada_parser.ml plugins/ada_terms/ada_parser.mli
+		plugins/parser/dimacs.ml
 
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
@@ -485,14 +485,12 @@ PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_ast py_parser py_lexer py_main
 PLUG_MICROC = mc_ast mc_parser mc_lexer mc_printer mc_main
-PLUG_ADA = ada_nametable ada_parser ada_lexer ada_main
 
-PLUGINS = genequlin dimacs tptp python microc ada
+PLUGINS = genequlin dimacs tptp python microc
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
 PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
 MICROCMODULES = $(addprefix plugins/microc/, $(PLUG_MICROC))
-ADAMODULES = $(addprefix plugins/ada_terms/, $(PLUG_ADA))
 
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
@@ -502,9 +500,6 @@ PYTHONCMX = $(addsuffix .cmx, $(PYTHONMODULES))
 
 MICROCCMO = $(addsuffix .cmo, $(MICROCMODULES))
 MICROCCMX = $(addsuffix .cmx, $(MICROCMODULES))
-
-ADACMO = $(addsuffix .cmo, $(ADAMODULES))
-ADACMX = $(addsuffix .cmx, $(ADAMODULES))
 
 ifeq (@enable_hypothesis_selection@,yes)
 PLUG_TRANSFORM += hypothesis_selection
@@ -521,14 +516,13 @@ endif
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
-	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
-	      $(ADAMODULES)
+	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 
-PLUGDIRS = parser printer transform tptp python microc ada_terms
+PLUGDIRS = parser printer transform tptp python microc
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 $(PLUGDEP) $(PLUGCMO) $(PLUGCMX): INCLUDES += $(PLUGINCLUDES)
@@ -564,8 +558,6 @@ lib/plugins/python.cmxs: $(PYTHONCMX)
 lib/plugins/python.cmo: $(PYTHONCMO)
 lib/plugins/microc.cmxs: $(MICROCCMX)
 lib/plugins/microc.cmo: $(MICROCCMO)
-lib/plugins/ada.cmxs: $(ADACMX)
-lib/plugins/ada.cmo: $(ADACMO)
 
 # depend and clean targets
 
@@ -889,11 +881,11 @@ install:: install-ide
 install_local:: bin/why3ide
 
 ifeq (@GTKVERSION@,2)
-src/ide/gtkcompat.ml: config.status src/ide/gtkcompat2.ml
-	cp src/ide/gtkcompat2.ml $@
+src/ide/gtkcompat.ml: src/ide/gtkcompat2.ml Makefile
+	cp $< $@
 else
-src/ide/gtkcompat.ml: config.status src/ide/gtkcompat3.ml
-	cp src/ide/gtkcompat3.ml $@
+src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
+	cp $< $@
 endif
 
 GENERATED += $(IDEGENERATED)
@@ -920,12 +912,7 @@ byte: bin/why3webserver.byte
 opt:  bin/why3webserver.opt
 
 bin/why3webserver.opt: $(WHY3CMXA) $(WEBSERVCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3webserver.byte: $(WHY3CMA) $(WEBSERVCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
 
 # depend and clean targets
 
@@ -1012,12 +999,7 @@ byte: bin/why3shell.byte
 opt:  bin/why3shell.opt
 
 bin/why3shell.opt: $(WHY3CMXA) $(SHELLCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3shell.byte: $(WHY3CMA) $(SHELLCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
@@ -1596,12 +1578,7 @@ byte: bin/why3pp.byte
 opt:  bin/why3pp.opt
 
 bin/why3pp.opt: $(WHY3CMXA) $(PRETTYPRINTCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3pp.byte: $(WHY3CMA) $(PRETTYPRINTCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
@@ -2238,20 +2215,20 @@ STDMACHLIBS = \
 	array bv c float fxp int matrix onetime peano tagset
 
 STDLIBS = \
-	algebra appmap array \
+	algebra array \
 	bag bintree bool bv \
 	cursor \
 	exn \
-	floating_point function \
+	floating_point fmap function \
 	graph hashtbl \
-	ieee_float impmap int \
+	ieee_float int \
 	list \
 	map matrix \
 	null number option ocaml \
 	pigeon pqueue \
 	queue \
 	random real ref regexp relations \
-	seq set stack string sum \
+	seq set stack string \
 	tree \
 	witness \
 	$(addprefix mach/, $(STDMACHLIBS))

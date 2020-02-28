@@ -23,6 +23,7 @@ module C
     offset : int ;
     mutable min : int ;
     mutable max : int ;
+    writable : bool;
     zone : zone ;
   }
 
@@ -49,6 +50,7 @@ module C
     ensures { result.min = p.min }
     ensures { result.max = p.max }
     ensures { result.zone = p.zone }
+    ensures { result.writable = p.writable }
     alias { p.data with result.data }
 
   (** pointer dereference *)
@@ -65,12 +67,14 @@ module C
   (** pointer assignment *)
   val set (p:ptr 'a) (v:'a) : unit
     requires { p.min <= p.offset < p.max }
+    requires { writable p }
     ensures { pelts p = Map.set (pelts (old p)) p.offset v }
     writes { p.data.elts }
 
   (** pointer assignment with offset *)
   let set_ofs (p:ptr 'a) (ofs:int32) (v:'a) : unit
     requires { p.min <= p.offset + ofs < p.max }
+    requires { writable p }
     ensures { pelts p = Map.set (pelts (old p))
               (p.offset + ofs) v }
     ensures { (pelts p)[p.offset + ofs] = v }
@@ -99,6 +103,7 @@ module C
     ensures { result.offset = 0 }
     ensures { result.min = 0 }
     ensures { result.max = plength result }
+    ensures { writable result }
 
   val partial c_assert (e:bool) : unit
     ensures { e }
@@ -109,6 +114,7 @@ module C
     ensures { result.offset = 0 }
     ensures { result.min = 0 }
     ensures { result.max = sz }
+    ensures { writable result }
   = let p = malloc sz in
     c_assert (is_not_null p);
     p
@@ -117,6 +123,7 @@ module C
     requires { p.offset = 0 }
     requires { p.min = 0 }
     requires { p.max = plength p }
+    requires { writable p }
     writes { p }
     writes { p.data }
 
@@ -124,6 +131,7 @@ module C
     requires { p.offset = 0 }
     requires { p.min = 0 }
     requires { p.max = plength p }
+    requires { writable p }
     writes { p }
     writes { p.data }
   = free p
@@ -134,8 +142,10 @@ module C
     requires { p.min = 0 }
     requires { p.max = plength p }
     requires { plength p > 0 }
+    requires { writable p }
     writes { p }
     writes { p.data }
+    ensures { writable result }
     ensures { result.zone <> null_zone -> result.min = 0 }
     ensures { result.zone <> null_zone -> result.max = plength result }
     ensures { result.offset = 0 }
@@ -148,8 +158,10 @@ module C
   val incr_split (p:ptr 'a) (i:int32) : ptr 'a
     requires { 0 <= i }
     requires { p.min <= p.offset + i <= p.max }
+    requires { writable p }
     writes   { p.max }
     writes   { p.data }
+    ensures  { writable result }
     ensures  { result.offset = p.offset + i }
     ensures  { p.max = p.offset + i }
     ensures  { result.min = p.offset + i }
@@ -164,6 +176,7 @@ module C
   val join (p1 p2: ptr 'a) : unit
     requires { p1.zone = p2.zone }
     requires { p1.max = p2.min }
+    requires { writable p1 /\ writable p2 }
     writes   { p1.max }
     writes   { p1.data.elts }
     writes   { p2 }
@@ -178,8 +191,10 @@ module C
   val decr_split (p:ptr 'a) (i:int32) : ptr 'a
     requires { 0 <= i }
     requires { p.min <= p.offset - i <= p.max }
+    requires { writable p }
     writes   { p.min }
     writes   { p.data }
+    ensures  { writable result }
     ensures  { result.offset = p.offset - i }
     ensures  { p.min = p.offset - i }
     ensures  { result.min = old p.min }
@@ -194,6 +209,7 @@ module C
   val join_r (p1 p2: ptr 'a) : unit
     requires { p1.zone = p2.zone }
     requires { p1.max = p2.min }
+    requires { writable p1 /\ writable p2 }
     writes   { p1 }
     writes   { p1.data }
     writes   { p2.min }
@@ -211,5 +227,53 @@ module C
   val print_newline () : unit
 
   val print_uint32 (n:UInt32.uint32):unit
+
+end
+
+module Char
+
+  type char = < range -128 127 >
+  let constant min_char : int = -128
+  let constant max_char : int = 127
+  function to_int (x:char) : int = char'int x
+
+  clone export mach.int.Bounded_int with
+    type t = char,
+    constant min = char'minInt,
+    constant max = char'maxInt,
+    function to_int = char'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+end
+
+module UChar
+
+  type uchar = < range 0 255 >
+
+  let constant max_uchar : int = 255
+  function to_int (x:uchar) : int = uchar'int x
+  let constant length : int = 8
+  let constant radix : int = 256
+
+  clone export mach.int.Unsigned with
+    type t = uchar,
+    constant max = uchar'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = uchar'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+  use int.Int
+  use mach.int.UInt64
+
+  val of_uint64 (x:uint64) : uchar
+    requires { 0 <= x <= 255 }
+    ensures  { result = to_int x }
+
+  val to_uint64 (x:uchar) : uint64
+    ensures  { to_int result = x }
 
 end

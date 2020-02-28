@@ -3,8 +3,7 @@
   <head>
     <title>Verify Python Code using Why3</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" type="text/css" href="trywhy3.css" />
-    <link rel="stylesheet" type="text/css" href="trywhy3_custom.css"/>
+    <link rel="stylesheet" type="text/css" href="trywhy3_help.css" />
 
 
     <script defer="defer" src="ace-builds/src-min-noconflict/ace.js"
@@ -22,7 +21,184 @@
   </head>
   <body>
 
-    This is the help page.
+    <h1>Online version of Why3, with Python input format</h1>
+
+    This version of Why3 is intended for teaching purposes.
+    Its input format is a tiny subset of Python, called "micro-Python"
+    and described below.
+
+    <p>
+
+    Note: the command-line version of Why3 is also supporting this
+    input format, for files with suffix <tt>.py</tt>.
+
+    <h2>Syntax of micro-Python</h2>
+
+    Notation: The grammar of micro-Python is given below in extended
+    Backus-Naur Form, using | for alternation, () for grouping,
+    [] for option, and {} for repetition.
+    Special symbols <tt>NEWLINE</tt>, <tt>INDENT</tt>,
+    and <tt>DEDENT</tt> mark an end of line, the beginning of a new
+    indentation block, and its end, respectively.
+
+    <p>
+
+    Logical annotations are inserted in special comments starting
+    with <tt>//@</tt> or <tt>/*@</tt>. In the following grammar, we
+    only use the former kind, for simplicity, but both kinds are allowed.
+
+<pre>
+      file ::= decl*
+      decl ::= py-import | py-function | stmt | logic-declaration
+ py-import ::= "from" ident "import" ident { "," ident } NEWLINE
+</pre>
+
+Directives <tt>import</tt> are ignored during the translation to
+Why3. They are allowed anyway, such that a Python source code using
+functions such as <tt>randint</tt> is accepted by a Python
+interpreter (see below).
+
+<h4>Function definition</h4>
+
+<pre>
+py-function ::= "def" ident "(" [ params ] ")" ":" NEWLINE INDENT { spec } { stmt } DEDENT
+     params ::= ident { "," ident }
+</pre>
+
+<h4>Function specification</h4>
+
+<pre>
+   spec ::= "requires" term NEWLINE
+          | "ensures"  term NEWLINE
+          | "variant"  term { "," term } NEWLINE
+</pre>
+
+<h4>Python expression</h4>
+
+<pre>
+  expr ::= "None" | "True" | "False" | integer-literal | string-literal
+	 | identifier
+	 | identifier "[" expr "]"
+	 | "-" expr | "not" expr
+	 | expr ( "+" | "-" | "*" | "//" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "and" | "or" ) expr
+	 | identifier "(" [ expr { "," expr } ] ")"
+	 | "[" [ expr { "," expr } ] "]"
+	 | "(" expr ")"
+</pre>
+
+<h4>Python statement</h4>
+
+<pre>
+       stmt ::= simple_stmt NEWLINE
+              | "if" expr ":" suite else_branch
+	      | "while" expr ":" loop_body
+	      | "for" ident "in" expr ":" loop_body
+else_branch ::= /* nothing */
+              | "else:" suite
+              | "elif" expr ":" suite else_branch
+      suite ::= simple_stmt NEWLINE
+              | NEWLINE INDENT stmt { stmt } DEDENT
+simple_stmt ::= expr
+              | "return" expr
+              | identifier "=" expr
+              | identifier "[" expr "]" "=" expr
+              | "break"
+	      | "//@" "label" identifier
+	      | "//@" ( "assert" | "assume" | "check" ) term
+   assignop ::= "=" | "+=" | "-=" | "*=" | "/="
+  loop_body ::= simple_stmt NEWLINE
+              | NEWLINE INDENT { loop_annot } stmt { stmt } DEDENT
+ loop_annot ::= "//@" "invariant" term NEWLINE
+              | "//@" "variant" term { "," term } NEWLINE
+</pre>
+
+<h4>Logic declaration</h4>
+
+<pre>
+  logic-declaration ::= "//@" "function" "int" identifier "(" params ")" NEWLINE
+		      | "//@" "predicate" identifier "(" params ")" NEWLINE
+</pre>
+
+Note that logic functions and predicates cannot be given definitions.
+Yet, they can be axiomatized, using toplevel <tt>assume</tt> statements.
+
+
+<h4>Logical term</h4>
+
+<pre>
+  term ::= identifier
+	 | integer-literal
+         | "None"
+	 | "True"
+	 | "False"
+	 | "(" term ")"
+	 | term "[" term "]"
+	 | term "[" term "<-" term "]"
+	 | "not" term
+	 | "old" "(" term ")"
+	 | "at" "(" term "," identifier ")"
+	 | "-" term
+	 | term ( "->" | "<->" | "or" | "and" ) term
+	 | term ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) term
+	 | term ( "+" | "-" | "*" | "//" | "% ) term
+	 | "if" term "then" term "else term
+	 | "let" identifier "=" term "in" term
+	 | ( "forall" | "exists" ) ident { "," ident } "." term
+	 | identifier "(" [ term { "," term } ] ")"
+</pre>
+
+    <h2>Built-in functions and predicates</h2>
+
+    <h4>Python code</h4>
+
+    <ul>
+      <li> <tt>len(l)</tt>, the length of list <tt>l</tt>
+      <li> <tt>int(input())</tt>, reads an integer from standard input
+      <li> <tt>range(l, u)</tt>, returns the list of integers
+        from <tt>l</tt> inclusive to <tt>u</tt> exclusive <br>
+        (in particular, <tt>for x in range(l, u):</tt> is supported)
+      <li> <tt>randint(l, u)</tt>, returns a pseudo-random integer
+        in the range <tt>l</tt> to <tt>u</tt> inclusive
+    </ul>
+
+    <h4>Logic</h4>
+
+    <ul>
+      <li> <tt>len(l)</tt>, the length of list <tt>l</tt>
+      <li> <tt>occurrence(v, l)</tt>, the number of
+	occurrences of the value <tt>v</tt> in list <tt>l</tt>
+    </ul>
+
+    <h2>Limitations</h2>
+
+    Python lists are modeled as arrays, whose size cannot be modified.
+
+    <h2>Verifying a program</h2>
+
+    <p>
+    Click on the gears button to launch the verification.
+    Verification conditions (VCs) then appear in the right panel, in
+    the Task List tab, and
+    Alt-Ergo is run on each of them with a default time limit (that
+    can be set in the Settings menu).
+    </p>
+
+    <p>
+    When a VC is not proved, there are several options:
+    <ul>
+      <li> use the contextual menu to rerun Alt-Ergo with a larger
+      time limit (e.g. 1000 or 5000 steps instead of 100);
+      <li> use the contextual menu to split the VC and rerun Alt-Ergo
+      on each sub-VC (split and prove);
+      <li> use the Task View tab to investigate the problematic VC,
+      for wrong or missing elements of specification (precondition,
+      postcondition, invariant);
+      <li> add intermediate assertions in the code, using <tt>//@
+      assert ...;</tt>.
+    </ul>
+    </p>
+
+    <br>
 
   </body>
 

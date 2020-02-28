@@ -656,7 +656,10 @@ let rec inject kn uf pins caps pos f = match f.t_node with
       let p = Mint.find n pins in
       let check _ (_,c) = assert (cap_valid uf c) in
       Mls.iter check p.p_vars;
-      let inv = List.map (t_attr_copy f) p.p_inv in
+      let inv_attr_copy i =
+        let loc = (if f.t_loc = None then i else f).t_loc in
+        t_attr_set ?loc (Sattr.union f.t_attrs i.t_attrs) i in
+      let inv = List.map inv_attr_copy p.p_inv in
       t_and_asym_l inv, uf
   | Tapp (ls,[t]) when not pos && ls_equal ls ls_valid ->
       let t, c = cap_of_term kn uf pins caps t in
