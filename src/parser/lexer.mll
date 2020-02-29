@@ -54,7 +54,7 @@
         "exists", EXISTS;
         "export", EXPORT;
         "false", FALSE;
-        "float", FLOAT;
+        "float", FLOAT; (* contextual *)
         "for", FOR;
         "forall", FORALL;
         "fun", FUN;
@@ -81,10 +81,10 @@
         "pure", PURE;
         "raise", RAISE;
         "raises", RAISES;
-        "range", RANGE;
+        "range", RANGE; (* contextual *)
         "reads", READS;
         "rec", REC;
-        "ref", REF;
+        "ref", REF; (* contextual *)
         "requires", REQUIRES;
         "return", RETURN;
         "returns", RETURNS;
