@@ -309,9 +309,9 @@ module UInt32BV
   use bv.BV32 as BV32
 
   val to_bv (x: uint32) : BV32.t
-    ensures { BV32.to_int result = to_int x }
+    ensures { BV32.t'int result = to_int x }
   val of_bv (x: BV32.t) : uint32
-    ensures { to_int result = BV32.to_int x }
+    ensures { to_int result = BV32.t'int x }
 
 end
 
