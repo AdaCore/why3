@@ -224,13 +224,6 @@ module Int31
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV31 as BV31
-
-  val to_bv (x: int31) : BV31.t
-    ensures { BV31.to_int result = to_int x }
-  val of_bv (x: BV31.t) : int31
-    ensures { to_int result = BV31.to_int x }
-*)
 end
 
 module Int32
@@ -251,14 +244,6 @@ module Int32
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*
-  use bv.BV32 as BV32
-
-  val to_bv (x: int32) : BV32.t
-    ensures { BV32.to_int result = to_int x }
-  val of_bv (x: BV32.t) : int32
-    ensures { to_int result = BV32.to_int x }
-*)
 end
 
 module Int32BV
@@ -314,6 +299,19 @@ module UInt32
     lemma zero_unsigned_is_zero,
     lemma to_int_in_bounds,
     lemma extensionality
+
+end
+
+module UInt32BV
+
+  use export UInt32
+
+  use bv.BV32 as BV32
+
+  val to_bv (x: uint32) : BV32.t
+    ensures { BV32.to_int result = to_int x }
+  val of_bv (x: BV32.t) : uint32
+    ensures { to_int result = BV32.to_int x }
 
 end
 
@@ -386,13 +384,6 @@ module UInt32GMP
     requires { x <= max_int32 }
     ensures { Int32.to_int result = to_int x }
 
-(*  use bv.BV32 as BV32
-
-  val to_bv (x: uint32) : BV32.t
-    ensures { BV32.to_uint result = to_int x }
-  val of_bv (x: BV32.t) : uint32
-    ensures { to_int result = BV32.to_uint x }
-*)
 end
 
 module Int63
@@ -420,13 +411,6 @@ module Int63
   val constant min_int:int63
      ensures { int63'int result = min_int63 }
 
-(*  use bv.BV63 as BV63
-
-  val to_bv (x: int63) : BV63.t
-    ensures { BV63.to_int result = to_int x }
-  val of_bv (x: BV63.t) : int63
-    ensures { to_int result = BV63.to_int x }
-*)
 end
 
 module Refint63
@@ -547,13 +531,6 @@ module Int64
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV64 as BV64
-
-  val to_bv (x: int64) : BV64.t
-    ensures { BV64.to_int result = to_int x }
-  val of_bv (x: BV64.t) : int64
-    ensures { to_int result = BV64.to_int x }
-*)
 end
 
 module UInt64Gen
@@ -584,13 +561,6 @@ module UInt64
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV64 as BV64
-
-  val to_bv (x: uint64) : BV64.t
-    ensures { BV64.to_uint result = to_int x }
-  val of_bv (x: BV64.t) : uint64
-    ensures { to_int result = BV64.to_uint x }
-*)
 end
 
 module UInt64GMP
