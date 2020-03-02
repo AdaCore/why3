@@ -546,12 +546,12 @@ lib/plugins/%.cmo: | lib/plugins
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
-lib/plugins/%.cmxs: plugins/parser/%.cmx
-lib/plugins/%.cmo: plugins/parser/%.cmo
-lib/plugins/%.cmxs: plugins/printer/%.cmx
-lib/plugins/%.cmo: plugins/printer/%.cmo
-lib/plugins/%.cmxs: plugins/transform/%.cmx
-lib/plugins/%.cmo: plugins/transform/%.cmo
+$(PLUG_PARSER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/parser/%.cmx
+$(PLUG_PARSER:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/parser/%.cmo
+$(PLUG_PRINTER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/printer/%.cmx
+$(PLUG_PRINTER:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/printer/%.cmo
+$(PLUG_TRANSFORM:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/transform/%.cmx
+$(PLUG_TRANSFORM:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/transform/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
 lib/plugins/tptp.cmo: $(TPTPCMO)
 lib/plugins/python.cmxs: $(PYTHONCMX)
