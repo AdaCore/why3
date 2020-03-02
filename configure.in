@@ -729,6 +729,12 @@ if test "$enable_hypothesis_selection" = yes; then
    fi
 fi
 
+# temporary until #453 is fixed
+if test "$enable_hypothesis_selection" = yes -a "$enable_ocamlfind" = yes; then
+   enable_hypothesis_selection=no
+   reason_hypothesis_selection=" (ocamlfind used)"
+fi
+
 if test "$enable_hypothesis_selection" = yes; then
    META_OCAMLGRAPH="ocamlgraph"
 else
