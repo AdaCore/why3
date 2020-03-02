@@ -1227,7 +1227,7 @@ module MLToC = struct
        | [], C.Sexpr c ->
           let c = handle_likely cond.e_attrs c in
           if is_false th && is_true el
-          then C.([], Sexpr(Eunop(Unot, c)))
+          then C.([], expr_or_return env (Eunop(Unot, c)))
           else [], C.Sif(c,C.Sblock t, C.Sblock e)
        | cdef, cs ->
           let cid = id_register (id_fresh "cond") in (* ? *)
