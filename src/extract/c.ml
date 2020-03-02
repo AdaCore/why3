@@ -1152,14 +1152,7 @@ module MLToC = struct
        (defs, Sseq (inits, expr_or_return env st))
     | Eapp (rs, el) ->
        Debug.dprintf debug_c_extraction "call to %s@." rs.rs_name.id_string;
-       let args =
-         List.filter
-           (fun e ->
-             assert (not e.e_effect.eff_ghost);
-             match e.e_ity with
-             | I i when ity_equal i Ity.ity_unit -> false
-             | _ -> true)
-           el
+       let args = List.filter (fun e -> not (is_unit e.e_ity)) el
        in (*FIXME still needed with masks? *)
        let env_f = { env with computes_return_value = false } in
        if is_rs_tuple rs
@@ -1218,11 +1211,10 @@ module MLToC = struct
                 String.contains s '%'
                 || String.contains s ' '
                 || String.contains s '(' in
+              let p = Mid.find rs.rs_name info.prec in
               if complex s
               then
-                let rty = ty_of_ity (match e.e_ity with
-                                     | C _ -> assert false
-                                     | I i -> i) in
+                let rty = ty_of_ity (ity_of_expr e) in
                 let rtyargs = match rty.ty_node with
                   | Tyvar _ -> [||]
                   | Tyapp (_,args) ->
@@ -1230,11 +1222,10 @@ module MLToC = struct
                        (List.map (ty_of_ty info)
                           args)
                 in
-                let p = Mid.find rs.rs_name info.prec in
                 C.Esyntax(s,ty_of_ty info rty, rtyargs, params, p)
               else
                 if args=[]
-                then C.(Esyntax(s, Tnosyntax, [||], [], [])) (*constant*)
+                then C.(Esyntax(s, Tnosyntax, [||], [], p)) (*constant*)
                 else
                   (*function defined in the prelude *)
                   let cargs = List.map fst params in
@@ -1456,13 +1447,19 @@ module MLToC = struct
               then C.Sreturn(Enothing)
               else C.Snop)
     | Efun _ -> raise (Unsupported "higher order")
-    | Elet (Lvar (v, { e_node = Eapp (rs, _) }), e)
-         when Sattr.mem decl_attribute rs.rs_name.id_attrs ->
+    | Elet (Lvar (v, { e_node = Eapp (rs, al) }), e)
+         when Sattr.mem decl_attribute rs.rs_name.id_attrs
+              && query_syntax info.syntax rs.rs_name <> None
+              && List.for_all (fun e -> is_unit e.e_ity) al
+      ->
        Debug.dprintf debug_c_extraction "variable declaration call@.";
        if var_escapes_from_expr env v e
        then raise (Unsupported "local variable escaping function");
        let t = ty_of_ty info (ty_of_ity v.pv_ity) in
-       let d = C.Ddecl (t, [pv_name v, Enothing]) in
+       let scall = Opt.get (query_syntax info.syntax rs.rs_name) in
+       let p = Mid.find rs.rs_name info.prec in
+       let ecall = C.(Esyntax(scall, Tnosyntax, [||], [], p)) in
+       let d = C.Ddecl (t, [pv_name v, ecall]) in
        let d', s = expr info env e in
        d::d', s
     | Elet (Lvar (a, { e_node = Eapp (rs, [n; v]) }), e)
@@ -1476,10 +1473,7 @@ module MLToC = struct
        let n = get_const_expr n in
        let avar = pv_name a in
        let sizes = Mid.add avar n env.array_sizes in
-       let v_ty =
-         match v.e_ity with
-         | I i -> ty_of_ty info (ty_of_ity i)
-         | _ -> assert false in
+       let v_ty = ty_of_ty info (ty_of_ity (ity_of_expr v)) in
        let loop_i = id_register (id_fresh "i") in
        let d = C.([Ddecl (Tarray (v_ty, n), [avar, Enothing]);
                    Ddecl (Tsyntax ("int", []), [loop_i, Enothing])]) in
