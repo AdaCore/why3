@@ -53,14 +53,16 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
       assert { value rp nl = value np nl at Realloc
                = old mpz.abs_value_of num };
       set_size rem ns rp;
+      unchanged num mpz (pure { mpz at Realloc });
       release_reader num np;
       unchanged num mpz ompz;
       release_writer rem rp;
       assert { value_of rem mpz = old value_of num mpz };
       ghost (if not mpz_eq num quot then unchanged quot mpz ompz);
     end;
-    label Quot0 in
+    let ghost mpz0 = pure { mpz } in
     set_size_0 quot;
+    unchanged rem mpz mpz0;
     assert { value_of quot mpz = 0 };
     assert { value_of rem mpz = old value_of num mpz };
     return
@@ -99,7 +101,6 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
     cmemd <- memd;
     clear_d <- true;
     let tdp = salloc (UInt32.of_int32 dl) in
-    set_size_0 d'; (* FIXME should not be needed *)
     set_alloc d' dl;
     wmpn_copyd_sep tdp dp dl;
     assert { value tdp dl = mpz'.abs_value_of den };
@@ -125,7 +126,6 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
     n' <- nn;
     clear_n <- true;
     let tnp = salloc (UInt32.of_int32 nl) in
-    set_size_0 n';
     set_alloc n' nl;
     wmpn_copyd_sep tnp np nl;
     assert { value tnp nl = mpz'.abs_value_of num };
@@ -226,6 +226,8 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
   release_writer rem rp;
   release_writer quot qp;
   let ghost mpzrq = pure { mpz } in
+  assert { value_of quot mpz * (old value_of den mpz) + value_of rem mpz
+           = old value_of num mpz };
   unchanged n' mpz mpzn;
   unchanged d' mpz mpzd;
   release_reader n' np;
@@ -260,6 +262,7 @@ let wmpz_tdiv_qr_ui (quot rem dividend: mpz_ptr) (divisor: limb) : limb
   then begin
     set_size_0 quot;
     set_size_0 rem;
+    assert { value_of quot mpz = 0 /\ value_of rem mpz = 0 };
     return 0;
   end;
   let nn = abs ns in

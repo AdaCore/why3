@@ -223,6 +223,7 @@ void wmpz_clear (wmpz_ptr);\n\
   syntax val release_reader "(void)(%1)" prec 2 15
   syntax val release_writer "(void)(%1)" prec 2 15
   syntax val wmpz_init "__wmpz_init" prec 2
+  syntax val wmpz_tmp_decl "{ 0, 0, NULL }" prec 2
   syntax val wmpz_struct_to_ptr "&%1" prec 2 2
   syntax val wmpz_clear "wmpz_clear" prec 2
 

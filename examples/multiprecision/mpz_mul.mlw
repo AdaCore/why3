@@ -162,7 +162,7 @@ let wmpz_mul (w u v: mpz_ptr) : unit
     clear_mpz_w <- memw;
     wmpz_init nw;
     w' <- nw;
-    assert { ompz.alloc[w'] = 0 };
+    assert { ompz.readers[w'] = -2 };
     let wp' = wmpz_realloc w' wsize in
     assert { forall x. x <> w' -> mpz_unchanged x mpz ompz };
     unchanged u' mpz ompz;
@@ -180,7 +180,6 @@ let wmpz_mul (w u v: mpz_ptr) : unit
       should_clear_u <- true;
       clear_mpz_u <- mu;
       u' <- nu;
-      set_size_0 u'; (* FIXME set_alloc precondition, we should not need this *)
       set_alloc u' usize;
       wmpn_copyi up wp usize;
       assert { value up usize = value wp usize = ompz.abs_value_of u };
@@ -200,7 +199,6 @@ let wmpz_mul (w u v: mpz_ptr) : unit
       should_clear_v <- true;
       clear_mpz_v <- mv;
       v' <- nv;
-      set_size_0 v';
       set_alloc v' vsize;
       wmpn_copyi vp wp vsize;
       assert { value vp vsize = value wp vsize = ompz.abs_value_of v };

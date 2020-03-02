@@ -263,6 +263,8 @@ let wmpz_sub (w u v: mpz_ptr) : unit
         release_reader v vp;
       end;
     label Set in
+    assert { value wp abs_usize + power radix abs_usize * cy
+             = old abs(mpz.abs_value_of[u] + mpz.abs_value_of[v]) };
     value_sub_update_no_change (pelts wp) (int32'int abs_usize)
                                     0 (int32'int abs_usize) cy;
     set_ofs wp abs_usize cy;
