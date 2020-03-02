@@ -710,7 +710,7 @@ module Print = struct
       else fprintf fmt "" in
     try match def with
       | Dfun (id,(rt,args),body) ->
-         let s = sprintf "@[@[<hv 2>%a%a %a(@[%a@]) {@\n@[%a@]@]\n}\n@]"
+         let s = sprintf "@[@\n@[<hv 2>%a%a %a(@[%a@]) {@\n@[%a@]@]\n}@]"
                    print_inline id
                    (print_ty ~paren:false) rt
                    print_global_ident id
@@ -722,7 +722,7 @@ module Print = struct
          (* print into string first to print nothing in case of exception *)
          fprintf fmt "%s" s
       | Dproto (id, (rt, args)) ->
-         let s = sprintf "%a %a(@[%a@]);@;"
+         let s = sprintf "@\n%a %a(@[%a@]);"
                    (print_ty ~paren:false) rt
                    print_global_ident id
                    (print_list comma
@@ -745,7 +745,7 @@ module Print = struct
                    lie in
          fprintf fmt "%s" s
       | Dstruct (s, lf) ->
-         let s = sprintf "struct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@\n@]"
+         let s = sprintf "@\nstruct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@]"
                    s
                    (print_list newline
                       (fun fmt (s,ty) -> fprintf fmt "%a %s;"
@@ -755,9 +755,9 @@ module Print = struct
       | Dstruct_decl s ->
          fprintf fmt "struct %s;@;" s
       | Dinclude (id, Sys) ->
-         fprintf fmt "#include <%s.h>@;"  (sanitizer id.id_string)
+         fprintf fmt "#include <%s.h>"  (sanitizer id.id_string)
       | Dinclude (id, Proj) ->
-         fprintf fmt "#include \"%s.h\"@;" (sanitizer id.id_string)
+         fprintf fmt "#include \"%s.h\"" (sanitizer id.id_string)
       | Dtypedef (ty,id) ->
          let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
                    (print_ty ~paren:false) ty print_global_ident id in
@@ -804,6 +804,7 @@ module MLToC = struct
 
   let structs : struct_def Hid.t = Hid.create 16
   let aliases : C.ty Hid.t = Hid.create 16
+  let globals : unit Hid.t = Hid.create 16
 
   let array = create_attribute "extraction:array"
   let array_mk = create_attribute "extraction:array_make"
@@ -1126,6 +1127,10 @@ module MLToC = struct
        in
        let e = C.(Econst (Cint s)) in
        ([], expr_or_return env e)
+    | Eapp (rs, []) when Hid.mem globals rs.rs_name ->
+       Debug.dprintf debug_c_extraction "global variable %s@."
+         rs.rs_name.id_string;
+       [], expr_or_return env (Evar rs.rs_name)
     | Eapp (rs, _) when Sattr.mem decl_attribute rs.rs_name.id_attrs ->
        raise (Unsupported "local variable declaration call outside let-in")
     | Eapp (rs, [e]) when rs_equal rs Pmodule.rs_ref ->
@@ -1587,7 +1592,12 @@ module MLToC = struct
           let d = C.group_defs_by_type d in
           let s = C.elim_nop s in
           let s = C.elim_empty_blocks s in
-          sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
+          match s with
+          | Sreturn r when params = [] ->
+             Format.printf "declaring global %s@." rs.rs_name.id_string;
+             Hid.add globals rs.rs_name ();
+             sdecls@[C.Ddecl (rtype, [rs.rs_name, r])]
+          | _ -> sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
     try
       begin match d with
       | Dlet (Lsym(rs, _, mlty, vl, e)) ->
