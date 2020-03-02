@@ -634,8 +634,6 @@ functions from the logical part of the modules
    :start-after: BEGIN{code2_import}
    :end-before: END{code2_import}
 
-\lstinputlisting{generated/mlw_expr__code2_import.ml}
-
 We want now to build a program equivalent to the following code in
 concrete Why3 syntax.
 
@@ -744,66 +742,69 @@ the JSON output as follows:
    :start-after: BEGIN{ce_callprover}
    :end-before: END{ce_callprover}
 
-.. _sec.infer_loop_api:
-
+.. _sec.infer_loop:
 Infering loop invariants
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
-For information about the inference of loop invariants in \why refer
-to :numref:`infer_loop`. This section describes how to use the
-API to infer loop invariants. The complete example used in this
-section is in \verb|examples/use_api/infer.ml|. For the matter of
-simplification, in this section we omit some details, such as the
-parsing of command line arguments.
+This section describes how to the Why3 API to infer loop
+invaiants. For more information about the inference of loop invariants
+refer to :numref:`chap.inferloop`. The example we use in this section
+can be found in the Why3 source code ``examples/use_api/infer.ml``.
 
-Let us start by defining a \why environment required to parse and type
-check a \whyml program. This was already discussed in the previous
-sections.
+Let us start by defining a environment required to parse and type
+check a program, as discussed in the previous sections.
 
-\lstinputlisting{generated/infer__buildenv.ml}
+.. literalinclude:: ../examples/use_api/infer.ml
+   :language: ocaml
+   :start-after: BEGIN{buildenv}
+   :end-before: END{buildenv}
 
-Now, we define a function that given a path for a file and an \why
-environment, returns a collection of typed modules corresponding to
-the top level modules declared in the file.
+Now, we define a function that given a path for a file and an
+environment, returns a collection of typed modules corresponding to the
+top level modules declared in the file.
 
-\lstinputlisting{generated/infer__parsefile.ml}
+.. literalinclude:: ../examples/use_api/infer.ml
+   :language: ocaml
+   :start-after: BEGIN{parsefile}
+   :end-before: END{parsefile}
 
-Up to this point we just defined what is required for our tool to
-parse and type check a \whyml file. It is now possible to infer loop
-invariants. For that we can use the Ocaml module \verb|Infer_ai| that
-provides the following interface.
+It is now possible to infer loop invariants using the module
+``Infer_ai`` that provides the following interface.
 
-\begin{verbatim}
-module type Inv_gen = sig
-  val infer_loop_invariants:
-    ?widening:int -> Env.env -> Pmodule.pmodule -> Pmodule.pmodule
-end
+.. code-block:: whyml
 
-module Make (D: Domain.DOMAIN) : Inv_gen
+    module type Inv_gen = sig
+      val infer_loop_invariants:
+        ?widening:int -> Env.env -> Pmodule.pmodule -> Pmodule.pmodule
+    end
 
-module InvGenPolyhedra : Inv_gen
-module InvGenBox       : Inv_gen
-module InvGenOct       : Inv_gen
-\end{verbatim}
+    module Make (D: Domain.DOMAIN) : Inv_gen
 
-The interface provides a module type \verb|Inv_gen| containing only a
-function that receives a \emph{widening} value (the default value is
-3), a \why environment, and a typed \why module. It returns the same
-module with the inferred invariants. Three modules of these type are
-also provided: \verb|InvGenPolyhedra|, \verb|InvGenBox|, and
-\verb|InvGenOct|. Each one of these modules imposes the obvious
-abstract interpretation domain, respectively \emph{Polyhedra},
-\emph{Box}, and \emph{Oct}. Other modules, using other domains can be
-created using the \verb|Make| functor.
+    module InvGenPolyhedra : Inv_gen
+    module InvGenBox       : Inv_gen
+    module InvGenOct       : Inv_gen
+
+The interface provides a module type ``Inv_gen`` containing only a
+function that receives a *widening* value (by default it is set to 3),
+an environment, and a typed Why3 module, and returns the same Why3
+module with the inferred loop invariants. Three instances of
+``Inv_gen`` are provided: ``InvGenPolyhedra``, ``InvGenBox``, and
+``InvGenOct``. Each one of these instances imposes the obvious
+abstract interpretation domain, respectively *Polyhedra*, *Box*, and
+*Oct*. Other modules, possibly using other domains can be created
+using the ``Make`` functor.
 
 Putting these pieces together, it is now possible to create a function
-that parses, type checks and infers invariants for some \whyml file.
-The function below receives a widening value, some flag indicating the
-desired domain to be used, and a path for a \whyml file, and outputs
-the result to the standard output.
+that parses, type checks and infers invariants for a given Why3
+file. The function below receives a widening value, some flag
+indicating the desired domain to be used, and a path for a file, and
+outputs the result to the standard output.
 
-\lstinputlisting{generated/infer__main.ml}
+.. literalinclude:: ../examples/use_api/infer.ml
+   :language: ocaml
+   :start-after: BEGIN{main}
+   :end-before: END{main}
 
-The complete example is in \verb|examples/use_api/infer.ml|. In
-particular it allows the domain and the widening value to be selected
-from the command line arguments.
+The complete example is in ``examples/use_api/infer.ml``, and it
+allows the domain and the widening value to be selected from the
+command line arguments.
