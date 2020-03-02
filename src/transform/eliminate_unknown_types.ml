@@ -103,16 +103,16 @@ let remove_ty_constr keep =
   let keep ts =
     match ts.Ty.ts_args with | [] -> true | _ -> keep ts
   in
-  let keep_ty ty =
-    Ty.ty_all (fun ty ->
-        match ty.ty_node with
-        | Ty.Tyvar _ -> invalid_arg "remove_ty_constr used with polymorphism"
-        | Ty.Tyapp (ts, _) -> keep ts)
-      ty
+  let rec keep_ty ty =
+    Ty.ty_all keep_ty ty &&
+    (match ty.ty_node with
+     | Ty.Tyvar _ -> invalid_arg "remove_ty_constr used with polymorphism"
+     | Ty.Tyapp (ts, _) -> keep ts)
   in
   let keep_ls ls =
-    List.for_all keep_ty ls.Term.ls_args
-    && Opt.for_all keep_ty ls.Term.ls_value
+    Term.ls_equal Term.ps_equ ls ||
+    (List.for_all keep_ty ls.Term.ls_args
+     && Opt.for_all keep_ty ls.Term.ls_value)
   in
   let keep_term t =
     Term.t_s_all keep_ty keep_ls t
@@ -215,12 +215,19 @@ let remove_ty_constr keep =
               in
               let d = create_logic_decl l in
               add_new mty mls new_ task_uc d
-          | Dprop (k,pr,t) when not (keep_term t) ->
-              let (mty,mls,new_,t) = map_term mty mls Mvs.empty [] t in
-              let d = create_prop_decl k pr t in
-              add_new mty mls new_ task_uc d
           | _ ->
-              ((mty,mls), Task.add_decl task_uc d)
+              let rmty = ref mty in
+              let rmls = ref mls in
+              let rnew_ = ref [] in
+              let map t =
+                let (mty,mls,new_,t) = map_term !rmty !rmls Mvs.empty !rnew_ t in
+                rmty := mty;
+                rmls := mls;
+                rnew_ := new_;
+                t
+              in
+              let d = Decl.decl_map map d in
+              add_new !rmty !rmls !rnew_ task_uc d
           end
       | _ -> ((mty,mls),Task.add_tdecl task_uc hd.Task.task_decl)
     )
@@ -232,7 +239,8 @@ let remove_ty_constr =
     (fun (_, task) -> Trans.return task)
 
 let () =
-  Trans.register_transform "eliminate_unknown_ty_constr" remove_ty_constr
+  Trans.register_transform "eliminate_unknown_ty_constr"
+    remove_ty_constr
     ~desc:"Remove@ type@ unknown@ type@ constructor,@ could@ be@ used@ only@ after@ eliminating@ polymorphism."
 
 
@@ -244,9 +252,9 @@ let syntactic_transform_ls =
       | _ -> assert false) Sls.empty metas in
       Trans.return (fun ls -> Sls.mem ls symbols))
 
-let remove_poly_unused_or_fail keep =
+let remove_poly_unused_or_fail _keep =
   let poly_ls ls =
-    not (keep ls ||
+    not (Term.ls_equal Term.ps_equ ls ||
          Stv.is_empty (Term.ls_ty_freevars ls))
   in
   Trans.decl (fun d ->

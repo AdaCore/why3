@@ -341,13 +341,19 @@ let print_task_goal t = match t with
       | _ -> ()
     end
 
-let create_debugging_trans trans_name (tran : Task.task trans) =
+let create_debugging_trans ?(print_all=false) trans_name (tran : Task.task trans) =
   let new_trans (t:Task.task) = begin
+    let print t =
+      if print_all
+      then
+        let form = Debug.get_debug_formatter () in
+        Pretty.print_task form t
+      else print_task_goal t in
     Debug.dprintf debug "The goal before the transformation %s:@." trans_name;
-    print_task_goal t;
+    print t;
     let t2 = apply tran t in
     Debug.dprintf debug "@.The goal after the transformation %s:@." trans_name;
-    print_task_goal t2;
+    print t2;
     Debug.dprintf debug "@.@.";
     t2;
   end in
