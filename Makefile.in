@@ -857,7 +857,11 @@ IDEDEP = $(addsuffix .dep, $(IDEMODULES))
 IDECMO = $(addsuffix .cmo, $(IDEMODULES))
 IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
-$(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/ide -I src/absint
+$(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
+
+ifeq (@enable_infer@,yes)
+$(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/absint
+endif
 
 $(IDEDEP): $(IDEGENERATED)
 
