@@ -451,6 +451,38 @@ module C = struct
     | Bassign -> true
     | _ -> false
 
+  let e_map fe (e:expr) =
+    match e with
+    | Enothing -> Enothing
+    | Eunop (u,e) -> Eunop (u, fe e)
+    | Ebinop (b, e1, e2) -> Ebinop (b, fe e1, fe e2)
+    | Equestion (c, t, e) -> Equestion (fe c, fe t, fe e)
+    | Ecast (t,e) -> Ecast(t, fe e)
+    | Ecall (f,args) -> Ecall (fe f, List.map fe args)
+    | Econst c -> Econst c
+    | Evar v -> Evar v
+    | Elikely e -> Elikely (fe e)
+    | Eunlikely e -> Eunlikely (fe e)
+    | Esize_expr e -> Esize_expr (fe e)
+    | Esize_type t -> Esize_type t
+    | Eindex (a,i) -> Eindex (fe a, fe i)
+    | Edot (e,f) -> Edot (fe e, f)
+    | Earrow (e, f) -> Earrow (fe e, f)
+    | Esyntaxrename (s,args) -> Esyntaxrename (s, List.map fe args)
+    | Esyntax (s,rt,ta,args,pl) ->
+       Esyntax (s, rt, ta, List.map (fun (e, t) -> (fe e, t)) args, pl)
+
+  let s_map fd fs fe (s:stmt) = match s with
+    | Snop -> Snop
+    | Sexpr e -> Sexpr (fe e)
+    | Sblock (d,s) -> Sblock (List.map fd d, fs s)
+    | Sseq (s1,s2) -> Sseq (fs s1, fs s2)
+    | Sif (ce,ts,es) -> Sif (fe ce, fs ts, fs es)
+    | Swhile (c,b) -> Swhile (fe c, fs b)
+    | Sfor (e1,e2,e3,b) -> Sfor (fe e1, fe e2, fe e3, fs b)
+    | Sbreak -> Sbreak
+    | Sreturn e -> Sreturn (fe e)
+
   (** Integer type bounds *)
   open BigInt
   let min32 = minus (pow_int_pos 2 31)
@@ -1677,6 +1709,31 @@ module MLToC = struct
 
 end
 
+module Transform = struct
+
+open C
+
+let rec expr e =
+  let e = e_map expr e in
+  match e with
+  | Equestion (c, Econst (Cint "1"), Econst (Cint "0")) -> c
+  | _ -> e
+
+and stmt s =
+  let s = s_map def stmt expr s in
+  s
+
+and def (d:definition) = match d with
+  | C.Dfun (id,p,(dl, s)) ->  Dfun (id, p, (List.map def dl, stmt s))
+  | C.Ddecl (ty, dl) -> C.Ddecl (ty, List.map (fun (id, e) -> id, expr e) dl)
+  | C.Dproto (_,_) | C.Dstruct _
+  | C.Dstruct_decl _ | C.Dtypedef (_,_)
+  | C.Dinclude (_,_) -> d
+
+let defs dl = List.map def dl
+
+end
+
 
 let name_gen suffix ?fname m =
   let n = m.Pmodule.mod_theory.Theory.th_name.Ident.id_string in
@@ -1736,6 +1793,7 @@ let print_prelude args ?old ?fname ~flat deps fmt pm =
 
 let print_decl args fmt d =
   let cds = MLToC.translate_decl args d ~header:false in
+  let cds = Transform.defs cds in
   let print_def d =
     Format.fprintf fmt "%a@." Print.print_global_def d in
   List.iter print_def cds
