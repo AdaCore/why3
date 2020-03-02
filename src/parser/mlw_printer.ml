@@ -305,6 +305,24 @@ let ghost_suffix = function
   | true -> " ghost"
   | false -> ""
 
+let pp_clone_subst fmt = function
+  | CSaxiom qid ->
+      fprintf fmt "axiom %a" pp_qualid qid
+  | CStsym (qid, args, pty) ->
+      let pp_args = pp_print_list ~pp_sep:(pp_sep " ") pp_id in
+      fprintf fmt "type %a = %a%a" pp_qualid qid pp_pty pty pp_args args
+  | CSfsym (qid, qid') ->
+      fprintf fmt "function %a = %a" pp_qualid qid pp_qualid qid'
+  | CSpsym (qid, qid') ->
+      fprintf fmt "predicate %a = %a" pp_qualid qid pp_qualid qid'
+  | CSvsym (qid, qid') ->
+      fprintf fmt "val %a = %a" pp_qualid qid pp_qualid qid'
+  | CSxsym _ -> todo fmt "CSxsym"
+  | CSprop Decl.Paxiom -> fprintf fmt "axiom ."
+  | CSprop _ -> todo fmt "CSprop"
+  | CSlemma _ -> todo fmt "CSlemma"
+  | CSgoal _ -> todo fmt "CSgoal"
+
 let rec pp_fun pp fmt (binders, opt_pty, _pat, _mask, spec, e) =
   (* TODO _pat, _mask *)
   fprintf fmt "@[<hv 2>fun %a%a%a ->@ @[%a@]@]" pp_binders binders pp_opt_pty opt_pty pp_spec spec pp e
@@ -730,12 +748,24 @@ and pp_decl fmt = function
       fprintf fmt "let rec %a" pp_fundefs defs
   | Dexn (id, pty, mask) ->
       fprintf fmt "%a" pp_exn (id, pty, mask)
-  | Dmeta _ ->
-      todo fmt "Dmeta _"
+  | Dmeta (ident, args) ->
+      let pp_metarg fmt = function
+        | Mty _ -> todo fmt "Mty"
+        | Mfs qid -> fprintf fmt "function %a" pp_qualid qid
+        | Mps _ -> todo fmt "Mps"
+        | Max _ -> todo fmt "Max"
+        | Mlm _ -> todo fmt "Mlm"
+        | Mgl _ -> todo fmt "Mgl"
+        | Mval _ -> todo fmt "Mval"
+        | Mstr _ -> todo fmt "Mstr"
+        | Mint _ -> todo fmt "Mint" in
+      let pp_args = pp_print_list ~pp_sep:(pp_sep " ") pp_metarg in
+      fprintf fmt "meta %a %a" pp_id ident pp_args args
   | Dcloneexport (qid, []) ->
       fprintf fmt "@[<h>clone export %a@]" pp_qualid qid
-  | Dcloneexport (_, _::_) ->
-      todo fmt "Dcloneexport (_, _::_)"
+  | Dcloneexport (qid, substs) ->
+      let pp_substs = pp_print_list ~pp_sep:(pp_sep ",@ ") pp_clone_subst in
+      fprintf fmt "@[<hv2>clone export %a with@ %a@]" pp_qualid qid pp_substs substs
   | Duseexport qid ->
       fprintf fmt "use export %a" pp_qualid qid
   | Dcloneimport (_, import, qid, None, []) ->
