@@ -75,9 +75,10 @@ module Args : sig
   val desc_shortcut : string -> Arg.key -> Arg.doc -> spec
   (** Option for setting a specific flag *)
 
-  val set_flags_selected : unit -> unit
+  val set_flags_selected : ?silent:bool -> unit -> unit
   (** Set the flags selected by debug_all, debug or a shortcut.
-      You should run this function after the plugins have been loaded. *)
+      When called before the plugins are loaded, pass [~silent:true] to
+      prevent errors due to unknown plugin flags. *)
 end
 
 val stats: flag

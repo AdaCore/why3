@@ -998,6 +998,7 @@ module Args = struct
       Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
       exit 0
     end;
+    Debug.Args.set_flags_selected ~silent:true ();
     let base_config = read_config !opt_config in
     let config = { base_config with conf_file = "" } in
     let config = List.fold_left merge_config config !opt_extra in
