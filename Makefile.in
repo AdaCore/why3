@@ -149,6 +149,7 @@ EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @WHY3LIB@
 
 ifeq (@enable_infer@,yes)
 EXTLIBS += gmp apron camllib fixpoint boxMPQ octMPQ polkaMPQ bigarray
+EXTPKGS += gmp apron camllib fixpoint apron.boxMPQ apron.octMPQ apron.polkaMPQ bigarray
 ifeq (@ELINA@,yes)
 EXTLIBS += elina
 endif
