@@ -395,7 +395,8 @@ and pp_expr fmt e =
       fprintf fmt "@[<v>let rec %a in@ %a@]" pp_fundefs defs pp_expr' e
   | Efun (binders, opt_pty, pat, mask, spec, e) ->
       pp_fun pp_expr fmt (binders, opt_pty, pat, mask, spec, e)
-  | Eany (params, _kind, Some pty, _pat, _mask, spec) ->
+  | Eany (_params, _kind, Some pty, _pat, _mask, spec) ->
+      (* TODO _params *)
       fprintf fmt "@[<hv 2>any %a%a@]" pp_pty pty pp_spec spec
   | Eany _ ->
       todo fmt "Eany _"
@@ -541,10 +542,9 @@ and pp_term fmt t =
       pp_infix pp_term term_closed fmt t1 op t2
   | Tinnfix _ ->
       todo fmt "Tinnfix _"
-  | Tbinop (t1, op, t2) ->
-      fprintf fmt "@[<hv 2>%a %a@ %a@]" pp_term t1 pp_binop op pp_term t2
-  | Tbinnop _ ->
-      todo fmt "Tbinnop"
+  | Tbinop (t1, op, t2)
+  | Tbinnop (t1, op, t2) ->
+      fprintf fmt "@[<hv 2>%a %a@ %a@]" pp_term' t1 pp_binop op pp_term' t2
   | Tnot t ->
       pp_not pp_term term_closed fmt t
   | Tif (t1, t2, t3) ->
@@ -687,18 +687,19 @@ and pp_ind_decl fmt d =
   fprintf fmt "%a%a = %a" pp_id d.in_ident (pp_print_opt_list ~prefix:" " pp_param) d.in_params pp_ind_decl_def d.in_def
 
 and pp_logic_decl fmt d =
-  pp_id fmt d.ld_ident;
-  pp_print_opt_list ~prefix:" " ~sep:" " pp_param fmt d.ld_params;
-  pp_opt ~prefix:" : " pp_pty fmt d.ld_type;
-  pp_opt ~prefix:" =@ " pp_term fmt d.ld_def
+  fprintf fmt "%a%a%a%a"
+    pp_id d.ld_ident
+    (pp_print_opt_list ~prefix:" " ~sep:" " pp_param) d.ld_params
+    (pp_opt ~prefix:" : " pp_pty) d.ld_type
+    (pp_opt ~prefix:" =@ " pp_term) d.ld_def
 
 and pp_decl fmt = function
   | Dtype decls ->
       let pp_type_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_type_decl in
       fprintf fmt "@[<v>type %a@]" pp_type_decls decls
   | Dlogic decls when List.for_all (fun d -> d.ld_type = None) decls ->
-      let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_logic_decl in
-      fprintf fmt "@[<v>predicate %a@]" pp_logic_decls decls
+      let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@]@,@[<hv 2>with ") pp_logic_decl in
+      fprintf fmt "@[<v>@[<hv 2>predicate %a@]@]" pp_logic_decls decls
   | Dlogic decls when List.for_all (fun d -> d.ld_type <> None) decls ->
       let pp_logic_decls = pp_print_list ~pp_sep:(pp_sep "@,with ") pp_logic_decl in
       fprintf fmt "@[<v>function %a@]" pp_logic_decls decls
@@ -753,7 +754,20 @@ and pp_decl fmt = function
       todo fmt "Dscope _"
 
 let pp_decls =
-  pp_print_list ~pp_sep:(pp_sep "@,@,") pp_decl
+  let previous_was_use_import_export =
+    ref false in
+  let pp_decl' fmt decl =
+    let this_is_use_import_export = match decl with
+      | Duseimport _ | Duseexport _
+      | Dcloneimport _ | Dcloneexport _
+      | Dimport _ ->
+          true
+      | _ -> false in
+    if not (!previous_was_use_import_export && this_is_use_import_export) then
+      fprintf fmt "@,";
+    previous_was_use_import_export := this_is_use_import_export;
+    pp_decl fmt decl in
+  pp_print_list ~pp_sep:(pp_sep "@,") pp_decl'
 
 let pp_mlw_file fmt = function
   | Decls decls ->

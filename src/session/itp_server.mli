@@ -29,7 +29,12 @@ end
 *)
 val add_registered_lang: string -> (Task.task -> any_pp Pp.pp -> any_pp Pp.pp) -> unit
 
-module Make (S:Controller_itp.Scheduler) (P:Protocol) : sig
+(* Used to update the config after preferences are changed in the ide.
+   This is not usable by other IDEs (webide): in the long term a
+   request/notification could be added for this kind of interaction. *)
+val set_partial_config: Whyconf.config -> unit
+
+module Make : Controller_itp.Scheduler -> Protocol -> sig
 
   (* This function is used to change the registered function for
      focus_on_loading. It focuses on the first goal that satisfies the given

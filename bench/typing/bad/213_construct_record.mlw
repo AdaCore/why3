@@ -1,0 +1,9 @@
+use int.Int
+
+type t = { mutable contents : int}
+  invariant {true}
+
+let error (v: int) : t
+  (* Cannot deconstruct type with invariant *)
+  ensures { match result with {contents = v } -> v = 3 end }
+= {contents = v}

@@ -1,0 +1,89 @@
+use int.Int
+
+scope Constant
+  let create () : unit = ()
+  exception Done
+  let next () : (r:int)
+    ensures { r = 42 } =
+    42
+end
+
+let test_Constant () =
+  for x in () with Constant do
+    variant { 0 }
+    assert { x =  42 };
+    if x = 42 then break
+  done
+
+use array.Array
+
+scope A
+  type t 'a = private {
+    a: array 'a;
+    mutable index: int; (* next index *)
+  }
+  invariant { 0 <= index <= Array.length a }
+  by { a = Array.make 0 (any 'a); index = 0 }
+
+  val create (a: array 'a) : t 'a
+    ensures { result.a = a }
+    ensures { result.index = 0 }
+
+  exception Done
+
+  val next (t: t 'a) : (int, 'a)
+    writes  { t.index }
+    raises  { Done -> t.index = old t.index = Array.length t.a }
+    ensures { old t.index < Array.length t.a }
+    returns { i, x -> i = old t.index && t.index = i + 1 && x = t.a[i] }
+end
+
+let test_A ()
+= let a = Array.make 10 1 in
+  let ref s = 0 in
+  for _, x in a with A do
+    invariant { s = it.A.index < 5 }
+    variant   { 10 - it.A.index }
+    s <- s + x;
+    if s = 5 then break
+  done;
+  assert { s = 5 }
+
+use list.List
+use list.Append
+use list.Length
+
+scope L
+  type t 'a = private {
+    initial: list 'a;
+    mutable visited: list 'a;
+    mutable upcoming: list 'a;
+  }
+  invariant { initial = visited ++ upcoming }
+  by { initial = Nil; visited = Nil; upcoming = Nil }
+
+  val create (l: list 'a) : t 'a
+    ensures { result.initial = result.upcoming = l }
+
+  exception Done
+
+  val next (t: t 'a) : 'a
+    writes  { t }
+    raises  { Done -> t.upcoming = old t.upcoming = Nil }
+    ensures { match old t.upcoming with
+              | Nil -> false
+              | Cons x a -> result = x && t.upcoming = a end }
+end
+
+let test_L () =
+  let l = Cons 1 (Cons 2 (Cons 3 Nil)) in
+  let ref s = 0 in
+  for x in l with L do
+    variant { length it.L.upcoming }
+    invariant { s = 0 && it.L.upcoming = Cons 1 (Cons 2 (Cons 3 Nil))
+             || s = 1 && it.L.upcoming =         Cons 2 (Cons 3 Nil)
+             || s = 3 && it.L.upcoming =                 Cons 3 Nil
+             || s = 6 && it.L.upcoming =                        Nil }
+    s <- s + x
+  done;
+  assert { s = 6 }

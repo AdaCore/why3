@@ -11,12 +11,60 @@ end
 
 theory string.String
 
+  remove prop concat_assoc
+  remove prop concat_empty
+  remove prop length_empty
+  remove prop length_concat
+  remove prop at_out_of_range
+  remove prop at_empty
+  remove prop at_length
+  remove prop concat_at
+  remove prop substring_out_of_range
+  remove prop substring_of_length_zero_or_less
+  remove prop substring_of_empty
+  remove prop substring_smaller
+  remove prop substring_smaller_x
+  remove prop substring_length
+  remove prop substring_at
+  remove prop prefixof_substring
+  remove prop prefixof_concat
+  remove prop prefixof_empty
+  remove prop prefixof_empty2
+  remove prop suffixof_substring
+  remove prop suffixof_concat
+  remove prop suffixof_empty
+  remove prop suffixof_empty2
+  remove prop contains_prefixof
+  remove prop contains_suffixof
+  remove prop contains_empty
+  remove prop contains_empty2
+  remove prop contains_substring
+  remove prop contains_concat
+  remove prop contains_at
+  remove prop indexof_empty
+  remove prop indexof_empty1
+  remove prop indexof_contains
+  remove prop contains_indexof
+  remove prop not_contains_indexof
+  remove prop substring_indexof
+  remove prop indexof_out_of_range
+  remove prop indexof_in_range
+  remove prop indexof_contains_substring
+  remove prop replace_empty
+  remove prop replace_not_contains
+  remove prop replace_empty2
+  remove prop replace_substring_indexof
+  remove prop to_int_gt_minus_1
+  remove prop to_int_empty
+  remove prop from_int_negative
+  remove prop from_int_to_int
+
   syntax function concat     "(str.++ %1 %2)"
   syntax function length     "(str.len %1)"
   syntax function indexof    "(str.indexof %1 %2 %3)"
   syntax function replace    "(str.replace %1 %2 %3)"
   syntax function substring  "(str.substr %1 %2 %3)"
-  syntax function ([])       "(str.at %1 %2)"
+  syntax function s_at       "(str.at %1 %2)"
   syntax predicate contains  "(str.contains %1 %2)"
   syntax predicate prefixof  "(str.prefixof %1 %2)"
   syntax predicate suffixof  "(str.suffixof %1 %2)"
@@ -36,7 +84,7 @@ theory string.StringRealization
   syntax function indexof    "(str.indexof %1 %2 %3)"
   syntax function replace    "(str.replace %1 %2 %3)"
   syntax function substring  "(str.substr %1 %2 %3)"
-  syntax function ([])       "(str.at %1 %2)"
+  syntax function s_at       "(str.at %1 %2)"
   syntax predicate contains  "(str.contains %1 %2)"
   syntax predicate prefixof  "(str.prefixof %1 %2)"
   syntax predicate suffixof  "(str.suffixof %1 %2)"

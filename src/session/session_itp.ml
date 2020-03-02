@@ -19,8 +19,6 @@ let debug = Debug.register_info_flag "session_itp"
 
 let debug_merge = Debug.lookup_flag "session_pairing"
 
-let debug_stack_trace = Debug.lookup_flag "stack_trace"
-
 type transID = int
 type proofNodeID = int
 type proofAttemptID = int
@@ -743,7 +741,7 @@ let update_proof_attempt ?(obsolete=false) notifier s id pr st =
     pa.proof_obsolete <- obsolete;
     notifier (APa paid)
   with
-  | BadID when not (Debug.test_flag debug_stack_trace) -> assert false
+  | BadID when not (Debug.test_flag Debug.stack_trace) -> assert false
 
 (* proved status *)
 
@@ -893,7 +891,7 @@ let change_prover notification s id opr npr =
     update_goal_node notification s id
   with
   | Not_found -> ()
-  | BadID when not (Debug.test_flag debug_stack_trace) -> assert false
+  | BadID when not (Debug.test_flag Debug.stack_trace) -> assert false
 
 (* Remove elements of the session tree *)
 
@@ -1367,7 +1365,7 @@ let rec read_global_buffer gs ch =
           with Not_found -> ("sum", sum) :: attrs
         in
         ("shape",shape) :: attrs
-      with _ -> has_shapes := false; attrs
+      with _ when not (Debug.test_flag Debug.stack_trace) -> has_shapes := false; attrs
     else attrs
 
 let read_xml_and_shapes ~shape_version gs xml_fn compressed_fn =
@@ -1632,11 +1630,9 @@ and merge_trans ~shape_version env old_s new_s new_goal_id old_tr_id =
     (* add_registered_transformation actually apply the transformation. It can fail *)
     try Some (add_registered_transformation new_s env old_tr new_goal_id)
     with
-    | e when Debug.test_flag debug_stack_trace ->
-        raise e
-    (* Non fatal exception are silently ignored *)
-    | e when not (is_fatal e) -> None
-    | e when is_fatal e ->
+    | e when not (Debug.test_flag Debug.stack_trace) ->
+        (* Non fatal exception are silently ignored *)
+        if is_fatal e then
         Warning.emit "FATAL unexpected exception during application of %s: %a@."
           old_tr.transf_name Exn_printer.exn_printer e;
         (* Notify the user but still allow her to load why3 *)
@@ -1682,7 +1678,7 @@ and merge_trans ~shape_version env old_s new_s new_goal_id old_tr_id =
                    old_tr.transf_name;
      save_detached_trans old_s new_s new_goal_id old_tr_id;
      found_detached := true
-  with e when not (Debug.test_flag debug_stack_trace) ->
+  with e when not (Debug.test_flag Debug.stack_trace) ->
     (* Printexc.print_backtrace stderr; (* Will appear with stack_trace *) *)
     Warning.emit "[Session_itp.merge_trans] FATAL unexpected exception: %a@." Exn_printer.exn_printer e;
     exit 2
@@ -1882,7 +1878,7 @@ let merge_file ~shape_version env (ses : session) (old_ses : session) file =
       ses ~shape_version ~old_ses ~old_theories ~file_is_detached:false
       ~env file_name new_theories format;
     None
-  with e -> (* TODO: capture only parsing and typing errors *)
+  with e when not (Debug.test_flag Debug.stack_trace) -> (* TODO: capture only parsing and typing errors *)
     merge_file_section
       ses ~shape_version ~old_ses ~old_theories ~file_is_detached:true
       ~env file_name [] format;

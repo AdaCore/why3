@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Wstdlib
 open Term
 open Number
 open Constant
@@ -269,9 +270,9 @@ let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
          session@ trees@ after@ modification@ of@ source@ files."
 
-let current_shape_version = 8
+let current_shape_version = 6
 
-type shape_version = SV1 | SV2 | SV3 | SV4 | SV5 | SV6 | SV7
+type shape_version = SV1 | SV2 | SV3 | SV4 | SV5
 
 module Shape = struct
 
@@ -320,12 +321,13 @@ let pushc c =
   check ()
 
 (* Remove infix and mixfix. (prefix should be rare enough) *)
-let decoded si =
-  Ident.(match sn_decode si with
-  | SNword s | SNinfix s | SNtight s | SNprefix s | SNget s | SNset s
+let decoded pr id =
+  Ident.(match sn_decode id.id_string with
+  | SNword _ -> Ident.id_unique pr id
+  | SNinfix s | SNtight s | SNprefix s | SNget s | SNset s
   | SNupdate s | SNcut s | SNlcut s | SNrcut s -> s)
 
-let ident_v5 h id =
+let ident_v4 h id =
   let x =
     try Ident.Mid.find id !h
     with Not_found ->
@@ -334,11 +336,11 @@ let ident_v5 h id =
   in
   push x
 
-let ident_v6 h id =
+let ident_v5 pr h id =
   let x =
     try Ident.Mid.find id !h
     with Not_found ->
-      let s = decoded id.Ident.id_string in
+      let s = decoded pr id in
       h := Ident.Mid.add id s !h; s
   in
   push x
@@ -366,66 +368,61 @@ let const_shape v c =
   let fmt = Format.formatter_of_buffer shape_buffer in
   begin match v with
   | SV1 | SV2 | SV3 | SV4 -> Common.const_v1 fmt c
-  | SV5 | SV6 | SV7 -> Common.const_v2 fmt c
+  | SV5 -> Common.const_v2 fmt c
   end;
   Format.pp_print_flush fmt ();
   check ()
 
-let rec pat_shape ~version c m p : 'a =
+let ident_shape v pr m id =
+  match v with
+  | SV1 | SV2 | SV3 | SV4 -> ident_v4 m id
+  | SV5 -> ident_v5 pr m id
+
+let rec pat_shape ~version pr c m p : 'a =
   match p.pat_node with
     | Pwild -> pushc tag_wild
     | Pvar _ -> pushc tag_var
     | Papp (f, l) ->
-       pushc tag_app;
-       begin match version with
-       | SV1 | SV2 | SV3 | SV4 | SV5 -> ident_v5 m f.ls_name
-       | SV6 | SV7 -> ident_v6 m f.ls_name
-       end;
-       List.iter (pat_shape ~version c m) l
-    | Pas (p, _) -> pat_shape ~version c m p; pushc tag_as
+        pushc tag_app;
+        ident_shape version pr m f.ls_name;
+        List.iter (pat_shape ~version pr c m) l
+    | Pas (p, _) -> pat_shape ~version pr c m p; pushc tag_as
     | Por (p, q) ->
-       pat_shape ~version c m q; pushc tag_or; pat_shape ~version c m p
+       pat_shape ~version pr c m q; pushc tag_or; pat_shape ~version pr c m p
 
-let rec t_shape ~version c m t =
-  let fn = t_shape ~version c m in
+let rec t_shape ~version pr c m t =
+  let fn = t_shape ~version pr c m in
   match t.t_node with
     | Tconst c -> pushc tag_const; const_shape version c
-    | Tvar v -> pushc tag_var;
-        begin match version with
-        | SV1 | SV2 | SV3 | SV4 | SV5 -> ident_v5 m v.vs_name
-        | SV6 | SV7 -> ident_v6 m v.vs_name
-        end
+    | Tvar v -> pushc tag_var; ident_shape version pr m v.vs_name
     | Tapp (s,l) ->
-       pushc tag_app;
-       begin match version with
-       | SV1 | SV2 | SV3 | SV4 | SV5 -> ident_v5 m s.ls_name
-       | SV6 | SV7 -> ident_v6 m s.ls_name
-       end;
-       List.iter fn l
+        pushc tag_app;
+        ident_shape version pr m s.ls_name;
+        List.iter fn l
     | Tif (f,t1,t2) ->
       begin match version with
       | SV1 | SV2 -> pushc tag_if; fn f; fn t1; fn t2
-      | SV3 | SV4 | SV5 | SV6 | SV7 -> pushc tag_if; fn t2; fn t1; fn f
+      | SV3 | SV4 | SV5 -> pushc tag_if; fn t2; fn t1; fn f
       end
     | Tcase (t1,bl) ->
         let br_shape b =
           let p,t2 = t_open_branch b in
           match version with
           | SV1 | SV2 ->
-            pat_shape ~version c m p;
+            pat_shape ~version pr c m p;
             pat_rename_alpha c m p;
-            t_shape ~version c m t2
-          | SV3 | SV4 | SV5 | SV6 | SV7 ->
+            fn t2
+          | SV3 | SV4 | SV5 ->
             pat_rename_alpha c m p;
-            t_shape ~version c m t2;
-            pat_shape ~version c m p
+            fn t2;
+            pat_shape ~version pr c m p
         in
         begin match version with
         | SV1 | SV2 ->
                  pushc tag_case;
                  fn t1;
                  List.iter br_shape bl
-        | SV3 | SV4 | SV5 | SV6 | SV7 ->
+        | SV3 | SV4 | SV5 ->
            pushc tag_case;
            List.iter br_shape bl;
            fn t1
@@ -434,21 +431,16 @@ let rec t_shape ~version c m t =
         pushc tag_eps;
         let u,f = t_open_bound b in
         vs_rename_alpha c m u;
-        t_shape ~version c m f
+        fn f
     | Tquant (q,b) ->
         let vl,triggers,f1 = t_open_quant b in
         vl_rename_alpha c m vl;
         (* argument first, intentionally, to give more weight on A in
            forall x,A *)
-        t_shape ~version c m f1;
+        fn f1;
         let hq = match q with Tforall -> tag_forall | Texists -> tag_exists in
         pushc hq;
-        List.iter
-          (fun trigger ->
-             List.iter
-               (fun t -> t_shape ~version c m t)
-               trigger)
-          triggers
+        List.iter (fun trigger -> List.iter fn trigger) triggers
     | Tbinop (o,f,g) ->
        (* g first, intentionally, to give more weight on B in A->B *)
        fn g;
@@ -466,21 +458,22 @@ let rec t_shape ~version c m t =
         begin
           match version with
             | SV1 ->
-               pushc tag_let; fn t1; t_shape ~version c m t2
-            | SV2 | SV3 | SV4 | SV5 | SV6 | SV7 ->
-                     (* t2 first, intentionally *)
-                     t_shape ~version c m t2; pushc tag_let; fn t1
+                pushc tag_let; fn t1; fn t2
+            | SV2 | SV3 | SV4 | SV5 ->
+                (* t2 first, intentionally *)
+                fn t2; pushc tag_let; fn t1
         end
     | Tnot f ->
       begin match version with
       | SV1 | SV2 -> fn f; pushc tag_not
-      | SV3 | SV4 | SV5 | SV6 | SV7 -> pushc tag_not; fn f
+      | SV3 | SV4 | SV5 -> pushc tag_not; fn f
       end
     | Ttrue -> pushc tag_true
     | Tfalse -> pushc tag_false
 
 let t_shape_task ~version ~expl t =
   Buffer.clear shape_buffer;
+  let pr = Ident.create_ident_printer [] in
   let f = Task.task_goal_fmla t in
   let c = ref (-1) in
   let m = ref Ident.Mid.empty in
@@ -489,20 +482,20 @@ let t_shape_task ~version ~expl t =
       (* expl *)
       begin match version with
       | SV1 | SV2 -> ()
-      | SV3 | SV4 | SV5 | SV6 | SV7 -> push expl end;
+      | SV3 | SV4 | SV5 -> push expl end;
       (* goal shape *)
-      t_shape ~version c m f;
+      t_shape ~version pr c m f;
       (* All declarations shape *)
       begin match version with
       | SV1 | SV2 | SV3 -> ()
-      | SV4 | SV5 | SV6 | SV7 ->
+      | SV4 | SV5 ->
          let open Decl in
          let do_td td = match td.Theory.td_node with
            | Theory.Decl d ->
               begin match d.d_node with
               | Dparam _ls -> ()
               | Dprop (_, _pr, f) ->
-                 t_shape ~version c m f
+                  t_shape ~version pr c m f
               | _ -> ()
               end
            | _ -> () in
@@ -517,14 +510,13 @@ end
 
 let int_to_shape_version n =
   match n with
-  | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5 | 7 -> SV6
-  | 8 -> SV7
+  | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5
   | _ -> assert false
 
 let is_bound_shape_version v =
   match int_to_shape_version v with
-  | SV1 | SV2 | SV3 | SV4 | SV5 | SV6 -> false
-  | SV7 -> true
+  | SV1 | SV2 | SV3 | SV4 -> false
+  | SV5 -> true
 
 module Gshape = struct
 
@@ -582,9 +574,10 @@ module Gshape = struct
           ""
     with Not_found -> ""
 
-  let t_shape_task_v7 ~expl gs t =
+  let t_shape_task_v5 ~expl gs t =
     let current_shape = ref [] in
     Buffer.clear Shape.shape_buffer;
+    let pr = Ident.create_ident_printer [] in
     let c = ref (-1) in
     let m = ref Ident.Mid.empty in
     (* All declarations shape *)
@@ -597,7 +590,7 @@ module Gshape = struct
       | Dparam _ls -> ()
       | Dprop (_, _pr, f) ->
           let sh =
-            (try Shape.t_shape ~version:SV7 c m f with Shape.ShapeTooLong -> ());
+            (try Shape.t_shape ~version:SV5 pr c m f with Shape.ShapeTooLong -> ());
             Buffer.contents Shape.shape_buffer in
           Buffer.clear Shape.shape_buffer;
           add_and_prepend gs current_shape sh
@@ -611,7 +604,7 @@ module Gshape = struct
 
   let t_bound_shape_task gs ~version ~expl t =
     if is_bound_shape_version version then
-      t_shape_task_v7 gs ~expl t
+      t_shape_task_v5 gs ~expl t
     else
       assert false
 
@@ -630,8 +623,8 @@ let t_shape_task ~version ~expl t =
  *)
   let s =
     match version with
-    | SV1 | SV2 | SV3 | SV4 | SV5 | SV6 -> Shape.t_shape_task ~version ~expl t
-    | _ -> assert false
+    | SV1 | SV2 | SV3 | SV4 -> Shape.t_shape_task ~version ~expl t
+    | SV5 -> assert false
   in
 (*
   let tim = Unix.gettimeofday () -. tim in
@@ -897,6 +890,8 @@ module Checksum = struct
       let _,_,dnew = Trans.apply tr t in
       Digest.to_hex dnew
 
+  module DMid = Diffmap.MakeOfMap (Ident.Mid)
+
   (* WARNING: The occurence of [Trans.fold] in [task_v3] needs to be executed
      once at initialization in order for all the applications of this
      transformation to share the same Wtask ([h] created on first line of
@@ -909,19 +904,22 @@ module Checksum = struct
     let b = Buffer.create 8192 in
     let task_hd t (cold,mold,dold) =
       c := cold;
-      m := mold;
+      let mo = DMid.get mold in
+      m := mo;
       tdecl (CV3,c,m,b) t.Task.task_decl;
       Buffer.add_string b (Digest.to_hex dold);
       let dnew = Digest.string (Buffer.contents b) in
       Buffer.clear b;
       let mnew = match t.Task.task_decl.Theory.td_node with
         | Theory.Decl { Decl.d_news = s } ->
-            Ident.Sid.fold (fun id a ->
-              Ident.Mid.add id (Ident.Mid.find id !m) a) s mold
-        | _ -> !m in
-      !c, mnew, dnew
+            (* as metas might be have been put on some symbols before their
+               declaration, ignore such symbols *)
+            let s = Ident.Mid.set_diff s mo in
+            Ident.Mid.mapi (fun id () -> Ident.Mid.find id !m) s
+        | _ -> Ident.Mid.set_diff !m mo in
+      !c, DMid.union mold mnew, dnew
     in
-    let tr = Trans.fold task_hd (0, Ident.Mid.empty, Digest.string "") in
+    let tr = Trans.fold task_hd (0, DMid.empty (), Digest.string "") in
     fun t ->
       let _,_,dnew = Trans.apply tr t in
       Digest.to_hex dnew
@@ -941,7 +939,7 @@ let task_checksum ?(version=current_shape_version) t =
   let version = match version with
     | 1 | 2 | 3 -> CV1
     | 4 | 5 -> CV2
-    | 6 | 7 | 8 -> CV3
+    | 6 -> CV3
     | _ -> assert false
   in
 (*
@@ -1035,11 +1033,11 @@ module Pairing (Old: S)(New: S) = struct
       | Old g ->
           let (sh, l) = Old.shape table.table_old.(g) in
           (* Sanitazing: sort the lists only once *)
-          (sh, List.sort Pervasives.compare l)
+          (sh, List.sort Int.compare l)
       | New g ->
           let (sh, l) = New.shape table.table_new.(g) in
           (* Sanitazing: sort the lists only once *)
-          (sh, List.sort Pervasives.compare l)
+          (sh, List.sort Int.compare l)
     in
     let rec n = { prev = n; shape = s; elt = g; next = n; valid = true }
     in n
@@ -1101,8 +1099,7 @@ module Pairing (Old: S)(New: S) = struct
              let oldi = Hashtbl.find old_checksums c in
              let oldg = table.table_old.(oldi) in
              Hashtbl.remove old_checksums c;
-             let obs = Old.shape oldg <> New.shape newg in
-             result.(new_goal_index newg) <- (newg, Some (oldg, obs))
+             result.(new_goal_index newg) <- (newg, Some (oldg, false))
         with Not_found ->
           acc := mk_node table (New newi) :: !acc
       done;
@@ -1119,7 +1116,10 @@ module Pairing (Old: S)(New: S) = struct
       let module E = struct
         let dummy = let n = List.hd allgoals (* safe *) in (0, 0), (n, n)
         type t = (int * int) * (node * node)
-        let compare (v1, _) (v2, _) = Pervasives.compare v2 v1
+        let compare ((u1,u2), _) ((v1,v2), _) =
+          let c = Int.compare v1 u1 in
+          if c <> 0 then c
+          else Int.compare v2 u2
       end in
       let module PQ = Pqueue.Make(E) in
       let pq = PQ.create () in

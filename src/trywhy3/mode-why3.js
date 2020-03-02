@@ -6,24 +6,19 @@ var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
 var Why3HighlightRules = function() {
 
-    // keep synchronized with src/why3doc/doc_lexer.mll
+    // keep synchronized with src/parser/lexer.mll
     var keywords = (
-        "as|axiom|by|clone|coinductive|constant|" +
-        "else|end|epsilon|exists|export|" +
-        "false|float|forall|function|" +
-        "goal|if|import|in|inductive|" +
-        "lemma|let|match|meta|not|predicate|" +
-        "range|scope|so|then|theory|true|type|use|with|" +
-        // programs
-        "abstract|any|at|" +
-        "begin|break|continue|do|done|downto|exception|" +
-        "for|fun|ghost|label|module|mutable|" +
-        "old|private|pure|raise|rec|ref|return|" +
-        "to|try|val|while|" +
-        // specification
-        "absurd|alias|assert|assume|" +
-        "check|diverges|ensures|invariant|" +
-        "raises|reads|requires|returns|variant|writes"
+        "abstract|absurd|alias|any|as|assert|assume|at|axiom|" +
+        "begin|break|by|check|clone|coinductive|constant|continue|" +
+        "diverges|do|done|downto|" +
+        "else|end|ensures|epsilon|exception|exists|export|" +
+        "false|float|for|forall|fun|function|ghost|goal|" +
+        "if|import|in|inductive|invariant|label|lemma|let|" +
+        "match|meta|module|mutable|not|old|" +
+        "partial|predicate|private|pure|" +
+        "raise|raises|range|reads|rec|ref|requires|return|returns|" +
+        "scope|so|then|theory|to|true|try|type|use|val|variant|" +
+        "while|with|writes"
     );
 
     var builtinConstants = ("true|false");

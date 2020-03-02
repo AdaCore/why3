@@ -103,7 +103,6 @@ type prop_decl = prop_kind * prsymbol * term
 
 type decl = private {
   d_node : decl_node;
-  d_syms : Sid.t;         (** idents used in declaration *)
   d_news : Sid.t;         (** idents introduced in declaration *)
   d_tag  : Weakhtbl.tag;  (** unique magical tag *)
 }
@@ -133,7 +132,11 @@ val create_logic_decl : logic_decl list -> decl
 val create_ind_decl : ind_sign -> ind_decl list -> decl
 val create_prop_decl : prop_kind -> prsymbol -> term -> decl
 
-(* {2 Exceptions} *)
+(** {2 Used symbols} *)
+
+val get_decl_syms : decl -> Sid.t
+
+(** {2 Exceptions} *)
 
 exception IllegalTypeAlias of tysymbol
 exception NonPositiveTypeDecl of tysymbol * lsymbol * ty
@@ -152,6 +155,9 @@ exception EmptyIndDecl of lsymbol
 
 exception BadConstructor of lsymbol
 exception BadRecordField of lsymbol
+exception BadRecordCons of lsymbol * tysymbol
+exception BadRecordType of lsymbol * tysymbol
+exception BadRecordUnnamed of lsymbol * tysymbol
 exception RecordFieldMissing of lsymbol
 exception DuplicateRecordField of lsymbol
 

@@ -20,6 +20,18 @@ val add (x y : byte) : byte
 
 end
 
+module AbstractAlone
+
+use int.Int
+use Abstract
+
+let p3 (a : byte) : byte =
+  add a (of_int 1)
+
+end
+
+
+
 module AbstractWithRef
 
 use int.Int

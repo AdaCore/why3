@@ -55,6 +55,23 @@ Instructions to build TryWhy3
     this creates a tarball containing a directory `trywhy3/` which you can put on a web server.
     You may want to add a symbolic link from `index.html` to `trywhy3.html` (or rename the file).
 
+
+To compile with a different file format (e.g. Python, Micro-C)
+--------------------------------------------------------------
+
+  * In `Makefile.in`, change the line
+
+        TRYWHY3CMO=lib/why3/why3.cma
+
+    to add the adequate plugin
+
+        TRYWHY3CMO=lib/why3/why3.cma lib/plugins/microc.cmo
+
+  * In `src/trywhy3/why3_worker.ml`, modify line 354 to specify the format
+
+        let (theories, _) = Env.read_file ~format:"micro-C" lang ...
+
+
 Customization
 -------------
 

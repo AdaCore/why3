@@ -14,6 +14,7 @@
 (** {2 Wrappers for deprecated string functions of OCaml stdlib} *)
 
 val lowercase : string -> string
+val uppercase : string -> string
 val capitalize : string -> string
 val uncapitalize : string -> string
 

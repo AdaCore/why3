@@ -17,6 +17,8 @@ why3.conf
 *.dep
 *.vo
 *.vd
+*.vok
+*.vos
 *.glob
 .*.aux
 *.elc
@@ -109,43 +111,15 @@ why3.conf
 /bin/isabelle_client
 
 # /doc/
-/doc/version.tex
-/doc/ocamldoc.sty
 /doc/*whizzy*
-/doc/manual.wdvi
-/doc/manual.raux
-/doc/manual.log
-/doc/manual.lof
-/doc/manual.toc
-/doc/manual.aux
-/doc/manual.bbl
-/doc/manual.blg
-/doc/manual.ind
-/doc/manual.ilg
-/doc/manual.idx
-/doc/manual.rel
-/doc/manual.glg
-/doc/manual.glo
-/doc/manual.gls
-/doc/manual.ist
-/doc/manual.out
-/doc/manual.image.out
-/doc/manual.synctex.gz
-/doc/*.haux
-/doc/*.pdf
 /doc/generated/
 /doc/html/
-/doc/*.hind
-/doc/*.htoc
-/doc/bnf
-/doc/bnf.ml
+/doc/latex/
 /doc/apidoc.tex
 /doc/apidoc/
 /doc/stdlibdoc/
-/doc/texput.log
-/doc/extract_ocaml_code
-/doc/*__*.ml
-/doc/*_bnf.tex
+/doc/_build
+/doc/.doctrees/
 
 # /lib
 /lib/why3-cpulimit
@@ -216,6 +190,7 @@ pvsbin/
 /src/util/config.ml
 /src/util/lexlib.ml
 /src/util/rc.ml
+/src/util/re.ml
 /src/util/json_lexer.ml
 /src/util/json_parser.mli
 /src/util/json_parser.ml
@@ -256,12 +231,6 @@ pvsbin/
 /plugins/microc/mc_parser.mli
 /plugins/microc/test/
 /plugins/microc/mc_parser.conflicts
-
-# /plugins/ada_terms/
-/plugins/ada_terms/ada_lexer.ml
-/plugins/ada_terms/ada_parser.conflicts
-/plugins/ada_terms/ada_parser.ml
-/plugins/ada_terms/ada_parser.mli
 
 # /drivers
 /drivers/coq-realizations.aux

@@ -85,6 +85,9 @@ type (_, _) trans_typ =
       to exist in the task, typically they could be fresh symbols *)
   | Ttermlist   : ('a, 'b) trans_typ -> ((Term.term list -> 'a), 'b) trans_typ
   (** transformation with a list of terms as argument. *)
+  | Ttermlist_same : int * ('a, 'b) trans_typ -> ((Term.term list -> 'a), 'b) trans_typ
+  (** transformation with a list of same type term: the int is the predefined
+      length of the list *)
   | Tterm       : ('a, 'b) trans_typ -> ((Term.term -> 'a), 'b) trans_typ
   (** transformation with a Why3 term as argument *)
   | Tformula    : ('a, 'b) trans_typ -> ((Term.term -> 'a), 'b) trans_typ

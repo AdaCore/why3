@@ -424,6 +424,63 @@ module Sum
 
 end
 
+(** A similar theory, but with a polymorphic parameter passed
+    to function `f` and to function `sum`. *)
+module SumParam
+
+  use Int
+
+  (** sum of `f x n` for `a <= n < b` *)
+  let rec function sum (f: 'a -> int -> int) (x: 'a) (a b: int) : int
+    variant { b - a }
+  = if b <= a then 0 else sum f x a (b - 1) + f x (b - 1)
+
+  lemma sum_left:
+    forall f: 'a -> int -> int, x: 'a, a b: int.
+    a < b -> sum f x a b = f x a + sum f x (a + 1) b
+
+  lemma sum_ext:
+    forall f: 'a -> int -> int, x: 'a, g: 'b -> int -> int, y: 'b, a b: int.
+    (forall i. a <= i < b -> f x i = g y i) ->
+    sum f x a b = sum g y a b
+
+  lemma sum_le:
+    forall f: 'a -> int -> int, x: 'a, g: 'b -> int -> int, y: 'b, a b: int.
+    (forall i. a <= i < b -> f x i <= g y i) ->
+    sum f x a b <= sum g y a b
+
+  lemma sum_zero:
+    forall f: 'a -> int -> int, x: 'a, a b: int.
+    (forall i. a <= i < b -> f x i = 0) ->
+    sum f x a b = 0
+
+  lemma sum_nonneg:
+    forall f: 'a -> int -> int, x: 'a, a b: int.
+    (forall i. a <= i < b -> 0 <= f x i) ->
+    0 <= sum f x a b
+
+  lemma sum_decomp:
+    forall f: 'a -> int -> int, x: 'a, a b c: int. a <= b <= c ->
+    sum f x a c = sum f x a b + sum f x b c
+
+  let rec lemma shift_left
+    (f: 'a -> int -> int) (x: 'a)
+    (g: 'b -> int -> int) (y: 'b) (a b c d: int)
+    requires { b - a = d - c }
+    requires { forall i. a <= i < b -> f x i  = g y (c + i - a) }
+    variant  { b - a }
+    ensures  { sum f x a b = sum g y c d }
+  = if a < b then shift_left f x g y (a+1) b (c+1) d
+
+  let rec lemma sum_middle_change (f:'a -> int -> int) (c1 c2:'a) (i j l: int)
+    requires { i <= l < j }
+    ensures  { (forall k : int. i <= k < j -> k <> l -> f c1 k = f c2 k) ->
+               sum f c1 i j - f c1 l = sum f c2 i j - f c2 l }
+    variant  { j - l }
+  = if l = (j-1) then () else sum_middle_change f c1 c2 i (j-1) l
+
+end
+
 (** {2 Factorial function} *)
 
 module Fact

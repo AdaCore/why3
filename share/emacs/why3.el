@@ -22,10 +22,28 @@
 (defun why3-regexp-opt (l)
   (regexp-opt l 'words))
 
+;; keep synchronized with src/parser/lexer.mll
 (defconst why3-font-lock-keywords-1
   (list
-   `(,(why3-regexp-opt '("invariant" "variant" "diverges" "requires" "ensures" "pure" "returns" "raises" "reads" "writes" "alias" "assert" "assume" "check")) . font-lock-type-face)
-   `(,(why3-regexp-opt '("use" "clone" "scope" "import" "export" "coinductive" "inductive" "external" "constant" "function" "predicate" "val" "exception" "axiom" "lemma" "goal" "type" "mutable" "abstract" "private" "any" "match" "let" "rec" "in" "if" "then" "else" "begin" "end" "while" "for" "to" "downto" "do" "done" "loop" "absurd" "ghost" "partial" "raise" "ref" "return" "break" "continue" "try" "with" "theory" "uses" "module" "fun" "at" "old" "true" "false" "forall" "exists" "label" "by" "so" "meta" "as")) . font-lock-keyword-face)
+   `(,(why3-regexp-opt
+       '("absurd" "alias" "assert" "assume"
+         "check" "diverges" "ensures" "invariant"
+         "raises" "reads" "requires" "returns"
+         "variant" "writes")) . font-lock-type-face)
+   `(,(why3-regexp-opt
+       '("abstract" "any" "as" "at" "axiom"
+         "begin" "break" "by"
+         "clone" "coinductive" "constant" "continue"
+         "do" "done" "downto"
+         "else" "end" "epsilon" "exception" "exists" "export"
+         "false" "float" "for" "forall" "fun" "function"
+         "ghost" "goal" "if" "import" "in" "inductive"
+         "label" "lemma" "let"
+         "match" "meta" "module" "mutable" "not"
+         "old" "partial" "predicate" "private" "pure"
+         "raise" "range" "rec" "ref" "return"
+         "scope" "so" "then" "theory" "to" "true" "try" "type"
+         "use" "val" "while" "with")) . font-lock-keyword-face)
    )
   "Minimal highlighting for Why3 mode")
 

@@ -42,15 +42,16 @@ install: [
 depends: [
   "ocaml" {>= "4.05.0"}
   "ocamlfind" {build}
+  "conf-autoconf" {dev}
   "menhir" {>= "20151112"}
   "num"
-  "re"
 ]
 
 depopts: [
   "zarith"
   "camlzip"
   "ocamlgraph"
+  "re"
 ]
 
 conflicts: [

@@ -90,13 +90,11 @@ end
 module MapSum
 
   use int.Int
-  use export Map
+  use int.Sum as S
+  use Map
 
   (** `sum m l h` is the sum of `m[i]` for `l <= i < h` *)
-
-  type container = map int int
-  clone export sum.Sum with
-    type container = container, function f = get, axiom .
+  function sum (m: map int int) (l h: int) : int = S.sum (get m) l h
 
 end
 

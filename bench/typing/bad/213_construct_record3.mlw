@@ -1,0 +1,8 @@
+use int.Int
+
+type t = A (contents: int) int
+
+let error (v: int) : t
+  (* Contains unnamed fields *)
+  ensures { match result with {contents = v } -> v = 3 end }
+= A 3 v

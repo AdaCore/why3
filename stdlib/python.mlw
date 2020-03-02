@@ -28,7 +28,7 @@ module Python
   = Array.([]<-) l i v
 
   val range (l u: int) : list int
-    requires { l <= u }
+    requires { [@expl:valid range] l <= u }
     ensures  { Array.length result = u - l }
     ensures  { forall i. l <= i < u -> result[i] = i }
 
@@ -61,16 +61,16 @@ module Python
     forall x y:int. y <> 0 -> if y < 0 then x % y <= 0 else x % y >= 0
 
   val (//) (x y: int) : int
-    requires { y <> 0 }
+    requires { [@expl:check division by zero] y <> 0 }
     ensures  { result = x // y }
 
   val (%) (x y: int) : int
-    requires { y <> 0 }
+    requires { [@expl:check division by zero] y <> 0 }
     ensures  { result = x % y }
 
   (* random.randint *)
   val randint (l u: int) : int
-    requires { l <= u }
+    requires { [@expl:valid range] l <= u }
     ensures  { l <= result <= u }
 
   val input () : int

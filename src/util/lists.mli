@@ -11,6 +11,8 @@
 
 (** Useful list combinators *)
 
+val rev_filter: ('a -> bool) -> 'a list -> 'a list
+
 val rev_map_fold_left :
   ('acc -> 'a -> 'acc * 'b) -> 'acc -> 'a list -> 'acc * 'b list
 
@@ -75,5 +77,8 @@ val chop : int -> 'a list -> 'a list
 
 val chop_last : 'a list -> 'a list * 'a
 (** removes (and returns) the last element of a list *)
+
+val split: int -> 'a list -> 'a list * 'a list
+(** split n l = (prefix n l, chop n l) *)
 
 val init : int -> (int -> 'a) -> 'a list

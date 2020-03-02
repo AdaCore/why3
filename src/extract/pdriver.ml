@@ -235,30 +235,39 @@ let load_driver env file extra_files =
 open Wstdlib
 
 type filename_generator = ?fname:string -> Pmodule.pmodule -> string
-type interface_generator = ?fname:string -> Pmodule.pmodule -> string
-
-type interf_printer =
-  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
-  -> Pmodule.pmodule -> Mltree.decl Pp.pp
-
-type prelude_printer =
-  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
-  -> Pmodule.pmodule list -> Pmodule.pmodule Pp.pp
-
-let print_empty_prelude _ ?old:_ ?fname:_ ~flat:_ _ _ _ = ()
 
 type decl_printer =
   printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->
   Pmodule.pmodule -> Mltree.decl Pp.pp
 
-type printer =
-  { desc            : Pp.formatted;
-    file_gen        : filename_generator;
-    decl_printer    : decl_printer;
-    interf_gen      : interface_generator option;
-    interf_printer  : interf_printer option;
-    prelude_printer : prelude_printer; }
+(** Things to print as header/footer. *)
+type border_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool ->
+  Pmodule.pmodule Pp.pp
 
+(** Things to do at the beginning of a module, e.g. open/#include.
+    Only used in modular extraction. *)
+type prelude_printer =
+  printer_args -> ?old:in_channel -> ?fname:string -> flat:bool
+  -> Pmodule.pmodule list -> Pmodule.pmodule Pp.pp
+
+type file_printer = {
+  filename_generator : filename_generator;
+  decl_printer : decl_printer;
+  header_printer : border_printer;
+  prelude_printer : prelude_printer;
+  footer_printer : border_printer;
+}
+
+type printer = {
+  desc           : Pp.formatted;
+  implem_printer : file_printer;
+  interf_printer : file_printer option;
+}
+
+let dummy_prelude_printer _ ?old:_ ?fname:_ ~flat:_ _ _ _ = ()
+
+let dummy_border_printer _ ?old:_ ?fname:_ ~flat:_ _ _ = ()
 
 let printers : printer Hstr.t = Hstr.create 17
 

@@ -1,0 +1,511 @@
+module Set_str
+
+  use int.Int
+  use int.Power
+  use array.Array
+  use map.Map
+  use mach.int.Int32
+  use mach.int.UInt32
+  use mach.c.UChar
+  use import mach.int.UInt64GMP as Limb
+  use mach.c.C
+  use types.Types
+  use lemmas.Lemmas
+  use powm.Powm
+  use stringlemmas.String_lemmas
+  use logical.Logical
+  use util.Util
+  use int.ComputerDivision as CD
+  use int.EuclideanDivision
+  use base_info.BaseInfo
+
+  let wmpn_set_str_bits (rp: ptr limb) (ghost sz: int32)
+                        (sp: ptr uchar) (sn: uint32)
+                        (bits: uint32) : int32
+    requires { 0 < sn <= max_int32 }
+    requires { 0 < sz }
+    requires { valid rp sz }
+    requires { valid sp sn }
+    requires { 1 <= bits <= 8 }
+    requires { power 2 (bits * sn) <= power radix (sz - 1) }
+    requires { writable rp }
+    requires { in_base (power 2 bits) (pelts sp)
+                       (offset sp) (offset sp + sn) }
+    ensures  { 0 <= result < sz }
+    ensures  { value rp result = svalue (power 2 bits) sp sn }
+    ensures  { svalue (power 2 bits) sp sn > 0
+                -> result > 0 /\ (pelts rp)[offset rp + result - 1] > 0 }
+  =
+    let ref rn = 0 in
+    let ref shift = 0 in
+    let ghost ref rdone : int = 0 in
+    let ref j = UInt32.to_int32 sn in
+    let ghost b = power 2 (uint32'int bits) in
+    assert { bits * sn <= 64 * (sz - 1)
+             by power 2 (bits * sn) <= power radix (sz - 1)
+                = power (power 2 64) (sz - 1)
+                = power 2 (64 * (sz - 1)) };
+    assert { 2 <= b <= 256
+             by 1 <= bits <= 8
+             so power 2 5 = 32
+             so power 2 6 = 64
+             so power 2 7 = 128
+             so power 2 8 = 256 };
+    while j > 0 do
+      invariant { 0 <= j <= sn }
+      invariant { 0 <= rn < sz }
+      invariant { (sn - j) * bits = rdone }
+      invariant { j > 0 -> if shift = 0 then rdone = 64 * rn
+                           else rdone = 64 * rn - 64 + shift }
+      invariant { 0 <= shift < 64 }
+      invariant { shift > 0 ->
+                  (pelts rp)[offset rp + rn - 1] < power 2 shift }
+      invariant { rn = 0 -> shift = 0 }
+      invariant { value rp rn
+                  = svalue_sub b (pelts sp) (offset sp + j)
+                                            (offset sp + sn) }
+      variant   { j }
+      label StartLoop in
+      let ghost orp = pure { rp } in
+      j <- j-1;
+      let sj = UChar.to_uint64 (C.get_ofs sp j) in
+      svalue_sub_tail b (pelts sp) (offset sp + int32'int j + 1)
+                                   (offset sp + uint32'int sn);
+      assert { svalue_sub b (pelts sp) (offset sp + j) (offset sp + sn)
+               = svalue_sub b (pelts sp) (offset sp + j + 1)
+                                              (offset sp + sn)
+                 + power b (sn - (j+1)) * sj
+               = svalue_sub b (pelts sp) (offset sp + j + 1)
+                                              (offset sp + sn)
+                 + power 2 rdone * sj
+               by power b (sn - (j+1))
+                  = power (power 2 bits) (sn - (j+1))
+                  = power 2 (bits * (sn - (j+1)))
+                  = power 2 rdone };
+      if shift = 0
+      then begin
+        assert { rn < sz - 1
+                 by (sn - (j+1)) * bits = 64 * rn + shift
+                 so (sn - (j+1)) * bits
+                    = bits * sn - (j+1) * bits
+                    <= 64 * (sz - 1) - (j+1) * bits
+                    < 64 * (sz - 1)
+                 so 64 * rn < 64 * (sz - 1) };
+        C.set_ofs rp rn sj;
+        value_sub_frame (pelts rp) (pelts orp)
+                        (offset rp) (offset rp + int32'int rn);
+        assert { value rp rn = value rp rn at StartLoop };
+        value_tail rp rn;
+        rn <- rn + 1;
+        shift <- bits;
+        assert { (pelts rp)[offset rp + rn - 1]
+                 = sj
+                 < power 2 bits };
+        assert { power b (sn - (j+1)) = power radix (rn-1)
+                 by power b (sn - (j+1))
+                 = power 2 (bits * (sn - (j+1)))
+                 = power 2 rdone
+                 = power 2 (64 * (rn-1))
+                 = power radix (rn-1) };
+        assert { value rp rn = svalue_sub b (pelts sp) (offset sp + j)
+                                            (offset sp + sn)
+                 by value rp rn
+                    = value rp (rn - 1) + power radix (rn - 1) * sj
+                    = value orp (rn - 1) + power radix (rn - 1) * sj
+                    = svalue_sub b (pelts sp) (offset sp + j + 1)
+                                              (offset sp + sn)
+                      + power radix (rn - 1) * sj
+                    = svalue_sub b (pelts sp) (offset sp + j)
+                                              (offset sp + sn) };
+      end
+      else begin
+        let rlow = C.get_ofs rp (rn - 1) in
+        assert { rlow < power 2 shift };
+        assert { radix = power 2 (64 - shift) * power 2 shift };
+        let slow = lsl_mod sj (Limb.of_uint32 shift) in
+        assert { slow = power 2 shift * mod sj (power 2 (64 - shift))
+                 by slow = mod (sj * power 2 shift) radix
+                    = mod (sj * power 2 shift)
+                          (power 2 (64 - shift) * power 2 shift)
+                    = power 2 shift * mod sj (power 2 (64 - shift)) };
+        assert { rlow + slow < radix
+                 by slow = power 2 shift * mod sj (power 2 (64 - shift))
+                    <= power 2 shift * (power 2 (64 - shift) - 1)
+                    = power 2 shift * power 2 (64 - shift)
+                      - power 2 shift
+                    = radix - power 2 shift };
+        let nr = rlow + slow in
+        C.set_ofs rp (rn-1) nr;
+        let ghost oshift = pure { shift } in
+        shift <- shift + bits;
+        assert { power radix (rn - 1) * power 2 oshift
+                 = power b (sn - (j+1))
+                 by power radix (rn - 1) = power 2 (64 * (rn - 1))
+                 so power radix (rn - 1) * power 2 oshift
+                    = power 2 (64 * (rn - 1) + oshift)
+                    = power 2 (bits * (sn - (j+1)))
+                    = power b (sn - (j+1)) };
+        if shift >= 64
+        then begin
+          shift <- shift - 64;
+          if shift > 0
+          then begin
+            assert { rdone = 64 * rn + shift - bits };
+            assert { rn < (sz - 1)
+                     by (sn - (j+1)) * bits = rdone
+                        = 64 * rn + shift - bits
+                     so bits * sn <= 64 * (sz - 1)
+                     so 64 * rn + shift - bits
+                        = sn * bits - (j+1) * bits
+                        <= 64 * (sz - 1) - (j+1) * bits
+                        <= 64 * (sz - 1) - bits
+                     so 64 * rn + shift <= 64 * (sz - 1)
+                     so 64 * rn < 64 * rn + shift };
+            let shigh = lsr_mod sj (Limb.of_uint32 (bits - shift)) in
+            assert { shigh < power 2 shift
+                     by shigh = div sj (power 2 (bits - shift))
+                     so sj = (power 2 (bits - shift))
+                                * div sj (power 2 (bits - shift))
+                             + mod sj (power 2 (bits - shift))
+                     so power 2 (bits - shift) * shigh
+                        = sj - mod sj (power 2 (bits - shift))
+                        <= sj < power 2 bits
+                        = power 2 (bits - shift) * power 2 shift
+                     so shigh < power 2 shift };
+            assert { slow + radix * shigh = power 2 oshift * sj
+                     by slow = mod (power 2 oshift * sj) radix
+                     so shigh = div sj (power 2 (bits - shift))
+                     so shift = oshift + bits - 64
+                     so shigh = div sj (power 2 (64 - oshift))
+                     so let m = mod sj (power 2 (64 - oshift)) in
+                        sj = power 2 (64 - oshift) * shigh + m
+                     so power 2 oshift * sj
+                        = power 2 oshift * power 2 (64 - oshift) * shigh
+                          + power 2 oshift * m
+                        = radix * shigh + power 2 oshift * m
+                     so 0 <= m < power 2 (64 - oshift)
+                     so 0 <= power 2 oshift * m
+                          < power 2 oshift * power 2 (64 - oshift)
+                          = radix
+                     so mod (power 2 oshift * sj) radix
+                        = mod (radix * shigh + power 2 oshift * m) radix
+                        = mod (power 2 oshift * m) radix
+                        = power 2 oshift * m
+                     so power 2 oshift * m = slow
+                     so power 2 oshift * sj = radix * shigh + slow };
+            C.set_ofs rp rn shigh;
+            value_tail rp (rn - 1);
+            value_sub_frame (pelts rp) (pelts orp)
+                            (offset rp) (offset rp + int32'int rn - 1);
+            assert { value rp rn
+                     = value orp (rn - 1) + power radix (rn - 1) * nr
+                     by (pelts rp)[offset rp + rn - 1] = nr
+                     so value rp rn
+                        = value rp (rn - 1) + power radix (rn - 1) * nr };
+            value_tail orp (rn - 1);
+            value_tail rp rn;
+            assert { value rp (rn + 1)
+                     = svalue_sub b (pelts sp) (offset sp + j) (offset sp + sn)
+                     by value rp (rn + 1)
+                        = value rp rn + power radix rn * shigh
+                        = value orp (rn - 1) + power radix (rn - 1) * nr
+                          + power radix rn * shigh
+                        = value orp (rn - 1) + power radix (rn - 1) * rlow
+                          + power radix (rn - 1) * slow
+                          + power radix rn * shigh
+                        = value orp rn
+                          + power radix (rn - 1) * slow
+                          + power radix rn * shigh
+                        = value orp rn
+                          + power radix (rn - 1) * (slow + radix * shigh)
+                        = value orp rn
+                          + power radix (rn - 1) * power 2 oshift * sj
+                        = value orp rn + power b (sn - (j+1)) * sj
+                        = svalue_sub b (pelts sp)
+                                       (offset sp + j) (offset sp + sn) };
+            rn <- rn + 1;
+          end else begin
+            value_tail rp (rn - 1);
+            value_tail orp (rn - 1);
+            assert { slow = power 2 oshift * sj
+                     by slow = power 2 oshift * mod sj (power 2 (64 - oshift))
+                     so 64 - oshift = bits
+                     so 0 <= sj < power 2 bits
+                     so mod sj (power 2 (64 - oshift))
+                        = mod sj (power 2 bits)
+                        = sj };
+            assert { value rp rn
+                     = svalue_sub b (pelts sp) (offset sp + j) (offset sp + sn)
+                     by value rp rn
+                        = value rp (rn - 1) + power radix (rn - 1) * nr
+                        = value rp (rn - 1) + power radix (rn - 1) * rlow
+                          + power radix (rn - 1) * slow
+                        = value orp (rn - 1) + power radix (rn - 1) * rlow
+                          + power radix (rn - 1) * slow
+                        = value orp rn + power radix (rn - 1) * slow
+                        = value orp rn
+                          + power radix (rn - 1) * power 2 oshift * sj
+                        = value orp rn + power b (sn - (j+1)) * sj
+                        = svalue_sub b (pelts sp) (offset sp + j)
+                                                  (offset sp + sn) };
+          end;
+        end else begin
+          assert { slow = power 2 oshift * sj
+                   by slow = power 2 oshift * mod sj (power 2 (64 - oshift))
+                   so oshift + bits < 64
+                   so sj < power 2 bits <= power 2 (64 - oshift)
+                   so mod sj (power 2 (64 - oshift)) = sj };
+          assert { nr < power 2 shift
+                   by nr = rlow + slow
+                   so rlow < power 2 oshift
+                   so rlow + slow < power 2 oshift + power 2 oshift * sj
+                      = power 2 oshift * (1 + sj)
+                      <= power 2 oshift * power 2 bits
+                      = power 2 shift };
+          value_tail rp (rn - 1);
+          value_tail orp (rn - 1);
+          assert { value rp rn
+                   = svalue_sub b (pelts sp) (offset sp + j) (offset sp + sn)
+                   by value rp rn
+                      = value rp (rn - 1) + power radix (rn - 1) * nr
+                      = value rp (rn - 1) + power radix (rn - 1) * rlow
+                        + power radix (rn - 1) * slow
+                      = value orp (rn - 1) + power radix (rn - 1) * rlow
+                        + power radix (rn - 1) * slow
+                      = value orp rn + power radix (rn - 1) * slow
+                      = value orp rn
+                        + power radix (rn - 1) * power 2 oshift * sj
+                      = value orp rn + power b (sn - (j+1)) * sj
+                      = svalue_sub b (pelts sp) (offset sp + j)
+                                                  (offset sp + sn) };
+        end
+      end;
+      rdone <- rdone + uint32'int bits;
+    done;
+    normalize rp rn;
+    rn
+
+  use mul.Mul
+  use add_1.Add_1
+
+  let wmpn_set_str_other (rp: ptr limb) (ghost sz: int32)
+                         (sp: ptr uchar) (sn: uint32) (b:limb)
+                         (info: wmpn_base_info) : int32
+    requires { 0 < sn <= max_int32 }
+    requires { 0 < sz }
+    requires { valid rp sz }
+    requires { valid sp sn }
+    requires { 2 <= b <= 256 }
+    requires { power b sn <= power radix (sz - 1) }
+    requires { writable rp }
+    requires { in_base b (pelts sp) (offset sp) (offset sp + sn) }
+    requires { info.b = b }
+    ensures  { svalue b sp sn > 0 -> 1 <= result < sz }
+    ensures  { value rp result = svalue b sp sn }
+    ensures  { svalue b sp sn > 0 -> (pelts rp)[offset rp + result - 1] > 0 }
+    ensures  { svalue b sp sn = 0 -> result = 1 }
+  =
+    let ref k = 1 + (sn - 1) % info.exp in
+    label Start in
+    let ref w = UChar.to_uint64 (C.get sp) in
+    let ref j = 1 in
+    while (k <- k - 1; k) > 0 do
+      variant { k }
+      invariant { 1 <= k <= sn }
+      invariant { 1 <= j <= sn }
+      invariant { w = svalue_sub b (pelts sp) (offset sp) (offset sp + j) }
+      invariant { 0 <= w < power b j }
+      invariant { j + k - 1 = 1 + mod (sn - 1) info.exp }
+      invariant { int32'int j = uint32'int sn -> k = 1 }
+      label Loop in
+      assert { k > 0 };
+      assert { j < info.exp };
+      let sj = UChar.to_uint64 (C.get_ofs sp j) in
+      svalue_sub_head (uint64'int b) (pelts sp)
+                      (offset sp) (offset sp + int32'int j + 1);
+      assert { w * b + sj
+               = svalue_sub b (pelts sp) (offset sp) (offset sp + j + 1) };
+      assert { w * b + sj < radix
+               by w * b + sj
+               = svalue_sub b (pelts sp) (offset sp) (offset sp + j + 1)
+               < power b (j+1)
+               so j+1 <= info.exp
+               so power b (j+1) <= power b (info.exp) < radix };
+      w <- w * b + sj;
+      j <- j + 1;
+    done;
+    C.set rp w;
+    let ref rn = 1 in
+    assert { value rp 1
+             = w
+             = svalue_sub b (pelts sp) (offset sp) (offset sp + j) };
+    assert { j = 1 + mod (sn - 1) info.exp };
+    assert { mod (sn - j) info.exp = 0
+             by info.exp > 1
+             so mod 1 info.exp = 1
+             so mod j info.exp
+                = mod (mod 1 info.exp + mod (sn - 1) info.exp) info.exp
+                = mod sn info.exp
+             so let ds = div sn info.exp in
+             let dj = div j info.exp in
+             sn = ds * info.exp + mod sn info.exp
+             so j = dj * info.exp + mod j info.exp
+             so sn - j = (ds - dj) * info.exp
+             so mod (sn - j) info.exp = 0 };
+    while j < UInt32.to_int32 sn do
+      variant { sn - j }
+      invariant { 0 <= j <= sn }
+      invariant { value rp rn
+                  = svalue_sub b (pelts sp) (offset sp)
+                                 (offset sp + int32'int j) }
+      invariant { (*k at Start <= *) j <= sn }
+      invariant { 0 <= rn <= sz }
+      invariant { svalue b sp j > 0 -> (pelts rp)[offset rp + rn - 1] > 0 }
+      invariant { svalue b sp j = 0 -> rn = 1 }
+      invariant { mod (sn - j) info.exp = 0 }
+      w <- UChar.to_uint64 (C.get_ofs sp j);
+      let oj = pure { j } in
+      assert { j + info.exp <= sn };
+      j <- j+1;
+      for k = 1 to info.exp - 1 do
+        invariant { w = svalue_sub b (pelts sp) (offset sp + oj)
+                                     (offset sp + j) }
+        invariant { 1 <= k <= info.exp }
+        invariant { j = oj + k }
+        let sj = UChar.to_uint64 (C.get_ofs sp j) in
+        svalue_sub_head (uint64'int b) (pelts sp) (offset sp + int32'int oj)
+                                      (offset sp + int32'int j + 1);
+        assert { w * b + sj = svalue_sub b (pelts sp) (offset sp + oj)
+                                           (offset sp + j + 1) };
+        assert { w * b + sj < radix
+                 by svalue_sub b (pelts sp) (offset sp + oj) (offset sp + j + 1)
+                    < power b (j + 1 - oj)
+                    = power b (k+1) <= power b info.exp < radix };
+        w <- w * b + sj;
+        j <- j + 1;
+      done;
+      assert { mod (sn - j) info.exp = 0
+               by j = oj + info.exp
+               so mod (sn - j) info.exp
+               = mod (sn - oj - info.exp) info.exp
+               = mod (mod (sn - oj) info.exp
+                     + mod (- info.exp) info.exp) info.exp
+               = mod (0 + 0) info.exp = 0 };
+      svalue_sub_concat (uint64'int b) (pelts sp) (offset sp)
+                          (offset sp + int32'int oj) (offset sp + int32'int j);
+      assert { svalue b sp j
+               = svalue b sp oj * power b (j - oj) + w
+               = value rp rn * power b info.exp + w
+               = value rp rn * info.bb + w };
+      let ghost orp = pure { rp } in
+      let ref cy = wmpn_mul_1_in_place rp rn info.bb in
+      assert { cy < radix - 1
+               by value rp rn <= (power radix rn - 1)
+               so info.bb <= radix - 1
+               so info.bb * value orp rn <= (radix - 1) * (power radix rn - 1)
+                  < (radix - 1) * (power radix rn)
+               so value orp rn * info.bb = value rp rn + power radix rn * cy
+                  >= power radix rn * cy
+               so power radix rn * cy < power radix rn * (radix - 1) };
+      let cy1 = wmpn_add_1_in_place rp rn w in
+      cy <- cy + cy1;
+      assert { value rp rn + power radix rn * cy
+               = svalue_sub b (pelts sp) (offset sp) (offset sp + j) };
+      if cy > 0 then begin
+        value_sub_update_no_change (pelts rp) (offset rp + int32'int rn)
+                                   (offset rp) (offset rp + int32'int rn)
+                                   cy;
+        value_tail orp (rn - 1);
+        assert { rn < sz
+                 by power b sn <= power radix (sz - 1)
+                 so svalue b sp oj > 0
+                 so (pelts orp)[offset rp + rn - 1] > 0
+                 so value orp rn
+                    = svalue b sp oj
+                    < power b oj
+                    <= power b sn <= power radix (sz - 1)
+                 so value orp rn
+                    = value orp (rn - 1)
+                      + power radix (rn - 1) * (pelts orp)[offset rp + rn - 1]
+                    >= power radix (rn - 1) * (pelts orp)[offset rp + rn - 1]
+                    >= power radix (rn - 1) };
+        C.set_ofs rp rn cy;
+        value_tail rp rn;
+        rn <- rn + 1;
+      end
+      else begin
+        value_tail rp (rn - 1);
+        value_tail orp (rn - 1);
+        assert { svalue b sp j > 0 -> (pelts rp)[offset rp + rn - 1] > 0
+                 by info.bb >= 1
+                 so value rp rn = value orp rn * info.bb + w
+                    >= value orp rn * info.bb
+                    >= value orp rn
+                 so if svalue b sp oj > 0
+                    then (pelts orp)[offset rp + rn - 1] > 0
+                    so value orp rn
+                       = value orp (rn - 1)
+                         + power radix (rn - 1)
+                           * (pelts orp)[offset rp + rn - 1]
+                       >= power radix (rn - 1) * (pelts orp)[offset rp + rn - 1]
+                       >= power radix (rn - 1)
+                    so value rp rn >= value orp rn
+                    so power radix (rn - 1) * 1
+                       = power radix (rn - 1) <= value rp rn
+                       = value rp (rn - 1)
+                         + power radix (rn - 1) * (pelts rp)[offset rp + rn - 1]
+                       < power radix (rn - 1)
+                         + power radix (rn - 1) * (pelts rp)[offset rp + rn - 1]
+                       = power radix (rn - 1)
+                         * (1 + (pelts rp)[offset rp + rn - 1])
+                    so 1 < 1 + (pelts rp)[offset rp + rn - 1]
+                    else rn = 1 /\ value rp rn = svalue b sp j = w
+                    so w > 0
+                    so (pelts rp)[offset rp + rn - 1] > 0 };
+      end
+    done;
+    value_tail rp (rn - 1);
+    assert { svalue b sp sn > 0 -> rn < sz
+             by value rp rn = svalue b sp sn < power b sn
+                <= power radix (sz - 1)
+                so value rp rn
+                   = value rp (rn - 1)
+                     + power radix (rn - 1) * (pelts rp)[offset rp + rn - 1]
+                   >= power radix (rn - 1) * (pelts rp)[offset rp + rn - 1]
+                   >= power radix (rn - 1) };
+    rn
+
+  let wmpn_set_str (rp: ptr limb) (ghost sz: int32) (sp: ptr uchar) (sn:uint32)
+                   (base: int32) : int32
+    requires { valid sp sn }
+    requires { valid rp sz }
+    requires { sz > 0 }
+    requires { sn >= 0 }
+    requires { power base sn <= power radix (sz - 1) }
+    requires { 2 <= base <= 256 }
+    requires { writable rp }
+    requires { in_base base (pelts sp) (offset sp) (offset sp + sn) }
+    writes   { rp.data.elts }
+    ensures  { value rp result = svalue base sp sn }
+    ensures  { sn > 0 -> (pelts sp)[offset sp] > 0
+               -> (pelts rp)[offset rp + result - 1] > 0 }
+  =
+    ghost (if sn > 0 then
+              svalue_sub_tail (int32'int base) (pelts sp) (offset sp + 1)
+              (offset sp + uint32'int sn));
+    assert { sn > 0 -> (pelts sp)[offset sp] > 0 -> svalue base sp sn > 0
+             by svalue base sp sn
+                = svalue_sub base (pelts sp) (offset sp + 1) (offset sp + sn)
+                  + power base (sn - 1) * (pelts sp)[offset sp]
+                >= power base (sn - 1) * (pelts sp)[offset sp]
+                > 0 };
+    if sn = 0 then return 0;
+    let bits = wmpn_base_power_of_two_p (Limb.of_int32 base) in
+    if (bits <> 0)
+    then return wmpn_set_str_bits rp sz sp sn bits
+    else begin
+      let info = wmpn_get_base_info (Limb.of_int32 base) in
+      return wmpn_set_str_other rp sz sp sn (Limb.of_int32 base) info
+    end
+
+end

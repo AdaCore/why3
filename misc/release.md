@@ -7,56 +7,57 @@
     (see below: copy the dtd on the web)
   - `make trywhy3`
 
-* change version number
-  ```
-  VERSION=1.1.0
-  echo "VERSION=$VERSION" > Version
-  ./config.status
-  ```
-  - check/update the content of the About dialog in `src/ide/gconfig.ml`
+* change version number `VERSION=1.3 RELEASE=1.3.0`
+  - update the first line of `configure.in` using `$RELEASE`
+  - update the `version` and `release` fields in `doc/conf.py` around line 60
+  - check `CHANGES.md`, add the release date
+  - update the date in `doc/index.rst`
+
+* check/update authors and copyright
+  - update the content of the About dialog in `src/ide/gconfig.ml`
     around lines 600-650
-  - check headers
-  - check the file `CHANGES.md`, add the release date
+  - update the `copyright` field in `doc/conf.py` around line 50
+  - update `doc/foreword.rst`
+  - check headers, run `make headers` if needed
 
 * generate documentation
-  - update the date in `doc/manual.tex` (near `\whyversion{}`)
-  - check/update the authors in `doc/manual.tex`
-  - check that macro `\todo` is commented out in `doc/macros.tex`
   - `make doc`
-    (check that manual in HTML is also generated, `doc/html/index.html`)
+    (check that the PDF manual is also generated, `doc/latex/manual.pdf`)
   - `make stdlibdoc`
   - `make apidoc`
 
 * prepare the archive
   - make a last commit:
     ```
-    git commit -am "Version $VERSION"
-    git tag $VERSION
+    git commit -am "Version $RELEASE"
+    git tag $RELEASE
     ```
   - `make dist`
-  - test `distrib/why3-$VERSION.tar.gz`
+  - test `distrib/why3-$RELEASE.tar.gz`
   - push the commit:
     ```
     git push
     git push --tags
     ```
-  - upload `distrib/why3-$VERSION.tar.gz` to https://gforge.inria.fr/frs/?group_id=2990
+  - upload `distrib/why3-$RELEASE.tar.gz` to https://gforge.inria.fr/frs/?group_id=2990
 
 * upload the documentation on the web page
   ```
-  cp share/why3session.dtd /users/www-perso/projets/why3/
-  cp doc/manual.pdf /users/www-perso/projets/why3/download/manual-$VERSION.pdf
-  ln -s -n -f download/manual-$VERSION.pdf /users/www-perso/projets/why3/manual.pdf
-  cp -r doc/html /users/www-perso/projets/why3/doc-$VERSION
-  ln -s -n -f doc-$VERSION /users/www-perso/projets/why3/doc
-  cp -r doc/stdlibdoc /users/www-perso/projets/why3/stdlib-$VERSION
-  ln -s -n -f stdlib-$VERSION /users/www-perso/projets/why3/stdlib
-  cp -r doc/apidoc /users/www-perso/projets/why3/api-$VERSION
-  ln -s -n -f api-$VERSION /users/www-perso/projets/why3/api
+  DEST=/users/www-perso/projets/why3
+  cp share/why3session.dtd $DEST/
+  cp doc/latex/manual.pdf $DEST/download/manual-$VERSION.pdf
+  ln -s -n -f download/manual-$VERSION.pdf $DEST/manual.pdf
+  rm -rf $DEST/doc-$VERSION $DEST/stdlib-$VERSION $DEST/api-$VERSION
+  cp -r doc/html $DEST/doc-$VERSION
+  ln -s -n -f doc-$VERSION $DEST/doc
+  cp -r doc/stdlibdoc $DEST/stdlib-$VERSION
+  ln -s -n -f stdlib-$VERSION $DEST/stdlib
+  cp -r doc/apidoc $DEST/api-$VERSION
+  ln -s -n -f api-$VERSION $DEST/api
   ```
 
 * update the main HTML page (sources are in repository `why3-www`)
-  - edit `index.html`, change at least all occurrences of `1.0.0` by `1.1.0`, and
+  - edit `index.html`, change at least all occurrences of the version, and
     update the url for download
   - `make` (to check validity)
   - `make export`
@@ -64,10 +65,8 @@
     ```
     make trywhy3
     make trywhy3_package
-    tar xzf trywhy3.tar.gz -C /users/www-perso/projets/why3/try/ --strip-components=1
+    tar xzf trywhy3.tar.gz -C $DEST/try/ --strip-components=1
     ```
-
-* next commit: add `+git` to the version in file `Version`
 
 * prepare the OPAM package
   - update `opam/why3{,-ide,-coq}.opam` with correct dependencies on external packages
@@ -85,11 +84,11 @@
     git push
     ```
   - create version directories:
-    - `mkdir packages/why3/why3.$VERSION packages/why3-coq/why3-coq.$VERSION packages/why3-ide/why3-ide.$VERSION`
+    - `mkdir packages/why3/why3.$RELEASE packages/why3-coq/why3-coq.$RELEASE packages/why3-ide/why3-ide.$RELEASE`
     - copy the `opam` files from the directories of the previous release
     - reconcile with the changes from Why3's repository
   - url and checksum of `why3.tar.gz`:
-    - `md5sum .../distrib/why3-$VERSION.tar.gz`
+    - `md5sum .../distrib/why3-$RELEASE.tar.gz`
     - update the `url` section of all three opam files
   - test opam files:
     ```

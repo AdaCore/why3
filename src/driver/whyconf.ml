@@ -106,7 +106,7 @@ module Hprover = Exthtbl.Make(Prover)
 
 module Editor = struct
   type t = string
-  let compare = Pervasives.compare
+  let compare = String.compare
 end
 
 module Meditor = Extmap.Make(Editor)
@@ -138,7 +138,7 @@ type config_prover = {
   interactive : bool;
   extra_options : string list;
   extra_drivers : string list;
-  added_at_startup : bool;
+  detected_at_startup : bool;
 }
 
 type config_editor = {
@@ -266,25 +266,21 @@ let pluginsdir m = Filename.concat m.libdir "plugins"
 
 let plugins_auto_detection main =
   let dir = pluginsdir main in
-  let plugins =
-    if Sys.file_exists dir then
-      let files = Sys.readdir dir in
-      let fold acc p =
-        if p.[0] == '.' then acc else
-          let p = Filename.concat dir p in
-          (Filename.chop_extension p)::acc
-      in
-      Array.fold_left fold [] files
+  let ext = if Dynlink.is_native then ".cmxs" else ".cmo" in
+  let files = try Sys.readdir dir with Sys_error _ -> [||] in
+  let fold acc p =
+    let open Filename in
+    if extension p = ext then
+      concat dir (chop_extension p) :: acc
     else
-      []
-  in
-  plugins
+      acc in
+  Array.fold_left fold [] files
 
 let load_plugins main =
   let load x =
     try Plugin.load x
     with exn ->
-      Format.eprintf "%s can't be loaded: %a@." x
+      Format.eprintf "%s cannot be loaded: %a@." x
         Exn_printer.exn_printer exn in
   if main.load_default_plugins then List.iter load (plugins_auto_detection main);
   List.iter load main.plugins
@@ -477,7 +473,7 @@ let load_prover (provers,shortcuts) section =
         interactive = get_bool ~default:false section "interactive";
         extra_options = [];
         extra_drivers = [];
-        added_at_startup = false;
+        detected_at_startup = false;
       } provers in
     let lshort = get_stringl section ~default:[] "shortcut" in
     let shortcuts = add_prover_shortcuts shortcuts prover lshort in
@@ -836,7 +832,7 @@ let set_main config main =
 let set_provers config ?shortcuts provers =
   let shortcuts = Opt.get_def config.prover_shortcuts shortcuts in
   let rc_config =
-    let provers = Mprover.filter (fun _ c -> not c.added_at_startup) provers in
+    let provers = Mprover.filter (fun _ c -> not c.detected_at_startup) provers in
     set_provers_shortcuts config.config shortcuts provers;
   in
   {config with
@@ -1002,6 +998,7 @@ module Args = struct
       Format.printf "@[%s%a@]" (Arg.usage_string options usage) extra_help ();
       exit 0
     end;
+    Debug.Args.set_flags_selected ~silent:true ();
     let base_config = read_config !opt_config in
     let config = { base_config with conf_file = "" } in
     let config = List.fold_left merge_config config !opt_extra in
@@ -1034,7 +1031,7 @@ let load_driver main env file extras =
   let file = absolute_driver_file main file in
   try
     Driver.load_driver_absolute env file extras
-  with e ->
+  with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "Fatal error while loading driver file '%s': %a@."
             file Exn_printer.exn_printer e;
     exit 1

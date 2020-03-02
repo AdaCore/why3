@@ -195,10 +195,13 @@ val remove_subtree: notification:notifier -> removed:notifier ->
 
 val get_undetached_children_no_pa: Session_itp.session -> any -> any list
 
+val set_partial_config: controller -> Whyconf.config -> unit
+(** edit a minimal part of the configuration that should be safe to edit during
+    execution of the server (provers config, editors) *)
 
 (** {2 Scheduled jobs} *)
 
-module Make(S : Scheduler) : sig
+module Make : Scheduler -> sig
 
 val register_observer : (int -> int -> int -> unit) -> unit
 (** records a hook that will be called with the number of waiting

@@ -2,16 +2,7 @@
 
 prelude ";; produced by cvc4_17.drv ;;"
 
-prelude "(set-logic AUFBVFPDTSNIRA)"
-(*
-    A    : Array
-    UF   : Uninterpreted Function
-    BV   : BitVectors
-    FP   : FloatingPoint
-    DT   : Datatypes
-    S    : Strings
-    NIRA : NonLinear Integer+Real Arithmetic
-*)
+prelude "(set-logic ALL_SUPPORTED)"
 
 unknown "^(error \"Can't get-info :reason-unknown when the last result wasn't unknown!\")$" "(not unknown!)"
 
@@ -25,6 +16,19 @@ theory BuiltIn
 end
 
 theory string.String
+
+  remove prop lt_empty
+  remove prop lt_not_com
+  remove prop lt_ref
+  remove prop lt_ref
+  remove prop lt_trans
+  remove prop le_empty
+  remove prop le_ref
+  remove prop lt_le
+  remove prop lt_le_eq
+  remove prop le_trans
+  remove prop replaceall_empty1
+  remove prop not_contains_replaceall
 
   syntax predicate lt        "(str.< %1 %2)"
   syntax predicate le        "(str.<= %1 %2)"

@@ -1,8 +1,10 @@
 #!/bin/bash
 
 set -e
-opam switch $COMPILER
-eval `opam env`
+if test "$COMPILER" != "system"; then
+    opam switch $COMPILER
+    eval `opam env`
+fi
 
 export OCAMLRUNPARAM=o=20,O=200
 ./autogen.sh
@@ -25,7 +27,7 @@ do
             make web_ide src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js
             ;;
         doc)
-            make doc
+            #make doc # disabled during Sphinx migration
             make stdlibdoc
             make apidoc
             ;;

@@ -6,39 +6,10 @@ module Util
   use int.Power
   use ref.Ref
   use mach.c.C
+  use array.Array
   use map.Map
   use types.Types
   use lemmas.Lemmas
-
-  let wmpn_copyi [@extraction:inline] (r x:t) (sz:int32) : unit
-    requires { valid x sz }
-    requires { valid r sz }
-    ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
-    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
-              (pelts r)[j] = old (pelts r)[j] }
-  =
-    let ref i = 0 in
-    let ref xp = C.incr x 0 in
-    let ref rp = C.incr r 0 in
-    while (Int32.(<) i sz) do
-      variant { p2i sz - p2i i }
-      invariant { 0 <= i <= sz }
-      invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset i }
-      invariant { pelts xp = pelts x }
-      invariant { pelts rp = pelts r }
-      invariant { xp.min = min x }
-      invariant { xp.max = x.max }
-      invariant { rp.min = r.min }
-      invariant { rp.max = r.max }
-      invariant { xp.offset = x.offset + i }
-      invariant { rp.offset = r.offset + i }
-      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
-                  (pelts r)[j] = old (pelts r)[j] }
-      C.set rp (C.get xp);
-      rp <- C.incr rp 1;
-      xp <- C.incr xp 1;
-      i <- i+1;
-    done
 
    (* `wmpn_zero_p` checks if `x[0..sz-1]` is zero. It corresponds to `mpn_zero_p`. *)
    let wmpn_zero_p (x:t) (sz:int32) : int32
@@ -76,6 +47,7 @@ module Util
   (** `wmpn_zero r sz` sets `(r,sz)` to zero. Corresponds to `mpn_zero`. *)
   let wmpn_zero [@extraction:inline] (r:t) (sz:int32) : unit
     requires { valid r sz }
+    requires { writable r }
     ensures { value r sz = 0 }
     ensures { forall j. (j < offset r \/ offset r + sz <= j)
               -> (pelts r)[j] = old (pelts r)[j] }
@@ -91,6 +63,167 @@ module Util
       set_ofs r !i lzero;
       value_sub_tail (pelts r) r.offset (r.offset + p2i !i);
       i := Int32.(+) !i (1:int32);
+    done
+
+  (** `normalize p n` sets n to the smallest number such that the value `(p,n)`
+       remains unchanged *)
+  let normalize [@extraction:inline] (p: ptr limb) (ref n: int32)
+    requires { n >= 0 }
+    requires { valid p n }
+    ensures  { 0 <= n <= old n }
+    ensures  { value p n = value p (old n) }
+    ensures  { n = 0 \/ (pelts p)[offset p + n-1] > 0 }
+    ensures  { n = 0 \/ value p n >= power radix (n-1) }
+  = label Start in
+    while n > 0 do
+      invariant { value p n = value p n at Start }
+      invariant { 0 <= n <= n at Start }
+      variant   { n }
+      if get_ofs p (n-1) <> 0
+      then begin
+        value_tail p (n-1);
+        break
+      end;
+      n <- n-1;
+    done
+
+  use ptralias.Alias
+
+  let wmpn_copyd (rp up:t) (n:int32) : unit
+    requires { valid up n }
+    requires { valid rp n }
+    requires { writable rp }
+    requires { offset up <= offset rp \/ offset rp + n <= offset up }
+    alias    { rp.data with up.data }
+    ensures { map_eq_sub_shift (pelts rp) (old pelts up)
+                               rp.offset up.offset n }
+    ensures { forall j. (j < offset rp \/ offset rp + n <= j) ->
+              (pelts rp)[j] = old (pelts rp)[j] }
+    writes  { rp.data.elts }
+  = let ghost ou = pure { up } in
+    for i = n-1 downto 0 do
+      invariant { forall j. i + 1 <= j < n ->
+                            (pelts rp)[offset rp + j]
+                            = (pelts ou)[offset up + j] }
+      invariant { forall j. (j < offset rp \/ offset rp + n <= j) ->
+                            (pelts rp)[j] = old (pelts rp)[j] }
+      invariant { forall j. 0 <= j <= i -> (pelts up)[offset up + j]
+                            = (pelts ou)[offset up + j] }
+      let lu = C.get_ofs up i in
+      let ghost lou = C.get_ofs ou i in
+      assert { lu = lou };
+      C.set_ofs rp i lu
+    done
+
+  let wmpn_copyd_sep (rp up:t) (n:int32) : unit
+    requires { valid up n }
+    requires { valid rp n }
+    requires { writable rp }
+    ensures { map_eq_sub_shift (pelts rp) (old pelts up)
+                               rp.offset (old up.offset) n }
+    ensures { forall j. (j < offset rp \/ offset rp + n <= j) ->
+              (pelts rp)[j] = old (pelts rp)[j] }
+    ensures { forall j. (pelts up)[j] = old (pelts up)[j] }
+    ensures { min up = old min up /\ max up = old max up
+              /\ plength up = old plength up }
+    ensures { min rp = old min rp /\ max rp = old max rp
+              /\ plength rp = old plength rp }
+  =
+    let ghost ou = pure { up } in
+    let nr, nx, m = open_shift_sep rp up n in
+    label Copy in
+    wmpn_copyd nr nx n;
+    let ghost onx = pure { nx } in
+    let ghost onr = pure { nr } in
+    close_shift_sep rp up n nr nx m;
+    assert { forall j. 0 <= j < n ->
+                       (pelts up)[offset up + j]
+                       = (pelts ou)[offset up + j]
+                       by offset nx + j at Copy < offset nr
+                       \/ offset nr + n <= offset nx + j at Copy
+                       so (pelts up)[offset up + j]
+                       = (pelts onx)[offset onx + j]
+                       = (pelts nx)[offset onx + j] at Copy
+                       = (pelts ou)[offset up + j] };
+    assert { forall j. 0 <= j < n ->
+                       (pelts rp)[offset rp + j] = (pelts ou)[offset ou + j]
+                       by (pelts rp)[offset rp + j]
+                       = (pelts onr)[offset nr + j]
+                       = (pelts nx)[offset nx + j] at Copy
+                       = (pelts ou)[offset ou + j] }
+
+  let wmpn_copyi (rp up:t) (n:int32) : unit
+    requires { valid up n }
+    requires { valid rp n }
+    requires { writable rp }
+    requires { offset rp <= offset up \/ offset up + n <= offset rp }
+    alias    { rp.data with up.data }
+    ensures { map_eq_sub_shift (pelts rp) (old pelts up)
+                               rp.offset up.offset n }
+    ensures { forall j. (j < offset rp \/ offset rp + n <= j) ->
+              (pelts rp)[j] = old (pelts rp)[j] }
+    writes  { rp.data.elts }
+  =
+    let ghost ou = pure { up } in
+    for i = 0 to n-1 do
+      invariant { forall j. 0 <= j < i ->
+                            (pelts rp)[offset rp + j]
+                            = (pelts ou)[offset up + j] }
+      invariant { forall j. (j < offset rp \/ offset rp + n <= j) ->
+                            (pelts rp)[j] = old (pelts rp)[j] }
+      invariant { forall j. i <= j < n -> (pelts up)[offset up + j]
+                            = (pelts ou)[offset up + j] }
+      label StartLoop in
+      let lu = C.get_ofs up i in
+      let ghost lou = C.get_ofs ou i in
+      assert { lu = lou };
+      C.set_ofs rp i lu;
+    done
+
+end
+module UtilOld
+
+  use int.Int
+  use mach.int.Int32
+  use import mach.int.UInt64GMP as Limb
+  use int.Power
+  use ref.Ref
+  use mach.c.C
+  use array.Array
+  use map.Map
+  use types.Types
+  use lemmas.Lemmas
+
+  let wmpn_copyi (r x:t) (sz:int32) : unit
+    requires { valid x sz }
+    requires { valid r sz }
+    requires { writable r }
+    ensures { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset sz }
+    ensures { forall j. (j < offset r \/ offset r + sz <= j) ->
+              (pelts r)[j] = old (pelts r)[j] }
+  =
+    let ref i = 0 in
+    let ref xp = C.incr x 0 in
+    let ref rp = C.incr r 0 in
+    while (Int32.(<) i sz) do
+      variant { p2i sz - p2i i }
+      invariant { 0 <= i <= sz }
+      invariant { map_eq_sub_shift (pelts r) (pelts x) r.offset x.offset i }
+      invariant { pelts xp = pelts x }
+      invariant { pelts rp = pelts r }
+      invariant { xp.min = min x }
+      invariant { xp.max = x.max }
+      invariant { rp.min = r.min }
+      invariant { rp.max = r.max }
+      invariant { writable rp }
+      invariant { xp.offset = x.offset + i }
+      invariant { rp.offset = r.offset + i }
+      invariant { forall j. (j < offset r \/ offset r + sz <= j) ->
+                  (pelts r)[j] = old (pelts r)[j] }
+      C.set rp (C.get xp);
+      rp <- C.incr rp 1;
+      xp <- C.incr xp 1;
+      i <- i+1;
     done
 
 end

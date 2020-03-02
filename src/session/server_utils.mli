@@ -79,7 +79,8 @@ val interp:
   Controller_itp.controller ->
   Session_itp.any option -> string -> command
 
-(* Find the first unproven goal around the node given.
+(* Find the next goal from the current node (using heuristic st).
+   @param st         : use heuristic st
    @param always_send: if true then always returns something
    @param proved     : oracle for proved node
    @param children   : returns the list children of a node
@@ -88,8 +89,9 @@ val interp:
    @param is_pa      : answer true iff a given node is a proof attempt
    @param node       : node_id
 *)
-val get_first_unproven_goal_around:
-    always_send:bool ->
+val get_next_with_strategy:
+  st:Itp_communication.next_unproved_node_strat ->
+  always_send:bool ->
       proved:('a -> bool) ->
         children:('a -> 'a list) ->
           get_parent:('a -> 'a option) ->

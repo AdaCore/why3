@@ -17,7 +17,6 @@ let debug_sched = Debug.register_info_flag "scheduler"
   ~desc:"Print@ debugging@ messages@ about@ scheduling@ of@ prover@ calls@ \
          and@ transformation@ applications."
 
-let debug_call_prover = Debug.lookup_flag "call_prover"
 let default_delay_ms = 100 (* 0.1 seconds *)
 
 (** State of a proof *)
@@ -84,6 +83,12 @@ type controller =
     controller_running_proof_attempts : unit Hpan.t;
   }
 
+let set_partial_config cont c =
+  let open Whyconf in
+  let config = set_editors cont.controller_config (get_editors c) in
+  let config = set_provers config (get_provers c) in
+  cont.controller_config <- config
+
 let session_max_tasks = ref 1
 
 let set_session_max_tasks n =
@@ -111,16 +116,10 @@ let load_drivers c =
   let env = c.controller_env in
   let config = c.controller_config in
   let provers = Whyconf.get_provers config in
-  Whyconf.Mprover.iter
-    (fun _ p ->
-     try
-       let d = Whyconf.load_driver (Whyconf.get_main config) env p.Whyconf.driver [] in
-       Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d)
-     with e ->
-       Debug.dprintf debug_call_prover
-         "[Controller_itp] error while loading driver for prover %a: %a@."
-         Whyconf.print_prover p.Whyconf.prover
-         Exn_printer.exn_printer e)
+  let main = Whyconf.get_main config in
+  Whyconf.Mprover.iter (fun _ p ->
+      let d = Whyconf.load_driver main env p.Whyconf.driver [] in
+      Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d))
     provers
 
 let create_controller config env ses =

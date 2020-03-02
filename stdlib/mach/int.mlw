@@ -224,13 +224,6 @@ module Int31
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV31 as BV31
-
-  val to_bv (x: int31) : BV31.t
-    ensures { BV31.to_int result = to_int x }
-  val of_bv (x: BV31.t) : int31
-    ensures { to_int result = BV31.to_int x }
-*)
 end
 
 module Int32
@@ -251,14 +244,6 @@ module Int32
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*
-  use bv.BV32 as BV32
-
-  val to_bv (x: int32) : BV32.t
-    ensures { BV32.to_int result = to_int x }
-  val of_bv (x: BV32.t) : int32
-    ensures { to_int result = BV32.to_int x }
-*)
 end
 
 module Int32BV
@@ -271,6 +256,20 @@ module Int32BV
     ensures { BV32.to_int result = to_int x }
   val of_bv (x: BV32.t) : int32
     ensures { to_int result = BV32.to_int x }
+
+end
+
+module Int32GMP
+
+  use int.Int
+  use export Int32
+
+  (* bitwise xor *)
+  val bxor (x y:int32) : int32
+    ensures { x = 0 -> result = y }
+    ensures { y = 0 -> result = x }
+    ensures { (x >= 0 /\ y >= 0) \/ (x < 0 /\ y < 0) -> result >= 0 }
+    ensures { (x < 0 /\ y >= 0) \/ (x >= 0 /\ y < 0) -> result < 0 }
 
 end
 
@@ -300,6 +299,19 @@ module UInt32
     lemma zero_unsigned_is_zero,
     lemma to_int_in_bounds,
     lemma extensionality
+
+end
+
+module UInt32BV
+
+  use export UInt32
+
+  use bv.BV32 as BV32
+
+  val to_bv (x: uint32) : BV32.t
+    ensures { BV32.t'int result = to_int x }
+  val of_bv (x: BV32.t) : uint32
+    ensures { to_int result = BV32.t'int x }
 
 end
 
@@ -364,17 +376,14 @@ module UInt32GMP
     ensures  { mod x (power 2 result) = 0 }
     ensures  { mod x (power 2 (result + 1)) <> 0 }
 
-  val of_int32(x:int32) : uint32
+  val of_int32 (x:int32) : uint32
     requires { Int32.to_int x >= 0 }
     ensures { to_int result = Int32.to_int x }
 
-(*  use bv.BV32 as BV32
+  val to_int32 (x:uint32) : int32
+    requires { x <= max_int32 }
+    ensures { Int32.to_int result = to_int x }
 
-  val to_bv (x: uint32) : BV32.t
-    ensures { BV32.to_uint result = to_int x }
-  val of_bv (x: BV32.t) : uint32
-    ensures { to_int result = BV32.to_uint x }
-*)
 end
 
 module Int63
@@ -402,13 +411,6 @@ module Int63
   val constant min_int:int63
      ensures { int63'int result = min_int63 }
 
-(*  use bv.BV63 as BV63
-
-  val to_bv (x: int63) : BV63.t
-    ensures { BV63.to_int result = to_int x }
-  val of_bv (x: BV63.t) : int63
-    ensures { to_int result = BV63.to_int x }
-*)
 end
 
 module Refint63
@@ -417,29 +419,30 @@ module Refint63
   use Int63
   use export ref.Ref
 
-  let incr (r: ref int63) : unit
-    requires { [@expl:integer overflow] to_int !r < max_int63 }
-    ensures  { to_int !r = to_int (old !r) + 1 }
-  = r := !r + (1:int63)
-  let decr (r: ref int63) : unit
-    requires { [@expl:integer overflow] min_int63 < to_int !r }
-    ensures  { to_int !r = to_int (old !r) - 1 }
-  = r := !r - (1:int63)
+  let incr (ref r: int63) : unit
+    requires { [@expl:integer overflow] to_int r < max_int63 }
+    ensures  { to_int r = to_int (old r) + 1 }
+  = r <- r + (1:int63)
 
-  let (+=) (r: ref int63) (v: int63) : unit
-    requires { [@expl:integer overflow] in_bounds (to_int !r + to_int v) }
-    ensures { to_int !r = to_int (old !r) + to_int v }
-  = r := !r + v
+  let decr (ref r: int63) : unit
+    requires { [@expl:integer overflow] min_int63 < to_int r }
+    ensures  { to_int r = to_int (old r) - 1 }
+  = r <- r - (1:int63)
 
-  let (-=) (r: ref int63) (v: int63) : unit
-    requires { [@expl:integer overflow] in_bounds (to_int !r - to_int v) }
-    ensures  { to_int !r = to_int (old !r) - to_int v }
-  = r := !r - v
+  let (+=) (ref r: int63) (v: int63) : unit
+    requires { [@expl:integer overflow] in_bounds (to_int r + to_int v) }
+    ensures { to_int r = to_int (old r) + to_int v }
+  = r <- r + v
 
-  let ( *= ) (r: ref int63) (v: int63) : unit
-    requires { [@expl:integer overflow] in_bounds (to_int !r * to_int v) }
-    ensures { to_int !r = to_int (old !r) * to_int v }
-  = r := !r * v
+  let (-=) (ref r: int63) (v: int63) : unit
+    requires { [@expl:integer overflow] in_bounds (to_int r - to_int v) }
+    ensures  { to_int r = to_int (old r) - to_int v }
+  = r <- r - v
+
+  let ( *= ) (ref r: int63) (v: int63) : unit
+    requires { [@expl:integer overflow] in_bounds (to_int r * to_int v) }
+    ensures { to_int r = to_int (old r) * to_int v }
+  = r <- r * v
 
 end
 
@@ -528,13 +531,6 @@ module Int64
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV64 as BV64
-
-  val to_bv (x: int64) : BV64.t
-    ensures { BV64.to_int result = to_int x }
-  val of_bv (x: BV64.t) : int64
-    ensures { to_int result = BV64.to_int x }
-*)
 end
 
 module UInt64Gen
@@ -565,13 +561,6 @@ module UInt64
     lemma to_int_in_bounds,
     lemma extensionality
 
-(*  use bv.BV64 as BV64
-
-  val to_bv (x: uint64) : BV64.t
-    ensures { BV64.to_uint result = to_int x }
-  val of_bv (x: BV64.t) : uint64
-    ensures { to_int result = BV64.to_uint x }
-*)
 end
 
 module UInt64GMP
@@ -581,6 +570,7 @@ module UInt64GMP
   use int.Power
   use Int32
   use Int64
+  use UInt32
   use export UInt64Gen
 
   clone export UnsignedGMP with
@@ -654,6 +644,13 @@ module UInt64GMP
   val of_int32(x:int32) : uint64
     requires { Int32.to_int x >= 0 }
     ensures { to_int result = Int32.to_int x }
+
+  val to_uint32(x:uint64) : uint32
+    requires { x <= max_uint32 }
+    ensures  { UInt32.to_int result = x }
+
+  val of_uint32(x:uint32) : uint64
+    ensures { to_int result = UInt32.to_int x }
 
   val to_int64(x:uint64) : int64
     requires { x <= max_int64 }

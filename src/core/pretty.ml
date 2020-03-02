@@ -34,6 +34,8 @@ let prio_binop = function
   | Timplies -> 1
   | Tiff -> 1
 
+let protect_on x s = if x then "(" ^^ s ^^ ")" else s
+
 type any_pp =
   | Pp_term of (Term.term * int) (* term and priority *)
   | Pp_ty of (Ty.ty * int * bool) (* ty * prio * q *)
@@ -240,8 +242,6 @@ let print_pr_qualified fmt pr =
   try print_qualified true fmt pr.pr_name with Not_found -> print_pr fmt pr
 
 (** Types *)
-
-let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
 let rec print_ty_node ?(ext_printer=true) q pri fmt ty =
   if ext_printer then
@@ -835,6 +835,21 @@ let () = Exn_printer.register
       fprintf fmt "Bad constructor: %a" print_ls ls
   | Decl.BadRecordField ls ->
       fprintf fmt "Not a record field: %a" print_ls ls
+  | Decl.BadRecordCons (ls, ty) ->
+      fprintf fmt "Type %a contains several constructors and cannot be \
+                   (de)constructed using curly braces.\n\
+                   Function %a is presumably a field of type %a."
+        print_ts ty print_ls ls print_ts ty
+  | Decl.BadRecordType (ls, ty) ->
+      fprintf fmt "Type %a is not a record type or contains an invariant, \
+                   it cannot be (de)constructed using curly braces.\n\
+                   Function %a is presumably a field of type %a."
+        print_ts ty print_ls ls print_ts ty
+  | Decl.BadRecordUnnamed (ls, ty) ->
+      fprintf fmt "Type %a contains unnamed fields and cannot be \
+                   (de)constructed using curly braces.\n\
+                   Function %a is presumably a field of type %a."
+        print_ts ty print_ls ls print_ts ty
   | Decl.RecordFieldMissing ls ->
       fprintf fmt "Field %a is missing" print_ls ls
   | Decl.DuplicateRecordField ls ->

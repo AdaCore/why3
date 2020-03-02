@@ -1,0 +1,4 @@
+set terminal png
+set output 'sqrtremplot.png'
+set logscale y
+plot 'bench_gmp_asm/gmpsqrtrem' u 1:2 title "GMP", 'bench_gmp_generic/gmpsqrtrem' u 1:2 title "GMP without assembly", 'bench_why/why3sqrtrem' u 1:2 title "WhyMP", 'bench_minigmp/minigmpsqrtrem' u 1:2 title "MiniGMP", 'bench_whygmp/why3sqrtrem' u 1:2 title "WhyMP with GMP primitives", 'bench_whymini/why3sqrtrem' u 1:2 title "WhyMP with Mini-GMP primitives"

@@ -319,7 +319,6 @@ type prop_decl = prop_kind * prsymbol * term
 
 type decl = {
   d_node : decl_node;
-  d_syms : Sid.t;         (* idents used in declaration *)
   d_news : Sid.t;         (* idents introduced in declaration *)
   d_tag  : Weakhtbl.tag;  (* unique magical tag *)
 }
@@ -405,9 +404,8 @@ let d_hash d = Weakhtbl.tag_hash d.d_tag
 
 (** Declaration constructors *)
 
-let mk_decl node syms news = Hsdecl.hashcons {
+let mk_decl node news = Hsdecl.hashcons {
   d_node = node;
-  d_syms = syms;
   d_news = news;
   d_tag  = Weakhtbl.dummy_tag;
 }
@@ -418,6 +416,9 @@ exception BadLogicDecl of lsymbol * lsymbol
 exception BadConstructor of lsymbol
 
 exception BadRecordField of lsymbol
+exception BadRecordType of lsymbol * tysymbol
+exception BadRecordUnnamed of lsymbol * tysymbol
+exception BadRecordCons of lsymbol * tysymbol
 exception RecordFieldMissing of lsymbol
 exception DuplicateRecordField of lsymbol
 
@@ -435,10 +436,19 @@ let syms_ls s ls = Sid.add ls.ls_name s
 let syms_ty s ty = ty_s_fold syms_ts s ty
 let syms_term s t = t_s_fold syms_ty syms_ls s t
 
+let syms_ty_decl ts =
+  type_def_fold syms_ty Sid.empty ts.ts_def
+
 let create_ty_decl ts =
-  let syms = type_def_fold syms_ty Sid.empty ts.ts_def in
   let news = Sid.singleton ts.ts_name in
-  mk_decl (Dtype ts) syms news
+  mk_decl (Dtype ts) news
+
+let syms_data_decl tdl =
+  let syms_constr syms (fs,_) =
+    List.fold_left syms_ty syms fs.ls_args in
+  let syms_decl syms (_,cl) =
+    List.fold_left syms_constr syms cl in
+  List.fold_left syms_decl Sid.empty tdl
 
 let create_data_decl tdl =
   if tdl = [] then raise EmptyDecl;
@@ -452,7 +462,7 @@ let create_data_decl tdl =
         Sls.add_new (DuplicateRecordField ls) ls s
     | Some ls -> raise (BadRecordField ls)
   in
-  let check_constr tys ty cll pjs (syms,news) (fs,pl) =
+  let check_constr tys ty cll pjs news (fs,pl) =
     ty_equal_check ty (Opt.get_exn (BadConstructor fs) fs.ls_value);
     let fs_pjs =
       try List.fold_left2 (check_proj ty) Sls.empty fs.ls_args pl
@@ -471,10 +481,9 @@ let create_data_decl tdl =
             else List.iter (check (seen || now)) tl
     in
     List.iter (check false) fs.ls_args;
-    let syms = List.fold_left syms_ty syms fs.ls_args in
-    syms, news_id news fs.ls_name
+    news_id news fs.ls_name
   in
-  let check_decl (syms,news) (ts,cl) =
+  let check_decl news (ts,cl) =
     let cll = List.length cl in
     if cl = [] then raise (EmptyAlgDecl ts);
     if ts.ts_def <> NoDef then raise (IllegalTypeAlias ts);
@@ -483,28 +492,36 @@ let create_data_decl tdl =
       List.fold_left (Opt.fold Sls.add_left) s pl) Sls.empty cl in
     let news = Sls.fold (fun pj s -> news_id s pj.ls_name) pjs news in
     let ty = ty_app ts (List.map ty_var ts.ts_args) in
-    List.fold_left (check_constr ts ty cll pjs) (syms,news) cl
+    List.fold_left (check_constr ts ty cll pjs) news cl
   in
-  let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) tdl in
-  mk_decl (Ddata tdl) syms news
+  let news = List.fold_left check_decl Sid.empty tdl in
+  mk_decl (Ddata tdl) news
+
+let syms_param_decl ls =
+  let syms = Opt.fold syms_ty Sid.empty ls.ls_value in
+  List.fold_left syms_ty syms ls.ls_args
 
 let create_param_decl ls =
-  let syms = Opt.fold syms_ty Sid.empty ls.ls_value in
-  let syms = List.fold_left syms_ty syms ls.ls_args in
   let news = Sid.singleton ls.ls_name in
-  mk_decl (Dparam ls) syms news
+  mk_decl (Dparam ls) news
+
+let syms_logic_decl ldl =
+  let syms_decl syms (ls,ld) =
+    let _, e = open_ls_defn ld in
+    let syms = List.fold_left syms_ty syms ls.ls_args in
+    syms_term syms e
+  in
+  List.fold_left syms_decl Sid.empty ldl
 
 let create_logic_decl ldl =
   if ldl = [] then raise EmptyDecl;
-  let check_decl (syms,news) (ls,((s,_,_) as ld)) =
+  let check_decl news (ls,(s,_,_)) =
     if not (ls_equal s ls) then raise (BadLogicDecl (ls, s));
-    let _, e = open_ls_defn ld in
-    let syms = List.fold_left syms_ty syms ls.ls_args in
-    syms_term syms e, news_id news ls.ls_name
+    news_id news ls.ls_name
   in
-  let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) ldl in
+  let news = List.fold_left check_decl Sid.empty ldl in
   let ldl = check_termination ldl in
-  mk_decl (Dlogic ldl) syms news
+  mk_decl (Dlogic ldl) news
 
 exception InvalidIndDecl of lsymbol * prsymbol
 exception NonPositiveIndDecl of lsymbol * prsymbol * lsymbol
@@ -526,11 +543,18 @@ let rec f_pos_ps sps pol f = match f.t_node, pol with
       f_pos_ps sps None f && f_pos_ps sps pol g && f_pos_ps sps pol h
   | _ -> TermTF.t_all (t_pos_ps sps) (f_pos_ps sps pol) f
 
+let syms_ind_decl idl =
+  let syms_ax syms (_,f) =
+    syms_term syms f in
+  let syms_decl syms (_,al) =
+    List.fold_left syms_ax syms al in
+  List.fold_left syms_decl Sid.empty idl
+
 let create_ind_decl s idl =
   if idl = [] then raise EmptyDecl;
   let add acc (ps,_) = Sls.add ps acc in
   let sps = List.fold_left add Sls.empty idl in
-  let check_ax ps (syms,news) (pr,f) =
+  let check_ax ps news (pr,f) =
     let rec clause acc f = match f.t_node with
       | Tquant (Tforall, f) ->
           let _,_,f = t_open_quant f in clause acc f
@@ -551,21 +575,32 @@ let create_ind_decl s idl =
           let ftv = t_ty_freevars Stv.empty f in
           if not (Stv.subset ftv gtv) then
             raise (UnboundTypeVar (Stv.choose (Stv.diff ftv gtv)));
-          syms_term syms f, news_id news pr.pr_name
+          news_id news pr.pr_name
       | _ -> raise (InvalidIndDecl (ps, pr))
   in
-  let check_decl (syms,news) (ps,al) =
+  let check_decl news (ps,al) =
     if al = [] then raise (EmptyIndDecl ps);
     let news = news_id news ps.ls_name in
-    List.fold_left (check_ax ps) (syms,news) al
+    List.fold_left (check_ax ps) news al
   in
-  let (syms,news) = List.fold_left check_decl (Sid.empty,Sid.empty) idl in
-  mk_decl (Dind (s, idl)) syms news
+  let news = List.fold_left check_decl Sid.empty idl in
+  mk_decl (Dind (s, idl)) news
+
+let syms_prop_decl f =
+  syms_term Sid.empty f
 
 let create_prop_decl k p f =
-  let syms = syms_term Sid.empty f in
   let news = news_id Sid.empty p.pr_name in
-  mk_decl (Dprop (k,p,check_fvs f)) syms news
+  mk_decl (Dprop (k,p,check_fvs f)) news
+
+let get_decl_syms d =
+  match d.d_node with
+  | Dtype ts -> syms_ty_decl ts
+  | Ddata dl -> syms_data_decl dl
+  | Dparam ls -> syms_param_decl ls
+  | Dlogic ldl -> syms_logic_decl ldl
+  | Dind (_, idl) -> syms_ind_decl idl
+  | Dprop (_,_,f) -> syms_prop_decl f
 
 (** Utilities *)
 
@@ -653,7 +688,7 @@ let known_add_decl kn0 decl =
     else raise (RedeclaredIdent id)
   in
   let kn = Mid.union check kn0 kn in
-  let unk = Mid.set_diff decl.d_syms kn in
+  let unk = Mid.set_diff (get_decl_syms decl) kn in
   if Sid.is_empty unk then kn
   else raise (UnknownIdent (Sid.choose unk))
 
@@ -797,8 +832,9 @@ let parse_record kn fll =
     | [{ ty_node = Tyapp (ts,_) }] -> ts
     | _ -> raise (BadRecordField fs) in
   let cs, pjl = match find_constructors kn ts with
-    | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordField fs)) pjl
-    | _ -> raise (BadRecordField fs) in
+    | [cs,pjl] -> cs, List.map (Opt.get_exn (BadRecordUnnamed (fs, ts))) pjl
+    | _hd1 :: _hd2 :: _ -> raise (BadRecordCons (fs, ts))
+    | _ -> raise (BadRecordType (fs, ts)) in
   let pjs = Sls.of_list pjl in
   let flm = List.fold_left (fun m (pj,v) ->
     if not (Sls.mem pj pjs) then raise (BadRecordField pj) else

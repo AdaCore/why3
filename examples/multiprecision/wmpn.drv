@@ -90,35 +90,28 @@ static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
 
 end
 
-module add_alias.AddAlias
+module ptralias.Alias
 
-  prelude "\n\
+  interface "\n\
 struct __open_sep_result\n\
 { uint64_t *__field_0;\n\
   uint64_t *__field_1;\n\
   uint64_t *__field_2;\n\
-}\n\
+};\n\
 \n\
 struct __open_rx_result\n\
 { uint64_t *__field_0;\n\
   uint64_t *__field_1;\n\
   uint64_t *__field_2;\n\
-}\n\
+};\n\
 \n\
-struct __open_ry_result\n\
+struct __open_shift_sep_result\n\
 { uint64_t *__field_0;\n\
   uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-}\n\
+};\n\
 \n\
-struct __open_rxy_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-}\n\
-\n\
-struct __open_sep_result open_sep (uint64_t * r, uint64_t * x, int32_t sx,\n\
-                                   uint64_t * y, int32_t sy)\n\
+static inline struct __open_sep_result\n\
+open_sep (uint64_t * r, uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)\n\
 {\n\
   struct __open_sep_result result;\n\
   result.__field_0 = r;\n\
@@ -127,84 +120,107 @@ struct __open_sep_result open_sep (uint64_t * r, uint64_t * x, int32_t sx,\n\
   return result;\n\
 }\n\
 \n\
-\n\
-struct __open_rx_result open_rx (uint64_t * x, int32_t sx,\n\
-                                 uint64_t * y, int32_t sy)\n\
+static inline struct __open_rx_result\n\
+open_rx (uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)\n\
 {\n\
-  struct __open_sep_result result;\n\
+  struct __open_rx_result result;\n\
   result.__field_0 = x;\n\
   result.__field_1 = x;\n\
   result.__field_2 = y;\n\
   return result;\n\
 }\n\
 \n\
-struct __open_ry_result open_ry (uint64_t * x, int32_t sx,\n\
-                                 uint64_t * y, int32_t sy)\n\
+static inline struct __open_shift_sep_result\n\
+open_shift_sep (uint64_t * r, uint64_t * x, int32_t sz)\n\
 {\n\
-  struct __open_sep_result result;\n\
-  result.__field_0 = y;\n\
+  struct __open_shift_sep_result result;\n\
+  result.__field_0 = r;\n\
   result.__field_1 = x;\n\
-  result.__field_2 = y;\n\
   return result;\n\
 }\n\
-\n\
-struct __open_rxy_result open_rxy (uint64_t * x, int32_t sx)\n\
-{\n\
-  struct __open_sep_result result;\n\
-  result.__field_0 = x;\n\
-  result.__field_1 = x;\n\
-  result.__field_2 = x;\n\
-  return result;\n\
-}\n\
-"
-
-  interface "\n\
-struct __open_sep_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-}\n\
-\n\
-struct __open_rx_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-}\n\
-\n\
-struct __open_ry_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-}\n\
-\n\
-struct __open_rxy_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-}\n\
-\n\
-struct __open_sep_result open_sep (uint64_t * r, uint64_t * x, int32_t sx,\n\
-                                   uint64_t * y, int32_t sy);\n\
-\n\
-struct __open_rx_result open_rx (uint64_t * x, int32_t sx,\n\
-                                 uint64_t * y, int32_t sy);\n\
-\n\
-struct __open_ry_result open_ry (uint64_t * x, int32_t sx,\n\
-                                 uint64_t * y, int32_t sy);\n\
-\n\
-struct __open_rxy_result open_rxy (uint64_t * x, int32_t sx);\n\
 "
 
   syntax val open_sep "open_sep"
   syntax val open_rx "open_rx"
-  syntax val open_ry "open_ry"
-  syntax val open_rxy "open_rxy"
-  syntax val close_sep "IGNORE3(%1,%2,%4)"
-  syntax val close_rx "IGNORE3(%1,%2,%4)"
-  syntax val close_ry "IGNORE3(%1,%2,%4)"
-  syntax val close_rxy "IGNORE3(%1,%2,%4)"
+  syntax val open_shift_sep "open_shift_sep"
+  syntax val close_sep "IGNORE3(%1,%2,%4)" prec 1 15 15 15
+  syntax val close_rx "IGNORE3(%1,%2,%4)" prec 1 15 15 15
+  syntax val close_shift_sep "IGNORE2(%1,%2)" prec 1 15 15
 
+end
 
+module mpz.Z
 
+prelude "\n\
+typedef struct\n\
+{\n\
+  int _alloc;\n\
+  int _size;\n\
+  uint64_t * _ptr;\n\
+} __wmpz_struct;\n\
+\n\
+typedef __wmpz_struct *wmpz_ptr;\n\
+\n\
+#define SIZ(x) ((x)->_size)\n\
+#define ALLOC(x) ((x)->_alloc)\n\
+#define PTR(x) ((x)->_ptr)\n\
+\n\
+"
+
+interface "\n\
+typedef struct\n\
+{\n\
+  int _alloc;\n\
+  int _size;\n\
+  uint64_t * _ptr;\n\
+} __wmpz_struct;\n\
+\n\
+typedef __wmpz_struct *wmpz_ptr;\n\
+\n\
+#define SIZ(x) ((x)->_size)\n\
+#define ALLOC(x) ((x)->_alloc)\n\
+#define PTR(x) ((x)->_ptr)\n\
+\n\
+"
+
+  syntax type mpz_ptr "wmpz_ptr"
+  syntax val mpz_eq "%1 == %2" prec 7 15 14
+  syntax val size_of "SIZ(%1)" prec 1 15
+  syntax val alloc_of "ALLOC(%1)" prec 1 15
+end
+
+module mpz.Zutil
+
+prelude "\n\
+wmpz_ptr __wmpz_init () {\n\
+  wmpz_ptr x = malloc(sizeof(__wmpz_struct));\n\
+  ALLOC(x) = 1;\n\
+  SIZ(x) = 0;\n\
+  PTR(x) = malloc(sizeof(uint64_t));\n\
+  PTR(x)[0] = 0;\n\
+  return x;\n\
+}\n\
+\n\
+void wmpz_clear (wmpz_ptr x)\n\
+{\n\
+  free (PTR(x));\n\
+}\n\
+"
+interface "\n\
+wmpz_ptr __wmpz_init ();\n\
+void wmpz_clear (wmpz_ptr x);\n\
+"
+
+  syntax val set_size "SIZ(%1) = %2" prec 14 15 14
+  syntax val set_size_0 "SIZ(%1) = 0" prec 14 15
+  syntax val wmpz_minus "SIZ(%1) = -SIZ(%1)" prec 14 15 15
+  syntax val set_alloc "ALLOC(%1) = %2" prec 14 15 14
+  syntax val set_ptr "PTR(%1) = %2" prec 14 15 14
+  syntax val get_read_ptr "PTR(%1)" prec 1 15
+  syntax val get_write_ptr "PTR(%1)" prec 1 15
+  syntax val release_reader "(void)(%1)" prec 2 15
+  syntax val release_writer "(void)(%1)" prec 2 15
+  syntax val wmpz_init "__wmpz_init()" prec 2
+  syntax val wmpz_clear "wmpz_clear" prec 2
 
 end

@@ -152,46 +152,49 @@ let print_preludes =
     Printer.print_prelude fmt l
 
 let print_mdecls ?fname m mdecls deps =
-  let pargs, printer = Pdriver.lookup_printer opt_driver in
-  let fg = printer.Pdriver.file_gen in
-  let pr = printer.Pdriver.decl_printer in
+  let open Pdriver in
+  let pargs, printer = lookup_printer opt_driver in
+  let implem = printer.implem_printer in
   let test_decl_not_driver decl =
     let decl_name = Mltree.get_decl_name decl in
     let test_id_not_driver id =
       Printer.query_syntax pargs.Pdriver.syntax id = None in
     List.exists test_id_not_driver decl_name in
   let prelude_exists =
-    Ident.Mid.mem m.mod_theory.th_name pargs.Pdriver.thprelude in
+    Ident.Mid.mem m.mod_theory.th_name pargs.thprelude in
   if List.exists test_decl_not_driver mdecls || prelude_exists
   then begin
     let flat = opt_modu_flat = Flat in
     let tname = m.mod_theory.th_name in
     (* print interface file *)
     if !opt_interface then begin
-      match printer.Pdriver.interf_gen, printer.Pdriver.interf_printer with
-      | None, _ | _, None ->
+      match printer.interf_printer with
+      | None ->
           eprintf "Driver does not support interface extraction.@.";
           exit 1
-      | Some ig, Some ipr ->
-          let iout, old = get_cout_old ig m ?fname in
+      | Some interf ->
+          let iout, old = get_cout_old interf.filename_generator m ?fname in
           let ifmt = formatter_of_out_channel iout in
-          Printer.print_prelude ifmt pargs.Pdriver.prelude;
-          let inter_p = Ident.Mid.find_def [] tname pargs.Pdriver.thinterface in
+          interf.header_printer pargs ?old ?fname ~flat ifmt m;
+          Printer.print_prelude ifmt pargs.prelude;
+          let inter_p = Ident.Mid.find_def [] tname pargs.thinterface in
           Printer.print_interface ifmt inter_p;
           let pr_idecl fmt d =
-            fprintf fmt "%a" (ipr pargs ?old ?fname ~flat m) d in
+            interf.decl_printer pargs ?old ?fname ~flat m fmt d in
           Pp.print_list Pp.nothing pr_idecl ifmt mdecls;
+          interf.footer_printer pargs ?old ?fname ~flat ifmt m;
           if iout <> stdout then close_out iout end;
-    let cout, old = get_cout_old fg m ?fname in
+    let cout, old = get_cout_old implem.filename_generator m ?fname in
     let fmt = formatter_of_out_channel cout in
     (* print driver prelude *)
-    Printer.print_prelude fmt pargs.Pdriver.prelude;
+    Printer.print_prelude fmt pargs.prelude;
     (* print module prelude *)
-    printer.Pdriver.prelude_printer pargs ?old ?fname ~flat deps fmt m;
-    let pm = pargs.Pdriver.thprelude in
+    implem.prelude_printer pargs ?old ?fname ~flat deps fmt m;
+    let pm = pargs.thprelude in
     print_preludes tname fmt pm;
     (* print decls *)
-    let pr_decl fmt d = fprintf fmt "%a" (pr pargs ?old ?fname ~flat m) d in
+    let pr_decl fmt d =
+      implem.decl_printer pargs ?old ?fname ~flat m fmt d in
     Pp.print_list Pp.nothing pr_decl fmt mdecls;
     if cout <> stdout then close_out cout;
     true end
@@ -385,14 +388,15 @@ let () =
     match opt_modu_flat with
     | Modular -> Queue.iter do_modular opt_queue
     | Flat ->
+        let open Pdriver in
         let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
-        let (pargs, printer) = Pdriver.lookup_printer opt_driver in
-        let pr = printer.Pdriver.decl_printer in
+        let (pargs, printer) = lookup_printer opt_driver in
+        let implem = printer.implem_printer in
         let cout = match opt_output with
           | None -> stdout
           | Some file -> open_out file in
         let fmt = formatter_of_out_channel cout in
-        let thprelude = pargs.Pdriver.thprelude in
+        let thprelude = pargs.thprelude in
         let print_prelude = List.iter (fun s -> fprintf fmt "%s@\n@." s) in
         let rec do_preludes id =
           (try
@@ -401,7 +405,7 @@ let () =
            with Not_found -> ());
           print_preludes id fmt thprelude
         in
-        print_prelude pargs.Pdriver.prelude;
+        print_prelude pargs.prelude;
         let visit_m _ m =
           do_preludes m.mod_theory.th_name;
           let tm = translate_module m in
@@ -413,7 +417,7 @@ let () =
           let pm = find_module_id mm id in
           let m = translate_module pm in
           let d = Ident.Mid.find id m.Mltree.mod_known in
-          pr pargs ~flat:true pm fmt d in
+          implem.decl_printer pargs ~flat:true pm fmt d in
         let idl = List.rev !toextract in
         let is_local { info_id = id; info_rec = r } =
           let (path, m, _) = Pmodule.restore_path id in

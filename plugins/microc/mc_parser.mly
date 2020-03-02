@@ -42,10 +42,6 @@
       | s -> raise (Unsupported ("no such operator " ^ s)) in
     { id_str = s; id_ats = []; id_loc = loc }
 
-  let new_axiom =
-    let r = ref 0 in
-    fun s e -> incr r; mk_id ("Axiom_" ^ string_of_int !r) s e
-
   let variant_union v1 v2 = match v1, v2 with
     | _, [] -> v1
     | [], _ -> v2
@@ -75,6 +71,11 @@
     sp_partial = s1.sp_partial || s2.sp_partial;
   }
 
+  let type_int s e = PTtyapp (Qident (mk_id "int" s e), [])
+  let type_array s e =
+    let array = Qdot (Qident (mk_id "Array" s e), mk_id "array" s e) in
+    PTtyapp (array, [type_int s e])
+                   
 %}
 
 %token <string> INCLUDE
@@ -91,6 +92,7 @@
 %token PLUSPLUS MINUSMINUS PLUSEQUAL MINUSEQUAL TIMESEQUAL DIVEQUAL
 %token AMPERSAND SCANF
 (* annotations *)
+%token LEMMA AXIOM GOAL COLON
 %token INVARIANT VARIANT ASSUME ASSERT CHECK REQUIRES ENSURES LABEL
 %token FUNCTION PREDICATE TRUE FALSE
 %token ARROW LARROW LRARROW FORALL EXISTS DOT THEN LET IN OLD AT
@@ -110,6 +112,10 @@
 %nonassoc unary_minus prec_prefix_op
 
 %start file
+(* Transformations entries *)
+%start <Why3.Ptree.term> term_eof
+%start <Why3.Ptree.term list> term_comma_list_eof
+%start <Why3.Ptree.ident list> ident_comma_list_eof
 
 %type <Mc_ast.file> file
 %type <Mc_ast.stmt> stmt
@@ -125,7 +131,7 @@ decl:
 | include_ { $1 }
 | def      { $1 }
 | func     { $1 }
-| axiom    { $1 }
+| prop     { $1 }
 
 include_:
 | f=INCLUDE
@@ -145,9 +151,13 @@ func:
   EQUAL t=term SEMICOLON
  { Dlogic (None, id, l, Some t) }
 
-axiom:
-| ASSUME t=term SEMICOLON
-  { Daxiom (new_axiom $startpos $endpos, t) }
+prop:
+| LEMMA id=ident COLON t=term SEMICOLON
+  { Dprop (Decl.Plemma, id, t) }
+| AXIOM id=ident COLON t=term SEMICOLON
+  { Dprop (Decl.Paxiom, id, t) }
+| GOAL id=ident COLON t=term SEMICOLON
+  { Dprop (Decl.Pgoal, id, t) }
 
 def:
 | ty=return_type f=ident LEFTPAR x=separated_list(COMMA, param) RIGHTPAR
@@ -409,8 +419,8 @@ term_:
     { Tif ($2, $4, $6) }
 | LET id=ident EQUAL t1=term IN t2=term
     { Tlet (id, t1, t2) }
-| q=quant l=comma_list1(ident) DOT t=term
-    { let var id = id.id_loc, Some id, false, None in
+| q=quant l=comma_list1(binder) DOT t=term
+    { let var (id, ty) = id.id_loc, Some id, false, Some ty in
       Tquant (q, List.map var l, [], t) }
 | id=ident LEFTPAR l=separated_list(COMMA, term) RIGHTPAR
     { Tidapp (Qident id, l) }
@@ -419,6 +429,10 @@ quant:
 | FORALL  { Dterm.DTforall }
 | EXISTS  { Dterm.DTexists }
 
+binder:
+| id=ident                { id, type_int   $startpos $endpos }
+| id=ident LEFTSQ RIGHTSQ { id, type_array $startpos $endpos }
+    
 term_arg: mk_term(term_arg_) { $1 }
 
 term_arg_:
@@ -464,3 +478,13 @@ term_sub_:
 
 comma_list1(X):
 | separated_nonempty_list(COMMA, X) { $1 }
+
+(* parsing of a single term *)
+term_eof:
+| term EOF { $1 }
+
+ident_comma_list_eof:
+| comma_list1(ident) EOF { $1 }
+
+term_comma_list_eof:
+| comma_list1(term) EOF { $1 }

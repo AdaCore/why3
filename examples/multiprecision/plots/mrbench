@@ -1,0 +1,4 @@
+set terminal png
+set output 'millerrabinplot.png'
+set logscale y
+plot 'bench_gmp_asm/gmpmillerrabin' u 1:2 title "GMP", 'bench_gmp_generic/gmpmillerrabin' u 1:2 title "GMP without assembly", 'bench_why/why3millerrabin' u 1:2 title "WhyMP", 'bench_minigmp/minigmpmillerrabin' u 1:2 title "MiniGMP", 'bench_whygmp/why3millerrabin' u 1:2 title "WhyMP with GMP primitives", 'bench_whymini/why3millerrabin' u 1:2 title "WhyMP with Mini-GMP primitives"

@@ -34,10 +34,10 @@ decide_fail () {
     case "$1" in
         # Inconsistent integer values between two runs
         "bench/ce/algebraic_types_mono_Z3,4.8.4_SP")
-           is_xfail=integer_values;;
+           is_xfail=full;;
         # Inconsistent results between two runs
         "bench/ce/algebraic_types_mono_Z3,4.8.4_WP")
-           is_xfail=integer_values;;
+           is_xfail=full;;
         # Inconsistent result values between two runs
         "bench/ce/algebraic_types_mono_CVC4,1.7_SP")
            is_xfail=full;;
@@ -146,12 +146,12 @@ run () {
             echo "FAILED!"
             # echo "Oracle is ${str_oracle}"
             # echo "Output is ${str_out}"
-            echo "diff is the following:"
-            echo "$f"
-            diff "${oracle_file}" "$f.out"
             if $is_xfail; then
                 echo "Failed but bench is ok because asserted as an XFAIL."
             else
+                echo "diff is the following:"
+                echo "$f"
+                diff "${oracle_file}" "$f.out"
                 success=false
             fi
         fi

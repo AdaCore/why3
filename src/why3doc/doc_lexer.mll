@@ -26,19 +26,23 @@
     List.iter (fun s -> Hashtbl.add ht s ()) l;
     Hashtbl.mem ht
 
-  (* keep synchronized with src/trywhy3/mode-why3.js *)
-  let is_keyword1 = make_table [ "as"; "axiom"; "by";
-    "clone"; "coinductive"; "constant";
-    "else"; "end"; "epsilon"; "exists"; "export";
-    "false"; "float"; "forall"; "function";
-    "goal"; "if"; "import"; "in"; "inductive";
-    "lemma"; "let"; "match"; "meta"; "not"; "predicate";
-    "range"; "scope"; "so"; "then"; "theory"; "true"; "type"; "use"; "with";
-    (* programs *) "abstract"; "any"; "at";
-    "begin"; "break"; "continue"; "do"; "done"; "downto"; "exception";
-    "for"; "fun"; "ghost"; "label"; "module"; "mutable";
-    "old"; "private"; "pure"; "raise"; "rec"; "ref"; "return";
-    "to"; "try"; "val"; "while"; ]
+  (* keep synchronized with src/parser/lexer.mll *)
+  let is_keyword1 = make_table [
+    "abstract"; "any"; "as"; "at"; "axiom";
+    "begin"; "break"; "by";
+    "clone"; "coinductive"; "constant"; "continue";
+    "do"; "done"; "downto";
+    "else"; "end"; "epsilon"; "exception"; "exists"; "export";
+    "false"; "float"; "for"; "forall"; "fun"; "function";
+    "ghost"; "goal"; "if"; "import"; "in"; "inductive";
+    "label"; "lemma"; "let";
+    "match"; "meta"; "module"; "mutable"; "not";
+    "old"; "partial"; "predicate"; "private"; "pure";
+    "raise"; "range"; "rec"; "ref"; "return";
+    "scope"; "so";
+    "then"; "theory"; "to"; "true"; "try"; "type";
+    "use"; "val"; "while"; "with";
+  ]
 
   let is_keyword2 = make_table [ "absurd"; "alias"; "assert"; "assume";
     "check"; "diverges"; "ensures"; "invariant";

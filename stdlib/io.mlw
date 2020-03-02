@@ -1,15 +1,29 @@
 module StdIO
 
   use string.String
+  use string.Char
+  use string.OCaml
   use int.Int
 
+  (** small trick so printing vals are extracted to OCaml *)
+  type t = private {ghost mutable foo:int}
+  val ghost bar:t
+
+  (** prints a string to the standard output *)
   val print_string (s: string) : unit
+    writes { bar }
+
+  (** prints a char to the standard output *)
+  val print_char (c: char) : unit
+    writes { bar }
 
   (** prints a newline character on standard output, and flushes standard output. *)
   val print_newline (_u:unit) : unit
+    writes { bar }
 
+  (** prints an why3 int to the standard output *)
   val print_int (i: int) : unit
-
+    writes { bar }
 
   (* (\** ghost references to represent the standard output *\) *)
   (* use int.Int *)
