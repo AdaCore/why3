@@ -42,7 +42,6 @@ let pp_print_opt_list ?(prefix:(unit, formatter, unit) format="") ?(sep:(unit, f
 
 let sanitize =
   let aux = function
-    | '\'' -> "__"
     | c -> String.make 1 c in
   sanitizer aux aux
 
