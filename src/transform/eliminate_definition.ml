@@ -281,16 +281,16 @@ let rec bisect_aux task a i1 i2 rem cont       (* lt i lk *) =
       (fun () -> cont rem)
   else
     let m = (i1+i2)/2 in
-    let rem1 = fold_sub add_rem rem a m i2 in
+    let rem1 = fold_sub add_rem rem a i1 m in
     call rem1
-      (fun () -> bisect_aux task a i1 m rem1 cont)
+      (fun () -> bisect_aux task a m i2 rem1 cont)
       (fun () ->
-        bisect_aux task a m i2 rem
+        bisect_aux task a i1 m rem
           (fun rem1 -> (* rem c rem1 c \old(rem1) *)
-            let rem2 = fold_sub add_rem rem1 a i1 m in
+            let rem2 = fold_sub add_rem rem1 a m i2 in
             call rem2
               (fun () -> cont rem2)
-              (fun () -> bisect_aux task a i1 m rem1 cont)))
+              (fun () -> bisect_aux task a m i2 rem1 cont)))
 
 let bisect_step task0 =
   let task = match task0 with
