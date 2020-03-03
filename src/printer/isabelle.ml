@@ -201,14 +201,14 @@ let binop_name = function
   | Timplies -> "HOL.implies"
   | Tiff -> "HOL.eq"
 
-let number_format = {
-    Number.long_int_support = `Default;
-    Number.negative_int_support = `Custom (fun _ _ -> assert false);
-    Number.dec_int_support = `Default;
+let number_format prty = {
+    Number.long_int_support = `Custom (fun fmt n -> fprintf fmt "<num val=\"%s\">%t</num>" n prty);
+    Number.negative_int_support = `Custom (fun fmt f -> fprintf fmt "<app><const name=\"Groups.uminus_class.uminus\"/>%t</app>" f);
+    Number.dec_int_support = `Unsupported (fun fmt n -> fprintf fmt "<num val=\"%s\">%t</num>" n prty);
     Number.hex_int_support = `Unsupported;
     Number.oct_int_support = `Unsupported;
     Number.bin_int_support = `Unsupported;
-    Number.negative_real_support = `Custom (fun _ _ -> assert false);
+    Number.negative_real_support = `Custom (fun fmt f -> fprintf fmt "<app><const name=\"Groups.uminus_class.uminus\"/>%t</app>" f);
     Number.dec_real_support = `Unsupported;
     Number.hex_real_support = `Unsupported;
     Number.frac_real_support =
@@ -232,21 +232,8 @@ let rec print_term info defs fmt t = match t.t_node with
   | Tvar v ->
       print_var info fmt v
   | Tconst c ->
-      begin match c with
-        | Constant.ConstInt _ ->
-           let pp = Constant.(print number_format unsupported_escape) in
-           fprintf fmt "<num val=\"%a\">%a</num>"
-             pp c (print_ty info) (t_type t)
-        | Constant.ConstStr _ ->
-           Constant.(print number_format unsupported_escape) fmt c
-        | Constant.ConstReal _ ->
-           match t.t_ty with
-           | None -> assert false (* impossible *)
-           | Some ty ->
-              if ty_equal ty ty_real then
-                Constant.(print number_format unsupported_escape) fmt c
-              else raise (UnsupportedTerm (t, "floating-point literal"))
-      end
+      Constant.(print (number_format (fun fmt -> print_ty info fmt (t_type t)))
+        unsupported_escape) fmt c
   | Tif (f, t1, t2) ->
       print_app print_const (print_term info defs) fmt ("HOL.If", [f; t1; t2])
   | Tlet (t1, tb) ->
