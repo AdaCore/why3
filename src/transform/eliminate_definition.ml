@@ -234,16 +234,14 @@ let rec elim_task task rem =
  *)
 
 let add_rem rem decl =
-  let remove_ts rem ts =
+  let _remove_ts rem ts =
     { rem with rem_ts = Sts.add ts rem.rem_ts} in
   let remove_ls rem ls =
     { rem with rem_ls = Sls.add ls rem.rem_ls} in
   let remove_pr rem pr =
     { rem with rem_pr = Spr.add pr rem.rem_pr} in
   match decl.d_node with
-  | Dtype ts -> remove_ts rem ts
-  | Ddata l -> List.fold_left (fun rem (ts,_) -> remove_ts rem ts) rem l
-  | Dparam ls -> remove_ls rem ls
+  | Dtype _ | Dparam _ | Ddata _ -> rem
   | Dlogic l -> List.fold_left (fun rem (ls,_) -> remove_ls rem ls) rem l
   | Dind (_,l) -> List.fold_left (fun rem (ls,_) -> remove_ls rem ls) rem l
   | Dprop (_,pr,_) -> remove_pr rem pr
@@ -288,21 +286,22 @@ let rec bisect_aux task a i1 i2 rem cont       (* lt i lk *) =
               (fun () -> bisect_aux task a i1 m rem1 cont)))
 
 let bisect_step task0 =
-  let task= match task0 with
+  let task = match task0 with
     | Some {task_decl = {td_node = Decl {d_node = Dprop (Pgoal,_,_)}};
             task_prev = task} -> task
     | _ -> raise GoalNotFound in
   let rec length acc = function
-    | Some {task_decl = {td_node = Decl _};
+    | Some {task_decl = {td_node = Decl {d_node = Dlogic _ | Dind _ | Dprop _}};
             task_prev = t} -> length (acc + 1) t
     | Some {task_prev = t} -> length acc t
     | None -> acc in
   let n = length 0 task in
   let a = Array.make n (Obj.magic 0) in
   let rec init acc = function
-    | Some {task_decl = {td_node = Decl d}; task_prev = t} ->
+    | Some {task_decl = {td_node = Decl ({d_node = Dlogic _ | Dind _ | Dprop _} as d)};
+            task_prev = t} ->
       a.(acc) <- d; init (acc - 1) t
-    | Some { task_prev = t} -> init acc t
+    | Some {task_prev = t} -> init acc t
     | None -> assert (acc = -1) in
   init (n-1) task;
   let empty_rem = {rem_ts = Sts.empty; rem_ls = Sls.empty;
