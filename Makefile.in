@@ -2013,7 +2013,9 @@ test-ce.opt: examples/use_api/counterexample.ml lib/why3/why3.cmxa
 
 infer.opt: examples/use_api/infer.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)$(OCAMLOPT) -o examples/use_api/$@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa  $<
+	$(HIDE)$(OCAMLOPT) -o examples/use_api/$@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa  $<
+
+# EXTLIBS EXTPKGS
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
