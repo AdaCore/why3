@@ -66,7 +66,7 @@ module C = struct
   (* template, type and type arguments of result, typed arguments, precedence level *)
 
   and constant =
-    | Cint of string
+    | Cint of string * Number.int_constant
     | Cfloat of string
     | Cchar of string
     | Cstring of string
@@ -104,12 +104,15 @@ module C = struct
     | Sseq (s1,s2) -> is_nop s1 && is_nop s2
     | _ -> false
 
+  let is_one ic = BigInt.eq ic.Number.il_int BigInt.one
+  let is_zero ic = BigInt.eq ic.Number.il_int BigInt.zero
+
   let is_true = function
-    | Sexpr(Econst(Cint "1")) -> true
+    | Sexpr(Econst(Cint (_,ic))) -> is_one ic
     | _ -> false
 
   let is_false = function
-    | Sexpr(Econst(Cint "0")) -> true
+    | Sexpr(Econst(Cint (_,ic))) -> is_zero ic
     | _ -> false
 
   let rec one_stmt = function
@@ -682,10 +685,9 @@ module Print = struct
         gen_syntax_arguments_prec fmt s pr pl
 
   and print_const  fmt = function
-    | Cint s | Cfloat s -> fprintf fmt "%s" s
+    | Cint (s,_) | Cfloat s -> fprintf fmt "%s" s
     | Cchar s -> fprintf fmt "'%s'" Constant.(escape char_escape s)
     | Cstring s -> fprintf fmt "\"%s\"" Constant.(escape default_escape s)
-
   let print_id_init ?(size=None) ~stars fmt ie =
     (if stars > 0
     then fprintf fmt "%s " (String.make stars '*')
@@ -1002,6 +1004,9 @@ module MLToC = struct
     | Eunlikely e -> Elikely e
     | e -> e
 
+  let lit_one = Number.(int_literal ILitDec ~neg:false "1")
+  let lit_zero = Number.(int_literal ILitDec ~neg:false "0")
+
   (* /!\ Do not use if e may have type unit and not be Enothing *)
   let expr_or_return env e =
     if env.computes_return_value
@@ -1117,10 +1122,10 @@ module MLToC = struct
        aux l
     | Eapp (rs, []) when rs_equal rs rs_true ->
        Debug.dprintf debug_c_extraction "true@.";
-       ([],expr_or_return env (C.Econst (Cint "1")))
+       ([],expr_or_return env (C.Econst (Cint ("1",lit_one))))
     | Eapp (rs, []) when rs_equal rs rs_false ->
        Debug.dprintf debug_c_extraction "false@.";
-       ([],expr_or_return env (C.Econst (Cint "0")))
+       ([],expr_or_return env (C.Econst (Cint ("0", lit_zero))))
     | Mltree.Evar pv ->
        let id = pv_name pv in
        let e = C.Evar id in
@@ -1157,7 +1162,7 @@ module MLToC = struct
             let s = ts.ts_name.id_string in
             raise (Unsupported ("unspecified number format for type "^s)) end
        in
-       let e = C.(Econst (Cint s)) in
+       let e = C.(Econst (Cint (s, ic))) in
        ([], expr_or_return env e)
     | Eapp (rs, []) when Hid.mem globals rs.rs_name ->
        Debug.dprintf debug_c_extraction "global variable %s@."
@@ -1342,7 +1347,7 @@ module MLToC = struct
         | C.Snop, e -> cd, C.(Swhile(handle_likely c.e_attrs e, C.Sblock b))
         | s,e ->
            let brc = reverse_likely (handle_likely c.e_attrs (Eunop(Unot,e))) in
-           cd, C.(Swhile(Econst (Cint "1"),
+           cd, C.(Swhile(Econst (Cint ("1", lit_one)),
                          Sseq(s,
                               Sseq(Sif(brc, Sbreak, Snop),
                                    C.Sblock b))))
@@ -1526,7 +1531,7 @@ module MLToC = struct
        let dv, sv = expr info env_f v in
        let eai = C.Eindex(Evar avar, i) in
        let assign_e = assignify eai sv in
-       let init_loop = C.(Sfor(Ebinop(Bassign, i, Econst (Cint "0")),
+       let init_loop = C.(Sfor(Ebinop(Bassign, i, Econst (Cint ("0", lit_zero))),
                                Ebinop(Blt, i, n),
                                Eunop(Upreincr, i),
                                assign_e)) in
@@ -1626,7 +1631,8 @@ module MLToC = struct
           let s = C.elim_empty_blocks s in
           match s with
           | Sreturn r when params = [] ->
-             Format.printf "declaring global %s@." rs.rs_name.id_string;
+             Debug.dprintf debug_c_extraction
+               "declaring global %s@." rs.rs_name.id_string;
              Hid.add globals rs.rs_name ();
              sdecls@[C.Ddecl (rtype, [rs.rs_name, r])]
           | _ -> sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
@@ -1713,15 +1719,24 @@ module Transform = struct
 
 open C
 
+(* Common simplifications *)
 let rec expr e =
   let e = e_map expr e in
   match e with
-  | Equestion (c, Econst (Cint "1"), Econst (Cint "0")) -> c
+  | Equestion (c, Econst (Cint (_, ic1)), Econst (Cint (_, ic0)))
+       when is_one ic1 && is_zero ic0 -> c                       (* c ? 1 : 0 *)
+  | Equestion (c, Econst (Cint (_, ic0)), Econst (Cint (_, ic1)))
+       when is_one ic1 && is_zero ic0 -> Eunop (Unot, c)         (* c ? 0 : 1 *)
+  | Eunop (Unot, Ebinop(Beq, e1, e2)) -> Ebinop (Bne, e1, e2) (* ! (e1 == e2) *)
   | _ -> e
 
 and stmt s =
   let s = s_map def stmt expr s in
-  s
+  match s with
+  | Sif (Eunop (Unot, Ebinop (Beq, c, Econst (Cint(_, ic0)))), t, e)
+  | Sif (Ebinop (Bne, c, Econst (Cint (_, ic0))), t, e)
+       when is_zero ic0 -> Sif (c, t, e)                         (* if c != 0 *)
+  | _ -> s
 
 and def (d:definition) = match d with
   | C.Dfun (id,p,(dl, s)) ->  Dfun (id, p, (List.map def dl, stmt s))
