@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Why3'
-copyright = '2019, The Why3 Development Team'
+copyright = '2020, The Why3 Development Team'
 author = 'The Why3 Development Team'
 
 # The version info for the project you're documenting, acts as replacement for
