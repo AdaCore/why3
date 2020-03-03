@@ -1212,9 +1212,15 @@ let create_rem_list =
     if Buffer.length b > 0 then Buffer.add_char b ',';
     Buffer.add_string b (Pp.string_of pr id)
   in
-  let remove_ts ts = add Pretty.print_ts ts in
-  let remove_ls ls = add Pretty.print_ls ls in
-  let remove_pr pr = add Pretty.print_pr pr in
+  let module P = (val Pretty.create
+      rem.Eliminate_definition.rem_nt.Trans.printer
+      rem.Eliminate_definition.rem_nt.Trans.aprinter
+      rem.Eliminate_definition.rem_nt.Trans.printer
+      rem.Eliminate_definition.rem_nt.Trans.printer
+      false) in
+  let remove_ts ts = add P.print_ts ts in
+  let remove_ls ls = add P.print_ls ls in
+  let remove_pr pr = add P.print_pr pr in
   Ty.Sts.iter remove_ts rem.Eliminate_definition.rem_ts;
   Term.Sls.iter remove_ls rem.Eliminate_definition.rem_ls;
   Decl.Spr.iter remove_pr rem.Eliminate_definition.rem_pr;

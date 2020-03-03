@@ -208,7 +208,12 @@ let () =
 open Task
 open Theory
 
-type rem = { rem_pr : Spr.t; rem_ls : Sls.t; rem_ts : Sts.t }
+type rem = {
+  rem_pr : Decl.Spr.t;
+  rem_ls : Term.Sls.t;
+  rem_ts : Ty.Sts.t;
+  rem_nt : Trans.naming_table;
+}
 
 type bisect_step =
  | BSdone of rem
@@ -246,11 +251,13 @@ let add_rem rem decl =
   | Dind (_,l) -> List.fold_left (fun rem (ls,_) -> remove_ls rem ls) rem l
   | Dprop (_,pr,_) -> remove_pr rem pr
 
+(*
 let _union_rem rem1 rem2 =
   { rem_ts = Sts.union rem1.rem_ts rem2.rem_ts;
     rem_ls = Sls.union rem1.rem_ls rem2.rem_ls;
     rem_pr = Spr.union rem1.rem_pr rem2.rem_pr;
   }
+*)
 
 let fold_sub f acc a i1 i2 =
   let acc = ref acc in
@@ -304,10 +311,10 @@ let bisect_step task0 =
     | Some {task_prev = t} -> init acc t
     | None -> assert (acc = -1) in
   init (n-1) task;
+  let namt = Args_wrapper.build_naming_tables task0 in
   let empty_rem = {rem_ts = Sts.empty; rem_ls = Sls.empty;
-                   rem_pr = Spr.empty} in
-  bisect_aux task0 a 0 n empty_rem
-    (fun rem -> BSdone rem)
+                   rem_pr = Spr.empty; rem_nt = namt} in
+  bisect_aux task0 a 0 n empty_rem (fun rem -> BSdone rem)
 
 (*
 let bisect f task =

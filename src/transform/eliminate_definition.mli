@@ -25,7 +25,12 @@ val eliminate_mutual_recursion: Task.task Trans.trans
 
 (** bisection *)
 
-type rem = { rem_pr : Decl.Spr.t; rem_ls : Term.Sls.t; rem_ts : Ty.Sts.t }
+type rem = {
+  rem_pr : Decl.Spr.t;
+  rem_ls : Term.Sls.t;
+  rem_ts : Ty.Sts.t;
+  rem_nt : Trans.naming_table;
+}
 
 (* unused
 val bisect : (Task.task -> bool) -> Task.task -> rem
