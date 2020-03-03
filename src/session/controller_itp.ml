@@ -1289,7 +1289,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
        2) on the generated sub-goal, run the prover with some callback
        3) the callback should :
           compute (next_iter success_value)
-          if result is done, do nothing more
+          if result is done, remove the transformation and go to bisect_end
           if result is some new rem, remove the previous transformation
            and recursively call bisect_step
      *)
@@ -1347,9 +1347,9 @@ later on. We do has if proof fails. *)
                    Call_provers.print_prover_answer res.Call_provers.pr_answer;
                  let b = res.Call_provers.pr_answer = Call_provers.Valid in
                  if b then set_timelimit res;
+                 Session_itp.remove_subtree ~notification ~removed ses (Session_itp.ATn trid);
                  match kont b with
                  | Eliminate_definition.BSstep (rem,kont) ->
-                    Session_itp.remove_subtree ~notification ~removed ses (Session_itp.ATn trid);
                     bisect_step rem kont
                  | Eliminate_definition.BSdone rem ->
                     bisect_end rem
