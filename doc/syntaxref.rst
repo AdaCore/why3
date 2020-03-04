@@ -770,6 +770,69 @@ This type is used in the standard library in the theories
 
 
 
+
+
+Function declarations
+^^^^^^^^^^^^^^^^^^^^^
+
+``let``
+   Definition of a program function, with prototype, contract, and body
+
+``val``
+   Declaration of a program function, with prototype and contract only
+
+``let function``
+   Definition of a pure (that is, side-effect free) program function
+   which can also be used in specifications as a logical function
+   symbol
+
+``let predicate``
+   Definition of a pure Boolean program function which can also be
+   used in specifications as a logical predicate symbol
+
+``val function``
+   Declaration of a pure program function which can also be used in
+   specifications as a logical function symbol
+
+``val predicate``
+   Declaration of a pure Boolean program function which can also be
+   used in specifications as a logical predicate symbol
+
+``function``
+   Definition or declaration of a logical function symbol which can
+   also be used as a program function in ghost code
+
+``predicate``
+   Definition or declaration of a logical predicate symbol which can
+   also be used as a Boolean program function in ghost code
+
+``let lemma``
+   definition of a special pure program function which serves not as
+   an actual code to execute but to prove the function's contract as a
+   lemma: “for all values of parameters, the precondition implies the
+   postcondition”. This lemma is then added to the logical context and
+   is made available to provers. If this “lemma-function” produces a
+   result, the lemma is “for all values of parameters, the
+   precondition implies the existence of a result that satisfies the
+   postcondition”. Lemma-functions are mostly used to prove some
+   property by induction directly in Why3, without resorting to an
+   external higher-order proof assistant.
+
+Program functions (defined with ``let`` or declared with ``val``) can
+additionally be marked ``ghost``, meaning that they can only be used
+in the ghost code and never translated into executable code ; or
+``partial``, meaning that their execution can produce observable
+effects unaccounted by their specification, and thus they cannot be
+used in the ghost code.
+
+
+
+Module Cloning
+^^^^^^^^^^^^^^
+
+TO BE COMPLETED
+
+
 The Why3 Standard Library
 -------------------------
 
