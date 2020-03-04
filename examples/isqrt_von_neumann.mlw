@@ -1,8 +1,13 @@
 
-(*
+(** {1 Integer Square Root: Hacker's version}
 
-algorithm from Warren's "Hacker's Delight" Figure 11.4
+We present certified version of programs for computing the square root
+of machine integers. This implementation is a very efficient one
+making use of low-level bitwise operations. The algorithm originated
+from Warren's book "Hacker's Delight", Figure 11.4.
 
+The reference C code is as follows
+{h <pre>
 int isqrt4(unsigned x) {
      unsigned m, y, b;
      m = 0x40000000;
@@ -18,10 +23,17 @@ int isqrt4(unsigned x) {
      }
      return y;
   }
+<pre>}
+
+We present 3 different implementations respectively for 16, 32 and 64
+bits. The proofs become significantly more difficult when increasing
+the number of bits, so a need for more manual steps shows up in the 64
+bits version.
 
 *)
 
 
+(** {2 Version 16 bits} *)
 
 module VonNeumann16
 
@@ -96,6 +108,7 @@ module VonNeumann16
 
 end
 
+(** {2 Version 32 bits} *)
 
 module VonNeumann32
 
@@ -170,6 +183,8 @@ module VonNeumann32
 
 end
 
+
+(** {2 Version 64 bits} *)
 
 module VonNeumann64
 
