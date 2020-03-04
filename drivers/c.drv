@@ -560,10 +560,16 @@ module mach.c.UChar
 
 end
 
-module mach.c.Char
+module mach.c.SChar
 
-  syntax literal char "%c"
-  syntax type char "char"
+  syntax literal schar "%c"
+  syntax type schar "signed char"
+
+end
+
+module mach.c.String
+
+  syntax type string "char *"
 
 end
 

@@ -187,3 +187,166 @@ module String_lemmas
                  <= svalue_sub b x (n+1) m + power b (m - n - 1) * (b-1) };
       end
 end
+
+module Conversions [@W:non_conservative_extension:N]
+
+  use array.Array
+  use map.Map
+  use map.MapEq
+  use map.Const
+  use int.Int
+  use int.Power
+  use lemmas.Lemmas
+  use string.String
+  use mach.c.String
+  use string.Char
+  use mach.int.Int32
+  use mach.c.UChar
+
+  constant numlowstring : string = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+  function num_to_lowercase_text (d:uchar) : char
+  = if 0 <= d < 36
+    then get numlowstring d
+    else chr (-1)
+
+  predicate to_lowercase_text (d:map int uchar) (t:map int char) (m n:int)
+  = forall i. n <= i < m -> Map.get t i = num_to_lowercase_text (Map.get d i)
+
+  constant numupstring : string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+  function num_to_uppercase_text (d:uchar) : char
+  = if 0 <= d < 36
+    then get numupstring d
+    else chr (-1)
+
+  predicate to_uppercase_text (d:map int uchar) (t:map int char) (m n:int)
+  = forall i. n <= i < m -> Map.get t i = num_to_uppercase_text (Map.get d i)
+
+  lemma lowconcat: numlowstring = concat digitstring lowstring
+  lemma upconcat: numupstring = concat digitstring upstring
+  lemma digitsublow: digitstring = substring numlowstring 0 10
+  lemma digitsubup: digitstring = substring numupstring 0 10
+  lemma lowsub: lowstring = substring numlowstring 10 26
+  lemma upsub: upstring = substring numupstring 10 26
+
+  function text_to_num (c:char) : int
+  = if (get "0" 0) <= c <= (get "9" 0)
+    then c - (get "0" 0)
+    else if (get "a" 0) <= c <= (get "z" 0)
+    then c - (get "a" 0) + 10
+    else if (get "A" 0) <= c <= (get "Z" 0)
+    then c - (get "A" 0) + 10
+    else -1
+
+  predicate to_num (t: map int char) (d: map int uchar) (n m:int)
+    = forall i. n <= i < m -> Map.get d i = text_to_num (Map.get t i)
+
+  let lemma digits ()
+    ensures { code (get "9" 0) = code (get "0" 0) + 9 }
+  =
+    assert { "9" = substring digitstring 9 1 };
+    assert { get "9" 0 = get digitstring 9 }
+
+  let lemma lower ()
+    ensures { code (get "z" 0) = code (get "a" 0) + 25 }
+  =
+    assert { "z" = substring lowstring 25 1 };
+    assert { get "z" 0 = get lowstring 25 }
+
+  let lemma upper ()
+    ensures { code (get "Z" 0) = code (get "A" 0) + 25 }
+  =
+    assert { "Z" = substring upstring 25 1 };
+    assert { get "Z" 0 = get upstring (25+0) = get upstring 25 }
+
+
+  lemma diglow: code (get "9" 0) < code (get "a" 0)
+  lemma digup: code (get "9" 0) < code (get "A" 0)
+  lemma lowup: code (get "Z" 0) < code (get "a" 0)
+
+  let lemma tnt_low (d:uchar)
+    requires { 0 <= d < 36 }
+    ensures { text_to_num (num_to_lowercase_text d) = d }
+  =
+    let t = num_to_lowercase_text d in
+    if 0 <= d < 10
+    then assert { t = get digitstring d }
+    else begin
+      assert { get lowstring (d - 10) = t
+               by get lowstring (d-10)
+                  = get (substring numlowstring 10 26) (d - 10)
+                  = get numlowstring d };
+      assert { text_to_num t = d
+               by code t = code (get lowstring (d-10))
+                    = code (get "a" 0) + (d-10)
+                    <= code (get "z" 0)
+               so code t > code (get "9" 0)
+               so text_to_num t = code t - code (get "a" 0) + 10 = d }
+    end
+
+  let lemma tnt_up (d:uchar)
+    requires { 0 <= d < 36 }
+    ensures { text_to_num (num_to_uppercase_text d) = d }
+  =
+    let t = num_to_uppercase_text d in
+    if 0 <= d < 10
+    then assert { t = get digitstring d }
+    else begin
+      assert { get upstring (d - 10) = t
+               by get upstring (d-10)
+                  = get (substring numupstring 10 26) (d - 10)
+                  = get numupstring d };
+      assert { text_to_num t = d
+               by code t = code (get upstring (d-10))
+                    = code (get "A" 0) + (d-10)
+                    <= code (get "Z" 0)
+               so code t > code (get "9" 0)
+               so code t < code (get "a" 0)
+               so text_to_num t = code t - code (get "A" 0) + 10 = d }
+    end
+
+end
+module String_value
+
+  use mach.c.C
+  use mach.c.String
+  use string.Char
+  use map.Map
+  use int.Int
+  use String_lemmas
+  use Conversions
+  use mach.c.UChar
+
+  let rec ghost function
+                abs_value_sub_text (b:int) (s:map int char) (n m: int) : int
+    variant { m - n }
+  = if n < m
+    then text_to_num s[m-1] + b * abs_value_sub_text b s n (m-1)
+    else 0
+
+  let rec lemma text_conversion (b:int) (t: map int char)
+                                (d: map int uchar) (n m:int)
+    requires { to_num t d n m }
+    variant  { m - n }
+    ensures  { abs_value_sub_text b t n m = svalue_sub b d n m }
+  =
+    if n < m then text_conversion b t d n (m-1)
+
+  let ghost function abs_value_text (b:int) (s:map int char) (ofs:int)
+    = abs_value_sub_text b s ofs (ofs + strlen s ofs)
+
+  let ghost function value_text (b:int) (s:map int char) (ofs:int)
+    = if Char.(=) s[ofs] minus_char
+      then - abs_value_text b s (ofs + 1)
+      else abs_value_text b s ofs
+
+  predicate text_in_base (b:int) (t: map int char) (n m:int)
+    = forall i. n <= i < m -> 0 <= text_to_num t[i] < b
+
+  predicate string_in_base (b:int) (s:map int char) (ofs: int)
+    = (text_in_base b s ofs (ofs + strlen s ofs) /\ strlen s ofs > 0)
+      \/ (s[ofs] = minus_char
+         /\ text_in_base b s (ofs + 1) (ofs + strlen s ofs)
+         /\ strlen s ofs > 1)
+end

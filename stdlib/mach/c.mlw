@@ -230,18 +230,18 @@ module C
 
 end
 
-module Char
+module SChar
 
-  type char = < range -128 127 >
+  type schar = < range -128 127 >
   let constant min_char : int = -128
   let constant max_char : int = 127
-  function to_int (x:char) : int = char'int x
+  function to_int (x:schar) : int = schar'int x
 
   clone export mach.int.Bounded_int with
-    type t = char,
-    constant min = char'minInt,
-    constant max = char'maxInt,
-    function to_int = char'int,
+    type t = schar,
+    constant min = schar'minInt,
+    constant max = schar'maxInt,
+    function to_int = schar'int,
     lemma to_int_in_bounds,
     lemma extensionality
 
@@ -275,5 +275,79 @@ module UChar
 
   val to_uint64 (x:uchar) : uint64
     ensures  { to_int result = x }
+
+  use mach.int.Int32
+
+  val of_int32 (x:int32) : uchar
+    requires { 0 <= x <= 255 }
+    ensures  { result = to_int x }
+
+  val to_int32 (x:uchar) : int32
+    ensures  { to_int result = x }
+end
+
+module String [@W:non_conservative_extension:N]
+
+  use int.Int
+  use mach.int.Int32
+  use string.String
+  use string.Char
+
+  meta coercion function code
+
+  val get (s:string) (i:int32) : char
+    requires { 0 <= i <= length s }
+    ensures  { 0 <= i < length s -> result = (get s i) }
+    ensures  { i = length s -> result = chr 0 }
+
+  val constant zero_char : char
+    ensures { code result = 0 }
+
+  val constant zero_num : char
+    ensures { result = get "0" 0 }
+
+  val constant minus_char : char
+    ensures { result = Char.get "-" 0 }
+
+  constant digitstring : string = "0123456789"
+  constant lowstring : string = "abcdefghijklmnopqrstuvwxyz"
+  constant upstring : string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+  axiom numcodes:
+        forall i. 0 <= i < 10 ->
+               code (get digitstring i) = code (get "0" 0) + i
+
+  axiom lowcodes:
+        forall i. 0 <= i < 26 ->
+               code (get lowstring i)
+               = code (get "a" 0) + i
+
+  axiom upcodes:
+        forall i. 0 <= i < 26 ->
+               code (get upstring i)
+               = code (get "A" 0) + i
+
+  axiom code_0: code (get "0" 0) = 48
+  axiom code_a: code (get "a" 0) = 97
+  axiom code_A: code (get "A" 0) = 65
+  axiom code_minus : code minus_char = 45
+
+  use C
+  use map.Map
+
+  function strlen (s:map int char) (ofs:int) : int
+
+  axiom strlen_def:
+    forall s ofs i. 0 <= i
+    -> (forall j. 0 <= j < i -> code s[ofs + j] <> 0)
+    -> code s[ofs + i] = 0
+    -> strlen s ofs = i
+
+  axiom strlen_invalid:
+    forall s ofs. (forall i. 0 <= i -> code s[ofs + i] <> 0) -> strlen s ofs < 0
+
+  predicate valid_string (p: ptr char)
+    = strlen (pelts p) (offset p) >= 0
+      /\ valid p (strlen (pelts p) (offset p))
 
 end
