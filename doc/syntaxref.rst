@@ -1,5 +1,5 @@
-Language Reference
-==================
+The WhyML Language Reference
+============================
 
 In this chapter, we describe the syntax and semantics of WhyML.
 
