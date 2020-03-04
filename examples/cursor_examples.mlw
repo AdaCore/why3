@@ -1,4 +1,11 @@
 
+(** {1 Cursors}
+
+    Some implementations and clients of module `cursor.Cursor`
+    from the standard library.
+
+    Author: Mário Pereira (Université Paris Sud) *)
+
 module TestCursor
 
   use int.Int
@@ -224,15 +231,6 @@ module TestArrayCursor
     let c = create a in
     let x = C.next c in
     assert { x = 0 }
-
-(*
-  let harness2 () : unit
-  = let a = Array.make 42 0 in
-    let c = create a in
-    a[1] <- 17;
-    let x = C.next c in
-    assert { x = 0 }
-*)
 
 end
 
