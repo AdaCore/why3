@@ -2064,7 +2064,7 @@ let save_status fmt s =
 
 let save_file_path fmt p =
   List.iter
-    (fun s -> fprintf fmt "@[<hov 1><path@ name=\"%s\"/>@]" s)
+    (fun s -> fprintf fmt "@[<hov 1><path name=\"%s\"/>@]" s)
     (Sysutil.decompose_path p)
 
 let save_proof_attempt fmt ((id,tl,sl,ml),a) =
