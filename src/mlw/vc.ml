@@ -85,9 +85,10 @@ type vc_env = {
   ps_wf_acc : lsymbol;
   exn_count : int ref;
   divergent : bool;
+  inferinvs : (expr * term) list;
 }
 
-let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc = {
+let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs = {
   known_map = kn;
   ts_ranges = tuc.Theory.uc_ranges;
   ps_int_le = Theory.ns_find_ls ns_int [Ident.op_infix "<="];
@@ -99,6 +100,7 @@ let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc = {
   ps_wf_acc = Theory.ns_find_ls ns_acc ["acc"];
   exn_count = ref 0;
   divergent = false;
+  inferinvs = invs;
 }
 
 let acc env r t =
@@ -117,10 +119,10 @@ let new_exn env = incr env.exn_count; !(env.exn_count)
 (* FIXME: cannot verify int.why because of a cyclic dependency.
    int.Int is used for the "for" loops and for integer variants.
    We should be able to extract the necessary lsymbols from kn. *)
-let mk_env env kn tuc =
+let mk_env env kn tuc invs =
   let th_int = Env.read_theory env ["int"] "Int" in
   let th_wf  = Env.read_theory env ["relations"] "WellFounded" in
-  mk_env th_int th_wf kn tuc
+  mk_env th_int th_wf kn tuc invs
 
 let int_of_range env ty =
   let td = Mts.find ty env.ts_ranges in
@@ -816,6 +818,13 @@ let rec k_expr env lps e res xmap =
     | Eabsurd ->
         Kstop (vc_expl loc attrs expl_absurd t_false)
     | Ewhile (e0, invl, varl, e1) ->
+        (* infer-loop *)
+        let invl =
+          match List.find_opt (fun (ee,_) -> e == ee) env.inferinvs with
+          | None -> invl
+          | Some (_,i) -> i :: invl in
+        (* ---------- *)
+
         (* [ STOP inv
            | HAVOC ; ASSUME inv ; IF e0 THEN e1 ; STOP inv
                                         ELSE SKIP ] *)
@@ -1562,23 +1571,52 @@ let vc env kn tuc d = match d.pd_node with
   | PDlet (LDvar (_, {e_node = Eexec ({c_node = Cany},_)})) ->
       []
   | PDlet (LDvar (v, e)) ->
-      let env = mk_env env kn tuc in
+      let env = mk_env env kn tuc [] in
       let c, e = match e.e_node with
         | Eexec ({c_node = Cfun e} as c, _) -> c, e
         | _ -> c_fun [] [] [] Mxs.empty Mpv.empty e, e in
       let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
       add_vc_decl env v.pv_vs.vs_name f []
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
-      let env = mk_env env kn tuc in
+      (* infer-loop *)
+      let open Theory in
+      let module AI = Ai_cfg.Make (struct
+         let env = env
+         let th_known = tuc.uc_known
+         let mod_known = kn
+         let widening = 3
+         module D = Domain.Polyhedra end)
+      in
+      let expl = "expl:infer-loop" in
+      let preconditions = cty.cty_pre in
+      let cfg = AI.start_cfg s in
+      let context = AI.empty_context () in
+      List.iter (AI.add_variable cfg context) cty.cty_args;
+      if Debug.test_flag Uf_domain.infer_debug then
+        Format.printf "%a@." Expr.print_expr e;
+      ignore (AI.put_expr_with_pre cfg context e preconditions);
+      (* will hold the different file offsets (useful when writing
+         multiple invariants) *)
+      let fixp = AI.eval_fixpoints cfg context in
+      let invs = List.map (fun (e,d) ->
+        let t = AI.domain_to_term cfg context d in
+        let t = Term.t_attr_add (Ident.create_attribute expl) t in
+        if Debug.test_flag Uf_domain.infer_debug then
+          Pretty.print_term Format.std_formatter t;
+        (e,t)
+                   ) fixp in
+      (* ---------- *)
+
+      let env = mk_env env kn tuc invs in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
       add_vc_decl env s.rs_name f []
   | PDlet (LDrec rdl) ->
-      let env = mk_env env kn tuc in
+      let env = mk_env env kn tuc [] in
       let fl = vc_rec env (Debug.test_noflag debug_sp) rdl in
       let add rd f vcl = add_vc_decl env rd.rec_sym.rs_name f vcl in
       List.fold_right2 add rdl fl []
   | PDtype tdl ->
-      let env = lazy (mk_env env kn tuc) in
+      let env = lazy (mk_env env kn tuc []) in
       let add_witness d vcl =
         let env = Lazy.force env in
         let add_fd (mv,ldl) fd e =

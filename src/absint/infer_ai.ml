@@ -160,6 +160,8 @@ module Make (D: Domain.DOMAIN) = struct
          (* will hold the different file offsets (useful when writing
                multiple invariants) *)
          let fixp = AI.eval_fixpoints cfg context in
+
+         (* continue here *)
          let new_e = reconstruct_expr cfg context fixp sm e in
          let ce = c_fun cexp.c_cty.cty_args cexp.c_cty.cty_pre
                     cexp.c_cty.cty_post cexp.c_cty.cty_xpost
