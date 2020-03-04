@@ -183,4 +183,153 @@ micro-Python
 Micro-Python is a valid subset of Python 3. Hence, micro-Python files can be
 passed to a Python interpreter.
 
+Syntax of micro-Python
+~~~~~~~~~~~~~~~~~~~~~~
 
+Notation: The grammar of micro-Python is given below in extended
+Backus-Naur Form, using `|` for alternation, `()` for grouping,
+`[]` for option, and `{}` for repetition.
+Special symbols `NEWLINE`, `INDENT`,
+and `DEDENT` mark an end of line, the beginning of a new
+indentation block, and its end, respectively.
+
+Logical annotations are inserted in special comments starting
+with `//@` or `/*@`. In the following grammar, we
+only use the former kind, for simplicity, but both kinds are allowed.
+
+.. productionlist:: micro-Python
+      file: `decl`*
+      decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
+ py_import: "from" ident "import" ident { "," ident } NEWLINE
+
+Directives `import` are ignored during the translation to
+Why3. They are allowed anyway, such that a Python source code using
+functions such as `randint` is accepted by a Python
+interpreter (see below).
+
+..  rubric:: Function definition
+
+.. productionlist:: micro-Python
+    py_function: "def" ident "(" [ `params` ] ")" ":" NEWLINE INDENT { `spec` } { `stmt` } DEDENT
+    params: ident { "," ident }
+
+.. rubric:: Function specification
+
+.. productionlist:: micro-Python
+   spec ::= "requires" `term` NEWLINE
+        : | "ensures"  `term` NEWLINE
+        : | "variant"  `term` { "," `term` } NEWLINE
+
+.. rubric:: Python expression
+
+.. productionlist:: micro-Python
+  expr ::= "None" | "True" | "False" | integer-literal | string-literal
+       : | identifier
+       : | identifier "[" `expr` "]"
+       : | "-" `expr` | "not" `expr`
+       : | `expr` ( "+" | "-" | "*" | "//" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "and" | "or" ) `expr`
+       : | identifier "(" [ `expr` { "," `expr` } ] ")"
+       : | "[" [ `expr` { "," `expr` } ] "]"
+       : | "(" `expr` ")"
+
+.. rubric:: Python statement
+
+.. productionlist:: micro-Python
+       stmt: `simple_stmt` NEWLINE
+            : | "if" `expr` ":" `suite` `else_branch`
+            : | "while" `expr` ":" `loop_body`
+            : | "for" ident "in" `expr` ":" `loop_body`
+    else_branch: /* nothing */
+            : | "else:" `suite`
+            : | "elif" `expr` ":" `suite` `else_branch`
+      suite: `simple_stmt` NEWLINE
+            : | NEWLINE INDENT `stmt` { `stmt` } DEDENT
+  simple_stmt: `expr`
+            : | "return" `expr`
+            : | identifier "=" `expr`
+            : | identifier "[" `expr` "]" "=" `expr`
+            : | "break"
+            : | "//@" "label" identifier
+            : | "//@" ( "assert" | "assume" | "check" ) `term`
+   assignop: "=" | "+=" | "-=" | "*=" | "/="
+  loop_body: `simple_stmt` NEWLINE
+            : | NEWLINE INDENT { `loop_annot` } `stmt` { `stmt` } DEDENT
+ loop_annot: "//@" "invariant" `term` NEWLINE
+            : | "//@" "variant" `term` { "," `term` } NEWLINE
+
+.. rubric:: Logic declaration
+
+.. productionlist:: micro-Python
+  logic-declaration: "//@" "function" "int" identifier "(" `params` ")" NEWLINE
+                 : | "//@" "predicate" identifier "(" `params` ")" NEWLINE
+
+Note that logic functions and predicates cannot be given definitions.
+Yet, they can be axiomatized, using toplevel `assume` statements.
+
+
+.. rubric:: Logical term
+
+.. productionlist:: micro-Python
+  term: identifier
+       : | integer-literal
+       : | "None"
+       : | "True"
+       : | "False"
+       : | "(" `term` ")"
+       : | `term` "[" `term` "]"
+       : | `term` "[" `term` "<-" `term` "]"
+       : | "not" `term`
+       : | "old" "(" `term` ")"
+       : | "at" "(" `term` "," identifier ")"
+       : | "-" `term`
+       : | `term` ( "->" | "<->" | "or" | "and" ) `term`
+       : | `term` ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) `term`
+       : | `term` ( "+" | "-" | "*" | "//" | "% ) `term`
+       : | "if" `term` "then" `term` "else `term`
+       : | "let" identifier "=" `term` "in" `term`
+       : | ( "forall" | "exists" ) ident { "," ident } "." `term`
+       : | identifier "(" [ `term` { "," `term` } ] ")"
+
+Built-in functions and predicates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. rubric:: Python code
+
+* `len(l)`, the length of list `l`
+* `int(input())`, reads an integer from standard input
+* `range(l, u)`, returns the list of integers
+  from `l` inclusive to `u` exclusive <br>
+  (in particular, `for x in range(l, u):` is supported)
+* `randint(l, u)`, returns a pseudo-random integer
+  in the range `l` to `u` inclusive
+
+.. rubric:: Logic
+
+* `len(l)`, the length of list `l`
+* `occurrence(v, l)`, the number of occurrences of the value `v` in list `l`
+
+Limitations
+~~~~~~~~~~~
+
+Python lists are modeled as arrays, whose size cannot be modified.
+
+
+Verifying a program
+~~~~~~~~~~~~~~~~~~~
+
+Click on the gears button to launch the verification.
+Verification conditions (VCs) then appear in the right panel, in
+the Task List tab, and
+Alt-Ergo is run on each of them with a default time limit (that
+can be set in the Settings menu).
+
+When a VC is not proved, there are several options:
+
+* use the contextual menu to rerun Alt-Ergo with a larger
+  time limit (e.g. 1000 or 5000 steps instead of 100);
+* use the contextual menu to split the VC and rerun Alt-Ergo
+  on each sub-VC (split and prove);
+* use the Task View tab to investigate the problematic VC,
+  for wrong or missing elements of specification (precondition,
+  postcondition, invariant);
+* add intermediate assertions in the code, using `//@ assert ...;`.
