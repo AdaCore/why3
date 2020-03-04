@@ -45,7 +45,7 @@ let list_attributes () =
 
 let attr_equal : attribute -> attribute -> bool = (==)
 let attr_hash a = a.attr_tag
-let attr_compare a1 a2 = Pervasives.compare a1.attr_tag a2.attr_tag
+let attr_compare a1 a2 = Int.compare a1.attr_tag a2.attr_tag
 
 (** Naming convention *)
 
@@ -171,7 +171,7 @@ type preid = {
 
 let id_equal : ident -> ident -> bool = (==)
 let id_hash id = Weakhtbl.tag_hash id.id_tag
-let id_compare id1 id2 = Pervasives.compare (id_hash id1) (id_hash id2)
+let id_compare id1 id2 = Int.compare (id_hash id1) (id_hash id2)
 
 (* constructors *)
 

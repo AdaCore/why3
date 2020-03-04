@@ -902,15 +902,15 @@ let (_ : GtkSignal.id) =
 (* Task view (part of notebook) *)
 (********************************)
 
-let task_view =
+let scrolled_task_view =
   let label = GMisc.label ~text:"Task" () in
-  let scrolled_task_view =
-    GBin.scrolled_window
-      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-      ~shadow_type:`ETCHED_OUT
-      ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
+  GBin.scrolled_window
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~shadow_type:`ETCHED_OUT
+    ~packing:(fun w -> ignore(notebook#append_page ~tab_label:label#coerce w))
     ()
-  in
+
+let task_view =
   GSourceView.source_view
     ~editable:false
     ~cursor_visible:true
@@ -2283,7 +2283,7 @@ let (_ : GMenu.menu_item) =
     ~callback:reduce_fonts
 
 let (_: GMenu.menu_item) =
-  view_factory#add_item "Collapse proven goals"
+  view_factory#add_item "Collapse proved goals"
     ~accel_group:tools_accel_group ~key:GdkKeysyms._exclam
     ~tooltip:"Collapse all the proven nodes under the current node"
     ~callback:collapse_proven_goals
@@ -2814,9 +2814,15 @@ let treat_notification n =
              (* Still scroll to the ident (for example for modules) *)
              scroll_to_loc ~force_tab_switch:true goal_loc
            end;
-         (* scroll to end of text. Since Gtk3 we must do it in idle() because
-            of the "smooth scrolling". *)
-         when_idle (fun () -> task_view#scroll_to_mark `INSERT)
+         (* Scroll to the end of task text without any animation.
+            We cannot use the scroll_to methods, as they eventually call
+            gtk_adjustment_animate_to_value in GTK3. So, we manually call
+            gtk_adjustment_set_value (through get_adjustment_clamp_page,
+            because of GTK2). We cannot do that immediately though, as the
+            vertical adjustment does not yet reflect the new content. *)
+         when_idle (fun () ->
+             let a = scrolled_task_view#vadjustment in
+             a#clamp_page ~lower:a#upper ~upper:a#upper)
        end
   | File_contents (file_name, content, f_format, read_only) ->
      let content = try_convert content in

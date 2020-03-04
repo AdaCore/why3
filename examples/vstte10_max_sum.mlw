@@ -16,14 +16,14 @@ module MaxAndSum
     requires { n = length a }
     requires { forall i. 0 <= i < n -> a[i] >= 0 }
     ensures  { sum <= n * max }
-  = let sum = ref 0 in
-    let max = ref 0 in
+  = let ref sum = 0 in
+    let ref max = 0 in
     for i = 0 to n - 1 do
-      invariant { !sum <= i * !max }
-      if !max < a[i] then max := a[i];
-      sum := !sum + a[i]
+      invariant { sum <= i * max }
+      if max < a[i] then max <- a[i];
+      sum <- sum + a[i]
     done;
-    !sum, !max
+    sum, max
 
 end
 
@@ -35,22 +35,23 @@ module MaxAndSum2
   use array.ArraySum
 
   predicate is_max (a: array int) (l h: int) (m: int) =
-    (forall k: int. l <= k < h -> a[k] <= m) &&
+    (forall k. l <= k < h -> a[k] <= m) &&
     ((h <= l && m = 0) ||
-     (l <  h && exists k: int. l <= k < h && m = a[k]))
+     (l <  h && exists k. l <= k < h && m = a[k]))
 
-  let max_sum (a: array int) (n: int)
-    requires { n = length a /\ forall i:int. 0 <= i < n -> a[i] >= 0 }
-    ensures  { let s, m = result in
-               s = sum a 0 n /\ is_max a 0 n m /\ s <= n * m }
-  = let s = ref 0 in
-    let m = ref 0 in
+  let max_sum (a: array int) (n: int) : (s: int, m: int)
+    requires { n = length a /\ forall i. 0 <= i < n -> a[i] >= 0 }
+    ensures  { s = sum a 0 n /\ is_max a 0 n m /\ s <= n * m }
+  = let ref s = 0 in
+    let ref m = 0 in
     for i = 0 to n - 1 do
-      invariant { !s = sum a 0 i /\ is_max a 0 i !m /\ !s <= i * !m }
-      if !m < a[i] then m := a[i];
-      s := !s + a[i]
+      invariant { s = sum a 0 i }
+      invariant { is_max a 0 i m }
+      invariant { s <= i * m }
+      if m < a[i] then m <- a[i];
+      s <- s + a[i]
     done;
-    !s, !m
+    s, m
 
 end
 

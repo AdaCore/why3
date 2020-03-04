@@ -91,8 +91,8 @@ ifeq (@LATEX@,pdflatex)
    LATEXCLEAN=true
 endif
 
-HEVEA = @HEVEA@
-HACHA = @HACHA@
+SPHINX = @SPHINX@
+
 EMACS = @EMACS@
 
 #PSVIEWER  = @PSVIEWER@
@@ -276,7 +276,7 @@ LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 LIB_SESSION = compress xml termcode session_itp \
               strategy strategy_parser controller_itp \
 	      server_utils itp_communication \
-	      itp_server json_util
+	      itp_server json_util unix_scheduler
 
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
@@ -303,21 +303,21 @@ $(LIBDEP): $(LIBGENERATED)
 # Mlmpfr
 
 ifeq (@found_mlmpfr@,yes)
-src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_real.ml
-	cp src/util/mlmpfr_real.ml $@
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
+	cp $< $@
 else
-src/util/mlmpfr_wrapper.ml: config.status src/util/mlmpfr_dummy.ml
-	cp src/util/mlmpfr_dummy.ml $@
+src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
+	cp $< $@
 endif
 
 # Ocamlzip
 
 ifeq (@enable_zip@,yes)
-src/session/compress.ml: config.status src/session/compress_z.ml
-	cp src/session/compress_z.ml $@
+src/session/compress.ml: src/session/compress_z.ml Makefile
+	cp $< $@
 else
-src/session/compress.ml: config.status src/session/compress_none.ml
-	cp src/session/compress_none.ml $@
+src/session/compress.ml: src/session/compress_none.ml Makefile
+	cp $< $@
 endif
 
 .PHONY: initialize_messages update-parsing-error-handling
@@ -360,8 +360,10 @@ endif
 # Re
 
 ifeq (@enable_re@,no)
-src/util/re.ml: src/util/recompat.ml config.status
+src/util/re.ml: src/util/recompat.ml Makefile
 	cp $< $@
+
+GENERATED += re.ml
 endif
 
 # build targets
@@ -480,8 +482,8 @@ PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/microc/mc_lexer.ml \
 		plugins/microc/mc_parser.ml plugins/microc/mc_parser.mli \
 		plugins/parser/dimacs.ml \
-		plugins/ada_terms/ada_lexer.ml \
-		plugins/ada_terms/ada_parser.ml plugins/ada_terms/ada_parser.mli
+                plugins/ada_terms/ada_lexer.ml \
+                plugins/ada_terms/ada_parser.ml plugins/ada_terms/ada_parser.mli
 
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
@@ -526,7 +528,7 @@ PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
 	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
-	      $(ADAMODULES)
+              $(ADAMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES))
 PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
@@ -556,12 +558,12 @@ lib/plugins/%.cmo: | lib/plugins
 	$(SHOW) 'Linking  $@'
 	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
 
-lib/plugins/%.cmxs: plugins/parser/%.cmx
-lib/plugins/%.cmo: plugins/parser/%.cmo
-lib/plugins/%.cmxs: plugins/printer/%.cmx
-lib/plugins/%.cmo: plugins/printer/%.cmo
-lib/plugins/%.cmxs: plugins/transform/%.cmx
-lib/plugins/%.cmo: plugins/transform/%.cmo
+$(PLUG_PARSER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/parser/%.cmx
+$(PLUG_PARSER:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/parser/%.cmo
+$(PLUG_PRINTER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/printer/%.cmx
+$(PLUG_PRINTER:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/printer/%.cmo
+$(PLUG_TRANSFORM:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/transform/%.cmx
+$(PLUG_TRANSFORM:%=lib/plugins/%.cmo): lib/plugins/%.cmo: plugins/transform/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
 lib/plugins/tptp.cmo: $(TPTPCMO)
 lib/plugins/python.cmxs: $(PYTHONCMX)
@@ -629,8 +631,8 @@ bin/why3prove.opt: $(WHY3CMXA) src/tools/why3prove.cmx
 bin/why3prove.byte: $(WHY3CMA) src/tools/why3prove.cmo
 bin/why3realize.opt: $(WHY3CMXA) src/tools/why3realize.cmx
 bin/why3realize.byte: $(WHY3CMA) src/tools/why3realize.cmo
-bin/why3replay.opt: $(WHY3CMXA) src/tools/unix_scheduler.cmx src/tools/why3replay.cmx
-bin/why3replay.byte: $(WHY3CMA) src/tools/unix_scheduler.cmo src/tools/why3replay.cmo
+bin/why3replay.opt: $(WHY3CMXA) src/tools/why3replay.cmx
+bin/why3replay.byte: $(WHY3CMA) src/tools/why3replay.cmo
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
 
@@ -864,7 +866,7 @@ gallery-subs::
 	  echo "exporting examples/$$d"; \
 	  mkdir -p $(GALLERYDIR)/$$d; \
 	  cd examples/$$d; \
-	  WHY3CONFIG="" ../../bin/why3doc.@OCAMLBEST@ -L ../../stdlib -L . --stdlib-url http://why3.lri.fr/stdlib/ --debug ignore_unused_vars *.mlw -o $(GALLERYDIR)/$$d; \
+	  WHY3CONFIG="" ../../bin/why3doc.@OCAMLBEST@ --no-stdlib --no-load-default-plugins -L ../../stdlib -L . --stdlib-url http://why3.lri.fr/stdlib/ --debug ignore_unused_vars *.mlw -o $(GALLERYDIR)/$$d; \
 	  cd ..; \
 	  rm -f $(GALLERYDIR)/$$d/$$d.zip; \
 	  git archive --format=zip -o $(GALLERYDIR)/$$d/$$d.zip HEAD $$d; \
@@ -899,7 +901,7 @@ xml-validate:
 	done
 
 xml-validate-local:
-	@for x in `find examples/ -name why3session.xml`; do \
+	@for x in `find examples/ -path examples/in_progress -prune -o -name why3session.xml -print`; do \
 	  xmllint --noout --dtdvalid share/why3session.dtd $$x 2>&1 | head -1; \
 	done
 
@@ -987,11 +989,11 @@ install:: install-ide
 install_local:: bin/why3ide
 
 ifeq (@GTKVERSION@,2)
-src/ide/gtkcompat.ml: config.status src/ide/gtkcompat2.ml
-	cp src/ide/gtkcompat2.ml $@
+src/ide/gtkcompat.ml: src/ide/gtkcompat2.ml Makefile
+	cp $< $@
 else
-src/ide/gtkcompat.ml: config.status src/ide/gtkcompat3.ml
-	cp src/ide/gtkcompat3.ml $@
+src/ide/gtkcompat.ml: src/ide/gtkcompat3.ml Makefile
+	cp $< $@
 endif
 
 GENERATED += $(IDEGENERATED)
@@ -1018,12 +1020,7 @@ byte: bin/why3webserver.byte
 opt:  bin/why3webserver.opt
 
 bin/why3webserver.opt: $(WHY3CMXA) $(WEBSERVCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3webserver.byte: $(WHY3CMA) $(WEBSERVCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) -custom $^
 
 # depend and clean targets
 
@@ -1094,7 +1091,7 @@ install_local:: bin/why3session
 # Why3 Shell
 ###############
 
-SHELL_FILES = unix_scheduler why3shell
+SHELL_FILES = why3shell
 
 SHELLMODULES = $(addprefix src/tools/, $(SHELL_FILES))
 
@@ -1110,12 +1107,7 @@ byte: bin/why3shell.byte
 opt:  bin/why3shell.opt
 
 bin/why3shell.opt: $(WHY3CMXA) $(SHELLCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3shell.byte: $(WHY3CMA) $(SHELLCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
@@ -1446,7 +1438,7 @@ clean::
 #######################
 
 
-ISABELLEVERSIONSPECIFIC=why3.ML Why3_Number.thy Why3_Real.thy
+ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy Why3_Map.thy
 
 ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
 ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
@@ -1697,12 +1689,7 @@ byte: bin/why3pp.byte
 opt:  bin/why3pp.opt
 
 bin/why3pp.opt: $(WHY3CMXA) $(PRETTYPRINTCMX)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
 bin/why3pp.byte: $(WHY3CMA) $(PRETTYPRINTCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 # depend and clean targets
 
@@ -2125,126 +2112,42 @@ endif
 
 ifeq (@enable_doc@,yes)
 
-doc: doc/manual.pdf doc/html/index.html
+doc: doc/html/index.html
 
-BNF = ident qualid attribute constant operator type \
-	term1 term2 term3 expr1 expr2 expr3 \
-	formula theory theory2 \
-	why_file spec expr expr2 module whyml_file term_old_at
-BNFTEX = $(BNF:%=doc/generated/%_bnf.tex)
-
-doc/generated/%_bnf.tex: doc/%.bnf doc/bnf$(EXE)
-	doc/bnf$(EXE) $< > $@
-
-doc/bnf$(EXE): doc/bnf.mll
-	$(OCAMLLEX) $<
-	$(OCAMLC) -o $@ doc/bnf.ml
-
-doc/generated/drivers_dependency.tex: doc/drv_depgraph drivers/*.drv drivers/*.gen
-	doc/drv_depgraph$(EXE) drivers doc/generated
-
-doc/extract_ocaml_code: doc/extract_ocaml_code.ml
-	$(OCAMLC) str.cma -o $@ $<
-
-doc/generated/logic__%.ml: examples/use_api/logic.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/whyconf__%.ml: src/driver/whyconf.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/call_provers__%.ml: src/driver/call_provers.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/mlw_tree__%.ml: examples/use_api/mlw_tree.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/mlw_expr__%.ml: examples/use_api/mlw_expr.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/transform__%.ml: examples/use_api/transform.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-doc/generated/counterexample__%.ml: examples/use_api/counterexample.ml doc/extract_ocaml_code
-	doc/extract_ocaml_code $* < $< > $@
-
-OCAMLCODE_LOGIC = opening printformula declarepropvars declarepropatoms \
-	buildtask printtask buildtask2 \
-	getconf getanyaltergo getaltergo200 \
-	getdriver callprover calltimelimit \
-	buildfmla buildtermalt buildtaskimport \
-	quantfmla1 quantfmla2 quantfmla3 quantfmla4 \
-	buildth1 buildth2 buildth3 buildth4 buildth5 buildth6 buildth7 \
-	printtheory splittheory printalltasks
-
-OCAMLCODE_CALLPROVERS = proveranswer proverresult resourcelimit
-
-OCAMLCODE_TRANSFORM = negate register
-
-OCAMLCODE_MLWTREE = buildenv \
-	source1 code1 helper1 source2 code2 source3 code3 source4 code4 \
-	getmodules checkingvcs
-
-OCAMLCODE_MLWEXPR = buildenv source2 code2_import code2 createmodule checkingvcs
-
-OCAMLCODE_COUNTEREXAMPLES =  ce_declarepropvars ce_adaptgoals \
-	ce_get_cvc4ce ce_callprover ce_nobuiltin
-
-OCAMLCODE = \
-	$(addprefix doc/generated/logic__, $(addsuffix .ml, $(OCAMLCODE_LOGIC))) \
-	$(addprefix doc/generated/call_provers__, $(addsuffix .ml, $(OCAMLCODE_CALLPROVERS))) \
-	$(addprefix doc/generated/transform__, $(addsuffix .ml, $(OCAMLCODE_TRANSFORM))) \
-	$(addprefix doc/generated/mlw_tree__, $(addsuffix .ml, $(OCAMLCODE_MLWTREE))) \
-	$(addprefix doc/generated/mlw_expr__, $(addsuffix .ml, $(OCAMLCODE_MLWEXPR))) \
-	$(addprefix doc/generated/counterexample__, $(addsuffix .ml, $(OCAMLCODE_COUNTEREXAMPLES))) \
-	doc/generated/whyconf__provertype.ml
-
-DOC = api glossary ide intro exec macros manpages install \
-      manual starting syntax syntaxref technical version whyml \
-      itp pvs coq isabelle
-
-DOCTEX = $(DOC:%=doc/%.tex)
-
-doc/manual.pdf: $(BNFTEX) $(OCAMLCODE) $(DOCTEX) doc/manual.bib share/provers-detection-data.conf doc/generated/drivers_dependency.tex
-	cd doc; $(LATEXCOMP) manual.tex
-ifeq (@LATEX@,pdflatex)
-	cd doc; if grep 'may have changed. Rerun to get' manual.log; then \
-		bibtex manual ; makeindex manual; pdflatex manual; \
-	fi
-	cd doc; if grep 'may have changed. Rerun to get' manual.log; then \
-		pdflatex manual; \
-	fi
-endif
+include Makefile.doc
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
 	export WHY3CONFIG=doc/why3ide-doc.conf; \
 	export WHY3LOADPATH=stdlib; \
-	sed -n -e 's/^%EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
+	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
 
-CLEANDIRS += doc
-GENERATED += doc/bnf.ml
+doc/html/index.html: $(DOCRST) $(DRVDOT) doc/conf.py
+	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
-ifeq (@enable_html_doc@,yes)
+doc/latex/manual.tex: $(DOCRST) $(DRVDOT) doc/conf.py
+	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
 
-# the dependency on the pdf ensures the bbl was built
-doc/html/manual.html: doc/manual.pdf doc/fix.hva
-	cd doc; rm -rf html; mkdir -p html
-	cp doc/*.png doc/manual.bbl doc/html/
-	cd doc; $(HEVEA) -o html/manual.html -fix -O fix.hva makeidx.hva manual.tex
+ifeq (@enable_pdf_doc@,yes)
 
-doc/html/index.html: doc/html/manual.html
-	cd doc; $(HACHA) -tocbis -o html/index.html html/manual.html
+doc: doc/latex/manual.pdf
 
-else
-
-doc/html/index.html:
+doc/latex/manual.pdf: doc/latex/manual.tex
+	cd doc/latex; $(LATEXCOMP) manual.tex
+ifeq (@LATEX@,pdflatex)
+	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  makeindex manual; pdflatex manual; \
+	fi
+	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  pdflatex manual; \
+	fi
+endif
 
 endif
 
 clean::
-	rm -rf doc/bnf$(EXE) $(BNFTEX) doc/html doc/manual.image.out; \
-	cd doc; $(LATEXCLEAN) manual.tex; \
-	rm -rf doc/generated/drivers*
+	rm -rf doc/html doc/latex; \
+	rm -rf doc/generated/drivers-*.dot
 
 else
 
@@ -2339,20 +2242,20 @@ STDMACHLIBS = \
 	array bv c float fxp int matrix onetime peano tagset
 
 STDLIBS = \
-	algebra appmap array \
+	algebra array \
 	bag bintree bool bv \
 	cursor \
 	exn \
-	floating_point function \
+	floating_point fmap function \
 	graph hashtbl \
-	ieee_float impmap int \
+	ieee_float int \
 	list \
 	map matrix \
 	null number option ocaml \
 	pigeon pqueue \
 	queue \
 	random real ref regexp relations \
-	seq set stack string sum \
+	seq set stack string \
 	tree \
 	witness \
 	$(addprefix mach/, $(STDMACHLIBS))
@@ -2512,7 +2415,7 @@ ocp:
 
 NAME = why3-@VERSION@
 # see .gitattributes for the list of files that are not distributed
-MORE_DIST = configure doc/manual.pdf
+MORE_DIST = configure
 
 dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
@@ -2548,8 +2451,7 @@ AUTOCONF_FILES = \
 	src/jessie/.merlin \
 	lib/why3/META \
 	lib/coq/version \
-	lib/pvs/version \
-	doc/version.tex
+	lib/pvs/version
 
 $(AUTOCONF_FILES): %: %.in config.status
 	./config.status chmod --file $@

@@ -56,7 +56,7 @@ module TestString
   goal TestLE: not (le "A" "")
 
   goal TestAt1:
-    "abc"[3] = empty
+    s_at "abc" 3 = empty
 
   goal TestSubstring1:
     substring "abcdef" 1 3 = "bcd"
@@ -118,11 +118,11 @@ module TestString
    replace "abcdefabcdef" "bc" "123" = "a123defabcdef"
 
   goal to_int_lt_0: forall s i.
-    0 <= i < length s && lt s[i] "0"
+    0 <= i < length s && lt (s_at s i) "0"
         -> to_int s = -1
 
   goal to_int_gt_9: forall s i.
-    0 <= i < length s && lt "9" s[i]
+    0 <= i < length s && lt "9" (s_at s i)
         -> to_int s = -1
 
   goal TestIsDigit:

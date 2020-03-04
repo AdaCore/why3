@@ -17,7 +17,7 @@ module TestCounterexample
   goal T12: forall s. let x = "b\123u\111h\ti" in le s x -> length s >= length x
   goal T13: forall s. lt s s
   goal T14: forall s. not (le s s)
-  goal T15: forall s i. length s[i] = 1
+  goal T15: forall s i. length (s_at s i) = 1
   goal T16: forall s. prefixof "abc" s
   goal T17: forall s. prefixof "abc" s -> length s > 3
 

@@ -1,0 +1,5 @@
+set terminal png
+set output 'toombplot.png'
+set logscale y
+set key bottom right
+plot 'bench_gmp_asm/gmptoomb' u 1:3 title "GMP", 'bench_gmp_generic/gmptoomb' u 1:3 title "GMP without assembly", 'bench_why/why3toomb' u 1:3 title "WhyMP", 'bench_minigmp/minigmptoomb' u 1:3 title "MiniGMP", 'bench_whygmp/why3toomb' u 1:3 title "WhyMP with GMP primitives", 'bench_whymini/why3toomb' u 1:3 title "WhyMP with Mini-GMP primitives"

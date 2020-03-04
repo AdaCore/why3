@@ -61,7 +61,6 @@ syn keyword  whyTodo contained TODO FIXME XXX NOTE
 " FIXME? match and try should detect the absence of "with" ?
 syn region   whyEnd matchgroup=whyKeyword start="\<begin\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
 syn region   whyEnd matchgroup=whyKeyword start="\<match\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
-syn region   whyEnd matchgroup=whyKeyword start="\<loop\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
 syn region   whyEnd matchgroup=whyKeyword start="\<try\>" matchgroup=whyKeyword end="\<end\>" contains=ALLBUT,@whyContained,whyEndErr
 syn region   whyNone matchgroup=whyKeyword start="\<for\>" matchgroup=whyKeyword end="\<\(to\|downto\)\>" contains=ALLBUT,@whyContained,whyCountErr
 syn region   whyDo matchgroup=whyKeyword start="\<do\>" matchgroup=whyKeyword end="\<done\>" contains=ALLBUT,@whyContained,whyDoneErr
@@ -83,22 +82,20 @@ syn region   whyNone matchgroup=whyKeyword start="\<import\>" matchgroup=whyModS
 
 syn region   whyNone matchgroup=whyKeyword start="\<\(axiom\|lemma\|goal\)\>" matchgroup=whyNone end="\<\w\(\w\|'\)\>\|" contains=@whyAllErrs,whyComment
 
-syn keyword  whyKeyword  as by constant
-syn keyword  whyKeyword  else epsilon exists
-syn keyword  whyKeyword  forall function
-syn keyword  whyKeyword  if in inductive coinductive
-syn keyword  whyKeyword  let meta
-syn keyword  whyKeyword  not predicate so
-syn keyword  whyKeyword  then type with
-
-syn keyword  whyKeyword  abstract any break continue
-syn keyword  whyKeyword  exception fun ghost label
-syn keyword  whyKeyword  model mutable partial private
-syn keyword  whyKeyword  raise rec return val while
+syn keyword  whyKeyword  abstract any as break by
+syn keyword  whyKeyword  coinductive constant continue
+syn keyword  whyKeyword  else epsilon exists exception
+syn keyword  whyKeyword  forall fun function ghost
+syn keyword  whyKeyword  if in inductive
+syn keyword  whyKeyword  label let
+syn keyword  whyKeyword  meta model mutable not
+syn keyword  whyKeyword  partial predicate private
+syn keyword  whyKeyword  raise rec return so then type
+syn keyword  whyKeyword  val while with
 
 syn keyword  whyBoolean  true false
 
-syn keyword  whyType     bool int list map option real
+syn keyword  whyType     bool float int list map option real range
 syn keyword  whyType     array ref unit
 
 syn keyword  whySpec     absurd alias assert assume check diverges ensures invariant
@@ -140,7 +137,7 @@ syn sync maxlines=500
 syn sync match whyDoSync      grouphere  whyDo      "\<do\>"
 syn sync match whyDoSync      groupthere whyDo      "\<done\>"
 
-syn sync match whyEndSync     grouphere  whyEnd     "\<\(begin\|match\|loop\|try\)\>"
+syn sync match whyEndSync     grouphere  whyEnd     "\<\(begin\|match\|try\)\>"
 syn sync match whyEndSync     groupthere whyEnd     "\<end\>"
 
 syn sync match whyTheorySync  grouphere  whyTheory  "\<theory\>"

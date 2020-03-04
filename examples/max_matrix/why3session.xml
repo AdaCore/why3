@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="8">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.5.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="max_matrix.mlw"/>
 <theory name="MaxMatrixMemo" proved="true">
@@ -15,13 +16,13 @@
  <goal name="maximum&#39;vc" expl="VC for maximum" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="maximum&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="39"/></proof>
+  <proof prover="4"><result status="valid" time="0.04" steps="39"/></proof>
   </goal>
   <goal name="maximum&#39;vc.1" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.00" steps="8"/></proof>
   </goal>
   <goal name="maximum&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.00" steps="15"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="15"/></proof>
   </goal>
   <goal name="maximum&#39;vc.3" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.01" steps="54"/></proof>
@@ -29,26 +30,43 @@
   <goal name="maximum&#39;vc.4" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="maximum&#39;vc.4.0" expl="VC for maximum" proved="true">
-   <proof prover="4"><result status="valid" time="0.01" steps="21"/></proof>
+   <proof prover="5"><result status="valid" time="0.01" steps="39"/></proof>
    </goal>
    <goal name="maximum&#39;vc.4.1" expl="VC for maximum" proved="true">
+   <proof prover="4"><result status="valid" time="6.15" steps="4469"/></proof>
+   <transf name="remove" proved="true" arg1="real,bool,string,tuple0,unit,ref,map,mapii,key,value,zero,one,( * ),min,max,const,(!),is_none,size,below,create,permutation,table1,table2,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,is_none&#39;spec,below&#39;spec,cardinal_empty,cardinal_remove,cardinal_below,create&#39;spec,n&#39;def,m&#39;def,Sum_def_empty,Sum_right_extension,Sum_transitivity,Sum_eq,H5,H7,H8,Ensures1,H10,Ensures3,Ensures4,Ensures5,Ensures6">
+    <goal name="maximum&#39;vc.4.1.0" expl="VC for maximum" proved="true">
+    <proof prover="1"><result status="valid" time="0.08" steps="208659"/></proof>
+    <proof prover="4" timelimit="1"><result status="valid" time="1.05" steps="2398"/></proof>
+    <proof prover="5" timelimit="5"><result status="valid" time="1.38" steps="3772"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="maximum&#39;vc.5" expl="loop invariant preservation" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="maximum&#39;vc.5.0" expl="VC for maximum" proved="true">
+   <proof prover="5"><result status="valid" time="0.01" steps="33"/></proof>
+   </goal>
+   <goal name="maximum&#39;vc.5.1" expl="VC for maximum" proved="true">
    <transf name="right" proved="true" >
-    <goal name="maximum&#39;vc.4.1.0" expl="right case" proved="true">
-    <transf name="split_goal_right" proved="true" >
-     <goal name="maximum&#39;vc.4.1.0.0" expl="VC for maximum" proved="true">
-     <proof prover="3"><result status="valid" time="0.04" steps="9105"/></proof>
+    <goal name="maximum&#39;vc.5.1.0" expl="right case" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="maximum&#39;vc.5.1.0.0" expl="right case" proved="true">
+     <proof prover="5"><result status="valid" time="0.02" steps="85"/></proof>
      </goal>
-     <goal name="maximum&#39;vc.4.1.0.1" expl="VC for maximum" proved="true">
-     <proof prover="2"><result status="valid" time="0.10" steps="150831"/></proof>
+     <goal name="maximum&#39;vc.5.1.0.1" expl="right case" proved="true">
+     <proof prover="5"><result status="valid" time="0.02" steps="95"/></proof>
      </goal>
-     <goal name="maximum&#39;vc.4.1.0.2" expl="VC for maximum" proved="true">
-     <proof prover="4" timelimit="1"><result status="valid" time="0.03" steps="59"/></proof>
+     <goal name="maximum&#39;vc.5.1.0.2" expl="right case" proved="true">
+     <proof prover="5"><result status="valid" time="0.02" steps="102"/></proof>
      </goal>
-     <goal name="maximum&#39;vc.4.1.0.3" expl="VC for maximum" proved="true">
-     <proof prover="3"><result status="valid" time="0.06" steps="15481"/></proof>
+     <goal name="maximum&#39;vc.5.1.0.3" expl="right case" proved="true">
+     <proof prover="5"><result status="valid" time="0.08" steps="188"/></proof>
      </goal>
-     <goal name="maximum&#39;vc.4.1.0.4" expl="VC for maximum" proved="true">
-     <proof prover="4" memlimit="2000"><result status="valid" time="1.49" steps="1598"/></proof>
+     <goal name="maximum&#39;vc.5.1.0.4" expl="right case" proved="true">
+     <proof prover="4"><result status="valid" time="1.72" steps="1502"/></proof>
      </goal>
     </transf>
     </goal>
@@ -56,20 +74,32 @@
    </goal>
   </transf>
   </goal>
-  <goal name="maximum&#39;vc.5" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="2.49"/></proof>
-  </goal>
   <goal name="maximum&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.04" steps="146"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="maximum&#39;vc.6.0" expl="VC for maximum" proved="true">
+   <transf name="right" proved="true" >
+    <goal name="maximum&#39;vc.6.0.0" expl="VC for maximum" proved="true">
+    <transf name="split_goal_right" proved="true" >
+     <goal name="maximum&#39;vc.6.0.0.0" expl="VC for maximum" proved="true">
+     <proof prover="3"><result status="valid" time="0.06" steps="7987"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="maximum&#39;vc.6.1" expl="VC for maximum" proved="true">
+   <proof prover="4"><result status="valid" time="0.01" steps="146"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="maximum&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.01" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.03"/></proof>
   </goal>
   <goal name="maximum&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.08" steps="139"/></proof>
+  <proof prover="4"><result status="valid" time="0.00" steps="139"/></proof>
   </goal>
   <goal name="maximum&#39;vc.9" expl="out of loop bounds" proved="true">
-  <proof prover="4"><result status="valid" time="0.00" steps="7"/></proof>
+  <proof prover="4"><result status="valid" time="0.01" steps="7"/></proof>
   </goal>
  </transf>
  </goal>

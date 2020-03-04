@@ -1,0 +1,5 @@
+FROM python:3.8-alpine
+
+RUN apk add --no-cache graphviz make
+
+RUN pip install --no-cache-dir sphinx sphinxcontrib-bibtex

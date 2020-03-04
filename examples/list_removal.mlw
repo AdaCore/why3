@@ -1,0 +1,181 @@
+
+(** Removing an element from a singly-linked list.
+
+    Authors: Jean-Christophe Filliâtre (CNRS)
+
+  The following is inspired by this interview of Linus Torvalds:
+
+    https://www.youtube.com/watch?v=o8NPllzkFhE
+
+  Assume that you are given singly-linked lists in C, like this:
+
+    typedef struct Entry *entry;
+    struct Entry { entry next; };
+    typedef struct List { entry head; } *list;
+
+  That is, there is a header structure (struct List) with a 'head'
+  field to the first element of a singly-linked list of list cells
+  (struct Entry).
+
+  You are given a list 'l' and some entry 'e' that belongs to the list,
+  and you have to remove it from the list. There is a pedestrian way of
+  doing it, like this:
+
+    void remove(list l, entry e) {
+      entry prev = NULL, curr = l->head;
+      while (curr != e) {
+        prev = curr;
+        curr = curr->next;
+      }
+      if (prev)
+        prev->next = curr->next;
+      else
+        l->head = curr->next;
+    }
+
+  But there is another one which avoids making a particular case for the
+  first element, like this:
+
+    void remove2(list l, entry e) {
+      entry *ind = &l->head;
+      while ( *ind != e)
+        ind = &( *ind )->next;
+      *ind = ( *ind )->next;
+    }
+
+  In the following, we explore the loop invariants involved in the
+  verification of these two programs. We make the following two
+  simplifications:
+
+  - The memory model does not make a distinction between the two types of
+    structures. In practice, this is an important point in the discussion.
+    But here we are rather focusing on the loop invariants.
+
+  - In the function contract, we underspecify the problem, using only
+    the length of the list, not its contents.
+
+*)
+
+use int.Int
+use ref.Ref
+use map.Map
+
+(** Minimal memory model *)
+
+type loc
+val (=) (x y: loc) : bool ensures { result <-> x=y }
+
+type mem = loc -> loc
+val ref mem: mem
+
+val constant null: loc
+
+val constant head: loc
+val constant entry: loc (* the entry to be removed from the list *)
+
+(** Program global variables *)
+
+axiom head_is_not_null : head <> null
+axiom entry_is_not_null: entry <> null
+axiom head_is_not_entry: head <> entry
+
+(** Chains of pointers. *)
+
+(** When starting from `x` and dereferencing pointers `n` times we get `y` *)
+let rec predicate list (mem: loc -> loc) (x: loc) (n :int) (y: loc)
+  requires { n >= 0 }
+  variant  { n }
+= if n = 0 then x = y
+  else x <> null && list mem mem[x] (n - 1) y
+
+val get (x: loc) : loc
+  requires { x <> null }
+  ensures  { result = mem[x] }
+
+val set (x y: loc) : unit
+  requires { x <> null }
+  ensures  { mem = (old mem)[x <- y] }
+
+let rec lemma list_concat
+  (mem: mem) (x: loc) (n1: int) (y: loc) (n2: int) (z: loc)
+  requires { n1 >= 0 } requires { n2 >= 0 }
+  ensures { list mem x (n1 + 1 + n2) z <->
+            exists y. y <> null /\ list mem x n1 y /\ list mem mem[y] n2 z }
+  variant { n1 }
+= if n1 > 0 then list_concat mem mem[x] (n1-1) y n2 z
+
+lemma path_shorten:
+  forall mem x n y. list mem x n y -> n > 0 -> list mem mem[x] (n-1) y
+
+lemma path_extend:
+  forall mem x n y. n >= 0 -> list mem y n x -> x <> null ->
+  list mem y (n+1) mem[x]
+
+let rec lemma two_paths_means_cycle
+  (mem: mem) (h e: loc) (n1 n2: int)
+  requires { 0 <= n1 < n2 }
+  requires { list mem h n1 e } requires { list mem h n2 e }
+  ensures  { list mem e (n2 - n1) e }
+  variant  { n1 }
+= if n1 > 0 then two_paths_means_cycle mem mem[h] e (n1-1) (n2-1)
+
+let rec lemma no_cycle_to_null
+  (mem: mem) (e: loc) (n n': int)
+  requires { 0 < n } requires { 0 <= n' } requires { e <> null }
+  requires { list mem e n e }
+  requires { list mem e n' null } ensures { false }
+  variant  { n' }
+= if n' > 0 then begin
+    list_concat mem mem[e] (n-1) e 0 mem[e];
+    no_cycle_to_null mem mem[e] n (n' - 1)
+  end
+
+(* Code 1 *)
+
+let remove1 (ghost n1 n2: int) : unit
+  requires { n1 > 0 } requires { n2 >= 0 }
+  requires { list mem head  n1 entry }
+  requires { list mem entry n2 null }
+  ensures  { list mem head  (n1 + n2) null }
+= let ref prev = null in
+  let ref curr = get head in
+  let ghost ref n = 1 in
+  while curr <> entry do
+    invariant { 0 < n <= n1 }
+    invariant { list mem head n curr }
+    invariant { curr <> null }
+    invariant { prev <> null -> mem[prev] = curr }
+    invariant { prev <> null -> list mem head (n - 1) prev }
+    invariant { list mem curr (n1 - n) entry }
+    invariant { list mem entry n2 null }
+    variant   { n1 - n }
+    prev <- curr;
+    curr <- get curr;
+    n <- n + 1
+  done;
+  assert { n = n1 };
+  if prev = null then
+    set head (get curr)
+  else
+    set prev (get curr)
+
+(* Code 2 *)
+
+let remove2 (ghost n1 n2: int) : unit
+  requires { n1 > 0 } requires { n2 >= 0 }
+  requires { list mem head  n1 entry }
+  requires { list mem entry n2 null }
+  ensures  { list mem head  (n1 + n2) null }
+= let ref ind = head in
+  let ghost ref n = 1 in
+  while get ind <> entry do
+    invariant { 0 < n <= n1 }
+    invariant { ind <> null }
+    invariant { list mem head n mem[ind] }
+    invariant { list mem mem[ind] (n1 - n) entry }
+    invariant { list mem entry n2 null }
+    variant   { n1 - n }
+    ind <- get ind;
+    n <- n + 1
+  done;
+  set (get ind) (get (get ind))

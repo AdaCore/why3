@@ -8,7 +8,7 @@ module Valuation
   use number.Coprime
   use export number.Parity
 
-  let rec function valuation (n p: int)
+  let rec ghost function valuation (n p: int)
     requires { 1 < p }
     requires { 1 <= n }
     variant { n }

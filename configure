@@ -655,7 +655,7 @@ FRAMAC_SHARE
 FRAMAC_VERSION
 enable_frama_c
 enable_emacs_compilation
-enable_html_doc
+enable_pdf_doc
 enable_doc
 enable_hypothesis_selection
 ISABELLEVERSION
@@ -695,13 +695,15 @@ LABLGTKINCLUDE
 LABLGTKPKG
 LABLGTKLIB
 enable_ide
+STATMEMPROFPKG
+enable_statmemprof
 enable_profiling
+enable_ocamlfind
 OCAMLGRAPHLIB
 OCAMLINSTALLLIB
 OCAMLLIB
 OCAMLVERSION
 OCAMLBEST
-OCAMLFIND
 STRIP
 EXE
 enable_verbose_make
@@ -712,10 +714,9 @@ PVS
 COQDEP
 COQC
 EMACS
-HACHA
-HEVEA
 LATEX
-USEOCAMLFIND
+SPHINX
+OCAMLFIND
 MENHIR
 OCAMLDOCOPT
 OCAMLDOC
@@ -786,6 +787,7 @@ enable_relocation
 enable_native_code
 enable_why3_lib
 enable_zarith
+enable_ocamlfind
 enable_zip
 enable_js_of_ocaml
 enable_re
@@ -796,9 +798,10 @@ enable_pvs_libs
 enable_isabelle_libs
 enable_hypothesis_selection
 enable_doc
-enable_html_doc
+enable_html_pdf
 enable_frama_c
 enable_profiling
+enable_statmemprof
 enable_emacs_compilation
 '
       ac_precious_vars='build_alias
@@ -1424,6 +1427,7 @@ Optional Features:
   --disable-native-code   use only the byte-code compiler
   --disable-why3-lib      use an already installed Why3
   --disable-zarith        use Nums instead of Zarith for computations
+  --disable-ocamlfind     do not use Ocamlfind
   --disable-zip           do not use LZ compression to store session files
   --disable-js-of-ocaml   do not use js-of-ocaml
   --disable-re            use Str instead of Re for regular expressions
@@ -1435,9 +1439,10 @@ Optional Features:
   --disable-hypothesis-selection
                           do not support hypothesis selection
   --disable-doc           do not build documentation
-  --disable-html-doc      do not build HTML documentation
+  --disable-pdf-doc       do not build PDF documentation
   --enable-frama-c        enable Frama-C plugin
   --enable-profiling      enable profiling
+  --enable-statmemprof    enable statistical memory profiling
   --disable-emacs-compilation
                           do not compile why3.elc
 
@@ -1980,6 +1985,15 @@ else
 fi
 
 
+# ocamlfind
+
+# Check whether --enable-ocamlfind was given.
+if test "${enable_ocamlfind+set}" = set; then :
+  enableval=$enable_ocamlfind;
+else
+  enable_ocamlfind=yes
+fi
+
 
 # camlzip
 
@@ -2079,11 +2093,11 @@ else
 fi
 
 
-# Check whether --enable-html-doc was given.
-if test "${enable_html_doc+set}" = set; then :
-  enableval=$enable_html_doc;
+# Check whether --enable-html-pdf was given.
+if test "${enable_html_pdf+set}" = set; then :
+  enableval=$enable_html_pdf;
 else
-  enable_html_doc=yes
+  enable_pdf_doc=yes
 fi
 
 
@@ -2105,6 +2119,15 @@ if test "${enable_profiling+set}" = set; then :
   enableval=$enable_profiling;
 else
   enable_profiling=no
+fi
+
+
+# Check whether --enable-statmemprof was given.
+if test "${enable_statmemprof+set}" = set; then :
+  enableval=$enable_statmemprof;
+else
+  enable_statmemprof=no
+     reason_statmemprof=" (disabled by default)"
 fi
 
 
@@ -4013,18 +4036,18 @@ case $? in #(
      ;;
 esac
 
-## Where are the library we need
-# we look for ocamlfind; if not present, we just don't use it to find
-# libraries
-# Extract the first word of "ocamlfind", so it can be a program name with args.
+if test "$enable_ocamlfind" != yes; then
+   OCAMLFIND=no
+else
+   # Extract the first word of "ocamlfind", so it can be a program name with args.
 set dummy ocamlfind; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_USEOCAMLFIND+:} false; then :
+if ${ac_cv_prog_OCAMLFIND+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  if test -n "$USEOCAMLFIND"; then
-  ac_cv_prog_USEOCAMLFIND="$USEOCAMLFIND" # Let the user override the test.
+  if test -n "$OCAMLFIND"; then
+  ac_cv_prog_OCAMLFIND="$OCAMLFIND" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -4033,7 +4056,7 @@ do
   test -z "$as_dir" && as_dir=.
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_USEOCAMLFIND="yes"
+    ac_cv_prog_OCAMLFIND="ocamlfind"
     $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -4041,47 +4064,57 @@ done
   done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_prog_USEOCAMLFIND" && ac_cv_prog_USEOCAMLFIND="no"
+  test -z "$ac_cv_prog_OCAMLFIND" && ac_cv_prog_OCAMLFIND="no"
 fi
 fi
-USEOCAMLFIND=$ac_cv_prog_USEOCAMLFIND
-if test -n "$USEOCAMLFIND"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USEOCAMLFIND" >&5
-$as_echo "$USEOCAMLFIND" >&6; }
+OCAMLFIND=$ac_cv_prog_OCAMLFIND
+if test -n "$OCAMLFIND"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $OCAMLFIND" >&5
+$as_echo "$OCAMLFIND" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
 
+   if test "$OCAMLFIND" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (not found)"
+   else
+      OCAMLFINDLIB=$(ocamlfind printconf stdlib)
+      if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
+         OCAMLFIND=no
+         enable_ocamlfind=no
+         reason_ocamlfind=" (incompatible with OCaml)"
+         echo "but your ocamlfind is not compatible with your ocamlc:"
+         echo "ocamlfind: $OCAMLFINDLIB, ocamlc: $OCAMLLIB"
+      fi
+   fi
+fi
 
-if test "$USEOCAMLFIND" = yes; then
-   OCAMLFINDLIB=$(ocamlfind printconf stdlib)
-   OCAMLFIND=$(which ocamlfind)
-   #if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
-   #USEOCAMLFIND=no;
-   #echo "but your ocamlfind is not compatible with your ocamlc:"
-   #echo "ocamlfind : $OCAMLFINDLIB, ocamlc : $OCAMLLIB"
-   #fi
+#if ocamlfind is used it gives the install path for ocaml library
+if test "$enable_ocamlfind" = yes; then
+   OCAMLINSTALLLIB=$($OCAMLFIND printconf destdir)
+else
+   OCAMLINSTALLLIB=$OCAMLLIB
 fi
 
 if test "$enable_why3_lib" = yes ; then
    WHY3LIB=
-   WHY3INCLUDE="-I lib/why3"
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: checking For Why3" >&5
 $as_echo_n "checking For Why3... " >&6; }
-   if test "$USEOCAMLFIND" = no; then
+   if test "$enable_ocamlfind" = no; then
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
       as_fn_error $? "Cannot use --disable-why3-lib without ocamlfind." "$LINENO" 5
    fi
    WHY3LIB=why3
-   WHY3INCLUDE=$(ocamlfind query why3)
-   if test -n "$WHY3INCLUDE"; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $WHY3INCLUDE" >&5
-$as_echo "$WHY3INCLUDE" >&6; }
-      WHY3INCLUDE="-I $WHY3INCLUDE"
+   DIR=$($OCAMLFIND query why3)
+   if test -n "$DIR"; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DIR" >&5
+$as_echo "$DIR" >&6; }
+      WHY3INCLUDE="-I $DIR"
    else
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4095,19 +4128,9 @@ else
    LOCALDIR="${PWD}"
 fi
 
-#if ocamlfind is used it gives the install path for ocaml library
-if test "$USEOCAMLFIND" = yes; then
-   OCAMLINSTALLLIB=$(ocamlfind printconf destdir)
-   OCAMLFIND=ocamlfind
-else
-   OCAMLINSTALLLIB=$OCAMLLIB
-   OCAMLFIND=no
-fi
-
 # ppx
-
-if test "$USEOCAMLFIND" = yes; then
-  COMPILERLIBS=$(ocamlfind query compiler-libs)
+if test "$enable_ocamlfind" = yes; then
+  COMPILERLIBS=$($OCAMLFIND query compiler-libs)
   if test -n "$COMPILERLIBS"; then
     echo "ocamlfind found compiler-libs in $COMPILERLIBS"
     enable_ppx=yes
@@ -4119,9 +4142,60 @@ else
   enable_ppx=no
 fi
 
+# checking for sphinx
+if test "$enable_doc" = yes; then
+   # Extract the first word of "sphinx-build", so it can be a program name with args.
+set dummy sphinx-build; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_SPHINX+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$SPHINX"; then
+  ac_cv_prog_SPHINX="$SPHINX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_SPHINX="sphinx-build"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_SPHINX" && ac_cv_prog_SPHINX="no"
+fi
+fi
+SPHINX=$ac_cv_prog_SPHINX
+if test -n "$SPHINX"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $SPHINX" >&5
+$as_echo "$SPHINX" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+   if test "$SPHINX" = no; then
+      enable_doc=no
+      enable_pdf_doc=no
+      reason_doc=" (sphinx-build not found)"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find sphinx-build, Documentation disabled." >&5
+$as_echo "$as_me: WARNING: Cannot find sphinx-build, Documentation disabled." >&2;}
+   fi
+else
+   enable_pdf_doc=no
+fi
+
 # checking for rubber or latexmk or pdflatex
-if test "$enable_doc" = yes ; then
-   for ac_prog in rubber latexmk pdflatex
+if test "$enable_pdf_doc" = yes; then
+   for ac_prog in latexmk rubber pdflatex
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -4164,110 +4238,11 @@ fi
 done
 test -n "$LATEX" || LATEX="no"
 
-   if test "$LATEX" = no ; then
-      enable_doc=no
-      enable_html_doc=no
-      reason_doc=" ((rubber|latexmk|pdflatex) not found)"
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find any latex compiler, documentation disabled." >&5
-$as_echo "$as_me: WARNING: Cannot find any latex compiler, documentation disabled." >&2;}
-   fi
-else
-   enable_html_doc=no
-fi
-
-# checking for hevea (note that the pdf documentation DOES NOT use hevea.sty)
-if test "$enable_html_doc" = yes ; then
-   # Extract the first word of "hevea", so it can be a program name with args.
-set dummy hevea; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_HEVEA+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$HEVEA"; then
-  ac_cv_prog_HEVEA="$HEVEA" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_HEVEA="hevea"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_prog_HEVEA" && ac_cv_prog_HEVEA="no"
-fi
-fi
-HEVEA=$ac_cv_prog_HEVEA
-if test -n "$HEVEA"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HEVEA" >&5
-$as_echo "$HEVEA" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-   if test "$HEVEA" = no ; then
-      enable_html_doc=no
-      reason_html_doc=" (hevea not found)"
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find hevea, HTML documentation disabled." >&5
-$as_echo "$as_me: WARNING: Cannot find hevea, HTML documentation disabled." >&2;}
-   fi
-fi
-
-# checking for hacha
-if test "$enable_html_doc" = yes ; then
-   # Extract the first word of "hacha", so it can be a program name with args.
-set dummy hacha; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_HACHA+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$HACHA"; then
-  ac_cv_prog_HACHA="$HACHA" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_HACHA="hacha"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_prog_HACHA" && ac_cv_prog_HACHA="no"
-fi
-fi
-HACHA=$ac_cv_prog_HACHA
-if test -n "$HACHA"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HACHA" >&5
-$as_echo "$HACHA" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-   if test "$HACHA" = no ; then
-      enable_html_doc=no
-      reason_html_doc=" (hacha not found)"
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find hacha, HTML documentation disabled." >&5
-$as_echo "$as_me: WARNING: Cannot find hacha, HTML documentation disabled." >&2;}
+   if test "$LATEX" = no; then
+      enable_pdf_doc=no
+      reason_pdf_doc=" ((rubber|latexmk|pdflatex) not found)"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find any latex compiler, PDF documentation disabled." >&5
+$as_echo "$as_me: WARNING: Cannot find any latex compiler, PDF documentation disabled." >&2;}
    fi
 fi
 
@@ -4321,10 +4296,11 @@ fi
 # checking for Num
 # (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
 found_num=no
-if test "$USEOCAMLFIND" = yes; then
-   DIR=$(ocamlfind query num)
+if test "$enable_ocamlfind" = yes; then
+   DIR=$($OCAMLFIND query num)
    if test -n "$DIR"; then
       echo "ocamlfind found num in $DIR"
+      NUMPKG=num
       NUMINCLUDE="-I $DIR"
       found_num=yes
       as_ac_File=`$as_echo "ac_cv_file_$DIR/nums.cma" | $as_tr_sh`
@@ -4373,6 +4349,9 @@ else
   found_num=no
 fi
 
+   else
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find num)"
    fi
 fi
 if test "$found_num" = no; then
@@ -4433,11 +4412,13 @@ fi
 # checking for Zarith
 if test "$enable_zarith" = yes; then
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
+   if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query zarith)
       if test -n "$DIR"; then
          echo "ocamlfind found zarith in $DIR"
          BIGINTINCLUDE="-I $DIR"
+      else
+         ocamlfind_zarith=no
       fi
    fi
    if test -z "$DIR"; then
@@ -4494,6 +4475,9 @@ fi
       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib Zarith not found, using Nums instead." >&5
 $as_echo "$as_me: WARNING: Lib Zarith not found, using Nums instead." >&2;}
       reason_zarith=" (zarith not found)"
+   elif test "$ocamlfind_zarith" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find zarith)"
    fi
 fi
 
@@ -4509,11 +4493,13 @@ fi
 # checking for camlzip
 if test "$enable_zip" = yes; then
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
+   if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query zip)
       if test -n "DIR"; then
          echo "ocamlfind found camlzip in $DIR"
          ZIPINCLUDE="-I $DIR"
+      else
+         ocamlfind_zip=no
       fi
    fi
    if test -z "$DIR"; then
@@ -4570,6 +4556,9 @@ fi
       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib camlzip not found, sessions files will not be compressed." >&5
 $as_echo "$as_me: WARNING: Lib camlzip not found, sessions files will not be compressed." >&2;}
       reason_zip=" (camlzip not found)"
+   elif test "$ocamlfind_zip" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find camlzip)"
    fi
 fi
 
@@ -4583,11 +4572,14 @@ fi
 # checking for menhirlib
 found_menhirlib=yes
 DIR=
-if test "$USEOCAMLFIND" = yes; then
-   DIR=$(ocamlfind query menhirLib)
+if test "$enable_ocamlfind" = yes; then
+   DIR=$($OCAMLFIND query menhirLib)
    if test -n "$DIR"; then
       echo "ocamlfind found menhirLib in $DIR"
       MENHIRINCLUDE="-I $DIR"
+   else
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find menhirLib)"
    fi
 fi
 if test -z "$DIR"; then
@@ -4647,8 +4639,8 @@ fi
 # checking for seq
 # (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
 found_seq=no
-if test "$USEOCAMLFIND" = yes; then
-   DIR=$(ocamlfind query seq)
+if test "$enable_ocamlfind" = yes; then
+   DIR=$($OCAMLFIND query seq)
    if test -n "$DIR"; then
       echo "ocamlfind found seq in $DIR"
       SEQINCLUDE="-I $DIR"
@@ -4744,11 +4736,13 @@ fi
 if test "$enable_re" = yes; then
    found_re=yes
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
+   if test "$enable_ocamlfind" = yes; then
       DIR=$(ocamlfind query re)
       if test -n "$DIR"; then
          echo "ocamlfind found re in $DIR"
          REINCLUDE="-I $DIR"
+      else
+         ocamlfind_re=no
       fi
    fi
    if test -z "$DIR"; then
@@ -4805,14 +4799,17 @@ fi
       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Library re not found." >&5
 $as_echo "$as_me: WARNING: Library re not found." >&2;}
       enable_re=no
+   elif test "$ocamlfind_re" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find re)"
    fi
 fi
 
 if test "$enable_re" = no; then
-   REINCLUDE=""
-   RELIB="str"
+   REINCLUDE=
+   RELIB=str
 else
-   RELIB="re"
+   RELIB=re
 fi
 
 # checking for lablgtk3
@@ -4820,8 +4817,8 @@ if test "$enable_ide" != yes ; then
    reason_ide=" (disabled by user)"
 else
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query lablgtk3)
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query lablgtk3)
       if test -n "$DIR"; then
          echo "ocamlfind found lablgtk3 in $DIR"
          LABLGTKINCLUDE="-I $DIR -I +threads"
@@ -4830,7 +4827,8 @@ else
    if test -z "$DIR"; then
       LABLGTKINCLUDE="-I +lablgtk3 -I +threads"
       DIR="$OCAMLLIB/lablgtk3"
-      as_ac_File=`$as_echo "ac_cv_file_$DIR/lablgtk.cma" | $as_tr_sh`
+   fi
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/lablgtk.cma" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/lablgtk.cma" >&5
 $as_echo_n "checking for $DIR/lablgtk.cma... " >&6; }
 if eval \${$as_ac_File+:} false; then :
@@ -4848,12 +4846,30 @@ eval ac_res=\$$as_ac_File
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-
-else
-  enable_ide=no
+  LABLGTKLIB="threads lablgtk"
 fi
 
-   fi
+   as_ac_File=`$as_echo "ac_cv_file_$DIR/lablgtk3.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/lablgtk3.cma" >&5
+$as_echo_n "checking for $DIR/lablgtk3.cma... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/lablgtk3.cma"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  LABLGTKLIB="threads lablgtk3"
+fi
+
    as_ac_File=`$as_echo "ac_cv_file_$DIR/gtkButton.cmi" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/gtkButton.cmi" >&5
 $as_echo_n "checking for $DIR/gtkButton.cmi... " >&6; }
@@ -4874,11 +4890,13 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 else
-  enable_ide=no
+  LABLGTKLIB=""
 fi
 
-   if test "$enable_ide" = yes; then
+   if test -n "$LABLGTKLIB"; then
       GTKVERSION=3
+      LIB_SOURCEVIEW=lablgtk3_sourceview3
+      PKG_SOURCEVIEW=lablgtk3-sourceview3
       reason_ide=" (gtk3)"
    else
       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib lablgtk3 not found, trying lablgtk2." >&5
@@ -4891,8 +4909,8 @@ fi
 if test "$enable_ide" = retry; then
    enable_ide=yes
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query lablgtk2)
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query lablgtk2)
       if test -n "$DIR"; then
          echo "ocamlfind found lablgtk2 in $DIR"
          LABLGTKINCLUDE="-I $DIR"
@@ -4950,6 +4968,9 @@ fi
 
    if test "$enable_ide" = yes; then
       GTKVERSION=2
+      LABLGTKLIB=lablgtk
+      LIB_SOURCEVIEW=lablgtksourceview2
+      PKG_SOURCEVIEW=lablgtk2.sourceview2
       reason_ide=" (gtk2)"
    else
       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib lablgtk2 not found, IDE disabled." >&5
@@ -4961,41 +4982,63 @@ fi
 # checking for lablgtksourceview
 if test "$enable_ide" = yes ; then
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      case $GTKVERSION in
-        2)
-           LIB_SOURCEVIEW=lablgtksourceview2
-           PKG_SOURCEVIEW=lablgtk2.sourceview2
-           DIR=$(ocamlfind query $PKG_SOURCEVIEW)
-           if test -z "$DIR"; then
-              PKG_SOURCEVIEW=lablgtksourceview2
-              DIR=$(ocamlfind query $PKG_SOURCEVIEW)
-           fi
-           ;;
-        3)
-           LIB_SOURCEVIEW=lablgtk3_sourceview3
-           PKG_SOURCEVIEW=lablgtk3-sourceview3
-           DIR=$(ocamlfind query $PKG_SOURCEVIEW)
-           ;;
-        *)
-           as_fn_error $? "Unknown gtk version $GTKVERSION" "$LINENO" 5
-           ;;
-      esac
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query $PKG_SOURCEVIEW)
+      if test -z "$DIR"; then
+         case $GTKVERSION in
+            2)
+                PKG_SOURCEVIEW=lablgtksourceview2
+                DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+                ;;
+            3)
+                PKG_SOURCEVIEW=lablgtksourceview3
+                DIR=$(ocamlfind query $PKG_SOURCEVIEW)
+                ;;
+         esac
+      fi
       if test -n "$DIR";then
          echo "ocamlfind found $PKG_SOURCEVIEW in $DIR"
       fi
    fi
    if test -z "$DIR"; then
       DIR="$OCAMLLIB/lablgtk$GTKVERSION"
-      as_ac_File=`$as_echo "ac_cv_file_$DIR/lablgtksourceview$GTKVERSION.cma" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/lablgtksourceview$GTKVERSION.cma" >&5
-$as_echo_n "checking for $DIR/lablgtksourceview$GTKVERSION.cma... " >&6; }
+      LIB_SOURCEVIEW="lablgtksourceview$GTKVERSION"
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/$LIB_SOURCEVIEW.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/$LIB_SOURCEVIEW.cma" >&5
+$as_echo_n "checking for $DIR/$LIB_SOURCEVIEW.cma... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$DIR/lablgtksourceview$GTKVERSION.cma"; then
+if test -r "$DIR/$LIB_SOURCEVIEW.cma"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  DIR=""
+fi
+
+   fi
+   if test -z "$DIR"; then
+      DIR="$OCAMLLIB/lablgtk$GTKVERSION-sourceview$GTKVERSION"
+      LIB_SOURCEVIEW="lablgtk${GTKVERSION}_sourceview$GTKVERSION"
+      as_ac_File=`$as_echo "ac_cv_file_$DIR/$LIB_SOURCEVIEW.cma" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $DIR/$LIB_SOURCEVIEW.cma" >&5
+$as_echo_n "checking for $DIR/$LIB_SOURCEVIEW.cma... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$DIR/$LIB_SOURCEVIEW.cma"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -5044,19 +5087,8 @@ $as_echo "$as_me: WARNING: Lib lablgtksourceview not found, IDE disabled." >&2;}
 fi
 
 if test "$enable_ide" = yes ; then
-   case $GTKVERSION in
-        2)
-           LABLGTKLIB="lablgtk"
-           ;;
-        3)
-           LABLGTKLIB="threads lablgtk3"
-           ;;
-        *)
-           as_fn_error $? "Unknown gtk version $GTKVERSION" "$LINENO" 5
-           ;;
-      esac
    LABLGTKLIB="$LABLGTKLIB $LIB_SOURCEVIEW"
-   LABLGTKPKG="lablgtk$GTKVERSION lablgtk$GTKVERSION.init $PKG_SOURCEVIEW"
+   LABLGTKPKG="lablgtk$GTKVERSION $PKG_SOURCEVIEW"
 else
    LABLGTKLIB=
    LABLGTKPKG=
@@ -5068,11 +5100,13 @@ fi
 # checking for ocamlgraph
 if test "$enable_hypothesis_selection" = yes; then
    DIR=
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query ocamlgraph)
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query ocamlgraph)
       if test -n "$DIR"; then
          echo "ocamlfind found ocamlgraph in $DIR"
          OCAMLGRAPHLIB="$DIR"
+      else
+         ocamlfind_ocamlgraph=no
       fi
    fi
    if test -z "$DIR"; then
@@ -5129,7 +5163,16 @@ fi
       reason_hypothesis_selection=" (ocamlgraph not found)"
       { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Lib ocamlgraph not found, hypothesis selection disabled." >&5
 $as_echo "$as_me: WARNING: Lib ocamlgraph not found, hypothesis selection disabled." >&2;}
+   elif test "$ocamlfind_ocamlgraph" = no; then
+      enable_ocamlfind=no
+      reason_ocamlfind=" (unable to find ocamlgraph)"
    fi
+fi
+
+# temporary until #453 is fixed
+if test "$enable_hypothesis_selection" = yes -a "$enable_ocamlfind" = yes; then
+   enable_hypothesis_selection=no
+   reason_hypothesis_selection=" (ocamlfind used)"
 fi
 
 if test "$enable_hypothesis_selection" = yes; then
@@ -5142,16 +5185,16 @@ fi
 # checking for js_of_ocaml
 if test "$enable_js_of_ocaml" != yes; then
    reason_js_of_ocaml=" (disabled by user)"
-elif test "$USEOCAMLFIND" != yes; then
+elif test "$enable_ocamlfind" != yes; then
    enable_js_of_ocaml=no
    reason_js_of_ocaml=" (ocamlfind not available)"
 else
-   JSOFOCAML=$(ocamlfind query js_of_ocaml)
+   JSOFOCAML=$($OCAMLFIND query js_of_ocaml)
    if test -z "$JSOFOCAML"; then
       enable_js_of_ocaml=no
       reason_js_of_ocaml=" (js_of_ocaml not found)"
    else
-      JSOFOCAMLPPX=$(ocamlfind query js_of_ocaml-ppx)
+      JSOFOCAMLPPX=$($OCAMLFIND query js_of_ocaml-ppx)
       if test -z "$JSOFOCAMLPPX"; then
          enable_js_of_ocaml=no
          reason_js_of_ocaml=" (js_of_ocaml-ppx not found)"
@@ -5174,8 +5217,8 @@ if test "$enable_js_of_ocaml" != no; then
    found_mlmpfr=no
    reason_mlmpfr=" (Cannot allow mlmpfr with js_of_ocaml) "
 else
-   if test "$USEOCAMLFIND" = yes; then
-      DIR=$(ocamlfind query mlmpfr)
+   if test "$enable_ocamlfind" = yes; then
+      DIR=$($OCAMLFIND query mlmpfr)
       if test -n "$DIR"; then
          echo "ocamlfind found mlmpfr in $DIR"
          # Test that mpfr version is higher than 4.0.0 (because of
@@ -5215,11 +5258,11 @@ fi
             found_mlmpfr=no
          fi
       else
-         reason_mlmpfr=" (Could not find mlmpfr) "
+         reason_mlmpfr=" (mlmpfr not found)"
          found_mlmpfr=no
       fi
    else
-      reason_mlmpfr=" (Should use ocamlfind to use mlmpfr) "
+      reason_mlmpfr=" (ocamlfind not available) "
       found_mlmpfr=no
    fi
 fi
@@ -5228,6 +5271,20 @@ if test "$found_mlmpfr" = no; then
    MLMPFR=
 fi
 
+# checking for statmemprof
+if test "$enable_statmemprof" = yes; then
+   if test "$enable_ocamlfind" != yes; then
+      enable_statmemprof=no
+      reason_statmemprof=" (ocamlfind not available)"
+   else
+      DIR=$($OCAMLFIND query statmemprof-emacs)
+      if test -z "$DIR"; then
+         enable_statmemprof=no
+         reason_statmemprof=" (statmemprof-emacs not found)"
+      fi
+      STATMEMPROFPKG=statmemprof-emacs
+   fi
+fi
 
 # Coq
 
@@ -5297,9 +5354,6 @@ $as_echo_n "checking Coq version... " >&6; }
 $as_echo "$COQVERSION" >&6; }
 
    case $COQVERSION in
-      8.5*)
-         coq_compat_version="COQ85"
-         ;;
       8.6*)
          coq_compat_version="COQ86"
          ;;
@@ -5312,11 +5366,17 @@ $as_echo "$COQVERSION" >&6; }
       8.9*)
          coq_compat_version="COQ89"
          ;;
+      8.10*)
+         coq_compat_version="COQ810"
+         ;;
+      8.11*)
+         coq_compat_version="COQ811"
+         ;;
       *)
          enable_coq_support=no
-         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You need Coq 8.5 or later; Coq discarded" >&5
-$as_echo "$as_me: WARNING: You need Coq 8.5 or later; Coq discarded" >&2;}
-         reason_coq_support=" (version is $COQVERSION but need version 8.5 or later)"
+         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You need Coq 8.6 or later; Coq discarded" >&5
+$as_echo "$as_me: WARNING: You need Coq 8.6 or later; Coq discarded" >&2;}
+         reason_coq_support=" (need version >= 8.6)"
          ;;
    esac
 fi
@@ -5474,7 +5534,7 @@ fi
 
 # Default version used for generation of realization in the case Isabelle is not
 # detected or Why3 is compiled with disable-isabelle.
-ISABELLEVERSION=2018
+ISABELLEVERSION=2019
 
 if test "$enable_isabelle_libs" = no; then
     enable_isabelle_support=no
@@ -5535,9 +5595,9 @@ $as_echo_n "checking Isabelle version... " >&6; }
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ISABELLEDETECTEDVERSION" >&5
 $as_echo "$ISABELLEDETECTEDVERSION" >&6; }
                 ;;
-          2017*)
+          2019*)
 	        enable_isabelle_support=yes
-                ISABELLEVERSION=2017
+                ISABELLEVERSION=2019
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ISABELLEDETECTEDVERSION" >&5
 $as_echo "$ISABELLEDETECTEDVERSION" >&6; }
                 ;;
@@ -5545,9 +5605,9 @@ $as_echo "$ISABELLEDETECTEDVERSION" >&6; }
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ISABELLEDETECTEDVERSION" >&5
 $as_echo "$ISABELLEDETECTEDVERSION" >&6; }
                 enable_isabelle_support=no
-	        { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You need Isabelle 2017 or later; Isabelle discarded" >&5
-$as_echo "$as_me: WARNING: You need Isabelle 2017 or later; Isabelle discarded" >&2;}
-                reason_isabelle_support=" (need version >= 2017)"
+	        { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You need Isabelle 2018 or later; Isabelle discarded" >&5
+$as_echo "$as_me: WARNING: You need Isabelle 2018 or later; Isabelle discarded" >&2;}
+                reason_isabelle_support=" (need version >= 2018)"
                 ;;
         esac
     fi
@@ -5754,10 +5814,14 @@ VERSION=$PACKAGE_VERSION
 
 
 
+
+
+
+
 # Finally create the Makefile from Makefile.in
 ac_config_files="$ac_config_files Makefile"
 
-ac_config_files="$ac_config_files src/config.sh doc/version.tex"
+ac_config_files="$ac_config_files src/config.sh"
 
 ac_config_files="$ac_config_files lib/why3/META"
 
@@ -6485,7 +6549,6 @@ do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/config.sh") CONFIG_FILES="$CONFIG_FILES src/config.sh" ;;
-    "doc/version.tex") CONFIG_FILES="$CONFIG_FILES doc/version.tex" ;;
     "lib/why3/META") CONFIG_FILES="$CONFIG_FILES lib/why3/META" ;;
     ".merlin") CONFIG_FILES="$CONFIG_FILES .merlin" ;;
     "src/jessie/Makefile") CONFIG_FILES="$CONFIG_FILES src/jessie/Makefile" ;;
@@ -6923,7 +6986,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
   case $ac_file$ac_mode in
     "chmod":C) chmod a-w Makefile src/jessie/Makefile;
-chmod a-w src/config.sh doc/version.tex;
+chmod a-w src/config.sh;
 chmod a-w lib/why3/META;
 chmod a-w .merlin;
 chmod a-w src/jessie/Makefile;
@@ -6979,8 +7042,10 @@ echo "Verbose make                : $enable_verbose_make"
 echo "OCaml compiler              : yes"
 echo "    Version                 : $OCAMLVERSION"
 echo "    Library path            : $OCAMLLIB"
+echo "    Ocamlfind               : $enable_ocamlfind$reason_ocamlfind"
 echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
+echo "    Memory profiling        : $enable_statmemprof$reason_statmemprof"
 echo "    PPX                     : $enable_ppx$reason_ppx"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
@@ -7000,8 +7065,8 @@ if test "$enable_frama_c" = yes ; then
 fi
 echo "Documentation               : $enable_doc$reason_doc"
 if test "$enable_doc" = yes ; then
-   echo "    PDF                     : with $LATEX"
-   echo "    HTML                    : $enable_html_doc$reason_html_doc"
+   echo "    HTML                    : yes"
+   echo "    PDF                     : $enable_pdf_doc$reason_pdf_doc"
 fi
 echo "Support for interactive proof assistants"
 echo "    Coq                     : $enable_coq_support$reason_coq_support"

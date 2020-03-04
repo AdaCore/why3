@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "http://why3.lri.fr/why3session.dtd">
-<why3session shape_version="8">
+<why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -58,130 +58,137 @@
  <goal name="String.at_length" proved="true">
  <proof prover="0"><result status="valid" time="0.05" steps="2982"/></proof>
  </goal>
+ <goal name="String.concat_at" proved="true">
+ <proof prover="0"><result status="valid" time="0.07" steps="11049"/></proof>
+ </goal>
  <goal name="String.substring_out_of_range" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="3051"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="3713"/></proof>
  </goal>
  <goal name="String.substring_of_length_zero_or_less" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="3257"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="3919"/></proof>
  </goal>
  <goal name="String.substring_of_empty" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="2132"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="2779"/></proof>
  </goal>
  <goal name="String.substring_smaller" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="3648"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="4310"/></proof>
  </goal>
  <goal name="String.substring_smaller_x" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="3863"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="4540"/></proof>
  </goal>
  <goal name="String.substring_length" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="4407"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="5265"/></proof>
  </goal>
  <goal name="String.substring_at" proved="true">
- <proof prover="0"><result status="valid" time="0.02" steps="2979"/></proof>
+ <proof prover="0"><result status="valid" time="0.02" steps="3642"/></proof>
+ </goal>
+ <goal name="String.substring_substring" proved="true">
+ <proof prover="0"><result status="valid" time="0.08" steps="10786"/></proof>
+ </goal>
+ <goal name="String.concat_substring" proved="true">
+ <proof prover="0"><result status="valid" time="0.08" steps="13750"/></proof>
  </goal>
  <goal name="String.prefixof_substring" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="3206"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="5422"/></proof>
  </goal>
  <goal name="String.prefixof_concat" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="3279"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="5495"/></proof>
  </goal>
  <goal name="String.prefixof_empty" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="3301"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="5517"/></proof>
  </goal>
  <goal name="String.prefixof_empty2" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="3385"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="5601"/></proof>
  </goal>
  <goal name="String.suffixof_substring" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="3726"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="5942"/></proof>
  </goal>
  <goal name="String.suffixof_concat" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="3825"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="6041"/></proof>
  </goal>
  <goal name="String.suffixof_empty" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="3847"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="6063"/></proof>
  </goal>
  <goal name="String.suffixof_empty2" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="3931"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="6147"/></proof>
  </goal>
  <goal name="String.contains_prefixof" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="5708"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="8036"/></proof>
  </goal>
  <goal name="String.contains_suffixof" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="6073"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="8401"/></proof>
  </goal>
  <goal name="String.contains_empty" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="4626"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="6842"/></proof>
  </goal>
  <goal name="String.contains_empty2" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="4648"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="6864"/></proof>
  </goal>
  <goal name="String.contains_substring" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="6656"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="8984"/></proof>
  </goal>
  <goal name="String.contains_concat" proved="true">
- <proof prover="0"><result status="valid" time="0.03" steps="4964"/></proof>
+ <proof prover="0"><result status="valid" time="0.03" steps="7180"/></proof>
  </goal>
  <goal name="String.contains_at" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="5226"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="7442"/></proof>
  </goal>
  <goal name="String.indexof_empty" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="6540"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="8868"/></proof>
  </goal>
  <goal name="String.indexof_empty1" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="7177"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="9505"/></proof>
  </goal>
  <goal name="String.indexof_contains" proved="true">
- <proof prover="0"><result status="valid" time="0.08" steps="10936"/></proof>
+ <proof prover="0"><result status="valid" time="0.08" steps="13264"/></proof>
  </goal>
  <goal name="String.contains_indexof" proved="true">
- <proof prover="0"><result status="valid" time="0.07" steps="10774"/></proof>
+ <proof prover="0"><result status="valid" time="0.07" steps="13102"/></proof>
  </goal>
  <goal name="String.not_contains_indexof" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="10984"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="13312"/></proof>
  </goal>
  <goal name="String.substring_indexof" proved="true">
- <proof prover="0"><result status="valid" time="0.15" steps="15678"/></proof>
+ <proof prover="0"><result status="valid" time="0.15" steps="18006"/></proof>
  </goal>
  <goal name="String.indexof_out_of_range" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="9348"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="11676"/></proof>
  </goal>
  <goal name="String.indexof_in_range" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="9899"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="12227"/></proof>
  </goal>
  <goal name="String.indexof_contains_substring" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="10460"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="12788"/></proof>
  </goal>
  <goal name="String.replace_empty" proved="true">
- <proof prover="0"><result status="valid" time="0.04" steps="8304"/></proof>
+ <proof prover="0"><result status="valid" time="0.04" steps="10520"/></proof>
  </goal>
  <goal name="String.replace_not_contains" proved="true">
- <proof prover="0"><result status="valid" time="0.07" steps="10948"/></proof>
+ <proof prover="0"><result status="valid" time="0.07" steps="13276"/></proof>
  </goal>
  <goal name="String.replace_empty2" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="10176"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="12504"/></proof>
  </goal>
  <goal name="String.replace_substring_indexof" proved="true">
- <proof prover="0"><result status="valid" time="0.15" steps="21449"/></proof>
+ <proof prover="0"><result status="valid" time="0.15" steps="23777"/></proof>
  </goal>
  <goal name="String.replaceall_empty1" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="11769"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="14097"/></proof>
  </goal>
  <goal name="String.not_contains_replaceall" proved="true">
- <proof prover="0"><result status="valid" time="0.16" steps="32887"/></proof>
+ <proof prover="0"><result status="valid" time="0.16" steps="50363"/></proof>
  </goal>
  <goal name="String.to_int_gt_minus_1" proved="true">
- <proof prover="0"><result status="valid" time="0.06" steps="11539"/></proof>
+ <proof prover="0"><result status="valid" time="0.06" steps="13867"/></proof>
  </goal>
  <goal name="String.to_int_empty" proved="true">
- <proof prover="0"><result status="valid" time="0.05" steps="10265"/></proof>
+ <proof prover="0"><result status="valid" time="0.05" steps="12481"/></proof>
  </goal>
  <goal name="String.from_int_negative" proved="true">
- <proof prover="0"><result status="valid" time="0.09" steps="11503"/></proof>
+ <proof prover="0"><result status="valid" time="0.09" steps="13831"/></proof>
  </goal>
  <goal name="String.from_int_to_int" proved="true">
- <proof prover="0"><result status="unknown" time="0.19" steps="35474"/></proof>
- <proof prover="1"><result status="valid" time="0.02" steps="11516"/></proof>
- <proof prover="2"><result status="unknown" time="0.03"/></proof>
+ <proof prover="1"><result status="valid" time="0.02" steps="13977"/></proof>
  </goal>
 </theory>
 </file>

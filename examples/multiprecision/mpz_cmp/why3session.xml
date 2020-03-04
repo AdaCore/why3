@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="3" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="4" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="5" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="2000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="mpz_cmp.mlw"/>
+<theory name="Zcmp" proved="true">
+ <goal name="wmpz_cmp&#39;vc" expl="VC for wmpz_cmp" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="wmpz_cmp&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05" steps="21"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.2" expl="integer overflow" proved="true">
+  <proof prover="4"><result status="valid" time="0.01" steps="23"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.13" steps="19415"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.32" steps="411"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.34" steps="452"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.02" steps="31"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="130"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.13" steps="14250"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.05" steps="16172"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.28" steps="363"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.19" steps="285"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04" steps="83"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.14" steps="274"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.14" expl="precondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.06" steps="15826"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.15" expl="precondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.10" steps="15865"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.16" expl="precondition" proved="true">
+  <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.04" steps="95"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.08" steps="17051"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.18" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04" steps="98"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.19" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05" steps="98"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.20" expl="integer overflow" proved="true">
+  <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.31" steps="396"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.21" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.12"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.22" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="1.61" steps="884"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.23" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="2.97" steps="951"/></proof>
+  </goal>
+  <goal name="wmpz_cmp&#39;vc.24" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="4.26" steps="1752"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="wmpz_cmp_ui&#39;vc" expl="VC for wmpz_cmp_ui" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="wmpz_cmp_ui&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.12" steps="15302"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.16"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.2" expl="postcondition" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.20" steps="16002"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.06" steps="153"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.07" steps="136"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="27"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04" steps="53"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.04"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.14" steps="15853"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.06" steps="15215"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.11" expl="postcondition" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.22" steps="23367"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.12" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="1.11" steps="512"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.03" steps="67"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.14" expl="postcondition" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.12" steps="15312"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.15" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.10" steps="23411"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.16" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.02"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.17" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="1.25" steps="522"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.09" steps="15349"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.20" steps="23269"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.20" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.11" steps="67"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.21" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.05" steps="68"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.22" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="2.07" steps="500"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.23" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="35"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.24" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="209"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.25" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.10" steps="206"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_ui&#39;vc.26" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.08" steps="16143"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="wmpz_cmp_si&#39;vc" expl="VC for wmpz_cmp_si" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="wmpz_cmp_si&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.10" steps="15330"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.1" expl="integer overflow" proved="true">
+  <proof prover="4"><result status="valid" time="0.10" steps="201"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.2" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.07" steps="31"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.08" steps="16095"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.4" expl="integer overflow" proved="true">
+  <proof prover="4"><result status="valid" time="0.06" steps="237"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.20" steps="19592"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.26" steps="655"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.19" steps="527"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02" steps="322"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.02" steps="35"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.09" steps="66"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="1" timelimit="1"><result status="valid" time="0.08" steps="14945"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.03" steps="61"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.14" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.10" steps="62"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.15" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.16" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.03" steps="75"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.17" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.03" steps="76"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="3.55" steps="837"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.14" steps="23747"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.20" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="1.23" steps="541"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.21" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="1.79" steps="682"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.22" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.03" steps="79"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.23" expl="integer overflow" proved="true">
+  <proof prover="4"><result status="valid" time="0.10" steps="250"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.24" expl="postcondition" proved="true">
+  <proof prover="1" memlimit="2000"><result status="valid" time="0.12" steps="24108"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.25" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="1.84" steps="670"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.26" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="1.09" steps="420"/></proof>
+  </goal>
+  <goal name="wmpz_cmp_si&#39;vc.27" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.04" steps="81"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="wmpz_sgn&#39;vc" expl="VC for wmpz_sgn" proved="true">
+ <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="932"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

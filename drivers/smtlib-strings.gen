@@ -18,6 +18,7 @@ theory string.String
   remove prop at_out_of_range
   remove prop at_empty
   remove prop at_length
+  remove prop concat_at
   remove prop substring_out_of_range
   remove prop substring_of_length_zero_or_less
   remove prop substring_of_empty
@@ -63,7 +64,7 @@ theory string.String
   syntax function indexof    "(str.indexof %1 %2 %3)"
   syntax function replace    "(str.replace %1 %2 %3)"
   syntax function substring  "(str.substr %1 %2 %3)"
-  syntax function ([])       "(str.at %1 %2)"
+  syntax function s_at       "(str.at %1 %2)"
   syntax predicate contains  "(str.contains %1 %2)"
   syntax predicate prefixof  "(str.prefixof %1 %2)"
   syntax predicate suffixof  "(str.suffixof %1 %2)"
@@ -83,7 +84,7 @@ theory string.StringRealization
   syntax function indexof    "(str.indexof %1 %2 %3)"
   syntax function replace    "(str.replace %1 %2 %3)"
   syntax function substring  "(str.substr %1 %2 %3)"
-  syntax function ([])       "(str.at %1 %2)"
+  syntax function s_at       "(str.at %1 %2)"
   syntax predicate contains  "(str.contains %1 %2)"
   syntax predicate prefixof  "(str.prefixof %1 %2)"
   syntax predicate suffixof  "(str.suffixof %1 %2)"

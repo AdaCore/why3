@@ -43,7 +43,7 @@ outofmemory "(error \".*out of memory\")\\|Cannot allocate memory"
 timeout "interrupted by timeout"
 steps "smt::SmtEngine::resourceUnitsUsed, \\([0-9]+.?[0-9]*\\)" 1
 (**
-Unfortunately, there is no specific output message when CVC4 reaches its resource limit
+Unfortunately, there is no specific output message when CVC4 (<1.6) reaches its resource limit
 steplimitexceeded "??"
 *)
 

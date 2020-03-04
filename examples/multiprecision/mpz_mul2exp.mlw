@@ -1,0 +1,263 @@
+module Zmul2exp
+
+use int.Int
+use int.EuclideanDivision
+use int.Power
+use map.Map
+use mach.int.Int32GMP
+use ref.Ref
+use mach.c.C
+use lemmas.Lemmas
+use util.Util
+use util.UtilOld
+use ptralias.Alias
+use compare.Compare
+use import mach.int.UInt64GMP as Limb
+use types.Types
+use logical.LogicalUtil
+use logical.Logical
+use logical.LogicalOld as OL
+use int.Abs
+use mpz.Z
+use mpz.Zutil
+
+let wmpz_mul2exp (r u:mpz_ptr) (cnt: limb) : unit
+  requires { mpz.alloc[r] >= 1 /\ mpz.alloc[u] >= 1 }
+  requires { mpz.readers[r] = 0 /\ mpz.readers[u] = 0 }
+  requires { mpz.abs_size[u] + div cnt 64 + 1 <= max_int32 }
+  ensures  { value_of r mpz = old (value_of u mpz * power 2 cnt) }
+  ensures  { forall x. x <> r -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[r] = 0 /\ mpz.readers[u] = 0 }
+=
+  let ghost ompz = pure { mpz } in
+  let un = abs_size_of u in
+  let limb_cnt = Limb.to_int32 (cnt / 64) in
+  let ref rn = un + limb_cnt in
+  if un = 0 then set_size_0 r
+  else begin
+    let rp = wmpz_realloc r (rn + 1) in
+    let c = cnt % 64 in
+    assert { cnt = 64 * limb_cnt + c };
+    assert { power 2 cnt = power 2 c * power radix limb_cnt
+             by power 2 cnt
+                = power 2 (64 * limb_cnt) * power 2 c
+                = power (power 2 64) limb_cnt * power 2 c
+                = power radix limb_cnt * power 2 c};
+    if mpz_eq u r
+    then begin
+      assert { value rp un = old (mpz.abs_value_of[u]) by rn+1 >= un };
+      if c <> 0
+      then begin
+        let rl = C.incr rp limb_cnt in
+        label Shift in
+        let rlimb = wmpn_lshift rl rp un c in
+        value_concat rp limb_cnt rn;
+        assert { value rp rn
+                 = value rp limb_cnt
+                    + power radix limb_cnt * value rl un };
+        assert { value rl un + power radix un * rlimb
+                 = old (mpz.abs_value_of[u] * power 2 c) };
+        label Set in
+        value_sub_update_no_change (pelts rp) (int32'int rn)
+                                   0 (int32'int rn) rlimb;
+        value_sub_update_no_change (pelts rp) (int32'int rn)
+                                   0 (int32'int limb_cnt) rlimb;
+        assert { value rp limb_cnt = value rp limb_cnt at Set };
+        assert { value rp rn = value rp rn at Set };
+        C.set_ofs rp rn rlimb;
+        value_tail rp rn;
+        assert { value rp (rn + 1)
+                 = value rp limb_cnt
+                   + power radix limb_cnt
+                     * old (mpz.abs_value_of[u] * power 2 c)
+                 = value rp limb_cnt
+                   + power 2 cnt * old mpz.abs_value_of[u]
+                 by value rp (rn+1)
+                    = value rp rn + power radix rn * rlimb
+                    = value rp rn at Set + power radix rn * rlimb
+                    = value rp rn at Set
+                      + power radix limb_cnt * power radix un * rlimb
+                    = (value rp limb_cnt
+                      + power radix limb_cnt * value rl un) at Set
+                      + power radix limb_cnt * power radix un * rlimb
+                    = value rp limb_cnt + power radix limb_cnt
+                      * old (mpz.abs_value_of[u] * power 2 c) };
+        value_concat rp limb_cnt rn;
+        rn <- rn + (if rlimb <> 0 then 1 else 0);
+        assert { value rp rn =
+                 value rp limb_cnt + power 2 cnt * old (mpz.abs_value_of[u]) };
+        assert { value rp rn >= value rp limb_cnt + power radix (rn - 1)
+                 by if rlimb <> 0
+                 then value rp rn
+                      = value rp (rn - 1) + power radix (rn - 1) * rlimb
+                      >= value rp limb_cnt + power radix (rn - 1) * rlimb
+                      >= value rp limb_cnt + power radix (rn - 1)
+                      by value rp (rn - 1)
+                         = value rp limb_cnt
+                            + power radix limb_cnt
+                              * value_sub (pelts rp) limb_cnt (rn - 1)
+                         >= value rp limb_cnt
+                      so power radix (rn - 1) = power radix (rn - 1) * 1
+                         <= power radix (rn - 1) * rlimb
+                 else old mpz.abs_value_of[u] >= power radix (un - 1)
+                      so rn = un + limb_cnt
+                      so power 2 cnt * old (mpz.abs_value_of[u])
+                         >= power 2 cnt * old (mpz.abs_value_of[u])
+                         >= power 2 cnt * power radix (un-1)
+                         = power 2 c * (power radix limb_cnt
+                           * power radix (un - 1))
+                         = power 2 c * power radix (rn - 1)
+                         >= power radix (rn - 1)
+                      so value rp rn
+                         = value rp limb_cnt
+                           + power 2 cnt * old (mpz.abs_value_of[u])
+                         >= value rp limb_cnt + power radix (rn - 1) };
+        value_concat rp limb_cnt rn;
+        assert { power radix limb_cnt * value_sub (pelts rp) limb_cnt rn
+                 = power 2 cnt * old (mpz.abs_value_of[u])
+                 >= power radix (rn-1) }
+      end
+      else begin
+        assert { power 2 cnt = power radix limb_cnt };
+        let ghost ou = pure { rp } in
+        assert { value ou un = old (mpz.abs_value_of[u]) };
+        wmpn_copyd (C.incr rp limb_cnt) rp un;
+        value_sub_frame_shift (pelts rp) (pelts ou)
+                              (offset rp + int32'int limb_cnt)
+                              (offset ou) (int32'int un);
+        assert { value_sub (pelts rp) limb_cnt rn
+                 = value ou un = old (mpz.abs_value_of[u]) };
+        value_concat rp limb_cnt rn;
+        assert { value rp rn = value rp limb_cnt
+                       + power 2 cnt * old (mpz.abs_value_of[u]) };
+        assert { power 2 cnt * old (mpz.abs_value_of[u]) >= power radix (rn - 1)
+                 by old (mpz.abs_value_of[u]) >= power radix (un - 1)
+                 so power 2 cnt * power radix (un - 1)
+                 = power radix (limb_cnt) * power radix (un - 1)
+                 = power radix (rn - 1) };
+    end end
+    else begin
+      unchanged u mpz ompz;
+      let up = get_read_ptr u in
+      if c <> 0
+      then begin
+        let rl = C.incr rp limb_cnt in
+        label Shift in
+        let rlimb = OL.wmpn_lshift rl up un c in
+        value_concat rp limb_cnt rn;
+        assert { value rp rn
+                 = value rp limb_cnt
+                    + power radix limb_cnt * value rl un };
+        assert { value rl un + power radix un * rlimb
+                 = old (mpz.abs_value_of[u] * power 2 c) };
+        label Set in
+        value_sub_update_no_change (pelts rp) (int32'int rn)
+                                   0 (int32'int rn) rlimb;
+        value_sub_update_no_change (pelts rp) (int32'int rn)
+                                   0 (int32'int limb_cnt) rlimb;
+        assert { value rp limb_cnt = value rp limb_cnt at Set };
+        assert { value rp rn = value rp rn at Set };
+        C.set_ofs rp rn rlimb;
+        value_tail rp rn;
+        assert { value rp (rn + 1)
+                 = value rp limb_cnt
+                   + power radix limb_cnt
+                     * old (mpz.abs_value_of[u] * power 2 c)
+                 = value rp limb_cnt
+                   + power 2 cnt * old mpz.abs_value_of[u]
+                 by value rp (rn+1)
+                    = value rp rn + power radix rn * rlimb
+                    = value rp rn at Set + power radix rn * rlimb
+                    = value rp rn at Set
+                      + power radix limb_cnt * power radix un * rlimb
+                    = (value rp limb_cnt
+                      + power radix limb_cnt * value rl un) at Set
+                      + power radix limb_cnt * power radix un * rlimb
+                    = value rp limb_cnt + power radix limb_cnt
+                      * old (mpz.abs_value_of[u] * power 2 c) };
+        value_concat rp limb_cnt rn;
+        rn <- rn + (if rlimb <> 0 then 1 else 0);
+        assert { value rp rn =
+                 value rp limb_cnt + power 2 cnt * old (mpz.abs_value_of[u]) };
+        assert { value rp rn >= value rp limb_cnt + power radix (rn - 1)
+                 by if rlimb <> 0
+                 then value rp rn
+                      = value rp (rn - 1) + power radix (rn - 1) * rlimb
+                      >= value rp limb_cnt + power radix (rn - 1) * rlimb
+                      >= value rp limb_cnt + power radix (rn - 1)
+                      by 0 <= power radix limb_cnt
+                              * value_sub (pelts rp) limb_cnt (rn - 1)
+                      so value rp (rn - 1)
+                         = value rp limb_cnt
+                            + power radix limb_cnt
+                              * value_sub (pelts rp) limb_cnt (rn - 1)
+                         >= value rp limb_cnt
+                      so power radix (rn - 1) = power radix (rn - 1) * 1
+                         <= power radix (rn - 1) * rlimb
+                 else old mpz.abs_value_of[u] >= power radix (un - 1)
+                      so rn = un + limb_cnt
+                      so power 2 cnt * old (mpz.abs_value_of[u])
+                         >= power 2 cnt * old (mpz.abs_value_of[u])
+                         >= power 2 cnt * power radix (un-1)
+                         = power 2 c * (power radix limb_cnt
+                           * power radix (un - 1))
+                         = power 2 c * power radix (rn - 1)
+                         >= power radix (rn - 1)
+                      so value rp rn
+                         = value rp limb_cnt
+                           + power 2 cnt * old (mpz.abs_value_of[u])
+                         >= value rp limb_cnt + power radix (rn - 1) };
+        value_concat rp limb_cnt rn;
+        assert { power radix limb_cnt * value_sub (pelts rp) limb_cnt rn
+                 = power 2 cnt * old (mpz.abs_value_of[u])
+                 >= power radix (rn-1) }
+      end else begin
+        assert { power 2 cnt = power radix limb_cnt };
+        let rl = C.incr rp limb_cnt in
+        wmpn_copyi rl up un;
+        value_sub_frame_shift (pelts rl) (pelts up)
+                              (offset rl) (offset up) (int32'int un);
+        assert { value_sub (pelts rp) limb_cnt rn
+                 = value up un = old (mpz.abs_value_of[u]) };
+        value_concat rp limb_cnt rn;
+        assert { value rp rn = value rp limb_cnt
+                       + power 2 cnt * old (mpz.abs_value_of[u]) };
+        assert { power 2 cnt * old (mpz.abs_value_of[u])
+                 >= power radix (rn - 1)
+                 by old (mpz.abs_value_of[u]) >= power radix (un - 1)
+                 so power 2 cnt * power radix (un - 1)
+                 = power radix (limb_cnt) * power radix (un - 1)
+                 = power radix (rn - 1) };
+      end;
+      release_reader u up
+    end;
+    let ghost orp = pure { rp } in
+    wmpn_zero rp limb_cnt;
+    value_sub_frame (pelts rp) (pelts orp) (int32'int limb_cnt) (int32'int rn);
+    value_concat rp limb_cnt rn;
+    assert { value rp limb_cnt = 0 };
+    assert { power radix limb_cnt * value_sub (pelts rp) limb_cnt rn
+                = power 2 cnt * old (mpz.abs_value_of[u])
+                >= power radix (rn-1) };
+    assert { value rp rn = power 2 cnt * old (mpz.abs_value_of[u])
+                         >= power radix (rn-1)  };
+    let ghost nrn = if size_of u >= 0 then rn else -rn in
+    assert { value rp (abs nrn) >= power radix ((abs nrn) - 1)
+             by abs nrn = rn };
+    assert { sgn_value rp nrn = power 2 cnt * old (value_of u mpz)
+             by if mpz.sgn[u] >= 0
+                then nrn = rn
+                     so value_of u mpz = mpz.abs_value_of[u]
+                     so sgn_value rp nrn = value rp rn
+                else nrn = -rn
+                     so value_of u mpz = - mpz.abs_value_of[u]
+                     so sgn_value rp nrn = - value rp rn };
+    label Size in
+    set_size r (if size_of u >= 0 then rn else -rn) rp;
+    release_writer r rp;
+    assert { value_of r mpz = sgn_value (rp at Size) nrn
+             = old (value_of u mpz) * power 2 cnt };
+  end
+
+
+end

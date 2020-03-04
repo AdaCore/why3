@@ -110,7 +110,7 @@ module Args = struct
         Format.printf "@[<hov 2>Known debug flags \
             (`*' marks the flags selected by --debug-all):@\n%a@]@."
           (Pp.print_list Pp.newline print)
-          (List.sort Pervasives.compare list);
+          (List.sort (fun (u,_,_) (v,_,_) -> String.compare u v) list);
       end;
       !opt_list_flags in
     desc,list
@@ -135,13 +135,16 @@ module Args = struct
         " set all debug flags that do not change Why3 behaviour" in
     ("--debug-all", Arg.Set opt_debug_all, desc_debug)
 
-  let set_flags_selected () =
+  let set_flags_selected ?(silent=false) () =
     if !opt_debug_all then
       List.iter
         (fun (s,f,_,_) -> if is_info_flag s then set_flag f)
         (list_flags ());
-    Queue.iter (fun flag -> let flag = lookup_flag flag in set_flag flag)
-      opt_list_flags;
+    let check flag =
+      match lookup_flag flag with
+      | f -> set_flag f
+      | exception UnknownFlag _ when silent -> () in
+    Queue.iter check opt_list_flags;
     if test_flag stack_trace then Printexc.record_backtrace true
 end
 
