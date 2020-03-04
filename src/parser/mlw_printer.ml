@@ -262,9 +262,9 @@ let pp_attr pp closed fmt attr x =
   match attr with
   | ATstr a ->
       fprintf fmt "@[[@%s]@ %a@]" a.attr_string pp x
-  | ATpos _loc ->
-      (* fprintf fmt "[# %a] %a" Loc.pp loc pp x *)
-      todo fmt "ATpos _"
+  | ATpos loc ->
+      let filename, line, bchar, echar = Loc.get loc in
+      fprintf fmt "[# %S %d %d %d]" filename line bchar echar
 
 let pp_exn fmt (id, pty, _mask) =
   (* TODO _mask *)
