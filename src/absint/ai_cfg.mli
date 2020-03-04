@@ -2,7 +2,8 @@ open Domain
 
 module Make(S:sig
     val env: Env.env
-    val pmod: Pmodule.pmodule
+    val th_known: Decl.known_map
+    val mod_known: Pdecl.known_map
     val widening: int
     module D: DOMAIN
   end): sig

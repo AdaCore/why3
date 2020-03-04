@@ -45,7 +45,8 @@ module Make (D: Domain.DOMAIN) = struct
   let infer_loop_invariants ~widening env pmod =
     let module AI = Ai_cfg.Make (struct
         let env = env
-        let pmod = pmod
+        let th_known = pmod.mod_theory.th_known
+        let mod_known = pmod.mod_known
         let widening = widening
         module D = D
       end)
@@ -203,10 +204,8 @@ module Make (D: Domain.DOMAIN) = struct
     let theory = pmod.mod_theory in
     let preid = Ident.id_clone Theory.(theory.th_name) in
     let pmuc = create_module env preid in
-    Format.eprintf "Before@.";
     let pmuc,_ =
       List.fold_left add_to_pmod (pmuc,sm_empty) pmod.mod_units in
-    Format.eprintf "After@.";
     if Debug.test_flag Uf_domain.infer_debug then
       Format.eprintf "Invariants inferred.@.";
     close_module pmuc

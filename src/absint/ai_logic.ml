@@ -6,13 +6,14 @@ open Apron
 
 module Make(S: sig
     val env: Env.env
-    val pmod: Pmodule.pmodule
+    val th_known: Decl.known_map
+    val mod_known: Pdecl.known_map
   end) = struct
 
   let env = S.env
 
-  let known_logical_ident = Pmodule.(Theory.(S.pmod.mod_theory.th_known))
-  let known_pdecl = Pmodule.(S.pmod.mod_known)
+  let known_logical_ident = S.th_known
+  let known_pdecl = S.mod_known
 
   let th_int = Env.read_theory env ["int"] "Int"
   let le_int = Theory.(ns_find_ls th_int.th_export ["infix <="])

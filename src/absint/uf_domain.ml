@@ -10,7 +10,8 @@ let infer_debug  = Debug.register_flag "infer_debug"
 module Make(S:sig
     module A:DOMAIN
     val env: Env.env
-    val pmod: Pmodule.pmodule
+    val th_known: Decl.known_map
+    val mod_known: Pdecl.known_map
   end) = struct
   module A = S.A
   module D = A
@@ -18,7 +19,8 @@ module Make(S:sig
   (* open Ai_logic *)
   module Ai_logic = Ai_logic.Make(struct
       let env = S.env
-      let pmod = S.pmod
+      let th_known = S.th_known
+      let mod_known = S.mod_known
     end)
   open Ai_logic
 
@@ -566,7 +568,7 @@ module Make(S:sig
           raise Not_found
     in
     let t =
-      D.to_term S.env S.pmod man a find_var    in
+      D.to_term S.env (S.th_known, S.mod_known) man a find_var    in
     let t = Union_find.fold_class (fun t a b ->
         let a = TermToClass.to_term uf_man.class_to_term a in
         let b = TermToClass.to_term uf_man.class_to_term b in

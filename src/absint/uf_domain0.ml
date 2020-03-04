@@ -5,14 +5,16 @@ open Term
 module Make(S:sig
     module A:DOMAIN
     val env: Env.env
-    val pmod: Pmodule.pmodule
+    val th_known: Decl.known_map
+    val mod_known: Pdecl.known_map
   end) = struct
   module A = S.A
   module D = A
 
   module Ai_logic = Ai_logic.Make(struct
       let env = S.env
-      let pmod = S.pmod
+      let th_known = S.th_known
+      let mod_known = S.mod_known
     end)
   open Ai_logic
 

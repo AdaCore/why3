@@ -6,14 +6,16 @@ type 'a a = { t: 'a list; c: bool; i: int; }
 module Make(S:sig
     module A:TERM_DOMAIN
     val env: Env.env
-    val pmod: Pmodule.pmodule
+    val th_known: Decl.known_map
+    val mod_known: Pdecl.known_map
   end) = struct
   module A = S.A
 
   open Ai_logic
   module Ai_logic = Ai_logic.Make(struct
       let env = S.env
-      let pmod = S.pmod
+      let th_known = S.th_known
+      let mod_known = S.mod_known
     end)
 
   type t = A.t a

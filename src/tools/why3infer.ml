@@ -78,7 +78,8 @@ let do_input f =
                     let module Abstract_interpreter =
                       Ai_cfg.Make(struct
                         let env = env
-                        let pmod = m
+                        let th_known = m.mod_theory.th_known
+                        let mod_known = m.mod_known
                         let widening = 3
                         module D = Disjunctive_domain_fast.Make(Domain.Polyhedra)
                       end) in

@@ -150,9 +150,9 @@ module Make(A:DOMAIN) = struct
     assert (t_ = None);
     List.map (fun t -> A.assign_linexpr man t v l None) t
 
-  let to_term env pmod man t var_mapping =
+  let to_term env kn man t var_mapping =
     let t = cleanup_hard man t in
-    let f = A.to_term env pmod in
+    let f = A.to_term env kn in
     let t = List.map (fun t -> f man t var_mapping) t
     |> Term.t_or_simp_l in
     t

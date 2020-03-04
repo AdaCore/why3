@@ -135,6 +135,8 @@ let do_input way f =
                       Ai_cfg.Make(struct
                         let env = env
                         let pmod = m
+                        let th_known = m.mod_theory.th_known
+                        let mod_known = m.mod_known
                         let widening = 4
                         module D = Disjunctive_domain_fast.Make(Domain.Polyhedra)
                       end) in

@@ -3,5 +3,6 @@ open Domain
 module Make(S:sig
     module A:TERM_DOMAIN
     val env: Env.env
-    val pmod: Pmodule.pmodule
+    val th_known: Decl.known_map
+    val mod_known: Pdecl.known_map
   end) : TERM_DOMAIN

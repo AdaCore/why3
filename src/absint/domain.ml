@@ -24,7 +24,7 @@ module type DOMAIN = sig
   val forget_array: man -> t -> Var.t array -> bool -> t
   val assign_linexpr: man -> t -> Var.t -> Linexpr1.t -> t option -> t
   val to_lincons_array: man -> t -> Lincons1.earray
-  val to_term: Env.env -> Pmodule.pmodule -> man -> t -> (Var.t -> Term.term) -> Term.term
+  val to_term: Env.env -> Decl.known_map * Pdecl.known_map -> man -> t -> (Var.t -> Term.term) -> Term.term
   val get_linexpr: man -> t -> Var.t -> ((Coeff.t * Var.t) list * Coeff.t) option
   val hash: man -> t -> int
   val is_eq: man -> t -> t -> bool

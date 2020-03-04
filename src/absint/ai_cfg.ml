@@ -9,14 +9,16 @@ open Format
 
 module Make(E: sig
     val env: Env.env
-    val pmod: Pmodule.pmodule
+    val th_known: Decl.known_map
+    val mod_known: Pdecl.known_map
     val widening: int
     module D: DOMAIN
   end) = struct
 
   module Ai_logic = Ai_logic.Make(struct
       let env = E.env
-      let pmod = E.pmod
+      let th_known = E.th_known
+      let mod_known = E.mod_known
     end)
   open Ai_logic
 
@@ -38,13 +40,16 @@ module Make(E: sig
       module A = Disjunctive_term_domain.Make(struct
           module A = Uf_domain.Make(struct
               module A = E.D
-              let pmod = E.pmod
+              let th_known = E.th_known
+              let mod_known = E.mod_known
               let env = E.env
             end)
-          let pmod = E.pmod
+          let th_known = E.th_known
+          let mod_known = E.mod_known
           let env = E.env
         end)
-      let pmod = E.pmod
+      let th_known = E.th_known
+      let mod_known = E.mod_known
       let env = E.env
     end)
   module Domain = D
