@@ -880,7 +880,11 @@ indeed come into two flavours: the module `EuclideanDivision` proposes
 a version where the result of the modulo is always non-negative,
 whereas the module `ComputerDivision` provides a version which matches
 the standard definition available in programming languages like C,
-Java or OCaml.
+Java or OCaml. Note that these modules do not provide any divsion or
+modulo operations to be used in programs. For those, you must use the
+module `mach.int.Int` instead, which provides these operations,
+including proper pre-conditions, and with the usual infix syntax `x /
+y` and `x % y`.
 
 The detailed documentation of the library is available on-line at
 http://why3.lri.fr/stdlib/int.html
@@ -896,8 +900,12 @@ displayed on Figure :numref:`fig.lib.array`.
    :caption: Module dependencies in library `array`
    :name: fig.lib.array
 
-TO BE COMPLETED
-
+The main module is `Array`, providing the operations for accessing and
+updating an array element, with respective syntax `a[i]` and `a[i] <-
+e`, and proper pre-conditions for the indexes. The length of an array
+is denoted as `a.length`. A fresh array can be created using `make l
+v` where `l` is the desired length and `v` is the initial values of
+all cells.
 
 The detailed documentation of the library is available on-line at
 http://why3.lri.fr/stdlib/array.html

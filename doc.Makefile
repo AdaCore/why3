@@ -26,6 +26,3 @@ doc/generated/library-%.dot: stdlib/%.mlw
 
 
 LIBDOT = $(patsubst %,doc/generated/library-%.dot, int array)
-
-public/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT)
-	sphinx-build -W --keep-going -b html doc public
