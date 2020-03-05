@@ -43,6 +43,8 @@ type reason =
    | VC_Assert
    | VC_Raise
    | VC_Inline_Check
+   | VC_UC_No_Holes
+   | VC_UC_Same_Size
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre

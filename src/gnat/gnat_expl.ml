@@ -39,6 +39,8 @@ type reason =
    | VC_Assert
    | VC_Raise
    | VC_Inline_Check
+   | VC_UC_No_Holes
+   | VC_UC_Same_Size
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -91,6 +93,8 @@ let is_warning_reason r =
    | VC_Assert
    | VC_Raise
    | VC_Inline_Check
+   | VC_UC_No_Holes
+   | VC_UC_Same_Size
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -182,6 +186,8 @@ let reason_from_string s =
    | "VC_ASSERT"                    -> VC_Assert
    | "VC_RAISE"                     -> VC_Raise
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
+   | "VC_UC_NO_HOLES"               -> VC_UC_No_Holes
+   | "VC_UC_SAME_SIZE"              -> VC_UC_Same_Size
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | "VC_WEAKER_PRE"                -> VC_Weaker_Pre
    | "VC_TRIVIAL_WEAKER_PRE"        -> VC_Trivial_Weaker_Pre
@@ -239,6 +245,8 @@ let reason_to_ada reason =
    | VC_Assert                    -> "VC_ASSERT"
    | VC_Raise                     -> "VC_RAISE"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
+   | VC_UC_No_Holes               -> "VC_UC_NO_HOLES"
+   | VC_UC_Same_Size              -> "VC_UC_SAME_SIZE"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "VC_WEAKER_PRE"
    | VC_Trivial_Weaker_Pre        -> "VC_TRIVIAL_WEAKER_PRE"
@@ -291,6 +299,8 @@ let reason_to_string reason =
    | VC_Assert                    -> "assert"
    | VC_Raise                     -> "raise"
    | VC_Inline_Check              -> "inline_check"
+   | VC_UC_No_Holes               -> "uc_no_holes"
+   | VC_UC_Same_Size              -> "uc_same_size"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "weaker_pre"
    | VC_Trivial_Weaker_Pre        -> "trivial_weaker_pre"
