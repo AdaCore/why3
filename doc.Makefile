@@ -21,4 +21,4 @@ DOC = index zebibliography genindex \
 
 DOCRST = $(DOC:%=doc/%.rst)
 
-LIBDOT = $(patsubst %,doc/generated/library-%.dot, int array)
+LIBDOT = $(patsubst %,doc/stdlib-dot/library-%.dot, int array)

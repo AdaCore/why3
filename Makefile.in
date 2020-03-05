@@ -1984,8 +1984,12 @@ doc: doc/html/index.html
 
 include doc.Makefile
 
-doc/generated/library-%.dot: stdlib/%.mlw bin/why3pp.@OCAMLBEST@
-	bin/why3pp.@OCAMLBEST@ --output=dep $< | tred > $@
+doc/stdlib-dot/library-%.dot: stdlib/%.mlw
+	if test -x bin/why3pp.@OCAMLBEST@; then \
+		bin/why3pp.@OCAMLBEST@ --output=dep $< | tred > $@; \
+	else \
+		touch $@; \
+	fi
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
