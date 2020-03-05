@@ -317,13 +317,13 @@ else
       reason_ocamlfind=" (not found)"
    else
       OCAMLFINDLIB=$(ocamlfind printconf stdlib)
-      if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
-         OCAMLFIND=no
-         enable_ocamlfind=no
-         reason_ocamlfind=" (incompatible with OCaml)"
-         echo "but your ocamlfind is not compatible with your ocamlc:"
-         echo "ocamlfind: $OCAMLFINDLIB, ocamlc: $OCAMLLIB"
-      fi
+      #if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
+      #   OCAMLFIND=no
+      #   enable_ocamlfind=no
+      #   reason_ocamlfind=" (incompatible with OCaml)"
+      #   echo "but your ocamlfind is not compatible with your ocamlc:"
+      #   echo "ocamlfind: $OCAMLFINDLIB, ocamlc: $OCAMLLIB"
+      #fi
    fi
 fi
 
