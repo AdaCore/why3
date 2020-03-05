@@ -538,6 +538,7 @@ conjunction and disjunction, respectively.
         : | "any" `result` `spec`*   ; arbitrary value
         : | "while" `expr` "do" `invariant`* `variant`? `expr` "done"   ; while loop
         : | "for" `lident` "=" `expr` ("to" | "downto") `expr` "do" `invariant`* `expr` "done"   ; for loop
+        : | "for" `pattern` "in" `expr` "with" `uident` ("as" `lident_nq`)? "do"  `invariant`* `variant`? `expr` "done" ; for each loop
         : | ("assert" | "assume" | "check") "{" `term` "}"   ; assertion
         : | "raise" `uqualid` `expr`?   ; exception raising
         : | "raise" "(" `uqualid` `expr`? ")"
@@ -596,6 +597,37 @@ Within a postcondition, :samp:`old {t}` refers to the value of term
 the term :samp:`at {t} '{L}` refers to the value of term
 *t* at the program point corresponding to *L*.
 
+.. index:: for each loop
+.. rubric:: For each loop
+
+The for each loop of Why3 has the following syntax:
+
+::
+
+    for p in e1 with S do invariants/variant... e2 done
+
+Here, ``p`` is a pattern, ``S`` is a namespace, and ``e1`` and ``e2``
+are program expressions. Such a for each loop is syntactic sugar for
+the following:
+
+::
+
+    let it = S.create e1 in
+    try while true do
+      invariants/variant...
+      let p = S.next it in
+      e2
+    with S.Done -> ()
+
+That is, namespace ``S`` is assumed to declare at least a function
+``create`` and a function ``next``, and an exception ``Done``. The
+latter is used to signal the end of the iteration.
+As shown above, the iterator is named ``it``. It can be referred to
+within annotations. A different name can be specified, using syntax
+``with S as x do``.
+
+Constructions ``break`` and ``continue`` can be used in for each
+loops, with the expected semantics.
 
 Modules
 -------
@@ -664,7 +696,11 @@ A WhyML input file is a (possibly empty) list of modules
 Algebraic types
 ^^^^^^^^^^^^^^^
 
+.. index:: algebraic type
+
 TO BE COMPLETED
+
+
 
 Record types
 ^^^^^^^^^^^^
@@ -820,7 +856,16 @@ When a private record type only has ghost fields, one can use
 
 This is equivalent to the previous declaration.
 
+.. rubric:: Recursive record types
 
+Record types can be recursive, e.g,
+
+::
+
+    type t = { a: int; next: option t; }
+
+Recursive record types cannot have invariants, cannot have mutable
+fields, and cannot be private.
 
 Range types
 ^^^^^^^^^^^
