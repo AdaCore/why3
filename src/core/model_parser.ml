@@ -559,6 +559,8 @@ let default_model = {
   model_files = empty_model;
 }
 
+let get_model_elements m = List.concat (List.concat (List.map IntMap.values (StringMap.values m.model_files)))
+
 type model_parser =  string -> Printer.printer_mapping -> model
 
 type raw_model_parser =
