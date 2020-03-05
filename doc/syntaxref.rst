@@ -841,13 +841,13 @@ in logic and/or programs. It can be browsed on-line at
 http://why3.lri.fr/stdlib/. Each file contains one or several modules.
 To ``use`` or ``clone`` a module ``M`` from file ``file``, use the
 syntax ``file.M``, since ``file`` is available in Why3’s default load
-path. For instance, the module of integers and the module of references
-are imported as follows:
+path. For instance, the module of integers and the module of arrays
+indexed by integers are imported as follows:
 
 ::
 
       use int.Int
-      use ref.Ref
+      use array.Array
 
 A sub-directory ``mach/`` provides various modules to model machine
 arithmetic. For instance, the module of 63-bit integers and the module
@@ -861,3 +861,43 @@ of arrays indexed by 63-bit integers are imported as follows:
 In particular, the types and operations from these modules are mapped to
 native OCaml’s types and operations when Why3 code is extracted to OCaml
 (see :numref:`sec.extract`).
+
+Library `int`: mathematical integers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The library `int` contains several modules whose dependencies are
+displayed on Figure :numref:`fig.lib.int`.
+
+.. graphviz:: generated/library-int.dot
+   :caption: Module dependencies in library `int`
+   :name: fig.lib.int
+
+The main module is `Int` which provides basic operations like addition
+and multiplication, and comparisons.
+
+The division of modulo operations are defined in other modules. They
+indeed come into two flavours: the module `EuclideanDivision` proposes
+a version where the result of the modulo is always non-negative,
+whereas the module `ComputerDivision` provides a version which matches
+the standard definition available in programming languages like C,
+Java or OCaml.
+
+The detailed documentation of the library is available on-line at
+http://why3.lri.fr/stdlib/int.html
+
+
+Library `array`: array data structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The library `array` contains several modules whose dependencies are
+displayed on Figure :numref:`fig.lib.array`.
+
+.. graphviz:: generated/library-array.dot
+   :caption: Module dependencies in library `array`
+   :name: fig.lib.array
+
+TO BE COMPLETED
+
+
+The detailed documentation of the library is available on-line at
+http://why3.lri.fr/stdlib/array.html

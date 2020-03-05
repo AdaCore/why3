@@ -21,5 +21,11 @@ DOC = index zebibliography genindex \
 
 DOCRST = $(DOC:%=doc/%.rst)
 
-public/index.html: $(DOCRST) $(DRVDOT)
+doc/generated/library-%.dot: stdlib/%.mlw
+	why3 pp --output=dep $^ | tred > $@
+
+
+LIBDOT = $(patsubst %,doc/generated/library-%.dot, int array)
+
+public/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT)
 	sphinx-build -W --keep-going -b html doc public
