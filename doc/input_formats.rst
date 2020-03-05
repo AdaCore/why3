@@ -52,9 +52,9 @@ functions such as `printf` (see below) is accepted by a C compiler.
 .. rubric:: Function specification
 
 .. productionlist:: micro-C
-    spec: "requires" `term` ";"
-       : | "ensures"  `term` ";"
-       : | "variant"  `term` { "," `term` } ";"
+    spec: "//@" "requires" `term` ";"
+       : | "//@" "ensures"  `term` ";"
+       : | "//@" "variant"  `term` { "," `term` } ";"
 
 .. rubric:: C expression
 
@@ -153,26 +153,6 @@ Built-in functions and predicates
 * `int occurrence(int v, int[] a)`, the number of occurrences of the
   value `v` in array `a`
 
-Verifying a program
-~~~~~~~~~~~~~~~~~~~
-
-Click on the gears button to launch the verification.
-Verification conditions (VCs) then appear in the right panel, in
-the Task List tab, and
-Alt-Ergo is run on each of them with a default time limit (that
-can be set in the Settings menu).
-
-When a VC is not proved, there are several options:
-
-* use the contextual menu to rerun Alt-Ergo with a larger time limit
-  (e.g. 1000 or 5000 steps instead of 100);
-* use the contextual menu to split the VC and rerun Alt-Ergo on each
-  sub-VC (split and prove);
-* use the Task View tab to investigate the problematic VC,
-  for wrong or missing elements of specification (precondition,
-  postcondition, invariant);
-* add intermediate assertions in the code, using `//@ assert ...;`.
-
 
 
 .. _format.micro-Python:
@@ -193,11 +173,9 @@ Special symbols `NEWLINE`, `INDENT`,
 and `DEDENT` mark an end of line, the beginning of a new
 indentation block, and its end, respectively.
 
-Logical annotations are inserted in special comments starting
-with `//@` or `/*@`. In the following grammar, we
-only use the former kind, for simplicity, but both kinds are allowed.
+Logical annotations are inserted in special comments starting with `#@`.
 
-.. productionlist:: micro-Python
+.. productionlist:: microPython
       file: `decl`*
       decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
  py_import: "from" ident "import" ident { "," ident } NEWLINE
@@ -209,20 +187,20 @@ interpreter (see below).
 
 ..  rubric:: Function definition
 
-.. productionlist:: micro-Python
+.. productionlist:: microPython
     py_function: "def" ident "(" [ `params` ] ")" ":" NEWLINE INDENT { `spec` } { `stmt` } DEDENT
     params: ident { "," ident }
 
 .. rubric:: Function specification
 
-.. productionlist:: micro-Python
-   spec ::= "requires" `term` NEWLINE
-        : | "ensures"  `term` NEWLINE
-        : | "variant"  `term` { "," `term` } NEWLINE
+.. productionlist:: microPython
+   spec ::= "#@" "requires" `term` NEWLINE
+        : | "#@" "ensures"  `term` NEWLINE
+        : | "#@" "variant"  `term` { "," `term` } NEWLINE
 
 .. rubric:: Python expression
 
-.. productionlist:: micro-Python
+.. productionlist:: microPython
   expr ::= "None" | "True" | "False" | integer-literal | string-literal
        : | identifier
        : | identifier "[" `expr` "]"
@@ -234,7 +212,7 @@ interpreter (see below).
 
 .. rubric:: Python statement
 
-.. productionlist:: micro-Python
+.. productionlist:: microPython
        stmt: `simple_stmt` NEWLINE
             : | "if" `expr` ":" `suite` `else_branch`
             : | "while" `expr` ":" `loop_body`
@@ -249,19 +227,19 @@ interpreter (see below).
             : | identifier "=" `expr`
             : | identifier "[" `expr` "]" "=" `expr`
             : | "break"
-            : | "//@" "label" identifier
-            : | "//@" ( "assert" | "assume" | "check" ) `term`
+            : | "#@" "label" identifier
+            : | "#@" ( "assert" | "assume" | "check" ) `term`
    assignop: "=" | "+=" | "-=" | "*=" | "/="
   loop_body: `simple_stmt` NEWLINE
             : | NEWLINE INDENT { `loop_annot` } `stmt` { `stmt` } DEDENT
- loop_annot: "//@" "invariant" `term` NEWLINE
-            : | "//@" "variant" `term` { "," `term` } NEWLINE
+ loop_annot: "#@" "invariant" `term` NEWLINE
+            : | "#@" "variant" `term` { "," `term` } NEWLINE
 
 .. rubric:: Logic declaration
 
-.. productionlist:: micro-Python
-  logic-declaration: "//@" "function" "int" identifier "(" `params` ")" NEWLINE
-                 : | "//@" "predicate" identifier "(" `params` ")" NEWLINE
+.. productionlist:: microPython
+  logic-declaration: "#@" "function" "int" identifier "(" `params` ")" NEWLINE
+                 : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
 Yet, they can be axiomatized, using toplevel `assume` statements.
@@ -269,7 +247,7 @@ Yet, they can be axiomatized, using toplevel `assume` statements.
 
 .. rubric:: Logical term
 
-.. productionlist:: micro-Python
+.. productionlist:: microPython
   term: identifier
        : | integer-literal
        : | "None"
@@ -312,24 +290,3 @@ Limitations
 ~~~~~~~~~~~
 
 Python lists are modeled as arrays, whose size cannot be modified.
-
-
-Verifying a program
-~~~~~~~~~~~~~~~~~~~
-
-Click on the gears button to launch the verification.
-Verification conditions (VCs) then appear in the right panel, in
-the Task List tab, and
-Alt-Ergo is run on each of them with a default time limit (that
-can be set in the Settings menu).
-
-When a VC is not proved, there are several options:
-
-* use the contextual menu to rerun Alt-Ergo with a larger
-  time limit (e.g. 1000 or 5000 steps instead of 100);
-* use the contextual menu to split the VC and rerun Alt-Ergo
-  on each sub-VC (split and prove);
-* use the Task View tab to investigate the problematic VC,
-  for wrong or missing elements of specification (precondition,
-  postcondition, invariant);
-* add intermediate assertions in the code, using `//@ assert ...;`.
