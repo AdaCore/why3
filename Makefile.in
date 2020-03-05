@@ -2003,9 +2003,6 @@ doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
 doc/latex/manual.tex: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
 	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
 
-public/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
-	$(SPHINX) -W --keep-going -b html doc public
-
 ifeq (@enable_pdf_doc@,yes)
 
 doc: doc/latex/manual.pdf
