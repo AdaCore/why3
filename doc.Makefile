@@ -21,8 +21,4 @@ DOC = index zebibliography genindex \
 
 DOCRST = $(DOC:%=doc/%.rst)
 
-doc/generated/library-%.dot: stdlib/%.mlw
-	why3 pp --output=dep $^ | tred > $@
-
-
 LIBDOT = $(patsubst %,doc/generated/library-%.dot, int array)

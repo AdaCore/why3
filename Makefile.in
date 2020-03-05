@@ -1984,6 +1984,9 @@ doc: doc/html/index.html
 
 include doc.Makefile
 
+doc/generated/library-%.dot: stdlib/%.mlw bin/why3pp.@OCAMLBEST@
+	bin/why3pp.@OCAMLBEST@ --output=dep $< | tred > $@
+
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
 	export WHY3CONFIG=doc/why3ide-doc.conf; \
@@ -2004,13 +2007,17 @@ ifeq (@enable_pdf_doc@,yes)
 doc: doc/latex/manual.pdf
 
 doc/latex/manual.pdf: doc/latex/manual.tex
-	cd doc/latex; $(LATEXCOMP) manual.tex
+	@echo "running LaTeX compilation..."
+	cd doc/latex; $(LATEXCOMP) manual.tex >/dev/null
 ifeq (@LATEX@,pdflatex)
-	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
-	  makeindex manual; pdflatex manual; \
+	@cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  makeindex manual; \
+	  echo "running LaTeX again to try to fix references..."; \
+	  pdflatex manual >/dev/null; \
 	fi
-	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
-	  pdflatex manual; \
+	@cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  echo "running LaTeX again to try to fix references..."; \
+	  pdflatex manual >/dev/null; \
 	fi
 endif
 
