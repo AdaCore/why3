@@ -703,6 +703,12 @@ dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
 dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
 
 # checking for ocamlgraph
+# temporarily disabled until #453 is fixed
+if test "$enable_hypothesis_selection" = yes; then
+   enable_hypothesis_selection=no
+   reason_hypothesis_selection=" (broken)"
+fi
+
 if test "$enable_hypothesis_selection" = yes; then
    DIR=
    if test "$enable_ocamlfind" = yes; then
@@ -727,12 +733,6 @@ if test "$enable_hypothesis_selection" = yes; then
       enable_ocamlfind=no
       reason_ocamlfind=" (unable to find ocamlgraph)"
    fi
-fi
-
-# temporary until #453 is fixed
-if test "$enable_hypothesis_selection" = yes -a "$enable_ocamlfind" = yes; then
-   enable_hypothesis_selection=no
-   reason_hypothesis_selection=" (ocamlfind used)"
 fi
 
 if test "$enable_hypothesis_selection" = yes; then

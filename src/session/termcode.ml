@@ -1098,7 +1098,8 @@ module Pairing (Old: S)(New: S) = struct
     in
     let newgoals =
       let acc = ref old_goals_without_checksum in
-      for newi = 0 to Array.length table.table_new - 1 do
+      (* in reverse order, since the hashtable acts like a LIFO *)
+      for newi = Array.length table.table_new - 1 downto 0 do
         try
           let newg = table.table_new.(newi) in
           match New.checksum newg with

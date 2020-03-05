@@ -1,7 +1,7 @@
 .. _chap.whyml:
 
-The WhyML Language
-==================
+Why3 by Examples
+================
 
 This chapter describes the WhyML specification and programming language.
 A WhyML source file has suffix :file:`.mlw`. It contains a list of modules.

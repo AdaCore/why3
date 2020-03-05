@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="ring_buffer.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="t&#39;vc" expl="VC for t" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="20"/></proof>
+ </goal>
+ <goal name="create&#39;vc" expl="VC for create" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="43"/></proof>
+ </goal>
+ <goal name="dequeue&#39;vc" expl="VC for dequeue" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="84"/></proof>
+ </goal>
+ <goal name="enqueue&#39;vc" expl="VC for enqueue" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="99"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

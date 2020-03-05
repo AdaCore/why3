@@ -79,8 +79,16 @@ theory ieee_float.Float32
   (* Faithful translations of the axiomatisation, mainly to remove this crud
      from the smtlib output of SPARK. *)
   syntax function round "(fp.to_real ((_ to_fp 8 24) %1 %2))"
-  syntax predicate in_range "(<= (abs %1) (fp.to_real (fp #b0 #b11111110 #b11111111111111111111111)))"
-  syntax predicate no_overflow "(<= (abs (fp.to_real ((_ to_fp 8 24) %1 %2))) (fp.to_real (fp #b0 #b11111110 #b11111111111111111111111)))"
+
+ syntax predicate in_range "\
+   (and (<= (fp.to_real (fp #b1 #b11111110 #b11111111111111111111111)) %1) \
+        (<= %1 (fp.to_real (fp #b0 #b11111110 #b11111111111111111111111))))"
+
+  syntax predicate no_overflow "\
+   (and (<= (fp.to_real (fp #b1 #b11111110 #b11111111111111111111111)) \
+            (fp.to_real ((_ to_fp 8 24) %1 %2))) \
+        (<= (fp.to_real ((_ to_fp 8 24) %1 %2)) \
+            (fp.to_real (fp #b0 #b11111110 #b11111111111111111111111))))"
 
   remove allprops
 end
@@ -102,8 +110,23 @@ theory ieee_float.Float64
   (* Faithful translations of the axiomatisation, mainly to remove this crud
      from the smtlib output of SPARK. *)
   syntax function round "(fp.to_real ((_ to_fp 11 53) %1 %2))"
-  syntax predicate in_range "(<= (abs %1) (fp.to_real (fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111)))"
-  syntax predicate no_overflow "(<= (abs (fp.to_real ((_ to_fp 11 53) %1 %2))) (fp.to_real (fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111)))"
+
+  syntax predicate in_range "\
+   (and \
+    (<= \
+     (fp.to_real (fp #b1 #b11111111110 #b1111111111111111111111111111111111111111111111111111)) \
+     %1) \
+    (<= %1 \
+     (fp.to_real (fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111))))"
+
+  syntax predicate no_overflow "\
+   (and \
+    (<= \
+     (fp.to_real (fp #b1 #b11111111110 #b1111111111111111111111111111111111111111111111111111)) \
+     (fp.to_real ((_ to_fp 11 53) %1 %2))) \
+    (<= \
+     (fp.to_real ((_ to_fp 11 53) %1 %2)) \
+     (fp.to_real (fp #b0 #b11111111110 #b1111111111111111111111111111111111111111111111111111))))"
 
   remove allprops
 end

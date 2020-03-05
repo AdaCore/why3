@@ -481,9 +481,10 @@ Menu :menuselection:`Tools`
             again on the subgoals.
 
         :menuselection:`--> Auto level 3`
-            is a strategy more elaborate than level 1, that attempts to
-            apply a few transformations that are typically useful. It
-            also tries the provers with a larger time limit.
+            is a strategy more elaborate than level 2m that attempts
+            to apply a few transformations that are typically
+            useful. It also tries the provers with a larger time
+            limit. It also tries more provers.
 
         A more detailed description of strategies is given in
         :numref:`sec.strategies`, as well as a description on how to

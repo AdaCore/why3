@@ -1,16 +1,19 @@
 
-use int.Int
-use ref.Refint
-use array.Array
-use array.NumOfEq
-
 (** A simple programming exercise: find out the most frequent value in an array
 
     Using an external table (e.g. a hash table), we can easily do it
     in linear time and space.
 
     However, if the array is sorted, we can do it in linear time and
-    constant space. *)
+    constant space.
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use ref.Refint
+use array.Array
+use array.NumOfEq
 
 let most_frequent (a: array int) : int
   requires { length a > 0 }

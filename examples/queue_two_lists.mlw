@@ -1,3 +1,8 @@
+
+(** Implementation of a mutable queue using two lists.
+
+    Author: Léo Andrès (Univ. paris-Sud) *)
+
 module Queue
 
   use int.Int
@@ -61,10 +66,9 @@ module Queue
   =
     match l with
     | Nil -> absurd
-    | Cons _ s -> (
+    | Cons _ s ->
       if i > 0 then nth_rev (i - 1) s
-    ) end
-
+    end
 
   let handle_empty_rear q
     requires { q.rear = Nil }
@@ -135,10 +139,10 @@ module Queue
   let copy (q: t 'a) : t 'a
     ensures { result == q }
   = {
-    front = q.front; (* TODO: ? *)
-    rear = q.rear; (* TODO: ? *)
+    front = q.front;
+    rear = q.rear;
     seq = q.seq
-  }
+    }
 
   let is_empty (q: t 'a)
     ensures { result <-> q == empty }

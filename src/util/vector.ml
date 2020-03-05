@@ -9,8 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** This module is automatically extracted from
-    why3/examples/util/Vector_impl.mlw *)
+(** This is OCaml code extracted from a verified WhyML implementation,
+    part of the VOCaL library.
+    See https://github.com/vocal-project/vocal/ *)
 
 type 'a t = {
   dummy: 'a;

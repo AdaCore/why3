@@ -2114,7 +2114,7 @@ ifeq (@enable_doc@,yes)
 
 doc: doc/html/index.html
 
-include Makefile.doc
+include doc.Makefile
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
@@ -2489,7 +2489,7 @@ detect-unused:
 	@L1=$$(mktemp); \
 	L2=$$(mktemp); \
 	for d in `find examples/ -name 'why3session.xml' -printf '%h\n'`; do \
-	  sed -n -e 's/.*edited="\([^"]*\)".*/\1/p' $$d/why3session.xml | sort > $$L1; \
+	  sed -n -e 's/.*proof.*name="\([^"]*\)".*/\1/p' $$d/why3session.xml | sort > $$L1; \
 	  (cd $$d; git ls-files) | grep -v -e '^why3session.xml' -e '^why3shapes' -e '^[.]gitignore' -e '^Makefile' -e '[.]ml$$' -e '[.]html$$' | sed -e 's/[.]prf$$/.pvs/;s/[.]thy$$/.xml/' | sort -u > $$L2; \
 	  diff -u --label="$$d/why3session.xml" --label="$$d/" $$L1 $$L2 || echo; \
 	done; \
