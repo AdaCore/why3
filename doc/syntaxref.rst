@@ -1060,7 +1060,9 @@ Library `int`: mathematical integers
 The library `int` contains several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.int`.
 
-.. graphviz:: generated/library-int.dot
+.. %EXECUTE bin/why3pp --output=dep stdlib/int.mlw | tred > doc/stdlib-dot/library-int.dot
+
+.. graphviz:: stdlib-dot/library-int.dot
    :caption: Module dependencies in library `int`
    :name: fig.lib.int
 
@@ -1088,7 +1090,9 @@ Library `array`: array data structure
 The library `array` contains several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.array`.
 
-.. graphviz:: generated/library-array.dot
+.. %EXECUTE bin/why3pp --output=dep stdlib/array.mlw | tred > doc/stdlib-dot/library-array.dot
+
+.. graphviz:: stdlib-dot/library-array.dot
    :caption: Module dependencies in library `array`
    :name: fig.lib.array
 

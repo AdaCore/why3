@@ -1984,23 +1984,17 @@ doc: doc/html/index.html
 
 include doc.Makefile
 
-doc/generated/library-%.dot: stdlib/%.mlw bin/why3pp.@OCAMLBEST@
-	bin/why3pp.@OCAMLBEST@ --output=dep $< | tred > $@
-
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
 	export WHY3CONFIG=doc/why3ide-doc.conf; \
 	export WHY3LOADPATH=stdlib; \
-	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
+	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCRST) | $(SHELL) -e
 
 doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
 	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
 doc/latex/manual.tex: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
 	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
-
-public/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
-	$(SPHINX) -W --keep-going -b html doc public
 
 ifeq (@enable_pdf_doc@,yes)
 
