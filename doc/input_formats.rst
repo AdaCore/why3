@@ -24,10 +24,6 @@ passed to a C compiler.
 Syntax of micro-C
 ~~~~~~~~~~~~~~~~~
 
-Notation: The grammar of micro-C is given below in extended
-Backus-Naur Form, using `|` for alternation, `()` for grouping,
-`[]` for option, and `{}` for repetition.
-
 Logical annotations are inserted in special comments starting
 with `//@` or `/*@`. In the following grammar, we
 only use the former kind, for simplicity, but both kinds are allowed.
@@ -44,9 +40,9 @@ functions such as `printf` (see below) is accepted by a C compiler.
 .. rubric:: Function definition
 
 .. productionlist:: micro-C
-     c_function: `return_type` identifier "(" [ `params` ] ")" { spec } block
+     c_function: `return_type` identifier "(" `params`? ")" `spec`* `block`
     return_type: "void" | "int"
-         params: `param` { "," `param` }
+         params: `param` ("," `param`)*
           param: "int" identifier | "int" identifier "[]"
 
 .. rubric:: Function specification
@@ -54,7 +50,7 @@ functions such as `printf` (see below) is accepted by a C compiler.
 .. productionlist:: micro-C
     spec: "//@" "requires" `term` ";"
        : | "//@" "ensures"  `term` ";"
-       : | "//@" "variant"  `term` { "," `term` } ";"
+       : | "//@" "variant"  `term` ("," `term`)* ";"
 
 .. rubric:: C expression
 
@@ -66,7 +62,7 @@ functions such as `printf` (see below) is accepted by a C compiler.
        : | ( "++" | "--") identifier "[" `expr` "]"
        : | "-" `expr` | "!" `expr`
        : | `expr` ( "+" | "-" | "*" | "/" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" ) `expr`
-       : | identifier "(" [ `expr` { "," `expr` } ] ")"
+       : | identifier "(" (`expr` ("," `expr`)*)? ")"
        : | "scanf" "(" "\"%d\"" "," "&" identifier ")"
        : | "(" `expr` ")"
 
@@ -86,16 +82,16 @@ functions such as `printf` (see below) is accepted by a C compiler.
             : | `block`
             : | "//@" "label" identifier ";"
             : | "//@" ( "assert" | "assume" | "check" ) `term` ";"
-      block: "{" { `stmt` } "}"
+      block: "{" `stmt`* "}"
   expr_stmt: "int" identifier "=" `expr`
             : | identifier `assignop` `expr`
             : | identifier "[" `expr` "]" `assignop` `expr`
             : | `expr`
    assignop: "=" | "+=" | "-=" | "*=" | "/="
-  loop_body: { `loop_annot` } `stmt`
-            : | "{" { `loop_annot` } { `stmt` } "}"
+  loop_body: `loop_annot`* `stmt`
+            : | "{" `loop_annot`* `stmt`* "}"
  loop_annot: "//@" "invariant" `term` ";"
-            : | "//@" "variant" `term` { "," `term` } ";"
+            : | "//@" "variant" `term` ("," `term`)* ";"
 
 Note that the syntax for loop bodies allows the loop annotations to be
 placed either before the block or right at the beginning of the block.
@@ -110,6 +106,8 @@ placed either before the block or right at the beginning of the block.
                     : | "//@" "axiom" identifier ":" `term` ";"
                     : | "//@" "lemma" identifier ":" `term` ";"
                     : | "//@" "goal"  identifier ":" `term` ";"
+
+Logic functions are limited to a return type ``int``.
 
 .. rubric:: Logical term
 
@@ -130,8 +128,8 @@ placed either before the block or right at the beginning of the block.
        : | `term` ( "+" | "-" | "*" | "/" | "% ) `term`
        : | "if" `term` "then" `term` "else `term`
        : | "let" identifier "=" `term` "in" `term`
-       : | ( "forall" | "exists" ) `binder` { "," `binder` } "." `term`
-       : | identifier "(" [ `term` { "," `term` } ] ")"
+       : | ( "forall" | "exists" ) `binder` ("," `binder`)* "." `term`
+       : | identifier "(" (`term` ("," `term`)*)? ")"
     binder: identifier
        : | identifier "[]"
 
@@ -166,10 +164,8 @@ passed to a Python interpreter.
 Syntax of micro-Python
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Notation: The grammar of micro-Python is given below in extended
-Backus-Naur Form, using `|` for alternation, `()` for grouping,
-`[]` for option, and `{}` for repetition.
-Special symbols `NEWLINE`, `INDENT`,
+Notation: In the grammar of micro-Python given below,
+special symbols `NEWLINE`, `INDENT`,
 and `DEDENT` mark an end of line, the beginning of a new
 indentation block, and its end, respectively.
 
@@ -178,7 +174,7 @@ Logical annotations are inserted in special comments starting with `#@`.
 .. productionlist:: microPython
       file: `decl`*
       decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
- py_import: "from" ident "import" ident { "," ident } NEWLINE
+ py_import: "from" identifier "import" identifier ("," identifier)* NEWLINE
 
 Directives `import` are ignored during the translation to
 Why3. They are allowed anyway, such that a Python source code using
@@ -188,15 +184,15 @@ interpreter (see below).
 ..  rubric:: Function definition
 
 .. productionlist:: microPython
-    py_function: "def" ident "(" [ `params` ] ")" ":" NEWLINE INDENT { `spec` } { `stmt` } DEDENT
-    params: ident { "," ident }
+    py_function: "def" identifier "(" [ `params` ] ")" ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
+    params: identifier ("," identifier)*
 
 .. rubric:: Function specification
 
 .. productionlist:: microPython
    spec ::= "#@" "requires" `term` NEWLINE
         : | "#@" "ensures"  `term` NEWLINE
-        : | "#@" "variant"  `term` { "," `term` } NEWLINE
+        : | "#@" "variant"  `term` ("," `term`)* NEWLINE
 
 .. rubric:: Python expression
 
@@ -206,8 +202,8 @@ interpreter (see below).
        : | identifier "[" `expr` "]"
        : | "-" `expr` | "not" `expr`
        : | `expr` ( "+" | "-" | "*" | "//" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "and" | "or" ) `expr`
-       : | identifier "(" [ `expr` { "," `expr` } ] ")"
-       : | "[" [ `expr` { "," `expr` } ] "]"
+       : | identifier "(" (`expr` ("," `expr`)*)? ")"
+       : | "[" (`expr` ("," `expr`)*)? "]"
        : | "(" `expr` ")"
 
 .. rubric:: Python statement
@@ -216,12 +212,12 @@ interpreter (see below).
        stmt: `simple_stmt` NEWLINE
             : | "if" `expr` ":" `suite` `else_branch`
             : | "while" `expr` ":" `loop_body`
-            : | "for" ident "in" `expr` ":" `loop_body`
+            : | "for" identifier "in" `expr` ":" `loop_body`
     else_branch: /* nothing */
             : | "else:" `suite`
             : | "elif" `expr` ":" `suite` `else_branch`
       suite: `simple_stmt` NEWLINE
-            : | NEWLINE INDENT `stmt` { `stmt` } DEDENT
+            : | NEWLINE INDENT `stmt` `stmt`* DEDENT
   simple_stmt: `expr`
             : | "return" `expr`
             : | identifier "=" `expr`
@@ -231,9 +227,9 @@ interpreter (see below).
             : | "#@" ( "assert" | "assume" | "check" ) `term`
    assignop: "=" | "+=" | "-=" | "*=" | "/="
   loop_body: `simple_stmt` NEWLINE
-            : | NEWLINE INDENT { `loop_annot` } `stmt` { `stmt` } DEDENT
+            : | NEWLINE INDENT `loop_annot`* `stmt` `stmt`* DEDENT
  loop_annot: "#@" "invariant" `term` NEWLINE
-            : | "#@" "variant" `term` { "," `term` } NEWLINE
+            : | "#@" "variant" `term` ("," `term`)* NEWLINE
 
 .. rubric:: Logic declaration
 
@@ -265,8 +261,8 @@ Yet, they can be axiomatized, using toplevel `assume` statements.
        : | `term` ( "+" | "-" | "*" | "//" | "% ) `term`
        : | "if" `term` "then" `term` "else `term`
        : | "let" identifier "=" `term` "in" `term`
-       : | ( "forall" | "exists" ) ident { "," ident } "." `term`
-       : | identifier "(" [ `term` { "," `term` } ] ")"
+       : | ( "forall" | "exists" ) identifier ("," identifier)* "." `term`
+       : | identifier "(" (`term` ("," `term`)*)? ")"
 
 Built-in functions and predicates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
