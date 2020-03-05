@@ -264,7 +264,7 @@ let pp_attr pp closed fmt attr x =
       fprintf fmt "@[[@%s]@ %a@]" a.attr_string pp x
   | ATpos loc ->
       let filename, line, bchar, echar = Loc.get loc in
-      fprintf fmt "[# %S %d %d %d]" filename line bchar echar
+      fprintf fmt "[# %S %d %d %d]@ %a" filename line bchar echar pp x
 
 let pp_exn fmt (id, pty, _mask) =
   (* TODO _mask *)
