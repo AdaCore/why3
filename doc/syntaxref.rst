@@ -618,18 +618,21 @@ A WhyML input file is a (possibly empty) list of modules
       : | "clone" `imp_exp` `tqualid` ("as" `uident`)? `subst`?
       : | "scope" "import"? `uident_nq` `decl`* "end"
       : | "import" `uident`
-      : | "type" `mtype_decl` ("with" `mtype_decl`)*   ; mutable types
-      : | "type" `lident_nq` ("'" `lident_nq`)* `invariant`+   ; added invariant
       : | "let" "ghost"? `lident_nq` `attribute`* `fun_defn`
       : | "let" "rec" `fun_defn`
       : | "val" "ghost"? `lident_nq` `attribute`* `pgm_decl`
       : | "exception" `lident_nq` `attribute`* `type`?
-    mtype_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `mtype_defn`
-    mtype_defn:   ; abstract type
+    type_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `type_defn`
+    type_defn:   ; abstract type
       : | "=" `type`   ; alias type
-      : | "=" "|"? `type_case` ("|" `type_case`)* `invariant`*   ; algebraic type
-      : | "=" "{" `mrecord_field` (";" `mrecord_field`)* "}" `invariant`*   ; record type
-    mrecord_field: "ghost"? "mutable"? `lident_nq` `attribute`* ":" `type`
+      : | "=" "|"? `type_case` ("|" `type_case`)*   ; algebraic type
+      : | "=" `vis_mut` "{" `record_field` (";" `record_field`)* "}" `invariant`* `type_witness`  ; record type
+      : | "<" "range" `integer` `integer` ">"   ; range type
+      : | "<" "float" `integer` `integer` ">"   ; float type
+    type_case: `uident` `attribute`* `type_param`*
+    record_field: "ghost"? "mutable"? `lident_nq` `attribute`* ":" `type`
+    type_witness: "by" "{" `lident_nq` "=" `expr` (";" `lident_nq` "=" `expr`)* "}"
+    vis_mut: ("abstract" | "private")? "mutable"?
     pgm_decl: ":" `type`   ; global variable
       : | `param` (`spec`* `param`)+ ":" `type` `spec`*   ; abstract function
     logic_decl: `function_decl`
@@ -651,15 +654,6 @@ A WhyML input file is a (possibly empty) list of modules
       : | "lemma" `qualid`
       : | "goal"  `qualid`
     tqualid: `uident` | `ident` ("." `ident`)* "." `uident`
-    type_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `type_defn`
-    type_defn:   ; abstract type
-      : | "=" `type`   ; alias type
-      : | "=" "|"? `type_case` ("|" `type_case`)*   ; algebraic type
-      : | "=" "{" `record_field` (";" `record_field`)* "}"   ; record type
-      : | "<" "range" `integer` `integer` ">"   ; range type
-      : | "<" "float" `integer` `integer` ">"   ; float type
-    type_case: `uident` `attribute`* `type_param`*
-    record_field: `lident` `attribute`* ":" `type`
     type_param: "'" `lident`
      : | `lqualid`
      : | "(" `lident`+ ":" `type` ")"
@@ -674,11 +668,164 @@ TO BE COMPLETED
 
 Record types
 ^^^^^^^^^^^^
+.. index:: record type
 
-TO BE COMPLETED
+A record type declaration introduces a new type, with named and types
+fields, as follows:
+
+::
+
+   type t = { a: int; b: bool; }
+
+Such a type can be used in both logic and programs.
+A new record is built using curly braces and a value for each field,
+such as ``{ a = 42; b = true }``. If ``x`` is a value of type ``t``,
+its fields are accessed using the dot notation, such as ``x.a``.
+Each field happens to be a projection function, so that we can also
+``a x``.
+A field can be declared ``mutable``, as follows:
+
+::
+
+   type t = { mutable a: int; b: bool; }
+
+A mutable field can be mutated using notation ``x.a <- 42``.
+The ``writes`` clause of a function contract can list mutable fields,
+e.g., ``writes { x.a }``.
+
+.. index:: type invariant
+.. rubric:: Type invariants
+
+Invariants can be attached to record types, as follows:
+
+::
+
+   type t = { mutable a: int; b: bool; } invariant { b -> a >= 0 }
+
+The semantics of type invariants is as follows. In the logic, a type
+invariant always holds. To prevent the introduction of a logical
+inconsistency, Why3 generates a VC to show the existence of at least
+one record instance satisfying the invariant. It is named ``t'vc``
+and has the form ``exists a:int, b:bool. ...``. To ease the
+verification of this VC, one can provide an explicit witness using the
+keyword ``by``, as follows:
+
+::
+
+   type t = { mutable a: int; b: bool; } invariant { b -> a >= 0 }
+      by { a = 42; b = true }
+
+It generates a simpler VC, where fields are instantiated accordingly.
+
+In programs, a type invariant is assumed to
+hold at function entry and must be restored at function exit.
+In the middle, the invariant can be temporarily broken. For instance,
+the following function can be verified:
+
+::
+
+    let f (x: t) = x.a <- x.a - 1; x.a <- 0
+
+After the first assignment, the invariant does not necessarily hold
+anymore. But it is restored before function exit with the second
+assignment.
+
+If ever the record is passed to another function, then the invariant
+must be reestablished (so as to honor the contract of the callee).
+For instance, the following function cannot be verified:
+
+::
+
+    let f1 (x: t) = x.a <- x.a - 1; f x; x.a <- 0
+
+Indeed, passing ``x`` to function ``f`` imposes to check for the
+invariant first, which does not hold on this example. Similarly, the
+invariant must be reestablished if the record is passed to a logical
+function or predicate. For instance, the following function cannot be
+verified:
+
+::
+
+    predicate p (x: t) = x.b
+    let f2 (x: t) = x.a <- x.a - 1; assert { p x }; x.a <- 0
+
+Accessing the record fields, however, does not imply to restore the
+invariant, in both logic and programs.
+For instance, the following function can be verified:
+
+::
+
+    let f2 (x: t) = x.a <- x.a - 1; assert { x.a < old x.a }; x.a <- 0
+
+Indeed, the invariant may not hold after the first assignment, but the
+assertion is only making use of field access, so there is no need to
+reestablished the invariant.
+
+.. index:: private type
+.. rubric:: Private types
+
+A record type can be declared ``private``, as follows:
+
+::
+
+    type t = private { mutable a: int; b: bool; }
+
+The meaning of such a declaration is that one cannot build a record
+instance anymore, neither in the logic, nor in programs.
+For instance, the following function cannot be defined anymore:
+
+::
+
+    let create () = { a = 42; b = true }
+
+One cannot modify mutable fields of private types either.
+One may wonder what is the purpose of private types, if one cannot
+build values in those types anymore. The purpose is to build
+interfaces, to be later refined with actual implementations (see
+section :ref:`Module Cloning` below). Indeed, if we cannot build
+record instances anymore, we can still *declare* operations that
+return such records. For instance, we can declare the following two
+functions:
+
+::
+
+    val create (n: int) : t
+      ensures { result.a = n }
+    val incr (x: t) : unit
+      writes  { x.a }
+      ensures { x.a = old x.a + 1 }
+
+Later, we can *refine* type ``t`` with a type that is not private
+anymore, and then implement operations ``create`` and ``incr``.
+
+Private types are often used in conjunction with ghost fields, that
+are used to model the contents of data structures. For instance, we
+can conveniently model a queue containing integers as follows:
+
+::
+
+    type queue = private { mutable ghost s: seq int }
+
+If needed, we could even add invariants (e.g., the sequence ``s`` is
+sorted for a priority queue).
+
+.. index:: abstract type
+
+When a private record type only has ghost fields, one can use
+``abstract`` as a convenient shortcut:
+
+::
+
+    type queue = abstract { mutable s: seq int }
+
+This is equivalent to the previous declaration.
+
+
 
 Range types
 ^^^^^^^^^^^
+
+.. index:: range type
 
 A declaration of the form ``type r = < range a b >`` defines a type that
 projects into the integer range ``[a,b]``. Note that in order to make
@@ -825,7 +972,7 @@ in the ghost code and never translated into executable code ; or
 effects unaccounted by their specification, and thus they cannot be
 used in the ghost code.
 
-
+.. _Module Cloning:
 
 Module Cloning
 ^^^^^^^^^^^^^^
