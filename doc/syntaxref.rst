@@ -708,39 +708,30 @@ A WhyML input file is a (possibly empty) list of modules
      : | "()"
 
 
-Algebraic types
-^^^^^^^^^^^^^^^
-
-.. index:: algebraic type
-
-TO BE COMPLETED
-
-
-
 Record types
 ^^^^^^^^^^^^
 .. index:: record type
 
-A record type declaration introduces a new type, with named and types
+A record type declaration introduces a new type, with named and typed
 fields, as follows:
 
 ::
 
-   type t = { a: int; b: bool; }
+    type t = { a: int; b: bool }
 
-Such a type can be used in both logic and programs.
+Such a type can be used both in logic and programs.
 A new record is built using curly braces and a value for each field,
 such as ``{ a = 42; b = true }``. If ``x`` is a value of type ``t``,
 its fields are accessed using the dot notation, such as ``x.a``.
 Each field happens to be a projection function, so that we can also
-``a x``.
+write ``a x``.
 A field can be declared ``mutable``, as follows:
 
 ::
 
-   type t = { mutable a: int; b: bool; }
+    type t = { mutable a: int; b: bool }
 
-A mutable field can be mutated using notation ``x.a <- 42``.
+A mutable field can be modified using notation ``x.a <- 42``.
 The ``writes`` clause of a function contract can list mutable fields,
 e.g., ``writes { x.a }``.
 
@@ -751,19 +742,21 @@ Invariants can be attached to record types, as follows:
 
 ::
 
-   type t = { mutable a: int; b: bool; } invariant { b -> a >= 0 }
+    type t = { mutable a: int; b: bool }
+      invariant { b = true -> a >= 0 }
 
 The semantics of type invariants is as follows. In the logic, a type
 invariant always holds. To prevent the introduction of a logical
 inconsistency, Why3 generates a VC to show the existence of at least
 one record instance satisfying the invariant. It is named ``t'vc``
-and has the form ``exists a:int, b:bool. ...``. To ease the
+and has the form ``exists a:int, b:bool. b = true -> a >= 0``. To ease the
 verification of this VC, one can provide an explicit witness using the
 keyword ``by``, as follows:
 
 ::
 
-   type t = { mutable a: int; b: bool; } invariant { b -> a >= 0 }
+    type t = { mutable a: int; b: bool }
+      invariant { b = true -> a >= 0 }
       by { a = 42; b = true }
 
 It generates a simpler VC, where fields are instantiated accordingly.
@@ -781,7 +774,7 @@ After the first assignment, the invariant does not necessarily hold
 anymore. But it is restored before function exit with the second
 assignment.
 
-If ever the record is passed to another function, then the invariant
+If the record is passed to another function, then the invariant
 must be reestablished (so as to honor the contract of the callee).
 For instance, the following function cannot be verified:
 
@@ -789,8 +782,8 @@ For instance, the following function cannot be verified:
 
     let f1 (x: t) = x.a <- x.a - 1; f x; x.a <- 0
 
-Indeed, passing ``x`` to function ``f`` imposes to check for the
-invariant first, which does not hold on this example. Similarly, the
+Indeed, passing ``x`` to function ``f`` requires checking the
+invariant first, which does not hold in this example. Similarly, the
 invariant must be reestablished if the record is passed to a logical
 function or predicate. For instance, the following function cannot be
 verified:
@@ -798,10 +791,11 @@ verified:
 ::
 
     predicate p (x: t) = x.b
+
     let f2 (x: t) = x.a <- x.a - 1; assert { p x }; x.a <- 0
 
-Accessing the record fields, however, does not imply to restore the
-invariant, in both logic and programs.
+Accessing the record fields, however, does not require restoring the
+invariant, both in logic and programs.
 For instance, the following function can be verified:
 
 ::
@@ -810,7 +804,7 @@ For instance, the following function can be verified:
 
 Indeed, the invariant may not hold after the first assignment, but the
 assertion is only making use of field access, so there is no need to
-reestablished the invariant.
+reestablish the invariant.
 
 .. index:: private type
 .. rubric:: Private types
@@ -819,11 +813,11 @@ A record type can be declared ``private``, as follows:
 
 ::
 
-    type t = private { mutable a: int; b: bool; }
+    type t = private { mutable a: int; b: bool }
 
 The meaning of such a declaration is that one cannot build a record
-instance anymore, neither in the logic, nor in programs.
-For instance, the following function cannot be defined anymore:
+instance, neither in the logic, nor in programs.
+For instance, the following function cannot be defined:
 
 ::
 
@@ -831,10 +825,10 @@ For instance, the following function cannot be defined anymore:
 
 One cannot modify mutable fields of private types either.
 One may wonder what is the purpose of private types, if one cannot
-build values in those types anymore. The purpose is to build
+build values in those types. The purpose is to build
 interfaces, to be later refined with actual implementations (see
 section :ref:`Module Cloning` below). Indeed, if we cannot build
-record instances anymore, we can still *declare* operations that
+record instances, we can still *declare* operations that
 return such records. For instance, we can declare the following two
 functions:
 
@@ -842,6 +836,7 @@ functions:
 
     val create (n: int) : t
       ensures { result.a = n }
+
     val incr (x: t) : unit
       writes  { x.a }
       ensures { x.a = old x.a + 1 }
@@ -858,7 +853,7 @@ can conveniently model a queue containing integers as follows:
     type queue = private { mutable ghost s: seq int }
 
 If needed, we could even add invariants (e.g., the sequence ``s`` is
-sorted for a priority queue).
+sorted in a priority queue).
 
 .. index:: abstract type
 
@@ -877,17 +872,26 @@ Record types can be recursive, e.g,
 
 ::
 
-    type t = { a: int; next: option t; }
+    type t = { a: int; next: option t }
 
 Recursive record types cannot have invariants, cannot have mutable
 fields, and cannot be private.
+
+Algebraic types
+^^^^^^^^^^^^^^^
+
+.. index:: algebraic type
+
+TO BE COMPLETED
+
+
 
 Range types
 ^^^^^^^^^^^
 
 .. index:: range type
 
-A declaration of the form ``type r = < range a b >`` defines a type that
+A declaration of the form ``type r = <range a b>`` defines a type that
 projects into the integer range ``[a,b]``. Note that in order to make
 such a declaration the theory ``int.Int`` must be imported.
 
@@ -897,9 +901,9 @@ range type :math:`r` automatically introduces the following:
 
 ::
 
-      function  r'int r : int
-      constant  r'maxInt : int
-      constant  r'minInt : int
+    function r'int r : int
+    constant r'maxInt : int
+    constant r'minInt : int
 
 The function ``r'int`` projects a term of type ``r`` to its integer
 value. The two constants represent the high bound and low bound of the
@@ -926,7 +930,7 @@ This type is used in the standard library in the theories ``bv.BV8``,
 Floating-point types
 ^^^^^^^^^^^^^^^^^^^^
 
-A declaration of the form ``type f = < float eb sb >`` defines a type of
+A declaration of the form ``type f = <float eb sb>`` defines a type of
 floating-point numbers as specified by the IEEE-754
 standard :cite:`ieee754-2008`. Here the literal ``eb``
 represents the number of bits in the exponent and the literal ``sb`` the
@@ -943,10 +947,10 @@ Defining such a type ``f`` automatically introduces the following:
 
 ::
 
-      predicate f'isFinite f
-      function  f'real f : real
-      constant  f'eb : int
-      constant  f'sb : int
+    predicate f'isFinite f
+    function  f'real f : real
+    constant  f'eb : int
+    constant  f'sb : int
 
 As specified by the IEEE standard, float formats includes infinite
 values and also a special NaN value (Not-a-Number) to represent results
