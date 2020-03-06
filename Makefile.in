@@ -248,7 +248,7 @@ LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer dri
 
 
 ifeq (@enable_infer@,yes)
-LIB_ABSINT = reduction_engine0 o2oterm o2mterm domain ai_logic trace_partitioning_domain quant_domain disjunctive_domain disjunctive_domain_fast apron_to_term union_find disjunctive_term_domain uf_domain ai_cfg
+LIB_INFER = reduction_engine0 o2oterm o2mterm domain ai_logic trace_partitioning_domain quant_domain disjunctive_domain disjunctive_domain_fast apron_to_term union_find disjunctive_term_domain uf_domain ai_cfg
 endif
 
 # FIX ME!!!
@@ -294,7 +294,7 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/mlw/, $(LIB_MLW1)) \
-	      $(addprefix src/absint/, $(LIB_ABSINT)) \
+	      $(addprefix src/infer/, $(LIB_INFER)) \
 	      $(addprefix src/mlw/, $(LIB_MLW2)) \
 	      $(addprefix src/extract/, $(LIB_EXTRACT)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
@@ -305,7 +305,7 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 LIBDIRS = util core driver mlw extract parser transform printer session
 
 ifeq (@enable_infer@,yes)
-LIBDIRS += absint
+LIBDIRS += infer
 endif
 
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
@@ -860,7 +860,7 @@ IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 $(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
 ifeq (@enable_infer@,yes)
-$(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/absint
+$(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/infer
 endif
 
 $(IDEDEP): $(IDEGENERATED)
