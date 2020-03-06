@@ -1162,70 +1162,73 @@ We start our module with the introduction of a monoid:
 
 .. code-block:: whyml
 
-  module Exp
-    use int.Int
-    use int.ComputerDivision
+   module Exp
+     use int.Int
+     use int.ComputerDivision
 
-    type t
+     type t
 
-    val constant one : t
+     val constant one : t
 
-    val function mul t t : t
+     val function mul t t : t
 
-    axiom one_neutral: forall x. mul one x = x = mul x one
+     axiom one_neutral: forall x. mul one x = x = mul x one
 
-    axiom mul_assoc: forall x y z. mul x (mul y z) = mul (mul x y) z
+     axiom mul_assoc: forall x y z. mul x (mul y z) = mul (mul x y) z
 
 Then we define a simple exponentiation function, mostly for the
 purpose of specification:
 
 .. code-block:: whyml
+   :dedent: 0
 
-    let rec function exp (x: t) (n: int) : t
-      requires { n >= 0 }
-      variant  { n }
-    = if n = 0 then one else mul x (exp x (n - 1))
+     let rec function exp (x: t) (n: int) : t
+       requires { n >= 0 }
+       variant  { n }
+     = if n = 0 then one else mul x (exp x (n - 1))
 
 In anticipation of the forthcoming verification of exponentiation by
 squaring, we prove two lemmas. As they require induction, we use lemma
 functions:
 
 .. code-block:: whyml
+   :dedent: 0
 
-    let rec lemma exp_add (x: t) (n m: int)
-      requires { 0 <= n /\ 0 <= m }
-      variant  { n }
-      ensures  { exp x (n + m) = mul (exp x n) (exp x m) }
-    = if n > 0 then exp_add x (n - 1) m
+     let rec lemma exp_add (x: t) (n m: int)
+       requires { 0 <= n /\ 0 <= m }
+       variant  { n }
+       ensures  { exp x (n + m) = mul (exp x n) (exp x m) }
+     = if n > 0 then exp_add x (n - 1) m
 
-    let rec lemma exp_mul (x: t) (n m: int)
-      requires { 0 <= n /\ 0 <= m }
-      variant  { m }
-      ensures  { exp x (n * m) = exp (exp x n) m }
-    = if m > 0 then exp_mul x n (m - 1)
+     let rec lemma exp_mul (x: t) (n m: int)
+       requires { 0 <= n /\ 0 <= m }
+       variant  { m }
+       ensures  { exp x (n * m) = exp (exp x n) m }
+     = if m > 0 then exp_mul x n (m - 1)
 
 Finally, we implement and verify exponentiation by squaring, which
 completes our module.
 
 .. code-block:: whyml
+   :dedent: 0
 
-    let fast_exp (x: t) (n: int) : t
-      requires { n >= 0 }
-      ensures  { result = exp x n }
-    = let ref p = x in
-      let ref q = n in
-      let ref r = one in
-      while q > 0 do
-        invariant { 0 <= q }
-        invariant { mul r (exp p q) = exp x n }
-        variant   { q }
-        if mod q 2 = 1 then r <- mul r p;
-        p <- mul p p;
-        q <- div q 2
-      done;
-      r
+     let fast_exp (x: t) (n: int) : t
+       requires { n >= 0 }
+       ensures  { result = exp x n }
+     = let ref p = x in
+       let ref q = n in
+       let ref r = one in
+       while q > 0 do
+         invariant { 0 <= q }
+         invariant { mul r (exp p q) = exp x n }
+         variant   { q }
+         if mod q 2 = 1 then r <- mul r p;
+         p <- mul p p;
+         q <- div q 2
+       done;
+       r
 
-  end
+   end
 
 Note that module ``Exp`` mixes declared symbols (type ``t``, constant
 ``one``, function ``mul``) and defined symbols (function ``exp``,
