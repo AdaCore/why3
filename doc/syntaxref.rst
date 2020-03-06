@@ -877,13 +877,87 @@ Record types can be recursive, e.g,
 Recursive record types cannot have invariants, cannot have mutable
 fields, and cannot be private.
 
-Algebraic types
-^^^^^^^^^^^^^^^
+Algebraic data types
+^^^^^^^^^^^^^^^^^^^^
 
-.. index:: algebraic type
+.. index:: algebraic data type
 
-TO BE COMPLETED
+Algebraic data types combine sum and product types.
+A simple example of a sum type is that of an option type:
 
+::
+
+    type maybe = No | Yes int
+
+Such a declaration introduces a new type ``maybe``, with two
+constructors ``No`` and ``Yes``. Constructor ``No`` has no argument
+and thus can be used as a constant value. Constructor ``Yes`` has an
+argument of type ``int`` and thus can be used to build values such as
+``Yes 42``. Algebraic data types can be polymorphic, e.g.,
+
+::
+
+    type option 'a = None | Some 'a
+
+(This type is already part of Why3 standard library, in module
+`option.Option <http://why3.lri.fr/stdlib/option.html>`_.)
+
+A data type can be recursive. The archetypal example is the type of
+polymorphic lists:
+
+::
+
+    type list 'a = Nil | Cons 'a (list 'a)
+
+(This type is already part of Why3 standard library, in module
+`list.List <http://why3.lri.fr/stdlib/list.html>`_.)
+
+When a field is common to all constructors, with the same type, it can
+be named:
+
+::
+
+    type t =
+      | MayBe (size: int) (option int)
+      | Many  (size: int) (list int)
+
+Such a named field introduces a projection function. Here, we get a
+function ``size`` of type ``t -> int``.
+
+Constructor arguments can be ghost, e.g.,
+
+::
+
+    type answer =
+      | Yes (ghost int)
+      | No
+
+Non-uniform data types are allowed, such as the following type for
+`random access lists <http://toccata.lri.fr/gallery/random_access_list.fr.html>`_:
+
+::
+
+    type ral 'a =
+      | Empty
+      | Zero    (ral ('a, 'a))
+      | One  'a (ral ('a, 'a))
+
+Why3 supports polymorphic recursion, both in logic and programs, so
+that we can define and verify operations on such types.
+
+.. index:: tuples
+.. rubric:: Tuples
+
+A tuple type is a particular case of algebraic data types, with a
+single constructor. A tuple type need not be declared by the user; it
+is generated on the fly. The syntax for a tuple type is ``(type1,
+type2, ...)``.
+
+Note: Record types, introduced in the previous section, also
+constitute a particular case of algebraic data types with a single
+constructor. There are differences, though. Record types may have
+mutable fields, invariants, or private status, while algebraic data
+types cannot.
 
 
 Range types
