@@ -122,7 +122,7 @@ module Make(E: sig
     D.add_lvariable_to_env manpk v;
     v
 
-  let start_cfg _ =
+  let start_cfg () =
     let cfg = { expr_to_control_point = Hashtbl.create 100;
       variable_mapping = Hashtbl.create 100;
       control_point_count = 0;

@@ -151,7 +151,7 @@ module Make (D: Domain.DOMAIN) = struct
          (* TODO: check that rs is not a "function" *)
          let open Ity in
          let preconditions = cexp.c_cty.cty_pre in
-         let cfg = AI.start_cfg rs in
+         let cfg = AI.start_cfg () in
          let context = AI.empty_context () in
          List.iter (AI.add_variable cfg context) cexp.c_cty.cty_args;
          if Debug.test_flag Uf_domain.infer_debug then

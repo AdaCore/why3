@@ -156,7 +156,7 @@ let annot_attrs = Sattr.add stop_split (Sattr.singleton annot_attr)
 
 let vc_expl loc attrs expl f =
   let attrs = Sattr.union annot_attrs (Sattr.union attrs f.t_attrs) in
-  let attrs = if attrs_has_expl attrs then attrs else Sattr.add expl attrs in
+  let attrs = Sattr.add expl attrs in (* FIXME check what was here before *)
   t_attr_set ?loc:(if loc = None then f.t_loc else loc) attrs f
 
 (* propositional connectives with limited simplification *)
@@ -1552,6 +1552,9 @@ let vc_fun env vc_wp cty e =
 let vc_rec env vc_wp rdl =
   List.map (vc_kode env vc_wp) (k_rec env Mls.empty rdl)
 
+let infer_flag =
+  Debug.register_flag "infer-loop" ~desc:"Infer loop invariants"
+
 let mk_vc_decl ({known_map = kn} as env) id f =
   let {id_string = nm; id_attrs = attrs; id_loc = loc} = id in
   let attrs = if attrs_has_expl attrs then attrs else
@@ -1567,6 +1570,40 @@ let mk_vc_decl ({known_map = kn} as env) id f =
 let add_vc_decl kn id f vcl =
   if can_simp f then vcl else mk_vc_decl kn id f :: vcl
 
+let infer_loops env tkn mkn e cty =
+  let open Theory in
+  let module AI = Ai_cfg.Make (struct
+    let env = env
+    let th_known = tkn
+    let mod_known = mkn
+    let widening = 3
+    module D = Domain.Polyhedra end)
+  in
+  let preconditions = cty.cty_pre in
+  let cfg = AI.start_cfg () in
+  let context = AI.empty_context () in
+  List.iter (AI.add_variable cfg context) cty.cty_args;
+  if Debug.test_flag Uf_domain.infer_debug then
+    Format.printf "%a@." Expr.print_expr e;
+  ignore (AI.put_expr_with_pre cfg context e preconditions);
+  (* will hold the different file offsets (useful when writing
+         multiple invariants) *)
+  let fixp = AI.eval_fixpoints cfg context in
+  let invs = List.map (fun (e,d) ->
+    let expl = "expl:infer-loop" in
+    let t    = AI.domain_to_term cfg context d in
+    let t    = Term.t_attr_add (Ident.create_attribute expl) t in
+    if Debug.test_flag Uf_domain.infer_debug then
+      Pretty.print_term Format.std_formatter t;
+    (e,t)
+               ) fixp in
+  invs
+
+let infer_loops env tkn mkn e cty =
+  if Debug.test_flag infer_flag then
+    infer_loops env tkn mkn e cty
+  else []
+
 let vc env kn tuc d = match d.pd_node with
   | PDlet (LDvar (_, {e_node = Eexec ({c_node = Cany},_)})) ->
       []
@@ -1578,35 +1615,7 @@ let vc env kn tuc d = match d.pd_node with
       let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
       add_vc_decl env v.pv_vs.vs_name f []
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
-      (* infer-loop *)
-      let open Theory in
-      let module AI = Ai_cfg.Make (struct
-         let env = env
-         let th_known = tuc.uc_known
-         let mod_known = kn
-         let widening = 3
-         module D = Domain.Polyhedra end)
-      in
-      let expl = "expl:infer-loop" in
-      let preconditions = cty.cty_pre in
-      let cfg = AI.start_cfg s in
-      let context = AI.empty_context () in
-      List.iter (AI.add_variable cfg context) cty.cty_args;
-      if Debug.test_flag Uf_domain.infer_debug then
-        Format.printf "%a@." Expr.print_expr e;
-      ignore (AI.put_expr_with_pre cfg context e preconditions);
-      (* will hold the different file offsets (useful when writing
-         multiple invariants) *)
-      let fixp = AI.eval_fixpoints cfg context in
-      let invs = List.map (fun (e,d) ->
-        let t = AI.domain_to_term cfg context d in
-        let t = Term.t_attr_add (Ident.create_attribute expl) t in
-        if Debug.test_flag Uf_domain.infer_debug then
-          Pretty.print_term Format.std_formatter t;
-        (e,t)
-                   ) fixp in
-      (* ---------- *)
-
+      let invs = infer_loops env tuc.uc_known kn e cty in
       let env = mk_env env kn tuc invs in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
       add_vc_decl env s.rs_name f []

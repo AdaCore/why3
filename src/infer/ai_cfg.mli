@@ -18,7 +18,7 @@ module Make(S:sig
 
   val empty_context : unit -> context
 
-  val start_cfg: Expr.rsymbol -> cfg
+  val start_cfg: unit -> cfg
 
   val put_expr_in_cfg: cfg -> context -> ?ret:Term.vsymbol option -> Expr.expr ->
             (control_point * control_point * ((control_point * Ity.xsymbol) list))
