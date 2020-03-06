@@ -24,4 +24,4 @@ DOCRST = $(DOC:%=doc/%.rst)
 LIBDOT = $(patsubst %,doc/stdlib-dot/library-%.dot, int array)
 
 public/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
-	$(SPHINX) -W --keep-going -b html doc public
+	sphinx-build -W --keep-going -b html doc public
