@@ -1255,12 +1255,12 @@ current namespace (which here contains a constant ``one`` of type
 
 When a module is cloned, any axiom is automatically turned into a
 lemma. Thus, the ``clone`` command above generates two VCs, one for
-lemma ``one_neutral`` and another for lemma ``mul_assoc``.
-If an axiom should instead remain an axiom, it should be explicitly
+lemma ``one_neutral`` and another for lemma ``mul_assoc``.  If an
+axiom should instead remain an axiom, it should be explicitly
 indicated in the substitution (using ``axiom mul_assoc`` for
-instance). Figuring out if an axiom should be turned into a lemma
-is not decidable. The default behavior of Why3 goes for the safe
-path (all axioms are to be proved).
+instance). Why3 cannot figure out by itself whether an axiom should be
+turned into a lemma, so it goes for the safe path (all axioms are to
+be proved) by default.
 
 Lemmas that were proved in the module being cloned (such as
 ``exp_add`` and ``exp_mul`` here) are not reproved. They are part
