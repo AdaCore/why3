@@ -81,8 +81,8 @@ ifeq (@LATEX@,rubber)
 endif
 
 ifeq (@LATEX@,latexmk)
-   LATEXCOMP=latexmk --pdf
-   LATEXCLEAN=latexmk --pdf -C
+   LATEXCOMP=LATEXOPTS= latexmk --pdf
+   LATEXCLEAN=LATEXOPTS= latexmk --pdf -C
 endif
 
 ifeq (@LATEX@,pdflatex)
