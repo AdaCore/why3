@@ -612,7 +612,7 @@ the value of term `t` in the prestate. Within the scope of a code mark
 `L`, the term `at t L` refers to the value of term `t` at the program
 point corresponding to `L`.
 
-.. index:: for loop
+.. index:: for loop, invariant; for loop
 .. rubric:: The “For” loop
 
 The “for” loop of Why3 has the following general form:
@@ -641,7 +641,7 @@ backwards.
 It is also possible for ``v`` to be an integer range type (see
 :numref:`sec.range_types`) instead of an integer.
 
-.. index:: for each loop
+.. index:: for each loop, invariant; for each loop
 .. rubric:: The “For each” loop
 
 The “for each” loop of Why3 has the following syntax:
@@ -765,7 +765,7 @@ A mutable field can be modified using notation ``x.a <- 42``.
 The ``writes`` clause of a function contract can list mutable fields,
 e.g., ``writes { x.a }``.
 
-.. index:: type invariant
+.. index:: type invariant, invariant; type
 .. rubric:: Type invariants
 
 Invariants can be attached to record types, as follows:
