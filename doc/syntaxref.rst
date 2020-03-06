@@ -172,6 +172,7 @@ type expressions is the following:
             : | "{" `type` "}"   ; snapshot type
             : | `qualifier`? "(" `type` ")"   ; type in a scope
 
+.. index:: mapping type
 
 Built-in types are ``int`` (arbitrary precision integers), ``real``
 (real numbers), ``bool``, the arrow type (also called the *mapping
@@ -181,6 +182,8 @@ type*), and the tuple types. The empty tuple type is also called the
 Note that the syntax for type expressions notably differs from the usual
 ML syntax. In particular, the type of polymorphic lists is written
 ``list 'a``, and not ``'a list``.
+
+.. index:: snapshot type
 
 *Snapshot types* are specific to WhyML, they denote the types of ghost
 values produced by pure logical functions in WhyML programs. A snapshot
@@ -373,6 +376,8 @@ As with normal identifiers, we can put a qualifier over a parenthesised
 operator, e.g., ``Map.S.([]) m i``. Also, as noted above, a qualifier
 can be put over a parenthesised term, and the parentheses can be omitted
 if the term is a record or a record update.
+
+.. index:: &&, ||, by, so
 
 The propositional connectives in WhyML formulas are listed in
 :token:`term`. The non-standard connectives — asymmetric
@@ -777,7 +782,10 @@ Invariants can be attached to record types, as follows:
       invariant { b = true -> a >= 0 }
 
 The semantics of type invariants is as follows. In the logic, a type
-invariant always holds. To prevent the introduction of a logical
+invariant always holds.
+Consequently, it is no more possible
+to build a value using the curly braces (in the logic).
+To prevent the introduction of a logical
 inconsistency, Why3 generates a VC to show the existence of at least
 one record instance satisfying the invariant. It is named ``t'vc``
 and has the form ``exists a:int, b:bool. b = true -> a >= 0``. To ease the

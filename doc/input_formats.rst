@@ -13,6 +13,7 @@ with a suffix `.c` or `.py`, which triggers the corresponding input format.
 These input formats can also be used in on-line versions of Why3, at
 http://why3.lri.fr/micro-C/ and http://why3.lri.fr/python/, respectively.
 
+.. index:: micro-C
 .. _format.micro-C:
 
 micro-C
@@ -152,7 +153,7 @@ Built-in functions and predicates
   value `v` in array `a`
 
 
-
+.. index:: Python
 .. _format.micro-Python:
 
 micro-Python
