@@ -830,7 +830,7 @@ non-exhaustive list (which is undergoing active development):
    This is current an issue in particular for the Array module of the
    standard library.
 
--  [TODO: complete this list]
+.. -  [TODO: complete this list]
 
 More information on the implementation of counterexamples in Why3 can be
 found in :cite:`hauzar16sefm` and
