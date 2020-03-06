@@ -601,9 +601,9 @@ lazy operators ``&&`` and ``||`` which evaluate from left to right,
 lazily.
 
 .. index:: specification clauses
-.. rubric:: Specification clauses
 .. index:: at
 .. index:: old
+.. rubric:: Specification clauses
 
 The syntax for specification clauses in programs is given in
 :token:`spec`.  Within specifications, terms are extended with
@@ -737,9 +737,10 @@ A WhyML input file is a (possibly empty) list of modules
      : | "()"
 
 
+.. index:: record type
+
 Record types
 ^^^^^^^^^^^^
-.. index:: record type
 
 A record type declaration introduces a new type, with named and typed
 fields, as follows:
@@ -906,10 +907,10 @@ Record types can be recursive, e.g,
 Recursive record types cannot have invariants, cannot have mutable
 fields, and cannot be private.
 
+.. index:: algebraic data type
+
 Algebraic data types
 ^^^^^^^^^^^^^^^^^^^^
-
-.. index:: algebraic data type
 
 Algebraic data types combine sum and product types.
 A simple example of a sum type is that of an option type:
@@ -1140,13 +1141,12 @@ in the ghost code and never translated into executable code ; or
 effects unaccounted by their specification, and thus they cannot be
 used in the ghost code.
 
+.. index:: clone
+.. index:: module cloning
 .. _Module Cloning:
 
 Module Cloning
 ^^^^^^^^^^^^^^
-
-.. index:: clone
-.. index:: module cloning
 
 Why3 features a mechanism to make an instance of a module, by
 substituting some of its declarations with other symbols. It is called
@@ -1283,10 +1283,10 @@ instantiating ``Exp`` with zero and addition instead.
       goal G: exp 2 3 = 6
     end
 
+.. index:: standard library
+
 The Why3 Standard Library
 -------------------------
-
-.. index:: standard library
 
 The Why3 standard library provides general-purpose modules, to be used
 in logic and/or programs. It can be browsed on-line at
