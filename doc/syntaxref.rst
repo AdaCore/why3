@@ -738,6 +738,7 @@ A WhyML input file is a (possibly empty) list of modules
 
 
 .. index:: record type
+.. _Record Types:
 
 Record types
 ^^^^^^^^^^^^
