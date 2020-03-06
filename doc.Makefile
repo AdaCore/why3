@@ -19,7 +19,7 @@ DRVDOT = $(patsubst %,doc/generated/drivers-%.dot, smt tptp coq isabelle pvs)
 DOC = index zebibliography genindex \
   foreword starting whyml api install manpages syntaxref input_formats exec itp technical changes
 
-DOCRST = $(DOC:%=doc/%.rst)
+DOCRST = $(DOC:%=doc/%.rst) doc/manual.bib
 
 LIBDOT = $(patsubst %,doc/stdlib-dot/library-%.dot, int array)
 
