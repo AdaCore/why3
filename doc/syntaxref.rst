@@ -612,6 +612,35 @@ the value of term `t` in the prestate. Within the scope of a code mark
 `L`, the term `at t L` refers to the value of term `t` at the program
 point corresponding to `L`.
 
+.. index:: for loop
+.. rubric:: The “For” loop
+
+The “for” loop of Why3 has the following general form:
+
+.. code-block:: whyml
+
+    for v=e1 to e2 do invariant { i } e3 done
+
+Here, ``v`` is a variable identifier, that is bound by the loop
+statement and of type ``integer`` ; ``e1`` and ``e2`` are program
+expressions of type ``integer``, and ``e3`` is an expression of type
+``unit``. The variable ``v`` may occur both in ``i`` and ``e3``, and
+is not mutable. The execution of such a loop amounts to first evaluate
+``e1`` and ``e2`` to values ``n1`` and ``n2``. If ``n1 >= n2`` then
+the loop is not executed at all, otherwise it is executed iteratively
+for ``v`` taking all the values between ``n1`` and ``n2`` included.
+
+Regarding verification conditions, one must prove that ``i[v <- n1]``
+holds (invariant initialization) ; and that ``forall n. n1 <= n <= n2
+/\ i[v <- n] -> i[v <- n+1]`` (invariant preservation). Beware that at
+loop exit, the property which is known is ``i[v <- n2+1]``.
+
+The variant with keyword ``downto`` instead of ``to`` iterates
+backwards.
+
+It is also possible for ``v`` to be an integer range type (see
+:numref:`sec.range_types`) instead of an integer.
+
 .. index:: for each loop
 .. rubric:: The “For each” loop
 
@@ -960,10 +989,11 @@ mutable fields, invariants, or private status, while algebraic data
 types cannot.
 
 
+.. index:: range type
+.. _sec.range_types:
+
 Range types
 ^^^^^^^^^^^
-
-.. index:: range type
 
 A declaration of the form ``type r = <range a b>`` defines a type that
 projects into the integer range ``[a,b]``. Note that in order to make
