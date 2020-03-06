@@ -354,6 +354,9 @@ with normal identifiers, names with a letter after a prime, such as
 ``(+)'spec``, can only be introduced by Why3, and not by the user in a
 WhyML source.
 
+.. index:: at
+.. index:: old
+
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
 past moment of execution (see the next section for details). These
@@ -451,12 +454,12 @@ conditionals, let-bindings, pattern matching, and local function
 definitions, either via the ``let-in`` construction or the ``fun``
 keyword. The pure logical functions defined in this way are called
 *mappings*; they are first-class values of “arrow” type
-:samp:`{t} -> {u}`.
+`t -> u`.
 
-The patterns are similar to those of OCaml, though the ``when`` clauses
-and numerical constants are not supported. Unlike in OCaml, ``as`` binds
-stronger than the comma: in the pattern :samp:`({p},{q} as {x})`, variable
-*x* is bound to the value matched by pattern *q*. Also notice
+The patterns are similar to those of OCaml, though the `when` clauses
+and numerical constants are not supported. Unlike in OCaml, `as` binds
+stronger than the comma: in the pattern `(p,q as x)`, variable
+`x` is bound to the value matched by pattern `q`. Also notice
 the closing ``end`` after the ``match with`` term. A ``let in``
 construction with a non-trivial pattern is translated as a
 ``match with`` term with a single branch.
@@ -572,10 +575,16 @@ conjunction and disjunction, respectively.
     variant_term: `term` ("with" `lqualid`)?   ; variant term + WF-order
 
 
+.. index:: ghost expressions
+.. rubric:: Ghost expressions
+
 Keyword ``ghost`` marks the expression as ghost code added for
 verification purposes. Ghost code is removed from the final code
 intended for execution, and thus cannot affect the computation of the
 program results nor the content of the observable memory.
+
+.. index:: assignment expressions
+.. rubric:: Assignment expressions
 
 Assignment updates in place a mutable record field or an element of a
 collection. The former can be done simultaneously on a tuple of values:
@@ -583,24 +592,30 @@ collection. The former can be done simultaneously on a tuple of values:
 of the ternary bracket operator ``([]<-)`` and cannot be used in a
 multiple assignment.
 
+.. index:: evaluation order
+.. rubric:: Evaluation order
+
 In applications, arguments are evaluated from right to left. This
 includes applications of infix operators, with the only exception of
 lazy operators ``&&`` and ``||`` which evaluate from left to right,
 lazily.
 
+.. index:: specification clauses
+.. rubric:: Specification clauses
+.. index:: at
+.. index:: old
+
 The syntax for specification clauses in programs is given in
-:token:`spec`.
-Within specifications, terms are extended with new constructs ``old``
-and ``at``.
-Within a postcondition, :samp:`old {t}` refers to the value of term
-*t* in the prestate. Within the scope of a code mark *L*,
-the term :samp:`at {t} '{L}` refers to the value of term
-*t* at the program point corresponding to *L*.
+:token:`spec`.  Within specifications, terms are extended with
+constructs `old` and `at`.  Within a postcondition, `old t` refers to
+the value of term `t` in the prestate. Within the scope of a code mark
+`L`, the term `at t L` refers to the value of term `t` at the program
+point corresponding to `L`.
 
 .. index:: for each loop
-.. rubric:: For each loop
+.. rubric:: The “For each” loop
 
-The for each loop of Why3 has the following syntax:
+The “for each” loop of Why3 has the following syntax:
 
 ::
 
