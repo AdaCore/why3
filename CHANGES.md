@@ -40,9 +40,11 @@ Tools
     formatting of mlw files)
 
 Documentation
-  * improved Section 10.4 on drivers, including an automatically generated
+  * improved Chapter 7 on the WhyML language (record types, various
+    kinds of function declarations, module cloning, etc.)
+  * improved Section 11.4 on drivers, including an automatically generated
     dependency graph of driver files
-  * improved Section 10.5 on transformations, including transformations
+  * improved Section 11.5 on transformations, including transformations
     with arguments
 
 API

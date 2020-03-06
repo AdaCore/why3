@@ -617,7 +617,7 @@ point corresponding to `L`.
 
 The “for each” loop of Why3 has the following syntax:
 
-::
+.. code-block:: whyml
 
     for p in e1 with S do invariants/variant... e2 done
 
@@ -625,7 +625,7 @@ Here, ``p`` is a pattern, ``S`` is a namespace, and ``e1`` and ``e2``
 are program expressions. Such a for each loop is syntactic sugar for
 the following:
 
-::
+.. code-block:: whyml
 
     let it = S.create e1 in
     try while true do
@@ -715,7 +715,7 @@ Record types
 A record type declaration introduces a new type, with named and typed
 fields, as follows:
 
-::
+.. code-block:: whyml
 
     type t = { a: int; b: bool }
 
@@ -727,7 +727,7 @@ Each field happens to be a projection function, so that we can also
 write ``a x``.
 A field can be declared ``mutable``, as follows:
 
-::
+.. code-block:: whyml
 
     type t = { mutable a: int; b: bool }
 
@@ -740,7 +740,7 @@ e.g., ``writes { x.a }``.
 
 Invariants can be attached to record types, as follows:
 
-::
+.. code-block:: whyml
 
     type t = { mutable a: int; b: bool }
       invariant { b = true -> a >= 0 }
@@ -753,7 +753,7 @@ and has the form ``exists a:int, b:bool. b = true -> a >= 0``. To ease the
 verification of this VC, one can provide an explicit witness using the
 keyword ``by``, as follows:
 
-::
+.. code-block:: whyml
 
     type t = { mutable a: int; b: bool }
       invariant { b = true -> a >= 0 }
@@ -766,7 +766,7 @@ hold at function entry and must be restored at function exit.
 In the middle, the invariant can be temporarily broken. For instance,
 the following function can be verified:
 
-::
+.. code-block:: whyml
 
     let f (x: t) = x.a <- x.a - 1; x.a <- 0
 
@@ -778,7 +778,7 @@ If the record is passed to another function, then the invariant
 must be reestablished (so as to honor the contract of the callee).
 For instance, the following function cannot be verified:
 
-::
+.. code-block:: whyml
 
     let f1 (x: t) = x.a <- x.a - 1; f x; x.a <- 0
 
@@ -788,7 +788,7 @@ invariant must be reestablished if the record is passed to a logical
 function or predicate. For instance, the following function cannot be
 verified:
 
-::
+.. code-block:: whyml
 
     predicate p (x: t) = x.b
 
@@ -798,7 +798,7 @@ Accessing the record fields, however, does not require restoring the
 invariant, both in logic and programs.
 For instance, the following function can be verified:
 
-::
+.. code-block:: whyml
 
     let f2 (x: t) = x.a <- x.a - 1; assert { x.a < old x.a }; x.a <- 0
 
@@ -811,7 +811,7 @@ reestablish the invariant.
 
 A record type can be declared ``private``, as follows:
 
-::
+.. code-block:: whyml
 
     type t = private { mutable a: int; b: bool }
 
@@ -819,7 +819,7 @@ The meaning of such a declaration is that one cannot build a record
 instance, neither in the logic, nor in programs.
 For instance, the following function cannot be defined:
 
-::
+.. code-block:: whyml
 
     let create () = { a = 42; b = true }
 
@@ -832,7 +832,7 @@ record instances, we can still *declare* operations that
 return such records. For instance, we can declare the following two
 functions:
 
-::
+.. code-block:: whyml
 
     val create (n: int) : t
       ensures { result.a = n }
@@ -848,7 +848,7 @@ Private types are often used in conjunction with ghost fields, that
 are used to model the contents of data structures. For instance, we
 can conveniently model a queue containing integers as follows:
 
-::
+.. code-block:: whyml
 
     type queue = private { mutable ghost s: seq int }
 
@@ -860,7 +860,7 @@ sorted in a priority queue).
 When a private record type only has ghost fields, one can use
 ``abstract`` as a convenient shortcut:
 
-::
+.. code-block:: whyml
 
     type queue = abstract { mutable s: seq int }
 
@@ -870,7 +870,7 @@ This is equivalent to the previous declaration.
 
 Record types can be recursive, e.g,
 
-::
+.. code-block:: whyml
 
     type t = { a: int; next: option t }
 
@@ -885,7 +885,7 @@ Algebraic data types
 Algebraic data types combine sum and product types.
 A simple example of a sum type is that of an option type:
 
-::
+.. code-block:: whyml
 
     type maybe = No | Yes int
 
@@ -895,7 +895,7 @@ and thus can be used as a constant value. Constructor ``Yes`` has an
 argument of type ``int`` and thus can be used to build values such as
 ``Yes 42``. Algebraic data types can be polymorphic, e.g.,
 
-::
+.. code-block:: whyml
 
     type option 'a = None | Some 'a
 
@@ -905,7 +905,7 @@ argument of type ``int`` and thus can be used to build values such as
 A data type can be recursive. The archetypal example is the type of
 polymorphic lists:
 
-::
+.. code-block:: whyml
 
     type list 'a = Nil | Cons 'a (list 'a)
 
@@ -915,7 +915,7 @@ polymorphic lists:
 When a field is common to all constructors, with the same type, it can
 be named:
 
-::
+.. code-block:: whyml
 
     type t =
       | MayBe (size: int) (option int)
@@ -926,7 +926,7 @@ function ``size`` of type ``t -> int``.
 
 Constructor arguments can be ghost, e.g.,
 
-::
+.. code-block:: whyml
 
     type answer =
       | Yes (ghost int)
@@ -935,7 +935,7 @@ Constructor arguments can be ghost, e.g.,
 Non-uniform data types are allowed, such as the following type for
 `random access lists <http://toccata.lri.fr/gallery/random_access_list.fr.html>`_:
 
-::
+.. code-block:: whyml
 
     type ral 'a =
       | Empty
@@ -973,7 +973,7 @@ Why3 let you cast an integer literal in a range type (e.g. ``(42:r)``)
 and will check at typing that the literal is in range. Defining such a
 range type :math:`r` automatically introduces the following:
 
-::
+.. code-block:: whyml
 
     function r'int r : int
     constant r'maxInt : int
@@ -986,14 +986,14 @@ range respectively.
 Unless specified otherwise with the meta ``keep:literal`` on ``r``, the
 transformation :why3:transform:`eliminate_literal` introduces an axiom
 
-::
+.. code-block:: whyml
 
     axiom r'axiom : forall i:r. r'minInt <= r'int i <= r'maxInt
 
 and replaces all casts of the form ``(42:r)`` with a constant and an
 axiom as in:
 
-::
+.. code-block:: whyml
 
     constant rliteral7 : r
     axiom rliteral7_axiom : r'int rliteral7 = 42
@@ -1019,7 +1019,7 @@ float type, it refuses the cast if the literal is not representable.
 
 Defining such a type ``f`` automatically introduces the following:
 
-::
+.. code-block:: whyml
 
     predicate f'isFinite f
     function  f'real f : real
@@ -1036,7 +1036,7 @@ real value, its result is not specified for non finite terms.
 Unless specified otherwise with the meta ``keep:literal`` on ``f``, the
 transformation :why3:transform:`eliminate_literal` will introduce an axiom
 
-::
+.. code-block:: whyml
 
     axiom f'axiom :
       forall x:f. f'isFinite x -> -. max_real <=. f'real x <=. max_real
@@ -1045,7 +1045,7 @@ where ``max_real`` is the value of the biggest finite float in the
 specified format. The transformation also replaces all casts of the form
 ``(0.5:f)`` with a constant and an axiom as in:
 
-::
+.. code-block:: whyml
 
     constant fliteral42 : f
     axiom fliteral42_axiom : f'real fliteral42 = 0.5 /\ f'isFinite fliteral42
@@ -1115,11 +1115,148 @@ used in the ghost code.
 Module Cloning
 ^^^^^^^^^^^^^^
 
-TO BE COMPLETED
+.. index:: clone
+.. index:: module cloning
 
+Why3 features a mechanism to make an instance of a module, by
+substituting some of its declarations with other symbols. It is called
+*module cloning*.
+
+Let us consider the example of a module implementing
+`exponentiation by squaring
+<https://en.wikipedia.org/wiki/Exponentiation_by_squaring>`_.
+We want to make it as general as possible, so that we can implement it
+and verify it only once and then reuse it in various different
+contexts, e.g., with integers, floating-point numbers, matrices, etc.
+We start our module with the introduction of a monoid:
+
+.. code-block:: whyml
+
+  module Exp
+    use int.Int
+    use int.ComputerDivision
+
+    type t
+
+    val constant one : t
+
+    val function mul t t : t
+
+    axiom one_neutral: forall x. mul one x = x = mul x one
+
+    axiom mul_assoc: forall x y z. mul x (mul y z) = mul (mul x y) z
+
+Then we define a simple exponentiation function, mostly for the
+purpose of specification:
+
+.. code-block:: whyml
+
+    let rec function exp (x: t) (n: int) : t
+      requires { n >= 0 }
+      variant  { n }
+    = if n = 0 then one else mul x (exp x (n - 1))
+
+In anticipation of the forthcoming verification of exponentiation by
+squaring, we prove two lemmas. As they require induction, we use lemma
+functions:
+
+.. code-block:: whyml
+
+    let rec lemma exp_add (x: t) (n m: int)
+      requires { 0 <= n /\ 0 <= m }
+      variant  { n }
+      ensures  { exp x (n + m) = mul (exp x n) (exp x m) }
+    = if n > 0 then exp_add x (n - 1) m
+
+    let rec lemma exp_mul (x: t) (n m: int)
+      requires { 0 <= n /\ 0 <= m }
+      variant  { m }
+      ensures  { exp x (n * m) = exp (exp x n) m }
+    = if m > 0 then exp_mul x n (m - 1)
+
+Finally, we implement and verify exponentiation by squaring, which
+completes our module.
+
+.. code-block:: whyml
+
+    let fast_exp (x: t) (n: int) : t
+      requires { n >= 0 }
+      ensures  { result = exp x n }
+    = let ref p = x in
+      let ref q = n in
+      let ref r = one in
+      while q > 0 do
+        invariant { 0 <= q }
+        invariant { mul r (exp p q) = exp x n }
+        variant   { q }
+        if mod q 2 = 1 then r <- mul r p;
+        p <- mul p p;
+        q <- div q 2
+      done;
+      r
+
+  end
+
+Note that module ``Exp`` mixes declared symbols (type ``t``, constant
+``one``, function ``mul``) and defined symbols (function ``exp``,
+program function ``fast_exp``).
+
+We can now make an instance of module ``Exp``, by substituting some of
+its declared symbols (not necessarily all of them) with some other
+symbols. For instance, we get exponentiation by squaring on integers
+by substituting ``int`` for type ``t``, integer ``1`` for constant
+``one``, and integer multiplication for function ``mul``.
+
+.. code-block:: whyml
+
+    module ExponentiationBySquaring
+      use int.Int
+      clone Exp with type t = int, val one = one, val mul = (*)
+    end
+
+In a substitution such as ``val one = one``,
+the left-hand side refers to the namespace of
+the module being cloned, while the right-hand side refers to the
+current namespace (which here contains a constant ``one`` of type
+``int``).
+
+When a module is cloned, any axiom is automatically turned into a
+lemma. Thus, the ``clone`` command above generates two VCs, one for
+lemma ``one_neutral`` and another for lemma ``mul_assoc``.
+If an axiom should instead remain an axiom, it should be explicitly
+indicated in the substitution (using ``axiom mul_assoc`` for
+instance). Figuring out if an axiom should be turned into a lemma
+is not decidable. The default behavior of Why3 goes for the safe
+path (all axioms are to be proved).
+
+Lemmas that were proved in the module being cloned (such as
+``exp_add`` and ``exp_mul`` here) are not reproved. They are part
+of the resulting namespace, the substitution being applied to
+their statements.
+Similarly, functions that were defined in the module being cloned
+(such as ``exp`` and ``fast_exp`` here) are not reproved and are part
+of the resulting module, the substitution being applied to their
+argument types, return type, and definition. For instance, we get a
+fresh function ``fast_exp`` of type ``int->int->int``.
+
+We can make plenty other instances of our module ``Exp``.
+For instance, we get
+`Russian multiplication
+<https://en.wikipedia.org/wiki/Ancient_Egyptian_multiplication>`_ for free
+instantiating ``Exp`` with zero and addition instead.
+
+.. code-block:: whyml
+
+    module Multiplication
+      use int.Int
+      clone Exp with type t = int, val one = zero, val mul = (+)
+      goal G: exp 2 3 = 6
+    end
 
 The Why3 Standard Library
 -------------------------
+
+.. index:: standard library
 
 The Why3 standard library provides general-purpose modules, to be used
 in logic and/or programs. It can be browsed on-line at
@@ -1129,7 +1266,7 @@ syntax ``file.M``, since ``file`` is available in Why3’s default load
 path. For instance, the module of integers and the module of arrays
 indexed by integers are imported as follows:
 
-::
+.. code-block:: whyml
 
       use int.Int
       use array.Array
@@ -1138,7 +1275,7 @@ A sub-directory ``mach/`` provides various modules to model machine
 arithmetic. For instance, the module of 63-bit integers and the module
 of arrays indexed by 63-bit integers are imported as follows:
 
-::
+.. code-block:: whyml
 
       use mach.int.Int63
       use mach.array.Array63
