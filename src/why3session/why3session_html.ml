@@ -51,7 +51,7 @@ let spec =
     "[simpletree|table] style to use (default: '" ^ default_style ^ "')";
     KLong "add_pp", Hnd1 (APair (',', AString, APair (',', AString, AString)),
       fun (suf, (cmd, out)) -> opt_pp := (suf, (cmd, out)) :: !opt_pp),
-    "<suffix>,<cmd>,<out_suffix> declare a pretty-printer for edited proofs";
+    "<suffix>,<cmd>,<out_suffix> declare a pretty-printer for edited\nproofs";
     KLong "coqdoc", Hnd0
       (fun () -> opt_pp := (".v",("coqdoc --no-index --html -o %o %i",".html"))::!opt_pp),
     " use coqdoc to print Coq proofs";

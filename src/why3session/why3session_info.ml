@@ -34,7 +34,7 @@ let spec =
     KLong "stats", Hnd0 (fun () -> opt_stats_print := true),
     " print various proofs statistics";
     KLong "graph", Hnd0 (fun () -> opt_hist_print := true),
-    " print a graph of the total time needed by each prover \
+    " print a graph of the total time needed by each prover\n\
       depending on the number of goals";
     KLong "dir", Hnd0 (fun () -> opt_project_dir := true),
     " print the directory of the session";

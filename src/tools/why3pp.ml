@@ -424,7 +424,8 @@ let spec =
   [ KLong "output", Hnd1 (ASymbol ["latex"; "mlw"; "ast"; "dep"], set_output),
     "<output> select output format (default: \"mlw\")";
     KLong "kind", Hnd1 (ASymbol ["inductive"], set_kind),
-    "<category> select syntactic category to be printed (only \"inductive\" for --output=latex)";
+    "<category> select syntactic category to be printed (only\n\
+     \"inductive\" for --output=latex)";
     KLong "prefix", Hnd1 (AString, (:=) prefix),
     "<prefix> set prefix for LaTeX macros (default: \"WHY\")";
   ]

@@ -45,7 +45,8 @@ let option_list =
     "<format> select input format (default: \"why\")";
     KLong "real", Hnd1 (APair (',', AInt, APair (',', AInt, AInt)),
       fun (i1, (i2, i3)) -> real_emin := i1; real_emax := i2; real_prec := i3),
-    "<emin>,<emax>,<prec> set format used for real computations (e.g., -148,128,24 for float32)"
+    "<emin>,<emax>,<prec> set format used for real computations\n\
+     (e.g., -148,128,24 for float32)"
   ]
 
 let config, _, env =
