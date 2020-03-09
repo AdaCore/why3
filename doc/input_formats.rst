@@ -8,7 +8,7 @@ designed for teaching purposes. They come with their own specification
 languages, written in special comments.
 These input formats are described below.
 
-Any Why3 tool (`why3 prove`, `why3 ide`, etc.) can be passed a file
+Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.) can be passed a file
 with a suffix `.c` or `.py`, which triggers the corresponding input format.
 These input formats can also be used in on-line versions of Why3, at
 http://why3.lri.fr/micro-C/ and http://why3.lri.fr/python/, respectively.
@@ -191,14 +191,14 @@ interpreter (see below).
 .. rubric:: Function specification
 
 .. productionlist:: microPython
-   spec ::= "#@" "requires" `term` NEWLINE
+   spec: "#@" "requires" `term` NEWLINE
         : | "#@" "ensures"  `term` NEWLINE
         : | "#@" "variant"  `term` ("," `term`)* NEWLINE
 
 .. rubric:: Python expression
 
 .. productionlist:: microPython
-  expr ::= "None" | "True" | "False" | integer-literal | string-literal
+  expr: "None" | "True" | "False" | integer-literal | string-literal
        : | identifier
        : | identifier "[" `expr` "]"
        : | "-" `expr` | "not" `expr`
@@ -226,7 +226,6 @@ interpreter (see below).
             : | "break"
             : | "#@" "label" identifier
             : | "#@" ( "assert" | "assume" | "check" ) `term`
-   assignop: "=" | "+=" | "-=" | "*=" | "/="
   loop_body: `simple_stmt` NEWLINE
             : | NEWLINE INDENT `loop_annot`* `stmt` `stmt`* DEDENT
  loop_annot: "#@" "invariant" `term` NEWLINE
@@ -235,7 +234,7 @@ interpreter (see below).
 .. rubric:: Logic declaration
 
 .. productionlist:: microPython
-  logic-declaration: "#@" "function" "int" identifier "(" `params` ")" NEWLINE
+  logic-declaration: "#@" "function" identifier "(" `params` ")" NEWLINE
                  : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
