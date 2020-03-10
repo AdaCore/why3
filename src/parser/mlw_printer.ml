@@ -595,21 +595,35 @@ and pp_term fmt t =
 and pp_spec fmt s =
   if s.sp_reads <> [] then
     fprintf fmt "@ reads { %a }" (pp_print_list ~pp_sep:(pp_sep ", ") pp_qualid) s.sp_reads;
+  let remove_attr s t =
+    match t.term_desc with
+    | Tattr (ATstr attr, t) when attr.attr_string = s -> t
+    | _ -> t in
   let pp_aux keyword t =
     fprintf fmt "@ %s { %a }" keyword pp_term t in
-  List.iter (pp_aux "requires") s.sp_pre;
+  List.iter (pp_aux "requires")
+    (List.map (remove_attr "hyp_name:Requires") s.sp_pre);
   List.iter (pp_aux "writes") s.sp_writes;
   let pp_post = function
     | _, [{pat_desc=Pvar {id_str="result"}}, t] ->
-        fprintf fmt "@ ensures { %a }" pp_term t
+        fprintf fmt "@ ensures { %a }" pp_term
+          (remove_attr "hyp_name:Ensures" t)
     | _, cases ->
         let pp_case fmt (p, t) =
           fprintf fmt "%a -> %a" pp_pattern' p pp_term' t in
         fprintf fmt "@ returns { %a }"
           (pp_print_list ~pp_sep:(pp_sep "|") pp_case) cases in
   List.iter pp_post s.sp_post;
-  let pp_xpost fmt _ =
-    todo fmt "sp_xpost" in
+  let pp_xpost fmt (_, exn_cases) =
+    let pp_exn_case fmt (qid, opt_pat_term) =
+      let pp_opt_t fmt = function
+        | Some (p, t) -> fprintf fmt " %a -> %a" pp_pattern p pp_term t
+        | None -> () in
+      fprintf fmt "@[<hv2>%a%a@]" pp_qualid qid pp_opt_t opt_pat_term in
+    fprintf fmt "@[<hv2>raises { %a }@]"
+      (pp_print_list ~pp_sep:(pp_sep "@ | ")
+         pp_exn_case)
+      exn_cases in
   List.iter (fun x -> fprintf fmt "@ %a" pp_xpost x) s.sp_xpost;
   let pp_alias _ =
     todo fmt "sp_alias" in
