@@ -97,7 +97,11 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@ @INFERINCLUDE@
+EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@
+
+ifeq (@enable_infer@,yes)
+EXTINCLUDES += @INFERINCLUDE@
+endif
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -255,7 +259,7 @@ endif
 LIB_MLW1 = ity expr pdecl eval_match typeinv
 
 # FIX ME!!!
-LIB_MLW2 = vc pmodule dexpr big_real pinterp
+LIB_MLW2 =  infer_loop vc pmodule dexpr big_real pinterp
 
 LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
               c ocaml cakeml
@@ -644,14 +648,6 @@ bin/why3replay.opt: $(WHY3CMXA) src/tools/why3replay.cmx
 bin/why3replay.byte: $(WHY3CMA) src/tools/why3replay.cmo
 bin/why3wc.opt: src/tools/why3wc.cmx
 bin/why3wc.byte: src/tools/why3wc.cmo
-ifeq (@enable_infer@,yes)
-bin/why3infer.opt: $(WHY3CMXA) src/tools/why3infer.cmx
-bin/why3infer.byte: $(WHY3CMA) src/tools/why3infer.cmo
-bin/test_disjunction.opt: $(WHY3CMXA) src/tools/test_disjunction.cmx
-bin/test_disjunction.byte: $(WHY3CMA) src/tools/test_disjunction.cmo
-bin/test_infer.opt: $(WHY3CMXA) src/tools/test_infer.cmx
-bin/test_infer.byte: $(WHY3CMA) src/tools/test_infer.cmo
-endif
 
 uninstall-bin::
 	rm -f $(BINDIR)/why3$(EXE)

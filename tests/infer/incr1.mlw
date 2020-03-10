@@ -5,7 +5,7 @@ module Incr1
 	use ref.Ref
 	use ref.Refint
 
-	let b(x:int) : int
+	let b[@infer](x:int) : int
 	ensures { result = max x 0 }
 	=
 	let i = ref 0 in
