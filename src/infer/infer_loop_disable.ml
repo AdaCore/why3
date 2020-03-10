@@ -10,4 +10,4 @@
 (********************************************************************)
 
 #13 "src/mlw/infer_loop_disable.ml"
-let infer_loops attrs env tkn mkn e cty = []
+let infer_loops _ _ _ _ _ _ = []
