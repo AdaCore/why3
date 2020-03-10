@@ -781,11 +781,11 @@ and pp_decl fmt = function
       fprintf fmt "@[<hv2>clone export %a with@ %a@]" pp_qualid qid pp_substs substs
   | Duseexport qid ->
       fprintf fmt "use export %a" pp_qualid qid
-  | Dcloneimport (_, import, qid, None, []) ->
-      let import = if import then " import" else "" in
-      fprintf fmt "clone%s %a" import pp_qualid qid
-  | Dcloneimport _ ->
-      todo fmt "Dcloneimport _"
+  | Dcloneimport (_, import, qid, as_id, substs) ->
+      let pp_import fmt = if import then pp_print_string fmt " import" in
+      let pp_as_id fmt = match as_id with Some id -> fprintf fmt " as %a" pp_id id | None -> () in
+      let pp_substs = pp_print_list ~pp_sep:(pp_sep ",@ ") pp_clone_subst in
+      fprintf fmt "clone%t %a%t%a" pp_import pp_qualid qid pp_as_id pp_substs substs
   | Duseimport (_, import, binds) ->
       let import = if import then " import" else "" in
       let pp_opt_id = pp_opt ~prefix:" as " pp_id in
