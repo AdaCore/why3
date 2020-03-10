@@ -392,8 +392,8 @@ and pp_expr fmt e =
       pp_apply pp_expr expr_closed fmt e1 e2
   | Einfix (e1, op, e2) ->
       pp_infix pp_expr expr_closed fmt e1 op e2
-  | Einnfix _ ->
-      todo fmt "Einnfix _"
+  | Einnfix (e1, op, e2) ->
+      pp_infix pp_expr expr_closed fmt e1 op e2
   | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e1)}, e2) ->
       (* TODO _pat *)
       fprintf fmt "@[<v>%a in@ %a@]"
@@ -555,10 +555,9 @@ and pp_term fmt t =
       pp_idapp pp_term term_closed fmt qid ts
   | Tapply (t1, t2) ->
       pp_apply pp_term term_closed fmt t1 t2
-  | Tinfix (t1, op, t2) ->
+  | Tinfix (t1, op, t2)
+  | Tinnfix (t1, op, t2) ->
       pp_infix pp_term term_closed fmt t1 op t2
-  | Tinnfix _ ->
-      todo fmt "Tinnfix _"
   | Tbinop (t1, op, t2)
   | Tbinnop (t1, op, t2) ->
       fprintf fmt "@[<hv 2>%a %a@ %a@]" pp_term' t1 pp_binop op pp_term' t2
