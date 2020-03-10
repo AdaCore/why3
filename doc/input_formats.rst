@@ -8,11 +8,12 @@ designed for teaching purposes. They come with their own specification
 languages, written in special comments.
 These input formats are described below.
 
-Any Why3 tool (`why3 prove`, `why3 ide`, etc.) can be passed a file
+Any Why3 tool (:why3:tool:`why3 prove`, :why3:tool:`why3 ide`, etc.) can be passed a file
 with a suffix `.c` or `.py`, which triggers the corresponding input format.
 These input formats can also be used in on-line versions of Why3, at
 http://why3.lri.fr/micro-C/ and http://why3.lri.fr/python/, respectively.
 
+.. index:: micro-C
 .. _format.micro-C:
 
 micro-C
@@ -23,10 +24,6 @@ passed to a C compiler.
 
 Syntax of micro-C
 ~~~~~~~~~~~~~~~~~
-
-Notation: The grammar of micro-C is given below in extended
-Backus-Naur Form, using `|` for alternation, `()` for grouping,
-`[]` for option, and `{}` for repetition.
 
 Logical annotations are inserted in special comments starting
 with `//@` or `/*@`. In the following grammar, we
@@ -44,17 +41,17 @@ functions such as `printf` (see below) is accepted by a C compiler.
 .. rubric:: Function definition
 
 .. productionlist:: micro-C
-     c_function: `return_type` identifier "(" [ `params` ] ")" { spec } block
+     c_function: `return_type` identifier "(" `params`? ")" `spec`* `block`
     return_type: "void" | "int"
-         params: `param` { "," `param` }
+         params: `param` ("," `param`)*
           param: "int" identifier | "int" identifier "[]"
 
 .. rubric:: Function specification
 
 .. productionlist:: micro-C
-    spec: "requires" `term` ";"
-       : | "ensures"  `term` ";"
-       : | "variant"  `term` { "," `term` } ";"
+    spec: "//@" "requires" `term` ";"
+       : | "//@" "ensures"  `term` ";"
+       : | "//@" "variant"  `term` ("," `term`)* ";"
 
 .. rubric:: C expression
 
@@ -66,7 +63,7 @@ functions such as `printf` (see below) is accepted by a C compiler.
        : | ( "++" | "--") identifier "[" `expr` "]"
        : | "-" `expr` | "!" `expr`
        : | `expr` ( "+" | "-" | "*" | "/" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "&&" | "||" ) `expr`
-       : | identifier "(" [ `expr` { "," `expr` } ] ")"
+       : | identifier "(" (`expr` ("," `expr`)*)? ")"
        : | "scanf" "(" "\"%d\"" "," "&" identifier ")"
        : | "(" `expr` ")"
 
@@ -86,16 +83,16 @@ functions such as `printf` (see below) is accepted by a C compiler.
             : | `block`
             : | "//@" "label" identifier ";"
             : | "//@" ( "assert" | "assume" | "check" ) `term` ";"
-      block: "{" { `stmt` } "}"
+      block: "{" `stmt`* "}"
   expr_stmt: "int" identifier "=" `expr`
             : | identifier `assignop` `expr`
             : | identifier "[" `expr` "]" `assignop` `expr`
             : | `expr`
    assignop: "=" | "+=" | "-=" | "*=" | "/="
-  loop_body: { `loop_annot` } `stmt`
-            : | "{" { `loop_annot` } { `stmt` } "}"
+  loop_body: `loop_annot`* `stmt`
+            : | "{" `loop_annot`* `stmt`* "}"
  loop_annot: "//@" "invariant" `term` ";"
-            : | "//@" "variant" `term` { "," `term` } ";"
+            : | "//@" "variant" `term` ("," `term`)* ";"
 
 Note that the syntax for loop bodies allows the loop annotations to be
 placed either before the block or right at the beginning of the block.
@@ -110,6 +107,8 @@ placed either before the block or right at the beginning of the block.
                     : | "//@" "axiom" identifier ":" `term` ";"
                     : | "//@" "lemma" identifier ":" `term` ";"
                     : | "//@" "goal"  identifier ":" `term` ";"
+
+Logic functions are limited to a return type ``int``.
 
 .. rubric:: Logical term
 
@@ -130,8 +129,8 @@ placed either before the block or right at the beginning of the block.
        : | `term` ( "+" | "-" | "*" | "/" | "% ) `term`
        : | "if" `term` "then" `term` "else `term`
        : | "let" identifier "=" `term` "in" `term`
-       : | ( "forall" | "exists" ) `binder` { "," `binder` } "." `term`
-       : | identifier "(" [ `term` { "," `term` } ] ")"
+       : | ( "forall" | "exists" ) `binder` ("," `binder`)* "." `term`
+       : | identifier "(" (`term` ("," `term`)*)? ")"
     binder: identifier
        : | identifier "[]"
 
@@ -153,28 +152,8 @@ Built-in functions and predicates
 * `int occurrence(int v, int[] a)`, the number of occurrences of the
   value `v` in array `a`
 
-Verifying a program
-~~~~~~~~~~~~~~~~~~~
 
-Click on the gears button to launch the verification.
-Verification conditions (VCs) then appear in the right panel, in
-the Task List tab, and
-Alt-Ergo is run on each of them with a default time limit (that
-can be set in the Settings menu).
-
-When a VC is not proved, there are several options:
-
-* use the contextual menu to rerun Alt-Ergo with a larger time limit
-  (e.g. 1000 or 5000 steps instead of 100);
-* use the contextual menu to split the VC and rerun Alt-Ergo on each
-  sub-VC (split and prove);
-* use the Task View tab to investigate the problematic VC,
-  for wrong or missing elements of specification (precondition,
-  postcondition, invariant);
-* add intermediate assertions in the code, using `//@ assert ...;`.
-
-
-
+.. index:: Python
 .. _format.micro-Python:
 
 micro-Python
@@ -186,21 +165,17 @@ passed to a Python interpreter.
 Syntax of micro-Python
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Notation: The grammar of micro-Python is given below in extended
-Backus-Naur Form, using `|` for alternation, `()` for grouping,
-`[]` for option, and `{}` for repetition.
-Special symbols `NEWLINE`, `INDENT`,
+Notation: In the grammar of micro-Python given below,
+special symbols `NEWLINE`, `INDENT`,
 and `DEDENT` mark an end of line, the beginning of a new
 indentation block, and its end, respectively.
 
-Logical annotations are inserted in special comments starting
-with `//@` or `/*@`. In the following grammar, we
-only use the former kind, for simplicity, but both kinds are allowed.
+Logical annotations are inserted in special comments starting with `#@`.
 
-.. productionlist:: micro-Python
+.. productionlist:: microPython
       file: `decl`*
       decl: `py_import` | `py_function` | `stmt` | `logic_declaration`
- py_import: "from" ident "import" ident { "," ident } NEWLINE
+ py_import: "from" identifier "import" identifier ("," identifier)* NEWLINE
 
 Directives `import` are ignored during the translation to
 Why3. They are allowed anyway, such that a Python source code using
@@ -209,59 +184,58 @@ interpreter (see below).
 
 ..  rubric:: Function definition
 
-.. productionlist:: micro-Python
-    py_function: "def" ident "(" [ `params` ] ")" ":" NEWLINE INDENT { `spec` } { `stmt` } DEDENT
-    params: ident { "," ident }
+.. productionlist:: microPython
+    py_function: "def" identifier "(" [ `params` ] ")" ":" NEWLINE INDENT `spec`* `stmt`* DEDENT
+    params: identifier ("," identifier)*
 
 .. rubric:: Function specification
 
-.. productionlist:: micro-Python
-   spec ::= "requires" `term` NEWLINE
-        : | "ensures"  `term` NEWLINE
-        : | "variant"  `term` { "," `term` } NEWLINE
+.. productionlist:: microPython
+   spec: "#@" "requires" `term` NEWLINE
+        : | "#@" "ensures"  `term` NEWLINE
+        : | "#@" "variant"  `term` ("," `term`)* NEWLINE
 
 .. rubric:: Python expression
 
-.. productionlist:: micro-Python
-  expr ::= "None" | "True" | "False" | integer-literal | string-literal
+.. productionlist:: microPython
+  expr: "None" | "True" | "False" | integer-literal | string-literal
        : | identifier
        : | identifier "[" `expr` "]"
        : | "-" `expr` | "not" `expr`
        : | `expr` ( "+" | "-" | "*" | "//" | "%" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "and" | "or" ) `expr`
-       : | identifier "(" [ `expr` { "," `expr` } ] ")"
-       : | "[" [ `expr` { "," `expr` } ] "]"
+       : | identifier "(" (`expr` ("," `expr`)*)? ")"
+       : | "[" (`expr` ("," `expr`)*)? "]"
        : | "(" `expr` ")"
 
 .. rubric:: Python statement
 
-.. productionlist:: micro-Python
+.. productionlist:: microPython
        stmt: `simple_stmt` NEWLINE
             : | "if" `expr` ":" `suite` `else_branch`
             : | "while" `expr` ":" `loop_body`
-            : | "for" ident "in" `expr` ":" `loop_body`
+            : | "for" identifier "in" `expr` ":" `loop_body`
     else_branch: /* nothing */
             : | "else:" `suite`
             : | "elif" `expr` ":" `suite` `else_branch`
       suite: `simple_stmt` NEWLINE
-            : | NEWLINE INDENT `stmt` { `stmt` } DEDENT
+            : | NEWLINE INDENT `stmt` `stmt`* DEDENT
   simple_stmt: `expr`
             : | "return" `expr`
             : | identifier "=" `expr`
             : | identifier "[" `expr` "]" "=" `expr`
             : | "break"
-            : | "//@" "label" identifier
-            : | "//@" ( "assert" | "assume" | "check" ) `term`
-   assignop: "=" | "+=" | "-=" | "*=" | "/="
+            : | "#@" "label" identifier
+            : | "#@" ( "assert" | "assume" | "check" ) `term`
   loop_body: `simple_stmt` NEWLINE
-            : | NEWLINE INDENT { `loop_annot` } `stmt` { `stmt` } DEDENT
- loop_annot: "//@" "invariant" `term` NEWLINE
-            : | "//@" "variant" `term` { "," `term` } NEWLINE
+            : | NEWLINE INDENT `loop_annot`* `stmt` `stmt`* DEDENT
+ loop_annot: "#@" "invariant" `term` NEWLINE
+            : | "#@" "variant" `term` ("," `term`)* NEWLINE
 
 .. rubric:: Logic declaration
 
-.. productionlist:: micro-Python
-  logic-declaration: "//@" "function" "int" identifier "(" `params` ")" NEWLINE
-                 : | "//@" "predicate" identifier "(" `params` ")" NEWLINE
+.. productionlist:: microPython
+  logic-declaration: "#@" "function" identifier "(" `params` ")" NEWLINE
+                 : | "#@" "predicate" identifier "(" `params` ")" NEWLINE
 
 Note that logic functions and predicates cannot be given definitions.
 Yet, they can be axiomatized, using toplevel `assume` statements.
@@ -269,7 +243,7 @@ Yet, they can be axiomatized, using toplevel `assume` statements.
 
 .. rubric:: Logical term
 
-.. productionlist:: micro-Python
+.. productionlist:: microPython
   term: identifier
        : | integer-literal
        : | "None"
@@ -287,8 +261,8 @@ Yet, they can be axiomatized, using toplevel `assume` statements.
        : | `term` ( "+" | "-" | "*" | "//" | "% ) `term`
        : | "if" `term` "then" `term` "else `term`
        : | "let" identifier "=" `term` "in" `term`
-       : | ( "forall" | "exists" ) ident { "," ident } "." `term`
-       : | identifier "(" [ `term` { "," `term` } ] ")"
+       : | ( "forall" | "exists" ) identifier ("," identifier)* "." `term`
+       : | identifier "(" (`term` ("," `term`)*)? ")"
 
 Built-in functions and predicates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -312,24 +286,3 @@ Limitations
 ~~~~~~~~~~~
 
 Python lists are modeled as arrays, whose size cannot be modified.
-
-
-Verifying a program
-~~~~~~~~~~~~~~~~~~~
-
-Click on the gears button to launch the verification.
-Verification conditions (VCs) then appear in the right panel, in
-the Task List tab, and
-Alt-Ergo is run on each of them with a default time limit (that
-can be set in the Settings menu).
-
-When a VC is not proved, there are several options:
-
-* use the contextual menu to rerun Alt-Ergo with a larger
-  time limit (e.g. 1000 or 5000 steps instead of 100);
-* use the contextual menu to split the VC and rerun Alt-Ergo
-  on each sub-VC (split and prove);
-* use the Task View tab to investigate the problematic VC,
-  for wrong or missing elements of specification (precondition,
-  postcondition, invariant);
-* add intermediate assertions in the code, using `//@ assert ...;`.

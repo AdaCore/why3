@@ -5,7 +5,7 @@ Why3 by Examples
 
 This chapter describes the WhyML specification and programming language.
 A WhyML source file has suffix :file:`.mlw`. It contains a list of modules.
-Each module contains a list of declarations. These includes
+Each module contains a list of declarations. These include
 
 -  Logical declarations:
 
@@ -65,6 +65,7 @@ code for all these examples is contained in Why3’s distribution, in
 sub-directory :file:`examples/`. Look for files :file:`logic/einstein.why` and
 :file:`vstte10_xxx.mlw`.
 
+.. index:: Einstein’s problem
 .. _sec.einstein:
 
 Problem 0: Einstein’s Problem
@@ -155,7 +156,9 @@ We now express that each house is associated bijectively to a color, by
       clone Bijection as Color with type t = house, type u = color
 
 Cloning a theory makes a copy of all its declarations, possibly in
-combination with a user-provided substitution. Here we substitute type
+combination with a user-provided substitution
+(see :numref:`Module Cloning`).
+Here we substitute type
 ``house`` for type ``t`` and type ``color`` for type ``u``. As a result,
 we get two new functions, namely ``Color.of`` and ``Color.to_``, from
 houses to colors and colors to houses, respectively, and two new axioms
@@ -402,6 +405,33 @@ solvers may fail at proving it, but other succeed, *e.g.*, CVC4.
 Note: It is of course possible to *execute* the code to test it,
 before or after you prove it correct. This is detailed in
 :numref:`sec.execute`.
+
+.. index:: auto-dereference
+.. rubric:: Auto-dereference
+
+Why3 features an auto-dereferencing mechanism, which simplifies the use of
+references. When a reference is introduced using ``let ref x`` (instead
+of ``let x = ref``), the use of operator ``!`` to access its value
+is not needed anymore. For instance, we can rewrite the program above
+as follows (the contract being unchanged and omitted):
+
+.. code-block:: whyml
+
+    let max_sum (a: array int) (n: int) : (sum: int, max: int)
+    = let ref sum = 0 in
+      let ref max = 0 in
+      for i = 0 to n - 1 do
+        invariant { sum <= i * max }
+        if max < a[i] then max <- a[i];
+        sum <- sum + a[i]
+      done;
+      sum, max
+
+Note that use of operator ``<-`` for assignment (instead of ``:=``)
+and the absence of ``!`` both in the loop invariant and in the program.
+See :numref:`auto-dereference` for more details about the
+auto-dereferencing mechanism.
+
 
 Problem 2: Inverting an Injection
 ---------------------------------
@@ -1015,11 +1045,13 @@ efficiency.
 
 The type definition is accompanied with an invariant — a logical
 property imposed on any value of the type. Why3 assumes that any
-``queue`` passed as an argument to a program function satisfies the
-invariant and it produces a proof obligation every time a ``queue`` is
-created. The ``by`` clause ensures the non-vacuity of this type with
+queue satisfies the invariant at any function entry and
+it requires that any queue satisfies the invariant at function exit
+(be the queue created or modified).
+The ``by`` clause ensures the non-vacuity of this type with
 invariant. If you omit it, a goal with an existential statement is
-generated.
+generated. (See :numref:`Record Types` for more details about record
+types with invariants.)
 
 For the purpose of the specification, it is convenient to introduce a
 function ``sequence`` which builds the sequence of elements of a queue,

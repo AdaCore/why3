@@ -153,9 +153,12 @@ let attrs_has_expl attrs =
 let annot_attrs = Sattr.add stop_split (Sattr.singleton annot_attr)
 
 let vc_expl loc attrs expl f =
+  let rec relocate g =
+    t_attr_set ?loc g.t_attrs (TermTF.t_map (fun t -> t) relocate g) in
   let attrs = Sattr.union annot_attrs (Sattr.union attrs f.t_attrs) in
   let attrs = if attrs_has_expl attrs then attrs else Sattr.add expl attrs in
-  t_attr_set ?loc:(if loc = None then f.t_loc else loc) attrs f
+  if loc = None then t_attr_set ?loc:f.t_loc attrs f
+                else t_attr_set ?loc attrs (relocate f)
 
 (* propositional connectives with limited simplification *)
 

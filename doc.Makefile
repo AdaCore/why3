@@ -19,7 +19,9 @@ DRVDOT = $(patsubst %,doc/generated/drivers-%.dot, smt tptp coq isabelle pvs)
 DOC = index zebibliography genindex \
   foreword starting whyml api install manpages syntaxref input_formats exec itp technical changes
 
-DOCRST = $(DOC:%=doc/%.rst)
+DOCRST = $(DOC:%=doc/%.rst) doc/manual.bib
 
-public/index.html: $(DOCRST) $(DRVDOT)
+LIBDOT = $(patsubst %,doc/stdlib-dot/library-%.dot, int array)
+
+public/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
 	sphinx-build -W --keep-going -b html doc public

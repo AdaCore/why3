@@ -1,0 +1,34 @@
+digraph G {
+	graph [nodesep=0.4,
+		rankdir=RL,
+		ranksep=0.6
+	];
+	node [margin=0.05,
+		shape=box
+	];
+	"int.Int" -> "algebra.OrderedUnitaryCommutativeRing";
+	"int.Abs" -> "int.Int";
+	"int.MinMax" -> "int.Int";
+	"int.MinMax" -> "relations.MinMax";
+	"int.Lex2" -> "int.Int";
+	"int.Lex2" -> "relations.Lex";
+	"int.EuclideanDivision" -> "int.Abs";
+	"int.Div2" -> "int.Int";
+	"int.ComputerDivision" -> "int.Abs";
+	"int.Exponentiation" -> "int.Int";
+	"int.Exponentiation" -> "algebra.Monoid";
+	"int.Power" -> "int.Exponentiation";
+	"int.NumOf" -> "int.Int";
+	"int.Sum" -> "int.Int";
+	"int.SumParam" -> "int.Int";
+	"int.Fact" -> "int.Int";
+	"int.Iter" -> "int.Int";
+	"int.IntInf" -> "int.Int";
+	"int.IntInf" -> "relations.TotalOrder";
+	"int.SimpleInduction" -> "int.Int";
+	"int.Induction" -> "int.Int";
+	"int.HOInduction" -> "int.Int";
+	"int.Fibonacci" -> "int.Int";
+	"int.WFltof" -> "int.Int";
+	"int.WFltof" -> "relations.WellFounded";
+}
