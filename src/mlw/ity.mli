@@ -22,6 +22,7 @@ type itysymbol = private {
   its_mutable : bool;           (** mutable type *)
   its_fragile : bool;           (** breakable invariant *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
+  its_ofields : pvsymbol list;  (** non-mutable fields *)
   its_regions : region list;    (** shareable components *)
   its_arg_flg : its_flag list;  (** flags for type args *)
   its_reg_flg : its_flag list;  (** flags for regions *)
