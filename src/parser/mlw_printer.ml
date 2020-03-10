@@ -795,8 +795,11 @@ and pp_decl fmt = function
       fprintf fmt "use%s %a" import pp_binds binds
   | Dimport qid ->
       fprintf fmt "import %a" pp_qualid qid
-  | Dscope _ ->
-      todo fmt "Dscope _"
+  | Dscope (_, export, id, decls) ->
+      let pp_export fmt =
+        if export then pp_print_string fmt " export" in
+      let pp_decls = pp_print_list ~pp_sep:(pp_sep "@,") pp_decl in
+      fprintf fmt "@[<v 2>@[<v 2>scope%t %a =@,%a@]@,end]@" pp_export pp_id id pp_decls decls
 
 let pp_decls =
   let previous_was_use_import_export =
