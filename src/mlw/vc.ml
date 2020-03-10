@@ -1578,6 +1578,7 @@ let vc env kn tuc d = match d.pd_node with
       let f = vc_fun env (Debug.test_noflag debug_sp) c.c_cty e in
       add_vc_decl env v.pv_vs.vs_name f []
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
+      let open Theory in
       let attrs = s.rs_name.id_attrs in
       let invs = Infer_loop.infer_loops attrs env tuc.uc_known kn e cty in
       let env = mk_env env kn tuc invs in
