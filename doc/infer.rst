@@ -51,4 +51,4 @@ Running it
 [TODO]
 
 For information about how to use the API to infer loop invariants refer
-to :numref:`sec:infer-loop-api`.
+to :numref:`sec.infer-loop-api`.

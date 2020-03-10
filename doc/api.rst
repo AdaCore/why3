@@ -742,13 +742,14 @@ the JSON output as follows:
    :start-after: BEGIN{ce_callprover}
    :end-before: END{ce_callprover}
 
-.. _sec.infer_loop:
+.. _sec.infer-loop-api:
+
 Infering loop invariants
 ------------------------
 
-This section describes how to the Why3 API to infer loop
+This section describes how to use the Why3 API to infer loop
 invaiants. For more information about the inference of loop invariants
-refer to :numref:`chap.inferloop`. The example we use in this section
+refer to :numref:`chap.inferloop`. The example from this section
 can be found in the Why3 source code ``examples/use_api/infer.ml``.
 
 Let us start by defining a environment required to parse and type
