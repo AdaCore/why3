@@ -822,7 +822,8 @@ let pp_mlw_file fmt = function
       pp_decls fmt decls
   | Modules modules ->
       let pp_module fmt (id, decls) =
-        fprintf fmt "@[<v 2>module %a@ %a@]@ end" pp_id id pp_decls decls in
+        fprintf fmt "@[<v>@[<v 2>module %a@ %a@]@,end@]"
+          pp_id id pp_decls decls in
       let pp_modules =
         pp_print_list ~pp_sep:(pp_sep "@,@,") pp_module in
       fprintf fmt "@[<v>%a@]" pp_modules modules
