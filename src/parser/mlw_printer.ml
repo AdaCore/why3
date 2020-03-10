@@ -342,16 +342,16 @@ and pp_let_any fmt (id, ghost, kind, (params, _kind', opt_pty, _pat, _mask, spec
 
 and pp_fundef fmt (id, ghost, kind, binders, pty_opt, _pat, _mask, spec, e) =
   (* TODO mask, pat *)
-  fprintf fmt "@[<hv 2>";
-  pp_print_string fmt (ghost_suffix ghost);
-  pp_print_string fmt (kind_suffix kind);
-  pp_id fmt id;
-  pp_print_opt_list ~prefix:" " pp_binder fmt binders;
-  (match pty_opt with
-   | None -> ()
-   | Some pty -> fprintf fmt " : %a" pp_pty pty);
-  pp_spec fmt spec;
-  fprintf fmt " =@ %a@]" pp_expr e;
+  fprintf fmt "@[<hv 2>%s%s%a%a%t%a =@ %a@]"
+    (ghost_suffix ghost)
+    (kind_suffix kind)
+    pp_id id
+    (pp_print_opt_list ~prefix:" " pp_binder) binders
+    (fun fmt -> match pty_opt with
+       | None -> ()
+       | Some pty -> fprintf fmt " : %a" pp_pty pty)
+    pp_spec spec
+    pp_expr e
 
 and pp_variant fmt (t, qid_opt) =
   let pp_optwith fmt = function
