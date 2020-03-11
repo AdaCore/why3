@@ -1,0 +1,2431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="4" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="2000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="mpz_get_str.mlw"/>
+<theory name="Zget_str" proved="true">
+ <goal name="pow_mon_strict&#39;vc" expl="VC for pow_mon_strict" proved="true">
+ <proof prover="3"><result status="valid" time="0.07" steps="74"/></proof>
+ </goal>
+ <goal name="pow_mon&#39;vc" expl="VC for pow_mon" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="pow_mon&#39;vc.0" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="pow_mon&#39;vc.0.0" expl="assertion" proved="true">
+   <proof prover="1"><result status="valid" time="0.18"/></proof>
+   </goal>
+   <goal name="pow_mon&#39;vc.0.1" expl="VC for pow_mon" proved="true">
+   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="80"/></proof>
+   </goal>
+   <goal name="pow_mon&#39;vc.0.2" expl="VC for pow_mon" proved="true">
+   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.07" steps="80"/></proof>
+   </goal>
+   <goal name="pow_mon&#39;vc.0.3" expl="VC for pow_mon" proved="true">
+   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="76"/></proof>
+   <proof prover="4"><result status="valid" time="0.18" steps="39314"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="pow_mon&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.14" steps="39002"/></proof>
+  </goal>
+  <goal name="pow_mon&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.14" steps="34211"/></proof>
+  </goal>
+  <goal name="pow_mon&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.21" steps="39218"/></proof>
+  </goal>
+  <goal name="pow_mon&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.16" steps="39039"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="mpz_get_str&#39;vc" expl="VC for mpz_get_str" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="mpz_get_str&#39;vc.0" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="78"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.03" steps="80"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.2" expl="postcondition" proved="true">
+  <transf name="replace" proved="true" arg1="(length result)" arg2="36">
+   <goal name="mpz_get_str&#39;vc.2.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.09" steps="430"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.2.1" expl="equality hypothesis" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="40203"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.3" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.18" steps="411"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.21" steps="454"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.15" steps="344"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.10" steps="351"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.13" steps="337"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.17" steps="34544"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.10" steps="242"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.04" steps="90"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.08" steps="265"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="105"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.13" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.14" steps="391"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.14" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.14.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.29" steps="40923"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.14.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.12" steps="124"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.14.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.98" steps="558"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.14.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.06" steps="124"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.14.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.26" steps="41754"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.15" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.05" steps="120"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.16" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.92"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.17" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.89"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.05" steps="128"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.60" steps="590"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.20" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.17" steps="34624"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.21" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="258"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.22" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="96"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.23" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.11" steps="111"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.24" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.26" steps="519"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.25" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.33" steps="669"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.26" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.13" steps="115"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.27" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.45" steps="671"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.28" expl="precondition" proved="true">
+  <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.02" steps="141"/></proof>
+  <proof prover="4"><result status="valid" time="0.08" steps="35848"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.29" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.50" steps="717"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.30" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.24" steps="392"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.31" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.24" steps="197"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.32" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.23" steps="199"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.33" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.35" steps="201"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.34" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.33" steps="462"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.35" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.83" steps="911"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.36" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.23" steps="42693"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.37" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.29" steps="213"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.38" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.41" steps="215"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.39" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.42" steps="217"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.40" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.40.0" expl="assertion" proved="true">
+   <proof prover="2"><result status="valid" time="1.75"/></proof>
+   <proof prover="3"><result status="valid" time="7.88" steps="1110"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.1" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.16" steps="37754"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.2" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.68" steps="219"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.3" expl="assertion" proved="true">
+   <proof prover="1"><result status="valid" time="0.30"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.4" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.68" steps="219"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="2"><result status="valid" time="0.60"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.6" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.16" steps="270830"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.7" expl="VC for mpz_get_str" proved="true">
+   <proof prover="1"><result status="valid" time="0.27"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.8" expl="VC for mpz_get_str" proved="true">
+   <proof prover="1"><result status="valid" time="0.65"/></proof>
+   <transf name="rewrite" proved="true" arg1="&lt;-" arg2="Power_sum">
+    <goal name="mpz_get_str&#39;vc.40.8.0" expl="VC for mpz_get_str" proved="true">
+    <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.03" steps="7994"/></proof>
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.24" steps="224"/></proof>
+    <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.16" steps="37157"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.40.8.1" expl="rewrite premises" proved="true">
+    <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.16" steps="265824"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.40.8.2" expl="rewrite premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.25" steps="224"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.9" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="1.26" steps="91357"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.40.10" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="1.42" steps="111395"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.41" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.41.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.27" steps="42907"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.41.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.19" steps="37007"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.41.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.77" steps="224"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.41.3" expl="VC for mpz_get_str" proved="true">
+   <transf name="apply" proved="true" arg1="pow_mon_strict" arg2="with" arg3="2">
+    <goal name="mpz_get_str&#39;vc.41.3.0" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.15" steps="222"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.41.3.1" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.85" steps="569"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.41.3.2" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.83" steps="568"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.41.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="37082"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.41.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="2.74" steps="2705446"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.42" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.42.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.12" steps="37037"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.42.1" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.28" steps="43154"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.42.2" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.75" steps="225"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.42.3" expl="VC for mpz_get_str" proved="true">
+   <transf name="apply" proved="true" arg1="pow_mon" arg2="with" arg3="2">
+    <goal name="mpz_get_str&#39;vc.42.3.0" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.11" steps="224"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.42.3.1" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.87" steps="583"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.42.3.2" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.72" steps="228"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.42.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="37156"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.42.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.08" steps="147480"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.42.6" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.28" steps="43674"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.42.7" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.19" steps="233"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.42.8" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.15" steps="37260"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.43" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.69" steps="227"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.44" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="1.63" steps="1502698"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.45" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.26" steps="43561"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.46" expl="precondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.46.0" expl="precondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="mpz_get_str&#39;vc.46.0.0" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.70" steps="232"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.46.0.1" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.17" steps="228"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.46.0.2" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.69" steps="232"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.46.0.3" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.79" steps="232"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.46.0.4" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.99" steps="232"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.46.0.5" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.72" steps="232"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.47" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.31" steps="43624"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.48" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.12" steps="231"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.49" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.99" steps="235"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.50" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.18" steps="233"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.51" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.16" steps="37315"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.52" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.52.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.12" steps="37944"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.52.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.77" steps="263"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.52.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.07" steps="227297"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.52.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.25" steps="45406"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.53" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.13" steps="260"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.54" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.77" steps="266"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.55" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.55.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.16" steps="37762"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.55.1" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="37769"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.55.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.27" steps="44425"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.55.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.12" steps="150007"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.55.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.28" steps="44489"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.56" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.56.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.23" steps="44075"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.56.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.86" steps="271"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.56.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="2"><result status="valid" time="1.71"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.56.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="1.13" steps="88571"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.57" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="45157"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.58" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.58.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="1.34" steps="94855"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.58.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="4.95" steps="278"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.58.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.29" steps="45344"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.58.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.26" steps="45345"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.58.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.84" steps="282"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.58.5" expl="VC for mpz_get_str" proved="true">
+   <transf name="inline_all" proved="true" >
+    <goal name="mpz_get_str&#39;vc.58.5.0" expl="VC for mpz_get_str" proved="true">
+    <proof prover="4"><result status="valid" time="5.66" steps="263740"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.59" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.09" steps="38045"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.60" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.20" steps="269"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.61" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="270"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.62" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.30" steps="44851"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.63" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.27" steps="45181"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.64" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.27" steps="45894"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.65" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.93" steps="297"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.66" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.66.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="38471"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.66.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="38787"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.66.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="38920"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.66.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.31" steps="46677"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.66.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.14" steps="178709"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.66.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.29" steps="38944"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.66.6" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="45383"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.66.7" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.20" steps="293"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.67" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.67.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.22" steps="39245"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.67.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.14" steps="237400"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.67.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="2.22" steps="298"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.67.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="39072"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.67.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="39028"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.67.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.95" steps="936881"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.68" expl="integer overflow" proved="true">
+  <proof prover="4"><result status="valid" time="0.28" steps="46238"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.69" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.23" steps="38644"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.70" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.27" steps="303"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.71" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="182716"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.72" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="182767"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.73" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="183333"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.74" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="305"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.75" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.06" steps="180847"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.76" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="44122"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.77" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="238553"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.78" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.78.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.85" steps="327"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.1" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.17" steps="242743"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="1.09" steps="331"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="1.00" steps="331"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.32" steps="47290"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="1.07" steps="337"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.6" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.35" steps="48712"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.7" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.32" steps="333"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.8" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.32" steps="48058"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.9" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.35" steps="49071"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.78.10" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.32" steps="47911"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.79" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.79.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="1.02" steps="329"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.79.1" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.94" steps="329"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.79.2" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="46515"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.80" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.28" steps="46743"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.81" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.58"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.82" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="241286"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.83" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.10" steps="39599"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.84" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.84.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.36" steps="353"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.84.1" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="1.24" steps="359"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.84.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.39" steps="355"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.85" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.29" steps="49344"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.86" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.87" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.30" steps="47565"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.88" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="1.19" steps="365"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.89" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="192590"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.90" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="193073"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.91" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.40" steps="353"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.92" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="3.26"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.93" expl="loop invariant preservation" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.93.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="mpz_get_str&#39;vc.93.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="case" proved="true" arg1="(i = offset sp + j + 1)">
+     <goal name="mpz_get_str&#39;vc.93.0.0.0" expl="true case (loop invariant preservation)" proved="true">
+     <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.23" steps="357"/></proof>
+     </goal>
+     <goal name="mpz_get_str&#39;vc.93.0.0.1" expl="false case (loop invariant preservation)" proved="true">
+     <proof prover="1"><result status="valid" time="4.30"/></proof>
+     <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,min,max,get2,set,const,map_eq_sub,empty,is_digit,([]),eq_string,min_unsigned4,in_bounds6,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int6,in_bounds8,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length4,radix3,to_int5,min_unsigned5,in_bounds7,min_unsigned3,in_bounds5,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int,in_bounds1,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length1,radix,to_int2,min_unsigned1,in_bounds2,min_unsigned,in_bounds,even,odd,divides,prime,coprime,in_us_bounds,in_bounds4,plength,pelts,valid_ptr_shift,valid,zero_num,minus_char,digitstring,lowstring,upstring,valid_string,uchar&#39;maxInt,uchar&#39;minInt,max_uchar,to_int3,length2,radix1,min_unsigned2,in_bounds3,map_eq_sub_shift,l2i,p2i,value,identical,value_of,sgn_value,mpz_unchanged,in_base,string_in_base1,svalue_le,svalue,numlowstring,num_to_lowercase_text,to_lowercase_text,numupstring,num_to_uppercase_text,to_uppercase_text,text_to_num,to_num,abs_value_text,value_text,string_in_base,compare_int,reciprocal,reciprocal_3by2,normalized,toom22_threshold,redc,valueb,effective,um,cj,Assoc2,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm2,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod1,Mod_bound1,Div_unique,Div_bound1,Mod_11,Div_11,Div_inf1,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult1,Mod_mult1,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,concat_assoc,concat_empty,length_empty,length_concat,lt_empty,lt_not_com,lt_ref,lt_trans,le_empty,le_ref,lt_le,lt_le_eq,le_trans,at_out_of_range,at_empty,at_length,concat_at,substring_out_of_range,substring_of_length_zero_or_less,substring_of_empty,substring_smaller,substring_smaller_x,substring_length,substring_at,substring_substring,concat_substring,prefixof_substring,prefixof_concat,prefixof_empty,prefixof_empty2,suffixof_substring,suffixof_concat,suffixof_empty,suffixof_empty2,contains_prefixof,contains_suffixof,contains_empty,contains_empty2,contains_substring,contains_concat,contains_at,indexof_empty,indexof_empty1,indexof_contains,contains_indexof,not_contains_indexof,substring_indexof,indexof_out_of_range,indexof_in_range,indexof_contains_substring,replace_empty,replace_not_contains,replace_empty2,replace_substring_indexof,replaceall_empty1,not_contains_replaceall,to_int_gt_minus_1,to_int_empty,from_int_negative,from_int_to_int,char&#39;invariant,char_eq,code,code_chr,chr_code,get,substring_get,concat_first,concat_second,extensionality2,make_length,make_contents,to_int_in_bounds5,extensionality6,zero_unsigned_is_zero4,radix_def,to_int_in_bounds7,extensionality8,to_int_in_bounds6,extensionality7,zero_unsigned_is_zero5,to_int_in_bounds4,extensionality5,zero_unsigned_is_zero3,is_msb_set&#39;spec1,to_int_in_bounds1,extensionality1,to_int_in_bounds2,extensionality3,zero_unsigned_is_zero1,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides&#39;spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_def2,gcd_def3,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,gcd_opp,gcd_euclid,Gcd_computer_mod,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Gauss,Euclid,gcd_coprime,array&#39;invariant,([&lt;-])&#39;spec,make&#39;spec,is_not_null&#39;spec,valid_itv_to_shift,zero_char&#39;def,numcodes,lowcodes,upcodes,code_0,code_a,code_A,code_minus,strlen_def,strlen_invalid,to_int_in_bounds3,extensionality4,zero_unsigned_is_zero2,of_char&#39;spec,to_char&#39;spec,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,mpz_memo&#39;invariant,unchanged_transitive,pow2_64,mod_mult,wmpn_base_info&#39;invariant,pow_compat,in_base_concat,svalue_le_sub&#39;def,svalue_le_sub_tail,svalue_le_sub_concat,svalue_le_sub_head,svalue_le_sub_frame,svalue_le_tail,svalue_le_concat,svalue_sub&#39;def,svalue_sub_tail,svalue_sub_concat,svalue_sub_head,svalue_sub_frame,svalue_le_sub_lower_bound,svalue_sub_lower_bound,svalue_le_sub_upper_bound,svalue_sub_upper_bound,lowconcat,upconcat,digitsublow,digitsubup,lowsub,upsub,digits1,lower,upper,diglow,digup,lowup,tnt_low,tnt_up,abs_value_sub_text&#39;def,text_conversion,abs_value_sub_text_frame,valuation&#39;spec,valuation&#39;def,valuation_mul,power_ge_1,valuation_times_pow,valuation_split,valuation_lower_bound,valuation_pow,valuation_monotonous,valuation_nondiv,valuation_zero_prod,valuation_times_nondiv,valuation_prod,valuation_mod,valuation_decomp,fact_div,bounds_imply_rec3by2,no_borrow,no_borrow_ptr,mod_mul,mod_sum,mod_id,mod_prod,unredc_inv,unredc,valueb_lower_bound,valueb_upper_bound,valueb_mod,valueb_mon,redc_mul,pow_mon_strict,pow_mon,Requires5,H78,Requires4,Requires3,Requires2,Requires1,Requires,Ensures60,Ensures59,Ensures58,Ensures57,Ensures56,Ensures55,Ensures54,H77,Ensures53,H76,H75,H74,H73,H72,H71,H70,Ensures52,Ensures51,Ensures50,Ensures49,H69,H68,Ensures48,Ensures47,H67,H66,H65,H64,H63,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,Ensures40,Ensures39,Assert8,H62,H61,H60,Ensures38,Ensures37,Ensures36,Ensures35,H59,Ensures34,Ensures33,H58,Assert7,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,Ensures27,Ensures26,Ensures25,Ensures24,Ensures23,H57,Ensures22,Ensures21,Ensures20,H56,H55,H54,H53,Ensures19,Ensures18,Ensures17,Ensures16,H52,H51,H50,H49,H48,H47,H46,H45,H44,H43,H42,H41,H40,H39,H38,H37,H36,Ensures15,Ensures14,H35,H34,Ensures13,Ensures12,Assert6,Ensures11,Ensures10,H33,H32,Assert5,bs,H31,H30,H29,H28,H27,H26,H25,H24,H23,Ensures9,Ensures8,tc,H22,H21,H20,Assert4,Ensures7,H19,H18,H17,H16,H15,H14,H13,H12,H11,H10,H9,LoopInvariant12,LoopInvariant11,LoopInvariant10,LoopInvariant9,LoopInvariant8,LoopInvariant6,Ensures6,H8,Ensures5,Ensures4,Ensures3,H7,H5,H4,H3,H2,Ensures1,Assert1,Ensures,Assert,LoopInvariant5,LoopInvariant4,LoopInvariant3,LoopInvariant2,LoopInvariant1,LoopInvariant,h">
+      <goal name="mpz_get_str&#39;vc.93.0.0.1.0" expl="false case (loop invariant preservation)" proved="true">
+      <proof prover="0"><result status="valid" time="0.01" steps="16245"/></proof>
+      <proof prover="1" timelimit="1"><result status="valid" time="0.02"/></proof>
+      <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.01" steps="49"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.94" expl="loop invariant preservation" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.94.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.12" steps="241229"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.95" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.09" steps="233570"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.96" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.31" steps="321"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.97" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.30" steps="48191"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.98" expl="assertion" proved="true">
+  <transf name="apply" proved="true" arg1="strlen_def">
+   <goal name="mpz_get_str&#39;vc.98.0" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.22" steps="46311"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.98.1" expl="apply premises" proved="true">
+   <proof prover="1"><result status="valid" time="1.72"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.98.2" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.20" steps="47033"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.99" expl="assertion" proved="true">
+  <transf name="apply" proved="true" arg1="strlen_def">
+   <goal name="mpz_get_str&#39;vc.99.0" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="39551"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.99.1" expl="apply premises" proved="true">
+   <proof prover="1"><result status="valid" time="1.86"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.99.2" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.24" steps="47080"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.100" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.100.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.12" steps="39553"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.100.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.14" steps="40221"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.100.2" expl="VC for mpz_get_str" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="mpz_get_str&#39;vc.100.2.0" expl="VC for mpz_get_str" proved="true">
+    <transf name="introduce_premises" proved="true" >
+     <goal name="mpz_get_str&#39;vc.100.2.0.0" expl="VC for mpz_get_str" proved="true">
+     <proof prover="1"><result status="valid" time="1.86"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.100.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.22" steps="341"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.101" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.101.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="1.14" steps="345"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.101.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="1"><result status="valid" time="0.38"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.101.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="39830"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.101.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.87" steps="1109299"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.101.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.16" steps="39197"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.101.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.88" steps="351"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.102" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.12" steps="39371"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.103" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.16" steps="39747"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.104" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.14" steps="39899"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.105" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.11" steps="39941"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.106" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.09" steps="39822"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.107" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.107.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="mpz_get_str&#39;vc.107.0.0" expl="postcondition" proved="true">
+    <proof prover="4"><result status="valid" time="0.31" steps="47899"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.107.0.1" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="mpz_get_str&#39;vc.107.0.1.0" expl="postcondition" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="mpz_get_str&#39;vc.107.0.1.0.0" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.98" steps="359"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.107.0.1.0.1" expl="postcondition" proved="true">
+      <proof prover="4"><result status="valid" time="0.29" steps="47899"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.107.0.1.0.2" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="1.01" steps="359"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.107.0.1.0.3" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="1.20" steps="359"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.107.0.1.0.4" expl="postcondition" proved="true">
+      <proof prover="0"><result status="valid" time="0.10" steps="187113"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.107.0.1.0.5" expl="postcondition" proved="true">
+      <proof prover="0"><result status="valid" time="0.11" steps="241677"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.108" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.35"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.109" expl="postcondition" proved="true">
+  <transf name="case" proved="true" arg1="(x=u)">
+   <goal name="mpz_get_str&#39;vc.109.0" expl="true case (postcondition)" proved="true">
+   <proof prover="3"><result status="valid" time="1.08" steps="365"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.109.1" expl="false case (postcondition)" proved="true">
+   <proof prover="0"><result status="valid" time="0.71" steps="923621"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.110" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.17" steps="240928"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.111" expl="out of loop bounds" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="160132"/></proof>
+  <proof prover="4"><result status="valid" time="0.16" steps="47479"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.112" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="199"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.113" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.70" steps="914"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.114" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="203"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.115" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.16" steps="205"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.116" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.24" steps="294049"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.117" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.26" steps="217"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.118" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.14" steps="211"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.119" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.28" steps="241"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.120" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.38" steps="243"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.121" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.15" steps="911"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.122" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.26" steps="247"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.123" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.04" steps="41375"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.124" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.15" steps="37332"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.125" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.14" steps="240"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.126" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.06" steps="939"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.127" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.27" steps="43687"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.128" expl="precondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.128.0" expl="precondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.36" steps="1068"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.129" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.16" steps="245"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.130" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.34" steps="280"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.131" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.35" steps="282"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.132" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.132.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.12" steps="38156"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.132.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.20" steps="285"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.132.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.53" steps="1005"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.132.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.20" steps="45377"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.133" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.133.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="43559"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.133.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.34" steps="287"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.133.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.44" steps="287"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.133.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.59" steps="63500"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.134" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.20" steps="278"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.135" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.135.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.61" steps="65894"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.135.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.45" steps="293"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.135.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.26" steps="45152"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.135.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.29" steps="45153"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.135.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.38" steps="297"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.135.5" expl="VC for mpz_get_str" proved="true">
+   <transf name="revert" proved="true" arg1="H3">
+    <goal name="mpz_get_str&#39;vc.135.5.0" expl="VC for mpz_get_str" proved="true">
+    <transf name="unfold" proved="true" arg1="in_base">
+     <goal name="mpz_get_str&#39;vc.135.5.0.0" expl="VC for mpz_get_str" proved="true">
+     <proof prover="2"><result status="valid" time="0.20"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.136" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.16" steps="38182"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.137" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.27" steps="44312"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.138" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.26" steps="44676"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.139" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.17" steps="280"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.140" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.24" steps="45023"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.141" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.27" steps="45579"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.142" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.40" steps="312"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.143" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.43" steps="308"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.144" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.144.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.12" steps="39303"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.144.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.99" steps="1009"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.144.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.44" steps="313"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.144.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="39130"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.144.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.19" steps="39112"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.144.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="3.61" steps="1090"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.145" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.35" steps="314"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.146" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="8406"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.147" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.31" steps="312"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.148" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.64" steps="809"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.149" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.66" steps="809"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.150" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.44" steps="321"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.151" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.24" steps="314"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.152" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.96" steps="823"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.153" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.10" steps="39788"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.154" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="3.41" steps="647"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.155" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.155.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.46" steps="342"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.1" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.11" steps="199321"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.47" steps="346"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.47" steps="346"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="47064"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.54" steps="352"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.6" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.31" steps="48497"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.7" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.26" steps="342"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.8" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="47895"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.9" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.31" steps="48878"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.155.10" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.29" steps="47753"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.156" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="2.02" steps="660"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.157" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.28" steps="46540"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.158" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.46"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.159" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="3.16" steps="676"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.160" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.30" steps="345"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.161" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.161.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.28" steps="362"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.161.1" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.52" steps="374"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.161.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.32" steps="47503"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.162" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.33" steps="49150"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.163" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.37"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.164" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.28" steps="47369"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.165" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.74" steps="380"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.166" expl="loop invariant preservation" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.166.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.11" steps="182358"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.167" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="182629"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.168" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="9010"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.169" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="2.24"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.170" expl="loop invariant preservation" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.170.0" expl="loop invariant preservation" proved="true">
+   <transf name="introduce_premises" proved="true" >
+    <goal name="mpz_get_str&#39;vc.170.0.0" expl="loop invariant preservation" proved="true">
+    <transf name="case" proved="true" arg1="(i = offset sp + j + 1)">
+     <goal name="mpz_get_str&#39;vc.170.0.0.0" expl="true case (loop invariant preservation)" proved="true">
+     <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.19" steps="366"/></proof>
+     </goal>
+     <goal name="mpz_get_str&#39;vc.170.0.0.1" expl="false case (loop invariant preservation)" proved="true">
+     <proof prover="1"><result status="valid" time="4.82"/></proof>
+     <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,min,max,get2,set,const,map_eq_sub,empty,is_digit,([]),eq_string,min_unsigned4,in_bounds6,int32&#39;maxInt,int32&#39;minInt,min_int32,max_int32,to_int6,in_bounds8,uint32&#39;maxInt,uint32&#39;minInt,max_uint32,length4,radix3,to_int5,min_unsigned5,in_bounds7,min_unsigned3,in_bounds5,(!),int64&#39;maxInt,int64&#39;minInt,min_int64,max_int64,to_int,in_bounds1,uint64&#39;maxInt,uint64&#39;minInt,max_uint64,length1,radix,to_int2,min_unsigned1,in_bounds2,min_unsigned,in_bounds,even,odd,divides,prime,coprime,in_us_bounds,in_bounds4,plength,pelts,valid_ptr_shift,valid,zero_num,minus_char,digitstring,lowstring,upstring,valid_string,uchar&#39;maxInt,uchar&#39;minInt,max_uchar,to_int3,length2,radix1,min_unsigned2,in_bounds3,map_eq_sub_shift,l2i,p2i,value,identical,value_of,sgn_value,mpz_unchanged,in_base,string_in_base1,svalue_le,svalue,numlowstring,num_to_lowercase_text,to_lowercase_text,numupstring,num_to_uppercase_text,to_uppercase_text,text_to_num,to_num,abs_value_text,value_text,string_in_base,compare_int,reciprocal,reciprocal_3by2,normalized,toom22_threshold,redc,valueb,effective,um,cj,Assoc2,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm2,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,Div_mod1,Mod_bound1,Div_unique,Div_bound1,Mod_11,Div_11,Div_inf1,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult1,Mod_mult1,Div_mod,Div_bound,Mod_bound,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_1,Mod_1,Div_inf,Mod_inf,Div_mult,Mod_mult,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,concat_assoc,concat_empty,length_empty,length_concat,lt_empty,lt_not_com,lt_ref,lt_trans,le_empty,le_ref,lt_le,lt_le_eq,le_trans,at_out_of_range,at_empty,at_length,concat_at,substring_out_of_range,substring_of_length_zero_or_less,substring_of_empty,substring_smaller,substring_smaller_x,substring_length,substring_at,substring_substring,concat_substring,prefixof_substring,prefixof_concat,prefixof_empty,prefixof_empty2,suffixof_substring,suffixof_concat,suffixof_empty,suffixof_empty2,contains_prefixof,contains_suffixof,contains_empty,contains_empty2,contains_substring,contains_concat,contains_at,indexof_empty,indexof_empty1,indexof_contains,contains_indexof,not_contains_indexof,substring_indexof,indexof_out_of_range,indexof_in_range,indexof_contains_substring,replace_empty,replace_not_contains,replace_empty2,replace_substring_indexof,replaceall_empty1,not_contains_replaceall,to_int_gt_minus_1,to_int_empty,from_int_negative,from_int_to_int,char&#39;invariant,char_eq,code,code_chr,chr_code,get,substring_get,concat_first,concat_second,extensionality2,make_length,make_contents,to_int_in_bounds5,extensionality6,zero_unsigned_is_zero4,radix_def,to_int_in_bounds7,extensionality8,to_int_in_bounds6,extensionality7,zero_unsigned_is_zero5,to_int_in_bounds4,extensionality5,zero_unsigned_is_zero3,is_msb_set&#39;spec1,to_int_in_bounds1,extensionality1,to_int_in_bounds2,extensionality3,zero_unsigned_is_zero1,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides&#39;spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_def2,gcd_def3,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,gcd_opp,gcd_euclid,Gcd_computer_mod,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Gauss,Euclid,gcd_coprime,array&#39;invariant,([&lt;-])&#39;spec,make&#39;spec,is_not_null&#39;spec,valid_itv_to_shift,zero_char&#39;def,numcodes,lowcodes,upcodes,code_0,code_a,code_A,code_minus,strlen_def,strlen_invalid,to_int_in_bounds3,extensionality4,zero_unsigned_is_zero2,of_char&#39;spec,to_char&#39;spec,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,mpz_eq&#39;spec,mpz_memo&#39;invariant,unchanged_transitive,pow2_64,mod_mult,wmpn_base_info&#39;invariant,pow_compat,in_base_concat,svalue_le_sub&#39;def,svalue_le_sub_tail,svalue_le_sub_concat,svalue_le_sub_head,svalue_le_sub_frame,svalue_le_tail,svalue_le_concat,svalue_sub&#39;def,svalue_sub_tail,svalue_sub_concat,svalue_sub_head,svalue_sub_frame,svalue_le_sub_lower_bound,svalue_sub_lower_bound,svalue_le_sub_upper_bound,svalue_sub_upper_bound,lowconcat,upconcat,digitsublow,digitsubup,lowsub,upsub,digits1,lower,upper,diglow,digup,lowup,tnt_low,tnt_up,abs_value_sub_text&#39;def,text_conversion,abs_value_sub_text_frame,valuation&#39;spec,valuation&#39;def,valuation_mul,power_ge_1,valuation_times_pow,valuation_split,valuation_lower_bound,valuation_pow,valuation_monotonous,valuation_nondiv,valuation_zero_prod,valuation_times_nondiv,valuation_prod,valuation_mod,valuation_decomp,fact_div,bounds_imply_rec3by2,no_borrow,no_borrow_ptr,mod_mul,mod_sum,mod_id,mod_prod,unredc_inv,unredc,valueb_lower_bound,valueb_upper_bound,valueb_mod,valueb_mon,redc_mul,pow_mon_strict,pow_mon,Requires5,H78,Requires4,Requires3,Requires2,Requires1,Requires,Ensures60,Ensures59,Ensures58,Ensures57,Ensures56,Ensures55,Ensures54,H77,Ensures53,H76,H75,H74,H73,H72,H71,H70,Ensures52,Ensures51,Ensures50,Ensures49,H69,H68,Ensures48,Ensures47,H67,H66,H65,H64,H63,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,Ensures40,Ensures39,Assert8,H62,H61,H60,Ensures38,Ensures37,Ensures36,Ensures35,H59,Ensures34,Ensures33,H58,Assert7,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,Ensures27,Ensures26,Ensures25,Ensures24,Ensures23,H57,Ensures22,Ensures21,Ensures20,H56,H55,H54,H53,Ensures19,Ensures18,Ensures17,Ensures16,H52,H51,H50,H49,H48,H47,H46,H45,H44,H43,H42,H41,H40,H39,H38,H37,H36,Ensures15,Ensures14,H35,H34,Ensures13,Ensures12,Assert6,Ensures11,Ensures10,H33,H32,Assert5,bs,H31,H30,H29,H28,H27,H26,H25,H24,H23,Ensures9,Ensures8,tc,H22,H21,H20,Assert4,Ensures7,H19,H18,H17,H16,H15,H14,H13,H12,H11,H10,H9,LoopInvariant12,LoopInvariant11,LoopInvariant10,LoopInvariant9,LoopInvariant8,LoopInvariant6,Ensures6,H8,Ensures5,Ensures4,Ensures3,H7,H5,H4,H3,H2,Ensures1,Assert1,Ensures,Assert,LoopInvariant5,LoopInvariant4,LoopInvariant3,LoopInvariant2,LoopInvariant1,LoopInvariant,h">
+      <goal name="mpz_get_str&#39;vc.170.0.0.1.0" expl="false case (loop invariant preservation)" proved="true">
+      <proof prover="0"><result status="valid" time="0.02" steps="19236"/></proof>
+      <proof prover="1" timelimit="1"><result status="valid" time="0.04"/></proof>
+      <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.02" steps="82"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.171" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.34" steps="50069"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.172" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.60" steps="636"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.173" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.27" steps="330"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.174" expl="precondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.174.0" expl="precondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.31" steps="347"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.175" expl="assertion" proved="true">
+  <transf name="apply" proved="true" arg1="strlen_def">
+   <goal name="mpz_get_str&#39;vc.175.0" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.23" steps="46118"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.175.1" expl="apply premises" proved="true">
+   <proof prover="3"><result status="valid" time="3.97" steps="881"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.175.2" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.20" steps="46840"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.176" expl="assertion" proved="true">
+  <transf name="apply" proved="true" arg1="strlen_def">
+   <goal name="mpz_get_str&#39;vc.176.0" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.22" steps="39688"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.176.1" expl="apply premises" proved="true">
+   <proof prover="0"><result status="valid" time="3.64" steps="4382363"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.176.2" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="46887"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.177" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.177.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="39690"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.177.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="40358"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.177.2" expl="VC for mpz_get_str" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="mpz_get_str&#39;vc.177.2.0" expl="VC for mpz_get_str" proved="true">
+    <transf name="introduce_premises" proved="true" >
+     <goal name="mpz_get_str&#39;vc.177.2.0.0" expl="VC for mpz_get_str" proved="true">
+     <proof prover="1"><result status="valid" time="1.23"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.177.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.63" steps="67135"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.178" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.178.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.53" steps="360"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.178.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="1"><result status="valid" time="0.34"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.178.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.20" steps="39967"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.178.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="2.00" steps="366"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.178.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="39334"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.178.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.62" steps="366"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.179" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.30" steps="46064"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.180" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.30" steps="352"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.181" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.21" steps="40512"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.182" expl="precondition" proved="true">
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.15" steps="44844"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.183" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.30"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.184" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.184.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="mpz_get_str&#39;vc.184.0.0" expl="postcondition" proved="true">
+    <proof prover="4"><result status="valid" time="0.34" steps="47703"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.184.0.1" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="mpz_get_str&#39;vc.184.0.1.0" expl="postcondition" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="mpz_get_str&#39;vc.184.0.1.0.0" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="1.74" steps="376"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.184.0.1.0.1" expl="postcondition" proved="true">
+      <proof prover="4"><result status="valid" time="0.29" steps="47703"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.184.0.1.0.2" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.55" steps="374"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.184.0.1.0.3" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.55" steps="374"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.184.0.1.0.4" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="1.94" steps="376"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.184.0.1.0.5" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="2.23" steps="376"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.185" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="6.92" steps="3703974"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.186" expl="postcondition" proved="true">
+  <transf name="case" proved="true" arg1="(x=u)">
+   <goal name="mpz_get_str&#39;vc.186.0" expl="true case (postcondition)" proved="true">
+   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.71" steps="380"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.186.1" expl="false case (postcondition)" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.22" steps="370934"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.187" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.73" steps="380"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.188" expl="out of loop bounds" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.188.0" expl="out of loop bounds (precondition)" proved="true">
+   <proof prover="4"><result status="valid" time="0.31" steps="45687"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.1" expl="out of loop bounds (precondition)" proved="true">
+   <proof prover="4"><result status="valid" time="0.19" steps="38784"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.2" expl="precondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.33" steps="46198"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.3" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.33" steps="46521"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.4" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.33" steps="46596"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.5" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.33" steps="46614"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.6" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.31" steps="46669"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.7" expl="precondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.32" steps="45220"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.8" expl="precondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.21" steps="39124"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.9" expl="precondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.20" steps="39831"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.10" expl="precondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.31" steps="45884"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.11" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.20" steps="39330"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.12" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.33" steps="46134"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.13" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.31" steps="46954"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.14" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="46165"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.188.15" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.34" steps="47042"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.189" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="475"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.190" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.32" steps="615"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.191" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="98"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.192" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.06" steps="122"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.193" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.07" steps="122"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.194" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.51" steps="670"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.195" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.27" steps="357"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.196" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="178"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.197" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.21" steps="180"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.198" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.28" steps="182"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.199" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.34" steps="427"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.200" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.92" steps="861"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.201" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.11" steps="188"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.202" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.29" steps="194"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.203" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.33" steps="196"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.204" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.38" steps="198"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.205" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.205.0" expl="assertion" proved="true">
+   <proof prover="2"><result status="valid" time="1.68"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.1" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="37360"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.2" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.72" steps="200"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.3" expl="assertion" proved="true">
+   <proof prover="1"><result status="valid" time="0.33"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.4" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.70" steps="200"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="2"><result status="valid" time="0.63"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.6" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.18" steps="268033"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.7" expl="VC for mpz_get_str" proved="true">
+   <proof prover="1"><result status="valid" time="0.31"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.8" expl="VC for mpz_get_str" proved="true">
+   <transf name="rewrite" proved="true" arg1="&lt;-" arg2="Power_sum">
+    <goal name="mpz_get_str&#39;vc.205.8.0" expl="VC for mpz_get_str" proved="true">
+    <proof prover="4"><result status="valid" time="0.16" steps="36763"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.205.8.1" expl="rewrite premises" proved="true">
+    <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.09" steps="263024"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.205.8.2" expl="rewrite premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.24" steps="205"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.9" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="1.00" steps="79916"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.205.10" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="1.44" steps="95708"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.206" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.206.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.20" steps="42402"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.206.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.16" steps="36613"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.206.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.58" steps="205"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.206.3" expl="VC for mpz_get_str" proved="true">
+   <transf name="apply" proved="true" arg1="pow_mon_strict" arg2="with" arg3="2">
+    <goal name="mpz_get_str&#39;vc.206.3.0" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="203"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.206.3.1" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.51" steps="533"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.206.3.2" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.50" steps="532"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.206.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.16" steps="36688"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.206.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="1.86" steps="2702480"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.207" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.207.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="36643"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.207.1" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.28" steps="42649"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.207.2" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.64" steps="206"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.207.3" expl="VC for mpz_get_str" proved="true">
+   <transf name="apply" proved="true" arg1="pow_mon" arg2="with" arg3="2">
+    <goal name="mpz_get_str&#39;vc.207.3.0" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="205"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.207.3.1" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.52" steps="547"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.207.3.2" expl="apply premises" proved="true">
+    <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.44" steps="209"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.207.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="36762"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.207.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.07" steps="145808"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.207.6" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="43162"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.207.7" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.23" steps="214"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.207.8" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="36866"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.208" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.74" steps="208"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.209" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="1.61" steps="1499746"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.210" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.20" steps="208"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.211" expl="precondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.211.0" expl="precondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="mpz_get_str&#39;vc.211.0.0" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.70" steps="213"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.211.0.1" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.15" steps="209"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.211.0.2" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.70" steps="213"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.211.0.3" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.76" steps="213"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.211.0.4" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.91" steps="213"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.211.0.5" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.70" steps="213"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.212" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.19" steps="211"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.213" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.35"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.214" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.97" steps="216"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.215" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.27" steps="43271"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.216" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.21" steps="215"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.217" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.217.0" expl="assertion" proved="true">
+   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.18" steps="239"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.217.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="38331"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.217.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="0.08" steps="8362"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.217.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.18" steps="239"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.218" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.30" steps="240"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.219" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.71" steps="246"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.220" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.14" steps="244"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.221" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.10"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.222" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.20" steps="248"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.223" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.223.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="1.00" steps="83065"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.223.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="1.15" steps="258"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.223.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.24" steps="256"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.223.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.28" steps="256"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.223.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="175394"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.223.5" expl="VC for mpz_get_str" proved="true">
+   <transf name="revert" proved="true" arg1="H3">
+    <goal name="mpz_get_str&#39;vc.223.5.0" expl="VC for mpz_get_str" proved="true">
+    <transf name="unfold" proved="true" arg1="in_base">
+     <goal name="mpz_get_str&#39;vc.223.5.0.0" expl="VC for mpz_get_str" proved="true">
+     <proof prover="2"><result status="valid" time="0.17"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.224" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.26" steps="249"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.225" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.21" steps="249"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.226" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.30" steps="44252"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.227" expl="precondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.227.0" expl="precondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.21" steps="251"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.228" expl="precondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.228.0" expl="precondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="44572"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.229" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.34"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.230" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.90" steps="277"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.231" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.15" steps="229462"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.232" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="39097"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.233" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.94" steps="277"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.234" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.28" steps="38210"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.235" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.26" steps="280"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.236" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="2.19" steps="898"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.237" expl="loop invariant init" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.237.0" expl="loop invariant init" proved="true">
+   <proof prover="3"><result status="valid" time="2.12" steps="896"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.238" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="1.16" steps="281"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.239" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="8434"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.240" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.11" steps="178005"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.241" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.11" steps="39356"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.242" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="235333"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.243" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.243.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.84" steps="303"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.1" expl="assertion" proved="true">
+   <proof prover="0"><result status="valid" time="0.10" steps="239913"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.96" steps="307"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="1.01" steps="307"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.26" steps="46577"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.95" steps="313"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.6" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.33" steps="47994"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.7" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="40141"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.8" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.29" steps="47573"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.9" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.32" steps="48354"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.243.10" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.28" steps="47426"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.244" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.244.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.64" steps="305"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.244.1" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.52" steps="305"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.244.2" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.20" steps="45971"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.245" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.30" steps="306"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.246" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.57"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.247" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="3.14"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.248" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="39304"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.249" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.249.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.27" steps="329"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.249.1" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.73" steps="335"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.249.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.28" steps="47176"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.250" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.28" steps="48726"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.251" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.44"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.252" expl="loop invariant preservation" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.252.0" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.31" steps="46454"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.252.1" expl="loop invariant preservation" proved="true">
+   <proof prover="4"><result status="valid" time="0.38" steps="46908"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.253" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="1.08" steps="341"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.254" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="188676"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.255" expl="loop invariant preservation" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.255.0" expl="loop invariant preservation" proved="true">
+   <proof prover="0"><result status="valid" time="0.12" steps="189128"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.256" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="41270"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.257" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="2.85"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.258" expl="loop invariant preservation" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.258.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="2.30"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.259" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.13" steps="8862"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.260" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="230268"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.261" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.25" steps="297"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.262" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.31" steps="47547"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.263" expl="assertion" proved="true">
+  <transf name="apply" proved="true" arg1="strlen_def">
+   <goal name="mpz_get_str&#39;vc.263.0" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.19" steps="39236"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.263.1" expl="apply premises" proved="true">
+   <proof prover="1"><result status="valid" time="2.06"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.263.2" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.28" steps="46573"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.264" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="39964"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.265" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.265.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.15" steps="39270"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.265.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.18" steps="39976"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.265.2" expl="VC for mpz_get_str" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="mpz_get_str&#39;vc.265.2.0" expl="VC for mpz_get_str" proved="true">
+    <proof prover="1"><result status="valid" time="0.91"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.265.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="1.75" steps="117179"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.266" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.266.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="1.00" steps="320"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.266.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.16" steps="39586"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.266.2" expl="VC for mpz_get_str" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="mpz_get_str&#39;vc.266.2.0" expl="VC for mpz_get_str" proved="true">
+    <proof prover="0"><result status="valid" time="0.50" steps="942106"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.266.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="38915"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.266.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="0"><result status="valid" time="1.04" steps="1092901"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.266.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.72" steps="326"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.267" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="39088"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.268" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.19" steps="39240"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.269" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="39616"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.270" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.20" steps="39658"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.271" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.20" steps="39539"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.272" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.272.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="mpz_get_str&#39;vc.272.0.0" expl="postcondition" proved="true">
+    <proof prover="4"><result status="valid" time="0.17" steps="47405"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.272.0.1" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="mpz_get_str&#39;vc.272.0.1.0" expl="postcondition" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="mpz_get_str&#39;vc.272.0.1.0.0" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.91" steps="334"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.272.0.1.0.1" expl="postcondition" proved="true">
+      <proof prover="4"><result status="valid" time="0.28" steps="47405"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.272.0.1.0.2" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.90" steps="334"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.272.0.1.0.3" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="1.01" steps="334"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.272.0.1.0.4" expl="postcondition" proved="true">
+      <proof prover="0"><result status="valid" time="0.12" steps="184260"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.272.0.1.0.5" expl="postcondition" proved="true">
+      <proof prover="0"><result status="valid" time="0.16" steps="238925"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.273" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.07" steps="336"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.274" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.274.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="mpz_get_str&#39;vc.274.0.0" expl="postcondition" proved="true">
+    <proof prover="2"><result status="valid" time="0.28"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.274.0.1" expl="postcondition" proved="true">
+    <proof prover="4"><result status="valid" time="0.33" steps="46210"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.274.0.2" expl="postcondition" proved="true">
+    <proof prover="4"><result status="valid" time="0.31" steps="46210"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.274.0.3" expl="postcondition" proved="true">
+    <proof prover="4"><result status="valid" time="0.31" steps="46210"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.274.0.4" expl="postcondition" proved="true">
+    <proof prover="4"><result status="valid" time="0.30" steps="46210"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.274.0.5" expl="postcondition" proved="true">
+    <proof prover="4"><result status="valid" time="0.32" steps="46370"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.275" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.16" steps="238396"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.276" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.32" steps="275"/></proof>
+  <proof prover="4"><result status="valid" time="0.27" steps="46901"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.277" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.19" steps="180"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.278" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.57" steps="846"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.279" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.20" steps="184"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.280" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.22" steps="186"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.281" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.20" steps="291160"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.282" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.24" steps="198"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.283" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.14" steps="36402"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.284" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.26" steps="222"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.285" expl="integer overflow" proved="true">
+  <proof prover="4"><result status="valid" time="0.30" steps="43300"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.286" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.25" steps="862"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.287" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.28" steps="228"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.288" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.28" steps="42742"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.289" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.16" steps="36934"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.290" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="36947"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.291" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.39" steps="881"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.292" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.29" steps="43152"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.293" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.82" steps="909"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.294" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.38" steps="236"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.295" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.33" steps="261"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.296" expl="integer overflow" proved="true">
+  <proof prover="3"><result status="valid" time="0.26" steps="263"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.297" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.297.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="37761"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.297.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="38539"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.297.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="39252"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.297.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.14" steps="38590"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.298" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.298.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.26" steps="43022"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.298.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.29" steps="267"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.298.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.36" steps="267"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.298.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.48" steps="56640"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.299" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.18" steps="258"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.300" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.300.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.56" steps="58636"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.300.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.36" steps="273"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.300.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="44590"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.300.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="44591"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.300.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.32" steps="277"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.300.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="4.23" steps="1009"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.301" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.17" steps="37776"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.302" expl="precondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.302.0" expl="precondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.25"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.303" expl="precondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.303.0" expl="precondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.17" steps="259"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.304" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.28" steps="44101"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.305" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.31" steps="44439"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.306" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.30"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.307" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.42" steps="292"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.308" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.49" steps="288"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.309" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.12" steps="8464"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.310" expl="integer overflow" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.310.0" expl="integer overflow" proved="true">
+   <proof prover="3"><result status="valid" time="0.44" steps="292"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.311" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.15" steps="38347"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.312" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.19" steps="38395"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.313" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.52" steps="755"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.314" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.60" steps="755"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.315" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.48" steps="298"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.316" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.18" steps="39184"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.317" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.94" steps="769"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.318" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.17" steps="39493"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.319" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="1.32"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.320" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.320.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.45" steps="318"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.1" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="4.55" steps="1340"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.51" steps="322"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.44" steps="322"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.32" steps="46399"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.48" steps="328"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.6" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.36" steps="47827"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.7" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.21" steps="40278"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.8" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.32" steps="47405"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.9" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.34" steps="48209"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.320.10" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.30" steps="47263"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.321" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="1.04" steps="611"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.322" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.30" steps="45976"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.323" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.42"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.324" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="1.72" steps="627"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.325" expl="precondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.325.0" expl="precondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.28" steps="321"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.326" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="2.41" steps="863"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.327" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.30" steps="48523"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.328" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.35"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.329" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.31" steps="336"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.330" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.64" steps="356"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.331" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.28"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.332" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.10" steps="177663"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.333" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.20" steps="41407"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.334" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="1.97"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.335" expl="loop invariant preservation" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.335.0" expl="loop invariant preservation" proved="true">
+   <proof prover="1"><result status="valid" time="1.56"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.336" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.03" steps="8886"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.337" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.78"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.338" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.16" steps="39141"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.339" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.14" steps="188581"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.340" expl="assertion" proved="true">
+  <transf name="apply" proved="true" arg1="strlen_def">
+   <goal name="mpz_get_str&#39;vc.340.0" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.13" steps="39373"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.340.1" expl="apply premises" proved="true">
+   <proof prover="0"><result status="valid" time="1.50" steps="3594536"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.340.2" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.17" steps="46375"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.341" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.20" steps="40101"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.342" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.342.0" expl="assertion" proved="true">
+   <proof prover="4"><result status="valid" time="0.14" steps="39407"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.342.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.14" steps="40113"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.342.2" expl="VC for mpz_get_str" proved="true">
+   <transf name="inline_goal" proved="true" >
+    <goal name="mpz_get_str&#39;vc.342.2.0" expl="VC for mpz_get_str" proved="true">
+    <proof prover="1"><result status="valid" time="0.39"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.342.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.38" steps="66244"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.343" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.343.0" expl="assertion" proved="true">
+   <proof prover="3"><result status="valid" time="0.50" steps="335"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.343.1" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.16" steps="39723"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.343.2" expl="VC for mpz_get_str" proved="true">
+   <proof prover="1"><result status="valid" time="0.96"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.343.3" expl="VC for mpz_get_str" proved="true">
+   <proof prover="4"><result status="valid" time="0.16" steps="39052"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.343.4" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="1.64" steps="341"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.343.5" expl="VC for mpz_get_str" proved="true">
+   <proof prover="3"><result status="valid" time="0.46" steps="341"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.344" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.30" steps="326"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.345" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.19" steps="39302"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.346" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.21" steps="40009"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.347" expl="precondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.347.0" expl="precondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="mpz_get_str&#39;vc.347.0.0" expl="precondition" proved="true">
+    <proof prover="3"><result status="valid" time="0.56" steps="340"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.348" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.34" steps="338"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.349" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="mpz_get_str&#39;vc.349.0" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="mpz_get_str&#39;vc.349.0.0" expl="postcondition" proved="true">
+    <proof prover="4"><result status="valid" time="0.32" steps="47197"/></proof>
+    </goal>
+    <goal name="mpz_get_str&#39;vc.349.0.1" expl="postcondition" proved="true">
+    <transf name="inline_goal" proved="true" >
+     <goal name="mpz_get_str&#39;vc.349.0.1.0" expl="postcondition" proved="true">
+     <transf name="split_vc" proved="true" >
+      <goal name="mpz_get_str&#39;vc.349.0.1.0.0" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="1.18" steps="351"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.349.0.1.0.1" expl="postcondition" proved="true">
+      <proof prover="4"><result status="valid" time="0.30" steps="47197"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.349.0.1.0.2" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.52" steps="349"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.349.0.1.0.3" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.49" steps="349"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.349.0.1.0.4" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.88" steps="351"/></proof>
+      </goal>
+      <goal name="mpz_get_str&#39;vc.349.0.1.0.5" expl="postcondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.68" steps="351"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.350" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.24" steps="374644"/></proof>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.351" expl="postcondition" proved="true">
+  <transf name="case" proved="true" arg1="(x=u)">
+   <goal name="mpz_get_str&#39;vc.351.0" expl="true case (postcondition)" proved="true">
+   <proof prover="3"><result status="valid" time="0.55" steps="355"/></proof>
+   </goal>
+   <goal name="mpz_get_str&#39;vc.351.1" expl="false case (postcondition)" proved="true">
+   <proof prover="0"><result status="valid" time="0.19" steps="366565"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.352" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="mpz_get_str&#39;vc.352.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.82" steps="355"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="mpz_get_str&#39;vc.353" expl="out of loop bounds" proved="true">
+  <proof prover="0" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="158101"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

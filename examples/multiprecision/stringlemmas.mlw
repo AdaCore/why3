@@ -349,4 +349,11 @@ module String_value
       \/ (s[ofs] = minus_char
          /\ text_in_base b s (ofs + 1) (ofs + strlen s ofs)
          /\ strlen s ofs > 1)
+
+  let rec lemma abs_value_sub_text_frame (b:int) (x y: map int char) (n m: int)
+    requires { forall i. n <= i < m -> x[i] = y[i] }
+    ensures  { abs_value_sub_text b x n m = abs_value_sub_text b y n m }
+    variant  { m - n }
+  = if n < m then abs_value_sub_text_frame b x y n (m-1) else ()
+
 end

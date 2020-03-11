@@ -1,6 +1,7 @@
 module Get_str
 
   use int.Int
+  use int.Abs
   use int.Power
   use array.Array
   use map.Map
@@ -18,45 +19,31 @@ module Get_str
   use int.EuclideanDivision
   use base_info.BaseInfo
 
-  let wmpn_get_str_bits (sp:ptr uchar) (bits:uint32) (up:ptr limb) (un:int32)
+  let wmpn_get_str_bits (sp:ptr uchar) (bits:uint32)
+                        (up:ptr limb) (un:int32) (ghost ub:int32)
       : uint32
     requires { 1 <= un }
     requires { valid up un }
     requires { 1 <= bits <= 8 }
-    requires { valid sp (div (64 * un + bits - 1) bits) }
+    requires { valid sp (div (ub + bits - 1) bits) }
+    requires { 0 <= ub }
+    requires { value up un < power 2 ub }
     requires { (pelts up)[offset up + un - 1] > 0 }
     requires { 64 * un + 7 <= max_int32 }
     requires { writable sp }
     ensures  { in_base (power 2 bits) (pelts sp)
                        (offset sp) (offset sp + result) }
     ensures  { svalue (power 2 bits) sp result = value up un }
-    ensures  { 0 < result <= (div (64 * un + bits - 1) bits) }
+    ensures  { 0 < result <= (div (ub + bits - 1) bits) }
     ensures  { (pelts sp)[offset sp] > 0 }
+    ensures  { forall j. j < offset sp
+               \/ offset sp + (div (ub + bits - 1) bits) <= j ->
+               (pelts sp)[j] = old (pelts sp)[j] }
     writes   { sp.data.elts }
   =
     let um = C.get_ofs up (un - 1) in
     let sb = wmpn_limb_size_in_base_2 um in
     let e = 64 * (un-1) + Limb.to_int32 sb + UInt32.to_int32 bits - 1 in
-    let sn = e / UInt32.to_int32 bits in
-    assert { offset sp + sn <= max sp
-             by e <= 64 * un + bits - 1
-             so let d = div (64 * un + bits - 1) bits in
-                let m = mod (64 * un + bits - 1) bits in
-                let m' = mod e bits in
-                sn * bits + m' = e <= d * bits + m
-             so m' <= bits - 1 so 0 <= m
-             so bits * sn <= bits * d + (m-m')
-             so - bits < m - m' < bits
-             so sn <= d };
-    let b = lsl 1 (Limb.of_uint32 bits) in
-    assert { b = power 2 bits };
-    assert { 2 <= b <= 256
-             by 1 <= bits <= 8
-             so power 2 5 = 32
-             so power 2 6 = 64
-             so power 2 7 = 128
-             so power 2 8 = 256
-            };
     value_tail up (un-1);
     assert { power 2 (e-bits) <= value up un < power 2 (e-bits+1)
              by value up un
@@ -79,6 +66,36 @@ module Get_str
                 = power 2 (64 * (un - 1)) * (1 + um)
                 <= power 2 (64 * (un - 1)) * power 2 sb
                 = power 2 (64 * (un - 1) + sb) };
+    assert { e <= ub + bits - 1
+             by power 2 (e - bits) <= value up un < power 2 ub
+             so if ub <= e - bits
+                then power 2 ub * 1 <= power 2 ub * power 2 (e - bits - ub)
+                     = power 2 (e - bits) so false
+                else e <= ub + bits - 1 };
+    let sn = e / UInt32.to_int32 bits in
+    assert { offset sp + sn <= max sp
+             by offset sp + div (ub + bits - 1) bits <= max sp
+             so sn = div e bits
+             so e <= ub + bits - 1
+             so let m' = mod e bits in
+                let d = div (ub + bits - 1) bits in
+                let m = mod (ub + bits - 1) bits in
+                sn * bits + m' = e <= d * bits + m
+             so m' <= bits - 1 so 0 <= m
+             so bits * sn <= bits * d + (m-m')
+             so - bits < m - m' < bits
+             so sn <= d };
+    let b = lsl 1 (Limb.of_uint32 bits) in
+    assert { b = power 2 bits };
+    assert { 2 <= b <= 256
+             by 1 <= bits <= 8
+             so power 2 2 = 4
+             so power 2 4 = 16
+             so power 2 5 = 32
+             so power 2 6 = 64
+             so power 2 7 = 128
+             so power 2 8 = 256
+            };
     assert { power b (sn - 1) <= value up un < power b sn
              by e = bits * sn + CD.mod e bits
              so 0 <= CD.mod e bits < bits
@@ -110,6 +127,9 @@ module Get_str
       invariant { (svalue_sub b (pelts sp) (offset sp + j) (offset sp + sn)
                    = valueb up udone /\ udone <= 64 * un)
                   \/ (j = 0 /\ svalue b sp sn = value up un) }
+      invariant { forall k. k < offset sp
+                  \/ offset sp + sn <= k ->
+                     (pelts sp)[k] = old (pelts sp)[k] }
       variant   { j }
       assert { i < un
                by j > 0
@@ -165,6 +185,8 @@ module Get_str
                             * power 2 (bits - shift))
                         + m * power 2 (bits - shift)
                       = d * radix + m * power 2 (bits - shift)
+                   so 0 <= m < abs (power 2 (64 - (bits - shift)))
+                        = power 2 (64 - (bits - shift))
                    so power 2 (bits - shift) * m
                       < power 2 (bits - shift) * power 2 (64 - (bits - shift))
                       = power 2 64 = radix
@@ -303,7 +325,8 @@ module Get_str
                       + power radix i * mod lu (power 2 (oshift + bits))
                  so let d = div digit (power 2 bits) in
                     let m = mod digit (power 2 bits) in
-                    lu = digit * power 2 oshift + low
+                    digit = d * power 2 bits + m
+                 so lu = digit * power 2 oshift + low
                        = ((d * power 2 bits) + m) * power 2 oshift + low
                        = d * power 2 (oshift + bits) + m * power 2 oshift + low
                  so 0 <= low < power 2 oshift
@@ -334,7 +357,8 @@ module Get_str
       let sj = digit % b in
       assert { sj = mod digit b
                by div digit b = CD.div digit b
-               so mod digit b = CD.mod digit b = sj };
+               so mod digit b = digit - b * div digit b
+                  = digit - b * CD.div digit b = CD.mod digit b = sj };
       label Set in
       C.set_ofs sp j (UChar.of_uint64 sj);
       assert { forall i. offset sp + j < i ->
@@ -379,12 +403,12 @@ module Get_str
                      = value up un
                        + power radix un * mod (pelts up)[offset up + un] 1
                      = value up un };
-    assert { sn <= div (64 * un + bits - 1) bits
+    assert { sn <= div (ub + bits - 1) bits
              by sn = div e bits
-             so e <= 64 * un + bits - 1
+             so e <= ub + bits - 1
              so let m1 = mod e bits in
-             let m2 = mod (64 * un + bits - 1) bits in
-             let d = div (64 * un + bits - 1) bits in
+             let m2 = mod (ub + bits - 1) bits in
+             let d = div (ub + bits - 1) bits in
              sn * bits + m1 = e <= d * bits + m2
              so sn * bits <= d * bits + m2 - m1
                 < d * bits + bits
@@ -528,11 +552,13 @@ module Get_str
     requires { (pelts up)[offset up + un - 1] > 0 }
     requires { 0 < sz }
     requires { valid sp sz }
-    requires { power radix un <= power base (sz-1) }
+    requires { value up un < power base (sz-1) }
     ensures  { 0 <= result < sz }
     ensures  { svalue base sp result = old value up un }
     ensures  { in_base base (pelts sp) (offset sp) (offset sp + result) }
     ensures  { (pelts sp)[offset sp] > 0 }
+    ensures  { forall j. j < offset sp \/ offset sp + sz <= j ->
+               (pelts sp)[j] = old (pelts sp)[j] }
   =
     let shift = Limb.of_int32
                   (Limb.count_leading_zeros (Limb.of_int32 base)) in
@@ -549,6 +575,8 @@ module Get_str
           ensures { in_base base (pelts sp) (offset sp) (offset sp + sn) }
           ensures { 0 <= sn < sz }
           ensures { 0 < value up 1 }
+          ensures { forall j. j < offset sp \/ offset sp + sz <= j ->
+                    (pelts sp)[j] = old (pelts sp)[j] }
     if n > 1
     then begin
       let tp = salloc (UInt32.of_int32 n) in
@@ -563,6 +591,8 @@ module Get_str
         invariant { sn = loopi * info.exp }
         invariant { in_base base (pelts sp) (offset sp) (offset sp + sn) }
         invariant { (pelts up)[offset up + n - 1] > 0 }
+        invariant { forall j. j < offset sp \/ offset sp + sz <= j ->
+                    (pelts sp)[j] = old (pelts sp)[j] }
         label StartLoop in
         let ghost osn = sn in
         let ref w = wmpn_divrem_1 tp up n info.bb in
@@ -573,7 +603,7 @@ module Get_str
                     >= power radix (n-1)
                  so n - 1 >= 1
                  so power radix (n-1) >= radix
-                 so vu < power radix un <= power base (sz - 1)
+                 so vu < power base (sz - 1)
                  so power base sn * power base info.exp
                     < power base sn * radix
                     <= power base sn * value up n
@@ -630,6 +660,10 @@ module Get_str
                                               w d1 di shift info in
         svalue_le_sub_frame (int32'int base) (pelts sp) (pelts osp)
                             (offset sp) (offset sp + int32'int sn);
+        assert { forall j. j < offset sp \/ offset sp + sz <= j ->
+                 (pelts sp)[j] = (pelts osp)[j]
+                 by j < offset sp <= offset spn
+                      \/ offset spn + sdone <= offset sp + sz <= j};
         assert { svalue_le base sp sn = svalue_le base sp sn at StartLoop };
         in_base_concat (int32'int base) (pelts sp)
                        (offset sp) (offset sp + int32'int sn)
@@ -683,6 +717,8 @@ module Get_str
                       (offset sp + sn) }
           invariant { svalue_le base sp sn
                       + power base (sn - sdone + info.exp) * value up n = vu }
+          invariant { forall j. j < offset sp \/ offset sp + sz <= j ->
+               (pelts sp)[j] = old (pelts sp)[j] }
           label Loop2 in
           let ghost osp = pure { sp } in
           C.set_ofs sp sn 0;
@@ -709,6 +745,10 @@ module Get_str
                 = power base sn * power base (sz - 1 - sn) };
     let sdone = wmpn_limb_get_str spn (sz - 1 - sn) lu d1 di shift info in
     assert { (pelts spn)[offset spn + sdone - 1] > 0 };
+    assert { forall j. j < offset sp \/ offset sp + sz <= j ->
+             (pelts sp)[j] = (pelts osp)[j]
+              by j < offset sp <= offset spn
+                 \/ offset spn + sdone <= offset sp + sz <= j };
     svalue_le_sub_frame (int32'int base) (pelts sp) (pelts osp)
                         (offset sp) (offset sp + int32'int sn);
     in_base_concat (int32'int base) (pelts sp)
@@ -739,14 +779,22 @@ module Get_str
                   = svalue_le_sub base (pelts osp) (offset sp + i)
                                                    (offset sp + sn - i) }
       invariant { i > 0 -> (pelts sp)[offset sp] > 0 }
+      invariant { forall j. j < offset sp \/ offset sp + sz <= j ->
+                  (pelts sp)[j] = old (pelts sp)[j] }
       let ghost osp' = pure { sp } in
       assert { 0 <= i < sn };
       let t = C.get_ofs sp i in
       assert { t = (pelts osp)[offset sp + i] };
       assert { (pelts sp)[offset sp + sn - i - 1]
                = (pelts osp)[offset sp + sn - i - 1] };
+      assert { forall j. offset sp <= j < offset sp + sn
+                      -> 0 <= (pelts sp)[j] < base };
       C.set_ofs sp i (C.get_ofs sp (sn - i - 1));
+      assert { forall j. offset sp <= j < offset sp + sn
+                      -> 0 <= (pelts sp)[j] < base };
       C.set_ofs sp (sn - i - 1) t;
+      assert inbase { forall j. offset sp <= j < offset sp + sn
+                      -> 0 <= (pelts sp)[j] < base };
       svalue_sub_frame (int32'int base) (pelts sp) (pelts osp')
                           (offset sp) (offset sp + int32'int i);
       svalue_sub_frame (int32'int base) (pelts sp) (pelts osp')
@@ -907,13 +955,19 @@ module Get_str
                by power 2 (64 * un) = power radix un <= power base (sz - 1)
                   = power (power 2 bits) (sz - 1)
                   = power 2 (bits * (sz - 1))
-               so 64 * un <= bits * (sz - 1)
+               so if bits * (sz - 1) < 64 * un
+                  then power 2 (bits * (sz - 1)) * 1
+                       < power 2 (bits * (sz - 1))
+                         * power 2 (64 * un - (bits * (sz - 1)))
+                       = power 2 (64 * un)
+                       so false
+               else 64 * un <= bits * (sz - 1)
                so 64 * un + bits - 1 < bits * sz
                so let d = div (64 * un + bits - 1) bits in
                   64 * un + bits - 1 >= bits * d
                so bits * d < bits * sz
                so d < sz };
-      wmpn_get_str_bits sp bits up un
+      wmpn_get_str_bits sp bits up un (64 * un);
     end
     else begin
      let info = wmpn_get_base_info (Limb.of_int32 base) in
