@@ -525,44 +525,46 @@ let rec clone_ity cl ity = match ity.ity_node with
   | Ityreg r ->
       ity_reg (clone_reg cl r)
   | Ityapp (s, tl, rl) ->
-      let tl = List.map (clone_ity cl) tl in
-      let rl = List.map (clone_ity cl) rl in
+      let tl' = List.map (clone_ity cl) tl in
       begin match Mts.find_opt s.its_ts cl.ts_table with
-      | Some its -> ity_app_pure its tl rl
+      | Some s' -> ity_app_pure s' tl' (clone_regs cl s tl rl s')
       | None -> (* creative indentation *)
       begin match Mts.find_opt s.its_ts cl.ty_table with
-      | Some ity -> ity_full_inst (its_match_regs s tl rl) ity
-      | None -> ity_app_pure s tl rl
+      | Some ity -> ity_full_inst (its_match_regs s tl' []) ity
+      | None -> ity_app_pure s tl' (List.map (clone_ity cl) rl)
       end end
   | Ityvar _ -> ity
 
 and clone_reg cl reg =
-  (* FIXME: what about top-level non-instantiated regions?
-     We cannot check in cl.cl_local to see if they are there.
-     Instead, we should prefill cl.pv_table and cl.rn_table
-     with all top-level pvsymbols (local or external) before
-     descending into a let_defn.
-     TODO: add to module/uc a list of locally-defined toplevel
-     variables, as well as a set of imported toplevel variables. *)
   try Mreg.find reg cl.rn_table with Not_found ->
-  let tl = List.map (clone_ity cl) reg.reg_args in
-  let rl = List.map (clone_ity cl) reg.reg_regs in
-  let r = match Mts.find_opt reg.reg_its.its_ts cl.ts_table with
-    | Some its ->
-        create_region (id_clone reg.reg_name) its tl rl
-    | None -> (* creative indentation *)
-    begin match Mts.find_opt reg.reg_its.its_ts cl.ty_table with
-    | Some {ity_node = Ityreg r} ->
-        let sbs = its_match_regs reg.reg_its tl rl in
-        let tl = List.map (ity_full_inst sbs) r.reg_args in
-        let rl = List.map (ity_full_inst sbs) r.reg_regs in
-        create_region (id_clone reg.reg_name) r.reg_its tl rl
-    | Some _ -> assert false
-    | None ->
-        create_region (id_clone reg.reg_name) reg.reg_its tl rl
-    end in
+  let tl' = List.map (clone_ity cl) reg.reg_args in
+  let s',rl' = match Mts.find_opt reg.reg_its.its_ts cl.ts_table with
+    | Some s' -> s', clone_regs cl reg.reg_its reg.reg_args reg.reg_regs s'
+    | None -> reg.reg_its, List.map (clone_ity cl) reg.reg_regs in
+  let r = create_region (id_clone reg.reg_name) s' tl' rl' in
   cl.rn_table <- Mreg.add reg r cl.rn_table;
   r
+
+and clone_regs cl s tl rl s' =
+  if rl = [] then [] else
+  let base = its_match_regs s tl rl in
+  let add sbs pj =
+    let ity = clone_ity cl (ity_full_inst base pj.pv_ity) in
+    ity_match sbs (Mpv.find pj cl.fd_table).pv_ity ity in
+  let sbs = List.fold_left add isb_empty s.its_mfields in
+  let sbs = List.fold_left add sbs s.its_ofields in
+  let rec inst ity =
+    if ity.ity_pure then ity_full_inst sbs ity else
+    match ity.ity_node with
+    | Ityreg r when Mreg.mem r sbs.isb_reg ->
+        Mreg.find r sbs.isb_reg
+    | Ityreg {reg_its = s; reg_args = tl; reg_regs = rl} ->
+        ity_app s (List.map inst tl) (List.map inst rl)
+    | Ityapp (s,tl,rl) ->
+        ity_app_pure s (List.map inst tl) (List.map inst rl)
+    | Ityvar v ->
+        Mtv.find v sbs.isb_var in
+  List.map (fun reg -> inst (ity_reg reg)) s'.its_regions
 
 let cl_find_ls cl ls =
   if not (Sid.mem ls.ls_name cl.cl_local) then ls
@@ -596,11 +598,15 @@ let cl_init m inst =
   Mts.iter (fun ts _ -> non_local ts.ts_name) inst.mi_ty;
   let check_ls ls _ =
     non_local ls.ls_name;
+    (* TODO: Loc.errorm "`ls` is a program function, it cannot
+                         be instantiated with a logical symbol" *)
     try  ignore (restore_rs ls); raise (BadInstance (BadI ls.ls_name))
     with Not_found -> () in
   Mls.iter check_ls inst.mi_ls;
   let check_rs rs _ =
     non_local rs.rs_name;
+    (* TODO: Loc.errorm "`rs` is a constructor/projection,
+                         it cannot be instantiated" *)
     match (Mid.find rs.rs_name m.mod_known).pd_node with
     | PDtype _ -> raise (BadInstance (BadI rs.rs_name))
     | PDlet  _ | PDexn  _ | PDpure -> () in
@@ -690,9 +696,9 @@ let cl_save_rs cl s s' =
   end;
   match s.rs_logic, s'.rs_logic with
   | RLls s, RLls s' -> cl_save_ls cl s s'
+  | RLnone, (RLnone | RLls _ | RLlemma) -> ()
   | RLlemma, RLlemma -> () (* TODO: update cl.pr_table? *)
-  | RLnone, RLnone -> ()
-  | _ -> assert false
+  | _ -> raise (BadInstance (BadI s.rs_name))
 
 type smap = {
   sm_vs : vsymbol Mvs.t;
@@ -908,29 +914,64 @@ and clone_let_defn cl sm ld = match ld with
 let clone_type_record cl s d s' d' =
   let id = s.its_ts.ts_name in
   let fields' = Hstr.create 16 in
+  let matched_fields' = Hpv.create 16 in
   let add_field' rs' = let pj' = fd_of_rs rs' in
     Hstr.add fields' pj'.pv_vs.vs_name.id_string rs' in
   List.iter add_field' d'.itd_fields;
-  (* check if fields from former type are also declared in the new type *)
-  let match_pj rs = let pj = fd_of_rs rs in
+  (* refinement preserves (im)mutability *)
+  if not (s.its_mutable = s'.its_mutable) then
+    raise (BadInstance (BadI id));
+  (* the fields from the old type must appear in the new type *)
+  let match_pj (bsb,fsb) rs =
+    let pj = fd_of_rs rs in
     let pj_str = pj.pv_vs.vs_name.id_string in
     let pj_ity = clone_ity cl pj.pv_ity in
     let pj_ght = pj.pv_ghost in
+    let pj_mut = List.exists (pv_equal pj) s.its_mfields in
     let rs' = try Hstr.find fields' pj_str with Not_found ->
         raise (BadInstance (BadI_not_found (id, pj_str))) in
     let pj' = fd_of_rs rs' in
     let pj'_ity = pj'.pv_ity in
     let pj'_ght = pj'.pv_ghost in
-    let equal_pjs = ity_equal pj_ity pj'_ity in
-    if not equal_pjs then
-      raise (BadInstance (BadI_type_proj (id, pj.pv_vs.vs_name.id_string)));
+    let pj'_mut = List.exists (pv_equal pj') s'.its_mfields in
+    let bsb = try ity_match bsb pj'_ity pj_ity with TypeMismatch _ ->
+      raise (BadInstance (BadI_type_proj (id, pj_str))) in
+    let fsb = try ity_match fsb pj_ity pj'_ity with TypeMismatch _ ->
+      raise (BadInstance (BadI_type_proj (id, pj_str))) in
     if not (pj_ght || not pj'_ght) then
-      raise (BadInstance (BadI_ghost_proj (id, pj.pv_vs.vs_name.id_string)));
+      raise (BadInstance (BadI_ghost_proj (id, pj_str)));
+    if not (pj_mut = pj'_mut) then (* TODO: dedicated BadI *)
+      raise (BadInstance (BadI_type_proj (id, pj_str)));
     let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     cl.rs_table <- Mrs.add rs rs' cl.rs_table;
-    cl.fd_table <- Mpv.add pj pj' cl.fd_table in
-  List.iter match_pj d.itd_fields;
+    cl.fd_table <- Mpv.add pj pj' cl.fd_table;
+    Hpv.add matched_fields' pj' pj;
+    bsb, fsb in
+  ignore (List.fold_left match_pj (isb_empty,isb_empty) d.itd_fields);
+  (* the new fields must be separated from the old ones *)
+  let check_npj' (op,np) rs' =
+    let pj' = fd_of_rs rs' in
+    if Hpv.mem matched_fields' pj' then ity_freeze op pj'.pv_ity, np
+                                   else op, ity_freeze np pj'.pv_ity in
+  let op,np = List.fold_left check_npj' (isb_empty,isb_empty) d'.itd_fields in
+  if not (Mreg.set_disjoint op.isb_reg np.isb_reg) then
+    raise (BadInstance (BadI id));
+(* NOTE: shouldn't be necessary
+  (* cannot add fields with regions to an immutable type *)
+  if not s.its_mutable && not (Mreg.is_empty np.isb_reg) then
+    raise (BadInstance (BadI id));
+*)
+  (* if we refine a mutable type, then all new regions in the invariant
+     come from the new fields (no invariant strengthening on the old ones) *)
+  let pj_occurs pj f = t_v_occurs pj.pv_vs f > 0 in
+  let check_opj' pj' pj =
+    if not pj'.pv_ity.ity_pure &&
+       List.exists (pj_occurs pj') d'.itd_invariant &&
+       not (List.exists (pj_occurs pj) d.itd_invariant) then
+    raise (BadInstance (BadI id)) in
+  Hpv.iter check_opj' matched_fields';
+  (* validate the refinement *)
   cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
 
 let clone_type_decl inst cl tdl kn =
@@ -969,7 +1010,7 @@ let clone_type_decl inst cl tdl kn =
           let pd' = Mid.find s'.its_ts.ts_name kn in
           let d' = match pd'.pd_node with
             | PDtype [d'] -> d'
-            (* FIXME: we could refine with mutual types *)
+            (* FIXME? we could refine with mutual types *)
             | PDtype _ -> raise (BadInstance (BadI id))
             | PDlet _ | PDexn _ | PDpure -> raise (BadInstance (BadI id)) in
           clone_type_record cl s d s' d'; (* clone record fields *)
@@ -981,16 +1022,14 @@ let clone_type_decl inst cl tdl kn =
             List.iter add_vc invl end
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity -> (* creative indentation *)
-          (* TODO: clone_type_record, axiom_of_invariant *)
-          (* TODO: should we only allow cloning into ity for
-             private types with no fields and no invariant? *)
           let stv = Stv.of_list ts.ts_args in
           if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
-                  its_pure s && ity.ity_pure) then raise (BadInstance (BadI id));
+                  d.itd_fields = [] && d.itd_invariant = [] &&
+                  its_pure s && ity.ity_pure) then
+            raise (BadInstance (BadI id));
           cl.ty_table <- Mts.add ts ity cl.ty_table
       | None -> assert false end end;
       Hits.add htd s None;
-      (* TODO: check typing conditions for refined record type *)
     end else
     (* variant *)
     if not s.its_mutable && d.itd_constructors <> [] &&
@@ -1085,6 +1124,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let add uc d = add_pdecl ~warn:false ~vc:false uc d in
       List.fold_left add uc dl
   | PDlet (LDsym (rs, c)) when Mrs.mem rs inst.mi_rs ->
+      freeze_foreign cl (cty_reads c.c_cty);
       (* refine only [val] symbols *)
       let cty = match c.c_node with (* cty for [val constant] is not c.c_cty *)
         | Cany -> c.c_cty
