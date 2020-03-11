@@ -68,6 +68,8 @@ let ident_printer () =
 
       "sqrt"; "sin"; "cos"; "tan"; "asin"; "acos"; "atan"; "pi";
 
+      "exp";
+
      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
       "Float16"; "Float32"; "Float64"; "Float128";
