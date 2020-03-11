@@ -45,18 +45,18 @@ module Make(E: sig
   end) = struct
 
   module Ai_logic = Ai_logic.Make(struct
-      let env = E.env
-      let th_known = E.th_known
-      let mod_known = E.mod_known
-    end)
+    let env = E.env
+    let th_known = E.th_known
+    let mod_known = E.mod_known
+  end)
+
   open Ai_logic
 
   let debug_fmt =
     if Debug.test_flag ai_print_domains then
       let d = open_out "dbg.dot" in
       Some (Format.formatter_of_out_channel d)
-    else
-      None
+    else None
 
   let _ =
     match debug_fmt with
@@ -73,9 +73,6 @@ module Make(E: sig
               let mod_known = E.mod_known
               let env = E.env
             end)
-          let th_known = E.th_known
-          let mod_known = E.mod_known
-          let env = E.env
         end)
       let th_known = E.th_known
       let mod_known = E.mod_known
@@ -204,12 +201,12 @@ module Make(E: sig
       Format.fprintf debug_fmt "%d -> %d@." a b
     | None -> ()
 
-  let warning_t s t =
-    Format.eprintf "-- warning: %s -- triggered by " s;
-    Pretty.print_term Format.err_formatter t;
-    Format.eprintf " of type ";
-    Pretty.print_ty Format.err_formatter (Term.t_type t);
-    Format.eprintf "@."
+  (* let warning_t s t =
+   *   Format.eprintf "-- warning: %s -- triggered by " s;
+   *   Pretty.print_term Format.err_formatter t;
+   *   Format.eprintf " of type ";
+   *   Pretty.print_ty Format.err_formatter (Term.t_type t);
+   *   Format.eprintf "@." *)
 
   let create_postcondition_equality _ manpk psym vreturn =
     if not Ity.(ity_equal  psym.pv_ity ity_unit) then

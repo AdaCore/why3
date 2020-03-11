@@ -5,28 +5,28 @@ type 'a a = { t: 'a list; c: bool; i: int; }
 
 module Make(S:sig
     module A:TERM_DOMAIN
-    val env: Env.env
-    val th_known: Decl.known_map
-    val mod_known: Pdecl.known_map
+    (* val env: Env.env
+     * val th_known: Decl.known_map
+     * val mod_known: Pdecl.known_map *)
   end) = struct
   module A = S.A
 
   open Ai_logic
-  module Ai_logic = Ai_logic.Make(struct
-      let env = S.env
-      let th_known = S.th_known
-      let mod_known = S.mod_known
-    end)
+  (* module Ai_logic = Ai_logic.Make(struct
+   *     let env = S.env
+   *     let th_known = S.th_known
+   *     let mod_known = S.mod_known
+   *   end) *)
 
   type t = A.t a
   type env = A.env
 
-  let is_eq _ _ _ = assert false
+  (* let is_eq _ _ _ = assert false *)
 
   type disj_man = ()
   type man = A.man * disj_man
 
-  let (create_manager:unit -> man) = fun () -> A.create_manager (), ()
+  let (create_manager:unit -> man) = fun _ -> A.create_manager (), ()
 
   let bottom _ _ = { i = 0; t = []; c = true; }
 

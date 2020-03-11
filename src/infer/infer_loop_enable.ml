@@ -12,7 +12,6 @@
 #13 "src/mlw/infer_loop_enable.ml"
 open Ident
 open Term
-open Theory
 open Ity
 open Expr
 

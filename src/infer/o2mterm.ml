@@ -50,8 +50,8 @@ module Make(S:sig type t end) = struct
   let card a =
     Term.Mterm.cardinal a.to_t
 
-  let card2 a =
-    TMap.filter (fun _ k -> k <> Term.Mterm.empty) a.to_term |> TMap.cardinal
+  (* let card2 a =
+   *   TMap.filter (fun _ k -> k <> Term.Mterm.empty) a.to_term |> TMap.cardinal *)
 
 
   let union f g a b =

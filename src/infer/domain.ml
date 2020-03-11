@@ -302,7 +302,7 @@ module Make_from_apron(M:sig
     let open Apron in
     let linexpr_a = A.to_lincons_array man a in
     let linexpr_b = A.to_lincons_array man b in
-    let a, b, linexpr_a, _ (* linexpr_b *) =
+    let _ (* a *), b, _ (* linexpr_a *), _ (* linexpr_b *) =
       if Lincons1.array_length linexpr_a > Lincons1.array_length linexpr_b then
         b, a, linexpr_b, linexpr_a
       else

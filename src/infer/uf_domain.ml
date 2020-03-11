@@ -131,9 +131,9 @@ module Make(S:sig
       uf_man.class_to_term <- TermToClass.add uf_man.class_to_term t c;
       c
 
-  let get_equivs uf_man uf t =
-    let tcl = TermToClass.to_t uf_man.class_to_term t in
-    Union_find.get_class tcl uf |> List.map (TermToClass.to_term uf_man.class_to_term)
+  (* let get_equivs uf_man uf t =
+   *   let tcl = TermToClass.to_t uf_man.class_to_term t in
+   *   Union_find.get_class tcl uf |> List.map (TermToClass.to_term uf_man.class_to_term) *)
 
   let apply_equal (man, uf_man) ud d l =
     List.fold_left (fun (d, v) t ->
@@ -327,17 +327,17 @@ module Make(S:sig
       ()
 
 
-  let print_uf b =
-    let k = ref b.uf_to_var in
-    try
-      while true do
-        let t, v = TermToVar.choose !k in
-        if Debug.test_flag infer_debug then
-          (p t; Format.eprintf " ---> %s@." (Var.to_string v));
-        k := TermToVar.remove_t !k v;
-      done;
-    with
-    | Not_found -> Format.eprintf "uf_to_var ended.@."
+  (* let print_uf b =
+   *   let k = ref b.uf_to_var in
+   *   try
+   *     while true do
+   *       let t, v = TermToVar.choose !k in
+   *       if Debug.test_flag infer_debug then
+   *         (p t; Format.eprintf " ---> %s@." (Var.to_string v));
+   *       k := TermToVar.remove_t !k v;
+   *     done;
+   *   with
+   *   | Not_found -> Format.eprintf "uf_to_var ended.@." *)
 
   let join_uf (man, uf_man) b d c =
     invariant_uf b;
@@ -577,8 +577,8 @@ module Make(S:sig
     t
 
 
-  let get_class_for_term_ro uf_man t =
-    TermToClass.to_t uf_man.class_to_term t
+  (* let get_class_for_term_ro uf_man t =
+   *   TermToClass.to_t uf_man.class_to_term t *)
 
   (** Get a set of (apron) linear expressions from a constraint stated in why3 logic.
    *
