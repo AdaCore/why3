@@ -230,62 +230,6 @@ module C
 
 end
 
-module SChar
-
-  type schar = < range -128 127 >
-  let constant min_char : int = -128
-  let constant max_char : int = 127
-  function to_int (x:schar) : int = schar'int x
-
-  clone export mach.int.Bounded_int with
-    type t = schar,
-    constant min = schar'minInt,
-    constant max = schar'maxInt,
-    function to_int = schar'int,
-    lemma to_int_in_bounds,
-    lemma extensionality
-
-end
-
-module UChar
-
-  type uchar = < range 0 255 >
-
-  let constant max_uchar : int = 255
-  function to_int (x:uchar) : int = uchar'int x
-  let constant length : int = 8
-  let constant radix : int = 256
-
-  clone export mach.int.Unsigned with
-    type t = uchar,
-    constant max = uchar'maxInt,
-    constant radix = radix,
-    goal radix_def,
-    function to_int = uchar'int,
-    lemma zero_unsigned_is_zero,
-    lemma to_int_in_bounds,
-    lemma extensionality
-
-  use int.Int
-  use mach.int.UInt64
-
-  val of_uint64 (x:uint64) : uchar
-    requires { 0 <= x <= 255 }
-    ensures  { result = to_int x }
-
-  val to_uint64 (x:uchar) : uint64
-    ensures  { to_int result = x }
-
-  use mach.int.Int32
-
-  val of_int32 (x:int32) : uchar
-    requires { 0 <= x <= 255 }
-    ensures  { result = to_int x }
-
-  val to_int32 (x:uchar) : int32
-    ensures  { to_int result = x }
-end
-
 module String [@W:non_conservative_extension:N]
 
   use int.Int
@@ -349,5 +293,107 @@ module String [@W:non_conservative_extension:N]
   predicate valid_string (p: ptr char)
     = strlen (pelts p) (offset p) >= 0
       /\ valid p (strlen (pelts p) (offset p))
+
+end
+
+
+module SChar
+
+  type schar = < range -128 127 >
+  let constant min_char : int = -128
+  let constant max_char : int = 127
+  function to_int (x:schar) : int = schar'int x
+
+  clone export mach.int.Bounded_int with
+    type t = schar,
+    constant min = schar'minInt,
+    constant max = schar'maxInt,
+    function to_int = schar'int,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+end
+
+module UChar
+
+  type uchar = < range 0 255 >
+
+  let constant max_uchar : int = 255
+  function to_int (x:uchar) : int = uchar'int x
+  let constant length : int = 8
+  let constant radix : int = 256
+
+  clone export mach.int.Unsigned with
+    type t = uchar,
+    constant max = uchar'maxInt,
+    constant radix = radix,
+    goal radix_def,
+    function to_int = uchar'int,
+    lemma zero_unsigned_is_zero,
+    lemma to_int_in_bounds,
+    lemma extensionality
+
+  use int.Int
+  use mach.int.UInt64
+
+  val of_uint64 (x:uint64) : uchar
+    requires { 0 <= x <= 255 }
+    ensures  { result = to_int x }
+
+  val to_uint64 (x:uchar) : uint64
+    ensures  { to_int result = x }
+
+  use mach.int.Int32
+
+  val of_int32 (x:int32) : uchar
+    requires { 0 <= x <= 255 }
+    ensures  { result = to_int x }
+
+  val to_int32 (x:uchar) : int32
+    ensures  { to_int result = x }
+
+  use string.Char
+  use map.Map
+
+  (* char can be signed or unsigned *)
+  val function of_char (x:char) : uchar
+    ensures { 0 <= code x <= 127 -> result = code x }
+
+  val function to_char (x:uchar) : char
+    ensures { 0 <= x <= 127 -> code result = x }
+
+
+  (* cast to and from char* *)
+
+  use C
+
+  type cast_mem = abstract { mi: int; ma: int; z: zone; l: int;
+                             mutable ok: bool }
+
+  val open_from_charptr (x: ptr char) : (nx: ptr uchar, ghost mem: cast_mem)
+    requires { writable x }
+    writes   { x }
+    ensures  { min nx = old min x = mem.mi }
+    ensures  { max nx = old max x = mem.ma }
+    ensures  { old zone x = mem.z }
+    ensures  { plength nx = old plength x = mem.l }
+    ensures  { mem.ok }
+    ensures  { nx.offset = old x.offset }
+    ensures  { forall i. 0 <= i < old plength x
+               -> (pelts nx)[i] = of_char (old pelts x)[i] }
+    ensures  { writable nx }
+
+  val close_from_charptr (x:ptr char) (nx:ptr uchar) (ghost mem:cast_mem) : unit
+    requires { mem.ok }
+    requires { mem.z = x.zone }
+    requires { mem.mi = nx.min }
+    requires { mem.ma = nx.max }
+    requires { x.offset = nx.offset }
+    requires { plength nx = mem.l }
+    writes   { x, nx, mem.ok }
+    ensures  { x.min = mem.mi /\ x.max = mem.ma }
+    ensures  { forall i. 0 <= i < plength x
+               -> (pelts x)[i] = to_char (old pelts nx)[i] }
+    ensures  { plength x = old plength nx }
 
 end
