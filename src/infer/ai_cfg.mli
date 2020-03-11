@@ -1,37 +1,39 @@
 open Domain
+open Term
+open Expr
+open Ity
 
-module Make(S:sig
-    val env: Env.env
-    val th_known: Decl.known_map
-    val mod_known: Pdecl.known_map
-    val widening: int
-    module D: DOMAIN
-  end): sig
-  module Domain : Domain.TERM_DOMAIN
+module type AiCfg = sig
+  module D : Domain.TERM_DOMAIN
 
   type control_point
-  type domain = Domain.t
+  type domain
   type cfg
   type context
 
-  val domain_manager: context -> Domain.man
+  val domain_manager : context -> D.man
+  val empty_context  : unit -> context
+  val start_cfg      : unit -> cfg
 
-  val empty_context : unit -> context
+  type xcontrol_point = control_point * xsymbol
+  type control_points = control_point * control_point * xcontrol_point list
 
-  val start_cfg: unit -> cfg
+  val put_expr_in_cfg   : cfg -> context -> ?ret:vsymbol option -> expr ->
+                         control_points
+  val put_expr_with_pre : cfg -> context -> expr -> term list ->
+                         control_points
 
-  val put_expr_in_cfg: cfg -> context -> ?ret:Term.vsymbol option -> Expr.expr ->
-            (control_point * control_point * ((control_point * Ity.xsymbol) list))
+  val eval_fixpoints : cfg -> context -> (expr * domain) list
 
-  val put_expr_with_pre: cfg -> context -> Expr.expr -> Term.term list ->
-            (control_point * control_point * ((control_point * Ity.xsymbol) list))
+  val domain_to_term : cfg -> context -> domain -> term
 
-  val eval_fixpoints: cfg -> context -> (Expr.expr * domain) list
-
-  val domain_to_term: cfg -> context -> domain -> Term.term
-
-  val add_variable: cfg -> context -> Ity.pvsymbol -> unit
-
-
-
+  val add_variable   : cfg -> context -> pvsymbol -> unit
 end
+
+module Make(S:sig
+  val env       : Env.env
+  val th_known  : Decl.known_map
+  val mod_known : Pdecl.known_map
+  val widening  : int
+  module Domain : DOMAIN
+end): AiCfg

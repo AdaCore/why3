@@ -1,18 +1,47 @@
+open Format
 open Domain
+open Term
+open Expr
+open Ity
 
 let ai_print_domains =
   Debug.register_flag "ai_print_domains" ~desc:"Print domains to debug"
 let ai_cfg_debug =
   Debug.register_flag "ai_cfg_debug" ~desc:"CFG debug"
 
-open Format
+module type AiCfg = sig
+  module D : Domain.TERM_DOMAIN
+
+  type control_point
+  type domain
+  type cfg
+  type context
+
+  val domain_manager : context -> D.man
+  val empty_context  : unit -> context
+  val start_cfg      : unit -> cfg
+
+  type xcontrol_point = control_point * xsymbol
+  type control_points = control_point * control_point * xcontrol_point list
+
+  val put_expr_in_cfg   : cfg -> context -> ?ret:vsymbol option -> expr ->
+                         control_points
+  val put_expr_with_pre : cfg -> context -> expr -> term list ->
+                         control_points
+
+  val eval_fixpoints : cfg -> context -> (expr * domain) list
+
+  val domain_to_term : cfg -> context -> domain -> term
+
+  val add_variable   : cfg -> context -> pvsymbol -> unit
+end
 
 module Make(E: sig
     val env: Env.env
     val th_known: Decl.known_map
     val mod_known: Pdecl.known_map
     val widening: int
-    module D: DOMAIN
+    module Domain: DOMAIN
   end) = struct
 
   module Ai_logic = Ai_logic.Make(struct
@@ -39,7 +68,7 @@ module Make(E: sig
   module D = Quant_domain.Make(struct
       module A = Disjunctive_term_domain.Make(struct
           module A = Uf_domain.Make(struct
-              module A = E.D
+              module A = E.Domain
               let th_known = E.th_known
               let mod_known = E.mod_known
               let env = E.env
@@ -52,7 +81,6 @@ module Make(E: sig
       let mod_known = E.mod_known
       let env = E.env
     end)
-  module Domain = D
 
   (* Apron manager *)
   (*let manpk = PolkaGrid.manager_alloc (Polka.manager_alloc_strict ()) (Ppl.manager_alloc_grid ())
@@ -60,7 +88,6 @@ module Make(E: sig
 
   type control_point = int
   type hedge = int
-
   type domain = D.t
 
   (* control flow graph *)
@@ -97,6 +124,9 @@ module Make(E: sig
   }
 
   type context = D.man
+  type xcontrol_point = control_point * xsymbol
+  type control_points = control_point * control_point * xcontrol_point list
+
 
   let domain_manager x = x
 
@@ -254,7 +284,7 @@ module Make(E: sig
           constraints abs);
       i, j, []
 
-    | Elet (LDvar (psym, let_expr), b) ->
+    | Elet (LDvar (psym, let_expr), c) ->
           (*
            * let a = b in c
            *
@@ -265,23 +295,32 @@ module Make(E: sig
            *  . b_begin_cp
            *  | …
            *  | result = c
-           *  . b_begin_cp
+           *  . b_end_cp
            *  | erase every temporary variable
            *  . end_cp
            **)
+       if Debug.test_flag ai_cfg_debug then
+         Format.eprintf "Computing for Elet: %a = %a@."
+           Ity.print_pv psym print_expr let_expr;
+
       D.add_variable_to_env manpk psym;
       let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg ~ret:(Some Ity.(psym.pv_vs)) cfg manpk let_expr in
 
-      (*let forget_ret = D.forget_var manpk cfg.env (create_vreturn Ity.(ty_of_ity (psym.pv_ity))) in*)
+      (* let forget_ret manpk abs =
+       *   let ty = Ity.(ty_of_ity (psym.pv_ity)) in
+       *   if Ty.ty_equal ty Ity.ty_unit then
+       *     abs
+       *   else
+       *     D.forget_var manpk psym.pv_vs abs in *)
 
       (* compute the child and add an hyperedge, to set the value of psym
        * to the value returned by let_expr *)
-      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg ~ret cfg manpk b in
+      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg ~ret cfg manpk c in
 
 
       (* Save the effect of the let *)
       new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun _ abs ->
-          abs
+          (* forget_ret manpk *) abs
         );
 
       let end_cp = new_node_cfg cfg expr in
