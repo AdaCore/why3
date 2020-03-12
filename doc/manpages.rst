@@ -1349,20 +1349,29 @@ The ``pp`` Command
 
 .. program:: why3 pp
 
-This tool pretty-prints Why3 declarations. Currenty it can be used to
-print WhyML inductive definitions to LaTeX (using the ``mathpartir``
-package), and to format WhyML source code.
+This tool pretty-prints Why3 declarations into various forms. The kind of output is specified using the `--output` option.
 
 ::
 
-    why3 pp [--output=latex|mlw] [--kind=inductive] [--prefix <prefix>] \
+    why3 pp [--output=latex|mlw|dep] [--kind=inductive] [--prefix <prefix>] \
       <filename> <file>[.<Module>].<ind_type> ...
 
 .. option:: --output=<output>
 
-   Set the output format. Currently, only pretty printing to LaTeX is
-   supported using ``--output=latex``, and formatting of WhyML source
-   code using ``--output=mlw``.
+   Set the output format, among the following:
+
+  - `latex` : currently can be used to print WhyML inductive definitions
+    to LaTeX, using the ``mathpartir`` package
+
+  - `mlw` : reformat WhyML source code
+
+  - `dep` : display module dependencies, under the form of a digraph
+    using the `dot` syntax from the graphviz package.
+
+..
+  - `ast` : print the abstract syntax tree (data-type from API module `Ptree`)
+
+
 
 .. option:: --kind=<kind>
 
