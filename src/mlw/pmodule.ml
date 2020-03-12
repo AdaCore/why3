@@ -496,8 +496,6 @@ let empty_clones m = {
   xs_table = Mxs.empty;
 }
 
-(* exception CloneDivergence of ident * ident *)
-
 (* populate the clone structure *)
 
 let rec sm_trans_ty tym tsm ty = match ty.ty_node with
@@ -598,17 +596,14 @@ let cl_init m inst =
   Mts.iter (fun ts _ -> non_local ts.ts_name) inst.mi_ty;
   let check_ls ls _ =
     non_local ls.ls_name;
-    (* TODO: Loc.errorm "`ls` is a program function, it cannot
-                         be instantiated with a logical symbol" *)
-    try  ignore (restore_rs ls); raise (BadInstance (BadI ls.ls_name))
+    try ignore (restore_rs ls);
+        raise (BadInstance (BadI_ls_rs ls))
     with Not_found -> () in
   Mls.iter check_ls inst.mi_ls;
   let check_rs rs _ =
     non_local rs.rs_name;
-    (* TODO: Loc.errorm "`rs` is a constructor/projection,
-                         it cannot be instantiated" *)
     match (Mid.find rs.rs_name m.mod_known).pd_node with
-    | PDtype _ -> raise (BadInstance (BadI rs.rs_name))
+    | PDtype _ -> raise (CannotInstantiate rs.rs_name)
     | PDlet  _ | PDexn  _ | PDpure -> () in
   Mrs.iter check_rs inst.mi_rs;
   Mvs.iter (fun vs _ -> non_local vs.vs_name) inst.mi_pv;
@@ -616,10 +611,12 @@ let cl_init m inst =
   let check_pk pr _ =
     non_local pr.pr_name;
     match (Mid.find pr.pr_name m.mod_known).pd_node with
-    | PDtype _ | PDlet  _ | PDexn  _ -> raise (BadInstance (BadI pr.pr_name))
+    | PDtype _ | PDlet  _ | PDexn  _ ->
+        raise (CannotInstantiate pr.pr_name)
     | PDpure -> () in
   Mpr.iter check_pk inst.mi_pk;
-  Mpr.iter (fun pr _ -> raise (BadInstance (BadI pr.pr_name))) inst.mi_pr;
+  Mpr.iter (fun pr _ -> (* only through bad API use *)
+    raise (BadInstance (BadI pr.pr_name))) inst.mi_pr;
   cl
 
 (* clone declarations *)
@@ -635,16 +632,17 @@ let clone_ls cl ls =
 
 let clone_decl inst cl uc d = match d.d_node with
   | Dtype _ | Ddata _ -> assert false (* impossible *)
-  | Dparam ({ls_name = id} as ls) when Mls.mem ls inst.mi_ls ->
+  | Dparam ls when Mls.mem ls inst.mi_ls ->
       let ls' = Mls.find ls inst.mi_ls in
-      let mtch sb ty ty' = try ty_match sb ty' (clone_ty cl ty)
-        with TypeMismatch _ -> raise (BadInstance (BadI id)) in
+      let mtch sb ty ty' = try ty_match sb ty' (clone_ty cl ty) with
+        | Ty.TypeMismatch _ -> raise (BadInstance (BadI_ls_type ls)) in
       let sbs = match ls.ls_value,ls'.ls_value with
         | Some ty, Some ty' -> mtch Mtv.empty ty ty'
         | None, None -> Mtv.empty
-        | _ -> raise (BadInstance (BadI id)) in
+        | _ -> raise (BadInstance (BadI_ls_kind ls)) in
       ignore (try List.fold_left2 mtch sbs ls.ls_args ls'.ls_args
-        with Invalid_argument _ -> raise (BadInstance (BadI id)));
+        with Invalid_argument _ ->
+          raise (BadInstance (BadI_ls_arity ls)));
       cl.ls_table <- Mls.add ls ls' cl.ls_table;
       uc
   | Dparam ls ->
@@ -692,13 +690,13 @@ let cl_save_rs cl s s' =
   begin match s.rs_field, s'.rs_field with
   | Some v, Some v' -> cl.fd_table <- Mpv.add v v' cl.fd_table
   | None, _ -> () (* can instantiate a non-field with a field *)
-  | _ -> assert false (* but not vice versa *)
+  | _ -> raise (CannotInstantiate s.rs_name) (* but not vice versa *)
   end;
   match s.rs_logic, s'.rs_logic with
   | RLls s, RLls s' -> cl_save_ls cl s s'
   | RLnone, (RLnone | RLls _ | RLlemma) -> ()
-  | RLlemma, RLlemma -> () (* TODO: update cl.pr_table? *)
-  | _ -> raise (BadInstance (BadI s.rs_name))
+  | RLlemma, RLlemma -> ()
+  | _ -> raise (BadInstance (BadI_rs_kind s.rs_name))
 
 type smap = {
   sm_vs : vsymbol Mvs.t;
@@ -928,15 +926,16 @@ and clone_let_defn cl sm ld = match ld with
       sm, ld
 
 let clone_type_record cl s d s' d' =
-  let id = s.its_ts.ts_name in
   let fields' = Hstr.create 16 in
   let matched_fields' = Hpv.create 16 in
   let add_field' rs' = let pj' = fd_of_rs rs' in
     Hstr.add fields' pj'.pv_vs.vs_name.id_string rs' in
   List.iter add_field' d'.itd_fields;
   (* refinement preserves (im)mutability *)
-  if not (s.its_mutable = s'.its_mutable) then
-    raise (BadInstance (BadI id));
+  if not s.its_mutable && s'.its_mutable then
+    raise (BadInstance (BadI_ty_mut_rhs s.its_ts));
+  if s.its_mutable && not s'.its_mutable then
+    raise (BadInstance (BadI_ty_mut_lhs s.its_ts));
   (* the fields from the old type must appear in the new type *)
   let match_pj (bsb,fsb) rs =
     let pj = fd_of_rs rs in
@@ -945,19 +944,19 @@ let clone_type_record cl s d s' d' =
     let pj_ght = pj.pv_ghost in
     let pj_mut = List.exists (pv_equal pj) s.its_mfields in
     let rs' = try Hstr.find fields' pj_str with Not_found ->
-        raise (BadInstance (BadI_not_found (id, pj_str))) in
+        raise (BadInstance (BadI_field (s.its_ts, pj.pv_vs))) in
     let pj' = fd_of_rs rs' in
     let pj'_ity = pj'.pv_ity in
     let pj'_ght = pj'.pv_ghost in
     let pj'_mut = List.exists (pv_equal pj') s'.its_mfields in
     let bsb = try ity_match bsb pj'_ity pj_ity with TypeMismatch _ ->
-      raise (BadInstance (BadI_type_proj (id, pj_str))) in
+      raise (BadInstance (BadI_field_type (s.its_ts, pj.pv_vs))) in
     let fsb = try ity_match fsb pj_ity pj'_ity with TypeMismatch _ ->
-      raise (BadInstance (BadI_type_proj (id, pj_str))) in
+      raise (BadInstance (BadI_field_type (s.its_ts, pj.pv_vs))) in
     if not (pj_ght || not pj'_ght) then
-      raise (BadInstance (BadI_ghost_proj (id, pj_str)));
-    if not (pj_mut = pj'_mut) then (* TODO: dedicated BadI *)
-      raise (BadInstance (BadI_type_proj (id, pj_str)));
+      raise (BadInstance (BadI_field_ghost (s.its_ts, pj.pv_vs)));
+    if not (pj_mut = pj'_mut) then
+      raise (BadInstance (BadI_field_mut (s.its_ts, pj.pv_vs)));
     let ls, ls' = ls_of_rs rs, ls_of_rs rs' in
     cl.ls_table <- Mls.add ls ls' cl.ls_table;
     cl.rs_table <- Mrs.add rs rs' cl.rs_table;
@@ -972,12 +971,7 @@ let clone_type_record cl s d s' d' =
                                    else op, ity_freeze np pj'.pv_ity in
   let op,np = List.fold_left check_npj' (isb_empty,isb_empty) d'.itd_fields in
   if not (Mreg.set_disjoint op.isb_reg np.isb_reg) then
-    raise (BadInstance (BadI id));
-(* NOTE: shouldn't be necessary
-  (* cannot add fields with regions to an immutable type *)
-  if not s.its_mutable && not (Mreg.is_empty np.isb_reg) then
-    raise (BadInstance (BadI id));
-*)
+    raise (BadInstance (BadI_ty_alias s.its_ts));
   (* if we refine a mutable type, then all new regions in the invariant
      come from the new fields (no invariant strengthening on the old ones) *)
   let pj_occurs pj f = t_v_occurs pj.pv_vs f > 0 in
@@ -985,8 +979,8 @@ let clone_type_record cl s d s' d' =
     if not pj'.pv_ity.ity_pure &&
        List.exists (pj_occurs pj') d'.itd_invariant &&
        not (List.exists (pj_occurs pj) d.itd_invariant) then
-    raise (BadInstance (BadI id)) in
-  Hpv.iter check_opj' matched_fields';
+    raise (BadInstance (BadI_field_inv (s.its_ts, pj.pv_vs))) in
+  if s.its_mutable then Hpv.iter check_opj' matched_fields';
   (* validate the refinement *)
   cl.ts_table <- Mts.add s.its_ts s' cl.ts_table
 
@@ -1022,13 +1016,13 @@ let clone_type_decl inst cl tdl kn =
       begin match Mts.find_opt ts inst.mi_ts with
       | Some s' ->
           if not (List.length ts.ts_args = List.length s'.its_ts.ts_args) then
-            raise (BadInstance (BadI id));
+            raise (BadInstance (BadI_ty_arity ts));
           let pd' = Mid.find s'.its_ts.ts_name kn in
           let d' = match pd'.pd_node with
             | PDtype [d'] -> d'
             (* FIXME? we could refine with mutual types *)
-            | PDtype _ -> raise (BadInstance (BadI id))
-            | PDlet _ | PDexn _ | PDpure -> raise (BadInstance (BadI id)) in
+            | PDtype _ -> raise (BadInstance (BadI_ty_rec ts))
+            | PDlet _ | PDexn _ | PDpure -> assert false in
           clone_type_record cl s d s' d'; (* clone record fields *)
           (* generate and add VC for type invariant implication *)
           if d.itd_invariant <> [] then begin
@@ -1039,10 +1033,12 @@ let clone_type_decl inst cl tdl kn =
       | None -> begin match Mts.find_opt ts inst.mi_ty with
       | Some ity -> (* creative indentation *)
           let stv = Stv.of_list ts.ts_args in
-          if not (Stv.subset (ity_freevars Stv.empty ity) stv &&
-                  d.itd_fields = [] && d.itd_invariant = [] &&
-                  its_pure s && ity.ity_pure) then
-            raise (BadInstance (BadI id));
+          if not (Stv.subset (ity_freevars Stv.empty ity) stv) then
+            raise (BadInstance (BadI_ty_vars ts));
+          if not (d.itd_fields = [] && d.itd_invariant = []) then
+            raise (BadInstance (BadI_ty_ner ts));
+          if not (its_pure s && ity.ity_pure) then
+            raise (BadInstance (BadI_ty_impure ts));
           cl.ty_table <- Mts.add ts ity cl.ty_table
       | None -> assert false end end;
       Hits.add htd s None;
@@ -1145,35 +1141,24 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let cty = match c.c_node with (* cty for [val constant] is not c.c_cty *)
         | Cany -> c.c_cty
         | Cfun {e_node = Eexec ({c_node = Cany}, cty)} -> cty
-        | _ -> raise (BadInstance (BadI rs.rs_name)) in
+        | _ -> raise (CannotInstantiate rs.rs_name) in
       let kind = match rs.rs_logic with
         | RLnone -> RKnone
-        | RLpv _ -> raise (BadInstance (BadI rs.rs_name))
+        | RLpv _ -> raise (CannotInstantiate rs.rs_name)
         | RLls ls when ls.ls_value = None -> RKpred
         | RLls _ -> RKfunc
         | RLlemma -> RKlemma in
       let cty = clone_cty cl (sm_of_cl cl) cty in
       let rs' = Mrs.find rs inst.mi_rs in
+      cl_save_rs cl rs rs';
       (* types are checked during c_app below *)
       if List.length cty.cty_args <> List.length rs'.rs_cty.cty_args then
-        raise (BadInstance (BadI rs.rs_name));
-      begin match rs.rs_logic, rs'.rs_logic with
-      | RLnone, (RLnone | RLls _ | RLlemma) | RLlemma, RLlemma -> ()
-      | RLls ls, RLls ls' -> cl.ls_table <- Mls.add ls ls' cl.ls_table
-      | _ -> raise (BadInstance (BadI rs.rs_name))
-      end;
-(*    TODO: this is subsumed by eff_equal below, except for the error
-      begin
-        match cty.cty_effect.eff_oneway, rs'.rs_cty.cty_effect.eff_oneway with
-        | _, Total | Diverges, _ | Partial, Partial -> ()
-        | _ -> raise (CloneDivergence (rs.rs_name, rs'.rs_name))
-      end;
-*)
-      cl.rs_table <- Mrs.add rs rs' cl.rs_table;
-      let e = e_exec (c_app rs' cty.cty_args [] cty.cty_result) in
+        raise (BadInstance (BadI_rs_arity rs.rs_name));
+      let e = try e_exec (c_app rs' cty.cty_args [] cty.cty_result) with
+        | TypeMismatch _ -> raise (BadInstance (BadI_rs_type rs.rs_name)) in
       let cexp = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
         cty.cty_post cty.cty_xpost cty.cty_oldies e in
-      let id = id_clone rs.rs_name in (* FIXME better name *)
+      let id = id_derive (rs.rs_name.id_string ^ "'refn") rs.rs_name in
       let ld, _ = let_sym id ~ghost:(rs_ghost rs) ~kind cexp in
       (* add a fake call based on the cloned cty for the right effects *)
       let _,fake = let_sym id ~ghost:(rs_ghost rs) (c_any cty) in
@@ -1182,22 +1167,65 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         cty.cty_post cty.cty_xpost cty.cty_oldies (e_if e_true e fake) in
       let _, ss = let_sym id ~ghost:(rs_ghost rs) ~kind fake in
       if not (cty_ghost rs.rs_cty = cty_ghost ss.rs_cty) then
-        raise (BadInstance (BadI rs.rs_name));
+        raise (BadInstance (BadI_rs_ghost rs.rs_name));
       if not (mask_equal rs.rs_cty.cty_mask ss.rs_cty.cty_mask) then
-        raise (BadInstance (BadI rs.rs_name));
+        raise (BadInstance (BadI_rs_mask rs.rs_name));
       let eff = eff_ghostify (rs_ghost rs) cty.cty_effect in
-      if not (eff_equal eff ss.rs_cty.cty_effect) then
+      let eff' = ss.rs_cty.cty_effect in
+      if not (eff_equal eff eff') then begin
+        (* Format.eprintf "@[%a@]@\n" print_cty cty; *)
+        (* Format.eprintf "@[%a@]@\n" print_cty ss.rs_cty; *)
+        let find_vars regs =
+          let reads = Spv.union eff.eff_reads (Spv.of_list cty.cty_args) in
+          Mreg.fold (fun r _ svs -> Spv.fold (fun v svs ->
+            if ity_r_reachable r v.pv_ity
+            then Svs.add v.pv_vs svs else svs) reads svs) regs Svs.empty in
+        if not (Spv.equal eff.eff_reads eff'.eff_reads) then
+          raise (BadInstance (BadI_rs_reads (rs.rs_name,
+            Spv.fold (fun v svs -> Svs.add v.pv_vs svs)
+              (Spv.diff eff'.eff_reads eff.eff_reads) Svs.empty)));
+        (* extra resets may lead to fewer writes, so we check them first *)
+        if not (Sreg.subset eff.eff_covers eff'.eff_covers) then
+          raise (BadInstance (BadI_rs_resets (rs.rs_name,
+            find_vars (Sreg.diff eff.eff_covers eff'.eff_covers))));
+        if not (Mreg.equal Spv.equal eff.eff_writes eff'.eff_writes) then
+          raise (BadInstance (BadI_rs_writes (rs.rs_name,
+            find_vars (Mreg.filter (fun r fd ->
+              try not (Spv.equal fd (Mreg.find r eff.eff_writes))
+              with Not_found -> true) eff'.eff_writes))));
+        if not (Sreg.equal eff.eff_taints eff'.eff_taints) then
+          raise (BadInstance (BadI_rs_taints (rs.rs_name,
+            find_vars (Sreg.diff eff'.eff_taints eff.eff_taints))));
+        if not (Sreg.equal eff.eff_covers eff'.eff_covers) then
+          raise (BadInstance (BadI_rs_covers (rs.rs_name,
+            find_vars (Sreg.diff eff'.eff_covers eff.eff_covers))));
+        if not (Sreg.equal eff.eff_resets eff'.eff_resets) then
+          raise (BadInstance (BadI_rs_resets (rs.rs_name,
+            find_vars (Sreg.diff eff'.eff_resets eff.eff_resets))));
+        if not (Sxs.equal eff.eff_raises eff'.eff_raises) then
+          raise (BadInstance (BadI_rs_raises (rs.rs_name,
+            Sxs.fold (fun xs sid -> Sid.add xs.xs_name sid)
+              (Sxs.diff eff'.eff_raises eff.eff_raises) Sid.empty)));
+        if not (Stv.equal eff.eff_spoils eff'.eff_spoils) then
+          raise (BadInstance (BadI_rs_spoils (rs.rs_name,
+              Stv.diff eff'.eff_spoils eff.eff_spoils)));
+        if not (eff.eff_oneway = eff'.eff_oneway) then
+          raise (BadInstance (BadI_rs_oneway rs.rs_name));
+        if not (eff.eff_ghost = eff'.eff_ghost) then
+          raise (BadInstance (BadI_rs_ghost rs.rs_name));
         raise (BadInstance (BadI rs.rs_name));
+      end;
       (* FIXME add correspondance for "let lemma" to cl.pr_table *)
       let dl = mk_vc uc (create_let_decl ld) in
       List.fold_left (add_pdecl_raw ~warn:false) uc dl
   | PDlet ld ->
       begin match ld with
         | LDvar ({pv_vs=vs}, _) when Mvs.mem vs inst.mi_pv ->
-            raise (BadInstance (BadI vs.vs_name))
+            raise (CannotInstantiate vs.vs_name)
         | LDrec rdl ->
-            let no_inst { rec_sym = rs } =
-              if Mrs.mem rs inst.mi_rs then raise (BadInstance (BadI rs.rs_name)) in
+            let no_inst {rec_sym = rs} =
+              if Mrs.mem rs inst.mi_rs then
+                raise (CannotInstantiate rs.rs_name) in
             List.iter no_inst rdl
         | _ -> () end;
       let reads = match ld with
@@ -1213,8 +1241,9 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let xs' = Mxs.find xs inst.mi_xs in
       begin try let ity = clone_ity cl xs.xs_ity in
                 ignore (ity_match isb_empty xs'.xs_ity ity)
-        with TypeMismatch _ -> raise (BadInstance (BadI id)) end;
-      if mask_spill xs'.xs_mask xs.xs_mask then raise (BadInstance (BadI id));
+        with TypeMismatch _ -> raise (BadInstance (BadI_xs_type id)) end;
+      if mask_spill xs'.xs_mask xs.xs_mask then
+        raise (BadInstance (BadI_xs_mask id));
       cl.xs_table <- Mxs.add xs xs' cl.xs_table;
       uc
   | PDexn xs ->
@@ -1357,17 +1386,9 @@ let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string
   (Pp.print_list Pp.newline2 print_unit) m.mod_units
 
-let _print_id fmt id = Ident.print_decoded fmt id.id_string
-
 let () = Exn_printer.register (fun fmt e -> match e with
   | IncompatibleNotation nm -> Format.fprintf fmt
       "Incombatible type signatures for notation '%a'" Ident.print_decoded nm
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
-(* TODO: reuse later for a proper error message
-  | CloneDivergence (iv, il) -> Format.fprintf fmt
-      "Cannot instantiate symbol %a with symbol %a \
-       that has worse termination status"
-      print_id iv print_id il
-*)
   | _ -> raise e)
