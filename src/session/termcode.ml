@@ -220,6 +220,20 @@ type shape = string
 
 type bound_shape = int list
 
+let current_shape_version = 6
+
+type shape_version = SV1 | SV2 | SV3 | SV4 | SV5
+
+let int_to_shape_version n =
+  match n with
+  | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5
+  | _ -> assert false
+
+let is_bound_shape_version v =
+  match int_to_shape_version v with
+  | SV1 | SV2 | SV3 | SV4 -> false
+  | SV5 -> true
+
 type shape_v =
   | Old_shape of shape
   | Bound_shape of bound_shape
@@ -233,7 +247,7 @@ let string_of_shape sv =
 let shape_of_string =
   let cache = ref [] in
   fun ~version s ->
-  if version >= 8 then
+  if is_bound_shape_version version then
     let s = Strings.rev_split 'H' s in
     (* most consecutive shapes have very long common suffixes,
        so we look for some sharing with the previously computed shape
@@ -269,10 +283,6 @@ let empty_bound_shape = []
 let debug = Debug.register_info_flag "session_pairing"
   ~desc:"Print@ debugging@ messages@ about@ reconstruction@ of@ \
          session@ trees@ after@ modification@ of@ source@ files."
-
-let current_shape_version = 6
-
-type shape_version = SV1 | SV2 | SV3 | SV4 | SV5
 
 module Shape = struct
 
@@ -507,16 +517,6 @@ let t_shape_task ~version ~expl t =
   Buffer.contents shape_buffer
 
 end
-
-let int_to_shape_version n =
-  match n with
-  | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5
-  | _ -> assert false
-
-let is_bound_shape_version v =
-  match int_to_shape_version v with
-  | SV1 | SV2 | SV3 | SV4 -> false
-  | SV5 -> true
 
 module Gshape = struct
 
