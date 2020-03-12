@@ -416,8 +416,7 @@ let set_output = function
 let prefix = ref "WHY"
 
 let usage =
-  "Pretty print Why3 declarations (currently only inductive types in LaTeX using mathpartir).\n\
-   why3 pp [--output=latex|mlw|ast] [--kind=inductive] [--prefix <prefix>] <filename> [<Module>.]<type> ..."
+  "why3 pp [--output=latex|mlw|ast|dep] [--kind=inductive] [--prefix <prefix>] <filename> [<Module>.]<type> ..."
 
 let options = [
   "--output", Arg.String set_output,                "<output> Output format";
@@ -493,10 +492,12 @@ let () =
          | Some Dep, None, _ ->
             let f = Filename.(chop_extension (basename filename)) in
             deps_file std_formatter true f mlw_file
-         (* | Some Ast, None, 0 ->
-          *     Ptree.pp_mlw_file std_formatter mlw_file *)
+         | Some Ast, None, 0 ->
+            eprintf "experimental output in AST form not available.@.";
+            exit 1
          | _, _, _ ->
-             failwith "command line arguments"
+            eprintf "invalid command line arguments.@\n%s@." usage;
+            exit 1
         )
     | None -> invalid_arg "no filename given"
   with Invalid_argument msg ->
