@@ -1365,10 +1365,12 @@ This tool pretty-prints Why3 declarations into various forms. The kind of output
 
   - `mlw` : reformat WhyML source code
 
-.. %%  - `ast` : print the abstract syntax tree (data-type from API module `Ptree`)
-
   - `dep` : display module dependencies, under the form of a digraph
     using the `dot` syntax from the graphviz package.
+
+..
+  - `ast` : print the abstract syntax tree (data-type from API module `Ptree`)
+
 
 
 .. option:: --kind=<kind>
