@@ -494,7 +494,8 @@ let manual_prover =
 let filename =
    let is_not_why_loc s =
       not (Filename.check_suffix s "why" ||
-           Filename.check_suffix s "mlw") in
+           Filename.check_suffix s "mlw" ||
+           Filename.check_suffix s "gnat-json") in
    match !opt_filename with
    | None -> Gnat_util.abort_with_message ~internal:true "No file given."
    | Some s ->

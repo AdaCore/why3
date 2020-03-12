@@ -673,6 +673,8 @@ enable_re
 SEQLIB
 SEQINCLUDE
 MENHIRINCLUDE
+PPXDERIVING
+YOJSONINCLUDES
 ZIPLIB
 ZIPINCLUDE
 enable_zip
@@ -4568,6 +4570,10 @@ else
    ZIPLIB=
    ZIPINCLUDE=
 fi
+
+
+YOJSONINCLUDES="-I $(ocamlfind query easy-format) -I $(ocamlfind query biniou) -I $(ocamlfind query yojson)"
+PPXDERIVING="-ppx \"$($OCAMLFIND query ppx_deriving)/ppx_deriving package:ppx_sexp_conv\""
 
 # checking for menhirlib
 found_menhirlib=yes

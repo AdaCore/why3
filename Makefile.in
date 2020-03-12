@@ -98,7 +98,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@
+EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@ @YOJSONINCLUDES@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -135,6 +135,8 @@ OLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMXA)
 BLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMA)
 endif
 
+FLAGS += @PPXDERIVING@
+
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
 endif
@@ -145,8 +147,8 @@ CMIHACK = -intf-suffix .cmi
 # external libraries common to all binaries
 
 EXTOBJS = menhirLib
-EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@
-EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @WHY3LIB@
+EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ result easy_format biniou yojson ppx_deriving_runtime @WHY3LIB@
+EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ yojson @WHY3LIB@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -288,7 +290,7 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
 	      $(addprefix src/session/, $(LIB_SESSION))
 
-LIBDIRS = util core driver mlw extract parser transform printer session
+LIBDIRS = util core driver mlw extract parser transform printer session gnat
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
 LIBDEP = $(addsuffix .dep, $(LIBMODULES))
@@ -700,26 +702,27 @@ clean::
 # GNATWhy3 #
 ############
 
+GNATASTMODULES := $(addprefix src/gnat/, gnat_ast ptree_constructors gnat_ast_to_ptree)
 
 GNAT_SERVER_FILES := gnat_util gnat_loc gnat_expl gnat_server
 GNATWHY3_FILES := gnat_util gnat_loc gnat_expl gnat_counterexamples gnat_config\
 	      gnat_scheduler gnat_manual gnat_report gnat_objectives gnat_main
 
 GNATWHY3MODULES := $(addprefix src/gnat/, $(GNATWHY3_FILES))
-GNATWHY3DEP = $(addsuffix .dep, $(GNATWHY3MODULES))
-GNATWHY3CMO = $(addsuffix .cmo, $(GNATWHY3MODULES))
+GNATWHY3DEP = $(addsuffix .dep, $(GNATASTMODULES) $(GNATWHY3MODULES))
+GNATWHY3CMO = $(addsuffix .cmo, $(GNATASTMODULES) $(GNATWHY3MODULES))
 # Import external printer parser for Ada
 GNATWHY3CMX = plugins/ada_terms/ada_nametable.cmx plugins/ada_terms/ada_parser.cmx plugins/ada_terms/ada_lexer.cmx plugins/ada_terms/ada_main.cmx
-GNATWHY3CMX += $(addsuffix .cmx, $(GNATWHY3MODULES))
+GNATWHY3CMX += $(addsuffix .cmx, $(GNATASTMODULES) $(GNATWHY3MODULES))
 $(GNATWHY3CMO) $(GNATWHY3CMX): INCLUDES += -I src/gnat -I src/util -I plugins/ada_terms
 $(GNATWHY3DEP): DEPFLAGS += -I src/gnat -I plugins/ada_terms
 
 GNAT_SERVER_MODULES := $(addprefix src/gnat/, $(GNAT_SERVER_FILES))
-GNAT_SERVER_DEP = $(addsuffix .dep, $(GNAT_SERVER_MODULES))
-GNAT_SERVER_CMO = $(addsuffix .cmo, $(GNAT_SERVER_MODULES))
+GNAT_SERVER_DEP = $(addsuffix .dep, $(GNATASTMODULES) $(GNAT_SERVER_MODULES))
+GNAT_SERVER_CMO = $(addsuffix .cmo, $(GNATASTMODULES) $(GNAT_SERVER_MODULES))
 # Import external printer parser for Ada
 GNAT_SERVER_CMX = plugins/ada_terms/ada_nametable.cmx plugins/ada_terms/ada_parser.cmx plugins/ada_terms/ada_lexer.cmx plugins/ada_terms/ada_main.cmx
-GNAT_SERVER_CMX += $(addsuffix .cmx, $(GNAT_SERVER_MODULES))
+GNAT_SERVER_CMX += $(addsuffix .cmx, $(GNATASTMODULES) $(GNAT_SERVER_MODULES))
 $(GNAT_SERVER_CMO) $(GNAT_SERVER_CMX): INCLUDES += -I src/gnat -I src/util -I plugins/ada_terms
 $(GNAT_SERVER_DEP): DEPFLAGS += -I src/gnat -I plugins/ada_terms
 
@@ -1033,9 +1036,9 @@ SESSION_FILES = why3session_lib why3session_info \
 
 SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))
 
-SESSIONDEP = $(addsuffix .dep, $(SESSIONMODULES))
-SESSIONCMO = $(addsuffix .cmo, $(SESSIONMODULES))
-SESSIONCMX = $(addsuffix .cmx, $(SESSIONMODULES))
+SESSIONDEP = $(addsuffix .dep, $(GNATASTMODULES) $(SESSIONMODULES))
+SESSIONCMO = $(addsuffix .cmo, $(GNATASTMODULES) $(SESSIONMODULES))
+SESSIONCMX = $(addsuffix .cmx, $(GNATASTMODULES) $(SESSIONMODULES))
 
 $(SESSIONDEP) $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
 
