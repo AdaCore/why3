@@ -556,7 +556,15 @@ module mach.c.UChar
   syntax type uchar "unsigned char"
   syntax val of_uint64 "(unsigned char)%1" prec 2 2
   syntax val to_uint64 "(uint64_t)%1" prec 2 2
+  syntax val of_int32  "(unsigned char)%1" prec 2 2
+  syntax val to_int32  "(int32_t)%1" prec 2 2
   syntax val (=) "%1 == %2"  prec 7 7 6
+
+  syntax val of_char "(unsigned char)%1" prec 2 2
+  syntax val to_char "(char)%1" prec 2 2
+
+  syntax val open_from_charptr "(unsigned char *)%1" prec 2 2
+  syntax val close_from_charptr "IGNORE2"
 
 end
 
@@ -567,9 +575,20 @@ module mach.c.SChar
 
 end
 
+module string.Char
+
+  syntax type char "char"
+
+end
+
 module mach.c.String
 
   syntax type string "char *"
+
+  syntax val get "%1[%2]" prec 1 1 15
+  syntax val zero_char "'\\0'" prec 0
+  syntax val zero_num "'0'" prec 0
+  syntax val minus_char "'-'" prec 0
 
 end
 

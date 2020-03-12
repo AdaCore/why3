@@ -646,7 +646,9 @@ module Print = struct
         gen_syntax_arguments_prec fmt s pr pl
 
   and print_const  fmt = function
-    | Cint s | Cfloat s | Cchar s | Cstring s -> fprintf fmt "%s" s
+    | Cint s | Cfloat s -> fprintf fmt "%s" s
+    | Cchar s -> fprintf fmt "'%s'" s
+    | Cstring s -> fprintf fmt "\"%s\"" s
 
   let print_id_init ?(size=None) ~stars fmt ie =
     (if stars > 0
@@ -1086,8 +1088,10 @@ module MLToC = struct
        let id = pv_name pv in
        let e = C.Evar id in
        ([], expr_or_return env e)
-    | Mltree.Econst (Constant.ConstStr _ | Constant.ConstReal _) ->
-       raise (Unsupported "string or real constant")
+    | Mltree.Econst (Constant.ConstStr s) ->
+       C.([], expr_or_return env (Econst (Cstring s)))
+    | Mltree.Econst (Constant.ConstReal _) ->
+       raise (Unsupported "real constant")
     | Mltree.Econst (Constant.ConstInt ic) ->
        let open Number in
        let print fmt ic =
