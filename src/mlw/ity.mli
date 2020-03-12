@@ -233,6 +233,8 @@ val reg_r_reachable : region -> region -> bool
 val ity_r_stale : Sreg.t -> Sreg.t -> ity -> bool
 val reg_r_stale : Sreg.t -> Sreg.t -> region -> bool
 
+val ity_frz_regs : Sreg.t -> ity -> Sreg.t
+
 (** {2 Built-in types} *)
 
 val ts_unit : tysymbol (** the same as [Ty.ts_tuple 0] *)

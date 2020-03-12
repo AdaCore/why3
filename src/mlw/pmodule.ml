@@ -496,7 +496,7 @@ let empty_clones m = {
   xs_table = Mxs.empty;
 }
 
-exception CloneDivergence of ident * ident
+(* exception CloneDivergence of ident * ident *)
 
 (* populate the clone structure *)
 
@@ -769,24 +769,40 @@ let clone_cty cl sm ?(drop_decr=false) cty =
   let reads = Spv.fold add_read (cty_reads cty) Spv.empty in
   let reads = List.fold_right add_read cty.cty_args reads in
   let reads = Spv.union reads (Mpv.domain olds) in
-  let add_write reg fs m = (* add new mutable fields to functions effect *)
+  let add_frz v frz = ity_frz_regs frz v.pv_ity in
+  let frz = Spv.fold add_frz reads Sreg.empty in
+  let add_write reg fs m =
     let add_fd fd s = Spv.add (Mpv.find_def fd fd cl.fd_table) s in
-    let reg' = clone_reg cl reg in
-    let smf_reg' = Spv.of_list reg'.reg_its.its_mfields in
+    (* add old mutable fields to the effect *)
+    let fs = Spv.fold add_fd fs Spv.empty in
+    (* add new mutable fields to the effect *)
+    let ({reg_its = s'} as reg') = clone_reg cl reg in
+    let smf_reg' = Spv.of_list s'.its_mfields in
     let smf_reg = Spv.of_list reg.reg_its.its_mfields in
     let smf_ref = Spv.fold add_fd smf_reg Spv.empty in
-    let smf_new = Spv.diff smf_reg' smf_ref in
-    let fs = Spv.fold add_fd fs Spv.empty in
-    Mreg.add reg' (Spv.union fs smf_new) m in
+    let fs = Spv.union fs (Spv.diff smf_reg' smf_ref) in
+    let m = if Spv.is_empty fs && not s'.its_private
+            then m else Mreg.add reg' fs m in
+    (* add new non-mutable fields to the effect *)
+    let sof_reg' = Spv.of_list s'.its_ofields in
+    let sof_reg = Spv.of_list reg.reg_its.its_ofields in
+    let sof_ref = Spv.fold add_fd sof_reg Spv.empty in
+    let sbs = its_match_regs s' reg'.reg_args reg'.reg_regs in
+    let add_reg m r = if Sreg.mem r frz then m else
+      Mreg.add r (Spv.of_list r.reg_its.its_mfields) m in
+    let add_fd f m = ity_exp_fold add_reg m (ity_full_inst sbs f.pv_ity) in
+    Spv.fold add_fd (Spv.diff sof_reg' sof_ref) m in
   let writes = Mreg.fold add_write cty.cty_effect.eff_writes Mreg.empty in
   let add_reset reg s = Sreg.add (clone_reg cl reg) s in
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
-  let eff = eff_reset (eff_write reads writes) resets in
+  let eff = eff_reset (eff_reset_overwritten (eff_write reads writes)) resets in
+  let add_spoil tv eff = eff_spoil eff (ity_var tv) in
+  let eff = Stv.fold add_spoil cty.cty_effect.eff_spoils eff in
   let add_raise xs eff = eff_raise eff (sm_find_xs sm xs) in
   let eff = Sxs.fold add_raise cty.cty_effect.eff_raises eff in
   let eff = if partial cty.cty_effect.eff_oneway then eff_partial eff else eff in
   let eff = if diverges cty.cty_effect.eff_oneway then eff_diverge eff else eff in
-  let cty = create_cty ~mask:cty.cty_mask args pre post xpost olds eff res in
+  let cty = create_cty_defensive ~mask:cty.cty_mask args pre post xpost olds eff res in
   cty_ghostify (cty_ghost cty) cty
 
 let sm_save_args sm c c' =
@@ -1138,25 +1154,40 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         | RLlemma -> RKlemma in
       let cty = clone_cty cl (sm_of_cl cl) cty in
       let rs' = Mrs.find rs inst.mi_rs in
-      (* arity and types will be checked when refinement VC is generated *)
+      (* types are checked during c_app below *)
+      if List.length cty.cty_args <> List.length rs'.rs_cty.cty_args then
+        raise (BadInstance (BadI rs.rs_name));
       begin match rs.rs_logic, rs'.rs_logic with
       | RLnone, (RLnone | RLls _ | RLlemma) | RLlemma, RLlemma -> ()
       | RLls ls, RLls ls' -> cl.ls_table <- Mls.add ls ls' cl.ls_table
       | _ -> raise (BadInstance (BadI rs.rs_name))
       end;
+(*    TODO: this is subsumed by eff_equal below, except for the error
       begin
         match cty.cty_effect.eff_oneway, rs'.rs_cty.cty_effect.eff_oneway with
         | _, Total | Diverges, _ | Partial, Partial -> ()
         | _ -> raise (CloneDivergence (rs.rs_name, rs'.rs_name))
       end;
+*)
       cl.rs_table <- Mrs.add rs rs' cl.rs_table;
       let e = e_exec (c_app rs' cty.cty_args [] cty.cty_result) in
       let cexp = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
         cty.cty_post cty.cty_xpost cty.cty_oldies e in
       let id = id_clone rs.rs_name in (* FIXME better name *)
       let ld, _ = let_sym id ~ghost:(rs_ghost rs) ~kind cexp in
-      (* FIXME check ghost status and mask of cexp/ld wrt rs *)
-      (* FIXME check effects of cexp/ld wrt rs *)
+      (* add a fake call based on the cloned cty for the right effects *)
+      let _,fake = let_sym id ~ghost:(rs_ghost rs) (c_any cty) in
+      let fake = e_exec (c_app fake cty.cty_args [] cty.cty_result) in
+      let fake = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
+        cty.cty_post cty.cty_xpost cty.cty_oldies (e_if e_true e fake) in
+      let _, ss = let_sym id ~ghost:(rs_ghost rs) ~kind fake in
+      if not (cty_ghost rs.rs_cty = cty_ghost ss.rs_cty) then
+        raise (BadInstance (BadI rs.rs_name));
+      if not (mask_equal rs.rs_cty.cty_mask ss.rs_cty.cty_mask) then
+        raise (BadInstance (BadI rs.rs_name));
+      let eff = eff_ghostify (rs_ghost rs) cty.cty_effect in
+      if not (eff_equal eff ss.rs_cty.cty_effect) then
+        raise (BadInstance (BadI rs.rs_name));
       (* FIXME add correspondance for "let lemma" to cl.pr_table *)
       let dl = mk_vc uc (create_let_decl ld) in
       List.fold_left (add_pdecl_raw ~warn:false) uc dl
@@ -1326,15 +1357,17 @@ let print_module fmt m = Format.fprintf fmt
   "@[<hov 2>module %s@\n%a@]@\nend" m.mod_theory.th_name.id_string
   (Pp.print_list Pp.newline2 print_unit) m.mod_units
 
-let print_id fmt id = Ident.print_decoded fmt id.id_string
+let _print_id fmt id = Ident.print_decoded fmt id.id_string
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | IncompatibleNotation nm -> Format.fprintf fmt
       "Incombatible type signatures for notation '%a'" Ident.print_decoded nm
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
+(* TODO: reuse later for a proper error message
   | CloneDivergence (iv, il) -> Format.fprintf fmt
       "Cannot instantiate symbol %a with symbol %a \
        that has worse termination status"
       print_id iv print_id il
+*)
   | _ -> raise e)
