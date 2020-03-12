@@ -105,6 +105,7 @@ Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq
 
 Provers
+  * support for Alt-Ergo 2.3.1 (released Feb 19, 2020)
   * support for Vampire 4.2.2 (released Dec 14, 2017)
   * support for Coq 8.10.0 (released Oct 8, 2019)
   * support for Coq 8.10.1 (released Oct 25, 2019)
