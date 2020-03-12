@@ -223,14 +223,29 @@ module Conversions [@W:non_conservative_extension:N]
   predicate to_uppercase_text (d:map int uchar) (t:map int char) (m n:int)
   = forall i. n <= i < m -> Map.get t i = num_to_uppercase_text (Map.get d i)
 
+  constant numuplowstring : string
+           = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+
+  function num_to_bothcase_text (d:uchar): char
+  = if 0 <= d < 62
+    then get numuplowstring d
+    else chr (-1)
+
+  predicate to_bothcase_text (d:map int uchar) (t:map int char) (m n:int)
+  = forall i. n <= i < m -> Map.get t i = num_to_bothcase_text (Map.get d i)
+
   lemma lowconcat: numlowstring = concat digitstring lowstring
   lemma upconcat: numupstring = concat digitstring upstring
   lemma digitsublow: digitstring = substring numlowstring 0 10
   lemma digitsubup: digitstring = substring numupstring 0 10
   lemma lowsub: lowstring = substring numlowstring 10 26
   lemma upsub: upstring = substring numupstring 10 26
+  lemma lowupconcat: numuplowstring = concat numupstring lowstring
+  lemma digitsublowup: digitstring = substring numuplowstring 0 10
+  lemma upsublowup: upstring = substring numuplowstring 10 26
+  lemma lowsublowup: lowstring = substring numuplowstring 36 26
 
-  function text_to_num (c:char) : int
+  function text_to_num_onecase (c:char) : int
   = if (get "0" 0) <= c <= (get "9" 0)
     then c - (get "0" 0)
     else if (get "a" 0) <= c <= (get "z" 0)
@@ -239,8 +254,31 @@ module Conversions [@W:non_conservative_extension:N]
     then c - (get "A" 0) + 10
     else -1
 
-  predicate to_num (t: map int char) (d: map int uchar) (n m:int)
-    = forall i. n <= i < m -> Map.get d i = text_to_num (Map.get t i)
+  function text_to_num_bothcase (c:char) : int
+  = if (get "0" 0) <= c <= (get "9" 0)
+    then c - (get "0" 0)
+    else if (get "a" 0) <= c <= (get "z" 0)
+    then c - (get "a" 0) + 36
+    else if (get "A" 0) <= c <= (get "Z" 0)
+    then c - (get "A" 0) + 10
+    else -1
+
+  function text_to_num (base:int) (c:char) : int
+  = if - 36 <= base <= 36
+    then text_to_num_onecase c
+    else text_to_num_bothcase c
+
+  function num_to_text (base:int) (d:uchar) : char
+  = if 0 <= base <= 36
+    then num_to_lowercase_text d
+    else if 36 < base <= 62
+    then num_to_bothcase_text d
+    else if -36 <= base
+    then num_to_uppercase_text d
+    else chr (-1)
+
+  predicate to_num (base:int) (t: map int char) (d: map int uchar) (n m:int)
+    = forall i. n <= i < m -> Map.get d i = text_to_num base (Map.get t i)
 
   let lemma digits ()
     ensures { code (get "9" 0) = code (get "0" 0) + 9 }
@@ -267,7 +305,7 @@ module Conversions [@W:non_conservative_extension:N]
 
   let lemma tnt_low (d:uchar)
     requires { 0 <= d < 36 }
-    ensures { text_to_num (num_to_lowercase_text d) = d }
+    ensures { text_to_num_onecase (num_to_lowercase_text d) = d }
   =
     let t = num_to_lowercase_text d in
     if 0 <= d < 10
@@ -277,17 +315,17 @@ module Conversions [@W:non_conservative_extension:N]
                by get lowstring (d-10)
                   = get (substring numlowstring 10 26) (d - 10)
                   = get numlowstring d };
-      assert { text_to_num t = d
+      assert { text_to_num_onecase t = d
                by code t = code (get lowstring (d-10))
                     = code (get "a" 0) + (d-10)
                     <= code (get "z" 0)
                so code t > code (get "9" 0)
-               so text_to_num t = code t - code (get "a" 0) + 10 = d }
+               so text_to_num_onecase t = code t - code (get "a" 0) + 10 = d }
     end
 
   let lemma tnt_up (d:uchar)
     requires { 0 <= d < 36 }
-    ensures { text_to_num (num_to_uppercase_text d) = d }
+    ensures { text_to_num_onecase (num_to_uppercase_text d) = d }
   =
     let t = num_to_uppercase_text d in
     if 0 <= d < 10
@@ -297,14 +335,64 @@ module Conversions [@W:non_conservative_extension:N]
                by get upstring (d-10)
                   = get (substring numupstring 10 26) (d - 10)
                   = get numupstring d };
-      assert { text_to_num t = d
+      assert { text_to_num_onecase t = d
                by code t = code (get upstring (d-10))
                     = code (get "A" 0) + (d-10)
                     <= code (get "Z" 0)
                so code t > code (get "9" 0)
                so code t < code (get "a" 0)
-               so text_to_num t = code t - code (get "A" 0) + 10 = d }
+               so text_to_num_onecase t = code t - code (get "A" 0) + 10 = d }
     end
+
+  let lemma tnt_both (d:uchar)
+    requires { 0 <= d < 62 }
+    ensures { text_to_num_bothcase (num_to_bothcase_text d) = d }
+  =
+    let t = num_to_bothcase_text d in
+    if 0 <= d < 10
+    then assert { t = get digitstring d }
+    else begin
+      if 10 <= d < 36
+      then begin
+        assert { get upstring (d-10) = t
+                 by get upstring (d-10)
+                  = get (substring numuplowstring 10 26) (d - 10)
+                  = get numuplowstring d };
+        assert { text_to_num_bothcase t = d
+                 by code t = code (get upstring (d-10))
+                     = code (get "A" 0) + (d-10)
+                     <= code (get "Z" 0)
+                 so code t > code (get "9" 0)
+                 so code t < code (get "a" 0)
+                 so text_to_num_bothcase t
+                    = code t - code (get "A" 0) + 10 = d }
+      end
+      else begin
+        assert { get lowstring (d - 36) = t
+                 by get lowstring (d-36)
+                    = get (substring numuplowstring 36 26) (d - 36)
+                    = get numuplowstring d };
+        assert { text_to_num_bothcase t = d
+                 by code t = code (get lowstring (d-36))
+                      = code (get "a" 0) + (d-36)
+                      <= code (get "z" 0)
+                 so code t > code (get "9" 0)
+                 so text_to_num_bothcase t
+                    = code t - code (get "a" 0) + 10 = d }
+      end
+    end
+
+  use int.Abs
+
+  let lemma tnt (base:int) (d:uchar)
+    requires { -36 <= base <= 62 }
+    requires { 0 <= d < abs base }
+    ensures  { text_to_num base (num_to_text base d) = d }
+  = if 0 <= base <= 36 then tnt_low d
+    else if 36 < base <= 62
+    then begin
+      tnt_both d
+    end else tnt_up d
 
 end
 module String_value
@@ -322,12 +410,12 @@ module String_value
                 abs_value_sub_text (b:int) (s:map int char) (n m: int) : int
     variant { m - n }
   = if n < m
-    then text_to_num s[m-1] + b * abs_value_sub_text b s n (m-1)
+    then text_to_num b s[m-1] + b * abs_value_sub_text b s n (m-1)
     else 0
 
   let rec lemma text_conversion (b:int) (t: map int char)
                                 (d: map int uchar) (n m:int)
-    requires { to_num t d n m }
+    requires { to_num b t d n m }
     variant  { m - n }
     ensures  { abs_value_sub_text b t n m = svalue_sub b d n m }
   =
@@ -342,7 +430,7 @@ module String_value
       else abs_value_text b s ofs
 
   predicate text_in_base (b:int) (t: map int char) (n m:int)
-    = forall i. n <= i < m -> 0 <= text_to_num t[i] < b
+    = forall i. n <= i < m -> 0 <= text_to_num b t[i] < b
 
   predicate string_in_base (b:int) (s:map int char) (ofs: int)
     = (text_in_base b s ofs (ofs + strlen s ofs) /\ strlen s ofs > 0)

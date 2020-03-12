@@ -26,11 +26,6 @@ use stringlemmas.Conversions
 use stringlemmas.String_value
 use get_str.Get_str
 
-(* TODO:
-   mpz_sizeinbase, precondition
-   strlen-related lemmas
-   value_of_string : takes into account minus sign (and 0b/0x prefix?),
-                     uses strlen, applies text_to_num *)
 function effective (b:int) : int
   = if (abs b < 2) then 10 else abs b
 
@@ -97,7 +92,7 @@ let mpz_get_str (sp: ptr char) (sz:int32) (base:int32) (u: mpz_ptr) : ptr char
              by zero_num <> minus_char
              so value_text base (pelts sp) (offset sp)
                 = abs_value_sub_text base (pelts sp) (offset sp) (offset sp + 1)
-                = text_to_num zero_num
+                = text_to_num ob zero_num
                 = 0 };
     return sp
   end;
@@ -212,8 +207,11 @@ let mpz_get_str (sp: ptr char) (sz:int32) (base:int32) (u: mpz_ptr) : ptr char
     invariant { i <= j <= sn }
     invariant { forall k. offset sp + j <= offset sp + k < offset sp + sn ->
                 (pelts sp)[offset sp + k] = (pelts sp at Conv)[offset sp + k] }
-    invariant { ob >= 0 ->
+    invariant { 0 <= ob <= 36 ->
                 to_lowercase_text (pelts ousp) (pelts sp)
+                                  (offset sp) (offset sp + j) }
+    invariant { 36 < ob ->
+                to_bothcase_text (pelts ousp) (pelts sp)
                                   (offset sp) (offset sp + j) }
     invariant { ob < 0 ->
                 to_uppercase_text (pelts ousp) (pelts sp)
@@ -226,10 +224,11 @@ let mpz_get_str (sp: ptr char) (sz:int32) (base:int32) (u: mpz_ptr) : ptr char
                 -> code (pelts sp)[k] <> 0 }
     invariant { text_in_base base (pelts sp) (offset sp + i) (offset sp + j) }
     invariant { i = 1 -> (pelts sp)[offset sp] = minus_char }
+    invariant { i = 0 -> j > i -> (pelts sp)[offset sp] <> minus_char }
     label L in
     let ghost osp = pure { sp } in
     let cj = UChar.of_char (C.get_ofs sp j) in
-    assert { cj = (pelts ousp)[offset sp + j]
+    assert { cj = (pelts ousp)[offset sp + j] /\ 0 <= cj < base
              by (pelts sp)[offset sp + j]
                 = (pelts sp at Conv)[offset sp + j]
                 = UChar.to_char (pelts ousp)[offset sp + j]
@@ -242,7 +241,18 @@ let mpz_get_str (sp: ptr char) (sz:int32) (base:int32) (u: mpz_ptr) : ptr char
                 = (pelts ousp)[offset sp + j] };
     assert { 0 <= cj < base <= String.length digits };
     let dc = String.get digits (UChar.to_int32 cj) in
-    assert { text_to_num dc = cj };
+    assert { dc <> minus_char };
+    assert { text_to_num base dc = cj
+             by text_to_num ob dc = cj
+             so if abs ob < 2
+                then text_to_num ob dc
+                     = text_to_num_onecase dc
+                     = text_to_num base dc
+                else if -36 <= ob <= 36
+                     then text_to_num ob dc
+                     = text_to_num_onecase dc
+                     = text_to_num base dc
+                else ob = base };
     C.set_ofs sp j dc;
     assert { forall k. offset sp + (j + 1) <= offset sp + k < offset sp + sn ->
              (pelts sp)[offset sp + k] = (pelts sp)[offset sp + k] at Conv
@@ -265,6 +275,7 @@ let mpz_get_str (sp: ptr char) (sz:int32) (base:int32) (u: mpz_ptr) : ptr char
            (offset sp + strlen (pelts sp) (offset sp))
            by base = effective ob
            so offset sp + strlen (pelts sp) (offset sp) = offset sp + sn
+           so text_in_base base (pelts osp) (offset sp + i) (offset sp + sn)
            so text_in_base base (pelts sp) (offset sp + i) (offset sp + sn) };
   assert { value_text base (pelts sp) (offset sp) = value_of u mpz
            by abs_value_text base (pelts sp) (offset sp + i)
@@ -274,7 +285,9 @@ let mpz_get_str (sp: ptr char) (sz:int32) (base:int32) (u: mpz_ptr) : ptr char
                 value_text base (pelts sp) (offset sp) = - mpz.abs_value_of[u]
                 so mpz.sgn[u] = -1
               else
-                value_text base (pelts sp) (offset sp) = mpz.abs_value_of[u]
+                value_text base (pelts sp) (offset sp)
+                = abs_value_text base (pelts sp) (offset sp)
+                = mpz.abs_value_of[u]
                 so mpz.sgn[u] = 1 };
   release_reader u up;
   return sp
