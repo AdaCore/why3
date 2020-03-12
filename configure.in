@@ -537,6 +537,7 @@ else
    ZIPINCLUDE=
 fi
 
+SEXPINCLUDES="-I $($OCAMLFIND query sexplib0) -I $($OCAMLFIND query parsexp) -I $($OCAMLFIND query sexplib) -I $($OCAMLFIND query ppx_sexp_conv.runtime-lib) -I $($OCAMLFIND query result) -I $($OCAMLFIND query ppx_deriving) -I $($OCAMLFIND query ppx_sexp_conv)"
 # checking for menhirlib
 found_menhirlib=yes
 DIR=
@@ -1094,6 +1095,7 @@ AC_SUBST(LABLGTKPKG)
 AC_SUBST(LABLGTKINCLUDE)
 AC_SUBST(GTKVERSION)
 
+AC_SUBST(SEXPINCLUDES)
 AC_SUBST(enable_web_ide)
 AC_SUBST(enable_js_of_ocaml)
 AC_SUBST(JSOFOCAMLPKG)

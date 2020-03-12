@@ -67,3 +67,10 @@ let pow_int_pos_bigint = power_int_positive_big_int
 let to_string = string_of_big_int
 let of_string = big_int_of_string
 let to_int = int_of_big_int
+
+let t_of_sexp = function
+  | Sexplib.Sexp.Atom x ->
+    of_string x
+  | _ -> failwith "BigInt.sexp_of_t"
+let sexp_of_t x =
+    Sexplib.Sexp.Atom (to_string x)

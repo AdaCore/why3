@@ -132,3 +132,20 @@ let with_location f lb =
     try f lb with
     | Located _ as e -> raise e
     | e -> raise (Located (loc lb, e))
+
+let position_of_sexp sexp =
+  let open Sexplib in
+  match sexp with
+  | Sexp.Atom "<dummy>" ->
+      dummy_position
+  | Sexp.Atom s ->
+      let f filename line bchar echar = filename, line, bchar, echar in
+      Scanf.sscanf s "%s %d %d-%d" f
+  | Sexp.List _ ->
+      invalid_arg "position_of_sexp"
+
+let sexp_of_position (filename, line, bchar, echar) =
+  Sexplib.Sexp.Atom
+    (if try Sys.getenv "SEXP_POS" = "dummy" with Not_found -> false
+     then "<dummy>"
+     else Format.sprintf "%s %d %d-%d" filename line bchar echar)

@@ -16,6 +16,7 @@ type constant =
   | ConstInt  of int_constant
   | ConstReal of real_constant
   | ConstStr  of string
+[@@deriving sexp]
 
 val compare_const : constant -> constant -> int
 (** structural comparison; two mathematically equal values might differ *)

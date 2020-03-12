@@ -192,9 +192,11 @@ and dpattern_node =
 
 type dbinop =
   | DTand | DTand_asym | DTor | DTor_asym | DTimplies | DTiff | DTby | DTso
+[@@deriving sexp]
 
 type dquant =
   | DTforall | DTexists | DTlambda
+[@@deriving sexp]
 
 type dbinder = preid option * dty * Loc.position option
 

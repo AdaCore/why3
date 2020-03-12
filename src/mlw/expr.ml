@@ -64,6 +64,7 @@ type rs_kind =
   | RKfunc    (* top-level let-function *)
   | RKpred    (* top-level let-predicate *)
   | RKlemma   (* top-level or local let-lemma *)
+[@@deriving sexp]
 
 let rs_kind s = match s.rs_logic with
   | RLnone  -> RKnone
@@ -297,8 +298,10 @@ let create_prog_pattern pp ity mask =
 (** {2 Program expressions} *)
 
 type assertion_kind = Assert | Assume | Check
+[@@deriving sexp]
 
 type for_direction = To | DownTo
+[@@deriving sexp]
 
 type for_bounds = pvsymbol * for_direction * pvsymbol
 
