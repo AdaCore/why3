@@ -70,36 +70,26 @@ let infer_loops ai_ops e cty =
   List.map domain2term fixp
 
 let infer_loops ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
-  match dom with
-  | Polyhedra ->
-     let module AI = Ai_cfg.Make (struct
+  let module AI = Ai_cfg.Make (struct
        let env       = env
        let th_known  = tkn
        let mod_known = mkn
-       let widening  = wid
-       module Domain = Domain.Polyhedra end) in
+       let widening  = wid end) in
+  match dom with
+  | Polyhedra ->
+     let module AI = AI(Domain.Polyhedra) in
      let ai_ops =
        ai_ops AI.domain_manager AI.empty_context AI.start_cfg AI.put_expr_in_cfg
          AI.put_expr_with_pre AI.eval_fixpoints AI.domain_to_term AI.add_variable in
      infer_loops ai_ops e cty
   | Box ->
-     let module AI = Ai_cfg.Make (struct
-       let env       = env
-       let th_known  = tkn
-       let mod_known = mkn
-       let widening  = wid
-       module Domain = Domain.Box end) in
+     let module AI = AI(Domain.Box) in
      let ai_ops =
        ai_ops AI.domain_manager AI.empty_context AI.start_cfg AI.put_expr_in_cfg
          AI.put_expr_with_pre AI.eval_fixpoints AI.domain_to_term AI.add_variable in
      infer_loops ai_ops e cty
   | Oct ->
-     let module AI = Ai_cfg.Make (struct
-       let env       = env
-       let th_known  = tkn
-       let mod_known = mkn
-       let widening  = wid
-       module Domain = Domain.Oct end) in
+     let module AI = AI(Domain.Oct) in
      let ai_ops =
        ai_ops AI.domain_manager AI.empty_context AI.start_cfg AI.put_expr_in_cfg
          AI.put_expr_with_pre AI.eval_fixpoints AI.domain_to_term AI.add_variable in

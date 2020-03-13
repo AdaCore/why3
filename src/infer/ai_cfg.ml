@@ -41,8 +41,7 @@ module Make(E: sig
     val th_known: Decl.known_map
     val mod_known: Pdecl.known_map
     val widening: int
-    module Domain: DOMAIN
-  end) = struct
+  end)(Domain: DOMAIN) = struct
 
   module Ai_logic = Ai_logic.Make(struct
     let env = E.env
@@ -68,7 +67,7 @@ module Make(E: sig
   module D = Quant_domain.Make(struct
       module A = Disjunctive_term_domain.Make(struct
           module A = Uf_domain.Make(struct
-              module A = E.Domain
+              module A = Domain
               let th_known = E.th_known
               let mod_known = E.mod_known
               let env = E.env
@@ -123,7 +122,6 @@ module Make(E: sig
   type context = D.man
   type xcontrol_point = control_point * xsymbol
   type control_points = control_point * control_point * xcontrol_point list
-
 
   let domain_manager x = x
 

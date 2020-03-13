@@ -35,5 +35,4 @@ module Make(S:sig
   val th_known  : Decl.known_map
   val mod_known : Pdecl.known_map
   val widening  : int
-  module Domain : DOMAIN
-end): AiCfg
+end)(Domain : DOMAIN): AiCfg
