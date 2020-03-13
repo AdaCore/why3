@@ -54,7 +54,7 @@ val shape_of_string: version:int -> string -> shape_v
 val string_of_shape: shape_v -> string
 
 val t_shape_task: version:int -> expl:string -> Task.task -> shape
-(** returns the shape of a given task. Raise [Assert_failure] for version >= 8 *)
+(** returns the shape of a given task. returns [empty_shape] for unrecognized versions *)
 
 (* True if a shape version represented as bound_shape false if it is shape *)
 val is_bound_shape_version: int -> bool

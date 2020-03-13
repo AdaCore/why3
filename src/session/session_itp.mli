@@ -159,9 +159,10 @@ val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
 (** {2 session operations} *)
 
 
-val empty_session : shape_version:int option -> ?from:session -> string -> session
+val empty_session : ?from:session -> string -> session
 (** create an empty_session in the directory specified by the
-    argument *)
+   argument. If [from] is present, the provers and global shapes are
+   taken from it. *)
 
 val add_file_section :
   session -> string -> file_is_detached:bool -> Theory.theory list->

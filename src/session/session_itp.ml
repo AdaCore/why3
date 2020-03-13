@@ -591,7 +591,7 @@ let _print_session fmt s =
   fprintf fmt "%a@." (print_s s) l;;
 
 
-let empty_session ~shape_version ?from dir =
+let empty_session ?from dir =
   let prover_ids =
     match from with
     | Some v -> v.session_prover_ids
@@ -599,7 +599,7 @@ let empty_session ~shape_version ?from dir =
   in
   let empty_shapes =
     {
-      shape_version = Opt.get_def Termcode.current_shape_version shape_version;
+      shape_version = Termcode.current_shape_version;
       session_global_shapes = Termcode.Gshape.create ();
       session_bound_shape_table = Hpn.create 97;
       session_shape_table = Hpn.create 97;
@@ -1368,13 +1368,11 @@ let rec read_global_buffer gs ch =
       with _ when not (Debug.test_flag Debug.stack_trace) -> has_shapes := false; attrs
     else attrs
 
-let read_xml_and_shapes ~shape_version gs xml_fn compressed_fn =
+let read_xml_and_shapes gs xml_fn compressed_fn =
   has_shapes := true;
   try
     let ch = C.open_in compressed_fn in
-    (match shape_version with
-    | Some s when Termcode.is_bound_shape_version s -> read_global_buffer gs ch
-    | _ -> ());
+    read_global_buffer gs ch;
     let xml = Xml.from_file ~fixattrs:(fix_attributes ch) xml_fn in
     C.close_in ch;
     xml, !has_shapes
@@ -1385,14 +1383,14 @@ end
 module ReadShapesNoCompress = ReadShapes(Compress.Compress_none)
 module ReadShapesCompress = ReadShapes(Compress.Compress_z)
 
-let read_file_session_and_shapes ~shape_version gs dir xml_filename =
+let read_file_session_and_shapes gs dir xml_filename =
   try
     let compressed_shape_filename =
       Filename.concat dir compressed_shape_filename
     in
     if Sys.file_exists compressed_shape_filename then
       if Compress.compression_supported then
-        ReadShapesCompress.read_xml_and_shapes ~shape_version gs
+        ReadShapesCompress.read_xml_and_shapes gs
           xml_filename compressed_shape_filename
       else
         begin
@@ -1403,7 +1401,8 @@ let read_file_session_and_shapes ~shape_version gs dir xml_filename =
     else
       let shape_filename = Filename.concat dir shape_filename in
       if Sys.file_exists shape_filename then
-        ReadShapesNoCompress.read_xml_and_shapes ~shape_version gs xml_filename shape_filename
+        ReadShapesNoCompress.read_xml_and_shapes gs
+          xml_filename shape_filename
       else
         begin
           Warning.emit "[Warning] could not find goal shapes file@.";
@@ -1416,32 +1415,18 @@ let read_file_session_and_shapes ~shape_version gs dir xml_filename =
 
 let load_session (dir : string) =
   let file = Filename.concat dir db_filename in
-  let shape_version =
-    (* If the xml is present we read it, otherwise we consider it empty *)
-    if Sys.file_exists file then
-      try
-        Some (get_version (Xml.from_file file))
-      with
-      | Sys_error msg ->
-          (* xml does not exist yet *)
-          raise (SessionFileError msg)
-      | Xml.Parse_error s ->
-          Warning.emit "XML database corrupted, ignored (%s)@." s;
-          raise (SessionFileError "XML corrupted")
-    else
-      None
-  in
-  let session = empty_session ~shape_version dir in
-  (* This shape is switched to None when the shape file is not found *)
+  let session = empty_session dir in
   let shape_version =
     if Sys.file_exists file then
       try
         let xml,has_shapes =
           let shapes = session.shapes in
-          read_file_session_and_shapes ~shape_version shapes.session_global_shapes dir file in
+          read_file_session_and_shapes shapes.session_global_shapes dir file
+        in
         try
+          let shape_version = get_version xml in
           let (_: int) = build_session session xml.Xml.content in
-          if has_shapes then shape_version else None
+          if has_shapes then Some shape_version else None
         with Sys_error msg ->
           failwith ("Open session: sys error " ^ msg)
       with

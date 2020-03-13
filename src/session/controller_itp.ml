@@ -251,7 +251,10 @@ let reload_files ?(hard_reload=false) (c : controller) ~shape_version  =
     Whyconf.Hprover.reset c.controller_provers;
     load_drivers c;
   end;
-  c.controller_session <- empty_session ~shape_version ~from:old_ses (get_dir old_ses);
+  c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
+  (* FIXME: here we should compare [shape_version] with the version of shapes just loaded.
+     OR: even better, this function has no reason to have a [shape_version] parameter
+     and should always take the version from the file just loaded. *)
   merge_files ~shape_version c.controller_env c.controller_session old_ses
 
 exception Errors_list of exn list

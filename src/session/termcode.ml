@@ -224,15 +224,19 @@ let current_shape_version = 6
 
 type shape_version = SV1 | SV2 | SV3 | SV4 | SV5
 
+exception NoShape
+
 let int_to_shape_version n =
   match n with
   | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5
-  | _ -> assert false
+  | _ -> raise NoShape
 
 let is_bound_shape_version v =
-  match int_to_shape_version v with
-  | SV1 | SV2 | SV3 | SV4 -> false
-  | SV5 -> true
+  try
+    match int_to_shape_version v with
+    | SV1 | SV2 | SV3 | SV4 -> false
+    | SV5 -> true
+  with NoShape -> false
 
 type shape_v =
   | Old_shape of shape
@@ -617,21 +621,24 @@ let time = ref 0.0
  *)
 
 let t_shape_task ~version ~expl t =
-  let version = int_to_shape_version version in
-(*
-  let tim = Unix.gettimeofday () in
- *)
-  let s =
-    match version with
-    | SV1 | SV2 | SV3 | SV4 -> Shape.t_shape_task ~version ~expl t
-    | SV5 -> assert false
-  in
-(*
-  let tim = Unix.gettimeofday () -. tim in
-  time := !time +. tim;
-  Format.eprintf "[Shape times] %f/%f@." tim !time;
-*)
-  s
+  try
+    let version = int_to_shape_version version in
+    (*
+      let   tim = Unix.gettimeofday () in
+     *)
+    let s =
+      match version with
+      | SV1 | SV2 | SV3 | SV4 -> Shape.t_shape_task ~version ~expl t
+      | SV5 -> raise NoShape
+    in
+    (*
+      let tim = Unix.gettimeofday () -. tim in
+      time := !time +. tim;
+      Format.eprintf "[Shape times] %f/%f@." tim !time;
+     *)
+    s
+  with NoShape -> empty_shape
+
 
 (* Checksums *)
 
