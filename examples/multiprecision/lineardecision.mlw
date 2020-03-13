@@ -44,6 +44,7 @@ val mul (a b: t) : t
 
 val opp (a:t) : t
   ensures { forall v: cvars. interp result v = - (interp a v) }
+  raises  { Unknown -> true }
 
 val predicate eq (a b:t)
   ensures { result -> forall y:cvars. interp a y = interp b y }
@@ -260,6 +261,7 @@ let rec opp_expr (e:expr) : expr
   ensures { forall y z. interp result y z = C.(-_) (interp e y z) }
   ensures { valid_expr e -> valid_expr result }
   ensures { forall b. expr_bound e b -> expr_bound result b }
+  raises  { C.Unknown -> true }
   variant { e }
 = match e with
   | Cst c -> Cst (C.opp c)
@@ -1033,7 +1035,7 @@ let iinv (_t:t') : t'
   raises { NError -> true }
 = raise NError
 
-clone export LinearEquationsDecision with type C.a = int, function C.(+)=(+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t', type C.cvars = int->int,function C.interp = interp_id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = izero, val C.cone = ione, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = iadd, val C.mul = imul, val C.opp = iopp, val C.eq = ieq, val C.inv = iinv, goal .
+clone export LinearEquationsDecision with type C.a = int, exception C.Unknown=NError, function C.(+)=(+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t', type C.cvars = int->int,function C.interp = interp_id, constant C.azero = zero, constant C.aone = one, predicate C.ale= (<=), val C.czero = izero, val C.cone = ione, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = iadd, val C.mul = imul, val C.opp = iopp, val C.eq = ieq, val C.inv = iinv, goal .
 
 
 use real.FromInt
@@ -1190,8 +1192,6 @@ function minterp (t:t) (y:evars) : real
   qinterp q *. pow rradix (from_int (interp_exp e y))
   end
 
-exception MPError
-
 let rec opp_exp (e:exp)
   ensures { forall y. interp_exp result y = - interp_exp e y }
   variant { e }
@@ -1208,14 +1208,14 @@ let rec add_sub_exp (e1 e2:exp) (s:bool) : exp
             if s
             then interp_exp result y = interp_exp e1 y + interp_exp e2 y
             else interp_exp result y = interp_exp e1 y - interp_exp e2 y }
-  raises  { MPError -> true }
+  raises  { Q.QError -> true }
   variant { e2, e1 }
 =
   let rec add_atom (e a:exp) (s:bool) : (exp, bool)
     returns { r, _ -> forall y.
               if s then interp_exp r y = interp_exp e y + interp_exp a y
                    else interp_exp r y = interp_exp e y - interp_exp a y }
-    raises { MPError -> true }
+    raises { Q.QError -> true }
     variant { e }
   = match (e,a) with
     | Lit n1, Lit n2 -> (if s then Lit (n1+n2) else Lit (n1-n2)), True
@@ -1261,7 +1261,7 @@ let rec add_sub_exp (e1 e2:exp) (s:bool) : exp
            if b then Sub e1 r, True
            else if s then Sub (Plus e1 a) e2, False
                 else Sub e1 (Plus e2 a), False
-    | _ -> raise MPError
+    | _ -> raise Q.QError
     end
   in
   match e2 with
@@ -1286,14 +1286,14 @@ let rec add_sub_exp (e1 e2:exp) (s:bool) : exp
 
 let add_exp (e1 e2:exp) : exp
   ensures { forall y. interp_exp result y = interp_exp e1 y + interp_exp e2 y }
-  raises  { MPError -> True }
+  raises  { Q.QError -> True }
 = add_sub_exp e1 e2 True
 
 
 let rec zero_exp (e:exp) : bool
   ensures { result -> forall y. interp_exp e y = 0 }
   variant { e }
-  raises  { MPError -> true }
+  raises  { Q.QError -> true }
 =
   let rec all_zero (e:exp) : bool
     ensures { result -> forall y. interp_exp e y = 0 }
@@ -1312,7 +1312,7 @@ let rec zero_exp (e:exp) : bool
 let rec same_exp (e1 e2: exp)
   ensures { result -> forall y. interp_exp e1 y = interp_exp e2 y }
   variant { e1, e2 }
-  raises  { MPError -> true }
+  raises  { Q.QError -> true }
 = match e1, e2 with
   | Lit n1, Lit n2 -> n1 = n2
   | Var v1, Var v2 -> v1 = v2
@@ -1322,7 +1322,6 @@ let rec same_exp (e1 e2: exp)
 
 let madd (a b:t)
   ensures { forall y. minterp result y = minterp a y +. minterp b y }
-  raises  { MPError -> true }
   raises  { Q.QError -> true }
 = match a, b with
   | (q1, e1), (q2, e2) ->
@@ -1338,13 +1337,12 @@ let madd (a b:t)
                   = qinterp q1 *. p +. qinterp q2 *. p
                   = minterp a y +. minterp b y };
       (q,e1) end
-    else raise MPError
+    else raise Q.QError
   end
 
 let mmul (a b:t)
   ensures { forall y. minterp result y = minterp a y *. minterp b y }
   raises  { Q.QError -> true }
-  raises  { MPError -> true }
 = match a, b with
   | (q1,e1), (q2,e2) ->
     let q = Q.rmul q1 q2 in
@@ -1406,7 +1404,7 @@ use real.RealInfix
 
 type coeff = t
 
-clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.(*) = ( *.), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=evars, function C.interp=minterp, exception C.Unknown = MPError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=mzero, val C.cone=mone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=madd, val C.mul=mmul, val C.opp=mopp, val C.eq=meq, val C.inv=minv, goal .
+clone export LinearEquationsDecision with type C.a = real, function C.(+) = (+.), function C.(*) = ( *.), function C.(-_) = (-._), function C.(-) = (-.), type coeff = t, type C.cvars=evars, function C.interp=minterp, exception C.Unknown = Q.QError, constant C.azero = Real.zero, constant C.aone = Real.one, predicate C.ale = (<=.), val C.czero=mzero, val C.cone=mone, lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add=madd, val C.mul=mmul, val C.opp=mopp, val C.eq=meq, val C.inv=minv, goal .
 
 end
 module LinearDecisionIntMP
@@ -1431,18 +1429,18 @@ function mpinterp (t:t) (y:evars) : int
 
 let mpadd (a b:t) : t
   ensures { forall y. mpinterp result y = mpinterp a y + mpinterp b y }
-  raises  { MPError -> true }
-= raise MPError
+  raises  { Q.QError -> true }
+= raise Q.QError
 
 let mpmul (a b:t) : t
   ensures { forall y. mpinterp result y = mpinterp a y * mpinterp b y }
-  raises  { MPError -> true }
-= raise MPError
+  raises  { Q.QError -> true }
+= raise Q.QError
 
 let mpopp (a:t) : t
   ensures { forall y. mpinterp result y = - mpinterp a y }
-  raises  { MPError -> true }
-= raise MPError
+  raises  { Q.QError -> true }
+= raise Q.QError
 
 let predicate mpeq (a b:t)
   ensures { result -> forall y. mpinterp a y = mpinterp b y }
@@ -1452,11 +1450,11 @@ let predicate mpeq (a b:t)
 
 let mpinv (_a:t) : t
   ensures { not mpeq result mpzero }
-  raises  { MPError -> true }
-= raise MPError
+  raises  { Q.QError -> true }
+= raise Q.QError
 
 
-clone export LinearEquationsDecision with type C.a = int, function C.(+) = (+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t, type C.cvars = int->int, function C.interp = mpinterp, constant C.azero = zero, constant C.aone = one, val C.czero = mpzero, val C.cone = mpone, predicate C.ale = (<=), lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = mpadd, val C.mul = mpmul, val C.opp = mpopp, val C.eq = mpeq, val C.inv = mpinv, goal .
+clone export LinearEquationsDecision with type C.a = int, exception C.Unknown=Q.QError, function C.(+) = (+), function C.(*) = (*), function C.(-_) = (-_), function C.(-) = (-), type coeff = t, type C.cvars = int->int, function C.interp = mpinterp, constant C.azero = zero, constant C.aone = one, val C.czero = mpzero, val C.cone = mpone, predicate C.ale = (<=), lemma C.sub_def, lemma C.zero_def, lemma C.one_def, val C.add = mpadd, val C.mul = mpmul, val C.opp = mpopp, val C.eq = mpeq, val C.inv = mpinv, goal .
 
 use LinearDecisionRationalMP as R
 use real.FromInt
@@ -1555,7 +1553,7 @@ let mp_decision (l: context') (g: equality') : bool
   requires { length l < 100000 }
   ensures  { forall y z. result -> pos_ctx' l z -> pos_eq' g z
              -> interp_ctx' l g y z }
-  raises  { R.Failure -> true | MPError -> true | Q.QError -> true }
+  raises  { R.Failure -> true | Q.QError -> true }
 =
   R.decision (m_ctx l) (m_eq g)
 
@@ -1969,8 +1967,7 @@ let prop_ctx (l:context') (g:equality') : (context', equality')
     requires { length l < 100000 }
     ensures { forall y z. result ->  pos_ctx' l z -> pos_eq' g z
                           -> y = z -> interp_ctx' l g y z }
-    raises { | OutOfBounds -> true | E.MPError -> true
-             | E.Q.QError -> true | R.Failure -> true}
+    raises { | OutOfBounds -> true | E.Q.QError -> true | R.Failure -> true}
   = let l', g' = prop_ctx l g in
     mp_decision l' g'
 
