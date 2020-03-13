@@ -48,6 +48,7 @@ let default_escape c = match c with
   | '\n' -> "\\n"
   | '\r' -> "\\r"
   | '\t' -> "\\t"
+  | '\b' -> "\\b"
   | '\"'  -> "\\\""
   | '\032' .. '\126' -> Format.sprintf "%c" c
   | '\000' .. '\031'

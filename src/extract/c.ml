@@ -522,6 +522,10 @@ module Print = struct
     in
   aux 0 ty
 
+  let char_escape c = match c with
+    | '\'' -> "\\'"
+    | _ -> Constant.default_escape c
+
   let rec print_ty ?(paren=false) fmt = function
     | Tvoid -> fprintf fmt "void"
     | Tsyntax (s, tl) ->
@@ -647,7 +651,7 @@ module Print = struct
 
   and print_const  fmt = function
     | Cint s | Cfloat s -> fprintf fmt "%s" s
-    | Cchar s -> fprintf fmt "'%s'" Constant.(escape default_escape s)
+    | Cchar s -> fprintf fmt "'%s'" Constant.(escape char_escape s)
     | Cstring s -> fprintf fmt "\"%s\"" Constant.(escape default_escape s)
 
   let print_id_init ?(size=None) ~stars fmt ie =
