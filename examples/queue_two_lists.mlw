@@ -8,13 +8,15 @@ module Queue
   use list.NthNoOpt
   use list.Append
   use seq.Seq
+  use seq.FreeMonoid
 
   type t 'a = {
-    mutable front: list 'a;
-    mutable rear: list 'a;
+    mutable front: list 'a; (* entry *)
+    mutable rear: list 'a;  (* exit *)
     ghost mutable seq: Seq.seq 'a;
   }
     invariant { length seq = Length.length front + Length.length rear }
+    invariant { Length.length front > 0 -> Length.length rear > 0 }
     invariant {
       forall i. 0 <= i < length seq ->
         seq[i] =
@@ -33,11 +35,13 @@ module Queue
   }
 
   let push (x: 'a) (q: t 'a) : unit
-    writes { q.front, q.seq }
+    writes  { q }
     ensures { q = snoc (old q) x }
-  =
-    q.seq <- snoc q.seq x;
-    q.front <- Cons x q.front
+  = match q.front, q.rear with
+    | Nil, Nil -> q.rear <- Cons x Nil
+    | _        -> q.front <- Cons x q.front
+    end;
+    q.seq <- snoc q.seq x
 
   let rec lemma nth_append (i: int) (l1: list 'a) (l2: list 'a)
     requires { 0 <= i < Length.length l1 + Length.length l2 }
@@ -65,50 +69,30 @@ module Queue
       if i > 0 then nth_rev (i - 1) s
     ) end
 
-
-  let handle_empty_rear q
-    requires { q.rear = Nil }
-    writes { q.front, q.rear }
-    ensures { q.front = Nil }
-  =
-    q.rear <- reverse q.front;
-    q.front <- Nil
-
   exception Empty
 
   let pop (q: t 'a) : 'a
-    writes { q }
+    writes  { q }
     ensures { (old q) <> empty }
     ensures { result = (old q)[0] }
     ensures { q = (old q)[1 ..] }
-    raises { Empty -> q == old q == empty }
+    raises  { Empty -> q = old q = empty }
   =
-    let res =
-    match q.rear with
-    | Nil ->
-      handle_empty_rear q;
-      match q.rear with
+    let res = match q.rear with
       | Nil -> raise Empty
+      | Cons x Nil -> q.front, q.rear <- Nil, reverse q.front; x
       | Cons x s -> q.rear <- s; x
-      end
-    | Cons x s -> q.rear <- s; x
-    end
-    in
+      end in
     q.seq <- q.seq [1 ..];
     res
 
   let peek (q: t 'a) : 'a
     ensures { q <> empty }
     ensures { result = q[0] }
-    raises { Empty -> q == empty }
+    raises  { Empty -> q == empty }
   =
     match q.rear with
-    | Nil ->
-      handle_empty_rear q;
-      match q.rear with
-      | Nil -> raise Empty
-      | Cons x _ -> x
-      end
+    | Nil -> raise Empty
     | Cons x _ -> x
     end
 
@@ -161,12 +145,16 @@ module Queue
     length_aux (length_aux Peano.zero q.front) q.rear
 
   let transfer (q1: t 'a) (q2: t 'a) : unit
-    writes { q1, q2.seq, q2.front }
+    writes  { q1, q2 }
     ensures { q1 = empty }
     ensures { q2 = (old q2) ++ (old q1) }
-  =
-    q2.front <- Append.(++) q1.front (Append.(++) (reverse q1.rear) q2.front);
-    q2.seq <- q2.seq ++ q1.seq;
+  = match q2.rear with
+    | Nil ->
+      q2.front, q2.rear, q2.seq <- q1.front, q1.rear, q1.seq
+    | _ ->
+      q2.front <- Append.(++) q1.front (Append.(++) (reverse q1.rear) q2.front);
+      q2.seq <- q2.seq ++ q1.seq;
+    end;
     clear q1
 
 end
@@ -175,7 +163,7 @@ end
 module Correct
   use Queue as Q
   clone queue.Queue with
-    type t = Q.t,
+    type t = Q.t, exception Empty = Q.Empty,
     val create = Q.create, val push = Q.push, val pop = Q.pop, val peek = Q.peek,
     val safe_pop = Q.safe_pop, val safe_peek = Q.safe_peek,
     val clear = Q.clear, val copy = Q.copy, val is_empty = Q.is_empty,
