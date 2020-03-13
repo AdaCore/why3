@@ -40,7 +40,7 @@ and check the validity of goals with external provers, in a friendly
 way. This section presents the basic use of this GUI. Please refer to
 :numref:`sec.ideref` for a more complete description.
 
-.. %EXECUTE bin/why3 ide --batch "snap doc/gui-1.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch "snap doc/images/gui-1.png" doc/hello_proof.why
 
 .. _fig.gui1:
 
@@ -61,7 +61,7 @@ view that allows to browse inside the theories. In this tree view, we
 have a structured view of the file: this file contains one theory,
 itself containing three goals.
 
-.. %EXECUTE bin/why3 ide --batch "type next;snap -crop 1024x384+0+0 doc/gui-2.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch "type next;view task;snap -crop 1024x384+0+0 doc/images/gui-2.png" doc/hello_proof.why
 
 .. _fig.gui2:
 
@@ -90,7 +90,7 @@ parent file.
 Let us now select the theory “HelloProof” and run the Alt-Ergo prover.
 After a short time, you should get the display of :numref:`fig.gui3`.
 
-.. %EXECUTE bin/why3 ide --batch "type alt-ergo;view source;wait 3;type next;snap -crop 1024x384+0+0 doc/gui-3.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch "type alt-ergo;view source;wait 3;type next;snap -crop 1024x384+0+0 doc/images/gui-3.png" doc/hello_proof.why
 
 .. _fig.gui3:
 
@@ -118,7 +118,7 @@ proved. This can be done by the menu :menuselection:`View --> Collapse
 proved goals`, or even better by its shortcut :kbd:`!`. You
 should see now what is displayed on :numref:`fig.gui4`.
 
-.. %EXECUTE bin/why3 ide --batch "type alt-ergo;wait 3;type next;type split_vc;wait 1;snap -crop 1024x384+0+0 doc/gui-4.png;save;wait 1" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch "type alt-ergo;wait 3;type next;type split_vc;wait 1;type up;type alt-ergo;wait 3;type next;snap -crop 1024x384+0+0 doc/images/gui-4.png;save;wait 1" doc/hello_proof.why
 
 .. _fig.gui4:
 
@@ -137,6 +137,8 @@ comments of this file. They indicate where Why3 expects you to fill the
 blanks. Note that the comments themselves should not be removed, as they
 are needed to properly regenerate the file when the goal is changed. See
 :numref:`sec.coq` for more details.
+
+.. %EXECUTE bin/why3 ide --batch "type next;type coq;wait 1;save;wait 1" doc/hello_proof.why
 
 .. _fig.coqide:
 
@@ -164,9 +166,8 @@ We can refresh the goals using menu :menuselection:`File --> Save all and
 Refresh session`, or the shortcut :kbd:`Control-r`. We get the tree view
 shown on :numref:`fig.gui5`.
 
-.. %EXECUTE bin/why3 ide --batch "type next;type coq;wait 1;save;wait 1" doc/hello_proof.why
 .. %EXECUTE sed -i -e 's/true -> false/false -> false/' doc/hello_proof.why
-.. %EXECUTE bin/why3 ide --batch "type next;type expand;snap -crop 1024x384+0+0 doc/gui-5.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch "type next;type expand;snap -crop 1024x384+0+0 doc/images/gui-5.png" doc/hello_proof.why
 
 .. _fig.gui5:
 
