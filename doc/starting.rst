@@ -35,7 +35,7 @@ in batch mode using the :program:`why3` executable (:numref:`sec.batch`).
 Getting Started with the GUI
 ----------------------------
 
-The graphical interface allows to browse into a file or a set of files,
+The graphical interface makes it possible to browse into a file or a set of files,
 and check the validity of goals with external provers, in a friendly
 way. This section presents the basic use of this GUI. Please refer to
 :numref:`sec.ideref` for a more complete description.
@@ -57,9 +57,12 @@ The GUI is launched on the file above as follows:
 
 When the GUI is started for the first time, you should get a window that
 looks like the screenshot of :numref:`fig.gui1`. The left part is a tree
-view that allows to browse inside the theories. In this tree view, we
-have a structured view of the file: this file contains one theory,
-itself containing three goals.
+view that makes it possible to browse inside the files and their
+theories. The tree view shows that the example is made of a single file
+containing a single theory containing three goals. The top-right pane
+displays the content of this file. Now click on the row corresponding to
+goal ``G1``, and then click on the “Task” tab of the top-right pane, so
+that it displays the corresponding *task*, as show on :numref:`fig.gui2`.
 
 .. %EXECUTE bin/why3 ide --batch "type next;view task;snap -crop 1024x384+0+0 doc/images/gui-2.png" doc/hello_proof.why
 
@@ -69,11 +72,6 @@ itself containing three goals.
    :alt: The GUI with goal ``G1`` selected.
 
    The GUI with goal ``G1`` selected.
-
-In :numref:`fig.gui2`, we clicked on the row corresponding to goal
-``G1``. The *task* associated with this goal is then displayed on
-the top-right pane. The corresponding part of the input file is shown
-when clicking the rightmost tab of that pane.
 
 Calling provers on goals
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,7 +114,7 @@ on them, for example Alt-Ergo. We already have a lot of goals and proof
 attempts, so it is a good idea to close the sub-trees which are already
 proved. This can be done by the menu :menuselection:`View --> Collapse
 proved goals`, or even better by its shortcut :kbd:`!`. You
-should see now what is displayed on :numref:`fig.gui4`.
+should now see what is displayed on :numref:`fig.gui4`.
 
 .. %EXECUTE bin/why3 ide --batch "type alt-ergo;wait 3;type next;type split_vc;wait 1;type up;type alt-ergo;wait 3;type next;snap -crop 1024x384+0+0 doc/images/gui-4.png;save;wait 1" doc/hello_proof.why
 
@@ -128,7 +126,7 @@ should see now what is displayed on :numref:`fig.gui4`.
    The GUI after splitting goal ``G2``.
 
 The first part of goal ``G2`` is still unproved. As a last resort,
-we can try to call the Coq proof assistant, by selecting it in the
+you can try to call the Coq proof assistant, by selecting it in the
 context menu. A new sub-row appear for Coq, and the Coq proof editor is
 launched. (It is ``coqide`` by default; see :numref:`sec.ideref` for
 details on how to configure this). You get now a regular Coq file to
@@ -155,15 +153,15 @@ Modifying the input
 ~~~~~~~~~~~~~~~~~~~
 
 You can edit the source file, using the corresponding tab in the
-top-right window of the GUI. Let us assume we change the goal
-``G2`` by replacing the first occurrence of ``true`` by ``false``, e.g.,
+top-right pane of the GUI. Change the goal ``G2`` by replacing the first
+occurrence of ``true`` by ``false``, e.g.,
 
 .. code-block:: whyml
 
    goal G2 : (false -> false) /\ (true \/ false)
 
-We can refresh the goals using menu :menuselection:`File --> Save all and
-Refresh session`, or the shortcut :kbd:`Control-r`. We get the tree view
+You can refresh the goals using menu :menuselection:`File --> Save all and
+Refresh session`, or the shortcut :kbd:`Control-r`. You get the tree view
 shown on :numref:`fig.gui5`.
 
 .. %EXECUTE sed -i -e 's/true -> false/false -> false/' doc/hello_proof.why
@@ -182,8 +180,8 @@ created when the Why3 file was opened in the GUI for the first time.
 Then, for all the goals that remain unchanged, the previous proofs are
 shown again. For the parts that changed, the previous proofs attempts
 are shown but marked with “(:index:`obsolete`)” so that you know the results are
-not accurate. You can now retry to prove all what remains unproved using
-any of the provers.
+not accurate. You can now retry to prove all the goals not yet proved using
+any prover.
 
 Replaying obsolete proofs
 ~~~~~~~~~~~~~~~~~~~~~~~~~
