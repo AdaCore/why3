@@ -1142,16 +1142,9 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         | Cany -> c.c_cty
         | Cfun {e_node = Eexec ({c_node = Cany}, cty)} -> cty
         | _ -> raise (CannotInstantiate rs.rs_name) in
-      let kind = match rs.rs_logic with
-        | RLnone -> RKnone
-        | RLpv _ -> raise (CannotInstantiate rs.rs_name)
-        | RLls ls when ls.ls_value = None -> RKpred
-        | RLls _ -> RKfunc
-        | RLlemma -> RKlemma in
       let cty = clone_cty cl (sm_of_cl cl) cty in
       let rs' = Mrs.find rs inst.mi_rs in
       cl_save_rs cl rs rs';
-      (* types are checked during c_app below *)
       if List.length cty.cty_args <> List.length rs'.rs_cty.cty_args then
         raise (BadInstance (BadI_rs_arity rs.rs_name));
       let e = try e_exec (c_app rs' cty.cty_args [] cty.cty_result) with
@@ -1159,19 +1152,13 @@ let clone_pdecl inst cl uc d = match d.pd_node with
       let cexp = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
         cty.cty_post cty.cty_xpost cty.cty_oldies e in
       let id = id_derive (rs.rs_name.id_string ^ "'refn") rs.rs_name in
-      let ld, _ = let_sym id ~ghost:(rs_ghost rs) ~kind cexp in
-      (* add a fake call based on the cloned cty for the right effects *)
-      let _,fake = let_sym id ~ghost:(rs_ghost rs) (c_any cty) in
-      let fake = e_exec (c_app fake cty.cty_args [] cty.cty_result) in
-      let fake = c_fun ~mask:cty.cty_mask cty.cty_args cty.cty_pre
-        cty.cty_post cty.cty_xpost cty.cty_oldies (e_if e_true e fake) in
-      let _, ss = let_sym id ~ghost:(rs_ghost rs) ~kind fake in
-      if not (cty_ghost rs.rs_cty = cty_ghost ss.rs_cty) then
+      let ld, ss = let_sym id ~ghost:(rs_ghost rs) ~kind:(rs_kind rs) cexp in
+      if cty_ghost ss.rs_cty <> cty_ghost rs.rs_cty then
         raise (BadInstance (BadI_rs_ghost rs.rs_name));
-      if not (mask_equal rs.rs_cty.cty_mask ss.rs_cty.cty_mask) then
+      if mask_spill ss.rs_cty.cty_mask rs.rs_cty.cty_mask then
         raise (BadInstance (BadI_rs_mask rs.rs_name));
-      let eff = eff_ghostify (rs_ghost rs) cty.cty_effect in
-      let eff' = ss.rs_cty.cty_effect in
+      let eff = rs.rs_cty.cty_effect in
+      let eff' = eff_union_par eff ss.rs_cty.cty_effect in
       if not (eff_equal eff eff') then begin
         (* Format.eprintf "@[%a@]@\n" print_cty cty; *)
         (* Format.eprintf "@[%a@]@\n" print_cty ss.rs_cty; *)
@@ -1209,9 +1196,9 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         if not (Stv.equal eff.eff_spoils eff'.eff_spoils) then
           raise (BadInstance (BadI_rs_spoils (rs.rs_name,
               Stv.diff eff'.eff_spoils eff.eff_spoils)));
-        if not (eff.eff_oneway = eff'.eff_oneway) then
+        if eff.eff_oneway <> eff'.eff_oneway then
           raise (BadInstance (BadI_rs_oneway rs.rs_name));
-        if not (eff.eff_ghost = eff'.eff_ghost) then
+        if eff.eff_ghost <> eff'.eff_ghost then
           raise (BadInstance (BadI_rs_ghost rs.rs_name));
         raise (BadInstance (BadI rs.rs_name));
       end;
