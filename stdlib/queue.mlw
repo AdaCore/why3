@@ -37,8 +37,6 @@ module Queue
     raises  { Empty -> q = old q = empty }
 
   val peek (q: t 'a) : 'a
-    writes { q }
-    ensures { q.seq = old q.seq }
     ensures { q <> empty }
     ensures { result = q[0] }
     raises  { Empty -> q = empty }
@@ -50,8 +48,6 @@ module Queue
     ensures { q = (old q)[1 ..] }
 
   val safe_peek (q: t 'a) : 'a
-    writes { q }
-    ensures { q.seq = old q.seq }
     requires { q <> empty }
     ensures { result = q[0] }
 
