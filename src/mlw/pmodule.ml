@@ -1157,7 +1157,7 @@ let clone_pdecl inst cl uc d = match d.pd_node with
         raise (BadInstance (BadI_rs_ghost rs.rs_name));
       if mask_spill ss.rs_cty.cty_mask rs.rs_cty.cty_mask then
         raise (BadInstance (BadI_rs_mask rs.rs_name));
-      let eff = rs.rs_cty.cty_effect in
+      let eff = eff_ghostify (rs_ghost rs) cty.cty_effect in
       let eff' = eff_union_par eff ss.rs_cty.cty_effect in
       if not (eff_equal eff eff') then begin
         (* Format.eprintf "@[%a@]@\n" print_cty cty; *)
