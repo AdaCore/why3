@@ -1988,6 +1988,7 @@ update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
 	export WHY3CONFIG=doc/why3ide-doc.conf; \
 	export WHY3LOADPATH=stdlib; \
+	export GTK_THEME=Adwaita; \
 	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCRST) | $(SHELL) -e
 
 doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
