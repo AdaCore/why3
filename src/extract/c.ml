@@ -647,8 +647,8 @@ module Print = struct
 
   and print_const  fmt = function
     | Cint s | Cfloat s -> fprintf fmt "%s" s
-    | Cchar s -> fprintf fmt "'%s'" s
-    | Cstring s -> fprintf fmt "\"%s\"" s
+    | Cchar s -> fprintf fmt "'%s'" Constant.(escape default_escape s)
+    | Cstring s -> fprintf fmt "\"%s\"" Constant.(escape default_escape s)
 
   let print_id_init ?(size=None) ~stars fmt ie =
     (if stars > 0
