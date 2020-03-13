@@ -140,7 +140,7 @@ are needed to properly regenerate the file when the goal is changed. See
 
 .. _fig.coqide:
 
-.. figure:: images/coqide-0-81.png
+.. figure:: images/coqide.png
    :alt: CoqIDE on subgoal 1 of ``G2``.
 
    CoqIDE on subgoal 1 of ``G2``.
