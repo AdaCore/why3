@@ -374,8 +374,8 @@ let t_compare trigger attr loc t1 t2 =
               t_compare bnd vml1 vml2 f1 f2
           | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
               perv_compare op1 op2;
-              t_compare bnd vml1 vml2 f1 f2;
-              t_compare bnd vml1 vml2 g1 g2
+              t_compare bnd vml1 vml2 g1 g2;
+              t_compare bnd vml1 vml2 f1 f2
           | Tnot f1, Tnot f2 ->
               t_compare bnd vml1 vml2 f1 f2
           | Ttrue, Ttrue -> ()

@@ -29,11 +29,17 @@ let client_connect ~fail socket_name =
         let curdir = Sys.getcwd () in
         let dir = Filename.dirname socket_name in
         let fn = Filename.basename socket_name in
-        Sys.chdir dir;
         let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
-        Unix.connect sock (Unix.ADDR_UNIX fn);
-        Sys.chdir curdir;
-        sock
+        try
+          Sys.chdir dir;
+          Unix.connect sock (Unix.ADDR_UNIX fn);
+          Sys.chdir curdir;
+          sock
+        with e ->
+          (* Make sure curdir is restored *)
+          let bt = Printexc.get_raw_backtrace () in
+          Sys.chdir curdir;
+          Printexc.raise_with_backtrace e bt
       end
     in
     socket := Some sock

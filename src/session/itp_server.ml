@@ -309,8 +309,7 @@ let get_exception_message ses id e =
   | Generic_arg_trans_utils.Cannot_infer_type s ->
       Pp.sprintf "Error in transformation %s. Cannot infer type of polymorphic element" s, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Remove_unknown (d, id) ->
-      Pp.sprintf "Error while removing ident: %s. The ident is used in the following declaration:\n%a\n\
-        You can try to use recursive remove or to add this declaration to the list of removed symbols"
+      Pp.sprintf "Error while removing ident: %s. The ident is used in the following goal:\n%a"
         (print_id id) P.print_decl d, Loc.dummy_position, ""
   | Args_wrapper.Arg_qid_not_found q ->
       Pp.sprintf "Following hypothesis was not found: %a \n" Typing.print_qualid q, Loc.dummy_position, ""

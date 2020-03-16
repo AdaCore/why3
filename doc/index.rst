@@ -26,7 +26,7 @@ project (ANR-15-CE25-0001), and the `VOCaL`_ ANR project
 (ANR-15-CE25-008).
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :numbered:
 
    foreword
@@ -36,6 +36,7 @@ project (ANR-15-CE25-0001), and the `VOCaL`_ ANR project
    install
    manpages
    syntaxref
+   input_formats
    exec
    itp
    technical

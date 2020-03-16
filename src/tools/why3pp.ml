@@ -402,7 +402,7 @@ let set_kind = function
   | "inductive" -> kind := Some Inductive
   | str -> ksprintf invalid_arg "kind: %s" str
 
-type output = Latex | Mlw | Ast
+type output = Latex | Mlw | Ast | Dep
 
 let output = ref None
 
@@ -410,13 +410,13 @@ let set_output = function
   | "latex" -> output := Some Latex
   | "mlw" -> output := Some Mlw
   | "ast" -> output := Some Ast
+  | "dep" -> output := Some Dep
   | str -> ksprintf invalid_arg "output: --%s--" str
 
 let prefix = ref "WHY"
 
 let usage =
-  "Pretty print Why3 declarations (currently only inductive types in LaTeX using mathpartir).\n\
-   why3 pp [--output=latex|mlw|ast] [--kind=inductive] [--prefix <prefix>] <filename> [<Module>.]<type> ..."
+  "why3 pp [--output=latex|mlw|ast|dep] [--kind=inductive] [--prefix <prefix>] <filename> [<Module>.]<type> ..."
 
 let options = [
   "--output", Arg.String set_output,                "<output> Output format";
@@ -433,6 +433,48 @@ let parse_mlw_file filename =
     close_in c;
   mlw_file
 
+let pident fmt i = fprintf fmt "%s" i.Ptree.id_str
+
+let rec pqualid fmt q =
+  Ptree.(match q with
+  | Qident id -> fprintf fmt "%a" pident id
+  | Qdot(q,id) -> fprintf fmt "%a.%a" pqualid q pident id)
+
+let deps_use fmt filename (modname:string) (q:Ptree.qualid) =
+  Ptree.(match q with
+  | Qident id ->
+     fprintf fmt "\"%s\" -> \"%s.%a\" ;@." modname filename pident id
+  | Qdot _ ->
+     fprintf fmt "\"%s\" -> \"%a\" ;@." modname pqualid q)
+
+let deps_decl fmt filename modname d =
+  Ptree.(match d with
+  | Dtype _ | Dlogic _ | Dind _ | Dprop _ | Dlet _ | Drec _ | Dexn _ | Dmeta _ -> ()
+  | Dcloneexport(q,_) | Duseexport q | Dcloneimport(_,_,q,_,_) ->
+     deps_use fmt filename modname q
+  | Duseimport(_,_, mods) ->
+     List.iter (fun (q,_) -> deps_use fmt filename modname q) mods
+  | Dimport _ -> ()
+  | Dscope _ -> ())
+
+let deps_module fmt filename modname dl =
+  List.iter (deps_decl fmt filename modname) dl
+
+let deps_file fmt header filename f =
+  if header then fprintf fmt "digraph G {\
+                              rankdir=RL;\
+                              nodesep=0.4;\
+                              ranksep=0.6;\
+                              node [shape=box,margin=0.05]@.";
+  begin
+    Ptree.(match f with
+  | Modules ml ->
+     List.iter (fun (n,dl) -> deps_module fmt filename (filename ^ "." ^ n.id_str) dl) ml
+    (** a list of modules containing lists of declarations *)
+  | Decls dl -> deps_module fmt filename (filename ^ ".Top") dl)
+  end;
+  if header then fprintf fmt "}@."
+
 let () =
   Arg.parse options add_filename_then_path usage;
   try
@@ -446,11 +488,16 @@ let () =
              let module M = LatexInd(Conf) in
              M.main std_formatter mlw_file paths
          | Some Mlw, None, 0 ->
-             Mlw_printer.pp_mlw_file std_formatter mlw_file
-         (* | Some Ast, None, 0 ->
-          *     Ptree.pp_mlw_file std_formatter mlw_file *)
+            Mlw_printer.pp_mlw_file std_formatter mlw_file
+         | Some Dep, None, _ ->
+            let f = Filename.(chop_extension (basename filename)) in
+            deps_file std_formatter true f mlw_file
+         | Some Ast, None, 0 ->
+            eprintf "experimental output in AST form not available.@.";
+            exit 1
          | _, _, _ ->
-             failwith "command line arguments"
+            eprintf "invalid command line arguments.@\n%s@." usage;
+            exit 1
         )
     | None -> invalid_arg "no filename given"
   with Invalid_argument msg ->

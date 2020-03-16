@@ -404,11 +404,16 @@ let d_hash d = Weakhtbl.tag_hash d.d_tag
 
 (** Declaration constructors *)
 
-let mk_decl node news = Hsdecl.hashcons {
-  d_node = node;
-  d_news = news;
-  d_tag  = Weakhtbl.dummy_tag;
-}
+let mk_decl node news =
+  let d = {
+      d_node = node;
+      d_news = news;
+      d_tag  = Weakhtbl.dummy_tag;
+    } in
+  match node with
+  | Dprop (Pgoal,_,_) -> Hsdecl.unique d
+  | _ -> Hsdecl.hashcons d
+
 
 exception IllegalTypeAlias of tysymbol
 exception ClashIdent of ident

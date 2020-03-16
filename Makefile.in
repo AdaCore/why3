@@ -81,8 +81,8 @@ ifeq (@LATEX@,rubber)
 endif
 
 ifeq (@LATEX@,latexmk)
-   LATEXCOMP=latexmk --pdf
-   LATEXCLEAN=latexmk --pdf -C
+   LATEXCOMP=LATEXOPTS= latexmk --pdf
+   LATEXCLEAN=LATEXOPTS= latexmk --pdf -C
 endif
 
 ifeq (@LATEX@,pdflatex)
@@ -727,32 +727,27 @@ clean::
 
 # we export exactly the programs that have a why3session.xml file
 
-.PHONY: gallery
+.PHONY: gallery gallery-simple gallery-subs
 
-gallery:: gallery-simple gallery-subs
+gallery: gallery-simple gallery-subs
 
-.PHONY: gallery-simple
-
-gallery-simple::
+gallery-simple:
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
-	@for x in examples/*/why3session.xml ; do \
-	  d=`dirname $$x`; \
-	  f=`basename $$d`; \
+	@cd examples/; \
+	for x in `git ls-files */why3session.xml` ; do \
+	  f=`dirname $$x`; \
+	  if echo $$f | grep -q -e '\(_vc_sp\|^bignum\)$$'; then continue; fi; \
 	  echo "exporting $$f"; \
 	  mkdir -p $(GALLERYDIR)/$$f; \
-	  WHY3CONFIG="" bin/why3session.@OCAMLBEST@ html $$x -o $(GALLERYDIR)/$$f; \
-	  cp examples/$$f.mlw $(GALLERYDIR)/$$f/; \
-	  cd examples/; \
+	  WHY3CONFIG="" ../bin/why3session.@OCAMLBEST@ html $$x -o $(GALLERYDIR)/$$f; \
+	  cp $$f.mlw $(GALLERYDIR)/$$f/; \
 	  rm -f $(GALLERYDIR)/$$f/$$f.zip; \
-	  zip -q -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f; \
-	  cd ..; \
+	  git archive --format=zip -o $(GALLERYDIR)/$$f/$$f.zip HEAD $$f.mlw $$f; \
 	done
-
-.PHONY: gallery-subs
 
 GALLERYSUBS=WP_revisited verifythis_2016_matrix_multiplication avl double_wp prover multiprecision
 
-gallery-subs::
+gallery-subs:
 	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
 	@for d in $(GALLERYSUBS) ; do \
 	  echo "exporting examples/$$d"; \
@@ -764,22 +759,6 @@ gallery-subs::
 	  git archive --format=zip -o $(GALLERYDIR)/$$d/$$d.zip HEAD $$d; \
 	  cd ..; \
 	done
-
-
-%-gallery::
-	@if test "$(GALLERYDIR)" = ""; then echo "set GALLERYDIR first"; exit 1; fi
-	x=$*/why3session.xml; \
-	d=`dirname $$x`; \
-	f=`basename $$d`; \
-	echo "exporting $$f"; \
-	rm -f $$d/*.bak; \
-	mkdir -p $(GALLERYDIR)/$$f; \
-	WHY3CONFIG="" bin/why3session.@OCAMLBEST@ html $$d -o $(GALLERYDIR)/$$f; \
-	if test -f examples/$$f.mlw; then cp examples/$$f.mlw $(GALLERYDIR)/$$f/; fi; \
-	if test -f examples/$$f.why; then cp examples/$$f.why $(GALLERYDIR)/$$f/; fi; \
-	cd examples/; \
-	rm -f $(GALLERYDIR)/$$f/$$f.zip; \
-	zip -q -r $(GALLERYDIR)/$$f/$$f.zip $$f.mlw $$f
 
 ########
 # XML DTD validation
@@ -2003,18 +1982,19 @@ ifeq (@enable_doc@,yes)
 
 doc: doc/html/index.html
 
-include Makefile.doc
+include doc.Makefile
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
 	export WHY3CONFIG=doc/why3ide-doc.conf; \
 	export WHY3LOADPATH=stdlib; \
-	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCTEX) | $(SHELL) -e
+	export GTK_THEME=Adwaita; \
+	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCRST) | $(SHELL) -e
 
-doc/html/index.html: $(DOCRST) $(DRVDOT) doc/conf.py
+doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
 	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
-doc/latex/manual.tex: $(DOCRST) $(DRVDOT) doc/conf.py
+doc/latex/manual.tex: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
 	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
 
 ifeq (@enable_pdf_doc@,yes)
@@ -2022,13 +2002,17 @@ ifeq (@enable_pdf_doc@,yes)
 doc: doc/latex/manual.pdf
 
 doc/latex/manual.pdf: doc/latex/manual.tex
-	cd doc/latex; $(LATEXCOMP) manual.tex
+	@echo "running LaTeX compilation..."
+	cd doc/latex; $(LATEXCOMP) manual.tex >/dev/null
 ifeq (@LATEX@,pdflatex)
-	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
-	  makeindex manual; pdflatex manual; \
+	@cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  makeindex manual; \
+	  echo "running LaTeX again to try to fix references..."; \
+	  pdflatex manual >/dev/null; \
 	fi
-	cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
-	  pdflatex manual; \
+	@cd doc/latex; if grep 'may have changed. Rerun to get' manual.log; then \
+	  echo "running LaTeX again to try to fix references..."; \
+	  pdflatex manual >/dev/null; \
 	fi
 endif
 
@@ -2376,7 +2360,7 @@ detect-unused:
 	@L1=$$(mktemp); \
 	L2=$$(mktemp); \
 	for d in `find examples/ -name 'why3session.xml' -printf '%h\n'`; do \
-	  sed -n -e 's/.*edited="\([^"]*\)".*/\1/p' $$d/why3session.xml | sort > $$L1; \
+	  sed -n -e 's/.*proof.*name="\([^"]*\)".*/\1/p' $$d/why3session.xml | sort > $$L1; \
 	  (cd $$d; git ls-files) | grep -v -e '^why3session.xml' -e '^why3shapes' -e '^[.]gitignore' -e '^Makefile' -e '[.]ml$$' -e '[.]html$$' | sed -e 's/[.]prf$$/.pvs/;s/[.]thy$$/.xml/' | sort -u > $$L2; \
 	  diff -u --label="$$d/why3session.xml" --label="$$d/" $$L1 $$L2 || echo; \
 	done; \

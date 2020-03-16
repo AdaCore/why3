@@ -1,4 +1,60 @@
 
+(** {1 Base64 encoding}
+
+  Implementation of the Base64 encoding algorithm.
+
+  An encode function translates an arbitrary string intro a string
+  containing only the following 64 characters.
+
+  {h
+  <pre>
+  Index  Binary  Char    |    Index  Binary  Char
+  0      000000  'A'     |    32     100000  'g'
+  1      000001  'B'     |    33     100001  'h'
+  2      000010  'C'     |    34     100010  'i'
+  3      000011  'D'     |    35     100011  'j'
+  4      000100  'E'     |    36     100100  'k'
+  5      000101  'F'     |    37     100101  'l'
+  6      000110  'G'     |    38     100110  'm'
+  7      000111  'H'     |    39     100111  'n'
+  8      001000  'I'     |    40     101000  'o'
+  9      001001  'J'     |    41     101001  'p'
+  10     001010  'K'     |    42     101010  'q'
+  11     001011  'L'     |    43     101011  'r'
+  12     001100  'M'     |    44     101100  's'
+  13     001101  'N'     |    45     101101  't'
+  14     001110  'O'     |    46     101110  'u'
+  15     001111  'P'     |    47     101111  'v'
+  16     010000  'Q'     |    48     110000  'w'
+  17     010001  'R'     |    49     110001  'x'
+  18     010010  'S'     |    50     110010  'y'
+  19     010011  'T'     |    51     110011  'z'
+  20     010100  'U'     |    52     110100  '0'
+  21     010101  'V'     |    53     110101  '1'
+  22     010110  'W'     |    54     110110  '2'
+  23     010111  'X'     |    55     110111  '3'
+  24     011000  'Y'     |    56     111000  '4'
+  25     011001  'Z'     |    57     111001  '5'
+  26     011010  'a'     |    58     111010  '6'
+  27     011011  'b'     |    59     111011  '7'
+  28     011100  'c'     |    60     111100  '8'
+  29     011101  'd'     |    61     111101  '9'
+  30     011110  'e'     |    62     111110  '+'
+  31     011111  'f'     |    63     111111  '/'
+  </pre>}
+
+  Four characters are required to encode each sequence of 3 characters
+  of the input string. The length of the encoded string is always a
+  multiple of four (if needed the padding character '=' is used).
+
+  A decode function does the inverse operation. It takes a previously
+  encoded string and returns the original string.
+
+  The main property of the algorithm is that, for every string `s`,
+  `decode (encode s) = s`.
+
+*)
+
 module Base64
   use mach.int.Int
   use mach.int.Int63
@@ -7,6 +63,8 @@ module Base64
   use string.OCaml
   use string.StringBuffer
 
+  (** `int2b64 i` calculates the character corresponding to index `i`
+  (see table above) *)
   function int2b64 (i: int) : char =
     if 0 <= i <= 25 then chr (i + 65) else
     if 26 <= i <= 51 then chr (i - 26 + 97) else
@@ -24,14 +82,18 @@ module Base64
     if i = 62 then chr 43 else if i = 63 then chr 47
     else absurd
 
+  (** character '=' *)
   let function char_eq : char = chr 61
 
+  (** `valid_b64_char c` is true, if and only if, `c` is in the table
+  above *)
   predicate valid_b64_char (c: char) =
     65 <= code c <= 90 || 97 <= code c <= 122 || 48 <= code c <= 57 ||
     code c = 43 || code c = 47
 
   lemma int2b64_valid_4_char: forall i. 0 <= i < 64 -> valid_b64_char (int2b64 i)
 
+  (** inverse of function `int2b64` *)
   function b642int (c: char) : int =
     if 65 <= code c <= 90  then code c - 65      else (* 0  - 25 *)
     if 97 <= code c <= 122 then code c - 97 + 26 else (* 26 - 51 *)
@@ -54,6 +116,8 @@ module Base64
 
   lemma b642int_int2b64: forall i. 0 <= i < 64 -> b642int (int2b64 i) = i
 
+  (** `get_pad s` calculates the number of padding characters in the
+  string `s` (between 0 and 2) *)
   function get_pad (s: string): int =
     if length s >= 1 && s[length s - 1] = char_eq then
         (if length s >= 2 && s[length s - 2] = char_eq then 2 else 1)
@@ -65,6 +129,8 @@ module Base64
         (if length s >= 2 && eq_char s[length s - 2] char_eq then 2 else 1)
     else 0
 
+  (** `calc_pad s` returns the number of padding characters that will
+  appear in the string that results from encoding `s` *)
   function calc_pad (s: string): int =
     if mod (length s) 3 = 1 then 2 else
       if mod (length s) 3 = 2 then 1 else 0
@@ -76,6 +142,8 @@ module Base64
   = if length s % 3 = 1 then 2 else
       if length s % 3 = 2 then 1 else 0
 
+  (** `encoding s1 s2` is true, if and only if, `s2` is a valid
+  encoding of `s1` *)
   predicate encoding (s1 s2: string) =
     length s2 = div (length s1 + calc_pad s1) 3 * 4 &&
     ( forall i. 0 <= i < div (length s2) 4 ->
@@ -92,6 +160,11 @@ module Base64
                        s2[length s2 - 2] = s2[length s2 - 1] = char_eq ) &&
     calc_pad s1 = get_pad s2
 
+  (** `valid_b64 s` is true, if and only if, `s` is a valid Base64
+  string: the length of `s` is a multiple of 4, and all its characters
+  (with exception to the last element or the two last elements) belong
+  to the table above. If the last characters of the string are not
+  valid then either the string terminates with "=" or "==". *)
   predicate valid_b64 (s: string) =
     (mod (length s) 4 = 0) &&
     (forall i. 0 <= i < length s - get_pad s -> valid_b64_char s[i]) &&
@@ -121,6 +194,8 @@ module Base64
       (0 <= i < length s2 - get_pad s2 -> valid_b64_char s2[i]) &&
       (length s2 - get_pad s2 <= i < length s2 -> s2[i] = char_eq) }
 
+
+  (** the decode of a string is unique *)
   let lemma decode_unique (s1 s2 s3: string)
     requires { encoding s1 s2 /\ encoding s3 s2 }
     ensures  { s1 = s3 }
@@ -130,6 +205,7 @@ module Base64
       (i * 3 + 2 < length s1 -> s1[i*3+2] = s3[i*3+2]) };
     assert { forall i. 0 <= i < length s1 -> s1[i] = s3[i] }
 
+  (** the encode of a string is unique *)
   let lemma encode_unique (s1 s2 s3: string)
     requires { encoding s1 s2 /\ encoding s1 s3 }
     ensures  { s2 = s3 }

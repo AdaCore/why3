@@ -225,19 +225,6 @@ let _print_rem fmt rem = Format.fprintf fmt
   (Pp.print_iter1 Sls.iter Pp.comma Pretty.print_ls) rem.rem_ls
   (Pp.print_iter1 Sts.iter Pp.comma Pretty.print_ts) rem.rem_ts
 
-(*
-let rec elim_task task rem =
-  match task with
-  | Some ({task_decl = {td_node = Decl decl}} as task) ->
-    let task = elim_task task.task_prev rem in
-    let l = elim_abstract Sls.empty
-      rem.rem_pr rem.rem_ls rem.rem_ts decl in
-    List.fold_left Task.add_decl task l
-  | Some task ->
-    Task.add_tdecl (elim_task task.task_prev rem) task.task_decl
-  | None      -> None
- *)
-
 let add_rem rem decl =
   let _remove_ts rem ts =
     { rem with rem_ts = Sts.add ts rem.rem_ts} in
@@ -251,14 +238,6 @@ let add_rem rem decl =
   | Dind (_,l) -> List.fold_left (fun rem (ls,_) -> remove_ls rem ls) rem l
   | Dprop (_,pr,_) -> remove_pr rem pr
 
-(*
-let _union_rem rem1 rem2 =
-  { rem_ts = Sts.union rem1.rem_ts rem2.rem_ts;
-    rem_ls = Sls.union rem1.rem_ls rem2.rem_ls;
-    rem_pr = Spr.union rem1.rem_pr rem2.rem_pr;
-  }
-*)
-
 let fold_sub f acc a i1 i2 =
   let acc = ref acc in
   for i=i1 to i2-1 do
@@ -270,9 +249,7 @@ let rec bisect_aux task a i1 i2 rem cont       (* lt i lk *) =
   (* Format.eprintf "i1: %i, i2: %i@\nrem:%a@." i1 i2 *)
   (*   print_rem rem; *)
   let call rem valid invalid =
-    try BSstep (rem,
-                fun b -> if b then valid () else invalid ())
-    with UnknownIdent _ -> invalid ()
+    BSstep (rem, fun b -> if b then valid () else invalid ())
   in
   if i2 - i1 < 2 then
     let rem1 = add_rem rem a.(i1) in
@@ -315,22 +292,3 @@ let bisect_step task0 =
   let empty_rem = {rem_ts = Sts.empty; rem_ls = Sls.empty;
                    rem_pr = Spr.empty; rem_nt = namt} in
   bisect_aux task0 a 0 n empty_rem (fun rem -> BSdone rem)
-
-(*
-let bisect f task =
-  let rec run = function
-    | BSdone r -> r
-    | BSstep (rem,c) -> let t = elim_task task rem in run (c (f t)) in
-  run (bisect_step task)
- *)
-
-(** catch exception for debug *)
-(* let bisect_step task0 = *)
-(*   let res = try bisect_step task0 with exn -> *)
-(*     Format.eprintf "bisect_step fail: %a@." Exn_printer.exn_printer exn; *)
-(*     raise exn in *)
-(*   match res with *)
-(*   | BSdone _ as d -> d *)
-(*   | BSstep (t,f) -> BSstep (t,fun b -> try f b with exn -> *)
-(*     Format.eprintf "bisect_step fail: %a@." Exn_printer.exn_printer exn; *)
-(*     raise exn) *)

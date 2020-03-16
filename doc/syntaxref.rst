@@ -1,5 +1,5 @@
-Language Reference
-==================
+The WhyML Language Reference
+============================
 
 In this chapter, we describe the syntax and semantics of WhyML.
 
@@ -172,6 +172,7 @@ type expressions is the following:
             : | "{" `type` "}"   ; snapshot type
             : | `qualifier`? "(" `type` ")"   ; type in a scope
 
+.. index:: mapping type
 
 Built-in types are ``int`` (arbitrary precision integers), ``real``
 (real numbers), ``bool``, the arrow type (also called the *mapping
@@ -181,6 +182,8 @@ type*), and the tuple types. The empty tuple type is also called the
 Note that the syntax for type expressions notably differs from the usual
 ML syntax. In particular, the type of polymorphic lists is written
 ``list 'a``, and not ``'a list``.
+
+.. index:: snapshot type
 
 *Snapshot types* are specific to WhyML, they denote the types of ghost
 values produced by pure logical functions in WhyML programs. A snapshot
@@ -354,6 +357,9 @@ with normal identifiers, names with a letter after a prime, such as
 ``(+)'spec``, can only be introduced by Why3, and not by the user in a
 WhyML source.
 
+.. index:: at
+.. index:: old
+
 The ``at`` and ``old`` operators are used inside postconditions and
 assertions to refer to the value of a mutable program variable at some
 past moment of execution (see the next section for details). These
@@ -370,6 +376,8 @@ As with normal identifiers, we can put a qualifier over a parenthesised
 operator, e.g., ``Map.S.([]) m i``. Also, as noted above, a qualifier
 can be put over a parenthesised term, and the parentheses can be omitted
 if the term is a record or a record update.
+
+.. index:: &&, ||, by, so
 
 The propositional connectives in WhyML formulas are listed in
 :token:`term`. The non-standard connectives — asymmetric
@@ -451,12 +459,12 @@ conditionals, let-bindings, pattern matching, and local function
 definitions, either via the ``let-in`` construction or the ``fun``
 keyword. The pure logical functions defined in this way are called
 *mappings*; they are first-class values of “arrow” type
-:samp:`{t} -> {u}`.
+`t -> u`.
 
-The patterns are similar to those of OCaml, though the ``when`` clauses
-and numerical constants are not supported. Unlike in OCaml, ``as`` binds
-stronger than the comma: in the pattern :samp:`({p},{q} as {x})`, variable
-*x* is bound to the value matched by pattern *q*. Also notice
+The patterns are similar to those of OCaml, though the `when` clauses
+and numerical constants are not supported. Unlike in OCaml, `as` binds
+stronger than the comma: in the pattern `(p,q as x)`, variable
+`x` is bound to the value matched by pattern `q`. Also notice
 the closing ``end`` after the ``match with`` term. A ``let in``
 construction with a non-trivial pattern is translated as a
 ``match with`` term with a single branch.
@@ -538,6 +546,7 @@ conjunction and disjunction, respectively.
         : | "any" `result` `spec`*   ; arbitrary value
         : | "while" `expr` "do" `invariant`* `variant`? `expr` "done"   ; while loop
         : | "for" `lident` "=" `expr` ("to" | "downto") `expr` "do" `invariant`* `expr` "done"   ; for loop
+        : | "for" `pattern` "in" `expr` "with" `uident` ("as" `lident_nq`)? "do"  `invariant`* `variant`? `expr` "done" ; for each loop
         : | ("assert" | "assume" | "check") "{" `term` "}"   ; assertion
         : | "raise" `uqualid` `expr`?   ; exception raising
         : | "raise" "(" `uqualid` `expr`? ")"
@@ -571,10 +580,16 @@ conjunction and disjunction, respectively.
     variant_term: `term` ("with" `lqualid`)?   ; variant term + WF-order
 
 
+.. index:: ghost expressions
+.. rubric:: Ghost expressions
+
 Keyword ``ghost`` marks the expression as ghost code added for
 verification purposes. Ghost code is removed from the final code
 intended for execution, and thus cannot affect the computation of the
 program results nor the content of the observable memory.
+
+.. index:: assignment expressions
+.. rubric:: Assignment expressions
 
 Assignment updates in place a mutable record field or an element of a
 collection. The former can be done simultaneously on a tuple of values:
@@ -582,20 +597,86 @@ collection. The former can be done simultaneously on a tuple of values:
 of the ternary bracket operator ``([]<-)`` and cannot be used in a
 multiple assignment.
 
+.. index:: evaluation order
+.. rubric:: Evaluation order
+
 In applications, arguments are evaluated from right to left. This
 includes applications of infix operators, with the only exception of
 lazy operators ``&&`` and ``||`` which evaluate from left to right,
 lazily.
 
-The syntax for specification clauses in programs is given in
-:token:`spec`.
-Within specifications, terms are extended with new constructs ``old``
-and ``at``.
-Within a postcondition, :samp:`old {t}` refers to the value of term
-*t* in the prestate. Within the scope of a code mark *L*,
-the term :samp:`at {t} '{L}` refers to the value of term
-*t* at the program point corresponding to *L*.
+.. index:: specification clauses
+.. index:: at
+.. index:: old
+.. rubric:: Specification clauses
 
+The syntax for specification clauses in programs is given in
+:token:`spec`.  Within specifications, terms are extended with
+constructs `old` and `at`.  Within a postcondition, `old t` refers to
+the value of term `t` in the prestate. Within the scope of a code mark
+`L`, the term `at t L` refers to the value of term `t` at the program
+point corresponding to `L`.
+
+.. index:: for loop, invariant; for loop
+.. rubric:: The “For” loop
+
+The “for” loop of Why3 has the following general form:
+
+.. code-block:: whyml
+
+    for v=e1 to e2 do invariant { i } e3 done
+
+Here, ``v`` is a variable identifier, that is bound by the loop
+statement and of type ``integer`` ; ``e1`` and ``e2`` are program
+expressions of type ``integer``, and ``e3`` is an expression of type
+``unit``. The variable ``v`` may occur both in ``i`` and ``e3``, and
+is not mutable. The execution of such a loop amounts to first evaluate
+``e1`` and ``e2`` to values ``n1`` and ``n2``. If ``n1 >= n2`` then
+the loop is not executed at all, otherwise it is executed iteratively
+for ``v`` taking all the values between ``n1`` and ``n2`` included.
+
+Regarding verification conditions, one must prove that ``i[v <- n1]``
+holds (invariant initialization) ; and that ``forall n. n1 <= n <= n2
+/\ i[v <- n] -> i[v <- n+1]`` (invariant preservation). Beware that at
+loop exit, the property which is known is ``i[v <- n2+1]``.
+
+The variant with keyword ``downto`` instead of ``to`` iterates
+backwards.
+
+It is also possible for ``v`` to be an integer range type (see
+:numref:`sec.range_types`) instead of an integer.
+
+.. index:: for each loop, invariant; for each loop
+.. rubric:: The “For each” loop
+
+The “for each” loop of Why3 has the following syntax:
+
+.. code-block:: whyml
+
+    for p in e1 with S do invariants/variant... e2 done
+
+Here, ``p`` is a pattern, ``S`` is a namespace, and ``e1`` and ``e2``
+are program expressions. Such a for each loop is syntactic sugar for
+the following:
+
+.. code-block:: whyml
+
+    let it = S.create e1 in
+    try while true do
+      invariants/variant...
+      let p = S.next it in
+      e2
+    with S.Done -> ()
+
+That is, namespace ``S`` is assumed to declare at least a function
+``create`` and a function ``next``, and an exception ``Done``. The
+latter is used to signal the end of the iteration.
+As shown above, the iterator is named ``it``. It can be referred to
+within annotations. A different name can be specified, using syntax
+``with S as x do``.
+
+Constructions ``break`` and ``continue`` can be used in for each
+loops, with the expected semantics.
 
 Modules
 -------
@@ -618,18 +699,21 @@ A WhyML input file is a (possibly empty) list of modules
       : | "clone" `imp_exp` `tqualid` ("as" `uident`)? `subst`?
       : | "scope" "import"? `uident_nq` `decl`* "end"
       : | "import" `uident`
-      : | "type" `mtype_decl` ("with" `mtype_decl`)*   ; mutable types
-      : | "type" `lident_nq` ("'" `lident_nq`)* `invariant`+   ; added invariant
       : | "let" "ghost"? `lident_nq` `attribute`* `fun_defn`
       : | "let" "rec" `fun_defn`
       : | "val" "ghost"? `lident_nq` `attribute`* `pgm_decl`
       : | "exception" `lident_nq` `attribute`* `type`?
-    mtype_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `mtype_defn`
-    mtype_defn:   ; abstract type
+    type_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `type_defn`
+    type_defn:   ; abstract type
       : | "=" `type`   ; alias type
-      : | "=" "|"? `type_case` ("|" `type_case`)* `invariant`*   ; algebraic type
-      : | "=" "{" `mrecord_field` (";" `mrecord_field`)* "}" `invariant`*   ; record type
-    mrecord_field: "ghost"? "mutable"? `lident_nq` `attribute`* ":" `type`
+      : | "=" "|"? `type_case` ("|" `type_case`)*   ; algebraic type
+      : | "=" `vis_mut` "{" `record_field` (";" `record_field`)* "}" `invariant`* `type_witness`  ; record type
+      : | "<" "range" `integer` `integer` ">"   ; range type
+      : | "<" "float" `integer` `integer` ">"   ; float type
+    type_case: `uident` `attribute`* `type_param`*
+    record_field: "ghost"? "mutable"? `lident_nq` `attribute`* ":" `type`
+    type_witness: "by" "{" `lident_nq` "=" `expr` (";" `lident_nq` "=" `expr`)* "}"
+    vis_mut: ("abstract" | "private")? "mutable"?
     pgm_decl: ":" `type`   ; global variable
       : | `param` (`spec`* `param`)+ ":" `type` `spec`*   ; abstract function
     logic_decl: `function_decl`
@@ -651,15 +735,6 @@ A WhyML input file is a (possibly empty) list of modules
       : | "lemma" `qualid`
       : | "goal"  `qualid`
     tqualid: `uident` | `ident` ("." `ident`)* "." `uident`
-    type_decl: `lident_nq` `attribute`* ("'" `lident_nq` `attribute`*)* `type_defn`
-    type_defn:   ; abstract type
-      : | "=" `type`   ; alias type
-      : | "=" "|"? `type_case` ("|" `type_case`)*   ; algebraic type
-      : | "=" "{" `record_field` (";" `record_field`)* "}"   ; record type
-      : | "<" "range" `integer` `integer` ">"   ; range type
-      : | "<" "float" `integer` `integer` ">"   ; float type
-    type_case: `uident` `attribute`* `type_param`*
-    record_field: `lident` `attribute`* ":" `type`
     type_param: "'" `lident`
      : | `lqualid`
      : | "(" `lident`+ ":" `type` ")"
@@ -667,20 +742,270 @@ A WhyML input file is a (possibly empty) list of modules
      : | "()"
 
 
-Algebraic types
-^^^^^^^^^^^^^^^
-
-TO BE COMPLETED
+.. index:: record type
+.. _Record Types:
 
 Record types
 ^^^^^^^^^^^^
 
-TO BE COMPLETED
+A record type declaration introduces a new type, with named and typed
+fields, as follows:
+
+.. code-block:: whyml
+
+    type t = { a: int; b: bool }
+
+Such a type can be used both in logic and programs.
+A new record is built using curly braces and a value for each field,
+such as ``{ a = 42; b = true }``. If ``x`` is a value of type ``t``,
+its fields are accessed using the dot notation, such as ``x.a``.
+Each field happens to be a projection function, so that we can also
+write ``a x``.
+A field can be declared ``mutable``, as follows:
+
+.. code-block:: whyml
+
+    type t = { mutable a: int; b: bool }
+
+A mutable field can be modified using notation ``x.a <- 42``.
+The ``writes`` clause of a function contract can list mutable fields,
+e.g., ``writes { x.a }``.
+
+.. index:: type invariant, invariant; type
+.. rubric:: Type invariants
+
+Invariants can be attached to record types, as follows:
+
+.. code-block:: whyml
+
+    type t = { mutable a: int; b: bool }
+      invariant { b = true -> a >= 0 }
+
+The semantics of type invariants is as follows. In the logic, a type
+invariant always holds.
+Consequently, it is no more possible
+to build a value using the curly braces (in the logic).
+To prevent the introduction of a logical
+inconsistency, Why3 generates a VC to show the existence of at least
+one record instance satisfying the invariant. It is named ``t'vc``
+and has the form ``exists a:int, b:bool. b = true -> a >= 0``. To ease the
+verification of this VC, one can provide an explicit witness using the
+keyword ``by``, as follows:
+
+.. code-block:: whyml
+
+    type t = { mutable a: int; b: bool }
+      invariant { b = true -> a >= 0 }
+      by { a = 42; b = true }
+
+It generates a simpler VC, where fields are instantiated accordingly.
+
+In programs, a type invariant is assumed to
+hold at function entry and must be restored at function exit.
+In the middle, the invariant can be temporarily broken. For instance,
+the following function can be verified:
+
+.. code-block:: whyml
+
+    let f (x: t) = x.a <- x.a - 1; x.a <- 0
+
+After the first assignment, the invariant does not necessarily hold
+anymore. But it is restored before function exit with the second
+assignment.
+
+If the record is passed to another function, then the invariant
+must be reestablished (so as to honor the contract of the callee).
+For instance, the following function cannot be verified:
+
+.. code-block:: whyml
+
+    let f1 (x: t) = x.a <- x.a - 1; f x; x.a <- 0
+
+Indeed, passing ``x`` to function ``f`` requires checking the
+invariant first, which does not hold in this example. Similarly, the
+invariant must be reestablished if the record is passed to a logical
+function or predicate. For instance, the following function cannot be
+verified:
+
+.. code-block:: whyml
+
+    predicate p (x: t) = x.b
+
+    let f2 (x: t) = x.a <- x.a - 1; assert { p x }; x.a <- 0
+
+Accessing the record fields, however, does not require restoring the
+invariant, both in logic and programs.
+For instance, the following function can be verified:
+
+.. code-block:: whyml
+
+    let f2 (x: t) = x.a <- x.a - 1; assert { x.a < old x.a }; x.a <- 0
+
+Indeed, the invariant may not hold after the first assignment, but the
+assertion is only making use of field access, so there is no need to
+reestablish the invariant.
+
+.. index:: private type
+.. rubric:: Private types
+
+A record type can be declared ``private``, as follows:
+
+.. code-block:: whyml
+
+    type t = private { mutable a: int; b: bool }
+
+The meaning of such a declaration is that one cannot build a record
+instance, neither in the logic, nor in programs.
+For instance, the following function cannot be defined:
+
+.. code-block:: whyml
+
+    let create () = { a = 42; b = true }
+
+One cannot modify mutable fields of private types either.
+One may wonder what is the purpose of private types, if one cannot
+build values in those types. The purpose is to build
+interfaces, to be later refined with actual implementations (see
+section :ref:`Module Cloning` below). Indeed, if we cannot build
+record instances, we can still *declare* operations that
+return such records. For instance, we can declare the following two
+functions:
+
+.. code-block:: whyml
+
+    val create (n: int) : t
+      ensures { result.a = n }
+
+    val incr (x: t) : unit
+      writes  { x.a }
+      ensures { x.a = old x.a + 1 }
+
+Later, we can *refine* type ``t`` with a type that is not private
+anymore, and then implement operations ``create`` and ``incr``.
+
+Private types are often used in conjunction with ghost fields, that
+are used to model the contents of data structures. For instance, we
+can conveniently model a queue containing integers as follows:
+
+.. code-block:: whyml
+
+    type queue = private { mutable ghost s: seq int }
+
+If needed, we could even add invariants (e.g., the sequence ``s`` is
+sorted in a priority queue).
+
+.. index:: abstract type
+
+When a private record type only has ghost fields, one can use
+``abstract`` as a convenient shortcut:
+
+.. code-block:: whyml
+
+    type queue = abstract { mutable s: seq int }
+
+This is equivalent to the previous declaration.
+
+.. rubric:: Recursive record types
+
+Record types can be recursive, e.g,
+
+.. code-block:: whyml
+
+    type t = { a: int; next: option t }
+
+Recursive record types cannot have invariants, cannot have mutable
+fields, and cannot be private.
+
+.. index:: algebraic data type
+
+Algebraic data types
+^^^^^^^^^^^^^^^^^^^^
+
+Algebraic data types combine sum and product types.
+A simple example of a sum type is that of an option type:
+
+.. code-block:: whyml
+
+    type maybe = No | Yes int
+
+Such a declaration introduces a new type ``maybe``, with two
+constructors ``No`` and ``Yes``. Constructor ``No`` has no argument
+and thus can be used as a constant value. Constructor ``Yes`` has an
+argument of type ``int`` and thus can be used to build values such as
+``Yes 42``. Algebraic data types can be polymorphic, e.g.,
+
+.. code-block:: whyml
+
+    type option 'a = None | Some 'a
+
+(This type is already part of Why3 standard library, in module
+`option.Option <http://why3.lri.fr/stdlib/option.html>`_.)
+
+A data type can be recursive. The archetypal example is the type of
+polymorphic lists:
+
+.. code-block:: whyml
+
+    type list 'a = Nil | Cons 'a (list 'a)
+
+(This type is already part of Why3 standard library, in module
+`list.List <http://why3.lri.fr/stdlib/list.html>`_.)
+
+When a field is common to all constructors, with the same type, it can
+be named:
+
+.. code-block:: whyml
+
+    type t =
+      | MayBe (size: int) (option int)
+      | Many  (size: int) (list int)
+
+Such a named field introduces a projection function. Here, we get a
+function ``size`` of type ``t -> int``.
+
+Constructor arguments can be ghost, e.g.,
+
+.. code-block:: whyml
+
+    type answer =
+      | Yes (ghost int)
+      | No
+
+Non-uniform data types are allowed, such as the following type for
+`random access lists <http://toccata.lri.fr/gallery/random_access_list.fr.html>`_:
+
+.. code-block:: whyml
+
+    type ral 'a =
+      | Empty
+      | Zero    (ral ('a, 'a))
+      | One  'a (ral ('a, 'a))
+
+Why3 supports polymorphic recursion, both in logic and programs, so
+that we can define and verify operations on such types.
+
+.. index:: tuples
+.. rubric:: Tuples
+
+A tuple type is a particular case of algebraic data types, with a
+single constructor. A tuple type need not be declared by the user; it
+is generated on the fly. The syntax for a tuple type is ``(type1,
+type2, ...)``.
+
+Note: Record types, introduced in the previous section, also
+constitute a particular case of algebraic data types with a single
+constructor. There are differences, though. Record types may have
+mutable fields, invariants, or private status, while algebraic data
+types cannot.
+
+
+.. index:: range type
+.. _sec.range_types:
 
 Range types
 ^^^^^^^^^^^
 
-A declaration of the form ``type r = < range a b >`` defines a type that
+A declaration of the form ``type r = <range a b>`` defines a type that
 projects into the integer range ``[a,b]``. Note that in order to make
 such a declaration the theory ``int.Int`` must be imported.
 
@@ -688,11 +1013,11 @@ Why3 let you cast an integer literal in a range type (e.g. ``(42:r)``)
 and will check at typing that the literal is in range. Defining such a
 range type :math:`r` automatically introduces the following:
 
-::
+.. code-block:: whyml
 
-      function  r'int r : int
-      constant  r'maxInt : int
-      constant  r'minInt : int
+    function r'int r : int
+    constant r'maxInt : int
+    constant r'minInt : int
 
 The function ``r'int`` projects a term of type ``r`` to its integer
 value. The two constants represent the high bound and low bound of the
@@ -701,14 +1026,14 @@ range respectively.
 Unless specified otherwise with the meta ``keep:literal`` on ``r``, the
 transformation :why3:transform:`eliminate_literal` introduces an axiom
 
-::
+.. code-block:: whyml
 
     axiom r'axiom : forall i:r. r'minInt <= r'int i <= r'maxInt
 
 and replaces all casts of the form ``(42:r)`` with a constant and an
 axiom as in:
 
-::
+.. code-block:: whyml
 
     constant rliteral7 : r
     axiom rliteral7_axiom : r'int rliteral7 = 42
@@ -719,7 +1044,7 @@ This type is used in the standard library in the theories ``bv.BV8``,
 Floating-point types
 ^^^^^^^^^^^^^^^^^^^^
 
-A declaration of the form ``type f = < float eb sb >`` defines a type of
+A declaration of the form ``type f = <float eb sb>`` defines a type of
 floating-point numbers as specified by the IEEE-754
 standard :cite:`ieee754-2008`. Here the literal ``eb``
 represents the number of bits in the exponent and the literal ``sb`` the
@@ -734,12 +1059,12 @@ float type, it refuses the cast if the literal is not representable.
 
 Defining such a type ``f`` automatically introduces the following:
 
-::
+.. code-block:: whyml
 
-      predicate f'isFinite f
-      function  f'real f : real
-      constant  f'eb : int
-      constant  f'sb : int
+    predicate f'isFinite f
+    function  f'real f : real
+    constant  f'eb : int
+    constant  f'sb : int
 
 As specified by the IEEE standard, float formats includes infinite
 values and also a special NaN value (Not-a-Number) to represent results
@@ -751,7 +1076,7 @@ real value, its result is not specified for non finite terms.
 Unless specified otherwise with the meta ``keep:literal`` on ``f``, the
 transformation :why3:transform:`eliminate_literal` will introduce an axiom
 
-::
+.. code-block:: whyml
 
     axiom f'axiom :
       forall x:f. f'isFinite x -> -. max_real <=. f'real x <=. max_real
@@ -760,7 +1085,7 @@ where ``max_real`` is the value of the biggest finite float in the
 specified format. The transformation also replaces all casts of the form
 ``(0.5:f)`` with a constant and an axiom as in:
 
-::
+.. code-block:: whyml
 
     constant fliteral42 : f
     axiom fliteral42_axiom : f'real fliteral42 = 0.5 /\ f'isFinite fliteral42
@@ -770,6 +1095,208 @@ This type is used in the standard library in the theories
 
 
 
+
+
+Function declarations
+^^^^^^^^^^^^^^^^^^^^^
+
+``let``
+   Definition of a program function, with prototype, contract, and body
+
+``val``
+   Declaration of a program function, with prototype and contract only
+
+``let function``
+   Definition of a pure (that is, side-effect free) program function
+   which can also be used in specifications as a logical function
+   symbol
+
+``let predicate``
+   Definition of a pure Boolean program function which can also be
+   used in specifications as a logical predicate symbol
+
+``val function``
+   Declaration of a pure program function which can also be used in
+   specifications as a logical function symbol
+
+``val predicate``
+   Declaration of a pure Boolean program function which can also be
+   used in specifications as a logical predicate symbol
+
+``function``
+   Definition or declaration of a logical function symbol which can
+   also be used as a program function in ghost code
+
+``predicate``
+   Definition or declaration of a logical predicate symbol which can
+   also be used as a Boolean program function in ghost code
+
+``let lemma``
+   definition of a special pure program function which serves not as
+   an actual code to execute but to prove the function's contract as a
+   lemma: “for all values of parameters, the precondition implies the
+   postcondition”. This lemma is then added to the logical context and
+   is made available to provers. If this “lemma-function” produces a
+   result, the lemma is “for all values of parameters, the
+   precondition implies the existence of a result that satisfies the
+   postcondition”. Lemma-functions are mostly used to prove some
+   property by induction directly in Why3, without resorting to an
+   external higher-order proof assistant.
+
+Program functions (defined with ``let`` or declared with ``val``) can
+additionally be marked ``ghost``, meaning that they can only be used
+in the ghost code and never translated into executable code ; or
+``partial``, meaning that their execution can produce observable
+effects unaccounted by their specification, and thus they cannot be
+used in the ghost code.
+
+.. index:: clone
+.. index:: module cloning
+.. _Module Cloning:
+
+Module Cloning
+^^^^^^^^^^^^^^
+
+Why3 features a mechanism to make an instance of a module, by
+substituting some of its declarations with other symbols. It is called
+*module cloning*.
+
+Let us consider the example of a module implementing
+`exponentiation by squaring
+<https://en.wikipedia.org/wiki/Exponentiation_by_squaring>`_.
+We want to make it as general as possible, so that we can implement it
+and verify it only once and then reuse it in various different
+contexts, e.g., with integers, floating-point numbers, matrices, etc.
+We start our module with the introduction of a monoid:
+
+.. code-block:: whyml
+
+   module Exp
+     use int.Int
+     use int.ComputerDivision
+
+     type t
+
+     val constant one : t
+
+     val function mul t t : t
+
+     axiom one_neutral: forall x. mul one x = x = mul x one
+
+     axiom mul_assoc: forall x y z. mul x (mul y z) = mul (mul x y) z
+
+Then we define a simple exponentiation function, mostly for the
+purpose of specification:
+
+.. code-block:: whyml
+   :dedent: 0
+
+     let rec function exp (x: t) (n: int) : t
+       requires { n >= 0 }
+       variant  { n }
+     = if n = 0 then one else mul x (exp x (n - 1))
+
+In anticipation of the forthcoming verification of exponentiation by
+squaring, we prove two lemmas. As they require induction, we use lemma
+functions:
+
+.. code-block:: whyml
+   :dedent: 0
+
+     let rec lemma exp_add (x: t) (n m: int)
+       requires { 0 <= n /\ 0 <= m }
+       variant  { n }
+       ensures  { exp x (n + m) = mul (exp x n) (exp x m) }
+     = if n > 0 then exp_add x (n - 1) m
+
+     let rec lemma exp_mul (x: t) (n m: int)
+       requires { 0 <= n /\ 0 <= m }
+       variant  { m }
+       ensures  { exp x (n * m) = exp (exp x n) m }
+     = if m > 0 then exp_mul x n (m - 1)
+
+Finally, we implement and verify exponentiation by squaring, which
+completes our module.
+
+.. code-block:: whyml
+   :dedent: 0
+
+     let fast_exp (x: t) (n: int) : t
+       requires { n >= 0 }
+       ensures  { result = exp x n }
+     = let ref p = x in
+       let ref q = n in
+       let ref r = one in
+       while q > 0 do
+         invariant { 0 <= q }
+         invariant { mul r (exp p q) = exp x n }
+         variant   { q }
+         if mod q 2 = 1 then r <- mul r p;
+         p <- mul p p;
+         q <- div q 2
+       done;
+       r
+
+   end
+
+Note that module ``Exp`` mixes declared symbols (type ``t``, constant
+``one``, function ``mul``) and defined symbols (function ``exp``,
+program function ``fast_exp``).
+
+We can now make an instance of module ``Exp``, by substituting some of
+its declared symbols (not necessarily all of them) with some other
+symbols. For instance, we get exponentiation by squaring on integers
+by substituting ``int`` for type ``t``, integer ``1`` for constant
+``one``, and integer multiplication for function ``mul``.
+
+.. code-block:: whyml
+
+    module ExponentiationBySquaring
+      use int.Int
+      clone Exp with type t = int, val one = one, val mul = (*)
+    end
+
+In a substitution such as ``val one = one``,
+the left-hand side refers to the namespace of
+the module being cloned, while the right-hand side refers to the
+current namespace (which here contains a constant ``one`` of type
+``int``).
+
+When a module is cloned, any axiom is automatically turned into a
+lemma. Thus, the ``clone`` command above generates two VCs, one for
+lemma ``one_neutral`` and another for lemma ``mul_assoc``.  If an
+axiom should instead remain an axiom, it should be explicitly
+indicated in the substitution (using ``axiom mul_assoc`` for
+instance). Why3 cannot figure out by itself whether an axiom should be
+turned into a lemma, so it goes for the safe path (all axioms are to
+be proved) by default.
+
+Lemmas that were proved in the module being cloned (such as
+``exp_add`` and ``exp_mul`` here) are not reproved. They are part
+of the resulting namespace, the substitution being applied to
+their statements.
+Similarly, functions that were defined in the module being cloned
+(such as ``exp`` and ``fast_exp`` here) are not reproved and are part
+of the resulting module, the substitution being applied to their
+argument types, return type, and definition. For instance, we get a
+fresh function ``fast_exp`` of type ``int->int->int``.
+
+We can make plenty other instances of our module ``Exp``.
+For instance, we get
+`Russian multiplication
+<https://en.wikipedia.org/wiki/Ancient_Egyptian_multiplication>`_ for free
+instantiating ``Exp`` with zero and addition instead.
+
+.. code-block:: whyml
+
+    module Multiplication
+      use int.Int
+      clone Exp with type t = int, val one = zero, val mul = (+)
+      goal G: exp 2 3 = 6
+    end
+
+.. index:: standard library
+
 The Why3 Standard Library
 -------------------------
 
@@ -778,19 +1305,19 @@ in logic and/or programs. It can be browsed on-line at
 http://why3.lri.fr/stdlib/. Each file contains one or several modules.
 To ``use`` or ``clone`` a module ``M`` from file ``file``, use the
 syntax ``file.M``, since ``file`` is available in Why3’s default load
-path. For instance, the module of integers and the module of references
-are imported as follows:
+path. For instance, the module of integers and the module of arrays
+indexed by integers are imported as follows:
 
-::
+.. code-block:: whyml
 
       use int.Int
-      use ref.Ref
+      use array.Array
 
 A sub-directory ``mach/`` provides various modules to model machine
 arithmetic. For instance, the module of 63-bit integers and the module
 of arrays indexed by 63-bit integers are imported as follows:
 
-::
+.. code-block:: whyml
 
       use mach.int.Int63
       use mach.array.Array63
@@ -798,3 +1325,55 @@ of arrays indexed by 63-bit integers are imported as follows:
 In particular, the types and operations from these modules are mapped to
 native OCaml’s types and operations when Why3 code is extracted to OCaml
 (see :numref:`sec.extract`).
+
+Library `int`: mathematical integers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The library `int` contains several modules whose dependencies are
+displayed on Figure :numref:`fig.lib.int`.
+
+.. %EXECUTE bin/why3pp --output=dep stdlib/int.mlw | tred > doc/stdlib-dot/library-int.dot
+
+.. graphviz:: stdlib-dot/library-int.dot
+   :caption: Module dependencies in library `int`
+   :name: fig.lib.int
+
+The main module is `Int` which provides basic operations like addition
+and multiplication, and comparisons.
+
+The division of modulo operations are defined in other modules. They
+indeed come into two flavours: the module `EuclideanDivision` proposes
+a version where the result of the modulo is always non-negative,
+whereas the module `ComputerDivision` provides a version which matches
+the standard definition available in programming languages like C,
+Java or OCaml. Note that these modules do not provide any divsion or
+modulo operations to be used in programs. For those, you must use the
+module `mach.int.Int` instead, which provides these operations,
+including proper pre-conditions, and with the usual infix syntax `x /
+y` and `x % y`.
+
+The detailed documentation of the library is available on-line at
+http://why3.lri.fr/stdlib/int.html
+
+
+Library `array`: array data structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The library `array` contains several modules whose dependencies are
+displayed on Figure :numref:`fig.lib.array`.
+
+.. %EXECUTE bin/why3pp --output=dep stdlib/array.mlw | tred > doc/stdlib-dot/library-array.dot
+
+.. graphviz:: stdlib-dot/library-array.dot
+   :caption: Module dependencies in library `array`
+   :name: fig.lib.array
+
+The main module is `Array`, providing the operations for accessing and
+updating an array element, with respective syntax `a[i]` and `a[i] <-
+e`, and proper pre-conditions for the indexes. The length of an array
+is denoted as `a.length`. A fresh array can be created using `make l
+v` where `l` is the desired length and `v` is the initial values of
+all cells.
+
+The detailed documentation of the library is available on-line at
+http://why3.lri.fr/stdlib/array.html

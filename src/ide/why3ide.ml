@@ -2736,8 +2736,9 @@ let treat_notification n =
              selected at once when a prover successfully end. To continue the
              proof, it is better to only have the new goal selected *)
           goals_view#selection#unselect_all ();
-          let iter = (get_node_row next_unproved_id)#iter in
-          select_iter iter
+          let row = get_node_row next_unproved_id in
+          goals_view#expand_to_path row#path;
+          select_iter row#iter
         end
   | New_node (id, parent_id, typ, name, detached) ->
      begin
