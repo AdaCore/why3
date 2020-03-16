@@ -947,7 +947,7 @@ let task_checksum ?(version=current_shape_version) t =
     | 1 | 2 | 3 -> CV1
     | 4 | 5 -> CV2
     | 6 -> CV3
-    | _ -> assert false
+    | _ -> assert false (* FIXME !!! *)
   in
 (*
   let tim = Unix.gettimeofday () in

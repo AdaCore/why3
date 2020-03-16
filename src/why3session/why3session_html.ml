@@ -64,7 +64,7 @@ let spec =
 open Session_itp
 
 let run_file print_session fname =
-  let ses,_ = read_session fname in
+  let ses = read_session fname in
   let project_dir = get_dir ses in
   let output_dir =
     if !output_dir = "" then project_dir else !output_dir

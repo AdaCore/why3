@@ -244,7 +244,7 @@ let print_session fmt c =
     reloaded.
  *)
 
-let reload_files ?(hard_reload=false) (c : controller) ~shape_version  =
+let reload_files ?(hard_reload=false) (c : controller) =
   let old_ses = c.controller_session in
   if hard_reload then begin
     c.controller_env <- Env.create_env (Env.get_loadpath c.controller_env);
@@ -255,12 +255,12 @@ let reload_files ?(hard_reload=false) (c : controller) ~shape_version  =
   (* FIXME: here we should compare [shape_version] with the version of shapes just loaded.
      OR: even better, this function has no reason to have a [shape_version] parameter
      and should always take the version from the file just loaded. *)
-  merge_files ~shape_version c.controller_env c.controller_session old_ses
+  merge_files c.controller_env c.controller_session old_ses
 
 exception Errors_list of exn list
 
-let reload_files ?(hard_reload=false) (c: controller) ~shape_version =
-  let errors, b1, b2 = reload_files c ~shape_version ~hard_reload in
+let reload_files ?(hard_reload=false) (c: controller) =
+  let errors, b1, b2 = reload_files c ~hard_reload in
   match errors with
   | [] -> b1, b2
   | _ -> raise (Errors_list errors)

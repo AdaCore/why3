@@ -78,7 +78,7 @@ let read_session fname =
   S.load_session project_dir
 
 let read_update_session ~allow_obsolete env config fname =
-  let session,shape_version = read_session fname in
+  let session = read_session fname in
 (*
   let ctxt = S.mk_update_context
     ~allow_obsolete_goals:allow_obsolete
@@ -90,7 +90,7 @@ let read_update_session ~allow_obsolete env config fname =
   let cont = Controller_itp.create_controller config env session in
   let found_obs, some_merge_miss =
     try
-      Controller_itp.reload_files cont ~shape_version
+      Controller_itp.reload_files cont
     with
     | Controller_itp.Errors_list l ->
         List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;

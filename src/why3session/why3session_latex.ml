@@ -448,7 +448,7 @@ let print_latex_statistics n table dir session =
 let table () = if !opt_longtable then "longtable" else "tabular"
 
 let run_one fname =
-  let ses,_ = read_session fname in
+  let ses = read_session fname in
   let project_dir = get_dir ses in
   let dir = if !opt_output_dir = "" then project_dir else
       !opt_output_dir
