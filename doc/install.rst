@@ -267,3 +267,107 @@ Outside the GUI, the prover upgrades are handled as follows. The
 stored in the configuration. The :why3:tool:`session` command performs move or
 copy operations on proof attempts in a fine-grained way, using filters,
 as detailed in :numref:`sec.why3session`.
+
+.. _sec.installinferloop:
+
+Inference of Loop Invariants
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This section shows how to install and use *infer-loop*, an utility
+based on *abstract interpretation* to infer loop invariants
+:cite:`baudin17`. This is still work in progress and many features are
+still very limited.
+
+Availability
+------------
+
+The ``infer-loop`` utility has the following OCaml dependencies.
+
+-  ``apron``: can be installed using ``opam``.
+
+-  ``camllib``: can be installed using ``opam``.
+
+-  ``fixpoint``: follow instructions below.
+
+The ``fixpoint`` library is not available in ``opam`` but it can be
+easily installed by downloading its sources and compiling them. The
+following commands are just an example of how the library can be
+installed and can be performed in any directory.
+
+::
+
+    svn co svn://scm.gforge.inria.fr/svnroot/bjeannet/pkg/fixpoint
+    cd fixpoint/trunk/
+    cp Makefile.config.model Makefile.config
+    # if required make modifications to Makefile.config
+    make all     # compiles
+    make install # uses ocamlfind to install the library
+
+By default *infer-loop* is not compiled and integrated with Why3. So,
+once the dependencies above are installed, the configuration script of
+Why3 should enable the compilation of the ``infer-loop`` utility, as
+follows:
+
+::
+
+    ./configure --enable-infer
+    # ...
+    Components
+        Invariant inference(exp): yes
+    # ...
+
+Running Why3 with infer-loop
+----------------------------
+
+Why3 can now be executed with support for inferring loop
+invariants. This can be done by passing the *debug* flag
+``infer-loop`` to Why3 or by annotating *let* declarations with
+the ``[@infer]`` attribute.
+
+As an example consider the following invocation of Why3.
+
+::
+
+   why3 ide tests/infer/incr.mlw --debug infer-loop
+
+In this case, Why3 will infer invariants for all the loops inside all
+the let declarations. Note that, the *Polyhedra* default domain will
+be used together with the default widening value of *3*. Why3 GUI will
+not display the inferred invariants in the source code, but the VCs
+corresponding to those invariants will be displayed and labeled with
+the ``infer-loop`` keyword as shown in :numref:`fig.gui.infer`.
+
+.. _fig.gui.infer:
+
+.. figure:: images/gui-infer.png
+   :alt: The GUI with inferred invariants (after split).
+
+Alternatively, attributes can be used in let declarations so that
+invariants are inferred for all the loops in that declaration. In this
+case, it is possible to select the desired domain and widening
+value. In the example below, invariants will be inferred using the
+*Polyhedra* domain and a widening value of *4*. These two arguments of
+the attribute can swapped, for instance, ``[@infer:Polyhedra:4]`` will
+produce exactly the same invariants.
+
+.. code-block:: whyml
+
+  module Incr
+
+    use int.Int
+    use int.MinMax
+    use ref.Ref
+    use ref.Refint
+
+    let incr[@infer:4:Polyhedra](x:int) : int
+      ensures { result = max x 0 }
+    = let i = ref 0 in
+      while !i < x do
+        variant { x - !i }
+        incr i;
+      done;
+      !i
+  end
+
+For information about how to use the API to infer loop invariants refer
+to :numref:`sec.infer-loop-api`.

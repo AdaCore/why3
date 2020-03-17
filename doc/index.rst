@@ -37,7 +37,6 @@ project (ANR-15-CE25-0001), and the `VOCaL`_ ANR project
    manpages
    syntaxref
    exec
-   infer
    itp
    technical
    changes

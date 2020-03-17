@@ -1,0 +1,16 @@
+module Incr
+
+	use int.Int
+	use int.MinMax
+	use ref.Ref
+	use ref.Refint
+
+	let incr(x:int) : int
+	  ensures { result = max x 0 }
+	= let i = ref 0 in
+	  while !i < x do
+	    variant { x - !i }
+	    incr i;
+	  done;
+	  !i
+end
