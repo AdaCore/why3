@@ -159,10 +159,15 @@ val fold_all_session: session -> ('a -> any -> 'a) -> 'a -> 'a
 (** {2 session operations} *)
 
 
-val empty_session : ?from:session -> string -> session
+val empty_session :
+  ?sum_shape_version:Termcode.sum_shape_version -> ?from:session ->
+  string -> session
 (** create an empty_session in the directory specified by the
-   argument. If [from] is present, the provers and global shapes are
-   taken from it. *)
+   argument. If [sum_shape_version] is present it will record it for
+   the generated session, otherwise the current version is taken from
+   module [Termcode].  If [from] is present, the provers, sum-shape
+   version and global shapes are taken from it.  It is forbidden to
+   pass both [sum_shape_version] and [from] arguments.  *)
 
 val add_file_section :
   session -> string -> file_is_detached:bool -> Theory.theory list->
