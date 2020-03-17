@@ -665,7 +665,7 @@ let show_about_window ~parent () =
                 "Piotr Trojanek";
                 "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2019 Inria, CNRS, Paris-Sud University"
+      ~copyright:"Copyright 2010-2020 Inria, CNRS, Paris-Sud University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
       ~website:"http://why3.lri.fr/"
       ~website_label:"http://why3.lri.fr/"

@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 1.3.0, March 17, 2020
+-----------------------------
+
 Standard library
   * `pqueue.Pqueue` is now modeled using sequences instead of lists :x:
   * `queue.Queue` is now modeled using sequences instead of lists :x:

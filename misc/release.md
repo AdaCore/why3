@@ -7,6 +7,7 @@
     (see below: copy the dtd on the web)
   - `make trywhy3`
   - run `make detect-unused` and remove unused files
+  - run `make update-doc-png` and check if some pictures need to be updated
 
 * change version number `VERSION=1.3 RELEASE=1.3.0`
   - update the first line of `configure.in` using `$RELEASE`
@@ -16,10 +17,10 @@
 
 * check/update authors and copyright
   - update the content of the About dialog in `src/ide/gconfig.ml`
-    around lines 600-650
+    around lines 630-670
   - update the `copyright` field in `doc/conf.py` around line 50
   - update `doc/foreword.rst`
-  - check headers, run `make headers` if needed
+  - check headers, modify `misc/header.txt` and run `make headers` if needed
 
 * generate documentation
   - `make doc`
