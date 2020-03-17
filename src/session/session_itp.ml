@@ -1298,32 +1298,32 @@ let shape = Buffer.create 97
 let read_sum_and_shape ch =
   let sum = Bytes.create 32 in
   let nsum = C.input ch sum 0 32 in
-  if nsum = 0 then raise End_of_file;
-  if nsum <> 32 then
-    begin
-      try
-        C.really_input ch sum nsum (32-nsum)
-      with End_of_file ->
-        raise
-          (ShapesFileError
-             ("shapes files corrupted (checksum '" ^
-                 (Bytes.sub_string sum 0 nsum) ^
-                 "' too short), ignored"))
-    end;
-  if try C.input_char ch <> ' ' with End_of_file -> true then
-      raise (ShapesFileError "shapes files corrupted (space missing), ignored");
-    Buffer.clear shape;
+  begin
     try
-      while true do
-        let c = C.input_char ch in
-        if c = '\n' then raise Exit;
-        Buffer.add_char shape c
-      done;
-      assert false
-    with
-      | End_of_file ->
-        raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
-      | Exit -> Bytes.unsafe_to_string sum, Buffer.contents shape
+      if nsum = 0 then raise End_of_file;
+      if nsum <> 32 then
+        C.really_input ch sum nsum (32-nsum)
+    with End_of_file ->
+      raise
+        (ShapesFileError
+           ("shapes files corrupted (checksum '" ^
+              (Bytes.sub_string sum 0 nsum) ^
+                "' too short), ignored"))
+  end;
+  if try C.input_char ch <> ' ' with End_of_file -> true then
+    raise (ShapesFileError "shapes files corrupted (space missing), ignored");
+  Buffer.clear shape;
+  try
+    while true do
+      let c = C.input_char ch in
+      if c = '\n' then raise Exit;
+      Buffer.add_char shape c
+    done;
+    assert false
+  with
+  | End_of_file ->
+     raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
+  | Exit -> Bytes.unsafe_to_string sum, Buffer.contents shape
 
 (* Read the first part of the shapes: a list of shapes which are then referred
    as H1 ... Hn in the shape corresponding to tasks *)
@@ -1352,15 +1352,28 @@ let rec read_global_buffer gs ch =
     | "why3session" ->
        begin try
            let sv = List.assoc "shape_version" attrs in
-           let sv = Termcode.string_to_sum_shape_version sv in
-           sum_shape_version := Some sv;
-           if Termcode.is_bound_sum_shape_version sv then read_global_buffer gs ch;
-           attrs
-         with Not_found ->
-           Warning.emit "Session file does not indicate any shape version@.";
-           attrs
+           try
+             let sv = Termcode.string_to_sum_shape_version sv in
+             sum_shape_version := Some sv;
+             if Termcode.is_bound_sum_shape_version sv then
+               begin
+                 try
+                   read_global_buffer gs ch
+                 with ShapesFileError msg ->
+                   Warning.emit "Error while reading shape file: %s. Continuing without shapes" msg;
+                   sum_shape_version := None
+               end;
+             attrs
+           with
+           | Termcode.InvalidShape ->
+              Warning.emit "Session file indicates an invalid shape version `%s`" sv;
+              attrs
+         with
+         | Not_found ->
+            Warning.emit "Session file does not indicate any shape version";
+            attrs
        end
-    | "goal" ->
+    | "goal" when !sum_shape_version <> None ->
        begin
          try
            let sum,shape = read_sum_and_shape ch in
@@ -1428,7 +1441,7 @@ let build_session ?sum_shape_version (s : session) xml : unit =
   | "why3session" ->
      let sv = try
          Some (Termcode.string_to_sum_shape_version (List.assoc "shape_version" xml.Xml.attributes))
-       with Not_found -> None
+       with Not_found | Termcode.InvalidShape -> None
      in
      Debug.dprintf debug "[Info] build_session: ~sum_shape_version is %a@\n"
        (Pp.print_option Termcode.pp_sum_shape_version) sum_shape_version;

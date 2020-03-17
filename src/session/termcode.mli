@@ -46,7 +46,10 @@ type shape_v =
 
 type sum_shape_version
 
+exception InvalidShape
+
 val string_to_sum_shape_version : string -> sum_shape_version
+(** raise [InvalidShape] if argument is not denoting a valid shape version *)
 
 val pp_sum_shape_version : Format.formatter -> sum_shape_version -> unit
 

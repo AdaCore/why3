@@ -224,12 +224,12 @@ type sum_shape_version = SV1 | SV2 | SV3 | SV4 | SV5 | SV6
 
 let current_sum_shape_version = SV6
 
-exception NoShape
+exception InvalidShape
 
 let string_to_sum_shape_version n =
   match n with
   | "1" -> SV1 | "2" -> SV2 | "3" -> SV3 | "4" -> SV4 | "5" -> SV5 | "6" -> SV6
-  | _ -> raise NoShape
+  | _ -> raise InvalidShape
 
 let string_of_sum_shape_version n =
   match n with
@@ -633,7 +633,7 @@ let t_shape_task ~version ~expl t =
     let s =
       match version with
       | SV1 | SV2 | SV3 | SV4 | SV5 -> Shape.t_shape_task ~version ~expl t
-      | SV6 -> raise NoShape
+      | SV6 -> raise InvalidShape
     in
     (*
       let tim = Unix.gettimeofday () -. tim in
@@ -641,7 +641,7 @@ let t_shape_task ~version ~expl t =
       Format.eprintf "[Shape times] %f/%f@." tim !time;
      *)
     s
-  with NoShape -> empty_shape
+  with InvalidShape -> empty_shape
 
 
 (* Checksums *)
