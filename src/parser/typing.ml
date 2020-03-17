@@ -1506,8 +1506,10 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
             Loc.errorm ~loc:(qloc q) "program constant expected"
         | RS _, PV _ ->
             Loc.errorm ~loc:(qloc q) "program function expected"
-        | OO _, _ | _, OO _ ->
+        | _, OO _ ->
             Loc.errorm ~loc:(qloc q) "ambiguous notation"
+        | OO _, _  ->
+            assert false (* should never happen *)
         end
     | CSxsym (p,q) ->
         let xs1 = find_xsymbol_ns m.mod_export p in
