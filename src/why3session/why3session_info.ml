@@ -348,7 +348,7 @@ let print_stats ses r0 r1 stats =
 
 
 let run_one stats r0 r1 fname =
-  let ses,_ = read_session fname in
+  let ses = read_session fname in
   let sep = if !opt_print0 then Pp.print0 else Pp.newline in
   if !opt_print_provers then
     printf "%a@."

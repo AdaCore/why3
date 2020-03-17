@@ -385,12 +385,12 @@ let () =
     Whyconf.Args.exit_with_usage option_list usage_msg;
   try
     Debug.dprintf debug "Opening session '%s'...@?" dir;
-    let ses,shape_version = S.load_session dir in
+    let ses = S.load_session dir in
     let cont = Controller_itp.create_controller config env ses in
     (* update the session *)
     let found_obs, found_detached =
       try
-        Controller_itp.reload_files cont ~shape_version
+        Controller_itp.reload_files cont
       with
       | Controller_itp.Errors_list l ->
           List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;

@@ -89,7 +89,7 @@ let d2 =
     let unit = Ident.id_fresh "unit" in
     Ity.create_pvsymbol unit Ity.ity_unit
   in
-  let def,rs = Expr.let_sym id
+  let def,_rs = Expr.let_sym id
       (Expr.c_fun [arg_unit] [] [post] Ity.Mxs.empty Ity.Mpv.empty body) in
   Pdecl.create_let_decl def
 

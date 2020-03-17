@@ -220,19 +220,28 @@ type shape = string
 
 type bound_shape = int list
 
-let current_shape_version = 6
+type sum_shape_version = SV1 | SV2 | SV3 | SV4 | SV5 | SV6
 
-type shape_version = SV1 | SV2 | SV3 | SV4 | SV5
+let current_sum_shape_version = SV6
 
-let int_to_shape_version n =
+exception InvalidShape
+
+let string_to_sum_shape_version n =
   match n with
-  | 1 -> SV1 | 2 -> SV2 | 3 | 4 -> SV3 | 5 -> SV4 | 6 -> SV5
-  | _ -> assert false
+  | "1" -> SV1 | "2" -> SV2 | "3" -> SV3 | "4" -> SV4 | "5" -> SV5 | "6" -> SV6
+  | _ -> raise InvalidShape
 
-let is_bound_shape_version v =
-  match int_to_shape_version v with
-  | SV1 | SV2 | SV3 | SV4 -> false
-  | SV5 -> true
+let string_of_sum_shape_version n =
+  match n with
+  | SV1 -> "1" | SV2 -> "2" | SV3 -> "3" | SV4 -> "4" | SV5 -> "5" | SV6 -> "6"
+
+let pp_sum_shape_version fmt v =
+  Format.pp_print_string fmt (string_of_sum_shape_version v)
+
+let is_bound_sum_shape_version v =
+    match v with
+    | SV1 | SV2 | SV3 | SV4 | SV5 -> false
+    | SV6 -> true
 
 type shape_v =
   | Old_shape of shape
@@ -247,7 +256,7 @@ let string_of_shape sv =
 let shape_of_string =
   let cache = ref [] in
   fun ~version s ->
-  if is_bound_shape_version version then
+  if is_bound_sum_shape_version version then
     let s = Strings.rev_split 'H' s in
     (* most consecutive shapes have very long common suffixes,
        so we look for some sharing with the previously computed shape
@@ -377,16 +386,16 @@ let ident_shape id = id_string_shape id.Ident.id_string
 let const_shape v c =
   let fmt = Format.formatter_of_buffer shape_buffer in
   begin match v with
-  | SV1 | SV2 | SV3 | SV4 -> Common.const_v1 fmt c
-  | SV5 -> Common.const_v2 fmt c
+  | SV1 | SV2 | SV3 | SV4 | SV5 -> Common.const_v1 fmt c
+  | SV6 -> Common.const_v2 fmt c
   end;
   Format.pp_print_flush fmt ();
   check ()
 
 let ident_shape v pr m id =
   match v with
-  | SV1 | SV2 | SV3 | SV4 -> ident_v4 m id
-  | SV5 -> ident_v5 pr m id
+  | SV1 | SV2 | SV3 | SV4 | SV5 -> ident_v4 m id
+  | SV6 -> ident_v5 pr m id
 
 let rec pat_shape ~version pr c m p : 'a =
   match p.pat_node with
@@ -412,7 +421,7 @@ let rec t_shape ~version pr c m t =
     | Tif (f,t1,t2) ->
       begin match version with
       | SV1 | SV2 -> pushc tag_if; fn f; fn t1; fn t2
-      | SV3 | SV4 | SV5 -> pushc tag_if; fn t2; fn t1; fn f
+      | SV3 | SV4 | SV5 | SV6 -> pushc tag_if; fn t2; fn t1; fn f
       end
     | Tcase (t1,bl) ->
         let br_shape b =
@@ -422,7 +431,7 @@ let rec t_shape ~version pr c m t =
             pat_shape ~version pr c m p;
             pat_rename_alpha c m p;
             fn t2
-          | SV3 | SV4 | SV5 ->
+          | SV3 | SV4 | SV5 | SV6 ->
             pat_rename_alpha c m p;
             fn t2;
             pat_shape ~version pr c m p
@@ -432,7 +441,7 @@ let rec t_shape ~version pr c m t =
                  pushc tag_case;
                  fn t1;
                  List.iter br_shape bl
-        | SV3 | SV4 | SV5 ->
+        | SV3 | SV4 | SV5 | SV6->
            pushc tag_case;
            List.iter br_shape bl;
            fn t1
@@ -469,14 +478,14 @@ let rec t_shape ~version pr c m t =
           match version with
             | SV1 ->
                 pushc tag_let; fn t1; fn t2
-            | SV2 | SV3 | SV4 | SV5 ->
+            | SV2 | SV3 | SV4 | SV5 | SV6 ->
                 (* t2 first, intentionally *)
                 fn t2; pushc tag_let; fn t1
         end
     | Tnot f ->
       begin match version with
       | SV1 | SV2 -> fn f; pushc tag_not
-      | SV3 | SV4 | SV5 -> pushc tag_not; fn f
+      | SV3 | SV4 | SV5 | SV6 -> pushc tag_not; fn f
       end
     | Ttrue -> pushc tag_true
     | Tfalse -> pushc tag_false
@@ -492,13 +501,13 @@ let t_shape_task ~version ~expl t =
       (* expl *)
       begin match version with
       | SV1 | SV2 -> ()
-      | SV3 | SV4 | SV5 -> push expl end;
+      | SV3 | SV4 | SV5 | SV6 -> push expl end;
       (* goal shape *)
       t_shape ~version pr c m f;
       (* All declarations shape *)
       begin match version with
-      | SV1 | SV2 | SV3 -> ()
-      | SV4 | SV5 ->
+      | SV1 | SV2 | SV3 | SV4 -> ()
+      | SV5 | SV6 ->
          let open Decl in
          let do_td td = match td.Theory.td_node with
            | Theory.Decl d ->
@@ -603,7 +612,7 @@ module Gshape = struct
     !current_shape
 
   let t_bound_shape_task gs ~version ~expl t =
-    if is_bound_shape_version version then
+    if is_bound_sum_shape_version version then
       t_shape_task_v5 gs ~expl t
     else
       assert false
@@ -617,21 +626,23 @@ let time = ref 0.0
  *)
 
 let t_shape_task ~version ~expl t =
-  let version = int_to_shape_version version in
-(*
-  let tim = Unix.gettimeofday () in
- *)
-  let s =
-    match version with
-    | SV1 | SV2 | SV3 | SV4 -> Shape.t_shape_task ~version ~expl t
-    | SV5 -> assert false
-  in
-(*
-  let tim = Unix.gettimeofday () -. tim in
-  time := !time +. tim;
-  Format.eprintf "[Shape times] %f/%f@." tim !time;
-*)
-  s
+  try
+    (*
+      let   tim = Unix.gettimeofday () in
+     *)
+    let s =
+      match version with
+      | SV1 | SV2 | SV3 | SV4 | SV5 -> Shape.t_shape_task ~version ~expl t
+      | SV6 -> raise InvalidShape
+    in
+    (*
+      let tim = Unix.gettimeofday () -. tim in
+      time := !time +. tim;
+      Format.eprintf "[Shape times] %f/%f@." tim !time;
+     *)
+    s
+  with InvalidShape -> empty_shape
+
 
 (* Checksums *)
 
@@ -645,8 +656,6 @@ let dumb_checksum = ""
 let buffer_checksum b =
   let s = Buffer.contents b in
   Digest.to_hex (Digest.string s)
-
-type checksum_version = CV1 | CV2 | CV3
 
 module Checksum = struct
 
@@ -674,14 +683,14 @@ module Checksum = struct
     int b i
 
   let ident (v,_,_,_ as b) id = match v with
-    | CV1 -> ident_v1 b id
-    | CV2 | CV3 -> ident_v2 b id
+    | SV1 | SV2 | SV3 -> ident_v1 b id
+    | SV4 | SV5 | SV6 -> ident_v2 b id
 
   let const (v,_,_,buf) c =
     let fmt = Format.formatter_of_buffer buf in
     begin match v with
-    | CV1 | CV2 -> Common.const_v1 fmt c
-    | CV3 -> Common.const_v2 fmt c
+    | SV1 | SV2 | SV3 | SV4 | SV5 -> Common.const_v1 fmt c
+    | SV6 -> Common.const_v2 fmt c
     end;
     Format.pp_print_flush fmt ()
 
@@ -692,8 +701,8 @@ module Checksum = struct
     | Ty.Tyapp (ts, tyl) -> char b 'a'; ident b ts.Ty.ts_name; list ty b tyl
 
   let vsymbol (v,_,_,_ as b) vs = match v with
-    | CV1 -> ty b vs.vs_ty
-    | CV2 | CV3 -> ident b vs.vs_name; ty b vs.vs_ty
+    | SV1 | SV2 | SV3 -> ty b vs.vs_ty
+    | SV4 | SV5 | SV6 -> ident b vs.vs_name; ty b vs.vs_ty
 
   (* start: _ V ident a o *)
   let rec pat b p = match p.pat_node with
@@ -861,7 +870,7 @@ module Checksum = struct
     let m = ref Ident.Mid.empty in
     let b = Buffer.create 8192 in
     fun t ->
-      Task.task_iter (tdecl (CV1,c,m,b)) t;
+      Task.task_iter (tdecl (SV1,c,m,b)) t;
       clear_ident_v1 ();
       let dnew = Digest.string (Buffer.contents b) in
       Buffer.clear b;
@@ -874,7 +883,7 @@ module Checksum = struct
     let task_hd t (cold,mold,dold) =
       c := cold;
       m := mold;
-      tdecl (CV2,c,m,b) t.Task.task_decl;
+      tdecl (SV4,c,m,b) t.Task.task_decl;
       Buffer.add_string b (Digest.to_hex dold);
       let dnew = Digest.string (Buffer.contents b) in
       Buffer.clear b;
@@ -906,7 +915,7 @@ module Checksum = struct
       c := cold;
       let mo = DMid.get mold in
       m := mo;
-      tdecl (CV3,c,m,b) t.Task.task_decl;
+      tdecl (SV6,c,m,b) t.Task.task_decl;
       Buffer.add_string b (Digest.to_hex dold);
       let dnew = Digest.string (Buffer.contents b) in
       Buffer.clear b;
@@ -925,9 +934,9 @@ module Checksum = struct
       Digest.to_hex dnew
 
   let task ~version t = match version with
-    | CV1 -> task_v1 t
-    | CV2 -> task_v2 t
-    | CV3 -> task_v3 t
+    | SV1 | SV2 | SV3 -> task_v1 t
+    | SV4 | SV5  -> task_v2 t
+    | SV6 -> task_v3 t
 
 end
 
@@ -935,14 +944,16 @@ end
 let time = ref 0.0
  *)
 
-let task_checksum ?(version=current_shape_version) t =
+let task_checksum ?(version=current_sum_shape_version) t =
+(*
   let version = match version with
-    | 1 | 2 | 3 -> CV1
+    | SV1 | SV2 | SV3 -> CV1
     | 4 | 5 -> CV2
     | 6 -> CV3
-    | _ -> assert false
+    | _ -> assert false (* FIXME !!! *)
   in
-(*
+ *)
+  (*
   let tim = Unix.gettimeofday () in
 *)
   let s = Checksum.task ~version t in

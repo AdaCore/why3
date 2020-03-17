@@ -42,7 +42,7 @@ let run_update () =
   if should_exit1 then exit 1;
   iter_files
     (fun fname ->
-     let session, _ = read_session fname in
+     let session = read_session fname in
      List.iter (do_action ~env ~session) !actions;
      Session_itp.save_session session)
 
