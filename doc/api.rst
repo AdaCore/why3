@@ -749,7 +749,7 @@ Infering loop invariants
 
 This section describes how to use the Why3 API to infer loop
 invaiants. For more information about the inference of loop invariants
-refer to :numref:`chap.inferloop`. The example from this section
+refer to :numref:`sec.installinferloop`. The example from this section
 can be found in the Why3 source code ``examples/use_api/infer.ml``.
 
 Let us start by defining a environment required to parse and type
