@@ -35,7 +35,7 @@ why3:
 	make -C ../..
 
 MLWFILES = \
-  mpz_get_str mpz_div2exp mpz_mul2exp mpz_div mpz_mul mpz_sub mpz_add mpz_getset mpz_abs mpz_cmp mpz_cmpabs mpz \
+  mpz_get_str mpz_set_str mpz_div2exp mpz_mul2exp mpz_div mpz_mul mpz_sub mpz_add mpz_getset mpz_abs mpz_cmp mpz_cmpabs mpz \
   set_str get_str base_info powm sqrtrem sqrt toom logical div mul sub add compare util
 
 build/extracted: $(addsuffix .mlw, $(MLWFILES))
@@ -58,7 +58,7 @@ EXTRACTED = build/extracted build/sqrtinit.h build/binverttab.h
 extract: $(EXTRACTED)
 
 CFILES = \
-  zutil.c z.c zcmp.c zcmpabs.c zabs.c zadd.c zsub.c zmul.c zdiv.c zmul2exp.c zdiv2exp.c zget_str.c \
+  zutil.c z.c zcmp.c zcmpabs.c zabs.c zadd.c zsub.c zmul.c zdiv.c zmul2exp.c zdiv2exp.c zget_str.c zset_str.c \
   set.c get_str.c set_str.c baseinfo.c powm.c fxp.c sqrt.c sqrt1.c toom.c div.c \
   logical.c logicalold.c logicalutil.c mul_basecase.c sub.c sub_1.c add.c add_1.c \
   compare.c util.c utilold.c int32.c

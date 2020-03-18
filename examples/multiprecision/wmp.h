@@ -39,6 +39,11 @@ void wmpz_set_ui (wmpz_ptr, uint64_t);
 void wmpz_set_si (wmpz_ptr, int64_t);
 uint64_t wmpz_get_ui (wmpz_srcptr);
 
+/* Whitespace, leading base prefix and base detection not supported.
+   base must be between -36 and 62, and |base| must be >= 2. */
+int32_t wmpz_set_str (wmpz_ptr, const char * sp, int32_t base);
+char * wmpz_get_str (char *, int32_t, wmpz_srcptr);
+
 int32_t wmpz_cmp (wmpz_srcptr, wmpz_ptr);
 int32_t wmpz_cmp_ui (wmpz_srcptr, uint64_t);
 int32_t wmpz_cmp_si (wmpz_srcptr, int64_t);

@@ -12,6 +12,7 @@ prelude "#include <stdint.h>"
 prelude "#include <stdio.h>"
 prelude "#include <assert.h>"
 prelude "#include <alloca.h>"
+prelude "#include <string.h>"
 
 module ref.Ref
   syntax val (!_) "%d1"           prec 2 2
@@ -558,7 +559,11 @@ module mach.c.UChar
   syntax val to_uint64 "(uint64_t)%1" prec 2 2
   syntax val of_int32  "(unsigned char)%1" prec 2 2
   syntax val to_int32  "(int32_t)%1" prec 2 2
-  syntax val (=) "%1 == %2"  prec 7 7 6
+  syntax val (=)  "%1 == %2"  prec 7 7 6
+  syntax val (<=) "%1 <= %2"  prec 6 6 5
+  syntax val (<)  "%1 < %2"   prec 6 6 5
+  syntax val (>=) "%1 >= %2"  prec 6 6 5
+  syntax val (>)  "%1 > %2"   prec 6 6 5
 
   syntax val of_char "(unsigned char)%1" prec 2 2
   syntax val to_char "(char)%1" prec 2 2
@@ -572,6 +577,10 @@ module mach.c.SChar
 
   syntax literal schar "%c"
   syntax type schar "signed char"
+  syntax val (<=) "%1 <= %2"  prec 6 6 5
+  syntax val (<)  "%1 < %2"   prec 6 6 5
+  syntax val (>=) "%1 >= %2"  prec 6 6 5
+  syntax val (>)  "%1 > %2"   prec 6 6 5
 
 end
 
@@ -582,6 +591,8 @@ module string.Char
 end
 
 module mach.c.String
+
+  prelude "#include<string.h>"
 
   syntax type string "char *"
 
