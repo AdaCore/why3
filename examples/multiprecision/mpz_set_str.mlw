@@ -88,14 +88,14 @@ let wmpz_set_str (r: mpz_ptr) (sp: ptr char) (base: int32) : int32
           ensures { 0 <= digit }
     if 36 < base
     then begin
-      if code zero_num <= code c <= code nine_num
+      if code zero_num <= code c && code c <= code nine_num
       then digit <- UChar.of_int32 (code c - code zero_num)
-      else if code small_a <= code c <= code small_z
+      else if code small_a <= code c && code c <= code small_z
       then begin
         let ghost d = code c - code small_a + 36 in
         assert { d = text_to_num base c };
         digit <- UChar.of_int32 (code c - code small_a + 36)
-      end else if code big_a <= code c <= code big_z
+      end else if code big_a <= code c && code c <= code big_z
       then digit <- UChar.of_int32 (code c - code big_a + 10)
       else begin
         assert { text_to_num base c = -1 };
@@ -103,16 +103,16 @@ let wmpz_set_str (r: mpz_ptr) (sp: ptr char) (base: int32) : int32
       end
     end
     else begin
-      if code zero_num <= code c <= code nine_num
+      if code zero_num <= code c && code c <= code nine_num
       then digit <- UChar.of_int32 (code c - code zero_num)
-      else if code small_a <= code c <= code small_z
+      else if code small_a <= code c && code c <= code small_z
       then begin
         let ghost d = code c - code small_a + 10 in
         assert { d = text_to_num base c };
         digit <- UChar.of_int32 (code c - code small_a + 10)
-      end else if code big_a <= code c <= code big_z
+      end else if code big_a <= code c && code c <= code big_z
       then begin
-        let d = code c - code big_a + 10 in
+        let ghost d = code c - code big_a + 10 in
         assert { d = text_to_num base c };
         digit <- UChar.of_int32 (code c - code big_a + 10)
       end else begin
