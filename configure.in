@@ -486,7 +486,7 @@ if test "$enable_infer" = yes; then
          echo "ocamlfind found apron, apron.polkaMPQ, apron.polkaGrid, apron.ppl, apron.boxMPQ, apron.octMPQ, camllib and fixpoint in $INFERINCLUDE"
          # camllib is a dependency of fixpoint, so it should not be
          # nedded to check for it
-         INFERINCLUDE=$($OCAMLFIND query -i-format apron apron.polkaMPQ apron.boxMPQ apron.octMPQ fixpoint camllib gmp | tr '\n\r' ' ')
+         INFERINCLUDE="$($OCAMLFIND query -separator ' ' -i-format apron apron.polkaMPQ apron.boxMPQ apron.octMPQ fixpoint camllib gmp)"
          INFERLIB="apron apron.polkaMPQ fixpoint apron.boxMPQ apron.octMPQ"
       else
          enable_infer=no
