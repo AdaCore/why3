@@ -1,0 +1,256 @@
+module Zset_str
+
+use int.Int
+use int.EuclideanDivision
+use int.Power
+use mach.int.Int32
+use mach.int.UInt32
+use mach.int.Int32GMP
+use ref.Ref
+use mach.c.C
+use mach.c.UChar
+use lemmas.Lemmas
+use import mach.int.UInt64GMP as Limb
+use types.Types
+use int.Abs
+use util.Util
+use mpz.Z
+use mpz.Zutil
+use string.Char
+use mach.c.String
+use mach.c.StrlenLemmas
+use array.Array
+use map.Map
+use base_info.BaseInfo
+use stringlemmas.String_lemmas
+use stringlemmas.Conversions
+use stringlemmas.String_value
+use set_str.Set_str
+
+(* TODO handle spaces (leading and between digits)
+        accept base 0 and deduce base from string prefix *)
+
+let wmpz_set_str (r: mpz_ptr) (sp: ptr char) (base: int32) : int32
+  requires { valid_string sp }
+  requires { strlen (pelts sp) (offset sp) * 8 + 63 <= max_int32 }
+  requires { mpz.readers[r] = 0 }
+  requires { mpz.alloc[r] >= 1 }
+  requires { 2 <= base <= 62 }
+  ensures  { forall x. x <> r -> mpz_unchanged x mpz (old mpz) }
+  ensures  { mpz.readers[r] = 0 }
+  ensures  { result = 0 ->
+             value_of r mpz = value_text base (pelts sp) (offset sp) }
+  ensures  { -1 <= result <= 0 }
+  ensures  { result = 0 <-> string_in_base base (pelts sp) (offset sp) }
+=
+  let sign = if C.get sp = minus_char then 1 else 0 in
+  let ghost slen = strlen sp in
+  assert { slen >= 0 };
+  assert { sign = 1 -> slen >= 1
+           by (pelts sp)[offset sp] <> zero_char };
+  assert { valid sp (slen + 1) };
+  let ref spi = C.incr sp sign in
+  if C.get spi = zero_char
+  then begin
+    assert { slen = int32'int sign };
+    assert { not string_in_base base (pelts sp) (offset sp) };
+    set_size_0 r;
+    return -1
+  end;
+  let dp : ptr uchar = salloc (strlen sp) in
+  let ref digit : uchar = 0 in
+  let ref dn = 0 in
+  assert { valid sp (strlen (pelts sp) (offset sp) + 1) };
+  label Loop in
+  while (C.get spi <> zero_char) do
+    variant { offset sp + strlen (pelts sp) (offset sp) - offset spi }
+    invariant { offset spi = offset sp + sign + dn }
+    invariant { offset sp + sign <= offset spi
+                <= offset sp + strlen (pelts sp) (offset sp) }
+    invariant { min sp <= offset spi <= max sp }
+    invariant { abs_value_sub_text base (pelts sp)
+                                   (offset sp + sign) (offset spi)
+                = svalue_sub base (pelts dp) 0 dn }
+    invariant { in_base base (pelts dp) 0 dn }
+    invariant { (pelts spi)[offset spi] <> 0 <->
+                offset spi < offset sp + strlen (pelts sp) (offset sp) }
+    invariant { min spi = min sp /\ max spi = max sp }
+    invariant { plength spi = plength sp }
+    invariant { pelts spi = pelts sp }
+    invariant { mpz = mpz at Loop }
+    invariant { text_in_base base (pelts sp) (offset sp + sign) (offset spi) }
+    assert { offset spi < offset sp + strlen (pelts sp) (offset sp) };
+    let c = C.get spi in
+    assert { c <> zero_char };
+    begin ensures { 0 <= digit < base -> digit = text_to_num base c }
+          ensures { digit >= int32'int base ->
+                    not (string_in_base base (pelts sp) (offset sp)) }
+          ensures { 0 <= digit }
+    if 36 < base
+    then begin
+      if code zero_num <= code c <= code nine_num
+      then digit <- UChar.of_int32 (code c - code zero_num)
+      else if code small_a <= code c <= code small_z
+      then begin
+        let ghost d = code c - code small_a + 36 in
+        assert { d = text_to_num base c };
+        digit <- UChar.of_int32 (code c - code small_a + 36)
+      end else if code big_a <= code c <= code big_z
+      then digit <- UChar.of_int32 (code c - code big_a + 10)
+      else begin
+        assert { text_to_num base c = -1 };
+        digit <- UChar.of_int32 base
+      end
+    end
+    else begin
+      if code zero_num <= code c <= code nine_num
+      then digit <- UChar.of_int32 (code c - code zero_num)
+      else if code small_a <= code c <= code small_z
+      then begin
+        let ghost d = code c - code small_a + 10 in
+        assert { d = text_to_num base c };
+        digit <- UChar.of_int32 (code c - code small_a + 10)
+      end else if code big_a <= code c <= code big_z
+      then begin
+        let d = code c - code big_a + 10 in
+        assert { d = text_to_num base c };
+        digit <- UChar.of_int32 (code c - code big_a + 10)
+      end else begin
+        assert { text_to_num base c = -1 };
+        digit <- UChar.of_int32 base
+      end
+    end;
+    assert { string_in_base base (pelts sp) (offset sp) -> digit < base
+             by text_in_base base (pelts sp) (offset sp + sign)
+                                  (offset sp + slen)
+             so offset sp + sign <= offset spi < offset sp + slen
+             so 0 <= text_to_num base (pelts sp)[offset spi] < base
+             so digit = text_to_num base (pelts sp)[offset spi] };
+    end;
+    if digit >= UChar.of_int32 base
+    then begin
+      (* sfree dp *)
+      set_size_0 r;
+      return -1
+    end;
+    assert { digit = text_to_num base c };
+    let ghost odp = pure { dp } in
+    C.set_ofs dp dn digit;
+    assert { in_base base (pelts dp) 0 (dn + 1) };
+    svalue_sub_frame (int32'int base) (pelts dp) (pelts odp) 0 (int32'int dn);
+    svalue_sub_head (int32'int base) (pelts dp) 0 (int32'int dn + 1);
+    dn <- dn + 1;
+    spi <- C.incr spi 1;
+  done;
+  if dn = 0
+  then begin
+    assert { strlen (pelts sp) (offset sp) = sign };
+    assert { not string_in_base base (pelts sp) (offset sp) };
+    (* sfree dp *)
+    set_size_0 r;
+    return -1;
+  end;
+  assert { strlen (pelts sp) (offset sp) = dn + sign };
+  assert { string_in_base base (pelts sp) (offset sp) };
+  assert { dn * 8 + 63 <= max_int32 };
+  let bits = wmpn_base_power_of_two_p (Limb.of_int32 base) in
+  if bits > 0
+  then begin
+    assert { dn * bits <= dn * 8 };
+    let alloc = (dn * UInt32.to_int32 bits + 63) / 64 in
+    let rp = wmpz_realloc r alloc in
+    assert { power 2 (bits * dn) <= power radix alloc
+             by power radix alloc
+                = power (power 2 64) alloc
+                = power 2 (64 * alloc)
+             so let m = mod (dn * bits + 63) 64 in
+             dn * bits + 63 = 64 * alloc + m
+             so 0 <= m < 64 };
+    let rn = wmpn_set_str_bits rp alloc dp (UInt32.of_int32 dn) bits in
+    ghost (if rn > 0 then value_tail rp (rn - 1));
+    assert { rn > 0 ->
+             value rp rn >= power radix (rn - 1)
+             by (pelts rp)[offset rp + rn - 1] > 0
+             so power radix (rn - 1) * (pelts rp)[offset rp + rn - 1]
+                >= power radix (rn - 1)
+             so value rp (rn - 1) >= 0 };
+    let rn = if sign <> 0 then -rn else rn in
+    assert { sgn_value rp rn = value_text base (pelts sp) (offset sp)
+             by value rp (abs rn) = svalue base dp dn
+                = abs_value_sub_text base (pelts sp)
+                  (offset sp + sign) (offset sp + sign + dn)
+             so if sign <> 0
+                then sgn_value rp rn = - value rp (abs rn)
+                  so (pelts sp)[offset sp] = minus_char
+                  so sign = 1
+                  so strlen (pelts sp) (offset sp + 1) = slen - 1
+                  so value_text base (pelts sp) (offset sp)
+                     = - abs_value_sub_text base (pelts sp)
+                       (offset sp + sign) (offset sp + sign + dn)
+                else sgn_value rp rn = value rp rn
+                  so value_text base (pelts sp) (offset sp)
+                     = abs_value_sub_text base (pelts sp)
+                       (offset sp + sign) (offset sp + sign + dn) };
+    set_size r rn rp;
+    release_writer r rp;
+  end
+  else begin
+    let info = wmpn_get_base_info (Limb.of_int32 base) in
+    let alloc = (dn + (UInt32.to_int32 info.exp) - 1)
+                / UInt32.to_int32 info.exp in
+    assert { power base dn <= power radix alloc
+             by let m = mod (dn + info.exp - 1) info.exp in
+             dn + info.exp - 1 = info.exp * alloc + m
+             so power base info.exp <= radix
+             so 0 <= m < info.exp
+             so dn = info.exp * (alloc - 1) + m + 1
+                   <= info.exp * alloc
+             so power base dn <= power base (info.exp * alloc)
+                = power (power base info.exp) alloc
+                <= power radix alloc };
+    assert { alloc > 0
+             by dn + info.exp - 1 >= info.exp };
+    let rp = wmpz_realloc r alloc in
+    let rn = wmpn_set_str_other rp alloc dp (UInt32.of_int32 dn)
+                                (Limb.of_int32 base) info in
+    let ghost orn = rn in
+    label Size in
+    value_tail rp (rn - 1);
+    let rn = rn - if C.get_ofs rp (rn - 1) = 0
+                  then begin assert { rn = 1 /\ svalue base dp dn = 0 };
+                       1 end
+                  else 0 in
+    assert { rn >= 0 };
+    assert { value rp rn = value rp orn };
+    ghost (if rn > 0 then value_tail rp (rn - 1));
+    assert { rn > 0 -> value rp rn >= power radix (rn - 1)
+             by rn = orn
+             so (pelts rp)[offset rp + rn - 1] > 0
+             so power radix (rn - 1) * 1
+                <= power radix (rn - 1) * (pelts rp)[offset rp + rn - 1]
+             so value rp (rn - 1) >= 0 };
+    let rn = if sign <> 0 then -rn else rn in
+    assert { sgn_value rp rn = value_text base (pelts sp) (offset sp)
+             by value rp (abs rn) = svalue base dp dn
+                = abs_value_sub_text base (pelts sp)
+                  (offset sp + sign) (offset sp + sign + dn)
+             so if sign <> 0
+                then sgn_value rp rn = - value rp (abs rn)
+                  so (pelts sp)[offset sp] = minus_char
+                  so sign = 1
+                  so strlen (pelts sp) (offset sp + 1) = slen - 1
+                  so value_text base (pelts sp) (offset sp)
+                     = - abs_value_sub_text base (pelts sp)
+                       (offset sp + sign) (offset sp + sign + dn)
+                else sgn_value rp rn = value rp rn
+                  so value_text base (pelts sp) (offset sp)
+                     = abs_value_sub_text base (pelts sp)
+                       (offset sp + sign) (offset sp + sign + dn) };
+    set_size r rn rp;
+    release_writer r rp;
+  end;
+  (* sfree dp *)
+  return 0
+
+
+end

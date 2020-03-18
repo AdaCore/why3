@@ -588,7 +588,15 @@ module mach.c.String
   syntax val get "%1[%2]" prec 1 1 15
   syntax val zero_char "'\\0'" prec 0
   syntax val zero_num "'0'" prec 0
+  syntax val nine_num "'9'" prec 0
+  syntax val small_a "'a'" prec 0
+  syntax val small_z "'z'" prec 0
+  syntax val big_a "'A'" prec 0
+  syntax val big_z "'Z'" prec 0
   syntax val minus_char "'-'" prec 0
+  syntax val code "%1" prec 0
+  syntax val strlen "strlen"
+  syntax val (=) "%1 == %2"  prec 7 7 6
 
 end
 

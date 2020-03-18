@@ -50,7 +50,7 @@ let lemma pow_mon (b x y:int)
                    = power b x }
   else pow_mon_strict b x y
 
-let mpz_get_str (sp: ptr char) (sz:int32) (base:int32) (u: mpz_ptr) : ptr char
+let wmpz_get_str (sp: ptr char) (sz:int32) (base:int32) (u: mpz_ptr) : ptr char
   requires { valid sp sz }
   requires { writable sp }
   requires { 2 <= sz }
