@@ -139,8 +139,6 @@ val add_pdecl : ?warn:bool -> vc:bool -> pmodule_uc -> pdecl -> pmodule_uc
 (** [add_pdecl ~vc m d] adds declaration [d] in module [m].
     If [vc] is [true], VC is computed and added to [m]. *)
 
-val add_clone: pmodule_uc -> mod_inst -> pmodule_uc
-
 (** {2 Builtin symbols} *)
 
 val builtin_module : pmodule
@@ -176,4 +174,3 @@ val read_module : env -> pathname -> string -> pmodule
 
 val print_unit : Format.formatter -> mod_unit -> unit
 val print_module : Format.formatter -> pmodule -> unit
-val convert: mlw_file -> Theory.theory Mstr.t

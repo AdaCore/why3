@@ -821,13 +821,10 @@ let rec k_expr env lps e res xmap =
     | Eabsurd ->
         Kstop (vc_expl loc attrs expl_absurd t_false)
     | Ewhile (e0, invl, varl, e1) ->
-        (* infer-loop *)
         let invl =
           match List.find_opt (fun (ee,_) -> e == ee) env.inferinvs with
           | None -> invl
           | Some (_,i) -> i :: invl in
-        (* ---------- *)
-
         (* [ STOP inv
            | HAVOC ; ASSUME inv ; IF e0 THEN e1 ; STOP inv
                                         ELSE SKIP ] *)

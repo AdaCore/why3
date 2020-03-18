@@ -107,8 +107,6 @@ val create_exn_decl : xsymbol -> pdecl
 
 val create_pure_decl : Decl.decl -> pdecl
 
-val create_pure_decl_l : Decl.decl list -> pdecl
-
 (** {2 Built-in decls} *)
 
 val pd_int : pdecl
