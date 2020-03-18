@@ -421,10 +421,10 @@ module String_value
   =
     if n < m then text_conversion b t d n (m-1)
 
-  let ghost function abs_value_text (b:int) (s:map int char) (ofs:int)
+  function abs_value_text (b:int) (s:map int char) (ofs:int) : int
     = abs_value_sub_text b s ofs (ofs + strlen s ofs)
 
-  let ghost function value_text (b:int) (s:map int char) (ofs:int)
+  function value_text (b:int) (s:map int char) (ofs:int) : int
     = if Char.(=) s[ofs] minus_char
       then - abs_value_text b s (ofs + 1)
       else abs_value_text b s ofs
