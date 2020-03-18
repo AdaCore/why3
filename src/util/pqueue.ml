@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -9,8 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** This module is automatically extracted from
-    why3/examples/util/PQueue_impl.mlw *)
+(** This is OCaml code extracted from a verified WhyML implementation,
+    part of the VOCaL library.
+    See https://github.com/vocal-project/vocal/ *)
 
 (** This is a contribution by Aymeric Walch. *)
 

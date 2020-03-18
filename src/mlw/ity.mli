@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -22,6 +22,7 @@ type itysymbol = private {
   its_mutable : bool;           (** mutable type *)
   its_fragile : bool;           (** breakable invariant *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
+  its_ofields : pvsymbol list;  (** non-mutable fields *)
   its_regions : region list;    (** shareable components *)
   its_arg_flg : its_flag list;  (** flags for type args *)
   its_reg_flg : its_flag list;  (** flags for regions *)
@@ -231,6 +232,8 @@ val reg_r_reachable : region -> region -> bool
 
 val ity_r_stale : Sreg.t -> Sreg.t -> ity -> bool
 val reg_r_stale : Sreg.t -> Sreg.t -> region -> bool
+
+val ity_frz_regs : Sreg.t -> ity -> Sreg.t
 
 (** {2 Built-in types} *)
 

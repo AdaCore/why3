@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -155,9 +155,12 @@ let attrs_has_expl attrs =
 let annot_attrs = Sattr.add stop_split (Sattr.singleton annot_attr)
 
 let vc_expl loc attrs expl f =
+  let rec relocate g =
+    t_attr_set ?loc g.t_attrs (TermTF.t_map (fun t -> t) relocate g) in
   let attrs = Sattr.union annot_attrs (Sattr.union attrs f.t_attrs) in
-  let attrs = Sattr.add expl attrs in (* FIXME check what was here before *)
-  t_attr_set ?loc:(if loc = None then f.t_loc else loc) attrs f
+  let attrs = Sattr.add expl attrs in
+  if loc = None then t_attr_set ?loc:f.t_loc attrs f
+                else t_attr_set ?loc attrs (relocate f)
 
 (* propositional connectives with limited simplification *)
 

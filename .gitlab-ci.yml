@@ -139,13 +139,13 @@ deploy:
 doc:
   stage: test
   script:
-    - make -f Makefile.doc public/index.html
+    - make -f doc.Makefile public/index.html
   <<: *sphinx_definition
 
 pages:
   stage: deploy
   script:
-    - make -f Makefile.doc public/index.html
+    - make -f doc.Makefile public/index.html
   artifacts:
     paths:
     - public

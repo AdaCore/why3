@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -25,10 +25,22 @@ let client_connect ~fail socket_name =
       if Sys.os_type = "Win32" then
         let name = "\\\\.\\pipe\\" ^ Filename.basename socket_name in
         Unix.openfile name [Unix.O_RDWR] 0
-      else
-      let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
-      Unix.connect sock (Unix.ADDR_UNIX socket_name);
-      sock
+      else begin
+        let curdir = Sys.getcwd () in
+        let dir = Filename.dirname socket_name in
+        let fn = Filename.basename socket_name in
+        let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
+        try
+          Sys.chdir dir;
+          Unix.connect sock (Unix.ADDR_UNIX fn);
+          Sys.chdir curdir;
+          sock
+        with e ->
+          (* Make sure curdir is restored *)
+          let bt = Printexc.get_raw_backtrace () in
+          Sys.chdir curdir;
+          Printexc.raise_with_backtrace e bt
+      end
     in
     socket := Some sock
   with

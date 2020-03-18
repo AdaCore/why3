@@ -60,8 +60,8 @@ module mach.int.UInt32Gen
 end
 
 module mach.int.UInt32BV
-  syntax val to_bv "%1"
-  syntax val of_bv "%1"
+  syntax val to_bv "%1" prec 0
+  syntax val of_bv "%1" prec 0
 end
 
 module mach.int.UInt32
@@ -464,9 +464,10 @@ end
 
 module bv.BV32
   syntax type t      "uint32_t"
-  syntax val  zeros  "0" prec 0
-  syntax val  one    "1" prec 0
-  syntax val  ones   "0xFFFFFFFF"
+  syntax literal t   "%cu"
+  syntax val  zeros  "0u" prec 0
+  syntax val  one    "1u" prec 0
+  syntax val  ones   "0xFFFFFFFFu" prec 0
   syntax val  eq     "%1 == %2" prec 7 7 6
   syntax val  bw_and "%1 & %2" prec 8 7 7
   syntax val  bw_or  "%1 | %2" prec 10 10 9
@@ -479,9 +480,9 @@ module bv.BV32
   syntax val  mul    "%1 * %2" prec 3 3 2
   syntax val  udiv   "%1 / %2" prec 3 3 2
   syntax val  urem   "%1 % %2" prec 3 3 2
-  syntax val  lsr_bv  "%1 >> %2" prec 5 5 4
-  syntax val  asr_bv  "%1 >> %2" prec 5 5 4
-  syntax val  lsl_bv  "%1 << %2" prec 5 5 4
+  syntax val  lsr_bv  "%1 >> %2" prec 5 5 2
+  syntax val  asr_bv  "%1 >> %2" prec 5 5 2
+  syntax val  lsl_bv  "%1 << %2" prec 5 5 2
 end
 
 module mach.array.Array32

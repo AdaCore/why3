@@ -1,8 +1,12 @@
 Release Notes
 =============
 
+.. _auto-dereference:
+
 Release Notes for version 1.2: new syntax for “auto-dereference”
 ----------------------------------------------------------------
+
+.. index:: auto-dereference
 
 Version 1.2 introduces a simplified syntax for reference variables, to
 avoid the somehow heavy OCaml syntax using bang character. In short, this

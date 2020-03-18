@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -2736,8 +2736,9 @@ let treat_notification n =
              selected at once when a prover successfully end. To continue the
              proof, it is better to only have the new goal selected *)
           goals_view#selection#unselect_all ();
-          let iter = (get_node_row next_unproved_id)#iter in
-          select_iter iter
+          let row = get_node_row next_unproved_id in
+          goals_view#expand_to_path row#path;
+          select_iter row#iter
         end
   | New_node (id, parent_id, typ, name, detached) ->
      begin

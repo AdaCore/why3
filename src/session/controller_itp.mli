@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -122,9 +122,8 @@ val print_session : Format.formatter -> controller -> unit
 
 exception Errors_list of exn list
 
-val reload_files : ?hard_reload:bool -> controller ->
-  shape_version:int option -> bool * bool
-(** [reload_files] returns a pair [(o,d)]: [o] true means there are
+val reload_files : ?hard_reload:bool -> controller -> bool * bool
+(** [reload_files c] returns a pair [(o,d)]: [o] true means there are
     obsolete goals, [d] means there are missed objects (goals,
     transformations, theories or files) that are now detached in the
     session returned.

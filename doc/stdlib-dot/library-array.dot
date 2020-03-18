@@ -1,0 +1,37 @@
+digraph G {
+	graph [nodesep=0.4,
+		rankdir=RL,
+		ranksep=0.6
+	];
+	node [margin=0.05,
+		shape=box
+	];
+	"array.Array" -> "int.Int";
+	"array.Array" -> "map.Map";
+	"array.Init" -> "array.Array";
+	"array.IntArraySorted" -> "array.Array";
+	"array.IntArraySorted" -> "map.MapSorted";
+	"array.Sorted" -> "array.Array";
+	"array.ArrayEq" -> "array.Array";
+	"array.ArrayEq" -> "map.MapEq";
+	"array.ArrayExchange" -> "array.Array";
+	"array.ArrayExchange" -> "map.MapExchange";
+	"array.ArrayPermut" -> "array.ArrayEq";
+	"array.ArrayPermut" -> "array.ArrayExchange";
+	"array.ArrayPermut" -> "map.MapPermut";
+	"array.ArraySwap" -> "array.ArrayExchange";
+	"array.ArraySum" -> "array.Array";
+	"array.ArraySum" -> "int.Sum";
+	"array.NumOf" -> "array.Array";
+	"array.NumOf" -> "int.NumOf";
+	"array.NumOfEq" -> "array.Array";
+	"array.NumOfEq" -> "int.NumOf";
+	"array.ToList" -> "array.Array";
+	"array.ToList" -> "list.List";
+	"array.ToList" -> "list.Append";
+	"array.ToSeq" -> "array.Array";
+	"array.ToSeq" -> "seq.Seq";
+	"array.Inversions" -> "array.ArrayExchange";
+	"array.Inversions" -> "int.Sum";
+	"array.Inversions" -> "int.NumOf";
+}

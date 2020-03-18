@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -249,6 +249,17 @@ let find_symbol q tables =
             try Tstysymbol (find_ts q tables) with
             | Not_found -> raise (Arg_qid_not_found q)
 
+let find_pr_list pr_list tables =
+  Lists.map_filter (fun id ->
+    try Some (find_pr id tables) with
+    | Not_found -> Warning.emit "Symbol '%a' not found, ignored"
+       Typing.print_qualid id; None) pr_list
+
+let find_symbol_list pr_list tables =
+  Lists.map_filter (fun id ->
+    try Some (find_symbol id tables) with Arg_qid_not_found _ ->
+      Warning.emit "Symbol '%a' not found, ignored"
+        Typing.print_qualid id; None) pr_list
 
 let type_ptree ~as_fmla t tables =
   let km = tables.known_map in
@@ -560,11 +571,7 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
       wrap_to_store t' (f pr) tail env tables lang task
     | Tprlist t', s :: tail ->
         let pr_list = parse_list_qualid ~lang s in
-        let pr_list =
-        List.map (fun id ->
-                    try find_pr id tables with
-                    | Not_found -> raise (Arg_qid_not_found id))
-                 pr_list in
+        let pr_list = find_pr_list pr_list tables in
         wrap_to_store t' (f pr_list) tail env tables lang task
     | Tlsymbol t', s :: tail ->
        let q = parse_qualid ~lang s in
@@ -577,8 +584,7 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
        wrap_to_store t' (f symbol) tail env tables lang task
     | Tlist t', s :: tail ->
        let pr_list = parse_list_qualid ~lang s in
-       let pr_list =
-         List.map (fun id -> find_symbol id tables) pr_list in
+       let pr_list = find_symbol_list pr_list tables in
        wrap_to_store t' (f pr_list) tail env tables lang task
     | Ttheory t', s :: tail ->
        let th = parse_theory env s in
@@ -628,11 +634,7 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
            wrap_to_store t' (f arg) tail env tables lang task
         | Tprlist t' ->
             let pr_list = parse_list_qualid ~lang s' in
-            let pr_list =
-              List.map (fun id ->
-                try find_pr id tables with
-                | Not_found -> raise (Arg_qid_not_found id))
-                pr_list in
+            let pr_list = find_pr_list pr_list tables in
             let arg = Some pr_list in
             wrap_to_store t' (f arg) tail env tables lang task
         | Ttermlist t' ->
@@ -644,8 +646,7 @@ let rec wrap_to_store : type a b. (a, b) trans_typ -> a -> string list -> Env.en
             wrap_to_store t' (f (Some list)) tail env tables lang task
         | Tlist t' ->
             let pr_list = parse_list_qualid ~lang s' in
-            let pr_list =
-              List.map (fun id -> find_symbol id tables) pr_list in
+            let pr_list = find_symbol_list pr_list tables in
             wrap_to_store t' (f (Some pr_list)) tail env tables lang task
         | _ -> raise (Arg_expected (string_of_trans_typ t', s'))
        end

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -134,6 +134,8 @@ val is_model_empty : model -> bool
 val default_model : model
 
 (** {2 Querying the model} *)
+
+val get_model_elements: model -> model_element list
 
 val print_model :
   ?me_name_trans:(model_element_name -> string) ->

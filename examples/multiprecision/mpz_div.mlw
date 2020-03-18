@@ -53,13 +53,16 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
       assert { value rp nl = value np nl at Realloc
                = old mpz.abs_value_of num };
       set_size rem ns rp;
+      unchanged num mpz (pure { mpz at Realloc });
       release_reader num np;
       unchanged num mpz ompz;
       release_writer rem rp;
       assert { value_of rem mpz = old value_of num mpz };
+      ghost (if not mpz_eq num quot then unchanged quot mpz ompz);
     end;
-    label Quot0 in
+    let ghost mpz0 = pure { mpz } in
     set_size_0 quot;
+    unchanged rem mpz mpz0;
     assert { value_of quot mpz = 0 };
     assert { value_of rem mpz = old value_of num mpz };
     return
@@ -67,8 +70,14 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
   let ref d' = den in
   let ref n' = num in
   let ghost mpz' = pure { mpz } in
+  let ghost ref cmemd = any mpz_mem in
+  let ghost ref cmemn = any mpz_mem in
+  let ghost ref clear_d = false in
+  let ghost ref clear_n = false in
+  assert { mpz.readers[d'] = 0 /\ mpz.readers[n'] = 0
+           /\ mpz.readers[quot] = 0 /\ mpz.readers[rem] = 0 };
   begin
-    ensures { d' <> rem }
+    (*ensures { d' <> rem }
     ensures { d' <> quot }
     ensures { n' <> rem }
     ensures { n' <> quot }
@@ -82,11 +91,15 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
     ensures { mpz.alloc[n'] > 0 }
     ensures { mpz.abs_size[n'] = old mpz.abs_size[num] }
     ensures { mpz.sgn[n'] = old mpz.sgn[num] }
-    ensures { mpz.abs_value_of[n'] = old mpz.abs_value_of[num] }
+    ensures { mpz.abs_value_of[n'] = old mpz.abs_value_of[num] }*)
   if mpz_eq den rem || mpz_eq den quot
   then begin
     let dp = get_read_ptr den in
-    d' <- wmpz_init ();
+    let ghost mpzd = pure { mpz } in
+    let nd, memd = wmpz_ptr_decl () in
+    d' <- nd;
+    cmemd <- memd;
+    clear_d <- true;
     let tdp = salloc (UInt32.of_int32 dl) in
     set_alloc d' dl;
     wmpn_copyd_sep tdp dp dl;
@@ -94,9 +107,11 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
     set_ptr d' tdp;
     set_size d' ds tdp;
     release_writer d' tdp;
+    assert { mpz.readers[d'] = 0 };
+    unchanged den mpz mpzd;
     release_reader den dp;
     unchanged den mpz mpz';
-    assert { forall x. mpz_unchanged x mpz mpz' };
+    assert { forall x. x <> d' ->  mpz_unchanged x mpz mpz' };
     unchanged num mpz mpz';
     unchanged rem mpz mpz';
     unchanged quot mpz mpz';
@@ -105,30 +120,42 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
   if mpz_eq num rem || mpz_eq num quot
   then begin
     let np = get_read_ptr num in
-    n' <- wmpz_init ();
+    let ghost mpzn = pure { mpz } in
+    let nn, memn = wmpz_ptr_decl () in
+    cmemn <- memn;
+    n' <- nn;
+    clear_n <- true;
     let tnp = salloc (UInt32.of_int32 nl) in
     set_alloc n' nl;
     wmpn_copyd_sep tnp np nl;
-    release_reader num np;
     assert { value tnp nl = mpz'.abs_value_of num };
     set_ptr n' tnp;
     set_size n' ns tnp;
     release_writer n' tnp;
+    unchanged num mpz mpzn;
+    release_reader num np;
     unchanged num mpz mpz'';
-    assert { forall x. mpz_unchanged x mpz mpz'' };
+    assert { forall x. x <> n' -> mpz_unchanged x mpz mpz'' };
     unchanged den mpz mpz'';
     unchanged rem mpz mpz'';
     unchanged quot mpz mpz'';
+    unchanged d' mpz mpz'';
   end
   end;
+  assert { d' <> quot /\ d' <> rem };
+  assert { n' <> quot /\ n' <> rem };
+  assert { forall x. x <> n' -> x <> d' -> mpz_unchanged x mpz mpz' };
   let ghost mpz' = pure { mpz } in
   let qp = wmpz_realloc quot ql in
+  unchanged rem mpz mpz';
   let ghost mpzq = pure { mpz } in
   let rp = wmpz_realloc rem dl in
   unchanged n' mpz mpz';
   unchanged d' mpz mpz';
   let np = get_read_ptr n' in
   let dp = get_read_ptr d' in
+  let ghost mpzn = pure { mpz } in
+  let ghost mpzd = pure { mpz } in
   value_tail dp (dl - 1);
   assert { (pelts dp)[offset dp + dl - 1] > 0
            by value dp dl = mpz.abs_value_of[d']
@@ -190,16 +217,27 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
   unchanged quot mpz mpzq;
   set_size quot qs qp;
   let ghost mpzr = pure { mpz } in
+  assert { sgn_value qp qs = value_of quot mpz };
   set_size rem rs rp;
   unchanged quot mpz mpzr;
-  assert { sgn_value qp qs = value_of quot mpz };
   assert { sgn_value rp rs = value_of rem mpz };
+  assert { value_of quot mpz * (old value_of den mpz) + value_of rem mpz
+           = old value_of num mpz };
   release_writer rem rp;
   release_writer quot qp;
+  let ghost mpzrq = pure { mpz } in
+  assert { value_of quot mpz * (old value_of den mpz) + value_of rem mpz
+           = old value_of num mpz };
+  unchanged n' mpz mpzn;
+  unchanged d' mpz mpzd;
   release_reader n' np;
   release_reader d' dp;
   unchanged d' mpz mpz';
   unchanged n' mpz mpz';
+  ghost (if clear_d then wmpz_tmp_clear d' cmemd);
+  ghost (if clear_n then wmpz_tmp_clear n' cmemn);
+  unchanged quot mpz mpzrq;
+  unchanged rem mpz mpzrq;
   return
 
 let wmpz_tdiv_qr_ui (quot rem dividend: mpz_ptr) (divisor: limb) : limb
@@ -224,6 +262,7 @@ let wmpz_tdiv_qr_ui (quot rem dividend: mpz_ptr) (divisor: limb) : limb
   then begin
     set_size_0 quot;
     set_size_0 rem;
+    assert { value_of quot mpz = 0 /\ value_of rem mpz = 0 };
     return 0;
   end;
   let nn = abs ns in

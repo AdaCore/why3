@@ -1376,78 +1376,89 @@ are:
 
 To examplify this basic programming language, we give below the default
 strategies that are attached to the default buttons of the IDE, assuming
-that the provers Alt-Ergo 1.30, CVC4 1.5 and Z3 4.5.0 were detected by
+that the provers Alt-Ergo 2.3.0, CVC4 1.7 and Z3 4.8.4 were detected by
 the :option:`why3 config --detect` command
 
-Split
+Split_VC
     is bound to the 1-line strategy
 
     ::
 
-        t split_goal_wp exit
+        t split_vc exit
 
-Auto level 0
+Auto_level_0
     is bound to
 
     ::
 
-        c Z3,4.5.0, 1 1000
-        c Alt-Ergo,1.30, 1 1000
-        c CVC4,1.5, 1 1000
+        c Z3,4.8.4, 1 1000
+        c Alt-Ergo,2.3.0, 1 1000
+        c CVC4,1.7, 1 1000
 
     The three provers are tried for a time limit of 1 second and memory
     limit of 1 Gb, each in turn. This is a perfect strategy for a first
     attempt to discharge a new goal.
 
-Auto level 1
+Auto_level_1
+    is bound to
+
+    ::
+
+        c Z3,4.8.4, 5 1000
+        c Alt-Ergo,2.3.0, 5 1000
+        c CVC4,1.7, 5 1000
+
+    Same as Auto_level_0 but with 5 seconds instead of 1.
+
+Auto_level_2
     is bound to
 
     ::
 
         start:
-        c Z3,4.5.0, 1 1000
-        c Alt-Ergo,1.30, 1 1000
-        c CVC4,1.5, 1 1000
-        t split_goal_wp start
-        c Z3,4.5.0, 10 4000
-        c Alt-Ergo,1.30, 10 4000
-        c CVC4,1.5, 10 4000
+        c Z3,4.8.4, 1 1000
+        c Alt-Ergo,2.3.0, 1 1000
+        c CVC4,1.7, 1 1000
+        t split_vc start
+        c Z3,4.8.4, 10 4000
+        c Alt-Ergo,2.3.0, 10 4000
+        c CVC4,1.7, 10 4000
 
     The three provers are first tried for a time limit of 1 second and
     memory limit of 1 Gb, each in turn. If none of them succeed, a split
     is attempted. If the split works then the same strategy is retried
     on each sub-goals. If the split does not succeed, the provers are
-    tried again with a larger limits.
+    tried again with larger limits.
 
-Auto level 2
+Auto level 3
     is bound to
 
     ::
 
         start:
-        c Z3,4.5.0, 1 1000
+        c Z3,4.8.4, 1 1000
         c Eprover,2.0, 1 1000
         c Spass,3.7, 1 1000
-        c Alt-Ergo,1.30, 1 1000
-        c CVC4,1.5, 1 1000
-        t split_goal_wp start
-        c Z3,4.5.0, 5 2000
+        c Alt-Ergo,2.3.0, 1 1000
+        c CVC4,1.7, 1 1000
+        t split_vc start
+        c Z3,4.8.4, 5 2000
         c Eprover,2.0, 5 2000
         c Spass,3.7, 5 2000
-        c Alt-Ergo,1.30, 5 2000
-        c CVC4,1.5, 5 2000
+        c Alt-Ergo,2.3.0, 5 2000
+        c CVC4,1.7, 5 2000
         t introduce_premises afterintro
         afterintro:
         t inline_goal afterinline
         g trylongertime
         afterinline:
-        t split_goal_wp start
+        t split_all_full start
         trylongertime:
-        c Z3,4.5.0, 30 4000
+        c Z3,4.8.4, 30 4000
         c Eprover,2.0, 30 4000
         c Spass,3.7, 30 4000
-        c Alt-Ergo,1.30, 30 4000
-        c CVC4,1.5, 30 4000
+        c Alt-Ergo,2.3.0, 30 4000
+        c CVC4,1.7, 30 4000
 
     Notice that now 5 provers are used. The provers are first tried for
     a time limit of 1 second and memory limit of 1 Gb, each in turn. If

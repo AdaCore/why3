@@ -178,9 +178,9 @@ the :menuselection:`Tools --> Edit` action in the Why3 IDE.
 Installation
 ~~~~~~~~~~~~
 
-You need version Isabelle2017 or Isabelle2018. Former versions are not
-supported. We assume below that your version is 2018, please replace
-2018 by 2017 otherwise.
+You need version Isabelle2018 or Isabelle2019. Former or later versions are not
+supported. We assume below that your version is 2019, please replace
+2019 by 2018 otherwise.
 
 Isabelle must be installed before compiling Why3. After compilation and
 installation of Why3, you must manually add the path
@@ -193,7 +193,7 @@ into either the user file
 
 ::
 
-    .isabelle/Isabelle2018/etc/components
+    .isabelle/Isabelle2019/etc/components
 
 or the system-wide file
 
@@ -218,8 +218,8 @@ opened instance of :program:`jEdit`. When the proof is completed, the
 user must send back the edited proof to Why3 IDE by closing
 the opened buffer, typically by hitting :kbd:`Control-w`.
 
-Using Isabelle 2018 server
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using Isabelle server
+~~~~~~~~~~~~~~~~~~~~~
 
 Starting from Isabelle version 2018, Why3 is able to exploit the server
 features of Isabelle to speed up the processing of proofs in batch mode,

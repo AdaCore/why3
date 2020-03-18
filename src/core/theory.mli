@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -236,14 +236,43 @@ val add_decl_with_tuples : theory_uc -> decl -> theory_uc
 
 (* {2 Exceptions} *)
 
-type badinstance_error =
+type bad_instance =
   | BadI of ident
-  | BadI_type_proj of ident * string (* Incompatible proj type *)
-  | BadI_ghost_proj of ident * string (* Incompatible ghost *)
-  | BadI_not_found of ident * string (* Field not found in implem *)
+  | BadI_ty_vars of tysymbol (* type variable mismatch *)
+  | BadI_ty_ner of tysymbol (* non-empty record -> ty *)
+  | BadI_ty_impure of tysymbol (* impure type -> ty *)
+  | BadI_ty_arity of tysymbol (* tysymbol arity mismatch *)
+  | BadI_ty_rec of tysymbol (* instance with a rectype *)
+  | BadI_ty_mut_lhs of tysymbol (* incompatible mutability *)
+  | BadI_ty_mut_rhs of tysymbol (* incompatible mutability *)
+  | BadI_ty_alias of tysymbol (* added aliased fields *)
+  | BadI_field of tysymbol * vsymbol (* field not found *)
+  | BadI_field_type of tysymbol * vsymbol (* incompatible field type *)
+  | BadI_field_ghost of tysymbol * vsymbol (* incompatible ghost status *)
+  | BadI_field_mut of tysymbol * vsymbol (* incompatible mutability *)
+  | BadI_field_inv of tysymbol * vsymbol (* strengthened invariant *)
+  | BadI_ls_type of lsymbol (* lsymbol type mismatch *)
+  | BadI_ls_kind of lsymbol (* function/predicate mismatch *)
+  | BadI_ls_arity of lsymbol (* lsymbol arity mismatch *)
+  | BadI_ls_rs of lsymbol (* "val function" -> "function" *)
+  | BadI_rs_arity of ident (* incompatible rsymbol arity *)
+  | BadI_rs_type of ident (* rsymbol type mismatch *)
+  | BadI_rs_kind of ident (* incompatible rsymbol kind *)
+  | BadI_rs_ghost of ident (* incompatible ghost status *)
+  | BadI_rs_mask of ident (* incompatible result mask *)
+  | BadI_rs_reads of ident * Svs.t (* incompatible dependencies *)
+  | BadI_rs_writes of ident * Svs.t (* incompatible write effect *)
+  | BadI_rs_taints of ident * Svs.t (* incompatible ghost writes *)
+  | BadI_rs_covers of ident * Svs.t (* incompatible written regions *)
+  | BadI_rs_resets of ident * Svs.t (* incompatible reset regions *)
+  | BadI_rs_raises of ident * Sid.t (* incompatible exception set *)
+  | BadI_rs_spoils of ident * Stv.t (* incompatible spoiled tyvars *)
+  | BadI_rs_oneway of ident (* incompatible partiality status *)
+  | BadI_xs_type of ident (* xsymbol type mismatch *)
+  | BadI_xs_mask of ident (* incompatible exception mask *)
 
 exception NonLocal of ident
-exception BadInstance of badinstance_error
+exception BadInstance of bad_instance
 exception CannotInstantiate of ident
 
 exception CloseTheory

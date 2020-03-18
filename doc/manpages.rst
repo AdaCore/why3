@@ -481,9 +481,10 @@ Menu :menuselection:`Tools`
             again on the subgoals.
 
         :menuselection:`--> Auto level 3`
-            is a strategy more elaborate than level 1, that attempts to
-            apply a few transformations that are typically useful. It
-            also tries the provers with a larger time limit.
+            is a strategy more elaborate than level 2m that attempts
+            to apply a few transformations that are typically
+            useful. It also tries the provers with a larger time
+            limit. It also tries more provers.
 
         A more detailed description of strategies is given in
         :numref:`sec.strategies`, as well as a description on how to
@@ -742,12 +743,8 @@ with the code, as shown in :numref:`fig.ce_example0_p2`.
 .. %%Generation of the screenshots:
 .. %%Those commands follow the style of starting.tex. To execute them one needs to
 .. %%do make update-doc-png.
-.. %EXECUTE rm -rf doc/cedoc/
-.. %EXECUTE cp bench/ce/cedoc.mlw doc/
-.. %EXECUTE bin/why3 ide -C doc/why3ide-doc.conf --batch "down;down;type cvc4;wait 2;down;snap -crop 1024x600+0+0 doc/images/ce_example0_p1.png" doc/cedoc.mlw
-.. %EXECUTE bin/why3 ide -C doc/why3ide-doc.conf --batch "down;down;type cvc4;wait 2;down;type get-ce;wait 2;down;faketype get-ce;snap -crop 1024x600+0+0 doc/images/ce_example0_p2.png" doc/cedoc.mlw
-.. %%Cleaning of the environment
-.. %EXECUTE rm -r doc/cedoc.mlw
+.. %EXECUTE bin/why3 ide --batch "down;down;type cvc4;wait 2;down;snap -crop 1024x600+0+0 doc/images/ce_example0_p1.png" doc/cedoc.mlw
+.. %EXECUTE bin/why3 ide --batch "down;down;type cvc4;wait 2;down;type get-ce;wait 2;down;faketype get-ce;snap -crop 1024x600+0+0 doc/images/ce_example0_p2.png" doc/cedoc.mlw
 
 .. _fig.ce_example0_p1:
 
@@ -833,7 +830,7 @@ non-exhaustive list (which is undergoing active development):
    This is current an issue in particular for the Array module of the
    standard library.
 
--  [TODO: complete this list]
+.. -  [TODO: complete this list]
 
 More information on the implementation of counterexamples in Why3 can be
 found in :cite:`hauzar16sefm` and
@@ -1352,20 +1349,29 @@ The ``pp`` Command
 
 .. program:: why3 pp
 
-This tool pretty-prints Why3 declarations. Currenty it can be used to
-print WhyML inductive definitions to LaTeX (using the ``mathpartir``
-package), and to format WhyML source code.
+This tool pretty-prints Why3 declarations into various forms. The kind of output is specified using the `--output` option.
 
 ::
 
-    why3 pp [--output=latex|mlw] [--kind=inductive] [--prefix <prefix>] \
+    why3 pp [--output=latex|mlw|dep] [--kind=inductive] [--prefix <prefix>] \
       <filename> <file>[.<Module>].<ind_type> ...
 
 .. option:: --output=<output>
 
-   Set the output format. Currently, only pretty printing to LaTeX is
-   supported using ``--output=latex``, and formatting of WhyML source
-   code using ``--output=mlw``.
+   Set the output format, among the following:
+
+  - `latex` : currently can be used to print WhyML inductive definitions
+    to LaTeX, using the ``mathpartir`` package
+
+  - `mlw` : reformat WhyML source code
+
+  - `dep` : display module dependencies, under the form of a digraph
+    using the `dot` syntax from the graphviz package.
+
+..
+  - `ast` : print the abstract syntax tree (data-type from API module `Ptree`)
+
+
 
 .. option:: --kind=<kind>
 

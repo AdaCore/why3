@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -374,8 +374,8 @@ let t_compare trigger attr loc t1 t2 =
               t_compare bnd vml1 vml2 f1 f2
           | Tbinop (op1,f1,g1), Tbinop (op2,f2,g2) ->
               perv_compare op1 op2;
-              t_compare bnd vml1 vml2 f1 f2;
-              t_compare bnd vml1 vml2 g1 g2
+              t_compare bnd vml1 vml2 g1 g2;
+              t_compare bnd vml1 vml2 f1 f2
           | Tnot f1, Tnot f2 ->
               t_compare bnd vml1 vml2 f1 f2
           | Ttrue, Ttrue -> ()

@@ -1,0 +1,23 @@
+module M32
+
+  use ieee_float.Float32
+
+  goal G1: in_range 0.0
+  goal G2: in_range 20.20
+  
+  goal G3: no_overflow RNE 0.0
+  goal G4: no_overflow RNE 20.20
+
+end
+
+module M64
+
+  use ieee_float.Float64
+
+  goal G1: in_range 0.0
+  goal G2: in_range 20.20
+  
+  goal G3: no_overflow RNE 0.0
+  goal G4: no_overflow RNE 20.20
+
+end

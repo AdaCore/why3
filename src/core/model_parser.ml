@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -558,6 +558,8 @@ let default_model = {
   vc_term_loc = None;
   model_files = empty_model;
 }
+
+let get_model_elements m = List.concat (List.concat (List.map IntMap.values (StringMap.values m.model_files)))
 
 type model_parser =  string -> Printer.printer_mapping -> model
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -42,7 +42,7 @@ let run_update () =
   if should_exit1 then exit 1;
   iter_files
     (fun fname ->
-     let session, _ = read_session fname in
+     let session = read_session fname in
      List.iter (do_action ~env ~session) !actions;
      Session_itp.save_session session)
 

@@ -52,8 +52,7 @@ echo "Current branch: "$GITBRANCH >> $REPORT
 echo "Current commit: "$NEWCOMMITHASH >> $REPORT
 
 # configuration
-autoconf
-automake --add-missing
+./autogen.sh
 ./configure --enable-local &> $OUT
 if test "$?" != "0" ; then
     echo "Configure failed" >> $REPORT

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -51,7 +51,22 @@ val compare_real : real_value -> real_value -> int
 val int_literal : int_literal_kind -> neg:bool -> string -> int_constant
 
 val real_literal : radix:int -> neg:bool -> int:string -> frac:string -> exp:string option -> real_constant
+(** [real_literal ~radix ~neg ~int ~frac ~exp] builds the real value
+   given by the mantissa [int.frac] and exponent [exp]. The [radix]
+   must be 10 or 16 only. If [radix] is 16, then [int] and [frac] are
+   interpreted in hexadecimal (but not [exp] which is always in
+   decimal) and the base of the exponent is 2 instead of 10. The
+   resulting number is negative when [neg] is true.
+
+   For example, [real_literal ~radix:10 ~neg:false ~int:"12"
+   ~frac:"34" ~exp:(Some "-5")] denotes the number [12.34 * 10 ^ (-5)],
+   [real_literal ~radix:10 ~neg:true ~int:"67" ~frac:"" ~exp:None]
+   denotes [-67.] and [real_literal ~radix:16 ~neg:false ~int:"9A" ~frac:"B" ~exp:(Some "5")] denotes
+   [0x9A.B * 2 ^ 5] that is [(9 * 16 + 10 + 11/16) * 2 ^ 42 = 4950]
+
+ *)
 val real_value : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> real_value
+(** [real_value ~pow2 ~pow5 n] builds the value [n * 2 ^ pow2 * 5 ^ pow5] *)
 
 (** Pretty-printing with conversion *)
 

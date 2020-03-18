@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -348,7 +348,7 @@ let print_stats ses r0 r1 stats =
 
 
 let run_one stats r0 r1 fname =
-  let ses,_ = read_session fname in
+  let ses = read_session fname in
   let sep = if !opt_print0 then Pp.print0 else Pp.newline in
   if !opt_print_provers then
     printf "%a@."

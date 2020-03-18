@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -385,12 +385,12 @@ let () =
     Whyconf.Args.exit_with_usage option_list usage_msg;
   try
     Debug.dprintf debug "Opening session '%s'...@?" dir;
-    let ses,shape_version = S.load_session dir in
+    let ses = S.load_session dir in
     let cont = Controller_itp.create_controller config env ses in
     (* update the session *)
     let found_obs, found_detached =
       try
-        Controller_itp.reload_files cont ~shape_version
+        Controller_itp.reload_files cont
       with
       | Controller_itp.Errors_list l ->
           List.iter (fun e -> Format.eprintf "%a@." Exn_printer.exn_printer e) l;

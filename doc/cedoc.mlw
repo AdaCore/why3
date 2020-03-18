@@ -1,0 +1,6 @@
+use int.Int
+
+let test_ce (ref x : int) (y:int)
+    requires { 0 <= x <= 10 /\ 3 <= y <= 17 }
+    ensures  { 17 <= x <= 42 }
+  = x <- x + y;

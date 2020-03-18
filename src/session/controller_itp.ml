@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -244,20 +244,23 @@ let print_session fmt c =
     reloaded.
  *)
 
-let reload_files ?(hard_reload=false) (c : controller) ~shape_version  =
+let reload_files ?(hard_reload=false) (c : controller) =
   let old_ses = c.controller_session in
   if hard_reload then begin
     c.controller_env <- Env.create_env (Env.get_loadpath c.controller_env);
     Whyconf.Hprover.reset c.controller_provers;
     load_drivers c;
   end;
-  c.controller_session <- empty_session ~shape_version ~from:old_ses (get_dir old_ses);
-  merge_files ~shape_version c.controller_env c.controller_session old_ses
+  c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
+  (* FIXME: here we should compare [shape_version] with the version of shapes just loaded.
+     OR: even better, this function has no reason to have a [shape_version] parameter
+     and should always take the version from the file just loaded. *)
+  merge_files c.controller_env c.controller_session old_ses
 
 exception Errors_list of exn list
 
-let reload_files ?(hard_reload=false) (c: controller) ~shape_version =
-  let errors, b1, b2 = reload_files c ~shape_version ~hard_reload in
+let reload_files ?(hard_reload=false) (c: controller) =
+  let errors, b1, b2 = reload_files c ~hard_reload in
   match errors with
   | [] -> b1, b2
   | _ -> raise (Errors_list errors)
@@ -1212,9 +1215,15 @@ let create_rem_list =
     if Buffer.length b > 0 then Buffer.add_char b ',';
     Buffer.add_string b (Pp.string_of pr id)
   in
-  let remove_ts ts = add Pretty.print_ts ts in
-  let remove_ls ls = add Pretty.print_ls ls in
-  let remove_pr pr = add Pretty.print_pr pr in
+  let module P = (val Pretty.create
+      rem.Eliminate_definition.rem_nt.Trans.printer
+      rem.Eliminate_definition.rem_nt.Trans.aprinter
+      rem.Eliminate_definition.rem_nt.Trans.printer
+      rem.Eliminate_definition.rem_nt.Trans.printer
+      false) in
+  let remove_ts ts = add P.print_ts ts in
+  let remove_ls ls = add P.print_ls ls in
+  let remove_pr pr = add P.print_pr pr in
   Ty.Sts.iter remove_ts rem.Eliminate_definition.rem_ts;
   Term.Sls.iter remove_ls rem.Eliminate_definition.rem_ls;
   Decl.Spr.iter remove_pr rem.Eliminate_definition.rem_pr;
@@ -1289,7 +1298,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
        2) on the generated sub-goal, run the prover with some callback
        3) the callback should :
           compute (next_iter success_value)
-          if result is done, do nothing more
+          if result is done, remove the transformation and go to bisect_end
           if result is some new rem, remove the previous transformation
            and recursively call bisect_step
      *)
@@ -1347,9 +1356,9 @@ later on. We do has if proof fails. *)
                    Call_provers.print_prover_answer res.Call_provers.pr_answer;
                  let b = res.Call_provers.pr_answer = Call_provers.Valid in
                  if b then set_timelimit res;
+                 Session_itp.remove_subtree ~notification ~removed ses (Session_itp.ATn trid);
                  match kont b with
                  | Eliminate_definition.BSstep (rem,kont) ->
-                    Session_itp.remove_subtree ~notification ~removed ses (Session_itp.ATn trid);
                     bisect_step rem kont
                  | Eliminate_definition.BSdone rem ->
                     bisect_end rem

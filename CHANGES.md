@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 1.3.0, March 17, 2020
+-----------------------------
+
 Standard library
   * `pqueue.Pqueue` is now modeled using sequences instead of lists :x:
   * `queue.Queue` is now modeled using sequences instead of lists :x:
@@ -40,9 +43,11 @@ Tools
     formatting of mlw files)
 
 Documentation
-  * improved Section 10.4 on drivers, including an automatically generated
+  * improved Chapter 7 on the WhyML language (record types, various
+    kinds of function declarations, module cloning, etc.)
+  * improved Section 11.4 on drivers, including an automatically generated
     dependency graph of driver files
-  * improved Section 10.5 on transformations, including transformations
+  * improved Section 11.5 on transformations, including transformations
     with arguments
 
 API
@@ -103,6 +108,7 @@ Realizations
   * added experimental realizations for new Set theories in both Isabelle and Coq
 
 Provers
+  * support for Alt-Ergo 2.3.1 (released Feb 19, 2020)
   * support for Vampire 4.2.2 (released Dec 14, 2017)
   * support for Coq 8.10.0 (released Oct 8, 2019)
   * support for Coq 8.10.1 (released Oct 25, 2019)

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -116,7 +116,7 @@ type split_ret = {
   (* implications are equivalences when byso_split is off *)
   (* Conjunctive decomposition of formula: /\ pos -> f *)
   pos : M.monoid;
-  (* Disjunctive decomposition of formula: f -> \/ pos *)
+  (* Disjunctive decomposition of formula: f -> \/ neg *)
   neg : M.monoid;
   (* Backward pull of formula: bwd -> f (typically from by) *)
   bwd : term;
@@ -174,7 +174,7 @@ let fold_cond = function
   | Comb c -> !+ (fold_cond c)
   | x -> x
 
-let rec split_core sp f =
+let rec split_core (sp:split) (f:term) : split_ret =
   let (~-) = t_attr_copy f in
   let ro = sp.right_only in
   let alias fo1 unop f1 =

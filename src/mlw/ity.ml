@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -23,6 +23,7 @@ type itysymbol = {
   its_mutable : bool;           (** mutable type *)
   its_fragile : bool;           (** breakable invariant *)
   its_mfields : pvsymbol list;  (** mutable record fields *)
+  its_ofields : pvsymbol list;  (** non-mutable fields *)
   its_regions : region list;    (** shareable components *)
   its_arg_flg : its_flag list;  (** flags for type args *)
   its_reg_flg : its_flag list;  (** flags for regions *)
@@ -541,7 +542,7 @@ let ity_app_pure s tl rl =
 
 let mk_its, restore_its =
   let ts_to_its = Wts.create 17 in
-  (fun ~ts ~nfr ~priv ~mut ~frg ~mfld ~regs ~aflg ~rflg ~def ->
+  (fun ~ts ~nfr ~priv ~mut ~frg ~mfld ~ofld ~regs ~aflg ~rflg ~def ->
     let its = {
       its_ts      = ts;
       its_nonfree = nfr;
@@ -549,6 +550,7 @@ let mk_its, restore_its =
       its_mutable = mut;
       its_fragile = frg;
       its_mfields = mfld;
+      its_ofields = ofld;
       its_regions = regs;
       its_arg_flg = aflg;
       its_reg_flg = rflg;
@@ -579,14 +581,14 @@ let mk_flg ~frz ~exp ~lbl ~fxd ~vis = {
 let its_of_ts ts priv =
   assert (ts.ts_def = NoDef);
   let flg = mk_flg ~frz:priv ~exp:true ~lbl:priv ~fxd:true ~vis:true in
-  mk_its ~ts ~nfr:priv ~priv ~mut:false ~frg:false ~mfld:[] ~regs:[]
-    ~aflg:(List.map (fun _ -> flg) ts.ts_args) ~rflg:[] ~def:NoDef
+  mk_its ~ts ~nfr:priv ~priv ~mut:false ~frg:false ~mfld:[] ~ofld:[]
+    ~regs:[] ~aflg:(List.map (fun _ -> flg) ts.ts_args) ~rflg:[] ~def:NoDef
 
 let create_rec_itysymbol id args =
   let ts = create_tysymbol id args NoDef in
   let flg = mk_flg ~frz:true ~exp:true ~lbl:false ~fxd:true ~vis:true in
-  mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~regs:[]
-    ~aflg:(List.map (fun _ -> flg) ts.ts_args) ~rflg:[] ~def:NoDef
+  mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~ofld:[]
+    ~regs:[] ~aflg:(List.map (fun _ -> flg) ts.ts_args) ~rflg:[] ~def:NoDef
 
 let create_alias_itysymbol id args def =
   let ts = create_tysymbol id args (Alias (ty_of_ity def)) in
@@ -595,19 +597,19 @@ let create_alias_itysymbol id args def =
     | _ -> false, def in
   let regs = Sreg.elements (ity_top_regs Sreg.empty ity) in
   let flg = mk_flg ~frz:true ~exp:true ~lbl:false ~fxd:true ~vis:true in
-  mk_its ~ts ~nfr:false ~priv:false ~mut ~frg:false ~mfld:[] ~regs
+  mk_its ~ts ~nfr:false ~priv:false ~mut ~frg:false ~mfld:[] ~ofld:[] ~regs
     ~aflg:(List.map (fun _ -> flg) args)
     ~rflg:(List.map (fun _ -> flg) regs) ~def:(Alias def)
 
 let create_range_itysymbol id ir =
   let ts = create_tysymbol id [] (Range ir) in
-  mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~regs:[]
-    ~aflg:[] ~rflg:[] ~def:(Range ir)
+  mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~ofld:[]
+    ~regs:[] ~aflg:[] ~rflg:[] ~def:(Range ir)
 
 let create_float_itysymbol id fp =
   let ts = create_tysymbol id [] (Float fp) in
-  mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~regs:[]
-    ~aflg:[] ~rflg:[] ~def:(Float fp)
+  mk_its ~ts ~nfr:false ~priv:false ~mut:false ~frg:false ~mfld:[] ~ofld:[]
+    ~regs:[] ~aflg:[] ~rflg:[] ~def:(Float fp)
 
 let fields_of_invariant ftv flds invl =
   if invl = [] then Mpv.empty, flds else
@@ -727,7 +729,8 @@ let create_plain_record_itysymbol ~priv ~mut id args flds invl =
     ~lbl:(Stv.mem v albl) ~fxd:(Stv.mem v afxd) ~vis:(Stv.mem v avis) in
   let reg_flag r = mk_flg  ~frz:(Sreg.mem r rfrz) ~exp:(Sreg.mem r rexp)
     ~lbl:(Sreg.mem r rlbl) ~fxd:(Sreg.mem r rfxd) ~vis:(Sreg.mem r rvis) in
-  mk_its ~ts ~nfr ~priv ~mut ~frg ~mfld:(Mpv.keys fmut) ~regs ~def:NoDef
+  mk_its ~ts ~nfr ~priv ~mut ~frg
+    ~mfld:(Mpv.keys fmut) ~ofld:(Mpv.keys ffix) ~regs ~def:NoDef
     ~aflg:(List.map arg_flag args) ~rflg:(List.map reg_flag regs)
 
 let create_plain_variant_itysymbol id args flds =

@@ -713,8 +713,8 @@ fun add_axioms s [t] =
       fold_map Specification.axiom
         (map_index (fn (i, t) =>
            ((fact_binding (s ^ "_" ^ string_of_int (i + 1)), []), t)) ts) #>
-      apfst (pair (fact_binding s)) #>
-      uncurry Global_Theory.store_thms #> snd;
+      apfst (pair (fact_binding s) #> rpair [] #> single) #>
+      uncurry Global_Theory.add_thmss #> snd;
 
 fun dest_record thy [((s, _), args, [((cname, _), cargs)])] =
       let val tyname = Sign.full_name thy (Binding.name s)
@@ -745,6 +745,13 @@ fun get_dt_spec thy err s =
     | NONE => err ());
 
 val why3_records = Attrib.setup_config_bool @{binding "why3_records"} (K true);
+
+fun add_inductive_global flags cnames_syn pnames pre_intros monos thy =
+  thy |>
+  Named_Target.theory_init |>
+  Inductive.add_inductive flags cnames_syn pnames pre_intros monos |> snd |>
+  Local_Theory.exit |>
+  Proof_Context.theory_of;
 
 fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
       (case lookup_thm thy id of
@@ -887,13 +894,13 @@ fun mk_decl _ (decl as Axiom ((s, id), ts)) thy =
   | mk_decl _ (decl as Inductive (coind, preds)) thy =
       (case lookup_list (snd o #1) (lookup_def thy) preds of
          NONE =>
-           (thy |> Inductive.add_inductive_global
+           (thy |> add_inductive_global
               {quiet_mode = true, verbose = false,
                alt_name = Binding.empty, coind = coind,
                no_elim = false, no_ind = false, skip_mono = false}
               (map (fn ((s, _), T, _) => ((Binding.name s, T), NoSyn)) preds) []
               (maps (map (apfst (rpair [] o Binding.name o fst)) o #3) preds) [] |>
-            snd |> fold (add_const o fst o #1) preds,
+            fold (add_const o fst o #1) preds,
             true)
        | SOME preds' =>
            let val cmap = map (fn (((s, id), _, _), th :: _) =>

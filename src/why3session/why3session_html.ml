@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -64,7 +64,7 @@ let spec =
 open Session_itp
 
 let run_file print_session fname =
-  let ses,_ = read_session fname in
+  let ses = read_session fname in
   let project_dir = get_dir ses in
   let output_dir =
     if !output_dir = "" then project_dir else !output_dir

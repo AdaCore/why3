@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -25,7 +25,12 @@ val eliminate_mutual_recursion: Task.task Trans.trans
 
 (** bisection *)
 
-type rem = { rem_pr : Decl.Spr.t; rem_ls : Term.Sls.t; rem_ts : Ty.Sts.t }
+type rem = {
+  rem_pr : Decl.Spr.t;
+  rem_ls : Term.Sls.t;
+  rem_ts : Ty.Sts.t;
+  rem_nt : Trans.naming_table;
+}
 
 (* unused
 val bisect : (Task.task -> bool) -> Task.task -> rem

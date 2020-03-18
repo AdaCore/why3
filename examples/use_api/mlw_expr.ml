@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -89,7 +89,7 @@ let d2 =
     let unit = Ident.id_fresh "unit" in
     Ity.create_pvsymbol unit Ity.ity_unit
   in
-  let def,rs = Expr.let_sym id
+  let def,_rs = Expr.let_sym id
       (Expr.c_fun [arg_unit] [] [post] Ity.Mxs.empty Ity.Mpv.empty body) in
   Pdecl.create_let_decl def
 

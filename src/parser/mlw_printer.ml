@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -42,7 +42,6 @@ let pp_print_opt_list ?(prefix:(unit, formatter, unit) format="") ?(sep:(unit, f
 
 let sanitize =
   let aux = function
-    | '\'' -> "__"
     | c -> String.make 1 c in
   sanitizer aux aux
 
@@ -263,9 +262,9 @@ let pp_attr pp closed fmt attr x =
   match attr with
   | ATstr a ->
       fprintf fmt "@[[@%s]@ %a@]" a.attr_string pp x
-  | ATpos _loc ->
-      (* fprintf fmt "[# %a] %a" Loc.pp loc pp x *)
-      todo fmt "ATpos _"
+  | ATpos loc ->
+      let filename, line, bchar, echar = Loc.get loc in
+      fprintf fmt "[# %S %d %d %d]@ %a" filename line bchar echar pp x
 
 let pp_exn fmt (id, pty, _mask) =
   (* TODO _mask *)
@@ -305,6 +304,24 @@ let ghost_suffix = function
   | true -> " ghost"
   | false -> ""
 
+let pp_clone_subst fmt = function
+  | CSaxiom qid ->
+      fprintf fmt "axiom %a" pp_qualid qid
+  | CStsym (qid, args, pty) ->
+      let pp_args = pp_print_list ~pp_sep:(pp_sep " ") pp_id in
+      fprintf fmt "type %a = %a%a" pp_qualid qid pp_pty pty pp_args args
+  | CSfsym (qid, qid') ->
+      fprintf fmt "function %a = %a" pp_qualid qid pp_qualid qid'
+  | CSpsym (qid, qid') ->
+      fprintf fmt "predicate %a = %a" pp_qualid qid pp_qualid qid'
+  | CSvsym (qid, qid') ->
+      fprintf fmt "val %a = %a" pp_qualid qid pp_qualid qid'
+  | CSxsym _ -> todo fmt "CSxsym"
+  | CSprop Decl.Paxiom -> fprintf fmt "axiom ."
+  | CSprop _ -> todo fmt "CSprop"
+  | CSlemma _ -> todo fmt "CSlemma"
+  | CSgoal _ -> todo fmt "CSgoal"
+
 let rec pp_fun pp fmt (binders, opt_pty, _pat, _mask, spec, e) =
   (* TODO _pat, _mask *)
   fprintf fmt "@[<hv 2>fun %a%a%a ->@ @[%a@]@]" pp_binders binders pp_opt_pty opt_pty pp_spec spec pp e
@@ -325,16 +342,16 @@ and pp_let_any fmt (id, ghost, kind, (params, _kind', opt_pty, _pat, _mask, spec
 
 and pp_fundef fmt (id, ghost, kind, binders, pty_opt, _pat, _mask, spec, e) =
   (* TODO mask, pat *)
-  fprintf fmt "@[<hv 2>";
-  pp_print_string fmt (ghost_suffix ghost);
-  pp_print_string fmt (kind_suffix kind);
-  pp_id fmt id;
-  pp_print_opt_list ~prefix:" " pp_binder fmt binders;
-  (match pty_opt with
-   | None -> ()
-   | Some pty -> fprintf fmt " : %a" pp_pty pty);
-  pp_spec fmt spec;
-  fprintf fmt " =@ %a@]" pp_expr e;
+  fprintf fmt "@[<hv 2>%s%s%a%a%t%a =@ %a@]"
+    (ghost_suffix ghost)
+    (kind_suffix kind)
+    pp_id id
+    (pp_print_opt_list ~prefix:" " pp_binder) binders
+    (fun fmt -> match pty_opt with
+       | None -> ()
+       | Some pty -> fprintf fmt " : %a" pp_pty pty)
+    pp_spec spec
+    pp_expr e
 
 and pp_variant fmt (t, qid_opt) =
   let pp_optwith fmt = function
@@ -375,8 +392,8 @@ and pp_expr fmt e =
       pp_apply pp_expr expr_closed fmt e1 e2
   | Einfix (e1, op, e2) ->
       pp_infix pp_expr expr_closed fmt e1 op e2
-  | Einnfix _ ->
-      todo fmt "Einnfix _"
+  | Einnfix (e1, op, e2) ->
+      pp_infix pp_expr expr_closed fmt e1 op e2
   | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e1)}, e2) ->
       (* TODO _pat *)
       fprintf fmt "@[<v>%a in@ %a@]"
@@ -538,10 +555,9 @@ and pp_term fmt t =
       pp_idapp pp_term term_closed fmt qid ts
   | Tapply (t1, t2) ->
       pp_apply pp_term term_closed fmt t1 t2
-  | Tinfix (t1, op, t2) ->
+  | Tinfix (t1, op, t2)
+  | Tinnfix (t1, op, t2) ->
       pp_infix pp_term term_closed fmt t1 op t2
-  | Tinnfix _ ->
-      todo fmt "Tinnfix _"
   | Tbinop (t1, op, t2)
   | Tbinnop (t1, op, t2) ->
       fprintf fmt "@[<hv 2>%a %a@ %a@]" pp_term' t1 pp_binop op pp_term' t2
@@ -578,21 +594,35 @@ and pp_term fmt t =
 and pp_spec fmt s =
   if s.sp_reads <> [] then
     fprintf fmt "@ reads { %a }" (pp_print_list ~pp_sep:(pp_sep ", ") pp_qualid) s.sp_reads;
+  let remove_attr s t =
+    match t.term_desc with
+    | Tattr (ATstr attr, t) when attr.attr_string = s -> t
+    | _ -> t in
   let pp_aux keyword t =
     fprintf fmt "@ %s { %a }" keyword pp_term t in
-  List.iter (pp_aux "requires") s.sp_pre;
+  List.iter (pp_aux "requires")
+    (List.map (remove_attr "hyp_name:Requires") s.sp_pre);
   List.iter (pp_aux "writes") s.sp_writes;
   let pp_post = function
     | _, [{pat_desc=Pvar {id_str="result"}}, t] ->
-        fprintf fmt "@ ensures { %a }" pp_term t
+        fprintf fmt "@ ensures { %a }" pp_term
+          (remove_attr "hyp_name:Ensures" t)
     | _, cases ->
         let pp_case fmt (p, t) =
           fprintf fmt "%a -> %a" pp_pattern' p pp_term' t in
         fprintf fmt "@ returns { %a }"
           (pp_print_list ~pp_sep:(pp_sep "|") pp_case) cases in
   List.iter pp_post s.sp_post;
-  let pp_xpost fmt _ =
-    todo fmt "sp_xpost" in
+  let pp_xpost fmt (_, exn_cases) =
+    let pp_exn_case fmt (qid, opt_pat_term) =
+      let pp_opt_t fmt = function
+        | Some (p, t) -> fprintf fmt " %a -> %a" pp_pattern p pp_term t
+        | None -> () in
+      fprintf fmt "@[<hv2>%a%a@]" pp_qualid qid pp_opt_t opt_pat_term in
+    fprintf fmt "@[<hv2>raises { %a }@]"
+      (pp_print_list ~pp_sep:(pp_sep "@ | ")
+         pp_exn_case)
+      exn_cases in
   List.iter (fun x -> fprintf fmt "@ %a" pp_xpost x) s.sp_xpost;
   let pp_alias _ =
     todo fmt "sp_alias" in
@@ -639,16 +669,8 @@ and pp_type_decl fmt d =
   let pp_def fmt = function
     | TDalias pty ->
         pp_pty fmt pty
-    | TDalgebraic variants ->
-        let pp_param fmt (_, id_opt, ghost, pty) =
-          let ghost = if ghost then "ghost " else "" in
-          match id_opt with
-          | None -> fprintf fmt "%s%a" ghost pp_pty pty
-          | Some id -> fprintf fmt "(%s%a : %a)" ghost pp_id id pp_pty pty in
-        let pp_variant fmt (_, id, params) =
-          fprintf fmt "%a%a" pp_id id (pp_print_opt_list ~prefix:" " pp_param) params in
-        let pp_variants = pp_print_list ~pp_sep:(pp_sep "@,| ") pp_variant in
-        fprintf fmt "@,@[<v 2>  | %a@]" pp_variants variants
+    | TDrecord [] when d.td_vis = Abstract && d.td_mut = false ->
+        ()
     | TDrecord fs ->
         let pp_vis fmt vis =
           pp_print_string fmt
@@ -664,16 +686,26 @@ and pp_type_decl fmt d =
           let ghost = if f.f_ghost then "ghost " else "" in
           fprintf fmt "%s%s%a : %a" mutable_ ghost pp_id f.f_ident pp_pty f.f_pty in
         let pp_fields = pp_print_list ~pp_sep:(pp_sep " ;@,") pp_field in
-        fprintf fmt "%a%a{@,@[<v 2>  %a@]@,}%a" pp_vis d.td_vis pp_mut d.td_mut pp_fields fs pp_invariants d.td_inv
+        fprintf fmt " = %a%a{@,@[<v 2>  %a@]@,}%a" pp_vis d.td_vis pp_mut d.td_mut pp_fields fs pp_invariants d.td_inv
+    | TDalgebraic variants ->
+        let pp_param fmt (_, id_opt, ghost, pty) =
+          let ghost = if ghost then "ghost " else "" in
+          match id_opt with
+          | None -> fprintf fmt "%s%a" ghost pp_pty pty
+          | Some id -> fprintf fmt "(%s%a : %a)" ghost pp_id id pp_pty pty in
+        let pp_variant fmt (_, id, params) =
+          fprintf fmt "%a%a" pp_id id (pp_print_opt_list ~prefix:" " pp_param) params in
+        let pp_variants = pp_print_list ~pp_sep:(pp_sep "@,| ") pp_variant in
+        fprintf fmt " = @,@[<v 2>  | %a@]" pp_variants variants
     | TDrange (i1, i2) ->
-        fprintf fmt "< range %s..%s >" (BigInt.to_string i1) (BigInt.to_string i2)
+        fprintf fmt " = < range %s..%s >" (BigInt.to_string i1) (BigInt.to_string i2)
     | TDfloat (i1, i2) ->
-        fprintf fmt "< float %d..%d >" i1 i2 in
+        fprintf fmt " = < float %d..%d >" i1 i2 in
   let pp_wit fmt = function
     | [] -> ()
     | wits ->
         fprintf fmt " by { %a }" (pp_fields pp_expr expr_closed) wits in
-  fprintf fmt "%a%a = %a%a"
+  fprintf fmt "%a%a%a%a"
     pp_id d.td_ident
     (pp_print_opt_list ~prefix:" " pp_id) d.td_params
     pp_def d.td_def
@@ -728,19 +760,31 @@ and pp_decl fmt = function
       fprintf fmt "let rec %a" pp_fundefs defs
   | Dexn (id, pty, mask) ->
       fprintf fmt "%a" pp_exn (id, pty, mask)
-  | Dmeta _ ->
-      todo fmt "Dmeta _"
+  | Dmeta (ident, args) ->
+      let pp_metarg fmt = function
+        | Mty _ -> todo fmt "Mty"
+        | Mfs qid -> fprintf fmt "function %a" pp_qualid qid
+        | Mps _ -> todo fmt "Mps"
+        | Max _ -> todo fmt "Max"
+        | Mlm _ -> todo fmt "Mlm"
+        | Mgl _ -> todo fmt "Mgl"
+        | Mval _ -> todo fmt "Mval"
+        | Mstr _ -> todo fmt "Mstr"
+        | Mint _ -> todo fmt "Mint" in
+      let pp_args = pp_print_list ~pp_sep:(pp_sep " ") pp_metarg in
+      fprintf fmt "meta %a %a" pp_id ident pp_args args
   | Dcloneexport (qid, []) ->
       fprintf fmt "@[<h>clone export %a@]" pp_qualid qid
-  | Dcloneexport (_, _::_) ->
-      todo fmt "Dcloneexport (_, _::_)"
+  | Dcloneexport (qid, substs) ->
+      let pp_substs = pp_print_list ~pp_sep:(pp_sep ",@ ") pp_clone_subst in
+      fprintf fmt "@[<hv2>clone export %a with@ %a@]" pp_qualid qid pp_substs substs
   | Duseexport qid ->
       fprintf fmt "use export %a" pp_qualid qid
-  | Dcloneimport (_, import, qid, None, []) ->
-      let import = if import then " import" else "" in
-      fprintf fmt "clone%s %a" import pp_qualid qid
-  | Dcloneimport _ ->
-      todo fmt "Dcloneimport _"
+  | Dcloneimport (_, import, qid, as_id, substs) ->
+      let pp_import fmt = if import then pp_print_string fmt " import" in
+      let pp_as_id fmt = match as_id with Some id -> fprintf fmt " as %a" pp_id id | None -> () in
+      let pp_substs = pp_print_list ~pp_sep:(pp_sep ",@ ") pp_clone_subst in
+      fprintf fmt "clone%t %a%t%a" pp_import pp_qualid qid pp_as_id pp_substs substs
   | Duseimport (_, import, binds) ->
       let import = if import then " import" else "" in
       let pp_opt_id = pp_opt ~prefix:" as " pp_id in
@@ -750,8 +794,11 @@ and pp_decl fmt = function
       fprintf fmt "use%s %a" import pp_binds binds
   | Dimport qid ->
       fprintf fmt "import %a" pp_qualid qid
-  | Dscope _ ->
-      todo fmt "Dscope _"
+  | Dscope (_, export, id, decls) ->
+      let pp_export fmt =
+        if export then pp_print_string fmt " export" in
+      let pp_decls = pp_print_list ~pp_sep:(pp_sep "@,") pp_decl in
+      fprintf fmt "@[<v 2>@[<v 2>scope%t %a =@,%a@]@,end]@" pp_export pp_id id pp_decls decls
 
 let pp_decls =
   let previous_was_use_import_export =
@@ -774,7 +821,8 @@ let pp_mlw_file fmt = function
       pp_decls fmt decls
   | Modules modules ->
       let pp_module fmt (id, decls) =
-        fprintf fmt "@[<v 2>module %a@ %a@]@ end" pp_id id pp_decls decls in
+        fprintf fmt "@[<v>@[<v 2>module %a@ %a@]@,end@]"
+          pp_id id pp_decls decls in
       let pp_modules =
         pp_print_list ~pp_sep:(pp_sep "@,@,") pp_module in
       fprintf fmt "@[<v>%a@]" pp_modules modules

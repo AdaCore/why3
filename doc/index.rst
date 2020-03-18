@@ -8,8 +8,8 @@ The Why3 Platform
   Guillaume Melquiond,
   Andrei Paskevich
 
-:Version: |version|, October 2019
-:Copyright: 2010--2019 University Paris-Sud, CNRS, Inria
+:Version: |version|, March 2020
+:Copyright: 2010--2020 University Paris-Saclay, CNRS, Inria
 
 .. _U3CAT: http://frama-c.com/u3cat/
 .. _Hi-Lite: http://www.open-do.org/projects/hi-lite/
@@ -26,7 +26,7 @@ project (ANR-15-CE25-0001), and the `VOCaL`_ ANR project
 (ANR-15-CE25-008).
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :numbered:
 
    foreword
@@ -36,6 +36,7 @@ project (ANR-15-CE25-0001), and the `VOCaL`_ ANR project
    install
    manpages
    syntaxref
+   input_formats
    exec
    itp
    technical

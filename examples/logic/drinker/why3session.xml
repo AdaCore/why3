@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<file format="whyml">
+<path name=".."/><path name="drinker.mlw"/>
+<theory name="Top">
+ <goal name="drinkers_paradox">
+ <transf name="case" arg1="(exists i. not (b i))">
+  <goal name="drinkers_paradox.0" expl="true case" proved="true">
+  <transf name="destruct" proved="true" arg1="h">
+   <goal name="drinkers_paradox.0.0" expl="true case" proved="true">
+   <transf name="exists" proved="true" arg1="i">
+    <goal name="drinkers_paradox.0.0.0" proved="true">
+    <transf name="intros" proved="true" arg1="h&#39;">
+     <goal name="drinkers_paradox.0.0.0.0" proved="true">
+     <transf name="destruct_rec" proved="true" arg1="h">
+      <goal name="drinkers_paradox.0.0.0.0.0" expl="destruct premise" proved="true">
+      <transf name="apply" proved="true" arg1="h&#39;">
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="drinkers_paradox.1" expl="false case">
+  <transf name="exists" arg1="a">
+   <goal name="drinkers_paradox.1.0">
+   <transf name="intros" arg1="h1">
+    <goal name="drinkers_paradox.1.0.0">
+    <transf name="destruct" arg1="h">
+     <goal name="drinkers_paradox.1.0.0.0">
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ <transf name="case" arg1="(forall j. b j)">
+  <goal name="drinkers_paradox.0" expl="true case" proved="true">
+  <transf name="exists" proved="true" arg1="a">
+   <goal name="drinkers_paradox.0.0" proved="true">
+   <transf name="intros" proved="true" arg1="h1,j">
+    <goal name="drinkers_paradox.0.0.0" proved="true">
+    <transf name="apply" proved="true" arg1="h">
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="drinkers_paradox.1" expl="false case">
+  <transf name="destruct" arg1="h">
+   <goal name="drinkers_paradox.1.0" expl="false case">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

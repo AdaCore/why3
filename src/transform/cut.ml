@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2019   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -58,26 +58,31 @@ let remove_list ~is_rec (name_list: symbol list) =
       | Theory.Use _ | Theory.Clone _ | Theory.Meta _ ->
           (removed_ids, Task.add_tdecl task_uc td.Task.task_decl)
       | Theory.Decl d ->
-          let removed_in_decls = Ident.Sid.inter removed_ids (get_decl_syms d) in
           begin match d.d_node with
             | Dprop (Pgoal, _, _) ->
                begin try
                    (removed_ids, Task.add_decl task_uc d)
                  with Decl.UnknownIdent id -> raise (Remove_unknown (d, id))
                end
-            | _ when Ident.Sid.exists (fun x -> Ident.Sid.mem x d.d_news) removed_ids ->
+            | _ when not (Ident.Sid.is_empty
+                                  (Ident.Sid.inter d.d_news removed_ids)) ->
                 (* The task create an element we want to delete -> removal *)
                 if is_rec then
                   (Ident.Sid.union removed_ids d.d_news, task_uc)
                 else
+                  let task_uc = match d.d_node with
+                    | Dprop _ -> task_uc
+                    | Dtype _ | Ddata _ | Dparam _ -> Task.add_decl task_uc d
+                    | Dlogic dl -> List.fold_left (fun t (ls,_) ->
+                        Task.add_param_decl t ls) task_uc dl
+                    | Dind (_,il) -> List.fold_left (fun t (ls,_) ->
+                        Task.add_param_decl t ls) task_uc il in
                   (removed_ids, task_uc)
-            | _ when not (Ident.Sid.is_empty removed_in_decls) ->
+            | _ when is_rec && not (Ident.Sid.is_empty
+                          (Ident.Sid.inter (get_decl_syms d) removed_ids)) ->
                 (* The task create an element we want to add but it uses deleted
                    elements *)
-                if is_rec then
-                  (Ident.Sid.union removed_ids d.d_news, task_uc)
-                else
-                  raise (Remove_unknown (d, Ident.Sid.choose removed_in_decls))
+                (Ident.Sid.union removed_ids d.d_news, task_uc)
             | _ ->
                 (removed_ids, Task.add_decl task_uc d)
           end) (Ident.Sid.of_list (List.map get_ident_symbol name_list)) None
