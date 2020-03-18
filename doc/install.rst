@@ -271,15 +271,15 @@ as detailed in :numref:`sec.why3session`.
 .. _sec.installinferloop:
 
 Inference of Loop Invariants
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 This section shows how to install and use *infer-loop*, an utility
 based on *abstract interpretation* to infer loop invariants
 :cite:`baudin17`. This is still work in progress and many features are
 still very limited.
 
-Availability
-------------
+Installation
+~~~~~~~~~~~~
 
 The ``infer-loop`` utility has the following OCaml dependencies.
 
@@ -317,7 +317,7 @@ follows:
     # ...
 
 Running Why3 with infer-loop
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Why3 can now be executed with support for inferring loop
 invariants. This can be done by passing the *debug* flag
@@ -368,6 +368,3 @@ produce exactly the same invariants.
       done;
       !i
   end
-
-For information about how to use the API to infer loop invariants refer
-to :numref:`sec.infer-loop-api`.

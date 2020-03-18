@@ -1987,12 +1987,6 @@ test-ce.opt: examples/use_api/counterexample.ml lib/why3/why3.cmxa
 	printf "Test of Why3 API calls for counterexamples failed. Please fix it"; exit 2)
 	@rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz
 
-infer.opt: examples/use_api/infer.ml lib/why3/why3.cmxa
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)$(OCAMLOPT) -o examples/use_api/$@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa  $<
-
-# EXTLIBS EXTPKGS
-
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META
 	OCAMLPATH=$(PWD)/lib $(MAKE) -C examples/use_api/runstrat clean
@@ -2022,18 +2016,6 @@ endif
 .PHONY: doc
 
 ifeq (@enable_doc@,yes)
-
-# doc/generated/infer__%.ml: examples/use_api/infer.ml doc/extract_ocaml_code
-# 	doc/extract_ocaml_code $* < $< > $@
-
-# OCAMLCODE_INFER = buildenv parsefile main
-
-# OCAMLCODE = \
-# 	...
-# 	$(addprefix doc/generated/infer__, $(addsuffix .ml, $(OCAMLCODE_INFER)))
-# 	...
-
-# DOC = ... infer
 
 doc: doc/html/index.html
 
