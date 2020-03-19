@@ -73,6 +73,8 @@ let ident_printer () =
       "exp"; "csc"; "sec"; "cot";
       "arcsin"; "arccos"; "arctan"; "arccsc"; "arcsec"; "arccot";
 
+      "exp";
+
      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
       "Float16"; "Float32"; "Float64"; "Float128";

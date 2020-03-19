@@ -27,24 +27,23 @@ module Set_str
     requires { valid rp sz }
     requires { valid sp sn }
     requires { 1 <= bits <= 8 }
-    requires { power 2 (bits * sn) <= power radix (sz - 1) }
+    requires { power 2 (bits * sn) <= power radix sz }
     requires { writable rp }
     requires { in_base (power 2 bits) (pelts sp)
                        (offset sp) (offset sp + sn) }
-    ensures  { 0 <= result < sz }
+    ensures  { 0 <= result <= sz }
     ensures  { value rp result = svalue (power 2 bits) sp sn }
-    ensures  { svalue (power 2 bits) sp sn > 0
-                -> result > 0 /\ (pelts rp)[offset rp + result - 1] > 0 }
+    ensures  { result > 0 -> (pelts rp)[offset rp + result - 1] > 0 }
   =
     let ref rn = 0 in
     let ref shift = 0 in
     let ghost ref rdone : int = 0 in
     let ref j = UInt32.to_int32 sn in
     let ghost b = power 2 (uint32'int bits) in
-    assert { bits * sn <= 64 * (sz - 1)
-             by power 2 (bits * sn) <= power radix (sz - 1)
-                = power (power 2 64) (sz - 1)
-                = power 2 (64 * (sz - 1)) };
+    assert { bits * sn <= 64 * sz
+             by power 2 (bits * sn) <= power radix sz
+                = power (power 2 64) sz
+                = power 2 (64 * sz) };
     assert { 2 <= b <= 256
              by 1 <= bits <= 8
              so power 2 5 = 32
@@ -53,7 +52,7 @@ module Set_str
              so power 2 8 = 256 };
     while j > 0 do
       invariant { 0 <= j <= sn }
-      invariant { 0 <= rn < sz }
+      invariant { 0 <= rn <= sz }
       invariant { (sn - j) * bits = rdone }
       invariant { j > 0 -> if shift = 0 then rdone = 64 * rn
                            else rdone = 64 * rn - 64 + shift }
@@ -84,13 +83,13 @@ module Set_str
                   = power 2 rdone };
       if shift = 0
       then begin
-        assert { rn < sz - 1
+        assert { rn < sz
                  by (sn - (j+1)) * bits = 64 * rn + shift
                  so (sn - (j+1)) * bits
                     = bits * sn - (j+1) * bits
-                    <= 64 * (sz - 1) - (j+1) * bits
-                    < 64 * (sz - 1)
-                 so 64 * rn < 64 * (sz - 1) };
+                    <= 64 * sz - (j+1) * bits
+                    < 64 * sz
+                 so 64 * rn < 64 * sz };
         C.set_ofs rp rn sj;
         value_sub_frame (pelts rp) (pelts orp)
                         (offset rp) (offset rp + int32'int rn);
@@ -151,15 +150,15 @@ module Set_str
           if shift > 0
           then begin
             assert { rdone = 64 * rn + shift - bits };
-            assert { rn < (sz - 1)
+            assert { rn < sz
                      by (sn - (j+1)) * bits = rdone
                         = 64 * rn + shift - bits
-                     so bits * sn <= 64 * (sz - 1)
+                     so bits * sn <= 64 * sz
                      so 64 * rn + shift - bits
                         = sn * bits - (j+1) * bits
-                        <= 64 * (sz - 1) - (j+1) * bits
-                        <= 64 * (sz - 1) - bits
-                     so 64 * rn + shift <= 64 * (sz - 1)
+                        <= 64 * sz - (j+1) * bits
+                        <= 64 * sz - bits
+                     so 64 * rn + shift <= 64 * sz
                      so 64 * rn < 64 * rn + shift };
             let shigh = lsr_mod sj (Limb.of_uint32 (bits - shift)) in
             assert { shigh < power 2 shift
@@ -296,14 +295,15 @@ module Set_str
     requires { valid rp sz }
     requires { valid sp sn }
     requires { 2 <= b <= 256 }
-    requires { power b sn <= power radix (sz - 1) }
+    requires { power b sn <= power radix sz }
     requires { writable rp }
     requires { in_base b (pelts sp) (offset sp) (offset sp + sn) }
     requires { info.b = b }
-    ensures  { svalue b sp sn > 0 -> 1 <= result < sz }
+    ensures  { svalue b sp sn > 0 -> 1 <= result <= sz }
     ensures  { value rp result = svalue b sp sn }
     ensures  { svalue b sp sn > 0 -> (pelts rp)[offset rp + result - 1] > 0 }
     ensures  { svalue b sp sn = 0 -> result = 1 }
+    ensures  { 0 < result }
   =
     let ref k = 1 + (sn - 1) % info.exp in
     label Start in
@@ -358,7 +358,7 @@ module Set_str
       invariant { value rp rn
                   = svalue_sub b (pelts sp) (offset sp)
                                  (offset sp + int32'int j) }
-      invariant { (*k at Start <= *) j <= sn }
+      invariant { j <= sn }
       invariant { 0 <= rn <= sz }
       invariant { svalue b sp j > 0 -> (pelts rp)[offset rp + rn - 1] > 0 }
       invariant { svalue b sp j = 0 -> rn = 1 }
@@ -417,18 +417,13 @@ module Set_str
                                    cy;
         value_tail orp (rn - 1);
         assert { rn < sz
-                 by power b sn <= power radix (sz - 1)
-                 so svalue b sp oj > 0
-                 so (pelts orp)[offset rp + rn - 1] > 0
-                 so value orp rn
-                    = svalue b sp oj
-                    < power b oj
-                    <= power b sn <= power radix (sz - 1)
-                 so value orp rn
-                    = value orp (rn - 1)
-                      + power radix (rn - 1) * (pelts orp)[offset rp + rn - 1]
-                    >= power radix (rn - 1) * (pelts orp)[offset rp + rn - 1]
-                    >= power radix (rn - 1) };
+                 by power b sn <= power radix sz
+                 so value rp rn + power radix rn * cy
+                    = svalue_sub b (pelts sp) (offset sp) (offset sp + j)
+                    < power b j <= power b sn <= power radix sz
+                 so power radix rn * cy >= power radix rn
+                 so value rp rn >= 0
+                 so power radix rn < power radix sz };
         C.set_ofs rp rn cy;
         value_tail rp rn;
         rn <- rn + 1;
@@ -465,14 +460,6 @@ module Set_str
       end
     done;
     value_tail rp (rn - 1);
-    assert { svalue b sp sn > 0 -> rn < sz
-             by value rp rn = svalue b sp sn < power b sn
-                <= power radix (sz - 1)
-                so value rp rn
-                   = value rp (rn - 1)
-                     + power radix (rn - 1) * (pelts rp)[offset rp + rn - 1]
-                   >= power radix (rn - 1) * (pelts rp)[offset rp + rn - 1]
-                   >= power radix (rn - 1) };
     rn
 
   let wmpn_set_str (rp: ptr limb) (ghost sz: int32) (sp: ptr uchar) (sn:uint32)
@@ -486,6 +473,7 @@ module Set_str
     requires { writable rp }
     requires { in_base base (pelts sp) (offset sp) (offset sp + sn) }
     writes   { rp.data.elts }
+    ensures  { result <= sz - 1 }
     ensures  { value rp result = svalue base sp sn }
     ensures  { sn > 0 -> (pelts sp)[offset sp] > 0
                -> (pelts rp)[offset rp + result - 1] > 0 }
@@ -502,10 +490,10 @@ module Set_str
     if sn = 0 then return 0;
     let bits = wmpn_base_power_of_two_p (Limb.of_int32 base) in
     if (bits <> 0)
-    then return wmpn_set_str_bits rp sz sp sn bits
+    then return wmpn_set_str_bits rp (sz-1) sp sn bits
     else begin
       let info = wmpn_get_base_info (Limb.of_int32 base) in
-      return wmpn_set_str_other rp sz sp sn (Limb.of_int32 base) info
+      return wmpn_set_str_other rp (sz-1) sp sn (Limb.of_int32 base) info
     end
 
 end
