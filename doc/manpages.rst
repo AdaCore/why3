@@ -1361,12 +1361,14 @@ This tool pretty-prints Why3 declarations into various forms. The kind of output
    Set the output format, among the following:
 
   - `latex` : currently can be used to print WhyML inductive definitions
-    to LaTeX, using the ``mathpartir`` package
+    to LaTeX, using the ``mathpartir`` package.
 
-  - `mlw` : reformat WhyML source code
+  - `mlw` : reformat WhyML source code.
+
+.. _GraphViz: https://www.graphviz.org/
 
   - `dep` : display module dependencies, under the form of a digraph
-    using the `dot` syntax from the graphviz package.
+    using the `dot` syntax from the `GraphViz`_ visualisation software.
 
 ..
   - `ast` : print the abstract syntax tree (data-type from API module `Ptree`)
@@ -1398,7 +1400,25 @@ The ``execute`` Command
 .. program:: why3 execute
 
 Why3 can symbolically execute programs written using the WhyML language
-(extension :file:`.mlw`). See also :numref:`sec.execute`.
+(extension :file:`.mlw`).
+
+::
+
+   why3 execute [options] file module.ident
+
+The first argument is the file where to read the code to execute. The
+second argument is a qualified identifier which denote a program
+function from that file. The latter function must have only `()` as
+argument.
+
+There are no specific options apart from the options common to all
+Why3 commands.
+
+Upon completion of the execution, the value of the result is displayed
+on the standard input. Additionally, values of the global mutable
+variables modified by that function are displayed too.
+
+See more details and examples of use in :numref:`sec.execute`.
 
 .. why3:tool:: extract
 .. _sec.why3extract:
