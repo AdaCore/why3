@@ -1,0 +1,15 @@
+### Debug: inferred invariants ###
+contents x1 <= 0 /\ x <= contents x1
+###
+### Debug: inferred invariants ###
+((((((contents x3 <= x2 /\ contents y = True) /\ ref'mk x2 = x3) /\
+    x2 = contents x3 \/
+    (x2 < 0 /\ x2 < contents x3) /\ (x2 + contents x3) < 0) /\
+   contents x3 <= 0) /\
+  (x2 + contents x3) <= 0) /\
+ x2 <= contents x3) /\
+x2 <= 0
+###
+### Debug: inferred invariants ###
+contents x5 <= 0 /\ x4 <= 0
+###

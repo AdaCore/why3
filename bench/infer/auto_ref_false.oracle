@@ -1,0 +1,27 @@
+### Debug: inferred invariants ###
+((0 = 0 /\ 0 < x) /\ contents k <= x) /\ 0 <= contents k
+###
+### Debug: inferred invariants ###
+(((0 = contents k1 /\ contents k1 = 0 \/
+   1 = contents k1 \/ 2 <= x1 /\ 2 <= contents k1) /\
+  0 = 0) /\
+ 0 <= contents k1) /\
+0 < x1
+###
+### Debug: inferred invariants ###
+(((0 = 0 /\ 2 <= x2) /\ contents k2 <= x2) /\ 0 <= contents k2) /\
+(2 * contents k2) = contents j
+###
+### Debug: inferred invariants ###
+contents k3 <= x3 /\ 2 <= x3
+###
+### Debug: inferred invariants ###
+((((((0 = contents k4 /\ 0 = contents j1) /\ contents k4 = 0) /\
+    contents j1 = 0 \/
+    ((1 = contents k4 /\ 2 = contents j1) /\ 2 = contents j1) /\
+    2 = contents j1 \/ (2 <= contents k4 /\ 4 <= contents j1) /\ 2 = 2) /\
+   0 = 0) /\
+  0 <= contents j1) /\
+ 0 <= contents k4) /\
+2 <= x4
+###

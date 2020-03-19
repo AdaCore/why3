@@ -1,0 +1,73 @@
+
+module Test2
+
+use export int.Int
+use ref.Ref
+
+let to_true (ii : bool) (arg : bool) : bool
+    writes { }
+    ensures { if ii then result = true else result = arg}
+    = if ii then true else arg
+
+val x0 : ref bool
+val x1 : ref bool
+val x2 : ref bool
+val x3 : ref bool
+
+let pgmtest[@infer]() : unit = [@vc:divergent]
+    let a = ref false in
+    let b = ref false in
+    let c = ref false in
+	while (!x3 && not !x1 && not !x2) do
+
+	      label Init in
+	      (* ****** *)
+	      let tmp1 = (!x0 || !a) in
+	      let a1 = tmp1 in
+	      let _ = to_true tmp1 !b in
+	      let tmp3 = tmp1 && !b && !x2 in
+	      let _ = to_true tmp3 !c in
+ 	      (* ****** *)
+	      a := a1
+	      (* ****** *)
+
+	done
+
+let pgmtest2[@infer:oct]() : unit = [@vc:divergent]
+    let a = ref false in
+    let b = ref false in
+    let c = ref false in
+	while (!x3 && not !x1 && not !x2) do
+
+	      label Init in
+	      (* ****** *)
+	      let tmp1 = (!x0 || !a) in
+	      let a1 = tmp1 in
+	      let _ = to_true tmp1 !b in
+	      let tmp3 = tmp1 && !b && !x2 in
+	      let _ = to_true tmp3 !c in
+ 	      (* ****** *)
+	      a := a1
+	      (* ****** *)
+
+	done
+
+let pgmtest3[@infer:box]() : unit = [@vc:divergent]
+    let a = ref false in
+    let b = ref false in
+    let c = ref false in
+	while (!x3 && not !x1 && not !x2) do
+
+	      label Init in
+	      (* ****** *)
+	      let tmp1 = (!x0 || !a) in
+	      let a1 = tmp1 in
+	      let _ = to_true tmp1 !b in
+	      let tmp3 = tmp1 && !b && !x2 in
+	      let _ = to_true tmp3 !c in
+ 	      (* ****** *)
+	      a := a1
+	      (* ****** *)
+
+	done
+end

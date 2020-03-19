@@ -1,0 +1,24 @@
+module Neg1
+	use int.Int
+	use ref.Ref
+
+
+	let b[@infer](_:unit): int
+		ensures { result = 10 } =
+		let i = ref 0 in
+		while !i <> 10 && !i < 12 do
+		variant { 15 - !i }
+			i := !i + 1;
+		done;
+		!i
+
+	let b2[@infer:oct](_:unit): int
+		ensures { result = 10 } =
+		let i = ref 0 in
+		while !i <> 10 && !i < 12 do
+		variant { 15 - !i }
+			i := !i + 1;
+		done;
+		!i
+
+end

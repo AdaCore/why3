@@ -1,0 +1,42 @@
+module While1
+
+	use int.Int
+	use ref.Ref
+
+	let b[@infer](_:int) : int
+	ensures { result = 18 }
+	=
+		let i = ref 1 in
+		let j = ref 0 in
+		while !i < 10 do
+			variant { 10 - !i  }
+			i := !i + 1;
+			j := !j + 2;
+		done;
+		!j
+
+	let b2[@infer:oct](_:int) : int
+	ensures { result = 18 }
+	=
+		let i = ref 1 in
+		let j = ref 0 in
+		while !i < 10 do
+			variant { 10 - !i  }
+			i := !i + 1;
+			j := !j + 2;
+		done;
+		!j
+
+	let b3[@infer:box](_:int) : int
+	ensures { result = 18 }
+	=
+		let i = ref 1 in
+		let j = ref 0 in
+		while !i < 10 do
+			variant { 10 - !i  }
+			i := !i + 1;
+			j := !j + 2;
+		done;
+		!j
+
+end

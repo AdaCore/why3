@@ -1,0 +1,41 @@
+
+module Test
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
+
+	let b[@infer](_:unit): unit
+	=
+		let k = ref 0 in
+		incr k;
+		incr k;
+		while (true) do
+		variant { 0 }
+		invariant { !k = 2}
+		()
+		done; ()
+
+	let b2[@infer:oct](_:unit): unit
+	=
+		let k = ref 0 in
+		incr k;
+		incr k;
+		while (true) do
+		variant { 0 }
+		invariant { !k = 2}
+		()
+		done; ()
+
+	let b3[@infer:box](_:unit): unit
+	=
+		let k = ref 0 in
+		incr k;
+		incr k;
+		while (true) do
+		variant { 0 }
+		invariant { !k = 2}
+		()
+		done; ()
+
+end

@@ -1,0 +1,37 @@
+### Debug: inferred invariants ###
+((((((length a = (1 + contents u) /\ 0 = contents l) /\
+     (length a - 1) = contents u) /\
+    contents l = 0 \/
+    contents l <= (1 + contents u) /\
+    (contents u + 2) <= (length a + contents l)) /\
+   1 = 1) /\
+  0 = 0) /\
+ contents u < length a) /\
+0 <= contents l
+###
+### Debug: inferred invariants ###
+(((contents l1 <= 0 /\ length a1 <= (1 + contents u1)) /\ contents l1 = 0 \/
+  ((((((0 < length a1 /\ 2 <= (length a1 + contents l1)) /\ 0 < contents l1) /\
+      contents l1 <= length a1) /\
+     0 < (length a1 + contents u1)) /\
+    contents l1 <= (1 + contents u1)) /\
+   0 < (contents l1 + contents u1)) /\
+  0 <= contents u1 \/
+  ((((((((0 < length a1 /\ 0 < (length a1 + contents l1)) /\
+         contents l1 < length a1) /\
+        contents l1 <= 0) /\
+       0 <= (length a1 + contents u1)) /\
+      contents l1 <= (1 + contents u1)) /\
+     0 <= (1 + (contents l1 + contents u1))) /\
+    0 <= (1 + contents u1)) /\
+   (contents u1 + 2) <= length a1) /\
+  contents l1 = 0) /\
+ contents u1 < length a1) /\
+0 <= contents l1
+###
+### Debug: inferred invariants ###
+(((0 = contents l2 /\ contents l2 = 0 \/ 0 < contents l2 /\ 0 <= contents u2) /\
+  1 = 1) /\
+ 0 = 0) /\
+0 <= contents l2
+###
