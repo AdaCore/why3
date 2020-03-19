@@ -4,7 +4,7 @@ module Try1
 	use ref.Ref
 
 	exception Myexc int
-	let b(x:int) : int
+	let b(_:int) : int
 	ensures { result = 10 }
 	=
 		let i = ref 0 in

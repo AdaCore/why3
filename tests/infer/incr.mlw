@@ -5,7 +5,7 @@ module Incr
 	use ref.Ref
 	use ref.Refint
 
-	let incr(x:int) : int
+	let incr[@infer](x:int) : int
 	  ensures { result = max x 0 }
 	= let i = ref 0 in
 	  while !i < x do

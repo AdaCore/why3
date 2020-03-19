@@ -1,0 +1,7 @@
+use int.Int
+use ref.Ref
+
+val x0 : ref bool
+
+let f[@infer] (x: bool): bool
+= x || !x0

@@ -1,0 +1,47 @@
+ 
+module Test2
+
+use export int.Int
+use import ref.Ref
+
+let to_true (ii : bool) (arg : bool) : bool
+    writes { }
+    ensures { if ii then result = true else result = arg}
+    = if ii then true else arg
+
+val x0 : ref bool
+val x1 : ref bool
+val x2 : ref bool
+val x3 : ref bool
+
+let pgmtest[@infer:3]() : unit = [@vc:divergent]
+    let a = ref false in
+    let b = ref false in
+    let c = ref false in
+	while (!x3 && not !x1 && not !x2) do
+
+	      label Init in
+	      (* ****** *)
+	      let tmp1 = (!x0 || !a) in
+	      let a1 = tmp1 in
+	      let b1 = to_true tmp1 !b in
+	      let tmp3 = tmp1 && !b && !x2 in
+	      let c1 = to_true tmp3 !c in
+ 	      (* ****** *)
+	      a := a1 
+	      (* ****** *)
+
+	done ;
+end
+
+
+(* while !x3 && not !x1 && not !x2 do *)
+(*   let tmp1 = !x0 || !a in *)
+(*   let a1 = tmp1 in *)
+(*   let b1 = let o = !b in *)
+(*     to_true tmp1 o in *)
+(*   let tmp3 = tmp1 && !b && !x2 in *)
+(*   let c1 = let o = !c in *)
+(*     to_true tmp3 o in *)
+(*   a := a1 *)
+(* done *)

@@ -4,7 +4,7 @@ module ListRev
 	use int.Int
 	use ref.Ref
 
-	val function length (l: list 'a) : int
+	val function length (_: list 'a) : int
 	ensures { result >= 0 }
 
 	let tl (l: list 'a) : list 'a
@@ -40,7 +40,7 @@ module ListRev
 		| _ -> false
 		end
 
-	let nil (unit)
+	let nil (_:unit)
 	: list 'a
 	ensures { length result = 0 }
 	= Nil

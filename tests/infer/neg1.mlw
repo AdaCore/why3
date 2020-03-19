@@ -3,7 +3,7 @@ module Neg1
 	use ref.Ref
 
 
-	let b(unit): int
+	let b(_:unit): int
 		ensures { result = 10 } =
 		let i = ref 0 in
 		while !i <> 10 && !i < 12 do
