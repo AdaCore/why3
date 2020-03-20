@@ -1,11 +1,13 @@
 open Domain
+open Term
+open Ity
 
 module Make(S:sig
     module A:TERM_DOMAIN
     val env: Env.env
     val th_known: Decl.known_map
     val mod_known: Pdecl.known_map
-  end) = struct
+  end): TERM_DOMAIN = struct
   module A = S.A
 
   open Ai_logic
@@ -19,10 +21,9 @@ module Make(S:sig
   include A
 
   let quant_var, pv =
-    let open Term in
-    let ident_ret = Ident.{pre_name = "w"; pre_attrs = Ident.Sattr.empty; pre_loc = None; } in
-    let v  = Ity.create_pvsymbol ident_ret Ity.ity_int in
-    t_var Ity.(v.pv_vs), v
+    let ident_ret = Ident.id_fresh "w" in
+    let v = create_pvsymbol ident_ret ity_int in
+    t_var v.pv_vs, v
 
   let create_manager () =
     let man = A.create_manager () in
@@ -30,20 +31,20 @@ module Make(S:sig
     man
 
   let to_term man t =
-    A.to_term man t
-    |> descend_quantifier quant_var
+    let t = A.to_term man t in
+    descend_quantifier quant_var t
 
   let rec meet_term man term elt =
-    let open Term in
     match term.t_node with
-    | Tbinop(Tor, a, b) ->
-      join man (meet_term man a elt) (meet_term man b elt)
-    | Tbinop(Tand, a, b) ->
-      meet_term man a elt |> meet_term man b
-    | Tbinop (Timplies, a, b) -> meet_term man (t_or (t_not a) b) elt
+    | Tbinop (Tor, a, b) ->
+       join man (meet_term man a elt) (meet_term man b elt)
+    | Tbinop (Tand, a, b) ->
+       meet_term man b (meet_term man a elt)
+    | Tbinop (Timplies, a, b) ->
+       meet_term man (t_or (t_not a) b) elt
     | Tbinop (Tiff, a, b) ->
        meet_term man (t_and (t_implies a b) (t_implies b a)) elt
-    | Tquant(Tforall, tq) ->
+    | Tquant (Tforall, tq) ->
       begin
         match t_open_quant tq with
         | [a], _, t when (Ty.ty_equal a.vs_ty Ty.ty_int) ->
