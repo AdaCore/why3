@@ -737,7 +737,7 @@ module Print = struct
     | Sreturn Enothing -> fprintf fmt "return;"
     | Sreturn e -> fprintf fmt "return %a;" print_expr_no_paren e
 
-  and print_def fmt def =
+  and print_def ~global fmt def =
     let print_inline fmt id =
       if Sattr.mem c_static_inline id.id_attrs
       then fprintf fmt "static inline "
@@ -777,7 +777,9 @@ module Print = struct
                    (print_ty ~paren:false) ty
                    (print_list comma (print_id_init ~stars:nb ~size:None))
                    lie in
-         fprintf fmt "%s" s
+         if global
+         then fprintf fmt "@\n%s" s
+         else fprintf fmt "%s" s
       | Dstruct (s, lf) ->
          let s = sprintf "@\nstruct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@]"
                    s
@@ -809,13 +811,13 @@ module Print = struct
     then print_stmt ~braces:true fmt s
     else
       print_pair_delim nothing newline nothing
-        (print_list newline print_def)
+        (print_list newline (print_def ~global:false))
         (print_stmt ~braces:true)
         fmt (def,s)
 
   let print_global_def fmt def =
     clear_local_printer ();
-    print_def fmt def
+    print_def ~global:true fmt def
 
   let print_file fmt info ast =
     Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
@@ -1611,9 +1613,21 @@ module MLToC = struct
             let st = struct_of_rs info rs in
             C.Tstruct st, [C.Dstruct st]
           else rtype, [] in
+        (* struct definition goes only in the header *)
+        let rm_struct_def = function
+          | C.Dstruct (s,_) ->
+             Debug.dprintf debug_c_extraction "removing def of %s@." s;
+             C.Dstruct_decl s
+          | d -> d in
+        let sdecls =
+          if header then sdecls
+          else List.map rm_struct_def sdecls in
         if has_array rtype then raise (Unsupported "array return");
         if header
-        then sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
+        then
+          if Hid.mem globals rs.rs_name
+          then sdecls@[C.Ddecl (rtype, [rs.rs_name, Enothing])]
+          else sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
         else
           let env = { computes_return_value = true;
                       in_unguarded_loop = false;
@@ -1674,7 +1688,9 @@ module MLToC = struct
                 then raise (Unsupported "array in struct");*)
                 let sd = id.id_string, fields in
                 Hid.replace structs id sd;
-                [C.Dstruct sd]
+                if header
+                then [C.Dstruct sd]
+                else [C.Dstruct_decl id.id_string]
              | Some Ddata _ -> raise (Unsupported "Ddata@.")
              | Some (Drange _) | Some (Dfloat _) ->
                 raise (Unsupported "Drange/Dfloat@.")
@@ -1792,19 +1808,20 @@ let print_header_decl =
     let info = mk_info args m in
     print_header_decl info fmt d end
 
-let print_prelude args ?old ?fname ~flat deps fmt pm =
+let print_prelude header args ?old ?fname ~flat deps fmt pm =
   ignore old;
-  ignore fname;
   ignore flat;
-  ignore pm;
+  ignore fname;
   ignore args;
-  let add_include id =
+  let add_include m =
+    let id = m.Pmodule.mod_theory.Theory.th_name in
     Format.fprintf fmt "%a@." Print.print_global_def C.(Dinclude (id,Proj)) in
-  List.iter
-    (fun m ->
-      let id = m.Pmodule.mod_theory.Theory.th_name in
-      add_include id)
-    (List.rev deps)
+  if header
+  then
+    List.iter add_include (List.rev deps)
+  else
+    (* C files include only their own header *)
+    add_include pm
 
 let print_decl args fmt d =
   let cds = MLToC.translate_decl args d ~header:false in
@@ -1831,14 +1848,14 @@ let c_printer = Pdriver.{
     implem_printer = {
         filename_generator = name_gen ".c";
         decl_printer = print_decl;
-        prelude_printer = print_prelude;
+        prelude_printer = print_prelude false;
         header_printer = dummy_border_printer;
         footer_printer = dummy_border_printer;
       };
     interf_printer = Some {
         filename_generator = name_gen ".h";
         decl_printer = print_header_decl;
-        prelude_printer = print_prelude;
+        prelude_printer = print_prelude true;
         header_printer = header_border_printer true;
         footer_printer = header_border_printer false;
       };

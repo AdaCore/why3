@@ -161,29 +161,13 @@ let print_mdecls ?fname m mdecls deps =
       Printer.query_syntax pargs.Pdriver.syntax id = None in
     List.exists test_id_not_driver decl_name in
   let prelude_exists =
-    Ident.Mid.mem m.mod_theory.th_name pargs.thprelude in
+    Ident.Mid.mem m.mod_theory.th_name pargs.thprelude
+  || (!opt_interface && Ident.Mid.mem m.mod_theory.th_name pargs.thinterface)
+  in
   if List.exists test_decl_not_driver mdecls || prelude_exists
   then begin
     let flat = opt_modu_flat = Flat in
     let tname = m.mod_theory.th_name in
-    (* print interface file *)
-    if !opt_interface then begin
-      match printer.interf_printer with
-      | None ->
-          eprintf "Driver does not support interface extraction.@.";
-          exit 1
-      | Some interf ->
-          let iout, old = get_cout_old interf.filename_generator m ?fname in
-          let ifmt = formatter_of_out_channel iout in
-          interf.header_printer pargs ?old ?fname ~flat ifmt m;
-          Printer.print_prelude ifmt pargs.prelude;
-          let inter_p = Ident.Mid.find_def [] tname pargs.thinterface in
-          Printer.print_interface ifmt inter_p;
-          let pr_idecl fmt d =
-            interf.decl_printer pargs ?old ?fname ~flat m fmt d in
-          Pp.print_list Pp.nothing pr_idecl ifmt mdecls;
-          interf.footer_printer pargs ?old ?fname ~flat ifmt m;
-          if iout <> stdout then close_out iout end;
     let cout, old = get_cout_old implem.filename_generator m ?fname in
     let fmt = formatter_of_out_channel cout in
     (* print driver prelude *)
@@ -197,6 +181,25 @@ let print_mdecls ?fname m mdecls deps =
       implem.decl_printer pargs ?old ?fname ~flat m fmt d in
     Pp.print_list Pp.nothing pr_decl fmt mdecls;
     if cout <> stdout then close_out cout;
+    (* print interface file *)
+    if !opt_interface then begin
+      match printer.interf_printer with
+      | None ->
+          eprintf "Driver does not support interface extraction.@.";
+          exit 1
+      | Some interf ->
+          let iout, old = get_cout_old interf.filename_generator m ?fname in
+          let ifmt = formatter_of_out_channel iout in
+          interf.header_printer pargs ?old ?fname ~flat ifmt m;
+          Printer.print_prelude ifmt pargs.prelude;
+          let inter_p = Ident.Mid.find_def [] tname pargs.thinterface in
+          interf.prelude_printer pargs ?old ?fname ~flat deps ifmt m;
+          Printer.print_interface ifmt inter_p;
+          let pr_idecl fmt d =
+            interf.decl_printer pargs ?old ?fname ~flat m fmt d in
+          Pp.print_list Pp.nothing pr_idecl ifmt mdecls;
+          interf.footer_printer pargs ?old ?fname ~flat ifmt m;
+          if iout <> stdout then close_out iout end;
     true end
   else false
 
@@ -236,13 +239,14 @@ let extract_to =
   fun ?fname ?decl m deps ->
     match m.mod_theory.th_path with
     | "why3"::_ -> false
-    | _ -> let name = m.mod_theory.th_name in
-        if not (Ident.Hid.mem memo name) then begin
-          let mdecls = translate ?decl m in
-          let file_exists = print_mdecls ?fname m mdecls deps in
-          Ident.Hid.add memo name file_exists;
-          file_exists end
-        else Ident.Hid.find memo name
+    | _ ->
+       let name = m.mod_theory.th_name in
+       if not (Ident.Hid.mem memo name) then begin
+           let mdecls = translate ?decl m in
+           let file_exists = print_mdecls ?fname m mdecls deps in
+           Ident.Hid.add memo name file_exists;
+           file_exists end
+       else Ident.Hid.find memo name
 
 let rec use_fold f l =
   List.fold_left

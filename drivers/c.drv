@@ -7,13 +7,6 @@
 
 printer "c"
 
-prelude "#include <stdlib.h>"
-prelude "#include <stdint.h>"
-prelude "#include <stdio.h>"
-prelude "#include <assert.h>"
-prelude "#include <alloca.h>"
-prelude "#include <string.h>"
-
 module ref.Ref
   syntax val (!_) "%d1"           prec 2 2
   syntax val (:=) "%d1 = %2"      prec 14 2 14
@@ -25,6 +18,7 @@ end
 
 module mach.int.Int32
 
+  interface "#include <stdint.h>"
   syntax type int32  "int32_t"
   syntax literal int32 "%c"
 
@@ -42,6 +36,7 @@ module mach.int.Int32
 end
 
 module mach.int.Int32BV
+  interface "#include <stdint.h>"
   syntax val to_bv "%1" prec 0
   syntax val of_bv "%1" prec 0
 end
@@ -53,6 +48,7 @@ module mach.int.Int32GMP
 end
 module mach.int.UInt32Gen
 
+  interface "#include <stdint.h>"
   syntax type uint32 "uint32_t"
 
   syntax val max_uint32 "0xffffffff" prec 0
@@ -67,6 +63,7 @@ end
 
 module mach.int.UInt32
 
+  interface "#include <stdint.h>"
   syntax literal uint32 "%cU"
 
   syntax val (+)     "%1 + %2"   prec 4 4 3
@@ -84,80 +81,6 @@ module mach.int.UInt32
 end
 
 module mach.int.UInt32GMP
-
-  prelude "\n\
-#define LOW_MASK 0x00000000FFFFFFFFUL\n\
-\n\
-struct __add32_with_carry_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
-\n\
-struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c)\n\
-{\n\
-  struct __add32_with_carry_result result;\n\
-  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) c;\n\
-  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
-  result.__field_1 = (uint32_t)(r >> 32);\n\
-  return result;\n\
-}\n\
-\n\
-struct __sub32_with_borrow_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
-\n\
-struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b)\n\
-{\n\
-  struct __sub32_with_borrow_result result;\n\
-  uint64_t r = (uint64_t)x - (uint64_t)y - (uint64_t) b;\n\
-  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
-  result.__field_1 = (uint32_t)(r >> 63);\n\
-  return result;\n\
-}\n\
-\n\
-struct __mul32_double_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
-\n\
-struct __mul32_double_result mul32_double(uint32_t x, uint32_t y)\n\
-{\n\
-  struct __mul32_double_result result;\n\
-  uint64_t r = (uint64_t)x * (uint64_t)y;\n\
-  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
-  result.__field_1 = (uint32_t)(r >> 32);\n\
-  return result;\n\
-}\n\
-\n\
-struct __add32_3_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
-\n\
-struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z)\n\
-{\n\
-  struct __add32_3_result result;\n\
-  uint64_t r = (uint64_t)x + (uint64_t)y + (uint64_t) z;\n\
-  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
-  result.__field_1 = (uint32_t)(r >> 32);\n\
-  return result;\n\
-}\n\
-\n\
-struct __lsld32_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
-\n\
-struct __lsld32_result lsld32(uint32_t x, uint32_t cnt)\n\
-{\n\
-  struct __lsld32_result result;\n\
-  uint64_t r = (uint64_t)x << cnt;\n\
-  result.__field_0 = (uint32_t)(r & LOW_MASK);\n\
-  result.__field_1 = (uint32_t)(r >> 32);\n\
-  return result;\n\
-}\n\
-"
 
   interface "\n\
 struct __add32_with_carry_result\n\
@@ -258,6 +181,7 @@ end
 
 module mach.int.UInt64Gen
 
+  interface "#include <stdint.h>"
   syntax type uint64 "uint64_t"
 
   syntax val max_uint64 "0xffffffffffffffff" prec 0
@@ -284,72 +208,6 @@ module mach.int.UInt64
 end
 
 module mach.int.UInt64GMP
-
-  prelude "\n\
-struct __add64_with_carry_result\n\
-{ uint64_t __field_0;\n\
-  uint64_t __field_1;\n\
-};\n\
-\n\
-struct __add64_with_carry_result\n\
-add64_with_carry(uint64_t x, uint64_t y, uint64_t c)\n\
-{\n\
-  struct __add64_with_carry_result result;\n\
-  uint64_t r = x + y + c;\n\
-  result.__field_0 = r;\n\
-  if (r == x) result.__field_1 = c;\n\
-  else result.__field_1 = (r < x);\n\
-  return result;\n\
-}\n\
-\n\
-struct __sub64_with_borrow_result\n\
-{ uint64_t __field_0;\n\
-  uint64_t __field_1;\n\
-};\n\
-\n\
-struct __sub64_with_borrow_result\n\
-sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)\n\
-{\n\
-  struct __sub64_with_borrow_result result;\n\
-  uint64_t r = x - y - b;\n\
-  result.__field_0 = r;\n\
-  if (r > x) result.__field_1 = 1;\n\
-  else if (r == x) result.__field_1 = b;\n\
-  else result.__field_1 = 0;\n\
-  return result;\n\
-}\n\
-\n\
-struct __add64_3_result\n\
-{ uint64_t __field_0;\n\
-  uint64_t __field_1;\n\
-};\n\
-\n\
-struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)\n\
-{\n\
-  struct __add64_3_result result;\n\
-  uint64_t r, c1, c2;\n\
-  r = x + y;\n\
-  c1 = r < y;\n\
-  r += z;\n\
-  c2 = r < z;\n\
-  result.__field_1 = c1 + c2;\n\
-  result.__field_0 = r;\n\
-  return result;\n\
-}\n\
-\n\
-struct __lsld64_result\n\
-{ uint64_t __field_0;\n\
-  uint64_t __field_1;\n\
-};\n\
-\n\
-struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\n\
-{\n\
-  struct __lsld64_result result;\n\
-  result.__field_1 = x >> (64 - cnt);\n\
-  result.__field_0 = x << cnt;\n\
-  return result;\n\
-}\n\
-"
 
   interface "\n\
 struct __add64_with_carry_result\n\
@@ -507,10 +365,10 @@ end
 
 module mach.c.C
 
-  prelude
-  "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
-  prelude
-  "#define IGNORE3(x,y,z) do { (void)(x); (void)(y); (void)(z); } while (0)"
+  interface "#include <stdlib.h>"
+  interface "#include <stdio.h>"
+  interface "#include <assert.h>"
+  interface "#include <alloca.h>"
   interface
   "#define IGNORE2(x,y) do { (void)(x); (void)(y); } while (0)"
   interface
@@ -592,8 +450,7 @@ end
 
 module mach.c.String
 
-  prelude "#include<string.h>"
-
+  interface "#include <string.h>"
   syntax type string "char *"
 
   syntax val get "%1[%2]" prec 1 1 15

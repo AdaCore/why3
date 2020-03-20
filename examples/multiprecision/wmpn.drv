@@ -151,23 +151,6 @@ end
 
 module mpz.Z
 
-prelude "\n\
-typedef struct\n\
-{\n\
-  int _alloc;\n\
-  int _size;\n\
-  uint64_t * _ptr;\n\
-} __wmpz_struct;\n\
-\n\
-typedef __wmpz_struct *wmpz_ptr;\n\
-typedef __wmpz_struct wmpz_t[1];\n\
-\n\
-#define SIZ(x) ((x)->_size)\n\
-#define ALLOC(x) ((x)->_alloc)\n\
-#define PTR(x) ((x)->_ptr)\n\
-\n\
-"
-
 interface "\n\
 typedef struct\n\
 {\n\
