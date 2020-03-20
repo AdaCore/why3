@@ -18,6 +18,9 @@ open Expr
 let infer_flag =
   Debug.register_flag "infer-loop" ~desc:"Infer loop invariants"
 
+let print_inferred_invs =
+  Debug.register_flag "print-inferred-invs" ~desc:"Print inferred invariant"
+
 let is_infer_attr s = Strings.has_prefix "infer" s || s = "infer"
 
 let attrs_has_infer attrs =
@@ -67,7 +70,14 @@ let infer_loops ai_ops e cty =
     if Debug.test_flag Uf_domain.infer_debug then
       Pretty.print_term Format.std_formatter t;
     (e,t) in
-  List.map domain2term fixp
+  let invs = List.map domain2term fixp in
+  if Debug.test_flag print_inferred_invs then begin
+      Format.printf "### Debug: inferred invariants ###@\n";
+      let print_i (_,t) = Format.printf "%a@\n" Pretty.print_term t in
+      List.iter print_i invs;
+      Format.printf "###@."
+    end;
+  invs
 
 let infer_loops ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
   let module AI = Ai_cfg.Make (struct

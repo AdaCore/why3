@@ -41,6 +41,8 @@ for d in $dirs; do
   files="$files $mlw"
 done
 
+failed=""
+
 # $1 = file
 run () {
   printf "running for $1"
@@ -62,6 +64,7 @@ run () {
       echo "diff is the following:"
       echo "$f"
       diff <(echo "$str_oracle") <(echo "$str_output")
+      failed="$failed\n$1"
       success=false
     fi
   fi
@@ -76,5 +79,6 @@ if $success; then
     exit 0
 else
     echo "Infer bench: failed"
+    printf "$failed\n"
     exit 1
 fi
