@@ -1551,7 +1551,7 @@ module MLToC = struct
        | Lany _ -> raise (Unsupported "Lany")
        end
 
-  let translate_decl (info:info) (d:decl) ~header : C.definition list =
+  let translate_decl (info:info) (d:decl) ~flat ~header : C.definition list =
     current_decl_name := "";
     let translate_fun rs mlty vl e =
       current_decl_name := rs.rs_name.id_string;
@@ -1620,8 +1620,9 @@ module MLToC = struct
              C.Dstruct_decl s
           | d -> d in
         let sdecls =
-          if header then sdecls
-          else List.map rm_struct_def sdecls in
+          if not (header || flat)
+          then List.map rm_struct_def sdecls
+          else sdecls in
         if has_array rtype then raise (Unsupported "array return");
         if header
         then
@@ -1692,7 +1693,7 @@ module MLToC = struct
                 then raise (Unsupported "array in struct");*)
                 let sd = id.id_string, fields in
                 Hid.replace structs id sd;
-                if header
+                if header || flat
                 then [C.Dstruct sd]
                 else [C.Dstruct_decl id.id_string]
              | Some Ddata _ -> raise (Unsupported "Ddata@.")
@@ -1724,14 +1725,15 @@ module MLToC = struct
            !current_decl_name s;
        []
 
-  let translate_decl (info:info) (d:Mltree.decl) ~header : C.definition list =
+  let translate_decl (info:info) (d:Mltree.decl) ~header ~flat
+      : C.definition list =
     let decide_print id =
       (not (header && (Sattr.mem Print.c_static_inline id.id_attrs)))
       && query_syntax info.syntax id = None in
     let names = Mltree.get_decl_name d in
     match List.filter decide_print names with
     | [] -> []
-    | _ -> translate_decl info d ~header
+    | _ -> translate_decl info d ~header ~flat
 
 end
 
@@ -1769,7 +1771,6 @@ let defs dl = List.map def dl
 
 end
 
-
 let name_gen suffix ?fname m =
   let n = m.Pmodule.mod_theory.Theory.th_name.Ident.id_string in
   let n = Print.sanitizer n in
@@ -1778,7 +1779,7 @@ let name_gen suffix ?fname m =
     | Some f -> f ^ "__" ^ n ^ suffix in
   Strings.lowercase r
 
-let header_border_printer header _args ?old:_ ?fname ~flat:_ fmt m =
+let header_border_printer header _args ?old:_ ?fname fmt m =
   let n = Strings.uppercase (name_gen "_H_INCLUDED" ?fname m) in
   if header then
     Format.fprintf fmt "#ifndef %s@\n@." n
@@ -1786,7 +1787,7 @@ let header_border_printer header _args ?old:_ ?fname ~flat:_ fmt m =
     Format.fprintf fmt "#define %s@\n#endif // %s@." n n
 
 let print_header_decl args fmt d =
-  let cds = MLToC.translate_decl args d ~header:true in
+  let cds = MLToC.translate_decl args d ~header:true ~flat:false in
   List.iter (Format.fprintf fmt "%a@." Print.print_global_def) cds
 
 let mk_info (args:Pdriver.printer_args) m = {
@@ -1802,17 +1803,16 @@ let mk_info (args:Pdriver.printer_args) m = {
 
 let print_header_decl =
   let memo = Hashtbl.create 16 in
-  fun args ?old ?fname ~flat m fmt d ->
+  fun args ?old ?fname m fmt d ->
   ignore old;
   ignore fname;
-  ignore flat;
   if not (Hashtbl.mem memo d)
   then begin
     Hashtbl.add memo d ();
     let info = mk_info args m in
     print_header_decl info fmt d end
 
-let print_prelude header args ?old ?fname ~flat deps fmt pm =
+let print_prelude ~header args ?old ?fname ~flat deps fmt pm =
   ignore old;
   ignore flat;
   ignore fname;
@@ -1827,41 +1827,47 @@ let print_prelude header args ?old ?fname ~flat deps fmt pm =
     (* C files include only their own header *)
     add_include pm
 
-let print_decl args fmt d =
-  let cds = MLToC.translate_decl args d ~header:false in
+let print_decl args fmt d ~flat =
+  let cds = MLToC.translate_decl args d ~header:false ~flat in
   let cds = Transform.defs cds in
   let print_def d =
     Format.fprintf fmt "%a@." Print.print_global_def d in
   List.iter print_def cds
 
-let print_decl =
+let print_decl ~flat =
   let memo = Hashtbl.create 16 in
-  fun args ?old ?fname ~flat m fmt d ->
+  fun args ?old ?fname m fmt d ->
   ignore old;
   ignore fname;
-  ignore flat;
   ignore m;
   if not (Hashtbl.mem memo d)
   then begin
       Hashtbl.add memo d ();
       let info = mk_info args m in
-    print_decl info fmt d end
+    print_decl info fmt d ~flat end
 
 let c_printer = Pdriver.{
     desc = "printer for C code";
     implem_printer = {
         filename_generator = name_gen ".c";
-        decl_printer = print_decl;
-        prelude_printer = print_prelude false;
+        decl_printer = print_decl ~flat:false;
+        prelude_printer = print_prelude ~flat:false ~header:false;
         header_printer = dummy_border_printer;
         footer_printer = dummy_border_printer;
       };
     interf_printer = Some {
         filename_generator = name_gen ".h";
         decl_printer = print_header_decl;
-        prelude_printer = print_prelude true;
+        prelude_printer = print_prelude ~flat:false ~header:true;
         header_printer = header_border_printer true;
         footer_printer = header_border_printer false;
+      };
+    flat_printer = {
+        filename_generator = name_gen ".c";
+        decl_printer = print_decl ~flat:true;
+        prelude_printer = print_prelude ~flat:true ~header:false;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
       };
   }
 

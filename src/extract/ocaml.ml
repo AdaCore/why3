@@ -865,7 +865,14 @@ let ocaml_printer = Pdriver.{
     desc = "printer for Ocaml code";
     implem_printer = {
         filename_generator = ng ".ml";
-        decl_printer = print_decl;
+        decl_printer = print_decl ~flat:false;
+        prelude_printer = dummy_prelude_printer;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
+      };
+    flat_printer = {
+        filename_generator = ng ".ml";
+        decl_printer = print_decl ~flat:true;
         prelude_printer = dummy_prelude_printer;
         header_printer = dummy_border_printer;
         footer_printer = dummy_border_printer;

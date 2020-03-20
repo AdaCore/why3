@@ -154,7 +154,6 @@ let print_preludes =
 let print_mdecls ?fname m mdecls deps =
   let open Pdriver in
   let pargs, printer = lookup_printer opt_driver in
-  let implem = printer.implem_printer in
   let test_decl_not_driver decl =
     let decl_name = Mltree.get_decl_name decl in
     let test_id_not_driver id =
@@ -162,23 +161,26 @@ let print_mdecls ?fname m mdecls deps =
     List.exists test_id_not_driver decl_name in
   let prelude_exists =
     Ident.Mid.mem m.mod_theory.th_name pargs.thprelude
-  || (!opt_interface && Ident.Mid.mem m.mod_theory.th_name pargs.thinterface)
+    || (!opt_interface && Ident.Mid.mem m.mod_theory.th_name pargs.thinterface)
   in
   if List.exists test_decl_not_driver mdecls || prelude_exists
   then begin
-    let flat = opt_modu_flat = Flat in
+    let implem =
+      if opt_modu_flat = Flat
+      then printer.flat_printer
+      else printer.implem_printer in
     let tname = m.mod_theory.th_name in
     let cout, old = get_cout_old implem.filename_generator m ?fname in
     let fmt = formatter_of_out_channel cout in
     (* print driver prelude *)
     Printer.print_prelude fmt pargs.prelude;
     (* print module prelude *)
-    implem.prelude_printer pargs ?old ?fname ~flat deps fmt m;
+    implem.prelude_printer pargs ?old ?fname deps fmt m;
     let pm = pargs.thprelude in
     print_preludes tname fmt pm;
     (* print decls *)
     let pr_decl fmt d =
-      implem.decl_printer pargs ?old ?fname ~flat m fmt d in
+      implem.decl_printer pargs ?old ?fname m fmt d in
     Pp.print_list Pp.nothing pr_decl fmt mdecls;
     if cout <> stdout then close_out cout;
     (* print interface file *)
@@ -190,15 +192,15 @@ let print_mdecls ?fname m mdecls deps =
       | Some interf ->
           let iout, old = get_cout_old interf.filename_generator m ?fname in
           let ifmt = formatter_of_out_channel iout in
-          interf.header_printer pargs ?old ?fname ~flat ifmt m;
+          interf.header_printer pargs ?old ?fname ifmt m;
           Printer.print_prelude ifmt pargs.prelude;
           let inter_p = Ident.Mid.find_def [] tname pargs.thinterface in
-          interf.prelude_printer pargs ?old ?fname ~flat deps ifmt m;
+          interf.prelude_printer pargs ?old ?fname deps ifmt m;
           Printer.print_interface ifmt inter_p;
           let pr_idecl fmt d =
-            interf.decl_printer pargs ?old ?fname ~flat m fmt d in
+            interf.decl_printer pargs ?old ?fname m fmt d in
           Pp.print_list Pp.nothing pr_idecl ifmt mdecls;
-          interf.footer_printer pargs ?old ?fname ~flat ifmt m;
+          interf.footer_printer pargs ?old ?fname ifmt m;
           if iout <> stdout then close_out iout end;
     true end
   else false
@@ -395,7 +397,7 @@ let () =
         let open Pdriver in
         let mm = Queue.fold flat_extraction Mstr.empty opt_queue in
         let (pargs, printer) = lookup_printer opt_driver in
-        let implem = printer.implem_printer in
+        let flat_printer = printer.flat_printer in
         let cout = match opt_output with
           | None -> stdout
           | Some file -> open_out file in
@@ -421,7 +423,7 @@ let () =
           let pm = find_module_id mm id in
           let m = translate_module pm in
           let d = Ident.Mid.find id m.Mltree.mod_known in
-          implem.decl_printer pargs ~flat:true pm fmt d in
+          flat_printer.decl_printer pargs pm fmt d in
         let idl = List.rev !toextract in
         let is_local { info_id = id; info_rec = r } =
           let (path, m, _) = Pmodule.restore_path id in
