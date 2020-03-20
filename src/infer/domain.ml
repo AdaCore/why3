@@ -44,15 +44,13 @@ end
 
 module Make_from_apron(M:sig
     type man
-    type env
     type t
     val create_manager: unit -> man
   end) = struct
   type man = M.man
-  type env = M.env
+  type env = Environment.t
   type t = M.t
   let create_manager = M.create_manager
-
 
   module A = Abstract1
 
@@ -92,51 +90,49 @@ module Make_from_apron(M:sig
     let int_add =  begin fun a ->
       match a with
       | [a; b] ->
-        if t_equal a int_zero then b
-        else if t_equal b int_zero then a
-        else fs_app Theory.(ns_find_ls th_int.th_export ["infix +"]) [a; b] ty_int
+         if t_equal a int_zero then b
+         else if t_equal b int_zero then a
+         else fs_app Theory.(ns_find_ls th_int.th_export ["infix +"])
+                [a; b] ty_int
       | _ -> assert false
     end in
-    let int_minus_u = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["prefix -"]) a ty_int in
+    let int_minus_u = fun a ->
+      fs_app Theory.(ns_find_ls th_int.th_export ["prefix -"]) a ty_int in
     let _ (* int_minus *) = begin fun a ->
       match a with
       | [a; b] ->
-        if t_equal a int_zero then int_minus_u [b]
-        else if t_equal b int_zero then a
-        else fs_app Theory.(ns_find_ls th_int.th_export ["infix -"]) [a; b] ty_int
+         if t_equal a int_zero then int_minus_u [b]
+         else if t_equal b int_zero then a
+         else fs_app Theory.(ns_find_ls th_int.th_export ["infix -"])
+                [a; b] ty_int
       | _ -> assert false
-    end
+      end
     in
-    let int_mult = fun a -> fs_app Theory.(ns_find_ls th_int.th_export ["infix *"]) a ty_int in
 
+    let int_mult = fun a ->
+      fs_app Theory.(ns_find_ls th_int.th_export ["infix *"]) a ty_int in
     let rec int_of_s s =
       let open Scalar in
       match s with
       | Float f ->
-        let i = int_of_float f in
-        assert (float_of_int i = f);
-        i
+         let i = int_of_float f in
+         assert (float_of_int i = f);
+         i
       | Mpqf t ->
-        int_of_s (Float (Mpqf.to_float t))
+         int_of_s (Float (Mpqf.to_float t))
       | Mpfrf t ->
-        int_of_s (Float (Mpfr.to_float t))
+         int_of_s (Float (Mpfr.to_float t))
     in
 
     let coeff_to_term = function
       | Coeff.Scalar s ->
-        let i = int_of_s s in
-        let n = Constant.int_const_of_int (abs i) in
-
-        if i = 1 then
-          COne
-        else if i = -1 then
-          CMinusOne
-        else if i > 0 then
-          CPos (t_const n Ty.ty_int)
-        else if i < 0 then
-          CMinus (t_const n Ty.ty_int)
-        else
-          CNone
+         let i = int_of_s s in
+         let n = Constant.int_const_of_int (abs i) in
+         if i = 1 then COne
+         else if i = -1 then CMinusOne
+         else if i > 0 then CPos (t_const n Ty.ty_int)
+         else if i < 0 then CMinus (t_const n Ty.ty_int)
+         else CNone
       | Coeff.Interval _ -> raise Cannot_be_expressed
     in
 
@@ -162,23 +158,17 @@ module Make_from_apron(M:sig
       let c = coeff_to_term (Lincons1.get_cst l) in
       let termr, terml, strict, terml_strict = match c with
         | CNone -> !termr, !terml, false, !terml
-        | CPos c ->
-          int_add [c; !termr], !terml, false, !terml
-        | CMinus c ->
-          !termr, int_add [!terml;c], false, !terml
-        | COne ->
-          int_add [int_one; !termr], !terml, false, !terml
-        | CMinusOne ->
-          !termr, int_add [int_one; !terml], true, !terml
+        | CPos c -> int_add [c; !termr], !terml, false, !terml
+        | CMinus c -> !termr, int_add [!terml;c], false, !terml
+        | COne -> int_add [int_one; !termr], !terml, false, !terml
+        | CMinusOne -> !termr, int_add [int_one; !terml], true, !terml
       in
       match Lincons1.get_typ l with
       | Lincons1.EQ -> ps_app ps_equ [terml; termr]
       | Lincons1.SUP -> ps_app int_lt [terml; termr]
       | Lincons1.SUPEQ ->
-        if strict then
-          ps_app int_lt [terml_strict; termr]
-        else
-          ps_app int_le [terml; termr;]
+        if strict then ps_app int_lt [terml_strict; termr]
+        else ps_app int_le [terml; termr;]
       | Lincons1.DISEQ ->  t_not (ps_app ps_equ [terml; termr])
       | Lincons1.EQMOD _ -> assert false
     in
@@ -187,7 +177,8 @@ module Make_from_apron(M:sig
       let n = Lincons1.array_length l in
       let t = ref (Term.t_true) in
       for i = 0 to n - 1 do
-        t := t_and_simp !t (lincons_to_term (Lincons1.array_get l i) variable_mapping);
+        let v = lincons_to_term (Lincons1.array_get l i) variable_mapping in
+        t := t_and_simp !t v;
       done;
       !t
     in
@@ -195,12 +186,13 @@ module Make_from_apron(M:sig
     let domain_to_term man d variable_mapping =
       let a = Abstract1.to_lincons_array man d in
       lincons_array_to_term a variable_mapping
-    in domain_to_term
+    in
+
+    domain_to_term
 
   let push_label _ _ _ t = t
 
   let to_lincons_array = Abstract1.to_lincons_array
-
 
   let get_linexpr man d v =
     let cons = to_lincons_array man d in
@@ -214,8 +206,7 @@ module Make_from_apron(M:sig
           let var_list = ref [] in
           let neg = ref false in
           Lincons1.iter (fun c v' ->
-              if v <> v' then
-                var_list := (c, v') :: !var_list
+              if v <> v' then var_list := (c, v') :: !var_list
               else match c with
                 | Coeff.Scalar s ->
                   neg := Scalar.equal_int s 1;
@@ -305,8 +296,7 @@ module Make_from_apron(M:sig
     let _ (* a *), b, _ (* linexpr_a *), _ (* linexpr_b *) =
       if Lincons1.array_length linexpr_a > Lincons1.array_length linexpr_b then
         b, a, linexpr_b, linexpr_a
-      else
-        a, b, linexpr_a, linexpr_b
+      else a, b, linexpr_a, linexpr_b
     in
     let precise = ref true in
     for i = 0 to Lincons1.array_length linexpr_a - 1 do
@@ -314,12 +304,9 @@ module Make_from_apron(M:sig
       (* FIXME: sat lincons *)
       let opp_typ =
         let typ = Lincons1.get_typ line in
-        if typ = Lincons1.EQ then
-          [Lincons1.SUP, 1; Lincons1.SUP, -1]
-        else if typ = Lincons1.SUP then
-          [Lincons1.SUPEQ, -1]
-        else if typ = Lincons1.SUPEQ then
-          [Lincons1.SUP, -1]
+        if typ = Lincons1.EQ then [Lincons1.SUP, 1; Lincons1.SUP, -1]
+        else if typ = Lincons1.SUP then [Lincons1.SUPEQ, -1]
+        else if typ = Lincons1.SUPEQ then [Lincons1.SUP, -1]
         else assert false
       in
       precise := !precise && begin
@@ -360,7 +347,6 @@ end
 
 module Polyhedra = Make_from_apron(struct
   type man = Polka.strict Polka.t Manager.t
-  type env = Environment.t
   type t = Polka.strict Polka.t Abstract1.t
   let create_manager = Polka.manager_alloc_strict
   end)
@@ -375,14 +361,12 @@ module Polyhedra = Make_from_apron(struct
 
 module Box = Make_from_apron(struct
   type man = Box.t Manager.t
-  type env = Environment.t
   type t = Box.t Abstract1.t
   let create_manager = Box.manager_alloc
   end)
 
 module Oct = Make_from_apron(struct
   type man = Oct.t Manager.t
-  type env = Environment.t
   type t = Oct.t Abstract1.t
   let create_manager = Oct.manager_alloc
   end)
