@@ -25,28 +25,6 @@ uint64_t binvert_limb_table (uint64_t n) {\n\
 end
 
 module mach.int.UInt64GMP
-
-  prelude "\n\
-typedef unsigned __int128 uint128_t;\n\
-\n\
-struct __mul64_double_result\n\
-{ uint64_t __field_0;\n\
-  uint64_t __field_1;\n\
-};\n\
-\n\
-struct __mul64_double_result mul64_double(uint64_t x, uint64_t y)\n\
-{\n\
-  uint128_t z = (uint128_t)x * (uint128_t)y;\n\
-  struct __mul64_double_result result = { z, z >> 64 };\n\
-  return result;\n\
-}\n\
-\n\
-uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)\n\
-{\n\
-  return (((uint128_t)uh << 64) | ul) / d;\n\
-}\n\
-"
-
   interface "\n\
 typedef unsigned __int128 uint128_t;\n\
 \n\

@@ -1680,7 +1680,11 @@ module MLToC = struct
                     pjl in
                 let fields =
                   List.map
-                    (fun (_, id, ty) -> (id.id_string, ty_of_mlty info ty))
+                    (fun (_, id, ty) ->
+                      let cty = ty_of_mlty info ty in
+                      match cty with
+                      | Tstruct _ -> raise (Unsupported "nested structs")
+                      | _ -> (id.id_string, cty))
                     pjl in
                 (*if List.exists
                      (fun (_,t) -> match t with Tarray _ -> true | _ -> false)
