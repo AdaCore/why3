@@ -484,8 +484,8 @@ PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/microc/mc_lexer.ml \
 		plugins/microc/mc_parser.ml plugins/microc/mc_parser.mli \
 		plugins/parser/dimacs.ml \
-                plugins/ada_terms/ada_lexer.ml \
-                plugins/ada_terms/ada_parser.ml plugins/ada_terms/ada_parser.mli
+		plugins/ada_terms/ada_lexer.ml \
+		plugins/ada_terms/ada_parser.ml plugins/ada_terms/ada_parser.mli
 
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
@@ -709,20 +709,18 @@ GNATWHY3_FILES := gnat_util gnat_loc gnat_expl gnat_counterexamples gnat_config\
 	      gnat_scheduler gnat_manual gnat_report gnat_objectives gnat_main
 
 GNATWHY3MODULES := $(addprefix src/gnat/, $(GNATWHY3_FILES))
-GNATWHY3DEP = $(addsuffix .dep, $(GNATASTMODULES) $(GNATWHY3MODULES))
-GNATWHY3CMO = $(addsuffix .cmo, $(GNATASTMODULES) $(GNATWHY3MODULES))
+GNATWHY3DEP = $(addsuffix .dep, $(GNATASTMODULES) $(ADAMODULES) $(GNATWHY3MODULES))
+GNATWHY3CMO = $(addsuffix .cmo, $(GNATASTMODULES) $(ADAMODULES) $(GNATWHY3MODULES))
 # Import external printer parser for Ada
-GNATWHY3CMX = plugins/ada_terms/ada_nametable.cmx plugins/ada_terms/ada_parser.cmx plugins/ada_terms/ada_lexer.cmx plugins/ada_terms/ada_main.cmx
-GNATWHY3CMX += $(addsuffix .cmx, $(GNATASTMODULES) $(GNATWHY3MODULES))
+GNATWHY3CMX = $(addsuffix .cmx, $(GNATASTMODULES) $(ADAMODULES) $(GNATWHY3MODULES))
 $(GNATWHY3CMO) $(GNATWHY3CMX): INCLUDES += -I src/gnat -I src/util -I plugins/ada_terms
 $(GNATWHY3DEP): DEPFLAGS += -I src/gnat -I plugins/ada_terms
 
 GNAT_SERVER_MODULES := $(addprefix src/gnat/, $(GNAT_SERVER_FILES))
-GNAT_SERVER_DEP = $(addsuffix .dep, $(GNATASTMODULES) $(GNAT_SERVER_MODULES))
-GNAT_SERVER_CMO = $(addsuffix .cmo, $(GNATASTMODULES) $(GNAT_SERVER_MODULES))
+GNAT_SERVER_DEP = $(addsuffix .dep, $(GNATASTMODULES) $(ADAMODULES) $(GNAT_SERVER_MODULES))
+GNAT_SERVER_CMO = $(addsuffix .cmo, $(GNATASTMODULES) $(ADAMODULES) $(GNAT_SERVER_MODULES))
 # Import external printer parser for Ada
-GNAT_SERVER_CMX = plugins/ada_terms/ada_nametable.cmx plugins/ada_terms/ada_parser.cmx plugins/ada_terms/ada_lexer.cmx plugins/ada_terms/ada_main.cmx
-GNAT_SERVER_CMX += $(addsuffix .cmx, $(GNATASTMODULES) $(GNAT_SERVER_MODULES))
+GNAT_SERVER_CMX = $(addsuffix .cmx, $(GNATASTMODULES) $(ADAMODULES) $(GNAT_SERVER_MODULES))
 $(GNAT_SERVER_CMO) $(GNAT_SERVER_CMX): INCLUDES += -I src/gnat -I src/util -I plugins/ada_terms
 $(GNAT_SERVER_DEP): DEPFLAGS += -I src/gnat -I plugins/ada_terms
 

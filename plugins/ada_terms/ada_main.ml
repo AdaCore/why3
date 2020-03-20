@@ -6,16 +6,12 @@
 *)
 
 open Why3
-
-let ada_format = "ada"
-
-let () = Env.register_format Pmodule.mlw_language ada_format ["adb"]
-    Lexer.read_channel ~desc:"WhyML@ for@ Ada"
-
 open Pretty
 open Term
 open Format
 open Pp
+
+let ada_format = "ada"
 
 let get_name ls =
   Ident.(get_element_name ~attrs:ls.ls_name.id_attrs)
@@ -189,20 +185,18 @@ let ada_ext_printer task =
   in
   ada_ext_printer is_record
 
-let () = Itp_server.add_registered_lang ada_format ada_ext_printer
+(* Registration of ada_terms plugin *)
 
-let () = Args_wrapper.set_argument_parsing_functions ada_format
-    ~parse_term:(fun nt lb -> Ada_lexer.parse_term nt lb)
-    ~parse_term_list:(fun nt lb -> Ada_lexer.parse_term_list nt lb)
-    ~parse_list_ident:(fun lb -> Ada_lexer.parse_list_ident lb)
-    ~parse_qualid:(fun lb -> Ada_lexer.parse_qualid lb)
-    ~parse_list_qualid:(fun lb -> Ada_lexer.parse_list_qualid lb)
+let () =
+  Env.register_format Pmodule.mlw_language ada_format ["adb"]
+    Lexer.read_channel ~desc:"WhyML@ for@ Ada"
 
-let () = Itp_server.add_registered_lang Lexer.whyml_format ada_ext_printer
+let register_ada_terms format =
+  Itp_server.add_registered_lang format ada_ext_printer;
+  let open Ada_lexer in
+  Args_wrapper.set_argument_parsing_functions format
+    ~parse_term ~parse_term_list ~parse_list_ident ~parse_qualid ~parse_list_qualid
 
-let () = Args_wrapper.set_argument_parsing_functions Lexer.whyml_format
-    ~parse_term:(fun nt lb -> Ada_lexer.parse_term nt lb)
-    ~parse_term_list:(fun nt lb -> Ada_lexer.parse_term_list nt lb)
-    ~parse_list_ident:(fun lb -> Ada_lexer.parse_list_ident lb)
-    ~parse_qualid:(fun lb -> Ada_lexer.parse_qualid lb)
-    ~parse_list_qualid:(fun lb -> Ada_lexer.parse_list_qualid lb)
+let () =
+  List.iter register_ada_terms
+    [ada_format; Lexer.whyml_format; Gnat_ast_to_ptree.gnat_json_format]

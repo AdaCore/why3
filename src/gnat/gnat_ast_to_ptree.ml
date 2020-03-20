@@ -1164,10 +1164,11 @@ let read_channel env path filename c =
   let mlw_file = mlw_file gnat_file.theory_declarations in
   Typing.type_mlw_file env path filename mlw_file
 
+let gnat_json_format = "gnat-json"
 
 let () =
   Env.register_format ~desc:"Gnat@ AST@ in@ JSON@ format"
-    Pmodule.mlw_language "gnat-json" ["gnat-json"] read_channel
+    Pmodule.mlw_language gnat_json_format ["gnat-json"] read_channel
 
 let () =
   Exn_printer.register
