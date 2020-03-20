@@ -1,8 +1,9 @@
 open Why3
 open Ptree
 open Gnat_ast
-
 open Ptree_constructors
+
+let debug = Debug.register_info_flag "gnat_ast" ~desc:"Output@ mlw@ file"
 
 [@@@warning "-42"]
 
@@ -1162,6 +1163,12 @@ let read_channel env path filename c =
     with Gnat_ast.From_json.Unexpected_Json (s, node) ->
       raise (E (s, find_path node json)) in
   let mlw_file = mlw_file gnat_file.theory_declarations in
+  if Debug.test_flag debug then begin
+    let out = open_out (filename^".mlw") in
+    let fmt = Format.formatter_of_out_channel out in
+    Mlw_printer.pp_mlw_file fmt mlw_file;
+    close_out out
+  end;
   Typing.type_mlw_file env path filename mlw_file
 
 let gnat_json_format = "gnat-json"

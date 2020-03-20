@@ -599,6 +599,10 @@ let _ =
   if debug_save_vcs || debug then
     Debug.set_flag debug_keep_vcs
 
+let _ =
+  if debug then
+    Debug.set_flag Gnat_ast_to_ptree.debug
+
 let force = !opt_force
 let limit_line = !opt_limit_line
 let limit_region = !opt_limit_region

@@ -26,3 +26,5 @@ val mk_generic_theory :
   Gnat_ast.generic_theory_id -> (Why3.Ptree.ident * Why3.Ptree.decl list) list
 
 val mlw_file : Gnat_ast.generic_theory_id list -> Why3.Ptree.mlw_file
+
+val debug : Why3.Debug.flag
