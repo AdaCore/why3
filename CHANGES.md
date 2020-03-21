@@ -1,5 +1,9 @@
 :x: marks a potential source of incompatibility
 
+Bug fixes
+  * fixed conflicting symbols for CVC4 1.7
+  * fixed META file
+
 Version 1.3.0, March 17, 2020
 -----------------------------
 
