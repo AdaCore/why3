@@ -67,14 +67,14 @@ module Make(E: sig
 
   module Uf_domain =
     Uf_domain.Make(struct
-        module A = Domain
+        module Dom = Domain
         let th_known = E.th_known
         let mod_known = E.mod_known
         let env = E.env
       end)
 
   module D = Quant_domain.Make(struct
-      module A = Disjunctive_term_domain.Make(Uf_domain)
+      module Dom = Disjunctive_term_domain.Make(Uf_domain)
       let th_known = E.th_known
       let mod_known = E.mod_known
       let env = E.env

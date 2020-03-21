@@ -3,38 +3,31 @@ open Domain
 type 'a a = { t: 'a list; c: bool; i: int; }
 
 
-module Make(A:TERM_DOMAIN) = struct
+module Make(Dom : TERM_DOMAIN) = struct
 
-  open Ai_logic
-  (* module Ai_logic = Ai_logic.Make(struct
-   *     let env = S.env
-   *     let th_known = S.th_known
-   *     let mod_known = S.mod_known
-   *   end) *)
-
-  type t = A.t a
-  type env = A.env
+  type t = Dom.t a
+  type env = Dom.env
 
   (* let is_eq _ _ _ = assert false *)
 
-  type disj_man = ()
-  type man = A.man * disj_man
+  type disj_man = unit
+  type man = Dom.man * disj_man
 
-  let (create_manager:unit -> man) = fun _ -> A.create_manager (), ()
+  let (create_manager:unit -> man) = fun _ -> Dom.create_manager (), ()
 
   let bottom _ _ = { i = 0; t = []; c = true; }
 
-  let top man e = { i = 0; t = [A.top (fst man) e]; c = true; }
+  let top man e = { i = 0; t = [Dom.top (fst man) e]; c = true; }
 
-  let canonicalize m a = List.iter (A.canonicalize (fst m)) a.t
+  let canonicalize m a = List.iter (Dom.canonicalize (fst m)) a.t
 
   let print fmt e = List.iter (fun b ->
-      A.print fmt b;
+      Dom.print fmt b;
       Format.fprintf fmt "@.";) e.t
 
   let is_bottom man t =
     let man = fst man in
-    List.fold_left ( && ) true (List.map (A.is_bottom man) t.t)
+    List.fold_left ( && ) true (List.map (Dom.is_bottom man) t.t)
 
   let is_leq (man, _) a b =
     let rec aux = function
@@ -44,13 +37,13 @@ module Make(A:TERM_DOMAIN) = struct
         let rec one_in_many = function
           | [] -> false
           | t':: q' ->
-             A.is_leq man t t' || one_in_many q' in
+             Dom.is_leq man t t' || one_in_many q' in
         one_in_many b.t && aux q in
     aux a.t
 
   let cleanup man a =
     let man = fst man in
-    let not_bottom t = not (A.is_bottom man t) in
+    let not_bottom t = not (Dom.is_bottom man t) in
     if a.c then a
     else { a with t = List.filter not_bottom a.t; c = true }
 
@@ -59,11 +52,11 @@ module Make(A:TERM_DOMAIN) = struct
   let join_one (man, _) { t; i; _ } =
     match t with
     | [] -> bottom () ()
-    | t::q -> { t = [List.fold_left (A.join man) t q]; c = true; i; }
+    | t::q -> { t = [List.fold_left (Dom.join man) t q]; c = true; i; }
 
   let join_precise man a b =
     let aux a t =
-      let find_precise_join e = A.is_join_precise man t e in
+      let find_precise_join e = Dom.is_join_precise man t e in
       let find (a,found) e =
         match find_precise_join e with
         | None -> e :: a, found
@@ -77,7 +70,7 @@ module Make(A:TERM_DOMAIN) = struct
     let rec zip a = function
       | [] -> a
       | t :: q ->
-         let x = List.map (A.is_leq man t) (q @ a) in
+         let x = List.map (Dom.is_leq man t) (q @ a) in
          let p = List.fold_left (||) false x in
          if p then zip a q else zip (t::a) q in
     let t = { t = zip [] c; c = true; i } in
@@ -114,19 +107,27 @@ module Make(A:TERM_DOMAIN) = struct
     let b = if List.length b.t > threshold then join_one man b else b in
     let b_leq = List.map (fun b ->
         b,
-        try List.find (fun a -> A.is_leq (fst man) a b) a.t
+        try List.find (fun a -> Dom.is_leq (fst man) a b) a.t
         with | Not_found -> b
       ) b.t
     in
-    let t = List.map (fun (k, v) -> A.widening (fst man) v k) b_leq in
+    let t = List.map (fun (k, v) -> Dom.widening (fst man) v k) b_leq in
     cleanup man {t; c = false; i = 0; }
 
+  let rec extract_atom_from_conjuction l t =
+    let open Term in
+    match t.t_node with
+    | Tbinop (Tand, a, b) ->
+       extract_atom_from_conjuction
+         (extract_atom_from_conjuction l a) b
+    | _ -> t::l
+
   let to_term man t =
-    let f = A.to_term (fst man) in
+    let f = Dom.to_term (fst man) in
     let t = cleanup_hard man t in
     let globals = match (join_one man t).t with
       | [] -> []
-      | [t] -> Ai_logic.extract_atom_from_conjuction [] (f t)
+      | [t] -> extract_atom_from_conjuction [] (f t)
       | _ -> assert false
     in
     let rec redundant t =
@@ -140,17 +141,17 @@ module Make(A:TERM_DOMAIN) = struct
 
   let make_consistent _ = failwith "not implemented"
 
-  let add_lvariable_to_env (man, _) = A.add_lvariable_to_env man
-  let add_variable_to_env (man, _) = A.add_variable_to_env man
+  let add_lvariable_to_env (man, _) = Dom.add_lvariable_to_env man
+  let add_variable_to_env (man, _) = Dom.add_variable_to_env man
 
   let forget_region (man, _) a b d =
-    { d with t = List.map (A.forget_region man a b) d.t }
+    { d with t = List.map (Dom.forget_region man a b) d.t }
 
   let forget_var (man, _) v d =
-    { d with t = List.map (A.forget_var man v) d.t }
+    { d with t = List.map (Dom.forget_var man v) d.t }
 
   let forget_term (man, _) v d =
-    { d with t = List.map (A.forget_term man v) d.t }
+    { d with t = List.map (Dom.forget_term man v) d.t }
 
   let rec meet_term man term elt =
     let open Term in
@@ -159,6 +160,6 @@ module Make(A:TERM_DOMAIN) = struct
        join man (meet_term man a elt) (meet_term man b elt)
     | Tbinop (Tand, a, b) -> meet_term man b (meet_term man a elt)
     | Tbinop _ -> assert false
-    | _ -> {elt with t = List.map (A.meet_term (fst man) term) elt.t }
+    | _ -> {elt with t = List.map (Dom.meet_term (fst man) term) elt.t }
 
 end

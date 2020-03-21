@@ -3,14 +3,14 @@ open Term
 open Ity
 
 module Make(S:sig
-    module A:TERM_DOMAIN
-    val env: Env.env
-    val th_known: Decl.known_map
-    val mod_known: Pdecl.known_map
-  end): TERM_DOMAIN = struct
-  module A = S.A
+    module    Dom : TERM_DOMAIN
+    val       env : Env.env
+    val  th_known : Decl.known_map
+    val mod_known : Pdecl.known_map
+  end): TERM_DOMAIN =struct
 
-  open Ai_logic
+  module Dom = S.Dom
+
   module Ai_logic = Ai_logic.Make(struct
       let env = S.env
       let th_known = S.th_known
@@ -18,7 +18,7 @@ module Make(S:sig
     end)
   open Ai_logic
 
-  include A
+  include Dom
 
   let quant_var, pv =
     let ident_ret = Ident.id_fresh "w" in
@@ -26,12 +26,46 @@ module Make(S:sig
     t_var v.pv_vs, v
 
   let create_manager () =
-    let man = A.create_manager () in
-    A.add_variable_to_env man pv;
+    let man = create_manager () in
+    Dom.add_variable_to_env man pv;
     man
 
+  let is_in t myt =
+    (* FIX ME *)
+    let found = ref false in
+    let rec is_in myt =
+      if t_equal t myt then found := true;
+      t_map is_in myt
+    in
+    is_in myt |> ignore;
+    !found
+
+  let rec descend_quantifier q t =
+    match t.t_node with
+    | Tbinop (Tand, a, b) ->
+       let ia = is_in q a
+       and ib = is_in q b in
+       if ia && ib then
+         let var = match q.t_node with
+           | Tvar v  -> v
+           | _ -> assert false
+         in
+         t_quant Tforall (t_close_quant [var] [] t)
+       else if ia && not ib then
+         t_and_simp (descend_quantifier q a) b
+       else if not ia && ib then
+         t_and_simp a (descend_quantifier q b)
+       else
+         t_and_simp a b
+    | _ ->
+       let var = match q.t_node with
+         | Tvar v -> v
+         | _ -> assert false
+       in
+       t_quant Tforall (t_close_quant [var] [] t)
+
   let to_term man t =
-    let t = A.to_term man t in
+    let t = Dom.to_term man t in
     descend_quantifier quant_var t
 
   let rec meet_term man term elt =
@@ -51,7 +85,7 @@ module Make(S:sig
           let t = t_descend_nots t in
           let t = t_subst_single a quant_var t in
           meet_term man t elt
-        | _ -> A.meet_term man term elt
+        | _ -> Dom.meet_term man term elt
       end
-    | _ -> A.meet_term man term elt
+    | _ -> Dom.meet_term man term elt
 end

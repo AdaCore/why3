@@ -1,13 +1,54 @@
 (** Several useful utilities to preprocess logic terms before analysing them
  * for AI *)
 
-open Term
 open Apron
+open Term
+open Ident
+open Decl
+
+module type AI_LOGIC = sig
+
+  type coeff
+  type env
+
+  exception Cannot_be_expressed
+  exception Recursive_logical_definition
+
+  val env : Env.env
+  val known_logical_ident : known_map
+  val known_pdecl : Pdecl.known_map
+  val th_int : Theory.theory
+
+  val le_int : lsymbol
+  val ge_int : lsymbol
+  val lt_int : lsymbol
+  val gt_int : lsymbol
+
+  val ad_int : lsymbol
+  val min_int : lsymbol
+  val min_u_int : lsymbol
+  val mult_int : lsymbol
+  val zero_int : term
+  val one_int : term
+  val int_add : term list -> term
+  val int_minus_u : term list -> term
+  val int_minus : term list -> term
+  val int_mult : term list -> term
+
+  val coeff_to_term : Coeff.union_5 -> coeff
+  val varlist_to_term : ('a -> term) ->
+                        (Coeff.union_5 * 'a) list * Coeff.union_5 -> term
+  val t_descend_nots : ?way:bool -> term -> term
+  val find_global_definition : decl Mid.t -> lsymbol -> logic_decl option
+  val find_definition : env -> Mls.key -> logic_decl option
+  val t_unfold : 'a -> Mls.key -> term list -> Ty.ty option -> term
+  val t_replace_all : term -> term
+end
 
 module Make(S: sig
-    val env: Env.env
-    val th_known: Decl.known_map
-    val mod_known: Pdecl.known_map
+    val       env : Env.env
+    val  th_known : Decl.known_map
+    val mod_known : Pdecl.known_map
   end) = struct
 
   let env = S.env
@@ -210,44 +251,3 @@ module Make(S: sig
       t_attr_copy t (t_unfold t.t_loc fs tl t.t_ty)
     | _ -> t
 end
-
-let rec extract_atom_from_conjuction l t =
-  match t.t_node with
-  | Tbinop (Tand, a, b) ->
-    extract_atom_from_conjuction
-      (extract_atom_from_conjuction l a) b
-  | _ -> t::l
-
-let is_in t myt =
-  let found = ref false in
-  let rec is_in myt =
-    if t_equal t myt then
-      found := true;
-    t_map is_in myt
-  in
-  is_in myt |> ignore;
-  !found
-
-let rec descend_quantifier q t =
-  match t.t_node with
-  | Tbinop (Tand, a, b) ->
-    let ia = is_in q a
-    and ib = is_in q b in
-    if ia && ib then
-      let var = match q.t_node with
-        | Tvar v  -> v
-        | _ -> assert false
-      in
-      t_quant Tforall (t_close_quant [var] [] t)
-    else if ia && not ib then
-      t_and_simp (descend_quantifier q a) b
-    else if not ia && ib then
-      t_and_simp a (descend_quantifier q b)
-    else
-      t_and_simp a b
-  | _ ->
-      let var = match q.t_node with
-        | Tvar v -> v
-        | _ -> assert false
-      in
-      t_quant Tforall (t_close_quant [var] [] t)

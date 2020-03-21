@@ -200,6 +200,14 @@ module Make(A:DOMAIN) = struct
     assert (t_ = None);
     { t with t = List.map (fun t -> A.assign_linexpr (fst man) t v l None) t.t; c = false; }
 
+  let rec extract_atom_from_conjuction l t =
+    let open Term in
+    match t.t_node with
+    | Tbinop (Tand, a, b) ->
+       extract_atom_from_conjuction
+         (extract_atom_from_conjuction l a) b
+    | _ -> t::l
+
   let to_term env pmod man t var_mapping =
     let f = A.to_term env pmod (fst man) in
     let t = cleanup_hard man t in
@@ -207,7 +215,7 @@ module Make(A:DOMAIN) = struct
       match (join_one man t).t with
       | [] -> []
       | [t] ->
-        f t var_mapping |> Ai_logic.extract_atom_from_conjuction []
+        f t var_mapping |> extract_atom_from_conjuction []
       | _ -> assert false
     in
     let rec redundant t =
