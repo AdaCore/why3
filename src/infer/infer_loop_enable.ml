@@ -28,16 +28,15 @@ let attrs_has_infer attrs =
 
 let attrs_get_infer attrs =
   let s = Sattr.filter (fun a -> is_infer_attr a.attr_string) attrs in
-  match Sattr.elements s with
-  | [] -> raise Not_found
-  | x :: _ -> x
+  Sattr.choose s
 
 type domain = Polyhedra | Box | Oct
 
 let def_domain = Polyhedra
 let def_wid = 3
 
-(* 'a = context, 'b = D.man, 'c = cfg,
+(* operations from a certain Domain
+   'a = context, 'b = D.man, 'c = cfg,
    'd = control_points, 'e = domain *)
 type ('a,'b,'c,'d,'e) ai_ops = {
     domain_manager    : 'a -> 'b;
@@ -55,20 +54,16 @@ let ai_ops a b c d e f g h =
    put_expr_in_cfg = d; put_expr_with_pre = e; eval_fixpoints = f;
    domain_to_term  = g; add_variable      = h}
 
-let infer_loops ai_ops e cty =
+let infer_with_ops ai_ops e cty =
   let cfg = ai_ops.start_cfg () in
   let context = ai_ops.empty_context () in
   List.iter (ai_ops.add_variable cfg context) cty.cty_args;
-  if Debug.test_flag Uf_domain.infer_debug then
-    Format.printf "%a@." Expr.print_expr e;
   ignore (ai_ops.put_expr_with_pre cfg context e cty.cty_pre);
   let fixp = ai_ops.eval_fixpoints cfg context in
   let domain2term (e,d) =
     let expl = "expl:infer-loop" in
     let t    = ai_ops.domain_to_term cfg context d in
     let t    = Term.t_attr_add (Ident.create_attribute expl) t in
-    if Debug.test_flag Uf_domain.infer_debug then
-      Pretty.print_term Format.std_formatter t;
     (e,t) in
   let invs = List.map domain2term fixp in
   if Debug.test_flag print_inferred_invs then begin
@@ -79,7 +74,7 @@ let infer_loops ai_ops e cty =
     end;
   invs
 
-let infer_loops ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
+let infer_loops_for_dom ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
   let module AI = Ai_cfg.Make (struct
        let env       = env
        let th_known  = tkn
@@ -89,21 +84,24 @@ let infer_loops ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
   | Polyhedra ->
      let module AI = AI(Domain.Polyhedra) in
      let ai_ops =
-       ai_ops AI.domain_manager AI.empty_context AI.start_cfg AI.put_expr_in_cfg
-         AI.put_expr_with_pre AI.eval_fixpoints AI.domain_to_term AI.add_variable in
-     infer_loops ai_ops e cty
+       ai_ops AI.domain_manager AI.empty_context AI.start_cfg
+         AI.put_expr_in_cfg AI.put_expr_with_pre AI.eval_fixpoints
+         AI.domain_to_term AI.add_variable in
+     infer_with_ops ai_ops e cty
   | Box ->
      let module AI = AI(Domain.Box) in
      let ai_ops =
-       ai_ops AI.domain_manager AI.empty_context AI.start_cfg AI.put_expr_in_cfg
-         AI.put_expr_with_pre AI.eval_fixpoints AI.domain_to_term AI.add_variable in
-     infer_loops ai_ops e cty
+       ai_ops AI.domain_manager AI.empty_context AI.start_cfg
+         AI.put_expr_in_cfg AI.put_expr_with_pre AI.eval_fixpoints
+         AI.domain_to_term AI.add_variable in
+     infer_with_ops ai_ops e cty
   | Oct ->
      let module AI = AI(Domain.Oct) in
      let ai_ops =
-       ai_ops AI.domain_manager AI.empty_context AI.start_cfg AI.put_expr_in_cfg
-         AI.put_expr_with_pre AI.eval_fixpoints AI.domain_to_term AI.add_variable in
-     infer_loops ai_ops e cty
+       ai_ops AI.domain_manager AI.empty_context AI.start_cfg
+         AI.put_expr_in_cfg AI.put_expr_with_pre AI.eval_fixpoints
+         AI.domain_to_term AI.add_variable in
+     infer_with_ops ai_ops e cty
 
 exception Parse_error
 
@@ -136,7 +134,7 @@ let infer_loops attrs env tkn mkn e cty =
         Warning.emit ?loc:e.e_loc
           "invalid@ infer@ attribute@ (using@ default@ values)";
         def_domain, def_wid in
-    infer_loops ~dom ~wid env tkn mkn e cty
+    infer_loops_for_dom ~dom ~wid env tkn mkn e cty
   else if Debug.test_flag infer_flag then
-    infer_loops env tkn mkn e cty
+    infer_loops_for_dom env tkn mkn e cty
   else []

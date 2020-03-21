@@ -1,7 +1,5 @@
 open Domain
 
-val infer_debug : Debug.flag
-
 module Make(S:sig
     module   Dom : DOMAIN
     val      env : Env.env

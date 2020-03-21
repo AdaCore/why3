@@ -4,14 +4,14 @@ open Expr
 open Ity
 
 module type AiCfg = sig
-  module D : Domain.TERM_DOMAIN
+  module QDom : Domain.TERM_DOMAIN
 
   type control_point
   type domain
   type cfg
   type context
 
-  val domain_manager : context -> D.man
+  val domain_manager : context -> QDom.man
   val empty_context  : unit -> context
   val start_cfg      : unit -> cfg
 

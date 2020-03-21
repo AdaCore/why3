@@ -2,11 +2,6 @@ open Domain
 open Apron
 open Term
 
-(* TODO move it deeper in the abstract interpretation mechanism (as needed) *)
-let infer_debug  = Debug.register_flag "infer_debug"
-                     ~desc:"Debug messages about loop inference using \
-                            abstract interpretation."
-
 module Make(S:sig
     module    Dom : DOMAIN
     val       env : Env.env
@@ -114,8 +109,6 @@ module Make(S:sig
 
   let is_bottom (man, _) (a, _) =
     Dom.is_bottom man a
-
-  let p = Pretty.print_term Format.err_formatter
 
   let get_class_for_term uf_man t =
     try TermToClass.to_t uf_man.class_to_term t with Not_found ->
@@ -639,7 +632,6 @@ module Make(S:sig
             let subv_a = get_subvalues a None in
             let subv_b = get_subvalues b None in
             List.fold_left (fun f ((a, _), (b, _)) ->
-                if Debug.test_flag infer_debug then (p a; p b);
                 let g = aux (t_app ps_equ [a; b] None) in
                 (fun abs -> f (g abs)))
               f_uf (List.combine subv_a subv_b)
