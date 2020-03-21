@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Bug fixes
+  * fixed META file
+
 Version 1.3.0, March 17, 2020
 -----------------------------
 
