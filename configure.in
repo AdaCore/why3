@@ -478,16 +478,16 @@ fi
 if test "$enable_infer" = yes; then
    if test "$enable_ocamlfind" = yes; then
       # gmp is a dependency of apron
-      INFERINCLUDE=$($OCAMLFIND query apron apron.boxMPQ apron.octMPQ apron.polkaMPQ camllib)
+      INFERINCLUDE=$($OCAMLFIND query apron camllib)
    fi
    if test -n "$INFERINCLUDE"; then
+      echo "ocamlfind found apron, camllib in $INFERINCLUDE"
       INFERINCLUDE=$($OCAMLFIND query fixpoint)
       if test -n "$INFERINCLUDE"; then
-         echo "ocamlfind found apron, apron.polkaMPQ, apron.polkaGrid, apron.ppl, apron.boxMPQ, apron.octMPQ, camllib and fixpoint in $INFERINCLUDE"
-         # camllib is a dependency of fixpoint, so it should not be
-         # nedded to check for it
-         INFERINCLUDE="$($OCAMLFIND query -separator ' ' -i-format apron apron.polkaMPQ apron.boxMPQ apron.octMPQ fixpoint camllib gmp)"
-         INFERLIB="apron apron.polkaMPQ fixpoint apron.boxMPQ apron.octMPQ"
+         echo "ocamlfind found fixpoint in $INFERINCLUDE"
+         INFERINCLUDE="$($OCAMLFIND query -separator ' ' -i-format apron fixpoint camllib gmp)"
+         INFERLIB="apron fixpoint"
+         INFERPKG="apron fixpoint apron.boxMPQ apron.octMPQ apron.polkaMPQ"
       else
          enable_infer=no
          AC_MSG_WARN([Lib fixpoint not found, infer will not be built.])
@@ -495,8 +495,8 @@ if test "$enable_infer" = yes; then
       fi
    else
       enable_infer=no
-      reason_infer=" (apron or apron.polkaMPQ or apron.boxMPQ or apron.octMPQ or camllib not found)"
-      AC_MSG_WARN([Lib apron or apron.polkaMPQ  not found or apron.boxMPQ or apron.octMPQ or camllib, infer will not be built.])
+      reason_infer=" (apron or camllib not found)"
+      AC_MSG_WARN([Lib apron or camllib not found, infer will not be built.])
    fi
 else
   reason_infer=" (disabled by default)"
@@ -1127,6 +1127,7 @@ AC_SUBST(BIGINTPKG)
 AC_SUBST(enable_infer)
 AC_SUBST(INFERINCLUDE)
 AC_SUBST(INFERLIB)
+AC_SUBST(INFERPKG)
 
 AC_SUBST(enable_zip)
 AC_SUBST(ZIPINCLUDE)

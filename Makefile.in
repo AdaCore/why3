@@ -97,11 +97,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@
-
-ifeq (@enable_infer@,yes)
-EXTINCLUDES += @INFERINCLUDE@
-endif
+EXTINCLUDES = @WHY3INCLUDE@ @SEQINCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @MLMPFRINCLUDE@ @INFERINCLUDE@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -148,13 +144,8 @@ CMIHACK = -intf-suffix .cmi
 # external libraries common to all binaries
 
 EXTOBJS = menhirLib
-EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@
-EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @WHY3LIB@
-
-ifeq (@enable_infer@,yes)
-EXTLIBS += gmp apron camllib fixpoint boxMPQ octMPQ polkaMPQ bigarray
-EXTPKGS += gmp apron camllib fixpoint apron.boxMPQ apron.octMPQ apron.polkaMPQ bigarray
-endif
+EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERLIB@
+EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ @WHY3LIB@ @INFERPKG@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
