@@ -1,4 +1,4 @@
-open Domain
+ open Domain
 open Term
 open Expr
 open Ity
@@ -7,16 +7,15 @@ module type AiCfg = sig
   module QDom : Domain.TERM_DOMAIN
 
   type control_point
-  type domain
-  type cfg
-  type context
-
-  val domain_manager : context -> QDom.man
-  val empty_context  : unit -> context
-  val start_cfg      : unit -> cfg
-
   type xcontrol_point = control_point * xsymbol
   type control_points = control_point * control_point * xcontrol_point list
+
+  type domain
+  type cfg
+  type context = QDom.man
+
+  val empty_context  : unit -> context
+  val start_cfg      : unit -> cfg
 
   val put_expr_in_cfg   : cfg -> context -> ?ret:vsymbol option -> expr ->
                          control_points
@@ -27,7 +26,8 @@ module type AiCfg = sig
 
   val domain_to_term : cfg -> context -> domain -> term
 
-  val add_variable   : cfg -> context -> pvsymbol -> unit
+  val add_variable   : context -> pvsymbol -> unit
+  (* [add_variable ctx pv] adds the variable pv to the *)
 end
 
 module Make(S:sig

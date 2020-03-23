@@ -14,16 +14,15 @@ module type AiCfg = sig
   module QDom : Domain.TERM_DOMAIN
 
   type control_point
-  type domain
-  type cfg
-  type context
-
-  val domain_manager : context -> QDom.man
-  val empty_context  : unit -> context
-  val start_cfg      : unit -> cfg
-
   type xcontrol_point = control_point * xsymbol
   type control_points = control_point * control_point * xcontrol_point list
+
+  type domain
+  type cfg
+  type context = QDom.man
+
+  val empty_context  : unit -> context
+  val start_cfg      : unit -> cfg
 
   val put_expr_in_cfg   : cfg -> context -> ?ret:vsymbol option -> expr ->
                          control_points
@@ -34,7 +33,7 @@ module type AiCfg = sig
 
   val domain_to_term : cfg -> context -> domain -> term
 
-  val add_variable   : cfg -> context -> pvsymbol -> unit
+  val add_variable   : context -> pvsymbol -> unit
 end
 
 module Make(E: sig
@@ -52,38 +51,29 @@ module Make(E: sig
 
   open Ai_logic
 
-  let debug_fmt =
-    if Debug.test_flag ai_print_domains then
-      let d = open_out "inferdbg.dot" in
-      Some (Format.formatter_of_out_channel d)
-    else None
-
-  let _ = match debug_fmt with
-    | Some debug_fmt -> Format.fprintf debug_fmt "digraph graphname {@."
-    | None -> ()
-
   module Uf_domain =
     Uf_domain.Make(struct
-        module Dom = Domain
-        let th_known = E.th_known
+        module    Dom = Domain
+        let  th_known = E.th_known
         let mod_known = E.mod_known
-        let env = E.env
+        let       env = E.env
       end)
 
   module QDom = Quant_domain.Make(struct
-      module Dom = Disjunctive_term_domain.Make(Uf_domain)
-      let th_known = E.th_known
+      module    Dom = Disjunctive_term_domain.Make(Uf_domain)
+      let  th_known = E.th_known
       let mod_known = E.mod_known
-      let env = E.env
+      let       env = E.env
     end)
 
-  (* Apron manager *)
-  (*let manpk = PolkaGrid.manager_alloc (Polka.manager_alloc_strict ()) (Ppl.manager_alloc_grid ())
-  type apron_domain = Polka.strict PolkaGrid.t*)
-
   type control_point = int
+  type xcontrol_point = control_point * xsymbol
+  type control_points = control_point * control_point * xcontrol_point list
+
   type hedge = int (* hyper edge *)
+
   type domain = QDom.t
+  type context = QDom.man
 
   (* control flow graph *)
   type cfg = {
@@ -121,35 +111,17 @@ module Make(E: sig
 
   }
 
-  type context = QDom.man
-  type xcontrol_point = control_point * xsymbol
-  type control_points = control_point * control_point * xcontrol_point list
+  let debug_fmt =
+    if Debug.test_flag ai_print_domains then
+      let d = open_out "inferdbg.dot" in
+      Some (Format.formatter_of_out_channel d)
+    else None
 
-  let domain_manager x = x
-
-  let empty_context = QDom.create_manager
+  let _ = match debug_fmt with
+    | Some debug_fmt -> Format.fprintf debug_fmt "digraph graphname {@."
+    | None -> ()
 
   exception Unknown_hedge
-
-  (* Initialize an hedge *)
-
-  let ident_ret = {pre_name = "$ret";
-                   pre_attrs = Sattr.empty;
-                   pre_loc = None; }
-  let cached_vreturn = ref (Ty.Mty.empty)
-  let create_vreturn manpk ty =
-    assert (not (Ty.ty_equal ty ty_unit));
-    let v =
-      try
-        Ty.Mty.find ty !cached_vreturn
-      with
-      | Not_found ->
-        let v  = create_vsymbol ident_ret ty in
-        cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
-        v
-    in
-    QDom.add_lvariable_to_env manpk v;
-    v
 
   let start_cfg () =
     let cfg = { expr_to_control_point = Hashtbl.create 100;
@@ -162,6 +134,11 @@ module Make(E: sig
       loop_invariants = []; }
     in
     cfg
+
+  let empty_context = QDom.create_manager
+
+  let add_variable a pvs =
+    QDom.add_variable_to_env a pvs
 
   (* Adds a new node to the cfg, associated to expr (which is only useful for
    * debugging purpose ATM) *)
@@ -226,6 +203,25 @@ module Make(E: sig
     else
       (fun abs -> abs)
 
+  (* Initialize an hedge *)
+  let ident_ret = {pre_name = "$ret";
+                   pre_attrs = Sattr.empty;
+                   pre_loc = None; }
+  let cached_vreturn = ref (Ty.Mty.empty)
+  let create_vreturn manpk ty =
+    assert (not (Ty.ty_equal ty ty_unit));
+    let v =
+      try
+        Ty.Mty.find ty !cached_vreturn
+      with
+      | Not_found ->
+        let v  = create_vsymbol ident_ret ty in
+        cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
+        v
+    in
+    QDom.add_lvariable_to_env manpk v;
+    v
+
   let create_postcondition cfg manpk psym =
     if not (ity_equal psym.pv_ity ity_unit) then
       begin
@@ -236,7 +232,6 @@ module Make(E: sig
       end
     else
       (fun abs -> abs), (fun abs -> abs)
-
 
   let remove_eps ?ret:(ret=None) manpk t =
     match t.t_node with
@@ -258,7 +253,6 @@ module Make(E: sig
         end
     | _ ->
       t
-
 
   (* Adds expr to the cfg. manpk is the types of the locally defined variable
    * (useful for references, when we need to get the type of a term in a logical formula).
@@ -301,7 +295,7 @@ module Make(E: sig
          Format.eprintf "Computing for Elet: %a = %a@."
            print_pv psym print_expr let_expr;
 
-      QDom.add_variable_to_env manpk psym;
+      add_variable manpk psym;
       let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg ~ret:(Some psym.pv_vs) cfg manpk let_expr in
 
       (* let forget_ret manpk abs =
@@ -379,7 +373,7 @@ module Make(E: sig
       let eff_write = effect.eff_writes in
       let vars_to_forget, constraint_copy_ghost = Mpv.fold_left (
           fun (vars_to_forget, constraints) k b ->
-            QDom.add_variable_to_env manpk k;
+            add_variable manpk k;
             let new_constraints = create_postcondition_equality cfg manpk b k.pv_vs in
             let forget_var = QDom.forget_var manpk k.pv_vs in
             (fun abs -> vars_to_forget abs |> forget_var), (fun abs -> constraints abs |> new_constraints)
@@ -493,7 +487,7 @@ module Make(E: sig
               let args = List.map (fun p -> match p.pat_node with
                   | Pvar (vsym) ->
                     let pv = restore_pv vsym in
-                    QDom.add_variable_to_env manpk pv;
+                    add_variable manpk pv;
                     vsym
                   | Pwild ->
                     create_vreturn manpk p.pat_ty
@@ -530,7 +524,7 @@ module Make(E: sig
       let i = new_node_cfg cfg expr in
       let exc = Mxs.map (fun (l, e) ->
           List.iter (fun p ->
-              QDom.add_variable_to_env manpk p) l;
+              add_variable manpk p) l;
 
           let before_assign_cp = new_node_cfg cfg e in
 
@@ -593,7 +587,7 @@ module Make(E: sig
       let k_term, lo, up =
         (t_var k.pv_vs, t_var lo.pv_vs, t_var up.pv_vs)
       in
-      QDom.add_variable_to_env manpk k;
+      add_variable manpk k;
 
       let before_loop_cp = new_node_cfg cfg expr in
       let start_loop_cp = new_node_cfg cfg expr in
@@ -786,8 +780,5 @@ module Make(E: sig
           expr, abs
         ) cfg.loop_invariants
     end
-
-  let add_variable _ a pvs =
-    QDom.add_variable_to_env a pvs
 
 end

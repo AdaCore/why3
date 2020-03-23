@@ -36,28 +36,27 @@ let def_domain = Polyhedra
 let def_wid = 3
 
 (* operations from a certain Domain
-   'a = context, 'b = D.man, 'c = cfg,
-   'd = control_points, 'e = domain *)
-type ('a,'b,'c,'d,'e) ai_ops = {
-    domain_manager    : 'a -> 'b;
+   'a = context,        'b = cfg,
+   'c = control_points, 'd = domain *)
+type ('a,'b,'c,'d) ai_ops = {
     empty_context     : unit -> 'a;
-    start_cfg         : unit -> 'c;
-    put_expr_in_cfg   : 'c -> 'a -> ?ret:vsymbol option -> expr -> 'd;
-    put_expr_with_pre : 'c -> 'a -> expr -> term list -> 'd;
-    eval_fixpoints    : 'c -> 'a -> (expr * 'e) list;
-    domain_to_term    : 'c -> 'a -> 'e -> term;
-    add_variable      : 'c -> 'a -> pvsymbol -> unit;
+    start_cfg         : unit -> 'b;
+    put_expr_in_cfg   : 'b -> 'a -> ?ret:vsymbol option -> expr -> 'c;
+    put_expr_with_pre : 'b -> 'a -> expr -> term list -> 'c;
+    eval_fixpoints    : 'b -> 'a -> (expr * 'd) list;
+    domain_to_term    : 'b -> 'a -> 'd -> term;
+    add_variable      : 'a -> pvsymbol -> unit;
 }
 
-let ai_ops a b c d e f g h =
-  {domain_manager  = a; empty_context     = b; start_cfg      = c;
-   put_expr_in_cfg = d; put_expr_with_pre = e; eval_fixpoints = f;
-   domain_to_term  = g; add_variable      = h}
+let ai_ops a b c d e f g =
+  {empty_context     = a; start_cfg      = b; put_expr_in_cfg = c;
+   put_expr_with_pre = d; eval_fixpoints = e; domain_to_term  = f;
+   add_variable      = g}
 
 let infer_with_ops ai_ops e cty =
   let cfg = ai_ops.start_cfg () in
   let context = ai_ops.empty_context () in
-  List.iter (ai_ops.add_variable cfg context) cty.cty_args;
+  List.iter (ai_ops.add_variable context) cty.cty_args;
   ignore (ai_ops.put_expr_with_pre cfg context e cty.cty_pre);
   let fixp = ai_ops.eval_fixpoints cfg context in
   let domain2term (e,d) =
@@ -84,21 +83,21 @@ let infer_loops_for_dom ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
   | Polyhedra ->
      let module AI = AI(Domain.Polyhedra) in
      let ai_ops =
-       ai_ops AI.domain_manager AI.empty_context AI.start_cfg
+       ai_ops AI.empty_context AI.start_cfg
          AI.put_expr_in_cfg AI.put_expr_with_pre AI.eval_fixpoints
          AI.domain_to_term AI.add_variable in
      infer_with_ops ai_ops e cty
   | Box ->
      let module AI = AI(Domain.Box) in
      let ai_ops =
-       ai_ops AI.domain_manager AI.empty_context AI.start_cfg
+       ai_ops AI.empty_context AI.start_cfg
          AI.put_expr_in_cfg AI.put_expr_with_pre AI.eval_fixpoints
          AI.domain_to_term AI.add_variable in
      infer_with_ops ai_ops e cty
   | Oct ->
      let module AI = AI(Domain.Oct) in
      let ai_ops =
-       ai_ops AI.domain_manager AI.empty_context AI.start_cfg
+       ai_ops AI.empty_context AI.start_cfg
          AI.put_expr_in_cfg AI.put_expr_with_pre AI.eval_fixpoints
          AI.domain_to_term AI.add_variable in
      infer_with_ops ai_ops e cty

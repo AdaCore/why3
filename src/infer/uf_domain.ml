@@ -18,7 +18,7 @@ module Make(S:sig
     end)
   open Ai_logic
 
-  exception Not_handled of Term.term
+  exception Not_handled of term
 
   (* utility function that make equivalent classes and
      sum the last component *)
@@ -43,10 +43,10 @@ module Make(S:sig
   end
 
   type uf_man = {
-    variable_mapping: (Apron.Var.t, Term.term) Hashtbl.t;
-    mutable apron_mapping: Var.t Term.Mterm.t;
-    mutable region_mapping: (Ity.pvsymbol * Term.term) list Ity.Mreg.t;
-    mutable region_var: Term.vsymbol list Ity.Mreg.t;
+    variable_mapping: (Apron.Var.t, term) Hashtbl.t;
+    mutable apron_mapping: Var.t Mterm.t;
+    mutable region_mapping: (Ity.pvsymbol * term) list Ity.Mreg.t;
+    mutable region_var: vsymbol list Ity.Mreg.t;
     mutable env: Environment.t;
 
     mutable defined_terms: unit Mterm.t;
@@ -79,7 +79,7 @@ module Make(S:sig
   let npool = 10
 
   let create_manager () =
-    let apron_mapping = Term.Mterm.empty in
+    let apron_mapping = Mterm.empty in
     let var_pool = build_var_pool npool in
     let vars = Array.of_list (VarPool.to_list var_pool @ tmp_pool) in
     let uf_man = {
@@ -145,7 +145,7 @@ module Make(S:sig
     if a >= 0 then t_nat_const a
     else t_app min_u_int [t_nat_const (-a)] (Some Ty.ty_int)
 
- (* let engine = Reduction_engine0.create {compute_defs = true; compute_builtin = true; compute_def_set = Term.Sls.empty; } env known_logical_ident*)
+ (* let engine = Reduction_engine0.create {compute_defs = true; compute_builtin = true; compute_def_set = Sls.empty; } env known_logical_ident*)
 
   (* we assume that there will be no overflow (oops) *)
   let rec eval_term t =
@@ -157,7 +157,7 @@ module Make(S:sig
         | Tvar _ -> Some t, 0
         | Tconst (Constant.ConstInt n) ->
           (None, BigInt.to_int n.il_int)
-        | Tapp (func, args) when Term.ls_equal func ad_int ->
+        | Tapp (func, args) when ls_equal func ad_int ->
           List.fold_left (fun (a, b) c ->
               let tc, cc = eval_num c in
               match tc, a with
@@ -166,7 +166,7 @@ module Make(S:sig
                  Some (t_app ad_int [v; t] (Some Ty.ty_int)), b + cc
               | Some t, None | None, Some t -> Some t, b + cc
             ) (None, 0) args
-        | Tapp (func, [a;b]) when Term.ls_equal func min_int ->
+        | Tapp (func, [a;b]) when ls_equal func min_int ->
           let ta, ca = eval_num a in
           let tb, cb = eval_num b in
           begin
@@ -176,7 +176,7 @@ module Make(S:sig
             | Some t, None -> Some t, ca - cb
             | None, Some t -> Some (t_app_infer min_u_int [t]), ca - cb
           end
-        | Tapp (func, [a]) when Term.ls_equal func min_u_int ->
+        | Tapp (func, [a]) when ls_equal func min_u_int ->
           let ta, ca = eval_num a in
           begin
             match ta with
@@ -211,9 +211,9 @@ module Make(S:sig
               TermToClass.to_term uf_man.class_to_term cl, ()) all_values
         in
         let all_values = all_terms
-                         |> Term.Mterm.of_list in
+                         |> Mterm.of_list in
         let all_terms = all_terms |> List.map fst in
-        Term.Mterm.fold (fun v () (d, ud) ->
+        Mterm.fold (fun v () (d, ud) ->
             (* This is far from perfect. If there is a function f, then terms `f a` and `f b` will be marked as equal.
              * But if there is g: 'a -> 'b -> 'c, then `g a b` and `g b a` can not be marked as such. (As the replacement is global.)
              * However, it is unclear wether it is or it is not a limitation. *)
@@ -352,7 +352,7 @@ module Make(S:sig
     Format.eprintf "-- warning: %s -- triggered by " s;
     Pretty.print_term Format.err_formatter t;
     Format.eprintf " of type ";
-    Pretty.print_ty Format.err_formatter (Term.t_type t);
+    Pretty.print_ty Format.err_formatter (t_type t);
     Format.eprintf "@."
 
   let ident_ret =
@@ -509,7 +509,7 @@ module Make(S:sig
    * why3 formula.
    * In the most imprecise case, it returns an empty list.
    *)
-  let meet_term: man -> Term.term -> (t -> t) =
+  let meet_term: man -> term -> (t -> t) =
     let meetid = ref 0 in
     fun (man, uf_man) t ->
       incr meetid;
@@ -519,7 +519,7 @@ module Make(S:sig
       (* Let's try to remove the nots that we can *)
       let t = t_descend_nots t in
       let var_of_term t =
-        try Some (Term.Mterm.find t uf_man.apron_mapping)
+        try Some (Mterm.find t uf_man.apron_mapping)
         with Not_found -> None
       in
 
@@ -542,19 +542,19 @@ module Make(S:sig
                       Format.eprintf "@."; failwith "undefined var" end
         | Tconst (Constant.ConstInt n) ->
           ([], coeff * (BigInt.to_int n.il_int))
-        | Tapp (func, args) when Term.ls_equal func ad_int ->
+        | Tapp (func, args) when ls_equal func ad_int ->
           List.fold_left (fun (a, b) c ->
               let c, d = re coeff c in
               (a @ c, b + d)) ([], 0)args
-        | Tapp (func, [a;b]) when Term.ls_equal func min_int ->
+        | Tapp (func, [a;b]) when ls_equal func min_int ->
           let c, d = re coeff a in
           let e, f = re (-coeff) b in
           (c @ e, d + f)
-        | Tapp (func, [a]) when Term.ls_equal func min_u_int ->
+        | Tapp (func, [a]) when ls_equal func min_u_int ->
           re (-coeff)  a;
         | Tapp (func, [{t_node = Tconst (Constant.ConstInt n); _}; a])
         | Tapp (func, [a; {t_node = Tconst (Constant.ConstInt n); _};])
-             when Term.ls_equal func mult_int ->
+             when ls_equal func mult_int ->
            re ((BigInt.to_int n.il_int) * coeff) a
         | _ -> (* maybe a record access *)
           begin
@@ -684,35 +684,35 @@ module Make(S:sig
       if Ty.ty_equal (t_type logical_term) ty_int then
         begin
           let reg_name =
-            Format.asprintf "%d%a" !var_id Pretty.print_term logical_term in
+            Format.asprintf "%d%a@." !var_id Pretty.print_term logical_term in
           let v = Var.of_string reg_name in
           assert (not (Environment.mem_var uf_man.env v));
           ensure_variable uf_man v logical_term;
           uf_man.apron_mapping <-
-            Term.Mterm.add logical_term v uf_man.apron_mapping
+            Mterm.add logical_term v uf_man.apron_mapping
         end
       else if Ty.ty_equal (t_type logical_term) ty_bool then
         begin
           let reg_name =
-            Format.asprintf "%d%a" !var_id Pretty.print_term logical_term in
+            Format.asprintf "%d%a@." !var_id Pretty.print_term logical_term in
           let v =
             Var.of_string reg_name in
           assert (not (Environment.mem_var uf_man.env v));
           ensure_variable uf_man v logical_term;
           uf_man.apron_mapping <-
-            Term.Mterm.add logical_term v uf_man.apron_mapping;
+            Mterm.add logical_term v uf_man.apron_mapping;
         end
       else
         begin
           let subv = get_subvalues logical_term None in
           List.iter (fun (t, _) ->
               ignore (Format.flush_str_formatter ());
-              let v = Format.asprintf "%d%a.%a"
+              let v = Format.asprintf "%d%a.%a@."
                         !var_id Pretty.print_term logical_term
                         Pretty.print_term t in
               let v = Var.of_string v in
               ensure_variable uf_man v t;
-              uf_man.apron_mapping <- Term.Mterm.add t v uf_man.apron_mapping) subv
+              uf_man.apron_mapping <- Mterm.add t v uf_man.apron_mapping) subv
         end
 
 
@@ -726,100 +726,74 @@ module Make(S:sig
   let create_vreturn man ty =
     assert (not (Ty.ty_equal ty Ity.ty_unit));
     try Ty.Mty.find ty !cached_vreturn with Not_found ->
-      let v  = Term.create_vsymbol ident_ret ty in
+      let v  = create_vsymbol ident_ret ty in
       add_lvariable_to_env man v;
       cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
       v
 
-  let add_variable_to_env (man, uf_man) psym =
+  let add_variable_to_env (man, uf_man) pv =
     incr var_id;
     let open Expr in
     let open Ty in
     let open Ity in
     let open Pretty in
-    let variable_type = psym.pv_ity in
-    let logical_term =
-      match Expr.term_of_expr ~prop:false (Expr.e_var psym) with
-      | Some s -> s
-      | None -> assert false
-    in
+    let pv_t = t_var pv.pv_vs in
     ignore (Format.flush_str_formatter ());
-    match variable_type.ity_node, (Term.t_type logical_term).ty_node with
-    | _ when Ty.ty_equal (t_type logical_term) ty_int ->
+    match pv.pv_ity.ity_node, (t_type pv_t).ty_node with
+    | _ when Ty.ty_equal (t_type pv_t) ty_int ->
       let reg_name =
-        Format.asprintf "%d%a" !var_id print_term logical_term in
+        Format.asprintf "%d%a@." !var_id print_term pv_t in
       let v = Var.of_string reg_name in
       assert (not (Environment.mem_var uf_man.env v));
-      ensure_variable uf_man v logical_term;
-      uf_man.apron_mapping <-
-        Term.Mterm.add logical_term v uf_man.apron_mapping
-    | _ when Ty.ty_equal (t_type logical_term) ty_bool ->
-      let reg_name = Format.asprintf "%d%a" !var_id print_term logical_term in
+      ensure_variable uf_man v pv_t;
+      uf_man.apron_mapping <- Mterm.add pv_t v uf_man.apron_mapping
+    | _ when Ty.ty_equal (t_type pv_t) ty_bool ->
+      let reg_name = Format.asprintf "%d%a@." !var_id print_term pv_t in
       let v = Var.of_string reg_name in
       assert (not (Environment.mem_var uf_man.env v));
-      ensure_variable uf_man v logical_term;
-      uf_man.apron_mapping <- Term.Mterm.add logical_term v uf_man.apron_mapping;
-    | _ when ity_equal variable_type Ity.ity_unit-> ()
-    | Ityreg reg, Tyapp (_, _) ->
+      ensure_variable uf_man v pv_t;
+      uf_man.apron_mapping <- Mterm.add pv_t v uf_man.apron_mapping;
+    | _ when ity_equal pv.pv_ity Ity.ity_unit-> ()
+    | Ityreg reg, Tyapp _ ->
       begin
-        let reg_name = Format.asprintf "%a" print_reg_name reg in
-        let vret = create_vreturn (man, uf_man) (t_type logical_term) in
-        let vret = t_var vret in
-        let subv = get_subvalues vret (Some reg.reg_its) in
-        let subv_r = get_subvalues logical_term (Some reg.reg_its) in
-        let subv = List.combine subv subv_r in
+        let vret = create_vreturn (man, uf_man) (t_type pv_t) in
+        let subv = get_subvalues (t_var vret) (Some reg.reg_its) in
+        let subv_r = get_subvalues pv_t (Some reg.reg_its) in
+        (* let subv = List.combine subv subv_r in *)
         let proj_list =
-          List.fold_left
-            (fun acc ((generic_region_term, pfield), (real_term, _)) ->
-              let pfield = match pfield with
-                | Some s -> s
-                | None -> assert false
-              in
-              ignore (Format.flush_str_formatter ());
-              let v = Pretty.print_term Format.str_formatter generic_region_term
-                      |> Format.flush_str_formatter
-                      |> Format.sprintf "r$%s.%s" reg_name
-                      |> Var.of_string
-              in
-              ensure_variable uf_man v real_term;
-              let accessor = match pfield.rs_field with
-                | Some s -> s
-                | None -> assert false
-              in
+          List.fold_left2
+            (fun acc (gen_reg_t, pfield) (real_term, _) ->
+              let name = Format.asprintf "r$%a.%a@." print_reg_name reg
+                           print_term gen_reg_t in
+              let var = Var.of_string name in
+              ensure_variable uf_man var real_term;
               uf_man.apron_mapping <-
-                Term.Mterm.add real_term v uf_man.apron_mapping;
+                Mterm.add real_term var uf_man.apron_mapping;
+              let accessor = Opt.get (Opt.get pfield).rs_field in
               (accessor, real_term) :: acc
-            ) [] subv
+            ) [] subv subv_r
         in
         let old_projs, old_vars =
-          try
-            Mreg.find reg uf_man.region_mapping,
-            Mreg.find reg uf_man.region_var
+          try Mreg.find reg uf_man.region_mapping,
+              Mreg.find reg uf_man.region_var
           with Not_found -> [], []
         in
         uf_man.region_mapping <-
           Mreg.add reg (proj_list @ old_projs) uf_man.region_mapping;
         uf_man.region_var <-
-          Mreg.add reg (psym.pv_vs :: old_vars) uf_man.region_var
+          Mreg.add reg (pv.pv_vs :: old_vars) uf_man.region_var
       end
     | Ityapp _, _ ->
-      let subv = get_subvalues logical_term None in
+      let subv = get_subvalues pv_t None in
       List.iter (fun (t, _) ->
-          ignore (Format.flush_str_formatter ());
-          let v = Format.asprintf "%d%a.%a" !var_id print_pv
-                    psym print_term t in
-          let v = Var.of_string v in
-          ensure_variable uf_man v t;
-          uf_man.apron_mapping <- Term.Mterm.add t v uf_man.apron_mapping) subv;
+          let name = Format.asprintf "%d%a.%a@." !var_id print_pv
+                       pv print_term t in
+          let var = Var.of_string name in
+          ensure_variable uf_man var t;
+          uf_man.apron_mapping <- Mterm.add t var uf_man.apron_mapping) subv
     | _ ->
-       (* We can safely give up on a, as no integer variable can
-          descend from it (because it is well typed) *)
-       Format.eprintf "Variable could not be added properly: ";
-       Pretty.print_term Format.err_formatter logical_term;
-       Format.eprintf " of type ";
-       print_ity Format.err_formatter variable_type;
-       Format.eprintf "@.";
-       ()
+       Format.eprintf "Variable of type %a could not be added properly: %a@."
+         print_ity pv.pv_ity print_term pv_t
 
   let is_in t myt =
     let found = ref false in
@@ -837,7 +811,7 @@ module Make(S:sig
     let f = fun (a, b) ->
       let a, b =
         try
-          let var = Term.Mterm.find t uf_man.apron_mapping in
+          let var = Mterm.find t uf_man.apron_mapping in
           let t' = extract_term (man, uf_man) (is_in t) (a, b) var in
           let a, b = match t' with
             | Some t' -> do_eq (man, uf_man) t t' (a, b)
