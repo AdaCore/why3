@@ -135,8 +135,6 @@ OLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMXA)
 BLINKFLAGS = -linkall @MLMPFR_LINK@ $(EXTCMA)
 endif
 
-FLAGS += @PPXDERIVING@
-
 ifeq (@enable_profiling@,yes)
 OFLAGS += -g -p
 endif
@@ -147,7 +145,7 @@ CMIHACK = -intf-suffix .cmi
 # external libraries common to all binaries
 
 EXTOBJS = menhirLib
-EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ result easy_format biniou yojson ppx_deriving_runtime @WHY3LIB@
+EXTLIBS = @SEQLIB@ @RELIB@ unix nums dynlink @ZIPLIB@ @MLMPFR@ result easy_format biniou yojson @WHY3LIB@
 EXTPKGS = menhirLib @SEQLIB@ @RELIB@ unix num dynlink @ZIPLIB@ yojson @WHY3LIB@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))

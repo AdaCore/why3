@@ -503,8 +503,6 @@ else
    ZIPINCLUDE=
 fi
 
-PPXDERIVING="-ppx \"$($OCAMLFIND query ppx_deriving)/ppx_deriving package:ppx_sexp_conv\""
-
 # checking for menhirlib
 found_menhirlib=yes
 DIR=
@@ -1072,8 +1070,6 @@ AC_SUBST(LABLGTKLIB)
 AC_SUBST(LABLGTKPKG)
 AC_SUBST(LABLGTKINCLUDE)
 AC_SUBST(GTKVERSION)
-
-AC_SUBST(PPXDERIVING)
 
 AC_SUBST(enable_web_ide)
 AC_SUBST(enable_js_of_ocaml)
