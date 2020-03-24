@@ -2288,9 +2288,9 @@ MORE_DIST = configure
 dist: $(MORE_DIST)
 	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
 	mkdir -p distrib/
-	git archive --format tar --prefix $(NAME)/ HEAD | tar x -C distrib/
-	for f in $(MORE_DIST); do cp $$f distrib/$(NAME)/$$f; done
-	cd distrib; tar cf $(NAME).tar $(NAME); gzip -f --best $(NAME).tar
+	git archive --format=tar --prefix=$(NAME)/ -o distrib/$(NAME).tar HEAD
+	tar rf distrib/$(NAME).tar --transform="s,^,$(NAME)/," --mtime="`git show -s --format=%ci`" $(MORE_DIST)
+	gzip -n -f --best distrib/$(NAME).tar
 
 
 ###############
