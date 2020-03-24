@@ -35,17 +35,16 @@ type domain = Polyhedra | Box | Oct
 let def_domain = Polyhedra
 let def_wid = 3
 
-(* operations from a certain Domain
-   'a = context,        'b = cfg,
-   'c = control_points, 'd = domain *)
-type ('a,'b,'c,'d) ai_ops = {
-    empty_context     : unit -> 'a;
-    start_cfg         : unit -> 'b;
-    put_expr_in_cfg   : 'b -> 'a -> ?ret:vsymbol option -> expr -> 'c;
-    put_expr_with_pre : 'b -> 'a -> expr -> term list -> 'c;
-    eval_fixpoints    : 'b -> 'a -> (expr * 'd) list;
-    domain_to_term    : 'b -> 'a -> 'd -> term;
-    add_variable      : 'a -> pvsymbol -> unit;
+type ('context,'cfg,'control_points,'domain) ai_ops = {
+    empty_context     : unit -> 'context;
+    start_cfg         : unit -> 'cfg;
+    put_expr_in_cfg   :
+      'cfg -> 'context -> ?ret:vsymbol option -> expr -> 'control_points;
+    put_expr_with_pre :
+      'cfg -> 'context -> expr -> term list -> 'control_points;
+    eval_fixpoints    : 'cfg -> 'context -> (expr * 'domain) list;
+    domain_to_term    : 'cfg -> 'context -> 'domain -> term;
+    add_variable      : 'context -> pvsymbol -> unit;
 }
 
 let ai_ops a b c d e f g =

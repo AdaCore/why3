@@ -52,22 +52,20 @@ module Make_from_apron(M:sig
   type t = M.t
   let create_manager = M.create_manager
 
-  module A = Abstract1
-
-  let bottom = A.bottom
-  let top = A.top
+  let bottom = Abstract1.bottom
+  let top = Abstract1.top
   let canonicalize _ _ = ()
-  let is_bottom = A.is_bottom
-  let is_leq = A.is_leq
-  let join = A.join
-  let join_list m t = List.fold_left (fun l a -> A.join m l a) (List.hd t) (List.tl t)
-  let widening = A.widening
-  let print = A.print
-  let meet_lincons_array = A.meet_lincons_array
-  let forget_array = A.forget_array
-  let assign_linexpr = A.assign_linexpr
-  let hash = A.hash
-  let is_eq = A.is_eq
+  let is_bottom = Abstract1.is_bottom
+  let is_leq = Abstract1.is_leq
+  let join = Abstract1.join
+  let join_list m t = List.fold_left (fun l a -> Abstract1.join m l a) (List.hd t) (List.tl t)
+  let widening = Abstract1.widening
+  let print = Abstract1.print
+  let meet_lincons_array = Abstract1.meet_lincons_array
+  let forget_array = Abstract1.forget_array
+  let assign_linexpr = Abstract1.assign_linexpr
+  let hash = Abstract1.hash
+  let is_eq = Abstract1.is_eq
 
   exception Cannot_be_expressed
 
@@ -242,7 +240,7 @@ module Make_from_apron(M:sig
 
   let round_integers man env a =
     let open Apron in
-    let l = A.to_lincons_array man a in
+    let l = Abstract1.to_lincons_array man a in
     let n = Apron.Lincons1.array_length l in
     let a = ref a in
     for i = 0 to n -1 do
@@ -282,17 +280,17 @@ module Make_from_apron(M:sig
             begin
               let ar = Lincons1.array_make env 1 in
               Lincons1.array_set ar 0 l';
-              a := A.meet_lincons_array man !a ar
+              a := Abstract1.meet_lincons_array man !a ar
             end
         end
     done;
     !a
 
   let is_join_precise man a b =
-    let c = A.join man a b in
+    let c = Abstract1.join man a b in
     let open Apron in
-    let linexpr_a = A.to_lincons_array man a in
-    let linexpr_b = A.to_lincons_array man b in
+    let linexpr_a = Abstract1.to_lincons_array man a in
+    let linexpr_b = Abstract1.to_lincons_array man b in
     let _ (* a *), b, _ (* linexpr_a *), _ (* linexpr_b *) =
       if Lincons1.array_length linexpr_a > Lincons1.array_length linexpr_b then
         b, a, linexpr_b, linexpr_a

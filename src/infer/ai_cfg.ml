@@ -5,7 +5,7 @@ open Term
 open Expr
 open Ity
 
-let ai_print_domains =
+let dbg_print_cfg =
   Debug.register_flag "ai_print_domains" ~desc:"Print domains to debug"
 let ai_cfg_debug =
   Debug.register_flag "ai_cfg_debug" ~desc:"CFG debug"
@@ -97,7 +97,7 @@ module Make(E: sig
 
     (* This function apply the effect of a transition (an hyperedge)
        to an abstract domain *)
-    mutable apply: QDom.man -> hedge -> QDom.t array -> unit * QDom.t;
+    mutable apply: QDom.man -> hedge -> QDom.t array -> QDom.t;
 
     (* Used to save the interesting control points, i.e. the beginning
        of while and for loops *)
@@ -112,14 +112,13 @@ module Make(E: sig
   }
 
   let debug_fmt =
-    if Debug.test_flag ai_print_domains then
+    if Debug.test_flag dbg_print_cfg then
       let d = open_out "inferdbg.dot" in
-      Some (Format.formatter_of_out_channel d)
-    else None
+      ref (formatter_of_out_channel d)
+    else ref err_formatter
 
-  let _ = match debug_fmt with
-    | Some debug_fmt -> Format.fprintf debug_fmt "digraph graphname {@."
-    | None -> ()
+  let _ = if Debug.test_flag dbg_print_cfg then
+            fprintf !debug_fmt "digraph graphname {@."
 
   exception Unknown_hedge
 
@@ -143,128 +142,95 @@ module Make(E: sig
   (* Adds a new node to the cfg, associated to expr (which is only useful for
    * debugging purpose ATM) *)
   let new_node_cfg cfg ?label:(l="") expr =
-    let i = cfg.control_point_count in
-    Hashtbl.add cfg.expr_to_control_point expr i;
-    cfg.control_point_count <- i + 1;
+    let id = cfg.control_point_count in
+    cfg.control_point_count <- id + 1;
+    Hashtbl.add cfg.expr_to_control_point expr id;
     (* save in the cfg *)
-    PSHGraph.add_vertex cfg.psh_graph i ();
+    PSHGraph.add_vertex cfg.psh_graph id ();
     (* debug *)
-    begin
-      match debug_fmt with
-      | Some debug_fmt ->
-        Format.fprintf debug_fmt "%d [label=\"" i;
-        if l <> "" then
-          Format.fprintf debug_fmt "%s" l
-        else
-          Expr.print_expr debug_fmt expr;
-        Format.fprintf debug_fmt "\"];@.";
-      | None -> ()
-    end;
-    i
+    if Debug.test_flag dbg_print_cfg then begin
+      fprintf !debug_fmt "%d [label=\"" id;
+      if l <> "" then fprintf !debug_fmt "%s" l
+      else Expr.print_expr !debug_fmt expr;
+      fprintf !debug_fmt "\"];@."
+      end;
+    id
 
-  (* Adds a new hyperedge between a and b, whose effect is described in f *)
-  let new_hedge_cfg cfg (a, b) f =
+  (* Adds a new hyperedge between src and trg, whose effect is
+     described in effect *)
+  let new_hedge_cfg cfg src trg effect =
     let hedge = cfg.hedge_count in
     cfg.hedge_count <- cfg.hedge_count + 1;
-    PSHGraph.add_hedge cfg.psh_graph hedge () ~pred:[|a|] ~succ:[|b|];
+    PSHGraph.add_hedge cfg.psh_graph hedge () ~pred:[|src|] ~succ:[|trg|];
     let old_apply = cfg.apply in
     cfg.apply <- begin fun man h tabs ->
       if h = hedge then
-        let abs = tabs.(0) in
-        let abs = QDom.push_label man () h abs in
-        (), f man abs
+        let abs = QDom.push_label man () h tabs.(0) in
+        effect man abs
       else old_apply man h tabs
     end;
-    match debug_fmt with
-    | Some debug_fmt ->
-      Format.fprintf debug_fmt "%d -> %d@." a b
-    | None -> ()
+    if Debug.test_flag dbg_print_cfg then
+      fprintf !debug_fmt "%d -> %d@." src trg
 
-  (* let warning_t s t =
-   *   Format.eprintf "-- warning: %s -- triggered by " s;
-   *   Pretty.print_term Format.err_formatter t;
-   *   Format.eprintf " of type ";
-   *   Pretty.print_ty Format.err_formatter (t_type t);
-   *   Format.eprintf "@." *)
-
-  let create_postcondition_equality _ manpk psym vreturn =
-    if not (ity_equal  psym.pv_ity ity_unit) then
-      begin
+  let create_postcondition_equality man pv vreturn =
+    if not (ity_equal pv.pv_ity ity_unit) then begin
         let postcondition =
-            t_app ps_equ [t_var (psym.pv_vs);t_var vreturn] None in
+          t_app ps_equ [t_var (pv.pv_vs); t_var vreturn] None in
         if Debug.test_flag ai_cfg_debug then
-          begin
-            Format.eprintf "--> Postcondition for let: ";
-            Pretty.print_term Format.err_formatter postcondition;
-            Format.eprintf "@.";
-          end;
-        QDom.meet_term manpk postcondition
+          Format.eprintf "--> Postcondition for let: %a@."
+            Pretty.print_term postcondition;
+        QDom.meet_term man postcondition
       end
-    else
-      (fun abs -> abs)
+    else fun x -> x
 
-  (* Initialize an hedge *)
-  let ident_ret = {pre_name = "$ret";
-                   pre_attrs = Sattr.empty;
-                   pre_loc = None; }
-  let cached_vreturn = ref (Ty.Mty.empty)
-  let create_vreturn manpk ty =
+  let create_vreturn: QDom.man -> Ty.ty -> vsymbol =
+    let cached_vreturn = ref (Ty.Mty.empty) in
+    fun man ty ->
     assert (not (Ty.ty_equal ty ty_unit));
-    let v =
-      try
-        Ty.Mty.find ty !cached_vreturn
-      with
-      | Not_found ->
-        let v  = create_vsymbol ident_ret ty in
+    let vs =
+      try Ty.Mty.find ty !cached_vreturn with Not_found ->
+        let v = create_vsymbol (id_fresh "$ret") ty in
         cached_vreturn := Ty.Mty.add ty v !cached_vreturn;
-        v
-    in
-    QDom.add_lvariable_to_env manpk v;
-    v
+        v in
+    QDom.add_lvariable_to_env man vs;
+    vs
 
-  let create_postcondition cfg manpk psym =
-    if not (ity_equal psym.pv_ity ity_unit) then
-      begin
-        let ty = psym.pv_vs.vs_ty in
-
-        let vreturn = create_vreturn manpk ty in
-        create_postcondition_equality cfg manpk psym vreturn, QDom.forget_var manpk vreturn
-      end
+  (* TODO write description *)
+  let create_postcondition man pv =
+    if not (ity_equal pv.pv_ity ity_unit) then
+      let vreturn = create_vreturn man pv.pv_vs.vs_ty in
+      create_postcondition_equality man pv vreturn, QDom.forget_var man vreturn
     else
-      (fun abs -> abs), (fun abs -> abs)
+      (fun x -> x), (fun x -> x)
 
   let remove_eps ?ret:(ret=None) manpk t =
     match t.t_node with
-    | Teps (tb) ->
+    | Teps tb ->
       let return, t = t_open_bound tb in
       (* Always use the same variable when returning a value,
-       * otherwise variables keep being created and the previous ones (with the
-       * good constraints) can not be accessed *)
-      if Ty.ty_equal return.vs_ty ty_unit then
-        t
-      else
-        begin
+         otherwise variables keep being created and the previous ones
+         (with the good constraints) can not be accessed *)
+      if Ty.ty_equal return.vs_ty ty_unit then t
+      else begin
           match ret with
           | None ->
-            let return_var = create_vreturn manpk (return.vs_ty) in
-            let return_term = t_var return_var in
-            t_subst_single return return_term t
+             let vs = create_vreturn manpk (return.vs_ty) in
+             t_subst_single return (t_var vs) t
           | Some v -> t_subst_single return (t_var v) t
         end
-    | _ ->
-      t
+    | _ -> t
 
-  (* Adds expr to the cfg. manpk is the types of the locally defined variable
-   * (useful for references, when we need to get the type of a term in a logical formula).
-   *
-   * Adds multiple node and edges if expr requires so.
-   *
-   * returns a tuple, whose first element is the entry point of expr in the cfg, and the second
-   * one is the ending point. The result of expr is stored is the variable "result"
-   * (see var_return) *)
+  (* Adds expr to the cfg. manpk is the types of the locally defined
+     variable (useful for references, when we need to get the type of
+     a term in a logical formula). *)
+  (* Adds multiple node and edges if expr requires so.  returns a
+     tuple, whose first element is the entry point of expr in the cfg,
+     and the second one is the ending point. *)
+  (* The result of expr is stored is the variable "result" (see
+     var_return) *)
   let rec put_expr_in_cfg cfg (manpk:QDom.man) ?ret:(ret=None) expr =
     match expr.e_node with
-    | Epure (t) ->
+    | Epure t ->
       let i, j = new_node_cfg cfg expr, new_node_cfg cfg expr in
       let vreturn = match ret with
         | None -> create_vreturn manpk (t_type t)
@@ -272,7 +238,7 @@ module Make(E: sig
       in
       let postcondition = t_app ps_equ [t_var vreturn; t] None in
       let constraints = QDom.meet_term manpk postcondition in
-      new_hedge_cfg cfg (i, j) (fun _ abs ->
+      new_hedge_cfg cfg i j (fun _ abs ->
           constraints abs);
       i, j, []
 
@@ -311,14 +277,14 @@ module Make(E: sig
 
 
       (* Save the effect of the let *)
-      new_hedge_cfg cfg (let_end_cp, b_begin_cp) (fun _ abs ->
+      new_hedge_cfg cfg let_end_cp b_begin_cp (fun _ abs ->
           (* forget_ret manpk *) abs
         );
 
       let end_cp = new_node_cfg cfg expr in
       (* erase a *)
       let forget_fun = QDom.forget_var manpk psym.pv_vs in
-      new_hedge_cfg cfg (b_end_cp, end_cp) (fun _ abs ->
+      new_hedge_cfg cfg b_end_cp end_cp (fun _ abs ->
           forget_fun abs
         );
       let_begin_cp, end_cp, let_exn @ b_exn
@@ -350,7 +316,7 @@ module Make(E: sig
 
       let begin_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg ~label:"value returned" expr in
-      new_hedge_cfg cfg (begin_cp, end_cp) (fun _ abs ->
+      new_hedge_cfg cfg begin_cp end_cp (fun _ abs ->
           constraints abs
         );
       begin_cp, end_cp, []
@@ -365,7 +331,7 @@ module Make(E: sig
       let postcondition = t_app ps_equ [t_const n Ty.ty_int; t_var vreturn] None in
       let constraints = QDom.meet_term manpk postcondition in
 
-      new_hedge_cfg cfg (begin_cp, end_cp) (fun _ abs ->
+      new_hedge_cfg cfg begin_cp end_cp (fun _ abs ->
           constraints abs
         );
       begin_cp, end_cp, []
@@ -374,7 +340,7 @@ module Make(E: sig
       let vars_to_forget, constraint_copy_ghost = Mpv.fold_left (
           fun (vars_to_forget, constraints) k b ->
             add_variable manpk k;
-            let new_constraints = create_postcondition_equality cfg manpk b k.pv_vs in
+            let new_constraints = create_postcondition_equality manpk b k.pv_vs in
             let forget_var = QDom.forget_var manpk k.pv_vs in
             (fun abs -> vars_to_forget abs |> forget_var), (fun abs -> constraints abs |> new_constraints)
         ) ((fun x -> x), fun x -> x) oldies in
@@ -407,7 +373,7 @@ module Make(E: sig
              constr x |> forget)
         ) (fun x -> x) eff_write in
 
-      new_hedge_cfg cfg (begin_cp, end_cp) (fun _ abs ->
+      new_hedge_cfg cfg begin_cp end_cp (fun _ abs ->
           constraint_copy_ghost abs  |> forget_writes |> constraints |> vars_to_forget
         );
       (* FIXME: handle exceptions *)
@@ -428,14 +394,14 @@ module Make(E: sig
       cfg.loop_invariants <- (expr, before_loop_cp) :: cfg.loop_invariants;
       let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg manpk content in
       let after_loop_cp = new_node_cfg cfg expr in
-      new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun _ abs ->
+      new_hedge_cfg cfg before_loop_cp start_loop_cp (fun _ abs ->
           constraints abs
         );
-      new_hedge_cfg cfg (before_loop_cp, after_loop_cp) (fun _ abs ->
+      new_hedge_cfg cfg before_loop_cp after_loop_cp (fun _ abs ->
           (* TODO *)
           abs
         );
-      new_hedge_cfg cfg (end_loop_cp, before_loop_cp) (fun _ abs ->
+      new_hedge_cfg cfg end_loop_cp before_loop_cp (fun _ abs ->
           abs
         );
       (* FIXME: exceptions while inside the condition *)
@@ -444,7 +410,7 @@ module Make(E: sig
       let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg manpk e in
       let j = new_node_cfg cfg expr in
       let k = new_node_cfg cfg expr in
-      new_hedge_cfg cfg (j, k) (fun man _ ->
+      new_hedge_cfg cfg j k (fun man _ ->
           QDom.bottom man ());
       arg_begin, k, ((arg_end_cp, s)::arg_exn)
 
@@ -466,13 +432,13 @@ module Make(E: sig
       let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg ~ret cfg manpk c in
       let start_cp = new_node_cfg cfg expr in
       let end_cp = new_node_cfg cfg expr in
-      new_hedge_cfg cfg (start_cp, b_begin_cp) (fun _ abs ->
+      new_hedge_cfg cfg start_cp b_begin_cp (fun _ abs ->
           constraints abs);
-      new_hedge_cfg cfg (start_cp, c_begin_cp) (fun _ abs ->
+      new_hedge_cfg cfg start_cp c_begin_cp (fun _ abs ->
           constraints_not abs);
-      new_hedge_cfg cfg (c_end_cp, end_cp) (fun _ abs ->
+      new_hedge_cfg cfg c_end_cp end_cp (fun _ abs ->
           abs);
-      new_hedge_cfg cfg (b_end_cp, end_cp) (fun _ abs ->
+      new_hedge_cfg cfg b_end_cp end_cp (fun _ abs ->
           abs);
       start_cp, end_cp, b_exn @ c_exn
     | Ematch (case_e, l, mxs) when Mxs.is_empty mxs ->
@@ -509,10 +475,10 @@ module Make(E: sig
             | Pas _ -> failwith "pattern as"
           in
           let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
-          new_hedge_cfg cfg (case_e_end_cp, e_begin_cp) (fun _ abs ->
+          new_hedge_cfg cfg case_e_end_cp e_begin_cp (fun _ abs ->
               constraints abs |> to_forget_before
             );
-          new_hedge_cfg cfg (e_end_cp, case_end_cp) (fun _ abs ->
+          new_hedge_cfg cfg e_end_cp case_end_cp (fun _ abs ->
               to_forget_end abs
             );
           e_exns := e_exn :: !e_exns;
@@ -535,18 +501,18 @@ module Make(E: sig
           begin
             match l with
             | [p] ->
-              let constraints, forget_ret = create_postcondition cfg manpk p in
-              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs ->
+              let constraints, forget_ret = create_postcondition manpk p in
+              new_hedge_cfg cfg before_assign_cp e_begin_cp (fun _ abs ->
                   constraints abs |> forget_ret
                 );
 
               let to_forget = QDom.forget_var manpk p.pv_vs in
-              new_hedge_cfg cfg (e_end_cp, i) (fun _ abs ->
+              new_hedge_cfg cfg e_end_cp i (fun _ abs ->
                   to_forget abs
                 );
             | _ -> Format.eprintf "Multiple constructors exception, not handled by AI.";
-              new_hedge_cfg cfg (before_assign_cp, e_begin_cp) (fun _ abs -> abs);
-              new_hedge_cfg cfg (e_end_cp, i) (fun _ abs -> abs);
+              new_hedge_cfg cfg before_assign_cp e_begin_cp (fun _ abs -> abs);
+              new_hedge_cfg cfg e_end_cp i (fun _ abs -> abs);
           end;
           l, before_assign_cp, e_end_cp
           ) exc in
@@ -555,7 +521,7 @@ module Make(E: sig
           List.filter (fun (cp, exc_sym_) ->
               if xs_equal exc_sym exc_sym_ then
                 begin
-                  new_hedge_cfg cfg (cp, cp_begin) (fun _ abs ->
+                  new_hedge_cfg cfg cp cp_begin (fun _ abs ->
                        abs
                     );
                   false
@@ -563,7 +529,7 @@ module Make(E: sig
               else
                 true
             ) e_exn) exc e_exn in
-      new_hedge_cfg cfg (e_end_cp, i) (fun _ abs ->
+      new_hedge_cfg cfg e_end_cp i (fun _ abs ->
           abs
         );
       e_begin_cp, i, !additional_exn @ e_exn
@@ -611,19 +577,19 @@ module Make(E: sig
       in
       let constraints_post = QDom.meet_term manpk postcondition in
 
-      new_hedge_cfg cfg (before_loop_cp, start_loop_cp) (fun _ -> constraints_start);
-      new_hedge_cfg cfg (start_loop_cp, e_begin_cp) (fun _ -> constraints_e);
+      new_hedge_cfg cfg before_loop_cp start_loop_cp (fun _ -> constraints_start);
+      new_hedge_cfg cfg start_loop_cp e_begin_cp (fun _ -> constraints_e);
       let vret_k = create_vreturn manpk Ty.ty_int in
       let forget_vret = QDom.forget_var manpk vret_k in
       let forget_k = QDom.forget_var manpk k.pv_vs in
       let res = t_app ad_int [k_term; t_nat_const 1] (Some Ty.ty_int) in
       let next_assignation = t_app ps_equ [t_var vret_k; res] None |> QDom.meet_term manpk in
       let vret_equal = t_app ps_equ [t_var vret_k; k_term] None |> QDom.meet_term manpk in
-      new_hedge_cfg cfg (e_end_cp, start_loop_cp) (fun _ abs ->
+      new_hedge_cfg cfg e_end_cp start_loop_cp (fun _ abs ->
           (* vret = k + 1, forget k, k = vret, forget vret *)
           next_assignation abs |> forget_k |> vret_equal |> forget_vret
         );
-      new_hedge_cfg cfg (start_loop_cp, end_loop_cp) (fun _ abs ->
+      new_hedge_cfg cfg start_loop_cp end_loop_cp (fun _ abs ->
           constraints_post abs |> forget_k
         );
       before_loop_cp, end_loop_cp, e_exn
@@ -643,7 +609,7 @@ module Make(E: sig
     let i = new_node_cfg cfg e in
     let e_start_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
     let constraints = QDom.meet_term manpk (t_and_l pre) in
-    new_hedge_cfg cfg (i, e_start_cp) (fun _ -> constraints);
+    new_hedge_cfg cfg i e_start_cp (fun _ -> constraints);
     i, e_end_cp, e_exn
 
   let domain_to_term _ manpk domain =
@@ -657,8 +623,8 @@ module Make(E: sig
 
   (** {2 The fixpoint manager } *)
 
-  let dot_file = open_out "t.dot";;
-  let dot_fmt = Format.formatter_of_out_channel dot_file;;
+  let dot_file = open_out "t.dot"
+  let dot_fmt = Format.formatter_of_out_channel dot_file
 
   let get_fixpoint_man cfg man =
     let (manager:(int,int, QDom.t,unit) Fixpoint.manager) = {
@@ -670,7 +636,7 @@ module Make(E: sig
       Fixpoint.join_list = begin fun _ labs -> QDom.join_list man labs end;
       Fixpoint.widening = begin fun _ abs1 abs2 -> QDom.widening man abs1 abs2 end;
       Fixpoint.odiff = None;
-      Fixpoint.apply = cfg.apply man;
+      Fixpoint.apply = (fun a b -> (), cfg.apply man a b);
       Fixpoint.arc_init = begin fun _ -> () end;
       Fixpoint.abstract_init=
         begin fun vertex ->
@@ -684,101 +650,101 @@ module Make(E: sig
 
       Fixpoint.accumulate = false;
       Fixpoint.print_fmt = Format.std_formatter;
-      Fixpoint.print_analysis = false;
-      Fixpoint.print_component = false;
-      Fixpoint.print_step = false;
-      Fixpoint.print_state = false;
-      Fixpoint.print_postpre = false;
-      Fixpoint.print_workingsets = false;
+      Fixpoint.print_analysis = true;
+      Fixpoint.print_component = true;
+      Fixpoint.print_step = true;
+      Fixpoint.print_state = true;
+      Fixpoint.print_postpre = true;
+      Fixpoint.print_workingsets = true;
 
       Fixpoint.dot_fmt = Some dot_fmt;
-      Fixpoint.dot_vertex = (fun fmt v -> Format.fprintf fmt "v%i@." v);
-      Fixpoint.dot_hedge = (fun fmt h -> Format.fprintf fmt "h%i" h);
-      Fixpoint.dot_attrvertex = (fun _ -> Format.printf "%d");
-      Fixpoint.dot_attrhedge = (fun _ -> Format.printf "%d");
+      Fixpoint.dot_vertex = (fun fmt -> Format.fprintf fmt "v%i@.");
+      Fixpoint.dot_hedge  = (fun fmt -> Format.fprintf fmt "h%i@.");
+      Fixpoint.dot_attrvertex = pp_print_int;
+      Fixpoint.dot_attrhedge = pp_print_int;
     }
     in manager
 
 
   let eval_fixpoints cfg manpk =
-    begin
-      let manager = get_fixpoint_man cfg manpk in
-      let compare_no_closured = PSHGraph.stdcompare.PSHGraph.comparev in
-      let sinit = PSette.singleton compare_no_closured 0 in
-      let make_strategy =
-        fun is_active ->
-          Fixpoint.make_strategy_default
-            ~widening_start:E.widening ~widening_descend:(max (E.widening/2) 2)
-            ~priority:(PSHGraph.Filter is_active)
-            ~vertex_dummy ~hedge_dummy
-            cfg.psh_graph sinit
-      in
-      let output = Fixpoint.analysis_guided
-          manager cfg.psh_graph sinit make_strategy
-      in
-      (*printf "output=%a@." (Fixpoint.print_output manager) output;*)
-      let l = ref [] in
-      PSHGraph.iter_vertex output
-        (fun vtx abs ~pred:_ ~succ:_ ->
-           l := (vtx, abs) :: !l);
+    let manager = get_fixpoint_man cfg manpk in
+    let compare_no_closured = PSHGraph.stdcompare.PSHGraph.comparev in
+    let sinit = PSette.singleton compare_no_closured 0 in
+    let make_strategy =
+      fun is_active ->
+      Fixpoint.make_strategy_default
+        ~widening_start:E.widening ~widening_descend:(max (E.widening/2) 2)
+        ~priority:(PSHGraph.Filter is_active)
+        ~vertex_dummy ~hedge_dummy
+        cfg.psh_graph sinit
+    in
+    let output = Fixpoint.analysis_guided
+                   manager cfg.psh_graph sinit make_strategy
+    in
+    (*printf "output=%a@." (Fixpoint.print_output manager) output;*)
+    let l = ref [] in
+    PSHGraph.iter_vertex output
+      (fun vtx abs ~pred:_ ~succ:_ ->
+        l := (vtx, abs) :: !l);
 
-      if Debug.test_flag ai_print_domains then
-        begin
-          let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
-          List.iter (fun (vtx, abs) ->
-             let t = QDom.to_term manpk abs in
-             printf "acc(%i) -> @." vtx;
-             Format.printf "@.";
-             Pretty.print_term Format.std_formatter t;
-             Format.printf "@.";
-              (*let gen = Abstract1.to_generator_array manpk abs in
-                Generator1.array_print Format.std_formatter gen;
-                let n = Generator1.array_length gen in
-                for i = 0 to n - 1 do
-                let linexpr = Generator1.array_get  gen i |> Generator1.get_linexpr1 in
-                Linexpr1.print Format.std_formatter linexpr;
-                Format.printf " = ";
-                Coeff.print Format.std_formatter (Linexpr1.get_cst linexpr);
-                Format.printf "@.";
-                done;
-                Format.printf "@.";*)
-            ) l;
+    if Debug.test_flag dbg_print_cfg then
+      begin
+        let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
+        List.iter (fun (vtx, abs) ->
+            let t = QDom.to_term manpk abs in
+            printf "acc(%i) -> @." vtx;
+            Format.printf "@.";
+            Pretty.print_term Format.std_formatter t;
+            Format.printf "@.";
+          (*let gen = Abstract1.to_generator_array manpk abs in
+            Generator1.array_print Format.std_formatter gen;
+            let n = Generator1.array_length gen in
+            for i = 0 to n - 1 do
+            let linexpr = Generator1.array_get  gen i |> Generator1.get_linexpr1 in
+            Linexpr1.print Format.std_formatter linexpr;
+            Format.printf " = ";
+            Coeff.print Format.std_formatter (Linexpr1.get_cst linexpr);
+            Format.printf "@.";
+            done;
+            Format.printf "@.";*)
+          ) l;
 
-          let l = ref [] in
-          Hashtbl.iter (fun a b ->
-              l := (a, b) :: !l;
-            ) cfg.expr_to_control_point;
-          let l = List.sort (fun (_, i) (_, j) -> compare i j) !l in
-          List.iter (fun (a, b) ->
+        let l = ref [] in
+        Hashtbl.iter (fun a b ->
+            l := (a, b) :: !l;
+          ) cfg.expr_to_control_point;
+        let l = List.sort (fun (_, i) (_, j) -> compare i j) !l in
+        List.iter (fun (a, b) ->
 
-              Format.eprintf "%d -> " b;
-              Expr.print_expr Format.err_formatter a;
-              Format.eprintf "@."
-            ) l;
+            Format.eprintf "%d -> " b;
+            Expr.print_expr Format.err_formatter a;
+            Format.eprintf "@."
+          ) l;
 
-          (* Print loop invariants *)
+        (* Print loop invariants *)
 
-          Format.printf "Loop invariants:\n@.";
+        Format.printf "Loop invariants:\n@.";
 
-          List.iter (fun (expr, cp) ->
-              Format.printf "For:@.";
-              Expr.print_expr Format.std_formatter expr;
-              Format.printf "@.";
-              let abs = PSHGraph.attrvertex output cp in
-              Format.printf "%a@." QDom.print abs;
-              Pretty.forget_all ();
-              Pretty.print_term Format.std_formatter (domain_to_term cfg manpk abs);
-              printf "@."
-            ) cfg.loop_invariants;
+        List.iter (fun (expr, cp) ->
+            Format.printf "For:@.";
+            Expr.print_expr Format.std_formatter expr;
+            Format.printf "@.";
+            let abs = PSHGraph.attrvertex output cp in
+            Format.printf "%a@." QDom.print abs;
+            Pretty.forget_all ();
+            Pretty.print_term Format.std_formatter (domain_to_term cfg manpk abs);
+            printf "@."
+          ) cfg.loop_invariants;
 
-          match debug_fmt with
-          | Some debug_fmt -> Format.fprintf debug_fmt "}@.";
-          | None -> ()
-        end;
-      List.map (fun (expr, cp) ->
-          let abs = PSHGraph.attrvertex output cp in
-          expr, abs
-        ) cfg.loop_invariants
-    end
+        if Debug.test_flag dbg_print_cfg then
+          Format.fprintf !debug_fmt "}@.";
+      end;
+    let invs = List.map (fun (expr, cp) ->
+        let abs = PSHGraph.attrvertex output cp in
+        expr, abs
+      ) cfg.loop_invariants in
+    (* FixpointType.dot_graph manager cfg.psh_graph; *)
+    close_out dot_file;
+    invs
 
 end
