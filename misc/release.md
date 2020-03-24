@@ -47,15 +47,15 @@
 * upload the documentation on the web page
   ```
   DEST=/users/www-perso/projets/why3
+  rm -rf $DEST/doc-$VERSION $DEST/stdlib-$VERSION $DEST/api-$VERSION
   cp share/why3session.dtd $DEST/
   cp doc/latex/manual.pdf $DEST/download/manual-$VERSION.pdf
-  ln -s -n -f download/manual-$VERSION.pdf $DEST/manual.pdf
-  rm -rf $DEST/doc-$VERSION $DEST/stdlib-$VERSION $DEST/api-$VERSION
   cp -r doc/html $DEST/doc-$VERSION
-  ln -s -n -f doc-$VERSION $DEST/doc
   cp -r doc/stdlibdoc $DEST/stdlib-$VERSION
-  ln -s -n -f stdlib-$VERSION $DEST/stdlib
   cp -r doc/apidoc $DEST/api-$VERSION
+  ln -s -n -f download/manual-$VERSION.pdf $DEST/manual.pdf
+  ln -s -n -f doc-$VERSION $DEST/doc
+  ln -s -n -f stdlib-$VERSION $DEST/stdlib
   ln -s -n -f api-$VERSION $DEST/api
   ```
 
