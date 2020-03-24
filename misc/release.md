@@ -8,6 +8,7 @@
   - `make trywhy3`
   - run `make detect-unused` and remove unused files
   - run `make update-doc-png` and check if some pictures need to be updated
+  - check `lib/why3/META.in`
 
 * change version number `VERSION=1.3 RELEASE=1.3.0`
   - update the first line of `configure.in` using `$RELEASE`

@@ -1,8 +1,12 @@
 :x: marks a potential source of incompatibility
 
+Version 1.3.1, March 24, 2020
+-----------------------------
+
 Bug fixes
   * fixed conflicting symbols for CVC4 1.7
   * fixed META file
+  * fixed infinite loops in strategies
 
 Version 1.3.0, March 17, 2020
 -----------------------------
