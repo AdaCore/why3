@@ -680,11 +680,10 @@ module Make(S:sig
     try let _ = Mterm.find logical_term uf_man.defined_terms in ()
     with Not_found ->
       uf_man.defined_terms <- Mterm.add logical_term () uf_man.defined_terms;
-      ignore (Format.flush_str_formatter ());
       if Ty.ty_equal (t_type logical_term) ty_int then
         begin
           let reg_name =
-            Format.asprintf "%a%d" Pretty.print_term logical_term !var_id in
+            Format.asprintf "%d%a" !var_id Pretty.print_term logical_term in
           let v = Var.of_string reg_name in
           assert (not (Environment.mem_var uf_man.env v));
           ensure_variable uf_man v logical_term;
@@ -694,7 +693,7 @@ module Make(S:sig
       else if Ty.ty_equal (t_type logical_term) ty_bool then
         begin
           let reg_name =
-            Format.asprintf "%a%d" Pretty.print_term logical_term !var_id in
+            Format.asprintf "%d%a" !var_id Pretty.print_term logical_term in
           let v =
             Var.of_string reg_name in
           assert (not (Environment.mem_var uf_man.env v));
@@ -706,10 +705,9 @@ module Make(S:sig
         begin
           let subv = get_subvalues logical_term None in
           List.iter (fun (t, _) ->
-              ignore (Format.flush_str_formatter ());
-              let v = Format.asprintf "%a.%a%d"
-                        Pretty.print_term logical_term
-                        Pretty.print_term t !var_id in
+              let v = Format.asprintf "%d%a.%a"
+                        !var_id Pretty.print_term logical_term
+                        Pretty.print_term t in
               let v = Var.of_string v in
               ensure_variable uf_man v t;
               uf_man.apron_mapping <- Mterm.add t v uf_man.apron_mapping) subv
@@ -738,17 +736,16 @@ module Make(S:sig
     let open Ity in
     let open Pretty in
     let pv_t = t_var pv.pv_vs in
-    ignore (Format.flush_str_formatter ());
     match pv.pv_ity.ity_node, (t_type pv_t).ty_node with
     | _ when Ty.ty_equal (t_type pv_t) ty_int ->
       let reg_name =
-        Format.asprintf "%a%d" print_term pv_t !var_id in
+        Format.asprintf "%d%a" !var_id print_term pv_t in
       let v = Var.of_string reg_name in
       assert (not (Environment.mem_var uf_man.env v));
       ensure_variable uf_man v pv_t;
       uf_man.apron_mapping <- Mterm.add pv_t v uf_man.apron_mapping
     | _ when Ty.ty_equal (t_type pv_t) ty_bool ->
-      let reg_name = Format.asprintf "%a%d" print_term pv_t !var_id in
+      let reg_name = Format.asprintf "%d%a" !var_id print_term pv_t in
       let v = Var.of_string reg_name in
       assert (not (Environment.mem_var uf_man.env v));
       ensure_variable uf_man v pv_t;
@@ -786,8 +783,8 @@ module Make(S:sig
     | Ityapp _, _ ->
       let subv = get_subvalues pv_t None in
       List.iter (fun (t, _) ->
-          let name = Format.asprintf "%a.%a%d" print_pv
-                       pv print_term t !var_id in
+          let name = Format.asprintf "%d%a.%a" !var_id
+                       print_pv pv print_term t in
           let var = Var.of_string name in
           ensure_variable uf_man var t;
           uf_man.apron_mapping <- Mterm.add t var uf_man.apron_mapping) subv
