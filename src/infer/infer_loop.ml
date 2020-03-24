@@ -9,7 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-#13 "src/mlw/infer_loop_enable.ml"
 open Ident
 open Term
 open Ity
@@ -136,3 +135,5 @@ let infer_loops attrs env tkn mkn e cty =
   else if Debug.test_flag infer_flag then
     infer_loops_for_dom env tkn mkn e cty
   else []
+
+let () = Vc.set_infer_invs infer_loops

@@ -215,8 +215,7 @@ LIBGENERATED = src/util/config.ml \
 	       src/driver/parse_smtv2_model_parser.mli src/driver/parse_smtv2_model_parser.ml \
 	       src/driver/parse_smtv2_model_lexer.ml \
 	       src/session/compress.ml src/session/xml.ml \
-	       src/session/strategy_parser.ml \
-	       src/infer/infer_loop.ml
+	       src/session/strategy_parser.ml
 
 LIB_UTIL = config bigInt mlmpfr_wrapper util opt lists strings \
 	   pp extmap extset exthtbl weakhtbl diffmap \
@@ -239,18 +238,12 @@ LIB_DRIVER = prove_client call_provers driver_ast driver_parser driver_lexer dri
 		collect_data_model parse_smtv2_model_lexer parse_smtv2_model \
 		parse_smtv2_model
 
+LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
+          pinterp
 
 ifeq (@enable_infer@,yes)
-LIB_INFER = reduction_engine0 o2oterm o2mterm domain ai_logic trace_partitioning_domain quant_domain disjunctive_domain disjunctive_domain_fast apron_to_term union_find disjunctive_term_domain uf_domain ai_cfg
+LIB_INFER = reduction_engine0 o2oterm o2mterm domain ai_logic trace_partitioning_domain quant_domain disjunctive_domain disjunctive_domain_fast apron_to_term union_find disjunctive_term_domain uf_domain ai_cfg infer_loop
 endif
-
-LIB_INFER += infer_loop
-
-# FIX ME!!!
-LIB_MLW1 = ity expr pdecl eval_match typeinv
-
-# FIX ME!!!
-LIB_MLW2 = vc pmodule dexpr big_real pinterp
 
 LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
               c ocaml cakeml
@@ -288,16 +281,19 @@ LIB_SESSION = compress xml termcode session_itp \
 LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/core/, $(LIB_CORE)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
-	      $(addprefix src/mlw/, $(LIB_MLW1)) \
+	      $(addprefix src/mlw/, $(LIB_MLW)) \
 	      $(addprefix src/infer/, $(LIB_INFER)) \
-	      $(addprefix src/mlw/, $(LIB_MLW2)) \
 	      $(addprefix src/extract/, $(LIB_EXTRACT)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
 	      $(addprefix src/session/, $(LIB_SESSION))
 
-LIBDIRS = util core driver mlw extract parser transform printer session infer
+LIBDIRS = util core driver mlw extract parser transform printer session
+
+ifeq (@enable_infer@,yes)
+	LIBDIRS += infer
+endif
 
 LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
 
@@ -327,16 +323,6 @@ src/session/compress.ml: src/session/compress_z.ml Makefile
 	cp $< $@
 else
 src/session/compress.ml: src/session/compress_none.ml Makefile
-	cp $< $@
-endif
-
-# Infer-loop
-
-ifeq (@enable_infer@,yes)
-src/infer/infer_loop.ml: src/infer/infer_loop_enable.ml Makefile
-	cp $< $@
-else
-src/infer/infer_loop.ml: src/infer/infer_loop_disable.ml Makefile
 	cp $< $@
 endif
 

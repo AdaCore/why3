@@ -1567,6 +1567,9 @@ let mk_vc_decl ({known_map = kn} as env) id f =
 let add_vc_decl kn id f vcl =
   if can_simp f then vcl else mk_vc_decl kn id f :: vcl
 
+let infer_invs = ref None
+let set_infer_invs f = infer_invs := Some f
+
 let vc env kn tuc d = match d.pd_node with
   | PDlet (LDvar (_, {e_node = Eexec ({c_node = Cany},_)})) ->
       []
@@ -1580,7 +1583,9 @@ let vc env kn tuc d = match d.pd_node with
   | PDlet (LDsym (s, {c_node = Cfun e; c_cty = cty})) ->
       let open Theory in
       let attrs = s.rs_name.id_attrs in
-      let invs = Infer_loop.infer_loops attrs env tuc.uc_known kn e cty in
+      let infer_invs =
+        Opt.get_def (fun _ _ _ _ _ _ -> []) !infer_invs in
+      let invs = infer_invs attrs env tuc.uc_known kn e cty in
       let env = mk_env env kn tuc invs in
       let f = vc_fun env (Debug.test_noflag debug_sp) cty e in
       add_vc_decl env s.rs_name f []
