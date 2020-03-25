@@ -167,11 +167,10 @@ void __wmpz_init (wmpz_ptr x) {\n\
 void wmpz_clear (wmpz_ptr x)\n\
 {\n\
   free (PTR(x));\n\
-}\n\
-"
+}"
 interface "\n\
 void __wmpz_init (wmpz_ptr);\n\
-void wmpz_clear (wmpz_ptr);\n\
+void wmpz_clear (wmpz_ptr);\
 "
 
   syntax val set_size "SIZ(%1) = %2" prec 14 15 14
