@@ -138,9 +138,7 @@ let sn_decode s =
           | _ -> SNword (if m = len then s else String.sub s 0 m) in
   if m = len then w (* no appended suffix *) else
   if s.[m] <> '\'' && s.[m] <> '_' then SNword s else
-  let p = print_sn Format.str_formatter w;
-          Format.flush_str_formatter () in
-  SNword (p ^ String.sub s m (len - m))
+  SNword (Format.asprintf "%a%s" print_sn w (String.sub s m (len - m)))
 
 let print_decoded fmt s = print_sn fmt (sn_decode s)
 
