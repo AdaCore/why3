@@ -11,11 +11,6 @@
 
 (* TODO Use less parenthesis to deal with precedence and associativity *)
 
-(* Test with
-   $ why3 pp --output=mlw test.mlw > test1.mlw
-   $ why3 pp --output=mlw test1.mlw > test2.mlw
-   $ diff test1.mlw test2.mlw *)
-
 open Format
 open Ptree
 open Ident
@@ -258,13 +253,13 @@ let pp_cast pp fmt x pty =
   fprintf fmt "(%a : %a)" pp x pp_pty pty
 
 let pp_attr pp closed fmt attr x =
-  let _pp' = pp_closed closed pp in
+  let pp' = pp_closed closed pp in
   match attr with
   | ATstr a ->
-      fprintf fmt "@[[@%s]@ %a@]" a.attr_string pp x
+      fprintf fmt "@[[@%s]@ %a@]" a.attr_string pp' x
   | ATpos loc ->
       let filename, line, bchar, echar = Loc.get loc in
-      fprintf fmt "[# %S %d %d %d]@ %a" filename line bchar echar pp x
+      fprintf fmt "[# %S %d %d %d]@ %a" filename line bchar echar pp' x
 
 let pp_exn fmt (id, pty, _mask) =
   (* TODO _mask *)
@@ -405,11 +400,15 @@ and pp_expr fmt e =
         pp_let_any (id, ghost, kind, (params, kind', pty_opt, pat, mask, spec))
         pp_expr' e2
   | Elet (id, ghost, kind, e1, e2) ->
-      fprintf fmt "@[<v>%a in@ %a@]" (pp_let pp_expr) (id, ghost, kind, e1) pp_expr' e2
+      fprintf fmt "@[<hv>@[<hv 2>%a@] in@ %a@]" (pp_let pp_expr) (id, ghost, kind, e1) pp_expr' e2
   | Erec (defs, e) ->
       let pp_fundefs =
         pp_print_list ~pp_sep:(pp_sep "@ and ") pp_fundef in
       fprintf fmt "@[<v>let rec %a in@ %a@]" pp_fundefs defs pp_expr' e
+  | Efun ([], None, {pat_desc=Pwild}, Ity.MaskVisible, spec, {expr_desc=Etuple []}) ->
+      fprintf fmt "@[<v>@[<v 2>begin%a@]@ end@]" pp_spec spec
+  | Efun ([], None, {pat_desc=Pwild}, Ity.MaskVisible, spec, e) ->
+      fprintf fmt "@[<v>@[<v 2>begin%a@ %a@]@ end@]" pp_spec spec pp_expr e
   | Efun (binders, opt_pty, pat, mask, spec, e) ->
       pp_fun pp_expr fmt (binders, opt_pty, pat, mask, spec, e)
   | Eany (_params, _kind, Some pty, _pat, _mask, spec) ->
@@ -523,7 +522,7 @@ and pp_expr fmt e =
   | Eghost e ->
       fprintf fmt "ghost %a" pp_expr e
   | Eattr (attr, e) ->
-      pp_attr pp_expr expr_closed fmt attr e
+      pp_attr pp_expr (function {expr_desc=Eattr _} -> true | e -> expr_closed e) fmt attr e
 
 and pp_term' fmt =
   pp_closed term_closed pp_term fmt
@@ -571,7 +570,7 @@ and pp_term fmt t =
   | Tquant (_, _, _::_, _) ->
       todo fmt "Tquant (_, _, _::_, _)"
   | Tattr (attr, t) ->
-      pp_attr pp_term term_closed fmt attr t
+      pp_attr pp_term (function {term_desc=Tattr _} -> true | t -> term_closed t) fmt attr t
   | Tlet (id, t1, t2) ->
       fprintf fmt "@[<v>%a in@ %a@]" (pp_let pp_term) (id, false, ((**)), t1) pp_term t2
   | Tcase (t, cases) ->
@@ -668,7 +667,7 @@ and pp_pattern fmt p =
 and pp_type_decl fmt d =
   let pp_def fmt = function
     | TDalias pty ->
-        pp_pty fmt pty
+        fprintf fmt " = %a" pp_pty pty
     | TDrecord [] when d.td_vis = Abstract && d.td_mut = false ->
         ()
     | TDrecord fs ->
@@ -698,9 +697,9 @@ and pp_type_decl fmt d =
         let pp_variants = pp_print_list ~pp_sep:(pp_sep "@,| ") pp_variant in
         fprintf fmt " = @,@[<v 2>  | %a@]" pp_variants variants
     | TDrange (i1, i2) ->
-        fprintf fmt " = < range %s..%s >" (BigInt.to_string i1) (BigInt.to_string i2)
+        fprintf fmt " = <range %s %s>" (BigInt.to_string i1) (BigInt.to_string i2)
     | TDfloat (i1, i2) ->
-        fprintf fmt " = < float %d..%d >" i1 i2 in
+        fprintf fmt " = <float %d %d>" i1 i2 in
   let pp_wit fmt = function
     | [] -> ()
     | wits ->
@@ -747,7 +746,7 @@ and pp_decl fmt = function
         | Decl.Plemma -> "lemma"
         | Decl.Paxiom -> "axiom"
         | Decl.Pgoal -> "goal" in
-      fprintf fmt "%s %a = %a" keyword pp_id id pp_term t
+      fprintf fmt "%s %a: %a" keyword pp_id id pp_term t
   | Dlet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e)}) ->
       pp_let_fun pp_expr fmt (id, ghost, kind, (binders, pty_opt, pat, mask, spec, e))
   | Dlet (id, ghost, kind, {expr_desc=Eany (params, kind', pty_opt, pat, mask, spec)}) ->
@@ -772,7 +771,7 @@ and pp_decl fmt = function
         | Mstr _ -> todo fmt "Mstr"
         | Mint _ -> todo fmt "Mint" in
       let pp_args = pp_print_list ~pp_sep:(pp_sep " ") pp_metarg in
-      fprintf fmt "meta %a %a" pp_id ident pp_args args
+      fprintf fmt "meta \"%a\" %a" pp_id ident pp_args args
   | Dcloneexport (qid, []) ->
       fprintf fmt "@[<h>clone export %a@]" pp_qualid qid
   | Dcloneexport (qid, substs) ->
@@ -821,7 +820,7 @@ let pp_mlw_file fmt = function
       pp_decls fmt decls
   | Modules modules ->
       let pp_module fmt (id, decls) =
-        fprintf fmt "@[<v>@[<v 2>module %a@ %a@]@,end@]"
+        fprintf fmt "@[<v 2>module %a@,%a@]@,end"
           pp_id id pp_decls decls in
       let pp_modules =
         pp_print_list ~pp_sep:(pp_sep "@,@,") pp_module in
