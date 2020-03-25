@@ -812,10 +812,6 @@ IDECMX = $(addsuffix .cmx, $(IDEMODULES))
 
 $(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
 
-ifeq (@enable_infer@,yes)
-$(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/infer
-endif
-
 $(IDEDEP): $(IDEGENERATED)
 
 # build targets
