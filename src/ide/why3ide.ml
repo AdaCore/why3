@@ -834,9 +834,7 @@ let clear_message_zone () =
 
 (* Function used to print stuff on the message_zone *)
 let print_message ~kind ~notif_kind fmt =
-  (* TODO: use kasprintf once OCaml 4.03 is used *)
-  Format.kfprintf
-    (fun _ -> let s = flush_str_formatter () in
+  Format.kasprintf (fun s ->
               let s = try_convert s in
               add_to_log notif_kind s;
               let buf = message_zone#buffer in
@@ -850,7 +848,6 @@ let print_message ~kind ~notif_kind fmt =
                     buf#insert (s ^ "\n");
                   messages_notebook#goto_page error_page;
                 end)
-    str_formatter
     fmt
 
 let display_warnings fmt warnings =
