@@ -1901,7 +1901,7 @@ let merge_file env (ses : session) (old_ses : session) file =
       ses ~old_ses ~old_theories ~file_is_detached:false
       ~env file_name new_theories format;
     None
-  with Loc.Located (_,e) -> (* TODO: capture only syntax and typing errors *)
+  with (Loc.Located _ as e) -> (* TODO: capture only syntax and typing errors *)
     merge_file_section
       ses ~old_ses ~old_theories ~file_is_detached:true
       ~env file_name [] format;
