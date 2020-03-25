@@ -6,9 +6,11 @@ open Expr
 open Ity
 
 let dbg_print_cfg =
-  Debug.register_flag "ai_print_domains" ~desc:"Print domains to debug"
+  Debug.register_flag "ai_print_cfg" ~desc:"Print domains to debug"
 let ai_cfg_debug =
   Debug.register_flag "ai_cfg_debug" ~desc:"CFG debug"
+
+let other_ai_debug = false
 
 module type AiCfg = sig
   module QDom : Domain.TERM_DOMAIN
@@ -120,6 +122,8 @@ module Make(E: sig
   let _ = if Debug.test_flag dbg_print_cfg then
             fprintf !debug_fmt "digraph graphname {@."
 
+  let fun_id x = x
+
   exception Unknown_hedge
 
   let start_cfg () =
@@ -141,24 +145,22 @@ module Make(E: sig
 
   (* Adds a new node to the cfg, associated to expr (which is only useful for
    * debugging purpose ATM) *)
-  let new_node_cfg cfg ?label:(l="") expr =
+  let new_node_cfg cfg ?(lbl="") expr =
     let id = cfg.control_point_count in
     cfg.control_point_count <- id + 1;
     Hashtbl.add cfg.expr_to_control_point expr id;
     (* save in the cfg *)
     PSHGraph.add_vertex cfg.psh_graph id ();
     (* debug *)
-    if Debug.test_flag dbg_print_cfg then begin
-      fprintf !debug_fmt "%d [label=\"" id;
-      if l <> "" then fprintf !debug_fmt "%s" l
-      else Expr.print_expr !debug_fmt expr;
-      fprintf !debug_fmt "\"];@."
-      end;
+    if Debug.test_flag dbg_print_cfg then
+      fprintf !debug_fmt
+        "%d [label=\"%d:%a@\n%s\"];@."
+        id id Expr.print_expr expr lbl;
     id
 
   (* Adds a new hyperedge between src and trg, whose effect is
      described in effect *)
-  let new_hedge_cfg cfg src trg effect =
+  let new_hedge_cfg ?(lbl="") cfg src trg effect =
     let hedge = cfg.hedge_count in
     cfg.hedge_count <- cfg.hedge_count + 1;
     PSHGraph.add_hedge cfg.psh_graph hedge () ~pred:[|src|] ~succ:[|trg|];
@@ -170,7 +172,7 @@ module Make(E: sig
       else old_apply man h tabs
     end;
     if Debug.test_flag dbg_print_cfg then
-      fprintf !debug_fmt "%d -> %d@." src trg
+      fprintf !debug_fmt "%d -> %d [label=\"%s\"];@." src trg lbl
 
   let create_postcondition_equality man pv vreturn =
     if not (ity_equal pv.pv_ity ity_unit) then begin
@@ -181,7 +183,7 @@ module Make(E: sig
             Pretty.print_term postcondition;
         QDom.meet_term man postcondition
       end
-    else fun x -> x
+    else fun_id
 
   let create_vreturn: QDom.man -> Ty.ty -> vsymbol =
     let cached_vreturn = ref (Ty.Mty.empty) in
@@ -195,13 +197,11 @@ module Make(E: sig
     QDom.add_lvariable_to_env man vs;
     vs
 
-  (* TODO write description *)
   let create_postcondition man pv =
     if not (ity_equal pv.pv_ity ity_unit) then
       let vreturn = create_vreturn man pv.pv_vs.vs_ty in
       create_postcondition_equality man pv vreturn, QDom.forget_var man vreturn
-    else
-      (fun x -> x), (fun x -> x)
+    else fun_id, fun_id
 
   let remove_eps ?ret:(ret=None) manpk t =
     match t.t_node with
@@ -231,379 +231,312 @@ module Make(E: sig
   let rec put_expr_in_cfg cfg (manpk:QDom.man) ?ret:(ret=None) expr =
     match expr.e_node with
     | Epure t ->
-      let i, j = new_node_cfg cfg expr, new_node_cfg cfg expr in
+      let node1, node2 = new_node_cfg cfg expr ~lbl:"pure bgn",
+                         new_node_cfg cfg expr ~lbl:"pure end" in
       let vreturn = match ret with
         | None -> create_vreturn manpk (t_type t)
         | Some v -> v
       in
       let postcondition = t_app ps_equ [t_var vreturn; t] None in
       let constraints = QDom.meet_term manpk postcondition in
-      new_hedge_cfg cfg i j (fun _ abs ->
-          constraints abs);
-      i, j, []
-
-    | Elet (LDvar (psym, let_expr), c) ->
-          (*
-           * let a = b in c
+      new_hedge_cfg cfg node1 node2 (fun _ -> constraints) ~lbl:"pure";
+      node1, node2, []
+    | Elet (LDvar (pv, e1), e2) ->
+          (*  let pv = e1 in e2
            *
            *  . let_begin_cp
-           *  | result = b
+           *  | result = e1
            *  . let_end_cp
-           *  | a = result
-           *  . b_begin_cp
+           *  | pv = result
+           *  . e1_begin_cp
            *  | …
-           *  | result = c
-           *  . b_end_cp
+           *  | result = e2
+           *  . e1_end_cp
            *  | erase every temporary variable
            *  . end_cp
            **)
-       if Debug.test_flag ai_cfg_debug then
-         Format.eprintf "Computing for Elet: %a = %a@."
-           print_pv psym print_expr let_expr;
 
-      add_variable manpk psym;
-      let let_begin_cp, let_end_cp, let_exn = put_expr_in_cfg ~ret:(Some psym.pv_vs) cfg manpk let_expr in
+      add_variable manpk pv;
 
-      (* let forget_ret manpk abs =
-       *   let ty = Ity.(ty_of_ity (psym.pv_ity)) in
-       *   if Ty.ty_equal ty Ity.ty_unit then
-       *     abs
-       *   else
-       *     D.forget_var manpk psym.pv_vs abs in *)
+      let begin_e1, end_e1, exn_e1 =
+        put_expr_in_cfg ~ret:(Some pv.pv_vs) cfg manpk e1 in
 
-      (* compute the child and add an hyperedge, to set the value of psym
-       * to the value returned by let_expr *)
-      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg ~ret cfg manpk c in
-
+      (* compute the child and add an hyperedge, to set the value of pv
+       * to the value returned by e1 *)
+      let begin_e2, end_e2, exn_e2 = put_expr_in_cfg ~ret cfg manpk e2 in
 
       (* Save the effect of the let *)
-      new_hedge_cfg cfg let_end_cp b_begin_cp (fun _ abs ->
-          (* forget_ret manpk *) abs
-        );
+      new_hedge_cfg ~lbl:"let_e1_e2" cfg end_e1 begin_e2 (fun _ abs -> abs);
 
-      let end_cp = new_node_cfg cfg expr in
-      (* erase a *)
-      let forget_fun = QDom.forget_var manpk psym.pv_vs in
-      new_hedge_cfg cfg b_end_cp end_cp (fun _ abs ->
-          forget_fun abs
-        );
-      let_begin_cp, end_cp, let_exn @ b_exn
+      let end_cp = new_node_cfg cfg expr ~lbl:"end let" in
+      (* erase pv *)
+      let forget_fun = QDom.forget_var manpk pv.pv_vs in
+      new_hedge_cfg ~lbl:"let_forget" cfg end_e2 end_cp
+        (fun _ abs -> forget_fun abs);
 
-    | Evar (psym) ->
+      begin_e1, end_cp, exn_e1 @ exn_e2
+    | Evar pv ->
       let constraints =
-        if not (ity_equal  psym.pv_ity ity_unit) then
-          begin
-          let ty = (psym.pv_vs.vs_ty) in
-
+        if ity_equal pv.pv_ity ity_unit then fun abs -> abs else
           let vreturn = match ret with
-            | None -> create_vreturn manpk ty
-            | Some v -> v
-          in
+            | None -> create_vreturn manpk pv.pv_vs.vs_ty
+            | Some v -> v in
           let postcondition =
-            t_app ps_equ [t_var psym.pv_vs;t_var vreturn] None in
-
-          if Debug.test_flag ai_cfg_debug then
-            begin
-              Format.eprintf "--> Postcondition for var: ";
-              Pretty.print_term Format.err_formatter postcondition;
-              Format.eprintf "@.";
-            end;
-          QDom.meet_term manpk postcondition
-          end
-        else
-          (fun abs -> abs)
-      in
-
-      let begin_cp = new_node_cfg cfg expr in
-      let end_cp = new_node_cfg cfg ~label:"value returned" expr in
+            t_app ps_equ [t_var pv.pv_vs;t_var vreturn] None in
+          QDom.meet_term manpk postcondition in
+      let begin_cp = new_node_cfg cfg expr ~lbl:"var" in
+      let end_cp   = new_node_cfg cfg expr ~lbl:"var ret" in
       new_hedge_cfg cfg begin_cp end_cp (fun _ abs ->
-          constraints abs
-        );
+          constraints abs) ~lbl:"pv=ret";
       begin_cp, end_cp, []
     | Econst n ->
-      let begin_cp = new_node_cfg cfg expr in
-      let end_cp = new_node_cfg ~label:"constant returned" cfg expr in
+       let begin_cp = new_node_cfg cfg expr ~lbl:"const bgn"in
+       let end_cp   = new_node_cfg cfg expr ~lbl:"const end" in
+       let vreturn  = match ret with
+         | None -> create_vreturn manpk Ty.ty_int
+         | Some v -> v in
+       let postcondition =
+         t_app ps_equ [t_const n Ty.ty_int; t_var vreturn] None in
+       let constraints = QDom.meet_term manpk postcondition in
+       new_hedge_cfg cfg begin_cp end_cp (fun _ abs ->
+           constraints abs) ~lbl:"const=ret";
+       begin_cp, end_cp, []
+    | Eexec ({ c_node = Capp (_, _) },
+             { cty_post; cty_effect; cty_oldies }) ->
 
-      let vreturn = match ret with
-        | None -> create_vreturn manpk Ty.ty_int
-        | Some v -> v
-      in
-      let postcondition = t_app ps_equ [t_const n Ty.ty_int; t_var vreturn] None in
-      let constraints = QDom.meet_term manpk postcondition in
+       let forget_and_constraints (vars, constrs) k b =
+         add_variable manpk k;
+         let new_constr = create_postcondition_equality manpk b k.pv_vs in
+         let forget_var = QDom.forget_var manpk k.pv_vs in
+         (fun abs -> forget_var (vars abs)),
+         (fun abs -> new_constr (constrs abs)) in
+       let vars_to_forget, constraint_copy_ghost =
+         Mpv.fold_left forget_and_constraints (fun_id, fun_id) cty_oldies in
 
-      new_hedge_cfg cfg begin_cp end_cp (fun _ abs ->
-          constraints abs
-        );
-      begin_cp, end_cp, []
-    | Eexec ({c_node = Capp (rsym, _); _}, { cty_post = post; cty_effect = effect;  cty_oldies = oldies; _ }) ->
-      let eff_write = effect.eff_writes in
-      let vars_to_forget, constraint_copy_ghost = Mpv.fold_left (
-          fun (vars_to_forget, constraints) k b ->
-            add_variable manpk k;
-            let new_constraints = create_postcondition_equality manpk b k.pv_vs in
-            let forget_var = QDom.forget_var manpk k.pv_vs in
-            (fun abs -> vars_to_forget abs |> forget_var), (fun abs -> constraints abs |> new_constraints)
-        ) ((fun x -> x), fun x -> x) oldies in
+       let constraints = List.map (remove_eps ~ret manpk) cty_post
+                         |> List.fold_left t_and t_true
+                         |> QDom.meet_term manpk in
 
-      (* Computing domain from postcondition *)
-      if Debug.test_flag ai_cfg_debug then
-        begin
-          Format.eprintf "Computing domain from postconditions for function: ";
-          Expr.print_rs Format.err_formatter rsym;
-          List.iter (fun a ->
-              Format.eprintf "    ###>  ";
-              Pretty.print_term Format.err_formatter a;
-              Format.eprintf "@.";
-            ) post;
+       let begin_cp = new_node_cfg cfg expr ~lbl:"exec bgn" in
+       let end_cp   = new_node_cfg cfg expr ~lbl:"exec end" in
 
-          Format.eprintf "@.";
-        end;
-      let constraints =
-        List.map (remove_eps ~ret manpk) post
-        |> List.fold_left t_and t_true
-        |> QDom.meet_term manpk
-      in
-      let begin_cp = new_node_cfg cfg expr in
-      let end_cp = new_node_cfg ~label:"function called" cfg expr in
+       let forget_writes = Mreg.fold_left (fun constr a b ->
+                               let forget = QDom.forget_region manpk a b in
+                               (fun x -> constr x |> forget)
+                             ) fun_id cty_effect.eff_writes in
 
-      let forget_writes = Mreg.fold_left (fun constr a b ->
+       new_hedge_cfg cfg begin_cp end_cp (fun _ abs ->
+           constraint_copy_ghost abs
+           |> forget_writes
+           |> constraints
+           |> vars_to_forget) ~lbl:"copy ghost\nforget writes\npost \
+                                    constraints\nforget vars";
 
-          let forget = QDom.forget_region manpk a b in
-          (fun x ->
-             constr x |> forget)
-        ) (fun x -> x) eff_write in
+       (* FIXME: handle exceptions *)
+       begin_cp, end_cp, []
+    | Ewhile (e1,_,_,e2) ->
 
-      new_hedge_cfg cfg begin_cp end_cp (fun _ abs ->
-          constraint_copy_ghost abs  |> forget_writes |> constraints |> vars_to_forget
-        );
-      (* FIXME: handle exceptions *)
-      begin_cp, end_cp, []
-    | Ewhile (cond, _, _, content) ->
-      (* Condition expression *)
-      let cond_term =
-        match Expr.term_of_expr ~prop:true cond with
-        | Some s ->
-          s
+      let e1_term = match Expr.term_of_expr ~prop:true e1 with
+        | Some s -> s
         | None ->
-          Format.eprintf "warning, condition in while could not be translated to term, an imprecise invariant will be generated";
-          t_true
-      in
-      let constraints = QDom.meet_term manpk cond_term in
+           Format.eprintf "warning, condition in while could not be \
+             translated to term, an imprecise invariant will be \
+             generated: %a@." Expr.print_expr e1;
+           t_true in
+      let constraints = QDom.meet_term manpk e1_term in
 
-      let before_loop_cp = new_node_cfg cfg cond in
-      cfg.loop_invariants <- (expr, before_loop_cp) :: cfg.loop_invariants;
-      let start_loop_cp, end_loop_cp, loop_exn = put_expr_in_cfg cfg manpk content in
-      let after_loop_cp = new_node_cfg cfg expr in
-      new_hedge_cfg cfg before_loop_cp start_loop_cp (fun _ abs ->
-          constraints abs
-        );
-      new_hedge_cfg cfg before_loop_cp after_loop_cp (fun _ abs ->
+      let before_loop = new_node_cfg cfg e1 ~lbl:"before while" in
+      cfg.loop_invariants <- (expr, before_loop) :: cfg.loop_invariants;
+      let start_loop, end_loop, exn_loop = put_expr_in_cfg cfg manpk e2 in
+      let after_loop = new_node_cfg cfg expr ~lbl:"after while" in
+
+      new_hedge_cfg cfg before_loop start_loop
+        (fun _ abs -> constraints abs) ~lbl:"meet";
+      new_hedge_cfg cfg before_loop after_loop (fun _ abs ->
           (* TODO *)
-          abs
-        );
-      new_hedge_cfg cfg end_loop_cp before_loop_cp (fun _ abs ->
-          abs
-        );
+          (* constraints negation loop condition,
+             constraints invariants *)
+          abs) ~lbl:"end (should negate)";
+      new_hedge_cfg cfg end_loop before_loop
+        (fun _ abs -> abs) ~lbl:"loop";
+
       (* FIXME: exceptions while inside the condition *)
-      before_loop_cp, after_loop_cp, loop_exn
-    | Eraise (s, e) ->
-      let arg_begin, arg_end_cp, arg_exn = put_expr_in_cfg cfg manpk e in
-      let j = new_node_cfg cfg expr in
-      let k = new_node_cfg cfg expr in
-      new_hedge_cfg cfg j k (fun man _ ->
-          QDom.bottom man ());
-      arg_begin, k, ((arg_end_cp, s)::arg_exn)
+      before_loop, after_loop, exn_loop
+    | Eraise (xs, e) ->
+       let e_begin, e_end, e_exn = put_expr_in_cfg cfg manpk e in
 
-    | Eif (cond, b, c) ->
-      (* Condition expression *)
-      let cond_term, not_cond_term =
-        match Expr.term_of_expr ~prop:true cond with
-        | Some s ->
-          s, t_not s
-        | None ->
-          Format.eprintf "warning, condition in if could not be translated to term (not pure), an imprecise invariant will be generated@.";
-          Expr.print_expr Format.err_formatter cond;
-          Format.eprintf "@.";
-          t_true, t_true
-      in
-      let constraints = QDom.meet_term manpk cond_term in
-      let constraints_not = QDom.meet_term manpk not_cond_term in
-      let b_begin_cp, b_end_cp, b_exn = put_expr_in_cfg ~ret cfg manpk b in
-      let c_begin_cp, c_end_cp, c_exn = put_expr_in_cfg ~ret cfg manpk c in
-      let start_cp = new_node_cfg cfg expr in
-      let end_cp = new_node_cfg cfg expr in
-      new_hedge_cfg cfg start_cp b_begin_cp (fun _ abs ->
-          constraints abs);
-      new_hedge_cfg cfg start_cp c_begin_cp (fun _ abs ->
-          constraints_not abs);
-      new_hedge_cfg cfg c_end_cp end_cp (fun _ abs ->
-          abs);
-      new_hedge_cfg cfg b_end_cp end_cp (fun _ abs ->
-          abs);
-      start_cp, end_cp, b_exn @ c_exn
-    | Ematch (case_e, l, mxs) when Mxs.is_empty mxs ->
-      let case_e_begin_cp, case_e_end_cp, case_e_exn = put_expr_in_cfg cfg manpk case_e in
-      let e_exns = ref [case_e_exn] in
-      let case_end_cp = new_node_cfg cfg expr in
-      List.iter (fun (p, e) ->
-          let constraints, to_forget_before, to_forget_end = match p.pp_pat.pat_node with
-            | Pwild -> (fun abs -> abs), (fun abs -> abs), (fun x -> x)
-            | Pvar _ -> failwith "pattern"
-            | Papp (l, p) ->
-              let args = List.map (fun p -> match p.pat_node with
-                  | Pvar (vsym) ->
-                    let pv = restore_pv vsym in
-                    add_variable manpk pv;
-                    vsym
-                  | Pwild ->
-                    create_vreturn manpk p.pat_ty
-                  | _ -> failwith "nested pattern or worse"
-                ) p in
-              let matched_term = t_app l (List.map t_var args) (Some (ty_of_ity (case_e.e_ity))) in
-              let vreturn = match ret with
-                | None -> create_vreturn manpk (t_type matched_term)
-                | Some v -> v
-              in
-              let postcondition =
-                  t_app ps_equ [matched_term; t_var vreturn] None in
-              let constr = QDom.meet_term manpk postcondition
-              in
-              constr, QDom.forget_var manpk vreturn, (List.fold_left (fun c arg ->
-                  fun x -> c x |> QDom.forget_var manpk arg) (fun x -> x) args)
+       (* create nodes to capture normal termination *)
+       let raise_bgn = new_node_cfg cfg expr ~lbl:"raise" in
+       let raise_end = new_node_cfg cfg expr ~lbl:"normal termination BOT" in
+       new_hedge_cfg cfg raise_bgn raise_end
+         (fun man _ -> QDom.bottom man ()) ~lbl:"raise bottom";
 
-            | Por _ -> failwith "pattern or"
-            | Pas _ -> failwith "pattern as"
-          in
-          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
-          new_hedge_cfg cfg case_e_end_cp e_begin_cp (fun _ abs ->
-              constraints abs |> to_forget_before
-            );
-          new_hedge_cfg cfg e_end_cp case_end_cp (fun _ abs ->
-              to_forget_end abs
-            );
-          e_exns := e_exn :: !e_exns;
-        ) l;
-      case_e_begin_cp, case_end_cp, (List.concat !e_exns)
-    | Ematch (e, [], exc) ->
-      let additional_exn = ref [] in
-      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg ~ret cfg manpk e in
-      let i = new_node_cfg cfg expr in
-      let exc = Mxs.map (fun (l, e) ->
-          List.iter (fun p ->
-              add_variable manpk p) l;
-
-          let before_assign_cp = new_node_cfg cfg e in
-
-          let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg ~ret cfg manpk e in
-
-          additional_exn := e_exn @ !additional_exn;
-
-          begin
-            match l with
-            | [p] ->
-              let constraints, forget_ret = create_postcondition manpk p in
-              new_hedge_cfg cfg before_assign_cp e_begin_cp (fun _ abs ->
-                  constraints abs |> forget_ret
-                );
-
+       e_begin, raise_end, (e_end, xs) :: e_exn
+    | Eif (e1, e2, e3) ->
+       let e1_true, e1_false =
+         match Expr.term_of_expr ~prop:true e1 with
+         | Some t -> t, t_not t
+         | None ->
+            Format.eprintf "warning, condition in if could not be \
+              translated to term (not pure), an imprecise invariant \
+              will be generated: %a@." Expr.print_expr e1;
+            t_true, t_true in
+       let constraints     = QDom.meet_term manpk e1_true in
+       let constraints_not = QDom.meet_term manpk e1_false in
+       let e2_begin, e2_end, e2_exn = put_expr_in_cfg ~ret cfg manpk e2 in
+       let e3_begin, e3_end, e3_exn = put_expr_in_cfg ~ret cfg manpk e3 in
+       let start_if = new_node_cfg cfg expr ~lbl:"if start" in
+       let end_if   = new_node_cfg cfg expr ~lbl:"if end" in
+       new_hedge_cfg cfg start_if e2_begin
+         (fun _ abs -> constraints abs) ~lbl:"if true";
+       new_hedge_cfg cfg start_if e3_begin
+         (fun _ abs -> constraints_not abs) ~lbl:"if false";
+       new_hedge_cfg cfg e3_end end_if
+         (fun _ abs -> abs) ~lbl:"if false end";
+       new_hedge_cfg cfg e2_end end_if
+         (fun _ abs -> abs) ~lbl:"if true end";
+      start_if, end_if, e2_exn @ e3_exn
+    | Ematch (match_e, l, mxs) when Mxs.is_empty mxs ->
+      let e_begin, e_end, e_exn = put_expr_in_cfg cfg manpk match_e in
+      let e_exns = ref [e_exn] in
+      let match_end = new_node_cfg cfg expr ~lbl:"match end" in
+      let process_branch (p,be) =
+        let constraints, forget_before, forget_end =
+          match p.pp_pat.pat_node with
+          | Pwild -> fun_id, fun_id, fun_id
+          | Pvar _ -> failwith "pattern"
+          | Papp (ls, p) ->
+             let args = List.map (fun p -> match p.pat_node with
+               | Pvar vs -> add_variable manpk (restore_pv vs); vs
+               | Pwild   -> create_vreturn manpk p.pat_ty
+               | _       -> failwith "nested pattern or worse") p in
+             let matched_term =
+               t_app ls (List.map t_var args) (Some (ty_of_ity match_e.e_ity)) in
+             let vreturn = match ret with
+               | None -> create_vreturn manpk (t_type matched_term)
+               | Some v -> v in
+             let postcondition =
+               t_app ps_equ [matched_term; t_var vreturn] None in
+             let constr = QDom.meet_term manpk postcondition in
+             let forget_before = QDom.forget_var manpk vreturn in
+             let forget_after = List.fold_left (fun f arg ->
+                  fun x -> QDom.forget_var manpk arg (f x)) fun_id args in
+             constr,forget_before,forget_after
+          | Por _ -> failwith "pattern or"
+          | Pas _ -> failwith "pattern as" in
+        let be_begin, be_end, be_exn = put_expr_in_cfg cfg manpk be in
+        new_hedge_cfg cfg e_end be_begin
+          (fun _ abs -> forget_before (constraints abs)) ~lbl:"match asgns forgets before";
+        new_hedge_cfg cfg be_end match_end
+          (fun _ abs -> forget_end abs) ~lbl:"match forget end";
+        e_exns := be_exn :: !e_exns in
+      List.iter process_branch l;
+      e_begin, match_end, List.concat !e_exns
+    | Ematch (exc_e, [], exc) ->
+       let additional_exn = ref [] in
+       let e_begin, e_end, e_exn = put_expr_in_cfg ~ret cfg manpk exc_e in
+       let end_match = new_node_cfg cfg expr ~lbl:"exn end" in
+       let process_branch (pvl,e) =
+         List.iter (fun p -> add_variable manpk p) pvl;
+         let before_assign = new_node_cfg cfg e ~lbl:"exn branch bfr asgn" in
+         let e_begin, e_end, e_exn = put_expr_in_cfg ~ret cfg manpk e in
+         additional_exn := e_exn @ !additional_exn;
+         begin match pvl with
+         | [p] ->
+            let constraints, forget_ret = create_postcondition manpk p in
+              new_hedge_cfg cfg before_assign e_begin (fun _ abs ->
+                  forget_ret (constraints abs)) ~lbl:"exn asgn forget before";
               let to_forget = QDom.forget_var manpk p.pv_vs in
-              new_hedge_cfg cfg e_end_cp i (fun _ abs ->
-                  to_forget abs
-                );
-            | _ -> Format.eprintf "Multiple constructors exception, not handled by AI.";
-              new_hedge_cfg cfg before_assign_cp e_begin_cp (fun _ abs -> abs);
-              new_hedge_cfg cfg e_end_cp i (fun _ abs -> abs);
-          end;
-          l, before_assign_cp, e_end_cp
-          ) exc in
-
-      let e_exn = Mxs.fold (fun exc_sym (_, cp_begin, _) e_exn ->
-          List.filter (fun (cp, exc_sym_) ->
-              if xs_equal exc_sym exc_sym_ then
-                begin
-                  new_hedge_cfg cfg cp cp_begin (fun _ abs ->
-                       abs
-                    );
-                  false
-                end
-              else
-                true
-            ) e_exn) exc e_exn in
-      new_hedge_cfg cfg e_end_cp i (fun _ abs ->
-          abs
-        );
-      e_begin_cp, i, !additional_exn @ e_exn
+              new_hedge_cfg cfg e_end end_match
+                (fun _ abs -> to_forget abs) ~lbl:"exn forget end";
+         | _ -> Format.eprintf
+                  "Multiple constructors exception, not handled by AI.";
+                new_hedge_cfg cfg before_assign e_begin
+                  (fun _ abs -> abs) ~lbl:"exn TODO";
+                new_hedge_cfg cfg e_end end_match
+                  (fun _ abs -> abs) ~lbl:"exn TODO";
+         end;
+         pvl, before_assign, e_end in
+       let exc = Mxs.map process_branch exc in
+       let process_exception xs1 (_, cp1,_) e_exn =
+         List.filter (fun (cp2, xs2) ->
+             if xs_equal xs1 xs2 then begin
+               new_hedge_cfg cfg cp2 cp1 (fun _ abs -> abs) ~lbl:"exn nothing";
+               false end
+             else true ) e_exn in
+       let e_exn = Mxs.fold process_exception exc e_exn in
+       new_hedge_cfg cfg e_end end_match
+         (fun _ abs -> abs) ~lbl:"exn e normal termination";
+       e_begin, end_match, !additional_exn @ e_exn
     | Eassert _ | Eabsurd -> (* FIXME: maybe they could be taken into account *)
-      let i = new_node_cfg cfg expr in
-
-      i, i, []
-
+       let node = new_node_cfg cfg expr in
+       node, node, []
     | Eghost e -> put_expr_in_cfg ~ret cfg manpk e
+    | Efor (pv, (lo, dir, up), _, _, e) ->
+       (* . before_loop
+        * | k = 0      k = n -> forget_k
+        * . start_loop ------------------> end_loop
+        * | 0 <= k <= n
+        * . e_begin
+        * :
+        * :       k = k + 1
+        * . e_end --------> start_loop
+        *)
+       let pv_t, lo_t, up_t = t_var pv.pv_vs, t_var lo.pv_vs, t_var up.pv_vs in
+       add_variable manpk pv;
 
-    | Efor (k, (lo, dir, up), _, _, e) ->
-      (* . before_loop
-       * | k = 0      k = n -> forget_k
-       * . start_loop ------------------> end_loop
-       * | 0 <= k <= n
-       * . e_begin
-       * :
-       * :       k = k + 1
-       * . e_end --------> start_loop
-       *)
-      let k_term, lo, up =
-        (t_var k.pv_vs, t_var lo.pv_vs, t_var up.pv_vs)
-      in
-      add_variable manpk k;
+       let before_loop = new_node_cfg cfg expr ~lbl:"for before" in
+       let start_loop = new_node_cfg cfg expr ~lbl:"for start" in
+       cfg.loop_invariants <- (expr, start_loop) :: cfg.loop_invariants;
+       let e_begin, e_end, e_exn = put_expr_in_cfg cfg manpk e in
+       let end_loop_cp = new_node_cfg cfg expr ~lbl:"for end" in
 
-      let before_loop_cp = new_node_cfg cfg expr in
-      let start_loop_cp = new_node_cfg cfg expr in
-      cfg.loop_invariants <- (expr, start_loop_cp) :: cfg.loop_invariants;
-      let e_begin_cp, e_end_cp, e_exn = put_expr_in_cfg cfg manpk e in
-      let end_loop_cp = new_node_cfg cfg expr in
+       let postcondition_before = t_app ps_equ [pv_t; lo_t] None in
+       let constraints_start = QDom.meet_term manpk postcondition_before in
 
-      let postcondition_before = t_app ps_equ [k_term; lo] None in
-      let constraints_start = QDom.meet_term manpk postcondition_before in
+       let bounds a b =
+         t_and (t_app le_int [a; pv_t] None)(t_app le_int [pv_t; b] None) in
+       let precondition_e =
+         if dir = Expr.To then bounds lo_t up_t else bounds up_t lo_t in
+       let constraints_e = QDom.meet_term manpk precondition_e in
+       let postcondition = t_app ps_equ [pv_t; up_t] None in
+       let constraints_post = QDom.meet_term manpk postcondition in
 
-      let precondition_e =
-        if dir = Expr.To then
-          t_and (t_app le_int [lo; k_term] None) (t_app le_int [k_term; up] None)
-        else
-          t_and (t_app le_int [up; k_term] None) (t_app le_int [k_term; lo] None)
-      in
-      let constraints_e = QDom.meet_term manpk precondition_e in
+       new_hedge_cfg cfg before_loop start_loop
+         (fun _ -> constraints_start) ~lbl:"for pv=lo";
+       new_hedge_cfg cfg start_loop e_begin
+         (fun _ -> constraints_e) ~lbl:"for lo<=pv<=up";
 
-      let postcondition =
-          t_app ps_equ [k_term; up] None
-      in
-      let constraints_post = QDom.meet_term manpk postcondition in
+       let vret_pv = create_vreturn manpk Ty.ty_int in
+       let res = t_app ad_int [pv_t; t_nat_const 1] (Some Ty.ty_int) in
+       let next_assign =
+         t_app ps_equ [t_var vret_pv; res] None
+         |> QDom.meet_term manpk in
+       let forget_pv = QDom.forget_var manpk pv.pv_vs in
+       let vret_equal =
+         t_app ps_equ [t_var vret_pv; pv_t] None
+         |> QDom.meet_term manpk in
+       let forget_vret = QDom.forget_var manpk vret_pv in
 
-      new_hedge_cfg cfg before_loop_cp start_loop_cp (fun _ -> constraints_start);
-      new_hedge_cfg cfg start_loop_cp e_begin_cp (fun _ -> constraints_e);
-      let vret_k = create_vreturn manpk Ty.ty_int in
-      let forget_vret = QDom.forget_var manpk vret_k in
-      let forget_k = QDom.forget_var manpk k.pv_vs in
-      let res = t_app ad_int [k_term; t_nat_const 1] (Some Ty.ty_int) in
-      let next_assignation = t_app ps_equ [t_var vret_k; res] None |> QDom.meet_term manpk in
-      let vret_equal = t_app ps_equ [t_var vret_k; k_term] None |> QDom.meet_term manpk in
-      new_hedge_cfg cfg e_end_cp start_loop_cp (fun _ abs ->
+       new_hedge_cfg cfg e_end start_loop (fun _ abs ->
           (* vret = k + 1, forget k, k = vret, forget vret *)
-          next_assignation abs |> forget_k |> vret_equal |> forget_vret
-        );
-      new_hedge_cfg cfg start_loop_cp end_loop_cp (fun _ abs ->
-          constraints_post abs |> forget_k
-        );
-      before_loop_cp, end_loop_cp, e_exn
-
+           next_assign abs
+           |> forget_pv
+           |> vret_equal
+           |> forget_vret) ~lbl:"for loop next_assign;\n \
+                                 forget pv; vret=pv; forget_vret";
+       new_hedge_cfg cfg start_loop end_loop_cp (fun _ abs ->
+           constraints_post abs
+           |> forget_pv) ~lbl:"loop termination";
+       before_loop, end_loop_cp, e_exn
     | _ ->
-      Format.eprintf "expression not handled, will probably lead to some errors";
-      Expr.print_expr Format.err_formatter expr;
-      begin
-      match expr.e_loc with
-      | None -> ()
-      | Some l -> Loc.report_position Format.err_formatter l;
-      end;
-      let i = new_node_cfg cfg expr in
-      i, i, []
+       Format.eprintf "expression not handled, will probably lead to \
+                       some errors: %a@." Expr.print_expr expr;
+       begin match expr.e_loc with
+       | None -> ()
+       | Some l -> Loc.report_position Format.err_formatter l; end;
+       let node = new_node_cfg cfg expr in
+       node, node, []
 
   let put_expr_with_pre cfg manpk e pre =
     let i = new_node_cfg cfg e in
@@ -644,7 +577,7 @@ module Make(E: sig
         end;
 
       Fixpoint.print_abstract = QDom.print;
-      Fixpoint.print_arc = (fun fmt () -> pp_print_string fmt "()");
+      Fixpoint.print_arc = (fun _ () -> ());
       Fixpoint.print_vertex = pp_print_int;
       Fixpoint.print_hedge = pp_print_int;
 
@@ -658,8 +591,8 @@ module Make(E: sig
       Fixpoint.print_workingsets = true;
 
       Fixpoint.dot_fmt = Some dot_fmt;
-      Fixpoint.dot_vertex = (fun fmt -> Format.fprintf fmt "v%i@.");
-      Fixpoint.dot_hedge  = (fun fmt -> Format.fprintf fmt "h%i@.");
+      Fixpoint.dot_vertex = (fun fmt -> Format.fprintf fmt "v%i");
+      Fixpoint.dot_hedge  = (fun fmt -> Format.fprintf fmt "h%i");
       Fixpoint.dot_attrvertex = pp_print_int;
       Fixpoint.dot_attrhedge = pp_print_int;
     }
@@ -687,7 +620,7 @@ module Make(E: sig
       (fun vtx abs ~pred:_ ~succ:_ ->
         l := (vtx, abs) :: !l);
 
-    if Debug.test_flag dbg_print_cfg then
+    if other_ai_debug then
       begin
         let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
         List.iter (fun (vtx, abs) ->
@@ -735,10 +668,9 @@ module Make(E: sig
             Pretty.print_term Format.std_formatter (domain_to_term cfg manpk abs);
             printf "@."
           ) cfg.loop_invariants;
-
-        if Debug.test_flag dbg_print_cfg then
-          Format.fprintf !debug_fmt "}@.";
       end;
+    if Debug.test_flag dbg_print_cfg then
+      Format.fprintf !debug_fmt "}@.";
     let invs = List.map (fun (expr, cp) ->
         let abs = PSHGraph.attrvertex output cp in
         expr, abs

@@ -22,8 +22,7 @@ module Make(Dom : TERM_DOMAIN) = struct
   let canonicalize m a = List.iter (Dom.canonicalize (fst m)) a.t
 
   let print fmt e = List.iter (fun b ->
-      Dom.print fmt b;
-      Format.fprintf fmt "@.";) e.t
+      Dom.print fmt b) e.t
 
   let is_bottom man t =
     let man = fst man in

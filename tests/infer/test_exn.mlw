@@ -5,8 +5,8 @@ exception B int
 exception C (int,int)
 
 let f (x: int): int
-  raises {C _ -> x = 1}
-= if x = 1 then raise C (x,2) else x + 1
+  raises {B _ -> x = 1}
+= if x = 1 then raise B x else x + 1
 
 let g[@infer](x:int): int
 = try f x with
