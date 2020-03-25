@@ -16,7 +16,9 @@ type driver = private {
   drv_printer     : string option;
   drv_prelude     : Printer.prelude;
   drv_thprelude   : Printer.prelude_map;
+  drv_thexportpre : Printer.prelude_export_map;
   drv_thinterface : Printer.interface_map;
+  drv_thexportint : Printer.interface_export_map;
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
   drv_literal     : Printer.syntax_map;
@@ -28,7 +30,9 @@ type printer_args = private {
   env         : Env.env;
   prelude     : Printer.prelude;
   thprelude   : Printer.prelude_map;
+  thexportpre : Printer.prelude_export_map;
   thinterface : Printer.interface_map;
+  thexportint : Printer.interface_export_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   literal     : Printer.syntax_map;
@@ -56,7 +60,10 @@ type border_printer =
     Only used in modular extraction. *)
 type prelude_printer =
   printer_args -> ?old:in_channel -> ?fname:string ->
-  Pmodule.pmodule list -> Pmodule.pmodule Pp.pp
+  deps:Pmodule.pmodule list ->
+  global_prelude:Printer.prelude ->
+  prelude:Printer.prelude ->
+  Pmodule.pmodule Pp.pp
 
 type file_printer = {
   filename_generator : filename_generator;
@@ -73,7 +80,7 @@ type printer = {
   flat_printer   : file_printer;
 }
 
-val dummy_prelude_printer : prelude_printer
+val default_prelude_printer : prelude_printer
 
 val dummy_border_printer : border_printer
 

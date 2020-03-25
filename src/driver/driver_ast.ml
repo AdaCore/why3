@@ -26,8 +26,15 @@ type metarg =
   | PMAstr of string
   | PMAint of int
 
+(* Extraction preludes and interfaces of a program module
+   are flagged with "export" if they should be printed
+   in modules that depend on it.
+   This flag is ignored by in prover drivers. *)
+
+type export = bool
+
 type th_rule =
-  | Rprelude   of string
+  | Rprelude   of string * export
   | Rsyntaxts  of qualid * string * bool
   | Rsyntaxfs  of qualid * string * bool
   | Rsyntaxps  of qualid * string * bool
@@ -41,10 +48,10 @@ type theory_rules = {
   thr_name  : qualid;
   thr_rules : (loc * th_rule) list;
 }
-                      
+
 type mo_rule =
   | MRtheory    of th_rule
-  | MRinterface of string
+  | MRinterface of string * export
   | MRexception of qualid * string
   | MRval       of qualid * string * int list
 

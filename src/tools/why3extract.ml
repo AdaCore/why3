@@ -143,13 +143,32 @@ let get_cout_old ?fname fg m = match opt_output with
           Some (open_in backup) end else None in
       open_out file, old
 
-let print_preludes =
+let pmod_name pm = pm.mod_theory.th_name
+
+let compute_preludes id_th pm deps epm =
   let ht = Hstr.create 8 in
   let add l s = if Hstr.mem ht s then l else (Hstr.add ht s (); s :: l) in
-  fun id_th fmt pm ->
-    let th_pm = Ident.Mid.find_def [] id_th pm in
-    let l = List.fold_left add [] th_pm in
-    Printer.print_prelude fmt l
+  let th_epm dep = Ident.Mid.find_def [] (pmod_name dep) epm in
+  let add_tps acc dep = List.fold_left add acc (th_epm dep) in
+  (* exported preludes from deps *)
+  let epl = List.fold_left add_tps [] deps in
+  (* prelude of current module *)
+  let mpl = List.fold_left add [] (Ident.Mid.find_def [] id_th pm) in
+  epl@mpl
+
+let export_deps = Ident.Hid.create 16
+
+let add_dep dep (ds, dl) =
+  let id = pmod_name dep in
+  if Ident.Sid.mem id ds then (ds, dl)
+  else (Ident.Sid.add id ds, dep::dl)
+
+let add_export_dep (ds, dl) pm =
+  let open Ident in
+  let dep = pmod_name pm in
+  let (_, depl) = Hid.find_def export_deps (Sid.empty, []) dep in
+  let (ds, dl) = List.fold_right add_dep depl (ds, dl) in
+  add_dep pm (ds, dl)
 
 let print_mdecls ?fname m mdecls deps =
   let open Pdriver in
@@ -161,7 +180,10 @@ let print_mdecls ?fname m mdecls deps =
     List.exists test_id_not_driver decl_name in
   let prelude_exists =
     Ident.Mid.mem m.mod_theory.th_name pargs.thprelude
-    || (!opt_interface && Ident.Mid.mem m.mod_theory.th_name pargs.thinterface)
+    || Ident.Mid.mem m.mod_theory.th_name pargs.thexportpre
+    || (!opt_interface &&
+          (Ident.Mid.mem m.mod_theory.th_name pargs.thinterface
+           || Ident.Mid.mem m.mod_theory.th_name pargs.thexportint))
   in
   if List.exists test_decl_not_driver mdecls || prelude_exists
   then begin
@@ -172,16 +194,19 @@ let print_mdecls ?fname m mdecls deps =
     let tname = m.mod_theory.th_name in
     let cout, old = get_cout_old implem.filename_generator m ?fname in
     let fmt = formatter_of_out_channel cout in
-    (* print driver prelude *)
-    Printer.print_prelude fmt pargs.prelude;
-    (* print module prelude *)
-    implem.prelude_printer pargs ?old ?fname deps fmt m;
+    implem.header_printer pargs ?old ?fname fmt m;
+    (* print_preludes *)
     let pm = pargs.thprelude in
-    print_preludes tname fmt pm;
+    let epm = pargs.thexportpre in
+    let pl = compute_preludes tname pm deps epm in
+    implem.prelude_printer pargs ?old ?fname ~deps
+      ~global_prelude:pargs.prelude
+      ~prelude:pl fmt m ;
     (* print decls *)
     let pr_decl fmt d =
       implem.decl_printer pargs ?old ?fname m fmt d in
     Pp.print_list Pp.nothing pr_decl fmt mdecls;
+    implem.footer_printer pargs ?old ?fname fmt m;
     if cout <> stdout then close_out cout;
     (* print interface file *)
     if !opt_interface then begin
@@ -193,10 +218,15 @@ let print_mdecls ?fname m mdecls deps =
           let iout, old = get_cout_old interf.filename_generator m ?fname in
           let ifmt = formatter_of_out_channel iout in
           interf.header_printer pargs ?old ?fname ifmt m;
-          Printer.print_prelude ifmt pargs.prelude;
-          let inter_p = Ident.Mid.find_def [] tname pargs.thinterface in
-          interf.prelude_printer pargs ?old ?fname deps ifmt m;
-          Printer.print_interface ifmt inter_p;
+          (* print interfaces *)
+          let im = pargs.thinterface in
+          let eim = pargs.thexportint in
+          let il = compute_preludes tname im deps eim in
+          interf.prelude_printer pargs ?old ?fname ~deps
+            ~global_prelude:pargs.prelude
+            ~prelude:il
+            ifmt m;
+          (* print decls *)
           let pr_idecl fmt d =
             interf.decl_printer pargs ?old ?fname m fmt d in
           Pp.print_list Pp.nothing pr_idecl ifmt mdecls;
@@ -238,23 +268,44 @@ let translate ?decl m = match decl with
 
 let extract_to =
   let memo = Ident.Hid.create 16 in
-  fun ?fname ?decl m deps ->
-    match m.mod_theory.th_path with
-    | "why3"::_ -> false
-    | _ ->
-       let name = m.mod_theory.th_name in
-       if not (Ident.Hid.mem memo name) then begin
-           let mdecls = translate ?decl m in
-           let file_exists = print_mdecls ?fname m mdecls deps in
-           Ident.Hid.add memo name file_exists;
-           file_exists end
-       else Ident.Hid.find memo name
+  fun ?fname ?decl m use use_export ->
+  match m.mod_theory.th_path with
+  | "why3"::_ -> false
+  | _ ->
+     let name = m.mod_theory.th_name in
+     if not (Ident.Hid.mem memo name) then begin
+         (* compute exported dependencies of m *)
+         let empty_deps = Ident.Sid.empty, [] in
+         let ex_deps = List.fold_left add_export_dep empty_deps use_export in
+         Ident.Hid.replace export_deps name ex_deps;
+         (* indirect dependencies are the exported deps of the direct deps *)
+         let ind_deps =
+           List.fold_left
+             (fun acc ddep ->
+               (snd (Ident.Hid.find export_deps (pmod_name ddep)))
+               @ acc)
+             []
+             use in
+         let deps = use @ ind_deps @ snd ex_deps in
+         (* translate and print m *)
+         let mdecls = translate ?decl m in
+         let file_exists = print_mdecls ?fname m mdecls deps in
+         Ident.Hid.add memo name file_exists;
+         file_exists end
+     else Ident.Hid.find memo name
 
-let rec use_fold f l =
+let rec use_fold toplevel f l =
   List.fold_left
-    (fun acc -> function | Uuse t -> if f t then t::acc else acc
-                         | Uscope (_,l) -> (use_fold f l)@acc
-                         | _ -> acc) [] l
+    (fun (use, use_export)
+     -> function | Uuse t ->
+                    if f t
+                    then if toplevel then (use, t::use_export)
+                         else (t::use, use_export)
+                    else use, use_export
+                 | Uscope (_,l) ->
+                    let use', _ = use_fold false f l in
+                    use'@use, use_export
+                 | _ -> use, use_export) ([], []) l
 
 let find_decl mm id =
   let m = find_module_id mm id in
@@ -267,11 +318,11 @@ let rec do_extract_module ?fname in_deps m =
     do_extract_module ?fname in_deps m' in
   let deps_and_use ({mod_theory = {th_name}} as m') =
     in_deps th_name && extract_use m' in
-  let deps = match opt_rec_single with
-    | Recursive -> use_fold extract_use m.mod_units
-    | RecursiveDeps -> use_fold deps_and_use m.mod_units
-    | Single -> [] in
-  extract_to ?fname m deps
+  let use, use_export = match opt_rec_single with
+    | Recursive -> use_fold true extract_use m.mod_units
+    | RecursiveDeps -> use_fold true deps_and_use m.mod_units
+    | Single -> [], [] in
+  extract_to ?fname m use use_export
 
 let do_extract_module ?fname m =
   let visited_mod = Ident.Hid.create 128 in
@@ -343,7 +394,7 @@ let do_modular target =
   | Symbol (path, m, s) ->
       let mm = Mstr.empty in
       let m = find_module_path mm path m in
-      ignore (do_extract_symbol_from m s []) (* FIXME empty deps ? *)
+      ignore (do_extract_symbol_from m s [] []) (* FIXME empty deps ? *)
 
 type extract_info = {
   info_rec : bool;
@@ -403,13 +454,27 @@ let () =
           | Some file -> open_out file in
         let fmt = formatter_of_out_channel cout in
         let thprelude = pargs.thprelude in
-        let print_prelude = List.iter (fun s -> fprintf fmt "%s@\n@." s) in
+        let thexportpre = pargs.thexportpre in
+        let prs = Hstr.create 16 in
+        let print_prelude sl =
+          List.iter
+            (fun s ->
+              if not (Hstr.mem prs s)
+              then begin
+                  Hstr.add prs s ();
+                  fprintf fmt "%s@\n@." s
+                end)
+            sl
+        in
         let rec do_preludes id =
           (try
              let m = find_module_id mm id in
              Ident.Sid.iter do_preludes m.mod_used
            with Not_found -> ());
-          print_preludes id fmt thprelude
+          let pl = Ident.Mid.find_def [] id thprelude in
+          let ipl = Ident.Mid.find_def [] id thexportpre in
+          print_prelude pl;
+          print_prelude ipl;
         in
         print_prelude pargs.prelude;
         let visit_m _ m =

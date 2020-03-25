@@ -1812,7 +1812,8 @@ let print_header_decl =
     let info = mk_info args m in
     print_header_decl info fmt d end
 
-let print_prelude ~header args ?old ?fname ~flat deps fmt pm =
+let print_prelude ~header args ?old ?fname ~flat ~deps
+      ~global_prelude ~prelude fmt pm =
   ignore old;
   ignore flat;
   ignore fname;
@@ -1820,12 +1821,17 @@ let print_prelude ~header args ?old ?fname ~flat deps fmt pm =
   let add_include m =
     let id = m.Pmodule.mod_theory.Theory.th_name in
     Format.fprintf fmt "%a@." Print.print_global_def C.(Dinclude (id,Proj)) in
+  (* system includes *)
+  Printer.print_prelude fmt global_prelude;
+  (* dependencies *)
   if header
   then
     List.iter add_include (List.rev deps)
   else
     (* C files include only their own header *)
-    add_include pm
+    add_include pm;
+  (* module and exported prelude *)
+  Printer.print_prelude fmt prelude
 
 let print_decl args fmt d ~flat =
   let cds = MLToC.translate_decl args d ~header:false ~flat in

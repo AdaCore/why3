@@ -24,18 +24,23 @@ type driver = {
   drv_printer     : string option;
   drv_prelude     : Printer.prelude;
   drv_thprelude   : Printer.prelude_map;
+  drv_thexportpre : Printer.prelude_export_map;
   drv_thinterface : Printer.interface_map;
+  drv_thexportint : Printer.interface_export_map;
   drv_blacklist   : Printer.blacklist;
   drv_syntax      : Printer.syntax_map;
   drv_literal     : Printer.syntax_map;
   drv_prec        : (int list) Mid.t;
 }
 
+
 type printer_args = {
   env         : Env.env;
   prelude     : Printer.prelude;
   thprelude   : Printer.prelude_map;
+  thexportpre : Printer.prelude_export_map;
   thinterface : Printer.interface_map;
+  thexportint : Printer.interface_export_map;
   blacklist   : Printer.blacklist;
   syntax      : Printer.syntax_map;
   literal     : Printer.syntax_map;
@@ -87,7 +92,9 @@ let load_driver env file extra_files =
   List.iter add_global f.fe_global;
 
   let thprelude = ref Mid.empty in
+  let thexportprelude = ref Mid.empty in
   let thinterface = ref Mid.empty in
+  let thexportinterface = ref Mid.empty in
   let syntax_map = ref Mid.empty in
   let literal_map = ref Mid.empty in
   let prec_map  = ref Mid.empty in
@@ -114,9 +121,12 @@ let load_driver env file extra_files =
     literal_map := Mid.add id (s,if b then 1 else 0) !literal_map in
 
   let add_local th = function
-    | Rprelude s ->
+    | Rprelude (s, false) ->
         let l = Mid.find_def [] th.th_name !thprelude in
         thprelude := Mid.add th.th_name (s::l) !thprelude
+    | Rprelude (s, true) ->
+        let l = Mid.find_def [] th.th_name !thexportprelude in
+        thexportprelude := Mid.add th.th_name (s::l) !thexportprelude
     | Rsyntaxts (q,s,b) ->
         let ts = find_ts th q in
         Printer.check_syntax_type ts s;
@@ -181,10 +191,14 @@ let load_driver env file extra_files =
     with Not_found -> Loc.error ~loc (UnknownExn (!qualid,q))
   in
   let add_local_module loc m = function
-    | MRinterface s ->
+    | MRinterface (s, false) ->
        let th = m.mod_theory in
        let l = Mid.find_def [] th.th_name !thinterface in
        thinterface := Mid.add th.th_name (s::l) !thinterface
+    | MRinterface (s, true) ->
+       let th = m.mod_theory in
+       let l = Mid.find_def [] th.th_name !thexportinterface in
+       thexportinterface := Mid.add th.th_name (s::l) !thexportinterface
     | MRexception (q,s) ->
         let xs = find_xs m q in
         add_syntax xs.Ity.xs_name s false
@@ -223,7 +237,9 @@ let load_driver env file extra_files =
     drv_printer     = !printer;
     drv_prelude     = List.rev !prelude;
     drv_thprelude   = Mid.map List.rev !thprelude;
+    drv_thexportpre = Mid.map List.rev !thexportprelude;
     drv_thinterface = Mid.map List.rev !thinterface;
+    drv_thexportint = Mid.map List.rev !thexportinterface;
     drv_blacklist   = Queue.fold (fun l s -> s :: l) [] blacklist;
     drv_syntax      = !syntax_map;
     drv_literal     = !literal_map;
@@ -249,7 +265,10 @@ type border_printer =
     Only used in modular extraction. *)
 type prelude_printer =
   printer_args -> ?old:in_channel -> ?fname:string ->
-  Pmodule.pmodule list -> Pmodule.pmodule Pp.pp
+  deps:Pmodule.pmodule list ->
+  global_prelude:Printer.prelude ->
+  prelude:Printer.prelude ->
+  Pmodule.pmodule Pp.pp
 
 type file_printer = {
   filename_generator : filename_generator;
@@ -266,7 +285,10 @@ type printer = {
   flat_printer   : file_printer;
 }
 
-let dummy_prelude_printer _ ?old:_ ?fname:_ _ _ _ = ()
+let default_prelude_printer _ ?old:_ ?fname:_ ~deps:_ ~global_prelude
+      ~prelude fmt _ =
+  Printer.print_prelude fmt global_prelude;
+  Printer.print_prelude fmt prelude
 
 let dummy_border_printer _ ?old:_ ?fname:_ _ _ = ()
 
@@ -289,7 +311,9 @@ let lookup_printer drv =
       env         = drv.drv_env;
       prelude     = drv.drv_prelude;
       thprelude   = drv.drv_thprelude;
+      thexportpre = drv.drv_thexportpre;
       thinterface = drv.drv_thinterface;
+      thexportint = drv.drv_thexportint;
       blacklist   = drv.drv_blacklist;
       syntax      = drv.drv_syntax;
       literal     = drv.drv_literal;

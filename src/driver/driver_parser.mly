@@ -21,7 +21,7 @@
 %token <string> RIGHTPAR_QUOTE
 %token <string> INPUT (* never reaches the parser *)
 %token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING USE
-%token INTERFACE
+%token EXPORT INTERFACE
 %token VALID INVALID UNKNOWN FAIL
 %token TIMEOUT OUTOFMEMORY STEPLIMITEXCEEDED TIME STEPS
 %token UNDERSCORE LEFTPAR RIGHTPAR DOT DOTDOT QUOTE EOF
@@ -82,8 +82,12 @@ syntax:
 | OVERRIDING SYNTAX { true }
 | SYNTAX            { false }
 
+export:
+| EXPORT        { true }
+| (* epsilon *)     { false }
+
 trule:
-| PRELUDE STRING                 { Rprelude   ($2) }
+| PRELUDE export STRING          { Rprelude   ($3, $2) }
 | syntax TYPE      qualid STRING { Rsyntaxts  ($3, $4, $1) }
 | syntax CONSTANT  qualid STRING { Rsyntaxfs  ($3, $4, $1) }
 | syntax FUNCTION  qualid STRING { Rsyntaxfs  ($3, $4, $1) }
@@ -209,7 +213,7 @@ module_:
 
 mrule:
 | trule                          { MRtheory $1 }
-| INTERFACE STRING               { MRinterface ($2) }
+| INTERFACE export STRING        { MRinterface ($3, $2) }
 | SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
 | SYNTAX VAL qualid STRING       { MRval ($3, $4, []) }
 | SYNTAX VAL qualid STRING precedence
