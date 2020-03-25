@@ -17,7 +17,8 @@ doc/generated/drivers-pvs.dot: NODE = pvs-common.gen
 DRVDOT = $(patsubst %,doc/generated/drivers-%.dot, smt tptp coq isabelle pvs)
 
 DOC = index zebibliography genindex \
-  foreword starting whyml api install manpages syntaxref input_formats exec itp technical changes
+  foreword starting whyml api install manpages syntaxref vcgen \
+  input_formats exec itp technical changes
 
 DOCRST = $(DOC:%=doc/%.rst) doc/manual.bib
 
