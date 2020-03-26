@@ -1118,15 +1118,6 @@ let mk_generic_theory (node : generic_theory_id) =
 let mlw_file nodes =
   Modules (List.concat (List.map mk_generic_theory nodes))
 
-(* let () =
- *   let mlw_file =
- *     mlw_file_from_why_node_list
- *       (Gnat_ast.From_Json.why_node_list_from_json
- *          (Json.from_file "/home/bb/tmp/test-spark/obj/gnatprove/main__f.mlw-json")) in
- *   let out = open_out filename in
- *   let fmt = Format.formatter_of_out_channel out in
- *   Mlw_printer.pp_mlw_file fmt mlw_file_by_mlw; *)
-
 (** {1 JSON auxiliaries} *)
 
 (** Pretty-print a JSON path *)
@@ -1157,20 +1148,46 @@ let find_path needle node =
 
 exception E of string * int list
 
+(* The locations in the generated ptree are unique but useless. In case of a typing error
+   in the generated ptree, we instruct the mlw-printer to mark the corresponding node by
+   [(*XXX*)], using [Mlw_printer.set_marker]. The exception [Located_by_marker (file, e)]
+   is then reported to the user with a hint to the marker in the given file. *)
+
+exception Located_by_marker of string * exn
+
 let read_channel env path filename c =
   let json = Yojson.Safe.from_channel c in
   let gnat_file =
-    try Gnat_ast.From_json.file_from_json json
-    with Gnat_ast.From_json.Unexpected_Json (s, node) ->
+    let open Gnat_ast.From_json in
+    try file_from_json json
+    with Unexpected_Json (s, node) ->
       raise (E (s, find_path node json)) in
   let mlw_file = mlw_file gnat_file.theory_declarations in
-  if Debug.test_flag debug then begin
-    let out = open_out (filename^".mlw") in
-    let fmt = Format.formatter_of_out_channel out in
-    Mlw_printer.pp_mlw_file fmt mlw_file;
-    close_out out
-  end;
-  Typing.type_mlw_file env path filename mlw_file
+  (* Defer printing of mlw file until after the typing, to set the marker of located
+     exceptions *)
+  let print_mlw_file () =
+    if Debug.test_flag debug then begin
+      let out = open_out (filename^".mlw") in
+      let fmt = Format.formatter_of_out_channel out in
+      Mlw_printer.pp_mlw_file fmt mlw_file;
+      Format.pp_print_flush fmt ();
+      close_out out
+    end in
+  (* Use [protect] with [~finally:print_mlw_file] in OCaml 4.08 *)
+  match Typing.type_mlw_file env path filename mlw_file with
+  | res ->
+      print_mlw_file ();
+      res
+  | exception Loc.Located (pos, e) ->
+      (* The positions in the generated ptree are useless - we set the marker for
+         printing the mlw file and report that. *)
+      Mlw_printer.set_marker pos;
+      print_mlw_file ();
+      raise (Located_by_marker (Filename.basename filename^".mlw", e))
+  | exception e ->
+      print_mlw_file ();
+      raise e
+
 
 let gnat_json_format = "gnat-json"
 
@@ -1184,4 +1201,7 @@ let () =
        | E (s, path) ->
            Format.fprintf fmt "Unexpected Json for %s at path %a@."
              s pp_path path
+       | Located_by_marker (filename, e) ->
+           Format.fprintf fmt "File %s, marker (*XXX*):@.%a"
+             filename Exn_printer.exn_printer e;
        | _ -> raise exn)

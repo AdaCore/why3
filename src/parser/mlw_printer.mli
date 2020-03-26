@@ -23,3 +23,7 @@ val pp_decl : Format.formatter -> Ptree.decl -> unit
 
 val pp_mlw_file : Format.formatter -> Ptree.mlw_file -> unit
 (** [pp_mlw_file fmt t] outputs the parse tree [t] in formatter [fmt] *)
+
+(*/*)
+
+val set_marker : Loc.position -> unit

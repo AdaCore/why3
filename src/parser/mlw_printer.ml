@@ -11,17 +11,21 @@
 
 (* TODO Use less parenthesis to deal with precedence and associativity *)
 
-(* Test with
-   $ why3 pp --output=mlw test.mlw > test1.mlw
-   $ why3 pp --output=mlw test1.mlw > test2.mlw
-   $ diff test1.mlw test2.mlw *)
-
 open Format
 open Ptree
 open Ident
 
+let marker = ref None
+
+let set_marker pos =
+  marker := Some pos
+
 let pp_sep f fmt () =
   fprintf fmt f
+
+let pp_loc_id fmt loc =
+  if !marker = Some loc then
+    fprintf fmt "(*XXX*)@ "
 
 let pp_opt ?(prefix:(unit, formatter, unit) format="") ?(suffix:(unit, formatter, unit) format="") pp fmt = function
   | None -> ()
@@ -372,6 +376,7 @@ and pp_expr' fmt =
   pp_closed expr_closed pp_expr fmt
 
 and pp_expr fmt e =
+  pp_loc_id fmt e.expr_loc;
   match e.expr_desc with
   | Eref ->
       pp_print_string fmt "ref"
@@ -540,6 +545,7 @@ and pp_term fmt t =
        | Dterm.DTiff -> "<->"
        | Dterm.DTby -> "by"
        | Dterm.DTso -> "so") in
+  pp_loc_id fmt t.term_loc;
   match t.term_desc with
   | Ttrue ->
       pp_true fmt ()
@@ -626,6 +632,7 @@ and pp_pattern' fmt =
   pp_closed pattern_closed pp_pattern fmt
 
 and pp_pattern fmt p =
+  pp_loc_id fmt p.pat_loc;
   match p.pat_desc with
   | Pwild ->
       pp_print_string fmt "_"
