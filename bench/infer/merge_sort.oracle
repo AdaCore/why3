@@ -6,8 +6,8 @@
 ###
 ### Debug: inferred invariants ###
 ((((0 = contents lo2 /\ 2 <= contents first_run) /\ contents lo2 = 0 \/
-   ((contents first_run + 2) <= contents lo2 /\ 2 <= contents first_run) /\
-   (contents first_run + 2) <= n \/
+   ((contents first_run = contents lo2 /\ 2 <= contents first_run) /\ 2 <= n) /\
+   contents lo2 = contents first_run \/
    (((((((n = length tmp /\ n = length a3) /\ 0 = contents lo2) /\
         0 = contents first_run) /\
        2 <= n) /\
@@ -15,8 +15,8 @@
      contents lo2 = 0) /\
     length a3 = n) /\
    length tmp = n \/
-   ((contents first_run = contents lo2 /\ 2 <= contents first_run) /\ 2 <= n) /\
-   contents lo2 = contents first_run) /\
+   ((contents first_run + 2) <= contents lo2 /\ 2 <= contents first_run) /\
+   (contents first_run + 2) <= n) /\
   0 = 0) /\
  0 <= contents first_run) /\
 0 <= contents lo2

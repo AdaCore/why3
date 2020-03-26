@@ -27,16 +27,16 @@
 101 <= n01
 ###
 ### Debug: inferred invariants ###
-((((3 <= contents e2 /\ contents n2 <= 111) /\ 11 = 11 \/ 91 <= contents n2) /\
+(((91 <= contents n2 \/ (3 <= contents e2 /\ contents n2 <= 111) /\ 11 = 11) /\
   1 = 1) /\
  0 <= contents e2) /\
 101 <= n02
 ###
 ### Debug: inferred invariants ###
-((contents n3 <= 111 /\ 3 <= contents e3 \/
+((91 <= contents n3 \/
   (((n03 + (11 * contents e3)) = (11 + contents n3) /\ n03 <= 100) /\
    contents e3 <= 2) /\
-  0 < contents e3 \/ 91 <= contents n3) /\
+  0 < contents e3 \/ (contents n3 <= 111 /\ 3 <= contents e3) /\ 11 = 11) /\
  1 = 1) /\
 0 <= contents e3
 ###
@@ -44,37 +44,35 @@
 (((((((n04 = contents n4 /\ 1 = contents e4) /\ ref'mk n04 = n4) /\
      n04 = contents n4) /\
     contents e4 = 1 \/
-    (((((n04 + (11 * contents e4)) <= (10 + contents n4) /\
-        contents n4 <= 111) /\
-       102 <= contents n4) /\
-      2 <= contents e4) /\
+    ((((((n04 + (11 * contents e4)) <= (9 + contents n4) /\
+         contents n4 <= 111) /\
+        92 <= contents n4) /\
+       0 < contents e4) /\
+      contents n4 <= (91 + (10 * contents e4))) /\
      11 = 11) /\
     10 = 10 \/
-    (((91 = contents n4 /\ 100 = (n04 + (11 * contents e4))) /\ n04 <= 100) /\
-     91 = contents n4) /\
+    (((n04 + (11 * contents e4)) <= (8 + contents n4) /\ 91 <= contents n4) /\
+     contents n4 <= (91 + (10 * contents e4))) /\
     10 = 10 \/
-    (((((n04 + (11 * contents e4)) <= (9 + contents n4) /\ contents n4 <= 101) /\
-       92 <= contents n4) /\
-      0 < contents e4) /\
-     10 = 10) /\
-    11 = 11 \/
     ((((n04 = (10 + contents n4) /\ 0 = contents e4) /\ 101 <= n04) /\
       0 = contents e4) /\
      (n04 - 10) = contents n4) /\
+    10 = 10 \/
+    ((((((n04 + (11 * contents e4)) = (10 + contents n4) /\
+         (n04 + (11 * contents e4)) <= 121) /\
+        (n04 + contents e4) <= 101) /\
+       0 < contents e4) /\
+      101 <= (n04 + (11 * contents e4))) /\
+     11 = 11) /\
     10 = 10 \/
     (((n04 + (11 * contents e4)) = (11 + contents n4) /\
       (n04 + (11 * contents e4)) <= 122) /\
      2 <= contents e4) /\
     11 = 11 \/
-    (((n04 + (11 * contents e4)) <= (8 + contents n4) /\ 91 <= contents n4) /\
-     contents n4 <= (91 + (10 * contents e4))) /\
-    10 = 10 \/
-    (((((n04 + (11 * contents e4)) = (10 + contents n4) /\
-        (n04 + (11 * contents e4)) <= 111) /\
-       0 < contents e4) /\
-      101 <= (n04 + (11 * contents e4))) /\
-     11 = 11) /\
-    10 = 10) /\
+    ((((91 = contents n4 /\ 100 = (n04 + (11 * contents e4))) /\ n04 <= 100) /\
+      91 = contents n4) /\
+     10 = 10) /\
+    11 = 11) /\
    1 = 1) /\
   0 <= contents e4) /\
  (n04 + (10 * contents e4)) <= (10 + contents n4)) /\
@@ -83,9 +81,9 @@
 ### Debug: inferred invariants ###
 ((((1 = contents e5 /\ ref'mk n05 = n5) /\ n05 = contents n5) /\
   contents e5 = 1 \/
+  (3 <= contents e5 /\ contents n5 <= 111) /\ 11 = 11 \/
   ((2 = contents e5 /\ contents n5 <= 111) /\ 2 = contents e5) /\ 11 = 11 \/
-  91 <= contents n5 /\ 10 = 10 \/
-  (3 <= contents e5 /\ contents n5 <= 111) /\ 11 = 11) /\
+  91 <= contents n5 /\ 10 = 10) /\
  1 = 1) /\
 0 <= contents e5
 ###

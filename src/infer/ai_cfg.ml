@@ -391,10 +391,10 @@ module Make(E: sig
          (fun _ abs -> constraints abs) ~lbl:"if true";
        new_hedge_cfg cfg start_if e3_begin
          (fun _ abs -> constraints_not abs) ~lbl:"if false";
-       new_hedge_cfg cfg e3_end end_if
-         (fun _ abs -> abs) ~lbl:"if false end";
        new_hedge_cfg cfg e2_end end_if
          (fun _ abs -> abs) ~lbl:"if true end";
+       new_hedge_cfg cfg e3_end end_if
+         (fun _ abs -> abs) ~lbl:"if false end";
       start_if, end_if, e2_exn @ e3_exn
     | Ematch (match_e, l, mxs) when Mxs.is_empty mxs ->
       let e_begin, e_end, e_exn = put_expr_in_cfg cfg manpk match_e in
