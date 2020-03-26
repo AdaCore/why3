@@ -86,7 +86,7 @@ val format : ?margin:int -> opt list -> string
     at column [margin] (25 by default). If an option does not support
     arguments, its description string should start with a space. *)
 
-val handle_exn : string array -> exn -> unit
+val handle_exn : string array -> string -> unit
 (** [handle_exn args exn] terminates the program after printing the content
     of the [GetoptFailure] exception. [args.(0)] is used as the program name
     for the error message. *)

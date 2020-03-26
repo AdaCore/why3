@@ -485,7 +485,6 @@ let _, _, _ =
   Whyconf.Args.initialize spec add_filename_then_path usage_msg
 
 let () =
-  try
     match !filename with
     | Some filename ->
         let mlw_file = parse_mlw_file filename in
@@ -504,10 +503,7 @@ let () =
             eprintf "experimental output in AST form not available.@.";
             exit 1
          | _, _, _ ->
-             Getopt.handle_exn Sys.argv (Getopt.GetoptFailure "invalid arguments")
+             Getopt.handle_exn Sys.argv "invalid arguments"
         )
     | None ->
-        Getopt.handle_exn Sys.argv (Getopt.GetoptFailure "missing filename")
-  with Invalid_argument msg ->
-    eprintf "Error: %s@." msg;
-    exit 1
+        Getopt.handle_exn Sys.argv "missing filename"

@@ -183,16 +183,13 @@ let parse_one opts args i =
         i + 1
     | None -> i
 
-let handle_exn args exn =
-  match exn with
-  | GetoptFailure err ->
-      if Array.length args <> 0 then
-        let p = Filename.basename args.(0) in
-        Printf.eprintf "%s: %s\nTry '%s --help' for more information.\n%!" p err p
-      else
-        Printf.eprintf "%s\nTry '--help' for more information.\n%!" err;
-      exit 1
-  | _ -> assert false
+let handle_exn args err =
+  if Array.length args <> 0 then
+    let p = Filename.basename args.(0) in
+    Printf.eprintf "%s: %s\nTry '%s --help' for more information.\n%!" p err p
+  else
+    Printf.eprintf "%s\nTry '--help' for more information.\n%!" err;
+  exit 1
 
 let parse_many opts args i =
   let nargs = Array.length args in
@@ -204,7 +201,7 @@ let parse_many opts args i =
       else i in
   try
     aux i
-  with GetoptFailure _ as exn ->
+  with GetoptFailure exn ->
     handle_exn args exn
 
 let parse_all ?(i = 1) opts extra args =
@@ -223,5 +220,5 @@ let parse_all ?(i = 1) opts extra args =
         aux (i + 1) in
   try
     aux i
-  with GetoptFailure _ as exn ->
+  with GetoptFailure exn ->
     handle_exn args exn
