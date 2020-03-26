@@ -1162,6 +1162,11 @@ let eff_union e1 e2 =
             (Mreg.set_diff e.eff_writes e.eff_covers));
   e
 
+let eff_fusion e1 e2 =
+  let e = eff_union e1 e2 in
+  {e with eff_writes = Mreg.set_inter e.eff_writes e.eff_covers;
+          eff_taints = Mreg.set_inter e.eff_taints e.eff_covers}
+
 let eff_contaminate e1 e2 =
   if not e1.eff_ghost then e2 else
   if Sxs.is_empty e1.eff_raises then e2 else

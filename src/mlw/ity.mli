@@ -401,6 +401,7 @@ val eff_ghostify_weak : bool -> effect -> effect     (* only if has no effect *)
 
 val eff_union_seq : effect -> effect -> effect  (* checks for stale variables *)
 val eff_union_par : effect -> effect -> effect  (* no stale-variable check *)
+val eff_fusion    : effect -> effect -> effect  (* drop invalidated writes *)
 
 val mask_adjust : effect -> ity -> mask -> mask
 
