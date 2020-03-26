@@ -532,16 +532,28 @@ module Print = struct
 
   let sanitizer = sanitizer char_to_lalpha char_to_alnumus
   let sanitizer s = Strings.lowercase (sanitizer s)
-  let local_printer = create_ident_printer c_keywords ~sanitizer
-  let global_printer = create_ident_printer c_keywords ~sanitizer
+  let local_printer = ref None
+  let global_printer = ref None
+  let printers_initialized = ref false
+
+  let init_printers blacklist =
+    if not !printers_initialized
+    then begin
+      let bl = c_keywords@blacklist in
+      local_printer := Some (create_ident_printer bl ~sanitizer);
+      global_printer := Some (create_ident_printer bl ~sanitizer);
+      printers_initialized := true
+      end
 
   let c_static_inline = create_attribute "extraction:c_static_inline"
   (* prints the c inline keyword *)
 
-  let print_local_ident fmt id = fprintf fmt "%s" (id_unique local_printer id)
-  let print_global_ident fmt id = fprintf fmt "%s" (id_unique global_printer id)
+  let print_local_ident fmt id =
+    fprintf fmt "%s" (id_unique (Opt.get !local_printer) id)
+  let print_global_ident fmt id =
+    fprintf fmt "%s" (id_unique (Opt.get !global_printer) id)
 
-  let clear_local_printer () = Ident.forget_all local_printer
+  let clear_local_printer () = Ident.forget_all (Opt.get !local_printer)
 
   let space_nolinebreak fmt () = fprintf fmt " "
 
@@ -1817,7 +1829,7 @@ let print_prelude ~header args ?old ?fname ~flat ~deps
   ignore old;
   ignore flat;
   ignore fname;
-  ignore args;
+  Print.init_printers args.Pdriver.blacklist;
   let add_include m =
     let id = m.Pmodule.mod_theory.Theory.th_name in
     Format.fprintf fmt "%a@." Print.print_global_def C.(Dinclude (id,Proj)) in

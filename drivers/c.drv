@@ -166,6 +166,9 @@ struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);\
 
 end
 
+blacklist "__builtin_clz" "__builtin_ctz" "add32_with_carry" "sub32_with_borrow"
+blacklist "mul32_double" "add32_3" "lsld32"
+
 module mach.int.Int64
   syntax type int64  "int64_t"
   syntax literal int64 "INT64_C(%c)"
@@ -328,6 +331,9 @@ module mach.int.UInt64GMP
 
 end
 
+blacklist "__builtin_clzll" "_builtin_ctzll" "add64_with_carry"
+blacklist "sub64_with_borrow" "mul64_double" "add64_3" "lsld64"
+
 module bv.BV32
   syntax type t      "uint32_t"
   syntax literal t   "%cu"
@@ -415,6 +421,8 @@ module mach.c.C
   syntax val print_uint32 "printf(\"%#010x\",%1)" prec 1 15
 
 end
+
+blacklist "printf" "alloca"
 
 module mach.c.UChar
 

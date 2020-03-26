@@ -11,7 +11,11 @@ module sqrt.Sqrt1
 \n}\
 "
 
+syntax val rsa_estimate "rsa_estimate"
+
 end
+
+blacklist "invsqrttab"
 
 module powm.Powm
 
@@ -22,7 +26,11 @@ prelude
 \n  return (uint64_t)binverttab[n];\
 \n}"
 
+syntax val binvert_limb_table "binvert_limb_table"
+
 end
+
+blacklist "binverttab"
 
 module mach.int.UInt64GMP
   interface
@@ -67,6 +75,8 @@ static uint64_t div64_2by1(uint64_t ul, uint64_t uh, uint64_t d)
   syntax val div2by1 "div64_2by1"
 
 end
+
+blacklist "mul64_double" "div64_2by1"
 
 module ptralias.Alias
 
@@ -190,3 +200,5 @@ void __wmpz_init (wmpz_ptr);\
   syntax val wmpz_clear "wmpz_clear" prec 2
 
 end
+
+blacklist "__wmpz_init"
