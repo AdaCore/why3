@@ -13,6 +13,8 @@
 
 val arg_extra_expl_prefix : string * Arg.spec * string
 
+val opt_extra_expl_prefix : Getopt.opt
+
 val goal_expl_task:
   root:bool -> Task.task -> Ident.ident * string * Task.task
 

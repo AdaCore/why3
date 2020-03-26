@@ -40,7 +40,7 @@ and check the validity of goals with external provers, in a friendly
 way. This section presents the basic use of this GUI. Please refer to
 :numref:`sec.ideref` for a more complete description.
 
-.. %EXECUTE bin/why3 ide --batch "snap doc/images/gui-1.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch="snap doc/images/gui-1.png" doc/hello_proof.why
 
 .. _fig.gui1:
 
@@ -64,7 +64,7 @@ displays the content of this file. Now click on the row corresponding to
 goal ``G1``, and then click on the “Task” tab of the top-right pane, so
 that it displays the corresponding *task*, as show on :numref:`fig.gui2`.
 
-.. %EXECUTE bin/why3 ide --batch "type next;view task;snap -crop 1024x384+0+0 doc/images/gui-2.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch="type next;view task;snap -crop 1024x384+0+0 doc/images/gui-2.png" doc/hello_proof.why
 
 .. _fig.gui2:
 
@@ -88,7 +88,7 @@ parent file.
 Let us now select the theory “HelloProof” and run the Alt-Ergo prover.
 After a short time, you should get the display of :numref:`fig.gui3`.
 
-.. %EXECUTE bin/why3 ide --batch "type alt-ergo;view source;wait 3;type next;snap -crop 1024x384+0+0 doc/images/gui-3.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch="type alt-ergo;view source;wait 3;type next;snap -crop 1024x384+0+0 doc/images/gui-3.png" doc/hello_proof.why
 
 .. _fig.gui3:
 
@@ -116,7 +116,7 @@ proved. This can be done by the menu :menuselection:`View --> Collapse
 proved goals`, or even better by its shortcut :kbd:`!`. You
 should now see what is displayed on :numref:`fig.gui4`.
 
-.. %EXECUTE bin/why3 ide --batch "type alt-ergo;wait 3;type next;type split_vc;wait 1;type up;type alt-ergo;wait 3;type next;snap -crop 1024x384+0+0 doc/images/gui-4.png;save;wait 1" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch="type alt-ergo;wait 3;type next;type split_vc;wait 1;type up;type alt-ergo;wait 3;type next;snap -crop 1024x384+0+0 doc/images/gui-4.png;save;wait 1" doc/hello_proof.why
 
 .. _fig.gui4:
 
@@ -136,7 +136,7 @@ blanks. Note that the comments themselves should not be removed, as they
 are needed to properly regenerate the file when the goal is changed. See
 :numref:`sec.coq` for more details.
 
-.. %EXECUTE bin/why3 ide --batch "type next;type coq;wait 1;save;wait 1" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch="type next;type coq;wait 1;save;wait 1" doc/hello_proof.why
 
 .. _fig.coqide:
 
@@ -165,7 +165,7 @@ Refresh session`, or the shortcut :kbd:`Control-r`. You get the tree view
 shown on :numref:`fig.gui5`.
 
 .. %EXECUTE sed -i -e 's/true -> false/false -> false/' doc/hello_proof.why
-.. %EXECUTE bin/why3 ide --batch "type next;type expand;snap -crop 1024x384+0+0 doc/images/gui-5.png" doc/hello_proof.why
+.. %EXECUTE bin/why3 ide --batch="type next;type expand;snap -crop 1024x384+0+0 doc/images/gui-5.png" doc/hello_proof.why
 
 .. _fig.gui5:
 

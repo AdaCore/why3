@@ -57,7 +57,7 @@ val stack_trace : flag
 
 (** Command line arguments *)
 module Args : sig
-  type spec = (Arg.key * Arg.spec * Arg.doc)
+  type spec = Getopt.opt
 
   val desc_debug_list : spec
   (** Option for printing the list of debug flags *)
@@ -72,7 +72,7 @@ module Args : sig
   val desc_debug : spec
   (** Option for specifying a debug flag to set *)
 
-  val desc_shortcut : string -> Arg.key -> Arg.doc -> spec
+  val desc_shortcut : string -> Getopt.key -> Getopt.doc -> spec
   (** Option for setting a specific flag *)
 
   val set_flags_selected : ?silent:bool -> unit -> unit
