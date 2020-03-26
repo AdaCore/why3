@@ -149,11 +149,12 @@ let compute_preludes id_th pm deps epm =
   let ht = Hstr.create 8 in
   let add l s = if Hstr.mem ht s then l else (Hstr.add ht s (); s :: l) in
   let th_epm dep = Ident.Mid.find_def [] (pmod_name dep) epm in
-  let add_tps acc dep = List.fold_left add acc (th_epm dep) in
+  let add_tps acc dep = List.fold_left add acc (List.rev (th_epm dep)) in
   (* exported preludes from deps *)
   let epl = List.fold_left add_tps [] deps in
   (* prelude of current module *)
-  let mpl = List.fold_left add [] (Ident.Mid.find_def [] id_th pm) in
+  let mpl = List.fold_left add []
+              (List.rev (Ident.Mid.find_def [] id_th pm)) in
   epl@mpl
 
 let export_deps = Ident.Hid.create 16

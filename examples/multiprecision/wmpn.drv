@@ -162,12 +162,14 @@ void __wmpz_init (wmpz_ptr x) {\n\
   PTR(x) = malloc(sizeof(uint64_t));\n\
   PTR(x)[0] = 0;\n\
   return;\n\
-}\n\
-\n\
-void wmpz_clear (wmpz_ptr x)\n\
+}\n"
+
+prelude
+"void wmpz_clear (wmpz_ptr x)\n\
 {\n\
   free (PTR(x));\n\
 }"
+
 interface "\n\
 void __wmpz_init (wmpz_ptr);\n\
 void wmpz_clear (wmpz_ptr);\
