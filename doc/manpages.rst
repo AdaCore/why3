@@ -1366,10 +1366,8 @@ output is specified using the ``--output`` option.
 
    - ``mlw``: reformat WhyML source code.
 
-   - .. _GraphViz: https://www.graphviz.org/
-
-     ``dep``: display module dependencies, under the form of a digraph
-     using the ``dot`` syntax from the `GraphViz`_ visualisation software.
+   - ``dep``: display module dependencies, under the form of a digraph
+     using the ``dot`` syntax from the `GraphViz <https://www.graphviz.org/>`_ visualisation software.
 
    .. - ``ast``: print the abstract syntax tree (data-type from API module ``Ptree``).
 
