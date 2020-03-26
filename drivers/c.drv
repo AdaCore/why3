@@ -85,41 +85,43 @@ end
 
 module mach.int.UInt32GMP
 
-  interface "\n\
-struct __add32_with_carry_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
+  interface "\
+\nstruct __add32_with_carry_result\
+\n{ uint32_t __field_0;\
+\n  uint32_t __field_1;\
+\n};\
 \n\
-struct __add32_with_carry_result add32_with_carry(uint32_t x, uint32_t y, uint32_t c);\n\
+\nstruct __add32_with_carry_result\
+\n      add32_with_carry(uint32_t x, uint32_t y, uint32_t c);\
 \n\
-struct __sub32_with_borrow_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
+\nstruct __sub32_with_borrow_result\
+\n{ uint32_t __field_0;\
+\n  uint32_t __field_1;\
+\n};\
 \n\
-struct __sub32_with_borrow_result sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b);\n\
+\nstruct __sub32_with_borrow_result\
+\n        sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b);\
 \n\
-struct __mul32_double_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
+\nstruct __mul32_double_result\
+\n{ uint32_t __field_0;\
+\n  uint32_t __field_1;\
+\n};\
 \n\
-struct __mul32_double_result mul32_double(uint32_t x, uint32_t y);\n\
+\nstruct __mul32_double_result mul32_double(uint32_t x, uint32_t y);\
 \n\
-struct __add32_3_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
+\nstruct __add32_3_result\
+\n{ uint32_t __field_0;\
+\n  uint32_t __field_1;\
+\n};\
 \n\
-struct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z);\n\
+\nstruct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z);\
 \n\
-struct __lsld32_result\n\
-{ uint32_t __field_0;\n\
-  uint32_t __field_1;\n\
-};\n\
+\nstruct __lsld32_result\
+\n{ uint32_t __field_0;\
+\n  uint32_t __field_1;\
+\n};\
 \n\
-struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);\n\
+struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);\
 "
 
   syntax literal uint32 "%cU"
@@ -213,70 +215,71 @@ end
 
 module mach.int.UInt64GMP
 
-  interface "\n\
-struct __add64_with_carry_result\n\
-{ uint64_t __field_0;\n\
-  uint64_t __field_1;\n\
-};\n\
+  interface "\
+\nstruct __add64_with_carry_result\
+\n{ uint64_t __field_0;\
+\n  uint64_t __field_1;\
+\n};\
 \n\
-static inline struct __add64_with_carry_result\n\
-add64_with_carry(uint64_t x, uint64_t y, uint64_t c)\n\
-{\n\
-  struct __add64_with_carry_result result;\n\
-  uint64_t r = x + y + c;\n\
-  result.__field_0 = r;\n\
-  if (r == x) result.__field_1 = c;\n\
-  else result.__field_1 = (r < x);\n\
-  return result;\n\
-}\n\
+\nstatic inline struct __add64_with_carry_result\
+\nadd64_with_carry(uint64_t x, uint64_t y, uint64_t c)\
+\n{\
+\n  struct __add64_with_carry_result result;\
+\n  uint64_t r = x + y + c;\
+\n  result.__field_0 = r;\
+\n  if (r == x) result.__field_1 = c;\
+\n  else result.__field_1 = (r < x);\
+\n  return result;\
+\n}\
 \n\
-struct __sub64_with_borrow_result\n\
-{ uint64_t __field_0;\n\
-  uint64_t __field_1;\n\
-};\n\
+\nstruct __sub64_with_borrow_result\
+\n{ uint64_t __field_0;\
+\n  uint64_t __field_1;\
+\n};\
 \n\
-static inline struct __sub64_with_borrow_result\n\
-sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)\n\
-{\n\
-  struct __sub64_with_borrow_result result;\n\
-  uint64_t r = x - y - b;\n\
-  result.__field_0 = r;\n\
-  if (r > x) result.__field_1 = 1;\n\
-  else if (r == x) result.__field_1 = b;\n\
-  else result.__field_1 = 0;\n\
-  return result;\n\
-}\n\
+\nstatic inline struct __sub64_with_borrow_result\
+\n              sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)\
+\n{\
+\n  struct __sub64_with_borrow_result result;\
+\n  uint64_t r = x - y - b;\
+\n  result.__field_0 = r;\
+\n  if (r > x) result.__field_1 = 1;\
+\n  else if (r == x) result.__field_1 = b;\
+\n  else result.__field_1 = 0;\
+\n  return result;\
+\n}\
 \n\
-struct __add64_3_result\n\
-{ uint64_t __field_0;\n\
-  uint64_t __field_1;\n\
-};\n\
+\nstruct __add64_3_result\
+\n{ uint64_t __field_0;\
+\n  uint64_t __field_1;\
+\n};\
 \n\
-static inline struct __add64_3_result add64_3(uint64_t x, uint64_t y, uint64_t z)\n\
-{\n\
-  struct __add64_3_result result;\n\
-  uint64_t r, c1, c2;\n\
-  r = x + y;\n\
-  c1 = r < y;\n\
-  r += z;\n\
-  c2 = r < z;\n\
-  result.__field_1 = c1 + c2;\n\
-  result.__field_0 = r;\n\
-  return result;\n\
-}\n\
+\nstatic inline struct __add64_3_result\
+\n              add64_3(uint64_t x, uint64_t y, uint64_t z)\
+\n{\
+\n  struct __add64_3_result result;\
+\n  uint64_t r, c1, c2;\
+\n  r = x + y;\
+\n  c1 = r < y;\
+\n  r += z;\
+\n  c2 = r < z;\
+\n  result.__field_1 = c1 + c2;\
+\n  result.__field_0 = r;\
+\n  return result;\
+\n}\
 \n\
-struct __lsld64_result\n\
-{ uint64_t __field_0;\n\
-  uint64_t __field_1;\n\
-};\n\
+\nstruct __lsld64_result\
+\n{ uint64_t __field_0;\
+\n  uint64_t __field_1;\
+\n};\
 \n\
-static inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\n\
-{\n\
-  struct __lsld64_result result;\n\
-  result.__field_1 = x >> (64 - cnt);\n\
-  result.__field_0 = x << cnt;\n\
-  return result;\n\
-}\n\
+\nstatic inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\
+\n{\
+\n  struct __lsld64_result result;\
+\n  result.__field_1 = x >> (64 - cnt);\
+\n  result.__field_0 = x << cnt;\
+\n  return result;\
+\n}\
 "
   syntax literal uint64 "UINT64_C(%c)"
 
