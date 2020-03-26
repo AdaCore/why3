@@ -305,24 +305,32 @@ and skip_until_nl = parse
 
   (** Command line parsing and entry point *)
 
-  let spec = Arg.align [
-    "-t", Arg.Set tokens,
-      " count tokens";
-    "--tokens", Arg.Set tokens,
-      " same as -t";
-    "-l", Arg.Clear tokens,
+  let spec =
+    let open Why3.Getopt in
+    [ Key ('l', "lines"), Hnd0 (fun () -> tokens := false),
       " count lines (default)";
-    "--lines", Arg.Clear tokens,
-      " same as -l";
-    "-f", Arg.Set factor,
+      Key ('t', "tokens"), Hnd0 (fun () -> tokens := true),
+      " count tokens instead of lines";
+      Key ('f', "factor"), Hnd0 (fun () -> factor := true),
       " print spec/code ratio";
-    "--factor", Arg.Set factor,
-      " same as -f";
-    "-a", Arg.Clear skip_header,
+      Key ('a', "do-not-skip-header"), Hnd0 (fun () -> skip_header := false),
       " count heading comments as well";
-    "--do-not-skip-header", Arg.Clear skip_header,
-      " same as -a";
-  ]
+    ]
+
+  let usage () =
+    Printf.eprintf
+      "Usage: %s [options] <file>...\n\
+       Count tokens/lines in Why3 source files.\n\
+       \n%s\n\
+       Source files are assumed to be lexically well-formed.\n\
+       If no source file is given, standard input is analyzed.\n%!"
+      (Filename.basename Sys.argv.(0))
+      (Why3.Getopt.format spec);
+    exit 0
+
+  let spec =
+    let open Why3.Getopt in
+    (Key ('h', "help"), Hnd0 usage," display this help and exit") :: spec
 
   let add_file file =
     if not (Sys.file_exists file) then begin
@@ -330,14 +338,7 @@ and skip_until_nl = parse
     end;
     Queue.add file files
 
-  let usage = Format.sprintf "Usage: %s [options] files...\n\
-  \n\
-  Counts tokens/lines in Why3 source files.\n\
-  Assumes source files to be lexically well-formed.\n\
-  If no source file is given, standard input is analyzed.\n"
-    (Filename.basename Sys.argv.(0))
-
-  let () = Arg.parse spec add_file usage
+  let () = Why3.Getopt.parse_all spec add_file Sys.argv
 
   let () =
     let n = Queue.length files in

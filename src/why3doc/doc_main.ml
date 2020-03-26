@@ -17,7 +17,8 @@ let () = Debug.set_flag Glob.flag
 (* command line parsing *)
 
 let usage_msg = sprintf
-  "Usage: %s [options...] [files...]"
+  "Usage: %s [options] <file>...\n\
+   Produce HTML documentation for the given files.\n"
   (Filename.basename Sys.argv.(0))
 
 let opt_output = ref None
@@ -26,22 +27,21 @@ let opt_title = ref None
 let opt_body = ref false
 let opt_queue = Queue.create ()
 
-let option_list = [
-  "-o", Arg.String (fun s -> opt_output := Some s),
-      "<dir> print files in <dir>";
-  "--output", Arg.String (fun s -> opt_output := Some s),
-      " same as -o";
-  "--stdlib-url", Arg.String Doc_def.set_stdlib_url,
-      "<url> add links to <url> for files found on loadpath";
-  "--index", Arg.Unit (fun () -> opt_index := Some true),
+let option_list =
+  let open Getopt in
+  [ Key ('o', "output"), Hnd1 (AString, fun s -> opt_output := Some s),
+    "<dir> print files in <dir>";
+    KLong "stdlib-url", Hnd1 (AString, Doc_def.set_stdlib_url),
+    "<url> add links to <url> for files found on loadpath";
+    KLong "index", Hnd0 (fun () -> opt_index := Some true),
     " generate an index file index.html";
-  "--no-index", Arg.Unit (fun () -> opt_index := Some false),
+    KLong "no-index", Hnd0 (fun () -> opt_index := Some false),
     " do not generate an index file index.html";
-  "--title", Arg.String (fun s -> opt_title := Some s),
-    " <title> set a title for the index page";
-  "--body-only", Arg.Set opt_body,
+    KLong "title", Hnd1 (AString, fun s -> opt_title := Some s),
+    "<title> set a title for the index page";
+    KLong "body-only", Hnd0 (fun () -> opt_body := true),
     " only produce the body of the HTML document";
-]
+  ]
 
 let _,_,env =
   Whyconf.Args.initialize option_list

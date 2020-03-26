@@ -53,20 +53,25 @@ let ident_printer () =
       "declare-funs"; "declare-preds"; "define";
       "simplify";
 
-     (* operators, including theory symbols *)
+      (* operators, including theory symbols *)
+      "="; "=>";
+      "+"; "-"; "*"; "^" ;
+      "<"; "<="; ">"; ">=";
       "ite";
       "and"; "distinct"; "is_int"; "not"; "or"; "select";
       "store"; "to_int"; "to_real"; "xor";
-
-      "div"; "mod"; "rem";
+      "/"; "div"; "mod"; "rem";
 
       "concat"; "bvnot"; "bvand"; "bvor"; "bvneg"; "bvadd"; "bvmul"; "bvudiv";
-      "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor";
+      "bvurem"; "bvshl"; "bvlshr"; "bvult"; "bvnand"; "bvnor"; "bvxor"; "bvxnor";
       "bvcomp"; "bvsub"; "bvsdiv"; "bvsrem"; "bvsmod"; "bvashr"; "bvule";
       "bvugt"; "bvuge"; "bvslt"; "bvsle"; "bvsgt"; "bvsge"; "rotate_left";
       "rotate_right"; "bvredor"; "bvredand";
+      "bv2nat";
 
       "sqrt"; "sin"; "cos"; "tan"; "asin"; "acos"; "atan"; "pi";
+      "exp"; "csc"; "sec"; "cot";
+      "arcsin"; "arccos"; "arctan"; "arccsc"; "arcsec"; "arccot";
 
      (* the new floating point theory - updated to the 2014-05-27 standard *)
       "FloatingPoint"; "fp";
@@ -88,16 +93,24 @@ let ident_printer () =
       "fp.to_ubv"; "fp.to_sbv"; "fp.to_real";
 
      (* the new proposed string theory *)
-      "String";
+      "String"; "str.<"; "str.<=";
       "str.++"; "str.len"; "str.substr"; "str.contains"; "str.at";
       "str.indexof"; "str.prefixof"; "str.suffixof"; "int.to.str";
       "str.to.int"; "u16.to.str"; "str.to.u16"; "u32.to.str"; "str.to.u32";
-      "str.in.re"; "str.to.re"; "re.++"; "re.union"; "re.inter";
+      "str.in.re"; "str.to.re";
+      "str.replace"; "str.tolower"; "str.toupper"; "str.rev";
+      "str.from_code"; "str.is_digit"; "str.from_int"; "str.to_int";
+      "str.in_re"; "str.to_code"; "str.replace_all";
+      "int.to.str"; "str.to.int"; "str.code"; "str.replaceall";
+
+      "re.++"; "re.union"; "re.inter";
       "re.*"; "re.+"; "re.opt"; "re.range"; "re.loop";
+      "re.comp"; "re.diff";
 
      (* the new proposed set theory *)
       "union"; "intersection"; "setminus"; "subset"; "member";
-      "singleton"; "insert";
+      "singleton"; "insert"; "card"; "complement"; "join";
+      "product"; "transpose"; "tclosure";
 
      (* built-in sorts *)
       "Bool"; "Int"; "Real"; "BitVec"; "Array";
@@ -115,7 +128,16 @@ let ident_printer () =
 
      (* Counterexamples specific keywords *)
       "lambda"; "LAMBDA"; "model";
-      ]
+
+      (* various stuff from
+         "sed -n -e 's/^.*addOperator.*\"\([^\"]*\)\".*/\1/p' src/parser/smt2/smt2.cpp"
+
+       *)
+
+      "inst-closure"; "dt.size"; "sep"; "pto"; "wand"; "emp";
+      "fmf.card"; "fmf.card.val";
+
+    ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
   create_ident_printer bls ~sanitizer:san

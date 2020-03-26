@@ -32,7 +32,7 @@ run () {
     file_path="$1/$2"
     oracle_file="$1/oracles/$2.oracle"
     echo "$file_path"
-    xvfb-run -a bin/why3ide --batch "down;down;type split_vc;wait 1;down;down;color;" "${file_path}.mlw" > "${file_path}.out"
+    xvfb-run -a bin/why3ide --batch="down;down;type split_vc;wait 1;down;down;color;" "${file_path}.mlw" > "${file_path}.out"
     str_oracle=$(tr -d ' \n' < "${oracle_file}")
     str_out=$(tr -d ' \n' < "${file_path}.out")
     if [ "$str_oracle" = "$str_out" ] ; then

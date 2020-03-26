@@ -13,12 +13,6 @@ open Format
 open Why3
 open Whyconf
 
-let usage_msg =
-  sprintf "Usage: %s [options]\n\
-  Environment variables WHY3LIB, WHY3DATA, and WHY3CONFIG\n\
-  can be set to change the default paths.@."
-    (Filename.basename Sys.argv.(0))
-
 (* let libdir = ref None *)
 (* let datadir = ref None *)
 let conf_file = ref None
@@ -42,42 +36,46 @@ let prover_bins = Queue.create ()
 let plugins = Queue.create ()
 let add_plugin x = Queue.add x plugins
 
-let option_list = Arg.align [
-  (* "--libdir", Arg.String (set_oref libdir), *)
-  (* "<dir> set the lib directory ($WHY3LIB)"; *)
-  (* "--datadir", Arg.String (set_oref datadir), *)
-  (* "<dir> set the data directory ($WHY3DATA)"; *)
-  "-C", Arg.String (set_oref conf_file),
-  "<file> config file to create";
-  "--config", Arg.String (set_oref conf_file),
-      " same as -C";
-  "--detect-provers", Arg.Set autoprovers,
-  " search for provers in $PATH";
-  "--detect-plugins", Arg.Set autoplugins,
-  " search for plugins in the default library directory";
-  "--detect", Arg.Unit (fun () -> resetloadpath := true; autoprovers := true; autoplugins := true),
-  " search for both provers and plugins, and resets the default loadpath";
-  "--add-prover", Arg.Tuple
-    (let id = ref "" in
-     let shortcut = ref "" in
-     [Arg.Set_string id;
-      Arg.Set_string shortcut;
-      Arg.String (fun name -> Queue.add (!id, !shortcut, name) prover_bins)]),
-  "<id><shortcut><file> add a new prover executable";
-  "--full-config", Arg.Unit (fun () -> partial_config := false; autoprovers := true),
-  " write in .why3.conf the default config for provers, shortcut, strategies and plugins instead of loading it at startup";
-  "--list-prover-families", Arg.Set opt_list_prover_families,
-  " list known prover families";
-  "--install-plugin", Arg.String add_plugin,
-  "<file> install a plugin to the actual libdir";
-  "--dont-save", Arg.Clear save,
-  " do not modify the config file";
-  Debug.Args.desc_debug_list;
-  Debug.Args.desc_debug_all;
-  Debug.Args.desc_debug;
-]
+let spec =
+  let open Getopt in
+  [ Key ('C', "config"), Hnd1 (AString, set_oref conf_file),
+    "<file> config file to create";
+    KLong "detect-provers", Hnd0 (fun () -> autoprovers := true),
+    " search for provers in $PATH";
+    KLong "detect-plugins", Hnd0 (fun () -> autoplugins := true),
+    " search for plugins in the default library directory";
+    KLong "detect", Hnd0 (fun () -> resetloadpath := true; autoprovers := true; autoplugins := true),
+    " search for both provers and plugins, and reset the default loadpath";
+    KLong "add-prover", Hnd1 (APair (',', AString, (APair (',', AString, AString))),
+      fun (id, (shortcut, name)) -> Queue.add (id, shortcut, name) prover_bins),
+    "<id>,<shortcut>,<file> add a new prover executable";
+    KLong "full-config", Hnd0 (fun () -> partial_config := false; autoprovers := true),
+    " write in why3.conf the default config for provers, shortcut, strategies, and plugins, instead of loading it at startup";
+    KLong "list-prover-families", Hnd0 (fun () -> opt_list_prover_families := true),
+    " list known prover families";
+    KLong "install-plugin", Hnd1 (AString, add_plugin),
+    "<file> copy a plugin to the current library directory";
+    KLong "dont-save", Hnd0 (fun () -> save := false),
+    " do not modify the config file";
+    Debug.Args.desc_debug;
+    Debug.Args.desc_debug_all;
+    Debug.Args.desc_debug_list;
+  ]
 
-let anon_file _ = Arg.usage option_list usage_msg; exit 1
+let usage () =
+  Printf.eprintf
+    "Usage: %s [options] \n\
+     Detect provers and plugins to configure Why3.\n\
+     \n%s%!"
+    (Filename.basename Sys.argv.(0))
+    (Getopt.format spec);
+  exit 0
+
+let spec =
+  let open Why3.Getopt in
+  (Key ('h', "help"), Hnd0 usage," display this help and exit") :: spec
+
+let anon_file x = raise (Getopt.GetoptFailure (sprintf "unexpected argument: %s" x))
 
 let add_prover_binary config (id,shortcut,file) =
   Autodetection.add_prover_binary config id shortcut file
@@ -117,7 +115,7 @@ let auto_fallback () =
 
 let main () =
   (* Parse the command line *)
-  Arg.parse option_list anon_file usage_msg;
+  Getopt.parse_all spec anon_file Sys.argv;
 
   let opt_list = ref false in
   Autodetection.is_config_command := true;
@@ -132,7 +130,7 @@ let main () =
       (List.sort String.compare (Autodetection.list_prover_families ()))
   end;
 
-  opt_list :=  Debug.Args.option_list () || !opt_list;
+  opt_list := Debug.Args.option_list () || !opt_list;
   if !opt_list then exit 0;
 
   (* Main *)

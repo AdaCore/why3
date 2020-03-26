@@ -174,22 +174,17 @@ let files : string Queue.t = Queue.create ()
 let opt_parser = ref None
 let opt_batch = ref None
 
-let spec = [
-  "-F", Arg.String (fun s -> opt_parser := Some s),
-      "<format> select input format (default: \"why\")";
-  "--format", Arg.String (fun s -> opt_parser := Some s),
-      " same as -F";
-(*
-  "-f",
-   Arg.String (fun s -> input_files := s :: !input_files),
-   "<file> add file to the project (ignored if it is already there)";
-*)
-  Termcode.arg_extra_expl_prefix;
-  "--batch", Arg.String (fun s -> opt_batch := Some s), "";
-]
+let spec =
+  let open Getopt in
+  [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
+    "<format> select input format (default: \"why\")";
+    Termcode.opt_extra_expl_prefix;
+    KLong "batch", Hnd1 (AString, fun s -> opt_batch := Some s), "";
+  ]
 
 let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]..."
+  "Usage: %s [options] [<file.why>|<project directory>]...\n\
+   Open a graphical interface for Why3.\n"
   (Filename.basename Sys.argv.(0))
 
 let env, gconfig = try
@@ -834,9 +829,7 @@ let clear_message_zone () =
 
 (* Function used to print stuff on the message_zone *)
 let print_message ~kind ~notif_kind fmt =
-  (* TODO: use kasprintf once OCaml 4.03 is used *)
-  Format.kfprintf
-    (fun _ -> let s = flush_str_formatter () in
+  Format.kasprintf (fun s ->
               let s = try_convert s in
               add_to_log notif_kind s;
               let buf = message_zone#buffer in
@@ -850,7 +843,6 @@ let print_message ~kind ~notif_kind fmt =
                     buf#insert (s ^ "\n");
                   messages_notebook#goto_page error_page;
                 end)
-    str_formatter
     fmt
 
 let display_warnings fmt warnings =

@@ -75,14 +75,15 @@ and task_hd = {
   task_tag   : Weakhtbl.tag; (* unique magical tag *)
 }
 
-let task_hd_equal : task_hd -> task_hd -> bool = (==)
+let task_hd_equal t1 t2 = match t1.task_decl.td_node, t2.task_decl.td_node with
+  | Decl {d_node = Dprop (Pgoal,p1,g1)}, Decl {d_node = Dprop (Pgoal,p2,g2)} ->
+      Opt.equal (==) t1.task_prev t2.task_prev &&
+      pr_equal p1 p2 && t_equal_strict g1 g2
+  | _ -> t1 == t2
 
 let task_hd_hash t = Weakhtbl.tag_hash t.task_tag
 
-let task_equal t1 t2 = match t1, t2 with
-  | Some t1, Some t2 -> task_hd_equal t1 t2
-  | None, None -> true
-  | _ -> false
+let task_equal t1 t2 = Opt.equal task_hd_equal t1 t2
 
 let task_hash t = Opt.fold (fun _ t -> task_hd_hash t + 1) 0 t
 

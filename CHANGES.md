@@ -1,5 +1,13 @@
 :x: marks a potential source of incompatibility
 
+Version 1.3.1, March 24, 2020
+-----------------------------
+
+Bug fixes
+  * fixed conflicting symbols for CVC4 1.7
+  * fixed META file
+  * fixed infinite loops in strategies
+
 Version 1.3.0, March 17, 2020
 -----------------------------
 
@@ -109,6 +117,7 @@ Realizations
 
 Provers
   * support for Alt-Ergo 2.3.1 (released Feb 19, 2020)
+  * support for Isabelle 2019 (released June 2019)
   * support for Vampire 4.2.2 (released Dec 14, 2017)
   * support for Coq 8.10.0 (released Oct 8, 2019)
   * support for Coq 8.10.1 (released Oct 25, 2019)

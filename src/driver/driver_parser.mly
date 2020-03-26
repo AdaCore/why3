@@ -11,6 +11,10 @@
 
 %{
   open Driver_ast
+
+  let () = Exn_printer.register (fun fmt exn -> match exn with
+    | Error -> Format.fprintf fmt "syntax error"
+    | _ -> raise exn)
 %}
 
 %token <int> INTEGER
