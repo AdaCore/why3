@@ -70,27 +70,26 @@ let mk_location = function
       Some (Loc.user_position r.filename r.line 0 0)
   | No_location -> None
 
-let strings_of_symbol = function
-  | Symbol s ->
-      (* FIXGNAT A symbol can contain a qualified identifier *)
-      String.split_on_char '.' s
-  | No_symbol -> []
-
 let mk_idents ~notation attrs =
   let f = Opt.get (fun s -> s) notation in
   List.map_and_last
     (mk_ident [])
     (fun s -> mk_ident attrs (f s))
 
+let string_of_symbol = function
+  | Symbol s -> Some s
+  | No_symbol -> None
+
 let strings_of_name (node : name_id) =
   let Name r = node.desc in
-  let module_strings =
+  let module_string =
     match r.module_ with
     | Some {desc=Module r} ->
-        strings_of_symbol r.name
-    | _ -> [] in
-  let namespace_strings = strings_of_symbol r.namespace in
-  module_strings @ namespace_strings @ strings_of_symbol r.symb
+        string_of_symbol r.name
+    | _ -> None in
+  let namespace_string = string_of_symbol r.namespace in
+  let symb_string = string_of_symbol r.symb in
+  Opt.(to_list module_string @ to_list namespace_string @ to_list symb_string)
 
 let name_of_identifier (node: identifier_id) =
   let Identifier r = node.desc in
@@ -102,8 +101,9 @@ let force_one = function
 
 let mk_module_qident (node: module_id) =
   let Module m = node.desc in
-  let file = mk_idents ~notation:None [] (strings_of_symbol m.file) in
-  mk_qualid (file @ mk_idents ~notation:None [] (strings_of_symbol m.name))
+  let file = mk_idents ~notation:None [] (Opt.to_list (string_of_symbol m.file)) in
+  let name = mk_idents ~notation:None [] (Opt.to_list (string_of_symbol m.name)) in
+  mk_qualid (file @ name)
 
 let mk_idents_of_name ~notation attrs (node: name_id) =
   mk_idents ~notation attrs (strings_of_name node)
@@ -112,7 +112,8 @@ let mk_idents_of_identifier ~notation attrs (node: identifier_id) =
   mk_idents ~notation attrs (strings_of_name (name_of_identifier node))
 
 let mk_ident_of_symbol ~notation attrs sym =
-  force_one (mk_idents ~notation attrs (strings_of_symbol sym))
+  let notation = Opt.get (fun s -> s) notation in
+  mk_ident attrs (notation (Opt.force (string_of_symbol sym)))
 
 let full_name Node_id =
   failwith "full_name"
@@ -176,8 +177,8 @@ let unroll_name (node : name_id) =
   let Name {module_; symb} = node.desc in
   let aux (node: module_id) =
     let Module r = node.desc in
-    strings_of_symbol r.file, strings_of_symbol r.name in
-  Opt.map aux module_, strings_of_symbol symb
+    string_of_symbol r.file, string_of_symbol r.name in
+  Opt.map aux module_, string_of_symbol symb
 
 let is_infix_identifier (node : identifier_id) =
   let Identifier r = node.desc in
@@ -466,7 +467,6 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         let arg1 = mk_of_expr (List.nth r.args 1) in
         mk_innfix arg0 op arg1
 
-
     (* Convert unqualified op234 prefix operations (/, *, !, etc.) *)
     | Call r when is_infix_identifier r.name && is_op234 r.name -> begin
         match List.length r.args with
@@ -485,7 +485,8 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
 
     | Call r ->
         if is_infix_identifier r.name then
-          failwith ("mk_to_expr: unexpected infix identifier "^String.concat " " (strings_of_name (name_of_identifier r.name)));
+          Format.ksprintf failwith "mk_to_expr: unexpected infix identifier %s"
+            (String.concat "." (strings_of_name (name_of_identifier r.name)));
         let notation =
           if is_op1 r.name || is_op234 r.name then
             match List.length r.args with
@@ -561,7 +562,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         let pty =
           let Type r = r.typ.desc in
           match unroll_name r.name with
-          | Some (["_gnatprove_standard"], [("BV8"|"BV16"|"BV32"|"BV64"|"BV128" as s)]), ["t"] ->
+          | Some (Some "_gnatprove_standard", Some (("BV8"|"BV16"|"BV32"|"BV64"|"BV128" as s))), Some "t" ->
               Ty.mk_atomic_type [s; "t"]
           | _ ->
               failwith "mk_of_expr: unknown module constant" in
@@ -579,7 +580,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         let prefix =
           let Type r = r.typ.desc in
           match unroll_name r.name with
-          | Some (["_gnatprove_standard"], ["Float32"|"Float64" as s]), ["t"] ->
+          | Some (Some "_gnatprove_standard", Some ("Float32"|"Float64" as s)), Some "t" ->
               mk_ident [] s
           | _ ->
               failwith "mk_of_expr: float_constant is neither Float32.t nor Float64.t"
@@ -985,8 +986,8 @@ let rec mk_declaration (node : declaration_id) =
         E.mk_any [] Expr.RKnone (Some pty) pat Ity.MaskVisible spec in
       [D.mk_let ident false Expr.RKnone value]
   | Meta_declaration r ->
-      let name = force_one (strings_of_symbol r.name) in
-      let parameter = force_one (strings_of_symbol r.parameter) in
+      let name = Opt.force (string_of_symbol r.name) in
+      let parameter = Opt.force (string_of_symbol r.parameter) in
       let id = mk_ident [] name in
       let metarg =
         match String.split_on_char ' ' parameter with
@@ -1110,7 +1111,7 @@ let mk_generic_theory (node : generic_theory_id) =
       [name, includes @ declarations]
   | Custom_substitution r ->
       Format.ksprintf invalid_arg "mk_generic_theory: custom substitution %s"
-        (String.concat "." (strings_of_symbol r.from))
+        (Opt.get "NO_SYMBOL" (string_of_symbol r.from))
   | Custom_declaration _ as desc ->
       mk_custom_declaration {node with desc=desc}
 
