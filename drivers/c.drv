@@ -495,3 +495,101 @@ module mach.fxp.Fxp
   syntax val fxp_asr' "(uint64_t)((int64_t)%1 >> %2)" prec 2 1 2
 
 end
+
+(* exclude some stdlib modules from extraction *)
+
+module array.Array
+
+  noextract
+
+end
+
+module bool.Bool
+
+  noextract
+
+end
+
+module map.Map
+
+  noextract
+
+end
+
+module map.Const
+
+  noextract
+
+end
+
+module number.Divisibility
+
+  noextract
+
+end
+
+module int.Int
+
+  noextract
+
+end
+
+module int.Abs
+
+  noextract
+
+end
+
+module int.ComputerDivision
+
+  noextract
+
+end
+
+module int.EuclideanDivision
+
+  noextract
+
+end
+
+module int.MinMax
+
+  noextract
+
+end
+
+module int.Power
+
+  noextract
+
+end
+
+module real.Real
+
+  noextract
+
+end
+
+module real.ExpLog
+
+  noextract
+
+end
+
+module real.RealInfix
+
+  noextract
+
+end
+
+module real.Square
+
+  noextract
+
+end
+
+module mach.int.Unsigned
+
+  noextract
+
+end

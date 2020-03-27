@@ -177,6 +177,7 @@ let print_mdecls ?fname m mdecls alldeps =
   let nontrivialdeps =
     List.filter (fun pm -> not (Ident.Hid.mem trivial_files (pmod_name pm)))
       alldeps in
+  let tname = m.mod_theory.th_name in
   let pargs, printer = lookup_printer opt_driver in
   let test_decl_not_driver decl =
     let decl_name = Mltree.get_decl_name decl in
@@ -185,15 +186,21 @@ let print_mdecls ?fname m mdecls alldeps =
     List.exists test_id_not_driver decl_name in
   let prelude_exists =
     Ident.Mid.mem m.mod_theory.th_name pargs.thprelude
-    || (!opt_interface && Ident.Mid.mem m.mod_theory.th_name pargs.thinterface)
+    || (!opt_interface && Ident.Mid.mem tname pargs.thinterface)
   in
-  if List.exists test_decl_not_driver mdecls || prelude_exists
+  let exported_prelude_exists =
+    Ident.Mid.mem tname pargs.thexportpre
+    || Ident.Mid.mem tname pargs.thexportint in
+  if Ident.Sid.mem tname opt_driver.drv_noextract
+  then begin
+    Ident.Hid.add trivial_files tname ();
+    exported_prelude_exists
+  end else if List.exists test_decl_not_driver mdecls || prelude_exists
   then begin
     let implem =
       if opt_modu_flat = Flat
       then printer.flat_printer
       else printer.implem_printer in
-    let tname = m.mod_theory.th_name in
     let cout, old = get_cout_old implem.filename_generator m ?fname in
     let fmt = formatter_of_out_channel cout in
     implem.header_printer pargs ?old ?fname fmt m;
@@ -236,9 +243,6 @@ let print_mdecls ?fname m mdecls alldeps =
           if iout <> stdout then close_out iout end;
     true end
   else
-    let exported_prelude_exists =
-      Ident.Mid.mem m.mod_theory.th_name pargs.thexportpre
-      || Ident.Mid.mem m.mod_theory.th_name pargs.thexportint in
     if exported_prelude_exists
     then begin
       Ident.Hid.add trivial_files (pmod_name m) ();

@@ -23,6 +23,7 @@ type driver = private {
   drv_syntax      : Printer.syntax_map;
   drv_literal     : Printer.syntax_map;
   drv_prec        : (int list) Ident.Mid.t;
+  drv_noextract   : Ident.Sid.t;
 }
 
 

@@ -31,6 +31,7 @@ type driver = {
   drv_syntax      : Printer.syntax_map;
   drv_literal     : Printer.syntax_map;
   drv_prec        : (int list) Mid.t;
+  drv_noextract   : Sid.t;
 }
 
 
@@ -95,6 +96,7 @@ let load_driver env file extra_files =
   let thexportprelude = ref Mid.empty in
   let thinterface = ref Mid.empty in
   let thexportinterface = ref Mid.empty in
+  let noextract = ref Sid.empty in
   let syntax_map = ref Mid.empty in
   let literal_map = ref Mid.empty in
   let prec_map  = ref Mid.empty in
@@ -206,6 +208,8 @@ let load_driver env file extra_files =
         let id = find_val m q in
         add_syntax id s false;
         prec_map := Mid.add id p !prec_map;
+    | MRnoextract ->
+        noextract := Sid.add m.mod_theory.th_name !noextract
     | MRtheory trule ->
         add_local m.mod_theory (loc,trule)
   in
@@ -244,6 +248,7 @@ let load_driver env file extra_files =
     drv_syntax      = !syntax_map;
     drv_literal     = !literal_map;
     drv_prec        = !prec_map;
+    drv_noextract   = !noextract;
   }
 
 (* registering printers for programs *)

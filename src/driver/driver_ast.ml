@@ -54,6 +54,7 @@ type mo_rule =
   | MRinterface of string * export
   | MRexception of qualid * string
   | MRval       of qualid * string * int list
+  | MRnoextract
 
 type module_rules = {
   mor_name  : qualid;
