@@ -131,7 +131,7 @@ let alt_ergo : Whyconf.config_prover =
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Alt-Ergo not installed or not configured@.";
-    exit 0
+    exit 1
   end else
     snd (Whyconf.Mprover.max_binding provers)
 

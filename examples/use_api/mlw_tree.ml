@@ -295,10 +295,16 @@ let mod_M5 =
   (mk_ident "M5",[use_int_Int ; scope_S ; import_S ; g])
 
 (* BEGIN{getmodules} *)
-let mods =
-  let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4] in
-  Typing.type_mlw_file env [] "myfile.mlw" mlw_file
+let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4]
 (* END{getmodules} *)
+
+(* Printing back the mlw file *)
+
+let () = Format.printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+
+(* BEGIN{typemodules} *)
+let mods = Typing.type_mlw_file env [] "myfile.mlw" mlw_file
+(* END{typemodules} *)
 
 (* Checking the VCs *)
 
@@ -363,6 +369,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma -I `ocamlfind query menhirLib` menhirLib.cmo -I `ocamlfind query camlzip` zip.cma ../../lib/why3/why3.cma mlw_tree.ml"
+compile-command: "ocamlfind ocaml ../../lib/why3/why3.cma mlw_tree.ml"
 End:
 *)

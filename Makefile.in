@@ -1802,10 +1802,12 @@ endif
 
 bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
   share/Makefile.config bin/why3extract.@OCAMLBEST@
-	bash bench/bench ".@OCAMLBEST@"
-	@echo "=== Check parsing message ==="
-	bench/parsing-bench
+	@echo "=== Check API examples ==="
 	$(MAKE) bench-api
+	@echo "=== Check examples ==="
+	bash bench/bench ".@OCAMLBEST@"
+	@echo "=== Check parsing messages ==="
+	bench/parsing-bench
 	@echo ""
 	@echo "=== Checking extraction ==="
 	$(MAKE) test-ocaml-extraction
@@ -1820,7 +1822,6 @@ bench-api:
 	$(MAKE) test-api-transform.@OCAMLBEST@
 	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
 	$(MAKE) test-api-mlw-expr.@OCAMLBEST@
-#	$(MAKE) test-api-mlw.@OCAMLBEST@
 	$(MAKE) test-session.@OCAMLBEST@
 
 ###############
@@ -1900,20 +1901,6 @@ test-api-mlw-expr.opt: examples/use_api/mlw_expr.ml lib/why3/why3.cmxa
 	&& ./test-api-mlw-expr.opt > /dev/null) \
 	|| (rm -f test-api-mlw-expr.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
 	@rm -f test-api-mlw-expr.opt
-
-test-api-mlw.byte: examples/use_api/mlw.ml lib/why3/why3.cma
-	$(SHOW) 'Ocaml    $<'
-	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./test-api-mlw.byte > /dev/null) \
-	|| (rm -f test-api-mlw.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-mlw.byte;
-
-test-api-mlw.opt: examples/use_api/mlw.ml lib/why3/why3.cmxa
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
-	&& ./test-api-mlw.opt > /dev/null) \
-	|| (rm -f test-api-mlw.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-mlw.opt
 
 #test-shape: lib/why3/why3.cma
 #	ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) $? examples/test_shape.ml

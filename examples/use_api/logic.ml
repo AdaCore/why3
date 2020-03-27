@@ -85,17 +85,20 @@ let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
+let () = eprintf "%d provers@." (Whyconf.Mprover.cardinal provers)
+let () = Whyconf.(Mprover.iter (fun _ p -> eprintf "%a@." print_prover p.prover) provers)
 (* END{getconf} *)
 
 (* BEGIN{getanyaltergo} *)
 (* One prover named Alt-Ergo in the config file *)
 let alt_ergo : Whyconf.config_prover =
   let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
+  eprintf "fp = [%a]@." Whyconf.print_filter_prover fp;
   (** all provers that have the name "Alt-Ergo" *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Alt-Ergo not installed or not configured@.";
-    exit 0
+    exit 1
   end else
     snd (Whyconf.Mprover.max_binding provers)
 (* END{getanyaltergo} *)
@@ -107,7 +110,7 @@ let alt_ergo_2_0_0 : Whyconf.config_prover =
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Alt-Ergo 2.0.0 not installed or not configured@.";
-    exit 0
+    exit 1
   end else
     snd (Whyconf.Mprover.max_binding provers)
 (* END{getaltergo200} *)
