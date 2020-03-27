@@ -1023,7 +1023,7 @@ The function ``r'int`` projects a term of type ``r`` to its integer
 value. The two constants represent the high bound and low bound of the
 range respectively.
 
-Unless specified otherwise with the meta ``keep:literal`` on ``r``, the
+Unless specified otherwise with the meta :why3:meta:`keep:literal` on ``r``, the
 transformation :why3:transform:`eliminate_literal` introduces an axiom
 
 .. code-block:: whyml
@@ -1073,7 +1073,7 @@ of undefined operations such as :math:`0/0`. The predicate
 NaN. The function ``f'real`` projects a finite term of type ``f`` to its
 real value, its result is not specified for non finite terms.
 
-Unless specified otherwise with the meta ``keep:literal`` on ``f``, the
+Unless specified otherwise with the meta :why3:meta:`keep:literal` on ``f``, the
 transformation :why3:transform:`eliminate_literal` will introduce an axiom
 
 .. code-block:: whyml

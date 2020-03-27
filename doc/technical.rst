@@ -269,7 +269,7 @@ by :option:`why3 --list-transforms`.
    -  Unfolding of definitions, as done by :why3:transform:`inline_goal`. Transformation
       :why3:transform:`compute_in_goal` unfolds all definitions, including recursive
       ones. For :why3:transform:`compute_specified`, the user can enable unfolding of a
-      specific logic symbol by attaching the meta ``rewrite_def`` to the
+      specific logic symbol by attaching the meta :why3:meta:`rewrite_def` to the
       symbol.
 
       .. code-block:: whyml
