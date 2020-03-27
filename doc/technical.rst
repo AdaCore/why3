@@ -1470,3 +1470,46 @@ Auto level 3
     in the goals. We then attempt a split again, if the split succeeds,
     we restart from the beginning, if it fails then provers are tried
     again with 30s and 4 Gb.
+
+WhyML Attributes
+----------------
+
+.. why3:attribute:: case_split
+
+.. why3:attribute:: induction
+
+.. why3:attribute:: inline:trivial
+
+.. why3:attribute:: model_trace
+
+.. why3:attribute:: rewrite
+
+.. why3:attribute:: stop_split
+
+.. why3:attribute:: vc:annotation
+
+.. why3:attribute:: vc:divergent
+
+.. why3:attribute:: vc:sp
+
+.. _sec.meta:
+
+Why3 Metas
+----------
+
+.. why3:meta:: compute_max_steps
+
+.. why3:meta:: keep:literal
+
+.. why3:meta:: realized_theory
+
+.. why3:meta:: rewrite
+
+.. why3:meta:: rewrite_def
+
+.. _sec.debug:
+
+Debug Flags
+-----------
+
+.. why3:debug:: stack_trace
