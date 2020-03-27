@@ -79,6 +79,16 @@ class Why3ToolRole(XRefRole):
             target = target[5:]
         return title, target
 
+attr_re = re.compile(r'\[@(.*)\]')
+
+class Why3AttributeRole(XRefRole):
+    def process_link(self, env, refnode, has_explicit_title, title, target):
+        target = ws_re.sub(' ', target)
+        m = attr_re.match(target)
+        if m:
+            target = m.group(1)
+        return title, target
+
 class Why3ToolDirective(SphinxDirective):
     has_content = False
     required_arguments = 1
@@ -97,12 +107,14 @@ class Why3ToolDirective(SphinxDirective):
         domain.add_object('tool', fullname, targetname)
         return [inode, node]
 
-class Why3Transform(ObjectDescription):
+class Why3Thing(ObjectDescription):
     has_content = True
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = True
     option_spec = {}
+    thing_index = ''
+    thing_kind = ''
 
     def handle_signature(self, sig, signode):
         signode += addnodes.desc_name(text = sig)
@@ -111,19 +123,41 @@ class Why3Transform(ObjectDescription):
     def add_target_and_index(self, name, sig, signode):
         targetname = '%s-%s' % (self.name, name)
         signode['ids'].append(targetname)
-        indexentry = '%s; transformation' % (name,)
+        indexentry = '%s; %s' % (name, self.thing_index)
         self.indexnode['entries'].append(('pair', indexentry, targetname, '', None))
         domain = self.env.get_domain('why3')
-        domain.add_object('transform', name, targetname)
+        domain.add_object(self.thing_kind, name, targetname)
+
+class Why3Attribute(Why3Thing):
+    thing_index = 'attribute'
+    thing_kind = 'attribute'
+
+class Why3Debug(Why3Thing):
+    thing_index = 'debug flag'
+    thing_kind = 'debug'
+
+class Why3Meta(Why3Thing):
+    thing_index = 'meta'
+    thing_kind = 'meta'
+
+class Why3Transform(Why3Thing):
+    thing_index = 'transformation'
+    thing_kind = 'transform'
 
 class Why3Domain(Domain):
     name = 'why3'
     label = 'Why3'
     roles = {
+        'attribute': Why3AttributeRole(),
+        'debug': XRefRole(),
+        'meta': XRefRole(),
         'tool': Why3ToolRole(),
         'transform': XRefRole(),
     }
     directives = {
+        'attribute': Why3Attribute,
+        'debug': Why3Debug,
+        'meta': Why3Meta,
         'tool': Why3ToolDirective,
         'transform': Why3Transform,
     }
@@ -131,6 +165,9 @@ class Why3Domain(Domain):
     }
     initial_data = {}
     initial_data['objects'] = {
+        'attribute': {},
+        'debug': {},
+        'meta': {},
         'tool': {},
         'transform': {},
     }
