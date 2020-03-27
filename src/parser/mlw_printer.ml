@@ -47,12 +47,12 @@ let pp_closed is_closed pp fmt x =
     fprintf fmt "(%a)" pp x
 
 let expr_closed e = match e.expr_desc with
-  | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Eabsurd | Escope _ | Eidapp (_, []) | Ecast _ ->
+  | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Eabsurd | Escope _ | Eidapp (_, []) | Ecast _ | Einnfix _ ->
       true
   | _ -> false
 
 let term_closed t = match t.term_desc with
-  | Ttrue | Tfalse | Tconst _ | Tident _ | Tupdate _ | Trecord _ | Ttuple _ | Tscope _ | Tidapp (_, []) | Tcast _ ->
+  | Ttrue | Tfalse | Tconst _ | Tident _ | Tupdate _ | Trecord _ | Ttuple _ | Tscope _ | Tidapp (_, []) | Tcast _ | Tinnfix _ | Tbinnop _ ->
       true
   | _ -> false
 
@@ -154,7 +154,15 @@ let pp_infix pp closed fmt x1 op x2 =
     match sn_decode op.id_str with
     | SNinfix s -> s
     | _ -> failwith ("pp_infix: "^op.id_str) in
-  fprintf fmt "@[<hv 3>%a@ %s %a@]" pp' x1 op pp' x2
+  fprintf fmt "@[<hv 2>%a@ %s %a@]" pp' x1 op pp' x2
+
+let pp_innfix pp closed fmt x1 op x2 =
+  let pp' = pp_closed closed pp in
+  let op =
+    match sn_decode op.id_str with
+    | SNinfix s -> s
+    | _ -> failwith ("pp_infix: "^op.id_str) in
+  fprintf fmt "@[<hv 3>(%a@ %s %a)@]" pp' x1 op pp' x2
 
 let pp_not pp closed fmt x =
   let pp = pp_closed closed pp in
@@ -386,9 +394,12 @@ and pp_expr fmt e =
   | Eapply (e1, e2) ->
       pp_apply pp_expr expr_closed fmt e1 e2
   | Einfix (e1, op, e2) ->
+      let expr_closed = function
+        | {expr_desc=Einfix _} -> true
+        | e -> expr_closed e in
       pp_infix pp_expr expr_closed fmt e1 op e2
   | Einnfix (e1, op, e2) ->
-      pp_infix pp_expr expr_closed fmt e1 op e2
+      pp_innfix pp_expr expr_closed fmt e1 op e2;
   | Elet (id, ghost, kind, {expr_desc=Efun (binders, pty_opt, pat, mask, spec, e1)}, e2) ->
       (* TODO _pat *)
       fprintf fmt "@[<v>%a in@ %a@]"
@@ -554,12 +565,22 @@ and pp_term fmt t =
       pp_idapp pp_term term_closed fmt qid ts
   | Tapply (t1, t2) ->
       pp_apply pp_term term_closed fmt t1 t2
-  | Tinfix (t1, op, t2)
-  | Tinnfix (t1, op, t2) ->
+  | Tinfix (t1, op, t2) ->
+      let term_closed = function
+        | {term_desc=Tinfix _} -> true
+        | t -> term_closed t in
       pp_infix pp_term term_closed fmt t1 op t2
-  | Tbinop (t1, op, t2)
-  | Tbinnop (t1, op, t2) ->
+  | Tinnfix (t1, op, t2) ->
+      pp_innfix pp_term term_closed fmt t1 op t2;
+  | Tbinop (t1, op, t2) ->
+      let pp_term' =
+        let term_closed = function
+          | {term_desc=Tbinop _} -> true
+          | t -> term_closed t in
+        pp_closed term_closed pp_term in
       fprintf fmt "@[<hv 2>%a %a@ %a@]" pp_term' t1 pp_binop op pp_term' t2
+  | Tbinnop (t1, op, t2) ->
+      fprintf fmt "@[<hv 3>(%a %a@ %a)@]" pp_term' t1 pp_binop op pp_term' t2
   | Tnot t ->
       pp_not pp_term term_closed fmt t
   | Tif (t1, t2, t3) ->
@@ -604,7 +625,7 @@ and pp_spec fmt s =
   List.iter (pp_aux "writes") s.sp_writes;
   let pp_post = function
     | _, [{pat_desc=Pvar {id_str="result"}}, t] ->
-        fprintf fmt "@ ensures { %a }" pp_term
+        fprintf fmt "@ @[<hv 2>ensures { %a@] }" pp_term
           (remove_attr "hyp_name:Ensures" t)
     | _, cases ->
         let pp_case fmt (p, t) =
