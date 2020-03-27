@@ -161,7 +161,6 @@ texinfo_documents = [
 
 highlight_language = 'none'
 numfig = True
-default_role = 'literal'
 
 rst_prolog = '''
 .. |whypath| replace:: ``why3-{v}``

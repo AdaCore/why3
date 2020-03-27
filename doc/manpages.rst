@@ -93,7 +93,8 @@ particular, option :option:`--help` displays the usage and options.
 
 .. option:: --list-metas
 
-   List known metas.
+   List known metas. See also :numref:`sec.meta` for a description of
+   some of those metas.
 
 .. option:: --debug-all
 
@@ -101,7 +102,8 @@ particular, option :option:`--help` displays the usage and options.
 
 .. option:: --debug=<flag>,...
 
-   Set some specific debug flags.
+   Set some specific debug flags. See also :numref:`sec.debug` for
+   a description of some of those flags.
 
 .. option:: --help
 

@@ -684,7 +684,7 @@ Attributes and locations on identifiers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For variables to be used for counterexamples they need to contain an
-attribute called ``model_trace`` and a location. The ``model_trace`` attribute
+attribute called :why3:attribute:`model_trace` and a location. This attribute
 states the name the user wants the variable to be named in the output of
 the counterexamples pass. Usually, people put a reference to their
 program AST node in this attribute; this helps them to parse and display
@@ -698,7 +698,7 @@ subsequent tasks:
 
     x := !y + 1
 
-This means that the ident generated for :math:`x` will hold both a
+This means that the ident generated for ``x`` will hold both a
 ``model_trace`` and a location.
 
 The example becomes the following:
@@ -716,7 +716,7 @@ Attributes in formulas
 
 Now that variables are tagged, we can define formulas. To define a goal
 formula for counterexamples, we need to tag it with the
-``vc:annotation`` attribute. This attribute is automatically added when
+:why3:attribute:`[@vc:annotation]` attribute. This attribute is automatically added when
 using the VC generation of Why3, but on a user-built task, this needs to
 be added. We also need to add a location for this goal. The following is
 obtained for the simple formula linking ``A`` and ``B``:
@@ -728,7 +728,7 @@ obtained for the simple formula linking ``A`` and ``B``:
 
 Note: the transformations used for counterexamples will create new
 variables for each variable occurring inside the formula tagged by
-``vc:annotation``. These variables are duplicates located at the VC
+:why3:attribute:`vc:annotation`. These variables are duplicates located at the VC
 line. They allow giving all counterexample values located at that VC
 line.
 

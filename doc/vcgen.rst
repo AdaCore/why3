@@ -45,7 +45,7 @@ To avoid exponential explosion of WP computation, Why3 provides a
 mechanism similar to (TODO: cite papers here).
 
 This can be activited locally on any program expression, by putting
-the attribute `[@vc:sp]` on that expression. Yet, the simplest usage
+the :why3:attribute:`[@vc:sp]` attribute on that expression. Yet, the simplest usage
 is to pose this attribute on the whole body of a program function.
 
 Show an example.
