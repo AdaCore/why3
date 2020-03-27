@@ -8,10 +8,10 @@ USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends wget libgmp-dev gtk+-2.0 libgtksourceview2.0-dev xvfb unzip build-essential autoconf automake ocaml-nox ca-certificates git xauth hevea texlive-latex-extra lmodern texlive-plain-generic texlive-fonts-recommended graphviz menhir libmenhir-ocaml-dev libzip-ocaml-dev liblablgtksourceview3-ocaml-dev libzarith-ocaml-dev && \
+    apt-get install -yq --no-install-recommends wget libgmp-dev xvfb unzip build-essential autoconf ocaml-nox ca-certificates git xauth graphviz menhir libmenhir-ocaml-dev libzip-ocaml-dev liblablgtksourceview3-ocaml-dev libzarith-ocaml-dev && \
     apt-get clean
 
-RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.5/opam-2.0.5-x86_64-linux -O /usr/local/bin/opam && \
+RUN wget --quiet https://github.com/ocaml/opam/releases/download/2.0.6/opam-2.0.6-x86_64-linux -O /usr/local/bin/opam && \
     chmod a+x /usr/local/bin/opam
 
 # install provers
@@ -45,9 +45,9 @@ ENV HOME /home/why3
 WORKDIR /home/why3
 
 # install opam
-ENV OPAM_PACKAGES="num menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip"
+ENV OPAM_PACKAGES="num menhir lablgtk3-sourceview3 zarith camlzip"
 RUN opam init -y --no-setup -j1 --bare --disable-sandboxing && \
-    opam switch create 4.09.0 ocaml-base-compiler.4.09.0 && opam install -y $OPAM_PACKAGES && \
+    opam switch create latest ocaml-base-compiler.4.10.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create bench  ocaml-base-compiler.4.05.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create full   ocaml-base-compiler.4.08.1 && opam install -y $OPAM_PACKAGES && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
