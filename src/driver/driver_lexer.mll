@@ -26,7 +26,6 @@
         "prelude", PRELUDE;
         "interface", INTERFACE;
         "export", EXPORT;
-        "noextract", NOEXTRACT;
         "printer", PRINTER;
 	"steps", STEPS;
 	"model_parser", MODEL_PARSER;

@@ -20,7 +20,7 @@
 %token <string> RIGHTSQ_QUOTE
 %token <string> RIGHTPAR_QUOTE
 %token <string> INPUT (* never reaches the parser *)
-%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING USE NOEXTRACT
+%token THEORY END SYNTAX REMOVE META PRELUDE PRINTER MODEL_PARSER OVERRIDING USE
 %token EXPORT INTERFACE
 %token VALID INVALID UNKNOWN FAIL
 %token TIMEOUT OUTOFMEMORY STEPLIMITEXCEEDED TIME STEPS
@@ -213,7 +213,7 @@ module_:
 
 mrule:
 | trule                          { MRtheory $1 }
-| NOEXTRACT                      { MRnoextract }
+| REMOVE MODULE                  { MRnoextract }
 | INTERFACE export STRING        { MRinterface ($3, $2) }
 | SYNTAX EXCEPTION qualid STRING { MRexception ($3, $4) }
 | SYNTAX VAL qualid STRING       { MRval ($3, $4, []) }
