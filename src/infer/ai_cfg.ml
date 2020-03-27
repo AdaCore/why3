@@ -6,9 +6,9 @@ open Expr
 open Ity
 
 let dbg_print_cfg =
-  Debug.register_flag "ai_print_cfg" ~desc:"Print domains to debug"
+  Debug.register_flag "ai-print-cfg" ~desc:"Print domains to debug"
 let ai_cfg_debug =
-  Debug.register_flag "ai_cfg_debug" ~desc:"CFG debug"
+  Debug.register_flag "ai-cfg-debug" ~desc:"CFG debug"
 
 let other_ai_debug = false
 
