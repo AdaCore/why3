@@ -158,6 +158,7 @@ let compute_preludes id_th pm deps epm =
   epl@mpl
 
 let export_deps = Ident.Hid.create 16
+let trivial_files = Ident.Hid.create 16
 
 let add_dep dep (ds, dl) =
   let id = pmod_name dep in
@@ -171,8 +172,11 @@ let add_export_dep (ds, dl) pm =
   let (ds, dl) = List.fold_right add_dep depl (ds, dl) in
   add_dep pm (ds, dl)
 
-let print_mdecls ?fname m mdecls deps =
+let print_mdecls ?fname m mdecls alldeps =
   let open Pdriver in
+  let nontrivialdeps =
+    List.filter (fun pm -> not (Ident.Hid.mem trivial_files (pmod_name pm)))
+      alldeps in
   let pargs, printer = lookup_printer opt_driver in
   let test_decl_not_driver decl =
     let decl_name = Mltree.get_decl_name decl in
@@ -181,10 +185,7 @@ let print_mdecls ?fname m mdecls deps =
     List.exists test_id_not_driver decl_name in
   let prelude_exists =
     Ident.Mid.mem m.mod_theory.th_name pargs.thprelude
-    || Ident.Mid.mem m.mod_theory.th_name pargs.thexportpre
-    || (!opt_interface &&
-          (Ident.Mid.mem m.mod_theory.th_name pargs.thinterface
-           || Ident.Mid.mem m.mod_theory.th_name pargs.thexportint))
+    || (!opt_interface && Ident.Mid.mem m.mod_theory.th_name pargs.thinterface)
   in
   if List.exists test_decl_not_driver mdecls || prelude_exists
   then begin
@@ -199,8 +200,8 @@ let print_mdecls ?fname m mdecls deps =
     (* print_preludes *)
     let pm = pargs.thprelude in
     let epm = pargs.thexportpre in
-    let pl = compute_preludes tname pm deps epm in
-    implem.prelude_printer pargs ?old ?fname ~deps
+    let pl = compute_preludes tname pm alldeps epm in
+    implem.prelude_printer pargs ?old ?fname ~deps:nontrivialdeps
       ~global_prelude:pargs.prelude
       ~prelude:pl fmt m ;
     (* print decls *)
@@ -222,8 +223,8 @@ let print_mdecls ?fname m mdecls deps =
           (* print interfaces *)
           let im = pargs.thinterface in
           let eim = pargs.thexportint in
-          let il = compute_preludes tname im deps eim in
-          interf.prelude_printer pargs ?old ?fname ~deps
+          let il = compute_preludes tname im alldeps eim in
+          interf.prelude_printer pargs ?old ?fname ~deps:nontrivialdeps
             ~global_prelude:pargs.prelude
             ~prelude:il
             ifmt m;
@@ -234,7 +235,16 @@ let print_mdecls ?fname m mdecls deps =
           interf.footer_printer pargs ?old ?fname ifmt m;
           if iout <> stdout then close_out iout end;
     true end
-  else false
+  else
+    let exported_prelude_exists =
+      Ident.Mid.mem m.mod_theory.th_name pargs.thexportpre
+      || Ident.Mid.mem m.mod_theory.th_name pargs.thexportint in
+    if exported_prelude_exists
+    then begin
+      Ident.Hid.add trivial_files (pmod_name m) ();
+      true
+    end
+    else false
 
 let find_module_path mm path m = match path with
   | [] -> Mstr.find m mm
