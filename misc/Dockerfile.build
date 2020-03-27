@@ -47,7 +47,7 @@ WORKDIR /home/why3
 # install opam
 ENV OPAM_PACKAGES="num menhir conf-gtksourceview lablgtk ocamlgraph zarith camlzip"
 RUN opam init -y --no-setup -j1 --bare --disable-sandboxing && \
-    opam switch create 4.09.0 ocaml-base-compiler.4.09.0 && opam install -y $OPAM_PACKAGES && \
+    opam switch create latest ocaml-base-compiler.4.10.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create bench  ocaml-base-compiler.4.05.0 && opam install -y $OPAM_PACKAGES && \
     opam switch create full   ocaml-base-compiler.4.08.1 && opam install -y $OPAM_PACKAGES && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
