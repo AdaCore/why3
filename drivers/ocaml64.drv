@@ -330,14 +330,7 @@ module mach.int.Random63
 end
 
 module mach.int.State63
-  (* the most appropriate way to do this would be to have
-     something similar to [remove] from smt drivers:
-     remove val create *)
-  syntax val create       "REMOVE"
-  syntax val init         "REMOVE"
-  syntax val self_init    "REMOVE"
-  syntax val random_bool  "REMOVE"
-  syntax val random_int63 "REMOVE"
+  remove module
 end
 
 module mach.peano.Peano
