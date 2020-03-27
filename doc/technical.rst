@@ -301,7 +301,7 @@ by :option:`why3 --list-transforms`.
       confluence of the set of rewrite rules declared.
 
    Instead of using a meta, it is possible to declare an axiom as a rewrite
-   rule by adding the ``[@rewrite]`` attribute on the axiom name or on the
+   rule by adding the :why3:attribute:`[@rewrite]` attribute on the axiom name or on the
    axiom itself, e.g.,
 
    .. code-block:: whyml
@@ -643,7 +643,7 @@ by :option:`why3 --list-transforms`.
              end
 
     When induction can be applied to several variables, the
-    transformation picks one heuristically. The ``[@induction]``
+    transformation picks one heuristically. The :why3:attribute:`[@induction]`
     attribute can be used to force induction over one particular
     variable, with
 
@@ -669,7 +669,7 @@ by :option:`why3 --list-transforms`.
     :samp:`x{j}`, and each ``x1 ... xn`` occurs at most once in
     all the :samp:`e{i}`.
 
-    The attribute ``[@inline:trivial]`` can be used to tag functions, so
+    The attribute :why3:attribute:`[@inline:trivial]` can be used to tag functions, so
     that the transformation forcefully expands them (not using the
     conditions above). This can be used to ensure that some specific
     functions are inlined for automatic provers
@@ -1185,16 +1185,16 @@ by :option:`why3 --list-transforms`.
     The transformations in the “split” family can be controlled by using
     attributes on formulas.
 
-    The ``[@stop_split]`` attribute can be used to block the splitting
+    The :why3:attribute:`[@stop_split]` attribute can be used to block the splitting
     of a formula. The attribute is removed after blocking, so applying
     the transformation a second time will split the formula. This is can
     be used to decompose the splitting process in several steps. Also,
     if a formula with this attribute is found in non-goal position, its
     ``by``/``so`` proof indication will be erased by the transformation.
-    In a sense, formulas tagged by ``[@stop_split]`` are handled as if
+    In a sense, formulas tagged by :why3:attribute:`[@stop_split]` are handled as if
     they were local lemmas.
 
-    The ``[@case_split]`` attribute can be used to force case analysis
+    The :why3:attribute:`[@case_split]` attribute can be used to force case analysis
     on hypotheses. For instance, applying :why3:transform:`split_goal` on
 
     ::
@@ -1212,7 +1212,7 @@ by :option:`why3 --list-transforms`.
     undesired case analysis may easily lead to an exponential blow-up.
 
     Note that the precise behavior of splitting transformations in
-    presence of the ``[@case_split]`` attribute is not yet specified and
+    presence of the :why3:attribute:`[@case_split]` attribute is not yet specified and
     is likely to change in future versions.
 
 .. why3:transform:: split_goal_full
