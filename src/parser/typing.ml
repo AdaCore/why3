@@ -1706,12 +1706,3 @@ let () = Exn_printer.register (fun fmt e -> match e with
       Format.fprintf fmt "unbound %s symbol '%a'" (symbol_kind_to_string ty)
         print_qualid q
   | _ -> raise e)
-
-let read_sexp_channel env _path file c =
-  Sexplib.Sexp.input_sexp c |>
-  Ptree.mlw_file_of_sexp |>
-  type_mlw_file env [] file
-
-let () =
-  Env.register_format Pmodule.mlw_language "ptree-sexp" ["ptree-sexp"]
-    read_sexp_channel ~desc:"WhyML@ programming@ and@ specification@ language as Sexp"

@@ -36,7 +36,7 @@ OCAMLBEST   = @OCAMLBEST@
 BIGINTLIB   = @BIGINTLIB@
 MPFRLIB     = @MLMPFR@
 INCLUDE     = @BIGINTINCLUDE@ -I \"$ocamllib\"
-INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @SEXPINCLUDES@ -I \"$ocamllib\"
+INCLUDEALL  = @BIGINTINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ -I \"$ocamllib\"
 " > $makefileconfig
 
 if [ "@enable_relocation@" = "no" ]; then

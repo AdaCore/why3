@@ -13,6 +13,7 @@
 type lexing_loc = Lexing.position * Lexing.position
 *)
 
+open Mysexplib.Std [@@warning "-33"]
 open Lexing
 
 let current_offset = ref 0
@@ -43,6 +44,7 @@ let report_line fmt l = fprintf fmt "%s:%d:" l.pos_fname l.pos_lnum
 *)
 
 type position = string * int * int * int
+[@@deriving sexp_of]
 
 let user_position fname lnum cnum1 cnum2 = (fname,lnum,cnum1,cnum2)
 
@@ -134,18 +136,6 @@ let with_location f lb =
     | e -> raise (Located (loc lb, e))
 
 let position_of_sexp sexp =
-  let open Sexplib in
-  match sexp with
-  | Sexp.Atom "<dummy>" ->
-      dummy_position
-  | Sexp.Atom s ->
-      let f filename line bchar echar = filename, line, bchar, echar in
-      Scanf.sscanf s "%s %d %d-%d" f
-  | Sexp.List _ ->
-      invalid_arg "position_of_sexp"
-
-let sexp_of_position (filename, line, bchar, echar) =
-  Sexplib.Sexp.Atom
-    (if try Sys.getenv "SEXP_POS" = "dummy" with Not_found -> false
-     then "<dummy>"
-     else Format.sprintf "%s %d %d-%d" filename line bchar echar)
+  match Mysexplib.of_list sexp with
+  | [] -> dummy_position
+  | _ -> invalid_arg "position_of_sexp: only () allowed for dummy position"

@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Sexplib.Std
+open Mysexplib.Std [@@warning "-33"]
 
 (** Parse trees *)
 
@@ -20,21 +20,7 @@ open Sexplib.Std
 type attr =
   | ATstr of Ident.attribute
   | ATpos of Loc.position
-
-let attr_of_sexp _ = failwith "attr_of_sexp"
-
-let sexp_of_attr = function
-  | ATstr id ->
-      Sexplib.Sexp.(List [Atom "ATstr"; Ident.sexp_of_attribute id])
-  | ATpos p ->
-      let filename, line, bchar, echar = Loc.get p in
-      Sexplib.Sexp.(List [
-          Atom "ATpos";
-          Atom filename;
-          Atom (string_of_int line);
-          Atom (string_of_int bchar);
-          Atom (string_of_int echar)
-        ])
+[@@deriving sexp]
 
 type ident = {
   id_str : string;

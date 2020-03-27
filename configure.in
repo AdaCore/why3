@@ -92,6 +92,12 @@ AC_ARG_ENABLE(re,
     AS_HELP_STRING([--disable-re], [use Str instead of Re for regular expressions]),,
     enable_re=yes)
 
+# pp_sexp
+
+AC_ARG_ENABLE(pp-sexp,
+    AS_HELP_STRING([--disable-pp-sexp], [disable S-expression output for why3pp (requires findlib and ppx_sexp_conv)]),,
+    enable_pp_sexp=yes)
+
 # IDE
 
 AC_ARG_ENABLE(ide,
@@ -537,7 +543,6 @@ else
    ZIPINCLUDE=
 fi
 
-SEXPINCLUDES="-I $($OCAMLFIND query sexplib0) -I $($OCAMLFIND query parsexp) -I $($OCAMLFIND query sexplib) -I $($OCAMLFIND query ppx_sexp_conv.runtime-lib) -I $($OCAMLFIND query result) -I $($OCAMLFIND query ppx_deriving) -I $($OCAMLFIND query ppx_sexp_conv)"
 # checking for menhirlib
 found_menhirlib=yes
 DIR=
@@ -855,6 +860,28 @@ if test "$enable_statmemprof" = yes; then
    fi
 fi
 
+# ppx_sexp_conv (only with ocamlfind)
+SEXPLIBPPX=""
+SEXPLIB=""
+if test "$enable_pp_sexp" = yes; then
+    if test "$enable_ocamlfind" != yes; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires ocamlfind)"
+    elif test "$enable_ppx" != yes; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires ppx)"
+    elif ! $OCAMLFIND query ppx_sexp_conv > /dev/null; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires ppx_sexp_conv)"
+    else
+        SEXPLIBPPX="ppx_sexp_conv"
+        SEXPLIB="sexplib sexplib.num"
+        reason_no_pp_sexp=""
+    fi
+else
+    reason_no_pp_sexp=" (disabled)"
+fi
+
 # Coq
 
 enable_coq_support=yes
@@ -1095,7 +1122,6 @@ AC_SUBST(LABLGTKPKG)
 AC_SUBST(LABLGTKINCLUDE)
 AC_SUBST(GTKVERSION)
 
-AC_SUBST(SEXPINCLUDES)
 AC_SUBST(enable_web_ide)
 AC_SUBST(enable_js_of_ocaml)
 AC_SUBST(JSOFOCAMLPKG)
@@ -1103,6 +1129,9 @@ AC_SUBST(JSOFOCAMLPKG)
 AC_SUBST(META_OCAMLGRAPH)
 
 AC_SUBST(enable_ppx)
+AC_SUBST(enable_pp_sexp)
+AC_SUBST(SEXPLIB)
+AC_SUBST(SEXPLIBPPX)
 
 AC_SUBST(NUMINCLUDE)
 AC_SUBST(MLMPFRINCLUDE)
@@ -1213,6 +1242,7 @@ echo "    Native compilation      : $enable_native_code"
 echo "    Profiling               : $enable_profiling"
 echo "    Memory profiling        : $enable_statmemprof$reason_statmemprof"
 echo "    PPX                     : $enable_ppx$reason_ppx"
+echo "    why3pp S-expr output    : $enable_pp_sexp$reason_no_pp_sexp"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    Mpfr support            : $found_mlmpfr$reason_mlmpfr"
 echo "    Re support              : $enable_re$reason_re"

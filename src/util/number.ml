@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Sexplib.Std
+open Mysexplib.Std [@@warning "-33"]
 
 let debug_float = Debug.register_info_flag "float"
   ~desc:"Avoid@ catching@ exceptions@ in@ order@ to@ get@ \

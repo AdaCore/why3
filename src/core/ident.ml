@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Sexplib.Std
+open Mysexplib.Std [@@warning "-33"]
 open Wstdlib
 
 (** Attributes *)
