@@ -515,13 +515,12 @@ module Make(S:sig
       incr meetid;
       (* First inline everything, for instance needed for references
        * where !i is (!) i and must be replaced by (contents i) *)
-      let t = t_replace_all t in
+      let t = t_inline_all t in
       (* Let's try to remove the nots that we can *)
-      let t = t_descend_nots t in
+      let t = t_push_negation t in
       let var_of_term t =
         try Some (Mterm.find t uf_man.apron_mapping)
-        with Not_found -> None
-      in
+        with Not_found -> None in
 
       (* Assuming that t is an arithmetic term, this computes the
        * number of ocurrence of variables
@@ -531,36 +530,33 @@ module Make(S:sig
        * For instance, 4 + x + y set cst to 4, and constr
        * to [(x, 1), (y, 1)] *)
       let rec term_to_var_list rud coeff t =
-        let re = term_to_var_list rud in
         let open Number in
         match t.t_node with
         | Tvar _ -> begin
             match var_of_term t with
             | Some var -> ([(var, coeff)], 0)
-            | None -> Format.eprintf "Variable undefined: ";
-                      Pretty.print_term Format.err_formatter t;
-                      Format.eprintf "@."; failwith "undefined var" end
+            | None -> Format.eprintf "Variable undefined: %a@."
+                        Pretty.print_term t; failwith "undefined var" end
         | Tconst (Constant.ConstInt n) ->
-          ([], coeff * (BigInt.to_int n.il_int))
-        | Tapp (func, args) when ls_equal func ad_int ->
-          List.fold_left (fun (a, b) c ->
-              let c, d = re coeff c in
-              (a @ c, b + d)) ([], 0)args
-        | Tapp (func, [a;b]) when ls_equal func min_int ->
-          let c, d = re coeff a in
-          let e, f = re (-coeff) b in
-          (c @ e, d + f)
-        | Tapp (func, [a]) when ls_equal func min_u_int ->
-          re (-coeff)  a;
-        | Tapp (func, [{t_node = Tconst (Constant.ConstInt n); _}; a])
-        | Tapp (func, [a; {t_node = Tconst (Constant.ConstInt n); _};])
-             when ls_equal func mult_int ->
-           re ((BigInt.to_int n.il_int) * coeff) a
+          ([], coeff * BigInt.to_int n.il_int)
+        | Tapp (ls, args) when ls_equal ls ad_int ->
+          List.fold_left (fun (acc_vars, acc_cons) t ->
+              let vars, cons = term_to_var_list rud coeff t in
+              (acc_vars @ vars, acc_cons + cons)) ([], 0) args
+        | Tapp (ls, [t1;t2]) when ls_equal ls min_int ->
+          let vars1, cons1 = term_to_var_list rud coeff t1 in
+          let vars2, cons2 = term_to_var_list rud (-coeff) t2 in
+          (vars1 @ vars2, cons1 + cons2)
+        | Tapp (ls, [t]) when ls_equal ls min_u_int ->
+          term_to_var_list rud (-coeff)  t;
+        | Tapp (ls, [{t_node = Tconst (Constant.ConstInt n)}; t])
+        | Tapp (ls, [t; {t_node = Tconst (Constant.ConstInt n)}])
+             when ls_equal ls mult_int ->
+           term_to_var_list rud (BigInt.to_int n.il_int * coeff) t
         | _ -> (* maybe a record access *)
           begin
             match var_of_term t with
-            | None ->
-              begin
+            | None -> begin
                 try
                   let myvar = get_var_for_term uf_man rud t in
                   let cl = get_class_for_term uf_man t in
@@ -637,7 +633,7 @@ module Make(S:sig
               f_uf (List.combine subv_a subv_b)
           | Tif (a, b, c) ->
             let fa = aux a in
-            let fa_not = aux (t_descend_nots a) in
+            let fa_not = aux (t_push_negation a) in
             let fb = aux b in
             let fc = aux c in
             (fun d ->
@@ -883,18 +879,17 @@ module Make(S:sig
 
   let forget_var m v = forget_term m (t_var v)
 
-  let forget_region (man, uf_man) v _ =
-    let members = Ity.Mreg.find v uf_man.region_mapping |> List.map snd in
-    let vars = Ity.Mreg.find v uf_man.region_var in
-    let f = List.fold_left (fun f t ->
-        let a = forget_term (man, uf_man) t in
-        fun x -> f x |> a) (fun x -> x) members in
+  let forget_region (man, uf_man) reg _ =
+    let members = Ity.Mreg.find reg uf_man.region_mapping |> List.map snd in
+    let vars = Ity.Mreg.find reg uf_man.region_var in
+    let forget_fields = List.fold_left (fun f t ->
+        let f2 = forget_term (man, uf_man) t in
+        fun x -> f x |> f2) (fun x -> x) members in
     List.fold_left (fun f v ->
         fun (d, ud) ->
           let acl = get_class_for_term uf_man (t_var v) in
           let ud = { ud with classes = snd (Union_find.forget acl ud.classes) } in
-          let d = f (d, ud) in
-          d) f vars
+          f (d, ud)) forget_fields vars
 
   let widening (man, uf_man) (a, b) (c, d) =
     let c, e = join_uf (man, uf_man) b d c in

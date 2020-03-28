@@ -508,10 +508,10 @@ module Make(S:sig
 
       (* First inline everything, for instance needed for references
        * where !i is (!) i and must be replaced by (contents i) *)
-      let t = t_replace_all t in
+      let t = t_inline_all t in
 
       (* Let's try to remove the nots that we can *)
-      let t = t_descend_nots t in
+      let t = t_push_negation t in
 
       let var_of_term t =
         try
@@ -711,7 +711,7 @@ module Make(S:sig
                    )) f_uf
           | Tif (a, b, c) ->
             let fa = aux a in
-            let fa_not = aux (t_descend_nots a) in
+            let fa_not = aux (t_push_negation a) in
             let fb = aux b in
             let fc = aux c in
             (fun d ->
@@ -727,7 +727,7 @@ module Make(S:sig
               match t_open_quant tq with
               | [a], _, t when (Ty.ty_equal a.vs_ty Ty.ty_int) ->
                 let quant_var, apron_var = uf_man.quant_var, uf_man.apron_var in (*TermToVaro.choose ud.quantified_vars in*)
-                let t = t_descend_nots t in
+                let t = t_push_negation t in
                 let t = t_subst_single a quant_var t in
                 aux t
               | _ -> raise (Not_handled t)
