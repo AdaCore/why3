@@ -51,22 +51,18 @@ module Make(E: sig
     let mod_known = E.mod_known
   end)
 
-  open Ai_logic
-
-  module Uf_domain =
-    Uf_domain.Make(struct
-        module    Dom = Domain
-        let  th_known = E.th_known
-        let mod_known = E.mod_known
-        let       env = E.env
-      end)
+  module Uf_domain = Uf_domain.Make(struct
+    module    Dom = Domain
+    let  th_known = E.th_known
+    let mod_known = E.mod_known
+    let       env = E.env
+  end)
 
   module QDom = Quant_domain.Make(struct
-      module    Dom = Disjunctive_term_domain.Make(Uf_domain)
-      let  th_known = E.th_known
-      let mod_known = E.mod_known
-      let       env = E.env
-    end)
+    module   TDom   = Disjunctive_term_domain.Make(Uf_domain)
+    module Ai_logic = Ai_logic
+  end)
+
 
   type control_point = int
   type xcontrol_point = control_point * xsymbol
@@ -495,7 +491,7 @@ module Make(E: sig
        let constraints_start = QDom.meet_term manpk postcondition_before in
 
        let bounds a b =
-         t_and (t_app le_int [a; pv_t] None)(t_app le_int [pv_t; b] None) in
+         t_and (t_app Ai_logic.le_int [a; pv_t] None)(t_app Ai_logic.le_int [pv_t; b] None) in
        let precondition_e =
          if dir = Expr.To then bounds lo_t up_t else bounds up_t lo_t in
        let constraints_e = QDom.meet_term manpk precondition_e in
@@ -508,7 +504,7 @@ module Make(E: sig
          (fun _ -> constraints_e) ~lbl:"for lo<=pv<=up";
 
        let vret_pv = create_vreturn manpk Ty.ty_int in
-       let res = t_app ad_int [pv_t; t_nat_const 1] (Some Ty.ty_int) in
+       let res = t_app Ai_logic.ad_int [pv_t; t_nat_const 1] (Some Ty.ty_int) in
        let next_assign =
          t_app ps_equ [t_var vret_pv; res] None
          |> QDom.meet_term manpk in

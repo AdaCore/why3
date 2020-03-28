@@ -1,22 +1,14 @@
 open Domain
+open Ai_logic
 open Term
 open Ity
 
 module Make(S:sig
-    module    Dom : TERM_DOMAIN
-    val       env : Env.env
-    val  th_known : Decl.known_map
-    val mod_known : Pdecl.known_map
-  end): TERM_DOMAIN =struct
+    module   TDom   : TERM_DOMAIN
+    module Ai_logic : AI_LOGIC
+  end): TERM_DOMAIN = struct
 
-  module Dom = S.Dom
-
-  module Ai_logic = Ai_logic.Make(struct
-      let env = S.env
-      let th_known = S.th_known
-      let mod_known = S.mod_known
-    end)
-  open Ai_logic
+  module Dom = S.TDom
 
   include Dom
 
@@ -82,7 +74,7 @@ module Make(S:sig
       begin
         match t_open_quant tq with
         | [a], _, t when (Ty.ty_equal a.vs_ty Ty.ty_int) ->
-          let t = t_push_negation t in
+          let t = S.Ai_logic.t_push_negation t in
           let t = t_subst_single a quant_var t in
           meet_term man t elt
         | _ -> Dom.meet_term man term elt

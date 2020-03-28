@@ -1,8 +1,7 @@
 open Domain
+open Ai_logic
 
 module Make(S:sig
-    module    Dom : TERM_DOMAIN
-    val       env : Env.env
-    val  th_known : Decl.known_map
-    val mod_known : Pdecl.known_map
+    module   TDom   : TERM_DOMAIN
+    module Ai_logic : AI_LOGIC
   end) : TERM_DOMAIN
