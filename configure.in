@@ -698,10 +698,6 @@ else
    LABLGTKINCLUDE=
 fi
 
-dnl AC_CHECK_PROG(enable_ide,lablgtk2,yes,no) not always available (Win32)
-
-dnl AC_CHECK_PROG(OCAMLWEB,ocamlweb,ocamlweb,true)
-
 # checking for ocamlgraph
 # temporarily disabled until #453 is fixed
 if test "$enable_hypothesis_selection" = yes; then
@@ -1027,10 +1023,6 @@ if test "$enable_frama_c" = yes; then
    FRAMAC_INCLUDE="-I $FRAMAC_LIBDIR"
 fi
 
-#Viewer for ps and pdf
-dnl AC_CHECK_PROGS(PSVIEWER,gv evince)
-dnl AC_CHECK_PROGS(PDFVIEWER,xpdf acroread evince)
-
 VERSION=$PACKAGE_VERSION
 
 # substitutions to perform
@@ -1051,10 +1043,7 @@ AC_SUBST(OCAMLBEST)
 AC_SUBST(OCAMLVERSION)
 AC_SUBST(OCAMLLIB)
 AC_SUBST(OCAMLINSTALLLIB)
-dnl AC_SUBST(OCAMLV)
-dnl AC_SUBST(FORPACK)
 AC_SUBST(OCAMLGRAPHLIB)
-dnl AC_SUBST(OCAMLWEB)
 AC_SUBST(MENHIR)
 
 AC_SUBST(enable_ocamlfind)
@@ -1147,9 +1136,6 @@ AC_SUBST(WHY3LIB)
 AC_SUBST(WHY3INCLUDE)
 
 AC_SUBST(enable_relocation)
-
-dnl AC_SUBST(PSVIEWER)
-dnl AC_SUBST(PDFVIEWER)
 
 # Finally create the Makefile from Makefile.in
 AC_CONFIG_FILES(Makefile)
