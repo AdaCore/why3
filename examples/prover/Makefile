@@ -24,7 +24,7 @@ BD=prover
 OCAMLC=ocamlopt.opt
 INCLUDES=$(INCLUDEALL) -I ../../plugins/tptp
 LIBS=unix.cmxa nums.cmxa $(BIGINTLIB).cmxa dynlink.cmxa str.cmxa menhirLib.cmx zip.cmxa why3.cmxa why3extract.cmxa tptp_ast.cmx tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
-WHY3FLAGS=-L . --debug ignore_unused_vars
+WHY3FLAGS=-L . --debug=ignore_unused_vars
 MLFLAGS=
 MLIFLAGS=
 MLEXECFLAGS=
