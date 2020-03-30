@@ -1202,6 +1202,6 @@ let () =
            Format.fprintf fmt "Unexpected Json for %s at path %a@."
              s pp_path path
        | Located_by_marker (filename, e) ->
-           Format.fprintf fmt "File %s, marker (*XXX*):@.%a"
+           Format.fprintf fmt "File %s, marked by (*XXX*)(...):@.%a"
              filename Exn_printer.exn_printer e;
        | _ -> raise exn)

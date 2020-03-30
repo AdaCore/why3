@@ -19,12 +19,17 @@ let marker = ref None
 let set_marker pos =
   marker := Some pos
 
+let is_marked loc =
+  !marker = Some loc
+
+let pp_maybe_marked fmt pp x loc =
+  if is_marked loc then
+    fprintf fmt "(*XXX*)@ (%a)" pp x
+  else
+    pp fmt x
+
 let pp_sep f fmt () =
   fprintf fmt f
-
-let pp_loc_id fmt loc =
-  if !marker = Some loc then
-    fprintf fmt "(*XXX*)@ "
 
 let pp_opt ?(prefix:(unit, formatter, unit) format="") ?(suffix:(unit, formatter, unit) format="") pp fmt = function
   | None -> ()
@@ -57,17 +62,17 @@ let pp_closed is_closed pp fmt x =
 let expr_closed e = match e.expr_desc with
   | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Eabsurd | Escope _ | Eidapp (_, []) | Ecast _ | Einnfix _ ->
       true
-  | _ -> false
+  | _ -> is_marked e.expr_loc
 
 let term_closed t = match t.term_desc with
   | Ttrue | Tfalse | Tconst _ | Tident _ | Tupdate _ | Trecord _ | Ttuple _ | Tscope _ | Tidapp (_, []) | Tcast _ | Tinnfix _ | Tbinnop _ ->
       true
-  | _ -> false
+  | _ -> is_marked t.term_loc
 
 let pattern_closed p = match p.pat_desc with
   | Pwild | Pvar _ | Ptuple _ | Pparen _ | Pscope _ | Papp (_, []) | Pcast _ ->
       true
-  | _ -> false
+  | _ -> is_marked p.pat_loc
 
 let pty_closed t = match t with
   | PTtyvar _ | PTtuple _ | PTscope _ | PTparen _ | PTpure _ | PTtyapp (_, []) ->
@@ -341,7 +346,7 @@ let rec pp_fun pp fmt (binders, opt_pty, _pat, _mask, spec, e) =
   (* TODO _pat, _mask *)
   fprintf fmt "@[<hv 2>fun %a%a%a ->@ @[%a@]@]" pp_binders binders pp_opt_pty opt_pty pp_spec spec pp e
 
-and pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, pat, _mask, spec, x)) =
+and pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, _pat, _mask, spec, x)) =
   (* TODO _pat, _mask *)
   fprintf fmt "@[<hv 2>let%s%s %a%a%a%a =@ %a@]"
     (ghost_suffix ghost) (kind_suffix kind)
@@ -387,7 +392,9 @@ and pp_expr' fmt =
   pp_closed expr_closed pp_expr fmt
 
 and pp_expr fmt e =
-  pp_loc_id fmt e.expr_loc;
+  pp_maybe_marked fmt pp_expr'' e e.expr_loc
+
+and pp_expr'' fmt e =
   match e.expr_desc with
   | Eref ->
       pp_print_string fmt "ref"
@@ -554,6 +561,9 @@ and pp_term' fmt =
   pp_closed term_closed pp_term fmt
 
 and pp_term fmt t =
+  pp_maybe_marked fmt pp_term'' t t.term_loc
+
+and pp_term'' fmt t =
   let pp_binop fmt op =
     pp_print_string fmt
       (match op with
@@ -565,7 +575,6 @@ and pp_term fmt t =
        | Dterm.DTiff -> "<->"
        | Dterm.DTby -> "by"
        | Dterm.DTso -> "so") in
-  pp_loc_id fmt t.term_loc;
   match t.term_desc with
   | Ttrue ->
       pp_true fmt ()
@@ -680,7 +689,9 @@ and pp_pattern' fmt =
   pp_closed pattern_closed pp_pattern fmt
 
 and pp_pattern fmt p =
-  pp_loc_id fmt p.pat_loc;
+  pp_maybe_marked fmt pp_pattern'' p p.pat_loc
+
+and pp_pattern'' fmt p =
   match p.pat_desc with
   | Pwild ->
       pp_print_string fmt "_"
