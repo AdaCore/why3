@@ -13,7 +13,6 @@
 
 open Format
 open Ptree
-open Ident
 
 let pp_sep f fmt () =
   fprintf fmt f
@@ -38,7 +37,7 @@ let pp_print_opt_list ?(prefix:(unit, formatter, unit) format="") ?(sep:(unit, f
 let sanitize =
   let aux = function
     | c -> String.make 1 c in
-  sanitizer aux aux
+  Ident.sanitizer aux aux
 
 let pp_closed is_closed pp fmt x =
   if is_closed x then
@@ -70,6 +69,7 @@ let pp_id fmt id =
   pp_print_string fmt (sanitize id.id_str)
 
 let pp_id' fmt id =
+  let open Ident in
   match sn_decode id.id_str with
   | SNword s ->
     pp_print_string fmt (sanitize s)
@@ -117,7 +117,8 @@ let pp_idapp pp closed fmt qid xs =
   let pp' = pp_closed closed pp in
   match qid with
   | Qident id ->
-      (match sn_decode id.id_str, xs with
+      (let open Ident in
+       match sn_decode id.id_str, xs with
        | SNword s, _ ->
            let pp_args = pp_print_list ~pp_sep:(pp_sep "@ ") pp' in
            fprintf fmt "@[<hv 2>%s@ %a@]" s pp_args xs
@@ -151,6 +152,7 @@ let pp_apply pp closed fmt x1 x2 =
 let pp_infix pp closed fmt x1 op x2 =
   let pp' = pp_closed closed pp in
   let op =
+    let open Ident in
     match sn_decode op.id_str with
     | SNinfix s -> s
     | _ -> failwith ("pp_infix: "^op.id_str) in
@@ -159,6 +161,7 @@ let pp_infix pp closed fmt x1 op x2 =
 let pp_innfix pp closed fmt x1 op x2 =
   let pp' = pp_closed closed pp in
   let op =
+    let open Ident in
     match sn_decode op.id_str with
     | SNinfix s -> s
     | _ -> failwith ("pp_infix: "^op.id_str) in
@@ -264,7 +267,7 @@ let pp_attr pp closed fmt attr x =
   let pp' = pp_closed closed pp in
   match attr with
   | ATstr a ->
-      fprintf fmt "@[[@%s]@ %a@]" a.attr_string pp' x
+      fprintf fmt "@[[@%s]@ %a@]" a.Ident.attr_string pp' x
   | ATpos loc ->
       let filename, line, bchar, echar = Loc.get loc in
       fprintf fmt "[# %S %d %d %d]@ %a" filename line bchar echar pp' x
@@ -329,11 +332,14 @@ let rec pp_fun pp fmt (binders, opt_pty, _pat, _mask, spec, e) =
   (* TODO _pat, _mask *)
   fprintf fmt "@[<hv 2>fun %a%a%a ->@ @[%a@]@]" pp_binders binders pp_opt_pty opt_pty pp_spec spec pp e
 
-and pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, _pat, _mask, spec, x)) =
+and pp_let_fun pp fmt (id, ghost, kind, (binders, opt_pty, pat, _mask, spec, x)) =
   (* TODO _pat, _mask *)
+  match pat.pat_desc with
+  | Pwild ->
   fprintf fmt "@[<hv 2>let%s%s %a%a%a%a =@ %a@]"
     (ghost_suffix ghost) (kind_suffix kind)
     pp_id id pp_binders binders pp_opt_pty opt_pty pp_spec spec pp x
+  | _ -> todo fmt "let fun with return pattern"
 
 and pp_let_any fmt (id, ghost, kind, (params, _kind', opt_pty, _pat, _mask, spec)) =
   (* TODO kind', mask, pat *)
@@ -422,8 +428,7 @@ and pp_expr fmt e =
       fprintf fmt "@[<v>@[<v 2>begin%a@ %a@]@ end@]" pp_spec spec pp_expr e
   | Efun (binders, opt_pty, pat, mask, spec, e) ->
       pp_fun pp_expr fmt (binders, opt_pty, pat, mask, spec, e)
-  | Eany (_params, _kind, Some pty, _pat, _mask, spec) ->
-      (* TODO _params *)
+  | Eany ([], _kind, Some pty, _pat, _mask, spec) ->
       fprintf fmt "@[<hv 2>any %a%a@]" pp_pty pty pp_spec spec
   | Eany _ ->
       todo fmt "Eany _"
@@ -510,11 +515,11 @@ and pp_expr fmt e =
       fprintf fmt "@[@[<v 2>for %a = %a %s %a do@ %a%a@]@ done@]"
         pp_id id pp_expr start dir pp_expr end_ pp_invs invs pp_expr body
   (** annotations *)
-  | Eassert (Expr.Assert, {term_desc=Tattr (ATstr {attr_string="hyp_name:Assert"}, t)}) ->
+  | Eassert (Expr.Assert, {term_desc=Tattr (ATstr {Ident.attr_string="hyp_name:Assert"}, t)}) ->
       fprintf fmt "@[<hv 2>assert {@ %a }@]" pp_term t
-  | Eassert (Expr.Assume, {term_desc=Tattr (ATstr {attr_string="hyp_name:Assume"}, t)}) ->
+  | Eassert (Expr.Assume, {term_desc=Tattr (ATstr {Ident.attr_string="hyp_name:Assume"}, t)}) ->
       fprintf fmt "@[<hv 2>assume {@ %a }@]" pp_term t
-  | Eassert (Expr.Check, {term_desc=Tattr (ATstr {attr_string="hyp_name:Check"}, t)}) ->
+  | Eassert (Expr.Check, {term_desc=Tattr (ATstr {Ident.attr_string="hyp_name:Check"}, t)}) ->
       fprintf fmt "@[<hv 2>check {@ %a }@]" pp_term t
   | Eassert (kind, t) ->
       let pp_assert_kind fmt kind =
@@ -533,7 +538,10 @@ and pp_expr fmt e =
   | Eghost e ->
       fprintf fmt "ghost %a" pp_expr e
   | Eattr (attr, e) ->
-      pp_attr pp_expr (function {expr_desc=Eattr _} -> true | e -> expr_closed e) fmt attr e
+      let expr_closed = function
+        | {expr_desc=Eattr _} -> true
+        | e -> expr_closed e in
+      pp_attr pp_expr expr_closed fmt attr e
 
 and pp_term' fmt =
   pp_closed term_closed pp_term fmt
@@ -591,7 +599,10 @@ and pp_term fmt t =
   | Tquant (_, _, _::_, _) ->
       todo fmt "Tquant (_, _, _::_, _)"
   | Tattr (attr, t) ->
-      pp_attr pp_term (function {term_desc=Tattr _} -> true | t -> term_closed t) fmt attr t
+      let term_closed = function
+        | {term_desc=Tattr _} -> true
+        | t -> term_closed t in
+      pp_attr pp_term term_closed fmt attr t
   | Tlet (id, t1, t2) ->
       fprintf fmt "@[<v>%a in@ %a@]" (pp_let pp_term) (id, false, ((**)), t1) pp_term t2
   | Tcase (t, cases) ->
@@ -616,7 +627,7 @@ and pp_spec fmt s =
     fprintf fmt "@ reads { %a }" (pp_print_list ~pp_sep:(pp_sep ", ") pp_qualid) s.sp_reads;
   let remove_attr s t =
     match t.term_desc with
-    | Tattr (ATstr attr, t) when attr.attr_string = s -> t
+    | Tattr (ATstr attr, t) when attr.Ident.attr_string = s -> t
     | _ -> t in
   let pp_aux keyword t =
     fprintf fmt "@ %s { %a }" keyword pp_term t in
@@ -644,9 +655,11 @@ and pp_spec fmt s =
          pp_exn_case)
       exn_cases in
   List.iter (fun x -> fprintf fmt "@ %a" pp_xpost x) s.sp_xpost;
-  let pp_alias _ =
-    todo fmt "sp_alias" in
-  List.iter pp_alias s.sp_alias;
+  let pp_alias tts =
+    let pp fmt (t1, t2) = fprintf fmt "%a with %a" pp_term t1 pp_term t2 in
+    fprintf fmt "@ alias { %a@ }" (pp_print_list ~pp_sep:(pp_sep ",@ ") pp) tts in
+  if s.sp_alias <> [] then
+    pp_alias s.sp_alias;
   List.iter (fun v -> fprintf fmt "@ %a" pp_variant v) s.sp_variant;
   (* TODO s.sp_checkrw *)
   if s.sp_diverge then
@@ -665,8 +678,10 @@ and pp_pattern fmt p =
       pp_id fmt id
   | Papp (qid, args) ->
       pp_idapp pp_pattern pattern_closed fmt qid args
-  | Prec _ ->
-      todo fmt "Prec _"
+  | Prec fields ->
+      let pp_field fmt (qid, pat) =
+        fprintf fmt "%a = %a" pp_qualid qid pp_pattern pat in
+      fprintf fmt "{ %a }" (pp_print_list ~pp_sep:(pp_sep ";@ ") pp_field) fields
   | Ptuple ps ->
       pp_tuple pp_pattern fmt ps
   | Pas (p, id, ghost) ->
@@ -782,7 +797,7 @@ and pp_decl fmt = function
       fprintf fmt "%a" pp_exn (id, pty, mask)
   | Dmeta (ident, args) ->
       let pp_metarg fmt = function
-        | Mty _ -> todo fmt "Mty"
+        | Mty ty -> fprintf fmt "type %a" pp_pty ty
         | Mfs qid -> fprintf fmt "function %a" pp_qualid qid
         | Mps _ -> todo fmt "Mps"
         | Max _ -> todo fmt "Max"
