@@ -137,7 +137,7 @@ deploy:
     - docker
 
 doc:
-  stage: test
+  stage: build
   script:
     - make -f doc.Makefile public/index.html
   <<: *sphinx_definition
