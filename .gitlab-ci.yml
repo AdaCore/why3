@@ -6,7 +6,7 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2020-03-27"
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2020-03-30"
   SPHINX_IMAGE: "$CI_REGISTRY_IMAGE:ci-sphinx"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
@@ -102,10 +102,36 @@ ce-bench:
 opam:
   stage: build
   script:
+    - opam switch bench
+    - opam pin -n add why3 .
+    - opam pin -n add why3-ide .
+    - opam install -v why3
+    - opam install -v why3-ide
+    - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
+  <<: *docker_definition
+
+opam-latest:
+  stage: test
+  script:
+    - opam switch latest
+    - opam pin -n add why3 .
+    - opam pin -n add why3-ide .
+    - opam install -v why3
+    - opam install -v why3-ide
+    - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
+  <<: *docker_definition
+
+opam-full:
+  stage: test
+  script:
     - opam switch full
-    - opam pin -v -y add why3 .
-    - opam pin -v -y add why3-ide .
-    - opam pin -v -y add why3-coq .
+    - opam pin -n add why3 .
+    - opam pin -n add why3-ide .
+    - opam pin -n add why3-coq .
+    - opam install -v why3
+    - opam install -v why3-ide
+    - opam install -v why3-coq
+    - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
   <<: *docker_definition
 
 deploy:
@@ -119,7 +145,7 @@ deploy:
     - docker pull "$IMAGE" || true
     - docker build --force-rm --cache-from="$CACHE" --target=builder -t "$CACHE" -f misc/Dockerfile.deploy .
     - docker build --force-rm --cache-from="$CACHE" --cache-from="$IMAGE" -t "$IMAGE" -f misc/Dockerfile.deploy .
-    - docker push "$CACHE"
+    - test -z "$CI_COMMIT_TAG" || docker push "$CACHE"
     - docker push "$IMAGE"
     - docker rmi "$CACHE"
     - docker rmi "$IMAGE"
@@ -137,7 +163,7 @@ deploy:
     - docker
 
 doc:
-  stage: test
+  stage: build
   script:
     - make -f doc.Makefile public/index.html
   <<: *sphinx_definition
