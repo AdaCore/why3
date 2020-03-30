@@ -102,10 +102,36 @@ ce-bench:
 opam:
   stage: build
   script:
+    - opam switch bench
+    - opam pin -n add why3 .
+    - opam pin -n add why3-ide .
+    - opam install -v why3
+    - opam install -v why3-ide
+    - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
+  <<: *docker_definition
+
+opam-latest:
+  stage: test
+  script:
+    - opam switch latest
+    - opam pin -n add why3 .
+    - opam pin -n add why3-ide .
+    - opam install -v why3
+    - opam install -v why3-ide
+    - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
+  <<: *docker_definition
+
+opam-full:
+  stage: test
+  script:
     - opam switch full
-    - opam pin -v -y add why3 .
-    - opam pin -v -y add why3-ide .
-    - opam pin -v -y add why3-coq .
+    - opam pin -n add why3 .
+    - opam pin -n add why3-ide .
+    - opam pin -n add why3-coq .
+    - opam install -v why3
+    - opam install -v why3-ide
+    - opam install -v why3-coq
+    - opam exec -- ocamlfind ocamlopt -package why3 -o test -linkpkg misc/test_lib.ml
   <<: *docker_definition
 
 deploy:
