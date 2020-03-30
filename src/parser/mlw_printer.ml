@@ -638,7 +638,8 @@ and pp_term'' fmt t =
       fprintf fmt "old %a" pp_term' t
   | Tat (t, id) ->
       fprintf fmt "%a at %a" pp_term' t pp_id id
-  | Teps _ -> assert false (* Tool not used in spark: no eps in prog in Why3 *)
+  | Teps ((id, pty), t) ->
+      fprintf fmt "epsilon %a: %a. %a" pp_id id pp_pty pty pp_term t
 
 and pp_spec fmt s =
   if s.sp_reads <> [] then

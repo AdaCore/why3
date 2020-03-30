@@ -7,6 +7,10 @@ let debug = Debug.register_info_flag "gnat_ast" ~desc:"Output@ mlw@ file"
 
 [@@@warning "-42"]
 
+exception Conversion_error of {node_id: int; message: string}
+
+let conversion_error node_id message () = raise (Conversion_error {node_id; message})
+
 (** {1 Auxiliaries for conversion} *)
 
 module Opt = struct
@@ -18,9 +22,9 @@ module Opt = struct
     | Some x -> x
     | None -> default
 
-  let force = function
+  let force err = function
     | Some x -> x
-    | None -> failwith "Opt.force"
+    | None -> err ()
 
   let to_list = function
     | None -> []
@@ -42,13 +46,13 @@ module List = struct
     | [x] -> [for_last x]
     | x :: xs -> x :: map_last for_last xs
 
-  let rec get_last = function
+  let rec get_last err = function
     | [x] -> x
-    | _ :: xs -> get_last xs
-    | [] -> failwith "get_last"
+    | _ :: xs -> get_last err xs
+    | [] -> err ()
 
   let filter_map f l =
-    map Opt.force
+    map (Opt.force (fun () -> assert false))
       (filter ((<>) None)
          (map f l))
 end
@@ -95,9 +99,9 @@ let name_of_identifier (node: identifier_id) =
   let Identifier r = node.desc in
   r.name
 
-let force_one = function
+let force_one err = function
   | [x] -> x
-  | _ -> failwith "force_one"
+  | _ -> err ()
 
 let mk_module_qident (node: module_id) =
   let Module m = node.desc in
@@ -111,9 +115,9 @@ let mk_idents_of_name ~notation attrs (node: name_id) =
 let mk_idents_of_identifier ~notation attrs (node: identifier_id) =
   mk_idents ~notation attrs (strings_of_name (name_of_identifier node))
 
-let mk_ident_of_symbol ~notation attrs sym =
+let mk_ident_of_symbol id ~notation attrs sym =
   let notation = Opt.get (fun s -> s) notation in
-  mk_ident attrs (notation (Opt.force (string_of_symbol sym)))
+  mk_ident attrs (notation (Opt.force (conversion_error id "empty symbol") (string_of_symbol sym)))
 
 let full_name Node_id =
   failwith "full_name"
@@ -155,7 +159,7 @@ let mk_include_declaration (node : include_declaration_id) =
   | Clone_default ->
       let Module m = r.module_.desc in
       D.mk_useimport false
-        [qid, Some (mk_ident_of_symbol ~notation:None [] m.name)]
+        [qid, Some (mk_ident_of_symbol node.info.id ~notation:None [] m.name)]
 
 let mk_pty_of_type (node : type_id) =
   Ty.mk_idapp (mk_qualid (mk_idents_of_type node)) []
@@ -168,10 +172,10 @@ let term_connector = function
   | Or -> `Or
   | And -> `And
 
-let expr_connector = function
+let expr_connector id = function
   | And_then -> `And_asym
   | Or_else -> `Or_asym
-  | _ -> failwith "expr_connector: unexpected expression operator"
+  | _ -> conversion_error id "unexpected expression operator" ()
 
 let unroll_name (node : name_id) =
   let Name {module_; symb} = node.desc in
@@ -192,7 +196,7 @@ let is_op1 (node: identifier_id) =
       (* see why3/src/parser/parser.mly, lexer.mll *)
       List.exists (String.contains s)
         ['='; '<'; '>']
-  | _ -> failwith "is_op1: empty"
+  | _ -> conversion_error node.info.id "empty operator identifier" ()
 
 (** Test if node is an potentially quantified OP234 *)
 let is_op234 (node: identifier_id) =
@@ -201,7 +205,7 @@ let is_op234 (node: identifier_id) =
       (* see why3/src/parser/parser.mly, lexer.mll *)
       List.exists (String.contains s)
         ['+'; '-'; '*'; '/'; '\\'; '%'; '!'; '$'; '&'; '?'; '@'; '^'; '|']
-  | _ -> failwith "is_op234: empty"
+  | _ -> conversion_error node.info.id "empty operator identifier" ()
 
 let mk_pattern_of_prog (node : prog_id) =
   match node.desc with
@@ -284,7 +288,10 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
     mk_qualid (mk_idents_of_name ~notation:None [] (name_of_identifier r.field)),
     mk_of_expr r.value in
   let mk_binder_of_identifier attrs pty node =
-    get_pos (), Some (force_one (mk_idents_of_identifier ~notation:None attrs node)), false, Some pty in
+    let id =
+      let err = conversion_error node.info.id "qualified or empty identifier" in
+      force_one err (mk_idents_of_identifier ~notation:None attrs node) in
+    get_pos (), Some id, false, Some pty in
   let mk_identifier_labels (node : identifier_id) =
     let Identifier r = node.desc in
     List.filter_map mk_label r.labels in
@@ -292,7 +299,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
     match mk_comment_attr s with
     | None -> e
     | Some a -> E.mk_attr a e in
-  let mk_const_of_ureal (Ureal r) =
+  let mk_const_of_ureal id (Ureal r) =
     (* gnat/ureal.ads *)
     if r.base = 0 then
       let Uint numerator = r.numerator in
@@ -301,7 +308,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         mk_const
           (Number.real_literal ~radix:10 ~neg:r.negative ~int:numerator ~frac:"0" ~exp:None)
       else
-        failwith "mk_const_of_ureal: base = 0, denominator /= 1"
+        conversion_error id "ureal with base = 0 and denominator /= 1" ()
         (* (\* Which operator /. for reals? *\)
           * let Uint denominator = r.denominator in
           * mk_idapp
@@ -323,7 +330,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
           let pow2 = BigInt.mul_int 4 exp in
           mk_const (Constant.real_const ~pow2 ~pow5:BigInt.zero int)
       | _ ->
-          failwith ("mk_const_of_ureal unsupported base: "^string_of_int r.base) in
+          conversion_error id ("unsupported base "^string_of_int r.base^" for ureal") () in
 
   let curr_attrs = Curr.mk_attrs () in
 
@@ -386,7 +393,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         end in
         expr_or_term
           ~expr:(fun () ->
-              let op = expr_connector r.op in
+              let op = expr_connector node.info.id r.op in
               let e1 =
                 let left = mk_expr_of_expr r.left in
                 let right = mk_expr_of_expr r.right in
@@ -461,9 +468,11 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
     | Call r when is_infix_identifier r.name && is_op1 r.name ->
         assert (is_infix_identifier r.name);
         if List.length r.args <> 2 then
-          failwith "mk_of_expr: op1 operations must be binary";
+          conversion_error node.info.id "op1 operations must be binary" ();
         let arg0 = mk_of_expr (List.nth r.args 0) in
-        let op = List.get_last (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] r.name) in
+        let op =
+          List.get_last (conversion_error node.info.id "empty operator name")
+            (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] r.name) in
         let arg1 = mk_of_expr (List.nth r.args 1) in
         mk_innfix arg0 op arg1
 
@@ -471,28 +480,36 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
     | Call r when is_infix_identifier r.name && is_op234 r.name -> begin
         match List.length r.args with
         | 1 -> (* Unary operation *)
-            let qid = mk_qualid [List.get_last (mk_idents_of_identifier ~notation:(Some Ident.op_prefix) [] r.name)] in
+            let qid =
+              let ident =
+                List.get_last (conversion_error node.info.id "empty operator name")
+                  (mk_idents_of_identifier ~notation:(Some Ident.op_prefix) [] r.name) in
+              mk_qualid [ident] in
             let arg = mk_of_expr (List.nth r.args 0) in
             mk_idapp qid [arg]
         | 2 -> (* Binary operation *)
-            let qid = mk_qualid [List.get_last (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] r.name)] in
+            let qid =
+              let ident =
+                List.get_last (conversion_error node.info.id "empty operator name")
+                  (mk_idents_of_identifier ~notation:(Some Ident.op_infix) [] r.name) in
+              mk_qualid [ident] in
             let arg0 = mk_of_expr (List.nth r.args 0) in
             let arg1 = mk_of_expr (List.nth r.args 1) in
             mk_idapp qid [arg0; arg1]
         | _ ->
-            failwith "mk_of_expr: only unary and binary infix op234 operators"
+            conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
       end
 
     | Call r ->
         if is_infix_identifier r.name then
-          Format.ksprintf failwith "mk_to_expr: unexpected infix identifier %s"
-            (String.concat "." (strings_of_name (name_of_identifier r.name)));
+          Format.ksprintf (conversion_error node.info.id) "infix identifier %s must be op1 or op234"
+            (String.concat "." (strings_of_name (name_of_identifier r.name))) ();
         let notation =
           if is_op1 r.name || is_op234 r.name then
             match List.length r.args with
             | 1 -> Some Ident.op_prefix
             | 2 -> Some Ident.op_infix
-            | _ -> failwith "mk_of_expr: only unary and binary op234 operators"
+            | _ -> conversion_error node.info.id "operations with op234 operators must be unary or binary" ()
           else
             None in
         let f = mk_var (mk_qualid (mk_idents_of_identifier ~notation [] r.name)) in
@@ -507,7 +524,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
 
     | Binding r ->
         let id =
-          force_one
+          force_one (conversion_error r.name.info.id "qualified or empty identifier")
             (mk_idents_of_identifier ~notation:None
                (mk_identifier_labels r.name) r.name) in
         let def = mk_of_expr r.def in
@@ -515,11 +532,13 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         mk_let id def body
 
     | Elsif _ ->
-        failwith "mk_of_expr: unexpected elsif"
+        conversion_error node.info.id "unexpected elsif" ()
 
     | Epsilon r ->
         term_only
-          (let id = force_one (mk_idents_of_identifier ~notation:None [] r.name) in
+          (let id =
+             force_one (conversion_error r.name.info.id "qualified or empty idenfitier")
+               (mk_idents_of_identifier ~notation:None [] r.name) in
            let pty = mk_pty_of_type r.typ in
            let body = mk_term_of_pred r.pred in
            T.mk_eps id pty body)
@@ -538,7 +557,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
               let elsif_parts' = mk_elsifs elsifs in
               mk_if condition' then_part' elsif_parts'
           | _ ->
-              failwith "mk_of_expr: unexpected elsif"
+              conversion_error node.info.id "unexpected elsif" ()
         in
         let condition = mk_of_expr r.condition in
         let then_part = mk_of_expr r.then_part in
@@ -565,7 +584,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
           | Some (Some "_gnatprove_standard", Some (("BV8"|"BV16"|"BV32"|"BV64"|"BV128" as s))), Some "t" ->
               Ty.mk_atomic_type [s; "t"]
           | _ ->
-              failwith "mk_of_expr: unknown module constant" in
+              conversion_error node.info.id "unknown module constant" () in
         mk_cast const pty
 
     | Fixed_constant r ->
@@ -574,7 +593,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         mk_cast const pty
 
     | Real_constant r ->
-        mk_const_of_ureal r.value
+        mk_const_of_ureal node.info.id r.value
 
     | Float_constant r ->
         let prefix =
@@ -583,7 +602,7 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
           | Some (Some "_gnatprove_standard", Some ("Float32"|"Float64" as s)), Some "t" ->
               mk_ident [] s
           | _ ->
-              failwith "mk_of_expr: float_constant is neither Float32.t nor Float64.t"
+              conversion_error node.info.id "float_constant must be Float32.t or Float64.t" ()
         in
         let const =
           let Ureal r' = r.value in
@@ -591,10 +610,10 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
             (* negate the casted negation [neg (-r : t)]] *)
             mk_apply (mk_var (mk_qualid [prefix; mk_ident [] "neg"]))
               (mk_cast
-                 (mk_const_of_ureal (Ureal {r' with negative=false}))
+                 (mk_const_of_ureal node.info.id (Ureal {r' with negative=false}))
                  (Ty.mk_idapp (mk_qualid [prefix; mk_ident [] "t"]) []))
           else
-            mk_const_of_ureal r.value in
+            mk_const_of_ureal node.info.id r.value in
         let pty = Ty.mk_idapp (mk_qualid [prefix; mk_ident [] "t"]) [] in
         mk_cast const pty
 
@@ -664,10 +683,14 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
     | Binding_ref r ->
         expr_only
           (let open E in
-           let id = force_one (mk_idents_of_identifier ~notation:None (mk_identifier_labels r.name) r.name) in
+           let id =
+             force_one (conversion_error r.name.info.id "quantified or empty name")
+               (mk_idents_of_identifier ~notation:None (mk_identifier_labels r.name) r.name) in
            let ref =
              let field =
-               let typ = Opt.force (let Identifier r = r.name.desc in r.typ) in
+               let typ =
+                 Opt.force (conversion_error r.name.info.id "missing type")
+                   (let Identifier r = r.name.desc in r.typ) in
                mk_qualid
                  (List.map_last (ident_add_suffix "__content")
                     (mk_idents_of_type typ)) in
@@ -784,6 +807,7 @@ let mk_function_decl (node: function_decl_id) =
   let Function_decl r = node.desc in
   let ident =
     force_one
+      (conversion_error r.name.info.id "quantified or empty function name")
       (mk_idents_of_identifier ~notation:None
          (Opt.(to_list (map mk_pos (mk_location r.location))) @
           List.filter_map mk_label r.labels)
@@ -794,7 +818,7 @@ let mk_function_decl (node: function_decl_id) =
     let aux (node: binder_id) : param =
       let Binder r = node.desc in
       get_pos (),
-      Opt.(map force_one
+      Opt.(map (force_one (conversion_error node.info.id "qualified or empty parameter name"))
              (map (mk_idents_of_identifier ~notation:None [])
                 r.name)),
       false,
@@ -901,10 +925,10 @@ let mk_function_decl (node: function_decl_id) =
             let any = E.mk_any params Expr.RKnone None (P.mk_wild ()) Ity.MaskVisible (mk_spec ()) in
             [D.mk_let ident false Expr.RKpred any]
         | Some def ->
-            let mk_arg_of_param (_, id_opt, _, pty) =
+            let mk_arg_of_param node (_, id_opt, _, pty) =
               match id_opt with
               | Some id -> T.(mk_cast (mk_var (Qident id)) pty)
-              | None -> failwith "mk_arg_of_param" in
+              | None -> conversion_error node.info.id "missing parameter name" () in
             let predicate_def =
               (* predicate <id> <params> = <def> *)
               let def =
@@ -923,7 +947,7 @@ let mk_function_decl (node: function_decl_id) =
                       T.(let left = mk_term (Tident (Qident result_ident)) in
                          let right =
                            let p = mk_var (Qident ident) in
-                           let args = List.map mk_arg_of_param params in
+                           let args = List.map2 mk_arg_of_param r.binders params in
                            List.fold_left (mk_apply ?loc:None) p args in
                          mk_binop left `Iff right)
                   ] in
@@ -935,16 +959,24 @@ let mk_function_decl (node: function_decl_id) =
 
 let mk_record_binder (node : record_binder_id) =
   let Record_binder r = node.desc in
-  let idents = mk_idents_of_identifier ~notation:None (List.filter_map mk_label r.labels) (Opt.force r.name) in
+  let ident =
+    let name = Opt.force (conversion_error node.info.id "missing name") r.name in
+    let idents = mk_idents_of_identifier ~notation:None (List.filter_map mk_label r.labels) name in
+    force_one (conversion_error node.info.id "quantified or empty name") idents in
   let pty = mk_pty_of_type r.arg_type in
-  {f_ident = force_one idents; f_pty = pty; f_mutable = r.is_mutable;
+  {f_ident = ident; f_pty = pty; f_mutable = r.is_mutable;
    f_ghost = false; f_loc = get_pos ()}
 
 let rec mk_declaration (node : declaration_id) =
   match node.desc with
   | Type_decl r ->
-      let ident = force_one (mk_idents_of_name ~notation:None (List.filter_map mk_label r.labels) r.name) in
-      let args = List.(map force_one (map (mk_idents_of_identifier ~notation:None []) r.args)) in
+      let ident =
+        force_one (conversion_error node.info.id "quantified or empty name")
+          (mk_idents_of_name ~notation:None (List.filter_map mk_label r.labels) r.name) in
+      let args =
+        let aux node ids =
+          force_one (conversion_error node.info.id "quantified or empty argument name") ids in
+        List.(map2 aux r.args (map (mk_idents_of_identifier ~notation:None []) r.args)) in
       let def, vis =
         match r.definition with
         | None ->
@@ -961,7 +993,7 @@ let rec mk_declaration (node : declaration_id) =
               | Range_type_definition r ->
                   TDrange (bigint_of_uint r.first, bigint_of_uint r.last)
               | Record_binder _ -> (* This should not be here *)
-                  failwith "declaration: Record_binder" in
+                  conversion_error definition.info.id "record binder in type definition" () in
             def, Ptree.Public in
       [D.mk_type [{
            td_ident = ident; td_params = args; td_def = def; td_mut = false;
@@ -975,7 +1007,8 @@ let rec mk_declaration (node : declaration_id) =
         let labels =
           Opt.(to_list (map mk_pos (mk_location r.location))) @
           List.filter_map mk_label r.labels in
-        force_one (mk_idents_of_identifier ~notation:None labels r.name) in
+        force_one (conversion_error r.name.info.id "quantified or empty name of global reference")
+          (mk_idents_of_identifier ~notation:None labels r.name) in
       let pty =
         let qid = mk_qualid (List.map_last (ident_add_suffix "__ref")
                                (mk_idents_of_type r.ref_type)) in
@@ -986,13 +1019,18 @@ let rec mk_declaration (node : declaration_id) =
         E.mk_any [] Expr.RKnone (Some pty) pat Ity.MaskVisible spec in
       [D.mk_let ident false Expr.RKnone value]
   | Meta_declaration r ->
-      let name = Opt.force (string_of_symbol r.name) in
-      let parameter = Opt.force (string_of_symbol r.parameter) in
+      let name =
+        Opt.force (conversion_error node.info.id "empty name symbol in meta declaration")
+          (string_of_symbol r.name) in
+      let parameter =
+        Opt.force (conversion_error node.info.id "empty parameter symbol in meta declaration")
+           (string_of_symbol r.parameter) in
       let id = mk_ident [] name in
       let metarg =
         match String.split_on_char ' ' parameter with
         | "function" :: strs -> Mfs (Qident (mk_ident [] (String.concat " " strs)))
-        | _ -> failwith ("mk_declaration: meta declaration: "^parameter) in
+        | _ -> conversion_error node.info.id
+            ("meta declaration "^parameter^" not yet support (please report)") () in
       [D.mk_meta id [metarg]]
   | Clone_declaration r -> begin
       let mk_clone_substitution (node : clone_substitution_id) =
@@ -1029,7 +1067,7 @@ let rec mk_declaration (node : declaration_id) =
           let qid = mk_module_qident r.origin in
           let as_name =
             if r.as_name <> No_symbol
-            then Some (mk_ident_of_symbol ~notation:None [] r.as_name)
+            then Some (mk_ident_of_symbol node.info.id ~notation:None [] r.as_name)
             else None in
           let substs =
             CSprop Decl.Paxiom (* axiom . *) ::
@@ -1039,19 +1077,21 @@ let rec mk_declaration (node : declaration_id) =
   | Include_declaration _ as desc ->
       [mk_include_declaration {node with desc}]
   | Axiom r ->
-      let id = mk_ident_of_symbol ~notation:None [mk_str "useraxiom"] r.name in
+      let id = mk_ident_of_symbol node.info.id ~notation:None [mk_str "useraxiom"] r.name in
       let body = mk_term_of_pred r.def in
       [D.mk_prop Decl.Paxiom id body]
   | Goal r ->
-      let id = mk_ident_of_symbol ~notation:None [] r.name in
+      let id = mk_ident_of_symbol node.info.id ~notation:None [] r.name in
       let body = mk_term_of_pred r.def in
       [D.mk_prop Decl.Pgoal id body]
   | Namespace_declaration r ->
-      let id = mk_ident_of_symbol ~notation:None [] r.name in
+      let id = mk_ident_of_symbol node.info.id ~notation:None [] r.name in
       let decls = List.concat (List.map mk_declaration r.declarations) in
       [D.mk_scope false id decls]
   | Exception_declaration r ->
-      let id = force_one (mk_idents_of_name ~notation:None [] r.name) in
+      let id =
+        force_one (conversion_error node.info.id "quantified or empty name in exception declaration")
+          (mk_idents_of_name ~notation:None [] r.name) in
       let pty = Opt.(get (Ty.mk_tuple []) (map mk_pty_of_type r.arg)) in
       [D.mk_exn id pty Ity.MaskVisible]
 
@@ -1105,7 +1145,7 @@ let mk_generic_theory (node : generic_theory_id) =
       (* Ignore [r.kind], because theory and module is the same *)
       let name =
         let curr_attrs = Opt.to_list (mk_comment_attr r.comment) in
-        mk_ident_of_symbol ~notation:None curr_attrs r.name in
+        mk_ident_of_symbol node.info.id ~notation:None curr_attrs r.name in
       let includes = List.map mk_include_declaration r.includes in
       let declarations = List.concat (List.map mk_declaration r.declarations) in
       [name, includes @ declarations]
@@ -1146,11 +1186,12 @@ let find_path needle node =
 
 (** {1 Registration of Gnat/JSON parser} *)
 
-exception E of string * int list
+exception Unexpected_json of string * int list
 
-(* The locations in the generated ptree are unique but useless. In case of a typing error
-   in the generated ptree, we instruct the mlw-printer to mark the corresponding node by
-   [(*XXX*)], using [Mlw_printer.set_marker]. The exception [Located_by_marker (file, e)]
+(* The locations in the generated ptree are unique but useless because they do not
+   correspond to any concrete syntax. In case of a typing error in the generated
+   ptree, we instruct the mlw-printer to mark the corresponding node by [(*XXX*)],
+   using [Mlw_printer.set_marker]. The exception [Located_by_marker (file, e)]
    is then reported to the user with a hint to the marker in the given file. *)
 
 exception Located_by_marker of string * exn
@@ -1158,10 +1199,10 @@ exception Located_by_marker of string * exn
 let read_channel env path filename c =
   let json = Yojson.Safe.from_channel c in
   let gnat_file =
-    let open Gnat_ast.From_json in
-    try file_from_json json
-    with Unexpected_Json (s, node) ->
-      raise (E (s, find_path node json)) in
+    let open Gnat_ast in
+    try From_json.file_from_json json
+    with From_json.Unexpected_Json (s, node) ->
+      raise (Unexpected_json (s, find_path node json)) in
   let mlw_file = mlw_file gnat_file.theory_declarations in
   (* Defer printing of mlw file until after the typing, to set the marker of located
      exceptions *)
@@ -1198,10 +1239,22 @@ let () =
 let () =
   Exn_printer.register
     (fun fmt exn -> match exn with
-       | E (s, path) ->
+       | Unexpected_json (s, path) ->
+           (* Errors in the conversion from JSON to Gnat_ast are reported with their path,
+              because the id is not guaranteed to be available. *)
            Format.fprintf fmt "Unexpected Json for %s at path %a@."
              s pp_path path
+       | Conversion_error r ->
+           (* Errors in the conversion from Gnat_ast to Why3 Ptree are reported with their
+              id. *)
+           Format.fprintf fmt "Conversion error for node with ID %d: %s" r.node_id r.message
        | Located_by_marker (filename, e) ->
-           Format.fprintf fmt "File %s, marked by (*XXX*)(...):@.%a"
-             filename Exn_printer.exn_printer e;
+           (* Located errors (from typing) are reported with an hint on the marker, which
+              is inserted into the mlw file by the mlw-printer, if debugging for gnat_ast
+              is enabled. *)
+           if Debug.test_flag debug then
+             Format.fprintf fmt "File %s, marked by (*XXX*)(...):@." filename
+           else (* [filename] not generated *)
+             Format.fprintf fmt "Error in converted why3 AST (enable debug flag \"gnat_ast\" for details):@.";
+           Exn_printer.exn_printer fmt e
        | _ -> raise exn)
