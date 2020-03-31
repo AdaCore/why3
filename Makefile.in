@@ -1828,7 +1828,7 @@ test-api-%.byte: examples/use_api/%.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
 	$(HIDE)mkdir -p examples/use_api/results
 	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./$@ | sed -e 's/^Versions of Alt-Ergo.*$/Versions of Alt-Ergo/' > examples/use_api/results/$@.stdout ) \
+	&& ./$@ | sed -e 's/^\(Versions of Alt-Ergo found: \).*$/\1<hidden>/' > examples/use_api/results/$@.stdout ) \
 	|| (rm -f $@; printf "Test of Why3 API calls failed for $@. Please fix it.\n"; exit 2)
 	$(HIDE)diff examples/use_api/results/$@.stdout examples/use_api/oracles/$@.stdout \
 	|| (printf "Oracle failed for API test $@. Please fix it.\n"; exit 2)
@@ -1839,9 +1839,11 @@ test-api-%.opt: examples/use_api/%.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
 	$(HIDE)mkdir -p examples/use_api/results
 	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
-	&& ./$@ > examples/use_api/results/$@.stdout ) \
+		&& (./$@ | sed -e 's/^\(Versions of Alt-Ergo found: \).*$$/\1<hidden>/' \
+			-e 's/0\.0[0-9]/0.0x/' \
+			> examples/use_api/results/$@.stdout) ) \
 	|| (rm -f $@; printf "Test of Why3 API calls failed for $@. Please fix it.\n"; exit 2)
-	$(HIDE)diff examples/use_api/results/$@.stdout examples/use_api/oracles/$@.stdout \
+	$(HIDE)diff examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout \
 	|| (printf "Oracle failed for API test $@. Please fix it.\n"; exit 2)
 	$(HIDE)rm -f $@
 	$(HIDE)rm -f why3session.xml why3shapes why3shapes.gz
