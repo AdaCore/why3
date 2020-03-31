@@ -1828,7 +1828,7 @@ test-api-%.byte: examples/use_api/%.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
 	$(HIDE)mkdir -p examples/use_api/results
 	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./$@ > examples/use_api/results/$@.stdout ) \
+	&& ./$@ | sed -e 's/^Versions of Alt-Ergo.*$/Versions of Alt-Ergo/' > examples/use_api/results/$@.stdout ) \
 	|| (rm -f $@; printf "Test of Why3 API calls failed for $@. Please fix it.\n"; exit 2)
 	$(HIDE)diff examples/use_api/results/$@.stdout examples/use_api/oracles/$@.stdout \
 	|| (printf "Oracle failed for API test $@. Please fix it.\n"; exit 2)
