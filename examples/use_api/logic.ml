@@ -95,20 +95,26 @@ let alt_ergo : Whyconf.config_prover =
   (** all provers that have the name "Alt-Ergo" *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    eprintf "Prover Alt-Ergo not installed or not configured@.";
-    exit 1
-  end else
-    snd (Whyconf.Mprover.max_binding provers)
+      eprintf "Prover Alt-Ergo not installed or not configured@.";
+      exit 1
+    end else begin
+      printf "Versions of Alt-Ergo found:";
+      Whyconf.(Mprover.iter (fun k _ -> printf " %s" k.prover_version) provers);
+      printf "@.";
+      (* returning an arbitrary one *)
+      snd (Whyconf.Mprover.max_binding provers)
+    end
 (* END{getanyaltergo} *)
 
 (* BEGIN{getaltergo200} *)
-(* Specific version 2.0.0 of Alt-Ergo in the config file *)
-let alt_ergo_2_0_0 : Whyconf.config_prover =
-  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.0.0" in
+(* Specific version 2.3.0 of Alt-Ergo in the config file *)
+let _ : Whyconf.config_prover =
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.3.0" in
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    eprintf "Prover Alt-Ergo 2.0.0 not installed or not configured@.";
-    exit 1
+      eprintf "Prover Alt-Ergo 2.3.0 not installed or not configured, using version %s instead@."
+        Whyconf.(alt_ergo.prover.prover_version) ;
+    alt_ergo (* we don't want to fail this time *)
   end else
     snd (Whyconf.Mprover.max_binding provers)
 (* END{getaltergo200} *)
@@ -324,6 +330,6 @@ let () =
 
 (*
 Local Variables:
-compile-command: "ocaml -I ../../lib/why3 unix.cma nums.cma str.cma dynlink.cma ../../lib/why3/why3.cma use_api.ml"
+compile-command: "make -C ../.. test-api-logic.byte"
 End:
 *)
