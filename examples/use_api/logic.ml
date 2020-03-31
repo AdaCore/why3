@@ -79,21 +79,19 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 
 (* BEGIN{getconf} *)
 (* reads the config file *)
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
-let () = eprintf "%d provers@." (Whyconf.Mprover.cardinal provers)
-let () = Whyconf.(Mprover.iter (fun _ p -> eprintf "%a@." print_prover p.prover) provers)
 (* END{getconf} *)
 
 (* BEGIN{getanyaltergo} *)
 (* One prover named Alt-Ergo in the config file *)
 let alt_ergo : Whyconf.config_prover =
   let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
-  eprintf "fp = [%a]@." Whyconf.print_filter_prover fp;
   (** all provers that have the name "Alt-Ergo" *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin

@@ -76,7 +76,8 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 (* To call a prover, we need to access the Why configuration *)
 
 (* reads the config file *)
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
@@ -91,7 +92,7 @@ let cvc4 : Whyconf.config_prover =
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Cvc4 not installed or not configured@.";
-    exit 0
+    exit 1
   end else
     (* Most recent version found *)
     snd (Whyconf.Mprover.max_binding provers)
@@ -119,7 +120,7 @@ let result1 : Call_provers.prover_result =
 (* BEGIN{ce_callprover} *)
 (* prints Cvc4 answer *)
 let () = printf "@[On task 1, Cvc4 answers %a@."
-  Call_provers.print_prover_result result1
+  (Call_provers.print_prover_result ~json_model:false) result1
 
 let () = printf "Model is %a@."
     (Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None)

@@ -1815,14 +1815,15 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 # if test -d examples/runstrat ; then \
 #  $(MAKE) test-runstrat.@OCAMLBEST@ ; fi
 
+APITESTS=logic transform clone mlw_tree mlw_expr create_session counterexample
+
 bench-api:
 	@echo ""
 	@echo "=== Checking Why3 API ==="
-	$(MAKE) test-api-logic.@OCAMLBEST@
-	$(MAKE) test-api-transform.@OCAMLBEST@
-	$(MAKE) test-api-mlw-tree.@OCAMLBEST@
-	$(MAKE) test-api-mlw-expr.@OCAMLBEST@
-	$(MAKE) test-session.@OCAMLBEST@
+	$(HIDE)for i in $(APITESTS); do \
+# we need `break` otherwise the for loop will continue ignoring failure of submake \
+		$(MAKE) test-api-$$i.@OCAMLBEST@ || break; \
+	done
 
 ###############
 # test targets
@@ -1832,110 +1833,31 @@ test-itp.opt: src/printer/itp.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	$(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa $<
 
-test-api-logic.byte: examples/use_api/logic.ml lib/why3/why3.cma
+test-api-%.byte: examples/use_api/%.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
+	$(HIDE)mkdir -p examples/use_api/results
 	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./test-api-logic.byte > /dev/null) \
-	|| (rm -f test-api-logic.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-logic.byte;
+	&& ./$@ > examples/use_api/results/$@.stdout ) \
+	|| (rm -f $@; printf "Test of Why3 API calls failed for $@. Please fix it.\n"; exit 2)
+	$(HIDE)diff examples/use_api/results/$@.stdout examples/use_api/oracles/$@.stdout \
+	|| (printf "Oracle failed for API test $@. Please fix it.\n"; exit 2)
+	$(HIDE)rm -f $@
+	$(HIDE)rm -f why3session.xml why3shapes why3shapes.gz
 
-test-api-logic.opt: examples/use_api/logic.ml lib/why3/why3.cmxa
+test-api-%.opt: examples/use_api/%.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)mkdir -p examples/use_api/results
 	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
-	&& ./test-api-logic.opt > /dev/null) \
-	|| (rm -f test-api-logic.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-logic.opt
-
-test-api-transform.byte: examples/use_api/transform.ml lib/why3/why3.cma
-	$(SHOW) 'Ocaml    $<'
-	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./test-api-transform.byte > /dev/null) \
-	|| (rm -f test-api-transform.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-transform.byte;
-
-test-api-transform.opt: examples/use_api/transform.ml lib/why3/why3.cmxa
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
-	&& ./test-api-transform.opt > /dev/null) \
-	|| (rm -f test-api-transform.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-transform.opt
-
-test-api-clone.opt: examples/use_api/clone.ml lib/why3/why3.cmxa
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
-	&& ./test-api-clone.opt > /dev/null) \
-	|| (rm -f test-api-clone.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-clone.opt
-
-test-api-clone.byte: examples/use_api/clone.ml lib/why3/why3.cma
-	$(SHOW) 'Ocamlc $<'
-	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./test-api-clone.byte > /dev/null) \
-	|| (rm -f test-api-clone.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-clone.byte
-
-test-api-mlw-tree.byte: examples/use_api/mlw_tree.ml lib/why3/why3.cma
-	$(SHOW) 'Ocaml    $<'
-	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./test-api-mlw-tree.byte) > /dev/null\
-	|| (rm -f test-api-mlw-tree.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-mlw-tree.byte;
-
-test-api-mlw-tree.opt: examples/use_api/mlw_tree.ml lib/why3/why3.cmxa
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
-	&& ./test-api-mlw-tree.opt > /dev/null) \
-	|| (rm -f test-api-mlw-tree.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-mlw-tree.opt
-
-test-api-mlw-expr.byte: examples/use_api/mlw_expr.ml lib/why3/why3.cma
-	$(SHOW) 'Ocaml    $<'
-	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./test-api-mlw-expr.byte > /dev/null) \
-	|| (rm -f test-api-mlw-expr.byte; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-mlw-expr.byte;
-
-test-api-mlw-expr.opt: examples/use_api/mlw_expr.ml lib/why3/why3.cmxa
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
-	&& ./test-api-mlw-expr.opt > /dev/null) \
-	|| (rm -f test-api-mlw-expr.opt; printf "Test of Why3 API calls failed. Please fix it"; exit 2)
-	@rm -f test-api-mlw-expr.opt
+	&& ./$@ > examples/use_api/results/$@.stdout ) \
+	|| (rm -f $@; printf "Test of Why3 API calls failed for $@. Please fix it.\n"; exit 2)
+	$(HIDE)diff examples/use_api/results/$@.stdout examples/use_api/oracles/$@.stdout \
+	|| (printf "Oracle failed for API test $@. Please fix it.\n"; exit 2)
+	$(HIDE)rm -f $@
+	$(HIDE)rm -f why3session.xml why3shapes why3shapes.gz
 
 #test-shape: lib/why3/why3.cma
 #	ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) $? examples/test_shape.ml
 
-test-session.byte: examples/use_api/create_session.ml lib/why3/why3.cma
-	$(SHOW) 'Ocaml    $<'
-	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./test-session.byte > /dev/null) \
-	|| (rm -f why3session.xml why3shapes why3shapes.gz;  \
-	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
-	@rm -f why3session.xml why3shapes why3shapes.gz
-
-test-session.opt: examples/use_api/create_session.ml lib/why3/why3.cmxa
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa  $< \
-	&& ./test-session.opt > /dev/null) \
-	|| (rm -f test-session.opt why3session.xml why3shapes why3shapes.gz; \
-	printf "Test of Why3 API calls for Session module failed. Please fix it"; exit 2)
-	@rm -f test-session.opt why3session.xml why3shapes why3shapes.gz
-
-test-ce.byte: examples/use_api/counterexample.ml lib/why3/why3.cma
-	$(SHOW) 'Ocaml    $<'
-	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(INCLUDES) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./test-ce.byte > /dev/null) \
-	|| (rm -f why3session.xml why3shapes why3shapes.gz;  \
-	printf "Test of Why3 API calls for counterexamples failed. Please fix it"; exit 2)
-	@rm -f why3session.xml why3shapes why3shapes.gz
-
-test-ce.opt: examples/use_api/counterexample.ml lib/why3/why3.cmxa
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa  $< \
-	&& ./test-ce.opt > /dev/null) \
-	|| (rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz; \
-	printf "Test of Why3 API calls for counterexamples failed. Please fix it"; exit 2)
-	@rm -f test-ce.opt why3session.xml why3shapes why3shapes.gz
 
 #only test the compilation of runstrat
 test-runstrat.byte: lib/why3/why3.cma lib/why3/META

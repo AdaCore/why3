@@ -18,7 +18,8 @@ API calls
 
 (* BEGIN{buildenv} *)
 open Why3
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 let main : Whyconf.main = Whyconf.get_main config
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 (* END{buildenv} *)
