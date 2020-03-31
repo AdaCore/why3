@@ -187,16 +187,17 @@ let usage_str = sprintf
    Open a graphical interface for Why3.\n"
   (Filename.basename Sys.argv.(0))
 
-let env, gconfig = try
-  let config, base_config, env =
-    Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
+let env, gconfig =
+  try
+    let config, base_config, env =
+      Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
+    in
     if Queue.is_empty files then
       Whyconf.Args.exit_with_usage spec usage_str;
     Gconfig.load_config config base_config;
     env, Gconfig.config ()
-
   with e when not (Debug.test_flag Debug.stack_trace) ->
-    eprintf "%a@." Exn_printer.exn_printer e;
+    eprintf "Anomaly while loading configuration: %a@." Exn_printer.exn_printer e;
     exit 1
 
 
