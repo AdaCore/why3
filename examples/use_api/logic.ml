@@ -79,7 +79,8 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 
 (* BEGIN{getconf} *)
 (* reads the config file *)
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
@@ -95,7 +96,7 @@ let alt_ergo : Whyconf.config_prover =
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Alt-Ergo not installed or not configured@.";
-    exit 0
+    exit 1
   end else
     snd (Whyconf.Mprover.max_binding provers)
 (* END{getanyaltergo} *)
@@ -107,7 +108,7 @@ let alt_ergo_2_0_0 : Whyconf.config_prover =
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
     eprintf "Prover Alt-Ergo 2.0.0 not installed or not configured@.";
-    exit 0
+    exit 1
   end else
     snd (Whyconf.Mprover.max_binding provers)
 (* END{getaltergo200} *)

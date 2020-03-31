@@ -30,7 +30,8 @@ let file_name =
     end
   else Sys.argv.(1)
 
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 
 let main : Whyconf.main = Whyconf.get_main config
 

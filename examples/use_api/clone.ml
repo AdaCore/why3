@@ -20,7 +20,8 @@ In particular, it tests the clone feature
 open Why3
 
 let () = Debug.set_flag Debug.stack_trace
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 let main : Whyconf.main = Whyconf.get_main config
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 open Ptree
@@ -43,9 +44,7 @@ let mk_qid l =
 let use_import (f, m) =
   let m = mk_ident m in
   let loc = Loc.dummy_position in
-  Typing.open_scope loc m;
-  Typing.add_decl loc (Ptree.Duse (Qdot (Qident (mk_ident f), m)));
-  Typing.close_scope loc ~import:true
+  Typing.add_decl loc (Ptree.Duseimport (loc,true, [Qdot (Qident (mk_ident f), m), None]))
 
 let use_int_Int = use_import ("int","Int")
 
@@ -61,17 +60,12 @@ let mk_var id = mk_term (Tident (Qident id))
 let param0 = [Loc.dummy_position, None, false, Some (PTtuple [])]
 let param1 id ty = [Loc.dummy_position, Some id, false, Some ty]
 
-let mk_tconst s =
-  mk_term
-    (Tconst
-       Number.(ConstInt { ic_negative = false ;
-                          ic_abs = int_literal_dec s }))
+let mk_const i =
+  Constant.(ConstInt Number.{ il_kind = ILitDec; il_int = BigInt.of_int i })
 
-let mk_econst s =
-  mk_expr
-    (Econst
-       Number.(ConstInt { ic_negative = false ;
-                          ic_abs = int_literal_dec s }))
+let mk_tconst i = mk_term (Tconst (mk_const i))
+
+let mk_econst i = mk_expr (Econst (mk_const i))
 
 let mk_tapp f l = mk_term (Tidapp(f,l))
 
@@ -79,7 +73,7 @@ let mk_eapp f l = mk_expr (Eidapp(f,l))
 
 let mk_evar x = mk_expr(Eident(Qident x))
 
-let eq_symb = mk_qid [Ident.infix "="]
+let eq_symb = mk_qid [Ident.op_infix "="]
 let int_type_id = mk_qid ["int"]
 let int_type = PTtyapp(int_type_id,[])
 
@@ -106,7 +100,7 @@ let type_a : Ptree.decl =
      true
 *)
 let d2 : Ptree.decl =
-  let id_b = mk_ident "b" in
+  let id_b = mk_ident "_b" in
   let pre = mk_term Ttrue in
   let result = mk_ident "result" in
   let post = mk_tapp eq_symb [mk_var result; mk_term Tfalse] in
@@ -125,7 +119,8 @@ let d2 : Ptree.decl =
   in
   let body: expr = mk_expr Etrue in
   let f1 =
-    Efun(param1 id_b (PTtyvar a), None, Ity.MaskVisible, spec, body)
+    Efun(param1 id_b (PTtyvar a), None,  mk_pat Pwild,
+         Ity.MaskVisible, spec, body)
   in
   Dlet(mk_ident "f2",false,Expr.RKnone, mk_expr f1)
 
@@ -138,9 +133,9 @@ let d3 : Ptree.decl =
   let id_b = mk_ident "b" in
   let pre = mk_term Ttrue in
   let a_int = mk_qid ["a'int"] in
-  let result = mk_ident "result" in
+  let result = mk_ident "_result" in
   let post = mk_tapp eq_symb [mk_tapp a_int [mk_var id_b];
-                              mk_tconst "42"] in
+                              mk_tconst 42] in
   let spec = {
     sp_pre = [pre];
     sp_post = [Loc.dummy_position,[pat_var result,post]];
@@ -156,7 +151,8 @@ let d3 : Ptree.decl =
   in
   let body: expr = mk_evar id_b in
   let f1 =
-    Efun(param1 id_b (PTtyapp (Qident a, [])), None, Ity.MaskVisible, spec, body)
+    Efun(param1 id_b (PTtyapp (Qident a, [])), None,  mk_pat Pwild,
+         Ity.MaskVisible, spec, body)
   in
   Dlet(mk_ident "f3",false,Expr.RKnone, mk_expr f1)
 
@@ -172,7 +168,7 @@ let d1 : Ptree.decl =
   let id_b = mk_ident "b" in
   let a_int = mk_qid ["a'int"] in
   let pre = mk_tapp eq_symb [mk_tapp a_int [mk_var id_b];
-                             mk_tconst "42"] in
+                             mk_tconst 42] in
   let result = mk_ident "result" in
   let post = mk_tapp eq_symb [mk_tapp a_int [mk_var result];
                               mk_tapp a_int [mk_var id_b]] in
@@ -189,9 +185,10 @@ let d1 : Ptree.decl =
     sp_partial = false;
   }
   in
-  let body: expr = mk_expr (Ecast (mk_econst "42", PTtyapp (Qident a, []))) in
+  let body: expr = mk_expr (Ecast (mk_econst 42, PTtyapp (Qident a, []))) in
   let f1 =
-    Efun(param1 id_b (PTtyapp (Qident a, [])), None, Ity.MaskVisible, spec, body)
+    Efun(param1 id_b (PTtyapp (Qident a, [])), None,  mk_pat Pwild,
+         Ity.MaskVisible, spec, body)
   in
   Dlet(mk_ident "f1",false,Expr.RKnone, mk_expr f1)
 
@@ -213,7 +210,7 @@ module Test1
 end
 *)
 let clone_decl : Ptree.decl =
-  Dclone (Qident (mk_ident "Test"), [])
+  Dcloneimport (Loc.dummy_position, false, Qident (mk_ident "Test"), Some (mk_ident "T"),[])
 
 let () = Typing.add_decl Loc.dummy_position clone_decl
 

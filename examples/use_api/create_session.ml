@@ -27,7 +27,8 @@ open Why3
 (* access to the Why configuration *)
 
 (* reads the config file *)
-let config : Whyconf.config = Whyconf.read_config None
+let config : Whyconf.config =
+  Whyconf.(load_default_config_if_needed (read_config None))
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
@@ -74,7 +75,7 @@ let file : Session_itp.file =
 
 (* explore the theories in that file *)
 let theories = Session_itp.file_theories file
-let () = eprintf "%d theories found@." (List.length theories)
+let () = printf "%d theories found in session@." (List.length theories)
 
 (* save the session on disk. *)
 let () = Session_itp.save_session session
