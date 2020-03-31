@@ -623,7 +623,7 @@ module Make(S:sig
               f_uf (List.combine subv_a subv_b)
           | Tif (a, b, c) ->
             let fa = aux a in
-            let fa_not = aux (t_push_negation a) in
+            let fa_not = aux (t_push_negation (t_not a)) in
             let fb = aux b in
             let fc = aux c in
             (fun d ->
