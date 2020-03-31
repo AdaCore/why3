@@ -120,6 +120,14 @@ let print_version_info () =
   Format.printf "Why3 for gnatprove version %s@." Config.version;
   exit 0
 
+let output_list_transforms () =
+  let print_trans_desc fmt (x,r) =
+    Format.fprintf fmt "@[<hov 2>%s@\n@[<hov>%a@]@]" x Pp.formatted r in
+  let transforms = Server_utils.list_transforms () in
+  Format.printf "@[<hov 2>Known transformations with arguments:@\n%a@]@\n@."
+    (Pp.print_list Pp.newline2 print_trans_desc) transforms;
+  exit 0
+
 let show_config () =
   Format.printf "enable_ide: %s@." Config.enable_ide;
   Format.printf "enable_zarith: %s@." Config.enable_zarith;
@@ -171,6 +179,8 @@ let options = Arg.align [
    "--limit-region", Arg.String set_limit_region,
           " Limit proof to a file and range of lines, given \
            by \"file:first_line:last_line\"";
+   "--list-transforms", Arg.Unit output_list_transforms,
+          " Output the list of available transformations and exit";
    "--prover", Arg.String set_prover,
           " Use prover given in argument instead of Alt-Ergo";
    "--replay", Arg.Set opt_replay,
