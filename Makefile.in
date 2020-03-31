@@ -1814,7 +1814,7 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 
 APITESTS=logic transform clone mlw_tree mlw_expr create_session counterexample
 
-bench-api: $(addprefix test-api-, $(addsuffix .@OCAMLBEST@, $(APITESTS)))
+bench-api: $(addprefix test-api-, $(APITESTS))
 
 ###############
 # test targets
@@ -1826,27 +1826,24 @@ test-itp.opt: src/printer/itp.ml lib/why3/why3.cmxa
 
 test-api-%.byte: examples/use_api/%.ml lib/why3/why3.cma
 	$(SHOW) 'Ocaml    $<'
-	$(HIDE)mkdir -p examples/use_api/results
-	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $< \
-	&& ./$@ | sed -e 's/^\(Versions of Alt-Ergo found: \).*$/\1<hidden>/' > examples/use_api/results/$@.stdout ) \
-	|| (rm -f $@; printf "Test of Why3 API calls failed for $@. Please fix it.\n"; exit 2)
-	$(HIDE)diff examples/use_api/results/$@.stdout examples/use_api/oracles/$@.stdout \
-	|| (printf "Oracle failed for API test $@. Please fix it.\n"; exit 2)
-	$(HIDE)rm -f $@
-	$(HIDE)rm -f why3session.xml why3shapes why3shapes.gz
+	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $<) \
+		|| (printf "Compilation failed for API test $@. Please fix it.\n"; exit 2)
 
 test-api-%.opt: examples/use_api/%.ml lib/why3/why3.cmxa
 	$(SHOW) 'Ocamlopt $<'
+	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $<) \
+		|| (printf "Compilation failed for API test $@. Please fix it.\n"; exit 2)
+
+test-api-%: test-api-%.@OCAMLBEST@
 	$(HIDE)mkdir -p examples/use_api/results
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $< \
-		&& (./$@ | sed -e 's/^\(Versions of Alt-Ergo found: \).*$$/\1<hidden>/' \
-			-e 's/0\.0[0-9]/0.0x/' \
-			> examples/use_api/results/$@.stdout) ) \
-	|| (rm -f $@; printf "Test of Why3 API calls failed for $@. Please fix it.\n"; exit 2)
-	$(HIDE)diff examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout \
-	|| (printf "Oracle failed for API test $@. Please fix it.\n"; exit 2)
-	$(HIDE)rm -f $@
-	$(HIDE)rm -f why3session.xml why3shapes why3shapes.gz
+	$(HIDE)(./$< | sed -e 's/^\(Versions of Alt-Ergo found: \).*$$/\1<hidden>/' \
+		  	   -e 's/0\.0[0-9]/0.0x/' \
+			    > examples/use_api/results/$@.stdout ) \
+		|| (printf "Execution failed for API test $<. Please fix it.\n"; exit 2)
+	$(HIDE)(diff examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout) \
+		|| (printf "Oracle failed for API test $<. Please fix it.\n"; exit 2)
+	$(HIDE)rm -f $< why3session.xml why3shapes why3shapes.gz
+
 
 #test-shape: lib/why3/why3.cma
 #	ocaml -I lib/why3 $(INCLUDES) $(BLINKFLAGS) $? examples/test_shape.ml
