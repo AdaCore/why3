@@ -1,0 +1,35 @@
+formula 2 is: A -> A /\ B
+task 2 created:
+theory Task
+  predicate A
+  
+  predicate B
+  
+  (* meta get_counterexmp "" *)
+  
+  goal goal2 : A -> A /\ B
+end
+
+On task 1, Cvc4 answers Unknown (sat) (0.02s, 84 steps)
+Counter-example model:
+File myfile.my_ext:
+  Line 28:
+    my_A = true
+  Line 42:
+    my_A = true
+    my_B = false
+File myfile.my_ext2:
+  Line 101:
+    my_B = false
+
+Model is {"myfile.my_ext" : {"28" : [{"name" : "my_A" ,
+"attrs" : ["model_trace:my_A"] , "value" : {"type" : "Boolean" ,
+"val" : true } , "kind" : "other" }] , "42" : [{"name" : "my_A" ,
+"attrs" : ["model_trace:my_A"] , "value" : {"type" : "Boolean" ,
+"val" : true } , "kind" : "other" }, {"name" : "my_B" ,
+"attrs" : ["model_trace:my_B"] , "value" : {"type" : "Boolean" ,
+"val" : false } , "kind" : "other" }] } ,
+"myfile.my_ext2" : {"101" : [{"name" : "my_B" ,
+"attrs" : ["model_trace:my_B"] , "value" : {"type" : "Boolean" ,
+"val" : false } ,
+"kind" : "other" }] } }

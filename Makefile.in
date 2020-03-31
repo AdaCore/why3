@@ -1814,13 +1814,7 @@ bench:: bin/why3.@OCAMLBEST@ bin/why3config.@OCAMLBEST@ plugins $(TOOLS) \
 
 APITESTS=logic transform clone mlw_tree mlw_expr create_session counterexample
 
-# we need `break` below otherwise the for loop will continue ignoring failure of submake
-bench-api:
-	@echo ""
-	@echo "=== Checking Why3 API ==="
-	$(HIDE)for i in $(APITESTS); do \
-		$(MAKE) test-api-$$i.@OCAMLBEST@ || break; \
-	done
+bench-api: $(addprefix test-api-, $(addsuffix .@OCAMLBEST@, $(APITESTS)))
 
 ###############
 # test targets
