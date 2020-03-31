@@ -1,9 +1,9 @@
 open Apron
 
 module type ABSTRACT_DOMAIN = sig
-  type man
-  type t
-  type env
+  type man  (* Apron.Manager.t *)
+  type t    (* Apron.Abstract1.t *)
+  type env  (* Apron.Environment.t *)
   val create_manager: unit -> man
   val bottom: man -> env -> t
   val top: man -> env -> t

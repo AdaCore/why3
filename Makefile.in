@@ -242,7 +242,7 @@ LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
           pinterp
 
 ifeq (@enable_infer@,yes)
-LIB_INFER = reduction_engine0 o2oterm o2mterm domain ai_logic trace_partitioning_domain quant_domain disjunctive_domain disjunctive_domain_fast apron_to_term union_find disjunctive_term_domain uf_domain ai_cfg infer_loop
+LIB_INFER = o2oterm domain ai_logic quant_domain union_find disjunctive_term_domain uf_domain ai_cfg infer_loop
 endif
 
 LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
