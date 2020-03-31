@@ -22,25 +22,20 @@ module Make(S:sig
 
   (* utility function that make equivalent classes and
      sum the last component *)
-  let sum_list a =
-    let a = List.sort (fun (i, _) (j, _) ->
-        compare i j) a in
+  let sum_list l =
+    let sl = List.sort (fun (i, _) (j, _) -> compare i j) l in
     let rec merge = function
       | [] -> []
       | [b] -> [b]
       | (a, b) :: (c, d) :: q ->
-        if a = c then merge ((a, b + d) :: q)
-        else (a, b) :: merge ((c, d) :: q)
-    in merge a
+         if a = c then merge ((a, b + d) :: q)
+         else (a, b) :: merge ((c, d) :: q)
+    in merge sl
 
   module TermToVar   = O2oterm.Make(struct type t = Var.t end)
   module TermToClass = O2oterm.Make(struct type t = Union_find.t end)
-  module VarPool = struct
-    module S = Set.Make(struct type t = Var.t
-                               let compare = compare end)
-    include S
-    let to_list a = S.fold (fun a l -> a :: l) a []
-  end
+  module VarPool     = Set.Make(struct type t = Var.t
+                                       let compare = compare end)
 
   type uf_man = {
     variable_mapping: (Apron.Var.t, term) Hashtbl.t;
@@ -62,9 +57,9 @@ module Make(S:sig
   }
 
 
-  type man = Dom.man * uf_man
+  type man = Dom.man * uf_man (* Manager *)
   type env = unit
-  type t = Dom.t * uf_t
+  type t   = Dom.t * uf_t     (* Abstract values *)
 
   let tmp_pool = ["$p1";"$p2"; "$p3"] |> List.map Var.of_string
 
@@ -72,19 +67,17 @@ module Make(S:sig
     let rec build_var_pool_aux = function
       | 0 -> []
       | n -> let v = Var.of_string (Format.sprintf "$%d" n) in
-             v :: build_var_pool_aux (n - 1)
-    in
+             v :: build_var_pool_aux (n - 1) in
     build_var_pool_aux n |> VarPool.of_list
 
   let npool = 10
 
   let create_manager () =
-    let apron_mapping = Mterm.empty in
     let var_pool = build_var_pool npool in
-    let vars = Array.of_list (VarPool.to_list var_pool @ tmp_pool) in
+    let vars = Array.of_list (VarPool.elements var_pool @ tmp_pool) in
     let uf_man = {
         variable_mapping = Hashtbl.create 512;
-        apron_mapping;
+        apron_mapping = Mterm.empty;
         region_mapping = Ity.Mreg.empty;
         region_var = Ity.Mreg.empty;
         env = Environment.make vars [||];
@@ -120,23 +113,22 @@ module Make(S:sig
    *   let tcl = TermToClass.to_t uf_man.class_to_term t in
    *   Union_find.get_class tcl uf |> List.map (TermToClass.to_term uf_man.class_to_term) *)
 
-  let apply_equal (man, uf_man) ud d l =
-    List.fold_left (fun (d, v) t ->
-        try
-          match v with
-          | None -> d, Some (TermToVar.to_t ud.uf_to_var t)
+  let apply_equal (man, uf_man) (dom,uf_t) tl =
+    List.fold_left (fun (dom, var) t ->
+        try match var with
+          | None -> dom, Some (TermToVar.to_t uf_t.uf_to_var t)
           | Some var ->
             let expr = Linexpr1.make uf_man.env in
-            let var' = TermToVar.to_t ud.uf_to_var t in
+            let var' = TermToVar.to_t uf_t.uf_to_var t in
             Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
             Linexpr1.set_coeff expr var' (Coeff.s_of_int 1);
             let lincons = Lincons1.make expr Lincons1.EQ in
             let lincons_array = Lincons1.array_make uf_man.env 1 in
             Lincons1.array_set lincons_array 0 lincons;
-            let d = Dom.meet_lincons_array man d lincons_array in
-            d, v
-        with Not_found -> d, v
-      ) (d, None) l
+            let d = Dom.meet_lincons_array man dom lincons_array in
+            d, Some var
+        with Not_found -> dom, var
+      ) (dom, None) tl
     |> fst
 
   exception Constant
@@ -158,13 +150,13 @@ module Make(S:sig
         | Tconst (Constant.ConstInt n) ->
           (None, BigInt.to_int n.il_int)
         | Tapp (func, args) when ls_equal func ad_int ->
-          List.fold_left (fun (a, b) c ->
-              let tc, cc = eval_num c in
-              match tc, a with
-              | None, None -> None, b + cc
+          List.fold_left (fun (acc_a, acc_b) arg ->
+              let a, b = eval_num arg in
+              match a, acc_a with
+              | None, None -> None, acc_b + b
               | Some t, Some v ->
-                 Some (t_app ad_int [v; t] (Some Ty.ty_int)), b + cc
-              | Some t, None | None, Some t -> Some t, b + cc
+                 Some (t_app ad_int [v; t] (Some Ty.ty_int)), acc_b + b
+              | Some t, None | None, Some t -> Some t, acc_b + b
             ) (None, 0) args
         | Tapp (func, [a;b]) when ls_equal func min_int ->
           let ta, ca = eval_num a in
@@ -186,24 +178,22 @@ module Make(S:sig
         | Tapp (func, args) ->
           let t = t_app func (List.map eval_term args) (Some (t_type t)) in
           Some t, 0
-        | _ -> Some t, 0
-      in
+        | _ -> Some t, 0 in
       match eval_num t with
       | Some t, 0 -> t
       | Some t, a -> t_app ad_int [t; t_z_const a] (Some Ty.ty_int)
       | None, _ -> raise Constant
-    else
-      t_map eval_term t
+    else t_map eval_term t
 
-  let rec replaceby a b t =
-    if t_equal t a then b
-    else t_map (replaceby a b) t
+  let rec replaceby t1 t2 t3 =
+    if t_equal t3 t1 then t2
+    else t_map (replaceby t1 t2) t3
 
-  let do_eq (man, uf_man) a b =
-    if not (Ty.ty_equal (t_type a) Ity.ty_unit) then
+  let do_eq (man, uf_man) t1 t2 =
+    if not (Ty.ty_equal (t_type t1) Ity.ty_unit) then
       fun (d, ud) ->
-        let cla = get_class_for_term uf_man a in
-        let clb = get_class_for_term uf_man b in
+        let cla = get_class_for_term uf_man t1 in
+        let clb = get_class_for_term uf_man t2 in
         let ud = { ud with classes = Union_find.union cla clb ud.classes; } in
         let all_values = Union_find.flat ud.classes in
         let all_terms =
@@ -217,8 +207,8 @@ module Make(S:sig
             (* This is far from perfect. If there is a function f, then terms `f a` and `f b` will be marked as equal.
              * But if there is g: 'a -> 'b -> 'c, then `g a b` and `g b a` can not be marked as such. (As the replacement is global.)
              * However, it is unclear wether it is or it is not a limitation. *)
-            let v' = replaceby a b v in
-            let v'' = replaceby b a v in
+            let v' = replaceby t1 t2 v in
+            let v'' = replaceby t2 t1 v in
             let v' = try eval_term v' with Constant -> v in
             let v'' = try eval_term v'' with Constant -> v in
             let v' = if List.exists (t_equal v') all_terms then v'
@@ -237,7 +227,7 @@ module Make(S:sig
                   if Ty.ty_equal (t_type v) Ty.ty_int then
                     Union_find.get_class cl ud.classes
                     |> List.map (TermToClass.to_term uf_man.class_to_term)
-                    |> apply_equal (man, uf_man) ud d
+                    |> apply_equal (man, uf_man) (d,ud)
                   else d
                 in d, ud
               end
@@ -651,8 +641,7 @@ module Make(S:sig
           Pretty.print_term Format.err_formatter t;
           Format.eprintf "@.";
           (fun d -> d)
-      in
-      (fun d -> aux t d)
+      in (fun d -> aux t d)
 
   let is_leq (man, uf_man) (a, b) (c, d) =
     let c', _ = join_uf (man, uf_man) b d c in
@@ -882,9 +871,9 @@ module Make(S:sig
   let forget_region (man, uf_man) reg _ =
     let members = Ity.Mreg.find reg uf_man.region_mapping |> List.map snd in
     let vars = Ity.Mreg.find reg uf_man.region_var in
-    let forget_fields = List.fold_left (fun f t ->
-        let f2 = forget_term (man, uf_man) t in
-        fun x -> f x |> f2) (fun x -> x) members in
+    let forget_fields = List.fold_left (fun forget t ->
+        let forget_t = forget_term (man, uf_man) t in
+        fun x -> forget x |> forget_t) (fun x -> x) members in
     List.fold_left (fun f v ->
         fun (d, ud) ->
           let acl = get_class_for_term uf_man (t_var v) in
