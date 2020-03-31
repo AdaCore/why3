@@ -304,15 +304,20 @@ compiled and installed, and can be performed in any directory.
 By default the *infer-loop* mechanism is not compiled and integrated
 with Why3. So, once the dependencies above are installed, the
 configuration script of Why3 should enable the compilation of the
-``infer-loop`` utility, as follows:
+``infer-loop`` utility. This can be done by passing to the Why3
+configure script the ``--enable-infer`` flag, as follows:
 
 ::
 
     ./configure --enable-infer
     # ...
-    Components
-        Invariant inference(exp): yes
+    # Components
+    # ...
+    #    Invariant inference(exp): yes
     # ...
 
-After compiling , the loop inference mechanism should be
-available. See :numref:`sec.runwithinferloop` for more details.
+The line ``Invariant inference(exp)`` indicates whether the
+dependencies are correctly installed and whether the flag mentioned
+above was selected. After the compilation, the loop inference
+mechanism should be available. See :numref:`sec.runwithinferloop` for
+more details.

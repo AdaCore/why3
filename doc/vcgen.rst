@@ -56,30 +56,32 @@ Automatic inference of loop invariants
 --------------------------------------
 
 Why3 can be executed with support for inferring loop invariants
-:cite:`baudin17` (for information about compilation of the
-`infer-loop` mechanism refer to :numref:`sec.installinferloop`). This
-can be done by passing the *debug* flag ``infer-loop`` to Why3 or by
-annotating *let* declarations with the ``[@infer]`` attribute.
+:cite:`baudin17` (see :numref:`sec.installinferloop` for information
+about the compilation of Why3 with support for `infer-loop`).
 
-As an example consider the following invocation of Why3.
+There are two ways of enabling the inference of loop invariants: by
+passing the *debug* flag ``infer-loop`` to Why3 or by annotating *let*
+declarations with the ``[@infer]`` attribute.
+
+Below is an example on how to invoke Why3 such that invariants are
+inferred for all the loops in the given file.
 
 ::
 
-   why3 ide tests/infer/incr.mlw --debug infer-loop
+   why3 ide tests/infer/incr.mlw --debug=infer-loop
 
-In this case, Why3 will infer invariants for all the loops inside all
-the let declarations. Note that, the *Polyhedra* default domain will
-be used together with the default widening value of *3*. Why3 GUI will
-not display the inferred invariants in the source code, but the VCs
-corresponding to those invariants will be displayed and labeled with
-the ``infer-loop`` keyword as shown in :numref:`fig.gui.infer`.
+In this case, the *Polyhedra* default domain will be used together
+with the default widening value of *3*. Why3 GUI will not display the
+inferred invariants in the source code, but the VCs corresponding to
+those invariants will be displayed and labeled with the ``infer-loop``
+keyword as shown in :numref:`fig.gui.infer`.
 
 .. _fig.gui.infer:
 
 .. figure:: images/gui-infer.png
    :alt: The GUI with inferred invariants (after split).
 
-Alternatively, attributes can be used in let declarations so that
+Alternatively, attributes can be used in *let* declarations so that
 invariants are inferred for all the loops in that declaration. In this
 case, it is possible to select the desired domain and widening
 value. In the example below, invariants will be inferred using the
@@ -105,3 +107,20 @@ produce exactly the same invariants.
       done;
       !i
   end
+
+
+There are two additional debugging flags that can be passed to Why3 to
+output additional information about the inference of loop
+invariants. The ``infer-print-cfg`` will print the Control Flow Graph
+(CFG) used for abstract interpretation in a file with the name
+``inferdbg.dot``. The ``infer-print-ai-result`` flag will print to the
+standard output the computed abstract values at each point of the
+CFG. Finally, ``print-inferred-invs`` will print the inferred
+invariants to the standard output (note that the displayed identifiers
+names might not be consistent with those in the initial program).
+
+Current limitations
+"""""""""""""""""""
+
+1. loop invariants can only be inferred for loops inside
+   (non-recursive) *let* declarations.

@@ -6,7 +6,7 @@ open Expr
 open Ity
 
 let infer_print_cfg =
-  Debug.register_flag "ai-print-cfg" ~desc:"Print abstract interpretation CFG"
+  Debug.register_flag "infer-print-cfg" ~desc:"Print CFG used in abstract interpretation"
 
 let infer_print_ai_result =
   Debug.register_flag "infer-print-ai-result" ~desc:"Print result of Abstract Interpretation"
