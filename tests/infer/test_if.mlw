@@ -1,0 +1,8 @@
+use int.Int
+
+
+let f (x: int): int
+= x + 1
+
+let g[@infer](x:int): int
+= if x = 1 then x else f x
