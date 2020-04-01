@@ -9,9 +9,6 @@
 (*                                                                  *)
 (********************************************************************)
 
-val clean_name : string -> string
-
-val module_name : ?fname:string -> string list -> string -> string
 
 module Translate : sig
   val module_ : Pmodule.pmodule -> Mltree.pmodule

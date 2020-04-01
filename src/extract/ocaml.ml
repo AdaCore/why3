@@ -11,7 +11,6 @@
 
 (** Printer for extracted OCaml code *)
 
-open Compile
 open Format
 open Ident
 open Pp
@@ -165,7 +164,7 @@ module Print = struct
       let p, t, q =
         try Pmodule.restore_path id with Not_found -> Theory.restore_path id in
       let fname = if p = [] then info.info_fname else None in
-      let m = Strings.capitalize (module_name ?fname p t) in
+      let m = Strings.capitalize (Ml_printer.module_name ?fname p t) in
       fprintf fmt "%s.%a" m (print_path ~sanitizer) (q, id)
     with
     | Not_found ->
@@ -227,6 +226,10 @@ module Print = struct
     | Ttuple tl ->
         fprintf fmt (protect_on paren "@[%a@]")
           (print_list star (print_ty ~use_quote ~paren:true info)) tl
+    | Tarrow (t1, t2) ->
+        fprintf fmt (protect_on paren "%a -> %a")
+          (print_ty ~use_quote ~paren info) t1
+          (print_ty ~use_quote ~paren info) t2
     | Tapp (ts, tl) ->
         match query_syntax info.info_syn ts with
         | Some s when complex_syntax s ->
@@ -270,12 +273,14 @@ module Print = struct
     else fprintf fmt "(%a:@ %a)" (print_lident info) id
       (print_ty ~use_quote:false ~paren:false info) ty
 
-  let print_vsty_opt_fun info fmt id = function
+  let print_vsty_opt_fun info fmt id ty = match ty with
     | Tapp (id_ty, [arg]) ->
         assert (query_syntax info.info_syn id_ty = Some "%1 option");
         fprintf fmt "?%s:%a" id.id_string
           (print_ty ~use_quote:false ~paren:false info) arg
-    | _ -> invalid_arg "print_vsty_opt_fun" (*FIXME : better error message *)
+    | _ ->
+       Loc.errorm "invalid optional argument of type %a"
+         (print_ty ~use_quote:false ~paren:false info) ty
 
   let print_vsty_named_fun info fmt id ty =
     fprintf fmt "%s:%a" id.id_string
@@ -848,7 +853,7 @@ let print_decl =
       info_current_mo   = Some m;
       info_th_known_map = th.th_known;
       info_mo_known_map = m.mod_known;
-      info_fname        = Opt.map Compile.clean_name fname;
+      info_fname        = Opt.map Ml_printer.clean_name fname;
       info_flat         = flat;
       info_prec         = pargs.Pdriver.prec;
       info_current_ph   = [];
@@ -859,7 +864,7 @@ let print_decl =
 let ng suffix ?fname m =
   let mod_name = m.mod_theory.th_name.id_string in
   let path     = m.mod_theory.th_path in
-  (module_name ?fname path mod_name) ^ suffix
+  (Ml_printer.module_name ?fname path mod_name) ^ suffix
 
 let ocaml_printer = Pdriver.{
     desc = "printer for Ocaml code";

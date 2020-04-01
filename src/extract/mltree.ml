@@ -18,6 +18,7 @@ open Term
 type ty =
   | Tvar   of tvsymbol
   | Tapp   of ident * ty list
+  | Tarrow of ty * ty
   | Ttuple of ty list
 
 type is_ghost = bool
@@ -43,6 +44,7 @@ type ity = I of Ity.ity | C of Ity.cty (* TODO: keep it like this? *)
 type expr = {
   e_node   : expr_node;
   e_ity    : ity;
+  e_mlty   : ty;
   e_effect : effect;
   e_attrs  : Sattr.t;
 }
@@ -148,7 +150,8 @@ let rec add_known_decl decl k_map id =
 
 let rec iter_deps_ty f = function
   | Tvar _ -> ()
-  | Tapp (id, ty_l) -> f id; List.iter (iter_deps_ty f) ty_l
+  | Tarrow (ty1, ty2) -> iter_deps_ty f ty1; iter_deps_ty f ty2
+  | Tapp (s, ty_l) -> f s; List.iter (iter_deps_ty f) ty_l
   | Ttuple ty_l -> List.iter (iter_deps_ty f) ty_l
 
 let iter_deps_typedef f = function
@@ -270,14 +273,19 @@ let ity_of_mask ity mask =
       I (ity_tuple tl)
   | _ -> ity (* FIXME ? *)
 
-let mk_expr e_node e_ity mask e_effect e_attrs =
-  { e_node; e_ity = ity_of_mask e_ity mask; e_effect; e_attrs; }
+let mk_expr e_node e_ity mask e_mlty e_effect e_attrs =
+  { e_node; e_ity = ity_of_mask e_ity mask; e_mlty; e_effect; e_attrs; }
 
 let tunit = Ttuple []
 
 let is_unit = function
   | I i -> ity_equal i Ity.ity_unit
   | _ -> false
+
+let t_arrow t1 t2 = Tarrow (t1, t2)
+
+let t_fun params res =
+  List.fold_right (fun (_, targ, _) ty -> t_arrow targ ty) params res
 
 let enope = Eblock []
 
@@ -292,7 +300,7 @@ let mk_its_defn its_name its_args its_private its_def =
 
 (* smart constructors *)
 let e_unit attrs =
-  mk_expr enope (I Ity.ity_unit) MaskVisible Ity.eff_empty attrs
+  mk_expr enope (I Ity.ity_unit) MaskVisible tunit Ity.eff_empty attrs
 
 let dummy_expr_attr = Ident.create_attribute "__dummy_expr__"
 
@@ -321,7 +329,7 @@ let e_fun args e = mk_expr (Efun (args, e))
 let e_ignore e_ity e =
   (* TODO : avoid ignore around a unit type expresson *)
   if ity_equal e_ity Ity.ity_unit then e
-  else mk_expr (Eignore e) ity_unit MaskVisible e.e_effect e.e_attrs
+  else mk_expr (Eignore e) ity_unit MaskVisible tunit e.e_effect e.e_attrs
 
 let e_if e1 e2 e3 =
   mk_expr (Eif (e1, e2, e3)) e2.e_ity
@@ -343,7 +351,7 @@ let e_match e bl xl =
 *)
 
 let e_assign al ity mask eff attrs =
-  if al = [] then e_unit else mk_expr (Eassign al) ity mask eff attrs
+  if al = [] then e_unit else mk_expr (Eassign al) ity mask tunit eff attrs
 
 let e_absurd =
   mk_expr Eabsurd
@@ -357,10 +365,10 @@ let e_seq e1 e2 =
     | _ -> Eblock [e1; e2] in
   mk_expr e
 
-let var_list_of_pv_list pvl =
-  let mk_var pv = mk_expr (Evar pv) (I pv.pv_ity)
-      MaskVisible eff_empty Sattr.empty in
-  List.map mk_var pvl
+let var_list_of_pv_list pvl mltyl =
+  let mk_var pv mlty = mk_expr (Evar pv) (I pv.pv_ity)
+      MaskVisible mlty eff_empty Sattr.empty in
+  List.map2 mk_var pvl mltyl
 
 let ld_map fn ld = match ld with
   | Lsym (rs, tv, ty, vl, e) -> Lsym (rs, tv, ty, vl, fn e)

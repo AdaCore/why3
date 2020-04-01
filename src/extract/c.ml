@@ -921,6 +921,7 @@ module MLToC = struct
     | Ttuple [] -> C.Tvoid
     | Ttuple [t] -> ty_of_mlty info t
     | Ttuple _ -> raise (Unsupported "tuple parameters")
+    | Tarrow _ -> raise (Unsupported "arrow type")
 
   let struct_of_rs info rs : struct_def =
     let rity = rs.rs_cty.cty_result in

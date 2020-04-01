@@ -13,6 +13,10 @@ open Pp
 open Printer
 open Mltree
 
+val clean_name : string -> string
+
+val module_name : ?fname:string -> string list -> string -> string
+
 val protect_on :
   bool -> ('a, 'b, 'c, 'd, 'e, 'f) format6 -> ('a, 'b, 'c, 'd, 'e, 'f) format6
 
