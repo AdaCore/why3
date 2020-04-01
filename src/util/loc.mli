@@ -24,7 +24,7 @@ val transfer_loc : Lexing.lexbuf -> Lexing.lexbuf -> unit
 (** {2 locations in files} *)
 
 type position
-[@@deriving sexp]
+[@@deriving sexp_of]
 
 val extract : Lexing.position * Lexing.position -> position
 val join : position -> position -> position

@@ -134,8 +134,3 @@ let with_location f lb =
     try f lb with
     | Located _ as e -> raise e
     | e -> raise (Located (loc lb, e))
-
-let position_of_sexp sexp =
-  match Mysexplib.of_list sexp with
-  | [] -> dummy_position
-  | _ -> invalid_arg "position_of_sexp: only () allowed for dummy position"

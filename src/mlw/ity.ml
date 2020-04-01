@@ -796,7 +796,7 @@ type mask =
   | MaskVisible
   | MaskTuple of mask list
   | MaskGhost
-[@@deriving sexp]
+[@@deriving sexp_of]
 
 let mask_of_pv v = if v.pv_ghost then MaskGhost else MaskVisible
 

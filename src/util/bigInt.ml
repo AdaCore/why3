@@ -13,7 +13,7 @@ open Mysexplib.Std_big_int [@@warning "-33"]
 open Big_int
 
 type t = big_int
-[@@deriving sexp]
+[@@deriving sexp_of]
 let compare = compare_big_int
 
 let zero = zero_big_int

@@ -87,7 +87,7 @@ val pr_hash : prsymbol -> int
 type ind_decl = lsymbol * (prsymbol * term) list
 
 type ind_sign = Ind | Coind
-[@@deriving sexp]
+[@@deriving sexp_of]
 
 type ind_list = ind_sign * ind_decl list
 
@@ -97,7 +97,7 @@ type prop_kind =
   | Plemma    (** prove, use as a premise *)
   | Paxiom    (** do not prove, use as a premise *)
   | Pgoal     (** prove, do not use as a premise *)
-[@@deriving sexp]
+[@@deriving sexp_of]
 
 type prop_decl = prop_kind * prsymbol * term
 
