@@ -145,7 +145,7 @@ let load_driver_absolute = let driver_tag = ref (-1) in fun env file extra_files
   in
   (* th_uc is the theory built with the uses forced by the driver *)
   let add_local th th_uc = function
-    | Rprelude s ->
+    | Rprelude (s, _transitive) ->
         let l = Mid.find_def [] th.th_name !thprelude in
         thprelude := Mid.add th.th_name (s::l) !thprelude;
         th_uc

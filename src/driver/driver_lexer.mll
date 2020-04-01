@@ -25,6 +25,7 @@
         "meta", META;
         "prelude", PRELUDE;
         "interface", INTERFACE;
+        "export", EXPORT;
         "printer", PRINTER;
 	"steps", STEPS;
 	"model_parser", MODEL_PARSER;

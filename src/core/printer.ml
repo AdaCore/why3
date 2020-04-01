@@ -24,8 +24,10 @@ open Task
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type prelude_export_map = prelude Mid.t
 type interface = string list
 type interface_map = interface Mid.t
+type interface_export_map = interface Mid.t
 type blacklist = string list
 
 type 'a pp = Pp.formatter -> 'a -> unit

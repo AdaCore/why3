@@ -66,7 +66,7 @@ module C = struct
   (* template, type and type arguments of result, typed arguments, precedence level *)
 
   and constant =
-    | Cint of string
+    | Cint of string * Number.int_constant
     | Cfloat of string
     | Cchar of string
     | Cstring of string
@@ -104,12 +104,15 @@ module C = struct
     | Sseq (s1,s2) -> is_nop s1 && is_nop s2
     | _ -> false
 
+  let is_one ic = BigInt.eq ic.Number.il_int BigInt.one
+  let is_zero ic = BigInt.eq ic.Number.il_int BigInt.zero
+
   let is_true = function
-    | Sexpr(Econst(Cint "1")) -> true
+    | Sexpr(Econst(Cint (_,ic))) -> is_one ic
     | _ -> false
 
   let is_false = function
-    | Sexpr(Econst(Cint "0")) -> true
+    | Sexpr(Econst(Cint (_,ic))) -> is_zero ic
     | _ -> false
 
   let rec one_stmt = function
@@ -451,6 +454,38 @@ module C = struct
     | Bassign -> true
     | _ -> false
 
+  let e_map fe (e:expr) =
+    match e with
+    | Enothing -> Enothing
+    | Eunop (u,e) -> Eunop (u, fe e)
+    | Ebinop (b, e1, e2) -> Ebinop (b, fe e1, fe e2)
+    | Equestion (c, t, e) -> Equestion (fe c, fe t, fe e)
+    | Ecast (t,e) -> Ecast(t, fe e)
+    | Ecall (f,args) -> Ecall (fe f, List.map fe args)
+    | Econst c -> Econst c
+    | Evar v -> Evar v
+    | Elikely e -> Elikely (fe e)
+    | Eunlikely e -> Eunlikely (fe e)
+    | Esize_expr e -> Esize_expr (fe e)
+    | Esize_type t -> Esize_type t
+    | Eindex (a,i) -> Eindex (fe a, fe i)
+    | Edot (e,f) -> Edot (fe e, f)
+    | Earrow (e, f) -> Earrow (fe e, f)
+    | Esyntaxrename (s,args) -> Esyntaxrename (s, List.map fe args)
+    | Esyntax (s,rt,ta,args,pl) ->
+       Esyntax (s, rt, ta, List.map (fun (e, t) -> (fe e, t)) args, pl)
+
+  let s_map fd fs fe (s:stmt) = match s with
+    | Snop -> Snop
+    | Sexpr e -> Sexpr (fe e)
+    | Sblock (d,s) -> Sblock (List.map fd d, fs s)
+    | Sseq (s1,s2) -> Sseq (fs s1, fs s2)
+    | Sif (ce,ts,es) -> Sif (fe ce, fs ts, fs es)
+    | Swhile (c,b) -> Swhile (fe c, fs b)
+    | Sfor (e1,e2,e3,b) -> Sfor (fe e1, fe e2, fe e3, fs b)
+    | Sbreak -> Sbreak
+    | Sreturn e -> Sreturn (fe e)
+
   (** Integer type bounds *)
   open BigInt
   let min32 = minus (pow_int_pos 2 31)
@@ -497,16 +532,28 @@ module Print = struct
 
   let sanitizer = sanitizer char_to_lalpha char_to_alnumus
   let sanitizer s = Strings.lowercase (sanitizer s)
-  let local_printer = create_ident_printer c_keywords ~sanitizer
-  let global_printer = create_ident_printer c_keywords ~sanitizer
+  let local_printer = ref None
+  let global_printer = ref None
+  let printers_initialized = ref false
+
+  let init_printers blacklist =
+    if not !printers_initialized
+    then begin
+      let bl = c_keywords@blacklist in
+      local_printer := Some (create_ident_printer bl ~sanitizer);
+      global_printer := Some (create_ident_printer bl ~sanitizer);
+      printers_initialized := true
+      end
 
   let c_static_inline = create_attribute "extraction:c_static_inline"
   (* prints the c inline keyword *)
 
-  let print_local_ident fmt id = fprintf fmt "%s" (id_unique local_printer id)
-  let print_global_ident fmt id = fprintf fmt "%s" (id_unique global_printer id)
+  let print_local_ident fmt id =
+    fprintf fmt "%s" (id_unique (Opt.get !local_printer) id)
+  let print_global_ident fmt id =
+    fprintf fmt "%s" (id_unique (Opt.get !global_printer) id)
 
-  let clear_local_printer () = Ident.forget_all local_printer
+  let clear_local_printer () = Ident.forget_all (Opt.get !local_printer)
 
   let space_nolinebreak fmt () = fprintf fmt " "
 
@@ -650,10 +697,9 @@ module Print = struct
         gen_syntax_arguments_prec fmt s pr pl
 
   and print_const  fmt = function
-    | Cint s | Cfloat s -> fprintf fmt "%s" s
+    | Cint (s,_) | Cfloat s -> fprintf fmt "%s" s
     | Cchar s -> fprintf fmt "'%s'" Constant.(escape char_escape s)
     | Cstring s -> fprintf fmt "\"%s\"" Constant.(escape default_escape s)
-
   let print_id_init ?(size=None) ~stars fmt ie =
     (if stars > 0
     then fprintf fmt "%s " (String.make stars '*')
@@ -703,14 +749,14 @@ module Print = struct
     | Sreturn Enothing -> fprintf fmt "return;"
     | Sreturn e -> fprintf fmt "return %a;" print_expr_no_paren e
 
-  and print_def fmt def =
+  and print_def ~global fmt def =
     let print_inline fmt id =
       if Sattr.mem c_static_inline id.id_attrs
       then fprintf fmt "static inline "
       else fprintf fmt "" in
     try match def with
       | Dfun (id,(rt,args),body) ->
-         let s = sprintf "@[@[<hv 2>%a%a %a(@[%a@]) {@\n@[%a@]@]\n}\n@]"
+         let s = sprintf "@[@\n@[<hv 2>%a%a %a(@[%a@]) {@\n@[%a@]@]\n}@]"
                    print_inline id
                    (print_ty ~paren:false) rt
                    print_global_ident id
@@ -722,7 +768,7 @@ module Print = struct
          (* print into string first to print nothing in case of exception *)
          fprintf fmt "%s" s
       | Dproto (id, (rt, args)) ->
-         let s = sprintf "%a %a(@[%a@]);@;"
+         let s = sprintf "@\n%a %a(@[%a@]);"
                    (print_ty ~paren:false) rt
                    print_global_ident id
                    (print_list comma
@@ -743,9 +789,11 @@ module Print = struct
                    (print_ty ~paren:false) ty
                    (print_list comma (print_id_init ~stars:nb ~size:None))
                    lie in
-         fprintf fmt "%s" s
+         if global
+         then fprintf fmt "@\n%s" s
+         else fprintf fmt "%s" s
       | Dstruct (s, lf) ->
-         let s = sprintf "struct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@\n@]"
+         let s = sprintf "@\nstruct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@]"
                    s
                    (print_list newline
                       (fun fmt (s,ty) -> fprintf fmt "%a %s;"
@@ -755,9 +803,9 @@ module Print = struct
       | Dstruct_decl s ->
          fprintf fmt "struct %s;@;" s
       | Dinclude (id, Sys) ->
-         fprintf fmt "#include <%s.h>@;"  (sanitizer id.id_string)
+         fprintf fmt "#include <%s.h>"  (sanitizer id.id_string)
       | Dinclude (id, Proj) ->
-         fprintf fmt "#include \"%s.h\"@;" (sanitizer id.id_string)
+         fprintf fmt "#include \"%s.h\"" (sanitizer id.id_string)
       | Dtypedef (ty,id) ->
          let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
                    (print_ty ~paren:false) ty print_global_ident id in
@@ -775,13 +823,13 @@ module Print = struct
     then print_stmt ~braces:true fmt s
     else
       print_pair_delim nothing newline nothing
-        (print_list newline print_def)
+        (print_list newline (print_def ~global:false))
         (print_stmt ~braces:true)
         fmt (def,s)
 
   let print_global_def fmt def =
     clear_local_printer ();
-    print_def fmt def
+    print_def ~global:true fmt def
 
   let print_file fmt info ast =
     Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
@@ -804,6 +852,7 @@ module MLToC = struct
 
   let structs : struct_def Hid.t = Hid.create 16
   let aliases : C.ty Hid.t = Hid.create 16
+  let globals : unit Hid.t = Hid.create 16
 
   let array = create_attribute "extraction:array"
   let array_mk = create_attribute "extraction:array_make"
@@ -969,6 +1018,9 @@ module MLToC = struct
     | Eunlikely e -> Elikely e
     | e -> e
 
+  let lit_one = Number.(int_literal ILitDec ~neg:false "1")
+  let lit_zero = Number.(int_literal ILitDec ~neg:false "0")
+
   (* /!\ Do not use if e may have type unit and not be Enothing *)
   let expr_or_return env e =
     if env.computes_return_value
@@ -1084,10 +1136,10 @@ module MLToC = struct
        aux l
     | Eapp (rs, []) when rs_equal rs rs_true ->
        Debug.dprintf debug_c_extraction "true@.";
-       ([],expr_or_return env (C.Econst (Cint "1")))
+       ([],expr_or_return env (C.Econst (Cint ("1",lit_one))))
     | Eapp (rs, []) when rs_equal rs rs_false ->
        Debug.dprintf debug_c_extraction "false@.";
-       ([],expr_or_return env (C.Econst (Cint "0")))
+       ([],expr_or_return env (C.Econst (Cint ("0", lit_zero))))
     | Mltree.Evar pv ->
        let id = pv_name pv in
        let e = C.Evar id in
@@ -1124,8 +1176,12 @@ module MLToC = struct
             let s = ts.ts_name.id_string in
             raise (Unsupported ("unspecified number format for type "^s)) end
        in
-       let e = C.(Econst (Cint s)) in
+       let e = C.(Econst (Cint (s, ic))) in
        ([], expr_or_return env e)
+    | Eapp (rs, []) when Hid.mem globals rs.rs_name ->
+       Debug.dprintf debug_c_extraction "global variable %s@."
+         rs.rs_name.id_string;
+       [], expr_or_return env (Evar rs.rs_name)
     | Eapp (rs, _) when Sattr.mem decl_attribute rs.rs_name.id_attrs ->
        raise (Unsupported "local variable declaration call outside let-in")
     | Eapp (rs, [e]) when rs_equal rs Pmodule.rs_ref ->
@@ -1305,7 +1361,7 @@ module MLToC = struct
         | C.Snop, e -> cd, C.(Swhile(handle_likely c.e_attrs e, C.Sblock b))
         | s,e ->
            let brc = reverse_likely (handle_likely c.e_attrs (Eunop(Unot,e))) in
-           cd, C.(Swhile(Econst (Cint "1"),
+           cd, C.(Swhile(Econst (Cint ("1", lit_one)),
                          Sseq(s,
                               Sseq(Sif(brc, Sbreak, Snop),
                                    C.Sblock b))))
@@ -1489,7 +1545,7 @@ module MLToC = struct
        let dv, sv = expr info env_f v in
        let eai = C.Eindex(Evar avar, i) in
        let assign_e = assignify eai sv in
-       let init_loop = C.(Sfor(Ebinop(Bassign, i, Econst (Cint "0")),
+       let init_loop = C.(Sfor(Ebinop(Bassign, i, Econst (Cint ("0", lit_zero))),
                                Ebinop(Blt, i, n),
                                Eunop(Upreincr, i),
                                assign_e)) in
@@ -1507,7 +1563,7 @@ module MLToC = struct
        | Lany _ -> raise (Unsupported "Lany")
        end
 
-  let translate_decl (info:info) (d:decl) ~header : C.definition list =
+  let translate_decl (info:info) (d:decl) ~flat ~header : C.definition list =
     current_decl_name := "";
     let translate_fun rs mlty vl e =
       current_decl_name := rs.rs_name.id_string;
@@ -1569,9 +1625,22 @@ module MLToC = struct
             let st = struct_of_rs info rs in
             C.Tstruct st, [C.Dstruct st]
           else rtype, [] in
+        (* struct definition goes only in the header *)
+        let rm_struct_def = function
+          | C.Dstruct (s,_) ->
+             Debug.dprintf debug_c_extraction "removing def of %s@." s;
+             C.Dstruct_decl s
+          | d -> d in
+        let sdecls =
+          if not (header || flat)
+          then List.map rm_struct_def sdecls
+          else sdecls in
         if has_array rtype then raise (Unsupported "array return");
         if header
-        then sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
+        then
+          if Hid.mem globals rs.rs_name
+          then sdecls@[C.Ddecl (rtype, [rs.rs_name, Enothing])]
+          else sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
         else
           let env = { computes_return_value = true;
                       in_unguarded_loop = false;
@@ -1587,7 +1656,13 @@ module MLToC = struct
           let d = C.group_defs_by_type d in
           let s = C.elim_nop s in
           let s = C.elim_empty_blocks s in
-          sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
+          match s with
+          | Sreturn r when params = [] ->
+             Debug.dprintf debug_c_extraction
+               "declaring global %s@." rs.rs_name.id_string;
+             Hid.add globals rs.rs_name ();
+             sdecls@[C.Ddecl (rtype, [rs.rs_name, r])]
+          | _ -> sdecls@[C.Dfun (rs.rs_name, (rtype,params), (d,s))] in
     try
       begin match d with
       | Dlet (Lsym(rs, _, mlty, vl, e)) ->
@@ -1618,7 +1693,11 @@ module MLToC = struct
                     pjl in
                 let fields =
                   List.map
-                    (fun (_, id, ty) -> (id.id_string, ty_of_mlty info ty))
+                    (fun (_, id, ty) ->
+                      let cty = ty_of_mlty info ty in
+                      match cty with
+                      | Tstruct _ -> raise (Unsupported "nested structs")
+                      | _ -> (id.id_string, cty))
                     pjl in
                 (*if List.exists
                      (fun (_,t) -> match t with Tarray _ -> true | _ -> false)
@@ -1626,7 +1705,9 @@ module MLToC = struct
                 then raise (Unsupported "array in struct");*)
                 let sd = id.id_string, fields in
                 Hid.replace structs id sd;
-                [C.Dstruct sd]
+                if header || flat
+                then [C.Dstruct sd]
+                else [C.Dstruct_decl id.id_string]
              | Some Ddata _ -> raise (Unsupported "Ddata@.")
              | Some (Drange _) | Some (Dfloat _) ->
                 raise (Unsupported "Drange/Dfloat@.")
@@ -1656,17 +1737,51 @@ module MLToC = struct
            !current_decl_name s;
        []
 
-  let translate_decl (info:info) (d:Mltree.decl) ~header : C.definition list =
+  let translate_decl (info:info) (d:Mltree.decl) ~header ~flat
+      : C.definition list =
     let decide_print id =
       (not (header && (Sattr.mem Print.c_static_inline id.id_attrs)))
       && query_syntax info.syntax id = None in
     let names = Mltree.get_decl_name d in
     match List.filter decide_print names with
     | [] -> []
-    | _ -> translate_decl info d ~header
+    | _ -> translate_decl info d ~header ~flat
 
 end
 
+module Transform = struct
+
+open C
+
+(* Common simplifications *)
+let rec expr e =
+  let e = e_map expr e in
+  match e with
+  | Equestion (c, Econst (Cint (_, ic1)), Econst (Cint (_, ic0)))
+       when is_one ic1 && is_zero ic0 -> c                       (* c ? 1 : 0 *)
+  | Equestion (c, Econst (Cint (_, ic0)), Econst (Cint (_, ic1)))
+       when is_one ic1 && is_zero ic0 -> Eunop (Unot, c)         (* c ? 0 : 1 *)
+  | Eunop (Unot, Ebinop(Beq, e1, e2)) -> Ebinop (Bne, e1, e2) (* ! (e1 == e2) *)
+  | _ -> e
+
+and stmt s =
+  let s = s_map def stmt expr s in
+  match s with
+  | Sif (Eunop (Unot, Ebinop (Beq, c, Econst (Cint(_, ic0)))), t, e)
+  | Sif (Ebinop (Bne, c, Econst (Cint (_, ic0))), t, e)
+       when is_zero ic0 -> Sif (c, t, e)                         (* if c != 0 *)
+  | _ -> s
+
+and def (d:definition) = match d with
+  | C.Dfun (id,p,(dl, s)) ->  Dfun (id, p, (List.map def dl, stmt s))
+  | C.Ddecl (ty, dl) -> C.Ddecl (ty, List.map (fun (id, e) -> id, expr e) dl)
+  | C.Dproto (_,_) | C.Dstruct _
+  | C.Dstruct_decl _ | C.Dtypedef (_,_)
+  | C.Dinclude (_,_) -> d
+
+let defs dl = List.map def dl
+
+end
 
 let name_gen suffix ?fname m =
   let n = m.Pmodule.mod_theory.Theory.th_name.Ident.id_string in
@@ -1676,7 +1791,7 @@ let name_gen suffix ?fname m =
     | Some f -> f ^ "__" ^ n ^ suffix in
   Strings.lowercase r
 
-let header_border_printer header _args ?old:_ ?fname ~flat:_ fmt m =
+let header_border_printer header _args ?old:_ ?fname fmt m =
   let n = Strings.uppercase (name_gen "_H_INCLUDED" ?fname m) in
   if header then
     Format.fprintf fmt "#ifndef %s@\n@." n
@@ -1684,7 +1799,7 @@ let header_border_printer header _args ?old:_ ?fname ~flat:_ fmt m =
     Format.fprintf fmt "#define %s@\n#endif // %s@." n n
 
 let print_header_decl args fmt d =
-  let cds = MLToC.translate_decl args d ~header:true in
+  let cds = MLToC.translate_decl args d ~header:true ~flat:false in
   List.iter (Format.fprintf fmt "%a@." Print.print_global_def) cds
 
 let mk_info (args:Pdriver.printer_args) m = {
@@ -1700,64 +1815,77 @@ let mk_info (args:Pdriver.printer_args) m = {
 
 let print_header_decl =
   let memo = Hashtbl.create 16 in
-  fun args ?old ?fname ~flat m fmt d ->
+  fun args ?old ?fname m fmt d ->
   ignore old;
   ignore fname;
-  ignore flat;
   if not (Hashtbl.mem memo d)
   then begin
     Hashtbl.add memo d ();
     let info = mk_info args m in
     print_header_decl info fmt d end
 
-let print_prelude args ?old ?fname ~flat deps fmt pm =
+let print_prelude ~header args ?old ?fname ~flat ~deps
+      ~global_prelude ~prelude fmt pm =
   ignore old;
-  ignore fname;
   ignore flat;
-  ignore pm;
-  ignore args;
-  let add_include id =
+  ignore fname;
+  Print.init_printers args.Pdriver.blacklist;
+  let add_include m =
+    let id = m.Pmodule.mod_theory.Theory.th_name in
     Format.fprintf fmt "%a@." Print.print_global_def C.(Dinclude (id,Proj)) in
-  List.iter
-    (fun m ->
-      let id = m.Pmodule.mod_theory.Theory.th_name in
-      add_include id)
-    (List.rev deps)
+  (* system includes *)
+  Printer.print_prelude fmt global_prelude;
+  (* dependencies *)
+  if header
+  then
+    List.iter add_include (List.rev deps)
+  else
+    (* C files include only their own header *)
+    add_include pm;
+  (* module and exported prelude *)
+  Printer.print_prelude fmt prelude
 
-let print_decl args fmt d =
-  let cds = MLToC.translate_decl args d ~header:false in
+let print_decl args fmt d ~flat =
+  let cds = MLToC.translate_decl args d ~header:false ~flat in
+  let cds = Transform.defs cds in
   let print_def d =
     Format.fprintf fmt "%a@." Print.print_global_def d in
   List.iter print_def cds
 
-let print_decl =
+let print_decl ~flat =
   let memo = Hashtbl.create 16 in
-  fun args ?old ?fname ~flat m fmt d ->
+  fun args ?old ?fname m fmt d ->
   ignore old;
   ignore fname;
-  ignore flat;
   ignore m;
   if not (Hashtbl.mem memo d)
   then begin
       Hashtbl.add memo d ();
       let info = mk_info args m in
-    print_decl info fmt d end
+    print_decl info fmt d ~flat end
 
 let c_printer = Pdriver.{
     desc = "printer for C code";
     implem_printer = {
         filename_generator = name_gen ".c";
-        decl_printer = print_decl;
-        prelude_printer = print_prelude;
+        decl_printer = print_decl ~flat:false;
+        prelude_printer = print_prelude ~flat:false ~header:false;
         header_printer = dummy_border_printer;
         footer_printer = dummy_border_printer;
       };
     interf_printer = Some {
         filename_generator = name_gen ".h";
         decl_printer = print_header_decl;
-        prelude_printer = print_prelude;
+        prelude_printer = print_prelude ~flat:false ~header:true;
         header_printer = header_border_printer true;
         footer_printer = header_border_printer false;
+      };
+    flat_printer = {
+        filename_generator = name_gen ".c";
+        decl_printer = print_decl ~flat:true;
+        prelude_printer = print_prelude ~flat:true ~header:false;
+        header_printer = dummy_border_printer;
+        footer_printer = dummy_border_printer;
       };
   }
 

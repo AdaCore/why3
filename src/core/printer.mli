@@ -23,8 +23,10 @@ exception BadSyntaxKind of char
 
 type prelude = string list
 type prelude_map = prelude Mid.t
+type prelude_export_map = prelude Mid.t
 type interface = string list
 type interface_map = interface Mid.t
+type interface_export_map = interface Mid.t
 type blacklist = string list
 
 (* Makes it possible to estabilish traceability from names
