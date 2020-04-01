@@ -1473,8 +1473,12 @@ end
     | Some (APa panid) ->
       let pan = Session_itp.get_proof_attempt_node session panid in
       let filter_prover =
-        Whyconf.mk_filter_prover ~version:pan.prover.Whyconf.prover_version
-          ~altern:"counterexamples" pan.prover.Whyconf.prover_name
+        if pan.prover.Whyconf.prover_altern = "strings" then
+          Whyconf.mk_filter_prover ~version:pan.prover.Whyconf.prover_version
+            ~altern:"strings-counterexamples" pan.prover.Whyconf.prover_name
+        else
+          Whyconf.mk_filter_prover ~version:pan.prover.Whyconf.prover_version
+            ~altern:"counterexamples" pan.prover.Whyconf.prover_name
       in
       begin match Whyconf.filter_one_prover config filter_prover with
       | config_prover ->
