@@ -85,7 +85,7 @@ type vc_env = {
   ps_wf_acc : lsymbol;
   exn_count : int ref;
   divergent : bool;
-  inferinvs : (expr * term) list;
+  inferinvs : (expr * term) list;   (* inferred invariants *)
 }
 
 let mk_env {Theory.th_export = ns_int} {Theory.th_export = ns_acc} kn tuc invs = {
@@ -158,7 +158,7 @@ let vc_expl loc attrs expl f =
   let rec relocate g =
     t_attr_set ?loc g.t_attrs (TermTF.t_map (fun t -> t) relocate g) in
   let attrs = Sattr.union annot_attrs (Sattr.union attrs f.t_attrs) in
-  let attrs = Sattr.add expl attrs in
+  let attrs = if attrs_has_expl attrs then attrs else Sattr.add expl attrs in
   if loc = None then t_attr_set ?loc:f.t_loc attrs f
                 else t_attr_set ?loc attrs (relocate f)
 

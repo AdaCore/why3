@@ -58,7 +58,7 @@ let infer_with_ops ai_ops e cty =
   ignore (ai_ops.put_expr_with_pre cfg context e cty.cty_pre);
   let fixp = ai_ops.eval_fixpoints cfg context in
   let domain2term (e,d) =
-    let expl = "expl:infer-loop" in
+    let expl = "infer:inferred with apron" in
     let t    = ai_ops.domain_to_term cfg context d in
     let t    = Term.t_attr_add (Ident.create_attribute expl) t in
     (e,t) in
