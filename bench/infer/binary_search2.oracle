@@ -1,0 +1,11 @@
+### Debug: inferred invariants ###
+((((((length a = (1 + contents u) /\ 0 = contents l) /\
+     (length a - 1) = contents u) /\
+    contents l = 0 \/
+    contents l <= (1 + contents u) /\
+    (contents u + 2) <= (length a + contents l)) /\
+   1 = 1) /\
+  0 = 0) /\
+ contents u < length a) /\
+0 <= contents l
+###

@@ -1,0 +1,17 @@
+module While5
+
+	use int.Int
+	use ref.Ref
+
+	exception Myexc int
+	let b(_:int) : int
+	ensures { result = 12 }
+	=
+		let i = ref 0 in
+		i := 0;
+		while !i < 10 do
+		variant { 10 - !i }
+			i := !i + 6;
+		done;
+		!i
+end

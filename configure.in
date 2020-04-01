@@ -75,6 +75,11 @@ AC_ARG_ENABLE(zip,
     AS_HELP_STRING([--disable-zip], [do not use LZ compression to store session files]),,
     enable_zip=yes)
 
+# infer
+
+AC_ARG_ENABLE(infer,
+    AS_HELP_STRING([--enable-infer], [use apron and fixpoint to infer loop invariants]),,
+    enable_infer=no)
 # js_of_ocaml
 
 AC_ARG_ENABLE(js_of_ocaml,
@@ -468,6 +473,35 @@ else
    BIGINTPKG=num
    BIGINTINCLUDE="$NUMINCLUDE"
 fi
+
+# checking for apron and fixpoint
+if test "$enable_infer" = yes; then
+   if test "$enable_ocamlfind" = yes; then
+      # gmp is a dependency of apron
+      INFERINCLUDE=$($OCAMLFIND query apron camllib)
+   fi
+   if test -n "$INFERINCLUDE"; then
+      echo "ocamlfind found apron, camllib in $INFERINCLUDE"
+      INFERINCLUDE=$($OCAMLFIND query fixpoint)
+      if test -n "$INFERINCLUDE"; then
+         echo "ocamlfind found fixpoint in $INFERINCLUDE"
+         INFERINCLUDE="$($OCAMLFIND query -separator ' ' -i-format apron fixpoint camllib gmp)"
+         INFERLIB="apron fixpoint"
+         INFERPKG="apron fixpoint apron.boxMPQ apron.octMPQ apron.polkaMPQ"
+      else
+         enable_infer=no
+         AC_MSG_WARN([Lib fixpoint not found, infer will not be built.])
+         reason_infer=" (fixpoint not found)"
+      fi
+   else
+      enable_infer=no
+      reason_infer=" (apron or camllib not found)"
+      AC_MSG_WARN([Lib apron or camllib not found, infer will not be built.])
+   fi
+else
+  reason_infer=" (disabled by default)"
+fi
+
 
 # checking for camlzip
 if test "$enable_zip" = yes; then
@@ -1079,6 +1113,11 @@ AC_SUBST(BIGINTINCLUDE)
 AC_SUBST(BIGINTLIB)
 AC_SUBST(BIGINTPKG)
 
+AC_SUBST(enable_infer)
+AC_SUBST(INFERINCLUDE)
+AC_SUBST(INFERLIB)
+AC_SUBST(INFERPKG)
+
 AC_SUBST(enable_zip)
 AC_SUBST(ZIPINCLUDE)
 AC_SUBST(ZIPLIB)
@@ -1182,6 +1221,7 @@ echo "    Web IDE                 : $enable_web_ide$reason_web_ide"
 echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
+echo "    Invariant inference(exp): $enable_infer$reason_infer"
 echo "    Frama-C support         : $enable_frama_c$reason_frama_c"
 if test "$enable_frama_c" = yes ; then
    echo "        Version             : $FRAMAC_VERSION"

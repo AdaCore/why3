@@ -1,0 +1,28 @@
+module Try2
+
+	use int.Int
+	use ref.Ref
+
+
+	type d = { field1: int; field2: int }
+	exception Myexc d
+	let b(x:int) : int
+	requires { x >= 0 }
+	ensures { result <= x + 6 }
+	=
+		let i = ref 0 in
+		i := 0;
+		let ghost k = ref 0 in
+		while !i < x do
+			variant { x - !i  }
+			k := !i;
+			try
+			i := !i + 1;
+			raise (Myexc { field1 = !i + 5; field2 = -1 })
+			with
+			| Myexc(a) -> i := a.field1
+			end
+		done;
+		!i
+end
+

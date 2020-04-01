@@ -636,8 +636,6 @@ functions from the logical part of the modules
    :start-after: BEGIN{code2_import}
    :end-before: END{code2_import}
 
-\lstinputlisting{generated/mlw_expr__code2_import.ml}
-
 We want now to build a program equivalent to the following code in
 concrete Why3 syntax.
 

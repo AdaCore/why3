@@ -1,0 +1,39 @@
+module Try1
+
+	use int.Int
+	use ref.Ref
+
+	exception Myexc int
+	let b[@infer](_:int) : int
+	ensures { result = 10 }
+	=
+		let i = ref 0 in
+		i := 0;
+		while !i < 10 do
+			variant { 10 - !i  }
+			try
+			raise (Myexc (!i + 1));
+			i := !i - 1;
+			with
+			| Myexc(a) -> i := a
+			end
+		done;
+		!i
+
+	let b2[@infer:oct](_:int) : int
+	ensures { result = 10 }
+	=
+		let i = ref 0 in
+		i := 0;
+		while !i < 10 do
+			variant { 10 - !i  }
+			try
+			raise (Myexc (!i + 1));
+			i := !i - 1;
+			with
+			| Myexc(a) -> i := a
+			end
+		done;
+		!i
+
+end

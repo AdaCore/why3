@@ -1,0 +1,21 @@
+module Junjie
+	use ref.Ref
+	use int.Int
+
+	let b(i:int):int
+	ensures { result = 102 }
+	=
+		let x = ref 0 in
+		let y = ref 0 in
+		while !y >= 0 do
+		variant { 0 }
+			if !x <= 50 then
+				y := !y + 1
+			else
+				y := !y - 1;
+			x := !x + 1;
+
+		done;
+		!y
+
+end

@@ -1,0 +1,31 @@
+
+module Test
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
+
+	let b(x:int): unit
+	requires { x >= 1 }
+	=
+		let k = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { !k < 1 }
+		incr k;
+		()
+		done; ()
+
+	let c(x:int): unit
+	requires { x >= 2 }
+	=
+		let k = ref 0 in
+		let j = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { !j < 4 }
+		incr k;
+		j := !j + 2;
+		()
+		done; ()
+end

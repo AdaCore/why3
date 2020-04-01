@@ -1,0 +1,20 @@
+module Disjunction1
+	use ref.Ref
+	use int.Int
+
+	let a[@infer](x:int) : int
+	ensures { result <> 5 }
+	=
+		let i = ref 0 in
+		let j = ref 0 in
+		while !i < x do
+			variant { x - !i }
+			if !i <= 5 then
+			j := 3
+			else
+			j := 6;
+			i := !i + 1;
+		done;
+		!j
+
+end

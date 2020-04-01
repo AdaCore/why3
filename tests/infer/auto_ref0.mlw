@@ -1,0 +1,15 @@
+
+module Test
+	use array.Array
+	use ref.Ref
+	use int.Int
+
+	let b(_:unit): unit
+	=
+		let k = ref 0 in
+		while (true) do
+		variant { 0 }
+		invariant { !k = 0 }
+		()
+		done; ()
+end

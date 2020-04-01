@@ -1,0 +1,16 @@
+use int.Int
+
+exception A
+exception B int
+exception C (int,int)
+
+let f (x: int): int
+  raises {B _ -> x = 1}
+= if x = 1 then raise B x else x + 1
+
+let g[@infer](x:int): int
+= try f x with
+  | A -> 1
+  | B _ -> 2
+  | C _ -> 3
+  end

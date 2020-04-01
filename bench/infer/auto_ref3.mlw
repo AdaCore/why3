@@ -1,0 +1,73 @@
+
+module Test
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
+
+	let b[@infer](x:int): unit
+	=
+		let k = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { !k = 0 \/ 0 <= !k <= x}
+		incr k;
+		()
+		done; ()
+
+	let b3[@infer:box](x:int): unit
+	=
+		let k = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { !k = 0 \/ 0 <= !k <= x}
+		incr k;
+		()
+		done; ()
+
+	let c[@infer](x:int): unit
+	=
+		let k = ref 0 in
+		let j = ref 0 in
+		while (!k < x) do
+		variant { x - !k }
+		invariant { !k = 0 \/ 0 <= !k <= x /\ !k *2 = !j}
+		incr k;
+		j := !j + 2;
+		()
+		done; ()
+
+	let e[@infer](x:int) : unit
+	requires { x > 0 }
+	=
+		let k = ref 0 in
+		k := x;
+		while (true) do
+		variant {0}
+		invariant { !k = x }
+		()
+		done; ()
+
+	let e2[@infer:oct](x:int) : unit
+	requires { x > 0 }
+	=
+		let k = ref 0 in
+		k := x;
+		while (true) do
+		variant {0}
+		invariant { !k = x }
+		()
+		done; ()
+
+	let e3[@infer:box](x:int) : unit
+	requires { x > 0 }
+	=
+		let k = ref 0 in
+		k := x;
+		while (true) do
+		variant {0}
+		invariant { !k = x }
+		()
+		done; ()
+
+end

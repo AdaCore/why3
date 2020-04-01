@@ -1,0 +1,25 @@
+module Test
+	use array.Array
+	use ref.Ref
+	use ref.Refint
+	use int.Int
+
+	let b(x:int): unit
+	=
+	 let y = 10 in
+	 while (true) do
+		variant { 0 }
+		invariant { y = 10 }
+	()
+		done; ()
+
+	let c(x:int): unit
+	=
+	 let y = 10 in
+	 let k = 42 in
+	 while (true) do
+		variant { 0 }
+		invariant { y = 10 /\ k = 42 }
+	()
+		done; ()
+end

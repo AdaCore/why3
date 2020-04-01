@@ -1,0 +1,84 @@
+#!/bin/bash
+
+updateoracle=false
+files=""
+dirs=""
+success=true
+why3="why3 prove"
+
+if test $# = 0; then
+  printf "no files provided\n"
+  exit 2
+fi
+
+while test $# != 0; do
+case "$1" in
+  "-update-oracle")
+      updateoracle=true;;
+  "-"*)
+      printf "unknown option: %s\n" "$1"
+      printf "usage: infer-bench [-update-oracle] <file>\n"
+      printf "  if <file> is a directory, it runs on all the *.mlw files\n"
+      exit 2;;
+  *)
+    if [ -d "$1" ]; then
+      dirs="$dirs $1"
+    else
+      if [ -f "$1" ]; then
+        files="$files $1"
+      else
+        echo "File not found: $1"
+        exit 2
+      fi
+    fi
+
+esac
+shift
+done
+
+for d in $dirs; do
+  mlw="$(ls $d/*.mlw 2> /dev/null)"
+  files="$files $mlw"
+done
+
+failed=""
+
+# $1 = file
+run () {
+  printf "running for $1"
+  file_base="$(basename $1)"
+  file_dir="$(dirname $1)"
+  oracle_file="$file_dir/${file_base%.*}.oracle"
+  str_oracle=$(cat $oracle_file 2> /dev/null)
+  str_output=$($why3 $1 --debug=print-inferred-invs | \
+                   sed -n '/^### Debug: inferred invariants ###/,/^###/p')
+  if [ "$str_oracle" = "$str_output" ] ; then
+    printf " - ok\n"
+  else
+    printf "\n"
+    if $updateoracle; then
+      echo "Updating oracle for $file_base"
+      echo "$str_output" > "${oracle_file}"
+    else
+      echo "FAILED!"
+      echo "diff is the following:"
+      echo "$f"
+      diff <(echo "$str_oracle") <(echo "$str_output")
+      failed="$failed\n$1"
+      success=false
+    fi
+  fi
+}
+
+for file in $files; do
+    run $file
+done
+
+if $success; then
+    echo "Infer bench: success"
+    exit 0
+else
+    echo "Infer bench: failed"
+    printf "$failed\n"
+    exit 1
+fi

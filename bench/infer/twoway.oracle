@@ -1,0 +1,16 @@
+### Debug: inferred invariants ###
+(((((((length a1 = (1 + contents j) /\ 0 = contents i) /\ 0 <= length a1) /\
+     (length a1 - 1) = contents j) /\
+    contents i = 0 \/
+    0 < contents i \/
+    (((0 = contents i /\ 0 <= contents j) /\ (contents j + 2) <= length a1) /\
+     True = (elts a1 @ contents i)) /\
+    contents i = 0) /\
+   1 = 1) /\
+  0 = 0) /\
+ 0 <= contents i) /\
+contents i <= (1 + contents j)
+###
+### Debug: inferred invariants ###
+0 = 0 /\ 1 = 1
+###

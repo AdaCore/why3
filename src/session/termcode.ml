@@ -18,7 +18,7 @@ open Constant
 (*          explanations       *)
 (*******************************)
 
-let expl_prefixes = ref ["expl:"]
+let expl_prefixes = ref ["expl:";"infer:"]
 
 let arg_extra_expl_prefix =
   ("--extra-expl-prefix",

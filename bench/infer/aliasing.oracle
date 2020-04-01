@@ -1,0 +1,21 @@
+### Debug: inferred invariants ###
+(0 = 0 /\ 0 <= contents i) /\ contents i <= 10
+###
+### Debug: inferred invariants ###
+contents i1 <= 10 /\ 0 <= contents i1
+###
+### Debug: inferred invariants ###
+(((((0 = contents i2 /\ j = i2) /\ contents i2 = 0) /\ contents j = 0 \/
+   10 = contents i2 /\ 1 = 1 \/
+   5 = contents i2 /\ 1 = 1 \/
+   8 = contents i2 /\ 1 = 1 \/
+   6 = contents i2 /\ 1 = 1 \/
+   (1 = contents i2 /\ 1 = contents i2) /\ 1 = contents i2 \/
+   7 = contents i2 /\ 1 = 1 \/
+   3 = contents i2 /\ 1 = 1 \/
+   9 = contents i2 /\ 1 = 1 \/
+   2 = contents i2 /\ 1 = 1 \/ 4 = contents i2 /\ 1 = 1) /\
+  0 = 0) /\
+ contents i2 <= 10) /\
+0 <= contents i2
+###

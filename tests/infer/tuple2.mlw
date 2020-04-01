@@ -1,0 +1,27 @@
+module Tuple2
+
+	use int.Int
+	use ref.Ref
+
+	val c(x:int) : (int, int)
+	ensures { result = (1, 2) }
+
+	let b(x:int) : int
+	ensures { result = 20 }
+	=
+	let b = () in
+	let a= c 4 in
+		let i = ref 0 in
+		let j = ref 0 in
+		i := 0;
+		j := 0;
+		while !i < 10 do
+			variant { 10 - !i }
+			let (a, b) = (!i + 1, !j + 2) in
+			i := a;
+			j := b;
+		done;
+		!j
+end
+
+

@@ -17,4 +17,9 @@ val kp_attr : Ident.attribute (* preserve preconditions after the call *)
 val wb_attr : Ident.attribute (* treat an abstract block as a whitebox *)
 val nt_attr : Ident.attribute (* allow non-terminating calls and loops *)
 
+val set_infer_invs :
+  (Ident.Sattr.t -> Env.env -> Decl.known_map -> known_map -> Expr.expr ->
+   Ity.cty -> (Expr.expr * Term.term) list) -> unit
+(* adds a function to infer invariants during the VC generation *)
+
 val vc : Env.env -> known_map -> Theory.theory_uc -> pdecl -> pdecl list

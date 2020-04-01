@@ -1,0 +1,44 @@
+### Debug: inferred invariants ###
+(((0 = contents i /\ contents i = 0 \/
+   42 = contents i /\ 6 = 6 \/
+   102 = contents i /\ 6 = 6 \/
+   60 = contents i /\ 6 = 6 \/
+   90 = contents i /\ 6 = 6 \/
+   84 = contents i /\ 6 = 6 \/
+   54 = contents i /\ 6 = 6 \/
+   18 = contents i /\ 6 = 6 \/
+   30 = contents i /\ 6 = 6 \/
+   (6 = contents i /\ 6 = contents i) /\ 6 = contents i \/
+   72 = contents i /\ 6 = 6 \/
+   12 = contents i /\ 6 = 6 \/
+   96 = contents i /\ 6 = 6 \/
+   48 = contents i /\ 6 = 6 \/
+   78 = contents i /\ 6 = 6 \/
+   24 = contents i /\ 6 = 6 \/
+   36 = contents i /\ 6 = 6 \/ 66 = contents i /\ 6 = 6) /\
+  0 = 0) /\
+ 0 <= contents i) /\
+contents i <= 102
+###
+### Debug: inferred invariants ###
+((contents i1 <= 0 /\ contents i1 = 0 \/
+  84 <= contents i1 /\ contents i1 <= 84 \/
+  36 <= contents i1 /\ contents i1 <= 36 \/
+  96 <= contents i1 /\ contents i1 <= 96 \/
+  30 <= contents i1 /\ contents i1 <= 30 \/
+  102 <= contents i1 \/
+  42 <= contents i1 /\ contents i1 <= 42 \/
+  66 <= contents i1 /\ contents i1 <= 66 \/
+  48 <= contents i1 /\ contents i1 <= 48 \/
+  12 <= contents i1 /\ contents i1 <= 12 \/
+  24 <= contents i1 /\ contents i1 <= 24 \/
+  (6 <= contents i1 /\ contents i1 <= 6) /\ 6 = contents i1 \/
+  60 <= contents i1 /\ contents i1 <= 60 \/
+  18 <= contents i1 /\ contents i1 <= 18 \/
+  54 <= contents i1 /\ contents i1 <= 54 \/
+  78 <= contents i1 /\ contents i1 <= 78 \/
+  90 <= contents i1 /\ contents i1 <= 90 \/
+  72 <= contents i1 /\ contents i1 <= 72) /\
+ contents i1 <= 102) /\
+0 <= contents i1
+###

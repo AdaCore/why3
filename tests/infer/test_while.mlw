@@ -1,0 +1,8 @@
+use int.Int
+use list.List
+
+let g[@infer](x:list int): int
+= let ref y = x in
+  while y > 0 do
+    decr y
+  done; y

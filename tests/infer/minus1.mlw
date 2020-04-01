@@ -1,0 +1,19 @@
+module Minus1
+
+	use int.Int
+	use ref.Ref
+
+	let b(_:int) : int
+	ensures { result = 0 }
+	=
+		let i = ref 0 in
+		let j = ref 0 in
+		j := 18;
+		i := 1;
+		while !i < 10 do
+			variant { 10 - !i  }
+			i := !i + 1;
+			j := !j - 2;
+		done;
+		!j
+end
