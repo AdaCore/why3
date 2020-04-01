@@ -76,6 +76,8 @@ val replacet : env -> Term.term -> Term.term
 val replacep : env -> Term.term -> Term.term
 *)
 
-val t_replace_all : (Term.Mvs.key list * Term.term) Term.Mls.t -> Term.term -> Term.term
-(** [t_replace_all env t] replaces in [t] all occurrences of function applicatios t
-    are given in [env], a map from function symbols to their definition. *)
+open Term
+
+val t_replace_all : (vsymbol list * term) Mls.t -> term -> term
+(* [t_replace_all env t] replaces in [t] all occurrences of function
+   applicatios given in [env] *)
