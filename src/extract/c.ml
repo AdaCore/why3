@@ -995,14 +995,6 @@ module MLToC = struct
                       (* is this struct boxed or passed by value? *)
                     }
 
-  let is_true e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_true
-    | _ -> false
-
-  let is_false e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_false
-    | _ -> false
-
   let is_unit = function
     | I i -> ity_equal i Ity.ity_unit
     | C _ -> false
@@ -1135,10 +1127,11 @@ module MLToC = struct
                                 C.Sblock (aux t)))
        in
        aux l
-    | Eapp (rs, []) when rs_equal rs rs_true ->
+    | Eapp (_, _, true) -> raise (Unsupported "partial application")
+    | Eapp (rs, [], false) when rs_equal rs rs_true ->
        Debug.dprintf debug_c_extraction "true@.";
        ([],expr_or_return env (C.Econst (Cint ("1",lit_one))))
-    | Eapp (rs, []) when rs_equal rs rs_false ->
+    | Eapp (rs, [], false) when rs_equal rs rs_false ->
        Debug.dprintf debug_c_extraction "false@.";
        ([],expr_or_return env (C.Econst (Cint ("0", lit_zero))))
     | Mltree.Evar pv ->
@@ -1179,18 +1172,18 @@ module MLToC = struct
        in
        let e = C.(Econst (Cint (s, ic))) in
        ([], expr_or_return env e)
-    | Eapp (rs, []) when Hid.mem globals rs.rs_name ->
+    | Eapp (rs, [], _) when Hid.mem globals rs.rs_name ->
        Debug.dprintf debug_c_extraction "global variable %s@."
          rs.rs_name.id_string;
        [], expr_or_return env (Evar rs.rs_name)
-    | Eapp (rs, _) when Sattr.mem decl_attribute rs.rs_name.id_attrs ->
+    | Eapp (rs, _, _) when Sattr.mem decl_attribute rs.rs_name.id_attrs ->
        raise (Unsupported "local variable declaration call outside let-in")
-    | Eapp (rs, [e]) when rs_equal rs Pmodule.rs_ref ->
+    | Eapp (rs, [e], _) when rs_equal rs Pmodule.rs_ref ->
        Debug.dprintf debug_c_extraction "ref constructor@.";
        let env_f = { env with computes_return_value = false } in
        let arg = simplify_expr (expr info env_f e) in
        ([], expr_or_return env arg)
-    | Eapp (rs, el)
+    | Eapp (rs, el, _)
          when is_struct_constructor info rs
               && query_syntax info.syntax rs.rs_name = None ->
        Debug.dprintf debug_c_extraction "constructor %s@." rs.rs_name.id_string;
@@ -1215,7 +1208,7 @@ module MLToC = struct
            (fun acc (f, _ty) arg -> Sseq (acc,assign_expr f arg))
            Snop sfields args in
        (defs, Sseq (inits, expr_or_return env st))
-    | Eapp (rs, el) ->
+    | Eapp (rs, el, _) ->
        Debug.dprintf debug_c_extraction "call to %s@." rs.rs_name.id_string;
        let args = List.filter (fun e -> not (is_unit e.e_ity)) el
        in (*FIXME still needed with masks? *)
@@ -1331,7 +1324,7 @@ module MLToC = struct
        begin match simplify_cond (cd, cs) with
        | [], C.Sexpr c ->
           let c = handle_likely cond.e_attrs c in
-          if is_false th && is_true el
+          if Mltree.is_false th && Mltree.is_true el
           then C.([], expr_or_return env (Eunop(Unot, c)))
           else [], C.Sif(c,C.Sblock t, C.Sblock e)
        | cdef, cs ->
@@ -1424,14 +1417,14 @@ module MLToC = struct
     | Efor (i, sb, dir, eb, body) ->
        Debug.dprintf debug_c_extraction "FOR@.";
        do_for eb None sb None i dir body
-    | Ematch (({e_node = Eapp(_rs,_)} as e1), [Pwild, e2], []) ->
+    | Ematch (({e_node = Eapp(_rs,_, _)} as e1), [Pwild, e2], []) ->
        let ne = { e with e_node = Eblock [e1; e2] } in
        expr info env ne
     | Ematch (e1, [Pvar v, e2], []) ->
        let ity = ity_of_expr e1 in
        let cty = ty_of_ty info (ty_of_ity ity) in
        do_let v.vs_name ity cty e1 e2
-    | Ematch (({e_node = Eapp(rs,_)} as e1), [Ptuple rets,e2], [])
+    | Ematch (({e_node = Eapp(rs,_, _)} as e1), [Ptuple rets,e2], [])
          when List.for_all
                 (function | Pwild (*ghost*) | Pvar _ -> true |_-> false)
                 rets
@@ -1512,7 +1505,7 @@ module MLToC = struct
               then C.Sreturn(Enothing)
               else C.Snop)
     | Efun _ -> raise (Unsupported "higher order")
-    | Elet (Lvar (v, { e_node = Eapp (rs, al) }), e)
+    | Elet (Lvar (v, { e_node = Eapp (rs, al, _) }), e)
          when Sattr.mem decl_attribute rs.rs_name.id_attrs
               && query_syntax info.syntax rs.rs_name <> None
               && List.for_all (fun e -> is_unit e.e_ity) al
@@ -1527,7 +1520,7 @@ module MLToC = struct
        let d = C.Ddecl (t, [pv_name v, ecall]) in
        let d', s = expr info env e in
        d::d', s
-    | Elet (Lvar (a, { e_node = Eapp (rs, [n; v]) }), e)
+    | Elet (Lvar (a, { e_node = Eapp (rs, [n; v], _) }), e)
          when Sattr.mem array_mk rs.rs_name.id_attrs ->
        (* let a = Array.make n v in e*)
        Debug.dprintf debug_c_extraction "call to an array constructor@.";

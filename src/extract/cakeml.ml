@@ -96,15 +96,6 @@ module Print = struct
   let pv_name pv = pv.pv_vs.vs_name
   let print_pv info fmt pv = print_lident info fmt (pv_name pv)
 
-  (* FIXME put these in Compile*)
-  let is_true e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_true
-    | _ -> false
-
-  let is_false e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_false
-    | _ -> false
-
   let is_mapped_to_int info ity =
     match ity.ity_node with
     | Ityapp ({ its_ts = ts }, _, _) ->
@@ -254,13 +245,11 @@ module Print = struct
         forget_let_defn let_def
     | Eabsurd ->
         fprintf fmt (protect_on paren "assert false (* absurd *)")
-    | Eapp (rs, []) when rs_equal rs rs_true ->
+    | Eapp (rs, [], false) when rs_equal rs rs_true ->
         fprintf fmt "true"
-    | Eapp (rs, []) when rs_equal rs rs_false ->
+    | Eapp (rs, [], false) when rs_equal rs rs_false ->
         fprintf fmt "false"
-    | Eapp (rs, [])  -> (* avoids parenthesis around values *)
-        fprintf fmt "%a" (print_apply info rs) []
-    | Eapp (rs, pvl) ->
+    | Eapp (rs, pvl, _) ->
        fprintf fmt (protect_on paren "%a")
                (print_apply info rs) pvl
     | Ematch (e1, [p, e2], []) ->

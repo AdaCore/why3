@@ -615,7 +615,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
       with Not_found ->
         Debug.dprintf debug_interp "var %a not found@." print_pv pv;
            raise CannotReduce)
-  | Eapp (rs, le) -> begin
+  | Eapp (rs, le, _) -> begin
       Debug.dprintf debug_interp "Eapp %a@." Expr.print_rs rs;
       let eval_call info vl e rs =
         Debug.dprintf debug_interp "eval params@.";

@@ -36,6 +36,7 @@ type pat =
   | Pas    of pat * vsymbol
 
 type is_rec = bool
+type is_partial = bool
 
 type binop = Band | Bor | Beq
 
@@ -52,7 +53,7 @@ type expr = {
 and expr_node =
   | Econst  of Constant.constant
   | Evar    of pvsymbol
-  | Eapp    of rsymbol * expr list
+  | Eapp    of rsymbol * expr list * is_partial
   | Efun    of var list * expr
   | Elet    of let_def * expr
   | Eif     of expr * expr * expr
@@ -188,7 +189,7 @@ and iter_deps_pat f = function
 and iter_deps_expr f e = match e.e_node with
   | Econst _ | Eabsurd -> ()
   | Evar pv -> f pv.pv_vs.vs_name
-  | Eapp (rs, exprl) ->
+  | Eapp (rs, exprl, _) ->
       f rs.rs_name; List.iter (iter_deps_expr f) exprl
   | Efun (args, e) ->
       List.iter (fun (_, ty_arg, _) -> iter_deps_ty f ty_arg) args;
@@ -282,6 +283,14 @@ let is_unit = function
   | I i -> ity_equal i Ity.ity_unit
   | _ -> false
 
+let is_true e = match e.e_node with
+  | Eapp (s, [], false) -> rs_equal s rs_true
+  | _ -> false
+
+let is_false e = match e.e_node with
+  | Eapp (s, [], false) -> rs_equal s rs_false
+  | _ -> false
+
 let t_arrow t1 t2 = Tarrow (t1, t2)
 
 let t_fun params res =
@@ -321,8 +330,8 @@ let sym_defn f svars ty_res args e =
 
 let e_let ld e = mk_expr (Elet (ld, e))
 
-let e_app rs pvl =
-  mk_expr (Eapp (rs, pvl))
+let e_app rs pvl partial =
+  mk_expr (Eapp (rs, pvl, partial))
 
 let e_fun args e = mk_expr (Efun (args, e))
 
@@ -381,7 +390,7 @@ let e_map fn e =
   let mk en = { e with e_node = en } in
   match e.e_node with
   | Econst _ | Evar _ | Efun (_,_) | Eabsurd -> e
-  | Eapp (rs,el) -> mk (Eapp(rs,(List.map fn el)))
+  | Eapp (rs,el, p) -> mk (Eapp(rs,(List.map fn el), p))
   | Elet (ld,e) -> mk (Elet (ld_map fn ld, fn e))
   | Eif (c,t,e) -> mk (Eif (fn c, fn t, fn e))
   | Eassign al ->
@@ -409,7 +418,7 @@ let e_fold fn acc e =
   match e.e_node with
   | Econst _ | Evar _
   | Efun (_,_) | Eabsurd -> acc
-  | Eapp (_,el) -> List.fold_left fn acc el
+  | Eapp (_,el,_) -> List.fold_left fn acc el
   | Elet (ld,e) -> fn (ld_fold fn acc ld) e
   | Eif (c,t,e) ->
      let acc = fn acc c in
@@ -450,9 +459,9 @@ let e_map_fold fn acc e =
   match e.e_node with
   | Econst _ | Evar _
   | Efun (_,_) | Eabsurd -> acc, e
-  | Eapp (rs,el) ->
+  | Eapp (rs,el,p) ->
      let acc,el = Lists.map_fold_left fn acc el in
-     acc,mk (Eapp(rs,el))
+     acc,mk (Eapp(rs,el,p))
   | Elet (ld,e) ->
      let acc, ld = ld_map_fold fn acc ld in
      let acc, e = fn acc e in

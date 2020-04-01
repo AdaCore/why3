@@ -360,15 +360,6 @@ module Print = struct
   let pv_name pv = pv.pv_vs.vs_name
   let print_pv info fmt pv = print_lident info fmt (pv_name pv)
 
-  (* FIXME put these in Compile*)
-  let is_true e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_true
-    | _ -> false
-
-  let is_false e = match e.e_node with
-    | Eapp (s, []) -> rs_equal s rs_false
-    | _ -> false
-
   let is_field rs =
       match rs.rs_field with
       | None   -> false
@@ -405,7 +396,7 @@ module Print = struct
     | expr :: exprl, pv :: pvl ->
         if is_optional ~attrs:(pv_name pv).id_attrs then
           begin match expr.e_node with
-            | Eapp (rs, _)
+            | Eapp (rs, _, false)
               when query_syntax info.info_syn rs.rs_name = Some "None" -> ()
             | _ -> fprintf fmt "?%s:%a" (pv_name pv).id_string
                      (print_expr info 1) expr end
@@ -567,15 +558,14 @@ module Print = struct
         forget_let_defn let_def
     | Eabsurd ->
         fprintf fmt (protect_on (opr && prec < 4) "assert false (* absurd *)")
-    | Eapp (rs, []) when rs_equal rs rs_true ->
+    | Eapp (rs, [], _) when rs_equal rs rs_true ->
         fprintf fmt "true"
-    | Eapp (rs, []) when rs_equal rs rs_false ->
+    | Eapp (rs, [], _) when rs_equal rs rs_false ->
         fprintf fmt "false"
-    | Eapp (rs, [])  -> (* avoids parenthesis around values *)
-        print_apply info prec rs fmt []
-    | Eapp (rs, [e]) when query_syntax info.info_syn rs.rs_name = Some "%1" ->
+    | Eapp (rs, [e], _)
+         when query_syntax info.info_syn rs.rs_name = Some "%1" ->
         print_expr ~boxed ~opr ~be info prec fmt e
-    | Eapp (rs, pvl) ->
+    | Eapp (rs, pvl, _) ->
         print_apply info prec rs fmt pvl
     | Ematch (e1, [p, e2], []) ->
         fprintf fmt (protect_on (opr && prec < 18) "let %a =@ %a in@ %a")

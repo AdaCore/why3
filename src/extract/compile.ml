@@ -185,7 +185,7 @@ module Translate = struct
       let extra_args = List.map def ca in
       args @ extra_args in
     let rty = mlty_of_ity mv c.cty_result in
-    let eapp = ML.mk_expr (ML.Eapp (rs, args)) (ML.C c) mv
+    let eapp = ML.mk_expr (ML.Eapp (rs, args, false)) (ML.C c) mv
                  rty ce Sattr.empty in
     let mlty = ML.t_fun args_f rty in
     ML.mk_expr (ML.Efun (args_f, eapp)) (ML.C c) mv mlty ce Sattr.empty
@@ -201,9 +201,12 @@ module Translate = struct
 
   let filter_params_cty p def pvl cty_args =
     let rec loop = function
-      | [], _ -> []
+      | [], rem -> [], List.map def (List.filter p rem)
       | pv :: l1, arg :: l2 ->
-          if p pv && p arg then def pv :: loop (l1, l2) else loop (l1, l2)
+         if p pv && p arg then
+           let applied, remaining = loop (l1, l2) in
+           def pv :: applied, remaining
+         else loop (l1, l2)
       | _ -> assert false
     in loop (pvl, cty_args)
 
@@ -211,8 +214,8 @@ module Translate = struct
     let def pv = ML.mk_expr (ML.Evar pv) (ML.I pv.pv_ity) MaskVisible
                    (mlty_of_ity MaskVisible pv.pv_ity)
                    eff_empty Sattr.empty in
-    let args = filter_params_cty pv_not_ghost def pvl cty_args in
-    f_zero args
+    let applied, remaining = filter_params_cty pv_not_ghost def pvl cty_args in
+    (f_zero applied, remaining)
 
   (* build the set of type variables from functions arguments *)
   let rec add_tvar acc = function
@@ -304,22 +307,28 @@ module Translate = struct
         let ein = expr info svar mask ein in
         ML.e_let ld ein (ML.I e.e_ity) mask (ein.ML.e_mlty) eff attrs
     | Elet (LDsym (rsf, {c_node = Capp (rs_app, pvl); c_cty = cty}), ein) ->
-        (* partial application *) (* FIXME -> zero arguments functions *)
+        (* partial application *)
         Debug.dprintf debug_compile "compiling partial application of %s@."
           rsf.rs_name.id_string;
         let cmk = cty.cty_mask in
         let ceff = cty.cty_effect in
-        let pvl = app pvl rs_app.rs_cty.cty_args (fun x -> x) in
         let rs_app = Hrs.find_def ht_rs rs_app rs_app in
+        let (pvl, remaining) = app pvl rs_app.rs_cty.cty_args (fun x -> x) in
         let res = mlty_of_ity cty.cty_mask cty.cty_result in
+        let fargs =
+          match remaining, rs_app.rs_logic with
+          | [], RLnone ->
+             (* application is partial, so some ghost arguments
+                must still be missing *)
+             [ML.mk_var_unit]
+          | _, _ -> [] in
         let appty =
           List.fold_right
             (fun pv rty -> ML.t_arrow pv.ML.e_mlty rty)
-            pvl res in
-        let eapp = ML.e_app rs_app pvl (ML.C cty) cmk appty ceff Sattr.empty in
-        let args = params cty.cty_args in
-        let new_svar = new_svar args res svar in
-        let ld = ML.sym_defn rsf new_svar res args eapp in
+            remaining res in
+        let eapp = ML.e_app rs_app pvl true
+                     (ML.C cty) cmk appty ceff Sattr.empty in
+        let ld = ML.sym_defn rsf Stv.empty appty fargs eapp in
         let ein = expr info svar mask ein in
         ML.e_let ld ein (ML.I e.e_ity) mask ein.ML.e_mlty eff attrs
     | Elet (LDsym (_, {c_node = Cany; _}), _) -> let loc = e.e_loc in
@@ -353,7 +362,8 @@ module Translate = struct
           List.map (fun pv -> mlty_of_ity MaskVisible pv.pv_ity) pvl in
         let res_ity = ity_tuple (List.map (fun v -> v.pv_ity) pvl) in
         let pvl = ML.var_list_of_pv_list pvl mltyl in
-        ML.e_app rs pvl (ML.I res_ity) mask (mlty_of_ity mask res_ity) eff attrs
+        ML.e_app rs pvl false
+          (ML.I res_ity) mask (mlty_of_ity mask res_ity) eff attrs
     | Eexec ({c_node = Capp (rs, _)}, _) when is_empty_record info rs ->
         ML.e_unit
     | Eexec ({c_node = Capp (rs, pvl); c_cty = cty}, _)
@@ -375,12 +385,13 @@ module Translate = struct
               (* FIXME: ideally this should be done in ocaml_printer *)
               add_unit
           | _ -> id_f in
-        let pvl = app pvl rs.rs_cty.cty_args f_zero in
+        let (pvl,rem) = app pvl rs.rs_cty.cty_args f_zero in
         let eta_exp_pj is_optimizable =
           Debug.dprintf debug_compile "record projection@.";
           let params = filter_params cty.cty_args in
           let args = cty.cty_args in
-          let app_args = app args args (fun x -> x) in
+          let (app_args,rem) = app args args (fun x -> x) in
+          assert (rem = []);
           (* create the identity function *)
           let ml_app =
             if is_optimizable then
@@ -388,7 +399,8 @@ module Translate = struct
             else
               let ity_res = (ML.I rs.rs_cty.cty_result) in
               let mlty_res = mlty_of_ity MaskVisible rs.rs_cty.cty_result in
-              ML.e_app rs app_args ity_res MaskVisible mlty_res eff_empty attrs
+              ML.e_app rs app_args false ity_res MaskVisible
+                mlty_res eff_empty attrs
           in
           let ity = ML.C cty in
           let attrs = Sattr.empty in
@@ -402,7 +414,7 @@ module Translate = struct
           | [] when rs.rs_field <> None -> eta_exp_pj false
           | _ ->
              let mlty = mlty_of_ity mask e.e_ity in
-             ML.e_app rs pvl (ML.I e.e_ity) mask mlty eff attrs end
+             ML.e_app rs pvl (rem <> []) (ML.I e.e_ity) mask mlty eff attrs end
     | Eexec ({c_node = Cfun e; c_cty = {cty_args = []}}, _) ->
         (* abstract block *)
         Debug.dprintf debug_compile "compiling abstract block@.";
@@ -700,9 +712,9 @@ module RefreshLetBindings = struct
     | Evar pv ->
        let pv' = pvs accv pv in
        acc, mk (Evar pv')
-    | Eapp (rs, el) ->
+    | Eapp (rs, el, p) ->
        let rs' = Mrs.find_def rs rs accf in
-       acc, mk (Eapp (rs', el))
+       acc, mk (Eapp (rs', el, p))
     | Eassign al ->
        let al' =
          List.map
@@ -769,7 +781,7 @@ module InlineFunctionCalls = struct
     let mk e_node = { e with e_node = e_node } in
     match e.e_node with
     | Evar v -> mk (Evar (pv subst v))
-    | Eapp (rs, el) when Sattr.mem inline_attr rs.rs_name.id_attrs ->
+    | Eapp (rs, el, _) when Sattr.mem inline_attr rs.rs_name.id_attrs ->
        let fname = rs.rs_name in
        Debug.dprintf debug_compile "inlining call to %s@." fname.id_string;
        let decl = Hid.find known_decls fname in
@@ -872,7 +884,7 @@ module InlineProxyVars = struct
            with zero arguments inside a [Efun]. *)
         let p _k e = match e.e_node with
           | Econst _ -> true
-          | Eapp (rs, []) when Translate.isconstructor info rs -> true
+          | Eapp (rs, [], _) when Translate.isconstructor info rs -> true
           | _ -> false in
         let restrict_subst = Mpv.filter p subst in
         (* We begin the inlining of proxy variables in an [Efun] with a
