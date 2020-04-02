@@ -7,7 +7,7 @@ use mach.int.Int32
 let f (n min max:int32) : int32
    ensures { min <= result <= max }
 =
-  let x = min + max in
+  let _x = min + max in
   if n < min then min else if n > max then max else n
 
 end
@@ -22,7 +22,7 @@ let f (n min max:BV32.t) : BV32.t
    ensures { ule min result /\ ule result max }
    (* ensures { BV32.t'int min <= BV32.t'int result  <= BV32.t'int max } *)
 =
-  let x = add_check min max in
+  let _x = add_check min max in
   if lt_check n min then min else if gt_check n max then max else n
 
 end

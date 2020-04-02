@@ -3,7 +3,9 @@ module M
 
 use int.Int
 
-let f () =
+let f () : unit
+  diverges
+  =
   let ref a = 0 in
   a <- 1;
   let ref b = 2 in
@@ -23,6 +25,7 @@ val ref a : int
 val ref b : int
 
 let f () : int
+  diverges
   ensures { result < a }
   =
   a <- 1;
@@ -44,6 +47,7 @@ val ref a : real
 val ref b : real
 
 let f () : real
+  diverges
   ensures { result < a }
   =
   a <- 1.0;
