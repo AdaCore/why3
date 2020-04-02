@@ -227,10 +227,7 @@ module Make(E: sig
     | Epure t ->
       let node1, node2 = new_node_cfg cfg expr ~lbl:"pure bgn",
                          new_node_cfg cfg expr ~lbl:"pure end" in
-      let vreturn = match ret with
-        | None -> create_vreturn manpk (t_type t)
-        | Some v -> v
-      in
+      let vreturn = Opt.get_def (create_vreturn manpk (t_type t)) ret in
       let postcondition = t_app ps_equ [t_var vreturn; t] None in
       let constraints = QDom.meet_term manpk postcondition in
       new_hedge_cfg cfg node1 node2 (fun _ -> constraints) ~lbl:"pure";
@@ -270,9 +267,8 @@ module Make(E: sig
     | Evar pv ->
       let postcondition =
         if ity_equal pv.pv_ity ity_unit then fun_id else
-          let vreturn = match ret with
-            | None -> create_vreturn manpk pv.pv_vs.vs_ty
-            | Some v -> v in
+          let vreturn =
+            Opt.get_def (create_vreturn manpk pv.pv_vs.vs_ty) ret in
           let t = t_app ps_equ [t_var pv.pv_vs;t_var vreturn] None in
           QDom.meet_term manpk t in
       let begin_cp = new_node_cfg cfg expr ~lbl:"var bgn" in
@@ -283,9 +279,7 @@ module Make(E: sig
     | Econst n ->
        let begin_cp = new_node_cfg cfg expr ~lbl:"const bgn" in
        let end_cp   = new_node_cfg cfg expr ~lbl:"const end" in
-       let vreturn  = match ret with
-         | None -> create_vreturn manpk Ty.ty_int
-         | Some v -> v in
+       let vreturn  = Opt.get_def (create_vreturn manpk Ty.ty_int) ret in
        let postcondition =
          t_app ps_equ [t_const n Ty.ty_int; t_var vreturn] None in
        let constraints = QDom.meet_term manpk postcondition in
@@ -407,9 +401,8 @@ module Make(E: sig
                | _       -> failwith "nested pattern or worse") p in
              let matched_term =
                t_app ls (List.map t_var args) (Some (ty_of_ity match_e.e_ity)) in
-             let vreturn = match ret with
-               | None -> create_vreturn manpk (t_type matched_term)
-               | Some v -> v in
+             let vreturn =
+               Opt.get_def (create_vreturn manpk (t_type matched_term)) ret in
              let postcondition =
                t_app ps_equ [matched_term; t_var vreturn] None in
              let constr = QDom.meet_term manpk postcondition in
