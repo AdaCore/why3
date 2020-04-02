@@ -17,6 +17,7 @@ type attribute = private {
   attr_string : string;
   attr_tag    : int;
 }
+[@@deriving sexp_of]
 
 module Mattr : Extmap.S with type key = attribute
 module Sattr : Extset.S with module M = Mattr

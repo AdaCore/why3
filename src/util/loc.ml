@@ -13,6 +13,7 @@
 type lexing_loc = Lexing.position * Lexing.position
 *)
 
+open Mysexplib.Std [@@warning "-33"]
 open Lexing
 
 let current_offset = ref 0
@@ -43,6 +44,7 @@ let report_line fmt l = fprintf fmt "%s:%d:" l.pos_fname l.pos_lnum
 *)
 
 type position = string * int * int * int
+[@@deriving sexp_of]
 
 let user_position fname lnum cnum1 cnum2 = (fname,lnum,cnum1,cnum2)
 

@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Mysexplib.Std [@@warning "-33"]
 open Number
 
 (** Construction *)
@@ -17,6 +18,7 @@ type constant =
   | ConstInt  of int_constant
   | ConstReal of real_constant
   | ConstStr  of string
+[@@deriving sexp_of]
 
 let compare_const c1 c2 =
   match c1, c2 with

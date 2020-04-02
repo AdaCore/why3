@@ -402,26 +402,26 @@ let set_kind = function
   | "inductive" -> kind := Some Inductive
   | _ -> assert false
 
-type output = Latex | Mlw | Ast | Dep
+type output = Latex | Mlw | Sexp | Dep
 
 let output = ref Mlw
 
 let set_output = function
   | "latex" -> output := Latex
   | "mlw" -> output := Mlw
-  | "ast" -> output := Ast
+  | "sexp" -> output := Sexp
   | "dep" -> output := Dep
   | _ -> assert false
 
 let prefix = ref "WHY"
 
 let usage_msg = sprintf
-  "Usage: %s [options] [--output=latex|mlw|ast|dep] [--kind=inductive] [--prefix=<prefix>] <filename> [<Module>.]<type> ...\n"
+  "Usage: %s [options] [--output=latex|mlw|sexp|dep] [--kind=inductive] [--prefix=<prefix>] <filename> [<Module>.]<type> ...\n"
   (Filename.basename Sys.argv.(0))
 
 let spec =
   let open Why3.Getopt in
-  [ KLong "output", Hnd1 (ASymbol ["latex"; "mlw"; "ast"; "dep"], set_output),
+  [ KLong "output", Hnd1 (ASymbol ["latex"; "mlw"; "sexp"; "dep"], set_output),
     "<output> select output format (default: \"mlw\")";
     KLong "kind", Hnd1 (ASymbol ["inductive"], set_kind),
     "<category> select syntactic category to be printed (only\n\
@@ -499,9 +499,8 @@ let () =
          | Dep, None, _ ->
             let f = Filename.(chop_extension (basename filename)) in
             deps_file std_formatter true f mlw_file
-         | Ast, None, 0 ->
-            eprintf "experimental output in AST form not available.@.";
-            exit 1
+         | Sexp, None, 0 ->
+             Why3pp_sexp.why3pp_sexp mlw_file
          | _, _, _ ->
              Getopt.handle_exn Sys.argv "invalid arguments"
         )

@@ -9,8 +9,9 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** Parse trees *)
+open Mysexplib.Std [@@warning "-33"]
 
+(** Parse trees *)
 
 (** {1 Parse trees} *)
 
@@ -19,16 +20,19 @@
 type attr =
   | ATstr of Ident.attribute
   | ATpos of Loc.position
+[@@deriving sexp_of]
 
 type ident = {
   id_str : string;
   id_ats : attr list;
   id_loc : Loc.position;
 }
+[@@deriving sexp_of]
 
 type qualid =
   | Qident of ident
   | Qdot of qualid * ident
+[@@deriving sexp_of]
 
 (** {2 Types} *)
 
@@ -41,10 +45,12 @@ type pty =
   | PTscope of qualid * pty
   | PTparen of pty
   | PTpure  of pty
+[@@deriving sexp_of]
 
 (** {2 Patterns} *)
 
 type ghost = bool
+[@@deriving sexp_of]
 
 type pattern = {
   pat_desc : pat_desc;
@@ -63,11 +69,15 @@ and pat_desc =
   | Pscope of qualid * pattern
   | Pparen of pattern
   | Pghost of pattern
+[@@deriving sexp_of]
 
 (** {2 Logical terms and formulas} *)
 
 type binder = Loc.position * ident option * ghost * pty option
+[@@deriving sexp_of]
+
 type param  = Loc.position * ident option * ghost * pty
+[@@deriving sexp_of]
 
 type term = {
   term_desc : term_desc;
@@ -98,23 +108,29 @@ and term_desc =
   | Tupdate of term * (qualid * term) list
   | Tscope of qualid * term
   | Tat of term * ident
+[@@deriving sexp_of]
 
 (** {2 Program expressions} *)
 
 (** Loop invariant or type invariant *)
 type invariant = term list
+[@@deriving sexp_of]
 
 (** Variant for both loops and recursive functions *)
 type variant = (term * qualid option) list
+[@@deriving sexp_of]
 
 (** Precondition *)
 type pre = term
+[@@deriving sexp_of]
 
 (** Normal postcondition *)
 type post = Loc.position * (pattern * term) list
+[@@deriving sexp_of]
 
 (** Exceptional postcondition *)
 type xpost = Loc.position * (qualid * (pattern * term) option) list
+[@@deriving sexp_of]
 
 (** Contract *)
 type spec = {
@@ -129,6 +145,7 @@ type spec = {
     sp_diverge : bool; (** may the function diverge? *)
     sp_partial : bool; (** is the function partial? *)
 }
+[@@deriving sexp_of]
 
 (** Expressions, equipped with a source location *)
 type expr = {
@@ -226,6 +243,7 @@ and exn_branch = qualid * pattern option * expr
 (** Local function definition *)
 and fundef = ident * ghost * Expr.rs_kind *
                binder list * pty option * pattern * Ity.mask * spec * expr
+[@@deriving sexp_of]
 
 (** {2 Declarations} *)
 
@@ -237,6 +255,7 @@ type field = {
   f_mutable : bool;
   f_ghost   : bool
 }
+[@@deriving sexp_of]
 
 (** Type definition body *)
 type type_def =
@@ -250,9 +269,11 @@ type type_def =
   (** integer type in given range  *)
   | TDfloat     of int * int
   (** floating-point type with given exponent and precision *)
+[@@deriving sexp_of]
 
 (** The different kinds of visibility *)
 type visibility = Public | Private | Abstract (** = Private + ghost fields *)
+[@@deriving sexp_of]
 
 (** A type declaration *)
 type type_decl = {
@@ -265,6 +286,7 @@ type type_decl = {
   td_wit    : (qualid * expr) list;  (** witness for the invariant *)
   td_def    : type_def;
 }
+[@@deriving sexp_of]
 
 (** A single declaration of a function or predicate *)
 type logic_decl = {
@@ -274,6 +296,7 @@ type logic_decl = {
   ld_type   : pty option;
   ld_def    : term option;
 }
+[@@deriving sexp_of]
 
 (** A single declaration of an inductive predicate *)
 type ind_decl = {
@@ -282,6 +305,7 @@ type ind_decl = {
   in_params : param list;
   in_def    : (Loc.position * ident * term) list;
 }
+[@@deriving sexp_of]
 
 (** Arguments of [meta] declarations *)
 type metarg =
@@ -294,6 +318,7 @@ type metarg =
   | Mval of qualid
   | Mstr of string
   | Mint of int
+[@@deriving sexp_of]
 
 (** The possible [clone] substitution elements *)
 type clone_subst =
@@ -306,6 +331,7 @@ type clone_subst =
   | CSaxiom of qualid
   | CSlemma of qualid
   | CSgoal  of qualid
+[@@deriving sexp_of]
 
 (** top-level declarations *)
 type decl =
@@ -337,9 +363,12 @@ type decl =
   (** [import] *)
   | Dscope of Loc.position * bool * ident * decl list
   (** [scope] *)
+[@@deriving sexp_of]
 
 type mlw_file =
   | Modules of (ident * decl list) list
   (** a list of modules containing lists of declarations *)
   | Decls of decl list
   (** a list of declarations outside any module *)
+[@@deriving sexp_of]
+

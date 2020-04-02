@@ -52,6 +52,8 @@ depopts: [
   "camlzip"
   "ocamlgraph"
   "re"
+  "sexplib" {ppx_sexp_conv:installed}
+  "ppx_sexp_conv" {build}
 ]
 
 conflicts: [

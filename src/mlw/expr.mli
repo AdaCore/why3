@@ -44,6 +44,7 @@ type rs_kind =
   | RKfunc    (* top-level let-function *)
   | RKpred    (* top-level let-predicate *)
   | RKlemma   (* top-level or local let-lemma *)
+[@@deriving sexp_of]
 
 val rs_kind : rsymbol -> rs_kind
 
@@ -102,8 +103,10 @@ val create_prog_pattern :
 (** {2 Program expressions} *)
 
 type assertion_kind = Assert | Assume | Check
+[@@deriving sexp_of]
 
 type for_direction = To | DownTo
+[@@deriving sexp_of]
 
 type for_bounds = pvsymbol * for_direction * pvsymbol
 

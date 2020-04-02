@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Mysexplib.Std [@@warning "-33"]
 open Wstdlib
 
 (** Attributes *)
@@ -17,6 +18,7 @@ type attribute = {
   attr_string : string;
   attr_tag    : int;
 }
+[@@deriving sexp_of]
 
 module Attr = MakeMSH (struct
   type t = attribute

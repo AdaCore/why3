@@ -1348,27 +1348,29 @@ The ``pp`` Command
 
 .. program:: why3 pp
 
-This tool pretty-prints Why3 declarations into various forms. The kind of
-output is specified using the ``--output`` option.
+This tool pretty-prints Why3 declarations into various forms. The kind of output is
+specified using the ``--output`` option.
 
 ::
 
-    why3 pp [--output=latex|mlw|dep] [--kind=inductive] [--prefix=<prefix>] \
-      <filename> <file>[.<Module>].<ind_type> ...
+    why3 pp [--output=mlw|sexp|latex|dep] [--kind=inductive] [--prefix=<prefix>] \
+      <filename> <file>[[.<Module>].<ind_type>] ...
 
 .. option:: --output=<output>
 
    Set the output format, among the following:
 
+   - ``mlw``: reformat WhyML source code.
+
+   - ``sexp``: print the abstract syntax tree of a WhyML file (data-type from API module
+     ``Ptree``) as a S-expression (enabled only when package ``ppx_sexp_conv`` is
+     available at configuration time of Why3).
+
    - ``latex``: currently can be used to print WhyML inductive definitions
      to LaTeX, using the ``mathpartir`` package.
 
-   - ``mlw``: reformat WhyML source code.
-
    - ``dep``: display module dependencies, under the form of a digraph
      using the ``dot`` syntax from the `GraphViz <https://www.graphviz.org/>`_ visualisation software.
-
-   .. - ``ast``: print the abstract syntax tree (data-type from API module ``Ptree``).
 
 .. option:: --kind=<kind>
 
@@ -1378,7 +1380,8 @@ output is specified using the ``--output`` option.
 
 .. option:: --prefix=<prefix>
 
-   Set the prefix for LaTeX commands to *<prefix>*. The default is ``WHY``.
+   Set the prefix for LaTeX commands when using ``--output=latex`` to *<prefix>*. The
+   default is ``WHY``.
 
 For the LaTeX output, the typesetting of variables, record fields, and
 functions can be configured by LaTeX commands. Dummy definitions of these

@@ -9,6 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
+open Mysexplib.Std [@@warning "-33"]
 open Wstdlib
 open Ident
 open Ty
@@ -795,6 +796,7 @@ type mask =
   | MaskVisible
   | MaskTuple of mask list
   | MaskGhost
+[@@deriving sexp_of]
 
 let mask_of_pv v = if v.pv_ghost then MaskGhost else MaskVisible
 
