@@ -1109,15 +1109,14 @@ module MLToC = struct
              (* default to base 10 *)
              Format.fprintf fmt "%a" (print_in_base 10 None) n in
        let s =
-         let i = ity_of_expr e in
-         let ts = match (ty_of_ity i) with
-           | { ty_node = Tyapp (ts, []) } -> ts
-             | _ -> assert false in
-         begin match query_syntax info.literal ts.ts_name with
+         let tname = match e.e_mlty with
+           | Tapp (id, _) -> id
+           | _ -> assert false in
+         begin match query_syntax info.literal tname with
          | Some st ->
             Format.asprintf "%a" (syntax_range_literal ~cb:(Some print) st) ic
          | _ ->
-            let s = ts.ts_name.id_string in
+            let s = tname.id_string in
             raise (Unsupported ("unspecified number format for type "^s)) end
        in
        let e = C.(Econst (Cint (s, ic))) in
@@ -1142,9 +1141,7 @@ module MLToC = struct
            (fun e ->
              assert (not e.e_effect.eff_ghost);
              (not (Sattr.mem dummy_expr_attr e.e_attrs)) &&
-             match e.e_ity with
-             | I i when ity_equal i Ity.ity_unit -> false
-             | _ -> true)
+             (not (is_unit e.e_mlty)))
            el in
        let env_f = { env with computes_return_value = false } in
        let args = List.map (fun e -> simplify_expr (expr info env_f e)) args in
@@ -1256,12 +1253,9 @@ module MLToC = struct
          let s =
            if env.computes_return_value
            then
-             begin match e.e_ity with
-             | I ity when ity_equal ity Ity.ity_unit ->
-                Sseq(Sexpr e', Sreturn Enothing)
-             | I _ -> Sreturn e'
-             | _ -> assert false
-             end
+             if is_unit e.e_mlty
+             then Sseq(Sexpr e', Sreturn Enothing)
+             else Sreturn e'
            else Sexpr e' in
          if is_nop prstmt
          then prdefs, s

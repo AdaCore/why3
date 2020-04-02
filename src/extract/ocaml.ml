@@ -539,8 +539,8 @@ module Print = struct
     | Econst (Constant.ConstInt c) ->
         let n = c.Number.il_int in
         let n = BigInt.to_string n in
-        let id = match e.e_ity with
-          | I { ity_node = Ityapp ({its_ts = ts},_,_) } -> ts.ts_name
+        let id = match e.e_mlty with
+          | Tapp (tname, _) -> tname
           | _ -> assert false in
         (match query_syntax info.info_literal id with
          | Some s -> syntax_arguments s print_constant fmt [e]
