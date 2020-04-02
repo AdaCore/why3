@@ -269,7 +269,7 @@ module Print = struct
           (print_expr info) e (print_list_next newline (print_branch info)) bl
           (print_list_next newline (print_xbranch true info)) xl
     | Eassign al ->
-        let assign fmt (rho, rs, e) =
+        let assign fmt (rho, _, rs, e) =
           fprintf fmt "@[<hov 2>%a.%a <-@ %a@]"
             (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
             (print_expr info) e in
@@ -308,7 +308,7 @@ module Print = struct
           (print_expr info) e1 (print_expr info) e2
     | Eraise (xs, e_opt) ->
         print_raise ~paren info xs fmt e_opt
-    | Efor (pv1, pv2, dir, pv3, e) ->
+    | Efor (pv1, _ty, pv2, dir, pv3, e) ->
         if is_mapped_to_int info pv1.pv_ity then
           fprintf fmt "@[<hov 2>for %a = %a %a %a do@ @[%a@]@ done@]"
             (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)

@@ -702,7 +702,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
      end
   | Eassign l ->
      List.iter
-       (fun (pvs, rs, e) ->
+       (fun (pvs, _, rs, e) ->
          let fld = fd_of_rs rs in
          let value = interp_expr info e in
          match get pvs info with
@@ -735,7 +735,7 @@ let rec interp_expr info (e:Mltree.expr) : value =
         interp_expr info e
      | Vbool false -> Vvoid
      | _ -> assert false end
-  | Efor (x, pv1, dir, pv2, e) ->
+  | Efor (x, _, pv1, dir, pv2, e) ->
      Debug.dprintf debug_interp "for@.";
      begin match (get pv1 info, get pv2 info) with
      | (Vbigint i1, Vbigint i2) ->

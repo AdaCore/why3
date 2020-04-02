@@ -466,8 +466,9 @@ module Translate = struct
         Debug.dprintf debug_compile "compiling for block@.";
         let dir = for_direction dir in
         let efor = expr info svar efor.e_mask efor in
+        let imlty = mlty_of_ity MaskVisible pv1.pv_ity in
         assert (efor.ML.e_mlty = ML.tunit);
-        ML.e_for pv1 pv2 dir pv3 efor mask ML.tunit eff attrs
+        ML.e_for pv1 imlty pv2 dir pv3 efor mask ML.tunit eff attrs
     | Eghost _ | Epure _ ->
         assert false
     | Eassign al ->
@@ -476,7 +477,11 @@ module Translate = struct
         let e_of_var pv =
           ML.e_var pv (ML.I pv.pv_ity) MaskVisible
             (mlty_of_ity MaskVisible pv.pv_ity) eff attrs in
-        let al = List.map (fun (pv1, rs, pv2) -> (pv1, rs, e_of_var pv2)) al in
+        let al =
+          List.map
+            (fun (pv1, rs, pv2) ->
+              (pv1, mlty_of_ity MaskVisible pv1.pv_ity, rs, e_of_var pv2)) al
+        in
         ML.e_assign al (ML.I e.e_ity) mask eff attrs
     | Ematch (e1, bl, xl) when e_ghost e1 ->
         assert (Mxs.is_empty xl); (* Expr ensures this for the time being *)
@@ -718,10 +723,10 @@ module RefreshLetBindings = struct
     | Eassign al ->
        let al' =
          List.map
-           (fun (pv, rs, e) ->
+           (fun (pv, ty, rs, e) ->
              let pv' = pvs accv pv in
              assert (not (Mrs.mem rs accf));
-             (pv', rs, e))
+             (pv', ty, rs, e))
            al in
        acc, mk (Eassign al')
     | _ -> acc, e
@@ -813,14 +818,14 @@ module InlineFunctionCalls = struct
        List.iter (fun (id, _ty, _gh) -> assert (not (Mid.mem id subst))) vl;
        mk (Efun (vl, expr subst e))
     | Eassign al ->
-       let assign (v, rs, e) =
+       let assign (v, ty, rs, e) =
          let pv' = pv subst v in
-         (pv', rs, e) in
+         (pv', ty, rs, e) in
        let al' = List.map assign al in
        mk (Eassign al')
-    | Efor (i, st, dir, en, e) ->
+    | Efor (i, ty, st, dir, en, e) ->
        assert (not (Mid.mem (pv_name i) subst));
-       mk (Efor (i, pv subst st, dir, pv subst en, e))
+       mk (Efor (i, ty, pv subst st, dir, pv subst en, e))
     | _ -> e
 
   and pv subst v = try pv subst (Mid.find (pv_name v) subst) with Not_found -> v
@@ -892,10 +897,11 @@ module InlineProxyVars = struct
            undiserable captures inside the [Efun] expression. *)
         let (spv,occ), e = expr info restrict_subst (vars,occ) e in
         (spv,occ), mk (Efun (vl, e))
-    | Efor (pv1, pv2, _, pv3, _) ->
+    | Efor (pv1, _, pv2, _, pv3, _) ->
        (vars, Spv.add pv1 (Spv.add pv2 (Spv.add pv3 occ))), e
     | Eassign al ->
-       (vars, List.fold_left (fun occ (pv, _, _) -> Spv.add pv occ) occ al), e
+       (vars, List.fold_left
+                (fun occ (pv, _, _, _) -> Spv.add pv occ) occ al), e
     | _ -> (vars, occ), e
 
   and let_def info subst (vars,occ) ld =

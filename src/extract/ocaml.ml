@@ -579,7 +579,7 @@ module Print = struct
           (print_expr info 18) e
           (print_list newline (print_branch info)) pl
     | Eassign al ->
-        let assign fmt (rho, rs, e) =
+        let assign fmt (rho, _, rs, e) =
           if rs_equal rs rs_ref_proj
           then fprintf fmt "@[<hv 2>%a :=@ %a@]"
                  (print_lident info) (pv_name rho) (print_expr info 15) e
@@ -595,7 +595,8 @@ module Print = struct
                 (print_expr info 15) e
             | None ->
                fprintf fmt "@[<hv 2>%a.%a <-@ %a@]"
-                 (print_lident info) (pv_name rho) (print_lident info) rs.rs_name
+                 (print_lident info) (pv_name rho)
+                 (print_lident info) rs.rs_name
                  (print_expr info 15) e in
         begin match al with
         | [] -> assert false | [a] -> assign fmt a
@@ -644,7 +645,7 @@ module Print = struct
           (print_expr info 18) e1 (print_expr ~opr:false info 18) e2
     | Eraise (xs, e_opt) ->
         print_raise ~paren:(prec < 4) info xs fmt e_opt
-    | Efor (pv1, pv2, dir, pv3, e) ->
+    | Efor (pv1, _, pv2, dir, pv3, e) ->
         if is_mapped_to_int info pv1.pv_ity then begin
           fprintf fmt "@[<hv 2>for %a = %a %a %a do@ @[%a@]@ done@]"
             (print_lident info) (pv_name pv1) (print_lident info) (pv_name pv2)

@@ -57,12 +57,13 @@ and expr_node =
   | Efun    of var list * expr
   | Elet    of let_def * expr
   | Eif     of expr * expr * expr
-  | Eassign of (pvsymbol * rsymbol * expr) list
+  | Eassign of (pvsymbol * ty * rsymbol * expr) list
   | Ematch  of expr * reg_branch list * exn_branch list
   | Eblock  of expr list
   | Ewhile  of expr * expr
-  (* For loop for Why3's type int *)
-  | Efor    of pvsymbol * pvsymbol * for_direction * pvsymbol * expr
+  (* For loop on a range type *)
+  (* index var, index ty, start, direction, end, expr *)
+  | Efor    of pvsymbol * ty * pvsymbol * for_direction * pvsymbol * expr
   | Eraise  of xsymbol * expr option
   | Eexn    of xsymbol * ty option * expr
   | Eignore of expr
@@ -225,7 +226,8 @@ and iter_deps_expr f e = match e.e_node with
   | Ewhile (e1, e2) ->
       iter_deps_expr f e1;
       iter_deps_expr f e2
-  | Efor (_, _, _, _, e) ->
+  | Efor (_, ty, _, _, _, e) ->
+      iter_deps_ty f ty;
       iter_deps_expr f e
   | Eraise (xs, None) ->
       f xs.xs_name
@@ -237,8 +239,8 @@ and iter_deps_expr f e = match e.e_node with
   | Eexn (_xs, Some ty, e) -> (* FIXME? How come we never do binding here? *)
       iter_deps_ty f ty;
       iter_deps_expr f e
-  | Eassign assingl ->
-      List.iter (fun (_, rs, _) -> f rs.rs_name) assingl
+  | Eassign assignl ->
+      List.iter (fun (_, ty, rs, _) -> iter_deps_ty f ty; f rs.rs_name) assignl
   | Eignore e -> iter_deps_expr f e
 
 let rec iter_deps f = function
@@ -346,8 +348,8 @@ let e_if e1 e2 e3 =
 let e_while e1 e2 =
   mk_expr (Ewhile (e1, e2)) ity_unit
 
-let e_for pv1 pv2 dir pv3 e1 =
-  mk_expr (Efor (pv1, pv2, dir, pv3, e1)) ity_unit
+let e_for pv1 ty pv2 dir pv3 e1 =
+  mk_expr (Efor (pv1, ty, pv2, dir, pv3, e1)) ity_unit
 
 let e_match e bl xl =
   mk_expr (Ematch (e, bl, xl))
@@ -394,7 +396,7 @@ let e_map fn e =
   | Elet (ld,e) -> mk (Elet (ld_map fn ld, fn e))
   | Eif (c,t,e) -> mk (Eif (fn c, fn t, fn e))
   | Eassign al ->
-     let al' = List.map (fun (pv, rs, e) -> pv, rs, fn e) al in
+     let al' = List.map (fun (pv, ty, rs, e) -> pv, ty, rs, fn e) al in
      mk (Eassign al')
   | Ematch (e,bl,xl) ->
      let bl' = List.map (fun (p,e) -> (p, fn e)) bl in
@@ -402,7 +404,7 @@ let e_map fn e =
      mk (Ematch (fn e, bl', xl'))
   | Eblock el -> mk (Eblock (List.map fn el))
   | Ewhile (c,b) -> mk (Ewhile (fn c, fn b))
-  | Efor (i,vb,d,ve,e) -> mk (Efor (i, vb, d, ve, fn e))
+  | Efor (i,ty,vb,d,ve,e) -> mk (Efor (i, ty, vb, d, ve, fn e))
   | Eraise (_, None) -> e
   | Eraise (x, Some e) -> mk (Eraise (x, Some (fn e)))
   | Eexn (x,t,e) -> mk (Eexn (x, t, fn e))
@@ -424,14 +426,14 @@ let e_fold fn acc e =
      let acc = fn acc c in
      let acc = fn acc t in
      fn acc e
-  | Eassign al -> List.fold_left (fun acc (_,_,e) -> fn acc e) acc al
+  | Eassign al -> List.fold_left (fun acc (_,_,_,e) -> fn acc e) acc al
   | Ematch (e,bl,xl) ->
      let acc = List.fold_left (fun acc (_p,e) -> fn acc e) acc bl in
      let acc = List.fold_left (fun acc (_x, _vl, e) -> fn acc e) acc xl in
      fn acc e
   | Eblock el -> List.fold_left fn acc el
   | Ewhile (c,b) -> fn (fn acc c) b
-  | Efor (_,_,_,_,e) -> fn acc e
+  | Efor (_,_,_,_,_,e) -> fn acc e
   | Eraise (_, None) -> acc
   | Eraise (_, Some e) -> fn acc e
   | Eexn (_x,_t,e) -> fn acc e
@@ -474,9 +476,9 @@ let e_map_fold fn acc e =
   | Eassign al ->
      let acc,al' =
        Lists.map_fold_left
-         (fun acc (pv, rs, e) ->
+         (fun acc (pv, ty, rs, e) ->
            let acc, e = fn acc e in
-           acc, (pv, rs, e))
+           acc, (pv, ty, rs, e))
          acc al in
      acc, mk (Eassign al')
   | Ematch (e,bl,xl) ->
@@ -499,9 +501,9 @@ let e_map_fold fn acc e =
      let acc, c' = fn acc c in
      let acc, b' = fn acc b in
      acc, mk (Ewhile (c', b'))
-  | Efor (i,vb,d,ve,e) ->
+  | Efor (i,ty,vb,d,ve,e) ->
      let acc, e' = fn acc e in
-     acc, mk (Efor (i, vb, d, ve, e'))
+     acc, mk (Efor (i, ty, vb, d, ve, e'))
   | Eraise (_, None) -> acc, e
   | Eraise (x, Some e) ->
      let acc, e' = fn acc e in
