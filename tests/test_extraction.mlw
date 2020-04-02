@@ -239,6 +239,12 @@ module TestExtraction
     let incr_a (a: int) = sum a in
     incr_a x x
 
+  let test_partial4 : int =
+    let f (ghost x1:int) (y:int) (z:int) = y + z + 64 in
+    let g = f 1 in
+    let h = g 2 in
+    h 3
+
   let constr_partial (x: int) : list int =
     let x = Cons 42 in
     x Nil
