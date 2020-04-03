@@ -3,7 +3,7 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.7" alternative="strings" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="string_hex_encoding.mlw"/>
 <theory name="Top" proved="true">
@@ -112,7 +112,7 @@
   <proof prover="0"><result status="valid" time="0.02" steps="20"/></proof>
   </goal>
   <goal name="decode&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.04" steps="7843"/></proof>
+  <proof prover="1"><result status="valid" time="0.06" steps="7843"/></proof>
   </goal>
   <goal name="decode&#39;vc.4" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.02" steps="25"/></proof>
@@ -154,7 +154,7 @@
   <proof prover="0"><result status="valid" time="0.05" steps="51"/></proof>
   </goal>
   <goal name="decode&#39;vc.17" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.63" steps="956"/></proof>
+  <proof prover="0"><result status="valid" time="0.89" steps="956"/></proof>
   </goal>
   <goal name="decode&#39;vc.18" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.12" steps="183"/></proof>
