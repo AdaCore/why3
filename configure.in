@@ -873,6 +873,12 @@ if test "$enable_pp_sexp" = yes; then
     elif ! $OCAMLFIND query ppx_sexp_conv > /dev/null; then
         enable_pp_sexp=no
         reason_no_pp_sexp=" (requires ppx_sexp_conv)"
+    elif ! $OCAMLFIND query sexplib > /dev/null; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires sexplib)"
+    elif ! $OCAMLFIND query ppx_deriving > /dev/null; then
+        enable_pp_sexp=no
+        reason_no_pp_sexp=" (requires ppx_deriving)"
     else
         SEXPLIBPPX="ppx_sexp_conv"
         SEXPLIB="sexplib sexplib.num"
