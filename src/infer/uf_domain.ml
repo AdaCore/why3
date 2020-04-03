@@ -1,22 +1,16 @@
 open Domain
+open Infer_why3
 open Apron
 open Term
 
 module Make(S:sig
-    module    Dom : DOMAIN
-    val       env : Env.env
-    val  th_known : Decl.known_map
-    val mod_known : Pdecl.known_map
+    module       Dom : DOMAIN
+    module Infer_why3 : INFERWHY3
   end) : TERM_DOMAIN = struct
 
   module Dom = S.Dom
 
-  module Ai_logic = Ai_logic.Make(struct
-      let       env = S.env
-      let  th_known = S.th_known
-      let mod_known = S.mod_known
-    end)
-  open Ai_logic
+  open S.Infer_why3
 
   exception Not_handled of term
   let fun_id x = x
@@ -364,7 +358,7 @@ module Make(S:sig
     | _ when ty_equal myty ty_int -> [t, None]
     | Tyapp (ts, vars) -> begin
         let vars = ts_match_args ts vars in
-        match (Ident.Mid.find ts.ts_name known_logical_ident).d_node with
+        match (Ident.Mid.find ts.ts_name th_known).d_node with
         | Ddata ([_, [ls, ls_projs]]) ->
            let tl =
              let my_ls_args = List.map (ty_inst vars) ls.ls_args in
@@ -383,7 +377,7 @@ module Make(S:sig
            begin match ity with
            | None -> List.map (fun t -> t, None) tl
            | Some its ->
-              let pdecl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
+              let pdecl = Pdecl.((find_its_defn mod_known its).itd_fields) in
               List.combine tl (List.map (fun a -> Some a) pdecl)
            end
         | Ddata [_; _] ->
@@ -401,7 +395,7 @@ module Make(S:sig
                let open Expr in
                let its = restore_its ts in
                Opt.iter (fun its2 -> assert (its_equal its its2)) ity;
-               let rsl = Pdecl.((find_its_defn known_pdecl its).itd_fields) in
+               let rsl = Pdecl.((find_its_defn mod_known its).itd_fields) in
                let inst_rs rs =
                  let ls = match (rs.rs_logic) with
                    | RLls ls -> ls
@@ -444,7 +438,7 @@ module Make(S:sig
           raise (Bad_domain (Dom.forget_array man dom_t [|v|] false)) in
     match Dom.get_linexpr man dom_t v with
     | Some x -> begin
-        try let t = Ai_logic.varlist_to_term find_var x in
+        try let t = varlist_to_term find_var x in
             assert (Ty.ty_equal (t_type t) Ty.ty_int); Some t
         with Bad_domain dom_t ->
           extract_term (man, uf_man) is_in (dom_t, uf_t) v
@@ -457,7 +451,8 @@ module Make(S:sig
         try TermToVar.to_term uf_t.uf_to_var v with Not_found ->
           Format.eprintf "Couldn't find variable %s@." (Var.to_string v);
           raise Not_found in
-    let t = Dom.to_term S.env (S.th_known, S.mod_known) man dom_t find_var in
+    let t = Dom.to_term S.Infer_why3.env
+              (S.Infer_why3.th_known, S.Infer_why3.mod_known) man dom_t find_var in
     Union_find.fold_class (fun t uf1 uf2 ->
         let t1 = TermToClass.to_term uf_man.class_to_term uf1 in
         let t2 = TermToClass.to_term uf_man.class_to_term uf2 in
@@ -603,8 +598,8 @@ module Make(S:sig
              (fun _ -> Dom.bottom man uf_man.env, empty_uf_domain)
           | _ -> raise (Not_handled t)
         with Not_handled t ->
-          Format.eprintf "Couldn't understand entirely the post condition: %a@."
-            Pretty.print_term t;
+          Format.eprintf "Couldn't understand entirely the post \
+                          condition:@\n@[%a@]@." Pretty.print_term t;
           fun_id
       in (fun d -> abstract t d)
 

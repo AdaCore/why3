@@ -1,7 +1,7 @@
 open Term
 
 
-(* Bidirectional map between term to t *)
+(* Bidirectional map between term and t *)
 
 module Make : functor (S:sig type t end) -> sig
   type t

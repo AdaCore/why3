@@ -72,11 +72,14 @@ let infer_with_ops ai_ops e cty =
   invs
 
 let infer_loops_for_dom ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
-  let module AI = Ai_cfg.Make (struct
-       let env       = env
-       let th_known  = tkn
-       let mod_known = mkn
-       let widening  = wid end) in
+  let module Infer_why3 = Infer_why3.Make(struct
+    let       env = env
+    let  th_known = tkn
+    let mod_known = mkn
+  end) in
+  let module AI = Infer_cfg.Make (struct
+       module Infer_why3 = Infer_why3
+       let     widening = wid end) in
   match dom with
   | Polyhedra ->
      let module AI = AI(Domain.Polyhedra) in

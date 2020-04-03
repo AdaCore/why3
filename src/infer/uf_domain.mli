@@ -1,8 +1,7 @@
 open Domain
+open Infer_why3
 
 module Make(S:sig
-    module   Dom : DOMAIN
-    val      env : Env.env
-    val th_known : Decl.known_map
-    val mod_known: Pdecl.known_map
+    module       Dom : DOMAIN
+    module Infer_why3 : INFERWHY3
   end) : TERM_DOMAIN
