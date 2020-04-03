@@ -337,9 +337,8 @@ let e_app rs pvl partial =
 
 let e_fun args e = mk_expr (Efun (args, e))
 
-let e_ignore e_ity e =
-  (* TODO : avoid ignore around a unit type expresson *)
-  if ity_equal e_ity Ity.ity_unit then e
+let e_ignore e =
+  if is_unit e.e_ity then e
   else mk_expr (Eignore e) ity_unit MaskVisible tunit e.e_effect e.e_attrs
 
 let e_if e1 e2 e3 =

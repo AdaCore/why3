@@ -271,7 +271,8 @@ module Translate = struct
       when pv.pv_ghost || not (Mpv.mem pv e2.e_effect.eff_reads) ->
         if eff_pure e1.e_effect then expr info svar mask e2
         else
-          let e1 = ML.e_ignore e1.e_ity (expr info svar MaskGhost e1) in
+          let e1 = (expr info svar MaskGhost e1) in
+          let e1 = ML.e_ignore e1 in
           let e2 = expr info svar mask e2 in
           ML.e_seq e1 e2 (ML.I e.e_ity) mask e2.ML.e_mlty eff attrs
     | Elet (LDvar (pv, e1), e2) ->
@@ -926,7 +927,7 @@ module InlineProxyVars = struct
 
 end
 
-module InlineTrivialLets = struct
+module ExprSimplifications = struct
 
   open Mltree
 
@@ -934,6 +935,13 @@ module InlineTrivialLets = struct
     let e = e_map expr e in
     match e.e_node with
     | Elet (Lvar (pv1, e'), { e_node = Evar pv2 }) when pv_equal pv1 pv2 -> e'
+    | Ematch (e1, [Pwild, e2], []) ->
+       mk_expr (Eblock [e_ignore e1; e2]) e.e_ity MaskVisible
+         e.e_mlty e.e_effect e.e_attrs
+    | Ematch (e1, [Pvar v, e2], []) ->
+       let pv = restore_pv v in
+       e_let (Lvar (pv, e1)) e2 e.e_ity MaskVisible
+         e.e_mlty e.e_effect e.e_attrs
     | _ -> e
 
   let let_def ld = ld_map expr ld
@@ -959,6 +967,6 @@ module Transform = struct
   let module_ m =
     let m = InlineFunctionCalls.module_ m in
     let m = InlineProxyVars.module_ m in
-    InlineTrivialLets.module_ m
+    ExprSimplifications.module_ m
 
 end

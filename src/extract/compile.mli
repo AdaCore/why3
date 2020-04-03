@@ -43,9 +43,12 @@ module InlineProxyVars : sig
 
 end
 
-module InlineTrivialLets : sig
+module ExprSimplifications : sig
 
-  (* Optimizes trivial let-ins of the form `let x = e in x`. *)
+  (* Expression optimizations:
+       - Optimizes trivial let-ins of the form `let x = e in x`.
+       - Optimizes trivial matches of the form `match e1 with x -> e2 end`.
+   *)
   val module_ : Mltree.pmodule -> Mltree.pmodule
 
 end

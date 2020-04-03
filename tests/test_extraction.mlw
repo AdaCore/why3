@@ -398,6 +398,13 @@ module TestExtraction
   type poly_r 'a = { l : int63; b : bool }
   let test_underapplied_l () = l
 
+  let test_match (y:int) : int
+  =
+  match
+    (match y with x -> x + 42 end)
+  with _ -> 89
+  end
+
 end
 
 (*

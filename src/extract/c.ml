@@ -1360,13 +1360,10 @@ module MLToC = struct
     | Efor (i, ty, sb, dir, eb, body) ->
        Debug.dprintf debug_c_extraction "FOR@.";
        do_for eb None sb None i ty dir body
-    | Ematch (({e_node = Eapp(_rs,_, _)} as e1), [Pwild, e2], []) ->
-       let ne = { e with e_node = Eblock [e1; e2] } in
-       expr info env ne
-    | Ematch (e1, [Pvar v, e2], []) ->
-       let cty = ty_of_mlty info e1.e_mlty in
-       let ity = ity_of_expr e1 in
-       do_let v.vs_name ity cty e1 e2
+    | Ematch (({e_node = Eapp(_rs,_, _)} as _e1), [Pwild, _e2], []) ->
+       assert false (* simplified at Compile *)
+    | Ematch (_e1, [Pvar _v, _e2], []) ->
+       assert false (* simplified at Compile *)
     | Ematch (({e_node = Eapp(rs,_, _)} as e1), [Ptuple rets,e2], [])
          when List.for_all
                 (function | Pwild (*ghost*) | Pvar _ -> true |_-> false)
