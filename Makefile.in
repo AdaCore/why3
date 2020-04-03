@@ -2202,7 +2202,7 @@ NAME = why3-@VERSION@
 MORE_DIST = configure
 
 dist: $(MORE_DIST)
-	rm -rf distrib/$(NAME)/ distrib/$(NAME).tar.gz
+	rm -f distrib/$(NAME).tar.gz
 	mkdir -p distrib/
 	git archive --format=tar --prefix=$(NAME)/ -o distrib/$(NAME).tar HEAD
 	tar rf distrib/$(NAME).tar --transform="s,^,$(NAME)/," --mtime="`git show -s --format=%ci`" $(MORE_DIST)
