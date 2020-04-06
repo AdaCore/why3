@@ -344,8 +344,8 @@ end
 
 
 module Polyhedra = Make_from_apron(struct
-  type man = Polka.strict Polka.t Manager.t
-  type t = Polka.strict Polka.t Abstract1.t
+  type           man = Polka.strict Polka.t Manager.t
+  type             t = Polka.strict Polka.t Abstract1.t
   let create_manager = Polka.manager_alloc_strict
   end)
 
@@ -358,13 +358,13 @@ module Polyhedra = Make_from_apron(struct
   end)*)
 
 module Box = Make_from_apron(struct
-  type man = Box.t Manager.t
-  type t = Box.t Abstract1.t
+  type           man = Box.t Manager.t
+  type             t = Box.t Abstract1.t
   let create_manager = Box.manager_alloc
   end)
 
 module Oct = Make_from_apron(struct
-  type man = Oct.t Manager.t
-  type t = Oct.t Abstract1.t
+  type           man = Oct.t Manager.t
+  type             t = Oct.t Abstract1.t
   let create_manager = Oct.manager_alloc
   end)

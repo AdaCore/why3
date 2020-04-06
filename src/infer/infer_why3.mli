@@ -6,10 +6,11 @@ open Term
 open Decl
 
 
-module type AI_LOGIC = sig
+module type INFERWHY3 = sig
 
-  val known_logical_ident : known_map
-  val known_pdecl         : Pdecl.known_map
+  val env       : Env.env
+  val th_known  : known_map
+  val mod_known : Pdecl.known_map
 
   val le_int : lsymbol
   val ge_int : lsymbol
@@ -42,4 +43,4 @@ module Make(S : sig
          val       env : Env.env
          val  th_known : known_map
          val mod_known : Pdecl.known_map
-       end) : AI_LOGIC
+       end) : INFERWHY3

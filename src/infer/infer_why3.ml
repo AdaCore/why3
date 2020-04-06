@@ -2,10 +2,11 @@ open Apron
 open Term
 open Decl
 
-module type AI_LOGIC = sig
+module type INFERWHY3 = sig
 
-  val known_logical_ident : known_map
-  val known_pdecl         : Pdecl.known_map
+  val env       : Env.env
+  val th_known  : known_map
+  val mod_known : Pdecl.known_map
 
   val le_int : lsymbol
   val ge_int : lsymbol
@@ -40,10 +41,9 @@ module Make(S: sig
   open Term
   open Theory
 
-  let env = S.env
-
-  let known_logical_ident = S.th_known
-  let known_pdecl = S.mod_known
+  let env       = S.env
+  let th_known  = S.th_known
+  let mod_known = S.mod_known
 
   let th_int = Env.read_theory env ["int"] "Int"
   let le_int = ns_find_ls th_int.th_export ["infix <="]
@@ -177,7 +177,7 @@ module Make(S: sig
   let t_unfold _ fs tl ty =
     let open Ty in
     if ls_equal fs ps_equ then t_app fs tl ty else
-      match find_definition { known = known_logical_ident; funenv = Mls.empty; } fs with
+      match find_definition { known = th_known; funenv = Mls.empty; } fs with
       | None ->
         t_app fs tl ty
       | Some (vl,e) ->

@@ -5,7 +5,7 @@ use ref.Ref
 val to_true (ii : bool) : int
   ensures { if ii then result = 1 else result = 100 }
 
-let pgmtest[@infer](x y: bool) : unit = [@vc:divergent]
+let pgmtest[@infer](x: bool) : unit = [@vc:divergent]
   let a = ref false in
   while true do
 	  let _ = to_true false in

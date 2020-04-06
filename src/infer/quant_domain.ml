@@ -1,11 +1,11 @@
 open Domain
-open Ai_logic
+open Infer_why3
 open Term
 open Ity
 
 module Make(S:sig
-    module   TDom   : TERM_DOMAIN
-    module Ai_logic : AI_LOGIC
+    module      TDom : TERM_DOMAIN
+    module Infer_why3 : INFERWHY3
   end): TERM_DOMAIN = struct
 
   module Dom = S.TDom
@@ -74,7 +74,7 @@ module Make(S:sig
       begin
         match t_open_quant tq with
         | [a], _, t when (Ty.ty_equal a.vs_ty Ty.ty_int) ->
-          let t = S.Ai_logic.t_push_negation t in
+          let t = S.Infer_why3.t_push_negation t in
           let t = t_subst_single a quant_var t in
           meet_term man t elt
         | _ -> Dom.meet_term man term elt

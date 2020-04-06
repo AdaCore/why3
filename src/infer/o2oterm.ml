@@ -3,13 +3,13 @@ open Term
 module Make(S:sig type t end) = struct
 
   module TMap = Map.Make(struct
-    type t = S.t
+    type      t = S.t
     let compare = compare
   end)
 
   type t = {
-    to_term: term TMap.t;
-    to_t: S.t Mterm.t;
+    to_term : term TMap.t;
+       to_t : S.t Mterm.t;
   }
 
   let empty = { to_term = TMap.empty;
@@ -17,7 +17,7 @@ module Make(S:sig type t end) = struct
 
   let add oto te t =
     { to_term = TMap.add t te oto.to_term;
-      to_t = Mterm.add te t oto.to_t; }
+         to_t = Mterm.add te t oto.to_t; }
 
   let to_term oto t =
     TMap.find t oto.to_term
@@ -27,11 +27,11 @@ module Make(S:sig type t end) = struct
 
   let remove_t oto t =
     { to_term = TMap.remove t oto.to_term;
-      to_t = Mterm.remove (TMap.find t oto.to_term) oto.to_t }
+         to_t = Mterm.remove (TMap.find t oto.to_term) oto.to_t }
 
   let remove_term oto te =
     { to_term = TMap.remove (Mterm.find te oto.to_t) oto.to_term;
-      to_t = Mterm.remove te oto.to_t }
+         to_t = Mterm.remove te oto.to_t }
 
   let union oto1 oto2 f g =
     Mterm.fold_left (fun oto te t ->
@@ -57,10 +57,8 @@ module Make(S:sig type t end) = struct
      * Mterm.fold2_union aux oto1.to_t oto2.to_t empty *)
 
 
-  let card a =
-    Mterm.cardinal a.to_t
+  let card a = Mterm.cardinal a.to_t
 
-  let choose a =
-    Mterm.choose a.to_t
+  let choose a = Mterm.choose a.to_t
 
 end
