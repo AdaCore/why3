@@ -8,9 +8,9 @@ module Make(S:sig
     module Infer_why3 : INFERWHY3
   end): TERM_DOMAIN = struct
 
-  module Dom = S.TDom
+  module TDom = S.TDom
 
-  include Dom
+  include TDom
 
   let quant_var, pv =
     let ident_ret = Ident.id_fresh "w" in
@@ -19,7 +19,7 @@ module Make(S:sig
 
   let create_manager () =
     let man = create_manager () in
-    Dom.add_variable_to_env man pv;
+    TDom.add_variable_to_env man pv;
     man
 
   let is_in t myt =
@@ -57,7 +57,7 @@ module Make(S:sig
        t_quant Tforall (t_close_quant [var] [] t)
 
   let to_term man t =
-    let t = Dom.to_term man t in
+    let t = TDom.to_term man t in
     descend_quantifier quant_var t
 
   let rec meet_term man term elt =
@@ -77,7 +77,7 @@ module Make(S:sig
           let t = S.Infer_why3.t_push_negation t in
           let t = t_subst_single a quant_var t in
           meet_term man t elt
-        | _ -> Dom.meet_term man term elt
+        | _ -> TDom.meet_term man term elt
       end
-    | _ -> Dom.meet_term man term elt
+    | _ -> TDom.meet_term man term elt
 end

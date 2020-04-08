@@ -4,7 +4,7 @@ open Apron
 open Term
 
 module Make(S:sig
-    module       Dom : DOMAIN
+    module        Dom : DOMAIN
     module Infer_why3 : INFERWHY3
   end) : TERM_DOMAIN = struct
 
@@ -452,7 +452,7 @@ module Make(S:sig
           Format.eprintf "Couldn't find variable %s@." (Var.to_string v);
           raise Not_found in
     let t = Dom.to_term S.Infer_why3.env
-              (S.Infer_why3.th_known, S.Infer_why3.mod_known) man dom_t find_var in
+      (S.Infer_why3.th_known, S.Infer_why3.mod_known) man dom_t find_var in
     Union_find.fold_class (fun t uf1 uf2 ->
         let t1 = TermToClass.to_term uf_man.class_to_term uf1 in
         let t2 = TermToClass.to_term uf_man.class_to_term uf2 in
