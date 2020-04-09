@@ -1,13 +1,15 @@
-(** {1 Iterated Register Coalescing }
+(** {1 VerifyThis @ ETAPS 2018 competition extra challenge : Register allocation }
 
 Author: Quentin Garchery (LRI, Université Paris-Sud)
 
 *)
 
-(** {2 Import sets and dictionnaries } *)
+(** {2 Import sets and maps } *)
 
-use export option.Option
 use int.Int
+use option.Option
+
+(** Assume there is a type of variables with decidable equality. *)
 
 type var
 val eq (x y : var) : bool
@@ -16,14 +18,21 @@ val eq (x y : var) : bool
 use set.Fset
 clone set.SetApp as Svar with type elt = var, val eq = eq
 
+(** We represent dictionaries as maps:
+
+       • the interference relation G between variables will be of type <Dvar.t Svar.set>
+
+       • the result dictionary A will be of type <Dvar.t var>
+*)
 
 use fmap.Fmap as D
 clone fmap.MapApp as Dvar with type key = var, val eq = eq
 
 
-(** {2 Define needed functions } *)
+(** {2 Define functions on relations and dictionaries } *)
 
-(** Define the remove operation *)
+(** Define the remove (rem) operation on the interference relation.  *)
+
 val map_remove (v : var) (g : Dvar.t Svar.set) : Dvar.t Svar.set
     ensures MapRemDomain { forall k. D.mem k result <-> D.mem k g }
     ensures MapRemValue { forall k. D.mem k result ->
@@ -40,7 +49,8 @@ let function rem (v : var) (g : Dvar.t Svar.set) : Dvar.t Svar.set
     let remv = Dvar.remove v g in
     map_remove v remv
 
-(** Define the merge operation *)
+(** Define the merge operation on the interference relation. *)
+
 let function replace (v u : var) (s : Svar.set) : Svar.set
     requires ReplaceDiff { v <> u }
     ensures ReplaceTarget { mem u result = (mem u s \/ mem v s) }
@@ -76,7 +86,8 @@ let function merge (v u : var) (g : Dvar.t Svar.set) : Dvar.t Svar.set
     Dvar.remove v g2
 
 
-(** Define the available operation *)
+(** Define the available operation on the result dictionary. *)
+
 let rec function all_from (s : Svar.set) (a : Dvar.t var) : Svar.set
     variant { cardinal s }
     ensures AllFrom { forall v. mem v result <->
@@ -107,7 +118,8 @@ let available (s : Svar.set) (a : Dvar.t var) (r : Svar.set) : option var
     else Some (Svar.choose free_r)
 
 
-(** Define init : the identity map built from a given set *)
+(** We also define the identity dictionary built from a given set. *)
+
 let rec init (r : Svar.set) : Dvar.t var
     variant { cardinal r }
     ensures InitDomain { forall u. Dvar.mem u result <-> mem u r }
@@ -148,7 +160,8 @@ predicate sym (g : Dvar.t Svar.set) =
      forall u v. Dvar.mem u g -> Dvar.mem v g ->
                  mem v (Dvar.find u g) -> mem u (Dvar.find v g)
 
-(** Symmetry is preserved in our use case *)
+(** Symmetry is preserved by merge in our use case. *)
+
 lemma sym_merge :
       forall v u g. sym g -> irrefl g -> Dvar.mem u g -> Dvar.mem v g ->
                     v <> u -> not mem v (Dvar.find u g) ->
@@ -160,18 +173,19 @@ lemma sym_merge :
             else if y = u then false else false
 
 
-(** {2 Main algorithm } *)
+(** {2 Iterated Register Coalescing algorithm } *)
 
-(** We assume that the variables in the A dictionary have aloready been replaced by their
+(** We assume that the variables in the A dictionary have already been replaced by their
     corresponding register so that we don't need a parameter for A. This is the same as
     assuming that A is injective. *)
+
 let rec irc (g : Dvar.t Svar.set) (r : Svar.set) : Dvar.t var
     requires InclReg { forall v. mem v r -> Dvar.mem v g }
     requires Irrefl { irrefl g }
     requires Sym { sym g }
     variant { Dvar.size g }
-    ensures ResValue { forall u v. Dvar.mapsto u v result -> Dvar.mem v g }
     ensures ResDomain { forall u. Dvar.mem u result <-> Dvar.mem u g }
+    ensures ResImage { forall u v. Dvar.mapsto u v result -> Dvar.mem v g }
     ensures ResInit { forall k. mem k r -> Dvar.mapsto k k result }
     ensures NoCollision { no_collision g result
     by forall u v. Dvar.mem u g -> Dvar.mem v g -> Dvar.mem u result -> Dvar.mem v result ->
