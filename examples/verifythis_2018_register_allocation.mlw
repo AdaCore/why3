@@ -1,0 +1,197 @@
+(** {1 Iterated Register Coalescing }
+
+Author: Quentin Garchery (LRI, Université Paris-Sud)
+
+*)
+
+(** {2 Import sets and dictionnaries } *)
+
+use export option.Option
+use int.Int
+
+type var
+val eq (x y : var) : bool
+    ensures { result <-> x = y }
+
+use set.Fset
+clone set.SetApp as Svar with type elt = var, val eq = eq
+
+
+use fmap.Fmap as D
+clone fmap.MapApp as Dvar with type key = var, val eq = eq
+
+
+(** {2 Define needed functions } *)
+
+(** Define the remove operation *)
+val map_remove (v : var) (g : Dvar.t Svar.set) : Dvar.t Svar.set
+    ensures MapRemDomain { forall k. D.mem k result <-> D.mem k g }
+    ensures MapRemValue { forall k. D.mem k result ->
+                          D.find k result == Svar.remove v (D.find k g) }
+    ensures MapRemSize { Dvar.size result = Dvar.size g }
+
+let function rem (v : var) (g : Dvar.t Svar.set) : Dvar.t Svar.set
+    requires RemReq { D.mem v g }
+    ensures RemRemove { not D.mem v result }
+    ensures RemDomain { forall k. D.mem k result <-> k <> v /\ D.mem k g }
+    ensures RemValue { forall k. D.mem k result -> D.find k result == Svar.remove v (D.find k g) }
+    ensures RemSize { Dvar.size result = Dvar.size g - 1 }
+=
+    let remv = Dvar.remove v g in
+    map_remove v remv
+
+(** Define the merge operation *)
+let function replace (v u : var) (s : Svar.set) : Svar.set
+    requires ReplaceDiff { v <> u }
+    ensures ReplaceTarget { mem u result = (mem u s \/ mem v s) }
+    ensures ReplaceRemove { not mem v result }
+    ensures ReplaceOther { forall w. w <> u -> w <> v -> mem w result = mem w s }
+  =
+    if Svar.mem v s
+    then Svar.add u (Svar.remove v s)
+    else s
+
+val map_replace (v u : var) (g : Dvar.t Svar.set) : Dvar.t Svar.set
+    ensures ReplaceDomain { forall k. D.mem k result <-> D.mem k g }
+    ensures ReplaceValue { forall k. D.mem k result ->
+                                     D.find k result == replace v u (D.find k g) }
+    ensures ReplaceSize { Dvar.size result = Dvar.size g }
+
+
+let function merge (v u : var) (g : Dvar.t Svar.set) : Dvar.t Svar.set
+    requires MergeReq1 { v <> u }
+    requires MergeReq2 { D.mem v g /\ D.mem u g }
+    ensures MergeDomain { forall k. D.mem k result <-> k <> v /\ D.mem k g }
+    ensures MergeValue { D.find u result == union (replace v u (D.find u g))
+                                                  (replace v u (D.find v g)) }
+    ensures MergeValueDiff { forall k. D.mem k result -> k <> u ->
+                             D.find k result == replace v u (D.find k g) }
+    ensures MergeSize { Dvar.size result = Dvar.size g - 1 }
+=
+    let g1 = map_replace v u g in
+    let gu = if Dvar.mem u g1 then Dvar.find u g1 else Svar.empty () in
+    let gv = if Dvar.mem v g1 then Dvar.find v g1 else Svar.empty () in
+    let g2 = Dvar.add u (Svar.union gu gv) g1 in
+    assert { Dvar.size g2 = Dvar.size g };
+    Dvar.remove v g2
+
+
+(** Define the available operation *)
+let rec function all_from (s : Svar.set) (a : Dvar.t var) : Svar.set
+    variant { cardinal s }
+    ensures AllFrom { forall v. mem v result <->
+                                exists k. mem k s /\ D.mapsto k v a }
+=
+   if Svar.is_empty s
+   then Svar.empty ()
+   else let k = Svar.choose s in
+        let sk = Svar.remove k s in
+        let allk = all_from sk a in
+        if Dvar.mem k a
+        then Svar.add (Dvar.find k a) allk
+        else allk
+
+let available (s : Svar.set) (a : Dvar.t var) (r : Svar.set) : option var
+    ensures Available
+            { match result with
+              | None -> forall u. mem u r ->
+                                  exists v. mem v s /\ D.mapsto v u a
+              | Some res -> mem res r /\
+                            forall v. mem v s -> D.mem v a ->
+                                      res <> D.find v a
+              end }
+=
+    let free_r = Svar.diff r (all_from s a) in
+    if Svar.is_empty free_r
+    then None
+    else Some (Svar.choose free_r)
+
+
+(** Define init : the identity map built from a given set *)
+let rec init (r : Svar.set) : Dvar.t var
+    variant { cardinal r }
+    ensures InitDomain { forall u. Dvar.mem u result <-> mem u r }
+    ensures InitValue  { forall u. Dvar.mem u result -> Dvar.find u result = u }
+=
+   if Svar.is_empty r
+   then Dvar.create ()
+   else let u = Svar.choose r in
+        let initu = init (Svar.remove u r) in
+        Dvar.add u u initu
+
+
+(** {2 Functions given : pick and coalesce } *)
+
+val pick (g : Dvar.t Svar.set ) (r : Svar.set) : option var
+    ensures Pick { match result with
+                   | None -> forall v. D.mem v g -> mem v r
+                   | Some v -> D.mem v g /\ not mem v r
+                   end }
+
+val coalesce (g : Dvar.t Svar.set) (v : var) : option var
+    ensures Coalesce { match result with
+                       | None -> true
+                       | Some u -> u <> v /\ Dvar.mem u g /\ not mem v (Dvar.find u g)
+                       end }
+
+(** {2 Define properties of our data structures } *)
+
+predicate no_collision (g : Dvar.t Svar.set) (a : Dvar.t var) =
+    forall u v. Dvar.mem u g -> Dvar.mem v g -> Dvar.mem u a -> Dvar.mem v a ->
+                mem v (Dvar.find u g) ->
+                Dvar.find u a <> Dvar.find v a
+
+predicate irrefl (g : Dvar.t Svar.set) =
+     forall u. Dvar.mem u g -> not mem u (Dvar.find u g)
+
+predicate sym (g : Dvar.t Svar.set) =
+     forall u v. Dvar.mem u g -> Dvar.mem v g ->
+                 mem v (Dvar.find u g) -> mem u (Dvar.find v g)
+
+(** Symmetry is preserved in our use case *)
+lemma sym_merge :
+      forall v u g. sym g -> irrefl g -> Dvar.mem u g -> Dvar.mem v g ->
+                    v <> u -> not mem v (Dvar.find u g) ->
+                    sym (merge v u g)
+      by forall x y. let mg = merge v u g in
+      	 Dvar.mem x mg -> Dvar.mem y mg ->
+         mem x (Dvar.find y mg) -> not (mem y (Dvar.find x mg)) -> false
+	 by if x = u then if y = u then false else false
+            else if y = u then false else false
+
+
+(** {2 Main algorithm } *)
+
+(** We assume that the variables in the A dictionary have aloready been replaced by their
+    corresponding register so that we don't need a parameter for A. This is the same as
+    assuming that A is injective. *)
+let rec irc (g : Dvar.t Svar.set) (r : Svar.set) : Dvar.t var
+    requires InclReg { forall v. mem v r -> Dvar.mem v g }
+    requires Irrefl { irrefl g }
+    requires Sym { sym g }
+    variant { Dvar.size g }
+    ensures ResValue { forall u v. Dvar.mapsto u v result -> Dvar.mem v g }
+    ensures ResDomain { forall u. Dvar.mem u result <-> Dvar.mem u g }
+    ensures ResInit { forall k. mem k r -> Dvar.mapsto k k result }
+    ensures NoCollision { no_collision g result
+    by forall u v. Dvar.mem u g -> Dvar.mem v g -> Dvar.mem u result -> Dvar.mem v result ->
+                   mem v (Dvar.find u g) ->
+                   Dvar.find u result = Dvar.find v result -> false
+           }
+=
+    let ghost ref gr = 0 in
+    match pick g r with
+    | None -> init r
+    | Some v -> match coalesce g v with
+                | None ->
+                    let s = Dvar.find v g in
+                    let a = irc (rem v g) r in
+                    match available s a r with
+                    | Some av -> Dvar.add v av a
+                    | None -> gr <- 1; Dvar.add v v a end
+                | Some u ->
+                    let a = irc (merge v u g) r in
+                    Dvar.add v (Dvar.find u a) a
+                end
+    end
+
