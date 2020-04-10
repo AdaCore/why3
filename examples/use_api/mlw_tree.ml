@@ -301,11 +301,25 @@ let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4]
 
 (* Printing back the mlw file *)
 
+(* BEGIN{mlwprinter} *)
 let () = Format.printf "%a@." Mlw_printer.pp_mlw_file mlw_file
+(* END{mlwprinter} *)
 
 (* BEGIN{typemodules} *)
 let mods = Typing.type_mlw_file env [] "myfile.mlw" mlw_file
 (* END{typemodules} *)
+
+(* BEGIN{typemoduleserror} *)
+let mods =
+  try
+    Typing.type_mlw_file env [] "myfile.mlw" mlw_file
+  with Loc.Located (loc, e) -> (* A located exception [e] *)
+    let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
+    Format.printf "%a@."
+      (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
+      mlw_file;
+    exit 1
+(* END{typemoduleserror} *)
 
 (* Checking the VCs *)
 
