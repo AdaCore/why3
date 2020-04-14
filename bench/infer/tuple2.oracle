@@ -18,37 +18,37 @@
 (2 * contents i) = contents j
 ###
 ### Debug: inferred invariants ###
-((((((((((((((((((((((((((((((((((((((((((((((((match _3 with
+((((((((((((((((((((((((((((((((((((((((((((((((match _8 with
                                                 | $pat, _ -> $pat
                                                 end + contents i1)
                                                <= 1 /\
                                                contents i1
-                                               < match _3 with
+                                               < match _8 with
                                                | $pat, _ -> $pat
                                                end) /\
-                                              (match _3 with
+                                              (match _8 with
                                                | _, $pat -> $pat
                                                end + contents i1)
                                               <= 2) /\
                                              (contents i1 + 2)
-                                             <= match _3 with
+                                             <= match _8 with
                                              | _, $pat -> $pat
                                              end) /\
                                             contents i1 <= 0) /\
-                                           (match _3 with
+                                           (match _8 with
                                             | $pat, _ -> $pat
                                             end + contents j1)
                                            <= 1) /\
                                           contents j1
-                                          < match _3 with
+                                          < match _8 with
                                           | $pat, _ -> $pat
                                           end) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | _, $pat -> $pat
                                           end + contents j1)
                                          <= 2) /\
                                         (contents j1 + 2)
-                                        <= match _3 with
+                                        <= match _8 with
                                         | _, $pat -> $pat
                                         end) /\
                                        (contents i1 + contents j1) <= 0) /\
@@ -56,844 +56,844 @@
                                      contents j1 <= 0) /\
                                     contents i1 = 0) /\
                                    contents j1 = 0 \/
-                                   (((((((((((match _3 with
+                                   (((((((((((match _8 with
                                               | $pat, _ -> $pat
                                               end + 9)
                                              <= contents i1 /\
                                              11
-                                             <= (match _3 with
+                                             <= (match _8 with
                                                  | $pat, _ -> $pat
                                                  end + contents i1)) /\
-                                            (match _3 with
+                                            (match _8 with
                                              | _, $pat -> $pat
                                              end + 8)
                                             <= contents i1) /\
                                            12
-                                           <= (match _3 with
+                                           <= (match _8 with
                                                | _, $pat -> $pat
                                                end + contents i1)) /\
                                           10 <= contents i1) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | $pat, _ -> $pat
                                           end + 19)
                                          <= contents j1) /\
                                         21
-                                        <= (match _3 with
+                                        <= (match _8 with
                                             | $pat, _ -> $pat
                                             end + contents j1)) /\
-                                       (match _3 with
+                                       (match _8 with
                                         | _, $pat -> $pat
                                         end + 18)
                                        <= contents j1) /\
                                       22
-                                      <= (match _3 with
+                                      <= (match _8 with
                                           | _, $pat -> $pat
                                           end + contents j1)) /\
                                      (contents i1 + 10) <= contents j1) /\
                                     30 <= (contents i1 + contents j1)) /\
                                    20 <= contents j1 \/
-                                   (((((((((((((((((((((((match _3 with
+                                   (((((((((((((((((((((((match _8 with
                                                           | $pat, _ -> $pat
                                                           end + 3)
                                                          <= contents i1 /\
                                                          5
-                                                         <= (match _3 with
+                                                         <= (match _8 with
                                                              | $pat, _ ->
                                                                  $pat
                                                              end
                                                              + contents i1)) /\
-                                                        (match _3 with
+                                                        (match _8 with
                                                          | _, $pat -> $pat
                                                          end + 2)
                                                         <= contents i1) /\
                                                        6
-                                                       <= (match _3 with
+                                                       <= (match _8 with
                                                            | _, $pat -> $pat
                                                            end + contents i1)) /\
                                                       4 <= contents i1) /\
-                                                     (match _3 with
+                                                     (match _8 with
                                                       | $pat, _ -> $pat
                                                       end + contents i1)
                                                      <= 5) /\
                                                     contents i1
                                                     <= (3
-                                                        + match _3 with
+                                                        + match _8 with
                                                         | $pat, _ -> $pat
                                                         end)) /\
-                                                   (match _3 with
+                                                   (match _8 with
                                                     | _, $pat -> $pat
                                                     end + contents i1)
                                                    <= 6) /\
                                                   contents i1
                                                   <= (2
-                                                      + match _3 with
+                                                      + match _8 with
                                                       | _, $pat -> $pat
                                                       end)) /\
                                                  contents i1 <= 4) /\
-                                                (match _3 with
+                                                (match _8 with
                                                  | $pat, _ -> $pat
                                                  end + 7)
                                                 <= contents j1) /\
                                                9
-                                               <= (match _3 with
+                                               <= (match _8 with
                                                    | $pat, _ -> $pat
                                                    end + contents j1)) /\
-                                              (match _3 with
+                                              (match _8 with
                                                | _, $pat -> $pat
                                                end + 6)
                                               <= contents j1) /\
                                              10
-                                             <= (match _3 with
+                                             <= (match _8 with
                                                  | _, $pat -> $pat
                                                  end + contents j1)) /\
                                             (contents i1 + 4) <= contents j1) /\
                                            12 <= (contents i1 + contents j1)) /\
                                           8 <= contents j1) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | $pat, _ -> $pat
                                           end + contents j1)
                                          <= 9) /\
                                         contents j1
                                         <= (7
-                                            + match _3 with
+                                            + match _8 with
                                             | $pat, _ -> $pat
                                             end)) /\
-                                       (match _3 with
+                                       (match _8 with
                                         | _, $pat -> $pat
                                         end + contents j1)
                                        <= 10) /\
                                       contents j1
                                       <= (6
-                                          + match _3 with
+                                          + match _8 with
                                           | _, $pat -> $pat
                                           end)) /\
                                      (contents i1 + contents j1) <= 12) /\
                                     contents j1 <= (4 + contents i1)) /\
                                    contents j1 <= 8 \/
-                                   (((((((((((((((((((((((match _3 with
+                                   (((((((((((((((((((((((match _8 with
                                                           | $pat, _ -> $pat
                                                           end + 8)
                                                          <= contents i1 /\
                                                          10
-                                                         <= (match _3 with
+                                                         <= (match _8 with
                                                              | $pat, _ ->
                                                                  $pat
                                                              end
                                                              + contents i1)) /\
-                                                        (match _3 with
+                                                        (match _8 with
                                                          | _, $pat -> $pat
                                                          end + 7)
                                                         <= contents i1) /\
                                                        11
-                                                       <= (match _3 with
+                                                       <= (match _8 with
                                                            | _, $pat -> $pat
                                                            end + contents i1)) /\
                                                       9 <= contents i1) /\
-                                                     (match _3 with
+                                                     (match _8 with
                                                       | $pat, _ -> $pat
                                                       end + contents i1)
                                                      <= 10) /\
                                                     contents i1
                                                     <= (8
-                                                        + match _3 with
+                                                        + match _8 with
                                                         | $pat, _ -> $pat
                                                         end)) /\
-                                                   (match _3 with
+                                                   (match _8 with
                                                     | _, $pat -> $pat
                                                     end + contents i1)
                                                    <= 11) /\
                                                   contents i1
                                                   <= (7
-                                                      + match _3 with
+                                                      + match _8 with
                                                       | _, $pat -> $pat
                                                       end)) /\
                                                  contents i1 <= 9) /\
-                                                (match _3 with
+                                                (match _8 with
                                                  | $pat, _ -> $pat
                                                  end + 17)
                                                 <= contents j1) /\
                                                19
-                                               <= (match _3 with
+                                               <= (match _8 with
                                                    | $pat, _ -> $pat
                                                    end + contents j1)) /\
-                                              (match _3 with
+                                              (match _8 with
                                                | _, $pat -> $pat
                                                end + 16)
                                               <= contents j1) /\
                                              20
-                                             <= (match _3 with
+                                             <= (match _8 with
                                                  | _, $pat -> $pat
                                                  end + contents j1)) /\
                                             (contents i1 + 9) <= contents j1) /\
                                            27 <= (contents i1 + contents j1)) /\
                                           18 <= contents j1) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | $pat, _ -> $pat
                                           end + contents j1)
                                          <= 19) /\
                                         contents j1
                                         <= (17
-                                            + match _3 with
+                                            + match _8 with
                                             | $pat, _ -> $pat
                                             end)) /\
-                                       (match _3 with
+                                       (match _8 with
                                         | _, $pat -> $pat
                                         end + contents j1)
                                        <= 20) /\
                                       contents j1
                                       <= (16
-                                          + match _3 with
+                                          + match _8 with
                                           | _, $pat -> $pat
                                           end)) /\
                                      (contents i1 + contents j1) <= 27) /\
                                     contents j1 <= (9 + contents i1)) /\
                                    contents j1 <= 18 \/
-                                   (((((((((((((((((((((((match _3 with
+                                   (((((((((((((((((((((((match _8 with
                                                           | $pat, _ -> $pat
                                                           end + 7)
                                                          <= contents i1 /\
                                                          9
-                                                         <= (match _3 with
+                                                         <= (match _8 with
                                                              | $pat, _ ->
                                                                  $pat
                                                              end
                                                              + contents i1)) /\
-                                                        (match _3 with
+                                                        (match _8 with
                                                          | _, $pat -> $pat
                                                          end + 6)
                                                         <= contents i1) /\
                                                        10
-                                                       <= (match _3 with
+                                                       <= (match _8 with
                                                            | _, $pat -> $pat
                                                            end + contents i1)) /\
                                                       8 <= contents i1) /\
-                                                     (match _3 with
+                                                     (match _8 with
                                                       | $pat, _ -> $pat
                                                       end + contents i1)
                                                      <= 9) /\
                                                     contents i1
                                                     <= (7
-                                                        + match _3 with
+                                                        + match _8 with
                                                         | $pat, _ -> $pat
                                                         end)) /\
-                                                   (match _3 with
+                                                   (match _8 with
                                                     | _, $pat -> $pat
                                                     end + contents i1)
                                                    <= 10) /\
                                                   contents i1
                                                   <= (6
-                                                      + match _3 with
+                                                      + match _8 with
                                                       | _, $pat -> $pat
                                                       end)) /\
                                                  contents i1 <= 8) /\
-                                                (match _3 with
+                                                (match _8 with
                                                  | $pat, _ -> $pat
                                                  end + 15)
                                                 <= contents j1) /\
                                                17
-                                               <= (match _3 with
+                                               <= (match _8 with
                                                    | $pat, _ -> $pat
                                                    end + contents j1)) /\
-                                              (match _3 with
+                                              (match _8 with
                                                | _, $pat -> $pat
                                                end + 14)
                                               <= contents j1) /\
                                              18
-                                             <= (match _3 with
+                                             <= (match _8 with
                                                  | _, $pat -> $pat
                                                  end + contents j1)) /\
                                             (contents i1 + 8) <= contents j1) /\
                                            24 <= (contents i1 + contents j1)) /\
                                           16 <= contents j1) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | $pat, _ -> $pat
                                           end + contents j1)
                                          <= 17) /\
                                         contents j1
                                         <= (15
-                                            + match _3 with
+                                            + match _8 with
                                             | $pat, _ -> $pat
                                             end)) /\
-                                       (match _3 with
+                                       (match _8 with
                                         | _, $pat -> $pat
                                         end + contents j1)
                                        <= 18) /\
                                       contents j1
                                       <= (14
-                                          + match _3 with
+                                          + match _8 with
                                           | _, $pat -> $pat
                                           end)) /\
                                      (contents i1 + contents j1) <= 24) /\
                                     contents j1 <= (8 + contents i1)) /\
                                    contents j1 <= 16 \/
-                                   ((((((((((((((((((((((match _3 with
+                                   ((((((((((((((((((((((match _8 with
                                                          | $pat, _ -> $pat
                                                          end < contents i1 /\
                                                          3
-                                                         <= (match _3 with
+                                                         <= (match _8 with
                                                              | $pat, _ ->
                                                                  $pat
                                                              end
                                                              + contents i1)) /\
-                                                        match _3 with
+                                                        match _8 with
                                                         | _, $pat -> $pat
                                                         end <= contents i1) /\
                                                        4
-                                                       <= (match _3 with
+                                                       <= (match _8 with
                                                            | _, $pat -> $pat
                                                            end + contents i1)) /\
                                                       2 <= contents i1) /\
-                                                     (match _3 with
+                                                     (match _8 with
                                                       | $pat, _ -> $pat
                                                       end + contents i1)
                                                      <= 3) /\
                                                     contents i1
                                                     <= (1
-                                                        + match _3 with
+                                                        + match _8 with
                                                         | $pat, _ -> $pat
                                                         end)) /\
-                                                   (match _3 with
+                                                   (match _8 with
                                                     | _, $pat -> $pat
                                                     end + contents i1)
                                                    <= 4) /\
                                                   contents i1
-                                                  <= match _3 with
+                                                  <= match _8 with
                                                   | _, $pat -> $pat
                                                   end) /\
                                                  contents i1 <= 2) /\
-                                                (match _3 with
+                                                (match _8 with
                                                  | $pat, _ -> $pat
                                                  end + 3)
                                                 <= contents j1) /\
                                                5
-                                               <= (match _3 with
+                                               <= (match _8 with
                                                    | $pat, _ -> $pat
                                                    end + contents j1)) /\
-                                              (match _3 with
+                                              (match _8 with
                                                | _, $pat -> $pat
                                                end + 2)
                                               <= contents j1) /\
                                              6
-                                             <= (match _3 with
+                                             <= (match _8 with
                                                  | _, $pat -> $pat
                                                  end + contents j1)) /\
                                             (contents i1 + 2) <= contents j1) /\
                                            6 <= (contents i1 + contents j1)) /\
                                           4 <= contents j1) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | $pat, _ -> $pat
                                           end + contents j1)
                                          <= 5) /\
                                         contents j1
                                         <= (3
-                                            + match _3 with
+                                            + match _8 with
                                             | $pat, _ -> $pat
                                             end)) /\
-                                       (match _3 with
+                                       (match _8 with
                                         | _, $pat -> $pat
                                         end + contents j1)
                                        <= 6) /\
                                       contents j1
                                       <= (2
-                                          + match _3 with
+                                          + match _8 with
                                           | _, $pat -> $pat
                                           end)) /\
                                      (contents i1 + contents j1) <= 6) /\
                                     contents j1 <= (2 + contents i1)) /\
                                    contents j1 <= 4 \/
-                                   (((((((((((((((((((((((match _3 with
+                                   (((((((((((((((((((((((match _8 with
                                                           | $pat, _ -> $pat
                                                           end + 6)
                                                          <= contents i1 /\
                                                          8
-                                                         <= (match _3 with
+                                                         <= (match _8 with
                                                              | $pat, _ ->
                                                                  $pat
                                                              end
                                                              + contents i1)) /\
-                                                        (match _3 with
+                                                        (match _8 with
                                                          | _, $pat -> $pat
                                                          end + 5)
                                                         <= contents i1) /\
                                                        9
-                                                       <= (match _3 with
+                                                       <= (match _8 with
                                                            | _, $pat -> $pat
                                                            end + contents i1)) /\
                                                       7 <= contents i1) /\
-                                                     (match _3 with
+                                                     (match _8 with
                                                       | $pat, _ -> $pat
                                                       end + contents i1)
                                                      <= 8) /\
                                                     contents i1
                                                     <= (6
-                                                        + match _3 with
+                                                        + match _8 with
                                                         | $pat, _ -> $pat
                                                         end)) /\
-                                                   (match _3 with
+                                                   (match _8 with
                                                     | _, $pat -> $pat
                                                     end + contents i1)
                                                    <= 9) /\
                                                   contents i1
                                                   <= (5
-                                                      + match _3 with
+                                                      + match _8 with
                                                       | _, $pat -> $pat
                                                       end)) /\
                                                  contents i1 <= 7) /\
-                                                (match _3 with
+                                                (match _8 with
                                                  | $pat, _ -> $pat
                                                  end + 13)
                                                 <= contents j1) /\
                                                15
-                                               <= (match _3 with
+                                               <= (match _8 with
                                                    | $pat, _ -> $pat
                                                    end + contents j1)) /\
-                                              (match _3 with
+                                              (match _8 with
                                                | _, $pat -> $pat
                                                end + 12)
                                               <= contents j1) /\
                                              16
-                                             <= (match _3 with
+                                             <= (match _8 with
                                                  | _, $pat -> $pat
                                                  end + contents j1)) /\
                                             (contents i1 + 7) <= contents j1) /\
                                            21 <= (contents i1 + contents j1)) /\
                                           14 <= contents j1) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | $pat, _ -> $pat
                                           end + contents j1)
                                          <= 15) /\
                                         contents j1
                                         <= (13
-                                            + match _3 with
+                                            + match _8 with
                                             | $pat, _ -> $pat
                                             end)) /\
-                                       (match _3 with
+                                       (match _8 with
                                         | _, $pat -> $pat
                                         end + contents j1)
                                        <= 16) /\
                                       contents j1
                                       <= (12
-                                          + match _3 with
+                                          + match _8 with
                                           | _, $pat -> $pat
                                           end)) /\
                                      (contents i1 + contents j1) <= 21) /\
                                     contents j1 <= (7 + contents i1)) /\
                                    contents j1 <= 14 \/
-                                   (((((((((((((((((((((((match _3 with
+                                   (((((((((((((((((((((((match _8 with
                                                           | $pat, _ -> $pat
                                                           end + 5)
                                                          <= contents i1 /\
                                                          7
-                                                         <= (match _3 with
+                                                         <= (match _8 with
                                                              | $pat, _ ->
                                                                  $pat
                                                              end
                                                              + contents i1)) /\
-                                                        (match _3 with
+                                                        (match _8 with
                                                          | _, $pat -> $pat
                                                          end + 4)
                                                         <= contents i1) /\
                                                        8
-                                                       <= (match _3 with
+                                                       <= (match _8 with
                                                            | _, $pat -> $pat
                                                            end + contents i1)) /\
                                                       6 <= contents i1) /\
-                                                     (match _3 with
+                                                     (match _8 with
                                                       | $pat, _ -> $pat
                                                       end + contents i1)
                                                      <= 7) /\
                                                     contents i1
                                                     <= (5
-                                                        + match _3 with
+                                                        + match _8 with
                                                         | $pat, _ -> $pat
                                                         end)) /\
-                                                   (match _3 with
+                                                   (match _8 with
                                                     | _, $pat -> $pat
                                                     end + contents i1)
                                                    <= 8) /\
                                                   contents i1
                                                   <= (4
-                                                      + match _3 with
+                                                      + match _8 with
                                                       | _, $pat -> $pat
                                                       end)) /\
                                                  contents i1 <= 6) /\
-                                                (match _3 with
+                                                (match _8 with
                                                  | $pat, _ -> $pat
                                                  end + 11)
                                                 <= contents j1) /\
                                                13
-                                               <= (match _3 with
+                                               <= (match _8 with
                                                    | $pat, _ -> $pat
                                                    end + contents j1)) /\
-                                              (match _3 with
+                                              (match _8 with
                                                | _, $pat -> $pat
                                                end + 10)
                                               <= contents j1) /\
                                              14
-                                             <= (match _3 with
+                                             <= (match _8 with
                                                  | _, $pat -> $pat
                                                  end + contents j1)) /\
                                             (contents i1 + 6) <= contents j1) /\
                                            18 <= (contents i1 + contents j1)) /\
                                           12 <= contents j1) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | $pat, _ -> $pat
                                           end + contents j1)
                                          <= 13) /\
                                         contents j1
                                         <= (11
-                                            + match _3 with
+                                            + match _8 with
                                             | $pat, _ -> $pat
                                             end)) /\
-                                       (match _3 with
+                                       (match _8 with
                                         | _, $pat -> $pat
                                         end + contents j1)
                                        <= 14) /\
                                       contents j1
                                       <= (10
-                                          + match _3 with
+                                          + match _8 with
                                           | _, $pat -> $pat
                                           end)) /\
                                      (contents i1 + contents j1) <= 18) /\
                                     contents j1 <= (6 + contents i1)) /\
                                    contents j1 <= 12 \/
-                                   (((((((((((((((((((((((match _3 with
+                                   (((((((((((((((((((((((match _8 with
                                                           | $pat, _ -> $pat
                                                           end + 2)
                                                          <= contents i1 /\
                                                          4
-                                                         <= (match _3 with
+                                                         <= (match _8 with
                                                              | $pat, _ ->
                                                                  $pat
                                                              end
                                                              + contents i1)) /\
-                                                        match _3 with
+                                                        match _8 with
                                                         | _, $pat -> $pat
                                                         end < contents i1) /\
                                                        5
-                                                       <= (match _3 with
+                                                       <= (match _8 with
                                                            | _, $pat -> $pat
                                                            end + contents i1)) /\
                                                       3 <= contents i1) /\
-                                                     (match _3 with
+                                                     (match _8 with
                                                       | $pat, _ -> $pat
                                                       end + contents i1)
                                                      <= 4) /\
                                                     contents i1
                                                     <= (2
-                                                        + match _3 with
+                                                        + match _8 with
                                                         | $pat, _ -> $pat
                                                         end)) /\
-                                                   (match _3 with
+                                                   (match _8 with
                                                     | _, $pat -> $pat
                                                     end + contents i1)
                                                    <= 5) /\
                                                   contents i1
                                                   <= (1
-                                                      + match _3 with
+                                                      + match _8 with
                                                       | _, $pat -> $pat
                                                       end)) /\
                                                  contents i1 <= 3) /\
-                                                (match _3 with
+                                                (match _8 with
                                                  | $pat, _ -> $pat
                                                  end + 5)
                                                 <= contents j1) /\
                                                7
-                                               <= (match _3 with
+                                               <= (match _8 with
                                                    | $pat, _ -> $pat
                                                    end + contents j1)) /\
-                                              (match _3 with
+                                              (match _8 with
                                                | _, $pat -> $pat
                                                end + 4)
                                               <= contents j1) /\
                                              8
-                                             <= (match _3 with
+                                             <= (match _8 with
                                                  | _, $pat -> $pat
                                                  end + contents j1)) /\
                                             (contents i1 + 3) <= contents j1) /\
                                            9 <= (contents i1 + contents j1)) /\
                                           6 <= contents j1) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | $pat, _ -> $pat
                                           end + contents j1)
                                          <= 7) /\
                                         contents j1
                                         <= (5
-                                            + match _3 with
+                                            + match _8 with
                                             | $pat, _ -> $pat
                                             end)) /\
-                                       (match _3 with
+                                       (match _8 with
                                         | _, $pat -> $pat
                                         end + contents j1)
                                        <= 8) /\
                                       contents j1
                                       <= (4
-                                          + match _3 with
+                                          + match _8 with
                                           | _, $pat -> $pat
                                           end)) /\
                                      (contents i1 + contents j1) <= 9) /\
                                     contents j1 <= (3 + contents i1)) /\
                                    contents j1 <= 6 \/
-                                   ((((((((((((((((((((((((match _3 with
+                                   ((((((((((((((((((((((((match _8 with
                                                            | $pat, _ -> $pat
                                                            end <= contents i1 /\
                                                            2
                                                            <= (match 
-                                                               _3 with
+                                                               _8 with
                                                                | $pat, _ ->
                                                                    $pat
                                                                end
                                                                + contents i1)) /\
-                                                          match _3 with
+                                                          match _8 with
                                                           | _, $pat -> $pat
                                                           end
                                                           <= (1 + contents i1)) /\
                                                          3
-                                                         <= (match _3 with
+                                                         <= (match _8 with
                                                              | _, $pat ->
                                                                  $pat
                                                              end
                                                              + contents i1)) /\
                                                         0 < contents i1) /\
-                                                       (match _3 with
+                                                       (match _8 with
                                                         | $pat, _ -> $pat
                                                         end + contents i1)
                                                        <= 2) /\
                                                       contents i1
-                                                      <= match _3 with
+                                                      <= match _8 with
                                                       | $pat, _ -> $pat
                                                       end) /\
-                                                     (match _3 with
+                                                     (match _8 with
                                                       | _, $pat -> $pat
                                                       end + contents i1)
                                                      <= 3) /\
                                                     contents i1
-                                                    < match _3 with
+                                                    < match _8 with
                                                     | _, $pat -> $pat
                                                     end) /\
                                                    contents i1 <= 1) /\
-                                                  match _3 with
+                                                  match _8 with
                                                   | $pat, _ -> $pat
                                                   end < contents j1) /\
                                                  3
-                                                 <= (match _3 with
+                                                 <= (match _8 with
                                                      | $pat, _ -> $pat
                                                      end + contents j1)) /\
-                                                match _3 with
+                                                match _8 with
                                                 | _, $pat -> $pat
                                                 end <= contents j1) /\
                                                4
-                                               <= (match _3 with
+                                               <= (match _8 with
                                                    | _, $pat -> $pat
                                                    end + contents j1)) /\
                                               contents i1 < contents j1) /\
                                              3 <= (contents i1 + contents j1)) /\
                                             2 <= contents j1) /\
-                                           (match _3 with
+                                           (match _8 with
                                             | $pat, _ -> $pat
                                             end + contents j1)
                                            <= 3) /\
                                           contents j1
                                           <= (1
-                                              + match _3 with
+                                              + match _8 with
                                               | $pat, _ -> $pat
                                               end)) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | _, $pat -> $pat
                                           end + contents j1)
                                          <= 4) /\
                                         contents j1
-                                        <= match _3 with
+                                        <= match _8 with
                                         | _, $pat -> $pat
                                         end) /\
                                        (contents i1 + contents j1) <= 3) /\
                                       contents j1 <= (1 + contents i1)) /\
                                      contents j1 <= 2) /\
                                     contents i1
-                                    = match _3 with
+                                    = match _8 with
                                     | $pat, _ -> $pat
                                     end) /\
                                    contents j1
-                                   = match _3 with
+                                   = match _8 with
                                    | _, $pat -> $pat
                                    end \/
-                                   (((((((((((((((((((((((match _3 with
+                                   (((((((((((((((((((((((match _8 with
                                                           | $pat, _ -> $pat
                                                           end + 4)
                                                          <= contents i1 /\
                                                          6
-                                                         <= (match _3 with
+                                                         <= (match _8 with
                                                              | $pat, _ ->
                                                                  $pat
                                                              end
                                                              + contents i1)) /\
-                                                        (match _3 with
+                                                        (match _8 with
                                                          | _, $pat -> $pat
                                                          end + 3)
                                                         <= contents i1) /\
                                                        7
-                                                       <= (match _3 with
+                                                       <= (match _8 with
                                                            | _, $pat -> $pat
                                                            end + contents i1)) /\
                                                       5 <= contents i1) /\
-                                                     (match _3 with
+                                                     (match _8 with
                                                       | $pat, _ -> $pat
                                                       end + contents i1)
                                                      <= 6) /\
                                                     contents i1
                                                     <= (4
-                                                        + match _3 with
+                                                        + match _8 with
                                                         | $pat, _ -> $pat
                                                         end)) /\
-                                                   (match _3 with
+                                                   (match _8 with
                                                     | _, $pat -> $pat
                                                     end + contents i1)
                                                    <= 7) /\
                                                   contents i1
                                                   <= (3
-                                                      + match _3 with
+                                                      + match _8 with
                                                       | _, $pat -> $pat
                                                       end)) /\
                                                  contents i1 <= 5) /\
-                                                (match _3 with
+                                                (match _8 with
                                                  | $pat, _ -> $pat
                                                  end + 9)
                                                 <= contents j1) /\
                                                11
-                                               <= (match _3 with
+                                               <= (match _8 with
                                                    | $pat, _ -> $pat
                                                    end + contents j1)) /\
-                                              (match _3 with
+                                              (match _8 with
                                                | _, $pat -> $pat
                                                end + 8)
                                               <= contents j1) /\
                                              12
-                                             <= (match _3 with
+                                             <= (match _8 with
                                                  | _, $pat -> $pat
                                                  end + contents j1)) /\
                                             (contents i1 + 5) <= contents j1) /\
                                            15 <= (contents i1 + contents j1)) /\
                                           10 <= contents j1) /\
-                                         (match _3 with
+                                         (match _8 with
                                           | $pat, _ -> $pat
                                           end + contents j1)
                                          <= 11) /\
                                         contents j1
                                         <= (9
-                                            + match _3 with
+                                            + match _8 with
                                             | $pat, _ -> $pat
                                             end)) /\
-                                       (match _3 with
+                                       (match _8 with
                                         | _, $pat -> $pat
                                         end + contents j1)
                                        <= 12) /\
                                       contents j1
                                       <= (8
-                                          + match _3 with
+                                          + match _8 with
                                           | _, $pat -> $pat
                                           end)) /\
                                      (contents i1 + contents j1) <= 15) /\
                                     contents j1 <= (5 + contents i1)) /\
                                    contents j1 <= 10) /\
-                                  2 = match _3 with
+                                  2 = match _8 with
                                   | _, $pat -> $pat
                                   end) /\
-                                 1 = match _3 with
+                                 1 = match _8 with
                                  | $pat, _ -> $pat
                                  end) /\
-                                (1, 2) = _3) /\
+                                (1, 2) = _8) /\
                                contents j1 <= 20) /\
                               contents j1 <= (10 + contents i1)) /\
                              (contents i1 + contents j1) <= 30) /\
                             contents j1
-                            <= (18 + match _3 with
+                            <= (18 + match _8 with
                                 | _, $pat -> $pat
                                 end)) /\
-                           (match _3 with
+                           (match _8 with
                             | _, $pat -> $pat
                             end + contents j1)
                            <= 22) /\
                           contents j1
-                          <= (19 + match _3 with
+                          <= (19 + match _8 with
                               | $pat, _ -> $pat
                               end)) /\
-                         (match _3 with
+                         (match _8 with
                           | $pat, _ -> $pat
                           end + contents j1)
                          <= 21) /\
                         0 <= contents j1) /\
                        0 <= (contents i1 + contents j1)) /\
                       contents i1 <= contents j1) /\
-                     2 <= (match _3 with
+                     2 <= (match _8 with
                            | _, $pat -> $pat
                            end + contents j1)) /\
-                    match _3 with
+                    match _8 with
                     | _, $pat -> $pat
                     end <= (2 + contents j1)) /\
-                   0 < (match _3 with
+                   0 < (match _8 with
                         | $pat, _ -> $pat
                         end + contents j1)) /\
-                  match _3 with
+                  match _8 with
                   | $pat, _ -> $pat
                   end <= (1 + contents j1)) /\
                  contents i1 <= 10) /\
-                contents i1 <= (8 + match _3 with
+                contents i1 <= (8 + match _8 with
                                 | _, $pat -> $pat
                                 end)) /\
-               (match _3 with
+               (match _8 with
                 | _, $pat -> $pat
                 end + contents i1) <= 12) /\
-              contents i1 <= (9 + match _3 with
+              contents i1 <= (9 + match _8 with
                               | $pat, _ -> $pat
                               end)) /\
-             (match _3 with
+             (match _8 with
               | $pat, _ -> $pat
               end + contents i1) <= 11) /\
             0 <= contents i1) /\
-           2 <= (match _3 with
+           2 <= (match _8 with
                  | _, $pat -> $pat
                  end + contents i1)) /\
-          match _3 with
+          match _8 with
           | _, $pat -> $pat
           end <= (2 + contents i1)) /\
-         0 < (match _3 with
+         0 < (match _8 with
               | $pat, _ -> $pat
               end + contents i1)) /\
-        match _3 with
+        match _8 with
         | $pat, _ -> $pat
         end <= (1 + contents i1)) /\
-       match _3 with
+       match _8 with
        | _, $pat -> $pat
        end <= 2) /\
-      match _3 with
+      match _8 with
       | _, $pat -> $pat
-      end <= (1 + match _3 with
+      end <= (1 + match _8 with
               | $pat, _ -> $pat
               end)) /\
-     (match _3 with
+     (match _8 with
       | $pat, _ -> $pat
-      end + match _3 with
+      end + match _8 with
       | _, $pat -> $pat
       end)
      <= 3) /\
-    2 <= match _3 with
+    2 <= match _8 with
     | _, $pat -> $pat
     end) /\
    3
-   <= (match _3 with
+   <= (match _8 with
        | $pat, _ -> $pat
-       end + match _3 with
+       end + match _8 with
        | _, $pat -> $pat
        end)) /\
-  match _3 with
+  match _8 with
   | $pat, _ -> $pat
-  end < match _3 with
+  end < match _8 with
   | _, $pat -> $pat
   end) /\
- match _3 with
+ match _8 with
  | $pat, _ -> $pat
  end <= 1) /\
-0 < match _3 with
+0 < match _8 with
 | $pat, _ -> $pat
 end
 ###
@@ -901,28 +901,28 @@ end
 ((((((((((((0 = contents i2 /\ 0 = contents j2) /\ contents i2 = 0) /\
           contents j2 = 0 \/
           ((1 = contents i2 /\ 2 = contents j2) /\
-           contents i2 = match _5 with
+           contents i2 = match _15 with
            | $pat, _ -> $pat
            end) /\
-          contents j2 = match _5 with
+          contents j2 = match _15 with
           | _, $pat -> $pat
           end \/ 2 <= contents i2 /\ 4 <= contents j2) /\
          4 = 4) /\
-        2 = match _5 with
+        2 = match _15 with
         | _, $pat -> $pat
         end) /\
        0 = 0) /\
-      (1, 2) = _5) /\
-     1 = match _5 with
+      (1, 2) = _15) /\
+     1 = match _15 with
      | $pat, _ -> $pat
      end) /\
     0 <= contents j2) /\
    contents i2 <= 10) /\
   0 <= contents i2) /\
- 2 = match _5 with
+ 2 = match _15 with
  | _, $pat -> $pat
  end) /\
-1 = match _5 with
+1 = match _15 with
 | $pat, _ -> $pat
 end
 ###

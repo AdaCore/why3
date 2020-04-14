@@ -243,7 +243,7 @@ module Make(E: sig
 
       let begin_e2, end_e2, exn_e2 = put_expr_in_cfg ~ret cfg manpk e2 in
 
-      let pv_str = "" in (* Format.asprintf "%a" print_pv pv in *)
+      let pv_str = Format.asprintf "%a" print_pv pv in
 
       (* Save the effect of the let *)
       new_hedge_cfg cfg end_e1 begin_e2
