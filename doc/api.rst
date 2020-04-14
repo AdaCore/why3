@@ -596,16 +596,51 @@ The corresponding OCaml code is as follows.
 
 Having declared all the programs we wanted to write, we can now close
 the module and the file, and get as a result the set of modules of our
-file, under the form of a map of module names to modules.
+file.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml
    :start-after: BEGIN{getmodules}
    :end-before: END{getmodules}
 
-We can then construct the proofs tasks for our module, and then try to
-call the Alt-Ergo prover. The rest of that code is using OCaml functions
-that were already introduced before.
+Module ``Mlw_printer`` provides functions to print elements of ``Ptree``
+in concrete whyml syntax.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{mlwprinter}
+   :end-before: END{mlwprinter}
+
+The typing of the modules is carried out by function
+``Typing.type_mlw_file``, which produces a mapping of module names to
+typed modules.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{typemodules}
+   :end-before: END{typemodules}
+
+Typing errors are reported by exceptions ``Located of position * exn``
+from module ``Loc``. However, the positions in our declarations, which
+are provided by the exception, cannot be used to identify the position
+in the (printed) program, because the locations do not correspond to any
+concrete syntax.
+
+Alternatively, we can give every ``Ptree`` element in our declarations
+above a unique location (for example using the function
+``Mlw_printer.next_pos``). When a located error is encountered, the
+function ``Mlw_printer.with_marker`` can then be used to instruct
+``Mlw_printer`` to insert the error as a comment just before the
+syntactic element with the given location.
+
+.. literalinclude:: ../examples/use_api/mlw_tree.ml
+   :language: ocaml
+   :start-after: BEGIN{typemoduleserror}
+   :end-before: END{typemoduleserror}
+
+Finally, we can then construct the proofs tasks for our typed module,
+and then try to call the Alt-Ergo prover. The rest of that code is using
+OCaml functions that were already introduced before.
 
 .. literalinclude:: ../examples/use_api/mlw_tree.ml
    :language: ocaml

@@ -9,10 +9,35 @@
 (*                                                                  *)
 (********************************************************************)
 
-(* TODO Use less parenthesis to deal with precedence and associativity *)
-
 open Format
 open Ptree
+
+let marker = ref None
+
+let with_marker ?(msg="XXX") loc pp fmt x =
+  marker := Some (msg, loc);
+  pp fmt x;
+  marker := None
+
+let marker loc =
+  match !marker with
+  | Some (msg, loc') when loc' = loc ->
+      Some msg
+  | _ -> None
+
+let pp_maybe_marked fmt pp x loc =
+  match marker loc with
+  | Some msg ->
+      fprintf fmt "(*%s*)@ (%a)" msg pp x
+  | None ->
+      pp fmt x
+
+let next_pos =
+  let counter = ref 0 in
+  fun () ->
+    incr counter;
+    Loc.user_position "" !counter 0 0
+
 
 let pp_sep f fmt () =
   fprintf fmt f
@@ -48,17 +73,17 @@ let pp_closed is_closed pp fmt x =
 let expr_closed e = match e.expr_desc with
   | Eref | Etrue | Efalse | Econst _ | Eident _ | Etuple _ | Erecord _ | Eabsurd | Escope _ | Eidapp (_, []) | Ecast _ | Einnfix _ ->
       true
-  | _ -> false
+  | _ -> marker e.expr_loc <> None
 
 let term_closed t = match t.term_desc with
   | Ttrue | Tfalse | Tconst _ | Tident _ | Tupdate _ | Trecord _ | Ttuple _ | Tscope _ | Tidapp (_, []) | Tcast _ | Tinnfix _ | Tbinnop _ ->
       true
-  | _ -> false
+  | _ -> marker t.term_loc <> None
 
 let pattern_closed p = match p.pat_desc with
   | Pwild | Pvar _ | Ptuple _ | Pparen _ | Pscope _ | Papp (_, []) | Pcast _ ->
       true
-  | _ -> false
+  | _ -> marker p.pat_loc <> None
 
 let pty_closed t = match t with
   | PTtyvar _ | PTtuple _ | PTscope _ | PTparen _ | PTpure _ | PTtyapp (_, []) ->
@@ -381,6 +406,9 @@ and pp_expr' fmt =
   pp_closed expr_closed pp_expr fmt
 
 and pp_expr fmt e =
+  pp_maybe_marked fmt pp_expr'' e e.expr_loc
+
+and pp_expr'' fmt e =
   match e.expr_desc with
   | Eref ->
       pp_print_string fmt "ref"
@@ -547,6 +575,9 @@ and pp_term' fmt =
   pp_closed term_closed pp_term fmt
 
 and pp_term fmt t =
+  pp_maybe_marked fmt pp_term'' t t.term_loc
+
+and pp_term'' fmt t =
   let pp_binop fmt op =
     pp_print_string fmt
       (match op with
@@ -671,6 +702,9 @@ and pp_pattern' fmt =
   pp_closed pattern_closed pp_pattern fmt
 
 and pp_pattern fmt p =
+  pp_maybe_marked fmt pp_pattern'' p p.pat_loc
+
+and pp_pattern'' fmt p =
   match p.pat_desc with
   | Pwild ->
       pp_print_string fmt "_"
