@@ -282,20 +282,7 @@ type model_parser =  string -> Printer.printer_mapping -> model
     and builds model data structure.
 *)
 
-type raw_model_parser =
-  Ident.ident Wstdlib.Mstr.t -> Ident.ident Wstdlib.Mstr.t -> ((string * string) list) Wstdlib.Mstr.t ->
-    string list -> Ident.Sattr.t Wstdlib.Mstr.t -> string -> model_element list
-(** Parses the input string into model elements.
-    [raw_model_parser: proj->record_map->noarg_cons->s->mel]
-    [proj]: is the list of projections
-    [list_field]: is the list of field function definition
-    [record_map]: is a map associating the name of printed projections to the
-      fields (couple of printed field and model_trace name).
-    [noarg_cons]: List of constructors with no arguments (collected to avoid
-      confusion between variable and constructors)
-    [s]: model
-    [mel]: collected model
- *)
+type raw_model_parser = Printer.printer_mapping -> string -> model_element list
 
 val register_remove_field:
   (Ident.Sattr.t * model_value -> Ident.Sattr.t * model_value) -> unit

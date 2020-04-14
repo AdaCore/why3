@@ -704,17 +704,13 @@ and convert_tarray_to_array a =
   | TConst t -> Const (convert_tterm_to_term t)
   | TStore (a, t1, t2) -> Store (convert_tarray_to_array a, convert_tterm_to_term t1, convert_tterm_to_term t2)
 
-let create_list (projections_list: Ident.ident Mstr.t)
-    (field_list: Ident.ident Mstr.t)
-    (list_records: ((string * string) list) Mstr.t)
-    (noarg_constructors: string list) (set_str: Ident.Sattr.t Mstr.t)
-    (table: definition Mstr.t) =
+let create_list pm (table: definition Mstr.t) =
 
   (* Convert list_records to take replace fields with model_trace when
      necessary. *)
   let list_records =
     Mstr.fold (fun key l acc ->
-      Mstr.add key (List.map (fun (a, b) -> if b = "" then a else b) l) acc) list_records Mstr.empty
+        Mstr.add key (List.map (fun (a, b) -> if b = "" then a else b) l) acc) pm.Printer.list_records Mstr.empty
   in
 
   (* Convert Apply that were actually recorded as record to Record. Also replace
@@ -722,7 +718,7 @@ let create_list (projections_list: Ident.ident Mstr.t)
   let table =
     Mstr.fold (fun key value acc ->
       let value =
-        definition_apply_to_record list_records noarg_constructors value
+        definition_apply_to_record list_records pm.Printer.noarg_constructors value
       in
       Mstr.add key value acc) table Mstr.empty
   in
@@ -752,7 +748,7 @@ let create_list (projections_list: Ident.ident Mstr.t)
   (* First recover values stored in projections that were registered *)
   let table =
     Mstr.fold (fun key value acc ->
-      if Mstr.mem key projections_list || Mstr.mem key field_list then
+        if Mstr.mem key pm.Printer.list_projections || Mstr.mem key pm.Printer.list_fields then
         add_vars_to_table acc key value
       else
         acc)
@@ -779,7 +775,7 @@ let create_list (projections_list: Ident.ident Mstr.t)
   (* Then converts all variables to raw_model_element *)
   Mstr.fold
     (fun key value list_acc ->
-      try (convert_to_model_element ~set_str field_list key value :: list_acc)
+      try (convert_to_model_element ~set_str:pm.Printer.set_str pm.Printer.list_fields key value :: list_acc)
       with Not_value when not (Debug.test_flag debug_cntex &&
                                Debug.test_flag Debug.stack_trace) ->
         Debug.dprintf debug_cntex "Element creation failed: %s@." key;

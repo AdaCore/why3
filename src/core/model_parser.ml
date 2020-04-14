@@ -619,9 +619,7 @@ let get_kind vc_attrs elt =
 
 type model_parser =  string -> Printer.printer_mapping -> model
 
-type raw_model_parser =
-  Ident.ident Mstr.t -> Ident.ident Mstr.t -> ((string * string) list) Mstr.t ->
-    string list -> Ident.Sattr.t Mstr.t -> string -> model_element list
+type raw_model_parser = printer_mapping -> string -> model_element list
 
 (*
 ***************************************************************
@@ -1233,16 +1231,6 @@ type reg_model_parser = Pp.formatted * raw_model_parser
 
 let model_parsers : reg_model_parser Hstr.t = Hstr.create 17
 
-let make_mp_from_raw (raw_mp:raw_model_parser) =
-  fun input printer_mapping ->
-    let list_proj = printer_mapping.list_projections in
-    let list_fields = printer_mapping.list_fields in
-    let list_records = printer_mapping.list_records in
-    let noarg_cons = printer_mapping.noarg_constructors in
-    let set_str = printer_mapping.set_str in
-    let raw_model = raw_mp list_proj list_fields list_records noarg_cons set_str input in
-    build_model raw_model printer_mapping
-
 let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s);
   Hstr.replace model_parsers s (desc, p)
@@ -1252,11 +1240,14 @@ let lookup_raw_model_parser s : raw_model_parser =
   with Not_found -> raise (UnknownModelParser s)
 
 let lookup_model_parser s : model_parser =
-  make_mp_from_raw (lookup_raw_model_parser s)
+  let raw_mp = lookup_raw_model_parser s in
+  fun input printer_mapping ->
+    let raw_model = raw_mp printer_mapping input in
+    build_model raw_model printer_mapping
 
 let list_model_parsers () =
   Hstr.fold (fun k (desc,_) acc -> (k,desc)::acc) model_parsers []
 
 let () = register_model_parser
   ~desc:"Model@ parser@ with@ no@ output@ (used@ if@ the@ solver@ does@ not@ support@ models." "no_model"
-  (fun _ _ _ _ _ _ -> [])
+  (fun _ _ -> [])
