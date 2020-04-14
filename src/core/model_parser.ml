@@ -661,8 +661,8 @@ let pp_kind fmt k =
   | Error_message -> "error_message"
   | Other -> "other"
   | Loop_before -> "before loop"
-  | Loop_previous_iteration -> "previous loop iteration"
-  | Loop_current_iteration -> "current loop iteration"
+  | Loop_previous_iteration -> "previous iteration"
+  | Loop_current_iteration -> "current iteration"
 
 let print_model_element ~at_loc ~print_attrs vc_attrs print_model_value me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
@@ -672,18 +672,20 @@ let print_model_element ~at_loc ~print_attrs vc_attrs print_model_value me_name_
     let me_name = me_name_trans m_element.me_name in
     let attrs = m_element.me_name.men_attrs in
     let me_name = apply_location_label ~at_loc ~attrs me_name in
-    let kind = get_kind vc_attrs m_element in
+    let pp_kind fmt =
+      match get_kind vc_attrs m_element with
+      | Old | Other -> ()
+      | kind -> Format.fprintf fmt "[%a] " pp_kind kind in
     if print_attrs then
-      fprintf fmt  "@[%s (%a), @[[%a]@] =@ %a@]"
-        me_name pp_kind kind
+      fprintf fmt  "@[%t%s, @[[%a]@] =@ %a@]"
+        pp_kind me_name
         (Pp.print_list Pp.comma Pretty.print_attr)
         (Sattr.elements m_element.me_name.men_attrs)
         print_model_value m_element.me_value
     else
-      fprintf fmt  "@[%s =@ %a (%a)@]"
-        me_name
+      fprintf fmt  "@[%t%s =@ %a@]"
+        pp_kind me_name
         print_model_value m_element.me_value
-        pp_kind kind
 
 let print_model_elements ~at_loc ~print_attrs vc_attrs ?(sep = Pp.newline)
     print_model_value me_name_trans fmt m_elements
