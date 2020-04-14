@@ -63,12 +63,12 @@ module Make(S:sig
   type env = unit
   type t   = Dom.t * uf_t     (* Abstract values *)
 
-  let tmp_pool = ["$abc1";"$abc2"; "$abc3"] |> List.map Var.of_string
+  let tmp_pool = ["z$tmp1";"z$tmp2"; "z$tmp3"] |> List.map Var.of_string
 
   let build_var_pool n =
     let rec build_var_pool_aux = function
       | 0 -> []
-      | n -> let v = Var.of_string (Format.sprintf "$pool%d" n) in
+      | n -> let v = Var.of_string (Format.sprintf "z$pool%d" n) in
              v :: build_var_pool_aux (n - 1) in
     build_var_pool_aux n |> VarPool.of_list
 

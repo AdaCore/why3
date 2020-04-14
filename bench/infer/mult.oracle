@@ -1,9 +1,9 @@
 ### Debug: inferred invariants ###
 (0 = contents i /\ contents i = 0 \/
- (((2 * (2 * 0)) = contents i /\ (2 * 0) <= 9) /\ (2 * (2 * 0)) = contents i) /\
+ ((contents i = (2 * (2 * 0)) /\ (2 * 0) <= 9) /\ (2 * (2 * 0)) = contents i) /\
  2 = 2 \/
  ((2 * 0) <= 9 /\ (2 * (2 * 0)) <= 9) /\ 2 = 2 \/
- (2 * 0) = contents i /\ 2 = 2 \/
+ (contents i = (2 * 0) /\ (2 * 0) = contents i) /\ 2 = 2 \/
  ((2 * 0) <= 9 /\ (2 * (2 * 0)) <= 9) /\ 2 = 2 \/
  ((2 * 0) <= 9 /\ (2 * (2 * 0)) <= 9) /\ 2 = 2) /\
 0 = 0
@@ -14,9 +14,9 @@ forall w2:int.
  ((((2 * 0) <= 9 /\ ((2 * 0) + (2 * (2 * 0))) <= 18) /\ (2 * (2 * 0)) <= 9) /\
   contents i1 <= contents i1) /\
  contents i1 <= contents i1 \/
- ((2 * 0) <= contents i1 /\ contents i1 <= (2 * 0)) /\ (2 * 0) = contents i1 \/
- (((2 * 0) <= 9 /\ (2 * (2 * 0)) <= contents i1) /\
-  contents i1 <= (2 * (2 * 0))) /\
+ (contents i1 <= (2 * 0) /\ (2 * 0) <= contents i1) /\ (2 * 0) = contents i1 \/
+ (((2 * 0) <= 9 /\ contents i1 <= (2 * (2 * 0))) /\
+  (2 * (2 * 0)) <= contents i1) /\
  (2 * (2 * 0)) = contents i1
 ###
 ### Debug: inferred invariants ###
