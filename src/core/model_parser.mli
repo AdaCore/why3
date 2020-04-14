@@ -115,9 +115,7 @@ val create_model_element :
   name      : string ->
   value     : model_value ->
   attrs     : Ident.Sattr.t ->
-  ?location : Loc.position ->
-  ?term     : Term.term ->
-  unit ->
+  Printer.printer_mapping ->
   model_element
 (** Creates a counter-example model element.
     @param name : the name of the source-code element

@@ -172,7 +172,7 @@ let print_prover_result ~json_model fmt {pr_answer = ans; pr_status = status;
     if json_model then
       Model_parser.print_model ~print_attrs fmt m
     else
-      Model_parser.print_model_human ?me_name_trans:None ~print_attrs fmt m
+      Model_parser.print_model_human ~print_attrs fmt m
   end;
   if ans == HighFailure then
     fprintf fmt "@\nProver exit status: %a@\nProver output:@\n%s@."

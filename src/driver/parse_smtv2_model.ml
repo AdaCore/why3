@@ -57,22 +57,25 @@ let do_parsing model =
        l;
      Wstdlib.Mstr.empty
 
+let get_model_string input =
+  (*    let r = Re.Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
+        ignore (Re.Str.search_forward r input 0);
+        let match_end = Re.Str.match_end () in*)
+  let nr = Re.Str.regexp "^)+" in
+  let res = Re.Str.search_backward nr input (String.length input) in
+  String.sub input 0 (res + String.length (Re.Str.matched_string input))
+
 (* Parses the model returned by CVC4, Z3 or Alt-ergo.
    Returns the list of pairs term - value *)
 (* For Alt-ergo the output is not the same and we
    match on "I don't know". But we also need to begin
    parsing on a fresh new line ".*" ensures it *)
 let parse : raw_model_parser =
-  fun printer_mapping input ->
+  fun pm input ->
     try
-      (*    let r = Re.Str.regexp "unknown\\|sat\\|\\(I don't know.*\\)" in
-            ignore (Re.Str.search_forward r input 0);
-            let match_end = Re.Str.match_end () in*)
-      let nr = Re.Str.regexp "^)+" in
-      let res = Re.Str.search_backward nr input (String.length input) in
-      let model_string = String.sub input 0 (res + String.length (Re.Str.matched_string input)) in
+      let model_string = get_model_string input in
       let model = do_parsing model_string in
-      Collect_data_model.create_list printer_mapping model
+      Collect_data_model.create_list pm model
     with Not_found -> []
 
 let () = register_model_parser "smtv2" parse

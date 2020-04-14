@@ -561,14 +561,12 @@ and convert_z3_array (t: term) : array =
 and convert_record lf l =
   List.map (fun (f, v) -> f, convert_to_model_value lf v) l
 
-let convert_to_model_element ~set_str list_field name (t: term) =
-  let value = convert_to_model_value list_field t in
+let convert_to_model_element pm name (t: term) =
+  let value = convert_to_model_value pm.Printer.list_fields t in
   let attrs =
-    match Mstr.find name set_str with
-    | exception Not_found -> Ident.Sattr.empty
-    | attrs -> attrs
-  in
-  Model_parser.create_model_element ~name ~value ~attrs ()
+    try Mstr.find name pm.Printer.set_str
+    with Not_found -> Ident.Sattr.empty in
+  Model_parser.create_model_element ~name ~value ~attrs pm
 
 let default_apply_to_record (list_records: (string list) Mstr.t)
     (noarg_constructors: string list) (t: term) =
@@ -767,19 +765,14 @@ let create_list pm (table: definition Mstr.t) =
   Debug.dprintf debug_cntex "Variable values were propagated@.";
   print_table table;
 
-  let table: term Mstr.t =
-    Mstr.fold (fun k e acc ->
-        Mstr.add k (convert_tree_to_term e) acc) table Mstr.empty
-  in
-
   (* Then converts all variables to raw_model_element *)
   Mstr.fold
-    (fun key value list_acc ->
-      try (convert_to_model_element ~set_str:pm.Printer.set_str pm.Printer.list_fields key value :: list_acc)
+    (fun name term list_acc ->
+      try (convert_to_model_element pm name term :: list_acc)
       with Not_value when not (Debug.test_flag debug_cntex &&
                                Debug.test_flag Debug.stack_trace) ->
-        Debug.dprintf debug_cntex "Element creation failed: %s@." key;
+        Debug.dprintf debug_cntex "Element creation failed: %s@." name;
         list_acc
       | e -> raise e)
-    table
+    (Mstr.map convert_tree_to_term table)
     []
