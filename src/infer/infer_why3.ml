@@ -125,6 +125,8 @@ module Make(S: sig
         t_or_simp (t_push_negation ~way t1) (t_push_negation ~way t2)
     | Tbinop (Timplies, t1, t2) ->
       t_push_negation ~way (t_or (t_not t1) t2)
+    | Tbinop (Tiff, t1, t2) ->
+      t_push_negation ~way (t_and (t_implies t1 t2) (t_implies t2 t1))
     | Tnot t -> t_push_negation ~way:(not way) t
     | Tapp (l, args) when ls_equal l lt_int && way ->
        t_app ge_int args None

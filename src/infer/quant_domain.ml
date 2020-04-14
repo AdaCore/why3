@@ -63,13 +63,21 @@ module Make(S:sig
   let rec meet_term man term elt =
     match term.t_node with
     | Tbinop (Tor, a, b) ->
-       join man (meet_term man a elt) (meet_term man b elt)
+       let dom_a = meet_term man a elt in
+       let dom_b = meet_term man b elt in
+       join man dom_a dom_b
     | Tbinop (Tand, a, b) ->
-       meet_term man b (meet_term man a elt)
-    | Tbinop (Timplies, a, b) ->
-       meet_term man (t_or (t_not a) b) elt
-    | Tbinop (Tiff, a, b) ->
-       meet_term man (t_and (t_implies a b) (t_implies b a)) elt
+       let dom_a = meet_term man a elt in
+       meet_term man b dom_a
+    | Tbinop _ -> assert false
+    (* | Tbinop (Timplies, a, b) ->
+     *    join man (meet_term man (S.Infer_why3.t_push_negation (t_not a)) elt) (meet_term man b elt)
+     * | Tbinop (Tiff, a, b) ->
+     *    meet_term man (t_implies a b) (meet_term man (t_implies b a) elt) *)
+    (* | Tbinop (Timplies, a, b) ->
+     *    (meet_term man (t_or (S.Infer_why3.t_push_negation (t_not a)) b) elt)
+     * | Tbinop (Tiff, a, b) ->
+     *    meet_term man (t_and (t_implies a b) (t_implies b a)) elt *)
     | Tquant (Tforall, tq) ->
       begin
         match t_open_quant tq with
@@ -80,4 +88,9 @@ module Make(S:sig
         | _ -> TDom.meet_term man term elt
       end
     | _ -> TDom.meet_term man term elt
+
+  let meet_term man term elt =
+    let term = S.Infer_why3.t_push_negation term in
+    meet_term man term elt
+
 end

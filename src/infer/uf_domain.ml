@@ -45,10 +45,13 @@ module Make(S:sig
     mutable class_to_term: TermToClass.t;
   }
 
+  (* abstract state of uf *)
   type uf_t = {
-    classes: Union_find.set;
-    uf_to_var: TermToVar.t;
-    var_pool: VarPool.t;
+    classes   : Union_find.set; (* union find on terms *)
+    uf_to_var : TermToVar.t;    (* bijection between vars from uf
+                                   domain and terms *)
+    var_pool  : VarPool.t;      (* bounded number of variables to
+                                   represent uninterpreted terms *)
   }
   (* type invariant: (see invariant_uf function below)
      - intersection of uf_to_var and var_pool is empty;
@@ -60,12 +63,12 @@ module Make(S:sig
   type env = unit
   type t   = Dom.t * uf_t     (* Abstract values *)
 
-  let tmp_pool = ["$p1";"$p2"; "$p3"] |> List.map Var.of_string
+  let tmp_pool = ["$abc1";"$abc2"; "$abc3"] |> List.map Var.of_string
 
   let build_var_pool n =
     let rec build_var_pool_aux = function
       | 0 -> []
-      | n -> let v = Var.of_string (Format.sprintf "$%d" n) in
+      | n -> let v = Var.of_string (Format.sprintf "$pool%d" n) in
              v :: build_var_pool_aux (n - 1) in
     build_var_pool_aux n |> VarPool.of_list
 
@@ -276,16 +279,15 @@ module Make(S:sig
     invariant_uf uf_t1;
     invariant_uf uf_t2;
     let classes = Union_find.join uf_t1.classes uf_t2.classes in
-    let rc = ref dom_t in
+    let dom_t = ref dom_t in
     let vars_to_replace = ref [] in
     let tmp_pool = ref tmp_pool in
     let var_pool = ref uf_t2.var_pool in
     let f_term t _ v = vars_to_replace := (t, v) :: !vars_to_replace in
     let f_t v1 _ t =
       let var_tmp = List.hd !tmp_pool in
-      tmp_pool := List.tl !tmp_pool;
-      rc := eq_var (man, uf_man) !rc v1 var_tmp;
-      rc := Dom.forget_array man !rc [|v1|] false;
+      dom_t := eq_var (man, uf_man) !dom_t v1 var_tmp;
+      dom_t := Dom.forget_array man !dom_t [|v1|] false;
       var_pool := VarPool.add v1 !var_pool;
       vars_to_replace := (t, var_tmp) :: !vars_to_replace;
       assert (
@@ -299,14 +301,14 @@ module Make(S:sig
     List.iter (fun (t, v) ->
         try
           let new_var = get_var_for_term uf_man rud t in
-          rc := eq_var (man, uf_man) !rc v new_var;
-          if v <> new_var then rc := Dom.forget_array man !rc [|v|] false;
+          dom_t := eq_var (man, uf_man) !dom_t v new_var;
+          if v <> new_var then dom_t := Dom.forget_array man !dom_t [|v|] false;
         with Not_found ->
           Format.eprintf "REACHED END OF THE POOL@.@.@.";
-          rc := Dom.forget_array man !rc [|v|] false;
+          dom_t := Dom.forget_array man !dom_t [|v|] false;
       ) !vars_to_replace;
     invariant_uf !rud;
-    !rc, !rud
+    !dom_t, !rud
 
   (* Why3 terms and APRON variables must be kept consistent. So. First
      there is the case where two different terms are linked to the
@@ -449,7 +451,7 @@ module Make(S:sig
     let find_var v =
       try Hashtbl.find uf_man.variable_mapping v with Not_found ->
         try TermToVar.to_term uf_t.uf_to_var v with Not_found ->
-          Format.eprintf "Couldn't find variable %s@." (Var.to_string v);
+          Format.eprintf "Couldn't find variable %a@." Var.print v;
           raise Not_found in
     let t = Dom.to_term S.Infer_why3.env
       (S.Infer_why3.th_known, S.Infer_why3.mod_known) man dom_t find_var in
@@ -466,11 +468,11 @@ module Make(S:sig
      empty list.  *)
   let meet_term: man -> term -> (t -> t) =
     let meetid = ref 0 in
-    fun (man, uf_man) t ->
+    fun (man, uf_man) t_init ->
       incr meetid;
       (* First inline everything, for instance needed for references
          where !i is (!) i and must be replaced by (contents i) *)
-      let t = t_inline_all t in
+      let t = t_inline_all t_init in
       (* Let's try to remove the nots that we can *)
       let t = t_push_negation t in
       let var_of_term t =
@@ -541,40 +543,40 @@ module Make(S:sig
           | Tbinop (Tor, t1, t2) ->
             let f1 = abstract t1 in
             let f2 = abstract t2 in
-            (fun (d, a) ->
-               let dom_uf1 = f1 (d, a) in
-               let dom_uf2 = f2 (d, a) in
+            (fun (dom, uf) ->
+               let dom_uf1 = f1 (dom, uf) in
+               let dom_uf2 = f2 (dom, uf) in
                join (man, uf_man) dom_uf1 dom_uf2)
-          | Tapp (func, [t1; t2]) when is_int_comp func t1 ->
+          | Tapp (ls, [t1; t2]) when is_int_comp ls t1 ->
             (* FIXME: >, <=, >=, booleans *)
             let base_coeff, eq_type =
-              if      ls_equal ps_equ func then  1, Lincons1.EQ
-              else if ls_equal lt_int func then  1, Lincons1.SUP
-              else if ls_equal gt_int func then -1, Lincons1.SUP
-              else if ls_equal le_int func then  1, Lincons1.SUPEQ
-              else if ls_equal ge_int func then -1, Lincons1.SUPEQ
+              if      ls_equal ps_equ ls then  1, Lincons1.EQ
+              else if ls_equal lt_int ls then  1, Lincons1.SUP
+              else if ls_equal gt_int ls then -1, Lincons1.SUP
+              else if ls_equal le_int ls then  1, Lincons1.SUPEQ
+              else if ls_equal ge_int ls then -1, Lincons1.SUPEQ
               else assert false in
+            let eqf =
+              if ls_equal ps_equ ls then do_eq (man, uf_man) t1 t2
+              else fun_id in
             (fun (dom, uf) ->
-              let eqf =
-                if ls_equal ps_equ func then do_eq (man, uf_man) t1 t2
-                else fun_id in
                let dom, uf = eqf (dom, uf) in
                let ruf = ref uf in
                let vl1, c1 = term_to_var_list ruf (-base_coeff) t1 in
                let vl2, c2 = term_to_var_list ruf base_coeff t2 in
-               let uf' = !ruf in
                let coef = c1 + c2 in
-               let v = sum_list (vl1 @ vl2) in
+               let varl = sum_list (vl1 @ vl2) in
                let expr = Linexpr1.make uf_man.env in
                let constr = List.map (fun (var, coeff) ->
-                   Coeff.Scalar (Scalar.of_int coeff), var) v in
+                   let scalar = Coeff.Scalar (Scalar.of_int coeff) in
+                   scalar, var) varl in
                Linexpr1.set_list expr constr None;
                let cons = Lincons1.make expr eq_type in
                Lincons1.set_cst cons (Coeff.Scalar (Scalar.of_int coef));
                let arr = Lincons1.array_make uf_man.env 1 in
                Lincons1.array_set arr 0 cons;
-               Dom.meet_lincons_array man dom arr, uf')
-          | Tapp (func, [t1;t2]) when ls_equal ps_equ func ->
+               Dom.meet_lincons_array man dom arr, !ruf)
+          | Tapp (ls, [t1;t2]) when ls_equal ps_equ ls ->
             let f_uf = do_eq (man, uf_man) t1 t2 in
             let subv_1 = get_subvalues t1 None in
             let subv_2 = get_subvalues t2 None in
@@ -586,7 +588,7 @@ module Make(S:sig
             let f1 = abstract t1 in
             let f1_not = abstract (t_push_negation (t_not t1)) in
             let f2 = abstract t2 in
-            let f3= abstract t3 in
+            let f3 = abstract t3 in
             (fun abs ->
                let dom2 = f2 (f1 abs) in
                let dom3 = f3 (f1_not abs) in
@@ -624,21 +626,14 @@ module Make(S:sig
     let t = t_var vs in
     try ignore (Mterm.find t uf_man.defined_terms) with Not_found ->
       uf_man.defined_terms <- Mterm.add t () uf_man.defined_terms;
-      if Ty.ty_equal (t_type t) ty_int then begin
+      if Ty.ty_equal (t_type t) ty_int ||
+           Ty.ty_equal (t_type t) ty_bool then begin
           let reg_name =
             Format.asprintf "%d%a" !var_id Pretty.print_term t in
           let v = Var.of_string reg_name in
           assert (not (Environment.mem_var uf_man.env v));
           ensure_variable uf_man v t;
           uf_man.apron_mapping <- Mterm.add t v uf_man.apron_mapping
-        end
-      else if Ty.ty_equal (t_type t) ty_bool then begin
-          let reg_name =
-            Format.asprintf "%d%a" !var_id Pretty.print_term t in
-          let v = Var.of_string reg_name in
-          assert (not (Environment.mem_var uf_man.env v));
-          ensure_variable uf_man v t;
-          uf_man.apron_mapping <- Mterm.add t v uf_man.apron_mapping;
         end
       else
         let subv = get_subvalues t None in
@@ -689,18 +684,18 @@ module Make(S:sig
     | _ when ity_equal pv.pv_ity Ity.ity_unit-> ()
     | Ityreg reg, Tyapp _ -> begin
         let vret = create_vreturn (man, uf_man) (t_type pv_t) in
-        let subv = get_subvalues (t_var vret) (Some reg.reg_its) in
-        let subv_r = get_subvalues pv_t (Some reg.reg_its) in
+        let subv_r  = get_subvalues (t_var vret) (Some reg.reg_its) in
+        let subv_pv = get_subvalues pv_t         (Some reg.reg_its) in
         let proj_list =
-          List.fold_left2 (fun acc (gen_reg_t, pfield) (real_term, _) ->
+          List.fold_left2 (fun acc (t_reg, rs) (t_pv, _) ->
             let name = Format.asprintf "r$%a.%a" print_reg_name reg
-                         print_term gen_reg_t in
+                         print_term t_reg in
             let var = Var.of_string name in
-            ensure_variable uf_man var real_term;
+            ensure_variable uf_man var t_pv;
             uf_man.apron_mapping <-
-              Mterm.add real_term var uf_man.apron_mapping;
-            let accessor = Opt.get (Opt.get pfield).rs_field in
-            (accessor, real_term) :: acc ) [] subv subv_r in
+              Mterm.add t_pv var uf_man.apron_mapping;
+            let accessor = Opt.get (Opt.get rs).rs_field in
+            (accessor, t_pv) :: acc ) [] subv_r subv_pv in
         let old_projs, old_vars =
           try Mreg.find reg uf_man.region_mapping,
               Mreg.find reg uf_man.region_var
