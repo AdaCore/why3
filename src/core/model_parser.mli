@@ -84,6 +84,9 @@ type model_element_kind =
 | Error_message
   (* The model element represents error message, not source-code element.
      The error message is saved in the name of the model element.*)
+| Loop_before
+| Loop_previous_iteration
+| Loop_current_iteration
 | Other
 
 (** Information about the name of the model element *)

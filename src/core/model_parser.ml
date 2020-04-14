@@ -427,6 +427,9 @@ type model_element_kind =
 | Result
 | Old
 | Error_message
+| Loop_before
+| Loop_previous_iteration
+| Loop_current_iteration
 | Other
 
 type model_element_name = {
@@ -547,6 +550,7 @@ type model_file = model_element list IntMap.t
 type model_files = model_file StringMap.t
 type model = {
   vc_term_loc : Loc.position option;
+  vc_term_attrs : Sattr.t;
   model_files : model_files;
 }
 
@@ -556,10 +560,62 @@ let is_model_empty model =
   model.model_files = empty_model
 let default_model = {
   vc_term_loc = None;
+  vc_term_attrs = Sattr.empty;
   model_files = empty_model;
 }
 
 let get_model_elements m = List.concat (List.concat (List.map IntMap.values (StringMap.values m.model_files)))
+
+
+let at_old_kind location attrs =
+  (* We match on the attribute on the form [@at:'Old:loc:file:line]. If it
+     exists, depending on the location of the me, we use it or not. If it
+     does not we keep me_kind.*)
+  let at_old_attrs =
+    Sattr.filter (fun x -> Strings.has_prefix "at:'Old:" x.attr_string) attrs
+  in
+  if Sattr.is_empty at_old_attrs then None
+  else
+    let a = Sattr.choose at_old_attrs in
+    match (Strings.split ':' a.attr_string, Opt.map Loc.get location) with
+    | ["at"; "'Old"; "loc"; file; line_number], Some (loc_file, loc_line, _, _)
+      when loc_file = file && loc_line = int_of_string line_number ->
+        Some Old
+    | _ -> None
+
+let loc_starts_le loc1 loc2 =
+  loc1 <> Loc.dummy_position && loc2 <> Loc.dummy_position &&
+  let f1, l1, b1, _ = Loc.get loc1 in
+  let f2, l2, b2, _ = Loc.get loc2 in
+  f1 = f2 && l1 <= l2 && l1 <= l2 && b1 <= b2
+
+let while_loop_kind vc_attrs var_loc =
+  let is_inv_pres a = a.attr_string = "expl:loop invariant preservation" in
+  if Sattr.exists is_inv_pres vc_attrs then
+    let loop_loc =
+      let is_while a = Strings.has_prefix "while-loop:" a.attr_string in
+      let attr = Sattr.choose (Sattr.filter is_while vc_attrs) in
+      Scanf.sscanf attr.attr_string
+        "while-loop:%[^:]:%d:%d:%d" Loc.user_position in
+    let kind =
+      if var_loc = loop_loc then
+        Loop_previous_iteration
+      else if loc_starts_le loop_loc var_loc then
+        Loop_current_iteration
+      else
+        Loop_before in
+    Some kind
+  else None
+
+(* Compute the kind of a model_element using its attributes and location *)
+let get_kind vc_attrs elt =
+  match at_old_kind elt.me_location elt.me_name.men_attrs with
+  | Some k -> k
+  | None -> match Opt.map (while_loop_kind vc_attrs) elt.me_location with
+    | Some (Some k) -> k
+    | _ ->
+        let _, type_s = split_model_trace_name elt.me_name.men_name in
+        if type_s = "result" then Result else Other
 
 type model_parser =  string -> Printer.printer_mapping -> model
 
@@ -598,7 +654,17 @@ let apply_location_label ~at_loc ~attrs me_name =
   in
   me_name
 
-let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt m_element =
+let pp_kind fmt k =
+  pp_print_string fmt @@ match k with
+  | Result -> "result"
+  | Old -> "old"
+  | Error_message -> "error_message"
+  | Other -> "other"
+  | Loop_before -> "before loop"
+  | Loop_previous_iteration -> "previous loop iteration"
+  | Loop_current_iteration -> "current loop iteration"
+
+let print_model_element ~at_loc ~print_attrs vc_attrs print_model_value me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message ->
     fprintf fmt "%s" m_element.me_name.men_name
@@ -606,26 +672,28 @@ let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt
     let me_name = me_name_trans m_element.me_name in
     let attrs = m_element.me_name.men_attrs in
     let me_name = apply_location_label ~at_loc ~attrs me_name in
+    let kind = get_kind vc_attrs m_element in
     if print_attrs then
-      fprintf fmt  "@[%s, @[[%a]@] =@ %a@]"
-        me_name
+      fprintf fmt  "@[%s (%a), @[[%a]@] =@ %a@]"
+        me_name pp_kind kind
         (Pp.print_list Pp.comma Pretty.print_attr)
         (Sattr.elements m_element.me_name.men_attrs)
         print_model_value m_element.me_value
     else
-      fprintf fmt  "@[%s =@ %a@]"
+      fprintf fmt  "@[%s =@ %a (%a)@]"
         me_name
         print_model_value m_element.me_value
+        pp_kind kind
 
-let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
+let print_model_elements ~at_loc ~print_attrs vc_attrs ?(sep = Pp.newline)
     print_model_value me_name_trans fmt m_elements
   =
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ~at_loc ~print_attrs print_model_value me_name_trans))
+       (print_model_element ~at_loc ~print_attrs vc_attrs print_model_value me_name_trans))
     m_elements
 
-let print_model_file ~print_attrs ~print_model_value fmt
+let print_model_file ~print_attrs ~print_model_value vc_attrs fmt
     me_name_trans filename model_file
   =
   (* Relativize does not work on nighly bench: using basename instead. It
@@ -635,7 +703,7 @@ let print_model_file ~print_attrs ~print_model_value fmt
   IntMap.iter
     (fun line m_elements ->
       fprintf fmt "  @[<v 2>Line %d:@\n" line;
-      print_model_elements ~at_loc:(filename,line) ~print_attrs print_model_value me_name_trans fmt m_elements;
+      print_model_elements ~at_loc:(filename,line) ~print_attrs vc_attrs print_model_value me_name_trans fmt m_elements;
       fprintf fmt "@]@\n"
     )
     model_file;
@@ -654,7 +722,7 @@ let print_model
     fmt
     model =
   StringMap.iter (fun k e ->
-      print_model_file ~print_attrs ~print_model_value fmt me_name_trans k e)
+      print_model_file ~print_attrs ~print_model_value model.vc_term_attrs fmt me_name_trans k e)
     model.model_files
 
 let print_model_human
@@ -720,6 +788,7 @@ let interleave_line
     end_comment
     me_name_trans
     model_file
+    vc_attrs
     (source_code, line_number, offset, remaining_locs, locs)
     line =
   let remaining_locs, list_loc =
@@ -732,7 +801,7 @@ let interleave_line
       asprintf "@[<h 0>%s%s%a%s@]"
         (get_padding line)
         start_comment
-        (print_model_elements ~sep:Pp.semi ~at_loc:(filename,line_number) ~print_attrs print_model_value_human me_name_trans) model_elements
+        (print_model_elements ~sep:Pp.semi ~at_loc:(filename,line_number) ~print_attrs vc_attrs print_model_value_human me_name_trans) model_elements
         end_comment in
 
     (* We need to know how many lines will be taken by the counterexample. This
@@ -773,7 +842,7 @@ let interleave_with_source
     let (source_code, _, _, _, gen_loc) =
       List.fold_left
         (interleave_line ~filename:rel_filename ~print_attrs
-           start_comment end_comment me_name_trans model_file)
+           start_comment end_comment me_name_trans model_file model.vc_term_attrs)
         ("", 1, 0, locations, [])
         (src_lines_up_to_last_cntexmp_el source_code model_file)
     in
@@ -828,6 +897,9 @@ let print_model_element_json me_name_to_str fmt me =
     | Old -> fprintf fmt "%a" Json_base.string "old"
     | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
     | Other -> fprintf fmt "%a" Json_base.string "other"
+    | Loop_before -> fprintf fmt "%a" Json_base.string "before-loop"
+    | Loop_previous_iteration -> fprintf fmt "%a" Json_base.string "previous-iteration"
+    | Loop_current_iteration -> fprintf fmt "%a" Json_base.string "current-iteration"
   in
   let print_name fmt =
     Json_base.string fmt (me_name_to_str me)
@@ -1097,6 +1169,7 @@ let build_model raw_model printer_mapping =
     handle_contradictory_vc model_files printer_mapping.Printer.vc_term_loc in
   {
     vc_term_loc = printer_mapping.Printer.vc_term_loc;
+    vc_term_attrs = printer_mapping.Printer.vc_term_attrs;
     model_files = model_files;
   }
 
@@ -1141,7 +1214,7 @@ let model_for_positions_and_decls model ~positions =
      counter-example from model to model_filtered.
      This corresponds to function declarations *)
   let model_filtered = StringMap.fold add_first_model_line model.model_files model_filtered in
-  { vc_term_loc = model.vc_term_loc;
+  { model with
     model_files = model_filtered }
 
 

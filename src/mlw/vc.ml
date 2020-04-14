@@ -511,6 +511,15 @@ let inv_of_pure {known_map = kn} loc fl k =
   let add f k = assert_inv (explain_inv loc f) k in
   List.fold_right add (Typeinv.inspect kn fl) k
 
+let add_loc_attr label loc attrs =
+  match loc with
+  | None -> attrs
+  | Some loc ->
+      let filename, line, bchar, echar = Loc.get loc in
+      let attr = Format.kasprintf Ident.create_attribute
+          "%s:%s:%d:%d:%d" label filename line bchar echar in
+      Sattr.add attr attrs
+
 (* translate the expression [e] into a k-expression:
    [lps] stores the variants of outer recursive functions
    [res] names the result of the normal execution of [e]
@@ -828,6 +837,7 @@ let rec k_expr env lps e res xmap =
         (* [ STOP inv
            | HAVOC ; ASSUME inv ; IF e0 THEN e1 ; STOP inv
                                         ELSE SKIP ] *)
+        let attrs = add_loc_attr "loop" e.e_loc attrs in
         let init = wp_of_inv None attrs expl_loop_init invl in
         let prev = sp_of_inv None attrs expl_loop_init invl in
         let keep = wp_of_inv None attrs expl_loop_keep invl in
@@ -857,6 +867,7 @@ let rec k_expr env lps e res xmap =
           | Tyvar _ -> assert false (* never *) in
         let a = int_of_pv a and i = t_var vi.pv_vs in
         let b = int_of_pv b and one = t_nat_const 1 in
+        let attrs = add_loc_attr "loop" e.e_loc attrs in
         let init = wp_of_inv None attrs expl_loop_init invl in
         let prev = sp_of_inv None attrs expl_loop_init invl in
         let keep = wp_of_inv None attrs expl_loop_keep invl in

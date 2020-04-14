@@ -35,6 +35,7 @@ type 'a pp = Pp.formatter -> 'a -> unit
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
+  vc_term_attrs : Sattr.t;
   queried_terms : Term.term Mstr.t;
   list_projections: Ident.ident Mstr.t;
   list_fields: Ident.ident Mstr.t;
@@ -63,6 +64,7 @@ exception UnknownPrinter of string
 let get_default_printer_mapping = {
   lsymbol_m = (function _ -> raise Not_found);
   vc_term_loc = None;
+  vc_term_attrs = Sattr.empty;
   queried_terms = Mstr.empty;
   list_projections = Mstr.empty;
   list_fields = Mstr.empty;
