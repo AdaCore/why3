@@ -170,8 +170,8 @@ File record_one_field.mlw:
     {"proj_name" : "contents" , "type" : "Proj" ,
     "value" : {"type" : "Integer" , "val" : "2" } }
   Line 55:
-    x, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "3" } }
+    [previous iteration] x, [[@introduced]] = {"proj_name" : "contents" ,
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "3" } }
   Line 56:
     x at L, [[@introduced], [@at:L], [@model_trace:x],
             [@at:L:loc:location] =
@@ -181,11 +181,12 @@ File record_one_field.mlw:
             [@at:M:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
     "value" : {"type" : "Integer" , "val" : "2" } }
-    x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "2" } }
-  Line 58:
-    x, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
+    [current iteration] x, [[@introduced], [@model_trace:x]] =
+    {"proj_name" : "contents" , "type" : "Proj" ,
     "value" : {"type" : "Integer" , "val" : "2" } }
+  Line 58:
+    [current iteration] x, [[@introduced]] = {"proj_name" : "contents" ,
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "2" } }
 
 bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:

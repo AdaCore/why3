@@ -193,8 +193,8 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 50:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
+    [previous iteration] x, [[@introduced], [@field:0:contents]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "1" } }] } }
   Line 51:
     x at L, [[@introduced], [@field:0:contents], [@at:L], [@model_trace:x],
@@ -205,12 +205,13 @@ File ref_mono.mlw:
             [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    [current iteration] x, [[@introduced], [@field:0:contents],
+                           [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 53:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
+    [current iteration] x, [[@introduced], [@field:0:contents]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown

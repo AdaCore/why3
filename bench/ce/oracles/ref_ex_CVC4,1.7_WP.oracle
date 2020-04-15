@@ -174,8 +174,8 @@ File ref_ex.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 37:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
+    [previous iteration] x, [[@introduced], [@field:0:contents]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "1" } }] } }
   Line 38:
     x at L, [[@introduced], [@field:0:contents], [@at:L], [@model_trace:x],
@@ -186,12 +186,13 @@ File ref_ex.mlw:
             [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    [current iteration] x, [[@introduced], [@field:0:contents],
+                           [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 40:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
+    [current iteration] x, [[@introduced], [@field:0:contents]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
 bench/ce/ref_ex.mlw M test_loop'vc: Timeout or Unknown
