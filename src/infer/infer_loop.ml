@@ -55,6 +55,7 @@ let infer_with_ops ai_ops e cty =
   let cfg = ai_ops.start_cfg () in
   let context = ai_ops.empty_context () in
   List.iter (ai_ops.add_variable context) cty.cty_args;
+  Mpv.iter (fun pv _ -> ai_ops.add_variable context pv) cty.cty_effect.eff_reads;
   ignore (ai_ops.put_expr_with_pre cfg context e cty.cty_pre);
   let fixp = ai_ops.eval_fixpoints cfg context in
   let domain2term (e,d) =
