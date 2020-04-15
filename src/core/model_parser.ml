@@ -509,13 +509,13 @@ let get_kind vc_attrs elt_loc elt_attrs elt_name =
         if type_s = "result" then Result else Other )
 
 let create_model_element ~name ~value ~attrs pm =
-  let me_kind = get_kind pm.Printer.vc_term_attrs None attrs name in
-  let me_name = {men_name= name; men_kind= me_kind; men_attrs= attrs} in
-  {me_name; me_value= value; me_location= None; me_term= None}
+  let me_kind = get_kind pm.vc_term_attrs None attrs name in
+  let me_name = {men_name=name; men_kind=me_kind; men_attrs=attrs} in
+  {me_name; me_value=value; me_location=None; me_term=None}
 
 let construct_name name pm loc attrs : model_element_name =
   let kind = get_kind pm.vc_term_attrs loc attrs name in
-  {men_name= name; men_kind= kind; men_attrs= attrs}
+  {men_name=name; men_kind=kind; men_attrs=attrs}
 
 (*
 let print_location fmt m_element =
@@ -529,29 +529,27 @@ let print_location fmt m_element =
 **  Model definitions
 ***************************************************************
 *)
-module IntMap = Mint
-module StringMap = Mstr
 
-type model_file = model_element list IntMap.t
-type model_files = model_file StringMap.t
+type model_file = model_element list Mint.t
+type model_files = model_file Mstr.t
 
 type model =
-  { vc_term_loc: Loc.position option
-  ; vc_term_attrs: Sattr.t
-  ; model_files: model_files }
+  { model_files: model_files
+  ; vc_term_loc: Loc.position option
+  ; vc_term_attrs: Sattr.t }
 
-let empty_model = StringMap.empty
-let empty_model_file = IntMap.empty
+let empty_model = Mstr.empty
+let empty_model_file = Mint.empty
 let is_model_empty model = model.model_files = empty_model
 
 let default_model =
-  {vc_term_loc= None; vc_term_attrs= Sattr.empty; model_files= empty_model}
+  {vc_term_loc=None; vc_term_attrs=Sattr.empty; model_files=empty_model}
 
 let get_model_elements m =
   List.concat
-    (List.concat (List.map IntMap.values (StringMap.values m.model_files)))
+    (List.concat (List.map Mint.values (Mstr.values m.model_files)))
 
-type model_parser = string -> Printer.printer_mapping -> model
+type model_parser = string -> printer_mapping -> model
 type raw_model_parser = printer_mapping -> string -> model_element list
 
 (*
@@ -574,8 +572,7 @@ let location_label ~at_loc ~attrs me_name =
     with End_of_file | Scanf.Scan_failure _ -> labels_added, me_name in
   snd (Sattr.fold aux attrs (Sstr.empty, me_name))
 
-let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt
-    m_element =
+let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message -> fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
@@ -603,7 +600,7 @@ let print_model_file ~print_attrs ~print_model_value fmt me_name_trans filename
      hides the local paths. *)
   let filename = Filename.basename filename in
   fprintf fmt "@[<v 0>File %s:@\n" filename ;
-  IntMap.iter
+  Mint.iter
     (fun line m_elements ->
       fprintf fmt "  @[<v 2>Line %d:@\n" line ;
       print_model_elements ~at_loc:(filename, line) ~print_attrs
@@ -619,12 +616,11 @@ let why_name_trans me_name =
   | Loop_before -> "[before loop] "^me_name.men_name
   | Loop_previous_iteration -> "[previous iteration] "^me_name.men_name
   | Loop_current_iteration -> "[current iteration] "^me_name.men_name
-  | Error_message | Other ->
-      me_name.men_name
+  | Error_message | Other -> me_name.men_name
 
 let print_model ~print_attrs ?(me_name_trans = why_name_trans)
     ~print_model_value fmt model =
-  StringMap.iter
+  Mstr.iter
     (fun k e ->
       print_model_file ~print_attrs ~print_model_value fmt me_name_trans k e)
     model.model_files
@@ -637,10 +633,10 @@ let print_model ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
   print_model ~print_attrs ~me_name_trans ~print_model_value fmt model
 
 let get_model_file model filename =
-  try StringMap.find filename model with Not_found -> empty_model_file
+  try Mstr.find filename model with Not_found -> empty_model_file
 
 let get_elements model_file line_number =
-  try IntMap.find line_number model_file with Not_found -> []
+  try Mint.find line_number model_file with Not_found -> []
 
 let get_padding line =
   try
@@ -681,7 +677,7 @@ let interleave_line ~filename ~print_attrs start_comment end_comment
     partition_loc line_number (String.length line) remaining_locs in
   let list_loc = List.map (add_offset offset) list_loc in
   try
-    let model_elements = IntMap.find line_number model_file in
+    let model_elements = Mint.find line_number model_file in
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
         (print_model_elements ~sep:Pp.semi ~at_loc:(filename, line_number)
@@ -720,12 +716,12 @@ let interleave_with_source ~print_attrs ?(start_comment = "(* ")
     *)
     let rel_filename = Filename.basename rel_filename in
     let model_files =
-      StringMap.filter
+      Mstr.filter
         (fun k _ -> Filename.basename k = rel_filename)
         model.model_files in
-    let model_file = snd (StringMap.choose model_files) in
+    let model_file = snd (Mstr.choose model_files) in
     let src_lines_up_to_last_cntexmp_el source_code model_file =
-      let last_cntexmp_line, _ = IntMap.max_binding model_file in
+      let last_cntexmp_line, _ = Mint.max_binding model_file in
       Re.Str.bounded_split (Re.Str.regexp "^") source_code
         (last_cntexmp_line + 1) in
     let source_code, _, _, _, gen_loc =
@@ -811,7 +807,7 @@ let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
           else string_of_int i)
     (print_model_elements_json me_name_to_str)
     fmt
-    (IntMap.bindings model_file)
+    (Mint.bindings model_file)
 
 let print_model_json ?(me_name_trans = why_name_trans)
     ?(vc_line_trans = fun i -> string_of_int i) fmt model =
@@ -821,7 +817,7 @@ let print_model_json ?(me_name_trans = why_name_trans)
       (fun bindings (file_name, model_file) ->
         List.append bindings [(file_name, (file_name, model_file))])
       []
-      (StringMap.bindings model.model_files) in
+      (Mstr.bindings model.model_files) in
   Json_base.map_bindings
     (fun s -> s)
     (print_model_elements_on_lines_json model me_name_to_str vc_line_trans)
@@ -861,8 +857,8 @@ let add_to_model model model_element =
       let elements =
         if found_elements <> [] then elements else model_element :: elements
       in
-      let model_file = IntMap.add line_number elements model_file in
-      StringMap.add filename model_file model
+      let model_file = Mint.add line_number elements model_file in
+      Mstr.add filename model_file model
 
 let recover_name list_projs pm raw_name =
   let name, attrs =
@@ -973,7 +969,7 @@ let build_model_rec raw_model pm list_projs =
             else add_to_model model {model_element with me_location= loc})
           attrs model
       with Not_found -> model)
-    StringMap.empty raw_model
+    Mstr.empty raw_model
 
 let handle_contradictory_vc model_files vc_term_loc =
   (* The VC is contradictory if the location of the term that triggers VC
@@ -1007,14 +1003,10 @@ let handle_contradictory_vc model_files vc_term_loc =
         else model_files
 
 let build_model raw_model pm : model =
-  let list_projs =
-    Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_projections pm.list_fields
-  in
+  let list_projs = Wstdlib.Mstr.union (fun _ x _ -> Some x) pm.list_projections pm.list_fields in
   let model_files = build_model_rec raw_model pm list_projs in
   let model_files = handle_contradictory_vc model_files pm.Printer.vc_term_loc in
-  { model_files
-  ; vc_term_loc= pm.Printer.vc_term_loc
-  ; vc_term_attrs= pm.Printer.vc_term_attrs }
+  { model_files; vc_term_loc = pm.Printer.vc_term_loc; vc_term_attrs = pm.Printer.vc_term_attrs }
 
 (*
 ***************************************************************
@@ -1027,23 +1019,23 @@ let add_loc orig_model new_model position =
   let file_name, line_num, _, _ = Loc.get position in
   let orig_model_file = get_model_file orig_model file_name in
   let new_model_file = get_model_file new_model file_name in
-  if IntMap.mem line_num new_model_file then
+  if Mint.mem line_num new_model_file then
     (* the location already is in new_model *)
     new_model
   else
     try
       (* get the location from original model *)
-      let line_map = IntMap.find line_num orig_model_file in
+      let line_map = Mint.find line_num orig_model_file in
       (* add the location to new model *)
-      let new_model_file = IntMap.add line_num line_map new_model_file in
-      StringMap.add file_name new_model_file new_model
+      let new_model_file = Mint.add line_num line_map new_model_file in
+      Mstr.add file_name new_model_file new_model
     with Not_found -> new_model
 
 let add_first_model_line filename model_file model =
-  let line_num, cnt_info = IntMap.min_binding model_file in
+  let line_num, cnt_info = Mint.min_binding model_file in
   let mf = get_model_file model filename in
-  let mf = IntMap.add line_num cnt_info mf in
-  StringMap.add filename mf model
+  let mf = Mint.add line_num cnt_info mf in
+  Mstr.add filename mf model
 
 let model_for_positions_and_decls model ~positions =
   (* Start with empty model and add locations from model that
@@ -1054,7 +1046,7 @@ let model_for_positions_and_decls model ~positions =
      counter-example from model to model_filtered.
      This corresponds to function declarations *)
   let model_filtered =
-    StringMap.fold add_first_model_line model.model_files model_filtered in
+    Mstr.fold add_first_model_line model.model_files model_filtered in
   {model with model_files= model_filtered}
 
 (*
@@ -1074,12 +1066,9 @@ let register_model_parser ~desc s p =
   if Hstr.mem model_parsers s then raise (KnownModelParser s) ;
   Hstr.replace model_parsers s (desc, p)
 
-let lookup_raw_model_parser s : raw_model_parser =
-  try snd (Hstr.find model_parsers s)
-  with Not_found -> raise (UnknownModelParser s)
-
 let lookup_model_parser s input pm =
-  let raw_model : model_element list = lookup_raw_model_parser s pm input in
+  let _, raw_model_parser = Hstr.find_exn model_parsers (UnknownModelParser s) s in
+  let raw_model = raw_model_parser pm input in
   build_model raw_model pm
 
 let list_model_parsers () =
