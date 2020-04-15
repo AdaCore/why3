@@ -566,7 +566,7 @@ let convert_to_model_element pm name (t: term) =
   let attrs =
     try Mstr.find name pm.Printer.set_str
     with Not_found -> Ident.Sattr.empty in
-  Model_parser.create_model_element ~name ~value ~attrs pm
+  Model_parser.create_model_element ~name ~value ~attrs
 
 let default_apply_to_record (list_records: (string list) Mstr.t)
     (noarg_constructors: string list) (t: term) =

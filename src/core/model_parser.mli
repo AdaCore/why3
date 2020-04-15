@@ -81,6 +81,8 @@ type model_element_kind =
   (* Result of a function call (if the counter-example is for postcondition)  *)
 | Old
   (* Old value of function argument (if the counter-example is for postcondition) *)
+| At of string
+(* Value at label *)
 | Error_message
   (* The model element represents error message, not source-code element.
      The error message is saved in the name of the model element.*)
@@ -115,7 +117,6 @@ val create_model_element :
   name      : string ->
   value     : model_value ->
   attrs     : Ident.Sattr.t ->
-  Printer.printer_mapping ->
   model_element
 (** Creates a counter-example model element.
     @param name : the name of the source-code element
@@ -160,9 +161,7 @@ val print_model_human :
   model ->
   print_attrs:bool ->
   unit
-(** Same as print_model but is intended to be human readable.
-
-*)
+(** Same as print_model but is intended to be human readable.*)
 
 val print_model_json :
   ?me_name_trans:(model_element_name -> string) ->

@@ -204,7 +204,7 @@ let craft_efficient_re l =
 
 let debug_print_model ~print_attrs model =
   Debug.dprintf debug "Call_provers: %a@."
-                (Model_parser.print_model ?me_name_trans:None ~print_attrs) model
+    (Model_parser.print_model ?me_name_trans:None ~print_attrs) model
 
 type answer_or_model = Answer of prover_answer | Model of string
 

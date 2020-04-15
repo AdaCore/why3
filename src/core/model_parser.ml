@@ -379,6 +379,7 @@ and print_model_value_human fmt (v : model_value) =
 type model_element_kind =
   | Result
   | Old
+  | At of string
   | Error_message
   | Loop_before
   | Loop_previous_iteration
@@ -459,63 +460,12 @@ let readd_one_fields ~attrs value =
           (fun v (_, field_name) -> Record [(field_name, v)])
           value l )
 
-let at_old_kind location attrs =
-  (* We match on the attribute on the form [@at:'Old:loc:file:line]. If it
-     exists, depending on the location of the me, we use it or not. If it
-     does not we keep me_kind.*)
-  let at_old_attrs =
-    Sattr.filter (fun x -> Strings.has_prefix "at:'Old:" x.attr_string) attrs
-  in
-  if Sattr.is_empty at_old_attrs then None
-  else
-    let a = Sattr.choose at_old_attrs in
-    match (Strings.split ':' a.attr_string, Opt.map Loc.get location) with
-    | ["at"; "'Old"; "loc"; file; line_number], Some (loc_file, loc_line, _, _)
-      when loc_file = file && loc_line = int_of_string line_number ->
-        Some Old
-    | _ -> None
-
-let loc_starts_le loc1 loc2 =
-  loc1 <> Loc.dummy_position && loc2 <> Loc.dummy_position
-  &&
-  let f1, l1, b1, _ = Loc.get loc1 in
-  let f2, l2, b2, _ = Loc.get loc2 in
-  f1 = f2 && l1 <= l2 && l1 <= l2 && b1 <= b2
-
-let while_loop_kind vc_attrs var_loc =
-  let is_inv_pres a = a.attr_string = "expl:loop invariant preservation" in
-  if Sattr.exists is_inv_pres vc_attrs then
-    let loop_loc =
-      let is_while a = Strings.has_prefix "while-loop:" a.attr_string in
-      let attr = Sattr.choose (Sattr.filter is_while vc_attrs) in
-      Scanf.sscanf attr.attr_string "while-loop:%[^:]:%d:%d:%d"
-        Loc.user_position in
-    let kind =
-      if var_loc = loop_loc then Loop_previous_iteration
-      else if loc_starts_le loop_loc var_loc then Loop_current_iteration
-      else Loop_before in
-    Some kind
-  else None
-
-(* Compute the kind of a model_element using its attributes and location *)
-let get_kind vc_attrs elt_loc elt_attrs elt_name =
-  match at_old_kind elt_loc elt_attrs with
-  | Some k -> k
-  | None -> (
-    match Opt.map (while_loop_kind vc_attrs) elt_loc with
-    | Some (Some k) -> k
-    | _ ->
-        let _, type_s = split_model_trace_name elt_name in
-        if type_s = "result" then Result else Other )
-
-let create_model_element ~name ~value ~attrs pm =
-  let me_kind = get_kind pm.vc_term_attrs None attrs name in
-  let me_name = {men_name=name; men_kind=me_kind; men_attrs=attrs} in
+let create_model_element ~name ~value ~attrs =
+  let me_name = {men_name=name; men_kind=Other; men_attrs=attrs} in
   {me_name; me_value=value; me_location=None; me_term=None}
 
-let construct_name name pm loc attrs : model_element_name =
-  let kind = get_kind pm.vc_term_attrs loc attrs name in
-  {men_name=name; men_kind=kind; men_attrs=attrs}
+let construct_name name attrs : model_element_name =
+  {men_name=name; men_kind=Other; men_attrs=attrs}
 
 (*
 let print_location fmt m_element =
@@ -558,44 +508,44 @@ type raw_model_parser = printer_mapping -> string -> model_element list
 ***************************************************************
 *)
 
-(* Adapt name of the model to potential labels applying to it: *)
-let location_label ~at_loc ~attrs me_name =
-  let aux attr_at (labels_added, me_name) =
+(* Adapt kind to matching label *)
+let fix_loc_kind ~at_loc name =
+  let aux attr_at (labels_added, name) =
     try
       Scanf.sscanf attr_at.attr_string "at:%[^:]:loc:%[^:]:%d" @@ fun label loc_file loc_line ->
       if at_loc = (Filename.basename loc_file, loc_line) &&
-         not (Sstr.mem label labels_added)
-      then
-        Sstr.add label labels_added,
-        if label = "'Old" then "old "^me_name else me_name^" at "^label
-      else labels_added, me_name
-    with End_of_file | Scanf.Scan_failure _ -> labels_added, me_name in
-  snd (Sattr.fold aux attrs (Sstr.empty, me_name))
+         not (Sstr.mem label labels_added) &&
+         label <> "'Old" (* Already dealt with in [get_kind] *)
+      then Sstr.add label labels_added, {name with men_kind=At label}
+      else labels_added, name
+    with End_of_file | Scanf.Scan_failure _ ->
+      labels_added, name in
+  snd (Sattr.fold aux name.men_attrs (Sstr.empty, name))
 
-let print_model_element ~at_loc ~print_attrs print_model_value me_name_trans fmt m_element =
+let print_model_element ~at_loc ~print_attrs ~print_model_value ~me_name_trans fmt m_element =
   match m_element.me_name.men_kind with
   | Error_message -> fprintf fmt "%s" m_element.me_name.men_name
   | _ ->
-      let name =
-        location_label ~at_loc ~attrs:m_element.me_name.men_attrs
-          (me_name_trans m_element.me_name) in
+      let m_element = {m_element with me_name=fix_loc_kind ~at_loc m_element.me_name} in
       if print_attrs then
-        fprintf fmt "@[%s, @[[%a]@] =@ %a@]" name
+        fprintf fmt "@[%s, @[[%a]@] =@ %a@]"
+          (me_name_trans m_element.me_name)
           (Pp.print_list Pp.comma Pretty.print_attr)
           (Sattr.elements m_element.me_name.men_attrs)
           print_model_value m_element.me_value
-      else fprintf fmt "@[%s =@ %a@]" name print_model_value m_element.me_value
+      else fprintf fmt "@[%s =@ %a@]"
+          (me_name_trans m_element.me_name)
+          print_model_value m_element.me_value
 
 let print_model_elements ~at_loc ~print_attrs ?(sep = Pp.newline)
-    print_model_value me_name_trans fmt m_elements =
+    ~print_model_value ~me_name_trans fmt m_elements =
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
-       (print_model_element ~at_loc ~print_attrs print_model_value
-          me_name_trans))
+       (print_model_element ~at_loc ~print_attrs ~print_model_value
+          ~me_name_trans))
     m_elements
 
-let print_model_file ~print_attrs ~print_model_value fmt me_name_trans filename
-    model_file =
+let print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt filename model_file =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths. *)
   let filename = Filename.basename filename in
@@ -604,39 +554,43 @@ let print_model_file ~print_attrs ~print_model_value fmt me_name_trans filename
     (fun line m_elements ->
       fprintf fmt "  @[<v 2>Line %d:@\n" line ;
       print_model_elements ~at_loc:(filename, line) ~print_attrs
-        print_model_value me_name_trans fmt m_elements ;
+        ~print_model_value ~me_name_trans fmt m_elements ;
       fprintf fmt "@]@\n")
     model_file ;
   fprintf fmt "@]"
 
-let why_name_trans me_name =
-  match me_name.men_kind with
+let why_name_trans {men_kind; men_name} =
+  match men_kind with
   | Result -> "result"
-  | Old -> me_name.men_name (* prefix "old" added by [location_label] *)
-  | Loop_before -> "[before loop] "^me_name.men_name
-  | Loop_previous_iteration -> "[previous iteration] "^me_name.men_name
-  | Loop_current_iteration -> "[current iteration] "^me_name.men_name
-  | Error_message | Other -> me_name.men_name
+  | Old -> "old "^men_name
+  | At l -> men_name^" at "^l
+  (* | Loop_before -> "[before loop] "^men_name *)
+  | Loop_previous_iteration -> "[previous iteration] "^men_name
+  | Loop_current_iteration -> "[current iteration] "^men_name
+  | _ -> men_name
+
+let json_name_trans {men_kind; men_name} =
+  match men_kind with
+  | Result -> "result"
+  | Old -> "old "^men_name
+  | _ -> men_name
 
 let print_model ~print_attrs ?(me_name_trans = why_name_trans)
     ~print_model_value fmt model =
-  Mstr.iter
-    (fun k e ->
-      print_model_file ~print_attrs ~print_model_value fmt me_name_trans k e)
+  Mstr.iter (print_model_file ~print_attrs ~print_model_value ~me_name_trans fmt)
     model.model_files
 
 let print_model_human ?(me_name_trans = why_name_trans) fmt model =
-  print_model ~me_name_trans ~print_model_value:print_model_value_human fmt
-    model
+  print_model ~me_name_trans ~print_model_value:print_model_value_human fmt model
 
 let print_model ?(me_name_trans = why_name_trans) ~print_attrs fmt model =
   print_model ~print_attrs ~me_name_trans ~print_model_value fmt model
 
 let get_model_file model filename =
-  try Mstr.find filename model with Not_found -> empty_model_file
+  Mstr.find_def empty_model_file filename model
 
 let get_elements model_file line_number =
-  try Mint.find line_number model_file with Not_found -> []
+  Mint.find_def [] line_number model_file
 
 let get_padding line =
   try
@@ -681,7 +635,7 @@ let interleave_line ~filename ~print_attrs start_comment end_comment
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
         (print_model_elements ~sep:Pp.semi ~at_loc:(filename, line_number)
-           ~print_attrs print_model_value_human me_name_trans)
+           ~print_attrs ~print_model_value:print_model_value_human ~me_name_trans)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
        is ad hoc as we don't really know how the lines are split in IDE. *)
@@ -775,6 +729,7 @@ let print_model_element_json me_name_to_str fmt me =
     let me_kind = compute_kind me in
     match me_kind with
     | Result -> fprintf fmt "%a" Json_base.string "result"
+    | At l -> fprintf fmt "at %s" l
     | Old -> fprintf fmt "%a" Json_base.string "old"
     | Error_message -> fprintf fmt "%a" Json_base.string "error_message"
     | Other -> fprintf fmt "%a" Json_base.string "other"
@@ -783,7 +738,7 @@ let print_model_element_json me_name_to_str fmt me =
         fprintf fmt "%a" Json_base.string "previous-iteration"
     | Loop_current_iteration ->
         fprintf fmt "%a" Json_base.string "current-iteration" in
-  let print_name fmt = Json_base.string fmt (me_name_to_str me) in
+  let print_name fmt = Json_base.string fmt (me_name_to_str me.me_name) in
   let print_json_attrs fmt = print_attrs_json me.me_name fmt in
   let print_value_or_kind_or_name fmt printer = printer fmt in
   Json_base.map_bindings
@@ -809,9 +764,8 @@ let print_model_elements_on_lines_json model me_name_to_str vc_line_trans fmt
     fmt
     (Mint.bindings model_file)
 
-let print_model_json ?(me_name_trans = why_name_trans)
+let print_model_json ?(me_name_trans = json_name_trans)
     ?(vc_line_trans = fun i -> string_of_int i) fmt model =
-  let me_name_to_str me = me_name_trans me.me_name in
   let model_files_bindings =
     List.fold_left
       (fun bindings (file_name, model_file) ->
@@ -820,7 +774,7 @@ let print_model_json ?(me_name_trans = why_name_trans)
       (Mstr.bindings model.model_files) in
   Json_base.map_bindings
     (fun s -> s)
-    (print_model_elements_on_lines_json model me_name_to_str vc_line_trans)
+    (print_model_elements_on_lines_json model me_name_trans vc_line_trans)
     fmt model_files_bindings
 
 (*
@@ -829,7 +783,55 @@ let print_model_json ?(me_name_trans = why_name_trans)
 ***************************************************************
 *)
 
-let add_to_model model model_element =
+let at_old_kind at_loc attrs =
+  let rec search = function
+    | [] -> None
+    | attr :: attrs ->
+        try
+          Scanf.sscanf attr.attr_string "at:%[^:]:loc:%[^:]:%d" @@
+          fun label loc_file loc_line ->
+          if at_loc = (loc_file, loc_line) then
+            Some (if label = "'Old" then Old else At label)
+          else
+            search attrs
+        with End_of_file | Scanf.Scan_failure _ ->
+          search attrs in
+  search (Sattr.elements attrs)
+
+let loc_starts_le loc1 loc2 =
+  loc1 <> Loc.dummy_position && loc2 <> Loc.dummy_position &&
+  let f1, l1, b1, _ = Loc.get loc1 in
+  let f2, l2, b2, _ = Loc.get loc2 in
+  f1 = f2 && l1 <= l2 && l1 <= l2 && b1 <= b2
+
+let while_loop_kind vc_attrs var_loc =
+  let is_inv_pres a = a.attr_string = "expl:loop invariant preservation" in
+  if Sattr.exists is_inv_pres vc_attrs then
+    let loop_loc =
+      let is_while a = Strings.has_prefix "loop:" a.attr_string in
+      let attr = Sattr.choose (Sattr.filter is_while vc_attrs) in
+      Scanf.sscanf attr.attr_string "loop:%[^:]:%d:%d:%d"
+        Loc.user_position in
+    let kind =
+      if var_loc = loop_loc then Loop_previous_iteration
+      else if loc_starts_le loop_loc var_loc then Loop_current_iteration
+      else Loop_before in
+    Some kind
+  else None
+
+let fix_kind at_loc vc_attrs me =
+  let men_kind =
+    match at_old_kind at_loc me.me_name.men_attrs with
+    | Some k -> k
+    | None -> (
+        match Opt.map (while_loop_kind vc_attrs) me.me_location with
+        | Some (Some k) -> k
+        | _ ->
+            let _, type_s = split_model_trace_name me.me_name.men_name in
+            if type_s = "result" then Result else me.me_name.men_kind) in
+  {me with me_name={me.me_name with men_kind}}
+
+let add_to_model ?vc_term_attrs model model_element =
   match model_element.me_location with
   | None -> model
   | Some pos ->
@@ -854,9 +856,13 @@ let add_to_model model model_element =
               (fun x -> not (Strings.has_prefix "at" x.attr_string))
               symm_diff)
           elements in
+      let model_element =
+        match vc_term_attrs with
+        | Some vc_term_attrs ->
+            fix_kind (filename, line_number) vc_term_attrs model_element
+        | None -> model_element in
       let elements =
-        if found_elements <> [] then elements else model_element :: elements
-      in
+        if found_elements <> [] then elements else model_element :: elements in
       let model_file = Mint.add line_number elements model_file in
       Mstr.add filename model_file model
 
@@ -870,7 +876,7 @@ let recover_name list_projs pm raw_name =
     with Not_found ->
       let id = Mstr.find raw_name list_projs in
       (id.id_string, id.id_attrs) in
-  construct_name (get_model_trace_string ~name ~attrs) pm None attrs
+  construct_name (get_model_trace_string ~name ~attrs) attrs
 
 let rec replace_projection (const_function : string -> string) model_value =
   match model_value with
@@ -946,19 +952,15 @@ let build_model_rec raw_model pm list_projs =
         let attrs, raw_element_value =
           readd_one_fields ~attrs raw_element_value in
         let model_element =
-          { me_name=
-              construct_name
-                (get_model_trace_string ~name ~attrs)
-                pm t.t_loc attrs
+          { me_name= construct_name (get_model_trace_string ~name ~attrs) attrs
           ; me_value= raw_element_value
           ; me_location= t.t_loc
           ; me_term= Some t } in
-        let model = add_to_model model model_element in
-        let internal_loc = internal_loc t in
+        let model = add_to_model ~vc_term_attrs:pm.Printer.vc_term_attrs model model_element in
         let model =
-          if internal_loc = None then model
-          else add_to_model model {model_element with me_location= internal_loc}
-        in
+          match internal_loc t with
+          | None -> model
+          | me_location -> add_to_model ~vc_term_attrs:pm.Printer.vc_term_attrs model {model_element with me_location} in
         (* Here we create the same element for all its possible locations (given
            by attribute vc:written).
         *)
@@ -966,7 +968,7 @@ let build_model_rec raw_model pm list_projs =
           (fun attr model ->
             let loc = Ident.extract_written_loc attr in
             if loc = None then model
-            else add_to_model model {model_element with me_location= loc})
+            else add_to_model ~vc_term_attrs:pm.Printer.vc_term_attrs model {model_element with me_location=loc})
           attrs model
       with Not_found -> model)
     Mstr.empty raw_model
