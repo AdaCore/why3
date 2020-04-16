@@ -25,7 +25,7 @@ let marker loc =
       Some msg
   | _ -> None
 
-let pp_maybe_marked fmt pp x loc =
+let pp_maybe_marked loc pp fmt x =
   match marker loc with
   | Some msg ->
       fprintf fmt "(*%s*)@ (%a)" msg pp x
@@ -91,31 +91,33 @@ let pty_closed t = match t with
   | _ -> false
 
 let pp_id fmt id =
-  pp_print_string fmt (sanitize id.id_str)
+  pp_maybe_marked id.id_loc pp_print_string fmt (sanitize id.id_str)
 
 let pp_id' fmt id =
-  let open Ident in
-  match sn_decode id.id_str with
-  | SNword s ->
-    pp_print_string fmt (sanitize s)
-  | SNinfix s ->
-    fprintf fmt "(%s)" s
-  | SNprefix s ->
-    fprintf fmt "(%s)" s
-  | SNtight s ->
-    fprintf fmt "(%s)" s
-  | SNget s ->
-    fprintf fmt "([]%s)" s
-  | SNset s ->
-    fprintf fmt "([]%s<-)" s
-  | SNupdate s ->
-    fprintf fmt "([<-]%s)" s
-  | SNcut s ->
-    fprintf fmt "([..]%s)" s
-  | SNlcut s ->
-    fprintf fmt "([.._]%s)" s
-  | SNrcut s ->
-    fprintf fmt "([_..]%s)" s
+  let aux fmt id =
+    let open Ident in
+    match sn_decode id.id_str with
+    | SNword s ->
+        pp_print_string fmt (sanitize s)
+    | SNinfix s ->
+        fprintf fmt "(%s)" s
+    | SNprefix s ->
+        fprintf fmt "(%s)" s
+    | SNtight s ->
+        fprintf fmt "(%s)" s
+    | SNget s ->
+        fprintf fmt "([]%s)" s
+    | SNset s ->
+        fprintf fmt "([]%s<-)" s
+    | SNupdate s ->
+        fprintf fmt "([<-]%s)" s
+    | SNcut s ->
+        fprintf fmt "([..]%s)" s
+    | SNlcut s ->
+        fprintf fmt "([.._]%s)" s
+    | SNrcut s ->
+        fprintf fmt "([_..]%s)" s in
+  pp_maybe_marked id.id_loc aux fmt id
 
 let rec pp_qualid fmt = function
   | Qident id ->
@@ -406,7 +408,7 @@ and pp_expr' fmt =
   pp_closed expr_closed pp_expr fmt
 
 and pp_expr fmt e =
-  pp_maybe_marked fmt pp_expr'' e e.expr_loc
+  pp_maybe_marked e.expr_loc pp_expr'' fmt e
 
 and pp_expr'' fmt e =
   match e.expr_desc with
@@ -575,7 +577,7 @@ and pp_term' fmt =
   pp_closed term_closed pp_term fmt
 
 and pp_term fmt t =
-  pp_maybe_marked fmt pp_term'' t t.term_loc
+  pp_maybe_marked t.term_loc pp_term'' fmt t
 
 and pp_term'' fmt t =
   let pp_binop fmt op =
@@ -702,7 +704,7 @@ and pp_pattern' fmt =
   pp_closed pattern_closed pp_pattern fmt
 
 and pp_pattern fmt p =
-  pp_maybe_marked fmt pp_pattern'' p p.pat_loc
+  pp_maybe_marked p.pat_loc pp_pattern'' fmt p
 
 and pp_pattern'' fmt p =
   match p.pat_desc with
