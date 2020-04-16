@@ -80,31 +80,34 @@ let pty_closed t = match t with
   | _ -> false
 
 let pp_id fmt id =
-  pp_print_string fmt (sanitize id.id_str)
+  let aux fmt id = pp_print_string fmt (sanitize id.id_str) in
+  pp_maybe_marked fmt aux id id.id_loc
 
 let pp_id' fmt id =
-  let open Ident in
-  match sn_decode id.id_str with
-  | SNword s ->
-    pp_print_string fmt (sanitize s)
-  | SNinfix s ->
-    fprintf fmt "(%s)" s
-  | SNprefix s ->
-    fprintf fmt "(%s)" s
-  | SNtight s ->
-    fprintf fmt "(%s)" s
-  | SNget s ->
-    fprintf fmt "([]%s)" s
-  | SNset s ->
-    fprintf fmt "([]%s<-)" s
-  | SNupdate s ->
-    fprintf fmt "([<-]%s)" s
-  | SNcut s ->
-    fprintf fmt "([..]%s)" s
-  | SNlcut s ->
-    fprintf fmt "([.._]%s)" s
-  | SNrcut s ->
-    fprintf fmt "([_..]%s)" s
+  let aux fmt id =
+    let open Ident in
+    match sn_decode id.id_str with
+    | SNword s ->
+        pp_print_string fmt (sanitize s)
+    | SNinfix s ->
+        fprintf fmt "(%s)" s
+    | SNprefix s ->
+        fprintf fmt "(%s)" s
+    | SNtight s ->
+        fprintf fmt "(%s)" s
+    | SNget s ->
+        fprintf fmt "([]%s)" s
+    | SNset s ->
+        fprintf fmt "([]%s<-)" s
+    | SNupdate s ->
+        fprintf fmt "([<-]%s)" s
+    | SNcut s ->
+        fprintf fmt "([..]%s)" s
+    | SNlcut s ->
+        fprintf fmt "([.._]%s)" s
+    | SNrcut s ->
+        fprintf fmt "([_..]%s)" s in
+  pp_maybe_marked fmt aux id id.id_loc
 
 let rec pp_qualid fmt = function
   | Qident id ->

@@ -1207,17 +1207,14 @@ let read_channel env path filename c =
   (* Defer printing of mlw file until after the typing, to set the marker of located
      exceptions *)
   let print_mlw_file () =
-    if Debug.test_flag debug then begin
-      let out = open_out (filename^".mlw") in
-      let fmt = Format.formatter_of_out_channel out in
-      Mlw_printer.pp_mlw_file fmt mlw_file;
-      Format.pp_print_flush fmt ();
-      close_out out
-    end in
-  (* Use [protect] with [~finally:print_mlw_file] in OCaml 4.08 *)
+    let out = open_out (filename^".mlw") in
+    Format.fprintf (Format.formatter_of_out_channel out) "%a@."
+      Mlw_printer.pp_mlw_file mlw_file;
+    close_out out in
   match Typing.type_mlw_file env path filename mlw_file with
   | res ->
-      print_mlw_file ();
+      if Debug.test_flag debug then
+        print_mlw_file ();
       res
   | exception Loc.Located (pos, e) ->
       (* The positions in the generated ptree are useless - we set the marker for
@@ -1249,12 +1246,8 @@ let () =
               id. *)
            Format.fprintf fmt "Conversion error for node with ID %d: %s" r.node_id r.message
        | Located_by_marker (filename, e) ->
-           (* Located errors (from typing) are reported with an hint on the marker, which
-              is inserted into the mlw file by the mlw-printer, if debugging for gnat_ast
-              is enabled. *)
-           if Debug.test_flag debug then
-             Format.fprintf fmt "File %s, marked by (*XXX*)(...):@." filename
-           else (* [filename] not generated *)
-             Format.fprintf fmt "Error in converted why3 AST (enable debug flag \"gnat_ast\" for details):@.";
-           Exn_printer.exn_printer fmt e
+           (* Located errors (i.e. typing errors) are reported with an hint on the marker, which
+              is inserted into the mlw file by the mlw-printer. *)
+           Format.fprintf fmt "File %s, marked by (*XXX*)(...):@\n%a"
+             filename Exn_printer.exn_printer e
        | _ -> raise exn)
