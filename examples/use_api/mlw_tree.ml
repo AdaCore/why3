@@ -96,7 +96,7 @@ let mod_M1 =
 (* declaration of
   BEGIN{source2}
 module M2
-  let f (x:int) : int
+  let f [@foo] (x:int) : int
     requires { x=6 }
     ensures { result=42 }
    = x*7
@@ -137,7 +137,9 @@ let mod_M2 =
       Efun(param1 id_x int_type, None, mk_pat Pwild,
            Ity.MaskVisible, spec, body)
     in
-    Dlet(mk_ident "f",false,Expr.RKnone, mk_expr f)
+    let attr = ATstr (Ident.create_attribute "foo") in
+    let id = { (mk_ident "f") with id_ats = [attr] } in
+    Dlet(id,false,Expr.RKnone, mk_expr f)
   in
   (mk_ident "M2",[use_int_Int ; f])
 (* END{code2} *)
