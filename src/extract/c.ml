@@ -1402,12 +1402,13 @@ module MLToC = struct
         d@defs, C.(Sseq(Sseq(s,assigns), Sblock b)) end
     | Ematch _ -> raise (Unsupported "pattern matching")
     | Eabsurd -> assert false
-    | Eassign ([pv, pvmlty, ({rs_field = Some _} as rs), e2]) ->
-       let id = pv_name pv in
+    | Eassign ([e1, pvmlty, ({rs_field = Some _} as rs), e2]) ->
        let boxed =
-         match pv.pv_ity.ity_node with
+         match (ity_of_expr e1).ity_node with
          | Ityreg r ->  Hreg.mem env.boxed r
          | _ -> false in
+       let ce1 = simplify_expr
+                   (expr info { env with computes_return_value = false } e1) in
        let t =
          match query_syntax info.syntax rs.rs_name with
          | Some s ->
@@ -1417,8 +1418,8 @@ module MLToC = struct
                   (Re.Str.regexp "[%]\\([tv]?\\)[0-9]+") s 0
               with Not_found -> raise (Unsupported "assign field format")  in
             let st = if boxed
-                     then C.(Eunop(Ustar, Evar id))
-                     else C.Evar id in
+                     then C.(Eunop(Ustar, ce1))
+                     else ce1 in
             let params = [ st, ty_of_mlty info pvmlty ] in
             let args = match pvmlty with
               | Tvar _ -> [||]
@@ -1432,11 +1433,11 @@ module MLToC = struct
              let ty = ty_of_mlty info pvmlty in
              match ty with
              | Tmutable _ ->
-                 if boxed then Eunop (Ustar, Evar id) else Evar id
+                 if boxed then Eunop (Ustar, ce1) else ce1
              | _ ->
                  if boxed
-                 then Earrow (Evar id, rs.rs_name.id_string)
-                 else Edot (Evar id, rs.rs_name.id_string) in
+                 then Earrow (ce1, rs.rs_name.id_string)
+                 else Edot (ce1, rs.rs_name.id_string) in
        let d,v = expr info { env with computes_return_value = false } e2 in
        d, C.(Sexpr(Ebinop(Bassign, t, simplify_expr ([],v))))
     | Eassign _ -> raise (Unsupported "assign")
@@ -1696,6 +1697,7 @@ let rec expr e =
   | Equestion (c, Econst (Cint (_, ic0)), Econst (Cint (_, ic1)))
        when is_one ic1 && is_zero ic0 -> Eunop (Unot, c)         (* c ? 0 : 1 *)
   | Eunop (Unot, Ebinop(Beq, e1, e2)) -> Ebinop (Bne, e1, e2) (* ! (e1 == e2) *)
+  | Edot (Eunop (Ustar, e1), s) -> Earrow (e1, s)
   | _ -> e
 
 and stmt s =

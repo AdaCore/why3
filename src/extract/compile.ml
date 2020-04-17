@@ -481,7 +481,8 @@ module Translate = struct
         let al =
           List.map
             (fun (pv1, rs, pv2) ->
-              (pv1, mlty_of_ity MaskVisible pv1.pv_ity, rs, e_of_var pv2)) al
+              (e_of_var pv1, mlty_of_ity MaskVisible pv1.pv_ity, rs,
+               e_of_var pv2)) al
         in
         ML.e_assign al (ML.I e.e_ity) mask eff attrs
     | Ematch (e1, bl, xl) when e_ghost e1 ->
@@ -721,15 +722,6 @@ module RefreshLetBindings = struct
     | Eapp (rs, el, p) ->
        let rs' = Mrs.find_def rs rs accf in
        acc, mk (Eapp (rs', el, p))
-    | Eassign al ->
-       let al' =
-         List.map
-           (fun (pv, ty, rs, e) ->
-             let pv' = pvs accv pv in
-             assert (not (Mrs.mem rs accf));
-             (pv', ty, rs, e))
-           al in
-       acc, mk (Eassign al')
     | _ -> acc, e
 
   and pvs accv pv = Mid.find_def pv (pv_name pv) accv
@@ -818,12 +810,6 @@ module InlineFunctionCalls = struct
     | Efun (vl, e) ->
        List.iter (fun (id, _ty, _gh) -> assert (not (Mid.mem id subst))) vl;
        mk (Efun (vl, expr subst e))
-    | Eassign al ->
-       let assign (v, ty, rs, e) =
-         let pv' = pv subst v in
-         (pv', ty, rs, e) in
-       let al' = List.map assign al in
-       mk (Eassign al')
     | Efor (i, ty, st, dir, en, e) ->
        assert (not (Mid.mem (pv_name i) subst));
        mk (Efor (i, ty, pv subst st, dir, pv subst en, e))
@@ -900,9 +886,6 @@ module InlineProxyVars = struct
         (spv,occ), mk (Efun (vl, e))
     | Efor (pv1, _, pv2, _, pv3, _) ->
        (vars, Spv.add pv1 (Spv.add pv2 (Spv.add pv3 occ))), e
-    | Eassign al ->
-       (vars, List.fold_left
-                (fun occ (pv, _, _, _) -> Spv.add pv occ) occ al), e
     | _ -> (vars, occ), e
 
   and let_def info subst (vars,occ) ld =

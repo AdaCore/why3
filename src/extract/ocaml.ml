@@ -579,25 +579,25 @@ module Print = struct
           (print_expr info 18) e
           (print_list newline (print_branch info)) pl
     | Eassign al ->
-        let assign fmt (rho, _, rs, e) =
+        let assign fmt (e1, _, rs, e2) =
           if rs_equal rs rs_ref_proj
           then fprintf fmt "@[<hv 2>%a :=@ %a@]"
-                 (print_lident info) (pv_name rho) (print_expr info 15) e
+                 (print_expr info 14) e1 (print_expr info 15) e2
           else if is_field rs
           then fprintf fmt "@[<hv 2>%a.%a <-@ %a@]"
-                 (print_lident info) (pv_name rho) (print_record_proj info) rs
-                (print_expr info 15) e
+                 (print_expr info 14) e1 (print_record_proj info) rs
+                (print_expr info 15) e2
           else
             match query_syntax info.info_syn rs.rs_name with
             | Some s ->
                fprintf fmt "@[<hv 2>%a <-@ %a@]"
-                (syntax_arguments s (print_lident info)) [pv_name rho]
-                (print_expr info 15) e
+                (syntax_arguments s (print_expr info 14)) [e1]
+                (print_expr info 15) e2
             | None ->
                fprintf fmt "@[<hv 2>%a.%a <-@ %a@]"
-                 (print_lident info) (pv_name rho)
+                 (print_expr info 14) e1
                  (print_lident info) rs.rs_name
-                 (print_expr info 15) e in
+                 (print_expr info 15) e2 in
         begin match al with
         | [] -> assert false | [a] -> assign fmt a
         | al -> fprintf fmt "@[begin %a end@]" (print_list semi assign) al end

@@ -57,7 +57,7 @@ and expr_node =
   | Efun    of var list * expr
   | Elet    of let_def * expr
   | Eif     of expr * expr * expr
-  | Eassign of (pvsymbol * ty * rsymbol * expr) list
+  | Eassign of (expr * ty * rsymbol * expr) list
   | Ematch  of expr * reg_branch list * exn_branch list
   | Eblock  of expr list
   | Ewhile  of expr * expr
@@ -395,7 +395,7 @@ let e_map fn e =
   | Elet (ld,e) -> mk (Elet (ld_map fn ld, fn e))
   | Eif (c,t,e) -> mk (Eif (fn c, fn t, fn e))
   | Eassign al ->
-     let al' = List.map (fun (pv, ty, rs, e) -> pv, ty, rs, fn e) al in
+     let al' = List.map (fun (e1, ty, rs, e2) -> fn e1, ty, rs, fn e2) al in
      mk (Eassign al')
   | Ematch (e,bl,xl) ->
      let bl' = List.map (fun (p,e) -> (p, fn e)) bl in
@@ -425,7 +425,8 @@ let e_fold fn acc e =
      let acc = fn acc c in
      let acc = fn acc t in
      fn acc e
-  | Eassign al -> List.fold_left (fun acc (_,_,_,e) -> fn acc e) acc al
+  | Eassign al ->
+     List.fold_left (fun acc (e1,_,_,e2) -> fn (fn acc e2) e1) acc al
   | Ematch (e,bl,xl) ->
      let acc = List.fold_left (fun acc (_p,e) -> fn acc e) acc bl in
      let acc = List.fold_left (fun acc (_x, _vl, e) -> fn acc e) acc xl in
@@ -475,9 +476,10 @@ let e_map_fold fn acc e =
   | Eassign al ->
      let acc,al' =
        Lists.map_fold_left
-         (fun acc (pv, ty, rs, e) ->
-           let acc, e = fn acc e in
-           acc, (pv, ty, rs, e))
+         (fun acc (e1, ty, rs, e2) ->
+           let acc, e2' = fn acc e2 in
+           let acc, e1' = fn acc e1 in
+           acc, (e1', ty, rs, e2'))
          acc al in
      acc, mk (Eassign al')
   | Ematch (e,bl,xl) ->
