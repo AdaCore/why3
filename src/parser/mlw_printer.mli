@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-(** {1 Pretty printing of Why3 parse trees as Why3 source code} *)
+(** {1 Pretty printing of Why3 parse trees as WhyML source code} *)
 
 (** {2 Printers} *)
 
