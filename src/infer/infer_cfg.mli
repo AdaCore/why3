@@ -4,6 +4,9 @@ open Term
 open Expr
 open Ity
 
+val infer_print_cfg : Debug.flag
+val infer_print_ai_result : Debug.flag
+
 module type INFERCFG = sig
   module QDom : Domain.TERM_DOMAIN
 

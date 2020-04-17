@@ -14,5 +14,7 @@ open Ity
 open Expr
 open Term
 
+val print_inferred_invs : Debug.flag
+
 val infer_loops : Sattr.t -> Env.env -> Decl.known_map ->
                   Pdecl.known_map -> expr -> cty -> (expr * term) list

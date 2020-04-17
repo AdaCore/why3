@@ -46,12 +46,9 @@ let mk_expr e = { expr_desc = e; expr_loc = Loc.dummy_position }
 let mk_term t = { term_desc = t; term_loc = Loc.dummy_position }
 
 let mk_pat p = { pat_desc = p; pat_loc = Loc.dummy_position }
-let pat_wild = mk_pat Pwild
-let pat_var id = mk_pat (Pvar id)
 
 let mk_var id = mk_term (Tident (Qident id))
 
-let param0 = [Loc.dummy_position, None, false, Some (PTtuple [])]
 let param1 id ty = [Loc.dummy_position, Some id, false, Some ty]
 
 let mk_const i =
@@ -67,7 +64,12 @@ let mk_eapp f l = mk_expr (Eidapp(f,l))
 
 let mk_evar x = mk_expr(Eident(Qident x))
 
+(*BEGIN{helper2}*)
+(* ... *)
+let pat_wild = mk_pat Pwild
+
 let mk_ewhile e1 i v e2 = mk_expr (Ewhile (e1,i,v,e2))
+(*END{helper2}*)
 (* END{helper1} *)
 
 (* declaration of
@@ -101,33 +103,38 @@ let eq_symb      = mk_qualid [Ident.op_infix "="]
 
 let mod_M1 =
   (* use int.Int *)
-  let use_int_Int   = use_import (["int";"Int"]) in
+  let use_int_Int    = use_import (["int";"Int"]) in
   let use_ref_Refint = use_import (["ref";"Refint"]) in
   (* f *)
   let f =
-    let id_x = mk_ident "x" in
+    let id_x  = mk_ident "x" in
     let var_x = mk_var id_x in
     let t_x   = mk_tapp ref_access [var_x] in
-    let pre = mk_tapp le_int [t_x; mk_tconst 100] in
-    let post = mk_tapp eq_symb [t_x; mk_tconst 100] in
-    let spec = {
-      sp_pre = [pre];
-      sp_post = [Loc.dummy_position,[pat_wild, post]];
-      sp_xpost = [];
-      sp_reads = [];
-      sp_writes = [];
-      sp_alias = [];
+    let pre   = mk_tapp le_int [t_x; mk_tconst 100] in
+    let post  = mk_tapp eq_symb [t_x; mk_tconst 100] in
+    let spec  = {
+      sp_pre     = [pre];
+      sp_post    = [Loc.dummy_position,[pat_wild, post]];
+      sp_xpost   = [];
+      sp_reads   = [];
+      sp_writes  = [];
+      sp_alias   = [];
       sp_variant = [];
       sp_checkrw = false;
       sp_diverge = false;
       sp_partial = false;
     }
     in
-    let vare_x     = mk_evar id_x in
-    let e_x        = mk_eapp ref_access [vare_x] in
+    let var_x      = mk_evar id_x in
+    (* !x *)
+    let e_x        = mk_eapp ref_access [var_x] in
+    (* !x < 100 *)
     let while_cond = mk_eapp l_int [e_x; mk_econst 100] in
+    (* 100 - !x *)
     let while_vari = mk_tapp minus_int [mk_tconst 100; t_x], None in
-    let incr       = mk_eapp ref_int_incr [vare_x] in
+    (* incr x *)
+    let incr       = mk_eapp ref_int_incr [var_x] in
+    (* while (!x < 100) do variant { 100 - !x } incr x done *)
     let while_loop = mk_ewhile while_cond [] [while_vari] incr in
     let f =
       Efun(param1 id_x ref_int_type, None, mk_pat Pwild,
@@ -139,6 +146,12 @@ let mod_M1 =
   in
   (mk_ident "M1",[use_int_Int; use_ref_Refint; f])
 (* END{code1} *)
+
+(*BEGIN{flags}*)
+let () = Debug.set_flag Infer_cfg.infer_print_ai_result;
+         Debug.set_flag Infer_cfg.infer_print_cfg;
+         Debug.set_flag Infer_loop.print_inferred_invs
+(*END{flags}*)
 
 (* BEGIN{getmodules} *)
 let mlw_file = Modules [ mod_M1 ]

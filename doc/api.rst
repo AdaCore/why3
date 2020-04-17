@@ -501,7 +501,10 @@ directly build the typed declaration. The first choice use concepts
 similar to the WhyML language but errors in the generation are harder to
 debug since they are lost inside the typing phase, the second choice use
 more internal notions but it is easier to pinpoint the functions wrongly
-used.
+used. :numref:`sec.build_untyped` and :numref:`sec.build_untyped_attr`
+follow choice one and :numref:`sec.build_typed` choice two.
+
+.. _sec.build_untyped:
 
 Untyped syntax tree
 ~~~~~~~~~~~~~~~~~~~
@@ -646,6 +649,59 @@ OCaml functions that were already introduced before.
    :language: ocaml
    :start-after: BEGIN{checkingvcs}
    :end-before: END{checkingvcs}
+
+.. _sec.build_untyped_attr:
+
+Use attributes to infer loop invariants
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this section we build a module containing a let declaration with a
+while loop and an attribute that triggers the inference of loop
+invariants during VC generation. For more information about the
+inference of loop invariants refer to :numref:`sec.installinferloop`
+and :numref:`sec.runwithinferloop`. The examples shown below are
+available in the file :file:`examples/use_api/mlw_tree1.ml`.
+
+We build an environment and define the some helper functions exactly
+as in :numref:`sec.build_untyped`. Additionally we create two other
+helper functions as follows:
+
+.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+   :language: ocaml
+   :start-after: BEGIN{helper2}
+   :end-before: END{helper2}
+
+Our goal is now to build a program equivalent to the following. Note
+that the let declaration contains an attribute ``[@infer]`` which will
+trigger the inference of loop invariants during VC generation (make
+sure that the why3 library was compiled with support for `infer-loop`,
+see :numref:`sec.installinferloop` for more information).
+
+.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+   :language: ocaml
+   :start-after: BEGIN{source1}
+   :end-before: END{source1}
+
+The OCaml code that builds such a module is shown below.
+
+.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+   :language: ocaml
+   :start-after: BEGIN{code1}
+   :end-before: END{code1}
+
+The debugging flags mentioned in :numref:`sec.runwithinferloop` can be
+enabled using the API as follows:
+
+.. literalinclude:: ../examples/use_api/mlw_tree1.ml
+   :language: ocaml
+   :start-after: BEGIN{flags}
+   :end-before: END{flags}
+
+Finally the code for closing the modules, printing it to the standard
+output, typing it, and so on is exactly the same as in the previous
+section, thus we omit it in here.
+
+.. _sec.build_typed:
 
 Typed declaration
 ~~~~~~~~~~~~~~~~~
