@@ -690,7 +690,8 @@ The OCaml code that builds such a module is shown below.
    :end-before: END{code1}
 
 The debugging flags mentioned in :numref:`sec.runwithinferloop` can be
-enabled using the API as follows:
+enabled using the API as follows (the line(s) corresponding to the
+desired flag(s) should be uncommented).
 
 .. literalinclude:: ../examples/use_api/mlw_tree1.ml
    :language: ocaml

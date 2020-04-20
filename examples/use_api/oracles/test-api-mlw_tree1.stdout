@@ -10,9 +10,6 @@ module M1
       variant { Int.(-) 100 (Refint.(!) x) } Refint.incr x
     done
 end
-### Debug: inferred invariants ###
-forall w1:int. contents x <= 100
-###
 Tasks are:
 Task 1: theory Task
           type int
@@ -232,15 +229,12 @@ Task 1: theory Task
           goal f'vc :
             forall x:int.
              x <= 100 ->
-             x <= 100 /\
              (forall x1:int.
-               x1 <= 100 ->
-               (if x1 < 100
-                then forall x2:int.
-                      x2 = (x1 + 1) ->
-                      (0 <= (100 - x1) /\ (100 - x2) < (100 - x1)) /\
-                      x2 <= 100
-                else x1 = 100))
+               if x1 < 100
+               then forall x2:int.
+                     x2 = (x1 + 1) ->
+                     0 <= (100 - x1) /\ (100 - x2) < (100 - x1)
+               else x1 = 100)
 end
 
-On task 1, alt-ergo answers Valid (0.0xs, 8 steps)
+On task 1, alt-ergo answers Unknown () (0.0xs)
