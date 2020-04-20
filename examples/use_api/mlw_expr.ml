@@ -28,7 +28,7 @@ let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
 declaration of
 BEGIN{source2}
-     let f2 [@foo] () : int
+     let f2 () : int
         requires { true }
         ensures { result >= 0 }
       = let x = ref 42 in !x
@@ -63,8 +63,7 @@ let get_fun : Expr.rsymbol =
 
 (* BEGIN{code2} *)
 let d2 =
-  let attrs = Ident.(Sattr.singleton (create_attribute "foo")) in
-  let id = Ident.id_fresh ~attrs "f" in
+  let id = Ident.id_fresh "f" in
   let post =
     let result =
       Term.create_vsymbol (Ident.id_fresh "result") Ty.ty_int
