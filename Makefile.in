@@ -1907,7 +1907,9 @@ update-doc-png:
 	export GTK_THEME=Adwaita; \
 	sed -n -e 's/^.. %EXECUTE \(.*\)/\1/p' $(DOCRST) | $(SHELL) -e
 
-doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
+TESTSAPI = $(addsuffix .ml, $(addprefix examples/use_api/, $(APITESTS)))
+
+doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) $(TESTSAPI) doc/conf.py
 	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
 doc/latex/manual.tex: $(DOCRST) $(DRVDOT) $(LIBDOT) doc/conf.py
