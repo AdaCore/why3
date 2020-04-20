@@ -33,6 +33,9 @@ module mach.int.Int32
   syntax val (<)     "%1 < %2"   prec 6 6 5
   syntax val (>=)    "%1 >= %2"  prec 6 6 5
   syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  remove module
+
 end
 
 module mach.int.Int32BV
@@ -47,6 +50,7 @@ module mach.int.Int32GMP
   syntax val bxor    "%1 ^ %2"   prec 9 9 8
 
 end
+
 module mach.int.UInt32Gen
 
   prelude export "#include <stdint.h>"
@@ -55,6 +59,8 @@ module mach.int.UInt32Gen
 
   syntax val max_uint32 "0xffffffff" prec 0
   syntax val length "32"             prec 0
+
+  remove module
 
 end
 
@@ -80,6 +86,8 @@ module mach.int.UInt32
   syntax val (<)     "%1 < %2"   prec 6 6 5
   syntax val (>=)    "%1 >= %2"  prec 6 6 5
   syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  remove module
 
 end
 
@@ -170,6 +178,7 @@ blacklist "__builtin_clz" "__builtin_ctz" "add32_with_carry" "sub32_with_borrow"
 blacklist "mul32_double" "add32_3" "lsld32"
 
 module mach.int.Int64
+
   syntax type int64  "int64_t"
   syntax literal int64 "INT64_C(%c)"
 
@@ -185,6 +194,8 @@ module mach.int.Int64
   syntax val (>=)    "%1 >= %2"  prec 6 6 5
   syntax val (>)     "%1 > %2"   prec 6 6 5
 
+  remove module
+
 end
 
 module mach.int.UInt64Gen
@@ -195,6 +206,8 @@ module mach.int.UInt64Gen
 
   syntax val max_uint64 "0xffffffffffffffff" prec 0
   syntax val length "64" prec 0
+
+  remove module
 
 end
 
@@ -213,6 +226,8 @@ module mach.int.UInt64
   syntax val (<)     "%1 < %2"   prec 6 6 5
   syntax val (>=)    "%1 >= %2"  prec 6 6 5
   syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  remove module
 
 end
 
@@ -444,6 +459,8 @@ module mach.c.UChar
   syntax val open_from_charptr "(unsigned char *)%1" prec 2 2
   syntax val close_from_charptr "IGNORE2"
 
+  remove module
+
 end
 
 module mach.c.SChar
@@ -499,97 +516,65 @@ end
 (* exclude some stdlib modules from extraction *)
 
 module array.Array
-
   remove module
-
 end
 
 module bool.Bool
-
   remove module
-
 end
 
 module map.Map
-
   remove module
-
 end
 
 module map.Const
-
   remove module
-
 end
 
 module number.Divisibility
-
   remove module
-
 end
 
 module int.Int
-
   remove module
-
 end
 
 module int.Abs
-
   remove module
-
 end
 
 module int.ComputerDivision
-
   remove module
-
 end
 
 module int.EuclideanDivision
-
   remove module
-
 end
 
 module int.MinMax
-
   remove module
-
 end
 
 module int.Power
-
   remove module
-
 end
 
 module real.Real
-
   remove module
-
 end
 
 module real.ExpLog
-
   remove module
-
 end
 
 module real.RealInfix
-
   remove module
-
 end
 
 module real.Square
-
   remove module
-
 end
 
 module mach.int.Unsigned
-
   remove module
-
 end
