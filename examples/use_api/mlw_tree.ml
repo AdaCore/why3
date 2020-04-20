@@ -310,7 +310,7 @@ let mods = Typing.type_mlw_file env [] "myfile.mlw" mlw_file
 (* END{typemodules} *)
 
 (* BEGIN{typemoduleserror} *)
-let mods =
+let _mods =
   try
     Typing.type_mlw_file env [] "myfile.mlw" mlw_file
   with Loc.Located (loc, e) -> (* A located exception [e] *)

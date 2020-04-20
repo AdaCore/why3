@@ -1,36 +1,35 @@
 module M1
-  
-  use int.Int
+  use  int.Int
   
   goal g: Int.(=) 4 (Int.(+) 2 2)
 end
 
 module M2
+  use  int.Int
   
-  use int.Int
-  
-  let f (x: int) requires { x = 6 } ensures { result = 42 } = Int.(*) x 7
+  let f (x : int)
+    requires {(x = 6)}
+    ensures { (result = 42) } =
+    (Int.(*) x 7)
 end
 
 module M3
+  use  int.Int
+  use  ref.Ref
   
-  use int.Int
-  use ref.Ref
-  
-  let f (_: ())
-    ensures { Int.(>=) result 0 } =
-    let x = Ref.ref 42 in (Ref.(!) x)
+  let f (_ : ())
+    ensures { (Int.(>=) result 0) } =
+    (let x = (Ref.ref 42) in Ref.(!) x)
 end
 
 module M4
+  use  int.Int
+  use  array.Array
   
-  use int.Int
-  use array.Array
-  
-  let f (a: Array.array int)
-    requires { Int.(>=) (Array.length a) 1 }
-    returns { _ -> ((Array.([]) a 0) = 42) } =
-    Array.([]<-) a 0 42
+  let f (a : Array.array int)
+    requires {(Int.(>=) (Array.length a) 1)}
+    returns { _ -> (Array.([]) a 0) = 42 } =
+    (Array.([]<-) a 0 42)
 end
 Tasks are:
 Task 1: theory Task
