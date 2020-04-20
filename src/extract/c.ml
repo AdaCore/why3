@@ -550,9 +550,9 @@ module Print = struct
   (* prints the c inline keyword *)
 
   let print_local_ident fmt id =
-    fprintf fmt "%s" (id_unique (Opt.get !local_printer) id)
+    pp_print_string fmt (id_unique (Opt.get !local_printer) id)
   let print_global_ident fmt id =
-    fprintf fmt "%s" (id_unique (Opt.get !global_printer) id)
+    pp_print_string fmt (id_unique (Opt.get !global_printer) id)
 
   let clear_local_printer () = Ident.forget_all (Opt.get !local_printer)
 
@@ -698,7 +698,7 @@ module Print = struct
         gen_syntax_arguments_prec fmt s pr pl
 
   and print_const  fmt = function
-    | Cint (s,_) | Cfloat s -> fprintf fmt "%s" s
+    | Cint (s,_) | Cfloat s -> pp_print_string fmt s
     | Cchar s -> fprintf fmt "'%s'" Constant.(escape char_escape s)
     | Cstring s -> fprintf fmt "\"%s\"" Constant.(escape default_escape s)
   let print_id_init ?(size=None) ~stars fmt ie =
@@ -1162,7 +1162,7 @@ module MLToC = struct
           | ILitOct -> Format.fprintf fmt "0%a" (print_in_base 8 None) n
           | ILitDec | ILitUnk ->
              (* default to base 10 *)
-             Format.fprintf fmt "%a" (print_in_base 10 None) n in
+             print_in_base 10 None fmt n in
        let s =
          let i = ity_of_expr e in
          let ts = match (ty_of_ity i) with
