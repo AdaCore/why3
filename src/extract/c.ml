@@ -1796,7 +1796,7 @@ let header_border_printer header _args ?old:_ ?fname fmt m =
   if header then
     Format.fprintf fmt "#ifndef %s@\n@." n
   else
-    Format.fprintf fmt "#define %s@\n#endif // %s@." n n
+    Format.fprintf fmt "@\n#define %s@\n#endif // %s@." n n
 
 let print_header_decl args fmt d =
   let cds = MLToC.translate_decl args d ~header:true ~flat:false in
