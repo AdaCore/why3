@@ -16,16 +16,13 @@ API calls
 
 ******************)
 
-(* BEGIN{buildenv} *)
 open Why3
 let config : Whyconf.config =
   Whyconf.(load_default_config_if_needed (read_config None))
 let main : Whyconf.main = Whyconf.get_main config
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 open Ptree
-(* END{buildenv} *)
 
-(* BEGIN{helper1} *)
 let mk_ident s = { id_str = s; id_ats = []; id_loc = Loc.dummy_position }
 
 let mk_qualid l =
@@ -70,7 +67,6 @@ let pat_wild = mk_pat Pwild
 
 let mk_ewhile e1 i v e2 = mk_expr (Ewhile (e1,i,v,e2))
 (*END{helper2}*)
-(* END{helper1} *)
 
 (* declaration of
   BEGIN{source1}
@@ -153,21 +149,14 @@ let () = Debug.set_flag Infer_cfg.infer_print_ai_result;
          Debug.set_flag Infer_loop.print_inferred_invs
 (*END{flags}*)
 
-(* BEGIN{getmodules} *)
 let mlw_file = Modules [ mod_M1 ]
-(* END{getmodules} *)
 
 (* Printing back the mlw file *)
 
-(* BEGIN{mlwprinter} *)
 let () = Format.printf "%a@." Mlw_printer.pp_mlw_file mlw_file
-(* END{mlwprinter} *)
 
-(* BEGIN{typemodules} *)
 let mods = Typing.type_mlw_file env [] "myfile.mlw" mlw_file
-(* END{typemodules} *)
 
-(* BEGIN{typemoduleserror} *)
 let mods =
   try
     Typing.type_mlw_file env [] "myfile.mlw" mlw_file
@@ -177,11 +166,9 @@ let mods =
       (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
       mlw_file;
     exit 1
-(* END{typemoduleserror} *)
 
 (* Checking the VCs *)
 
-(* BEGIN{checkingvcs} *)
 let my_tasks : Task.task list =
   let mods =
     Wstdlib.Mstr.fold
@@ -238,8 +225,6 @@ let () =
       )
       1 my_tasks
   in ()
-(* END{checkingvcs} *)
-
 
 (* make sure the why3 lib is installed: do "make install-lib"
    in the why3 root directory *)
