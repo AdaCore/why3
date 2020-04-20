@@ -80,53 +80,53 @@ blacklist "mul64_double" "div64_2by1"
 
 module ptralias.Alias
 
-  interface "\n\
-struct __open_sep_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-};\n\
-\n\
-struct __open_rx_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-  uint64_t *__field_2;\n\
-};\n\
-\n\
-struct __open_shift_sep_result\n\
-{ uint64_t *__field_0;\n\
-  uint64_t *__field_1;\n\
-};\n\
-\n\
-static inline struct __open_sep_result\n\
-open_sep (uint64_t * r, uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)\n\
-{\n\
-  struct __open_sep_result result;\n\
-  result.__field_0 = r;\n\
-  result.__field_1 = x;\n\
-  result.__field_2 = y;\n\
-  return result;\n\
-}\n\
-\n\
-static inline struct __open_rx_result\n\
-open_rx (uint64_t * x, int32_t sx, uint64_t * y, int32_t sy)\n\
-{\n\
-  struct __open_rx_result result;\n\
-  result.__field_0 = x;\n\
-  result.__field_1 = x;\n\
-  result.__field_2 = y;\n\
-  return result;\n\
-}\n\
-\n\
-static inline struct __open_shift_sep_result\n\
-open_shift_sep (uint64_t * r, uint64_t * x, int32_t sz)\n\
-{\n\
-  struct __open_shift_sep_result result;\n\
-  result.__field_0 = r;\n\
-  result.__field_1 = x;\n\
-  return result;\n\
-}\n\
-"
+  interface "\
+    \nstruct __open_sep_result {\
+    \n  uint64_t *__field_0;\
+    \n  uint64_t *__field_1;\
+    \n  uint64_t *__field_2;\
+    \n};\
+    \n\
+    \nstruct __open_rx_result {\
+    \n  uint64_t *__field_0;\
+    \n  uint64_t *__field_1;\
+    \n  uint64_t *__field_2;\
+    \n};\
+    \n\
+    \nstruct __open_shift_sep_result {\
+    \n  uint64_t *__field_0;\
+    \n  uint64_t *__field_1;\
+    \n};\
+    \n\
+    \nstatic inline struct __open_sep_result\
+    \nopen_sep (uint64_t *r, uint64_t *x, int32_t sx, uint64_t *y, int32_t sy)\
+    \n{\
+    \n  struct __open_sep_result result;\
+    \n  result.__field_0 = r;\
+    \n  result.__field_1 = x;\
+    \n  result.__field_2 = y;\
+    \n  return result;\
+    \n}\
+    \n\
+    \nstatic inline struct __open_rx_result\
+    \nopen_rx (uint64_t *x, int32_t sx, uint64_t *y, int32_t sy)\
+    \n{\
+    \n  struct __open_rx_result result;\
+    \n  result.__field_0 = x;\
+    \n  result.__field_1 = x;\
+    \n  result.__field_2 = y;\
+    \n  return result;\
+    \n}\
+    \n\
+    \nstatic inline struct __open_shift_sep_result\
+    \nopen_shift_sep (uint64_t *r, uint64_t *x, int32_t sz)\
+    \n{\
+    \n  struct __open_shift_sep_result result;\
+    \n  result.__field_0 = r;\
+    \n  result.__field_1 = x;\
+    \n  return result;\
+    \n}\
+  "
 
   syntax val open_sep "open_sep"
   syntax val open_rx "open_rx"
