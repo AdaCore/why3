@@ -1,27 +1,28 @@
 ### Debug: inferred invariants ###
 (((((forall w1:int.
-      w1 < 0 \/ 2 = (elts a @ w1) /\ (elts a @ w1) = 2 \/ x <= w1) /\
+      w1 < 0 \/
+      2 = (elts a @ w1) /\ (elts a @ w1) = 2 \/ length (make x 2) <= w1) /\
     length (make x 2) = length a) /\
    x = length a) /\
   2 = 2) /\
- x = length a) /\
-x = length (make x 2)
+ length (make x 2) = x) /\
+length (make x 2) = length a
 ###
 ### Debug: inferred invariants ###
 (((forall w2:int.
-    ((((w2 < 0 /\ x1 <= length (make x1 2)) /\
-       length a1 <= length (make x1 2)) /\
-      length (make x1 2) <= x1) /\
-     length (make x1 2) <= length a1) /\
+    ((((w2 < 0 /\ length (make x1 2) <= x1) /\ x1 <= length (make x1 2)) /\
+      length (make x1 2) <= length a1) /\
+     length a1 <= length (make x1 2)) /\
     length (make x1 2) = length a1 \/
-    (((x1 <= x1 /\ 2 <= (elts a1 @ w2)) /\ (elts a1 @ w2) <= 2) /\
+    ((((2 <= (elts a1 @ w2) /\ (elts a1 @ w2) <= 2) /\ x1 <= x1) /\ x1 <= x1) /\
      length (make x1 (elts a1 @ w2)) = length a1) /\
     (elts a1 @ w2) = 2 \/
-    ((((((x1 <= w2 /\ length a1 <= w2) /\ x1 <= length (make x1 2)) /\
-        length a1 <= length (make x1 2)) /\
-       length (make x1 2) <= w2) /\
-      length (make x1 2) <= x1) /\
-     length (make x1 2) <= length a1) /\
+    ((((((length (make x1 2) <= w2 /\ length (make x1 2) <= x1) /\
+         x1 <= length (make x1 2)) /\
+        x1 <= w2) /\
+       length (make x1 2) <= length a1) /\
+      length a1 <= length (make x1 2)) /\
+     length a1 <= w2) /\
     length (make x1 2) = length a1) /\
   x1 = length a1) /\
  length a1 <= x1) /\
@@ -32,67 +33,76 @@ x1 <= length a1
 ###
 ### Debug: inferred invariants ###
 (((((((((forall w4:int.
-          w4 < 0 \/ 10 = (elts a3 @ w4) /\ (elts a3 @ w4) = 10 \/ n <= w4) /\
+          w4 < 0 \/
+          10 = (elts a3 @ w4) /\ (elts a3 @ w4) = 10 \/
+          length (make n 10) <= w4) /\
         (elts a3 @ 5) = b) /\
        5 = 5) /\
       length (make n 10) = length a3) /\
      n = length a3) /\
     10 = 10) /\
-   0 <= n) /\
-  b = (elts a3 @ 5)) /\
- n = length a3) /\
-n = length (make n 10)
+   0 <= length (make n 10)) /\
+  (elts a3 @ 5) = b) /\
+ length (make n 10) = n) /\
+length (make n 10) = length a3
 ###
 ### Debug: inferred invariants ###
 (((((((((forall w5:int.
-          ((((((((((w5 < 0 /\ w5 < n1) /\ w5 < length a4) /\
-                  w5 < length (make n1 10)) /\
-                 n1 <= length (make n1 10)) /\
-                0 <= (n1 + length (make n1 10))) /\
-               length a4 <= length (make n1 10)) /\
-              0 <= (length a4 + length (make n1 10))) /\
-             0 <= length (make n1 10)) /\
-            length (make n1 10) <= n1) /\
-           length (make n1 10) <= length a4) /\
+          ((((((((((0 <= length (make n1 10) /\ w5 < length (make n1 10)) /\
+                   w5 < 0) /\
+                  length (make n1 10) <= n1) /\
+                 0 <= (length (make n1 10) + n1)) /\
+                w5 < n1) /\
+               n1 <= length (make n1 10)) /\
+              length (make n1 10) <= length a4) /\
+             0 <= (length (make n1 10) + length a4)) /\
+            w5 < length a4) /\
+           length a4 <= length (make n1 10)) /\
           length (make n1 10) = length a4 \/
-          ((((((((((((n1 <= n1 /\ 0 <= (n1 + n1)) /\ 0 <= (length a4 + n1)) /\
-                    n1 <= n1) /\
-                   10 <= (n1 + (elts a4 @ w5))) /\
-                  10 <= (length a4 + (elts a4 @ w5))) /\
-                 10 <= (n1 + (elts a4 @ w5))) /\
-                10 <= (elts a4 @ w5)) /\
-               (elts a4 @ w5) <= (10 + n1)) /\
-              (elts a4 @ w5) <= (10 + length a4)) /\
-             (elts a4 @ w5) <= (10 + n1)) /\
-            (elts a4 @ w5) <= 10) /\
+          (((((((((((10 <= (n1 + (elts a4 @ w5)) /\ 10 <= (elts a4 @ w5)) /\
+                    (elts a4 @ w5) <= (10 + n1)) /\
+                   (elts a4 @ w5) <= 10) /\
+                  n1 <= n1) /\
+                 0 <= (n1 + n1)) /\
+                (elts a4 @ w5) <= (10 + n1)) /\
+               10 <= ((elts a4 @ w5) + n1)) /\
+              n1 <= n1) /\
+             (elts a4 @ w5) <= (10 + length a4)) /\
+            10 <= ((elts a4 @ w5) + length a4)) /\
            length (make n1 (elts a4 @ w5)) = length a4) /\
           (elts a4 @ w5) = 10 \/
-          (((((((((((((0 <= w5 /\ 0 <= (w5 + n1)) /\ n1 <= w5) /\
-                     0 <= (w5 + length a4)) /\
-                    length a4 <= w5) /\
-                   0 <= (w5 + length (make n1 10))) /\
-                  n1 <= length (make n1 10)) /\
-                 0 <= (n1 + length (make n1 10))) /\
-                length a4 <= length (make n1 10)) /\
-               0 <= (length a4 + length (make n1 10))) /\
-              0 <= length (make n1 10)) /\
-             length (make n1 10) <= w5) /\
-            length (make n1 10) <= n1) /\
-           length (make n1 10) <= length a4) /\
+          (((((((((((((0 <= length (make n1 10) /\ length (make n1 10) <= w5) /\
+                      0 <= (length (make n1 10) + w5)) /\
+                     0 <= w5) /\
+                    length (make n1 10) <= n1) /\
+                   0 <= (length (make n1 10) + n1)) /\
+                  0 <= (w5 + n1)) /\
+                 n1 <= length (make n1 10)) /\
+                n1 <= w5) /\
+               length (make n1 10) <= length a4) /\
+              0 <= (length (make n1 10) + length a4)) /\
+             0 <= (w5 + length a4)) /\
+            length a4 <= length (make n1 10)) /\
+           length a4 <= w5) /\
           length (make n1 10) = length a4) /\
         (elts a4 @ 5) = b1) /\
        n1 = length a4) /\
-      (elts a4 @ 5) <= b1) /\
-     b1 <= (elts a4 @ 5)) /\
-    length a4 <= n1) /\
-   0 <= length a4) /\
-  0 <= (n1 + length a4)) /\
- n1 <= length a4) /\
+      length a4 <= n1) /\
+     0 <= length a4) /\
+    0 <= (n1 + length a4)) /\
+   n1 <= length a4) /\
+  b1 <= (elts a4 @ 5)) /\
+ (elts a4 @ 5) <= b1) /\
 0 <= n1
 ###
 ### Debug: inferred invariants ###
-(((((length (make n2 10) = length a5 /\ n2 = length a5) /\ 10 = 10) /\ 5 = 5) /\
-  (elts a5 @ 5) = b2) /\
+(((((((forall w6:int.
+        w6 < 0 \/ 10 = (elts a5 @ w6) /\ (elts a5 @ w6) = 10 \/ 0 <= w6) /\
+      (elts a5 @ 5) = b2) /\
+     5 = 5) /\
+    length (make n2 10) = length a5) /\
+   n2 = length a5) /\
+  10 = 10) /\
  0 <= length a5) /\
 0 <= n2
 ###

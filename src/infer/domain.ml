@@ -175,8 +175,12 @@ module Make_from_apron(M:sig
       let n = Lincons1.array_length l in
       let t = ref (Term.t_true) in
       for i = 0 to n - 1 do
-        let v = lincons_to_term (Lincons1.array_get l i) variable_mapping in
-        t := t_and_simp !t v;
+        try
+          (* Sometimes Apron inserts variables that are not
+             referrenced and that are not mapped to Why3 terms. *)
+          let v = lincons_to_term (Lincons1.array_get l i) variable_mapping in
+          t := t_and_simp !t v
+        with Not_found -> ()
       done;
       !t
     in

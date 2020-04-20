@@ -629,7 +629,7 @@ module Make(S:sig
       if Ty.ty_equal (t_type t) ty_int ||
            Ty.ty_equal (t_type t) ty_bool then begin
           let reg_name =
-            Format.asprintf "%d%a" !var_id Pretty.print_term t in
+            Format.asprintf "z%d%a" !var_id Pretty.print_term t in
           let v = Var.of_string reg_name in
           assert (not (Environment.mem_var uf_man.env v));
           ensure_variable uf_man v t;
@@ -638,7 +638,7 @@ module Make(S:sig
       else
         let subv = get_subvalues t None in
         let name_var t1 t2 =
-          Format.asprintf "%d%a.%a"
+          Format.asprintf "z%d%a.%a"
             !var_id Pretty.print_term t1 Pretty.print_term t2 in
         List.iter (fun (t2, _) ->
           let v = Var.of_string (name_var t t2) in
@@ -670,13 +670,13 @@ module Make(S:sig
     match pv.pv_ity.ity_node, (t_type pv_t).ty_node with
     | _ when Ty.ty_equal (t_type pv_t) ty_int ->
       let reg_name =
-        Format.asprintf "%d%a" !var_id print_term pv_t in
+        Format.asprintf "z%d%a" !var_id print_term pv_t in
       let v = Var.of_string reg_name in
       assert (not (Environment.mem_var uf_man.env v));
       ensure_variable uf_man v pv_t;
       uf_man.apron_mapping <- Mterm.add pv_t v uf_man.apron_mapping
     | _ when Ty.ty_equal (t_type pv_t) ty_bool ->
-      let reg_name = Format.asprintf "%d%a" !var_id print_term pv_t in
+      let reg_name = Format.asprintf "z%d%a" !var_id print_term pv_t in
       let v = Var.of_string reg_name in
       assert (not (Environment.mem_var uf_man.env v));
       ensure_variable uf_man v pv_t;
@@ -688,7 +688,7 @@ module Make(S:sig
         let subv_pv = get_subvalues pv_t         (Some reg.reg_its) in
         let proj_list =
           List.fold_left2 (fun acc (t_reg, rs) (t_pv, _) ->
-            let name = Format.asprintf "r$%a.%a" print_reg_name reg
+            let name = Format.asprintf "zr$%a.%a" print_reg_name reg
                          print_term t_reg in
             let var = Var.of_string name in
             ensure_variable uf_man var t_pv;
@@ -708,7 +708,7 @@ module Make(S:sig
     | Ityapp _, _ ->
       let subv = get_subvalues pv_t None in
       List.iter (fun (t, _) ->
-          let name = Format.asprintf "%d%a.%a" !var_id
+          let name = Format.asprintf "z%d%a.%a" !var_id
                        print_pv pv print_term t in
           let var = Var.of_string name in
           ensure_variable uf_man var t;
