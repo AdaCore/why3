@@ -1,0 +1,246 @@
+module M1
+  
+  use int.Int
+  use ref.Refint
+  
+  let f (x: ref int)
+    requires { Int.(<=) (Refint.(!) x) 100 }
+    returns { _ -> ((Refint.(!) x) = 100) } =
+    while Int.(<) (Refint.(!) x) 100 do
+      variant { Int.(-) 100 (Refint.(!) x) } Refint.incr x
+    done
+end
+### Debug: inferred invariants ###
+forall w1:int. contents x <= 100
+###
+Tasks are:
+Task 1: theory Task
+          type int
+          
+          type real
+          
+          type string
+          
+          predicate (=) 'a 'a
+          
+          (* use why3.BuiltIn.BuiltIn *)
+          
+          type bool =
+            | True
+            | False
+          
+          (* use why3.Bool.Bool *)
+          
+          type tuple0 =
+            | Tuple0
+          
+          (* use why3.Tuple0.Tuple01 *)
+          
+          type unit = unit
+          
+          (* use why3.Unit.Unit *)
+          
+          constant zero : int = 0
+          
+          constant one : int = 1
+          
+          function (-_) int : int
+          
+          function (+) int int : int
+          
+          function ( * ) int int : int
+          
+          predicate (<) int int
+          
+          function (-) (x:int) (y:int) : int = x + (- y)
+          
+          predicate (>) (x:int) (y:int) = y < x
+          
+          predicate (<=) (x:int) (y:int) = x < y \/ x = y
+          
+          predicate (>=) (x:int) (y:int) = y <= x
+          
+          Assoc : forall x:int, y:int, z:int. ((x + y) + z) = (x + (y + z))
+          
+          (* clone algebra.Assoc with type t = int, function op = (+),
+            prop Assoc1 = Assoc,  *)
+          
+          Unit_def_l : forall x:int. (zero + x) = x
+          
+          Unit_def_r : forall x:int. (x + zero) = x
+          
+          (* clone algebra.Monoid with type t1 = int, constant unit = zero,
+            function op1 = (+), prop Unit_def_r1 = Unit_def_r,
+            prop Unit_def_l1 = Unit_def_l, prop Assoc2 = Assoc,  *)
+          
+          Inv_def_l : forall x:int. ((- x) + x) = zero
+          
+          Inv_def_r : forall x:int. (x + (- x)) = zero
+          
+          (* clone algebra.Group with type t2 = int, function inv = (-_),
+            constant unit1 = zero, function op2 = (+),
+            prop Inv_def_r1 = Inv_def_r, prop Inv_def_l1 = Inv_def_l,
+            prop Unit_def_r2 = Unit_def_r, prop Unit_def_l2 = Unit_def_l,
+            prop Assoc3 = Assoc,  *)
+          
+          Comm : forall x:int, y:int. (x + y) = (y + x)
+          
+          (* clone algebra.Comm with type t3 = int, function op3 = (+),
+            prop Comm1 = Comm,  *)
+          
+          (* meta AC function (+) *)
+          
+          (* clone algebra.CommutativeGroup with type t4 = int,
+            function inv1 = (-_), constant unit2 = zero, function op4 = (+),
+            prop Comm2 = Comm, prop Inv_def_r2 = Inv_def_r,
+            prop Inv_def_l2 = Inv_def_l, prop Unit_def_r3 = Unit_def_r,
+            prop Unit_def_l3 = Unit_def_l, prop Assoc4 = Assoc,  *)
+          
+          Assoc5 : forall x:int, y:int, z:int. ((x * y) * z) = (x * (y * z))
+          
+          (* clone algebra.Assoc with type t = int, function op = ( * ),
+            prop Assoc1 = Assoc5,  *)
+          
+          Mul_distr_l :
+            forall x:int, y:int, z:int. (x * (y + z)) = ((x * y) + (x * z))
+          
+          Mul_distr_r :
+            forall x:int, y:int, z:int. ((y + z) * x) = ((y * x) + (z * x))
+          
+          (* clone algebra.Ring with type t5 = int, function ( *') = ( * ),
+            function (-'_) = (-_), function (+') = (+),
+            constant zero1 = zero, prop Mul_distr_r1 = Mul_distr_r,
+            prop Mul_distr_l1 = Mul_distr_l, prop Assoc6 = Assoc5,
+            prop Comm3 = Comm, prop Inv_def_r3 = Inv_def_r,
+            prop Inv_def_l3 = Inv_def_l, prop Unit_def_r4 = Unit_def_r,
+            prop Unit_def_l4 = Unit_def_l, prop Assoc7 = Assoc,  *)
+          
+          Comm4 : forall x:int, y:int. (x * y) = (y * x)
+          
+          (* clone algebra.Comm with type t3 = int, function op3 = ( * ),
+            prop Comm1 = Comm4,  *)
+          
+          (* meta AC function ( * ) *)
+          
+          (* clone algebra.CommutativeRing with type t6 = int,
+            function ( *'') = ( * ), function (-''_) = (-_),
+            function (+'') = (+), constant zero2 = zero, prop Comm5 = Comm4,
+            prop Mul_distr_r2 = Mul_distr_r, prop Mul_distr_l2 = Mul_distr_l,
+            prop Assoc8 = Assoc5, prop Comm6 = Comm,
+            prop Inv_def_r4 = Inv_def_r, prop Inv_def_l4 = Inv_def_l,
+            prop Unit_def_r5 = Unit_def_r, prop Unit_def_l5 = Unit_def_l,
+            prop Assoc9 = Assoc,  *)
+          
+          Unitary : forall x:int. (one * x) = x
+          
+          NonTrivialRing : not zero = one
+          
+          (* clone algebra.UnitaryCommutativeRing with type t7 = int,
+            constant one1 = one, function ( *''') = ( * ),
+            function (-'''_) = (-_), function (+''') = (+),
+            constant zero3 = zero, prop NonTrivialRing1 = NonTrivialRing,
+            prop Unitary1 = Unitary, prop Comm7 = Comm4,
+            prop Mul_distr_r3 = Mul_distr_r, prop Mul_distr_l3 = Mul_distr_l,
+            prop Assoc10 = Assoc5, prop Comm8 = Comm,
+            prop Inv_def_r5 = Inv_def_r, prop Inv_def_l5 = Inv_def_l,
+            prop Unit_def_r6 = Unit_def_r, prop Unit_def_l6 = Unit_def_l,
+            prop Assoc11 = Assoc,  *)
+          
+          (* clone relations.EndoRelation with type t8 = int,
+            predicate rel = (<=),  *)
+          
+          Refl : forall x:int. x <= x
+          
+          (* clone relations.Reflexive with type t9 = int,
+            predicate rel1 = (<=), prop Refl1 = Refl,  *)
+          
+          (* clone relations.EndoRelation with type t8 = int,
+            predicate rel = (<=),  *)
+          
+          Trans : forall x:int, y:int, z:int. x <= y -> y <= z -> x <= z
+          
+          (* clone relations.Transitive with type t10 = int,
+            predicate rel2 = (<=), prop Trans1 = Trans,  *)
+          
+          (* clone relations.PreOrder with type t11 = int,
+            predicate rel3 = (<=), prop Trans2 = Trans, prop Refl2 = Refl,
+             *)
+          
+          (* clone relations.EndoRelation with type t8 = int,
+            predicate rel = (<=),  *)
+          
+          Antisymm : forall x:int, y:int. x <= y -> y <= x -> x = y
+          
+          (* clone relations.Antisymmetric with type t12 = int,
+            predicate rel4 = (<=), prop Antisymm1 = Antisymm,  *)
+          
+          (* clone relations.PartialOrder with type t13 = int,
+            predicate rel5 = (<=), prop Antisymm2 = Antisymm,
+            prop Trans3 = Trans, prop Refl3 = Refl,  *)
+          
+          (* clone relations.EndoRelation with type t8 = int,
+            predicate rel = (<=),  *)
+          
+          Total : forall x:int, y:int. x <= y \/ y <= x
+          
+          (* clone relations.Total with type t14 = int,
+            predicate rel6 = (<=), prop Total1 = Total,  *)
+          
+          (* clone relations.TotalOrder with type t15 = int,
+            predicate rel7 = (<=), prop Total2 = Total,
+            prop Antisymm3 = Antisymm, prop Trans4 = Trans,
+            prop Refl4 = Refl,  *)
+          
+          ZeroLessOne : zero <= one
+          
+          CompatOrderAdd :
+            forall x:int, y:int, z:int. x <= y -> (x + z) <= (y + z)
+          
+          CompatOrderMult :
+            forall x:int, y:int, z:int.
+             x <= y -> zero <= z -> (x * z) <= (y * z)
+          
+          (* clone algebra.OrderedUnitaryCommutativeRing with type t16 = int,
+            predicate (<=') = (<=), constant one2 = one,
+            function ( *'''') = ( * ), function (-''''_) = (-_),
+            function (+'''') = (+), constant zero4 = zero,
+            prop CompatOrderMult1 = CompatOrderMult,
+            prop CompatOrderAdd1 = CompatOrderAdd,
+            prop ZeroLessOne1 = ZeroLessOne, prop Total3 = Total,
+            prop Antisymm4 = Antisymm, prop Trans5 = Trans,
+            prop Refl5 = Refl, prop NonTrivialRing2 = NonTrivialRing,
+            prop Unitary2 = Unitary, prop Comm9 = Comm4,
+            prop Mul_distr_r4 = Mul_distr_r, prop Mul_distr_l4 = Mul_distr_l,
+            prop Assoc12 = Assoc5, prop Comm10 = Comm,
+            prop Inv_def_r6 = Inv_def_r, prop Inv_def_l6 = Inv_def_l,
+            prop Unit_def_r7 = Unit_def_r, prop Unit_def_l7 = Unit_def_l,
+            prop Assoc13 = Assoc,  *)
+          
+          (* use int.Int *)
+          
+          type ref 'a =
+            | Ref'mk (contents:'a)
+          
+          (* use why3.Ref.Ref *)
+          
+          function (!) (r:ref 'a) : 'a = contents r
+          
+          (* use ref.Ref1 *)
+          
+          (* use ref.Refint *)
+          
+          goal f'vc :
+            forall x:int.
+             x <= 100 ->
+             x <= 100 /\
+             (forall x1:int.
+               x1 <= 100 ->
+               (if x1 < 100
+                then forall x2:int.
+                      x2 = (x1 + 1) ->
+                      (0 <= (100 - x1) /\ (100 - x2) < (100 - x1)) /\
+                      x2 <= 100
+                else x1 = 100))
+end
+
+On task 1, alt-ergo answers Valid (0.0xs, 8 steps)

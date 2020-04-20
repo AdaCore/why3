@@ -144,9 +144,7 @@ let mod_M1 =
 (* END{code1} *)
 
 (*BEGIN{flags}*)
-let () = Debug.set_flag Infer_cfg.infer_print_ai_result;
-         Debug.set_flag Infer_cfg.infer_print_cfg;
-         Debug.set_flag Infer_loop.print_inferred_invs
+let () = Debug.set_flag Infer_loop.print_inferred_invs
 (*END{flags}*)
 
 let mlw_file = Modules [ mod_M1 ]
@@ -154,8 +152,6 @@ let mlw_file = Modules [ mod_M1 ]
 (* Printing back the mlw file *)
 
 let () = Format.printf "%a@." Mlw_printer.pp_mlw_file mlw_file
-
-let mods = Typing.type_mlw_file env [] "myfile.mlw" mlw_file
 
 let mods =
   try
