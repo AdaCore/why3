@@ -793,13 +793,11 @@ module Print = struct
          then fprintf fmt "@\n%s" s
          else fprintf fmt "%s" s
       | Dstruct (s, lf) ->
-         let s = sprintf "@\nstruct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@]"
-                   s
-                   (print_list newline
-                      (fun fmt (s,ty) -> fprintf fmt "%a %s;"
-                                           (print_ty ~paren:false) ty s))
-                   lf in
-         fprintf fmt "%s" s
+          fprintf fmt "@\nstruct %s {@\n%a};" s
+            (print_list_suf newline
+               (fun fmt (s,ty) -> fprintf fmt "  %a %s;"
+                                    (print_ty ~paren:false) ty s))
+            lf
       | Dstruct_decl s ->
          fprintf fmt "struct %s;@;" s
       | Dinclude (id, Sys) ->
