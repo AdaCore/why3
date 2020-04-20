@@ -88,6 +88,7 @@ module C = struct
     | Dinclude of ident * include_kind
     | Dproto of ident * proto
     | Ddecl of names
+    | Dextern of ty * ident
     | Dstruct of struct_def
     | Dstruct_decl of string
     | Dtypedef of ty * ident
@@ -220,7 +221,7 @@ module C = struct
     | Dinclude (i,k) -> Dinclude (i,k), true
     | Dstruct _ -> raise (Unsupported "struct declaration inside function")
     | Dfun _ -> raise (Unsupported "nested function")
-    | Dtypedef _ | Dproto _ | Dstruct_decl _ -> assert false
+    | Dextern _ | Dtypedef _ | Dproto _ | Dstruct_decl _ -> assert false
 
   and propagate_in_block id v (dl, s) =
     let dl, b = List.fold_left
@@ -792,6 +793,8 @@ module Print = struct
          if global
          then fprintf fmt "@\n%s" s
          else fprintf fmt "%s" s
+      | Dextern (ty, id) ->
+          fprintf fmt "@\nextern %a %a;" (print_ty ~paren:false) ty print_local_ident id
       | Dstruct (s, lf) ->
           fprintf fmt "@\nstruct %s {@\n%a};" s
             (print_list_suf newline
@@ -1637,7 +1640,7 @@ module MLToC = struct
         if header
         then
           if Hid.mem globals rs.rs_name
-          then sdecls@[C.Ddecl (rtype, [rs.rs_name, Enothing])]
+          then sdecls@[C.Dextern (rtype, rs.rs_name)]
           else sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
         else
           let env = { computes_return_value = true;
@@ -1773,6 +1776,7 @@ and stmt s =
 and def (d:definition) = match d with
   | C.Dfun (id,p,(dl, s)) ->  Dfun (id, p, (List.map def dl, stmt s))
   | C.Ddecl (ty, dl) -> C.Ddecl (ty, List.map (fun (id, e) -> id, expr e) dl)
+  | C.Dextern _
   | C.Dproto (_,_) | C.Dstruct _
   | C.Dstruct_decl _ | C.Dtypedef (_,_)
   | C.Dinclude (_,_) -> d
