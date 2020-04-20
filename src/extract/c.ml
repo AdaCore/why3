@@ -88,6 +88,7 @@ module C = struct
     | Dinclude of ident * include_kind
     | Dproto of ident * proto
     | Ddecl of names
+    | Dextern of ty * ident
     | Dstruct of struct_def
     | Dstruct_decl of string
     | Dtypedef of ty * ident
@@ -220,7 +221,7 @@ module C = struct
     | Dinclude (i,k) -> Dinclude (i,k), true
     | Dstruct _ -> raise (Unsupported "struct declaration inside function")
     | Dfun _ -> raise (Unsupported "nested function")
-    | Dtypedef _ | Dproto _ | Dstruct_decl _ -> assert false
+    | Dextern _ | Dtypedef _ | Dproto _ | Dstruct_decl _ -> assert false
 
   and propagate_in_block id v (dl, s) =
     let dl, b = List.fold_left
@@ -549,9 +550,9 @@ module Print = struct
   (* prints the c inline keyword *)
 
   let print_local_ident fmt id =
-    fprintf fmt "%s" (id_unique (Opt.get !local_printer) id)
+    pp_print_string fmt (id_unique (Opt.get !local_printer) id)
   let print_global_ident fmt id =
-    fprintf fmt "%s" (id_unique (Opt.get !global_printer) id)
+    pp_print_string fmt (id_unique (Opt.get !global_printer) id)
 
   let clear_local_printer () = Ident.forget_all (Opt.get !local_printer)
 
@@ -697,7 +698,7 @@ module Print = struct
         gen_syntax_arguments_prec fmt s pr pl
 
   and print_const  fmt = function
-    | Cint (s,_) | Cfloat s -> fprintf fmt "%s" s
+    | Cint (s,_) | Cfloat s -> pp_print_string fmt s
     | Cchar s -> fprintf fmt "'%s'" Constant.(escape char_escape s)
     | Cstring s -> fprintf fmt "\"%s\"" Constant.(escape default_escape s)
   let print_id_init ?(size=None) ~stars fmt ie =
@@ -754,9 +755,9 @@ module Print = struct
       if Sattr.mem c_static_inline id.id_attrs
       then fprintf fmt "static inline "
       else fprintf fmt "" in
-    try match def with
+    match def with
       | Dfun (id,(rt,args),body) ->
-         let s = sprintf "@[@\n@[<hv 2>%a%a %a(@[%a@]) {@\n@[%a@]@]\n}@]"
+          fprintf fmt "@[@\n@[<hv 2>%a%a %a(@[%a@]) {@\n@[%a@]@]\n}@]"
                    print_inline id
                    (print_ty ~paren:false) rt
                    print_global_ident id
@@ -764,42 +765,36 @@ module Print = struct
                       (print_pair_delim nothing space_nolinebreak nothing
                          (print_ty ~paren:false) print_local_ident))
                    args
-                   print_body body in
-         (* print into string first to print nothing in case of exception *)
-         fprintf fmt "%s" s
+                   print_body body
       | Dproto (id, (rt, args)) ->
-         let s = sprintf "@\n%a %a(@[%a@]);"
+          fprintf fmt "@\n%a %a(@[%a@]);"
                    (print_ty ~paren:false) rt
                    print_global_ident id
                    (print_list comma
                       (print_pair_delim nothing space_nolinebreak nothing
                          (print_ty ~paren:false) print_local_ident))
-                   args in
-         fprintf fmt "%s" s
+                   args
       | Ddecl (Tarray(ty, e), lie) ->
-         let s = sprintf "%a @[<hov>%a@];"
+          fprintf fmt "%a @[<hov>%a@];"
                    (print_ty ~paren:false) ty
                    (print_list comma (print_id_init ~stars:0 ~size:(Some e)))
-                   lie in
-         fprintf fmt "%s" s
+                   lie
       | Ddecl (ty, lie) ->
-         let nb, ty = extract_stars ty in
-         assert (nb=0);
-         let s = sprintf "%a @[<hov>%a@];"
+          if global then pp_force_newline fmt ();
+          let nb, ty = extract_stars ty in
+          assert (nb = 0);
+          fprintf fmt "%a @[<hov>%a@];"
                    (print_ty ~paren:false) ty
                    (print_list comma (print_id_init ~stars:nb ~size:None))
-                   lie in
-         if global
-         then fprintf fmt "@\n%s" s
-         else fprintf fmt "%s" s
+                   lie
+      | Dextern (ty, id) ->
+          fprintf fmt "@\nextern %a %a;" (print_ty ~paren:false) ty print_local_ident id
       | Dstruct (s, lf) ->
-         let s = sprintf "@\nstruct %s@ @[<hov>{@;<1 2>@[<hov>%a@]@\n};@]"
-                   s
-                   (print_list newline
-                      (fun fmt (s,ty) -> fprintf fmt "%a %s;"
-                                           (print_ty ~paren:false) ty s))
-                   lf in
-         fprintf fmt "%s" s
+          fprintf fmt "@\nstruct %s {@\n%a};" s
+            (print_list_suf newline
+               (fun fmt (s,ty) -> fprintf fmt "  %a %s;"
+                                    (print_ty ~paren:false) ty s))
+            lf
       | Dstruct_decl s ->
          fprintf fmt "struct %s;@;" s
       | Dinclude (id, Sys) ->
@@ -807,16 +802,8 @@ module Print = struct
       | Dinclude (id, Proj) ->
          fprintf fmt "#include \"%s.h\"" (sanitizer id.id_string)
       | Dtypedef (ty,id) ->
-         let s = sprintf "@[<hov>typedef@ %a@;%a;@]"
-                   (print_ty ~paren:false) ty print_global_ident id in
-         fprintf fmt "%s" s
-    with
-      Unprinted s ->
-       if Debug.test_noflag debug_c_no_error_msgs
-       then
-         Format.eprintf
-           "Could not print declaration of %s. Unsupported: %s@."
-           !current_decl_name s
+          fprintf fmt "@[<hov>typedef@ %a@;%a;@]"
+            (print_ty ~paren:false) ty print_global_ident id
 
   and print_body fmt (def, s) =
     if def = []
@@ -828,8 +815,20 @@ module Print = struct
         fmt (def,s)
 
   let print_global_def fmt def =
-    clear_local_printer ();
-    print_def ~global:true fmt def
+    try
+      clear_local_printer ();
+      let buf = Buffer.create 1024 in
+      let f = formatter_of_buffer buf in
+      print_def ~global:true f def;
+      pp_print_flush f ();
+      pp_print_string fmt (Buffer.contents buf)
+    with
+      Unprinted s ->
+       if Debug.test_noflag debug_c_no_error_msgs
+       then
+         Format.eprintf
+           "Could not print declaration of %s. Unsupported: %s@."
+           !current_decl_name s
 
   let print_file fmt info ast =
     Mid.iter (fun _ sl -> List.iter (fprintf fmt "%s\n") sl) info.thprelude;
@@ -1163,7 +1162,7 @@ module MLToC = struct
           | ILitOct -> Format.fprintf fmt "0%a" (print_in_base 8 None) n
           | ILitDec | ILitUnk ->
              (* default to base 10 *)
-             Format.fprintf fmt "%a" (print_in_base 10 None) n in
+             print_in_base 10 None fmt n in
        let s =
          let i = ity_of_expr e in
          let ts = match (ty_of_ity i) with
@@ -1639,7 +1638,7 @@ module MLToC = struct
         if header
         then
           if Hid.mem globals rs.rs_name
-          then sdecls@[C.Ddecl (rtype, [rs.rs_name, Enothing])]
+          then sdecls@[C.Dextern (rtype, rs.rs_name)]
           else sdecls@[C.Dproto (rs.rs_name, (rtype, params))]
         else
           let env = { computes_return_value = true;
@@ -1775,6 +1774,7 @@ and stmt s =
 and def (d:definition) = match d with
   | C.Dfun (id,p,(dl, s)) ->  Dfun (id, p, (List.map def dl, stmt s))
   | C.Ddecl (ty, dl) -> C.Ddecl (ty, List.map (fun (id, e) -> id, expr e) dl)
+  | C.Dextern _
   | C.Dproto (_,_) | C.Dstruct _
   | C.Dstruct_decl _ | C.Dtypedef (_,_)
   | C.Dinclude (_,_) -> d
@@ -1796,7 +1796,7 @@ let header_border_printer header _args ?old:_ ?fname fmt m =
   if header then
     Format.fprintf fmt "#ifndef %s@\n@." n
   else
-    Format.fprintf fmt "#define %s@\n#endif // %s@." n n
+    Format.fprintf fmt "@\n#define %s@\n#endif // %s@." n n
 
 let print_header_decl args fmt d =
   let cds = MLToC.translate_decl args d ~header:true ~flat:false in
