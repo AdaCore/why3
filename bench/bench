@@ -298,16 +298,16 @@ list_stuff () {
 
 test_mlw_printer () {
     python3 -m sexpdata || return
-    bench_mlw_printer "bench/valid/booleans.mlw" || exit 1
-    bench_mlw_printer "bench/valid/complex_arg_1.mlw" || exit 1
-    bench_mlw_printer "bench/valid/complex_arg_2.mlw" || exit 1
-    bench_mlw_printer "bench/valid/division.mlw" || exit 1
-    bench_mlw_printer "bench/valid/exns.mlw" || exit 1
-    bench_mlw_printer "bench/valid/oldify.mlw" || exit 1
-    bench_mlw_printer "bench/valid/recfun.mlw" || exit 1
-    bench_mlw_printer "bench/valid/see.mlw" || exit 1
-    bench_mlw_printer "bench/valid/type_invariant.mlw" || exit 1
-    bench_mlw_printer "bench/valid/wpcalls.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/booleans.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/complex_arg_1.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/complex_arg_2.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/division.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/exns.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/oldify.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/recfun.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/see.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/type_invariant.mlw" || exit 1
+    bench/test_mlw_printer "bench/valid/wpcalls.mlw" || exit 1
 }
 
 echo "=== Checking stdlib ==="
