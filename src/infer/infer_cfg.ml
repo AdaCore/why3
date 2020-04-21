@@ -12,6 +12,9 @@ let infer_print_cfg =
 let infer_print_ai_result =
   Debug.register_flag "infer-print-ai-result" ~desc:"Print result of Abstract Interpretation"
 
+let print_domains_loop =
+  Debug.register_flag "print-domains-loop" ~desc:"Print domains in loops"
+
 module type INFERCFG = sig
   module QDom : Domain.TERM_DOMAIN
 
@@ -617,9 +620,9 @@ module Make(E: sig
         List.iter (fun (vtx, abs) ->
             let t = QDom.to_term manpk abs in
             printf "acc(%i) -> %a@." vtx Pretty.print_term t) l;
-
+      end;
+    if Debug.test_flag print_domains_loop then begin
         (* Print loop invariants *)
-
         Format.printf "Loop invariants:@.";
         List.iter (fun (expr, cp) ->
             let abs = PSHGraph.attrvertex output cp in
