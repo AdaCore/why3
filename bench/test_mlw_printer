@@ -53,11 +53,14 @@ def trace(path, sexp, sexp1):
 
 def test(filename):
     sexp0 = read(filename)
-    sexp1 = print_and_read(filename)
     try:
+        sexp1 = print_and_read(filename)
         assert_equal([], sexp0, sexp1)
         print("OK:", filename)
         return True
+    except AssertionError:
+        print("CANT REPARSE:", filename)
+        return False
     except NotEqual as e:
         print("FAILED:", filename)
         # sexpdata.dump(trace(e.path, sexp0, e.sexp1), sys.stdout)
