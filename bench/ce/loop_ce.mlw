@@ -1,0 +1,26 @@
+
+
+module M1
+use int.Int
+let ref a = 0
+let ref b = 0
+let f () =
+  a <- -1;
+  a <- 1;
+  b <- 2;
+  while b < 10 do
+    variant { 10 - b }
+    invariant { b - a < 5 }
+    b <- b + a;
+  done
+end
+
+module M2
+  use int.Int
+  let g (ref a: int) ensures { a = old a + 1 } =
+    label X in
+    if a <> 10 then a <- a + 1;
+    assert { a = a at X }
+    
+end
+  

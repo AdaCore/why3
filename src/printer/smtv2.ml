@@ -586,7 +586,7 @@ let print_incremental_axiom info fmt =
     l;
   add_check_sat info fmt
 
-let print_prop_decl vc_loc args info fmt k pr f = match k with
+let print_prop_decl vc_loc vc_attrs args info fmt k pr f = match k with
   | Paxiom ->
       if info.info_incremental then
         info.incr_list <- (pr, f) :: info.incr_list
@@ -612,6 +612,7 @@ let print_prop_decl vc_loc args info fmt k pr f = match k with
 
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
                                 vc_term_loc = vc_loc;
+                                vc_term_attrs = vc_attrs;
                                 queried_terms = model_list;
                                 list_projections = info.list_projs;
                                 list_fields = info.list_field_def;
@@ -685,7 +686,7 @@ let print_sort_decl info fmt (ts,_) =
     (print_ident info) ts.ts_name
     (List.length ts.ts_args)
 
-let print_decl vc_loc args info fmt d =
+let print_decl vc_loc vc_attrs args info fmt d =
   match d.d_node with
   | Dtype ts ->
       print_type_decl info fmt ts
@@ -709,7 +710,7 @@ let print_decl vc_loc args info fmt d =
       "smtv2: inductive definitions are not supported"
   | Dprop (k,pr,f) ->
       if Mid.mem pr.pr_name info.info_syn then () else
-      print_prop_decl vc_loc args info fmt k pr f
+      print_prop_decl vc_loc vc_attrs args info fmt k pr f
 
 let set_produce_models fmt info =
   if info.info_cntexample then
@@ -748,6 +749,7 @@ let print_task version args ?old:_ fmt task =
     not (Theory.Stdecl.is_empty m.Task.tds_set)
   in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
+  let vc_attrs = (Task.task_goal_fmla task).t_attrs in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {
     info_syn = Discriminate.get_syntax_map task;
@@ -784,7 +786,7 @@ let print_task version args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc args info fmt d
+            begin try print_decl vc_loc vc_attrs args info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in
