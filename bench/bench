@@ -296,6 +296,12 @@ list_stuff () {
     fi
 }
 
+test_mlw_printer () {
+    python3 -m sexpdata || return
+    bench/test_mlw_printer bench/valid/*.mlw
+    bench/test_mlw_printer bench/typing/good/*.mlw
+}
+
 echo "=== Checking stdlib ==="
 goods stdlib
 goods stdlib/mach
@@ -467,3 +473,6 @@ echo ""
 
 echo "=== Checking realizations ==="
 exec bench/check_realizations.sh
+
+echo "=== Checking mlw_printer ==="
+test_mlw_printer
