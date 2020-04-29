@@ -1443,6 +1443,7 @@ module MLToC = struct
     | Eassign _ -> raise (Unsupported "assign")
     | Eexn (_,_,e) -> expr info env e
     | Eignore e ->
+       Debug.dprintf debug_c_extraction "Eignore@.";
        [],
        C.Sseq(C.Sblock(expr info {env with computes_return_value = false} e),
               if env.computes_return_value
