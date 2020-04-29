@@ -1592,7 +1592,7 @@ module MLToC = struct
           let s = C.elim_nop s in
           let s = C.elim_empty_blocks s in
           match s with
-          | Sreturn r when params = [] ->
+          | Sreturn r when rs.rs_cty.cty_args = [] ->
              Debug.dprintf debug_c_extraction
                "declaring global %s@." rs.rs_name.id_string;
              Hid.add globals rs.rs_name ();
