@@ -1794,6 +1794,7 @@ let print_decl ~flat =
   ignore old;
   ignore fname;
   ignore m;
+  Print.init_printers args.Pdriver.blacklist;
   if not (Hashtbl.mem memo d)
   then begin
       Hashtbl.add memo d ();
