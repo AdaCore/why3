@@ -11,8 +11,8 @@
 
 {
   open Lexing
-  open Mc_ast
-  open Mc_parser
+  open Cfg_ast
+  open Cfg_parser
 
   exception Lexing_error of string
 
