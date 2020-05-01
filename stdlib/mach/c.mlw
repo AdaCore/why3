@@ -317,6 +317,9 @@ module String [@W:non_conservative_extension:N]
 
   use mach.int.UInt32
 
+  val length (s: string) : uint32
+    ensures { result = String.length s }
+
   val strlen (p: ptr char) : uint32
     requires { valid_string p }
     ensures  { result = strlen (pelts p) (offset p) }
