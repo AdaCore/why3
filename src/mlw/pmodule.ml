@@ -785,11 +785,15 @@ let clone_cty cl sm ?(drop_decr=false) cty =
     let sof_reg' = Spv.of_list s'.its_ofields in
     let sof_reg = Spv.of_list reg.reg_its.its_ofields in
     let sof_ref = Spv.fold add_fd sof_reg Spv.empty in
-    let sbs = its_match_regs s' reg'.reg_args reg'.reg_regs in
-    let add_reg m r = if Sreg.mem r frz then m else
-      Mreg.add r (Spv.of_list r.reg_its.its_mfields) m in
-    let add_fd f m = ity_exp_fold add_reg m (ity_full_inst sbs f.pv_ity) in
-    Spv.fold add_fd (Spv.diff sof_reg' sof_ref) m in
+    let rec add_ofds r ofds m = if Spv.is_empty ofds then m else
+      let sbs = its_match_regs r.reg_its r.reg_args r.reg_regs in
+      let add_ofd f m =
+        ity_exp_fold add_ofd_reg m (ity_full_inst sbs f.pv_ity) in
+      Spv.fold add_ofd ofds m
+    and add_ofd_reg m r = if Sreg.mem r frz then m else
+      add_ofds r (Spv.of_list r.reg_its.its_ofields)
+        (Mreg.add r (Spv.of_list r.reg_its.its_mfields) m) in
+    add_ofds reg' (Spv.diff sof_reg' sof_ref) m in
   let writes = Mreg.fold add_write cty.cty_effect.eff_writes Mreg.empty in
   let add_reset reg s = Sreg.add (clone_reg cl reg) s in
   let resets = Sreg.fold add_reset cty.cty_effect.eff_resets Sreg.empty in
