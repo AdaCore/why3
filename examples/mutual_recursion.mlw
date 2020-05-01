@@ -18,13 +18,13 @@ with f2 (n: int) : int
 
 (** Hofstadter's Female and Male sequences *)
 
-let rec f (n: int) : int
+let rec function f (n: int) : int
   requires { 0 <= n }
   variant  { n, 1 }
-  ensures  { 1 <= result <= n + 1 }
+  ensures  { if n = 0 then result = 1  else 1 <= result <= n }
 = if n = 0 then 1 else n - m (f (n - 1))
 
-with m (n: int) : int
+with function m (n: int) : int
   requires { 0 <= n }
   variant  { n, 0 }
   ensures  { if n = 0 then result = 0 else 0 <= result < n }
