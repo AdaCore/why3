@@ -157,11 +157,9 @@ module Editor =
 
     let () =
       let editor_theme : Js.js_string Js.t = get_global "editor_theme" in
-      let editor_mode : Js.js_string Js.t = get_global "editor_mode" in
       let task_viewer_mode : Js.js_string Js.t = get_global "task_viewer_mode" in
 
       editor ## setTheme editor_theme;
-      editor ## getSession ## setMode editor_mode;
       JSU.(set editor (Js.string "$blockScrolling") _Infinity);
 
       task_viewer ## setTheme editor_theme;
@@ -325,13 +323,23 @@ module FormatList = struct
 
   let formats = ref []
 
+  let change_mode ext =
+    let mode =
+      match ext with
+      | "py" -> "python"
+      | "c" -> "c_cpp"
+      | _ -> "why3" in
+    let mode = "ace/mode/" ^ mode in
+    Editor.editor ## getSession ## setMode (Js.string mode)
+
   let handle _ =
     let i = select_format ##. selectedIndex in
     if i > 0 then
       begin match List.nth_opt !formats (i - 1) with
       | Some (name, ext :: _) ->
           Editor.name := Js.string ("test." ^ ext);
-          selected_format := name
+          selected_format := name;
+          change_mode ext
       | Some (name, []) -> selected_format := name
       | _ -> selected_format := ""
       end;
@@ -360,7 +368,8 @@ module FormatList = struct
       | [] -> ("", 0) in
     let (name, idx) = aux 1 !formats in
     selected_format := name;
-    select_format ##. selectedIndex := idx
+    select_format ##. selectedIndex := idx;
+    change_mode ext
 
   let add_formats l =
     let fresh = !formats = [] in

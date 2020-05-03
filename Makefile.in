@@ -1753,7 +1753,10 @@ TRYWHY3_PACK = \
 	trywhy3.js trywhy3.html trywhy3.css \
 	README.md examples/ \
 	trywhy3_custom.css gen_index.sh \
-	ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
+	ace-builds/src-min-noconflict/ace.js \
+	ace-builds/src-min-noconflict/mode-why3.js \
+	ace-builds/src-min-noconflict/mode-python.js \
+	ace-builds/src-min-noconflict/mode-c_cpp.js \
 	ace-builds/src-min-noconflict/theme-chrome.js $(JS_MAPS)
 
 trywhy3.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_PACK))
