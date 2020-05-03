@@ -1758,7 +1758,7 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/
 		`find src/trywhy3/examples \( -name "*.mlw" -o -name "*.why" \) -printf " --file=examples/%P:/examples/%P"` \
 	$<
 
-src/trywhy3/trywhy3.byte: src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
+src/trywhy3/trywhy3.byte: src/trywhy3/bindings.cmo src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
 	$(JSOCAMLC) -o $@ -linkpkg $^
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/try_alt_ergo.drv
@@ -1767,7 +1767,7 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/try_alt_erg
 		`find stdlib \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/%p"` \
 	+dynlink.js +toplevel.js $<
 
-src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
+src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/bindings.cmo src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
 	$(JSOCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
@@ -1777,7 +1777,7 @@ src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src
 	$(JSOCAMLC) -o $@ -package num -package dynlink -package str -package unix -package camlzip -linkpkg $^
 
 src/trywhy3/alt_ergo_worker.cmo: src/trywhy3/worker_proto.cmo
-src/trywhy3/why3_worker.cmo: src/trywhy3/worker_proto.cmo
+src/trywhy3/why3_worker.cmo: src/trywhy3/bindings.cmo src/trywhy3/worker_proto.cmo
 src/trywhy3/trywhy3.cmo: src/trywhy3/worker_proto.cmo
 
 src/trywhy3/%.cmo: src/trywhy3/%.ml

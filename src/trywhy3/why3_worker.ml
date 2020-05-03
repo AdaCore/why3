@@ -17,6 +17,7 @@ let why3_conf_file = "/trywhy3.conf"
 open Why3
 open Format
 open Worker_proto
+open Bindings
 
 module Sys_js = Js_of_ocaml.Sys_js
 module Worker = Js_of_ocaml.Worker

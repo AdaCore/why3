@@ -9,7 +9,7 @@
 (*                                                                  *)
 (********************************************************************)
 
-open Js_of_ocaml
+module Js = Js_of_ocaml.Js
 
 type id = string
 type loc = int * int * int * int
@@ -44,9 +44,3 @@ let unmarshal a =
 let status_of_result = function
     (id, Valid) -> SetStatus(`Valid, id)
   | (id, _) -> SetStatus(`Unknown, id)
-
-let log s = ignore (Firebug.console ## log (Js.string s))
-let log_time s =
-  let date = new%js Js.date_now in
-  let date_str = string_of_float (date ## getTime /. 1000.) in
-  log (date_str ^ " : " ^ s)

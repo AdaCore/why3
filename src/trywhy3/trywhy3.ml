@@ -11,6 +11,7 @@
 
 (* simple helpers *)
 open Worker_proto
+open Bindings
 
 module Js = Js_of_ocaml.Js
 module JSU = Js_of_ocaml.Js.Unsafe
@@ -120,77 +121,7 @@ let addMouseEventListener prevent o e f =
 			   inject cb;
 			   inject Js._false |])
 
-
-module Ace =
-  struct
-    open Js
-
-    type marker
-
-    class type annotation =
-      object
-        method row : int readonly_prop
-        method column : int readonly_prop
-        method text : js_string t readonly_prop
-        method _type : js_string t readonly_prop
-      end
-
-    class type range =
-      object
-      end
-
-    class type selection =
-      object
-        method setSelectionRange : range t -> bool t -> unit meth
-      end
-
-    class type editSession =
-      object
-        method addMarker : range t -> js_string t -> js_string t -> bool t -> marker meth
-        method clearAnnotations : unit meth
-        method getLength : int meth
-        method removeMarker : marker -> unit meth
-        method setAnnotations : annotation t js_array t -> unit meth
-        method setMode : js_string t -> unit meth
-      end
-
-    class type editor =
-      object
-        method focus : unit meth
-        method getSelection : selection t meth
-        method getSession : editSession t meth
-        method getValue : js_string t meth
-        method gotoLine : int -> int -> bool t -> unit meth
-        method redo : unit meth
-        method setReadOnly : bool t -> unit meth
-        method setTheme : js_string t -> unit meth
-        method setValue : js_string t -> int -> unit meth
-        method undo : unit meth
-      end
-
-    class type ace =
-      object
-        method edit : js_string t -> editor t optdef meth
-      end
-
-    let ace : ace Js.t = get_global "ace"
-    let edit s = ace ## edit s
-
-    let range : (int -> int -> int -> int -> range Js.t) Js.constr =
-      let r =
-	JSU.(get (meth_call ace "require" [| inject (Js.string "ace/range") |])
-		 (Js.string "Range"))
-      in
-      check_def "Range" r
-
-    let annotation row col text kind : annotation t =
-      object%js
-        val row = row
-        val column = col
-        val text = text
-        val _type = kind
-      end
-  end
+module Ace = Ace ()
 
 module Editor =
   struct
