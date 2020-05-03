@@ -128,7 +128,6 @@ module Ace = Ace ()
 module Editor =
   struct
     let name = ref (Js.string "")
-    let saved = ref false
 
     let editor =
       let e = Ace.edit (Js.string "why3-editor") in
@@ -178,7 +177,8 @@ module Editor =
       editor ## getValue
 
     let set_value ?(editor=editor) str =
-      editor ## setValue str ~-1
+      editor ## setValue str ~-1;
+      editor ## getSession ## getUndoManager ## reset
 
     let mk_range l1 c1 l2 c2 =
       new%js Ace.range l1 c1 l2 c2
@@ -234,7 +234,7 @@ module Editor =
 
 
       let confirm_unsaved () =
-        if not !saved then
+        if Js.to_bool (editor ## getSession ## getUndoManager ## hasUndo) then
           Js.to_bool
             (Dom_html.window ## confirm (Js.string "You have unsaved changes in your editor, proceed anyway ?"))
         else
@@ -565,7 +565,6 @@ module TaskList =
       Editor.set_on_event "change"
         (Js.wrap_callback (fun () ->
              clear ();
-             Editor.saved := false;
              ExampleList.unselect ();
              Editor.clear_annotations ();
              Editor.update_error_marker None))

@@ -38,11 +38,19 @@ module Ace () = struct
       method setSelectionRange : range t -> bool t -> unit meth
     end
 
+  class type undoManager =
+    object
+      method hasRedo : bool t meth
+      method hasUndo : bool t meth
+      method reset : unit meth
+    end
+
   class type editSession =
     object
       method addMarker : range t -> js_string t -> js_string t -> bool t -> marker meth
       method clearAnnotations : unit meth
       method getLength : int meth
+      method getUndoManager : undoManager t meth
       method removeMarker : marker -> unit meth
       method setAnnotations : annotation t js_array t -> unit meth
       method setMode : js_string t -> unit meth
