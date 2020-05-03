@@ -314,6 +314,7 @@ module ContextMenu =
 module FormatList = struct
 
   let select_format = getElement AsHtml.select "why3-select-format"
+  let format_label = getElement AsHtml.span "why3-format-label"
 
   let selected_format = ref ""
 
@@ -375,6 +376,7 @@ module FormatList = struct
     let fresh = !formats = [] in
     formats := l;
     List.iter (fun (name, _) -> add_format name) l;
+    format_label ##. className := Js.string "fas fa-code why3-icon";
     if fresh then
       if !selected_format <> "" then
         resolve_format (Js.string !selected_format)
@@ -398,7 +400,7 @@ module ExampleList =
     let set_loading_label b =
       select_example ##. disabled := Js.bool b;
       if b then
-        example_label ##. className := Js.string "fas fa-spin fa-refresh why3-icon"
+        example_label ##. className := Js.string "fas fa-spin fa-spinner why3-icon"
       else
         example_label ##. className := Js.string "fas fa-book why3-icon"
 
