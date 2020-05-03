@@ -346,13 +346,13 @@ let why3_execute modules =
 
 let () = Sys_js.create_file ~name:temp_file_name ~content:""
 
-let why3_run f lang code =
+let why3_run f format lang code =
   try
     let ch = open_out temp_file_name in
     output_string ch code;
     close_out ch;
 
-    let (theories, _) = Env.read_file lang env temp_file_name in
+    let (theories, _) = Env.read_file ~format lang env temp_file_name in
     W.send (Warning !Task.warnings);
     f theories
   with
@@ -367,27 +367,30 @@ let why3_run f lang code =
 		      "unexpected exception: %a (%s)" Exn_printer.exn_printer e
 		      (Printexc.to_string e)))
 
+let handle_message = function
+  | Transform (`Split, id) -> why3_split id
+  | Transform (`Prove(steps), id) -> why3_prove ~steps id
+  | Transform (`Clean, id) -> why3_clean id
+  | ProveAll -> why3_prove_all ()
+  | ParseBuffer (format, code) ->
+      Task.clear_warnings ();
+      Task.clear_table ();
+      why3_run why3_parse_theories format Env.base_language code
+  | ExecuteBuffer (format, code) ->
+      Task.clear_warnings ();
+      Task.clear_table ();
+      why3_run why3_execute format Pmodule.mlw_language code
+  | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)
+  | GetFormats ->
+      let formats = Env.list_formats Env.base_language in
+      let formats = List.map (fun (name, ext, _) -> (name, ext)) formats in
+      W.send (Formats formats)
+
 
 let () =
-  W.set_onmessage
-    (fun msg ->
-     let () =
-       match msg with
-       | Transform (`Split, id) -> why3_split id
-       | Transform (`Prove(steps), id) -> why3_prove ~steps id
-       | Transform (`Clean, id) -> why3_clean id
-       | ProveAll -> why3_prove_all ()
-       | ParseBuffer code ->
-          Task.clear_warnings ();
-          Task.clear_table ();
-          why3_run why3_parse_theories Env.base_language code
-       | ExecuteBuffer code ->
-          Task.clear_warnings ();
-	  Task.clear_table ();
-	  why3_run why3_execute Pmodule.mlw_language code
-       | SetStatus (st, id) -> List.iter W.send (Task.set_status id st)
-     in
-     W.send Idle
+  W.set_onmessage (fun msg ->
+      handle_message msg;
+      W.send Idle
     )
 (*
 Local Variables:

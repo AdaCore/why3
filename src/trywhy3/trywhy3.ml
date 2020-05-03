@@ -25,8 +25,10 @@ module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
 let get_opt o = Js.Opt.get o (fun () -> assert false)
 
 let check_def s o =
-  Js.Optdef.get o (fun () -> log ("Object " ^ s ^ " is undefined or null");
-			     assert false)
+  Js.Optdef.get o (fun () ->
+      log ("Object " ^ s ^ " is undefined or null");
+      assert false)
+
 let get_global ident =
   let res : 'a Js.optdef = JSU.(get global) (Js.string ident) in
   check_def ident res
@@ -46,12 +48,12 @@ module XHR =
 
     let load_embedded_files =
       Js.to_bool (get_global "load_embedded_files") ||
-	Js.to_string (Dom_html.window ##. location ##. protocol) = "file:"
+        Js.to_string (Dom_html.window ##. location ##. protocol) = "file:"
 
     let make_url =
       if load_embedded_files then
-	fun u ->
-	Js.string (blob_url_of_string ("/" ^ (Js.to_string u)))
+        fun u ->
+        Js.string (blob_url_of_string ("/" ^ (Js.to_string u)))
       else fun u -> u
 
     let update_file ?(date=0.) cb url =
@@ -60,7 +62,7 @@ module XHR =
         Js.wrap_callback
           (fun () ->
            if xhr ##. readyState == DONE then
-	     if xhr ##. status = 200 || (xhr ##. status = 0 && load_embedded_files) then
+             if xhr ##. status = 200 || (xhr ##. status = 0 && load_embedded_files) then
                let date_str = Js.Opt.get (xhr ## getResponseHeader (Js.string "Last-Modified"))
                                          (fun () -> Js.string "01/01/2100") (* far into the future *)
                in
@@ -73,7 +75,7 @@ module XHR =
                             Js.wrap_callback
                               (fun () ->
                                if xhr ##. readyState == DONE then
-	                         if xhr ##. status = 200 then
+                                 if xhr ##. status = 200 then
                                    cb (`New xhr ##. responseText)
                                  else
                                    cb `NotFound)
@@ -110,16 +112,16 @@ let getElement cast id =
     assert false
 
 let addMouseEventListener prevent o e f =
-  let cb = Js.wrap_callback
-	     (fun (e : Dom_html.mouseEvent Js.t) ->
-	      if prevent then Dom.preventDefault e;
-	      f e;
-	      Js._false)
-  in
+  let cb =
+    Js.wrap_callback (fun (e : Dom_html.mouseEvent Js.t) ->
+        if prevent then Dom.preventDefault e;
+        f e;
+        Js._false
+      ) in
   ignore JSU.(meth_call o "addEventListener"
-			[| inject (Js.string e);
-			   inject cb;
-			   inject Js._false |])
+                [| inject (Js.string e);
+                   inject cb;
+                   inject Js._false |])
 
 module Ace = Ace ()
 
@@ -138,7 +140,7 @@ module Editor =
 
     let set_annotations l =
       let a =
-	Array.map (fun (r,c,t,k) -> Ace.annotation r c t k) (Array.of_list l)
+        Array.map (fun (r,c,t,k) -> Ace.annotation r c t k) (Array.of_list l)
       in
       let a = Js.array a in
       editor ## getSession ## setAnnotations a
@@ -217,8 +219,8 @@ module Editor =
       mk_range (l1-1) c1 (l2-1) c2
 
       let set_on_event e f =
-	ignore JSU.(meth_call editor "on" [| inject (Js.string e);
-					   inject f|])
+        ignore JSU.(meth_call editor "on"
+                      [| inject (Js.string e); inject f|])
 
 
       let editor_bg = getElement AsHtml.div "why3-editor-bg"
@@ -240,34 +242,39 @@ module Editor =
         else
           true
 
+    let error_marker = ref None
+
+    let update_error_marker new_m =
+      begin match !error_marker with
+      | Some (m, _) -> remove_marker m
+      | None -> ()
+      end;
+      error_marker := new_m
+
   end
 
-module Tabs =
-  struct
+module Tabs = struct
 
-    let () =
-      let tab_groups = select Dom_html.document ".why3-tab-group" in
-      List.iter
-	(fun tab_group ->
-	 let labels = select tab_group ".why3-tab-label" in
-	 List.iter
-	     (fun tab ->
-	      tab ##. onclick :=
-		Dom.handler
-                    (fun _ev ->
-                   let () = if Js.to_bool
-                       (tab ##. classList ## contains (Js.string "why3-inactive")) then
-		       List.iter
-	                  (fun t ->
-                            ignore (t ##. classList ## toggle (Js.string "why3-inactive")))
-		            labels
-                   in
-		   Js._false)
-      ) labels)
+  let () =
+    let tab_groups = select Dom_html.document ".why3-tab-group" in
+    List.iter (fun tab_group ->
+        let labels = select tab_group ".why3-tab-label" in
+        List.iter (fun tab ->
+            tab ##. onclick :=
+              Dom.handler (fun _ev ->
+                  let () =
+                    if Js.to_bool (tab ##. classList ## contains (Js.string "why3-inactive")) then
+                      List.iter (fun t ->
+                          ignore (t ##. classList ## toggle (Js.string "why3-inactive"))
+                        ) labels in
+                  Js._false)
+          ) labels)
       tab_groups
-    let focus id =
-      (Dom_html.getElementById id) ## click
-  end
+
+  let focus id =
+    (Dom_html.getElementById id) ## click
+
+end
 
 module ContextMenu =
   struct
@@ -289,21 +296,91 @@ module ContextMenu =
           task_menu ##. style ##. left := Js.string ((string_of_int x) ^ "px");
           task_menu ##. style ##. top := Js.string ((string_of_int y) ^ "px")
         end
+
     let hide () =
       if !enabled then
         task_menu ##. style ##. display := Js.string "none"
 
     let add_action b f =
-      b ##. onclick := Dom.handler (fun _ ->
-				   hide ();
-				   f ();
-				   Editor.editor ## focus;
-				   Js._false)
-    let () = addMouseEventListener false task_menu "mouseleave"
-	(fun _ -> hide())
+      b ##. onclick :=
+        Dom.handler (fun _ ->
+            hide ();
+            f ();
+            Editor.editor ## focus;
+            Js._false)
 
+    let () = addMouseEventListener false task_menu "mouseleave" (fun _ -> hide())
 
   end
+
+module FormatList = struct
+
+  let select_format = getElement AsHtml.select "why3-select-format"
+
+  let selected_format = ref ""
+
+  let unselect () =
+    selected_format := "";
+    select_format ##. selectedIndex := 0
+
+  let formats = ref []
+
+  let handle _ =
+    let i = select_format ##. selectedIndex in
+    if i > 0 then
+      begin match List.nth_opt !formats (i - 1) with
+      | Some (name, ext :: _) ->
+          Editor.name := Js.string ("test." ^ ext);
+          selected_format := name
+      | Some (name, []) -> selected_format := name
+      | _ -> selected_format := ""
+      end;
+    Js._false
+
+  let () =
+    select_format ##. onchange := Dom.handler handle
+
+  let add_format text =
+    let option = Dom_html.createOption Dom_html.document in
+    option ##. value := Js.string text;
+    option ##. innerHTML := Js.string text;
+    Dom.appendChild select_format option
+
+  let resolve_format name =
+    let ext =
+      let arr = name ## split (Js.string ".") in
+      let arr = Js.to_array (Js.str_array arr) in
+      let l = Array.length arr in
+      if l = 0 then ""
+      else Js.to_string (arr.(l - 1)) in
+    let rec aux i = function
+      | (name, exts) :: l ->
+          if List.mem ext exts then (name, i)
+          else aux (i + 1) l
+      | [] -> ("", 0) in
+    let (name, idx) = aux 1 !formats in
+    selected_format := name;
+    select_format ##. selectedIndex := idx
+
+  let add_formats l =
+    let fresh = !formats = [] in
+    formats := l;
+    List.iter (fun (name, _) -> add_format name) l;
+    if fresh then
+      if !selected_format <> "" then
+        resolve_format (Js.string !selected_format)
+      else
+        let () = select_format ##. selectedIndex := 1 in
+        ignore (handle ())
+
+  let enable () =
+    select_format ##. disabled := Js._false
+
+  let disable () =
+    select_format ##. disabled := Js._true
+
+end
+
 module ExampleList =
   struct
 
@@ -312,47 +389,50 @@ module ExampleList =
     let set_loading_label b =
       select_example ##. disabled := Js.bool b;
       if b then
-	example_label ##. className := Js.string "fas fa-spin fa-refresh why3-icon"
+        example_label ##. className := Js.string "fas fa-spin fa-refresh why3-icon"
       else
-	example_label ##. className := Js.string "fas fa-book why3-icon"
+        example_label ##. className := Js.string "fas fa-book why3-icon"
 
     let selected_index = ref 0
     let unselect () =
       selected_index := 0;
       select_example ##. selectedIndex := 0
 
-    let () =
+    let handle () =
+      let filename url =
+        let arr = url ## split (Js.string "/") in
+        let arr = Js.to_array (Js.str_array arr) in
+        arr.(Array.length arr - 1) in
       let sessionStorage =
         check_def "sessionStorage" (Dom_html.window ##. sessionStorage) in
-      let filename url =
-	let arr = url ## split (Js.string "/") in
-	let arr = Js.to_array (Js.str_array arr) in
-	arr.(Array.length arr - 1)
-      in
-      select_example ##. onchange :=
-	Dom.handler (fun _ ->
-                     if Editor.confirm_unsaved () then begin
-                         selected_index := select_example ##. selectedIndex;
-		         let url = select_example ##. value in
-		         let name = filename url in
-		         begin
-		           match Js.Opt.to_option (sessionStorage ## getItem (url)) with
-			     Some s -> Editor.set_value s; Editor.name := name
-		           | None ->
-                  let upd mlw =
-                    sessionStorage ## setItem url mlw;
-                    Editor.name := name;
-                    Editor.set_value mlw;
-                    set_loading_label false
-                  in
-                  XHR.update_file (function `New mlw -> Js.Opt.iter mlw upd
-                                          | _ -> ()) url
-             end
-                       end
-                     else
-                       select_example ##. selectedIndex := !selected_index;
-		     Js._false
-		    )
+      selected_index := select_example ##. selectedIndex;
+      let url = select_example ##. value in
+      let name = filename url in
+      FormatList.resolve_format name;
+      begin match Js.Opt.to_option (sessionStorage ## getItem (url)) with
+      | Some s ->
+          Editor.set_value s;
+          Editor.name := name
+      | None ->
+          let upd mlw =
+            sessionStorage ## setItem url mlw;
+            Editor.name := name;
+            Editor.set_value mlw;
+            set_loading_label false
+          in
+          XHR.update_file (function
+              | `New mlw -> Js.Opt.iter mlw upd
+              | _ -> ()) url
+      end
+
+    let handle _ =
+      if Editor.confirm_unsaved () then handle ()
+      else select_example ##. selectedIndex := !selected_index;
+      Js._false
+
+    let () =
+      select_example ##. onchange := Dom.handler handle
+
     let add_example text url =
       let option = Dom_html.createOption Dom_html.document in
       option ##. value := url;
@@ -368,7 +448,6 @@ module ExampleList =
 
 module TaskList =
   struct
-
 
     let task_list = getElement AsHtml.div "why3-task-list"
 
@@ -390,15 +469,15 @@ module TaskList =
 
     let mk_li_content id expl =
       Js.string (Format.sprintf
-		   "<span id='%s_container'><span id='%s_icon'></span> %s <span id='%s_msg'></span></span><ul id='%s_ul'></ul>"
-		   id id expl id id)
+                   "<span id='%s_container'><span id='%s_icon'></span> %s <span id='%s_msg'></span></span><ul id='%s_ul'></ul>"
+                   id id expl id id)
 
     let clean_task id =
       try
-	let ul = getElement_exn AsHtml.ul (id ^ "_ul") in
-	ul ##. innerHTML := Js.string ""
+        let ul = getElement_exn AsHtml.ul (id ^ "_ul") in
+        ul ##. innerHTML := Js.string ""
       with
-	Not_found -> ()
+        Not_found -> ()
 
     let attach_to_parent id parent_id expl _loc =
       let doc = Dom_html.document in
@@ -446,113 +525,100 @@ module TaskList =
       task_list ##. innerHTML := Js.string "";
       Editor.set_value ~editor:Editor.task_viewer (Js.string "")
 
-    let error_marker = ref None
-
-    let update_error_marker new_m =
-      begin match !error_marker with
-      | Some (m, _) -> Editor.remove_marker m
-      | None -> ()
-      end;
-      error_marker := new_m
+    let add_task id parent_id expl locs pretty =
+      attach_to_parent id (parent_id ^ "_ul") expl locs;
+      let span = getElement AsHtml.span (id ^ "_container") in
+      let buffer = Editor.get_value () in
+      let locs =
+        List.map (fun (k, loc) -> k, Editor.why3_loc_to_range buffer loc) locs in
+      span ##. onclick :=
+        Dom.handler (fun ev ->
+            let ctrl = Js.to_bool (ev ##. ctrlKey) in
+            if is_selected id then
+              if ctrl then deselect_task id
+              else clear_task_selection ()
+            else
+              begin
+                if not ctrl then clear_task_selection ();
+                select_task id span locs pretty
+              end;
+            Js._false);
+      addMouseEventListener true span "contextmenu" (fun e ->
+          clear_task_selection ();
+          select_task id span locs pretty;
+          let x = max 0 (e ##. clientX - 2) in
+          let y = max 0 (e ##. clientY - 2) in
+          ContextMenu.show_at x y)
 
     let () =
-      Editor.set_on_event
-        "change"
-        (Js.wrap_callback (fun () -> clear ();
-                                  Editor.saved := false;
-                                  ExampleList.unselect ();
-				  Editor.clear_annotations ();
-                                  update_error_marker None))
+      Editor.set_on_event "change"
+        (Js.wrap_callback (fun () ->
+             clear ();
+             Editor.saved := false;
+             ExampleList.unselect ();
+             Editor.clear_annotations ();
+             Editor.update_error_marker None))
 
     let () =
       Editor.set_on_event
         "focus"
         (Js.wrap_callback  clear_task_selection )
 
-
-    let print_why3_output o =
-      let doc = Dom_html.document in
-      (* see why3_worker.ml *)
-      match o with
-      | Idle | Warning [] -> ()
-      | Warning lst ->
-         let annot =
-           List.map (fun ((l1, c1), msg) ->
-                     (l1,c1, Js.string msg, Js.string "warning")) lst
-         in
-         Editor.set_annotations annot
-
-      | Error s -> print_error s
-
-      | ErrorLoc ((l1, b, l2, e), s) ->
-         let r = Editor.mk_range l1 b l2 e in
-         update_error_marker (Some (Editor.add_marker "why3-error" r, r));
-         print_error s;
-	 Editor.set_annotations [ (l1, b, Js.string s, Js.string "error") ]
-
-      | Result sl ->
-         clear ();
-         let ul = Dom_html.createUl doc in
-         Dom.appendChild task_list ul;
-         List.iter (fun (s : string) ->
-                    let li = Dom_html.createLi doc in
-                    li ##. innerHTML := (Js.string s);
-                    Dom.appendChild ul li;) sl
-
-      | Theory (th_id, th_name) ->
-	 attach_to_parent th_id "why3-theory-list" th_name []
-
-      | Task (id, parent_id, expl, _code, locs, pretty, _) ->
-	 begin
-	   try
-	     ignore (Dom_html.getElementById id)
-	   with Not_found ->
-		attach_to_parent id (parent_id ^ "_ul") expl locs;
-		let span = getElement AsHtml.span (id ^ "_container") in
-                let buffer = Editor.get_value () in
-                let locs =
-		  List.map (fun (k, loc) -> k, Editor.why3_loc_to_range buffer loc) locs
-		in
-		span ##. onclick :=
-		  Dom.handler
-		    (fun ev ->
-		     let ctrl = Js.to_bool (ev ##. ctrlKey) in
-		     if is_selected id then
-                       if ctrl then deselect_task id else
-			 clear_task_selection ()
-		     else begin
-			 if not ctrl then clear_task_selection ();
-                         select_task id span locs pretty
-                       end;
-		     Js._false);
-		addMouseEventListener
-		  true span "contextmenu"
-		  (fun e ->
-		   clear_task_selection ();
-                   select_task id span locs pretty;
-		   let x = max 0 (e ##. clientX - 2) in
-		   let y = max 0 (e ##. clientY - 2) in
-		   ContextMenu.show_at x y)
-	 end
-
-
-
-      | UpdateStatus(st, id) ->
-         try
-           let span_icon = getElement AsHtml.span (id ^ "_icon") in
-	   let span_msg = getElement AsHtml.span (id ^ "_msg") in
-           let cls =
-             match st with
-               `New -> "fas fa-fw fa-cog fa-spin fa-fw why3-task-pending"
-             | `Valid -> span_msg ##. innerHTML := Js.string "";
-			 "fas fa-check-circle why3-task-valid"
-             | `Unknown -> "fas fa-question-circle why3-task-unknown"
-           in
-           span_icon ##. className := Js.string cls
-         with
-           Not_found -> ()
-
   end
+
+let handle_why3_message o =
+  let doc = Dom_html.document in
+  match o with
+  | Idle | Warning [] -> ()
+  | Warning lst ->
+      let annot =
+        List.map (fun ((l1, c1), msg) ->
+            (l1,c1, Js.string msg, Js.string "warning")) lst
+      in
+      Editor.set_annotations annot
+
+  | Error s -> TaskList.print_error s
+
+  | ErrorLoc ((l1, b, l2, e), s) ->
+      let r = Editor.mk_range l1 b l2 e in
+      Editor.update_error_marker (Some (Editor.add_marker "why3-error" r, r));
+      TaskList.print_error s;
+      Editor.set_annotations [ (l1, b, Js.string s, Js.string "error") ]
+
+  | Result sl ->
+      TaskList.clear ();
+      let ul = Dom_html.createUl doc in
+      Dom.appendChild TaskList.task_list ul;
+      List.iter (fun (s : string) ->
+          let li = Dom_html.createLi doc in
+          li ##. innerHTML := (Js.string s);
+          Dom.appendChild ul li;) sl
+
+  | Theory (th_id, th_name) ->
+      TaskList.attach_to_parent th_id "why3-theory-list" th_name []
+
+  | Task (id, parent_id, expl, _code, locs, pretty, _) ->
+      begin match Dom_html.getElementById_opt id with
+      | Some _ -> ()
+      | None -> TaskList.add_task id parent_id expl locs pretty
+      end
+
+  | Formats l -> FormatList.add_formats l
+
+  | UpdateStatus(st, id) ->
+      try
+        let span_icon = getElement AsHtml.span (id ^ "_icon") in
+        let span_msg = getElement AsHtml.span (id ^ "_msg") in
+        let cls =
+          match st with
+            `New -> "fas fa-fw fa-cog fa-spin fa-fw why3-task-pending"
+          | `Valid -> span_msg ##. innerHTML := Js.string "";
+                      "fas fa-check-circle why3-task-valid"
+          | `Unknown -> "fas fa-question-circle why3-task-unknown"
+        in
+        span_icon ##. className := Js.string cls
+      with
+        Not_found -> ()
 
 
 module ToolBar =
@@ -587,9 +653,9 @@ module ToolBar =
 
     let add_action b f =
       let cb = fun _ ->
-	f ();
-	Editor.editor ## focus;
-	Js._false
+        f ();
+        Editor.editor ## focus;
+        Js._false
       in
       b ##. onclick := Dom.handler cb
 
@@ -597,6 +663,7 @@ module ToolBar =
     let disable_compile () =
       Editor.disable ();
       ContextMenu.disable ();
+      FormatList.disable ();
       ExampleList.disable ();
       disable button_open;
       disable button_undo;
@@ -607,6 +674,7 @@ module ToolBar =
     let enable_compile () =
       Editor.enable ();
       ContextMenu.enable ();
+      FormatList.enable ();
       ExampleList.enable ();
       enable button_open;
       enable button_undo;
@@ -623,7 +691,7 @@ module ToolBar =
         File.blob_from_string ~contentType:"text/plain" ~endings:`Native code
       in
       let name =
-	if !Editor.name ##. length == 0 then Js.string "test.mlw" else !Editor.name
+        if !Editor.name ##. length == 0 then Js.string "test.mlw" else !Editor.name
       in
       blob, name
 
@@ -646,27 +714,35 @@ module ToolBar =
          let blob, name = mk_save () in
          ignore JSU.(meth_call (Dom_html.window ##. navigator) "msSaveBlob" [| inject blob; inject name |])
 
+    let finish_open url reader _ =
+      match Js.Opt.to_option (File.CoerceTo.string (reader ##. result)) with
+      | None -> Js._true
+      | Some content ->
+          let name = File.filename url in
+          FormatList.resolve_format name;
+          Editor.name := name;
+          Editor.set_value content;
+          Js._true
+
     let open_ = getElement AsHtml.input "why3-open"
+
+    let start_open _ =
+      FormatList.unselect ();
+      ExampleList.unselect ();
+      match Js.Optdef.to_option (open_ ##. files) with
+      | None -> Js._false
+      | Some f ->
+          match Js.Opt.to_option (f ## item 0) with
+          | None -> Js._false
+          | Some f ->
+              let reader = new%js File.fileReader in
+              reader ##. onloadend := Dom.handler (finish_open f reader);
+              reader ## readAsText (f :> File.blob Js.t);
+              Js._true
+
     let () =
-      open_ ##. onchange := Dom.handler (fun _e ->
-        ExampleList.unselect ();
-	match Js.Optdef.to_option (open_ ##. files) with
-	| None -> Js._false
-	| Some (f) ->
-          match Js.Opt.to_option (f ## item (0)) with
-	  | None -> Js._false
-	  | Some f ->
-            let reader = new%js File.fileReader in
-            reader ##. onloadend := Dom.handler (fun _ ->
-              match Js.Opt.to_option (File.CoerceTo.string (reader ##. result)) with
-              | None -> Js._true
-              | Some content ->
-                Editor.name := File.filename f;
-                Editor.set_value content;
-                Js._true);
-            reader##readAsText ((f :> File.blob Js.t));
-	    Js._true
-          )
+      open_ ##. onchange := Dom.handler start_open
+
     let open_ () = if Editor.confirm_unsaved () then open_ ## click
 
   end
@@ -686,9 +762,9 @@ module Panel =
       main_panel ##. classList ## remove (Js.string "why3-wide-view");
       main_panel ##. classList ## remove (Js.string "why3-column-view");
       if b then
-	main_panel ##. classList ## add (Js.string "why3-wide-view")
+        main_panel ##. classList ## add (Js.string "why3-wide-view")
       else
-	main_panel ##. classList ## add (Js.string "why3-column-view")
+        main_panel ##. classList ## add (Js.string "why3-column-view")
 
     let is_wide () =
       Js.to_bool (main_panel ##. classList ## contains (Js.string "why3-wide-view"))
@@ -699,20 +775,20 @@ module Panel =
       resize_bar ##. ondblclick := Dom.handler (fun _ -> reset (); Js._false);
       main_panel ##. onmouseup := Dom.handler (fun _ -> mouse_down := false; Js._false);
       main_panel ##. onmousemove :=
-	Dom.handler (fun e ->
-		     if !mouse_down then begin
-			 let offset =
-			   if is_wide ()
-			   then (e ##. clientX) - (main_panel ##. offsetLeft)
-			   else (e ##. clientY) - (main_panel ##. offsetTop)
-			 in
-			 let offset = Js.string ((string_of_int offset) ^ "px") in
-			 let edit_style = editor_container ##. style in
-			 JSU.(set edit_style (Js.string "flexGrow") (Js.string "0"));
-			     JSU.(set edit_style (Js.string "flexBasis") offset);
-			     Js._false
-		       end
-		     else Js._true)
+        Dom.handler (fun e ->
+            if !mouse_down then begin
+                let offset =
+                  if is_wide ()
+                  then (e ##. clientX) - (main_panel ##. offsetLeft)
+                  else (e ##. clientY) - (main_panel ##. offsetTop)
+                in
+                let offset = Js.string ((string_of_int offset) ^ "px") in
+                let edit_style = editor_container ##. style in
+                JSU.(set edit_style (Js.string "flexGrow") (Js.string "0"));
+                JSU.(set edit_style (Js.string "flexBasis") offset);
+                Js._false
+              end
+            else Js._true)
   end
 
 module Dialogs =
@@ -825,8 +901,8 @@ module Controller =
     let task_queue  = Queue.create ()
     let array_for_all a f =
       let rec loop i n =
-	if i < n then (f a.(i)) && loop (i+1) n
-	else true
+        if i < n then (f a.(i)) && loop (i+1) n
+        else true
       in
       loop 0 (Array.length a)
 
@@ -840,9 +916,8 @@ module Controller =
 
     let get_why3_worker () =
       match !why3_worker with
-	Some w -> w
+      | Some w -> w
       | None -> log ("Why3 Worker not initialized !"); assert false
-
 
     let alt_ergo_not_running () =
       array_for_all !alt_ergo_workers (function Busy _ -> false | _ -> true)
@@ -855,48 +930,46 @@ module Controller =
     let rec init_alt_ergo_worker i =
       let worker = Worker.create (blob_url_of_string "/alt_ergo_worker.js") in
       worker ##. onmessage :=
-	(Dom.handler (fun ev ->
-                      let (id, result) as res = unmarshal (ev ##. data) in
-                      TaskList.print_alt_ergo_output id result;
-		      let status_update = status_of_result res in
-		      let () = match status_update with
-			  SetStatus(v, id) ->
-			  TaskList.print_why3_output (UpdateStatus(v, id))
-			| _ -> ()
-		      in
-                      (get_why3_worker()) ## postMessage (marshal status_update);
-                      !alt_ergo_workers.(i) <- Free(worker);
-                      process_task ();
-                      Js._false));
+        Dom.handler (fun ev ->
+            let (id, result) as res = unmarshal (ev ##. data) in
+            TaskList.print_alt_ergo_output id result;
+            let status_update = status_of_result res in
+            let () = match status_update with
+              | SetStatus(v, id) ->
+                  handle_why3_message (UpdateStatus(v, id))
+              | _ -> () in
+            (get_why3_worker()) ## postMessage (marshal status_update);
+            !alt_ergo_workers.(i) <- Free(worker);
+            process_task ();
+            Js._false);
       Free (worker)
 
     and process_task () =
       let rec find_free_worker_slot i =
-	if i < num_workers then
-	  match !alt_ergo_workers.(i) with
-            Free _ as w -> i, w
-	  | _ -> find_free_worker_slot (i+1)
-	else -1, Absent
+        if i < num_workers then
+          match !alt_ergo_workers.(i) with
+          | Free _ as w -> i, w
+          | _ -> find_free_worker_slot (i + 1)
+        else -1, Absent
       in
       let idx, w = find_free_worker_slot 0 in
       match w with
-	Free w when not (Queue.is_empty task_queue) ->
-	let task = Queue.take task_queue in
-	!alt_ergo_workers.(idx) <- Busy (w);
-	w ## postMessage (marshal (OptionSteps !alt_ergo_steps));
-	w ## postMessage (marshal task)
+      | Free w when not (Queue.is_empty task_queue) ->
+        let task = Queue.take task_queue in
+        !alt_ergo_workers.(idx) <- Busy (w);
+        w ## postMessage (marshal (OptionSteps !alt_ergo_steps));
+        w ## postMessage (marshal task)
       | _ -> if is_idle () then ToolBar.enable_compile ()
 
     let reset_workers () =
-      Array.iteri
-	(fun i w ->
-	 match w with
-	   Busy (w)  ->
-           w ## terminate;
-           !alt_ergo_workers.(i) <- init_alt_ergo_worker i
-	 | Absent -> !alt_ergo_workers.(i) <- init_alt_ergo_worker i
-	 | Free _ -> ()
-	) !alt_ergo_workers
+      Array.iteri (fun i w ->
+          match w with
+          | Busy (w)  ->
+              w ## terminate;
+              !alt_ergo_workers.(i) <- init_alt_ergo_worker i
+          | Absent -> !alt_ergo_workers.(i) <- init_alt_ergo_worker i
+          | Free _ -> ()
+        ) !alt_ergo_workers
 
     let push_task task =
       Queue.add  task task_queue;
@@ -905,23 +978,28 @@ module Controller =
     let init_why3_worker () =
       let worker = Worker.create (blob_url_of_string "/why3_worker.js") in
       worker ##. onmessage :=
-	(Dom.handler (fun ev ->
-                      let msg = unmarshal (ev ##. data) in
-                      if !first_task then begin
-			  first_task := false;
-			  TaskList.clear ()
-			end;
-                      TaskList.print_why3_output msg;
-                      let () =
-			match msg with
-			  Task (id,_,_,code,_, _, steps) ->
-			  push_task (Goal (id,code, steps))
-			| Idle -> why3_busy := false; if is_idle () then ToolBar.enable_compile ()
-			| _ -> ()
-                      in Js._false));
+        Dom.handler (fun ev ->
+            let msg = unmarshal (ev ##. data) in
+            if !first_task then begin
+                first_task := false;
+                TaskList.clear ()
+              end;
+            handle_why3_message msg;
+            let () =
+              match msg with
+                Task (id,_,_,code,_, _, steps) ->
+                  push_task (Goal (id,code, steps))
+              | Idle ->
+                  why3_busy := false;
+                  if is_idle () then ToolBar.enable_compile ()
+              | _ -> () in
+            Js._false);
       worker
 
-    let () = why3_worker := Some (init_why3_worker ())
+    let () =
+      let worker = init_why3_worker () in
+      worker ## postMessage (marshal GetFormats);
+      why3_worker := Some worker
 
     let why3_parse () =
       Tabs.focus "why3-task-list-tab";
@@ -932,8 +1010,9 @@ module Controller =
       reset_workers ();
       first_task := true;
       let code = Js.to_string (Editor.get_value ()) in
-      let msg = marshal (ParseBuffer code) in
-      (get_why3_worker()) ## postMessage (msg)
+      let format = !FormatList.selected_format in
+      let msg = marshal (ParseBuffer (format, code)) in
+      (get_why3_worker ()) ## postMessage msg
 
     let why3_execute () =
       Tabs.focus "why3-task-list-tab";
@@ -943,27 +1022,26 @@ module Controller =
       TaskList.print_msg "<span class='fas fa-cog fa-spin'></span> Compiling buffer … ";
       reset_workers ();
       let code = Js.to_string (Editor.get_value ()) in
-      (get_why3_worker()) ## postMessage (marshal (ExecuteBuffer code))
-
-
+      let format = !FormatList.selected_format in
+      let msg = marshal (ExecuteBuffer (format, code)) in
+      (get_why3_worker ()) ## postMessage msg
 
     let why3_transform tr f () =
       if is_idle () then
-	begin
+        begin
           why3_busy := true;
           ToolBar.disable_compile ();
-	  Hashtbl.iter
-            (fun id _ ->
-	     f id;
-	     (get_why3_worker()) ## postMessage (marshal (Transform(tr, id))))
-	    TaskList.task_selection;
-	  TaskList.clear_task_selection ()
-	end
+          Hashtbl.iter (fun id _ ->
+              f id;
+              (get_why3_worker()) ## postMessage (marshal (Transform(tr, id))))
+            TaskList.task_selection;
+          TaskList.clear_task_selection ()
+        end
 
     let why3_prove_all () =
       if is_idle () then begin
           why3_busy := true;
-	  (get_why3_worker()) ## postMessage (marshal ProveAll)
+          (get_why3_worker()) ## postMessage (marshal ProveAll)
         end
 
     let force_stop () =
@@ -1005,30 +1083,28 @@ let () =
                                                             Js.null));
   ToolBar.(add_action button_about Dialogs.(show about_dialog));
   ContextMenu.(add_action split_menu_entry
-			  Controller.(why3_transform `Split ignore));
+                 Controller.(why3_transform `Split ignore));
   ContextMenu.(add_action prove_menu_entry
-			  Controller.(why3_transform (`Prove(-1)) ignore));
+                 Controller.(why3_transform (`Prove(-1)) ignore));
   ContextMenu.(add_action prove100_menu_entry
-			  Controller.(why3_transform (`Prove(100)) ignore));
+                 Controller.(why3_transform (`Prove(100)) ignore));
   ContextMenu.(add_action prove1000_menu_entry
-			  Controller.(why3_transform (`Prove(1000)) ignore));
+                 Controller.(why3_transform (`Prove(1000)) ignore));
   ContextMenu.(add_action prove5000_menu_entry
-			  Controller.(why3_transform (`Prove(5000)) ignore));
+                 Controller.(why3_transform (`Prove(5000)) ignore));
   ContextMenu.(add_action clean_menu_entry
-			  Controller.(why3_transform (`Clean) TaskList.clean_task));
-  Dialogs.(set_onchange input_num_threads
-			 (fun o ->
-			  let open Controller in
-			  let len = int_of_js_string (o ##. value) in
-                          force_stop ();
-			  alt_ergo_workers := Array.make len Absent));
+                 Controller.(why3_transform (`Clean) TaskList.clean_task));
 
-  Dialogs.(set_onchange input_num_steps
-			 (fun o ->
-			  let steps = int_of_js_string (o ##. value) in
-                          Controller.alt_ergo_steps := steps;
-			  Controller.force_stop ()
-	                 ));
+  Dialogs.(set_onchange input_num_threads (fun o ->
+               let open Controller in
+               let len = int_of_js_string (o ##. value) in
+               force_stop ();
+               alt_ergo_workers := Array.make len Absent));
+
+  Dialogs.(set_onchange input_num_steps (fun o ->
+               let steps = int_of_js_string (o ##. value) in
+               Controller.alt_ergo_steps := steps;
+               Controller.force_stop ()));
 
   ToolBar.add_action Dialogs.button_close Dialogs.close;
   (*KeyBinding.add_global Keycode.esc  Dialogs.close;*)
@@ -1036,19 +1112,19 @@ let () =
   Dialogs.(set_onchange radio_wide (fun _ -> Panel.set_wide true));
   Dialogs.(set_onchange radio_column (fun _ -> Panel.set_wide false))
 
-
 let () =
   let upd content =
-	  let examples = content ## split (Js.string "\n") in
-	  let examples = Js.to_array (Js.str_array examples) in
-	  for i = 0 to ((Array.length examples) / 2) - 1 do
-	    ExampleList.add_example
-	      examples.(2*i)
-	      ((Js.string "examples/") ## concat (examples.(2*i+1)))
-	  done;
-	  ExampleList.set_loading_label false in
-  XHR.update_file (function `New content -> Js.Opt.iter content upd
-                          | _ -> ExampleList.set_loading_label false
+    let examples = content ## split (Js.string "\n") in
+    let examples = Js.to_array (Js.str_array examples) in
+    for i = 0 to ((Array.length examples) / 2) - 1 do
+      ExampleList.add_example
+        examples.(2*i)
+        ((Js.string "examples/") ## concat (examples.(2*i+1)))
+    done;
+    ExampleList.set_loading_label false in
+  XHR.update_file (function
+        | `New content -> Js.Opt.iter content upd
+        | _ -> ExampleList.set_loading_label false
     ) (Js.string "examples/index.txt");
   ExampleList.set_loading_label true
 
@@ -1056,6 +1132,7 @@ let () =
 let () =
   (* restore the session *)
   let name, buffer = Session.load_buffer () in
+  FormatList.selected_format := Js.to_string name; (* formats not loaded yet *)
   Editor.name := name;
   Editor.set_value buffer;
   Panel.set_wide (Session.load_view_mode () = (Js.string "wide"));
