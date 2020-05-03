@@ -1654,6 +1654,8 @@ install_local:: bin/why3doc
 # trywhy3
 #########
 
+.PHONY: trywhy3
+
 ifeq ($(DEBUGJS),yes)
  JSOO_DEBUG=--pretty --debug-info --source-map
  JS_MAPS=alt_ergo_worker.map  trywhy3.map  why3_worker.map
@@ -1661,6 +1663,15 @@ else
  JSOO_DEBUG=
  JS_MAPS=
 endif
+
+TRYWHY3_FILES = alt_ergo_worker bindings trywhy3 why3_worker worker_proto
+
+TRYWHY3MODULES = $(addprefix src/trywhy3/, $(TRYWHY3_FILES))
+
+TRYWHY3DEP = $(addsuffix .dep, $(TRYWHY3MODULES))
+TRYWHY3CMO = $(addsuffix .cmo, $(TRYWHY3MODULES))
+
+$(TRYWHY3DEP) $(TRYWHY3CMO): INCLUDES += -I src/trywhy3
 
 ALTERGODIR=src/trywhy3/alt-ergo
 
@@ -1738,47 +1749,44 @@ ALTERGOCMO = \
 	$(addprefix $(ALTERGODIR)/lib/, $(addsuffix .cmo,$(ALTERGOLIBS))) \
 	$(addprefix $(ALTERGODIR)/parsers/, $(addsuffix .cmo,$(ALTERGOPARSERS)))
 
-TRYWHY3CMO=lib/why3/why3.cma
-TRYWHY3FILES=trywhy3.js trywhy3.html trywhy3.css \
+TRYWHY3_PACK = \
+	trywhy3.js trywhy3.html trywhy3.css \
 	README.md examples/ \
 	trywhy3_custom.css gen_index.sh \
 	ace-builds/src-min-noconflict/ace.js ace-builds/src-min-noconflict/mode-why3.js \
 	ace-builds/src-min-noconflict/theme-chrome.js $(JS_MAPS)
 
-trywhy3_package: trywhy3
-	tar czf trywhy3.tar.gz -C src $(addprefix trywhy3/, $(TRYWHY3FILES))
+trywhy3.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_PACK))
+	tar czf trywhy3.tar.gz -C src $(addprefix trywhy3/, $(TRYWHY3_PACK))
 
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js src/trywhy3/examples/*.mlw
-	js_of_ocaml --extern-fs $(JSOO_DEBUG) -I src/trywhy3 \
+	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I src/trywhy3 \
 		--file=why3_worker.js:/ \
 		--file=alt_ergo_worker.js:/ \
 	        --file=examples/index.txt:/examples/index.txt \
-		`find src/trywhy3/examples \( -name "*.mlw" -o -name "*.why" \) -printf " --file=examples/%P:/examples/%P"` \
+		`find src/trywhy3/examples -name "*.mlw" -printf " --file=examples/%P:/examples/%P"` \
 	$<
 
-src/trywhy3/trywhy3.byte: src/trywhy3/bindings.cmo src/trywhy3/worker_proto.cmo src/trywhy3/trywhy3.cmo
+src/trywhy3/trywhy3.byte: $(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo trywhy3.cmo)
 	$(JSOCAMLC) -o $@ -linkpkg $^
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/try_alt_ergo.drv
-	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 --file=trywhy3.conf:/ \
+	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 \
+		--file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
-		`find stdlib \( -name "*.mlw" -o -name "*.why" \) -printf " --file=%p:/%p"` \
+		`find stdlib -name "*.mlw" -printf " --file=%p:/%p"` \
 	+dynlink.js +toplevel.js $<
 
-src/trywhy3/why3_worker.byte: $(TRYWHY3CMO) src/trywhy3/bindings.cmo src/trywhy3/worker_proto.cmo src/trywhy3/why3_worker.cmo
+src/trywhy3/why3_worker.byte: $(WHY3CMA) $(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo why3_worker.cmo)
 	$(JSOCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
 
 src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
 	js_of_ocaml $(JSOO_DEBUG) +dynlink.js +toplevel.js $<
 
-src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) src/trywhy3/worker_proto.cmo src/trywhy3/alt_ergo_worker.cmo
+src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) $(addprefix src/trywhy3/, worker_proto.cmo alt_ergo_worker.cmo)
 	$(JSOCAMLC) -o $@ -package num -package dynlink -package str -package unix -package camlzip -linkpkg $^
-
-src/trywhy3/alt_ergo_worker.cmo: src/trywhy3/worker_proto.cmo
-src/trywhy3/why3_worker.cmo: src/trywhy3/bindings.cmo src/trywhy3/worker_proto.cmo
-src/trywhy3/trywhy3.cmo: src/trywhy3/worker_proto.cmo
 
 src/trywhy3/%.cmo: src/trywhy3/%.ml
 	$(JSOCAMLC) $(BFLAGS) -c $<
@@ -1788,11 +1796,17 @@ src/trywhy3/%.cmi: src/trywhy3/%.mli
 
 src/trywhy3/%.cmo: BFLAGS += -w -48
 
+ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
+-include $(TRYWHY3DEP)
+endif
+
+depend: $(TRYWHY3DEP)
+
 clean::
-	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte src/trywhy3/trywhy3.cm* \
-	 src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte src/trywhy3/why3_worker.cm* \
-         src/trywhy3/alt_ergo_worker.js src/trywhy3/alt_ergo_worker.byte src/trywhy3/alt_ergo_worker.cm* \
-         src/trywhy3/worker_proto.cm* trywhy3.tar.gz
+	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte \
+	  src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte \
+	  src/trywhy3/alt_ergo_worker.js src/trywhy3/alt_ergo_worker.byte \
+	  trywhy3.tar.gz
 
 CLEANDIRS += src/trywhy3
 

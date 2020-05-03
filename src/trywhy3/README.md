@@ -50,7 +50,7 @@ Instructions to build TryWhy3
 
   * You can build a package with
 
-        make trywhy3_package
+        make trywhy3.tar.gz
 
     this creates a tarball containing a directory `trywhy3/` which you can put on a web server.
     You may want to add a symbolic link from `index.html` to `trywhy3.html` (or rename the file).
