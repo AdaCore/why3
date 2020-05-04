@@ -22,17 +22,6 @@ module Worker = Js_of_ocaml.Worker
 module Dom_html = Js_of_ocaml.Dom_html
 module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
 
-let get_opt o = Js.Opt.get o (fun () -> assert false)
-
-let check_def s o =
-  Js.Optdef.get o (fun () ->
-      log ("Object " ^ s ^ " is undefined or null");
-      assert false)
-
-let get_global ident =
-  let res : 'a Js.optdef = JSU.(get global) (Js.string ident) in
-  check_def ident res
-
 let int_of_js_string s = int_of_string (Js.to_string s)
 
 let blob_url_of_string s =
