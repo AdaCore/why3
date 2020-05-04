@@ -1744,6 +1744,7 @@ ALTERGOCMO = \
 
 TRYWHY3_PACK = \
 	trywhy3.js trywhy3.html trywhy3.css \
+	why3_worker.js alt_ergo_worker.js \
 	README.md examples/ \
 	trywhy3_custom.css gen_index.sh \
 	ace-builds/src-min-noconflict/ace.js \
@@ -1757,10 +1758,8 @@ trywhy3.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_PACK))
 
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
 
-src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js src/trywhy3/examples/*.mlw
+src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/examples/*.mlw
 	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I src/trywhy3 \
-		--file=why3_worker.js:/ \
-		--file=alt_ergo_worker.js:/ \
 	        --file=examples/index.txt:/examples/index.txt \
 		`find src/trywhy3/examples -name "*.mlw" -printf " --file=examples/%P:/examples/%P"` \
 	$<

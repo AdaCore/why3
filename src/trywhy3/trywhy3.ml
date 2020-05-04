@@ -923,7 +923,7 @@ module Controller =
 
 
     let rec init_alt_ergo_worker i =
-      let worker = Worker.create (blob_url_of_string "/alt_ergo_worker.js") in
+      let worker = Worker.create "alt_ergo_worker.js" in
       worker ##. onmessage :=
         Dom.handler (fun ev ->
             let (id, result) as res = unmarshal (ev ##. data) in
@@ -971,7 +971,7 @@ module Controller =
       process_task ()
 
     let init_why3_worker () =
-      let worker = Worker.create (blob_url_of_string "/why3_worker.js") in
+      let worker = Worker.create "why3_worker.js" in
       worker ##. onmessage :=
         Dom.handler (fun ev ->
             let msg = unmarshal (ev ##. data) in
