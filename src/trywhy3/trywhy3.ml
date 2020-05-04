@@ -236,9 +236,11 @@ module Editor =
         editor ## setReadOnly Js._false;
         editor_bg ##. style ##. display := !!"none"
 
+      let is_clean () =
+        Js.to_bool (editor ## getSession ## getUndoManager ## isClean)
 
       let confirm_unsaved () =
-        Js.to_bool (editor ## getSession ## getUndoManager ## isClean) ||
+        is_clean () ||
           Js.to_bool (Dom_html.window ## confirm
                         !!"You have unsaved changes in your editor, proceed anyway ?")
 
@@ -587,13 +589,14 @@ module TaskList =
       Editor.editor ## on !!"change"
         (Js.wrap_callback (fun _ _ ->
              clear ();
-             ExampleList.unselect ();
              Editor.clear_annotations ();
              Editor.update_error_marker None))
 
     let () =
       Editor.editor ## on !!"input"
-        (Js.wrap_callback (fun _ _ -> Editor.update_undo ()))
+        (Js.wrap_callback (fun _ _ ->
+             if not (Editor.is_clean ()) then ExampleList.unselect ();
+             Editor.update_undo ()))
 
     let () =
       Editor.editor ## on !!"focus"
