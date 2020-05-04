@@ -284,7 +284,7 @@ module FormatList = struct
   let select_format = getElement AsHtml.select "why3-select-format"
   let format_label = getElement AsHtml.span "why3-format-label"
 
-  let selected_format = ref ""
+  let selected_format = ref "whyml"
 
   let unselect () =
     selected_format := "";
@@ -304,13 +304,20 @@ module FormatList = struct
   let handle _ =
     let i = select_format ##. selectedIndex in
     if i > 0 then
-      begin match List.nth_opt !formats (i - 1) with
-      | Some (name, ext :: _) ->
-          Editor.name := Js.string ("test." ^ ext);
-          selected_format := name;
-          change_mode ext
-      | Some (name, []) -> selected_format := name
-      | _ -> selected_format := ""
+      begin
+        let name =
+          match List.nth_opt !formats (i - 1) with
+          | Some (name, ext :: _) ->
+              Editor.name := Js.string ("test." ^ ext);
+              change_mode ext;
+              name
+          | Some (name, []) -> name
+          | _ -> "" in
+        selected_format := name;
+        if name <> "" then
+          let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
+          url ##. searchParams ## set !!"lang" (Js.string name);
+          Dom_html.window ##. history ## replaceState Js.null (Js.string "") (Js.some (url ##. href))
       end;
     Js._false
 
@@ -328,8 +335,7 @@ module FormatList = struct
       let arr = name ## split !!"." in
       let arr = Js.to_array (Js.str_array arr) in
       let l = Array.length arr in
-      if l = 0 then ""
-      else Js.to_string (arr.(l - 1)) in
+      Js.to_string arr.(l - 1) in
     let rec aux i = function
       | (name, exts) :: l ->
           if List.mem ext exts then (name, i)
@@ -340,6 +346,17 @@ module FormatList = struct
     select_format ##. selectedIndex := idx;
     change_mode ext
 
+  let set_format name =
+    let rec aux i = function
+      | (n, ext :: _) :: l ->
+          if n = name then (name, ext, i)
+          else aux (i + 1) l
+      | _ -> ("", "", 0) in
+    let (name, ext, idx) = aux 1 !formats in
+    select_format ##. selectedIndex := idx;
+    selected_format := name;
+    change_mode ext
+
   let add_formats l =
     let fresh = !formats = [] in
     formats := l;
@@ -347,7 +364,10 @@ module FormatList = struct
     format_label ##. className := !!"fas fa-code why3-icon";
     if fresh then
       if !selected_format <> "" then
-        resolve_format (Js.string !selected_format)
+        if String.contains !selected_format '.' then
+          resolve_format (Js.string !selected_format)
+        else
+          set_format !selected_format
       else
         let () = select_format ##. selectedIndex := 1 in
         ignore (handle ())
@@ -1111,9 +1131,14 @@ let () =
 
 
 let () =
+  let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
   (* restore the session *)
   let name, buffer = Session.load_buffer () in
-  FormatList.selected_format := Js.to_string name; (* formats not loaded yet *)
+  let lang =
+    match Js.Opt.to_option (url ##. searchParams ## get !!"lang") with
+    | Some lang -> lang
+    | None -> name in
+  FormatList.selected_format := Js.to_string lang; (* formats not yet loaded *)
   Editor.name := name;
   Editor.set_value buffer;
   Panel.set_wide (Session.load_view_mode () = !!"wide");
