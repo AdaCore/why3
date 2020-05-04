@@ -21,6 +21,8 @@ module Worker = Js_of_ocaml.Worker
 module Dom_html = Js_of_ocaml.Dom_html
 module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
 
+let (!!) = Js.string
+
 let int_of_js_string s = int_of_string (Js.to_string s)
 
 module XHR =
@@ -34,8 +36,8 @@ module XHR =
           (fun () ->
            if xhr ##. readyState == DONE then
              if xhr ##. status = 200 then
-               let date_str = Js.Opt.get (xhr ## getResponseHeader (Js.string "Last-Modified"))
-                                         (fun () -> Js.string "01/01/2100") (* far into the future *)
+               let date_str = Js.Opt.get (xhr ## getResponseHeader !!"Last-Modified")
+                                         (fun () -> !!"01/01/2100") (* far into the future *)
                in
                let document_date = Js.date ## parse (date_str) in
                if document_date < date then
@@ -50,12 +52,12 @@ module XHR =
                                  else
                                    cb `NotFound)
                  in
-                 let () = xhr ## _open (Js.string "GET") url Js._true in
+                 let () = xhr ## _open !!"GET" url Js._true in
                  xhr ## send (Js.null)
              else
                cb `NotFound
           );
-      xhr ## _open (Js.string "HEAD") url Js._true;
+      xhr ## _open !!"HEAD" url Js._true;
       xhr ## send (Js.null)
 
   end
@@ -97,14 +99,14 @@ module Ace = Ace ()
 
 module Editor =
   struct
-    let name = ref (Js.string "")
+    let name = ref !!""
 
     let editor =
-      let e = Ace.edit (Js.string "why3-editor") in
+      let e = Ace.edit !!"why3-editor" in
       check_def "why3-editor" e
 
     let task_viewer =
-      let e = Ace.edit (Js.string "why3-task-viewer") in
+      let e = Ace.edit !!"why3-task-viewer" in
       check_def "why3-task-viewer" e
 
     let set_annotations l =
@@ -154,7 +156,7 @@ module Editor =
       selection ## setSelectionRange r Js._false
 
     let add_marker cls r =
-      editor ## getSession ## addMarker r (Js.string cls) (Js.string "text") Js._false
+      editor ## getSession ## addMarker r (Js.string cls) !!"text" Js._false
 
     let remove_marker m =
       editor ## getSession ## removeMarker m
@@ -191,18 +193,18 @@ module Editor =
 
       let disable () =
         editor ## setReadOnly Js._true;
-        editor_bg ##. style ##. display := Js.string "block"
+        editor_bg ##. style ##. display := !!"block"
 
 
       let enable () =
         editor ## setReadOnly Js._false;
-        editor_bg ##. style ##. display := Js.string "none"
+        editor_bg ##. style ##. display := !!"none"
 
 
       let confirm_unsaved () =
         if Js.to_bool (editor ## getSession ## getUndoManager ## hasUndo) then
           Js.to_bool
-            (Dom_html.window ## confirm (Js.string "You have unsaved changes in your editor, proceed anyway ?"))
+            (Dom_html.window ## confirm !!"You have unsaved changes in your editor, proceed anyway ?")
         else
           true
 
@@ -227,9 +229,9 @@ module Tabs = struct
             tab ##. onclick :=
               Dom.handler (fun _ev ->
                   let () =
-                    if Js.to_bool (tab ##. classList ## contains (Js.string "why3-inactive")) then
+                    if Js.to_bool (tab ##. classList ## contains !!"why3-inactive") then
                       List.iter (fun t ->
-                          ignore (t ##. classList ## toggle (Js.string "why3-inactive"))
+                          ignore (t ##. classList ## toggle !!"why3-inactive")
                         ) labels in
                   Js._false)
           ) labels)
@@ -256,14 +258,14 @@ module ContextMenu =
 
     let show_at x y =
       if !enabled then begin
-          task_menu ##. style ##. display := Js.string "block";
+          task_menu ##. style ##. display := !!"block";
           task_menu ##. style ##. left := Js.string ((string_of_int x) ^ "px");
           task_menu ##. style ##. top := Js.string ((string_of_int y) ^ "px")
         end
 
     let hide () =
       if !enabled then
-        task_menu ##. style ##. display := Js.string "none"
+        task_menu ##. style ##. display := !!"none"
 
     let add_action b f =
       b ##. onclick :=
@@ -323,7 +325,7 @@ module FormatList = struct
 
   let resolve_format name =
     let ext =
-      let arr = name ## split (Js.string ".") in
+      let arr = name ## split !!"." in
       let arr = Js.to_array (Js.str_array arr) in
       let l = Array.length arr in
       if l = 0 then ""
@@ -342,7 +344,7 @@ module FormatList = struct
     let fresh = !formats = [] in
     formats := l;
     List.iter (fun (name, _) -> add_format name) l;
-    format_label ##. className := Js.string "fas fa-code why3-icon";
+    format_label ##. className := !!"fas fa-code why3-icon";
     if fresh then
       if !selected_format <> "" then
         resolve_format (Js.string !selected_format)
@@ -366,9 +368,9 @@ module ExampleList =
     let set_loading_label b =
       select_example ##. disabled := Js.bool b;
       if b then
-        example_label ##. className := Js.string "fas fa-spin fa-spinner why3-icon"
+        example_label ##. className := !!"fas fa-spin fa-spinner why3-icon"
       else
-        example_label ##. className := Js.string "fas fa-book why3-icon"
+        example_label ##. className := !!"fas fa-book why3-icon"
 
     let selected_index = ref 0
     let unselect () =
@@ -377,7 +379,7 @@ module ExampleList =
 
     let handle () =
       let filename url =
-        let arr = url ## split (Js.string "/") in
+        let arr = url ## split !!"/" in
         let arr = Js.to_array (Js.str_array arr) in
         arr.(Array.length arr - 1) in
       let sessionStorage =
@@ -440,7 +442,7 @@ module TaskList =
     let print_alt_ergo_output id res =
       let span_msg = getElement AsHtml.span (id ^ "_msg") in
       match res with
-        Valid -> span_msg ##. innerHTML := Js.string ""
+        Valid -> span_msg ##. innerHTML := !!""
       | Unknown msg -> span_msg ##. innerHTML := Js.string (" (" ^ msg ^ ")")
       | Invalid msg -> span_msg ##. innerHTML := Js.string (" (" ^ msg ^ ")")
 
@@ -452,7 +454,7 @@ module TaskList =
     let clean_task id =
       try
         let ul = getElement_exn AsHtml.ul (id ^ "_ul") in
-        ul ##. innerHTML := Js.string ""
+        ul ##. innerHTML := !!""
       with
         Not_found -> ()
 
@@ -477,7 +479,7 @@ module TaskList =
     let task_selection = Hashtbl.create 17
     let is_selected id = Hashtbl.mem task_selection id
     let select_task id span loc pretty =
-      span ##. classList ## add (Js.string "why3-task-selected");
+      span ##. classList ## add !!"why3-task-selected";
       let markers = List.map (fun (cls, range) -> Editor.add_marker cls range) loc in
       Hashtbl.add task_selection id (span, loc, markers);
       Editor.set_value ~editor:Editor.task_viewer (Js.string pretty);
@@ -486,7 +488,7 @@ module TaskList =
     let deselect_task id =
       try
         let span, _loc, markers = Hashtbl.find task_selection id in
-        span ##. classList ## remove (Js.string "why3-task-selected");
+        span ##. classList ## remove !!"why3-task-selected";
         List.iter Editor.remove_marker markers;
         Hashtbl.remove task_selection id
       with
@@ -499,8 +501,8 @@ module TaskList =
 
     let clear () =
       clear_task_selection ();
-      task_list ##. innerHTML := Js.string "";
-      Editor.set_value ~editor:Editor.task_viewer (Js.string "")
+      task_list ##. innerHTML := !!"";
+      Editor.set_value ~editor:Editor.task_viewer !!""
 
     let add_task id parent_id expl locs pretty =
       attach_to_parent id (parent_id ^ "_ul") expl locs;
@@ -549,7 +551,7 @@ let handle_why3_message o =
   | Warning lst ->
       let annot =
         List.map (fun ((l1, c1), msg) ->
-            (l1,c1, Js.string msg, Js.string "warning")) lst
+            (l1,c1, Js.string msg, !!"warning")) lst
       in
       Editor.set_annotations annot
 
@@ -559,7 +561,7 @@ let handle_why3_message o =
       let r = Editor.mk_range l1 b l2 e in
       Editor.update_error_marker (Some (Editor.add_marker "why3-error" r, r));
       TaskList.print_error s;
-      Editor.set_annotations [ (l1, b, Js.string s, Js.string "error") ]
+      Editor.set_annotations [ (l1, b, Js.string s, !!"error") ]
 
   | Result sl ->
       TaskList.clear ();
@@ -588,7 +590,7 @@ let handle_why3_message o =
         let cls =
           match st with
             `New -> "fas fa-fw fa-cog fa-spin fa-fw why3-task-pending"
-          | `Valid -> span_msg ##. innerHTML := Js.string "";
+          | `Valid -> span_msg ##. innerHTML := !!"";
                       "fas fa-check-circle why3-task-valid"
           | `Unknown -> "fas fa-question-circle why3-task-unknown"
         in
@@ -616,11 +618,11 @@ module ToolBar =
 
     let disable b  =
       b ##. disabled := Js._true;
-      b ##. classList ## add (Js.string "why3-inactive")
+      b ##. classList ## add !!"why3-inactive"
 
     let enable b =
       b ##. disabled := Js._false;
-      b ##. classList ## remove (Js.string "why3-inactive")
+      b ##. classList ## remove !!"why3-inactive"
 
 
     let toggle (b : <disabled : bool Js.t Js.prop; ..> Js.t) =
@@ -667,7 +669,7 @@ module ToolBar =
         File.blob_from_string ~contentType:"text/plain" ~endings:`Native code
       in
       let name =
-        if !Editor.name ##. length == 0 then Js.string "test.mlw" else !Editor.name
+        if !Editor.name ##. length == 0 then !!"test.mlw" else !Editor.name
       in
       blob, name
 
@@ -675,14 +677,14 @@ module ToolBar =
       let blob, name = mk_save () in
       let url = Dom_html.window ##. _URL ## createObjectURL blob in
       real_save ##. href := url;
-      JSU.(set real_save (Js.string "download") name);
+      JSU.(set real_save !!"download" name);
       real_save ## click
     (* does not work with firefox *)
     (*ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |]) *)
 
 
     let save =
-      match Js.Optdef.to_option JSU.(get (Dom_html.window ##. navigator) (Js.string "msSaveBlob"))
+      match Js.Optdef.to_option JSU.(get (Dom_html.window ##. navigator) !!"msSaveBlob")
       with
         None -> save_default
       | Some _f ->
@@ -730,20 +732,20 @@ module Panel =
     let resize_bar = getElement AsHtml.div "why3-resize-bar"
     let reset () =
       let edit_style = editor_container ##. style in
-      JSU.(set edit_style (Js.string "flexGrow") (Js.string "2"));
-      JSU.(set edit_style (Js.string "flexBasis") (Js.string ""))
+      JSU.(set edit_style !!"flexGrow" !!"2");
+      JSU.(set edit_style !!"flexBasis" !!"")
 
     let set_wide b =
       reset ();
-      main_panel ##. classList ## remove (Js.string "why3-wide-view");
-      main_panel ##. classList ## remove (Js.string "why3-column-view");
+      main_panel ##. classList ## remove !!"why3-wide-view";
+      main_panel ##. classList ## remove !!"why3-column-view";
       if b then
-        main_panel ##. classList ## add (Js.string "why3-wide-view")
+        main_panel ##. classList ## add !!"why3-wide-view"
       else
-        main_panel ##. classList ## add (Js.string "why3-column-view")
+        main_panel ##. classList ## add !!"why3-column-view"
 
     let is_wide () =
-      Js.to_bool (main_panel ##. classList ## contains (Js.string "why3-wide-view"))
+      Js.to_bool (main_panel ##. classList ## contains !!"why3-wide-view")
 
     let () =
       let mouse_down = ref false in
@@ -760,8 +762,8 @@ module Panel =
                 in
                 let offset = Js.string ((string_of_int offset) ^ "px") in
                 let edit_style = editor_container ##. style in
-                JSU.(set edit_style (Js.string "flexGrow") (Js.string "0"));
-                JSU.(set edit_style (Js.string "flexBasis") offset);
+                JSU.(set edit_style !!"flexGrow" !!"0");
+                JSU.(set edit_style !!"flexBasis" offset);
                 Js._false
               end
             else Js._true)
@@ -780,13 +782,13 @@ module Dialogs =
 
     let all_dialogs = [ setting_dialog; about_dialog ]
     let show diag () =
-      dialog_panel ##. style ##. display := Js.string "flex";
-      diag ##. style ##. display := Js.string "inline-block";
+      dialog_panel ##. style ##. display := !!"flex";
+      diag ##. style ##. display := !!"inline-block";
       diag ## focus
 
     let close () =
-      List.iter (fun d -> d ##. style ##. display := Js.string "none") all_dialogs;
-      dialog_panel ##. style ##. display := Js.string "none"
+      List.iter (fun d -> d ##. style ##. display := !!"none") all_dialogs;
+      dialog_panel ##. style ##. display := !!"none"
 
     let set_onchange o f =
       o ##. onchange := Dom.handler (fun _ -> f o; Js._false)
@@ -832,37 +834,37 @@ module Session =
       check_def "localStorage" (Dom_html.window ##. localStorage)
 
     let save_num_threads i =
-      localStorage ## setItem (Js.string "why3-num-threads") (Js.string (string_of_int i))
+      localStorage ## setItem !!"why3-num-threads" (Js.string (string_of_int i))
 
     let save_num_steps i =
-      localStorage ## setItem (Js.string "why3-num-steps") (Js.string (string_of_int i))
+      localStorage ## setItem !!"why3-num-steps" (Js.string (string_of_int i))
 
 
     let save_view_mode m =
-      localStorage ## setItem (Js.string "why3-view-mode") m
+      localStorage ## setItem !!"why3-view-mode" m
 
     let save_buffer name content =
-      localStorage ## setItem (Js.string "why3-buffer-name") name;
-      localStorage ## setItem (Js.string "why3-buffer-content") content
+      localStorage ## setItem !!"why3-buffer-name" name;
+      localStorage ## setItem !!"why3-buffer-content" content
 
     let load_num_threads () =
-      int_of_js_string (Js.Opt.get (localStorage ## getItem (Js.string "why3-num-threads"))
-                                (fun () -> Js.string "4"))
+      int_of_js_string (Js.Opt.get (localStorage ## getItem !!"why3-num-threads")
+                                (fun () -> !!"4"))
 
     let load_num_steps () =
-      int_of_js_string (Js.Opt.get (localStorage ## getItem (Js.string "why3-num-steps"))
-                                (fun () -> Js.string "100"))
+      int_of_js_string (Js.Opt.get (localStorage ## getItem !!"why3-num-steps")
+                                (fun () -> !!"100"))
 
     let load_view_mode () =
-      Js.Opt.get (localStorage ## getItem (Js.string "why3-view-mode"))
-                 (fun () -> Js.string "wide")
+      Js.Opt.get (localStorage ## getItem !!"why3-view-mode")
+                 (fun () -> !!"wide")
 
     let load_buffer () =
-      let name = Js.Opt.get  (localStorage ## getItem (Js.string "why3-buffer-name"))
-                             (fun () -> Js.string "")
+      let name = Js.Opt.get  (localStorage ## getItem !!"why3-buffer-name")
+                             (fun () -> !!"")
       in
-      let buffer = Js.Opt.get  (localStorage ## getItem (Js.string "why3-buffer-content"))
-                               (fun () -> Js.string "")
+      let buffer = Js.Opt.get  (localStorage ## getItem !!"why3-buffer-content")
+                               (fun () -> !!"")
       in
       (name, buffer)
 
@@ -1054,8 +1056,8 @@ let () =
   ToolBar.(add_action button_stop Controller.stop);
   ToolBar.(add_action button_settings Dialogs.(show setting_dialog));
   ToolBar.(add_action button_help (fun () ->
-                                   Dom_html.window ## open_ (Js.string "trywhy3_help.html")
-                                                            (Js.string "_blank")
+                                   Dom_html.window ## open_ !!"trywhy3_help.html"
+                                                            !!"_blank"
                                                             Js.null));
   ToolBar.(add_action button_about Dialogs.(show about_dialog));
   ContextMenu.(add_action split_menu_entry
@@ -1090,18 +1092,18 @@ let () =
 
 let () =
   let upd content =
-    let examples = content ## split (Js.string "\n") in
+    let examples = content ## split !!"\n" in
     let examples = Js.to_array (Js.str_array examples) in
     for i = 0 to ((Array.length examples) / 2) - 1 do
       ExampleList.add_example
         examples.(2*i)
-        ((Js.string "examples/") ## concat (examples.(2*i+1)))
+        (!!"examples/" ## concat (examples.(2*i+1)))
     done;
     ExampleList.set_loading_label false in
   XHR.update_file (function
         | `New content -> Js.Opt.iter content upd
         | _ -> ExampleList.set_loading_label false
-    ) (Js.string "examples/index.txt");
+    ) !!"examples/index.txt";
   ExampleList.set_loading_label true
 
 
@@ -1111,15 +1113,15 @@ let () =
   FormatList.selected_format := Js.to_string name; (* formats not loaded yet *)
   Editor.name := name;
   Editor.set_value buffer;
-  Panel.set_wide (Session.load_view_mode () = (Js.string "wide"));
+  Panel.set_wide (Session.load_view_mode () = !!"wide");
   ExampleList.unselect();
   Dom_html.window ##. onunload :=
     Dom.handler (fun _ ->
                    Session.save_buffer !Editor.name (Editor.get_value ());
                    Session.save_num_threads (Array.length !Controller.alt_ergo_workers);
                    Session.save_num_steps !Controller.alt_ergo_steps;
-                   Session.save_view_mode (if Panel.is_wide () then Js.string "wide"
-                                           else Js.string "column");
+                   Session.save_view_mode (if Panel.is_wide () then !!"wide"
+                                           else !!"column");
                    Js._true)
 
 (*
