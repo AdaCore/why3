@@ -136,23 +136,19 @@ module Editor =
     let clear_annotations () =
       editor ## getSession ## clearAnnotations
 
-    let _Infinity : int = get_global "Infinity"
-
     let scroll_to_end e =
       let len = e ## getSession ## getLength in
       let last_line = len - 1 in
-      e ## gotoLine last_line _Infinity Js._false
+      e ## gotoLine last_line 0 Js._false
 
     let () =
       let editor_theme : Js.js_string Js.t = get_global "editor_theme" in
       let task_viewer_mode : Js.js_string Js.t = get_global "task_viewer_mode" in
 
       editor ## setTheme editor_theme;
-      JSU.(set editor (Js.string "$blockScrolling") _Infinity);
 
       task_viewer ## setTheme editor_theme;
       task_viewer ## getSession ## setMode task_viewer_mode;
-      JSU.(set task_viewer (Js.string "$blockScrolling") _Infinity);
 
       task_viewer ## setReadOnly Js._true
 
