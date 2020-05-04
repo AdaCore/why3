@@ -17,6 +17,36 @@ let get_global ident =
   let res : 'a Js.optdef = Js.Unsafe.(get global) (Js.string ident) in
   check_def ident res
 
+module Url = struct
+
+  class type urlSearchParams =
+    object
+      method get : js_string t -> js_string t opt meth
+      method set : js_string t -> js_string t -> unit meth
+      method delete : js_string t -> unit meth
+      method toString : js_string t meth
+    end
+
+  class type url =
+    object
+      method hash : js_string t prop
+      method host : js_string t prop
+      method hostname : js_string t prop
+      method href : js_string t prop
+      method origin : js_string t readonly_prop
+      method password : js_string t prop
+      method pathname : js_string t prop
+      method port : js_string t prop
+      method protocol : js_string t prop
+      method search : js_string t prop
+      method searchParams : urlSearchParams t readonly_prop
+      method username : js_string t prop
+    end
+
+  let _URL : (js_string t -> url t) constr = Unsafe.global ##. _URL
+
+end
+
 module Ace () = struct
 
   type marker
@@ -79,9 +109,9 @@ module Ace () = struct
   let ace : ace Js.t = get_global "ace"
   let edit s = ace ## edit s
 
-  let range : (int -> int -> int -> int -> range Js.t) Js.constr =
+  let range : (int -> int -> int -> int -> range t) constr =
     let r =
-      Unsafe.get (ace ## require (Js.string "ace/range")) (Js.string "Range")
+      Unsafe.get (ace ## require (string "ace/range")) (string "Range")
     in
     check_def "Range" r
 
