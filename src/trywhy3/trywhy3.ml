@@ -96,6 +96,41 @@ let addMouseEventListener prevent o (e : Js.js_string Js.t) f =
                    inject cb;
                    inject Js._false |])
 
+module Buttons = struct
+
+  let button_open = getElement AsHtml.button "why3-button-open"
+  let real_save = getElement AsHtml.a "why3-save-as"
+  let button_save = getElement AsHtml.button "why3-button-save"
+
+  let button_undo = getElement AsHtml.button "why3-button-undo"
+  let button_redo = getElement AsHtml.button "why3-button-redo"
+
+  let button_execute = getElement AsHtml.button "why3-button-execute"
+  let button_compile = getElement AsHtml.button "why3-button-compile"
+  let button_stop = getElement AsHtml.button "why3-button-stop"
+
+  let button_settings = getElement AsHtml.button "why3-button-settings"
+  let button_help = getElement AsHtml.button "why3-button-help"
+  let button_about = getElement AsHtml.button "why3-button-about"
+
+  let disable b =
+    b ##. disabled := Js._true;
+    b ##. classList ## add !!"why3-inactive"
+
+  let enable b =
+    b ##. disabled := Js._false;
+    b ##. classList ## remove !!"why3-inactive"
+
+  let toggle b =
+    if Js.to_bool (b ##. disabled) then enable b else disable b
+
+  let change b v =
+    if v = Js.to_bool (b ##. disabled) then
+      if v then enable b
+      else disable b
+
+end
+
 module Ace = Ace ()
 
 module Editor =
@@ -142,12 +177,17 @@ module Editor =
     let redo () =
       editor ## redo
 
+    let update_undo () =
+      let manager = editor ## getSession ## getUndoManager in
+      Buttons.(change button_undo) (Js.to_bool (manager ## hasUndo));
+      Buttons.(change button_redo) (Js.to_bool (manager ## hasRedo))
+
     let get_value ?(editor=editor) () =
       editor ## getValue
 
     let set_value ?(editor=editor) str =
       editor ## setValue str ~-1;
-      editor ## getSession ## getUndoManager ## reset
+      editor ## getSession ## getUndoManager ## markClean
 
     let mk_range l1 c1 l2 c2 =
       new%js Ace.range l1 c1 l2 c2
@@ -185,10 +225,6 @@ module Editor =
       let l2, c2 = convert_range l1 b (i+b) (e-b) in
       mk_range (l1-1) c1 (l2-1) c2
 
-      let set_on_event (e : Js.js_string Js.t) f =
-        ignore JSU.(meth_call editor "on" [| inject e; inject f|])
-
-
       let editor_bg = getElement AsHtml.div "why3-editor-bg"
 
       let disable () =
@@ -202,11 +238,9 @@ module Editor =
 
 
       let confirm_unsaved () =
-        if Js.to_bool (editor ## getSession ## getUndoManager ## hasUndo) then
-          Js.to_bool
-            (Dom_html.window ## confirm !!"You have unsaved changes in your editor, proceed anyway ?")
-        else
-          true
+        Js.to_bool (editor ## getSession ## getUndoManager ## isClean) ||
+          Js.to_bool (Dom_html.window ## confirm
+                        !!"You have unsaved changes in your editor, proceed anyway ?")
 
     let error_marker = ref None
 
@@ -550,17 +584,20 @@ module TaskList =
           ContextMenu.show_at x y)
 
     let () =
-      Editor.set_on_event !!"change"
-        (Js.wrap_callback (fun () ->
+      Editor.editor ## on !!"change"
+        (Js.wrap_callback (fun _ _ ->
              clear ();
              ExampleList.unselect ();
              Editor.clear_annotations ();
              Editor.update_error_marker None))
 
     let () =
-      Editor.set_on_event
-        !!"focus"
-        (Js.wrap_callback  clear_task_selection )
+      Editor.editor ## on !!"input"
+        (Js.wrap_callback (fun _ _ -> Editor.update_undo ()))
+
+    let () =
+      Editor.editor ## on !!"focus"
+        (Js.wrap_callback (fun _ _ -> clear_task_selection ()))
 
   end
 
@@ -622,131 +659,99 @@ let handle_why3_message o =
         Not_found -> ()
 
 
-module ToolBar =
-  struct
-    let button_open = getElement AsHtml.button "why3-button-open"
-    let real_save = getElement AsHtml.a "why3-save-as"
-    let button_save = getElement AsHtml.button "why3-button-save"
+module ToolBar = struct
 
-    let button_undo = getElement AsHtml.button "why3-button-undo"
-    let button_redo = getElement AsHtml.button "why3-button-redo"
-
-    let button_execute = getElement AsHtml.button "why3-button-execute"
-    let button_compile = getElement AsHtml.button "why3-button-compile"
-    let button_stop = getElement AsHtml.button "why3-button-stop"
-
-    let button_settings = getElement AsHtml.button "why3-button-settings"
-    let button_help = getElement AsHtml.button "why3-button-help"
-    let button_about = getElement AsHtml.button "why3-button-about"
-
-    let disable b  =
-      b ##. disabled := Js._true;
-      b ##. classList ## add !!"why3-inactive"
-
-    let enable b =
-      b ##. disabled := Js._false;
-      b ##. classList ## remove !!"why3-inactive"
+  let add_action b f =
+    let cb = fun _ ->
+      f ();
+      Editor.editor ## focus;
+      Js._false in
+    b ##. onclick := Dom.handler cb
 
 
-    let toggle (b : <disabled : bool Js.t Js.prop; ..> Js.t) =
-      if Js.to_bool (b ##. disabled) then enable b else disable b
+  let disable_compile () =
+    Editor.disable ();
+    ContextMenu.disable ();
+    FormatList.disable ();
+    ExampleList.disable ();
+    let open Buttons in
+    disable button_open;
+    disable button_undo;
+    disable button_redo;
+    disable button_execute;
+    disable button_compile
 
+  let enable_compile () =
+    Editor.enable ();
+    ContextMenu.enable ();
+    FormatList.enable ();
+    ExampleList.enable ();
+    let open Buttons in
+    enable button_open;
+    Editor.update_undo ();
+    enable button_execute;
+    enable button_compile
 
-    let add_action b f =
-      let cb = fun _ ->
-        f ();
-        Editor.editor ## focus;
-        Js._false
-      in
-      b ##. onclick := Dom.handler cb
+  let mk_save () =
+    let blob =
+      let code = Editor.get_value () in
+      File.blob_from_any ~contentType:"text/plain" ~endings:`Native [`js_string code]
+    in
+    let name =
+      if !Editor.name ##. length == 0 then !!"test.mlw" else !Editor.name
+    in
+    blob, name
 
-
-    let disable_compile () =
-      Editor.disable ();
-      ContextMenu.disable ();
-      FormatList.disable ();
-      ExampleList.disable ();
-      disable button_open;
-      disable button_undo;
-      disable button_redo;
-      disable button_execute;
-      disable button_compile
-
-    let enable_compile () =
-      Editor.enable ();
-      ContextMenu.enable ();
-      FormatList.enable ();
-      ExampleList.enable ();
-      enable button_open;
-      enable button_undo;
-      enable button_redo;
-      enable button_execute;
-      enable button_compile
-
-
-
-
-    let mk_save () =
-      let blob =
-        let code = Editor.get_value () in
-        File.blob_from_any ~contentType:"text/plain" ~endings:`Native [`js_string code]
-      in
-      let name =
-        if !Editor.name ##. length == 0 then !!"test.mlw" else !Editor.name
-      in
-      blob, name
-
-    let save_default () =
-      let blob, name = mk_save () in
-      let url = Dom_html.window ##. _URL ## createObjectURL blob in
-      real_save ##. href := url;
-      JSU.(set real_save !!"download" name);
-      real_save ## click
+  let save_default () =
+    let blob, name = mk_save () in
+    let url = Dom_html.window ##. _URL ## createObjectURL blob in
+    Buttons.real_save ##. href := url;
+    JSU.(set Buttons.real_save !!"download" name);
+    Buttons.real_save ## click
     (* does not work with firefox *)
     (*ignore JSU.(meth_call _URL "revokeObjectURL" [| inject url |]) *)
 
+  let save =
+    let nav = Dom_html.window ##. navigator in
+    match Js.Optdef.to_option (JSU.get nav !!"msSaveBlob") with
+    | None -> save_default
+    | Some _f ->
+        fun () ->
+        let blob, name = mk_save () in
+        ignore JSU.(meth_call nav "msSaveBlob" [| inject blob; inject name |])
 
-    let save =
-      match Js.Optdef.to_option JSU.(get (Dom_html.window ##. navigator) !!"msSaveBlob")
-      with
-        None -> save_default
-      | Some _f ->
-         fun () ->
-         let blob, name = mk_save () in
-         ignore JSU.(meth_call (Dom_html.window ##. navigator) "msSaveBlob" [| inject blob; inject name |])
+  let finish_open url reader _ =
+    match Js.Opt.to_option (File.CoerceTo.string (reader ##. result)) with
+    | None -> Js._true
+    | Some content ->
+        let name = File.filename url in
+        FormatList.resolve_format name;
+        Editor.name := name;
+        Editor.set_value content;
+        Js._true
 
-    let finish_open url reader _ =
-      match Js.Opt.to_option (File.CoerceTo.string (reader ##. result)) with
-      | None -> Js._true
-      | Some content ->
-          let name = File.filename url in
-          FormatList.resolve_format name;
-          Editor.name := name;
-          Editor.set_value content;
-          Js._true
+  let open_ = getElement AsHtml.input "why3-open"
 
-    let open_ = getElement AsHtml.input "why3-open"
+  let start_open _ =
+    FormatList.unselect ();
+    ExampleList.unselect ();
+    match Js.Optdef.to_option (open_ ##. files) with
+    | None -> Js._false
+    | Some f ->
+        match Js.Opt.to_option (f ## item 0) with
+        | None -> Js._false
+        | Some f ->
+            let reader = new%js File.fileReader in
+            reader ##. onloadend := Dom.handler (finish_open f reader);
+            reader ## readAsText (f :> File.blob Js.t);
+            Js._true
 
-    let start_open _ =
-      FormatList.unselect ();
-      ExampleList.unselect ();
-      match Js.Optdef.to_option (open_ ##. files) with
-      | None -> Js._false
-      | Some f ->
-          match Js.Opt.to_option (f ## item 0) with
-          | None -> Js._false
-          | Some f ->
-              let reader = new%js File.fileReader in
-              reader ##. onloadend := Dom.handler (finish_open f reader);
-              reader ## readAsText (f :> File.blob Js.t);
-              Js._true
+  let () =
+    open_ ##. onchange := Dom.handler start_open
 
-    let () =
-      open_ ##. onchange := Dom.handler start_open
+  let open_ () = if Editor.confirm_unsaved () then open_ ## click
 
-    let open_ () = if Editor.confirm_unsaved () then open_ ## click
-
-  end
+end
 
 module Panel =
   struct
@@ -1061,28 +1066,27 @@ end
 
 (* Initialisation *)
 let () =
-  ToolBar.(add_action button_open open_);
+  ToolBar.(add_action Buttons.button_open open_);
   KeyBinding.add_global ~ctrl:Js._true 79 ToolBar.open_;
 
-  ToolBar.(add_action button_save save);
+  ToolBar.(add_action Buttons.button_save save);
   KeyBinding.add_global ~ctrl:Js._true 83 ToolBar.save;
 
-  ToolBar.(add_action button_undo Editor.undo);
+  ToolBar.(add_action Buttons.button_undo Editor.undo);
   KeyBinding.add_global ~ctrl:Js._true 90 Editor.undo;
 
-  ToolBar.(add_action button_redo Editor.redo);
+  ToolBar.(add_action Buttons.button_redo Editor.redo);
   KeyBinding.add_global ~ctrl:Js._true 89 Editor.redo;
 
 
-  ToolBar.(add_action button_execute Controller.why3_execute);
-  ToolBar.(add_action button_compile Controller.why3_parse);
-  ToolBar.(add_action button_stop Controller.stop);
-  ToolBar.(add_action button_settings Dialogs.(show setting_dialog));
-  ToolBar.(add_action button_help (fun () ->
-                                   Dom_html.window ## open_ !!"trywhy3_help.html"
-                                                            !!"_blank"
-                                                            Js.null));
-  ToolBar.(add_action button_about Dialogs.(show about_dialog));
+  ToolBar.(add_action Buttons.button_execute Controller.why3_execute);
+  ToolBar.(add_action Buttons.button_compile Controller.why3_parse);
+  ToolBar.(add_action Buttons.button_stop Controller.stop);
+  ToolBar.(add_action Buttons.button_settings Dialogs.(show setting_dialog));
+  ToolBar.(add_action Buttons.button_help (fun () ->
+               Dom_html.window ## open_ !!"trywhy3_help.html" !!"_blank" Js.null));
+  ToolBar.(add_action Buttons.button_about Dialogs.(show about_dialog));
+
   ContextMenu.(add_action split_menu_entry
                  Controller.(why3_transform `Split ignore));
   ContextMenu.(add_action prove_menu_entry
@@ -1141,6 +1145,9 @@ let () =
   FormatList.selected_format := Js.to_string lang; (* formats not yet loaded *)
   Editor.name := name;
   Editor.set_value buffer;
+  Editor.editor ## getSession ## getUndoManager ## reset;
+  Editor.update_undo ();
+  Editor.editor ## focus;
   Panel.set_wide (Session.load_view_mode () = !!"wide");
   ExampleList.unselect();
   Dom_html.window ##. onunload :=

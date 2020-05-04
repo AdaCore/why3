@@ -72,6 +72,8 @@ module Ace () = struct
     object
       method hasRedo : bool t meth
       method hasUndo : bool t meth
+      method isClean : bool t meth
+      method markClean : unit meth
       method reset : unit meth
     end
 
@@ -93,6 +95,7 @@ module Ace () = struct
       method getSession : editSession t meth
       method getValue : js_string t meth
       method gotoLine : int -> int -> bool t -> unit meth
+      method on : js_string t -> (Unsafe.any -> editor t -> unit) callback -> unit meth
       method redo : unit meth
       method setReadOnly : bool t -> unit meth
       method setTheme : js_string t -> unit meth
