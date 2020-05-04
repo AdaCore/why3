@@ -268,7 +268,7 @@ let why3_split id =
       | [ child ], `Task(orig) when Why3.Task.task_equal child orig -> ()
       | subtasks, _ ->
           t.subtasks <- List.map (fun t -> register_task id t) subtasks;
-          List.iter why3_prove t.subtasks
+          List.iter (why3_prove ?steps:None) t.subtasks
     end
   | _ -> ()
 

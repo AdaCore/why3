@@ -1675,14 +1675,7 @@ $(TRYWHY3DEP) $(TRYWHY3CMO): INCLUDES += -I src/trywhy3
 
 ALTERGODIR=src/trywhy3/alt-ergo
 
-JSOCAMLC=$(OCAMLFIND) ocamlc -package js_of_ocaml -g -package js_of_ocaml.ppx \
-        -package ocplib-simplex -I src/trywhy3 \
-	-I $(ALTERGODIR)/lib/util \
-	-I $(ALTERGODIR)/lib/structures \
-	-I $(ALTERGODIR)/lib/parsing \
-	-I $(ALTERGODIR)/lib/frontend \
-	-I $(ALTERGODIR)/lib/reasoners \
-	-I $(ALTERGODIR)/parsers/why
+ALTERGOINCLUDES = $(addprefix -I $(ALTERGODIR)/, lib/util lib/structures lib/parsing lib/frontend lib/reasoners parsers/why)
 
 ALTERGOLIBS = \
 	util/config \
@@ -1773,7 +1766,7 @@ src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.js src/
 	$<
 
 src/trywhy3/trywhy3.byte: $(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo trywhy3.cmo)
-	$(JSOCAMLC) -o $@ -linkpkg $^
+	$(OCAMLFIND) ocamlc -o $@ -package js_of_ocaml -linkpkg $^
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/try_alt_ergo.drv
 	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 \
@@ -1784,21 +1777,25 @@ src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/try_alt_erg
 
 src/trywhy3/why3_worker.byte: $(WHY3CMA) lib/plugins/python.cmo lib/plugins/microc.cmo \
 		$(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo why3_worker.cmo)
-	$(JSOCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
+	$(OCAMLFIND) ocamlc $(BFLAGS) -package js_of_ocaml -o $@ $(BLINKFLAGS) $^
 
 src/trywhy3/alt_ergo_worker.js: src/trywhy3/alt_ergo_worker.byte
 	js_of_ocaml $(JSOO_DEBUG) +dynlink.js +toplevel.js $<
 
 src/trywhy3/alt_ergo_worker.byte: $(ALTERGOCMO) $(addprefix src/trywhy3/, worker_proto.cmo alt_ergo_worker.cmo)
-	$(JSOCAMLC) -o $@ -package num -package dynlink -package str -package unix -package camlzip -linkpkg $^
+	$(OCAMLFIND) ocamlc -o $@ -package num -package dynlink -package str -package unix -package camlzip -package ocplib-simplex -package js_of_ocaml -linkpkg $^
+
+src/trywhy3/alt_ergo_worker.cmo: BFLAGS += $(ALTERGOINCLUDES)
 
 src/trywhy3/%.cmo: src/trywhy3/%.ml
-	$(JSOCAMLC) $(BFLAGS) -c $<
+	$(OCAMLFIND) ocamlc $(BFLAGS) -c $<
 
 src/trywhy3/%.cmi: src/trywhy3/%.mli
-	$(JSOCAMLC) $(BFLAGS) -c $<
+	$(OCAMLFIND) ocamlc $(BFLAGS) -c $<
 
-src/trywhy3/%.cmo: BFLAGS += -w -48
+$(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo alt_ergo_worker.cmo): BFLAGS += -package js_of_ocaml
+
+$(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml.ppx
 
 ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
 -include $(TRYWHY3DEP)
