@@ -342,9 +342,11 @@ endif
 
 .PHONY: initialize_messages update-parsing-error-handling
 
-src/parser/parser_messages.ml: src/parser/parser.mly src/parser/handcrafted.messages
+PARSERS=src/parser/parser.mly src/parser/parsing_only.mly
+
+src/parser/parser_messages.ml: src/parser/handcrafted.messages
 	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
-	$(MENHIR) --explain --strict src/parser/parser.mly --update-errors \
+	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --update-errors \
 	src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
 	diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; \
 	RET_CODE=$$?; \
@@ -354,7 +356,7 @@ contains an updated version that must be checked before replacing 'src/parser/ha
 		exit 1; \
 	fi
 	rm -f src/parser/handcrafted.messages.temp
-	$(MENHIR) --explain --strict src/parser/parser.mly --compile-errors \
+	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --compile-errors \
 	src/parser/handcrafted.messages > src/parser/parser_messages.ml.tmp
 	mv src/parser/parser_messages.ml.tmp src/parser/parser_messages.ml
 
@@ -2130,6 +2132,10 @@ clean::
 %.ml %.mli: %.mly
 	$(SHOW) 'Menhir $<'
 	$(HIDE)$(MENHIR) --table --explain --strict $<
+
+src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
+	$(SHOW) 'Menhir $<'
+	$(HIDE)$(MENHIR) --table --explain --strict $(PARSERS) --base src/parser/parser
 
 %.dep: %.ml %.mli
 	$(SHOW) 'Ocamldep $<'
