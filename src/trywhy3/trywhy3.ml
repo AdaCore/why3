@@ -17,33 +17,15 @@ module Js = Js_of_ocaml.Js
 module JSU = Js_of_ocaml.Js.Unsafe
 module Dom = Js_of_ocaml.Dom
 module File = Js_of_ocaml.File
-module Sys_js = Js_of_ocaml.Sys_js
 module Worker = Js_of_ocaml.Worker
 module Dom_html = Js_of_ocaml.Dom_html
 module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
 
 let int_of_js_string s = int_of_string (Js.to_string s)
 
-let blob_url_of_string s =
-  let s = Sys_js.read_file ~name:s in
-  let blob = File.blob_from_string s in
-  let url = Dom_html.window ##. _URL ## createObjectURL blob in
-  Js.to_string url
-
-
 module XHR =
   struct
     include XmlHttpRequest
-
-    let load_embedded_files =
-      Js.to_bool (get_global "load_embedded_files") ||
-        Js.to_string (Dom_html.window ##. location ##. protocol) = "file:"
-
-    let make_url =
-      if load_embedded_files then
-        fun u ->
-        Js.string (blob_url_of_string ("/" ^ (Js.to_string u)))
-      else fun u -> u
 
     let update_file ?(date=0.) cb url =
       let xhr = create () in
@@ -51,11 +33,10 @@ module XHR =
         Js.wrap_callback
           (fun () ->
            if xhr ##. readyState == DONE then
-             if xhr ##. status = 200 || (xhr ##. status = 0 && load_embedded_files) then
+             if xhr ##. status = 200 then
                let date_str = Js.Opt.get (xhr ## getResponseHeader (Js.string "Last-Modified"))
                                          (fun () -> Js.string "01/01/2100") (* far into the future *)
                in
-               log (Printf.sprintf "File %s has date %s" (Js.to_string url) (Js.to_string date_str));
                let document_date = Js.date ## parse (date_str) in
                if document_date < date then
                  cb `UpToDate
@@ -69,12 +50,12 @@ module XHR =
                                  else
                                    cb `NotFound)
                  in
-                 let () = xhr ## _open (Js.string "GET") (make_url url) Js._true in
+                 let () = xhr ## _open (Js.string "GET") url Js._true in
                  xhr ## send (Js.null)
              else
                cb `NotFound
           );
-      xhr ## _open (Js.string "HEAD") (make_url url) Js._true;
+      xhr ## _open (Js.string "HEAD") url Js._true;
       xhr ## send (Js.null)
 
   end

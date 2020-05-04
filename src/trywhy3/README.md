@@ -37,13 +37,6 @@ Instructions to build TryWhy3
 
         ALTERGODIR=src/trywhy3/alt-ergo
 
-  * [optional] If you want to build a standalone trywhy3 that can be
-    run without a web server, the example files must be present at
-    compile time. See the step 'To add predefined examples' in the
-    'customization' section below and populate the `examples/`
-    directory of the trywhy3 source directory accordingly *before*
-    building trywhy3.
-
   * Compile with
 
         make trywhy3
@@ -70,18 +63,9 @@ Customization
   * To change the look and feel of the rest of the application, edit
     the file `trywhy3_custom.css`.
 
-  * To add some predefined examples, put some `.mlw` or `.why` files in the
+  * To add some predefined examples, put some `.mlw` files in the
     `examples/` subdirectory and generate an index as follows:
 
         cp some_file.mlw examples/
         cd examples/
         ../gen_index.sh *.mlw > index.txt
-
-  * [optional] If you want trywhy3 to only use its embedded files,
-    change the variable declaration `var load_embedded_files = false;`
-    to `var load_embedded_files = true;` in the header section of
-    `trywhy3.html`.
-
-    Note that this is the default behavior when `trywhy3.html` is opened from
-    a `file://` URL rather than a `http(s)://` URL, regardless of the value of
-    the `load_embedded_files` variable.

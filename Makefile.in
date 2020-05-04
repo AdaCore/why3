@@ -1758,16 +1758,13 @@ trywhy3.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_PACK))
 
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_worker.js
 
-src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte src/trywhy3/examples/*.mlw
-	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I src/trywhy3 \
-	        --file=examples/index.txt:/examples/index.txt \
-		`find src/trywhy3/examples -name "*.mlw" -printf " --file=examples/%P:/examples/%P"` \
-	$<
+src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
+	js_of_ocaml $(JSOO_DEBUG) $<
 
 src/trywhy3/trywhy3.byte: $(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo trywhy3.cmo)
 	$(OCAMLFIND) ocamlc -o $@ -package js_of_ocaml -linkpkg $^
 
-src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/try_alt_ergo.drv
+src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.conf src/trywhy3/try_alt_ergo.drv
 	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 \
 		--file=trywhy3.conf:/ \
 		--file=try_alt_ergo.drv:/ \
