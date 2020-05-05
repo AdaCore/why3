@@ -457,20 +457,23 @@ module ExampleList =
       let url = select_example ##. value in
       let name = filename url in
       FormatList.resolve_format name;
+      let set_content s =
+        Editor.set_value s;
+        Editor.name := name;
+        Editor.editor ## focus in
       begin match Js.Opt.to_option (sessionStorage ## getItem (url)) with
-      | Some s ->
-          Editor.set_value s;
-          Editor.name := name
+      | Some s -> set_content s
       | None ->
           let upd mlw =
             sessionStorage ## setItem url mlw;
-            Editor.name := name;
-            Editor.set_value mlw;
+            set_content mlw;
             set_loading_label false
           in
+          set_loading_label true;
           XHR.update_file (function
               | `New mlw -> Js.Opt.iter mlw upd
-              | _ -> ()) url
+              | _ -> set_loading_label false
+            ) url
       end
 
     let handle _ =
@@ -1135,12 +1138,11 @@ let () =
         (!!"examples/" ## concat (examples.(2*i+1)))
     done;
     ExampleList.set_loading_label false in
+  ExampleList.set_loading_label true;
   XHR.update_file (function
         | `New content -> Js.Opt.iter content upd
         | _ -> ExampleList.set_loading_label false
-    ) !!"examples/index.txt";
-  ExampleList.set_loading_label true
-
+    ) !!"examples/index.txt"
 
 let () =
   let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
