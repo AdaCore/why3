@@ -328,11 +328,11 @@ module FormatList = struct
 
   let formats = ref []
 
-  let change_mode ext =
+  let change_mode lang =
     let mode =
-      match ext with
-      | "py" -> !!"python"
-      | "c" -> !!"c_cpp"
+      match lang with
+      | "python" -> !!"python"
+      | "micro-C" -> !!"c_cpp"
       | _ -> !!"why3" in
     let mode = !!"ace/mode/" ## concat mode in
     Editor.editor ## getSession ## setMode mode
@@ -345,10 +345,10 @@ module FormatList = struct
           match List.nth_opt !formats (i - 1) with
           | Some (name, ext :: _) ->
               Editor.name := Js.string ("test." ^ ext);
-              change_mode ext;
               name
           | Some (name, []) -> name
           | _ -> "" in
+        change_mode name;
         selected_format := name;
         if name <> "" then
           let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
@@ -366,6 +366,11 @@ module FormatList = struct
     option ##. innerHTML := text;
     Dom.appendChild select_format option
 
+  let set_format name idx =
+    selected_format := name;
+    select_format ##. selectedIndex := idx;
+    change_mode name
+
   let resolve_format name =
     let ext =
       let arr = name ## split !!"." in
@@ -378,20 +383,16 @@ module FormatList = struct
           else aux (i + 1) l
       | [] -> ("", 0) in
     let (name, idx) = aux 1 !formats in
-    selected_format := name;
-    select_format ##. selectedIndex := idx;
-    change_mode ext
+    set_format name idx
 
   let set_format name =
     let rec aux i = function
-      | (n, ext :: _) :: l ->
-          if n = name then (name, ext, i)
+      | (n, _) :: l ->
+          if n = name then (name, i)
           else aux (i + 1) l
-      | _ -> ("", "", 0) in
-    let (name, ext, idx) = aux 1 !formats in
-    select_format ##. selectedIndex := idx;
-    selected_format := name;
-    change_mode ext
+      | _ -> ("", 0) in
+    let (name, idx) = aux 1 !formats in
+    set_format name idx
 
   let add_formats l =
     let fresh = !formats = [] in
@@ -858,51 +859,44 @@ module KeyBinding =
   end
 
 
-module Session =
-  struct
+module Session = struct
 
-    let localStorage =
-      check_def "localStorage" (Dom_html.window ##. localStorage)
+  let localStorage =
+    check_def "localStorage" (Dom_html.window ##. localStorage)
 
-    let save_num_threads i =
-      localStorage ## setItem !!"why3-num-threads" (js_string_of_int i)
+  let save_num_threads i =
+    localStorage ## setItem !!"why3-num-threads" (js_string_of_int i)
 
-    let save_num_steps i =
-      localStorage ## setItem !!"why3-num-steps" (js_string_of_int i)
+  let save_num_steps i =
+    localStorage ## setItem !!"why3-num-steps" (js_string_of_int i)
 
+  let save_view_mode m =
+    localStorage ## setItem !!"why3-view-mode" m
 
-    let save_view_mode m =
-      localStorage ## setItem !!"why3-view-mode" m
+  let save_buffer lang name content =
+    localStorage ## setItem !!"why3-buffer-lang" lang;
+    localStorage ## setItem !!"why3-buffer-name" name;
+    localStorage ## setItem !!"why3-buffer-content" content
 
-    let save_buffer name content =
-      localStorage ## setItem !!"why3-buffer-name" name;
-      localStorage ## setItem !!"why3-buffer-content" content
+  let get_item s def =
+    Js.Opt.get (localStorage ## getItem s) (fun () -> def)
 
-    let load_num_threads () =
-      int_of_js_string (Js.Opt.get (localStorage ## getItem !!"why3-num-threads")
-                                (fun () -> !!"4"))
+  let load_num_threads () =
+    int_of_js_string (get_item !!"why3-num-threads" !!"4")
 
-    let load_num_steps () =
-      int_of_js_string (Js.Opt.get (localStorage ## getItem !!"why3-num-steps")
-                                (fun () -> !!"100"))
+  let load_num_steps () =
+    int_of_js_string (get_item !!"why3-num-steps" !!"100")
 
-    let load_view_mode () =
-      Js.Opt.get (localStorage ## getItem !!"why3-view-mode")
-                 (fun () -> !!"wide")
+  let load_view_mode () =
+    get_item !!"why3-view-mode" !!"wide"
 
-    let load_buffer () =
-      let name = Js.Opt.get  (localStorage ## getItem !!"why3-buffer-name")
-                             (fun () -> !!"")
-      in
-      let buffer = Js.Opt.get  (localStorage ## getItem !!"why3-buffer-content")
-                               (fun () -> !!"")
-      in
-      (name, buffer)
+  let load_buffer () =
+    let lang= get_item !!"why3-buffer-lang" !!"" in
+    let name = get_item !!"why3-buffer-name" !!"" in
+    let buffer = get_item !!"why3-buffer-content" !!"" in
+    (lang, name, buffer)
 
-
-
-
-  end
+end
 
 
 module Controller =
@@ -1140,12 +1134,17 @@ let () =
 let () =
   let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
   (* restore the session *)
-  let name, buffer = Session.load_buffer () in
+  let lang, name, buffer = Session.load_buffer () in
   let lang =
     match Js.Opt.to_option (url ##. searchParams ## get !!"lang") with
     | Some lang -> lang
-    | None -> name in
-  FormatList.selected_format := Js.to_string lang; (* formats not yet loaded *)
+    | None -> lang in
+  let lang = Js.to_string lang in
+  let lang =
+    if lang <> "" then
+      let () = FormatList.change_mode lang in lang
+    else Js.to_string name in
+  FormatList.selected_format := lang; (* formats not yet loaded *)
   Editor.name := name;
   Editor.set_value buffer;
   Editor.editor ## getSession ## getUndoManager ## reset;
@@ -1155,12 +1154,13 @@ let () =
   ExampleList.unselect();
   Dom_html.window ##. onunload :=
     Dom.handler (fun _ ->
-                   Session.save_buffer !Editor.name (Editor.get_value ());
-                   Session.save_num_threads (Array.length !Controller.alt_ergo_workers);
-                   Session.save_num_steps !Controller.alt_ergo_steps;
-                   Session.save_view_mode (if Panel.is_wide () then !!"wide"
-                                           else !!"column");
-                   Js._true)
+        Session.save_buffer (Js.string !FormatList.selected_format)
+          !Editor.name (Editor.get_value ());
+        Session.save_num_threads (Array.length !Controller.alt_ergo_workers);
+        Session.save_num_steps !Controller.alt_ergo_steps;
+        Session.save_view_mode (if Panel.is_wide () then !!"wide"
+                                else !!"column");
+        Js._true)
 
 (*
 Local Variables:
