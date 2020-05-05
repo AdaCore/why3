@@ -1069,26 +1069,26 @@ end
 
 (* Initialisation *)
 let () =
-  ToolBar.(add_action Buttons.button_open open_);
+  ToolBar.add_action Buttons.button_open ToolBar.open_;
   KeyBinding.add_global ~ctrl:Js._true 79 ToolBar.open_;
 
-  ToolBar.(add_action Buttons.button_save save);
+  ToolBar.add_action Buttons.button_save ToolBar.save;
   KeyBinding.add_global ~ctrl:Js._true 83 ToolBar.save;
 
-  ToolBar.(add_action Buttons.button_undo Editor.undo);
+  ToolBar.add_action Buttons.button_undo Editor.undo;
   KeyBinding.add_global ~ctrl:Js._true 90 Editor.undo;
 
-  ToolBar.(add_action Buttons.button_redo Editor.redo);
+  ToolBar.add_action Buttons.button_redo Editor.redo;
   KeyBinding.add_global ~ctrl:Js._true 89 Editor.redo;
 
 
-  ToolBar.(add_action Buttons.button_execute Controller.why3_execute);
-  ToolBar.(add_action Buttons.button_compile Controller.why3_parse);
-  ToolBar.(add_action Buttons.button_stop Controller.stop);
-  ToolBar.(add_action Buttons.button_settings Dialogs.(show setting_dialog));
-  ToolBar.(add_action Buttons.button_help (fun () ->
-               Dom_html.window ## open_ !!"trywhy3_help.html" !!"_blank" Js.null));
-  ToolBar.(add_action Buttons.button_about Dialogs.(show about_dialog));
+  ToolBar.add_action Buttons.button_execute Controller.why3_execute;
+  ToolBar.add_action Buttons.button_compile Controller.why3_parse;
+  ToolBar.add_action Buttons.button_stop Controller.stop;
+  ToolBar.add_action Buttons.button_settings Dialogs.(show setting_dialog);
+  ToolBar.add_action Buttons.button_help (fun () ->
+      Dom_html.window ## open_ !!"trywhy3_help.html" !!"_blank" Js.null);
+  ToolBar.add_action Buttons.button_about Dialogs.(show about_dialog);
 
   ContextMenu.(add_action split_menu_entry
                  Controller.(why3_transform `Split ignore));
