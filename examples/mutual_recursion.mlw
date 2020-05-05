@@ -1,0 +1,31 @@
+
+(** Some examples of mutual recursion and corresponding proofs of
+    termination *)
+
+use int.Int
+
+(** This example is from the book "Program Proofs" by Rustan Leino *)
+
+let rec f1 (n: int) : int
+  requires { 0 <= n }
+  variant  { n, 1 }
+= if n = 0 then 0 else f2 n + 1
+
+with f2 (n: int) : int
+  requires { 1 <= n }
+  variant  { n, 0 }
+= 2 * f1 (n - 1)
+
+(** Hofstadter's Female and Male sequences *)
+
+let rec function f (n: int) : int
+  requires { 0 <= n }
+  variant  { n, 1 }
+  ensures  { if n = 0 then result = 1  else 1 <= result <= n }
+= if n = 0 then 1 else n - m (f (n - 1))
+
+with function m (n: int) : int
+  requires { 0 <= n }
+  variant  { n, 0 }
+  ensures  { if n = 0 then result = 0 else 0 <= result < n }
+= if n = 0 then 0 else n - f (m (n - 1))
