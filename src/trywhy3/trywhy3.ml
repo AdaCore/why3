@@ -320,11 +320,7 @@ module FormatList = struct
   let select_format = getElement AsHtml.select "why3-select-format"
   let format_label = getElement AsHtml.span "why3-format-label"
 
-  let selected_format = ref "whyml"
-
-  let unselect () =
-    selected_format := "";
-    select_format ##. selectedIndex := 0
+  let selected_format = ref ""
 
   let formats = ref []
 
@@ -336,6 +332,15 @@ module FormatList = struct
       | _ -> !!"why3" in
     let mode = !!"ace/mode/" ## concat mode in
     Editor.editor ## getSession ## setMode mode
+
+  let change_url lang =
+    let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
+    let search = url ##. searchParams in
+    if Js.to_bool (search ## has !!"lang") && lang <> "" then
+      begin
+        search ## set !!"lang" (Js.string lang);
+        Dom_html.window ##. history ## replaceState Js.null (Js.string "") (Js.some (url ##. href))
+      end
 
   let handle _ =
     let i = select_format ##. selectedIndex in
@@ -350,10 +355,7 @@ module FormatList = struct
           | _ -> "" in
         change_mode name;
         selected_format := name;
-        if name <> "" then
-          let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
-          url ##. searchParams ## set !!"lang" (Js.string name);
-          Dom_html.window ##. history ## replaceState Js.null (Js.string "") (Js.some (url ##. href))
+        change_url name
       end;
     Js._false
 
@@ -369,7 +371,17 @@ module FormatList = struct
   let set_format name idx =
     selected_format := name;
     select_format ##. selectedIndex := idx;
-    change_mode name
+    change_mode name;
+    change_url name
+
+  let set_format name idx =
+    if idx = 0 then
+      match !formats with
+      | (name, _) :: _ ->
+          if select_format ##. selectedIndex = 0 then
+            set_format name idx
+      | [] -> ()
+    else set_format name idx
 
   let resolve_format name =
     let ext =
@@ -728,6 +740,7 @@ module ToolBar = struct
     match Js.Opt.to_option (File.CoerceTo.string (reader ##. result)) with
     | None -> Js._true
     | Some content ->
+        ExampleList.unselect ();
         let name = File.filename url in
         FormatList.resolve_format name;
         Editor.name := name;
@@ -737,8 +750,6 @@ module ToolBar = struct
   let open_ = getElement AsHtml.input "why3-open"
 
   let start_open _ =
-    FormatList.unselect ();
-    ExampleList.unselect ();
     match Js.Optdef.to_option (open_ ##. files) with
     | None -> Js._false
     | Some f ->

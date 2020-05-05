@@ -22,6 +22,7 @@ module Url = struct
   class type urlSearchParams =
     object
       method get : js_string t -> js_string t opt meth
+      method has : js_string t -> bool t meth
       method set : js_string t -> js_string t -> unit meth
       method delete : js_string t -> unit meth
       method toString : js_string t meth
