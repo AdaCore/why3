@@ -48,6 +48,49 @@ module Url = struct
 
 end
 
+module Promise = struct
+
+  (* opaque, as it would not be a regular tree otherwise, because of _then *)
+  type 'a promise
+
+  (* the various signatures for _then are needed,
+     because promises of promises do not really exist *)
+  class type ['a] inner_promise =
+    object
+      method _then : 'b. ('a -> 'b promise) callback -> 'b promise meth
+      method _then_value : 'b. ('a -> 'b t) callback -> 'b t promise meth
+      method _then_unit : ('a -> unit) callback -> unit promise meth
+      method _then_int : ('a -> int) callback -> int promise meth
+      method _then_float : ('a -> float) callback -> float promise meth
+      method catch : (Unsafe.any -> 'a) callback -> 'a promise meth
+    end
+
+  external unwrap : 'a promise -> 'a inner_promise t = "%identity"
+  external wrap : 'a inner_promise t -> 'a promise = "%identity"
+
+  let bind (x : 'a promise) (f : 'a -> 'b promise) : 'b promise =
+    (unwrap x) ## _then (wrap_callback (fun v -> f v))
+
+  let bind_unit (x : 'a promise) (f : 'a -> unit) : unit promise =
+    (unwrap x) ## _then_unit (wrap_callback (fun v -> f v))
+
+  let catch (x : unit promise) (f : Unsafe.any -> unit) : unit =
+    ignore ((unwrap x) ## catch (wrap_callback f))
+
+end
+
+module Fetch = struct
+
+  class type response =
+    object
+      method ok : bool prop
+      method text : js_string t Promise.promise meth
+    end
+
+  let fetch : js_string t -> response t Promise.promise = get_global "fetch"
+
+end
+
 module Ace () = struct
 
   type marker

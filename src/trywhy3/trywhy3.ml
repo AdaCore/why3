@@ -26,43 +26,6 @@ let (!!) = Js.string
 let int_of_js_string = Js.parseInt
 let js_string_of_int n = (Js.number_of_float (float_of_int n)) ## toString
 
-module XHR =
-  struct
-    include XmlHttpRequest
-
-    let update_file ?(date=0.) cb url =
-      let xhr = create () in
-      xhr ##. onreadystatechange :=
-        Js.wrap_callback
-          (fun () ->
-           if xhr ##. readyState == DONE then
-             if xhr ##. status = 200 then
-               let date_str = Js.Opt.get (xhr ## getResponseHeader !!"Last-Modified")
-                                         (fun () -> !!"01/01/2100") (* far into the future *)
-               in
-               let document_date = Js.date ## parse (date_str) in
-               if document_date < date then
-                 cb `UpToDate
-               else
-                 let () = xhr ##. onreadystatechange :=
-                            Js.wrap_callback
-                              (fun () ->
-                               if xhr ##. readyState == DONE then
-                                 if xhr ##. status = 200 then
-                                   cb (`New xhr ##. responseText)
-                                 else
-                                   cb `NotFound)
-                 in
-                 let () = xhr ## _open !!"GET" url Js._true in
-                 xhr ## send (Js.null)
-             else
-               cb `NotFound
-          );
-      xhr ## _open !!"HEAD" url Js._true;
-      xhr ## send (Js.null)
-
-  end
-
 module AsHtml =
   struct
     include Dom_html.CoerceTo
@@ -470,10 +433,12 @@ module ExampleList =
             set_loading_label false
           in
           set_loading_label true;
-          XHR.update_file (function
-              | `New mlw -> Js.Opt.iter mlw upd
-              | _ -> set_loading_label false
-            ) url
+          Promise.catch
+            (Promise.bind_unit
+               (Promise.bind (Fetch.fetch url)
+                  (fun r -> r ## text))
+               (fun s -> upd s))
+            (fun _ -> set_loading_label false)
       end
 
     let handle _ =
@@ -1139,10 +1104,12 @@ let () =
     done;
     ExampleList.set_loading_label false in
   ExampleList.set_loading_label true;
-  XHR.update_file (function
-        | `New content -> Js.Opt.iter content upd
-        | _ -> ExampleList.set_loading_label false
-    ) !!"examples/index.txt"
+  Promise.catch
+    (Promise.bind_unit
+       (Promise.bind (Fetch.fetch !!"examples/index.txt")
+          (fun r -> r ## text))
+       (fun s -> upd s))
+    (fun _ -> ExampleList.set_loading_label false)
 
 let () =
   let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
