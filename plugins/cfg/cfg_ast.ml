@@ -11,68 +11,38 @@
 
 open Why3
 
+type pty = Ptree.pty
+
 type ident = Ptree.ident
 
-type unop =
-  | Uneg (* -e *)
-  | Unot (* !e *)
+type binder = Ptree.binder
 
-type binop =
-  | Badd | Bsub | Bmul | Bdiv | Bmod    (* + - * / % *)
-  | Beq | Bneq | Blt | Ble | Bgt | Bge  (* == != < <= > >= *)
-  | Band | Bor                          (* && || *)
+type pattern = Ptree.pattern
 
-type ty =
-  | Tvoid
-  | Tint
-  | Tarray
+type spec = Ptree.spec
 
-type loop_annotation =
-  Ptree.invariant * Ptree.variant
+type cfg_expr = {
+    cfg_expr_desc : cfg_expr_desc;
+    cfg_expr_loc  : Loc.position;
+  }
 
-type expr = {
-  expr_desc: expr_desc;
-  expr_loc : Loc.position;
-}
+and cfg_expr_desc =
+  | CFGtrue
+  (** Boolean literal [True] *)
+  | CFGfalse
+  (** Boolean literal [False] *)
+  | CFGconst of Constant.constant
+  (** Constant literals *)
+(* TODO: expand *)
 
-and expr_desc =
-  | Eunit
-  | Eint of string
-  | Estring of string
-  | Eaddr of ident
-  | Eident of ident
-  | Ebinop of binop * expr * expr
-  | Eunop of unop * expr
-  | Ecall of ident * expr list
-  | Eget of expr * expr  (* e1[e2] *)
 
-and stmt = {
-  stmt_desc: stmt_desc;
-  stmt_loc : Loc.position;
-}
+type cfg_fundef =
+  ident * binder list * pty * pattern * spec * binder list * cfg_expr
+(** function name, argument, return type, ?, contract, local variables, body *)
 
-and stmt_desc =
-  | Sskip
-  | Sif of expr * stmt * stmt
-  | Sreturn of expr
-  | Svar of ty * ident * expr
-  | Sassign of ident * expr
-  | Swhile of expr * loop_annotation * stmt
-  (* | Sfor of stmt * expr * stmt * loop_annotation * block *)
-  | Seval of expr
-  | Sset of expr * expr * expr (* e1[e2] = e3 *)
-  | Sassert of Expr.assertion_kind * Ptree.term
-  | Sbreak
-  | Slabel of ident
-  | Sblock of stmt list
+type cfg_decl =
+  | Dmlw_decl of Ptree.decl
+  | Dletcfg of cfg_fundef list
 
-type param =
-  ty * ident
-
-type decl =
-  | Dinclude of ident
-  | Dfun     of ty * ident * param list * Ptree.spec * stmt
-  | Dlogic   of ty option * ident * param list * Ptree.term option
-  | Dprop    of Decl.prop_kind * ident * Ptree.term
-
-type file = decl list
+type cfg_file = (ident * cfg_decl list) list
+  (** a list of modules containing lists of declarations *)

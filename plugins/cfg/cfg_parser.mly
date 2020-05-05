@@ -11,24 +11,44 @@
 
 %{
 
-
   open Cfg_ast
+
+  let mk_cfgexpr d s e = { cfgexpr_desc = d; cfgexpr_loc = floc s e }
 
 %}
 
+(* extra token *)
+%token CFG
 
 %start cfgfile
-
 %type <Cfg_ast.cfg> cfgfile
 
 %%
 
 cfgfile:
-| dl=decl* EOF { dl }
+| ml=cfgmodule* EOF { ml }
 ;
 
-decl:
-| LET attrs(lident_rich) binders EQUAL seq { $1 }
+cfgmodule:
+| MODULE id=attrs(uident_nq) dl=cfgdecl* END
+    { (id,dl) }
+
+cfgdecl:
+| module_decl_parsing_only { Dmlw_decl $1 }
+| LET CFG with_list1(recdefn) { Dletcfg $2 }
 ;
 
-seq:
+recdefn:
+| id=attrs(lident_rich) args=binders COLON ret=return_named sp=spec EQUAL b=body
+    { let pat, ty, _mask = ret in
+      let spec = apply_return pat sp in
+      (id, args, ret, ty, pat, spec, b) }
+;
+
+body:
+  | cfgexpr { $1 }
+;
+
+cfgexpr:
+| TRUE { mk_cfgexpr CFGtrue $startpos $endpos }
+;

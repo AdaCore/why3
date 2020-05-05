@@ -362,7 +362,7 @@ module_decl:
     }
 | use_clone { () }
 
-module_decl_parsing_only:
+%public module_decl_parsing_only:
 | scope_head_parsing_only module_decl_parsing_only* END
     { let loc,import,qid = $1 in (Dscope(loc,import,qid,$2))}
 | IMPORT uqualid { (Dimport $2) }
@@ -653,7 +653,7 @@ params:  param*  { List.concat $1 }
 
 params1: param+  { List.concat $1 }
 
-binders: binder+ { List.concat $1 }
+%public binders: binder+ { List.concat $1 }
 
 param:
 | special_binder
@@ -1296,7 +1296,7 @@ for_dir:
 
 (* Specification *)
 
-spec:
+%public spec:
 | (* epsilon *) %prec prec_no_spec  { empty_spec }
 | single_spec spec                  { spec_union $1 $2 }
 
@@ -1354,7 +1354,7 @@ return_opt:
 | (* epsilon *)       { mk_pat Pwild $startpos $endpos, None, Ity.MaskVisible }
 | COLON return_named  { let pat, ty, mask = $2 in pat, Some ty, mask }
 
-return_named:
+%public return_named:
 | LEFTPAR ret_cast RIGHTPAR
     { $2 }
 | LEFTPAR comma_list2(ret_cast) RIGHTPAR
@@ -1496,12 +1496,12 @@ ident:
 | lident          { $1 }
 | lident_op       { $1 }
 
-ident_nq:
+%public ident_nq:
 | uident_nq       { $1 }
 | lident_nq       { $1 }
 | lident_op_nq    { $1 }
 
-lident_rich:
+%public lident_rich:
 | lident_nq       { $1 }
 | lident_op_nq    { $1 }
 
@@ -1509,7 +1509,7 @@ uident:
 | UIDENT          { mk_id $1 $startpos $endpos }
 | CORE_UIDENT     { mk_id $1 $startpos $endpos }
 
-uident_nq:
+%public uident_nq:
 | UIDENT          { mk_id $1 $startpos $endpos }
 | CORE_UIDENT     { let loc = floc $startpos($1) $endpos($1) in
                     Loc.errorm ~loc core_ident_error $1 }
@@ -1609,7 +1609,7 @@ prefix_op:
 
 (* Attributes and position markers *)
 
-attrs(X): X attr* { add_attr $1 $2 }
+%public attrs(X): X attr* { add_attr $1 $2 }
 
 attr:
 | ATTRIBUTE { ATstr (Ident.create_attribute $1) }
@@ -1620,7 +1620,7 @@ attr:
 bar_list1(X):
 | ioption(BAR) ; xl = separated_nonempty_list(BAR, X) { xl }
 
-with_list1(X):
+%public with_list1(X):
 | separated_nonempty_list(WITH, X)  { $1 }
 
 comma_list2(X):
