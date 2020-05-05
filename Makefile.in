@@ -342,7 +342,7 @@ endif
 
 .PHONY: initialize_messages update-parsing-error-handling
 
-PARSERS=src/parser/parser.mly src/parser/parsing_only.mly
+PARSERS=src/parser/parser.mly src/parser/mlw_parser.mly src/parser/parsing_only.mly
 
 src/parser/parser_messages.ml: src/parser/handcrafted.messages
 	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
