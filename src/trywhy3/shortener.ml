@@ -537,6 +537,7 @@ let decode input =
   done;
   Buffer.contents buf
 
+(*
 let () =
   let inp =
     let buf = Buffer.create 1024 in
@@ -549,3 +550,4 @@ let () =
   let dec = decode enc in
   (*print_endline dec;*)
   exit (if String.equal inp dec then 0 else 1)
+*)

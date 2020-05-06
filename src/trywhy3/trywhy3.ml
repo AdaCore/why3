@@ -64,6 +64,7 @@ module Buttons = struct
   let button_open = getElement AsHtml.button "why3-button-open"
   let real_save = getElement AsHtml.a "why3-save-as"
   let button_save = getElement AsHtml.button "why3-button-save"
+  let button_export = getElement AsHtml.button "why3-button-export"
 
   let button_undo = getElement AsHtml.button "why3-button-undo"
   let button_redo = getElement AsHtml.button "why3-button-redo"
@@ -302,7 +303,7 @@ module FormatList = struct
     if Js.to_bool (search ## has !!"lang") && lang <> "" then
       begin
         search ## set !!"lang" (Js.string lang);
-        Dom_html.window ##. history ## replaceState Js.null (Js.string "") (Js.some (url ##. href))
+        Dom_html.window ##. history ## replaceState Js.null !!"" (Js.some (url ##. href))
       end
 
   let handle _ =
@@ -734,6 +735,18 @@ module ToolBar = struct
 
   let open_ () = if Editor.confirm_unsaved () then open_ ## click
 
+  let export () =
+    let code = Js.to_string (Editor.get_value ()) in
+    let code = Shortener.encode code in
+    let clip = getElement AsHtml.textarea "why3-clipboard" in
+    let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
+    let search = url ##. searchParams in
+    search ## set !!"lang" (Js.string !FormatList.selected_format);
+    search ## set !!"code" (Js.string code);
+    clip ##. value := url ##. href;
+    clip ## select;
+    Dom_html.document ## execCommand !!"Copy" Js._false Js.null
+
 end
 
 module Panel =
@@ -1048,6 +1061,8 @@ let () =
   ToolBar.add_action Buttons.button_save ToolBar.save;
   KeyBinding.add_global ~ctrl:Js._true 83 ToolBar.save;
 
+  ToolBar.add_action Buttons.button_export ToolBar.export;
+
   ToolBar.add_action Buttons.button_undo Editor.undo;
   KeyBinding.add_global ~ctrl:Js._true 90 Editor.undo;
 
@@ -1113,19 +1128,28 @@ let () =
 
 let () =
   let url = new%js Url._URL (Dom_html.window ##. location ##. href) in
-  (* restore the session *)
-  let lang, name, buffer = Session.load_buffer () in
+  let search = url ##. searchParams in
+  let lang, buffer =
+    match Js.Opt.to_option (search ## get !!"code") with
+    | Some code ->
+        let code =
+          try Shortener.decode (Js.to_string code)
+          with Invalid_argument _ -> "Invalid 'code' fragment in the URL" in
+        search ## delete !!"code";
+        Dom_html.window ##. history ## replaceState Js.null !!"" (Js.some (url ##. href));
+        ("", Js.string code)
+    | None ->
+        (* restore the session *)
+        let lang, name, buffer = Session.load_buffer () in
+        Editor.name := name;
+        let lang = if lang ##. length == 0 then name else lang in
+        (Js.to_string lang, buffer) in
   let lang =
-    match Js.Opt.to_option (url ##. searchParams ## get !!"lang") with
-    | Some lang -> lang
+    match Js.Opt.to_option (search ## get !!"lang") with
+    | Some lang -> Js.to_string lang
     | None -> lang in
-  let lang = Js.to_string lang in
-  let lang =
-    if lang <> "" then
-      let () = FormatList.change_mode lang in lang
-    else Js.to_string name in
+  FormatList.change_mode lang;
   FormatList.selected_format := lang; (* formats not yet loaded *)
-  Editor.name := name;
   Editor.set_value buffer;
   Editor.editor ## getSession ## getUndoManager ## reset;
   Editor.update_undo ();

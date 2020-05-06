@@ -1626,7 +1626,7 @@ else
  JS_MAPS=
 endif
 
-TRYWHY3_FILES = alt_ergo_worker bindings trywhy3 why3_worker worker_proto
+TRYWHY3_FILES = alt_ergo_worker bindings shortener trywhy3 why3_worker worker_proto
 
 TRYWHY3MODULES = $(addprefix src/trywhy3/, $(TRYWHY3_FILES))
 
@@ -1723,7 +1723,7 @@ trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js src/trywhy3/alt_ergo_
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 	js_of_ocaml $(JSOO_DEBUG) $<
 
-src/trywhy3/trywhy3.byte: $(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo trywhy3.cmo)
+src/trywhy3/trywhy3.byte: $(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo shortener.cmo trywhy3.cmo)
 	$(OCAMLFIND) ocamlc -o $@ -package js_of_ocaml -linkpkg $^
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.conf src/trywhy3/try_alt_ergo.drv
