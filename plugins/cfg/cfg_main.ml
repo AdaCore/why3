@@ -11,13 +11,14 @@
 
 open Why3
 open Pmodule
-open Mc_ast
+open Cfg_ast
 open Ptree
 open Wstdlib
 
-let debug = Debug.register_flag "micro-C"
-  ~desc:"micro-C plugin debug flag"
+let debug = Debug.register_flag "CFG"
+  ~desc:"CFG plugin debug flag"
 
+(*
 let mk_id ~loc name =
   { id_str = name; id_ats = []; id_loc = loc }
 
@@ -342,11 +343,13 @@ let read_channel env path file c =
     Ident.Mid.iter print_m (Mstr.fold add_m mm Ident.Mid.empty)
   end;
   mm
+ *)
 
 let () =
-  Env.register_format mlw_language "micro-C" ["c"] read_channel
-    ~desc:"micro-C format"
+  Env.register_format mlw_language "CFG" ["cfg"] read_channel
+    ~desc:"CFG format"
 
+(*
 (* Add an extension of task printing *)
 let () = Itp_server.add_registered_lang "micro-C"
     (fun _ -> Mc_printer.microc_ext_printer)
@@ -359,3 +362,4 @@ let () = Args_wrapper.set_argument_parsing_functions "micro-C"
     (* TODO for qualids, add a similar funciton *)
     ~parse_qualid:(fun lb -> Lexer.parse_qualid lb)
     ~parse_list_qualid:(fun lb -> Lexer.parse_list_qualid lb)
+ *)

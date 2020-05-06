@@ -342,7 +342,7 @@ endif
 
 .PHONY: initialize_messages update-parsing-error-handling
 
-PARSERS=src/parser/parser.mly src/parser/mlw_parser.mly src/parser/parsing_only.mly
+PARSERS=src/parser/parser_common.mly src/parser/parser.mly
 
 src/parser/parser_messages.ml: src/parser/handcrafted.messages
 	rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
@@ -512,7 +512,7 @@ PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_ast py_parser py_lexer py_main
 PLUG_MICROC = mc_ast mc_parser mc_lexer mc_printer mc_main
-PLUG_CFG = cfg_ast cfg_parser cfg_main
+PLUG_CFG = cfg_ast cfg_tokens cfg_parser cfg_main
 
 PLUGINS = genequlin dimacs tptp python microc cfg
 
@@ -2141,13 +2141,14 @@ clean::
 
 src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
 	$(SHOW) 'Menhir $<'
-	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser $<
+	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser \
+		$^
 
 plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: plugins/cfg/cfg_parser.mly
 	$(SHOW) 'Menhir $<'
-	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser \
-		--external-tokens Why3.Parser \
-		src/parser/parser.mly $<
+	$(HIDE)$(MENHIR) --table --explain --base plugins/cfg/cfg_parser \
+		--external-tokens Cfg_tokens \
+		src/parser/parser_common.mly $^
 
 
 %.dep: %.ml %.mli

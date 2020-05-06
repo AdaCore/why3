@@ -11,17 +11,20 @@
 
 %{
 
+  open Why3
   open Cfg_ast
 
-  let mk_cfgexpr d s e = { cfgexpr_desc = d; cfgexpr_loc = floc s e }
+  let floc s e = Loc.extract (s,e)
+
+  let mk_cfgexpr d s e = { cfg_expr_desc = d; cfg_expr_loc = floc s e }
 
 %}
 
-(* extra token *)
-%token CFG
+(* extra tokens *)
+%token CFG GOTO
 
 %start cfgfile
-%type <Cfg_ast.cfg> cfgfile
+%type <Cfg_ast.cfg_file> cfgfile
 
 %%
 
@@ -35,14 +38,14 @@ cfgmodule:
 
 cfgdecl:
 | module_decl_parsing_only { Dmlw_decl $1 }
-| LET CFG with_list1(recdefn) { Dletcfg $2 }
+| LET CFG dl=with_list1(recdefn) { Dletcfg dl }
 ;
 
 recdefn:
 | id=attrs(lident_rich) args=binders COLON ret=return_named sp=spec EQUAL b=body
     { let pat, ty, _mask = ret in
       let spec = apply_return pat sp in
-      (id, args, ret, ty, pat, spec, b) }
+      (id, args, ty, pat, spec, [], b) }
 ;
 
 body:
