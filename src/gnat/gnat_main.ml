@@ -41,8 +41,12 @@ let register_goal cont goal_id =
   | true, None ->
       Gnat_objectives.set_not_interesting goal_id
   | false, None ->
-      Gnat_util.abort_with_message ~internal:true
-        "Task has no tracability label."
+      let base_msg = "Task has no tracability label" in
+      let msg =
+        if Gnat_config.debug then
+          Pp.sprintf "%s: %a.@." base_msg Pretty.print_term fml
+        else base_msg in
+      Gnat_util.abort_with_message ~internal:true msg
   | _, Some c ->
       if c.Gnat_expl.already_proved then
         Gnat_objectives.set_not_interesting goal_id
