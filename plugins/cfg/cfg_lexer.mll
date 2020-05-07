@@ -287,9 +287,16 @@ rule token = parse
 
 {
 
+  let () = Exn_printer.register (fun fmt exn -> match exn with
+  | Cfg_parser.Error -> Format.fprintf fmt "syntax error"
+  | _ -> raise exn)
+
   let parse_channel file c =
     let lb = Lexing.from_channel c in
     Loc.set_file file lb;
-    Cfg_parser.cfgfile token lb
+    try
+      Cfg_parser.cfgfile token lb
+    with
+      Cfg_parser.Error as e -> raise (Loc.Located (Loc.extract (lb.lex_start_p,lb.lex_curr_p),e))
 
 }

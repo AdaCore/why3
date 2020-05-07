@@ -29,20 +29,20 @@
 %%
 
 cfgfile:
-| ml=cfgmodule* EOF { ml }
+  | ml=cfgmodule* EOF { ml }
 ;
 
 cfgmodule:
-| MODULE id=attrs(uident_nq) dl=cfgdecl* END
+  | MODULE id=attrs(uident_nq) dl=cfgdecl* END
     { (id,dl) }
 
 cfgdecl:
-| module_decl_parsing_only { Dmlw_decl $1 }
-| LET CFG dl=with_list1(recdefn) { Dletcfg dl }
+  | module_decl_parsing_only { Dmlw_decl $1 }
+  | LET CFG dl=with_list1(recdefn) { Dletcfg dl }
 ;
 
 recdefn:
-| id=attrs(lident_rich) args=binders COLON ret=return_named sp=spec EQUAL b=body
+  | id=attrs(lident_rich) args=binders COLON ret=return_named sp=spec EQUAL b=body
     { let pat, ty, _mask = ret in
       let spec = apply_return pat sp in
       (id, args, ty, pat, spec, [], b) }
@@ -53,7 +53,15 @@ body:
 ;
 
 cfgexpr:
-| TRUE { mk_cfgexpr CFGtrue $startpos $endpos }
-| FALSE { mk_cfgexpr CFGfalse $startpos $endpos }
-| GOTO uident { mk_cfgexpr (CFGgoto $2) $startpos $endpos }
+  | TRUE
+    { mk_cfgexpr CFGtrue $startpos $endpos }
+  | FALSE
+    { mk_cfgexpr CFGfalse $startpos $endpos }
+  | GOTO uident
+    { mk_cfgexpr (CFGgoto $2) $startpos $endpos }
+  | LABEL id = attrs(uident) IN e = cfgexpr
+    { mk_cfgexpr (CFGlabel(id,e)) $startpos $endpos }
+  | k=assertion_kind id=option(ident_nq) LEFTBRC t=term RIGHTBRC
+    { let (n,k)=k in
+      mk_cfgexpr (CFGassert(k, name_term id n t)) $startpos $endpos }
 ;

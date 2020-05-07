@@ -15,7 +15,7 @@ open Cfg_ast
 open Ptree
 open Wstdlib
 
-let debug = Debug.register_flag "CFG"
+let debug = Debug.register_flag "cfg"
   ~desc:"CFG plugin debug flag"
 
 (*
@@ -315,10 +315,38 @@ let decl = function
      Typing.add_decl id.id_loc (Dprop (pk, id, t))
  *)
 
+let mk_expr loc e = { expr_desc = e; expr_loc = loc }
+
+let psexp_pty fmt t =
+  Ptree.sexp_of_pty t |> Sexplib.Sexp.output_hum_indent 2 stdout
+
+let rec pp_qid fmt qid =
+  match qid with
+  | Qident id -> Format.fprintf fmt "%s" id.id_str
+  | Qdot(q,id) -> Format.fprintf fmt "%a.%s" pp_qid q id.id_str
+
+let rec pp_pty fmt t =
+  match t with
+  | PTtyapp(qid,l) ->
+     Format.fprintf fmt "@[%a %a@]"
+       pp_qid qid
+       (Pp.print_list Pp.semi pp_pty) l
+  | _ ->
+     Format.fprintf fmt "@[<pp_pty>@]"
+
+let translate_cfg (id,args,retty,pat,spec,locals,body) =
+  Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
+  Debug.dprintf debug "return type is `%a`@." pp_pty retty;
+  let body = mk_expr body.cfg_expr_loc (Etuple []) in
+  let f =
+      Efun(args, Some retty, pat, Ity.MaskVisible, spec, body)
+  in
+  Dlet (id,false,Expr.RKnone,mk_expr id.id_loc f)
+
 let translate_decl d acc =
   match d with
   | Dmlw_decl d -> d :: acc
-  | Dletcfg l -> acc (* (id,_,_) -> Dmeta (id,[]) *)
+  | Dletcfg l -> List.fold_right (fun d acc -> (translate_cfg d)::acc) l acc
 
 let translate (m,dl) =
   (m,List.fold_right translate_decl dl [])

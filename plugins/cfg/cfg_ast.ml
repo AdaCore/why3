@@ -33,8 +33,11 @@ and cfg_expr_desc =
   (** Boolean literal [False] *)
   | CFGconst of Constant.constant
   (** Constant literals *)
+  | CFGlabel of ident * cfg_expr
+  (** declare a label *)
   | CFGgoto of ident
   (** goto a label *)
+  | CFGassert of Expr.assertion_kind * Ptree.term
 (* TODO: expand *)
 
 

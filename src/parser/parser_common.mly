@@ -1274,7 +1274,7 @@ ext_match_cases0:
 exn_handler:
 | uqualid pat_arg? ARROW seq_expr { $1, $2, $4 }
 
-assertion_kind:
+%public assertion_kind:
 | ASSERT  { "Assert", Expr.Assert }
 | ASSUME  { "Assume", Expr.Assume }
 | CHECK   { "Check", Expr.Check }
@@ -1485,7 +1485,7 @@ squalid:
 | lident          { $1 }
 | lident_op       { $1 }
 
-ident_nq:
+%public ident_nq:
 | uident_nq       { $1 }
 | lident_nq       { $1 }
 | lident_op_nq    { $1 }

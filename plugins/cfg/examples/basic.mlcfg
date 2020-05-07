@@ -1,0 +1,21 @@
+
+module Basic
+
+use int.Int
+
+val test (x:int) : unit
+
+let cfg cfgassert (x:int) : unit
+  requires { x >= 0 }
+  =
+  assert { false }
+
+let cfg cfggoto (x:int) : unit
+  requires { x >= 0 }
+  =
+  label L in
+  goto L
+
+let main () = cfgassert 42; cfggoto 43
+
+end
