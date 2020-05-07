@@ -1224,9 +1224,17 @@ let editors_page c (notebook:GPack.notebook) =
 	    (* Debug.dprintf debug "prover %a: selected editor '%s'@." *)
             (*   print_prover p data; *)
             let provers = Whyconf.get_provers c.config in
-            c.config <-
-              Whyconf.set_provers c.config
-              (Mprover.add p { pi with editor = data} provers)
+            let pi =
+              if String.equal pi.editor data
+              then pi (* keep detected_at_startup if no change *)
+              else { pi with
+                     editor = data;
+                     detected_at_startup = false;
+                   }
+            in
+              c.config <-
+                Whyconf.set_provers c.config
+                  (Mprover.add p pi provers)
       )
     in
     ()
