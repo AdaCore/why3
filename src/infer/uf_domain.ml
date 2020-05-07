@@ -116,22 +116,23 @@ module Make(S:sig
    *   Union_find.get_class tcl uf |> List.map (TermToClass.to_term uf_man.class_to_term) *)
 
   let apply_equal (man, uf_man) (dom,uf_t) tl =
-    List.fold_left (fun (dom, var) t ->
-        try match var with
-          | None -> dom, Some (TermToVar.to_t uf_t.uf_to_var t)
-          | Some var ->
-            let expr = Linexpr1.make uf_man.env in
-            let var' = TermToVar.to_t uf_t.uf_to_var t in
-            Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
-            Linexpr1.set_coeff expr var' (Coeff.s_of_int 1);
-            let lincons = Lincons1.make expr Lincons1.EQ in
-            let lincons_array = Lincons1.array_make uf_man.env 1 in
-            Lincons1.array_set lincons_array 0 lincons;
-            let d = Dom.meet_lincons_array man dom lincons_array in
-            d, Some var
-        with Not_found -> dom, var
-      ) (dom, None) tl
-    |> fst
+    match tl with
+    | [] | [_] -> dom,uf_t
+    | t :: tl ->
+       try
+       let var = TermToVar.to_t uf_t.uf_to_var t in
+       List.fold_left (fun dom t ->
+           let expr = Linexpr1.make uf_man.env in
+           let var' = TermToVar.to_t uf_t.uf_to_var t in
+           Linexpr1.set_coeff expr var (Coeff.s_of_int (-1));
+           Linexpr1.set_coeff expr var' (Coeff.s_of_int 1);
+           let lincons = Lincons1.make expr Lincons1.EQ in
+           let lincons_array = Lincons1.array_make uf_man.env 1 in
+           Lincons1.array_set lincons_array 0 lincons;
+           let dom = Dom.meet_lincons_array man dom lincons_array in
+           dom
+         ) dom tl, uf_t
+       with Not_found -> dom,uf_t
 
   exception Constant
 
@@ -192,49 +193,49 @@ module Make(S:sig
     else t_map (replaceby t1 t2) t3
 
   let do_eq (man, uf_man) t1 t2 =
-    if not (Ty.ty_equal (t_type t1) Ity.ty_unit) then
-      fun (d, ud) ->
-        let cla = get_class_for_term uf_man t1 in
-        let clb = get_class_for_term uf_man t2 in
-        let ud = { ud with classes = Union_find.union cla clb ud.classes; } in
-        let all_values = Union_find.flat ud.classes in
-        let all_terms =
-          List.map (fun cl ->
-              TermToClass.to_term uf_man.class_to_term cl, ()) all_values
-        in
-        let all_values = all_terms
-                         |> Mterm.of_list in
-        let all_terms = all_terms |> List.map fst in
-        Mterm.fold (fun v () (d, ud) ->
-            (* This is far from perfect. If there is a function f, then terms `f a` and `f b` will be marked as equal.
-             * But if there is g: 'a -> 'b -> 'c, then `g a b` and `g b a` can not be marked as such. (As the replacement is global.)
-             * However, it is unclear wether it is or it is not a limitation. *)
-            let v' = replaceby t1 t2 v in
-            let v'' = replaceby t2 t1 v in
-            let v' = try eval_term v' with Constant -> v in
-            let v'' = try eval_term v'' with Constant -> v in
-            let v' = if List.exists (t_equal v') all_terms then v'
-                     else v in
-            let v'' = if List.exists (t_equal v'') all_terms then v''
-                      else v in
-            if t_equal v v' && t_equal v v'' then d, ud
-            else
-              begin
-                let cl  = get_class_for_term uf_man v
-                and cl' = get_class_for_term uf_man v'
-                and cl'' = get_class_for_term uf_man v'' in
-                let cl_cl' = Union_find.union cl cl' ud.classes in
-                let ud = { ud with classes = Union_find.union cl cl'' cl_cl' } in
-                let d =
-                  if Ty.ty_equal (t_type v) Ty.ty_int then
-                    Union_find.get_class cl ud.classes
-                    |> List.map (TermToClass.to_term uf_man.class_to_term)
-                    |> apply_equal (man, uf_man) (d,ud)
-                  else d
-                in d, ud
-              end
-          ) all_values (d, ud)
-    else fun_id
+    if Ty.ty_equal (t_type t1) Ity.ty_unit then fun_id else
+      fun (dom, uf_t) ->
+        let cl1 = get_class_for_term uf_man t1 in
+        let cl2 = get_class_for_term uf_man t2 in
+        let uf_t = { uf_t with
+          classes = Union_find.union cl1 cl2 uf_t.classes } in
+        let all_values = Union_find.flat uf_t.classes in
+        let all_terms = List.map (fun cl ->
+              TermToClass.to_term
+                uf_man.class_to_term cl, ()) all_values in
+        let all_values = Mterm.of_list all_terms in
+        let all_terms = List.map fst all_terms in
+        Mterm.fold (fun t () (dom, uf_t) ->
+            (* This is far from perfect. If there is a function f,
+               then terms `f a` and `f b` will be marked as equal.
+             * But if there is g: 'a -> 'b -> 'c, then `g a b` and `g
+               b a` can not be marked as such. (As the replacement is
+               global.)
+             * However, it is unclear wether it is or it is not a
+               limitation. *)
+            let t12 = try eval_term (replaceby t1 t2 t)
+                      with Constant -> t in
+            let t21 = try eval_term (replaceby t2 t1 t)
+                      with Constant -> t in
+
+            let t12 = if List.exists (t_equal t12) all_terms
+                      then t12 else t in
+            let t21 = if List.exists (t_equal t21) all_terms
+                      then t21 else t in
+            if t_equal t t12 && t_equal t t21 then dom, uf_t else
+              let cl   = get_class_for_term uf_man t
+              and cl12 = get_class_for_term uf_man t12
+              and cl21 = get_class_for_term uf_man t21 in
+              let cl_cl12 = Union_find.union cl cl12 uf_t.classes in
+              let uf_t = { uf_t with
+                classes = Union_find.union cl cl21 cl_cl12 } in
+              if Ty.ty_equal (t_type t) Ty.ty_int then begin
+                let classes = Union_find.get_class cl uf_t.classes in
+                let tl = List.map (
+                  TermToClass.to_term uf_man.class_to_term) classes in
+                apply_equal (man, uf_man) (dom,uf_t) tl end
+              else dom,uf_t
+          ) all_values (dom, uf_t)
 
   (* probably not clever enough, will not work with a complex CFG with exceptions etc *)
   let print fmt (a, _) = Dom.print fmt a
