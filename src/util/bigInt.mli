@@ -12,6 +12,7 @@
 (** Wrapper for big nums, implemented either with OCaml's [Nums] or [ZArith] *)
 
 type t
+[@@deriving sexp_of]
 
 val compare : t -> t -> int
 

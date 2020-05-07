@@ -1,9 +1,13 @@
- open Domain
+open Domain
+open Infer_why3
 open Term
 open Expr
 open Ity
 
-module type AiCfg = sig
+val infer_print_cfg : Debug.flag
+val infer_print_ai_result : Debug.flag
+
+module type INFERCFG = sig
   module QDom : Domain.TERM_DOMAIN
 
   type control_point
@@ -31,8 +35,6 @@ module type AiCfg = sig
 end
 
 module Make(S:sig
-  val env       : Env.env
-  val th_known  : Decl.known_map
-  val mod_known : Pdecl.known_map
-  val widening  : int
-end)(Domain : DOMAIN): AiCfg
+  module Infer_why3 : INFERWHY3
+  val    widening  : int
+end)(Domain : DOMAIN): INFERCFG

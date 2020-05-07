@@ -1,6 +1,7 @@
 open Format
 open Ident
 open Domain
+open Infer_why3
 open Term
 open Expr
 open Ity
@@ -11,7 +12,10 @@ let infer_print_cfg =
 let infer_print_ai_result =
   Debug.register_flag "infer-print-ai-result" ~desc:"Print result of Abstract Interpretation"
 
-module type AiCfg = sig
+let print_domains_loop =
+  Debug.register_flag "print-domains-loop" ~desc:"Print domains in loops"
+
+module type INFERCFG = sig
   module QDom : Domain.TERM_DOMAIN
 
   type control_point
@@ -38,38 +42,27 @@ module type AiCfg = sig
 end
 
 module Make(E: sig
-    val       env : Env.env
-    val  th_known : Decl.known_map
-    val mod_known : Pdecl.known_map
-    val  widening : int
-  end) (Domain: DOMAIN) = struct
-
-  module Ai_logic = Ai_logic.Make(struct
-    let       env = E.env
-    let  th_known = E.th_known
-    let mod_known = E.mod_known
-  end)
-
-  module Uf_domain = Uf_domain.Make(struct
-    module    Dom = Domain
-    let  th_known = E.th_known
-    let mod_known = E.mod_known
-    let       env = E.env
-  end)
+    module Infer_why3 : INFERWHY3
+    val     widening : int
+  end) (Domain: DOMAIN) : INFERCFG = struct
 
   module QDom = Quant_domain.Make(struct
-    module   TDom   = Disjunctive_term_domain.Make(Uf_domain)
-    module Ai_logic = Ai_logic
+    module Uf_domain = Uf_domain.Make(struct
+      module       Dom = Domain
+      module Infer_why3 = E.Infer_why3
+    end)
+    module      TDom = Disjunctive_term_domain.Make(Uf_domain)
+    module Infer_why3 = E.Infer_why3
   end)
 
 
-  type control_point = int
+  type  control_point = int
   type xcontrol_point = control_point * xsymbol
   type control_points = control_point * control_point * xcontrol_point list
 
   type hedge = int (* hyper edge *)
 
-  type domain = QDom.t
+  type  domain = QDom.t
   type context = QDom.man
 
   (* control flow graph *)
@@ -111,7 +104,7 @@ module Make(E: sig
   let debug_fmt =
     if Debug.test_flag infer_print_cfg then
       let _ = Format.fprintf Format.std_formatter
-                "CFG will be printed in inferdbg.dot" in
+                "CFG will be printed in inferdbg.dot@." in
       let d = open_out "inferdbg.dot" in
       ref (formatter_of_out_channel d)
     else ref err_formatter
@@ -227,10 +220,7 @@ module Make(E: sig
     | Epure t ->
       let node1, node2 = new_node_cfg cfg expr ~lbl:"pure bgn",
                          new_node_cfg cfg expr ~lbl:"pure end" in
-      let vreturn = match ret with
-        | None -> create_vreturn manpk (t_type t)
-        | Some v -> v
-      in
+      let vreturn = Opt.get_def (create_vreturn manpk (t_type t)) ret in
       let postcondition = t_app ps_equ [t_var vreturn; t] None in
       let constraints = QDom.meet_term manpk postcondition in
       new_hedge_cfg cfg node1 node2 (fun _ -> constraints) ~lbl:"pure";
@@ -256,23 +246,24 @@ module Make(E: sig
 
       let begin_e2, end_e2, exn_e2 = put_expr_in_cfg ~ret cfg manpk e2 in
 
+      let pv_str = Format.asprintf "%a" print_pv pv in
+
       (* Save the effect of the let *)
       new_hedge_cfg cfg end_e1 begin_e2
-        (fun _ abs -> abs) ~lbl:"let_e1_e2";
+        (fun _ abs -> abs) ~lbl:("let_e1_e2: " ^ pv_str);
 
       let end_cp = new_node_cfg cfg expr ~lbl:"end let" in
       (* erase pv *)
       let forget_fun = QDom.forget_var manpk pv.pv_vs in
       new_hedge_cfg cfg end_e2 end_cp
-        (fun _ abs -> forget_fun abs) ~lbl:"let_forget: ";
+        (fun _ abs -> forget_fun abs) ~lbl:("let_forget: " ^ pv_str);
 
       begin_e1, end_cp, exn_e1 @ exn_e2
     | Evar pv ->
       let postcondition =
         if ity_equal pv.pv_ity ity_unit then fun_id else
-          let vreturn = match ret with
-            | None -> create_vreturn manpk pv.pv_vs.vs_ty
-            | Some v -> v in
+          let vreturn =
+            Opt.get_def (create_vreturn manpk pv.pv_vs.vs_ty) ret in
           let t = t_app ps_equ [t_var pv.pv_vs;t_var vreturn] None in
           QDom.meet_term manpk t in
       let begin_cp = new_node_cfg cfg expr ~lbl:"var bgn" in
@@ -283,9 +274,7 @@ module Make(E: sig
     | Econst n ->
        let begin_cp = new_node_cfg cfg expr ~lbl:"const bgn" in
        let end_cp   = new_node_cfg cfg expr ~lbl:"const end" in
-       let vreturn  = match ret with
-         | None -> create_vreturn manpk Ty.ty_int
-         | Some v -> v in
+       let vreturn  = Opt.get_def (create_vreturn manpk Ty.ty_int) ret in
        let postcondition =
          t_app ps_equ [t_const n Ty.ty_int; t_var vreturn] None in
        let constraints = QDom.meet_term manpk postcondition in
@@ -378,9 +367,9 @@ module Make(E: sig
             t_true, t_true in
        let constraints     = QDom.meet_term manpk e1_true in
        let constraints_not = QDom.meet_term manpk e1_false in
+       let start_if = new_node_cfg cfg expr ~lbl:"if start" in
        let e2_begin, e2_end, e2_exn = put_expr_in_cfg ~ret cfg manpk e2 in
        let e3_begin, e3_end, e3_exn = put_expr_in_cfg ~ret cfg manpk e3 in
-       let start_if = new_node_cfg cfg expr ~lbl:"if start" in
        let end_if   = new_node_cfg cfg expr ~lbl:"if end" in
        new_hedge_cfg cfg start_if e2_begin
          (fun _ abs -> constraints abs) ~lbl:"if true";
@@ -407,9 +396,8 @@ module Make(E: sig
                | _       -> failwith "nested pattern or worse") p in
              let matched_term =
                t_app ls (List.map t_var args) (Some (ty_of_ity match_e.e_ity)) in
-             let vreturn = match ret with
-               | None -> create_vreturn manpk (t_type matched_term)
-               | Some v -> v in
+             let vreturn =
+               Opt.get_def (create_vreturn manpk (t_type matched_term)) ret in
              let postcondition =
                t_app ps_equ [matched_term; t_var vreturn] None in
              let constr = QDom.meet_term manpk postcondition in
@@ -490,7 +478,8 @@ module Make(E: sig
        let constraints_start = QDom.meet_term manpk postcondition_before in
 
        let bounds a b =
-         t_and (t_app Ai_logic.le_int [a; pv_t] None)(t_app Ai_logic.le_int [pv_t; b] None) in
+         t_and (t_app E.Infer_why3.le_int [a; pv_t] None)
+               (t_app E.Infer_why3.le_int [pv_t; b] None) in
        let precondition_e =
          if dir = Expr.To then bounds lo_t up_t else bounds up_t lo_t in
        let constraints_e = QDom.meet_term manpk precondition_e in
@@ -503,7 +492,7 @@ module Make(E: sig
          (fun _ -> constraints_e) ~lbl:"for lo<=pv<=up";
 
        let vret_pv = create_vreturn manpk Ty.ty_int in
-       let res = t_app Ai_logic.ad_int [pv_t; t_nat_const 1] (Some Ty.ty_int) in
+       let res = t_app E.Infer_why3.ad_int [pv_t; t_nat_const 1] (Some Ty.ty_int) in
        let next_assign =
          t_app ps_equ [t_var vret_pv; res] None
          |> QDom.meet_term manpk in
@@ -609,28 +598,31 @@ module Make(E: sig
     let output = Fixpoint.analysis_guided manager
                    cfg.psh_graph sinit make_strategy in
 
-    (* Format.printf "output=%a@." (Fixpoint.print_output manager) output;
-     * Format.printf "\n\nRESULT:\n";
-     * PSHGraph.iter_vertex output
-     *   (fun vtx abs ~pred ~succ ->
-     *   printf "\tacc(%i) = %a@." vtx QDom.print abs); *)
+    if Debug.test_flag infer_print_ai_result then begin
+        Format.printf "output=%a@." (Fixpoint.print_output manager) output;
+        Format.printf "\n\nRESULT:\n";
+        let iter_vertex vtx abs ~pred ~succ =
+          ignore(pred);ignore(succ);
+          printf "\tacc(%i) = %a@." vtx QDom.print abs in
+        PSHGraph.iter_vertex output iter_vertex;
+        Format.eprintf "\n@.";
+    end;
 
     (*printf "output=%a@." (Fixpoint.print_output manager) output;*)
     let l = ref [] in
     PSHGraph.iter_vertex output
       (fun vtx abs ~pred:_ ~succ:_ -> l := (vtx, abs) :: !l);
 
-    if Debug.test_flag infer_print_ai_result then
-      begin
+    if Debug.test_flag infer_print_ai_result then begin
         let l = List.sort (fun (i, _) (j, _) -> compare i j) !l in
         Format.printf "DOMAIN TERMS (set ai-print-cfg to true and \
                        check inferdbg.dot file to see control points)\n";
         List.iter (fun (vtx, abs) ->
             let t = QDom.to_term manpk abs in
             printf "acc(%i) -> %a@." vtx Pretty.print_term t) l;
-
+      end;
+    if Debug.test_flag print_domains_loop then begin
         (* Print loop invariants *)
-
         Format.printf "Loop invariants:@.";
         List.iter (fun (expr, cp) ->
             let abs = PSHGraph.attrvertex output cp in

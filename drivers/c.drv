@@ -33,6 +33,9 @@ module mach.int.Int32
   syntax val (<)     "%1 < %2"   prec 6 6 5
   syntax val (>=)    "%1 >= %2"  prec 6 6 5
   syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  remove module
+
 end
 
 module mach.int.Int32BV
@@ -47,6 +50,7 @@ module mach.int.Int32GMP
   syntax val bxor    "%1 ^ %2"   prec 9 9 8
 
 end
+
 module mach.int.UInt32Gen
 
   prelude export "#include <stdint.h>"
@@ -55,6 +59,8 @@ module mach.int.UInt32Gen
 
   syntax val max_uint32 "0xffffffff" prec 0
   syntax val length "32"             prec 0
+
+  remove module
 
 end
 
@@ -81,48 +87,53 @@ module mach.int.UInt32
   syntax val (>=)    "%1 >= %2"  prec 6 6 5
   syntax val (>)     "%1 > %2"   prec 6 6 5
 
+  remove module
+
 end
 
 module mach.int.UInt32GMP
 
   interface "\
-\nstruct __add32_with_carry_result\
-\n{ uint32_t __field_0;\
-\n  uint32_t __field_1;\
-\n};\
-\n\
-\nstruct __add32_with_carry_result\
-\n      add32_with_carry(uint32_t x, uint32_t y, uint32_t c);\
-\n\
-\nstruct __sub32_with_borrow_result\
-\n{ uint32_t __field_0;\
-\n  uint32_t __field_1;\
-\n};\
-\n\
-\nstruct __sub32_with_borrow_result\
-\n        sub32_with_borrow(uint32_t x, uint32_t y, uint32_t b);\
-\n\
-\nstruct __mul32_double_result\
-\n{ uint32_t __field_0;\
-\n  uint32_t __field_1;\
-\n};\
-\n\
-\nstruct __mul32_double_result mul32_double(uint32_t x, uint32_t y);\
-\n\
-\nstruct __add32_3_result\
-\n{ uint32_t __field_0;\
-\n  uint32_t __field_1;\
-\n};\
-\n\
-\nstruct __add32_3_result add32_3(uint32_t x, uint32_t y, uint32_t z);\
-\n\
-\nstruct __lsld32_result\
-\n{ uint32_t __field_0;\
-\n  uint32_t __field_1;\
-\n};\
-\n\
-struct __lsld32_result lsld32(uint32_t x, uint32_t cnt);\
-"
+    \nstruct __add32_with_carry_result {\
+    \n  uint32_t __field_0;\
+    \n  uint32_t __field_1;\
+    \n};\
+    \n\
+    \nstruct __add32_with_carry_result\
+    \nadd32_with_carry(uint32_t x, uint32_t y, uint32_t c);\
+    \n\
+    \nstruct __sub32_with_borrow_result {\
+    \n  uint32_t __field_0;\
+    \n  uint32_t __field_1;\
+    \n};\
+    \n\
+    \nstruct __sub32_with_borrow_result\
+    \nsub32_with_borrow(uint32_t x, uint32_t y, uint32_t b);\
+    \n\
+    \nstruct __mul32_double_result {\
+    \n  uint32_t __field_0;\
+    \n  uint32_t __field_1;\
+    \n};\
+    \n\
+    \nstruct __mul32_double_result\
+    \nmul32_double(uint32_t x, uint32_t y);\
+    \n\
+    \nstruct __add32_3_result {\
+    \n  uint32_t __field_0;\
+    \n  uint32_t __field_1;\
+    \n};\
+    \n\
+    \nstruct __add32_3_result\
+    \nadd32_3(uint32_t x, uint32_t y, uint32_t z);\
+    \n\
+    \nstruct __lsld32_result {\
+    \n  uint32_t __field_0;\
+    \n  uint32_t __field_1;\
+    \n};\
+    \n\
+    \nstruct __lsld32_result\
+    \nlsld32(uint32_t x, uint32_t cnt);\
+  "
 
   syntax literal uint32 "%cU"
 
@@ -170,6 +181,7 @@ blacklist "__builtin_clz" "__builtin_ctz" "add32_with_carry" "sub32_with_borrow"
 blacklist "mul32_double" "add32_3" "lsld32"
 
 module mach.int.Int64
+
   syntax type int64  "int64_t"
   syntax literal int64 "INT64_C(%c)"
 
@@ -185,6 +197,8 @@ module mach.int.Int64
   syntax val (>=)    "%1 >= %2"  prec 6 6 5
   syntax val (>)     "%1 > %2"   prec 6 6 5
 
+  remove module
+
 end
 
 module mach.int.UInt64Gen
@@ -195,6 +209,8 @@ module mach.int.UInt64Gen
 
   syntax val max_uint64 "0xffffffffffffffff" prec 0
   syntax val length "64" prec 0
+
+  remove module
 
 end
 
@@ -214,76 +230,80 @@ module mach.int.UInt64
   syntax val (>=)    "%1 >= %2"  prec 6 6 5
   syntax val (>)     "%1 > %2"   prec 6 6 5
 
+  remove module
+
 end
 
 module mach.int.UInt64GMP
 
   interface "\
-\nstruct __add64_with_carry_result\
-\n{ uint64_t __field_0;\
-\n  uint64_t __field_1;\
-\n};\
-\n\
-\nstatic inline struct __add64_with_carry_result\
-\nadd64_with_carry(uint64_t x, uint64_t y, uint64_t c)\
-\n{\
-\n  struct __add64_with_carry_result result;\
-\n  uint64_t r = x + y + c;\
-\n  result.__field_0 = r;\
-\n  if (r == x) result.__field_1 = c;\
-\n  else result.__field_1 = (r < x);\
-\n  return result;\
-\n}\
-\n\
-\nstruct __sub64_with_borrow_result\
-\n{ uint64_t __field_0;\
-\n  uint64_t __field_1;\
-\n};\
-\n\
-\nstatic inline struct __sub64_with_borrow_result\
-\n              sub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)\
-\n{\
-\n  struct __sub64_with_borrow_result result;\
-\n  uint64_t r = x - y - b;\
-\n  result.__field_0 = r;\
-\n  if (r > x) result.__field_1 = 1;\
-\n  else if (r == x) result.__field_1 = b;\
-\n  else result.__field_1 = 0;\
-\n  return result;\
-\n}\
-\n\
-\nstruct __add64_3_result\
-\n{ uint64_t __field_0;\
-\n  uint64_t __field_1;\
-\n};\
-\n\
-\nstatic inline struct __add64_3_result\
-\n              add64_3(uint64_t x, uint64_t y, uint64_t z)\
-\n{\
-\n  struct __add64_3_result result;\
-\n  uint64_t r, c1, c2;\
-\n  r = x + y;\
-\n  c1 = r < y;\
-\n  r += z;\
-\n  c2 = r < z;\
-\n  result.__field_1 = c1 + c2;\
-\n  result.__field_0 = r;\
-\n  return result;\
-\n}\
-\n\
-\nstruct __lsld64_result\
-\n{ uint64_t __field_0;\
-\n  uint64_t __field_1;\
-\n};\
-\n\
-\nstatic inline struct __lsld64_result lsld64(uint64_t x, uint64_t cnt)\
-\n{\
-\n  struct __lsld64_result result;\
-\n  result.__field_1 = x >> (64 - cnt);\
-\n  result.__field_0 = x << cnt;\
-\n  return result;\
-\n}\
-"
+    \nstruct __add64_with_carry_result {\
+    \n  uint64_t __field_0;\
+    \n  uint64_t __field_1;\
+    \n};\
+    \n\
+    \nstatic inline struct __add64_with_carry_result\
+    \nadd64_with_carry(uint64_t x, uint64_t y, uint64_t c)\
+    \n{\
+    \n  struct __add64_with_carry_result result;\
+    \n  uint64_t r = x + y + c;\
+    \n  result.__field_0 = r;\
+    \n  if (r == x) result.__field_1 = c;\
+    \n  else result.__field_1 = (r < x);\
+    \n  return result;\
+    \n}\
+    \n\
+    \nstruct __sub64_with_borrow_result {\
+    \n  uint64_t __field_0;\
+    \n  uint64_t __field_1;\
+    \n};\
+    \n\
+    \nstatic inline struct __sub64_with_borrow_result\
+    \nsub64_with_borrow(uint64_t x, uint64_t y, uint64_t b)\
+    \n{\
+    \n  struct __sub64_with_borrow_result result;\
+    \n  uint64_t r = x - y - b;\
+    \n  result.__field_0 = r;\
+    \n  if (r > x) result.__field_1 = 1;\
+    \n  else if (r == x) result.__field_1 = b;\
+    \n  else result.__field_1 = 0;\
+    \n  return result;\
+    \n}\
+    \n\
+    \nstruct __add64_3_result {\
+    \n  uint64_t __field_0;\
+    \n  uint64_t __field_1;\
+    \n};\
+    \n\
+    \nstatic inline struct __add64_3_result\
+    \nadd64_3(uint64_t x, uint64_t y, uint64_t z)\
+    \n{\
+    \n  struct __add64_3_result result;\
+    \n  uint64_t r, c1, c2;\
+    \n  r = x + y;\
+    \n  c1 = r < y;\
+    \n  r += z;\
+    \n  c2 = r < z;\
+    \n  result.__field_1 = c1 + c2;\
+    \n  result.__field_0 = r;\
+    \n  return result;\
+    \n}\
+    \n\
+    \nstruct __lsld64_result\
+    \n{ uint64_t __field_0;\
+    \n  uint64_t __field_1;\
+    \n};\
+    \n\
+    \nstatic inline struct __lsld64_result\
+    \nlsld64(uint64_t x, uint64_t cnt)\
+    \n{\
+    \n  struct __lsld64_result result;\
+    \n  result.__field_1 = x >> (64 - cnt);\
+    \n  result.__field_0 = x << cnt;\
+    \n  return result;\
+    \n}\
+  "
+
   syntax literal uint64 "UINT64_C(%c)"
 
   syntax val uint64_max "0xffffffffffffffffUL" prec 0
@@ -444,6 +464,8 @@ module mach.c.UChar
   syntax val open_from_charptr "(unsigned char *)%1" prec 2 2
   syntax val close_from_charptr "IGNORE2"
 
+  remove module
+
 end
 
 module mach.c.SChar
@@ -479,6 +501,7 @@ module mach.c.String
   syntax val big_z "'Z'" prec 0
   syntax val minus_char "'-'" prec 0
   syntax val code "%1" prec 0
+  syntax val length "strlen"
   syntax val strlen "strlen"
   syntax val (=) "%1 == %2"  prec 7 7 6
 
@@ -499,97 +522,65 @@ end
 (* exclude some stdlib modules from extraction *)
 
 module array.Array
-
   remove module
-
 end
 
 module bool.Bool
-
   remove module
-
 end
 
 module map.Map
-
   remove module
-
 end
 
 module map.Const
-
   remove module
-
 end
 
 module number.Divisibility
-
   remove module
-
 end
 
 module int.Int
-
   remove module
-
 end
 
 module int.Abs
-
   remove module
-
 end
 
 module int.ComputerDivision
-
   remove module
-
 end
 
 module int.EuclideanDivision
-
   remove module
-
 end
 
 module int.MinMax
-
   remove module
-
 end
 
 module int.Power
-
   remove module
-
 end
 
 module real.Real
-
   remove module
-
 end
 
 module real.ExpLog
-
   remove module
-
 end
 
 module real.RealInfix
-
   remove module
-
 end
 
 module real.Square
-
   remove module
-
 end
 
 module mach.int.Unsigned
-
   remove module
-
 end

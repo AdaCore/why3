@@ -55,6 +55,7 @@ let infer_with_ops ai_ops e cty =
   let cfg = ai_ops.start_cfg () in
   let context = ai_ops.empty_context () in
   List.iter (ai_ops.add_variable context) cty.cty_args;
+  Mpv.iter (fun pv _ -> ai_ops.add_variable context pv) cty.cty_effect.eff_reads;
   ignore (ai_ops.put_expr_with_pre cfg context e cty.cty_pre);
   let fixp = ai_ops.eval_fixpoints cfg context in
   let domain2term (e,d) =
@@ -72,32 +73,35 @@ let infer_with_ops ai_ops e cty =
   invs
 
 let infer_loops_for_dom ?(dom=def_domain) ?(wid=def_wid) env tkn mkn e cty =
-  let module AI = Ai_cfg.Make (struct
-       let env       = env
-       let th_known  = tkn
-       let mod_known = mkn
-       let widening  = wid end) in
+  let module Infer_why3 = Infer_why3.Make(struct
+    let       env = env
+    let  th_known = tkn
+    let mod_known = mkn
+  end) in
+  let module Infer = Infer_cfg.Make (struct
+       module Infer_why3 = Infer_why3
+       let     widening = wid end) in
   match dom with
   | Polyhedra ->
-     let module AI = AI(Domain.Polyhedra) in
+     let module Infer = Infer(Domain.Polyhedra) in
      let ai_ops =
-       ai_ops AI.empty_context AI.start_cfg
-         AI.put_expr_in_cfg AI.put_expr_with_pre AI.eval_fixpoints
-         AI.domain_to_term AI.add_variable in
+       ai_ops Infer.empty_context Infer.start_cfg Infer.put_expr_in_cfg
+         Infer.put_expr_with_pre Infer.eval_fixpoints
+         Infer.domain_to_term Infer.add_variable in
      infer_with_ops ai_ops e cty
   | Box ->
-     let module AI = AI(Domain.Box) in
+     let module Infer = Infer(Domain.Box) in
      let ai_ops =
-       ai_ops AI.empty_context AI.start_cfg
-         AI.put_expr_in_cfg AI.put_expr_with_pre AI.eval_fixpoints
-         AI.domain_to_term AI.add_variable in
+       ai_ops Infer.empty_context Infer.start_cfg Infer.put_expr_in_cfg
+         Infer.put_expr_with_pre Infer.eval_fixpoints
+         Infer.domain_to_term Infer.add_variable in
      infer_with_ops ai_ops e cty
   | Oct ->
-     let module AI = AI(Domain.Oct) in
+     let module Infer = Infer(Domain.Oct) in
      let ai_ops =
-       ai_ops AI.empty_context AI.start_cfg
-         AI.put_expr_in_cfg AI.put_expr_with_pre AI.eval_fixpoints
-         AI.domain_to_term AI.add_variable in
+       ai_ops Infer.empty_context Infer.start_cfg Infer.put_expr_in_cfg
+         Infer.put_expr_with_pre Infer.eval_fixpoints
+         Infer.domain_to_term Infer.add_variable in
      infer_with_ops ai_ops e cty
 
 exception Parse_error

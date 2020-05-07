@@ -109,15 +109,18 @@ produce exactly the same invariants.
   end
 
 
-There are two additional debugging flags that can be passed to Why3 to
-output additional information about the inference of loop
-invariants. The ``infer-print-cfg`` will print the Control Flow Graph
-(CFG) used for abstract interpretation in a file with the name
-``inferdbg.dot``. The ``infer-print-ai-result`` flag will print to the
-standard output the computed abstract values at each point of the
-CFG. Finally, ``print-inferred-invs`` will print the inferred
-invariants to the standard output (note that the displayed identifiers
-names might not be consistent with those in the initial program).
+There are a few debugging flags that can be passed to Why3 to output
+additional information about the inference of loop invariants. The
+``infer-print-cfg`` will print the Control Flow Graph (CFG) used for
+abstract interpretation in a file with the name ``inferdbg.dot``;
+``infer-print-ai-result`` will print to the standard output the
+computed abstract values at each point of the CFG;
+``print-inferred-invs`` will print the inferred invariants to the
+standard output (note that the displayed identifiers names might not
+be consistent with those in the initial program); finally, the
+``print-domains-loop`` debugging flag will print for each loop the
+loop expression, the domain at that point, and its translation into a
+Why3 term.
 
 Current limitations
 """""""""""""""""""

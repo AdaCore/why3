@@ -37,39 +37,16 @@ Instructions to build TryWhy3
 
         ALTERGODIR=src/trywhy3/alt-ergo
 
-  * [optional] If you want to build a standalone trywhy3 that can be
-    run without a web server, the example files must be present at
-    compile time. See the step 'To add predefined examples' in the
-    'customization' section below and populate the `examples/`
-    directory of the trywhy3 source directory accordingly *before*
-    building trywhy3.
-
   * Compile with
 
         make trywhy3
 
   * You can build a package with
 
-        make trywhy3_package
+        make trywhy3.tar.gz
 
     this creates a tarball containing a directory `trywhy3/` which you can put on a web server.
     You may want to add a symbolic link from `index.html` to `trywhy3.html` (or rename the file).
-
-
-To compile with a different file format (e.g. Python, Micro-C)
---------------------------------------------------------------
-
-  * In `Makefile.in`, change the line
-
-        TRYWHY3CMO=lib/why3/why3.cma
-
-    to add the adequate plugin
-
-        TRYWHY3CMO=lib/why3/why3.cma lib/plugins/microc.cmo
-
-  * In `src/trywhy3/why3_worker.ml`, modify line 354 to specify the format
-
-        let (theories, _) = Env.read_file ~format:"micro-C" lang ...
 
 
 Customization
@@ -86,18 +63,9 @@ Customization
   * To change the look and feel of the rest of the application, edit
     the file `trywhy3_custom.css`.
 
-  * To add some predefined examples, put some `.mlw` or `.why` files in the
+  * To add some predefined examples, put some `.mlw` files in the
     `examples/` subdirectory and generate an index as follows:
 
         cp some_file.mlw examples/
         cd examples/
         ../gen_index.sh *.mlw > index.txt
-
-  * [optional] If you want trywhy3 to only use its embedded files,
-    change the variable declaration `var load_embedded_files = false;`
-    to `var load_embedded_files = true;` in the header section of
-    `trywhy3.html`.
-
-    Note that this is the default behavior when `trywhy3.html` is opened from
-    a `file://` URL rather than a `http(s)://` URL, regardless of the value of
-    the `load_embedded_files` variable.

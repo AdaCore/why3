@@ -34,6 +34,7 @@ in the output of the printer to elements of AST in its input. *)
 type printer_mapping = {
   lsymbol_m     : string -> Term.lsymbol;
   vc_term_loc   : Loc.position option;
+  vc_term_attrs : Sattr.t;
   (* The position of the term that triggers the VC *)
   queried_terms : Term.term Mstr.t;
   (* The list of terms that were queried for the counter-example

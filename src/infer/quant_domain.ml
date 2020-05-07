@@ -1,16 +1,16 @@
 open Domain
-open Ai_logic
+open Infer_why3
 open Term
 open Ity
 
 module Make(S:sig
-    module   TDom   : TERM_DOMAIN
-    module Ai_logic : AI_LOGIC
+    module      TDom : TERM_DOMAIN
+    module Infer_why3 : INFERWHY3
   end): TERM_DOMAIN = struct
 
-  module Dom = S.TDom
+  module TDom = S.TDom
 
-  include Dom
+  include TDom
 
   let quant_var, pv =
     let ident_ret = Ident.id_fresh "w" in
@@ -19,7 +19,7 @@ module Make(S:sig
 
   let create_manager () =
     let man = create_manager () in
-    Dom.add_variable_to_env man pv;
+    TDom.add_variable_to_env man pv;
     man
 
   let is_in t myt =
@@ -57,27 +57,40 @@ module Make(S:sig
        t_quant Tforall (t_close_quant [var] [] t)
 
   let to_term man t =
-    let t = Dom.to_term man t in
+    let t = TDom.to_term man t in
     descend_quantifier quant_var t
 
   let rec meet_term man term elt =
     match term.t_node with
     | Tbinop (Tor, a, b) ->
-       join man (meet_term man a elt) (meet_term man b elt)
+       let dom_a = meet_term man a elt in
+       let dom_b = meet_term man b elt in
+       join man dom_a dom_b
     | Tbinop (Tand, a, b) ->
-       meet_term man b (meet_term man a elt)
-    | Tbinop (Timplies, a, b) ->
-       meet_term man (t_or (t_not a) b) elt
-    | Tbinop (Tiff, a, b) ->
-       meet_term man (t_and (t_implies a b) (t_implies b a)) elt
+       let dom_a = meet_term man a elt in
+       meet_term man b dom_a
+    | Tbinop _ -> assert false
+    (* | Tbinop (Timplies, a, b) ->
+     *    join man (meet_term man (S.Infer_why3.t_push_negation (t_not a)) elt) (meet_term man b elt)
+     * | Tbinop (Tiff, a, b) ->
+     *    meet_term man (t_implies a b) (meet_term man (t_implies b a) elt) *)
+    (* | Tbinop (Timplies, a, b) ->
+     *    (meet_term man (t_or (S.Infer_why3.t_push_negation (t_not a)) b) elt)
+     * | Tbinop (Tiff, a, b) ->
+     *    meet_term man (t_and (t_implies a b) (t_implies b a)) elt *)
     | Tquant (Tforall, tq) ->
       begin
         match t_open_quant tq with
         | [a], _, t when (Ty.ty_equal a.vs_ty Ty.ty_int) ->
-          let t = S.Ai_logic.t_push_negation t in
+          let t = S.Infer_why3.t_push_negation t in
           let t = t_subst_single a quant_var t in
           meet_term man t elt
-        | _ -> Dom.meet_term man term elt
+        | _ -> TDom.meet_term man term elt
       end
-    | _ -> Dom.meet_term man term elt
+    | _ -> TDom.meet_term man term elt
+
+  let meet_term man term elt =
+    let term = S.Infer_why3.t_push_negation term in
+    meet_term man term elt
+
 end

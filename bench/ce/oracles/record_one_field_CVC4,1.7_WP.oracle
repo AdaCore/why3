@@ -76,14 +76,14 @@ File record_one_field.mlw:
   Line 41:
     x23, [[@introduced], [@at:'Old:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "1" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
   Line 42:
     x23, [[@introduced], [@model_trace:x23]] = {"proj_name" : "contents" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "3" } }
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "2" } }
     old x23, [[@introduced], [@at:'Old], [@model_trace:x23],
              [@at:'Old:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "1" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
     old y, [[@introduced], [@at:'Old], [@model_trace:y],
            [@at:'Old:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
@@ -93,10 +93,10 @@ File record_one_field.mlw:
     "value" : {"type" : "Integer" , "val" : "2" } }
   Line 46:
     x23, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "2" } }
+    "value" : {"type" : "Integer" , "val" : "1" } }
   Line 47:
     x23, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "3" } }
+    "value" : {"type" : "Integer" , "val" : "2" } }
 
 bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
@@ -104,7 +104,7 @@ File record_one_field.mlw:
   Line 39:
     y, [[@introduced], [@at:'Old:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
   Line 42:
     old x, [[@introduced], [@at:'Old],
            [@at:'Old:loc:location],
@@ -113,7 +113,7 @@ File record_one_field.mlw:
     "value" : {"type" : "Integer" , "val" : "0" } }
     x, [[@introduced], [@at:M:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }
+    "value" : {"type" : "Integer" , "val" : "2" } }
   Line 49:
     x, [[@introduced], [@at:'Old],
        [@at:'Old:loc:location],
@@ -123,9 +123,9 @@ File record_one_field.mlw:
   Line 53:
     x, [[@introduced], [@at:M:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }
+    "value" : {"type" : "Integer" , "val" : "2" } }
     y, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
   Line 56:
     x at L, [[@introduced], [@at:L], [@model_trace:x],
             [@at:L:loc:location] =
@@ -134,9 +134,9 @@ File record_one_field.mlw:
     x at M, [[@introduced], [@at:M], [@model_trace:x],
             [@at:M:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }
+    "value" : {"type" : "Integer" , "val" : "2" } }
     x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "0" } }
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "2" } }
 
 bench/ce/record_one_field.mlw M test_loop'vc: Valid
 bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
@@ -144,14 +144,14 @@ Counter-example model:
 File record_one_field.mlw:
   Line 13:
     x, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "1" } }
+    "value" : {"type" : "Integer" , "val" : "3" } }
   Line 15:
     x, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }
+    "value" : {"type" : "Integer" , "val" : "2" } }
   Line 39:
     y, [[@introduced], [@at:'Old:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
   Line 42:
     old x, [[@introduced], [@at:'Old],
            [@at:'Old:loc:location],
@@ -160,7 +160,7 @@ File record_one_field.mlw:
     "value" : {"type" : "Integer" , "val" : "0" } }
     x, [[@introduced], [@at:M:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }
+    "value" : {"type" : "Integer" , "val" : "2" } }
   Line 49:
     x, [[@introduced], [@at:'Old],
        [@at:'Old:loc:location],
@@ -170,12 +170,12 @@ File record_one_field.mlw:
   Line 53:
     x, [[@introduced], [@at:M:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }
+    "value" : {"type" : "Integer" , "val" : "2" } }
     y, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
   Line 55:
-    x, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "1" } }
+    [previous iteration] x, [[@introduced]] = {"proj_name" : "contents" ,
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "3" } }
   Line 56:
     x at L, [[@introduced], [@at:L], [@model_trace:x],
             [@at:L:loc:location] =
@@ -184,23 +184,24 @@ File record_one_field.mlw:
     x at M, [[@introduced], [@at:M], [@model_trace:x],
             [@at:M:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }
-    x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "0" } }
+    "value" : {"type" : "Integer" , "val" : "2" } }
+    [current iteration] x, [[@introduced], [@model_trace:x]] =
+    {"proj_name" : "contents" , "type" : "Proj" ,
+    "value" : {"type" : "Integer" , "val" : "2" } }
   Line 58:
-    x, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "0" } }
+    [current iteration] x, [[@introduced]] = {"proj_name" : "contents" ,
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "2" } }
 
 bench/ce/record_one_field.mlw M test_loop'vc: Timeout or Unknown
 Counter-example model:
 File record_one_field.mlw:
   Line 13:
     x, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
   Line 39:
     y, [[@introduced], [@at:'Old:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
   Line 42:
     old x, [[@introduced], [@at:'Old],
            [@at:'Old:loc:location],
@@ -210,7 +211,7 @@ File record_one_field.mlw:
     "value" : {"type" : "Integer" , "val" : "-2" } }
     x, [[@introduced], [@at:M:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
   Line 49:
     x, [[@introduced], [@at:'Old],
        [@at:'Old:loc:location],
@@ -220,7 +221,7 @@ File record_one_field.mlw:
     "value" : {"type" : "Integer" , "val" : "-2" } }
   Line 50:
     x, [[@introduced], [@model_trace:x]] = {"proj_name" : "contents" ,
-    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "-2" } }
+    "type" : "Proj" , "value" : {"type" : "Integer" , "val" : "0" } }
     old x, [[@introduced], [@at:'Old], [@model_trace:x],
            [@at:'Old:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
@@ -228,10 +229,10 @@ File record_one_field.mlw:
   Line 53:
     x, [[@introduced], [@at:M:loc:location] =
     {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
     y, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
   Line 55:
     x, [[@introduced]] = {"proj_name" : "contents" , "type" : "Proj" ,
-    "value" : {"type" : "Integer" , "val" : "-2" } }
+    "value" : {"type" : "Integer" , "val" : "0" } }
 

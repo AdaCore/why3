@@ -7,6 +7,7 @@
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="5" name="CVC4" version="1.7" alternative="strings" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mpz_get_str.mlw"/>
 <theory name="Zget_str" proved="true">
@@ -68,7 +69,7 @@
     <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.56" steps="646"/></proof>
     </goal>
     <goal name="wmpz_get_str&#39;vc.3.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.10" steps="36211"/></proof>
+    <proof prover="5"><result status="valid" time="0.12" steps="36211"/></proof>
     </goal>
    </transf>
    </goal>
@@ -78,7 +79,7 @@
     <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.66" steps="647"/></proof>
     </goal>
     <goal name="wmpz_get_str&#39;vc.3.1.1" expl="equality hypothesis" proved="true">
-    <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.08" steps="36219"/></proof>
+    <proof prover="5"><result status="valid" time="0.15" steps="36219"/></proof>
     </goal>
    </transf>
    </goal>
@@ -88,7 +89,7 @@
     <proof prover="3" timelimit="1" memlimit="1000"><result status="valid" time="0.60" steps="645"/></proof>
     </goal>
     <goal name="wmpz_get_str&#39;vc.3.2.1" expl="equality hypothesis" proved="true">
-    <proof prover="4" timelimit="1" memlimit="1000"><result status="valid" time="0.20" steps="36223"/></proof>
+    <proof prover="5"><result status="valid" time="0.11" steps="36223"/></proof>
     </goal>
    </transf>
    </goal>

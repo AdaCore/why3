@@ -23,7 +23,7 @@ File ref_mono.mlw:
   Line 21:
     x, [[@introduced], [@model_trace:x]] = {"type" : "Integer" ,
     "val" : "1" }
-    old y, [[@introduced], [@at:'Old], [@field:0:contents], [@model_trace:y],
+    old y, [[@introduced], [@field:0:contents], [@at:'Old], [@model_trace:y],
            [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
@@ -56,7 +56,7 @@ File ref_mono.mlw:
     y, [[@introduced], [@field:0:contents], [@model_trace:y]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "42" } }] } }
-    old y, [[@introduced], [@at:'Old], [@field:0:contents], [@model_trace:y],
+    old y, [[@introduced], [@field:0:contents], [@at:'Old], [@model_trace:y],
            [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
@@ -91,11 +91,11 @@ File ref_mono.mlw:
     x23, [[@introduced], [@field:0:contents], [@model_trace:x23]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "2" } }] } }
-    old x23, [[@introduced], [@at:'Old], [@field:0:contents],
+    old x23, [[@introduced], [@field:0:contents], [@at:'Old],
              [@model_trace:x23], [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    old y, [[@introduced], [@at:'Old], [@field:0:contents], [@model_trace:y],
+    old y, [[@introduced], [@field:0:contents], [@at:'Old], [@model_trace:y],
            [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "-1" } }] } }
@@ -121,7 +121,7 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "-2" } }] } }
   Line 38:
-    old x, [[@introduced], [@at:'Old], [@field:0:contents],
+    old x, [[@introduced], [@field:0:contents], [@at:'Old],
            [@at:'Old:loc:location],
            [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
@@ -131,7 +131,7 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 44:
-    x, [[@introduced], [@at:'Old], [@field:0:contents],
+    x, [[@introduced], [@field:0:contents], [@at:'Old],
        [@at:'Old:loc:location],
        [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
@@ -172,7 +172,7 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "-2" } }] } }
   Line 38:
-    old x, [[@introduced], [@at:'Old], [@field:0:contents],
+    old x, [[@introduced], [@field:0:contents], [@at:'Old],
            [@at:'Old:loc:location],
            [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
@@ -182,7 +182,7 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 44:
-    x, [[@introduced], [@at:'Old], [@field:0:contents],
+    x, [[@introduced], [@field:0:contents], [@at:'Old],
        [@at:'Old:loc:location],
        [@at:L:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
@@ -193,8 +193,8 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 50:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
+    [previous iteration] x, [[@introduced], [@field:0:contents]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "1" } }] } }
   Line 51:
     x at L, [[@introduced], [@field:0:contents], [@at:L], [@model_trace:x],
@@ -205,12 +205,13 @@ File ref_mono.mlw:
             [@at:M:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
+    [current iteration] x, [[@introduced], [@field:0:contents],
+                           [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
   Line 53:
-    x, [[@introduced], [@field:0:contents]] = {"type" : "Record" ,
-    "val" : {"Field" : [{"field" : "contents" ,
+    [current iteration] x, [[@introduced], [@field:0:contents]] =
+    {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
 
 bench/ce/ref_mono.mlw M test_loop'vc: Timeout or Unknown
@@ -226,7 +227,7 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "-3" } }] } }
   Line 38:
-    old x, [[@introduced], [@at:'Old], [@field:0:contents],
+    old x, [[@introduced], [@field:0:contents], [@at:'Old],
            [@at:'Old:loc:location],
            [@at:L:loc:location],
            [@at:'Old:loc:location] =
@@ -237,7 +238,7 @@ File ref_mono.mlw:
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "-1" } }] } }
   Line 44:
-    x, [[@introduced], [@at:'Old], [@field:0:contents],
+    x, [[@introduced], [@field:0:contents], [@at:'Old],
        [@at:'Old:loc:location],
        [@at:L:loc:location],
        [@at:'Old:loc:location] =
@@ -247,7 +248,7 @@ File ref_mono.mlw:
     x, [[@introduced], [@field:0:contents], [@model_trace:x]] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }
-    old x, [[@introduced], [@at:'Old], [@field:0:contents], [@model_trace:x],
+    old x, [[@introduced], [@field:0:contents], [@at:'Old], [@model_trace:x],
            [@at:'Old:loc:location] =
     {"type" : "Record" , "val" : {"Field" : [{"field" : "contents" ,
     "value" : {"type" : "Integer" , "val" : "0" } }] } }

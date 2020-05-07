@@ -1,30 +1,30 @@
 
-(* Swapping two integers in-place *)
+(** Swapping two integers in-place *)
 
 module Swap
 
   use int.Int
   use ref.Ref
 
-  let swap (a b: ref int) : unit
+  let swap (ref a b: int) : unit
     writes  { a, b }
-    ensures { !a = old !b /\ !b = old !a }
+    ensures { a = old b /\ b = old a }
   =
-    a := !a + !b;
-    b := !a - !b;
-    a := !a - !b
+    a <- a + b;
+    b <- a - b;
+    a <- a - b
 
 end
 
-(* It also works fine with machine integers, even with overflows *)
+(** It also works fine with machine integers, even with overflows *)
 
 module SwapInt32
 
   use int.Int
   use ref.Ref
 
-  (* a simple model of 32-bit integers with addition, subtraction,
-     and possible overflows *)
+  (** a simple model of 32-bit integers with addition, subtraction,
+      and possible overflows *)
 
   type int32 = < range -0x8000_0000 0x7fff_ffff >
 
@@ -46,7 +46,7 @@ module SwapInt32
 
   predicate in_bounds (n: int32) = int32'minInt <= n <= int32'maxInt
 
-  (* purely applicative version first *)
+  (** purely applicative version first *)
 
   let swap (a b: int32) : (x: int32, y: int32)
     requires { in_bounds a /\ in_bounds b }
@@ -57,15 +57,32 @@ module SwapInt32
     let a = a - b in
     a, b
 
-  (* then rephrased with mutable variables *)
+  (** then rephrased with mutable variables *)
 
-  let swap_ref (a b: ref int32) : unit
-    requires { in_bounds !a /\ in_bounds !b }
+  let swap_ref (ref a b: int32) : unit
+    requires { in_bounds a /\ in_bounds b }
     writes   { a, b }
-    ensures  { int32'int !a = old !b /\ int32'int !b = old !a }
+    ensures  { int32'int a = old b /\ int32'int b = old a }
   =
-    a := !a + !b;
-    b := !a - !b;
-    a := !a - !b
+    a <- a + b;
+    b <- a - b;
+    a <- a - b
 
 end
+
+(** with bitwise XOR this time *)
+
+module SwapInt32xor
+
+  use bv.BV32
+  use ref.Ref
+
+  let swap (ref a b: t) : unit
+    writes   { a, b }
+    ensures  { a = old b /\ b = old a }
+  = a <- bw_xor a b;
+    b <- bw_xor a b;
+    a <- bw_xor a b
+
+end
+

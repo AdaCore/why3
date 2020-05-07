@@ -418,7 +418,7 @@ let print_info_model info =
   else
     Mstr.empty
 
-let print_prop_decl vc_loc args info fmt k pr f =
+let print_prop_decl vc_loc vc_attrs args info fmt k pr f =
   match k with
   | Paxiom ->
       fprintf fmt "@[<hov 2>axiom %a :@ %a@]@\n@\n"
@@ -426,8 +426,9 @@ let print_prop_decl vc_loc args info fmt k pr f =
   | Pgoal ->
       let model_list = print_info_model info in
       args.printer_mapping <- { lsymbol_m = args.printer_mapping.lsymbol_m;
-				vc_term_loc = vc_loc;
-				queried_terms = model_list;
+                                vc_term_loc = vc_loc;
+                                vc_term_attrs = vc_attrs;
+                                queried_terms = model_list;
                                 list_projections = info.list_projs;
                                 list_fields = info.list_field_def;
                                 list_records = Mstr.empty;
@@ -437,11 +438,11 @@ let print_prop_decl vc_loc args info fmt k pr f =
         (print_ident info) pr.pr_name (print_fmla info) f
   | Plemma -> assert false
 
-let print_prop_decl vc_loc args info fmt k pr f =
+let print_prop_decl vc_loc vc_attrs args info fmt k pr f =
   if Mid.mem pr.pr_name info.info_syn || Spr.mem pr info.info_axs
-    then () else (print_prop_decl vc_loc args info fmt k pr f; forget_tvs info)
+    then () else (print_prop_decl vc_loc vc_attrs args info fmt k pr f; forget_tvs info)
 
-let print_decl vc_loc args info fmt d = match d.d_node with
+let print_decl vc_loc vc_attrs args info fmt d = match d.d_node with
   | Dtype ts ->
       print_ty_decl info fmt ts
   | Ddata dl ->
@@ -453,7 +454,7 @@ let print_decl vc_loc args info fmt d = match d.d_node with
       print_list nothing (print_logic_decl info) fmt dl
   | Dind _ -> unsupportedDecl d
       "alt-ergo: inductive definitions are not supported"
-  | Dprop (k,pr,f) -> print_prop_decl vc_loc args info fmt k pr f
+  | Dprop (k,pr,f) -> print_prop_decl vc_loc vc_attrs args info fmt k pr f
 
 let add_projection (csm,pjs,axs) = function
   | [Theory.MAls ls; Theory.MAls cs; Theory.MAint ind; Theory.MApr pr] ->
@@ -477,6 +478,7 @@ let print_task args ?old:_ fmt task =
     check_options (false,true) task in
   let cntexample = Inlining.get_counterexmp task in
   let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
+  let vc_attrs = (Task.task_goal_fmla task).t_attrs in
   let vc_info = {vc_inside = false; vc_loc = None; vc_func_name = None} in
   let info = {
     info_syn = Discriminate.get_syntax_map task;
@@ -504,7 +506,7 @@ let print_task args ?old:_ fmt task =
         print_decls t.Task.task_prev;
         begin match t.Task.task_decl.Theory.td_node with
         | Theory.Decl d ->
-            begin try print_decl vc_loc args info fmt d
+            begin try print_decl vc_loc vc_attrs args info fmt d
             with Unsupported s -> raise (UnsupportedDecl (d,s)) end
         | _ -> () end
     | None -> () in

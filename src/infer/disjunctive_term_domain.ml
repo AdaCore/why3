@@ -159,6 +159,9 @@ module Make(TDom : TERM_DOMAIN) = struct
        join man (meet_term man a elt) (meet_term man b elt)
     | Tbinop (Tand, a, b) -> meet_term man b (meet_term man a elt)
     | Tbinop _ -> assert false
-    | _ -> {elt with abs_values = List.map (TDom.meet_term (fst man) term) elt.abs_values }
+    | _ ->
+       let meet = TDom.meet_term (fst man) term in
+       let abs_values = List.map meet elt.abs_values  in
+       {elt with abs_values }
 
 end

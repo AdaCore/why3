@@ -27,7 +27,8 @@ while setting the `NEW_BUILD_IMAGE` variable.
 
 1.  create a virtual machine from a Debian 9 template
 2.  connect to it by `ssh`
-3.  run:
+3.  remove any unneeded package coming from the original template
+4.  run:
     ```
     apt-get update
     apt-get dist-upgrade
@@ -41,12 +42,10 @@ while setting the `NEW_BUILD_IMAGE` variable.
     usermod -aG docker gitlab-runner
     apt-get clean
     ```
-4.  remove any unneeded package coming from the original template
 5.  stop the virtual machine
-6.  take a snapshot of its storage volume
-7.  turn the snapshot into a 64-bit Debian template
-8.  restart the virtual machine
-9.  turn the virtual machine into a proper slave (see above)
+6.  turn its storage volume into a 64-bit Debian template
+7.  restart the virtual machine
+8.  turn the virtual machine into a proper slave (see above)
 
 # To update the template (from time to time)
 
@@ -66,8 +65,8 @@ while setting the `NEW_BUILD_IMAGE` variable.
 2.  connect to it by `ssh`
 3.  run:
     ```
-    swapoff
-    fdisk /dev/sda
+    swapoff -a
+    fdisk /dev/vda
     ```
 4.  delete all the partitions
 5.  create a primary partition that fills almost the whole volume except for 2GB (refuse to overwrite its signature)
@@ -76,8 +75,8 @@ while setting the `NEW_BUILD_IMAGE` variable.
 8.  reboot and reconnect to it by `ssh`
 9.  run:
     ```
-    resize2fs /dev/sda1
-    mkswap /dev/sda2
+    resize2fs /dev/vda1
+    mkswap /dev/vda2
     blkid
     ```
 10. replace the `UUID` of `/dev/sda2` inside `/etc/fstab`

@@ -21,6 +21,7 @@
     around lines 630-670
   - update the `copyright` field in `doc/conf.py` around line 50
   - update `doc/foreword.rst`
+  - update `src/trywhy3/trywhy3.html`
   - check headers, modify `misc/header.txt` and run `make headers` if needed
 
 * generate documentation
