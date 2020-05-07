@@ -13,7 +13,6 @@ open Why3
 open Pmodule
 open Cfg_ast
 open Ptree
-open Wstdlib
 
 let debug = Debug.register_flag "cfg"
   ~desc:"CFG plugin debug flag"
@@ -317,9 +316,6 @@ let decl = function
 
 let mk_expr loc e = { expr_desc = e; expr_loc = loc }
 
-let psexp_pty fmt t =
-  Ptree.sexp_of_pty t |> Sexplib.Sexp.output_hum_indent 2 stdout
-
 let rec pp_qid fmt qid =
   match qid with
   | Qident id -> Format.fprintf fmt "%s" id.id_str
@@ -334,10 +330,20 @@ let rec pp_pty fmt t =
   | _ ->
      Format.fprintf fmt "@[<pp_pty>@]"
 
-let translate_cfg (id,args,retty,pat,spec,locals,body) =
+let rec translate_cfg e =
+  let loc = e.cfg_expr_loc in
+  match e.cfg_expr_desc with
+  | CFGtrue -> mk_expr loc Etrue
+  | CFGfalse -> mk_expr loc Efalse
+  | CFGconst c -> mk_expr loc (Econst c)
+  | CFGassert(k,t) -> mk_expr loc (Eassert(k,t))
+  | CFGlabel(_id,e) -> translate_cfg e
+  | CFGgoto _id -> mk_expr loc (Etuple [])
+
+let translate_cfg (id,args,retty,pat,spec,_locals,body) =
   Debug.dprintf debug "translating cfg function `%s`@." id.id_str;
   Debug.dprintf debug "return type is `%a`@." pp_pty retty;
-  let body = mk_expr body.cfg_expr_loc (Etuple []) in
+  let body = translate_cfg body in
   let f =
       Efun(args, Some retty, pat, Ity.MaskVisible, spec, body)
   in
@@ -351,11 +357,26 @@ let translate_decl d acc =
 let translate (m,dl) =
   (m,List.fold_right translate_decl dl [])
 
-let read_channel env path file c =
-  let f : Cfg_ast.cfg_file = Cfg_lexer.parse_channel file c in
+let read_channel env _path file c =
+  let f : Cfg_ast.cfg_file =
+    try
+      Cfg_lexer.parse_channel file c
+    with Loc.Located(loc,e) ->
+      Format.eprintf "%a%a@." Loc.report_position loc Exn_printer.exn_printer e;
+      exit 1
+  in
   Debug.dprintf debug "%s parsed successfully.@." file;
   let ptree = Modules (List.map translate f) in
-  Typing.type_mlw_file env [] (file ^ ".mlw") ptree
+  try
+    Typing.type_mlw_file env [] (file ^ ".mlw") ptree
+  with
+    Loc.Located(loc,e) ->
+    let msg = Format.asprintf "%a" Exn_printer.exn_printer e in
+    Format.eprintf "%a%s@." Loc.report_position loc msg;
+    Format.eprintf "%a@."
+      (Mlw_printer.with_marker ~msg loc Mlw_printer.pp_mlw_file)
+      ptree;
+    exit 1
 
 let () =
   Env.register_format mlw_language "mlcfg" ["mlcfg"] read_channel

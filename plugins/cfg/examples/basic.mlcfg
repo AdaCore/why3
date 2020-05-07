@@ -8,7 +8,7 @@ val test (x:int) : unit
 let cfg cfgassert (x:int) : unit
   requires { x >= 0 }
   =
-  assert { false }
+  assert { 3 }
 
 let cfg cfggoto (x:int) : unit
   requires { x >= 0 }
