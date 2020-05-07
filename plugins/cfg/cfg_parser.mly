@@ -54,4 +54,6 @@ body:
 
 cfgexpr:
 | TRUE { mk_cfgexpr CFGtrue $startpos $endpos }
+| FALSE { mk_cfgexpr CFGfalse $startpos $endpos }
+| GOTO uident { mk_cfgexpr (CFGgoto $2) $startpos $endpos }
 ;

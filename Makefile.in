@@ -503,6 +503,7 @@ PLUGGENERATED = plugins/tptp/tptp_lexer.ml \
 		plugins/python/py_parser.ml plugins/python/py_parser.mli \
 		plugins/microc/mc_lexer.ml \
 		plugins/microc/mc_parser.ml plugins/microc/mc_parser.mli \
+		plugins/cfg/cfg_lexer.ml \
 		plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli \
 		plugins/parser/dimacs.ml
 
@@ -512,7 +513,7 @@ PLUG_TRANSFORM =
 PLUG_TPTP = tptp_ast tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_PYTHON = py_ast py_parser py_lexer py_main
 PLUG_MICROC = mc_ast mc_parser mc_lexer mc_printer mc_main
-PLUG_CFG = cfg_ast cfg_tokens cfg_parser cfg_main
+PLUG_CFG = cfg_ast cfg_tokens cfg_parser cfg_lexer cfg_main
 
 PLUGINS = genequlin dimacs tptp python microc cfg
 
@@ -2141,8 +2142,7 @@ clean::
 
 src/parser/parser.ml src/parser/parser.mli: $(PARSERS)
 	$(SHOW) 'Menhir $<'
-	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser \
-		$^
+	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser $^
 
 plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli: plugins/cfg/cfg_parser.mly
 	$(SHOW) 'Menhir $<'

@@ -33,6 +33,8 @@ and cfg_expr_desc =
   (** Boolean literal [False] *)
   | CFGconst of Constant.constant
   (** Constant literals *)
+  | CFGgoto of ident
+  (** goto a label *)
 (* TODO: expand *)
 
 

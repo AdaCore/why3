@@ -1285,7 +1285,7 @@ for_dir:
 
 (* Specification *)
 
-spec:
+%public spec:
 | (* epsilon *) %prec prec_no_spec  { empty_spec }
 | single_spec spec                  { spec_union $1 $2 }
 
@@ -1343,7 +1343,7 @@ return_opt:
 | (* epsilon *)       { mk_pat Pwild $startpos $endpos, None, Ity.MaskVisible }
 | COLON return_named  { let pat, ty, mask = $2 in pat, Some ty, mask }
 
-return_named:
+%public return_named:
 | LEFTPAR ret_cast RIGHTPAR
     { $2 }
 | LEFTPAR comma_list2(ret_cast) RIGHTPAR
@@ -1494,7 +1494,7 @@ ident_nq:
 | lident_nq       { $1 }
 | lident_op_nq    { $1 }
 
-uident:
+%public uident:
 | UIDENT          { mk_id $1 $startpos $endpos }
 | CORE_UIDENT     { mk_id $1 $startpos $endpos }
 

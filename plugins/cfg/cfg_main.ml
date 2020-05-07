@@ -313,41 +313,25 @@ let decl = function
     Typing.add_decl id.id_loc (Dlogic [d])
   | Mc_ast.Dprop (pk, id, t) ->
      Typing.add_decl id.id_loc (Dprop (pk, id, t))
-
-let translate dl =
-  List.iter decl dl
-
-let read_channel env path file c =
-  let f : Mc_ast.file = Mc_lexer.parse file c in
-  Debug.dprintf debug "%s parsed successfully.@." file;
-  let file = Filename.basename file in
-  let file = Filename.chop_extension file in
-  let name = Strings.capitalize file in
-  Debug.dprintf debug "building module %s.@." name;
-  Typing.open_file env path;
-  let loc = Loc.user_position file 0 0 0 in
-  Typing.open_module (mk_id ~loc name);
-  let use_import (f, m) =
-    let m = mk_id ~loc m in
-    let qid = Qdot (Qident (mk_id ~loc f), m) in
-    let decl = Ptree.Duseimport(loc,false,[(qid,None)]) in
-    Typing.add_decl loc decl in
-  List.iter use_import
-    ["int", "Int"; "ref", "Refint"; "microc", "MicroC"];
-  translate f;
-  Typing.close_module loc;
-  let mm = Typing.close_file () in
-  if path = [] && Debug.test_flag debug then begin
-    let add_m _ m modm = Ident.Mid.add m.mod_theory.Theory.th_name m modm in
-    let print_m _ m = Pmodule.print_module Format.err_formatter m in
-    Ident.Mid.iter print_m (Mstr.fold add_m mm Ident.Mid.empty)
-  end;
-  mm
  *)
 
+let translate_decl d acc =
+  match d with
+  | Dmlw_decl d -> d :: acc
+  | Dletcfg l -> acc (* (id,_,_) -> Dmeta (id,[]) *)
+
+let translate (m,dl) =
+  (m,List.fold_right translate_decl dl [])
+
+let read_channel env path file c =
+  let f : Cfg_ast.cfg_file = Cfg_lexer.parse_channel file c in
+  Debug.dprintf debug "%s parsed successfully.@." file;
+  let ptree = Modules (List.map translate f) in
+  Typing.type_mlw_file env [] (file ^ ".mlw") ptree
+
 let () =
-  Env.register_format mlw_language "CFG" ["cfg"] read_channel
-    ~desc:"CFG format"
+  Env.register_format mlw_language "mlcfg" ["mlcfg"] read_channel
+    ~desc:"whyml extending with functions implemented by control-flow-graphs"
 
 (*
 (* Add an extension of task printing *)
