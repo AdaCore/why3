@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="program_proofs.mlw"/>
+<theory name="Mult" proved="true">
+ <goal name="mult&#39;vc" expl="VC for mult" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="6"/></proof>
+ </goal>
+ <goal name="mult_commutative&#39;vc" expl="VC for mult_commutative" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="42"/></proof>
+ </goal>
+</theory>
+<theory name="Mirror" proved="true">
+ <goal name="mirror&#39;vc" expl="VC for mirror" proved="true">
+ <proof prover="0"><result status="valid" time="0.00" steps="41"/></proof>
+ </goal>
+ <goal name="mirror_involutive&#39;vc" expl="VC for mirror_involutive" proved="true">
+ <proof prover="0"><result status="valid" time="0.01" steps="54"/></proof>
+ </goal>
+ <goal name="mirror_size&#39;vc" expl="VC for mirror_size" proved="true">
+ <proof prover="0"><result status="valid" time="0.02" steps="135"/></proof>
+ </goal>
+</theory>
+<theory name="AST" proved="true">
+ <goal name="MapApp.eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
+ <proof prover="0"><result status="valid" time="0.04" steps="10"/></proof>
+ </goal>
+ <goal name="eval&#39;vc" expl="VC for eval" proved="true">
+ <proof prover="0"><result status="valid" time="0.03" steps="78"/></proof>
+ </goal>
+ <goal name="eval_list&#39;vc" expl="VC for eval_list" proved="true">
+ <proof prover="0"><result status="valid" time="0.06" steps="69"/></proof>
+ </goal>
+ <goal name="shorten&#39;vc" expl="VC for shorten" proved="true">
+ <proof prover="1"><result status="valid" time="0.20" steps="35469"/></proof>
+ </goal>
+ <goal name="optimize&#39;vc" expl="VC for optimize" proved="true">
+ <proof prover="0"><result status="valid" time="0.06" steps="148"/></proof>
+ </goal>
+ <goal name="optimize_and_filter&#39;vc" expl="VC for optimize_and_filter" proved="true">
+ <proof prover="1"><result status="valid" time="0.50" steps="95446"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
