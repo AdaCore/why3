@@ -105,9 +105,9 @@ val add_rule : Term.term -> engine -> engine
 *)
 
 
-val normalize : ?step_limit:int -> limit:int -> engine -> Term.term -> Term.term
-(** [normalize e t] normalizes the term [t] with respect to the engine
-    [e]
+val normalize : ?step_limit:int -> limit:int -> engine -> Term.term Term.Mvs.t -> Term.term -> Term.term
+(** [normalize e sigma t] normalizes the term [t] with respect to the engine
+    [e] with an initial variable environment [sigma].
 
     parameter [limit] provides a maximum number of steps for execution.
     When limit is reached, the partially reduced term is returned.

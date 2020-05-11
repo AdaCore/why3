@@ -1281,7 +1281,7 @@ let rec reconstruct c =
 
 (** iterated reductions *)
 
-let normalize ?step_limit ~limit engine t0 =
+let normalize ?step_limit ~limit engine sigma t0 =
   rec_step_limit := 0;
   let rec many_steps c n =
     match c.value_stack, c.cont_stack with
@@ -1309,7 +1309,7 @@ let normalize ?step_limit ~limit engine t0 =
       end
   in
   let c = { value_stack = [];
-            cont_stack = [Keval(t0,Mvs.empty),t0] ;
+            cont_stack = [Keval(t0,sigma),t0] ;
           }
   in
   many_steps c 0
