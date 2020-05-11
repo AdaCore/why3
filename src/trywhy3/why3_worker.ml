@@ -313,34 +313,33 @@ let why3_parse_theories theories =
     ) theories
 
 let why3_execute modules =
-  let result =
     let mods =
       Wstdlib.Mstr.fold
-	(fun _k m acc ->
-         let th = m.Pmodule.mod_theory in
-         let modname = th.Theory.th_name.Ident.id_string in
-         try
-           let rs = Pmodule.ns_find_rs m.Pmodule.mod_export ["main"]
-           in
-           let result = Pp.sprintf "%a" (Pinterp.eval_global_symbol env m) rs in
-           let loc =
-             Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc
-           in
-           (loc, modname ^ ".main() returns " ^ result)
-           :: acc
-         with Not_found -> acc)
-	modules []
-    in
-    match mods with
-    | [] -> Error "No main function found"
-    | _ ->
-       let s =
-	 List.sort
-           (fun (l1,_) (l2,_) -> Loc.compare l2 l1)
-           mods
-       in
-       (Result (List.rev_map snd s) )
-  in
+        (fun _k m acc ->
+           let th = m.Pmodule.mod_theory in
+           let mod_name = th.Theory.th_name.Ident.id_string in
+           try
+             let fun_name = "main" in
+             let rs = Pmodule.ns_find_rs m.Pmodule.mod_export [fun_name] in
+             let open Pinterp in
+             let locals, body = find_global_fundef m.Pmodule.mod_known rs in
+             let result =
+               try
+                 let res = eval_global_fundef ~rac:false env m.Pmodule.mod_known locals body in
+                 asprintf "%a@." (report_eval_result ~mod_name ~fun_name body) res
+               with Contr (ctx, term) ->
+                 asprintf "%a@." (report_cntr ~mod_name ~fun_name body) (ctx, term) in
+             let loc = Opt.get_def Loc.dummy_position th.Theory.th_name.Ident.id_loc in
+             (loc, mod_name ^ ".main() returns " ^ result)
+             :: acc
+           with Not_found -> acc)
+        modules [] in
+    let result =
+      if mods = [] then
+        Error "No main function found"
+      else
+        let s = List.sort (fun (l1,_) (l2,_) -> Loc.compare l2 l1) mods in
+        Result (List.rev_map snd s) in
   W.send result
 
 

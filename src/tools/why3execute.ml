@@ -11,7 +11,6 @@
 
 open Format
 open Why3
-open Wstdlib
 
 let usage_msg = sprintf
   "Usage: %s [options] <file> <module>.<ident>...\n\
@@ -30,12 +29,7 @@ let add_opt x =
     exit 1
 
 (* Used for real numbers approximation *)
-let real_prec = ref 0
-let real_emin = ref 0
-let real_emax = ref 0
-
-let precision () =
-  (!real_emin, !real_emax, !real_prec)
+let prec = ref None
 
 let opt_parser = ref None
 
@@ -44,7 +38,7 @@ let option_list =
   [ Key ('F', "format"), Hnd1 (AString, fun s -> opt_parser := Some s),
     "<format> select input format (default: \"why\")";
     KLong "real", Hnd1 (APair (',', AInt, APair (',', AInt, AInt)),
-      fun (i1, (i2, i3)) -> real_emin := i1; real_emax := i2; real_prec := i3),
+      fun (i1, (i2, i3)) -> prec := Some (i1, i2, i3)),
     "<emin>,<emax>,<prec> set format used for real computations\n\
      (e.g., -148,128,24 for float32)"
   ]
@@ -65,34 +59,21 @@ let do_input f =
           Env.read_file Pmodule.mlw_language ?format env file in
         mlw_files
   in
-  let do_exec (mid,name) =
-    let m = try Mstr.find mid mm with Not_found ->
-      eprintf "Module '%s' not found.@." mid;
+  let do_exec (mod_name, fun_name) =
+    try
+      let open Pinterp in
+      let {Pmodule.mod_known= known}, rs = find_global_symbol mm ~mod_name ~fun_name in
+      let locals, body = find_global_fundef known rs in
+      Opt.iter init_real !prec;
+      ( try
+          let res = eval_global_fundef ~rac:!enable_rac env known locals body in
+          printf "%a@." (report_eval_result ~mod_name ~fun_name body) res;
+          exit (match res with Pinterp.Normal _, _ -> 0 | _ -> 1);
+        with Contr (ctx, term) ->
+          printf "%a@." (report_cntr ~mod_name ~fun_name body) (ctx, term) ;
+          exit 1 )
+    with Not_found ->
       exit 1 in
-    let rs =
-      try Pmodule.ns_find_rs m.Pmodule.mod_export [name]
-      with Not_found ->
-        eprintf "Function '%s' not found in module '%s'.@." name mid;
-        exit 1 in
-(*
-    match Pdecl.find_definition m.Pmodule.mod_known rs with
-    | None ->
-      eprintf "Function '%s.%s' has no definition.@." mid name;
-      exit 1
-    | Some d ->
-*)
-      try
-        let real_param = precision () in
-        let res =
-          if real_param <> (0, 0, 0) then
-            Pinterp.eval_global_symbol ~real_param env m
-          else
-            Pinterp.eval_global_symbol env m in
-        printf "@[<hov 2>Execution of %s.%s ():@\n%a" mid name
-          res rs
-      with e when Debug.test_noflag Debug.stack_trace ->
-        printf "@\n@]@.";
-        raise e in
   Queue.iter do_exec opt_exec
 
 let () =
