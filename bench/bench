@@ -12,6 +12,11 @@ has_mpfr=`sed -n -e 's/MPFRLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 shopt -s nullglob
 
 suffix=$1
+only=${2:-"ALL"}
+
+enabled () {
+    [ "$only" = "ALL" -o "$only" = "$1" ]
+}
 
 # TODO: remove the hack about int.mlw once it has become builtin
 goods () {
@@ -317,15 +322,20 @@ rac () {
     echo >&2
 }
 
+if enabled stdlib; then
 echo "=== Checking stdlib ==="
 goods stdlib
 goods stdlib/mach
 echo ""
+fi
 
+if enabled drivers; then
 echo "=== Checking drivers ==="
 drivers drivers
 echo ""
+fi
 
+if enabled badfiles; then
 echo "=== Checking bad files ==="
 goods bench/typing/bad --parse-only
 goods bench/programs/bad-typing --parse-only
@@ -335,7 +345,9 @@ bads bench/programs/bad-typing --type-only
 warns bench/programs/warn-typing --type-only
 goods bench/typing/x-bad --type-only
 echo ""
+fi
 
+if enabled goodfiles; then
 echo "=== Checking good files ==="
 goods bench/typing/good
 goods bench/typing/x-good --parse-only
@@ -363,19 +375,27 @@ goods examples/in_progress
 plugins tests/python --type-only py
 plugins tests/microc --type-only c
 echo ""
+fi
 
+if enabled validgoals; then
 echo "=== Checking valid goals ==="
 valid_goals bench/valid
 echo ""
+fi
 
+if enabled validsplitgoals; then
 echo "=== Checking splitted valid goals ==="
 valid_goals bench/valid/split_vc "-a split_vc"
 echo ""
+fi
 
+if enabled invalidgoals; then
 echo "=== Checking invalid goals ==="
 invalid_goals bench/invalid
 echo ""
+fi
 
+if enabled rac; then
 echo "=== Checking RAC ==="
 mlw="examples/tests/rac.mlw"
 output="examples/tests/rac.out"
@@ -398,7 +418,9 @@ else
     exit 1
 fi
 echo ""
+fi
 
+if enabled execution; then
 echo "=== Checking execution ==="
 execute examples/euler001.mlw Euler001.bench
 execute examples/euler002.mlw Solve.bench
@@ -463,7 +485,9 @@ else
     echo "MPFR not installed, skipping tests"
 fi
 echo ""
+fi
 
+if enabled extraction; then
 echo "=== Checking extraction to OCaml ==="
 extract bench/extraction -D ocaml64
 extract_and_run examples/euler001 euler001.ml 1000000
@@ -477,7 +501,9 @@ echo ""
 echo "=== Checking extraction to C ==="
 extract_and_test_wmp examples/multiprecision
 echo ""
+fi
 
+if enabled replay; then
 echo "=== Checking replay (no prover) ==="
 replay bench/replay
 replay examples/stdlib --merging-only
@@ -499,7 +525,9 @@ replay examples/multiprecision "-L examples/multiprecision --merging-only"
 replay examples/prover "-L examples/prover --merging-only --debug=ignore_unused_vars"
 #replay examples/in_progress --merging-only
 echo ""
+fi
 
+if enabled list; then
 echo "=== Checking --list-* ==="
 list_stuff --list-transforms
 list_stuff --list-printers
@@ -508,9 +536,14 @@ list_stuff --list-formats
 list_stuff --list-metas
 list_stuff --list-debug-flags
 echo ""
+fi
 
+if enabled realizations; then
 echo "=== Checking realizations ==="
 exec bench/check_realizations.sh
+fi
 
+if enabled mlwprinter; then
 echo "=== Checking mlw_printer ==="
 test_mlw_printer
+fi
